@@ -1,6 +1,7 @@
+#!/usr/bin/python3
 """Tests for http module."""
 #
-# (C) Pywikibot team, 2014-2021
+# (C) Pywikibot team, 2014-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,6 +10,7 @@ import re
 import warnings
 from contextlib import suppress
 from http import HTTPStatus
+from unittest.mock import patch
 
 import requests
 
@@ -17,7 +19,7 @@ from pywikibot import config
 from pywikibot.comms import http
 from pywikibot.exceptions import FatalServerError, Server504Error
 from pywikibot.tools import PYTHON_VERSION, suppress_warnings
-from tests import join_images_path, patch
+from tests import join_images_path
 from tests.aspects import HttpbinTestCase, TestCase, require_modules, unittest
 
 
@@ -89,7 +91,7 @@ class HttpsCertificateTestCase(TestCase):
     hostname = 'testssl-expire-r2i2.disig.sk'
 
     def test_https_cert_error(self):
-        """Test if http.fetch respects disable_ssl_certificate_validation."""
+        """Test if http.fetch respects disabled ssl certificate validation."""
         with self.assertRaisesRegex(
                 FatalServerError,
                 self.CERT_VERIFY_FAILED_RE):
@@ -143,7 +145,7 @@ class TestHttpStatus(HttpbinTestCase):
     def test_server_not_found(self):
         """Test server not found exception."""
         with self.assertRaisesRegex(
-                requests.exceptions.ConnectionError,
+                ConnectionError,
                 'Max retries exceeded with url: /w/api.php'):
             http.fetch('http://ru-sib.wikipedia.org/w/api.php',
                        default_error_handling=True)
@@ -301,43 +303,6 @@ class LiveFakeUserAgentTestCase(HttpbinTestCase):
         self._test_fetch_use_fake_user_agent()
 
 
-class GetFakeUserAgentTestCase(TestCase):
-
-    """Test the deprecated get_fake_user_agent()."""
-
-    net = False
-
-    def setUp(self):
-        """Set up unit test."""
-        self.orig_fake_user_agent = config.fake_user_agent
-        super().setUp()
-
-    def tearDown(self):
-        """Tear down unit test."""
-        config.fake_user_agent = self.orig_fake_user_agent
-        super().tearDown()
-
-    def _test_config_settings(self):
-        """Test if method honours configuration toggle."""
-        with suppress_warnings(r'.*?get_fake_user_agent is deprecated'):
-            # ON: True and None in config are considered turned on.
-            config.fake_user_agent = True
-            self.assertNotEqual(http.get_fake_user_agent(), http.user_agent())
-            config.fake_user_agent = None
-            self.assertNotEqual(http.get_fake_user_agent(), http.user_agent())
-
-            # OFF: All other values won't make it return random UA.
-            config.fake_user_agent = False
-            self.assertEqual(http.get_fake_user_agent(), http.user_agent())
-            config.fake_user_agent = 'ARBITRARY'
-            self.assertEqual(http.get_fake_user_agent(), 'ARBITRARY')
-
-    @require_modules('fake_useragent')
-    def test_with_fake_useragent(self):
-        """Test method with fake_useragent module."""
-        self._test_config_settings()
-
-
 class CharsetTestCase(TestCase):
 
     """Test that HttpRequest correct handles the charsets given."""
@@ -415,7 +380,7 @@ class CharsetTestCase(TestCase):
         charset = None
         resp = CharsetTestCase._create_response(
             headers={'content-type': 'application/xml'},
-            data='<?xml version="1.0" encoding="UTF-8"?>'.encode('utf-8'))
+            data=b'<?xml version="1.0" encoding="UTF-8"?>')
         resp.encoding = http._decide_encoding(resp, charset)
         self.assertEqual('UTF-8', resp.encoding)
 
@@ -424,8 +389,8 @@ class CharsetTestCase(TestCase):
         charset = None
         resp = CharsetTestCase._create_response(
             headers={'content-type': 'application/xml'},
-            data='<?xml version="1.0" encoding="UTF-8" '
-                 'someparam="ignored"?>'.encode('utf-8'))
+            data=b'<?xml version="1.0" encoding="UTF-8" '
+                 b'someparam="ignored"?>')
         resp.encoding = http._decide_encoding(resp, charset)
         self.assertEqual('UTF-8', resp.encoding)
 
@@ -434,7 +399,7 @@ class CharsetTestCase(TestCase):
         charset = None
         resp = CharsetTestCase._create_response(
             headers={'content-type': 'application/xml'},
-            data="<?xml version='1.0' encoding='latin1'?>".encode('latin1'))
+            data=b"<?xml version='1.0' encoding='latin1'?>")
         resp.encoding = http._decide_encoding(resp, charset)
         self.assertEqual('latin1', resp.encoding)
 
@@ -556,7 +521,7 @@ class QueryStringParamsTestCase(HttpbinTestCase):
         self.assertEqual(r.status_code, HTTPStatus.OK)
 
         content = json.loads(r.text)
-        self.assertDictEqual(content['args'], {})
+        self.assertEqual(content['args'], {})
 
     def test_unencoded_params(self):
         """
@@ -575,7 +540,7 @@ class QueryStringParamsTestCase(HttpbinTestCase):
         self.assertEqual(r.status_code, HTTPStatus.OK)
 
         content = json.loads(r.text)
-        self.assertDictEqual(content['args'], {'fish&chips': 'delicious'})
+        self.assertEqual(content['args'], {'fish&chips': 'delicious'})
 
     def test_encoded_params(self):
         """
@@ -594,7 +559,7 @@ class QueryStringParamsTestCase(HttpbinTestCase):
         self.assertEqual(r.status_code, HTTPStatus.OK)
 
         content = json.loads(r.text)
-        self.assertDictEqual(content['args'], {'fish%26chips': 'delicious'})
+        self.assertEqual(content['args'], {'fish%26chips': 'delicious'})
 
 
 class DataBodyParameterTestCase(HttpbinTestCase):
@@ -623,7 +588,7 @@ class DataBodyParameterTestCase(HttpbinTestCase):
             r_data['headers'].pop(tracker_id, None)
             r_body['headers'].pop(tracker_id, None)
 
-        self.assertDictEqual(r_data, r_body)
+        self.assertEqual(r_data, r_body)
 
 
 if __name__ == '__main__':  # pragma: no cover

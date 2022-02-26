@@ -1,19 +1,24 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 This bot appends some text to all unused images and notifies uploaders.
 
 Parameters:
 
--always         Don't be asked every time.
--nouserwarning  Do not warn uploader about orphaned file.
--filetemplate:  Use a custom template on unused file pages.
--usertemplate:  Use a custom template to warn the uploader.
 -limit          Specify number of pages to work on with "-limit:n" where
                 n is the maximum number of articles to work on.
                 If not used, all pages are used.
+-always         Don't be asked every time.
+
+This script is a :py:obj:`ConfigParserBot <pywikibot.bot.ConfigParserBot>`.
+The following options can be set within a settings file which is scripts.ini
+by default::
+
+-nouserwarning  Do not warn uploader about orphaned file.
+-filetemplate:  Use a custom template on unused file pages.
+-usertemplate:  Use a custom template to warn the uploader.
 """
 #
-# (C) Pywikibot team, 2007-2021
+# (C) Pywikibot team, 2007-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -21,7 +26,12 @@ import re
 
 import pywikibot
 from pywikibot import i18n, pagegenerators
-from pywikibot.bot import AutomaticTWSummaryBot, ExistingPageBot, SingleSiteBot
+from pywikibot.bot import (
+    AutomaticTWSummaryBot,
+    ConfigParserBot,
+    ExistingPageBot,
+    SingleSiteBot,
+)
 from pywikibot.exceptions import Error, NoPageError, TranslationError
 from pywikibot.flow import Board
 
@@ -29,21 +39,39 @@ from pywikibot.flow import Board
 template_to_the_image = {
     'meta': '{{Orphan file}}',
     'test': '{{Orphan file}}',
-    'it': '{{immagine orfana}}',
+    'ar': '{{صورة يتيمة}}',
+    'arz': '{{صوره يتيمه}}',
+    'en': '{{Orphan image}}',
     'fa': '{{تصاویر بدون استفاده}}',
+    'id': '{{Berkas yatim}}',
+    'it': '{{immagine orfana}}',
+    'mk': '{{Слика сираче}}',
+    'te': '{{Orphan image}}',
     'ur': '{{غیر مستعمل تصاویر}}',
+    'uz': '{{Yetim tasvir}}',
+    'vec': '{{Imaxine orfana}}',
+    'vi': '{{Hình mồ côi}}',
 }
 
 template_to_the_user = {
-    'fa': '{{جا:اخطار به کاربر برای تصاویر بدون استفاده|%(title)s}}',
-    'ur': '{{جا:اطلاع برائے غیر مستعمل تصاویر}}',
     'test': '{{User:Happy5214/Unused file notice (user)|%(title)s}}',
+    'ar': '{{subst:تنبيه صورة يتيمة|%(title)s}}',
+    'arz': '{{subst:تنبيه صوره يتيمه|%(title)s}}',
+    'fa': '{{subst:اخطار به کاربر برای تصاویر بدون استفاده|%(title)s}}',
+    'ur': '{{subst:اطلاع برائے غیر مستعمل تصاویر|%(title)s}}',
 }
 
 
-class UnusedFilesBot(SingleSiteBot, AutomaticTWSummaryBot, ExistingPageBot):
+class UnusedFilesBot(SingleSiteBot,
+                     AutomaticTWSummaryBot,
+                     ConfigParserBot,
+                     ExistingPageBot):
 
-    """Unused files bot."""
+    """Unused files bot.
+
+    .. versionchanged:: 7.0
+       UnusedFilesBot is a ConfigParserBot
+    """
 
     summary_key = 'unusedfiles-comment'
     update_options = {
@@ -90,7 +118,7 @@ class UnusedFilesBot(SingleSiteBot, AutomaticTWSummaryBot, ExistingPageBot):
             self.append_text(image, '\n\n' + self.opt.filetemplate)
             if self.opt.nouserwarning:
                 return
-            uploader = image.get_file_history().pop(0)['user']
+            uploader = image.oldest_file_info.user
             user = pywikibot.User(image.site, uploader)
             usertalkpage = user.getUserTalkPage()
             template2uploader = self.opt.usertemplate \

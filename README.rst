@@ -1,3 +1,6 @@
+.. image:: https://github.com/wikimedia/pywikibot/actions/workflows/pywikibot-ci.yml/badge.svg?branch=master
+   :alt: Github CI
+   :target: https://github.com/wikimedia/pywikibot/actions/workflows/pywikibot-ci.yml
 .. image:: https://ci.appveyor.com/api/projects/status/xo2g4ctoom8k6yvw/branch/master?svg=true
    :alt: AppVeyor Build Status
    :target: https://ci.appveyor.com/project/ladsgroup/pywikibot-g4xqx
@@ -50,6 +53,7 @@ Or to install using PyPI (excluding scripts)
 
     pip install -U setuptools
     pip install pywikibot
+    pwb <scriptname>
 
 In addition a MediaWiki markup parser is required. Please install one of them:
 
@@ -110,7 +114,7 @@ Pywikibot provides bot classes to develop your own script easily:
 
         update_options = {
             'text': 'This is a test text',
-            'summary: 'Bot: a bot test edit with Pywikbot.'
+            'summary: 'Bot: a bot test edit with Pywikibot.'
         }
 
         def treat_page(self):

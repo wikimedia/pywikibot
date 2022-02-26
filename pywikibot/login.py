@@ -1,7 +1,6 @@
-#!/usr/bin/python
 """Library to log the bot in to a wiki account."""
 #
-# (C) Pywikibot team, 2003-2021
+# (C) Pywikibot team, 2003-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -18,23 +17,13 @@ from pywikibot import __url__, config
 from pywikibot.backports import Dict, Tuple
 from pywikibot.comms import http
 from pywikibot.exceptions import APIError, NoUsernameError
-from pywikibot.tools import (
-    ModuleDeprecationWrapper,
-    deprecated_args,
-    file_mode_checker,
-    normalize_username,
-    remove_last_args,
-)
+from pywikibot.tools import file_mode_checker, normalize_username
 
 
 try:
     import mwoauth
 except ImportError as e:
     mwoauth = e
-
-# TODO: replace these after T286867
-
-OPT_SITE_TYPE = Any  # Optional['pywikibot.site.BaseSite']
 
 
 class _PasswordFileWarning(UserWarning):
@@ -89,9 +78,8 @@ class LoginManager:
 
     """Site login manager."""
 
-    @deprecated_args(username='user', verbose=True, sysop=True)
     def __init__(self, password: Optional[str] = None,
-                 site: OPT_SITE_TYPE = None,
+                 site: Optional['pywikibot.site.BaseSite'] = None,
                  user: Optional[str] = None) -> None:
         """
         Initializer.
@@ -190,7 +178,6 @@ class LoginManager:
         # THIS IS OVERRIDDEN IN data/api.py
         raise NotImplementedError
 
-    @remove_last_args(['data'])
     def storecookiedata(self) -> None:
         """Store cookie data."""
         http.cookie_jar.save(ignore_discard=True)
@@ -369,9 +356,8 @@ class OauthLoginManager(LoginManager):
     # NOTE: Currently OauthLoginManager use mwoauth directly to complete OAuth
     # authentication process
 
-    @deprecated_args(sysop=True)
     def __init__(self, password: Optional[str] = None,
-                 site: OPT_SITE_TYPE = None,
+                 site: Optional['pywikibot.site.BaseSite'] = None,
                  user: Optional[str] = None) -> None:
         """
         Initializer.
@@ -430,8 +416,7 @@ class OauthLoginManager(LoginManager):
                 pywikibot.error(e)
                 if retry:
                     return self.login(retry=True, force=force)
-                else:
-                    return False
+                return False
         else:
             pywikibot.output('Logged in to {site} via consumer {key}'
                              .format(key=self.consumer_token[0],
@@ -472,12 +457,3 @@ class OauthLoginManager(LoginManager):
         except Exception as e:
             pywikibot.error(e)
             return None
-
-
-OAuthImpossible = ImportError
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper.add_deprecated_attr(
-    'OAuthImpossible',
-    replacement_name='ImportError',
-    since='20210423')

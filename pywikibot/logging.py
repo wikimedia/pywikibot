@@ -1,24 +1,43 @@
-"""Logging functions."""
+"""User output/logging functions.
+
+Six output functions are defined. Each requires a string argument
+All of these functions generate a message to the log file if
+logging is enabled (`-log` or `-debug` command line arguments).
+
+The functions :func:`output()`, :func:`stdout()`, :func:`warning()` and
+:func:`error()` all display a message to the user through the logger
+object; the only difference is the priority level, which can be used by
+the application layer to alter the display. The :func:`stdout()`
+function should be used only for data that is the "result" of a script,
+as opposed to information messages to the user.
+
+The function :func:`log()` by default does not display a message to the
+user, but this can be altered by using the `-verbose` command line
+option.
+
+The function :func:`debug()` only logs its messages, they are never
+displayed on the user console. :func:`debug()` takes a required second
+argument, which is a string indicating the debugging layer.
+"""
 #
-# (C) Pywikibot team, 2010-2021
+# (C) Pywikibot team, 2010-2022
 #
 # Distributed under the terms of the MIT license.
 #
 import logging
 import os
 import sys
-from typing import Any
 
 # logging levels
 from logging import CRITICAL, DEBUG, ERROR, INFO, WARNING
-from typing import AnyStr, Optional
+from typing import Any, Optional
 
 from pywikibot.backports import Callable, List
 
 
-STDOUT = 16
-VERBOSE = 18
-INPUT = 25
+STDOUT = 16  #:
+VERBOSE = 18  #:
+INPUT = 25  #:
 
 _init_routines = []  # type: List[Callable[[], Any]]
 _inited_routines = set()
@@ -41,28 +60,7 @@ def _init() -> None:
     _init_routines[:] = []  # the global variable is used with slice operator
 
 
-# User output/logging functions
-
-# Six output functions are defined. Each requires a string argument
-# All of these functions generate a message to the log file if
-# logging is enabled ("-log" or "-debug" command line arguments).
-
-# The functions output(), stdout(), warning(), and error() all display a
-# message to the user through the logger object; the only difference is the
-# priority level, which can be used by the application layer to alter the
-# display. The stdout() function should be used only for data that is
-# the "result" of a script, as opposed to information messages to the
-# user.
-
-# The function log() by default does not display a message to the user, but
-# this can be altered by using the "-verbose" command line option.
-
-# The function debug() only logs its messages, they are never displayed on
-# the user console. debug() takes a required second argument, which is a
-# string indicating the debugging layer.
-
-
-def logoutput(text: Any, decoder: Optional[str] = None,
+def logoutput(text: object, decoder: Optional[str] = None,
               newline: bool = True, _level: int = INFO, _logger: str = '',
               **kwargs: Any) -> None:
     """Format output and send to the logging module.
@@ -108,7 +106,7 @@ def logoutput(text: Any, decoder: Optional[str] = None,
     logger.log(_level, decoded_text, extra=context, **kwargs)
 
 
-def output(text: AnyStr, decoder: Optional[str] = None, newline: bool = True,
+def output(text: object, decoder: Optional[str] = None, newline: bool = True,
            **kwargs: Any) -> None:
     r"""Output a message to the user via the userinterface.
 
@@ -133,7 +131,7 @@ def output(text: AnyStr, decoder: Optional[str] = None, newline: bool = True,
     logoutput(text, decoder, newline, INFO, **kwargs)
 
 
-def stdout(text: AnyStr, decoder: Optional[str] = None, newline: bool = True,
+def stdout(text: object, decoder: Optional[str] = None, newline: bool = True,
            **kwargs: Any) -> None:
     """Output script results to the user via the userinterface.
 
@@ -151,7 +149,7 @@ def stdout(text: AnyStr, decoder: Optional[str] = None, newline: bool = True,
     logoutput(text, decoder, newline, STDOUT, **kwargs)
 
 
-def warning(text: AnyStr, decoder: Optional[str] = None,
+def warning(text: object, decoder: Optional[str] = None,
             newline: bool = True, **kwargs: Any) -> None:
     """Output a warning message to the user via the userinterface.
 
@@ -165,7 +163,7 @@ def warning(text: AnyStr, decoder: Optional[str] = None,
     logoutput(text, decoder, newline, WARNING, **kwargs)
 
 
-def error(text: AnyStr, decoder: Optional[str] = None, newline: bool = True,
+def error(text: object, decoder: Optional[str] = None, newline: bool = True,
           **kwargs: Any) -> None:
     """Output an error message to the user via the userinterface.
 
@@ -179,7 +177,7 @@ def error(text: AnyStr, decoder: Optional[str] = None, newline: bool = True,
     logoutput(text, decoder, newline, ERROR, **kwargs)
 
 
-def log(text: AnyStr, decoder: Optional[str] = None, newline: bool = True,
+def log(text: object, decoder: Optional[str] = None, newline: bool = True,
         **kwargs: Any) -> None:
     """Output a record to the log file.
 
@@ -193,7 +191,7 @@ def log(text: AnyStr, decoder: Optional[str] = None, newline: bool = True,
     logoutput(text, decoder, newline, VERBOSE, **kwargs)
 
 
-def critical(text: AnyStr, decoder: Optional[str] = None, newline: bool = True,
+def critical(text: object, decoder: Optional[str] = None, newline: bool = True,
              **kwargs: Any) -> None:
     """Output a critical record to the user via the userinterface.
 
@@ -207,7 +205,7 @@ def critical(text: AnyStr, decoder: Optional[str] = None, newline: bool = True,
     logoutput(text, decoder, newline, CRITICAL, **kwargs)
 
 
-def debug(text: AnyStr, layer: str, decoder: Optional[str] = None,
+def debug(text: object, layer: str, decoder: Optional[str] = None,
           newline: bool = True, **kwargs: Any) -> None:
     """Output a debug record to the log file.
 

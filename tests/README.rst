@@ -27,6 +27,7 @@ setup.py
 
 ::
 
+    pip install pytest
     pip install pytest-runner
     python setup.py pytest
 
@@ -92,54 +93,6 @@ env
     PYWIKIBOT_TEST_MODULES=api,site python -m unittest -v
 
 
-Travis CI
-=========
-
-After changes are published into a GitHub repository, tests may be run on
-travis-ci.com according to the configuration in .travis.yml .
-
-When changes are merged into the main repository, they are replicated to
-https://github.com/wikimedia/pywikibot , and Travis tests are run and
-published at https://travis-ci.com/github/wikimedia/pywikibot/builds .  These tests
-use the Wikimedia global (SUL) account 'Pywikibot-test', which has a password
-securely stored in .travis.yml file. See section env:global:secure.
-
-Anyone can run these tests on travis-ci.com using their own GitHub account, with
-code changes that have not been merged into the main repository. To do this:
-
-1. create a GitHub and travis-ci account
-2. fork the main GitHub repository https://github.com/wikimedia/pywikibot
-3. enable builds from the Travis profile page: https://travis-ci.com/profile
-4. push changes into the forked git repository
-5. watch the build at https://travis-ci.com/<username>/pywikibot/builds
-
-Only travis-ci builds from the main repository can access the password for the
-Wikimedia account 'Pywikibot-test'. All tests which require a logged in user
-are skipped if the travis-ci build environment does not have a password.
-
-To enable 'user' tests on travis-ci builds for a different repository, add
-a username and password to Travis:
-
-1. Go to https://travis-ci.com/<username>/pywikibot/settings
-2. Add a new variable named PYWIKIBOT_USERNAME and a value of a valid
-   Wikimedia SUL username
-3. Add another variable named USER_PASSWORD, with the private password for
-   the Wikimedia SUL username used in step 2.  Check that this
-   environment variable has "Display value in build logs" set to OFF, so
-   the password does not leak into the build logs.
-4. The next build should run tests that require a logged in user
-
-If the username does not exist on one of the Travis build sites, user tests
-will not be run on that build site.
-
-While passwords in travis-ci environment variables are not leaked in normal
-operations, you are responsible for your own passwords. If the variables contain
-single quotes it is necessary to surround them in double quotes (see also
-`travis-ci #4350 <https://github.com/travis-ci/travis-ci/issues/4350>`_).
-
-It is strongly recommended that an untrusted bot account is created for
-Travis tests, using a password that is not shared with trusted accounts.
-
 AppVeyor CI
 ===========
 
@@ -156,31 +109,6 @@ configuration in .appveyor.yml file. To do this:
 6. watch the build at https://ci.appveyor.com/<username>/pywikibot/history
 
 The 'user' tests are not yet enabled on AppVeyor builds.
-
-CircleCI
-========
-
-After changes are published into a GitHub repository, tests may be run on
-CircleCI Ubuntu servers.
-
-1. create a GitHub and CircleCI account
-2. fork the main GitHub repository
-3. create a project in circleci.com
-4. go to https://circleci.com/gh/<username>/pywikibot/edit#env-vars
-   and add the following variables:
-
-     - PYWIKIBOT_NO_USER_CONFIG=2
-     - TOXENV=py27,py34
-
-5. push changes into the forked git repository
-6. watch the build at https://circleci.com/gh/<username>/pywikibot
-
-PYWIKIBOT_NO_USER_CONFIG=2 is needed because 'python -m unittest' is run.
-
-TOXENV=py27,py34 is a workaround because CircleCI runs 'tox',
-but there is a bug in the CircleCI default 'py26' implementation.
-
-This approach does not include 'user' tests.
 
 Environment variables
 =====================
@@ -254,7 +182,7 @@ avoided.
 
 ::
 
-  from tests import patch
+  from unittest.mock import patch
 
 
   def fake_ping(url):

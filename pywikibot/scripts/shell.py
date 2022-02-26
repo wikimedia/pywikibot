@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 Spawns an interactive Python shell and imports the pywikibot library.
 
@@ -12,6 +12,9 @@ Usage:
     python pwb.py shell [args]
 
 If no arguments are given, the pywikibot library will not be loaded.
+
+.. versionchanged:: 7.0
+   moved to pywikibot.scripts
 """
 # (C) Pywikibot team, 2014-2021
 #
@@ -52,7 +55,8 @@ if __name__ == '__main__':
         import platform
         import subprocess
         subprocess.run('title Python {} Shell'
-                       .format(platform.python_version()), shell=True)
+                       .format(platform.python_version()),
+                       shell=True, check=True)
         del subprocess
         del platform
     args = []

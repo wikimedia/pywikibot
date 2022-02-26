@@ -21,12 +21,7 @@ import pywikibot
 from pywikibot import config
 from pywikibot.backports import Dict, List, Tuple
 from pywikibot.exceptions import FamilyMaintenanceWarning, UnknownFamilyError
-from pywikibot.tools import (
-    ModuleDeprecationWrapper,
-    classproperty,
-    deprecated,
-    deprecated_args,
-)
+from pywikibot.tools import classproperty, deprecated
 
 
 logger = logging.getLogger('pywiki.wiki.family')
@@ -549,10 +544,24 @@ class Family:
     # site. This value can specify this last one with (lang, family) tuple.
     shared_urlshortner_wiki = None  # type: Optional[Tuple[str, str]]
 
+    title_delimiter_and_aliases = ' _'
+    """Titles usually are delimited by a space and the alias is replaced
+    to this delimiter; e.g. "Main page" is the title with spaces as
+    delimiters but "Main_page" also works. Other families may have
+    different settings.
+
+    .. note:: The first character is used as delimiter, the others are
+       aliases.
+
+    .. warning:: This attribute is used within ``re.sub()`` method. Use
+       escape sequence if necessary
+
+    .. versionadded:: 7.0
+    """
+
     _families = {}
 
     @staticmethod
-    @deprecated_args(fatal=True)
     def load(fam: Optional[str] = None):
         """Import the named family.
 
@@ -657,11 +666,6 @@ class Family:
                 if newtitle not in cr_template_tuple:
                     cr_set.add(newtitle)
         self._catredirtemplates[code] = list(cr_template_tuple) + list(cr_set)
-
-    @deprecated('site.category_redirects()', since='20170608')
-    def get_cr_templates(self, code, fallback):
-        """DEPRECATED: Build list of category redirect templates."""
-        self._get_cr_templates(code, fallback)
 
     def get_edit_restricted_templates(self, code):
         """Return tuple of edit restricted templates.
@@ -795,7 +799,6 @@ class Family:
         """
         raise NotImplementedError('This family does not support EventStreams')
 
-    @deprecated_args(name='title')
     def get_address(self, code, title):
         """Return the path to title using index.php with redirects disabled."""
         return '{}?title={}&redirect=no'.format(self.path(code), title)
@@ -818,12 +821,12 @@ class Family:
         return config.site_interface
 
     def from_url(self, url: str) -> Optional[str]:
-        """
-        Return whether this family matches the given url.
+        """Return whether this family matches the given url.
 
         It is first checking if a domain of this family is in the domain of
         the URL. If that is the case it's checking all codes and verifies that
-        a path generated via :py:obj:`APISite.article_path` and
+        a path generated via
+        :py:obj:`APISite.articlepath<pywikibot.site.APISite.articlepath>` and
         :py:obj:`Family.path` matches the path of the URL together with
         the hostname for that code.
 
@@ -832,13 +835,11 @@ class Family:
         determine which code applies.
 
         :param url: the URL which may contain a ``$1``. If it's missing it is
-            assumed to be at the end and if it's present nothing is allowed
-            after it.
+            assumed to be at the end.
         :return: The language code of the url. None if that url is not from
             this family.
         :raises RuntimeError: When there are multiple languages in this family
             which would work with the given URL.
-        :raises ValueError: When text is present after $1.
         """
         parsed = urlparse.urlparse(url)
         if not re.match('(https?)?$', parsed.scheme):
@@ -849,10 +850,7 @@ class Family:
             path += '?' + parsed.query
 
         # Discard $1 and everything after it
-        path, _, suffix = path.partition('$1')
-        if suffix:
-            raise ValueError('Url: {}\nText {} after the $1 placeholder is '
-                             'not supported (T111513).'.format(url, suffix))
+        path, *_ = path.partition('$1')
 
         for domain in self.domains:
             if domain in parsed.netloc:
@@ -872,6 +870,7 @@ class Family:
                 pywikibot.log('Found candidate {}'.format(site))
 
                 for iw_url in site._interwiki_urls():
+                    iw_url, *_ = iw_url.partition('{}')
                     if path.startswith(iw_url):
                         matched_sites.add(site)
                         break
@@ -1235,7 +1234,6 @@ class WikimediaOrgFamily(SingleSiteFamily, WikimediaFamily):
         return '{}.wikimedia.org'.format(cls.name)
 
 
-@deprecated_args(site=True)
 def AutoFamily(name: str, url: str):
     """
     Family that automatically loads the site configuration.
@@ -1263,8 +1261,3 @@ def AutoFamily(name: str, url: str):
 
     AutoFamily = type('AutoFamily', (SingleSiteFamily,), locals())
     return AutoFamily()
-
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper.add_deprecated_attr('WikiaFamily', replacement=FandomFamily,
-                            since='20190420')

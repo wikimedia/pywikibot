@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 Bot to add new or existing categories to pages.
 
@@ -327,7 +327,7 @@ def main(*args):
                 checked.add(pl)
 
         excludefile = codecs.open(filename, 'a', encoding=mysite.encoding())
-    except IOError:
+    except OSError:
         # File does not exist
         excludefile = codecs.open(filename, 'w', encoding=mysite.encoding())
 

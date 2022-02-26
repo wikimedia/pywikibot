@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 r"""
 This script can be used for reverting certain edits.
 
@@ -45,8 +45,8 @@ from typing import Union
 import pywikibot
 from pywikibot import i18n
 from pywikibot.bot import OptionHandler
+from pywikibot.date import format_date, formatYear
 from pywikibot.exceptions import APIError, Error
-from pywikibot.tools import deprecate_arg
 from pywikibot.tools.formatter import color_format
 
 
@@ -69,8 +69,7 @@ class BaseRevertBot(OptionHandler):
         self.user = kwargs.pop('user', self.site.username())
         super().__init__(**kwargs)
 
-    @deprecate_arg('max', 'total')
-    def get_contributions(self, total=500, ns=None):
+    def get_contributions(self, total: int = 500, ns=None):
         """Get contributions."""
         return self.site.usercontribs(user=self.user, namespaces=ns,
                                       total=total)
@@ -94,6 +93,16 @@ class BaseRevertBot(OptionHandler):
         """Callback function."""
         return 'top' in item
 
+    def local_timestamp(self, ts) -> str:
+        """Convert Timestamp to a localized timestamp string.
+
+        .. versionadded:: 7.0
+        """
+        year = formatYear(self.site.lang, ts.year)
+        date = format_date(ts.month, ts.day, self.site)
+        *_, time = str(ts).strip('Z').partition('T')
+        return ' '.join((date, year, time))
+
     def revert(self, item) -> Union[str, bool]:
         """Revert a single item."""
         page = pywikibot.Page(self.site, item['title'])
@@ -112,7 +121,7 @@ class BaseRevertBot(OptionHandler):
                 self.site, 'revertbot-revert',
                 {'revid': rev.revid,
                  'author': rev.user,
-                 'timestamp': rev.timestamp})
+                 'timestamp': self.local_timestamp(rev.timestamp)})
             if self.opt.comment:
                 comment += ': ' + self.opt.comment
 

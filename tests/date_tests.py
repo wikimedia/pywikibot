@@ -1,6 +1,7 @@
+#!/usr/bin/python3
 """Tests for the date module."""
 #
-# (C) Pywikibot team, 2012-2021
+# (C) Pywikibot team, 2012-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -49,7 +50,7 @@ class TestDateMeta(MetaTestCaseClass):
             cls.add_method(dct, 'test_' + formatname, test_method(formatname),
                            doc_suffix='using {} format'.format(formatname))
 
-        return super(TestDateMeta, cls).__new__(cls, name, bases, dct)
+        return super().__new__(cls, name, bases, dct)
 
 
 class TestDate(TestCase, metaclass=TestDateMeta):

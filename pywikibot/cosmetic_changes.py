@@ -1,4 +1,3 @@
-#!/usr/bin/python
 """
 This module can do slight modifications to tidy a wiki page's source code.
 
@@ -51,14 +50,14 @@ or by adding a list to the given one::
                                      'your_script_name_2']
 """
 #
-# (C) Pywikibot team, 2006-2021
+# (C) Pywikibot team, 2006-2022
 #
 # Distributed under the terms of the MIT license.
 #
 import re
-
 from enum import IntEnum
-from typing import Any, Optional, Union
+from typing import Any, Union
+from urllib.parse import urlparse, urlunparse
 
 import pywikibot
 from pywikibot import textlib
@@ -69,14 +68,7 @@ from pywikibot.textlib import (
     MultiTemplateMatchBuilder,
     _get_regexes,
 )
-from pywikibot.tools import (
-    deprecated,
-    deprecated_args,
-    first_lower,
-    first_upper,
-    issue_deprecation_warning,
-    ModuleDeprecationWrapper,
-)
+from pywikibot.tools import first_lower, first_upper
 from pywikibot.tools.chars import url2string
 
 
@@ -223,48 +215,33 @@ def _reformat_ISBNs(text: str, strict: bool = True) -> str:
 
 class CosmeticChangesToolkit:
 
-    """Cosmetic changes toolkit."""
+    """Cosmetic changes toolkit.
 
-    @deprecated_args(redirect=True, diff='show_diff', site='page')
+    .. versionchanged:: 7.0
+       `from_page()` method was removed
+    """
+
     def __init__(self, page: 'pywikibot.page.BasePage', *,
                  show_diff: bool = False,
-                 namespace: Optional[int] = None,
-                 pageTitle: Optional[str] = None,
                  ignore: IntEnum = CANCEL.ALL) -> None:
         """Initializer.
 
+        .. versionchanged:: 5.2
+           instantiate the CosmeticChangesToolkit from a page object;
+           only allow keyword arguments except for page parameter;
+           `namespace` and `pageTitle` parameters are deprecated
+
+        .. versionchanged:: 7.0
+           `namespace` and `pageTitle` parameters were removed
+
         :param page: the Page object containing the text to be modified
         :param show_diff: show difference after replacements
-        :param namespace: DEPRECATED namespace parameter
-        :param pageTitle: DEPRECATED page title parameter
         :param ignore: ignores if an error occurred and either skips the page
             or only that method. It can be set one of the CANCEL constants
         """
-        if isinstance(page, pywikibot.BaseSite):
-            self.site = page
-            self.title = pageTitle
-
-            class_name = type(self).__name__
-            if self.title is None:
-                raise ValueError('Page title required for ' + class_name)
-
-            try:
-                self.namespace = self.site.namespaces.resolve(namespace).pop(0)
-            except (KeyError, TypeError, IndexError):
-                raise ValueError('{} needs a valid namespace'
-                                 .format(class_name))
-            issue_deprecation_warning(
-                'site parameter of ' + class_name,
-                'a pywikibot.Page object as first parameter',
-                since='20201102')
-        else:
-            if namespace is not None or pageTitle is not None:
-                raise TypeError(
-                    "'namespace' and 'pageTitle' arguments are invalid with "
-                    'a given Page object')
-            self.site = page.site
-            self.title = page.title()
-            self.namespace = page.namespace()
+        self.site = page.site
+        self.title = page.title()
+        self.namespace = page.namespace()
 
         self.show_diff = show_diff
         self.template = (self.namespace == 10)
@@ -296,28 +273,6 @@ class CosmeticChangesToolkit:
         ]
         if stdnum_isbn:
             self.common_methods.append(self.fix_ISBN)
-
-    @property  # type: ignore[misc]
-    @deprecated('show_diff', since='20200415')
-    def diff(self) -> bool:
-        """CosmeticChangesToolkit.diff attribute getter."""
-        return self.show_diff
-
-    @diff.setter  # type: ignore[misc]
-    @deprecated('show_diff', since='20200415')
-    def diff(self, value: bool) -> None:
-        """CosmeticChangesToolkit.diff attribute setter."""
-        self.show_diff = bool(value)
-
-    @classmethod
-    @deprecated('CosmeticChangesToolkit with pywikibot.Page object',
-                since='20200415')
-    @deprecated_args(diff='show_diff')
-    def from_page(cls, page: 'pywikibot.page.BasePage',
-                  show_diff: bool = False,
-                  ignore: IntEnum = CANCEL.ALL) -> 'CosmeticChangesToolkit':
-        """Create toolkit based on the page."""
-        return cls(page, show_diff=show_diff, ignore=ignore)
 
     def safe_execute(self, method: Callable[[str], str], text: str) -> str:
         """Execute the method and catch exceptions if enabled."""
@@ -563,11 +518,7 @@ class CosmeticChangesToolkit:
             trailingChars = match.group('linktrail')
             newline = match.group('newline')
 
-            try:
-                is_interwiki = self.site.isInterwikiLink(titleWithSection)
-            except ValueError:  # T111513
-                is_interwiki = True
-
+            is_interwiki = self.site.isInterwikiLink(titleWithSection)
             if is_interwiki:
                 return match.group()
 
@@ -870,6 +821,7 @@ class CosmeticChangesToolkit:
 
         exceptions = ['comment', 'math', 'nowiki', 'pre', 'startspace',
                       'syntaxhighlight']
+
         # link to the wiki working on
         # Only use suffixes for article paths
         for suffix in self.site._interwiki_urls(True):
@@ -878,31 +830,43 @@ class CosmeticChangesToolkit:
                 https_url = None
             else:
                 https_url = self.site.base_url(suffix, 'https')
+
             # compare strings without the protocol, if they are empty support
             # also no prefix (//en.wikipedia.org/…)
-            if https_url is not None and http_url[4:] == https_url[5:]:
-                urls = ['(?:https?:)?' + re.escape(http_url[5:])]
+            http = urlparse(http_url)
+            https = urlparse(https_url)
+            if https_url is not None and http.netloc == https.netloc:
+                urls = ['(?:https?:)?'
+                        + re.escape(urlunparse(('', *http[1:])))]
             else:
                 urls = [re.escape(url) for url in (http_url, https_url)
                         if url is not None]
+
             for url in urls:
-                # Only include links which don't include the separator as
-                # the wikilink won't support additional parameters
-                separator = '?'
-                if '?' in suffix:
-                    separator += '&'
+                # unescape {} placeholder
+                url = url.replace(r'\{\}', '{title}')
+
+                # Only include links which don't include the separator
+                # as the wikilink won't support additional parameters
+                separator = '?&' if '?' in suffix else '?'
+
                 # Match first a non space in the title to prevent that multiple
                 # spaces at the end without title will be matched by it
+                title_regex = (r'(?P<link>[^{sep}]+?)'
+                               r'(\s+(?P<title>[^\s].*?))'
+                               .format(sep=separator))
+                url_regex = r'\[\[?{url}?\s*\]\]?'.format(url=url)
                 text = textlib.replaceExcept(
                     text,
-                    r'\[\[?' + url + r'(?P<link>[^' + separator + r']+?)'
-                    r'(\s+(?P<title>[^\s].*?))?\s*\]\]?',
+                    url_regex.format(title=title_regex),
                     replace_link, exceptions, site=self.site)
+
         # external link in/starting with double brackets
         text = textlib.replaceExcept(
             text,
             r'\[\[(?P<url>https?://[^\]]+?)\]\]?',
             r'[\g<url>]', exceptions, site=self.site)
+
         # external link and description separated by a pipe, with
         # whitespace in front of the pipe, so that it is clear that
         # the dash is not a legitimate part of the URL.
@@ -910,6 +874,7 @@ class CosmeticChangesToolkit:
             text,
             r'\[(?P<url>https?://[^\|\] \r\n]+?) +\| *(?P<label>[^\|\]]+?)\]',
             r'[\g<url> \g<label>]', exceptions)
+
         # dash in external link, where the correct end of the URL can
         # be detected from the file extension. It is very unlikely that
         # this will cause mistakes.
@@ -1128,23 +1093,3 @@ class CosmeticChangesToolkit:
     def fix_ISBN(self, text: str) -> str:
         """Hyphenate ISBN numbers."""
         return _reformat_ISBNs(text, strict=self.ignore != CANCEL.MATCH)
-
-
-_CANCEL_ALL = CANCEL.ALL
-_CANCEL_PAGE = CANCEL.PAGE
-_CANCEL_METHOD = CANCEL.METHOD
-_CANCEL_MATCH = CANCEL.MATCH
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper.add_deprecated_attr('CANCEL_ALL', _CANCEL_ALL,
-                            replacement_name='CANCEL.ALL',
-                            since='20210528')
-wrapper.add_deprecated_attr('CANCEL_PAGE', _CANCEL_PAGE,
-                            replacement_name='CANCEL.PAGE',
-                            since='20210528')
-wrapper.add_deprecated_attr('CANCEL_METHOD', _CANCEL_METHOD,
-                            replacement_name='CANCEL.METHOD',
-                            since='20210528')
-wrapper.add_deprecated_attr('CANCEL_MATCH', _CANCEL_MATCH,
-                            replacement_name='CANCEL.MATCH',
-                            since='20210528')

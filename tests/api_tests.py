@@ -1,6 +1,7 @@
+#!/usr/bin/python3
 """API test module."""
 #
-# (C) Pywikibot team, 2007-2021
+# (C) Pywikibot team, 2007-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -8,6 +9,7 @@ import datetime
 import types
 from collections import defaultdict
 from contextlib import suppress
+from unittest.mock import patch
 
 import pywikibot.family
 import pywikibot.login
@@ -17,7 +19,6 @@ from pywikibot.data import api
 from pywikibot.exceptions import APIError, NoUsernameError
 from pywikibot.throttle import Throttle
 from pywikibot.tools import suppress_warnings
-from tests import patch
 from tests.aspects import (
     DefaultDrySiteTestCase,
     DefaultSiteTestCase,
@@ -97,20 +98,8 @@ class TestParamInfo(DefaultSiteTestCase):
 
     def test_init_query_first(self):
         """Test init where it first adds query and then main."""
-        def patched_generate_submodules(modules):
-            # Change the query such that query is handled before main
-            modules = set(modules)
-            if 'main' in modules:
-                assert 'query' in modules
-                modules.discard('main')
-                modules = list(modules) + ['main']
-            else:
-                assert 'query' not in modules
-            original_generate_submodules(modules)
         pi = api.ParamInfo(self.site, {'query', 'main'})
         self.assertIsEmpty(pi)
-        original_generate_submodules = pi._generate_submodules
-        pi._generate_submodules = patched_generate_submodules
         pi._init()
         self.assertIn('main', pi._paraminfo)
         self.assertIn('query', pi._paraminfo)
@@ -842,7 +831,7 @@ class TestLazyLoginBase(TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up steward Family."""
-        super(TestLazyLoginBase, cls).setUpClass()
+        super().setUpClass()
         fam = pywikibot.family.AutoFamily(
             'steward', 'https://steward.wikimedia.org/w/api.php')
         cls.site = pywikibot.site.APISite('steward', fam)

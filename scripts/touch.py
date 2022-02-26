@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 This bot goes over multiple pages of a wiki, and edits them without changes.
 
@@ -59,9 +59,8 @@ class TouchBot(MultipleSitesBot):
         except LockedPageError:
             pywikibot.error('Page {} is locked.'
                             .format(page.title(as_link=True)))
-        except PageSaveRelatedError:
-            pywikibot.error('Page {} not saved.'
-                            .format(page.title(as_link=True)))
+        except PageSaveRelatedError as e:
+            pywikibot.error('Page {} not saved:\n{}'.format(page, e.args))
 
 
 class PurgeBot(MultipleSitesBot):

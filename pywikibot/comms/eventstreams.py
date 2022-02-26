@@ -7,7 +7,7 @@ This module requires sseclient to be installed::
 
     pip install sseclient
 
-*New in version 3.0.*
+.. versionadded:: 3.0
 """
 #
 # (C) Pywikibot team, 2017-2021
@@ -15,7 +15,6 @@ This module requires sseclient to be installed::
 # Distributed under the terms of the MIT license.
 #
 import json
-import socket
 from functools import partial
 from typing import Optional
 
@@ -25,7 +24,6 @@ from requests.packages.urllib3.exceptions import ProtocolError
 from requests.packages.urllib3.util.response import httplib
 
 from pywikibot import Site, Timestamp, config, debug, warning
-from pywikibot.tools import deprecated_args
 
 
 try:
@@ -76,7 +74,6 @@ class EventStreams:
     >>> del stream
     """
 
-    @deprecated_args(stream='streams')
     def __init__(self, **kwargs):
         """Initializer.
 
@@ -297,7 +294,7 @@ class EventStreams:
                         "Install it with 'pip install \"sseclient>=0.0.18\"'")
             try:
                 event = next(self.source)
-            except (ProtocolError, socket.error, httplib.IncompleteRead) as e:
+            except (ProtocolError, OSError, httplib.IncompleteRead) as e:
                 warning('Connection error: {}.\n'
                         'Try to re-establish connection.'.format(e))
                 del self.source

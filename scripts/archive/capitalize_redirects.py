@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 Bot to create capitalized redirects.
 
@@ -31,7 +31,6 @@ Example:
 #
 import pywikibot
 from pywikibot import i18n, pagegenerators
-from pywikibot.backports import Tuple
 from pywikibot.bot import (
     ExistingPageBot,
     FollowRedirectPageBot,

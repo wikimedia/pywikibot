@@ -25,10 +25,11 @@ build paths relative to base_dir:
  - datafilepath
  - shortpath
 
-*Renamed in version 6.2*
+.. versionchanged 6.2::
+   config2 was renamed to config
 """
 #
-# (C) Pywikibot team, 2003-2021
+# (C) Pywikibot team, 2003-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -49,10 +50,17 @@ from warnings import warn
 from zipfile import ZipFile, is_zipfile
 
 from pywikibot.__metadata__ import __version__ as pwb_version
-from pywikibot.backports import (DefaultDict, Dict, FrozenSet, List, Mapping,
-                                 Tuple, removesuffix)
+from pywikibot.backports import (
+    DefaultDict,
+    Dict,
+    FrozenSet,
+    List,
+    Mapping,
+    Tuple,
+    removesuffix,
+)
 from pywikibot.logging import error, output, warning
-from pywikibot.tools import deprecated, issue_deprecation_warning
+from pywikibot.tools import deprecated
 
 
 _DabComDict = DefaultDict[str, Dict[str, str]]
@@ -63,22 +71,6 @@ OSWIN32 = (sys.platform == 'win32')
 
 if OSWIN32:
     import winreg
-
-
-# Normalize old PYWIKIBOT2 environment variables and issue a deprecation warn.
-for env_name in (
-    'PYWIKIBOT2_DIR', 'PYWIKIBOT2_DIR_PWB', 'PYWIKIBOT2_NO_USER_CONFIG',
-):
-    if env_name not in environ:
-        continue
-    env_value = environ[env_name]
-    new_env_name = env_name.replace('PYWIKIBOT2_', 'PYWIKIBOT_')
-    del environ[env_name]
-    if new_env_name not in environ:
-        environ[new_env_name] = env_value
-    issue_deprecation_warning(
-        env_name + ' environment variable', new_env_name, 0, since='20180803')
-
 
 # This frozen set should contain all imported modules/variables, so it must
 # occur directly after the imports. At that point globals() only contains the
@@ -174,8 +166,6 @@ fake_user_agent_default = {'reflinks': False, 'weblinkchecker': False}
 # Example: {'problematic.site.example': True,
 #           'prefers.specific.ua.example': 'snakeoil/4.2'}
 fake_user_agent_exceptions = {}  # type: Dict[str, Union[bool, str]]
-# This following option is deprecated in favour of finer control options above.
-fake_user_agent = False
 
 # The default interface for communicating with the site
 # currently the only defined interface is 'APISite', so don't change this!
@@ -347,10 +337,8 @@ def get_base_dir(test_directory: Optional[str] = None) -> str:
                 elif win_version in (6, 10):
                     sub_dir = ['AppData', 'Roaming']
                 else:
-                    raise WindowsError(  # type: ignore[name-defined]
-                        'Windows version {} not supported yet.'
-                        .format(win_version)
-                    )
+                    raise OSError('Windows version {} not supported yet.'
+                                  .format(win_version))
                 base_dir_cand.extend([[home] + sub_dir + ['Pywikibot'],
                                      [home] + sub_dir + ['pywikibot']])
             else:
@@ -400,7 +388,7 @@ for arg in sys.argv[1:]:
 family_files = {}
 
 
-@deprecated('family_files[family_name] = file_path', since='20210305')
+@deprecated('family_files[family_name] = file_path', since='6.0.0')
 def register_family_file(family_name: str, file_path: str) -> None:
     """Register a single family class file.
 
@@ -410,14 +398,27 @@ def register_family_file(family_name: str, file_path: str) -> None:
     family_files[family_name] = file_path
 
 
-def register_families_folder(folder_path: str) -> None:
+def register_families_folder(folder_path: str,
+                             not_exists_ok: bool = False) -> None:
     """Register all family class files contained in a directory.
+
+    .. versionadded:: 7.0
+       The *not_exists_ok* parameter
 
     :param folder_path: The path of a folder containing family files.
         The families may also be inside a zip archive structure.
+    :param not_exists_ok: When true, ignore FileNotFoundError
+    :raises FileNotFoundError: Family folder does not exist
     :raises NotADirectoryError: folder_path is not a directory
     """
     suffix = '_family.py'
+
+    if not os.path.exists(folder_path):
+        if not_exists_ok:
+            return
+        raise FileNotFoundError('Family folder {!r} does not exist'
+                                .format(folder_path))
+
     if os.path.isdir(folder_path):
         for file_name in os.listdir(folder_path):
             if file_name.endswith(suffix):
@@ -450,6 +451,9 @@ def register_families_folder(folder_path: str) -> None:
 # Get the names of all known families, and initialize with empty dictionaries.
 # ‘families/’ is a subdirectory of the directory in which config.py is found.
 register_families_folder(os.path.join(os.path.dirname(__file__), 'families'))
+# ‘families/’ can also be stored in the base directory
+register_families_folder(os.path.join(base_dir, 'families'),
+                         not_exists_ok=True)
 
 
 # ############# USER INTERFACE SETTINGS ##############
@@ -539,7 +543,7 @@ tkvertsize = 1000
 # ############# EXTERNAL EDITOR SETTINGS ##############
 # The command for the editor you want to use. If set to None, a simple Tkinter
 # editor will be used.
-editor = os.environ.get('EDITOR', None)
+editor = os.environ.get('EDITOR')
 
 # Warning: DO NOT use an editor which doesn't support Unicode to edit pages!
 # You will BREAK non-ASCII symbols!
@@ -587,15 +591,18 @@ debug_log = []  # type: List[str]
 # ############# EXTERNAL SCRIPT PATH SETTINGS ##############
 # Set your own script path to lookup for your script files.
 #
-# Your private script path must be located inside the
-# framework folder, subfolders must be delimited by '.'.
-# every folder must contain an (empty) __init__.py file.
+# Your private script path is relative to your base directory.
+# Subfolders must be delimited by '.'. every folder must contain
+# an (empty) __init__.py file.
 #
 # The search order is
 # 1. user_script_paths in the given order
 # 2. scripts/userscripts
 # 3. scripts
 # 4. scripts/maintenance
+# 5. pywikibot/scripts
+#
+# 2. - 4. are available in directory mode only
 #
 # sample:
 # user_script_paths = ['scripts.myscripts']
@@ -909,7 +916,7 @@ def _win32_extension_command(extension: str) -> Optional[str]:
             # Remove any trailing character, which should be a quote or space
             # and then remove all whitespace.
             return cmd[:-1].strip()
-    except WindowsError as e:  # type: ignore[name-defined]
+    except OSError as e:
         # Catch any key lookup errors
         output('Unable to detect program for file extension "{}": {!r}'
                .format(extension, e))
@@ -1126,23 +1133,24 @@ if __name__ == '__main__':
             _all = False
         else:
             warning('Unknown arg {} ignored'.format(_arg))
+
     for _name in sorted(globals().keys()):
-        if _name[0] != '_':
-            if not type(globals()[_name]) in [types.FunctionType,
-                                              types.ModuleType]:
-                if _all or _name in _modified:
-                    _value = globals()[_name]
-                    if _name in _private_values and _value:
-                        if isinstance(_value, dict):
-                            _value = '{ ...xxxxxxxx... }'
-                        elif hasattr(_value, '__dict__'):
-                            _value = (_value.__class__.__name__
-                                      + '( ...xxxxxxxx... )')
-                        else:
-                            _value = repr('xxxxxxxx')
-                    else:
-                        _value = repr(_value)
-                    output('{}={}'.format(_name, _value))
+        if _name[0] != '_' \
+           and not type(globals()[_name]) in [types.FunctionType,
+                                              types.ModuleType] \
+           and (_all or _name in _modified):
+            _value = globals()[_name]
+
+            if _name not in _private_values or not _value:
+                _value = repr(_value)
+            elif isinstance(_value, dict):
+                _value = '{ ...xxxxxxxx... }'
+            elif hasattr(_value, '__dict__'):
+                _value = (_value.__class__.__name__
+                          + '( ...xxxxxxxx... )')
+            else:
+                _value = repr('xxxxxxxx')
+            output('{}={}'.format(_name, _value))
 
 # cleanup all locally-defined variables
 for __var in list(globals().keys()):

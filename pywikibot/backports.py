@@ -1,11 +1,12 @@
 """This module contains backports to support older Python versions."""
 #
-# (C) Pywikibot team, 2014-2021
+# (C) Pywikibot team, 2014-2022
 #
 # Distributed under the terms of the MIT license.
 #
 import sys
 from typing import Any
+
 
 PYTHON_VERSION = sys.version_info[:3]
 
@@ -44,13 +45,11 @@ else:
 
 
 # typing
-if PYTHON_VERSION < (3, 5, 2):
-    from typing import Dict as DefaultDict
-elif PYTHON_VERSION < (3, 9):
+if PYTHON_VERSION < (3, 9):
     from typing import DefaultDict  # type: ignore[misc]
 else:
     from collections import (  # type: ignore[misc] # noqa: N812
-        defaultdict as DefaultDict
+        defaultdict as DefaultDict,
     )
 
 
@@ -63,8 +62,10 @@ else:
 
 if PYTHON_VERSION < (3, 9):
     from typing import (
+        Container,
         Dict,
         FrozenSet,
+        Generator,
         Iterable,
         Iterator,
         List,
@@ -74,15 +75,24 @@ if PYTHON_VERSION < (3, 9):
         Sequence,
         Set,
         Tuple,
+        Type,
     )
 else:
-    from collections.abc import Iterable, Iterator, Mapping, Sequence
+    from collections.abc import (
+        Container,
+        Generator,
+        Iterable,
+        Iterator,
+        Mapping,
+        Sequence,
+    )
     from re import Match, Pattern
     Dict = dict  # type: ignore[misc]
     FrozenSet = frozenset  # type: ignore[misc]
     List = list  # type: ignore[misc]
     Set = set  # type: ignore[misc]
     Tuple = tuple  # type: ignore[assignment]
+    Type = type
 
 
 if PYTHON_VERSION < (3, 9, 2):

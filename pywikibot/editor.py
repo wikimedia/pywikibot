@@ -1,7 +1,6 @@
-#!/usr/bin/python
 """Text editor class for your favourite editor."""
 #
-# (C) Pywikibot team, 2004-2020
+# (C) Pywikibot team, 2004-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -69,7 +68,7 @@ class TextEditor:
 
     @staticmethod
     def _concat(command: Sequence[str]) -> str:
-        return ' '.join("'{}'".format(part) if ' ' in part else part
+        return ' '.join('{!r}'.format(part) if ' ' in part else part
                         for part in command)
 
     def edit(self, text: str, jumpIndex: Optional[int] = None,
@@ -95,7 +94,7 @@ class TextEditor:
                     tempFile.write(text)
                 creationDate = os.stat(tempFilename).st_mtime
                 cmd = self._command(tempFilename, text, jumpIndex)
-                subprocess.run(cmd, shell=platform == 'win32')
+                subprocess.run(cmd, shell=platform == 'win32', check=True)
                 lastChangeDate = os.stat(tempFilename).st_mtime
                 if lastChangeDate == creationDate:
                     # Nothing changed

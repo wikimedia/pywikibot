@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 r"""
 This script transfers pages from a source wiki to a target wiki.
 

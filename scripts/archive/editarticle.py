@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 Edit a Wikipedia article with your favourite editor.
 
@@ -34,7 +34,6 @@ import tempfile
 
 import pywikibot
 from pywikibot import i18n
-from pywikibot.backports import Tuple
 from pywikibot.editor import TextEditor
 from pywikibot.exceptions import EditConflictError, NoPageError
 

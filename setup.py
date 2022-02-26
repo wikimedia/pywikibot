@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 """Installer script for Pywikibot framework.
 
@@ -6,10 +7,13 @@ To create a new distribution:
 
 - replace the developmental version string in ``pywikibot.__metadata__.py``
   by the corresponing final release
+- copy pwb.py to pywikibot/scripts folder
+- copy scripts/i18n/pywikibot folder to pywikibot/scripts/i18n/pywikibot
 - create the package with::
 
     python setup.py sdist
 
+- remove copied files
 - push the change to Gerrit and merge it to the repository
 - upload the package to PyPy by::
 
@@ -24,7 +28,7 @@ To create a new distribution:
 - upload this patchset to Gerrit and merge it.
 """
 #
-# (C) Pywikibot team, 2009-2021
+# (C) Pywikibot team, 2009-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -32,23 +36,23 @@ To create a new distribution:
 import os
 import sys
 
-from pkg_resources import parse_version, safe_version
-from setuptools import setup
-
-
-PYTHON_VERSION = sys.version_info[:3]
 
 VERSIONS_REQUIRED_MESSAGE = """
 Pywikibot is not available on:
 {version}
 
-This version of Pywikibot only supports Python 3.5+.
+This version of Pywikibot only supports Python 3.5.3+.
 """
+
+try:
+    from setuptools import setup
+except SyntaxError:
+    raise RuntimeError(VERSIONS_REQUIRED_MESSAGE.format(version=sys.version))
 
 
 def python_is_supported():
     """Check that Python is supported."""
-    return PYTHON_VERSION >= (3, 5, 0)
+    return sys.version_info[:3] >= (3, 5, 3)
 
 
 if not python_is_supported():  # pragma: no cover
@@ -59,13 +63,13 @@ if not python_is_supported():  # pragma: no cover
 extra_deps = {
     # Core library dependencies
     'eventstreams': ['sseclient!=0.0.23,!=0.0.24,>=0.0.18'],
-    'isbn': ['python-stdnum>=1.16'],
+    'isbn': ['python-stdnum>=1.17'],
     'Graphviz': ['pydot>=1.2'],
     'Google': ['google>=1.7'],
     'mwparserfromhell': ['mwparserfromhell>=0.5.0'],
     'wikitextparser': ['wikitextparser>=0.47.5; python_version < "3.6"',
                        'wikitextparser>=0.47.0; python_version >= "3.6"'],
-    'mysql': ['PyMySQL >= 0.6.7, < 1.0.0 ; python_version < "3.6"',
+    'mysql': ['PyMySQL >= 0.7.11, < 1.0.0 ; python_version < "3.6"',
               'PyMySQL >= 1.0.0 ; python_version >= "3.6"'],
     'Tkinter': [  # vulnerability found in Pillow<8.1.1
         'Pillow>=8.1.1;python_version>="3.6"',
@@ -75,8 +79,9 @@ extra_deps = {
     'http': ['fake_useragent'],
     'flake8': [  # Due to incompatibilities between packages the order matters.
         'flake8>=3.9.1',
+        'darglint',
         'pydocstyle>=4.0.0',
-        'flake8-bugbear!=21.4.1',
+        'flake8-bugbear!=21.4.1,!=21.11.28',
         'flake8-coding',
         'flake8-colors>=0.1.9',
         'flake8-comprehensions>=3.1.4; python_version >= "3.8"',
@@ -114,8 +119,9 @@ dependencies = [
     # PEP 440
     'setuptools>=48.0.0 ; python_version >= "3.10"',
     'setuptools>=38.5.2 ; python_version >= "3.7" and python_version < "3.10"',
-    'setuptools>=20.8.1 ; python_version >= "3.6" and python_version < "3.7"',
-    'setuptools>=20.8.1, !=50.0.0, <50.2.0 ; python_version < "3.6"',
+    'setuptools>=20.8.1, <59.7.0 '
+    '; python_version >= "3.6" and python_version < "3.7"',
+    'setuptools>=20.8.1, !=50.0.0, <51.0.0 ; python_version < "3.6"',
 ]
 # in addition either mwparserfromhell or wikitextparser is required
 
@@ -163,6 +169,8 @@ def get_validated_version():  # pragma: no cover
     # validate version for sdist
     from contextlib import suppress
     from subprocess import PIPE, run
+
+    from pkg_resources import parse_version, safe_version
     try:
         tags = run(['git', 'tag'], check=True, stdout=PIPE,
                    universal_newlines=True).stdout.splitlines()
@@ -248,19 +256,83 @@ def main():
         maintainer_email=metadata.__maintainer_email__,
         license=metadata.__license__,
         packages=get_packages(name),
-        python_requires='>=3.5.0',
+        python_requires='>=3.5.3',
         install_requires=dependencies,
         extras_require=extra_deps,
         url=metadata.__url__,
         download_url=metadata.__download_url__,
         test_suite='tests.collector',
         tests_require=test_deps,
+        include_package_data=True,
+        entry_points={
+            'console_scripts': [
+                'pwb = pywikibot.scripts.pwb:run',
+            ],
+        },
         classifiers=[
             'Development Status :: 5 - Production/Stable',
             'Environment :: Console',
             'Intended Audience :: Developers',
             'License :: OSI Approved :: MIT License',
+            'Natural Language :: Afrikaans',
+            'Natural Language :: Arabic',
+            'Natural Language :: Basque',
+            'Natural Language :: Bengali',
+            'Natural Language :: Bosnian',
+            'Natural Language :: Bulgarian',
+            'Natural Language :: Cantonese',
+            'Natural Language :: Catalan',
+            'Natural Language :: Chinese (Simplified)',
+            'Natural Language :: Chinese (Traditional)',
+            'Natural Language :: Croatian',
+            'Natural Language :: Czech',
+            'Natural Language :: Danish',
+            'Natural Language :: Dutch',
             'Natural Language :: English',
+            'Natural Language :: Esperanto',
+            'Natural Language :: Finnish',
+            'Natural Language :: French',
+            'Natural Language :: Galician',
+            'Natural Language :: German',
+            'Natural Language :: Greek',
+            'Natural Language :: Hebrew',
+            'Natural Language :: Hindi',
+            'Natural Language :: Hungarian',
+            'Natural Language :: Icelandic',
+            'Natural Language :: Indonesian',
+            'Natural Language :: Irish',
+            'Natural Language :: Italian',
+            'Natural Language :: Japanese',
+            'Natural Language :: Javanese',
+            'Natural Language :: Korean',
+            'Natural Language :: Latin',
+            'Natural Language :: Latvian',
+            'Natural Language :: Lithuanian',
+            'Natural Language :: Macedonian',
+            'Natural Language :: Malay',
+            'Natural Language :: Marathi',
+            'Natural Language :: Nepali',
+            'Natural Language :: Norwegian',
+            'Natural Language :: Panjabi',
+            'Natural Language :: Persian',
+            'Natural Language :: Polish',
+            'Natural Language :: Portuguese',
+            'Natural Language :: Portuguese (Brazilian)',
+            'Natural Language :: Romanian',
+            'Natural Language :: Russian',
+            'Natural Language :: Serbian',
+            'Natural Language :: Slovak',
+            'Natural Language :: Slovenian',
+            'Natural Language :: Spanish',
+            'Natural Language :: Swedish',
+            'Natural Language :: Tamil',
+            'Natural Language :: Telugu',
+            'Natural Language :: Thai',
+            'Natural Language :: Tibetan',
+            'Natural Language :: Turkish',
+            'Natural Language :: Ukrainian',
+            'Natural Language :: Urdu',
+            'Natural Language :: Vietnamese',
             'Operating System :: OS Independent',
             'Programming Language :: Python',
             'Programming Language :: Python :: 3',
@@ -271,7 +343,9 @@ def main():
             'Programming Language :: Python :: 3.8',
             'Programming Language :: Python :: 3.9',
             'Programming Language :: Python :: 3.10',
+            'Programming Language :: Python :: 3.11',
             'Programming Language :: Python :: Implementation :: CPython',
+            'Programming Language :: Python :: Implementation :: PyPy',
             'Topic :: Internet :: WWW/HTTP :: Dynamic Content :: Wiki',
             'Topic :: Software Development :: Libraries :: Python Modules',
             'Topic :: Utilities',

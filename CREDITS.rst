@@ -55,6 +55,7 @@ C
 ::
 
     CodeCat
+    Costa Shulyupin
     Christian List
 
 D
@@ -300,9 +301,11 @@ T
 
     Tacsipacsi
     Tgr
+    TheRogueMule
     theopolisme
     Thomas R. Koll
     ThomasV
+    timgates42
     Timo Tijhof
     Tony Thomas
     Toto Azéro

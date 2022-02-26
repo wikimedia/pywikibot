@@ -1,5 +1,9 @@
-#!/usr/bin/python
-"""Script to determine the Pywikibot version (tag, revision and date)."""
+#!/usr/bin/python3
+"""Script to determine the Pywikibot version (tag, revision and date).
+
+.. versionchanged:: 7.0
+   version script was moved to the framework scripts folder
+"""
 #
 # (C) Pywikibot team, 2007-2021
 #
@@ -70,7 +74,7 @@ def main(*args: str) -> None:
             if WMF_CACERT in text:
                 has_wikimedia_cert = True
         pywikibot.output('    certificate test: {}'
-                         .format(('ok' if has_wikimedia_cert else 'not ok')))
+                         .format('ok' if has_wikimedia_cert else 'not ok'))
     if not has_wikimedia_cert:
         pywikibot.output('  Please reinstall requests!')
 
@@ -85,15 +89,15 @@ def main(*args: str) -> None:
     settings.update(['PYWIKIBOT_DIR', 'PYWIKIBOT_DIR_PWB',
                      'PYWIKIBOT_NO_USER_CONFIG'])
     for environ_name in sorted(settings):
-        pywikibot.output('{}: {}'.format(environ_name,
-                                         os.environ.get(environ_name,
-                                                        'Not set')))
+        pywikibot.output(
+            '{}: {}'.format(environ_name,
+                            os.environ.get(environ_name, 'Not set') or "''"))
 
     pywikibot.output('Config base dir: ' + pywikibot.config.base_dir)
     for family, usernames in pywikibot.config.usernames.items():
         if not usernames:
             continue
-        pywikibot.output('Usernames for family "{}":'.format(family))
+        pywikibot.output('Usernames for family {!r}:'.format(family))
         for lang, username in usernames.items():
             pywikibot.output('\t{}: {}'.format(lang, username))
 

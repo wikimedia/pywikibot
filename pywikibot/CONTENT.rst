@@ -113,6 +113,25 @@ The contents of the package
 
 
     +----------------------------+------------------------------------------------------+
+    | scripts                    | Framework helper scripts and entry points            |
+    +============================+======================================================+
+    | generate_family_file.py    | Creates a new family file                            |
+    +----------------------------+------------------------------------------------------+
+    | generate_user_files.py     | Creates user-config.py or user-fixes.py              |
+    +----------------------------+------------------------------------------------------+
+    | pwb.py                     | Code entry wrapper script (site-package only)        |
+    +----------------------------+------------------------------------------------------+
+    | shell.py                   | Spawns an interactive Python shell with pywikibot    |
+    |                            | imported                                             |
+    +----------------------------+------------------------------------------------------+
+    | version.py                 | Outputs Pywikibot's revision number, Python's        |
+    |                            | version and OS used.                                 |
+    +----------------------------+------------------------------------------------------+
+    | i18n (folder)              | Contains i18n translations (site-package only)       |
+    +----------------------------+------------------------------------------------------+
+
+
+    +----------------------------+------------------------------------------------------+
     | site                       | Module with classes for MediaWiki sites              |
     +============================+======================================================+
     | __init__.py                | Objects representing MediaWiki sites (wikis)         |

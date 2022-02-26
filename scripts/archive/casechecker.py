@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """Bot to find all pages on the wiki with mixed latin and cyrilic alphabets."""
 #
 # (C) Pywikibot team, 2006-2021
@@ -198,7 +198,7 @@ class CaseChecker:
 
         # TODO: handle "continue"
         if self.site.code in self.whitelists:
-            wlpage = self.whitelists[self.site.code]
+            wlpage = i18n.translate(self.site.code, self.whitelists)
             pywikibot.output('Loading whitelist from {}'.format(wlpage))
             wlparams = {
                 'action': 'query',
@@ -751,7 +751,7 @@ class CaseChecker:
         """Open logfile."""
         try:
             return codecs.open(filename, 'a', 'utf-8')
-        except IOError:
+        except OSError:
             return codecs.open(filename, 'w', 'utf-8')
 
     def AppendLineToLog(self, filename, text):

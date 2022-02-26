@@ -1,6 +1,6 @@
 """Stdout, stderr and argv support for unicode."""
 #
-# (C) Pywikibot team, 2012-2021
+# (C) Pywikibot team, 2012-2022
 #
 ##############################################
 # Support for unicode in Windows cmd.exe
@@ -22,12 +22,14 @@
 #
 ################################################
 import sys
-
 from contextlib import suppress
 from ctypes import Structure, byref
 from ctypes import c_void_p as LPVOID
 from ctypes import create_unicode_buffer, sizeof
 from io import IOBase, UnsupportedOperation
+from typing import IO
+
+from pywikibot.backports import List, Tuple
 
 
 OSWIN32 = (sys.platform == 'win32')
@@ -133,7 +135,7 @@ class UnicodeOutput(IOBase):
                     if 0 in (retval, n.value):
                         msg = 'WriteConsoleW returned {!r}, n.value = {!r}' \
                               .format(retval, n.value)
-                        raise IOError(msg)
+                        raise OSError(msg)
                     remaining -= n.value
                     if remaining == 0:
                         break
@@ -224,7 +226,7 @@ def force_truetype_console(h_stdout):
             WinError()
 
 
-def get_unicode_console():
+def get_unicode_console() -> Tuple[IO, IO, IO, List[str]]:
     """
     Get Unicode console objects.
 
@@ -238,7 +240,7 @@ def get_unicode_console():
     # and TZOmegaTZIOY
     # https://stackoverflow.com/questions/878972/windows-cmd-encoding-change-causes-python-crash/1432462#1432462
 
-    global stdin, stdout, stderr, argv
+    global stdin, stdout, stderr
 
     if not OSWIN32:
         return stdin, stdout, stderr, argv

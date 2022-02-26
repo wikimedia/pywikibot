@@ -83,6 +83,11 @@ cosmetic\_changes script
 
 .. automodule:: scripts.cosmetic_changes
 
+data\_ingestion script
+----------------------
+
+.. automodule:: scripts.data_ingestion
+
 delete script
 -------------
 
@@ -207,11 +212,6 @@ revertbot script
 
 .. automodule:: scripts.revertbot
 
-shell script
-------------
-
-.. automodule:: scripts.shell
-
 solve\_disambiguation script
 ----------------------------
 
@@ -251,11 +251,6 @@ upload script
 -------------
 
 .. automodule:: scripts.upload
-
-version script
---------------
-
-.. automodule:: scripts.version
 
 watchlist script
 ----------------

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 A tool to transfer flickr photos to Wikimedia Commons.
 
@@ -18,7 +18,7 @@ The following parameters are supported:
  -autonomous        run bot in autonomous mode
 """
 #
-# (C) Pywikibot team, 2009-2020
+# (C) Pywikibot team, 2009-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -143,7 +143,7 @@ def getTags(photoInfo, raw: bool = False):
 
 def getFlinfoDescription(photo_id):
     """
-    Get the description from http://wikipedia.ramselehof.de/flinfo.php
+    Get the description from http://wikipedia.ramselehof.de/flinfo.php.
 
     TODO: Add exception handling, try a couple of times
     """

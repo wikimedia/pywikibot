@@ -10,13 +10,10 @@ import stat
 import sys
 from typing import Optional
 
-from pywikibot.tools import deprecated_args
-
 
 is_daemon = False
 
 
-@deprecated_args(write_pid=True)
 def daemonize(close_fd: bool = True, chdir: bool = True,
               redirect_std: Optional[str] = None) -> None:
     """

@@ -1,6 +1,7 @@
+#!/usr/bin/python3
 """Tests for the site module."""
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -8,10 +9,10 @@ import re
 import unittest
 from contextlib import suppress
 from datetime import datetime
+from unittest.mock import MagicMock, patch
 
 import pywikibot
 from pywikibot import async_request, page_put_queue
-from tests import MagicMock, patch
 from tests.aspects import DefaultDrySiteTestCase, DefaultSiteTestCase
 from tests.utils import entered_loop
 

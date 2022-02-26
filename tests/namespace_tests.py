@@ -1,6 +1,7 @@
+#!/usr/bin/python3
 """Tests for the Namespace class."""
 #
-# (C) Pywikibot team, 2014-2021
+# (C) Pywikibot team, 2014-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -67,18 +68,18 @@ class TestNamespaceObject(TestCase):
         ns = Namespace.builtin_namespaces()
 
         self.assertIsInstance(ns, dict)
-        self.assertTrue(all(x in ns for x in range(0, 16)))
+        for ns_number in range(16):
+            self.assertIn(ns_number, ns)
+            # Use a namespace object as a dict key
+            self.assertEqual(ns[ns[ns_number]], ns[ns_number])
 
-        self.assertTrue(all(isinstance(key, int)
-                            for key in ns))
-        self.assertTrue(all(isinstance(val, Iterable)
-                            for val in ns.values()))
-        self.assertTrue(all(isinstance(name, str)
-                            for val in ns.values()
-                            for name in val))
-
-        # Use a namespace object as a dict key
-        self.assertEqual(ns[ns[6]], ns[6])
+        for key, value in ns.items():
+            self.assertIsInstance(key, int)
+            self.assertIsInstance(value, Iterable)
+            self.assertTrue(value)
+            for name in value:
+                self.assertIsInstance(name, str)
+            self.assertEqual(ns[ns[key]], ns[key])
 
     def testNamespaceConstructor(self):
         """Test Namespace constructor."""
@@ -234,22 +235,19 @@ class TestNamespaceCollections(TestCase):
         """Test converting sequence of Namespace to a set."""
         namespaces = Namespace.builtin_namespaces()
 
-        self.assertTrue(all(isinstance(x, int) for x in namespaces))
-        self.assertTrue(all(isinstance(x, int) for x in namespaces.keys()))
-        self.assertTrue(all(isinstance(x, Namespace)
-                            for x in namespaces.values()))
+        for key, value in namespaces.items():
+            self.assertIsInstance(key, int)
+            self.assertIsInstance(value, Namespace)
 
         namespaces_set = set(namespaces)
-
         self.assertLength(namespaces, namespaces_set)
-        self.assertTrue(all(isinstance(x, int) for x in namespaces_set))
+        for key in namespaces_set:
+            self.assertIsInstance(key, int)
 
     def test_set_minus(self):
         """Test performing set minus operation on set of Namespace objects."""
         namespaces = Namespace.builtin_namespaces()
-
         excluded_namespaces = {-1, -2}
-
         positive_namespaces = set(namespaces) - excluded_namespaces
 
         self.assertLength(namespaces,

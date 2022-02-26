@@ -5,7 +5,7 @@ Several parts of the test infrastructure are implemented as mixins,
 such as API result caching and excessive test durations.
 """
 #
-# (C) Pywikibot team, 2014-2021
+# (C) Pywikibot team, 2014-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -65,7 +65,30 @@ OSWIN32 = (sys.platform == 'win32')
 pywikibot.bot.set_interface('buffer')
 
 
-class TestCaseBase(unittest.TestCase):
+class TestTimerMixin(unittest.TestCase):
+
+    """Time each test and report excessive durations."""
+
+    # Number of seconds each test may consume
+    # before a note is added after the test.
+    test_duration_warning_interval = 10
+
+    def setUp(self):
+        """Set up test."""
+        self.test_start = time.time()
+        super().setUp()
+
+    def tearDown(self):
+        """Tear down test."""
+        super().tearDown()
+        self.test_completed = time.time()
+        duration = self.test_completed - self.test_start
+        if duration > self.test_duration_warning_interval:
+            unittest_print(' {:.3f}s'.format(duration), end=' ')
+            sys.stdout.flush()
+
+
+class TestCaseBase(TestTimerMixin):
 
     """Base class for all tests."""
 
@@ -268,31 +291,6 @@ class TestCaseBase(unittest.TestCase):
             code, info, msg, self).handle(callable_obj, args, kwargs)
 
 
-class TestTimerMixin(TestCaseBase):
-
-    """Time each test and report excessive durations."""
-
-    # Number of seconds each test may consume
-    # before a note is added after the test.
-    test_duration_warning_interval = 10
-
-    def setUp(self):
-        """Set up test."""
-        super().setUp()
-        self.test_start = time.time()
-
-    def tearDown(self):
-        """Tear down test."""
-        self.test_completed = time.time()
-        duration = self.test_completed - self.test_start
-
-        if duration > self.test_duration_warning_interval:
-            unittest_print(' {0:.3f}s'.format(duration), end=' ')
-            sys.stdout.flush()
-
-        super().tearDown()
-
-
 def require_modules(*required_modules):
     """Require that the given list of modules can be imported."""
     def test_requirement(obj):
@@ -328,7 +326,6 @@ class DisableSiteMixin(TestCaseBase):
         self.old_Site_lookup_method = pywikibot.Site
         pywikibot.Site = lambda *args: self.fail(
             '{}: Site() not permitted'.format(self.__class__.__name__))
-        pywikibot.Site.__doc__ = 'TEST'
 
         super().setUp()
 
@@ -590,18 +587,25 @@ class RequireLoginMixin(TestCaseBase):
         Login to the site if it is not logged in.
         """
         super().setUp()
-        self._reset_login()
+        self._reset_login(True)
 
     def tearDown(self):
         """Log back into the site."""
         super().tearDown()
         self._reset_login()
 
-    def _reset_login(self):
-        """Login to all sites."""
-        # There may be many sites, and setUp doesn't know
-        # which site is to be tested; ensure they are all
-        # logged in.
+    def _reset_login(self, skip_if_login_fails: bool = False):
+        """Login to all sites.
+
+        There may be many sites, and setUp doesn't know which site is to
+        be tested; ensure they are all logged in.
+
+        .. versionadded:: 7.0
+           The `skip_if_login_fails` parameter.
+
+        :param skip_if_login_fails: called with setUp(); if True, skip
+            the current current test.
+        """
         for site in self.sites.values():
             site = site['site']
 
@@ -610,7 +614,10 @@ class RequireLoginMixin(TestCaseBase):
 
             if not site.logged_in():
                 site.login()
-            assert site.user()
+
+            if skip_if_login_fails and not site.user():  # during setUp() only
+                self.skipTest('{}: Not able to re-login to {}'
+                              .format(type(self).__name__, site))
 
     def get_userpage(self, site=None):
         """Create a User object for the user's userpage."""
@@ -731,12 +738,11 @@ class MetaTestCaseClass(type):
             # test class dependencies are declarative, this requires the
             # test writer explicitly sets 'site=False' so code reviewers
             # check that the script invoked by pwb will not load a site.
-            if dct.get('pwb'):
-                if 'site' not in dct:
-                    raise Exception(
-                        '{}: Test classes using pwb must set "site"; add '
-                        'site=False if the test script will not use a site'
-                        .format(name))
+            if dct.get('pwb') and 'site' not in dct:
+                raise Exception(
+                    '{}: Test classes using pwb must set "site"; add '
+                    'site=False if the test script will not use a site'
+                    .format(name))
 
             # If the 'site' attribute is a false value,
             # remove it so it matches 'not site' in pytest.
@@ -835,7 +841,7 @@ class MetaTestCaseClass(type):
             dct[test_name].__doc__ = doc
 
 
-class TestCase(TestTimerMixin, TestCaseBase, metaclass=MetaTestCaseClass):
+class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
 
     """Run tests on pre-defined sites."""
 
@@ -866,10 +872,11 @@ class TestCase(TestTimerMixin, TestCaseBase, metaclass=MetaTestCaseClass):
             interface = DrySite
 
         for data in cls.sites.values():
+            prod_only = os.environ.get('PYWIKIBOT_TEST_PROD_ONLY', '0') == '1'
             if (data.get('code') in ('test', 'mediawiki')
-                    and 'PYWIKIBOT_TEST_PROD_ONLY' in os.environ and not dry):
+                    and prod_only and not dry):
                 raise unittest.SkipTest(
-                    'Site code "{}" and PYWIKIBOT_TEST_PROD_ONLY is set.'
+                    'Site code {!r} and PYWIKIBOT_TEST_PROD_ONLY is set.'
                     .format(data['code']))
 
             if 'site' not in data and 'code' in data and 'family' in data:
@@ -1372,7 +1379,8 @@ class RecentChangesTestCase(WikimediaDefaultSiteTestCase):
     def setUpClass(cls):
         """Set up test class."""
         if os.environ.get('PYWIKIBOT_TEST_NO_RC', '0') == '1':
-            raise unittest.SkipTest('RecentChanges tests disabled.')
+            raise unittest.SkipTest(
+                'PYWIKIBOT_TEST_NO_RC is set; RecentChanges tests disabled.')
 
         super().setUpClass()
 
@@ -1405,7 +1413,6 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
         unittest.case._AssertRaisesContext,
         TestCase.assertRaises,
         TestCase.assertRaisesRegex,
-        TestCase.assertRaisesRegexp,
     ]
 
     # Require no instead string
@@ -1533,12 +1540,12 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
         if msg:
             self.assertNotIn(msg, self.deprecation_messages)
         else:
-            self.assertEqual([], self.deprecation_messages)
+            self.assertIsEmpty(self.deprecation_messages)
 
     def assertDeprecationClass(self, cls):
         """Assert that all deprecation warning are of one class."""
-        self.assertTrue(all(isinstance(item.message, cls)
-                            for item in self.warning_log))
+        for item in self.warning_log:
+            self.assertIsInstance(item.message, cls)
 
     def assertDeprecationFile(self, filename):
         """Assert that all deprecation warning are of one filename."""

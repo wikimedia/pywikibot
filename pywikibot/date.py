@@ -1,13 +1,12 @@
 """Date data and manipulation module."""
 #
-# (C) Pywikibot team, 2003-2021
+# (C) Pywikibot team, 2003-2022
 #
 # Distributed under the terms of the MIT license.
 #
 import calendar
 import datetime
 import re
-
 from collections import abc, defaultdict
 from contextlib import suppress
 from functools import singledispatch
@@ -16,9 +15,6 @@ from typing import Optional, Union
 
 import pywikibot.site
 from pywikibot import Site
-from pywikibot.textlib import NON_LATIN_DIGITS
-from pywikibot.tools import deprecated, first_lower, first_upper
-
 from pywikibot.backports import (
     Any,
     Callable,
@@ -30,6 +26,9 @@ from pywikibot.backports import (
     Sequence,
     Tuple,
 )
+from pywikibot.textlib import NON_LATIN_DIGITS
+from pywikibot.tools import first_lower, first_upper
+
 
 #
 # Different collections of well known formats
@@ -407,7 +406,7 @@ def escapePattern2(pattern: str
 
         if len(subpattern) == 3:
             # enforce mandatory field size
-            newpattern += '([%s]{%s})' % (dec[0], subpattern[1])
+            newpattern += '([{}]{{{}}})'.format(dec[0], subpattern[1])
             # add the number of required digits as the last (4th)
             # part of the tuple
             decoders.append(dec + (int(s[1]),))  # type: ignore
@@ -597,6 +596,8 @@ class MonthFormat(abc.MutableMapping):  # type: ignore[type-arg]
     day_formats = {
         'af': ('%d {}', True),
         'ang': ('%d {}', True),
+        'ar': ('%d {}', True),
+        'arz': ('%d {}', True),
         'bg': ('%d {}', False),
         'bn': ('{} %%B', None),
         'ceb': ('{} %d', True),
@@ -645,7 +646,6 @@ class MonthFormat(abc.MutableMapping):  # type: ignore[type-arg]
     }
 
     year_formats = {
-        'ar': ('{} %d', None),
         'cs': ('{} %d', None),
         'eo': ('{} de %d', None),
         'es': ('{} de %d', True),
@@ -706,6 +706,7 @@ class MonthFormat(abc.MutableMapping):  # type: ignore[type-arg]
 formats = {
     'Number': {
         'ar': lambda v: dh_number(v, '%d (عدد)'),
+        'ary': lambda v: dh_number(v, '%d'),
         'be': lambda v: dh_number(v, '%d (лік)'),
         'bg': lambda v: dh_number(v, '%d (число)'),
         'bs': lambda v: dh_number(v, '%d (broj)'),
@@ -764,6 +765,7 @@ formats = {
 
     'YearBC': {
         'af': lambda v: dh_yearBC(v, '%d v.C.'),
+        'ar': lambda v: dh_yearBC(v, '%d ق م'),
         'ast': lambda v: dh_yearBC(v, '%d edC'),
         'be': lambda v: dh_yearBC(v, '%d да н.э.'),
         'bg': lambda v: dh_yearBC(v, '%d г. пр.н.е.'),
@@ -973,6 +975,7 @@ formats = {
     },
 
     'DecadeBC': {
+        'ar': lambda v: dh_decBC(v, 'عقد %d ق م'),
         'de': lambda v: dh_decBC(v, '%der v. Chr.'),
         'da': lambda v: dh_decBC(v, "%d'erne f.Kr."),
         'en': lambda v: dh_decBC(v, '%ds BC'),
@@ -1037,7 +1040,7 @@ formats = {
              lambda p: p in (1, 8) or (p >= 20)),
             (lambda v: dh_centuryAD(v, '%dde eeu'), alwaysTrue)]),
         'ang': lambda v: dh_centuryAD(v, '%de gēarhundred'),
-        'ar': lambda v: dh_centuryAD(v, 'قرن %d'),
+        'ar': lambda v: dh_centuryAD(v, 'القرن %d'),
         'ast': lambda v: dh_centuryAD(v, 'Sieglu %R'),
         'be': lambda v: dh_centuryAD(v, '%d стагодзьдзе'),
         'bg': lambda v: dh_centuryAD(v, '%d век'),
@@ -1410,6 +1413,7 @@ formats = {
     },
 
     'Cat_Year_MusicAlbums': {
+        'ar': lambda v: dh_yearAD(v, 'ألبومات %d'),
         'cs': lambda v: dh_yearAD(v, 'Alba roku %d'),
         'en': lambda v: dh_yearAD(v, '%d albums'),
         'fa': lambda v: dh_yearAD(v, 'آلبوم‌های %d (میلادی)'),
@@ -1425,6 +1429,7 @@ formats = {
     'Cat_BirthsAD': {
         'an': lambda v: dh_yearAD(v, '%d (naixencias)'),
         'ar': lambda v: dh_yearAD(v, 'مواليد %d'),
+        'ary': lambda v: dh_yearAD(v, 'زيادة %d'),
         'arz': lambda v: dh_yearAD(v, 'مواليد %d'),
         'bar': lambda v: dh_yearAD(v, 'Geboren %d'),
         'be': lambda v: dh_yearAD(v, 'Нарадзіліся ў %d годзе'),
@@ -1596,10 +1601,14 @@ formats = {
     },
 
     'Cat_BirthsBC': {
+        'ar': lambda v: dh_yearBC(v, 'مواليد %d ق م'),
+        'arz': lambda v: dh_yearBC(v, 'مواليد %d ق م'),
         'en': lambda v: dh_yearBC(v, '%d BC births'),
         'nb': lambda v: dh_yearBC(v, 'Fødsler i %d f.Kr.'),
     },
     'Cat_DeathsBC': {
+        'ar': lambda v: dh_yearBC(v, 'وفيات %d ق م'),
+        'arz': lambda v: dh_yearBC(v, 'وفيات %d ق م'),
         'en': lambda v: dh_yearBC(v, '%d BC deaths'),
         'fr': lambda v: dh_yearBC(v, 'Décès en -%d'),
         'nb': lambda v: dh_yearBC(v, 'Dødsfall i %d f.Kr.'),
@@ -1609,6 +1618,7 @@ formats = {
         'an': lambda v: dh_singVal(v, 'Autualidá'),
         'ang': lambda v: dh_singVal(v, 'Efenealde belimpas'),
         'ar': lambda v: dh_singVal(v, 'أحداث جارية'),
+        'ary': lambda v: dh_singVal(v, 'آخر الأحداث'),
         'arz': lambda v: dh_singVal(v, 'احداث دلوقتى'),
         'be': lambda v: dh_singVal(v, 'Бягучыя падзеі'),
         'bg': lambda v: dh_singVal(v, 'Текущи събития'),
@@ -1837,30 +1847,30 @@ addFmt1('vi', False, makeMonthList('%%d tháng %d'))
 addFmt1('zh', False, makeMonthList('%d月%%d日'))
 
 # Walloon names depend on the day number, thus we must generate various
-# different patterns
+# different patterns:
 
 # For month names beginning with a consonant...
-for i in (0, 1, 2, 4, 5, 6, 8, 10, 11):
-    formats[dayMnthFmts[i]]['wa'] = eval(
-        'lambda m: multi(m, ['
-        '(lambda v: dh_dayOfMnth(v, "%dî d\' {mname}"), lambda p: p == 1), '
-        '(lambda v: dh_dayOfMnth(v, "%d d\' {mname}"), '
-        'lambda p: p in [2,3,20,22,23]), '
-        '(lambda v: dh_dayOfMnth(v, "%d di {mname}"), alwaysTrue)])'
-        .format(mname=waMonthNames[i]))
-
+_consonant_pattern = (
+    'lambda m: multi(m, ['
+    '(lambda v: dh_dayOfMnth(v, "%dî d\' {mname}"), lambda p: p == 1), '
+    '(lambda v: dh_dayOfMnth(v, "%d d\' {mname}"), '
+    'lambda p: p in [2,3,20,22,23]), '
+    '(lambda v: dh_dayOfMnth(v, "%d di {mname}"), alwaysTrue)])'
+)
 # For month names beginning with a vowel...
-for i in (3, 7, 9):
-    formats[dayMnthFmts[i]]['wa'] = eval(
-        'lambda m: multi(m, ['
-        '(lambda v: dh_dayOfMnth(v, "%dî d\' {mname}"), lambda p: p == 1), '
-        '(lambda v: dh_dayOfMnth(v, "%d d\' {mname}"), alwaysTrue)])'
-        .format(mname=waMonthNames[i]))
+_vowel_pattern = (
+    'lambda m: multi(m, ['
+    '(lambda v: dh_dayOfMnth(v, "%dî d\' {mname}"), lambda p: p == 1), '
+    '(lambda v: dh_dayOfMnth(v, "%d d\' {mname}"), alwaysTrue)])'
+)
 
 # Brazil uses '1añ' for the 1st of every month, and number without suffix for
 # all other days
 brMonthNames = makeMonthNamedList('br', '%s', True)
-for i in range(0, 12):
+
+for i in range(12):
+    pattern = _vowel_pattern if i in (3, 7, 9) else _consonant_pattern
+    formats[dayMnthFmts[i]]['wa'] = eval(pattern.format(mname=waMonthNames[i]))
     formats[dayMnthFmts[i]]['br'] = eval(
         'lambda m: multi(m, ['
         '(lambda v: dh_dayOfMnth(v, "%dañ {mname}"), lambda p: p == 1), '
@@ -1984,20 +1994,6 @@ def getAutoFormat(lang: str, title: str, ignoreFirstLetterCase: bool = True
                 title = first_upper(title)
             return getAutoFormat(lang, title, ignoreFirstLetterCase=False)
     return None, None
-
-
-@deprecated('date.format_date', since='20190526')
-class FormatDate:
-
-    """DEPRECATED. Format a date."""
-
-    def __init__(self, site: Union[str, 'pywikibot.site.BaseSite']) -> None:
-        """Initializer."""
-        self.site = site
-
-    def __call__(self, m: int, d: int) -> str:
-        """Return a formatted month and day."""
-        return format_date(m, d, self.site)
 
 
 def format_date(month: int, day: int,

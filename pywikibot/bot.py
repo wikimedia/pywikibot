@@ -57,14 +57,14 @@ Additionally there is the :py:obj:`AutomaticTWSummaryBot` which subclasses
 ``put_current`` is used.
 """
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
 __all__ = (
     'CRITICAL', 'ERROR', 'INFO', 'WARNING', 'DEBUG', 'INPUT', 'STDOUT',
     'VERBOSE', 'critical', 'debug', 'error', 'exception', 'log', 'warning',
-    'output', 'stdout', 'LoggingFormatter', 'RotatingFileHandler',
+    'output', 'stdout', 'LoggingFormatter',
     'init_handlers', 'writelogheader',
     'input', 'input_choice', 'input_yn', 'input_list_choice', 'ui',
     'Option', 'StandardOption', 'NestedOption', 'IntegerOption',
@@ -75,7 +75,7 @@ __all__ = (
     'QuitKeyboardInterrupt',
     'InteractiveReplace',
     'calledModuleName', 'handle_args',
-    'show_help', 'showHelp', 'suggest_help',
+    'show_help', 'suggest_help',
     'writeToCommandLogFile', 'open_webbrowser',
     'OptionHandler',
     'BaseBot', 'Bot', 'ConfigParserBot', 'SingleSiteBot', 'MultipleSitesBot',
@@ -98,12 +98,14 @@ import sys
 import time
 import warnings
 import webbrowser
+from collections import Counter
 from collections.abc import Generator
 from contextlib import closing
+from functools import wraps
 from importlib import import_module
 from pathlib import Path
 from textwrap import fill
-from typing import Any, Optional, Union
+from typing import TYPE_CHECKING, Any, Optional, Union
 from warnings import warn
 
 import pywikibot
@@ -170,29 +172,24 @@ from pywikibot.logging import (
     stdout,
     warning,
 )
+from pywikibot.throttle import Throttle
 from pywikibot.tools import (
     PYTHON_VERSION,
-    deprecate_arg,
     deprecated,
-    deprecated_args,
     issue_deprecation_warning,
-    redirect_func,
-    remove_last_args,
-    suppress_warnings,
 )
 from pywikibot.tools._logging import LoggingFormatter
 from pywikibot.tools.formatter import color_format
 
-ANSWER_TYPE = Iterable[Union[
-    Tuple[str, str],
-    'pywikibot.bot_choice.Option']]
 
-# TODO: We should change this to the following after T286867...
+if TYPE_CHECKING:
+    from pywikibot.site import BaseSite
 
-PAGE_OR_LINK_TYPE = Any  # Union['pywikibot.page.Link', 'pywikibot.page.Page']
-OPT_SITE_TYPE = Any  # Optional['pywikibot.site.BaseSite']
-OPT_CLAIM_TYPE = Any  # Optional['pywikibot.page.Claim']
-OPT_ITEM_PAGE_TYPE = Any  # Optional['pywikibot.page.ItemPage']
+AnswerType = Union[
+    Iterable[Union[Tuple[str, str], 'pywikibot.bot_choice.Option']],
+    'pywikibot.bot_choice.Option',
+]
+PageLinkType = Union['pywikibot.page.Link', 'pywikibot.page.Page']
 
 # Note: all output goes through python std library "logging" module
 _logger = 'bot'
@@ -320,15 +317,14 @@ def handler_namer(name: str) -> str:
     return '{}.{}{}'.format(root, qualifier, ext)
 
 
-@remove_last_args(['strm'])
 def init_handlers() -> None:
     """Initialize logging system for terminal-based bots.
 
-    This function must be called before using pywikibot.output(); and must
-    be called again if the destination stream is changed.
+    This function must be called before using any input/output methods;
+    and must be called again if ui handler is changed..
 
-    Note: this function is called by handle_args(), so it should normally
-    not need to be called explicitly
+    Note: this function is called by any user input and output function,
+    so it should normally not need to be called explicitly.
 
     All user output is routed through the logging module.
     Each type of output is handled by an appropriate handler object.
@@ -394,18 +390,12 @@ def init_handlers() -> None:
 
     # if user has enabled file logging, configure file handler
     if module_name in config.log or '*' in config.log:
-        pid = ''
-        if pywikibot.Site.__doc__ != 'TEST':  # set by aspects.DisableSiteMixin
-            try:  # T286848
-                site = pywikibot.Site()
-                if site is None:  # T289427
-                    raise ValueError('Running script_test with net=False')
-            except ValueError:
-                pass
-            else:  # get PID
-                throttle = site.throttle  # initialize a Throttle obj
-                pid_int = throttle.get_pid(module_name)  # get the global PID
-                pid = str(pid_int) + '-' if pid_int > 1 else ''
+        # Use a dummy Throttle to get a PID.
+        # This is necessary because tests may have site disabled.
+        throttle = Throttle('')
+        pid_int = throttle.get_pid(module_name)  # get the global PID
+        pid = str(pid_int) + '-' if pid_int > 1 else ''
+
         if config.logfilename:
             # keep config.logfilename unchanged
             logfile = config.datafilepath('logs', config.logfilename)
@@ -536,9 +526,23 @@ add_init_routine(init_handlers)
 
 # User input functions
 
+def initialize_handlers(function):
+    """Make sure logging system has been initialized.
 
-def input(question: str, password: bool = False,
-          default: str = '', force: bool = False) -> str:
+    .. versionadded:: 7.0
+    """
+    @wraps(function)
+    def wrapper(*args, **kwargs):
+        init_handlers()
+        return function(*args, **kwargs)
+    return wrapper
+
+
+@initialize_handlers
+def input(question: str,
+          password: bool = False,
+          default: Optional[str] = '',
+          force: bool = False) -> str:
     """Ask the user a question, return the user's answer.
 
     :param question: a string that will be shown to the user. Don't add a
@@ -548,21 +552,17 @@ def input(question: str, password: bool = False,
         an answer.
     :param force: Automatically use the default
     """
-    # make sure logging system has been initialized
-    if not _handlers_initialized:
-        init_handlers()
-
     assert ui is not None
-    data = ui.input(question, password=password, default=default, force=force)
-    return data
+    return ui.input(question, password=password, default=default, force=force)
 
 
+@initialize_handlers
 def input_choice(question: str,
-                 answers: ANSWER_TYPE,
+                 answers: AnswerType,
                  default: Optional[str] = None,
                  return_shortcut: bool = True,
                  automatic_quit: bool = True,
-                 force: bool = False) -> Union[int, str]:
+                 force: bool = False) -> Any:
     """
     Ask the user the question and return one of the valid answers.
 
@@ -581,10 +581,6 @@ def input_choice(question: str,
         selected, it does not return the shortcut and the default is not a
         valid shortcut.
     """
-    # make sure logging system has been initialized
-    if not _handlers_initialized:
-        init_handlers()
-
     assert ui is not None
     return ui.input_choice(question, answers, default, return_shortcut,
                            automatic_quit=automatic_quit, force=force)
@@ -621,8 +617,9 @@ def input_yn(question: str,
                         automatic_quit=automatic_quit, force=force) == 'y'
 
 
+@initialize_handlers
 def input_list_choice(question: str,
-                      answers: ANSWER_TYPE,
+                      answers: AnswerType,
                       default: Union[int, str, None] = None,
                       force: bool = False) -> str:
     """
@@ -635,9 +632,6 @@ def input_list_choice(question: str,
     :param force: Automatically use the default
     :return: The selected answer.
     """
-    if not _handlers_initialized:
-        init_handlers()
-
     assert ui is not None
     return ui.input_list_choice(question, answers, default=default,
                                 force=force)
@@ -669,8 +663,8 @@ class InteractiveReplace:
     """
 
     def __init__(self,
-                 old_link: PAGE_OR_LINK_TYPE,
-                 new_link: Union[PAGE_OR_LINK_TYPE, bool],
+                 old_link: PageLinkType,
+                 new_link: Union[PageLinkType, bool],
                  default: Optional[str] = None,
                  automatic_quit: bool = True) -> None:
         """
@@ -698,7 +692,7 @@ class InteractiveReplace:
         self._quit = automatic_quit
 
         current_match_type = Optional[Tuple[
-            PAGE_OR_LINK_TYPE,
+            PageLinkType,
             str,
             Mapping[str, str],
             Tuple[int, int]
@@ -740,7 +734,7 @@ class InteractiveReplace:
 
         raise ValueError('Invalid choice "{}"'.format(choice))
 
-    def __call__(self, link: PAGE_OR_LINK_TYPE,
+    def __call__(self, link: PageLinkType,
                  text: str, groups: Mapping[str, str],
                  rng: Tuple[int, int]) -> Any:
         """Ask user how the selected link should be replaced."""
@@ -806,7 +800,7 @@ class InteractiveReplace:
         return self.handle_answer(choice)
 
     @property
-    def current_link(self) -> PAGE_OR_LINK_TYPE:
+    def current_link(self) -> PageLinkType:
         """Get the current link when it's handling one currently."""
         if self._current_match is None:
             raise ValueError('No current link')
@@ -1002,7 +996,7 @@ def show_help(module_name: Optional[str] = None,
         module = import_module(module_name)  # type: ignore
         help_text = module.__doc__  # type: str # type: ignore[assignment]
         if hasattr(module, 'docuReplacements'):
-            for key, value in module.docuReplacements.items():  # type: ignore
+            for key, value in module.docuReplacements.items():
                 help_text = help_text.replace(key, value.strip('\n\r'))
     except Exception:
         if module_name:
@@ -1015,12 +1009,6 @@ def show_help(module_name: Optional[str] = None,
         pywikibot.stdout(_GLOBAL_HELP.format(module_name))
     else:
         pywikibot.stdout(_GLOBAL_HELP_NOTE)
-
-
-@deprecated('show_help', since='20200705')
-def showHelp(module_name: Optional[str] = None) -> None:  # pragma: no cover
-    """DEPRECATED. Show help for the Bot."""
-    return show_help(module_name)
 
 
 def suggest_help(missing_parameters: Optional[Sequence[str]] = None,
@@ -1085,7 +1073,7 @@ def writeToCommandLogFile() -> None:
     command_log_filename = config.datafilepath('logs', 'commands.log')
     try:
         command_log_file = codecs.open(command_log_filename, 'a', 'utf-8')
-    except IOError:
+    except OSError:
         command_log_file = codecs.open(command_log_filename, 'w', 'utf-8')
 
     with closing(command_log_file):
@@ -1101,11 +1089,10 @@ def writeToCommandLogFile() -> None:
 def open_webbrowser(page: 'pywikibot.page.BasePage') -> None:
     """Open the web browser displaying the page and wait for input."""
     webbrowser.open(page.full_url())
-    i18n.input('pywikibot-enter-finished-browser',
-               fallback_prompt='Press Enter when finished in browser.')
+    i18n.input('pywikibot-enter-finished-browser')
 
 
-class _OptionDict(dict):
+class _OptionDict(Dict[str, Any]):
 
     """The option dict which holds the options of OptionHandler.
 
@@ -1130,10 +1117,6 @@ class _OptionDict(dict):
             self.__setitem__(name, value)
         else:
             super().__setattr__(name, value)
-
-
-_DEPRECATION_MSG = 'Optionhandler.opt.option attribute ' \
-                   'or Optionhandler.opt[option] item'
 
 
 class OptionHandler:
@@ -1193,28 +1176,8 @@ class OptionHandler:
         """
         self.set_options(**kwargs)
 
-    @property  # type: ignore[misc]
-    @deprecated('available_options', since='20201006')
-    def availableOptions(self) -> Dict[str, Any]:
-        """DEPRECATED. Options that are available."""
-        return self.available_options
-
-    @deprecated('set_options', since='20201006')
-    def setOptions(self, **options: Any) -> None:  # pragma: no cover
-        """DEPRECATED. Set the instance options."""
-        self.set_options(**options)
-
     def set_options(self, **options: Any) -> None:
         """Set the instance options."""
-        warning = 'pywikibot.bot.OptionHandler.availableOptions'
-        with suppress_warnings(warning.replace('.', r'\.') + ' is deprecated',
-                               category=FutureWarning):
-            old_options = self.availableOptions is not self.available_options
-        if old_options:  # old options were set and not updated
-            self.available_options = self.availableOptions
-            issue_deprecation_warning(warning, 'available_options',
-                                      since='20201006')
-
         valid_options = set(self.available_options)
         received_options = set(options)
 
@@ -1226,16 +1189,6 @@ class OptionHandler:
         for opt in received_options - valid_options:
             pywikibot.warning('{} is not a valid option. It was ignored.'
                               .format(opt))
-
-    @deprecated(_DEPRECATION_MSG, since='20201006')
-    def getOption(self, option: str) -> Any:  # pragma: no cover
-        """DEPRECATED. Get the current value of an option.
-
-        :param option: key defined in OptionHandler.available_options
-        :raise pywikibot.exceptions.Error: No valid option is given with
-            option parameter
-        """
-        return self.opt[option]
 
 
 class BaseBot(OptionHandler):
@@ -1259,6 +1212,10 @@ class BaseBot(OptionHandler):
     treat() or run(), NotImplementedError is raised.
 
     For bot options handling refer OptionHandler class above.
+
+    .. versionchanged:: 7.0
+       A counter attribute is provided which is a collections.Counter;
+       The default counters are 'read', 'write' and 'skip'.
     """
 
     # Handler configuration.
@@ -1292,11 +1249,39 @@ class BaseBot(OptionHandler):
         self.available_options.update(self.update_options)
         super().__init__(**kwargs)
 
-        self._treat_counter = 0
-        self._save_counter = 0
-        self._skip_counter = 0
+        self.counter = Counter()
         self._generator_completed = False
         self.treat_page_type = pywikibot.page.BasePage  # default type
+
+    @property
+    @deprecated("self.counter['read']", since='7.0.0')
+    def _treat_counter(self):
+        return self.counter['read']
+
+    @_treat_counter.setter
+    @deprecated("self.counter['read']", since='7.0.0')
+    def _treat_counter(self, value):
+        self.counter['read'] = value
+
+    @property
+    @deprecated("self.counter['write']", since='7.0.0')
+    def _save_counter(self):
+        return self.counter['write']
+
+    @_save_counter.setter
+    @deprecated("self.counter['write']", since='7.0.0')
+    def _save_counter(self, value):
+        self.counter['write'] = value
+
+    @property
+    @deprecated("self.counter['skip']", since='7.0.0')
+    def _skip_counter(self):
+        return self.counter['skip']
+
+    @_skip_counter.setter
+    @deprecated("self.counter['skip']", since='7.0.0')
+    def _skip_counter(self, value):
+        self.counter['skip'] = value
 
     @property
     def current_page(self) -> 'pywikibot.page.BasePage':
@@ -1351,8 +1336,6 @@ class BaseBot(OptionHandler):
 
         return True
 
-    @deprecate_arg('async', 'asynchronous')  # T106230
-    @deprecated_args(comment='summary')
     def userPut(self, page: 'pywikibot.page.BasePage', oldtext: str,
                 newtext: str, **kwargs: Any) -> bool:
         """
@@ -1423,7 +1406,7 @@ class BaseBot(OptionHandler):
 
         try:
             func(*args, **kwargs)
-            self._save_counter += 1
+            self.counter['write'] += 1
         except PageSaveRelatedError as e:
             if not ignore_save_related_errors:
                 raise
@@ -1448,16 +1431,6 @@ class BaseBot(OptionHandler):
             return True
         return False
 
-    @deprecated('generator.close()', since='20200804')
-    def stop(self) -> None:  # pragma: no cover
-        """Stop iterating.
-
-        .. deprecated::
-           Use generator.close() instead.
-        """
-        pywikibot.output('Generator has been stopped.')
-        self.generator.close()
-
     def quit(self) -> None:
         """Cleanup and quit processing."""
         raise QuitKeyboardInterrupt
@@ -1479,12 +1452,10 @@ class BaseBot(OptionHandler):
         # wait until pending threads finished but don't close the queue
         pywikibot.stopme()
 
-        pywikibot.output('\n{} pages read'
-                         '\n{} pages written'
-                         '\n{} pages skipped'
-                         .format(self._treat_counter,
-                                 self._save_counter,
-                                 self._skip_counter))
+        pywikibot.output('\n{read} pages read'
+                         '\n{write} pages written'
+                         '\n{skip} pages skipped'
+                         .format_map(self.counter))
 
         if hasattr(self, '_start_ts'):
             write_delta = pywikibot.Timestamp.now() - self._start_ts
@@ -1496,12 +1467,14 @@ class BaseBot(OptionHandler):
             else:
                 pywikibot.output('Execution time: {} seconds'
                                  .format(write_delta.seconds))
-            if self._treat_counter:
+
+            if self.counter['read']:
                 pywikibot.output('Read operation time: {:.1f} seconds'
-                                 .format(read_seconds / self._treat_counter))
-            if self._save_counter:
-                pywikibot.output('Write operation time: {:.1f} seconds'
-                                 .format(write_seconds / self._save_counter))
+                                 .format(read_seconds / self.counter['read']))
+            if self.counter['write']:
+                pywikibot.output(
+                    'Write operation time: {:.1f} seconds'
+                    .format(write_seconds / self.counter['write']))
 
         # exc_info contains exception from self.run() while terminating
         exc_info = sys.exc_info()
@@ -1576,15 +1549,7 @@ class BaseBot(OptionHandler):
         try:
             for item in self.generator:
                 # preprocessing of the page
-                initialized_page = self.init_page(item)
-                if initialized_page is None:
-                    issue_deprecation_warning(
-                        'Returning None from init_page() method',
-                        'return a pywikibot.page.BasePage object',
-                        since='20200406')
-                    page = item
-                else:
-                    page = initialized_page
+                page = self.init_page(item)
 
                 # validate page type
                 if not isinstance(page, self.treat_page_type):
@@ -1593,12 +1558,12 @@ class BaseBot(OptionHandler):
                                             page.__class__.__name__))
 
                 if self.skip_page(page):
-                    self._skip_counter += 1
+                    self.counter['skip'] += 1
                     continue
 
                 # Process the page
                 self.treat(page)
-                self._treat_counter += 1
+                self.counter['read'] += 1
 
             self._generator_completed = True
         except QuitKeyboardInterrupt:
@@ -1625,7 +1590,7 @@ class Bot(BaseBot):
     instead which specifically handle multiple or single sites.
     """
 
-    def __init__(self, site: OPT_SITE_TYPE = None,
+    def __init__(self, site: Optional['BaseSite'] = None,
                  **kwargs: Any) -> None:
         """Create a Bot instance and initialize cached sites."""
         # TODO: add warning if site is specified and generator
@@ -1636,7 +1601,7 @@ class Bot(BaseBot):
         super().__init__(**kwargs)
 
     @property
-    def site(self) -> 'pywikibot.site.BaseSite':
+    def site(self) -> Optional['BaseSite']:
         """Get the current site."""
         if not self._site:
             warning('Bot.site was not set before being retrieved.')
@@ -1646,7 +1611,7 @@ class Bot(BaseBot):
         return self._site
 
     @site.setter
-    def site(self, site: OPT_SITE_TYPE) -> None:
+    def site(self, site: Optional['BaseSite']) -> None:
         """
         Set the Site that the bot is using.
 
@@ -1708,7 +1673,7 @@ class SingleSiteBot(BaseBot):
     """
 
     def __init__(self,
-                 site: Union[OPT_SITE_TYPE, bool] = True,
+                 site: Union['BaseSite', bool, None] = True,
                  **kwargs: Any) -> None:
         """
         Create a SingleSiteBot instance.
@@ -1717,7 +1682,7 @@ class SingleSiteBot(BaseBot):
             pywikibot.Site.
         """
         if site is True:
-            self._site = pywikibot.Site()
+            self._site = pywikibot.Site()  # type: Optional[BaseSite]
         elif site is False:
             raise ValueError("'site' must be a site, True, or None")
         else:
@@ -1725,14 +1690,14 @@ class SingleSiteBot(BaseBot):
         super().__init__(**kwargs)
 
     @property
-    def site(self) -> OPT_SITE_TYPE:
+    def site(self) -> 'BaseSite':
         """Site that the bot is using."""
         if not self._site:
             raise ValueError('The site has not been defined yet.')
         return self._site
 
     @site.setter
-    def site(self, value: OPT_SITE_TYPE) -> None:
+    def site(self, value: Optional['BaseSite']) -> None:
         """Set the current site but warns if different."""
         if self._site:
             # Warn in any case where the site is (probably) changed after
@@ -1789,7 +1754,7 @@ class ConfigParserBot(BaseBot):
         # edit summary for the bot.
         summary = Bot: Aggiungo template Categorizzare
 
-        [shell] ; Shell options
+        [commonscat] ; commonscat options
         always: true
 
     The option values are interpreted in this order:
@@ -1854,7 +1819,6 @@ class CurrentPageBot(BaseBot):
         self.current_page = page
         self.treat_page()
 
-    @deprecated_args(comment='summary')
     def put_current(self, new_text: str,
                     ignore_save_related_errors: Optional[bool] = None,
                     ignore_server_errors: Optional[bool] = None,
@@ -1895,7 +1859,8 @@ class AutomaticTWSummaryBot(CurrentPageBot):
     parameters for the translated message.
     """
 
-    summary_key = None  # must be defined in subclasses
+    #: Must be defined in subclasses.
+    summary_key = None  # type: Optional[str]
 
     @property
     def summary_parameters(self) -> Dict[str, str]:
@@ -2025,7 +1990,6 @@ class WikidataBot(Bot, ExistingPageBot):
     use_from_page = True
     treat_missing_item = False
 
-    @deprecated_args(use_from_page=True)
     def __init__(self, **kwargs: Any) -> None:
         """Initializer of the WikidataBot."""
         self.create_missing_item = False
@@ -2113,7 +2077,7 @@ class WikidataBot(Bot, ExistingPageBot):
 
     def user_add_claim(self, item: 'pywikibot.page.ItemPage',
                        claim: 'pywikibot.page.Claim',
-                       source: OPT_SITE_TYPE = None,
+                       source: Optional['BaseSite'] = None,
                        bot: bool = True, **kwargs: Any) -> bool:
         """
         Add a claim to an item, with user confirmation as required.
@@ -2139,8 +2103,7 @@ class WikidataBot(Bot, ExistingPageBot):
                                                    claim.getTarget()))
         return self._save_page(item, item.addClaim, claim, bot=bot, **kwargs)
 
-    def getSource(self, site: 'pywikibot.site.BaseSite'
-                  ) -> OPT_CLAIM_TYPE:
+    def getSource(self, site: 'BaseSite') -> Optional['pywikibot.page.Claim']:
         """
         Create a Claim usable as a source for Wikibase statements.
 
@@ -2159,7 +2122,7 @@ class WikidataBot(Bot, ExistingPageBot):
             self, item: 'pywikibot.page.ItemPage',
             claim: 'pywikibot.page.Claim',
             exists_arg: str = '',
-            source: OPT_SITE_TYPE = None,
+            source: Optional['BaseSite'] = None,
             logger_callback: Callable[[str], Any] = log,
             **kwargs: Any) -> bool:
         """
@@ -2232,7 +2195,7 @@ class WikidataBot(Bot, ExistingPageBot):
                              data: Optional[Dict[str, Any]] = None,
                              summary: Optional[str] = None,
                              **kwargs: Any
-                             ) -> OPT_ITEM_PAGE_TYPE:
+                             ) -> Optional['pywikibot.page.ItemPage']:
         """
         Create an ItemPage with the provided page as the sitelink.
 
@@ -2329,10 +2292,6 @@ class WikidataBot(Bot, ExistingPageBot):
 
 
 set_interface(config.userinterface)
-
-# Deprecate RotatingFileHandler
-RotatingFileHandler = redirect_func(logging.handlers.RotatingFileHandler,
-                                    since='6.5.0')
 
 # NOTE: (T286348)
 # Do not use ModuleDeprecationWrapper with this module.

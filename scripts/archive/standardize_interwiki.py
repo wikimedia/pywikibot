@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 Loop over all pages in the home wiki, standardizing the interwiki links.
 

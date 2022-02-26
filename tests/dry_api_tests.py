@@ -1,10 +1,12 @@
+#!/usr/bin/python3
 """API tests which do not interact with a site."""
 #
-# (C) Pywikibot team, 2012-2021
+# (C) Pywikibot team, 2012-2022
 #
 # Distributed under the terms of the MIT license.
 #
 import datetime
+from unittest.mock import patch
 
 import pywikibot
 from pywikibot.data.api import (
@@ -17,7 +19,7 @@ from pywikibot.exceptions import Error
 from pywikibot.family import Family
 from pywikibot.login import LoginStatus
 from pywikibot.tools import suppress_warnings
-from tests import join_images_path, patch
+from tests import join_images_path
 from tests.aspects import (
     DefaultDrySiteTestCase,
     SiteAttributeTestCase,

@@ -1,20 +1,40 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Wrapper script to invoke pywikibot-based scripts.
+
+This wrapper script invokes script by its name in this search order:
+
+1. Scripts listed in `user_script_paths` list inside your `user-config.py`
+   settings file in the given order. Refer
+   :ref:`External Script Path Settings<external-script-path-settings>`.
+2. User scripts residing in `scripts/userscripts` (directory mode only).
+3. Scripts residing in `scripts` folder (directory mode only).
+4. Maintenance scripts residing in `scripts/maintenance` (directory mode only).
+5. Framework scripts residing in `pywikibot/scripts`.
+
+This wrapper script is able to invoke scripts even if the script name is
+misspelled. In directory mode it also checks package dependencies.
 
 Run scripts with pywikibot in directory mode using::
 
     python pwb.py <pwb options> <name_of_script> <options>
 
+or run scripts with pywikibot installed as a site package using::
+
+    pwb <pwb options> <name_of_script> <options>
+
 This wrapper script uses the package directory to store all user files,
 will fix up search paths so the package does not need to be installed, etc.
 
-Currently `<pwb options>` are :ref:`global options`. This can be used
+Currently, `<pwb options>` are :ref:`global options`. This can be used
 for tests to set the default site (see T216825)::
 
     python pwb.py -lang:de bot_tests -v
+
+.. versionchanged:: 7.0
+   pwb wrapper was added to the Python site package lib
 """
-# (C) Pywikibot team, 2012-2021
+# (C) Pywikibot team, 2012-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -24,14 +44,21 @@ from __future__ import print_function
 import os
 import sys
 import types
-
 from difflib import get_close_matches
 from importlib import import_module
 from time import sleep
 from warnings import warn
 
 
+try:
+    from pathlib import Path
+except ImportError as e:
+    from setup import PYTHON_VERSION, VERSIONS_REQUIRED_MESSAGE
+    print(VERSIONS_REQUIRED_MESSAGE.format(version=PYTHON_VERSION))
+    sys.exit(e)
+
 pwb = None
+site_package = False
 
 
 def check_pwb_versions(package):
@@ -39,7 +66,7 @@ def check_pwb_versions(package):
 
     Rules:
         - Pywikibot version must not be older than scrips version
-        - Scripts version must not be older than previous Pyvikibot version
+        - Scripts version must not be older than previous Pywikibot version
           due to deprecation policy
     """
     from pywikibot.tools import Version
@@ -81,12 +108,16 @@ def check_pwb_versions(package):
 # https://bitbucket.org/ned/coveragepy/src/2c5fb3a8b81c/setup.py?at=default#cl-31
 
 
-def run_python_file(filename, argv, argvu, package=None):
+def run_python_file(filename, args, package=None):
     """Run a python file as if it were the main program on the command line.
 
-    `filename` is the path to the file to execute, it need not be a .py file.
-    `args` is the argument array to present as sys.argv, as unicode strings.
-
+    :param filename: The path to the file to execute, it need not be a
+        .py file.
+    :type filename: str
+    :param args: is the argument list to present as sys.argv, as strings.
+    :type args: List[str]
+    :param package: The package of the script. Used for checks.
+    :type package: Optional[module]
     """
     # Create a module to serve as __main__
     old_main_mod = sys.modules['__main__']
@@ -102,8 +133,8 @@ def run_python_file(filename, argv, argvu, package=None):
     old_argv = sys.argv
     old_argvu = pwb.argvu
 
-    sys.argv = argv
-    pwb.argvu = argvu
+    sys.argv = [filename] + args
+    pwb.argvu = [Path(filename).stem] + args
     sys.path.insert(0, os.path.dirname(filename))
 
     try:
@@ -141,13 +172,16 @@ def handle_args(pwb_py, *args):
     fname = None
     index = 0
     for arg in args:
-        if arg.startswith('-'):
+        if arg in ('-version', '--version'):
+            fname = 'version.py'
+        elif arg.startswith('-'):
             index += 1
+            continue
         else:
             fname = arg
             if not fname.endswith('.py'):
                 fname += '.py'
-            break
+        break
     return fname, list(args[index + int(bool(fname)):]), args[:index]
 
 
@@ -172,7 +206,7 @@ def _print_requirements(requirements, script, variant):
 def check_modules(script=None):
     """Check whether mandatory modules are present.
 
-    This also checks Python version when importing deptendencies from setup.py
+    This also checks Python version when importing dependencies from setup.py
 
     :param script: The script name to be checked for dependencies
     :type script: str or None
@@ -182,27 +216,30 @@ def check_modules(script=None):
     """
     import pkg_resources
 
-    from setup import dependencies, script_deps
+    from setup import script_deps
 
     missing_requirements = []
     version_conflicts = []
 
-    try:
-        requirement = next(pkg_resources.parse_requirements(dependencies))
-    except ValueError as e:
-        # T286980: setuptools is too old and requirement parsing fails
-        import setuptools
-        setupversion = tuple(int(num)
-                             for num in setuptools.__version__.split('.'))
-        if setupversion < (20, 8, 1):
-            # print the minimal requirement
-            _print_requirements(['setuptools==20.8.1'], None,
-                                'outdated ({})'.format(setuptools.__version__))
-            return False
-        raise e
-
     if script:
         dependencies = script_deps.get(Path(script).name, [])
+    else:
+        from setup import dependencies
+        try:
+            next(pkg_resources.parse_requirements(dependencies))
+        except ValueError as e:
+            # T286980: setuptools is too old and requirement parsing fails
+            import setuptools
+            setupversion = tuple(int(num)
+                                 for num in setuptools.__version__.split('.'))
+            if setupversion < (20, 8, 1):
+                # print the minimal requirement
+                _print_requirements(
+                    ['setuptools>=20.8.1'], None,
+                    'outdated ({})'.format(setuptools.__version__))
+                return False
+            raise e
+
     for requirement in pkg_resources.parse_requirements(dependencies):
         if requirement.marker is None \
            or pkg_resources.evaluate_marker(str(requirement.marker)):
@@ -232,15 +269,6 @@ def check_modules(script=None):
     return not missing_requirements
 
 
-try:
-    if not check_modules():
-        raise RuntimeError('')  # no further output needed
-except RuntimeError as e:  # setup.py may also raise RuntimeError
-    sys.exit(e)
-
-from pathlib import Path  # noqa: E402
-
-
 filename, script_args, global_args = handle_args(*sys.argv)
 
 # Search for user-config.py before creating one.
@@ -260,9 +288,8 @@ except RuntimeError:
                                      or filename == 'version.py'):
         print("NOTE: 'user-config.py' was not found!")
         print('Please follow the prompts to create it:')
-        run_python_file(os.path.join(_pwb_dir, 'generate_user_files.py'),
-                        ['generate_user_files.py'],
-                        ['generate_user_files.py'])
+        run_python_file(os.path.join(
+            _pwb_dir, 'pywikibot', 'scripts', 'generate_user_files.py'), [])
         # because we have loaded pywikibot without user-config.py loaded,
         # we need to re-start the entire process. Ask the user to do so.
         print('Now, you have to re-execute the command to start your script.')
@@ -289,12 +316,13 @@ def find_alternates(filename, script_paths):
 
     script_paths = [['.']] + script_paths  # add current directory
     for path in script_paths:
-        for script_name in os.listdir(os.path.join(*path)):
-            # remove .py for better matching
-            name, _, suffix = script_name.rpartition('.')
-            if suffix == 'py' and not name.startswith('__'):
-                scripts[name] = os.path.join(*(path + [script_name]))
+        folder = Path(_pwb_dir).joinpath(*path)
+        for script_name in folder.iterdir():
+            name, suffix = script_name.stem, script_name.suffix
+            if suffix == '.py' and not name.startswith('__'):
+                scripts[name] = script_name
 
+    # remove .py for better matching
     filename = filename[:-3]
     similar_scripts = get_close_matches(filename, scripts,
                                         config.pwb_close_matches,
@@ -323,41 +351,65 @@ def find_alternates(filename, script_paths):
         except QuitKeyboardInterrupt:
             return None
         print()
-    return scripts[script]
+    return str(scripts[script])
 
 
 def find_filename(filename):
-    """Search for the filename in the given script paths."""
+    """Search for the filename in the given script paths.
+
+    .. versionchanged:: 7.0
+       Search users_scripts_paths in config.base_dir
+    """
     from pywikibot import config
+    path_list = []  # paths to find misspellings
 
-    script_paths = ['scripts.userscripts',
-                    'scripts',
-                    'scripts.maintenance']
+    def test_paths(paths, root):
+        """Search for filename in given paths within 'root' base directory."""
+        for file_package in paths:
+            package = file_package.split('.')
+            path = package + [filename]
+            testpath = os.path.join(root, *path)
+            if os.path.exists(testpath):
+                return testpath
+            path_list.append(package)
+        return None
 
+    if site_package:
+        script_paths = [_pwb_dir]
+    else:
+        script_paths = [
+            'scripts.userscripts',
+            'scripts',
+            'scripts.maintenance',
+            'pywikibot.scripts',
+        ]
+
+    user_script_paths = []
     if config.user_script_paths:
         if isinstance(config.user_script_paths, list):
-            script_paths = config.user_script_paths + script_paths
+            user_script_paths = config.user_script_paths
         else:
             warn("'user_script_paths' must be a list,\n"
                  'found: {}. Ignoring this setting.'
                  .format(type(config.user_script_paths)))
 
-    path_list = []
-    for file_package in script_paths:
-        package = file_package.split('.')
-        paths = package + [filename]
-        testpath = os.path.join(_pwb_dir, *paths)
-        if os.path.exists(testpath):
-            filename = testpath
-            break
-        path_list.append(package)
-    else:
-        filename = find_alternates(filename, path_list)
-    return filename
+    found = test_paths(user_script_paths, config.base_dir)
+    if found:
+        return found
+
+    found = test_paths(script_paths, _pwb_dir)
+    if found:
+        return found
+
+    return find_alternates(filename, path_list)
 
 
-def main():
-    """Command line entry point."""
+def execute():
+    """Parse arguments, extract filename and run the script.
+
+    .. versionadded:: 7.0
+       renamed from :func:`main`
+    """
     global filename
 
     if global_args:  # don't use sys.argv
@@ -372,7 +424,6 @@ def main():
         return False
 
     file_package = None
-    argvu = pwb.argvu[1:]
 
     if not os.path.exists(filename):
         filename = find_filename(filename)
@@ -408,14 +459,37 @@ def main():
 
     help_option = any(arg.startswith('-help:') or arg == '-help'
                       for arg in script_args)
-    if check_modules(filename) or help_option:
-        run_python_file(filename,
-                        [filename] + script_args,
-                        [Path(filename).stem] + argvu[1:],
-                        module)
+    if site_package or check_modules(filename) or help_option:
+        run_python_file(filename, script_args, module)
     return True
 
 
-if __name__ == '__main__':
-    if not main():
+def main():
+    """Script entry point. Print doc if necessary.
+
+    .. versionchanged:: 7.0
+       previous implementation was renamed to :func:`execute`
+    """
+    try:
+        if not check_modules():
+            raise RuntimeError('')  # no further output needed
+    except RuntimeError as e:  # setup.py may also raise RuntimeError
+        sys.exit(e)
+
+    if not execute():
         print(__doc__)
+
+
+def run():
+    """Site package entry point. Print doc if necessary.
+
+    .. versionadded:: 7.0
+    """
+    global site_package
+    site_package = True
+    if not execute():
+        print(__doc__)
+
+
+if __name__ == '__main__':
+    main()

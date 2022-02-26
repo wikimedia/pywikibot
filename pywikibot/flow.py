@@ -1,13 +1,13 @@
 """Objects representing Flow entities, like boards, topics, and posts."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2022
 #
 # Distributed under the terms of the MIT license.
 #
 import abc
 import datetime
 import logging
-from typing import Any, Union
+from typing import Any, Type, Union
 from urllib.parse import parse_qs, urlparse
 
 import pywikibot
@@ -17,20 +17,10 @@ from pywikibot.exceptions import (
     NoPageError,
     UnknownExtensionError,
 )
-from pywikibot.page import BasePage, User
-from pywikibot.tools import deprecate_arg
+from pywikibot.page import BasePage, PageSourceType, User
 
 
 logger = logging.getLogger('pywiki.wiki.flow')
-
-# TODO: replace these after T286867
-
-TOPIC_CLASS_TYPE = Any  # Type['Topic']
-
-# Union['pywikibot.site.BaseSite', 'pywikibot.page.Link',
-#       'pywikibot.page.Page']
-
-SOURCE_TYPE = Any
 
 
 # Flow page-like objects (boards and topics)
@@ -41,7 +31,7 @@ class FlowPage(BasePage, abc.ABC):
     It cannot be instantiated directly.
     """
 
-    def __init__(self, source: SOURCE_TYPE, title: str = '') -> None:
+    def __init__(self, source: PageSourceType, title: str = '') -> None:
         """Initializer.
 
         :param source: A Flow-enabled site or a Link or Page on such a site
@@ -114,7 +104,6 @@ class Board(FlowPage):
                     new_params[key] = value
         return new_params
 
-    @deprecate_arg('format', 'content_format')
     def topics(self, content_format: str = 'wikitext', limit: int = 100,
                sort_by: str = 'newest',
                offset: Union[str, datetime.datetime, None] = None,
@@ -133,7 +122,7 @@ class Board(FlowPage):
         :param reverse: Whether to reverse the topic ordering.
         :param include_offset: Whether to include the offset topic.
         :param toc_only: Whether to only include information for the TOC.
-        :return: A generator of this board's topics.
+        :yield: A generator of this board's topics.
         """
         data = self.site.load_topiclist(self, content_format=content_format,
                                         limit=limit, sortby=sort_by,
@@ -147,7 +136,6 @@ class Board(FlowPage):
             cont_args = self._parse_url(data['links']['pagination'])
             data = self.site.load_topiclist(self, **cont_args)
 
-    @deprecate_arg('format', 'content_format')
     def new_topic(self, title: str, content: str,
                   content_format: str = 'wikitext') -> 'Topic':
         """Create and return a Topic object for a new topic on this Board.
@@ -181,8 +169,7 @@ class Topic(FlowPage):
         self.root._load(load_from_topic=True)
 
     @classmethod
-    @deprecate_arg('format', 'content_format')
-    def create_topic(cls: TOPIC_CLASS_TYPE, board: 'Board', title: str,
+    def create_topic(cls: Type['Topic'], board: 'Board', title: str,
                      content: str, content_format: str = 'wikitext'
                      ) -> 'Topic':
         """Create and return a Topic object for a new topic on a Board.
@@ -199,7 +186,7 @@ class Topic(FlowPage):
         return cls(board.site, data['topic-page'])
 
     @classmethod
-    def from_topiclist_data(cls: TOPIC_CLASS_TYPE, board: 'Board',
+    def from_topiclist_data(cls: Type['Topic'], board: 'Board',
                             root_uuid: str,
                             topiclist_data: Dict[str, Any]) -> 'Topic':
         """Create a Topic object from API data.
@@ -238,7 +225,6 @@ class Topic(FlowPage):
         """Whether this topic is moderated."""
         return self.root._current_revision['isModerated']
 
-    @deprecate_arg('format', 'content_format')
     def replies(self, content_format: str = 'wikitext', force: bool = False
                 ) -> List['Post']:
         """A list of replies to this topic's root post.
@@ -250,7 +236,6 @@ class Topic(FlowPage):
         """
         return self.root.replies(content_format=content_format, force=force)
 
-    @deprecate_arg('format', 'content_format')
     def reply(self, content: str, content_format: str = 'wikitext') -> 'Post':
         """A convenience method to reply to this topic's root post.
 
@@ -428,7 +413,7 @@ class Post:
         return self._current_revision['isModerated']
 
     @property
-    def creator(self) -> str:
+    def creator(self) -> User:
         """The creator of this post."""
         if not hasattr(self, '_current_revision'):
             self._load()
@@ -437,7 +422,6 @@ class Post:
                                  self._current_revision['creator']['name'])
         return self._creator
 
-    @deprecate_arg('format', 'content_format')
     def get(self, content_format: str = 'wikitext',
             force: bool = False) -> str:
         """Return the contents of the post in the given format.
@@ -450,7 +434,6 @@ class Post:
             self._load(content_format=content_format)
         return self._content[content_format]
 
-    @deprecate_arg('format', 'content_format')
     def replies(self, content_format: str = 'wikitext', force: bool = False
                 ) -> List['Post']:
         """Return this post's replies.
@@ -476,7 +459,6 @@ class Post:
 
         return self._replies
 
-    @deprecate_arg('format', 'content_format')
     def reply(self, content: str, content_format: str = 'wikitext') -> 'Post':
         """Reply to this post.
 

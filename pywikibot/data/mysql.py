@@ -4,13 +4,14 @@
 #
 # Distributed under the terms of the MIT license.
 #
+import struct
 from typing import Optional
 
 import pkg_resources
 
 import pywikibot
 from pywikibot import config
-from pywikibot.tools import deprecated_args
+from pywikibot.backports import removesuffix
 
 
 try:
@@ -19,7 +20,33 @@ except ImportError:
     raise ImportError('MySQL python module not found. Please install PyMySQL.')
 
 
-@deprecated_args(encoding=True)
+COM_QUIT = 0x01
+
+
+class _OldConnection(pymysql.connections.Connection):
+
+    """Representation of a socket with a mysql server.
+
+    This class is used to patch close() method for pymysql<0.7.11 on
+    toolforge (T216741).
+
+    .. versionadded:: 7.0
+    """
+
+    def close(self):
+        """Send the quit message and close the socket."""
+        if self._closed or self._sock is None:
+            super().close()
+
+        send_data = struct.pack('<iB', 1, COM_QUIT)
+        try:
+            self._write_bytes(send_data)
+        except Exception:
+            pass
+        finally:
+            self._force_close()
+
+
 def mysql_query(query: str, params=None,
                 dbname: Optional[str] = None,
                 verbose: Optional[bool] = None):
@@ -56,14 +83,20 @@ def mysql_query(query: str, params=None,
     else:
         credentials = {'read_default_file': config.db_connect_file}
 
-    connection = pymysql.connect(host=config.db_hostname_format.format(dbname),
-                                 database=config.db_name_format.format(dbname),
-                                 port=config.db_port,
-                                 charset='utf8',
-                                 defer_connect=query == 'test',  # for tests
-                                 **credentials)
+    pymysql_version = pkg_resources.parse_version(
+        removesuffix(pymysql.__version__, '.None'))
+    args = {
+        'host': config.db_hostname_format.format(dbname),
+        'database': config.db_name_format.format(dbname),
+        'port': config.db_port,
+        'charset': 'utf8',
+        'defer_connect': query == 'test',  # for tests
+    }
 
-    pymysql_version = pkg_resources.parse_version(pymysql.__version__)
+    if pymysql_version < pkg_resources.parse_version('0.7.11'):
+        connection = _OldConnection(**args, **credentials)
+    else:
+        connection = pymysql.connect(**args, **credentials)
 
     if pymysql_version < pkg_resources.parse_version('1.0.0'):
         from contextlib import closing

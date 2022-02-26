@@ -1,6 +1,7 @@
+#!/usr/bin/python3
 """Test add_text bot module."""
 #
-# (C) Pywikibot team, 2016-2021
+# (C) Pywikibot team, 2016-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,9 +10,7 @@ from unittest.mock import ANY, MagicMock, Mock, mock_open, patch
 
 import pywikibot
 import pywikibot.pagegenerators
-
 from scripts.add_text import AddTextBot, main, parse
-
 from tests.aspects import TestCase
 
 
@@ -175,6 +174,16 @@ class TestAdding(TestCase):
         self.assertEqual([
             "mock_page doesn't exist, creating it!"
         ], pywikibot.bot.ui.pop_output())
+
+    def test_skip_missing_standard_with_create(self):
+        """Exercise skip_page() with -create option for a non-talk page."""
+        bot = AddTextBot(create=True)
+        for exists in (True, False):
+            with self.subTest(exists=exists):
+                page = _mock_page(exists=exists)
+
+                self.assertFalse(bot.skip_page(page))
+                self.assertIsEmpty(pywikibot.bot.ui.pop_output())
 
     def test_skip_if_redirect(self):
         """Exercise skip_page() with a page that is a redirect."""

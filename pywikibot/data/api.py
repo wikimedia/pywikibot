@@ -1,6 +1,6 @@
 """Interface to Mediawiki's api.php."""
 #
-# (C) Pywikibot team, 2007-2021
+# (C) Pywikibot team, 2007-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -13,7 +13,6 @@ import pprint
 import re
 import traceback
 from collections.abc import Container, MutableMapping, Sized
-from contextlib import suppress
 from email.generator import BytesGenerator
 from email.mime.multipart import MIMEMultipart as MIMEMultipartOrig
 from email.mime.nonmultipart import MIMENonMultipart
@@ -42,7 +41,7 @@ from pywikibot.exceptions import (
 from pywikibot.family import SubdomainFamily
 from pywikibot.login import LoginStatus
 from pywikibot.textlib import removeHTMLParts
-from pywikibot.tools import PYTHON_VERSION, ModuleDeprecationWrapper, itergroup
+from pywikibot.tools import PYTHON_VERSION, itergroup
 from pywikibot.tools.formatter import color_format
 
 
@@ -222,7 +221,7 @@ class ParamInfo(Sized, Container):
         """Emulate the pageset module, which existed until MW 1.24."""
         # pageset isn't a module in the new system, so it is emulated, with
         # the paraminfo from the query module.
-        assert('query' in self._paraminfo)
+        assert 'query' in self._paraminfo
 
         self._paraminfo['pageset'] = {
             'name': 'pageset',
@@ -373,67 +372,65 @@ class ParamInfo(Sized, Container):
                     del normalized_result[path]
 
             self._paraminfo.update(normalized_result)
-            self._generate_submodules(mod['path']
-                                      for mod in normalized_result.values())
+            for mod in normalized_result.values():
+                self._generate_submodules(mod['path'])
 
         if 'pageset' in modules and 'pageset' not in self._paraminfo:
             self._emulate_pageset()
 
-    def _generate_submodules(self, modules):
-        """Check and generate submodules for the given modules."""
-        for module in modules:
-            parameters = self._paraminfo[module].get('parameters', [])
-            submodules = set()
-            # Advanced submodule into added to MW API in df80f1ea
-            if self.site.mw_version >= '1.26wmf9':
-                # This is supplying submodules even if they aren't submodules
-                # of the given module so skip those
-                for param in parameters:
-                    if ((module == 'main' and param['name'] == 'format')
-                            or 'submodules' not in param):
-                        continue
-                    for submodule in param['submodules'].values():
-                        if '+' in submodule:
-                            parent, child = submodule.rsplit('+', 1)
-                        else:
-                            parent = 'main'
-                            child = submodule
-                        if parent == module:
-                            submodules.add(child)
-            else:
-                # Boolean submodule info added to MW API in afa153ae
-                if self.site.mw_version < '1.24wmf18':
-                    if module == 'main':
-                        params = {'action'}
-                    elif module == 'query':
-                        params = {'prop', 'list', 'meta'}
+    def _generate_submodules(self, module):
+        """Check and generate submodules for the given module."""
+        parameters = self._paraminfo[module].get('parameters', [])
+        submodules = set()
+        # Advanced submodule into added to MW API in df80f1ea
+        if self.site.mw_version >= '1.26wmf9':
+            # This is supplying submodules even if they aren't submodules
+            # of the given module so skip those
+            for param in parameters:
+                if module == 'main' and param['name'] == 'format' \
+                   or 'submodules' not in param:
+                    continue
+
+                for submodule in param['submodules'].values():
+                    if '+' in submodule:
+                        parent, child = submodule.rsplit('+', 1)
                     else:
-                        params = set()
-                    for param in parameters:
-                        if param['name'] in params:
-                            param['submodules'] = ''
-
-                for param in parameters:
-                    # Do not add format modules
-                    if ('submodules' in param
-                        and (module != 'main'
-                             or param['name'] != 'format')):
-                        submodules |= set(param['type'])
-
-            if submodules:
-                self._add_submodules(module, submodules)
-            if module == 'query':
-                # Previously also modules from generator were used as query
-                # modules, but verify that those are just a subset of the
-                # prop/list/meta modules. There is no sanity check as this
-                # needs to be revisited if query has no generator parameter
-                for param in parameters:
-                    if param['name'] == 'generator':
-                        break
+                        parent, child = 'main', submodule
+                    if parent == module:
+                        submodules.add(child)
+        else:
+            # Boolean submodule info added to MW API in afa153ae
+            if self.site.mw_version < '1.24wmf18':
+                if module == 'main':
+                    params = {'action'}
+                elif module == 'query':
+                    params = {'prop', 'list', 'meta'}
                 else:
-                    param = {}
-                assert param['name'] == 'generator' \
-                    and submodules >= set(param['type'])
+                    params = set()
+                for param in parameters:
+                    if param['name'] in params:
+                        param['submodules'] = ''
+
+            for param in parameters:
+                # Do not add format modules
+                if 'submodules' in param \
+                   and (module != 'main' or param['name'] != 'format'):
+                    submodules |= set(param['type'])
+
+        if submodules:
+            self._add_submodules(module, submodules)
+        if module == 'query':
+            # Previously also modules from generator were used as query
+            # modules, but verify that those are just a subset of the
+            # prop/list/meta modules. There is no sanity check as this
+            # needs to be revisited if query has no generator parameter
+            for param in parameters:
+                if param['name'] == 'generator':
+                    break
+            else:
+                param = {}
+            assert param['name'] == 'generator' \
+                and submodules >= set(param['type'])
 
     def _normalize_modules(self, modules) -> set:
         """Add query+ to any query module name not also in action modules."""
@@ -1098,7 +1095,7 @@ class Request(MutableMapping):
             args |= set(getfullargspec(super_cls.__init__).args)
         else:
             raise ValueError('Request was not a super class of '
-                             '{0!r}'.format(cls))
+                             '{!r}'.format(cls))
         args -= {'self'}
         old_kwargs = set(kwargs)
         # all kwargs defined above but not in args indicate 'kwargs' mode
@@ -1233,10 +1230,10 @@ class Request(MutableMapping):
                 uiprop = self._params.get('uiprop', [])
                 uiprop = set(uiprop + ['blockinfo', 'hasmsg'])
                 self['uiprop'] = sorted(uiprop)
-            if 'prop' in self._params:
-                if self.site.has_extension('ProofreadPage'):
-                    prop = set(self['prop'] + ['proofread'])
-                    self['prop'] = sorted(prop)
+            if 'prop' in self._params \
+               and self.site.has_extension('ProofreadPage'):
+                prop = set(self['prop'] + ['proofread'])
+                self['prop'] = sorted(prop)
             # When neither 'continue' nor 'rawcontinue' is present and the
             # version number is at least 1.25wmf5 we add a dummy rawcontinue
             # parameter. Querying siteinfo is save as it adds 'continue'
@@ -1430,7 +1427,7 @@ class Request(MutableMapping):
 
         :param params: HTTP request params
         :param mime_params: HTTP request parts which must be sent in the body
-        :type mime_params: dict of (content, keytype, headers)
+        :type mime_params: dict of (content, keytype, headers)  # noqa: DAR103
         :return: HTTP request headers and body
         """
         # construct a MIME message containing all API key/values
@@ -1496,7 +1493,7 @@ class Request(MutableMapping):
                 pywikibot.warning('Caught HTTP 414 error, although not '
                                   'using GET.')
                 raise
-        except FatalServerError:
+        except (ConnectionError, FatalServerError):
             # This error is not going to be fixed by just waiting
             pywikibot.error(traceback.format_exc())
             raise
@@ -1849,6 +1846,17 @@ The text message is:
                 self.wait()
                 continue
 
+            if code in ('search-title-disabled', 'search-text-disabled'):
+                prefix = 'gsr' if 'gsrsearch' in self._params else 'sr'
+                del self._params[prefix + 'what']
+                # use intitle: search instead
+                if code == 'search-title-disabled' \
+                   and self.site.has_extension('CirrusSearch'):
+                    key = prefix + 'search'
+                    self._params[key] = ['intitle:' + search
+                                         for search in self._params[key]]
+                continue
+
             if code == 'urlshortener-blocked':  # T244062
                 # add additional informations to result['error']
                 result['error']['current site'] = self.site
@@ -1924,7 +1932,7 @@ class CachedRequest(Request):
         :return: base directory path for cache entries
         """
         path = os.path.join(config.base_dir,
-                            'apicache-py{0:d}'.format(PYTHON_VERSION[0]))
+                            'apicache-py{:d}'.format(PYTHON_VERSION[0]))
         cls._make_dir(path)
         cls._get_cache_dir = classmethod(lambda c: path)  # cache the result
         return path
@@ -1933,13 +1941,14 @@ class CachedRequest(Request):
     def _make_dir(dir_name: str) -> str:
         """Create directory if it does not exist already.
 
-        The directory name (dir_name) is returned unmodified.
+        .. versionchanged:: 7.0
+           Only `FileExistsError` is ignored but other OS exceptions can
+           be still raised
 
         :param dir_name: directory path
-        :return: directory name
+        :return: unmodified directory name for test purpose
         """
-        with suppress(OSError):  # directory already exists
-            os.makedirs(dir_name)
+        os.makedirs(dir_name, exist_ok=True)
         return dir_name
 
     def _uniquedescriptionstr(self) -> str:
@@ -2001,7 +2010,7 @@ class CachedRequest(Request):
                             .format(self.__class__.__name__, filename,
                                     uniquedescr), _logger)
             return True
-        except IOError:
+        except OSError:
             # file not found
             return False
         except Exception as e:
@@ -2477,7 +2486,7 @@ class QueryGenerator(_RequestWrapper):
 
     def _handle_query_limit(self, prev_limit, new_limit, had_data):
         """Handle query limit."""
-        if self.query_limit is None:
+        if self.query_limit is None or self.limited_module is None:
             return prev_limit, new_limit
 
         prev_limit = new_limit
@@ -2547,9 +2556,9 @@ class QueryGenerator(_RequestWrapper):
         """Extract results from resultdata."""
         for item in resultdata:
             result = self.result(item)
-            if self._namespaces:
-                if not self._check_result_namespace(result):
-                    continue
+            if self._namespaces and not self._check_result_namespace(result):
+                continue
+
             yield result
             if isinstance(item, dict) \
                     and set(self.continuekey) & set(item.keys()):
@@ -2883,13 +2892,13 @@ class LoginManager(login.LoginManager):
         takes care of all the cookie stuff. Throws exception on failure.
         """
         self.below_mw_1_27 = False
-        if hasattr(self, '_waituntil'):
-            if datetime.datetime.now() < self._waituntil:
-                diff = self._waituntil - datetime.datetime.now()
-                pywikibot.warning(
-                    'Too many tries, waiting {} seconds before retrying.'
-                    .format(diff.seconds))
-                pywikibot.sleep(diff.seconds)
+        if hasattr(self, '_waituntil') \
+           and datetime.datetime.now() < self._waituntil:
+            diff = self._waituntil - datetime.datetime.now()
+            pywikibot.warning(
+                'Too many tries, waiting {} seconds before retrying.'
+                .format(diff.seconds))
+            pywikibot.sleep(diff.seconds)
 
         self.site._loginstatus = LoginStatus.IN_PROGRESS
 
@@ -3016,11 +3025,10 @@ def _update_pageid(page, pagedict: dict):
         page._pageid = 0  # Non-existent page
     else:
         # Something is wrong.
-        if page.site.sametitle(page.title(), pagedict['title']):
-            if 'invalid' in pagedict:
-                raise InvalidTitleError('{}: {}'
-                                        .format(page,
-                                                pagedict['invalidreason']))
+        if page.site.sametitle(page.title(), pagedict['title']) \
+           and 'invalid' in pagedict:
+            raise InvalidTitleError('{}: {}'
+                                    .format(page, pagedict['invalidreason']))
         if int(pagedict['ns']) < 0:
             raise UnsupportedPageError(page)
         raise RuntimeError(
@@ -3168,15 +3176,3 @@ def update_page(page, pagedict: dict, props=None):
         page._lintinfo.pop('pageid')
         page._lintinfo.pop('title')
         page._lintinfo.pop('ns')
-
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper.add_deprecated_attr(
-    'APIError', replacement_name='pywikibot.exceptions.APIError',
-    since='20210423')
-wrapper.add_deprecated_attr(
-    'UploadWarning', replacement_name='pywikibot.exceptions.UploadError',
-    since='20210423')
-wrapper.add_deprecated_attr(
-    'APIMWException', replacement_name='pywikibot.exceptions.APIMWError',
-    since='20210423')

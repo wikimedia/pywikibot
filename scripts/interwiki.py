@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 Script to check language links for general pages.
 
@@ -92,7 +92,7 @@ These arguments control miscellaneous bot behaviour:
                    (note: without ending colon)
 
     -async         Put page on queue to be saved to wiki asynchronously. This
-                   enables loading pages during saving throtteling and gives a
+                   enables loading pages during saving throttling and gives a
                    better performance.
                    NOTE: For post-processing it always assumes that saving the
                    the pages was successful.
@@ -328,14 +328,13 @@ that you have to break it off, use "-continue" next time.
 
 """
 #
-# (C) Pywikibot team, 2003-2021
+# (C) Pywikibot team, 2003-2022
 #
 # Distributed under the terms of the MIT license.
 #
 import codecs
 import os
 import re
-import socket
 import sys
 from collections import Counter, defaultdict
 from contextlib import suppress
@@ -545,8 +544,8 @@ class InterwikiBotConfig:
             self.summary = value or pywikibot.input(
                 'What summary do you want to use?')
         elif arg == 'lack':
-            self.lacklanguage, sep, minlinks = value.partition(':')
-            self.minlinks = int(minlinks) if minlinks.isdigit() else 1
+            self.lacklanguage, _, minlinks = value.partition(':')
+            self.minlinks = int(minlinks or 1)
         elif arg in ('cleanup', 'confirm', 'force', 'hintnobracket',
                      'hintsareright', 'initialredirect', 'localonly', 'quiet',
                      'repository', 'same', 'select', 'skipauto',
@@ -557,36 +556,6 @@ class InterwikiBotConfig:
         else:
             return False
         return True
-
-
-class PageTree(SizedKeyCollection):
-
-    """
-    Structure to manipulate a set of pages.
-
-    Allows filtering efficiently by Site.
-    """
-
-    def __init__(self):
-        """Initializer.
-
-        While using dict values would be faster for the remove() operation,
-        keeping list values is important, because the order in which the pages
-        were found matters: the earlier a page is found, the closer it is to
-        the Subject.origin. Chances are that pages found within 2 interwiki
-        distance from the origin are more related to the original topic
-        than pages found later on, after 3, 4, 5 or more interwiki hops.
-
-        Keeping this order is hence important to display an ordered
-        list of pages to the user when he'll be asked to resolve
-        conflicts.
-
-        :ivar data: dictionary with Site as keys and list of page as values.
-            All pages found within Site are kept in self.data[site].
-
-        :type data: defaultdict(list)
-        """
-        super().__init__('site')
 
 
 class Subject(interwiki_graph.Subject):
@@ -667,16 +636,16 @@ class Subject(interwiki_graph.Subject):
         self.repoPage = None
         # todo is a list of all pages that still need to be analyzed.
         # Mark the origin page as todo.
-        self.todo = PageTree()
+        self.todo = SizedKeyCollection('site')
         if origin:
             self.todo.append(origin)
 
         # done is a list of all pages that have been analyzed and that
         # are known to belong to this subject.
-        self.done = PageTree()
+        self.done = SizedKeyCollection('site')
         # This is a list of all pages that are currently scheduled for
         # download.
-        self.pending = PageTree()
+        self.pending = SizedKeyCollection('site')
         if self.conf.hintsareright:
             # This is a set of sites that we got hints to
             self.hintedsites = set()
@@ -1098,6 +1067,184 @@ class Subject(interwiki_graph.Subject):
                     if self.conf.hintsareright:
                         self.hintedsites.add(page.site)
 
+    def check_page(self, page, counter):
+        """Check whether any iw links should be added to the todo list."""
+        if not page.exists():
+            self.conf.remove.append(str(page))
+            self.conf.note('{} does not exist. Skipping.'.format(page))
+            if page == self.origin:
+                # The page we are working on is the page that does not
+                # exist. No use in doing any work on it in that case.
+                for site, count in self.todo.iter_values_len():
+                    counter.minus(site, count)
+                self.todo.clear()
+                # In some rare cases it might be we already did check some
+                # 'automatic' links
+                self.done.clear()
+            return
+
+        if page.isRedirectPage():
+            redirectTargetPage = page.getRedirectTarget()
+            redir = ''
+        elif page.isCategoryRedirect():
+            redirectTargetPage = page.getCategoryRedirectTarget()
+            redir = 'category '
+        else:
+            redir = None
+
+        if redir is not None:
+            self.conf.note('{} is {}redirect to {}'
+                           .format(page, redir, redirectTargetPage))
+            if self.origin is None or page == self.origin:
+                # the 1st existig page becomes the origin page, if none was
+                # supplied
+                if self.conf.initialredirect:
+                    # don't follow another redirect; it might be a self
+                    # loop
+                    if not redirectTargetPage.isRedirectPage() \
+                       and not redirectTargetPage.isCategoryRedirect():
+                        self.origin = redirectTargetPage
+                        self.todo.append(redirectTargetPage)
+                        counter.plus(redirectTargetPage.site)
+                else:
+                    # This is a redirect page to the origin. We don't need
+                    # to follow the redirection.
+                    # In this case we can also stop all hints!
+                    for site, count in self.todo.iter_values_len():
+                        counter.minus(site, count)
+                    self.todo.clear()
+            elif not self.conf.followredirect:
+                self.conf.note('not following {}redirects.'.format(redir))
+            elif page.isStaticRedirect():
+                self.conf.note('not following static {}redirects.'
+                               .format(redir))
+            elif (page.site.family == redirectTargetPage.site.family
+                  and not self.skipPage(page, redirectTargetPage, counter)):
+                if self.addIfNew(redirectTargetPage, counter, page):
+                    if config.interwiki_shownew:
+                        pywikibot.output('{}: {} gives new {}redirect {}'
+                                         .format(self.origin, page, redir,
+                                                 redirectTargetPage))
+            return
+
+        # must be behind the page.isRedirectPage() part
+        # otherwise a redirect error would be raised
+        if page_empty_check(page):
+            self.conf.remove.append(str(page))
+            self.conf.note('{} is empty. Skipping.'.format(page))
+            if page == self.origin:
+                for site, count in self.todo.iter_values_len():
+                    counter.minus(site, count)
+                self.todo.clear()
+                self.done.clear()
+                self.origin = None
+            return
+
+        if page.section():
+            self.conf.note('{} is a page section. Skipping.'.format(page))
+            return
+
+        # Page exists, isn't a redirect, and is a plain link (no section)
+        if self.origin is None:
+            # the 1st existig page becomes the origin page, if none was
+            # supplied
+            self.origin = page
+
+        try:
+            iw = page.langlinks()
+        except UnknownSiteError:
+            self.conf.note('site {} does not exist.'.format(page.site))
+            return
+
+        (skip, alternativePage) = self.disambigMismatch(page, counter)
+        if skip:
+            pywikibot.output('NOTE: ignoring {} and its interwiki links'
+                             .format(page))
+            self.done.remove(page)
+            iw = ()
+            if alternativePage:
+                # add the page that was entered by the user
+                self.addIfNew(alternativePage, counter, None)
+
+        duplicate = None
+        for p in self.done.filter(page.site):
+            if p != page and p.exists() \
+               and not p.isRedirectPage() and not p.isCategoryRedirect():
+                duplicate = p
+                break
+
+        if self.origin == page:
+            self.untranslated = not iw
+            if self.conf.untranslatedonly:
+                # Ignore the interwiki links.
+                iw = ()
+            if self.conf.lacklanguage:
+                if self.conf.lacklanguage in (link.site.lang for link in iw):
+                    iw = ()
+                    self.workonme = False
+            if len(iw) < self.conf.minlinks:
+                iw = ()
+                self.workonme = False
+
+        elif self.conf.autonomous and duplicate and not skip:
+            pywikibot.output('Stopping work on {} because duplicate pages'
+                             ' {} and {} are found'
+                             .format(self.originP, duplicate, page))
+            self.makeForcedStop(counter)
+            try:
+                with codecs.open(
+                    pywikibot.config.datafilepath('autonomous_problems.dat'),
+                        'a', 'utf-8') as f:
+                    f.write('* {} {{Found more than one link for {}}}'
+                            .format(self.origin, page.site))
+                    if config.interwiki_graph and config.interwiki_graph_url:
+                        filename = interwiki_graph.getFilename(
+                            self.origin,
+                            extension=config.interwiki_graph_formats[0])
+                        f.write(' [{}{} graph]'
+                                .format(config.interwiki_graph_url, filename))
+                    f.write('\n')
+            # FIXME: What errors are we catching here?
+            except Exception:
+                pywikibot.output(
+                    'File autonomous_problems.dat open or corrupted! '
+                    'Try again with -restore.')
+                sys.exit()
+            iw = ()
+
+        for link in iw:
+            linkedPage = pywikibot.Page(link)
+            if self.conf.hintsareright and linkedPage.site in self.hintedsites:
+                pywikibot.output(
+                    'NOTE: {}: {} extra interwiki on hinted site ignored {}'
+                    .format(self.origin, page, linkedPage))
+                break
+
+            if not self.skipPage(page, linkedPage, counter):
+                if self.conf.followinterwiki or page == self.origin:
+                    if self.addIfNew(linkedPage, counter, page):
+                        # It is new. Also verify whether it is the second
+                        # on the same site
+                        lpsite = linkedPage.site
+                        for prevPage in self.found_in:
+                            if prevPage != linkedPage and \
+                               prevPage.site == lpsite:
+                                # Still, this could be "no problem" as
+                                # either may be a redirect to the other.
+                                # No way to find out quickly!
+                                pywikibot.output(
+                                    'NOTE: {}: {} gives duplicate '
+                                    'interwiki on same site {}'
+                                    .format(self.origin, page, linkedPage))
+                                break
+                        else:
+                            if config.interwiki_shownew:
+                                pywikibot.output(
+                                    '{}: {} gives new interwiki {}'
+                                    .format(self.origin, page, linkedPage))
+            if self.forcedStop:
+                break
+
     def batchLoaded(self, counter):
         """
         Notify that the promised batch of pages was loaded.
@@ -1136,187 +1283,7 @@ class Subject(interwiki_graph.Subject):
 
             # Now check whether any interwiki links should be added to the
             # todo list.
-
-            if not page.exists():
-                self.conf.remove.append(str(page))
-                self.conf.note('{} does not exist. Skipping.'.format(page))
-                if page == self.origin:
-                    # The page we are working on is the page that does not
-                    # exist. No use in doing any work on it in that case.
-                    for site, count in self.todo.iter_values_len():
-                        counter.minus(site, count)
-                    self.todo.clear()
-                    # In some rare cases it might be we already did check some
-                    # 'automatic' links
-                    self.done.clear()
-                continue
-
-            if page.isRedirectPage() or page.isCategoryRedirect():
-                if page.isRedirectPage():
-                    redirectTargetPage = page.getRedirectTarget()
-                    redir = ''
-                else:
-                    redirectTargetPage = page.getCategoryRedirectTarget()
-                    redir = 'category '
-                self.conf.note('{} is {}redirect to {}'
-                               .format(page, redir, redirectTargetPage))
-                if self.origin is None or page == self.origin:
-                    # the 1st existig page becomes the origin page, if none was
-                    # supplied
-                    if self.conf.initialredirect:
-                        # don't follow another redirect; it might be a self
-                        # loop
-                        if not redirectTargetPage.isRedirectPage() \
-                           and not redirectTargetPage.isCategoryRedirect():
-                            self.origin = redirectTargetPage
-                            self.todo.append(redirectTargetPage)
-                            counter.plus(redirectTargetPage.site)
-                    else:
-                        # This is a redirect page to the origin. We don't need
-                        # to follow the redirection.
-                        # In this case we can also stop all hints!
-                        for site, count in self.todo.iter_values_len():
-                            counter.minus(site, count)
-                        self.todo.clear()
-                elif not self.conf.followredirect:
-                    self.conf.note('not following {}redirects.'.format(redir))
-                elif page.isStaticRedirect():
-                    self.conf.note('not following static {}redirects.'
-                                   .format(redir))
-                elif (page.site.family == redirectTargetPage.site.family
-                      and not self.skipPage(page, redirectTargetPage,
-                                            counter)):
-                    if self.addIfNew(redirectTargetPage, counter, page):
-                        if config.interwiki_shownew:
-                            pywikibot.output('{}: {} gives new {}redirect {}'
-                                             .format(self.origin,
-                                                     page, redir,
-                                                     redirectTargetPage))
-                continue
-
-            # must be behind the page.isRedirectPage() part
-            # otherwise a redirect error would be raised
-            if page_empty_check(page):
-                self.conf.remove.append(str(page))
-                self.conf.note('{} is empty. Skipping.'.format(page))
-                if page == self.origin:
-                    for site, count in self.todo.iter_values_len():
-                        counter.minus(site, count)
-                    self.todo.clear()
-                    self.done.clear()
-                    self.origin = None
-                continue
-
-            if page.section():
-                self.conf.note('{} is a page section. Skipping.'.format(page))
-                continue
-
-            # Page exists, isn't a redirect, and is a plain link (no section)
-            if self.origin is None:
-                # the 1st existig page becomes the origin page, if none was
-                # supplied
-                self.origin = page
-
-            try:
-                iw = page.langlinks()
-            except UnknownSiteError:
-                self.conf.note('site {} does not exist.'.format(page.site))
-                continue
-
-            (skip, alternativePage) = self.disambigMismatch(page, counter)
-            if skip:
-                pywikibot.output('NOTE: ignoring {} and its interwiki links'
-                                 .format(page))
-                self.done.remove(page)
-                iw = ()
-                if alternativePage:
-                    # add the page that was entered by the user
-                    self.addIfNew(alternativePage, counter, None)
-
-            duplicate = None
-            for p in self.done.filter(page.site):
-                if p != page and p.exists() and \
-                   not p.isRedirectPage() and not p.isCategoryRedirect():
-                    duplicate = p
-                    break
-
-            if self.origin == page:
-                self.untranslated = not iw
-                if self.conf.untranslatedonly:
-                    # Ignore the interwiki links.
-                    iw = ()
-                if self.conf.lacklanguage:
-                    if self.conf.lacklanguage in (link.site.lang
-                                                  for link in iw):
-                        iw = ()
-                        self.workonme = False
-                if len(iw) < self.conf.minlinks:
-                    iw = ()
-                    self.workonme = False
-
-            elif self.conf.autonomous and duplicate and not skip:
-                pywikibot.output('Stopping work on {} because duplicate pages'
-                                 ' {} and {} are found'
-                                 .format(self.originP, duplicate, page))
-                self.makeForcedStop(counter)
-                try:
-                    with codecs.open(
-                        pywikibot.config.datafilepath(
-                            'autonomous_problems.dat'),
-                            'a', 'utf-8') as f:
-                        f.write('* {} {{Found more than one link for {}}}'
-                                .format(self.origin, page.site))
-                        if config.interwiki_graph \
-                           and config.interwiki_graph_url:
-                            filename = interwiki_graph.getFilename(
-                                self.origin,
-                                extension=config.interwiki_graph_formats[0])
-                            f.write(' [{}{} graph]'
-                                    .format(config.interwiki_graph_url,
-                                            filename))
-                        f.write('\n')
-                # FIXME: What errors are we catching here?
-                except Exception:
-                    # raise
-                    pywikibot.output(
-                        'File autonomous_problems.dat open or corrupted! '
-                        'Try again with -restore.')
-                    sys.exit()
-                iw = ()
-
-            for link in iw:
-                linkedPage = pywikibot.Page(link)
-                if self.conf.hintsareright \
-                   and linkedPage.site in self.hintedsites:
-                    pywikibot.output(
-                        'NOTE: {}: {} extra interwiki on hinted site '
-                        'ignored {}'.format(self.origin, page, linkedPage))
-                    break
-
-                if not self.skipPage(page, linkedPage, counter):
-                    if self.conf.followinterwiki or page == self.origin:
-                        if self.addIfNew(linkedPage, counter, page):
-                            # It is new. Also verify whether it is the second
-                            # on the same site
-                            lpsite = linkedPage.site
-                            for prevPage in self.found_in:
-                                if prevPage != linkedPage and \
-                                   prevPage.site == lpsite:
-                                    # Still, this could be "no problem" as
-                                    # either may be a redirect to the other.
-                                    # No way to find out quickly!
-                                    pywikibot.output(
-                                        'NOTE: {}: {} gives duplicate '
-                                        'interwiki on same site {}'
-                                        .format(self.origin, page, linkedPage))
-                                    break
-                            else:
-                                if config.interwiki_shownew:
-                                    pywikibot.output(
-                                        '{}: {} gives new interwiki {}'
-                                        .format(self.origin, page, linkedPage))
-                if self.forcedStop:
-                    break
+            self.check_page(page, counter)
 
         # These pages are no longer 'in progress'
         self.pending.clear()
@@ -1788,7 +1755,7 @@ class Subject(interwiki_graph.Subject):
                 pywikibot.output('ERROR putting page: {}'
                                  .format(error.args,))
                 raise SaveError('PageSaveRelatedError')
-            except (socket.error, IOError) as error:
+            except OSError as error:
                 if timeout > 3600:
                     raise
                 pywikibot.output('ERROR putting page: {}'
@@ -1866,7 +1833,7 @@ class Subject(interwiki_graph.Subject):
                                           .format(page.site.family.name,
                                                   page, linkedPage))
 
-        except (socket.error, IOError):
+        except OSError:
             pywikibot.output('ERROR: could not report backlinks')
 
 
@@ -2409,15 +2376,13 @@ def main(*args: str) -> None:
                 namespaces.append(int(arg[11:]))
             except ValueError:
                 namespaces.append(arg[11:])
-        # deprecated for consistency with other scripts
         elif arg.startswith('-number:'):
             number = int(arg[8:])
         elif arg.startswith('-until:'):
             until = arg[7:]
         else:
-            if not genFactory.handle_arg(arg):
-                if not singlePageTitle:
-                    singlePageTitle = arg
+            if not genFactory.handle_arg(arg) and not singlePageTitle:
+                singlePageTitle = arg
 
     # Do not use additional summary with autonomous mode
     if iwconf.autonomous:

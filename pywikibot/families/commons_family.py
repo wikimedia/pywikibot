@@ -42,6 +42,6 @@ class Family(family.WikimediaFamily):
     def interface(self, code):
         """Return 'DataSite' to enable structured data.
 
-        *New in version 6.5.*
+        .. versionadded 6.5
         """
         return 'DataSite'

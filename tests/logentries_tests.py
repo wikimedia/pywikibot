@@ -1,6 +1,7 @@
+#!/usr/bin/python3
 """Test logentries module."""
 #
-# (C) Pywikibot team, 2015-2021
+# (C) Pywikibot team, 2015-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -196,7 +197,9 @@ class TestLogentryParams(TestLogentriesBase):
             if logentry.action() == 'block':
                 self.assertIsInstance(logentry.flags(), list)
                 # Check that there are no empty strings
-                self.assertTrue(all(logentry.flags()))
+                for flag in logentry.flags():
+                    self.assertIsInstance(flag, str)
+                    self.assertNotEqual(flag, '')
                 if logentry.expiry() is not None:
                     self.assertIsInstance(logentry.expiry(),
                                           pywikibot.Timestamp)

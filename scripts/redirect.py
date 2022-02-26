@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 Script to resolve double redirects, and to delete broken redirects.
 
@@ -66,7 +66,7 @@ Furthermore the following options are provided:
 &params;
 """
 #
-# (C) Pywikibot team, 2004-2021
+# (C) Pywikibot team, 2004-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -78,7 +78,12 @@ import pywikibot
 import pywikibot.data
 from pywikibot import i18n, pagegenerators, xmlreader
 from pywikibot.backports import Dict, List, Set, Tuple
-from pywikibot.bot import ExistingPageBot, OptionHandler, RedirectPageBot
+from pywikibot.bot import (
+    ExistingPageBot,
+    OptionHandler,
+    RedirectPageBot,
+    suggest_help,
+)
 from pywikibot.exceptions import (
     CircularRedirectError,
     InterwikiRedirectPageError,
@@ -155,10 +160,11 @@ class RedirectGenerator(OptionHandler):
             # always print status message after 10000 pages
             if readPagesCount % 10000 == 0:
                 pywikibot.output('{} pages read...'.format(readPagesCount))
-            if self.opt.namespaces:
-                if pywikibot.Page(self.site, entry.title).namespace() \
-                        not in self.opt.namespaces:
-                    continue
+            if self.opt.namespaces and pywikibot.Page(
+                    self.site,
+                    entry.title).namespace() not in self.opt.namespaces:
+                continue
+
             if alsoGetPageTitles:
                 pageTitles.add(space_to_underscore(pywikibot.Link(entry.title,
                                                                   self.site)))
@@ -212,21 +218,24 @@ class RedirectGenerator(OptionHandler):
 
     def _next_redirect_group(self) -> Generator[List[pywikibot.Page], None,
                                                 None]:
-        """Generator that yields batches of 500 redirects as a list."""
-        apiQ = []
+        """Generator that yields batches of redirects as a list."""
+        chunk = []
         for page in self.get_redirect_pages_via_api():
-            apiQ.append(str(page.pageid))
-            if len(apiQ) >= 500:
+            chunk.append(str(page.pageid))
+            if len(chunk) >= self.site.maxlimit:
                 pywikibot.output('.', newline=False)
-                yield apiQ
-                apiQ = []
-        if apiQ:
-            yield apiQ
+                yield chunk
+                chunk.clear()
+        if chunk:
+            yield chunk
 
     def get_redirects_via_api(self, maxlen=8) -> Generator[Tuple[
             str, Optional[int], str, Optional[str]], None, None]:
         r"""
         Return a generator that yields tuples of data about redirect Pages.
+
+        .. versionchanged:: 7.0
+           only yield tuple if type of redirect is not 1 (normal redirect)
 
         The description of returned tuple items is as follows:
 
@@ -280,7 +289,9 @@ class RedirectGenerator(OptionHandler):
                             result += 1
                             final = redirects[final]
 
-                yield (redirect, result, target, final)
+                # only yield multiple or broken redirects
+                if result != 1:
+                    yield redirect, result, target, final
 
     def retrieve_broken_redirects(self) -> Generator[
             Union[str, pywikibot.Page], None, None]:
@@ -472,74 +483,83 @@ class RedirectRobot(ExistingPageBot, RedirectPageBot):
                          ignore_save_related_errors=True,
                          ignore_server_errors=True)
 
+    @staticmethod
+    def get_redirect_target(page):
+        """Get redirect target page and handle some exceptions."""
+        try:
+            return page.getRedirectTarget()
+        except (CircularRedirectError, RuntimeError):
+            pywikibot.exception()
+            pywikibot.output('Skipping {}.'.format(page))
+        except InterwikiRedirectPageError:
+            pywikibot.output('{} is on another site, skipping.'.format(page))
+        return None
+
     def delete_1_broken_redirect(self) -> None:
         """Treat one broken redirect."""
         redir_page = self.current_page
         done = not self.opt.delete
         try:
-            targetPage = redir_page.getRedirectTarget()
-        except (CircularRedirectError,
-                InvalidTitleError,
-                RuntimeError):
+            targetPage = self.get_redirect_target(redir_page)
+        except InvalidTitleError:
             pywikibot.exception()
-        except InterwikiRedirectPageError:
-            pywikibot.output('{} is on another site.'
-                             .format(redir_page.title()))
-        else:
-            try:
-                targetPage.get()
-            except InvalidTitleError:
-                pywikibot.exception()
-            except NoPageError:
-                movedTarget = None
-                with suppress(NoMoveTargetError):
-                    movedTarget = targetPage.moved_target()
-                if movedTarget:
-                    if not movedTarget.exists():
-                        # FIXME: Test to another move
-                        pywikibot.output('Target page {} does not exist'
-                                         .format(movedTarget))
-                    elif redir_page == movedTarget:
-                        pywikibot.output(
-                            'Redirect to target page forms a redirect loop')
-                    else:
-                        pywikibot.output('{} has been moved to {}'
-                                         .format(redir_page, movedTarget))
-                        reason = i18n.twtranslate(
-                            redir_page.site, 'redirect-fix-broken-moved',
-                            {'to': movedTarget.title(as_link=True,
-                                                     allow_interwiki=False)})
-                        content = redir_page.get(get_redirect=True)
-                        redir_page.set_redirect_target(
-                            movedTarget, keep_section=True, save=False)
-                        pywikibot.output('Summary - ' + reason)
-                        done = self.userPut(redir_page, content,
-                                            redir_page.text, summary=reason,
-                                            ignore_save_related_errors=True,
-                                            ignore_server_errors=True)
-                if not done and self.user_confirm(
-                        'Redirect target {} does not exist.\n'
-                        'Do you want to delete {}?'
-                        .format(targetPage.title(as_link=True),
-                                redir_page.title(as_link=True))):
-                    self.delete_redirect(redir_page, 'redirect-remove-broken')
-                elif not (self.opt.delete or movedTarget):
+            targetPage = None
+
+        if not targetPage:
+            return
+
+        try:
+            targetPage.get()
+        except InvalidTitleError:
+            pywikibot.exception()
+        except NoPageError:
+            movedTarget = None
+            with suppress(NoMoveTargetError):
+                movedTarget = targetPage.moved_target()
+            if movedTarget:
+                if not movedTarget.exists():
+                    # FIXME: Test to another move
+                    pywikibot.output('Target page {} does not exist'
+                                     .format(movedTarget))
+                elif redir_page == movedTarget:
                     pywikibot.output(
-                        'Cannot fix or delete the broken redirect')
-            except IsRedirectPageError:
-                pywikibot.output(
-                    'Redirect target {} is also a redirect! {}'.format(
-                        targetPage.title(as_link=True),
-                        "Won't delete anything."
-                        if self.opt.delete else 'Skipping.'))
-            else:
-                # we successfully get the target page, meaning that
-                # it exists and is not a redirect: no reason to touch it.
-                pywikibot.output(
-                    'Redirect target {} does exist! {}'.format(
-                        targetPage.title(as_link=True),
-                        "Won't delete anything."
-                        if self.opt.delete else 'Skipping.'))
+                        'Redirect to target page forms a redirect loop')
+                else:
+                    pywikibot.output('{} has been moved to {}'
+                                     .format(redir_page, movedTarget))
+                    reason = i18n.twtranslate(
+                        redir_page.site, 'redirect-fix-broken-moved',
+                        {'to': movedTarget.title(as_link=True,
+                                                 allow_interwiki=False)})
+                    content = redir_page.get(get_redirect=True)
+                    redir_page.set_redirect_target(
+                        movedTarget, keep_section=True, save=False)
+                    pywikibot.output('Summary - ' + reason)
+                    done = self.userPut(redir_page, content,
+                                        redir_page.text, summary=reason,
+                                        ignore_save_related_errors=True,
+                                        ignore_server_errors=True)
+            if not done and self.user_confirm(
+                    'Redirect target {} does not exist.\n'
+                    'Do you want to delete {}?'
+                    .format(targetPage.title(as_link=True),
+                            redir_page.title(as_link=True))):
+                self.delete_redirect(redir_page, 'redirect-remove-broken')
+            elif not (self.opt.delete or movedTarget):
+                pywikibot.output('Cannot fix or delete the broken redirect')
+        except IsRedirectPageError:
+            pywikibot.output(
+                'Redirect target {} is also a redirect! {}'.format(
+                    targetPage.title(as_link=True),
+                    "Won't delete anything."
+                    if self.opt.delete else 'Skipping.'))
+        else:
+            # we successfully get the target page, meaning that
+            # it exists and is not a redirect: no reason to touch it.
+            pywikibot.output('Redirect target {} does exist! {}'
+                             .format(targetPage.title(as_link=True),
+                                     "Won't delete anything."
+                                     if self.opt.delete else 'Skipping.'))
 
     def fix_1_double_redirect(self) -> None:
         """Treat one double redirect."""
@@ -550,7 +570,7 @@ class RedirectRobot(ExistingPageBot, RedirectPageBot):
                              .format(newRedir.site.lang,
                                      newRedir.title(with_section=False)))
             try:
-                targetPage = newRedir.getRedirectTarget()
+                targetPage = self.get_redirect_target(newRedir)
             except IsNotRedirectPageError:
                 if len(redirList) == 2:
                     pywikibot.output(
@@ -561,10 +581,7 @@ class RedirectRobot(ExistingPageBot, RedirectPageBot):
                 pywikibot.warning(
                     "Redirect target section {} doesn't exist."
                     .format(newRedir.title(as_link=True)))
-            except (CircularRedirectError,
-                    InterwikiRedirectPageError,
-                    UnsupportedPageError,
-                    RuntimeError):
+            except UnsupportedPageError:
                 pywikibot.exception()
                 pywikibot.output('Skipping {}.'.format(newRedir))
                 break
@@ -576,13 +593,15 @@ class RedirectRobot(ExistingPageBot, RedirectPageBot):
                         .format(title))
                     break  # skip if automatic
                 pywikibot.warning(
-                    "Redirect target {} doesn't exist."
-                    .format(title))
+                    "Redirect target {} doesn't exist.".format(title))
             except ServerError:
                 pywikibot.output('Skipping due to server error: '
                                  'No textarea found')
                 break
             else:
+                if not targetPage:
+                    break
+
                 pywikibot.output(
                     '   Links to: {}.'
                     .format(targetPage.title(as_link=True)))
@@ -649,7 +668,7 @@ class RedirectRobot(ExistingPageBot, RedirectPageBot):
         @param page: Page to be treated.
         @type page: pywikibot.page.BasePage
         """
-        if self._treat_counter >= self.opt.limit:
+        if self.counter['read'] >= self.opt.limit:
             pywikibot.output('\nNumber of pages reached the limit. '
                              'Script terminated.')
             self.generator.close()
@@ -670,6 +689,7 @@ def main(*args: str) -> None:
     # redirs)
     action = None
     source = set()
+    unknown = []
     gen_factory = pagegenerators.GeneratorFactory()
 
     local_args = pywikibot.handle_args(args)
@@ -705,17 +725,13 @@ def main(*args: str) -> None:
         elif gen_factory.handle_arg(argument):
             pass
         else:
-            pywikibot.output('Unknown argument: ' + arg)
+            unknown.append(arg)
 
-    if len(source) > 1:
-        problem = 'You can only use one of {} options.'.format(
-            ' or '.join(source))
-        pywikibot.bot.suggest_help(additional_text=problem,
-                                   missing_action=not action)
-        return
-
-    if not action:
-        pywikibot.bot.suggest_help(missing_action=True)
+    problem = 'You can only use one of {} options.'.format(
+        ' or '.join(source)) if len(source) > 1 else ''
+    if suggest_help(additional_text=problem,
+                    unknown_parameters=unknown,
+                    missing_action=not action):
         return
 
     gen = None

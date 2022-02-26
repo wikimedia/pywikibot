@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 r"""
 Script to delete files that are also present on Wikimedia Commons.
 
@@ -38,15 +38,12 @@ Example
 
     python pwb.py nowcommons -replaceonly -replaceloose -replacealways -replace
 
-Todo
-----
-Please fix these if you are capable and motivated:
-
-- if a file marked nowcommons is not present on Wikimedia Commons, the bot
-  will exit.
+.. note:: This script is a
+   :py:obj:`ConfigParserBot <pywikibot.bot.ConfigParserBot>`. All options
+   can be set within a settings file which is scripts.ini by default.
 """
 #
-# (C) Pywikibot team, 2006-2021
+# (C) Pywikibot team, 2006-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -54,8 +51,9 @@ import sys
 from itertools import chain
 
 import pywikibot
-from pywikibot import Bot, i18n
+from pywikibot import i18n
 from pywikibot import pagegenerators as pg
+from pywikibot.bot import Bot, ConfigParserBot
 from pywikibot.exceptions import IsRedirectPageError, NoPageError
 from pywikibot.tools import filter_unique
 from pywikibot.tools.formatter import color_format
@@ -175,9 +173,13 @@ namespace_in_template = [
 ]
 
 
-class NowCommonsDeleteBot(Bot):
+class NowCommonsDeleteBot(Bot, ConfigParserBot):
 
-    """Bot to delete migrated files."""
+    """Bot to delete migrated files.
+
+    .. versionchanged:: 7.0
+       NowCommonsDeleteBot is a ConfigParserBot
+    """
 
     update_options = {
         'replace': False,
@@ -290,7 +292,7 @@ class NowCommonsDeleteBot(Bot):
                                 local_file_page.title(with_ns=False),
                                 commons_file_page.title(with_ns=False)))
                             bot = ImageBot(
-                                pg.FileLinksGenerator(local_file_page),
+                                local_file_page.usingPages(),
                                 local_file_page.title(with_ns=False),
                                 commons_file_page.title(with_ns=False),
                                 always=self.opt.replacealways,
@@ -303,7 +305,7 @@ class NowCommonsDeleteBot(Bot):
                                 page.title()).using_pages(total=1)))
                             if is_used and self.opt.replaceloose:
                                 bot = ImageBot(
-                                    pg.FileLinksGenerator(local_file_page),
+                                    local_file_page.usimgPages(),
                                     local_file_page.title(with_ns=False,
                                                           as_url=True),
                                     commons_file_page.title(with_ns=False),
@@ -362,8 +364,8 @@ class NowCommonsDeleteBot(Bot):
                 pywikibot.output(str(e[0]))
                 continue
             else:
-                self._treat_counter += 1
-        if not self._treat_counter:
+                self.counter['read'] += 1
+        if not self.counter['read']:
             pywikibot.output('No transcluded files found for {}.'
                              .format(self.nc_templates_list()[0]))
         self.exit()
@@ -383,9 +385,11 @@ def main(*args: str) -> None:
         if arg == '-replacealways':
             options['replace'] = True
             options['replacealways'] = True
-        elif arg.startswith('-'):
-            if arg[1:] in ('always', 'replace', 'replaceloose', 'replaceonly'):
-                options[arg[1:]] = True
+        elif arg.startswith('-') and arg[1:] in ('always',
+                                                 'replace',
+                                                 'replaceloose',
+                                                 'replaceonly'):
+            options[arg[1:]] = True
 
     bot = NowCommonsDeleteBot(**options)
     bot.run()

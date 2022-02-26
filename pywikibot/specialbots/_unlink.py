@@ -1,10 +1,9 @@
-#!/usr/bin/python
 """Special bot library containing BaseUnlinkBot.
 
 Do not import classes directly from here but from specialbots.
 """
 #
-# (C) Pywikibot team, 2003-2021
+# (C) Pywikibot team, 2003-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -16,10 +15,9 @@ from pywikibot.bot import (
     InteractiveReplace,
     NoRedirectPageBot,
 )
-from pywikibot.editor import TextEditor
 from pywikibot.bot_choice import UnhandledAnswer
+from pywikibot.editor import TextEditor
 from pywikibot.textlib import replace_links
-from pywikibot.tools import ModuleDeprecationWrapper
 
 
 class EditReplacementError(ChoiceException, UnhandledAnswer):
@@ -93,12 +91,3 @@ class BaseUnlinkBot(ExistingPageBot, NoRedirectPageBot, AutomaticTWSummaryBot):
                 break
 
         self.put_current(text)
-
-
-EditReplacement = EditReplacementError
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper.add_deprecated_attr(
-    'EditReplacement',
-    replacement_name='EditReplacementError',
-    since='20210423')

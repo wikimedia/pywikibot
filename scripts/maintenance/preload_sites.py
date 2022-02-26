@@ -1,14 +1,14 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """Script that preloads site and user info for all sites of given family.
 
 The following parameters are supported:
 
 -worker:<num>     The number of parallel tasks to be run. Default is the
-                  number of precessors on the machine
+                  number of processors on the machine
 
 Usage:
 
-    python pwb.py preload_sites [{<family>}] [-worker{<num>}]
+    python pwb.py preload_sites [{<family>}] [-worker:{<num>}]
 
 To force preloading, change the global expiry value to 0:
 
@@ -16,7 +16,7 @@ To force preloading, change the global expiry value to 0:
 
 """
 #
-# (C) Pywikibot team, 2021
+# (C) Pywikibot team, 2022
 #
 # Distributed under the terms of the MIT license.
 #

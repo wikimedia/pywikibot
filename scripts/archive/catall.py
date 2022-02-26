@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 This script shows the categories on each page and lets you change them.
 
@@ -26,7 +26,7 @@ Options:
 #
 import pywikibot
 from pywikibot import i18n, textlib
-from pywikibot.backports import List, Tuple
+from pywikibot.backports import List
 from pywikibot.bot import QuitKeyboardInterrupt
 from pywikibot.exceptions import IsRedirectPageError
 

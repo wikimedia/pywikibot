@@ -1,6 +1,7 @@
+#!/usr/bin/python3
 """Tests for the site module."""
 #
-# (C) Pywikibot team, 2018-2021
+# (C) Pywikibot team, 2018-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -98,10 +99,6 @@ class TestInterwikiMap(TestCase):
         else:
             iw_site = site.interwiki(prefix)
             self.assertEqual(iw_site.family, site.family)
-
-    def test_interwiki_prefix(self, key):
-        """Test site.interwiki_prefix method."""
-        self.assertTrue(True)
 
 
 class TestInterwikiMapPrefix(TestCase):

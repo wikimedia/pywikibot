@@ -1,6 +1,6 @@
 """Objects representing API generators to MediaWiki site."""
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -14,7 +14,7 @@ from warnings import warn
 
 import pywikibot
 import pywikibot.family
-from pywikibot.backports import Dict, List
+from pywikibot.backports import Dict, Generator, Iterable, List
 from pywikibot.data import api
 from pywikibot.exceptions import (
     APIError,
@@ -25,14 +25,12 @@ from pywikibot.exceptions import (
     UserRightsError,
 )
 from pywikibot.site._decorators import need_right, need_version
+from pywikibot.site._namespace import NamespaceArgType
 from pywikibot.tools import (
-    deprecated,
-    deprecated_args,
     filter_unique,
     is_ip_address,
     issue_deprecation_warning,
     itergroup,
-    remove_last_args,
 )
 
 
@@ -66,14 +64,7 @@ class GeneratorsMixin:
         # Validate pageids.
         gen = (str(int(p)) for p in pageids if int(p) > 0)
 
-        # Find out how many pages can be specified at a time.
-        parameter = self._paraminfo.parameter('query+info', 'prop')
-        if self.logged_in() and self.has_right('apihighlimits'):
-            groupsize = int(parameter['highlimit'])
-        else:
-            groupsize = int(parameter['limit'])
-
-        for sublist in itergroup(filter_unique(gen), groupsize):
+        for sublist in itergroup(filter_unique(gen), self.maxlimit):
             # Store the order of the input data.
             priority_dict = dict(zip(sublist, range(len(sublist))))
 
@@ -131,13 +122,7 @@ class GeneratorsMixin:
         if pageprops:
             props += '|pageprops'
 
-        parameter = self._paraminfo.parameter('query+info', 'prop')
-        if self.logged_in() and self.has_right('apihighlimits'):
-            max_ids = int(parameter['highlimit'])
-        else:
-            max_ids = int(parameter['limit'])  # T78333, T161783
-
-        for sublist in itergroup(pagelist, min(groupsize, max_ids)):
+        for sublist in itergroup(pagelist, min(groupsize, self.maxlimit)):
             # Do not use p.pageid property as it will force page loading.
             pageids = [str(p._pageid) for p in sublist
                        if hasattr(p, '_pageid') and p._pageid > 0]
@@ -155,7 +140,8 @@ class GeneratorsMixin:
             rvgen = api.PropertyGenerator(props, site=self)
             rvgen.set_maximum_items(-1)  # suppress use of "rvlimit" parameter
 
-            if len(pageids) == len(sublist) and len(set(pageids)) <= max_ids:
+            if len(pageids) == len(sublist) \
+               and len(set(pageids)) <= self.maxlimit:
                 # only use pageids if all pages have them
                 rvgen.request['pageids'] = set(pageids)
             else:
@@ -208,8 +194,6 @@ class GeneratorsMixin:
                 priority, page = heapq.heappop(prio_queue)
                 yield page
 
-    @deprecated_args(
-        followRedirects='follow_redirects', filterRedirects='filter_redirects')
     def pagebacklinks(self, page, *, follow_redirects=False,
                       filter_redirects=None, namespaces=None, total=None,
                       content=False):
@@ -273,7 +257,6 @@ class GeneratorsMixin:
             return itertools.chain(*genlist.values())
         return blgen
 
-    @deprecated_args(step=True, filterRedirects='filter_redirects')
     def page_embeddedin(self, page, *, filter_redirects=None, namespaces=None,
                         total=None, content=False):
         """Iterate all pages that embedded the given page as a template.
@@ -305,11 +288,39 @@ class GeneratorsMixin:
                                namespaces=namespaces, total=total,
                                g_content=content, **eiargs)
 
-    @deprecated_args(
-        step=None, followRedirects='follow_redirects',
-        filterRedirects='filter_redirects',
-        onlyTemplateInclusion='only_template_inclusion',
-        withTemplateInclusion='with_template_inclusion')
+    @need_version('1.24')
+    def page_redirects(
+        self,
+        page: 'pywikibot.Page',
+        *,
+        filter_fragments: Optional[bool] = None,
+        namespaces: NamespaceArgType = None,
+        total: Optional[int] = None,
+        content: bool = False
+    ) -> 'Iterable[pywikibot.Page]':
+        """Iterale all redirects to the given page.
+
+        :see: https://www.mediawiki.org/wiki/API:Redirects
+
+        :param page: The Page to get redirects for.
+        :param filter_fragments: If True, only return redirects with fragments.
+            If False, only return redirects without fragments. If None, return
+            both (no filtering).
+        :param namespaces: Only return redirects from the namespaces
+        :param total: maximum number of redirects to retrieve in total
+        :param content: load the current content of each redirect
+
+        .. versionadded:: 7.0
+        """
+        rdargs = {
+            'titles': page.title(with_section=False).encode(self.encoding()),
+        }
+        if filter_fragments is not None:
+            rdargs['grdshow'] = ('' if filter_fragments else '!') + 'fragment'
+        return self._generator(api.PageGenerator, type_arg='redirects',
+                               namespaces=namespaces, total=total,
+                               g_content=content, **rdargs)
+
     def pagereferences(self, page, *, follow_redirects=False,
                        filter_redirects=None, with_template_inclusion=True,
                        only_template_inclusion=False, namespaces=None,
@@ -348,12 +359,16 @@ class GeneratorsMixin:
                     namespaces=namespaces, content=content)
             ), total)
 
-    @deprecated_args(step=True)
-    def pagelinks(self, page, *, namespaces=None, follow_redirects=False,
-                  total=None, content=False):
+    def pagelinks(
+        self, page, *,
+        namespaces=None,
+        follow_redirects: bool = False,
+        total: Optional[int] = None,
+        content: bool = False
+    ) -> Generator['pywikibot.Page', None, None]:
         """Iterate internal wikilinks contained (or transcluded) on page.
 
-        :see: https://www.mediawiki.org/wiki/API:Links
+        .. seealso:: https://www.mediawiki.org/wiki/API:Links
 
         :param namespaces: Only iterate pages in these namespaces
             (default: all)
@@ -362,8 +377,8 @@ class GeneratorsMixin:
             list of namespace identifiers.
         :param follow_redirects: if True, yields the target of any redirects,
             rather than the redirect page
+        :param total: iterate no more than this number of pages in total
         :param content: if True, load the current content of each iterated page
-            (default False)
         :raises KeyError: a namespace identifier was not resolved
         :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
@@ -380,7 +395,6 @@ class GeneratorsMixin:
                                **plargs)
 
     # Sortkey doesn't work with generator
-    @deprecated_args(withSortKey=True, step=True)
     def pagecategories(self, page, *, total=None, content=False):
         """Iterate categories to which page belongs.
 
@@ -400,7 +414,6 @@ class GeneratorsMixin:
                                type_arg='categories', total=total,
                                g_content=content, **clargs)
 
-    @deprecated_args(step=True)
     def pageimages(self, page, *, total=None, content=False):
         """Iterate images used (not just linked) on the page.
 
@@ -416,7 +429,6 @@ class GeneratorsMixin:
                                titles=imtitle, total=total,
                                g_content=content)
 
-    @deprecated_args(step=True)
     def pagetemplates(self, page, *, namespaces=None, total=None,
                       content=False):
         """Iterate templates transcluded (not just linked) on the page.
@@ -439,7 +451,6 @@ class GeneratorsMixin:
                                titles=tltitle, namespaces=namespaces,
                                total=total, g_content=content)
 
-    @deprecated_args(step=True, startsort=True, endsort=True)
     def categorymembers(self, category, *,
                         namespaces=None,
                         sortby: Optional[str] = None,
@@ -600,8 +611,6 @@ class GeneratorsMixin:
             props.append('roles')
         return props
 
-    @deprecated_args(getText='content', sysop=True)
-    @remove_last_args(['rollback'])
     def loadrevisions(self, page, *, content=False, section=None, **kwargs):
         """Retrieve revision information and store it in page object.
 
@@ -729,14 +738,14 @@ class GeneratorsMixin:
                 raise NoPageError(page)
             api.update_page(page, pagedata, rvgen.props)
 
-    @deprecated_args(step=True)
     def pagelanglinks(self, page, *,
                       total: Optional[int] = None,
                       include_obsolete: bool = False,
                       include_empty_titles: bool = False):
         """Iterate all interlanguage links on page, yielding Link objects.
 
-        *New in version 6.2:* *include_empty_titles* parameter was added.
+        .. versionchanged:: 6.2:
+           *include_empty_titles* parameter was added.
 
         :see: https://www.mediawiki.org/wiki/API:Langlinks
 
@@ -765,7 +774,6 @@ class GeneratorsMixin:
                 if link.title or include_empty_titles:
                     yield link
 
-    @deprecated_args(step=True)
     def page_extlinks(self, page, *, total=None):
         """Iterate all external links on page, yielding URL strings.
 
@@ -783,8 +791,6 @@ class GeneratorsMixin:
             for linkdata in pageitem['extlinks']:
                 yield linkdata['*']
 
-    @deprecated_args(throttle=True, limit='total', step=True,
-                     includeredirects='filterredir')
     def allpages(self, start='!', prefix='', namespace=0, filterredir=None,
                  filterlanglinks=None, minsize=None, maxsize=None,
                  protect_type=None, protect_level=None, reverse=False,
@@ -822,16 +828,15 @@ class GeneratorsMixin:
         # backward compatibility test
         if filterredir not in (True, False, None):
             old = filterredir
-            if filterredir:
-                if filterredir == 'only':
-                    filterredir = True
-                else:
-                    filterredir = None
-            else:
+            if not filterredir:
                 filterredir = False
-            warn('The value "{0!r}" for "filterredir" is deprecated; use '
-                 '{1} instead.'.format(old, filterredir),
-                 DeprecationWarning, 3)
+            elif filterredir == 'only':
+                filterredir = True
+            else:
+                filterredir = None
+            issue_deprecation_warning(
+                'The value "{}" for "filterredir"'.format(old),
+                '"{}"'.format(filterredir), since='7.0.0')
 
         apgen = self._generator(api.PageGenerator, type_arg='allpages',
                                 namespaces=namespace,
@@ -858,7 +863,6 @@ class GeneratorsMixin:
             apgen.request['gapdir'] = 'descending'
         return apgen
 
-    @deprecated_args(step=True)
     def alllinks(self, start='!', prefix='', namespace=0, unique=False,
                  fromids=False, total=None):
         """Iterate all links to pages (which need not exist) in one namespace.
@@ -897,7 +901,6 @@ class GeneratorsMixin:
                 p._fromid = link['fromid']
             yield p
 
-    @deprecated_args(step=True)
     def allcategories(self, start='!', prefix='', total=None,
                       reverse=False, content=False):
         """Iterate categories used (which need not have a Category page).
@@ -925,7 +928,6 @@ class GeneratorsMixin:
             acgen.request['gacdir'] = 'descending'
         return acgen
 
-    @deprecated_args(step=True)
     def botusers(self, total=None):
         """Iterate bot users.
 
@@ -943,7 +945,6 @@ class GeneratorsMixin:
 
         yield from self._bots.values()
 
-    @deprecated_args(step=True)
     def allusers(self, start='!', prefix='', group=None, total=None):
         """Iterate registered users, ordered by username.
 
@@ -969,7 +970,6 @@ class GeneratorsMixin:
             augen.request['augroup'] = group
         return augen
 
-    @deprecated_args(step=True)
     def allimages(self, start='!', prefix='', minsize=None, maxsize=None,
                   reverse=False, sha1=None, sha1base36=None,
                   total=None, content=False):
@@ -1008,7 +1008,6 @@ class GeneratorsMixin:
             aigen.request['gaisha1base36'] = sha1base36
         return aigen
 
-    @deprecated_args(limit='total')  # ignore falimit setting
     def filearchive(self, start=None, end=None, reverse=False, total=None,
                     **kwargs):
         """Iterate archived files.
@@ -1040,7 +1039,6 @@ class GeneratorsMixin:
             fagen.request['fadir'] = 'descending'
         return fagen
 
-    @deprecated_args(step=True)
     def blocks(self, starttime=None, endtime=None, reverse=False,
                blockids=None, users=None, iprange: Optional[str] = None,
                total: Optional[int] = None):
@@ -1098,7 +1096,6 @@ class GeneratorsMixin:
             bkgen.request['bkip'] = iprange
         return bkgen
 
-    @deprecated_args(step=True)
     def exturlusage(self, url: Optional[str] = None,
                     protocol: Optional[str] = None, namespaces=None,
                     total: Optional[int] = None, content=False):
@@ -1137,7 +1134,6 @@ class GeneratorsMixin:
                                namespaces=namespaces,
                                total=total, g_content=content)
 
-    @deprecated_args(step=True)
     def imageusage(self, image, namespaces=None, filterredir=None,
                    total=None, content=False):
         """Iterate Pages that contain links to the given FilePage.
@@ -1167,7 +1163,6 @@ class GeneratorsMixin:
                                namespaces=namespaces,
                                total=total, g_content=content, **iuargs)
 
-    @deprecated_args(step=True)
     def logevents(self, logtype: Optional[str] = None,
                   user: Optional[str] = None, page=None,
                   namespace=None, start=None, end=None,
@@ -1227,12 +1222,6 @@ class GeneratorsMixin:
 
         return legen
 
-    @deprecated_args(includeredirects='redirect', namespace='namespaces',
-                     number='total', rcend='end', rclimit='total',
-                     rcnamespace='namespaces', rcstart='start',
-                     rctype='changetype', showAnon='anon', showBot='bot',
-                     showMinor='minor', showPatrolled='patrolled',
-                     showRedirects='redirect', topOnly='top_only')
     def recentchanges(self, *,
                       start=None,
                       end=None,
@@ -1320,11 +1309,9 @@ class GeneratorsMixin:
         rcgen.request['rctag'] = tag
         return rcgen
 
-    @deprecated_args(number='total', step=True, key='searchstring',
-                     getredirects=True, get_redirects=True)
     def search(self, searchstring: str, *,
                namespaces=None,
-               where: str = 'text',
+               where: Optional[str] = None,
                total: Optional[int] = None,
                content: bool = False):
         """Iterate Pages that contain the searchstring.
@@ -1332,11 +1319,18 @@ class GeneratorsMixin:
         Note that this may include non-existing Pages if the wiki's database
         table contains outdated entries.
 
-        :see: https://www.mediawiki.org/wiki/API:Search
+        .. versionchanged:: 7.0
+           Default of `where` parameter has been changed from 'text' to
+           None. The behaviour depends on the installed search engine
+           which is 'text' on CirrusSearch'.
+           raises APIError instead of Error if searchstring is not set
+           or what parameter is wrong.
+
+        .. seealso:: https://www.mediawiki.org/wiki/API:Search
 
         :param searchstring: the text to search for
-        :param where: Where to search; value must be "text", "title" or
-            "nearmatch" (many wikis do not support title or nearmatch search)
+        :param where: Where to search; value must be "text", "title",
+            "nearmatch" or None (many wikis do not support all search types)
         :param namespaces: search only in these namespaces (defaults to all)
         :type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
@@ -1346,29 +1340,11 @@ class GeneratorsMixin:
         :raises KeyError: a namespace identifier was not resolved
         :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
+        :raises APIError: The "gsrsearch" parameter must be set:
+            searchstring parameter is not set
+        :raises APIError: Unrecognized value for parameter "gsrwhat":
+            wrong where parameter is given
         """
-        where_types = ['nearmatch', 'text', 'title', 'titles']
-        if not searchstring:
-            raise Error('search: searchstring cannot be empty')
-        if where not in where_types:
-            raise Error("search: unrecognized 'where' value: {}".format(where))
-        if where in ('title', 'titles'):
-            if where == 'titles':
-                issue_deprecation_warning("where='titles'", "where='title'",
-                                          since='20160224')
-                where = 'title'
-
-            if self.has_extension('CirrusSearch') and \
-               isinstance(self.family, pywikibot.family.WikimediaFamily):
-                # 'title' search was disabled, use intitle instead
-                searchstring = 'intitle:' + searchstring
-                issue_deprecation_warning(
-                    "where='{}'".format(where),
-                    "searchstring='{}'".format(searchstring),
-                    since='20160224')
-
-                where = None  # default
-
         if not namespaces and namespaces != 0:
             namespaces = [ns_id for ns_id in self.namespaces if ns_id >= 0]
         srgen = self._generator(api.PageGenerator, type_arg='search',
@@ -1377,7 +1353,6 @@ class GeneratorsMixin:
                                 total=total, g_content=content)
         return srgen
 
-    @deprecated_args(step=True, showMinor='minor')
     def usercontribs(self, user=None, userprefix=None, start=None, end=None,
                      reverse=False, namespaces=None, minor=None,
                      total: Optional[int] = None, top_only=False):
@@ -1434,8 +1409,6 @@ class GeneratorsMixin:
         ucgen.request['ucshow'] = option_set
         return ucgen
 
-    @deprecated_args(step=True, showMinor='minor', showAnon='anon',
-                     showBot='bot')
     def watchlist_revs(self, start=None, end=None, reverse=False,
                        namespaces=None, minor=None, bot=None,
                        anon=None, total=None):
@@ -1500,8 +1473,6 @@ class GeneratorsMixin:
                                        or self.has_right('undelete'))):
             raise UserRightsError(err + 'deleted content.')
 
-    @deprecated_args(step=True, get_text='content', page='titles',
-                     limit='total')
     def deletedrevs(self, titles=None, start=None, end=None,
                     reverse: bool = False,
                     content=False, total=None, **kwargs):
@@ -1566,7 +1537,7 @@ class GeneratorsMixin:
         self._check_view_deleted('deletedrevs', prop)
 
         revids = kwargs.pop('revids', None)
-        if not (bool(titles) ^ (revids is not None)):
+        if not bool(titles) ^ (revids is not None):
             raise Error('deletedrevs: either "titles" or "revids" parameter '
                         'must be given.')
         if revids and self.mw_version < '1.25':
@@ -1680,7 +1651,6 @@ class GeneratorsMixin:
                 'ususers': usernames, 'usprop': usprop})
         return usgen
 
-    @deprecated_args(step=True)
     def randompages(self, total=None, namespaces=None,
                     redirects=False, content=False):
         """Iterate a number of random pages.
@@ -1737,7 +1707,6 @@ class GeneratorsMixin:
     }
 
     @need_right('patrol')
-    @deprecated_args(token=True)
     def patrol(self, rcid=None, revid=None, revision=None):
         """Return a generator of patrolled pages.
 
@@ -1765,9 +1734,8 @@ class GeneratorsMixin:
         """
         # If patrol is not enabled, attr will be set the first time a
         # request is done.
-        if hasattr(self, '_patroldisabled'):
-            if self._patroldisabled:
-                return
+        if hasattr(self, '_patroldisabled') and self._patroldisabled:
+            return
 
         if all(_ is None for _ in [rcid, revid, revision]):
             raise Error('No rcid, revid or revision provided.')
@@ -1820,10 +1788,6 @@ class GeneratorsMixin:
 
             yield result['patrol']
 
-    @deprecated_args(number='total', repeat=True, namespace='namespaces',
-                     rcshow=True, rc_show=True, get_redirect=True, step=True,
-                     showBot='bot', showRedirects='redirect',
-                     showPatrolled='patrolled')
     def newpages(self, user=None, returndict=False,
                  start=None, end=None, reverse=False, bot=False,
                  redirect=False, excludeuser=None,
@@ -1868,29 +1832,6 @@ class GeneratorsMixin:
                 yield (newpage, pageitem['timestamp'], pageitem['newlen'],
                        '', pageitem['user'], pageitem['comment'])
 
-    @deprecated('APISite.logevents(logtype="upload")', since='20170619')
-    @deprecated_args(lestart='start', leend='end', leuser='user', letitle=True,
-                     repeat=True, number='total', step=True)
-    def newfiles(self, user=None, start=None, end=None, reverse=False,
-                 total=None):
-        """Yield information about newly uploaded files.
-
-        DEPRECATED: Use logevents(logtype='upload') instead.
-
-        Yields a tuple of FilePage, Timestamp, user(str), comment(str).
-
-        N.B. the API does not provide direct access to Special:Newimages, so
-        this is derived from the "upload" log events instead.
-        """
-        for event in self.logevents(logtype='upload', user=user,
-                                    start=start, end=end, reverse=reverse,
-                                    total=total):
-            filepage = event.page()
-            date = event.timestamp()
-            user = event.user()
-            comment = event.comment() or ''
-            yield (filepage, date, user, comment)
-
     def querypage(self, special_page, total=True):
         """Yield Page objects retrieved from Special:{special_page}.
 
@@ -1910,7 +1851,6 @@ class GeneratorsMixin:
                                type_arg='querypage', gqppage=special_page,
                                total=total)
 
-    @deprecated_args(number='total', step=True, repeat=True)
     def longpages(self, total=None):
         """Yield Pages and lengths from Special:Longpages.
 
@@ -1925,7 +1865,6 @@ class GeneratorsMixin:
             yield (pywikibot.Page(self, pageitem['title']),
                    int(pageitem['value']))
 
-    @deprecated_args(number='total', step=True, repeat=True)
     def shortpages(self, total=None):
         """Yield Pages and lengths from Special:Shortpages.
 
@@ -1940,7 +1879,6 @@ class GeneratorsMixin:
             yield (pywikibot.Page(self, pageitem['title']),
                    int(pageitem['value']))
 
-    @deprecated_args(number='total', step=True, repeat=True)
     def deadendpages(self, total=None):
         """Yield Page objects retrieved from Special:Deadendpages.
 
@@ -1948,7 +1886,6 @@ class GeneratorsMixin:
         """
         return self.querypage('Deadendpages', total)
 
-    @deprecated_args(number='total', step=True, repeat=True)
     def ancientpages(self, total=None):
         """Yield Pages, datestamps from Special:Ancientpages.
 
@@ -1961,7 +1898,6 @@ class GeneratorsMixin:
             yield (pywikibot.Page(self, pageitem['title']),
                    pywikibot.Timestamp.fromISOformat(pageitem['timestamp']))
 
-    @deprecated_args(number='total', step=True, repeat=True)
     def lonelypages(self, total=None):
         """Yield Pages retrieved from Special:Lonelypages.
 
@@ -1969,7 +1905,6 @@ class GeneratorsMixin:
         """
         return self.querypage('Lonelypages', total)
 
-    @deprecated_args(number='total', step=True, repeat=True)
     def unwatchedpages(self, total=None):
         """Yield Pages from Special:Unwatchedpages (requires Admin privileges).
 
@@ -1977,7 +1912,6 @@ class GeneratorsMixin:
         """
         return self.querypage('Unwatchedpages', total)
 
-    @deprecated_args(step=True)
     def wantedpages(self, total=None):
         """Yield Pages from Special:Wantedpages.
 
@@ -1999,7 +1933,6 @@ class GeneratorsMixin:
         """
         return self.querypage('Wantedtemplates', total)
 
-    @deprecated_args(number='total', step=True, repeat=True)
     def wantedcategories(self, total=None):
         """Yield Pages from Special:Wantedcategories.
 
@@ -2007,7 +1940,6 @@ class GeneratorsMixin:
         """
         return self.querypage('Wantedcategories', total)
 
-    @deprecated_args(number='total', step=True, repeat=True)
     def uncategorizedcategories(self, total=None):
         """Yield Categories from Special:Uncategorizedcategories.
 
@@ -2015,7 +1947,6 @@ class GeneratorsMixin:
         """
         return self.querypage('Uncategorizedcategories', total)
 
-    @deprecated_args(number='total', step=True, repeat=True)
     def uncategorizedimages(self, total=None):
         """Yield FilePages from Special:Uncategorizedimages.
 
@@ -2026,7 +1957,6 @@ class GeneratorsMixin:
     # synonym
     uncategorizedfiles = uncategorizedimages
 
-    @deprecated_args(number='total', step=True, repeat=True)
     def uncategorizedpages(self, total=None):
         """Yield Pages from Special:Uncategorizedpages.
 
@@ -2034,7 +1964,6 @@ class GeneratorsMixin:
         """
         return self.querypage('Uncategorizedpages', total)
 
-    @deprecated_args(number='total', step=True, repeat=True)
     def uncategorizedtemplates(self, total=None):
         """Yield Pages from Special:Uncategorizedtemplates.
 
@@ -2042,7 +1971,6 @@ class GeneratorsMixin:
         """
         return self.querypage('Uncategorizedtemplates', total)
 
-    @deprecated_args(number='total', step=True, repeat=True)
     def unusedcategories(self, total=None):
         """Yield Category objects from Special:Unusedcategories.
 
@@ -2050,7 +1978,6 @@ class GeneratorsMixin:
         """
         return self.querypage('Unusedcategories', total)
 
-    @deprecated_args(extension=True, number='total', step=True, repeat=True)
     def unusedfiles(self, total=None):
         """Yield FilePage objects from Special:Unusedimages.
 
@@ -2058,7 +1985,6 @@ class GeneratorsMixin:
         """
         return self.querypage('Unusedimages', total)
 
-    @deprecated_args(number='total', step=True, repeat=True)
     def withoutinterwiki(self, total=None):
         """Yield Pages without language links from Special:Withoutinterwiki.
 
@@ -2066,7 +1992,6 @@ class GeneratorsMixin:
         """
         return self.querypage('Withoutinterwiki', total)
 
-    @deprecated_args(step=True)
     def broken_redirects(self, total=None):
         """Yield Pages with broken redirects from Special:BrokenRedirects.
 
@@ -2074,7 +1999,6 @@ class GeneratorsMixin:
         """
         return self.querypage('BrokenRedirects', total)
 
-    @deprecated_args(step=True)
     def double_redirects(self, total=None):
         """Yield Pages with double redirects from Special:DoubleRedirects.
 
@@ -2082,7 +2006,6 @@ class GeneratorsMixin:
         """
         return self.querypage('DoubleRedirects', total)
 
-    @deprecated_args(step=True)
     def redirectpages(self, total=None):
         """Yield redirect pages from Special:ListRedirects.
 
@@ -2090,7 +2013,6 @@ class GeneratorsMixin:
         """
         return self.querypage('Listredirects', total)
 
-    @deprecated_args(lvl='level')
     def protectedpages(self, namespace=0, type='edit', level=False,
                        total=None):
         """
@@ -2140,7 +2062,6 @@ class GeneratorsMixin:
         return self._generator(api.PageGenerator, type_arg='pageswithprop',
                                gpwppropname=propname, total=total)
 
-    @deprecated_args(step=True, sysop=True)
     def watched_pages(self, force=False, total=None):
         """
         Return watchlist.

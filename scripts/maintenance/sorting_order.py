@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """Script that updates interwiki sorting order in family.py file."""
 #
 # (C) Pywikibot team, 2020-2021

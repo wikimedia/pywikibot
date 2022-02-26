@@ -1,13 +1,14 @@
+#!/usr/bin/python3
 """Test generate_user_files script."""
 #
-# (C) Pywikibot team, 2018-2021
+# (C) Pywikibot team, 2018-2022
 #
 # Distributed under the terms of the MIT license.
 #
 import re
 import unittest
 
-import generate_user_files as guf
+from pywikibot.scripts import generate_user_files as guf
 from tests.aspects import TestCase
 
 

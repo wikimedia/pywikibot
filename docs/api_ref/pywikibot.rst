@@ -106,6 +106,7 @@ pywikibot.logging module
 ------------------------
 
 .. automodule:: pywikibot.logging
+   :member-order: bysource
 
 pywikibot.login module
 ----------------------

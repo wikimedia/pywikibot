@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """
 Test pwb.py.
 
@@ -6,7 +7,7 @@ should be added locally.
 https://bitbucket.org/ned/coveragepy/src/default/tests/test_execfile.py
 """
 #
-# (C) Pywikibot team, 2007-2021
+# (C) Pywikibot team, 2007-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -75,6 +76,23 @@ class TestPwb(PwbTestCase):
         self.assertEqual('Häuser', vpwb['stdout'].strip())
         self.assertEqual('Häuser', vpwb['stderr'].strip())
 
+    def test_argv(self):
+        """Test argv of pywikibot.
+
+        Make sure that argv passed to the script is not contaminated by
+        global options given to pwb.py wrapper.
+        """
+        script_name = 'print_argv'
+        script_path = join_pwb_tests_path(script_name + '.py')
+        script_opts = ['-help']
+        command = [script_path] + script_opts
+        without_global_args = execute_pwb(command)
+        with_no_global_args = execute_pwb(['-maxlag:5'] + command)
+        self.assertEqual(without_global_args['stdout'],
+                         with_no_global_args['stdout'])
+        self.assertEqual(without_global_args['stdout'].rstrip(),
+                         str([script_name] + script_opts))
+
     def test_script_found(self):
         """Test pwb.py script call which is found."""
         stdout = io.StringIO(execute_pwb(['pwb'])['stdout'])
@@ -114,12 +132,15 @@ class TestPwb(PwbTestCase):
             'The most similar scripts are:',
             '1 - interwikidata',
             '2 - interwiki',
+            '3 - illustrate_wikidata',
         ]
         stderr = io.StringIO(
             execute_pwb(['inter_wikidata'], data_in='q')['stderr'])
         for line in result:
             with self.subTest(line=line):
                 self.assertEqual(stderr.readline().strip(), line)
+        remaining = stderr.readlines()
+        self.assertLength(remaining, 3)  # always 3 lines remaining after list
 
 
 if __name__ == '__main__':  # pragma: no cover

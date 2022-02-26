@@ -22,7 +22,7 @@ If required you can use your own Session object passing it to the
 :py:obj:`flush()` can be called to close the session object.
 """
 #
-# (C) Pywikibot team, 2007-2021
+# (C) Pywikibot team, 2007-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -48,12 +48,7 @@ from pywikibot.exceptions import (
     Server504Error,
 )
 from pywikibot.logging import critical, debug, error, log, warning
-from pywikibot.tools import (
-    deprecated,
-    deprecated_args,
-    file_mode_checker,
-    issue_deprecation_warning,
-)
+from pywikibot.tools import file_mode_checker
 
 
 try:
@@ -196,22 +191,6 @@ def user_agent(site=None, format_string: str = None) -> str:
     return formatted
 
 
-@deprecated('pywikibot.comms.http.fake_user_agent', since='20161205')
-def get_fake_user_agent():
-    """
-    Return a fake user agent depending on `fake_user_agent` option in config.
-
-    Deprecated, use fake_user_agent() instead.
-
-    :rtype: str
-    """
-    if isinstance(config.fake_user_agent, str):
-        return config.fake_user_agent
-    if config.fake_user_agent is False:
-        return user_agent()
-    return fake_user_agent()
-
-
 def fake_user_agent() -> str:
     """Return a fake user agent."""
     try:
@@ -222,7 +201,6 @@ def fake_user_agent() -> str:
     return UserAgent().random
 
 
-@deprecated_args(body='data')
 def request(site,
             uri: Optional[str] = None,
             headers: Optional[dict] = None,
@@ -245,13 +223,6 @@ def request(site,
     :return: The received data Response
     """
     kwargs.setdefault('verify', site.verify_SSL_certificate())
-    old_validation = kwargs.pop('disable_ssl_certificate_validation', None)
-    if old_validation is not None:
-        issue_deprecation_warning('disable_ssl_certificate_validation',
-                                  instead='verify',
-                                  since='20201220')
-        kwargs.update(verify=not old_validation)
-
     if not headers:
         headers = {}
         format_string = None
@@ -301,6 +272,12 @@ def error_handling_callback(response):
         if SSL_CERT_VERIFY_FAILED_MSG in str(response):
             raise FatalServerError(str(response))
 
+    if isinstance(response, requests.ConnectionError):
+        msg = str(response)
+        if 'NewConnectionError' in msg \
+           and re.search(r'\[Errno (-2|8|11001)\]', msg):
+            raise ConnectionError(response)
+
     if isinstance(response, Exception):
         with suppress(Exception):
             # request exception may contain response and request attribute
@@ -323,7 +300,6 @@ def error_handling_callback(response):
         warning('Http response status {}'.format(response.status_code))
 
 
-@deprecated_args(body='data')
 def fetch(uri: str, method: str = 'GET', headers: Optional[dict] = None,
           default_error_handling: bool = True,
           use_fake_user_agent: Union[bool, str] = False, **kwargs):
@@ -402,12 +378,6 @@ def fetch(uri: str, method: str = 'GET', headers: Optional[dict] = None,
             auth = requests_oauthlib.OAuth1(*auth)
 
     timeout = config.socket_timeout
-    old_validation = kwargs.pop('disable_ssl_certificate_validation', None)
-    if old_validation is not None:
-        issue_deprecation_warning('disable_ssl_certificate_validation',
-                                  instead='verify',
-                                  since='20201220')
-        kwargs.update(verify=not old_validation)
 
     try:
         # Note that the connections are pooled which mean that a future

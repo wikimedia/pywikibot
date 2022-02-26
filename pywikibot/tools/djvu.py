@@ -1,7 +1,6 @@
-#!/usr/bin/python
 """Wrapper around djvulibre to access djvu files properties and content."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,7 +10,6 @@ import subprocess
 from collections import Counter
 
 import pywikibot
-from pywikibot.tools import deprecated_args
 
 
 def _call_cmd(args, lib='djvulibre') -> tuple:
@@ -58,7 +56,6 @@ class DjVuFile:
 
     """
 
-    @deprecated_args(file_djvu='file')
     def __init__(self, file: str):
         """
         Initializer.
@@ -81,13 +78,13 @@ class DjVuFile:
 
     def __repr__(self) -> str:
         """Return a more complete string representation."""
-        return str("{}.{}('{}')").format(self.__module__,
-                                         self.__class__.__name__,
-                                         self._filename)
+        return "{}.{}('{}')".format(self.__module__,
+                                    self.__class__.__name__,
+                                    self._filename)
 
     def __str__(self) -> str:
         """Return a string representation."""
-        return str("{}('{}')").format(self.__class__.__name__, self._filename)
+        return "{}('{}')".format(self.__class__.__name__, self._filename)
 
     def check_cache(fn):
         """Decorator to check if cache shall be cleared."""
@@ -110,7 +107,7 @@ class DjVuFile:
         def wrapper(obj, *args, **kwargs):
             n = args[0]
             force = kwargs.get('force', False)
-            if not (1 <= n <= obj.number_of_images(force=force)):
+            if not 1 <= n <= obj.number_of_images(force=force):
                 raise ValueError('Page {} not in file {} [{}-{}]'
                                  .format(int(n), obj.file, int(n),
                                          int(obj.number_of_images())))
@@ -138,6 +135,8 @@ class DjVuFile:
         """
         Return a tuple (id, (size, dpi)) for page n of djvu file.
 
+        :param n: page n of djvu file
+        :type n: int
         :param force: if True, refresh the cached data
         :type force: bool
         """
@@ -209,6 +208,8 @@ class DjVuFile:
         """Remove djvu format control characters.
 
         See http://djvu.sourceforge.net/doc/man/djvused.html for control chars.
+
+        :param data: the data checked for djvu format control characters
         """
         txt = data.decode('utf-8')
         # vertical tab (\013=\x0b): remove
@@ -227,6 +228,8 @@ class DjVuFile:
         """
         Get page n for djvu file.
 
+        :param n: page n of djvu file
+        :type n: int
         :param force: if True, refresh the cached data
         :type force: bool
         """
@@ -241,7 +244,11 @@ class DjVuFile:
 
     @check_page_number
     def whiten_page(self, n):
-        """Replace page 'n' of djvu file with a blank page."""
+        """Replace page 'n' of djvu file with a blank page.
+
+        :param n: page n of djvu file
+        :type n: int
+        """
         # tmp files for creation/insertion of a white page.
         white_ppm = os.path.join(self.dirname, 'white_page.ppm')
         white_djvu = os.path.join(self.dirname, 'white_page.djvu')
@@ -288,7 +295,11 @@ class DjVuFile:
 
     @check_page_number
     def delete_page(self, n):
-        """Delete page 'n' of djvu file ."""
+        """Delete page 'n' of djvu file.
+
+        :param n: page n of djvu file
+        :type n: int
+        """
         n_tot = self.number_of_images()
 
         # Check n is in valid range and set ref_page number for final checks.

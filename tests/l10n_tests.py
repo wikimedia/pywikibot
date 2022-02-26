@@ -1,11 +1,13 @@
+#!/usr/bin/python3
 """Test valid templates."""
 #
-# (C) Pywikibot team, 2015-2021
+# (C) Pywikibot team, 2015-2022
 #
 # Distributed under the terms of the MIT license.
 #
 import unittest
 from contextlib import suppress
+from itertools import chain
 
 import pywikibot
 from pywikibot import i18n
@@ -79,7 +81,7 @@ class TestValidTemplateMeta(MetaTestCaseClass):
                     doc_suffix='{} and language {}'.format(
                         package, code))
 
-        return super(TestValidTemplateMeta, cls).__new__(cls, name, bases, dct)
+        return super().__new__(cls, name, bases, dct)
 
 
 class TestValidTemplate(TestCase, metaclass=TestValidTemplateMeta):
@@ -92,32 +94,44 @@ class TestValidTemplate(TestCase, metaclass=TestValidTemplateMeta):
     @classmethod
     def setUpClass(cls):
         """Skip test gracefully if i18n package is missing."""
-        super(TestValidTemplate, cls).setUpClass()
+        super().setUpClass()
         if not i18n.messages_available():
             raise unittest.SkipTest("i18n messages package '{}' not available."
                                     .format(i18n._messages_package_name))
 
 
-class TestSites(TestCase):
+class TestPackages(TestCase):
 
     """Other test L10N cases processed by unittest."""
 
-    family = 'wikipedia'
-    code = 'en'
+    net = False
 
-    def test_valid_sites(self):
-        """Test whether language key has a corresponding site."""
-        codes = self.site.family.languages_by_size
-        languages = {pywikibot.Site(code, self.family).lang for code in codes}
-        # langs used by foreign wikis
-        languages.update(('pt-br', 'zh-tw'))
-        for package in PACKAGES:
+    def test_valid_package(self):
+        """Test whether package has entries."""
+        for package in chain(['cosmetic_changes-standalone',
+                              'pywikibot-cosmetic-changes'], PACKAGES):
             keys = i18n.twget_keys(package)
-            for key in keys:
-                with self.subTest(package=package, key=key):
-                    self.assertIn(key, languages,
-                                  "json key '{}' is not a site language"
-                                  .format(key))
+            with self.subTest(package=package):
+                self.assertIsNotEmpty(keys)
+                self.assertIn('en', keys)
+
+    def test_package_bundles(self):
+        """Test whether package bundles has valid entries."""
+        langs = i18n.known_languages()
+        self.assertIsInstance(langs, list)
+        self.assertIsNotEmpty(langs)
+        for dirname in i18n.bundles(stem=True):
+            for lang in langs:
+                with self.subTest(bundle=dirname, lang=lang):
+                    bundle = i18n._get_bundle(lang, dirname)
+                    if lang in ('en', 'qqq'):
+                        self.assertIsNotEmpty(bundle)
+                    for key in bundle.keys():
+                        if key == '@metadata':
+                            continue
+                        self.assertTrue(key.startswith(dirname),
+                                        '{!r} does not start with {!r}'
+                                        .format(key, dirname))
 
 
 if __name__ == '__main__':  # pragma: no cover

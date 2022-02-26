@@ -14,17 +14,15 @@ The contents of the package
     +---------------------------+-----------------------------------------------------------+
     | Dockerfile                | Assemble a Docker image, install all dependencies via pip |
     +---------------------------+-----------------------------------------------------------+
-    | Dockerfile-dev            | Docker image including developement dependencies          |
-    +---------------------------+-----------------------------------------------------------+
-    | generate_family_file.py   | Creates a new family file                                 |
-    +---------------------------+-----------------------------------------------------------+
-    | generate_user_files.py    | Creates user-config.py or user-fixes.py                   |
+    | Dockerfile-dev            | Docker image including development dependencies           |
     +---------------------------+-----------------------------------------------------------+
     | HISTORY.rst               | PyPI version history file                                 |
     +---------------------------+-----------------------------------------------------------+
     | LICENSE                   | Reference to the MIT license                              |
     +---------------------------+-----------------------------------------------------------+
-    | pwb.py                    | Wrapper script to use Pywikibot in 'directory' mode       |
+    | MANIFEST.in               | Setup file for package data                               |
+    +---------------------------+-----------------------------------------------------------+
+    | pwb.py                    | Code entry wrapper script (directory mode only)           |
     +---------------------------+-----------------------------------------------------------+
     | README.rst                | Short info string used by Pywikibot Nightlies             |
     +---------------------------+-----------------------------------------------------------+

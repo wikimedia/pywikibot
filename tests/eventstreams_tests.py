@@ -1,17 +1,18 @@
+#!/usr/bin/python3
 """Tests for the eventstreams module."""
 #
-# (C) Pywikibot team, 2017-2021
+# (C) Pywikibot team, 2017-2022
 #
 # Distributed under the terms of the MIT license.
 #
 import json
 import unittest
 from contextlib import suppress
+from unittest import mock
 
 from pywikibot import config
 from pywikibot.comms.eventstreams import EventSource, EventStreams
 from pywikibot.family import WikimediaFamily
-from tests import mock
 from tests.aspects import DefaultSiteTestCase, TestCase, require_modules
 
 

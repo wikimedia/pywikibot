@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 Periodically grab list of new articles and analyze to blank or flag them.
 

@@ -1,6 +1,6 @@
 """Test utilities."""
 #
-# (C) Pywikibot team, 2013-2021
+# (C) Pywikibot team, 2013-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -20,8 +20,6 @@ from pywikibot.data.api import Request as _original_Request
 from pywikibot.exceptions import APIError
 from pywikibot.login import LoginStatus
 from pywikibot.site import Namespace
-from pywikibot.tools import PYTHON_VERSION
-
 from tests import _pwb_py
 
 
@@ -168,7 +166,7 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
             if issubclass(warn_msg.category, ResourceWarning) \
                and str(warn_msg.message).startswith(
                    ('unclosed <ssl.SSLSocket', 'unclosed <socket.socket')):
-                return None
+                return
 
             log.append(warn_msg)
 
@@ -217,6 +215,7 @@ class AssertAPIErrorContextManager:
             return self
         with self:
             callable_obj(*args, **kwargs)
+        return None
 
 
 class DryParamInfo(dict):
@@ -376,6 +375,7 @@ class DrySite(pywikibot.site.APISite):
         if bool(code or fam):
             return pywikibot.Site(code, fam, self.username(),
                                   interface=self.__class__)
+        return None
 
     def data_repository(self):
         """Return Site object for data repository e.g. Wikidata."""
@@ -396,6 +396,7 @@ class DrySite(pywikibot.site.APISite):
         if bool(code or fam):
             return pywikibot.Site(code, fam, self.username(),
                                   interface=DryDataSite)
+        return None
 
 
 class DryDataSite(DrySite, pywikibot.site.DataSite):
@@ -446,8 +447,6 @@ def execute(command, data_in=None, timeout=None, error=None):
     :param command: executable to run and arguments to use
     :type command: list of str
     """
-    if PYTHON_VERSION < (3, 5, 3):
-        command.insert(1, '-W ignore::FutureWarning:pywikibot:112')
     if cryptography_version and cryptography_version < [1, 3, 4]:
         command.insert(1, '-W ignore:Old version of cryptography:Warning')
 

@@ -271,17 +271,17 @@ _first_upper_exception = _first_upper_exception_dict.get
 # codepoint it takes longer especially when working with UCS2. The lists also
 # differ between Python versions which can be avoided by this static list.
 #
-# This frozenset was created using Python 3.9 (Unicode version 13.0.0):
+# This frozenset was created using Python 3.11 (Unicode version 14.0.0):
 # list(c for c in (chr(i) for i in range(sys.maxunicode))
 #      if unicodedata.category(c) == 'Cf')
 _category_cf = frozenset([
     '\xad',
     '\u0600', '\u0601', '\u0602', '\u0603', '\u0604', '\u0605', '\u061c',
-    '\u06dd', '\u070f', '\u08e2', '\u180e', '\u200b', '\u200c', '\u200d',
-    '\u200e', '\u200f', '\u202a', '\u202b', '\u202c', '\u202d', '\u202e',
-    '\u2060', '\u2061', '\u2062', '\u2063', '\u2064', '\u2066', '\u2067',
-    '\u2068', '\u2069', '\u206a', '\u206b', '\u206c', '\u206d', '\u206e',
-    '\u206f', '\ufeff', '\ufff9', '\ufffa', '\ufffb',
+    '\u06dd', '\u070f', '\u0890', '\u0891', '\u08e2', '\u180e', '\u200b',
+    '\u200c', '\u200d', '\u200e', '\u200f', '\u202a', '\u202b', '\u202c',
+    '\u202d', '\u202e', '\u2060', '\u2061', '\u2062', '\u2063', '\u2064',
+    '\u2066', '\u2067', '\u2068', '\u2069', '\u206a', '\u206b', '\u206c',
+    '\u206d', '\u206e', '\u206f', '\ufeff', '\ufff9', '\ufffa', '\ufffb',
     '\U000110bd', '\U000110cd', '\U00013430', '\U00013431', '\U00013432',
     '\U00013433', '\U00013434', '\U00013435', '\U00013436', '\U00013437',
     '\U00013438', '\U0001bca0', '\U0001bca1', '\U0001bca2', '\U0001bca3',

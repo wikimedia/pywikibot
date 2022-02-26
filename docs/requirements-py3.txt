@@ -1,4 +1,4 @@
 # This is a PIP requirements file for building Sphinx documentation of pywikibot
 # requirements.txt is also needed
 
-sphinx > 3.5.0, != 4.0.0
+sphinx >= 4.1.0

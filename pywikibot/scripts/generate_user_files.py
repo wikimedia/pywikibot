@@ -1,5 +1,9 @@
-#!/usr/bin/python
-"""Script to create user-config.py."""
+#!/usr/bin/python3
+"""Script to create user-config.py.
+
+.. versionchanged:: 7.0
+   moved to pywikibot.scripts folder
+"""
 #
 # (C) Pywikibot team, 2010-2021
 #
@@ -10,16 +14,14 @@ import os
 import re
 import sys
 from collections import namedtuple
+from pathlib import Path
 from textwrap import fill
 from typing import Optional
 
-from generate_family_file import _import_with_no_user_config
+from pywikibot.scripts import _import_with_no_user_config
 
 
-if sys.version_info[:2] >= (3, 9):
-    Tuple = tuple
-else:
-    from typing import Tuple
+PYTHON_VERSION = sys.version_info[:2]
 
 
 # DISABLED_SECTIONS cannot be copied; variables must be set manually
@@ -41,9 +43,6 @@ try:
 # unittests fails with "StringIO instance has no attribute 'encoding'"
 except AttributeError:
     console_encoding = None
-
-# the directory in which generate_user_files.py is located
-pywikibot_dir = sys.path[0]
 
 if console_encoding is None or sys.platform == 'cygwin':
     console_encoding = 'iso-8859-1'
@@ -105,13 +104,13 @@ def get_site_and_lang(default_family: Optional[str] = 'wikipedia',
                       default_lang: Optional[str] = 'en',
                       default_username: Optional[str] = None, force=False):
     """
-    Ask the user for the family, language and username.
+    Ask the user for the family, site code and username.
 
     :param default_family: The default family which should be chosen.
-    :param default_lang: The default language which should be chosen, if the
-        family supports this language.
+    :param default_lang: The default site code which should be chosen,
+        if the family supports it.
     :param default_username: The default username which should be chosen.
-    :return: The family, language and username
+    :return: The family, site code and username
     :rtype: tuple of three str
     """
     known_families = sorted(pywikibot.config.family_files.keys())
@@ -136,14 +135,14 @@ def get_site_and_lang(default_family: Optional[str] = 'wikipedia',
         known_langs = []
 
     if not known_langs:
-        pywikibot.output('There were no known languages found in {}.'
+        pywikibot.output('There were no known site codes found in {}.'
                          .format(fam.name))
         default_lang = None
     elif len(known_langs) == 1:
-        pywikibot.output('The only known language: {}'.format(known_langs[0]))
+        pywikibot.output('The only known site code: {}'.format(known_langs[0]))
         default_lang = known_langs[0]
     else:
-        pywikibot.output('This is the list of known languages:')
+        pywikibot.output('This is the list of known site oodes:')
         pywikibot.output(', '.join(known_langs))
         if default_lang not in known_langs:
             if default_lang != 'en' and 'en' in known_langs:
@@ -151,14 +150,14 @@ def get_site_and_lang(default_family: Optional[str] = 'wikipedia',
             else:
                 default_lang = None
 
-    message = "The language code of the site we're working on"
+    message = "The site code of the site we're working on"
     mycode = None
     while not mycode:
         mycode = pywikibot.input(message, default=default_lang, force=force)
         if known_langs and mycode and mycode not in known_langs:
             if not pywikibot.input_yn(
-                    fill('The language code {} is not in the list of known '
-                         'languages. Do you want to continue?'.format(mycode)),
+                    fill('The site code {!r} is not in the list of known '
+                         'sites. Do you want to continue?'.format(mycode)),
                     default=False, automatic_quit=False):
                 mycode = None
 
@@ -181,11 +180,11 @@ EXTENDED_CONFIG = """\
 # generate_family_file to create one.
 family = '{main_family}'
 
-# The language code of the site to be working on.
+# The site code (language) of the site to be working on.
 mylang = '{main_code}'
 
 # The dictionary usernames should contain a username for each site where you
-# have a bot account. If you have a unique username for all languages of a
+# have a bot account. If you have a unique username for all sites of a
 # family , you can use '*'
 {usernames}
 
@@ -217,21 +216,22 @@ PASSFILE_CONFIG = """\
 {botpasswords}"""
 
 
-def parse_sections():
+def parse_sections() -> list:
     """Parse sections from config.py file.
 
-    config.py will be in the pywikibot/ directory relative to this
-    generate_user_files script.
+    config.py will be in the pywikibot/ directory whereas
+    generate_user_files script is in pywikibot/scripts.
 
     :return: a list of ConfigSection named tuples.
-    :rtype: list
     """
     data = []
     ConfigSection = namedtuple('ConfigSection', 'head, info, section')
 
-    install = os.path.dirname(os.path.abspath(__file__))
-    with codecs.open(os.path.join(install, 'pywikibot', 'config.py'),
-                     'r', 'utf-8') as config_f:
+    config_path = Path(__file__).resolve().parents[1].joinpath('config.py')
+    if PYTHON_VERSION < (3, 6):
+        config_path = str(config_path)
+
+    with codecs.open(config_path, 'r', 'utf-8') as config_f:
         config_file = config_f.read()
 
     result = re.findall(
@@ -368,8 +368,8 @@ def save_botpasswords(botpasswords, _fncpass):
             with codecs.open(_fncpass, 'w', 'utf-8') as f:
                 f.write(PASSFILE_CONFIG.format(botpasswords=botpasswords))
                 file_mode_checker(_fncpass, mode=0o600)
-                pywikibot.output("'{0}' written.".format(_fncpass))
-        except EnvironmentError:
+                pywikibot.output("'{}' written.".format(_fncpass))
+        except OSError:
             os.remove(_fncpass)
             raise
 
@@ -406,7 +406,7 @@ def ask_for_dir_change(force):
     return userfile, passfile
 
 
-def main(*args: Tuple[str, ...]):
+def main(*args: str):
     """
     Process command line arguments and generate user-config.
 

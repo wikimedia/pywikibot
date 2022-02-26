@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 This bot uploads text from djvu files onto pages in the "Page" namespace.
 
@@ -19,6 +19,11 @@ The following parameters are supported:
                      A-  -> pages A until number of images
                      A   -> just page A
                      -B  -> pages 1 until B
+
+This script is a :py:obj:`ConfigParserBot <pywikibot.bot.ConfigParserBot>`.
+The following options can be set within a settings file which is scripts.ini
+by default:
+
     -summary:      custom edit summary.
                    Use quotes if edit summary contains spaces.
     -force         overwrites existing text
@@ -27,7 +32,7 @@ The following parameters are supported:
 
 """
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -48,6 +53,9 @@ class DjVuTextBot(SingleSiteBot):
     A bot that uploads text-layer from djvu files to Page:namespace.
 
     Works only on sites with Proofread Page extension installed.
+
+    .. versionchanged:: 7.0
+       CheckerBot is a ConfigParserBot
     """
 
     update_options = {
@@ -65,7 +73,7 @@ class DjVuTextBot(SingleSiteBot):
         :type index: Page object
         :param pages: page interval to upload (start, end)
         """
-        super().__init__(site=index.site, **kwargs)
+        super().__init__(**kwargs)
         self._djvu = djvu
         self._index = index
         self._prefix = self._index.title(with_ns=False)
@@ -172,13 +180,10 @@ def main(*args: str) -> None:
 
     # Parse pages param.
     pages = pages.split(',')
-    for i, page in enumerate(pages):
-        start, sep, end = page.partition('-')
-        start = 1 if not start else int(start)
-        if not sep:
-            end = start
-        else:
-            end = int(end) if end else djvu.number_of_images()
+    for i, page_interval in enumerate(pages):
+        start, sep, end = page_interval.partition('-')
+        start = int(start or 1)
+        end = int(end or djvu.number_of_images()) if sep else start
         pages[i] = (start, end)
 
     site = pywikibot.Site()

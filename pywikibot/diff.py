@@ -8,14 +8,14 @@ import difflib
 import math
 from collections import abc
 from difflib import (  # type: ignore[attr-defined]
-    _format_range_unified as format_range_unified
+    _format_range_unified as format_range_unified,
 )
 from itertools import zip_longest
 from typing import Optional, Union
 
 import pywikibot
 from pywikibot.backports import Dict, Iterable, List, Sequence, Tuple
-from pywikibot.tools import chars, deprecated_args
+from pywikibot.tools import chars
 from pywikibot.tools.formatter import color_format
 
 
@@ -249,7 +249,6 @@ class PatchManager:
     If all hunks are approved, text_b will be obtained.
     """
 
-    @deprecated_args(n='context')
     def __init__(self, text_a: str, text_b: str, context: int = 0,
                  by_letter: bool = False,
                  replace_invisible: bool = False) -> None:
@@ -531,7 +530,7 @@ class PatchManager:
             else:  # choice == '?':
                 pywikibot.output(color_format(
                     '{purple}{0}{default}', '\n'.join(
-                        '{0} -> {1}'.format(answer, help_msg[answer])
+                        '{} -> {}'.format(answer, help_msg[answer])
                         for answer in answers)))
 
     def apply(self) -> List[str]:

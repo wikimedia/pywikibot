@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """
 Used to find expensive templates that are subject to be converted to Lua.
 
@@ -43,7 +44,7 @@ Should you specify neither first nor atleast, all templates using parser
 functions will be listed.
 """
 #
-# (C) Pywikibot team, 2013-2021
+# (C) Pywikibot team, 2013-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -133,10 +134,10 @@ class ParserFunctionCountBot(SingleSiteBot,
     def treat(self, page):
         """Process a single template."""
         title = page.title()
-        if (self._treat_counter + 1) % 50 == 0:
+        if (self.counter['read'] + 1) % 50 == 0:
             # Don't let the poor user panic in front of a black screen.
             pywikibot.output('{}th template is being processed: {}'
-                             .format(self._treat_counter + 1, title))
+                             .format(self.counter['read'] + 1, title))
 
         text = page.text
         functions = self.regex.findall(text)

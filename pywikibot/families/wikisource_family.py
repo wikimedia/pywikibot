@@ -27,10 +27,10 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     languages_by_size = [
         'pl', 'en', 'ru', 'de', 'fr', 'zh', 'he', 'it', 'es', 'uk', 'ar', 'cs',
         'mul', 'gu', 'pt', 'sr', 'sv', 'fa', 'hu', 'ko', 'ml', 'bn', 'sa',
-        'ta', 'te', 'sl', 'tr', 'hy', 'el', 'la', 'vi', 'ro', 'ja', 'fi',
+        'ta', 'te', 'sl', 'tr', 'hy', 'el', 'la', 'vi', 'ja', 'ro', 'fi',
         'nap', 'nl', 'az', 'ca', 'br', 'kn', 'hr', 'no', 'th', 'be', 'hi',
         'eo', 'is', 'vec', 'id', 'pms', 'ban', 'da', 'lij', 'et', 'mk', 'yi',
-        'as', 'mr', 'bg', 'cy', 'li', 'lt', 'wa', 'pa', 'or', 'jv', 'eu', 'gl',
+        'as', 'mr', 'cy', 'bg', 'li', 'lt', 'wa', 'pa', 'or', 'jv', 'eu', 'gl',
         'bs', 'sah', 'sk', 'zh-min-nan', 'fo',
     ]
 
@@ -51,7 +51,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # the main page, so using 'wikisource.org'
     @classproperty
     def langs(cls):
-        cls.langs = super(Family, cls).langs
+        cls.langs = super().langs
         cls.langs['mul'] = cls.domain
         cls.langs['beta'] = 'en.wikisource.beta.wmflabs.org'
         return cls.langs
@@ -59,7 +59,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # Need to explicitly inject the beta domain
     @classproperty
     def domains(cls):
-        cls.domains = super(Family, cls).domains
+        cls.domains = super().domains
         cls.domains.append(cls.langs['beta'])
         return cls.domains
 
@@ -67,7 +67,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # the main page, so using mul alias, see T114574 and T241413
     @classproperty
     def code_aliases(cls):
-        cls.code_aliases = super(Family, cls).code_aliases.copy()
+        cls.code_aliases = super().code_aliases.copy()
         aliases = cls.alphabetic + ['-', 'www']
         for code in aliases:
             if (code not in cls.languages_by_size

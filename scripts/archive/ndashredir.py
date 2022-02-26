@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 A script to create hyphenated redirects for n or m dash pages.
 

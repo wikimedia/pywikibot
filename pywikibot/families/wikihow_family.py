@@ -1,9 +1,9 @@
 """Family module for Wikihow Wiki.
 
-*New in version 3.0.*
+.. versionadded:: 3.0
 """
 #
-# (C) Pywikibot team, 2020
+# (C) Pywikibot team, 2020-2021
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,7 +11,12 @@ from pywikibot import family
 from pywikibot.tools import classproperty
 
 
-class Family(family.SubdomainFamily):  # noqa: D101
+class Family(family.SubdomainFamily):
+
+    """Family class for Wikihow Wiki.
+
+    .. versionadded:: 3.0
+    """
 
     name = 'wikihow'
     domain = 'wikihow.com'
@@ -20,7 +25,11 @@ class Family(family.SubdomainFamily):  # noqa: D101
         'ar', 'cs', 'de', 'en', 'es', 'fr', 'hi', 'id', 'it', 'ja', 'ko', 'nl',
         'pt', 'ru', 'th', 'tr', 'vi', 'zh',
     )
+
     removed_wikis = ['ca', 'cy', 'fa', 'he', 'pl', 'ur']
+
+    title_delimiter_and_aliases = '- '
+    """.. versionadded:: 7.0"""
 
     @classproperty
     def domains(cls):

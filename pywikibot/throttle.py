@@ -1,6 +1,6 @@
 """Mechanics to slow down wiki read and/or write rate."""
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -8,16 +8,14 @@ import itertools
 import math
 import threading
 import time
-
-from collections import namedtuple, Counter
+from collections import Counter, namedtuple
 from contextlib import suppress
 from typing import Optional, Union
 
 import pywikibot
-
 from pywikibot import config
+from pywikibot.tools import PYTHON_VERSION, deprecated
 
-from pywikibot.tools import deprecated, deprecated_args, PYTHON_VERSION
 
 if PYTHON_VERSION < (3, 6):
     from hashlib import md5
@@ -49,10 +47,14 @@ class Throttle:
     Each Site initiates one Throttle object (`site.throttle`) to control
     the rate of access.
 
+    :param site: site or sitename for this Throttle. If site is an empty
+        string, it will not be written to the throttle.ctrl file.
+    :param mindelay: The minimal delay, also used for read access
+    :param maxdelay: The maximal delay
+    :param writedelay: The write delay
     """
 
-    @deprecated_args(multiplydelay=True)
-    def __init__(self, site, *,
+    def __init__(self, site: Union['pywikibot.site.BaseSite', str], *,
                  mindelay: Optional[int] = None,
                  maxdelay: Optional[int] = None,
                  writedelay: Union[int, float, None] = None):
@@ -112,9 +114,9 @@ class Throttle:
     def _read_file(self, raise_exc=False):
         """Yield process entries from file."""
         try:
-            with open(self.ctrlfilename, 'r') as f:
+            with open(self.ctrlfilename) as f:
                 lines = f.readlines()
-        except IOError:
+        except OSError:
             if raise_exc and pid:
                 raise
             return
@@ -149,7 +151,11 @@ class Throttle:
                 f.write(FORMAT_LINE.format_map(p._asdict()))
 
     def checkMultiplicity(self):
-        """Count running processes for site and set process_multiplicity."""
+        """Count running processes for site and set process_multiplicity.
+
+        .. versionchanged:: 7.0
+           process is not written to throttle.ctrl file is site is empty
+        """
         global pid
         mysite = self.mysite
         pywikibot.debug('Checking multiplicity: pid = {pid}'.format(pid=pid),
@@ -168,7 +174,7 @@ class Throttle:
                    and proc.site == mysite \
                    and proc.pid != pid:
                     count += 1
-                if proc.site != self.mysite or proc.pid != pid:
+                if proc.site != mysite or proc.pid != pid:
                     processes.append(proc)
 
             free_pid = (i for i in itertools.count(start=1)
@@ -181,6 +187,9 @@ class Throttle:
                 ProcEntry(module_id=self._module_hash(), pid=pid,
                           time=self.checktime, site=mysite))
             self.modules = Counter(p.module_id for p in processes)
+
+            if not mysite:
+                del processes[-1]
 
             self._write_file(sorted(processes, key=lambda p: p.pid))
 
@@ -327,5 +336,4 @@ class Throttle:
 
     def get_pid(self, module: str) -> int:
         """Get the global pid if the module is running multiple times."""
-        global pid
         return pid if self.modules[self._module_hash(module)] > 1 else 0

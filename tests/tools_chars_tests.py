@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """Test tools.chars package."""
 #
 # (C) Pywikibot team, 2015-2021

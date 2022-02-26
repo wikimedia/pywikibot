@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 Fetch and add titles for bare links in references.
 
@@ -18,12 +18,19 @@ pdfinfo is needed for parsing pdf titles.
 
 The following parameters are supported:
 
--limit:n          Stops after n edits
-
 -xml:dump.xml     Should be used instead of a simple page fetching method
                   from pagegenerators.py for performance and load issues
 
 -xmlstart         Page to start with when using an XML dump
+
+This script is a :py:obj:`ConfigParserBot <pywikibot.bot.ConfigParserBot>`.
+The following options can be set within a settings file which is scripts.ini
+by default::
+
+-always          Doesn't ask every time whether the bot should make the change.
+                 Do it always.
+
+-limit:n          Stops after n edits
 
 -ignorepdf        Do not handle PDF files (handy if you use Windows and
                   can't get pdfinfo)
@@ -44,10 +51,8 @@ import http.client as httplib
 import itertools
 import os
 import re
-import socket
 import subprocess
 import tempfile
-
 from contextlib import suppress
 from enum import IntEnum
 from functools import partial
@@ -57,7 +62,12 @@ from textwrap import shorten
 import pywikibot
 from pywikibot import comms, config, i18n, pagegenerators, textlib
 from pywikibot.backports import removeprefix
-from pywikibot.bot import ExistingPageBot, NoRedirectPageBot, SingleSiteBot
+from pywikibot.bot import (
+    ConfigParserBot,
+    ExistingPageBot,
+    NoRedirectPageBot,
+    SingleSiteBot,
+)
 from pywikibot.exceptions import (
     FatalServerError,
     Server414Error,
@@ -67,9 +77,8 @@ from pywikibot.pagegenerators import (
     XMLDumpPageGenerator as _XMLDumpPageGenerator,
 )
 from pywikibot.textlib import replaceExcept
-from pywikibot.tools.formatter import color_format
 from pywikibot.tools.chars import string2html
-
+from pywikibot.tools.formatter import color_format
 from scripts import noreferences
 
 
@@ -112,7 +121,7 @@ deadLinkTag = {
     'it': '{{Collegamento interrotto|%s}}',
     'en': '[%s] {{dead link}}',
     'pl': '[%s] {{Martwy link}}',
-    'ru': '[%s] {{subst:deadlink2}}',
+    'ru': '[%s] {{Недоступная ссылка}}',
     'sr': '[%s] {{dead link}}',
     'ur': '[%s] {{مردہ ربط}}',
 }
@@ -412,9 +421,16 @@ class DuplicateReferences:
         return text
 
 
-class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
+class ReferencesRobot(SingleSiteBot,
+                      ConfigParserBot,
+                      ExistingPageBot,
+                      NoRedirectPageBot):
 
-    """References bot."""
+    """References bot.
+
+    .. versionchanged:: 7.0
+       ReferencesRobot is a ConfigParserBot
+    """
 
     update_options = {
         'ignorepdf': False,
@@ -462,9 +478,11 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                                   .format(self.stop_page.title(as_link=True)))
 
         # Regex to grasp content-type meta HTML tag in HTML source
-        self.META_CONTENT = re.compile(br'(?i)<meta[^>]*content\-type[^>]*>')
+        self.META_CONTENT = re.compile(
+            br'(?i)<meta[^>]*(?:content\-type|charset)[^>]*>')
         # Extract the encoding from a charset property (from content-type !)
-        self.CHARSET = re.compile(r'(?i)charset\s*=\s*(?P<enc>[^\'",;>/]*)')
+        self.CHARSET = re.compile(
+            r'(?i)charset\s*=\s*(?P<enc>(?P<q>[\'"]?)[^\'",;>/]*(?P=q))')
         # Extract html title from page
         self.TITLE = re.compile(r'(?is)(?<=<title>).*?(?=</title>)')
         # Matches content inside <script>/<style>/HTML comments
@@ -519,7 +537,7 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         try:
             with codecs.open(listof404pages, 'r', 'latin_1') as f:
                 self.dead_links = f.read()
-        except IOError:
+        except OSError:
             raise NotImplementedError(
                 '404-links.txt is required for reflinks.py\n'
                 'You need to download\n'
@@ -620,8 +638,7 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                 continue
 
             except (ValueError,  # urllib3.LocationParseError derives from it
-                    socket.error,
-                    IOError,
+                    OSError,
                     httplib.error,
                     FatalServerError,
                     Server414Error,
@@ -699,9 +716,8 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             new_text = new_text.replace(match.group(), repl)
 
         # Add <references/> when needed, but ignore templates !
-        if page.namespace != 10:
-            if self.norefbot.lacksReferences(new_text):
-                new_text = self.norefbot.addReferences(new_text)
+        if page.namespace != 10 and self.norefbot.lacksReferences(new_text):
+            new_text = self.norefbot.addReferences(new_text)
 
         new_text = self.deduplicator.process(new_text)
         old_text = page.text
@@ -713,15 +729,15 @@ class ReferencesRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                      ignore_save_related_errors=True,
                      ignore_server_errors=True)
 
-        if not self._save_counter:
+        if not self.counter['write']:
             return
 
-        if self.opt.limit and self._save_counter >= self.opt.limit:
+        if self.opt.limit and self.counter['write'] >= self.opt.limit:
             pywikibot.output('Edited {} pages, stopping.'
                              .format(self.opt.limit))
             self.generator.close()
 
-        if self.site_stop_page and self._save_counter % 20 == 0:
+        if self.site_stop_page and self.counter['write'] % 20 == 0:
             self.stop_page = pywikibot.Page(self.site, self.site_stop_page)
             if self.stop_page.exists():
                 pywikibot.output(color_format(

@@ -1,6 +1,7 @@
+#!/usr/bin/python3
 """Test plural module."""
 #
-# (C) Pywikibot team, 2015-2021
+# (C) Pywikibot team, 2015-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -47,7 +48,7 @@ class MetaPluralRulesTest(MetaTestCaseClass):
             cls.add_method(dct, 'test_{}'.format(lang.replace('-', '_')),
                            create_test(rule),
                            doc_suffix='for "{}"'.format(lang))
-        return super(MetaPluralRulesTest, cls).__new__(cls, name, bases, dct)
+        return super().__new__(cls, name, bases, dct)
 
 
 class TestPluralRules(TestCase, metaclass=MetaPluralRulesTest):

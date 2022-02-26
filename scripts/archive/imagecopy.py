@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """
 Script to copy files from a local Wikimedia wiki to Wikimedia Commons.
 
@@ -56,7 +57,7 @@ deletion):
 By default the bot works on your home wiki (set in user-config)
 """
 #
-# (C) Pywikibot team, 2003-2021
+# (C) Pywikibot team, 2003-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -72,7 +73,6 @@ import pywikibot
 from pywikibot import config, i18n, pagegenerators
 from pywikibot.comms.http import fetch
 from pywikibot.specialbots import UploadRobot
-from pywikibot.tools import remove_last_args
 from scripts.image import ImageRobot
 
 
@@ -225,7 +225,7 @@ def pageTextPost(url, parameters):
     return data
 
 
-class imageTransfer(threading.Thread):
+class imageTransfer(threading.Thread):  # noqa: N801
 
     """Facilitate transfer of image/file to commons."""
 
@@ -312,7 +312,7 @@ class imageTransfer(threading.Thread):
             pywikibot.showDiff(self.imagePage.get(), imtxt + addTemplate)
             self.imagePage.put(imtxt + addTemplate, comment=commentText)
 
-            self.gen = pagegenerators.FileLinksGenerator(self.imagePage)
+            self.gen = self.imagePage.usingPages()
             self.preloadingGen = pagegenerators.PreloadingGenerator(self.gen)
 
             moveSummary = i18n.twtranslate(
@@ -382,7 +382,6 @@ class TkdialogIC(Tkdialog):
 
     """The dialog window for image info."""
 
-    @remove_last_args(('commonsconflict',))
     def __init__(self, image_title, content, uploader, url, templates):
         """Initializer."""
         # Check if `Tkinter` wasn't imported

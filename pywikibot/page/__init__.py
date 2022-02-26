@@ -11,7 +11,7 @@ This module also includes objects:
 
 """
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -31,7 +31,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import config, i18n, textlib
-from pywikibot.backports import Dict, Iterable, List, Tuple
+from pywikibot.backports import Dict, Generator, Iterable, List, Tuple
 from pywikibot.comms import http
 from pywikibot.exceptions import (
     APIError,
@@ -65,19 +65,14 @@ from pywikibot.page._collections import (
 )
 from pywikibot.page._decorators import allow_asynchronous
 from pywikibot.page._revision import Revision
-from pywikibot.site import DataSite, Namespace
+from pywikibot.site import DataSite, Namespace, NamespaceArgType
 from pywikibot.tools import (
     ComparableMixin,
     compute_file_hash,
-    deprecate_arg,
     deprecated,
-    deprecated_args,
     first_upper,
     is_ip_address,
     issue_deprecation_warning,
-    ModuleDeprecationWrapper,
-    redirect_func,
-    remove_last_args,
 )
 
 
@@ -105,6 +100,12 @@ __all__ = (
     'unicode2html',
     'url2unicode',
 )
+
+PageSourceType = Union[
+    'pywikibot.site.BaseLink',
+    'pywikibot.page.BaseSite',
+    'pywikibot.page.Page',
+]
 
 logger = logging.getLogger('pywiki.wiki.page')
 
@@ -261,10 +262,6 @@ class BasePage(ComparableMixin):
             self.site.loadpageinfo(self)
         return self._pageid
 
-    @deprecated_args(
-        savetitle='as_url', withNamespace='with_ns',
-        withSection='with_section', forceInterwiki='force_interwiki',
-        asUrl='as_url', asLink='as_link', allowInterwiki='allow_interwiki')
     def title(self, *, underscore=False, with_ns=True,
               with_section=True, as_url=False, as_link=False,
               allow_interwiki=True, force_interwiki=False, textlink=False,
@@ -351,7 +348,6 @@ class BasePage(ComparableMixin):
                 title = title.replace(forbidden, '_')
         return title
 
-    @remove_last_args(('decode', 'underscore'))
     def section(self) -> Optional[str]:
         """
         Return the name of the section this Page refers to.
@@ -395,8 +391,8 @@ class BasePage(ComparableMixin):
 
     def full_url(self):
         """Return the full URL."""
-        return self.site.base_url(self.site.article_path
-                                  + self.title(as_url=True))
+        return self.site.base_url(
+            self.site.articlepath.format(self.title(as_url=True)))
 
     def autoFormat(self):
         """
@@ -420,7 +416,6 @@ class BasePage(ComparableMixin):
         """Return True if title of this Page is in the autoFormat dict."""
         return self.autoFormat()[0] is not None
 
-    @remove_last_args(['sysop'])
     def get(self, force: bool = False, get_redirect: bool = False) -> str:
         """Return the wiki-text of the page.
 
@@ -483,7 +478,6 @@ class BasePage(ComparableMixin):
             self._getexception = IsRedirectPageError(self)
             raise self._getexception
 
-    @remove_last_args(['sysop'])
     def getOldVersion(self, oldid,
                       force: bool = False, get_redirect: bool = False) -> str:
         """
@@ -648,7 +642,6 @@ class BasePage(ComparableMixin):
         """
         return self.properties(force=force).get('defaultsort')
 
-    @deprecate_arg('refresh', 'force')
     def expand_text(self, force=False, includecomments=False) -> str:
         """Return the page text with all templates and parser words expanded.
 
@@ -698,7 +691,6 @@ class BasePage(ComparableMixin):
 
         return self._lastNonBotUser
 
-    @remove_last_args(('datetime', ))
     def editTime(self):
         """Return timestamp of last revision to page.
 
@@ -730,22 +722,18 @@ class BasePage(ComparableMixin):
         return self.site.page_isredirect(self)
 
     def isStaticRedirect(self, force: bool = False) -> bool:
-        """
-        Determine whether the page is a static redirect.
+        """Determine whether the page is a static redirect.
 
         A static redirect must be a valid redirect, and contain the magic
         word __STATICREDIRECT__.
 
+        .. versionchanged:: 7.0.0
+           __STATICREDIRECT__ can be transcluded
+
         :param force: Bypass local caching
         """
-        if self.isRedirectPage():
-            static_keys = self.site.getmagicwords('staticredirect')
-            text = self.get(get_redirect=True, force=force)
-            if static_keys:
-                for key in static_keys:
-                    if key in text:
-                        return True
-        return False
+        return self.isRedirectPage() \
+            and 'staticredirect' in self.properties(force=force)
 
     def isCategoryRedirect(self) -> bool:
         """Return True if this is a category redirect page, False otherwise."""
@@ -827,7 +815,6 @@ class BasePage(ComparableMixin):
         """Return True if this is a file description page, False otherwise."""
         return self.namespace() == 6
 
-    @remove_last_args(['get_Index'])
     def isDisambig(self) -> bool:
         """
         Return True if this is a disambiguation page, False otherwise.
@@ -886,9 +873,6 @@ class BasePage(ComparableMixin):
         disambig_in_page = disambigs.intersection(templates)
         return self.namespace() != 10 and bool(disambig_in_page)
 
-    @deprecated_args(withTemplateInclusion='with_template_inclusion',
-                     onlyTemplateInclusion='only_template_inclusion',
-                     redirectsOnly='filter_redirects')
     def getReferences(self,
                       follow_redirects: bool = True,
                       with_template_inclusion: bool = True,
@@ -932,8 +916,6 @@ class BasePage(ComparableMixin):
             content=content
         )
 
-    @deprecated_args(followRedirects='follow_redirects',
-                     filterRedirects='filter_redirects')
     def backlinks(self,
                   follow_redirects: bool = True,
                   filter_redirects: Optional[bool] = None,
@@ -984,6 +966,34 @@ class BasePage(ComparableMixin):
             content=content
         )
 
+    def redirects(
+        self,
+        *,
+        filter_fragments: Optional[bool] = None,
+        namespaces: NamespaceArgType = None,
+        total: Optional[int] = None,
+        content: bool = False
+    ) -> 'Iterable[pywikibot.Page]':
+        """
+        Return an iterable of redirects to this page.
+
+        :param filter_fragments: If True, only return redirects with fragments.
+            If False, only return redirects without fragments. If None, return
+            both (no filtering).
+        :param namespaces: only return redirects from these namespaces
+        :param total: maximum number of redirects to retrieve in total
+        :param content: load the current content of each redirect
+
+        .. versionadded:: 7.0
+        """
+        return self.site.page_redirects(
+            self,
+            filter_fragments=filter_fragments,
+            namespaces=namespaces,
+            total=total,
+            content=content,
+        )
+
     def protection(self) -> dict:
         """Return a dictionary reflecting page protections."""
         return self.site.page_restrictions(self)
@@ -1024,11 +1034,6 @@ class BasePage(ComparableMixin):
         :raises ValueError: invalid action parameter
         """
         return self.site.page_can_be_edited(self, action)
-
-    @deprecated("Page.has_permission('edit')", since='20200208')
-    def canBeEdited(self):  # pragma: no cover
-        """DEPRECATED. Determine whether the page may be edited."""
-        return self.has_permission()
 
     def botMayEdit(self) -> bool:
         """
@@ -1150,19 +1155,22 @@ class BasePage(ComparableMixin):
         # no restricting template found
         return True
 
-    @deprecate_arg('async', 'asynchronous')  # T106230
-    @deprecated_args(comment='summary')
     def save(self,
              summary: Optional[str] = None,
-             watch: Union[str, bool, None] = None,
+             watch: Optional[str] = None,
              minor: bool = True,
              botflag: Optional[bool] = None,
              force: bool = False,
              asynchronous: bool = False,
-             callback=None, apply_cosmetic_changes=None,
-             quiet: bool = False, **kwargs):
+             callback=None,
+             apply_cosmetic_changes: Optional[bool] = None,
+             quiet: bool = False,
+             **kwargs):
         """
         Save the current contents of page's text to the wiki.
+
+        .. versionchanged:: 7.0
+           boolean watch parameter is deprecated
 
         :param summary: The edit summary for the modification (optional, but
             most wikis strongly encourage its use)
@@ -1173,11 +1181,6 @@ class BasePage(ComparableMixin):
             * preferences: use the preference settings (Default)
             * nochange: don't change the watchlist
             If None (default), follow bot account's default settings
-
-            For backward compatibility watch parameter may also be boolean:
-            if True, add or if False, remove this Page to/from bot
-            user's watchlist.
-        :type watch: str, bool (deprecated) or None
         :param minor: if True, mark this edit as minor
         :param botflag: if True, mark this edit as made by a bot (default:
             True if user has bot status, False if not)
@@ -1192,7 +1195,6 @@ class BasePage(ComparableMixin):
             successful.
         :param apply_cosmetic_changes: Overwrites the cosmetic_changes
             configuration value to this value unless it's None.
-        :type apply_cosmetic_changes: bool or None
         :param quiet: enable/disable successful save operation message;
             defaults to False.
             In asynchronous mode, if True, it is up to the calling bot to
@@ -1200,10 +1202,14 @@ class BasePage(ComparableMixin):
         """
         if not summary:
             summary = config.default_edit_summary
-        if watch is True:
-            watch = 'watch'
-        elif watch is False:
-            watch = 'unwatch'
+
+        if isinstance(watch, bool):
+            issue_deprecation_warning(
+                'boolean watch parameter',
+                '"watch", "unwatch", "preferences" or "nochange" value',
+                since='7.0.0')
+            watch = ('unwatch', 'watch')[watch]
+
         if not force and not self.botMayEdit():
             raise OtherPageSaveError(
                 self, 'Editing restricted by {{bots}}, {{nobots}} '
@@ -1258,24 +1264,30 @@ class BasePage(ComparableMixin):
         pywikibot.log('Cosmetic changes for {}-{} enabled.'
                       .format(family, self.site.lang))
         # cc depends on page directly and via several other imports
-        from pywikibot.cosmetic_changes import (
-            CANCEL,
-            CosmeticChangesToolkit,
-        )
+        from pywikibot.cosmetic_changes import CANCEL, CosmeticChangesToolkit
         cc_toolkit = CosmeticChangesToolkit(self, ignore=CANCEL.MATCH)
         self.text = cc_toolkit.change(old)
 
+        # i18n package changed in Pywikibot 7.0.0
+        old_i18n = i18n.twtranslate(self.site, 'cosmetic_changes-append',
+                                    fallback_prompt='; cosmetic changes')
         if summary and old.strip().replace(
                 '\r\n', '\n') != self.text.strip().replace('\r\n', '\n'):
-            summary += i18n.twtranslate(self.site, 'cosmetic_changes-append',
-                                        fallback_prompt='; cosmetic changes')
+            summary += i18n.twtranslate(self.site,
+                                        'pywikibot-cosmetic-changes',
+                                        fallback_prompt=old_i18n)
         return summary
 
-    @deprecate_arg('async', 'asynchronous')  # T106230
-    @deprecated_args(comment='summary', watchArticle='watch',
-                     minorEdit='minor')
-    def put(self, newtext, summary=None, watch=None, minor=True, botflag=None,
-            force=False, asynchronous=False, callback=None, **kwargs):
+    def put(self, newtext: str,
+            summary: Optional[str] = None,
+            watch: Optional[str] = None,
+            minor: bool = True,
+            botflag: Optional[bool] = None,
+            force: bool = False,
+            asynchronous: bool = False,
+            callback=None,
+            show_diff: bool = False,
+            **kwargs):
         """
         Save the page with the contents of the first argument as the text.
 
@@ -1283,32 +1295,19 @@ class BasePage(ComparableMixin):
         For new code, using Page.save() is preferred. See save() method
         docs for all parameters not listed here.
 
+        .. versionadded:: 7.0
+           The `show_diff` parameter
+
         :param newtext: The complete text of the revised page.
-        :type newtext: str
+        :param show_diff: show changes between oldtext and newtext
+            (default: False)
         """
+        if show_diff:
+            pywikibot.showDiff(self.text, newtext)
         self.text = newtext
         self.save(summary=summary, watch=watch, minor=minor, botflag=botflag,
                   force=force, asynchronous=asynchronous, callback=callback,
                   **kwargs)
-
-    @deprecated('put(asynchronous=True) or save(asynchronous=True)',
-                since='20180501')
-    @deprecated_args(comment='summary', watchArticle='watch',
-                     minorEdit='minor')
-    def put_async(self, newtext, summary=None, watch=None, minor=True,
-                  botflag=None, force=False, callback=None,
-                  **kwargs):  # pragma: no cover
-        """
-        Put page on queue to be saved to wiki asynchronously.
-
-        Asynchronous version of put (takes the same arguments), which places
-        pages on a queue to be saved by a daemon thread. All arguments are
-        the same as for .put(). This version is maintained solely for
-        backwards-compatibility.
-        """
-        self.put(newtext, summary=summary, watch=watch,
-                 minor=minor, botflag=botflag, force=force,
-                 asynchronous=True, callback=callback, **kwargs)
 
     def watch(self, unwatch: bool = False) -> bool:
         """
@@ -1363,8 +1362,7 @@ class BasePage(ComparableMixin):
         if self.exists():
             # ensure always get the page text and not to change it.
             del self.text
-            summary = i18n.twtranslate(self.site, 'pywikibot-touch',
-                                       fallback_prompt='Pywikibot touch edit')
+            summary = i18n.twtranslate(self.site, 'pywikibot-touch')
             self.save(summary=summary, watch='nochange',
                       minor=False, botflag=botflag, force=True,
                       asynchronous=False, callback=callback,
@@ -1372,27 +1370,51 @@ class BasePage(ComparableMixin):
         else:
             raise NoPageError(self)
 
-    def linkedPages(self, namespaces=None,
-                    total: Optional[int] = None,
-                    content: bool = False):
-        """
-        Iterate Pages that this Page links to.
+    def linkedPages(
+        self, *args, **kwargs
+    ) -> Generator['pywikibot.Page', None, None]:
+        """Iterate Pages that this Page links to.
 
-        Only returns pages from "normal" internal links. Image and category
-        links are omitted unless prefixed with ":". Embedded templates are
-        omitted (but links within them are returned). All interwiki and
-        external links are omitted.
+        Only returns pages from "normal" internal links. Embedded
+        templates are omitted but links within them are returned. All
+        interwiki and external links are omitted.
 
-        :param namespaces: only iterate links in these namespaces
-        :param namespaces: int, or list of ints
-        :param total: iterate no more than this number of pages in total
-        :param content: if True, retrieve the content of the current version
-            of each linked page (default False)
-        :return: a generator that yields Page objects.
-        :rtype: generator
+        For the parameters refer
+        :py:mod:`APISite.pagelinks<pywikibot.site.APISite.pagelinks>`
+
+        .. versionadded:: 7.0.0
+           the `follow_redirects` keyword argument
+        .. deprecated:: 7.0.0
+           the positional arguments
+
+        .. seealso:: https://www.mediawiki.org/wiki/API:Links
+
+        :keyword namespaces: Only iterate pages in these namespaces
+            (default: all)
+        :type namespaces: iterable of str or Namespace key,
+            or a single instance of those types. May be a '|' separated
+            list of namespace identifiers.
+        :keyword follow_redirects: if True, yields the target of any redirects,
+            rather than the redirect page
+        :keyword total: iterate no more than this number of pages in total
+        :keyword content: if True, load the current content of each page
         """
-        return self.site.pagelinks(self, namespaces=namespaces,
-                                   total=total, content=content)
+        # Deprecate positional arguments and synchronize with Site.pagelinks
+        keys = ('namespaces', 'total', 'content')
+        for i, arg in enumerate(args):
+            key = keys[i]
+            issue_deprecation_warning(
+                'Positional argument {} ({})'.format(i + 1, arg),
+                'keyword argument "{}={}"'.format(key, arg),
+                since='7.0.0')
+            if key in kwargs:
+                pywikibot.warning('{!r} is given as keyword argument {!r} '
+                                  'already; ignoring {!r}'
+                                  .format(key, arg, kwargs[key]))
+            else:
+                kwargs[key] = arg
+
+        return self.site.pagelinks(self, **kwargs)
 
     def interwiki(self, expand=True):
         """
@@ -1527,7 +1549,6 @@ class BasePage(ComparableMixin):
         """
         return self.site.pageimages(self, total=total, content=content)
 
-    @deprecated_args(withSortKey='with_sort_key')
     def categories(self,
                    with_sort_key: bool = False,
                    total: Optional[int] = None,
@@ -1623,7 +1644,6 @@ class BasePage(ComparableMixin):
         else:
             return lastmove.target_page
 
-    @deprecated_args(getText='content', reverseOrder='reverse')
     def revisions(self,
                   reverse: bool = False,
                   total: Optional[int] = None,
@@ -1637,7 +1657,6 @@ class BasePage(ComparableMixin):
         return (self._revisions[rev] for rev in
                 sorted(self._revisions, reverse=not reverse)[:total])
 
-    @deprecated_args(reverseOrder='reverse')
     def getVersionHistoryTable(self,
                                reverse: bool = False,
                                total: Optional[int] = None):
@@ -1707,8 +1726,6 @@ class BasePage(ComparableMixin):
         """
         self.site.merge_history(self, dest, timestamp, reason)
 
-    @deprecated_args(deleteAndMove='noredirect', movetalkpage='movetalk')
-    @remove_last_args(['safe'])
     def move(self,
              newtitle: str,
              reason: Optional[str] = None,
@@ -1731,7 +1748,6 @@ class BasePage(ComparableMixin):
                                   movetalk=movetalk,
                                   noredirect=noredirect)
 
-    @deprecate_arg('quit', 'automatic_quit')
     def delete(self,
                reason: Optional[str] = None,
                prompt: bool = True,
@@ -1795,7 +1811,7 @@ class BasePage(ComparableMixin):
     def has_deleted_revisions(self) -> bool:
         """Return True if the page has deleted revisions.
 
-        *New in version 4.2.*
+        .. versionadded:: 4.2
         """
         if not hasattr(self, '_has_deleted_revisions'):
             gen = self.site.deletedrevs(self, total=1, prop=['ids'])
@@ -1820,7 +1836,6 @@ class BasePage(ComparableMixin):
                 self._deletedRevs[rev['timestamp']] = rev
                 yield rev['timestamp']
 
-    @deprecated_args(retrieveText='content')
     def getDeletedRevision(self, timestamp, content=False, **kwargs) -> List:
         """
         Return a particular deleted revision by timestamp.
@@ -1859,7 +1874,6 @@ class BasePage(ComparableMixin):
                 .format(timestamp))
         self._deletedRevs[timestamp]['marked'] = undelete
 
-    @deprecated_args(comment='reason')
     def undelete(self, reason: Optional[str] = None):
         """
         Undelete revisions based on the markers set by previous calls.
@@ -1927,15 +1941,17 @@ class BasePage(ComparableMixin):
 
         self.site.protect(self, protections, reason, **kwargs)
 
-    @deprecated_args(
-        comment='summary', oldCat='old_cat', newCat='new_cat',
-        sortKey='sort_key', inPlace='in_place')
-    def change_category(
-        self, old_cat, new_cat, summary=None, sort_key=None, in_place=True,
-        include=None
-    ) -> bool:
+    def change_category(self, old_cat, new_cat,
+                        summary: Optional[str] = None,
+                        sort_key=None,
+                        in_place: bool = True,
+                        include: Optional[List[str]] = None,
+                        show_diff: bool = False) -> bool:
         """
         Remove page from oldCat and add it to newCat.
+
+        .. versionadded:: 7.0
+           The `show_diff` parameter
 
         :param old_cat: category to be removed
         :type old_cat: pywikibot.page.Category
@@ -1949,11 +1965,12 @@ class BasePage(ComparableMixin):
             If sortKey=True, the sortKey used for oldCat will be used.
 
         :param in_place: if True, change categories in place rather than
-                      rearranging them.
+            rearranging them.
 
         :param include: list of tags not to be disabled by default in relevant
             textlib functions, where CategoryLinks can be searched.
-        :type include: list
+        :param show_diff: show changes between oldtext and newtext
+            (default: False)
 
         :return: True if page was saved changed, otherwise False.
         """
@@ -2011,14 +2028,16 @@ class BasePage(ComparableMixin):
 
         if oldtext != newtext:
             try:
-                self.put(newtext, summary)
-                return True
+                self.put(newtext, summary, show_diff=show_diff)
             except PageSaveRelatedError as error:
                 pywikibot.output('Page {} not saved: {}'
                                  .format(self.title(as_link=True), error))
             except NoUsernameError:
                 pywikibot.output('Page {} not saved; sysop privileges '
                                  'required.'.format(self.title(as_link=True)))
+            else:
+                return True
+
         return False
 
     def is_flow_page(self) -> bool:
@@ -2060,7 +2079,6 @@ class Page(BasePage):
 
     """Page: A MediaWiki page."""
 
-    @deprecated_args(defaultNamespace='ns')
     def __init__(self, source, title: str = '', ns=0):
         """Instantiate a Page object."""
         if isinstance(source, pywikibot.site.BaseSite):
@@ -2212,7 +2230,7 @@ class Page(BasePage):
         Return the first 'preferred' ranked Claim specified by Wikibase
         property or the first 'normal' one otherwise.
 
-        *New in version 3.0.*
+        .. versionadded:: 3.0
 
         :param prop: property id, "P###"
         :return: Claim object given by Wikibase property number
@@ -2365,11 +2383,6 @@ class FilePage(Page):
                                 url_param=url_param)
         return self.latest_file_info.thumburl
 
-    @deprecated('file_is_shared', since='20200618')
-    def fileIsShared(self) -> bool:  # pragma: no cover
-        """DEPRECATED. Check if the image is stored on Wikimedia Commons."""
-        return self.file_is_shared()
-
     def file_is_shared(self) -> bool:
         """Check if the file is stored on any known shared repository."""
         # as of now, the only known repositories are commons and wikitravel
@@ -2436,20 +2449,6 @@ class FilePage(Page):
             will only upload in chunks, if the chunk size is positive but lower
             than the file size.
         :type chunk_size: int
-        :keyword _file_key: Reuses an already uploaded file using the filekey.
-            If None (default) it will upload the file.
-        :type _file_key: str or None
-        :keyword _offset: When file_key is not None this can be an integer to
-            continue a previously canceled chunked upload. If False it treats
-            that as a finished upload. If True it requests the stash info from
-            the server to determine the offset. By default starts at 0.
-        :type _offset: int or bool
-        :keyword _verify_stash: Requests the SHA1 and file size uploaded and
-            compares it to the local file. Also verifies that _offset is
-            matching the file size if the _offset is an int. If _offset is
-            False if verifies that the file size match with the local file. If
-            None it'll verifies the stash when a file key and offset is given.
-        :type _verify_stash: bool or None
         :keyword report_success: If the upload was successful it'll print a
             success message and if ignore_warnings is set to False it'll
             raise an UploadError if a warning occurred. If it's
@@ -2499,7 +2498,7 @@ class FilePage(Page):
                 with open(filename, 'wb') as f:
                     for chunk in req.iter_content(chunk_size):
                         f.write(chunk)
-            except IOError as e:
+            except OSError as e:
                 raise e
 
             sha1 = compute_file_hash(filename)
@@ -2528,7 +2527,7 @@ class FilePage(Page):
         the method returns the associated mediainfo entity. Otherwise,
         it falls back to behavior of BasePage.data_item.
 
-        *New in version 6.5.*
+        .. versionadded:: 6.5
 
         :rtype: pywikibot.page.WikibaseEntity
         """
@@ -2545,7 +2544,6 @@ class Category(Page):
 
     """A page in the Category: namespace."""
 
-    @deprecated_args(sortKey='sort_key')
     def __init__(self, source, title: str = '', sort_key=None):
         """
         Initializer.
@@ -2558,7 +2556,6 @@ class Category(Page):
             raise ValueError("'{}' is not in the category namespace!"
                              .format(self.title()))
 
-    @deprecated_args(sortKey='sort_key')
     def aslink(self, sort_key: Optional[str] = None) -> str:
         """
         Return a link to place a page in this Category.
@@ -2629,7 +2626,6 @@ class Category(Page):
                             if total == 0:
                                 return
 
-    @deprecated_args(startFrom='startprefix', startsort=True, endsort=True)
     def articles(self,
                  recurse: Union[int, bool] = False,
                  total: Optional[int] = None,
@@ -2844,7 +2840,6 @@ class User(Page):
     This class also represents the Wiki page User:<username>
     """
 
-    @deprecated_args(site='source', name='title')
     def __init__(self, source, title=''):
         """
         Initializer for a User object.
@@ -2911,7 +2906,7 @@ class User(Page):
         if not hasattr(self, '_userprops'):
             self._userprops = list(self.site.users([self.username, ]))[0]
             if self.isAnonymous():
-                r = list(self.site.blocks(users=self.username))
+                r = list(self.site.blocks(iprange=self.username, total=1))
                 if r:
                     self._userprops['blockedby'] = r[0]['by']
                     self._userprops['blockreason'] = r[0]['reason']
@@ -2942,13 +2937,36 @@ class User(Page):
         """
         return self.getprops(force).get('editcount', 0)
 
-    def isBlocked(self, force: bool = False) -> bool:
-        """
-        Determine whether the user is currently blocked.
+    def is_blocked(self, force: bool = False) -> bool:
+        """Determine whether the user is currently blocked.
+
+        .. versionchanged:: 7.0
+           renamed from :meth:`isBlocked` method,
+           can also detect range blocks.
 
         :param force: if True, forces reloading the data from API
         """
         return 'blockedby' in self.getprops(force)
+
+    @deprecated('is_blocked', since='7.0.0')
+    def isBlocked(self, force: bool = False) -> bool:
+        """Determine whether the user is currently blocked.
+
+        .. deprecated:: 7.0
+           use :meth:`is_blocked` instead
+
+        :param force: if True, forces reloading the data from API
+        """
+        return self.is_blocked(force)
+
+    def is_locked(self, force: bool = False) -> bool:
+        """Determine whether the user is currently locked globally.
+
+        .. versionadded:: 7.0
+
+        :param force: if True, forces reloading the data from API
+        """
+        return self.site.is_locked(self.username, force)
 
     def isEmailable(self, force: bool = False) -> bool:
         """
@@ -3119,7 +3137,6 @@ class User(Page):
         """
         return next(iter(self.logevents(total=1)), None)
 
-    @deprecated_args(limit='total', namespace='namespaces')
     def contributions(self, total: int = 500, **kwargs) -> tuple:
         """
         Yield tuples describing this user edits.
@@ -3176,7 +3193,7 @@ class User(Page):
     ) -> Iterable[Tuple[Page, Revision]]:
         """Yield tuples describing this user's deleted edits.
 
-        *New in version 5.5.*
+        .. versionadded:: 5.5
 
         :param total: Limit results to this number of pages
         :keyword start: Iterate contributions starting at this Timestamp
@@ -3190,7 +3207,6 @@ class User(Page):
             for contrib in data['revisions']:
                 yield page, Revision(**contrib)
 
-    @deprecate_arg('number', 'total')
     def uploadedImages(self, total=10):
         """
         Yield tuples describing files uploaded by this user.
@@ -3479,7 +3495,7 @@ class MediaInfo(WikibaseEntity):
 
     """Interface for MediaInfo entities on Commons.
 
-    *New in version 6.5.*
+    .. versionadded:: 6.5
     """
 
     title_pattern = r'M[1-9]\d*'
@@ -4246,12 +4262,6 @@ class ItemPage(WikibasePage):
         return super().isRedirectPage()
 
 
-# alias for backwards compatibility
-ItemPage.concept_url = redirect_func(
-    ItemPage.concept_uri, old_name='concept_url', class_name='ItemPage',
-    since='20170222')
-
-
 class Property:
 
     """
@@ -4459,7 +4469,6 @@ class Claim(Property):
 
     SNAK_TYPES = ('value', 'somevalue', 'novalue')
 
-    @deprecated_args(isReference='is_reference', isQualifier='is_qualifier')
     def __init__(self, site, pid, snak=None, hash=None, is_reference=False,
                  is_qualifier=False, rank='normal', **kwargs):
         """
@@ -5082,7 +5091,7 @@ class BaseLink(ComparableMixin):
         assert isinstance(self._items, tuple)
         assert all(isinstance(item, (bytes, str)) for item in self._items)
 
-        attrs = ('{0!r}'.format(getattr(self, attr)) for attr in self._items)
+        attrs = ('{!r}'.format(getattr(self, attr)) for attr in self._items)
         return 'pywikibot.page.{}({})'.format(
             self.__class__.__name__, ', '.join(attrs))
 
@@ -5150,8 +5159,8 @@ class BaseLink(ComparableMixin):
             if specified, present title using onsite local namespace,
             otherwise use self canonical namespace.
 
-        :raise pywikibot.exceptions.Error: no corresponding namespace is found
-            in onsite
+        :raise pywikibot.exceptions.InvalidTitleError: no corresponding
+            namespace is found in onsite
         """
         if onsite is None:
             name = self.namespace.canonical_name
@@ -5163,9 +5172,8 @@ class BaseLink(ComparableMixin):
                     name = namespace.custom_name
                     break
             else:
-                # not found
-                raise Error(
-                    'No corresponding namespace found for namespace {} on {}.'
+                raise InvalidTitleError(
+                    'No corresponding title found for namespace {} on {}.'
                     .format(self.namespace, onsite))
 
         if self.namespace != Namespace.MAIN:
@@ -5261,7 +5269,6 @@ class Link(BaseLink):
         '|&#x[0-9A-Fa-f]+;'
     )
 
-    @deprecated_args(defaultNamespace='default_namespace')
     def __init__(self, text, source=None, default_namespace=0):
         """
         Initializer.
@@ -5302,6 +5309,8 @@ class Link(BaseLink):
         else:
             self._anchor = None
 
+        self._text = self._text.strip()
+
         # Convert URL-encoded characters to unicode
         self._text = pywikibot.tools.chars.url2string(
             self._text, encodings=self._source.encodings())
@@ -5320,9 +5329,11 @@ class Link(BaseLink):
                 '{!r} contains illegal char {!r}'.format(t, '\ufffd'))
 
         # Cleanup whitespace
+        sep = self._source.family.title_delimiter_and_aliases[0]
         t = re.sub(
-            '[_ \xa0\u1680\u180E\u2000-\u200A\u2028\u2029\u202F\u205F\u3000]+',
-            ' ', t)
+            '[{}\xa0\u1680\u180E\u2000-\u200A\u2028\u2029\u202F\u205F\u3000]+'
+            .format(self._source.family.title_delimiter_and_aliases),
+            sep, t)
         # Strip spaces at both ends
         t = t.strip()
         # Remove left-to-right and right-to-left markers.
@@ -5670,7 +5681,7 @@ class SiteLink(BaseLink):
 
       - badges: Any badges associated with the sitelink
 
-    *New in version 3.0.*
+    .. versionadded:: 3.0
     """
 
     # Components used for __repr__
@@ -5846,13 +5857,14 @@ def html2unicode(text: str, ignore=None, exceptions=None) -> str:
     return _ENTITY_SUB(handle_entity, text)
 
 
-@deprecated_args(site='encodings')
 @deprecated('pywikibot.tools.chars.url2string', since='6.2.0')
 def url2unicode(title: str, encodings='utf-8') -> str:
-    """
-    DEPRECATED. Convert URL-encoded text to unicode using several encoding.
+    """Convert URL-encoded text to unicode using several encoding.
 
     Uses the first encoding that doesn't cause an error.
+
+    .. deprecated:: 6.2.0
+       Use :func:`pywikibot.tools.chars.url2string` instead.
 
     :param title: URL-encoded character data to convert
     :param encodings: Encodings to attempt to use during conversion.
@@ -5865,20 +5877,9 @@ def url2unicode(title: str, encodings='utf-8') -> str:
         encodings = encodings.encodings()
         issue_deprecation_warning(
             'Passing BaseSite object to encodings parameter',
-            'BaseSite.endcodings()',
+            'BaseSite.encodings()',
             depth=1,
             since='6.2.0'
         )
 
     return pywikibot.tools.chars.url2string(title, encodings)
-
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper.add_deprecated_attr(
-    'UnicodeToAsciiHtml',
-    replacement_name='pywikibot.tools.chars.string_to_ascii_html',
-    since='6.2.0')
-wrapper.add_deprecated_attr(
-    'unicode2html',
-    replacement_name='pywikibot.tools.chars.string2html',
-    since='6.2.0')

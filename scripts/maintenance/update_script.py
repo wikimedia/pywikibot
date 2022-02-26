@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 A helper script to update scripts and replace deprecated parts.
 

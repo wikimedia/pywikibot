@@ -25,7 +25,6 @@ from pywikibot import config
 from pywikibot.backports import cache
 from pywikibot.comms.http import fetch
 from pywikibot.exceptions import VersionParseError
-from pywikibot.tools import ModuleDeprecationWrapper, deprecated
 
 
 _logger = 'version'
@@ -40,7 +39,7 @@ def _get_program_dir():
 def get_toolforge_hostname() -> Optional[str]:
     """Get hostname of the current Toolforge host.
 
-    *New in version 3.0.*
+    .. versionadded:: 3.0
 
     :return: The hostname of the currently running host,
              if it is in Wikimedia Toolforge; otherwise return None.
@@ -246,7 +245,7 @@ def getversion_git(path=None):
         # some Windows git versions provide git.cmd instead of git.exe
         cmd = 'git.cmd'
 
-    with open(os.path.join(_program_dir, '.git/config'), 'r') as f:
+    with open(os.path.join(_program_dir, '.git/config')) as f:
         tag = f.read()
     # Try 'origin' and then 'gerrit' as remote name; bail if can't find either.
     remote_pos = tag.find('[remote "origin"]')
@@ -340,21 +339,6 @@ def getversion_onlinerepo(path='branches/master'):
         return hsh
     except Exception as e:
         raise VersionParseError('{!r} while parsing {!r}'.format(e, buf))
-
-
-@deprecated('pywikibot.__version__', since='20201003')
-def get_module_version(module) -> Optional[str]:  # pragma: no cover
-    """
-    Retrieve __version__ variable from an imported module.
-
-    :param module: The module instance.
-    :type module: module
-    :return: The version hash without the surrounding text. If not present
-        return None.
-    """
-    if hasattr(module, '__version__'):
-        return module.__version__
-    return None
 
 
 def get_module_filename(module) -> Optional[str]:
@@ -499,12 +483,3 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
             del data[name]
 
     return data
-
-
-ParseError = VersionParseError
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper.add_deprecated_attr(
-    'ParseError',
-    replacement_name='pywikibot.exceptions.VersionParseError',
-    since='20210423')

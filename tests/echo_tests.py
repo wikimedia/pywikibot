@@ -1,6 +1,7 @@
+#!/usr/bin/python3
 """Test echo module."""
 #
-# (C) Pywikibot team, 2019-2021
+# (C) Pywikibot team, 2019-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,7 +10,6 @@ from contextlib import suppress
 
 import pywikibot
 from pywikibot.echo import Notification
-from pywikibot.tools import suppress_warnings
 from tests.aspects import DefaultDrySiteTestCase
 
 
@@ -43,10 +43,7 @@ class TestNotification(DefaultDrySiteTestCase):
         notif = Notification.fromJSON(self.get_site(), self.data)
         self.assertIsInstance(notif, Notification)
         self.assertEqual(notif.site, self.get_site())
-        with suppress_warnings(category=FutureWarning):
-            notif_id = notif.id
-        self.assertEqual(notif_id, self.data['id'])
-        self.assertEqual(int(notif_id), notif.event_id)
+        self.assertEqual(str(notif.event_id), self.data['id'])
         self.assertEqual(notif.type, self.data['type'])
         self.assertEqual(notif.category, self.data['category'])
         self.assertIsInstance(notif.timestamp, pywikibot.Timestamp)

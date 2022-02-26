@@ -1,7 +1,7 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """Test tools package alone which don't fit into other tests."""
 #
-# (C) Pywikibot team, 2015-2021
+# (C) Pywikibot team, 2015-2022
 #
 # Distributed under the terms of the MIT license.
 import decimal
@@ -9,19 +9,21 @@ import os.path
 import subprocess
 import tempfile
 import unittest
-from collections import OrderedDict
+from collections import Counter, OrderedDict
 from collections.abc import Mapping
 from contextlib import suppress
 from importlib import import_module
+from unittest import mock
 
 from pywikibot import tools
 from pywikibot.tools import (
     classproperty,
     has_module,
+    intersect_generators,
     is_ip_address,
     suppress_warnings,
 )
-from tests import join_xml_data_path, mock
+from tests import join_xml_data_path
 from tests.aspects import TestCase, require_modules
 
 
@@ -377,7 +379,7 @@ class ProcessAgainList(set):
         if item in self.process_again_list:
             return
 
-        return super().add(item)
+        super().add(item)
 
 
 class ContainsStopList(set):
@@ -576,7 +578,7 @@ class TestFilterUnique(TestCase):
         self.assertEqual(deduped_out, [1, 3, 2, 1, 1, 4])
         self.assertEqual(deduped, {2, 4})
 
-    def test_stop(self):
+    def test_stop_contains(self):
         """Test filter_unique with an ignoring container."""
         deduped = ContainsStopList()
         deduped.stop_list = [2]
@@ -589,6 +591,8 @@ class TestFilterUnique(TestCase):
         with self.assertRaises(StopIteration):
             next(deduper)
 
+    def test_stop_add(self):
+        """Test filter_unique with an ignoring container during add call."""
         deduped = AddStopList()
         deduped.stop_list = [4]
         deduper = tools.filter_unique(self.ints, container=deduped)
@@ -729,6 +733,58 @@ class TestClassProperty(TestCase):
         """Test for classproperty decorator."""
         self.assertEqual(Foo.bar, 'baz')
         self.assertEqual(Foo.bar, Foo._bar)
+
+
+class GeneratorIntersectTestCase(TestCase):
+
+    """Base class for intersect_generators test cases."""
+
+    def assertEqualItertools(self, gens):
+        """Assert intersect_generators result is same as set intersection."""
+        # If they are a generator, we need to convert to a list
+        # first otherwise the generator is empty the second time.
+        datasets = [list(gen) for gen in gens]
+        set_result = set(datasets[0]).intersection(*datasets[1:])
+        result = list(intersect_generators(*datasets))
+
+        self.assertCountEqual(set(result), result)
+        self.assertCountEqual(result, set_result)
+
+    def assertEqualItertoolsWithDuplicates(self, gens):
+        """Assert intersect_generators result equals Counter intersection."""
+        # If they are a generator, we need to convert to a list
+        # first otherwise the generator is empty the second time.
+        datasets = [list(gen) for gen in gens]
+        counter_result = Counter(datasets[0])
+        for dataset in datasets[1:]:
+            counter_result = counter_result & Counter(dataset)
+        counter_result = list(counter_result.elements())
+        result = list(intersect_generators(*datasets, allow_duplicates=True))
+        self.assertCountEqual(counter_result, result)
+
+
+class BasicGeneratorIntersectTestCase(GeneratorIntersectTestCase):
+
+    """Disconnected intersect_generators test cases."""
+
+    net = False
+
+    def test_intersect_basic(self):
+        """Test basic intersect without duplicates."""
+        self.assertEqualItertools(['abc', 'db', 'ba'])
+
+    def test_intersect_with_dups(self):
+        """Test basic intersect with duplicates."""
+        self.assertEqualItertools(['aabc', 'dddb', 'baa'])
+
+    def test_intersect_with_accepted_dups(self):
+        """Test intersect with duplicates accepted."""
+        self.assertEqualItertoolsWithDuplicates(['abc', 'db', 'ba'])
+        self.assertEqualItertoolsWithDuplicates(['aabc', 'dddb', 'baa'])
+        self.assertEqualItertoolsWithDuplicates(['abb', 'bb'])
+        self.assertEqualItertoolsWithDuplicates(['bb', 'abb'])
+        self.assertEqualItertoolsWithDuplicates(['abbcd', 'abcba'])
+        self.assertEqualItertoolsWithDuplicates(['abcba', 'abbcd'])
 
 
 class TestMergeGenerator(TestCase):

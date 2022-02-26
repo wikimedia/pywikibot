@@ -6,10 +6,8 @@
 #
 import pywikibot
 from pywikibot import config, date
-from pywikibot.tools import deprecated_args
 
 
-@deprecated_args(family=True)
 def translate(page=None, hints=(), auto=True, removebrackets=False,
               site=None) -> list:
     """

@@ -1,6 +1,6 @@
 """Objects representing API interface to MediaWiki site."""
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -14,12 +14,12 @@ from collections import OrderedDict, defaultdict, namedtuple
 from collections.abc import Iterable
 from contextlib import suppress
 from textwrap import fill
-from typing import Optional, Union
+from typing import Any, Optional, Union
 from warnings import warn
 
 import pywikibot
 import pywikibot.family
-from pywikibot.backports import List
+from pywikibot.backports import Dict, List
 from pywikibot.comms.http import get_authentication
 from pywikibot.data import api
 from pywikibot.exceptions import (
@@ -73,13 +73,9 @@ from pywikibot.site._tokenwallet import TokenWallet
 from pywikibot.tools import (
     MediaWikiVersion,
     compute_file_hash,
-    deprecate_arg,
     deprecated,
-    deprecated_args,
-    issue_deprecation_warning,
     merge_unique_dicts,
     normalize_username,
-    remove_last_args,
 )
 
 
@@ -109,15 +105,15 @@ class APISite(
     Do not instantiate directly; use :py:obj:`pywikibot.Site` function.
     """
 
-    @remove_last_args(['sysop'])
     def __init__(self, code, fam=None, user=None):
         """Initializer."""
         super().__init__(code, fam, user)
-        self._msgcache = {}
-        self._loginstatus = _LoginStatus.NOT_ATTEMPTED
-        self._siteinfo = Siteinfo(self)
-        self._paraminfo = api.ParamInfo(self)
+        self._globaluserinfo = {}
         self._interwikimap = _InterwikiMap(self)
+        self._loginstatus = _LoginStatus.NOT_ATTEMPTED
+        self._msgcache = {}
+        self._paraminfo = api.ParamInfo(self)
+        self._siteinfo = Siteinfo(self)
         self.tokens = TokenWallet(self)
 
     def __getstate__(self):
@@ -215,7 +211,6 @@ class APISite(
                         return pywikibot.Site(url=site['url'] + '/w/index.php')
         raise ValueError('Cannot parse a site out of {}.'.format(dbname))
 
-    @deprecated_args(step=True)
     def _generator(self, gen_class, type_arg: Optional[str] = None,
                    namespaces=None, total: Optional[int] = None, **args):
         """Convenience method that returns an API generator.
@@ -284,7 +279,6 @@ class APISite(
         return self._request_class({'parameters': kwargs}).create_simple(
             self, **kwargs)
 
-    @remove_last_args(['sysop'])
     def logged_in(self):
         """Verify the bot is logged into the site as the expected user.
 
@@ -392,12 +386,18 @@ class APISite(
             del self.userinfo  # force reloading
 
             # load userinfo
-            assert self.userinfo['name'] == self.username(), \
-                '{} != {}'.format(self.userinfo['name'], self.username())
+            if self.userinfo['name'] == self.username():
+                self._loginstatus = _LoginStatus.AS_USER
+                return
 
-            self._loginstatus = _LoginStatus.AS_USER
-        else:
-            self._loginstatus = _LoginStatus.NOT_LOGGED_IN  # failure
+            pywikibot.error('{} != {} after {}.login() and successfull '
+                            '{}.login()'
+                            .format(self.userinfo['name'],
+                                    self.username(),
+                                    type(self).__name__,
+                                    type(login_manager).__name__))
+
+        self._loginstatus = _LoginStatus.NOT_LOGGED_IN  # failure
 
     def _relogin(self):
         """Force a login sequence without logging out, using the current user.
@@ -438,13 +438,27 @@ class APISite(
         api._invalidate_superior_cookies(self.family)
 
     @property
+    def maxlimit(self):
+        """Get the maximum limit of pages to be retrieved.
+
+        .. versionadded:: 7.0
+        """
+        parameter = self._paraminfo.parameter('query+info', 'prop')
+        if self.logged_in() and self.has_right('apihighlimits'):
+            return int(parameter['highlimit'])
+
+        return int(parameter['limit'])  # T78333, T161783
+
+    @property
     def userinfo(self):
         """Retrieve userinfo from site and store in _userinfo attribute.
 
         To force retrieving userinfo ignoring cache, just delete this
         property.
 
-        self._userinfo will be a dict with the following keys and values:
+        .. seealso:: https://www.mediawiki.org/wiki/API:Userinfo
+
+        :return: A dict with the following keys and values:
 
           - id: user id (numeric str)
           - name: username (if user is logged in)
@@ -454,7 +468,6 @@ class APISite(
           - message: present if user has a new message on talk page
           - blockinfo: present if user is blocked (dict)
 
-        https://www.mediawiki.org/wiki/API:Userinfo
         """
         if not hasattr(self, '_userinfo'):
             uirequest = self._simple_request(
@@ -475,15 +488,24 @@ class APISite(
 
     @userinfo.deleter
     def userinfo(self):
-        """Delete cached userinfo."""
+        """Delete cached userinfo.
+
+        ..versionadded:: 5.5
+        """
         if hasattr(self, '_userinfo'):
             del self._userinfo
 
-    @property
-    def globaluserinfo(self):
+    def get_globaluserinfo(self,
+                           user: Union[str, int, None] = None,
+                           force: bool = False) -> Dict[str, Any]:
         """Retrieve globaluserinfo from site and cache it.
 
-        self._globaluserinfo will be a dict with the following keys and values:
+        .. versionadded:: 7.0
+
+        :param user: The user name or user ID whose global info is
+            retrieved. Defaults to the current user.
+        :param force: Whether the cache should be discarded.
+        :return: A dict with the following keys and values:
 
           - id: user id (numeric str)
           - home: dbname of home wiki
@@ -491,36 +513,86 @@ class APISite(
           - groups: list of groups (could be empty)
           - rights: list of rights (could be empty)
           - editcount: global editcount
+
+        :raises TypeError: Inappropriate argument type of 'user'
         """
-        if not hasattr(self, '_globaluserinfo'):
-            uirequest = self._simple_request(
+        if user is None:
+            user = self.username
+            param = {}
+        elif isinstance(user, str):
+            param = {'guiuser': user}
+        elif isinstance(user, int):
+            param = {'guiid': user}
+        else:
+            raise TypeError("Inappropriate argument type of 'user' ({})"
+                            .format(type(user).__name__))
+
+        if force or user not in self._globaluserinfo:
+            param.update(
                 action='query',
                 meta='globaluserinfo',
-                guiprop='groups|rights|editcount'
+                guiprop='groups|rights|editcount',
             )
+            uirequest = self._simple_request(**param)
             uidata = uirequest.submit()
             assert 'query' in uidata, \
                    "API userinfo response lacks 'query' key"
             assert 'globaluserinfo' in uidata['query'], \
-                   "API userinfo response lacks 'userinfo' key"
-            self._globaluserinfo = uidata['query']['globaluserinfo']
-            ts = self._globaluserinfo['registration']
-            iso_ts = pywikibot.Timestamp.fromISOformat(ts)
-            self._globaluserinfo['registration'] = iso_ts
-        return self._globaluserinfo
+                   "API userinfo response lacks 'globaluserinfo' key"
+            data = uidata['query']['globaluserinfo']
+            ts = data['registration']
+            data['registration'] = pywikibot.Timestamp.fromISOformat(ts)
+            self._globaluserinfo[user] = data
+        return self._globaluserinfo[user]
 
-    @remove_last_args(['sysop'])
-    def is_blocked(self):
+    @property
+    def globaluserinfo(self) -> Dict[str, Any]:
+        """Retrieve globaluserinfo of the current user from site.
+
+        To get globaluserinfo for a given user or user ID use
+        :meth:`get_globaluserinfo` method instead
+
+        .. versionadded:: 3.0
         """
-        Return True when logged in user is blocked.
+        return self.get_globaluserinfo()
+
+    @globaluserinfo.deleter
+    def globaluserinfo(self):
+        """Delete cached globaluserinfo of current user.
+
+        ..versionadded:: 7.0
+        """
+        with suppress(KeyError):
+            del self._globaluserinfo[self.username]
+
+    def is_blocked(self, force: bool = False) -> bool:
+        """Return True when logged in user is blocked.
 
         To check whether a user can perform an action,
         the method has_right should be used.
         https://www.mediawiki.org/wiki/API:Userinfo
 
-        :rtype: bool
+        .. versionadded:: 7.0
+           The *force* parameter
+
+        :param force: Whether the cache should be discarded.
         """
+        if force:
+            del self.userinfo
         return 'blockinfo' in self.userinfo
+
+    def is_locked(self,
+                  user: Union[str, int, None] = None,
+                  force: bool = False) -> bool:
+        """Return True when given user is locked globally.
+
+        .. versionadded:: 7.0
+
+        :param user: The user name or user ID. Defaults to the current
+            user.
+        :param force: Whether the cache should be discarded.
+        """
+        return 'locked' in self.get_globaluserinfo(user, force)
 
     def get_searched_namespaces(self, force=False):
         """
@@ -557,12 +629,26 @@ class APISite(
                 in ['1', True]}
 
     @property
+    @deprecated('articlepath', since='7.0.0')
     def article_path(self):
-        """Get the nice article path without $1."""
-        # Assert and remove the trailing $1 and assert that it'll end in /
-        assert self.siteinfo['general']['articlepath'].endswith('/$1'), \
-            'articlepath must end with /$1'
-        return self.siteinfo['general']['articlepath'][:-2]
+        """Get the nice article path without $1.
+
+        .. deprecated:: 7.0
+           Replaced by :py:meth:`articlepath`
+        """
+        return self.articlepath[:-2]
+
+    @property
+    def articlepath(self):
+        """Get the nice article path with placeholder.
+
+        .. versionadded:: 7.0
+           Replaces :py:meth:`article_path`
+        """
+        # Assert $1 placeholder is present
+        path = self.siteinfo['general']['articlepath']
+        assert '$1' in path, 'articlepath must contain "$1" placeholder'
+        return path.replace('$1', '{}')
 
     @staticmethod
     def assert_valid_iter_params(msg_prefix, start, end, reverse,
@@ -593,7 +679,6 @@ class APISite(
                                            start=start, end=end,
                                            reverse=reverse, is_ts=is_ts))
 
-    @remove_last_args(['sysop'])
     def has_right(self, right):
         """Return true if and only if the user has a specific right.
 
@@ -605,7 +690,6 @@ class APISite(
         """
         return right.lower() in self.userinfo['rights']
 
-    @remove_last_args(['sysop'])
     def has_group(self, group):
         """Return true if and only if the user is a member of specified group.
 
@@ -615,7 +699,6 @@ class APISite(
         """
         return group.lower() in self.userinfo['groups']
 
-    @remove_last_args(['sysop'])
     def messages(self):
         """Return true if the user has new messages, and false otherwise."""
         return 'messages' in self.userinfo
@@ -658,7 +741,6 @@ class APISite(
 
         return OrderedDict((key, _mw_msg_cache[amlang][key]) for key in keys)
 
-    @deprecated_args(forceReload=True)
     def mediawiki_message(self, key, lang=None) -> str:
         """Fetch the text for a MediaWiki message.
 
@@ -750,7 +832,6 @@ class APISite(
         return msgs['comma-separator'].join(
             args[:-2] + [concat.join(args[-2:])])
 
-    @deprecated_args(string='text')
     def expand_text(self, text: str, title=None, includecomments=None) -> str:
         """Parse the given text for preprocessing and rendering.
 
@@ -818,13 +899,12 @@ class APISite(
             return self._magicwords[word]
         return [word]
 
-    @remove_last_args(('default', ))
     def redirect(self):
         """Return the localized #REDIRECT keyword."""
         # return the magic word without the preceding '#' character
         return self.getmagicwords('redirect')[0].lstrip('#')
 
-    @deprecated('redirect_regex', since='20210103')
+    @deprecated('redirect_regex', since='5.5.0')
     def redirectRegex(self):  # noqa: N802
         """Return a compiled regular expression matching on redirect pages."""
         return self.redirect_regex
@@ -846,12 +926,10 @@ class APISite(
             pattern = None
         return super().redirectRegex(pattern)
 
-    @remove_last_args(('default', ))
     def pagenamecodes(self):
         """Return list of localized PAGENAME tags for the site."""
         return self.getmagicwords('pagename')
 
-    @remove_last_args(('default', ))
     def pagename2codes(self):
         """Return list of localized PAGENAMEE tags for the site."""
         return self.getmagicwords('pagenamee')
@@ -1146,11 +1224,6 @@ class APISite(
                                 **args)
         self._update_page(page, query, verify_imageinfo=True)
 
-    @deprecated('page.exists()', since='20180218')
-    def page_exists(self, page):
-        """Return True if and only if page is an existing page on site."""
-        return page.pageid > 0
-
     def page_restrictions(self, page):
         """Return a dictionary reflecting page protections."""
         if not hasattr(page, '_protection'):
@@ -1420,7 +1493,7 @@ class APISite(
         If more than one target id is provided, the same action is taken for
         all of them.
 
-        *New in version 6.0.*
+        .. versionadded:: 6.0
 
         :param targettype: Type of target. One of "archive", "filearchive",
             "logging", "oldimage", "revision".
@@ -1644,11 +1717,7 @@ class APISite(
                                 exception.format_map(errdata)
                             ) from None
                         if issubclass(exception, AbuseFilterDisallowedError):
-                            errdata = {
-                                'info': err.info,
-                                'other': err.other,
-                            }
-                            raise exception(page, **errdata) from None
+                            raise exception(page, info=err.info) from None
                         if issubclass(exception, SpamblacklistError):
                             urls = ', '.join(err.other[err.code]['matches'])
                             raise exception(page, url=urls) from None
@@ -2051,9 +2120,11 @@ class APISite(
         To delete a specific version of an image the oldimage identifier
         must be provided.
 
-        *Renamed in version 6.1.*
+        .. versionadded:: 6.1
+           renamed from *deletepage*
 
-        *New in version 6.1:* keyword only parameter *oldimage* was added.
+        .. versionchanged:: 6.1
+           keyword only parameter *oldimage* was added.
 
         :param page: Page to be deleted or its pageid.
         :type page: :py:obj:`pywikibot.page.BasePage` or, for pageid,
@@ -2108,49 +2179,18 @@ class APISite(
         finally:
             self.unlock_page(page)
 
-    @deprecate_arg('summary', 'reason')
-    @deprecated('delete()', since='20210330')
-    def deletepage(self, page, reason: str):
-        """Delete page from the wiki. Requires appropriate privilege level.
-
-        :see: https://www.mediawiki.org/wiki/API:Delete
-        Page to be deleted can be given either as Page object or as pageid.
-
-        :param page: Page to be deleted or its pageid.
-        :type page: :py:obj:`pywikibot.page.BasePage` or, for pageid,
-            int or str
-        :param reason: Deletion reason.
-        :raises TypeError, ValueError: page has wrong type/value.
-        """
-        self.delete(page, reason)
-
-    @deprecated('delete() with oldimage keyword parameter', since='20210330')
-    def deleteoldimage(self, page, oldimage: str, reason: str):
-        """Delete a specific version of a file. Requires appropriate privileges.
-
-        :see: https://www.mediawiki.org/wiki/API:Delete
-        The oldimage identifier for the specific version of the image must be
-        provided.
-
-        :param page: Page to be deleted or its pageid
-        :type page: FilePage or, in case of pageid, int or str
-        :param oldimage: oldimageid of the file version to be deleted.
-        :param reason: Deletion reason.
-        :raises TypeError, ValueError: page has wrong type/value.
-        """
-        self.delete(page, reason, oldimage=oldimage)
-
     @need_right('undelete')
     def undelete(self, page, reason: str, *, revisions=None, fileids=None):
         """Undelete page from the wiki. Requires appropriate privilege level.
 
         :see: https://www.mediawiki.org/wiki/API:Undelete
 
-        *Renamed in version 6.1.*
+        .. versionadded:: 6.1
+           renamed from *undelete_page*
 
-        *New in version 6.1:* *fileids* parameter was added.
-
-        *Changed in verson 6.1:* keyword argument required for *revisions*.
+        .. versionchanged:: 6.1
+           *fileids* parameter was added,
+           keyword argument required for *revisions*.
 
         :param page: Page to be deleted.
         :type page: pywikibot.BasePage
@@ -2192,36 +2232,6 @@ class APISite(
         finally:
             self.unlock_page(page)
 
-    @deprecate_arg('summary', 'reason')
-    @deprecated('undelete()', since='20210330')
-    def undelete_page(self, page, reason: str, revisions=None):
-        """DEPRECATED. Undelete page from the wiki.
-
-        :see: https://www.mediawiki.org/wiki/API:Undelete
-
-        :param page: Page to be deleted.
-        :type page: pywikibot.BasePage
-        :param revisions: List of timestamps to restore.
-            If None, restores all revisions.
-        :type revisions: list
-        :param reason: Undeletion reason.
-        """
-        self.undelete(page, reason, revisions=revisions)
-
-    @deprecated('undelete() with fileids parameter', since='20210330')
-    def undelete_file_versions(self, page, reason: str, fileids=None):
-        """DEPRECATED. Undelete page from the wiki.
-
-        :see: https://www.mediawiki.org/wiki/API:Undelete
-
-        :param page: Page to be deleted.
-        :type page: pywikibot.BasePage
-        :param reason: Undeletion reason.
-        :param fileids: List of fileids to restore.
-        :type fileids: list
-        """
-        self.undelete(page, reason, fileids=fileids)
-
     _protect_errors = {
         'noapiwrite': 'API editing not enabled on {site} wiki',
         'writeapidenied': 'User {user} not allowed to edit through the API',
@@ -2255,7 +2265,6 @@ class APISite(
         return set(self.siteinfo.get('restrictions')['levels'])
 
     @need_right('protect')
-    @deprecate_arg('summary', 'reason')
     def protect(self, page, protections: dict,
                 reason: str, expiry=None, **kwargs):
         """(Un)protect a wiki page. Requires administrator status.
@@ -2506,7 +2515,6 @@ class APISite(
             siiprop=props)
         return req.submit()['query']['stashimageinfo'][0]
 
-    @deprecate_arg('imagepage', 'filepage')
     @need_right('upload')
     def upload(self, filepage, *,
                source_filename: Optional[str] = None,
@@ -2517,10 +2525,10 @@ class APISite(
                ignore_warnings=False,
                chunk_size: int = 0,
                asynchronous: bool = False,
+               report_success: Optional[bool] = None,
                _file_key: Optional[str] = None,
                _offset: Union[bool, int] = 0,
-               _verify_stash: Optional[bool] = None,
-               report_success: Optional[bool] = None) -> bool:
+               _verify_stash: Optional[bool] = None) -> bool:
         """
         Upload a file to the wiki.
 
@@ -2528,11 +2536,11 @@ class APISite(
 
         Either source_filename or source_url, but not both, must be provided.
 
-        *Changed in version 6.0:* keyword arguments required for all
-        parameters except *filepage*.
+        .. versionchanged:: 6.0
+           keyword arguments required for all parameters except *filepage*
 
-        *Changed in version 6.2:* asynchronous upload is used if
-        *asynchronous* parameter is set.
+        .. versionchanged:: 6.2:
+           asynchronous upload is used if *asynchronous* parameter is set.
 
         :param filepage: a FilePage object from which the wiki-name of the
             file will be obtained.
@@ -2560,22 +2568,25 @@ class APISite(
             but lower than the file size.
         :param asynchronous: Make potentially large file operations
             asynchronous on the server side when possible.
-        :param _file_key: Reuses an already uploaded file using the filekey. If
-            None (default) it will upload the file.
-        :param _offset: When file_key is not None this can be an integer to
-            continue a previously canceled chunked upload. If False it treats
-            that as a finished upload. If True it requests the stash info from
-            the server to determine the offset. By default starts at 0.
-        :param _verify_stash: Requests the SHA1 and file size uploaded and
-            compares it to the local file. Also verifies that _offset is
-            matching the file size if the _offset is an int. If _offset is
-            False if verifies that the file size match with the local file. If
-            None it'll verifies the stash when a file key and offset is given.
         :param report_success: If the upload was successful it'll print a
             success message and if ignore_warnings is set to False it'll
             raise an UploadError if a warning occurred. If it's None
             (default) it'll be True if ignore_warnings is a bool and False
             otherwise. If it's True or None ignore_warnings must be a bool.
+        :param _file_key: Private parameter for upload recurion. Reuses
+            an already uploaded file using the filekey. If None (default)
+            it will upload the file.
+        :param _offset: Private parameter for upload recurion. When
+            file_key is not None this can be an integer to continue a
+            previously canceled chunked upload. If False it treats that
+            as a finished upload. If True it requests the stash info from
+            the server to determine the offset. By default starts at 0.
+        :param _verify_stash: Private parameter for upload recurion.
+            Requests the SHA1 and file size uploaded and compares it to
+            the local file. Also verifies that _offset is matching the
+            file size if the _offset is an int. If _offset is False if
+            verifies that the file size match with the local file. If
+            None it'll verifies the stash when a file key and offset is given.
         :return: It returns True if the upload was successful and False
             otherwise.
         """
@@ -2628,11 +2639,6 @@ class APISite(
             if not isinstance(ignore_warnings, bool):
                 raise ValueError('report_success may only be set to True when '
                                  'ignore_warnings is a boolean')
-            issue_deprecation_warning('"ignore_warnings" as a boolean and '
-                                      '"report_success" is True or None',
-                                      '"report_success=False" or define '
-                                      '"ignore_warnings" as callable/iterable',
-                                      3, since='20150823')
         if isinstance(ignore_warnings, Iterable):
             ignored_warnings = ignore_warnings
 
@@ -2867,11 +2873,11 @@ class APISite(
                             if 'offset' in data:
                                 new_offset = int(data['offset'])
                                 if offset + len(chunk) != new_offset:
-                                    pywikibot.log('Old offset: {0}; Returned '
-                                                  'offset: {1}; Chunk size: '
-                                                  '{2}'.format(offset,
-                                                               new_offset,
-                                                               len(chunk)))
+                                    pywikibot.log('Old offset: {}; Returned '
+                                                  'offset: {}; Chunk size: '
+                                                  '{}'.format(offset,
+                                                              new_offset,
+                                                              len(chunk)))
                                     pywikibot.warning('Unexpected offset.')
                                 offset = new_offset
                             else:
@@ -2918,7 +2924,7 @@ class APISite(
                 try:
                     result = final_request.submit()
                     self._uploaddisabled = False
-                except api.APIError as error:
+                except APIError as error:
                     # TODO: catch and process foreseeable errors
                     if error.code == 'uploaddisabled':
                         self._uploaddisabled = True
@@ -2931,33 +2937,35 @@ class APISite(
 
             if result['result'] == 'Warning':
                 assert 'warnings' in result and not ignore_all_warnings
-                if 'filekey' in result:
-                    _file_key = result['filekey']
-                elif 'sessionkey' in result:
-                    # TODO: Probably needs to be reflected in the API call
-                    # above
-                    _file_key = result['sessionkey']
-                    pywikibot.warning('Using sessionkey instead of filekey.')
+
+                if source_filename:
+                    if 'filekey' in result:
+                        _file_key = result['filekey']
+                    elif 'sessionkey' in result:
+                        # TODO: Probably needs to be reflected in the API call
+                        # above
+                        _file_key = result['sessionkey']
+                        pywikibot.warning(
+                            'Using sessionkey instead of filekey.')
+                    else:
+                        _file_key = None
+                        pywikibot.warning('No filekey defined.')
                 else:
                     _file_key = None
-                    pywikibot.warning('No filekey defined.')
 
                 if not report_success:
-                    result.setdefault('offset', True)
+                    result.setdefault('offset', bool(source_filename))
+                    offset = result['offset'] if source_filename else False
                     if ignore_warnings(create_warnings_list(result)):
                         return self.upload(
                             filepage, source_filename=source_filename,
                             source_url=source_url, comment=comment,
                             text=text, watch=watch, ignore_warnings=True,
                             chunk_size=chunk_size, asynchronous=asynchronous,
-                            _file_key=_file_key, _offset=result['offset'],
+                            _file_key=_file_key, _offset=offset,
                             report_success=False)
                     return False
 
-                warn('When ignore_warnings=False in APISite.upload will '
-                     'change from raising an UploadWarning into behaving like '
-                     'being a callable returning False.',
-                     DeprecationWarning, 3)
                 if len(result['warnings']) > 1:
                     warn('The upload returned {} warnings: {}'
                          .format(len(result['warnings']),

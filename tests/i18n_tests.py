@@ -1,6 +1,7 @@
+#!/usr/bin/python3
 """Test i18n module."""
 #
-# (C) Pywikibot team, 2007-2021
+# (C) Pywikibot team, 2007-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,12 +10,7 @@ from contextlib import suppress
 import pywikibot
 from pywikibot import bot, config, i18n
 from pywikibot.exceptions import TranslationError
-from tests.aspects import (
-    DefaultSiteTestCase,
-    PwbTestCase,
-    TestCase,
-    unittest,
-)
+from tests.aspects import DefaultSiteTestCase, PwbTestCase, TestCase, unittest
 
 
 class Site:
@@ -341,9 +337,9 @@ class MissingPackageTestCase(TWNSetMessagePackageBase,
         bot.set_interface('terminal')
         self.output_text = ''
         self.orig_raw_input = bot.ui._raw_input
-        self.orig_output = bot.ui.output
+        self.orig_output = bot.ui.stream_output
         bot.ui._raw_input = lambda *args, **kwargs: 'dummy input'
-        bot.ui.output = self._capture_output
+        bot.ui.stream_output = self._capture_output
         self.old_cc_setting = config.cosmetic_changes_mylang_only
 
     def tearDown(self):

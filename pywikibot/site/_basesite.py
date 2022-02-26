@@ -1,6 +1,6 @@
 """Objects with site methods independent of the communication interface."""
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -22,10 +22,8 @@ from pywikibot.throttle import Throttle
 from pywikibot.tools import (
     ComparableMixin,
     SelfCallString,
-    deprecated,
     first_upper,
     normalize_username,
-    remove_last_args,
 )
 
 
@@ -33,7 +31,6 @@ class BaseSite(ComparableMixin):
 
     """Site methods that are independent of the communication interface."""
 
-    @remove_last_args(['sysop'])
     def __init__(self, code: str, fam=None, user=None) -> None:
         """
         Initializer.
@@ -186,7 +183,6 @@ class BaseSite(ComparableMixin):
             return self.username()
         return None
 
-    @remove_last_args(['sysop'])
     def username(self):
         """Return the username used for the site."""
         return self._username
@@ -237,10 +233,10 @@ class BaseSite(ComparableMixin):
     def _interwiki_urls(self, only_article_suffixes=False):
         base_path = self.path()
         if not only_article_suffixes:
-            yield base_path
-        yield base_path + '/'
-        yield base_path + '?title='
-        yield self.article_path
+            yield base_path + '{}'
+        yield base_path + '/{}'
+        yield base_path + '?title={}'
+        yield self.articlepath
 
     def _build_namespaces(self):
         """Create default namespaces."""
@@ -264,17 +260,14 @@ class BaseSite(ComparableMixin):
         index = self.namespaces.lookup_name(value)
         return self.namespace(index)
 
-    @remove_last_args(('default', ))
     def redirect(self):
         """Return list of localized redirect tags for the site."""
         return ['REDIRECT']
 
-    @remove_last_args(('default', ))
     def pagenamecodes(self):
         """Return list of localized PAGENAME tags for the site."""
         return ['PAGENAME']
 
-    @remove_last_args(('default', ))
     def pagename2codes(self):
         """Return list of localized PAGENAMEE tags for the site."""
         return ['PAGENAMEE']
@@ -384,10 +377,14 @@ class BaseSite(ComparableMixin):
                 return default_ns, title
             return ns, name
 
-        # Replace underscores with spaces and multiple combinations of them
-        # with only one space
-        title1 = re.sub(r'[_ ]+', ' ', title1)
-        title2 = re.sub(r'[_ ]+', ' ', title2)
+        # Replace alias characters like underscores with title
+        # delimiters like spaces and multiple combinations of them with
+        # only one delimiter
+        sep = self.family.title_delimiter_and_aliases[0]
+        pattern = re.compile('[{}]+'
+                             .format(self.family.title_delimiter_and_aliases))
+        title1 = pattern.sub(sep, title1)
+        title2 = pattern.sub(sep, title2)
         if title1 == title2:
             return True
 
@@ -407,33 +404,6 @@ class BaseSite(ComparableMixin):
             name1 = first_upper(name1)
             name2 = first_upper(name2)
         return name1 == name2
-
-    # namespace shortcuts for backwards-compatibility
-
-    @deprecated('namespaces.SPECIAL.custom_name', since='20160407')
-    def special_namespace(self):
-        """Return local name for the Special: namespace."""
-        return self.namespace(-1)
-
-    @deprecated('namespaces.FILE.custom_name', since='20160407')
-    def image_namespace(self):
-        """Return local name for the File namespace."""
-        return self.namespace(6)
-
-    @deprecated('namespaces.MEDIAWIKI.custom_name', since='20160407')
-    def mediawiki_namespace(self):
-        """Return local name for the MediaWiki namespace."""
-        return self.namespace(8)
-
-    @deprecated('namespaces.TEMPLATE.custom_name', since='20160407')
-    def template_namespace(self):
-        """Return local name for the Template namespace."""
-        return self.namespace(10)
-
-    @deprecated('namespaces.CATEGORY.custom_name', since='20160407')
-    def category_namespace(self):
-        """Return local name for the Category namespace."""
-        return self.namespace(14)
 
     # site-specific formatting preferences
 

@@ -1,6 +1,7 @@
+#!/usr/bin/python3
 """Test cases for the WikiStats dataset."""
 #
-# (C) Pywikibot team, 2014-2021
+# (C) Pywikibot team, 2014-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -32,9 +33,9 @@ class WikiStatsTestCase(TestCase):
                 self.assertIn(key, top)
                 self.assertIn(key, bottom)
 
-        self.assertTrue(all(isinstance(key, str)
-                            for key in top.keys()
-                            if key is not None))
+        for key in top:
+            self.assertIsInstance(key, (str, type(None)))
+
         self.assertIsInstance(top['good'], str)
         self.assertIsInstance(top['total'], str)
         self.assertIsInstance(bottom['good'], str)

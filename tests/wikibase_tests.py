@@ -1,6 +1,7 @@
+#!/usr/bin/python3
 """Tests for the Wikidata parts of the page module."""
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,6 +10,7 @@ import json
 import unittest
 from contextlib import suppress
 from decimal import Decimal
+from unittest import mock
 
 import pywikibot
 from pywikibot import pagegenerators
@@ -23,7 +25,7 @@ from pywikibot.exceptions import (
 from pywikibot.page import ItemPage, Page, PropertyPage, WikibasePage
 from pywikibot.site import Namespace, NamespacesDict
 from pywikibot.tools import MediaWikiVersion, suppress_warnings
-from tests import WARN_SITE_CODE, join_pages_path, mock
+from tests import WARN_SITE_CODE, join_pages_path
 from tests.aspects import TestCase, WikidataTestCase
 from tests.basepage import (
     BasePageLoadRevisionsCachingTestBase,
@@ -40,6 +42,7 @@ def _get_test_unconnected_page(site):
     for page in gen:
         if not page.properties().get('wikibase_item'):
             return page
+    return None
 
 
 class WbRepresentationTestCase(WikidataTestCase):
@@ -1815,7 +1818,8 @@ class TestPreloadingEntityGenerator(TestCase):
         page = pywikibot.Page(site, 'Property:P31')
         ref_gen = page.getReferences(follow_redirects=False, total=5)
         gen = pagegenerators.PreloadingEntityGenerator(ref_gen)
-        self.assertTrue(all(isinstance(item, ItemPage) for item in gen))
+        for item in gen:
+            self.assertIsInstance(item, ItemPage)
 
     def test_foreign_page_item_gen(self):
         """Test PreloadingEntityGenerator with connected pages."""
@@ -1823,7 +1827,8 @@ class TestPreloadingEntityGenerator(TestCase):
         page_gen = [pywikibot.Page(site, 'Main Page'),
                     pywikibot.Page(site, 'New York City')]
         gen = pagegenerators.PreloadingEntityGenerator(page_gen)
-        self.assertTrue(all(isinstance(item, ItemPage) for item in gen))
+        for item in gen:
+            self.assertIsInstance(item, ItemPage)
 
 
 class TestNamespaces(WikidataTestCase):

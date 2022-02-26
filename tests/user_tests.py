@@ -1,15 +1,16 @@
+#!/usr/bin/python3
 """Tests for the User page."""
 #
-# (C) Pywikibot team, 2016-2021
+# (C) Pywikibot team, 2016-2022
 #
 # Distributed under the terms of the MIT license.
 #
 from contextlib import suppress
+from unittest.mock import patch
 
 import pywikibot
 from pywikibot import Page, Timestamp, User
 from pywikibot.exceptions import AutoblockUserError
-from tests import patch
 from tests.aspects import DefaultSiteTestCase, TestCase, unittest
 
 
@@ -56,7 +57,7 @@ class TestUserClass(TestCase):
         self.assertFalse(user.isAnonymous())
         self.assertIsInstance(user.registration(), pywikibot.Timestamp)
         self.assertGreater(user.editCount(), 0)
-        self.assertFalse(user.isBlocked())
+        self.assertFalse(user.is_blocked())
         # self.assertTrue(user.isEmailable())
         self.assertEqual(user.gender(), 'unknown')
         self.assertIn('userid', user.getprops())
@@ -74,13 +75,15 @@ class TestUserClass(TestCase):
         self.assertTrue(user.is_thankable)
         contribs = user.contributions(total=10)
         self.assertLength(list(contribs), 10)
-        self.assertTrue(all(isinstance(contrib, tuple)
-                            for contrib in contribs))
-        self.assertTrue(all('user' in contrib
-                            and contrib['user'] == user.username
-                            for contrib in contribs))
+
+        for contrib in contribs:
+            self.assertIsInstance(contrib, tuple)
+            self.assertIn('user', contrib)
+            self.assertIsEqual(contrib['user'], user.username)
+
         self.assertIn('user', user.groups())
         self.assertIn('edit', user.rights())
+        self.assertFalse(user.is_locked())
 
     def test_registered_user_without_timestamp(self):
         """Test registered user when registration timestamp is None."""
@@ -155,6 +158,11 @@ class TestUserClass(TestCase):
                 'This is an autoblock ID'):
             user.getUserTalkPage()
 
+    def test_locked_user(self):
+        """Test global lock."""
+        user = User(self.site, 'TonjaHeritage2')
+        self.assertTrue(user.is_locked())
+
 
 class TestUserMethods(DefaultSiteTestCase):
 
@@ -192,8 +200,9 @@ class TestUserMethods(DefaultSiteTestCase):
                           .format(mysite.user(), mysite))
         self.assertLessEqual(len(le), 10)
         last = le[0]
-        self.assertTrue(all(event.user() == user.username for event in le))
         self.assertEqual(last, user.last_event)
+        for event in le:
+            self.assertEqual(event.user(), user.username)
 
 
 if __name__ == '__main__':  # pragma: no cover

@@ -60,7 +60,7 @@ function ParsePythonVersion ($python_version) {
 function DownloadPython ($python_version, $platform_suffix) {
     $major, $minor, $micro, $prerelease = ParsePythonVersion $python_version
 
-    # Only Python 3.5+ is supported
+    # Only Python 3.5.3+ is supported
     $dir = "$major.$minor.$micro"
     $ext = "exe"
     if ($platform_suffix) {
@@ -126,7 +126,7 @@ function RunCommand ($command, $command_args) {
 
 
 function main () {
-    if ($env:PYTHON_VERSION -eq "3.5.0") {
+    if ($env:PYTHON_VERSION -eq "3.5.3") {
         InstallPython $env:PYTHON_VERSION $env:PYTHON_ARCH $env:PYTHON
     }
 }

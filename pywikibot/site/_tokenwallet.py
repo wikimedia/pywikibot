@@ -1,11 +1,14 @@
 """Objects representing api tokens."""
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
-from pywikibot import log
+from pywikibot import debug
 from pywikibot.exceptions import Error
+
+
+_logger = 'site.tokenwallet'
 
 
 class TokenWallet:
@@ -60,7 +63,8 @@ class TokenWallet:
         if self.site.mw_version >= '1.24wmf19' \
            and key in {'edit', 'delete', 'protect', 'move', 'block', 'unblock',
                        'email', 'import', 'options'}:
-            log('Token {!r} was replaced by {!r}'.format(key, 'csrf'))
+            debug(
+                'Token {!r} was replaced by {!r}'.format(key, 'csrf'), _logger)
             key = 'csrf'
 
         try:

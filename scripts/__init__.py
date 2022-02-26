@@ -1,7 +1,7 @@
 """**Scripts** folder contains predefined scripts easy to use.
 
-Scripts are only available im Pywikibot if instaled in directory mode
-and not as side package. They can be run in command line using the pwb
+Scripts are only available with Pywikibot if installed in directory mode
+and not as site package. They can be run in command line using the pwb
 wrapper script::
 
     python pwb.py <global options> <name_of_script> <options>
@@ -29,4 +29,4 @@ The advantages of pwb.py wrapper script are:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '6.6.1'
+__version__ = '7.0.0'

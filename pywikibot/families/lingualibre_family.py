@@ -1,4 +1,7 @@
-"""Family module for Lingua Libre."""
+"""Family module for Lingua Libre.
+
+.. versionaddded: 6.5
+"""
 #
 # (C) Pywikibot team, 2021
 #
@@ -7,12 +10,11 @@
 from pywikibot import family
 
 
-# The Lingua Libre family
 class Family(family.WikimediaFamily):
 
     """Family class for Lingua Libre.
 
-    *New in version 6.5.*
+    .. versionaddded: 6.5
     """
 
     name = 'lingualibre'

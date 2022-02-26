@@ -1,7 +1,7 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """Test pagegenerators module."""
 #
-# (C) Pywikibot team, 2009-2021
+# (C) Pywikibot team, 2009-2022
 #
 # Distributed under the terms of the MIT license.
 import calendar
@@ -11,6 +11,7 @@ import sys
 import unittest
 from contextlib import suppress
 from typing import Optional
+from unittest import mock
 
 import pywikibot
 from pywikibot import date, pagegenerators
@@ -21,8 +22,8 @@ from pywikibot.pagegenerators import (
     PreloadingGenerator,
     WikibaseItemFilterPageGenerator,
 )
-from pywikibot.tools import has_module, suppress_warnings
-from tests import join_data_path, mock
+from pywikibot.tools import has_module
+from tests import join_data_path
 from tests.aspects import (
     DefaultSiteTestCase,
     DeprecationTestCase,
@@ -30,14 +31,7 @@ from tests.aspects import (
     TestCase,
     WikidataTestCase,
 )
-from tests.thread_tests import GeneratorIntersectTestCase
-
-
-LINKSEARCH_MSG = (r'.*pywikibot\.pagegenerators\.LinksearchPageGenerator .*'
-                  r'is deprecated for .*; use Site\.exturlusage')
-
-PAGES_ID_GEN_MSG = (r'.*pywikibot\.pagegenerators\.PagesFromPageidGenerator .*'
-                    r'is deprecated for .*; use site\.load_pages_from_pageids')
+from tests.tools_tests import GeneratorIntersectTestCase
 
 
 en_wp_page_titles = (
@@ -216,11 +210,9 @@ class TestPagesFromPageidGenerator(BasetitleTestCase):
         """Test PagesFromPageidGenerator."""
         gen_pages = pagegenerators.PagesFromTitlesGenerator(self.titles,
                                                             self.site)
-        pageids = [page.pageid for page in gen_pages]
-
-        with suppress_warnings(PAGES_ID_GEN_MSG, category=FutureWarning):
-            gen = pagegenerators.PagesFromPageidGenerator(pageids, self.site)
-            self.assertPageTitlesEqual(gen, self.titles)
+        pageids = (page.pageid for page in gen_pages)
+        gen = pagegenerators.PagesFromPageidGenerator(pageids, self.site)
+        self.assertPageTitlesEqual(gen, self.titles)
 
 
 class TestCategoryFilterPageGenerator(BasetitleTestCase):
@@ -287,12 +279,12 @@ class EdittimeFilterPageGeneratorTestCase(TestCase):
         self.assertPageTitlesEqual(gen, titles=expect, site=self.site)
 
         gen = PagesFromTitlesGenerator(self.titles, self.site)
-        gen = pagegenerators.EdittimeFilterPageGenerator(
+        opposite_pages = pagegenerators.EdittimeFilterPageGenerator(
             gen, first_edit_start=datetime.datetime(2006, 1, 1))
-        opposite_pages = list(gen)
-        self.assertTrue(all(isinstance(p, pywikibot.Page)
-                            for p in opposite_pages))
-        self.assertTrue(all(p.title not in expect for p in opposite_pages))
+
+        for p in opposite_pages:
+            self.assertIsInstance(p, pywikibot.Page)
+            self.assertNotIn(p.title(), expect)
 
     def test_last_edit(self):
         """Test last edit."""
@@ -407,21 +399,25 @@ class TestRepeatingGenerator(RecentChangesTestCase):
 
     def test_RepeatingGenerator(self):
         """Test RepeatingGenerator."""
-        with suppress_warnings(category=FutureWarning):
-            gen = pagegenerators.RepeatingGenerator(
-                self.site.recentchanges,
-                key_func=lambda x: x['revid'],
-                sleep_duration=10,
-                reverse=True,
-                namespaces=[0],
-                total=self.length)
+        gen = pagegenerators.RepeatingGenerator(
+            self.site.recentchanges,
+            key_func=lambda x: x['revid'],
+            sleep_duration=10,
+            reverse=True,
+            namespaces=[0],
+            total=self.length)
         items = list(gen)
         self.assertLength(items, self.length)
         timestamps = [pywikibot.Timestamp.fromISOformat(item['timestamp'])
                       for item in items]
         self.assertEqual(sorted(timestamps), timestamps)
-        self.assertTrue(all(item['ns'] == 0 for item in items))
-        self.assertLength({item['revid'] for item in items}, self.length)
+
+        itemsset = set()
+        for item in items:
+            self.assertEqual(item['ns'], 0)
+            revid = item['revid']
+            self.assertNotIn(revid, itemsset)
+            itemsset.add(revid)
 
 
 class TestTextIOPageGenerator(DefaultSiteTestCase):
@@ -631,12 +627,12 @@ class TestDequePreloadingGenerator(DefaultSiteTestCase):
             if not page.isTalkPage():
                 pages.extend([page.toggleTalkPage()])
 
-        self.assertTrue(all(isinstance(page,
-                                       pywikibot.Page) for page in pages_out))
         self.assertIn(mainpage, pages_out)
         self.assertIn(mainpage.toggleTalkPage(), pages_out)
         self.assertLength(pages_out, 2)
         self.assertTrue(pages_out[1].isTalkPage())
+        for page in pages_out:
+            self.assertIsInstance(page, pywikibot.Page)
 
 
 class TestPreloadingEntityGenerator(WikidataTestCase):
@@ -649,8 +645,8 @@ class TestPreloadingEntityGenerator(WikidataTestCase):
         page = pywikibot.Page(site, 'Property:P31')
         ref_gen = page.getReferences(follow_redirects=False, total=5)
         gen = pagegenerators.PreloadingEntityGenerator(ref_gen)
-        is_all_type = all(isinstance(i, pywikibot.ItemPage) for i in gen)
-        self.assertTrue(is_all_type)
+        for ipage in gen:
+            self.assertIsInstance(ipage, pywikibot.ItemPage)
 
 
 class WikibaseItemFilterPageGeneratorTestCase(TestCase):
@@ -894,12 +890,39 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         self.assertEqual(tuple(gen), ('A', 'B', 'C'))
 
     def test_intersect_generator(self):
-        """Test getCombinedGenerator with generator parameter."""
+        """Test getCombinedGenerator with -intersect option."""
         gf = pagegenerators.GeneratorFactory()
         gf.handle_arg('-intersect')
-        gf.gens = ['Python 3.7-dev']
-        gen = gf.getCombinedGenerator(gen='Pywikibot 3.0.dev')
-        self.assertEqual(''.join(gen), 'Pyot 3.dev')
+
+        # check wether the generator works for both directions
+        patterns = ['Python 3.7-dev', 'Pywikibot 7.0.dev']
+        for index in range(2):
+            with self.subTest(index=index):
+                gf.gens = [patterns[index]]
+                gen = gf.getCombinedGenerator(gen=patterns[index - 1])
+                self.assertEqual(''.join(gen), 'Pyot 7.dev')
+
+        # check wether the generator works for a very long text
+        patterns.append('PWB 7+ unittest developed with a very long text.')
+        with self.subTest(patterns=patterns):
+            gf.gens = patterns
+            gen = gf.getCombinedGenerator()
+            self.assertEqual(''.join(gen), 'P 7tedvoy.')
+
+        # check whether an early stop fits
+        with self.subTest(comment='Early stop'):
+            gf.gens = 'ABC', 'A Big City'
+            gen = gf.getCombinedGenerator()
+            self.assertEqual(''.join(gen), 'ABC')
+
+        with self.subTest(comment='Commutative'):
+            gf.gens = 'ABB', 'BB'
+            gen1 = gf.getCombinedGenerator()
+            gf2 = pagegenerators.GeneratorFactory()
+            gf2.handle_arg('-intersect')
+            gf2.gens = 'BB', 'ABB'
+            gen2 = gf2.getCombinedGenerator()
+            self.assertEqual(list(gen1), list(gen2))
 
     def test_ns(self):
         """Test namespace option."""
@@ -1541,8 +1564,8 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
         self.assertIsNotNone(gen)
         pages = set(gen)
         self.assertIsNotEmpty(pages)
-        self.assertTrue(all(isinstance(item, pywikibot.User)
-                            for item in pages))
+        for item in pages:
+            self.assertIsInstance(item, pywikibot.User)
 
     def test_logevents_with_start_and_end_timestamp(self):
         """Test -logevents which uses timestamps for start and end."""
@@ -1562,8 +1585,8 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
         self.assertIsNotNone(gen)
         pages = set(gen)
         self.assertLength(pages, 1)
-        self.assertTrue(all(isinstance(item, pywikibot.User)
-                            for item in pages))
+        for item in pages:
+            self.assertIsInstance(item, pywikibot.User)
 
 
 class PageGeneratorIntersectTestCase(GeneratorIntersectTestCase,
@@ -1654,10 +1677,7 @@ class TestUnconnectedPageGenerator(DefaultSiteTestCase):
         """Test UnconnectedPageGenerator."""
         if not self.site.data_repository():
             self.skipTest('Site is not using a Wikibase repository')
-        with suppress_warnings(
-                'pywikibot.pagegenerators.UnconnectedPageGenerator is '
-                'deprecated', FutureWarning):
-            upgen = pagegenerators.UnconnectedPageGenerator(self.site, 3)
+        upgen = pagegenerators.UnconnectedPageGenerator(self.site, 3)
         self.assertDictEqual(
             upgen.request._params, {
                 'gqppage': ['UnconnectedPages'],
@@ -1711,22 +1731,19 @@ class TestLinksearchPageGenerator(TestCase):
 
     def test_double_opposite_protocols(self):
         """Test LinksearchPageGenerator with two opposite protocols."""
-        with suppress_warnings(LINKSEARCH_MSG, category=FutureWarning):
-            with self.assertRaises(ValueError):
-                pagegenerators.LinksearchPageGenerator(
-                    'http://w.wiki',
-                    protocol='https',
-                    site=self.site)
+        with self.assertRaises(ValueError):
+            pagegenerators.LinksearchPageGenerator('http://w.wiki',
+                                                   protocol='https',
+                                                   site=self.site)
 
     def test_double_same_protocols(self):
         """Test LinksearchPageGenerator with two same protocols."""
-        with suppress_warnings(LINKSEARCH_MSG, category=FutureWarning):
-            gen = pagegenerators.LinksearchPageGenerator('https://w.wiki',
-                                                         protocol='https',
-                                                         site=self.site,
-                                                         total=1)
-            self.assertIsInstance(gen, pywikibot.data.api.PageGenerator)
-            self.assertLength(list(gen), 1)
+        gen = pagegenerators.LinksearchPageGenerator('https://w.wiki',
+                                                     protocol='https',
+                                                     site=self.site,
+                                                     total=1)
+        self.assertIsInstance(gen, pywikibot.data.api.PageGenerator)
+        self.assertLength(list(gen), 1)
 
 
 if __name__ == '__main__':  # pragma: no cover

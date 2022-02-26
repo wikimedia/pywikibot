@@ -1,14 +1,15 @@
+#!/usr/bin/python3
 """Tests for tokens."""
 #
-# (C) Pywikibot team, 2015-2021
+# (C) Pywikibot team, 2015-2022
 #
 # Distributed under the terms of the MIT license.
 #
 from contextlib import suppress
 
 from pywikibot.exceptions import APIError, Error
-from pywikibot.tools import MediaWikiVersion
 from pywikibot.site import TokenWallet
+from pywikibot.tools import MediaWikiVersion
 from tests.aspects import DefaultSiteTestCase, TestCase, TestCaseBase, unittest
 
 

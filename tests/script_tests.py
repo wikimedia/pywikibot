@@ -1,6 +1,7 @@
+#!/usr/bin/python3
 """Test that each script can be compiled and executed."""
 #
-# (C) Pywikibot team, 2014-2021
+# (C) Pywikibot team, 2014-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -16,6 +17,7 @@ from tests.utils import execute_pwb
 
 
 scripts_path = join_root_path('scripts')
+framework_scripts = ['shell']
 
 # These dependencies are not always the package name which is in setup.py.
 # Here, the name given to the module which will be imported is required.
@@ -54,11 +56,8 @@ def list_scripts(path, exclude=None):
     return scripts
 
 
-script_list = (['login']
-               + list_scripts(scripts_path, 'login.py'))
-
-runnable_script_list = (
-    ['login'] + sorted(set(script_list) - {'login'} - unrunnable_script_set))
+script_list = ['login'] + list_scripts(scripts_path,
+                                       exclude='login.py') + framework_scripts
 
 script_input = {
     'interwiki': 'Test page that should not exist\n',
@@ -120,6 +119,11 @@ no_args_expected_results = {
     # the timeout of 5 seconds.
     'revertbot': 'Fetching new batch of contributions',
     'upload': 'ERROR: Upload error',
+}
+
+# skip test if result is unexpected in this way
+skip_on_results = {
+    'speedy_delete': 'No user is logged in on site'  # T301555
 }
 
 
@@ -195,10 +199,12 @@ class TestScriptMeta(MetaTestCaseClass):
                     'PYWIKIBOT_TEST_AUTORUN=1 to enable) "{}"'
                     .format(script_name))
 
-            def testScript(self):
-                global_args = 'For global options use -help:global or run pwb'
+            def test_script(self):
+                global_args_msg = \
+                    'For global options use -help:global or run pwb'
+                global_args = ['-pwb_close_matches:1']
 
-                cmd = [script_name] + args
+                cmd = global_args + [script_name] + args
                 data_in = script_input.get(script_name)
                 timeout = 5 if is_autorun else None
 
@@ -232,13 +238,17 @@ class TestScriptMeta(MetaTestCaseClass):
                 if result['exit_code'] == -9:
                     unittest_print(' killed', end='  ')
 
+                skip_result = self._skip_results.get(script_name)
+                if skip_result and skip_result in err_result:
+                    self.skipTest(skip_result)
+
                 if error:
-                    self.assertIn(error, result['stderr'])
+                    self.assertIn(error, err_result)
                     exit_codes = [0, 1, 2, -9]
 
                 elif not is_autorun:
                     if not stderr_other:
-                        self.assertIn(global_args, out_result)
+                        self.assertIn(global_args_msg, out_result)
                     else:
                         self.assertIn('Use -help for further information.',
                                       stderr_other)
@@ -267,7 +277,7 @@ class TestScriptMeta(MetaTestCaseClass):
                 self.assertNotIn('deprecated', err_result.lower())
 
                 # If stdout doesn't include global help..
-                if global_args not in out_result:
+                if global_args_msg not in out_result:
                     # Specifically look for deprecated
                     self.assertNotIn('deprecated', out_result.lower())
                     # But also complain if there is any stdout
@@ -281,7 +291,7 @@ class TestScriptMeta(MetaTestCaseClass):
 
             if not enable_autorun_tests and is_autorun:
                 return test_skip_script
-            return testScript
+            return test_script
 
         arguments = dct['_arguments']
 
@@ -319,7 +329,7 @@ class TestScriptMeta(MetaTestCaseClass):
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
                 dct[test_name].__test__ = False
 
-        return super(TestScriptMeta, cls).__new__(cls, name, bases, dct)
+        return super().__new__(cls, name, bases, dct)
 
 
 class TestScriptHelp(PwbTestCase, metaclass=TestScriptMeta):
@@ -338,6 +348,7 @@ class TestScriptHelp(PwbTestCase, metaclass=TestScriptMeta):
 
     _arguments = '-help'
     _results = None
+    _skip_results = {}
 
 
 class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
@@ -366,6 +377,7 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
 
     _arguments = '-simulate'
     _results = no_args_expected_results
+    _skip_results = skip_on_results
 
 
 if __name__ == '__main__':  # pragma: no cover

@@ -1,23 +1,30 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """This script generates a family file from a given URL.
+
+This script must be invoked with the pwb wrapper script/code entry point.
 
 Usage::
 
-    generate_family_file.py [<url>] [<name>] [<dointerwiki>] [<verify>]
+    pwb generate_family_file.py [<url>] [<name>] [<dointerwiki>] [<verify>]
 
 Parameters are optional. They must be given consecutively but may be
 omitted if there is no successor parameter. The parameters are::
 
     <url>:         an url from where the family settings are loaded
     <name>:        the family name without "_family.py" tail.
-    <dointerwiki>: predefined answer (y|n) to add multiple language
+    <dointerwiki>: predefined answer (y|n) to add multiple site codes
     <verify>:      disable certificate validaton `(y|n)
 
 Example::
 
-    generate_family_file.py https://www.mywiki.bogus/wiki/Main_Page mywiki
+    pwb generate_family_file.py https://www.mywiki.bogus/wiki/Main_Page mywiki
 
-This will create the file mywiki_family.py in pywikibot/families folder
+This will create the file mywiki_family.py in families folder of your
+base directory.
+
+.. versionchanged:: 7.0
+   moved to pywikibot.scripts folder; create family files in families
+   folder of your base directory instead of pywikibot/families.
 """
 #
 # (C) Pywikibot team, 2010-2021
@@ -28,8 +35,6 @@ import codecs
 import os
 import string
 import sys
-
-from os import environ, getenv
 from typing import Optional
 from urllib.parse import urlparse
 
@@ -56,19 +61,24 @@ class FamilyFileGenerator:
 
         :param url: an url from where the family settings are loaded
         :param name: the family name without "_family.py" tail.
-        :param dointerwiki: Predefined answer to add multiple language
+        :param dointerwiki: Predefined answer to add multiple site
             codes. Pass `Y` or `y` for yes `N` or `n` for no and
             `E` or `e` if you want to edit the collection of sites.
         :param verify: If a certificate verification failes, you may
             pass `Y` or `y` to disable certificate validaton `N` or `n`
             to keep it enabled.
         """
-        # from pywikibot.site_detect import MWSite
+        from pywikibot.scripts import _import_with_no_user_config
+
+        # from pywikibot.site_detect import MWSite and
+        # from pywikibot.config import base_dir
         # when required but disable user-config checks
         # so the family can be created first,
         # and then used when generating the user-config
         self.Wiki = _import_with_no_user_config(
             'pywikibot.site_detect').site_detect.MWSite
+        self.base_dir = _import_with_no_user_config(
+            'pywikibot.config').config.base_dir
 
         self.base_url = url
         self.name = name
@@ -138,8 +148,8 @@ class FamilyFileGenerator:
         self.writefile(verify)
 
     def getlangs(self, w):
-        """Determine language of a site."""
-        print('Determining other languages...', end='')
+        """Determine site code of a family."""
+        print('Determining other sites...', end='')
         try:
             self.langs = w.langs
             print(' '.join(sorted(wiki['prefix'] for wiki in self.langs)))
@@ -159,7 +169,7 @@ class FamilyFileGenerator:
         if code_len > 1:
             if self.dointerwiki is None:
                 makeiw = input(
-                    '\nThere are {} languages available.'
+                    '\nThere are {} sites available.'
                     '\nDo you want to generate interwiki links? '
                     'This might take a long time. ([y]es/[N]o/[e]dit)'
                     .format(code_len)).lower()
@@ -172,7 +182,7 @@ class FamilyFileGenerator:
             elif makeiw == 'e':
                 for wiki in self.langs:
                     print(wiki['prefix'], wiki['url'])
-                do_langs = input('Which languages do you want: ')
+                do_langs = input('Which sites do you want: ')
                 self.langs = [wiki for wiki in self.langs
                               if wiki['prefix'] in do_langs
                               or wiki['url'] == w.iwpath]
@@ -184,7 +194,7 @@ class FamilyFileGenerator:
                 .format(self.name, wiki['prefix'])
 
     def getapis(self):
-        """Load other language pages."""
+        """Load other site pages."""
         print('Loading wikis... ')
         for lang in self.langs:
             key = lang['prefix']
@@ -200,8 +210,7 @@ class FamilyFileGenerator:
 
     def writefile(self, verify):
         """Write the family file."""
-        fn = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                          'pywikibot', 'families',
+        fn = os.path.join(self.base_dir, 'families',
                           '{}_family.py'.format(self.name))
         print('Writing %s... ' % fn)
         try:
@@ -210,7 +219,7 @@ class FamilyFileGenerator:
                      .format(fn)).lower() == 'n':
                 print('Terminating.')
                 sys.exit(1)
-        except IOError:  # file not found
+        except OSError:  # file not found
             pass
 
         code_hostname_pairs = '\n        '.join(
@@ -239,6 +248,7 @@ class FamilyFileGenerator:
     def verify_SSL_certificate(self, code: str) -> bool:
         return False
 """
+        os.makedirs(os.path.dirname(fn), exist_ok=True)
         with codecs.open(fn, 'w', 'utf-8') as fh:
             fh.write(content)
 
@@ -273,20 +283,6 @@ class Family(family.Family):  # noqa: D101
             %(code_protocol_pairs)s
         }[code]
 """
-
-
-def _import_with_no_user_config(*import_args):
-    """Return __import__(*import_args) without loading user-config.py."""
-    orig_no_user_config = getenv('PYWIKIBOT_NO_USER_CONFIG') or getenv(
-        'PYWIKIBOT2_NO_USER_CONFIG')
-    environ['PYWIKIBOT_NO_USER_CONFIG'] = '2'
-    result = __import__(*import_args)
-    # Reset this flag
-    if not orig_no_user_config:
-        del environ['PYWIKIBOT_NO_USER_CONFIG']
-    else:
-        environ['PYWIKIBOT_NO_USER_CONFIG'] = orig_no_user_config
-    return result
 
 
 def main():

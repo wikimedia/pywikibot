@@ -1,19 +1,20 @@
+#!/usr/bin/python3
 """
 Tests for LoginManager classes.
 
 e.g. used to test password-file based login.
 """
 #
-# (C) Pywikibot team, 2012-2021
+# (C) Pywikibot team, 2012-2022
 #
 # Distributed under the terms of the MIT license.
 #
 from collections import defaultdict
 from io import StringIO
+from unittest import mock
 
 from pywikibot.exceptions import NoUsernameError
 from pywikibot.login import LoginManager
-from tests import mock
 from tests.aspects import DefaultDrySiteTestCase, unittest
 
 

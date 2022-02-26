@@ -1,9 +1,81 @@
-# Schripts Changelog
+# Scripts Changelog
+
+## 7.0.0
+*In development*
+
+### general
+* L10N updates
+* Provide ConfigParserBot for several scripts (T223778)
+
+### add_text
+* Provide -create and -createonly options (T291354)
+* Deprecated function get_text() was removed in favour of Page.text and BaseBot.skip_page()
+* Deprecated function put_text() was removed in favour of BaseBot.userPut() method
+* Deprecated function add_text() were remove in favour of textlib.add_text()
+
+### blockpageschecker
+* Use different edit comments when adding, changeing or removing templates (T291345)
+* Derive CheckerBot from ConfigParserBot (T57106)
+* Derive CheckerBot from CurrentPageBot (T196851, T171713)
+
+### category
+* CleanBot was added which can be invoked by clean action option
+* Recurse CategoryListifyRobot with depth
+* Show a warning if a pagegenerator option is not enabled (T298522)
+* Deprecated code parts were removed
+
+### checkimages
+* Skip PageSaveRelatedError and ServerError when putting talk page (T302174)
+
+### commonscat
+* Ignore InvalidTitleError in CommonscatBot.findCommonscatLink (T291783)
+
+### cosmetic_changes
+* Ignore InvalidTitleError in CosmeticChangesBot.treat_page (T293612)
+
+### djvutext
+* pass site arg only once (T292367)
+
+### fixing_redirects
+* Let only put_current show the message "No changes were needed"
+* Use concurrent.futures to retrieve redirect or moved targets (T298789)
+* Add an option to ignore solving moved targets (T298789)
+
+### imagetransfer
+* Add support for chunked uploading (T300531)
+
+### newitem
+* Do not pass OtherPageSaveRelatedError silently
+
+### pagefromfile
+* Preload pages instead of reading them one by one before putting changes
+* Don't ask for confirmation by default (T291757)
+
+### redirect
+* Use site.maxlimit to determine the highest limit to load (T299859)
+
+### replace
+* Enable default behaviour with -mysqlquery (T299306)
+* Deprecated "acceptall" and "addedCat" parameters were replaced by "always" and "addcat"
+
+### revertbot
+* Add support for translated dates/times (T102174)
+* Deprecated "max" parameter was replaced by "total"
+
+### solve_disambiguation
+* Remove deprecated properties in favour of DisambiguationRobot.opt options
+
+### touch
+*Do not pass OtherPageSaveRelatedError silently
+
+### unusedfiles
+* Use oldest_file_info.user as uploader (T301768)
+
 
 ## 6.6.1
 *21 September 2021*
 
-## category
+### category
 * Fix -match option
 
 
@@ -39,7 +111,7 @@
 * Enable multiple sites (T57083)
 * Use new textlib.add_text function
 
-### cosmetic_changeds
+### cosmetic_changes
 * set -ignore option to CANCEL.MATCH by default (T108446)
 
 ### fixing_redirects
@@ -57,11 +129,11 @@
 * compat2core script was restored and renamed to update_script
 
 ### version
-* Show all mandatory dependecies 
+* Show all mandatory dependecies
 
 
 ## 6.3.0
-*31 May 2021* 
+*31 May 2021*
 
 ### addtext
 * -except option was removed in favour of commonly used -grepnot
@@ -174,6 +246,7 @@
 
 ### solve_disambiguation
 * Deprecated methods were removed
+* Positional arguments of DisambiguationRobot are deprecated, also some keywords were replaced
 
 ### unusedfiles
 * Update unusedfiles.py to add custom templates

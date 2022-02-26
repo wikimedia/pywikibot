@@ -1,6 +1,7 @@
+#!/usr/bin/python3
 """Tests for the site module."""
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -12,6 +13,7 @@ import unittest
 from collections.abc import Iterable, Mapping
 from contextlib import suppress
 from http import HTTPStatus
+from unittest.mock import patch
 
 import pywikibot
 from pywikibot import config
@@ -28,7 +30,7 @@ from pywikibot.exceptions import (
     UnknownSiteError,
 )
 from pywikibot.tools import suppress_warnings
-from tests import WARN_SITE_CODE, patch, unittest_print
+from tests import WARN_SITE_CODE, unittest_print
 from tests.aspects import (
     AlteredDefaultSiteTestCase,
     DefaultDrySiteTestCase,
@@ -59,16 +61,6 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase,
         for page in self.site.allpages(filterredir='', total=1):
             self.assertFalse(page.isRedirectPage())
         self.assertOneDeprecation()
-
-    def test_namespace_shortcuts(self):
-        """Test namespace shortcuts."""
-        self.assertEqual(self.site.image_namespace(), self.site.namespace(6))
-        self.assertEqual(self.site.mediawiki_namespace(),
-                         self.site.namespace(8))
-        self.assertEqual(self.site.template_namespace(),
-                         self.site.namespace(10))
-        self.assertEqual(self.site.category_namespace(),
-                         self.site.namespace(14))
 
 
 class TestSiteDryDeprecatedFunctions(DefaultDrySiteTestCase,
@@ -254,9 +246,8 @@ class TestSiteObject(DefaultSiteTestCase):
         with self.subTest(test='months_names'):
             self.assertIsInstance(mysite.months_names, list)
             self.assertLength(mysite.months_names, 12)
-            self.assertTrue(all(isinstance(month, tuple)
-                                for month in mysite.months_names))
             for month in mysite.months_names:
+                self.assertIsInstance(month, tuple)
                 self.assertLength(month, 2)
 
         with self.subTest(test='list_to_text'):
@@ -279,9 +270,6 @@ class TestSiteObject(DefaultSiteTestCase):
         """Test ApiSite methods for getting page-specific info."""
         mysite = self.get_site()
         mainpage = self.get_mainpage()
-        with suppress_warnings('pywikibot.site._apisite.APISite.page_exists',
-                               FutureWarning):
-            self.assertIsInstance(mysite.page_exists(mainpage), bool)
         self.assertIsInstance(mysite.page_restrictions(mainpage), dict)
         self.assertIsInstance(mysite.page_can_be_edited(mainpage), bool)
         self.assertIsInstance(mysite.page_isredirect(mainpage), bool)
@@ -378,6 +366,56 @@ class TestSiteGenerators(DefaultSiteTestCase):
         self.assertLessEqual(redirs, embedded_ns_0)
         self.assertLessEqual(no_redirs, embedded_ns_0)
         self.assertLessEqual(embedded_ns_0, embedded_ns_0_2)
+
+    def test_page_redirects(self):
+        """Test Site.page_redirects."""
+        if self.get_site().mw_version < '1.24':
+            self.skipTest('site.page_redirects() needs mw 1.24')
+
+        redirects_ns_0 = set(self.site.page_redirects(
+            self.mainpage,
+            namespaces=0,
+        ))
+        redirects_ns_0_4 = set(self.site.page_redirects(
+            self.mainpage,
+            namespaces=[0, 4],
+        ))
+        redirects_ns_0_frag = set(self.site.page_redirects(
+            self.mainpage,
+            filter_fragments=True,
+            namespaces=0,
+        ))
+        redirects_ns_0_nofrag = set(self.site.page_redirects(
+            self.mainpage,
+            filter_fragments=False,
+            namespaces=0,
+        ))
+
+        self.assertLessEqual(redirects_ns_0, redirects_ns_0_4)
+        self.assertLessEqual(redirects_ns_0_frag, redirects_ns_0)
+        self.assertLessEqual(redirects_ns_0_nofrag, redirects_ns_0)
+
+        for redirect in redirects_ns_0_4:
+            self.assertIsInstance(redirect, pywikibot.Page)
+            self.assertIn(redirect.namespace(), [0, 4])
+            self.assertTrue(redirect.isRedirectPage())
+
+        for redirect in redirects_ns_0:
+            self.assertEqual(redirect.namespace(), 0)
+
+        for redirect in redirects_ns_0_frag:
+            redirect_target = redirect.getRedirectTarget()
+            self.assertIsNotNone(redirect_target.section())
+            redirect_target = pywikibot.Page(
+                redirect_target.site,
+                redirect_target.title(with_section=False)
+            )
+            self.assertEqual(redirect_target, self.mainpage)
+
+        for redirect in redirects_ns_0_nofrag:
+            redirect_target = redirect.getRedirectTarget()
+            self.assertIsNone(redirect_target.section())
+            self.assertEqual(redirect_target, self.mainpage)
 
     def test_pagecategories(self):
         """Test Site.pagecategories."""
@@ -562,10 +600,13 @@ class TestSiteGenerators(DefaultSiteTestCase):
         """Test the site.alllinks() method."""
         mysite = self.get_site()
         fwd = list(mysite.alllinks(total=10))
-        self.assertLessEqual(len(fwd), 10)
-        self.assertTrue(all(isinstance(link, pywikibot.Page) for link in fwd))
         uniq = list(mysite.alllinks(total=10, unique=True))
-        self.assertTrue(all(link in uniq for link in fwd))
+
+        self.assertLessEqual(len(fwd), 10)
+
+        for link in fwd:
+            self.assertIsInstance(link, pywikibot.Page)
+            self.assertIn(link, uniq)
         for page in mysite.alllinks(start='Link', total=5):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertEqual(page.namespace(), 0)
@@ -591,8 +632,9 @@ class TestSiteGenerators(DefaultSiteTestCase):
         mysite = self.get_site()
         ac = list(mysite.allcategories(total=10))
         self.assertLessEqual(len(ac), 10)
-        self.assertTrue(all(isinstance(cat, pywikibot.Category)
-                            for cat in ac))
+        for cat in ac:
+            self.assertIsInstance(cat, pywikibot.Category)
+
         for cat in mysite.allcategories(total=5, start='Abc'):
             self.assertIsInstance(cat, pywikibot.Category)
             self.assertGreaterEqual(cat.title(with_ns=False), 'Abc')
@@ -609,8 +651,9 @@ class TestSiteGenerators(DefaultSiteTestCase):
         mysite = self.get_site()
         ai = list(mysite.allimages(total=10))
         self.assertLessEqual(len(ai), 10)
-        self.assertTrue(all(isinstance(image, pywikibot.FilePage)
-                            for image in ai))
+        for image in ai:
+            self.assertIsInstance(image, pywikibot.FilePage)
+
         for impage in mysite.allimages(start='Ba', total=5):
             self.assertIsInstance(impage, pywikibot.FilePage)
             self.assertTrue(impage.exists())
@@ -633,70 +676,53 @@ class TestSiteGenerators(DefaultSiteTestCase):
             self.assertTrue(impage.exists())
             self.assertLessEqual(impage.latest_file_info['size'], 2000)
 
-    def test_newfiles(self):
-        """Test the site.newfiles() method."""
-        my_site = self.get_site()
-        with suppress_warnings(category=FutureWarning):
-            gen = my_site.newfiles(total=10)
-        the_list = list(gen)
-        self.assertLessEqual(len(the_list), 10)
-        self.assertTrue(all(isinstance(tup, tuple) and len(tup) == 4
-                            for tup in the_list))
-        self.assertTrue(all(isinstance(tup[0], pywikibot.FilePage)
-                            for tup in the_list))
-        self.assertTrue(all(isinstance(tup[1], pywikibot.Timestamp)
-                            for tup in the_list))
-        self.assertTrue(all(isinstance(tup[2], str) for tup in the_list))
-        self.assertTrue(all(isinstance(tup[3], str) for tup in the_list))
-
     def test_querypage(self):
         """Test the site.querypage() method."""
         mysite = self.get_site()
-        pages = list(mysite.querypage('Longpages', total=10))
-
-        self.assertTrue(all(isinstance(p, pywikibot.Page) for p in pages))
+        pages = mysite.querypage('Longpages', total=10)
+        for p in pages:
+            self.assertIsInstance(p, pywikibot.Page)
         with self.assertRaises(AssertionError):
             mysite.querypage('LongpageX')
 
     def test_longpages(self):
         """Test the site.longpages() method."""
         mysite = self.get_site()
-        longpages = list(mysite.longpages(total=10))
+        longpages = mysite.longpages(total=10)
 
         # Make sure each object returned by site.longpages() is
         # a tuple of a Page object and an int
-        self.assertTrue(all(isinstance(tup, tuple) and len(tup) == 2
-                            for tup in longpages))
-        self.assertTrue(all(isinstance(tup[0], pywikibot.Page)
-                            for tup in longpages))
-        self.assertTrue(all(isinstance(tup[1], int) for tup in longpages))
+        for tup in longpages:
+            self.assertIsInstance(tup, tuple)
+            self.assertLength(tup, 2)
+            self.assertIsInstance(tup[0], pywikibot.Page)
+            self.assertIsInstance(tup[1], int)
 
     def test_shortpages(self):
         """Test the site.shortpages() method."""
         mysite = self.get_site()
-        shortpages = list(mysite.shortpages(total=10))
+        shortpages = mysite.shortpages(total=10)
 
         # Make sure each object returned by site.shortpages() is
         # a tuple of a Page object and an int
-        self.assertTrue(all(isinstance(tup, tuple) and len(tup) == 2
-                            for tup in shortpages))
-        self.assertTrue(all(isinstance(tup[0], pywikibot.Page)
-                            for tup in shortpages))
-        self.assertTrue(all(isinstance(tup[1], int) for tup in shortpages))
+        for tup in shortpages:
+            self.assertIsInstance(tup, tuple)
+            self.assertLength(tup, 2)
+            self.assertIsInstance(tup[0], pywikibot.Page)
+            self.assertIsInstance(tup[1], int)
 
     def test_ancientpages(self):
         """Test the site.ancientpages() method."""
         mysite = self.get_site()
-        ancientpages = list(mysite.ancientpages(total=10))
+        ancientpages = mysite.ancientpages(total=10)
 
         # Make sure each object returned by site.ancientpages() is
         # a tuple of a Page object and a Timestamp object
-        self.assertTrue(all(isinstance(tup, tuple) and len(tup) == 2
-                            for tup in ancientpages))
-        self.assertTrue(all(isinstance(tup[0], pywikibot.Page)
-                            for tup in ancientpages))
-        self.assertTrue(all(isinstance(tup[1], pywikibot.Timestamp)
-                            for tup in ancientpages))
+        for tup in ancientpages:
+            self.assertIsInstance(tup, tuple)
+            self.assertLength(tup, 2)
+            self.assertIsInstance(tup[0], pywikibot.Page)
+            self.assertIsInstance(tup[1], pywikibot.Timestamp)
 
     def test_unwatchedpages(self):
         """Test the site.unwatchedpages() method."""
@@ -713,8 +739,8 @@ class TestSiteGenerators(DefaultSiteTestCase):
 
         # Make sure each object returned by site.unwatchedpages() is a
         # Page object
-        self.assertTrue(all(isinstance(p, pywikibot.Page)
-                            for p in unwatchedpages))
+        for p in unwatchedpages:
+            self.assertIsInstance(p, pywikibot.Page)
 
     def test_blocks(self):
         """Test the site.blocks() method."""
@@ -803,8 +829,9 @@ class TestSiteGenerators(DefaultSiteTestCase):
         url = 'www.google.com'
         eu = list(mysite.exturlusage(url, total=10))
         self.assertLessEqual(len(eu), 10)
-        self.assertTrue(all(isinstance(link, pywikibot.Page)
-                            for link in eu))
+        for link in eu:
+            self.assertIsInstance(link, pywikibot.Page)
+
         for link in mysite.exturlusage(url, namespaces=[2, 3], total=5):
             self.assertIsInstance(link, pywikibot.Page)
             self.assertIn(link.namespace(), (2, 3))
@@ -873,8 +900,9 @@ class TestSiteGenerators(DefaultSiteTestCase):
         if not self.site.data_repository():
             self.skipTest('Site is not using a Wikibase repository')
         upgen = self.site.unconnected_pages(total=3)
-        self.assertDictEqual(
-            upgen.request._params, {
+        self.assertEqual(
+            upgen.request._params,
+            {
                 'gqppage': ['UnconnectedPages'],
                 'prop': ['info', 'imageinfo', 'categoryinfo'],
                 'inprop': ['protection'],
@@ -882,7 +910,9 @@ class TestSiteGenerators(DefaultSiteTestCase):
                 'iiprop': ['timestamp', 'user', 'comment', 'url', 'size',
                            'sha1', 'metadata'],
                 'generator': ['querypage'], 'action': ['query'],
-                'indexpageids': [True], 'continue': [True]})
+                'indexpageids': [True], 'continue': [True]
+            }
+        )
         self.assertLessEqual(len(tuple(upgen)), 3)
 
     def test_assert_valid_iter_params(self):
@@ -1047,7 +1077,7 @@ class TestImageUsage(DefaultSiteTestCase):
         page = pywikibot.Page(mysite, mysite.siteinfo['mainpage'])
         with skipping(
             StopIteration,
-                msg='No images on the main page of site {0!r}'.format(mysite)):
+                msg='No images on the main page of site {!r}'.format(mysite)):
             imagepage = next(iter(page.imagelinks()))  # 1st image of page
 
         pywikibot.output('site_tests.TestImageUsage found {} on {}'
@@ -1062,8 +1092,8 @@ class TestImageUsage(DefaultSiteTestCase):
         imagepage = self.imagepage
         iu = list(mysite.imageusage(imagepage, total=10))
         self.assertLessEqual(len(iu), 10)
-        self.assertTrue(all(isinstance(link, pywikibot.Page)
-                            for link in iu))
+        for link in iu:
+            self.assertIsInstance(link, pywikibot.Page)
 
     def test_image_usage_in_namespaces(self):
         """Test the site.imageusage() method with namespaces."""
@@ -1131,8 +1161,8 @@ class TestLogEvents(DefaultSiteTestCase):
         mysite = self.get_site()
         le = list(mysite.logevents(total=10))
         self.assertLessEqual(len(le), 10)
-        self.assertTrue(all(isinstance(entry, pywikibot.logentries.LogEntry)
-                            for entry in le))
+        for entry in le:
+            self.assertIsInstance(entry, pywikibot.logentries.LogEntry)
 
         for logtype in mysite.logtypes:
             with self.subTest(logtype=logtype):
@@ -1216,7 +1246,7 @@ class TestRecentChanges(DefaultSiteTestCase):
             # 1st image on main page
             imagepage = next(iter(mysite.allimages()))
         except StopIteration:
-            unittest_print('No images on site {0!r}'.format(mysite))
+            unittest_print('No images on site {!r}'.format(mysite))
             imagepage = None
         cls.imagepage = imagepage
 
@@ -1225,8 +1255,8 @@ class TestRecentChanges(DefaultSiteTestCase):
         mysite = self.site
         rc = list(mysite.recentchanges(total=10))
         self.assertLessEqual(len(rc), 10)
-        self.assertTrue(all(isinstance(change, dict)
-                            for change in rc))
+        for change in rc:
+            self.assertIsInstance(change, dict)
 
     def test_time_range(self):
         """Test the site.recentchanges() method with start/end."""
@@ -1414,9 +1444,9 @@ class SearchTestCase(DefaultSiteTestCase):
         try:
             se = list(mysite.search('wiki', total=100, namespaces=0))
             self.assertLessEqual(len(se), 100)
-            self.assertTrue(all(isinstance(hit, pywikibot.Page)
-                                for hit in se))
-            self.assertTrue(all(hit.namespace() == 0 for hit in se))
+            for hit in se:
+                self.assertIsInstance(hit, pywikibot.Page)
+                self.assertEqual(hit.namespace(), 0)
             for hit in mysite.search('common', namespaces=4, total=5):
                 self.assertIsInstance(hit, pywikibot.Page)
                 self.assertEqual(hit.namespace(), 4)
@@ -1436,8 +1466,8 @@ class SearchTestCase(DefaultSiteTestCase):
             if e.code == 'gsrsearch-text-disabled':
                 self.skipTest('gsrsearch is diabled on site {}:\n{!r}'
                               .format(mysite, e))
+            raise
 
-    @suppress_warnings("where='title' is deprecated", FutureWarning)
     def test_search_where_title(self):
         """Test site.search() method with 'where' parameter set to title."""
         search_gen = self.site.search(
@@ -1445,27 +1475,15 @@ class SearchTestCase(DefaultSiteTestCase):
         expected_params = {
             'prop': ['info', 'imageinfo', 'categoryinfo'],
             'inprop': ['protection'],
-            'iiprop': [
-                'timestamp', 'user', 'comment', 'url', 'size', 'sha1',
-                'metadata'],
+            'iiprop': ['timestamp', 'user', 'comment', 'url', 'size', 'sha1',
+                       'metadata'],
             'iilimit': ['max'], 'generator': ['search'], 'action': ['query'],
-            'indexpageids': [True], 'continue': [True], 'gsrnamespace': [0]}
-        if self.site.has_extension('CirrusSearch'):
-            expected_params.update({
-                'gsrsearch': ['intitle:wiki'], 'gsrwhat': [None]})
-        else:
-            expected_params.update({
-                'gsrsearch': ['wiki'], 'gsrwhat': ['title']})
+            'indexpageids': [True], 'continue': [True],
+            'gsrnamespace': [0], 'gsrsearch': ['wiki'], 'gsrwhat': ['title']}
         self.assertEqual(search_gen.request._params, expected_params)
-        try:
-            for hit in search_gen:
-                self.assertIsInstance(hit, pywikibot.Page)
-                self.assertEqual(hit.namespace(), 0)
-        except APIError as e:
-            if e.code in ('search-title-disabled', 'gsrsearch-title-disabled'):
-                self.skipTest(
-                    'Title search disabled on site: {}'.format(self.site))
-            raise
+        for hit in search_gen:
+            self.assertIsInstance(hit, pywikibot.Page)
+            self.assertEqual(hit.namespace(), 0)
 
 
 class TestUserContribsAsUser(DefaultSiteTestCase):
@@ -1479,11 +1497,10 @@ class TestUserContribsAsUser(DefaultSiteTestCase):
         mysite = self.get_site()
         uc = list(mysite.usercontribs(user=mysite.user(), total=10))
         self.assertLessEqual(len(uc), 10)
-        self.assertTrue(all(isinstance(contrib, dict)
-                            for contrib in uc))
-        self.assertTrue(
-            all('user' in contrib and contrib['user'] == mysite.user()
-                for contrib in uc))
+        for contrib in uc:
+            self.assertIsInstance(contrib, dict)
+            self.assertIn('user', contrib)
+            self.assertEqual(contrib['user'], mysite.user())
 
     def test_namespaces(self):
         """Test the site.usercontribs() method using namespaces."""
@@ -1801,8 +1818,8 @@ class SiteWatchlistRevsTestCase(DefaultSiteTestCase):
         mysite = self.get_site()
         wl = list(mysite.watchlist_revs(total=10))
         self.assertLessEqual(len(wl), 10)
-        self.assertTrue(all(isinstance(rev, dict)
-                            for rev in wl))
+        for rev in wl:
+            self.assertIsInstance(rev, dict)
         for rev in mysite.watchlist_revs(start='2008-10-11T01:02:03Z',
                                          total=5):
             self.assertIsInstance(rev, dict)
@@ -1900,7 +1917,8 @@ class SiteSysopTestCase(DefaultSiteTestCase):
             self.skipTest(
                 '{} contains no deleted revisions.'.format(mainpage))
         self.assertLessEqual(len(dr['revisions']), 10)
-        self.assertTrue(all(isinstance(rev, dict) for rev in dr['revisions']))
+        for rev in dr['revisions']:
+            self.assertIsInstance(rev, dict)
 
         with self.subTest(start='2008-10-11T01:02:03Z', reverse=False):
             for item in mysite.deletedrevs(start='2008-10-11T01:02:03Z',
@@ -2217,10 +2235,13 @@ class TestSiteSysopWrite(TestCase):
                         reason='pywikibot unit tests',
                         target='File:T276726.png')
 
+        ts1 = pywikibot.Timestamp(2021, 3, 14, 18, 43, 57)
+        ts2 = pywikibot.Timestamp(2021, 3, 14, 18, 44, 17)
+
         fp1 = pywikibot.FilePage(site, 'File:T276726.png')
         site.loadimageinfo(fp1, history=True)
         for idx, v in fp1._file_revisions.items():
-            if v['timestamp'] == pywikibot.Timestamp(2021, 3, 14, 18, 43, 57):
+            if v['timestamp'] == ts1:
                 self.assertTrue(hasattr(v, 'userhidden'))
 
         # Multiple revisions
@@ -2231,9 +2252,7 @@ class TestSiteSysopWrite(TestCase):
         fp2 = pywikibot.FilePage(site, 'File:T276726.png')
         site.loadimageinfo(fp2, history=True)
         for idx, v in fp2._file_revisions.items():
-            if v['timestamp'] == pywikibot.Timestamp(2021, 3, 14, 18, 43, 57):
-                self.assertTrue(hasattr(v, 'commenthidden'))
-            if v['timestamp'] == pywikibot.Timestamp(2021, 3, 14, 18, 44, 17):
+            if v['timestamp'] in (ts1, ts2):
                 self.assertTrue(hasattr(v, 'commenthidden'))
 
         # Concurrently show and hide
@@ -2245,11 +2264,7 @@ class TestSiteSysopWrite(TestCase):
         fp3 = pywikibot.FilePage(site, 'File:T276726.png')
         site.loadimageinfo(fp3, history=True)
         for idx, v in fp3._file_revisions.items():
-            if v['timestamp'] == pywikibot.Timestamp(2021, 3, 14, 18, 43, 57):
-                self.assertFalse(hasattr(v, 'commenthidden'))
-                self.assertFalse(hasattr(v, 'userhidden'))
-                self.assertFalse(hasattr(v, 'filehidden'))
-            if v['timestamp'] == pywikibot.Timestamp(2021, 3, 14, 18, 44, 17):
+            if v['timestamp'] in (ts1, ts2):
                 self.assertFalse(hasattr(v, 'commenthidden'))
                 self.assertFalse(hasattr(v, 'userhidden'))
                 self.assertFalse(hasattr(v, 'filehidden'))
@@ -2359,9 +2374,9 @@ class SiteRandomTestCase(DefaultSiteTestCase):
         mysite = self.get_site()
         rn = list(mysite.randompages(total=10))
         self.assertLessEqual(len(rn), 10)
-        self.assertTrue(all(isinstance(a_page, pywikibot.Page)
-                            for a_page in rn))
-        self.assertFalse(all(a_page.isRedirectPage() for a_page in rn))
+        for a_page in rn:
+            self.assertIsInstance(a_page, pywikibot.Page)
+            self.assertFalse(a_page.isRedirectPage())
 
     def test_redirects(self):
         """Test site.randompages() with redirects."""
@@ -2502,12 +2517,12 @@ class TestSiteLoadRevisions(TestCase):
         """Test the site.loadrevisions() method, listing based on revid."""
         # revids as list of int
         self.mysite.loadrevisions(self.mainpage, revids=[139992, 139993])
-        self.assertTrue(all(rev in self.mainpage._revisions
-                            for rev in [139992, 139993]))
+        for rev in [139992, 139993]:
+            self.assertIn(rev, self.mainpage._revisions)
         # revids as list of str
         self.mysite.loadrevisions(self.mainpage, revids=['139994', '139995'])
-        self.assertTrue(all(rev in self.mainpage._revisions
-                            for rev in [139994, 139995]))
+        for rev in [139994, 139995]:
+            self.assertIn(rev, self.mainpage._revisions)
         # revids as int
         self.mysite.loadrevisions(self.mainpage, revids=140000)
         self.assertIn(140000, self.mainpage._revisions)
@@ -2535,7 +2550,8 @@ class TestSiteLoadRevisions(TestCase):
         self.assertLength(self.mainpage._revisions, 15)
         revs = self.mainpage._revisions
         timestamps = [str(revs[rev].timestamp) for rev in revs]
-        self.assertTrue(all(ts < '2002-01-31T00:00:00Z' for ts in timestamps))
+        for ts in timestamps:
+            self.assertLess(ts, '2002-01-31T00:00:00Z')
 
         # Retrieve oldest revisions; listing based on timestamp.
         # Raises "loadrevisions: starttime > endtime with rvdir=True"
@@ -2556,7 +2572,8 @@ class TestSiteLoadRevisions(TestCase):
         self.mysite.loadrevisions(self.mainpage, rvdir=True, total=15)
         self.assertLength(self.mainpage._revisions, 15)
         revs = self.mainpage._revisions
-        self.assertTrue(all(139900 <= rev <= 140100 for rev in revs))
+        for rev in revs:
+            self.assertTrue(139900 <= rev <= 140100)
 
         # Retrieve oldest revisions; listing based on revid.
         # Raises "loadrevisions: startid > endid with rvdir=True"
@@ -2576,18 +2593,17 @@ class TestSiteLoadRevisions(TestCase):
         self.mainpage._revisions = {}
         self.mysite.loadrevisions(self.mainpage, rvdir=True,
                                   user='Magnus Manske')
-        revs = self.mainpage._revisions
-        self.assertTrue(all(revs[rev].user == 'Magnus Manske' for rev in revs))
+        for rev in self.mainpage._revisions.values():
+            self.assertEqual(rev.user, 'Magnus Manske')
 
     def test_loadrevisions_excludeuser(self):
         """Test the site.loadrevisions() method, excluding user."""
-        # Do not list revisions made by this user.
+        excludeuser = 'Magnus Manske'  # exclude revisions made by this user
         self.mainpage._revisions = {}
         self.mysite.loadrevisions(self.mainpage, rvdir=True,
-                                  excludeuser='Magnus Manske')
-        revs = self.mainpage._revisions
-        self.assertFalse(any(revs[rev].user == 'Magnus Manske'
-                             for rev in revs))
+                                  excludeuser=excludeuser)
+        for rev in self.mainpage._revisions.values():
+            self.assertNotEqual(rev.user, excludeuser)
 
         # TODO test other optional arguments
 
@@ -2686,12 +2702,6 @@ class TestFileArchive(DeprecationTestCase):
             self.assertEqual(item['ns'], 6)
             self.assertEqual('File:' + item['name'].replace('_', ' '),
                              item['title'])
-
-    def test_filearchive_limit(self):
-        """Test deprecated limit parameter."""
-        fa = list(self.site.filearchive(limit=10))
-        self.assertOneDeprecation()
-        self.assertLessEqual(len(fa), 10)
 
     def test_filearchive_prefix(self):
         """Test prefix parameter."""
@@ -2931,11 +2941,10 @@ class TestPagePreloading(DefaultSiteTestCase):
         """Test basic preloading with pageids."""
         mysite = self.get_site()
         mainpage = self.get_mainpage()
-        count = 0
         links = mysite.pagelinks(mainpage, total=10)
         # preloadpages will send the page ids,
         # as they have already been loaded by pagelinks
-        for page in mysite.preloadpages(links):
+        for count, page in enumerate(mysite.preloadpages(links), start=1):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             if page.exists():
@@ -2944,7 +2953,6 @@ class TestPagePreloading(DefaultSiteTestCase):
                 self.assertIn(page._revid, page._revisions)
                 self.assertIsNotNone(page._revisions[page._revid].text)
                 self.assertFalse(hasattr(page, '_pageprops'))
-            count += 1
             if count >= 5:
                 break
 
@@ -2952,7 +2960,6 @@ class TestPagePreloading(DefaultSiteTestCase):
         """Test basic preloading with titles."""
         mysite = self.get_site()
         mainpage = self.get_mainpage()
-        count = 0
         links = mysite.pagelinks(mainpage, total=10)
 
         # remove the pageids that have already been loaded above by pagelinks
@@ -2962,14 +2969,13 @@ class TestPagePreloading(DefaultSiteTestCase):
                 self.assertEqual(page.pageid, page._pageid)
             del page._pageid
 
-        for page in mysite.preloadpages(links):
+        for count, page in enumerate(mysite.preloadpages(links), start=1):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             if page.exists():
                 self.assertLength(page._revisions, 1)
                 self.assertIsNotNone(page._revisions[page._revid].text)
                 self.assertFalse(hasattr(page, '_pageprops'))
-            count += 1
             if count >= 5:
                 break
 
@@ -2977,17 +2983,15 @@ class TestPagePreloading(DefaultSiteTestCase):
         """Test preloading continuation works."""
         mysite = self.get_site()
         mainpage = self.get_mainpage()
-        count = 0
         links = mysite.pagelinks(mainpage, total=10)
-        for page in mysite.preloadpages(links, groupsize=5):
+        for count, page in enumerate(mysite.preloadpages(links, groupsize=5)):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             if page.exists():
                 self.assertLength(page._revisions, 1)
                 self.assertIsNotNone(page._revisions[page._revid].text)
                 self.assertFalse(hasattr(page, '_pageprops'))
-            count += 1
-            if count >= 6:
+            if count >= 5:
                 break
 
     def test_preload_high_groupsize(self):
@@ -3044,7 +3048,6 @@ class TestPagePreloading(DefaultSiteTestCase):
         """Test sending pageids with unnormalized titles, causing warnings."""
         mysite = self.get_site()
         mainpage = self.get_mainpage()
-        count = 0
         links = list(mysite.pagelinks(mainpage, total=10))
         if len(links) < 2:
             self.skipTest('insufficient links on main page')
@@ -3058,22 +3061,20 @@ class TestPagePreloading(DefaultSiteTestCase):
             page._link._text += ' '
 
         gen = mysite.preloadpages(links, groupsize=5)
-        for page in gen:
+        for count, page in enumerate(gen):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             if page.exists():
                 self.assertLength(page._revisions, 1)
                 self.assertIsNotNone(page._revisions[page._revid].text)
                 self.assertFalse(hasattr(page, '_pageprops'))
-            count += 1
-            if count > 5:
+            if count >= 5:
                 break
 
     def test_preload_unexpected_titles_using_titles(self):
         """Test sending unnormalized titles, causing warnings."""
         mysite = self.get_site()
         mainpage = self.get_mainpage()
-        count = 0
         links = list(mysite.pagelinks(mainpage, total=10))
         if len(links) < 2:
             self.skipTest('insufficient links on main page')
@@ -3087,22 +3088,20 @@ class TestPagePreloading(DefaultSiteTestCase):
             del page._pageid
 
         gen = mysite.preloadpages(links, groupsize=5)
-        for page in gen:
+        for count, page in enumerate(gen):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             if page.exists():
                 self.assertLength(page._revisions, 1)
                 self.assertIsNotNone(page._revisions[page._revid].text)
                 self.assertFalse(hasattr(page, '_pageprops'))
-            count += 1
-            if count > 5:
+            if count >= 5:
                 break
 
     def test_preload_invalid_titles_without_pageids(self):
         """Test sending invalid titles. No warnings issued, but it should."""
         mysite = self.get_site()
         mainpage = self.get_mainpage()
-        count = 0
         links = list(mysite.pagelinks(mainpage, total=10))
         if len(links) < 2:
             self.skipTest('insufficient links on main page')
@@ -3112,12 +3111,11 @@ class TestPagePreloading(DefaultSiteTestCase):
             del page._pageid
 
         gen = mysite.preloadpages(links, groupsize=5)
-        for page in gen:
+        for count, page in enumerate(gen):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
-            self.assertFalse(page.exists())
-            count += 1
-            if count > 5:
+            self.assertFalse(page.exists(), 'page {} exists'.format(page))
+            if count >= 5:
                 break
 
     def test_preload_langlinks_normal(self):
@@ -3562,66 +3560,6 @@ class TestCategoryFromWikibase(DefaultSiteTestCase):
         site = pywikibot.Site('pdc', 'wikipedia')
         page = site.page_from_repository(self.ITEM)
         self.assertIsNone(page)
-
-
-class TestLoginLogout(DefaultSiteTestCase):
-
-    """Test for login and logout methods."""
-
-    login = True
-
-    def test_login_logout(self):
-        """Validate login and logout methods by toggling the state."""
-        site = self.get_site()
-        loginstatus = pywikibot.login.LoginStatus
-
-        self.assertTrue(site.logged_in())
-        self.assertIn(site._loginstatus, (loginstatus.IN_PROGRESS,
-                                          loginstatus.AS_USER))
-        self.assertIn('_userinfo', site.__dict__.keys())
-
-        self.assertIsNone(site.login())
-
-        if site.is_oauth_token_available():
-            with self.assertRaisesRegex(APIError, 'cannotlogout.*OAuth'):
-                site.logout()
-            self.assertTrue(site.logged_in())
-            self.assertIn(site._loginstatus, (loginstatus.IN_PROGRESS,
-                                              loginstatus.AS_USER))
-            self.assertIn('_userinfo', site.__dict__.keys())
-
-        # Fandom family wikis don't support API action=logout
-        elif 'fandom.com' not in site.hostname():
-            site.logout()
-            self.assertFalse(site.logged_in())
-            self.assertEqual(site._loginstatus, loginstatus.NOT_LOGGED_IN)
-            self.assertNotIn('_userinfo', site.__dict__.keys())
-
-            self.assertIsNone(site.user())
-
-
-class TestClearCookies(TestCase):
-    """Test cookies are cleared after logout."""
-
-    login = True
-
-    family = 'wikisource'
-    code = 'zh'
-
-    def test_clear_cookies(self):
-        """Test cookies are cleared (T224712)."""
-        site = self.get_site()
-        site.login()
-        site2 = pywikibot.Site('mul', 'wikisource', user=site.username())
-        site2.login()
-        site.logout()
-
-        raised = False
-        try:
-            site.login()
-        except Exception as e:
-            raised = e
-        self.assertFalse(raised)
 
 
 if __name__ == '__main__':  # pragma: no cover

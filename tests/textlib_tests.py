@@ -1,6 +1,7 @@
+#!/usr/bin/python3
 """Test textlib module."""
 #
-# (C) Pywikibot team, 2011-2021
+# (C) Pywikibot team, 2011-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,6 +12,7 @@ import re
 import unittest
 from collections import OrderedDict
 from contextlib import suppress
+from unittest import mock
 
 import pywikibot
 from pywikibot import textlib
@@ -18,8 +20,7 @@ from pywikibot.backports import nullcontext
 from pywikibot.exceptions import UnknownSiteError
 from pywikibot.site._interwikimap import _IWEntry
 from pywikibot.textlib import MultiTemplateMatchBuilder, extract_sections
-from pywikibot.tools import has_module, suppress_warnings
-from tests import mock
+from pywikibot.tools import has_module
 from tests.aspects import (
     DefaultDrySiteTestCase,
     SiteAttributeTestCase,
@@ -656,6 +657,23 @@ class TestDisabledParts(DefaultDrySiteTestCase):
                 self.assertEqual(
                     textlib.removeDisabledParts(pattern, tags=[test]), '')
 
+    def test_remove_disabled_parts_include(self):
+        """Test removeDisabledParts function with the include argument."""
+        text = 'text <nowiki>tag</nowiki> text'
+        self.assertEqual(
+            textlib.removeDisabledParts(text, include=['nowiki']), text)
+
+    def test_remove_disabled_parts_order(self):
+        """Test the order of the replacements in removeDisabledParts."""
+        text = 'text <ref>This is a reference.</ref> text'
+        regex = re.compile('</?ref>')
+        self.assertEqual(
+            textlib.removeDisabledParts(text, tags=['ref', regex]),
+            'text  text')
+        self.assertEqual(
+            textlib.removeDisabledParts(text, tags=[regex, 'ref']),
+            'text This is a reference. text')
+
 
 class TestReplaceLinks(TestCase):
 
@@ -703,6 +721,9 @@ class TestReplaceLinks(TestCase):
                 return pywikibot.Link('Homeworld', link.site)
             if link.title.lower() == 'you':
                 return False
+
+            return None
+
         self.assertEqual(
             textlib.replace_links(self.text, callback, self.wp_site),
             'Hello [[Homeworld]], [[how|are]] you? Are you a [[bug:1337]]?')
@@ -714,10 +735,12 @@ class TestReplaceLinks(TestCase):
                 self._count += 1
                 if link.section:
                     return pywikibot.Link(
-                        '{0}#{1}'
+                        '{}#{}'
                         .format(self._count, link.section), link.site)
-                return pywikibot.Link('{0}'
-                                      .format(self._count), link.site)
+                return pywikibot.Link('{}'.format(self._count), link.site)
+
+            return None
+
         self._count = 0  # buffer number of found instances
         self.assertEqual(
             textlib.replace_links(self.text, callback, self.wp_site),
@@ -904,6 +927,8 @@ class TestReplaceLinks(TestCase):
             if link.title == 'World':
                 # This must be a unicode instance not bytes
                 return 'homewörlder'
+            return None
+
         self.assertEqual(
             textlib.replace_links(self.text, callback, self.wp_site),
             'Hello homewörlder, [[how|are]] [[you#section|you]]? '
@@ -916,6 +941,7 @@ class TestReplaceLinks(TestCase):
             if link.title == 'World':
                 # This must be a bytes instance not unicode
                 return b'homeworlder'
+            return None
 
         with self.assertRaisesRegex(ValueError,
                                     r'The result must be str and not bytes\.'):
@@ -967,7 +993,7 @@ class TestReplaceLinksNonDry(TestCase):
             link)
 
 
-class TestLocalDigits(TestCase):
+class TestDigitsConversion(TestCase):
 
     """Test to verify that local digits are correctly being handled."""
 
@@ -984,6 +1010,22 @@ class TestLocalDigits(TestCase):
         self.assertEqual(
             textlib.to_local_digits(
                 '299792458', 'km'), '២៩៩៧៩២៤៥៨')
+
+    def test_to_latin(self):
+        """Test converting local digits to Latin digits."""
+        self.assertEqual(textlib.to_latin_digits('299792458'), '299792458')
+        self.assertEqual(
+            textlib.to_latin_digits('۲۹۹۷۹۲۴۵۸', 'fa'), '299792458')
+        self.assertEqual(
+            textlib.to_latin_digits('۲۹۹۷۹۲۴۵۸ flash'), '299792458 flash')
+        self.assertEqual(
+            textlib.to_latin_digits('២៩៩៧៩២៤៥៨', 'km'), '299792458')
+        self.assertEqual(
+            textlib.to_latin_digits('២៩៩៧៩២៤៥៨'), '299792458')
+        self.assertEqual(
+            textlib.to_latin_digits('២៩៩៧៩២៤៥៨', ['km', 'en']), '299792458')
+        self.assertEqual(
+            textlib.to_latin_digits('២៩៩៧៩២៤៥៨', ['en']), '២៩៩៧៩២៤៥៨')
 
 
 class TestReplaceExcept(DefaultDrySiteTestCase):
@@ -1503,23 +1545,6 @@ class TestGetLanguageLinks(SiteAttributeTestCase):
         self.assertEqual({page.title() for page in lang_links.values()},
                          {'Site'})
         self.assertEqual(set(lang_links), self.sites_set - {self.site})
-
-
-UNESCAPE_WARNING_MSG = (r'.*pywikibot\.textlib\.unescape .*'
-                        r'is deprecated for .*; use html.unescape')
-
-
-class TestUnescape(TestCase):
-
-    """Test to verify that unescaping HTML chars are correctly done."""
-
-    net = False
-
-    def test_unescape(self):
-        """Test unescaping HTML chars."""
-        with suppress_warnings(UNESCAPE_WARNING_MSG, category=FutureWarning):
-            self.assertEqual(textlib.unescape('!23&lt;&gt;&apos;&quot;&amp;&'),
-                             '!23<>\'"&&')
 
 
 class TestExtractSections(DefaultDrySiteTestCase):

@@ -14,7 +14,7 @@ from pywikibot.exceptions import (
     SiteDefinitionError,
 )
 from pywikibot.site._decorators import need_extension, need_right
-from pywikibot.tools import deprecate_arg, deprecated_args, merge_unique_dicts
+from pywikibot.tools import merge_unique_dicts
 
 
 class EchoMixin:
@@ -232,7 +232,6 @@ class WikibaseClientMixin:
 
     """APISite mixin for WikibaseClient extension."""
 
-    @deprecated_args(step=True)
     @need_extension('WikibaseClient')
     def unconnected_pages(self, total=None):
         """Yield Page objects from Special:UnconnectedPages.
@@ -370,7 +369,6 @@ class FlowMixin:
         return data['flow']['view-topiclist']['result']['topiclist']
 
     @need_extension('Flow')
-    @deprecate_arg('format', 'content_format')
     def load_topiclist(self, page, content_format: str = 'wikitext', limit=100,
                        sortby='newest', toconly=False, offset=None,
                        offset_id=None, reverse=False, include_offset=False):
@@ -413,7 +411,6 @@ class FlowMixin:
         return data['flow']['view-topiclist']['result']['topiclist']
 
     @need_extension('Flow')
-    @deprecate_arg('format', 'content_format')
     def load_topic(self, page, content_format: str):
         """
         Retrieve the data for a Flow topic.
@@ -432,7 +429,6 @@ class FlowMixin:
         return data['flow']['view-topic']['result']['topic']
 
     @need_extension('Flow')
-    @deprecate_arg('format', 'content_format')
     def load_post_current_revision(self, page, post_id, content_format: str):
         """
         Retrieve the data for a post to a Flow topic.
@@ -454,7 +450,6 @@ class FlowMixin:
 
     @need_right('edit')
     @need_extension('Flow')
-    @deprecate_arg('format', 'content_format')
     def create_new_topic(self, page, title, content, content_format):
         """
         Create a new topic on a Flow board.
@@ -480,7 +475,6 @@ class FlowMixin:
 
     @need_right('edit')
     @need_extension('Flow')
-    @deprecate_arg('format', 'content_format')
     def reply_to_post(self, page, reply_to_uuid: str, content: str,
                       content_format: str) -> dict:
         """Reply to a post on a Flow topic.

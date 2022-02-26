@@ -1,4 +1,3 @@
-
 """Decorators for Page objects."""
 #
 # (C) Pywikibot team, 2017-2021

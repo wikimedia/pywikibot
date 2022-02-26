@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """
 Tests for edit failures.
 
@@ -7,12 +8,13 @@ unless something has broken badly.
 These tests use special code 'write = -1' for edit failures.
 """
 #
-# (C) Pywikibot team, 2014-2021
+# (C) Pywikibot team, 2014-2022
 #
 # Distributed under the terms of the MIT license.
 #
 import unittest
 from contextlib import suppress
+from unittest.mock import patch
 
 import pywikibot
 from pywikibot import config
@@ -27,7 +29,6 @@ from pywikibot.exceptions import (
     SpamblacklistError,
     TitleblacklistError,
 )
-from tests import patch
 from tests.aspects import TestCase, WikibaseTestCase
 
 

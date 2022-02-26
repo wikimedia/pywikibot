@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """
 User assisted updating redirect links on disambiguation pages.
 

@@ -54,6 +54,8 @@ The contents of the package
     | cosmetic_changes.py    | Can do slight modifications to a wiki page source code  |
     |                        | such that the code looks cleaner.                       |
     +------------------------+---------------------------------------------------------+
+    | data_ingestion.py      | A generic bot to do batch uploading to Commons.         |
+    +------------------------+---------------------------------------------------------+
     | delete.py              | This script can be used to delete pages en masse.       |
     +------------------------+---------------------------------------------------------+
     | djvutext.py            | Extracts OCR text from djvu files and uploads onto      |
@@ -123,8 +125,6 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | revertbot.py           | Script that can be used for reverting certain edits.    |
     +------------------------+---------------------------------------------------------+
-    | shell.py               | Spawns an interactive Python shell.                     |
-    +------------------------+---------------------------------------------------------+
     | solve_disambiguation.py| Interactive robot doing disambiguation.                 |
     +------------------------+---------------------------------------------------------+
     | speedy_delete.py       | Help sysops to quickly check and/or delete pages listed |
@@ -145,14 +145,34 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | upload.py              | Upload an image to a wiki.                              |
     +------------------------+---------------------------------------------------------+
-    | version.py             | Outputs Pywikibot's revision number, Python's version   |
-    |                        | and OS used.                                            |
-    +------------------------+---------------------------------------------------------+
     | watchlists.py          | Allows access to the account's watchlist.               |
     +------------------------+---------------------------------------------------------+
     | weblinkchecker.py      | Check if external links are still working.              |
     +------------------------+---------------------------------------------------------+
     | welcome.py             | Script to welcome new users.                            |
+    +------------------------+---------------------------------------------------------+
+
+
+    +------------------------+---------------------------------------------------------+
+    | maintenance            | Framework helper scripts.   .                           |
+    +========================+=========================================================+
+    | cache.py               | Script for showing and deleting API cache.              |
+    +------------------------+---------------------------------------------------------+
+    | colors.py              | Utility to show pywikibot colors.                       |
+    +------------------------+---------------------------------------------------------+
+    | update_script.py       | Helper script to update scripts and replace deprecated  |
+    |                        | code parts.                                             |
+    +------------------------+---------------------------------------------------------+
+    | make_i18n_dict.py      | Generate an i18n file from a given script.              |
+    +------------------------+---------------------------------------------------------+
+    | preload_sites.py       | Preload and cache site information for each WikiMedia   |
+    |                        | family. Usefull for bots running on multiple sites.     |
+    +------------------------+---------------------------------------------------------+
+    | sorting_order.py       | Updates interwiki sorting order in family.py file.      |
+    +------------------------+---------------------------------------------------------+
+    | update_linktrails.py   | Script that updates the linktrails in family.py file.   |
+    +------------------------+---------------------------------------------------------+
+    | wikimedia_sites.py     | Updates the language lists in Wikimedia family files.   |
     +------------------------+---------------------------------------------------------+
 
 
@@ -172,8 +192,6 @@ The contents of the package
     |                        | and your wiki project.                                  |
     +------------------------+---------------------------------------------------------+
     | create_categories.py   | Program to batch create categories.                     |
-    +------------------------+---------------------------------------------------------+
-    | data_ingestion.py      | A generic bot to do batch uploading to Commons.         |
     +------------------------+---------------------------------------------------------+
     | disambredir.py         | Changing redirect names in disambiguation pages.        |
     +------------------------+---------------------------------------------------------+
@@ -240,29 +258,7 @@ The contents of the package
 
 
     +------------------------+---------------------------------------------------------+
-    | maintenance            | Framework helper scripts.                               |
-    +========================+=========================================================+
-    | cache.py               | Script for showing and deleting API cache.              |
-    +------------------------+---------------------------------------------------------+
-    | colors.py              | Utility to show pywikibot colors.                       |
-    +------------------------+---------------------------------------------------------+
-    | update_script.py       | Helper script to update scripts and replace deprecated  |
-    |                        | code parts.                                             |
-    +------------------------+---------------------------------------------------------+
-    | make_i18n_dict.py      | Generate an i18n file from a given script.              |
-    +------------------------+---------------------------------------------------------+
-    | preload_sites.py       | Preload and cache site information for each WM family.  |
-    +------------------------+---------------------------------------------------------+
-    | sorting_order.py       | Updates interwiki sorting order in family.py file.      |
-    +------------------------+---------------------------------------------------------+
-    | update_linktrails.py   | Script that updates the linktrails in family.py file.   |
-    +------------------------+---------------------------------------------------------+
-    | wikimedia_sites.py     | Updates the language lists in Wikimedia family files.   |
-    +------------------------+---------------------------------------------------------+
-
-
-    +----------------------------------------------------------------------------------+
-    | Others                                                                           |
+    | Others                 |                                                         |
     +========================+=========================================================+
     | i18n (folder)          | Contains i18n translations for bot edit summaries.      |
     +------------------------+---------------------------------------------------------+

@@ -1,6 +1,43 @@
 Release history
 ^^^^^^^^^^^^^^^
 
+6.6.5
+-----
+*07 February 2022*
+
+* L10N updates
+
+
+6.6.4
+-----
+*27 January 2022*
+
+* L10N updates
+
+
+6.6.3
+-----
+*01 December 2021*
+
+* L10N updates
+
+
+6.6.2
+-----
+*28 October 2021*
+
+* L10N updates (T292423, T294526, T294527)
+
+
+6.6.1
+-----
+*21 September 2021*
+
+* Fix for removed action API token parameters of MediaWiki 1.37 (T291202)
+* APISite.validate_tokens() no longer replaces outdated tokens (T291202)
+* L10N updates
+
+
 6.6.0
 -----
 *15 September 2021*
@@ -428,7 +465,7 @@ Other changes
 * Only run cosmetic changes on wikitext pages (T260489)
 * Leave a script gracefully for wrong -lang and -family option (T259756)
 * Change meaning of BasePage.text (T260472)
-* site/family methods code2encodings() and code2encoding() has been removed in favour of encoding()/endcodings() methods
+* site/family methods code2encodings() and code2encoding() has been removed in favour of encoding()/encodings() methods
 * Site.getExpandedString() method was removed in favour of expand_text
 * Site.Family() function was removed in favour of Family.load() method
 * Add wikispore family (T260049)
@@ -842,7 +879,6 @@ Other changes
 * Use API's retry-after value (T144023)
 * Provide startprefix parameter for Category.articles() (T74101, T143120)
 * Page.put_async() is marked as deprecated (T193494)
-* pagegenerators.RepeatingGenerator is marked as deprecated (T192229)
 * Deprecate requests-requirements.txt (T193476)
 * Bugfixes and improvements
 * New mediawiki projects were provided

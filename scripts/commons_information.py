@@ -1,7 +1,7 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """Insert a language template into the description field."""
 #
-# (C) Pywikibot team, 2015-2021
+# (C) Pywikibot team, 2015-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -38,7 +38,7 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
 
     def __init__(self, **kwargs):
         """Initialzer."""
-        super(InformationBot, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         lang_tmp_cat = pywikibot.Category(self.site, self.lang_tmp_cat)
         self.lang_tmps = lang_tmp_cat.articles(namespaces=[10])
 
@@ -74,8 +74,8 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
                         'was found, but langdetect thinks {after!r} is the '
                         'most appropriate with a probability of {prob}:'
                         '\03{{default}}\n{text}'
-                        .format(before=tmp_page.title(withNamespace=False),
-                                after=tmp_page2.title(withNamespace=False),
+                        .format(before=tmp_page.title(with_ns=False),
+                                after=tmp_page2.title(with_ns=False),
                                 prob=langs[0].prob,
                                 text=lang_tmp_val))
                     choice = pywikibot.input_choice(
