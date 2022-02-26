@@ -16,6 +16,8 @@ coverage:
   ignore:
     - pywikibot/backports.py
     - pywikibot/daemonize.py
+    - pywikibot/families/__init__.py
+    - scripts/archive/
     - scripts/userscripts/
     - scripts/maintenance/colors.py
     - scripts/maintenance/make_i18n_dict.py
@@ -23,6 +25,7 @@ coverage:
     - scripts/maintenance/sorting_order.py
     - scripts/maintenance/update_linktrails.py
     - scripts/maintenance/wikimedia_sites.py
+    - tests/archive/
     - tests/pwb/
 
   notify:

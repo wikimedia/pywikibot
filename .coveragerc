@@ -9,7 +9,3 @@ exclude_lines =
     if .PYWIKIBOT_TEST_.*. in os.environ:
     @(abc\.)?abstractmethod
     @deprecated\([^\)]+\)
-
-omit = */archive/*
-
-include = */scripts/version.py
