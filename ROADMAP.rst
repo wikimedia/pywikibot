@@ -158,3 +158,4 @@ Deprecations
 * 5.5.0: APISite.redirectRegex() is deprecated in favour of APISite.redirect_regex()
 * 4.0.0: Revision.parent_id is deprecated in favour of Revision.parentid
 * 4.0.0: Revision.content_model is deprecated in favour of Revision.contentmodel
+
