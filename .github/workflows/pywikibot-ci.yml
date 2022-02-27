@@ -117,3 +117,6 @@ jobs:
       run: |
         python pwb.py version
         coverage run -m unittest discover -vv -p \"*_tests.py\"
+
+    - name: Upload coverage to Codecov
+      run: codecov
