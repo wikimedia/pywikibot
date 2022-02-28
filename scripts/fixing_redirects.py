@@ -4,6 +4,8 @@ Correct all redirect links in featured pages or only one page of each wiki.
 
 Can be used with:
 
+-always           The bot won't ask for confirmation when putting a page
+
 -featured         Run over featured pages (for some Wikimedia wikis only)
 
 -overwrite        Usually only the link is changed ([[Foo]] -> [[Bar|Foo]]).
@@ -229,7 +231,7 @@ def main(*args: str) -> None:
     for arg in local_args:
         if arg == '-featured':
             featured = True
-        elif arg in ('-ignoremoves', '-overwrite'):
+        elif arg in ('-always', '-ignoremoves', '-overwrite'):
             options[arg[1:]] = True
         else:
             unknown.append(arg)
