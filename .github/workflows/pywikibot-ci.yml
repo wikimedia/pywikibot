@@ -43,6 +43,7 @@ jobs:
             experimental: true
           - python-version: "3.7"
             site: "wikipedia:test"
+            experimental: true
           - python-version: "3.7"
             site: "wikidata:test"
           - python-version: "3.9"
@@ -56,7 +57,7 @@ jobs:
           - python-version: "3.11.0-alpha - 3.11.0"
             site: "wikipedia:test"
             experimental: true
-          - python-version: 3
+          - python-version: "3"
             site: "wikipedia:de"
             os: macOS-latest
 
@@ -116,10 +117,10 @@ jobs:
         PYWIKIBOT_TEST_PROD_ONLY: ${{ matrix.test_prod_only && 1 || 0 }}
       run: |
         python pwb.py version
-        if [ ${{matrix.site || 0}} == 'wikipedia:test' ]; then
+        if [ ${{matrix.site || 0}} != 'wikipedia:test' ]; then
           coverage run -m unittest discover -vv -p \"*_tests.py\";
         else
-          pytest --addopts="-vvv -s --cov=. -rsxX";
+          pytest --cov=.;
         fi
 
     - name: Upload coverage to Codecov
