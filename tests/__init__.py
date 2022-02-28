@@ -103,6 +103,7 @@ library_test_modules = {
     'interwiki_graph',
     'interwiki_link',
     'interwikimap',
+    'l10n',  # pywikibot-i18n repository runs it too
     'link',
     'linter',
     'logentries',
@@ -171,7 +172,6 @@ script_test_modules = {
 
 disabled_test_modules = {
     'tests',  # tests of the tests package
-    'l10n',  # pywikibot-i18n repository runs it
     'site_login_logout',  # separate Login CI action
 }
 
