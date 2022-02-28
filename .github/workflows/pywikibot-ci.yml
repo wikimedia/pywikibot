@@ -116,7 +116,11 @@ jobs:
         PYWIKIBOT_TEST_PROD_ONLY: ${{ matrix.test_prod_only && 1 || 0 }}
       run: |
         python pwb.py version
-        coverage run -m unittest discover -vv -p \"*_tests.py\"
+        if [ ${{matrix.site || 0}} == 'wikipedia:test' ]; then
+          coverage run -m unittest discover -vv -p \"*_tests.py\";
+        else
+          pytest --addopts="-vvv -s --cov=. -rsxX";
+        fi
 
     - name: Upload coverage to Codecov
       run: codecov
