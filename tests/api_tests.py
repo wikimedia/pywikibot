@@ -7,6 +7,7 @@
 #
 import datetime
 import types
+import unittest
 from collections import defaultdict
 from contextlib import suppress
 from unittest.mock import patch
@@ -23,7 +24,6 @@ from tests.aspects import (
     DefaultDrySiteTestCase,
     DefaultSiteTestCase,
     TestCase,
-    unittest,
 )
 from tests.utils import FakeLoginManager
 

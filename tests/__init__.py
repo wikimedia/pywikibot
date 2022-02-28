@@ -175,6 +175,7 @@ disabled_test_modules = {
     'site_login_logout',  # separate Login CI action
 }
 
+# remove "# pragma: no cover" below if this set is not empty
 disabled_tests = {}  # type: Dict[str, List[str]]
 
 
@@ -236,7 +237,7 @@ def collector(loader=unittest.loader.defaultTestLoader):
 
     for module in modules:
         module_class_name = 'tests.' + module + '_tests'
-        if module in disabled_tests:
+        if module in disabled_tests:  # pragma: no cover
             discovered = loader.loadTestsFromName(module_class_name)
             enabled_tests = []
             for cls in discovered:
