@@ -1,6 +1,6 @@
 """Non-interactive interface that stores output."""
 #
-# (C) Pywikibot team, 2021
+# (C) Pywikibot team, 2021-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,9 +11,6 @@ from typing import Any, Sequence, Union
 from pywikibot import config
 from pywikibot.logging import INFO, VERBOSE
 from pywikibot.userinterfaces._interface_base import ABUIC
-
-
-BAD_BUFFER_TYPE = 'BUG: bufffer can only contain logs and strings, had {}'
 
 
 class UI(ABUIC):
@@ -66,7 +63,9 @@ class UI(ABUIC):
             elif isinstance(record, logging.LogRecord):
                 output.append(record.getMessage())
             else:
-                raise ValueError(BAD_BUFFER_TYPE.format(type(record).__name__))
+                raise ValueError(
+                    'BUG: buffer can only contain logs and strings, had {}'
+                    .format(type(record).__name__))
 
         return output
 
