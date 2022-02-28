@@ -6,6 +6,7 @@ exclude_lines =
     # Have to re-enable the standard pragma
     pragma: no cover
     raise NotImplementedError
+    raise unittest\.SkipTest
     if .PYWIKIBOT_TEST_.*. in os.environ:
     @(abc\.)?abstractmethod
     @deprecated\([^\)]+\)
