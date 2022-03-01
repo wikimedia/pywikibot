@@ -243,7 +243,7 @@ def get_packages(name):  # pragma: no cover
     return [str(name)] + packages
 
 
-def main():
+def main():  # pragma: no cover
     """Setup entry point."""
     version = get_validated_version()
     setup(

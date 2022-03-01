@@ -5,6 +5,10 @@ skip_empty = True
 exclude_lines =
     # Have to re-enable the standard pragma
     pragma: no cover
+    except ImportError
+    except KeyboardInterrupt
+    except pkg_resources
+    except SyntaxError
     raise NotImplementedError
     raise unittest\.SkipTest
     if .PYWIKIBOT_TEST_.*. in os.environ:

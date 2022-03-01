@@ -73,7 +73,7 @@ def check_pwb_versions(package):
     scripts_version = Version(getattr(package, '__version__', pwb.__version__))
     wikibot_version = Version(pwb.__version__)
 
-    if scripts_version.release > wikibot_version.release:
+    if scripts_version.release > wikibot_version.release:  # pragma: no cover
         print('WARNING: Pywikibot version {} is behind scripts package '
               'version {}.\nYour Pywikibot may need an update or be '
               'misconfigured.\n'.format(wikibot_version, scripts_version))
@@ -84,12 +84,12 @@ def check_pwb_versions(package):
                                .format(wikibot_version.minor - 1,
                                        v=wikibot_version))
 
-        if scripts_version.release < prev_wikibot.release:
+        if scripts_version.release < prev_wikibot.release:  # pragma: no cover
             print('WARNING: Scripts package version {} is behind legacy '
                   'Pywikibot version {} and current version {}\nYour scripts '
                   'may need an update or be misconfigured.\n'
                   .format(scripts_version, prev_wikibot, wikibot_version))
-    elif scripts_version.release < wikibot_version.release:
+    elif scripts_version.release < wikibot_version.release:  # pragma: no cover
         print('WARNING: Scripts package version {} is behind current version '
               '{}\nYour scripts may need an update or be misconfigured.\n'
               .format(scripts_version, wikibot_version))
@@ -185,7 +185,7 @@ def handle_args(pwb_py, *args):
     return fname, list(args[index + int(bool(fname)):]), args[:index]
 
 
-def _print_requirements(requirements, script, variant):
+def _print_requirements(requirements, script, variant):  # pragma: no cover
     """Print pip command to install requirements."""
     if not requirements:
         return
@@ -227,7 +227,7 @@ def check_modules(script=None):
         from setup import dependencies
         try:
             next(pkg_resources.parse_requirements(dependencies))
-        except ValueError as e:
+        except ValueError as e:  # pragma: no cover
             # T286980: setuptools is too old and requirement parsing fails
             import setuptools
             setupversion = tuple(int(num)
@@ -259,7 +259,7 @@ def check_modules(script=None):
     _print_requirements(missing_requirements, script, 'missing')
     _print_requirements(version_conflicts, script, 'outdated')
 
-    if version_conflicts and not missing_requirements:
+    if version_conflicts and not missing_requirements:  # pragma: no cover
         print('\nYou may continue on your own risk; type CTRL-C to stop.')
         try:
             sleep(5)
@@ -279,7 +279,7 @@ _pwb_dir = os.path.split(__file__)[0]
 os.environ['PYWIKIBOT_DIR_PWB'] = _pwb_dir
 try:
     import pywikibot as pwb
-except RuntimeError:
+except RuntimeError:  # pragma: no cover
     os.environ['PYWIKIBOT_NO_USER_CONFIG'] = '2'
     import pywikibot as pwb
 
@@ -350,7 +350,7 @@ def find_alternates(filename, script_paths):
                                           alternatives, default='1')
         except QuitKeyboardInterrupt:
             return None
-        print()
+        print()  # pragma: no cover
     return str(scripts[script])
 
 
@@ -374,7 +374,7 @@ def find_filename(filename):
             path_list.append(package)
         return None
 
-    if site_package:
+    if site_package:  # pragma: no cover
         script_paths = [_pwb_dir]
     else:
         script_paths = [
@@ -385,7 +385,7 @@ def find_filename(filename):
         ]
 
     user_script_paths = []
-    if config.user_script_paths:
+    if config.user_script_paths:  # pragma: no cover
         if isinstance(config.user_script_paths, list):
             user_script_paths = config.user_script_paths
         else:
@@ -394,7 +394,7 @@ def find_filename(filename):
                  .format(type(config.user_script_paths)))
 
     found = test_paths(user_script_paths, config.base_dir)
-    if found:
+    if found:  # pragma: no cover
         return found
 
     found = test_paths(script_paths, _pwb_dir)
@@ -414,7 +414,7 @@ def execute():
 
     if global_args:  # don't use sys.argv
         unknown_args = pwb.handle_args(global_args)
-        if unknown_args:
+        if unknown_args:  # pragma: no cover
             print('ERROR: unknown pwb.py argument{}: {}\n'
                   .format('' if len(unknown_args) == 1 else 's',
                           ', '.join(unknown_args)))
@@ -471,16 +471,17 @@ def main():
        previous implementation was renamed to :func:`execute`
     """
     try:
-        if not check_modules():
+        if not check_modules():  # pragma: no cover
             raise RuntimeError('')  # no further output needed
-    except RuntimeError as e:  # setup.py may also raise RuntimeError
+    # setup.py may also raise RuntimeError
+    except RuntimeError as e:  # pragma: no cover
         sys.exit(e)
 
     if not execute():
         print(__doc__)
 
 
-def run():
+def run():  # pragma: no cover
     """Site package entry point. Print doc if necessary.
 
     .. versionadded:: 7.0
