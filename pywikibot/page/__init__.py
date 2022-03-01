@@ -30,9 +30,10 @@ from urllib.parse import quote_from_bytes
 from warnings import warn
 
 import pywikibot
-from pywikibot import config, i18n, textlib
+from pywikibot import config, date, i18n, textlib
 from pywikibot.backports import Dict, Generator, Iterable, List, Tuple
 from pywikibot.comms import http
+from pywikibot.cosmetic_changes import CANCEL, CosmeticChangesToolkit
 from pywikibot.exceptions import (
     APIError,
     AutoblockUserError,
@@ -405,7 +406,6 @@ class BasePage(ComparableMixin):
         same names. Regular titles return (None, None).
         """
         if not hasattr(self, '_autoFormat'):
-            from pywikibot import date
             self._autoFormat = date.getAutoFormat(
                 self.site.lang,
                 self.title(with_ns=False)
@@ -1266,7 +1266,6 @@ class BasePage(ComparableMixin):
         pywikibot.log('Cosmetic changes for {}-{} enabled.'
                       .format(family, self.site.lang))
         # cc depends on page directly and via several other imports
-        from pywikibot.cosmetic_changes import CANCEL, CosmeticChangesToolkit
         cc_toolkit = CosmeticChangesToolkit(self, ignore=CANCEL.MATCH)
         self.text = cc_toolkit.change(old)
 
