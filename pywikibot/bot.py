@@ -85,7 +85,6 @@ __all__ = (
     'WikidataBot',
 )
 
-
 import atexit
 import codecs
 import configparser
@@ -177,6 +176,7 @@ from pywikibot.tools import (
     PYTHON_VERSION,
     deprecated,
     issue_deprecation_warning,
+    strtobool,
 )
 from pywikibot.tools._logging import LoggingFormatter
 from pywikibot.tools.formatter import color_format
@@ -248,9 +248,13 @@ GLOBAL OPTIONS
 -verbose          Have the bot provide additional console output that may be
 -v                useful in debugging.
 
--cosmeticchanges  Toggles the cosmetic_changes setting made in config.py or
--cc               user-config.py to its inverse and overrules it. All other
-                  settings and restrictions are untouched.
+-cosmeticchanges  Toggles the cosmetic_changes setting made in config.py
+-cc               or user-config.py to its inverse and overrules it. All
+                  other settings and restrictions are untouched. The
+                  setting may also be given directly like `-cc:True`;
+                  accepted values for the option are `1`, `yes`, `true`,
+                  `on`, `y`, `t` for True and `0`, `no`, `false`, `off`,
+                  `n`, `f` for False. Values are case-insensitive.
 
 -simulate         Disables writing to the server. Useful for testing and
                   debugging of new code (if given, doesn't do any real
@@ -899,7 +903,8 @@ def handle_args(args: Optional[Iterable[str]] = None,
         elif option == '-nolog':
             config.log = []
         elif option in ('-cosmeticchanges', '-cc'):
-            config.cosmetic_changes = not config.cosmetic_changes
+            config.cosmetic_changes = (strtobool(value) if value
+                                       else not config.cosmetic_changes)
             output('NOTE: option cosmetic_changes is {}\n'
                    .format(config.cosmetic_changes))
         elif option == '-simulate':

@@ -892,6 +892,38 @@ class TestHasModule(TestCase):
         self.assertFalse(has_module('setuptools', '99999'))
 
 
+class TestStringFunctions(TestCase):
+
+    """Unit test class for string functions."""
+
+    net = False
+
+    def test_first_lower(self):
+        """Test first_lower function."""
+        self.assertEqual(tools.first_lower('Foo Bar'), 'foo Bar')
+        self.assertEqual(tools.first_lower('FOO BAR'), 'fOO BAR')
+        self.assertEqual(tools.first_lower(''), '')
+
+    def test_first_upper(self):
+        """Test first_upper function."""
+        self.assertEqual(tools.first_upper('foo bar'), 'Foo bar')
+        self.assertEqual(tools.first_upper('foo BAR'), 'Foo BAR')
+        self.assertEqual(tools.first_upper(''), '')
+        self.assertEqual(tools.first_upper('ß'), 'ß')
+        self.assertNotEqual(tools.first_upper('ß'), str.upper('ß'))
+
+    def test_strtobool(self):
+        """Test strtobool function."""
+        for string in ('True', 'TRUE', 'true', 'T', 'Yes', 'y', 'on', '1'):
+            with self.subTest(truth=string):
+                self.assertTrue(tools.strtobool(string))
+        for string in ('False', 'F', 'No', 'n', 'oFF', '0'):
+            with self.subTest(falsity=string):
+                self.assertFalse(tools.strtobool(string))
+        with self.assertRaises(ValueError):
+            tools.strtobool('okay')
+
+
 if __name__ == '__main__':  # pragma: no cover
     with suppress(SystemExit):
         unittest.main()
