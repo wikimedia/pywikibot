@@ -260,17 +260,18 @@ class DataIngestionBot(pywikibot.Bot):
         :param configuration_page: page with configuration
         :type configuration_page: :py:obj:`pywikibot.Page`
         """
-        configuration = {}
         # Set a bunch of defaults
-        configuration['csvDialect'] = 'excel'
-        configuration['csvDelimiter'] = ';'
-        configuration['csvEncoding'] = 'Windows-1252'  # FIXME: Encoding hell
+        configuration = {
+            'csvDialect': 'excel',
+            'csvDelimiter': ';',
+            'csvEncoding': 'Windows-1252',  # FIXME: Encoding hell
+        }
 
         templates = configuration_page.templatesWithParams()
         for (template, params) in templates:
             if template.title(with_ns=False) == 'Data ingestion':
                 for param in params:
-                    (field, sep, value) = param.partition('=')
+                    field, _, value = param.partition('=')
 
                     # Remove leading or trailing spaces
                     field = field.strip()
