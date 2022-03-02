@@ -1,6 +1,6 @@
 """Base for terminal user interfaces."""
 #
-# (C) Pywikibot team, 2003-2021
+# (C) Pywikibot team, 2003-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -50,8 +50,8 @@ colors = [
 ]
 
 _color_pat = '{}|previous'.format('|'.join(colors))
-colorTagR = re.compile('\03{{((:?{});?(:?{})?)}}'.format(_color_pat,
-                                                         _color_pat))
+colorTagR = re.compile('\03{{((:?{cpat});?(:?{cpat})?)}}'
+                       .format(cpat=_color_pat))
 
 
 class UI(ABUIC):
