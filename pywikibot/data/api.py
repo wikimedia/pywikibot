@@ -835,7 +835,7 @@ class OptionSet(MutableMapping):
         """Remove the item by setting it to None."""
         self[name] = None
 
-    def __contains__(self, name):
+    def __contains__(self, name) -> bool:
         """Return True if option has been set."""
         return name in self._enabled or name in self._disabled
 
@@ -850,7 +850,7 @@ class OptionSet(MutableMapping):
         for disabled in self._disabled:
             yield '!{}'.format(disabled)
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Return the number of enabled and disabled options."""
         return len(self._enabled) + len(self._disabled)
 
@@ -921,7 +921,7 @@ class Request(MutableMapping):
                  max_retries: Optional[int] = None,
                  retry_wait: Optional[int] = None,
                  use_get: Optional[bool] = None,
-                 parameters=_PARAM_DEFAULT, **kwargs):
+                 parameters=_PARAM_DEFAULT, **kwargs) -> None:
         """
         Create a new Request instance with the given parameters.
 
@@ -1186,7 +1186,7 @@ class Request(MutableMapping):
         """Implement dict interface."""
         return list(self._params.keys())
 
-    def __contains__(self, key):
+    def __contains__(self, key) -> bool:
         """Implement dict interface."""
         return key in self._params
 
@@ -1194,7 +1194,7 @@ class Request(MutableMapping):
         """Implement dict interface."""
         return iter(self._params)
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Implement dict interface."""
         return len(self._params)
 
@@ -1318,13 +1318,13 @@ class Request(MutableMapping):
         """
         return encode_url(self._encoded_items())
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return a string representation."""
         return unquote(self.site.scriptpath()
                        + '/api.php?'
                        + self._http_param_string())
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return internal representation."""
         return '{}.{}<{}->{!r}>'.format(self.__class__.__module__,
                                         self.__class__.__name__,
@@ -2203,7 +2203,7 @@ class QueryGenerator(_RequestWrapper):
     # set_namespace call. Only to be used by _check_result_namespace.
     _namespaces = None
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         """
         Initialize a QueryGenerator object.
 

@@ -203,7 +203,7 @@ class BaseSite(ComparableMixin):
             raise AttributeError("{} instance has no attribute '{}'"
                                  .format(self.__class__.__name__, attr))
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return string representing this Site's name and code."""
         return self.family.name + ':' + self.code
 
@@ -212,7 +212,7 @@ class BaseSite(ComparableMixin):
         """String representing this Site's name and code."""
         return SelfCallString(self.__str__())
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return internal representation."""
         return '{}("{}", "{}")'.format(
             self.__class__.__name__, self.code, self.family)

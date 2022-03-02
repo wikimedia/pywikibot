@@ -314,7 +314,7 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
         },
     }
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         """Initializer.
 
         :keyword site: the site to work on

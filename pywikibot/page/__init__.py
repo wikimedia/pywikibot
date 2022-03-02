@@ -135,7 +135,7 @@ class BasePage(ComparableMixin):
         '_pageimage', '_item', '_lintinfo',
     )
 
-    def __init__(self, source, title='', ns=0):
+    def __init__(self, source, title='', ns=0) -> None:
         """
         Instantiate a Page object.
 
@@ -2080,7 +2080,7 @@ class Page(BasePage):
 
     """Page: A MediaWiki page."""
 
-    def __init__(self, source, title: str = '', ns=0):
+    def __init__(self, source, title: str = '', ns=0) -> None:
         """Instantiate a Page object."""
         if isinstance(source, pywikibot.site.BaseSite):
             if not title:
@@ -2280,7 +2280,7 @@ class FilePage(Page):
     Supports the same interface as Page, with some added methods.
     """
 
-    def __init__(self, source, title: str = ''):
+    def __init__(self, source, title: str = '') -> None:
         """Initializer."""
         self._file_revisions = {}  # dictionary to cache File history.
         super().__init__(source, title, 6)
@@ -2545,7 +2545,7 @@ class Category(Page):
 
     """A page in the Category: namespace."""
 
-    def __init__(self, source, title: str = '', sort_key=None):
+    def __init__(self, source, title: str = '', sort_key=None) -> None:
         """
         Initializer.
 
@@ -2841,7 +2841,7 @@ class User(Page):
     This class also represents the Wiki page User:<username>
     """
 
-    def __init__(self, source, title=''):
+    def __init__(self, source, title='') -> None:
         """
         Initializer for a User object.
 
@@ -3262,7 +3262,7 @@ class WikibaseEntity:
 
     DATA_ATTRIBUTES = {}  # type: Dict[str, Any]
 
-    def __init__(self, repo, id_=None):
+    def __init__(self, repo, id_=None) -> None:
         """
         Initializer.
 
@@ -3278,7 +3278,7 @@ class WikibaseEntity:
                 "'{}' is not a valid {} page title"
                 .format(self.id, self.entity_type))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         if self.id != '-1':
             return 'pywikibot.page.{}({!r}, {!r})'.format(
                 self.__class__.__name__, self.repo, self.id)
@@ -3574,7 +3574,7 @@ class WikibasePage(BasePage, WikibaseEntity):
 
     _cache_attrs = BasePage._cache_attrs + ('_content', )
 
-    def __init__(self, site, title='', **kwargs):
+    def __init__(self, site, title='', **kwargs) -> None:
         """
         Initializer.
 
@@ -3900,7 +3900,7 @@ class ItemPage(WikibasePage):
         'sitelinks': SiteLinkCollection,
     }
 
-    def __init__(self, site, title=None, ns=None):
+    def __init__(self, site, title=None, ns=None) -> None:
         """
         Initializer.
 
@@ -4365,7 +4365,7 @@ class PropertyPage(WikibasePage, Property):
         'claims': ClaimCollection,
     }
 
-    def __init__(self, source, title=None, datatype=None):
+    def __init__(self, source, title=None, datatype=None) -> None:
         """
         Initializer.
 
@@ -4471,7 +4471,7 @@ class Claim(Property):
     SNAK_TYPES = ('value', 'somevalue', 'novalue')
 
     def __init__(self, site, pid, snak=None, hash=None, is_reference=False,
-                 is_qualifier=False, rank='normal', **kwargs):
+                 is_qualifier=False, rank='normal', **kwargs) -> None:
         """
         Initializer.
 
@@ -4516,7 +4516,7 @@ class Claim(Property):
                 for source in values:
                     source.on_item = item
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return the representation string."""
         return '{cls_name}.fromJSON({}, {})'.format(
             repr(self.repo), self.toJSON(), cls_name=type(self).__name__)
@@ -5033,7 +5033,7 @@ class FileInfo:
         """Give access to class values by key."""
         return getattr(self, key)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return a more complete string representation."""
         return repr(self.__dict__)
 
@@ -5087,7 +5087,7 @@ class BaseLink(ComparableMixin):
         else:
             self._sitekey = site
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return a more complete string representation."""
         assert isinstance(self._items, tuple)
         assert all(isinstance(item, (bytes, str)) for item in self._items)
@@ -5270,7 +5270,7 @@ class Link(BaseLink):
         '|&#x[0-9A-Fa-f]+;'
     )
 
-    def __init__(self, text, source=None, default_namespace=0):
+    def __init__(self, text, source=None, default_namespace=0) -> None:
         """
         Initializer.
 

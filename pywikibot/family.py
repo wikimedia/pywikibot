@@ -920,10 +920,10 @@ class Family:
     def __hash__(self):
         return hash(self.name)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return 'Family("{}")'.format(self.name)
 
     def shared_image_repository(self, code):

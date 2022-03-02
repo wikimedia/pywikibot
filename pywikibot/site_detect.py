@@ -30,7 +30,7 @@ class MWSite:
 
     """Minimal wiki site class."""
 
-    def __init__(self, fromurl, **kwargs):
+    def __init__(self, fromurl, **kwargs) -> None:
         """
         Initializer.
 
@@ -90,7 +90,7 @@ class MWSite:
                 raise RuntimeError('Unable to determine articlepath: '
                                    '{}'.format(self.fromurl))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '{}("{}")'.format(
             self.__class__.__name__, self.fromurl)
 

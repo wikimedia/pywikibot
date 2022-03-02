@@ -31,7 +31,7 @@ class SparqlQuery:
                  endpoint: Optional[str] = None,
                  entity_url: Optional[str] = None, repo=None,
                  max_retries: Optional[int] = None,
-                 retry_wait: Optional[float] = None):
+                 retry_wait: Optional[float] = None) -> None:
         """
         Create endpoint.
 
@@ -208,7 +208,7 @@ class SparqlNode:
         """Create a SparqlNode."""
         self.value = value
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.value
 
 
@@ -231,7 +231,7 @@ class URI(SparqlNode):
             return self.value[urllen:]
         return None
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '<' + self.value + '>'
 
 
@@ -244,7 +244,7 @@ class Literal(SparqlNode):
         self.type = data.get('datatype')
         self.language = data.get('xml:lang')
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         if self.type:
             return self.value + '^^' + self.type
         if self.language:
@@ -259,7 +259,7 @@ class Bnode(SparqlNode):
         """Create Bnode."""
         super().__init__(data.get('value'))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '_:' + self.value
 
 

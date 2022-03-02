@@ -801,7 +801,7 @@ class WbMonolingualText(_WbRepresentation):
 
     _items = ('text', 'language')
 
-    def __init__(self, text: str, language: str):
+    def __init__(self, text: str, language: str) -> None:
         """
         Create a new WbMonolingualText object.
 

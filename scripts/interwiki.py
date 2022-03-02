@@ -2081,7 +2081,7 @@ class InterwikiBot:
         while not self.isDone():
             self.queryStep()
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Return length of subjects."""
         return len(self.subjects)
 

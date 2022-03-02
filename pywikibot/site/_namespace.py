@@ -159,7 +159,7 @@ class Namespace(Iterable, ComparableMixin):
         """
         return True
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Obtain length of the iterable."""
         return len(self._distinct())
 
@@ -187,7 +187,7 @@ class Namespace(Iterable, ComparableMixin):
 
         return name + ':'
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return the canonical string representation."""
         return self.canonical_prefix()
 
@@ -199,11 +199,11 @@ class Namespace(Iterable, ComparableMixin):
         """Return the custom name with required colons."""
         return Namespace._colons(self.id, self.custom_name)
 
-    def __int__(self):
+    def __int__(self) -> int:
         """Return the namespace id."""
         return self.id
 
-    def __index__(self):
+    def __index__(self) -> int:
         """Return the namespace id."""
         return self.id
 
@@ -244,7 +244,7 @@ class Namespace(Iterable, ComparableMixin):
         """Return the ID as a comparison key."""
         return self.id
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return a reconstructable representation."""
         standard_attr = ['id', 'custom_name', 'canonical_name', 'aliases']
         extra = [(key, self.__dict__[key])
@@ -372,7 +372,7 @@ class NamespacesDict(Mapping, SelfCallMixin):
 
         return self.__getattribute__(attr)
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Get the number of namespaces."""
         return len(self._namespaces)
 

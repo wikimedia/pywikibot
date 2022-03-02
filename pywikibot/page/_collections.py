@@ -55,14 +55,14 @@ class BaseDataDict(MutableMapping):
     def __iter__(self):
         return iter(self._data)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._data)
 
-    def __contains__(self, key):
+    def __contains__(self, key) -> bool:
         key = self.normalizeKey(key)
         return key in self._data
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '{}({})'.format(type(self), self._data)
 
     @staticmethod
@@ -222,13 +222,13 @@ class ClaimCollection(MutableMapping):
     def __iter__(self):
         return iter(self._data)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._data)
 
-    def __contains__(self, key):
+    def __contains__(self, key) -> bool:
         return key in self._data
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '{}({})'.format(type(self), self._data)
 
     @classmethod
@@ -384,10 +384,10 @@ class SiteLinkCollection(MutableMapping):
     def __iter__(self):
         return iter(self._data)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._data)
 
-    def __contains__(self, key):
+    def __contains__(self, key) -> bool:
         key = self.getdbName(key)
         return key in self._data
 

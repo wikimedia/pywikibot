@@ -536,7 +536,13 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
         about the missing site
     """
 
-    def __init__(self, generator, replacements, exceptions=None, **kwargs):
+    def __init__(
+        self,
+        generator,
+        replacements,
+        exceptions=None,
+        **kwargs
+    ) -> None:
         """Initializer."""
         self.available_options.update({
             'addcat': None,

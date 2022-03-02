@@ -80,7 +80,7 @@ class UnusedFilesBot(SingleSiteBot,
         'usertemplate': '',
     }
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         """Initializer."""
         super().__init__(**kwargs)
 

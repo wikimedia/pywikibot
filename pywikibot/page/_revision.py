@@ -79,11 +79,11 @@ class Revision(Mapping):
         """Provide Revision data as iterator."""
         return iter(self._data)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """String representation of Revision."""
         return '{}({})'.format(self.__class__.__name__, self._data)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Printable representation of Revision data."""
         return str(self._data)
 

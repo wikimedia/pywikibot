@@ -44,7 +44,7 @@ class UploadRobot(BaseBot):
                  summary: Optional[str] = None,
                  filename_prefix: Optional[str] = None,
                  force_if_shared: bool = False,
-                 **kwargs):
+                 **kwargs) -> None:
         """Initializer.
 
         .. versionchanged:: 6.2

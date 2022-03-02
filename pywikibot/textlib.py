@@ -1842,7 +1842,7 @@ class tzoneFixedOffset(datetime.tzinfo):
         """Return no daylight savings time."""
         return datetime.timedelta(0)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return the internal representation of the timezone."""
         return '{}({}, {})'.format(
             self.__class__.__name__,

@@ -22,7 +22,8 @@ from contextlib import suppress
 from functools import total_ordering, wraps
 from importlib import import_module
 from itertools import chain, zip_longest
-from typing import Any, Optional
+from types import TracebackType
+from typing import Any, Optional, Type
 from warnings import catch_warnings, showwarning, warn
 
 import pkg_resources
@@ -176,7 +177,12 @@ class suppress_warnings(catch_warnings):  # noqa: N801
         """Catch all warnings and store them in `self.log`."""
         self.log = super().__enter__()
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType]
+    ) -> None:
         """Stop logging warnings and show those that do not match to params."""
         super().__exit__(exc_type, exc_val, exc_tb)
         for warning in self.log:
@@ -562,7 +568,7 @@ class RLock:
         """Delegate attributes and methods to self._lock."""
         return getattr(self._lock, name)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Representation of tools.RLock instance."""
         return repr(self._lock).replace(
             '_thread.RLock',
@@ -609,7 +615,7 @@ class ThreadedGenerator(threading.Thread):
     """
 
     def __init__(self, group=None, target=None, name='GeneratorThread',
-                 args=(), kwargs=None, qsize=65536):
+                 args=(), kwargs=None, qsize=65536) -> None:
         """Initializer. Takes same keyword arguments as threading.Thread.
 
         target must be a generator function (or other callable that returns
@@ -748,7 +754,7 @@ class ThreadList(list):
 
     _logger = 'threadlist'
 
-    def __init__(self, limit=128, wait_time=2, *args):
+    def __init__(self, limit=128, wait_time=2, *args) -> None:
         """Initializer.
 
         :param limit: the number of simultaneous threads
@@ -1095,7 +1101,7 @@ class DequeGenerator(Iterator, collections.deque):
             return self.popleft()
         raise StopIteration
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Provide an object representation without clearing the content."""
         items = list(self)
         result = '{}({})'.format(self.__class__.__name__, items)
