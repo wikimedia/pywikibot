@@ -120,7 +120,7 @@ class Photo(pywikibot.FilePage):
     """Represents a Photo (or other file), with metadata, to be uploaded."""
 
     def __init__(self, url: str, metadata: Dict[str, Any],
-                 site: Optional[pywikibot.site.APISite] = None):
+                 site: Optional[pywikibot.site.APISite] = None) -> None:
         """
         Initializer.
 
@@ -216,7 +216,7 @@ class DataIngestionBot(pywikibot.Bot):
 
     """Data ingestion bot."""
 
-    def __init__(self, titlefmt: str, pagefmt: str, **kwargs):
+    def __init__(self, titlefmt: str, pagefmt: str, **kwargs) -> None:
         """
         Initializer.
 
@@ -227,7 +227,7 @@ class DataIngestionBot(pywikibot.Bot):
         self.titlefmt = titlefmt
         self.pagefmt = pagefmt
 
-    def treat(self, page):
+    def treat(self, page) -> None:
         """Process each page.
 
         1. Check for existing duplicates on the wiki specified in self.site.
@@ -282,7 +282,7 @@ class DataIngestionBot(pywikibot.Bot):
         return configuration
 
 
-def main(*args: str):
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 

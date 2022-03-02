@@ -15,7 +15,7 @@ class TokenWallet:
 
     """Container for tokens."""
 
-    def __init__(self, site):
+    def __init__(self, site) -> None:
         """Initializer.
 
         :type site: pywikibot.site.APISite
@@ -24,7 +24,7 @@ class TokenWallet:
         self._tokens = {}
         self.failed_cache = set()  # cache unavailable tokens.
 
-    def load_tokens(self, types, all=False):
+    def load_tokens(self, types, all=False) -> None:
         """
         Preload one or multiple tokens.
 

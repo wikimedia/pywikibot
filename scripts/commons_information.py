@@ -36,7 +36,7 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
                'appropriate language template')
     }
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         """Initialzer."""
         super().__init__(**kwargs)
         lang_tmp_cat = pywikibot.Category(self.site, self.lang_tmp_cat)
@@ -95,7 +95,7 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
         return False
 
     @staticmethod
-    def replace_value(param, value):
+    def replace_value(param, value) -> None:
         """Replace param with given value."""
         lstrip = param.value.lstrip()
         lspaces = param.value[:len(param.value) - len(lstrip)]
@@ -107,7 +107,7 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
         if isinstance(mwparserfromhell, Exception):
             raise mwparserfromhell
 
-    def treat_page(self):
+    def treat_page(self) -> None:
         """Treat current page."""
         page = self.current_page
         code = mwparserfromhell.parse(page.text)

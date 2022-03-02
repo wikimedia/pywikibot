@@ -88,7 +88,7 @@ class Namespace(Iterable, ComparableMixin):
                  canonical_name: Optional[str] = None,
                  custom_name: Optional[str] = None,
                  aliases: Optional[List[str]] = None,
-                 **kwargs):
+                 **kwargs) -> None:
         """Initializer.
 
         :param canonical_name: Canonical name
@@ -323,7 +323,7 @@ class NamespacesDict(Mapping, SelfCallMixin):
     APISite was callable.
     """
 
-    def __init__(self, namespaces):
+    def __init__(self, namespaces) -> None:
         """Create new dict using the given namespaces."""
         super().__init__()
         self._namespaces = namespaces

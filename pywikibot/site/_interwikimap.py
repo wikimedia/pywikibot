@@ -12,7 +12,7 @@ class _IWEntry:
 
     """An entry of the _InterwikiMap with a lazy loading site."""
 
-    def __init__(self, local, url, prefix=None):
+    def __init__(self, local, url, prefix=None) -> None:
         self._site = None
         self.local = local
         self.url = url
@@ -33,7 +33,7 @@ class _InterwikiMap:
 
     """A representation of the interwiki map of a site."""
 
-    def __init__(self, site):
+    def __init__(self, site) -> None:
         """
         Create an empty uninitialized interwiki map for the given site.
 
@@ -44,7 +44,7 @@ class _InterwikiMap:
         self._site = site
         self._map = None
 
-    def reset(self):
+    def reset(self) -> None:
         """Remove all mappings to force building a new mapping."""
         self._map = None
 

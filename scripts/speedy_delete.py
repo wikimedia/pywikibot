@@ -394,11 +394,11 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
 
         return reason or suggested_reason
 
-    def exit(self):
+    def exit(self) -> None:
         """Just call teardown after current run."""
         self.teardown()
 
-    def run(self):
+    def run(self) -> None:
         """Start the bot's action."""
         start_ts = pywikibot.Timestamp.now()
         self.saved_progress = None
@@ -420,7 +420,7 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
         self._start_ts = start_ts
         super().exit()
 
-    def treat_page(self):
+    def treat_page(self) -> None:
         """Process one page."""
         page = self.current_page
 
@@ -464,7 +464,7 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
         else:
             pywikibot.output('Skipping page {}'.format(page))
 
-    def setup(self):
+    def setup(self) -> None:
         """Refresh generator."""
         generator = pagegenerators.CategorizedPageGenerator(
             self.csd_cat, start=self.saved_progress)

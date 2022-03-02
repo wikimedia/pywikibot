@@ -24,7 +24,7 @@ class EditReplacementError(ChoiceException, UnhandledAnswer):
 
     """The text should be edited and replacement should be restarted."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initializer."""
         super().__init__('edit', 'e')
         self.stop = True
@@ -34,7 +34,7 @@ class InteractiveUnlink(InteractiveReplace):
 
     """An implementation which just allows unlinking."""
 
-    def __init__(self, bot):
+    def __init__(self, bot) -> None:
         """Create default settings."""
         super().__init__(old_link=bot.pageToUnlink,
                          new_link=False, default='u')
@@ -58,7 +58,7 @@ class BaseUnlinkBot(ExistingPageBot, NoRedirectPageBot, AutomaticTWSummaryBot):
 
     """A basic bot unlinking a given link from the current page."""
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         """Redirect all parameters and add namespace as an available option."""
         self.available_options.update({
             'namespaces': [],
@@ -71,7 +71,7 @@ class BaseUnlinkBot(ExistingPageBot, NoRedirectPageBot, AutomaticTWSummaryBot):
         """Create a new callback instance for replace_links."""
         return InteractiveUnlink(self)
 
-    def unlink(self, target_page):
+    def unlink(self, target_page) -> None:
         """Unlink all links linking to the target page."""
         text = self.current_page.text
         while True:

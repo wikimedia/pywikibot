@@ -41,7 +41,7 @@ def get(site=None):
     return watchlist
 
 
-def count_watchlist(site=None):
+def count_watchlist(site=None) -> None:
     """Count only the total number of page(s) in watchlist for this wiki."""
     if site is None:
         site = pywikibot.Site()
@@ -50,7 +50,7 @@ def count_watchlist(site=None):
                      .format(watchlist_count))
 
 
-def count_watchlist_all():
+def count_watchlist_all() -> None:
     """Count only the total number of page(s) in watchlist for all wikis."""
     wl_count_all = 0
     pywikibot.output('Counting pages in watchlists of all wikis...')
@@ -74,7 +74,7 @@ def refresh(site):
     return list(site.watched_pages(force=True))
 
 
-def refresh_all():
+def refresh_all() -> None:
     """Reload watchlists for all wikis where a watchlist is already present."""
     cache_path = CachedRequest._get_cache_dir()
     files = os.scandir(cache_path)
@@ -89,7 +89,7 @@ def refresh_all():
             seen.add(entry.site)
 
 
-def refresh_new():
+def refresh_new() -> None:
     """Load watchlists of all wikis for accounts set in user-config.py."""
     pywikibot.output(
         'Downloading all watchlists for your accounts in user-config.py')

@@ -204,7 +204,7 @@ class SparqlQuery:
 class SparqlNode:
     """Base class for SPARQL nodes."""
 
-    def __init__(self, value):
+    def __init__(self, value) -> None:
         """Create a SparqlNode."""
         self.value = value
 
@@ -215,7 +215,7 @@ class SparqlNode:
 class URI(SparqlNode):
     """Representation of URI result type."""
 
-    def __init__(self, data: dict, entity_url, **kwargs):
+    def __init__(self, data: dict, entity_url, **kwargs) -> None:
         """Create URI object."""
         super().__init__(data.get('value'))
         self.entity_url = entity_url
@@ -238,7 +238,7 @@ class URI(SparqlNode):
 class Literal(SparqlNode):
     """Representation of RDF literal result type."""
 
-    def __init__(self, data: dict, **kwargs):
+    def __init__(self, data: dict, **kwargs) -> None:
         """Create Literal object."""
         super().__init__(data.get('value'))
         self.type = data.get('datatype')
@@ -255,7 +255,7 @@ class Literal(SparqlNode):
 class Bnode(SparqlNode):
     """Representation of blank node."""
 
-    def __init__(self, data: dict, **kwargs):
+    def __init__(self, data: dict, **kwargs) -> None:
         """Create Bnode."""
         super().__init__(data.get('value'))
 

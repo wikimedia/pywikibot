@@ -187,7 +187,7 @@ class MultiTemplateMatchBuilder:
 
     """Build template matcher."""
 
-    def __init__(self, site):
+    def __init__(self, site) -> None:
         """Initializer."""
         self.site = site
 
@@ -247,7 +247,7 @@ def _tag_regex(tag_name: str):
     return re.compile(_tag_pattern(tag_name))
 
 
-def _create_default_regexes():
+def _create_default_regexes() -> None:
     """Fill (and possibly overwrite) _regex_cache with default regexes."""
     _regex_cache.update({
         # categories
@@ -539,22 +539,22 @@ class _GetDataHTML(HTMLParser):
     textdata = ''
     keeptags = []
 
-    def __enter__(self):
+    def __enter__(self) -> None:
         pass
 
-    def __exit__(self, *exc_info):
+    def __exit__(self, *exc_info) -> None:
         self.close()
 
-    def handle_data(self, data):
+    def handle_data(self, data) -> None:
         """Add data to text."""
         self.textdata += data
 
-    def handle_starttag(self, tag, attrs):
+    def handle_starttag(self, tag, attrs) -> None:
         """Add start tag to text if tag should be kept."""
         if tag in self.keeptags:
             self.textdata += '<{}>'.format(tag)
 
-    def handle_endtag(self, tag):
+    def handle_endtag(self, tag) -> None:
         """Add end tag to text if tag should be kept."""
         if tag in self.keeptags:
             self.textdata += '</{}>'.format(tag)
@@ -1825,7 +1825,7 @@ class tzoneFixedOffset(datetime.tzinfo):
     :param name: a string with name of the timezone
     """
 
-    def __init__(self, offset: int, name: str):
+    def __init__(self, offset: int, name: str) -> None:
         """Initializer."""
         self.__offset = datetime.timedelta(minutes=offset)
         self.__name = name
@@ -1855,7 +1855,7 @@ class TimeStripper:
 
     """Find timestamp in page and return it as pywikibot.Timestamp object."""
 
-    def __init__(self, site=None):
+    def __init__(self, site=None) -> None:
         """Initializer."""
         self.site = pywikibot.Site() if site is None else site
 

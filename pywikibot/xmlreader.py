@@ -49,7 +49,7 @@ class XmlEntry:
 
     def __init__(self, title, ns, id, text, username, ipedit, timestamp,
                  editRestriction, moveRestriction, revisionid, comment,
-                 redirect):
+                 redirect) -> None:
         """Initializer."""
         # TODO: there are more tags we can read.
         self.title = title
@@ -78,13 +78,13 @@ class XmlParserThread(threading.Thread):
     There surely are more elegant ways to do this.
     """
 
-    def __init__(self, filename, handler):
+    def __init__(self, filename, handler) -> None:
         """Initializer."""
         super().__init__()
         self.filename = filename
         self.handler = handler
 
-    def run(self):
+    def run(self) -> None:
         """Parse the file in a single thread."""
         xml.sax.parse(self.filename, self.handler)
 
@@ -102,7 +102,7 @@ class XmlDump:
         Default: False.
     """
 
-    def __init__(self, filename, allrevisions=False):
+    def __init__(self, filename, allrevisions=False) -> None:
         """Initializer."""
         self.filename = filename
         if allrevisions:
@@ -143,7 +143,7 @@ class XmlDump:
             elem.clear()
             self.root.clear()
 
-    def _headers(self, elem):
+    def _headers(self, elem) -> None:
         """Extract headers from XML chunk."""
         self.title = elem.findtext('{%s}title' % self.uri)
         self.ns = elem.findtext('{%s}ns' % self.uri)

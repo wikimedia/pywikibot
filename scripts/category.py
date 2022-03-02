@@ -188,7 +188,7 @@ class CategoryPreprocess(BaseBot):
     """A class to prepare a list of pages for robots."""
 
     def __init__(self, follow_redirects=False, edit_redirects=False,
-                 create=False, **kwargs):
+                 create=False, **kwargs) -> None:
         """Initializer."""
         super().__init__(**kwargs)
         self.follow_redirects = follow_redirects

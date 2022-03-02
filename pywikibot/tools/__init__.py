@@ -130,7 +130,7 @@ class classproperty:  # noqa: N801
     .. versionadded:: 3.0
     """
 
-    def __init__(self, cls_method):
+    def __init__(self, cls_method) -> None:
         """Hold the class method."""
         self.method = cls_method
         self.__doc__ = self.method.__doc__
@@ -150,7 +150,7 @@ class suppress_warnings(catch_warnings):  # noqa: N801
     .. versionadded:: 3.0
     """
 
-    def __init__(self, message='', category=Warning, filename=''):
+    def __init__(self, message='', category=Warning, filename='') -> None:
         """Initialize the object.
 
         The parameter semantics are similar to those of
@@ -172,11 +172,11 @@ class suppress_warnings(catch_warnings):  # noqa: N801
         self.filename_match = re.compile(filename).match
         super().__init__(record=True)
 
-    def __enter__(self):
+    def __enter__(self) -> None:
         """Catch all warnings and store them in `self.log`."""
         self.log = super().__enter__()
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         """Stop logging warnings and show those that do not match to params."""
         super().__exit__(exc_type, exc_val, exc_tb)
         for warning in self.log:
@@ -269,7 +269,7 @@ class SizedKeyCollection(Container, Iterable, Sized):
     .. versionadded:: 6.1
     """
 
-    def __init__(self, keyattr: str):
+    def __init__(self, keyattr: str) -> None:
         """Initializer.
 
         :param keyattr: an attribute or method of the values to be hold
@@ -301,7 +301,7 @@ class SizedKeyCollection(Container, Iterable, Sized):
     def __repr__(self) -> str:
         return str(self.data).replace('defaultdict', self.__class__.__name__)
 
-    def append(self, value):
+    def append(self, value) -> None:
         """Add a value to the collection."""
         key = getattr(value, self.keyattr)
         if callable(key):
@@ -311,7 +311,7 @@ class SizedKeyCollection(Container, Iterable, Sized):
         self.data[key].append(value)
         self.size += 1
 
-    def remove(self, value):
+    def remove(self, value) -> None:
         """Remove a value from the container."""
         key = getattr(value, self.keyattr)
         if callable(key):
@@ -320,13 +320,13 @@ class SizedKeyCollection(Container, Iterable, Sized):
             self.data[key].remove(value)
             self.size -= 1
 
-    def remove_key(self, key):
+    def remove_key(self, key) -> None:
         """Remove all values for a given key."""
         with suppress(KeyError):
             self.size -= len(self.data[key])
             del self.data[key]
 
-    def clear(self):
+    def clear(self) -> None:
         """Remove all elements from SizedKeyCollection."""
         self.data = {}  # defaultdict fails (T282865)
         self.size = 0
@@ -545,7 +545,7 @@ class RLock:
     .. versionadded:: 6.2
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """Initializer."""
         self._lock = threading.RLock(*args, **kwargs)
         self._block = threading.Lock()
@@ -644,11 +644,11 @@ class ThreadedGenerator(threading.Thread):
             except KeyboardInterrupt:
                 self.stop()
 
-    def stop(self):
+    def stop(self) -> None:
         """Stop the background thread."""
         self.finished.set()
 
-    def run(self):
+    def run(self) -> None:
         """Run the generator and store the results on the queue."""
         iterable = any(hasattr(self.generator, key)
                        for key in ('__iter__', '__getitem__'))
@@ -788,7 +788,7 @@ class ThreadList(list):
         debug("thread {} ('{}') started".format(len(self), type(thd)),
               self._logger)
 
-    def stop_all(self):
+    def stop_all(self) -> None:
         """Stop all threads the pool."""
         if self:
             debug('EARLY QUIT: Threads: {}'.format(len(self)), self._logger)
@@ -981,12 +981,12 @@ def filter_unique(iterable, container=None, key=None, add=None):
 
     if not add:
         if hasattr(container, 'add'):
-            def container_add(x):
+            def container_add(x) -> None:
                 container.add(key(x) if key else x)
 
             add = container_add
         else:
-            def container_setitem(x):
+            def container_setitem(x) -> None:
                 container.__setitem__(key(x) if key else x,
                                       True)
 
@@ -1026,7 +1026,7 @@ class EmptyDefault(str, Mapping):
        ``empty_iterator()`` was removed in favour of ``iter()``.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialise the default as an empty string."""
         str.__init__(self)
 

@@ -34,7 +34,7 @@ class Win32UI(terminal_interface_base.UI):
 
     """User interface for Win32 terminals."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initializer."""
         super().__init__()
         (stdin, stdout, stderr, argv) = win32_unicode.get_unicode_console()
@@ -48,7 +48,7 @@ class Win32UI(terminal_interface_base.UI):
         """Return whether the target stream supports actually color."""
         return getattr(target_stream, '_hConsole', None) is not None
 
-    def encounter_color(self, color, target_stream):
+    def encounter_color(self, color, target_stream) -> None:
         """Set the new color."""
         fg, bg = self.divide_color(color)
         windows_color = windowsColors[fg]

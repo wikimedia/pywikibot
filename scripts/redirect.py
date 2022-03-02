@@ -124,7 +124,7 @@ class RedirectGenerator(OptionHandler):
         'xml': None,
     }
 
-    def __init__(self, action, **kwargs):
+    def __init__(self, action, **kwargs) -> None:
         """Initializer."""
         super().__init__(**kwargs)
         self.site = pywikibot.Site()

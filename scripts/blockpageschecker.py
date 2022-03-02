@@ -184,7 +184,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
         'move': False,
     }
 
-    def invoke_editor(self, page):
+    def invoke_editor(self, page) -> None:
         """Ask for an editor and invoke it."""
         choice = pywikibot.input_choice(
             'Do you want to open the page?',
@@ -195,16 +195,16 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
             editor = TextEditor()
             editor.edit(page.text)
 
-    def setup(self):
+    def setup(self) -> None:
         """Initialize the coroutine for parsing templates."""
         self.parse_tempates = self.remove_templates()
         self.parse_tempates.send(None)
 
-    def teardown(self):
+    def teardown(self) -> None:
         """Close the coroutine."""
         self.parse_tempates.close()
 
-    def treat_page(self):
+    def treat_page(self) -> None:
         """Load the given page, do some changes, and save it."""
         page = self.current_page
         if page.isRedirectPage():

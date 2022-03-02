@@ -1260,7 +1260,7 @@ class BaseBot(OptionHandler):
 
     @_treat_counter.setter
     @deprecated("self.counter['read']", since='7.0.0')
-    def _treat_counter(self, value):
+    def _treat_counter(self, value) -> None:
         self.counter['read'] = value
 
     @property
@@ -1270,7 +1270,7 @@ class BaseBot(OptionHandler):
 
     @_save_counter.setter
     @deprecated("self.counter['write']", since='7.0.0')
-    def _save_counter(self, value):
+    def _save_counter(self, value) -> None:
         self.counter['write'] = value
 
     @property
@@ -1280,7 +1280,7 @@ class BaseBot(OptionHandler):
 
     @_skip_counter.setter
     @deprecated("self.counter['skip']", since='7.0.0')
-    def _skip_counter(self, value):
+    def _skip_counter(self, value) -> None:
         self.counter['skip'] = value
 
     @property

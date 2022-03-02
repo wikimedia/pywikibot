@@ -55,7 +55,7 @@ class FamilyFileGenerator:
                  url: Optional[str] = None,
                  name: Optional[str] = None,
                  dointerwiki: Optional[str] = None,
-                 verify: Optional[str] = None):
+                 verify: Optional[str] = None) -> None:
         """
         Parameters are optional. If not given the script asks for the values.
 
@@ -128,7 +128,7 @@ class FamilyFileGenerator:
                 return w, verify
         return None, None
 
-    def run(self):
+    def run(self) -> None:
         """Main method, generate family file."""
         if not self.get_params():
             return
@@ -147,7 +147,7 @@ class FamilyFileGenerator:
         self.getapis()
         self.writefile(verify)
 
-    def getlangs(self, w):
+    def getlangs(self, w) -> None:
         """Determine site code of a family."""
         print('Determining other sites...', end='')
         try:
@@ -193,7 +193,7 @@ class FamilyFileGenerator:
                 'letters and digits [a-z0-9] or underscore/dash [_-]' \
                 .format(self.name, wiki['prefix'])
 
-    def getapis(self):
+    def getapis(self) -> None:
         """Load other site pages."""
         print('Loading wikis... ')
         for lang in self.langs:
@@ -208,7 +208,7 @@ class FamilyFileGenerator:
             else:
                 print('in cache')
 
-    def writefile(self, verify):
+    def writefile(self, verify) -> None:
         """Write the family file."""
         fn = os.path.join(self.base_dir, 'families',
                           '{}_family.py'.format(self.name))
@@ -285,7 +285,7 @@ class Family(family.Family):  # noqa: D101
 """
 
 
-def main():
+def main() -> None:
     """Process command line arguments and generate a family file."""
     if len(sys.argv) > 1 and sys.argv[1] == '-help':
         print(__doc__)

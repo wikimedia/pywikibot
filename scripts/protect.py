@@ -84,7 +84,7 @@ class ProtectionRobot(SingleSiteBot, ConfigParserBot, CurrentPageBot):
         'expiry': '',
     }
 
-    def __init__(self, protections, **kwargs):
+    def __init__(self, protections, **kwargs) -> None:
         """
         Create a new ProtectionRobot.
 
@@ -95,7 +95,7 @@ class ProtectionRobot(SingleSiteBot, ConfigParserBot, CurrentPageBot):
         super().__init__(**kwargs)
         self.protections = protections
 
-    def treat_page(self):
+    def treat_page(self) -> None:
         """Run the bot's action on each page.
 
         treat_page treats every page given by the generator and applies

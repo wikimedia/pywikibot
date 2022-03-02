@@ -56,7 +56,7 @@ class DjVuFile:
 
     """
 
-    def __init__(self, file: str):
+    def __init__(self, file: str) -> None:
         """
         Initializer.
 

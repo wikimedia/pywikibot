@@ -158,7 +158,7 @@ class EventStreams:
                                         if self._since else '')))
         return self._url
 
-    def set_maximum_items(self, value: int):
+    def set_maximum_items(self, value: int) -> None:
         """
         Set the maximum number of items to be retrieved from the stream.
 

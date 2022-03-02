@@ -75,7 +75,7 @@ class ProofreadPageMixin:
     """APISite mixin for ProofreadPage extension."""
 
     @need_extension('ProofreadPage')
-    def _cache_proofreadinfo(self, expiry=False):
+    def _cache_proofreadinfo(self, expiry=False) -> None:
         """Retrieve proofreadinfo from site and cache response.
 
         Applicable only to sites with ProofreadPage extension installed.
@@ -144,7 +144,7 @@ class GeoDataMixin:
     """APISite mixin for GeoData extension."""
 
     @need_extension('GeoData')
-    def loadcoordinfo(self, page):
+    def loadcoordinfo(self, page) -> None:
         """Load [[mw:Extension:GeoData]] info."""
         title = page.title(with_section=False)
         query = self._generator(api.PropertyGenerator,
@@ -162,7 +162,7 @@ class PageImagesMixin:
     """APISite mixin for PageImages extension."""
 
     @need_extension('PageImages')
-    def loadpageimage(self, page):
+    def loadpageimage(self, page) -> None:
         """
         Load [[mw:Extension:PageImages]] info.
 

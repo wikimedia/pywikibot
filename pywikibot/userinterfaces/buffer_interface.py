@@ -17,7 +17,7 @@ class UI(ABUIC):
 
     """Collects output into an unseen buffer."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the UI."""
         super().__init__()
 
@@ -26,7 +26,7 @@ class UI(ABUIC):
         self.log_handler = logging.handlers.QueueHandler(self._buffer)
         self.log_handler.setLevel(VERBOSE if config.verbose_output else INFO)
 
-    def init_handlers(self, root_logger, *args, **kwargs):
+    def init_handlers(self, root_logger, *args, **kwargs) -> None:
         """Initialize the handlers for user output."""
         root_logger.addHandler(self.log_handler)
 
@@ -69,6 +69,6 @@ class UI(ABUIC):
 
         return output
 
-    def clear(self):
+    def clear(self) -> None:
         """Removes any buffered output."""
         self.pop_output()

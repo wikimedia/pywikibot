@@ -64,7 +64,7 @@ except ImportError as e:
 _logger = 'patrol'
 
 
-def verbose_output(string):
+def verbose_output(string) -> None:
     """Verbose output."""
     if pywikibot.config.verbose_output:
         pywikibot.output(string)
@@ -85,7 +85,7 @@ class PatrolBot(BaseBot):
         'en': 'patrol_whitelist',
     }
 
-    def __init__(self, site=None, **kwargs):
+    def __init__(self, site=None, **kwargs) -> None:
         """
         Initializer.
 
@@ -335,7 +335,7 @@ class LinkedPagesRule:
 
     """Matches of page site title and linked pages title."""
 
-    def __init__(self, page_title: str):
+    def __init__(self, page_title: str) -> None:
         """Initializer.
 
         :param page_title: The page title for this rule

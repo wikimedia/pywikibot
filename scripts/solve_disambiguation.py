@@ -632,7 +632,7 @@ class DisambiguationRobot(SingleSiteBot):
         self.summary = None
         self.dn_template_str = i18n.translate(self.site, dn_template)
 
-    def _clean_args(self, args, kwargs):
+    def _clean_args(self, args, kwargs) -> None:
         """Cleanup positional and keyword arguments.
 
         Replace positional arguments with keyword arguments.
@@ -1255,7 +1255,7 @@ or press enter to quit:""")
                      'to': targets,
                      'count': len(new_targets)})
 
-    def teardown(self):
+    def teardown(self) -> None:
         """Write ignoring pages to a file."""
         self.primaryIgnoreManager.ignore(self.ignores)
 

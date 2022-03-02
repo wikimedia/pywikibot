@@ -164,7 +164,7 @@ docuReplacements = {
 }
 
 
-def precompile_exceptions(exceptions, use_regex, flags):
+def precompile_exceptions(exceptions, use_regex, flags) -> None:
     """Compile the exceptions with the given flags."""
     if not exceptions:
         return
@@ -187,7 +187,13 @@ class ReplacementBase:
 
     """The replacement instructions."""
 
-    def __init__(self, old, new, edit_summary=None, default_summary=True):
+    def __init__(
+        self,
+        old,
+        new,
+        edit_summary=None,
+        default_summary=True
+    ) -> None:
         """Create a basic replacement instance."""
         self.old = old
         self.old_regex = None
@@ -225,7 +231,7 @@ class ReplacementBase:
         """
         return None
 
-    def _compile(self, use_regex, flags):
+    def _compile(self, use_regex, flags) -> None:
         """Compile the search text without modifying the flags."""
         # This does not update use_regex and flags depending on this instance
         if not use_regex:
@@ -234,7 +240,7 @@ class ReplacementBase:
             self.old_regex = self.old
         self.old_regex = re.compile(self.old_regex, flags)
 
-    def compile(self, use_regex, flags):
+    def compile(self, use_regex, flags) -> None:
         """Compile the search text."""
         # Set the regular expression flags
         if self.case_insensitive is False:
@@ -253,7 +259,7 @@ class Replacement(ReplacementBase):
 
     def __init__(self, old, new, use_regex=None, exceptions=None,
                  case_insensitive=None, edit_summary=None,
-                 default_summary=True):
+                 default_summary=True) -> None:
         """Create a single replacement entry unrelated to a fix."""
         super().__init__(old, new, edit_summary, default_summary)
         self._use_regex = use_regex
@@ -279,7 +285,7 @@ class Replacement(ReplacementBase):
         """Return whether the search text is using regex."""
         return self._use_regex
 
-    def _compile(self, use_regex, flags):
+    def _compile(self, use_regex, flags) -> None:
         """Compile the search regex and exceptions."""
         super()._compile(use_regex, flags)
         precompile_exceptions(self.exceptions, use_regex, flags)
@@ -304,7 +310,7 @@ class ReplacementList(list):
     """
 
     def __init__(self, use_regex, exceptions, case_insensitive, edit_summary,
-                 name):
+                 name) -> None:
         """Create a fix list which can contain multiple replacements."""
         super().__init__()
         self.use_regex = use_regex
@@ -314,7 +320,7 @@ class ReplacementList(list):
         self.edit_summary = edit_summary
         self.name = name
 
-    def _compile_exceptions(self, use_regex, flags):
+    def _compile_exceptions(self, use_regex, flags) -> None:
         """Compile the exceptions if not already done."""
         if not self.exceptions and self._exceptions is not None:
             self.exceptions = dict(self._exceptions)
@@ -326,7 +332,7 @@ class ReplacementListEntry(ReplacementBase):
     """A replacement entry for ReplacementList."""
 
     def __init__(self, old, new, fix_set, edit_summary=None,
-                 default_summary=True):
+                 default_summary=True) -> None:
         """Create a replacement entry inside a fix set."""
         super().__init__(old, new, edit_summary, default_summary)
         self.fix_set = fix_set
@@ -366,7 +372,7 @@ class ReplacementListEntry(ReplacementBase):
         """
         return self.fix_set
 
-    def _compile(self, use_regex, flags):
+    def _compile(self, use_regex, flags) -> None:
         """Compile the search regex and the fix's exceptions."""
         super()._compile(use_regex, flags)
         self.fix_set._compile_exceptions(use_regex, flags)
@@ -395,7 +401,14 @@ class XmlDumpReplacePageGenerator:
     :type exceptions: dict
     """
 
-    def __init__(self, xmlFilename, xmlStart, replacements, exceptions, site):
+    def __init__(
+        self,
+        xmlFilename,
+        xmlStart,
+        replacements,
+        exceptions,
+        site
+    ) -> None:
         """Initializer."""
         self.xmlFilename = xmlFilename
         self.replacements = replacements
@@ -656,7 +669,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
 
         return super().skip_page(page)
 
-    def treat(self, page):
+    def treat(self, page) -> None:
         """Work on each page retrieved from generator."""
         try:
             original_text = page.text
@@ -746,7 +759,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             self.save(page, original_text, new_text, applied,
                       show_diff=False, asynchronous=False)
 
-    def save(self, page, oldtext, newtext, applied, **kwargs):
+    def save(self, page, oldtext, newtext, applied, **kwargs) -> None:
         """Save the given page."""
         self.userPut(page, oldtext, newtext,
                      summary=self.generate_summary(applied),

@@ -43,7 +43,7 @@ class UnixUI(terminal_interface_base.UI):
         code = re.search(r'(?<=\[)\d+', color).group()
         return chr(27) + '[' + str(int(code) + 10) + 'm'
 
-    def encounter_color(self, color, target_stream):
+    def encounter_color(self, color, target_stream) -> None:
         """Write the Unix color directly to the stream."""
         fg, bg = self.divide_color(color)
         fg = unixColors[fg]
@@ -52,6 +52,6 @@ class UnixUI(terminal_interface_base.UI):
             bg = unixColors[bg]
             self._write(self.make_unix_bg_color(bg), target_stream)
 
-    def _write(self, text, target_stream):
+    def _write(self, text, target_stream) -> None:
         """Optionally encode and write the text to the target stream."""
         target_stream.write(text)

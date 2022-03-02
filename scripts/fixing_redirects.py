@@ -191,7 +191,7 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
             target = None
         return page, target
 
-    def treat_page(self):
+    def treat_page(self) -> None:
         """Change all redirects from the current page to actual links."""
         try:
             newtext = self.current_page.text

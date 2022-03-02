@@ -49,13 +49,13 @@ class ChangeLangBot(ConfigParserBot, SingleSiteBot):
         'setlang': '',
     }
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         """Initializer."""
         super().__init__(**kwargs)
         assert not (self.opt.always and self.opt.never), \
             'Either "always" or "never" must be set but not both'
 
-    def changelang(self, page):
+    def changelang(self, page) -> None:
         """Set page language.
 
         :param page: The page to update and save
@@ -73,7 +73,7 @@ class ChangeLangBot(ConfigParserBot, SingleSiteBot):
             'page language to {green}{1}{default}',
             page.title(as_link=True), self.opt.setlang))
 
-    def treat(self, page):
+    def treat(self, page) -> None:
         """Treat a page.
 
         :param page: The page to treat

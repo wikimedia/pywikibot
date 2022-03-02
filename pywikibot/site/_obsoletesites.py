@@ -18,11 +18,11 @@ class RemovedSite(BaseSite):
 class ClosedSite(APISite):
     """Site closed to read-only mode."""
 
-    def __init__(self, code, fam, user=None):
+    def __init__(self, code, fam, user=None) -> None:
         """Initializer."""
         super().__init__(code, fam, user)
 
-    def _closed_error(self, notice=''):
+    def _closed_error(self, notice='') -> None:
         """An error instead of pointless API call."""
         pywikibot.error('Site {} has been closed. {}'.format(self.sitename,
                                                              notice))
@@ -39,7 +39,7 @@ class ClosedSite(APISite):
                                 'create': ('steward', 'infinity')}
         return page._protection
 
-    def recentchanges(self, **kwargs):
+    def recentchanges(self, **kwargs) -> None:
         """An error instead of pointless API call."""
         self._closed_error('No recent changes can be returned.')
 
@@ -49,6 +49,6 @@ class ClosedSite(APISite):
             self._uploaddisabled = True
         return self._uploaddisabled
 
-    def newpages(self, **kwargs):
+    def newpages(self, **kwargs) -> None:
         """An error instead of pointless API call."""
         self._closed_error('No new pages can be returned.')

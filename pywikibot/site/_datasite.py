@@ -34,7 +34,7 @@ class DataSite(APISite):
 
     """Wikibase data capable site."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """Initializer."""
         super().__init__(*args, **kwargs)
         self._item_namespace = None
@@ -45,7 +45,7 @@ class DataSite(APISite):
             'mediainfo': pywikibot.MediaInfo,
         }
 
-    def _cache_entity_namespaces(self):
+    def _cache_entity_namespaces(self) -> None:
         """Find namespaces for each known wikibase entity type."""
         self._entity_namespaces = {}
         for entity_type in self._type_to_class:
@@ -298,7 +298,7 @@ class DataSite(APISite):
         return req.submit()
 
     @need_right('edit')
-    def addClaim(self, entity, claim, bot=True, summary=None):
+    def addClaim(self, entity, claim, bot=True, summary=None) -> None:
         """
         Add a claim.
 

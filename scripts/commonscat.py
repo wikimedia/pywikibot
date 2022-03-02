@@ -269,7 +269,7 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot, NoRedirectPageBot):
                         return True
         return False
 
-    def treat_page(self):
+    def treat_page(self) -> None:
         """
         Add CommonsCat template to page.
 
@@ -333,7 +333,7 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot, NoRedirectPageBot):
 
     def changeCommonscat(
             self, page=None, oldtemplate='', oldcat='',
-            newtemplate='', newcat='', linktitle=''):
+            newtemplate='', newcat='', linktitle='') -> None:
         """Change the current commonscat template and target."""
         if '3=S' in (oldcat, linktitle):
             return  # TODO: handle additional param on de-wiki

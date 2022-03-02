@@ -45,7 +45,7 @@ class TextEditor(ScrolledText):
 
     """
 
-    def __init__(self, master=None, **kwargs):
+    def __init__(self, master=None, **kwargs) -> None:
         """
         Initializer.
 
@@ -100,7 +100,7 @@ class TextEditor(ScrolledText):
                 Theme, 'cursor', fgBg='fg')
         return config
 
-    def add_bindings(self):
+    def add_bindings(self) -> None:
         """Assign key and events bindings to methods."""
         # due to IDLE dependencies, this can't be called from __init__
         # add key and event bindings
@@ -161,7 +161,7 @@ class TextEditor(ScrolledText):
         self.see('insert')
         return 'break'
 
-    def remove_selection(self, event=None):
+    def remove_selection(self, event=None) -> None:
         """Perform remove operation."""
         self.tag_remove('sel', '1.0', 'end')
         self.see('insert')
@@ -253,7 +253,7 @@ class TextEditor(ScrolledText):
                     self.do_highlight(found[0], found[1])
         return None
 
-    def do_highlight(self, start, end):
+    def do_highlight(self, start, end) -> None:
         """Select and show the text from index start to index end."""
         self.see(start)
         self.tag_remove(tkinter.SEL, '1.0', tkinter.END)
@@ -278,7 +278,7 @@ class EditBoxWindow(tkinter.Frame):
 
     """Edit box window."""
 
-    def __init__(self, parent=None, **kwargs):
+    def __init__(self, parent=None, **kwargs) -> None:
         """Initializer."""
         if parent is None:
             # create a new window
@@ -405,23 +405,23 @@ class EditBoxWindow(tkinter.Frame):
         self.parent.mainloop()
         return self.text
 
-    def find_all(self, target):
+    def find_all(self, target) -> None:
         """Perform find all operation."""
         self.textfield.insert(tkinter.END, target)
         self.editbox.find_all(target)
 
-    def find(self):
+    def find(self) -> None:
         """Perform find operation."""
         # get text to search for
         s = self.textfield.get()
         if s:
             self.editbox.find_all(s)
 
-    def config_dialog(self, event=None):
+    def config_dialog(self, event=None) -> None:
         """Show config dialog."""
         ConfigDialog(self, 'Settings')
 
-    def pressedOK(self):
+    def pressedOK(self) -> None:
         """
         Perform OK operation.
 
@@ -444,7 +444,7 @@ class ListBoxWindow:
 
     # called when user pushes the OK button.
     # closes the window.
-    def pressedOK(self):
+    def pressedOK(self) -> None:
         """
         Perform OK operation.
 
@@ -452,7 +452,7 @@ class ListBoxWindow:
         """
         self.parent.destroy()
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None) -> None:
         """Initializer."""
         if parent is None:
             # create a new window
@@ -495,7 +495,7 @@ class Tkdialog:
 
     """The dialog window for image info."""
 
-    def __init__(self, photo_description, photo, filename):
+    def __init__(self, photo_description, photo, filename) -> None:
         """Initializer."""
         self.root = tkinter.Tk()
         # "%dx%d%+d%+d" % (width, height, xoffset, yoffset)
@@ -583,13 +583,13 @@ class Tkdialog:
         imageTk = ImageTk.PhotoImage(image)
         return imageTk
 
-    def ok_file(self):
+    def ok_file(self) -> None:
         """The user pressed the OK button."""
         self.filename = self.filename_field.get()
         self.photo_description = self.description_field.get(0.0, tkinter.END)
         self.root.destroy()
 
-    def skip_file(self):
+    def skip_file(self) -> None:
         """The user pressed the Skip button."""
         self.skip = True
         self.root.destroy()

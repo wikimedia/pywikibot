@@ -458,7 +458,7 @@ class InterwikiBotConfig:
     summary = ''
     repository = False
 
-    def note(self, text):
+    def note(self, text) -> None:
         """Output a notification message with.
 
         The text will be printed only if conf.quiet isn't set.
@@ -622,7 +622,7 @@ class Subject(interwiki_graph.Subject):
         this Object.
     """
 
-    def __init__(self, origin=None, hints=None, conf=None):
+    def __init__(self, origin=None, hints=None, conf=None) -> None:
         """
         Initializer.
 
@@ -710,7 +710,7 @@ class Subject(interwiki_graph.Subject):
                         return page
         return None
 
-    def translate(self, hints=None, keephintedsites=False):
+    def translate(self, hints=None, keephintedsites=False) -> None:
         """Add the given translation hints to the todo list."""
         if self.conf.same and self.origin:
             if hints:
@@ -772,7 +772,7 @@ class Subject(interwiki_graph.Subject):
         # If there are any, return them. Otherwise, nothing is in progress.
         return result
 
-    def makeForcedStop(self, counter):
+    def makeForcedStop(self, counter) -> None:
         """End work on the page before the normal end."""
         for site, count in self.todo.iter_values_len():
             counter.minus(site, count)
@@ -1013,7 +1013,7 @@ class Subject(interwiki_graph.Subject):
 
         return False
 
-    def reportInterwikilessPage(self, page):
+    def reportInterwikilessPage(self, page) -> None:
         """Report interwikiless page."""
         self.conf.note('{} does not have any interwiki links'
                        .format(self.origin))
@@ -1023,7 +1023,7 @@ class Subject(interwiki_graph.Subject):
                     'a', 'utf-8') as f:
                 f.write('# {} \n'.format(page))
 
-    def askForHints(self, counter):
+    def askForHints(self, counter) -> None:
         """Ask for hints to other sites."""
         if (not self.workonme  # we don't work on it anyway
             or not self.untranslated and not self.conf.askhints
@@ -1067,7 +1067,7 @@ class Subject(interwiki_graph.Subject):
                     if self.conf.hintsareright:
                         self.hintedsites.add(page.site)
 
-    def check_page(self, page, counter):
+    def check_page(self, page, counter) -> None:
         """Check whether any iw links should be added to the todo list."""
         if not page.exists():
             self.conf.remove.append(str(page))
@@ -1245,7 +1245,7 @@ class Subject(interwiki_graph.Subject):
             if self.forcedStop:
                 break
 
-    def batchLoaded(self, counter):
+    def batchLoaded(self, counter) -> None:
         """
         Notify that the promised batch of pages was loaded.
 
@@ -1296,14 +1296,14 @@ class Subject(interwiki_graph.Subject):
         """Return True if all the work for this subject has completed."""
         return not self.todo
 
-    def problem(self, txt, createneed=True):
+    def problem(self, txt, createneed=True) -> None:
         """Report a problem with the resolution of this subject."""
         pywikibot.error(txt)
         self.confirm = True
         if createneed:
             self.problemfound = True
 
-    def whereReport(self, page, indent=4):
+    def whereReport(self, page, indent=4) -> None:
         """Report found interlanguage links with conflicts."""
         for page2 in sorted(self.found_in[page]):
             if page2 is None:
@@ -1776,7 +1776,7 @@ class Subject(interwiki_graph.Subject):
                 break
         return True
 
-    def reportBacklinks(self, new, updatedSites):
+    def reportBacklinks(self, new, updatedSites) -> None:
         """
         Report missing back links. This will be called from finish() if needed.
 
@@ -1845,7 +1845,7 @@ class InterwikiBot:
     It controls which pages are queried from which languages when.
     """
 
-    def __init__(self, conf=None):
+    def __init__(self, conf=None) -> None:
         """Initializer."""
         self.subjects = []
         # We count how many pages still need to be loaded per site.
@@ -1859,7 +1859,7 @@ class InterwikiBot:
         self.conf = conf
         self.site = pywikibot.Site()
 
-    def add(self, page, hints=None):
+    def add(self, page, hints=None) -> None:
         """Add a single subject to the list."""
         subj = Subject(page, hints=hints, conf=self.conf)
         self.subjects.append(subj)
@@ -1867,7 +1867,7 @@ class InterwikiBot:
             # Keep correct counters
             self.plus(site, count)
 
-    def setPageGenerator(self, pageGenerator, number=None, until=None):
+    def setPageGenerator(self, pageGenerator, number=None, until=None) -> None:
         """
         Add a generator of subjects.
 
@@ -1883,7 +1883,7 @@ class InterwikiBot:
         """Return generator of titles for dump file."""
         return (s.origin.title(as_link=True) for s in self.subjects)
 
-    def generateMore(self, number):
+    def generateMore(self, number) -> None:
         """Generate more subjects.
 
         This is called internally when the
@@ -2054,7 +2054,7 @@ class InterwikiBot:
             subject.batchLoaded(self)
         return True
 
-    def queryStep(self):
+    def queryStep(self) -> None:
         """Delete the ones that are done now."""
         self.oneQuery()
         for i in range(len(self.subjects) - 1, -1, -1):
@@ -2067,16 +2067,16 @@ class InterwikiBot:
         """Check whether there is still more work to do."""
         return not self and self.pageGenerator is None
 
-    def plus(self, site, count=1):
+    def plus(self, site, count=1) -> None:
         """Helper routine that the Subject class expects in a counter."""
         self.counts[site] += count
 
-    def minus(self, site, count=1):
+    def minus(self, site, count=1) -> None:
         """Helper routine that the Subject class expects in a counter."""
         self.counts[site] -= count
         self.counts = +self.counts  # remove zero and negative counts
 
-    def run(self):
+    def run(self) -> None:
         """Start the process until finished."""
         while not self.isDone():
             self.queryStep()
@@ -2199,7 +2199,7 @@ class InterwikiDumps(OptionHandler):
 
     FILE_PATTERN = '{site.family.name}-{site.code}.txt'
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         """Initializer.
 
         :keyword do_continue: If true, continue alphabetically starting at the
@@ -2225,7 +2225,7 @@ class InterwikiDumps(OptionHandler):
         """Return next page namespace for continue option."""
         return self._next_namespace
 
-    def remove(self, filename: str):
+    def remove(self, filename: str) -> None:
         """Remove filename from restored files.
 
         :param filename: A filename to be removed from restored set.
@@ -2278,7 +2278,7 @@ class InterwikiDumps(OptionHandler):
                                           namespace=self.next_namespace,
                                           filterredir=False)
 
-    def write_dump(self, iterable, append: bool = True):
+    def write_dump(self, iterable, append: bool = True) -> None:
         """Write dump file.
 
         :param iterable: an iterable of page titles to be dumped.
@@ -2296,7 +2296,7 @@ class InterwikiDumps(OptionHandler):
                          .format(site=self.site, mode=mode))
         self.remove(filename)
 
-    def delete_dumps(self):
+    def delete_dumps(self) -> None:
         """Delete processed dumps."""
         for filename in self.restored_files:
             tail = os.path.split(filename)[-1]

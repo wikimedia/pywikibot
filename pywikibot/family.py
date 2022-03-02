@@ -642,7 +642,7 @@ class Family:
             self._get_cr_templates(code, fallback)
         return self._catredirtemplates[code]
 
-    def _get_cr_templates(self, code, fallback):
+    def _get_cr_templates(self, code, fallback) -> None:
         """Build list of category redirect templates."""
         if not hasattr(self, '_catredirtemplates'):
             self._catredirtemplates = {}
@@ -967,7 +967,7 @@ class Family:
         return types.MappingProxyType(data)
 
     @obsolete.setter
-    def obsolete(self, data):
+    def obsolete(self, data) -> None:
         """Split obsolete dict into constituent parts."""
         self.interwiki_removals[:] = [old for (old, new) in data.items()
                                       if new is None]

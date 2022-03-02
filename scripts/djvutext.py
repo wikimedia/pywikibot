@@ -63,7 +63,13 @@ class DjVuTextBot(SingleSiteBot):
         'summary': '',
     }
 
-    def __init__(self, djvu, index, pages: Optional[tuple] = None, **kwargs):
+    def __init__(
+        self,
+        djvu,
+        index,
+        pages: Optional[tuple] = None,
+        **kwargs
+    ) -> None:
         """
         Initializer.
 
@@ -109,7 +115,7 @@ class DjVuTextBot(SingleSiteBot):
             page.page_number = page_number  # remember page number in djvu file
             yield page
 
-    def treat(self, page):
+    def treat(self, page) -> None:
         """Process one page."""
         old_text = page.text
 

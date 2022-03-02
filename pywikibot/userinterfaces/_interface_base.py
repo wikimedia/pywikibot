@@ -31,14 +31,14 @@ class ABUIC(ABC):
         """
         return list(sys.argv)
 
-    def flush(self):
+    def flush(self) -> None:
         """Flush cached output.
 
         May be passed to atexit.register() to flush any ui cache.
         """
 
     @abstractmethod
-    def init_handlers(self, *args, **kwargs):
+    def init_handlers(self, *args, **kwargs) -> None:
         """Initialize the handlers for user output.
 
         Called in bot.init_handlers().

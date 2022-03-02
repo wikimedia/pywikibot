@@ -188,7 +188,7 @@ class NowCommonsDeleteBot(Bot, ConfigParserBot):
         'replaceonly': False,
     }
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         """Initializer."""
         super().__init__(**kwargs)
         self.site = pywikibot.Site()
@@ -257,7 +257,7 @@ class NowCommonsDeleteBot(Bot, ConfigParserBot):
                     file_on_commons = val[1].strip()
             return file_on_commons
 
-    def run(self):
+    def run(self) -> None:
         """Run the bot."""
         commons = self.commons
         comment = self.summary

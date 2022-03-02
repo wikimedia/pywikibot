@@ -406,7 +406,7 @@ def ask_for_dir_change(force):
     return userfile, passfile
 
 
-def main(*args: str):
+def main(*args: str) -> None:
     """
     Process command line arguments and generate user-config.
 

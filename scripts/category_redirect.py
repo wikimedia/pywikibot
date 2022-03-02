@@ -63,7 +63,7 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
         'delay': 7,  # cool down delay in days
     }
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         """Initializer."""
         super().__init__(**kwargs)
         self.catprefix = self.site.namespace(14) + ':'
@@ -211,7 +211,7 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
         log_text += ('\n\n' + message)
         return log_text
 
-    def check_hard_redirect(self):
+    def check_hard_redirect(self) -> None:
         """
         Check for hard-redirected categories.
 
@@ -270,7 +270,7 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
                     self.site, 'category_redirect-log-add-failed', params)
                 self.log_text.append(message)
 
-    def run(self):
+    def run(self) -> None:
         """Run the bot."""
         # validate L10N
         self.template_list = self.site.category_redirects()
@@ -451,7 +451,7 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
 
         self.teardown()
 
-    def teardown(self):
+    def teardown(self) -> None:
         """Write self.record to file and save logs."""
         with open(self.datafile, 'wb') as f:
             pickle.dump(self.record, f, protocol=config.pickle_protocol)

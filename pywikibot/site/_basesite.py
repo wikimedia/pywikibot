@@ -172,7 +172,7 @@ class BaseSite(ComparableMixin):
             del new['_iw_sites']
         return new
 
-    def __setstate__(self, attrs):
+    def __setstate__(self, attrs) -> None:
         """Restore things removed in __getstate__."""
         self.__dict__.update(attrs)
         self._pagemutex = threading.Condition()
@@ -293,7 +293,7 @@ class BaseSite(ComparableMixin):
                 self._pagemutex.wait()
             self._locked_pages.add(title)
 
-    def unlock_page(self, page):
+    def unlock_page(self, page) -> None:
         """
         Unlock page. Call as soon as a write operation has completed.
 

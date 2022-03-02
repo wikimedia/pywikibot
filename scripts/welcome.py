@@ -648,7 +648,7 @@ class WelcomeBot(SingleSiteBot):
             pywikibot.output('Reported')
         self.BAQueue = []
 
-    def makelogpage(self):
+    def makelogpage(self) -> None:
         """Make log page."""
         if not globalvar.make_welcome_log or not self.welcomed_users:
             return
@@ -855,7 +855,7 @@ class WelcomeBot(SingleSiteBot):
             if welcomed_count >= globalvar.dump_to_log:
                 self.makelogpage()
 
-    def write_log(self):
+    def write_log(self) -> None:
         """Write logfile."""
         welcomed_count = len(self.welcomed_users)
         if globalvar.make_welcome_log and welcomed_count > 0:
@@ -874,14 +874,14 @@ class WelcomeBot(SingleSiteBot):
             self.report_bad_account()
 
     @staticmethod
-    def show_status(message=Msg.DEFAULT):
+    def show_status(message=Msg.DEFAULT) -> None:
         """Output colorized status."""
         msg, color = message.value
         pywikibot.output(color_format('{color}[{msg:5}]{default} ',
                                       msg=msg, color=color),
                          newline=False)
 
-    def teardown(self):
+    def teardown(self) -> None:
         """Some cleanups after run operation."""
         if self.welcomed_users:
             self.show_status()
@@ -930,7 +930,7 @@ def _handle_offset(val) -> None:
             'script source header for documentation.'))
 
 
-def handle_args(args):
+def handle_args(args) -> None:
     """Process command line arguments.
 
     If args is an empty list, sys.argv is used.

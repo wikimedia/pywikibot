@@ -210,7 +210,7 @@ class RefLink:
 
     """Container to handle a single bare reference."""
 
-    def __init__(self, link, name, site=None):
+    def __init__(self, link, name, site=None) -> None:
         """Initializer."""
         self.name = name
         self.link = link
@@ -239,7 +239,7 @@ class RefLink:
             dead_link = '<ref{}>{}</ref>'.format(self.name, tag)
         return dead_link
 
-    def transform(self, ispdf=False):
+    def transform(self, ispdf=False) -> None:
         """Normalize the title."""
         # convert html entities
         if not ispdf:
@@ -263,7 +263,7 @@ class RefLink:
         self.title = string2html(self.title, self.site.encoding())
         # TODO : remove HTML when both opening and closing tags are included
 
-    def avoid_uppercase(self):
+    def avoid_uppercase(self) -> None:
         """
         Convert to title()-case if title is 70% uppercase characters.
 
@@ -302,7 +302,7 @@ class DuplicateReferences:
     name the first, and remove the content of the others
     """
 
-    def __init__(self, site=None):
+    def __init__(self, site=None) -> None:
         """Initializer."""
         if not site:
             site = pywikibot.Site()
@@ -438,7 +438,7 @@ class ReferencesRobot(SingleSiteBot,
         'summary': '',
     }
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         """Initializer."""
         super().__init__(**kwargs)
         self._use_fake_user_agent = config.fake_user_agent_default.get(
@@ -494,12 +494,12 @@ class ReferencesRobot(SingleSiteBot,
         self.MIME = re.compile(
             r'application/(?:xhtml\+xml|xml)|text/(?:ht|x)ml')
 
-    def httpError(self, err_num, link, pagetitleaslink):
+    def httpError(self, err_num, link, pagetitleaslink) -> None:
         """Log HTTP Error."""
         pywikibot.stdout('HTTP error ({}) for {} on {}'
                          .format(err_num, link, pagetitleaslink))
 
-    def getPDFTitle(self, ref, response):
+    def getPDFTitle(self, ref, response) -> None:
         """Use pdfinfo to retrieve title from a PDF."""
         # pdfinfo is Unix-only
         pywikibot.output('Reading PDF file...')
@@ -551,7 +551,7 @@ class ReferencesRobot(SingleSiteBot,
             return True
         return super().skip_page(page)
 
-    def treat(self, page):
+    def treat(self, page) -> None:
         """Process one page."""
         # Load the page's text from the wiki
         new_text = page.text

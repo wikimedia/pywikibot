@@ -33,7 +33,7 @@ class _OldConnection(pymysql.connections.Connection):
     .. versionadded:: 7.0
     """
 
-    def close(self):  # pragma: no cover
+    def close(self) -> None:  # pragma: no cover
         """Send the quit message and close the socket."""
         if self._closed or self._sock is None:
             super().close()

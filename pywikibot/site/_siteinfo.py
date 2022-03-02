@@ -58,7 +58,7 @@ class Siteinfo(Container):
         ],
     }
 
-    def __init__(self, site):
+    def __init__(self, site) -> None:
         """Initialise it with an empty cache."""
         self._site = site
         self._cache = {}
@@ -95,7 +95,7 @@ class Siteinfo(Container):
         return EMPTY_DEFAULT
 
     @staticmethod
-    def _post_process(prop, data):
+    def _post_process(prop, data) -> None:
         """Do some default handling of data. Directly modifies data."""
         # Be careful with version tests inside this here as it might need to
         # query this method to actually get the version number

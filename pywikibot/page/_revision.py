@@ -26,14 +26,14 @@ class Revision(Mapping):
     'Sample for Revision access'
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         """Initializer."""
         self._data = kwargs
         self._upcast_dict(self._data)
         super().__init__()
 
     @staticmethod
-    def _upcast_dict(map_):
+    def _upcast_dict(map_) -> None:
         """Upcast dictionary values."""
         with suppress(KeyError):  # enable doctest
             map_['timestamp'] = Timestamp.fromISOformat(map_['timestamp'])

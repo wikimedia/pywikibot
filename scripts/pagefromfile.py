@@ -83,7 +83,7 @@ class NoTitleError(Exception):
 
     """No title found."""
 
-    def __init__(self, offset):
+    def __init__(self, offset) -> None:
         """Initializer."""
         self.offset = offset
 

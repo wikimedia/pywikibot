@@ -70,7 +70,7 @@ class DownloadDumpBot(Bot, ConfigParserBot):
                         return dump_filepath
         return None
 
-    def run(self):
+    def run(self) -> None:
         """Run bot."""
         def convert_from_bytes(total_bytes):
             for unit in ['B', 'K', 'M', 'G', 'T']:

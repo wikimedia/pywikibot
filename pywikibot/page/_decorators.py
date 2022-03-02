@@ -46,7 +46,7 @@ def allow_asynchronous(func):
         if callback:
             callback(self, err)
 
-    def wrapper(self, *args, **kwargs):
+    def wrapper(self, *args, **kwargs) -> None:
         if kwargs.get('asynchronous'):
             pywikibot.async_request(handle, func, self, *args, **kwargs)
         else:
