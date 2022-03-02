@@ -684,7 +684,7 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         index = len(tmpText)
         return self.createReferenceSection(oldText, index)
 
-    def createReferenceSection(self, oldText, index, ident='==') -> str:
+    def createReferenceSection(self, oldText, index, ident: str = '==') -> str:
         """Create a reference section and insert it into the given text.
 
         :param oldText: page text that is going to be be amended
@@ -694,7 +694,6 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         :type index: int
         :param ident: symbols to be inserted before and after reference section
             title
-        :type ident: str
         :return: the amended page text with reference section added
         """
         if self.site.code in noTitleRequired:

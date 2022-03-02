@@ -620,7 +620,7 @@ class Family:
         Family._families[fam] = cls
         return cls
 
-    def linktrail(self, code, fallback='_default'):
+    def linktrail(self, code, fallback: str = '_default'):
         """Return regex for trailing chars displayed as part of a link.
 
         Returns a string, not a compiled regular expression object.
@@ -635,7 +635,7 @@ class Family:
             'ERROR: linktrail in language {language_code} unknown'
             .format(language_code=code))
 
-    def category_redirects(self, code, fallback='_default'):
+    def category_redirects(self, code, fallback: str = '_default'):
         """Return list of category redirect templates."""
         if not hasattr(self, '_catredirtemplates') \
            or code not in self._catredirtemplates:
@@ -681,7 +681,7 @@ class Family:
         """
         return self.archived_page_templates.get(code, ())
 
-    def disambig(self, code, fallback='_default'):
+    def disambig(self, code, fallback: str = '_default'):
         """Return list of disambiguation templates."""
         if code in self.disambiguationTemplates:
             return self.disambiguationTemplates[code]

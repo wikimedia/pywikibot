@@ -506,9 +506,15 @@ class CheckImagesBot:
     ignore_save_related_errors = True
     ignore_server_errors = False
 
-    def __init__(self, site, log_full_number=25000, sendemail_active=False,
-                 duplicates_report=False, log_full_error=True,
-                 max_user_notify=None) -> None:
+    def __init__(
+        self,
+        site,
+        log_full_number: int = 25000,
+        sendemail_active=False,
+        duplicates_report=False,
+        log_full_error=True,
+        max_user_notify=None
+    ) -> None:
         """Initializer, define some instance variables."""
         self.site = site
         self.log_full_error = log_full_error

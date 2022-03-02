@@ -120,7 +120,7 @@ class Formatter:
     # Identify which formats need outputlang
     fmt_need_lang = [k for k, v in fmt_options.items() if 'trs_title' in v]
 
-    def __init__(self, page, outputlang=None, default='******') -> None:
+    def __init__(self, page, outputlang=None, default: str = '******') -> None:
         """
         Initializer.
 
@@ -152,7 +152,7 @@ class Formatter:
             except Error:
                 self.trs_title = '{}:{}'.format(default, page._link.title)
 
-    def output(self, num=None, fmt='1') -> str:
+    def output(self, num=None, fmt: str = '1') -> str:
         """Output formatted string."""
         fmt = self.fmt_options.get(fmt, fmt)
         # If selected format requires trs_title, outputlang must be set.

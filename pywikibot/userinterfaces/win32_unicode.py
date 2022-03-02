@@ -67,7 +67,7 @@ class UnicodeInput(IOBase):
 
     """Unicode terminal input class."""
 
-    def __init__(self, hConsole, name, bufsize=1024) -> None:
+    def __init__(self, hConsole, name, bufsize: int = 1024) -> None:
         """Initialize the input stream."""
         self._hConsole = hConsole
         self.bufsize = bufsize

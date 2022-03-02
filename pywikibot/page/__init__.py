@@ -135,7 +135,7 @@ class BasePage(ComparableMixin):
         '_pageimage', '_item', '_lintinfo',
     )
 
-    def __init__(self, source, title='', ns=0) -> None:
+    def __init__(self, source, title: str = '', ns=0) -> None:
         """
         Instantiate a Page object.
 
@@ -2841,7 +2841,7 @@ class User(Page):
     This class also represents the Wiki page User:<username>
     """
 
-    def __init__(self, source, title='') -> None:
+    def __init__(self, source, title: str = '') -> None:
         """
         Initializer for a User object.
 
@@ -3006,7 +3006,7 @@ class User(Page):
         """
         return self.getprops(force).get('rights', [])
 
-    def getUserPage(self, subpage=''):
+    def getUserPage(self, subpage: str = ''):
         """
         Return a Page object relative to this user's main page.
 
@@ -3025,7 +3025,7 @@ class User(Page):
             subpage = '/' + subpage
         return Page(Link(self.title() + subpage, self.site))
 
-    def getUserTalkPage(self, subpage=''):
+    def getUserTalkPage(self, subpage: str = ''):
         """
         Return a Page object relative to this user's main talk page.
 
@@ -3574,7 +3574,7 @@ class WikibasePage(BasePage, WikibaseEntity):
 
     _cache_attrs = BasePage._cache_attrs + ('_content', )
 
-    def __init__(self, site, title='', **kwargs) -> None:
+    def __init__(self, site, title: str = '', **kwargs) -> None:
         """
         Initializer.
 
@@ -4471,7 +4471,7 @@ class Claim(Property):
     SNAK_TYPES = ('value', 'somevalue', 'novalue')
 
     def __init__(self, site, pid, snak=None, hash=None, is_reference=False,
-                 is_qualifier=False, rank='normal', **kwargs) -> None:
+                 is_qualifier=False, rank: str = 'normal', **kwargs) -> None:
         """
         Initializer.
 
@@ -4738,14 +4738,19 @@ class Claim(Property):
                              .format(value, value_class))
         self.target = value
 
-    def changeTarget(self, value=None, snaktype='value', **kwargs) -> None:
+    def changeTarget(
+        self,
+        value=None,
+        snaktype: str = 'value',
+        **kwargs
+    ) -> None:
         """
         Set the target value in the data repository.
 
         :param value: The new target value.
         :type value: object
-        :param snaktype: The new snak type.
-        :type snaktype: str ('value', 'somevalue', or 'novalue')
+        :param snaktype: The new snak type ('value', 'somevalue', or
+            'novalue').
         """
         if value:
             self.setTarget(value)

@@ -325,7 +325,7 @@ def getversion_package(path=None):
     return (tag, rev, date, hsh)
 
 
-def getversion_onlinerepo(path='branches/master'):
+def getversion_onlinerepo(path: str = 'branches/master'):
     """Retrieve current framework git hash from Gerrit."""
     from pywikibot.comms import http
 

@@ -65,13 +65,12 @@ class ClaimRobot(WikidataBot):
 
     use_from_page = None
 
-    def __init__(self, claims, exists_arg='', **kwargs) -> None:
+    def __init__(self, claims, exists_arg: str = '', **kwargs) -> None:
         """Initializer.
 
         :param claims: A list of wikidata claims
         :type claims: list
         :param exists_arg: String specifying how to handle duplicate claims
-        :type exists_arg: str
         """
         self.available_options['always'] = True
         super().__init__(**kwargs)

@@ -81,7 +81,11 @@ class UI(ABUIC):
         self.cache = []
         self.lock = RLock()
 
-    def init_handlers(self, root_logger, default_stream='stderr') -> None:
+    def init_handlers(
+        self,
+        root_logger,
+        default_stream: str = 'stderr'
+    ) -> None:
         """Initialize the handlers for user output.
 
         This method initializes handler(s) for output levels VERBOSE (if

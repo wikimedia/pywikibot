@@ -151,7 +151,12 @@ class suppress_warnings(catch_warnings):  # noqa: N801
     .. versionadded:: 3.0
     """
 
-    def __init__(self, message='', category=Warning, filename='') -> None:
+    def __init__(
+        self,
+        message: str = '',
+        category=Warning,
+        filename: str = ''
+    ) -> None:
         """Initialize the object.
 
         The parameter semantics are similar to those of
@@ -159,14 +164,12 @@ class suppress_warnings(catch_warnings):  # noqa: N801
 
         :param message: A string containing a regular expression that the start
             of the warning message must match. (case-insensitive)
-        :type message: str
         :param category: A class (a subclass of Warning) of which the warning
             category must be a subclass in order to match.
         :type category: type
         :param filename: A string containing a regular expression that the
             start of the path to the warning module must match.
             (case-sensitive)
-        :type filename: str
         """
         self.message_match = re.compile(message, re.I).match
         self.category = category
@@ -614,8 +617,8 @@ class ThreadedGenerator(threading.Thread):
     ..versionadded:: 3.0
     """
 
-    def __init__(self, group=None, target=None, name='GeneratorThread',
-                 args=(), kwargs=None, qsize=65536) -> None:
+    def __init__(self, group=None, target=None, name: str = 'GeneratorThread',
+                 args=(), kwargs=None, qsize: int = 65536) -> None:
         """Initializer. Takes same keyword arguments as threading.Thread.
 
         target must be a generator function (or other callable that returns
@@ -624,7 +627,6 @@ class ThreadedGenerator(threading.Thread):
         :param qsize: The size of the lookahead queue. The larger the qsize,
             the more values will be computed in advance of use (which can eat
             up memory and processor time).
-        :type qsize: int
         """
         if kwargs is None:
             kwargs = {}
@@ -705,7 +707,7 @@ def itergroup(iterable, size: int):
         yield group
 
 
-def islice_with_ellipsis(iterable, *args, marker='…'):
+def islice_with_ellipsis(iterable, *args, marker: str = '…'):
     """
     Generator which yields the first n elements of the iterable.
 
@@ -722,7 +724,6 @@ def islice_with_ellipsis(iterable, *args, marker='…'):
         - ``itertools.islice(iterable, start, stop[, step])``
     :param marker: element to yield if iterable still contains elements
         after showing the required number. Default value: '…'
-    :type marker: str
     """
     s = slice(*args)
     _iterable = iter(iterable)
@@ -754,13 +755,11 @@ class ThreadList(list):
 
     _logger = 'threadlist'
 
-    def __init__(self, limit=128, wait_time=2, *args) -> None:
+    def __init__(self, limit: int = 128, wait_time: float = 2, *args) -> None:
         """Initializer.
 
         :param limit: the number of simultaneous threads
-        :type limit: int
         :param wait_time: how long to wait if active threads exceeds limit
-        :type wait_time: int or float
         """
         self.limit = limit
         self.wait_time = wait_time
@@ -1109,7 +1108,7 @@ class DequeGenerator(Iterator, collections.deque):
         return result
 
 
-def open_archive(filename, mode='rb', use_extension=True):
+def open_archive(filename, mode: str = 'rb', use_extension=True):
     """
     Open a file and uncompress it if needed.
 
@@ -1132,7 +1131,6 @@ def open_archive(filename, mode='rb', use_extension=True):
     :param mode: The mode in which the file should be opened. It may either be
         'r', 'rb', 'a', 'ab', 'w' or 'wb'. All modes open the file in binary
         mode. It defaults to 'rb'.
-    :type mode: str
     :raises ValueError: When 7za is not available or the opening mode is
         unknown or it tries to write a 7z archive.
     :raises FileNotFoundError: When the filename doesn't exist and it tries
@@ -1240,14 +1238,18 @@ def merge_unique_dicts(*args, **kwargs):
     return result
 
 
-def file_mode_checker(filename: str, mode=0o600, quiet=False, create=False):
+def file_mode_checker(
+    filename: str,
+    mode: int = 0o600,
+    quiet=False,
+    create=False
+):
     """Check file mode and update it, if needed.
 
     .. versionadded: 3.0
 
     :param filename: filename path
     :param mode: requested file mode
-    :type mode: int
     :param quiet: warn about file mode change if False.
     :type quiet: bool
     :param create: create the file if it does not exist already
@@ -1270,7 +1272,7 @@ def file_mode_checker(filename: str, mode=0o600, quiet=False, create=False):
             warn(warn_str.format(filename, st_mode - stat.S_IFREG, mode))
 
 
-def compute_file_hash(filename: str, sha='sha1', bytes_to_read=None):
+def compute_file_hash(filename: str, sha: str = 'sha1', bytes_to_read=None):
     """Compute file hash.
 
     Result is expressed as hexdigest().
@@ -1281,7 +1283,6 @@ def compute_file_hash(filename: str, sha='sha1', bytes_to_read=None):
     :param sha: hashing function among the following in hashlib:
         md5(), sha1(), sha224(), sha256(), sha384(), and sha512()
         function name shall be passed as string, e.g. 'sha1'.
-    :type sha: str
     :param bytes_to_read: only the first bytes_to_read will be considered;
         if file size is smaller, the whole file will be considered.
     :type bytes_to_read: None or int

@@ -370,7 +370,7 @@ class LinkedPagesRule:
         return False
 
 
-def api_feed_repeater(gen, delay=0, repeat=False, namespaces=None,
+def api_feed_repeater(gen, delay: float = 0, repeat=False, namespaces=None,
                       user=None, recent_new_gen=True):
     """Generator which loads pages details to be processed."""
     while True:

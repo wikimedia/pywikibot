@@ -43,7 +43,7 @@ class _NotImplementedWarning(RuntimeWarning):
     """
 
 
-def add_decorated_full_name(obj, stacklevel=1) -> None:
+def add_decorated_full_name(obj, stacklevel: int = 1) -> None:
     """Extract full object name, including class, and store in __full_name__.
 
     This must be done on all decorators that are chained together, otherwise
@@ -52,7 +52,6 @@ def add_decorated_full_name(obj, stacklevel=1) -> None:
     :param obj: An object being decorated
     :type obj: object
     :param stacklevel: level to use
-    :type stacklevel: int
     """
     if hasattr(obj, '__full_name__'):
         return

@@ -94,7 +94,7 @@ class GeneratorsMixin:
                 priority, page = heapq.heappop(prio_queue)
                 yield page
 
-    def preloadpages(self, pagelist, *, groupsize=50, templates=False,
+    def preloadpages(self, pagelist, *, groupsize: int = 50, templates=False,
                      langlinks=False, pageprops=False):
         """Return a generator to a list of preloaded pages.
 
@@ -791,10 +791,21 @@ class GeneratorsMixin:
             for linkdata in pageitem['extlinks']:
                 yield linkdata['*']
 
-    def allpages(self, start='!', prefix='', namespace=0, filterredir=None,
-                 filterlanglinks=None, minsize=None, maxsize=None,
-                 protect_type=None, protect_level=None, reverse=False,
-                 total=None, content=False):
+    def allpages(
+        self,
+        start: str = '!',
+        prefix: str = '',
+        namespace=0,
+        filterredir=None,
+        filterlanglinks=None,
+        minsize=None,
+        maxsize=None,
+        protect_type=None,
+        protect_level=None,
+        reverse=False,
+        total=None,
+        content=False
+    ):
         """Iterate pages in a single namespace.
 
         :see: https://www.mediawiki.org/wiki/API:Allpages
@@ -863,8 +874,15 @@ class GeneratorsMixin:
             apgen.request['gapdir'] = 'descending'
         return apgen
 
-    def alllinks(self, start='!', prefix='', namespace=0, unique=False,
-                 fromids=False, total=None):
+    def alllinks(
+        self,
+        start: str = '!',
+        prefix: str = '',
+        namespace=0,
+        unique=False,
+        fromids=False,
+        total=None
+    ):
         """Iterate all links to pages (which need not exist) in one namespace.
 
         Note that, in practice, links that were found on pages that have
@@ -901,7 +919,7 @@ class GeneratorsMixin:
                 p._fromid = link['fromid']
             yield p
 
-    def allcategories(self, start='!', prefix='', total=None,
+    def allcategories(self, start: str = '!', prefix: str = '', total=None,
                       reverse=False, content=False):
         """Iterate categories used (which need not have a Category page).
 
@@ -945,7 +963,13 @@ class GeneratorsMixin:
 
         yield from self._bots.values()
 
-    def allusers(self, start='!', prefix='', group=None, total=None):
+    def allusers(
+        self,
+        start: str = '!',
+        prefix: str = '',
+        group=None,
+        total=None
+    ):
         """Iterate registered users, ordered by username.
 
         Iterated values are dicts containing 'name', 'editcount',
@@ -970,9 +994,18 @@ class GeneratorsMixin:
             augen.request['augroup'] = group
         return augen
 
-    def allimages(self, start='!', prefix='', minsize=None, maxsize=None,
-                  reverse=False, sha1=None, sha1base36=None,
-                  total=None, content=False):
+    def allimages(
+        self,
+        start: str = '!',
+        prefix: str = '',
+        minsize=None,
+        maxsize=None,
+        reverse=False,
+        sha1=None,
+        sha1base36=None,
+        total=None,
+        content=False
+    ):
         """Iterate all images, ordered by image title.
 
         Yields FilePages, but these pages need not exist on the wiki.
@@ -2013,7 +2046,7 @@ class GeneratorsMixin:
         """
         return self.querypage('Listredirects', total)
 
-    def protectedpages(self, namespace=0, type='edit', level=False,
+    def protectedpages(self, namespace=0, type: str = 'edit', level=False,
                        total=None):
         """
         Return protected pages depending on protection level and type.

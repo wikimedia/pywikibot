@@ -277,7 +277,7 @@ class Throttle:
 
         time.sleep(seconds)
 
-    def __call__(self, requestsize=1, write=False) -> None:
+    def __call__(self, requestsize: int = 1, write=False) -> None:
         """Block the calling program if the throttle time has not expired.
 
         Parameter requestsize is the number of Pages to be read/written;

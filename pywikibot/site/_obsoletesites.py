@@ -22,7 +22,7 @@ class ClosedSite(APISite):
         """Initializer."""
         super().__init__(code, fam, user)
 
-    def _closed_error(self, notice='') -> None:
+    def _closed_error(self, notice: str = '') -> None:
         """An error instead of pointless API call."""
         pywikibot.error('Site {} has been closed. {}'.format(self.sitename,
                                                              notice))

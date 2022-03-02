@@ -1561,7 +1561,7 @@ The text message is:
         self.wait()
         return None
 
-    def _relogin(self, message='') -> None:
+    def _relogin(self, message: str = '') -> None:
         """Force re-login and inform user."""
         pywikibot.error('{}{}Forcing re-login.'.format(message,
                                                        ' ' if message else ''))

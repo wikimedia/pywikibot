@@ -180,7 +180,7 @@ class SparqlQuery:
         data = self.query(query, headers=headers)
         return data['boolean']
 
-    def get_items(self, query, item_name='item', result_type=set):
+    def get_items(self, query, item_name: str = 'item', result_type=set):
         """
         Retrieve items which satisfy given query.
 

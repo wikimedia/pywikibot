@@ -177,7 +177,7 @@ class DataSite(APISite):
             raise APIError(data['errors'], '')
         return data['entities']
 
-    def preload_entities(self, pagelist, groupsize=50):
+    def preload_entities(self, pagelist, groupsize: int = 50):
         """
         Yield subclasses of WikibaseEntity's with content prefilled.
 
@@ -187,7 +187,6 @@ class DataSite(APISite):
         :param pagelist: an iterable that yields either WikibaseEntity objects,
                          or Page objects linked to an ItemPage.
         :param groupsize: how many pages to query at a time
-        :type groupsize: int
         """
         if not hasattr(self, '_entity_namespaces'):
             self._cache_entity_namespaces()
@@ -329,15 +328,15 @@ class DataSite(APISite):
         entity.latest_revision_id = data['pageinfo']['lastrevid']
 
     @need_right('edit')
-    def changeClaimTarget(self, claim, snaktype='value',
+    def changeClaimTarget(self, claim, snaktype: str = 'value',
                           bot=True, summary=None):
         """
         Set the claim target to the value of the provided claim target.
 
         :param claim: The source of the claim target value
         :type claim: pywikibot.Claim
-        :param snaktype: An optional snaktype. Default: 'value'
-        :type snaktype: str ('value', 'novalue' or 'somevalue')
+        :param snaktype: An optional snaktype ('value', 'novalue' or
+            'somevalue'). Default: 'value'
         :param bot: Whether to mark the edit as a bot edit
         :type bot: bool
         :param summary: Edit summary

@@ -1303,7 +1303,7 @@ class Subject(interwiki_graph.Subject):
         if createneed:
             self.problemfound = True
 
-    def whereReport(self, page, indent=4) -> None:
+    def whereReport(self, page, indent: int = 4) -> None:
         """Report found interlanguage links with conflicts."""
         for page2 in sorted(self.found_in[page]):
             if page2 is None:
@@ -2067,11 +2067,11 @@ class InterwikiBot:
         """Check whether there is still more work to do."""
         return not self and self.pageGenerator is None
 
-    def plus(self, site, count=1) -> None:
+    def plus(self, site, count: int = 1) -> None:
         """Helper routine that the Subject class expects in a counter."""
         self.counts[site] += count
 
-    def minus(self, site, count=1) -> None:
+    def minus(self, site, count: int = 1) -> None:
         """Helper routine that the Subject class expects in a counter."""
         self.counts[site] -= count
         self.counts = +self.counts  # remove zero and negative counts

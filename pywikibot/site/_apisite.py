@@ -1230,7 +1230,7 @@ class APISite(
             self.loadpageinfo(page)
         return page._protection
 
-    def page_can_be_edited(self, page, action='edit') -> bool:
+    def page_can_be_edited(self, page, action: str = 'edit') -> bool:
         """Determine if the page can be modified.
 
         Return True if the bot has the permission of needed restriction level
@@ -1485,7 +1485,7 @@ class APISite(
 
     @need_right('deleterevision')
     def deleterevs(self, targettype: str, ids, *,
-                   hide=None, show=None, reason='', target=None):
+                   hide=None, show=None, reason: str = '', target=None):
         """Delete or undelete specified page revisions, file versions or logs.
 
         :see: https://www.mediawiki.org/wiki/API:Revisiondelete

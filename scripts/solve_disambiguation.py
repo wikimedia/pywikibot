@@ -394,8 +394,13 @@ class ReferringPageGeneratorWithIgnore:
 
     """Referring Page generator, with an ignore manager."""
 
-    def __init__(self, page, primary=False, minimum=0, main_only=False
-                 ) -> None:
+    def __init__(
+        self,
+        page,
+        primary=False,
+        minimum: int = 0,
+        main_only=False
+    ) -> None:
         """Initializer.
 
         :type page: pywikibot.Page
@@ -1189,8 +1194,13 @@ or press enter to quit:""")
             self.opt.pos += links
         return True
 
-    def setSummaryMessage(self, page, new_targets=None, unlink_counter=0,
-                          dn=False) -> None:
+    def setSummaryMessage(
+        self,
+        page,
+        new_targets=None,
+        unlink_counter: int = 0,
+        dn=False
+    ) -> None:
         """Setup i18n summary message."""
         new_targets = new_targets or []
         # make list of new targets

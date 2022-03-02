@@ -567,7 +567,7 @@ class WeblinkCheckerRobot(SingleSiteBot, ExistingPageBot):
     It uses several LinkCheckThreads at once to process pages from generator.
     """
 
-    def __init__(self, http_ignores=None, day=7, **kwargs) -> None:
+    def __init__(self, http_ignores=None, day: int = 7, **kwargs) -> None:
         """Initializer."""
         super().__init__(**kwargs)
 

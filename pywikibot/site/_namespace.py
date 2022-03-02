@@ -278,7 +278,7 @@ class Namespace(Iterable, ComparableMixin):
         return default_case
 
     @classmethod
-    def builtin_namespaces(cls, case='first-letter'):
+    def builtin_namespaces(cls, case: str = 'first-letter'):
         """Return a dict of the builtin namespaces."""
         return {i: cls(i, case=cls.default_case(i, case))
                 for i in range(-2, 16)}

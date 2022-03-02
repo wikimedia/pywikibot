@@ -28,11 +28,10 @@ class IllustrateRobot(WikidataBot):
 
     """A bot to add Wikidata image claims."""
 
-    def __init__(self, wdproperty='P18', **kwargs) -> None:
+    def __init__(self, wdproperty: str = 'P18', **kwargs) -> None:
         """Initializer.
 
         :param wdproperty: The property to add. Should be of type commonsMedia
-        :type wdproperty: str
         """
         super().__init__(**kwargs)
         self.wdproperty = wdproperty
