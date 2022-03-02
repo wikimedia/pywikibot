@@ -1567,7 +1567,7 @@ The text message is:
                                                        ' ' if message else ''))
         self.site._relogin()
 
-    def _userinfo_query(self, result):
+    def _userinfo_query(self, result) -> bool:
         """Handle userinfo query."""
         if self.action == 'query' and 'userinfo' in result.get('query', ()):
             # if we get passed userinfo in the query result, we can confirm
@@ -1604,7 +1604,7 @@ The text message is:
                         pywikibot.warning('API warning ({}): {}'
                                           .format(mod, single_warning))
 
-    def _logged_in(self, code):
+    def _logged_in(self, code) -> bool:
         """Check whether user is logged in.
 
         Older wikis returned an error instead of a warning when the request
@@ -1631,7 +1631,7 @@ The text message is:
         self._relogin(message)
         return False
 
-    def _internal_api_error(self, code, error, result):
+    def _internal_api_error(self, code, error, result) -> bool:
         """Check for internal_api_error_ or readonly and retry.
 
         :raises pywikibot.exceptions.APIMWError: internal_api_error or readonly
@@ -2472,7 +2472,7 @@ class QueryGenerator(_RequestWrapper):
 
         return None
 
-    def _query_continue(self):
+    def _query_continue(self) -> bool:
         if all(key not in self.data[self.continue_name]
                for key in self.continuekey):
             pywikibot.log(
@@ -2484,7 +2484,7 @@ class QueryGenerator(_RequestWrapper):
             self._add_continues(query_continue_pair)
         return False  # a new request with query-continue is needed
 
-    def _continue(self):
+    def _continue(self) -> bool:
         self._add_continues(self.data['continue'])
         return False  # a new request with continue is needed
 

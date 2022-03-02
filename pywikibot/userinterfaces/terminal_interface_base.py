@@ -145,7 +145,7 @@ class UI(ABUIC):
         """Optionally encode and write the text to the target stream."""
         target_stream.write(text)
 
-    def support_color(self, target_stream):
+    def support_color(self, target_stream) -> bool:
         """Return whether the target stream does support colors."""
         return False
 

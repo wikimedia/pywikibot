@@ -175,7 +175,7 @@ class SyncSites:
             sync_overview_page.text = output
             sync_overview_page.save(self.put_message(site))
 
-    def put_message(self, site):
+    def put_message(self, site) -> str:
         """Return synchronization message."""
         return ('{} replicate_wiki.py synchronization from {}'
                 .format(site.user(), str(self.original)))

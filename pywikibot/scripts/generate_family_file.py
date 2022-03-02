@@ -88,7 +88,7 @@ class FamilyFileGenerator:
         self.wikis = {}  # {'https://wiki/$1': Wiki('https://wiki/$1'), ...}
         self.langs = []  # [Wiki('https://wiki/$1'), ...]
 
-    def get_params(self):  # pragma: no cover
+    def get_params(self) -> bool:  # pragma: no cover
         """Ask for parameters if necessary."""
         if self.base_url is None:
             self.base_url = input('Please insert URL to wiki: ')

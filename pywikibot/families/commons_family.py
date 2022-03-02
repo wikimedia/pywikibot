@@ -39,7 +39,7 @@ class Family(family.WikimediaFamily):
         '_default': (('/doc', ), ['commons']),
     }
 
-    def interface(self, code):
+    def interface(self, code) -> str:
         """Return 'DataSite' to enable structured data.
 
         .. versionadded 6.5

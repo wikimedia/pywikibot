@@ -468,7 +468,7 @@ class InterwikiBotConfig:
         if not self.quiet:
             pywikibot.output('NOTE: ' + text)
 
-    def readOptions(self, option):
+    def readOptions(self, option) -> bool:
         """Read all commandline parameters for the global container."""
         arg, _, value = option.partition(':')
         if not arg.startswith('-'):
@@ -779,7 +779,7 @@ class Subject(interwiki_graph.Subject):
         self.todo.clear()
         self.forcedStop = True
 
-    def addIfNew(self, page, counter, linkingPage):
+    def addIfNew(self, page, counter, linkingPage) -> bool:
         """
         Add the pagelink given to the todo list, if it hasn't been seen yet.
 
@@ -819,7 +819,7 @@ class Subject(interwiki_graph.Subject):
             or self.namespaceMismatch(page, target, counter) \
             or self.wiktionaryMismatch(target)
 
-    def namespaceMismatch(self, linkingPage, linkedPage, counter):
+    def namespaceMismatch(self, linkingPage, linkedPage, counter) -> bool:
         """
         Check whether or not the given page has a different namespace.
 
@@ -897,7 +897,7 @@ class Subject(interwiki_graph.Subject):
         # or no origin page yet, also no problem
         return False
 
-    def wiktionaryMismatch(self, page):
+    def wiktionaryMismatch(self, page) -> bool:
         """Check for ignoring pages."""
         if self.origin and self.conf.same == 'wiktionary':
             if page.title().lower() != self.origin.title().lower():
@@ -999,7 +999,7 @@ class Subject(interwiki_graph.Subject):
         # We can follow the page.
         return (False, None)
 
-    def isIgnored(self, page):
+    def isIgnored(self, page) -> bool:
         """Return True if pages is to be ignored."""
         if page.site.lang in self.conf.neverlink:
             pywikibot.output('Skipping link {} to an ignored language'
@@ -1547,7 +1547,7 @@ class Subject(interwiki_graph.Subject):
         if config.interwiki_backlink:
             self.reportBacklinks(new, updatedSites)
 
-    def replaceLinks(self, page, newPages):
+    def replaceLinks(self, page, newPages) -> bool:
         """Return True if saving was successful."""
         # In this case only continue on the Page we started with
         if self.conf.localonly and page != self.origin:
@@ -2012,7 +2012,7 @@ class InterwikiBot:
         # foreign page queries we can find.
         return self.maxOpenSite()
 
-    def oneQuery(self):
+    def oneQuery(self) -> bool:
         """
         Perform one step in the solution process.
 
@@ -2142,7 +2142,7 @@ def compareLanguages(old, new, insite, summary):
     return mods, mcomment, adding, removing, modifying
 
 
-def botMayEdit(page):
+def botMayEdit(page) -> bool:
     """Test for allowed edits."""
     tmpl = []
     with suppress(KeyError):

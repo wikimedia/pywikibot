@@ -137,24 +137,24 @@ class TextEditor(ScrolledText):
             if keylist:
                 self.event_add(event, *keylist)
 
-    def cut(self, event):
+    def cut(self, event) -> str:
         """Perform cut operation."""
         if self.tag_ranges('sel'):
             self.event_generate('<<Cut>>')
         return 'break'
 
-    def copy(self, event):
+    def copy(self, event) -> str:
         """Perform copy operation."""
         if self.tag_ranges('sel'):
             self.event_generate('<<Copy>>')
         return 'break'
 
-    def paste(self, event):
+    def paste(self, event) -> str:
         """Perform paste operation."""
         self.event_generate('<<Paste>>')
         return 'break'
 
-    def select_all(self, event=None):
+    def select_all(self, event=None) -> str:
         """Perform select all operation."""
         self.tag_add('sel', '1.0', 'end-1c')
         self.mark_set('insert', '1.0')
@@ -166,17 +166,17 @@ class TextEditor(ScrolledText):
         self.tag_remove('sel', '1.0', 'end')
         self.see('insert')
 
-    def del_word_left(self, event):
+    def del_word_left(self, event) -> str:
         """Perform delete word (left) operation."""
         self.event_generate('<Meta-Delete>')
         return 'break'
 
-    def del_word_right(self, event=None):
+    def del_word_right(self, event=None) -> str:
         """Perform delete word (right) operation."""
         self.event_generate('<Meta-d>')
         return 'break'
 
-    def find_event(self, event=None):
+    def find_event(self, event=None) -> str:
         """Perform find operation."""
         if not self.tag_ranges('sel'):
             found = self.tag_ranges('found')
@@ -187,17 +187,17 @@ class TextEditor(ScrolledText):
         SearchDialog.find(self)
         return 'break'
 
-    def find_again_event(self, event=None):
+    def find_again_event(self, event=None) -> str:
         """Perform find again operation."""
         SearchDialog.find_again(self)
         return 'break'
 
-    def find_selection_event(self, event=None):
+    def find_selection_event(self, event=None) -> str:
         """Perform find selection operation."""
         SearchDialog.find_selection(self)
         return 'break'
 
-    def replace_event(self, event=None):
+    def replace_event(self, event=None) -> str:
         """Perform replace operation."""
         ReplaceDialog.replace(self)
         return 'break'
@@ -431,7 +431,7 @@ class EditBoxWindow(tkinter.Frame):
         self.text = self.editbox.get('1.0', tkinter.END)
         self.parent.destroy()
 
-    def debug(self, event=None):
+    def debug(self, event=None) -> str:
         """Call quit() and return 'break'."""
         self.quit()
         return 'break'

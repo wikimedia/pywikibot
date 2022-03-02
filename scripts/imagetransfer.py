@@ -326,7 +326,7 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
                 pywikibot.output(
                     color_format('{yellow}No such image number.{default}'))
 
-    def transfer_allowed(self, image):
+    def transfer_allowed(self, image) -> bool:
         """Check whether transfer is allowed."""
         target_repo = self.opt.target.image_repository()
 

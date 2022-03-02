@@ -167,7 +167,7 @@ class PatrolBot(BaseBot):
                 raise
             pywikibot.error(str(e))
 
-    def in_list(self, pagelist, title):
+    def in_list(self, pagelist, title) -> bool:
         """Check if title present in pagelist."""
         verbose_output('Checking whitelist for: ' + title)
 
@@ -259,7 +259,7 @@ class PatrolBot(BaseBot):
 
         return dict(whitelist)
 
-    def is_wikisource_author_page(self, title):
+    def is_wikisource_author_page(self, title) -> bool:
         """Patrol a single item."""
         if self.site.family.name != 'wikisource':
             return False
@@ -344,7 +344,7 @@ class LinkedPagesRule:
         self.page_title = page_title
         self.linkedpages = None
 
-    def match(self, page_title):
+    def match(self, page_title) -> bool:
         """Match page_title to linkedpages elements."""
         if page_title == self.page_title:
             return True

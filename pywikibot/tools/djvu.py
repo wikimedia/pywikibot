@@ -243,7 +243,7 @@ class DjVuFile:
         return self._remove_control_chars(stdoutdata)
 
     @check_page_number
-    def whiten_page(self, n):
+    def whiten_page(self, n) -> bool:
         """Replace page 'n' of djvu file with a blank page.
 
         :param n: page n of djvu file
@@ -294,7 +294,7 @@ class DjVuFile:
         return True
 
     @check_page_number
-    def delete_page(self, n):
+    def delete_page(self, n) -> bool:
         """Delete page 'n' of djvu file.
 
         :param n: page n of djvu file

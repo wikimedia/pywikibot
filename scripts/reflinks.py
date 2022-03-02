@@ -219,12 +219,12 @@ class RefLink:
         self.url = re.sub('#.*', '', self.link)
         self.title = None
 
-    def refTitle(self):
+    def refTitle(self) -> str:
         """Return the <ref> with its new title."""
         return '<ref{r.name}>[{r.link} {r.title}<!-- {r.comment} -->]</ref>' \
                .format(r=self)
 
-    def refLink(self):
+    def refLink(self) -> str:
         """No title has been found, return the unbracketed link."""
         return '<ref{r.name}>{r.link}</ref>'.format(r=self)
 

@@ -83,7 +83,7 @@ def is_ip_address(value: str) -> bool:
     return False
 
 
-def has_module(module, version=None):
+def has_module(module, version=None) -> bool:
     """Check if a module can be imported.
 
     .. versionadded:: 3.0

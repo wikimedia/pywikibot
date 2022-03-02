@@ -458,7 +458,7 @@ class XmlDumpReplacePageGenerator:
                         'To resume, use "-xmlstart:{}" on the command line.'
                         .format(entry.title))
 
-    def isTitleExcepted(self, title):
+    def isTitleExcepted(self, title) -> bool:
         """
         Return True if one of the exceptions applies for the given title.
 
@@ -771,7 +771,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                      summary=self.generate_summary(applied),
                      ignore_save_related_errors=True, **kwargs)
 
-    def user_confirm(self, question):
+    def user_confirm(self, question) -> bool:
         """Always return True due to our own input choice."""
         return True
 

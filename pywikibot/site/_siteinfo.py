@@ -132,7 +132,7 @@ class Siteinfo(Container):
             is the default value.
         :see: https://www.mediawiki.org/wiki/API:Meta#siteinfo_.2F_si
         """
-        def warn_handler(mod, message):
+        def warn_handler(mod, message) -> bool:
             """Return True if the warning is handled."""
             matched = Siteinfo.WARNING_REGEX.match(message)
             if mod == 'siteinfo' and matched:

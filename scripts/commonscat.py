@@ -250,7 +250,7 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot, NoRedirectPageBot):
         return super().skip_page(page)
 
     @staticmethod
-    def skipPage(page):
+    def skipPage(page) -> bool:
         """Determine if the page should be skipped."""
         try:
             templates_to_ignore = ignoreTemplates[page.site.code]

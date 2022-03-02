@@ -28,7 +28,7 @@ def contains_invisible(text):
 
 def replace_invisible(text):
     """Replace invisible characters by '<codepoint>'."""
-    def replace(match):
+    def replace(match) -> str:
         match = match.group()
         if sys.maxunicode < 0x10ffff and len(match) == 2:
             mask = (1 << 10) - 1

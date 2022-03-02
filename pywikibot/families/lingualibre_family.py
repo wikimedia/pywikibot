@@ -25,10 +25,10 @@ class Family(family.WikimediaFamily):
 
     interwiki_forward = 'wikipedia'
 
-    def scriptpath(self, code):
+    def scriptpath(self, code) -> str:
         """Return the script path for this family."""
         return ''
 
-    def interface(self, code):
+    def interface(self, code) -> str:
         """Return 'DataSite'."""
         return 'DataSite'

@@ -279,7 +279,7 @@ class APISite(
         return self._request_class({'parameters': kwargs}).create_simple(
             self, **kwargs)
 
-    def logged_in(self):
+    def logged_in(self) -> bool:
         """Verify the bot is logged into the site as the expected user.
 
         The expected usernames are those provided as the user parameter
@@ -763,7 +763,7 @@ class APISite(
         """
         return self.has_all_mediawiki_messages([key], lang=lang)
 
-    def has_all_mediawiki_messages(self, keys, lang=None):
+    def has_all_mediawiki_messages(self, keys, lang=None) -> bool:
         """Confirm that the site defines a set of MediaWiki messages.
 
         :param keys: names of MediaWiki messages
@@ -970,7 +970,7 @@ class APISite(
 
         return _namespaces
 
-    def has_extension(self, name):
+    def has_extension(self, name) -> bool:
         """Determine whether extension `name` is loaded.
 
         :param name: The extension to check for, case sensitive
@@ -1230,7 +1230,7 @@ class APISite(
             self.loadpageinfo(page)
         return page._protection
 
-    def page_can_be_edited(self, page, action='edit'):
+    def page_can_be_edited(self, page, action='edit') -> bool:
         """Determine if the page can be modified.
 
         Return True if the bot has the permission of needed restriction level

@@ -44,6 +44,6 @@ class Family(family.SingleSiteFamily):
         'en': ('In Bearbeitung',),
     }
 
-    def protocol(self, code):
+    def protocol(self, code) -> str:
         """Return https as the protocol for this family."""
         return 'https'

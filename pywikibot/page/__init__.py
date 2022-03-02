@@ -3480,7 +3480,7 @@ class WikibaseEntity:
             del self._content
         self.latest_revision_id = updates['entity'].get('lastrevid')
 
-    def concept_uri(self):
+    def concept_uri(self) -> str:
         """
         Return the full concept URI.
 
@@ -4531,7 +4531,7 @@ class Claim(Property):
         return not self.__eq__(other)
 
     @staticmethod
-    def _claim_mapping_same(this, other):
+    def _claim_mapping_same(this, other) -> bool:
         if len(this) != len(other):
             return False
         my_values = list(chain.from_iterable(this.values()))
@@ -4547,7 +4547,7 @@ class Claim(Property):
         return True
 
     def same_as(self, other, ignore_rank=True, ignore_quals=False,
-                ignore_refs=True):
+                ignore_refs=True) -> bool:
         """Check if two claims are same."""
         if ignore_rank:
             attributes = ['id', 'snaktype', 'target']
@@ -5181,7 +5181,7 @@ class BaseLink(ComparableMixin):
             return '{}:{}'.format(name, self.title)
         return self.title
 
-    def astext(self, onsite=None):
+    def astext(self, onsite=None) -> str:
         """
         Return a text representation of the link.
 

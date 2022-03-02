@@ -15,6 +15,6 @@ class Family(family.WikimediaOrgFamily):
     name = 'wikitech'
     code = 'en'
 
-    def protocol(self, code):
+    def protocol(self, code) -> str:
         """Return the protocol for this family."""
         return 'https'

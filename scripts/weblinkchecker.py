@@ -441,7 +441,7 @@ class History:
             else:
                 self.history_dict[url] = [(page.title(), now, error)]
 
-    def set_link_alive(self, url):
+    def set_link_alive(self, url) -> bool:
         """
         Record that the link is now alive.
 

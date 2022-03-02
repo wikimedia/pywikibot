@@ -34,7 +34,7 @@ class UnixUI(terminal_interface_base.UI):
 
     """User interface for Unix terminals."""
 
-    def support_color(self, target_stream):
+    def support_color(self, target_stream) -> bool:
         """Return that the target stream supports colors."""
         return True
 

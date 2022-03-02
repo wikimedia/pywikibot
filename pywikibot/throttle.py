@@ -90,7 +90,7 @@ class Throttle:
 
     @property
     @deprecated(since='6.2')
-    def multiplydelay(self):
+    def multiplydelay(self) -> bool:
         """DEPRECATED attribute."""
         return True
 

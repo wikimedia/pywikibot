@@ -743,7 +743,7 @@ class Family:
         """
         return '/w'
 
-    def ssl_pathprefix(self, code):
+    def ssl_pathprefix(self, code) -> str:
         """The path prefix for secure HTTP access."""
         # Override this ONLY if the wiki family requires a path prefix
         return ''
@@ -773,15 +773,15 @@ class Family:
             uri = self.ssl_pathprefix(code) + uri
         return urlparse.urljoin('{}://{}'.format(protocol, host), uri)
 
-    def path(self, code):
+    def path(self, code) -> str:
         """Return path to index.php."""
         return '{}/index.php'.format(self.scriptpath(code))
 
-    def querypath(self, code):
+    def querypath(self, code) -> str:
         """Return path to query.php."""
         return '{}/query.php'.format(self.scriptpath(code))
 
-    def apipath(self, code):
+    def apipath(self, code) -> str:
         """Return path to api.php."""
         return '{}/api.php'.format(self.scriptpath(code))
 
@@ -799,7 +799,7 @@ class Family:
         """
         raise NotImplementedError('This family does not support EventStreams')
 
-    def get_address(self, code, title):
+    def get_address(self, code, title) -> str:
         """Return the path to title using index.php with redirects disabled."""
         return '{}?title={}&redirect=no'.format(self.path(code), title)
 
@@ -889,11 +889,11 @@ class Family:
         """Return the maximum URL length for GET instead of POST."""
         return config.maximum_GET_length
 
-    def dbName(self, code):
+    def dbName(self, code) -> str:
         """Return the name of the MySQL database."""
         return '{}{}'.format(code, self.name)
 
-    def encoding(self, code):
+    def encoding(self, code) -> str:
         """Return the encoding for a specific language wiki."""
         return 'utf-8'
 
@@ -930,7 +930,7 @@ class Family:
         """Return the shared image repository, if any."""
         return (None, None)
 
-    def isPublic(self, code):
+    def isPublic(self, code) -> bool:
         """Check the wiki require logging in before viewing it."""
         return True
 
@@ -1084,7 +1084,7 @@ class FandomFamily(Family):
 
         return {code: cls.domain for code in codes}
 
-    def protocol(self, code):
+    def protocol(self, code) -> str:
         """Return 'https' as the protocol."""
         return 'https'
 
@@ -1211,15 +1211,15 @@ class WikimediaFamily(Family):
         """Return Wikimedia Commons as the shared image repository."""
         return ('commons', 'commons')
 
-    def protocol(self, code):
+    def protocol(self, code) -> str:
         """Return 'https' as the protocol."""
         return 'https'
 
-    def eventstreams_host(self, code):
+    def eventstreams_host(self, code) -> str:
         """Return 'https://stream.wikimedia.org' as the stream hostname."""
         return 'https://stream.wikimedia.org'
 
-    def eventstreams_path(self, code):
+    def eventstreams_path(self, code) -> str:
         """Return path for EventStreams."""
         return '/v2/stream'
 
@@ -1229,7 +1229,7 @@ class WikimediaOrgFamily(SingleSiteFamily, WikimediaFamily):
     """Single site family for sites hosted at ``*.wikimedia.org``."""
 
     @classproperty
-    def domain(cls):
+    def domain(cls) -> str:
         """Return the parents domain with a subdomain prefix."""
         return '{}.wikimedia.org'.format(cls.name)
 

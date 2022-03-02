@@ -59,7 +59,7 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
             return langdetect.detect_langs(text)
         return None
 
-    def process_desc_template(self, template):
+    def process_desc_template(self, template) -> bool:
         """Process description template."""
         tmp_page = pywikibot.Page(self.site, template.name.strip(), ns=10)
         if tmp_page in self.lang_tmps and len(template.params) == 1 \

@@ -1967,7 +1967,7 @@ class TimeStripper:
         return (txt, None)
 
     @staticmethod
-    def _valid_date_dict_positions(dateDict):
+    def _valid_date_dict_positions(dateDict) -> bool:
         """Check consistency of reasonable positions for groups."""
         time_pos = dateDict['time']['start']
         tzinfo_pos = dateDict['tzinfo']['start']

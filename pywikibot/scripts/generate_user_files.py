@@ -91,7 +91,7 @@ set environment variables.""".format(new_base=new_base), width=76)
     return False
 
 
-def file_exists(filename):
+def file_exists(filename) -> bool:
     """Return whether the file exists and print a message if it exists."""
     if os.path.exists(filename):
         pywikibot.output('{1} already exists in the target directory "{0}".'

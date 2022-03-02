@@ -15,6 +15,6 @@ class Family(family.SingleSiteFamily):
     name = 'omegawiki'
     domain = 'www.omegawiki.org'
 
-    def scriptpath(self, code):
+    def scriptpath(self, code) -> str:
         """Return the script path for this family."""
         return ''
