@@ -900,25 +900,6 @@ class TestLazyLoginNoUsername(TestLazyLoginBase):
             'You have no API read permissions. Seems you are not logged in.')
 
 
-class TestBadTokenRecovery(TestCase):
-
-    """Test that the request recovers from bad tokens."""
-
-    family = 'wikipedia'
-    code = 'test'
-
-    write = True
-
-    def test_bad_token(self):
-        """Test the bad token recovery by corrupting the cache."""
-        site = self.get_site()
-        site.tokens._tokens.setdefault(site.user(), {})['edit'] = 'INVALID'
-        page = pywikibot.Page(site, 'Pywikibot bad token test')
-        page.text = ('This page is testing whether pywikibot rerequests '
-                     'a token when a badtoken error was received.')
-        page.save(summary='Bad token test')
-
-
 class TestUrlEncoding(TestCase):
 
     """Test encode_url() function."""
