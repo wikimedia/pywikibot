@@ -230,7 +230,7 @@ class BaseSite(ComparableMixin):
         return [lang for lang in self.languages()
                 if self.namespaces.lookup_normalized_name(lang) is None]
 
-    def _interwiki_urls(self, only_article_suffixes=False):
+    def _interwiki_urls(self, only_article_suffixes: bool = False):
         base_path = self.path()
         if not only_article_suffixes:
             yield base_path + '{}'
@@ -272,7 +272,7 @@ class BaseSite(ComparableMixin):
         """Return list of localized PAGENAMEE tags for the site."""
         return ['PAGENAMEE']
 
-    def lock_page(self, page, block=True):
+    def lock_page(self, page, block: bool = True):
         """
         Lock page for writing. Must be called before writing any page.
 

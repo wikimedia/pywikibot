@@ -19,7 +19,7 @@ from html.parser import HTMLParser
 from typing import NamedTuple, Optional, Union
 
 import pywikibot
-from pywikibot.backports import Container, Iterable, List
+from pywikibot.backports import Container, Dict, Iterable, List
 from pywikibot.backports import OrderedDict as OrderedDictType
 from pywikibot.backports import Sequence as SequenceType
 from pywikibot.backports import Tuple
@@ -1006,7 +1006,11 @@ def extract_sections(
 #        do not find or change links of other kinds, nor any that are formatted
 #        as in-line interwiki links (e.g., "[[:es:Artículo]]".
 
-def getLanguageLinks(text: str, insite=None, template_subpage=False) -> dict:
+def getLanguageLinks(
+    text: str,
+    insite=None,
+    template_subpage: bool = False
+) -> Dict:
     """
     Return a dict of inter-language links found in text.
 
@@ -1601,7 +1605,7 @@ def categoryFormat(categories, insite=None) -> str:
 # Functions dealing with external links
 # -------------------------------------
 
-def compileLinkR(withoutBracketed=False, onlyBracketed: bool = False):
+def compileLinkR(withoutBracketed: bool = False, onlyBracketed: bool = False):
     """Return a regex that matches external links."""
     # RFC 2396 says that URLs may only contain certain characters.
     # For this regex we also accept non-allowed characters, so that the bot

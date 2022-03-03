@@ -113,12 +113,11 @@ class DjVuFile:
         return wrapper
 
     @check_cache
-    def number_of_images(self, force=False):
+    def number_of_images(self, force: bool = False):
         """
         Return the number of images in the djvu file.
 
         :param force: if True, refresh the cached data
-        :type force: bool
         """
         if not hasattr(self, '_page_count'):
             res, stdoutdata = _call_cmd(['djvused', '-e', 'n', self.file])
@@ -128,26 +127,23 @@ class DjVuFile:
         return self._page_count
 
     @check_page_number
-    def page_info(self, n, force=False):
+    def page_info(self, n: int, force: bool = False):
         """
         Return a tuple (id, (size, dpi)) for page n of djvu file.
 
         :param n: page n of djvu file
-        :type n: int
         :param force: if True, refresh the cached data
-        :type force: bool
         """
         if not hasattr(self, '_page_info') or force:
             self._get_page_info(force=force)
         return self._page_info[n]
 
     @check_cache
-    def _get_page_info(self, force=False):
+    def _get_page_info(self, force: bool = False):
         """
         Return a dict of tuples (id, (size, dpi)) for all pages of djvu file.
 
         :param force: if True, refresh the cached data
-        :type force: bool
         """
         if not hasattr(self, '_page_info'):
             self._page_info = {}
@@ -190,12 +186,11 @@ class DjVuFile:
         return size, dpi
 
     @check_cache
-    def has_text(self, force=False):
+    def has_text(self, force: bool = False):
         """
         Test if the djvu file has a text-layer.
 
         :param force: if True, refresh the cached data
-        :type force: bool
         """
         if not hasattr(self, '_has_text'):
             self._get_page_info(force=force)
@@ -221,14 +216,12 @@ class DjVuFile:
 
     @check_page_number
     @check_cache
-    def get_page(self, n, force=False):
+    def get_page(self, n: int, force: bool = False):
         """
         Get page n for djvu file.
 
         :param n: page n of djvu file
-        :type n: int
         :param force: if True, refresh the cached data
-        :type force: bool
         """
         if not self.has_text(force=force):
             raise ValueError('Djvu file {} has no text layer.'

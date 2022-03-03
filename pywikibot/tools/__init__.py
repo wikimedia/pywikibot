@@ -1108,7 +1108,7 @@ class DequeGenerator(Iterator, collections.deque):
         return result
 
 
-def open_archive(filename, mode: str = 'rb', use_extension=True):
+def open_archive(filename: str, mode: str = 'rb', use_extension: bool = True):
     """
     Open a file and uncompress it if needed.
 
@@ -1123,11 +1123,9 @@ def open_archive(filename, mode: str = 'rb', use_extension=True):
     .. versionadded:: 3.0
 
     :param filename: The filename.
-    :type filename: str
     :param use_extension: Use the file extension instead of the magic number
         to determine the type of compression (default True). Must be True when
         writing or appending.
-    :type use_extension: bool
     :param mode: The mode in which the file should be opened. It may either be
         'r', 'rb', 'a', 'ab', 'w' or 'wb'. All modes open the file in binary
         mode. It defaults to 'rb'.
@@ -1241,8 +1239,8 @@ def merge_unique_dicts(*args, **kwargs):
 def file_mode_checker(
     filename: str,
     mode: int = 0o600,
-    quiet=False,
-    create=False
+    quiet: bool = False,
+    create: bool = False
 ):
     """Check file mode and update it, if needed.
 
@@ -1251,9 +1249,7 @@ def file_mode_checker(
     :param filename: filename path
     :param mode: requested file mode
     :param quiet: warn about file mode change if False.
-    :type quiet: bool
     :param create: create the file if it does not exist already
-    :type create: bool
     :raise IOError: The file does not exist and `create` is False.
     """
     try:

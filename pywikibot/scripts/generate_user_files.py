@@ -100,9 +100,12 @@ def file_exists(filename) -> bool:
     return False
 
 
-def get_site_and_lang(default_family: Optional[str] = 'wikipedia',
-                      default_lang: Optional[str] = 'en',
-                      default_username: Optional[str] = None, force=False):
+def get_site_and_lang(
+    default_family: Optional[str] = 'wikipedia',
+    default_lang: Optional[str] = 'en',
+    default_username: Optional[str] = None,
+    force: bool = False
+):
     """
     Ask the user for the family, site code and username.
 
@@ -264,7 +267,12 @@ def copy_sections():
     return ''.join(result)
 
 
-def create_user_config(main_family, main_code, main_username, force=False):
+def create_user_config(
+    main_family,
+    main_code,
+    main_username,
+    force: bool = False
+):
     """
     Create a user-config.py in base_dir.
 

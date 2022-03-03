@@ -488,7 +488,7 @@ class WelcomeBot(SingleSiteBot):
                 .format(self.site))
         self.welcome_text = site_netext
 
-    def bad_name_filer(self, name, force=False) -> bool:
+    def bad_name_filer(self, name, force: bool = False) -> bool:
         """Check for bad names."""
         if not globalvar.filt_bad_name:
             return False
@@ -726,7 +726,7 @@ class WelcomeBot(SingleSiteBot):
                              .format(globalvar.time_recur, strfstr))
             pywikibot.sleep(globalvar.time_recur)
 
-    def define_sign(self, force=False) -> List[str]:
+    def define_sign(self, force: bool = False) -> List[str]:
         """Setup signature."""
         if hasattr(self, '_random_signature') and not force:
             return self._random_signature

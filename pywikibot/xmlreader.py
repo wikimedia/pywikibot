@@ -102,7 +102,7 @@ class XmlDump:
         Default: False.
     """
 
-    def __init__(self, filename, allrevisions=False) -> None:
+    def __init__(self, filename, allrevisions: bool = False) -> None:
         """Initializer."""
         self.filename = filename
         if allrevisions:

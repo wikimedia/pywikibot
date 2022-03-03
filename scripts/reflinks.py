@@ -239,7 +239,7 @@ class RefLink:
             dead_link = '<ref{}>{}</ref>'.format(self.name, tag)
         return dead_link
 
-    def transform(self, ispdf=False) -> None:
+    def transform(self, ispdf: bool = False) -> None:
         """Normalize the title."""
         # convert html entities
         if not ispdf:

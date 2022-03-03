@@ -22,7 +22,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import cache
+from pywikibot.backports import List, cache
 from pywikibot.comms.http import fetch
 from pywikibot.exceptions import VersionParseError
 
@@ -379,18 +379,19 @@ def get_module_mtime(module):
     return None
 
 
-def package_versions(modules=None, builtins=False, standard_lib=None):
+def package_versions(
+    modules: Optional[List[str]] = None,
+    builtins: Optional[bool] = False,
+    standard_lib: Optional[bool] = None
+):
     """Retrieve package version information.
 
     When builtins or standard_lib are None, they will be included only
     if a version was found in the package.
 
     :param modules: Modules to inspect
-    :type modules: list of strings
     :param builtins: Include builtins
-    :type builtins: Boolean, or None for automatic selection
     :param standard_lib: Include standard library packages
-    :type standard_lib: Boolean, or None for automatic selection
     """
     if not modules:
         modules = sys.modules.keys()

@@ -263,10 +263,21 @@ class BasePage(ComparableMixin):
             self.site.loadpageinfo(self)
         return self._pageid
 
-    def title(self, *, underscore=False, with_ns=True,
-              with_section=True, as_url=False, as_link=False,
-              allow_interwiki=True, force_interwiki=False, textlink=False,
-              as_filename=False, insite=None, without_brackets=False) -> str:
+    def title(
+        self,
+        *,
+        underscore: bool = False,
+        with_ns: bool = True,
+        with_section: bool = True,
+        as_url: bool = False,
+        as_link: bool = False,
+        allow_interwiki: bool = True,
+        force_interwiki: bool = False,
+        textlink: bool = False,
+        as_filename: bool = False,
+        insite=None,
+        without_brackets: bool = False
+    ) -> str:
         """
         Return the title of this Page, as a string.
 
@@ -623,7 +634,7 @@ class BasePage(ComparableMixin):
             self._parsed_text = self.site.get_parsed_page(self)
         return self._parsed_text
 
-    def properties(self, force=False) -> dict:
+    def properties(self, force: bool = False) -> dict:
         """
         Return the properties of the page.
 
@@ -634,7 +645,7 @@ class BasePage(ComparableMixin):
             self.site.loadpageprops(self)
         return self._pageprops
 
-    def defaultsort(self, force=False) -> Optional[str]:
+    def defaultsort(self, force: bool = False) -> Optional[str]:
         """
         Extract value of the {{DEFAULTSORT:}} magic word from the page.
 
@@ -642,7 +653,11 @@ class BasePage(ComparableMixin):
         """
         return self.properties(force=force).get('defaultsort')
 
-    def expand_text(self, force=False, includecomments=False) -> str:
+    def expand_text(
+        self,
+        force: bool = False,
+        includecomments: bool = False
+    ) -> str:
         """Return the page text with all templates and parser words expanded.
 
         :param force: force updating from the live site
@@ -1221,8 +1236,8 @@ class BasePage(ComparableMixin):
                    cc=apply_cosmetic_changes, quiet=quiet, **kwargs)
 
     @allow_asynchronous
-    def _save(self, summary=None, watch=None, minor=True, botflag=None,
-              cc=None, quiet=False, **kwargs):
+    def _save(self, summary=None, watch=None, minor: bool = True, botflag=None,
+              cc=None, quiet: bool = False, **kwargs):
         """Helper function for save()."""
         link = self.title(as_link=True)
         if cc or (cc is None and config.cosmetic_changes):
@@ -1345,7 +1360,7 @@ class BasePage(ComparableMixin):
         self.clear_cache()
         return self.site.purgepages([self], **kwargs)
 
-    def touch(self, callback=None, botflag=False, **kwargs):
+    def touch(self, callback=None, botflag: bool = False, **kwargs):
         """
         Make a touch edit for this page.
 
@@ -1417,15 +1432,13 @@ class BasePage(ComparableMixin):
 
         return self.site.pagelinks(self, **kwargs)
 
-    def interwiki(self, expand=True):
+    def interwiki(self, expand: bool = True):
         """
         Iterate interwiki links in the page text, excluding language links.
 
         :param expand: if True (default), include interwiki links found in
             templates transcluded onto this page; if False, only iterate
             interwiki links found in this page's own wikitext
-        :type expand: bool
-
         :return: a generator that yields Link objects
         :rtype: generator
         """
@@ -1453,14 +1466,12 @@ class BasePage(ComparableMixin):
                 # ignore any links with invalid contents
                 continue
 
-    def langlinks(self, include_obsolete=False) -> list:
+    def langlinks(self, include_obsolete: bool = False) -> list:
         """
         Return a list of all inter-language Links on this page.
 
         :param include_obsolete: if true, return even Link objects whose site
                                  is obsolete
-        :type include_obsolete: bool
-
         :return: list of Link objects.
         """
         # Note: We preload a list of *all* langlinks, including links to
@@ -1580,7 +1591,7 @@ class BasePage(ComparableMixin):
         """
         return self.site.page_extlinks(self, total=total)
 
-    def coordinates(self, primary_only=False):
+    def coordinates(self, primary_only: bool = False):
         """
         Return a list of Coordinate objects for points on the page.
 
@@ -1837,7 +1848,12 @@ class BasePage(ComparableMixin):
                 self._deletedRevs[rev['timestamp']] = rev
                 yield rev['timestamp']
 
-    def getDeletedRevision(self, timestamp, content=False, **kwargs) -> List:
+    def getDeletedRevision(
+        self,
+        timestamp,
+        content: bool = False,
+        **kwargs
+    ) -> List:
         """
         Return a particular deleted revision by timestamp.
 
@@ -1860,12 +1876,11 @@ class BasePage(ComparableMixin):
                     return item['revisions'][0]
         return []
 
-    def markDeletedRevision(self, timestamp, undelete=True):
+    def markDeletedRevision(self, timestamp, undelete: bool = True):
         """
         Mark the revision identified by timestamp for undeletion.
 
         :param undelete: if False, mark the revision to remain deleted.
-        :type undelete: bool
         """
         if not hasattr(self, '_deletedRevs'):
             self.loadDeletedRevisions()
@@ -2167,8 +2182,15 @@ class Page(BasePage):
             result.append((pywikibot.Page(link, self.site), positional))
         return result
 
-    def set_redirect_target(self, target_page, create=False, force=False,
-                            keep_section=False, save=True, **kwargs):
+    def set_redirect_target(
+        self,
+        target_page,
+        create: bool = False,
+        force: bool = False,
+        keep_section: bool = False,
+        save: bool = True,
+        **kwargs
+    ):
         """
         Change the page's text to point to the redirect page.
 
@@ -2176,15 +2198,11 @@ class Page(BasePage):
         :type target_page: pywikibot.Page or string
         :param create: if true, it creates the redirect even if the page
             doesn't exist.
-        :type create: bool
         :param force: if true, it set the redirect target even the page
             doesn't exist or it's not redirect.
-        :type force: bool
         :param keep_section: if the old redirect links to a section
             and the new one doesn't it uses the old redirect's section.
-        :type keep_section: bool
         :param save: if true, it saves the page immediately.
-        :type save: bool
         :param kwargs: Arguments which are used for saving the page directly
             afterwards, like 'summary' for edit summary.
         """
@@ -2717,7 +2735,7 @@ class Category(Page):
     def members(self, recurse: bool = False,
                 namespaces=None,
                 total: Optional[int] = None,
-                content=False):
+                content: bool = False):
         """Yield all category contents (subcats, pages, and files).
 
         :rtype: typing.Iterable[pywikibot.Page]
@@ -2913,13 +2931,11 @@ class User(Page):
                     self._userprops['blockreason'] = r[0]['reason']
         return self._userprops
 
-    def registration(self, force=False):
+    def registration(self, force: bool = False):
         """
         Fetch registration date for this user.
 
         :param force: if True, forces reloading the data from API
-        :type force: bool
-
         :rtype: pywikibot.Timestamp or None
         """
         if not self.isAnonymous():
@@ -3326,12 +3342,11 @@ class WikibaseEntity:
                 params['ids'] = self.id
         return params
 
-    def getID(self, numeric=False):
+    def getID(self, numeric: bool = False):
         """
         Get the identifier of this entity.
 
         :param numeric: Strip the first letter and return an int
-        :type numeric: bool
         """
         if numeric:
             return int(self.id[1:]) if self.id != '-1' else -1
@@ -3552,12 +3567,11 @@ class MediaInfo(WikibaseEntity):
 
         return super().get(force=force)
 
-    def getID(self, numeric=False):
+    def getID(self, numeric: bool = False):
         """
         Get the entity identifier.
 
         :param numeric: Strip the first letter and return an int
-        :type numeric: bool
         """
         if self.id == '-1':
             self.get()
@@ -3823,8 +3837,15 @@ class WikibasePage(BasePage, WikibaseEntity):
         data = {'aliases': aliases}
         self.editEntity(data, **kwargs)
 
-    def set_redirect_target(self, target_page, create=False, force=False,
-                            keep_section=False, save=True, **kwargs):
+    def set_redirect_target(
+        self,
+        target_page,
+        create: bool = False,
+        force: bool = False,
+        keep_section: bool = False,
+        save: bool = True,
+        **kwargs
+    ):
         """
         Set target of a redirect for a Wikibase page.
 
@@ -3833,14 +3854,13 @@ class WikibasePage(BasePage, WikibaseEntity):
         raise NotImplementedError
 
     @allow_asynchronous
-    def addClaim(self, claim, bot=True, **kwargs):
+    def addClaim(self, claim, bot: bool = True, **kwargs):
         """
         Add a claim to the entity.
 
         :param claim: The claim to add
         :type claim: pywikibot.page.Claim
         :param bot: Whether to flag as bot (if possible)
-        :type bot: bool
         :keyword asynchronous: if True, launch a separate thread to add claim
             asynchronously
         :type asynchronous: bool
@@ -4011,21 +4031,19 @@ class ItemPage(WikibasePage):
 
         return super().title(**kwargs)
 
-    def getID(self, numeric=False, force=False):
+    def getID(self, numeric: bool = False, force: bool = False):
         """
         Get the entity identifier.
 
         :param numeric: Strip the first letter and return an int
-        :type numeric: bool
         :param force: Force an update of new data
-        :type force: bool
         """
         if not hasattr(self, 'id') or force:
             self.get(force=force)
         return super().getID(numeric=numeric)
 
     @classmethod
-    def fromPage(cls, page, lazy_load=False):
+    def fromPage(cls, page, lazy_load: bool = False):
         """
         Get the ItemPage for a Page that links to it.
 
@@ -4033,7 +4051,6 @@ class ItemPage(WikibasePage):
         :type page: pywikibot.page.Page
         :param lazy_load: Do not raise NoPageError if either page or
             corresponding ItemPage does not exist.
-        :type lazy_load: bool
         :rtype: pywikibot.page.ItemPage
 
         :raise pywikibot.exceptions.NoPageError: There is no corresponding
@@ -4099,15 +4116,19 @@ class ItemPage(WikibasePage):
 
         return item
 
-    def get(self, force=False, get_redirect=False, *args, **kwargs) -> dict:
+    def get(
+        self,
+        force: bool = False,
+        get_redirect: bool = False,
+        *args,
+        **kwargs
+    ) -> Dict[str, Any]:
         """
         Fetch all item data, and cache it.
 
         :param force: override caching
-        :type force: bool
         :param get_redirect: return the item content, do not follow the
                              redirect, do not raise an exception.
-        :type get_redirect: bool
         :raise NotImplementedError: a value in args or kwargs
         :return: actual data which entity holds
         :note: dicts returned by this method are references to content of this
@@ -4151,7 +4172,7 @@ class ItemPage(WikibasePage):
                 pg._item = self
                 yield pg
 
-    def getSitelink(self, site, force=False) -> str:
+    def getSitelink(self, site, force: bool = False) -> str:
         """
         Return the title for the specific site.
 
@@ -4226,8 +4247,15 @@ class ItemPage(WikibasePage):
             self._isredir = True
             self._redirtarget = item
 
-    def set_redirect_target(self, target_page, create=False, force=False,
-                            keep_section=False, save=True, **kwargs):
+    def set_redirect_target(
+        self,
+        target_page,
+        create: bool = False,
+        force: bool = False,
+        keep_section: bool = False,
+        save: bool = True,
+        **kwargs
+    ):
         """
         Make the item redirect to another item.
 
@@ -4237,7 +4265,6 @@ class ItemPage(WikibasePage):
         :type target_page: pywikibot.page.ItemPage or string
         :param force: if true, it sets the redirect target even the page
             is not redirect.
-        :type force: bool
         """
         if isinstance(target_page, str):
             target_page = pywikibot.ItemPage(self.repo, target_page)
@@ -4328,12 +4355,11 @@ class Property:
             self._type = self.repo.getPropertyType(self)
         return self._type
 
-    def getID(self, numeric=False):
+    def getID(self, numeric: bool = False):
         """
         Get the identifier of this property.
 
         :param numeric: Strip the first letter and return an int
-        :type numeric: bool
         """
         if numeric:
             return int(self.id[1:])
@@ -4425,12 +4451,11 @@ class PropertyPage(WikibasePage, Property):
         return Claim(self.site, self.getID(), datatype=self.type,
                      *args, **kwargs)
 
-    def getID(self, numeric=False):
+    def getID(self, numeric: bool = False):
         """
         Get the identifier of this property.
 
         :param numeric: Strip the first letter and return an int
-        :type numeric: bool
         """
         # enforce this parent's implementation
         return WikibasePage.getID(self, numeric=numeric)
@@ -4470,8 +4495,17 @@ class Claim(Property):
 
     SNAK_TYPES = ('value', 'somevalue', 'novalue')
 
-    def __init__(self, site, pid, snak=None, hash=None, is_reference=False,
-                 is_qualifier=False, rank: str = 'normal', **kwargs) -> None:
+    def __init__(
+        self,
+        site,
+        pid,
+        snak=None,
+        hash=None,
+        is_reference: bool = False,
+        is_qualifier: bool = False,
+        rank: str = 'normal',
+        **kwargs
+    ) -> None:
         """
         Initializer.
 
@@ -4546,8 +4580,13 @@ class Claim(Property):
                 return False
         return True
 
-    def same_as(self, other, ignore_rank=True, ignore_quals=False,
-                ignore_refs=True) -> bool:
+    def same_as(
+        self,
+        other,
+        ignore_rank: bool = True,
+        ignore_quals: bool = False,
+        ignore_refs: bool = True
+    ) -> bool:
         """Check if two claims are same."""
         if ignore_rank:
             attributes = ['id', 'snaktype', 'target']

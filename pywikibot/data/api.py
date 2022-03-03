@@ -93,7 +93,7 @@ class CTEBinaryMIMEMultipart(MIMEMultipartOrig):
 
     """Workaround for bug in python 3 email handling of CTE binary."""
 
-    def as_bytes(self, unixfrom=False, policy=None):
+    def as_bytes(self, unixfrom: bool = False, policy=None):
         """Return unmodified binary payload."""
         policy = self.policy if policy is None else policy
         fp = BytesIO()
@@ -2662,7 +2662,12 @@ class PageGenerator(QueryGenerator):
 
     """
 
-    def __init__(self, generator: str, g_content=False, **kwargs) -> None:
+    def __init__(
+        self,
+        generator: str,
+        g_content: bool = False,
+        **kwargs
+    ) -> None:
         """
         Initializer.
 

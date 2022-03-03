@@ -244,7 +244,7 @@ class DataSite(APISite):
         return dtype
 
     @need_right('edit')
-    def editEntity(self, entity, data, bot=True, **kwargs):
+    def editEntity(self, entity, data, bot: bool = True, **kwargs):
         """
         Edit entity.
 
@@ -257,7 +257,6 @@ class DataSite(APISite):
         :param data: data updates
         :type data: dict
         :param bot: Whether to mark the edit as a bot edit
-        :type bot: bool
         :return: New entity data
         :rtype: dict
         """
@@ -297,7 +296,7 @@ class DataSite(APISite):
         return req.submit()
 
     @need_right('edit')
-    def addClaim(self, entity, claim, bot=True, summary=None) -> None:
+    def addClaim(self, entity, claim, bot: bool = True, summary=None) -> None:
         """
         Add a claim.
 
@@ -306,7 +305,6 @@ class DataSite(APISite):
         :param claim: Claim to be added
         :type claim: pywikibot.Claim
         :param bot: Whether to mark the edit as a bot edit
-        :type bot: bool
         :param summary: Edit summary
         :type summary: str
         """
@@ -329,7 +327,7 @@ class DataSite(APISite):
 
     @need_right('edit')
     def changeClaimTarget(self, claim, snaktype: str = 'value',
-                          bot=True, summary=None):
+                          bot: bool = True, summary=None):
         """
         Set the claim target to the value of the provided claim target.
 
@@ -338,7 +336,6 @@ class DataSite(APISite):
         :param snaktype: An optional snaktype ('value', 'novalue' or
             'somevalue'). Default: 'value'
         :param bot: Whether to mark the edit as a bot edit
-        :type bot: bool
         :param summary: Edit summary
         :type summary: str
         """
@@ -359,14 +356,13 @@ class DataSite(APISite):
         return req.submit()
 
     @need_right('edit')
-    def save_claim(self, claim, summary=None, bot=True):
+    def save_claim(self, claim, summary=None, bot: bool = True):
         """
         Save the whole claim to the wikibase site.
 
         :param claim: The claim to save
         :type claim: pywikibot.Claim
         :param bot: Whether to mark the edit as a bot edit
-        :type bot: bool
         :param summary: Edit summary
         :type summary: str
         """
@@ -573,7 +569,7 @@ class DataSite(APISite):
         return req.submit()
 
     @need_right('edit')
-    def linkTitles(self, page1, page2, bot=True):
+    def linkTitles(self, page1, page2, bot: bool = True):
         """
         Link two pages together.
 
@@ -582,7 +578,6 @@ class DataSite(APISite):
         :param page2: Second page to link
         :type page2: pywikibot.Page
         :param bot: Whether to mark the edit as a bot edit
-        :type bot: bool
         :return: dict API output
         :rtype: dict
         """
@@ -601,7 +596,7 @@ class DataSite(APISite):
 
     @need_right('item-merge')
     def mergeItems(self, from_item, to_item, ignore_conflicts=None,
-                   summary=None, bot=True):
+                   summary=None, bot: bool = True):
         """
         Merge two items together.
 
@@ -616,7 +611,6 @@ class DataSite(APISite):
         :param summary: Edit summary
         :type summary: str
         :param bot: Whether to mark the edit as a bot edit
-        :type bot: bool
         :return: dict API output
         :rtype: dict
         """
@@ -634,7 +628,7 @@ class DataSite(APISite):
         return req.submit()
 
     @need_right('item-redirect')
-    def set_redirect_target(self, from_item, to_item, bot=True):
+    def set_redirect_target(self, from_item, to_item, bot: bool = True):
         """
         Make a redirect to another item.
 
@@ -643,7 +637,6 @@ class DataSite(APISite):
         :param from_item: Title of the item to be redirected.
         :type from_item: pywikibot.ItemPage
         :param bot: Whether to mark the edit as a bot edit
-        :type bot: bool
         """
         params = {
             'action': 'wbcreateredirect',

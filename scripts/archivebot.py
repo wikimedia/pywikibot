@@ -492,7 +492,7 @@ class DiscussionPage(pywikibot.Page):
         return len(self.header.encode('utf-8')) + sum(t.size()
                                                       for t in self.threads)
 
-    def update(self, summary, sort_threads=False) -> None:
+    def update(self, summary, sort_threads: bool = False) -> None:
         """Recombine threads and save page."""
         if sort_threads:
             pywikibot.output('Sorting threads...')
@@ -558,7 +558,7 @@ class PageArchiver:
         """Get an archiver attribute."""
         return self.attributes.get(attr, [default])[0]
 
-    def set_attr(self, attr, value, out=True) -> None:
+    def set_attr(self, attr, value, out: bool = True) -> None:
         """Set an archiver attribute."""
         if attr == 'archive':
             value = value.replace('_', ' ')

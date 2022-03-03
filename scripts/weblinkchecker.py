@@ -228,7 +228,11 @@ def get_archive_url(url):
     return archive
 
 
-def weblinks_from_text(text, without_bracketed=False, only_bracketed=False):
+def weblinks_from_text(
+    text,
+    without_bracketed: bool = False,
+    only_bracketed: bool = False
+):
     """
     Yield web links from text.
 

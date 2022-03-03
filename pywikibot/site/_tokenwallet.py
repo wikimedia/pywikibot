@@ -24,7 +24,7 @@ class TokenWallet:
         self._tokens = {}
         self.failed_cache = set()  # cache unavailable tokens.
 
-    def load_tokens(self, types, all=False) -> None:
+    def load_tokens(self, types, all: bool = False) -> None:
         """
         Preload one or multiple tokens.
 
@@ -32,7 +32,6 @@ class TokenWallet:
         :type types: iterable
         :param all: load all available tokens, if None only if it can be done
             in one request.
-        :type all: bool
         """
         if self.site.user() is None:
             self.site.login()

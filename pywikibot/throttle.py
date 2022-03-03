@@ -111,7 +111,7 @@ class Throttle:
             hashobj = md5(module)
         return hashobj.hexdigest()[:4]  # slice for Python 3.5
 
-    def _read_file(self, raise_exc=False):
+    def _read_file(self, raise_exc: bool = False):
         """Yield process entries from file."""
         try:
             with open(self.ctrlfilename) as f:
@@ -197,7 +197,12 @@ class Throttle:
             pywikibot.log('Found {} {} processes running, including this one.'
                           .format(count, mysite))
 
-    def setDelays(self, delay=None, writedelay=None, absolute=False) -> None:
+    def setDelays(
+        self,
+        delay=None,
+        writedelay=None,
+        absolute: bool = False
+    ) -> None:
         """Set the nominal delays in seconds. Defaults to config values."""
         with self.lock:
             delay = delay or self.mindelay
@@ -211,7 +216,7 @@ class Throttle:
             # Start the delay count now, not at the next check
             self.last_read = self.last_write = time.time()
 
-    def getDelay(self, write=False):
+    def getDelay(self, write: bool = False):
         """Return the actual delay, accounting for multiple processes.
 
         This value is the maximum wait between reads/writes, not taking
@@ -234,7 +239,7 @@ class Throttle:
         thisdelay *= self.process_multiplicity
         return thisdelay
 
-    def waittime(self, write=False):
+    def waittime(self, write: bool = False):
         """Return waiting time in seconds.
 
         The result is for a query that would be made right now.
@@ -277,7 +282,7 @@ class Throttle:
 
         time.sleep(seconds)
 
-    def __call__(self, requestsize: int = 1, write=False) -> None:
+    def __call__(self, requestsize: int = 1, write: bool = False) -> None:
         """Block the calling program if the throttle time has not expired.
 
         Parameter requestsize is the number of Pages to be read/written;

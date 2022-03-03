@@ -710,7 +710,7 @@ class Subject(interwiki_graph.Subject):
                         return page
         return None
 
-    def translate(self, hints=None, keephintedsites=False) -> None:
+    def translate(self, hints=None, keephintedsites: bool = False) -> None:
         """Add the given translation hints to the todo list."""
         if self.conf.same and self.origin:
             if hints:
@@ -1296,7 +1296,7 @@ class Subject(interwiki_graph.Subject):
         """Return True if all the work for this subject has completed."""
         return not self.todo
 
-    def problem(self, txt, createneed=True) -> None:
+    def problem(self, txt, createneed: bool = True) -> None:
         """Report a problem with the resolution of this subject."""
         pywikibot.error(txt)
         self.confirm = True

@@ -138,8 +138,10 @@ class RedirectGenerator(OptionHandler):
         elif action == 'both':
             cls.__iter__ = lambda slf: slf.get_redirects_via_api(maxlen=2)
 
-    def get_redirects_from_dump(self, alsoGetPageTitles=False) -> Tuple[
-            Dict[str, str], Set[str]]:
+    def get_redirects_from_dump(
+        self,
+        alsoGetPageTitles: bool = False
+    ) -> Tuple[Dict[str, str], Set[str]]:
         """
         Extract redirects from dump.
 

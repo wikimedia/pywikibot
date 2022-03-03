@@ -187,8 +187,13 @@ class CategoryPreprocess(BaseBot):
 
     """A class to prepare a list of pages for robots."""
 
-    def __init__(self, follow_redirects=False, edit_redirects=False,
-                 create=False, **kwargs) -> None:
+    def __init__(
+        self,
+        follow_redirects: bool = False,
+        edit_redirects: bool = False,
+        create: bool = False,
+        **kwargs
+    ) -> None:
         """Initializer."""
         super().__init__(**kwargs)
         self.follow_redirects = follow_redirects
@@ -305,7 +310,7 @@ class CategoryDatabase:
 
     def __init__(
         self,
-        rebuild=False,
+        rebuild: bool = False,
         filename: str = 'category.dump.bz2'
     ) -> None:
         """Initializer."""
@@ -833,7 +838,7 @@ class CategoryMoveRobot(CategoryPreprocess):
         self.newcat.text = self.oldcat.text
         self._strip_cfd_templates(summary)
 
-    def _strip_cfd_templates(self, summary=None, commit=True) -> None:
+    def _strip_cfd_templates(self, summary=None, commit: bool = True) -> None:
         """Private function to strip out CFD templates from the new category.
 
         The new category is saved.

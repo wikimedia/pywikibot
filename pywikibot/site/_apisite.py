@@ -594,7 +594,7 @@ class APISite(
         """
         return 'locked' in self.get_globaluserinfo(user, force)
 
-    def get_searched_namespaces(self, force=False):
+    def get_searched_namespaces(self, force: bool = False):
         """
         Retrieve the default searched namespaces for the user.
 
@@ -651,8 +651,8 @@ class APISite(
         return path.replace('$1', '{}')
 
     @staticmethod
-    def assert_valid_iter_params(msg_prefix, start, end, reverse,
-                                 is_ts=True) -> None:
+    def assert_valid_iter_params(msg_prefix, start, end, reverse: bool,
+                                 is_ts: bool = True) -> None:
         """Validate iterating API parameters.
 
         :param msg_prefix: The calling method name
@@ -660,10 +660,8 @@ class APISite(
         :param start: The start value to compare
         :param end: The end value to compare
         :param reverse: The reverse option
-        :type reverse: bool
         :param is_ts: When comparing timestamps (with is_ts=True) the start
             is usually greater than end. Comparing titles this is vice versa.
-        :type is_ts: bool
         :raises AssertionError: start/end values are in wrong order
         """
         if reverse ^ is_ts:
@@ -1127,14 +1125,13 @@ class APISite(
         # 'title' is expected to be URL-encoded already
         return self.siteinfo['articlepath'].replace('$1', title)
 
-    def namespace(self, num, all=False):
+    def namespace(self, num: int, all: bool = False):
         """Return string containing local name of namespace 'num'.
 
         If optional argument 'all' is true, return all recognized
         values for this namespace.
 
         :param num: Namespace constant.
-        :type num: int
         :param all: If True return a Namespace object. Otherwise
             return the namespace name.
         :return: local name or Namespace object
@@ -1168,7 +1165,7 @@ class APISite(
                 raise PageRelatedError(
                     page, 'loadimageinfo: Query on {} returned no imageinfo')
 
-    def loadpageinfo(self, page, preload=False) -> None:
+    def loadpageinfo(self, page, preload: bool = False) -> None:
         """Load page info from api and store in page attributes.
 
         :see: https://www.mediawiki.org/wiki/API:Info
@@ -1193,7 +1190,7 @@ class APISite(
                                 )
         self._update_page(page, query)
 
-    def loadimageinfo(self, page, history=False,
+    def loadimageinfo(self, page, history: bool = False,
                       url_width=None, url_height=None, url_param=None) -> None:
         """Load image info from api and save in page attributes.
 
@@ -1590,9 +1587,19 @@ class APISite(
     _ep_text_overrides = {'appendtext', 'prependtext', 'undo'}
 
     @need_right('edit')
-    def editpage(self, page, summary=None, minor=True, notminor=False,
-                 bot=True, recreate=True, createonly=False, nocreate=False,
-                 watch=None, **kwargs) -> bool:
+    def editpage(
+        self,
+        page,
+        summary=None,
+        minor: bool = True,
+        notminor: bool = False,
+        bot: bool = True,
+        recreate: bool = True,
+        createonly: bool = False,
+        nocreate: bool = False,
+        watch=None,
+        **kwargs
+    ) -> bool:
         """Submit an edit to be saved to the wiki.
 
         :see: https://www.mediawiki.org/wiki/API:Edit
@@ -1934,8 +1941,8 @@ class APISite(
     }
 
     @need_right('move')
-    def movepage(self, page, newtitle: str, summary, movetalk=True,
-                 noredirect=False):
+    def movepage(self, page, newtitle: str, summary, movetalk: bool = True,
+                 noredirect: bool = False):
         """Move a Page to a new title.
 
         :see: https://www.mediawiki.org/wiki/API:Move
@@ -2324,9 +2331,18 @@ class APISite(
     # TODO: implement undelete
 
     @need_right('block')
-    def blockuser(self, user, expiry, reason: str, anononly=True,
-                  nocreate=True, autoblock=True, noemail=False,
-                  reblock=False, allowusertalk=False):
+    def blockuser(
+        self,
+        user,
+        expiry,
+        reason: str,
+        anononly: bool = True,
+        nocreate: bool = True,
+        autoblock: bool = True,
+        noemail: bool = False,
+        reblock: bool = False,
+        allowusertalk: bool = False
+    ):
         """
         Block a user for certain amount of time and for a certain reason.
 
@@ -2350,20 +2366,14 @@ class APISite(
             str (relative/absolute) or False ('never')
         :param reason: The reason for the block.
         :param anononly: Disable anonymous edits for this IP.
-        :type anononly: boolean
         :param nocreate: Prevent account creation.
-        :type nocreate: boolean
         :param autoblock: Automatically block the last used IP address and all
             subsequent IP addresses from which this account logs in.
-        :type autoblock: boolean
         :param noemail: Prevent user from sending email through the wiki.
-        :type noemail: boolean
         :param reblock: If the user is already blocked, overwrite the existing
             block.
-        :type reblock: boolean
         :param allowusertalk: Whether the user can edit their talk page while
             blocked.
-        :type allowusertalk: boolean
         :return: The data retrieved from the API request.
         :rtype: dict
         """

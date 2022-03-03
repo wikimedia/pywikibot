@@ -375,11 +375,11 @@ class FlowMixin:
         content_format: str = 'wikitext',
         limit: int = 100,
         sortby: str = 'newest',
-        toconly=False,
+        toconly: bool = False,
         offset=None,
         offset_id=None,
-        reverse=False,
-        include_offset=False
+        reverse: bool = False,
+        include_offset: bool = False
     ):
         """
         Retrieve the topiclist of a Flow board.
