@@ -269,16 +269,16 @@ class DataIngestionBot(pywikibot.Bot):
 
         templates = configuration_page.templatesWithParams()
         for (template, params) in templates:
-            if template.title(with_ns=False) == 'Data ingestion':
-                for param in params:
-                    field, _, value = param.partition('=')
+            if template.title(with_ns=False) != 'Data ingestion':
+                continue
 
-                    # Remove leading or trailing spaces
-                    field = field.strip()
-                    value = value.strip()
-                    if not value:
-                        value = None
-                    configuration[field] = value
+            for param in params:
+                field, _, value = param.partition('=')
+
+                # Remove leading or trailing spaces
+                field = field.strip()
+                value = value.strip() or None
+                configuration[field] = value
 
         return configuration
 
