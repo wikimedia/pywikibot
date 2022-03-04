@@ -63,6 +63,13 @@ class Siteinfo(Container):
         self._site = site
         self._cache = {}
 
+    def clear(self) -> None:
+        """Remove all items from Siteinfo.
+
+        .. versionadded: 7.1
+        """
+        self._cache.clear()
+
     @staticmethod
     def _get_default(key: str):
         """
@@ -316,10 +323,26 @@ class Siteinfo(Container):
             return self._cache[key]
         raise KeyError(key)
 
-    def __contains__(self, key: str) -> bool:
-        """Return whether the value is cached."""
+    def is_cached(self, key: str) -> bool:
+        """Return whether the value is cached.
+
+        .. versionadded:: 7.1
+        """
         try:
             self._get_cached(key)
+        except KeyError:
+            return False
+        else:
+            return True
+
+    def __contains__(self, key: str) -> bool:
+        """Return whether the value is in Siteinfo container.
+
+        .. versionchanged:: 7.1
+           Previous implementation only checked for cached keys.
+        """
+        try:
+            self[key]
         except KeyError:
             return False
         else:
