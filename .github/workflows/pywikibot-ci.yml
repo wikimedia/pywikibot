@@ -115,6 +115,7 @@ jobs:
         PYWIKIBOT_TEST_NO_RC:
           ${{ (matrix.site == 'wikisource:zh' || matrix.test_no_rc) && 1 || 0 }}
         PYWIKIBOT_TEST_PROD_ONLY: ${{ matrix.test_prod_only && 1 || 0 }}
+        PYWIKIBOT_TEST_WRITE: ${{ (matrix.site == 'wikipedia:test') && 1 || 0 }}
       run: |
         python pwb.py version
         if [ ${{matrix.site || 0}} != 'wikipedia:test' ]; then
