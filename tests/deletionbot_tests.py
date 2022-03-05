@@ -22,7 +22,7 @@ class TestDeletionBotWrite(ScriptMainTestCase):
     family = 'wikipedia'
     code = 'test'
 
-    sysop = True
+    rights = 'undelete'
     write = True
 
     def test_delete(self):

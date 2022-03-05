@@ -1017,11 +1017,11 @@ class TestPageDelete(TestCase):
         # Ensure the page exists
         p.text = 'pywikibot unit test page'
         p.save('#redirect[[unit test]]', botflag=True)
-        self.assertEqual(p.isRedirectPage(), True)
+        self.assertTrue(p.isRedirectPage())
         # Test deletion
         p.delete(reason='pywikibot unit test', prompt=False, mark=False)
         self.assertEqual(p._pageid, 0)
-        self.assertEqual(p.isRedirectPage(), False)
+        self.assertFalse(p.isRedirectPage())
         with self.assertRaisesRegex(NoPageError, NO_PAGE_RE):
             p.get(force=True)
 
