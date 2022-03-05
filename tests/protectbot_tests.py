@@ -21,7 +21,7 @@ class TestProtectionBot(ScriptMainTestCase):
     family = 'wikipedia'
     code = 'test'
 
-    sysop = True
+    rights = 'protect'
     write = True
 
     def test_protect(self):

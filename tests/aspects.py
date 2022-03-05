@@ -635,6 +635,32 @@ class RequireLoginMixin(TestCaseBase):
         return userpage
 
 
+class NeedRightsMixin(TestCaseBase):
+
+    """Require specific rights."""
+
+    @classmethod
+    def setUpClass(cls):
+        """Set up the test class.
+
+        Skip the test class if the user does not have required rights.
+        """
+        super().setUpClass()
+        for site_dict in cls.sites.values():
+            site = site_dict['site']
+
+            if site.siteinfo['readonly'] or site.obsolete:
+                raise unittest.SkipTest(
+                    'Site {} has readonly state: {}'.format(
+                        site, site.siteinfo.get('readonlyreason', '')))
+
+            for right in cls.rights.split(','):
+                if not site.has_right(right):
+                    raise unittest.SkipTest('User "{}" does not have required '
+                                            'user right "{}"'
+                                            .format(site.user(), right))
+
+
 class MetaTestCaseClass(type):
 
     """Test meta class."""
@@ -686,7 +712,7 @@ class MetaTestCaseClass(type):
         for base in bases:
             for key in ('cached', 'code', 'dry', 'family', 'hostname',
                         'hostnames', 'net', 'oauth', 'pwb', 'site', 'sites',
-                        'sysop', 'user', 'wikibase', 'write'):
+                        'rights', 'sysop', 'user', 'wikibase', 'write'):
                 if hasattr(base, key) and key not in dct:
                     dct[key] = getattr(base, key)
 
@@ -779,8 +805,12 @@ class MetaTestCaseClass(type):
             assert not hostnames, 'net must be True with hostnames defined'
 
         if dct.get('write'):
-            dct.setdefault('user', True)
+            dct.setdefault('login', True)
             bases = cls.add_base(bases, SiteWriteMixin)
+
+        if dct.get('rights'):
+            bases = cls.add_base(bases, NeedRightsMixin)
+            dct.setdefault('login', True)
 
         if dct.get('login') or dct.get('sysop'):
             bases = cls.add_base(bases, RequireLoginMixin)

@@ -127,6 +127,7 @@ class PatrolTestCase(TokenTestBase, TestCase):
 
     login = True
     write = True
+    rights = 'patrol'
 
     def test_patrol(self):
         """Test the site.patrol() method."""

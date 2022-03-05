@@ -1099,7 +1099,7 @@ class TestPageProtect(TestCase):
     code = 'test'
 
     write = True
-    sysop = True
+    rights = 'protect'
 
     def test_protect(self):
         """Test Page.protect."""

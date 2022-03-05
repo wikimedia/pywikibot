@@ -256,7 +256,7 @@ class TestFlowSysop(FlowTests):
 
     """Deleting and Suppressing topics and posts."""
 
-    sysop = True
+    rights = 'flow-delete,flow-suppress'
 
     def test_delete(self):
         """Delete and restore a test topic and post."""
