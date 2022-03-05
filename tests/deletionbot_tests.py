@@ -30,7 +30,7 @@ class TestDeletionBotWrite(ScriptMainTestCase):
         site = self.get_site()
         cat = pywikibot.Category(site, 'Pywikibot Delete Test')
         delete.main('-cat:Pywikibot_Delete_Test', '-always')
-        self.assertEmpty(list(cat.members()))
+        self.assertIsEmpty(list(cat.members()))
         delete.main('-page:User:Unicodesnowman/DeleteTest1', '-always',
                     '-undelete', '-summary=pywikibot unit tests')
         delete.main('-page:User:Unicodesnowman/DeleteTest2', '-always',
