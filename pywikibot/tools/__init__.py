@@ -378,6 +378,26 @@ def first_upper(string: str) -> str:
     return (_first_upper_exception(first) or first.upper()) + string[1:]
 
 
+def strtobool(val: str) -> bool:
+    """Convert a string representation of truth to True or False.
+
+    This is a reimplementation of distutils.util.strtobool due to
+    :pep:`632#Migration Advice`
+
+    .. versionadded:: 7.1
+
+    :param val: True values are 'y', 'yes', 't', 'true', 'on', and '1';
+        false values are 'n', 'no', 'f', 'false', 'off', and '0'.
+    :raises ValueError: `val` is not a valid truth value
+    """
+    val = val.lower()
+    if val in ('y', 'yes', 't', 'true', 'on', '1'):
+        return True
+    if val in ('n', 'no', 'f', 'false', 'off', '0'):
+        return False
+    raise ValueError('invalid truth value {!r}'.format(val))
+
+
 def normalize_username(username) -> Optional[str]:
     """Normalize the username.
 
