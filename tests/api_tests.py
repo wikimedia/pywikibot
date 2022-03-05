@@ -988,8 +988,8 @@ class TestLagpattern(DefaultSiteTestCase):
             pywikibot.warning(
                 'Wrong api.lagpattern regex, cannot retrieve lag value')
             raise e
-        self.assertIsInstance(mythrottle._lagvalue, float)
-        self.assertGreaterEqual(mythrottle._lagvalue, 0.0)
+        self.assertIsInstance(mythrottle._lagvalue, (int, float))
+        self.assertGreaterEqual(mythrottle._lagvalue, 0)
         self.assertIsInstance(mythrottle.retry_after, int)
         self.assertGreaterEqual(mythrottle.retry_after, 0)
 
