@@ -2353,6 +2353,14 @@ class SiteRandomTestCase(DefaultSiteTestCase):
 
     """Test random methods of a site."""
 
+    @classmethod
+    def setUpClass(cls):
+        """Skip test on beta due to T282602."""
+        super().setUpClass()
+        site = cls.get_site()
+        if site.family.name in ('wpbeta', 'wsbeta'):
+            cls.skipTest('Skipping test on {} due to T282602'.format(site))
+
     def test_unlimited_small_step(self):
         """Test site.randompages() continuation.
 
@@ -2360,8 +2368,6 @@ class SiteRandomTestCase(DefaultSiteTestCase):
         performed, so we also don't test this here.
         """
         mysite = self.get_site()
-        if mysite.family.name in ('wpbeta', 'wsbeta'):
-            self.skipTest('Skipping test on {} due to T282602'.format(mysite))
         pages = []
         rngen = mysite.randompages(total=None)
         rngen.set_query_increment = 5
@@ -2375,8 +2381,6 @@ class SiteRandomTestCase(DefaultSiteTestCase):
     def test_limit_10(self):
         """Test site.randompages() with limit."""
         mysite = self.get_site()
-        if mysite.family.name in ('wpbeta', 'wsbeta'):
-            self.skipTest('Skipping test on {} due to T282602'.format(mysite))
         rn = list(mysite.randompages(total=10))
         self.assertLessEqual(len(rn), 10)
         for a_page in rn:
