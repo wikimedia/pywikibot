@@ -1089,10 +1089,11 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_recentchanges_rctag(self):
         """Test recentchanges generator with recent changes tag."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handle_arg('-recentchanges:visualeditor')
+        gf.handle_arg('-ns:0,2,4')
+        gf.handle_arg('-recentchanges:visualeditor,500')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
-        self.assertPagesInNamespacesAll(gen, {0, 1, 2}, skip=True)
+        self.assertPagesInNamespacesAll(gen, {0, 2, 4}, skip=True)
 
     def test_recentchanges_default(self):
         """Test recentchanges generator with default namespace setting."""
@@ -1100,6 +1101,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
             self.skipTest('Skipping {} due to too many autoblocked users'
                           .format(self.site))
         gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handle_arg('-ns:0,1,2')
         gf.handle_arg('-recentchanges:50')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
