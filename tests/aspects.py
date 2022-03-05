@@ -222,10 +222,10 @@ class TestCaseBase(TestTimerMixin):
 
         page_namespaces = {page.namespace() for page in gen}
 
-        if skip and page_namespaces != namespaces:
-            raise unittest.SkipTest('Pages in namespaces {!r} not found.'
-                                    .format(
-                                        list(namespaces - page_namespaces)))
+        if skip and page_namespaces < namespaces:
+            raise unittest.SkipTest(
+                'No pages in namespaces {} found.'
+                .format(list(namespaces - page_namespaces)))
 
         self.assertEqual(page_namespaces, namespaces)
 
