@@ -50,12 +50,11 @@ class TestDeletionBotWrite(ScriptMainTestCase):
 
 class TestDeletionBotUser(ScriptMainTestCase):
 
-    """Test deletionbot as a user (not sysop)."""
+    """Test deletionbot as a user (no 'deletion' right)."""
 
     family = 'wikipedia'
     code = 'test'
 
-    login = True
     write = True
 
     def test_delete_mark(self):

@@ -556,9 +556,6 @@ class RequireLoginMixin(TestCaseBase):
         """
         super().setUpClass()
 
-        # currently 'sysop' attribute is an alias for 'login'
-        # sysop = hasattr(cls, 'sysop') and cls.sysop
-
         for site_dict in cls.sites.values():
             cls.require_site_user(site_dict['family'], site_dict['code'])
 
@@ -711,8 +708,8 @@ class MetaTestCaseClass(type):
         # Inherit superclass attributes
         for base in bases:
             for key in ('cached', 'code', 'dry', 'family', 'hostname',
-                        'hostnames', 'net', 'oauth', 'pwb', 'site', 'sites',
-                        'rights', 'sysop', 'user', 'wikibase', 'write'):
+                        'hostnames', 'login', 'net', 'oauth', 'pwb', 'site',
+                        'sites', 'rights', 'wikibase', 'write'):
                 if hasattr(base, key) and key not in dct:
                     dct[key] = getattr(base, key)
 
@@ -812,7 +809,7 @@ class MetaTestCaseClass(type):
             bases = cls.add_base(bases, NeedRightsMixin)
             dct.setdefault('login', True)
 
-        if dct.get('login') or dct.get('sysop'):
+        if dct.get('login'):
             bases = cls.add_base(bases, RequireLoginMixin)
 
         for test in tests:
