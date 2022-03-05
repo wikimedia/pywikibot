@@ -605,17 +605,6 @@ class TestPageCoordinates(TestCase):
             self.assertTrue(coord.primary)
 
 
-class TestPageBaseUnicode(DefaultDrySiteTestCase):
-
-    """Base class for tests requiring a page using a unicode title."""
-
-    @classmethod
-    def setUpClass(cls):
-        """Initialize page instance."""
-        super().setUpClass()
-        cls.page = pywikibot.Page(cls.site, 'Ō')
-
-
 class TestPageGetFileHistory(DefaultDrySiteTestCase):
 
     """Test the get_file_history method of the FilePage class."""
@@ -653,9 +642,15 @@ class TestFilePage(DefaultSiteTestCase):
             self.assertNotEqual(p.site, self.site)
 
 
-class TestPageRepr(TestPageBaseUnicode):
+class TestPageRepr(DefaultDrySiteTestCase):
 
     """Test for Page's repr implementation."""
+
+    @classmethod
+    def setUpClass(cls):
+        """Initialize page instance."""
+        super().setUpClass()
+        cls.page = pywikibot.Page(cls.site, 'Ō')
 
     def setUp(self):
         """Force the console encoding to UTF-8."""
@@ -683,22 +678,6 @@ class TestPageRepr(TestPageBaseUnicode):
         self.assertEqual(repr(self.page), "Page('Ō')")
         self.assertEqual('%r' % self.page, "Page('Ō')")
         self.assertEqual('{!r}'.format(self.page), "Page('Ō')")
-
-
-class TestPageReprASCII(TestPageBaseUnicode):
-
-    """Test for Page's repr implementation when using ASCII encoding."""
-
-    def setUp(self):
-        """Patch the current console encoding to ASCII."""
-        super().setUp()
-        self._old_encoding = config.console_encoding
-        config.console_encoding = 'ascii'
-
-    def tearDown(self):
-        """Restore the original console encoding."""
-        config.console_encoding = self._old_encoding
-        super().tearDown()
 
 
 class TestPageBotMayEdit(TestCase):
