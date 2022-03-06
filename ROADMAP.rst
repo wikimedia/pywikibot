@@ -1,7 +1,10 @@
 Current release changes
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-* (no changes yet)
+* -cosmetic_changes (-cc) option allows to assign the value directly instead of toggle it
+* distutils.util.strtobool() was implemented as tools.strtobool() due to :pep:`632`
+* The "in" operator always return whether the siteinfo contains the key even it is not cached (T302859)
+* Siteinfo.clear() and  Siteinfo.is_cached() methods were added
 
 Deprecations
 ^^^^^^^^^^^^

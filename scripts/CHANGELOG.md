@@ -1,7 +1,15 @@
 # Scripts Changelog
 
-## 7.0.0
+
+## 7.1.0
 *In development*
+
+### fixing_redirects
+* -always option was enabled
+
+
+## 7.0.0
+*26 February 2022*
 
 ### general
 * L10N updates
