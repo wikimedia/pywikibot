@@ -57,7 +57,6 @@ jobs:
             experimental: true
           - python-version: "3.11.0-alpha - 3.11.0"
             site: "wikipedia:test"
-            experimental: true
           - python-version: "3"
             site: "wikipedia:de"
             os: macOS-latest
@@ -111,7 +110,7 @@ jobs:
         echo "password_file = os.path.expanduser('passwordfile')" >> user-config.py
         echo "('${{ env.PYWIKIBOT_USERNAME }}', '${{ secrets.PYWIKIBOT_USERPWD }}')" > passwordfile
 
-    - name: Test with unittest
+    - name: Test with unittest or pytest
       env:
         PYWIKIBOT_TEST_NO_RC:
           ${{ (matrix.site == 'wikisource:zh' || matrix.test_no_rc) && 1 || 0 }}

@@ -34,15 +34,12 @@ jobs:
             site: False
             family: wpbeta
             code: en
-            experimental: true
           - python-version: "3.6"
             site: False
             family: wpbeta
             code: zh
-            experimental: true
           - python-version: "3.5"
             site: wsbeta:en
-            experimental: true
           - python-version: "3.7"
             site: "wikipedia:test"
           - python-version: "3.7"
@@ -54,11 +51,9 @@ jobs:
             site: "wikidata:wikidata"
           - python-version: "3.8"
             site: "wowwiki:uk"
-            experimental: true
           - python-version: "3.11.0-alpha - 3.11.0"
             site: "wikipedia:test"
-            experimental: true
-          - python-version: 3
+          - python-version: "3"
             site: "wikipedia:de"
             os: macOS-latest
 
@@ -119,3 +114,5 @@ jobs:
       run: |
         python pwb.py version
         coverage run -m unittest -vv tests/site_login_logout_tests.py
+    - name: Upload coverage to Codecov
+      run: codecov
