@@ -1,12 +1,13 @@
 """User interface for Win32 terminals."""
 #
-# (C) Pywikibot team, 2003-2020
+# (C) Pywikibot team, 2003-2022
 #
 # Distributed under the terms of the MIT license.
 #
 import ctypes
 
-from pywikibot.userinterfaces import terminal_interface_base, win32_unicode
+from pywikibot.tools import PYTHON_VERSION
+from pywikibot.userinterfaces import terminal_interface_base
 
 
 windowsColors = {
@@ -37,12 +38,14 @@ class Win32UI(terminal_interface_base.UI):
     def __init__(self) -> None:
         """Initializer."""
         super().__init__()
-        (stdin, stdout, stderr, argv) = win32_unicode.get_unicode_console()
-        self.stdin = stdin
-        self.stdout = stdout
-        self.stderr = stderr
-        self.argv = argv
-        self.encoding = 'utf-8'
+        if PYTHON_VERSION == (3, 5):  # issue1602 solved in Python 3.6
+            from pywikibot.userinterfaces import win32_unicode
+            stdin, stdout, stderr, argv = win32_unicode.get_unicode_console()
+            self.stdin = stdin
+            self.stdout = stdout
+            self.stderr = stderr
+            self.argv = argv
+            self.encoding = 'utf-8'
 
     def support_color(self, target_stream):
         """Return whether the target stream supports actually color."""
