@@ -24,7 +24,7 @@ from unittest.util import safe_repr
 
 import pywikibot
 from pywikibot import Site, config
-from pywikibot.backports import removeprefix
+from pywikibot.backports import removeprefix, removesuffix
 from pywikibot.comms import http
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.exceptions import (
@@ -677,10 +677,7 @@ class MetaTestCaseClass(type):
             # sitedata['family'] may be an AutoFamily. Use str() for its name
             sitename = str(sitedata['family']) + ':' + sitedata['code']
             if func.__doc__:
-                if func.__doc__.endswith('.'):
-                    wrapped_method.__doc__ = func.__doc__[:-1]
-                else:
-                    wrapped_method.__doc__ = func.__doc__
+                wrapped_method.__doc__ = removesuffix(func.__doc__, '.')
                 wrapped_method.__doc__ += ' on ' + sitename
             else:
                 wrapped_method.__doc__ = 'Test ' + sitename
@@ -815,16 +812,13 @@ class MetaTestCaseClass(type):
         for test in tests:
             test_func = dct[test]
 
-            # method decorated with unittest.expectedFailure has no arguments
+            # Method decorated with unittest.expectedFailure has no arguments
             # so it is assumed to not be a multi-site test method.
-            if test_func.__code__.co_argcount == 0:
+            # A normal test method only accepts 'self'
+            if test_func.__code__.co_argcount in (0, 1):
                 continue
 
-            # a normal test method only accepts 'self'
-            if test_func.__code__.co_argcount == 1:
-                continue
-
-            # a multi-site test method only accepts 'self' and the site-key
+            # A multi-site test method only accepts 'self' and the site-key
             if test_func.__code__.co_argcount != 2:
                 raise Exception(
                     '{}: Test method {} must accept either 1 or 2 arguments; '
@@ -833,8 +827,8 @@ class MetaTestCaseClass(type):
 
             # create test methods processed by unittest
             for (key, sitedata) in dct['sites'].items():
-                test_name = (test + '_'
-                             + key.replace('-', '_').replace(':', '_'))
+                table = str.maketrans('-:', '__')
+                test_name = (test + '_' + key.translate(table))
                 cls.add_method(dct, test_name,
                                wrap_method(key, sitedata, dct[test]))
 
@@ -961,8 +955,7 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
         if not family:
             raise Exception('no family defined for {}'.format(cls.__name__))
         if not code:
-            raise Exception('no site code defined for {}'
-                            .format(cls.__name__))
+            raise Exception('no site code defined for {}'.format(cls.__name__))
 
         usernames = config.usernames
 
@@ -1018,78 +1011,11 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
         """
         if not site:
             site = self.get_site()
-        page = pywikibot.Page(pywikibot.page.Link(
-                              'There is no page with this title', site))
+        page = pywikibot.Page(site, 'There is no page with this title')
         if page.exists():
             raise unittest.SkipTest('Did not find a page that does not exist.')
 
         return page
-
-
-class CapturingTestCase(TestCase):
-
-    """
-    Capture assertion calls to do additional calls around them.
-
-    All assertions done which start with "assert" are patched in such a way
-    that after the assertion it calls ``process_assertion`` with the assertion
-    and the arguments.
-
-    To avoid that it patches the assertion it's possible to put the call in an
-    ``disable_assert_capture`` with-statement.
-
-    """
-
-    # Is True while an assertion is running, so that assertions won't be
-    # patched when they are executed while an assertion is running and only
-    # the outer most assertion gets actually patched.
-    _patched = False
-
-    @contextmanager
-    def disable_assert_capture(self):
-        """A context manager preventing that assertions are patched."""
-        nested = self._patched  # Don't reset if it was set before
-        self._patched = True
-        yield
-        if not nested:
-            self._patched = False
-
-    @contextmanager
-    def _delay_assertion(self, context, assertion, args, kwargs):
-        with self.disable_assert_capture():
-            with context as ctx:
-                yield ctx
-            self.after_assert(assertion, *args, **kwargs)
-
-    def process_assert(self, assertion, *args, **kwargs):
-        """Handle the assertion call."""
-        return assertion(*args, **kwargs)
-
-    def after_assert(self, assertion, *args, **kwargs):
-        """Handle after the assertion."""
-
-    def patch_assert(self, assertion):
-        """Execute process_assert when the assertion is called."""
-        def inner_assert(*args, **kwargs):
-            assert self._patched is False
-            self._patched = True
-            try:
-                context = self.process_assert(assertion, *args, **kwargs)
-                if hasattr(context, '__enter__'):
-                    return self._delay_assertion(context, assertion, args,
-                                                 kwargs)
-                self.after_assert(assertion, *args, **kwargs)
-                return context
-            finally:
-                self._patched = False
-        return inner_assert
-
-    def __getattribute__(self, attr):
-        """Patch assertions if enabled."""
-        result = super().__getattribute__(attr)
-        if attr.startswith('assert') and not self._patched:
-            return self.patch_assert(result)
-        return result
 
 
 class PatchingTestCase(TestCase):
@@ -1600,27 +1526,6 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
         self.context_manager.__exit__()
 
         super().tearDown()
-
-
-class AutoDeprecationTestCase(CapturingTestCase, DeprecationTestCase):
-
-    """
-    A test case capturing asserts and asserting a deprecation afterwards.
-
-    For example ``assertEqual`` will do first ``assertEqual`` and then
-    ``assertOneDeprecation``.
-    """
-
-    def after_assert(self, assertion, *args, **kwargs):
-        """Handle assertion and call ``assertOneDeprecation`` after it."""
-        super().after_assert(
-            assertion, *args, **kwargs)
-        self.assertOneDeprecation()
-
-    source_adjustment_skips = DeprecationTestCase.source_adjustment_skips + [
-        CapturingTestCase.process_assert,
-        CapturingTestCase.patch_assert,
-    ]
 
 
 @optional_pytest_httpbin_cls_decorator
