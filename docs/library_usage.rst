@@ -16,7 +16,7 @@ is a minimal example script which shows their usage:
 
         update_options = {
             'text': 'This is a test text',
-            'summary': 'Bot: a bot test edit with Pywikbot.',
+            'summary': 'Bot: a bot test edit with Pywikibot.',
         }
 
         def treat_page(self):
