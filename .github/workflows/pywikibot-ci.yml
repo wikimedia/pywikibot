@@ -125,4 +125,5 @@ jobs:
         fi
 
     - name: Upload coverage to Codecov
+      continue-on-error: true
       run: codecov
