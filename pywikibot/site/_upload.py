@@ -11,7 +11,6 @@ from typing import Optional, Union
 from warnings import warn
 
 import pywikibot
-from pywikibot.data import api
 from pywikibot.exceptions import (
     APIError,
     Error,
@@ -518,59 +517,3 @@ class UploadMixin:
                 return True
 
             raise Error('Unrecognized result: %s' % data['result'])
-
-    def get_property_names(self, force: bool = False):
-        """
-        Get property names for pages_with_property().
-
-        :see: https://www.mediawiki.org/wiki/API:Pagepropnames
-
-        :param force: force to retrieve userinfo ignoring cache
-        """
-        if force or not hasattr(self, '_property_names'):
-            ppngen = self._generator(api.ListGenerator, 'pagepropnames')
-            self._property_names = [pn['propname'] for pn in ppngen]
-        return self._property_names
-
-    def compare(self, old, diff):
-        """
-        Corresponding method to the 'action=compare' API action.
-
-        :see: https://www.mediawiki.org/wiki/API:Compare
-
-        See: https://en.wikipedia.org/w/api.php?action=help&modules=compare
-        Use pywikibot.diff's html_comparator() method to parse result.
-        :param old: starting revision ID, title, Page, or Revision
-        :type old: int, str, pywikibot.Page, or pywikibot.Page.Revision
-        :param diff: ending revision ID, title, Page, or Revision
-        :type diff: int, str, pywikibot.Page, or pywikibot.Page.Revision
-        :return: Returns an HTML string of a diff between two revisions.
-        :rtype: str
-        """
-        # check old and diff types
-        def get_param(item):
-            if isinstance(item, str):
-                return 'title', item
-            if isinstance(item, pywikibot.Page):
-                return 'title', item.title()
-            if isinstance(item, int):
-                return 'rev', item
-            if isinstance(item, pywikibot.page.Revision):
-                return 'rev', item.revid
-            return None
-
-        old = get_param(old)
-        if not old:
-            raise TypeError('old parameter is of invalid type')
-        diff = get_param(diff)
-        if not diff:
-            raise TypeError('diff parameter is of invalid type')
-
-        params = {'action': 'compare',
-                  'from{}'.format(old[0]): old[1],
-                  'to{}'.format(diff[0]): diff[1]}
-
-        req = self._simple_request(**params)
-        data = req.submit()
-        comparison = data['compare']['*']
-        return comparison
