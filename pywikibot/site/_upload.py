@@ -114,13 +114,20 @@ class UploadMixin:
                     _file_key, response['offset'])
                 for warning, data in response['warnings'].items()]
 
+        # some warning keys have been changed
+        warning_keys = {
+            'nochange': 'no-change',
+            'duplicateversions': 'duplicate-version',
+            'emptyfile': 'empty-file',
+        }
+
         upload_warnings = {
             # map API warning codes to user error messages
             # {msg} will be replaced by message string from API response
             'duplicate-archive':
                 'The file is a duplicate of a deleted file {msg}.',
             'was-deleted': 'The file {msg} was previously deleted.',
-            'emptyfile': 'File {msg} is empty.',
+            'empty-file': 'File {msg} is empty.',
             'exists': 'File {msg} already exists.',
             'duplicate': 'Uploaded file is a duplicate of {msg}.',
             'badfilename': 'Target filename is invalid.',
@@ -132,9 +139,9 @@ class UploadMixin:
                 'Target filename exists but with a different file {msg}.',
 
             # API-returned message string will be timestamps, not much use here
-            'nochange': 'The upload is an exact duplicate of the current '
-                        'version of this file.',
-            'duplicateversions': 'The upload is an exact duplicate of older '
+            'no-change': 'The upload is an exact duplicate of the current '
+                         'version of this file.',
+            'duplicate-version': 'The upload is an exact duplicate of older '
                                  'version(s) of this file.',
         }
 
@@ -489,6 +496,7 @@ class UploadMixin:
                          UserWarning, 3)
                 warning = list(result['warnings'].keys())[0]
                 message = result['warnings'][warning]
+                warning = warning_keys.get(warning, warning)
                 raise UploadError(warning,
                                   upload_warnings[warning]
                                   .format(msg=message),
