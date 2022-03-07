@@ -74,7 +74,8 @@ jobs:
         pip install -U setuptools
         pip install requests
         pip install mwparserfromhell
-        pip install coverage
+        pip install codecov
+        pip install "coverage>=5.2.1"
         python -c "import setuptools; print('setuptools:', setuptools.__version__)"
 
     - name: Generate family files
