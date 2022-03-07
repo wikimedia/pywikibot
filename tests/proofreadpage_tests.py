@@ -305,7 +305,6 @@ class TestProofreadPageValidSite(TestCase):
         self.assertEqual(json.loads(page_text), json.loads(loaded_text))
 
     @require_modules('bs4')
-    @unittest.skip('T181913 and T114318')
     def test_url_image(self):
         """Test fetching of url image of the scan of ProofreadPage."""
         page = ProofreadPage(self.site, self.valid['title'])
@@ -615,7 +614,6 @@ class TestLoadRevisionsCachingIndexPage(BS4TestCase,
             references='<references/>', div_end=div)
 
 
-@unittest.skip('T181913 and T114318')
 class TestIndexPageMappings(BS4TestCase):
 
     """Test IndexPage class."""
