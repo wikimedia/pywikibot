@@ -43,8 +43,7 @@ class UploadMixin:
                asynchronous: bool = False,
                report_success: Optional[bool] = None,
                _file_key: Optional[str] = None,
-               _offset: Union[bool, int] = 0,
-               _verify_stash: Optional[bool] = None) -> bool:
+               _offset: Union[bool, int] = 0) -> bool:
         """
         Upload a file to the wiki.
 
@@ -97,12 +96,6 @@ class UploadMixin:
             previously canceled chunked upload. If False it treats that
             as a finished upload. If True it requests the stash info from
             the server to determine the offset. By default starts at 0.
-        :param _verify_stash: Private parameter for upload recurion.
-            Requests the SHA1 and file size uploaded and compares it to
-            the local file. Also verifies that _offset is matching the
-            file size if the _offset is an int. If _offset is False if
-            verifies that the file size match with the local file. If
-            None it'll verifies the stash when a file key and offset is given.
         :return: It returns True if the upload was successful and False
             otherwise.
         """
@@ -187,10 +180,15 @@ class UploadMixin:
                 raise ValueError("File '{}' does not exist."
                                  .format(source_filename))
 
+        # Verify the stash when a file key and offset is given:
+        # requests the SHA1 and file size uploaded and compares it to
+        # the local file. Also verify that _offset is matching the
+        # file size if the _offset is an int. If _offset is False if
+        # verifies that the file size match with the local file.
+        verify_stash = False
         if source_filename and _file_key:
             assert offset is False or file_size is not None
-            if _verify_stash is None:
-                _verify_stash = True
+            verify_stash = True
             if (offset is not False and offset is not True
                     and offset > file_size):
                 raise ValueError(
@@ -198,7 +196,7 @@ class UploadMixin:
                     'while the file is only {} bytes large.'.format(
                         _file_key, offset, file_size))
 
-        if _verify_stash or offset is True:
+        if verify_stash or offset is True:
             if not _file_key:
                 raise ValueError('Without a file key it cannot request the '
                                  'stash information')
@@ -206,7 +204,7 @@ class UploadMixin:
                 raise ValueError('Can request stash information only when '
                                  'using a file name.')
             props = ['size']
-            if _verify_stash:
+            if verify_stash:
                 props += ['sha1']
             stash_info = self.stash_info(_file_key, props)
             if offset is True:
@@ -223,7 +221,7 @@ class UploadMixin:
                     'while the offset was {}'.format(
                         _file_key, stash_info['size'], offset))
 
-            if _verify_stash:
+            if verify_stash:
                 # The SHA1 was also requested so calculate and compare it
                 assert 'sha1' in stash_info, \
                     'sha1 not in stash info: {}'.format(stash_info)
