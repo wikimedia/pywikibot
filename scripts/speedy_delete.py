@@ -21,7 +21,7 @@ article.  The onus is on you to avoid making these mistakes.
 NOTE: This script currently only works for the Wikipedia project.
 """
 #
-# (C) Pywikibot team, 2007-2021
+# (C) Pywikibot team, 2007-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -65,7 +65,12 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
             'ar': {
                 '_default':
                     'حذف مرشح للحذف السريع حسب '
-                    '[[وProject:حذف سريع|معايير الحذف السريع]]',
+                    '[[وب:شطب|معايير الحذف السريع]]',
+            },
+            'arz': {
+                '_default':
+                    'مسح صفحه مترشحه للمسح السريع حسب '
+                    '[[ويكيبيديا:مسح سريع|معايير المسح السريع]]',
             },
             'cs': {
                 '_default':
@@ -199,6 +204,7 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
     talk_deletion_msg = {
         'wikipedia': {
             'ar': 'صفحة نقاش يتيمة',
+            'arz': 'صفحه نقاش يتيمه',
             'cs': 'Osiřelá diskusní stránka',
             'de': 'Verwaiste Diskussionsseite',
             'en': 'Orphaned talk page',
