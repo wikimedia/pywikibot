@@ -441,7 +441,7 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
     ]
 
     _arguments = '-simulate -page:Foo -always'
-    _results = ("Working on 'Foo'", '1 pages read')
+    _results = ("Working on 'Foo'", 'Script terminated successfully')
     _skip_results = {}
     _timeout = True
 
