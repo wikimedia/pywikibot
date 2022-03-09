@@ -168,6 +168,18 @@ def collector(loader=unittest.loader.defaultTestLoader):
     test_list += ['tests.script_tests.TestScriptSimulate.' + name
                   for name in tests]
 
+    tests = (['test__login']
+             + ['test_' + name
+                 for name in sorted(script_list)
+                 if name != 'login'
+                 and name not in failed_dep_script_set
+                 and name not in unrunnable_script_set
+                 and (enable_autorun_tests or name not in auto_run_script_list)
+                ])
+
+    test_list += ['tests.script_tests.TestScriptGenerator.' + name
+                  for name in tests]
+
     tests = loader.loadTestsFromNames(test_list)
     suite = unittest.TestSuite()
     suite.addTests(tests)
