@@ -1258,7 +1258,7 @@ class Request(MutableMapping):
 
         self.__defaulted = True
 
-    def _encoded_items(self):
+    def _encoded_items(self) -> Dict[str, Union[str, bytes]]:
         """
         Build a dict of params with minimal encoding needed for the site.
 
@@ -1272,7 +1272,6 @@ class Request(MutableMapping):
         are not supported.
 
         :return: Parameters either in the site encoding, or ASCII strings
-        :rtype: dict with values of either str or bytes
         """
         params = {}
         for key, values in self._params.items():
@@ -1978,12 +1977,8 @@ class CachedRequest(Request):
         request_key = repr(sorted(self._encoded_items().items()))
         return '{!r}{}{}'.format(self.site, user_key, request_key)
 
-    def _create_file_name(self):
-        """
-        Return a unique ascii identifier for the cache entry.
-
-        :rtype: str (hexadecimal; i.e. characters 0-9 and a-f only)
-        """
+    def _create_file_name(self) -> str:
+        """Return a unique ascii identifier for the cache entry."""
         return hashlib.sha256(
             self._uniquedescriptionstr().encode('utf-8')
         ).hexdigest()

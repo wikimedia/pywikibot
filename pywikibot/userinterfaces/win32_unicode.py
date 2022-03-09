@@ -231,7 +231,6 @@ def get_unicode_console() -> Tuple[IO, IO, IO, List[str]]:
     Get Unicode console objects.
 
     :return: stdin, stdout, stderr, argv
-    :rtype: tuple
     """
     # Make Unicode console output work independently of the current code page.
     # This also fixes https://bugs.python.org/issue1602

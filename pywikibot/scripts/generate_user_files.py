@@ -5,7 +5,7 @@
    moved to pywikibot.scripts folder
 """
 #
-# (C) Pywikibot team, 2010-2021
+# (C) Pywikibot team, 2010-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -18,6 +18,7 @@ from pathlib import Path
 from textwrap import fill
 from typing import Optional
 
+from pywikibot.backports import Tuple
 from pywikibot.scripts import _import_with_no_user_config
 
 
@@ -105,7 +106,7 @@ def get_site_and_lang(
     default_lang: Optional[str] = 'en',
     default_username: Optional[str] = None,
     force: bool = False
-):
+) -> Tuple[str, str, str]:
     """
     Ask the user for the family, site code and username.
 
@@ -114,7 +115,6 @@ def get_site_and_lang(
         if the family supports it.
     :param default_username: The default username which should be chosen.
     :return: The family, site code and username
-    :rtype: tuple of three str
     """
     known_families = sorted(pywikibot.config.family_files.keys())
     if default_family not in known_families:
@@ -251,11 +251,10 @@ def parse_sections() -> list:
     return data
 
 
-def copy_sections():
+def copy_sections() -> str:
     """Take config sections and copy them to user-config.py.
 
     :return: config text of all selected sections.
-    :rtype: str
     """
     result = []
     sections = parse_sections()
@@ -382,7 +381,7 @@ def save_botpasswords(botpasswords, _fncpass):
             raise
 
 
-def ask_for_dir_change(force):
+def ask_for_dir_change(force) -> Tuple[bool, bool]:
     """Ask whether the base directory is has to be changed.
 
     Only give option for directory change if user-config.py or user-password
@@ -392,7 +391,6 @@ def ask_for_dir_change(force):
     :param force: Skip asking for directory change
     :type force: bool
     :return: whether user file or password file exists already
-    :rtype: tuple of bool
     """
     global base_dir
 

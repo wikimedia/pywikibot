@@ -7,7 +7,7 @@ Useful for editing the contents of an article.
    Python 3.6 or highter is required.
 """
 #
-# (C) Pywikibot team, 2003-2021
+# (C) Pywikibot team, 2003-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -373,7 +373,7 @@ class EditBoxWindow(tkinter.Frame):
         self.pack()
 
     def edit(self, text: str, jumpIndex: Optional[int] = None,
-             highlight: Optional[str] = None):
+             highlight: Optional[str] = None) -> Optional[str]:
         """
         Provide user with editor to modify text.
 
@@ -382,7 +382,6 @@ class EditBoxWindow(tkinter.Frame):
         :param highlight: each occurrence of this substring will be highlighted
         :return: the modified text, or None if the user didn't save the text
             file in his text editor
-        :rtype: str or None
         """
         self.text = None
         # put given text into our textarea

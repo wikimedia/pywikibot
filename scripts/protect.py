@@ -57,7 +57,7 @@ Unprotect all pages listed in text file 'unprotect.txt' without prompting:
 #
 # Created by modifying delete.py
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -115,11 +115,10 @@ class ProtectionRobot(SingleSiteBot, ConfigParserBot, CurrentPageBot):
                                   protections=protections)
 
 
-def check_protection_level(operation, level, levels, default=None):
+def check_protection_level(operation, level, levels, default=None) -> str:
     """Check if the protection level is valid or ask if necessary.
 
     :return: a valid protection level
-    :rtype: str
     """
     if level in levels:
         return level

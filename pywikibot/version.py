@@ -1,6 +1,6 @@
 """Module to determine the pywikibot version (tag, revision and date)."""
 #
-# (C) Pywikibot team, 2007-2021
+# (C) Pywikibot team, 2007-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -22,7 +22,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import List, cache
+from pywikibot.backports import cache, Dict, List, Tuple
 from pywikibot.comms.http import fetch
 from pywikibot.exceptions import VersionParseError
 
@@ -78,7 +78,7 @@ def getversion(online: bool = True) -> str:
 
 
 @cache
-def getversiondict():
+def getversiondict() -> Dict[str, str]:
     """Get version info for the package.
 
     :return:
@@ -86,7 +86,6 @@ def getversiondict():
         - rev (current revision identifier),
         - date (date of current revision),
         - hash (git hash for the current revision)
-    :rtype: ``dict`` of four ``str``
     """
     _program_dir = _get_program_dir()
     exceptions = {}
@@ -305,7 +304,7 @@ def getversion_nightly(path=None):  # pragma: no cover
     return (tag, rev, date, hsh)
 
 
-def getversion_package(path=None):
+def getversion_package(path=None) -> Tuple[str, str, str, str]:
     """Get version info for an installed package.
 
     :param path: Unused argument
@@ -314,7 +313,6 @@ def getversion_package(path=None):
         - rev: '-1 (unknown)'
         - date (date the package was installed locally),
         - hash (git hash for the current revision of 'pywikibot/__init__.py')
-    :rtype: ``tuple`` of four ``str``
     """
     hsh = ''
     date = get_module_mtime(pywikibot).timetuple()

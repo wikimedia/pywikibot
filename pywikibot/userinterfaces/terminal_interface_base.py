@@ -488,7 +488,7 @@ class UI(ABUIC):
                 pywikibot.error('Invalid response')
 
     def editText(self, text: str, jumpIndex: Optional[int] = None,
-                 highlight: Optional[str] = None):
+                 highlight: Optional[str] = None) -> Optional[str]:
         """Return the text as edited by the user.
 
         Uses a Tkinter edit box because we don't have a console editor
@@ -498,7 +498,6 @@ class UI(ABUIC):
         :param highlight: each occurrence of this substring will be highlighted
         :return: the modified text, or None if the user didn't save the text
             file in his text editor
-        :rtype: str or None
         """
         try:
             from pywikibot.userinterfaces import gui

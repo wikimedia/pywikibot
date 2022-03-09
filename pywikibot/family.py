@@ -19,7 +19,7 @@ from typing import Optional
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Dict, List, Tuple
+from pywikibot.backports import Dict, List, Set, Tuple
 from pywikibot.exceptions import FamilyMaintenanceWarning, UnknownFamilyError
 from pywikibot.tools import classproperty, deprecated
 
@@ -803,12 +803,8 @@ class Family:
         """Return the path to title using index.php with redirects disabled."""
         return '{}?title={}&redirect=no'.format(self.path(code), title)
 
-    def interface(self, code):
-        """
-        Return interface to use for code.
-
-        :rtype: str or subclass of BaseSite
-        """
+    def interface(self, code) -> str:
+        """Return interface to use for code."""
         if code in self.interwiki_removals:
             if code in self.codes:
                 pywikibot.warn('Interwiki removal {} is in {} codes'
@@ -953,14 +949,13 @@ class Family:
         return putText
 
     @property
-    def obsolete(self):
+    def obsolete(self) -> Dict[str, Optional[str]]:
         """
         Old codes that are not part of the family.
 
         Interwiki replacements override removals for the same code.
 
         :return: mapping of old codes to new codes (or None)
-        :rtype: dict
         """
         data = {code: None for code in self.interwiki_removals}
         data.update(self.interwiki_replacements)
@@ -977,13 +972,11 @@ class Family:
                                            if new is not None)
 
     @classproperty
-    def domains(cls):
+    def domains(cls) -> Set[str]:
         """
         Get list of unique domain names included in this family.
 
         These domains may also exist in another family.
-
-        :rtype: set of str
         """
         return set(cls.langs.values())
 
@@ -1234,14 +1227,13 @@ class WikimediaOrgFamily(SingleSiteFamily, WikimediaFamily):
         return '{}.wikimedia.org'.format(cls.name)
 
 
-def AutoFamily(name: str, url: str):
+def AutoFamily(name: str, url: str) -> SingleSiteFamily:
     """
     Family that automatically loads the site configuration.
 
     :param name: Name for the family
     :param url: API endpoint URL of the wiki
     :return: Generated family class
-    :rtype: SingleSiteFamily
     """
     url = urlparse.urlparse(url)
     domain = url.netloc

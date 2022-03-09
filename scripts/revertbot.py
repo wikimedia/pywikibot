@@ -20,12 +20,11 @@ and override its `callback` method. Here is a sample:
 
         '''Example revert bot.'''
 
-        def callback(self, item):
+        def callback(self, item) -> bool:
             '''Sample callback function for 'private' revert bot.
 
             :param item: an item from user contributions
             :type item: dict
-            :rtype: bool
             '''
             if 'top' in item:
                 page = pywikibot.Page(self.site, item['title'])
@@ -36,7 +35,7 @@ and override its `callback` method. Here is a sample:
 
 """
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #

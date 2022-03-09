@@ -459,11 +459,7 @@ class XmlDumpReplacePageGenerator:
                         .format(entry.title))
 
     def isTitleExcepted(self, title) -> bool:
-        """
-        Return True if one of the exceptions applies for the given title.
-
-        :rtype: bool
-        """
+        """Return True if one of the exceptions applies for the given title."""
         if 'title' in self.exceptions:
             for exc in self.exceptions['title']:
                 if exc.search(title):
@@ -475,12 +471,8 @@ class XmlDumpReplacePageGenerator:
 
         return False
 
-    def isTextExcepted(self, text):
-        """
-        Return True if one of the exceptions applies for the given text.
-
-        :rtype: bool
-        """
+    def isTextExcepted(self, text) -> bool:
+        """Return True if one of the exceptions applies for the given text."""
         if 'text-contains' in self.exceptions:
             return any(exc.search(text)
                        for exc in self.exceptions['text-contains'])

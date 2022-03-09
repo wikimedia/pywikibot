@@ -452,8 +452,6 @@ class PrimaryIgnoreManager:
         """Initializer.
 
         :type disamb_page: pywikibot.Page
-        :rtype: None
-
         """
         self.disamb_page = disamb_page
         self.enabled = enabled

@@ -2163,7 +2163,7 @@ def botMayEdit(page) -> bool:
     return True
 
 
-def page_empty_check(page):
+def page_empty_check(page) -> bool:
     """
     Return True if page should be skipped as it is almost empty.
 
@@ -2171,8 +2171,6 @@ def page_empty_check(page):
     50 characters, and other pages are considered empty if they are not
     category pages and contain less than 4 characters excluding interlanguage
     links and categories.
-
-    :rtype: bool
     """
     txt = page.text
     # Check if the page is in content namespace
