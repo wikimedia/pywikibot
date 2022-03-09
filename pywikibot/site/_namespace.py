@@ -1,6 +1,6 @@
 """Objects representing Namespaces of MediaWiki site."""
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,8 +9,8 @@ from enum import IntEnum
 from typing import Optional, Union
 
 from pywikibot.backports import Iterable as IterableType
-from pywikibot.backports import List
-from pywikibot.tools import ComparableMixin, SelfCallMixin
+from pywikibot.backports import Dict, List
+from pywikibot.tools import classproperty, ComparableMixin, SelfCallMixin
 
 
 NamespaceIDType = Union[int, str, 'Namespace']
@@ -40,6 +40,15 @@ class BuiltinNamespace(IntEnum):
     CATEGORY = 14
     CATEGORY_TALK = 15
 
+    @property
+    def canonical(self) -> str:
+        """Canonical form of MediaWiki built-in namespace.
+
+        .. versionadded:: 7.1
+        """
+        name = '' if self == 0 else self.name.capitalize().replace('_', ' ')
+        return name.replace('Mediawiki', 'MediaWiki')
+
 
 class Namespace(Iterable, ComparableMixin):
 
@@ -61,30 +70,6 @@ class Namespace(Iterable, ComparableMixin):
     properties will have the same value.
     """
 
-    # These are the MediaWiki built-in names for MW 1.14+.
-    # Namespace prefixes are always case-insensitive, but the
-    # canonical forms are capitalized.
-    canonical_namespaces = {
-        -2: 'Media',
-        -1: 'Special',
-        0: '',
-        1: 'Talk',
-        2: 'User',
-        3: 'User talk',
-        4: 'Project',
-        5: 'Project talk',
-        6: 'File',
-        7: 'File talk',
-        8: 'MediaWiki',
-        9: 'MediaWiki talk',
-        10: 'Template',
-        11: 'Template talk',
-        12: 'Help',
-        13: 'Help talk',
-        14: 'Category',
-        15: 'Category talk',
-    }
-
     def __init__(self, id,
                  canonical_name: Optional[str] = None,
                  custom_name: Optional[str] = None,
@@ -97,7 +82,7 @@ class Namespace(Iterable, ComparableMixin):
         :param aliases: Aliases
         """
         self.id = id
-        canonical_name = canonical_name or self.canonical_namespaces.get(id)
+        canonical_name = canonical_name or BuiltinNamespace(self.id).canonical
 
         assert custom_name is not None or canonical_name is not None, \
             'Namespace needs to have at least one name'
@@ -119,6 +104,15 @@ class Namespace(Iterable, ComparableMixin):
 
         for key, value in kwargs.items():
             setattr(self, key, value)
+
+    @classproperty
+    def canonical_namespaces(cls) -> Dict[int, str]:
+        """Return the canonical forms of MediaWiki built-in namespaces.
+
+        .. versionchanged:: 7.1
+           implemented as classproperty using BuiltinNamespace IntEnum.
+        """
+        return {item.value: item.canonical for item in BuiltinNamespace}
 
     def _distinct(self):
         if self.custom_name == self.canonical_name:
