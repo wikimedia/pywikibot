@@ -206,7 +206,11 @@ class TestScriptMeta(MetaTestCaseClass):
 
                 cmd = global_args + [script_name] + args
                 data_in = script_input.get(script_name)
-                timeout = 5 if is_autorun else None
+                if isinstance(self._timeout, bool):
+                    do_timeout = self._timeout
+                else:
+                    do_timeout = script_name in self._timeout
+                timeout = 5 if do_timeout else None
 
                 stdout, error = None, None
                 if self._results and script_name in self._results:
@@ -349,6 +353,7 @@ class TestScriptHelp(PwbTestCase, metaclass=TestScriptMeta):
     _arguments = '-help'
     _results = None
     _skip_results = {}
+    _timeout = False
 
 
 class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
@@ -378,6 +383,7 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
     _arguments = '-simulate'
     _results = no_args_expected_results
     _skip_results = skip_on_results
+    _timeout = auto_run_script_list
 
 
 if __name__ == '__main__':  # pragma: no cover
