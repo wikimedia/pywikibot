@@ -213,8 +213,11 @@ class TestScriptMeta(MetaTestCaseClass):
                 timeout = 5 if do_timeout else None
 
                 stdout, error = None, None
-                if self._results and script_name in self._results:
-                    error = self._results[script_name]
+                if self._results:
+                    if isinstance(self._results, dict):
+                        error = self._results.get(script_name)
+                    else:
+                        error = self._results
                     if isinstance(error, tuple):
                         stdout, error = error
 
@@ -359,9 +362,9 @@ class TestScriptHelp(PwbTestCase, metaclass=TestScriptMeta):
 class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
                          metaclass=TestScriptMeta):
 
-    """Test cases for scripts.
+    """Test cases for running scripts with -siumlate.
 
-    This class sets the'user' attribute on every test, thereby ensuring
+    This class sets the 'user' attribute on every test, thereby ensuring
     that the test runner has a username for the default site, and so that
     Site.login() is called in the test runner, which means that the scripts
     run in pwb can automatically login using the saved cookies.
@@ -384,6 +387,51 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
     _results = no_args_expected_results
     _skip_results = skip_on_results
     _timeout = auto_run_script_list
+
+
+class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
+                          metaclass=TestScriptMeta):
+
+    """Test cases for running scripts with a generator."""
+
+    login = True
+
+    _expected_failures = {
+        'add_text',
+        'archivebot',
+        'category',
+        'change_pagelang',
+        'claimit',
+        'commonscat',
+        'data_ingestion',
+        'delete',
+        'djvutext',
+        'download_dump',
+        'harvest_template',
+        'image',
+        'interwiki',
+        'listpages',
+        'movepages',
+        'newitem',
+        'pagefromfile',
+        'protect',
+        'redirect',
+        'replicate_wiki',
+        'solve_disambiguation',
+        'speedy_delete',
+        'template',
+        'templatecount',
+        'transferbot',
+        'weblinkchecker',
+    }
+
+    _allowed_failures = [
+    ]
+
+    _arguments = '-simulate -page:Foo -always'
+    _results = ("Working on 'Foo'", '1 pages read')
+    _skip_results = {}
+    _timeout = True
 
 
 if __name__ == '__main__':  # pragma: no cover
