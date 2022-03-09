@@ -65,7 +65,7 @@ from pywikibot.site._interwikimap import _InterwikiMap
 from pywikibot.site._namespace import Namespace
 from pywikibot.site._siteinfo import Siteinfo
 from pywikibot.site._tokenwallet import TokenWallet
-from pywikibot.site._upload import UploadMixin
+from pywikibot.site._upload import Uploader
 from pywikibot.tools import (
     MediaWikiVersion,
     deprecated,
@@ -93,7 +93,6 @@ class APISite(
     ThanksMixin,
     UrlShortenerMixin,
     WikibaseClientMixin,
-    UploadMixin,
 ):
 
     """API interface to MediaWiki site.
@@ -2520,6 +2519,29 @@ class APISite(
             action='query', prop='stashimageinfo', siifilekey=file_key,
             siiprop=props)
         return req.submit()['query']['stashimageinfo'][0]
+
+    @need_right('upload')
+    def upload(self, filepage, **kwargs) -> bool:
+        """Upload a file to the wiki.
+
+        :see: https://www.mediawiki.org/wiki/API:Upload
+
+        Either source_filename or source_url, but not both, must be provided.
+
+        .. versionchanged:: 6.0
+           keyword arguments required for all parameters except `filepage`
+
+        .. versionchanged:: 6.2:
+           asynchronous upload is used if `asynchronous` parameter is set.
+
+        For keyword arguments refer :class:`pywikibot.site._upload.Uploader`
+
+        :param filepage: a FilePage object from which the wiki-name of the
+            file will be obtained.
+        :return: It returns True if the upload was successful and False
+            otherwise.
+        """
+        return Uploader(self, filepage, **kwargs).upload()
 
     def get_property_names(self, force: bool = False):
         """
