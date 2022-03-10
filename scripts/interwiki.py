@@ -1448,6 +1448,10 @@ class Subject(interwiki_graph.Subject):
 #             # No interwiki at all
 #             return
 
+        self.post_processing()
+
+    def post_processing(self):
+        """Some finishing processes to be done."""
         pywikibot.output('======Post-processing {}======'
                          .format(self.origin))
         # Assemble list of accepted interwiki links
