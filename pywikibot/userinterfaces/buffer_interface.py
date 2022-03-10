@@ -26,6 +26,10 @@ class UI(ABUIC):
         self.log_handler = logging.handlers.QueueHandler(self._buffer)
         self.log_handler.setLevel(VERBOSE if config.verbose_output else INFO)
 
+    def flush(self) -> None:
+        """Flush cached output."""
+        self.clear()
+
     def init_handlers(self, root_logger, *args, **kwargs) -> None:
         """Initialize the handlers for user output."""
         root_logger.addHandler(self.log_handler)

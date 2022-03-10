@@ -31,6 +31,7 @@ class ABUIC(ABC):
         """
         return list(sys.argv)
 
+    @abstractmethod
     def flush(self) -> None:
         """Flush cached output.
 
