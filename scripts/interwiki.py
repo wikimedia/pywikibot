@@ -1067,6 +1067,50 @@ class Subject(interwiki_graph.Subject):
                     if self.conf.hintsareright:
                         self.hintedsites.add(page.site)
 
+    def redir_checked(self, page, counter):
+        """Check and handle redirect. Return True if check is done."""
+        if page.isRedirectPage():
+            redirect_target = page.getRedirectTarget()
+            redir = ''
+        elif page.isCategoryRedirect():
+            redirect_target = page.getCategoryRedirectTarget()
+            redir = 'category '
+        else:
+            return False
+
+        self.conf.note('{} is {}redirect to {}'
+                       .format(page, redir, redirect_target))
+        if self.origin is None or page == self.origin:
+            # the 1st existig page becomes the origin page, if none was
+            # supplied
+            if self.conf.initialredirect:
+                # don't follow another redirect; it might be a self
+                # loop
+                if not redirect_target.isRedirectPage() \
+                   and not redirect_target.isCategoryRedirect():
+                    self.origin = redirect_target
+                    self.todo.append(redirect_target)
+                    counter.plus(redirect_target.site)
+            else:
+                # This is a redirect page to the origin. We don't need
+                # to follow the redirection.
+                # In this case we can also stop all hints!
+                for site, count in self.todo.iter_values_len():
+                    counter.minus(site, count)
+                self.todo.clear()
+        elif not self.conf.followredirect:
+            self.conf.note('not following {}redirects.'.format(redir))
+        elif page.isStaticRedirect():
+            self.conf.note('not following static {}redirects.'.format(redir))
+        elif (page.site.family == redirect_target.site.family
+              and not self.skipPage(page, redirect_target, counter)):
+            if self.addIfNew(redirect_target, counter, page):
+                if config.interwiki_shownew:
+                    pywikibot.output('{}: {} gives new {}redirect {}'
+                                     .format(self.origin, page, redir,
+                                             redirect_target))
+        return True
+
     def check_page(self, page, counter) -> None:
         """Check whether any iw links should be added to the todo list."""
         if not page.exists():
@@ -1083,48 +1127,7 @@ class Subject(interwiki_graph.Subject):
                 self.done.clear()
             return
 
-        if page.isRedirectPage():
-            redirectTargetPage = page.getRedirectTarget()
-            redir = ''
-        elif page.isCategoryRedirect():
-            redirectTargetPage = page.getCategoryRedirectTarget()
-            redir = 'category '
-        else:
-            redir = None
-
-        if redir is not None:
-            self.conf.note('{} is {}redirect to {}'
-                           .format(page, redir, redirectTargetPage))
-            if self.origin is None or page == self.origin:
-                # the 1st existig page becomes the origin page, if none was
-                # supplied
-                if self.conf.initialredirect:
-                    # don't follow another redirect; it might be a self
-                    # loop
-                    if not redirectTargetPage.isRedirectPage() \
-                       and not redirectTargetPage.isCategoryRedirect():
-                        self.origin = redirectTargetPage
-                        self.todo.append(redirectTargetPage)
-                        counter.plus(redirectTargetPage.site)
-                else:
-                    # This is a redirect page to the origin. We don't need
-                    # to follow the redirection.
-                    # In this case we can also stop all hints!
-                    for site, count in self.todo.iter_values_len():
-                        counter.minus(site, count)
-                    self.todo.clear()
-            elif not self.conf.followredirect:
-                self.conf.note('not following {}redirects.'.format(redir))
-            elif page.isStaticRedirect():
-                self.conf.note('not following static {}redirects.'
-                               .format(redir))
-            elif (page.site.family == redirectTargetPage.site.family
-                  and not self.skipPage(page, redirectTargetPage, counter)):
-                if self.addIfNew(redirectTargetPage, counter, page):
-                    if config.interwiki_shownew:
-                        pywikibot.output('{}: {} gives new {}redirect {}'
-                                         .format(self.origin, page, redir,
-                                                 redirectTargetPage))
+        if self.redir_checked(page, counter):
             return
 
         # must be behind the page.isRedirectPage() part
