@@ -190,7 +190,12 @@ class UI(ABUIC):
 
             if current_color != next_color and colorized:
                 # set the new color, but only if they change
+                # flush first to enable color change on Windows (T283808)
+                target_stream.flush()
                 self.encounter_color(color_stack[-1], target_stream)
+
+        # finally flush stream to show the text, required for Windows (T303373)
+        target_stream.flush()
 
     def output(self, text, targetStream=None) -> None:
         """Forward text to cache and flush if output is not locked.

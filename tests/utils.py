@@ -11,7 +11,6 @@ import unittest
 import warnings
 from contextlib import contextmanager
 from subprocess import PIPE, Popen, TimeoutExpired
-from types import ModuleType
 
 import pywikibot
 from pywikibot import config
@@ -58,23 +57,6 @@ def entered_loop(iterable):
     for _ in iterable:
         return True
     return False
-
-
-class FakeModule(ModuleType):
-
-    """An empty fake module."""
-
-    @classmethod
-    def create_dotted(cls, name):
-        """Create a chain of modules based on the name separated by periods."""
-        modules = name.split('.')
-        mod = None
-        for mod_name in modules[::-1]:
-            module = cls(str(mod_name))
-            if mod:
-                setattr(module, mod.__name__, mod)
-            mod = module
-        return mod
 
 
 class WarningSourceSkipContextManager(warnings.catch_warnings):

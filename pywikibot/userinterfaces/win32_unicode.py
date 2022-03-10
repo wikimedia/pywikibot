@@ -153,6 +153,10 @@ class UnicodeOutput(IOBase):
             _complain('{}.writelines: {!r}'.format(self.name, e))
             raise
 
+    def isatty(self):
+        """Return True if the stream is interactive."""
+        return self._hConsole is not None
+
 
 def old_fileno(std_name):
     """Return the fileno or None if that doesn't work."""

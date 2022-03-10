@@ -31,7 +31,6 @@ from pywikibot.userinterfaces import (
 )
 from pywikibot.userinterfaces.transliteration import NON_LATIN_DIGITS, _trans
 from tests.aspects import TestCase, TestCaseBase
-from tests.utils import FakeModule
 
 
 class Stream:
@@ -487,7 +486,10 @@ class FakeUIColorizedTestBase(TestCase):
 
     """Base class for test cases requiring that colorized output is active."""
 
+    net = False
+
     expect_color = True
+    expected = 'Hello world you!'
 
     def setUp(self):
         """Force colorized_output to True."""
@@ -500,16 +502,6 @@ class FakeUIColorizedTestBase(TestCase):
         pywikibot.config.colorized_output = self._old_config
         super().tearDown()
 
-
-class FakeUnixTest(FakeUIColorizedTestBase, FakeUITest):
-
-    """Test case to allow doing colorized Unix tests in any environment."""
-
-    net = False
-
-    expected = 'Hello world you!'
-    ui_class = terminal_interface_unix.UnixUI
-
     def _encounter_color(self, color, target_stream):
         """Verify that the written data, color and stream are correct."""
         self.assertIs(target_stream, self.stream)
@@ -518,6 +510,13 @@ class FakeUnixTest(FakeUIColorizedTestBase, FakeUITest):
         self.assertEqual(color, expected_color)
         self.assertLength(self.stream.getvalue(),
                           sum(e[1] for e in self._colors[:self._index]))
+
+
+class FakeUnixTest(FakeUIColorizedTestBase, FakeUITest):
+
+    """Test case to allow doing colorized Unix tests in any environment."""
+
+    ui_class = terminal_interface_unix.UnixUI
 
 
 class FakeWin32Test(FakeUIColorizedTestBase, FakeUITest):
@@ -530,53 +529,20 @@ class FakeWin32Test(FakeUIColorizedTestBase, FakeUITest):
     import these will be unpatched.
     """
 
-    net = False
-
-    expected = 'Hello world you!'
     ui_class = terminal_interface_win32.Win32UI
 
     def setUp(self):
         """Patch the ctypes import and initialize a stream and UI instance."""
         super().setUp()
-        self._orig_ctypes = terminal_interface_win32.ctypes
-        ctypes = FakeModule.create_dotted('ctypes.windll.kernel32')
-        ctypes.windll.kernel32.SetConsoleTextAttribute = self._handle_setattr
-        terminal_interface_win32.ctypes = ctypes
-        self.stream._hConsole = object()
-
-    def tearDown(self):
-        """Unpatch the ctypes import and check that all colors were used."""
-        terminal_interface_win32.ctypes = self._orig_ctypes
-        super().tearDown()
-
-    def _encounter_color(self, color, target_stream):
-        """Call the original method."""
-        self._orig_encounter_color(color, target_stream)
-
-    def _handle_setattr(self, handle, attribute):
-        """Dummy method to handle SetConsoleTextAttribute."""
-        self.assertIs(handle, self.stream._hConsole)
-        color = self._colors[self._index][0]
-        self._index += 1
-        color = terminal_interface_win32.windowsColors[color]
-        self.assertEqual(attribute, color)
-        self.assertLength(self.stream.getvalue(),
-                          sum(e[1] for e in self._colors[:self._index]))
+        self.stream.isatty = lambda: self.expect_color
 
 
 class FakeWin32UncolorizedTest(FakeWin32Test):
 
     """Test case to allow doing uncolorized Win32 tests in any environment."""
 
-    net = False
-
     expected = 'Hello world you! ***'
     expect_color = False
-
-    def setUp(self):
-        """Change the local stream's console to None to disable colors."""
-        super().setUp()
-        self.stream._hConsole = None
 
 
 if __name__ == '__main__':  # pragma: no cover
