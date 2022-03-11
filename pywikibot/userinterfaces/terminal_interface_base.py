@@ -130,7 +130,7 @@ class UI(ABUIC):
         warnings_logger.addHandler(warning_handler)
 
     def encounter_color(self, color, target_stream):
-        """Handle the next color encountered."""
+        """Abstract method to handle the next color encountered."""
         raise NotImplementedError('The {} class does not support '
                                   'colors.'.format(self.__class__.__name__))
 
@@ -506,10 +506,6 @@ class UI(ABUIC):
             return text
         editor = gui.EditBoxWindow()
         return editor.edit(text, jumpIndex=jumpIndex, highlight=highlight)
-
-    def argvu(self):
-        """Return copy of argv."""
-        return list(self.argv)
 
 
 class TerminalHandler(logging.StreamHandler):
