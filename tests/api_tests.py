@@ -13,8 +13,6 @@ from contextlib import suppress
 from unittest.mock import patch
 
 import pywikibot.family
-import pywikibot.login
-import pywikibot.page
 import pywikibot.site
 from pywikibot.data import api
 from pywikibot.exceptions import APIError, NoUsernameError

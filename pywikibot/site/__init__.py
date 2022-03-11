@@ -15,5 +15,4 @@ from pywikibot.site._tokenwallet import TokenWallet
 
 
 __all__ = ('APISite', 'BaseSite', 'ClosedSite', 'DataSite', 'RemovedSite',
-           'Namespace', 'NamespacesDict', 'PageInUse', 'Siteinfo',
-           'TokenWallet')
+           'Namespace', 'NamespacesDict', 'Siteinfo', 'TokenWallet')

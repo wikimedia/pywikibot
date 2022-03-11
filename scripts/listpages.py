@@ -87,7 +87,7 @@ page object:
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -189,7 +189,7 @@ def main(*args: str) -> None:
     gen_factory = GeneratorFactory()
 
     for arg in local_args:
-        option, sep, value = arg.partition(':')
+        option, _, value = arg.partition(':')
         if option == '-notitle':
             notitle = True
         elif option == '-format':

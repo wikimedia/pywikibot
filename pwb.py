@@ -346,8 +346,8 @@ def find_alternates(filename, script_paths):
         msg = '\nThe most similar scripts are:'
         alternatives = ShowingListOption(similar_scripts, pre=msg, post='')
         try:
-            prefix, script = input_choice('Which script to be run:',
-                                          alternatives, default='1')
+            _, script = input_choice('Which script to be run:',
+                                     alternatives, default='1')
         except QuitKeyboardInterrupt:
             return None
         print()  # pragma: no cover

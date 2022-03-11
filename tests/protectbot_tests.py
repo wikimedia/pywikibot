@@ -9,7 +9,6 @@ import unittest
 from contextlib import suppress
 
 import pywikibot
-import pywikibot.page
 from scripts import protect
 from tests.aspects import ScriptMainTestCase
 

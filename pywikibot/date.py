@@ -482,7 +482,7 @@ def dh(value: int, pattern: str, encf: encf_type, decf: decf_type,
         numeral number.
 
     """
-    compPattern, strPattern, decoders = escapePattern2(pattern)
+    _compPattern, strPattern, decoders = escapePattern2(pattern)
     # Encode an integer value into a textual form.
     # This will be called from outside as well as recursivelly to verify
     # parsed value
@@ -510,7 +510,7 @@ def dh(value: int, pattern: str, encf: encf_type, decf: decf_type,
 @dh.register(str)  # type: ignore
 def _(value: str, pattern: str, encf: encf_type, decf: decf_type,
       filter: Optional[Callable[[int], bool]] = None) -> int:
-    compPattern, strPattern, decoders = escapePattern2(pattern)
+    compPattern, _strPattern, decoders = escapePattern2(pattern)
     m = compPattern.match(value)
     if m:
         # decode each found value using provided decoder

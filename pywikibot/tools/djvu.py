@@ -251,8 +251,8 @@ class DjVuFile:
         size, dpi = self.get_most_common_info()
 
         # Generate white_page.
-        res, data = _call_cmd(['convert', '-size', size, 'xc:white',
-                               white_ppm], lib='ImageMagik')
+        res, _ = _call_cmd(['convert', '-size', size, 'xc:white', white_ppm],
+                           lib='ImageMagik')
         if not res:
             return False
 
@@ -299,7 +299,7 @@ class DjVuFile:
         # Delete page n.
         # Get ref page info for later checks.
         info_ref_page = self.page_info(ref_page)
-        res, data = _call_cmd(['djvm', '-d', self.file, n])
+        res, _ = _call_cmd(['djvm', '-d', self.file, n])
         if not res:
             return False
 

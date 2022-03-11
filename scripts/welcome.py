@@ -173,7 +173,7 @@ from textwrap import fill
 
 import pywikibot
 from pywikibot import config, i18n
-from pywikibot.backports import Dict, Generator, List
+from pywikibot.backports import Dict, Generator, List  # skipcq: PY-W2000
 from pywikibot.bot import SingleSiteBot
 from pywikibot.exceptions import EditConflictError, Error, HiddenKeyError
 from pywikibot.tools.formatter import color_format

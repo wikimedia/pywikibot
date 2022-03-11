@@ -29,7 +29,7 @@ Furthermore, the following command line parameters are supported:
    can be set within a settings file which is scripts.ini by default.
 """
 
-# (C) Pywikibot team, 2015-2021
+# (C) Pywikibot team, 2015-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -243,7 +243,7 @@ def main(*args: str) -> None:
 
     options = {}
     for arg in local_args:
-        option, sep, value = arg.partition(':')
+        option, _, value = arg.partition(':')
         option = option[1:] if option.startswith('-') else None
         if option == 'summary':
             options[option] = value

@@ -19,7 +19,7 @@ from typing import Optional
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Dict, List, Set, Tuple
+from pywikibot.backports import Dict, List, Set, Tuple  # skipcq: PY-W2000
 from pywikibot.exceptions import FamilyMaintenanceWarning, UnknownFamilyError
 from pywikibot.tools import classproperty, deprecated
 

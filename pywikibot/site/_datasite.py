@@ -1,6 +1,6 @@
 """Objects representing API interface to Wikibase site."""
 #
-# (C) Pywikibot team, 2012-2021
+# (C) Pywikibot team, 2012-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -12,7 +12,6 @@ from typing import Optional
 from warnings import warn
 
 import pywikibot
-import pywikibot.family
 from pywikibot.data import api
 from pywikibot.exceptions import (
     APIError,

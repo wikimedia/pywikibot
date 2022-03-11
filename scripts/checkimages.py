@@ -825,7 +825,7 @@ class CheckImagesBot:
             return list_given[inx_found][1]
 
         # find the oldest image
-        sec, image = max(list_given, key=lambda element: element[0])
+        _, image = max(list_given, key=lambda element: element[0])
         return image
 
     def check_image_on_commons(self) -> bool:

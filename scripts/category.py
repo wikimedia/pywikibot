@@ -136,7 +136,7 @@ from typing import Optional, Union
 
 import pywikibot
 from pywikibot import config, i18n, pagegenerators, textlib
-from pywikibot.backports import Sequence, Set
+from pywikibot.backports import Sequence, Set  # skipcq: PY-W2000
 from pywikibot.bot import (
     BaseBot,
     Bot,
@@ -272,7 +272,7 @@ class CategoryPreprocess(BaseBot):
 
         tmpl = []  # type: Sequence
         with suppress(KeyError):
-            tmpl, loc = moved_links[page.site.code]
+            tmpl, _loc = moved_links[page.site.code]
 
         if not isinstance(tmpl, list):
             tmpl = [tmpl]

@@ -461,9 +461,6 @@ def main(*args: str) -> None:
 
     :param args: command line arguments
     """
-    # Loading the comments
-    global category_to_check, project_inserted
-
     options = {}
     generator = None
 
@@ -482,7 +479,7 @@ def main(*args: str) -> None:
 
     # Process local args
     for arg in local_args:
-        arg, sep, value = arg.partition(':')
+        arg, _, value = arg.partition(':')
         option = arg[1:]
         if arg in ('-always', '-move', '-show'):
             options[option] = True

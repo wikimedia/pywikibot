@@ -2241,7 +2241,7 @@ class TestSiteSysopWrite(TestCase):
 
         fp1 = pywikibot.FilePage(site, 'File:T276726.png')
         site.loadimageinfo(fp1, history=True)
-        for idx, v in fp1._file_revisions.items():
+        for v in fp1._file_revisions.values():
             if v['timestamp'] == ts1:
                 self.assertTrue(hasattr(v, 'userhidden'))
 

@@ -899,8 +899,8 @@ class GeneratorFactory:
             pnames = self.site.get_property_names()
             # also use the default by <enter> key
             if value == '?' or value not in pnames:
-                prefix, value = pywikibot.input_choice(
-                    question, ShowingListOption(pnames))
+                _, value = pywikibot.input_choice(question,
+                                                  ShowingListOption(pnames))
         return self.site.pages_with_property(value)
 
     def _handle_usercontribs(self, value: str) -> HANDLER_RETURN_TYPE:

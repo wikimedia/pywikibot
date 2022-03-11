@@ -5,7 +5,6 @@
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-import pywikibot.family
 from pywikibot.data import api
 from pywikibot.echo import Notification
 from pywikibot.exceptions import (

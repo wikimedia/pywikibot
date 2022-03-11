@@ -14,7 +14,6 @@ from textwrap import fill
 from typing import Any, Optional, Union
 
 import pywikibot
-import pywikibot.family
 from pywikibot.backports import Dict, List
 from pywikibot.comms.http import get_authentication
 from pywikibot.data import api

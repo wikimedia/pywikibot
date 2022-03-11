@@ -97,8 +97,6 @@ __all__ = (
     'SiteLink',
     'SiteLinkCollection',
     'html2unicode',
-    'UnicodeToAsciiHtml',
-    'unicode2html',
     'url2unicode',
 )
 

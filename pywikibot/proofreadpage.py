@@ -22,7 +22,7 @@ OCR support of page scans via:
 
 """
 #
-# (C) Pywikibot team, 2015-2021
+# (C) Pywikibot team, 2015-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -680,7 +680,7 @@ class ProofreadPage(pywikibot.Page):
             soup = _bs4_soup(txt)  # type: ignore
 
             res = []
-            for ocr_page in soup.find_all(class_='ocr_page'):
+            for _ocr_page in soup.find_all(class_='ocr_page'):
                 for area in soup.find_all(class_='ocr_carea'):
                     for par in area.find_all(class_='ocr_par'):
                         for line in par.find_all(class_='ocr_line'):

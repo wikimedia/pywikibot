@@ -149,7 +149,7 @@ def main(*args: str) -> None:
 
     # Parse your own command line arguments
     for arg in local_args:
-        arg, sep, value = arg.partition(':')
+        arg, _, value = arg.partition(':')
         option = arg[1:]
         if option in ('summary', 'text'):
             if not value:

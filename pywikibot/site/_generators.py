@@ -13,8 +13,7 @@ from typing import Any, Optional, Union
 from warnings import warn
 
 import pywikibot
-import pywikibot.family
-from pywikibot.backports import Dict, Generator, Iterable, List
+from pywikibot.backports import Dict, Generator, Iterable, List  # skipcq
 from pywikibot.data import api
 from pywikibot.exceptions import (
     APIError,
@@ -1828,8 +1827,8 @@ class GeneratorsMixin:
                 errdata = {
                     'site': self,
                     'user': self.user(),
+                    idtype: idvalue,
                 }
-                errdata[idtype] = idvalue
                 if err.code in self._patrol_errors:
                     raise Error(self._patrol_errors[err.code]
                                 .format_map(errdata))
