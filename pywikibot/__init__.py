@@ -32,7 +32,7 @@ from pywikibot.__metadata__ import (
     __version__,
 )
 from pywikibot._wbtypes import WbRepresentation as _WbRepresentation
-from pywikibot.backports import (
+from pywikibot.backports import (  # skipcq: PY-W2000
     Callable,
     Dict,
     List,
@@ -82,9 +82,8 @@ __all__ = (
     'html2unicode', 'input', 'input_choice', 'input_yn', 'ItemPage', 'Link',
     'log', 'MediaInfo', 'output', 'Page', 'PropertyPage', 'showDiff',
     'show_help', 'Site', 'SiteLink', 'stdout', 'Timestamp', 'translate', 'ui',
-    'unicode2html', 'UploadWarning', 'url2unicode', 'User', 'warning',
-    'WbGeoShape', 'WbMonolingualText', 'WbQuantity', 'WbTabularData', 'WbTime',
-    'WbUnknown', 'WikidataBot',
+    'url2unicode', 'User', 'warning', 'WbGeoShape', 'WbMonolingualText',
+    'WbQuantity', 'WbTabularData', 'WbTime', 'WbUnknown', 'WikidataBot',
 )
 
 # argvu is set by pywikibot.bot when it's imported

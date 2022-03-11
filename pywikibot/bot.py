@@ -695,7 +695,7 @@ class InteractiveReplace:
         self._default = default
         self._quit = automatic_quit
 
-        current_match_type = Optional[Tuple[
+        current_match_type = Optional[Tuple[  # skipcq: PYL-W0612
             PageLinkType,
             str,
             Mapping[str, str],

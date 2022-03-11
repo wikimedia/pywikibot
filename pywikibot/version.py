@@ -168,7 +168,7 @@ def svn_rev_info(path):  # pragma: no cover
         cur.execute("""select
 local_relpath, repos_path, revision, changed_date, checksum from nodes
 order by revision desc, changed_date desc""")
-        name, tag, rev, date, checksum = cur.fetchone()
+        _name, tag, rev, date, _checksum = cur.fetchone()
         cur.execute('select root from repository')
         tag, = cur.fetchone()
 
@@ -265,7 +265,7 @@ def getversion_git(path=None):
                            '--date=iso'],
                           cwd=_program_dir,
                           stdout=subprocess.PIPE)
-    info, stderr = dp.communicate()
+    info, _ = dp.communicate()
     info = info.decode(config.console_encoding).split('|')
     date = info[0][:-6]
     date = time.strptime(date.strip('"'), '%Y-%m-%d %H:%M:%S')

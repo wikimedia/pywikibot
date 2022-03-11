@@ -60,7 +60,7 @@ a parameter -appendtop:foo would add 'foo' between them. A new line
 can be added between them by specifying '\n' as a value.
 """
 #
-# (C) Pywikibot team, 2004-2021
+# (C) Pywikibot team, 2004-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -279,7 +279,7 @@ def main(*args: str) -> None:
     r_options = {}
 
     for arg in pywikibot.handle_args(args):
-        arg, sep, value = arg.partition(':')
+        arg, _, value = arg.partition(':')
         option = arg.partition('-')[2]
         # reader options
         if option in ('begin', 'end', 'titlestart', 'titleend', 'title'):

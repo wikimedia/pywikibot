@@ -353,7 +353,7 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
             templates = page.templatesWithParams()
             reasons = i18n.translate(self.site, self.deletion_messages)
 
-            for template, params in templates:
+            for template, _ in templates:
                 template_name = template.title().lower()
                 if template_name in reasons:
                     if not isinstance(reasons[template_name], str):

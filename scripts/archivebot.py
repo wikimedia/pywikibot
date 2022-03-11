@@ -779,7 +779,7 @@ class PageArchiver:
             pywikibot.output('Archiving {} thread(s).'
                              .format(self.archived_threads))
             # Save the archives first (so that bugs don't cause a loss of data)
-            for title, archive in sorted(self.archives.items()):
+            for _title, archive in sorted(self.archives.items()):
                 count = archive.archived_threads
                 if count == 0:
                     continue

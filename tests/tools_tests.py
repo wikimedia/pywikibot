@@ -5,7 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 import decimal
-import os.path
+import os
 import subprocess
 import tempfile
 import unittest

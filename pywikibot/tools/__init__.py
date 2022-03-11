@@ -29,7 +29,7 @@ from warnings import catch_warnings, showwarning, warn
 import pkg_resources
 
 from pywikibot.logging import debug
-from pywikibot.tools._deprecate import (  # noqa: F401
+from pywikibot.tools._deprecate import (  # noqa: F401 skipcq: PY-W2000
     ModuleDeprecationWrapper,
     add_decorated_full_name,
     add_full_name,

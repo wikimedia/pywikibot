@@ -220,7 +220,7 @@ class PatrolBot(BaseBot):
                     # this allows a prefix that doesn't match an existing page
                     # to be a blue link, and can be clicked to see what pages
                     # will be included in the whitelist
-                    name, sep, prefix = obj.title.partition('/')
+                    name, _, prefix = obj.title.partition('/')
                     if name.lower() in self._prefixindex_aliases:
                         if not prefix:
                             verbose_output('Whitelist everything')

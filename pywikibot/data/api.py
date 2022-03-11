@@ -1256,7 +1256,7 @@ class Request(MutableMapping):
             raise TypeError(
                 "Query format '{}' cannot be parsed.".format(self['format']))
 
-        self.__defaulted = True
+        self.__defaulted = True  # skipcq: PTC-W0037
 
     def _encoded_items(self) -> Dict[str, Union[str, bytes]]:
         """

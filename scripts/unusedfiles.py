@@ -168,7 +168,7 @@ def main(*args: str) -> None:
     local_args = pywikibot.handle_args(args)
 
     for arg in local_args:
-        arg, sep, value = arg.partition(':')
+        arg, _, value = arg.partition(':')
         if arg == '-limit':
             total = value
         elif arg == '-filetemplate':

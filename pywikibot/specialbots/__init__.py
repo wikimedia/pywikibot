@@ -10,7 +10,6 @@ from pywikibot.specialbots._upload import UploadRobot
 
 __all__ = (
     'BaseUnlinkBot',
-    'EditReplacement',
     'InteractiveUnlink',
     'UploadRobot',
 )

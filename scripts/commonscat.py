@@ -279,7 +279,7 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot, NoRedirectPageBot):
         """
         page = self.current_page
         # Get the right templates for this page
-        primaryCommonscat, commonscatAlternatives = i18n.translate(
+        primaryCommonscat, _alternatives = i18n.translate(
             page.site.code, commonscatTemplates,
             fallback=i18n.DEFAULT_FALLBACK)
 
@@ -288,7 +288,7 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot, NoRedirectPageBot):
             pywikibot.output('Commonscat template is already on '
                              + page.title())
             (currentCommonscatTemplate,
-             currentCommonscatTarget, LinkText, Note) = commonscatLink
+             currentCommonscatTarget, LinkText, _note) = commonscatLink
             checkedCommonscatTarget = self.checkCommonscatLink(
                 currentCommonscatTarget)
 
@@ -554,7 +554,7 @@ def main(*args: str) -> None:
 
     if checkcurrent:
         site = pywikibot.Site()
-        primaryCommonscat, commonscatAlternatives = i18n.translate(
+        primaryCommonscat, _alternatives = i18n.translate(
             site.code, commonscatTemplates, fallback=i18n.DEFAULT_FALLBACK)
         template_page = pywikibot.Page(site, 'Template:' + primaryCommonscat)
         generator = template_page.getReferences(namespaces=14,

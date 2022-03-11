@@ -452,7 +452,7 @@ class RedirectRobot(ExistingPageBot, RedirectPageBot):
         if isinstance(item, str):
             item = pywikibot.Page(default_site, item)
         elif isinstance(item, tuple):
-            redir_name, code, target, final = item
+            redir_name, code, *_ = item
             item = pywikibot.Page(default_site, redir_name)
             item._redirect_type = code
         page = super().init_page(item)
@@ -698,7 +698,7 @@ def main(*args: str) -> None:
 
     local_args = pywikibot.handle_args(args)
     for argument in local_args:
-        arg, sep, value = argument.partition(':')
+        arg, _, value = argument.partition(':')
         option = arg.partition('-')[2]
         # bot options
         if arg == 'do':

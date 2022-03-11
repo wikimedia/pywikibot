@@ -442,7 +442,7 @@ class TestPageOCR(BS4TestCase):
         except Exception as exc:
             self.assertIsInstance(exc, ValueError)
         else:
-            ref_error, ref_text = self.data['wmfOCR']
+            _error, ref_text = self.data['wmfOCR']
             s = difflib.SequenceMatcher(None, text, ref_text)
             self.assertGreater(s.ratio(), 0.9)
 
@@ -680,7 +680,7 @@ class TestIndexPageMappings(BS4TestCase):
         data = self.sites[key]
         index_page = IndexPage(self.site, self.sites[key]['index'])
 
-        num, title_num, label = data['get_label']
+        num, _title_num, label = data['get_label']
         self.assertIs(index_page._cached, False)
         fetched_label = index_page.get_label_from_page_number(num)
 
@@ -763,7 +763,7 @@ class TestIndexPageMappings(BS4TestCase):
     def test_page_gen(self, key):
         """Test Index page generator."""
         data = self.sites[key]
-        num, title_num, label = data['get_label']
+        num, title_num, _label = data['get_label']
 
         index_page = IndexPage(self.site, self.sites[key]['index'])
         page_title = self.sites[key]['page'].format(title_num)

@@ -1511,7 +1511,7 @@ class Subject(interwiki_graph.Subject):
                         pywikibot.output('BUG>>> {} no longer exists?'
                                          .format(new[site]))
                         continue
-                    mods, mcomment, adding, removing, modifying \
+                    _mods, _comment, adding, removing, modifying \
                         = compareLanguages(old, new, lclSite,
                                            self.conf.summary)
                     if (removing and not self.conf.autonomous
@@ -1628,12 +1628,8 @@ class Subject(interwiki_graph.Subject):
             old[page2.site] = page2
 
         # Check what needs to get done
-        mods, mcomment, adding, removing, modifying = compareLanguages(
-            old,
-            new,
-            page.site,
-            self.conf.summary
-        )
+        mods, _comment, _adding, removing, modifying = compareLanguages(
+            old, new, page.site, self.conf.summary)
 
         # When running in autonomous mode without -force switch, make sure we
         # don't remove any items, but allow addition of the new ones
@@ -1904,7 +1900,7 @@ class InterwikiBot:
         pywikibot.output(
             'NOTE: Number of pages queued is {}, trying to add {} more.'
             .format(len(self.subjects), number))
-        for i in range(number):
+        for _ in range(number):
             for page in self.pageGenerator:
                 if page in self.conf.skip:
                     pywikibot.output('Skipping: {} is in the skip list'
@@ -2052,10 +2048,11 @@ class InterwikiBot:
         # Get the content of the assembled list in one blow
         gen = site.preloadpages(pageGroup, templates=True, langlinks=True,
                                 pageprops=True)
-        for page in gen:
+        for _ in gen:
             # we don't want to do anything with them now. The
             # page contents will be read via the Subject class.
             pass
+
         # Tell all of the subjects that the promised work is done
         for subject in subjectGroup:
             subject.batchLoaded(self)
