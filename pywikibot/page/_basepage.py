@@ -25,6 +25,7 @@ from contextlib import suppress
 from html.entities import name2codepoint
 from http import HTTPStatus
 from itertools import chain
+from textwrap import shorten, wrap
 from typing import Any, Optional, Union
 from urllib.parse import quote_from_bytes
 from warnings import warn
@@ -624,6 +625,71 @@ class BasePage(ComparableMixin):
         if not hasattr(self, '_parsed_text'):
             self._parsed_text = self.site.get_parsed_page(self)
         return self._parsed_text
+
+    def extract(self, variant: str = 'plain', *,
+                lines: Optional[int] = None,
+                chars: Optional[int] = None,
+                sentences: Optional[int] = None,
+                intro: bool = True) -> str:
+        """Retrieve an extract of this page.
+
+        .. versionadded:: 7.1
+
+        :param variant: The variant of extract, either 'plain' for plain
+            text, 'html' for limited HTML (both excludes templates and
+            any text formatting) or 'wiki' for bare wikitext which also
+            includes any templates for example.
+        :param lines: if not None, wrap the extract into lines with
+            width of 79 chars and return a string with that given number
+            of lines.
+        :param chars: How many characters to return.  Actual text
+            returned might be slightly longer.
+        :param sentences: How many sentences to return
+        :param intro: Return only content before the first section
+        :raises NoPageError: given page does not exist
+        :raises NotImplementedError: "wiki" variant does not support
+            `sencence` parameter.
+        :raises ValueError: `variant` parameter must be "plain", "html" or
+            "wiki"
+
+        .. seealso:: :meth:`APISite.extract()
+           <pywikibot.site._extensions.TextExtractsMixin.extract>`.
+        """
+        if variant in ('plain', 'html'):
+            extract = self.site.extract(self, chars=chars, sentences=sentences,
+                                        intro=intro,
+                                        plaintext=variant == 'plain')
+        elif variant == 'wiki':
+            if not self.exists():
+                raise NoPageError(self)
+            if sentences:
+                raise NotImplementedError(
+                    "'wiki' variant of extract method does not support "
+                    "'sencence' parameter")
+
+            extract = self.text[:]
+            if intro:
+                pos = extract.find('\n=')
+                if pos:
+                    extract = extract[:pos]
+            if chars:
+                extract = shorten(extract, chars, break_long_words=False,
+                                  placeholder='…')
+        else:
+            raise ValueError(
+                'variant parameter must be "plain", "html" or "wiki", not "{}"'
+                .format(variant))
+
+        if not lines:
+            return extract
+
+        text_lines = []
+        for i, text in enumerate(extract.splitlines(), start=1):
+            text_lines += wrap(text, width=79) or ['']
+            if i >= lines:
+                break
+
+        return '\n'.join(text_lines[:min(lines, len(text_lines))])
 
     def properties(self, force: bool = False) -> dict:
         """
