@@ -422,7 +422,6 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
         'interwiki',
         'listpages',
         'movepages',
-        'newitem',
         'pagefromfile',
         'protect',
         'redirect',
@@ -435,6 +434,7 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
     }
 
     _allowed_failures = [
+        'newitem',
     ]
 
     _arguments = '-simulate -page:Foo -always'
