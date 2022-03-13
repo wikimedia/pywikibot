@@ -326,7 +326,7 @@ class OtherPageSaveError(PageSaveRelatedError):
 
     message = 'Edit to page {title} failed:\n{reason}'
 
-    def __init__(self, page: 'pywikibot.page.Page',
+    def __init__(self, page: 'pywikibot.page.BasePage',
                  reason: Union[str, Exception]) -> None:
         """Initializer.
 
@@ -379,7 +379,7 @@ class InconsistentTitleError(PageLoadRelatedError):
 
     """Page receives a title inconsistent with query."""
 
-    def __init__(self, page: 'pywikibot.page.Page', actual: str) -> None:
+    def __init__(self, page: 'pywikibot.page.BasePage', actual: str) -> None:
         """Initializer.
 
         :param page: Page that caused the exception
@@ -455,8 +455,8 @@ class InterwikiRedirectPageError(PageRelatedError):
                'Page: {page}\n'
                'Target page: {target_page} on {target_site}.')
 
-    def __init__(self, page: 'pywikibot.page.Page',
-                 target_page: 'pywikibot.page.Page') -> None:
+    def __init__(self, page: 'pywikibot.page.BasePage',
+                 target_page: 'pywikibot.page.BasePage') -> None:
         """Initializer.
 
         :param target_page: Target page of the redirect.
@@ -550,7 +550,7 @@ class AbuseFilterDisallowedError(PageSaveRelatedError):
     message = ('Edit to page {title} disallowed by the AbuseFilter.\n'
                '{info}')
 
-    def __init__(self, page: 'pywikibot.page.Page', info: str) -> None:
+    def __init__(self, page: 'pywikibot.page.BasePage', info: str) -> None:
         """Initializer."""
         self.info = info
         super().__init__(page)
@@ -563,7 +563,7 @@ class SpamblacklistError(PageSaveRelatedError):
     message = ('Edit to page {title} rejected by spam filter due to '
                'content:\n{url}')
 
-    def __init__(self, page: 'pywikibot.page.Page', url: str) -> None:
+    def __init__(self, page: 'pywikibot.page.BasePage', url: str) -> None:
         """Initializer."""
         self.url = url
         super().__init__(page)
