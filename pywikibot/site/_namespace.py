@@ -8,12 +8,13 @@ from collections.abc import Iterable, Mapping
 from enum import IntEnum
 from typing import Optional, Union
 
+from pywikibot.backports import Iterable as IterableType
 from pywikibot.backports import List
 from pywikibot.tools import ComparableMixin, SelfCallMixin
 
 
-NamespaceIDType = 'Union[int, str, Namespace]'
-NamespaceArgType = 'Union[NamespaceIDType, Iterable[NamespaceIDType], None]'
+NamespaceIDType = Union[int, str, 'Namespace']
+NamespaceArgType = Union[NamespaceIDType, IterableType[NamespaceIDType], None]
 
 
 class BuiltinNamespace(IntEnum):
