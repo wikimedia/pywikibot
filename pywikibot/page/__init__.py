@@ -740,7 +740,7 @@ class BasePage(ComparableMixin):
         A static redirect must be a valid redirect, and contain the magic
         word __STATICREDIRECT__.
 
-        .. versionchanged:: 7.0.0
+        .. versionchanged:: 7.0
            __STATICREDIRECT__ can be transcluded
 
         :param force: Bypass local caching
@@ -1396,9 +1396,9 @@ class BasePage(ComparableMixin):
         For the parameters refer
         :py:mod:`APISite.pagelinks<pywikibot.site.APISite.pagelinks>`
 
-        .. versionadded:: 7.0.0
+        .. versionadded:: 7.0
            the `follow_redirects` keyword argument
-        .. deprecated:: 7.0.0
+        .. deprecated:: 7.0
            the positional arguments
 
         .. seealso:: https://www.mediawiki.org/wiki/API:Links
@@ -5906,7 +5906,7 @@ def url2unicode(title: str, encodings='utf-8') -> str:
 
     Uses the first encoding that doesn't cause an error.
 
-    .. deprecated:: 6.2.0
+    .. deprecated:: 6.2
        Use :func:`pywikibot.tools.chars.url2string` instead.
 
     :param title: URL-encoded character data to convert

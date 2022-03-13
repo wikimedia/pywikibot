@@ -1928,7 +1928,7 @@ class TimeStripper:
     def fix_digits(line):
         """Make non-latin digits like Persian to latin to parse.
 
-        .. deprecated:: 7.0.0
+        .. deprecated:: 7.0
            Use :func:`to_latin_digits` instead.
         """
         return to_latin_digits(line)
