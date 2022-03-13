@@ -9,7 +9,7 @@ import datetime
 import re
 from collections.abc import Container
 from contextlib import suppress
-from typing import Optional
+from typing import Any, Optional, Union
 
 import pywikibot
 from pywikibot.exceptions import APIError
@@ -254,8 +254,13 @@ class Siteinfo(Container):
         """Return a siteinfo property, caching and not forcing it."""
         return self.get(key, False)  # caches and doesn't force it
 
-    def get(self, key: str, get_default: bool = True, cache: bool = True,
-            expiry=False):
+    def get(
+        self,
+        key: str,
+        get_default: bool = True,
+        cache: bool = True,
+        expiry: Union[datetime.datetime, float, bool] = False
+    ) -> Any:
         """
         Return a siteinfo property.
 
@@ -268,10 +273,7 @@ class Siteinfo(Container):
             this method won't query the server.
         :param expiry: If the cache is older than the expiry it ignores the
             cache and queries the server to get the newest value.
-        :type expiry: int/float (days), :py:obj:`datetime.timedelta`,
-            False (never expired), True (always expired)
         :return: The gathered property
-        :rtype: various
         :raises KeyError: If the key is not a valid siteinfo property and the
             get_default option is set to False.
         :see: :py:obj:`_get_siteinfo`

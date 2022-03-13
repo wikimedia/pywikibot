@@ -7,9 +7,11 @@
 import functools
 import re
 import threading
+from typing import Optional
 from warnings import warn
 
 import pywikibot
+from pywikibot.backports import Pattern
 from pywikibot.exceptions import (
     Error,
     FamilyMaintenanceWarning,
@@ -177,13 +179,13 @@ class BaseSite(ComparableMixin):
         self.__dict__.update(attrs)
         self._pagemutex = threading.Condition()
 
-    def user(self):
+    def user(self) -> Optional[str]:
         """Return the currently-logged in bot username, or None."""
         if self.logged_in():
             return self.username()
         return None
 
-    def username(self):
+    def username(self) -> Optional[str]:
         """Return the username used for the site."""
         return self._username
 
@@ -347,7 +349,10 @@ class BaseSite(ComparableMixin):
         linkfam, linkcode = pywikibot.Link(text, self).parse_site()
         return linkfam != self.family.name or linkcode != self.code
 
-    def redirectRegex(self, pattern=None):  # noqa: N802
+    def redirectRegex(  # noqa: N802
+        self,
+        pattern: Optional[str] = None
+    ) -> Pattern[str]:
         """Return a compiled regular expression matching on redirect pages.
 
         Group 1 in the regex match object will be the target title.

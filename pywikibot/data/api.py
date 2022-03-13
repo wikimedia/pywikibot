@@ -18,13 +18,13 @@ from email.mime.multipart import MIMEMultipart as MIMEMultipartOrig
 from email.mime.nonmultipart import MIMENonMultipart
 from inspect import getfullargspec
 from io import BytesIO
-from typing import Optional, Union
+from typing import Any, Optional, Union
 from urllib.parse import unquote, urlencode
 from warnings import warn
 
 import pywikibot
 from pywikibot import config, login
-from pywikibot.backports import Dict, Tuple, removeprefix
+from pywikibot.backports import Callable, Dict, Match, Tuple, removeprefix
 from pywikibot.comms import http
 from pywikibot.exceptions import (
     Error,
@@ -551,7 +551,11 @@ class ParamInfo(Sized, Container):
         """Return number of cached modules."""
         return len(self._paraminfo)
 
-    def parameter(self, module: str, param_name: str) -> Optional[dict]:
+    def parameter(
+        self,
+        module: str,
+        param_name: str
+    ) -> Optional[Dict[str, Any]]:
         """
         Get details about one modules parameter.
 
@@ -1011,7 +1015,7 @@ class Request(MutableMapping):
             raise ValueError("'action' specification missing from Request.")
         self.action = parameters['action']
         self.update(parameters)  # also convert all parameter values to lists
-        self._warning_handler = None
+        self._warning_handler = None  # type: Optional[Callable[[str, str], Union[Match[str], bool, None]]]  # noqa: E501
         # Actions that imply database updates on the server, used for various
         # things like throttling or skipping actions when we're in simulation
         # mode
@@ -2050,6 +2054,9 @@ class _RequestWrapper:
         kwargs = self.request_class.clean_kwargs(kwargs)
         kwargs['parameters'].update(mw_api_args)
         return kwargs
+
+    def set_maximum_items(self, value: Union[int, str, None]) -> None:
+        raise NotImplementedError
 
 
 class APIGenerator(_RequestWrapper):
