@@ -618,10 +618,20 @@ class BasePage(ComparableMixin):
         self.site.loadpageinfo(self, preload=True)
         return self._preloadedtext
 
-    def _get_parsed_page(self):
-        """Retrieve parsed text (via action=parse) and cache it."""
-        # Get (cached) parsed text.
-        if not hasattr(self, '_parsed_text'):
+    def get_parsed_page(self, force: bool = False) -> str:
+        """Retrieve parsed text (via action=parse) and cache it.
+
+        .. versionchanged:: 7.1
+           `force` parameter was added;
+           `_get_parsed_page` becomes a public method
+
+        :param force: force updating from the live site
+
+        .. seealso::
+           :meth:`APISite.get_parsed_page()
+           <pywikibot.site._apisite.APISite.get_parsed_page>`
+        """
+        if not hasattr(self, '_parsed_text') or force:
             self._parsed_text = self.site.get_parsed_page(self)
         return self._parsed_text
 

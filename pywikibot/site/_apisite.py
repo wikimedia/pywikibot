@@ -1441,16 +1441,22 @@ class APISite(
         return user_tokens
 
     # TODO: expand support to other parameters of action=parse?
-    def get_parsed_page(self, page):
+    def get_parsed_page(self, page: 'pywikibot.Page') -> str:
         """Retrieve parsed text of the page using action=parse.
 
-        :see: https://www.mediawiki.org/wiki/API:Parse
+        .. versionchanged:: 7.1
+           raises KeyError instead of AssertionError
+
+        .. seealso::
+           - https://www.mediawiki.org/wiki/API:Parse
+           - :meth:`pywikibot.page.BasePage.get_parsed_page`.
         """
         req = self.simple_request(action='parse', page=page)
         data = req.submit()
-        assert 'parse' in data, "API parse response lacks 'parse' key"
-        assert 'text' in data['parse'], "API parse response lacks 'text' key"
-        parsed_text = data['parse']['text']['*']
+        try:
+            parsed_text = data['parse']['text']['*']
+        except KeyError as e:
+            raise KeyError('API parse response lacks {} key'.format(e))
         return parsed_text
 
     def getcategoryinfo(self, category) -> None:

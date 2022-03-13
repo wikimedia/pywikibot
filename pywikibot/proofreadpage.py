@@ -906,11 +906,7 @@ class IndexPage(pywikibot.Page):
         self._pages_from_label = {}  # type: PagesFromLabelType
         self._labels_from_page_number = {}  # type: Dict[int, str]
         self._labels_from_page = {}  # type: Dict[pywikibot.page.Page, str]
-        if hasattr(self, '_parsed_text'):
-            del self._parsed_text
-
-        self._parsed_text = self._get_parsed_page()
-        self._soup = _bs4_soup(self._parsed_text)  # type: ignore
+        self._soup = _bs4_soup(self.get_parsed_page(True))  # type: ignore
         # Do not search for "new" here, to avoid to skip purging if links
         # to non-existing pages are present.
         attrs = {'class': re.compile('prp-pagequality')}
@@ -932,9 +928,7 @@ class IndexPage(pywikibot.Page):
         attrs = {'class': re.compile('prp-pagequality|new')}
         if not found:
             self.purge()
-            del self._parsed_text
-            self._parsed_text = self._get_parsed_page()
-            self._soup = _bs4_soup(self._parsed_text)  # type: ignore
+            self._soup = _bs4_soup(self.get_parsed_page(True))  # type: ignore
             if not self._soup.find_all('a', attrs=attrs):
                 raise ValueError(
                     'Missing class="qualityN prp-pagequality-N" or '
