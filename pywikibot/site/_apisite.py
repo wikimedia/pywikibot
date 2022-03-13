@@ -512,7 +512,7 @@ class APISite(
         :raises TypeError: Inappropriate argument type of 'user'
         """
         if user is None:
-            user = self.username
+            user = self.username()
             param = {}
         elif isinstance(user, str):
             param = {'guiuser': user}
@@ -558,7 +558,7 @@ class APISite(
         ..versionadded:: 7.0
         """
         with suppress(KeyError):
-            del self._globaluserinfo[self.username]
+            del self._globaluserinfo[self.username()]
 
     def is_blocked(self, force: bool = False) -> bool:
         """Return True when logged in user is blocked.
