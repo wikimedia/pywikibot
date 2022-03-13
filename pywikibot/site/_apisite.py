@@ -268,8 +268,17 @@ class APISite(
 
         return self._request_class(kwargs)(site=self, **kwargs)
 
+    @deprecated('simple_request', since='7.1.0')
     def _simple_request(self, **kwargs):
-        """Create a request by defining all kwargs as parameters."""
+        """DEPRECATED. Create a request using all kwargs as parameters."""
+        return self.simple_request(**kwargs)
+
+    def simple_request(self, **kwargs):
+        """Create a request by defining all kwargs as parameters.
+
+        .. versionchanged:: 7.1
+           `_simple_request` becomes a public method
+        """
         return self._request_class({'parameters': kwargs}).create_simple(
             self, **kwargs)
 
@@ -419,7 +428,7 @@ class APISite(
         # csrf token introduced in MW 1.24
         with suppress(Error):
             req_params['token'] = self.tokens['csrf']
-        uirequest = self._simple_request(**req_params)
+        uirequest = self.simple_request(**req_params)
         uirequest.submit()
         self._loginstatus = _LoginStatus.NOT_LOGGED_IN
 
@@ -464,7 +473,7 @@ class APISite(
 
         """
         if not hasattr(self, '_userinfo'):
-            uirequest = self._simple_request(
+            uirequest = self.simple_request(
                 action='query',
                 meta='userinfo',
                 uiprop='blockinfo|hasmsg|groups|rights|ratelimits'
@@ -527,7 +536,7 @@ class APISite(
                 meta='globaluserinfo',
                 guiprop='groups|rights|editcount',
             )
-            uirequest = self._simple_request(**param)
+            uirequest = self.simple_request(**param)
             uidata = uirequest.submit()
             assert 'query' in uidata, \
                    "API userinfo response lacks 'query' key"
@@ -603,7 +612,7 @@ class APISite(
         # TODO: Integrate into _userinfo
         if (force or not hasattr(self, '_useroptions')
                 or self.user() != self._useroptions['_name']):
-            uirequest = self._simple_request(
+            uirequest = self.simple_request(
                 action='query',
                 meta='userinfo',
                 uiprop='options'
@@ -843,7 +852,7 @@ class APISite(
             raise ValueError('text must be a string')
         if not text:
             return ''
-        req = self._simple_request(action='expandtemplates', text=text)
+        req = self.simple_request(action='expandtemplates', text=text)
         if title is not None:
             req['title'] = title
         if includecomments is True:
@@ -1281,11 +1290,12 @@ class APISite(
             return page._redirtarget
 
         title = page.title(with_section=False)
-        query = self._simple_request(
+        query = self.simple_request(
             action='query',
             prop='info',
             titles=title,
-            redirects=True)
+            redirects=True
+        )
         result = query.submit()
         if 'query' not in result or 'redirects' not in result['query']:
             raise RuntimeError(
@@ -1406,16 +1416,16 @@ class APISite(
                 types_wiki = self._paraminfo.parameter('tokens',
                                                        'type')['type']
                 types.extend(types_wiki)
-            req = self._simple_request(action='tokens',
-                                       type=self.validate_tokens(types))
+            req = self.simple_request(action='tokens',
+                                      type=self.validate_tokens(types))
         else:
             if all is not False:
                 types_wiki = self._paraminfo.parameter('query+tokens',
                                                        'type')['type']
                 types.extend(types_wiki)
 
-            req = self._simple_request(action='query', meta='tokens',
-                                       type=self.validate_tokens(types))
+            req = self.simple_request(action='query', meta='tokens',
+                                      type=self.validate_tokens(types))
 
         req._warning_handler = warn_handler
         data = req.submit()
@@ -1436,7 +1446,7 @@ class APISite(
 
         :see: https://www.mediawiki.org/wiki/API:Parse
         """
-        req = self._simple_request(action='parse', page=page)
+        req = self.simple_request(action='parse', page=page)
         data = req.submit()
         assert 'parse' in data, "API parse response lacks 'parse' key"
         assert 'text' in data['parse'], "API parse response lacks 'text' key"
@@ -1516,7 +1526,7 @@ class APISite(
             'target': target,
             'reason': reason}
 
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
 
         if target:
             self.lock_page(page)
@@ -1686,7 +1696,7 @@ class APISite(
         elif watch:
             pywikibot.warning("editpage: Invalid watch value '{}' ignored."
                               .format(watch))
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
 
         self.lock_page(page)
         try:
@@ -1867,8 +1877,7 @@ class APISite(
 
         # Send the merge API request
         token = self.tokens['csrf']
-        req = self._simple_request(action='mergehistory',
-                                   token=token)
+        req = self.simple_request(action='mergehistory', token=token)
         req['from'] = source
         req['to'] = dest
         if reason:
@@ -1966,12 +1975,12 @@ class APISite(
                               'does not exist on {site}.')
         token = self.tokens['move']
         self.lock_page(page)
-        req = self._simple_request(action='move',
-                                   noredirect=noredirect,
-                                   reason=summary,
-                                   movetalk=movetalk,
-                                   token=token,
-                                   to=newtitle)
+        req = self.simple_request(action='move',
+                                  noredirect=noredirect,
+                                  reason=summary,
+                                  movetalk=movetalk,
+                                  token=token,
+                                  to=newtitle)
         req['from'] = oldtitle  # "from" is a python keyword
         try:
             result = req.submit()
@@ -2076,7 +2085,7 @@ class APISite(
                                         token=self.tokens['rollback'],
                                         user=user)
         self.lock_page(page)
-        req = self._simple_request(**parameters)
+        req = self.simple_request(**parameters)
         try:
             req.submit()
         except APIError as err:
@@ -2174,7 +2183,7 @@ class APISite(
             else:
                 params['deletetalk'] = deletetalk
 
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         self.lock_page(page)
         try:
             req.submit()
@@ -2229,7 +2238,7 @@ class APISite(
             'fileids': fileids,
         }
 
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         self.lock_page(page)
         try:
             req.submit()
@@ -2312,7 +2321,7 @@ class APISite(
                                         protections=protections, reason=reason,
                                         expiry=expiry)
 
-        req = self._simple_request(**parameters)
+        req = self.simple_request(**parameters)
         try:
             result = req.submit()
         except APIError as err:
@@ -2391,12 +2400,11 @@ class APISite(
         token = self.tokens['block']
         if expiry is False:
             expiry = 'never'
-        req = self._simple_request(action='block', user=user.username,
-                                   expiry=expiry, reason=reason, token=token,
-                                   anononly=anononly, nocreate=nocreate,
-                                   autoblock=autoblock, noemail=noemail,
-                                   reblock=reblock,
-                                   allowusertalk=allowusertalk)
+        req = self.simple_request(action='block', user=user.username,
+                                  expiry=expiry, reason=reason, token=token,
+                                  anononly=anononly, nocreate=nocreate,
+                                  autoblock=autoblock, noemail=noemail,
+                                  reblock=reblock, allowusertalk=allowusertalk)
 
         data = req.submit()
         return data
@@ -2412,10 +2420,10 @@ class APISite(
         :type user: :py:obj:`pywikibot.User`
         :param reason: Reason for the unblock.
         """
-        req = self._simple_request(action='unblock',
-                                   user=user.username,
-                                   token=self.tokens['block'],
-                                   reason=reason)
+        req = self.simple_request(action='unblock',
+                                  user=user.username,
+                                  token=self.tokens['block'],
+                                  reason=reason)
 
         data = req.submit()
         return data
@@ -2440,7 +2448,7 @@ class APISite(
             'token': self.tokens['watch'],
             'unwatch': unwatch,
         }
-        req = self._simple_request(**parameters)
+        req = self.simple_request(**parameters)
         results = req.submit()
         unwatch = 'unwatched' if unwatch else 'watched'
         return all(unwatch in r for r in results['watch'])
@@ -2464,7 +2472,7 @@ class APISite(
             links tables for any page that uses this page as a template.
         :return: True if API returned expected response; False otherwise
         """
-        req = self._simple_request(action='purge', titles=list(set(pages)))
+        req = self.simple_request(action='purge', titles=list(set(pages)))
         if converttitles:
             req['converttitles'] = True
         if redirects:
@@ -2531,9 +2539,8 @@ class APISite(
         :see: https://www.mediawiki.org/wiki/API:Stashimageinfo
         """
         props = props or False
-        req = self._simple_request(
-            action='query', prop='stashimageinfo', siifilekey=file_key,
-            siiprop=props)
+        req = self.simple_request(action='query', prop='stashimageinfo',
+                                  siifilekey=file_key, siiprop=props)
         return req.submit()['query']['stashimageinfo'][0]
 
     @need_right('upload')
@@ -2610,7 +2617,7 @@ class APISite(
                   'from{}'.format(old[0]): old[1],
                   'to{}'.format(diff[0]): diff[1]}
 
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         data = req.submit()
         comparison = data['compare']['*']
         return comparison

@@ -66,7 +66,7 @@ class ChangeLangBot(ConfigParserBot, SingleSiteBot):
                       'title': page.title(),
                       'lang': self.opt.setlang,
                       'token': token}
-        r = self.site._simple_request(**parameters)
+        r = self.site.simple_request(**parameters)
         r.submit()
         pywikibot.output(color_format(
             '{lightpurple}{0}{default}: Setting '
@@ -84,7 +84,7 @@ class ChangeLangBot(ConfigParserBot, SingleSiteBot):
                       'prop': 'info',
                       'titles': page.title(),
                       'meta': 'siteinfo'}
-        r = self.site._simple_request(**parameters)
+        r = self.site.simple_request(**parameters)
         langcheck = r.submit()['query']
 
         currentlang = ''

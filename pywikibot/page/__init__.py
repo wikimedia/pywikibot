@@ -3093,7 +3093,7 @@ class User(Page):
         }
         if ccme:
             params['ccme'] = 1
-        mailrequest = self.site._simple_request(**params)
+        mailrequest = self.site.simple_request(**params)
         maildata = mailrequest.submit()
 
         if 'emailuser' in maildata:

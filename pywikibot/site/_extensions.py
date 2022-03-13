@@ -1,6 +1,6 @@
 """Objects representing API interface to MediaWiki site extenstions."""
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -40,7 +40,7 @@ class EchoMixin:
         for key, value in kwargs.items():
             params['not' + key] = value
 
-        data = self._simple_request(**params).submit()
+        data = self.simple_request(**params).submit()
         notifications = data['query']['notifications']['list']
 
         # Support API before 1.27.0-wmf.22
@@ -61,7 +61,7 @@ class EchoMixin:
         # is supported by the site
         kwargs = merge_unique_dicts(kwargs, action='echomarkread',
                                     token=self.tokens['edit'])
-        req = self._simple_request(**kwargs)
+        req = self.simple_request(**kwargs)
         data = req.submit()
         try:
             return data['query']['echomarkread']['result'] == 'success'
@@ -315,8 +315,8 @@ class ThanksMixin:
         :return: The API response.
         """
         token = self.tokens['csrf']
-        req = self._simple_request(action='thank', rev=revid, token=token,
-                                   source=source)
+        req = self.simple_request(action='thank', rev=revid, token=token,
+                                  source=source)
         data = req.submit()
         if data['result']['success'] != 1:
             raise APIError('Thanking unsuccessful', '')
@@ -339,8 +339,8 @@ class ThanksFlowMixin:
         """
         post_id = post.uuid
         token = self.tokens['csrf']
-        req = self._simple_request(action='flowthank',
-                                   postid=post_id, token=token)
+        req = self.simple_request(action='flowthank', postid=post_id,
+                                  token=token)
         data = req.submit()
         if data['result']['success'] != 1:
             raise APIError('Thanking unsuccessful', '')
@@ -361,9 +361,8 @@ class FlowMixin:
         :return: A dict representing the board's metadata.
         :rtype: dict
         """
-        req = self._simple_request(action='flow', page=page,
-                                   submodule='view-topiclist',
-                                   vtllimit=1)
+        req = self.simple_request(action='flow', page=page,
+                                  submodule='view-topiclist', vtllimit=1)
         data = req.submit()
         return data['flow']['view-topiclist']['result']['topiclist']
 
@@ -428,9 +427,9 @@ class FlowMixin:
         :return: A dict representing the topic's data.
         :rtype: dict
         """
-        req = self._simple_request(action='flow', page=page,
-                                   submodule='view-topic',
-                                   vtformat=content_format)
+        req = self.simple_request(action='flow', page=page,
+                                  submodule='view-topic',
+                                  vtformat=content_format)
         data = req.submit()
         return data['flow']['view-topic']['result']['topic']
 
@@ -448,9 +447,9 @@ class FlowMixin:
         :return: A dict representing the post data for the given UUID.
         :rtype: dict
         """
-        req = self._simple_request(action='flow', page=page,
-                                   submodule='view-post', vppostId=post_id,
-                                   vpformat=content_format)
+        req = self.simple_request(action='flow', page=page,
+                                  submodule='view-post', vppostId=post_id,
+                                  vpformat=content_format)
         data = req.submit()
         return data['flow']['view-post']['result']['topic']
 
@@ -711,6 +710,6 @@ class UrlShortenerMixin:
         :return: The reduced link, without protocol prefix.
         :rtype: str
         """
-        req = self._simple_request(action='shortenurl', url=url)
+        req = self.simple_request(action='shortenurl', url=url)
         data = req.submit()
         return data['shortenurl']['shorturl']

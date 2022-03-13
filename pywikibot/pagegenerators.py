@@ -2901,7 +2901,7 @@ def WikidataPageFromItemGenerator(gen: Iterable['pywikibot.page.ItemPage'],
                'action': 'wbgetentities',
                'props': 'sitelinks'}
 
-        wbrequest = repo._simple_request(**req)
+        wbrequest = repo.simple_request(**req)
         wbdata = wbrequest.submit()
         entities = (item for item in wbdata['entities'].values() if
                     'sitelinks' in item and site.dbName() in item['sitelinks'])

@@ -288,7 +288,7 @@ class Uploader:
                         if poll:
                             # run a poll; not possible in first iteration
                             assert file_key
-                            req = self.site._simple_request(
+                            req = self.site.simple_request(
                                 action='upload',
                                 token=token,
                                 filekey=file_key,
@@ -440,7 +440,7 @@ class Uploader:
                 raise Error(
                     "User '{}' is not authorized to upload by URL on site {}."
                     .format(self.site.user(), self))
-            final_request = self.site._simple_request(
+            final_request = self.site.simple_request(
                 action='upload', filename=file_page_title, url=self.url,
                 comment=self.comment, text=self.text, token=token)
 
@@ -509,7 +509,7 @@ class Uploader:
                 assert file_key
                 pywikibot.log('Waiting for upload to be published.')
                 result = None
-                final_request = self.site._simple_request(
+                final_request = self.site.simple_request(
                     action='upload',
                     token=token,
                     filekey=file_key,

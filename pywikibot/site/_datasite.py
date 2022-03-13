@@ -170,7 +170,7 @@ class DataSite(APISite):
                                     # an empty string ('&props=') but it should
                                     # result in a missing entry.
                                     props=props if props else False)
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         data = req.submit()
         if 'success' not in data:
             raise APIError(data['errors'], '')
@@ -206,7 +206,7 @@ class DataSite(APISite):
                         req['sites'].append(p.site.dbName())
                         req['titles'].append(p._link._text)
 
-            req = self._simple_request(action='wbgetentities', **req)
+            req = self.simple_request(action='wbgetentities', **req)
             data = req.submit()
             for entity in data['entities']:
                 if 'missing' in data['entities'][entity]:
@@ -291,7 +291,7 @@ class DataSite(APISite):
                      UserWarning, 2)
 
         params['data'] = json.dumps(data)
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         return req.submit()
 
     @need_right('edit')
@@ -315,7 +315,7 @@ class DataSite(APISite):
                   'token': self.tokens['edit'],
                   'bot': bot,
                   }
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         data = req.submit()
         # Update the item
         if claim.getID() in entity.claims:
@@ -351,7 +351,7 @@ class DataSite(APISite):
             params['value'] = json.dumps(claim._formatValue())
 
         params['baserevid'] = claim.on_item.latest_revision_id
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         return req.submit()
 
     @need_right('edit')
@@ -378,7 +378,7 @@ class DataSite(APISite):
                   'bot': bot,
                   }
 
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         data = req.submit()
         claim.on_item.latest_revision_id = data['pageinfo']['lastrevid']
         return data
@@ -433,7 +433,7 @@ class DataSite(APISite):
                 params['reference'] = sourceclaim.hash
         params['snaks'] = json.dumps(snak)
 
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         return req.submit()
 
     @need_right('edit')
@@ -472,7 +472,7 @@ class DataSite(APISite):
         params['snaktype'] = qualifier.getSnakType()
         params['property'] = qualifier.getID()
 
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         return req.submit()
 
     @need_right('edit')
@@ -505,7 +505,7 @@ class DataSite(APISite):
             'token': self.tokens['edit'],
         }
 
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         return req.submit()
 
     @need_right('edit')
@@ -534,7 +534,7 @@ class DataSite(APISite):
             'token': self.tokens['edit'],
         }
 
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         return req.submit()
 
     @need_right('edit')
@@ -564,7 +564,7 @@ class DataSite(APISite):
             'token': self.tokens['edit']
         }
 
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         return req.submit()
 
     @need_right('edit')
@@ -590,7 +590,7 @@ class DataSite(APISite):
         }
         if bot:
             params['bot'] = 1
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         return req.submit()
 
     @need_right('item-merge')
@@ -623,7 +623,7 @@ class DataSite(APISite):
         }
         if bot:
             params['bot'] = 1
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         return req.submit()
 
     @need_right('item-redirect')
@@ -644,7 +644,7 @@ class DataSite(APISite):
             'token': self.tokens['edit'],
             'bot': bot,
         }
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         return req.submit()
 
     def search_entities(self, search: str, language: str,
@@ -787,7 +787,7 @@ class DataSite(APISite):
                 warn('Unknown parameter {} for action {}, ignored'
                      .format(arg, action), UserWarning, 2)
 
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         data = req.submit()
         return data
 
