@@ -1,6 +1,6 @@
 """Module to daemonize the current process on Unix."""
 #
-# (C) Pywikibot team, 2007-2021
+# (C) Pywikibot team, 2007-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -56,10 +56,11 @@ def daemonize(close_fd: bool = True, chdir: bool = True,
             if chdir:
                 os.chdir('/')
             return
+
         # Write out the pid
         path = os.path.basename(sys.argv[0]) + '.pid'
         with codecs.open(path, 'w', 'utf-8') as f:
             f.write(str(pid))
     # Exit to return control to the terminal
     # os._exit to prevent the cleanup to run
-    os._exit(0)
+    os._exit(os.EX_OK)
