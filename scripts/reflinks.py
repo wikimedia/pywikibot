@@ -522,6 +522,8 @@ class ReferencesRobot(SingleSiteBot,
             pywikibot.exception()
         else:
             for aline in pdfinfo_out.splitlines():
+                if isinstance(aline, bytes):
+                    aline = aline.decode()
                 if aline.lower().startswith('title'):
                     ref.title = ' '.join(aline.split()[1:])
                     if ref.title:
