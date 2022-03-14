@@ -2359,7 +2359,8 @@ class SiteRandomTestCase(DefaultSiteTestCase):
         super().setUpClass()
         site = cls.get_site()
         if site.family.name in ('wpbeta', 'wsbeta'):
-            cls.skipTest('Skipping test on {} due to T282602'.format(site))
+            cls.skipTest(cls,
+                         'Skipping test on {} due to T282602' .format(site))
 
     def test_unlimited_small_step(self):
         """Test site.randompages() continuation.

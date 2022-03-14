@@ -425,7 +425,10 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
     }
 
     _allowed_failures = [
+        'coordinate_import',
+        'illustrate_wikidata',
         'newitem',
+        'solve_disambiguation',
     ]
 
     _arguments = '-simulate -page:Foo -always'
