@@ -15,16 +15,14 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     name = 'wikipedia'
 
     closed_wikis = [
-        # See:
         # https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist
         'aa', 'cho', 'ho', 'hz', 'ii', 'kj', 'kr', 'lrc', 'mh', 'mus', 'ng',
         'ten',
     ]
 
     removed_wikis = [
-        # See:
         # https://noc.wikimedia.org/conf/highlight.php?file=dblists/deleted.dblist
-        'dk', 'ru-sib', 'tlh', 'tokipona', 'zh_cn', 'zh_tw',
+        'dk', 'mo', 'ru-sib', 'tlh', 'tokipona', 'zh_cn', 'zh_tw',
     ]
 
     languages_by_size = [
