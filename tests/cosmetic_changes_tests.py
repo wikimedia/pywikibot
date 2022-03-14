@@ -560,7 +560,7 @@ class TestCosmeticChangesISBN(TestCosmeticChanges):
     ISBN_INVALIDLENGTHERROR_RE = 'The number has an invalid length'
 
     @classmethod
-    def setUpClass(cls):  # noqa: N802
+    def setUpClass(cls):
         """Skip tests if isbn libraries are missing."""
         if not has_module('stdnum', version='1.17'):
             raise unittest.SkipTest('python-stdnum is not available.')

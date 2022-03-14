@@ -77,7 +77,7 @@ PagesFromLabelType = Dict[str, Set['pywikibot.page.Page']]
 _IndexType = Tuple[Optional['IndexPage'], List['IndexPage']]
 
 
-def decompose(fn: Callable) -> Callable:  # type: ignore # noqa: N805
+def decompose(fn: Callable) -> Callable:  # type: ignore
     """Decorator for ProofreadPage.
 
     Decompose text if needed and recompose text.
@@ -92,7 +92,7 @@ def decompose(fn: Callable) -> Callable:  # type: ignore # noqa: N805
     return wrapper
 
 
-def check_if_cached(fn: Callable) -> Callable:  # type: ignore # noqa: N805
+def check_if_cached(fn: Callable) -> Callable:  # type: ignore
     """Decorator for IndexPage to ensure data is cached."""
     def wrapper(self: 'IndexPage', *args: Any, **kwargs: Any) -> Any:
         if self._cached is False:

@@ -137,9 +137,9 @@ class TestNamespaceObject(TestCase):
 
         self.assertEqual(a, 0)
         self.assertEqual(a, '')
-        self.assertFalse(a < 0)  # noqa: H205
-        self.assertFalse(a > 0)  # noqa: H205
-        self.assertNotEqual(a, None)  # noqa: H203
+        self.assertGreaterEqual(a, 0)
+        self.assertLessEqual(a, 0)
+        self.assertIsNotNone(a)
 
         self.assertGreater(a, -1)
 
@@ -166,8 +166,8 @@ class TestNamespaceObject(TestCase):
         self.assertEqual(x, 'image')
         self.assertEqual(x, 'Image')
 
-        self.assertFalse(x < 6)  # noqa: H205
-        self.assertFalse(x > 6)  # noqa: H205
+        self.assertGreaterEqual(x, 6)
+        self.assertLessEqual(x, 6)
 
         self.assertEqual(y, 'ملف')
 

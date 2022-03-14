@@ -279,7 +279,6 @@ class TestLogentryParams(TestLogentriesBase):
         le4 = next(gen1)
         le5 = next(gen2)
         self.assertEqual(le1, le2)
-        self.assertFalse(le1 != le2)  # noqa: H204
         self.assertNotEqual(le1, le3)
         self.assertNotEqual(le1, site)
         self.assertIsInstance(le4, OtherLogEntry)
