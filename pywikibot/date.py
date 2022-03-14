@@ -234,7 +234,7 @@ def slh(value: int, lst: Sequence[str]) -> str:
     return lst[value - 1]
 
 
-@slh.register(str)  # type: ignore
+@slh.register(str)
 def _(value: str, lst: Sequence[str]) -> int:
     return lst.index(value) + 1
 
@@ -245,7 +245,7 @@ def dh_singVal(value: int, match: str) -> str:
     return dh_constVal(value, 0, match)
 
 
-@dh_singVal.register(str)  # type: ignore
+@dh_singVal.register(str)
 def _(value: str, match: str) -> int:
     return dh_constVal(value, 0, match)  # type: ignore[return-value]
 
@@ -262,7 +262,7 @@ def dh_constVal(value: int, ind: int, match: str) -> str:
     raise ValueError('unknown value {}'.format(value))
 
 
-@dh_constVal.register(str)  # type: ignore
+@dh_constVal.register(str)
 def _(value: str, ind: int, match: str) -> int:
     if value == match:
         return ind
@@ -351,7 +351,7 @@ def romanNumToInt(v: str) -> int:
 # (from int to a str) and decoder (from str to an int)
 _digitDecoders = {
     # %% is a %
-    '%': '%',  # type: ignore
+    '%': '%',
     # %d is a decimal
     'd': (_decimalDigits, str, int),
     # %R is a roman numeral. This allows for only the simplest linear
@@ -409,7 +409,7 @@ def escapePattern2(pattern: str
             newpattern += '([{}]{{{}}})'.format(dec[0], subpattern[1])
             # add the number of required digits as the last (4th)
             # part of the tuple
-            decoders.append(dec + (int(s[1]),))  # type: ignore
+            decoders.append(dec + (int(s[1]),))
         else:
             newpattern += '([{}]+)'.format(dec[0])
             decoders.append(dec)
@@ -507,7 +507,7 @@ def dh(value: int, pattern: str, encf: encf_type, decf: decf_type,
     return strPattern % _make_parameter(decoders[0], params)
 
 
-@dh.register(str)  # type: ignore
+@dh.register(str)
 def _(value: str, pattern: str, encf: encf_type, decf: decf_type,
       filter: Optional[Callable[[int], bool]] = None) -> int:
     compPattern, _strPattern, decoders = escapePattern2(pattern)
@@ -531,7 +531,7 @@ def _(value: str, pattern: str, encf: encf_type, decf: decf_type,
 
 def _make_parameter(decoder: decoder_type, param: int) -> str:
     newValue = decoder[1](param)
-    required_digits = decoder[3] if len(decoder) == 4 else None  # type: ignore
+    required_digits = decoder[3] if len(decoder) == 4 else None
     if required_digits is not None and len(newValue) < required_digits:
         # force parameter length by taking the first digit in the list and
         # repeating it required number of times
@@ -552,7 +552,7 @@ def _make_parameter(decoder: decoder_type, param: int) -> str:
 # This is useful when trying to decide if a certain article is a localized date
 # or not, or generating dates.
 # See dh() for additional information.
-class MonthNames(abc.Mapping):
+class MonthNames(Mapping):
 
     """A Mapping which reads month names from MediaWiki messages."""
 
@@ -682,7 +682,7 @@ class MonthFormat(abc.MutableMapping):  # type: ignore[type-arg]
             elif ucase is False:
                 f = first_lower
             else:
-                f = str  # type: ignore
+                f = str
 
             month_pattern = pattern.format(f(monthName(key, self.index)))
             expression = "lambda v: {}(v, '{}')".format(func, month_pattern)
@@ -1674,18 +1674,18 @@ formats = {
         'yo': lambda v: dh_singVal(v, 'Current events'),
         'zh': lambda v: dh_singVal(v, '新闻动态'),
     },
-}  # type: Dict[str, Dict[str, Callable[[int], str]]]
+}  # type: Dict[Union[str, int], Mapping[str, Callable[[int], str]]]
 
-formats['MonthName'] = MonthNames()  # type: ignore[assignment]
+formats['MonthName'] = MonthNames()
 #
 # Add auto-generated empty dictionaries for DayOfMonth and MonthOfYear articles
 #
 for index, day_of_month in enumerate(dayMnthFmts, 1):
     val = MonthFormat(index, day_of_month)
-    formats[day_of_month] = val  # type: ignore[assignment]
+    formats[day_of_month] = val
 for index, month_of_year in enumerate(yrMnthFmts, 1):
     val = MonthFormat(index, month_of_year)
-    formats[month_of_year] = val  # type: ignore[assignment]
+    formats[month_of_year] = val
 
 
 def addFmt1(lang: str, isMnthOfYear: bool,
@@ -1981,7 +1981,7 @@ def getAutoFormat(lang: str, title: str, ignoreFirstLetterCase: bool = True
     """
     for dict_name, dictionary in formats.items():
         with suppress(Exception):
-            year = dictionary[lang](title)  # type: ignore
+            year = dictionary[lang](title)
             return dict_name, year
     # sometimes the title may begin with an upper case while its listed as
     # lower case, or the other way around

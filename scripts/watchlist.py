@@ -62,7 +62,7 @@ def count_watchlist_all() -> None:
                      'for all wikis.'.format(wl_count_all))
 
 
-def isWatched(pageName, site=None):  # noqa N802, N803
+def isWatched(pageName, site=None):  # noqa: N802, N803
     """Check whether a page is being watched."""
     watchlist = get(site)
     return pageName in watchlist

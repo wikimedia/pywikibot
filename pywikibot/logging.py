@@ -30,14 +30,14 @@ import sys
 
 # logging levels
 from logging import CRITICAL, DEBUG, ERROR, INFO, WARNING
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 from pywikibot.backports import Callable, List
 
 
-STDOUT = 16  #:
-VERBOSE = 18  #:
-INPUT = 25  #:
+STDOUT = 16
+VERBOSE = 18
+INPUT = 25
 
 _init_routines = []  # type: List[Callable[[], Any]]
 _inited_routines = set()
@@ -221,8 +221,13 @@ def debug(text: object, layer: str, decoder: Optional[str] = None,
     logoutput(text, decoder, newline, DEBUG, layer, **kwargs)
 
 
-def exception(msg: Optional[Exception] = None, decoder: Optional[str] = None,
-              newline: bool = True, tb: bool = False, **kwargs: Any) -> None:
+def exception(
+    msg: Union[Exception, str, None] = None,
+    decoder: Optional[str] = None,
+    newline: bool = True,
+    tb: bool = False,
+    **kwargs: Any
+) -> None:
     """Output an error traceback to the user via the userinterface.
 
     Use directly after an 'except' statement::
@@ -251,12 +256,13 @@ def exception(msg: Optional[Exception] = None, decoder: Optional[str] = None,
     :param tb: Set to True in order to output traceback also.
     """
     if isinstance(msg, BaseException):
-        exc_info = 1  # type: Any
+        if tb:
+            kwargs['exc_info'] = 1
     else:
         exc_info = sys.exc_info()
-        msg = '{}: {}'.format(repr(exc_info[1]).split('(')[0],  # type: ignore
+        msg = '{}: {}'.format(repr(exc_info[1]).split('(')[0],
                               str(exc_info[1]).strip())
-    if tb:
-        kwargs['exc_info'] = exc_info
+        if tb:
+            kwargs['exc_info'] = exc_info
     assert msg is not None
     logoutput(msg, decoder, newline, ERROR, **kwargs)

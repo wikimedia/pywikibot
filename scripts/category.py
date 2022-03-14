@@ -612,10 +612,10 @@ class CategoryMoveRobot(CategoryPreprocess):
         self.oldtalk = self.oldcat.toggleTalkPage()
 
         if newcat:
-            self.newcat = self._makecat(newcat)
+            self.newcat = self._makecat(newcat)  # type: Optional[pywikibot.Category]  # noqa: E501
             self.newtalk = self.newcat.toggleTalkPage()
         else:
-            self.newcat = None  # type: ignore
+            self.newcat = None
             self.newtalk = None
 
         # Set boolean settings.

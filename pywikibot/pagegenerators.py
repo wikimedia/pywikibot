@@ -33,7 +33,7 @@ from itertools import zip_longest
 from typing import Any, Optional, Union
 from urllib.parse import urlparse
 
-from requests.exceptions import ReadTimeout  # type: ignore[import]
+from requests.exceptions import ReadTimeout
 
 import pywikibot
 from pywikibot import config, date, i18n, xmlreader
@@ -596,7 +596,7 @@ class GeneratorFactory:
 
             if self.limit:
                 try:
-                    gen_item.set_maximum_items(self.limit)  # type: ignore
+                    gen_item.set_maximum_items(self.limit)  # type: ignore[attr-defined]  # noqa: E501
                 except AttributeError:
                     self.gens[i] = itertools.islice(gen_item, self.limit)
 

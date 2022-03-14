@@ -16,13 +16,13 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     name = 'wiktionary'
 
     closed_wikis = [
-        # See https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist  # noqa
+        # See https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist  # noqa: E501
         'aa', 'ab', 'ak', 'as', 'av', 'bh', 'bi', 'bm', 'bo', 'ch', 'cr', 'dz',
         'ik', 'mh', 'pi', 'rm', 'rn', 'sc', 'sn', 'to', 'tw', 'xh', 'yo', 'za',
     ]
 
     removed_wikis = [
-        # See https://noc.wikimedia.org/conf/highlight.php?file=dblists/deleted.dblist  # noqa
+        # See https://noc.wikimedia.org/conf/highlight.php?file=dblists/deleted.dblist  # noqa: E501
         'als', 'ba', 'dk', 'tlh', 'tokipona',
     ]
 

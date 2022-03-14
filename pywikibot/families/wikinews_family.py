@@ -15,7 +15,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     name = 'wikinews'
 
     closed_wikis = [
-        # https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist  # noqa
+        # https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist  # noqa: E501
         'bg', 'hu', 'sd', 'th', 'tr',
     ]
 

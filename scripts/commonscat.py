@@ -426,7 +426,7 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot, NoRedirectPageBot):
         return self.findCommonscatLink(page)
 
     @staticmethod
-    def getCommonscatLink(page):  # noqa N802, N803
+    def getCommonscatLink(page):  # noqa: N802
         """Find CommonsCat template on page.
 
         :rtype: tuple of (<templatename>, <target>, <linktext>, <note>)
