@@ -2478,6 +2478,14 @@ class FilePage(Page):
         """
         return self.site.imageusage(self, total=total, content=content)
 
+    @property
+    def file_is_used(self) -> bool:
+        """Check whether the file is used at this site.
+
+        .. versionadded:: 7.1
+        """
+        return bool(list(self.usingPages(total=1)))
+
     def upload(self, source: str, **kwargs) -> bool:
         """
         Upload this file to the wiki.
