@@ -2112,7 +2112,14 @@ class APISite(
     }  # other errors shouldn't occur because of pre-submission checks
 
     @need_right('delete')
-    def delete(self, page, reason: str, *, oldimage: Optional[str] = None):
+    def delete(
+        self,
+        page: Union['pywikibot.page.BasePage', int, str],
+        reason: str,
+        *,
+        deletetalk: bool = False,
+        oldimage: Optional[str] = None
+    ) -> None:
         """Delete a page or a specific old version of a file from the wiki.
 
         Requires appropriate privileges.
@@ -2128,10 +2135,12 @@ class APISite(
         .. versionchanged:: 6.1
            keyword only parameter *oldimage* was added.
 
+        .. versionchanged:: 7.1
+           keyword only parameter *deletetalk* was added.
+
         :param page: Page to be deleted or its pageid.
-        :type page: :py:obj:`pywikibot.page.BasePage` or, for pageid,
-            int or str
         :param reason: Deletion reason.
+        :param deletetalk: Also delete the talk page, if it exists.
         :param oldimage: oldimage id of the file version to be deleted.
             If a BasePage object is given with page parameter, it has to
             be a FilePage.
@@ -2157,6 +2166,14 @@ class APISite(
             pageid = int(page)
             params['pageid'] = pageid
             msg = pageid
+
+        if deletetalk:
+            if self.mw_version < '1.38wmf24':
+                pywikibot.warning(
+                    'deletetalk is not available on {}'.format(self.mw_version)
+                )
+            else:
+                params['deletetalk'] = deletetalk
 
         req = self._simple_request(**params)
         self.lock_page(page)

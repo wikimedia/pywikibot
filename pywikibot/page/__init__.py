@@ -1758,16 +1758,24 @@ class BasePage(ComparableMixin):
                                   movetalk=movetalk,
                                   noredirect=noredirect)
 
-    def delete(self,
-               reason: Optional[str] = None,
-               prompt: bool = True,
-               mark: bool = False,
-               automatic_quit: bool = False) -> None:
+    def delete(
+        self,
+        reason: Optional[str] = None,
+        prompt: bool = True,
+        mark: bool = False,
+        automatic_quit: bool = False,
+        *,
+        deletetalk: bool = False
+    ) -> None:
         """
         Delete the page from the wiki. Requires administrator status.
 
+        .. versionchanged:: 7.1
+           keyword only parameter *deletetalk* was added.
+
         :param reason: The edit summary for the deletion, or rationale
             for deletion if requesting. If None, ask for it.
+        :param deletetalk: Also delete the talk page, if it exists.
         :param prompt: If true, prompt user for confirmation before deleting.
         :param mark: If true, and user does not have sysop rights, place a
             speedy-deletion request on the page instead. If false, non-sysops
@@ -1792,7 +1800,7 @@ class BasePage(ComparableMixin):
                     answer = 'y'
                     self.site._noDeletePrompt = True
             if answer == 'y':
-                self.site.delete(self, reason)
+                self.site.delete(self, reason, deletetalk=deletetalk)
             return
 
         # Otherwise mark it for deletion
