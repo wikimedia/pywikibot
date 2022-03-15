@@ -195,7 +195,7 @@ class MultiTemplateMatchBuilder:
         """Return a compiled regex to match template."""
         # TODO: add ability to also match contents within the template
         # TODO: add option for template to be None to match any template
-        # TODO: use NESTED_TEMPLATE_REGEX with <parameters> instead of <params>
+        # TODO: merge regex with NESTED_TEMPLATE_REGEX
         namespace = self.site.namespaces[10]
         if isinstance(template, pywikibot.Page):
             if template.namespace() == 10:
@@ -214,10 +214,13 @@ class MultiTemplateMatchBuilder:
         namespaces = [_ignore_case(ns) for ns in namespace]
         namespaces.append(_ignore_case('msg'))
         pattern = re.sub(r'_|\\ ', r'[_ ]', pattern)
-        templateRegex = re.compile(
-            r'\{\{ *(%(namespace)s:)?%(pattern)s(?P<parameters>\s*\|.+?|) *}}'
-            % {'namespace': ':|'.join(namespaces), 'pattern': pattern},
-            flags)
+        templateRegexP = (
+            r'{{\s*(%(namespace)s:)?%(pattern)s'
+            r'(?P<parameters>\s*\|[^{]+?'
+            r'((({{{[^{}]+?}}}|{{[^{}]+?}}|{[^{}]*?})[^{]*?)*?)?'
+            r'|)\s*}}'
+        ) % {'namespace': ':|'.join(namespaces), 'pattern': pattern}
+        templateRegex = re.compile(templateRegexP, flags)
         return templateRegex
 
     def search_any_predicate(self, templates):
