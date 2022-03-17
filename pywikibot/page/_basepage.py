@@ -74,6 +74,7 @@ from pywikibot.tools import (
     first_upper,
     is_ip_address,
     issue_deprecation_warning,
+    remove_last_args,
 )
 
 
@@ -480,19 +481,15 @@ class BasePage(ComparableMixin):
             self._getexception = IsRedirectPageError(self)
             raise self._getexception
 
-    def getOldVersion(self, oldid,
-                      force: bool = False, get_redirect: bool = False) -> str:
-        """
-        Return text of an old revision of this page; same options as get().
+    @remove_last_args(['get_redirect'])
+    def getOldVersion(self, oldid, force: bool = False) -> str:
+        """Return text of an old revision of this page.
 
         :param oldid: The revid of the revision desired.
         """
         if force or oldid not in self._revisions \
                 or self._revisions[oldid].text is None:
-            self.site.loadrevisions(self,
-                                    content=True,
-                                    revids=oldid)
-        # TODO: what about redirects, errors?
+            self.site.loadrevisions(self, content=True, revids=oldid)
         return self._revisions[oldid].text
 
     def permalink(self, oldid=None, percent_encoded: bool = True,
