@@ -1127,6 +1127,8 @@ for file_path in user_families_paths:
 # When called as main program, list all configuration variables
 #
 if __name__ == '__main__':  # pragma: no cover
+    from pprint import PrettyPrinter as _PrettyPrinter
+    _pp = _PrettyPrinter()
     _all = True
     for _arg in sys.argv[1:]:
         if _arg == 'modified':
@@ -1142,7 +1144,7 @@ if __name__ == '__main__':  # pragma: no cover
             _value = globals()[_name]
 
             if _name not in _private_values or not _value:
-                _value = repr(_value)
+                _value = _pp.pformat(_value)
             elif isinstance(_value, dict):
                 _value = '{ ...xxxxxxxx... }'
             elif hasattr(_value, '__dict__'):
