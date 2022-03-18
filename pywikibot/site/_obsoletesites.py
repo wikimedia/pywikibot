@@ -5,6 +5,7 @@
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
+from pywikibot.backports import Dict, Tuple
 from pywikibot.exceptions import NoPageError
 from pywikibot.site._apisite import APISite
 from pywikibot.site._basesite import BaseSite
@@ -27,23 +28,22 @@ class ClosedSite(APISite):
         pywikibot.error('Site {} has been closed. {}'.format(self.sitename,
                                                              notice))
 
-    def page_restrictions(self, page):
+    def page_restrictions(
+            self, page: 'pywikibot.Page') -> Dict[str, Tuple[str, str]]:
         """Return a dictionary reflecting page protections."""
         if not page.exists():
             raise NoPageError(page)
         if not hasattr(page, '_protection'):
-            page._protection = {'edit': ('steward', 'infinity'),
-                                'move': ('steward', 'infinity'),
-                                'delete': ('steward', 'infinity'),
-                                'upload': ('steward', 'infinity'),
-                                'create': ('steward', 'infinity')}
+            page._protection = dict.fromkeys(
+                ('create', 'delete', 'edit', 'move', 'upload'),
+                ('steward', 'infinity'))
         return page._protection
 
     def recentchanges(self, **kwargs) -> None:
         """An error instead of pointless API call."""
         self._closed_error('No recent changes can be returned.')
 
-    def is_uploaddisabled(self):
+    def is_uploaddisabled(self) -> bool:
         """Return True if upload is disabled on site."""
         if not hasattr(self, '_uploaddisabled'):
             self._uploaddisabled = True
