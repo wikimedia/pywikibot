@@ -209,10 +209,10 @@ class ProofreadPage(pywikibot.Page):
             raise ValueError('Page {} must belong to {} namespace'
                              .format(self.title(), site.proofread_page_ns))
         # Ensure that constants are in line with Extension values.
-        if list(self.site.proofread_levels.keys()) != self.PROOFREAD_LEVELS:
+        level_list = list(self.site.proofread_levels)
+        if level_list != self.PROOFREAD_LEVELS:
             raise ValueError('QLs do not match site values: {} != {}'
-                             .format(self.site.proofread_levels.keys(),
-                                     self.PROOFREAD_LEVELS))
+                             .format(level_list, self.PROOFREAD_LEVELS))
 
         self._base, self._base_ext, self._num = self._parse_title()
         self._multi_page = self._base_ext in self._MULTI_PAGE_EXT
@@ -350,7 +350,7 @@ class ProofreadPage(pywikibot.Page):
     def ql(self, value: int) -> None:
         if value not in self.site.proofread_levels:
             raise ValueError('Not valid QL value: {} (legal values: {})'
-                             .format(value, self.site.proofread_levels))
+                             .format(value, list(self.site.proofread_levels)))
         # TODO: add logic to validate ql value change, considering
         # site.proofread_levels.
         self._full_header.ql = value
@@ -375,7 +375,7 @@ class ProofreadPage(pywikibot.Page):
         except KeyError:
             pywikibot.warning('Not valid status set for {}: quality level = {}'
                               .format(self.title(as_link=True), self.ql))
-            return None
+        return None
 
     def without_text(self) -> None:
         """Set Page QL to "Without text"."""
@@ -1024,7 +1024,7 @@ class IndexPage(pywikibot.Page):
 
         # All but 'Without Text'
         if filter_ql is None:
-            filter_ql = list(self.site.proofread_levels.keys())
+            filter_ql = list(self.site.proofread_levels)
             filter_ql.remove(ProofreadPage.WITHOUT_TEXT)
 
         gen = (self.get_page(i) for i in range(start, end + 1))
