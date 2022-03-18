@@ -102,7 +102,9 @@ The contents of the package
     +----------------------------+------------------------------------------------------+
     | page                       | Module with classes for MediaWiki page content       |
     +============================+======================================================+
-    | __init__.py                | Objects representing MediaWiki pages                 |
+    | __init__.py                | Interface representing MediaWiki pages               |
+    +----------------------------+------------------------------------------------------+
+    | _basepage.py               | Objects representing MediaWiki pages                 |
     +----------------------------+------------------------------------------------------+
     | _collections.py            | Structures holding data for Wikibase entities        |
     +----------------------------+------------------------------------------------------+
