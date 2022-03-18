@@ -7,6 +7,9 @@
 ### fixing_redirects
 * -always option was enabled
 
+### reflinks
+* Decode pdfinfo if it is bytes content (T303731)
+
 
 ## 7.0.0
 *26 February 2022*
