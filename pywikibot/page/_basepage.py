@@ -80,31 +80,24 @@ from pywikibot.tools import (
 PROTOCOL_REGEX = r'\Ahttps?://'
 
 __all__ = (
+    'BaseLink',
     'BasePage',
-    'Page',
-    'FilePage',
     'Category',
-    'User',
-    'WikibasePage',
+    'Claim',
+    'FileInfo',
+    'FilePage',
     'ItemPage',
+    'Link',
+    'MediaInfo',
+    'Page',
     'Property',
     'PropertyPage',
-    'Claim',
-    'Revision',
-    'FileInfo',
-    'BaseLink',
-    'Link',
     'SiteLink',
-    'SiteLinkCollection',
+    'User',
+    'WikibaseEntity',
+    'WikibasePage',
     'html2unicode',
-    'url2unicode',
 )
-
-PageSourceType = Union[
-    'pywikibot.site.BaseLink',
-    'pywikibot.page.BaseSite',
-    'pywikibot.page.Page',
-]
 
 logger = logging.getLogger('pywiki.wiki.page')
 
@@ -3555,6 +3548,12 @@ class MediaInfo(WikibaseEntity):
         return self._file
 
     def get(self, force: bool = False) -> dict:
+        """Fetch all MediaInfo entity data and cache it.
+
+        :param force: override caching
+        :raise NoWikibaseEntityError: if this entity doesn't exist
+        :return: actual data which entity holds
+        """
         if self.id == '-1':
             if force:
                 if not self.file.exists():
@@ -5906,31 +5905,3 @@ def html2unicode(text: str, ignore=None, exceptions=None) -> str:
         return match.group(0)
 
     return _ENTITY_SUB(handle_entity, text)
-
-
-@deprecated('pywikibot.tools.chars.url2string', since='6.2.0')
-def url2unicode(title: str, encodings='utf-8') -> str:
-    """Convert URL-encoded text to unicode using several encoding.
-
-    Uses the first encoding that doesn't cause an error.
-
-    .. deprecated:: 6.2
-       Use :func:`pywikibot.tools.chars.url2string` instead.
-
-    :param title: URL-encoded character data to convert
-    :param encodings: Encodings to attempt to use during conversion.
-    :type encodings: str, list or Site
-
-    :raise UnicodeError: Could not convert using any encoding.
-    """
-    if isinstance(encodings, pywikibot.site.BaseSite):
-        # use all possible encodings from Site object
-        encodings = encodings.encodings()
-        issue_deprecation_warning(
-            'Passing BaseSite object to encodings parameter',
-            'BaseSite.encodings()',
-            depth=1,
-            since='6.2.0'
-        )
-
-    return pywikibot.tools.chars.url2string(title, encodings)

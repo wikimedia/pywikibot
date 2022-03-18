@@ -1,14 +1,14 @@
 #!/usr/bin/python3
 """Tests for the Wikidata parts of the page module."""
 #
-# (C) Pywikibot team, 2019-2021
+# (C) Pywikibot team, 2019-2022
 #
 # Distributed under the terms of the MIT license.
 #
 import unittest
 from contextlib import suppress
 
-from pywikibot.page import (
+from pywikibot.page._collections import (
     AliasesDict,
     ClaimCollection,
     LanguageDict,
