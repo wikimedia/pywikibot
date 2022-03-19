@@ -494,12 +494,14 @@ class ReferencesRobot(SingleSiteBot,
         self.MIME = re.compile(
             r'application/(?:xhtml\+xml|xml)|text/(?:ht|x)ml')
 
-    def httpError(self, err_num, link, pagetitleaslink) -> None:
+    @staticmethod
+    def httpError(err_num, link, pagetitleaslink) -> None:
         """Log HTTP Error."""
         pywikibot.stdout('HTTP error ({}) for {} on {}'
                          .format(err_num, link, pagetitleaslink))
 
-    def getPDFTitle(self, ref, response) -> None:
+    @staticmethod
+    def getPDFTitle(ref, response) -> None:
         """Use pdfinfo to retrieve title from a PDF."""
         # pdfinfo is Unix-only
         pywikibot.output('Reading PDF file...')
