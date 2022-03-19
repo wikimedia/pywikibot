@@ -7,24 +7,21 @@
 from typing import Union
 
 from pywikibot.page._basepage import (
-    BaseLink,
     BasePage,
     Category,
     Claim,
     FileInfo,
     FilePage,
     ItemPage,
-    Link,
     MediaInfo,
     Page,
     Property,
     PropertyPage,
-    SiteLink,
     User,
     WikibaseEntity,
     WikibasePage,
-    html2unicode,
 )
+from pywikibot.page._links import BaseLink, Link, SiteLink, html2unicode
 from pywikibot.page._revision import Revision
 from pywikibot.site import BaseSite as _BaseSite
 from pywikibot.tools import deprecated, issue_deprecation_warning
