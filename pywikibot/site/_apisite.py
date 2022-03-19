@@ -56,6 +56,7 @@ from pywikibot.site._extensions import (
     ProofreadPageMixin,
     ThanksFlowMixin,
     ThanksMixin,
+    TextExtractsMixin,
     UrlShortenerMixin,
     WikibaseClientMixin,
 )
@@ -88,6 +89,7 @@ class APISite(
     LinterMixin,
     PageImagesMixin,
     ProofreadPageMixin,
+    TextExtractsMixin,
     ThanksFlowMixin,
     ThanksMixin,
     UrlShortenerMixin,

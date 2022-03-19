@@ -26,7 +26,7 @@ NOTE: This script currently only works for the Wikipedia project.
 # Distributed under the terms of the MIT license.
 #
 import time
-from textwrap import fill, wrap
+from textwrap import fill
 
 import pywikibot
 from pywikibot import i18n, pagegenerators
@@ -430,18 +430,10 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
         """Process one page."""
         page = self.current_page
 
-        page_text = []
-        for text in page.text.split('\n'):
-            page_text += wrap(text, width=79) or ['']
-
-        pywikibot.output(color_format('{blue}{}{default}', '_' * 80))
-        if len(page_text) > self.LINES:
-            pywikibot.output(color_format(
-                '{blue}The page detail is too many lines, '
-                'only output first {} lines:{default}', self.LINES))
-        pywikibot.output(
-            '\n'.join(page_text[:min(self.LINES, len(page_text))]))
-        pywikibot.output(color_format('{blue}{}{default}', '_' * 80))
+        color_line = color_format('{blue}{}{default}', '_' * 80)
+        pywikibot.output(color_line)
+        pywikibot.output(page.extract('wiki', lines=self.LINES))
+        pywikibot.output(color_line)
 
         choice = pywikibot.input_choice(
             'Input action?',

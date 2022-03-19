@@ -4,12 +4,16 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from typing import Optional
+
 import pywikibot
 from pywikibot.data import api
 from pywikibot.echo import Notification
 from pywikibot.exceptions import (
     APIError,
+    Error,
     InconsistentTitleError,
+    NoPageError,
     SiteDefinitionError,
 )
 from pywikibot.site._decorators import need_extension, need_right
@@ -713,3 +717,50 @@ class UrlShortenerMixin:
         req = self.simple_request(action='shortenurl', url=url)
         data = req.submit()
         return data['shortenurl']['shorturl']
+
+
+class TextExtractsMixin:
+
+    """APISite mixin for TextExtracts extension.
+
+    .. versionadded:: 7.1
+    """
+
+    @need_extension('TextExtracts')
+    def extract(self, page: 'pywikibot.Page', *,
+                chars: Optional[int] = None,
+                sentences: Optional[int] = None,
+                intro: bool = True,
+                plaintext: bool = True) -> str:
+        """Retrieve an extract of a page.
+
+        :param page: The Page object for which the extract is read
+        :param chars: How many characters to return.  Actual text
+            returned might be slightly longer.
+        :param sentences: How many sentences to return
+        :param intro: Return only content before the first section
+        :param plaintext: if True, return extracts as plain text instead
+            of limited HTML
+
+        .. seealso::
+
+           - https://www.mediawiki.org/wiki/Extension:TextExtracts
+
+           - :meth:`pywikibot.page.BasePage.extract`.
+        """
+        if not page.exists():
+            raise NoPageError(page)
+        req = self._simple_request(action='query',
+                                   prop='extracts',
+                                   titles=page.title(with_section=False),
+                                   exchars=chars,
+                                   exsentences=sentences,
+                                   exintro=intro,
+                                   explaintext=plaintext)
+        data = req.submit()['query']['pages']
+        if '-1' in data:
+            msg = data['-1'].get('invalidreason',
+                                 'Unknown exception:\n{}'.format(data['-1']))
+            raise Error(msg)
+
+        return data[str(page.pageid)]['extract']
