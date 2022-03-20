@@ -6,23 +6,25 @@
 #
 from typing import Union
 
-from pywikibot.page._basepage import (
+from pywikibot.page._links import BaseLink, Link, SiteLink, html2unicode
+from pywikibot.page._pages import (
     BasePage,
     Category,
-    Claim,
     FileInfo,
     FilePage,
+    Page,
+    User,
+)
+from pywikibot.page._revision import Revision
+from pywikibot.page._wikibase import (
+    Claim,
     ItemPage,
     MediaInfo,
-    Page,
     Property,
     PropertyPage,
-    User,
     WikibaseEntity,
     WikibasePage,
 )
-from pywikibot.page._links import BaseLink, Link, SiteLink, html2unicode
-from pywikibot.page._revision import Revision
 from pywikibot.site import BaseSite as _BaseSite
 from pywikibot.tools import deprecated, issue_deprecation_warning
 from pywikibot.tools.chars import url2string as _url2string

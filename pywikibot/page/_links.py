@@ -1,7 +1,7 @@
 """Objects representing internal or interwiki link in wikitext.
 
 ..note::
-  `Link` objects represent a wiki-page's title, while
+  `Link` objects definded here represent a wiki-page's title, while
   :class:`pywikibot.Page` objects represent the page itself, including
   its contents.
 """
