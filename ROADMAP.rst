@@ -1,6 +1,7 @@
 Current release changes
 ^^^^^^^^^^^^^^^^^^^^^^^
 
+* TextExtracts support was aded (T72682)
 * Unused `get_redirect` parameter of Page.getOldVersion() has been dropped
 * Provide BasePage.get_parsed_page() a public method
 * Provide BuiltinNamespace.canonical_namespaces() with BuiltinNamespace IntEnum

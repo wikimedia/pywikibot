@@ -108,6 +108,8 @@ The contents of the package
     +----------------------------+------------------------------------------------------+
     | _decorators.py             | Decorators used by page objects                      |
     +----------------------------+------------------------------------------------------+
+    | _links.py                  | Objects representing link objects                    |
+    +----------------------------+------------------------------------------------------+
     | _pages.py                  | Objects representing MediaWiki pages                 |
     +----------------------------+------------------------------------------------------+
     | _revision.py               | Object representing page revision                    |
