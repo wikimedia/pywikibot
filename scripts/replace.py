@@ -146,14 +146,14 @@ import codecs
 import re
 from collections.abc import Sequence
 from contextlib import suppress
-from typing import Optional
+from typing import Any, Optional
 
 import pywikibot
 from pywikibot import editor, fixes, i18n, pagegenerators, textlib
 from pywikibot.backports import Dict, Generator, List, Pattern, Tuple
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 from pywikibot.exceptions import InvalidPageError, NoPageError
-from pywikibot.tools import chars
+from pywikibot.tools import chars, deprecated
 
 
 # This is required for the text that is shown when you run this script
@@ -382,6 +382,7 @@ class ReplacementListEntry(ReplacementBase):
         return _get_text_exceptions(self.fix_set.exceptions or {})
 
 
+@deprecated('pagegenerators.XMLDumpPageGenerator', since='7.1.0')
 class XmlDumpReplacePageGenerator:
 
     """
@@ -389,26 +390,23 @@ class XmlDumpReplacePageGenerator:
 
     These pages will be retrieved from a local XML dump file.
 
+    .. deprecated:: 7.1
+
     :param xmlFilename: The dump's path, either absolute or relative
-    :type xmlFilename: str
     :param xmlStart: Skip all articles in the dump before this one
-    :type xmlStart: str
     :param replacements: A list of 2-tuples of original text (as a
         compiled regular expression) and replacement text (as a string).
-    :type replacements: list of 2-tuples
     :param exceptions: A dictionary which defines when to ignore an
         occurrence. See docu of the ReplaceRobot initializer below.
     :type exceptions: dict
     """
 
-    def __init__(
-        self,
-        xmlFilename,
-        xmlStart,
-        replacements,
-        exceptions,
-        site
-    ) -> None:
+    def __init__(self,
+                 xmlFilename: str,
+                 xmlStart: str,
+                 replacements: List[Tuple[Any, str]],
+                 exceptions: Dict[str, Any],
+                 site) -> None:
         """Initializer."""
         self.xmlFilename = xmlFilename
         self.replacements = replacements
@@ -488,7 +486,6 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
     :param replacements: a list of Replacement instances or sequences of
         length 2 with the original text (as a compiled regular expression)
         and replacement text (as a string).
-    :type replacements: list
     :param exceptions: a dictionary which defines when not to change an
         occurrence. This dictionary can have these keys:
 
@@ -508,17 +505,16 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             dictionary in textlib._create_default_regexes() or must be
             accepted by textlib._get_regexes().
 
-    :type exceptions: dict
-    :param allowoverlap: when matches overlap, all of them are replaced.
+    :keyword allowoverlap: when matches overlap, all of them are replaced.
     :type allowoverlap: bool
-    :param recursive: Recurse replacement as long as possible.
+    :keyword recursive: Recurse replacement as long as possible.
     :type recursive: bool
     :warning: Be careful, this might lead to an infinite loop.
-    :param addcat: category to be added to every page touched
+    :keyword addcat: category to be added to every page touched
     :type addcat: pywikibot.Category or str or None
-    :param sleep: slow down between processing multiple regexes
+    :keyword sleep: slow down between processing multiple regexes
     :type sleep: int
-    :param summary: Set the summary message text bypassing the default
+    :keyword summary: Set the summary message text bypassing the default
     :type summary: str
     :keyword always: the user won't be prompted before changes are made
     :type keyword: bool
@@ -528,13 +524,10 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
         about the missing site
     """
 
-    def __init__(
-        self,
-        generator,
-        replacements,
-        exceptions=None,
-        **kwargs
-    ) -> None:
+    def __init__(self, generator,
+                 replacements: List[Tuple[Any, str]],
+                 exceptions: Optional[Dict[str, Any]] = None,
+                 **kwargs) -> None:
         """Initializer."""
         self.available_options.update({
             'addcat': None,
@@ -1086,8 +1079,8 @@ def main(*args: str) -> None:
     precompile_exceptions(exceptions, regex, flags)
 
     if xmlFilename:
-        gen = XmlDumpReplacePageGenerator(xmlFilename, xmlStart,
-                                          replacements, exceptions, site)
+        gen = pagegenerators.XmlDumpPageGenerator(
+            xmlFilename, xmlStart, namespaces=genFactory.namespaces, site=site)
     elif sql_query is not None:
         # Only -excepttext option is considered by the query. Other
         # exceptions are taken into account by the ReplaceRobot
