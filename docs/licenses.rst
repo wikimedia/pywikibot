@@ -4,11 +4,10 @@ Licenses
 ========
 
 **The framework itself and this documentation** are available under the
-:ref:`MIT license <licenses-MIT>`; manual pages on mediawiki.org are
+:ref:`MIT license`; manual pages on mediawiki.org are
 available under the `CC-BY-SA 3.0`_ license. The Pywikibot logo is
 available under the `CC-BY-SA 4.0`_ license.
 
-.. _licenses-MIT:
 
 MIT License
 -----------

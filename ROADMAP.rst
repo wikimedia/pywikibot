@@ -1,21 +1,21 @@
 Current release changes
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-* TextExtracts support was aded (T72682)
+* TextExtracts support was aded (:phab:`T72682`)
 * Unused `get_redirect` parameter of Page.getOldVersion() has been dropped
 * Provide BasePage.get_parsed_page() a public method
 * Provide BuiltinNamespace.canonical_namespaces() with BuiltinNamespace IntEnum
 * BuiltinNamespace got a canonical() method
-* Enable nested templates with MultiTemplateMatchBuilder (T110529)
+* Enable nested templates with MultiTemplateMatchBuilder (:phab:`T110529`)
 * Introduce APISite.simple_request as a public method
 * Provide an Uploader class to upload files
 * Enable use of deletetalk parameter of the delete API
-* Fix contextlib redirection for terminal interfaces (T283808)
-* No longer use win32_unicode for Python 3.6+ (T281042, T283808, T303373)
+* Fix contextlib redirection for terminal interfaces (:phab:`T283808`)
+* No longer use win32_unicode for Python 3.6+ (:phab:`T281042`, :phab:`T283808`, :phab:`T303373`)
 * L10N updates
 * -cosmetic_changes (-cc) option allows to assign the value directly instead of toggle it
 * distutils.util.strtobool() was implemented as tools.strtobool() due to :pep:`632`
-* The "in" operator always return whether the siteinfo contains the key even it is not cached (T302859)
+* The "in" operator always return whether the siteinfo contains the key even it is not cached (:phab:`T302859`)
 * Siteinfo.clear() and  Siteinfo.is_cached() methods were added
 
 Deprecations
@@ -25,7 +25,7 @@ Deprecations
 * 7.1.0: APISite._simple_request() will be removed in favour of APISite.simple_request()
 * 7.0.0: The i18n identifier 'cosmetic_changes-append' will be removed in favour of 'pywikibot-cosmetic-changes'
 * 7.0.0: User.isBlocked() method is renamed to is_blocked for consistency
-* 7.0.0: Require mysql >= 0.7.11 (T216741)
+* 7.0.0: Require mysql >= 0.7.11 (:phab:`T216741`)
 * 7.0.0: Private BaseBot counters _treat_counter, _save_counter, _skip_counter will be removed in favour of collections.Counter counter attribute
 * 7.0.0: A boolean watch parameter in Page.save() is deprecated and will be desupported
 * 7.0.0: baserevid parameter of editSource(), editQualifier(), removeClaims(), removeSources(), remove_qualifiers() DataSite methods will be removed

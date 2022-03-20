@@ -38,6 +38,6 @@ language to be used can be set as follows:
 .. seealso::
    * :manpage:`i18n` Manual
    * `MediaWiki Language Codes <https://www.mediawiki.org/wiki/Manual:Language#Language_code>`_
-   * :ref:`User Interface Settings<user-interface-settings>`
+   * :ref:`User Interface Settings`
    * :py:mod:`pywikibot.i18n`
 

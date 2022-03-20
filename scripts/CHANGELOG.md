@@ -8,7 +8,7 @@
 * -always option was enabled
 
 ### reflinks
-* Decode pdfinfo if it is bytes content (T303731)
+* Decode pdfinfo if it is bytes content (:phab:`:phab:`T303731``)
 
 
 ## 7.0.0
@@ -16,61 +16,61 @@
 
 ### general
 * L10N updates
-* Provide ConfigParserBot for several scripts (T223778)
+* Provide ConfigParserBot for several scripts (:phab:`T223778`)
 
 ### add_text
-* Provide -create and -createonly options (T291354)
+* Provide -create and -createonly options (:phab:`T291354`)
 * Deprecated function get_text() was removed in favour of Page.text and BaseBot.skip_page()
 * Deprecated function put_text() was removed in favour of BaseBot.userPut() method
 * Deprecated function add_text() were remove in favour of textlib.add_text()
 
 ### blockpageschecker
-* Use different edit comments when adding, changeing or removing templates (T291345)
-* Derive CheckerBot from ConfigParserBot (T57106)
-* Derive CheckerBot from CurrentPageBot (T196851, T171713)
+* Use different edit comments when adding, changeing or removing templates (:phab:`T291345`)
+* Derive CheckerBot from ConfigParserBot (:phab:`T57106`)
+* Derive CheckerBot from CurrentPageBot (:phab:`T196851`, :phab:`T171713`)
 
 ### category
 * CleanBot was added which can be invoked by clean action option
 * Recurse CategoryListifyRobot with depth
-* Show a warning if a pagegenerator option is not enabled (T298522)
+* Show a warning if a pagegenerator option is not enabled (:phab:`T298522`)
 * Deprecated code parts were removed
 
 ### checkimages
-* Skip PageSaveRelatedError and ServerError when putting talk page (T302174)
+* Skip PageSaveRelatedError and ServerError when putting talk page (:phab:`T302174`)
 
 ### commonscat
-* Ignore InvalidTitleError in CommonscatBot.findCommonscatLink (T291783)
+* Ignore InvalidTitleError in CommonscatBot.findCommonscatLink (:phab:`T291783`)
 
 ### cosmetic_changes
-* Ignore InvalidTitleError in CosmeticChangesBot.treat_page (T293612)
+* Ignore InvalidTitleError in CosmeticChangesBot.treat_page (:phab:`T293612`)
 
 ### djvutext
-* pass site arg only once (T292367)
+* pass site arg only once (:phab:`T292367`)
 
 ### fixing_redirects
 * Let only put_current show the message "No changes were needed"
-* Use concurrent.futures to retrieve redirect or moved targets (T298789)
-* Add an option to ignore solving moved targets (T298789)
+* Use concurrent.futures to retrieve redirect or moved targets (:phab:`T298789`)
+* Add an option to ignore solving moved targets (:phab:`T298789`)
 
 ### imagetransfer
-* Add support for chunked uploading (T300531)
+* Add support for chunked uploading (:phab:`T300531`)
 
 ### newitem
 * Do not pass OtherPageSaveRelatedError silently
 
 ### pagefromfile
 * Preload pages instead of reading them one by one before putting changes
-* Don't ask for confirmation by default (T291757)
+* Don't ask for confirmation by default (:phab:`T291757`)
 
 ### redirect
-* Use site.maxlimit to determine the highest limit to load (T299859)
+* Use site.maxlimit to determine the highest limit to load (:phab:`T299859`)
 
 ### replace
-* Enable default behaviour with -mysqlquery (T299306)
+* Enable default behaviour with -mysqlquery (:phab:`T299306`)
 * Deprecated "acceptall" and "addedCat" parameters were replaced by "always" and "addcat"
 
 ### revertbot
-* Add support for translated dates/times (T102174)
+* Add support for translated dates/times (:phab:`T102174`)
 * Deprecated "max" parameter was replaced by "total"
 
 ### solve_disambiguation
@@ -80,7 +80,7 @@
 *Do not pass OtherPageSaveRelatedError silently
 
 ### unusedfiles
-* Use oldest_file_info.user as uploader (T301768)
+* Use oldest_file_info.user as uploader (:phab:`T301768`)
 
 
 ## 6.6.1
@@ -101,7 +101,7 @@
 *05 August 2021*
 
 ### reflinks
-* Don't ignore identical references with newline in ref content (T286369)
+* Don't ignore identical references with newline in ref content (:phab:`T286369`)
 * L10N updates
 
 
@@ -112,29 +112,29 @@
 * show a warning if pywikibot.__version__ is behind scripts.__version__
 
 ### addtext
-* Deprecate get_text, put_text and add_text functions (T284388)
-* Use AutomaticTWSummaryBot and NoRedirectPageBot bot class instead of functions (T196851)
+* Deprecate get_text, put_text and add_text functions (:phab:`T284388`)
+* Use AutomaticTWSummaryBot and NoRedirectPageBot bot class instead of functions (:phab:`T196851`)
 
 ### blockpageschecker
 * Script was unarchived
 
 ### commonscat
-* Enable multiple sites (T57083)
+* Enable multiple sites (:phab:`T57083`)
 * Use new textlib.add_text function
 
 ### cosmetic_changes
-* set -ignore option to CANCEL.MATCH by default (T108446)
+* set -ignore option to CANCEL.MATCH by default (:phab:`T108446`)
 
 ### fixing_redirects
-* Add -overwrite option (T235219)
+* Add -overwrite option (:phab:`T235219`)
 
 ### imagetransfer
-* Skip pages which does not exist on source site (T284414)
+* Skip pages which does not exist on source site (:phab:`T284414`)
 * Use roundrobin_generators to combine multiple template inclusions
-* Allow images existing in the shared repo (T267535)
+* Allow images existing in the shared repo (:phab:`T267535`)
 
 ### template
-* Do not try to initialze generator twice in TemplateRobot (T284534)
+* Do not try to initialze generator twice in TemplateRobot (:phab:`T284534`)
 
 ### update_script
 * compat2core script was restored and renamed to update_script
@@ -166,22 +166,22 @@
 * dry parameter of CategoryAddBot will be removed
 
 ### commonscat
-* Ignore InvalidTitleError (T267742)
-* exit checkCommonscatLink method if target name is empty (T282693)
+* Ignore InvalidTitleError (:phab:`T267742`)
+* exit checkCommonscatLink method if target name is empty (:phab:`T282693`)
 
 ### fixing_redirects
-* ValueError will be ignored (T283403, T111513)
-* InterwikiRedirectPageError will be ignored (T137754)
-* InvalidPageError will be ignored (T280043)
+* ValueError will be ignored (:phab:`T283403`, :phab:`T111513`)
+* InterwikiRedirectPageError will be ignored (:phab:`T137754`)
+* InvalidPageError will be ignored (:phab:`T280043`)
 
 ### reflinks
 * Use consecutive reference numbers for autogenerated links
 
 ### replace
-* InvalidPageError will be ignored (T280043)
+* InvalidPageError will be ignored (:phab:`T280043`)
 
 ### upload
-* Support async chunked uploads (T129216)
+* Support async chunked uploads (:phab:`T129216`)
 
 
 ## 6.1.0
@@ -196,19 +196,19 @@
 * watchlist.py was restored
 
 ### archivebot
-* PageArchiver.maxsize must be defined before load_config() (T277547)
+* PageArchiver.maxsize must be defined before load_config() (:phab:`T277547`)
 * Time period must have a qualifier
 
 ### imagetransfer
-* Fix usage of -tofamily -tolang options (T279232)
+* Fix usage of -tofamily -tolang options (:phab:`T279232`)
 
 ### misspelling
 * Use the new DisambiguationRobot interface and options
 
 ### reflinks
-* Catch urllib3.LocationParseError and skip link (T280356)
+* Catch urllib3.LocationParseError and skip link (:phab:`T280356`)
 * L10N updates
-* Avoid dupliate reference names (T278040)
+* Avoid dupliate reference names (:phab:`T278040`)
 
 ### solve_disambiguation
 * Keyword arguments are recommended if deriving the bot; opt option handler is used.
@@ -221,12 +221,12 @@
 *15 March 2021*
 
 ### general
-* interwikidumps.py, cfd.py and featured.py scripts were deleted (T223826)
-* Long time unused scripts were archived (T223826). Ask to recover if needed.
+* interwikidumps.py, cfd.py and featured.py scripts were deleted (:phab:`T223826`)
+* Long time unused scripts were archived (:phab:`T223826`). Ask to recover if needed.
 * pagegenerators.handle_args() is used in several scripts
 
 ### archivebot
-* Always take 'maxarticlesize' into account when saving (T276937)
+* Always take 'maxarticlesize' into account when saving (:phab:`T276937`)
 * Remove deprecated parts
 
 ### category
@@ -236,16 +236,16 @@
 * New script to wrap Commons file descriptions in language templates
 
 ### generate_family_file
-* Ignore ssl certificate validation (T265210)
+* Ignore ssl certificate validation (:phab:`T265210`)
 
 ### login
 * update help string
 
 ### maintenance
-* Add a preload_sites.py script to preload site informations (T226157)
+* Add a preload_sites.py script to preload site informations (:phab:`T226157`)
 
 ### reflinks
-* Force pdf file to be closed (T276747)
+* Force pdf file to be closed (:phab:`T276747`)
 * Fix http.fetch response data attribute
 * Fix treat process flow
 
@@ -253,7 +253,7 @@
 * Add replacement description to -summary message
 
 ### replicate_wiki
-* replace pages in all sites (T275291)
+* replace pages in all sites (:phab:`T275291`)
 
 ### solve_disambiguation
 * Deprecated methods were removed
@@ -267,15 +267,15 @@
 *24 January 2021*
 
 ### general
-* pagegenerators handleArg was renamed to handle_arg (T271437)
+* pagegenerators handleArg was renamed to handle_arg (:phab:`T271437`)
 * i18n updates
 
 ### add_text
-* bugfix: str.join() expects an iterable not multiple args (T272223)
+* bugfix: str.join() expects an iterable not multiple args (:phab:`T272223`)
 
 ### redirect
-* pagegenerators -page option was implemented (T100643)
-* pagegenerators namespace filter was implemented (T234133, T271116)
+* pagegenerators -page option was implemented (:phab:`T100643`)
+* pagegenerators namespace filter was implemented (:phab:`T234133`, :phab:`T271116`)
 
 ## weblinkchecker
 * Deprecated LinkChecker class was removed
@@ -292,7 +292,7 @@
 * -except option was renamed to -grepnot from pagegenerators
 
 ### solve_disambiguation
-* ignore ValueError when parsing a Link object (T111513)
+* ignore ValueError when parsing a Link object (:phab:`T111513`)
 
 
 ## 5.4.0
@@ -322,8 +322,8 @@
 *10 December 2020*
 
 ### general
-* Removed unsupported BadTitle Exception (T267768)
-* Replaced PageNotSaved by PageSaveRelatedError (T267821)
+* Removed unsupported BadTitle Exception (:phab:`T267768`)
+* Replaced PageNotSaved by PageSaveRelatedError (:phab:`T267821`)
 * Update scripts to support Python 3.5+ only
 * i18n updates
 * L10N updates
@@ -332,17 +332,17 @@
 * Make BasicBot example a ConfigParserBot to explain the usage
 
 ### clean_sandbox
-* Fix TypeError (T267717)
+* Fix TypeError (:phab:`T267717`)
 
 ### fixing_redirects
-*  Ignore RuntimeError for missing 'redirects' in api response (T267567)
+*  Ignore RuntimeError for missing 'redirects' in api response (:phab:`T267567`)
 
 ### imagetransfer
 * Implement -tosite command and other improvements
-* Do not use UploadRobot.run() with imagetransfer (T267579)
+* Do not use UploadRobot.run() with imagetransfer (:phab:`T267579`)
 
 ### interwiki
-* Use textfile for interwiki dumps and enable -restore:all option (T74943, T213624)
+* Use textfile for interwiki dumps and enable -restore:all option (:phab:`T74943`, :phab:`T213624`)
 
 ### makecat
 * Use input_choice for options
@@ -350,16 +350,16 @@
 * Other improvements
 
 ### revertbot
-* Take rollbacktoken to revert (T250509)
+* Take rollbacktoken to revert (:phab:`T250509`)
 
 ### solve_disambiguation
 * Write ignoring pages as a whole
 
 ### touch
-* Fix available_options and purge options (T268394)
+* Fix available_options and purge options (:phab:`T268394`)
 
 ### weblinkchecker
-* Fix AttributeError of HttpRequest (T269821)
+* Fix AttributeError of HttpRequest (:phab:`T269821`)
 
 
 ## 5.1.0
@@ -367,35 +367,35 @@
 
 ### general
 * i18n updates
-* switch to new OptionHandler interface (T264721)
+* switch to new OptionHandler interface (:phab:`T264721`)
 
 ### change_pagelang
 * New script was added
 
 ### download_dump
-*  Make `dumpdate` param work when using the script in Toolforge (T266630)
+*  Make `dumpdate` param work when using the script in Toolforge (:phab:`T266630`)
 
 ### imagetransfer
-* Remove outdated "followRedirects" parameter from imagelinks(); treat instead of run method (T266867, T196851, T171713)
+* Remove outdated "followRedirects" parameter from imagelinks(); treat instead of run method (:phab:`T266867`, :phab:`T196851`, :phab:`T171713`)
 
 ### interwiki
 * Replace deprecated originPage by origin in Subjects
 
 ### misspelling
-* Enable misspelling.py for several sites using wikidata (T258859, T94681)
+* Enable misspelling.py for several sites using wikidata (:phab:`T258859`, :phab:`T94681`)
 
 ### noreferences
-* Rename NoReferencesBot.run to treat (T196851, T171713)
-* Use wikidata item instead of dropped MediaWiki message for default category (T266413)
+* Rename NoReferencesBot.run to treat (:phab:`T196851`, :phab:`T171713`)
+* Use wikidata item instead of dropped MediaWiki message for default category (:phab:`T266413`)
 
 ### reflinks
 * Derive ReferencesRobot from ExistingPageBot and NoRedirectPageBot
 * Use chardet to find a valid encoding (266862)
-* Rename ReferencesRobot.run to treat (T196851, T171713)
-* Ignore duplication replacements inside templates (T266411)
-* Fix edit summary (T265968)
-* Add Server414Error in and close file after reading (T266000)
-* Call ReferencesRobot.setup() (T265928)
+* Rename ReferencesRobot.run to treat (:phab:`T196851`, :phab:`T171713`)
+* Ignore duplication replacements inside templates (:phab:`T266411`)
+* Fix edit summary (:phab:`T265968`)
+* Add Server414Error in and close file after reading (:phab:`T266000`)
+* Call ReferencesRobot.setup() (:phab:`T265928`)
 
 ### welcome
 * Replace _COLORS and _MSGS dicts by Enum
@@ -414,11 +414,11 @@
 *  Split initializer and put getting whitelist to its own method
 
 ### checkimages
-* Re-enable -sleep parameter (T264521)
+* Re-enable -sleep parameter (:phab:`T264521`)
 
 ### commonscat
-* get commons category from wikibase (T175207)
-* Adjust save counter (T262772)
+* get commons category from wikibase (:phab:`T175207`)
+* Adjust save counter (:phab:`T262772`)
 
 ### flickrripper
 * Improve option handling
@@ -427,19 +427,19 @@
 * Improvements were made
 
 ### imagetransfer
-* Do not encode str to bytes (T265257)
+* Do not encode str to bytes (:phab:`T265257`)
 
 ### match_images
 * Improvements
 
 ### parser_function_count
-Porting parser_function_count.py from compat to core/scripts (T66878)
+Porting parser_function_count.py from compat to core/scripts (:phab:`T66878`)
 
 ### reflinks
-decode byte-like object meta_content.group() (T264575)
+decode byte-like object meta_content.group() (:phab:`T264575`)
 
 ### speedy_delete
-* port speedy_delete.py to core (T66880)
+* port speedy_delete.py to core (:phab:`T66880`)
 
 ### weblinkchecker
 * Use ThreadList with weblinkchecker
@@ -480,7 +480,7 @@ decode byte-like object meta_content.group() (T264575)
 * i18n updates
 
 ### download_dump
-* Move this script to script folder (T123885, T184033)
+* Move this script to script folder (:phab:`T123885`, :phab:`T184033`)
 
 ## replace
 * Show a FutureWarning for deprecated doReplacements method
@@ -496,13 +496,13 @@ decode byte-like object meta_content.group() (T264575)
 *4 August 2020*
 
 ### general
-* Remove Python 2 related code (T257399)
+* Remove Python 2 related code (:phab:`T257399`)
 * i18n updates
 * L10N updates
 
 ### archivebot
 * Only mention archives where something was really archived
-* Reset counter when "era" changes (T215247)
+* Reset counter when "era" changes (:phab:`T215247`)
 * Code improvements and cleanups
 * Fix ShouldArchive type
 * Refactor PageArchiver's main loop
@@ -510,7 +510,7 @@ decode byte-like object meta_content.group() (T264575)
 * Fix str2size to allow space separators
 
 ### cfd
-* Script was archived and is no longer supported (T223826)
+* Script was archived and is no longer supported (:phab:`T223826`)
 
 ### delete
-*  Use Dict in place of DefaultDict (T257770)
+*  Use Dict in place of DefaultDict (:phab:`T257770`)

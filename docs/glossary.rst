@@ -36,10 +36,9 @@ Glossary
       - the :mod:`pwb` wrapper script
 
    python2
-      A :term:`tag` for the last Pywikibot release :ref:`3.0.20200703<python2>`
-      supporting Python 2 (Python 2.7.3 - 2.7.18). Ask for `Python 2 to
-      3 support <https://phabricator.wikimedia.org/T242120>`_ to
-      convert your old scripts.
+      A :term:`tag` for the last Pywikibot release :ref:`3.0.20200703`
+      supporting Python 2 (Python 2.7.3 - 2.7.18). Ask for :phab:`Python 2 to
+      3 support <T242120>` to convert your old scripts.
 
    pywikibot
       **Py**\ thon Media\ **Wiki Bot** Framework, a Python library and

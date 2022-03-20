@@ -1,5 +1,3 @@
-.. _global options:
-
 Global Options
 --------------
 

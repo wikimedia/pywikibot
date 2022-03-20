@@ -23,7 +23,7 @@ Frequent Asked Questions
 **The bot cannot delete pages**
   Your account needs delete rights on your wiki. If you have setup another
   account in your user_config use ``-user``
-  :ref:`global option <global options>` to change it.
+  :ref:`global options` to change it.
   Maybe you have to login first.
 
 **ERROR: Unable to execute script because no *generator* was defined.**
