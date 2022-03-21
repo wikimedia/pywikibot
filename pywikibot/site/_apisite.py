@@ -2025,11 +2025,15 @@ class APISite(
         newtitle: str,
         summary: str,
         movetalk: bool = True,
-        noredirect: bool = False
+        noredirect: bool = False,
+        movesubpages: bool = True
     ) -> 'pywikibot.page.Page':
         """Move a Page to a new title.
 
-        :see: https://www.mediawiki.org/wiki/API:Move
+        .. seealso:: https://www.mediawiki.org/wiki/API:Move
+
+        .. versionchanged:: 7.2
+           The `movesubpages` parameter was added
 
         :param page: the Page to be moved (must exist)
         :param newtitle: the new title for the Page
@@ -2037,6 +2041,7 @@ class APISite(
         :param movetalk: if True (default), also move the talk page if possible
         :param noredirect: if True, suppress creation of a redirect from the
             old title to the new one
+        :param movesubpages: Rename subpages, if applicable.
         :return: Page object with the new title
         """
         oldtitle = page.title(with_section=False)
@@ -2059,6 +2064,7 @@ class APISite(
                                   noredirect=noredirect,
                                   reason=summary,
                                   movetalk=movetalk,
+                                  movesubpages=movesubpages,
                                   token=token,
                                   to=newtitle)
         req['from'] = oldtitle  # "from" is a python keyword

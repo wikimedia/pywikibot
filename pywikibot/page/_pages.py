@@ -1773,15 +1773,20 @@ class BasePage(ComparableMixin):
              newtitle: str,
              reason: Optional[str] = None,
              movetalk: bool = True,
-             noredirect: bool = False):
+             noredirect: bool = False,
+             movesubpages: bool = True) -> None:
         """
         Move this page to a new title.
+
+        .. versionchanged:: 7.2
+           The `movesubpages` parameter was added
 
         :param newtitle: The new page title.
         :param reason: The edit summary for the move.
         :param movetalk: If true, move this page's talk page (if it exists)
         :param noredirect: if move succeeds, delete the old page
             (usually requires sysop privileges, depending on wiki settings)
+        :param movesubpages: Rename subpages, if applicable.
         """
         if reason is None:
             pywikibot.output('Moving {} to [[{}]].'
@@ -1789,7 +1794,8 @@ class BasePage(ComparableMixin):
             reason = pywikibot.input('Please enter a reason for the move:')
         return self.site.movepage(self, newtitle, reason,
                                   movetalk=movetalk,
-                                  noredirect=noredirect)
+                                  noredirect=noredirect,
+                                  movesubpages=movesubpages)
 
     def delete(
         self,
