@@ -10,7 +10,7 @@ This module requires sseclient to be installed::
 .. versionadded:: 3.0
 """
 #
-# (C) Pywikibot team, 2017-2021
+# (C) Pywikibot team, 2017-2022
 #
 # Distributed under the terms of the MIT license.
 #
