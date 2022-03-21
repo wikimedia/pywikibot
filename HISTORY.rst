@@ -280,9 +280,9 @@ Code cleanups
 * pagenenerators.handleArg() method was renamed to handle_arg() (:phab:`T271437`)
 * CategoryGenerator, FileGenerator, ImageGenerator and ReferringPageGenerator pagegenerator functions were removed
 * Family.ignore_certificate_error() method was removed in favour of verify_SSL_certificate (:phab:`T265205`)
-* tools.is_IP was renamed to is_ip_address due to PEP8
+* tools.is_IP was renamed to is_ip_address due to :pep:`8`
 * config2.py was renamed to config.py
-* Exceptions were renamed having a suffix "Error" due to PEP8 (:phab:`T280227`)
+* Exceptions were renamed having a suffix "Error" due to :pep:`8` (:phab:`T280227`)
 
 
 6.1.0
@@ -339,7 +339,7 @@ Breaking changes
 ~~~~~~~~~~~~~~~~
 
 * interwiki_graph module was removed (:phab:`T223826`)
-* Require setuptools >= 20.2 due to PEP 440
+* Require setuptools >= 20.2 due to :pep:`440`
 * Support of MediaWiki < 1.23 has been dropped (:phab:`T268979`)
 * APISite.loadimageinfo will no longer return any content
 * Return requests.Response with http.request() instead of plain text (:phab:`T265206`)
@@ -995,7 +995,7 @@ Other changes
 * BaseBot has new methods setup and teardown
 * UploadBot got a filename prefix parameter (:phab:`T170123`)
 * cosmetic_changes is able to remove empty sections (:phab:`T140570`)
-* Pywikibot is following PEP 396 versioning
+* Pywikibot is following :pep:`396` versioning
 * pagegenerators AllpagesPageGenerator, CombinedPageGenerator, UnconnectedPageGenerator are deprecated
 * Some DayPageGenerator parameters has been renamed
 * unicodedata2, httpbin and Flask dependency was removed (:phab:`T102461`, :phab:`T108068`, :phab:`T178864`, :phab:`T193383`)
