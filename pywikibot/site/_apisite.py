@@ -988,7 +988,7 @@ class APISite(
             namespace = Namespace(ns, canonical_name, custom_name, **nsdata)
             _namespaces[ns] = namespace
 
-        for item in self.siteinfo.get('namespacealiasesi'):
+        for item in self.siteinfo.get('namespacealiases'):
             ns = int(item['id'])
             try:
                 namespace = _namespaces[ns]
