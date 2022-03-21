@@ -431,8 +431,9 @@ def register_families_folder(folder_path: str,
     # find the parent zip folder
     path = Path(folder_path)
     if not is_zipfile(path):
-        for path in path.parents:
+        for parent in path.parents:
             if is_zipfile(path):
+                path = parent
                 break
         else:
             raise NotADirectoryError('20', 'Not a directory', folder_path)
