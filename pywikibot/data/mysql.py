@@ -1,6 +1,6 @@
 """Miscellaneous helper functions for mysql queries."""
 #
-# (C) Pywikibot team, 2016-2021
+# (C) Pywikibot team, 2016-2022
 #
 # Distributed under the terms of the MIT license.
 #

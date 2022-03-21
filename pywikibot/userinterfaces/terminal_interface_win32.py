@@ -1,6 +1,6 @@
 """User interface for Win32 terminals."""
 #
-# (C) Pywikibot team, 2003-2020
+# (C) Pywikibot team, 2003-2022
 #
 # Distributed under the terms of the MIT license.
 #
