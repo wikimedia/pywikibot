@@ -1910,9 +1910,8 @@ class BasePage(ComparableMixin):
         for item in self.site.deletedrevs(self, start=timestamp,
                                           content=content, total=1, **kwargs):
             # should only be one item with one revision
-            if item['title'] == self.title():
-                if 'revisions' in item:
-                    return item['revisions'][0]
+            if item['title'] == self.title() and 'revisions' in item:
+                return item['revisions'][0]
         return []
 
     def markDeletedRevision(self, timestamp, undelete: bool = True):
@@ -2136,10 +2135,9 @@ class Page(BasePage):
 
     def __init__(self, source, title: str = '', ns=0) -> None:
         """Instantiate a Page object."""
-        if isinstance(source, pywikibot.site.BaseSite):
-            if not title:
-                raise ValueError('Title must be specified and not empty '
-                                 'if source is a Site.')
+        if isinstance(source, pywikibot.site.BaseSite) and not title:
+            raise ValueError('Title must be specified and not empty '
+                             'if source is a Site.')
         super().__init__(source, title, ns)
 
     @property
@@ -3137,9 +3135,9 @@ class User(Page):
         mailrequest = self.site.simple_request(**params)
         maildata = mailrequest.submit()
 
-        if 'emailuser' in maildata:
-            if maildata['emailuser']['result'] == 'Success':
-                return True
+        if 'emailuser' in maildata \
+           and maildata['emailuser']['result'] == 'Success':
+            return True
         return False
 
     def block(self, *args, **kwargs):

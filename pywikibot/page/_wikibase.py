@@ -1395,28 +1395,26 @@ class Claim(Property):
         ignore_refs: bool = True
     ) -> bool:
         """Check if two claims are same."""
-        if ignore_rank:
-            attributes = ['id', 'snaktype', 'target']
-        else:
-            attributes = ['id', 'snaktype', 'rank', 'target']
+        attributes = ['id', 'snaktype', 'target']
+        if not ignore_rank:
+            attributes.append('rank')
         for attr in attributes:
             if getattr(self, attr) != getattr(other, attr):
                 return False
 
-        if not ignore_quals:
-            if not self._claim_mapping_same(self.qualifiers, other.qualifiers):
-                return False
+        if not (ignore_quals or self._claim_mapping_same(self.qualifiers,
+                                                         other.qualifiers)):
+            return False
 
         if not ignore_refs:
             if len(self.sources) != len(other.sources):
                 return False
+
             for source in self.sources:
-                same = False
                 for other_source in other.sources:
                     if self._claim_mapping_same(source, other_source):
-                        same = True
                         break
-                if not same:
+                else:
                     return False
 
         return True
