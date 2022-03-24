@@ -61,7 +61,9 @@ class TestShareFiles(TestCase):
         self.assertTrue(commons_file.exists())
 
         self.assertTrue(itwp_file.file_is_shared())
+        self.assertFalse(itwp_file.file_is_used)
         self.assertTrue(commons_file.file_is_shared())
+        self.assertTrue(commons_file.file_is_used)
         self.assertTrue(commons_file.get_file_url())
 
         self.assertIn('/wikipedia/commons/', itwp_file.get_file_url())
@@ -124,7 +126,9 @@ class TestShareFiles(TestCase):
         self.assertTrue(commons_file.exists())
 
         self.assertFalse(itwp_file.file_is_shared())
+        self.assertTrue(itwp_file.file_is_used)
         self.assertTrue(commons_file.file_is_shared())
+        self.assertTrue(commons_file.file_is_used)
 
     def testNonFileLocal(self):
         """Test file page, without local file, existing on the local wiki."""
