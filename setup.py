@@ -34,6 +34,7 @@ To create a new distribution:
 #
 # ## KEEP PYTHON 2 SUPPORT FOR THIS SCRIPT ## #
 import os
+import re
 import sys
 
 
@@ -216,6 +217,7 @@ def read_desc(filename):  # pragma: no cover
     Combine included restructured text files which must be done before
     uploading because the source isn't available after creating the package.
     """
+    pattern = r'\:phab\:`(T\d+)`', r'\1'
     desc = []
     with open(filename) as f:
         for line in f:
@@ -223,11 +225,11 @@ def read_desc(filename):  # pragma: no cover
                 include = os.path.relpath(line.rsplit('::')[1].strip())
                 if os.path.exists(include):
                     with open(include) as g:
-                        desc.append(g.read())
+                        desc.append(re.sub(*pattern, g.read()))
                 else:
                     print('Cannot include {}; file not found'.format(include))
             else:
-                desc.append(line)
+                desc.append(re.sub(*pattern, line))
     return ''.join(desc)
 
 
