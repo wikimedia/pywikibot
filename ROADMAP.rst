@@ -1,6 +1,8 @@
 Current release changes
 ^^^^^^^^^^^^^^^^^^^^^^^
 
+* Add FilePage.file_is_used property to determine whether a file is used on a site
+* Add support for guwwiki and shnwikivoyage (:phab:`T303762`, :phab:`T302799`)
 * TextExtracts support was aded (:phab:`T72682`)
 * Unused `get_redirect` parameter of Page.getOldVersion() has been dropped
 * Provide BasePage.get_parsed_page() a public method
