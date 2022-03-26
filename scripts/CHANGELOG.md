@@ -1,8 +1,11 @@
 # Scripts Changelog
 
-
 ## 7.1.0
 *In development*
+
+
+## 7.2.0
+*26 March 2022*
 
 ### fixing_redirects
 * -always option was enabled
