@@ -846,7 +846,7 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
     .. versionadded:: 3.0
 
     .. versionchanged:: 5.0
-       Avoid duplicates (T263947).
+       Avoid duplicates (:phab:`T263947`).
 
     .. versionchanged:: 6.4
        ``genlist`` was renamed to ``iterables``; consecutive iterables

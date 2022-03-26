@@ -28,7 +28,7 @@ class _OldConnection(pymysql.connections.Connection):
     """Representation of a socket with a mysql server.
 
     This class is used to patch close() method for pymysql<0.7.11 on
-    toolforge (T216741).
+    toolforge (:phab:`T216741`).
 
     .. versionadded:: 7.0
     """
