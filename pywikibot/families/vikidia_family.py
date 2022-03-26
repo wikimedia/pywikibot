@@ -22,6 +22,6 @@ class Family(family.SubdomainFamily):
     # Sites we want to edit but not count as real languages
     test_codes = ['central', 'test']
 
-    def protocol(self, code):
+    def protocol(self, code) -> str:
         """Return https as the protocol for this family."""
         return 'https'

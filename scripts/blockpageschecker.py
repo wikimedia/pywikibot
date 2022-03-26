@@ -184,7 +184,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
         'move': False,
     }
 
-    def invoke_editor(self, page):
+    def invoke_editor(self, page) -> None:
         """Ask for an editor and invoke it."""
         choice = pywikibot.input_choice(
             'Do you want to open the page?',
@@ -195,16 +195,16 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
             editor = TextEditor()
             editor.edit(page.text)
 
-    def setup(self):
+    def setup(self) -> None:
         """Initialize the coroutine for parsing templates."""
         self.parse_tempates = self.remove_templates()
         self.parse_tempates.send(None)
 
-    def teardown(self):
+    def teardown(self) -> None:
         """Close the coroutine."""
         self.parse_tempates.close()
 
-    def treat_page(self):
+    def treat_page(self) -> None:
         """Load the given page, do some changes, and save it."""
         page = self.current_page
         if page.isRedirectPage():
@@ -308,10 +308,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                         '"template_total_protection"'
                         .format(self.site.sitename))
 
-                if tu:
-                    replacement = '|'.join(ttp + tsp + tu)
-                else:
-                    replacement = '|'.join(ttp + tsp)
+                replacement = '|'.join(ttp + tsp + (tu or ''))
                 text, changes = re.subn(
                     '<noinclude>({})</noinclude>'.format(replacement),
                     '', text)
@@ -342,12 +339,8 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                     pywikibot.output(
                         'The page is protected to the sysop, but the template '
                         'seems not correct. Fixing...')
-                    if tu:
-                        text, changes = re.subn(
-                            template_in_page.regex, tnr[4], text)
-                    else:
-                        text, changes = re.subn(
-                            template_in_page.regex, tnr[1], text)
+                    text, changes = re.subn(
+                        template_in_page.regex, tnr[(1, 4)[bool(tu)]], text)
                     msg_type = template_in_page.msgtype
 
             elif tsp or tu:
@@ -368,12 +361,8 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                     pywikibot.output(
                         'The page is editable only for the autoconfirmed '
                         'users, but the template seems not correct. Fixing...')
-                    if tu:
-                        text, changes = re.subn(
-                            template_in_page.regex, tnr[4], text)
-                    else:
-                        text, changes = re.subn(
-                            template_in_page.regex, tnr[0], text)
+                    text, changes = re.subn(
+                        template_in_page.regex, tnr[(0, 4)[bool(tu)]], text)
                     msg_type = template_in_page.msgtype
 
             if not changes:
@@ -390,10 +379,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                     pywikibot.output('The page is movable for all, deleting '
                                      'the template...')
                     # Deleting the template because the page doesn't need it.
-                    if tu:
-                        replacement = '|'.join(tsmp + ttmp + tu)
-                    else:
-                        replacement = '|'.join(tsmp + ttmp)
+                    replacement = '|'.join(tsmp + ttmp + (tu or ''))
                     text, changes = re.subn(
                         '<noinclude>({})</noinclude>'.format(replacement),
                         '', text)
@@ -414,12 +400,8 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                         pywikibot.output(
                             'The page is protected from moving to the sysop, '
                             'but the template seems not correct. Fixing...')
-                        if tu:
-                            text, changes = re.subn(
-                                template_in_page.regex, tnr[4], text)
-                        else:
-                            text, changes = re.subn(
-                                template_in_page.regex, tnr[3], text)
+                        text, changes = re.subn(
+                            template_in_page.regex, tnr[3 + bool(tu)], text)
                         msg_type = template_in_page.msgtype
 
                 elif tsmp or tu:
@@ -436,12 +418,8 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                             'The page is movable only for the autoconfirmed '
                             'users, but the template seems not correct. '
                             'Fixing...')
-                        if tu:
-                            text, changes = re.subn(
-                                template_in_page.regex, tnr[4], text)
-                        else:
-                            text, changes = re.subn(
-                                template_in_page.regex, tnr[2], text)
+                        text, changes = re.subn(template_in_page.regex,
+                                                tnr[(2, 4)[bool(tu)]], text)
                         msg_type = template_in_page.msgtype
 
                 if not changes:
@@ -461,9 +439,6 @@ def main(*args: str) -> None:
 
     :param args: command line arguments
     """
-    # Loading the comments
-    global category_to_check, project_inserted
-
     options = {}
     generator = None
 
@@ -482,7 +457,7 @@ def main(*args: str) -> None:
 
     # Process local args
     for arg in local_args:
-        arg, sep, value = arg.partition(':')
+        arg, _, value = arg.partition(':')
         option = arg[1:]
         if arg in ('-always', '-move', '-show'):
             options[option] = True

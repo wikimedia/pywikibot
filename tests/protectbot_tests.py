@@ -9,7 +9,6 @@ import unittest
 from contextlib import suppress
 
 import pywikibot
-import pywikibot.page
 from scripts import protect
 from tests.aspects import ScriptMainTestCase
 
@@ -21,7 +20,7 @@ class TestProtectionBot(ScriptMainTestCase):
     family = 'wikipedia'
     code = 'test'
 
-    sysop = True
+    rights = 'protect'
     write = True
 
     def test_protect(self):

@@ -15,7 +15,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     name = 'wikibooks'
 
     closed_wikis = [
-        # See https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist  # noqa
+        # https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist
         'aa', 'ak', 'ang', 'as', 'ast', 'ay', 'bi', 'bm', 'bo', 'ch', 'co',
         'ga', 'gn', 'got', 'gu', 'ie', 'kn', 'ks', 'lb', 'ln', 'lv', 'mi',
         'mn', 'my', 'na', 'nah', 'nds', 'ps', 'qu', 'rm', 'se', 'simple', 'su',
@@ -24,7 +24,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     ]
 
     removed_wikis = [
-        # See https://noc.wikimedia.org/conf/highlight.php?file=dblists/deleted.dblist  # noqa
+        # https://noc.wikimedia.org/conf/highlight.php?file=dblists/deleted.dblist
         'als', 'dk', 'tokipona',
     ]
 

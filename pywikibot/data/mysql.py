@@ -1,6 +1,6 @@
 """Miscellaneous helper functions for mysql queries."""
 #
-# (C) Pywikibot team, 2016-2021
+# (C) Pywikibot team, 2016-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -33,7 +33,7 @@ class _OldConnection(pymysql.connections.Connection):
     .. versionadded:: 7.0
     """
 
-    def close(self):
+    def close(self) -> None:  # pragma: no cover
         """Send the quit message and close the socket."""
         if self._closed or self._sock is None:
             super().close()

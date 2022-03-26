@@ -228,7 +228,11 @@ def get_archive_url(url):
     return archive
 
 
-def weblinks_from_text(text, without_bracketed=False, only_bracketed=False):
+def weblinks_from_text(
+    text,
+    without_bracketed: bool = False,
+    only_bracketed: bool = False
+):
     """
     Yield web links from text.
 
@@ -286,7 +290,7 @@ class LinkCheckThread(threading.Thread):
     After checking the page, it will die.
     """
 
-    def __init__(self, page, url, history, http_ignores, day):
+    def __init__(self, page, url, history, http_ignores, day) -> None:
         """Initializer."""
         self.page = page
         self.url = url
@@ -364,7 +368,7 @@ class History:
      }
     """
 
-    def __init__(self, report_thread, site=None):
+    def __init__(self, report_thread, site=None) -> None:
         """Initializer."""
         self.report_thread = report_thread
         if not site:
@@ -385,7 +389,7 @@ class History:
             # no saved history exists yet, or history dump broken
             self.history_dict = {}
 
-    def log(self, url, error, containing_page, archive_url):
+    def log(self, url, error, containing_page, archive_url) -> None:
         """Log an error report to a text file in the deadlinks subdirectory."""
         if archive_url:
             error_report = '* {} ([{} archive])\n'.format(url, archive_url)
@@ -414,7 +418,7 @@ class History:
             self.report_thread.report(url, error_report, containing_page,
                                       archive_url)
 
-    def set_dead_link(self, url, error, page, weblink_dead_days):
+    def set_dead_link(self, url, error, page, weblink_dead_days) -> None:
         """Add the fact that the link was found dead to the .dat file."""
         with self.semaphore:
             now = time.time()
@@ -441,7 +445,7 @@ class History:
             else:
                 self.history_dict[url] = [(page.title(), now, error)]
 
-    def set_link_alive(self, url):
+    def set_link_alive(self, url) -> bool:
         """
         Record that the link is now alive.
 
@@ -456,7 +460,7 @@ class History:
 
         return False
 
-    def save(self):
+    def save(self) -> None:
         """Save the .dat file to disk."""
         with open(self.datfilename, 'wb') as f:
             pickle.dump(self.history_dict, f, protocol=config.pickle_protocol)
@@ -471,7 +475,7 @@ class DeadLinkReportThread(threading.Thread):
     sure that two LinkCheckerThreads cannot access the queue at the same time.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initializer."""
         super().__init__()
         self.semaphore = threading.Semaphore()
@@ -479,22 +483,22 @@ class DeadLinkReportThread(threading.Thread):
         self.finishing = False
         self.killed = False
 
-    def report(self, url, error_report, containing_page, archive_url):
+    def report(self, url, error_report, containing_page, archive_url) -> None:
         """Report error on talk page of the page containing the dead link."""
         with self.semaphore:
             self.queue.append((url, error_report, containing_page,
                                archive_url))
 
-    def shutdown(self):
+    def shutdown(self) -> None:
         """Finish thread."""
         self.finishing = True
 
-    def kill(self):
+    def kill(self) -> None:
         """Kill thread."""
         # TODO: remove if unneeded
         self.killed = True
 
-    def run(self):
+    def run(self) -> None:
         """Run thread."""
         while not self.killed:
             if not self.queue:
@@ -567,7 +571,7 @@ class WeblinkCheckerRobot(SingleSiteBot, ExistingPageBot):
     It uses several LinkCheckThreads at once to process pages from generator.
     """
 
-    def __init__(self, http_ignores=None, day=7, **kwargs):
+    def __init__(self, http_ignores=None, day: int = 7, **kwargs) -> None:
         """Initializer."""
         super().__init__(**kwargs)
 
@@ -585,7 +589,7 @@ class WeblinkCheckerRobot(SingleSiteBot, ExistingPageBot):
         self.threads = ThreadList(limit=config.max_external_links,
                                   wait_time=config.retry_wait)
 
-    def treat_page(self):
+    def treat_page(self) -> None:
         """Process one page."""
         page = self.current_page
         for url in weblinks_from_text(page.text):

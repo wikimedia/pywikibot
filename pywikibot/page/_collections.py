@@ -29,7 +29,7 @@ class BaseDataDict(MutableMapping):
     specialised in subclasses.
     """
 
-    def __init__(self, data=None):
+    def __init__(self, data=None) -> None:
         super().__init__()
         self._data = {}
         if data:
@@ -44,25 +44,25 @@ class BaseDataDict(MutableMapping):
         key = self.normalizeKey(key)
         return self._data[key]
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key, value) -> None:
         key = self.normalizeKey(key)
         self._data[key] = value
 
-    def __delitem__(self, key):
+    def __delitem__(self, key) -> None:
         key = self.normalizeKey(key)
         del self._data[key]
 
     def __iter__(self):
         return iter(self._data)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._data)
 
-    def __contains__(self, key):
+    def __contains__(self, key) -> bool:
         key = self.normalizeKey(key)
         return key in self._data
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '{}({})'.format(type(self), self._data)
 
     @staticmethod
@@ -190,7 +190,7 @@ class AliasesDict(BaseDataDict):
 class ClaimCollection(MutableMapping):
     """A structure holding claims for a Wikibase entity."""
 
-    def __init__(self, repo):
+    def __init__(self, repo) -> None:
         """Initializer."""
         super().__init__()
         self.repo = repo
@@ -213,22 +213,22 @@ class ClaimCollection(MutableMapping):
     def __getitem__(self, key):
         return self._data[key]
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key, value) -> None:
         self._data[key] = value
 
-    def __delitem__(self, key):
+    def __delitem__(self, key) -> None:
         del self._data[key]
 
     def __iter__(self):
         return iter(self._data)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._data)
 
-    def __contains__(self, key):
+    def __contains__(self, key) -> bool:
         return key in self._data
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '{}({})'.format(type(self), self._data)
 
     @classmethod
@@ -294,7 +294,7 @@ class ClaimCollection(MutableMapping):
         claims = temp
         return claims
 
-    def set_on_item(self, item):
+    def set_on_item(self, item) -> None:
         """Set Claim.on_item attribute for all claims in this collection."""
         for claims in self.values():
             for claim in claims:
@@ -304,7 +304,7 @@ class ClaimCollection(MutableMapping):
 class SiteLinkCollection(MutableMapping):
     """A structure holding SiteLinks for a Wikibase item."""
 
-    def __init__(self, repo, data=None):
+    def __init__(self, repo, data=None) -> None:
         """
         Initializer.
 
@@ -358,7 +358,7 @@ class SiteLinkCollection(MutableMapping):
         self._data[key] = val
         return val
 
-    def __setitem__(self, key, val):
+    def __setitem__(self, key, val) -> None:
         """
         Set the SiteLink for a given key.
 
@@ -377,17 +377,17 @@ class SiteLinkCollection(MutableMapping):
             assert val.site.dbName() == key
         self._data[key] = val
 
-    def __delitem__(self, key):
+    def __delitem__(self, key) -> None:
         key = self.getdbName(key)
         del self._data[key]
 
     def __iter__(self):
         return iter(self._data)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._data)
 
-    def __contains__(self, key):
+    def __contains__(self, key) -> bool:
         key = self.getdbName(key)
         return key in self._data
 

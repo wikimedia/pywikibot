@@ -43,7 +43,7 @@ class _NotImplementedWarning(RuntimeWarning):
     """
 
 
-def add_decorated_full_name(obj, stacklevel=1):
+def add_decorated_full_name(obj, stacklevel: int = 1) -> None:
     """Extract full object name, including class, and store in __full_name__.
 
     This must be done on all decorators that are chained together, otherwise
@@ -52,7 +52,6 @@ def add_decorated_full_name(obj, stacklevel=1):
     :param obj: An object being decorated
     :type obj: object
     :param stacklevel: level to use
-    :type stacklevel: int
     """
     if hasattr(obj, '__full_name__'):
         return
@@ -68,7 +67,7 @@ def add_decorated_full_name(obj, stacklevel=1):
         obj.__full_name__ = '{}.{}'.format(obj.__module__, obj.__name__)
 
 
-def manage_wrapping(wrapper, obj):
+def manage_wrapping(wrapper, obj) -> None:
     """Add attributes to wrapper and wrapped functions.
 
     .. versionadded:: 3.0
@@ -185,7 +184,7 @@ def _build_msg_string(instead: str, since: str) -> str:
 
 
 def issue_deprecation_warning(name: str, instead: str = '', depth: int = 2,
-                              warning_class=None, since: str = ''):
+                              warning_class=None, since: str = '') -> None:
     """Issue a deprecation warning.
 
     .. versionchanged:: 7.0
@@ -244,7 +243,7 @@ def deprecated(*args, **kwargs):
                 warning_class=None if future_warning else DeprecationWarning)
             return obj(*args, **kwargs)
 
-        def add_docstring(wrapper):
+        def add_docstring(wrapper) -> None:
             """Add a Deprecated notice to the docstring."""
             deprecation_notice = 'Deprecated'
             if instead:
@@ -552,7 +551,7 @@ class ModuleDeprecationWrapper(types.ModuleType):
 
     """A wrapper for a module to deprecate classes or variables of it."""
 
-    def __init__(self, module):
+    def __init__(self, module) -> None:
         """
         Initialise the wrapper.
 
@@ -627,7 +626,7 @@ class ModuleDeprecationWrapper(types.ModuleType):
         self._deprecated[name] = (
             replacement_name, replacement, warning_message, future_warning)
 
-    def __setattr__(self, attr, value):
+    def __setattr__(self, attr, value) -> None:
         """Set the value of the wrapped module."""
         self.__dict__[attr] = value
         setattr(self._module, attr, value)

@@ -23,5 +23,5 @@ class Family(family.Family):
         'test': 'wikispore-test.wmflabs.org',
     }
 
-    def protocol(self, code):
+    def protocol(self, code) -> str:
         return 'https'

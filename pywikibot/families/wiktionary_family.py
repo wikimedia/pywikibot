@@ -16,29 +16,29 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     name = 'wiktionary'
 
     closed_wikis = [
-        # See https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist  # noqa
+        # https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist
         'aa', 'ab', 'ak', 'as', 'av', 'bh', 'bi', 'bm', 'bo', 'ch', 'cr', 'dz',
         'ik', 'mh', 'pi', 'rm', 'rn', 'sc', 'sn', 'to', 'tw', 'xh', 'yo', 'za',
     ]
 
     removed_wikis = [
-        # See https://noc.wikimedia.org/conf/highlight.php?file=dblists/deleted.dblist  # noqa
-        'als', 'ba', 'dk', 'tlh', 'tokipona',
+        # https://noc.wikimedia.org/conf/highlight.php?file=dblists/deleted.dblist
+        'als', 'ba', 'dk', 'mo', 'tlh', 'tokipona',
     ]
 
     languages_by_size = [
-        'en', 'fr', 'mg', 'ru', 'zh', 'de', 'sh', 'es', 'sv', 'el', 'nl', 'pl',
+        'en', 'fr', 'mg', 'zh', 'ru', 'de', 'sh', 'es', 'sv', 'nl', 'el', 'pl',
         'ku', 'lt', 'it', 'ca', 'fi', 'ta', 'hu', 'tr', 'io', 'hy', 'ko', 'ja',
         'pt', 'kn', 'vi', 'sr', 'th', 'hi', 'ro', 'no', 'et', 'id', 'cs', 'ml',
-        'my', 'uz', 'li', 'or', 'te', 'eo', 'fa', 'gl', 'ar', 'oc', 'jv', 'az',
-        'skr', 'eu', 'uk', 'br', 'ast', 'da', 'lo', 'simple', 'is', 'bn', 'la',
-        'hr', 'fj', 'tg', 'sk', 'ky', 'wa', 'bg', 'ur', 'ps', 'shn', 'cy',
-        'vo', 'sl', 'he', 'af', 'om', 'zh-min-nan', 'scn', 'tl', 'pa', 'sw',
-        'fy', 'mnw', 'sg', 'lmo', 'nn', 'ka', 'lv', 'ms', 'min', 'sq', 'nds',
-        'co', 'mn', 'pnb', 'lb', 'bs', 'nah', 'yue', 'sa', 'kk', 'km', 'diq',
-        'vec', 'be', 'tk', 'mk', 'sm', 'hsb', 'nia', 'shy', 'ks', 'gd', 'ga',
-        'mr', 'gom', 'an', 'wo', 'mni', 'su', 'ia', 'ang', 'mt', 'fo', 'sd',
-        'tt', 'gn', 'ie', 'so', 'bcl', 'csb', 'ug', 'si', 'st', 'roa-rup',
+        'my', 'uz', 'li', 'or', 'te', 'eo', 'fa', 'gl', 'ar', 'oc', 'jv',
+        'skr', 'az', 'eu', 'uk', 'br', 'ast', 'da', 'lo', 'simple', 'is', 'bn',
+        'la', 'hr', 'fj', 'tg', 'sk', 'ky', 'wa', 'bg', 'ur', 'ps', 'shn',
+        'cy', 'vo', 'sl', 'om', 'he', 'af', 'zh-min-nan', 'scn', 'sg', 'mnw',
+        'tl', 'pa', 'sw', 'fy', 'lmo', 'nn', 'ka', 'lv', 'ms', 'min', 'sq',
+        'nds', 'co', 'mn', 'pnb', 'lb', 'bs', 'nah', 'yue', 'sa', 'kk', 'km',
+        'diq', 'vec', 'be', 'tk', 'mk', 'sm', 'hsb', 'nia', 'shy', 'ks', 'gd',
+        'ga', 'su', 'mr', 'gom', 'an', 'wo', 'mni', 'ia', 'ang', 'mt', 'bcl',
+        'fo', 'sd', 'tt', 'gn', 'so', 'ie', 'csb', 'ug', 'si', 'st', 'roa-rup',
         'hif', 'tpi', 'zu', 'kl', 'mi', 'ay', 'ha', 'jbo', 'yi', 'ln', 'gu',
         'na', 'gv', 'kw', 'am', 'ne', 'rw', 'ts', 'qu', 'ss', 'chr', 'iu',
         'dv', 'ti', 'tn',

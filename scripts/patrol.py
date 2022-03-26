@@ -64,7 +64,7 @@ except ImportError as e:
 _logger = 'patrol'
 
 
-def verbose_output(string):
+def verbose_output(string) -> None:
     """Verbose output."""
     if pywikibot.config.verbose_output:
         pywikibot.output(string)
@@ -85,7 +85,7 @@ class PatrolBot(BaseBot):
         'en': 'patrol_whitelist',
     }
 
-    def __init__(self, site=None, **kwargs):
+    def __init__(self, site=None, **kwargs) -> None:
         """
         Initializer.
 
@@ -167,7 +167,7 @@ class PatrolBot(BaseBot):
                 raise
             pywikibot.error(str(e))
 
-    def in_list(self, pagelist, title):
+    def in_list(self, pagelist, title) -> bool:
         """Check if title present in pagelist."""
         verbose_output('Checking whitelist for: ' + title)
 
@@ -220,7 +220,7 @@ class PatrolBot(BaseBot):
                     # this allows a prefix that doesn't match an existing page
                     # to be a blue link, and can be clicked to see what pages
                     # will be included in the whitelist
-                    name, sep, prefix = obj.title.partition('/')
+                    name, _, prefix = obj.title.partition('/')
                     if name.lower() in self._prefixindex_aliases:
                         if not prefix:
                             verbose_output('Whitelist everything')
@@ -259,7 +259,7 @@ class PatrolBot(BaseBot):
 
         return dict(whitelist)
 
-    def is_wikisource_author_page(self, title):
+    def is_wikisource_author_page(self, title) -> bool:
         """Patrol a single item."""
         if self.site.family.name != 'wikisource':
             return False
@@ -335,7 +335,7 @@ class LinkedPagesRule:
 
     """Matches of page site title and linked pages title."""
 
-    def __init__(self, page_title: str):
+    def __init__(self, page_title: str) -> None:
         """Initializer.
 
         :param page_title: The page title for this rule
@@ -344,7 +344,7 @@ class LinkedPagesRule:
         self.page_title = page_title
         self.linkedpages = None
 
-    def match(self, page_title):
+    def match(self, page_title) -> bool:
         """Match page_title to linkedpages elements."""
         if page_title == self.page_title:
             return True
@@ -370,8 +370,14 @@ class LinkedPagesRule:
         return False
 
 
-def api_feed_repeater(gen, delay=0, repeat=False, namespaces=None,
-                      user=None, recent_new_gen=True):
+def api_feed_repeater(
+    gen,
+    delay: float = 0,
+    repeat: bool = False,
+    namespaces=None,
+    user=None,
+    recent_new_gen: bool = True
+):
     """Generator which loads pages details to be processed."""
     while True:
         if recent_new_gen:

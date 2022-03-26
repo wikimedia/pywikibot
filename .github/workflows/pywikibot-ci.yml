@@ -43,6 +43,8 @@ jobs:
             experimental: true
           - python-version: "3.7"
             site: "wikipedia:test"
+            write-test: true
+            experimental: true
           - python-version: "3.7"
             site: "wikidata:test"
           - python-version: "3.9"
@@ -55,8 +57,7 @@ jobs:
             experimental: true
           - python-version: "3.11.0-alpha - 3.11.0"
             site: "wikipedia:test"
-            experimental: true
-          - python-version: 3
+          - python-version: "3"
             site: "wikipedia:de"
             os: macOS-latest
 
@@ -103,17 +104,32 @@ jobs:
         echo "usernames['commons']['commons'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
         echo "usernames['meta']['meta'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
         echo "max_retries = 3" >> user-config.py
+        echo "noisysleep = float('inf')" >> user-config.py
         echo "maximum_GET_length = 5000" >> user-config.py
         echo "console_encoding = 'utf8'" >> user-config.py
         echo "import os" >> user-config.py
         echo "password_file = os.path.expanduser('passwordfile')" >> user-config.py
         echo "('${{ env.PYWIKIBOT_USERNAME }}', '${{ secrets.PYWIKIBOT_USERPWD }}')" > passwordfile
 
-    - name: Test with unittest
+    - name: Test with unittest or pytest
+      id: ci_test
+      continue-on-error: true
       env:
         PYWIKIBOT_TEST_NO_RC:
           ${{ (matrix.site == 'wikisource:zh' || matrix.test_no_rc) && 1 || 0 }}
         PYWIKIBOT_TEST_PROD_ONLY: ${{ matrix.test_prod_only && 1 || 0 }}
+        PYWIKIBOT_TEST_WRITE: ${{ (matrix.site == 'wikipedia:test' && matrix.write-test ) && 1 || 0}}
       run: |
         python pwb.py version
-        coverage run -m unittest discover -vv -p \"*_tests.py\"
+        if [ ${{matrix.site || 0}} != 'wikipedia:test' ]; then
+          coverage run -m unittest discover -vv -p \"*_tests.py\";
+        else
+          pytest --cov=.;
+        fi
+
+    - name: Upload coverage to Codecov
+      run: codecov
+
+    - name: Check on failure
+      if: steps.ci_test.outcome == 'failure'
+      run: exit 1

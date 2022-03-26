@@ -91,7 +91,7 @@ class MovePagesBot(CurrentPageBot):
             return True
         return super().skip_page(page)
 
-    def treat_page(self):
+    def treat_page(self) -> None:
         """Treat a single page."""
         page = self.current_page
         pagetitle = page.title(with_ns=False)

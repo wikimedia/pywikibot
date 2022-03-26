@@ -35,3 +35,8 @@ Namespace Package
 TokenWallet Package
 -------------------
 .. automodule:: pywikibot.site._tokenwallet
+
+Uploader Package
+----------------
+.. automodule:: pywikibot.site._upload
+

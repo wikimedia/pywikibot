@@ -37,7 +37,7 @@ class SequenceOutputter:
     prefix = '\n'
     suffix = '\n'
 
-    def __init__(self, sequence):
+    def __init__(self, sequence) -> None:
         """Create a new instance with a reference to the sequence."""
         super().__init__()
         self.sequence = sequence
@@ -60,7 +60,7 @@ class SequenceOutputter:
             content = ''
         return self.prefix + content + self.suffix
 
-    def output(self):
+    def output(self) -> None:
         """Output the text of the current sequence."""
         output(self.out)
 

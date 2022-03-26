@@ -81,7 +81,7 @@ class PageWithRefs(Page):
     Supports the same interface as Page, with some added methods.
     """
 
-    def __init__(self, source, title='', ns=0) -> None:
+    def __init__(self, source, title: str = '', ns=0) -> None:
         """Initializer."""
         super().__init__(source, title, ns)
         _cache_attrs = list(super()._cache_attrs)

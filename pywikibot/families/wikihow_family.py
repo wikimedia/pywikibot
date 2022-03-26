@@ -57,10 +57,10 @@ class Family(family.SubdomainFamily):
             cls.langs[code] = 'www.' + domain
         return cls.langs
 
-    def scriptpath(self, code):
+    def scriptpath(self, code) -> str:
         """Return the script path for this family."""
         return ''
 
-    def protocol(self, code):
+    def protocol(self, code) -> str:
         """Return 'https' as the protocol."""
         return 'https'

@@ -106,7 +106,7 @@ if PYTHON_VERSION >= (3, 9):
     removeprefix = str.removeprefix  # type: ignore[attr-defined]
     removesuffix = str.removesuffix  # type: ignore[attr-defined]
 else:
-    def removeprefix(string: str, prefix: str) -> str:
+    def removeprefix(string: str, prefix: str) -> str:  # skipcq: TYP-053
         """Remove prefix from a string or return a copy otherwise.
 
         .. versionadded:: 5.4
@@ -115,7 +115,7 @@ else:
             return string[len(prefix):]
         return string
 
-    def removesuffix(string: str, suffix: str) -> str:
+    def removesuffix(string: str, suffix: str) -> str:  # skipcq: TYP-053
         """Remove prefix from a string or return a copy otherwise.
 
         .. versionadded:: 5.4

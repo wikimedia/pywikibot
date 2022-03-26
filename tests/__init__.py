@@ -103,6 +103,7 @@ library_test_modules = {
     'interwiki_graph',
     'interwiki_link',
     'interwikimap',
+    'l10n',  # pywikibot-i18n repository runs it too
     'link',
     'linter',
     'logentries',
@@ -171,10 +172,10 @@ script_test_modules = {
 
 disabled_test_modules = {
     'tests',  # tests of the tests package
-    'l10n',  # pywikibot-i18n repository runs it
     'site_login_logout',  # separate Login CI action
 }
 
+# remove "# pragma: no cover" below if this set is not empty
 disabled_tests = {}  # type: Dict[str, List[str]]
 
 
@@ -236,7 +237,7 @@ def collector(loader=unittest.loader.defaultTestLoader):
 
     for module in modules:
         module_class_name = 'tests.' + module + '_tests'
-        if module in disabled_tests:
+        if module in disabled_tests:  # pragma: no cover
             discovered = loader.loadTestsFromName(module_class_name)
             enabled_tests = []
             for cls in discovered:
@@ -267,17 +268,16 @@ CachedRequest._get_cache_dir = classmethod(
     lambda cls, *args: cls._make_dir(join_cache_path()))
 
 
-# Travis-CI builds are set to retry twice, which aims to reduce the number
-# of 'red' builds caused by intermittent server problems, while also avoiding
-# the builds taking a long time due to retries.
-# The following allows builds to retry twice, but higher default values are
-# overridden here to restrict retries to only 1, so developer builds fail more
-# frequently in code paths resulting from mishandled server problems.
-if config.max_retries > 2:
+# Appveyor and Github action builds are set to retry twice or thrice, which
+# aims to reduce the number of 'red' builds caused by intermittent server
+# problems, while also avoiding the builds taking a long time due to retries.
+# The following allows builds to retry up to three times, but higher default
+# values are overridden here to restrict retries to only 1, so developer builds
+# fail more frequently in code paths resulting from mishandled server problems.
+if config.max_retries > 3:
     if 'PYWIKIBOT_TEST_QUIET' not in os.environ:
-        unittest_print(
-            'tests: max_retries reduced from {} to 1'
-            .format(config.max_retries))
+        unittest_print('tests: max_retries reduced from {} to 1'
+                       .format(config.max_retries))
     config.max_retries = 1
 
 # Raise CaptchaError if a test requires solving a captcha

@@ -1,6 +1,6 @@
 """Objects representing API interface to Wikibase site."""
 #
-# (C) Pywikibot team, 2012-2021
+# (C) Pywikibot team, 2012-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -12,7 +12,6 @@ from typing import Optional
 from warnings import warn
 
 import pywikibot
-import pywikibot.family
 from pywikibot.data import api
 from pywikibot.exceptions import (
     APIError,
@@ -34,7 +33,7 @@ class DataSite(APISite):
 
     """Wikibase data capable site."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """Initializer."""
         super().__init__(*args, **kwargs)
         self._item_namespace = None
@@ -45,7 +44,7 @@ class DataSite(APISite):
             'mediainfo': pywikibot.MediaInfo,
         }
 
-    def _cache_entity_namespaces(self):
+    def _cache_entity_namespaces(self) -> None:
         """Find namespaces for each known wikibase entity type."""
         self._entity_namespaces = {}
         for entity_type in self._type_to_class:
@@ -171,13 +170,13 @@ class DataSite(APISite):
                                     # an empty string ('&props=') but it should
                                     # result in a missing entry.
                                     props=props if props else False)
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         data = req.submit()
         if 'success' not in data:
             raise APIError(data['errors'], '')
         return data['entities']
 
-    def preload_entities(self, pagelist, groupsize=50):
+    def preload_entities(self, pagelist, groupsize: int = 50):
         """
         Yield subclasses of WikibaseEntity's with content prefilled.
 
@@ -187,7 +186,6 @@ class DataSite(APISite):
         :param pagelist: an iterable that yields either WikibaseEntity objects,
                          or Page objects linked to an ItemPage.
         :param groupsize: how many pages to query at a time
-        :type groupsize: int
         """
         if not hasattr(self, '_entity_namespaces'):
             self._cache_entity_namespaces()
@@ -208,7 +206,7 @@ class DataSite(APISite):
                         req['sites'].append(p.site.dbName())
                         req['titles'].append(p._link._text)
 
-            req = self._simple_request(action='wbgetentities', **req)
+            req = self.simple_request(action='wbgetentities', **req)
             data = req.submit()
             for entity in data['entities']:
                 if 'missing' in data['entities'][entity]:
@@ -245,7 +243,7 @@ class DataSite(APISite):
         return dtype
 
     @need_right('edit')
-    def editEntity(self, entity, data, bot=True, **kwargs):
+    def editEntity(self, entity, data, bot: bool = True, **kwargs):
         """
         Edit entity.
 
@@ -258,7 +256,6 @@ class DataSite(APISite):
         :param data: data updates
         :type data: dict
         :param bot: Whether to mark the edit as a bot edit
-        :type bot: bool
         :return: New entity data
         :rtype: dict
         """
@@ -294,11 +291,11 @@ class DataSite(APISite):
                      UserWarning, 2)
 
         params['data'] = json.dumps(data)
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         return req.submit()
 
     @need_right('edit')
-    def addClaim(self, entity, claim, bot=True, summary=None):
+    def addClaim(self, entity, claim, bot: bool = True, summary=None) -> None:
         """
         Add a claim.
 
@@ -307,7 +304,6 @@ class DataSite(APISite):
         :param claim: Claim to be added
         :type claim: pywikibot.Claim
         :param bot: Whether to mark the edit as a bot edit
-        :type bot: bool
         :param summary: Edit summary
         :type summary: str
         """
@@ -319,7 +315,7 @@ class DataSite(APISite):
                   'token': self.tokens['edit'],
                   'bot': bot,
                   }
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         data = req.submit()
         # Update the item
         if claim.getID() in entity.claims:
@@ -329,17 +325,16 @@ class DataSite(APISite):
         entity.latest_revision_id = data['pageinfo']['lastrevid']
 
     @need_right('edit')
-    def changeClaimTarget(self, claim, snaktype='value',
-                          bot=True, summary=None):
+    def changeClaimTarget(self, claim, snaktype: str = 'value',
+                          bot: bool = True, summary=None):
         """
         Set the claim target to the value of the provided claim target.
 
         :param claim: The source of the claim target value
         :type claim: pywikibot.Claim
-        :param snaktype: An optional snaktype. Default: 'value'
-        :type snaktype: str ('value', 'novalue' or 'somevalue')
+        :param snaktype: An optional snaktype ('value', 'novalue' or
+            'somevalue'). Default: 'value'
         :param bot: Whether to mark the edit as a bot edit
-        :type bot: bool
         :param summary: Edit summary
         :type summary: str
         """
@@ -356,18 +351,17 @@ class DataSite(APISite):
             params['value'] = json.dumps(claim._formatValue())
 
         params['baserevid'] = claim.on_item.latest_revision_id
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         return req.submit()
 
     @need_right('edit')
-    def save_claim(self, claim, summary=None, bot=True):
+    def save_claim(self, claim, summary=None, bot: bool = True):
         """
         Save the whole claim to the wikibase site.
 
         :param claim: The claim to save
         :type claim: pywikibot.Claim
         :param bot: Whether to mark the edit as a bot edit
-        :type bot: bool
         :param summary: Edit summary
         :type summary: str
         """
@@ -384,7 +378,7 @@ class DataSite(APISite):
                   'bot': bot,
                   }
 
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         data = req.submit()
         claim.on_item.latest_revision_id = data['pageinfo']['lastrevid']
         return data
@@ -439,7 +433,7 @@ class DataSite(APISite):
                 params['reference'] = sourceclaim.hash
         params['snaks'] = json.dumps(snak)
 
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         return req.submit()
 
     @need_right('edit')
@@ -478,7 +472,7 @@ class DataSite(APISite):
         params['snaktype'] = qualifier.getSnakType()
         params['property'] = qualifier.getID()
 
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         return req.submit()
 
     @need_right('edit')
@@ -511,7 +505,7 @@ class DataSite(APISite):
             'token': self.tokens['edit'],
         }
 
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         return req.submit()
 
     @need_right('edit')
@@ -540,7 +534,7 @@ class DataSite(APISite):
             'token': self.tokens['edit'],
         }
 
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         return req.submit()
 
     @need_right('edit')
@@ -570,11 +564,11 @@ class DataSite(APISite):
             'token': self.tokens['edit']
         }
 
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         return req.submit()
 
     @need_right('edit')
-    def linkTitles(self, page1, page2, bot=True):
+    def linkTitles(self, page1, page2, bot: bool = True):
         """
         Link two pages together.
 
@@ -583,7 +577,6 @@ class DataSite(APISite):
         :param page2: Second page to link
         :type page2: pywikibot.Page
         :param bot: Whether to mark the edit as a bot edit
-        :type bot: bool
         :return: dict API output
         :rtype: dict
         """
@@ -597,12 +590,12 @@ class DataSite(APISite):
         }
         if bot:
             params['bot'] = 1
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         return req.submit()
 
     @need_right('item-merge')
     def mergeItems(self, from_item, to_item, ignore_conflicts=None,
-                   summary=None, bot=True):
+                   summary=None, bot: bool = True):
         """
         Merge two items together.
 
@@ -617,7 +610,6 @@ class DataSite(APISite):
         :param summary: Edit summary
         :type summary: str
         :param bot: Whether to mark the edit as a bot edit
-        :type bot: bool
         :return: dict API output
         :rtype: dict
         """
@@ -631,11 +623,11 @@ class DataSite(APISite):
         }
         if bot:
             params['bot'] = 1
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         return req.submit()
 
     @need_right('item-redirect')
-    def set_redirect_target(self, from_item, to_item, bot=True):
+    def set_redirect_target(self, from_item, to_item, bot: bool = True):
         """
         Make a redirect to another item.
 
@@ -644,7 +636,6 @@ class DataSite(APISite):
         :param from_item: Title of the item to be redirected.
         :type from_item: pywikibot.ItemPage
         :param bot: Whether to mark the edit as a bot edit
-        :type bot: bool
         """
         params = {
             'action': 'wbcreateredirect',
@@ -653,7 +644,7 @@ class DataSite(APISite):
             'token': self.tokens['edit'],
             'bot': bot,
         }
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         return req.submit()
 
     def search_entities(self, search: str, language: str,
@@ -796,7 +787,7 @@ class DataSite(APISite):
                 warn('Unknown parameter {} for action {}, ignored'
                      .format(arg, action), UserWarning, 2)
 
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         data = req.submit()
         return data
 

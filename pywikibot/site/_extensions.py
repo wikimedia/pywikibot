@@ -1,16 +1,19 @@
 """Objects representing API interface to MediaWiki site extenstions."""
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
+from typing import Optional
+
 import pywikibot
-import pywikibot.family
 from pywikibot.data import api
 from pywikibot.echo import Notification
 from pywikibot.exceptions import (
     APIError,
+    Error,
     InconsistentTitleError,
+    NoPageError,
     SiteDefinitionError,
 )
 from pywikibot.site._decorators import need_extension, need_right
@@ -41,7 +44,7 @@ class EchoMixin:
         for key, value in kwargs.items():
             params['not' + key] = value
 
-        data = self._simple_request(**params).submit()
+        data = self.simple_request(**params).submit()
         notifications = data['query']['notifications']['list']
 
         # Support API before 1.27.0-wmf.22
@@ -62,7 +65,7 @@ class EchoMixin:
         # is supported by the site
         kwargs = merge_unique_dicts(kwargs, action='echomarkread',
                                     token=self.tokens['edit'])
-        req = self._simple_request(**kwargs)
+        req = self.simple_request(**kwargs)
         data = req.submit()
         try:
             return data['query']['echomarkread']['result'] == 'success'
@@ -75,7 +78,7 @@ class ProofreadPageMixin:
     """APISite mixin for ProofreadPage extension."""
 
     @need_extension('ProofreadPage')
-    def _cache_proofreadinfo(self, expiry=False):
+    def _cache_proofreadinfo(self, expiry=False) -> None:
         """Retrieve proofreadinfo from site and cache response.
 
         Applicable only to sites with ProofreadPage extension installed.
@@ -144,7 +147,7 @@ class GeoDataMixin:
     """APISite mixin for GeoData extension."""
 
     @need_extension('GeoData')
-    def loadcoordinfo(self, page):
+    def loadcoordinfo(self, page) -> None:
         """Load [[mw:Extension:GeoData]] info."""
         title = page.title(with_section=False)
         query = self._generator(api.PropertyGenerator,
@@ -162,7 +165,7 @@ class PageImagesMixin:
     """APISite mixin for PageImages extension."""
 
     @need_extension('PageImages')
-    def loadpageimage(self, page):
+    def loadpageimage(self, page) -> None:
         """
         Load [[mw:Extension:PageImages]] info.
 
@@ -316,8 +319,8 @@ class ThanksMixin:
         :return: The API response.
         """
         token = self.tokens['csrf']
-        req = self._simple_request(action='thank', rev=revid, token=token,
-                                   source=source)
+        req = self.simple_request(action='thank', rev=revid, token=token,
+                                  source=source)
         data = req.submit()
         if data['result']['success'] != 1:
             raise APIError('Thanking unsuccessful', '')
@@ -340,8 +343,8 @@ class ThanksFlowMixin:
         """
         post_id = post.uuid
         token = self.tokens['csrf']
-        req = self._simple_request(action='flowthank',
-                                   postid=post_id, token=token)
+        req = self.simple_request(action='flowthank', postid=post_id,
+                                  token=token)
         data = req.submit()
         if data['result']['success'] != 1:
             raise APIError('Thanking unsuccessful', '')
@@ -362,16 +365,24 @@ class FlowMixin:
         :return: A dict representing the board's metadata.
         :rtype: dict
         """
-        req = self._simple_request(action='flow', page=page,
-                                   submodule='view-topiclist',
-                                   vtllimit=1)
+        req = self.simple_request(action='flow', page=page,
+                                  submodule='view-topiclist', vtllimit=1)
         data = req.submit()
         return data['flow']['view-topiclist']['result']['topiclist']
 
     @need_extension('Flow')
-    def load_topiclist(self, page, content_format: str = 'wikitext', limit=100,
-                       sortby='newest', toconly=False, offset=None,
-                       offset_id=None, reverse=False, include_offset=False):
+    def load_topiclist(
+        self,
+        page,
+        content_format: str = 'wikitext',
+        limit: int = 100,
+        sortby: str = 'newest',
+        toconly: bool = False,
+        offset=None,
+        offset_id=None,
+        reverse: bool = False,
+        include_offset: bool = False
+    ):
         """
         Retrieve the topiclist of a Flow board.
 
@@ -380,9 +391,7 @@ class FlowMixin:
         :param content_format: The content format to request the data in.
             must be either 'wikitext', 'html', or 'fixed-html'
         :param limit: The number of topics to fetch in each request.
-        :type limit: int
-        :param sortby: Algorithm to sort topics by.
-        :type sortby: str (either 'newest' or 'updated')
+        :param sortby: Algorithm to sort topics by ('newest' or 'updated').
         :param toconly: Whether to only include information for the TOC.
         :type toconly: bool
         :param offset: The timestamp to start at (when sortby is 'updated').
@@ -422,9 +431,9 @@ class FlowMixin:
         :return: A dict representing the topic's data.
         :rtype: dict
         """
-        req = self._simple_request(action='flow', page=page,
-                                   submodule='view-topic',
-                                   vtformat=content_format)
+        req = self.simple_request(action='flow', page=page,
+                                  submodule='view-topic',
+                                  vtformat=content_format)
         data = req.submit()
         return data['flow']['view-topic']['result']['topic']
 
@@ -442,9 +451,9 @@ class FlowMixin:
         :return: A dict representing the post data for the given UUID.
         :rtype: dict
         """
-        req = self._simple_request(action='flow', page=page,
-                                   submodule='view-post', vppostId=post_id,
-                                   vpformat=content_format)
+        req = self.simple_request(action='flow', page=page,
+                                  submodule='view-post', vppostId=post_id,
+                                  vpformat=content_format)
         data = req.submit()
         return data['flow']['view-post']['result']['topic']
 
@@ -705,6 +714,53 @@ class UrlShortenerMixin:
         :return: The reduced link, without protocol prefix.
         :rtype: str
         """
-        req = self._simple_request(action='shortenurl', url=url)
+        req = self.simple_request(action='shortenurl', url=url)
         data = req.submit()
         return data['shortenurl']['shorturl']
+
+
+class TextExtractsMixin:
+
+    """APISite mixin for TextExtracts extension.
+
+    .. versionadded:: 7.1
+    """
+
+    @need_extension('TextExtracts')
+    def extract(self, page: 'pywikibot.Page', *,
+                chars: Optional[int] = None,
+                sentences: Optional[int] = None,
+                intro: bool = True,
+                plaintext: bool = True) -> str:
+        """Retrieve an extract of a page.
+
+        :param page: The Page object for which the extract is read
+        :param chars: How many characters to return.  Actual text
+            returned might be slightly longer.
+        :param sentences: How many sentences to return
+        :param intro: Return only content before the first section
+        :param plaintext: if True, return extracts as plain text instead
+            of limited HTML
+
+        .. seealso::
+
+           - https://www.mediawiki.org/wiki/Extension:TextExtracts
+
+           - :meth:`pywikibot.page.BasePage.extract`.
+        """
+        if not page.exists():
+            raise NoPageError(page)
+        req = self._simple_request(action='query',
+                                   prop='extracts',
+                                   titles=page.title(with_section=False),
+                                   exchars=chars,
+                                   exsentences=sentences,
+                                   exintro=intro,
+                                   explaintext=plaintext)
+        data = req.submit()['query']['pages']
+        if '-1' in data:
+            msg = data['-1'].get('invalidreason',
+                                 'Unknown exception:\n{}'.format(data['-1']))
+            raise Error(msg)
+
+        return data[str(page.pageid)]['extract']

@@ -1,6 +1,6 @@
 """Module to determine the pywikibot version (tag, revision and date)."""
 #
-# (C) Pywikibot team, 2007-2021
+# (C) Pywikibot team, 2007-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -22,7 +22,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import cache
+from pywikibot.backports import cache, Dict, List, Tuple
 from pywikibot.comms.http import fetch
 from pywikibot.exceptions import VersionParseError
 
@@ -78,7 +78,7 @@ def getversion(online: bool = True) -> str:
 
 
 @cache
-def getversiondict():
+def getversiondict() -> Dict[str, str]:
     """Get version info for the package.
 
     :return:
@@ -86,7 +86,6 @@ def getversiondict():
         - rev (current revision identifier),
         - date (date of current revision),
         - hash (git hash for the current revision)
-    :rtype: ``dict`` of four ``str``
     """
     _program_dir = _get_program_dir()
     exceptions = {}
@@ -169,7 +168,7 @@ def svn_rev_info(path):  # pragma: no cover
         cur.execute("""select
 local_relpath, repos_path, revision, changed_date, checksum from nodes
 order by revision desc, changed_date desc""")
-        name, tag, rev, date, checksum = cur.fetchone()
+        _name, tag, rev, date, _checksum = cur.fetchone()
         cur.execute('select root from repository')
         tag, = cur.fetchone()
 
@@ -266,7 +265,7 @@ def getversion_git(path=None):
                            '--date=iso'],
                           cwd=_program_dir,
                           stdout=subprocess.PIPE)
-    info, stderr = dp.communicate()
+    info, _ = dp.communicate()
     info = info.decode(config.console_encoding).split('|')
     date = info[0][:-6]
     date = time.strptime(date.strip('"'), '%Y-%m-%d %H:%M:%S')
@@ -305,7 +304,7 @@ def getversion_nightly(path=None):  # pragma: no cover
     return (tag, rev, date, hsh)
 
 
-def getversion_package(path=None):
+def getversion_package(path=None) -> Tuple[str, str, str, str]:
     """Get version info for an installed package.
 
     :param path: Unused argument
@@ -314,7 +313,6 @@ def getversion_package(path=None):
         - rev: '-1 (unknown)'
         - date (date the package was installed locally),
         - hash (git hash for the current revision of 'pywikibot/__init__.py')
-    :rtype: ``tuple`` of four ``str``
     """
     hsh = ''
     date = get_module_mtime(pywikibot).timetuple()
@@ -325,7 +323,7 @@ def getversion_package(path=None):
     return (tag, rev, date, hsh)
 
 
-def getversion_onlinerepo(path='branches/master'):
+def getversion_onlinerepo(path: str = 'branches/master'):
     """Retrieve current framework git hash from Gerrit."""
     from pywikibot.comms import http
 
@@ -379,18 +377,19 @@ def get_module_mtime(module):
     return None
 
 
-def package_versions(modules=None, builtins=False, standard_lib=None):
+def package_versions(
+    modules: Optional[List[str]] = None,
+    builtins: Optional[bool] = False,
+    standard_lib: Optional[bool] = None
+):
     """Retrieve package version information.
 
     When builtins or standard_lib are None, they will be included only
     if a version was found in the package.
 
     :param modules: Modules to inspect
-    :type modules: list of strings
     :param builtins: Include builtins
-    :type builtins: Boolean, or None for automatic selection
     :param standard_lib: Include standard library packages
-    :type standard_lib: Boolean, or None for automatic selection
     """
     if not modules:
         modules = sys.modules.keys()

@@ -62,7 +62,7 @@ class SyncSites:
 
     """Work is done in here."""
 
-    def __init__(self, options):
+    def __init__(self, options) -> None:
         """Initializer."""
         self.options = options
 
@@ -96,7 +96,7 @@ class SyncSites:
             pywikibot.output(str(s), newline=False)
         pywikibot.output('')
 
-    def check_sysops(self):
+    def check_sysops(self) -> None:
         """Check if sysops are the same on all wikis."""
         def get_users(site):
             userlist = [ul['name'] for ul in site.allusers(group='sysop')]
@@ -109,7 +109,7 @@ class SyncSites:
             diff.sort()
             self.user_diff[site] = diff
 
-    def check_namespaces(self):
+    def check_namespaces(self) -> None:
         """Check all namespaces, to be ditched for clarity."""
         namespaces = [
             0,    # Main
@@ -131,7 +131,7 @@ class SyncSites:
         for ns in namespaces:
             self.check_namespace(ns)
 
-    def check_namespace(self, namespace):
+    def check_namespace(self, namespace) -> None:
         """Check an entire namespace."""
         pywikibot.output('\nCHECKING NAMESPACE {}'.format(namespace))
         pages = (p.title() for p in self.original.allpages(
@@ -149,7 +149,7 @@ class SyncSites:
                         'error: Redirectpage - todo: handle gracefully')
         pywikibot.output('')
 
-    def generate_overviews(self):
+    def generate_overviews(self) -> None:
         """Create page on wikis with overview of bot results."""
         for site in self.sites:
             sync_overview_page = Page(site,
@@ -175,12 +175,12 @@ class SyncSites:
             sync_overview_page.text = output
             sync_overview_page.save(self.put_message(site))
 
-    def put_message(self, site):
+    def put_message(self, site) -> str:
         """Return synchronization message."""
         return ('{} replicate_wiki.py synchronization from {}'
                 .format(site.user(), str(self.original)))
 
-    def check_page(self, pagename):
+    def check_page(self, pagename) -> None:
         """Check one page."""
         pywikibot.output('\nChecking ' + pagename)
         page1 = Page(self.original, pagename)

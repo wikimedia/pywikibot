@@ -120,7 +120,7 @@ class Photo(pywikibot.FilePage):
     """Represents a Photo (or other file), with metadata, to be uploaded."""
 
     def __init__(self, url: str, metadata: Dict[str, Any],
-                 site: Optional[pywikibot.site.APISite] = None):
+                 site: Optional[pywikibot.site.APISite] = None) -> None:
         """
         Initializer.
 
@@ -216,7 +216,7 @@ class DataIngestionBot(pywikibot.Bot):
 
     """Data ingestion bot."""
 
-    def __init__(self, titlefmt: str, pagefmt: str, **kwargs):
+    def __init__(self, titlefmt: str, pagefmt: str, **kwargs) -> None:
         """
         Initializer.
 
@@ -227,7 +227,7 @@ class DataIngestionBot(pywikibot.Bot):
         self.titlefmt = titlefmt
         self.pagefmt = pagefmt
 
-    def treat(self, page):
+    def treat(self, page) -> None:
         """Process each page.
 
         1. Check for existing duplicates on the wiki specified in self.site.
@@ -260,29 +260,30 @@ class DataIngestionBot(pywikibot.Bot):
         :param configuration_page: page with configuration
         :type configuration_page: :py:obj:`pywikibot.Page`
         """
-        configuration = {}
         # Set a bunch of defaults
-        configuration['csvDialect'] = 'excel'
-        configuration['csvDelimiter'] = ';'
-        configuration['csvEncoding'] = 'Windows-1252'  # FIXME: Encoding hell
+        configuration = {
+            'csvDialect': 'excel',
+            'csvDelimiter': ';',
+            'csvEncoding': 'Windows-1252',  # FIXME: Encoding hell
+        }
 
         templates = configuration_page.templatesWithParams()
         for (template, params) in templates:
-            if template.title(with_ns=False) == 'Data ingestion':
-                for param in params:
-                    (field, sep, value) = param.partition('=')
+            if template.title(with_ns=False) != 'Data ingestion':
+                continue
 
-                    # Remove leading or trailing spaces
-                    field = field.strip()
-                    value = value.strip()
-                    if not value:
-                        value = None
-                    configuration[field] = value
+            for param in params:
+                field, _, value = param.partition('=')
+
+                # Remove leading or trailing spaces
+                field = field.strip()
+                value = value.strip() or None
+                configuration[field] = value
 
         return configuration
 
 
-def main(*args: str):
+def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
 

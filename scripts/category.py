@@ -136,7 +136,7 @@ from typing import Optional, Union
 
 import pywikibot
 from pywikibot import config, i18n, pagegenerators, textlib
-from pywikibot.backports import Sequence, Set
+from pywikibot.backports import Sequence, Set  # skipcq: PY-W2000
 from pywikibot.bot import (
     BaseBot,
     Bot,
@@ -187,8 +187,13 @@ class CategoryPreprocess(BaseBot):
 
     """A class to prepare a list of pages for robots."""
 
-    def __init__(self, follow_redirects=False, edit_redirects=False,
-                 create=False, **kwargs):
+    def __init__(
+        self,
+        follow_redirects: bool = False,
+        edit_redirects: bool = False,
+        create: bool = False,
+        **kwargs
+    ) -> None:
         """Initializer."""
         super().__init__(**kwargs)
         self.follow_redirects = follow_redirects
@@ -267,7 +272,7 @@ class CategoryPreprocess(BaseBot):
 
         tmpl = []  # type: Sequence
         with suppress(KeyError):
-            tmpl, loc = moved_links[page.site.code]
+            tmpl, _loc = moved_links[page.site.code]
 
         if not isinstance(tmpl, list):
             tmpl = [tmpl]
@@ -303,7 +308,11 @@ class CategoryDatabase:
     This prevents loading the category pages over and over again.
     """
 
-    def __init__(self, rebuild=False, filename='category.dump.bz2') -> None:
+    def __init__(
+        self,
+        rebuild: bool = False,
+        filename: str = 'category.dump.bz2'
+    ) -> None:
         """Initializer."""
         if not os.path.isabs(filename):
             filename = config.datafilepath(filename)
@@ -603,10 +612,10 @@ class CategoryMoveRobot(CategoryPreprocess):
         self.oldtalk = self.oldcat.toggleTalkPage()
 
         if newcat:
-            self.newcat = self._makecat(newcat)
+            self.newcat = self._makecat(newcat)  # type: Optional[pywikibot.Category]  # noqa: E501
             self.newtalk = self.newcat.toggleTalkPage()
         else:
-            self.newcat = None  # type: ignore
+            self.newcat = None
             self.newtalk = None
 
         # Set boolean settings.
@@ -829,7 +838,7 @@ class CategoryMoveRobot(CategoryPreprocess):
         self.newcat.text = self.oldcat.text
         self._strip_cfd_templates(summary)
 
-    def _strip_cfd_templates(self, summary=None, commit=True) -> None:
+    def _strip_cfd_templates(self, summary=None, commit: bool = True) -> None:
         """Private function to strip out CFD templates from the new category.
 
         The new category is saved.
@@ -1260,7 +1269,13 @@ class CategoryTreeRobot:
                      the tree to stdout.
     """
 
-    def __init__(self, cat_title, cat_db, filename=None, max_depth=10) -> None:
+    def __init__(
+        self,
+        cat_title,
+        cat_db,
+        filename=None,
+        max_depth: int = 10
+    ) -> None:
         """Initializer."""
         self.cat_title = cat_title or \
             pywikibot.input(
@@ -1277,7 +1292,7 @@ class CategoryTreeRobot:
         self.max_depth = max_depth
         self.site = pywikibot.Site()
 
-    def treeview(self, cat, current_depth=0, parent=None) -> str:
+    def treeview(self, cat, current_depth: int = 0, parent=None) -> str:
         """Return a tree view of all subcategories of cat.
 
         The multi-line string contains a tree view of all subcategories of cat,

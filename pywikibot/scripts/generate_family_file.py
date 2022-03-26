@@ -27,7 +27,7 @@ base directory.
    folder of your base directory instead of pywikibot/families.
 """
 #
-# (C) Pywikibot team, 2010-2021
+# (C) Pywikibot team, 2010-2022
 #
 # Distributed under the terms of the MIT license
 #
@@ -55,7 +55,7 @@ class FamilyFileGenerator:
                  url: Optional[str] = None,
                  name: Optional[str] = None,
                  dointerwiki: Optional[str] = None,
-                 verify: Optional[str] = None):
+                 verify: Optional[str] = None) -> None:
         """
         Parameters are optional. If not given the script asks for the values.
 
@@ -88,7 +88,7 @@ class FamilyFileGenerator:
         self.wikis = {}  # {'https://wiki/$1': Wiki('https://wiki/$1'), ...}
         self.langs = []  # [Wiki('https://wiki/$1'), ...]
 
-    def get_params(self):
+    def get_params(self) -> bool:  # pragma: no cover
         """Ask for parameters if necessary."""
         if self.base_url is None:
             self.base_url = input('Please insert URL to wiki: ')
@@ -115,7 +115,7 @@ class FamilyFileGenerator:
         for verify in (True, False):
             try:
                 w = self.Wiki(self.base_url, verify=verify)
-            except FatalServerError:
+            except FatalServerError:  # pragma: no cover
                 print('ERROR: '
                       + pywikibot.comms.http.SSL_CERT_VERIFY_FAILED_MSG)
                 pywikibot.exception()
@@ -128,7 +128,7 @@ class FamilyFileGenerator:
                 return w, verify
         return None, None
 
-    def run(self):
+    def run(self) -> None:
         """Main method, generate family file."""
         if not self.get_params():
             return
@@ -147,13 +147,13 @@ class FamilyFileGenerator:
         self.getapis()
         self.writefile(verify)
 
-    def getlangs(self, w):
+    def getlangs(self, w) -> None:
         """Determine site code of a family."""
         print('Determining other sites...', end='')
         try:
             self.langs = w.langs
             print(' '.join(sorted(wiki['prefix'] for wiki in self.langs)))
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             self.langs = []
             print(e, '; continuing...')
 
@@ -193,7 +193,7 @@ class FamilyFileGenerator:
                 'letters and digits [a-z0-9] or underscore/dash [_-]' \
                 .format(self.name, wiki['prefix'])
 
-    def getapis(self):
+    def getapis(self) -> None:
         """Load other site pages."""
         print('Loading wikis... ')
         for lang in self.langs:
@@ -203,12 +203,12 @@ class FamilyFileGenerator:
                 try:
                     self.wikis[key] = self.Wiki(lang['url'])
                     print('downloaded')
-                except Exception as e:
+                except Exception as e:  # pragma: no cover
                     print(e)
             else:
                 print('in cache')
 
-    def writefile(self, verify):
+    def writefile(self, verify) -> None:
         """Write the family file."""
         fn = os.path.join(self.base_dir, 'families',
                           '{}_family.py'.format(self.name))
@@ -285,7 +285,7 @@ class Family(family.Family):  # noqa: D101
 """
 
 
-def main():
+def main() -> None:
     """Process command line arguments and generate a family file."""
     if len(sys.argv) > 1 and sys.argv[1] == '-help':
         print(__doc__)

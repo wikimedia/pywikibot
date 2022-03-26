@@ -22,13 +22,14 @@ from contextlib import suppress
 from functools import total_ordering, wraps
 from importlib import import_module
 from itertools import chain, zip_longest
-from typing import Any, Optional
+from types import TracebackType
+from typing import Any, Optional, Type
 from warnings import catch_warnings, showwarning, warn
 
 import pkg_resources
 
 from pywikibot.logging import debug
-from pywikibot.tools._deprecate import (  # noqa: F401
+from pywikibot.tools._deprecate import (  # noqa: F401 skipcq: PY-W2000
     ModuleDeprecationWrapper,
     add_decorated_full_name,
     add_full_name,
@@ -82,7 +83,7 @@ def is_ip_address(value: str) -> bool:
     return False
 
 
-def has_module(module, version=None):
+def has_module(module, version=None) -> bool:
     """Check if a module can be imported.
 
     .. versionadded:: 3.0
@@ -130,7 +131,7 @@ class classproperty:  # noqa: N801
     .. versionadded:: 3.0
     """
 
-    def __init__(self, cls_method):
+    def __init__(self, cls_method) -> None:
         """Hold the class method."""
         self.method = cls_method
         self.__doc__ = self.method.__doc__
@@ -150,7 +151,12 @@ class suppress_warnings(catch_warnings):  # noqa: N801
     .. versionadded:: 3.0
     """
 
-    def __init__(self, message='', category=Warning, filename=''):
+    def __init__(
+        self,
+        message: str = '',
+        category=Warning,
+        filename: str = ''
+    ) -> None:
         """Initialize the object.
 
         The parameter semantics are similar to those of
@@ -158,25 +164,28 @@ class suppress_warnings(catch_warnings):  # noqa: N801
 
         :param message: A string containing a regular expression that the start
             of the warning message must match. (case-insensitive)
-        :type message: str
         :param category: A class (a subclass of Warning) of which the warning
             category must be a subclass in order to match.
         :type category: type
         :param filename: A string containing a regular expression that the
             start of the path to the warning module must match.
             (case-sensitive)
-        :type filename: str
         """
         self.message_match = re.compile(message, re.I).match
         self.category = category
         self.filename_match = re.compile(filename).match
         super().__init__(record=True)
 
-    def __enter__(self):
+    def __enter__(self) -> None:
         """Catch all warnings and store them in `self.log`."""
         self.log = super().__enter__()
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType]
+    ) -> None:
         """Stop logging warnings and show those that do not match to params."""
         super().__exit__(exc_type, exc_val, exc_tb)
         for warning in self.log:
@@ -269,7 +278,7 @@ class SizedKeyCollection(Container, Iterable, Sized):
     .. versionadded:: 6.1
     """
 
-    def __init__(self, keyattr: str):
+    def __init__(self, keyattr: str) -> None:
         """Initializer.
 
         :param keyattr: an attribute or method of the values to be hold
@@ -301,7 +310,7 @@ class SizedKeyCollection(Container, Iterable, Sized):
     def __repr__(self) -> str:
         return str(self.data).replace('defaultdict', self.__class__.__name__)
 
-    def append(self, value):
+    def append(self, value) -> None:
         """Add a value to the collection."""
         key = getattr(value, self.keyattr)
         if callable(key):
@@ -311,7 +320,7 @@ class SizedKeyCollection(Container, Iterable, Sized):
         self.data[key].append(value)
         self.size += 1
 
-    def remove(self, value):
+    def remove(self, value) -> None:
         """Remove a value from the container."""
         key = getattr(value, self.keyattr)
         if callable(key):
@@ -320,13 +329,13 @@ class SizedKeyCollection(Container, Iterable, Sized):
             self.data[key].remove(value)
             self.size -= 1
 
-    def remove_key(self, key):
+    def remove_key(self, key) -> None:
         """Remove all values for a given key."""
         with suppress(KeyError):
             self.size -= len(self.data[key])
             del self.data[key]
 
-    def clear(self):
+    def clear(self) -> None:
         """Remove all elements from SizedKeyCollection."""
         self.data = {}  # defaultdict fails (T282865)
         self.size = 0
@@ -367,6 +376,26 @@ def first_upper(string: str) -> str:
     """
     first = string[:1]
     return (_first_upper_exception(first) or first.upper()) + string[1:]
+
+
+def strtobool(val: str) -> bool:
+    """Convert a string representation of truth to True or False.
+
+    This is a reimplementation of distutils.util.strtobool due to
+    :pep:`632#Migration Advice`
+
+    .. versionadded:: 7.1
+
+    :param val: True values are 'y', 'yes', 't', 'true', 'on', and '1';
+        false values are 'n', 'no', 'f', 'false', 'off', and '0'.
+    :raises ValueError: `val` is not a valid truth value
+    """
+    val = val.lower()
+    if val in ('y', 'yes', 't', 'true', 'on', '1'):
+        return True
+    if val in ('n', 'no', 'f', 'false', 'off', '0'):
+        return False
+    raise ValueError('invalid truth value {!r}'.format(val))
 
 
 def normalize_username(username) -> Optional[str]:
@@ -545,7 +574,7 @@ class RLock:
     .. versionadded:: 6.2
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """Initializer."""
         self._lock = threading.RLock(*args, **kwargs)
         self._block = threading.Lock()
@@ -562,7 +591,7 @@ class RLock:
         """Delegate attributes and methods to self._lock."""
         return getattr(self._lock, name)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Representation of tools.RLock instance."""
         return repr(self._lock).replace(
             '_thread.RLock',
@@ -608,8 +637,8 @@ class ThreadedGenerator(threading.Thread):
     ..versionadded:: 3.0
     """
 
-    def __init__(self, group=None, target=None, name='GeneratorThread',
-                 args=(), kwargs=None, qsize=65536):
+    def __init__(self, group=None, target=None, name: str = 'GeneratorThread',
+                 args=(), kwargs=None, qsize: int = 65536) -> None:
         """Initializer. Takes same keyword arguments as threading.Thread.
 
         target must be a generator function (or other callable that returns
@@ -618,7 +647,6 @@ class ThreadedGenerator(threading.Thread):
         :param qsize: The size of the lookahead queue. The larger the qsize,
             the more values will be computed in advance of use (which can eat
             up memory and processor time).
-        :type qsize: int
         """
         if kwargs is None:
             kwargs = {}
@@ -644,11 +672,11 @@ class ThreadedGenerator(threading.Thread):
             except KeyboardInterrupt:
                 self.stop()
 
-    def stop(self):
+    def stop(self) -> None:
         """Stop the background thread."""
         self.finished.set()
 
-    def run(self):
+    def run(self) -> None:
         """Run the generator and store the results on the queue."""
         iterable = any(hasattr(self.generator, key)
                        for key in ('__iter__', '__getitem__'))
@@ -699,7 +727,7 @@ def itergroup(iterable, size: int):
         yield group
 
 
-def islice_with_ellipsis(iterable, *args, marker='…'):
+def islice_with_ellipsis(iterable, *args, marker: str = '…'):
     """
     Generator which yields the first n elements of the iterable.
 
@@ -716,7 +744,6 @@ def islice_with_ellipsis(iterable, *args, marker='…'):
         - ``itertools.islice(iterable, start, stop[, step])``
     :param marker: element to yield if iterable still contains elements
         after showing the required number. Default value: '…'
-    :type marker: str
     """
     s = slice(*args)
     _iterable = iter(iterable)
@@ -748,13 +775,11 @@ class ThreadList(list):
 
     _logger = 'threadlist'
 
-    def __init__(self, limit=128, wait_time=2, *args):
+    def __init__(self, limit: int = 128, wait_time: float = 2, *args) -> None:
         """Initializer.
 
         :param limit: the number of simultaneous threads
-        :type limit: int
         :param wait_time: how long to wait if active threads exceeds limit
-        :type wait_time: int or float
         """
         self.limit = limit
         self.wait_time = wait_time
@@ -788,7 +813,7 @@ class ThreadList(list):
         debug("thread {} ('{}') started".format(len(self), type(thd)),
               self._logger)
 
-    def stop_all(self):
+    def stop_all(self) -> None:
         """Stop all threads the pool."""
         if self:
             debug('EARLY QUIT: Threads: {}'.format(len(self)), self._logger)
@@ -981,12 +1006,12 @@ def filter_unique(iterable, container=None, key=None, add=None):
 
     if not add:
         if hasattr(container, 'add'):
-            def container_add(x):
+            def container_add(x) -> None:
                 container.add(key(x) if key else x)
 
             add = container_add
         else:
-            def container_setitem(x):
+            def container_setitem(x) -> None:
                 container.__setitem__(key(x) if key else x,
                                       True)
 
@@ -1026,7 +1051,7 @@ class EmptyDefault(str, Mapping):
        ``empty_iterator()`` was removed in favour of ``iter()``.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialise the default as an empty string."""
         str.__init__(self)
 
@@ -1095,7 +1120,7 @@ class DequeGenerator(Iterator, collections.deque):
             return self.popleft()
         raise StopIteration
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Provide an object representation without clearing the content."""
         items = list(self)
         result = '{}({})'.format(self.__class__.__name__, items)
@@ -1103,7 +1128,7 @@ class DequeGenerator(Iterator, collections.deque):
         return result
 
 
-def open_archive(filename, mode='rb', use_extension=True):
+def open_archive(filename: str, mode: str = 'rb', use_extension: bool = True):
     """
     Open a file and uncompress it if needed.
 
@@ -1118,15 +1143,12 @@ def open_archive(filename, mode='rb', use_extension=True):
     .. versionadded:: 3.0
 
     :param filename: The filename.
-    :type filename: str
     :param use_extension: Use the file extension instead of the magic number
         to determine the type of compression (default True). Must be True when
         writing or appending.
-    :type use_extension: bool
     :param mode: The mode in which the file should be opened. It may either be
         'r', 'rb', 'a', 'ab', 'w' or 'wb'. All modes open the file in binary
         mode. It defaults to 'rb'.
-    :type mode: str
     :raises ValueError: When 7za is not available or the opening mode is
         unknown or it tries to write a 7z archive.
     :raises FileNotFoundError: When the filename doesn't exist and it tries
@@ -1234,18 +1256,20 @@ def merge_unique_dicts(*args, **kwargs):
     return result
 
 
-def file_mode_checker(filename: str, mode=0o600, quiet=False, create=False):
+def file_mode_checker(
+    filename: str,
+    mode: int = 0o600,
+    quiet: bool = False,
+    create: bool = False
+):
     """Check file mode and update it, if needed.
 
     .. versionadded: 3.0
 
     :param filename: filename path
     :param mode: requested file mode
-    :type mode: int
     :param quiet: warn about file mode change if False.
-    :type quiet: bool
     :param create: create the file if it does not exist already
-    :type create: bool
     :raise IOError: The file does not exist and `create` is False.
     """
     try:
@@ -1264,7 +1288,7 @@ def file_mode_checker(filename: str, mode=0o600, quiet=False, create=False):
             warn(warn_str.format(filename, st_mode - stat.S_IFREG, mode))
 
 
-def compute_file_hash(filename: str, sha='sha1', bytes_to_read=None):
+def compute_file_hash(filename: str, sha: str = 'sha1', bytes_to_read=None):
     """Compute file hash.
 
     Result is expressed as hexdigest().
@@ -1275,7 +1299,6 @@ def compute_file_hash(filename: str, sha='sha1', bytes_to_read=None):
     :param sha: hashing function among the following in hashlib:
         md5(), sha1(), sha224(), sha256(), sha384(), and sha512()
         function name shall be passed as string, e.g. 'sha1'.
-    :type sha: str
     :param bytes_to_read: only the first bytes_to_read will be considered;
         if file size is smaller, the whole file will be considered.
     :type bytes_to_read: None or int

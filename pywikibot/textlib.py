@@ -19,7 +19,7 @@ from html.parser import HTMLParser
 from typing import NamedTuple, Optional, Union
 
 import pywikibot
-from pywikibot.backports import Container, Iterable, List
+from pywikibot.backports import Container, Dict, Iterable, List
 from pywikibot.backports import OrderedDict as OrderedDictType
 from pywikibot.backports import Sequence as SequenceType
 from pywikibot.backports import Tuple
@@ -187,7 +187,7 @@ class MultiTemplateMatchBuilder:
 
     """Build template matcher."""
 
-    def __init__(self, site):
+    def __init__(self, site) -> None:
         """Initializer."""
         self.site = site
 
@@ -195,7 +195,7 @@ class MultiTemplateMatchBuilder:
         """Return a compiled regex to match template."""
         # TODO: add ability to also match contents within the template
         # TODO: add option for template to be None to match any template
-        # TODO: use NESTED_TEMPLATE_REGEX with <parameters> instead of <params>
+        # TODO: merge regex with NESTED_TEMPLATE_REGEX
         namespace = self.site.namespaces[10]
         if isinstance(template, pywikibot.Page):
             if template.namespace() == 10:
@@ -214,10 +214,13 @@ class MultiTemplateMatchBuilder:
         namespaces = [_ignore_case(ns) for ns in namespace]
         namespaces.append(_ignore_case('msg'))
         pattern = re.sub(r'_|\\ ', r'[_ ]', pattern)
-        templateRegex = re.compile(
-            r'\{\{ *(%(namespace)s:)?%(pattern)s(?P<parameters>\s*\|.+?|) *}}'
-            % {'namespace': ':|'.join(namespaces), 'pattern': pattern},
-            flags)
+        templateRegexP = (
+            r'{{\s*(%(namespace)s:)?%(pattern)s'
+            r'(?P<parameters>\s*\|[^{]+?'
+            r'((({{{[^{}]+?}}}|{{[^{}]+?}}|{[^{}]*?})[^{]*?)*?)?'
+            r'|)\s*}}'
+        ) % {'namespace': ':|'.join(namespaces), 'pattern': pattern}
+        templateRegex = re.compile(templateRegexP, flags)
         return templateRegex
 
     def search_any_predicate(self, templates):
@@ -247,7 +250,7 @@ def _tag_regex(tag_name: str):
     return re.compile(_tag_pattern(tag_name))
 
 
-def _create_default_regexes():
+def _create_default_regexes() -> None:
     """Fill (and possibly overwrite) _regex_cache with default regexes."""
     _regex_cache.update({
         # categories
@@ -539,22 +542,22 @@ class _GetDataHTML(HTMLParser):
     textdata = ''
     keeptags = []
 
-    def __enter__(self):
+    def __enter__(self) -> None:
         pass
 
-    def __exit__(self, *exc_info):
+    def __exit__(self, *exc_info) -> None:
         self.close()
 
-    def handle_data(self, data):
+    def handle_data(self, data) -> None:
         """Add data to text."""
         self.textdata += data
 
-    def handle_starttag(self, tag, attrs):
+    def handle_starttag(self, tag, attrs) -> None:
         """Add start tag to text if tag should be kept."""
         if tag in self.keeptags:
             self.textdata += '<{}>'.format(tag)
 
-    def handle_endtag(self, tag):
+    def handle_endtag(self, tag) -> None:
         """Add end tag to text if tag should be kept."""
         if tag in self.keeptags:
             self.textdata += '</{}>'.format(tag)
@@ -1006,7 +1009,11 @@ def extract_sections(
 #        do not find or change links of other kinds, nor any that are formatted
 #        as in-line interwiki links (e.g., "[[:es:Artículo]]".
 
-def getLanguageLinks(text: str, insite=None, template_subpage=False) -> dict:
+def getLanguageLinks(
+    text: str,
+    insite=None,
+    template_subpage: bool = False
+) -> Dict:
     """
     Return a dict of inter-language links found in text.
 
@@ -1601,7 +1608,7 @@ def categoryFormat(categories, insite=None) -> str:
 # Functions dealing with external links
 # -------------------------------------
 
-def compileLinkR(withoutBracketed=False, onlyBracketed: bool = False):
+def compileLinkR(withoutBracketed: bool = False, onlyBracketed: bool = False):
     """Return a regex that matches external links."""
     # RFC 2396 says that URLs may only contain certain characters.
     # For this regex we also accept non-allowed characters, so that the bot
@@ -1825,7 +1832,7 @@ class tzoneFixedOffset(datetime.tzinfo):
     :param name: a string with name of the timezone
     """
 
-    def __init__(self, offset: int, name: str):
+    def __init__(self, offset: int, name: str) -> None:
         """Initializer."""
         self.__offset = datetime.timedelta(minutes=offset)
         self.__name = name
@@ -1842,7 +1849,7 @@ class tzoneFixedOffset(datetime.tzinfo):
         """Return no daylight savings time."""
         return datetime.timedelta(0)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return the internal representation of the timezone."""
         return '{}({}, {})'.format(
             self.__class__.__name__,
@@ -1855,7 +1862,7 @@ class TimeStripper:
 
     """Find timestamp in page and return it as pywikibot.Timestamp object."""
 
-    def __init__(self, site=None):
+    def __init__(self, site=None) -> None:
         """Initializer."""
         self.site = pywikibot.Site() if site is None else site
 
@@ -1924,7 +1931,7 @@ class TimeStripper:
     def fix_digits(line):
         """Make non-latin digits like Persian to latin to parse.
 
-        .. deprecated:: 7.0.0
+        .. deprecated:: 7.0
            Use :func:`to_latin_digits` instead.
         """
         return to_latin_digits(line)
@@ -1967,7 +1974,7 @@ class TimeStripper:
         return (txt, None)
 
     @staticmethod
-    def _valid_date_dict_positions(dateDict):
+    def _valid_date_dict_positions(dateDict) -> bool:
         """Check consistency of reasonable positions for groups."""
         time_pos = dateDict['time']['start']
         tzinfo_pos = dateDict['tzinfo']['start']

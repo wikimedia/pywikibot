@@ -16,21 +16,21 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     name = 'wikisource'
 
     closed_wikis = [
-        # https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist  # noqa
+        # https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist
         'ang', 'ht',
     ]
     removed_wikis = [
-        # https://noc.wikimedia.org/conf/highlight.php?file=dblists/deleted.dblist  # noqa
+        # https://noc.wikimedia.org/conf/highlight.php?file=dblists/deleted.dblist
         'tokipona',
     ]
 
     languages_by_size = [
         'pl', 'en', 'ru', 'de', 'fr', 'zh', 'he', 'it', 'es', 'uk', 'ar', 'cs',
-        'mul', 'gu', 'pt', 'sr', 'sv', 'fa', 'hu', 'ko', 'ml', 'bn', 'sa',
+        'mul', 'gu', 'sr', 'pt', 'sv', 'fa', 'hu', 'ko', 'ml', 'bn', 'sa',
         'ta', 'te', 'sl', 'tr', 'hy', 'el', 'la', 'vi', 'ja', 'ro', 'fi',
         'nap', 'nl', 'az', 'ca', 'br', 'kn', 'hr', 'no', 'th', 'be', 'hi',
         'eo', 'is', 'vec', 'id', 'pms', 'ban', 'da', 'lij', 'et', 'mk', 'yi',
-        'as', 'mr', 'cy', 'bg', 'li', 'lt', 'wa', 'pa', 'or', 'jv', 'eu', 'gl',
+        'as', 'cy', 'mr', 'bg', 'li', 'lt', 'wa', 'pa', 'or', 'jv', 'eu', 'gl',
         'bs', 'sah', 'sk', 'zh-min-nan', 'fo',
     ]
 

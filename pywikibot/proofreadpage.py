@@ -22,7 +22,7 @@ OCR support of page scans via:
 
 """
 #
-# (C) Pywikibot team, 2015-2021
+# (C) Pywikibot team, 2015-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -77,7 +77,7 @@ PagesFromLabelType = Dict[str, Set['pywikibot.page.Page']]
 _IndexType = Tuple[Optional['IndexPage'], List['IndexPage']]
 
 
-def decompose(fn: Callable) -> Callable:  # type: ignore # noqa: N805
+def decompose(fn: Callable) -> Callable:  # type: ignore
     """Decorator for ProofreadPage.
 
     Decompose text if needed and recompose text.
@@ -92,7 +92,7 @@ def decompose(fn: Callable) -> Callable:  # type: ignore # noqa: N805
     return wrapper
 
 
-def check_if_cached(fn: Callable) -> Callable:  # type: ignore # noqa: N805
+def check_if_cached(fn: Callable) -> Callable:  # type: ignore
     """Decorator for IndexPage to ensure data is cached."""
     def wrapper(self: 'IndexPage', *args: Any, **kwargs: Any) -> Any:
         if self._cached is False:
@@ -209,10 +209,10 @@ class ProofreadPage(pywikibot.Page):
             raise ValueError('Page {} must belong to {} namespace'
                              .format(self.title(), site.proofread_page_ns))
         # Ensure that constants are in line with Extension values.
-        if list(self.site.proofread_levels.keys()) != self.PROOFREAD_LEVELS:
+        level_list = list(self.site.proofread_levels)
+        if level_list != self.PROOFREAD_LEVELS:
             raise ValueError('QLs do not match site values: {} != {}'
-                             .format(self.site.proofread_levels.keys(),
-                                     self.PROOFREAD_LEVELS))
+                             .format(level_list, self.PROOFREAD_LEVELS))
 
         self._base, self._base_ext, self._num = self._parse_title()
         self._multi_page = self._base_ext in self._MULTI_PAGE_EXT
@@ -350,7 +350,7 @@ class ProofreadPage(pywikibot.Page):
     def ql(self, value: int) -> None:
         if value not in self.site.proofread_levels:
             raise ValueError('Not valid QL value: {} (legal values: {})'
-                             .format(value, self.site.proofread_levels))
+                             .format(value, list(self.site.proofread_levels)))
         # TODO: add logic to validate ql value change, considering
         # site.proofread_levels.
         self._full_header.ql = value
@@ -375,7 +375,7 @@ class ProofreadPage(pywikibot.Page):
         except KeyError:
             pywikibot.warning('Not valid status set for {}: quality level = {}'
                               .format(self.title(as_link=True), self.ql))
-            return None
+        return None
 
     def without_text(self) -> None:
         """Set Page QL to "Without text"."""
@@ -680,7 +680,7 @@ class ProofreadPage(pywikibot.Page):
             soup = _bs4_soup(txt)  # type: ignore
 
             res = []
-            for ocr_page in soup.find_all(class_='ocr_page'):
+            for _ocr_page in soup.find_all(class_='ocr_page'):
                 for area in soup.find_all(class_='ocr_carea'):
                     for par in area.find_all(class_='ocr_par'):
                         for line in par.find_all(class_='ocr_line'):
@@ -906,11 +906,7 @@ class IndexPage(pywikibot.Page):
         self._pages_from_label = {}  # type: PagesFromLabelType
         self._labels_from_page_number = {}  # type: Dict[int, str]
         self._labels_from_page = {}  # type: Dict[pywikibot.page.Page, str]
-        if hasattr(self, '_parsed_text'):
-            del self._parsed_text
-
-        self._parsed_text = self._get_parsed_page()
-        self._soup = _bs4_soup(self._parsed_text)  # type: ignore
+        self._soup = _bs4_soup(self.get_parsed_page(True))  # type: ignore
         # Do not search for "new" here, to avoid to skip purging if links
         # to non-existing pages are present.
         attrs = {'class': re.compile('prp-pagequality')}
@@ -932,9 +928,7 @@ class IndexPage(pywikibot.Page):
         attrs = {'class': re.compile('prp-pagequality|new')}
         if not found:
             self.purge()
-            del self._parsed_text
-            self._parsed_text = self._get_parsed_page()
-            self._soup = _bs4_soup(self._parsed_text)  # type: ignore
+            self._soup = _bs4_soup(self.get_parsed_page(True))  # type: ignore
             if not self._soup.find_all('a', attrs=attrs):
                 raise ValueError(
                     'Missing class="qualityN prp-pagequality-N" or '
@@ -1030,7 +1024,7 @@ class IndexPage(pywikibot.Page):
 
         # All but 'Without Text'
         if filter_ql is None:
-            filter_ql = list(self.site.proofread_levels.keys())
+            filter_ql = list(self.site.proofread_levels)
             filter_ql.remove(ProofreadPage.WITHOUT_TEXT)
 
         gen = (self.get_page(i) for i in range(start, end + 1))

@@ -13,8 +13,7 @@ from typing import Any, Optional, Union
 from warnings import warn
 
 import pywikibot
-import pywikibot.family
-from pywikibot.backports import Dict, Generator, Iterable, List
+from pywikibot.backports import Dict, Generator, Iterable, List  # skipcq
 from pywikibot.data import api
 from pywikibot.exceptions import (
     APIError,
@@ -94,8 +93,15 @@ class GeneratorsMixin:
                 priority, page = heapq.heappop(prio_queue)
                 yield page
 
-    def preloadpages(self, pagelist, *, groupsize=50, templates=False,
-                     langlinks=False, pageprops=False):
+    def preloadpages(
+        self,
+        pagelist,
+        *,
+        groupsize: int = 50,
+        templates: bool = False,
+        langlinks: bool = False,
+        pageprops: bool = False
+    ):
         """Return a generator to a list of preloaded pages.
 
         Pages are iterated in the same order than in the underlying pagelist.
@@ -103,16 +109,11 @@ class GeneratorsMixin:
 
         :param pagelist: an iterable that returns Page objects
         :param groupsize: how many Pages to query at a time
-        :type groupsize: int
         :param templates: preload pages (typically templates) transcluded in
             the provided pages
-        :type templates: bool
         :param langlinks: preload all language links from the provided pages
             to other languages
-        :type langlinks: bool
         :param pageprops: preload various properties defined in page content
-        :type pageprops: bool
-
         """
         props = 'revisions|info|categoryinfo'
         if templates:
@@ -194,9 +195,9 @@ class GeneratorsMixin:
                 priority, page = heapq.heappop(prio_queue)
                 yield page
 
-    def pagebacklinks(self, page, *, follow_redirects=False,
+    def pagebacklinks(self, page, *, follow_redirects: bool = False,
                       filter_redirects=None, namespaces=None, total=None,
-                      content=False):
+                      content: bool = False):
         """Iterate all pages that link to the given page.
 
         :see: https://www.mediawiki.org/wiki/API:Backlinks
@@ -258,7 +259,7 @@ class GeneratorsMixin:
         return blgen
 
     def page_embeddedin(self, page, *, filter_redirects=None, namespaces=None,
-                        total=None, content=False):
+                        total=None, content: bool = False):
         """Iterate all pages that embedded the given page as a template.
 
         :see: https://www.mediawiki.org/wiki/API:Embeddedin
@@ -321,10 +322,17 @@ class GeneratorsMixin:
                                namespaces=namespaces, total=total,
                                g_content=content, **rdargs)
 
-    def pagereferences(self, page, *, follow_redirects=False,
-                       filter_redirects=None, with_template_inclusion=True,
-                       only_template_inclusion=False, namespaces=None,
-                       total=None, content=False):
+    def pagereferences(
+        self,
+        page, *,
+        follow_redirects: bool = False,
+        filter_redirects=None,
+        with_template_inclusion: bool = True,
+        only_template_inclusion: bool = False,
+        namespaces=None,
+        total=None,
+        content: bool = False
+    ):
         """
         Convenience method combining pagebacklinks and page_embeddedin.
 
@@ -395,7 +403,7 @@ class GeneratorsMixin:
                                **plargs)
 
     # Sortkey doesn't work with generator
-    def pagecategories(self, page, *, total=None, content=False):
+    def pagecategories(self, page, *, total=None, content: bool = False):
         """Iterate categories to which page belongs.
 
         :see: https://www.mediawiki.org/wiki/API:Categories
@@ -414,7 +422,7 @@ class GeneratorsMixin:
                                type_arg='categories', total=total,
                                g_content=content, **clargs)
 
-    def pageimages(self, page, *, total=None, content=False):
+    def pageimages(self, page, *, total=None, content: bool = False):
         """Iterate images used (not just linked) on the page.
 
         :see: https://www.mediawiki.org/wiki/API:Images
@@ -430,7 +438,7 @@ class GeneratorsMixin:
                                g_content=content)
 
     def pagetemplates(self, page, *, namespaces=None, total=None,
-                      content=False):
+                      content: bool = False):
         """Iterate templates transcluded (not just linked) on the page.
 
         :see: https://www.mediawiki.org/wiki/API:Templates
@@ -611,7 +619,14 @@ class GeneratorsMixin:
             props.append('roles')
         return props
 
-    def loadrevisions(self, page, *, content=False, section=None, **kwargs):
+    def loadrevisions(
+        self,
+        page,
+        *,
+        content: bool = False,
+        section=None,
+        **kwargs
+    ):
         """Retrieve revision information and store it in page object.
 
         By default, retrieves the last (current) revision of the page,
@@ -630,7 +645,6 @@ class GeneratorsMixin:
         :type page: pywikibot.Page
         :param content: if True, retrieve the wiki-text of each revision;
             otherwise, only retrieve the revision metadata (default)
-        :type content: bool
         :param section: if specified, retrieve only this section of the text
             (content must be True); section must be given by number (top of
             the article is section 0), not name
@@ -791,10 +805,21 @@ class GeneratorsMixin:
             for linkdata in pageitem['extlinks']:
                 yield linkdata['*']
 
-    def allpages(self, start='!', prefix='', namespace=0, filterredir=None,
-                 filterlanglinks=None, minsize=None, maxsize=None,
-                 protect_type=None, protect_level=None, reverse=False,
-                 total=None, content=False):
+    def allpages(
+        self,
+        start: str = '!',
+        prefix: str = '',
+        namespace=0,
+        filterredir=None,
+        filterlanglinks=None,
+        minsize=None,
+        maxsize=None,
+        protect_type=None,
+        protect_level=None,
+        reverse: bool = False,
+        total=None,
+        content: bool = False
+    ):
         """Iterate pages in a single namespace.
 
         :see: https://www.mediawiki.org/wiki/API:Allpages
@@ -863,8 +888,15 @@ class GeneratorsMixin:
             apgen.request['gapdir'] = 'descending'
         return apgen
 
-    def alllinks(self, start='!', prefix='', namespace=0, unique=False,
-                 fromids=False, total=None):
+    def alllinks(
+        self,
+        start: str = '!',
+        prefix: str = '',
+        namespace=0,
+        unique: bool = False,
+        fromids: bool = False,
+        total=None
+    ):
         """Iterate all links to pages (which need not exist) in one namespace.
 
         Note that, in practice, links that were found on pages that have
@@ -901,8 +933,8 @@ class GeneratorsMixin:
                 p._fromid = link['fromid']
             yield p
 
-    def allcategories(self, start='!', prefix='', total=None,
-                      reverse=False, content=False):
+    def allcategories(self, start: str = '!', prefix: str = '', total=None,
+                      reverse: bool = False, content: bool = False):
         """Iterate categories used (which need not have a Category page).
 
         Iterator yields Category objects. Note that, in practice, links that
@@ -945,7 +977,13 @@ class GeneratorsMixin:
 
         yield from self._bots.values()
 
-    def allusers(self, start='!', prefix='', group=None, total=None):
+    def allusers(
+        self,
+        start: str = '!',
+        prefix: str = '',
+        group=None,
+        total=None
+    ):
         """Iterate registered users, ordered by username.
 
         Iterated values are dicts containing 'name', 'editcount',
@@ -970,9 +1008,18 @@ class GeneratorsMixin:
             augen.request['augroup'] = group
         return augen
 
-    def allimages(self, start='!', prefix='', minsize=None, maxsize=None,
-                  reverse=False, sha1=None, sha1base36=None,
-                  total=None, content=False):
+    def allimages(
+        self,
+        start: str = '!',
+        prefix: str = '',
+        minsize=None,
+        maxsize=None,
+        reverse: bool = False,
+        sha1=None,
+        sha1base36=None,
+        total=None,
+        content: bool = False
+    ):
         """Iterate all images, ordered by image title.
 
         Yields FilePages, but these pages need not exist on the wiki.
@@ -1008,8 +1055,14 @@ class GeneratorsMixin:
             aigen.request['gaisha1base36'] = sha1base36
         return aigen
 
-    def filearchive(self, start=None, end=None, reverse=False, total=None,
-                    **kwargs):
+    def filearchive(
+        self,
+        start=None,
+        end=None,
+        reverse: bool = False,
+        total=None,
+        **kwargs
+    ):
         """Iterate archived files.
 
         Yields dict of file archive informations.
@@ -1039,7 +1092,7 @@ class GeneratorsMixin:
             fagen.request['fadir'] = 'descending'
         return fagen
 
-    def blocks(self, starttime=None, endtime=None, reverse=False,
+    def blocks(self, starttime=None, endtime=None, reverse: bool = False,
                blockids=None, users=None, iprange: Optional[str] = None,
                total: Optional[int] = None):
         """Iterate all current blocks, in order of creation.
@@ -1058,7 +1111,6 @@ class GeneratorsMixin:
         :param endtime: stop iterating at this Timestamp
         :type endtime: pywikibot.Timestamp
         :param reverse: if True, iterate oldest blocks first (default: newest)
-        :type reverse: bool
         :param blockids: only iterate blocks with these id numbers. Numbers
             must be separated by '|' if given by a str.
         :type blockids: str, tuple or list
@@ -1098,7 +1150,7 @@ class GeneratorsMixin:
 
     def exturlusage(self, url: Optional[str] = None,
                     protocol: Optional[str] = None, namespaces=None,
-                    total: Optional[int] = None, content=False):
+                    total: Optional[int] = None, content: bool = False):
         """Iterate Pages that contain links to the given URL.
 
         :see: https://www.mediawiki.org/wiki/API:Exturlusage
@@ -1135,7 +1187,7 @@ class GeneratorsMixin:
                                total=total, g_content=content)
 
     def imageusage(self, image, namespaces=None, filterredir=None,
-                   total=None, content=False):
+                   total=None, content: bool = False):
         """Iterate Pages that contain links to the given FilePage.
 
         :see: https://www.mediawiki.org/wiki/API:Imageusage
@@ -1354,8 +1406,8 @@ class GeneratorsMixin:
         return srgen
 
     def usercontribs(self, user=None, userprefix=None, start=None, end=None,
-                     reverse=False, namespaces=None, minor=None,
-                     total: Optional[int] = None, top_only=False):
+                     reverse: bool = False, namespaces=None, minor=None,
+                     total: Optional[int] = None, top_only: bool = False):
         """Iterate contributions by a particular user.
 
         Iterated values are in the same format as recentchanges.
@@ -1409,7 +1461,7 @@ class GeneratorsMixin:
         ucgen.request['ucshow'] = option_set
         return ucgen
 
-    def watchlist_revs(self, start=None, end=None, reverse=False,
+    def watchlist_revs(self, start=None, end=None, reverse: bool = False,
                        namespaces=None, minor=None, bot=None,
                        anon=None, total=None):
         """Iterate revisions to pages on the bot user's watchlist.
@@ -1475,7 +1527,7 @@ class GeneratorsMixin:
 
     def deletedrevs(self, titles=None, start=None, end=None,
                     reverse: bool = False,
-                    content=False, total=None, **kwargs):
+                    content: bool = False, total=None, **kwargs):
         """Iterate deleted revisions.
 
         Each value returned by the iterator will be a dict containing the
@@ -1652,7 +1704,7 @@ class GeneratorsMixin:
         return usgen
 
     def randompages(self, total=None, namespaces=None,
-                    redirects=False, content=False):
+                    redirects: Optional[bool] = False, content: bool = False):
         """Iterate a number of random pages.
 
         :see: https://www.mediawiki.org/wiki/API:Random
@@ -1668,7 +1720,6 @@ class GeneratorsMixin:
         :param redirects: if True, include only redirect pages in results,
             False does not include redirects and None (MW 1.26+) include both
             types. (default: False)
-        :type redirects: bool or None
         :param content: if True, load the current content of each iterated page
             (default False)
         :raises KeyError: a namespace identifier was not resolved
@@ -1776,8 +1827,8 @@ class GeneratorsMixin:
                 errdata = {
                     'site': self,
                     'user': self.user(),
+                    idtype: idvalue,
                 }
-                errdata[idtype] = idvalue
                 if err.code in self._patrol_errors:
                     raise Error(self._patrol_errors[err.code]
                                 .format_map(errdata))
@@ -1788,10 +1839,20 @@ class GeneratorsMixin:
 
             yield result['patrol']
 
-    def newpages(self, user=None, returndict=False,
-                 start=None, end=None, reverse=False, bot=False,
-                 redirect=False, excludeuser=None,
-                 patrolled=None, namespaces=None, total=None):
+    def newpages(
+        self,
+        user=None,
+        returndict: bool = False,
+        start=None,
+        end=None,
+        reverse: bool = False,
+        bot: bool = False,
+        redirect: bool = False,
+        excludeuser=None,
+        patrolled=None,
+        namespaces=None,
+        total=None
+    ):
         """Yield new articles (as Page objects) from recent changes.
 
         Starts with the newest article and fetches the number of articles
@@ -2013,8 +2074,13 @@ class GeneratorsMixin:
         """
         return self.querypage('Listredirects', total)
 
-    def protectedpages(self, namespace=0, type='edit', level=False,
-                       total=None):
+    def protectedpages(
+        self,
+        namespace=0,
+        type: str = 'edit',
+        level: Union[str, bool] = False,
+        total=None
+    ):
         """
         Return protected pages depending on protection level and type.
 
@@ -2030,7 +2096,6 @@ class GeneratorsMixin:
         :type type: str
         :param level: The protection level (like 'autoconfirmed'). If False it
             shows all protection levels.
-        :type level: str or False
         :return: The pages which are protected.
         :rtype: typing.Iterable[pywikibot.Page]
         """
@@ -2062,14 +2127,13 @@ class GeneratorsMixin:
         return self._generator(api.PageGenerator, type_arg='pageswithprop',
                                gpwppropname=propname, total=total)
 
-    def watched_pages(self, force=False, total=None):
+    def watched_pages(self, force: bool = False, total=None):
         """
         Return watchlist.
 
         :see: https://www.mediawiki.org/wiki/API:Watchlistraw
 
         :param force: Reload watchlist
-        :type force: bool
         :param total: if not None, limit the generator to yielding this many
             items in total
         :type total: int

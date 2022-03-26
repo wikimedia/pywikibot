@@ -49,13 +49,13 @@ class ChangeLangBot(ConfigParserBot, SingleSiteBot):
         'setlang': '',
     }
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         """Initializer."""
         super().__init__(**kwargs)
         assert not (self.opt.always and self.opt.never), \
             'Either "always" or "never" must be set but not both'
 
-    def changelang(self, page):
+    def changelang(self, page) -> None:
         """Set page language.
 
         :param page: The page to update and save
@@ -66,14 +66,14 @@ class ChangeLangBot(ConfigParserBot, SingleSiteBot):
                       'title': page.title(),
                       'lang': self.opt.setlang,
                       'token': token}
-        r = self.site._simple_request(**parameters)
+        r = self.site.simple_request(**parameters)
         r.submit()
         pywikibot.output(color_format(
             '{lightpurple}{0}{default}: Setting '
             'page language to {green}{1}{default}',
             page.title(as_link=True), self.opt.setlang))
 
-    def treat(self, page):
+    def treat(self, page) -> None:
         """Treat a page.
 
         :param page: The page to treat
@@ -84,7 +84,7 @@ class ChangeLangBot(ConfigParserBot, SingleSiteBot):
                       'prop': 'info',
                       'titles': page.title(),
                       'meta': 'siteinfo'}
-        r = self.site._simple_request(**parameters)
+        r = self.site.simple_request(**parameters)
         langcheck = r.submit()['query']
 
         currentlang = ''

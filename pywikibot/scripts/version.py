@@ -5,7 +5,7 @@
    version script was moved to the framework scripts folder
 """
 #
-# (C) Pywikibot team, 2007-2021
+# (C) Pywikibot team, 2007-2022
 #
 # Distributed under the terms of the MIT license.
 #

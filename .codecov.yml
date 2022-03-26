@@ -17,6 +17,8 @@ coverage:
     - pywikibot/backports.py
     - pywikibot/daemonize.py
     - pywikibot/families/__init__.py
+    - pywikibot/scripts/version.py
+    - pywikibot/userinterfaces/win32_unicode.py
     - scripts/archive/
     - scripts/userscripts/
     - scripts/maintenance/colors.py

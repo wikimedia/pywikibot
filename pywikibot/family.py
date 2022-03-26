@@ -19,7 +19,7 @@ from typing import Optional
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Dict, List, Tuple
+from pywikibot.backports import Dict, List, Set, Tuple  # skipcq: PY-W2000
 from pywikibot.exceptions import FamilyMaintenanceWarning, UnknownFamilyError
 from pywikibot.tools import classproperty, deprecated
 
@@ -233,6 +233,7 @@ class Family:
         'glk': '[ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیآأئؤة‌]*',
         'gn': '[a-záéíóúñ]*',
         'gu': '[઀-૿]*',
+        'guw': '[a-zàáǎèéěìíǐòóǒùúɛ̌ɔɖẹọ]*',
         'he': '[a-zא-ת]*',
         'hi': '[a-zऀ-ॣ०-꣠-ꣿ]*',
         'hr': '[čšžćđßa-z]*',
@@ -620,7 +621,7 @@ class Family:
         Family._families[fam] = cls
         return cls
 
-    def linktrail(self, code, fallback='_default'):
+    def linktrail(self, code, fallback: str = '_default'):
         """Return regex for trailing chars displayed as part of a link.
 
         Returns a string, not a compiled regular expression object.
@@ -635,14 +636,14 @@ class Family:
             'ERROR: linktrail in language {language_code} unknown'
             .format(language_code=code))
 
-    def category_redirects(self, code, fallback='_default'):
+    def category_redirects(self, code, fallback: str = '_default'):
         """Return list of category redirect templates."""
         if not hasattr(self, '_catredirtemplates') \
            or code not in self._catredirtemplates:
             self._get_cr_templates(code, fallback)
         return self._catredirtemplates[code]
 
-    def _get_cr_templates(self, code, fallback):
+    def _get_cr_templates(self, code, fallback) -> None:
         """Build list of category redirect templates."""
         if not hasattr(self, '_catredirtemplates'):
             self._catredirtemplates = {}
@@ -681,7 +682,7 @@ class Family:
         """
         return self.archived_page_templates.get(code, ())
 
-    def disambig(self, code, fallback='_default'):
+    def disambig(self, code, fallback: str = '_default'):
         """Return list of disambiguation templates."""
         if code in self.disambiguationTemplates:
             return self.disambiguationTemplates[code]
@@ -743,7 +744,7 @@ class Family:
         """
         return '/w'
 
-    def ssl_pathprefix(self, code):
+    def ssl_pathprefix(self, code) -> str:
         """The path prefix for secure HTTP access."""
         # Override this ONLY if the wiki family requires a path prefix
         return ''
@@ -773,15 +774,15 @@ class Family:
             uri = self.ssl_pathprefix(code) + uri
         return urlparse.urljoin('{}://{}'.format(protocol, host), uri)
 
-    def path(self, code):
+    def path(self, code) -> str:
         """Return path to index.php."""
         return '{}/index.php'.format(self.scriptpath(code))
 
-    def querypath(self, code):
+    def querypath(self, code) -> str:
         """Return path to query.php."""
         return '{}/query.php'.format(self.scriptpath(code))
 
-    def apipath(self, code):
+    def apipath(self, code) -> str:
         """Return path to api.php."""
         return '{}/api.php'.format(self.scriptpath(code))
 
@@ -799,16 +800,12 @@ class Family:
         """
         raise NotImplementedError('This family does not support EventStreams')
 
-    def get_address(self, code, title):
+    def get_address(self, code, title) -> str:
         """Return the path to title using index.php with redirects disabled."""
         return '{}?title={}&redirect=no'.format(self.path(code), title)
 
-    def interface(self, code):
-        """
-        Return interface to use for code.
-
-        :rtype: str or subclass of BaseSite
-        """
+    def interface(self, code) -> str:
+        """Return interface to use for code."""
         if code in self.interwiki_removals:
             if code in self.codes:
                 pywikibot.warn('Interwiki removal {} is in {} codes'
@@ -889,11 +886,11 @@ class Family:
         """Return the maximum URL length for GET instead of POST."""
         return config.maximum_GET_length
 
-    def dbName(self, code):
+    def dbName(self, code) -> str:
         """Return the name of the MySQL database."""
         return '{}{}'.format(code, self.name)
 
-    def encoding(self, code):
+    def encoding(self, code) -> str:
         """Return the encoding for a specific language wiki."""
         return 'utf-8'
 
@@ -920,17 +917,17 @@ class Family:
     def __hash__(self):
         return hash(self.name)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return 'Family("{}")'.format(self.name)
 
     def shared_image_repository(self, code):
         """Return the shared image repository, if any."""
         return (None, None)
 
-    def isPublic(self, code):
+    def isPublic(self, code) -> bool:
         """Check the wiki require logging in before viewing it."""
         return True
 
@@ -953,21 +950,20 @@ class Family:
         return putText
 
     @property
-    def obsolete(self):
+    def obsolete(self) -> Dict[str, Optional[str]]:
         """
         Old codes that are not part of the family.
 
         Interwiki replacements override removals for the same code.
 
         :return: mapping of old codes to new codes (or None)
-        :rtype: dict
         """
         data = {code: None for code in self.interwiki_removals}
         data.update(self.interwiki_replacements)
         return types.MappingProxyType(data)
 
     @obsolete.setter
-    def obsolete(self, data):
+    def obsolete(self, data) -> None:
         """Split obsolete dict into constituent parts."""
         self.interwiki_removals[:] = [old for (old, new) in data.items()
                                       if new is None]
@@ -977,13 +973,11 @@ class Family:
                                            if new is not None)
 
     @classproperty
-    def domains(cls):
+    def domains(cls) -> Set[str]:
         """
         Get list of unique domain names included in this family.
 
         These domains may also exist in another family.
-
-        :rtype: set of str
         """
         return set(cls.langs.values())
 
@@ -1084,7 +1078,7 @@ class FandomFamily(Family):
 
         return {code: cls.domain for code in codes}
 
-    def protocol(self, code):
+    def protocol(self, code) -> str:
         """Return 'https' as the protocol."""
         return 'https'
 
@@ -1211,15 +1205,15 @@ class WikimediaFamily(Family):
         """Return Wikimedia Commons as the shared image repository."""
         return ('commons', 'commons')
 
-    def protocol(self, code):
+    def protocol(self, code) -> str:
         """Return 'https' as the protocol."""
         return 'https'
 
-    def eventstreams_host(self, code):
+    def eventstreams_host(self, code) -> str:
         """Return 'https://stream.wikimedia.org' as the stream hostname."""
         return 'https://stream.wikimedia.org'
 
-    def eventstreams_path(self, code):
+    def eventstreams_path(self, code) -> str:
         """Return path for EventStreams."""
         return '/v2/stream'
 
@@ -1229,19 +1223,18 @@ class WikimediaOrgFamily(SingleSiteFamily, WikimediaFamily):
     """Single site family for sites hosted at ``*.wikimedia.org``."""
 
     @classproperty
-    def domain(cls):
+    def domain(cls) -> str:
         """Return the parents domain with a subdomain prefix."""
         return '{}.wikimedia.org'.format(cls.name)
 
 
-def AutoFamily(name: str, url: str):
+def AutoFamily(name: str, url: str) -> SingleSiteFamily:
     """
     Family that automatically loads the site configuration.
 
     :param name: Name for the family
     :param url: API endpoint URL of the wiki
     :return: Generated family class
-    :rtype: SingleSiteFamily
     """
     url = urlparse.urlparse(url)
     domain = url.netloc

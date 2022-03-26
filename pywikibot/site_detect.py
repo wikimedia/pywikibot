@@ -30,7 +30,7 @@ class MWSite:
 
     """Minimal wiki site class."""
 
-    def __init__(self, fromurl, **kwargs):
+    def __init__(self, fromurl, **kwargs) -> None:
         """
         Initializer.
 
@@ -90,7 +90,7 @@ class MWSite:
                 raise RuntimeError('Unable to determine articlepath: '
                                    '{}'.format(self.fromurl))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '{}("{}")'.format(
             self.__class__.__name__, self.fromurl)
 
@@ -108,7 +108,7 @@ class MWSite:
         return [wiki for wiki in iw['query']['interwikimap']
                 if 'language' in wiki]
 
-    def _fetch_old_version(self):
+    def _fetch_old_version(self) -> None:
         """Extract the version from API help with ?version enabled."""
         if self.version is None:
             try:
@@ -128,7 +128,7 @@ class MWSite:
             else:
                 self.version = MediaWikiVersion(self.version)
 
-    def _parse_site(self):
+    def _parse_site(self) -> None:
         """Parse siteinfo data."""
         response = fetch(self.api + '?action=query&meta=siteinfo&format=json')
         check_response(response)
@@ -190,7 +190,7 @@ class WikiHTMLPageParser(HTMLParser):
 
     """Wiki HTML page parser."""
 
-    def __init__(self, url):
+    def __init__(self, url) -> None:
         """Initializer."""
         super().__init__(convert_charrefs=True)
         self.url = urlparse(url)
@@ -200,14 +200,14 @@ class WikiHTMLPageParser(HTMLParser):
         self.server = None
         self.scriptpath = None
 
-    def set_version(self, value):
+    def set_version(self, value) -> None:
         """Set highest version."""
         if self.version and value < self.version:
             return
 
         self.version = value
 
-    def set_api_url(self, url):
+    def set_api_url(self, url) -> None:
         """Set api_url."""
         url = url.split('.php', 1)[0]
         try:
@@ -257,7 +257,7 @@ class WikiHTMLPageParser(HTMLParser):
             self._parsed_url.scheme, self._parsed_url.netloc)
         self.scriptpath = self._parsed_url.path
 
-    def handle_starttag(self, tag, attrs):
+    def handle_starttag(self, tag, attrs) -> None:
         """Handle an opening tag."""
         attrs = dict(attrs)
         if tag == 'meta':

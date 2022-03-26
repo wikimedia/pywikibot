@@ -539,10 +539,10 @@ class _PluralMappingAlias(abc.Mapping):
         return self.source
 
     def __iter__(self) -> Iterator[int]:
-        raise NotImplementedError  # pragma: no cover
+        raise NotImplementedError
 
     def __len__(self) -> int:
-        raise NotImplementedError  # pragma: no cover
+        raise NotImplementedError
 
 
 DEFAULT_FALLBACK = ('_default', )

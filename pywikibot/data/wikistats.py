@@ -1,6 +1,6 @@
 """Objects representing WikiStats API."""
 #
-# (C) Pywikibot team, 2014-2021
+# (C) Pywikibot team, 2014-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -71,7 +71,7 @@ class WikiStats:
 
     ALL_KEYS = set(FAMILY_MAPPING.keys()) | ALL_TABLES
 
-    def __init__(self, url='https://wikistats.wmcloud.org/') -> None:
+    def __init__(self, url: str = 'https://wikistats.wmcloud.org/') -> None:
         """Initializer."""
         self.url = url
         self._data = {}

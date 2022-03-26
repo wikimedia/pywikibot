@@ -94,7 +94,7 @@ will not add duplicate claims for the same member:
    can be set within a settings file which is scripts.ini by default.
 """
 #
-# (C) Pywikibot team, 2013-2021
+# (C) Pywikibot team, 2013-2022
 #
 # Distributed under the terms of MIT License.
 #
@@ -394,7 +394,7 @@ def main(*args: str) -> None:
                 if needs_second:
                     break  # will stop below
 
-                arg, sep, value = arg[1:].partition(':')
+                arg, _, value = arg[1:].partition(':')
                 if len(current_args) == 0:
                     assert not fields
                     options[arg] = value or True

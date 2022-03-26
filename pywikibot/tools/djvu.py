@@ -12,16 +12,13 @@ from collections import Counter
 import pywikibot
 
 
-def _call_cmd(args, lib='djvulibre') -> tuple:
+def _call_cmd(args, lib: str = 'djvulibre') -> tuple:
     """
     Tiny wrapper around subprocess.Popen().
 
     :param args: same as Popen()
     :type args: str or typing.Sequence[string]
-
     :param lib: library to be logged in logging messages
-    :type lib: str
-
     :return: returns a tuple (res, stdoutdata), where
         res is True if dp.returncode != 0 else False
     """
@@ -56,7 +53,7 @@ class DjVuFile:
 
     """
 
-    def __init__(self, file: str):
+    def __init__(self, file: str) -> None:
         """
         Initializer.
 
@@ -116,12 +113,11 @@ class DjVuFile:
         return wrapper
 
     @check_cache
-    def number_of_images(self, force=False):
+    def number_of_images(self, force: bool = False):
         """
         Return the number of images in the djvu file.
 
         :param force: if True, refresh the cached data
-        :type force: bool
         """
         if not hasattr(self, '_page_count'):
             res, stdoutdata = _call_cmd(['djvused', '-e', 'n', self.file])
@@ -131,26 +127,23 @@ class DjVuFile:
         return self._page_count
 
     @check_page_number
-    def page_info(self, n, force=False):
+    def page_info(self, n: int, force: bool = False):
         """
         Return a tuple (id, (size, dpi)) for page n of djvu file.
 
         :param n: page n of djvu file
-        :type n: int
         :param force: if True, refresh the cached data
-        :type force: bool
         """
         if not hasattr(self, '_page_info') or force:
             self._get_page_info(force=force)
         return self._page_info[n]
 
     @check_cache
-    def _get_page_info(self, force=False):
+    def _get_page_info(self, force: bool = False):
         """
         Return a dict of tuples (id, (size, dpi)) for all pages of djvu file.
 
         :param force: if True, refresh the cached data
-        :type force: bool
         """
         if not hasattr(self, '_page_info'):
             self._page_info = {}
@@ -193,12 +186,11 @@ class DjVuFile:
         return size, dpi
 
     @check_cache
-    def has_text(self, force=False):
+    def has_text(self, force: bool = False):
         """
         Test if the djvu file has a text-layer.
 
         :param force: if True, refresh the cached data
-        :type force: bool
         """
         if not hasattr(self, '_has_text'):
             self._get_page_info(force=force)
@@ -224,14 +216,12 @@ class DjVuFile:
 
     @check_page_number
     @check_cache
-    def get_page(self, n, force=False):
+    def get_page(self, n: int, force: bool = False):
         """
         Get page n for djvu file.
 
         :param n: page n of djvu file
-        :type n: int
         :param force: if True, refresh the cached data
-        :type force: bool
         """
         if not self.has_text(force=force):
             raise ValueError('Djvu file {} has no text layer.'
@@ -243,7 +233,7 @@ class DjVuFile:
         return self._remove_control_chars(stdoutdata)
 
     @check_page_number
-    def whiten_page(self, n):
+    def whiten_page(self, n) -> bool:
         """Replace page 'n' of djvu file with a blank page.
 
         :param n: page n of djvu file
@@ -261,8 +251,8 @@ class DjVuFile:
         size, dpi = self.get_most_common_info()
 
         # Generate white_page.
-        res, data = _call_cmd(['convert', '-size', size, 'xc:white',
-                               white_ppm], lib='ImageMagik')
+        res, _ = _call_cmd(['convert', '-size', size, 'xc:white', white_ppm],
+                           lib='ImageMagik')
         if not res:
             return False
 
@@ -294,7 +284,7 @@ class DjVuFile:
         return True
 
     @check_page_number
-    def delete_page(self, n):
+    def delete_page(self, n) -> bool:
         """Delete page 'n' of djvu file.
 
         :param n: page n of djvu file
@@ -309,7 +299,7 @@ class DjVuFile:
         # Delete page n.
         # Get ref page info for later checks.
         info_ref_page = self.page_info(ref_page)
-        res, data = _call_cmd(['djvm', '-d', self.file, n])
+        res, _ = _call_cmd(['djvm', '-d', self.file, n])
         if not res:
             return False
 

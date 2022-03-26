@@ -15,50 +15,48 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     name = 'wikipedia'
 
     closed_wikis = [
-        # See:
         # https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist
         'aa', 'cho', 'ho', 'hz', 'ii', 'kj', 'kr', 'lrc', 'mh', 'mus', 'ng',
         'ten',
     ]
 
     removed_wikis = [
-        # See:
         # https://noc.wikimedia.org/conf/highlight.php?file=dblists/deleted.dblist
-        'dk', 'ru-sib', 'tlh', 'tokipona', 'zh_cn', 'zh_tw',
+        'dk', 'mo', 'ru-sib', 'tlh', 'tokipona', 'zh_cn', 'zh_tw',
     ]
 
     languages_by_size = [
         'en', 'ceb', 'de', 'sv', 'fr', 'nl', 'ru', 'es', 'it', 'arz', 'pl',
         'ja', 'vi', 'war', 'zh', 'ar', 'uk', 'pt', 'fa', 'ca', 'sr', 'id',
-        'no', 'ko', 'fi', 'hu', 'cs', 'tr', 'ce', 'sh', 'zh-min-nan', 'ro',
+        'ko', 'no', 'fi', 'hu', 'cs', 'tr', 'ce', 'sh', 'zh-min-nan', 'ro',
         'tt', 'eu', 'ms', 'eo', 'he', 'hy', 'bg', 'da', 'azb', 'sk', 'kk',
         'et', 'min', 'be', 'hr', 'el', 'simple', 'lt', 'az', 'gl', 'sl', 'ur',
         'nn', 'ka', 'hi', 'th', 'ta', 'uz', 'la', 'cy', 'ast', 'vo', 'mk',
-        'zh-yue', 'bn', 'lv', 'tg', 'my', 'af', 'mg', 'bs', 'oc', 'sq', 'nds',
-        'mr', 'ky', 'ml', 'be-tarask', 'te', 'new', 'br', 'sw', 'vec', 'pms',
-        'jv', 'pnb', 'ht', 'su', 'lb', 'ba', 'ga', 'szl', 'is', 'lmo', 'ku',
-        'cv', 'fy', 'tl', 'wuu', 'an', 'sco', 'diq', 'ckb', 'pa', 'yo', 'ne',
+        'zh-yue', 'bn', 'lv', 'tg', 'my', 'af', 'mg', 'bs', 'oc', 'sq', 'mr',
+        'nds', 'ky', 'ml', 'be-tarask', 'te', 'new', 'br', 'sw', 'vec', 'jv',
+        'pms', 'pnb', 'ht', 'su', 'lb', 'ba', 'ga', 'szl', 'is', 'lmo', 'ku',
+        'cv', 'fy', 'tl', 'wuu', 'an', 'ckb', 'sco', 'diq', 'pa', 'yo', 'ne',
         'bar', 'io', 'gu', 'als', 'kn', 'scn', 'bpy', 'ia', 'qu', 'mn', 'avk',
-        'nv', 'xmf', 'si', 'crh', 'bat-smg', 'or', 'gd', 'cdo', 'ilo', 'yi',
-        'os', 'frr', 'sd', 'am', 'bug', 'nap', 'ha', 'sah', 'hsb', 'map-bms',
-        'mai', 'fo', 'li', 'ps', 'mzn', 'eml', 'gor', 'ace', 'ban', 'lld',
+        'nv', 'xmf', 'crh', 'si', 'bat-smg', 'or', 'gd', 'cdo', 'frr', 'os',
+        'ilo', 'yi', 'sd', 'am', 'bug', 'ha', 'nap', 'sah', 'hsb', 'ps',
+        'map-bms', 'fo', 'mai', 'li', 'mzn', 'eml', 'gor', 'ban', 'ace', 'lld',
         'bcl', 'sa', 'wa', 'zh-classical', 'lij', 'shn', 'zu', 'mrj', 'mhr',
-        'hif', 'as', 'mni', 'hak', 'hyw', 'roa-tara', 'pam', 'km', 'ie', 'nso',
-        'rue', 'bh', 'se', 'so', 'sn', 'vls', 'nds-nl', 'myv', 'nah', 'mi',
-        'sat', 'sc', 'vep', 'gan', 'glk', 'kab', 'tk', 'fiu-vro', 'co', 'bo',
-        'ab', 'kv', 'frp', 'csb', 'pcd', 'kw', 'ug', 'udm', 'gv', 'ay', 'ary',
-        'nrm', 'zea', 'gn', 'bjn', 'mt', 'lez', 'skr', 'lfn', 'stq', 'smn',
-        'lo', 'mwl', 'olo', 'rm', 'fur', 'lad', 'gom', 'ang', 'koi', 'ext',
-        'tyv', 'dsb', 'dty', 'ln', 'cbk-zam', 'ig', 'dv', 'rw', 'ksh', 'gag',
-        'bxr', 'pfl', 'av', 'pi', 'pag', 'haw', 'awa', 'tay', 'pap', 'krc',
+        'hif', 'as', 'mni', 'hyw', 'hak', 'roa-tara', 'pam', 'km', 'ie', 'nso',
+        'rue', 'so', 'bh', 'sn', 'se', 'vls', 'nds-nl', 'myv', 'sat', 'mi',
+        'nah', 'sc', 'vep', 'gan', 'glk', 'kab', 'tk', 'fiu-vro', 'co', 'bo',
+        'ab', 'kv', 'frp', 'csb', 'pcd', 'kw', 'ug', 'gv', 'udm', 'ary', 'ay',
+        'nrm', 'zea', 'gn', 'mt', 'bjn', 'skr', 'lez', 'lfn', 'smn', 'stq',
+        'lo', 'mwl', 'olo', 'rm', 'fur', 'lad', 'gom', 'ang', 'ig', 'koi',
+        'ext', 'tyv', 'dsb', 'dty', 'ln', 'cbk-zam', 'dv', 'rw', 'ksh', 'gag',
+        'bxr', 'pfl', 'av', 'pag', 'pi', 'haw', 'awa', 'tay', 'pap', 'krc',
         'xal', 'szy', 'za', 'inh', 'kaa', 'pdc', 'atj', 'to', 'arc', 'kbp',
-        'tpi', 'jam', 'na', 'wo', 'tw', 'kbd', 'tcy', 'mdf', 'nov', 'dag',
-        'ki', 'nia', 'tet', 'lg', 'bi', 'jbo', 'roa-rup', 'kg', 'fj', 'xh',
-        'lbe', 'ty', 'nqo', 'mnw', 'tum', 'cu', 'shi', 'trv', 'srn', 'ks',
-        'om', 'gcr', 'sm', 'alt', 'ltg', 'chr', 'pih', 'ny', 'got', 'mad',
+        'tpi', 'jam', 'tw', 'dag', 'na', 'wo', 'mdf', 'kbd', 'tcy', 'nov',
+        'ki', 'nia', 'tet', 'lg', 'bi', 'jbo', 'roa-rup', 'fj', 'kg', 'xh',
+        'lbe', 'ty', 'nqo', 'mnw', 'tum', 'cu', 'ks', 'shi', 'trv', 'srn',
+        'om', 'sm', 'gcr', 'alt', 'ltg', 'chr', 'pih', 'ny', 'got', 'mad',
         'st', 'ami', 'kl', 'rmy', 'tn', 'bm', 'ts', 'chy', 've', 'rn', 'iu',
-        'ak', 'ss', 'ch', 'pnt', 'ady', 'ik', 'ee', 'ff', 'din', 'sg', 'dz',
-        'ti', 'pwn', 'cr',
+        'ak', 'ss', 'ch', 'pnt', 'ady', 'ik', 'ee', 'ff', 'din', 'sg', 'ti',
+        'dz', 'pwn', 'cr', 'guw',
     ]
 
     # Sites we want to edit but not count as real languages

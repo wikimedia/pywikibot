@@ -506,9 +506,15 @@ class CheckImagesBot:
     ignore_save_related_errors = True
     ignore_server_errors = False
 
-    def __init__(self, site, log_full_number=25000, sendemail_active=False,
-                 duplicates_report=False, log_full_error=True,
-                 max_user_notify=None) -> None:
+    def __init__(
+        self,
+        site,
+        log_full_number: int = 25000,
+        sendemail_active: bool = False,
+        duplicates_report: bool = False,
+        log_full_error: bool = True,
+        max_user_notify=None
+    ) -> None:
         """Initializer, define some instance variables."""
         self.site = site
         self.log_full_error = log_full_error
@@ -565,9 +571,17 @@ class CheckImagesBot:
         self.timestamp = None
         self.uploader = None
 
-    def report(self, newtext, image_to_report, notification=None, head=None,
-               notification2=None, unver=True, comm_talk=None, comm_image=None
-               ) -> None:
+    def report(
+        self,
+        newtext,
+        image_to_report,
+        notification=None,
+        head=None,
+        notification2=None,
+        unver: bool = True,
+        comm_talk=None,
+        comm_image=None
+    ) -> None:
         """Function to make the reports easier."""
         self.image_to_report = image_to_report
         self.newtext = newtext
@@ -621,7 +635,7 @@ class CheckImagesBot:
         # we can't find the user, report the problem to the bot
         return upload_bot_array[0]
 
-    def tag_image(self, put=True) -> bool:
+    def tag_image(self, put: bool = True) -> bool:
         """Add template to the Image page and find out the uploader."""
         # Get the image's description
         report_page_object = pywikibot.FilePage(self.site,
@@ -811,7 +825,7 @@ class CheckImagesBot:
             return list_given[inx_found][1]
 
         # find the oldest image
-        sec, image = max(list_given, key=lambda element: element[0])
+        _, image = max(list_given, key=lambda element: element[0])
         return image
 
     def check_image_on_commons(self) -> bool:
@@ -1034,7 +1048,7 @@ class CheckImagesBot:
         return True  # Ok - No problem. Let's continue the checking phase
 
     def report_image(self, image_to_report, rep_page=None, com=None,
-                     rep_text=None, addings=True) -> bool:
+                     rep_text=None, addings: bool = True) -> bool:
         """Report the files to the report page when needed."""
         rep_page = rep_page or self.rep_page
         com = com or self.com

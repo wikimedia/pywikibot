@@ -57,7 +57,7 @@ class Throttle:
     def __init__(self, site: Union['pywikibot.site.BaseSite', str], *,
                  mindelay: Optional[int] = None,
                  maxdelay: Optional[int] = None,
-                 writedelay: Union[int, float, None] = None):
+                 writedelay: Union[int, float, None] = None) -> None:
         """Initializer."""
         self.lock = threading.RLock()
         self.lock_write = threading.RLock()
@@ -90,13 +90,13 @@ class Throttle:
 
     @property
     @deprecated(since='6.2')
-    def multiplydelay(self):
+    def multiplydelay(self) -> bool:
         """DEPRECATED attribute."""
         return True
 
     @multiplydelay.setter
     @deprecated(since='6.2')
-    def multiplydelay(self):
+    def multiplydelay(self) -> None:
         """DEPRECATED attribute setter."""
 
     @staticmethod
@@ -111,7 +111,7 @@ class Throttle:
             hashobj = md5(module)
         return hashobj.hexdigest()[:4]  # slice for Python 3.5
 
-    def _read_file(self, raise_exc=False):
+    def _read_file(self, raise_exc: bool = False):
         """Yield process entries from file."""
         try:
             with open(self.ctrlfilename) as f:
@@ -140,7 +140,7 @@ class Throttle:
                 continue
             yield proc_entry
 
-    def _write_file(self, processes):
+    def _write_file(self, processes) -> None:
         """Write process entries to file."""
         if not isinstance(processes, list):
             processes = list(processes)
@@ -150,7 +150,7 @@ class Throttle:
             for p in processes:
                 f.write(FORMAT_LINE.format_map(p._asdict()))
 
-    def checkMultiplicity(self):
+    def checkMultiplicity(self) -> None:
         """Count running processes for site and set process_multiplicity.
 
         .. versionchanged:: 7.0
@@ -197,7 +197,12 @@ class Throttle:
             pywikibot.log('Found {} {} processes running, including this one.'
                           .format(count, mysite))
 
-    def setDelays(self, delay=None, writedelay=None, absolute=False):
+    def setDelays(
+        self,
+        delay=None,
+        writedelay=None,
+        absolute: bool = False
+    ) -> None:
         """Set the nominal delays in seconds. Defaults to config values."""
         with self.lock:
             delay = delay or self.mindelay
@@ -211,7 +216,7 @@ class Throttle:
             # Start the delay count now, not at the next check
             self.last_read = self.last_write = time.time()
 
-    def getDelay(self, write=False):
+    def getDelay(self, write: bool = False):
         """Return the actual delay, accounting for multiple processes.
 
         This value is the maximum wait between reads/writes, not taking
@@ -234,7 +239,7 @@ class Throttle:
         thisdelay *= self.process_multiplicity
         return thisdelay
 
-    def waittime(self, write=False):
+    def waittime(self, write: bool = False):
         """Return waiting time in seconds.
 
         The result is for a query that would be made right now.
@@ -246,7 +251,7 @@ class Throttle:
         ago = now - (self.last_write if write else self.last_read)
         return max(0.0, thisdelay - ago)
 
-    def drop(self):
+    def drop(self) -> None:
         """Remove me from the list of running bot processes."""
         # drop all throttles with this process's pid, regardless of site
         self.checktime = 0
@@ -257,7 +262,7 @@ class Throttle:
 
         self._write_file(processes)
 
-    def wait(self, seconds):
+    def wait(self, seconds) -> None:
         """Wait for seconds seconds.
 
         Announce the delay if it exceeds a preset limit.
@@ -277,7 +282,7 @@ class Throttle:
 
         time.sleep(seconds)
 
-    def __call__(self, requestsize=1, write=False):
+    def __call__(self, requestsize: int = 1, write: bool = False) -> None:
         """Block the calling program if the throttle time has not expired.
 
         Parameter requestsize is the number of Pages to be read/written;
@@ -304,7 +309,7 @@ class Throttle:
             else:
                 self.last_read = time.time()
 
-    def lag(self, lagtime: Optional[float] = None):
+    def lag(self, lagtime: Optional[float] = None) -> None:
         """Seize the throttle lock due to server lag.
 
         Usually the `self.retry-after` value from `response_header` of the

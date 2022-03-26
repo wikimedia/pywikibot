@@ -1,6 +1,6 @@
 """Configuration file for Sphinx."""
 #
-# (C) Pywikibot team, 2014-2021
+# (C) Pywikibot team, 2014-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -50,12 +50,15 @@ needs_sphinx = '4.1'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc',
-              'sphinx.ext.todo',
-              'sphinx.ext.coverage',
-              'sphinx.ext.viewcode',
-              'sphinx.ext.autosummary',
-              'sphinx.ext.napoleon']
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.autosectionlabel',
+    'sphinx.ext.extlinks',
+    'sphinx.ext.todo',
+    'sphinx.ext.viewcode',
+    'sphinx.ext.autosummary',
+    'sphinx.ext.napoleon',
+]
 
 # Allow lines like "Example:" to be followed by a code block
 napoleon_use_admonition_for_examples = True
@@ -353,6 +356,10 @@ texinfo_documents = [
 # Other settings
 autodoc_typehints = 'description'
 
+extlinks = {
+    'phab': ('https://phabricator.wikimedia.org/%s', '%s')
+}
+
 
 TOKENS_WITH_PARAM = [
     # sphinx
@@ -405,6 +412,15 @@ def pywikibot_epytext_to_sphinx(app, what, name, obj, options, lines):
         line = re.sub(r'(\A| )U\{([^}]*)\}', r'\1\2', line)  # Url
         result.append(line)
     lines[:] = result[:]  # assignment required in this way
+
+
+def pywikibot_fix_phab_tasks(app, what, name, obj, options, lines):
+    """Convert Phabricator tasks id to a link using sphinx.ext.extlinks."""
+    result = []
+    for line in lines:
+        line = re.sub(r'(T\d{5,6})', r':phab:`\1`', line)
+        result.append(line)
+    lines[:] = result[:]
 
 
 def pywikibot_docstring_fixups(app, what, name, obj, options, lines):
@@ -510,6 +526,7 @@ def pywikibot_family_classproperty_getattr(obj, name, *defargs):
 def setup(app):
     """Implicit Sphinx extension hook."""
     app.connect('autodoc-process-docstring', pywikibot_epytext_to_sphinx)
+    app.connect('autodoc-process-docstring', pywikibot_fix_phab_tasks)
     app.connect('autodoc-process-docstring', pywikibot_docstring_fixups)
     app.connect('autodoc-process-docstring', pywikibot_script_docstring_fixups)
     app.connect('autodoc-skip-member', pywikibot_skip_members)

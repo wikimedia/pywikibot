@@ -1,6 +1,6 @@
 """Base for terminal user interfaces."""
 #
-# (C) Pywikibot team, 2003-2021
+# (C) Pywikibot team, 2003-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -50,8 +50,8 @@ colors = [
 ]
 
 _color_pat = '{}|previous'.format('|'.join(colors))
-colorTagR = re.compile('\03{{((:?{});?(:?{})?)}}'.format(_color_pat,
-                                                         _color_pat))
+colorTagR = re.compile('\03{{((:?{cpat});?(:?{cpat})?)}}'
+                       .format(cpat=_color_pat))
 
 
 class UI(ABUIC):
@@ -65,23 +65,32 @@ class UI(ABUIC):
 
     split_col_pat = re.compile(r'(\w+);?(\w+)?')
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initialize the UI.
 
         This caches the std-streams locally so any attempts to
         monkey-patch the streams later will not work.
+
+        .. versionchanged:: 7.1
+           memorize original streams
         """
-        self.stdin = sys.stdin
-        self.stdout = sys.stdout
-        self.stderr = sys.stderr
+        # for Windows GUI they can be None under some conditions
+        self.stdin = sys.__stdin__ or sys.stdin
+        self.stdout = sys.__stdout__ or sys.stdout
+        self.stderr = sys.__stderr__ or sys.stderr
+
         self.argv = sys.argv
         self.encoding = config.console_encoding
         self.transliteration_target = config.transliteration_target
         self.cache = []
         self.lock = RLock()
 
-    def init_handlers(self, root_logger, default_stream='stderr'):
+    def init_handlers(
+        self,
+        root_logger,
+        default_stream: str = 'stderr'
+    ) -> None:
         """Initialize the handlers for user output.
 
         This method initializes handler(s) for output levels VERBOSE (if
@@ -126,7 +135,7 @@ class UI(ABUIC):
         warnings_logger.addHandler(warning_handler)
 
     def encounter_color(self, color, target_stream):
-        """Handle the next color encountered."""
+        """Abstract method to handle the next color encountered."""
         raise NotImplementedError('The {} class does not support '
                                   'colors.'.format(self.__class__.__name__))
 
@@ -141,15 +150,43 @@ class UI(ABUIC):
         """
         return cls.split_col_pat.search(color).groups()
 
-    def _write(self, text, target_stream):
-        """Optionally encode and write the text to the target stream."""
-        target_stream.write(text)
+    def _write(self, text: str, target_stream) -> None:
+        """Write the text to the target stream.
 
-    def support_color(self, target_stream):
+        sys.stderr and sys.stdout are frozen upon initialization to
+        original streams (which are stored in the sys module as
+        `sys.__stderr__` and `sys.__stdout__`). This works fine except
+        when using `redirect_stderr` or `redirect_stdout` context
+        managers, where values of global `sys.stderr` and `sys.stdout`
+        are temporarily changed to a redirecting `StringIO` stream, in
+        which case writing to the frozen streams (which are still set to
+        `sys.__stderr__` / `sys.__stdout__`) will not write to the
+        redirecting stream as expected. So, we check the target stream
+        against the frozen streams, and then write to the (potentially
+        redirected) `sys.stderr` or `sys.stdout` stream.
+
+        .. versionchanged:: 7.1
+           instead of writing to `target_stream`, dispatch to
+           `sys.stderr` or `sys.stdout`.
+        """
+        if target_stream == self.stderr:
+            sys.stderr.write(text)
+        elif target_stream == self.stdout:
+            sys.stdout.write(text)
+        else:
+            try:
+                out, err = self.stdout.name, self.stderr.name
+            except AttributeError:
+                out, err = self.stdout, self.stderr
+            raise OSError(
+                'Target stream {} is neither stdin ({}) nor stderr ({})'
+                .format(target_stream.name, out, err))
+
+    def support_color(self, target_stream) -> bool:
         """Return whether the target stream does support colors."""
         return False
 
-    def _print(self, text, target_stream):
+    def _print(self, text, target_stream) -> None:
         """Write the text to the target stream handling the colors."""
         colorized = (config.colorized_output
                      and self.support_color(target_stream))
@@ -186,9 +223,14 @@ class UI(ABUIC):
 
             if current_color != next_color and colorized:
                 # set the new color, but only if they change
+                # flush first to enable color change on Windows (T283808)
+                target_stream.flush()
                 self.encounter_color(color_stack[-1], target_stream)
 
-    def output(self, text, targetStream=None):
+        # finally flush stream to show the text, required for Windows (T303373)
+        target_stream.flush()
+
+    def output(self, text, targetStream=None) -> None:
         """Forward text to cache and flush if output is not locked.
 
         All input methods locks the output to a stream but collect them
@@ -202,7 +244,7 @@ class UI(ABUIC):
         if not self.lock.locked():
             self.flush()
 
-    def flush(self):
+    def flush(self) -> None:
         """Output cached text.
 
         .. versionadded:: 7.0
@@ -212,7 +254,7 @@ class UI(ABUIC):
                 self.stream_output(*args, **kwargs)
             self.cache.clear()
 
-    def cache_output(self, *args, **kwargs):
+    def cache_output(self, *args, **kwargs) -> None:
         """Put text to cache.
 
         .. versionadded:: 7.0
@@ -220,7 +262,7 @@ class UI(ABUIC):
         with self.lock:
             self.cache.append((args, kwargs))
 
-    def stream_output(self, text, targetStream=None):
+    def stream_output(self, text, targetStream=None) -> None:
         """Output text to a stream.
 
         If a character can't be displayed in the encoding used by the user's
@@ -388,7 +430,7 @@ class UI(ABUIC):
             default (if it's not None). Otherwise the index of the answer in
             options. If default is not a shortcut, it'll return -1.
         """
-        def output_option(option, before_question):
+        def output_option(option, before_question) -> None:
             """Print an OutputOption before or after question."""
             if isinstance(option, OutputOption) \
                and option.before_question is before_question:
@@ -484,7 +526,7 @@ class UI(ABUIC):
                 pywikibot.error('Invalid response')
 
     def editText(self, text: str, jumpIndex: Optional[int] = None,
-                 highlight: Optional[str] = None):
+                 highlight: Optional[str] = None) -> Optional[str]:
         """Return the text as edited by the user.
 
         Uses a Tkinter edit box because we don't have a console editor
@@ -494,7 +536,6 @@ class UI(ABUIC):
         :param highlight: each occurrence of this substring will be highlighted
         :return: the modified text, or None if the user didn't save the text
             file in his text editor
-        :rtype: str or None
         """
         try:
             from pywikibot.userinterfaces import gui
@@ -503,10 +544,6 @@ class UI(ABUIC):
             return text
         editor = gui.EditBoxWindow()
         return editor.edit(text, jumpIndex=jumpIndex, highlight=highlight)
-
-    def argvu(self):
-        """Return copy of argv."""
-        return list(self.argv)
 
 
 class TerminalHandler(logging.StreamHandler):
@@ -523,7 +560,7 @@ class TerminalHandler(logging.StreamHandler):
     # create a class-level lock that can be shared by all instances
     sharedlock = threading.RLock()
 
-    def __init__(self, UI, stream=None):
+    def __init__(self, UI, stream=None) -> None:
         """Initialize the handler.
 
         If stream is not specified, sys.stderr is used.
@@ -531,7 +568,7 @@ class TerminalHandler(logging.StreamHandler):
         super().__init__(stream=stream)
         self.UI = UI
 
-    def createLock(self):
+    def createLock(self) -> None:
         """Acquire a thread lock for serializing access to the underlying I/O.
 
         Replace Handler's instance-specific lock with the shared
@@ -540,7 +577,7 @@ class TerminalHandler(logging.StreamHandler):
         """
         self.lock = TerminalHandler.sharedlock
 
-    def emit(self, record):
+    def emit(self, record) -> None:
         """Emit the record formatted to the output."""
         self.flush()
         if record.name == 'py.warnings':
@@ -564,7 +601,7 @@ class MaxLevelFilter(logging.Filter):
 
     """
 
-    def __init__(self, level=None):
+    def __init__(self, level=None) -> None:
         """Initializer."""
         self.level = level
 

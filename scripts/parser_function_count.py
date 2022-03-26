@@ -77,7 +77,7 @@ class ParserFunctionCountBot(SingleSiteBot,
         'upload': None,
     }
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         """Initializer."""
         super().__init__(**kwargs)
         editcomment = {
@@ -121,7 +121,7 @@ class ParserFunctionCountBot(SingleSiteBot,
                 gen, self.site.doc_subpage, quantifier='none')
         return gen
 
-    def setup(self):
+    def setup(self) -> None:
         """Setup magic words, regex and result counter."""
         pywikibot.output('Hold on, this will need some time. '
                          'You will be notified by 50 templates.')
@@ -131,7 +131,7 @@ class ParserFunctionCountBot(SingleSiteBot,
         self.regex = re.compile(r'#({}):'.format('|'.join(magicwords)), re.I)
         self.results = Counter()
 
-    def treat(self, page):
+    def treat(self, page) -> None:
         """Process a single template."""
         title = page.title()
         if (self.counter['read'] + 1) % 50 == 0:
@@ -149,7 +149,7 @@ class ParserFunctionCountBot(SingleSiteBot,
            and len(self.results) >= self.opt.first:
             self.stop()
 
-    def teardown(self):
+    def teardown(self) -> None:
         """Final processing."""
         resultlist = '\n'.join(
             '# [[{result[0]}]] ({result[1]})'

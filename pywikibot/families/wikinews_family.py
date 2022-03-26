@@ -1,6 +1,6 @@
 """Family module for Wikinews."""
 #
-# (C) Pywikibot team, 2005-2021
+# (C) Pywikibot team, 2005-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -15,7 +15,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     name = 'wikinews'
 
     closed_wikis = [
-        # https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist  # noqa
+        # https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist
         'bg', 'hu', 'sd', 'th', 'tr',
     ]
 

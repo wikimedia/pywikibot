@@ -34,6 +34,7 @@ To create a new distribution:
 #
 # ## KEEP PYTHON 2 SUPPORT FOR THIS SCRIPT ## #
 import os
+import re
 import sys
 
 
@@ -87,7 +88,6 @@ extra_deps = {
         'flake8-comprehensions>=3.1.4; python_version >= "3.8"',
         'flake8-comprehensions>=2.2.0; python_version < "3.8"',
         'flake8-docstrings>=1.3.1',
-        'flake8-future-import',
         'flake8-mock>=0.3',
         'flake8-print>=2.0.1',
         'flake8-quotes>=2.0.1',
@@ -217,6 +217,7 @@ def read_desc(filename):  # pragma: no cover
     Combine included restructured text files which must be done before
     uploading because the source isn't available after creating the package.
     """
+    pattern = r'\:phab\:`(T\d+)`', r'\1'
     desc = []
     with open(filename) as f:
         for line in f:
@@ -224,11 +225,11 @@ def read_desc(filename):  # pragma: no cover
                 include = os.path.relpath(line.rsplit('::')[1].strip())
                 if os.path.exists(include):
                     with open(include) as g:
-                        desc.append(g.read())
+                        desc.append(re.sub(*pattern, g.read()))
                 else:
                     print('Cannot include {}; file not found'.format(include))
             else:
-                desc.append(line)
+                desc.append(re.sub(*pattern, line))
     return ''.join(desc)
 
 
@@ -243,7 +244,7 @@ def get_packages(name):  # pragma: no cover
     return [str(name)] + packages
 
 
-def main():
+def main():  # pragma: no cover
     """Setup entry point."""
     version = get_validated_version()
     setup(

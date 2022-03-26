@@ -80,7 +80,7 @@ class UnusedFilesBot(SingleSiteBot,
         'usertemplate': '',
     }
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         """Initializer."""
         super().__init__(**kwargs)
 
@@ -104,7 +104,7 @@ class UnusedFilesBot(SingleSiteBot,
                 'This script is not localized for {} site;\n'
                 'try using -filetemplate:<template name>.'.format(self.site))
 
-    def treat(self, image):
+    def treat(self, image) -> None:
         """Process one image page."""
         # Use get_file_url() and file_is_shared() to confirm it is local media
         # rather than a local page with the same name as shared media.
@@ -145,7 +145,7 @@ class UnusedFilesBot(SingleSiteBot,
         self.current_page = page
         self.put_current(text)
 
-    def post_to_flow_board(self, page, post):
+    def post_to_flow_board(self, page, post) -> None:
         """Post message as a Flow topic."""
         board = Board(page)
         header, rest = post.split('\n', 1)
@@ -168,7 +168,7 @@ def main(*args: str) -> None:
     local_args = pywikibot.handle_args(args)
 
     for arg in local_args:
-        arg, sep, value = arg.partition(':')
+        arg, _, value = arg.partition(':')
         if arg == '-limit':
             total = value
         elif arg == '-filetemplate':

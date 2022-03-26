@@ -605,17 +605,6 @@ class TestPageCoordinates(TestCase):
             self.assertTrue(coord.primary)
 
 
-class TestPageBaseUnicode(DefaultDrySiteTestCase):
-
-    """Base class for tests requiring a page using a unicode title."""
-
-    @classmethod
-    def setUpClass(cls):
-        """Initialize page instance."""
-        super().setUpClass()
-        cls.page = pywikibot.Page(cls.site, 'Ō')
-
-
 class TestPageGetFileHistory(DefaultDrySiteTestCase):
 
     """Test the get_file_history method of the FilePage class."""
@@ -653,9 +642,15 @@ class TestFilePage(DefaultSiteTestCase):
             self.assertNotEqual(p.site, self.site)
 
 
-class TestPageRepr(TestPageBaseUnicode):
+class TestPageRepr(DefaultDrySiteTestCase):
 
     """Test for Page's repr implementation."""
+
+    @classmethod
+    def setUpClass(cls):
+        """Initialize page instance."""
+        super().setUpClass()
+        cls.page = pywikibot.Page(cls.site, 'Ō')
 
     def setUp(self):
         """Force the console encoding to UTF-8."""
@@ -683,22 +678,6 @@ class TestPageRepr(TestPageBaseUnicode):
         self.assertEqual(repr(self.page), "Page('Ō')")
         self.assertEqual('%r' % self.page, "Page('Ō')")
         self.assertEqual('{!r}'.format(self.page), "Page('Ō')")
-
-
-class TestPageReprASCII(TestPageBaseUnicode):
-
-    """Test for Page's repr implementation when using ASCII encoding."""
-
-    def setUp(self):
-        """Patch the current console encoding to ASCII."""
-        super().setUp()
-        self._old_encoding = config.console_encoding
-        config.console_encoding = 'ascii'
-
-    def tearDown(self):
-        """Restore the original console encoding."""
-        config.console_encoding = self._old_encoding
-        super().tearDown()
 
 
 class TestPageBotMayEdit(TestCase):
@@ -1029,7 +1008,7 @@ class TestPageDelete(TestCase):
     code = 'test'
 
     write = True
-    sysop = True
+    rights = 'delete'
 
     def test_delete(self):
         """Test the site.delete and site.undelete method."""
@@ -1037,12 +1016,11 @@ class TestPageDelete(TestCase):
         p = pywikibot.Page(site, 'User:Unicodesnowman/DeleteTest')
         # Ensure the page exists
         p.text = 'pywikibot unit test page'
-        p.save('#redirect[[unit test]]', botflag=True)
-        self.assertEqual(p.isRedirectPage(), True)
+        p.save('Pywikibot unit test', botflag=True)
+
         # Test deletion
-        p.delete(reason='pywikibot unit test', prompt=False, mark=False)
+        p.delete(reason='Pywikibot unit test', prompt=False, mark=False)
         self.assertEqual(p._pageid, 0)
-        self.assertEqual(p.isRedirectPage(), False)
         with self.assertRaisesRegex(NoPageError, NO_PAGE_RE):
             p.get(force=True)
 
@@ -1053,7 +1031,7 @@ class TestPageDelete(TestCase):
         p.markDeletedRevision(del_revs[-2])
         with self.assertRaisesRegex(ValueError, 'is not a deleted revision'):
             p.markDeletedRevision(123)
-        p.undelete(reason='pywikibot unit test')
+        p.undelete(reason='Pywikibot unit test')
         revs = list(p.revisions())
         self.assertLength(revs, 2)
         self.assertEqual(revs[1].revid, revid)
@@ -1099,7 +1077,7 @@ class TestPageProtect(TestCase):
     code = 'test'
 
     write = True
-    sysop = True
+    rights = 'protect'
 
     def test_protect(self):
         """Test Page.protect."""

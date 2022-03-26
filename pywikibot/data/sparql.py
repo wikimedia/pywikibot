@@ -31,7 +31,7 @@ class SparqlQuery:
                  endpoint: Optional[str] = None,
                  entity_url: Optional[str] = None, repo=None,
                  max_retries: Optional[int] = None,
-                 retry_wait: Optional[float] = None):
+                 retry_wait: Optional[float] = None) -> None:
         """
         Create endpoint.
 
@@ -180,7 +180,7 @@ class SparqlQuery:
         data = self.query(query, headers=headers)
         return data['boolean']
 
-    def get_items(self, query, item_name='item', result_type=set):
+    def get_items(self, query, item_name: str = 'item', result_type=set):
         """
         Retrieve items which satisfy given query.
 
@@ -204,18 +204,18 @@ class SparqlQuery:
 class SparqlNode:
     """Base class for SPARQL nodes."""
 
-    def __init__(self, value):
+    def __init__(self, value) -> None:
         """Create a SparqlNode."""
         self.value = value
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.value
 
 
 class URI(SparqlNode):
     """Representation of URI result type."""
 
-    def __init__(self, data: dict, entity_url, **kwargs):
+    def __init__(self, data: dict, entity_url, **kwargs) -> None:
         """Create URI object."""
         super().__init__(data.get('value'))
         self.entity_url = entity_url
@@ -231,20 +231,20 @@ class URI(SparqlNode):
             return self.value[urllen:]
         return None
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '<' + self.value + '>'
 
 
 class Literal(SparqlNode):
     """Representation of RDF literal result type."""
 
-    def __init__(self, data: dict, **kwargs):
+    def __init__(self, data: dict, **kwargs) -> None:
         """Create Literal object."""
         super().__init__(data.get('value'))
         self.type = data.get('datatype')
         self.language = data.get('xml:lang')
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         if self.type:
             return self.value + '^^' + self.type
         if self.language:
@@ -255,11 +255,11 @@ class Literal(SparqlNode):
 class Bnode(SparqlNode):
     """Representation of blank node."""
 
-    def __init__(self, data: dict, **kwargs):
+    def __init__(self, data: dict, **kwargs) -> None:
         """Create Bnode."""
         super().__init__(data.get('value'))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '_:' + self.value
 
 

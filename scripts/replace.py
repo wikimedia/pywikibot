@@ -146,14 +146,14 @@ import codecs
 import re
 from collections.abc import Sequence
 from contextlib import suppress
-from typing import Optional
+from typing import Any, Optional
 
 import pywikibot
 from pywikibot import editor, fixes, i18n, pagegenerators, textlib
 from pywikibot.backports import Dict, Generator, List, Pattern, Tuple
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 from pywikibot.exceptions import InvalidPageError, NoPageError
-from pywikibot.tools import chars
+from pywikibot.tools import chars, deprecated
 
 
 # This is required for the text that is shown when you run this script
@@ -164,7 +164,7 @@ docuReplacements = {
 }
 
 
-def precompile_exceptions(exceptions, use_regex, flags):
+def precompile_exceptions(exceptions, use_regex, flags) -> None:
     """Compile the exceptions with the given flags."""
     if not exceptions:
         return
@@ -187,7 +187,13 @@ class ReplacementBase:
 
     """The replacement instructions."""
 
-    def __init__(self, old, new, edit_summary=None, default_summary=True):
+    def __init__(
+        self,
+        old,
+        new,
+        edit_summary=None,
+        default_summary=True
+    ) -> None:
         """Create a basic replacement instance."""
         self.old = old
         self.old_regex = None
@@ -225,7 +231,7 @@ class ReplacementBase:
         """
         return None
 
-    def _compile(self, use_regex, flags):
+    def _compile(self, use_regex, flags) -> None:
         """Compile the search text without modifying the flags."""
         # This does not update use_regex and flags depending on this instance
         if not use_regex:
@@ -234,7 +240,7 @@ class ReplacementBase:
             self.old_regex = self.old
         self.old_regex = re.compile(self.old_regex, flags)
 
-    def compile(self, use_regex, flags):
+    def compile(self, use_regex, flags) -> None:
         """Compile the search text."""
         # Set the regular expression flags
         if self.case_insensitive is False:
@@ -253,7 +259,7 @@ class Replacement(ReplacementBase):
 
     def __init__(self, old, new, use_regex=None, exceptions=None,
                  case_insensitive=None, edit_summary=None,
-                 default_summary=True):
+                 default_summary=True) -> None:
         """Create a single replacement entry unrelated to a fix."""
         super().__init__(old, new, edit_summary, default_summary)
         self._use_regex = use_regex
@@ -279,7 +285,7 @@ class Replacement(ReplacementBase):
         """Return whether the search text is using regex."""
         return self._use_regex
 
-    def _compile(self, use_regex, flags):
+    def _compile(self, use_regex, flags) -> None:
         """Compile the search regex and exceptions."""
         super()._compile(use_regex, flags)
         precompile_exceptions(self.exceptions, use_regex, flags)
@@ -304,7 +310,7 @@ class ReplacementList(list):
     """
 
     def __init__(self, use_regex, exceptions, case_insensitive, edit_summary,
-                 name):
+                 name) -> None:
         """Create a fix list which can contain multiple replacements."""
         super().__init__()
         self.use_regex = use_regex
@@ -314,7 +320,7 @@ class ReplacementList(list):
         self.edit_summary = edit_summary
         self.name = name
 
-    def _compile_exceptions(self, use_regex, flags):
+    def _compile_exceptions(self, use_regex, flags) -> None:
         """Compile the exceptions if not already done."""
         if not self.exceptions and self._exceptions is not None:
             self.exceptions = dict(self._exceptions)
@@ -326,7 +332,7 @@ class ReplacementListEntry(ReplacementBase):
     """A replacement entry for ReplacementList."""
 
     def __init__(self, old, new, fix_set, edit_summary=None,
-                 default_summary=True):
+                 default_summary=True) -> None:
         """Create a replacement entry inside a fix set."""
         super().__init__(old, new, edit_summary, default_summary)
         self.fix_set = fix_set
@@ -366,7 +372,7 @@ class ReplacementListEntry(ReplacementBase):
         """
         return self.fix_set
 
-    def _compile(self, use_regex, flags):
+    def _compile(self, use_regex, flags) -> None:
         """Compile the search regex and the fix's exceptions."""
         super()._compile(use_regex, flags)
         self.fix_set._compile_exceptions(use_regex, flags)
@@ -376,6 +382,7 @@ class ReplacementListEntry(ReplacementBase):
         return _get_text_exceptions(self.fix_set.exceptions or {})
 
 
+@deprecated('pagegenerators.XMLDumpPageGenerator', since='7.1.0')
 class XmlDumpReplacePageGenerator:
 
     """
@@ -383,19 +390,23 @@ class XmlDumpReplacePageGenerator:
 
     These pages will be retrieved from a local XML dump file.
 
+    .. deprecated:: 7.1
+
     :param xmlFilename: The dump's path, either absolute or relative
-    :type xmlFilename: str
     :param xmlStart: Skip all articles in the dump before this one
-    :type xmlStart: str
     :param replacements: A list of 2-tuples of original text (as a
         compiled regular expression) and replacement text (as a string).
-    :type replacements: list of 2-tuples
     :param exceptions: A dictionary which defines when to ignore an
         occurrence. See docu of the ReplaceRobot initializer below.
     :type exceptions: dict
     """
 
-    def __init__(self, xmlFilename, xmlStart, replacements, exceptions, site):
+    def __init__(self,
+                 xmlFilename: str,
+                 xmlStart: str,
+                 replacements: List[Tuple[Any, str]],
+                 exceptions: Dict[str, Any],
+                 site) -> None:
         """Initializer."""
         self.xmlFilename = xmlFilename
         self.replacements = replacements
@@ -445,12 +456,8 @@ class XmlDumpReplacePageGenerator:
                         'To resume, use "-xmlstart:{}" on the command line.'
                         .format(entry.title))
 
-    def isTitleExcepted(self, title):
-        """
-        Return True if one of the exceptions applies for the given title.
-
-        :rtype: bool
-        """
+    def isTitleExcepted(self, title) -> bool:
+        """Return True if one of the exceptions applies for the given title."""
         if 'title' in self.exceptions:
             for exc in self.exceptions['title']:
                 if exc.search(title):
@@ -462,12 +469,8 @@ class XmlDumpReplacePageGenerator:
 
         return False
 
-    def isTextExcepted(self, text):
-        """
-        Return True if one of the exceptions applies for the given text.
-
-        :rtype: bool
-        """
+    def isTextExcepted(self, text) -> bool:
+        """Return True if one of the exceptions applies for the given text."""
         if 'text-contains' in self.exceptions:
             return any(exc.search(text)
                        for exc in self.exceptions['text-contains'])
@@ -483,7 +486,6 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
     :param replacements: a list of Replacement instances or sequences of
         length 2 with the original text (as a compiled regular expression)
         and replacement text (as a string).
-    :type replacements: list
     :param exceptions: a dictionary which defines when not to change an
         occurrence. This dictionary can have these keys:
 
@@ -503,17 +505,16 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             dictionary in textlib._create_default_regexes() or must be
             accepted by textlib._get_regexes().
 
-    :type exceptions: dict
-    :param allowoverlap: when matches overlap, all of them are replaced.
+    :keyword allowoverlap: when matches overlap, all of them are replaced.
     :type allowoverlap: bool
-    :param recursive: Recurse replacement as long as possible.
+    :keyword recursive: Recurse replacement as long as possible.
     :type recursive: bool
     :warning: Be careful, this might lead to an infinite loop.
-    :param addcat: category to be added to every page touched
+    :keyword addcat: category to be added to every page touched
     :type addcat: pywikibot.Category or str or None
-    :param sleep: slow down between processing multiple regexes
+    :keyword sleep: slow down between processing multiple regexes
     :type sleep: int
-    :param summary: Set the summary message text bypassing the default
+    :keyword summary: Set the summary message text bypassing the default
     :type summary: str
     :keyword always: the user won't be prompted before changes are made
     :type keyword: bool
@@ -523,7 +524,10 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
         about the missing site
     """
 
-    def __init__(self, generator, replacements, exceptions=None, **kwargs):
+    def __init__(self, generator,
+                 replacements: List[Tuple[Any, str]],
+                 exceptions: Optional[Dict[str, Any]] = None,
+                 **kwargs) -> None:
         """Initializer."""
         self.available_options.update({
             'addcat': None,
@@ -656,7 +660,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
 
         return super().skip_page(page)
 
-    def treat(self, page):
+    def treat(self, page) -> None:
         """Work on each page retrieved from generator."""
         try:
             original_text = page.text
@@ -746,13 +750,13 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             self.save(page, original_text, new_text, applied,
                       show_diff=False, asynchronous=False)
 
-    def save(self, page, oldtext, newtext, applied, **kwargs):
+    def save(self, page, oldtext, newtext, applied, **kwargs) -> None:
         """Save the given page."""
         self.userPut(page, oldtext, newtext,
                      summary=self.generate_summary(applied),
                      ignore_save_related_errors=True, **kwargs)
 
-    def user_confirm(self, question):
+    def user_confirm(self, question) -> bool:
         """Always return True due to our own input choice."""
         return True
 
@@ -1075,8 +1079,8 @@ def main(*args: str) -> None:
     precompile_exceptions(exceptions, regex, flags)
 
     if xmlFilename:
-        gen = XmlDumpReplacePageGenerator(xmlFilename, xmlStart,
-                                          replacements, exceptions, site)
+        gen = pagegenerators.XmlDumpPageGenerator(
+            xmlFilename, xmlStart, namespaces=genFactory.namespaces, site=site)
     elif sql_query is not None:
         # Only -excepttext option is considered by the query. Other
         # exceptions are taken into account by the ReplaceRobot

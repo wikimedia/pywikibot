@@ -394,14 +394,16 @@ class ReferringPageGeneratorWithIgnore:
 
     """Referring Page generator, with an ignore manager."""
 
-    def __init__(self, page, primary=False, minimum=0, main_only=False
-                 ) -> None:
+    def __init__(
+        self,
+        page,
+        primary: bool = False,
+        minimum: int = 0,
+        main_only: bool = False
+    ) -> None:
         """Initializer.
 
         :type page: pywikibot.Page
-        :type primary: bool
-        :type minimum: int
-        :type main_only: bool
         """
         self.page = page
         # if run with the -primary argument, enable the ignore manager
@@ -446,13 +448,10 @@ class PrimaryIgnoreManager:
 
     """
 
-    def __init__(self, disamb_page, enabled=False) -> None:
+    def __init__(self, disamb_page, enabled: bool = False) -> None:
         """Initializer.
 
         :type disamb_page: pywikibot.Page
-        :type enabled: bool
-        :rtype: None
-
         """
         self.disamb_page = disamb_page
         self.enabled = enabled
@@ -573,7 +572,7 @@ class AliasOption(StandardOption):
 
     """An option allowing multiple aliases which also select it."""
 
-    def __init__(self, option, shortcuts, stop=True) -> None:
+    def __init__(self, option, shortcuts, stop: bool = True) -> None:
         """Initializer."""
         super().__init__(option, shortcuts[0], stop=stop)
         self._aliases = frozenset(s.lower() for s in shortcuts[1:])
@@ -632,7 +631,7 @@ class DisambiguationRobot(SingleSiteBot):
         self.summary = None
         self.dn_template_str = i18n.translate(self.site, dn_template)
 
-    def _clean_args(self, args, kwargs):
+    def _clean_args(self, args, kwargs) -> None:
         """Cleanup positional and keyword arguments.
 
         Replace positional arguments with keyword arguments.
@@ -1189,8 +1188,13 @@ or press enter to quit:""")
             self.opt.pos += links
         return True
 
-    def setSummaryMessage(self, page, new_targets=None, unlink_counter=0,
-                          dn=False) -> None:
+    def setSummaryMessage(
+        self,
+        page,
+        new_targets=None,
+        unlink_counter: int = 0,
+        dn: bool = False
+    ) -> None:
         """Setup i18n summary message."""
         new_targets = new_targets or []
         # make list of new targets
@@ -1255,7 +1259,7 @@ or press enter to quit:""")
                      'to': targets,
                      'count': len(new_targets)})
 
-    def teardown(self):
+    def teardown(self) -> None:
         """Write ignoring pages to a file."""
         self.primaryIgnoreManager.ignore(self.ignores)
 

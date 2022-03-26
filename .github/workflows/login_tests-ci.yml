@@ -34,15 +34,12 @@ jobs:
             site: False
             family: wpbeta
             code: en
-            experimental: true
           - python-version: "3.6"
             site: False
             family: wpbeta
             code: zh
-            experimental: true
           - python-version: "3.5"
             site: wsbeta:en
-            experimental: true
           - python-version: "3.7"
             site: "wikipedia:test"
           - python-version: "3.7"
@@ -54,11 +51,9 @@ jobs:
             site: "wikidata:wikidata"
           - python-version: "3.8"
             site: "wowwiki:uk"
-            experimental: true
           - python-version: "3.11.0-alpha - 3.11.0"
             site: "wikipedia:test"
-            experimental: true
-          - python-version: 3
+          - python-version: "3"
             site: "wikipedia:de"
             os: macOS-latest
 
@@ -79,7 +74,8 @@ jobs:
         pip install -U setuptools
         pip install requests
         pip install mwparserfromhell
-        pip install coverage
+        pip install codecov
+        pip install "coverage>=5.2.1"
         python -c "import setuptools; print('setuptools:', setuptools.__version__)"
 
     - name: Generate family files
@@ -105,6 +101,7 @@ jobs:
         echo "usernames['commons']['commons'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
         echo "usernames['meta']['meta'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
         echo "max_retries = 3" >> user-config.py
+        echo "noisysleep = float('inf')" >> user-config.py
         echo "maximum_GET_length = 5000" >> user-config.py
         echo "console_encoding = 'utf8'" >> user-config.py
         echo "import os" >> user-config.py
@@ -119,3 +116,5 @@ jobs:
       run: |
         python pwb.py version
         coverage run -m unittest -vv tests/site_login_logout_tests.py
+    - name: Upload coverage to Codecov
+      run: codecov

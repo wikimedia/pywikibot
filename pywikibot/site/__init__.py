@@ -1,6 +1,6 @@
 """Library module representing MediaWiki sites (wikis)."""
 #
-# (C) Pywikibot team, 2021
+# (C) Pywikibot team, 2021-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -15,5 +15,4 @@ from pywikibot.site._tokenwallet import TokenWallet
 
 
 __all__ = ('APISite', 'BaseSite', 'ClosedSite', 'DataSite', 'RemovedSite',
-           'Namespace', 'NamespacesDict', 'PageInUse', 'Siteinfo',
-           'TokenWallet')
+           'Namespace', 'NamespacesDict', 'Siteinfo', 'TokenWallet')

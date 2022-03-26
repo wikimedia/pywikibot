@@ -173,7 +173,7 @@ from textwrap import fill
 
 import pywikibot
 from pywikibot import config, i18n
-from pywikibot.backports import Dict, Generator, List
+from pywikibot.backports import Dict, Generator, List  # skipcq: PY-W2000
 from pywikibot.bot import SingleSiteBot
 from pywikibot.exceptions import EditConflictError, Error, HiddenKeyError
 from pywikibot.tools.formatter import color_format
@@ -488,7 +488,7 @@ class WelcomeBot(SingleSiteBot):
                 .format(self.site))
         self.welcome_text = site_netext
 
-    def bad_name_filer(self, name, force=False) -> bool:
+    def bad_name_filer(self, name, force: bool = False) -> bool:
         """Check for bad names."""
         if not globalvar.filt_bad_name:
             return False
@@ -648,7 +648,7 @@ class WelcomeBot(SingleSiteBot):
             pywikibot.output('Reported')
         self.BAQueue = []
 
-    def makelogpage(self):
+    def makelogpage(self) -> None:
         """Make log page."""
         if not globalvar.make_welcome_log or not self.welcomed_users:
             return
@@ -726,7 +726,7 @@ class WelcomeBot(SingleSiteBot):
                              .format(globalvar.time_recur, strfstr))
             pywikibot.sleep(globalvar.time_recur)
 
-    def define_sign(self, force=False) -> List[str]:
+    def define_sign(self, force: bool = False) -> List[str]:
         """Setup signature."""
         if hasattr(self, '_random_signature') and not force:
             return self._random_signature
@@ -855,7 +855,7 @@ class WelcomeBot(SingleSiteBot):
             if welcomed_count >= globalvar.dump_to_log:
                 self.makelogpage()
 
-    def write_log(self):
+    def write_log(self) -> None:
         """Write logfile."""
         welcomed_count = len(self.welcomed_users)
         if globalvar.make_welcome_log and welcomed_count > 0:
@@ -874,14 +874,14 @@ class WelcomeBot(SingleSiteBot):
             self.report_bad_account()
 
     @staticmethod
-    def show_status(message=Msg.DEFAULT):
+    def show_status(message=Msg.DEFAULT) -> None:
         """Output colorized status."""
         msg, color = message.value
         pywikibot.output(color_format('{color}[{msg:5}]{default} ',
                                       msg=msg, color=color),
                          newline=False)
 
-    def teardown(self):
+    def teardown(self) -> None:
         """Some cleanups after run operation."""
         if self.welcomed_users:
             self.show_status()
@@ -930,7 +930,7 @@ def _handle_offset(val) -> None:
             'script source header for documentation.'))
 
 
-def handle_args(args):
+def handle_args(args) -> None:
     """Process command line arguments.
 
     If args is an empty list, sys.argv is used.

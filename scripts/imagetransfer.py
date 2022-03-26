@@ -152,7 +152,7 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
         'chunk_size': 0,
     }
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         """Initializer.
 
         :keyword generator: the pages to work on
@@ -179,7 +179,7 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
         else:
             self.opt.target = pywikibot.Site(self.opt.target)
 
-    def transfer_image(self, sourceImagePage):
+    def transfer_image(self, sourceImagePage) -> None:
         """
         Download image and its description, and upload it to another site.
 
@@ -257,7 +257,7 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
                                         % target_filename,
                                         summary=reason)
 
-    def show_image_list(self, imagelist):
+    def show_image_list(self, imagelist) -> None:
         """Print image list."""
         pywikibot.output('-' * 60)
         for i, image in enumerate(imagelist):
@@ -292,7 +292,7 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
 
         pywikibot.output('=' * 60)
 
-    def treat(self, page):
+    def treat(self, page) -> None:
         """Treat a single page."""
         if self.opt.interwiki:
             imagelist = []
@@ -326,7 +326,7 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
                 pywikibot.output(
                     color_format('{yellow}No such image number.{default}'))
 
-    def transfer_allowed(self, image):
+    def transfer_allowed(self, image) -> bool:
         """Check whether transfer is allowed."""
         target_repo = self.opt.target.image_repository()
 

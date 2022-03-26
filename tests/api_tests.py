@@ -7,13 +7,12 @@
 #
 import datetime
 import types
+import unittest
 from collections import defaultdict
 from contextlib import suppress
 from unittest.mock import patch
 
 import pywikibot.family
-import pywikibot.login
-import pywikibot.page
 import pywikibot.site
 from pywikibot.data import api
 from pywikibot.exceptions import APIError, NoUsernameError
@@ -23,7 +22,6 @@ from tests.aspects import (
     DefaultDrySiteTestCase,
     DefaultSiteTestCase,
     TestCase,
-    unittest,
 )
 from tests.utils import FakeLoginManager
 
@@ -900,25 +898,6 @@ class TestLazyLoginNoUsername(TestLazyLoginBase):
             'You have no API read permissions. Seems you are not logged in.')
 
 
-class TestBadTokenRecovery(TestCase):
-
-    """Test that the request recovers from bad tokens."""
-
-    family = 'wikipedia'
-    code = 'test'
-
-    write = True
-
-    def test_bad_token(self):
-        """Test the bad token recovery by corrupting the cache."""
-        site = self.get_site()
-        site.tokens._tokens.setdefault(site.user(), {})['edit'] = 'INVALID'
-        page = pywikibot.Page(site, 'Pywikibot bad token test')
-        page.text = ('This page is testing whether pywikibot rerequests '
-                     'a token when a badtoken error was received.')
-        page.save(summary='Bad token test')
-
-
 class TestUrlEncoding(TestCase):
 
     """Test encode_url() function."""
@@ -1007,7 +986,7 @@ class TestLagpattern(DefaultSiteTestCase):
             pywikibot.warning(
                 'Wrong api.lagpattern regex, cannot retrieve lag value')
             raise e
-        self.assertIsInstance(mythrottle._lagvalue, int)
+        self.assertIsInstance(mythrottle._lagvalue, (int, float))
         self.assertGreaterEqual(mythrottle._lagvalue, 0)
         self.assertIsInstance(mythrottle.retry_after, int)
         self.assertGreaterEqual(mythrottle.retry_after, 0)

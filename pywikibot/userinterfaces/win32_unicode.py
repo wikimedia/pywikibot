@@ -67,7 +67,7 @@ class UnicodeInput(IOBase):
 
     """Unicode terminal input class."""
 
-    def __init__(self, hConsole, name, bufsize=1024):
+    def __init__(self, hConsole, name, bufsize: int = 1024) -> None:
         """Initialize the input stream."""
         self._hConsole = hConsole
         self.bufsize = bufsize
@@ -90,7 +90,7 @@ class UnicodeOutput(IOBase):
 
     """Unicode terminal output class."""
 
-    def __init__(self, hConsole, stream, fileno, name):
+    def __init__(self, hConsole, stream, fileno, name) -> None:
         """Initialize the output stream."""
         self._hConsole = hConsole
         self._stream = stream
@@ -153,6 +153,10 @@ class UnicodeOutput(IOBase):
             _complain('{}.writelines: {!r}'.format(self.name, e))
             raise
 
+    def isatty(self):
+        """Return True if the stream is interactive."""
+        return self._hConsole is not None
+
 
 def old_fileno(std_name):
     """Return the fileno or None if that doesn't work."""
@@ -169,12 +173,12 @@ def old_fileno(std_name):
 # which makes for frustrating debugging if stderr is directed to our wrapper.
 # So be paranoid about catching errors and reporting them to original_stderr,
 # so that we can at least see them.
-def _complain(message):
+def _complain(message) -> None:
     print(isinstance(message, str) and message or repr(message),
           file=original_stderr)
 
 
-def force_truetype_console(h_stdout):
+def force_truetype_console(h_stdout) -> None:
     """Force the console to use a TrueType font (Vista+)."""
     TMPF_TRUETYPE = 0x04
     LF_FACESIZE = 32
@@ -231,7 +235,6 @@ def get_unicode_console() -> Tuple[IO, IO, IO, List[str]]:
     Get Unicode console objects.
 
     :return: stdin, stdout, stderr, argv
-    :rtype: tuple
     """
     # Make Unicode console output work independently of the current code page.
     # This also fixes https://bugs.python.org/issue1602

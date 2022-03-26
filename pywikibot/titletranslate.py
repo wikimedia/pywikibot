@@ -6,10 +6,16 @@
 #
 import pywikibot
 from pywikibot import config, date
+from pywikibot.backports import List
 
 
-def translate(page=None, hints=(), auto=True, removebrackets=False,
-              site=None) -> list:
+def translate(
+    page=None,
+    hints=(),
+    auto: bool = True,
+    removebrackets: bool = False,
+    site=None
+) -> List['pywikibot.Link']:
     """
     Return a list of links to pages on other sites based on hints.
 

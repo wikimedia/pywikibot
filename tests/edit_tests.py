@@ -77,7 +77,7 @@ class TestSiteMergeHistory(TestCase):
     code = 'test'
 
     write = True
-    sysop = True
+    rights = 'mergehistory'
 
     def setup_test_pages(self):
         """Helper function to set up pages that we will use in these tests."""

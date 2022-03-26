@@ -1,6 +1,6 @@
 """Non-interactive interface that stores output."""
 #
-# (C) Pywikibot team, 2021
+# (C) Pywikibot team, 2021-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -13,14 +13,11 @@ from pywikibot.logging import INFO, VERBOSE
 from pywikibot.userinterfaces._interface_base import ABUIC
 
 
-BAD_BUFFER_TYPE = 'BUG: bufffer can only contain logs and strings, had {}'
-
-
 class UI(ABUIC):
 
     """Collects output into an unseen buffer."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the UI."""
         super().__init__()
 
@@ -29,7 +26,11 @@ class UI(ABUIC):
         self.log_handler = logging.handlers.QueueHandler(self._buffer)
         self.log_handler.setLevel(VERBOSE if config.verbose_output else INFO)
 
-    def init_handlers(self, root_logger, *args, **kwargs):
+    def flush(self) -> None:
+        """Flush cached output."""
+        self.clear()
+
+    def init_handlers(self, root_logger, *args, **kwargs) -> None:
         """Initialize the handlers for user output."""
         root_logger.addHandler(self.log_handler)
 
@@ -66,10 +67,12 @@ class UI(ABUIC):
             elif isinstance(record, logging.LogRecord):
                 output.append(record.getMessage())
             else:
-                raise ValueError(BAD_BUFFER_TYPE.format(type(record).__name__))
+                raise ValueError(
+                    'BUG: buffer can only contain logs and strings, had {}'
+                    .format(type(record).__name__))
 
         return output
 
-    def clear(self):
+    def clear(self) -> None:
         """Removes any buffered output."""
         self.pop_output()

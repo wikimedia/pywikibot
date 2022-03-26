@@ -1,6 +1,6 @@
 """Objects representing Namespaces of MediaWiki site."""
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -8,12 +8,13 @@ from collections.abc import Iterable, Mapping
 from enum import IntEnum
 from typing import Optional, Union
 
-from pywikibot.backports import List
-from pywikibot.tools import ComparableMixin, SelfCallMixin
+from pywikibot.backports import Iterable as IterableType
+from pywikibot.backports import Dict, List
+from pywikibot.tools import classproperty, ComparableMixin, SelfCallMixin
 
 
-NamespaceIDType = 'Union[int, str, Namespace]'
-NamespaceArgType = 'Union[NamespaceIDType, Iterable[NamespaceIDType], None]'
+NamespaceIDType = Union[int, str, 'Namespace']
+NamespaceArgType = Union[NamespaceIDType, IterableType[NamespaceIDType], None]
 
 
 class BuiltinNamespace(IntEnum):
@@ -39,6 +40,15 @@ class BuiltinNamespace(IntEnum):
     CATEGORY = 14
     CATEGORY_TALK = 15
 
+    @property
+    def canonical(self) -> str:
+        """Canonical form of MediaWiki built-in namespace.
+
+        .. versionadded:: 7.1
+        """
+        name = '' if self == 0 else self.name.capitalize().replace('_', ' ')
+        return name.replace('Mediawiki', 'MediaWiki')
+
 
 class Namespace(Iterable, ComparableMixin):
 
@@ -60,35 +70,11 @@ class Namespace(Iterable, ComparableMixin):
     properties will have the same value.
     """
 
-    # These are the MediaWiki built-in names for MW 1.14+.
-    # Namespace prefixes are always case-insensitive, but the
-    # canonical forms are capitalized.
-    canonical_namespaces = {
-        -2: 'Media',
-        -1: 'Special',
-        0: '',
-        1: 'Talk',
-        2: 'User',
-        3: 'User talk',
-        4: 'Project',
-        5: 'Project talk',
-        6: 'File',
-        7: 'File talk',
-        8: 'MediaWiki',
-        9: 'MediaWiki talk',
-        10: 'Template',
-        11: 'Template talk',
-        12: 'Help',
-        13: 'Help talk',
-        14: 'Category',
-        15: 'Category talk',
-    }
-
     def __init__(self, id,
                  canonical_name: Optional[str] = None,
                  custom_name: Optional[str] = None,
                  aliases: Optional[List[str]] = None,
-                 **kwargs):
+                 **kwargs) -> None:
         """Initializer.
 
         :param canonical_name: Canonical name
@@ -96,7 +82,7 @@ class Namespace(Iterable, ComparableMixin):
         :param aliases: Aliases
         """
         self.id = id
-        canonical_name = canonical_name or self.canonical_namespaces.get(id)
+        canonical_name = canonical_name or BuiltinNamespace(self.id).canonical
 
         assert custom_name is not None or canonical_name is not None, \
             'Namespace needs to have at least one name'
@@ -118,6 +104,15 @@ class Namespace(Iterable, ComparableMixin):
 
         for key, value in kwargs.items():
             setattr(self, key, value)
+
+    @classproperty
+    def canonical_namespaces(cls) -> Dict[int, str]:
+        """Return the canonical forms of MediaWiki built-in namespaces.
+
+        .. versionchanged:: 7.1
+           implemented as classproperty using BuiltinNamespace IntEnum.
+        """
+        return {item.value: item.canonical for item in BuiltinNamespace}
 
     def _distinct(self):
         if self.custom_name == self.canonical_name:
@@ -159,7 +154,7 @@ class Namespace(Iterable, ComparableMixin):
         """
         return True
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Obtain length of the iterable."""
         return len(self._distinct())
 
@@ -187,7 +182,7 @@ class Namespace(Iterable, ComparableMixin):
 
         return name + ':'
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return the canonical string representation."""
         return self.canonical_prefix()
 
@@ -199,11 +194,11 @@ class Namespace(Iterable, ComparableMixin):
         """Return the custom name with required colons."""
         return Namespace._colons(self.id, self.custom_name)
 
-    def __int__(self):
+    def __int__(self) -> int:
         """Return the namespace id."""
         return self.id
 
-    def __index__(self):
+    def __index__(self) -> int:
         """Return the namespace id."""
         return self.id
 
@@ -244,7 +239,7 @@ class Namespace(Iterable, ComparableMixin):
         """Return the ID as a comparison key."""
         return self.id
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return a reconstructable representation."""
         standard_attr = ['id', 'custom_name', 'canonical_name', 'aliases']
         extra = [(key, self.__dict__[key])
@@ -278,7 +273,7 @@ class Namespace(Iterable, ComparableMixin):
         return default_case
 
     @classmethod
-    def builtin_namespaces(cls, case='first-letter'):
+    def builtin_namespaces(cls, case: str = 'first-letter'):
         """Return a dict of the builtin namespaces."""
         return {i: cls(i, case=cls.default_case(i, case))
                 for i in range(-2, 16)}
@@ -323,7 +318,7 @@ class NamespacesDict(Mapping, SelfCallMixin):
     APISite was callable.
     """
 
-    def __init__(self, namespaces):
+    def __init__(self, namespaces) -> None:
         """Create new dict using the given namespaces."""
         super().__init__()
         self._namespaces = namespaces
@@ -372,7 +367,7 @@ class NamespacesDict(Mapping, SelfCallMixin):
 
         return self.__getattribute__(attr)
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Get the number of namespaces."""
         return len(self._namespaces)
 

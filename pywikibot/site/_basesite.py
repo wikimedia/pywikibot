@@ -7,9 +7,11 @@
 import functools
 import re
 import threading
+from typing import Optional
 from warnings import warn
 
 import pywikibot
+from pywikibot.backports import Pattern
 from pywikibot.exceptions import (
     Error,
     FamilyMaintenanceWarning,
@@ -172,18 +174,18 @@ class BaseSite(ComparableMixin):
             del new['_iw_sites']
         return new
 
-    def __setstate__(self, attrs):
+    def __setstate__(self, attrs) -> None:
         """Restore things removed in __getstate__."""
         self.__dict__.update(attrs)
         self._pagemutex = threading.Condition()
 
-    def user(self):
+    def user(self) -> Optional[str]:
         """Return the currently-logged in bot username, or None."""
         if self.logged_in():
             return self.username()
         return None
 
-    def username(self):
+    def username(self) -> Optional[str]:
         """Return the username used for the site."""
         return self._username
 
@@ -203,7 +205,7 @@ class BaseSite(ComparableMixin):
             raise AttributeError("{} instance has no attribute '{}'"
                                  .format(self.__class__.__name__, attr))
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return string representing this Site's name and code."""
         return self.family.name + ':' + self.code
 
@@ -212,7 +214,7 @@ class BaseSite(ComparableMixin):
         """String representing this Site's name and code."""
         return SelfCallString(self.__str__())
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return internal representation."""
         return '{}("{}", "{}")'.format(
             self.__class__.__name__, self.code, self.family)
@@ -230,7 +232,7 @@ class BaseSite(ComparableMixin):
         return [lang for lang in self.languages()
                 if self.namespaces.lookup_normalized_name(lang) is None]
 
-    def _interwiki_urls(self, only_article_suffixes=False):
+    def _interwiki_urls(self, only_article_suffixes: bool = False):
         base_path = self.path()
         if not only_article_suffixes:
             yield base_path + '{}'
@@ -272,7 +274,7 @@ class BaseSite(ComparableMixin):
         """Return list of localized PAGENAMEE tags for the site."""
         return ['PAGENAMEE']
 
-    def lock_page(self, page, block=True):
+    def lock_page(self, page, block: bool = True):
         """
         Lock page for writing. Must be called before writing any page.
 
@@ -293,7 +295,7 @@ class BaseSite(ComparableMixin):
                 self._pagemutex.wait()
             self._locked_pages.add(title)
 
-    def unlock_page(self, page):
+    def unlock_page(self, page) -> None:
         """
         Unlock page. Call as soon as a write operation has completed.
 
@@ -347,7 +349,10 @@ class BaseSite(ComparableMixin):
         linkfam, linkcode = pywikibot.Link(text, self).parse_site()
         return linkfam != self.family.name or linkcode != self.code
 
-    def redirectRegex(self, pattern=None):  # noqa: N802
+    def redirectRegex(  # noqa: N802
+        self,
+        pattern: Optional[str] = None
+    ) -> Pattern[str]:
         """Return a compiled regular expression matching on redirect pages.
 
         Group 1 in the regex match object will be the target title.

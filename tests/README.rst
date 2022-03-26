@@ -258,5 +258,5 @@ Other class attributes
 - ``dry = True`` : test class can use a fake site object
 - ``cached = True``:  test class may aggressively cache API responses
 - ``login = True`` : test class needs to login to site
-- ``sysop = True`` : test class needs to login to site as a sysop
+- ``rights = '<rights>'`` : test class needs specific rights. Multiple rights  must be delimited with `,`.
 - ``write = True`` : test class needs to write to a site

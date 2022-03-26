@@ -124,7 +124,7 @@ class RedirectGenerator(OptionHandler):
         'xml': None,
     }
 
-    def __init__(self, action, **kwargs):
+    def __init__(self, action, **kwargs) -> None:
         """Initializer."""
         super().__init__(**kwargs)
         self.site = pywikibot.Site()
@@ -138,8 +138,10 @@ class RedirectGenerator(OptionHandler):
         elif action == 'both':
             cls.__iter__ = lambda slf: slf.get_redirects_via_api(maxlen=2)
 
-    def get_redirects_from_dump(self, alsoGetPageTitles=False) -> Tuple[
-            Dict[str, str], Set[str]]:
+    def get_redirects_from_dump(
+        self,
+        alsoGetPageTitles: bool = False
+    ) -> Tuple[Dict[str, str], Set[str]]:
         """
         Extract redirects from dump.
 
@@ -229,8 +231,10 @@ class RedirectGenerator(OptionHandler):
         if chunk:
             yield chunk
 
-    def get_redirects_via_api(self, maxlen=8) -> Generator[Tuple[
-            str, Optional[int], str, Optional[str]], None, None]:
+    def get_redirects_via_api(
+        self,
+        maxlen: int = 8
+    ) -> Generator[Tuple[str, Optional[int], str, Optional[str]], None, None]:
         r"""
         Return a generator that yields tuples of data about redirect Pages.
 
@@ -448,7 +452,7 @@ class RedirectRobot(ExistingPageBot, RedirectPageBot):
         if isinstance(item, str):
             item = pywikibot.Page(default_site, item)
         elif isinstance(item, tuple):
-            redir_name, code, target, final = item
+            redir_name, code, *_ = item
             item = pywikibot.Page(default_site, redir_name)
             item._redirect_type = code
         page = super().init_page(item)
@@ -694,7 +698,7 @@ def main(*args: str) -> None:
 
     local_args = pywikibot.handle_args(args)
     for argument in local_args:
-        arg, sep, value = argument.partition(':')
+        arg, _, value = argument.partition(':')
         option = arg.partition('-')[2]
         # bot options
         if arg == 'do':

@@ -1085,7 +1085,7 @@ class transliterator:  # noqa: N801
 
     """Class to transliterating text."""
 
-    def __init__(self, encoding: str):
+    def __init__(self, encoding: str) -> None:
         """
         Initialize the transliteration mapping.
 

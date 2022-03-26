@@ -168,6 +168,18 @@ def collector(loader=unittest.loader.defaultTestLoader):
     test_list += ['tests.script_tests.TestScriptSimulate.' + name
                   for name in tests]
 
+    tests = (['test__login']
+             + ['test_' + name
+                 for name in sorted(script_list)
+                 if name != 'login'
+                 and name not in failed_dep_script_set
+                 and name not in unrunnable_script_set
+                 and (enable_autorun_tests or name not in auto_run_script_list)
+                ])
+
+    test_list += ['tests.script_tests.TestScriptGenerator.' + name
+                  for name in tests]
+
     tests = loader.loadTestsFromNames(test_list)
     suite = unittest.TestSuite()
     suite.addTests(tests)
@@ -206,11 +218,18 @@ class TestScriptMeta(MetaTestCaseClass):
 
                 cmd = global_args + [script_name] + args
                 data_in = script_input.get(script_name)
-                timeout = 5 if is_autorun else None
+                if isinstance(self._timeout, bool):
+                    do_timeout = self._timeout
+                else:
+                    do_timeout = script_name in self._timeout
+                timeout = 5 if do_timeout else None
 
                 stdout, error = None, None
-                if self._results and script_name in self._results:
-                    error = self._results[script_name]
+                if self._results:
+                    if isinstance(self._results, dict):
+                        error = self._results.get(script_name)
+                    else:
+                        error = self._results
                     if isinstance(error, tuple):
                         stdout, error = error
 
@@ -224,16 +243,7 @@ class TestScriptMeta(MetaTestCaseClass):
 
                 err_result = result['stderr']
                 out_result = result['stdout']
-
-                stderr_sleep, stderr_other = [], []
-                for line in err_result.splitlines():
-                    if line.startswith('Sleeping for '):
-                        stderr_sleep.append(line)
-                    else:
-                        stderr_other.append(line)
-
-                if stderr_sleep:
-                    unittest_print('\n'.join(stderr_sleep))
+                stderr_other = err_result.splitlines()
 
                 if result['exit_code'] == -9:
                     unittest_print(' killed', end='  ')
@@ -349,14 +359,15 @@ class TestScriptHelp(PwbTestCase, metaclass=TestScriptMeta):
     _arguments = '-help'
     _results = None
     _skip_results = {}
+    _timeout = False
 
 
 class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
                          metaclass=TestScriptMeta):
 
-    """Test cases for scripts.
+    """Test cases for running scripts with -siumlate.
 
-    This class sets the'user' attribute on every test, thereby ensuring
+    This class sets the 'user' attribute on every test, thereby ensuring
     that the test runner has a username for the default site, and so that
     Site.login() is called in the test runner, which means that the scripts
     run in pwb can automatically login using the saved cookies.
@@ -378,6 +389,52 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
     _arguments = '-simulate'
     _results = no_args_expected_results
     _skip_results = skip_on_results
+    _timeout = auto_run_script_list
+
+
+class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
+                          metaclass=TestScriptMeta):
+
+    """Test cases for running scripts with a generator."""
+
+    login = True
+
+    _expected_failures = {
+        'add_text',
+        'archivebot',
+        'category',
+        'change_pagelang',
+        'claimit',
+        'data_ingestion',
+        'delete',
+        'djvutext',
+        'download_dump',
+        'harvest_template',
+        'interwiki',
+        'listpages',
+        'movepages',
+        'pagefromfile',
+        'protect',
+        'redirect',
+        'reflinks',
+        'replicate_wiki',
+        'speedy_delete',
+        'template',
+        'templatecount',
+        'transferbot',
+    }
+
+    _allowed_failures = [
+        'coordinate_import',
+        'illustrate_wikidata',
+        'newitem',
+        'solve_disambiguation',
+    ]
+
+    _arguments = '-simulate -page:Foo -always'
+    _results = ("Working on 'Foo", 'Script terminated successfully')
+    _skip_results = {}
+    _timeout = True
 
 
 if __name__ == '__main__':  # pragma: no cover

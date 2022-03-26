@@ -44,7 +44,7 @@ class UploadRobot(BaseBot):
                  summary: Optional[str] = None,
                  filename_prefix: Optional[str] = None,
                  force_if_shared: bool = False,
-                 **kwargs):
+                 **kwargs) -> None:
         """Initializer.
 
         .. versionchanged:: 6.2
@@ -441,7 +441,7 @@ class UploadRobot(BaseBot):
 
         return None
 
-    def skip_run(self):
+    def skip_run(self) -> bool:
         """Check whether processing is to be skipped."""
         # early check that upload is enabled
         if self.target_site.is_uploaddisabled():
