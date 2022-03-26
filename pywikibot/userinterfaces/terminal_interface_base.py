@@ -173,7 +173,7 @@ class UI(ABUIC):
             sys.stderr.write(text)
         elif target_stream == self.stdout:
             sys.stdout.write(text)
-        else:
+        else:  # pragma: no cover
             try:
                 out, err = self.stdout.name, self.stderr.name
             except AttributeError:
