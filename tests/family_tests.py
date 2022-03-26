@@ -80,12 +80,14 @@ class TestFamily(TestCase):
         family = Family.load('wikipedia')
         other = 'wikipedia'
         self.assertEqual(family, other)
+        self.assertFalse(family != other)  # noqa: H204
 
     def test_ne_family_with_string_repr_different_family(self):
         """Test that Family and string with different name are not equal."""
         family = Family.load('wikipedia')
         other = 'wikisource'
         self.assertNotEqual(family, other)
+        self.assertFalse(family == other)  # noqa: H204
 
     def test_eq_family_with_string_repr_not_existing_family(self):
         """Test that Family and string with different name are not equal."""

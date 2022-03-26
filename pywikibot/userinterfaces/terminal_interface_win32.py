@@ -52,7 +52,7 @@ class Win32UI(terminal_interface_base.UI):
         return target_stream.isatty()
 
     def encounter_color(self, color,
-                        target_stream) -> None:  # pragma: no cover 
+                        target_stream) -> None:  # pragma: no cover
         """Set the new color."""
         fg, bg = self.divide_color(color)
         windows_color = windowsColors[fg]

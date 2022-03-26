@@ -35,9 +35,9 @@ from typing import Any, Optional, Union
 from pywikibot.backports import Callable, List
 
 
-STDOUT = 16
-VERBOSE = 18
-INPUT = 25
+STDOUT = 16  #:
+VERBOSE = 18  #:
+INPUT = 25  #:
 
 _init_routines = []  # type: List[Callable[[], Any]]
 _inited_routines = set()
