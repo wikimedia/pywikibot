@@ -904,147 +904,143 @@ class CheckImagesBot:
         hash_found = image_page.latest_file_info.sha1
         duplicates = list(self.site.allimages(sha1=hash_found))
 
-        if not duplicates:
-            return False  # Image deleted, no hash found. Skip the image.
+        # If empty, image is deleted, no hash found. Skip the image.
+        # Otherwise ok, let's continue the checking phase
+        if len(duplicates) <= 1:
+            return bool(duplicates)
 
-        if len(duplicates) > 1:
-            xdict = {'en':
-                     '%(name)s has {{PLURAL:count'
-                     '|a duplicate! Reporting it'
-                     '|%(count)s duplicates! Reporting them}}...'}
-            pywikibot.output(i18n.translate('en', xdict,
-                                            {'name': self.image_name,
-                                             'count': len(duplicates) - 1}))
-            if dup_text and dup_regex:
-                time_image_list = []
+        xdict = {'en':
+                 '%(name)s has {{PLURAL:count'
+                 '|a duplicate! Reporting it'
+                 '|%(count)s duplicates! Reporting them}}...'}
+        pywikibot.output(i18n.translate('en', xdict,
+                                        {'name': self.image_name,
+                                         'count': len(duplicates) - 1}))
+        if dup_text and dup_regex:
+            time_image_list = []
 
-                for dup_page in duplicates:
-                    if (dup_page.title(as_url=True) != self.image.title(
-                        as_url=True)
-                            or self.timestamp is None):
-                        try:
-                            self.timestamp = (
-                                dup_page.latest_file_info.timestamp)
-                        except PageRelatedError:
-                            continue
-                    data = self.timestamp.timetuple()
-                    data_seconds = time.mktime(data)
-                    time_image_list.append([data_seconds, dup_page])
-                older_image_page = self.important_image(time_image_list)
-                older_page_text = older_image_page.text
-                # And if the images are more than two?
-                string = ''
-                images_to_tag_list = []
-
-                for dup_page in duplicates:
-                    if dup_page == older_image_page:
-                        # the most used or oldest image
-                        # not report also this as duplicate
-                        continue
+            for dup_page in duplicates:
+                if dup_page.title(as_url=True) != self.image.title(
+                        as_url=True) or self.timestamp is None:
                     try:
-                        dup_page_text = dup_page.text
-                    except NoPageError:
+                        self.timestamp = (dup_page.latest_file_info.timestamp)
+                    except PageRelatedError:
                         continue
+                data = self.timestamp.timetuple()
+                data_seconds = time.mktime(data)
+                time_image_list.append([data_seconds, dup_page])
+            older_image_page = self.important_image(time_image_list)
+            older_page_text = older_image_page.text
+            # And if the images are more than two?
+            string = ''
+            images_to_tag_list = []
 
-                    if not (re.findall(dup_regex, dup_page_text)
-                            or re.findall(dup_regex, older_page_text)):
-                        pywikibot.output(
-                            '{} is a duplicate and has to be tagged...'
-                            .format(dup_page))
-                        images_to_tag_list.append(dup_page.title())
-                        string += '* {}\n'.format(
-                            dup_page.title(as_link=True, textlink=True))
-                    else:
-                        pywikibot.output(
-                            "Already put the dupe-template in the files's page"
-                            " or in the dupe's page. Skip.")
-                        return False  # Ok - Let's continue the checking phase
+            for dup_page in duplicates:
+                if dup_page == older_image_page:
+                    # the most used or oldest image
+                    # not report also this as duplicate
+                    continue
+                try:
+                    dup_page_text = dup_page.text
+                except NoPageError:
+                    continue
 
-                # true if the image are not to be tagged as dupes
-                only_report = False
-
-                # put only one image or the whole list according to the request
-                if '__images__' in dup_text:
-                    text_for_the_report = dup_text.replace(
-                        '__images__',
-                        '\n{}* {}\n'.format(
-                            string,
-                            older_image_page.title(
-                                as_link=True, textlink=True)))
+                if not (re.findall(dup_regex, dup_page_text)
+                        or re.findall(dup_regex, older_page_text)):
+                    pywikibot.output(
+                        '{} is a duplicate and has to be tagged...'
+                        .format(dup_page))
+                    images_to_tag_list.append(dup_page.title())
+                    string += '* {}\n'.format(dup_page.title(as_link=True,
+                                                             textlink=True))
                 else:
-                    text_for_the_report = dup_text.replace(
-                        '__image__',
-                        older_image_page.title(as_link=True, textlink=True))
+                    pywikibot.output(
+                        "Already put the dupe-template in the files's page"
+                        " or in the dupe's page. Skip.")
+                    return False  # Ok - Let's continue the checking phase
 
-                # Two iteration: report the "problem" to the user only once
-                # (the last)
-                if len(images_to_tag_list) > 1:
-                    for image_to_tag in images_to_tag_list[:-1]:
-                        fp = pywikibot.FilePage(self.site, image_to_tag)
-                        already_reported_in_past = fp.revision_count(self.bots)
-                        # if you want only one edit, the edit found should be
-                        # more than 0 -> num - 1
-                        if already_reported_in_past > duplicates_rollback - 1:
-                            only_report = True
-                            break
-                        # Delete the image in the list where we're write on
-                        image = self.image_namespace + image_to_tag
-                        text_for_the_report = re.sub(
-                            r'\n\*\[\[:{}\]\]'.format(re.escape(image)),
-                            '', text_for_the_report)
-                        self.report(text_for_the_report, image_to_tag,
-                                    comm_image=dup_comment_image, unver=True)
+            # true if the image are not to be tagged as dupes
+            only_report = False
 
-                if images_to_tag_list and not only_report:
-                    fp = pywikibot.FilePage(self.site, images_to_tag_list[-1])
+            # put only one image or the whole list according to the request
+            if '__images__' in dup_text:
+                text_for_the_report = dup_text.replace(
+                    '__images__',
+                    '\n{}* {}\n'.format(string,
+                                        older_image_page.title(as_link=True,
+                                                               textlink=True)))
+            else:
+                text_for_the_report = dup_text.replace(
+                    '__image__',
+                    older_image_page.title(as_link=True, textlink=True))
+
+            # Two iteration: report the "problem" to the user only once
+            # (the last)
+            if len(images_to_tag_list) > 1:
+                for image_to_tag in images_to_tag_list[:-1]:
+                    fp = pywikibot.FilePage(self.site, image_to_tag)
                     already_reported_in_past = fp.revision_count(self.bots)
-                    image_title = re.escape(self.image.title(as_url=True))
-                    from_regex = (r'\n\*\[\[:{}{}\]\]'
-                                  .format(self.image_namespace, image_title))
-                    # Delete the image in the list where we're write on
-                    text_for_the_report = re.sub(from_regex, '',
-                                                 text_for_the_report)
-                    # if you want only one edit, the edit found should be more
-                    # than 0 -> num - 1
-                    if already_reported_in_past > duplicates_rollback - 1 or \
-                            not dup_talk_text:
+                    # if you want only one edit, the edit found should be
+                    # more than 0 -> num - 1
+                    if already_reported_in_past > duplicates_rollback - 1:
                         only_report = True
-                    else:
-                        self.report(
-                            text_for_the_report, images_to_tag_list[-1],
-                            dup_talk_text
-                            % (older_image_page.title(with_ns=True),
-                               string),
-                            dup_talk_head, comm_talk=dup_comment_talk,
-                            comm_image=dup_comment_image, unver=True)
+                        break
+                    # Delete the image in the list where we're write on
+                    image = self.image_namespace + image_to_tag
+                    text_for_the_report = re.sub(
+                        r'\n\*\[\[:{}\]\]'.format(re.escape(image)),
+                        '', text_for_the_report)
+                    self.report(text_for_the_report, image_to_tag,
+                                comm_image=dup_comment_image, unver=True)
 
-            if self.duplicates_report or only_report:
-                if only_report:
-                    repme = ((self.list_entry + 'has the following duplicates '
-                              "('''forced mode'''):")
-                             % self.image.title(as_url=True))
+            if images_to_tag_list and not only_report:
+                fp = pywikibot.FilePage(self.site, images_to_tag_list[-1])
+                already_reported_in_past = fp.revision_count(self.bots)
+                image_title = re.escape(self.image.title(as_url=True))
+                from_regex = (r'\n\*\[\[:{}{}\]\]'
+                              .format(self.image_namespace, image_title))
+                # Delete the image in the list where we're write on
+                text_for_the_report = re.sub(from_regex, '',
+                                             text_for_the_report)
+                # if you want only one edit, the edit found should be more
+                # than 0 -> num - 1
+                if already_reported_in_past > duplicates_rollback - 1 \
+                   or not dup_talk_text:
+                    only_report = True
                 else:
-                    repme = (
-                        (self.list_entry + 'has the following duplicates:')
-                        % self.image.title(as_url=True))
+                    self.report(
+                        text_for_the_report, images_to_tag_list[-1],
+                        dup_talk_text % (older_image_page.title(with_ns=True),
+                                         string),
+                        dup_talk_head, comm_talk=dup_comment_talk,
+                        comm_image=dup_comment_image, unver=True)
 
-                for dup_page in duplicates:
-                    if (dup_page.title(as_url=True)
-                            == self.image.title(as_url=True)):
-                        # the image itself, not report also this as duplicate
-                        continue
-                    repme += '\n** [[:{}{}]]'.format(
-                        self.image_namespace, dup_page.title(as_url=True))
+        if self.duplicates_report or only_report:
+            if only_report:
+                repme = ((self.list_entry + 'has the following duplicates '
+                          "('''forced mode'''):")
+                         % self.image.title(as_url=True))
+            else:
+                repme = ((self.list_entry + 'has the following duplicates:')
+                         % self.image.title(as_url=True))
 
-                result = self.report_image(self.image_name, self.rep_page,
-                                           self.com, repme, addings=False)
-                if not result:
-                    return True  # If Errors, exit (but continue the check)
+            for dup_page in duplicates:
+                if dup_page.title(as_url=True) \
+                   == self.image.title(as_url=True):
+                    # the image itself, not report also this as duplicate
+                    continue
+                repme += '\n** [[:{}{}]]'.format(self.image_namespace,
+                                                 dup_page.title(as_url=True))
 
-            if older_image_page.title() != self.image_name:
-                # The image is a duplicate, it will be deleted. So skip the
-                # check-part, useless
-                return False
+            result = self.report_image(self.image_name, self.rep_page,
+                                       self.com, repme, addings=False)
+            if not result:
+                return True  # If Errors, exit (but continue the check)
+
+        if older_image_page.title() != self.image_name:
+            # The image is a duplicate, it will be deleted. So skip the
+            # check-part, useless
+            return False
         return True  # Ok - No problem. Let's continue the checking phase
 
     def report_image(self, image_to_report, rep_page=None, com=None,
