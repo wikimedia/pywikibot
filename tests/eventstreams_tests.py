@@ -44,7 +44,7 @@ class TestEventStreamsUrlTests(TestCase):
         self.assertEqual(e._url, e.sse_kwargs.get('url'))
         self.assertIsNone(e._total)
         self.assertIsNone(e._streams)
-        if PYTHON_VERSION > (3, 5):
+        if PYTHON_VERSION >= (3, 6):
             self.assertEqual(repr(e),
                              "EventStreams(url='{}')"
                              .format(self.sites[key]['hostname']))
@@ -60,7 +60,7 @@ class TestEventStreamsUrlTests(TestCase):
         self.assertEqual(e._url, e.sse_kwargs.get('url'))
         self.assertIsNone(e._total)
         self.assertEqual(e._streams, streams)
-        if PYTHON_VERSION > (3, 5):
+        if PYTHON_VERSION >= (3, 6):
             site_repr = 'site={}, '.format(
                 repr(site)) if site != Site() else ''
             self.assertEqual(repr(e),
