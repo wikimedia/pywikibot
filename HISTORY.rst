@@ -1,6 +1,30 @@
 Release history
 ^^^^^^^^^^^^^^^
 
+7.1.0
+-----
+*26 March 2022*
+
+* Add FilePage.file_is_used property to determine whether a file is used on a site
+* Add support for guwwiki and shnwikivoyage (:phab:`T303762`, :phab:`T302799`)
+* TextExtracts support was aded (:phab:`T72682`)
+* Unused `get_redirect` parameter of Page.getOldVersion() has been dropped
+* Provide BasePage.get_parsed_page() a public method
+* Provide BuiltinNamespace.canonical_namespaces() with BuiltinNamespace IntEnum
+* BuiltinNamespace got a canonical() method
+* Enable nested templates with MultiTemplateMatchBuilder (:phab:`T110529`)
+* Introduce APISite.simple_request as a public method
+* Provide an Uploader class to upload files
+* Enable use of deletetalk parameter of the delete API
+* Fix contextlib redirection for terminal interfaces (:phab:`T283808`)
+* No longer use win32_unicode for Python 3.6+ (:phab:`T281042`, :phab:`T283808`, :phab:`T303373`)
+* L10N updates
+* -cosmetic_changes (-cc) option allows to assign the value directly instead of toggle it
+* distutils.util.strtobool() was implemented as tools.strtobool() due to :pep:`632`
+* The "in" operator always return whether the siteinfo contains the key even it is not cached (:phab:`T302859`)
+* Siteinfo.clear() and  Siteinfo.is_cached() methods were added
+
+
 7.0.0
 -----
 *26 February 2022*
