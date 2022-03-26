@@ -7,6 +7,7 @@ Current release changes
 Deprecations
 ^^^^^^^^^^^^
 
+* 7.1.0: win32_unicode.py will be removed with Pywikibot 8
 * 7.1.0: Unused `get_redirect` parameter of Page.getOldVersion() will be removed
 * 7.1.0: APISite._simple_request() will be removed in favour of APISite.simple_request()
 * 7.0.0: The i18n identifier 'cosmetic_changes-append' will be removed in favour of 'pywikibot-cosmetic-changes'
@@ -30,4 +31,3 @@ Deprecations
 * 5.5.0: APISite.redirectRegex() is deprecated in favour of APISite.redirect_regex()
 * 4.0.0: Revision.parent_id is deprecated in favour of Revision.parentid
 * 4.0.0: Revision.content_model is deprecated in favour of Revision.contentmodel
-
