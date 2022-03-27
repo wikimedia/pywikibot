@@ -291,10 +291,7 @@ class Coordinate(_WbRepresentation):
         globe = None
 
         if data['globe']:
-            globes = {}
-            for name, entity in site.globes().items():
-                globes[entity] = name
-
+            globes = {entity: name for name, entity in site.globes().items()}
             globe = globes.get(data['globe'])
 
         return cls(data['latitude'], data['longitude'],
