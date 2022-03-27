@@ -30,6 +30,7 @@ from tests.aspects import (
     TestCase,
     unittest,
 )
+from tests.utils import skipping
 
 
 EMPTY_TITLE_RE = r'Title must be specified and not empty if source is a Site\.'
@@ -280,6 +281,19 @@ class TestPageObjectEnglish(TestCase):
         self.assertEqual(mainpage.oldest_revision.user, 'TwoOneTwo')
         self.assertIsInstance(mainpage.oldest_revision.timestamp,
                               pywikibot.Timestamp)
+
+    def test_old_version(self):
+        """Test page.getOldVersion()."""
+        mainpage = self.get_mainpage()
+        revid = mainpage.oldest_revision.revid
+        self.assertIsNone(mainpage.oldest_revision.text)
+        self.assertIsNone(mainpage._revisions[revid].text)
+        text = mainpage.getOldVersion(revid)
+        self.assertEqual(
+            text[:53], "'''[[Welcome, newcomers|Welcome]] to [[Wikipedia]]'''")
+        self.assertEqual(text, mainpage._revisions[revid].text)
+        with skipping(AssertionError, msg='T304786'):
+            self.assertEqual(text, mainpage.oldest_revision.text)
 
 
 class TestPageObject(DefaultSiteTestCase):
