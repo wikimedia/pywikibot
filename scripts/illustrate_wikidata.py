@@ -13,7 +13,7 @@ Usage:
 &params;
 """
 #
-# (C) Pywikibot team, 2013-2021
+# (C) Pywikibot team, 2013-2022
 #
 # Distributed under the terms of MIT License.
 #

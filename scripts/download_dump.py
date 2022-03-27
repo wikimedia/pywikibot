@@ -16,7 +16,7 @@ This script supports the following command line parameters:
    can be set within a settings file which is scripts.ini by default.
 """
 #
-# (C) Pywikibot team, 2017-2021
+# (C) Pywikibot team, 2017-2022
 #
 # Distributed under the terms of the MIT license.
 #

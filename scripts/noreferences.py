@@ -29,7 +29,7 @@ bandwidth. Instead, use the -xml parameter, or use another way to generate
 a list of affected articles
 """
 #
-# (C) Pywikibot team, 2007-2021
+# (C) Pywikibot team, 2007-2022
 #
 # Distributed under the terms of the MIT license.
 #
