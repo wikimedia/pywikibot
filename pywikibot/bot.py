@@ -507,7 +507,7 @@ def writelogheader() -> None:
 
     # imported modules
     log('MODULES:')
-    for module in sys.modules.values():
+    for module in sys.modules.copy().values():
         filename = version.get_module_filename(module)
         if not filename:
             continue
