@@ -1,6 +1,6 @@
 """Module containing various formatting related utilities."""
 #
-# (C) Pywikibot team, 2015-2021
+# (C) Pywikibot team, 2015-2022
 #
 # Distributed under the terms of the MIT license.
 #

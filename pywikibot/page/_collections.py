@@ -1,6 +1,6 @@
 """Structures holding data for Wikibase entities."""
 #
-# (C) Pywikibot team, 2019-2021
+# (C) Pywikibot team, 2019-2022
 #
 # Distributed under the terms of the MIT license.
 #
