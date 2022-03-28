@@ -1585,27 +1585,63 @@ The text message is:
                 return True
         return False
 
-    def _handle_warnings(self, result) -> None:
-        if 'warnings' in result:
-            for mod, warning in result['warnings'].items():
-                if mod == 'info':
-                    continue
-                if '*' in warning:
-                    text = warning['*']
-                elif 'html' in warning:
-                    # bug T51978
-                    text = warning['html']['*']
-                else:
-                    pywikibot.warning(
-                        'API warning ({}) of unknown format: {}'.
-                        format(mod, warning))
-                    continue
-                # multiple warnings are in text separated by a newline
-                for single_warning in text.splitlines():
-                    if (not callable(self._warning_handler)
-                            or not self._warning_handler(mod, single_warning)):
+    def _handle_warnings(self, result: Dict[str, Any]) -> bool:
+        """Handle warnings; return True to retry request, False to resume.
+
+        .. versionchanged:: 7.2
+           Return True to retry the current request and Falso to resume.
+        """
+        retry = False
+        if 'warnings' not in result:
+            return retry
+
+        for mod, warning in result['warnings'].items():
+            if mod == 'info':
+                continue
+            if '*' in warning:
+                text = warning['*']
+            elif 'html' in warning:
+                # bug T51978
+                text = warning['html']['*']
+            else:
+                pywikibot.warning('API warning ({}) of unknown format: {}'
+                                  .format(mod, warning))
+                continue
+
+            # multiple warnings are in text separated by a newline
+            for single_warning in text.splitlines():
+                if (not callable(self._warning_handler)
+                        or not self._warning_handler(mod, single_warning)):
+                    handled = self._default_warning_handler(mod,
+                                                            single_warning)
+                    if handled is None:
                         pywikibot.warning('API warning ({}): {}'
                                           .format(mod, single_warning))
+                    else:
+                        retry = retry or handled
+        return retry
+
+    def _default_warning_handler(self, mode: str, msg: str) -> Optional[bool]:
+        """A default warning handler to handle specific warnings.
+
+        Return True to retry the request, False to resume and None if
+        the warning is not handled.
+
+        .. versionadded:: 7.2
+        """
+        warnings = {
+            'purge': ("You've exceeded your rate limit. "
+                      'Please wait some time and try again.',
+                      '_ratelimited', True),
+        }
+        warning, handler, retry = warnings.get(mode, (None, None, None))
+        if handler and msg == warning:
+            # Only show the first warning part
+            pywikibot.warning(msg.split('.')[0] + '.')
+            # call the handler
+            getattr(self, handler)()
+            return retry
+        return None
 
     def _logged_in(self, code) -> bool:
         """Check whether user is logged in.
@@ -1771,7 +1807,8 @@ The text message is:
             if self._userinfo_query(result):
                 continue
 
-            self._handle_warnings(result)
+            if self._handle_warnings(result):
+                continue
 
             if 'error' not in result:
                 return result
