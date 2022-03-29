@@ -1,7 +1,10 @@
 Current release changes
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-* (no change yet)
+* Fix URL of GoogleOCR
+* Handle ratelimit with purgepages() (:phab:`T152597`)
+* Add movesubpages parameter to Page.move() and APISite.movepage() (:phab:`T57084`)
+* Do not iterate over sys.modules (:phab:`T304785`)
 
 
 Deprecations
