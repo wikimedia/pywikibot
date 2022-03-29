@@ -562,10 +562,12 @@ class ReferencesRobot(SingleSiteBot,
         if enc:
             # Use encoding if found. Else use chardet apparent encoding
             encoding = enc.group('enc').strip('"\' ').lower()
-            naked = re.sub(r'[ _\-]', '', encoding)
             # Convert to python correct encoding names
-            if naked == 'xeucjp':
+            if re.sub(r'[ _\-]', '', encoding) == 'xeucjp':
                 encoding = 'euc_jp'
+            else:
+                # fix cp encodings (T304830)
+                encoding = re.sub(r'\Acp[ _\-](\d{3,4})', r'cp\1', encoding)
             return encoding
         return None
 
