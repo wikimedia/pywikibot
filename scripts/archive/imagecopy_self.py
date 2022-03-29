@@ -47,7 +47,8 @@ import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.specialbots import UploadRobot
 from pywikibot.textlib import removeCategoryLinks
-from scripts import image, imagerecat
+from scripts import image
+from scripts.archive import imagerecat
 
 
 try:
