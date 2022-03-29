@@ -58,6 +58,8 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | delete.py              | This script can be used to delete pages en masse.       |
     +------------------------+---------------------------------------------------------+
+    | delinker.py            | Delink file references of deleted images.               |
+    +------------------------+---------------------------------------------------------+
     | djvutext.py            | Extracts OCR text from djvu files and uploads onto      |
     |                        | pages in the "Page" namespace on Wikisource.            |
     +------------------------+---------------------------------------------------------+
