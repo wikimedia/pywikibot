@@ -16,7 +16,7 @@ OCR support of page scans via:
 - Wikimedia OCR
 - see: https://www.mediawiki.org/wiki/Help:Extension:Wikisource/Wikimedia_OCR
 
-- https://ws-google-ocr.toolforge.org/
+- https://ocr.wmcloud.org/
 - inspired by https://wikisource.org/wiki/MediaWiki:GoogleOCR.js
 - see also: https://wikisource.org/wiki/Wikisource:Google_OCR
 
@@ -180,8 +180,8 @@ class ProofreadPage(pywikibot.Page):
                    'langs[]={lang}&image={url_image}&uselang={lang}')
 
     # googleOCR ocr utility
-    _GOCR_CMD = ('https://ws-google-ocr.toolforge.org/api.php?'
-                 'image={url_image}&lang={lang}')
+    _GOCR_CMD = ('https://ocr.wmcloud.org/api.php?engine=google&'
+                 'langs[]={lang}&image={url_image}')
 
     _MULTI_PAGE_EXT = ['djvu', 'pdf']
 
