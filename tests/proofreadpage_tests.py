@@ -21,6 +21,7 @@ from tests.basepage import (
     BasePageLoadRevisionsCachingTestBase,
     BasePageMethodsTestBase,
 )
+from tests.utils import skipping
 
 
 class TestProofreadPageInvalidSite(TestCase):
@@ -310,13 +311,14 @@ class TestProofreadPageValidSite(TestCase):
         page = ProofreadPage(self.site, self.valid['title'])
         self.assertEqual(page.url_image, self.valid['url_image'])
 
-        page = ProofreadPage(self.site, self.valid_redlink['title'])
-        self.assertEqual(page.url_image, self.valid_redlink['url_image'])
-
         page = ProofreadPage(self.site, self.existing_unlinked['title'])
         # test Exception in property.
         with self.assertRaises(ValueError):
             page.url_image
+
+        page = ProofreadPage(self.site, self.valid_redlink['title'])
+        with skipping(ValueError, msg='T181913, T114318'):
+            self.assertEqual(page.url_image, self.valid_redlink['url_image'])
 
 
 class TestPageQuality(TestCase):
