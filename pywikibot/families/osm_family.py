@@ -1,6 +1,6 @@
 """Family module for OpenStreetMap wiki."""
 #
-# (C) Pywikibot team, 2009-2020
+# (C) Pywikibot team, 2009-2022
 #
 # Distributed under the terms of the MIT license.
 #

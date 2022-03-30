@@ -8,7 +8,7 @@ https://dumps.wikimedia.org/backup-index.html) and offers a generator over
 XmlEntry objects which can be used by other bots.
 """
 #
-# (C) Pywikibot team, 2005-2020
+# (C) Pywikibot team, 2005-2022
 #
 # Distributed under the terms of the MIT license.
 #

@@ -1,6 +1,6 @@
 """Family module for Wikidata."""
 #
-# (C) Pywikibot team, 2012-2020
+# (C) Pywikibot team, 2012-2022
 #
 # Distributed under the terms of the MIT license.
 #
