@@ -20,7 +20,7 @@ Command line options:
              user-config.py
 """
 #
-# (C) Pywikibot team, 2005-2021
+# (C) Pywikibot team, 2005-2022
 #
 # Distributed under the terms of the MIT license.
 #

@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Script that forms part of pwb_tests."""
 #
-# (C) Pywikibot team, 2018-2021
+# (C) Pywikibot team, 2018-2022
 #
 # Distributed under the terms of the MIT license.
 #
