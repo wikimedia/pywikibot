@@ -37,7 +37,7 @@ used on a page reachable via interwiki links.
 &params;
 """
 #
-# (C) Pywikibot team, 2004-2021
+# (C) Pywikibot team, 2004-2022
 #
 # Distributed under the terms of the MIT license.
 #

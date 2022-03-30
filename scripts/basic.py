@@ -44,7 +44,7 @@ cannot be set by settings file:
 &params;
 """
 #
-# (C) Pywikibot team, 2006-2021
+# (C) Pywikibot team, 2006-2022
 #
 # Distributed under the terms of the MIT license.
 #

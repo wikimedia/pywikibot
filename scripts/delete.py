@@ -51,7 +51,7 @@ Delete everything in the category "To delete" without prompting:
     python pwb.py delete -cat:"To delete" -always
 """
 #
-# (C) Pywikibot team, 2013-2021
+# (C) Pywikibot team, 2013-2022
 #
 # Distributed under the terms of the MIT license.
 #

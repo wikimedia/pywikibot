@@ -1,6 +1,6 @@
 """Family module for Vikidia."""
 #
-# (C) Pywikibot team, 2010-2021
+# (C) Pywikibot team, 2010-2022
 #
 # Distributed under the terms of the MIT license.
 #
