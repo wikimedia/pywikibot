@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Bot to find all pages on the wiki with mixed latin and cyrilic alphabets."""
 #
-# (C) Pywikibot team, 2006-2021
+# (C) Pywikibot team, 2006-2022
 #
 # Distributed under the terms of the MIT license.
 #
