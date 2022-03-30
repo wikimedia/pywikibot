@@ -38,7 +38,7 @@ from functools import partial
 
 import pywikibot
 from pywikibot import i18n, pagegenerators, textlib
-from pywikibot.bot import ExistingPageBot, NoRedirectPageBot, SingleSiteBot
+from pywikibot.bot import ExistingPageBot, SingleSiteBot
 from pywikibot.exceptions import LockedPageError
 from pywikibot.pagegenerators import XMLDumpPageGenerator
 
@@ -511,9 +511,11 @@ XmlDumpNoReferencesPageGenerator = partial(
     XMLDumpPageGenerator, text_predicate=_match_xml_page_text)
 
 
-class NoReferencesBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
+class NoReferencesBot(SingleSiteBot, ExistingPageBot):
 
     """References section bot."""
+
+    use_redirects = False
 
     def __init__(self, **kwargs) -> None:
         """Initializer."""

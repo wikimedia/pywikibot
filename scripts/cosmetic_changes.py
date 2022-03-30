@@ -32,17 +32,13 @@ The following generators and filters are supported:
 For further information see pywikibot/cosmetic_changes.py
 """
 #
-# (C) Pywikibot team, 2006-2021
+# (C) Pywikibot team, 2006-2022
 #
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
 from pywikibot import config, pagegenerators
-from pywikibot.bot import (
-    AutomaticTWSummaryBot,
-    ExistingPageBot,
-    NoRedirectPageBot,
-)
+from pywikibot.bot import AutomaticTWSummaryBot, ExistingPageBot
 from pywikibot.cosmetic_changes import CANCEL, CosmeticChangesToolkit
 from pywikibot.exceptions import InvalidPageError
 
@@ -59,12 +55,11 @@ docuReplacements = {
 }
 
 
-class CosmeticChangesBot(AutomaticTWSummaryBot,
-                         ExistingPageBot,
-                         NoRedirectPageBot):
+class CosmeticChangesBot(AutomaticTWSummaryBot, ExistingPageBot):
 
     """Cosmetic changes bot."""
 
+    use_redirects = False
     summary_key = 'cosmetic_changes-standalone'
     update_options = {
         'async': False,

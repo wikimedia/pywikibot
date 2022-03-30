@@ -63,12 +63,7 @@ from typing import Optional
 import pywikibot
 from pywikibot import comms, config, i18n, pagegenerators, textlib
 from pywikibot.backports import Match, removeprefix
-from pywikibot.bot import (
-    ConfigParserBot,
-    ExistingPageBot,
-    NoRedirectPageBot,
-    SingleSiteBot,
-)
+from pywikibot.bot import ConfigParserBot, ExistingPageBot, SingleSiteBot
 from pywikibot.exceptions import (
     FatalServerError,
     Server414Error,
@@ -421,16 +416,15 @@ class DuplicateReferences:
         return text
 
 
-class ReferencesRobot(SingleSiteBot,
-                      ConfigParserBot,
-                      ExistingPageBot,
-                      NoRedirectPageBot):
+class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
 
     """References bot.
 
     .. versionchanged:: 7.0
        ReferencesRobot is a ConfigParserBot
     """
+
+    use_redirects = False
 
     update_options = {
         'ignorepdf': False,

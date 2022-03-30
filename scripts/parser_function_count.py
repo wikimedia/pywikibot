@@ -60,13 +60,14 @@ from collections import Counter
 
 import pywikibot
 from pywikibot import pagegenerators
-from pywikibot.bot import ExistingPageBot, NoRedirectPageBot, SingleSiteBot
+from pywikibot.bot import ExistingPageBot, SingleSiteBot
 
 
-class ParserFunctionCountBot(SingleSiteBot,
-                             ExistingPageBot, NoRedirectPageBot):
+class ParserFunctionCountBot(SingleSiteBot, ExistingPageBot):
 
     """Bot class used for obtaining Parser function Count."""
+
+    use_redirects = False
 
     update_options = {
         'atleast': None,

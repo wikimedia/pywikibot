@@ -30,7 +30,6 @@ from pywikibot import pagegenerators
 from pywikibot.bot import (
     AutomaticTWSummaryBot,
     ExistingPageBot,
-    NoRedirectPageBot,
     SingleSiteBot,
     suggest_help,
 )
@@ -54,11 +53,11 @@ docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 FEATURED_ARTICLES = 'Q4387444'
 
 
-class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
-                        AutomaticTWSummaryBot):
+class FixingRedirectBot(SingleSiteBot, ExistingPageBot, AutomaticTWSummaryBot):
 
     """Run over pages and resolve redirect links."""
 
+    use_redirects = False
     ignore_save_related_errors = True
     ignore_server_errors = True
     summary_key = 'fixing_redirects-fixing'

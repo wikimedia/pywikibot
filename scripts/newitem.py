@@ -20,7 +20,7 @@ This script understands various command-line arguments:
 
 """
 #
-# (C) Pywikibot team, 2014-2021
+# (C) Pywikibot team, 2014-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -30,7 +30,7 @@ from textwrap import fill
 import pywikibot
 from pywikibot import pagegenerators
 from pywikibot.backports import Set
-from pywikibot.bot import NoRedirectPageBot, WikidataBot
+from pywikibot.bot import WikidataBot
 from pywikibot.exceptions import (
     LockedPageError,
     NoCreateError,
@@ -42,10 +42,11 @@ from pywikibot.exceptions import (
 DELETION_TEMPLATES = ('Q4847311', 'Q6687153', 'Q21528265')
 
 
-class NewItemRobot(WikidataBot, NoRedirectPageBot):
+class NewItemRobot(WikidataBot):
 
     """A bot to create new items."""
 
+    use_redirect = False
     treat_missing_item = True
     update_options = {
         'always': True,
