@@ -1186,21 +1186,26 @@ class GeneratorsMixin:
                                namespaces=namespaces,
                                total=total, g_content=content)
 
-    def imageusage(self, image, namespaces=None, filterredir=None,
-                   total=None, content: bool = False):
+    def imageusage(self, image: 'pywikibot.FilePage', *,
+                   namespaces=None,
+                   filterredir: Optional[bool] = None,
+                   total: Optional[int] = None,
+                   content: bool = False):
         """Iterate Pages that contain links to the given FilePage.
 
-        :see: https://www.mediawiki.org/wiki/API:Imageusage
+        .. seealso:: https://www.mediawiki.org/wiki/API:Imageusage
+        .. versionchanged:: 7.2
+           all parameters except `image` are keyword only.
 
         :param image: the image to search for (FilePage need not exist on
             the wiki)
-        :type image: pywikibot.FilePage
         :param namespaces: If present, only iterate pages in these namespaces
         :type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         :param filterredir: if True, only yield redirects; if False (and not
             None), only yield non-redirects (default: yield both)
+        :param total: iterate no more than this number of pages in total
         :param content: if True, load the current content of each iterated page
             (default False)
         :raises KeyError: a namespace identifier was not resolved
