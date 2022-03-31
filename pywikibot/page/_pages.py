@@ -2446,17 +2446,27 @@ class FilePage(Page):
         return self.latest_file_info.thumburl
 
     def file_is_shared(self) -> bool:
-        """Check if the file is stored on any known shared repository."""
+        """Check if the file is stored on any known shared repository.
+
+        .. versionchanged:: 7.0
+           return False if file does not exist on shared image repository
+           instead raising NoPageError.
+        """
         # as of now, the only known repositories are commons and wikitravel
         # TODO: put the URLs to family file
         if not self.site.has_image_repository:
             return False
 
+        try:
+            info = self.latest_file_info
+        except NoPageError:
+            return False
+
         if 'wikitravel_shared' in self.site.shared_image_repository():
-            return self.latest_file_info.url.startswith(
-                'https://wikitravel.org/upload/shared/')
+            return info.url.startswith('https://wikitravel.org/upload/shared/')
+
         # default to commons
-        return self.latest_file_info.url.startswith(
+        return info.url.startswith(
             'https://upload.wikimedia.org/wikipedia/commons/')
 
     def getFileVersionHistoryTable(self):
