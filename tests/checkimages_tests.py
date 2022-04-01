@@ -7,8 +7,10 @@
 #
 import unittest
 
+from pywikibot import FilePage
+
 from scripts import checkimages
-from tests.aspects import TestCase
+from tests.aspects import DefaultSiteTestCase, TestCase
 
 
 class TestSettings(TestCase):
@@ -27,6 +29,18 @@ class TestSettings(TestCase):
         item1 = rv[0]
         self.assertEqual(item1[0], 1)
         self.assertEqual(item1[1], 'a deprecated template')
+
+
+class TestMethods(DefaultSiteTestCase):
+
+    """Test methods of CheckImagesBot."""
+
+    def test_important_image(self):
+        """Test important_image method."""
+        filenames = ('Example.jpg', 'Demo.jpg')
+        images = [(0.0, FilePage(self.site, name)) for name in filenames]
+        self.assertEqual(checkimages.CheckImagesBot.important_image(images),
+                         FilePage(self.site, 'Example.jpg'))
 
 
 if __name__ == '__main__':  # pragma: no cover

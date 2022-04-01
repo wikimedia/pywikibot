@@ -84,6 +84,8 @@ Todo
 import collections
 import re
 import time
+
+from itertools import zip_longest
 from typing import Generator
 
 import pywikibot
@@ -803,26 +805,33 @@ class CheckImagesBot:
             for element in self.load(page_hidden_text):
                 self.hiddentemplates.add(pywikibot.Page(self.site, element))
 
-    def important_image(self, list_given) -> pywikibot.FilePage:
+    @staticmethod
+    def important_image(
+        list_given: List[Tuple[float, pywikibot.FilePage]]
+    ) -> pywikibot.FilePage:
         """
         Get tuples of image and time, return the most used or oldest image.
 
+        .. versionchanged: 7.2
+           itertools.zip_longest is used to stop `usingPages` as soon as
+           possible.
+
         :param list_given: a list of tuples which hold seconds and FilePage
-        :type list_given: list
         :return: the most used or oldest image
         """
         # find the most used image
-        inx_found = None  # index of found image
-        max_usage = 0  # hold max amount of using pages
-        for num, element in enumerate(list_given):
-            image = element[1]
-            image_used = len(list(image.usingPages()))
-            if image_used > max_usage:
-                max_usage = image_used
-                inx_found = num
+        images = [image for _, image in list_given]
+        iterables = [image.usingPages() for image in images]
+        curr_images = []
+        for values in zip_longest(*iterables, fillvalue=False):
+            curr_images = values
+            # bool(FilePage) is True because it is an object subclass
+            if sum(bool(image) for image in values) <= 1:
+                break
 
-        if inx_found is not None:
-            return list_given[inx_found][1]
+        for inx, image in enumerate(curr_images):
+            if image is not False:
+                return images[inx]
 
         # find the oldest image
         _, image = max(list_given, key=lambda element: element[0])
