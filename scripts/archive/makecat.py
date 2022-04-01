@@ -44,7 +44,7 @@ Other possibilities with extended menu bar:
 * [r]educe   - reduce menu bar
 
 """
-# (C) Pywikibot team, 2004-2020
+# (C) Pywikibot team, 2004-2022
 #
 # Distributed under the terms of the MIT license.
 #
