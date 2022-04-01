@@ -91,7 +91,7 @@ class ImageRobot(ReplaceBot):
         escaped = re.sub('\\\\[_ ]', '[_ ]', escaped)
         if not self.opt.loose or not self.new_image:
             image_regex = re.compile(
-                r'\[\[ *(?:{})\s*:\s*{} *(?P<parameters>\|[^\n]+|) *\]\]'
+                r'\[\[ *(?i:{})\s*:\s*{} *(?P<parameters>\|[^\n]+?|) *\]\]'
                 .format('|'.join(namespace), escaped))
         else:
             image_regex = re.compile(r'' + escaped)
