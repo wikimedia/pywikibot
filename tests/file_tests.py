@@ -91,13 +91,10 @@ class TestShareFiles(TestCase):
         self.assertFalse(commons_file.exists())
 
         self.assertFalse(enwp_file.file_is_shared())
+        self.assertFalse(commons_file.file_is_shared())
 
         page_doesnt_exist_exc_regex = re.escape(
             "Page [[commons:{}]] doesn't exist.".format(title))
-        with self.assertRaisesRegex(
-                NoPageError,
-                page_doesnt_exist_exc_regex):
-            commons_file.file_is_shared()
 
         with self.assertRaisesRegex(
                 NoPageError,
