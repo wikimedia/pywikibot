@@ -1,6 +1,9 @@
-Current release changes
-^^^^^^^^^^^^^^^^^^^^^^^
+Current release 7.2.0
+^^^^^^^^^^^^^^^^^^^^^
 
+* Add Lexeme support for Lexicographical data (:phab:`T189321`)
+* enable all parameters of `APISite.imageusage()` with `FilePage.usingPages()`
+* Don't raise `NoPageError` with `file_is_shared` (:phab:`T305182`)
 * Fix URL of GoogleOCR
 * Handle ratelimit with purgepages() (:phab:`T152597`)
 * Add movesubpages parameter to Page.move() and APISite.movepage() (:phab:`T57084`)
@@ -10,6 +13,7 @@ Current release changes
 Deprecations
 ^^^^^^^^^^^^
 
+* 8.0.0: Python 3.5 support will be dropped (:phab:`T301908`)
 * 7.1.0: win32_unicode.py will be removed with Pywikibot 8
 * 7.1.0: Unused `get_redirect` parameter of Page.getOldVersion() will be removed
 * 7.1.0: APISite._simple_request() will be removed in favour of APISite.simple_request()

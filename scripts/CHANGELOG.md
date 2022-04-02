@@ -1,10 +1,19 @@
 # Scripts Changelog
 
-## 7.1.0
+## 7.2.0
 *In development*
 
+### checkimages
+* Use `itertools.zip_longest` to find the most important image
 
-## 7.2.0
+### image
+* Fix image regex (:phab:`T305226`, :phab:`T305227`)
+
+### reflinks
+* Fix cp encodings (:phab:`T304830`)
+
+
+## 7.1.0
 *26 March 2022*
 
 ### fixing_redirects
