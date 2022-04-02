@@ -43,7 +43,8 @@ from pywikibot.page._collections import (
     SubEntityCollection,
 )
 from pywikibot.page._decorators import allow_asynchronous
-from pywikibot.page._pages import BasePage, FilePage
+from pywikibot.page._filepage import FilePage
+from pywikibot.page._pages import BasePage
 from pywikibot.site import DataSite, Namespace
 
 
