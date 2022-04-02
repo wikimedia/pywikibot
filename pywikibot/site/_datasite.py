@@ -21,7 +21,7 @@ from pywikibot.exceptions import (
     NoWikibaseEntityError,
 )
 from pywikibot.site._apisite import APISite
-from pywikibot.site._decorators import need_right, need_version
+from pywikibot.site._decorators import need_extension, need_right, need_version
 from pywikibot.tools import itergroup, merge_unique_dicts, remove_last_args
 
 
@@ -42,6 +42,9 @@ class DataSite(APISite):
             'item': pywikibot.ItemPage,
             'property': pywikibot.PropertyPage,
             'mediainfo': pywikibot.MediaInfo,
+            'lexeme': pywikibot.LexemePage,
+            'form': pywikibot.LexemeForm,
+            'sense': pywikibot.LexemeSense,
         }
 
     def _cache_entity_namespaces(self) -> None:
@@ -69,7 +72,8 @@ class DataSite(APISite):
         if entity_type in self._entity_namespaces:
             return self._entity_namespaces[entity_type]
         raise EntityTypeUnknownError(
-            '{!r} does not support entity type "{}"'
+            '{!r} does not support entity type "{}" '
+            "or it doesn't have its own namespace"
             .format(self, entity_type))
 
     @property
@@ -626,6 +630,35 @@ class DataSite(APISite):
         req = self.simple_request(**params)
         return req.submit()
 
+    @need_right('item-merge')
+    @need_extension('WikibaseLexeme')
+    def mergeLexemes(self, from_lexeme, to_lexeme, summary=None, *,
+                     bot: bool = True) -> dict:
+        """
+        Merge two lexemes together.
+
+        :param from_lexeme: Lexeme to merge from
+        :type from_lexeme: pywikibot.LexemePage
+        :param to_lexeme: Lexeme to merge into
+        :type to_lexeme: pywikibot.LexemePage
+        :param summary: Edit summary
+        :type summary: str
+        :keyword bot: Whether to mark the edit as a bot edit
+        :return: dict API output
+        """
+        params = {
+            'action': 'wblmergelexemes',
+            'source': from_lexeme.getID(),
+            'target': to_lexeme.getID(),
+            'token': self.tokens['edit'],
+            'summary': summary,
+        }
+        if bot:
+            params['bot'] = 1
+        req = self._simple_request(**params)
+        data = req.submit()
+        return data
+
     @need_right('item-redirect')
     def set_redirect_target(self, from_item, to_item, bot: bool = True):
         """
@@ -823,3 +856,87 @@ class DataSite(APISite):
         See self._wbset_action() for parameters
         """
         return self._wbset_action(itemdef, 'wbsetsitelink', sitelink, **kwargs)
+
+    @need_right('edit')
+    @need_extension('WikibaseLexeme')
+    def add_form(self, lexeme, form, *, bot: bool = True,
+                 baserevid=None) -> dict:
+        """
+        Add a form.
+
+        :param lexeme: Lexeme to modify
+        :type lexeme: pywikibot.LexemePage
+        :param form: Form to be added
+        :type form: pywikibot.LexemeForm
+        :keyword bot: Whether to mark the edit as a bot edit
+        :keyword baserevid: Base revision id override, used to detect
+            conflicts.
+        :type baserevid: long
+        """
+        params = {
+            'action': 'wbladdform',
+            'lexemeId': lexeme.getID(),
+            'data': json.dumps(form.toJSON()),
+            'bot': bot,
+            'token': self.tokens['edit'],
+        }
+        if baserevid:
+            params['baserevid'] = baserevid
+        req = self._simple_request(**params)
+        data = req.submit()
+        return data
+
+    @need_right('edit')
+    @need_extension('WikibaseLexeme')
+    def remove_form(self, form, *, bot: bool = True, baserevid=None) -> dict:
+        """
+        Remove a form.
+
+        :param form: Form to be removed
+        :type form: pywikibot.LexemeForm
+        :keyword bot: Whether to mark the edit as a bot edit
+        :keyword baserevid: Base revision id override, used to detect
+            conflicts.
+        :type baserevid: long
+        """
+        params = {
+            'action': 'wblremoveform',
+            'id': form.getID(),
+            'bot': bot,
+            'token': self.tokens['edit'],
+        }
+        if baserevid:
+            params['baserevid'] = baserevid
+        req = self._simple_request(**params)
+        data = req.submit()
+        return data
+
+    @need_right('edit')
+    @need_extension('WikibaseLexeme')
+    def edit_form_elements(self, form, data, *, bot: bool = True,
+                           baserevid=None) -> dict:
+        """
+        Edit lexeme form elements.
+
+        :param form: Form
+        :type form: pywikibot.LexemeForm
+        :param data: data updates
+        :type data: dict
+        :keyword bot: Whether to mark the edit as a bot edit
+        :keyword baserevid: Base revision id override, used to detect
+            conflicts.
+        :type baserevid: long
+        :return: New form data
+        """
+        params = {
+            'action': 'wbleditformelements',
+            'formId': form.getID(),
+            'data': json.dumps(data),
+            'bot': bot,
+            'token': self.tokens['edit'],
+        }
+        if baserevid:
+            params['baserevid'] = baserevid
+        req = self._simple_request(**params)
+        data = req.submit()
+        return data

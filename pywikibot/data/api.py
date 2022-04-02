@@ -1031,6 +1031,8 @@ class Request(MutableMapping):
             'wbremovequalifiers', 'wbremovereferences', 'wbsetaliases',
             'wbsetclaim', 'wbsetclaimvalue', 'wbsetdescription', 'wbsetlabel',
             'wbsetqualifier', 'wbsetreference', 'wbsetsitelink',
+            'wbladdform', 'wbleditformelements', 'wblmergelexemes',
+            'wblremoveform',
         }
         # Client side verification that the request is being performed
         # by a logged in user, and warn if it isn't a config username.

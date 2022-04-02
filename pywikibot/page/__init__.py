@@ -24,6 +24,9 @@ from pywikibot.page._wikibase import (
     PropertyPage,
     WikibaseEntity,
     WikibasePage,
+    LexemePage,
+    LexemeForm,
+    LexemeSense,
 )
 from pywikibot.site import BaseSite as _BaseSite
 from pywikibot.tools import deprecated, issue_deprecation_warning
@@ -41,6 +44,9 @@ __all__ = (
     'User',
     'WikibasePage',
     'ItemPage',
+    'LexemePage',
+    'LexemeForm',
+    'LexemeSense',
     'PropertyPage',
     'Property',
     'Claim',
