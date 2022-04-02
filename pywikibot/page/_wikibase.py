@@ -1112,21 +1112,26 @@ class Property:
     behaviour and semantics.
     """
 
-    types = {'wikibase-item': ItemPage,
-             # 'wikibase-property': PropertyPage, must be declared first
-             'string': str,
-             'commonsMedia': FilePage,
-             'globe-coordinate': pywikibot.Coordinate,
-             'url': str,
-             'time': pywikibot.WbTime,
-             'quantity': pywikibot.WbQuantity,
-             'monolingualtext': pywikibot.WbMonolingualText,
-             'math': str,
-             'external-id': str,
-             'geo-shape': pywikibot.WbGeoShape,
-             'tabular-data': pywikibot.WbTabularData,
-             'musical-notation': str,
-             }
+    types = {
+        'commonsMedia': FilePage,
+        'external-id': str,
+        'geo-shape': pywikibot.WbGeoShape,
+        'globe-coordinate': pywikibot.Coordinate,
+        'math': str,
+        'monolingualtext': pywikibot.WbMonolingualText,
+        'musical-notation': str,
+        'quantity': pywikibot.WbQuantity,
+        'string': str,
+        'tabular-data': pywikibot.WbTabularData,
+        'time': pywikibot.WbTime,
+        'url': str,
+        'wikibase-item': ItemPage,
+        # The following types are added later, they must be declared first
+        # 'wikibase-form': LexemeForm,
+        # 'wikibase-sense': LexemeSense,
+        # 'wikibase-lexeme': LexemePage,
+        # 'wikibase-property': PropertyPage,
+    }
 
     # the value type where different from the type
     value_types = {'wikibase-item': 'wikibase-entityid',
@@ -2045,6 +2050,10 @@ class LexemePage(WikibasePage):
         return super().isRedirectPage()
 
 
+# Add LexemePage to the class attribute "types" after its declaration.
+Property.types['wikibase-lexeme'] = LexemePage
+
+
 class LexemeSubEntity(WikibaseEntity):
 
     """Common super class for LexemeForm and LexemeSense."""
@@ -2199,6 +2208,10 @@ class LexemeForm(LexemeSubEntity):
             self._content = updates['form']
 
 
+# Add LexemeForm to the class attribute "types" after its declaration.
+Property.types['wikibase-form'] = LexemeForm
+
+
 class LexemeSense(LexemeSubEntity):
 
     """Wikibase lexeme sense."""
@@ -2209,6 +2222,10 @@ class LexemeSense(LexemeSubEntity):
         'glosses': LanguageDict,
         'claims': ClaimCollection,
     }
+
+
+# Add LexemeSnese to the class attribute "types" after its declaration.
+Property.types['wikibase-sense'] = LexemeSense
 
 
 class LexemeFormCollection(SubEntityCollection):
