@@ -50,6 +50,9 @@ from pywikibot.site import DataSite, Namespace
 __all__ = (
     'Claim',
     'ItemPage',
+    'LexemeForm',
+    'LexemePage',
+    'LexemeSense',
     'MediaInfo',
     'Property',
     'PropertyPage',
