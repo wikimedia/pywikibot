@@ -2483,14 +2483,19 @@ class FilePage(Page):
                 '| {{int:filehist-dimensions}} || {{int:filehist-comment}}\n'
                 '|-\n%s\n|}\n' % '\n|-\n'.join(lines))
 
-    def usingPages(self, total: Optional[int] = None, content: bool = False):
+    def usingPages(self, **kwargs):
         """Yield Pages on which the file is displayed.
 
-        :param total: iterate no more than this number of pages in total
-        :param content: if True, load the current content of each iterated page
-            (default False)
+        For parameters refer
+        :meth:`APISite.imageusage()
+        <pywikibot.site._generators.GeneratorsMixin.imageusage>`
+
+        .. versionchanged:: 7.2
+           all parameters from :meth:`APISite.imageusage()
+           <pywikibot.site._generators.GeneratorsMixin.imageusage>`
+           are available.
         """
-        return self.site.imageusage(self, total=total, content=content)
+        return self.site.imageusage(self, **kwargs)
 
     @property
     def file_is_used(self) -> bool:
