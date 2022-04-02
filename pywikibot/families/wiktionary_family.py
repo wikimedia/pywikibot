@@ -36,11 +36,11 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'cy', 'vo', 'sl', 'om', 'he', 'af', 'zh-min-nan', 'scn', 'sg', 'mnw',
         'tl', 'pa', 'sw', 'fy', 'lmo', 'nn', 'ka', 'lv', 'ms', 'min', 'sq',
         'nds', 'co', 'mn', 'pnb', 'lb', 'bs', 'nah', 'yue', 'sa', 'kk', 'km',
-        'diq', 'vec', 'be', 'tk', 'mk', 'sm', 'hsb', 'nia', 'shy', 'ks', 'gd',
-        'ga', 'su', 'mr', 'gom', 'an', 'wo', 'mni', 'ia', 'ang', 'mt', 'bcl',
+        'diq', 'vec', 'be', 'tk', 'mk', 'sm', 'hsb', 'nia', 'shy', 'ks', 'su',
+        'gd', 'ga', 'mr', 'gom', 'an', 'wo', 'mni', 'ia', 'ang', 'mt', 'bcl',
         'fo', 'sd', 'tt', 'gn', 'so', 'ie', 'csb', 'ug', 'si', 'st', 'roa-rup',
-        'hif', 'tpi', 'zu', 'kl', 'mi', 'ay', 'ha', 'jbo', 'yi', 'ln', 'gu',
-        'na', 'gv', 'kw', 'am', 'ne', 'rw', 'ts', 'qu', 'ss', 'chr', 'iu',
+        'tpi', 'kl', 'hif', 'zu', 'mi', 'ay', 'ha', 'jbo', 'yi', 'ln', 'gu',
+        'na', 'gv', 'kw', 'am', 'rw', 'ne', 'ts', 'qu', 'iu', 'ss', 'chr',
         'dv', 'ti', 'tn',
     ]
 
