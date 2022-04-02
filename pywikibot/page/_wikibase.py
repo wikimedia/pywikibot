@@ -1867,7 +1867,26 @@ class Claim(Property):
 
 class LexemePage(WikibasePage):
 
-    """Wikibase entity of type 'lexeme'."""
+    """Wikibase entity of type 'lexeme'.
+
+    Basic usage sample:
+
+    >>> import pywikibot
+    >>> repo = pywikibot.Site('wikidata:wikidata')
+    >>> L2 = pywikibot.LexemePage(repo, 'L2')  # create a Lexeme page
+    >>> list(L2.claims.keys())  # access the claims
+    ['P5831', 'P5402']
+    >>> len(L2.forms)  # access the forms
+    2
+    >>> F1 = L2.forms[0]  # access the first form
+    >>> list(F1.claims.keys())  # access its claims
+    ['P898']
+    >>> len(L2.senses)  # access the senses
+    1
+    >>> S1 = L2.senses[0]  # access the first sense
+    >>> list(S1.claims.keys())  # and its claims
+    ['P5137', 'P5972', 'P2888']
+    """
 
     _cache_attrs = WikibasePage._cache_attrs + (
         'lemmas', 'language', 'lexicalCategory', 'forms', 'senses',
