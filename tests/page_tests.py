@@ -637,25 +637,6 @@ class TestPageGetFileHistory(DefaultDrySiteTestCase):
             self.site.loadimageinfo.assert_called_once_with(page, history=True)
 
 
-class TestFilePage(DefaultSiteTestCase):
-
-    """Test methods of the FilePage class."""
-
-    family = 'commons'
-    code = 'commons'
-    cached = True
-
-    def test_globalusage(self, key):
-        """Test globalusage generator."""
-        page = pywikibot.FilePage(self.site, 'File:Example.jpg')
-        gen = page.globalusage(total=3)
-        pages = list(gen)
-        self.assertLength(pages, 3)
-        for p in pages:
-            self.assertIsInstance(p, pywikibot.Page)
-            self.assertNotEqual(p.site, self.site)
-
-
 class TestPageRepr(DefaultDrySiteTestCase):
 
     """Test for Page's repr implementation."""
