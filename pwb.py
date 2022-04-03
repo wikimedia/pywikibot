@@ -6,7 +6,7 @@ This wrapper script invokes script by its name in this search order:
 
 1. Scripts listed in `user_script_paths` list inside your `user-config.py`
    settings file in the given order. Refer
-   :ref:`External Script Path Settings<external-script-path-settings>`.
+   :ref:`External Script Path Settings`.
 2. User scripts residing in `scripts/userscripts` (directory mode only).
 3. Scripts residing in `scripts` folder (directory mode only).
 4. Maintenance scripts residing in `scripts/maintenance` (directory mode only).

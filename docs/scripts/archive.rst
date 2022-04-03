@@ -2,6 +2,7 @@ Archived scripts
 ================
 
 .. automodule:: scripts.archive
+.. seealso:: :ref:`Outdated scripts`
 
 capitalize\_redirects script
 ----------------------------
