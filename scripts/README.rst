@@ -177,87 +177,6 @@ The contents of the package
 
 
     +------------------------+---------------------------------------------------------+
-    | archive                | Scripts no longer maintained.                           |
-    |                        | Please open a Phabricator task if you want to use one.  |
-    +========================+=========================================================+
-    | capitalize_redirects.py| Script to create a redirect of capitalize articles.     |
-    +------------------------+---------------------------------------------------------+
-    | casechecker.py         | Script to enumerate all pages in Wikipedia and          |
-    |                        | find all titles with mixed Latin and Cyrillic           |
-    |                        | alphabets.                                              |
-    +------------------------+---------------------------------------------------------+
-    | catall.py              | Add or change categories on a number of pages.          |
-    +------------------------+---------------------------------------------------------+
-    | commons_link.py        | This robot includes commons template to link Commons    |
-    |                        | and your wiki project.                                  |
-    +------------------------+---------------------------------------------------------+
-    | create_categories.py   | Program to batch create categories.                     |
-    +------------------------+---------------------------------------------------------+
-    | disambredir.py         | Changing redirect names in disambiguation pages.        |
-    +------------------------+---------------------------------------------------------+
-    | editarticle.py         | Edit a Wikipedia article with your favourite editor.    |
-    +------------------------+---------------------------------------------------------+
-    | flickrripper.py        | Upload images from Flickr easily.                       |
-    +------------------------+---------------------------------------------------------+
-    | followlive.py          | Follow new articles on a Wikipedia and flag them        |
-    |                        | with a template.                                        |
-    +------------------------++--------------------------------------------------------+
-    | freebasemappingupload.py| Script to upload the mappings of Freebase to Wikidata. |
-    +------------------------++--------------------------------------------------------+
-    | imagecopy.py           | Copies images from a Wikimedia wiki to Commons.         |
-    +------------------------+---------------------------------------------------------+
-    | imagecopy_self.py      | Copy self published files from the English Wikipedia to |
-    |                        | Commons.                                                |
-    +------------------------+---------------------------------------------------------+
-    | imageharvest.py        | Bot for getting multiple images from an external site.  |
-    +------------------------+---------------------------------------------------------+
-    | iamgerecat.py          | Try to find categories for media on Commons.            |
-    +------------------------+---------------------------------------------------------+
-    | imageuncat.py          | Adds uncat template to images without categories at     |
-    |                        | Commons.                                                |
-    +------------------------+---------------------------------------------------------+
-    | isbn.py                | Bot to convert all ISBN-10 codes to the ISBN-13         |
-    |                        | format.                                                 |
-    +------------------------+---------------------------------------------------------+
-    | lonelypages.py         | Place a template on pages which are not linked to by    |
-    |                        | other pages, and are therefore lonely.                  |
-    +------------------------+---------------------------------------------------------+
-    | makecat.py             | Given an existing or new category, find pages for that  |
-    |                        | category.                                               |
-    +------------------------+---------------------------------------------------------+
-    | match_images.py        | Match two images based on histograms.                   |
-    +------------------------+---------------------------------------------------------+
-    | ndashredir.py          | Creates hyphenated redirects to articles with n dash    |
-    |                        | or m dash in their title.                               |
-    +------------------------+---------------------------------------------------------+
-    | piper.py               | Pipes article text through external program(s) on       |
-    |                        | STDIN and collects its STDOUT which is used as the      |
-    |                        | new article text if it differs from the original.       |
-    +------------------------+---------------------------------------------------------+
-    | selflink.py            | This bot goes over multiple pages of the home wiki,     |
-    |                        | searches for selflinks, and allows removing them.       |
-    +------------------------+---------------------------------------------------------+
-    | spamremove.py          | Remove links that are being or have been spammed.       |
-    +------------------------+--+------------------------------------------------------+
-    | standardize_interwiki.py  | A robot that downloads a page, and reformats the     |
-    |                           | interwiki links in a standard way (i.e. move all     |
-    |                           | of them to the bottom or the top, with the same      |
-    |                           | separator, in the right order).                      |
-    +------------------------+--+------------------------------------------------------+
-    | states_redirect.py     | A robot to add redirects to cities for state            |
-    |                        | abbreviations.                                          |
-    +------------------------+---------------------------------------------------------+
-    | surnames_redirects.py  | Bot to create redirects based on name order.            |
-    +------------------------+---------------------------------------------------------+
-    | table2wiki.py          | Semi-automatic converting HTML-tables to wiki-tables.   |
-    +------------------------+---------------------------------------------------------+
-    | unlink.py              | This bot unlinks a page on every page that links to it. |
-    +------------------------+---------------------------------------------------------+
-    | wikisourcetext.py      | This bot applies to Wikisource sites to upload text.    |
-    +------------------------+---------------------------------------------------------+
-
-
-    +------------------------+---------------------------------------------------------+
     | Others                 |                                                         |
     +========================+=========================================================+
     | i18n (folder)          | Contains i18n translations for bot edit summaries.      |
@@ -268,11 +187,15 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
 
 **External packages could be required with Pywikibot:**
-The pwb.py wrapper scripts informs about the requirement and how to install.
 
+The pwb.py wrapper scripts informs about the requirement and how to install.
 
 More precise information, and a list of the options that are available for
 the various programs, can be retrieved by running the bot with the -help
 parameter, e.g.::
 
     python pwb.py interwiki -help
+
+** Outdated and deleted scripts can be recovered.**
+Refer `Outdated core scripts` and `Outdated compat scripts` in our documentation:
+https://doc.wikimedia.org/pywikibot/master/scripts/index.html#scripts-descriptions
