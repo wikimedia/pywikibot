@@ -28,3 +28,4 @@ Scripts descriptions
    unsorted
    maintenance
    archive
+   outdated

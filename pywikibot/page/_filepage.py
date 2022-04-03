@@ -182,6 +182,7 @@ class FilePage(Page):
         :meth:`APISite.imageusage()
         <pywikibot.site._generators.GeneratorsMixin.imageusage>`
 
+        .. seealso:: :meth:`globalusage`
         .. versionchanged:: 7.2
            all parameters from :meth:`APISite.imageusage()
            <pywikibot.site._generators.GeneratorsMixin.imageusage>`
@@ -288,6 +289,8 @@ class FilePage(Page):
     def globalusage(self, total=None):
         """
         Iterate all global usage for this page.
+
+        .. seealso:: :meth:`usingPages`
 
         :param total: iterate no more than this number of pages in total
         :return: a generator that yields Pages also on sites different from

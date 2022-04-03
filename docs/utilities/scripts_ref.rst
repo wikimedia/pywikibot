@@ -1,7 +1,8 @@
-.. _utility_scripts:
-
 Utility scripts
 ===============
+
+.. automodule:: pywikibot.scripts
+   :private-members:
 
 pwb wrapper script
 ------------------
