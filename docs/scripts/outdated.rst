@@ -1,15 +1,16 @@
-Outdated scripts
-================
+Outdated compat scripts
+=======================
 
 This list contains outdated scripts from :term:`compat` banch which
-haven't ported to the current :term:`core` branch of Pywikibot |version|.
+haven't ported to the :term:`core` branch of Pywikibot.
+
 Feel free to reactivate any script at any time by creating a Phabricator
 task (:phab:`Porting request
 <maniphest/task/edit/form/1/?projects=pywikibot,pywikibot-scripts,Pywikibot-compat-to-core&title=Port
 Pywikibot%20compat%20script%20to%20core:%20>`)
 or reactivate the specified task below.
 
-.. seealso:: :ref:`Archived scripts`
+.. seealso:: :ref:`Outdated core scripts`
 
 
 catimages script
@@ -64,6 +65,7 @@ copyright\_clean script
 copyright\_put script
 ---------------------
 **Script to put reports of copyright.py to wiki page** (:phab:`T66848`)
+
 
 deledpimage script
 ------------------
@@ -165,14 +167,6 @@ tag\_nowcommons script
 
 **This script tags files available at Commons with the Nowcommons template**
 (:phab:`66159`)
-
-
-us\_states script
------------------
-**Check pages on the whether they are in common form**
-
-On English Wikipedia the common form is like `Something, State`
-and if so, create a redirect from `Something, ST`.
 
 
 warnfile script
