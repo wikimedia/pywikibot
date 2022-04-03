@@ -185,6 +185,25 @@ class TestFilePage(TestCase):
             image = image.latest_file_info
 
 
+class TestFilePageCommons(TestCase):
+
+    """Test methods of the FilePage class on Commons."""
+
+    family = 'commons'
+    code = 'commons'
+    cached = True
+
+    def test_globalusage(self, key):
+        """Test globalusage generator."""
+        page = pywikibot.FilePage(self.site, 'File:Example.jpg')
+        gen = page.globalusage(total=3)
+        pages = list(gen)
+        self.assertLength(pages, 3)
+        for p in pages:
+            self.assertIsInstance(p, pywikibot.Page)
+            self.assertNotEqual(p.site, self.site)
+
+
 class TestFilePageLatestFileInfo(TestCase):
 
     """Test FilePage.latest_file_info.
