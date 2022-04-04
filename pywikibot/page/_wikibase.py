@@ -1140,6 +1140,9 @@ class Property:
     # the value type where different from the type
     value_types = {'wikibase-item': 'wikibase-entityid',
                    'wikibase-property': 'wikibase-entityid',
+                   'wikibase-lexeme': 'wikibase-entityid',
+                   'wikibase-form': 'wikibase-entityid',
+                   'wikibase-sense': 'wikibase-entityid',
                    'commonsMedia': 'string',
                    'url': 'string',
                    'globe-coordinate': 'globecoordinate',
@@ -1299,6 +1302,9 @@ class Claim(Property):
             ItemPage(site, 'Q' + str(value['numeric-id'])),
         'wikibase-property': lambda value, site:
             PropertyPage(site, 'P' + str(value['numeric-id'])),
+        'wikibase-lexeme': lambda value, site: LexemePage(site, value['id']),
+        'wikibase-form': lambda value, site: LexemeForm(site, value['id']),
+        'wikibase-sense': lambda value, site: LexemeSense(site, value['id']),
         'commonsMedia': lambda value, site:
             FilePage(pywikibot.Site('commons', 'commons'), value),  # T90492
         'globe-coordinate': pywikibot.Coordinate.fromWikibase,
@@ -1775,7 +1781,7 @@ class Claim(Property):
 
         The function checks for:
 
-        - WikibasePage ID equality
+        - WikibaseEntity ID equality
         - WbTime year equality
         - Coordinate equality, regarding precision
         - WbMonolingualText text equality
@@ -1785,7 +1791,7 @@ class Claim(Property):
         :return: true if the Claim's target is equal to the value provided,
             false otherwise
         """
-        if (isinstance(self.target, WikibasePage)
+        if (isinstance(self.target, WikibaseEntity)
                 and isinstance(value, str)):
             return self.target.id == value
 
@@ -1836,9 +1842,14 @@ class Claim(Property):
 
         :return: JSON value
         """
+        # todo: eventually unify the following two groups
         if self.type in ('wikibase-item', 'wikibase-property'):
             value = {'entity-type': self.getTarget().entity_type,
                      'numeric-id': self.getTarget().getID(numeric=True)}
+        elif self.type in (
+                'wikibase-lexeme', 'wikibase-form', 'wikibase-sense'):
+            value = {'entity-type': self.getTarget().entity_type,
+                     'id': self.getTarget().getID()}
         elif self.type in ('string', 'url', 'math', 'external-id',
                            'musical-notation'):
             value = self.getTarget()
