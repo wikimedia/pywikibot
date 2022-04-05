@@ -557,8 +557,9 @@ class APISite(
             assert 'globaluserinfo' in uidata['query'], \
                    "API userinfo response lacks 'globaluserinfo' key"
             data = uidata['query']['globaluserinfo']
-            ts = data['registration']
-            data['registration'] = pywikibot.Timestamp.fromISOformat(ts)
+            if 'missing' not in data:
+                ts = data['registration']
+                data['registration'] = pywikibot.Timestamp.fromISOformat(ts)
             self._globaluserinfo[user] = data
         return self._globaluserinfo[user]
 
