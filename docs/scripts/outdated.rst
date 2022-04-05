@@ -166,7 +166,7 @@ tag\_nowcommons script
 ----------------------
 
 **This script tags files available at Commons with the Nowcommons template**
-(:phab:`66159`)
+(:phab:`T66159`)
 
 
 warnfile script
