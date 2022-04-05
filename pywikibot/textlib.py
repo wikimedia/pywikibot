@@ -211,8 +211,8 @@ class MultiTemplateMatchBuilder:
 
         pattern = case_escape(namespace.case, old)
         # namespaces may be any mixed case
-        namespaces = [_ignore_case(ns) for ns in namespace]
-        namespaces.append(_ignore_case('msg'))
+        namespaces = [ignore_case(ns) for ns in namespace]
+        namespaces.append(ignore_case('msg'))
         pattern = re.sub(r'_|\\ ', r'[_ ]', pattern)
         templateRegexP = (
             r'{{\s*(%(namespace)s:)?%(pattern)s'
@@ -229,8 +229,12 @@ class MultiTemplateMatchBuilder:
         return lambda text: any(predicate(text) for predicate in predicates)
 
 
-def _ignore_case(string: str) -> str:
-    """Return a case-insensitive pattern for the string."""
+def ignore_case(string: str) -> str:
+    """Return a case-insensitive pattern for the string.
+
+    .. versionchanged:: 7.2
+       `_ignore_case` becomes a public method
+    """
     return ''.join(
         '[{}{}]'.format(c, s) if c != s else c
         for s, c in zip(string, string.swapcase()))
@@ -242,7 +246,7 @@ def _tag_pattern(tag_name: str) -> str:
         r'<{0}(?:>|\s+[^>]*(?<!/)>)'  # start tag
         r'[\s\S]*?'  # contents
         r'</{0}\s*>'  # end tag
-        .format(_ignore_case(tag_name)))
+        .format(ignore_case(tag_name)))
 
 
 def _tag_regex(tag_name: str):
@@ -270,24 +274,24 @@ def _create_default_regexes() -> None:
         'interwiki': (
             r'\[\[:?(%s)\s?:[^\]]*\]\]\s*',
             lambda site: '|'.join(
-                _ignore_case(i) for i in site.validLanguageLinks()
+                ignore_case(i) for i in site.validLanguageLinks()
                 + list(site.family.obsolete.keys()))),
         # Module invocations (currently only Lua)
         'invoke': (
             r'\{\{\s*\#(?:%s):[\s\S]*?\}\}',
             lambda site: '|'.join(
-                _ignore_case(mw) for mw in site.getmagicwords('invoke'))),
+                ignore_case(mw) for mw in site.getmagicwords('invoke'))),
         # this matches internal wikilinks, but also interwiki, categories, and
         # images.
         'link': re.compile(r'\[\[[^\]|]*(\|[^\]]*)?\]\]'),
         # pagelist tag (used in Proofread extension).
         'pagelist': re.compile(r'<{}[\s\S]*?/>'
-                               .format(_ignore_case('pagelist'))),
+                               .format(ignore_case('pagelist'))),
         # Wikibase property inclusions
         'property': (
             r'\{\{\s*\#(?:%s):\s*[Pp]\d+.*?\}\}',
             lambda site: '|'.join(
-                _ignore_case(mw) for mw in site.getmagicwords('property'))),
+                ignore_case(mw) for mw in site.getmagicwords('property'))),
         # lines that start with a colon or more will be indented
         'startcolon': re.compile(r'(?:(?<=\n)|\A):(.*?)(?=\n|\Z)'),
         # lines that start with a space are shown in a monospace font and
