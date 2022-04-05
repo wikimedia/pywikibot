@@ -16,7 +16,7 @@ or reactivate the specified task below.
 catimages script
 ----------------
 
-**Image by content categorization** (:phab:`T66838)`
+**Image by content categorization** (:phab:`T66838`)
 
 Script to check uncategorized files. This script checks if a file
 has some content that allows to assign it to a category.
