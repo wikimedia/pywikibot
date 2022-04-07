@@ -8,7 +8,7 @@
 from collections.abc import Mapping
 from contextlib import suppress
 
-import pywikibot.site
+import pywikibot
 from pywikibot.exceptions import UnknownFamilyError
 from pywikibot.family import Family, SingleSiteFamily
 from pywikibot.tools import suppress_warnings

@@ -36,7 +36,6 @@ Furthermore, the following command line parameters are supported:
 from typing import Union
 
 import pywikibot
-import pywikibot.data.api
 import pywikibot.i18n
 import pywikibot.textlib
 from pywikibot import output, pagegenerators, warning

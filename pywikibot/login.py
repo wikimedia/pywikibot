@@ -12,7 +12,6 @@ from typing import Any, Optional
 from warnings import warn
 
 import pywikibot
-import pywikibot.data.api
 from pywikibot import __url__, config
 from pywikibot.backports import Dict, Tuple
 from pywikibot.comms import http
