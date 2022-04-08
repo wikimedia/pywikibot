@@ -98,6 +98,7 @@ no_args_expected_results = {
     # TODO: until done here, remember to set editor = None in user-config.py
     'change_pagelang': 'No -setlang parameter given',
     'checkimages': 'Execution time: 0 seconds',
+    'dataextend': 'No item page specified',
     'harvest_template': 'ERROR: Please specify',
     # script_input['interwiki'] above lists a title that should not exist
     'interwiki': 'does not exist. Skipping.',
