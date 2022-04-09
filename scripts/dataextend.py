@@ -398,12 +398,13 @@ class DataExtendBot(SingleSiteBot):
 
         with codecs.open(self.labelfile, **param) as f:
             for item in self.labels:
-                f.write('%s:%s\n' % (item, self.labels[item]))
+                f.write('{}:{}\n'.format(item, self.labels[item]))
 
         with codecs.open(self.datafile, **param) as f:
             for dtype in self.data:
                 for key in self.data[dtype]:
-                    f.write('%s:%s:%s\n' % (dtype, key, self.data[dtype][key]))
+                    f.write('{}:{}:{}\n'.format(dtype, key,
+                                                self.data[dtype][key]))
 
         with codecs.open(self.nonamefile, **param) as f:
             for noname in self.noname:
@@ -425,15 +426,15 @@ class DataExtendBot(SingleSiteBot):
         if time.precision < 9:
             result = 'ca. ' + result
         if time.precision >= 10:
-            result = '%s-%s' % (time.month, result)
+            result = '{}-{}'.format(time.month, result)
         if time.precision >= 11:
-            result = '%s-%s' % (time.day, result)
+            result = '{}-{}'.format(time.day, result)
         if time.precision >= 12:
-            result = '%s %s' % (result, time.hour)
+            result = '{} {}'.format(result, time.hour)
         if time.precision >= 13:
-            result = '%s:%s' % (result, time.minute)
+            result = '{}:{}'.format(result, time.minute)
         if time.precision >= 14:
-            result = '%s:%s' % (result, time.second)
+            result = '{}:{}'.format(result, time.second)
         return result
 
     def showclaims(self, claims):
@@ -441,7 +442,8 @@ class DataExtendBot(SingleSiteBot):
             for claim in claims[prop]:
                 if claim.type == 'wikibase-item':
                     if claim.getTarget() is None:
-                        pywikibot.output('%s: unknown' % (self.label(prop)))
+                        pywikibot.output('{}: unknown'
+                                         .format(self.label(prop)))
                     else:
                         pywikibot.output('{}: {}'.format(self.label(prop), self.label(claim.getTarget().title())))
                 elif claim.type == 'time':
@@ -2580,7 +2582,8 @@ class GndAnalyzer(Analyzer):
         for sectionname in [r'Beruf\(e\)', r'Funktion\(en\)', 'Weitere Angaben']:
             if sectionname == 'Weitere Angaben' and sectionfound:
                 continue
-            section = self.findbyre(r'(?s)<strong>%s</strong>(.*?)</tr>' % sectionname, html)
+            section = self.findbyre(r'(?s)<strong>{}</strong>(.*?)</tr>'
+                                    .format(sectionname), html)
             if section:
                 sectionfound = True
                 result += self.findallbyre(r'(?s)[>;,]([^<>;,]*)', section, 'occupation')
@@ -3716,7 +3719,7 @@ class FindGraveAnalyzer(Analyzer):
         self.hrtre = r'(<h1.*?</table>)'
 
     def getvalue(self, name, html, category=None):
-        return self.findbyre(r'%s: "(.*?)"' % name, html, category)
+        return self.findbyre(r'{}: "(.*?)"'.format(name), html, category)
 
     def findnames(self, html):
         return [self.getvalue('shareTitle', html)]
@@ -3925,7 +3928,9 @@ class LeonoreAnalyzer(Analyzer):
         self.escapeunicode = True
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre(r'(?s)>\s*%s\s*<.*?<TD[^<>]*>(?:<[^<>]*>|\s)*([^<>]+)</' % field, html, dtype)
+        return self.findbyre(
+            r'(?s)>\s*{}\s*<.*?<TD[^<>]*>(?:<[^<>]*>|\s)*([^<>]+)</'
+            .format(field), html, dtype)
 
     def findinstanceof(self, html):
         return 'Q5'
@@ -4288,7 +4293,8 @@ class SikartAnalyzer(Analyzer):
         self.escapehtml = True
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre(r'(?s)>%s<.*?<div[^<>]*>(.*?)<' % field, html, dtype)
+        return self.findbyre(r'(?s)>{}<.*?<div[^<>]*>(.*?)<'
+                             .format(field), html, dtype)
 
     def findinstanceof(self, html):
         return 'Q5'
@@ -4346,12 +4352,11 @@ class SikartAnalyzer(Analyzer):
         section = self.getvalue('Vitazeile', html)
         if section:
             result = []
-            if ' et ' in section:
-                splitter = 'et'
-            else:
-                splitter = 'und'
-            for subsection in section.split('.')[0].split(' %s ' % splitter):
-                result += self.findallbyre(r'([\w\s]+)', subsection, 'occupation')
+            splitter = 'et' if ' et ' in section else 'und'
+            for subsection in section.split('.')[0].split(' {} '
+                                                          .format(splitter)):
+                result += self.findallbyre(r'([\w\s]+)', subsection,
+                                           'occupation')
             return result
 
     def findmixedrefs(self, html):
@@ -4407,7 +4412,7 @@ class ImslpAnalyzer(Analyzer):
 
 class HdsAnalyzer(Analyzer):
     def setup(self):
-        self.id = '%06i' % int(self.id)
+        self.id = '{:06d}'.format(int(self.id))
         self.dbproperty = 'P902'
         self.dbid = 'Q642074'
         self.dbname = 'Historical Dictionary of Switzerland'
@@ -4898,7 +4903,9 @@ class NndbAnalyzer(Analyzer):
         self.language = 'en'
 
     def getvalue(self, field, dtype=None, bold=True):
-        rawtext = self.findbyre(r'%s%s:%s\s*(.+?)<(?:br|p)>' % ('<b>' if bold else ' ', field, '</b>' if bold else ''),
+        rawtext = self.findbyre(r'{}{}:{}\s*(.+?)<(?:br|p)>'
+                                .format('<b>' if bold else ' ', field,
+                                        '</b>' if bold else ''),
                                 self.html)
         if rawtext:
             text = self.TAGRE.sub('', rawtext)
@@ -4998,11 +5005,15 @@ class MarcAnalyzer(Analyzer):
         self.language = 'en'
 
     def getvalue(self, field, html, dtype=None, alt=None):
-        return self.findbyre('(?s)<td[^<>]*class="eti">%s</td>.*?<td[^<>]*class="sub">(.*?)<' % field, html, dtype, alt=alt)
+        return self.findbyre(
+            '(?s)<td[^<>]*class="eti">{}</td>.*?<td[^<>]*class="sub">(.*?)<'
+            .format(field), html, dtype, alt=alt)
 
     def getvalues(self, field, html, dtype=None, alt=None) -> List[str]:
         result = []
-        for preresult in self.findallbyre('(?s)<td[^<>]*class="eti">%s</td>.*?<td[^<>]*class="sub">(.*?)<' % field, html, dtype, alt=alt):
+        for preresult in self.findallbyre(
+            '(?s)<td[^<>]*class="eti">{}</td>.*?<td[^<>]*class="sub">(.*?)<'
+                .format(field), html, dtype, alt=alt):
             result += preresult.split('|')
         return result
 
@@ -5076,9 +5087,10 @@ class ConorSiAnalyzer(ConorAnalyzer):
         self.language = 'sl'
 
     def findnames(self, html):
-        result = ConorAnalyzer.findnames(self, html)
+        result = super().findnames(html)
         for sectionname in ['Osebno ime', 'Variante osebnega imena']:
-            section = self.findbyre(r'(?s)<td>%s</td>.*?<a[^<>]*>(.*?)<' % sectionname, html)
+            section = self.findbyre(r'(?s)<td>{}</td>.*?<a[^<>]*>(.*?)<'
+                                    .format(sectionname), html)
             if section:
                 result += [','.join(name.split(',')[:-1]) for name in self.findallbyre('([^=;]+)', section)] +\
                             self.findallbyre('([^=;]+)', section)
@@ -5154,7 +5166,8 @@ class ConorBgAnalyzer(ConorAnalyzer):
     def findnames(self, html):
         result = ConorAnalyzer.findnames(self, html)
         for sectionname in ['Име на лице', 'Вариант на име на лице']:
-            section = self.findbyre(r'(?s)<td>%s</td>.*?<a[^<>]*>(.*?)<' % sectionname, html)
+            section = self.findbyre(r'(?s)<td>{}</td>.*?<a[^<>]*>(.*?)<'
+                                    .format(sectionname), html)
             if section:
                 result += [','.join(name.split(',')[:-1]) for name in self.findallbyre('([^=;]+)', section)] +\
                           self.findallbyre('([^=;]+)', section)
@@ -5191,7 +5204,8 @@ class ConorSrAnalyzer(ConorAnalyzer):
     def findnames(self, html):
         result = ConorAnalyzer.findnames(self, html)
         for sectionname in ['Лично име', 'Варијанте личног имена']:
-            section = self.findbyre(r'(?s)<td>%s</td>.*?<a[^<>]*>(.*?)<' % sectionname, html)
+            section = self.findbyre(r'(?s)<td>{}</td>.*?<a[^<>]*>(.*?)<'
+                                    .format(sectionname), html)
             if section:
                 result += [','.join(name.split(',')[:-1]) for name in self.findallbyre('([^=;]+)', section)]
         return result
@@ -5361,7 +5375,9 @@ class LnbAnalyzer(Analyzer):
         return html.replace('&nbsp;', ' ')
 
     def getvalue(self, field, html, dtype=None, alt=None):
-        return self.findbyre(r'(?s)<td[^<>]*>[^<>]*%s[^<>]*</td>\s*<td[^<>]*>(.*?)</td>' % field, html, dtype, alt=alt)
+        return self.findbyre(
+            r'(?s)<td[^<>]*>[^<>]*{}[^<>]*</td>\s*<td[^<>]*>(.*?)</td>'
+            .format(field), html, dtype, alt=alt)
 
     def getvalues(self, field, html, dtype=None, alt=None) -> List[str]:
         parts = re.findall('(?s)<td[^<>]*>(.*?)</td>', html)
@@ -5648,7 +5664,8 @@ class FifaAnalyzer(Analyzer):
         self.language = 'en'
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre(r'<meta name="%s" content="(.*?)"' % field, html, dtype)
+        return self.findbyre(r'<meta name="{}" content="(.*?)"'
+                             .format(field), html, dtype)
 
     def findinstanceof(self, html):
         return 'Q5'
@@ -6026,7 +6043,8 @@ class DaaoAnalyzer(Analyzer):
         self.escapehtml = True
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre(r'(?s)<dt>\s*%s\s*</dt>\s*<dd>(.*?)</dd>' % field, html, dtype)
+        return self.findbyre(r'(?s)<dt>\s*{}\s*</dt>\s*<dd>(.*?)</dd>'
+                             .format(field), html, dtype)
 
     def findinstanceof(self, html):
         return 'Q5'
@@ -6171,7 +6189,8 @@ class ParlementPolitiekAnalyzer(Analyzer):
         self.language = 'nl'
 
     def getsection(self, field, html, ntype=None):
-        return self.findbyre(r'(?s)%s</h2>\s*</div></div>(.*?)<[bp][>\s]' % field, html, ntype)
+        return self.findbyre(r'(?s){}</h2>\s*</div></div>(.*?)<[bp][>\s]'
+                             .format(field), html, ntype)
 
     def findlongtext(self, html):
         return self.findbyre(r'(?s)<p class="m(?:none|top)">(.*?)</div>', html)
@@ -6367,18 +6386,23 @@ class GenealogicsAnalyzer(Analyzer):
         return html.replace('&nbsp;', ' ').replace('&nbsp', ' ')
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre(r'(?s)"fieldname">\s*%s\s*</span></td>\s*<td[^<>]*>(?:<[^<>]*>)*(.+?)<' % field, html,
-                             dtype)
+        return self.findbyre(
+            r'(?s)"fieldname">\s*{}\s*</span></td>\s*<td[^<>]*>(?:<[^<>]*>)*(.+?)<'
+            .format(field), html, dtype)
 
     def getallvalues(self, field, html, dtype=None):
-        return self.findallbyre(r'(?s)"fieldname">\s*%s\s*</span></td>\s*<td[^<>]*>(?:<[^<>]*>)*(.+?)<' % field, html,
-                                dtype)
+        return self.findallbyre(
+            r'(?s)"fieldname">\s*{}\s*</span></td>\s*<td[^<>]*>(?:<[^<>]*>)*(.+?)<'
+            .format(field), html, dtype)
 
     def getfullvalue(self, field, html, dtype=None):
-        return self.findbyre(r'(?s)"fieldname">\s*%s\s*</span></td>\s*<td[^<>]*>(.*?)</td>' % field, html, dtype)
+        return self.findbyre(
+            r'(?s)"fieldname">\s*{}\s*</span></td>\s*<td[^<>]*>(.*?)</td>'
+            .format(field), html, dtype)
 
     def getsecondvalue(self, field, html, dtype=None):
-        section = self.findbyre(r'(?s)"fieldname">(\s*%s\s*</span>.*?)</tr>' % field, html)
+        section = self.findbyre(r'(?s)"fieldname">(\s*{}\s*</span>.*?)</tr>'
+                                .format(field), html)
         if section:
             return self.findbyre(r'<td.*?</td>\s*<td[^<>]*>(?:<[^<>]*>)*([^<>]*?)<', section, dtype)
 
@@ -6514,13 +6538,18 @@ class CerlAnalyzer(Analyzer):
         self.language = 'en'
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre(r'(?s)>%s</span><span[^<>]*>(?:<[^<>]*>)?([^<>]*)</' % field, html, dtype)
+        return self.findbyre(
+            r'(?s)>{}</span><span[^<>]*>(?:<[^<>]*>)?([^<>]*)</'
+            .format(field), html, dtype)
 
     def getvalues(self, field, html, dtype=None, link=False) -> List[str]:
-        section = self.findbyre(r'(?s)>%s</span>(.*?>)[^<>]+</span><span' % field, html) or \
-                  self.findbyre(r'(?s)>%s</span>(.*)' % field, html)
+        section = self.findbyre(r'(?s)>{}</span>(.*?>)[^<>]+</span><span'
+                                .format(field), html) or \
+                  self.findbyre(r'(?s)>{}</span>(.*)'.format(field), html)
         if section:
-            return self.findallbyre(r'<%s[^<>]*>(.*?)[\(<]' % ('a ' if link else 'span'), section, dtype)
+            return self.findallbyre(r'<{}[^<>]*>(.*?)[\(<]'
+                                    .format('a ' if link else 'span'),
+                                    section, dtype)
         return []
 
     def findnames(self, html):
@@ -6589,7 +6618,9 @@ class MetallumAnalyzer(Analyzer):
         self.language = 'en'
 
     def getvalue(self, field, html, dtype=None, alt=None):
-        return self.findbyre(r'(?s)<dt>%s:</dt>\s*<dd[^<>]*>(?:<[^<>]*>)*(.+?)(?:<[^<>]*>)*</dd>' % field, html, dtype, alt=alt)
+        return self.findbyre(
+            r'(?s)<dt>{}:</dt>\s*<dd[^<>]*>(?:<[^<>]*>)*(.+?)(?:<[^<>]*>)*</dd>'
+            .format(field), html, dtype, alt=alt)
 
     def findinstanceof(self, html):
         return 'Q215380'
@@ -7323,8 +7354,8 @@ class CesarAnalyzer(Analyzer):
 
     def getvalue(self, field, html, dtype=None):
         return self.findbyre(
-            '(?s)<TR><TD[^<>]*keyColumn[^<>]*>[^<>]*%s[^<>]*</TD>[^<>]*<TD[^<>]*valueColumn[^<>]*>(.*?)<' % field,
-            html.replace('&nbsp;', ' '), dtype)
+            '(?s)<TR><TD[^<>]*keyColumn[^<>]*>[^<>]*{}[^<>]*</TD>[^<>]*<TD[^<>]*valueColumn[^<>]*>(.*?)<'
+            .format(field), html.replace('&nbsp;', ' '), dtype)
 
     def findnames(self, html):
         return [
@@ -7400,10 +7431,14 @@ class StuttgartAnalyzer(Analyzer):
         self.escapehtml = True
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre(r'<label[^<>]*>\s*%s\s*<.*?"form_input_element">(.*?)<' % field, html, dtype)
+        return self.findbyre(
+            r'<label[^<>]*>\s*{}\s*<.*?"form_input_element">(.*?)<'
+            .format(field), html, dtype)
 
     def getvalues(self, field, html, dtype=None) -> List[str]:
-        sections = self.findallbyre(r'<label[^<>]*>\s*%s\s*<.*?"form_input_element">(.*?)<' % field, html)
+        sections = self.findallbyre(
+            r'<label[^<>]*>\s*{}\s*<.*?"form_input_element">(.*?)<'
+            .format(field), html)
         result = []
         for section in sections:
             result += self.findallbyre('([^;]*)', section, dtype)
@@ -8214,7 +8249,8 @@ class IWDAnalyzer(Analyzer):
         self.language = 'en'
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre(r'<strong>%s:</strong>(.*?)</td>' % field, html, dtype)
+        return self.findbyre(r'<strong>{}:</strong>(.*?)</td>'
+                             .format(field), html, dtype)
 
     def getvalues(self, field, html, dtype=None) -> List[str]:
         section = self.getvalue(field, html)
@@ -8527,7 +8563,8 @@ class BookTradeAnalyzer(Analyzer):
         self.language = 'en'
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre(r'(?s)<strong>%s:</strong></td>\s*<td>(.*?)</td>' % field, html, dtype)
+        return self.findbyre(r'(?s)<strong>{}:</strong></td>\s*<td>(.*?)</td>'
+                             .format(field), html, dtype)
 
     def findnames(self, html):
         return [self.getvalue('Name', html)]
@@ -9144,7 +9181,8 @@ class AdultFilmAnalyzer(Analyzer):
         self.language = 'en'
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre(r'(?s)</i>%s.*?(<ul.*?)</ul>' % field, html, dtype)
+        return self.findbyre(r'(?s)</i>{}.*?(<ul.*?)</ul>'
+                             .format(field), html, dtype)
 
     def getvalues(self, field, html, dtype=None) -> List[str]:
         section = self.getvalue(field, html)
@@ -9604,8 +9642,9 @@ class BnaAnalyzer(Analyzer):
         self.language = 'es'
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre(r'(?s)<td class="td1"[^<>]*>\s*<strong>%s</strong>\s*</td>\s*<td[^<>]*>(.*?)</td>' % field,
-                             html, dtype)
+        return self.findbyre(
+            r'(?s)<td class="td1"[^<>]*>\s*<strong>{}</strong>\s*</td>\s*<td[^<>]*>(.*?)</td>'
+            .format(field), html, dtype)
 
     def getvalues(self, field, html, dtype=None) -> List[str]:
         section = self.getvalue(field, html)
@@ -9717,7 +9756,8 @@ class PublonsAnalyzer(Analyzer):
 
     def findnames(self, html):
         return [
-            self.findbyre(r'href="[^"]*/%s/[^"]*">(.*?)<' % self.id, html),
+            self.findbyre(r'href="[^"]*/{}/[^"]*">(.*?)<'
+                          .format(self.id), html),
             self.findbyre(r'<title>([^<>\|]*)', html)
         ]
 
@@ -9923,7 +9963,8 @@ class AutoresArAnalyzer(Analyzer):
         return html.replace('&nbsp;', ' ')
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre(r'>%s:\s*(?:<[^<>]*>)*([^<>]+)<' % field, html, dtype)
+        return self.findbyre(r'>{}:\s*(?:<[^<>]*>)*([^<>]+)<'
+                             .format(field), html, dtype)
 
     def findinstanceof(self, html):
         return 'Q5'
@@ -10530,7 +10571,8 @@ class GameFaqsAnalyzer(Analyzer):
         self.escapehtml = True
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre(r'(?s)<b>%s:</b>(?:\s|<[^<>]*>)*([^<>]+)' % field, html, dtype)
+        return self.findbyre(r'(?s)<b>{}:</b>(?:\s|<[^<>]*>)*([^<>]+)'
+                             .format(field), html, dtype)
 
     def findinstanceof(self, html):
         return 'Q7889'
@@ -10737,7 +10779,9 @@ class AinmAnalyzer(Analyzer):
         self.language = 'ga'
 
     def getvalue(self, field, html, category=None):
-        return self.findbyre(r'(?s)<td class="caption">%s</td>\s*<td class="value">(.*?)</td>' % field, html, category)
+        return self.findbyre(
+            r'(?s)<td class="caption">{}</td>\s*<td class="value">(.*?)</td>'
+            .format(field), html, category)
 
     def findlongtext(self, html):
         return self.findbyre(r'(?s)<div class="article">(.*?)<div id="machines"', html)
@@ -10790,7 +10834,8 @@ class TmdbAnalyzer(Analyzer):
     def getvalue(self, field, html, dtype=None, alt=None):
         if alt is None:
             alt = []
-        return self.findbyre(r'(?s)<bdi>%s</bdi></strong>(.*?)</p>' % field, html, dtype, alt=alt)
+        return self.findbyre(r'(?s)<bdi>{}</bdi></strong>(.*?)</p>'
+                             .format(field), html, dtype, alt=alt)
 
     def findnames(self, html):
         return self.findallbyre(r'title" content="(.*?)"', html) + \
@@ -10839,7 +10884,8 @@ class LibraryKoreaAnalyzer(Analyzer):
         self.language = 'ko'
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre(r'(?s)<td id="%s" title="([^"<>]+)">' % field, html, dtype)
+        return self.findbyre(r'(?s)<td id="{}" title="([^"<>]+)">'
+                             .format(field), html, dtype)
 
     def getvalues(self, field, html, dtype=None) -> List[str]:
         section = self.getvalue(field, html)
@@ -10874,7 +10920,8 @@ class LibraryKoreaAnalyzer(Analyzer):
 
     def findemployers(self, html):
         descriptions = self.getvalues('related_org', html)
-        return [self.findbyre(r'([^\(\)]+)', desc, 'employer') for desc in descriptions]
+        return [self.findbyre(r'([^\(\)]+)', desc, 'employer')
+                for desc in descriptions]
 
     def findmixedrefs(self, html):
         return self.finddefaultmixedrefs(html)
@@ -10890,7 +10937,8 @@ class KunstenpuntAnalyzer(Analyzer):
         self.language = 'nl'
 
     def getvalue(self, field, html, category=None):
-        return self.findbyre(r'<dt>%s</dt><dd>(.*?)<' % field, html, category)
+        return self.findbyre(r'<dt>{}</dt><dd>(.*?)<'
+                             .format(field), html, category)
 
     def findnames(self, html):
         return [self.getvalue('Volledige naam', html)]
@@ -11037,8 +11085,11 @@ class PornhubAnalyzer(Analyzer):
         self.showurl = False
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre(r'(?si)itemprop="%s"[^<>]*>(.*?)<' % field, html, dtype) \
-            or self.findbyre(r'(?si)"infoPiece"><span>%s:</span>(?:\s|<[^<>]*>)*([^<>]*)' % field, html, dtype)
+        return self.findbyre(r'(?si)itemprop="{}"[^<>]*>(.*?)<'
+                             .format(field), html, dtype) \
+            or self.findbyre(
+                r'(?si)"infoPiece"><span>{}:</span>(?:\s|<[^<>]*>)*([^<>]*)'
+                .format(field), html, dtype)
 
     def findnames(self, html):
         return [self.findbyre(r'(?s)<h1>(.*?)<', html)]
@@ -11356,7 +11407,8 @@ class InternetBookAnalyzer(Analyzer):
         self.language = 'en'
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre(r'<dt>%s:</dt><dd>(.*?)</dd>' % field, html, dtype)
+        return self.findbyre(r'<dt>{}:</dt><dd>(.*?)</dd>'
+                             .format(field), html, dtype)
 
     def findnames(self, html):
         return [self.getvalue('Full Name', html)]
@@ -11433,9 +11485,12 @@ class PoetsWritersAnalyzer(Analyzer):
         self.escapehtml = True
 
     def getvalue(self, field, html, stype=None):
-        section = self.findbyre(r'(?s)"field-label">[^<>]*%s:[^<>]*</div>(.*?)</div><div>' % field, html)
+        section = self.findbyre(
+            r'(?s)"field-label">[^<>]*{}:[^<>]*</div>(.*?)</div><div>'
+            .format(field), html)
         if section:
             return self.findbyre(r'>\s*(\w[^<>]+)<', section, stype)
+        return None
 
     def findnames(self, html):
         return [self.findbyre(r'"og:title"[^<>]*content="(.*?)"', html)]
@@ -11612,7 +11667,9 @@ class EntomologistAnalyzer(Analyzer):
         self.language = 'en'
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre(r'<SPAN[^<>]*>%s:\s*</SPAN>(?:\s|<[^<>]*>)*([^<>]*)' % field, html, dtype)
+        return self.findbyre(
+            r'<SPAN[^<>]*>{}:\s*</SPAN>(?:\s|<[^<>]*>)*([^<>]*)'
+            .format(field), html, dtype)
 
     def getvalues(self, field, html, dtype=None) -> List[str]:
         section = self.getvalue(field, html)
@@ -11860,7 +11917,8 @@ class Edit16Analyzer(Analyzer):
         self.language = 'it'
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre('<B>%s:(?:<[^<>]*>)*([^<>]+)<' % field, html, dtype)
+        return self.findbyre('<B>{}:(?:<[^<>]*>)*([^<>]+)<'
+                             .format(field), html, dtype)
 
     def findnames(self, html):
         result = []
@@ -11914,14 +11972,16 @@ class RismAnalyzer(Analyzer):
         self.language = 'de'
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre('<span class="label">%s</span>: <span class="value">(.*?)</span>' % field, html, dtype)
+        return self.findbyre(
+            '<span class="label">{}</span>: <span class="value">(.*?)</span>'
+            .format(field), html, dtype)
 
     def getvalues(self, field, html, dtype=None, splitter=',') -> List[str]:
         field = self.getvalue(field, html)
         if field:
             if splitter == '<':
                 return self.findallbyre('>(.*?)<', '>' + field + '<', dtype)
-            return self.findallbyre('[^%s]+' % splitter, field, dtype)
+            return self.findallbyre('[^{}]+'.format(splitter), field, dtype)
         return []
 
     def findnames(self, html):
@@ -12017,7 +12077,9 @@ class RedTubeAnalyzer(Analyzer):
         self.showurl = False
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre(r'(?is)<span class="pornstar_more_details_label">%s</span>\s*<span class="pornstar_more_details_data">(.*?)<' % field, html, dtype)
+        return self.findbyre(
+            r'(?is)<span class="pornstar_more_details_label">{}</span>\s*<span class="pornstar_more_details_data">(.*?)<'
+            .format(field), html, dtype)
 
     def findnames(self, html):
         result = self.findallbyre('<h1[^<>]*>(.*?)<', html)
@@ -12250,8 +12312,8 @@ class PuscAnalyzer(Analyzer):
 
     def getcode(self, code, html):
         return self.findbyre(
-            r'(?s)<b>Source of number or code:</b>\s*%s</p>\s*<p><b>Standard number or code:</b>\s*(.*?)</p>' % code,
-            html)
+            r'(?s)<b>Source of number or code:</b>\s*{}</p>\s*<p><b>Standard number or code:</b>\s*(.*?)</p>'
+            .format(code), html)
 
     def findmixedrefs(self, html):
         return [
@@ -12309,7 +12371,9 @@ class IgdbAnalyzer(Analyzer):
         self.language = 'en'
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre('<label>%s:</label>(.*?)<(?:label|<h3 class="underscratch)' % field, html, dtype)
+        return self.findbyre(
+            '<label>{}:</label>(.*?)<(?:label|<h3 class="underscratch)'
+            .format(field), html, dtype)
 
     def getvalues(self, field, html, dtype=None) -> List[str]:
         section = self.getvalue(field, html)
@@ -12662,7 +12726,9 @@ class BdelAnalyzer(Analyzer):
         self.escapehtml = True
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre(r'(?s)<td[^<>]*>\s*%s\s*:\s*</td>\s*<td[^<>]*>(.*?)</td>' % field, html, dtype)
+        return self.findbyre(
+            r'(?s)<td[^<>]*>\s*{}\s*:\s*</td>\s*<td[^<>]*>(.*?)</td>'
+            .fomat(field), html, dtype)
 
     def findnames(self, html):
         return self.findallbyre(r'<H1>(.*?)[\(<]', html)
@@ -12785,7 +12851,9 @@ class AcademieRouenAnalyzer(Analyzer):
         self.escapeunicode = True
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre(r'(?s)%s.\s*:\s*</strong>.*?<td[^<>]*>(?:<[^<>]*>)*([^<>]+)<' % field, html, dtype)
+        return self.findbyre(
+            r'(?s){}.\s*:\s*</strong>.*?<td[^<>]*>(?:<[^<>]*>)*([^<>]+)<'
+            .format(field), html, dtype)
 
     def findinstanceof(self, html):
         return 'Q5'
@@ -12891,7 +12959,8 @@ class SnsaAnalyzer(Analyzer):
         self.language = 'it'
 
     def getvalue(self, field, html, dtype=None, alt=None):
-        return self.findbyre('(?s)<strong>%s</strong><br>(.*?)</p>' % field, html, dtype, alt=alt)
+        return self.findbyre('(?s)<strong>{}</strong><br>(.*?)</p>'
+                             .format(field), html, dtype, alt=alt)
 
     def getvalues(self, field, html, dtype=None, alt=None) -> List[str]:
         section = self.getvalue(field, html)
@@ -12959,10 +13028,12 @@ class UvaAlbumAnalyzer(Analyzer):
         return html.replace('&nbsp;', ' ')
 
     def getvalue(self, field, html, dtype=None, alt=None):
-        return self.findbyre('(?s)<th>%s</th><td>(?:<a[^<>]*>)?(.*?)<' % field, html, dtype, alt=alt)
+        return self.findbyre('(?s)<th>{}</th><td>(?:<a[^<>]*>)?(.*?)<'
+                             .format(field), html, dtype, alt=alt)
 
     def getvalues(self, field, html, dtype=None, alt=None) -> List[str]:
-        return self.findallbyre('(?s)<th>%s</th><td>(?:<a[^<>]*>)?(.*?)<' % field, html, dtype, alt=alt)
+        return self.findallbyre('(?s)<th>{}</th><td>(?:<a[^<>]*>)?(.*?)<'
+                                .format(field), html, dtype, alt=alt)
 
     def findinstanceof(self, html):
         return 'Q5'
@@ -13225,15 +13296,19 @@ class PlwabnAnalyzer(Analyzer):
         self.language = 'pl'
 
     def getvalue(self, field, letter, html, dtype=None):
-        row = self.findbyre(r'(<tr><td[^<>]*>%s\s*<.*?</tr>)' % field, html)
+        row = self.findbyre(r'(<tr><td[^<>]*>{}\s*<.*?</tr>)'
+                            .format(field), html)
         if row:
-            return self.findbyre(r'<I>\s*%s\s*</TT></I>(.*?)<' % letter, row, dtype)
+            return self.findbyre(r'<I>\s*{}\s*</TT></I>(.*?)<'
+                                 .fomat(letter), row, dtype)
 
     def getvalues(self, field, letter, html, dtype=None) -> List[str]:
         result = []
-        rows = self.findallbyre(r'(<tr><td[^<>]*>%s\s*<.*?</tr>)' % field, html)
+        rows = self.findallbyre(r'(<tr><td[^<>]*>{}\s*<.*?</tr>)'
+                                .format(field), html)
         for row in rows:
-            result += self.findallbyre(r'<I>\s*%s\s*</TT></I>(.*?)<' % letter, row, dtype)
+            result += self.findallbyre(r'<I>\s*{}\s*</TT></I>(.*?)<'
+                                       .format(letter), row, dtype)
         return result
 
     def findinstanceof(self, html):
@@ -13278,11 +13353,13 @@ class BewebAnalyzer(Analyzer):
         self.urlbase = 'https://www.beweb.chiesacattolica.it/persone/persona/{id}/'
         self.hrtre = 'Elementi descrittivi</h3>(.*?)<h3'
         self.language = 'it'
-        self.languagetranslate = {'ita': 'it', 'lat': 'la', 'deu': 'de', 'spa': 'es', 'fra': 'fr', 'eng': 'en'}
+        self.languagetranslate = {'ita': 'it', 'lat': 'la', 'deu': 'de',
+                                  'spa': 'es', 'fra': 'fr', 'eng': 'en'}
         self.escapehtml = True
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre(r'(?s)<b>%s</b>\s*:\s*([^<>]*)' % field, html, dtype)
+        return self.findbyre(r'(?s)<b>{}</b>\s*:\s*([^<>]*)'
+                             .format(field), html, dtype)
 
     def getvalues(self, field, html, dtype=None) -> List[str]:
         result = self.getvalue(field, html)
@@ -13368,8 +13445,9 @@ class DeutscheBiographieAnalyzer(Analyzer):
         self.language = 'de'
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre(r'(?s)<dt class="indexlabel">%s</dt>\s*<dd class="indexvalue">(.*?)</dd>' % field, html,
-                             dtype)
+        return self.findbyre(
+            r'(?s)<dt class="indexlabel">{}</dt>\s*<dd class="indexvalue">(.*?)</dd>'
+            .format(field), html, dtype)
 
     def findnames(self, html):
         section = self.getvalue('Namensvarianten', html) or ''
@@ -13435,7 +13513,8 @@ class WorldsWithoutEndAnalyzer(Analyzer):
         self.language = 'en'
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre(r'(?s)>%s:</td>\s*<td[^<>]*>(.*?)</td>' % field, html, dtype)
+        return self.findbyre(r'(?s)>{}:</td>\s*<td[^<>]*>(.*?)</td>'
+                             .format(field), html, dtype)
 
     def findinstanceof(self, html):
         return 'Q5'
@@ -13506,7 +13585,8 @@ class BelgianPhotographerAnalyzer(Analyzer):
     def getvalue(self, field, html, dtype=None, alt=None):
         if alt is None:
             alt = []
-        return self.findbyre(r'(?s)<h3>\s*%s\s*</h3>\s*<div[^<>]*>(.*?)</div>' % field, html, dtype, alt=alt)
+        return self.findbyre(r'(?s)<h3>\s*{}\s*</h3>\s*<div[^<>]*>(.*?)</div>'
+                             .format(field), html, dtype, alt=alt)
 
     def getvalues(self, field, html, dtype=None, alt=None) -> List[str]:
         if alt is None:
@@ -13576,10 +13656,13 @@ class AlkindiAnalyzer(Analyzer):
         self.escapehtml = True
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre(r'(?s)<p class="ltr (?:notice-label|text-muted)">\s*%s.*?<[^<>]* class="ltr"\s*>(.*?)<' % field, html, dtype)
+        return self.findbyre(
+            r'(?s)<p class="ltr (?:notice-label|text-muted)">\s*{}.*?<[^<>]* class="ltr"\s*>(.*?)<'
+            .format(field), html, dtype)
 
     def getvalues(self, field, html, dtype=None) -> List[str]:
-        return self.findallbyre(r'(?s)<p class="ltr (?:notice-label|text-muted)">\s*%s.*?<[^<>]* class="ltr"\s*>(.*?)<' % field, html, dtype)
+        return self.findallbyre(r'(?s)<p class="ltr (?:notice-label|text-muted)">\s*{}.*?<[^<>]* class="ltr"\s*>(.*?)<'
+                                .format(field), html, dtype)
 
     def instanceof(self, html):
         return 'Q5'
@@ -13760,7 +13843,9 @@ class JwaAnalyzer(Analyzer):
         self.language = 'en'
 
     def getvalue(self, field, html, dtype=None):
-        result = self.findbyre(r'(?s)<div class="field-label">\s*%s\s*<.*?<div class=[^<>]*field-item[^<>]*>(.*?)</div>' % field, html)
+        result = self.findbyre(
+            r'(?s)<div class="field-label">\s*{}\s*<.*?<div class=[^<>]*field-item[^<>]*>(.*?)</div>'
+            .format(field), html)
         if result:
             result = self.TAGRE.sub('', result)
             if dtype:
@@ -13849,8 +13934,10 @@ class WikiAnalyzer(Analyzer):
         if self.language in ['commons', 'species']:
             site = 'wikimedia'
         self.dbname = '{} {}'.format(site.title(), self.language.upper())
-        self.urlbase = 'https://%s.%s.org/wiki/{id}' % (self.language, site)
-        self.urlbase3 = 'https://%s.%s.org/w/index.php?title={id}&veswitched=1&action=edit' % (self.language, site)
+        self.urlbase = 'https://{}.{}.org/wiki/{{id}}'.format(
+            self.language, site)
+        self.urlbase3 = 'https://{}.{}.org/w/index.php?title={{id}}&veswitched=1&action=edit'.format(
+            self.language, site)
         self.hrtre = '{{(.*?)}}'
         self.mainRE = '(?s)<textarea[^<>]*name="wpTextbox1">(.*?)</textarea>'
         self.escapehtml = True
@@ -13899,7 +13986,8 @@ class WikiAnalyzer(Analyzer):
                 else:
                     sections = self.findallbyre(r'(?is)[\b\|_\s]%s\s*=((?:[^\|、\{\}]|\{\{[^\{\}]*\}\})+)' % name, box, alt=alt)
                     for section in sections:
-                        result += self.findallbyre(r'([^%s]+)' % splitters, section, dtype)
+                        result += self.findallbyre(
+                            r'([^{}]+)'.format(splitters), section, dtype)
         return result
 
     def getinfo(self, names, html, dtype=None, splitters=None, alt=None) -> str:
@@ -13917,7 +14005,8 @@ class WikiAnalyzer(Analyzer):
                     result = []
                     preresult = self.findallbyre(r'(?is)[\b\|_\s]%s\s*=((?:[^\|\{\}]|\{\{[^\{\}]*\}\})+)' % name, box, alt=alt)
                     for section in preresult:
-                        result += self.findallbyre(r'([^%s]+)' % splitters, section, dtype)
+                        result += self.findallbyre(
+                            r'([^{}]+)'.format(splitters), section, dtype)
                 if result:
                     return result[0]
 
@@ -14539,7 +14628,8 @@ class BibliotecaNacionalAnalyzer(UrlAnalyzer):
         return html.replace('&nbsp;', ' ')
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre('(?s)<strong>%s</strong>.*?<td[^<>]*>(.*?)</td>' % field, html, dtype)
+        return self.findbyre('(?s)<strong>{}</strong>.*?<td[^<>]*>(.*?)</td>'
+                             .format(field), html, dtype)
 
     def getvalues(self, field, html, dtype=None) -> List[str]:
         section = self.getvalue(field, html)
@@ -14632,14 +14722,18 @@ class IasAnalyzer(UrlAnalyzer):
     def getvalue(self, field, html, dtype=None, alt=None):
         if alt is None:
             alt = []
-        prevalue = self.findbyre(r'(?s)<h3[^<>]*>\s*%s\s*</h3>(.*?)(?:<h3|<div class="scholar__)' % field, html)
+        prevalue = self.findbyre(
+            r'(?s)<h3[^<>]*>\s*{}\s*</h3>(.*?)(?:<h3|<div class="scholar__)'
+            .format(field), html)
         if prevalue:
             return self.findbyre(r'(?s)^(?:<[^<>]*>|\s)*(.*?)(?:<[^<>]*>|\s)*$', prevalue, dtype, alt=alt)
 
     def getvalues(self, field, html, dtype=None, alt=None) -> List[str]:
         if alt is None:
             alt = []
-        section = self.findbyre(r'(?s)<h3[^<>]*>\s*%s\s*</h3>(.*?)(?:<h3|<div class="scholar__)' % field, html)
+        section = self.findbyre(
+            r'(?s)<h3[^<>]*>\s*{}\s*</h3>(.*?)(?:<h3|<div class="scholar__)'
+            .format(field), html)
         if section:
             return self.findallbyre(r'(?s)>([^<>]*)<', section, dtype, alt=alt) or []
         return []
@@ -14647,9 +14741,13 @@ class IasAnalyzer(UrlAnalyzer):
     def getsubvalues(self, field, secondfield, html, dtype=None, alt=None):
         if alt is None:
             alt = []
-        section = self.findbyre(r'(?s)<h3[^<>]*>\s*%s\s*</h3>(.*?)(?:<h3|<div class="scholar__)' % field, html)
+        section = self.findbyre(
+            r'(?s)<h3[^<>]*>\s*{}\s*</h3>(.*?)(?:<h3|<div class="scholar__)'
+            .format(field), html)
         if section:
-            return self.findallbyre(r'(?s)<div class="[^"]*%s[^"]*"><div class="field__item">(.*?)</div>' % secondfield, section, dtype, alt=alt) or []
+            return self.findallbyre(
+                r'(?s)<div class="[^"]*{}[^"]*"><div class="field__item">(.*?)</div>'
+                .format(secondfield), section, dtype, alt=alt) or []
         return []
 
     def findinstanceof(self, html):
@@ -14734,7 +14832,8 @@ class FotomuseumAnalyzer(UrlAnalyzer):
         self.language = 'en'
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre(r'(?s)<h3>%s</h3>\s*<div>(.*?)</div>' % field, html, dtype)
+        return self.findbyre(r'(?s)<h3>{}</h3>\s*<div>(.*?)</div>'
+                             .format(field), html, dtype)
 
     def instanceof(self, html):
         return self.findbyre('Category', html, 'instanceof')
@@ -14906,7 +15005,8 @@ class UnivieAnalyzer(UrlAnalyzer):
         self.language = 'en'
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre(r'<meta property=(?:\w+:)?%s" content="(.*?)"' % field, html, dtype)
+        return self.findbyre(r'<meta property=(?:\w+:)?{}" content="(.*?)"'
+                             .format(field), html, dtype)
 
     def findinstanceof(self, html):
         return self.findbyre(r'"@type":"(.*?)"', html, 'instanceof')
@@ -15024,13 +15124,16 @@ class BacklinkAnalyzer(Analyzer):
         self.dbproperty = None
         self.dbid = 'Q2013'
         self.urlbase = None
-        self.sparqlquery = 'SELECT ?a ?b WHERE { ?a ?b wd:%s }' % self.id
+        self.sparqlquery = 'SELECT ?a ?b WHERE {{ ?a ?b wd:{} }}'.format(self.id)
         self.skipfirst = True
         self.hrtre = '()'
         self.language = 'en'
 
     def getrelations(self, relation, html):
-        return [x.upper() for x in self.findallbyre(r'statement/([qQ]\d+)[^{}]+statement/%s[^\d]' % relation, html)]
+        return [x.upper()
+                for x in self.findallbyre(
+                    r'statement/([qQ]\d+)[^{{}}]+statement/{}[^\d]'
+                    .format(relation), html)]
 
     def findlongtext(self, html):
         matches = re.findall(r'statement/([qQ]\d+)[^{}]+statement/([pP]\d+)', html)
