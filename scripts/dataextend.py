@@ -69,6 +69,7 @@ from urllib.parse import quote, unquote
 from urllib.request import urlopen
 
 import pywikibot
+from pywikibot.backports import List
 from pywikibot.bot import SingleSiteBot
 from pywikibot.data import sparql
 
@@ -85,10 +86,11 @@ class DataExtendBot(SingleSiteBot):
     }
 
     def __init__(self, **kwargs):
+        """Initializer."""
         super().__init__(**kwargs)
         self.labels = {}
         self.data = defaultdict(dict)
-        self.noname = []
+        self.noname = set()
         self.labelfile = 'labels.txt'
         self.datafile = 'defaultdata.txt'
         self.nonamefile = 'noname.txt'
@@ -371,40 +373,41 @@ class DataExtendBot(SingleSiteBot):
 
     def loaddata(self):
 
-        with suppress(IOError):
-            with codecs.open(self.labelfile, 'r', 'utf-8') as f:
-                for line in f.readlines():
-                    key, value = line.strip().split(':', 1)
-                    self.labels[key] = value
+        param = {'mode': 'r', 'encoding': 'utf-8'}
 
-        with suppress(IOError):
-            with codecs.open(self.datafile, 'r', 'utf-8') as f:
-                for line in f.readlines():
-                    parts = line.strip().split(':')
-                    try:
-                        dtype, key, value = parts
-                    except ValueError:
-                        dtype, key, value = (parts[0], ':'.join(parts[1:-1]), parts[-1])
-                    self.data[dtype][key] = value
+        with suppress(IOError), codecs.open(self.labelfile, **param) as f:
+            for line in f.readlines():
+                key, value = line.strip().split(':', 1)
+                self.labels[key] = value
 
-        with suppress(IOError):
-            with codecs.open(self.nonamefile, 'r', 'utf-8') as f:
-                for line in f.readlines():
-                    self.noname.append(line.strip())
+        with suppress(IOError), codecs.open(self.datafile, **param) as f:
+            for line in f.readlines():
+                parts = line.strip().split(':')
+                try:
+                    dtype, key, value = parts
+                except ValueError:
+                    dtype, key, value = (parts[0], ':'.join(parts[1:-1]), parts[-1])
+                self.data[dtype][key] = value
+
+        with suppress(IOError), codecs.open(self.nonamefile, **param) as f:
+            self.noname = {line.strip() for line in f.readlines()}
 
     def savedata(self):
-        with codecs.open(self.labelfile, 'w', 'utf-8') as f:
+
+        param = {'mode': 'w', 'encoding': 'utf-8'}
+
+        with codecs.open(self.labelfile, **param) as f:
             for item in self.labels:
                 f.write('%s:%s\n' % (item, self.labels[item]))
 
-        with codecs.open(self.datafile, 'w', 'utf-8') as f:
+        with codecs.open(self.datafile, **param) as f:
             for dtype in self.data:
                 for key in self.data[dtype]:
                     f.write('%s:%s:%s\n' % (dtype, key, self.data[dtype][key]))
 
-        with codecs.open(self.nonamefile, 'w', 'utf-8') as f:
-            for noname in set(self.noname):
-                f.write('%s\n' % noname)
+        with codecs.open(self.nonamefile, **param) as f:
+            for noname in self.noname:
+                f.write('{}\n'.format(noname))
 
     def page(self, title):
         title = title.split(':')[-1]
@@ -548,15 +551,11 @@ class DataExtendBot(SingleSiteBot):
         'gener': 1,
         'febrer': 2,
         'març': 3,
-        'abril': 4,
         'maig': 5,
         'juny': 6,
         'juliol': 7,
-        'agost': 8,
         'setembre': 9,
-        'novembre': 11,
         'desembre': 12,
-        'ag': 8,
     }
 
     def createdateclaim(self, text):
@@ -1007,13 +1006,13 @@ class DataExtendBot(SingleSiteBot):
                         if (not result) or result[0].upper() == 'Y':
                             chosennewnames[language].append(name)
                         elif result[0].upper() == 'X':
-                            self.noname.append(name)
+                            self.noname.add(name)
                 realnewnames = chosennewnames
                 result = 'Y'
             if result[0].upper() == 'X':
                 for language in realnewnames.keys():
                     for name in realnewnames[language]:
-                        self.noname.append(name)
+                        self.noname.add(name)
             elif result[0].upper() != 'N':
                 returnvalue = [{}, {}]
                 for language in realnewnames.keys():
@@ -1062,13 +1061,15 @@ class DataExtendBot(SingleSiteBot):
 class Quasiclaim:
 
     def __init__(self, title):
+        """Initializer."""
         self._target = title
 
     @property
     def type(self):
         return 'external-id'
 
-    def getTarget(self):
+    def getTarget(self):  # noqa: N802
+        """Return the target value of this QuasiClaim."""
         return self._target
 
 
@@ -1077,6 +1078,7 @@ class Analyzer:
     SCRIPTRE = re.compile('(?s)<script.*?</script>')
 
     def __init__(self, id, data=None, item=None, bot=None):
+        """Initializer."""
         self.id = id
         self.data = defaultdict(dict) if data is None else data
         self.dbname = None
@@ -1102,45 +1104,38 @@ class Analyzer:
         self.site = pywikibot.Site().data_repository()
 
     def setup(self):
-        pass  # to be used for putting data into subclasses
+        """To be used for putting data into subclasses."""
 
     @property
     def url(self):
         usedurl = self.urlbase
         if usedurl is None:
             if not self.sparqlquery:
-                pywikibot.output('')
-                pywikibot.output('### Skipping {} ({}) ###'.format(self.dbname, self.dbproperty))
+                pywikibot.output('\n### Skipping {} ({}) ###'
+                                 .format(self.dbname, self.dbproperty))
             return None
-        else:
-            return usedurl.format(id=quote(self.id))
+        return usedurl.format(id=quote(self.id))
 
     @property
     def alturl(self):
         if self.urlbase2:
             return self.urlbase2.format(id=quote(self.id))
-        else:
-            return None
+        return None
 
     @property
-    def extraurls(self):
-        if self.urlbase3:
-            if self.urlbase4:
-                return [
-                    self.urlbase3.format(id=quote(self.id)),
-                    self.urlbase4.format(id=quote(self.id))
-                ]
-            else:
-                return [self.urlbase3.format(id=quote(self.id))]
-        else:
+    def extraurls(self) -> List[str]:
+        if not self.urlbase3:
             return []
+
+        if self.urlbase4:
+            return [self.urlbase3.format(id=quote(self.id)),
+                    self.urlbase4.format(id=quote(self.id))]
+        else:
+            return [self.urlbase3.format(id=quote(self.id))]
 
     @staticmethod
     def commastrip(term):
-        term = term.replace('&nbsp;', ' ')
-        term = term.replace('\n', ' ')
-        term = term.replace('\r', ' ')
-        term = term.replace('\t', ' ')
+        term = re.sub(r'(?:\s|&nbsp;)+', ' ', term)
         term = term.strip().strip(',').rstrip('.').strip()
         term = term.split('(')[0]
         if ',' in term:
@@ -1150,15 +1145,12 @@ class Analyzer:
                 if term.strip()[-1] != term.strip()[-1].lower():
                     term = term.strip() + '.'
                 term = term.split(',', 1)[1] + ' ' + term.split(',', 1)[0]
-        while '  ' in term:
-            term = term.replace('  ', ' ')
         term = re.sub(r'\s*-\s*', '-', term)
         return unescape(term).strip()
 
     def getdata(self, dtype, text, ask=True):
         text = text.strip('. ').lower().replace('\\n', ' ').replace('\n', ' ').replace('%20', ' ').strip()
-        while '  ' in text:
-            text = text.replace('  ', ' ')
+        text = re.sub(' +', ' ', text)
 
         if not text:
             return None
@@ -1173,8 +1165,9 @@ class Analyzer:
             return None
 
         pywikibot.output("Trying to get a {} out of '{}'".format(dtype, text))
-        pywikibot.output('Type Qnnn to let it point to Qnnn from now on, Xnnn to let it point to Qnnn only now, '
-                         'XXX to never use it, or nothing to not use it now')
+        pywikibot.output('Type Qnnn to let it point to Qnnn from now on, Xnnn '
+                         'to let it point to Qnnn only now, XXX to never use '
+                         'it, or nothing to not use it now')
         answer = input()
         if answer.startswith('Q'):
             self.data[dtype][text] = answer
@@ -2292,12 +2285,11 @@ class IsniAnalyzer(Analyzer):
         if section:
             return [('en', name) for name in self.findallbyre(r'(?s)<span>(.*?)(?:\([^{}<>]*\))?\s*</span>', section)]
 
-    def getvalues(self, field, html, dtype=None):
+    def getvalues(self, field, html, dtype=None) -> List[str]:
         section = self.findbyre('(?s)<td class="rec_lable"><div><span>%s:.*?<td class="rec_title">(.*?)</td>', html)
         if section:
             return self.findallbyre('<span>(.*?)<', html, dtype)
-        else:
-            return []
+        return []
 
     def findnames(self, html):
         return [self.findbyre(r'([^\(]*)', name) for name in self.getvalues('Name', html)]
@@ -4912,7 +4904,7 @@ class NndbAnalyzer(Analyzer):
             text = self.TAGRE.sub('', rawtext)
             return self.findbyre(r'(.+)', text, dtype)
 
-    def getvalues(self, field, dtype=None, bold=True):
+    def getvalues(self, field, dtype=None, bold=True) -> List[str]:
         rawtexts = self.findallbyre(
             r'{}{}:{}\s*(.+?)<(?:br|p)>'.format('<b>' if bold else ' ', field, '</b>' if bold else ''), self.html)
         texts = [self.TAGRE.sub('', rawtext) for rawtext in rawtexts]
@@ -5008,7 +5000,7 @@ class MarcAnalyzer(Analyzer):
     def getvalue(self, field, html, dtype=None, alt=None):
         return self.findbyre('(?s)<td[^<>]*class="eti">%s</td>.*?<td[^<>]*class="sub">(.*?)<' % field, html, dtype, alt=alt)
 
-    def getvalues(self, field, html, dtype=None, alt=None):
+    def getvalues(self, field, html, dtype=None, alt=None) -> List[str]:
         result = []
         for preresult in self.findallbyre('(?s)<td[^<>]*class="eti">%s</td>.*?<td[^<>]*class="sub">(.*?)<' % field, html, dtype, alt=alt):
             result += preresult.split('|')
@@ -5371,7 +5363,7 @@ class LnbAnalyzer(Analyzer):
     def getvalue(self, field, html, dtype=None, alt=None):
         return self.findbyre(r'(?s)<td[^<>]*>[^<>]*%s[^<>]*</td>\s*<td[^<>]*>(.*?)</td>' % field, html, dtype, alt=alt)
 
-    def getvalues(self, field, html, dtype=None, alt=None):
+    def getvalues(self, field, html, dtype=None, alt=None) -> List[str]:
         parts = re.findall('(?s)<td[^<>]*>(.*?)</td>', html)
         status = 'inactive'
         result = []
@@ -6524,13 +6516,12 @@ class CerlAnalyzer(Analyzer):
     def getvalue(self, field, html, dtype=None):
         return self.findbyre(r'(?s)>%s</span><span[^<>]*>(?:<[^<>]*>)?([^<>]*)</' % field, html, dtype)
 
-    def getvalues(self, field, html, dtype=None, link=False):
+    def getvalues(self, field, html, dtype=None, link=False) -> List[str]:
         section = self.findbyre(r'(?s)>%s</span>(.*?>)[^<>]+</span><span' % field, html) or \
                   self.findbyre(r'(?s)>%s</span>(.*)' % field, html)
         if section:
             return self.findallbyre(r'<%s[^<>]*>(.*?)[\(<]' % ('a ' if link else 'span'), section, dtype)
-        else:
-            return []
+        return []
 
     def findnames(self, html):
         return self.getvalues('Heading', html) + self.getvalues('Variant Name', html)
@@ -7411,7 +7402,7 @@ class StuttgartAnalyzer(Analyzer):
     def getvalue(self, field, html, dtype=None):
         return self.findbyre(r'<label[^<>]*>\s*%s\s*<.*?"form_input_element">(.*?)<' % field, html, dtype)
 
-    def getvalues(self, field, html, dtype=None):
+    def getvalues(self, field, html, dtype=None) -> List[str]:
         sections = self.findallbyre(r'<label[^<>]*>\s*%s\s*<.*?"form_input_element">(.*?)<' % field, html)
         result = []
         for section in sections:
@@ -8040,10 +8031,11 @@ class CageMatchAnalyzer(Analyzer):
             r'(?s)<div class="InformationBoxTitle">{}:</div>\s*<div class="InformationBoxContents">(.*?)</div>'.format(field),
             html, dtype)
 
-    def getvalues(self, field, html, dtype=None):
+    def getvalues(self, field, html, dtype=None) -> List[str]:
         section = self.getvalue(field, html)
         if section:
             return self.findallbyre(r'>([^<>]*)<', '>' + section + '<', dtype)
+        return []
 
     def findlanguagenames(self, html):
         result = []
@@ -8224,7 +8216,7 @@ class IWDAnalyzer(Analyzer):
     def getvalue(self, field, html, dtype=None):
         return self.findbyre(r'<strong>%s:</strong>(.*?)</td>' % field, html, dtype)
 
-    def getvalues(self, field, html, dtype=None):
+    def getvalues(self, field, html, dtype=None) -> List[str]:
         section = self.getvalue(field, html)
         if section:
             return self.findallbyre(r'([^,]+)', section, dtype)
@@ -9154,7 +9146,7 @@ class AdultFilmAnalyzer(Analyzer):
     def getvalue(self, field, html, dtype=None):
         return self.findbyre(r'(?s)</i>%s.*?(<ul.*?)</ul>' % field, html, dtype)
 
-    def getvalues(self, field, html, dtype=None):
+    def getvalues(self, field, html, dtype=None) -> List[str]:
         section = self.getvalue(field, html)
         if section:
             return self.findallbyre(r'>([^<>]*)</li>', section, dtype)
@@ -9615,12 +9607,11 @@ class BnaAnalyzer(Analyzer):
         return self.findbyre(r'(?s)<td class="td1"[^<>]*>\s*<strong>%s</strong>\s*</td>\s*<td[^<>]*>(.*?)</td>' % field,
                              html, dtype)
 
-    def getvalues(self, field, html, dtype=None):
+    def getvalues(self, field, html, dtype=None) -> List[str]:
         section = self.getvalue(field, html)
         if section:
             return self.findallbyre(r'(?s)>(.*?)<', '>' + section + '<', dtype)
-        else:
-            return []
+        return []
 
     def prepare(self, html):
         return html.replace('&nbsp;', ' ')
@@ -10551,7 +10542,7 @@ class GameFaqsAnalyzer(Analyzer):
         return self.findbyre('(?s)<div class="body game_desc">(.*?)</div>', html)
 
     def findplatforms(self, html):
-        result = [self.getvalue('Platform')]
+        result = [self.getvalue('Platform', html)]
         section = self.findbyre('(?s)<h3 class="platform-title">(.*?)</h3>', html)
         if section:
             result += self.findallbyre('>([^<>]*)<', section, 'platform')
@@ -10570,7 +10561,7 @@ class GameFaqsAnalyzer(Analyzer):
         return [self.getvalue('[^<>]*Publisher', html, 'gamecompany')]
 
     def findpubdate(self, html):
-        return self.findbyre('Release')
+        return self.findbyre('Release', html)
 
 
 class AmericanBiographyAnalyzer(Analyzer):
@@ -10717,10 +10708,10 @@ class InvaluableAnalyzer(Analyzer):
         section = self.findbyre(r'"profession":\[(.*?)\]', html)
         if section:
             return self.findallbyre(r'"(.*?)"', section, 'occupation')
-        else:
-            section = self.findbyre(r'Professions?:([^<>]*)', html)
-            if section:
-                return self.findallbyre(r'([\w\s]+)', section, 'occupation')
+
+        section = self.findbyre(r'Professions?:([^<>]*)', html)
+        if section:
+            return self.findallbyre(r'([\w\s]+)', section, 'occupation')
         return None
 
     def findbirthdate(self, html):
@@ -10850,7 +10841,7 @@ class LibraryKoreaAnalyzer(Analyzer):
     def getvalue(self, field, html, dtype=None):
         return self.findbyre(r'(?s)<td id="%s" title="([^"<>]+)">' % field, html, dtype)
 
-    def getvalues(self, field, html, dtype=None):
+    def getvalues(self, field, html, dtype=None) -> List[str]:
         section = self.getvalue(field, html)
         if section:
             return self.findallbyre(r'([^;]*)', section, dtype)
@@ -11623,10 +11614,11 @@ class EntomologistAnalyzer(Analyzer):
     def getvalue(self, field, html, dtype=None):
         return self.findbyre(r'<SPAN[^<>]*>%s:\s*</SPAN>(?:\s|<[^<>]*>)*([^<>]*)' % field, html, dtype)
 
-    def getvalues(self, field, html, dtype=None):
+    def getvalues(self, field, html, dtype=None) -> List[str]:
         section = self.getvalue(field, html)
         if section:
             return self.findallbyre('([^,;]*)', section, dtype)
+        return []
 
     def findnames(self, html):
         return [self.getvalue('Name', html)]
@@ -11924,17 +11916,16 @@ class RismAnalyzer(Analyzer):
     def getvalue(self, field, html, dtype=None):
         return self.findbyre('<span class="label">%s</span>: <span class="value">(.*?)</span>' % field, html, dtype)
 
-    def getvalues(self, field, html, dtype=None, splitter=','):
+    def getvalues(self, field, html, dtype=None, splitter=',') -> List[str]:
         field = self.getvalue(field, html)
         if field:
             if splitter == '<':
                 return self.findallbyre('>(.*?)<', '>' + field + '<', dtype)
-            else:
-                return self.findallbyre('[^%s]+' % splitter, field, dtype)
+            return self.findallbyre('[^%s]+' % splitter, field, dtype)
         return []
 
     def findnames(self, html):
-        return [self.getvalues('Name', html, splitter='<')[0]] or + self.getvalues('Namensvarianten', html, splitter='<')
+        return [self.getvalues('Name', html, splitter='<')[0]] + self.getvalues('Namensvarianten', html, splitter='<')
 
     def finddescription(self, html):
         return self.getvalue('Beruf', html)
@@ -12320,12 +12311,11 @@ class IgdbAnalyzer(Analyzer):
     def getvalue(self, field, html, dtype=None):
         return self.findbyre('<label>%s:</label>(.*?)<(?:label|<h3 class="underscratch)' % field, html, dtype)
 
-    def getvalues(self, field, html, dtype=None):
+    def getvalues(self, field, html, dtype=None) -> List[str]:
         section = self.getvalue(field, html)
         if section:
             return self.findallbyre('>([^<>]+)<', section, dtype)
-        else:
-            return []
+        return []
 
     def findinstanceof(self, html):
         return ['Q7889']
@@ -12342,9 +12332,10 @@ class IgdbAnalyzer(Analyzer):
         return self.finddefaultmixedrefs(html)
 
     def findpubdates(self, html):
-        section = self.getvalue('Release Dates')
+        section = self.getvalue('Release Dates', html)
         if section:
             return self.findallbyre(r'datetime="([\d\-]+)', section)
+        return None
 
     def finddevelopers(self, html):
         return self.getvalues('Developers', html, 'gamecompany')
@@ -12809,9 +12800,8 @@ class AcademieRouenAnalyzer(Analyzer):
         return self.getvalue('Nom', html, 'lastname')
 
     def findfirstname(self, html):
-        f = open('result.html', 'w')
-        f.write(html)
-        f.close()
+        with open('result.html', 'w') as f:
+            f.write(html)
         return self.getvalue('Prénoms', html, 'firstname')
 
     def findbirthdate(self, html):
@@ -12903,12 +12893,11 @@ class SnsaAnalyzer(Analyzer):
     def getvalue(self, field, html, dtype=None, alt=None):
         return self.findbyre('(?s)<strong>%s</strong><br>(.*?)</p>' % field, html, dtype, alt=alt)
 
-    def getvalues(self, field, html, dtype=None, alt=None):
+    def getvalues(self, field, html, dtype=None, alt=None) -> List[str]:
         section = self.getvalue(field, html)
         if section:
             return self.findallbyre('([^;]*)', section, dtype, alt=alt)
-        else:
-            return []
+        return []
 
     def findinstanceof(self, html):
         return self.getvalue('Formation', html, 'instanceof')
@@ -12972,7 +12961,7 @@ class UvaAlbumAnalyzer(Analyzer):
     def getvalue(self, field, html, dtype=None, alt=None):
         return self.findbyre('(?s)<th>%s</th><td>(?:<a[^<>]*>)?(.*?)<' % field, html, dtype, alt=alt)
 
-    def getvalues(self, field, html, dtype=None, alt=None):
+    def getvalues(self, field, html, dtype=None, alt=None) -> List[str]:
         return self.findallbyre('(?s)<th>%s</th><td>(?:<a[^<>]*>)?(.*?)<' % field, html, dtype, alt=alt)
 
     def findinstanceof(self, html):
@@ -12983,8 +12972,7 @@ class UvaAlbumAnalyzer(Analyzer):
         fullname = self.getvalue('Voornamen', html)
         if name and fullname and '. ' in name:
             return [name, fullname + name[name.find('. ') + 1:]]
-        else:
-            return [name]
+        return [name]
 
     def findfirstname(self, html):
         section = self.getvalue('Voornamen', html)
@@ -13241,7 +13229,7 @@ class PlwabnAnalyzer(Analyzer):
         if row:
             return self.findbyre(r'<I>\s*%s\s*</TT></I>(.*?)<' % letter, row, dtype)
 
-    def getvalues(self, field, letter, html, dtype=None):
+    def getvalues(self, field, letter, html, dtype=None) -> List[str]:
         result = []
         rows = self.findallbyre(r'(<tr><td[^<>]*>%s\s*<.*?</tr>)' % field, html)
         for row in rows:
@@ -13296,10 +13284,11 @@ class BewebAnalyzer(Analyzer):
     def getvalue(self, field, html, dtype=None):
         return self.findbyre(r'(?s)<b>%s</b>\s*:\s*([^<>]*)' % field, html, dtype)
 
-    def getvalues(self, field, html, dtype=None):
+    def getvalues(self, field, html, dtype=None) -> List[str]:
         result = self.getvalue(field, html)
         if result:
             return self.findallbyre('([^;]*)', result, dtype)
+        return []
 
     def findinstanceof(self, html):
         return self.getvalue('Categoria entità', html, 'instanceof')
@@ -13519,14 +13508,13 @@ class BelgianPhotographerAnalyzer(Analyzer):
             alt = []
         return self.findbyre(r'(?s)<h3>\s*%s\s*</h3>\s*<div[^<>]*>(.*?)</div>' % field, html, dtype, alt=alt)
 
-    def getvalues(self, field, html, dtype=None, alt=None):
+    def getvalues(self, field, html, dtype=None, alt=None) -> List[str]:
         if alt is None:
             alt = []
         section = self.getvalue(field, html, alt=alt)
         if section:
             return self.findallbyre('>(.*?)<', '>' + section + '<', dtype)
-        else:
-            return []
+        return []
 
     def findinstanceof(self, html):
         return self.getvalue('Category', html, 'instanceof')
@@ -13590,7 +13578,7 @@ class AlkindiAnalyzer(Analyzer):
     def getvalue(self, field, html, dtype=None):
         return self.findbyre(r'(?s)<p class="ltr (?:notice-label|text-muted)">\s*%s.*?<[^<>]* class="ltr"\s*>(.*?)<' % field, html, dtype)
 
-    def getvalues(self, field, html, dtype=None):
+    def getvalues(self, field, html, dtype=None) -> List[str]:
         return self.findallbyre(r'(?s)<p class="ltr (?:notice-label|text-muted)">\s*%s.*?<[^<>]* class="ltr"\s*>(.*?)<' % field, html, dtype)
 
     def instanceof(self, html):
@@ -13711,12 +13699,11 @@ class PatrinumAnalyzer(Analyzer):
     def getvalue(self, field, html, dtype=None):
         return self.findbyre(r"(?s)<div class='metadata-row'><span [^<>]*>\s*%s\s*</span>\s*<span [^<>]*>(.*?)</span>" % field, html, dtype)
 
-    def getvalues(self, field, html, dtype=None):
+    def getvalues(self, field, html, dtype=None) -> List[str]:
         section = self.getvalue(field, html)
         if section:
             return self.findallbyre('(?s)>([^<>]*)<', '>' + section + '<', dtype)
-        else:
-            return []
+        return []
 
     def findnames(self, html):
         return [self.getvalue('Nom', html)] +\
@@ -13778,16 +13765,14 @@ class JwaAnalyzer(Analyzer):
             result = self.TAGRE.sub('', result)
             if dtype:
                 return self.findbyre('(.*)', result, dtype)
-            else:
-                return result
+        return result
 
     def findinstanceof(self, html):
         return 'Q5'
 
     def findnames(self, html):
         return [self.findbyre(r'<title>(.*?)[\|<]', html),
-                self.findbyre('<h1[^<>]*>(.*?)</h1', html)
-                ]
+                self.findbyre('<h1[^<>]*>(.*?)</h1', html)]
 
     def finddescription(self, html):
         return self.findbyre('"description" content="(.*?)"', html)
@@ -14534,6 +14519,7 @@ class WikiAnalyzer(Analyzer):
 
 class UrlAnalyzer(Analyzer):
     def __init__(self, id, data=None, item=None, bot=None):
+        """Initializer."""
         if data is None:
             data = defaultdict(dict)
         super().__init__(id.split('/', 3)[-1], data, item, bot)
@@ -14555,10 +14541,11 @@ class BibliotecaNacionalAnalyzer(UrlAnalyzer):
     def getvalue(self, field, html, dtype=None):
         return self.findbyre('(?s)<strong>%s</strong>.*?<td[^<>]*>(.*?)</td>' % field, html, dtype)
 
-    def getvalues(self, field, html, dtype=None):
+    def getvalues(self, field, html, dtype=None) -> List[str]:
         section = self.getvalue(field, html)
         if section:
             return self.findallbyre('>(.*?)<', '>' + section + '<', dtype)
+        return []
 
     def findnames(self, html):
         section = self.getvalue('Nombre personal', html)
@@ -14649,14 +14636,13 @@ class IasAnalyzer(UrlAnalyzer):
         if prevalue:
             return self.findbyre(r'(?s)^(?:<[^<>]*>|\s)*(.*?)(?:<[^<>]*>|\s)*$', prevalue, dtype, alt=alt)
 
-    def getvalues(self, field, html, dtype=None, alt=None):
+    def getvalues(self, field, html, dtype=None, alt=None) -> List[str]:
         if alt is None:
             alt = []
         section = self.findbyre(r'(?s)<h3[^<>]*>\s*%s\s*</h3>(.*?)(?:<h3|<div class="scholar__)' % field, html)
         if section:
             return self.findallbyre(r'(?s)>([^<>]*)<', section, dtype, alt=alt) or []
-        else:
-            return []
+        return []
 
     def getsubvalues(self, field, secondfield, html, dtype=None, alt=None):
         if alt is None:
@@ -14670,8 +14656,8 @@ class IasAnalyzer(UrlAnalyzer):
         return 'Q5'
 
     def findnames(self, html):
-        self.findallbyre(r'title" content="(.*?)"', html) +\
-            self.findallbyre(r'(?s)<li>([^<>]*)</li>', html)
+        return self.findallbyre(r'title" content="(.*?)"', html) \
+               + self.findallbyre(r'(?s)<li>([^<>]*)</li>', html)
 
     def finddescription(self, html):
         return self.getvalue('Affiliation', html)
@@ -15110,7 +15096,7 @@ def main(*args: Tuple[str, ...]) -> None:
     @param args: command line arguments
     """
     item = None
-    property = None
+    prop = None
     options = {}
     unknownarguments = []
     local_args = pywikibot.handle_args(args)
@@ -15118,7 +15104,7 @@ def main(*args: Tuple[str, ...]) -> None:
         if arg.startswith('Q'):
             item = arg
         elif arg.startswith('P') or arg in ('Data', 'Wiki'):
-            property = arg
+            prop = arg
         elif arg == '-ask':
             options['ask'] = True
         else:
@@ -15133,7 +15119,7 @@ def main(*args: Tuple[str, ...]) -> None:
         repo = pywikibot.Site().data_repository()
         item = pywikibot.ItemPage(repo, item)
         bot = DataExtendBot(site=repo, **options)
-        bot.workon(item, property)
+        bot.workon(item, prop)
 
 
 if __name__ == '__main__':
