@@ -377,8 +377,6 @@ class DataExtendBot(SingleSiteBot):
                     key, value = line.strip().split(':', 1)
                     self.labels[key] = value
 
-
-
         with suppress(IOError):
             with codecs.open(self.datafile, 'r', 'utf-8') as f:
                 for line in f.readlines():
@@ -388,7 +386,6 @@ class DataExtendBot(SingleSiteBot):
                     except ValueError:
                         dtype, key, value = (parts[0], ':'.join(parts[1:-1]), parts[-1])
                     self.data[dtype][key] = value
-
 
         with suppress(IOError):
             with codecs.open(self.nonamefile, 'r', 'utf-8') as f:
@@ -912,7 +909,7 @@ class DataExtendBot(SingleSiteBot):
                                                     try:
                                                         updatedclaims[claim[0]][
                                                             self.getlocnumber(claim[1], updatedclaims[claim[0]])
-                                                            ].addSources(sourcedata)
+                                                        ].addSources(sourcedata)
                                                     except AttributeError:
                                                         if prop not in propstodo:
                                                             propstodo.append(prop)
@@ -1260,7 +1257,6 @@ class Analyzer:
         if self.escapeurl:
             self.html = unquote(self.html)
         self.html = self.prepare(self.html)
-
 
         pywikibot.output('\n=== {} ({}) ===='.format(self.dbname, self.dbproperty))
         if self.hrtre:
@@ -3437,8 +3433,8 @@ class MusicBrainzAnalyzer(Analyzer):
     def findformationlocation(self, html):
         if not self.isperson:
             return self.findbyre(r'(?s)<dt>Founded in:</dt>.*?<bdi>(\w+)', html, 'city') \
-               or self.findbyre(r'(?s)<dt>Founded in:</dt>.*?<bdi>(.*?)</bdi>', html, 'city') \
-               or self.findbyre(r'(?s)<dt>Area:</dt>.*?<bdi>(.*?)</bdi>', html, 'city')
+                   or self.findbyre(r'(?s)<dt>Founded in:</dt>.*?<bdi>(.*?)</bdi>', html, 'city') \
+                   or self.findbyre(r'(?s)<dt>Area:</dt>.*?<bdi>(.*?)</bdi>', html, 'city')
 
     def findorigcountry(self, html):
         if not self.isperson:
@@ -10577,7 +10573,6 @@ class GameFaqsAnalyzer(Analyzer):
         return self.findbyre('Release')
 
 
-
 class AmericanBiographyAnalyzer(Analyzer):
     def setup(self):
         self.dbproperty = 'P4823'
@@ -11114,7 +11109,7 @@ class PornhubAnalyzer(Analyzer):
         return [
             self.getvalue('ethnicity', html, 'ethnicity'),
             self.getvalue('background', html, 'ethnicity')
-            ]
+        ]
 
     def findeyecolor(self, html):
         return self.getvalue(r'eye\s*color', html, 'eyecolor')
@@ -11186,7 +11181,6 @@ class YoupornAnalyzer(Analyzer):
 
     def findmixedrefs(self, html):
         return self.finddefaultmixedrefs(html)
-
 
 
 class NelsonAtkinsAnalyzer(Analyzer):
@@ -12073,7 +12067,7 @@ class RedTubeAnalyzer(Analyzer):
         return [
             self.getvalue('Ethnicity', html, 'ethnicity'),
             self.getvalue('Background', html, 'ethnicity')
-            ]
+        ]
 
     def findwebsite(self, html):
         return self.findbyre(r'(?s)href="([^<>"]*)"[^<>]*>(?:\s|<[^<>]*>)*Official Site', html)
@@ -12389,7 +12383,6 @@ class MathOlympAnalyzer(Analyzer):
 
     def findnationalities(self, html):
         return self.findallbyre('"country_team[^"]*">(.*?)<', html, 'country')
-
 
 
 class MuziekwebAnalyzer(Analyzer):
@@ -13735,7 +13728,7 @@ class PatrinumAnalyzer(Analyzer):
         return [
             self.getvalue('Nom', html),
             self.getvalue('Parcours de vie', html)
-            ]
+        ]
 
     def findlongtext(self, html):
         return self.findbyre(r'(?s)Historique\s*</h3>(.*?)(?:<h3|<!--)', html)
@@ -13943,7 +13936,6 @@ class WikiAnalyzer(Analyzer):
                 if result:
                     return result[0]
 
-
     def findinstanceof(self, html):
         return self.getinfo([
             'background', 'färg', 'farve', 'fondo', 'culoare', '背景色', 'barva pozadí',
@@ -14014,10 +14006,9 @@ class WikiAnalyzer(Analyzer):
                 self.findbyre(r" %s(?: stato)? (?:e[eiu]?n |an? |u[nm][ea]? |eine[nr]? |'n |ne |e |unha |ett? |o |một )?(.+?)[\.;]" % word, html)) for
                word in [
                    'is', 'w[aio]s', 'ist', 'wao?r', 'este?', 'était', 'fu', 'fou', '—', '-', 'era', 'е', 'היה', 'by[łl]',
-                    'foi', 'был', 'fue', 'oli', 'bio', 'wie', 'var', 'je', 'იყო', 'adalah', 'é', 'ήταν', 'هو', 'стала',
-                    '[eé]s', 'er', 'est[ia]s', 'एक', 'یک', 'كان', 'è', 'бил', 'là', 'on', ',', 'on', 'egy', 'sono',
-                    'är', 'are', 'fuit', 'وهو', 'esas', 'は、', 'ni', 'là'
-                   ]] \
+                   'foi', 'был', 'fue', 'oli', 'bio', 'wie', 'var', 'je', 'იყო', 'adalah', 'é', 'ήταν', 'هو', 'стала',
+                   '[eé]s', 'er', 'est[ia]s', 'एक', 'یک', 'كان', 'è', 'бил', 'là', 'on', ',', 'on', 'egy', 'sono',
+                   'är', 'are', 'fuit', 'وهو', 'esas', 'は、', 'ni', 'là']] \
                    + self.findallbyre(r'{{short description\|(.*?)}', html) \
                    + self.findallbyre(r'\[\[[^\[\]\|]+?:([^\[\]\|]+)\]\]', html) \
                    + [x.replace('_', ' ') for x in self.findallbyre(r'\((.*?)\)', self.id)]
