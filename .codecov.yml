@@ -1,5 +1,7 @@
 codecov:
   bot: jayvdb
+  max_report_age: 48
+  strict_yaml_branch: master
 
 coverage:
   round: up
@@ -8,6 +10,15 @@ coverage:
     project:
       default:
         enabled: yes
+      framework:
+        flags:
+          - framework
+      tests:
+        flags:
+          - tests
+      scripts:
+        flags:
+          - scripts
     patch:
       default:
         enabled: yes
