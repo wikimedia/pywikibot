@@ -8,6 +8,19 @@ coverage:
     project:
       default:
         enabled: yes
+        range: 75..95
+      framework:
+        range: 75..95
+        flags:
+          - framework
+      tests:
+        range: 75..95
+        flags:
+          - tests
+      scripts:
+        range: 75..95
+        flags:
+          - scripts
     patch:
       default:
         enabled: yes
@@ -39,3 +52,20 @@ coverage:
     gitter:
       default:
         url: https://webhooks.gitter.im/e/f312b840da1c40d9f4be
+
+flags:
+  framework:
+    carryforward: true
+    paths:
+      - pywikibot
+
+  tests:
+    carryforward: true
+    paths:
+      - tests
+
+  scripts:
+    carryforward: true
+    paths:
+      - scripts
+  
