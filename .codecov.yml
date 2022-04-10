@@ -1,7 +1,9 @@
 codecov:
-  bot: jayvdb
+  bot: xqt
 
 coverage:
+  round: up
+  range: 75..95
   status:
     project:
       default:

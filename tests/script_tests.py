@@ -9,6 +9,7 @@ import os
 import sys
 import unittest
 from contextlib import suppress
+from importlib import import_module
 
 from pywikibot.tools import has_module
 from tests import join_root_path, unittest_print
@@ -16,6 +17,7 @@ from tests.aspects import DefaultSiteTestCase, MetaTestCaseClass, PwbTestCase
 from tests.utils import execute_pwb
 
 
+ci_test_run = os.environ.get('PYWIKIBOT_TESTS_RUNNING', '0') == '1'
 scripts_path = join_root_path('scripts')
 framework_scripts = ['shell']
 
@@ -193,6 +195,17 @@ def load_tests(loader=unittest.loader.defaultTestLoader,
     return collector(loader)
 
 
+def import_script(script_name: str):
+    """Import script for coverage only (T305795)."""
+    if not ci_test_run:
+        return
+    if script_name in framework_scripts:
+        prefix = 'pywikibot.scripts.'
+    else:
+        prefix = 'scripts.'
+    import_module(prefix + script_name)
+
+
 class TestScriptMeta(MetaTestCaseClass):
 
     """Test meta class."""
@@ -307,6 +320,8 @@ class TestScriptMeta(MetaTestCaseClass):
         arguments = dct['_arguments']
 
         for script_name in script_list:
+            import_script(script_name)
+
             # force login to be the first, alphabetically, so the login
             # message does not unexpectedly occur during execution of
             # another script.
