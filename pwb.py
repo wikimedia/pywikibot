@@ -450,12 +450,15 @@ def execute():
             filename = os.path.join(os.curdir, relative_filename)
 
     module = None
-    if file_package and file_package not in sys.modules:
+    if file_package:
         try:
-            module = import_module(file_package)
-        except ImportError as e:
-            warn('Parent module {} not found: {}'
-                 .format(file_package, e), ImportWarning)
+            module = sys.modules[file_package]
+        except KeyError:
+            try:
+                module = import_module(file_package)
+            except ImportError as e:
+                warn('Parent module {} not found: {}'
+                     .format(file_package, e), ImportWarning)
 
     help_option = any(arg.startswith('-help:') or arg == '-help'
                       for arg in script_args)
