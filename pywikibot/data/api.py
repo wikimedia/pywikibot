@@ -3117,7 +3117,13 @@ def _update_protection(page, pagedict: dict) -> None:
 def _update_revisions(page, revisions) -> None:
     """Update page revisions."""
     for rev in revisions:
-        page._revisions[rev['revid']] = pywikibot.page.Revision(**rev)
+        revid = rev['revid']
+        revision = pywikibot.page.Revision(**rev)
+        # do not overwrite an existing Revision if there is no content
+        if revid in page._revisions and revision.text is None:
+            pass
+        else:
+            page._revisions[revid] = revision
 
 
 def _update_templates(page, templates) -> None:
