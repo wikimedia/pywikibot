@@ -1079,7 +1079,7 @@ def main(*args: str) -> None:
     precompile_exceptions(exceptions, regex, flags)
 
     if xmlFilename:
-        gen = pagegenerators.XmlDumpPageGenerator(
+        gen = pagegenerators.XMLDumpPageGenerator(
             xmlFilename, xmlStart, namespaces=genFactory.namespaces, site=site)
     elif sql_query is not None:
         # Only -excepttext option is considered by the query. Other
