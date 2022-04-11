@@ -1132,8 +1132,8 @@ class Analyzer:
         if self.urlbase4:
             return [self.urlbase3.format(id=quote(self.id)),
                     self.urlbase4.format(id=quote(self.id))]
-        else:
-            return [self.urlbase3.format(id=quote(self.id))]
+
+        return [self.urlbase3.format(id=quote(self.id))]
 
     @staticmethod
     def commastrip(term):
@@ -2215,22 +2215,21 @@ class Analyzer:
         if not alt:
             alt = []
         m = re.search(regex, html)
-        if m:
-            if dtype:
-                alt = [dtype] + alt
-            for alttype in alt:
-                if self.getdata(alttype, m.group(1), ask=False) and \
-                        self.getdata(alttype, m.group(1), ask=False) != 'XXX':
-                    return self.getdata(alttype, m.group(1), ask=False)
-            for skip in skips:
-                if self.getdata(skip, m.group(1), ask=False) and self.getdata(skip, m.group(1), ask=False) != 'XXX':
-                    return None
-            if dtype:
-                return self.getdata(dtype, m.group(1))
-            else:
-                return m.group(1)
-        else:
+        if not m:
             return None
+        if dtype:
+            alt = [dtype] + alt
+        for alttype in alt:
+            if self.getdata(alttype, m.group(1), ask=False) \
+               and self.getdata(alttype, m.group(1), ask=False) != 'XXX':
+                return self.getdata(alttype, m.group(1), ask=False)
+        for skip in skips:
+            if self.getdata(skip, m.group(1), ask=False) \
+               and self.getdata(skip, m.group(1), ask=False) != 'XXX':
+                return None
+        if dtype:
+            return self.getdata(dtype, m.group(1))
+        return m.group(1)
 
     def findallbyre(self, regex, html, dtype=None, skips=None, alt=None) -> list:
         if not skips:
@@ -2601,11 +2600,11 @@ class GndAnalyzer(Analyzer):
 
     def findvoice(self, html):
         section = self.findbyre(r'(?s)<strong>Instrumente.*?<td[^<>]*>(.*?)</td>', html)
-        if section:
-            if '(' in section:
-                return self.findbyre(r'(?s)([\s\w]+)\(', section, 'voice')
-            else:
-                return self.findbyre(r'(?s)([\s\w]+)', section, 'voice')
+        if not section:
+            return None
+        if '(' in section:
+            return self.findbyre(r'(?s)([\s\w]+)\(', section, 'voice')
+        return self.findbyre(r'(?s)([\s\w]+)', section, 'voice')
 
     def findlanguagesspoken(self, html):
         if self.isperson:
@@ -2670,9 +2669,10 @@ class GndAnalyzer(Analyzer):
     def findemployers(self, html):
         section = self.findbyre(r'(?s)<strong>Beziehungen zu Organisationen</strong>.*?(<td.*?</td>)', html)
         if section:
-            return self.findallbyre(r'(?s)[>;]([^<>;]*)[<;]', section, 'employer', alt=['university'])
-        else:
-            return self.findallbyre(r'Tätig an (?:d\w\w )?([^<>;]*)', html, 'employer', alt=['university'])
+            return self.findallbyre(r'(?s)[>;]([^<>;]*)[<;]', section,
+                                    'employer', alt=['university'])
+        return self.findallbyre(r'Tätig an (?:d\w\w )?([^<>;]*)', html,
+                                'employer', alt=['university'])
 
     def findsources(self, html):
         section = self.findbyre(r'(?s)<strong>Quelle</strong>.*?<td[^<>]*(>.*?<)/td>', html)
@@ -2713,9 +2713,12 @@ class LcAuthAnalyzer(Analyzer):
     @property
     def url(self):
         if self.isperson:
-            return 'http://id.loc.gov/authorities/names/{id}.html'.format(id=self.id)
-        elif self.id.startswith('s'):
-            return 'http://id.loc.gov/authorities/subjects/{id}.html'.format(id=self.id)
+            return 'http://id.loc.gov/authorities/names/{id}.html'.format(
+                id=self.id)
+        if self.id.startswith('s'):
+            return 'http://id.loc.gov/authorities/subjects/{id}.html'.format(
+                id=self.id)
+        return None
 
     @property
     def isperson(self):
@@ -3159,10 +3162,9 @@ class ImdbAnalyzer(Analyzer):
     def url(self):
         if self.isfilm:
             return 'https://www.imdb.com/title/{id}/'.format(id=self.id)
-        elif self.isperson:
+        if self.isperson:
             return 'https://www.imdb.com/name/{id}/'.format(id=self.id)
-        else:
-            return None
+        return None
 
     @property
     def isfilm(self):
@@ -3289,13 +3291,13 @@ class SbnAnalyzer(Analyzer):
         return self.findbyre(r'(?s)Datazione\s*</td>\s*<td[^<>]*>[^<>]*-(.*?)<', html)
 
     def findoccupations(self, html):
-        section = self.findbyre(r'(?s)Nota informativa.*?detail_value">([^<>]*?)\.', html)
-        if section:
-            if ',' in section or ';' in section:
-                return self.findallbyre(r'([^,;]+)', section, 'occupation')
-            else:
-                return self.findallbyre(r'(\w{3,})', section, 'occupation')
-        return None
+        section = self.findbyre(
+            r'(?s)Nota informativa.*?detail_value">([^<>]*?)\.', html)
+        if not section:
+            return None
+        if ',' in section or ';' in section:
+            return self.findallbyre(r'([^,;]+)', section, 'occupation')
+        return self.findallbyre(r'(\w{3,})', section, 'occupation')
 
     def findbirthplace(self, html):
         return self.findbyre(r'Nato ad? ([^<>]+) e morto', html, 'city') or \
@@ -3347,15 +3349,14 @@ class LibrariesAustraliaAnalyzer(Analyzer):
             section = self.findbyre(r'(?s)<dt>Heading:</dt>.*?>([^<>]*)</a', html)
             if section and 'approx' not in section and 'active' not in section:
                 result = self.findbyre(r',([^,]*)-', section)
-                if result:
-                    return result
-                else:
-                    return section
+                return result if result else section
+        return None
 
     def findbirthplace(self, html):
         result = self.findbyre(r'(?s)<dt>Birth:</dt>(?:\s|<[^<>]*>)*<li>[^<>]*</li>\s*<li>(.*?)</li>', html)
         if result:
             return self.getdata('city', result)
+        return None
 
     def finddeathdate(self, html):
         result = self.findbyre(r'(?s)<dt>Death:</dt>.*?<li>(.*?)</li>', html)
@@ -4376,8 +4377,7 @@ class ImslpAnalyzer(Analyzer):
     def findinstanceof(self, html):
         if self.isperson:
             return 'Q5'
-        else:
-            raise NotImplementedError  # analysis only made for persons
+        raise NotImplementedError  # analysis only made for persons
 
     def findbirthdate(self, html):
         return self.findbyre(r'</h2>\(([^<>]*?)—', html)
@@ -5604,8 +5604,8 @@ class SportsReferenceAnalyzer(Analyzer):
         section = self.findbyre(r'(?s)Sport:</span>(.*?)(?:<p>|<br>|</div>)', html)
         if section:
             return self.findallbyre(r'>([^<>]*)</', section, 'occupation')
-        else:
-            return ['Q2066131']
+
+        return ['Q2066131']
 
     def findparticipations(self, html):
         section = self.findbyre(r'(?s)(<tbody>.*</tbody>)', html)
@@ -5974,11 +5974,13 @@ class TgnAnalyzer(Analyzer):
     def findadminloc(self, html):
         county = self.findbyre(r'>([^<>]+)</A> \(county\)', html)
         state = self.findbyre(r'>([^<>]+)</A> \(state\)', html)
-        if state:
-            if county:
-                return self.getdata('county', '{} county, {}'.format(county, state))
-            else:
-                return self.getdata('state', state)
+        if not state:
+            return None
+
+        if county:
+            return self.getdata('county', '{} county, {}'
+                                .format(county, state))
+        return self.getdata('state', state)
 
     def findcoords(self, html):
         lat = self.findbyre(r'Lat:\s*(-?\d+\.\d+)', html)
@@ -6576,15 +6578,15 @@ class CerlAnalyzer(Analyzer):
         values = self.getvalues('Place of Birth', html, 'city', link=True)
         if values:
             return values[0]
-        else:
-            return self.getvalue('Place of Birth', html, 'city')
+
+        return self.getvalue('Place of Birth', html, 'city')
 
     def finddeathplace(self, html):
         values = self.getvalues('Place of Death', html, 'city', link=True)
         if values:
             return values[0]
-        else:
-            return self.getvalue('Place of Death', html, 'city')
+
+        return self.getvalue('Place of Death', html, 'city')
 
     def findoccupations(self, html):
         sections = self.getvalues('Profession / Occupation', html) + \
@@ -7162,11 +7164,11 @@ class SvenskFilmAnalyzer(Analyzer):
 
     def findnames(self, html):
         result = [self.findbyre(r'<h1[^<>]*>(.*?)<', html)]
-        section = self.findbyre(r'(?s)<th>Alternativnamn</th>\s*<td>(.*?)</td>', html)
+        section = self.findbyre(
+            r'(?s)<th>Alternativnamn</th>\s*<td>(.*?)</td>', html)
         if section:
             return result + self.findallbyre(r'>([^<>]+)<', section)
-        else:
-            return result
+        return result
 
     def findlongtext(self, html):
         return self.findbyre(r'(?s)<h3>Beskrivning</h3>(.*?)</div>', html)
@@ -7242,9 +7244,9 @@ class NgaAnalyzer(Analyzer):
     def findnames(self, html):
         section = self.findbyre(r'(?s)<dd class="description">(.*?)</dd>', html)
         if section:
-            return [self.findbyre(r'<dt class="artist">(.*?)<', html)] + self.findallbyre(r'(\w.+)', section)
-        else:
-            return [self.findbyre(r'<dt class="artist">(.*?)<', html)]
+            return [self.findbyre(r'<dt class="artist">(.*?)<', html)] \
+                + self.findallbyre(r'(\w.+)', section)
+        return [self.findbyre(r'<dt class="artist">(.*?)<', html)]
 
     def findnationality(self, html):
         return self.findbyre(r'(?s)<dd class="lifespan">([^<>]+?),', html, 'country')
@@ -10675,7 +10677,7 @@ class GeprisAnalyzer(Analyzer):
     def findgender(self, html):
         if 'Antragstellerin<' in html:
             return 'Q6581072'
-        elif 'Antragsteller<' in html:
+        if 'Antragsteller<' in html:
             return 'Q6581097'
 
     def findresidences(self, html):
@@ -10790,12 +10792,12 @@ class AinmAnalyzer(Analyzer):
         return 'Q5'
 
     def findnames(self, html):
-        result = [self.findbyre(r'<meta name="title" content="(.*?)[\(\|"]', html)]
+        result = [self.findbyre(
+            r'<meta name="title" content="(.*?)[\(\|"]', html)]
         section = self.getvalue('ainm eile', html)
         if section:
             return result + self.findallbyre(r'>([^<>]+)</', section)
-        else:
-            return result
+        return result
 
     def findbirthdate(self, html):
         return self.getvalue('dáta breithe', html) or \
@@ -11306,8 +11308,8 @@ class ArmbAnalyzer(Analyzer):
             for part in parts:
                 result += self.findallbyre(r'([^,;\-\.]*\w)', part, 'subject')
             return result
-        else:
-            return self.findallbyre(r'Spécialité\s*:\s*([^<>]*\w)', html, 'subject')
+        return self.findallbyre(
+            r'Spécialité\s*:\s*([^<>]*\w)', html, 'subject')
 
     def findmemberships(self, html):
         return ['Q2124852']
