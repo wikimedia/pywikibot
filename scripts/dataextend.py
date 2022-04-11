@@ -71,6 +71,7 @@ import pywikibot
 from pywikibot.backports import List
 from pywikibot.bot import SingleSiteBot
 from pywikibot.data import sparql
+from pywikibot.exceptions import InvalidTitleError, OtherPageSaveError
 
 
 class DataExtendBot(SingleSiteBot):
@@ -135,7 +136,9 @@ class DataExtendBot(SingleSiteBot):
             'P1280': ConorSiAnalyzer,
             'P1284': MunzingerAnalyzer,
             # 'P1305': SkyScraperAnalyzer, <forbidden>
-            # 'P1315': PeopleAustraliaAnalyzer,  # <changed, content is not on page any more>
+
+            # <changed, content is not on page any more>
+            # 'P1315': PeopleAustraliaAnalyzer,
             'P1367': ArtUkAnalyzer,
             'P1368': LnbAnalyzer,
             'P1415': OxfordAnalyzer,
@@ -367,7 +370,7 @@ class DataExtendBot(SingleSiteBot):
         return label
 
     def loaddata(self):
-
+        """Read data from files."""
         param = {'mode': 'r', 'encoding': 'utf-8'}
 
         with suppress(IOError), codecs.open(self.labelfile, **param) as f:
@@ -378,17 +381,16 @@ class DataExtendBot(SingleSiteBot):
         with suppress(IOError), codecs.open(self.datafile, **param) as f:
             for line in f.readlines():
                 parts = line.strip().split(':')
-                try:
-                    dtype, key, value = parts
-                except ValueError:
-                    dtype, key, value = (parts[0], ':'.join(parts[1:-1]), parts[-1])
+                # assume len(parts) > 1
+                dtype, *keys, value = parts
+                key = ':'.join(keys)
                 self.data[dtype][key] = value
 
         with suppress(IOError), codecs.open(self.nonamefile, **param) as f:
             self.noname = {line.strip() for line in f.readlines()}
 
     def savedata(self):
-
+        """Save data to files."""
         param = {'mode': 'w', 'encoding': 'utf-8'}
 
         with codecs.open(self.labelfile, **param) as f:
@@ -406,12 +408,13 @@ class DataExtendBot(SingleSiteBot):
                 f.write('{}\n'.format(noname))
 
     def page(self, title):
-        title = title.split(':')[-1]
+        """Dispatch title and return the appropriate Page object."""
+        title = title.rsplit(':', 1)[-1]
         if title.startswith('Q'):
             return pywikibot.ItemPage(self.site, title)
         if title.startswith('P'):
             return pywikibot.PropertyPage(self.site, title)
-        raise ValueError
+        raise ValueError('Invalid title {}'.format(title))
 
     @staticmethod
     def showtime(time):
@@ -440,16 +443,27 @@ class DataExtendBot(SingleSiteBot):
                         pywikibot.output('{}: unknown'
                                          .format(self.label(prop)))
                     else:
-                        pywikibot.output('{}: {}'.format(self.label(prop), self.label(claim.getTarget().title())))
+                        pywikibot.output(
+                            '{}: {}'
+                            .format(self.label(prop),
+                                    self.label(claim.getTarget().title())))
                 elif claim.type == 'time':
-                    pywikibot.output('{}: {}'.format(self.label(prop), self.showtime(claim.getTarget())))
+                    pywikibot.output('{}: {}'
+                                     .format(self.label(prop),
+                                             self.showtime(claim.getTarget())))
                 elif claim.type in ['external-id', 'commonsMedia']:
-                    pywikibot.output('{}: {}'.format(self.label(prop), claim.getTarget()))
+                    pywikibot.output('{}: {}'.format(self.label(prop),
+                                                     claim.getTarget()))
                 elif claim.type == 'quantity':
-                    pywikibot.output('{}: {} {}'.format(self.label(prop), claim.getTarget().amount,
-                                                        self.label(claim.getTarget().unit.split('/')[-1])))
+                    pywikibot.output(
+                        '{}: {} {}'
+                        .format(self.label(prop),
+                                claim.getTarget().amount,
+                                self.label(
+                                    claim.getTarget().unit.split('/')[-1])))
                 else:
-                    pywikibot.output('Unknown type {} for property {}'.format(claim.type, self.label(prop)))
+                    pywikibot.output('Unknown type {} for property {}'
+                                     .format(claim.type, self.label(prop)))
 
     MONTHNUMBER = {
         '1': 1, '01': 1, 'i': 1,
@@ -585,7 +599,8 @@ class DataExtendBot(SingleSiteBot):
             year = int(m.group(1))
             month = int(m.group(2))
             day = int(m.group(3))
-        m = re.match(r'(\d{1,2})[-./|]\s*(\d{1,2})[-./|]\s*(\d{3,4})\.?$', text)
+        m = re.match(
+            r'(\d{1,2})[-./|]\s*(\d{1,2})[-./|]\s*(\d{3,4})\.?$', text)
         if m:
             year = int(m.group(3))
             month = int(m.group(2))
@@ -598,7 +613,8 @@ class DataExtendBot(SingleSiteBot):
             except KeyError:
                 raise ValueError("Don't know month {}".format(m.group(2)))
             day = int(m.group(1))
-        m = re.match(r"(\d+)(?:\.|er|eme|ème)?[\s.]\s*(?:d'|d[aei] )?([^\s.]{2,})\.?[\s.]\s*(\d+)$", text)
+        m = re.match(r"(\d+)(?:\.|er|eme|ème)?[\s.]\s*(?:d'|d[aei] )?"
+                     r'([^\s.]{2,})\.?[\s.]\s*(\d+)$', text)
         if m:
             year = int(m.group(3))
             try:
@@ -629,7 +645,8 @@ class DataExtendBot(SingleSiteBot):
                 month = self.MONTHNUMBER[m.group(1).lower()]
             except KeyError:
                 raise ValueError("Don't know month {}".format(m.group(1)))
-        m = re.match(r'(\w+)\.? (\d{1,2})(?:st|nd|rd|th)?\.?\s*,\s*(\d{3,4})$', text)
+        m = re.match(r'(\w+)\.? (\d{1,2})(?:st|nd|rd|th)?\.?\s*,\s*(\d{3,4})$',
+                     text)
         if m:
             year = int(m.group(3))
             try:
@@ -658,21 +675,26 @@ class DataExtendBot(SingleSiteBot):
         if day is None and month == 0:
             month = None
         if month and month > 12:
-            raise ValueError('Date seems to have an invalid month number {}'.format(month))
+            raise ValueError('Date seems to have an invalid month number {}'
+                             .format(month))
         if day and day > 31:
-            raise ValueError('Date seems to have an invalid day number {}'.format(day))
+            raise ValueError('Date seems to have an invalid day number {}'
+                             .format(day))
         if not year:
             raise ValueError("Can't interpret date {}".format(text))
-        return pywikibot.WbTime(year=year, month=month, day=day,
-                                precision=9 if month is None else 10 if day is None else 11)
+        return pywikibot.WbTime(year=year, month=month, day=day, precision=9
+                                if month is None
+                                else 10 if day is None else 11)
 
     QUANTITYTYPE = {
-        'meter': 'Q11573', 'metre': 'Q11573', 'm': 'Q11573', 'meters': 'Q11573', 'metres': 'Q11573', 'м': 'Q11573',
+        'meter': 'Q11573', 'metre': 'Q11573', 'm': 'Q11573',
+        'meters': 'Q11573', 'metres': 'Q11573', 'м': 'Q11573',
         'centimeter': 'Q174728', 'centimetre': 'Q174728', 'cm': 'Q174728',
         'foot': 'Q3710', 'feet': 'Q3710', 'ft': 'Q3710',
         'mile': 'Q253276', 'mi': 'Q253276',
         'kilometer': 'Q828224', 'kilometre': 'Q828224', 'km': 'Q828224',
-        'minute': 'Q7727', 'minutes': 'Q7727', 'min': 'Q7727', 'minuten': 'Q7727',
+        'minute': 'Q7727', 'minutes': 'Q7727', 'min': 'Q7727',
+        'minuten': 'Q7727',
         'second': 'Q11574', 's': 'Q11574',
         'kilogram': 'Q11570', 'kg': 'Q11570',
         'lb': 'Q100995', 'lbs': 'Q100995', 'pond': 'Q100995',
@@ -682,7 +704,10 @@ class DataExtendBot(SingleSiteBot):
         m = re.match(r'(\d+(?:\.\d+)?)\s*([a-z]\w*)', text.replace(',', '.'))
         amount = m.group(1)
         name = m.group(2).lower()
-        return pywikibot.WbQuantity(amount, unit=pywikibot.ItemPage(self.site, self.QUANTITYTYPE[name]), site=self.site)
+        return pywikibot.WbQuantity(
+            amount, unit=pywikibot.ItemPage(self.site,
+                                            self.QUANTITYTYPE[name]),
+            site=self.site)
 
     def workon(self, item, restrict=None):
         try:
@@ -710,7 +735,8 @@ class DataExtendBot(SingleSiteBot):
                 continueafterrestrict = True
             unidentifiedprops = []
             failedprops = []
-            claims['Wiki'] = [Quasiclaim(page.title(force_interwiki=True, as_link=True)[2:-2])
+            claims['Wiki'] = [Quasiclaim(page.title(force_interwiki=True,
+                                                    as_link=True)[2:-2])
                               for page in item.iterlinks()]
             claims['Data'] = [Quasiclaim(item.title())]
             propstodo = list(claims)
@@ -719,7 +745,8 @@ class DataExtendBot(SingleSiteBot):
                 if propsdone:
                     item.get(force=True)
                     claims = item.claims
-                    claims['Wiki'] = [Quasiclaim(page.title(force_interwiki=True, as_link=True)[2:-2])
+                    claims['Wiki'] = [Quasiclaim(page.title(
+                        force_interwiki=True, as_link=True)[2:-2])
                                       for page in item.iterlinks()]
                     claims['Data'] = [Quasiclaim(item.title())]
                     descriptions = item.descriptions
@@ -745,13 +772,15 @@ class DataExtendBot(SingleSiteBot):
                             identifier = mainclaim.getTarget()
                             try:
                                 if prop == 'P973':
-                                    analyzertype = self.analyzertype[identifier.split('/')[2]]
+                                    analyzertype = self.analyzertype[
+                                        identifier.split('/')[2]]
                                 else:
                                     analyzertype = self.analyzertype[prop]
                             except KeyError:
                                 unidentifiedprops.append(prop)
                             else:
-                                analyzer = analyzertype(identifier, self.data, item.title(), self)
+                                analyzer = analyzertype(identifier, self.data,
+                                                        item.title(), self)
                                 newclaims = analyzer.findclaims() or []
                                 if newclaims is None:
                                     failedprops.append(prop)
@@ -762,70 +791,96 @@ class DataExtendBot(SingleSiteBot):
                                     pywikibot.output('Found here:')
                                     for claim in newclaims:
                                         try:
-                                            pywikibot.output('{}: {}'.format(self.label(claim[0]), self.label(claim[1])))
+                                            pywikibot.output('{}: {}'
+                                                             .format(self.label(claim[0]), self.label(claim[1])))
                                         except ValueError:
                                             newclaims = [nclaim for nclaim in newclaims if nclaim != claim]
                                     result = input('Save this? (Y/n) ')
                                 if not result or result[0].upper() != 'N':
                                     for claim in newclaims:
-                                        if claim[0] in updatedclaims and self.isinclaims(claim[1],
-                                                                                         updatedclaims[claim[0]]):
+                                        if claim[0] in updatedclaims \
+                                           and self.isinclaims(claim[1],
+                                                               updatedclaims[claim[0]]):
                                             if claim[2]:
                                                 if claim[2].dbid:
                                                     if claim[2].iswiki:
                                                         source = pywikibot.Claim(self.site, 'P143')
                                                     else:
                                                         source = pywikibot.Claim(self.site, 'P248')
-                                                    source.setTarget(pywikibot.ItemPage(self.site, claim[2].dbid))
+                                                    source.setTarget(
+                                                        pywikibot.ItemPage(
+                                                            self.site,
+                                                            claim[2].dbid))
                                                 else:
                                                     source = None
 
                                                 if claim[2].iswiki:
-                                                    url = pywikibot.Claim(self.site, 'P4656')
+                                                    url = pywikibot.Claim(
+                                                        self.site, 'P4656')
                                                 else:
-                                                    url = pywikibot.Claim(self.site, 'P854')
+                                                    url = pywikibot.Claim(
+                                                        self.site, 'P854')
                                                 if claim[2].sparqlquery:
-                                                    url.setTarget(pywikibot.ItemPage(self.site, claim[1]).full_url())
+                                                    url.setTarget(
+                                                        pywikibot.ItemPage(
+                                                            self.site,
+                                                            claim[1]).full_url())
                                                 else:
                                                     url.setTarget(claim[2].url)
                                                 if claim[2].iswiki or claim[2].isurl:
                                                     iddata = None
                                                 else:
-                                                    iddata = pywikibot.Claim(self.site, prop)
-                                                    iddata.setTarget(identifier)
+                                                    iddata = pywikibot.Claim(
+                                                        self.site, prop)
+                                                    iddata.setTarget(
+                                                        identifier)
                                                 if url is None:
                                                     date = None
                                                 else:
-                                                    date = pywikibot.Claim(self.site, 'P813')
-                                                    date.setTarget(self.createdateclaim(min(datetime.datetime.now()
-                                                                                            .strftime('%Y-%m-%d'),
-                                                                                            datetime.datetime.utcnow()
-                                                                                            .strftime('%Y-%m-%d'))))
+                                                    date = pywikibot.Claim(
+                                                        self.site, 'P813')
+                                                    date.setTarget(
+                                                        self.createdateclaim(
+                                                            min(datetime.datetime.now()
+                                                                .strftime('%Y-%m-%d'),
+                                                                datetime.datetime.utcnow()
+                                                                .strftime('%Y-%m-%d'))))
                                                 if not analyzer.showurl:
                                                     url = None
-                                                sourcedata = [source, url, iddata, date]
-                                                sourcedata = [sourcepart for sourcepart in sourcedata
+                                                sourcedata = [source, url,
+                                                              iddata, date]
+                                                sourcedata = [sourcepart
+                                                              for sourcepart in sourcedata
                                                               if sourcepart is not None]
-                                                pywikibot.output('Sourcing {}: {}'.format(self.label(claim[0]),
-                                                                                          self.label(claim[1])))
+                                                pywikibot.output(
+                                                    'Sourcing {}: {}'
+                                                    .format(self.label(claim[0]),
+                                                            self.label(claim[1])))
 
                                                 # probably means the sourcing is already there
-                                                with suppress(pywikibot.data.api.APIError):
+                                                with suppress(
+                                                        pywikibot.data.api.APIError):
                                                     updatedclaims[claim[0]][self.getlocnumber(
-                                                        claim[1], updatedclaims[claim[0]])].addSources(sourcedata)
+                                                        claim[1],
+                                                        updatedclaims[claim[0]])].addSources(sourcedata)
                                         else:
                                             if claim[0] not in propsdone + propstodo:
                                                 propstodo.append(claim[0])
-                                            createdclaim = pywikibot.Claim(self.site, claim[0])
+                                            createdclaim = pywikibot.Claim(
+                                                self.site, claim[0])
                                             if self.QRE.match(claim[1]):
-                                                createdclaim.setTarget(pywikibot.ItemPage(self.site, claim[1]))
+                                                createdclaim.setTarget(
+                                                    pywikibot.ItemPage(
+                                                        self.site, claim[1]))
                                             elif claim[1].startswith('!date!'):
                                                 try:
                                                     target = self.createdateclaim(claim[1][6:])
                                                 except ValueError as ex:
-                                                    pywikibot.output('Unable to analyze date "{}" for {}: {}'
-                                                                     .format(claim[1][6:], self.label(claim[0]), ex))
-                                                    input('Press enter to continue')
+                                                    pywikibot.output(
+                                                        'Unable to analyze date "{}" for {}: {}'
+                                                        .format(claim[1][6:], self.label(claim[0]), ex))
+                                                    input(
+                                                        'Press enter to continue')
                                                     target = None
 
                                                 if target is None:
@@ -838,22 +893,29 @@ class DataExtendBot(SingleSiteBot):
                                                     continue
                                                 createdclaim.setTarget(target)
                                             elif claim[1].startswith('!i!'):
-                                                createdclaim.setTarget(pywikibot.page.FilePage(self.site, claim[1][3:]))
+                                                createdclaim.setTarget(
+                                                    pywikibot.page.FilePage(self.site, claim[1][3:]))
                                             else:
-                                                createdclaim.setTarget(claim[1])
-                                            pywikibot.output('Adding {}: {}'.format(
-                                                self.label(claim[0]), self.label(claim[1])))
+                                                createdclaim.setTarget(
+                                                    claim[1])
+                                            pywikibot.output(
+                                                'Adding {}: {}'
+                                                .format(
+                                                    self.label(claim[0]),
+                                                    self.label(claim[1])))
                                             try:
                                                 item.addClaim(createdclaim)
-                                            except pywikibot.exceptions.OtherPageSaveError as ex:  # noqa: E501
+                                            except OtherPageSaveError as ex:
                                                 if claim[1].startswith('!i!'):
-                                                    pywikibot.output('Unable to save image {}: {}'
-                                                                     .format(claim[1][3:], ex))
+                                                    pywikibot.output(
+                                                        'Unable to save image {}: {}'
+                                                        .format(claim[1][3:], ex))
                                                     continue
                                                 raise
 
                                             if claim[0] in updatedclaims:
-                                                updatedclaims[claim[0]].append(createdclaim)
+                                                updatedclaims[claim[0]].append(
+                                                    createdclaim)
                                             else:
                                                 updatedclaims[claim[0]] = [createdclaim]
 
@@ -863,44 +925,60 @@ class DataExtendBot(SingleSiteBot):
                                                         source = pywikibot.Claim(self.site, 'P143')
                                                     else:
                                                         source = pywikibot.Claim(self.site, 'P248')
-                                                    source.setTarget(pywikibot.ItemPage(self.site, claim[2].dbid))
+                                                    source.setTarget(
+                                                        pywikibot.ItemPage(
+                                                            self.site,
+                                                            claim[2].dbid))
                                                 else:
                                                     source = None
 
                                                 if claim[2].iswiki:
-                                                    url = pywikibot.Claim(self.site, 'P4656')
+                                                    url = pywikibot.Claim(
+                                                        self.site, 'P4656')
                                                 else:
-                                                    url = pywikibot.Claim(self.site, 'P854')
+                                                    url = pywikibot.Claim(
+                                                        self.site, 'P854')
 
                                                 if claim[2].sparqlquery:
-                                                    url.setTarget(pywikibot.ItemPage(self.site, claim[1]).full_url())
+                                                    url.setTarget(
+                                                        pywikibot.ItemPage(self.site, claim[1]).full_url())
                                                 else:
                                                     url.setTarget(claim[2].url)
 
                                                 if claim[2].iswiki or claim[2].isurl:
                                                     iddata = None
                                                 else:
-                                                    iddata = pywikibot.Claim(self.site, prop)
-                                                    iddata.setTarget(identifier)
+                                                    iddata = pywikibot.Claim(
+                                                        self.site, prop)
+                                                    iddata.setTarget(
+                                                        identifier)
 
                                                 if url is None:
                                                     date = None
                                                 else:
-                                                    date = pywikibot.Claim(self.site, 'P813')
+                                                    date = pywikibot.Claim(
+                                                        self.site, 'P813')
                                                     date.setTarget(self.createdateclaim(
                                                         min(datetime.datetime.now().strftime('%Y-%m-%d'),
                                                             datetime.datetime.utcnow().strftime('%Y-%m-%d'))))
                                                 if not analyzer.showurl:
                                                     url = None
 
-                                                sourcedata = [source, url, iddata, date]
+                                                sourcedata = [source, url,
+                                                              iddata, date]
                                                 sourcedata = [
-                                                    sourcepart for sourcepart in sourcedata if sourcepart is not None]
-                                                pywikibot.output('Sourcing {}: {}'
-                                                                 .format(self.label(claim[0]), self.label(claim[1])))
+                                                    sourcepart
+                                                    for sourcepart in sourcedata if sourcepart is not None]
+                                                pywikibot.output(
+                                                    'Sourcing {}: {}'
+                                                    .format(
+                                                        self.label(claim[0]),
+                                                        self.label(claim[1])))
 
                                                 try:
-                                                    createdclaim.addSources([s for s in sourcedata if s is not None])
+                                                    createdclaim.addSources(
+                                                        [s for s in sourcedata
+                                                         if s is not None])
                                                 except AttributeError:
                                                     try:
                                                         updatedclaims[claim[0]][
@@ -908,13 +986,17 @@ class DataExtendBot(SingleSiteBot):
                                                         ].addSources(sourcedata)
                                                     except AttributeError:
                                                         if prop not in propstodo:
-                                                            propstodo.append(prop)
-                                                        pywikibot.output('Sourcing failed')
+                                                            propstodo.append(
+                                                                prop)
+                                                        pywikibot.output(
+                                                            'Sourcing failed')
                                 for language, description in analyzer.getdescriptions():
-                                    newdescriptions[language].add(shorten(description.rstrip('.'),
-                                                                          width=249, placeholder='...'))
+                                    newdescriptions[language].add(
+                                        shorten(description.rstrip('.'),
+                                                width=249, placeholder='...'))
                                 newnames = analyzer.getnames()
-                                newlabels, newaliases = self.definelabels(labels, aliases, newnames)
+                                newlabels, newaliases = self.definelabels(
+                                    labels, aliases, newnames)
                                 if newlabels:
                                     item.editLabels(newlabels)
                                 if newaliases:
@@ -922,27 +1004,32 @@ class DataExtendBot(SingleSiteBot):
                                 if newlabels or newaliases:
                                     item.get(force=True)
                                     claims = item.claims
-                                    claims['Wiki'] = [Quasiclaim(page.title(force_interwiki=True, as_link=True)[2:-2])
+                                    claims['Wiki'] = [Quasiclaim(
+                                        page.title(force_interwiki=True, as_link=True)[2:-2])
                                                       for page in item.iterlinks()]
                                     claims['Data'] = [Quasiclaim(item.title())]
                                     descriptions = item.descriptions
                                     labels = item.labels
                                     aliases = item.aliases
                                 if analyzer.longtext():
-                                    longtexts.append((analyzer.dbname, analyzer.longtext()))
+                                    longtexts.append((analyzer.dbname,
+                                                      analyzer.longtext()))
 
             editdescriptions = {}
             for language in newdescriptions.keys():
                 newdescription = self.definedescription(
-                    language, descriptions.get(language), newdescriptions.get(language))
+                    language, descriptions.get(language),
+                    newdescriptions.get(language))
                 if newdescription:
                     editdescriptions[language] = newdescription
             if editdescriptions:
                 item.editDescriptions(editdescriptions)
             for prop in unidentifiedprops:
-                pywikibot.output('Unknown external {} ({})'.format(prop, self.label(prop)))
+                pywikibot.output('Unknown external {} ({})'
+                                 .format(prop, self.label(prop)))
             for prop in failedprops:
-                pywikibot.output('External failed to load: {} ({})'.format(prop, self.label(prop)))
+                pywikibot.output('External failed to load: {} ({})'
+                                 .format(prop, self.label(prop)))
             if longtexts:
                 if unidentifiedprops or failedprops:
                     input('Press Enter to continue')
@@ -959,7 +1046,8 @@ class DataExtendBot(SingleSiteBot):
     def definedescription(language, existingdescription, suggestions):
         possibilities = [existingdescription] + list(suggestions)
 
-        pywikibot.output('\nSelect a description for language {}:'.format(language))
+        pywikibot.output('\nSelect a description for language {}:'
+                         .format(language))
         pywikibot.output('Default is to keep the old value (0)')
         for i, pos in enumerate(possibilities):
             if pos is None:
@@ -981,7 +1069,8 @@ class DataExtendBot(SingleSiteBot):
         for (language, name) in newnames:
             name = name.strip()
             if name.lower() == (existinglabels.get(language) or '').lower() \
-               or name.lower() in (n.lower() for n in existingaliases.get(language, [])):
+               or name.lower() in (n.lower()
+                                   for n in existingaliases.get(language, [])):
                 continue
 
             if name not in realnewnames[language] and name not in self.noname:
@@ -1014,11 +1103,13 @@ class DataExtendBot(SingleSiteBot):
                 returnvalue = [{}, {}]
                 for language in realnewnames.keys():
                     if language in existinglabels.keys():
-                        returnvalue[1][language] = existingaliases.get(language, []) + realnewnames[language]
+                        returnvalue[1][language] = existingaliases.get(
+                            language, []) + realnewnames[language]
                     else:
                         returnvalue[0][language] = realnewnames[language][0]
                         if realnewnames[language]:
-                            returnvalue[1][language] = existingaliases.get(language, []) + realnewnames[language][1:]
+                            returnvalue[1][language] = existingaliases.get(
+                                language, []) + realnewnames[language][1:]
                 return returnvalue
         return [{}, {}]
 
@@ -1033,13 +1124,16 @@ class DataExtendBot(SingleSiteBot):
 
             if str(claim.getTarget()) == value:
                 return True
-            if claim.type == 'wikibase-item' and claim.getTarget().title() == value:
+            if claim.type == 'wikibase-item' \
+               and claim.getTarget().title() == value:
                 return True
             if claim.type == 'commonsMedia' \
-                    and claim.getTarget().title().split(':', 1)[1].replace('_', ' ') == value.replace('_', ' '):
+                    and claim.getTarget().title().split(
+                        ':', 1)[1].replace('_', ' ') == value.replace('_', ' '):
                 return True
             if claim.type == 'time' \
-               and self.showtime(claim.getTarget()) == self.showtime(self.createdateclaim(value)):
+               and self.showtime(claim.getTarget()) == self.showtime(
+                   self.createdateclaim(value)):
                 return True
 
         except (ValueError, AttributeError):
@@ -1146,7 +1240,8 @@ class Analyzer:
         return unescape(term).strip()
 
     def getdata(self, dtype, text, ask=True):
-        text = text.strip('. ').lower().replace('\\n', ' ').replace('\n', ' ').replace('%20', ' ').strip()
+        text = text.strip('. ').lower().replace('\\n', ' ').replace(
+            '\n', ' ').replace('%20', ' ').strip()
         text = re.sub(' +', ' ', text)
 
         if not text:
@@ -1207,7 +1302,8 @@ class Analyzer:
                     pywikibot.output('Unable to load {}'.format(self.url))
                     return []
             except UnicodeEncodeError:
-                pywikibot.output('Unable to receive page {} - not unicode?'.format(self.url))
+                pywikibot.output('Unable to receive page {} - not unicode?'
+                                 .format(self.url))
                 pagerequest = None
                 self.html = ''
 
@@ -1248,7 +1344,8 @@ class Analyzer:
             self.html = unquote(self.html)
         self.html = self.prepare(self.html)
 
-        pywikibot.output('\n=== {} ({}) ===='.format(self.dbname, self.dbproperty))
+        pywikibot.output('\n=== {} ({}) ===='.format(self.dbname,
+                                                     self.dbproperty))
         if self.hrtre:
             match = re.compile('(?s)' + self.hrtre).search(self.html)
             if match:
@@ -1381,7 +1478,8 @@ class Analyzer:
         ]:
             results = function(self.html) or []
             for result in results:
-                if result is not None and str(result).strip() and result != self.item:
+                if result is not None and str(result).strip() \
+                   and result != self.item:
                     newclaims.append((prop, result.replace('\n', ' '), None))
 
         for (function, prop) in [
@@ -1468,7 +1566,8 @@ class Analyzer:
                         newclaims.append(('P2031', '!date!' + start, self))
                         newclaims.append(('P2032', '!date!' + end, self))
                 else:
-                    newclaims.append(('P1317', '!date!' + result.strip(), self))
+                    newclaims.append(
+                        ('P1317', '!date!' + result.strip(), self))
 
         for (function, prop) in [
             (self.findfloorsabove, 'P1101'),
@@ -1508,7 +1607,8 @@ class Analyzer:
         if result:
             m = re.search(r'(\d{4})\s*(\d{4})\s*(\d{4})\s*(\w{4})', result)
             if m:
-                newclaims.append(('P213', '{} {} {} {}'.format(*m.groups()), self))
+                newclaims.append(('P213', '{} {} {} {}'
+                                  .format(*m.groups()), self))
 
         for (prop, result) in self.findmixedrefs(self.html) or []:
             if result is not None:
@@ -1533,7 +1633,8 @@ class Analyzer:
         ]:
             result = function(self.html)
             if result:
-                pywikibot.output('Please add yourself: {} - {}'.format(prop, result))
+                pywikibot.output('Please add yourself: {} - {}'
+                                 .format(prop, result))
         return newclaims
 
     def prepare(self, html):
@@ -1547,9 +1648,11 @@ class Analyzer:
         return text.strip()
 
     def getdescriptions(self):
-        return [(self.language, self.singlespace(unescape(self.TAGRE.sub(' ', x))))
+        return [(self.language,
+                 self.singlespace(unescape(self.TAGRE.sub(' ', x))))
                 for x in self.finddescriptions(self.html) or [] if x] \
-                + [(language, self.singlespace(unescape(self.TAGRE.sub(' ', x))))
+                + [(language,
+                    self.singlespace(unescape(self.TAGRE.sub(' ', x))))
                    for (language, x) in self.findlanguagedescriptions(self.html) or [] if x]
 
     def longtext(self):
@@ -1595,13 +1698,16 @@ class Analyzer:
         return code.replace('_', '-')
 
     def findwikipedianames(self, html):
-        links = self.findallbyre(r'//(\w+\.wikipedia\.org/wiki/[^\'"<>\s]+)', html)
+        links = self.findallbyre(
+            r'//(\w+\.wikipedia\.org/wiki/[^\'"<>\s]+)', html)
         return [(self.getlanguage(link.split('.')[0]),
-                 unescape(unquote(link.split('/')[-1].replace('_', ' '))).split('(')[0]) for link in links]
+                 unescape(unquote(link.split('/')[-1].replace(
+                     '_', ' '))).split('(')[0]) for link in links]
 
     def getnames(self):
         return [(self.language, (self.commastrip(term)))
-                for term in self.findnames(self.html) or [] if term and term.strip()] \
+                for term in self.findnames(self.html) or []
+                if term and term.strip()] \
                 + [(self.getlanguage(language), self.commastrip(term))
                    for (language, term) in self.findlanguagenames(self.html) or [] if term and term.strip()] \
                    + self.findwikipedianames(self.html)
@@ -2069,137 +2175,239 @@ class Analyzer:
         defaultmixedrefs = [
             ('P214', self.findbyre(r'viaf.org/(?:viaf/)?(\d+)', html)),
             ('P227', self.findbyre(r'd-nb\.info/(?:gnd/)?([\d\-xX]+)', html)),
-            ('P244', self.findbyre(r'id\.loc\.gov/authorities/\w+/(\w+)', html)),
+            ('P244', self.findbyre(
+                r'id\.loc\.gov/authorities/\w+/(\w+)', html)),
             ('P244', self.findbyre(r'https?://lccn\.loc\.gov/(\w+)', html)),
-            ('P245', self.findbyre(r'https?://www.getty.edu/[^"\'\s]+subjectid=(\w+)', html)),
+            ('P245', self.findbyre(
+                r'https?://www.getty.edu/[^"\'\s]+subjectid=(\w+)', html)),
             ('P245', self.findbyre(r'getty.edu/page/ulan/(\w+)', html)),
-            ('P268', self.findbyre(r'https?://catalogue.bnf.fr/ark./\d+/(?:cb)?(\w+)', html)),
+            ('P268', self.findbyre(
+                r'https?://catalogue.bnf.fr/ark./\d+/(?:cb)?(\w+)', html)),
             ('P268', self.findbyre(r'data\.bnf\.fr/ark:/\d+/cb(\w+)', html)),
             ('P269', self.findbyre(r'https?://\w+.idref.fr/(\w+)', html)),
             ('P345', self.findbyre(r'https?://www.imdb.com/\w+/(\w+)', html)),
-            ('P349', self.findbyre(r'https?://id.ndl.go.jp/auth/[^"\'\s]+/(\w+)', html)),
-            ('P396', self.findbyre(r'opac\.sbn\.it/opacsbn/opac/[^<>\'"\s]+\?bid=([^\s\'"<>]+)', html)),
-            ('P409', self.findbyre(r'https?://nla.gov.au/anbd.aut-an(\w+)', html)),
-            ('P434', self.findbyre(r'https?://musicbrainz.org/\w+/([\w\-]+)', html)),
+            ('P349', self.findbyre(
+                r'https?://id.ndl.go.jp/auth/[^"\'\s]+/(\w+)', html)),
+            ('P396', self.findbyre(
+                r'opac\.sbn\.it/opacsbn/opac/[^<>\'"\s]+\?bid=([^\s\'"<>]+)',
+                html)),
+            ('P409', self.findbyre(
+                r'https?://nla.gov.au/anbd.aut-an(\w+)', html)),
+            ('P434', self.findbyre(
+                r'https?://musicbrainz.org/\w+/([\w\-]+)', html)),
             ('P496', self.findbyre(r'https?://orcid.org/([\d\-]+)', html)),
-            ('P535', self.findbyre(r'https?://www.findagrave.com/memorial/(\w+)', html)),
-            ('P535', self.findbyre(r'https?://www.findagrave.com/cgi-bin/fg.cgi\?[^<>"\']*id=(\w+)', html)),
-            ('P549', self.findbyre(r'genealogy.math.ndsu.nodak.edu/id.php\?id=(\w+)', html)),
-            ('P650', self.findbyre(r'https?://rkd.nl(?:/\w+)?/explore/artists/(\w+)', html)),
-            ('P651', self.findbyre(r'biografischportaal\.nl/persoon/(\w+)', html)),
-            ('P723', self.findbyre(r'dbnl\.(?:nl|org)/auteurs/auteur.php\?id=(\w+)', html)),
-            ('P723', self.findbyre(r'data.bibliotheken.nl/id/dbnla/(\w+)', html)),
+            ('P535', self.findbyre(
+                r'https?://www.findagrave.com/memorial/(\w+)', html)),
+            ('P535', self.findbyre(
+                r'https?://www.findagrave.com/cgi-bin/fg.cgi\?[^<>"\']*id=(\w+)',
+                html)),
+            ('P549', self.findbyre(
+                r'genealogy.math.ndsu.nodak.edu/id.php\?id=(\w+)', html)),
+            ('P650', self.findbyre(
+                r'https?://rkd.nl(?:/\w+)?/explore/artists/(\w+)', html)),
+            ('P651', self.findbyre(
+                r'biografischportaal\.nl/persoon/(\w+)', html)),
+            ('P723', self.findbyre(
+                r'dbnl\.(?:nl|org)/auteurs/auteur.php\?id=(\w+)', html)),
+            ('P723', self.findbyre(
+                r'data.bibliotheken.nl/id/dbnla/(\w+)', html)),
             ('P866', self.findbyre(r'perlentaucher.de/autor/([\w\-]+)', html)),
-            ('P902', self.findbyre(r'hls-dhs-dss.ch/textes/\w/[A-Z]?(\d+)\.php', html)),
-            ('P906', self.findbyre(r'libris.kb.se/(?:resource/)?auth/(\w+)', html)),
-            ('P950', self.findbyre(r'catalogo.bne.es/[^"\'\s]+authority.id=(\w+)', html)),
-            ('P1006', self.findbyre(r'data.bibliotheken.nl/id/thes/p(\d+X?)', html)),
-            ('P1047', self.findbyre(r'catholic-hierarchy.org/\w+/b(.+?)\.html', html)),
+            ('P902', self.findbyre(
+                r'hls-dhs-dss.ch/textes/\w/[A-Z]?(\d+)\.php', html)),
+            ('P906', self.findbyre(
+                r'libris.kb.se/(?:resource/)?auth/(\w+)', html)),
+            ('P950', self.findbyre(
+                r'catalogo.bne.es/[^"\'\s]+authority.id=(\w+)', html)),
+            ('P1006', self.findbyre(
+                r'data.bibliotheken.nl/id/thes/p(\d+X?)', html)),
+            ('P1047', self.findbyre(
+                r'catholic-hierarchy.org/\w+/b(.+?)\.html', html)),
             ('P1220', self.findbyre(r'//ibdb.com/person.php\?id=(\d+)', html)),
-            ('P1233', self.findbyre(r'https?://www.isfdb.org/cgi-bin/ea.cgi\?(\d+)', html)),
-            ('P1415', self.findbyre(r'doi\.org/\d+\.\d+/ref:odnb/(\d+)', html)),
-            ('P1417', self.findbyre(r'https://www.britannica.com/([\w\-/]+)', html)),
+            ('P1233', self.findbyre(
+                r'https?://www.isfdb.org/cgi-bin/ea.cgi\?(\d+)', html)),
+            ('P1415', self.findbyre(
+                r'doi\.org/\d+\.\d+/ref:odnb/(\d+)', html)),
+            ('P1417', self.findbyre(
+                r'https://www.britannica.com/([\w\-/]+)', html)),
             ('P1422', self.findbyre(r'ta.sandrartnet/-person-(\w+)', html)),
-            ('P1563', self.findbyre(r'https?://www-history.mcs.st-andrews.ac.uk/Biographies/([^\'"<>\s]+)', html)),
-            ('P1728', self.findbyre(r'https?://www.allmusic.com/artist/[\w\-]*?(mn/d+)', html)),
-            ('P1749', self.findbyre(r'https?://www.parlement(?:airdocumentatiecentrum)?.(?:com|nl)/id/(\w+)', html)),
-            ('P1788', self.findbyre(r'huygens.knaw.nl/vrouwenlexicon/lemmata/data/([^"\'<>\s]+)', html)),
-            ('P1802', self.findbyre(r'https?://emlo.bodleian.ox.ac.uk/profile/person/([\w\-]+)', html)),
-            ('P1842', self.findbyre(r'https?://gameo.org/index.php\?title=([^\'"\s]+)', html)),
-            ('P1871', self.findbyre(r'https?://(?:data|thesaurus).cerl.org/(?:thesaurus|record)/(\w+)', html)),
-            ('P1871', self.findbyre(r'thesaurus.cerl.org/cgi-bin/record.pl\?rid=(\w+)', html)),
-            ('P1902', self.findbyre(r'https?://open.spotify.com/artist/(\w+)', html)),
-            ('P1907', self.findbyre(r'https?://adb.anu.edu.au/biography/([\w\-]+)', html)),
-            ('P1938', self.findbyre(r'https?://www.gutenberg.org/ebooks/author/(\d+)', html)),
-            ('P1953', self.findbyre(r'https?://www.discogs.com/(\w+/)?artist/(\d+)', html)),
-            ('P1986', self.findbyre(r'treccani.it/enciclopedia/([\w\-_]+)_\(Dizionario-Biografico\)', html)),
-            ('P2016', self.findbyre(r'hoogleraren\.ub\.rug\.nl/hoogleraren/(\w+)', html)),
-            ('P2038', self.findbyre(r'https?://www.researchgate.net/profile/([^\'"<>\s\?]+)', html)),
+            ('P1563', self.findbyre(
+                r'https?://www-history.mcs.st-andrews.ac.uk/Biographies/([^\'"<>\s]+)', html)),
+            ('P1728', self.findbyre(
+                r'https?://www.allmusic.com/artist/[\w\-]*?(mn/d+)', html)),
+            ('P1749', self.findbyre(
+                r'https?://www.parlement(?:airdocumentatiecentrum)?.(?:com|nl)/id/(\w+)', html)),
+            ('P1788', self.findbyre(
+                r'huygens.knaw.nl/vrouwenlexicon/lemmata/data/([^"\'<>\s]+)', html)),
+            ('P1802', self.findbyre(
+                r'https?://emlo.bodleian.ox.ac.uk/profile/person/([\w\-]+)', html)),
+            ('P1842', self.findbyre(
+                r'https?://gameo.org/index.php\?title=([^\'"\s]+)', html)),
+            ('P1871', self.findbyre(
+                r'https?://(?:data|thesaurus).cerl.org/(?:thesaurus|record)/(\w+)', html)),
+            ('P1871', self.findbyre(
+                r'thesaurus.cerl.org/cgi-bin/record.pl\?rid=(\w+)', html)),
+            ('P1902', self.findbyre(
+                r'https?://open.spotify.com/artist/(\w+)', html)),
+            ('P1907', self.findbyre(
+                r'https?://adb.anu.edu.au/biography/([\w\-]+)', html)),
+            ('P1938', self.findbyre(
+                r'https?://www.gutenberg.org/ebooks/author/(\d+)', html)),
+            ('P1953', self.findbyre(
+                r'https?://www.discogs.com/(\w+/)?artist/(\d+)', html)),
+            ('P1986', self.findbyre(
+                r'treccani.it/enciclopedia/([\w\-_]+)_\(Dizionario-Biografico\)', html)),
+            ('P2016', self.findbyre(
+                r'hoogleraren\.ub\.rug\.nl/hoogleraren/(\w+)', html)),
+            ('P2038', self.findbyre(
+                r'https?://www.researchgate.net/profile/([^\'"<>\s\?]+)', html)),
             ('P2163', self.findbyre(r'id\.worldcat\.org/fast/(\d+)', html)),
             ('P2332', self.findbyre(r'/arthistorians\.info/(\w+)', html)),
             ('P2372', self.findbyre(r'odis\.be/lnk/([\w_]+)', html)),
-            ('P2373', self.findbyre(r'https?://genius.com/artists/([^\s\'"]*)', html)),
+            ('P2373', self.findbyre(
+                r'https?://genius.com/artists/([^\s\'"]*)', html)),
             ('P2397', self.findbyre(r'youtube\.com/channel/([\w\-_]+)', html)),
-            ('P2454', self.findbyre(r'https?://www.dwc.knaw.nl/[^\'"\s]+=(\w+)', html)),
-            ('P2456', self.findbyre(r'https?://dblp.uni-trier.de/pid/([\w/]+)', html)),
+            ('P2454', self.findbyre(
+                r'https?://www.dwc.knaw.nl/[^\'"\s]+=(\w+)', html)),
+            ('P2456', self.findbyre(
+                r'https?://dblp.uni-trier.de/pid/([\w/]+)', html)),
             ('P2469', self.findbyre(r'theatricalia.com/person/(\w+)', html)),
-            ('P2639', (self.findbyre(r'filmportal.de/person/(\w+)', html) or '').lower() or None),
+            ('P2639', (self.findbyre(
+                r'filmportal.de/person/(\w+)', html) or '').lower() or None),
             ('P2722', self.findbyre(r'deezer.com/artist/(\w+)', html)),
-            ('P2799', self.findbyre(r'cervantesvirtual.com/person/(\d+)', html)),
-            ('P2850', self.findbyre(r'https?://itunes.apple.com(?:/\w{2})?/(?:id)?(\d+)', html)),
-            ('P2909', self.findbyre(r'https?://www.secondhandsongs.com/artist/(\w+)', html)),
-            ('P2915', self.findbyre(r'vondel.humanities.uva.nl/ecartico/persons/(\d+)', html)),
-            ('P2941', self.findbyre(r'munksroll.rcplondon.ac.uk/Biography/Details/(\d+)', html)),
-            ('P2949', self.findbyre(r'www\.wikitree\.com/wiki/(\w+-\d+)', html)),
-            ('P2963', self.findbyre(r'goodreads\.com/author/show/(\d+)', html)),
+            ('P2799', self.findbyre(
+                r'cervantesvirtual.com/person/(\d+)', html)),
+            ('P2850', self.findbyre(
+                r'https?://itunes.apple.com(?:/\w{2})?/(?:id)?(\d+)', html)),
+            ('P2909', self.findbyre(
+                r'https?://www.secondhandsongs.com/artist/(\w+)', html)),
+            ('P2915', self.findbyre(
+                r'vondel.humanities.uva.nl/ecartico/persons/(\d+)', html)),
+            ('P2941', self.findbyre(
+                r'munksroll.rcplondon.ac.uk/Biography/Details/(\d+)', html)),
+            ('P2949', self.findbyre(
+                r'www\.wikitree\.com/wiki/(\w+-\d+)', html)),
+            ('P2963', self.findbyre(
+                r'goodreads\.com/author/show/(\d+)', html)),
             ('P2969', self.findbyre(r'goodreads\.com/book/show/(\d+)', html)),
-            ('P3040', self.findbyre(r'https?://soundcloud.com/([\w\-]+)', html)),
-            ('P3192', self.findbyre(r'https?://www.last.fm/music/([^\'"\s]+)', html)),
-            ('P3217', self.findbyre(r'https?://sok.riksarkivet.se/sbl/Presentation.aspx\?id=(\d+)', html)),
-            ('P3217', self.findbyre(r'https?://sok.riksarkivet.se/sbl/artikel/(\d+)', html)),
-            ('P3241', self.findbyre(r'https?://www.newadvent.org/cathen/(\w+)\.htm', html)),
-            ('P3265', self.findbyre(r'https?://myspace.com/([\w\-_/]+)', html)),
-            ('P3365', self.findbyre(r'treccani.it/enciclopedia/([\w\-_]+)', html)),
-            ('P3368', self.findbyre(r'https?://prabook.com/web/[^/<>"\']+/(\d+)', html)),
-            ('P3368', self.findbyre(r'prabook.com/web/person-view.html\?profileId=(\d+)', html)),
+            ('P3040', self.findbyre(
+                r'https?://soundcloud.com/([\w\-]+)', html)),
+            ('P3192', self.findbyre(
+                r'https?://www.last.fm/music/([^\'"\s]+)', html)),
+            ('P3217', self.findbyre(
+                r'https?://sok.riksarkivet.se/sbl/Presentation.aspx\?id=(\d+)', html)),
+            ('P3217', self.findbyre(
+                r'https?://sok.riksarkivet.se/sbl/artikel/(\d+)', html)),
+            ('P3241', self.findbyre(
+                r'https?://www.newadvent.org/cathen/(\w+)\.htm', html)),
+            ('P3265', self.findbyre(
+                r'https?://myspace.com/([\w\-_/]+)', html)),
+            ('P3365', self.findbyre(
+                r'treccani.it/enciclopedia/([\w\-_]+)', html)),
+            ('P3368', self.findbyre(
+                r'https?://prabook.com/web/[^/<>"\']+/(\d+)', html)),
+            ('P3368', self.findbyre(
+                r'prabook.com/web/person-view.html\?profileId=(\d+)', html)),
             ('P3435', self.findbyre(r'vgmdb\.net/artist/(\w+)', html)),
             ('P3478', self.findbyre(r'songkick\.com/artists/(\w+)', html)),
-            ('P3630', self.findbyre(r'https?://www.babelio.com/auteur/[^<>\'"\s]+/(\d+)', html)),
-            ('P3854', self.findbyre(r'soundtrackcollector.com/\w+/(\w+)', html)),
+            ('P3630', self.findbyre(
+                r'https?://www.babelio.com/auteur/[^<>\'"\s]+/(\d+)', html)),
+            ('P3854', self.findbyre(
+                r'soundtrackcollector.com/\w+/(\w+)', html)),
             ('P4013', self.findbyre(r'https?://giphy.com/(\w+)', html)),
             ('P4073', self.findbyre(r'(\w+)\.wikia\.com', html)),
-            ('P4198', self.findbyre(r'play.google.com/store/music/artist\?id=(\w+)', html)),
-            ('P4223', self.findbyre(r'treccani.it/enciclopedia/([\w\-_]+)_\(Enciclopedia-Italiana\)', html)),
-            ('P4228', self.findbyre(r'www.eoas.info/biogs/([^\s]+)\.html', html)),
-            ('P4228', self.findbyre(r'www.eoas.info%2Fbiogs%2F([^\s]+)\.html', html)),
-            ('P4252', self.findbyre(r'www.mathnet.ru/[\w/\.]+\?.*?personid=(\w+)', html)),
-            ('P4862', self.findbyre(r'https?://www.amazon.com/[\w\-]*/e/(\w+)', html)),
-            ('P5357', self.findbyre(r'sf-encyclopedia.com/entry/([\w_]+)', html)),
-            ('P5404', self.findbyre(r'rateyourmusic.com/artist/([^\'"<>\s]+)', html)),
-            ('P5431', self.findbyre(r'https?://www.setlist.fm/setlists/[\w\-]*?(\w+).html', html)),
-            ('P5570', self.findbyre(r'www.noosfere.org/[\w\./]+\?numauteur=(\w+)', html)),
-            ('P5882', self.findbyre(r'www\.muziekweb\.nl/\w+/(\w+)', html)),
-            ('P5924', self.findbyre(r'lyrics.wikia.com/wiki/([^\'"<>\s]*)', html)),
-            ('P6194', self.findbyre(r'biographien\.ac.\at/oebl/oebl_\w/[^\s\.]+\.', html)),
-            ('P6517', self.findbyre(r'whosampled.com/([^\'"<>/\s]+)', html)),
-            ('P6594', self.findbyre(r'gf\.org/fellows/all-fellows/([\w\-]+)', html)),
-            ('P7032', self.findbyre(r'historici.nl/Onderzoek/Projecten/Repertorium/app/personen/(\d+)', html)),
-            ('P7032', self.findbyre(r'repertoriumambtsdragersambtenaren1428-1861/app/personen/(\d+)', html)),
-            ('P7195', self.findbyre(r'https?://www.bandsintown.com/\w+/(\d+)', html)),
-            ('P7545', self.findbyre(r'https?://www.askart.com/artist/[\w_]*/(\d+)/', html)),
-            ('P7620', self.findbyre(r'treccani.it/enciclopedia/([\w\-]+)_\(Enciclopedia_dei_Papi\)', html)),
-            ('P7902', self.findbyre(r'www.deutsche-biographie.de/pnd(\w+)\.html', html)),
-            ('P8034', self.findbyre(r'viaf.org/viaf/sourceID/BAV\|(\w+)', html)),
-            ('P9029', self.findbyre(r'viceversalitterature\.ch/author/(\d+)', html)),
+            ('P4198', self.findbyre(
+                r'play.google.com/store/music/artist\?id=(\w+)', html)),
+            ('P4223', self.findbyre(
+                r'treccani.it/enciclopedia/([\w\-_]+)_\(Enciclopedia-Italiana\)', html)),
+            ('P4228', self.findbyre(
+                r'www.eoas.info/biogs/([^\s]+)\.html', html)),
+            ('P4228', self.findbyre(
+                r'www.eoas.info%2Fbiogs%2F([^\s]+)\.html', html)),
+            ('P4252', self.findbyre(
+                r'www.mathnet.ru/[\w/\.]+\?.*?personid=(\w+)', html)),
+            ('P4862', self.findbyre(
+                r'https?://www.amazon.com/[\w\-]*/e/(\w+)', html)),
+            ('P5357', self.findbyre(
+                r'sf-encyclopedia.com/entry/([\w_]+)', html)),
+            ('P5404', self.findbyre(
+                r'rateyourmusic.com/artist/([^\'"<>\s]+)', html)),
+            ('P5431', self.findbyre(
+                r'https?://www.setlist.fm/setlists/[\w\-]*?(\w+).html', html)),
+            ('P5570', self.findbyre(
+                r'www.noosfere.org/[\w\./]+\?numauteur=(\w+)', html)),
+            ('P5882', self.findbyre(
+                r'www\.muziekweb\.nl/\w+/(\w+)', html)),
+            ('P5924', self.findbyre(
+                r'lyrics.wikia.com/wiki/([^\'"<>\s]*)', html)),
+            ('P6194', self.findbyre(
+                r'biographien\.ac.\at/oebl/oebl_\w/[^\s\.]+\.', html)),
+            ('P6517', self.findbyre(
+                r'whosampled.com/([^\'"<>/\s]+)', html)),
+            ('P6594', self.findbyre(
+                r'gf\.org/fellows/all-fellows/([\w\-]+)', html)),
+            ('P7032', self.findbyre(
+                r'historici.nl/Onderzoek/Projecten/Repertorium/app/personen/(\d+)', html)),
+            ('P7032', self.findbyre(
+                r'repertoriumambtsdragersambtenaren1428-1861/app/personen/(\d+)', html)),
+            ('P7195', self.findbyre(
+                r'https?://www.bandsintown.com/\w+/(\d+)', html)),
+            ('P7545', self.findbyre(
+                r'https?://www.askart.com/artist/[\w_]*/(\d+)/', html)),
+            ('P7620', self.findbyre(
+                r'treccani.it/enciclopedia/([\w\-]+)_\(Enciclopedia_dei_Papi\)', html)),
+            ('P7902', self.findbyre(
+                r'www.deutsche-biographie.de/pnd(\w+)\.html', html)),
+            ('P8034', self.findbyre(
+                r'viaf.org/viaf/sourceID/BAV\|(\w+)', html)),
+            ('P9029', self.findbyre(
+                r'viceversalitterature\.ch/author/(\d+)', html)),
         ]
         if includesocial:
             defaultmixedrefs += [
-                ('P2002', self.findbyre(r'https?://(?:www\.)?twitter.com/#?(\w+)', html)),
-                ('P2003', self.findbyre(r'https?://(?:\w+\.)?instagram.com/([^/\s\'"]{2,})', html)),
-                ('P2013', self.findbyre(r'https?://www.facebook.com/(?:pg/)?([^/\s\'"<>\?]+)', html)),
-                ('P2847', self.findbyre(r'https?://plus.google.com/(\+?\w+)', html)),
-                ('P2850', self.findbyre(r'https?://itunes.apple.com/(?:\w+/)?artist/(?:\w*/)?[a-z]{0,2}(\d{3,})', html)),
-                ('P3258', self.findbyre(r'https?://([\w\-]+)\.livejournal.com', html)),
-                ('P3258', self.findbyre(r'https?://users\.livejournal.com/(\w+)', html)),
-                ('P3265', self.findbyre(r'https?://www.myspace.com/([\w\-]+)', html)),
-                ('P3283', self.findbyre(r'https?://([^/"\']+)\.bandcamp.com', html)),
-                ('P4003', self.findbyre(r'https?://www.facebook.com/pages/([^\s\'"<>\?]+)', html)),
-                ('P4175', self.findbyre(r'https://www.patreon.com/([\w\-]+)', html)),
-                ('P6634', self.findbyre(r'\.linkedin\.com/in/([\w\-]+)', html)),
+                ('P2002', self.findbyre(
+                    r'https?://(?:www\.)?twitter.com/#?(\w+)', html)),
+                ('P2003', self.findbyre(
+                    r'https?://(?:\w+\.)?instagram.com/([^/\s\'"]{2,})', html)),
+                ('P2013', self.findbyre(
+                    r'https?://www.facebook.com/(?:pg/)?([^/\s\'"<>\?]+)', html)),
+                ('P2847', self.findbyre(
+                    r'https?://plus.google.com/(\+?\w+)', html)),
+                ('P2850', self.findbyre(
+                    r'https?://itunes.apple.com/(?:\w+/)?artist/(?:\w*/)?[a-z]{0,2}(\d{3,})', html)),
+                ('P3258', self.findbyre(
+                    r'https?://([\w\-]+)\.livejournal.com', html)),
+                ('P3258', self.findbyre(
+                    r'https?://users\.livejournal.com/(\w+)', html)),
+                ('P3265', self.findbyre(
+                    r'https?://www.myspace.com/([\w\-]+)', html)),
+                ('P3283', self.findbyre(
+                    r'https?://([^/"\']+)\.bandcamp.com', html)),
+                ('P4003', self.findbyre(
+                    r'https?://www.facebook.com/pages/([^\s\'"<>\?]+)', html)),
+                ('P4175', self.findbyre(
+                    r'https://www.patreon.com/([\w\-]+)', html)),
+                ('P6634', self.findbyre(
+                    r'\.linkedin\.com/in/([\w\-]+)', html)),
             ]
-        result = [pair for pair in defaultmixedrefs if pair[0] != self.dbproperty]
-        isniresult = re.search(r'isni\.org/isni/(\d{4})(\d{4})(\d{4})(\w{4})', html)
+        result = [pair for pair in defaultmixedrefs
+                  if pair[0] != self.dbproperty]
+        isniresult = re.search(
+            r'isni\.org/isni/(\d{4})(\d{4})(\d{4})(\w{4})', html)
         if isniresult:
             result.append(('P213', '{} {} {} {}'.format(*isniresult.groups())))
-        commonsresult = self.findbyre(r'commons\.wikimedia\.org/wiki/\w+:([^\'"<>\s]+)', html)
+        commonsresult = self.findbyre(
+            r'commons\.wikimedia\.org/wiki/\w+:([^\'"<>\s]+)', html)
         if commonsresult:
             result += [('P18', '!i!' + commonsresult)]
         return [r for r in result if r[1]
                 and not (r[0] == 'P2002' and r[1] == 'intent')
                 and not (r[0] == 'P2013' and r[1].startswith('pages'))
-                and not (r[0] == 'P2013' and r[1] in ['pg', 'plugins', 'sharer'])
+                and not (r[0] == 'P2013' and r[1] in ['pg', 'plugins',
+                                                      'sharer'])
                 and not (r[0] == 'P214' and r[1].lower() == 'sourceid')
-                and not (r[0] == 'P3258' and r[1].lower() in ['users', 'comunity', 'www'])
+                and not (r[0] == 'P3258' and r[1].lower() in ['users',
+                                                              'comunity',
+                                                              'www'])
                 and not r[1].lower() == 'search'
                 and not (r[0] == 'P3365' and ('(Dizionario_Biografico)' in r[1] or '(Enciclopedia-Italiana)' in r[1] or '(Enciclopedia-dei-Papi)' in r[1]))
                 and not (r[0] == 'P2013' and '.php' in r[1])]
@@ -14092,7 +14300,8 @@ class WikiAnalyzer(Analyzer):
             'asa', 'kazi yake', r'(?:antaŭ|aliaj)?okupoj?\d*', 'работил', 'ocupacio', 'aktywność zawodowa',
             'funkcja', 'profesio', 'ocupație', 'povolání', 'töökoht', 'szakma', 'profession',
         ], html, 'occupation') + \
-            self.findallbyre(r'(?i)info(?:box|boks|taula|kast)(?:\s*-\s*)?([\w\s]+)', html, 'occupation') + self.findallbyr(
+            self.findallbyre(r'(?i)info(?:box|boks|taula|kast)(?:\s*-\s*)?([\w\s]+)', html, 'occupation') \
+            + self.findallbyre(
                 r'基礎情報([\w\s]+)', html, 'occupation') \
                 + self.findallbyre(r'{([\w\s]+)infobox', html, 'occupation') + self.findallbyre(
                     r'Categorie:\s*(\w+) (?:van|der) ', html, 'occupation') \
@@ -15217,9 +15426,13 @@ def main(*args: Tuple[str, ...]) -> None:
         pywikibot.output('No item page specified')
     else:
         repo = pywikibot.Site().data_repository()
-        item = pywikibot.ItemPage(repo, item)
-        bot = DataExtendBot(site=repo, **options)
-        bot.workon(item, prop)
+        try:
+            item = pywikibot.ItemPage(repo, item)
+        except InvalidTitleError:
+            pywikibot.exception()
+        else:
+            bot = DataExtendBot(site=repo, **options)
+            bot.workon(item, prop)
 
 
 if __name__ == '__main__':
