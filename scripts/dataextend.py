@@ -17,9 +17,8 @@ those coming after it (not those coming before it) are included.
 
 There is currently one argument defined:
 
-    -ask    If this is supplied, the bot will after each external link
-            has been handled, show which changes it intends to make, and
-            ask for permission.
+-always   If this is supplied, the bot will not ask for permission after
+          each external link has been handled.
 
 The bot will load the corresponding pages for these identifiers, and try
 to the meaning of that string for the specified type of thing (for
@@ -80,10 +79,6 @@ class DataExtendBot(SingleSiteBot):
 
     QRE = re.compile(r'Q\d+$')
     PQRE = re.compile(r'[PQ]\d+$')
-
-    avaliable_options = {
-        'ask': False,
-    }
 
     def __init__(self, **kwargs):
         """Initializer."""
@@ -761,7 +756,7 @@ class DataExtendBot(SingleSiteBot):
                                 if newclaims is None:
                                     failedprops.append(prop)
                                     newclaims = []
-                                if not self.opt.ask:
+                                if self.opt.always:
                                     result = ''
                                 else:
                                     pywikibot.output('Found here:')
@@ -15208,8 +15203,8 @@ def main(*args: Tuple[str, ...]) -> None:
             item = arg
         elif arg.startswith('P') or arg in ('Data', 'Wiki'):
             prop = arg
-        elif arg == '-ask':
-            options['ask'] = True
+        elif arg == '-always':
+            options['always'] = True
         else:
             unknownarguments.append(arg)
 
