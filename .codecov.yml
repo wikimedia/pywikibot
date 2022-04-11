@@ -50,3 +50,19 @@ coverage:
     gitter:
       default:
         url: https://webhooks.gitter.im/e/f312b840da1c40d9f4be
+
+flags:
+  framework:
+    carryforward: true
+    paths:
+      - pywikibot
+
+  tests:
+    carryforward: true
+    paths:
+      - tests
+
+  scripts:
+    carryforward: true
+    paths:
+      - scripts
