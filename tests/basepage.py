@@ -53,6 +53,7 @@ class BasePageLoadRevisionsCachingTestBase(BasePageTestBase):
         custom_text = self.custom_text
         page.text = custom_text
 
+        page._revisions = {}
         self.site.loadrevisions(page, total=1)
 
         self.assertTrue(hasattr(page, '_revid'))
@@ -66,7 +67,6 @@ class BasePageLoadRevisionsCachingTestBase(BasePageTestBase):
 
         self.assertFalse(hasattr(page, '_text'))
         self.assertIsNone(page._revisions[page._revid].text)
-        self.assertFalse(hasattr(page, '_text'))
         self.assertIsNone(page._latest_cached_revision())
 
         page.text = custom_text
