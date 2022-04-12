@@ -69,12 +69,19 @@ from urllib.request import urlopen
 
 import pywikibot
 from pywikibot.backports import List
-from pywikibot.bot import SingleSiteBot
+from pywikibot.bot import input_yn, SingleSiteBot
 from pywikibot.data import sparql
-from pywikibot.exceptions import InvalidTitleError, OtherPageSaveError
+from pywikibot.exceptions import (
+    APIError,
+    InvalidTitleError,
+    NoPageError,
+    OtherPageSaveError,
+)
 
 
 class DataExtendBot(SingleSiteBot):
+
+    update_options = {'restrict': ''}
 
     """The Bot."""
 
@@ -353,7 +360,7 @@ class DataExtendBot(SingleSiteBot):
         item = self.page(title)
         try:
             labels = item.get()['labels']
-        except pywikibot.NoPage:
+        except NoPageError:
             labels = {}
         for lang in ['en', 'nl', 'de', 'fr', 'es', 'it', 'af', 'nds', 'li',
                      'vls', 'zea', 'fy', 'no', 'sv', 'da', 'pt', 'ro', 'pl',
@@ -389,7 +396,7 @@ class DataExtendBot(SingleSiteBot):
         with suppress(IOError), codecs.open(self.nonamefile, **param) as f:
             self.noname = {line.strip() for line in f.readlines()}
 
-    def savedata(self):
+    def teardown(self) -> None:
         """Save data to files."""
         param = {'mode': 'w', 'encoding': 'utf-8'}
 
@@ -709,338 +716,347 @@ class DataExtendBot(SingleSiteBot):
                                             self.QUANTITYTYPE[name]),
             site=self.site)
 
-    def workon(self, item, restrict=None):
-        try:
-            longtexts = []
-            item.get()
-            pywikibot.output('Current information:')
-            claims = item.claims
-            descriptions = item.descriptions
-            labels = item.labels
-            aliases = item.aliases
-            newdescriptions = defaultdict(set)
-            updatedclaims = {
-                prop: claims[prop]
-                for prop in claims
-            }
-            self.showclaims(claims)
-            dorestrict = True
-            continueafterrestrict = False
-            if restrict and restrict.endswith('+'):
-                restrict = restrict[:-1]
-                continueafterrestrict = True
-            if restrict and restrict.endswith('*'):
-                restrict = restrict[:-1]
-                dorestrict = False
-                continueafterrestrict = True
-            unidentifiedprops = []
-            failedprops = []
-            claims['Wiki'] = [Quasiclaim(page.title(force_interwiki=True,
-                                                    as_link=True)[2:-2])
-                              for page in item.iterlinks()]
-            claims['Data'] = [Quasiclaim(item.title())]
-            propstodo = list(claims)
-            propsdone = []
-            while propstodo:
-                if propsdone:
-                    item.get(force=True)
-                    claims = item.claims
-                    claims['Wiki'] = [Quasiclaim(page.title(
-                        force_interwiki=True, as_link=True)[2:-2])
-                                      for page in item.iterlinks()]
-                    claims['Data'] = [Quasiclaim(item.title())]
-                    descriptions = item.descriptions
-                    labels = item.labels
-                    aliases = item.aliases
-                propsdone += propstodo
-                propstodonow = propstodo[:]
-                propstodo = []
-                for prop in propstodonow:
-                    # No idea how this can happen, but apparently it can
-                    if prop not in claims.keys():
+    def treat(self, item) -> None:
+        """Process the ItemPage."""
+        longtexts = []
+        item.get()
+        pywikibot.output('Current information:')
+        claims = item.claims
+        descriptions = item.descriptions
+        labels = item.labels
+        aliases = item.aliases
+        newdescriptions = defaultdict(set)
+        updatedclaims = {
+            prop: claims[prop]
+            for prop in claims
+        }
+        self.showclaims(claims)
+        dorestrict = True
+        continueafterrestrict = False
+        if self.opt.restrict and self.opt.restrict.endswith('+'):
+            self.opt.restrict = self.opt.restrict[:-1]
+            continueafterrestrict = True
+        if self.opt.restrict and self.opt.restrict.endswith('*'):
+            self.opt.restrict = self.opt.restrict[:-1]
+            dorestrict = False
+            continueafterrestrict = True
+        unidentifiedprops = []
+        failedprops = []
+        claims['Wiki'] = [Quasiclaim(page.title(force_interwiki=True,
+                                                as_link=True)[2:-2])
+                          for page in item.iterlinks()]
+        claims['Data'] = [Quasiclaim(item.title())]
+        propstodo = list(claims)
+        propsdone = []
+        while propstodo:
+            if propsdone:
+                item.get(force=True)
+                claims = item.claims
+                claims['Wiki'] = [Quasiclaim(page.title(force_interwiki=True,
+                                                        as_link=True)[2:-2])
+                                  for page in item.iterlinks()]
+                claims['Data'] = [Quasiclaim(item.title())]
+                descriptions = item.descriptions
+                labels = item.labels
+                aliases = item.aliases
+            propsdone += propstodo
+            propstodonow = propstodo[:]
+            propstodo = []
+            for prop in propstodonow:
+                # No idea how this can happen, but apparently it can
+                if prop not in claims.keys():
+                    continue
+
+                if self.opt.restrict:
+                    if prop != self.opt.restrict:
                         continue
-
-                    if restrict:
-                        if prop != restrict:
-                            continue
-                        if continueafterrestrict:
-                            restrict = None
-                        if not dorestrict:
-                            continue
-                    for mainclaim in claims[prop]:
-                        if mainclaim.type == 'external-id' or prop == 'P973':
-                            identifier = mainclaim.getTarget()
-                            try:
-                                if prop == 'P973':
-                                    analyzertype = self.analyzertype[
-                                        identifier.split('/')[2]]
-                                else:
-                                    analyzertype = self.analyzertype[prop]
-                            except KeyError:
-                                unidentifiedprops.append(prop)
+                    if continueafterrestrict:
+                        self.opt.restrict = ''
+                    if not dorestrict:
+                        continue
+                for mainclaim in claims[prop]:
+                    if mainclaim.type == 'external-id' or prop == 'P973':
+                        identifier = mainclaim.getTarget()
+                        try:
+                            if prop == 'P973':
+                                analyzertype = self.analyzertype[
+                                    identifier.split('/')[2]]
                             else:
-                                analyzer = analyzertype(identifier, self.data,
-                                                        item.title(), self)
-                                newclaims = analyzer.findclaims() or []
-                                if newclaims is None:
-                                    failedprops.append(prop)
-                                    newclaims = []
-                                if self.opt.always:
-                                    result = ''
-                                else:
-                                    pywikibot.output('Found here:')
-                                    for claim in newclaims:
-                                        try:
-                                            pywikibot.output('{}: {}'
-                                                             .format(self.label(claim[0]), self.label(claim[1])))
-                                        except ValueError:
-                                            newclaims = [nclaim for nclaim in newclaims if nclaim != claim]
-                                    result = input('Save this? (Y/n) ')
-                                if not result or result[0].upper() != 'N':
-                                    for claim in newclaims:
-                                        if claim[0] in updatedclaims \
-                                           and self.isinclaims(claim[1],
-                                                               updatedclaims[claim[0]]):
-                                            if claim[2]:
-                                                if claim[2].dbid:
-                                                    if claim[2].iswiki:
-                                                        source = pywikibot.Claim(self.site, 'P143')
-                                                    else:
-                                                        source = pywikibot.Claim(self.site, 'P248')
-                                                    source.setTarget(
-                                                        pywikibot.ItemPage(
-                                                            self.site,
-                                                            claim[2].dbid))
-                                                else:
-                                                    source = None
+                                analyzertype = self.analyzertype[prop]
+                        except KeyError:
+                            unidentifiedprops.append(prop)
+                            continue
 
-                                                if claim[2].iswiki:
-                                                    url = pywikibot.Claim(
-                                                        self.site, 'P4656')
-                                                else:
-                                                    url = pywikibot.Claim(
-                                                        self.site, 'P854')
-                                                if claim[2].sparqlquery:
-                                                    url.setTarget(
-                                                        pywikibot.ItemPage(
-                                                            self.site,
-                                                            claim[1]).full_url())
-                                                else:
-                                                    url.setTarget(claim[2].url)
-                                                if claim[2].iswiki or claim[2].isurl:
-                                                    iddata = None
-                                                else:
-                                                    iddata = pywikibot.Claim(
-                                                        self.site, prop)
-                                                    iddata.setTarget(
-                                                        identifier)
-                                                if url is None:
-                                                    date = None
-                                                else:
-                                                    date = pywikibot.Claim(
-                                                        self.site, 'P813')
-                                                    date.setTarget(
-                                                        self.createdateclaim(
-                                                            min(datetime.datetime.now()
-                                                                .strftime('%Y-%m-%d'),
-                                                                datetime.datetime.utcnow()
-                                                                .strftime('%Y-%m-%d'))))
-                                                if not analyzer.showurl:
-                                                    url = None
-                                                sourcedata = [source, url,
-                                                              iddata, date]
-                                                sourcedata = [sourcepart
-                                                              for sourcepart in sourcedata
-                                                              if sourcepart is not None]
-                                                pywikibot.output(
-                                                    'Sourcing {}: {}'
-                                                    .format(self.label(claim[0]),
-                                                            self.label(claim[1])))
+                        analyzer = analyzertype(identifier, self.data,
+                                                item.title(), self)
+                        newclaims = analyzer.findclaims() or []
+                        if newclaims is None:
+                            failedprops.append(prop)
+                            newclaims = []
 
-                                                # probably means the sourcing is already there
-                                                with suppress(
-                                                        pywikibot.data.api.APIError):
-                                                    updatedclaims[claim[0]][self.getlocnumber(
-                                                        claim[1],
-                                                        updatedclaims[claim[0]])].addSources(sourcedata)
-                                        else:
-                                            if claim[0] not in propsdone + propstodo:
-                                                propstodo.append(claim[0])
-                                            createdclaim = pywikibot.Claim(
-                                                self.site, claim[0])
-                                            if self.QRE.match(claim[1]):
-                                                createdclaim.setTarget(
-                                                    pywikibot.ItemPage(
-                                                        self.site, claim[1]))
-                                            elif claim[1].startswith('!date!'):
-                                                try:
-                                                    target = self.createdateclaim(claim[1][6:])
-                                                except ValueError as ex:
-                                                    pywikibot.output(
-                                                        'Unable to analyze date "{}" for {}: {}'
-                                                        .format(claim[1][6:], self.label(claim[0]), ex))
-                                                    input(
-                                                        'Press enter to continue')
-                                                    target = None
-
-                                                if target is None:
-                                                    continue
-
-                                                createdclaim.setTarget(target)
-                                            elif claim[1].startswith('!q!'):
-                                                target = self.createquantityclaim(claim[1][3:].strip())
-                                                if target is None:
-                                                    continue
-                                                createdclaim.setTarget(target)
-                                            elif claim[1].startswith('!i!'):
-                                                createdclaim.setTarget(
-                                                    pywikibot.page.FilePage(self.site, claim[1][3:]))
-                                            else:
-                                                createdclaim.setTarget(
-                                                    claim[1])
-                                            pywikibot.output(
-                                                'Adding {}: {}'
-                                                .format(
-                                                    self.label(claim[0]),
-                                                    self.label(claim[1])))
-                                            try:
-                                                item.addClaim(createdclaim)
-                                            except OtherPageSaveError as ex:
-                                                if claim[1].startswith('!i!'):
-                                                    pywikibot.output(
-                                                        'Unable to save image {}: {}'
-                                                        .format(claim[1][3:], ex))
-                                                    continue
-                                                raise
-
-                                            if claim[0] in updatedclaims:
-                                                updatedclaims[claim[0]].append(
-                                                    createdclaim)
-                                            else:
-                                                updatedclaims[claim[0]] = [createdclaim]
-
-                                            if claim[2]:
-                                                if claim[2].dbid:
-                                                    if claim[2].iswiki:
-                                                        source = pywikibot.Claim(self.site, 'P143')
-                                                    else:
-                                                        source = pywikibot.Claim(self.site, 'P248')
-                                                    source.setTarget(
-                                                        pywikibot.ItemPage(
-                                                            self.site,
-                                                            claim[2].dbid))
-                                                else:
-                                                    source = None
-
-                                                if claim[2].iswiki:
-                                                    url = pywikibot.Claim(
-                                                        self.site, 'P4656')
-                                                else:
-                                                    url = pywikibot.Claim(
-                                                        self.site, 'P854')
-
-                                                if claim[2].sparqlquery:
-                                                    url.setTarget(
-                                                        pywikibot.ItemPage(self.site, claim[1]).full_url())
-                                                else:
-                                                    url.setTarget(claim[2].url)
-
-                                                if claim[2].iswiki or claim[2].isurl:
-                                                    iddata = None
-                                                else:
-                                                    iddata = pywikibot.Claim(
-                                                        self.site, prop)
-                                                    iddata.setTarget(
-                                                        identifier)
-
-                                                if url is None:
-                                                    date = None
-                                                else:
-                                                    date = pywikibot.Claim(
-                                                        self.site, 'P813')
-                                                    date.setTarget(self.createdateclaim(
-                                                        min(datetime.datetime.now().strftime('%Y-%m-%d'),
-                                                            datetime.datetime.utcnow().strftime('%Y-%m-%d'))))
-                                                if not analyzer.showurl:
-                                                    url = None
-
-                                                sourcedata = [source, url,
-                                                              iddata, date]
-                                                sourcedata = [
-                                                    sourcepart
-                                                    for sourcepart in sourcedata if sourcepart is not None]
-                                                pywikibot.output(
-                                                    'Sourcing {}: {}'
-                                                    .format(
-                                                        self.label(claim[0]),
+                        if not self.opt.always:
+                            pywikibot.output('Found here:')
+                            for claim in newclaims:
+                                try:
+                                    pywikibot.output(
+                                        '{}: {}'.format(self.label(claim[0]),
                                                         self.label(claim[1])))
+                                except ValueError:
+                                    newclaims = [nclaim
+                                                 for nclaim in newclaims
+                                                 if nclaim != claim]
 
-                                                try:
-                                                    createdclaim.addSources(
-                                                        [s for s in sourcedata
-                                                         if s is not None])
-                                                except AttributeError:
-                                                    try:
-                                                        updatedclaims[claim[0]][
-                                                            self.getlocnumber(claim[1], updatedclaims[claim[0]])
-                                                        ].addSources(sourcedata)
-                                                    except AttributeError:
-                                                        if prop not in propstodo:
-                                                            propstodo.append(
-                                                                prop)
-                                                        pywikibot.output(
-                                                            'Sourcing failed')
-                                for language, description in analyzer.getdescriptions():
-                                    newdescriptions[language].add(
-                                        shorten(description.rstrip('.'),
-                                                width=249, placeholder='...'))
-                                newnames = analyzer.getnames()
-                                newlabels, newaliases = self.definelabels(
-                                    labels, aliases, newnames)
-                                if newlabels:
-                                    item.editLabels(newlabels)
-                                if newaliases:
-                                    item.editAliases(newaliases)
-                                if newlabels or newaliases:
-                                    item.get(force=True)
-                                    claims = item.claims
-                                    claims['Wiki'] = [Quasiclaim(
-                                        page.title(force_interwiki=True, as_link=True)[2:-2])
-                                                      for page in item.iterlinks()]
-                                    claims['Data'] = [Quasiclaim(item.title())]
-                                    descriptions = item.descriptions
-                                    labels = item.labels
-                                    aliases = item.aliases
-                                if analyzer.longtext():
-                                    longtexts.append((analyzer.dbname,
-                                                      analyzer.longtext()))
+                        if self.opt.always or input_yn('Save this?',
+                                                       default=True):
+                            for claim in newclaims:
+                                if claim[0] in updatedclaims \
+                                   and self.isinclaims(
+                                       claim[1], updatedclaims[claim[0]]):
+                                    if claim[2]:
+                                        if claim[2].dbid:
+                                            if claim[2].iswiki:
+                                                source = pywikibot.Claim(
+                                                    self.site, 'P143')
+                                            else:
+                                                source = pywikibot.Claim(
+                                                    self.site, 'P248')
+                                            source.setTarget(
+                                                pywikibot.ItemPage(
+                                                    self.site,
+                                                    claim[2].dbid))
+                                        else:
+                                            source = None
 
-            editdescriptions = {}
-            for language in newdescriptions.keys():
-                newdescription = self.definedescription(
-                    language, descriptions.get(language),
-                    newdescriptions.get(language))
-                if newdescription:
-                    editdescriptions[language] = newdescription
-            if editdescriptions:
-                item.editDescriptions(editdescriptions)
-            for prop in unidentifiedprops:
-                pywikibot.output('Unknown external {} ({})'
-                                 .format(prop, self.label(prop)))
-            for prop in failedprops:
-                pywikibot.output('External failed to load: {} ({})'
-                                 .format(prop, self.label(prop)))
-            if longtexts:
-                if unidentifiedprops or failedprops:
-                    input('Press Enter to continue')
-                pywikibot.output('== longtexts ==')
-                for longtext in longtexts:
-                    pywikibot.output('')
-                    pywikibot.output('== {} =='.format(longtext[0]))
-                    pywikibot.output(longtext[1])
-                    pywikibot.input('(press enter)')
-        finally:
-            self.savedata()
+                                        if claim[2].iswiki:
+                                            url = pywikibot.Claim(
+                                                self.site, 'P4656')
+                                        else:
+                                            url = pywikibot.Claim(
+                                                self.site, 'P854')
+                                        if claim[2].sparqlquery:
+                                            url.setTarget(
+                                                pywikibot.ItemPage(
+                                                    self.site,
+                                                    claim[1]).full_url())
+                                        else:
+                                            url.setTarget(claim[2].url)
+                                        if claim[2].iswiki or claim[2].isurl:
+                                            iddata = None
+                                        else:
+                                            iddata = pywikibot.Claim(
+                                                self.site, prop)
+                                            iddata.setTarget(identifier)
+                                        if url is None:
+                                            date = None
+                                        else:
+                                            date = pywikibot.Claim(
+                                                self.site, 'P813')
+                                            date.setTarget(
+                                                self.createdateclaim(
+                                                    min(datetime.datetime.now()
+                                                        .strftime('%Y-%m-%d'),
+                                                        datetime.datetime.utcnow()
+                                                        .strftime('%Y-%m-%d'))))
+                                        if not analyzer.showurl:
+                                            url = None
+                                        sourcedata = [source, url, iddata,
+                                                      date]
+                                        sourcedata = [sourcepart
+                                                      for sourcepart in sourcedata
+                                                      if sourcepart is not None]
+                                        pywikibot.output(
+                                            'Sourcing {}: {}'
+                                            .format(self.label(claim[0]),
+                                                    self.label(claim[1])))
+
+                                        # probably means the sourcing is already there
+                                        with suppress(APIError):
+                                            updatedclaims[claim[0]][self.getlocnumber(
+                                                claim[1],
+                                                updatedclaims[claim[0]])].addSources(sourcedata)
+                                else:
+                                    if claim[0] not in propsdone + propstodo:
+                                        propstodo.append(claim[0])
+                                    createdclaim = pywikibot.Claim(
+                                        self.site, claim[0])
+                                    if self.QRE.match(claim[1]):
+                                        createdclaim.setTarget(
+                                            pywikibot.ItemPage(self.site,
+                                                               claim[1]))
+                                    elif claim[1].startswith('!date!'):
+                                        try:
+                                            target = self.createdateclaim(
+                                                claim[1][6:])
+                                        except ValueError as ex:
+                                            pywikibot.output(
+                                                'Unable to analyze date "{}" for {}: {}'
+                                                .format(
+                                                    claim[1][6:],
+                                                    self.label(claim[0]), ex))
+                                            pywikibot.input(
+                                                'Press enter to continue')
+                                            target = None
+
+                                        if target is None:
+                                            continue
+
+                                        createdclaim.setTarget(target)
+                                    elif claim[1].startswith('!q!'):
+                                        target = self.createquantityclaim(
+                                            claim[1][3:].strip())
+                                        if target is None:
+                                            continue
+                                        createdclaim.setTarget(target)
+                                    elif claim[1].startswith('!i!'):
+                                        createdclaim.setTarget(
+                                            pywikibot.page.FilePage(
+                                                self.site, claim[1][3:]))
+                                    else:
+                                        createdclaim.setTarget(claim[1])
+                                    pywikibot.output(
+                                        'Adding {}: {}'
+                                        .format(self.label(claim[0]),
+                                                self.label(claim[1])))
+                                    try:
+                                        item.addClaim(createdclaim)
+                                    except OtherPageSaveError as ex:
+                                        if claim[1].startswith('!i!'):
+                                            pywikibot.output(
+                                                'Unable to save image {}: {}'
+                                                .format(claim[1][3:], ex))
+                                            continue
+                                        raise
+
+                                    if claim[0] in updatedclaims:
+                                        updatedclaims[claim[0]].append(
+                                            createdclaim)
+                                    else:
+                                        updatedclaims[claim[0]] = [createdclaim]
+
+                                    if claim[2]:
+                                        if claim[2].dbid:
+                                            if claim[2].iswiki:
+                                                source = pywikibot.Claim(
+                                                    self.site, 'P143')
+                                            else:
+                                                source = pywikibot.Claim(
+                                                    self.site, 'P248')
+                                            source.setTarget(
+                                                pywikibot.ItemPage(
+                                                    self.site, claim[2].dbid))
+                                        else:
+                                            source = None
+
+                                        if claim[2].iswiki:
+                                            url = pywikibot.Claim(
+                                                self.site, 'P4656')
+                                        else:
+                                            url = pywikibot.Claim(
+                                                self.site, 'P854')
+
+                                        if claim[2].sparqlquery:
+                                            url.setTarget(
+                                                pywikibot.ItemPage(
+                                                    self.site,
+                                                    claim[1]).full_url())
+                                        else:
+                                            url.setTarget(claim[2].url)
+
+                                        if claim[2].iswiki \
+                                           or claim[2].isurl:
+                                            iddata = None
+                                        else:
+                                            iddata = pywikibot.Claim(
+                                                self.site, prop)
+                                            iddata.setTarget(identifier)
+
+                                        if url is None:
+                                            date = None
+                                        else:
+                                            date = pywikibot.Claim(
+                                                self.site, 'P813')
+                                            date.setTarget(self.createdateclaim(
+                                                min(datetime.datetime.now().strftime('%Y-%m-%d'),
+                                                    datetime.datetime.utcnow().strftime('%Y-%m-%d'))))
+                                        if not analyzer.showurl:
+                                            url = None
+
+                                        sourcedata = [source, url, iddata,
+                                                      date]
+                                        sourcedata = [
+                                            sourcepart
+                                            for sourcepart in sourcedata
+                                            if sourcepart is not None]
+                                        pywikibot.output(
+                                            'Sourcing {}: {}'
+                                            .format(self.label(claim[0]),
+                                                    self.label(claim[1])))
+
+                                        try:
+                                            createdclaim.addSources(
+                                                [s for s in sourcedata
+                                                 if s is not None])
+                                        except AttributeError:
+                                            try:
+                                                updatedclaims[claim[0]][
+                                                    self.getlocnumber(
+                                                        claim[1],
+                                                        updatedclaims[claim[0]])
+                                                ].addSources(sourcedata)
+                                            except AttributeError:
+                                                if prop not in propstodo:
+                                                    propstodo.append(prop)
+                                                pywikibot.output(
+                                                    'Sourcing failed')
+                        for language, description in analyzer.getdescriptions():
+                            newdescriptions[language].add(
+                                shorten(description.rstrip('.'), width=249,
+                                        placeholder='...'))
+                        newnames = analyzer.getnames()
+                        newlabels, newaliases = self.definelabels(
+                            labels, aliases, newnames)
+                        if newlabels:
+                            item.editLabels(newlabels)
+                        if newaliases:
+                            item.editAliases(newaliases)
+                        if newlabels or newaliases:
+                            item.get(force=True)
+                            claims = item.claims
+                            claims['Wiki'] = [Quasiclaim(
+                                page.title(force_interwiki=True,
+                                           as_link=True)[2:-2])
+                                              for page in item.iterlinks()]
+                            claims['Data'] = [Quasiclaim(item.title())]
+                            descriptions = item.descriptions
+                            labels = item.labels
+                            aliases = item.aliases
+                        if analyzer.longtext():
+                            longtexts.append((analyzer.dbname,
+                                              analyzer.longtext()))
+
+        editdescriptions = {}
+        for language in newdescriptions.keys():
+            newdescription = self.definedescription(
+                language, descriptions.get(language),
+                newdescriptions.get(language))
+            if newdescription:
+                editdescriptions[language] = newdescription
+        if editdescriptions:
+            item.editDescriptions(editdescriptions)
+        for prop in unidentifiedprops:
+            pywikibot.output('Unknown external {} ({})'
+                             .format(prop, self.label(prop)))
+        for prop in failedprops:
+            pywikibot.output('External failed to load: {} ({})'
+                             .format(prop, self.label(prop)))
+        if longtexts:
+            if unidentifiedprops or failedprops:
+                pywikibot.input('Press Enter to continue')
+            pywikibot.output('== longtexts ==')
+            for longtext in longtexts:
+                pywikibot.output('\n== {} =='.format(longtext[0]))
+                pywikibot.output(longtext[1])
+                pywikibot.input('(press enter)')
 
     @staticmethod
     def definedescription(language, existingdescription, suggestions):
@@ -1054,7 +1070,7 @@ class DataExtendBot(SingleSiteBot):
                 pywikibot.output('{}: No description'.format(i))
             else:
                 pywikibot.output('{}: {}'.format(i, pos))
-        answer = input('Which one to choose? ')
+        answer = pywikibot.input('Which one to choose? ')
         try:
             answer = int(answer)
         except ValueError:
@@ -1083,12 +1099,13 @@ class DataExtendBot(SingleSiteBot):
             for language in realnewnames.keys():
                 for name in realnewnames[language]:
                     pywikibot.output('{}: {}'.format(language, name))
-            result = input('Add these names? (y/n/[S]elect/x) ')
+            result = pywikibot.input('Add these names? (y/n/[S]elect/x) ')
             if not result or result[0].upper() not in 'YNX':
                 chosennewnames = defaultdict(list)
                 for language in realnewnames.keys():
                     for name in realnewnames[language]:
-                        result = input('{}: {} - '.format(language, name))
+                        result = pywikibot.input(
+                            '{}: {} - '.format(language, name))
                         if (not result) or result[0].upper() == 'Y':
                             chosennewnames[language].append(name)
                         elif result[0].upper() == 'X':
@@ -1257,10 +1274,10 @@ class Analyzer:
             return None
 
         pywikibot.output("Trying to get a {} out of '{}'".format(dtype, text))
-        pywikibot.output('Type Qnnn to let it point to Qnnn from now on, Xnnn '
-                         'to let it point to Qnnn only now, XXX to never use '
-                         'it, or nothing to not use it now')
-        answer = input()
+        answer = pywikibot.input(
+            'Type Qnnn to let it point to Qnnn from now on,\n'
+            'Xnnn to let it point to Qnnn only now,\n'
+            'XXX to never use it, or nothing to not use it now')
         if answer.startswith('Q'):
             self.data[dtype][text] = answer
         elif answer.upper() == 'XXX':
@@ -15405,7 +15422,6 @@ def main(*args: Tuple[str, ...]) -> None:
     @param args: command line arguments
     """
     item = None
-    prop = None
     options = {}
     unknownarguments = []
     local_args = pywikibot.handle_args(args)
@@ -15413,7 +15429,7 @@ def main(*args: Tuple[str, ...]) -> None:
         if arg.startswith('Q'):
             item = arg
         elif arg.startswith('P') or arg in ('Data', 'Wiki'):
-            prop = arg
+            options['restrict'] = arg
         elif arg == '-always':
             options['always'] = True
         else:
@@ -15431,8 +15447,8 @@ def main(*args: Tuple[str, ...]) -> None:
         except InvalidTitleError:
             pywikibot.exception()
         else:
-            bot = DataExtendBot(site=repo, **options)
-            bot.workon(item, prop)
+            bot = DataExtendBot(site=repo, generator=[item], **options)
+            bot.run()
 
 
 if __name__ == '__main__':
