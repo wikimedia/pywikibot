@@ -1349,8 +1349,9 @@ class Request(MutableMapping):
                 action: {'result': 'Success', 'nochange': ''},
 
                 # wikibase results
-                'pageinfo': {'lastrevid': -1},
                 'entity': {'lastrevid': -1},
+                'pageinfo': {'lastrevid': -1},
+                'reference': {'hash': -1},
             }
         return None
 
