@@ -293,7 +293,6 @@ def find_alternates(filename, script_paths):
     """Search for similar filenames in the given script paths."""
     from pywikibot import config, input_choice, output
     from pywikibot.bot import QuitKeyboardInterrupt, ShowingListOption
-    from pywikibot.tools.formatter import color_format
 
     assert config.pwb_close_matches > 0, \
         'config.pwb_close_matches must be greater than 0'
@@ -324,11 +323,10 @@ def find_alternates(filename, script_paths):
     if len(similar_scripts) == 1:
         script = similar_scripts[0]
         wait_time = config.pwb_autostart_waittime
-        output(color_format(
-            'NOTE: Starting the most similar script '
-            '{lightyellow}{0}.py{default}\n'
-            '      in {1} seconds; type CTRL-C to stop.',
-            script, wait_time))
+        output('NOTE: Starting the most similar script '
+               '<<lightyellow>>{}.py<<default>>\n'
+               '      in {} seconds; type CTRL-C to stop.'
+               .format(script, wait_time))
         try:
             sleep(wait_time)  # Wait a bit to let it be cancelled
         except KeyboardInterrupt:
