@@ -91,6 +91,8 @@ Furthermore, the following command line parameters are supported:
 
 -always           Don't prompt you for each replacement
 
+-quiet            Don't prompt a message if a page keeps unchanged
+
 -recursive        Recurse replacement as long as possible. Be careful, this
                   might lead to an infinite loop.
 
@@ -532,6 +534,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
         self.available_options.update({
             'addcat': None,
             'allowoverlap': False,
+            'quiet': False,
             'recursive': False,
             'sleep': 0.0,
             'summary': None,
@@ -686,8 +689,9 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                     break
 
             if new_text == original_text:
-                pywikibot.output('No changes were necessary in '
-                                 + page.title(as_link=True))
+                if not self.opt.quiet:
+                    pywikibot.output('No changes were necessary in '
+                                     + page.title(as_link=True))
                 return
 
             if self.opt.addcat:
@@ -933,7 +937,7 @@ def main(*args: str) -> None:
             fixes_set.append(value)
         elif opt == '-sleep':
             options['sleep'] = float(value)
-        elif opt in ('-allowoverlap', '-always', '-recursive'):
+        elif opt in ('-allowoverlap', '-always', '-quiet', '-recursive'):
             options[opt[1:]] = True
         elif opt == '-nocase':
             flags |= re.IGNORECASE
