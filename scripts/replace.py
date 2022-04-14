@@ -153,7 +153,7 @@ from pywikibot import editor, fixes, i18n, pagegenerators, textlib
 from pywikibot.backports import Dict, Generator, List, Pattern, Tuple
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 from pywikibot.exceptions import InvalidPageError, NoPageError
-from pywikibot.tools import chars, deprecated
+from pywikibot.tools import chars
 
 
 # This is required for the text that is shown when you run this script
@@ -382,15 +382,12 @@ class ReplacementListEntry(ReplacementBase):
         return _get_text_exceptions(self.fix_set.exceptions or {})
 
 
-@deprecated('pagegenerators.XMLDumpPageGenerator', since='7.1.0')
 class XmlDumpReplacePageGenerator:
 
     """
     Iterator that will yield Pages that might contain text to replace.
 
     These pages will be retrieved from a local XML dump file.
-
-    .. deprecated:: 7.1
 
     :param xmlFilename: The dump's path, either absolute or relative
     :param xmlStart: Skip all articles in the dump before this one
@@ -1079,8 +1076,8 @@ def main(*args: str) -> None:
     precompile_exceptions(exceptions, regex, flags)
 
     if xmlFilename:
-        gen = pagegenerators.XMLDumpPageGenerator(
-            xmlFilename, xmlStart, namespaces=genFactory.namespaces, site=site)
+        gen = XmlDumpReplacePageGenerator(xmlFilename, xmlStart,
+                                          replacements, exceptions, site)
     elif sql_query is not None:
         # Only -excepttext option is considered by the query. Other
         # exceptions are taken into account by the ReplaceRobot
