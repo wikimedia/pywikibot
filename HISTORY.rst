@@ -9,7 +9,7 @@ Release history
 * Add support for guwwiki and shnwikivoyage (:phab:`T303762`, :phab:`T302799`)
 * TextExtracts support was aded (:phab:`T72682`)
 * Unused `get_redirect` parameter of Page.getOldVersion() has been dropped
-* Provide BasePage.get_parsed_page() a public method
+* Provide BasePage.get_parsed_page() as a public method
 * Provide BuiltinNamespace.canonical_namespaces() with BuiltinNamespace IntEnum
 * BuiltinNamespace got a canonical() method
 * Enable nested templates with MultiTemplateMatchBuilder (:phab:`T110529`)

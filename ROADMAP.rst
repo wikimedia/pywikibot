@@ -1,7 +1,14 @@
 Current release 7.2.0
 ^^^^^^^^^^^^^^^^^^^^^
 
-* Add Lexeme support for Lexicographical data (:phab:`T189321`)
+* Fix Page.revisions() with starttime (:phab:`T109181`)
+* Use stream_output for messages inside input_list_choice method (:phab:`T305940`)
+* Expand simulate query result (:phab:`T305918`)
+* Do not delete text when updating a Revision (:phab:`T304786`)
+* Re-enable scripts package version check with pwb wrapper (:phab:`T305799`)
+* Provide textlib.ignore_case() as a public method
+* Don't try to upcast timestamp from global userinfo if global account does not exists (:phab:`T305351`)
+* Add Lexeme support for Lexicographical data (:phab:`T189321`, :phab:`T305297`)
 * enable all parameters of `APISite.imageusage()` with `FilePage.usingPages()`
 * Don't raise `NoPageError` with `file_is_shared` (:phab:`T305182`)
 * Fix URL of GoogleOCR

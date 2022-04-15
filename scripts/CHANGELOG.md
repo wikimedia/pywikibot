@@ -3,8 +3,14 @@
 ## 7.2.0
 *In development*
 
+### general
+* Archived scripts were removed
+
 ### checkimages
 * Use `itertools.zip_longest` to find the most important image
+
+### dataextend
+* This new script was added. It is able to add properties, identifiers and sources to WikiBase items
 
 ### image
 * Fix image regex (:phab:`T305226`, :phab:`T305227`)
