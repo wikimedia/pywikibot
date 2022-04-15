@@ -148,7 +148,7 @@ class RedirectGenerator(OptionHandler):
         xmlFilename = self.opt.xml
         redict = {}
         # open xml dump and read page titles out of it
-        dump = xmlreader.XmlDump(xmlFilename)
+        dump = xmlreader.XmlDump(xmlFilename, on_error=pywikibot.error)
         redirR = self.site.redirect_regex
         readPagesCount = 0
         pageTitles = set()

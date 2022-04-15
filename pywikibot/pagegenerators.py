@@ -2815,7 +2815,7 @@ class XMLDumpPageGenerator(abc.Iterator):  # type: ignore[type-arg]
             self.namespaces = self.site.namespaces
         else:
             self.namespaces = self.site.namespaces.resolve(namespaces)
-        dump = xmlreader.XmlDump(filename)
+        dump = xmlreader.XmlDump(filename, on_error=pywikibot.error)
         self.parser = dump.parse()
 
     def __next__(self) -> 'pywikibot.page.Page':

@@ -423,7 +423,7 @@ class XmlDumpReplacePageGenerator:
             self.site = site
         else:
             self.site = pywikibot.Site()
-        dump = xmlreader.XmlDump(self.xmlFilename)
+        dump = xmlreader.XmlDump(self.xmlFilename, on_error=pywikibot.error)
         self.parser = dump.parse()
 
     def __iter__(self):
