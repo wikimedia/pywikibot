@@ -15,10 +15,13 @@ after that (including new identifiers added while working on those
 identifiers). With a '*' after it, the identifier itself is skipped, but
 those coming after it (not those coming before it) are included.
 
-There is currently one argument defined:
+The following parameters are supported:
 
--always   If this is supplied, the bot will not ask for permission after
-          each external link has been handled.
+-always    If this is supplied, the bot will not ask for permission
+           after each external link has been handled.
+
+-showonly  Only show claims for a given ItemPage. Don't try to add any
+           properties
 
 The bot will load the corresponding pages for these identifiers, and try
 to the meaning of that string for the specified type of thing (for
@@ -69,7 +72,7 @@ from urllib.request import urlopen
 
 import pywikibot
 from pywikibot.backports import List
-from pywikibot.bot import input_yn, SingleSiteBot
+from pywikibot.bot import input_yn, SingleSiteBot, suggest_help
 from pywikibot.data import sparql
 from pywikibot.exceptions import (
     APIError,
@@ -81,7 +84,10 @@ from pywikibot.exceptions import (
 
 class DataExtendBot(SingleSiteBot):
 
-    update_options = {'restrict': ''}
+    update_options = {
+        'restrict': '',
+        'showonly': False,
+    }
 
     """The Bot."""
 
@@ -443,6 +449,7 @@ class DataExtendBot(SingleSiteBot):
         return result
 
     def showclaims(self, claims):
+        pywikibot.output('Current information:')
         for prop in claims:
             for claim in claims[prop]:
                 if claim.type == 'wikibase-item':
@@ -718,10 +725,13 @@ class DataExtendBot(SingleSiteBot):
 
     def treat(self, item) -> None:
         """Process the ItemPage."""
-        longtexts = []
         item.get()
-        pywikibot.output('Current information:')
         claims = item.claims
+        self.showclaims(claims)
+        if self.opt.showonly:
+            return
+
+        longtexts = []
         descriptions = item.descriptions
         labels = item.labels
         aliases = item.aliases
@@ -730,7 +740,6 @@ class DataExtendBot(SingleSiteBot):
             prop: claims[prop]
             for prop in claims
         }
-        self.showclaims(claims)
         dorestrict = True
         continueafterrestrict = False
         if self.opt.restrict and self.opt.restrict.endswith('+'):
@@ -15423,32 +15432,31 @@ def main(*args: Tuple[str, ...]) -> None:
     """
     item = None
     options = {}
-    unknownarguments = []
+    unknown_parameters = []
     local_args = pywikibot.handle_args(args)
     for arg in local_args:
         if arg.startswith('Q'):
             item = arg
         elif arg.startswith('P') or arg in ('Data', 'Wiki'):
             options['restrict'] = arg
-        elif arg == '-always':
-            options['always'] = True
+        elif arg in ('-always', '-showonly'):
+            options[arg[1:]] = True
         else:
-            unknownarguments.append(arg)
+            unknown_parameters.append(arg)
 
-    if unknownarguments:
-        pywikibot.output('Unknown argument(s) found: %s'
-                         % (', '.join(unknownarguments)))
-    elif item is None:
-        pywikibot.output('No item page specified')
+    if suggest_help(unknown_parameters=unknown_parameters,
+                    additional_text='No item page specified'
+                    if item is None else ''):
+        return
+
+    repo = pywikibot.Site().data_repository()
+    try:
+        item = pywikibot.ItemPage(repo, item)
+    except InvalidTitleError:
+        pywikibot.exception()
     else:
-        repo = pywikibot.Site().data_repository()
-        try:
-            item = pywikibot.ItemPage(repo, item)
-        except InvalidTitleError:
-            pywikibot.exception()
-        else:
-            bot = DataExtendBot(site=repo, generator=[item], **options)
-            bot.run()
+        bot = DataExtendBot(site=repo, generator=[item], **options)
+        bot.run()
 
 
 if __name__ == '__main__':
