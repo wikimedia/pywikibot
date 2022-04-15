@@ -381,7 +381,7 @@ fixes = {
             r'-search:insource:/nowiki\>ISBN:? *(?:&nbsp;|&\#160;)? *[0-9]/',
             '-namespace:0'],
         'regex': True,
-        'msg': 'isbn-formatting',  # use i18n translations
+        'msg': 'pywikibot-fixes-isbn',
         'replacements': [
             # Remove colon between the word ISBN and the number
             (r'ISBN: (\d+)', r'ISBN \1'),
