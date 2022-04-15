@@ -23,13 +23,14 @@ various pages for Proofread Extensions are defines in
 import re
 from collections import Counter, defaultdict
 from contextlib import suppress
+from itertools import islice
 from textwrap import shorten, wrap
 from typing import Optional, Union
 from urllib.parse import quote_from_bytes
 from warnings import warn
 
 import pywikibot
-from pywikibot import config, date, i18n, textlib
+from pywikibot import Timestamp, config, date, i18n, textlib
 from pywikibot.backports import Generator, Iterable, List
 from pywikibot.cosmetic_changes import CANCEL, CosmeticChangesToolkit
 from pywikibot.exceptions import (
@@ -1679,8 +1680,24 @@ class BasePage(ComparableMixin):
         self.site.loadrevisions(self, content=content, rvdir=reverse,
                                 starttime=starttime, endtime=endtime,
                                 total=total)
-        return (self._revisions[rev] for rev in
-                sorted(self._revisions, reverse=not reverse)[:total])
+
+        revs = self._revisions.values()
+
+        if starttime or endtime:
+            t_min, t_max = Timestamp.min, Timestamp.max
+
+            if reverse:
+                t0 = Timestamp.fromISOformat(starttime) if starttime else t_min
+                t1 = Timestamp.fromISOformat(endtime) if endtime else t_max
+            else:
+                t0 = Timestamp.fromISOformat(endtime) if endtime else t_min
+                t1 = Timestamp.fromISOformat(starttime) if starttime else t_max
+
+            revs = [rev for rev in revs if t0 <= rev.timestamp <= t1]
+
+        revs = sorted(revs, reverse=not reverse, key=lambda rev: rev.timestamp)
+
+        return islice(revs, total)
 
     def getVersionHistoryTable(self,
                                reverse: bool = False,

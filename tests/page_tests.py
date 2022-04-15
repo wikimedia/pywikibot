@@ -8,6 +8,7 @@
 import pickle
 import re
 from contextlib import suppress
+from datetime import timedelta
 from unittest import mock
 
 import pywikibot
@@ -885,6 +886,38 @@ class TestPageHistory(DefaultSiteTestCase):
         top_two_edit_count = mp.revision_count(top_two_usernames)
         self.assertIsInstance(top_two_edit_count, int)
         self.assertEqual(top_two_edit_count, sum(top_two_counts))
+
+    def test_revisions_time_interval_false(self):
+        """Test Page.revisions() with reverse=False."""
+        mp = self.get_mainpage()
+
+        latest_rev = mp.latest_revision
+        oldest_rev = mp.oldest_revision
+        oldest_ts = oldest_rev.timestamp
+
+        [rev] = list(mp.revisions(total=1))
+        self.assertEqual(rev.revid, latest_rev.revid)
+
+        ts = oldest_ts + timedelta(seconds=1)
+        [rev] = list(mp.revisions(total=1, starttime=ts.isoformat()))
+        self.assertEqual(rev.revid, oldest_rev.revid)
+
+    def test_revisions_time_interval_true(self):
+        """Test Page.revisions() with reverse=True."""
+        mp = self.get_mainpage()
+
+        latest_rev = mp.latest_revision
+        latest_ts = latest_rev.timestamp
+        oldest_rev = mp.oldest_revision
+
+        [rev] = list(mp.revisions(total=1, reverse=True))
+        self.assertEqual(rev.revid, oldest_rev.revid)
+
+        ts = latest_ts - timedelta(seconds=1)
+        [rev] = list(mp.revisions(total=1,
+                                  starttime=ts.isoformat(),
+                                  reverse=True))
+        self.assertEqual(rev.revid, latest_rev.revid)
 
 
 class TestPageRedirects(TestCase):
