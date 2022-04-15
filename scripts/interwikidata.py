@@ -161,12 +161,14 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
         """Clean interwiki links from the page."""
         if not self.iwlangs:
             return
+
         dbnames = [iw_site.dbName() for iw_site in self.iwlangs]
-        if set(dbnames) - set(self.current_item.sitelinks.keys()):
-            if not self.handle_complicated():
-                warning('Interwiki conflict in {}, skipping...'
-                        .format(self.current_page.title(as_link=True)))
-                return
+        if set(dbnames) - set(self.current_item.sitelinks.keys()) \
+           and not self.handle_complicated():
+            warning('Interwiki conflict in {}, skipping...'
+                    .format(self.current_page.title(as_link=True)))
+            return
+
         output('Cleaning up the page')
         new_text = pywikibot.textlib.removeLanguageLinks(
             self.current_page.text, site=self.current_page.site)

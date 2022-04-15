@@ -268,9 +268,9 @@ def error_handling_callback(response):
     :type response: :py:obj:`requests.Response`
     """
     # TODO: do some error correcting stuff
-    if isinstance(response, requests.exceptions.SSLError):
-        if SSL_CERT_VERIFY_FAILED_MSG in str(response):
-            raise FatalServerError(str(response))
+    if isinstance(response, requests.exceptions.SSLError) \
+       and SSL_CERT_VERIFY_FAILED_MSG in str(response):
+        raise FatalServerError(str(response))
 
     if isinstance(response, requests.ConnectionError):
         msg = str(response)

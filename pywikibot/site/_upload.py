@@ -170,10 +170,9 @@ class Uploader:
 
         if report_success is None:
             report_success = isinstance(ignore_warnings, bool)
-        if report_success is True:
-            if not isinstance(ignore_warnings, bool):
-                raise ValueError('report_success may only be set to True when '
-                                 'ignore_warnings is a boolean')
+        if report_success is True and not isinstance(ignore_warnings, bool):
+            raise ValueError('report_success may only be set to True when '
+                             'ignore_warnings is a boolean')
         if isinstance(ignore_warnings, Iterable):
             ignored_warnings = ignore_warnings
 
