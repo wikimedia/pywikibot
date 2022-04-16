@@ -21,6 +21,101 @@ class TestTimestamp(TestCase):
 
     net = False
 
+    test_results = {
+        'MW': [
+            ['20090213233130', '1234567890.000000'],
+        ],
+        'ISO8601': [
+            ['2009-02-13T23:31:30Z', '1234567890.000000'],
+            ['2009-02-13T23:31:30', '1234567890.000000'],
+            ['2009-02-13T23:31:30.123Z', '1234567890.123000'],
+            ['2009-02-13T23:31:30.123', '1234567890.123000'],
+            ['2009-02-13T23:31:30.123456Z', '1234567890.123456'],
+            ['2009-02-13T23:31:30.123456', '1234567890.123456'],
+            ['2009-02-13T23:31:30,123456Z', '1234567890.123456'],
+            ['2009-02-13T23:31:30,123456', '1234567890.123456'],
+            ['2009-02-14T00:31:30+0100', '1234567890.000000'],
+            ['2009-02-13T22:31:30-0100', '1234567890.000000'],
+            ['2009-02-14T00:31:30+01:00', '1234567890.000000'],
+            ['2009-02-13T22:31:30-01:00', '1234567890.000000'],
+            ['2009-02-13T23:41:30+00:10', '1234567890.000000'],
+            ['2009-02-13T23:21:30-00:10', '1234567890.000000'],
+            ['2009-02-14T00:31:30.123456+01', '1234567890.123456'],
+            ['2009-02-13T22:31:30.123456-01', '1234567890.123456'],
+            ['2009-02-14 00:31:30.123456+01', '1234567890.123456'],
+            ['2009-02-13 22:31:30.123456-01', '1234567890.123456'],
+        ],
+        'POSIX': [
+            ['1234567890', '1234567890.000000'],
+            ['-1234567890', '-1234567890.000000'],
+            ['1234567890.123', '1234567890.123000'],
+            ['-1234567890.123', '-1234567890.123000'],
+            ['1234567890.123456', '1234567890.123456'],
+            ['-1234567890.123456', '-1234567890.123456'],
+            ['1234567890.000001', '1234567890.000001'],
+            ['-1234567890.000001', '-1234567890.000001'],
+        ],
+        'INVALID': [
+            ['200902132331309999', None],
+            ['2009-99-99 22:31:30.123456-01', None],
+            ['1234567890.1234569999', None],
+        ],
+    }
+
+    def test_set_from_timestamp(self):
+        """Test creating instance from Timestamp string."""
+        t1 = Timestamp.utcnow()
+        t2 = Timestamp.set_timestamp(t1)
+        self.assertEqual(t1, t2)
+        self.assertIsInstance(t2, Timestamp)
+
+    def test_set_from_datetime(self):
+        """Test creating instance from datetime.datetime string."""
+        t1 = datetime.datetime.utcnow()
+        t2 = Timestamp.set_timestamp(t1)
+        self.assertEqual(t1, t2)
+        self.assertIsInstance(t2, datetime.datetime)
+
+    @staticmethod
+    def _compute_posix(timestr):
+        """Compute POSIX timestamp with independent method."""
+        sec, usec = map(int, timestr.split('.'))
+
+        if sec < 0 and usec > 0:
+            sec = sec - 1
+            usec = 1000000 - usec
+
+        return (datetime.datetime(1970, 1, 1)
+                + datetime.timedelta(seconds=sec, microseconds=usec))
+
+    def _test_set_from_string_fmt(self, fmt):
+        """Test creating instance from <FMT> string."""
+        for timestr, posix in self.test_results[fmt]:
+            with self.subTest(timestr):
+                ts = Timestamp.set_timestamp(timestr)
+                self.assertEqual(ts, self._compute_posix(posix))
+                self.assertEqual(ts.posix_timestamp_format(), posix)
+
+    def test_set_from_string_mw(self):
+        """Test creating instance from MW string."""
+        self._test_set_from_string_fmt('MW')
+
+    def test_set_from_string_iso8601(self):
+        """Test creating instance from ISO8601 string."""
+        self._test_set_from_string_fmt('ISO8601')
+
+    def test_set_from_string_posix(self):
+        """Test creating instance from POSIX string."""
+        self._test_set_from_string_fmt('POSIX')
+
+    def test_set_from_string_invalid(self):
+        """Test failure creating instance from invalid string."""
+        for timestr, posix in self.test_results['INVALID']:
+            regex = "time data \'[^\']*?\' does not match"
+            with self.subTest(timestr):
+                self.assertRaisesRegex(ValueError, regex,
+                                       Timestamp.set_timestamp, timestr)
+
     def test_clone(self):
         """Test cloning a Timestamp instance."""
         t1 = Timestamp.utcnow()
@@ -57,6 +152,7 @@ class TestTimestamp(TestCase):
         self.assertEqual(date, str(t1.date()))
         self.assertEqual(time, str(t1.time()))
 
+    @unittest.expectedFailure
     def test_iso_format_with_sep(self):
         """Test conversion from and to ISO format with separator."""
         sep = '*'

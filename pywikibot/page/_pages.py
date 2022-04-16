@@ -1675,11 +1675,11 @@ class BasePage(ComparableMixin):
             t_min, t_max = Timestamp.min, Timestamp.max
 
             if reverse:
-                t0 = Timestamp.fromISOformat(starttime) if starttime else t_min
-                t1 = Timestamp.fromISOformat(endtime) if endtime else t_max
+                t0 = Timestamp.set_timestamp(starttime) if starttime else t_min
+                t1 = Timestamp.set_timestamp(endtime) if endtime else t_max
             else:
-                t0 = Timestamp.fromISOformat(endtime) if endtime else t_min
-                t1 = Timestamp.fromISOformat(starttime) if starttime else t_max
+                t0 = Timestamp.set_timestamp(endtime) if endtime else t_min
+                t1 = Timestamp.set_timestamp(starttime) if starttime else t_max
 
             revs = [rev for rev in revs if t0 <= rev.timestamp <= t1]
 
