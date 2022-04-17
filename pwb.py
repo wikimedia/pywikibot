@@ -154,15 +154,6 @@ def run_python_file(filename, args, package=None):
 # end of snippet from coverage
 
 
-def abspath(path):
-    """Convert path to absolute path, with uppercase drive letter on win32."""
-    path = os.path.abspath(path)
-    if path[0] != '/':
-        # normalise Windows drive letter
-        path = path[0].upper() + path[1:]
-    return path
-
-
 def handle_args(pwb_py, *args):
     """Handle args and get filename.
 
@@ -438,16 +429,15 @@ def execute():
     # This is a rough (and quick!) emulation of 'package name' detection.
     # a much more detailed implementation is in coverage's find_module.
     # https://bitbucket.org/ned/coveragepy/src/default/coverage/execfile.py
-    cwd = abspath(os.getcwd())
-    absolute_path = abspath(os.path.dirname(sys.argv[0]))
-    if absolute_path == cwd:
-        absolute_filename = abspath(filename)[:len(cwd)]
-        if absolute_filename == cwd:
-            relative_filename = os.path.relpath(filename)
-            # remove the filename, and use '.' instead of path separator.
-            file_package = os.path.dirname(
-                relative_filename).replace(os.sep, '.')
-            filename = os.path.join(os.curdir, relative_filename)
+    cwd = Path.cwd()
+    syspath = Path(sys.argv[0])
+    absolute_path = syspath.parent
+    file_path = Path(filename)
+    if absolute_path == cwd and cwd in file_path.parents:
+        relative_filename = file_path.relative_to(absolute_path)
+        # remove the filename, and use '.' instead of path separator.
+        file_package = str(relative_filename.parent).replace(os.sep, '.')
+        filename = os.path.join(os.curdir, str(relative_filename))
 
     module = None
     if file_package:
