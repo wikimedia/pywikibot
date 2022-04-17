@@ -13,8 +13,6 @@ XmlEntry objects which can be used by other bots.
 # Distributed under the terms of the MIT license.
 #
 import re
-import threading
-import xml.sax
 from xml.etree.ElementTree import iterparse
 
 from pywikibot.tools import open_archive
@@ -64,29 +62,6 @@ class XmlEntry:
         self.revisionid = revisionid
         self.comment = comment
         self.isredirect = redirect
-
-
-class XmlParserThread(threading.Thread):
-
-    """
-    XML parser that will run as a single thread.
-
-    This allows the XmlDump
-    generator to yield pages before the parser has finished reading the
-    entire dump.
-
-    There surely are more elegant ways to do this.
-    """
-
-    def __init__(self, filename, handler) -> None:
-        """Initializer."""
-        super().__init__()
-        self.filename = filename
-        self.handler = handler
-
-    def run(self) -> None:
-        """Parse the file in a single thread."""
-        xml.sax.parse(self.filename, self.handler)
 
 
 class XmlDump:
