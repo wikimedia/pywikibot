@@ -58,12 +58,12 @@ from enum import IntEnum
 from functools import partial
 from http import HTTPStatus
 from textwrap import shorten
-from typing import Optional
 
 import pywikibot
 from pywikibot import comms, config, i18n, pagegenerators, textlib
-from pywikibot.backports import Match, removeprefix
+from pywikibot.backports import removeprefix
 from pywikibot.bot import ConfigParserBot, ExistingPageBot, SingleSiteBot
+from pywikibot.comms.http import get_charset_from_content_type
 from pywikibot.exceptions import (
     FatalServerError,
     Server414Error,
@@ -474,9 +474,6 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
         # Regex to grasp content-type meta HTML tag in HTML source
         self.META_CONTENT = re.compile(
             br'(?i)<meta[^>]*(?:content\-type|charset)[^>]*>')
-        # Extract the encoding from a charset property (from content-type !)
-        self.CHARSET = re.compile(
-            r'(?i)charset\s*=\s*(?P<enc>(?P<q>[\'"]?)[^\'",;>/]*(?P=q))')
         # Extract html title from page
         self.TITLE = re.compile(r'(?is)(?<=<title>).*?(?=</title>)')
         # Matches content inside <script>/<style>/HTML comments
@@ -548,21 +545,6 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
             pywikibot.warning("You can't edit page {page}" .format(page=page))
             return True
         return super().skip_page(page)
-
-    @staticmethod
-    def charset(enc: Match) -> Optional[str]:
-        """Find an encoding type."""
-        if enc:
-            # Use encoding if found. Else use chardet apparent encoding
-            encoding = enc.group('enc').strip('"\' ').lower()
-            # Convert to python correct encoding names
-            if re.sub(r'[ _\-]', '', encoding) == 'xeucjp':
-                encoding = 'euc_jp'
-            else:
-                # fix cp encodings (T304830)
-                encoding = re.sub(r'\Acp[ _\-](\d{3,4})', r'cp\1', encoding)
-            return encoding
-        return None
 
     def treat(self, page) -> None:
         """Process one page."""
@@ -664,14 +646,12 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
             linkedpagetext = self.NON_HTML.sub(b'', linkedpagetext)
 
             meta_content = self.META_CONTENT.search(linkedpagetext)
-            s = None
+            encoding = None
             if content_type:
-                # use charset from http header
-                s = self.CHARSET.search(content_type)
+                encoding = get_charset_from_content_type(content_type)
 
             if meta_content:
                 tag = None
-                encoding = self.charset(s)
                 encodings = [encoding] if encoding else []
                 encodings += list(page.site.encodings())
                 for enc in encodings:
@@ -679,14 +659,12 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
                         tag = meta_content.group().decode(enc)
                         break
 
-                # Prefer the contentType from the HTTP header :
+                # Prefer the content-type from the HTTP header
                 if not content_type and tag:
                     content_type = tag
-                if not s:
-                    # use charset from html
-                    s = self.CHARSET.search(tag)
+                if not encoding:
+                    encoding = get_charset_from_content_type(tag)
 
-            encoding = self.charset(s)
             if encoding:
                 r.encoding = encoding
 

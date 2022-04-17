@@ -403,6 +403,20 @@ class CharsetTestCase(TestCase):
         resp.encoding = http._decide_encoding(resp, charset)
         self.assertEqual('latin1', resp.encoding)
 
+    def test_charset_not_last(self):
+        """Test charset not last part of content-type header."""
+        charset = None
+        resp = CharsetTestCase._create_response(
+            headers={
+                'content-type': (
+                    'text/html; charset=utf-8; profile='
+                    '"https://www.mediawiki.org/wiki/Specs/HTML/2.4.0"'
+                )
+            },
+            data=CharsetTestCase.UTF8_BYTES)
+        resp.encoding = http._decide_encoding(resp, charset)
+        self.assertEqual('utf-8', resp.encoding)
+
     def test_server_charset(self):
         """Test decoding with server explicit charset."""
         charset = None

@@ -395,6 +395,31 @@ def fetch(uri: str, method: str = 'GET', headers: Optional[dict] = None,
     return response
 
 
+# Extract charset (from content-type header)
+CHARSET_RE = re.compile(
+    r'charset\s*=\s*(?P<q>[\'"]?)(?P<charset>[^\'",;>/]+)(?P=q)',
+    flags=re.I,
+)
+
+
+def get_charset_from_content_type(content_type: str) -> Optional[str]:
+    """Get charset from the content-type header.
+
+    .. versionadded:: 7.3
+    """
+    m = CHARSET_RE.search(content_type)
+    if not m:
+        return None
+    charset = m.group('charset').strip('"\' ').lower()
+    # Convert to python correct encoding names
+    if re.sub(r'[ _\-]', '', charset) == 'xeucjp':
+        charset = 'euc_jp'
+    else:
+        # fix cp encodings (T304830)
+        charset = re.sub(r'\Acp[ _\-](\d{3,4})', r'cp\1', charset)
+    return charset
+
+
 def _get_encoding_from_response_headers(response) -> Optional[str]:
     """Return charset given by the response header."""
     content_type = response.headers.get('content-type')
@@ -402,9 +427,9 @@ def _get_encoding_from_response_headers(response) -> Optional[str]:
     if not content_type:
         return None
 
-    m = re.search('charset=(?P<charset>.*?$)', content_type)
-    if m:
-        header_encoding = m.group('charset')
+    charset = get_charset_from_content_type(content_type)
+    if charset:
+        header_encoding = charset
     elif 'json' in content_type:
         # application/json | application/sparql-results+json
         header_encoding = 'utf-8'
