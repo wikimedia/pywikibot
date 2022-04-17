@@ -158,7 +158,7 @@ globalbadtitles = r"""
             403[ ]forbidden
             |(404|page|file|information|resource).*not([ ]*be)?[ ]*
             (available|found)
-            |are[ ]robot
+            |are[ ](?:.+?[ ])?robot
             |site.*disabled
             |error[ ]404
             |error.+not[ ]found
