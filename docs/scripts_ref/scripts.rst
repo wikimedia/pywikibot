@@ -8,7 +8,6 @@ Subpackages
 
 .. toctree::
 
-    scripts.archive
     scripts.i18n
     scripts.maintenance
     scripts.userscripts
