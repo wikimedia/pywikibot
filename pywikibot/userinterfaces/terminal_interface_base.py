@@ -50,9 +50,9 @@ colors = [
     'white',
 ]
 
-_color_pat = '{}|previous'.format('|'.join(colors))
-colorTagR = re.compile('\03{{((:?{cpat});?(:?{cpat})?)}}'
-                       .format(cpat=_color_pat))
+_color_pat = '((:?{0});?(:?{0})?)'.format('|'.join(colors + ['previous']))
+old_colorTagR = re.compile('\03{{{cpat}}}'.format(cpat=_color_pat))
+new_colorTagR = re.compile('<<{cpat}>>'.format(cpat=_color_pat))
 
 
 class UI(ABUIC):
@@ -195,7 +195,14 @@ class UI(ABUIC):
         # Color tags might be cascaded, e.g. because of transliteration.
         # Therefore we need this stack.
         color_stack = ['default']
-        text_parts = colorTagR.split(text) + ['default']
+        old_parts = old_colorTagR.split(text)
+        new_parts = new_colorTagR.split(text)
+        if min(len(old_parts), len(new_parts)) > 1:
+            raise ValueError('Old color format must not be mixed with new '
+                             'color format. Found:\n'
+                             + text.replace('\03', '\\03'))
+        text_parts = old_parts if len(old_parts) > 1 else new_parts
+        text_parts += ['default']
         # match.split() includes every regex group; for each matched color
         # fg_col:b_col, fg_col and bg_col are added to the resulting list.
         len_text_parts = len(text_parts[::4])
