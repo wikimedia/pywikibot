@@ -515,6 +515,7 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot):
 
     """References section bot."""
 
+    use_disambigs = False
     use_redirects = False
 
     def __init__(self, **kwargs) -> None:
@@ -708,11 +709,6 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot):
 
     def skip_page(self, page):
         """Check whether the page could be processed."""
-        if page.isDisambig():
-            pywikibot.output('Page {} is a disambig; skipping.'
-                             .format(page.title(as_link=True)))
-            return True
-
         if self.site.sitename == 'wikipedia:en' and page.isIpEdit():
             pywikibot.warning(
                 'Page {} is edited by IP. Possible vandalized'
