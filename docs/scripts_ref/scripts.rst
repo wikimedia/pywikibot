@@ -97,6 +97,11 @@ delete script
 
 .. automodule:: scripts.delete
 
+delinker script
+---------------
+
+.. automodule:: scripts.delinker
+
 djvutext script
 ---------------
 .. automodule:: scripts.djvutext

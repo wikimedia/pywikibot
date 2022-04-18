@@ -19,6 +19,11 @@ coordinate\_import script
 .. automodule:: scripts.coordinate_import
    :no-members:
 
+delinker script
+---------------
+.. automodule:: scripts.delinker
+   :no-members:
+
 djvutext script
 ---------------
 .. automodule:: scripts.djvutext
