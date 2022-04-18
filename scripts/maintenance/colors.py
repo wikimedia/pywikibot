@@ -1,13 +1,12 @@
 #!/usr/bin/python3
 """Utility to show pywikibot colors."""
 #
-# (C) Pywikibot team, 2016-2020
+# (C) Pywikibot team, 2016-2022
 #
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
 from pywikibot.tools import itergroup
-from pywikibot.tools.formatter import color_format
 from pywikibot.userinterfaces.terminal_interface_base import colors
 
 
@@ -31,9 +30,9 @@ def main():
             line = ''
             for fg_col in fg_col_group:
                 line += ' '
-                line += color_format('{color}{0}{default}',
-                                     fg_col.ljust(max_len_fg_colors),
-                                     color='{};{}'.format(fg_col, bg_col))
+                line += '<<{color}>>{}<<default>>'.format(
+                    fg_col.ljust(max_len_fg_colors),
+                    color='{};{}'.format(fg_col, bg_col))
 
             line = '{} {}'.format(bg_col.ljust(max_len_bc_color), line)
             pywikibot.output(line)

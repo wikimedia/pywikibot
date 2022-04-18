@@ -9,7 +9,7 @@ import unittest
 from contextlib import suppress
 
 from pywikibot.tools import formatter
-from tests.aspects import TestCase
+from tests.aspects import DeprecationTestCase, TestCase
 
 
 class TestListOutputter(TestCase):
@@ -29,8 +29,7 @@ class TestListOutputter(TestCase):
         self.assertEqual(outputter.out, '\nfoo\nbar\n')
 
 
-# TODO: add tests for background colors.
-class TestColorFormat(TestCase):
+class TestColorFormat(DeprecationTestCase):
 
     """Test color_format function in bot module."""
 
@@ -49,6 +48,7 @@ class TestColorFormat(TestCase):
         result = formatter.color_format(format_string, *args, **kwargs)
         self.assertEqual(result, expected)
         self.assertIsInstance(result, type(expected))
+        self.assertOneDeprecation()
 
     def test_no_colors(self):
         """Test without colors in template string."""

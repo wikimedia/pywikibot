@@ -23,7 +23,6 @@ from pywikibot import config
 from pywikibot.backports import List
 from pywikibot.bot import BaseBot, QuitKeyboardInterrupt
 from pywikibot.exceptions import APIError, FatalServerError, NoPageError
-from pywikibot.tools.formatter import color_format
 
 
 class UploadRobot(BaseBot):
@@ -328,9 +327,8 @@ class UploadRobot(BaseBot):
 
         while not self.description or self.verify_description:
             if not self.description:
-                pywikibot.output(color_format(
-                    '{lightred}It is not possible to upload a file '
-                    'without a description.{default}'))
+                pywikibot.output('<<lightred>>It is not possible to upload a '
+                                 'file without a description.<<default>>')
             assert not self.opt.always
             # if no description, ask if user want to add one or quit,
             # and loop until one is filled.

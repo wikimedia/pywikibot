@@ -79,7 +79,6 @@ from pywikibot.pagegenerators import (
 )
 from pywikibot.textlib import replaceExcept
 from pywikibot.tools.chars import string2html
-from pywikibot.tools.formatter import color_format
 from scripts import noreferences
 
 
@@ -598,9 +597,8 @@ class ReferencesRobot(SingleSiteBot,
                         # If file has a PDF suffix
                         self.getPDFTitle(ref, r)
                     else:
-                        pywikibot.output(color_format(
-                            '{lightyellow}WARNING{default} : media : {} ',
-                            ref.link))
+                        pywikibot.output('<<lightyellow>>WARNING<<default>> : '
+                                         'media : {} '.format(ref.link))
 
                     if not ref.title:
                         repl = ref.refLink()
@@ -609,9 +607,9 @@ class ReferencesRobot(SingleSiteBot,
                         ref.transform(ispdf=True)
                         repl = ref.refTitle()
                     else:
-                        pywikibot.output(color_format(
-                            '{lightyellow}WARNING{default} : '
-                            'PDF title blacklisted : {0} ', ref.title))
+                        pywikibot.output('<<lightyellow>>WARNING<<default>> : '
+                                         'PDF title blacklisted : {} '
+                                         .format(ref.title))
                         repl = ref.refLink()
 
                     new_text = new_text.replace(match.group(), repl)
@@ -623,16 +621,16 @@ class ReferencesRobot(SingleSiteBot,
                    and domain.findall(redir) == domain.findall(link):
                     if soft404.search(redir) \
                        and not soft404.search(ref.link):
-                        pywikibot.output(color_format(
-                            '{lightyellow}WARNING{default} : '
-                            'Redirect 404 : {0} ', ref.link))
+                        pywikibot.output('<<lightyellow>>WARNING<<default>> : '
+                                         'Redirect 404 : {} '
+                                         .format(ref.link))
                         continue
 
                     if dirIndex.match(redir) \
                        and not dirIndex.match(ref.link):
-                        pywikibot.output(color_format(
-                            '{lightyellow}WARNING{default} : '
-                            'Redirect to root : {0} ', ref.link))
+                        pywikibot.output('<<lightyellow>>WARNING<<default>> : '
+                                         'Redirect to root : {} '
+                                         .format(ref.link))
                         continue
 
                 if r.status_code != HTTPStatus.OK:
@@ -652,9 +650,8 @@ class ReferencesRobot(SingleSiteBot,
                 # example:
                 # http://www.adminet.com/jo/20010615¦/ECOC0100037D.html
                 # in [[fr:Cyanure]]
-                pywikibot.output(color_format(
-                    '{lightred}Bad link{default} : {0} in {1}',
-                    ref.url, page.title(as_link=True)))
+                pywikibot.output('<<lightred>>Bad link<<default>> : {} in {}'
+                                 .format(ref.url, page.title(as_link=True)))
                 continue
 
             except (ValueError,  # urllib3.LocationParseError derives from it
@@ -704,9 +701,8 @@ class ReferencesRobot(SingleSiteBot,
                 continue
 
             if not self.MIME.search(content_type):
-                pywikibot.output(color_format(
-                    '{lightyellow}WARNING{default} : media : {0} ',
-                    ref.link))
+                pywikibot.output('<<lightyellow>>WARNING<<default>> : media : '
+                                 '{} '.format(ref.link))
                 repl = ref.refLink()
                 new_text = new_text.replace(match.group(), repl)
                 continue
@@ -729,9 +725,9 @@ class ReferencesRobot(SingleSiteBot,
             if self.titleBlackList.match(ref.title):
                 repl = ref.refLink()
                 new_text = new_text.replace(match.group(), repl)
-                pywikibot.output(color_format(
-                    '{lightred}WARNING{default} {0} : '
-                    'Blacklisted title ({1})', ref.link, ref.title))
+                pywikibot.output('<<lightred>>WARNING<<default>> {} : '
+                                 'Blacklisted title ({})'
+                                 .format(ref.link, ref.title))
                 continue
 
             # Truncate long titles. 175 is arbitrary
@@ -765,8 +761,8 @@ class ReferencesRobot(SingleSiteBot,
         if self.site_stop_page and self.counter['write'] % 20 == 0:
             self.stop_page = pywikibot.Page(self.site, self.site_stop_page)
             if self.stop_page.exists():
-                pywikibot.output(color_format(
-                    '{lightgreen}Checking stop page...{default}'))
+                pywikibot.output(
+                    '<<lightgreen>>Checking stop page...<<default>>')
                 actual_rev = self.stop_page.latest_revision_id
                 if actual_rev != self.stop_page_rev_id:
                     pywikibot.output(

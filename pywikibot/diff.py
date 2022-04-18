@@ -16,7 +16,6 @@ from typing import Optional, Union
 import pywikibot
 from pywikibot.backports import Dict, Iterable, List, Sequence, Tuple
 from pywikibot.tools import chars
-from pywikibot.tools.formatter import color_format
 
 
 class Hunk:
@@ -167,8 +166,8 @@ class Hunk:
 
         if line_ref is None:
             if color in self.colors:
-                colored_line = color_format('{color}{0}{default}',
-                                            line, color=self.colors[color])
+                colored_line = '<<{color}>>{}<<default>>'.format(
+                    line, color=self.colors[color])
                 return colored_line
             return line
 
@@ -184,17 +183,17 @@ class Hunk:
                         apply_color = self.colors[color]
                     else:
                         apply_color = 'default;' + self.bg_colors[color]
-                    char_tagged = color_format('{color}{0}',
-                                               char, color=apply_color)
+                    char_tagged = '<<{color}>>{}'.format(char,
+                                                         color=apply_color)
                     color_closed = False
             else:
                 if char_ref == ' ':
-                    char_tagged = color_format('{default}{0}', char)
+                    char_tagged = '<<default>>{}'.format(char)
                     color_closed = True
             colored_line += char_tagged
 
         if not color_closed:
-            colored_line += color_format('{default}')
+            colored_line += '<<default>>'
 
         return colored_line
 
@@ -374,10 +373,9 @@ class PatchManager:
 
         context_range = self._get_context_range(hunks)
 
-        output = color_format('{aqua}{0}{default}\n{1}',
-                              Hunk.get_header_text(*context_range),
-                              extend_context(context_range[0][0],
-                                             hunks[0].a_rng[0]))
+        output = '<<aqua>>{}<<default>>\n{}'.format(
+            Hunk.get_header_text(*context_range),
+            extend_context(context_range[0][0], hunks[0].a_rng[0]))
         previous_hunk = None
         for hunk in hunks:
             if previous_hunk:
@@ -528,8 +526,8 @@ class PatchManager:
                 pywikibot.output(
                     'Split into {} hunks'.format(len(super_hunk._hunks)))
             else:  # choice == '?':
-                pywikibot.output(color_format(
-                    '{purple}{0}{default}', '\n'.join(
+                pywikibot.output(
+                    '<<purple>>{}<<default>>'.format('\n'.join(
                         '{} -> {}'.format(answer, help_msg[answer])
                         for answer in answers)))
 
@@ -568,24 +566,24 @@ def cherry_pick(oldtext: str, newtext: str, n: int = 0,
     by_letter: if text_a and text_b are single lines, comparison can be done
 
     """
-    template = '{2}{lightpurple}{0:{1}^50}{default}{2}'
+    template = '{2}<<lightpurple>>{0:{1}^50}<<default>>{2}'
 
     patch = PatchManager(oldtext, newtext, context=n, by_letter=by_letter)
-    pywikibot.output(color_format(template, '  ALL CHANGES  ', '*', '\n'))
+    pywikibot.output(template.format('  ALL CHANGES  ', '*', '\n'))
 
     for hunk in patch.hunks:
         pywikibot.output(hunk.diff_text)
-    pywikibot.output(color_format(template, '  REVIEW CHANGES  ', '*', '\n'))
+    pywikibot.output(template.format('  REVIEW CHANGES  ', '*', '\n'))
 
     text_list = patch.apply()
-    pywikibot.output(color_format(template, '  APPROVED CHANGES  ', '*', '\n'))
+    pywikibot.output(template.format('  APPROVED CHANGES  ', '*', '\n'))
 
     if any(hunk.reviewed == hunk.APPR for hunk in patch.hunks):
         for hunk in patch.hunks:
             if hunk.reviewed == hunk.APPR:
                 pywikibot.output(hunk.diff_text)
     else:
-        pywikibot.output(color_format(template, 'None.', '', ''))
+        pywikibot.output(template.format('None.', '', ''))
 
     text = ''.join(text_list)
 

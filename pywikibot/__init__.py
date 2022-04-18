@@ -67,7 +67,6 @@ from pywikibot.logging import (
 )
 from pywikibot.site import APISite, BaseSite, DataSite
 from pywikibot.tools import classproperty, normalize_username
-from pywikibot.tools.formatter import color_format
 
 
 ItemPageStrNoneType = Union[str, 'ItemPage', None]
@@ -1303,9 +1302,9 @@ def _flush(stop: bool = True) -> None:
 
     num, sec = remaining()
     if num > 0 and sec.total_seconds() > _config.noisysleep:
-        output(color_format(
-            '{lightblue}Waiting for {num} pages to be put. '
-            'Estimated time remaining: {sec}{default}', num=num, sec=sec))
+        output('<<lightblue>>Waiting for {num} pages to be put. '
+               'Estimated time remaining: {sec}<<default>>'
+               .format(num=num, sec=sec))
 
     if _putthread is not threading.current_thread():
         while (_putthread.is_alive()

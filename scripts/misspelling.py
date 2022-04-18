@@ -30,7 +30,6 @@ from typing import Generator
 
 import pywikibot
 from pywikibot import i18n, pagegenerators
-from pywikibot.tools.formatter import color_format
 from scripts.solve_disambiguation import DisambiguationRobot as BaseDisambigBot
 
 
@@ -65,8 +64,7 @@ class MisspellingRobot(BaseDisambigBot):
                       if cat is not None]
 
         if templates:
-            pywikibot.output(color_format(
-                '{yellow}Working on templates...{default}'))
+            pywikibot.output('<<yellow>>Working on templates...<<default>>')
             if isinstance(templates, str):
                 templates = (templates, )
 
@@ -82,8 +80,7 @@ class MisspellingRobot(BaseDisambigBot):
                     '-start parameter is not supported on this wiki\n'
                     'because templates are used for misspellings.')
         elif categories:
-            pywikibot.output(color_format(
-                '{yellow}Working on categories...{default}'))
+            pywikibot.output('<<yellow>>Working on categories...<<default>>')
             generators = (
                 pagegenerators.CategorizedPageGenerator(
                     cat, recurse=True, start=self.opt.start

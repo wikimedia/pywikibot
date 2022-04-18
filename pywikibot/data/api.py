@@ -42,7 +42,6 @@ from pywikibot.family import SubdomainFamily
 from pywikibot.login import LoginStatus
 from pywikibot.textlib import removeHTMLParts
 from pywikibot.tools import PYTHON_VERSION, itergroup
-from pywikibot.tools.formatter import color_format
 
 
 _logger = 'data.api'
@@ -1339,9 +1338,8 @@ class Request(MutableMapping):
         """Simulate action."""
         if action and config.simulate and (
                 self.write or action in config.actions_to_block):
-            pywikibot.output(color_format(
-                '{black;yellow}SIMULATION: {} action blocked.{default}',
-                action))
+            pywikibot.output('<<black;yellow>>SIMULATION: {} action blocked.'
+                             '<<default>>'.format(action))
             # for more realistic simulation
             if config.simulate is not True:
                 pywikibot.sleep(float(config.simulate))

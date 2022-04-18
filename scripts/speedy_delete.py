@@ -32,7 +32,6 @@ import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 from pywikibot.exceptions import Error
-from pywikibot.tools.formatter import color_format
 
 
 class SpeedyBot(SingleSiteBot, ExistingPageBot):
@@ -374,9 +373,8 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
     def get_reason_for_deletion(self, page):
         """Get a reason for speedy deletion from operator."""
         suggested_reason = self.guess_reason_for_deletion(page)
-        pywikibot.output(color_format(
-            'The suggested reason is: {lightred}{}{default}',
-            suggested_reason))
+        pywikibot.output('The suggested reason is: <<lightred>>{}<<default>>'
+                         .format(suggested_reason))
 
         # We don't use i18n.translate() here because for some languages the
         # entry is intentionally left out.
@@ -430,7 +428,7 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
         """Process one page."""
         page = self.current_page
 
-        color_line = color_format('{blue}{}{default}', '_' * 80)
+        color_line = '<<blue>>{}<<default>>'.format('_' * 80)
         pywikibot.output(color_line)
         pywikibot.output(page.extract('wiki', lines=self.LINES))
         pywikibot.output(color_line)
@@ -453,9 +451,8 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
         # delete the current page
         elif choice == 'd':
             reason = self.get_reason_for_deletion(page)
-            pywikibot.output(color_format(
-                'The chosen reason is: {lightred}{}{default}',
-                reason))
+            pywikibot.output('The chosen reason is: <<lightred>>{}<<default>>'
+                             .format(reason))
             page.delete(reason, prompt=False)
 
         # skip this page

@@ -56,7 +56,6 @@ from pywikibot import pagegenerators as pg
 from pywikibot.bot import Bot, ConfigParserBot
 from pywikibot.exceptions import IsRedirectPageError, NoPageError
 from pywikibot.tools import filter_unique
-from pywikibot.tools.formatter import color_format
 from scripts.image import ImageRobot as ImageBot
 
 
@@ -280,17 +279,17 @@ class NowCommonsDeleteBot(Bot, ConfigParserBot):
                         != commons_file_page.title(with_ns=False)):
                     using_pages = list(local_file_page.using_pages())
                     if using_pages and using_pages != [local_file_page]:
-                        pywikibot.output(color_format(
-                            '"{lightred}{0}{default}" '
-                            'is still used in {1} pages.',
-                            local_file_page.title(with_ns=False),
-                            len(using_pages)))
-                        if self.opt.replace:
-                            pywikibot.output(color_format(
-                                'Replacing "{lightred}{0}{default}" by '
-                                '"{lightgreen}{1}{default}\".',
+                        pywikibot.output(
+                            '"<<lightred>>{}<<default>>" is still used in {} '
+                            'pages.'.format(
                                 local_file_page.title(with_ns=False),
-                                commons_file_page.title(with_ns=False)))
+                                len(using_pages)))
+                        if self.opt.replace:
+                            pywikibot.output(
+                                'Replacing "<<lightred>>{}<<default>>" by '
+                                '"<<lightgreen>>{}<<default>>".'.format(
+                                    local_file_page.title(with_ns=False),
+                                    commons_file_page.title(with_ns=False)))
                             bot = ImageBot(
                                 local_file_page.usingPages(),
                                 local_file_page.title(with_ns=False),
@@ -319,10 +318,10 @@ class NowCommonsDeleteBot(Bot, ConfigParserBot):
                         else:
                             pywikibot.output('Please change them manually.')
                         continue
-                    pywikibot.output(color_format(
-                        'No page is using "{lightgreen}{0}{default}" '
-                        'anymore.',
-                        local_file_page.title(with_ns=False)))
+                    pywikibot.output(
+                        'No page is using "<<lightgreen>>{}<<default>>" '
+                        'anymore.'.format(
+                            local_file_page.title(with_ns=False)))
                 commons_text = commons_file_page.get()
                 if not self.opt.replaceonly:
                     if sha1 == commons_file_page.latest_file_info.sha1:
@@ -335,13 +334,14 @@ class NowCommonsDeleteBot(Bot, ConfigParserBot):
                                 'the old versions are not worth keeping.')
                             continue
                         if self.opt.always is False:
-                            format_str = color_format(
-                                '\n\n>>>> Description on {lightpurple}%s'
-                                '{default} <<<<\n')
-                            pywikibot.output(format_str % page.title())
+                            format_str = (
+                                '\n\n>>>> Description on '
+                                '<<<lightpurple>>{}<<default>> <<<<\n'
+                            )
+                            pywikibot.output(format_str.format(page.title()))
                             pywikibot.output(local_file_page.get())
-                            pywikibot.output(format_str %
-                                             commons_file_page.title())
+                            pywikibot.output(
+                                format_str.format(commons_file_page.title()))
                             pywikibot.output(commons_text)
                             if pywikibot.input_yn(
                                     'Does the description on Commons contain '

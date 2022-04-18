@@ -108,7 +108,7 @@ def logoutput(text: object, decoder: Optional[str] = None,
 
 def output(text: object, decoder: Optional[str] = None, newline: bool = True,
            **kwargs: Any) -> None:
-    r"""Output a message to the user via the userinterface.
+    """Output a message to the user via the userinterface.
 
     Works like print, but uses the encoding used by the user's console
     (console_encoding in the configuration file) instead of ASCII.
@@ -119,10 +119,8 @@ def output(text: object, decoder: Optional[str] = None, newline: bool = True,
     If newline is True, a line feed will be added after printing the text.
 
     text can contain special sequences to create colored output. These
-    consist of the escape character \03 and the color name in curly braces,
-    e. g. \03{lightpurple}. \03{default} resets the color. By using the
-    color_format method from pywikibot.tools.formatter, the escape character
-    may be omitted.
+    consist of the color name in angle bracket, e. g. <<lightpurple>>.
+    <<default>> resets the color.
 
     Other keyword arguments are passed unchanged to the logger; so far, the
     only argument that is useful is "exc_info=True", which causes the

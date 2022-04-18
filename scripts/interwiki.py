@@ -366,7 +366,6 @@ from pywikibot.exceptions import (
     UnknownSiteError,
 )
 from pywikibot.tools import SizedKeyCollection, first_upper
-from pywikibot.tools.formatter import color_format
 
 
 docuReplacements = {
@@ -1648,9 +1647,8 @@ class Subject(interwiki_graph.Subject):
             self.conf.note('No changes needed on page {}'.format(page))
             return False
 
-        # Show a message in purple.
-        pywikibot.output(color_format(
-            '{lightpurple}Updating links on page {0}.{default}', page))
+        pywikibot.output('<<lightpurple>>Updating links on page {}.<<default>>'
+                         .format(page))
         pywikibot.output('Changes to be made: {}'.format(mods))
         oldtext = page.get()
         template = (page.namespace() == 10)
