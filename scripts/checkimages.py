@@ -91,7 +91,7 @@ from typing import Generator
 import pywikibot
 from pywikibot import config, i18n
 from pywikibot import pagegenerators as pg
-from pywikibot.backports import List, Tuple
+from pywikibot.backports import List, Set, Tuple
 from pywikibot.bot import suggest_help
 from pywikibot.exceptions import (
     EditConflictError,
@@ -422,28 +422,13 @@ DUPLICATES_REGEX = {
     'sr': r'\{\{[nN](?:C|ow(?: c|[cC])ommons)[\|\}',
 }
 
-# Category with the licenses and / or with subcategories with the other
-# licenses.
-CATEGORY_WITH_LICENSES = {
-    'commons': 'Category:License tags',
-    'meta': 'Category:License templates',
-    'test': 'Category:CC license tags',
-    'ar': 'تصنيف:قوالب حقوق الصور',
-    'arz': 'تصنيف:Wikipedia image copyright templates',
-    'de': 'Kategorie:Vorlage:Lizenz für Bilder',
-    'en': 'Category:Wikipedia file copyright templates',
-    'fa': 'رده:الگو:حق تکثیر پرونده',
-    'ga': "Catagóir:Clibeanna cóipchirt d'íomhánna",
-    'it': 'Categoria:Template Licenze copyright',
-    'ja': 'Category:画像の著作権表示テンプレート',
-    'ko': '분류:위키백과 그림 저작권 틀',
-    'ru': 'Category:Шаблоны:Лицензии файлов',
-    'sd': 'زمرو:وڪيپيڊيا فائل ڪاپي رائيٽ سانچا',
-    'sr': 'Категорија:Шаблони за слике',
-    'ta': 'Category:காப்புரிமை வார்ப்புருக்கள்',
-    'ur': 'زمرہ:ویکیپیڈیا سانچہ جات حقوق تصاویر',
-    'zh': 'Category:版權申告模板',
-}
+CATEGORIES_WITH_LICENSES = 'Q4481876', 'Q7451504'
+"""Category items with the licenses; subcategories may contain other
+licenses.
+
+.. versionchanged:: 7.2
+   uses wikibase items instead of category titles.
+"""
 
 # Page where is stored the message to send as email to the users
 EMAIL_PAGE_WITH_TEXT = {
@@ -563,7 +548,7 @@ class CheckImagesBot:
             self.num_notify = None
 
         # Load the licenses only once, so do it once
-        self.list_licenses = self.load_licenses()
+        self.licenses = self.load_licenses()
 
     def set_parameters(self, image) -> None:
         """Set parameters."""
@@ -1152,23 +1137,25 @@ class CheckImagesBot:
         else:
             pywikibot.output('>> No additional settings found! <<')
 
-    def load_licenses(self) -> List[pywikibot.Page]:
-        """Load the list of the licenses."""
-        cat_name = i18n.translate(self.site, CATEGORY_WITH_LICENSES)
-        if not cat_name:
-            raise TranslationError(
-                'No allowed licenses category provided in '
-                '"CATEGORY_WITH_LICENSES" dict for your project!')
+    def load_licenses(self) -> Set[pywikibot.Page]:
+        """Load the list of the licenses.
+
+        .. versionchanged:: 7.2
+           return a set instead of a list for quicker lookup.
+        """
         pywikibot.output('\nLoading the allowed licenses...\n')
-        cat = pywikibot.Category(self.site, cat_name)
-        list_licenses = list(cat.articles())
+        licenses = set()
+        for item in CATEGORIES_WITH_LICENSES:
+            cat = self.site.page_from_repository(item)
+            if cat:
+                licenses.update(cat.articles())
+
         if self.site.code == 'commons':
             no_licenses_to_skip = pywikibot.Category(self.site,
                                                      'License-related tags')
             for license_given in no_licenses_to_skip.articles():
-                if license_given in list_licenses:
-                    list_licenses.remove(license_given)
-        pywikibot.output('')
+                if license_given in licenses:
+                    licenses.remove(license_given)
 
         # Add the licenses set in the default page as licenses to check
         if self.page_allowed:
@@ -1176,20 +1163,23 @@ class CheckImagesBot:
                 page_allowed_text = pywikibot.Page(self.site,
                                                    self.page_allowed).get()
             except (NoPageError, IsRedirectPageError):
-                page_allowed_text = ''
+                pass
+            else:
+                for name_license in self.load(page_allowed_text):
+                    licenses.add(pywikibot.Page(self.site, name_license))
 
-            for name_license in self.load(page_allowed_text):
-                page_license = pywikibot.Page(self.site, name_license)
-                if page_license not in list_licenses:
-                    # the list has wiki-pages
-                    list_licenses.append(page_license)
-        return list_licenses
+        if not licenses:
+            raise pywikibot.Error(
+                'No allowed licenses categories provided. Add that category '
+                'to wikibase to make the script work correctly')
+
+        return licenses
 
     def mini_template_check(self, template) -> bool:
         """Check if template is in allowed licenses or in licenses to skip."""
         # the list_licenses are loaded in the __init__
         # (not to load them multimple times)
-        if template in self.list_licenses:
+        if template in self.licenses:
             self.license_selected = template.title(with_ns=False)
             self.seems_ok = True
             # let the last "fake" license normally detected
@@ -1257,11 +1247,6 @@ class CheckImagesBot:
                         "Invalid or broken templates found in the image's "
                         'page {}!'.format(self.image))
             self.all_licenses = []
-
-            if not self.list_licenses:
-                raise TranslationError(
-                    'No allowed licenses found in "CATEGORY_WITH_LICENSES" '
-                    'category for your project!')
 
             # Found the templates ONLY in the image's description
             for template_selected in templates_in_the_image_raw:
