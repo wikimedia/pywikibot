@@ -588,12 +588,11 @@ class HighlightContextOption(ContextOption):
         """Highlighted output section of the text."""
         start = max(0, self.start - self.context)
         end = min(len(self.text), self.end + self.context)
-        color_format = pywikibot.tools.formatter.color_format
-        return color_format('{}{%(color)s}{}{default}{}'
-                            % {'color': self.color},
-                            self.text[start:self.start],
-                            self.text[self.start:self.end],
-                            self.text[self.end:end])
+        return '{}<<{color}>>{}<<default>>{}'.format(
+            self.text[start:self.start],
+            self.text[self.start:self.end],
+            self.text[self.end:end],
+            color=self.color)
 
     @deprecated('pywikibot.output(HighlightContextOption.out)',
                 since='6.2.0')

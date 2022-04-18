@@ -123,6 +123,8 @@ class _ColorFormatter(Formatter):
         return super().vformat(format_string, args, kwargs)
 
 
+@deprecated('New color format pattern like <<color>>colored text<<default>>',
+            since='7.2.0')
 def color_format(text: str, *args, **kwargs) -> str:
     r"""
     Do ``str.format`` without having to worry about colors.
@@ -133,6 +135,10 @@ def color_format(text: str, *args, **kwargs) -> str:
 
     You may use a variant {color} by assigning a valid color to a named
     parameter color.
+
+    .. deprecated:: 7.2
+       new color format pattern like <<color>>colored text<<default>>
+       may be used instead.
 
     :param text: The format template string
     :return: The formatted string

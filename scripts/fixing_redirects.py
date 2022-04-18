@@ -44,7 +44,6 @@ from pywikibot.exceptions import (
 from pywikibot.textlib import does_text_contain_section, isDisabled
 from pywikibot.tools import first_lower
 from pywikibot.tools import first_upper as firstcap
-from pywikibot.tools.formatter import color_format
 
 
 # This is required for the text that is shown when you run this script
@@ -240,9 +239,9 @@ def main(*args: str) -> None:
 
     mysite = pywikibot.Site()
     if mysite.sitename == 'wikipedia:nl':
-        pywikibot.output(color_format(
-            '{lightred}There is consensus on the Dutch Wikipedia that '
-            'bots should not be used to fix redirects.{default}'))
+        pywikibot.output(
+            '<<lightred>>There is consensus on the Dutch Wikipedia that '
+            'bots should not be used to fix redirects.<<default>>')
         return
 
     if featured:

@@ -179,7 +179,6 @@ from pywikibot.tools import (
     strtobool,
 )
 from pywikibot.tools._logging import LoggingFormatter
-from pywikibot.tools.formatter import color_format
 
 
 if TYPE_CHECKING:
@@ -777,28 +776,29 @@ class InteractiveReplace:
             if isinstance(c, AlwaysChoice) and c.handle_link():
                 return c.answer
 
+        question = 'Should the link '
         if self.context > 0:
             rng = self.current_range
             text = self.current_text
             # at the beginning of the link, start red color.
             # at the end of the link, reset the color to default
             pywikibot.output(text[max(0, rng[0] - self.context): rng[0]]
-                             + color_format('{lightred}{0}{default}',
-                                            text[rng[0]: rng[1]])
+                             + '<<lightred>>{}<<default>>'.format(
+                                 text[rng[0]: rng[1]])
                              + text[rng[1]: rng[1] + self.context])
-            question = 'Should the link '
         else:
-            question = 'Should the link {lightred}{0}{default} '
+            question += '<<lightred>>{}<<default>> '.format(
+                self._old.canonical_title())
 
         if self._new is False:
             question += 'be unlinked?'
         else:
-            question += color_format('target to {lightpurple}{0}{default}?',
-                                     self._new.canonical_title())
+            question += 'target to <<lightpurple>>{}<<default>>?'.format(
+                self._new.canonical_title())
 
-        choice = pywikibot.input_choice(
-            color_format(question, self._old.canonical_title()),
-            choices, default=self._default, automatic_quit=self._quit)
+        choice = pywikibot.input_choice(question, choices,
+                                        default=self._default,
+                                        automatic_quit=self._quit)
 
         assert isinstance(choice, str)
         return self.handle_answer(choice)
@@ -1312,8 +1312,8 @@ class BaseBot(OptionHandler):
             msg = 'Working on {!r}'.format(page.title())
             if config.colorized_output:
                 log(msg)
-                stdout(color_format('\n\n>>> {lightpurple}{0}{default} <<<',
-                                    page.title()))
+                stdout('\n\n>>> <<lightpurple>>{}<<default>> <<<'
+                       .format(page.title()))
             else:
                 stdout(msg)
 

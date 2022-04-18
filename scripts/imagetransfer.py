@@ -49,7 +49,6 @@ from pywikibot import config, i18n, pagegenerators, textlib
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 from pywikibot.exceptions import IsRedirectPageError, NoPageError
 from pywikibot.specialbots import UploadRobot
-from pywikibot.tools.formatter import color_format
 
 
 docuReplacements = {
@@ -323,8 +322,7 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
                 # remove the selected image from the list
                 imagelist.pop(todo)
             else:
-                pywikibot.output(
-                    color_format('{yellow}No such image number.{default}'))
+                pywikibot.output('<<yellow>>No such image number.<<default>>')
 
     def transfer_allowed(self, image) -> bool:
         """Check whether transfer is allowed."""
@@ -333,9 +331,8 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
         if not self.opt.force_if_shared \
            and image.file_is_shared() \
            and image.site.image_repository() == target_repo:
-            pywikibot.output(color_format(
-                '{yellow}The image is already shared on {}.{default}',
-                target_repo))
+            pywikibot.output('<<yellow>>The image is already shared on {}.'
+                             '<<default>>'.format(target_repo))
             return False
         return True
 

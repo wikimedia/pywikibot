@@ -46,7 +46,6 @@ from pywikibot import i18n
 from pywikibot.bot import OptionHandler
 from pywikibot.date import format_date, formatYear
 from pywikibot.exceptions import APIError, Error
-from pywikibot.tools.formatter import color_format
 
 
 class BaseRevertBot(OptionHandler):
@@ -111,9 +110,10 @@ class BaseRevertBot(OptionHandler):
 
         rev = history[1]
 
-        pywikibot.output(color_format(
-            '\n\n>>> {lightpurple}{0}{default} <<<',
-            page.title(as_link=True, force_interwiki=True, textlink=True)))
+        pywikibot.output('\n\n>>> <<lightpurple>>{0}<<default>> <<<'
+                         .format(page.title(as_link=True,
+                                            force_interwiki=True,
+                                            textlink=True)))
 
         if not self.opt.rollback:
             comment = i18n.twtranslate(
