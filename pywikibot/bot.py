@@ -1227,6 +1227,14 @@ class BaseBot(OptionHandler):
        The default counters are 'read', 'write' and 'skip'.
     """
 
+    use_disambigs = None  # type: Optional[bool]
+    """Attribute to determine whether to use disambiguation pages. Set
+    it to True to use disambigs only, set it to False to skip disambigs.
+    If None both are processed.
+
+    .. versionadded:: 7.2
+    """
+
     use_redirects = None  # type: Optional[bool]
     """Attribute to determine whether to use redirect pages. Set it to
     True to use redirects only, set it to False to skip redirects. If
@@ -1527,7 +1535,8 @@ class BaseBot(OptionHandler):
         .. versionadded:: 3.0
 
         .. versionchanged:: 7.2
-           use :attr:`use_redirects` to handle redirects
+           use :attr:`use_redirects` to handle redirects,
+           use :attr:`use_disambigs` to handle disambigs
 
         :param page: Page object to be processed
         """
@@ -1537,6 +1546,14 @@ class BaseBot(OptionHandler):
                 'Page {page} on {page.site} is skipped because it is {not_}'
                 'a redirect'
                 .format(page=page, not_='not ' if self.use_redirects else ''))
+            return True
+
+        if isinstance(self.use_disambigs, bool) \
+           and page.isDisambig() is not self.use_disambigs:
+            pywikibot.warning(
+                'Page {page} on {page.site} is skipped because it is {not_}'
+                'a disambig'
+                .format(page=page, not_='not ' if self.use_disambigs else ''))
             return True
 
         return False

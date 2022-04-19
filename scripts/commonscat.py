@@ -233,19 +233,15 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
        CommonscatBot is a ConfigParserBot
     """
 
+    use_disambigs = False
     use_redirects = False
     update_options = {'summary': ''}
 
     def skip_page(self, page):
-        """Skip category redirects or disambigs."""
+        """Skip category redirects."""
         if page.isCategoryRedirect():
             pywikibot.warning(
                 'Page {page} on {page.site} is a category redirect. '
-                'Skipping.'.format(page=page))
-            return True
-        if page.isDisambig():
-            pywikibot.warning(
-                'Page {page} on {page.site} is a disambiguation. '
                 'Skipping.'.format(page=page))
             return True
         return super().skip_page(page)
