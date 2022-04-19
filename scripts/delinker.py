@@ -47,7 +47,6 @@ from pywikibot.bot import (
     calledModuleName,
 )
 from pywikibot.textlib import case_escape, ignore_case, replaceExcept
-from pywikibot.tools.formatter import color_format
 
 
 class CommonsDelinker(SingleSiteBot, ConfigParserBot, AutomaticTWSummaryBot):
@@ -113,8 +112,8 @@ class CommonsDelinker(SingleSiteBot, ConfigParserBot, AutomaticTWSummaryBot):
         for page in file_page.usingPages(content=True, namespaces=0):
             if not shown:
                 pywikibot.output(
-                    color_format('\n>>> {lightgreen}Delinking {}{default} <<<',
-                                 file_page.title()))
+                    '\n>>> <<lightgreen>>Delinking {}<<default>> <<<'
+                    .format(file_page.title()))
                 shown = True
             super().treat(page)
 

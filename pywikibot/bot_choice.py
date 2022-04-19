@@ -594,16 +594,18 @@ class HighlightContextOption(ContextOption):
             self.text[self.end:end],
             color=self.color)
 
-    @deprecated('pywikibot.output(HighlightContextOption.out)',
-                since='6.2.0')
+    @deprecated('pywikibot.output(HighlightContextOption.out)', since='6.2.0')
     def output_range(self, start: int, end: int) -> None:
-        """DEPRECATED. Show normal context with a highlighted center region."""
-        color_format = pywikibot.tools.formatter.color_format
-        text = color_format('{}{%(color)s}{}{default}{}'
-                            % {'color': self.color},
-                            self.text[start:self.start],
-                            self.text[self.start:self.end],
-                            self.text[self.end:end])
+        """Show normal context with a highlighted center region.
+
+        .. deprecated:: 6.2
+           use :attr:`out` instead.
+        """
+        text = '{}<<{color}>>{}<<default>>{}'.format(
+            self.text[start:self.start],
+            self.text[self.start:self.end],
+            self.text[self.end:end],
+            color=self.color)
         pywikibot.output(text)
 
 
