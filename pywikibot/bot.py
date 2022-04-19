@@ -1202,26 +1202,37 @@ class BaseBot(OptionHandler):
     """
     Generic Bot to be subclassed.
 
-    This class provides a run() method for basic processing of a
+    This class provides a :meth:`run` method for basic processing of a
     generator one page at a time.
 
-    If the subclass places a page generator in self.generator,
-    Bot will process each page in the generator, invoking the method treat()
-    which must then be implemented by subclasses.
+    If the subclass places a page generator in
+    :attr:`self.generator<generator>`, Bot will process each page in the
+    generator, invoking the method :meth:`treat` which must then be
+    implemented by subclasses.
 
-    Each item processed by treat() must be a :py:obj:`pywikibot.page.BasePage`
-    type. Use init_page() to upcast the type. To enable other types, set
-    BaseBot.treat_page_type to an appropriate type; your bot should
-    derive from BaseBot in that case and handle site properties.
+    Each item processed by :meth:`treat` must be a
+    :class:`pywikibot.page.BasePage` type. Use :meth:`init_page` to
+    upcast the type. To enable other types, set
+    :attr:`BaseBot.treat_page_type` to an appropriate type; your bot
+    should derive from :class:`BaseBot` in that case and handle site
+    properties.
 
     If the subclass does not set a generator, or does not override
-    treat() or run(), NotImplementedError is raised.
+    :meth:`treat` or :meth:`run`, NotImplementedError is raised.
 
-    For bot options handling refer OptionHandler class above.
+    For bot options handling refer :class:`OptionHandler` class above.
 
     .. versionchanged:: 7.0
-       A counter attribute is provided which is a collections.Counter;
+       A counter attribute is provided which is a `collections.Counter`;
        The default counters are 'read', 'write' and 'skip'.
+    """
+
+    use_redirects = None  # type: Optional[bool]
+    """Attribute to determine whether to use redirect pages. Set it to
+    True to use redirects only, set it to False to skip redirects. If
+    None both are processed.
+
+    .. versionadded:: 7.2
     """
 
     # Handler configuration.
@@ -1232,10 +1243,13 @@ class BaseBot(OptionHandler):
         'always': False,  # By default ask for confirmation when putting a page
     }
 
-    # update_options can be used to update available_options;
-    # do not use it if the bot class is to be derived but use
-    # self.available_options.update(<dict>) initializer in such case
     update_options = {}  # type: Dict[str, Any]
+    """update_options can be used to update available_options;
+    do not use it if the bot class is to be derived but use
+    self.available_options.update(<dict>) initializer in such case.
+
+    .. versionadded:: 6.4
+    """
 
     _current_page = None  # type: Optional[pywikibot.page.BasePage]
 
@@ -1243,13 +1257,14 @@ class BaseBot(OptionHandler):
         """Only accept 'generator' and options defined in available_options.
 
         :param kwargs: bot options
-        :keyword generator: a generator processed by run method
+        :keyword generator: a :attr:`generator` processed by :meth:`run` method
         """
         if 'generator' in kwargs:
             if hasattr(self, 'generator'):
                 pywikibot.warn('{} has a generator already. Ignoring argument.'
                                .format(self.__class__.__name__))
             else:
+                #: generator processed by :meth:`run` method
                 self.generator = kwargs.pop('generator')
 
         self.available_options.update(self.update_options)
@@ -1257,7 +1272,8 @@ class BaseBot(OptionHandler):
 
         self.counter = Counter()
         self._generator_completed = False
-        self.treat_page_type = pywikibot.page.BasePage  # default type
+        #: instance variable to hold the default page type
+        self.treat_page_type = pywikibot.page.BasePage  # type: Any
 
     @property
     @deprecated("self.counter['read']", since='7.0.0')
@@ -1510,14 +1526,27 @@ class BaseBot(OptionHandler):
 
         .. versionadded:: 3.0
 
+        .. versionchanged:: 7.2
+           use :attr:`use_redirects` to handle redirects
+
         :param page: Page object to be processed
         """
+        if isinstance(self.use_redirects, bool) \
+           and page.isRedirectPage() is not self.use_redirects:
+            pywikibot.warning(
+                'Page {page} on {page.site} is skipped because it is {not_}'
+                'a redirect'
+                .format(page=page, not_='not ' if self.use_redirects else ''))
+            return True
+
         return False
 
-    def treat(self, page: 'pywikibot.page.BasePage') -> None:
+    def treat(self, page: Any) -> None:
         """Process one page (abstract method).
 
-        :param page: Page object to be processed
+        :param page: Object to be processed, usually a
+            :class:`pywikibot.page.BasePage`. For other page types the
+            :attr:`treat_page_type` must be set.
         """
         raise NotImplementedError('Method {}.treat() not implemented.'
                                   .format(self.__class__.__name__))
@@ -1940,7 +1969,18 @@ class CreatingPageBot(CurrentPageBot):
 
 class RedirectPageBot(CurrentPageBot):
 
-    """A RedirectPageBot class which only treats redirects."""
+    """A RedirectPageBot class which only treats redirects.
+
+    .. deprecated:: 7.2
+       use BaseBot attribute 'use_redirects = True' instead
+    """
+
+    def __init__(self, *args, **kwargs):
+        """Deprecate RedirectPageBot."""
+        issue_deprecation_warning('RedirectPageBot',
+                                  "BaseBot attribute 'use_redirects = True'",
+                                  since='7.2.0')
+        super().__init__(*args, **kwargs)
 
     def skip_page(self, page: 'pywikibot.page.BasePage') -> bool:
         """Treat only redirect pages and handle IsNotRedirectPageError."""
@@ -1954,7 +1994,18 @@ class RedirectPageBot(CurrentPageBot):
 
 class NoRedirectPageBot(CurrentPageBot):
 
-    """A NoRedirectPageBot class which only treats non-redirects."""
+    """A NoRedirectPageBot class which only treats non-redirects.
+
+    .. deprecated:: 7.2
+       use BaseBot attribute 'use_redirects = False' instead
+    """
+
+    def __init__(self, *args, **kwargs):
+        """Deprecate NoRedirectPageBot."""
+        issue_deprecation_warning('RedirectPageBot',
+                                  "BaseBot attribute 'use_redirects = False'",
+                                  since='7.2.0')
+        super().__init__(*args, **kwargs)
 
     def skip_page(self, page: 'pywikibot.page.BasePage') -> bool:
         """Treat only non-redirect pages and handle IsRedirectPageError."""

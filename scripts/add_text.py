@@ -68,11 +68,7 @@ from typing import Union
 import pywikibot
 from pywikibot import config, pagegenerators, textlib
 from pywikibot.backports import Dict, Sequence
-from pywikibot.bot import (
-    AutomaticTWSummaryBot,
-    ExistingPageBot,
-    NoRedirectPageBot,
-)
+from pywikibot.bot import AutomaticTWSummaryBot, ExistingPageBot
 
 
 ARGS_TYPE = Dict[str, Union[bool, str]]
@@ -101,10 +97,11 @@ ARG_PROMPT = {
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
-class AddTextBot(AutomaticTWSummaryBot, ExistingPageBot, NoRedirectPageBot):
+class AddTextBot(AutomaticTWSummaryBot, ExistingPageBot):
 
     """A bot which adds a text to a page."""
 
+    use_redirects = False
     summary_key = 'add_text-adding'
     update_options = DEFAULT_ARGS
 

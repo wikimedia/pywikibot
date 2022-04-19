@@ -46,7 +46,7 @@ import re
 
 import pywikibot
 from pywikibot import i18n, pagegenerators
-from pywikibot.bot import ConfigParserBot, ExistingPageBot, NoRedirectPageBot
+from pywikibot.bot import ConfigParserBot, ExistingPageBot
 from pywikibot.exceptions import InvalidTitleError
 from pywikibot.textlib import add_text
 
@@ -225,7 +225,7 @@ ignoreTemplates = {
 }
 
 
-class CommonscatBot(ConfigParserBot, ExistingPageBot, NoRedirectPageBot):
+class CommonscatBot(ConfigParserBot, ExistingPageBot):
 
     """Commons categorisation bot.
 
@@ -233,6 +233,7 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot, NoRedirectPageBot):
        CommonscatBot is a ConfigParserBot
     """
 
+    use_redirects = False
     update_options = {'summary': ''}
 
     def skip_page(self, page):
