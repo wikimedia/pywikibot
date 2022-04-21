@@ -1691,6 +1691,7 @@ The text message is:
         # TODO: T154011: 'ReadOnlyError' seems replaced by 'readonly'
         retry = class_name in ['DBConnectionError',  # T64974
                                'DBQueryError',  # T60158
+                               'DBQueryTimeoutError',  # T297708
                                'ReadOnlyError',  # T61227
                                'readonly',  # T154011
                                ]
