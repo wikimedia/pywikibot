@@ -59,6 +59,7 @@ from pywikibot.exceptions import (
 )
 from pywikibot.proofreadpage import ProofreadPage
 from pywikibot.tools import (
+    deprecated,
     DequeGenerator,
     filter_unique,
     intersect_generators,
@@ -2775,9 +2776,11 @@ def MySQLPageGenerator(query: str, site: OPT_SITE_TYPE = None,
         yield page
 
 
-class XMLDumpOldPageGenerator(abc.Iterator):  # type: ignore[type-arg]
-    """
-    Xml generator that yields Page objects with old text loaded.
+class XMLDumpPageGenerator(abc.Iterator):  # type: ignore[type-arg]
+    """Xml generator that yields Page objects.
+
+    .. versionadded:: 7.2
+       the `content` parameter
 
     :param filename: filename of XML dump
     :param start: skip entries below that value
@@ -2785,11 +2788,9 @@ class XMLDumpOldPageGenerator(abc.Iterator):  # type: ignore[type-arg]
     :param site: current site for the generator
     :param text_predicate: a callable with entry.text as parameter and boolean
         as result to indicate the generator should return the page or not
+    :param content: If True, assign old page content to Page.text
 
-    :ivar text_predicate: holds text_predicate function
     :ivar skipping: True if start parameter is given, else False
-    :ivar start: holds start parameter
-    :ivar namespaces: holds namespaces filter
     :ivar parser: holds the xmlreader.XmlDump parse method
     """
 
@@ -2798,11 +2799,11 @@ class XMLDumpOldPageGenerator(abc.Iterator):  # type: ignore[type-arg]
                      None, NAMESPACE_OR_STR_TYPE,
                      Sequence[NAMESPACE_OR_STR_TYPE]] = None,
                  site: OPT_SITE_TYPE = None,
-                 text_predicate: Optional[Callable[[str], bool]] = None
-                 ) -> None:
+                 text_predicate: Optional[Callable[[str], bool]] = None,
+                 content=False) -> None:
         """Initializer."""
         self.text_predicate = text_predicate
-
+        self.content = content
         self.skipping = bool(start)
 
         self.start = None  # type: Optional[str]
@@ -2814,7 +2815,6 @@ class XMLDumpOldPageGenerator(abc.Iterator):  # type: ignore[type-arg]
             self.namespaces = self.site.namespaces
         else:
             self.namespaces = self.site.namespaces.resolve(namespaces)
-
         dump = xmlreader.XmlDump(filename)
         self.parser = dump.parse()
 
@@ -2830,19 +2830,24 @@ class XMLDumpOldPageGenerator(abc.Iterator):  # type: ignore[type-arg]
             if page.namespace() not in self.namespaces:
                 continue
             if not self.text_predicate or self.text_predicate(entry.text):
-                page.text = entry.text
+                if self.content:
+                    page.text = entry.text
                 return page
 
 
-class XMLDumpPageGenerator(XMLDumpOldPageGenerator):
+@deprecated('XMLDumpPageGenerator with content=True parameter', since='7.2.0')
+class XMLDumpOldPageGenerator(XMLDumpPageGenerator):
 
-    """Xml generator that yields Page objects without text loaded."""
+    """Xml generator that yields Page objects with old text loaded.
 
-    def __next__(self) -> 'pywikibot.page.Page':
-        """Get next Page from dump and remove the text."""
-        page = super().__next__()
-        del page.text
-        return page
+    .. deprecated:: 7.2
+       :class:`XMLDumpPageGenerator` with `content` parameter should be
+       used instead
+    """
+
+    def __init__(self, *args, **kwargs):
+        """Initializer."""
+        super().__init__(*args, **kwargs, content=True)
 
 
 def YearPageGenerator(start: int = 1, end: int = 2050,
