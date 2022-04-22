@@ -92,7 +92,7 @@ class TestLogentriesBase(TestCase):
             self.assertRegex(
                 str(e),
                 r"Log entry \([^)]+\) has a hidden 'comment' key and you "
-                r"don't have permission to view it\.")
+                r"don't have permission to view it")
         except KeyError as e:
             self.assertRegex(str(e), "Log entry ([^)]+) has no 'comment' key")
         else:
