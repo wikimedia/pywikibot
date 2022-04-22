@@ -240,9 +240,9 @@ class WikiHTMLPageParser(HTMLParser):
         else:
             if self._parsed_url:
                 # allow upgrades to https, but not downgrades
-                if self._parsed_url.scheme == 'https':
-                    if new_parsed_url.scheme != self._parsed_url.scheme:
-                        return
+                if self._parsed_url.scheme == 'https' \
+                   and new_parsed_url.scheme != self._parsed_url.scheme:
+                    return
 
                 # allow http://www.brickwiki.info/ vs http://brickwiki.info/
                 if (new_parsed_url.netloc in self._parsed_url.netloc

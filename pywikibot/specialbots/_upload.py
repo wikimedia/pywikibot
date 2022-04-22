@@ -189,9 +189,8 @@ class UploadRobot(BaseBot):
         :return: False if this warning should cause an abort, True if it should
             be ignored or None if this warning has no default handler.
         """
-        if self.aborts is not True:
-            if warning in self.aborts:
-                return False
+        if self.aborts is not True and warning in self.aborts:
+            return False
         if self.ignore_warning is True or (self.ignore_warning is not False
                                            and warning in self.ignore_warning):
             return True

@@ -1102,12 +1102,12 @@ class Subject(interwiki_graph.Subject):
         elif page.isStaticRedirect():
             self.conf.note('not following static {}redirects.'.format(redir))
         elif (page.site.family == redirect_target.site.family
-              and not self.skipPage(page, redirect_target, counter)):
-            if self.addIfNew(redirect_target, counter, page):
-                if config.interwiki_shownew:
-                    pywikibot.output('{}: {} gives new {}redirect {}'
-                                     .format(self.origin, page, redir,
-                                             redirect_target))
+              and not self.skipPage(page, redirect_target, counter)
+              and self.addIfNew(redirect_target, counter, page)
+              and config.interwiki_shownew):
+            pywikibot.output('{}: {} gives new {}redirect {}'
+                             .format(self.origin, page, redir,
+                                     redirect_target))
         return True
 
     def check_page(self, page, counter) -> None:
@@ -1180,10 +1180,10 @@ class Subject(interwiki_graph.Subject):
             if self.conf.untranslatedonly:
                 # Ignore the interwiki links.
                 iw = ()
-            if self.conf.lacklanguage:
-                if self.conf.lacklanguage in (link.site.lang for link in iw):
-                    iw = ()
-                    self.workonme = False
+            if self.conf.lacklanguage \
+               and self.conf.lacklanguage in (link.site.lang for link in iw):
+                iw = ()
+                self.workonme = False
             if len(iw) < self.conf.minlinks:
                 iw = ()
                 self.workonme = False
@@ -1222,28 +1222,26 @@ class Subject(interwiki_graph.Subject):
                     .format(self.origin, page, linkedPage))
                 break
 
-            if not self.skipPage(page, linkedPage, counter):
-                if self.conf.followinterwiki or page == self.origin:
-                    if self.addIfNew(linkedPage, counter, page):
-                        # It is new. Also verify whether it is the second
-                        # on the same site
-                        lpsite = linkedPage.site
-                        for prevPage in self.found_in:
-                            if prevPage != linkedPage and \
-                               prevPage.site == lpsite:
-                                # Still, this could be "no problem" as
-                                # either may be a redirect to the other.
-                                # No way to find out quickly!
-                                pywikibot.output(
-                                    'NOTE: {}: {} gives duplicate '
-                                    'interwiki on same site {}'
-                                    .format(self.origin, page, linkedPage))
-                                break
-                        else:
-                            if config.interwiki_shownew:
-                                pywikibot.output(
-                                    '{}: {} gives new interwiki {}'
-                                    .format(self.origin, page, linkedPage))
+            if not self.skipPage(page, linkedPage, counter) \
+               and self.conf.followinterwiki or page == self.origin \
+               and self.addIfNew(linkedPage, counter, page):
+                # It is new. Also verify whether it is the second on the
+                # same site
+                lpsite = linkedPage.site
+                for prevPage in self.found_in:
+                    if prevPage != linkedPage and prevPage.site == lpsite:
+                        # Still, this could be "no problem" as
+                        # either may be a redirect to the other.
+                        # No way to find out quickly!
+                        pywikibot.output(
+                            'NOTE: {}: {} gives duplicate interwiki on same '
+                            'site {}'.format(self.origin, page, linkedPage))
+                        break
+                else:
+                    if config.interwiki_shownew:
+                        pywikibot.output(
+                            '{}: {} gives new interwiki {}'
+                            .format(self.origin, page, linkedPage))
             if self.forcedStop:
                 break
 

@@ -102,9 +102,8 @@ class DownloadDumpBot(Bot, ConfigParserBot):
                 if toolforge_dump_filepath:
                     pywikibot.output('Symlinking file from '
                                      + toolforge_dump_filepath)
-                    if non_atomic:
-                        if os.path.exists(file_final_storepath):
-                            remove(file_final_storepath)
+                    if non_atomic and os.path.exists(file_final_storepath):
+                        remove(file_final_storepath)
                     symlink(toolforge_dump_filepath, file_current_storepath)
                 else:
                     url = 'https://dumps.wikimedia.org/{}/{}/{}'.format(

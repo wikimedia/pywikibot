@@ -1251,12 +1251,13 @@ class CheckImagesBot:
             # Found the templates ONLY in the image's description
             for template_selected in templates_in_the_image_raw:
                 tp = pywikibot.Page(self.site, template_selected)
+                page_title = tp.title(as_url=True, with_ns=False).lower()
                 for template_real in self.licenses_found:
-                    if (tp.title(as_url=True, with_ns=False).lower()
-                            == template_real.title(as_url=True,
-                                                   with_ns=False).lower()):
-                        if template_real not in self.all_licenses:
-                            self.all_licenses.append(template_real)
+                    template_title = template_real.title(as_url=True,
+                                                         with_ns=False).lower()
+                    if page_title == template_title \
+                       and template_real not in self.all_licenses:
+                        self.all_licenses.append(template_real)
             break
 
         if self.licenses_found:
@@ -1433,19 +1434,8 @@ class CheckImagesBot:
                 if find_tipe.lower() == 'findonly':
                     search_results = re.findall(r'{}'.format(k.lower()),
                                                 self.image_check_text.lower())
-                    if search_results:
-                        if search_results[0] == self.image_check_text.lower():
-                            self.some_problem = True
-                            self.text_used = text
-                            self.head_used = head_2
-                            self.imagestatus_used = imagestatus
-                            self.name_used = name
-                            self.summary_used = summary
-                            self.mex_used = mex_catched
-                            break
-                elif find_tipe.lower() == 'find':
-                    if re.findall(r'{}'.format(k.lower()),
-                                  self.image_check_text.lower()):
+                    if search_results \
+                       and search_results[0] == self.image_check_text.lower():
                         self.some_problem = True
                         self.text_used = text
                         self.head_used = head_2
@@ -1453,7 +1443,18 @@ class CheckImagesBot:
                         self.name_used = name
                         self.summary_used = summary
                         self.mex_used = mex_catched
-                        continue
+                        break
+                elif find_tipe.lower() == 'find' \
+                    and re.findall(r'{}'.format(k.lower()),
+                                   self.image_check_text.lower()):
+                    self.some_problem = True
+                    self.text_used = text
+                    self.head_used = head_2
+                    self.imagestatus_used = imagestatus
+                    self.name_used = name
+                    self.summary_used = summary
+                    self.mex_used = mex_catched
+                    continue
 
     def check_step(self) -> None:
         """Check a single file page."""
@@ -1737,14 +1738,14 @@ def main(*args: str) -> bool:
                 continue
 
             # Check on commons if there's already an image with the same name
-            if commons_active and site.family.name != 'commons':
-                if not bot.check_image_on_commons():
-                    continue
+            if commons_active and site.family.name != 'commons' \
+               and not bot.check_image_on_commons():
+                continue
 
             # Check if there are duplicates of the image on the project
-            if duplicates_active:
-                if not bot.check_image_duplicated(duplicates_rollback):
-                    continue
+            if duplicates_active \
+               and not bot.check_image_duplicated(duplicates_rollback):
+                continue
 
             bot.check_step()
 

@@ -1907,11 +1907,10 @@ class BasePage(ComparableMixin):
             been retrieved earlier). If timestamp is not found, returns
             empty list.
         """
-        if hasattr(self, '_deletedRevs'):
-            if timestamp in self._deletedRevs and (
-                    not content
-                    or 'content' in self._deletedRevs[timestamp]):
-                return self._deletedRevs[timestamp]
+        if hasattr(self, '_deletedRevs') \
+           and timestamp in self._deletedRevs \
+           and (not content or 'content' in self._deletedRevs[timestamp]):
+            return self._deletedRevs[timestamp]
 
         for item in self.site.deletedrevs(self, start=timestamp,
                                           content=content, total=1, **kwargs):
