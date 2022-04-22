@@ -70,9 +70,6 @@ else:
         _bs4_soup = partial(BeautifulSoup, features='lxml')
 
 
-_logger = 'proofreadpage'
-
-
 PagesFromLabelType = Dict[str, Set['pywikibot.page.Page']]
 _IndexType = Tuple[Optional['IndexPage'], List['IndexPage']]
 
@@ -627,8 +624,7 @@ class ProofreadPage(pywikibot.Page):
 
         # wrong link fail with Exceptions
         for retry in range(5, 30, 5):
-            pywikibot.debug('{}: get URI {!r}'.format(ocr_tool, cmd_uri),
-                            _logger)
+            pywikibot.debug('{}: get URI {!r}'.format(ocr_tool, cmd_uri))
             try:
                 response = http.fetch(cmd_uri)
             except ReadTimeout as e:
@@ -637,8 +633,7 @@ class ProofreadPage(pywikibot.Page):
                 pywikibot.error('"{}": {}'.format(cmd_uri, e))
                 return True, e
             else:
-                pywikibot.debug('{}: {}'.format(ocr_tool, response.text),
-                                _logger)
+                pywikibot.debug('{}: {}'.format(ocr_tool, response.text))
                 break
 
             pywikibot.warning('retrying in {} seconds ...'.format(retry))

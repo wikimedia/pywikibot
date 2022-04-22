@@ -33,9 +33,6 @@ from pywikibot.tools import (
 )
 
 
-_logger = 'wiki.apisite'
-
-
 class GeneratorsMixin:
 
     """API generators mixin to MediaWiki site."""
@@ -152,7 +149,7 @@ class GeneratorsMixin:
                              .format(len(cache), self))
 
             for pagedata in rvgen:
-                pywikibot.debug('Preloading {}'.format(pagedata), _logger)
+                pywikibot.debug('Preloading {}'.format(pagedata))
                 try:
                     if pagedata['title'] not in cache:
                         # API always returns a "normalized" title which is
@@ -172,11 +169,9 @@ class GeneratorsMixin:
                                 "title '{}'".format(pagedata['title']))
                             continue
                 except KeyError:
-                    pywikibot.debug("No 'title' in {}"
-                                    .format(pagedata), _logger)
-                    pywikibot.debug('pageids={}'.format(pageids), _logger)
-                    pywikibot.debug('titles={}'
-                                    .format(list(cache.keys())), _logger)
+                    pywikibot.debug("No 'title' in {}".format(pagedata))
+                    pywikibot.debug('pageids={}'.format(pageids))
+                    pywikibot.debug('titles={}'.format(list(cache.keys())))
                     continue
                 priority, page = cache[pagedata['title']]
                 api.update_page(page, pagedata, rvgen.props)
@@ -1838,8 +1833,7 @@ class GeneratorsMixin:
                     raise Error(self._patrol_errors[err.code]
                                 .format_map(errdata))
                 pywikibot.debug("protect: Unexpected error code '{}' received."
-                                .format(err.code),
-                                _logger)
+                                .format(err.code))
                 raise
 
             yield result['patrol']

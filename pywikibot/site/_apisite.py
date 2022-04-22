@@ -77,7 +77,6 @@ from pywikibot.tools import (
 
 
 __all__ = ('APISite', )
-_logger = 'wiki.apisite'
 _mw_msg_cache = defaultdict(dict)  # type: DefaultDict[str, Dict[str, str]]
 
 
@@ -1617,8 +1616,7 @@ class APISite(
                     self._dl_errors[err.code].format_map(errdata)
                 ) from None
             pywikibot.debug("revdelete: Unexpected error code '{}' received."
-                            .format(err.code),
-                            _logger)
+                            .format(err.code))
             raise
         else:
             if target:
@@ -1776,14 +1774,11 @@ class APISite(
             while True:
                 try:
                     result = req.submit()
-                    pywikibot.debug('editpage response: {}'.format(result),
-                                    _logger)
+                    pywikibot.debug('editpage response: {}'.format(result))
                 except APIError as err:
                     if err.code.endswith('anon') and self.logged_in():
-                        pywikibot.debug(
-                            "editpage: received '{}' even though bot is "
-                            'logged in'.format(err.code),
-                            _logger)
+                        pywikibot.debug("editpage: received '{}' even though "
+                                        'bot is logged in'.format(err.code))
                     if err.code == 'abusefilter-warning':
                         pywikibot.warning('{info}\nRetrying.'
                                           .format(info=err.info))
@@ -1808,8 +1803,7 @@ class APISite(
                         raise exception(page) from None
                     pywikibot.debug(
                         "editpage: Unexpected error code '{}' received."
-                        .format(err.code),
-                        _logger)
+                        .format(err.code))
                     raise
                 assert 'edit' in result and 'result' in result['edit'], result
 
@@ -1966,8 +1960,7 @@ class APISite(
         try:
             result = req.submit()
             pywikibot.debug('mergehistory response: {result}'
-                            .format(result=result),
-                            _logger)
+                            .format(result=result))
         except APIError as err:
             if err.code in self._mh_errors:
                 on_error = self._mh_errors[err.code]
@@ -1975,9 +1968,7 @@ class APISite(
 
             pywikibot.debug(
                 "mergehistory: Unexpected error code '{code}' received"
-                .format(code=err.code),
-                _logger
-            )
+                .format(code=err.code))
             raise
         finally:
             self.unlock_page(source)
@@ -2071,14 +2062,13 @@ class APISite(
         req['from'] = oldtitle  # "from" is a python keyword
         try:
             result = req.submit()
-            pywikibot.debug('movepage response: {}'.format(result),
-                            _logger)
+            pywikibot.debug('movepage response: {}'.format(result))
         except APIError as err:
             if err.code.endswith('anon') and self.logged_in():
                 pywikibot.debug(
                     "movepage: received '{}' even though bot is logged in"
-                    .format(err.code),
-                    _logger)
+                    .format(err.code))
+
             if err.code in self._mv_errors:
                 on_error = self._mv_errors[err.code]
                 if not isinstance(on_error, str):
@@ -2111,8 +2101,7 @@ class APISite(
                 raise Error(on_error.format_map(errdata)) from None
 
             pywikibot.debug("movepage: Unexpected error code '{}' received."
-                            .format(err.code),
-                            _logger)
+                            .format(err.code))
             raise
         finally:
             self.unlock_page(page)
@@ -2190,8 +2179,7 @@ class APISite(
                     self._rb_errors[err.code].format_map(errdata)
                 ) from None
             pywikibot.debug("rollback: Unexpected error code '{}' received."
-                            .format(err.code),
-                            _logger)
+                            .format(err.code))
             raise
         finally:
             self.unlock_page(page)
@@ -2288,8 +2276,7 @@ class APISite(
                     self._dl_errors[err.code].format_map(errdata)
                 ) from None
             pywikibot.debug('delete: Unexpected error code {!r} received.'
-                            .format(err.code),
-                            _logger)
+                            .format(err.code))
             raise
         else:
             if isinstance(page, pywikibot.page.BasePage):
@@ -2348,8 +2335,7 @@ class APISite(
                     self._dl_errors[err.code].format_map(errdata)
                 ) from None
             pywikibot.debug('undelete: Unexpected error code {!r} received.'
-                            .format(err.code),
-                            _logger)
+                            .format(err.code))
             raise
         finally:
             self.unlock_page(page)
@@ -2432,8 +2418,7 @@ class APISite(
                     self._protect_errors[err.code].format_map(errdata)
                 ) from None
             pywikibot.debug("protect: Unexpected error code '{}' received."
-                            .format(err.code),
-                            _logger)
+                            .format(err.code))
             raise
         else:
             protection = {}

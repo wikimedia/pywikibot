@@ -61,8 +61,6 @@ try:
 except ImportError as e:
     mwparserfromhell = e
 
-_logger = 'patrol'
-
 
 def verbose_output(string) -> None:
     """Verbose output."""
@@ -210,8 +208,8 @@ class PatrolBot(BaseBot):
                 continue
             if isinstance(node, mwparserfromhell.nodes.wikilink.Wikilink):
                 if current_user is False:
-                    pywikibot.debug('Link to "{}" ignored as outside '
-                                    'list'.format(node.title), _logger)
+                    pywikibot.debug('Link to "{}" ignored as outside list'
+                                    .format(node.title))
                     continue
 
                 obj = pywikibot.Link(node.title, self.site)

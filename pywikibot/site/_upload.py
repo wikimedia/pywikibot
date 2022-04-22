@@ -20,7 +20,6 @@ from pywikibot.tools import compute_file_hash
 
 
 __all__ = ('Uploader', )
-_logger = 'wiki.apisite'
 
 
 class Uploader:
@@ -456,7 +455,7 @@ class Uploader:
                         self.site._uploaddisabled = True
                     raise error
                 result = result['upload']
-                pywikibot.debug(result, _logger)
+                pywikibot.debug(result)
 
             if 'result' not in result:
                 raise Error('Upload: unrecognized response: {}'.format(result))

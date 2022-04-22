@@ -65,8 +65,6 @@ except ImportError as lzma_import_error:
 
 PYTHON_VERSION = sys.version_info[:3]
 
-_logger = 'tools'
-
 
 def is_ip_address(value: str) -> bool:
     """Check if a value is a valid IPv4 or IPv6 address.
@@ -507,8 +505,7 @@ class MediaWikiVersion:
                                                 version_match.group(2))
             if version_match.group(2):
                 debug('Additional unused version part '
-                      '"{}"'.format(version_match.group(2)),
-                      _logger)
+                      '"{}"'.format(version_match.group(2)))
             self._dev_version = (4, )
 
         self.suffix = version_match.group(2) or ''
@@ -773,8 +770,6 @@ class ThreadList(list):
 
     """
 
-    _logger = 'threadlist'
-
     def __init__(self, limit: int = 128, wait_time: float = 2, *args) -> None:
         """Initializer.
 
@@ -810,17 +805,16 @@ class ThreadList(list):
 
         super().append(thd)
         thd.start()
-        debug("thread {} ('{}') started".format(len(self), type(thd)),
-              self._logger)
+        debug("thread {} ('{}') started".format(len(self), type(thd)))
 
     def stop_all(self) -> None:
         """Stop all threads the pool."""
         if self:
-            debug('EARLY QUIT: Threads: {}'.format(len(self)), self._logger)
+            debug('EARLY QUIT: Threads: {}'.format(len(self)))
         for thd in self:
             thd.stop()
             debug('EARLY QUIT: Queue size left in {}: {}'
-                  .format(thd, thd.queue.qsize()), self._logger)
+                  .format(thd, thd.queue.qsize()))
 
 
 def intersect_generators(*iterables, allow_duplicates: bool = False):
@@ -890,7 +884,7 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
     for source in iterables:
         if not source:
             debug('At least one iterable ({!r}) is empty and execution was '
-                  'skipped immediately.'.format(source), 'intersect')
+                  'skipped immediately.'.format(source))
             return
 
     # Item is cached to check that it is found n_gen times

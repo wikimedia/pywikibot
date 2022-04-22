@@ -44,8 +44,6 @@ from pywikibot.textlib import removeHTMLParts
 from pywikibot.tools import PYTHON_VERSION, itergroup
 
 
-_logger = 'data.api'
-
 lagpattern = re.compile(
     r'Waiting for [\w.: ]+: (?P<lag>\d+(?:\.\d+)?) seconds? lagged')
 
@@ -311,13 +309,13 @@ class ParamInfo(Sized, Container):
         # number of modules that may be processed in a single batch.
         for module_batch in module_generator():
             if self.modules_only_mode and 'pageset' in module_batch:
-                pywikibot.debug('paraminfo fetch: removed pageset', _logger)
+                pywikibot.debug('paraminfo fetch: removed pageset')
                 module_batch.remove('pageset')
                 # If this occurred during initialisation,
                 # also record it in the preloaded_modules.
                 # (at least so tests know an extra load was intentional)
                 if 'query' not in self._paraminfo:
-                    pywikibot.debug('paraminfo batch: added query', _logger)
+                    pywikibot.debug('paraminfo batch: added query')
                     module_batch.append('query')
                     self.preloaded_modules |= {'query'}
 
@@ -1052,7 +1050,7 @@ class Request(MutableMapping):
 
         # Make sure user is logged in
         if self.write:
-            pywikibot.debug('Adding user assertion', _logger)
+            pywikibot.debug('Adding user assertion')
             self['assert'] = 'user'
 
     @classmethod
@@ -1477,8 +1475,7 @@ class Request(MutableMapping):
 
         pywikibot.debug('API request to {} (uses get: {}):\n'
                         'Headers: {!r}\nURI: {!r}\nBody: {!r}'
-                        .format(self.site, use_get, headers, uri, body),
-                        _logger)
+                        .format(self.site, use_get, headers, uri, body))
         return use_get, uri, body, headers
 
     def _http_request(self, use_get: bool, uri: str, data, headers,
@@ -1545,7 +1542,7 @@ The text message is:
             # Do not retry for AutoFamily but raise a SiteDefinitionError
             # Note: family.AutoFamily is a function to create that class
             if self.site.family.__class__.__name__ == 'AutoFamily':
-                pywikibot.debug(msg, _logger)
+                pywikibot.debug(msg)
                 raise SiteDefinitionError('Invalid AutoFamily({!r})'
                                           .format(self.site.family.domain))
 
@@ -2051,7 +2048,7 @@ class CachedRequest(Request):
                 return False
             pywikibot.debug('{}: cache hit ({}) for API request: {}'
                             .format(self.__class__.__name__, filename,
-                                    uniquedescr), _logger)
+                                    uniquedescr))
             return True
         except OSError:
             # file not found
@@ -2155,8 +2152,7 @@ class APIGenerator(_RequestWrapper):
         self.query_increment = int(value)
         self.request[self.limit_name] = self.query_increment
         pywikibot.debug('{}: Set query_increment to {}.'
-                        .format(self.__class__.__name__,
-                                self.query_increment), _logger)
+                        .format(type(self).__name__, self.query_increment))
 
     def set_maximum_items(self, value: Union[int, str, None]) -> None:
         """
@@ -2173,11 +2169,9 @@ class APIGenerator(_RequestWrapper):
             if self.query_increment and self.limit < self.query_increment:
                 self.request[self.limit_name] = self.limit
                 pywikibot.debug('{}: Set request item limit to {}'
-                                .format(self.__class__.__name__, self.limit),
-                                _logger)
+                                .format(type(self).__name__, self.limit))
             pywikibot.debug('{}: Set limit (maximum_items) to {}.'
-                            .format(self.__class__.__name__, self.limit),
-                            _logger)
+                            .format(type(self).__name__, self.limit))
 
     def __iter__(self):
         """
@@ -2190,28 +2184,25 @@ class APIGenerator(_RequestWrapper):
         while True:
             self.request[self.continue_name] = offset
             pywikibot.debug('{}: Request: {}'
-                            .format(self.__class__.__name__, self.request),
-                            _logger)
+                            .format(type(self).__name__, self.request))
             data = self.request.submit()
 
             n_items = len(data[self.data_name])
             pywikibot.debug('{}: Retrieved {} items'
-                            .format(self.__class__.__name__, n_items),
-                            _logger)
+                            .format(type(self).__name__, n_items))
             if n_items > 0:
                 for item in data[self.data_name]:
                     yield item
                     n += 1
                     if self.limit is not None and n >= self.limit:
-                        pywikibot.debug('%s: Stopped iterating due to '
-                                        'exceeding item limit.' %
-                                        self.__class__.__name__, _logger)
+                        pywikibot.debug('{}: Stopped iterating due to '
+                                        'exceeding item limit.'
+                                        .format(type(self).__name__))
                         return
                 offset += n_items
             else:
                 pywikibot.debug('{}: Stopped iterating due to empty list in '
-                                'response.'.format(self.__class__.__name__),
-                                _logger)
+                                'response.'.format(type(self).__name__))
                 break
 
 
@@ -2410,8 +2401,7 @@ class QueryGenerator(_RequestWrapper):
         else:
             self.query_limit = min(self.api_limit, limit)
         pywikibot.debug('{}: Set query_limit to {}.'
-                        .format(self.__class__.__name__,
-                                self.query_limit), _logger)
+                        .format(type(self).__name__, self.query_limit))
 
     def set_maximum_items(self, value: Union[int, str, None]) -> None:
         """Set the maximum number of items to be retrieved from the wiki.
@@ -2440,10 +2430,8 @@ class QueryGenerator(_RequestWrapper):
             limit = int(param['max'])
         if self.api_limit is None or limit < self.api_limit:
             self.api_limit = limit
-            pywikibot.debug(
-                '{}: Set query_limit to {}.'.format(self.__class__.__name__,
-                                                    self.api_limit),
-                _logger)
+            pywikibot.debug('{}: Set query_limit to {}.'
+                            .format(type(self).__name__, self.api_limit))
 
     def support_namespace(self) -> bool:
         """Check if namespace is a supported parameter on this query.
@@ -2579,8 +2567,7 @@ class QueryGenerator(_RequestWrapper):
                         new=new_limit,
                         count=self._count,
                         prefix=self.prefix,
-                        value=self.request[self.prefix + 'limit']),
-                _logger)
+                        value=self.request[self.prefix + 'limit']))
         return prev_limit, new_limit
 
     def _get_resultdata(self):
@@ -2599,9 +2586,8 @@ class QueryGenerator(_RequestWrapper):
                 resultdata = [resultdata[k]
                               for k in sorted(resultdata.keys())]
         pywikibot.debug('{name} received {keys}; limit={limit}'
-                        .format(name=self.__class__.__name__,
-                                keys=keys, limit=self.limit),
-                        _logger)
+                        .format(name=type(self).__name__, keys=keys,
+                                limit=self.limit))
         return resultdata
 
     def _extract_results(self, resultdata):
@@ -2646,9 +2632,9 @@ class QueryGenerator(_RequestWrapper):
             if not self.data or not isinstance(self.data, dict):
                 pywikibot.debug(
                     '{}: stopped iteration because no dict retrieved from api.'
-                    .format(self.__class__.__name__),
-                    _logger)
+                    .format(type(self).__name__))
                 return
+
             if 'query' in self.data and self.resultkey in self.data['query']:
                 resultdata = self._get_resultdata()
                 if 'normalized' in self.data['query']:

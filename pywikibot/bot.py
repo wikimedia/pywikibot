@@ -190,9 +190,6 @@ AnswerType = Union[
 ]
 PageLinkType = Union['pywikibot.page.Link', 'pywikibot.page.Page']
 
-# Note: all output goes through python std library "logging" module
-_logger = 'bot'
-
 ui = None  # type: Optional[pywikibot.userinterfaces._interface_base.ABUIC]
 
 
@@ -977,7 +974,7 @@ def handle_args(args: Optional[Iterable[str]] = None,
         show_help(show_global=do_help_val == 'global')
         sys.exit(0)
 
-    debug('handle_args() completed.', _logger)
+    debug('handle_args() completed.')
     return non_global_args
 
 

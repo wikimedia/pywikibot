@@ -427,9 +427,7 @@ class WikibasePage(BasePage, WikibaseEntity):
         if title and ('ns' not in kwargs and 'entity_type' not in kwargs):
             pywikibot.debug('{}.__init__: {} title {!r} specified without '
                             'ns or entity_type'
-                            .format(self.__class__.__name__, site,
-                                    title),
-                            layer='wikibase')
+                            .format(type(self).__name__, site, title))
 
         self._namespace = None
 
