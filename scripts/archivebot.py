@@ -497,7 +497,7 @@ class DiscussionPage(pywikibot.Page):
         if sort_threads:
             pywikibot.output('Sorting threads...')
             self.threads.sort(key=lambda t: t.timestamp)
-        newtext = re.sub('\n*$', '\n\n', self.header)  # Fix trailing newlines
+        newtext = self.header.strip() + '\n\n'  # Fix trailing newlines
         for t in self.threads:
             newtext += t.to_text()
         if self.full:
