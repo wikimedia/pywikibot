@@ -719,10 +719,10 @@ class DataExtendBot(SingleSiteBot):
         m = re.match(r'(\d+(?:\.\d+)?)\s*([a-z]\w*)', text.replace(',', '.'))
         amount = m.group(1)
         name = m.group(2).lower()
-        return pywikibot.WbQuantity(
-            amount, unit=pywikibot.ItemPage(self.site,
-                                            self.QUANTITYTYPE[name]),
-            site=self.site)
+        return pywikibot.WbQuantity(amount,
+                                    unit=pywikibot.ItemPage(
+                                        self.site, self.QUANTITYTYPE[name]),
+                                    site=self.site)
 
     def treat(self, item) -> None:
         """Process the ItemPage."""
@@ -734,19 +734,18 @@ class DataExtendBot(SingleSiteBot):
 
         longtexts = []
         newdescriptions = defaultdict(set)
-        updatedclaims = {
-            prop: claims[prop]
-            for prop in claims
-        }
+        updatedclaims = {prop: claims[prop] for prop in claims}
         dorestrict = True
         continueafterrestrict = False
-        if self.opt.restrict and self.opt.restrict.endswith('+'):
+
+        restrict_end = self.opt.restrict and self.opt.restrict[-1]
+        if restrict_end in ('+', '*'):
             self.opt.restrict = self.opt.restrict[:-1]
             continueafterrestrict = True
-        if self.opt.restrict and self.opt.restrict.endswith('*'):
-            self.opt.restrict = self.opt.restrict[:-1]
+
+        if restrict_end == '*':
             dorestrict = False
-            continueafterrestrict = True
+
         unidentifiedprops = []
         failedprops = []
         claims['Wiki'] = [Quasiclaim(page.title(force_interwiki=True,
@@ -779,11 +778,9 @@ class DataExtendBot(SingleSiteBot):
 
                 identifier = mainclaim.getTarget()
                 try:
-                    if prop == 'P973':
-                        analyzertype = self.analyzertype[
-                            identifier.split('/')[2]]
-                    else:
-                        analyzertype = self.analyzertype[prop]
+                    analyzertype = self.analyzertype[identifier.split('/')[2]
+                                                     if prop == 'P973'
+                                                     else prop]
                 except KeyError:
                     unidentifiedprops.append(prop)
                     continue
@@ -791,6 +788,7 @@ class DataExtendBot(SingleSiteBot):
                 analyzer = analyzertype(identifier, self.data,
                                         item.title(), self)
                 newclaims = analyzer.findclaims() or []
+
                 if newclaims is None:
                     failedprops.append(prop)
                     newclaims = []
@@ -810,37 +808,32 @@ class DataExtendBot(SingleSiteBot):
                 if self.opt.always or input_yn('Save this?', default=True):
                     for claim in newclaims:
                         if claim[0] in updatedclaims \
-                           and self.isinclaims(
-                               claim[1], updatedclaims[claim[0]]):
+                           and self.isinclaims(claim[1],
+                                               updatedclaims[claim[0]]):
                             if claim[2]:
+                                source = None
                                 if claim[2].dbid:
-                                    if claim[2].iswiki:
-                                        source = pywikibot.Claim(self.site,
-                                                                 'P143')
-                                    else:
-                                        source = pywikibot.Claim(self.site,
-                                                                 'P248')
+                                    id_ = 'P143' if claim[2].iswiki else 'P248'
+                                    source = pywikibot.Claim(self.site, id_)
                                     source.setTarget(
                                         pywikibot.ItemPage(self.site,
                                                            claim[2].dbid))
-                                else:
-                                    source = None
 
-                                if claim[2].iswiki:
-                                    url = pywikibot.Claim(self.site, 'P4656')
-                                else:
-                                    url = pywikibot.Claim(self.site, 'P854')
+                                id_ = 'P4656' if claim[2].iswiki else 'P854'
+                                url = pywikibot.Claim(self.site, id_)
+
                                 if claim[2].sparqlquery:
-                                    url.setTarget(
-                                        pywikibot.ItemPage(
-                                            self.site, claim[1]).full_url())
+                                    url.setTarget(pywikibot.ItemPage(
+                                        self.site, claim[1]).full_url())
                                 else:
                                     url.setTarget(claim[2].url)
+
                                 if claim[2].iswiki or claim[2].isurl:
                                     iddata = None
                                 else:
                                     iddata = pywikibot.Claim(self.site, prop)
                                     iddata.setTarget(identifier)
+
                                 if url is None:
                                     date = None
                                 else:
@@ -851,12 +844,15 @@ class DataExtendBot(SingleSiteBot):
                                                 .strftime('%Y-%m-%d'),
                                                 datetime.datetime.utcnow()
                                                 .strftime('%Y-%m-%d'))))
+
                                 if not analyzer.showurl:
                                     url = None
-                                sourcedata = [source, url, iddata, date]
+
+                                sourceparts = [source, url, iddata, date]
                                 sourcedata = [sourcepart
-                                              for sourcepart in sourcedata
+                                              for sourcepart in sourceparts
                                               if sourcepart is not None]
+
                                 pywikibot.output('Sourcing {}: {}'
                                                  .format(self.label(claim[0]),
                                                          self.label(claim[1])))
@@ -870,16 +866,16 @@ class DataExtendBot(SingleSiteBot):
                         else:
                             if claim[0] not in propsdone:
                                 propstodo.append(claim[0])
-                            createdclaim = pywikibot.Claim(
-                                self.site, claim[0])
+
+                            createdclaim = pywikibot.Claim(self.site, claim[0])
+
                             if self.QRE.match(claim[1]):
-                                createdclaim.setTarget(
-                                    pywikibot.ItemPage(self.site,
-                                                       claim[1]))
+                                createdclaim.setTarget(pywikibot.ItemPage(
+                                    self.site, claim[1]))
+
                             elif claim[1].startswith('!date!'):
                                 try:
-                                    target = self.createdateclaim(
-                                        claim[1][6:])
+                                    target = self.createdateclaim(claim[1][6:])
                                 except ValueError as ex:
                                     pywikibot.output(
                                         'Unable to analyze date "{}" for {}: {}'
@@ -892,22 +888,27 @@ class DataExtendBot(SingleSiteBot):
                                     continue
 
                                 createdclaim.setTarget(target)
+
                             elif claim[1].startswith('!q!'):
                                 target = self.createquantityclaim(
                                     claim[1][3:].strip())
+
                                 if target is None:
                                     continue
 
                                 createdclaim.setTarget(target)
+
                             elif claim[1].startswith('!i!'):
                                 createdclaim.setTarget(
                                     pywikibot.page.FilePage(self.site,
                                                             claim[1][3:]))
                             else:
                                 createdclaim.setTarget(claim[1])
+
                             pywikibot.output('Adding {}: {}'
                                              .format(self.label(claim[0]),
                                                      self.label(claim[1])))
+
                             try:
                                 item.addClaim(createdclaim)
                             except OtherPageSaveError as ex:
@@ -916,6 +917,7 @@ class DataExtendBot(SingleSiteBot):
                                         'Unable to save image {}: {}'
                                         .format(claim[1][3:], ex))
                                     continue
+
                                 raise
 
                             if claim[0] in updatedclaims:
