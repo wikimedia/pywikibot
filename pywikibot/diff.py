@@ -86,10 +86,13 @@ class Hunk:
         return '{0} -{1} +{2} {0}'.format(affix, a_rng, b_rng)
 
     def create_diff(self) -> Iterable[str]:
-        """Generator of diff text for this hunk, without formatting."""
-        # make sure each line ends with '\n' to prevent
-        # behaviour like https://bugs.python.org/issue2142
+        """Generator of diff text for this hunk, without formatting.
+
+        Check each line ends with line feed to prevent behaviour like
+        :bug:`2142`
+        """
         def check_line(line: str) -> str:
+            r"""Make sure each line ends with '\n'."""
             return line if line.endswith('\n') else line + '\n'
 
         for tag, i1, i2, j1, j2 in self.group:

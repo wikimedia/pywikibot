@@ -127,6 +127,8 @@ class Siteinfo(Container):
         returned when a property doesn't exists, it queries each property
         independetly if a property is invalid.
 
+        .. seealso:: :api:Siteinfo
+
         :param prop: The property names of the siteinfo.
         :type prop: str or iterable
         :param expiry: The expiry date of the cached request.
@@ -134,7 +136,6 @@ class Siteinfo(Container):
         :return: A dictionary with the properties of the site. Each entry in
             the dictionary is a tuple of the value and a boolean to save if it
             is the default value.
-        :see: https://www.mediawiki.org/wiki/API:Meta#siteinfo_.2F_si
         """
         def warn_handler(mod, message) -> bool:
             """Return True if the warning is handled."""

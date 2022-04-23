@@ -37,7 +37,7 @@ by default::
 -expiry:          Supply a custom protection expiry, which defaults to
                   indefinite. Any string understandable by MediaWiki, including
                   relative and absolute, is acceptable. See:
-                  https://www.mediawiki.org/wiki/API:Protect#Parameters
+                  :api:`Protect#Parameters`
 
 Usage:
 

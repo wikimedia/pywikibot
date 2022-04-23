@@ -53,7 +53,7 @@ def _invalidate_superior_cookies(family) -> None:
     Clear cookies for site's second level domain.
 
     get_login_token() will generate new cookies needed.
-    This is a workaround for requests bug, see T224712
+    This is a workaround for requests bug, see :phab:`T224712`
     and https://github.com/psf/requests/issues/5411
     for more details.
     """
@@ -3038,13 +3038,11 @@ class LoginManager(login.LoginManager):
 
 
 def encode_url(query) -> str:
-    """
-    Encode parameters to pass with a url.
+    """Encode parameters to pass with a url.
 
     Reorder parameters so that token parameters go last and call wraps
-    :py:obj:`urlencode`. Return an HTTP URL query fragment which complies with
-    https://www.mediawiki.org/wiki/API:Edit#Parameters
-    (See the 'token' bullet.)
+    :py:obj:`urlencode`. Return an HTTP URL query fragment which
+    complies with :api:`Edit#Parameters` (See the 'token' bullet.)
 
     :param query: keys and values to be uncoded for passing with a url
     :type query: mapping object or a sequence of two-element tuples

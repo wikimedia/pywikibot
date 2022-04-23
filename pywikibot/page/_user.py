@@ -417,9 +417,9 @@ class User(Page):
         """
         Determine if the user has thanks notifications enabled.
 
-        NOTE: This doesn't accurately determine if thanks is enabled for user.
-              Privacy of thanks preferences is under discussion, please see
-              https://phabricator.wikimedia.org/T57401#2216861, and
-              https://phabricator.wikimedia.org/T120753#1863894
+        .. note::
+           This doesn't accurately determine if thanks is enabled for user.
+           Privacy of thanks preferences is under discussion, please see
+           :phab:`T57401#2216861` and :phab:`T120753#1863894`.
         """
         return self.isRegistered() and 'bot' not in self.groups()

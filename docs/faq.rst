@@ -18,7 +18,7 @@ Frequent Asked Questions
      to the ``PreloadingGenerator`` function mentioned above.
   4. Use :py:mod:`MySQLPageGenerator
      <pywikibot.pagegenerators.MySQLPageGenerator >` if direct DB access is
-     available and appropriate. See also: `MySQL`_
+     available and appropriate. See also: :manpage:`MySQL`
 
 **The bot cannot delete pages**
   Your account needs delete rights on your wiki. If you have setup another
@@ -30,13 +30,9 @@ Frequent Asked Questions
   Using ``-help`` option is a good way to find all generators which can be
   used  with that script. You can also find all generator options and filter
   options at :py:mod:`pywikibot.pagegenerators` module.
-  See also `Page Generators`_ MediaWiki page for additional information.
+  See also :manpage:`Page Generators` for additional information.
 
 **pywikibot.i18n.TranslationError: No English translation has been defined**
   It can happen due to lack of i18n submodule or files. Update i18n submodule
-  or download these files first. See also: `i18n submodule`_
+  or download these files first. See also: :manpage:`i18n` manual.
 
-
-.. _i18n submodule: https://www.mediawiki.org/wiki/Manual:Pywikibot/i18n
-.. _MySQL: https://www.mediawiki.org/wiki/Manual:Pywikibot/MySQL
-.. _Page Generators: https://www.mediawiki.org/wiki/Manual:Pywikibot/Page_Generators

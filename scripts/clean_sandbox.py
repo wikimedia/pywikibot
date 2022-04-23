@@ -25,8 +25,10 @@ Furthermore, the following command line parameters are supported:
 
 This script is a :py:obj:`ConfigParserBot <pywikibot.bot.ConfigParserBot>`.
 All local parameters can be given inside a scripts.ini file. Options
-passed to the script are priorized over options read from ini file. See:
-https://docs.python.org/3/library/configparser.html#supported-ini-file-structure
+passed to the script are priorized over options read from ini file.
+
+.. seealso:: :python:`Supported .ini File Structure
+   <library/configparser.html#supported-ini-file-structure>`
 
 For example:
 

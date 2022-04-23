@@ -72,9 +72,9 @@ week, which is in the year before if January 1st is not a Monday. If it's
 between Friday or Sunday (including) the following week is then the first week
 of the year. So up to three days are still counted as the year before.
 
-See also:
- - https://webspace.science.uu.nl/~gent0113/calendar/isocalendar.htm
- - https://docs.python.org/3/library/datetime.html#datetime.date.isocalendar
+.. seealso:: Python :python:`datetime.date.isocalendar
+   <library/datetime.html#datetime.date.isocalendar>`,
+   https://webspace.science.uu.nl/~gent0113/calendar/isocalendar.htm
 
 Options (may be omitted):
 

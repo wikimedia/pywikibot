@@ -195,7 +195,7 @@ class GeneratorsMixin:
                       content: bool = False):
         """Iterate all pages that link to the given page.
 
-        :see: https://www.mediawiki.org/wiki/API:Backlinks
+        .. seealso:: :api:`Backlinks`
 
         :param page: The Page to get links to.
         :param follow_redirects: Also return links to redirects pointing to
@@ -257,7 +257,7 @@ class GeneratorsMixin:
                         total=None, content: bool = False):
         """Iterate all pages that embedded the given page as a template.
 
-        :see: https://www.mediawiki.org/wiki/API:Embeddedin
+        .. seealso:: :api:`Embeddedin`
 
         :param page: The Page to get inclusions for.
         :param filter_redirects: If True, only return redirects that embed
@@ -296,7 +296,9 @@ class GeneratorsMixin:
     ) -> 'Iterable[pywikibot.Page]':
         """Iterale all redirects to the given page.
 
-        :see: https://www.mediawiki.org/wiki/API:Redirects
+        .. seealso:: :api:`Redirects`
+
+        .. versionadded:: 7.0
 
         :param page: The Page to get redirects for.
         :param filter_fragments: If True, only return redirects with fragments.
@@ -305,8 +307,6 @@ class GeneratorsMixin:
         :param namespaces: Only return redirects from the namespaces
         :param total: maximum number of redirects to retrieve in total
         :param content: load the current content of each redirect
-
-        .. versionadded:: 7.0
         """
         rdargs = {
             'titles': page.title(with_section=False).encode(self.encoding()),
@@ -371,7 +371,7 @@ class GeneratorsMixin:
     ) -> Generator['pywikibot.Page', None, None]:
         """Iterate internal wikilinks contained (or transcluded) on page.
 
-        .. seealso:: https://www.mediawiki.org/wiki/API:Links
+        .. seealso:: :api:`Links`
 
         :param namespaces: Only iterate pages in these namespaces
             (default: all)
@@ -401,7 +401,7 @@ class GeneratorsMixin:
     def pagecategories(self, page, *, total=None, content: bool = False):
         """Iterate categories to which page belongs.
 
-        :see: https://www.mediawiki.org/wiki/API:Categories
+        .. seealso:: :api:`Categories`
 
         :param content: if True, load the current content of each iterated page
             (default False); note that this means the contents of the
@@ -420,7 +420,7 @@ class GeneratorsMixin:
     def pageimages(self, page, *, total=None, content: bool = False):
         """Iterate images used (not just linked) on the page.
 
-        :see: https://www.mediawiki.org/wiki/API:Images
+        .. seealso:: :api:`Images`
 
         :param content: if True, load the current content of each iterated page
             (default False); note that this means the content of the image
@@ -436,7 +436,7 @@ class GeneratorsMixin:
                       content: bool = False):
         """Iterate templates transcluded (not just linked) on the page.
 
-        :see: https://www.mediawiki.org/wiki/API:Templates
+        .. seealso:: :api:`Templates`
 
         :param namespaces: Only iterate pages in these namespaces
         :type namespaces: iterable of str or Namespace key,
@@ -467,7 +467,7 @@ class GeneratorsMixin:
                         endprefix: Optional[str] = None):
         """Iterate members of specified category.
 
-        :see: https://www.mediawiki.org/wiki/API:Categorymembers
+        .. seealso:: :api:`Categorymembers`
 
         :param category: The Category to iterate.
         :param namespaces: If present, only return category members from
@@ -634,7 +634,7 @@ class GeneratorsMixin:
         endid if both are specified; likewise, starttime must be greater
         than endtime. If rvdir is True, these relationships are reversed.
 
-        :see: https://www.mediawiki.org/wiki/API:Revisions
+        .. seealso:: :api:`Revisions`
 
         :param page: retrieve revisions of this Page and hold the data.
         :type page: pywikibot.Page
@@ -754,9 +754,9 @@ class GeneratorsMixin:
         """Iterate all interlanguage links on page, yielding Link objects.
 
         .. versionchanged:: 6.2:
-           *include_empty_titles* parameter was added.
+           `include_empty_titles` parameter was added.
 
-        :see: https://www.mediawiki.org/wiki/API:Langlinks
+        .. seealso:: :api:`Langlinks`
 
         :param include_obsolete: if true, yield even Link objects whose
             site is obsolete
@@ -786,7 +786,7 @@ class GeneratorsMixin:
     def page_extlinks(self, page, *, total=None):
         """Iterate all external links on page, yielding URL strings.
 
-        :see: https://www.mediawiki.org/wiki/API:Extlinks
+        .. seealso:: :api:`Extlinks`
         """
         eltitle = page.title(with_section=False)
         elquery = self._generator(api.PropertyGenerator, type_arg='extlinks',
@@ -817,7 +817,7 @@ class GeneratorsMixin:
     ):
         """Iterate pages in a single namespace.
 
-        :see: https://www.mediawiki.org/wiki/API:Allpages
+        .. seealso:: :api:`Allpages`
 
         :param start: Start at this title (page need not exist).
         :param prefix: Only yield pages starting with this string.
@@ -898,7 +898,7 @@ class GeneratorsMixin:
         been deleted may not have been removed from the links table, so this
         method can return false positives.
 
-        :see: https://www.mediawiki.org/wiki/API:Alllinks
+        .. seealso:: :api:`Alllinks`
 
         :param start: Start at this title (page need not exist).
         :param prefix: Only yield pages starting with this string.
@@ -936,7 +936,7 @@ class GeneratorsMixin:
         were found on pages that have been deleted may not have been removed
         from the database table, so this method can return false positives.
 
-        :see: https://www.mediawiki.org/wiki/API:Allcategories
+        .. seealso:: :api:`Allcategories`
 
         :param start: Start at this category title (category need not exist).
         :param prefix: Only yield categories starting with this string.
@@ -987,7 +987,7 @@ class GeneratorsMixin:
         will be a list of str; all the other values are str and should
         always be present.
 
-        :see: https://www.mediawiki.org/wiki/API:Allusers
+        .. seealso:: :api:`Allusers`
 
         :param start: start at this username (name need not exist)
         :param prefix: only iterate usernames starting with this substring
@@ -1019,7 +1019,7 @@ class GeneratorsMixin:
 
         Yields FilePages, but these pages need not exist on the wiki.
 
-        :see: https://www.mediawiki.org/wiki/API:Allimages
+        .. seealso:: :api:`Allimages`
 
         :param start: start at this title (name need not exist)
         :param prefix: only iterate titles starting with this substring
@@ -1062,7 +1062,7 @@ class GeneratorsMixin:
 
         Yields dict of file archive informations.
 
-        :see: https://www.mediawiki.org/wiki/API:filearchive
+        .. seealso:: :api:`filearchive`
 
         :param start: start at this title (name need not exist)
         :param end: end at this title (name need not exist)
@@ -1095,11 +1095,13 @@ class GeneratorsMixin:
         The iterator yields dicts containing keys corresponding to the
         block properties.
 
-        :see: https://www.mediawiki.org/wiki/API:Blocks
+        .. seealso:: :api:`Blocks`
 
-        :note: logevents only logs user blocks, while this method
-            iterates all blocks including IP ranges.
-        :note: ``iprange`` parameter cannot be used together with ``users``.
+        .. note::
+           logevents only logs user blocks, while this method iterates
+           all blocks including IP ranges.
+        .. warning::
+           ``iprange`` parameter cannot be used together with ``users``.
 
         :param starttime: start iterating at this Timestamp
         :type starttime: pywikibot.Timestamp
@@ -1148,7 +1150,7 @@ class GeneratorsMixin:
                     total: Optional[int] = None, content: bool = False):
         """Iterate Pages that contain links to the given URL.
 
-        :see: https://www.mediawiki.org/wiki/API:Exturlusage
+        .. seealso:: :api:`Exturlusage`
 
         :param url: The URL to search for (with or without the protocol
             prefix); this may include a '*' as a wildcard, only at the start
@@ -1188,7 +1190,7 @@ class GeneratorsMixin:
                    content: bool = False):
         """Iterate Pages that contain links to the given FilePage.
 
-        .. seealso:: https://www.mediawiki.org/wiki/API:Imageusage
+        .. seealso:: :api:`Imageusage`
         .. versionchanged:: 7.2
            all parameters except `image` are keyword only.
 
@@ -1222,10 +1224,11 @@ class GeneratorsMixin:
                   total: Optional[int] = None):
         """Iterate all log entries.
 
-        :see: https://www.mediawiki.org/wiki/API:Logevents
+        .. seealso:: :api:`Logevents`
 
-        :note: logevents with logtype='block' only logs user blocks whereas
-            site.blocks iterates all blocks including IP ranges.
+        .. note::
+           logevents with `logtype='block'` only logs user blocks
+           whereas `site.blocks` iterates all blocks including IP ranges.
 
         :param logtype: only iterate entries of this type
             (see mediawiki api documentation for available types)
@@ -1292,7 +1295,7 @@ class GeneratorsMixin:
                       tag: Optional[str] = None):
         """Iterate recent changes.
 
-        :see: https://www.mediawiki.org/wiki/API:RecentChanges
+        .. seealso:: :api:`RecentChanges`
 
         :param start: Timestamp to start listing from
         :type start: pywikibot.Timestamp
@@ -1378,7 +1381,7 @@ class GeneratorsMixin:
            raises APIError instead of Error if searchstring is not set
            or what parameter is wrong.
 
-        .. seealso:: https://www.mediawiki.org/wiki/API:Search
+        .. seealso:: :api:`Search`
 
         :param searchstring: the text to search for
         :param where: Where to search; value must be "text", "title",
@@ -1412,7 +1415,7 @@ class GeneratorsMixin:
 
         Iterated values are in the same format as recentchanges.
 
-        :see: https://www.mediawiki.org/wiki/API:Usercontribs
+        .. seealso:: :api:`Usercontribs`
 
         :param user: Iterate contributions by this user (name or IP)
         :param userprefix: Iterate contributions by all users whose names
@@ -1468,7 +1471,7 @@ class GeneratorsMixin:
 
         Iterated values will be in same format as recentchanges.
 
-        :see: https://www.mediawiki.org/wiki/API:Watchlist
+        .. seealso:: :api:`Watchlist`
 
         :param start: Iterate revisions starting at this Timestamp
         :param end: Iterate revisions ending at this Timestamp
@@ -1537,7 +1540,7 @@ class GeneratorsMixin:
         when 'content' parameter is set. For older wikis a 'token' key is
         also given with the content request.
 
-        :see: https://www.mediawiki.org/wiki/API:Deletedrevisions
+        .. seealso:: :api:`Deletedrevisions`
 
         :param titles: The page titles to check for deleted revisions
         :type titles: str (multiple titles delimited with '|')
@@ -1644,7 +1647,7 @@ class GeneratorsMixin:
         """
         Iterate all deleted revisions.
 
-        :see: https://www.mediawiki.org/wiki/API:Alldeletedrevisions
+        .. seealso:: :api:`Alldeletedrevisions`
 
         :param namespaces: Only iterate pages in these namespaces
         :type namespaces: iterable of str or Namespace key,
@@ -1691,7 +1694,7 @@ class GeneratorsMixin:
     def users(self, usernames):
         """Iterate info about a list of users by name or IP.
 
-        :see: https://www.mediawiki.org/wiki/API:Users
+        .. seealso:: :api:`Users`
 
         :param usernames: a list of user names
         :type usernames: list, or other iterable, of str
@@ -1707,7 +1710,7 @@ class GeneratorsMixin:
                     redirects: Optional[bool] = False, content: bool = False):
         """Iterate a number of random pages.
 
-        :see: https://www.mediawiki.org/wiki/API:Random
+        .. seealso: :api:`Random`
 
         Pages are listed in a fixed sequence, only the starting point is
         random.
@@ -1761,7 +1764,7 @@ class GeneratorsMixin:
     def patrol(self, rcid=None, revid=None, revision=None):
         """Return a generator of patrolled pages.
 
-        :see: https://www.mediawiki.org/wiki/API:Patrol
+        .. seealso:: :api:`Patrol`
 
         Pages to be patrolled are identified by rcid, revid or revision.
         At least one of the parameters is mandatory.
@@ -1858,11 +1861,10 @@ class GeneratorsMixin:
         specified in the first argument.
 
         The objects yielded are dependent on parameter returndict.
-        When true, it yields a tuple composed of a Page object and a dict of
-        attributes.
-        When false, it yields a tuple composed of the Page object,
-        timestamp (str), length (int), an empty string, username or IP
-        address (str), comment (str).
+        When true, it yields a tuple composed of a Page object and a
+        dict of attributes. When false, it yields a tuple composed of
+        the Page object, timestamp (str), length (int), an empty string,
+        username or IP address (str), comment (str).
 
         :param namespaces: only iterate pages in these namespaces
         :type namespaces: iterable of str or Namespace key,
@@ -1895,7 +1897,7 @@ class GeneratorsMixin:
     def querypage(self, special_page, total=True):
         """Yield Page objects retrieved from Special:{special_page}.
 
-        :see: https://www.mediawiki.org/wiki/API:Querypage
+        .. seealso:: :api:`Querypage`
 
         Generic function for all special pages supported by the site MW API.
 
@@ -2087,7 +2089,7 @@ class GeneratorsMixin:
         :py:obj:`APISite.allpages`, while it uses for 'create' the
         'query+protectedtitles' module.
 
-        :see: https://www.mediawiki.org/wiki/API:Protectedtitles
+        .. seealso:: :api:`Protectedtitles`
 
         :param namespace: The searched namespace.
         :type namespace: int or Namespace or str
@@ -2113,7 +2115,7 @@ class GeneratorsMixin:
                             total: Optional[int] = None):
         """Yield Page objects from Special:PagesWithProp.
 
-        :see: https://www.mediawiki.org/wiki/API:Pageswithprop
+        .. seealso:: :api:`Pageswithprop`
 
         :param propname: must be a valid property.
         :param total: number of pages to return
@@ -2130,7 +2132,7 @@ class GeneratorsMixin:
         """
         Return watchlist.
 
-        :see: https://www.mediawiki.org/wiki/API:Watchlistraw
+        .. seealso:: :api:`Watchlistraw`
 
         :param force: Reload watchlist
         :param total: if not None, limit the generator to yielding this many
