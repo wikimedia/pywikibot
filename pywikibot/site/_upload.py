@@ -39,10 +39,10 @@ class Uploader:
     :param text: Initial page text; if this is not set, then
         filepage.text will be used, or comment.
     :param watch: If true, add filepage to the bot user's watchlist
-    :param chunk_size: The chunk size in bytes for chunked uploading (see
-        https://www.mediawiki.org/wiki/API:Upload#Chunked_uploading).
-        It will only upload in chunks, if the chunk size is positive
-        but lower than the file size.
+    :param chunk_size: The chunk size in bytes for chunked uploading
+        (see :api:`Upload#Chunked_uploading`). It will only upload in
+        chunks, if the chunk size is positive but lower than the file
+        size.
     :param asynchronous: Make potentially large file operations
         asynchronous on the server side when possible.
     :param ignore_warnings: It may be a static boolean, a callable

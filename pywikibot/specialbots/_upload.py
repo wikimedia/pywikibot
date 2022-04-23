@@ -373,7 +373,7 @@ class UploadRobot(BaseBot):
         """
         Upload the image at file_url to the target wiki.
 
-        :see: https://www.mediawiki.org/wiki/API:Upload
+        .. seealso:: :api:`Upload`
 
         Return the filename that was used to upload the image.
         If the upload fails, ask the user whether to try again or not.

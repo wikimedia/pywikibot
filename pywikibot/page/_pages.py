@@ -1417,7 +1417,7 @@ class BasePage(ComparableMixin):
         .. deprecated:: 7.0
            the positional arguments
 
-        .. seealso:: https://www.mediawiki.org/wiki/API:Links
+        .. seealso:: :api:`Links`
 
         :keyword namespaces: Only iterate pages in these namespaces
             (default: all)

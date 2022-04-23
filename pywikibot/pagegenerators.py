@@ -246,9 +246,8 @@ GENERATOR OPTIONS
 
 -mysqlquery         Takes a MySQL query string like
                     "SELECT page_namespace, page_title FROM page
-                    WHERE page_namespace = 0" and treats
-                    the resulting pages. See
-                    https://www.mediawiki.org/wiki/Manual:Pywikibot/MySQL
+                    WHERE page_namespace = 0"
+                    and treats the resulting pages. See :manpage:`MySQL`
                     for more details.
 
 -sparql             Takes a SPARQL SELECT query string including ?item
@@ -317,7 +316,7 @@ GENERATOR OPTIONS
                     -linter:show just shows available categories.
 
 -querypage:name     Work on pages provided by a QueryPage-based special page,
-                    see https://www.mediawiki.org/wiki/API:Querypage.
+                    see :api:`Querypage`.
                     (tip: use -limit:n to fetch only n pages).
 
                     -querypage shows special pages available.
@@ -2750,7 +2749,7 @@ def MySQLPageGenerator(query: str, site: OPT_SITE_TYPE = None,
         FROM page
         WHERE page_namespace = 0;
 
-    See https://www.mediawiki.org/wiki/Manual:Pywikibot/MySQL
+    .. seealso:: :manpage:`MySQL`
 
     :param query: MySQL query to execute
     :param site: Site object

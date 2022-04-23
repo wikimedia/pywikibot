@@ -327,6 +327,8 @@ class APISite(
         """
         Log the user in if not already logged in.
 
+        .. seealso:: :api:`Login`
+
         :param autocreate: if true, allow auto-creation of the account
             using unified login
         :param user: bot user name. Overrides the username set by
@@ -334,7 +336,6 @@ class APISite(
 
         :raises pywikibot.exceptions.NoUsernameError: Username is not
             recognised by the site.
-        :see: https://www.mediawiki.org/wiki/API:Login
         """
         # TODO: this should include an assert that loginstatus
         #       is not already IN_PROGRESS, however the
@@ -429,7 +430,8 @@ class APISite(
         Logout of the site and load details for the logged out user.
 
         Also logs out of the global account if linked to the user.
-        https://www.mediawiki.org/wiki/API:Logout
+
+        .. seealso:: :api:`Logout`
 
         :raises APIError: Logout is not available when OAuth enabled.
         """
@@ -471,7 +473,7 @@ class APISite(
         To force retrieving userinfo ignoring cache, just delete this
         property.
 
-        .. seealso:: https://www.mediawiki.org/wiki/API:Userinfo
+        .. seealso:: :api:`Userinfo`
 
         :return: A dict with the following keys and values:
 
@@ -589,10 +591,11 @@ class APISite(
 
         To check whether a user can perform an action,
         the method has_right should be used.
-        https://www.mediawiki.org/wiki/API:Userinfo
+
+        .. seealso:: :api:`Userinfo`
 
         .. versionadded:: 7.0
-           The *force* parameter
+           The `force` parameter
 
         :param force: Whether the cache should be discarded.
         """
@@ -713,7 +716,8 @@ class APISite(
         """Return true if and only if the user has a specific right.
 
         Possible values of 'right' may vary depending on wiki settings.
-        https://www.mediawiki.org/wiki/API:Userinfo
+
+        .. seealso:: :api:`Userinfo`
 
         :param right: a specific right to be validated
         """
@@ -724,7 +728,8 @@ class APISite(
 
         Possible values of 'group' may vary depending on wiki settings,
         but will usually include bot.
-        https://www.mediawiki.org/wiki/API:Userinfo
+
+        .. seealso:: :api:`Userinfo`
         """
         return group.lower() in self.userinfo['groups']
 
@@ -741,7 +746,7 @@ class APISite(
 
         The returned dict uses each key to store the associated message.
 
-        :see: https://www.mediawiki.org/wiki/API:Allmessages
+        .. seealso:: :api:`Allmessages`
 
         :param keys: MediaWiki messages to fetch
         :param lang: a language code, default is self.lang
@@ -1214,7 +1219,7 @@ class APISite(
     ) -> None:
         """Load page info from api and store in page attributes.
 
-        :see: https://www.mediawiki.org/wiki/API:Info
+        .. seealso:: :api:`Info`
         """
         title = page.title(with_section=False)
         inprop = 'protection'
@@ -1247,7 +1252,7 @@ class APISite(
         """Load image info from api and save in page attributes.
 
         Parameters correspond to iiprops in:
-        [1] https://www.mediawiki.org/wiki/API:Imageinfo
+        [1] :api:`Imageinfo`
 
         Parameters validation and error handling left to the API call.
 
@@ -1453,7 +1458,7 @@ class APISite(
          - userrights
          - watch
 
-        :see: https://www.mediawiki.org/wiki/API:Tokens
+        .. seealso:: :api:`Tokens`
 
         :param types: the types of token (e.g., "edit", "move", "delete");
             see API documentation for full list of types
@@ -1505,7 +1510,7 @@ class APISite(
            raises KeyError instead of AssertionError
 
         .. seealso::
-           - https://www.mediawiki.org/wiki/API:Parse
+           - :api:`Parse`
            - :meth:`pywikibot.page.BasePage.get_parsed_page`.
         """
         req = self.simple_request(action='parse', page=page)
@@ -1519,7 +1524,7 @@ class APISite(
     def getcategoryinfo(self, category: 'pywikibot.page.Category') -> None:
         """Retrieve data on contents of category.
 
-        :see: https://www.mediawiki.org/wiki/API:Categoryinfo
+        .. seealso:: :api:`Categoryinfo`
         """
         cititle = category.title(with_section=False)
         ciquery = self._generator(api.PropertyGenerator,
@@ -1564,7 +1569,7 @@ class APISite(
     ) -> None:
         """Delete or undelete specified page revisions, file versions or logs.
 
-        :see: https://www.mediawiki.org/wiki/API:Revisiondelete
+        .. seealso:: :api:`Revisiondelete`
 
         If more than one target id is provided, the same action is taken for
         all of them.
@@ -1677,7 +1682,7 @@ class APISite(
     ) -> bool:
         """Submit an edit to be saved to the wiki.
 
-        :see: https://www.mediawiki.org/wiki/API:Edit
+        .. seealso:: :api:`Edit`
 
         :param page: The Page to be saved.
             By default its .text property will be used
@@ -1905,7 +1910,7 @@ class APISite(
     ) -> None:
         """Merge revisions from one page into another.
 
-        :see: https://www.mediawiki.org/wiki/API:Mergehistory
+        .. seealso:: :api:`Mergehistory`
 
         Revisions dating up to the given timestamp in the source will be
         moved into the destination page history. History merge fails if
@@ -2022,7 +2027,7 @@ class APISite(
     ) -> 'pywikibot.page.Page':
         """Move a Page to a new title.
 
-        .. seealso:: https://www.mediawiki.org/wiki/API:Move
+        .. seealso:: :api:`Move`
 
         .. versionchanged:: 7.2
            The `movesubpages` parameter was added
@@ -2131,7 +2136,7 @@ class APISite(
     ) -> None:
         """Roll back page to version before last user's edits.
 
-        :see: https://www.mediawiki.org/wiki/API:Rollback
+        .. seealso:: :api:`Rollback`
 
         The keyword arguments are those supported by the rollback API.
 
@@ -2211,19 +2216,20 @@ class APISite(
 
         Requires appropriate privileges.
 
-        :see: https://www.mediawiki.org/wiki/API:Delete
+        .. seealso: :api:`Delete`
+
         Page to be deleted can be given either as Page object or as pageid.
         To delete a specific version of an image the oldimage identifier
         must be provided.
 
         .. versionadded:: 6.1
-           renamed from *deletepage*
+           renamed from `deletepage`
 
         .. versionchanged:: 6.1
-           keyword only parameter *oldimage* was added.
+           keyword only parameter `oldimage` was added.
 
         .. versionchanged:: 7.1
-           keyword only parameter *deletetalk* was added.
+           keyword only parameter `deletetalk` was added.
 
         :param page: Page to be deleted or its pageid.
         :param reason: Deletion reason.
@@ -2295,14 +2301,14 @@ class APISite(
     ) -> None:
         """Undelete page from the wiki. Requires appropriate privilege level.
 
-        :see: https://www.mediawiki.org/wiki/API:Undelete
+        .. seealso:: :api:`Undelete`
 
         .. versionadded:: 6.1
-           renamed from *undelete_page*
+           renamed from `undelete_page`
 
         .. versionchanged:: 6.1
-           *fileids* parameter was added,
-           keyword argument required for *revisions*.
+           `fileids` parameter was added,
+           keyword argument required for `revisions`.
 
         :param page: Page to be deleted.
         :param reason: Undeletion reason.
@@ -2355,8 +2361,9 @@ class APISite(
         """
         Return the protection types available on this site.
 
+        .. seealso:: :py:obj:`Siteinfo._get_default()`
+
         :return: protection types available
-        :see: :py:obj:`Siteinfo._get_default()`
         """
         return set(self.siteinfo.get('restrictions')['types'])
 
@@ -2364,8 +2371,9 @@ class APISite(
         """
         Return the protection levels available on this site.
 
+        .. seealso:: :py:obj:`Siteinfo._get_default()`
+
         :return: protection types available
-        :see: :py:obj:`Siteinfo._get_default()`
         """
         # implemented in b73b5883d486db0e9278ef16733551f28d9e096d
         return set(self.siteinfo.get('restrictions')['levels'])
@@ -2381,7 +2389,7 @@ class APISite(
     ) -> None:
         """(Un)protect a wiki page. Requires administrator status.
 
-        :see: https://www.mediawiki.org/wiki/API:Protect
+        .. seealso:: :api:`Protect`
 
         :param protections: A dict mapping type of protection to protection
             level of that type. Valid restriction types are 'edit', 'create',
@@ -2449,7 +2457,7 @@ class APISite(
         """
         Block a user for certain amount of time and for a certain reason.
 
-        :see: https://www.mediawiki.org/wiki/API:Block
+        .. seealso:: :api:`Block
 
         :param user: The username/IP to be blocked without a namespace.
         :param expiry: The length or date/time when the block expires. If
@@ -2497,7 +2505,7 @@ class APISite(
         """
         Remove the block for the user.
 
-        :see: https://www.mediawiki.org/wiki/API:Block
+        .. seealso:: :api:`Block`
 
         :param user: The username/IP without a namespace.
         :param reason: Reason for the unblock.
@@ -2521,7 +2529,7 @@ class APISite(
     ) -> bool:
         """Add or remove pages from watchlist.
 
-        :see: https://www.mediawiki.org/wiki/API:Watch
+        .. seealso:: :api:`Watch`
 
         :param pages: A single page or a sequence of pages.
         :param unwatch: If True, remove pages from watchlist;
@@ -2630,7 +2638,7 @@ class APISite(
     ) -> Dict[str, Any]:
         """Get the stash info for a given file key.
 
-        :see: https://www.mediawiki.org/wiki/API:Stashimageinfo
+        .. seealso:: :api:`Stashimageinfo`
         """
         props = props or None
         req = self.simple_request(action='query', prop='stashimageinfo',
@@ -2645,7 +2653,7 @@ class APISite(
     ) -> bool:
         """Upload a file to the wiki.
 
-        :see: https://www.mediawiki.org/wiki/API:Upload
+        .. seealso:: :api:`Upload`
 
         Either source_filename or source_url, but not both, must be provided.
 
@@ -2668,7 +2676,7 @@ class APISite(
         """
         Get property names for pages_with_property().
 
-        :see: https://www.mediawiki.org/wiki/API:Pagepropnames
+        .. seealso:: :api:`Pagepropnames`
 
         :param force: force to retrieve userinfo ignoring cache
         """
@@ -2681,7 +2689,7 @@ class APISite(
         """
         Corresponding method to the 'action=compare' API action.
 
-        :see: https://www.mediawiki.org/wiki/API:Compare
+        .. seealso: :api:`Compare`
 
         See: https://en.wikipedia.org/w/api.php?action=help&modules=compare
         Use pywikibot.diff's html_comparator() method to parse result.

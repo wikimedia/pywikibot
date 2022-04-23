@@ -533,12 +533,13 @@ def removeHTMLParts(text: str, keeptags: Optional[List[str]] = None) -> str:
     return parser.textdata
 
 
-# thanks to https://docs.python.org/3/library/html.parser.html
 class _GetDataHTML(HTMLParser):
 
     """HTML parser which removes html tags except they are listed in keeptags.
 
     This class is also a context manager which closes itself at exit time.
+
+    .. seealso:: :pylib:`html.parser`
     """
 
     textdata = ''

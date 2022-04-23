@@ -38,6 +38,11 @@ from pywikibot.backports import Callable, List
 STDOUT = 16  #:
 VERBOSE = 18  #:
 INPUT = 25  #:
+"""Three additional logging levels which are implemented beside
+`CRITICAL`, `DEBUG`, `ERROR`, `INFO` and `WARNING`.
+
+.. seealso:: :python:`Python Logging Levels<logging.html#logging-levels>`
+"""
 
 _init_routines = []  # type: List[Callable[[], Any]]
 _inited_routines = set()
@@ -66,6 +71,8 @@ def logoutput(text: object, decoder: Optional[str] = None,
     """Format output and send to the logging module.
 
     Helper function used by all the user-output convenience functions.
+    It can be used to implement your own high-level output function with
+    a different lgging level.
     """
     if _logger:
         logger = logging.getLogger('pywiki.' + _logger)
@@ -142,7 +149,7 @@ def stdout(text: object, decoder: Optional[str] = None, newline: bool = True,
         be encoded in the given encoding.
     :param newline: If True, a line feed will be added after printing the text.
     :param kwargs: The keyword arguments can be found in the python doc:
-        https://docs.python.org/3/howto/logging-cookbook.html
+        :pyhow:`logging-cookbook`
     """
     logoutput(text, decoder, newline, STDOUT, **kwargs)
 
@@ -156,7 +163,7 @@ def warning(text: object, decoder: Optional[str] = None,
         should be encoded in the given encoding.
     :param newline: If True, a line feed will be added after printing the text.
     :param kwargs: The keyword arguments can be found in the python doc:
-        https://docs.python.org/3/howto/logging-cookbook.html
+        :pyhow:`logging-cookbook`
     """
     logoutput(text, decoder, newline, WARNING, **kwargs)
 
@@ -170,7 +177,7 @@ def error(text: object, decoder: Optional[str] = None, newline: bool = True,
         be encoded in the given encoding.
     :param newline: If True, a line feed will be added after printing the text.
     :param kwargs: The keyword arguments can be found in the python doc:
-        https://docs.python.org/3/howto/logging-cookbook.html
+        :pyhow:`logging-cookbook`
     """
     logoutput(text, decoder, newline, ERROR, **kwargs)
 
@@ -184,7 +191,7 @@ def log(text: object, decoder: Optional[str] = None, newline: bool = True,
         be encoded in the given encoding.
     :param newline: If True, a line feed will be added after printing the text.
     :param kwargs: The keyword arguments can be found in the python doc:
-        https://docs.python.org/3/howto/logging-cookbook.html
+        :pyhow:`logging-cookbook`
     """
     logoutput(text, decoder, newline, VERBOSE, **kwargs)
 
@@ -198,7 +205,7 @@ def critical(text: object, decoder: Optional[str] = None, newline: bool = True,
         be encoded in the given encoding.
     :param newline: If True, a line feed will be added after printing the text.
     :param kwargs: The keyword arguments can be found in the python doc:
-        https://docs.python.org/3/howto/logging-cookbook.html
+        :pyhow:`logging-cookbook`
     """
     logoutput(text, decoder, newline, CRITICAL, **kwargs)
 
@@ -217,7 +224,7 @@ def debug(text: object, layer: str = '', decoder: Optional[str] = None,
         be encoded in the given encoding.
     :param newline: If True, a line feed will be added after printing the text.
     :param kwargs: The keyword arguments can be found in the python doc:
-        https://docs.python.org/3/howto/logging-cookbook.html
+        :pyhow:`logging-cookbook`
     """
     logoutput(text, decoder, newline, DEBUG, layer, **kwargs)
 
@@ -253,7 +260,7 @@ def exception(
         be encoded in the given encoding.
     :param newline: If True, a line feed will be added after printing the text.
     :param kwargs: The keyword arguments can be found in the python doc:
-        https://docs.python.org/3/howto/logging-cookbook.html
+        :pyhow:`logging-cookbook`
     :param tb: Set to True in order to output traceback also.
     """
     if isinstance(msg, BaseException):

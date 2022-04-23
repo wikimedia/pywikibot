@@ -115,7 +115,7 @@ class LoginManager:
         """
         Check that the username exists on the site.
 
-        :see: https://www.mediawiki.org/wiki/API:Users
+        .. seealso:: :api:`Users`
 
         :raises pywikibot.exceptions.NoUsernameError: Username doesn't exist in
             user list.
@@ -265,7 +265,7 @@ class LoginManager:
         """
         Attempt to log into the server.
 
-        :see: https://www.mediawiki.org/wiki/API:Login
+        .. seealso:: :api:`Login`
 
         :param retry: infinitely retry if the API returns an unknown error
         :param autocreate: if true, allow auto-creation of the account
@@ -384,7 +384,7 @@ class OauthLoginManager(LoginManager):
         """
         Attempt to log into the server.
 
-        :see: https://www.mediawiki.org/wiki/API:Login
+        .. seealso:: :api:`Login`
 
         :param retry: infinitely retry if exception occurs during
             authentication.
@@ -424,7 +424,7 @@ class OauthLoginManager(LoginManager):
         """
         Return OAuth consumer key token and secret token.
 
-        :see: https://www.mediawiki.org/wiki/API:Tokens
+        .. seealso:: :api:`Tokens`
         """
         return self._consumer_token
 
@@ -433,7 +433,7 @@ class OauthLoginManager(LoginManager):
         """
         Return OAuth access key token and secret token.
 
-        :see: https://www.mediawiki.org/wiki/API:Tokens
+        .. seealso:: :api:`Tokens`
         """
         return self._access_token
 

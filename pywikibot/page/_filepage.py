@@ -118,7 +118,7 @@ class FilePage(Page):
         - url, thumburl, thumbwidth and thumbheight
 
         Parameters correspond to iiprops in:
-        [1] https://www.mediawiki.org/wiki/API:Imageinfo
+        [1] :api:`Imageinfo`
 
         Parameters validation and error handling left to the API call.
 
@@ -222,10 +222,10 @@ class FilePage(Page):
             or None it'll raise an UploadError exception if the static
             boolean is False.
         :type ignore_warnings: bool or callable or iterable of str
-        :keyword chunk_size: The chunk size in bytesfor chunked uploading (see
-            https://www.mediawiki.org/wiki/API:Upload#Chunked_uploading). It
-            will only upload in chunks, if the chunk size is positive but lower
-            than the file size.
+        :keyword chunk_size: The chunk size in bytesfor chunked
+            uploading (see :api:`Upload#Chunked_uploading`). It will
+            only upload in chunks, if the chunk size is positive but
+            lower than the file size.
         :type chunk_size: int
         :keyword report_success: If the upload was successful it'll print a
             success message and if ignore_warnings is set to False it'll

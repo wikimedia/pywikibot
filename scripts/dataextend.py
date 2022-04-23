@@ -50,6 +50,8 @@ It is advisable to (re)load the item page that the bot has been working
 on in the browser afterward, to correct any mistakes it has made, or
 cases where a more precise and less precise value have both been
 included.
+
+.. versionadded:: 7.2
 """
 #
 # (C) Pywikibot team, 2020-2022
