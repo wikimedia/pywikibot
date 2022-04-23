@@ -81,7 +81,8 @@ fixes = {
                 'nowiki',
                 'comment',
                 'math',
-                'pre'
+                'pre',
+                'syntaxhighlight',
             ],
         }
     },
