@@ -21,7 +21,7 @@ Command line options:
                given, it starts at the beginning.
 """
 #
-# (C) Pywikibot team, 2007-2021
+# (C) Pywikibot team, 2007-2022
 #
 # Distributed under the terms of the MIT license.
 #
