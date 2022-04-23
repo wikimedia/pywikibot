@@ -28,9 +28,9 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'pl', 'en', 'ru', 'de', 'fr', 'zh', 'he', 'it', 'es', 'ar', 'uk', 'cs',
         'mul', 'gu', 'sr', 'pt', 'sv', 'fa', 'hu', 'ko', 'ml', 'bn', 'sa',
         'ta', 'te', 'sl', 'tr', 'hy', 'el', 'la', 'vi', 'ja', 'ro', 'fi',
-        'nap', 'nl', 'az', 'ca', 'br', 'kn', 'hr', 'no', 'th', 'be', 'hi',
-        'eo', 'is', 'vec', 'id', 'pms', 'ban', 'da', 'lij', 'et', 'mk', 'yi',
-        'mr', 'cy', 'as', 'bg', 'li', 'lt', 'wa', 'pa', 'jv', 'or', 'eu', 'gl',
+        'nap', 'nl', 'az', 'ca', 'br', 'kn', 'hr', 'no', 'th', 'id', 'be',
+        'hi', 'eo', 'is', 'vec', 'pms', 'ban', 'da', 'lij', 'et', 'mk', 'mr',
+        'cy', 'yi', 'as', 'bg', 'li', 'lt', 'jv', 'wa', 'pa', 'eu', 'or', 'gl',
         'bs', 'sah', 'sk', 'zh-min-nan', 'fo',
     ]
 
