@@ -37,7 +37,7 @@ def main():
             line = '{} {}'.format(bg_col.ljust(max_len_bc_color), line)
             pywikibot.output(line)
 
-        pywikibot.output('')
+        pywikibot.output()
 
 
 if __name__ == '__main__':

@@ -268,7 +268,7 @@ def process_entries(cache_path, func, use_accesstime=None, output_func=None,
         except ValueError as e:
             pywikibot.error('Failed loading {}'.format(
                 entry._cachefile_path()))
-            pywikibot.exception(e, tb=True)
+            pywikibot.exception(e, exc_info=True)
             continue
 
         if use_accesstime is None:
@@ -294,7 +294,7 @@ def process_entries(cache_path, func, use_accesstime=None, output_func=None,
             pywikibot.error('Problems loading {} with key {}, {!r}'
                             .format(entry.filename, entry.key,
                                     entry._parsed_key))
-            pywikibot.exception(e, tb=True)
+            pywikibot.exception(e, exc_info=True)
             continue
 
         if func is None or func(entry):

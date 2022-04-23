@@ -1422,7 +1422,7 @@ def LogeventsPageGenerator(logtype: Optional[str] = None,
             pywikibot.warning('LogeventsPageGenerator: '
                               'failed to load page for {!r}; skipping'
                               .format(entry.data))
-            pywikibot.exception(e)
+            pywikibot.error(e)
 
 
 def NewpagesPageGenerator(site: OPT_SITE_TYPE = None,
@@ -1752,7 +1752,7 @@ def NamespaceFilterPageGenerator(generator: Iterable['pywikibot.page.Page'],
         namespaces = site.namespaces.resolve(namespaces)
     except KeyError as e:
         pywikibot.log('Failed resolving namespaces:')
-        pywikibot.exception(e)
+        pywikibot.error(e)
         raise
 
     return (page for page in generator if page.namespace() in namespaces)
@@ -2707,7 +2707,7 @@ class GoogleSearchPageGenerator(Iterable['pywikibot.page.Page']):
         try:
             import google
         except ImportError:
-            pywikibot.error('ERROR: generator GoogleSearchPageGenerator '
+            pywikibot.error('generator GoogleSearchPageGenerator '
                             "depends on package 'google'.\n"
                             'To install, please run: pip install google.')
             sys.exit(1)

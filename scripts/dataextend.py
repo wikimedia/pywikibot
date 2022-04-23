@@ -1290,7 +1290,7 @@ class Analyzer:
         if not self.url and not self.sparqlquery:
             return
         newclaims = []
-        pywikibot.output('')
+        pywikibot.output()
         pagerequest = None
         if not self.skipfirst:
             try:
@@ -1638,7 +1638,7 @@ class Analyzer:
                 if result:
                     newclaims.append((prop, result, self))
 
-        pywikibot.output('')
+        pywikibot.output()
         for (function, prop) in [
             (self.findcoords, 'coordinates'),
         ]:

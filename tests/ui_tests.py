@@ -160,17 +160,26 @@ class TestTerminalOutput(UITestCase):
             pywikibot.exception('exception')
         self.assertEqual(self.strout.getvalue(), '')
         self.assertEqual(self.strerr.getvalue(),
-                         'ERROR: TestExceptionError: Testing Exception\n')
+                         'ERROR: exception\n')
+
+    def test_exception_empty(self):
+        try:
+            raise TestExceptionError('Testing Exception')
+        except TestExceptionError:
+            pywikibot.exception()
+        self.assertEqual(self.strout.getvalue(), '')
+        self.assertEqual(self.strerr.getvalue(),
+                         'ERROR: Testing Exception (TestExceptionError)\n')
 
     def test_exception_tb(self):
         try:
             raise TestExceptionError('Testing Exception')
         except TestExceptionError:
-            pywikibot.exception('exception', tb=True)
+            pywikibot.exception(exc_info=True)
         self.assertEqual(self.strout.getvalue(), '')
         stderrlines = self.strerr.getvalue().split('\n')
         self.assertEqual(stderrlines[0],
-                         'ERROR: TestExceptionError: Testing Exception')
+                         'ERROR: Testing Exception')
         self.assertEqual(stderrlines[1], 'Traceback (most recent call last):')
         self.assertEqual(stderrlines[3],
                          "    raise TestExceptionError('Testing Exception')")

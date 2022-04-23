@@ -133,7 +133,7 @@ class DownloadDumpBot(Bot, ConfigParserBot):
                         parts = 50
                         display_string = ''
 
-                        pywikibot.output('')
+                        pywikibot.output()
                         for data in response.iter_content(100 * 1024):
                             result_file.write(data)
 
@@ -156,7 +156,7 @@ class DownloadDumpBot(Bot, ConfigParserBot):
                                 - len(display_string.rstrip()))
 
                             pywikibot.output(display_string, newline=False)
-                        pywikibot.output('')
+                        pywikibot.output()
 
                 # Rename the temporary file to the target file
                 # if the download completes successfully
