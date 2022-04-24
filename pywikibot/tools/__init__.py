@@ -28,7 +28,7 @@ from warnings import catch_warnings, showwarning, warn
 
 import pkg_resources
 
-import pywikibot.logging as _pylogging
+import pywikibot  # T306760
 from pywikibot.tools._deprecate import (  # noqa: F401 skipcq: PY-W2000
     ModuleDeprecationWrapper,
     add_decorated_full_name,
@@ -504,8 +504,8 @@ class MediaWikiVersion:
                     'Found "{}" in "{}"'.format(handled,
                                                 version_match.group(2))
             if version_match.group(2):
-                _pylogging.debug('Additional unused version part '
-                                 '"{}"'.format(version_match.group(2)))
+                pywikibot.logging.debug('Additional unused version part '
+                                        '"{}"'.format(version_match.group(2)))
             self._dev_version = (4, )
 
         self.suffix = version_match.group(2) or ''
@@ -805,17 +805,18 @@ class ThreadList(list):
 
         super().append(thd)
         thd.start()
-        _pylogging.debug("thread {} ('{}') started"
-                         .format(len(self), type(thd)))
+        pywikibot.logging.debug("thread {} ('{}') started"
+                                .format(len(self), type(thd)))
 
     def stop_all(self) -> None:
         """Stop all threads the pool."""
         if self:
-            _pylogging.debug('EARLY QUIT: Threads: {}'.format(len(self)))
+            pywikibot.logging.debug('EARLY QUIT: Threads: {}'
+                                    .format(len(self)))
         for thd in self:
             thd.stop()
-            _pylogging.debug('EARLY QUIT: Queue size left in {}: {}'
-                             .format(thd, thd.queue.qsize()))
+            pywikibot.logging.debug('EARLY QUIT: Queue size left in {}: {}'
+                                    .format(thd, thd.queue.qsize()))
 
 
 def intersect_generators(*iterables, allow_duplicates: bool = False):
@@ -884,9 +885,9 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
     # If any iterable is empty, no pages are going to be returned
     for source in iterables:
         if not source:
-            _pylogging.debug('At least one iterable ({!r}) is empty and '
-                             'execution was skipped immediately.'
-                             .format(source))
+            pywikibot.logging.debug('At least one iterable ({!r}) is empty '
+                                    'and execution was skipped immediately.'
+                                    .format(source))
             return
 
     # Item is cached to check that it is found n_gen times
