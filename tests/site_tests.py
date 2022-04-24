@@ -2309,7 +2309,7 @@ class TestSiteSysopWrite(TestCase):
 
         self.assertIsNotNone(fileid)
 
-        site.undelet(fp, 'pywikibot unit tests', fileids=[fileid])
+        site.undelete(fp, 'pywikibot unit tests', fileids=[fileid])
 
 
 class TestUsernameInUsers(DefaultSiteTestCase):
