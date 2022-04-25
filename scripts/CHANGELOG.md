@@ -28,7 +28,7 @@
 * Fix cp encodings (:phab:`T304830`)
 
 ### replace
-* A -quiet option was ddet to omit message when no change was made
+* A -quiet option was added to omit message when no change was made
 
 
 ## 7.1.0
