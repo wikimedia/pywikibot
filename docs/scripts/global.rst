@@ -1,8 +1,8 @@
 Global bot scripts
 ==================
 
-interwiki script
-----------------
+interwiki script description
+----------------------------
 
 Creates or modifies Interlanguage links between projects.
 
@@ -10,8 +10,8 @@ Creates or modifies Interlanguage links between projects.
    :no-members:
 
 
-redirect script
----------------
+redirect script description
+---------------------------
 
 .. automodule:: scripts.redirect
    :no-members:

@@ -486,6 +486,7 @@ def removeDisabledParts(text: str,
     .. versionchanged:: 7.0
        the order of removals will correspond to the tags argument
        if provided as an ordered collection (list, tuple)
+
     :param tags: The exact set of parts which should be removed using
         keywords from textlib._get_regexes().
     :param include: Or, in alternative, default parts that shall not
