@@ -443,10 +443,14 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
     }
 
     _allowed_failures = [
+        'basic',
+        'commonscat',
         'coordinate_import',
         'illustrate_wikidata',
         'newitem',
+        'replace',
         'solve_disambiguation',
+        'touch',
     ]
 
     _arguments = '-simulate -page:Foo -always'
