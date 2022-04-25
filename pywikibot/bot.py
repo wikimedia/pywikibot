@@ -388,6 +388,7 @@ def init_handlers() -> None:
         warnings.filterwarnings('once', category=FutureWarning)
 
     root_logger.handlers = []  # remove any old handlers
+    root_logger.propagate = False  # T281643
 
     # configure handler(s) for display to user interface
     assert ui is not None
