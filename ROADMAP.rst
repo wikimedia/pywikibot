@@ -11,10 +11,8 @@ Current release 7.2.0
 * `use_disambig` BaseBot attribute was added to hande disambig skipping
 * Deprecate RedirectPageBot and NoRedirectPageBot in favour of `use_redirects` attribute
 * tools.formatter.color_format is deprecated and will be removed
-* A new and easier color format was implemented; colors can be used like::
-
-    'this is a <<green>>colored<<default>> text'
-
+* A new and easier color format was implemented; colors can be used like:
+    ``'this is a <<green>>colored<<default>> text'``
 * Unused and unsupported `xmlreader.XmlParserThread` was removed
 * Use upercased IP user titles (:phab:`T306291`)
 * Use pathlib to extract filename and file_package in pwb.py
