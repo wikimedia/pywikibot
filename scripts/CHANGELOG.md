@@ -6,17 +6,29 @@
 ### general
 * Archived scripts were removed
 
+### archive
+* Fix trailing newlines (:phab:`T306529`)
+
 ### checkimages
+* Use page_from_repository() method to read categoried from wikibase
 * Use `itertools.zip_longest` to find the most important image
 
 ### dataextend
+* A -showonly option was added to only show claims of an ItemPage
 * This new script was added. It is able to add properties, identifiers and sources to WikiBase items
+
+### delinker
+* New delinker script was added; it replaces compat's CommonsDelinker (:phab:`T299563`)
 
 ### image
 * Fix image regex (:phab:`T305226`, :phab:`T305227`)
 
 ### reflinks
+* Ignore Bloomberg captcha (:phab:`T306304`)
 * Fix cp encodings (:phab:`T304830`)
+
+### replace
+* A -quiet option was ddet to omit message when no change was made
 
 
 ## 7.1.0
