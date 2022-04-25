@@ -1,44 +1,44 @@
 Images scripts
 ==============
 
-checkimages script
-------------------
+checkimages script description
+------------------------------
 
 .. automodule:: scripts.checkimages
    :no-members:
 
-commons\_information script
----------------------------
+commons\_information script description
+---------------------------------------
 
 .. automodule:: scripts.commons_information
    :no-members:
 
-data\_ingestion script
-----------------------
+data\_ingestion script description
+----------------------------------
 
 .. automodule:: scripts.data_ingestion
    :no-members:
 
-image script
-------------
+image script description
+------------------------
 
 .. automodule:: scripts.image
    :no-members:
 
-imagetransfer script
---------------------
+imagetransfer script description
+--------------------------------
 
 .. automodule:: scripts.imagetransfer
    :no-members:
 
-nowcommons script
------------------
+nowcommons script description
+-----------------------------
 
 .. automodule:: scripts.nowcommons
    :no-members:
 
-unusedfiles script
-------------------
+unusedfiles script description
+------------------------------
 
 .. automodule:: scripts.unusedfiles
    :no-members:

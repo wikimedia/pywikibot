@@ -1,38 +1,38 @@
 Wikibase scripts
 ================
 
-claimit script
---------------
+claimit script description
+--------------------------
 
 .. automodule:: scripts.claimit
    :no-members:
 
-dataextend script
------------------
+dataextend script description
+-----------------------------
 
 .. automodule:: scripts.dataextend
    :no-members:
 
-harvest\_template script
-------------------------
+harvest\_template script description
+------------------------------------
 
 .. automodule:: scripts.harvest_template
    :no-members:
 
-illustrate\_wikidata script
----------------------------
+illustrate\_wikidata script description
+---------------------------------------
 
 .. automodule:: scripts.illustrate_wikidata
    :no-members:
 
-interwikidata script
---------------------
+interwikidata script description
+--------------------------------
 
 .. automodule:: scripts.interwikidata
    :no-members:
 
-newitem script
---------------
+newitem script description
+--------------------------
 
 .. automodule:: scripts.newitem
    :no-members:
