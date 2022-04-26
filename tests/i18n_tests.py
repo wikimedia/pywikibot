@@ -60,7 +60,7 @@ class TestTranslate(TestCase):
         Test whether the localzation is found either with the Site object
         or with the site code.
         """
-        site = Site('commons', 'commons')
+        site = Site('commons')
         for code in (site, 'commons'):
             with self.subTest(code=code):
                 self.assertEqual(i18n.translate(code, self.xdict),

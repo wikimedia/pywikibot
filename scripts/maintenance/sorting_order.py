@@ -68,7 +68,7 @@ def update_family(list_name, page):
 
 def main():
     """Main entry function."""
-    site = pywikibot.Site('meta', 'meta')
+    site = pywikibot.Site('meta')
     for list_name, page_name in pages.items():
         page = pywikibot.Page(site, page_name, ns=site.namespaces.MEDIAWIKI)
         update_family(list_name, page)

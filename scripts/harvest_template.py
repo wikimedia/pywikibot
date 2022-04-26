@@ -335,7 +335,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
                         continue
                     claim.setTarget(match.group('url'))
                 elif claim.type == 'commonsMedia':
-                    commonssite = pywikibot.Site('commons', 'commons')
+                    commonssite = pywikibot.Site('commons')
                     imagelink = pywikibot.Link(
                         value, source=commonssite, default_namespace=6)
                     image = pywikibot.FilePage(imagelink)

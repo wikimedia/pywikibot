@@ -195,7 +195,7 @@ class APISite(
         """
         # TODO this only works for some WMF sites
         if not site:
-            site = pywikibot.Site('meta', 'meta')
+            site = pywikibot.Site('meta')
         req = site._request(expiry=datetime.timedelta(days=10),
                             parameters={'action': 'sitematrix'})
         data = req.submit()

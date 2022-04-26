@@ -573,10 +573,6 @@ class Family:
         if fam is None:
             fam = config.family
 
-        assert all(x in NAME_CHARACTERS for x in fam), \
-            'Name of family "{}" must be ASCII letters and digits ' \
-            '[a-zA-Z0-9]'.format(fam)
-
         if fam in Family._families:
             return Family._families[fam]
 
