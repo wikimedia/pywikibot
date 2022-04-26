@@ -190,9 +190,6 @@ AnswerType = Union[
 ]
 PageLinkType = Union['pywikibot.page.Link', 'pywikibot.page.Page']
 
-ui = None  # type: Optional[pywikibot.userinterfaces._interface_base.ABUIC]
-
-
 _GLOBAL_HELP = """
 GLOBAL OPTIONS
 ==============
@@ -270,13 +267,24 @@ For global options use -help:global or run pwb.py -help
 
 """
 
+ui = None  # type: Optional[pywikibot.userinterfaces._interface_base.ABUIC]
+"""Holds a user interface object defined in
+:mod:`pywikibot.userinterfaces` subpackage.
+"""
+
 
 def set_interface(module_name: str) -> None:
-    """Configures any bots to use the given interface module."""
+    """Configures any bots to use the given interface module.
+
+    Search for user interface module in the
+    :mod:`pywikibot.userinterfaces` subdirectory and initialize UI.
+    Calls :func:`init_handlers` to re-initialize if we were already
+    initialized with another UI.
+
+    .. versionadded:: 6.4
+    """
     global ui
 
-    # User interface initialization
-    # search for user interface module in the 'userinterfaces' subdirectory
     ui_module = __import__('pywikibot.userinterfaces.{}_interface'
                            .format(module_name), fromlist=['UI'])
     ui = ui_module.UI()
@@ -284,47 +292,39 @@ def set_interface(module_name: str) -> None:
     atexit.register(ui.flush)
     pywikibot.argvu = ui.argvu()
 
-    # re-initialize if we were already initialized with another UI
+    # re-initialize
 
     if _handlers_initialized:
         init_handlers()
 
 
-# Initialize the handlers and formatters for the logging system.
-#
-# This relies on the global variable 'ui' which is a UserInterface object
-# defined in the 'userinterface' subpackage.
-#
-# The UserInterface object must define its own init_handlers() method
-# which takes the root logger as its only argument, and which adds to that
-# logger whatever handlers and formatters are needed to process output and
-# display it to the user. The default (terminal) interface sends level
-# STDOUT to sys.stdout (as all interfaces should) and sends all other
-# levels to sys.stderr; levels WARNING and above are labeled with the
-# level name.
-#
-# UserInterface objects must also define methods input(), input_choice(),
-# and editText(), all of which are documented in
-# userinterfaces/terminal_interface.py
-
 _handlers_initialized = False
 
 
 def handler_namer(name: str) -> str:
-    """Modify the filename of a log file when rotating."""
+    """Modify the filename of a log file when rotating.
+
+    .. versionadded:: 6.5
+    """
     path, qualifier = name.rsplit('.', 1)
     root, ext = os.path.splitext(path)
     return '{}.{}{}'.format(root, qualifier, ext)
 
 
 def init_handlers() -> None:
-    """Initialize logging system for terminal-based bots.
+    """Initialize the handlers and formatters for the logging system.
 
+    This relies on the global variable :attr:`ui` which is a UI object.
+
+    .. seealso:: :mod:`pywikibot.userinterfaces`
+
+    Calls :func:`writelogheader` after handlers are initialized.
     This function must be called before using any input/output methods;
-    and must be called again if ui handler is changed..
+    and must be called again if ui handler is changed. Use
+    :func:`set_interface` to set the new interface which initializes it.
 
-    Note: this function is called by any user input and output function,
-    so it should normally not need to be called explicitly.
+    .. note:: this function is called by any user input and output
+       function, so it should normally not need to be called explicitly.
 
     All user output is routed through the logging module.
     Each type of output is handled by an appropriate handler object.
@@ -343,8 +343,13 @@ def init_handlers() -> None:
      - ERROR: user error messages.
      - CRITICAL: fatal error messages.
 
+     .. seealso::
+        * :mod:`pywikibot.logging`
+        * :python:`Python Logging Levels<library/logging.html#logging-levels>`
+
     Accordingly, do **not** use print statements in bot code; instead,
-    use pywikibot.output function.
+    use :func:`pywikibot.output` function and other functions from
+    :mod:`pywikibot.logging` module.
 
     .. versionchanged:: 6.2
       Different logfiles are used if multiple processes of the same

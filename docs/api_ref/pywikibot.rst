@@ -3,8 +3,8 @@ pywikibot package
 
 .. automodule:: pywikibot
 
-Subpackages
------------
+Pywikibot Subpackages
+---------------------
 
 .. toctree::
 

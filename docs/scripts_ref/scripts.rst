@@ -3,8 +3,8 @@ scripts package
 
 .. automodule:: scripts
 
-Subpackages
------------
+Scripts Subpackages
+-------------------
 
 .. toctree::
 
