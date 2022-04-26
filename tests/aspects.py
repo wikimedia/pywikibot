@@ -1137,14 +1137,7 @@ class DefaultDrySiteTestCase(DefaultSiteTestCase):
     dry = True
 
 
-class WikimediaSiteTestCase(TestCase):
-
-    """Test class uses only WMF sites."""
-
-    wmf = True
-
-
-class WikimediaDefaultSiteTestCase(DefaultSiteTestCase, WikimediaSiteTestCase):
+class WikimediaDefaultSiteTestCase(DefaultSiteTestCase):
 
     """Test class to run against a WMF site, preferring the default site."""
 
