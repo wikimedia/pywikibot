@@ -467,9 +467,9 @@ class CheckHostnameMixin(TestCaseBase):
                         'HTTP status: {} - {}'.format(
                             r.status_code, HTTPStatus(r.status_code).phrase))
             except Exception as e:
-                pywikibot.error('{}: accessing {} caused exception:'
-                                .format(cls.__name__, hostname))
-                pywikibot.exception(e, tb=True)
+                pywikibot.exception('{}: accessing {} caused exception:'
+                                    .format(cls.__name__, hostname),
+                                    exc_info=True)
 
                 cls._checked_hostnames[hostname] = e
                 raise unittest.SkipTest(
@@ -1137,14 +1137,7 @@ class DefaultDrySiteTestCase(DefaultSiteTestCase):
     dry = True
 
 
-class WikimediaSiteTestCase(TestCase):
-
-    """Test class uses only WMF sites."""
-
-    wmf = True
-
-
-class WikimediaDefaultSiteTestCase(DefaultSiteTestCase, WikimediaSiteTestCase):
+class WikimediaDefaultSiteTestCase(DefaultSiteTestCase):
 
     """Test class to run against a WMF site, preferring the default site."""
 

@@ -157,12 +157,12 @@ def get_site_and_lang(
     mycode = None
     while not mycode:
         mycode = pywikibot.input(message, default=default_lang, force=force)
-        if known_langs and mycode and mycode not in known_langs:
-            if not pywikibot.input_yn(
-                    fill('The site code {!r} is not in the list of known '
-                         'sites. Do you want to continue?'.format(mycode)),
-                    default=False, automatic_quit=False):
-                mycode = None
+        if known_langs and mycode and mycode not in known_langs \
+           and not pywikibot.input_yn(
+               fill('The site code {!r} is not in the list of known sites. '
+                    'Do you want to continue?'.format(mycode)),
+               default=False, automatic_quit=False):
+            mycode = None
 
     message = 'Username on {}:{}'.format(mycode, fam.name)
     username = pywikibot.input(message, default=default_username, force=force)

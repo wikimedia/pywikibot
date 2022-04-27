@@ -16,7 +16,7 @@ This script supports the following command line parameters:
    can be set within a settings file which is scripts.ini by default.
 """
 #
-# (C) Pywikibot team, 2017-2021
+# (C) Pywikibot team, 2017-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -102,9 +102,8 @@ class DownloadDumpBot(Bot, ConfigParserBot):
                 if toolforge_dump_filepath:
                     pywikibot.output('Symlinking file from '
                                      + toolforge_dump_filepath)
-                    if non_atomic:
-                        if os.path.exists(file_final_storepath):
-                            remove(file_final_storepath)
+                    if non_atomic and os.path.exists(file_final_storepath):
+                        remove(file_final_storepath)
                     symlink(toolforge_dump_filepath, file_current_storepath)
                 else:
                     url = 'https://dumps.wikimedia.org/{}/{}/{}'.format(
@@ -134,7 +133,7 @@ class DownloadDumpBot(Bot, ConfigParserBot):
                         parts = 50
                         display_string = ''
 
-                        pywikibot.output('')
+                        pywikibot.output()
                         for data in response.iter_content(100 * 1024):
                             result_file.write(data)
 
@@ -157,7 +156,7 @@ class DownloadDumpBot(Bot, ConfigParserBot):
                                 - len(display_string.rstrip()))
 
                             pywikibot.output(display_string, newline=False)
-                        pywikibot.output('')
+                        pywikibot.output()
 
                 # Rename the temporary file to the target file
                 # if the download completes successfully

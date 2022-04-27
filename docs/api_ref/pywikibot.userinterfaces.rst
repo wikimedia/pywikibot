@@ -28,6 +28,11 @@ terminal\_interface\_win32 module
 
 .. automodule:: pywikibot.userinterfaces.terminal_interface_win32
 
+buffer\_interface module
+------------------------
+
+.. automodule:: pywikibot.userinterfaces.buffer_interface
+
 gui module
 ----------
 

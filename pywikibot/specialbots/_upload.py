@@ -23,7 +23,6 @@ from pywikibot import config
 from pywikibot.backports import List
 from pywikibot.bot import BaseBot, QuitKeyboardInterrupt
 from pywikibot.exceptions import APIError, FatalServerError, NoPageError
-from pywikibot.tools.formatter import color_format
 
 
 class UploadRobot(BaseBot):
@@ -190,9 +189,8 @@ class UploadRobot(BaseBot):
         :return: False if this warning should cause an abort, True if it should
             be ignored or None if this warning has no default handler.
         """
-        if self.aborts is not True:
-            if warning in self.aborts:
-                return False
+        if self.aborts is not True and warning in self.aborts:
+            return False
         if self.ignore_warning is True or (self.ignore_warning is not False
                                            and warning in self.ignore_warning):
             return True
@@ -328,9 +326,8 @@ class UploadRobot(BaseBot):
 
         while not self.description or self.verify_description:
             if not self.description:
-                pywikibot.output(color_format(
-                    '{lightred}It is not possible to upload a file '
-                    'without a description.{default}'))
+                pywikibot.output('<<lightred>>It is not possible to upload a '
+                                 'file without a description.<<default>>')
             assert not self.opt.always
             # if no description, ask if user want to add one or quit,
             # and loop until one is filled.
@@ -376,7 +373,7 @@ class UploadRobot(BaseBot):
         """
         Upload the image at file_url to the target wiki.
 
-        :see: https://www.mediawiki.org/wiki/API:Upload
+        .. seealso:: :api:`Upload`
 
         Return the filename that was used to upload the image.
         If the upload fails, ask the user whether to try again or not.

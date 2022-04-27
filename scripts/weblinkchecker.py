@@ -132,7 +132,6 @@ from pywikibot.pagegenerators import (
     XMLDumpPageGenerator as _XMLDumpPageGenerator,
 )
 from pywikibot.tools import ThreadList
-from pywikibot.tools.formatter import color_format
 
 
 try:
@@ -511,16 +510,14 @@ class DeadLinkReportThread(threading.Thread):
                 url, error_report, containing_page, archive_url = self.queue[0]
                 self.queue = self.queue[1:]
                 talk_page = containing_page.toggleTalkPage()
-                pywikibot.output(color_format(
-                    '{lightaqua}** Reporting dead link on {}...{default}',
-                    talk_page))
+                pywikibot.output('<<lightaqua>>** Reporting dead link on {}...'
+                                 '<<default>>'.format(talk_page))
                 try:
                     content = talk_page.get() + '\n\n\n'
                     if url in content:
-                        pywikibot.output(color_format(
-                            '{lightaqua}** Dead link seems to have '
-                            'already been reported on {}{default}',
-                            talk_page))
+                        pywikibot.output('<<lightaqua>>** Dead link seems to '
+                                         'have already been reported on {}'
+                                         '<<default>>'.format(talk_page))
                         continue
                 except (NoPageError, IsRedirectPageError):
                     content = ''
@@ -557,10 +554,10 @@ class DeadLinkReportThread(threading.Thread):
                 try:
                     talk_page.put(content, comment)
                 except SpamblacklistError as error:
-                    pywikibot.output(color_format(
-                        '{lightaqua}** SpamblacklistError while trying to '
-                        'change {0}: {1}{default}',
-                        talk_page, error.url))
+                    pywikibot.output(
+                        '<<lightaqua>>** SpamblacklistError while trying to '
+                        'change {}: {}<<default>>'
+                        .format(talk_page, error.url))
 
 
 class WeblinkCheckerRobot(SingleSiteBot, ExistingPageBot):

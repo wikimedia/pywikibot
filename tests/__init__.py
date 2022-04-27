@@ -17,8 +17,6 @@ import unittest
 import warnings
 from contextlib import suppress
 from itertools import chain
-from unittest import mock  # noqa: F401
-from unittest.mock import MagicMock, Mock, patch  # noqa: F401
 
 # Verify that the unit tests have a base working environment:
 # - requests is mandatory

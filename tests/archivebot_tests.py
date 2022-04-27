@@ -10,7 +10,6 @@ from contextlib import suppress
 from datetime import datetime, timedelta
 
 import pywikibot
-import pywikibot.page
 from pywikibot.exceptions import Error
 from pywikibot.textlib import TimeStripper
 from scripts import archivebot

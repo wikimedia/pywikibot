@@ -8,15 +8,15 @@ https://dumps.wikimedia.org/backup-index.html) and offers a generator over
 XmlEntry objects which can be used by other bots.
 """
 #
-# (C) Pywikibot team, 2005-2020
+# (C) Pywikibot team, 2005-2022
 #
 # Distributed under the terms of the MIT license.
 #
 import re
-import threading
-import xml.sax
-from xml.etree.ElementTree import iterparse
+from typing import Optional
+from xml.etree.ElementTree import iterparse, ParseError
 
+from pywikibot.backports import Callable, Type
 from pywikibot.tools import open_archive
 
 
@@ -66,57 +66,73 @@ class XmlEntry:
         self.isredirect = redirect
 
 
-class XmlParserThread(threading.Thread):
-
-    """
-    XML parser that will run as a single thread.
-
-    This allows the XmlDump
-    generator to yield pages before the parser has finished reading the
-    entire dump.
-
-    There surely are more elegant ways to do this.
-    """
-
-    def __init__(self, filename, handler) -> None:
-        """Initializer."""
-        super().__init__()
-        self.filename = filename
-        self.handler = handler
-
-    def run(self) -> None:
-        """Parse the file in a single thread."""
-        xml.sax.parse(self.filename, self.handler)
-
-
 class XmlDump:
 
-    """
-    Represents an XML dump file.
+    """Represents an XML dump file.
 
     Reads the local file at initialization,
     parses it, and offers access to the resulting XmlEntries via a generator.
 
+    .. versionadded:: 7.2
+       the `on_error` parameter
+    .. versionchanged:: 7.2
+       `allrevisions` parameter must be given as keyword parameter
+
+    Usage example:
+
+    >>> from pywikibot import xmlreader
+    >>> dump = xmlreader.XmlDump('tests/data/xml/article-pear.xml')
+    >>> for elem in dump.parse():
+    ...     print(elem.title, elem.revisionid)
+    ...
+    ...
+    Pear 185185
+    Pear 185241
+    Pear 185408
+    Pear 188924
+    >>>
+
     :param allrevisions: boolean
         If True, parse all revisions instead of only the latest one.
         Default: False.
+    :param on_error: a callable which is invoked within :meth:`parse`
+        method when a ParseError occurs. The exception is passed to this
+        callable. Otherwise the exception is raised.
     """
 
-    def __init__(self, filename, allrevisions: bool = False) -> None:
+    def __init__(self, filename, *,
+                 allrevisions: bool = False,
+                 on_error: Optional[
+                     Callable[[Type[BaseException]], None]] = None) -> None:
         """Initializer."""
         self.filename = filename
+        self.on_error = on_error
         if allrevisions:
             self._parse = self._parse_all
         else:
             self._parse = self._parse_only_latest
 
     def parse(self):
-        """Generator using ElementTree iterparse function."""
+        """Generator using ElementTree iterparse function.
+
+        .. versionchanged:: 7.2
+           if a ParseError occurs it can be handled by the callable
+           given with `on_error` parameter of this instance.
+        """
         with open_archive(self.filename) as source:
             context = iterparse(source, events=('start', 'end', 'start-ns'))
             self.root = None
+            while True:
+                try:
+                    event, elem = next(context)
+                except StopIteration:
+                    return
+                except ParseError as e:
+                    if self.on_error:
+                        self.on_error(e)
+                        continue
+                    raise
 
-            for event, elem in context:
                 if event == 'start-ns' and elem[0] == '':
                     self.uri = elem[1]
                     continue

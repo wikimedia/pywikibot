@@ -10,7 +10,6 @@ import copy
 import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
-from pywikibot.tools.formatter import color_format
 
 
 try:
@@ -132,12 +131,12 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
             pywikibot.output(value)
             langs = self.detect_langs(value)
             if langs:
-                pywikibot.output(color_format(
-                    '{lightblue}Hints from langdetect:{default}'))
+                pywikibot.output(
+                    '<<lightblue>>Hints from langdetect:<<default>>')
                 for language in langs:
-                    pywikibot.output(color_format(
-                        '{{lightblue}}{obj.lang}: {obj.prob}{{default}}',
-                        obj=language))
+                    pywikibot.output(
+                        '<<lightblue>>{obj.lang}: {obj.prob}<<default>>'
+                        .format(obj=language))
             lang = pywikibot.input(
                 'Enter the language of the displayed text:').strip()
             if lang != '':

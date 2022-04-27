@@ -51,7 +51,8 @@ class Win32UI(terminal_interface_base.UI):
         """Return whether the target stream supports actually color."""
         return target_stream.isatty()
 
-    def encounter_color(self, color, target_stream) -> None:
+    def encounter_color(self, color,
+                        target_stream) -> None:  # pragma: no cover
         """Set the new color."""
         fg, bg = self.divide_color(color)
         windows_color = windowsColors[fg]
@@ -74,7 +75,7 @@ class Win32UI(terminal_interface_base.UI):
         handle = get_handle(DWORD(addr))
         ctypes.windll.kernel32.SetConsoleTextAttribute(handle, windows_color)
 
-    def _raw_input(self):
+    def _raw_input(self):  # pragma: no cover
         data = self.stdin.readline()
         if '\x1a' in data:
             raise EOFError()

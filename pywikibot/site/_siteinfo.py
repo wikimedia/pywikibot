@@ -16,9 +16,6 @@ from pywikibot.exceptions import APIError
 from pywikibot.tools import EMPTY_DEFAULT
 
 
-_logger = 'wiki.siteinfo'
-
-
 class Siteinfo(Container):
 
     """
@@ -130,6 +127,8 @@ class Siteinfo(Container):
         returned when a property doesn't exists, it queries each property
         independetly if a property is invalid.
 
+        .. seealso:: :api:Siteinfo
+
         :param prop: The property names of the siteinfo.
         :type prop: str or iterable
         :param expiry: The expiry date of the cached request.
@@ -137,7 +136,6 @@ class Siteinfo(Container):
         :return: A dictionary with the properties of the site. Each entry in
             the dictionary is a tuple of the value and a boolean to save if it
             is the default value.
-        :see: https://www.mediawiki.org/wiki/API:Meta#siteinfo_.2F_si
         """
         def warn_handler(mod, message) -> bool:
             """Return True if the warning is handled."""
@@ -228,7 +226,7 @@ class Siteinfo(Container):
         :rtype: various (the value), bool (if the default value is used)
         """
         if 'general' not in self._cache:
-            pywikibot.debug('general siteinfo not loaded yet.', _logger)
+            pywikibot.debug('general siteinfo not loaded yet.')
             force = True
             props = ['namespaces', 'namespacealiases']
         else:
@@ -239,7 +237,7 @@ class Siteinfo(Container):
             if props:
                 pywikibot.debug(
                     "Load siteinfo properties '{}' along with 'general'"
-                    .format("', '".join(props)), _logger)
+                    .format("', '".join(props)))
             props += ['general']
             default_info = self._get_siteinfo(props, expiry)
             for prop in props:

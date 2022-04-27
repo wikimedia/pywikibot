@@ -65,7 +65,7 @@ __all__ = (
     'CRITICAL', 'ERROR', 'INFO', 'WARNING', 'DEBUG', 'INPUT', 'STDOUT',
     'VERBOSE', 'critical', 'debug', 'error', 'exception', 'log', 'warning',
     'output', 'stdout', 'LoggingFormatter',
-    'init_handlers', 'writelogheader',
+    'set_interface', 'init_handlers', 'writelogheader',
     'input', 'input_choice', 'input_yn', 'input_list_choice', 'ui',
     'Option', 'StandardOption', 'NestedOption', 'IntegerOption',
     'ContextOption', 'ListOption', 'ShowingListOption', 'MultipleChoiceList',
@@ -179,7 +179,6 @@ from pywikibot.tools import (
     strtobool,
 )
 from pywikibot.tools._logging import LoggingFormatter
-from pywikibot.tools.formatter import color_format
 
 
 if TYPE_CHECKING:
@@ -190,12 +189,6 @@ AnswerType = Union[
     'pywikibot.bot_choice.Option',
 ]
 PageLinkType = Union['pywikibot.page.Link', 'pywikibot.page.Page']
-
-# Note: all output goes through python std library "logging" module
-_logger = 'bot'
-
-ui = None  # type: Optional[pywikibot.userinterfaces._interface_base.ABUIC]
-
 
 _GLOBAL_HELP = """
 GLOBAL OPTIONS
@@ -274,13 +267,24 @@ For global options use -help:global or run pwb.py -help
 
 """
 
+ui = None  # type: Optional[pywikibot.userinterfaces._interface_base.ABUIC]
+"""Holds a user interface object defined in
+:mod:`pywikibot.userinterfaces` subpackage.
+"""
+
 
 def set_interface(module_name: str) -> None:
-    """Configures any bots to use the given interface module."""
+    """Configures any bots to use the given interface module.
+
+    Search for user interface module in the
+    :mod:`pywikibot.userinterfaces` subdirectory and initialize UI.
+    Calls :func:`init_handlers` to re-initialize if we were already
+    initialized with another UI.
+
+    .. versionadded:: 6.4
+    """
     global ui
 
-    # User interface initialization
-    # search for user interface module in the 'userinterfaces' subdirectory
     ui_module = __import__('pywikibot.userinterfaces.{}_interface'
                            .format(module_name), fromlist=['UI'])
     ui = ui_module.UI()
@@ -288,47 +292,39 @@ def set_interface(module_name: str) -> None:
     atexit.register(ui.flush)
     pywikibot.argvu = ui.argvu()
 
-    # re-initialize if we were already initialized with another UI
+    # re-initialize
 
     if _handlers_initialized:
         init_handlers()
 
 
-# Initialize the handlers and formatters for the logging system.
-#
-# This relies on the global variable 'ui' which is a UserInterface object
-# defined in the 'userinterface' subpackage.
-#
-# The UserInterface object must define its own init_handlers() method
-# which takes the root logger as its only argument, and which adds to that
-# logger whatever handlers and formatters are needed to process output and
-# display it to the user. The default (terminal) interface sends level
-# STDOUT to sys.stdout (as all interfaces should) and sends all other
-# levels to sys.stderr; levels WARNING and above are labeled with the
-# level name.
-#
-# UserInterface objects must also define methods input(), input_choice(),
-# and editText(), all of which are documented in
-# userinterfaces/terminal_interface.py
-
 _handlers_initialized = False
 
 
 def handler_namer(name: str) -> str:
-    """Modify the filename of a log file when rotating."""
+    """Modify the filename of a log file when rotating.
+
+    .. versionadded:: 6.5
+    """
     path, qualifier = name.rsplit('.', 1)
     root, ext = os.path.splitext(path)
     return '{}.{}{}'.format(root, qualifier, ext)
 
 
 def init_handlers() -> None:
-    """Initialize logging system for terminal-based bots.
+    """Initialize the handlers and formatters for the logging system.
 
+    This relies on the global variable :attr:`ui` which is a UI object.
+
+    .. seealso:: :mod:`pywikibot.userinterfaces`
+
+    Calls :func:`writelogheader` after handlers are initialized.
     This function must be called before using any input/output methods;
-    and must be called again if ui handler is changed..
+    and must be called again if ui handler is changed. Use
+    :func:`set_interface` to set the new interface which initializes it.
 
-    Note: this function is called by any user input and output function,
-    so it should normally not need to be called explicitly.
+    .. note:: this function is called by any user input and output
+       function, so it should normally not need to be called explicitly.
 
     All user output is routed through the logging module.
     Each type of output is handled by an appropriate handler object.
@@ -347,8 +343,13 @@ def init_handlers() -> None:
      - ERROR: user error messages.
      - CRITICAL: fatal error messages.
 
+     .. seealso::
+        * :mod:`pywikibot.logging`
+        * :python:`Python Logging Levels<library/logging.html#logging-levels>`
+
     Accordingly, do **not** use print statements in bot code; instead,
-    use pywikibot.output function.
+    use :func:`pywikibot.output` function and other functions from
+    :mod:`pywikibot.logging` module.
 
     .. versionchanged:: 6.2
       Different logfiles are used if multiple processes of the same
@@ -507,7 +508,7 @@ def writelogheader() -> None:
 
     # imported modules
     log('MODULES:')
-    for module in sys.modules.values():
+    for module in sys.modules.copy().values():
         filename = version.get_module_filename(module)
         if not filename:
             continue
@@ -777,28 +778,29 @@ class InteractiveReplace:
             if isinstance(c, AlwaysChoice) and c.handle_link():
                 return c.answer
 
+        question = 'Should the link '
         if self.context > 0:
             rng = self.current_range
             text = self.current_text
             # at the beginning of the link, start red color.
             # at the end of the link, reset the color to default
             pywikibot.output(text[max(0, rng[0] - self.context): rng[0]]
-                             + color_format('{lightred}{0}{default}',
-                                            text[rng[0]: rng[1]])
+                             + '<<lightred>>{}<<default>>'.format(
+                                 text[rng[0]: rng[1]])
                              + text[rng[1]: rng[1] + self.context])
-            question = 'Should the link '
         else:
-            question = 'Should the link {lightred}{0}{default} '
+            question += '<<lightred>>{}<<default>> '.format(
+                self._old.canonical_title())
 
         if self._new is False:
             question += 'be unlinked?'
         else:
-            question += color_format('target to {lightpurple}{0}{default}?',
-                                     self._new.canonical_title())
+            question += 'target to <<lightpurple>>{}<<default>>?'.format(
+                self._new.canonical_title())
 
-        choice = pywikibot.input_choice(
-            color_format(question, self._old.canonical_title()),
-            choices, default=self._default, automatic_quit=self._quit)
+        choice = pywikibot.input_choice(question, choices,
+                                        default=self._default,
+                                        automatic_quit=self._quit)
 
         assert isinstance(choice, str)
         return self.handle_answer(choice)
@@ -977,7 +979,7 @@ def handle_args(args: Optional[Iterable[str]] = None,
         show_help(show_global=do_help_val == 'global')
         sys.exit(0)
 
-    debug('handle_args() completed.', _logger)
+    debug('handle_args() completed.')
     return non_global_args
 
 
@@ -1202,26 +1204,45 @@ class BaseBot(OptionHandler):
     """
     Generic Bot to be subclassed.
 
-    This class provides a run() method for basic processing of a
+    This class provides a :meth:`run` method for basic processing of a
     generator one page at a time.
 
-    If the subclass places a page generator in self.generator,
-    Bot will process each page in the generator, invoking the method treat()
-    which must then be implemented by subclasses.
+    If the subclass places a page generator in
+    :attr:`self.generator<generator>`, Bot will process each page in the
+    generator, invoking the method :meth:`treat` which must then be
+    implemented by subclasses.
 
-    Each item processed by treat() must be a :py:obj:`pywikibot.page.BasePage`
-    type. Use init_page() to upcast the type. To enable other types, set
-    BaseBot.treat_page_type to an appropriate type; your bot should
-    derive from BaseBot in that case and handle site properties.
+    Each item processed by :meth:`treat` must be a
+    :class:`pywikibot.page.BasePage` type. Use :meth:`init_page` to
+    upcast the type. To enable other types, set
+    :attr:`BaseBot.treat_page_type` to an appropriate type; your bot
+    should derive from :class:`BaseBot` in that case and handle site
+    properties.
 
     If the subclass does not set a generator, or does not override
-    treat() or run(), NotImplementedError is raised.
+    :meth:`treat` or :meth:`run`, NotImplementedError is raised.
 
-    For bot options handling refer OptionHandler class above.
+    For bot options handling refer :class:`OptionHandler` class above.
 
     .. versionchanged:: 7.0
-       A counter attribute is provided which is a collections.Counter;
+       A counter attribute is provided which is a `collections.Counter`;
        The default counters are 'read', 'write' and 'skip'.
+    """
+
+    use_disambigs = None  # type: Optional[bool]
+    """Attribute to determine whether to use disambiguation pages. Set
+    it to True to use disambigs only, set it to False to skip disambigs.
+    If None both are processed.
+
+    .. versionadded:: 7.2
+    """
+
+    use_redirects = None  # type: Optional[bool]
+    """Attribute to determine whether to use redirect pages. Set it to
+    True to use redirects only, set it to False to skip redirects. If
+    None both are processed.
+
+    .. versionadded:: 7.2
     """
 
     # Handler configuration.
@@ -1232,10 +1253,13 @@ class BaseBot(OptionHandler):
         'always': False,  # By default ask for confirmation when putting a page
     }
 
-    # update_options can be used to update available_options;
-    # do not use it if the bot class is to be derived but use
-    # self.available_options.update(<dict>) initializer in such case
     update_options = {}  # type: Dict[str, Any]
+    """update_options can be used to update available_options;
+    do not use it if the bot class is to be derived but use
+    self.available_options.update(<dict>) initializer in such case.
+
+    .. versionadded:: 6.4
+    """
 
     _current_page = None  # type: Optional[pywikibot.page.BasePage]
 
@@ -1243,13 +1267,14 @@ class BaseBot(OptionHandler):
         """Only accept 'generator' and options defined in available_options.
 
         :param kwargs: bot options
-        :keyword generator: a generator processed by run method
+        :keyword generator: a :attr:`generator` processed by :meth:`run` method
         """
         if 'generator' in kwargs:
             if hasattr(self, 'generator'):
                 pywikibot.warn('{} has a generator already. Ignoring argument.'
                                .format(self.__class__.__name__))
             else:
+                #: generator processed by :meth:`run` method
                 self.generator = kwargs.pop('generator')
 
         self.available_options.update(self.update_options)
@@ -1257,7 +1282,8 @@ class BaseBot(OptionHandler):
 
         self.counter = Counter()
         self._generator_completed = False
-        self.treat_page_type = pywikibot.page.BasePage  # default type
+        #: instance variable to hold the default page type
+        self.treat_page_type = pywikibot.page.BasePage  # type: Any
 
     @property
     @deprecated("self.counter['read']", since='7.0.0')
@@ -1312,8 +1338,8 @@ class BaseBot(OptionHandler):
             msg = 'Working on {!r}'.format(page.title())
             if config.colorized_output:
                 log(msg)
-                stdout(color_format('\n\n>>> {lightpurple}{0}{default} <<<',
-                                    page.title()))
+                stdout('\n\n>>> <<lightpurple>>{}<<default>> <<<'
+                       .format(page.title()))
             else:
                 stdout(msg)
 
@@ -1510,14 +1536,36 @@ class BaseBot(OptionHandler):
 
         .. versionadded:: 3.0
 
+        .. versionchanged:: 7.2
+           use :attr:`use_redirects` to handle redirects,
+           use :attr:`use_disambigs` to handle disambigs
+
         :param page: Page object to be processed
         """
+        if isinstance(self.use_redirects, bool) \
+           and page.isRedirectPage() is not self.use_redirects:
+            pywikibot.warning(
+                'Page {page} on {page.site} is skipped because it is {not_}'
+                'a redirect'
+                .format(page=page, not_='not ' if self.use_redirects else ''))
+            return True
+
+        if isinstance(self.use_disambigs, bool) \
+           and page.isDisambig() is not self.use_disambigs:
+            pywikibot.warning(
+                'Page {page} on {page.site} is skipped because it is {not_}'
+                'a disambig'
+                .format(page=page, not_='not ' if self.use_disambigs else ''))
+            return True
+
         return False
 
-    def treat(self, page: 'pywikibot.page.BasePage') -> None:
+    def treat(self, page: Any) -> None:
         """Process one page (abstract method).
 
-        :param page: Page object to be processed
+        :param page: Object to be processed, usually a
+            :class:`pywikibot.page.BasePage`. For other page types the
+            :attr:`treat_page_type` must be set.
         """
         raise NotImplementedError('Method {}.treat() not implemented.'
                                   .format(self.__class__.__name__))
@@ -1940,7 +1988,18 @@ class CreatingPageBot(CurrentPageBot):
 
 class RedirectPageBot(CurrentPageBot):
 
-    """A RedirectPageBot class which only treats redirects."""
+    """A RedirectPageBot class which only treats redirects.
+
+    .. deprecated:: 7.2
+       use BaseBot attribute 'use_redirects = True' instead
+    """
+
+    def __init__(self, *args, **kwargs):
+        """Deprecate RedirectPageBot."""
+        issue_deprecation_warning('RedirectPageBot',
+                                  "BaseBot attribute 'use_redirects = True'",
+                                  since='7.2.0')
+        super().__init__(*args, **kwargs)
 
     def skip_page(self, page: 'pywikibot.page.BasePage') -> bool:
         """Treat only redirect pages and handle IsNotRedirectPageError."""
@@ -1954,7 +2013,18 @@ class RedirectPageBot(CurrentPageBot):
 
 class NoRedirectPageBot(CurrentPageBot):
 
-    """A NoRedirectPageBot class which only treats non-redirects."""
+    """A NoRedirectPageBot class which only treats non-redirects.
+
+    .. deprecated:: 7.2
+       use BaseBot attribute 'use_redirects = False' instead
+    """
+
+    def __init__(self, *args, **kwargs):
+        """Deprecate NoRedirectPageBot."""
+        issue_deprecation_warning('RedirectPageBot',
+                                  "BaseBot attribute 'use_redirects = False'",
+                                  since='7.2.0')
+        super().__init__(*args, **kwargs)
 
     def skip_page(self, page: 'pywikibot.page.BasePage') -> bool:
         """Treat only non-redirect pages and handle IsRedirectPageError."""

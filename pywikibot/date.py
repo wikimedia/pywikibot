@@ -552,7 +552,7 @@ def _make_parameter(decoder: decoder_type, param: int) -> str:
 # This is useful when trying to decide if a certain article is a localized date
 # or not, or generating dates.
 # See dh() for additional information.
-class MonthNames(Mapping):
+class MonthNames(abc.Mapping):
 
     """A Mapping which reads month names from MediaWiki messages."""
 

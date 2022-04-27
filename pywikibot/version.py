@@ -27,9 +27,6 @@ from pywikibot.comms.http import fetch
 from pywikibot.exceptions import VersionParseError
 
 
-_logger = 'version'
-
-
 def _get_program_dir():
     _program_dir = os.path.normpath(
         os.path.split(os.path.dirname(__file__))[0])
@@ -113,7 +110,7 @@ def getversiondict() -> Dict[str, str]:
     # Git and SVN can silently fail, as it may be a nightly.
     if exceptions:
         pywikibot.debug('version algorithm exceptions:\n{!r}'
-                        .format(exceptions), _logger)
+                        .format(exceptions))
 
     if isinstance(date, str):
         datestring = date

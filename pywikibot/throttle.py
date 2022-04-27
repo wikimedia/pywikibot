@@ -24,8 +24,6 @@ else:
     from hashlib import blake2b
 
 
-_logger = 'wiki.throttle'
-
 FORMAT_LINE = '{module_id} {pid} {time} {site}\n'
 ProcEntry = namedtuple('ProcEntry', ['module_id', 'pid', 'time', 'site'])
 
@@ -158,8 +156,7 @@ class Throttle:
         """
         global pid
         mysite = self.mysite
-        pywikibot.debug('Checking multiplicity: pid = {pid}'.format(pid=pid),
-                        _logger)
+        pywikibot.debug('Checking multiplicity: pid = {pid}'.format(pid=pid))
         with self.lock:
             processes = []
             used_pids = set()

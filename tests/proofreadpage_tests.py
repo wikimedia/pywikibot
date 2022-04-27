@@ -21,6 +21,7 @@ from tests.basepage import (
     BasePageLoadRevisionsCachingTestBase,
     BasePageMethodsTestBase,
 )
+from tests.utils import skipping
 
 
 class TestProofreadPageInvalidSite(TestCase):
@@ -305,19 +306,19 @@ class TestProofreadPageValidSite(TestCase):
         self.assertEqual(json.loads(page_text), json.loads(loaded_text))
 
     @require_modules('bs4')
-    @unittest.skip('T181913 and T114318')
     def test_url_image(self):
         """Test fetching of url image of the scan of ProofreadPage."""
         page = ProofreadPage(self.site, self.valid['title'])
         self.assertEqual(page.url_image, self.valid['url_image'])
 
-        page = ProofreadPage(self.site, self.valid_redlink['title'])
-        self.assertEqual(page.url_image, self.valid_redlink['url_image'])
-
         page = ProofreadPage(self.site, self.existing_unlinked['title'])
         # test Exception in property.
         with self.assertRaises(ValueError):
             page.url_image
+
+        page = ProofreadPage(self.site, self.valid_redlink['title'])
+        with skipping(ValueError, msg='T181913, T114318'):
+            self.assertEqual(page.url_image, self.valid_redlink['url_image'])
 
 
 class TestPageQuality(TestCase):
@@ -615,7 +616,6 @@ class TestLoadRevisionsCachingIndexPage(BS4TestCase,
             references='<references/>', div_end=div)
 
 
-@unittest.skip('T181913 and T114318')
 class TestIndexPageMappings(BS4TestCase):
 
     """Test IndexPage class."""

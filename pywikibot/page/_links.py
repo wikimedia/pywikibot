@@ -18,7 +18,7 @@ import pywikibot
 from pywikibot import textlib
 from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.site import Namespace
-from pywikibot.tools import ComparableMixin, first_upper
+from pywikibot.tools import ComparableMixin, first_upper, is_ip_address
 
 
 __all__ = (
@@ -485,7 +485,10 @@ class Link(BaseLink):
                 'The link [[{}]] does not contain a page title'
                 .format(self._text))
 
-        if self._site.namespaces[self._namespace].case == 'first-letter':
+        # MediaWiki uses uppercase IP addresses
+        if self._namespace in (2, 3) and is_ip_address(t):
+            t = t.upper()
+        elif self._site.namespaces[self._namespace].case == 'first-letter':
             t = first_upper(t)
 
         self._title = t

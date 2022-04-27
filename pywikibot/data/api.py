@@ -42,10 +42,7 @@ from pywikibot.family import SubdomainFamily
 from pywikibot.login import LoginStatus
 from pywikibot.textlib import removeHTMLParts
 from pywikibot.tools import PYTHON_VERSION, itergroup
-from pywikibot.tools.formatter import color_format
 
-
-_logger = 'data.api'
 
 lagpattern = re.compile(
     r'Waiting for [\w.: ]+: (?P<lag>\d+(?:\.\d+)?) seconds? lagged')
@@ -56,7 +53,7 @@ def _invalidate_superior_cookies(family) -> None:
     Clear cookies for site's second level domain.
 
     get_login_token() will generate new cookies needed.
-    This is a workaround for requests bug, see T224712
+    This is a workaround for requests bug, see :phab:`T224712`
     and https://github.com/psf/requests/issues/5411
     for more details.
     """
@@ -312,13 +309,13 @@ class ParamInfo(Sized, Container):
         # number of modules that may be processed in a single batch.
         for module_batch in module_generator():
             if self.modules_only_mode and 'pageset' in module_batch:
-                pywikibot.debug('paraminfo fetch: removed pageset', _logger)
+                pywikibot.debug('paraminfo fetch: removed pageset')
                 module_batch.remove('pageset')
                 # If this occurred during initialisation,
                 # also record it in the preloaded_modules.
                 # (at least so tests know an extra load was intentional)
                 if 'query' not in self._paraminfo:
-                    pywikibot.debug('paraminfo batch: added query', _logger)
+                    pywikibot.debug('paraminfo batch: added query')
                     module_batch.append('query')
                     self.preloaded_modules |= {'query'}
 
@@ -1031,6 +1028,8 @@ class Request(MutableMapping):
             'wbremovequalifiers', 'wbremovereferences', 'wbsetaliases',
             'wbsetclaim', 'wbsetclaimvalue', 'wbsetdescription', 'wbsetlabel',
             'wbsetqualifier', 'wbsetreference', 'wbsetsitelink',
+            'wbladdform', 'wbleditformelements', 'wblmergelexemes',
+            'wblremoveform',
         }
         # Client side verification that the request is being performed
         # by a logged in user, and warn if it isn't a config username.
@@ -1051,7 +1050,7 @@ class Request(MutableMapping):
 
         # Make sure user is logged in
         if self.write:
-            pywikibot.debug('Adding user assertion', _logger)
+            pywikibot.debug('Adding user assertion')
             self['assert'] = 'user'
 
     @classmethod
@@ -1337,9 +1336,8 @@ class Request(MutableMapping):
         """Simulate action."""
         if action and config.simulate and (
                 self.write or action in config.actions_to_block):
-            pywikibot.output(color_format(
-                '{black;yellow}SIMULATION: {} action blocked.{default}',
-                action))
+            pywikibot.output('<<black;yellow>>SIMULATION: {} action blocked.'
+                             '<<default>>'.format(action))
             # for more realistic simulation
             if config.simulate is not True:
                 pywikibot.sleep(float(config.simulate))
@@ -1347,8 +1345,9 @@ class Request(MutableMapping):
                 action: {'result': 'Success', 'nochange': ''},
 
                 # wikibase results
-                'pageinfo': {'lastrevid': -1},
                 'entity': {'lastrevid': -1},
+                'pageinfo': {'lastrevid': -1},
+                'reference': {'hash': -1},
             }
         return None
 
@@ -1476,8 +1475,7 @@ class Request(MutableMapping):
 
         pywikibot.debug('API request to {} (uses get: {}):\n'
                         'Headers: {!r}\nURI: {!r}\nBody: {!r}'
-                        .format(self.site, use_get, headers, uri, body),
-                        _logger)
+                        .format(self.site, use_get, headers, uri, body))
         return use_get, uri, body, headers
 
     def _http_request(self, use_get: bool, uri: str, data, headers,
@@ -1544,7 +1542,7 @@ The text message is:
             # Do not retry for AutoFamily but raise a SiteDefinitionError
             # Note: family.AutoFamily is a function to create that class
             if self.site.family.__class__.__name__ == 'AutoFamily':
-                pywikibot.debug(msg, _logger)
+                pywikibot.debug(msg)
                 raise SiteDefinitionError('Invalid AutoFamily({!r})'
                                           .format(self.site.family.domain))
 
@@ -1585,27 +1583,63 @@ The text message is:
                 return True
         return False
 
-    def _handle_warnings(self, result) -> None:
-        if 'warnings' in result:
-            for mod, warning in result['warnings'].items():
-                if mod == 'info':
-                    continue
-                if '*' in warning:
-                    text = warning['*']
-                elif 'html' in warning:
-                    # bug T51978
-                    text = warning['html']['*']
-                else:
-                    pywikibot.warning(
-                        'API warning ({}) of unknown format: {}'.
-                        format(mod, warning))
-                    continue
-                # multiple warnings are in text separated by a newline
-                for single_warning in text.splitlines():
-                    if (not callable(self._warning_handler)
-                            or not self._warning_handler(mod, single_warning)):
+    def _handle_warnings(self, result: Dict[str, Any]) -> bool:
+        """Handle warnings; return True to retry request, False to resume.
+
+        .. versionchanged:: 7.2
+           Return True to retry the current request and Falso to resume.
+        """
+        retry = False
+        if 'warnings' not in result:
+            return retry
+
+        for mod, warning in result['warnings'].items():
+            if mod == 'info':
+                continue
+            if '*' in warning:
+                text = warning['*']
+            elif 'html' in warning:
+                # bug T51978
+                text = warning['html']['*']
+            else:
+                pywikibot.warning('API warning ({}) of unknown format: {}'
+                                  .format(mod, warning))
+                continue
+
+            # multiple warnings are in text separated by a newline
+            for single_warning in text.splitlines():
+                if (not callable(self._warning_handler)
+                        or not self._warning_handler(mod, single_warning)):
+                    handled = self._default_warning_handler(mod,
+                                                            single_warning)
+                    if handled is None:
                         pywikibot.warning('API warning ({}): {}'
                                           .format(mod, single_warning))
+                    else:
+                        retry = retry or handled
+        return retry
+
+    def _default_warning_handler(self, mode: str, msg: str) -> Optional[bool]:
+        """A default warning handler to handle specific warnings.
+
+        Return True to retry the request, False to resume and None if
+        the warning is not handled.
+
+        .. versionadded:: 7.2
+        """
+        warnings = {
+            'purge': ("You've exceeded your rate limit. "
+                      'Please wait some time and try again.',
+                      '_ratelimited', True),
+        }
+        warning, handler, retry = warnings.get(mode, (None, None, None))
+        if handler and msg == warning:
+            # Only show the first warning part
+            pywikibot.warning(msg.split('.')[0] + '.')
+            # call the handler
+            getattr(self, handler)()
+            return retry
+        return None
 
     def _logged_in(self, code) -> bool:
         """Check whether user is logged in.
@@ -1654,6 +1688,7 @@ The text message is:
         # TODO: T154011: 'ReadOnlyError' seems replaced by 'readonly'
         retry = class_name in ['DBConnectionError',  # T64974
                                'DBQueryError',  # T60158
+                               'DBQueryTimeoutError',  # T297708
                                'ReadOnlyError',  # T61227
                                'readonly',  # T154011
                                ]
@@ -1771,7 +1806,8 @@ The text message is:
             if self._userinfo_query(result):
                 continue
 
-            self._handle_warnings(result)
+            if self._handle_warnings(result):
+                continue
 
             if 'error' not in result:
                 return result
@@ -2012,7 +2048,7 @@ class CachedRequest(Request):
                 return False
             pywikibot.debug('{}: cache hit ({}) for API request: {}'
                             .format(self.__class__.__name__, filename,
-                                    uniquedescr), _logger)
+                                    uniquedescr))
             return True
         except OSError:
             # file not found
@@ -2116,8 +2152,7 @@ class APIGenerator(_RequestWrapper):
         self.query_increment = int(value)
         self.request[self.limit_name] = self.query_increment
         pywikibot.debug('{}: Set query_increment to {}.'
-                        .format(self.__class__.__name__,
-                                self.query_increment), _logger)
+                        .format(type(self).__name__, self.query_increment))
 
     def set_maximum_items(self, value: Union[int, str, None]) -> None:
         """
@@ -2134,11 +2169,9 @@ class APIGenerator(_RequestWrapper):
             if self.query_increment and self.limit < self.query_increment:
                 self.request[self.limit_name] = self.limit
                 pywikibot.debug('{}: Set request item limit to {}'
-                                .format(self.__class__.__name__, self.limit),
-                                _logger)
+                                .format(type(self).__name__, self.limit))
             pywikibot.debug('{}: Set limit (maximum_items) to {}.'
-                            .format(self.__class__.__name__, self.limit),
-                            _logger)
+                            .format(type(self).__name__, self.limit))
 
     def __iter__(self):
         """
@@ -2151,28 +2184,25 @@ class APIGenerator(_RequestWrapper):
         while True:
             self.request[self.continue_name] = offset
             pywikibot.debug('{}: Request: {}'
-                            .format(self.__class__.__name__, self.request),
-                            _logger)
+                            .format(type(self).__name__, self.request))
             data = self.request.submit()
 
             n_items = len(data[self.data_name])
             pywikibot.debug('{}: Retrieved {} items'
-                            .format(self.__class__.__name__, n_items),
-                            _logger)
+                            .format(type(self).__name__, n_items))
             if n_items > 0:
                 for item in data[self.data_name]:
                     yield item
                     n += 1
                     if self.limit is not None and n >= self.limit:
-                        pywikibot.debug('%s: Stopped iterating due to '
-                                        'exceeding item limit.' %
-                                        self.__class__.__name__, _logger)
+                        pywikibot.debug('{}: Stopped iterating due to '
+                                        'exceeding item limit.'
+                                        .format(type(self).__name__))
                         return
                 offset += n_items
             else:
                 pywikibot.debug('{}: Stopped iterating due to empty list in '
-                                'response.'.format(self.__class__.__name__),
-                                _logger)
+                                'response.'.format(type(self).__name__))
                 break
 
 
@@ -2371,8 +2401,7 @@ class QueryGenerator(_RequestWrapper):
         else:
             self.query_limit = min(self.api_limit, limit)
         pywikibot.debug('{}: Set query_limit to {}.'
-                        .format(self.__class__.__name__,
-                                self.query_limit), _logger)
+                        .format(type(self).__name__, self.query_limit))
 
     def set_maximum_items(self, value: Union[int, str, None]) -> None:
         """Set the maximum number of items to be retrieved from the wiki.
@@ -2401,10 +2430,8 @@ class QueryGenerator(_RequestWrapper):
             limit = int(param['max'])
         if self.api_limit is None or limit < self.api_limit:
             self.api_limit = limit
-            pywikibot.debug(
-                '{}: Set query_limit to {}.'.format(self.__class__.__name__,
-                                                    self.api_limit),
-                _logger)
+            pywikibot.debug('{}: Set query_limit to {}.'
+                            .format(type(self).__name__, self.api_limit))
 
     def support_namespace(self) -> bool:
         """Check if namespace is a supported parameter on this query.
@@ -2540,8 +2567,7 @@ class QueryGenerator(_RequestWrapper):
                         new=new_limit,
                         count=self._count,
                         prefix=self.prefix,
-                        value=self.request[self.prefix + 'limit']),
-                _logger)
+                        value=self.request[self.prefix + 'limit']))
         return prev_limit, new_limit
 
     def _get_resultdata(self):
@@ -2560,9 +2586,8 @@ class QueryGenerator(_RequestWrapper):
                 resultdata = [resultdata[k]
                               for k in sorted(resultdata.keys())]
         pywikibot.debug('{name} received {keys}; limit={limit}'
-                        .format(name=self.__class__.__name__,
-                                keys=keys, limit=self.limit),
-                        _logger)
+                        .format(name=type(self).__name__, keys=keys,
+                                limit=self.limit))
         return resultdata
 
     def _extract_results(self, resultdata):
@@ -2607,9 +2632,9 @@ class QueryGenerator(_RequestWrapper):
             if not self.data or not isinstance(self.data, dict):
                 pywikibot.debug(
                     '{}: stopped iteration because no dict retrieved from api.'
-                    .format(self.__class__.__name__),
-                    _logger)
+                    .format(type(self).__name__))
                 return
+
             if 'query' in self.data and self.resultkey in self.data['query']:
                 resultdata = self._get_resultdata()
                 if 'normalized' in self.data['query']:
@@ -3013,13 +3038,11 @@ class LoginManager(login.LoginManager):
 
 
 def encode_url(query) -> str:
-    """
-    Encode parameters to pass with a url.
+    """Encode parameters to pass with a url.
 
     Reorder parameters so that token parameters go last and call wraps
-    :py:obj:`urlencode`. Return an HTTP URL query fragment which complies with
-    https://www.mediawiki.org/wiki/API:Edit#Parameters
-    (See the 'token' bullet.)
+    :py:obj:`urlencode`. Return an HTTP URL query fragment which
+    complies with :api:`Edit#Parameters` (See the 'token' bullet.)
 
     :param query: keys and values to be uncoded for passing with a url
     :type query: mapping object or a sequence of two-element tuples
@@ -3078,7 +3101,13 @@ def _update_protection(page, pagedict: dict) -> None:
 def _update_revisions(page, revisions) -> None:
     """Update page revisions."""
     for rev in revisions:
-        page._revisions[rev['revid']] = pywikibot.page.Revision(**rev)
+        revid = rev['revid']
+        revision = pywikibot.page.Revision(**rev)
+        # do not overwrite an existing Revision if there is no content
+        if revid in page._revisions and revision.text is None:
+            pass
+        else:
+            page._revisions[revid] = revision
 
 
 def _update_templates(page, templates) -> None:

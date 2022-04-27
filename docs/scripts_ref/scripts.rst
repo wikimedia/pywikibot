@@ -3,12 +3,11 @@ scripts package
 
 .. automodule:: scripts
 
-Subpackages
------------
+Scripts Subpackages
+-------------------
 
 .. toctree::
 
-    scripts.archive
     scripts.i18n
     scripts.maintenance
     scripts.userscripts
@@ -83,6 +82,11 @@ cosmetic\_changes script
 
 .. automodule:: scripts.cosmetic_changes
 
+dataextend script
+-----------------
+
+.. automodule:: scripts.dataextend
+
 data\_ingestion script
 ----------------------
 
@@ -92,6 +96,11 @@ delete script
 -------------
 
 .. automodule:: scripts.delete
+
+delinker script
+---------------
+
+.. automodule:: scripts.delinker
 
 djvutext script
 ---------------

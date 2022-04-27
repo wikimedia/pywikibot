@@ -357,7 +357,23 @@ texinfo_documents = [
 autodoc_typehints = 'description'
 
 extlinks = {
-    'phab': ('https://phabricator.wikimedia.org/%s', '%s')
+    # MediaWiki API
+    'api': ('https://www.mediawiki.org/wiki/API:%s', 'API:%s'),
+    # Python bug tracker
+    'bug': ('https://bugs.python.org/issue%s', 'Python issue %s'),
+    # Python bug tracker
+    'issue': ('https://github.com/python/cpython/issues/%s',
+              'Python issue %s'),
+    # Phabricator tasks
+    'phab': ('https://phabricator.wikimedia.org/%s', '%s'),
+    # Python howto link
+    'pyhow': ('https://docs.python.org/3/howto/%s.html',
+              'Python Howto %s'),
+    # Python library link
+    'pylib': ('https://docs.python.org/3/library/%s.html',
+              'Python Library %s'),
+    # Generic Python link; should be used with explicit title
+    'python': ('https://docs.python.org/3/%s', None),
 }
 
 
@@ -418,7 +434,7 @@ def pywikibot_fix_phab_tasks(app, what, name, obj, options, lines):
     """Convert Phabricator tasks id to a link using sphinx.ext.extlinks."""
     result = []
     for line in lines:
-        line = re.sub(r'(T\d{5,6})', r':phab:`\1`', line)
+        line = re.sub(r'(?<!:phab:`)(T\d{5,6})', r':phab:`\1`', line)
         result.append(line)
     lines[:] = result[:]
 

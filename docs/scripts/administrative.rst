@@ -1,38 +1,38 @@
 Administrative scripts
 ======================
 
-blockpageschecker script
-------------------------
+blockpageschecker script description
+------------------------------------
 
 .. automodule:: scripts.blockpageschecker
    :no-members:
 
-delete script
--------------
+delete script description
+-------------------------
 
 .. automodule:: scripts.delete
    :no-members:
 
-patrol script
--------------
+patrol script description
+-------------------------
 
 .. automodule:: scripts.patrol
    :no-members:
 
-protect script
---------------
+protect script description
+--------------------------
 
 .. automodule:: scripts.protect
    :no-members:
 
-revertbot script
-----------------
+revertbot script description
+----------------------------
 
 .. automodule:: scripts.revertbot
    :no-members:
 
-speedy\_delete script
----------------------
+speedy\_delete script description
+---------------------------------
 
 .. automodule:: scripts.speedy_delete
    :no-members:

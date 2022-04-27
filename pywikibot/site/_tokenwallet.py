@@ -8,9 +8,6 @@ from pywikibot import debug
 from pywikibot.exceptions import Error
 
 
-_logger = 'site.tokenwallet'
-
-
 class TokenWallet:
 
     """Container for tokens."""
@@ -62,8 +59,7 @@ class TokenWallet:
         if self.site.mw_version >= '1.24wmf19' \
            and key in {'edit', 'delete', 'protect', 'move', 'block', 'unblock',
                        'email', 'import', 'options'}:
-            debug(
-                'Token {!r} was replaced by {!r}'.format(key, 'csrf'), _logger)
+            debug('Token {!r} was replaced by {!r}'.format(key, 'csrf'))
             key = 'csrf'
 
         try:

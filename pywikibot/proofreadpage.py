@@ -16,7 +16,7 @@ OCR support of page scans via:
 - Wikimedia OCR
 - see: https://www.mediawiki.org/wiki/Help:Extension:Wikisource/Wikimedia_OCR
 
-- https://ws-google-ocr.toolforge.org/
+- https://ocr.wmcloud.org/
 - inspired by https://wikisource.org/wiki/MediaWiki:GoogleOCR.js
 - see also: https://wikisource.org/wiki/Wikisource:Google_OCR
 
@@ -68,9 +68,6 @@ else:
         _bs4_soup = partial(BeautifulSoup, features='html.parser')
     else:
         _bs4_soup = partial(BeautifulSoup, features='lxml')
-
-
-_logger = 'proofreadpage'
 
 
 PagesFromLabelType = Dict[str, Set['pywikibot.page.Page']]
@@ -180,8 +177,8 @@ class ProofreadPage(pywikibot.Page):
                    'langs[]={lang}&image={url_image}&uselang={lang}')
 
     # googleOCR ocr utility
-    _GOCR_CMD = ('https://ws-google-ocr.toolforge.org/api.php?'
-                 'image={url_image}&lang={lang}')
+    _GOCR_CMD = ('https://ocr.wmcloud.org/api.php?engine=google&'
+                 'langs[]={lang}&image={url_image}')
 
     _MULTI_PAGE_EXT = ['djvu', 'pdf']
 
@@ -627,8 +624,7 @@ class ProofreadPage(pywikibot.Page):
 
         # wrong link fail with Exceptions
         for retry in range(5, 30, 5):
-            pywikibot.debug('{}: get URI {!r}'.format(ocr_tool, cmd_uri),
-                            _logger)
+            pywikibot.debug('{}: get URI {!r}'.format(ocr_tool, cmd_uri))
             try:
                 response = http.fetch(cmd_uri)
             except ReadTimeout as e:
@@ -637,8 +633,7 @@ class ProofreadPage(pywikibot.Page):
                 pywikibot.error('"{}": {}'.format(cmd_uri, e))
                 return True, e
             else:
-                pywikibot.debug('{}: {}'.format(ocr_tool, response.text),
-                                _logger)
+                pywikibot.debug('{}: {}'.format(ocr_tool, response.text))
                 break
 
             pywikibot.warning('retrying in {} seconds ...'.format(retry))

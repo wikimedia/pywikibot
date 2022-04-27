@@ -1,11 +1,11 @@
 """Structures holding data for Wikibase entities."""
 #
-# (C) Pywikibot team, 2019-2021
+# (C) Pywikibot team, 2019-2022
 #
 # Distributed under the terms of the MIT license.
 #
 from collections import defaultdict
-from collections.abc import MutableMapping
+from collections.abc import MutableMapping, MutableSequence
 from typing import Optional
 
 import pywikibot
@@ -17,6 +17,7 @@ __all__ = (
     'ClaimCollection',
     'LanguageDict',
     'SiteLinkCollection',
+    'SubEntityCollection',
 )
 
 
@@ -476,3 +477,101 @@ class SiteLinkCollection(MutableMapping):
             for dbname in to_nuke:
                 del data[dbname]
         return data
+
+
+class SubEntityCollection(MutableSequence):
+
+    """Ordered collection of sub-entities indexed by their ids."""
+
+    def __init__(self, repo, data=None):
+        """
+        Initializer.
+
+        :param repo: Wikibase site
+        :type repo: pywikibot.site.DataSite
+        :param data: iterable of LexemeSubEntity
+        :type data: iterable
+        """
+        super().__init__()
+        self.repo = repo
+        self._data = []
+        self._by_key = {}
+        if data:
+            self.extend(data)
+
+    def _validate_isinstance(self, obj):
+        if not isinstance(obj, self.type_class):
+            raise TypeError(
+                '{} should only hold instances of {}, '
+                'instance of {} was provided'
+                .format(self.__class__.__name__,
+                        self.type_class.__name__,
+                        obj.__class__.__name__))
+
+    def __getitem__(self, index):
+        if isinstance(index, str):
+            try:
+                index = self._by_key[index]
+            except KeyError as e:
+                raise ValueError('No entity with id {} was found'
+                                 .format(index)) from e
+        return self._data[index]
+
+    def __setitem__(self, index, value):
+        raise NotImplementedError
+
+    def __delitem__(self, index):
+        if isinstance(index, str):
+            try:
+                index = self._by_key[index]
+            except KeyError as e:
+                raise ValueError('No entity with id {} was found'
+                                 .format(index)) from e
+        obj = self._data[index]
+        del self._data[index]
+        del self._by_key[obj.id]
+
+    def __len__(self):
+        return len(self._data)
+
+    def insert(self, index, obj):
+        """Insert a sub-entity to the collection."""
+        self._validate_isinstance(obj)
+        self._data.insert(index, obj)
+        self._by_key[obj.id] = index
+
+    @classmethod
+    def new_empty(cls, repo):
+        """Construct a new empty SubEntityCollection."""
+        return cls(repo)
+
+    @classmethod
+    def fromJSON(cls, data, repo):
+        """Construct a new SubEntityCollection from JSON."""
+        this = cls(repo)
+        for entity in data:
+            this.append(cls.type_class.fromJSON(repo, entity))
+        return this
+
+    @classmethod
+    def normalizeData(cls, data: list) -> dict:
+        """
+        Helper function to expand data into the Wikibase API structure.
+
+        :param data: Data to normalize
+        :type data: list
+
+        :return: the altered dict from parameter data.
+        """
+        raise NotImplementedError  # todo
+
+    def toJSON(self, diffto: Optional[dict] = None) -> dict:
+        """
+        Create JSON suitable for Wikibase API.
+
+        When diffto is provided, JSON representing differences
+        to the provided data is created.
+
+        :param diffto: JSON containing entity data
+        """
+        raise NotImplementedError  # todo

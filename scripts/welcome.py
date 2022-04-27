@@ -176,7 +176,6 @@ from pywikibot import config, i18n
 from pywikibot.backports import Dict, Generator, List  # skipcq: PY-W2000
 from pywikibot.bot import SingleSiteBot
 from pywikibot.exceptions import EditConflictError, Error, HiddenKeyError
-from pywikibot.tools.formatter import color_format
 
 
 locale.setlocale(locale.LC_ALL, '')
@@ -877,9 +876,8 @@ class WelcomeBot(SingleSiteBot):
     def show_status(message=Msg.DEFAULT) -> None:
         """Output colorized status."""
         msg, color = message.value
-        pywikibot.output(color_format('{color}[{msg:5}]{default} ',
-                                      msg=msg, color=color),
-                         newline=False)
+        pywikibot.output('<<{color}>>[{msg:5}]<<default>> '
+                         .format(msg=msg, color=color), newline=False)
 
     def teardown(self) -> None:
         """Some cleanups after run operation."""

@@ -2,8 +2,6 @@ version = 1
 
 test_patterns = ["tests/**"]
 
-exclude_patterns = ["scripts/archive/**"]
-
 [[analyzers]]
 name = "python"
 enabled = true

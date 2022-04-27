@@ -14,6 +14,8 @@ Furthermore, the following command line parameters are supported:
 
 -notalkpage       Do not move this page's talk page (if it exists)
 
+-nosubpages       Do not move subpages
+
 -prefix           Move pages by adding a namespace prefix to the names of the
                   pages. (Will remove the old namespace prefix if any)
                   Argument can also be given as "-prefix:namespace:".
@@ -50,12 +52,17 @@ docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 class MovePagesBot(CurrentPageBot):
 
-    """Page move bot."""
+    """Page move bot.
+
+    .. versionchanged:: 7.2
+       `movesubpages` option was added
+    """
 
     update_options = {
         'prefix': '',
         'noredirect': False,
         'movetalkpage': True,
+        'movesubpages': True,
         'skipredirects': False,
         'summary': '',
     }
@@ -69,18 +76,18 @@ class MovePagesBot(CurrentPageBot):
 
     def move_one(self, page, new_page_tite) -> None:
         """Move one page to new_page_tite."""
+        msg = self.opt.summary
+        if not msg:
+            msg = i18n.twtranslate(page.site, 'movepages-moving')
+        pywikibot.output('Moving page {} to [[{}]]'
+                         .format(page, new_page_tite))
         try:
-            msg = self.opt.summary
-            if not msg:
-                msg = i18n.twtranslate(page.site, 'movepages-moving')
-            pywikibot.output('Moving page {} to [[{}]]'
-                             .format(page, new_page_tite))
-            page.move(
-                new_page_tite, reason=msg,
-                movetalk=self.opt.movetalkpage,
-                noredirect=self.opt.noredirect)
-        except PageRelatedError as error:
-            pywikibot.output(error)
+            page.move(new_page_tite, reason=msg,
+                      movetalk=self.opt.movetalkpage,
+                      movesubpages=self.opt.movesubpages,
+                      noredirect=self.opt.noredirect)
+        except PageRelatedError:
+            pywikibot.exception()
 
     def skip_page(self, page):
         """Treat only non-redirect pages if 'skipredirects' is set."""
@@ -178,7 +185,6 @@ def main(*args: str) -> None:
     If args is an empty list, sys.argv is used.
 
     :param args: command line arguments
-    :type args: str
     """
     old_name = None
     options = {}
@@ -190,12 +196,13 @@ def main(*args: str) -> None:
     local_args = gen_factory.handle_args(local_args)
 
     for arg in local_args:
-        if arg.startswith('-pairsfile'):
-            if len(arg) == len('-pairsfile'):
-                filename = pywikibot.input(
-                    'Enter the name of the file containing pairs:')
-            else:
-                filename = arg[len('-pairsfile:'):]
+        opt, _, value = arg.partition(':')
+        if opt.startswith('-'):
+            continue
+        opt = opt[1:]
+        if opt == 'pairsfile':
+            filename = value or pywikibot.input(
+                'Enter the name of the file containing pairs:')
             old_name1 = None
             for page in pagegenerators.TextIOPageGenerator(filename):
                 if old_name1:
@@ -206,34 +213,24 @@ def main(*args: str) -> None:
             if old_name1:
                 pywikibot.warning(
                     'file {} contains odd number of links'.format(filename))
-        elif arg == '-noredirect':
-            options['noredirect'] = True
-        elif arg == '-notalkpage':
-            options['movetalkpage'] = False
-        elif arg == '-always':
-            options['always'] = True
-        elif arg == '-skipredirects':
-            options['skipredirects'] = True
-        elif arg.startswith('-from:'):
+        elif opt in ('always', 'noredirect', 'skipredirects'):
+            options[opt] = True
+        elif opt in ('notalkpage', 'nosubpages'):
+            options[opt.replace('no', 'move', 1)] = False
+        elif opt == 'from':
             if old_name:
                 pywikibot.warning('-from:{} without -to:'.format(old_name))
-            old_name = arg[len('-from:'):]
-        elif arg.startswith('-to:'):
+            old_name = value
+        elif opt == 'to:':
             if old_name:
-                from_to_pairs.append([old_name, arg[len('-to:'):]])
+                from_to_pairs.append([old_name, value])
                 old_name = None
             else:
                 pywikibot.warning('{} without -from'.format(arg))
-        elif arg.startswith('-prefix'):
-            if len(arg) == len('-prefix'):
-                options['prefix'] = pywikibot.input('Enter the prefix:')
-            else:
-                options['prefix'] = arg[8:]
-        elif arg.startswith('-summary'):
-            if len(arg) == len('-summary'):
-                options['summary'] = pywikibot.input('Enter the summary:')
-            else:
-                options['summary'] = arg[9:]
+        elif opt == 'prefix':
+            options[opt] = value or pywikibot.input('Enter the prefix:')
+        elif opt == 'summary':
+            options[opt] = value or pywikibot.input('Enter the summary:')
 
     if old_name:
         pywikibot.warning('-from:{} without -to:'.format(old_name))

@@ -38,9 +38,6 @@ if parse_version(requests_version) < parse_version('2.20.1'):
         "install it with 'pip install \"requests>=2.20.1\"'\n")
 
 
-_logger = 'pywikibot.eventstreams'
-
-
 class EventStreams:
 
     """Basic EventStreams iterator class for Server-Sent Events (SSE) protocol.
@@ -171,7 +168,7 @@ class EventStreams:
         if value is not None:
             self._total = int(value)
             debug('{}: Set limit (maximum_items) to {}.'
-                  .format(self.__class__.__name__, self._total), _logger)
+                  .format(self.__class__.__name__, self._total))
 
     def register_filter(self, *args, **kwargs):
         """Register a filter.
@@ -322,7 +319,7 @@ class EventStreams:
                 warning('Unknown event {} occurred.'.format(event.event))
 
         debug('{}: Stopped iterating due to exceeding item limit.'
-              .format(self.__class__.__name__), _logger)
+              .format(self.__class__.__name__))
         del self.source
 
 

@@ -46,7 +46,7 @@ import re
 import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import SingleSiteBot
-from pywikibot.textlib import case_escape
+from pywikibot.textlib import case_escape, ignore_case
 from scripts.replace import ReplaceRobot as ReplaceBot
 
 
@@ -91,8 +91,9 @@ class ImageRobot(ReplaceBot):
         escaped = re.sub('\\\\[_ ]', '[_ ]', escaped)
         if not self.opt.loose or not self.new_image:
             image_regex = re.compile(
-                r'\[\[ *(?:{})\s*:\s*{} *(?P<parameters>\|[^\n]+|) *\]\]'
-                .format('|'.join(namespace), escaped))
+                r'\[\[ *(?:{})\s*:\s*{} *(?P<parameters>\|'
+                r'(?:[^\[\]]|\[\[[^\]]+\]\]|\[[^\]]+\])*|) *\]\]'
+                .format('|'.join(ignore_case(s) for s in namespace), escaped))
         else:
             image_regex = re.compile(r'' + escaped)
 

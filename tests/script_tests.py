@@ -9,6 +9,7 @@ import os
 import sys
 import unittest
 from contextlib import suppress
+from importlib import import_module
 
 from pywikibot.tools import has_module
 from tests import join_root_path, unittest_print
@@ -16,6 +17,7 @@ from tests.aspects import DefaultSiteTestCase, MetaTestCaseClass, PwbTestCase
 from tests.utils import execute_pwb
 
 
+ci_test_run = os.environ.get('PYWIKIBOT_TESTS_RUNNING', '0') == '1'
 scripts_path = join_root_path('scripts')
 framework_scripts = ['shell']
 
@@ -77,13 +79,14 @@ auto_run_script_list = [
     'category_redirect',
     'checkimages',
     'clean_sandbox',
+    'delinker',
     'login',
     'misspelling',
-    'revertbot',
     'noreferences',
     'nowcommons',
     'parser_function_count',
     'patrol',
+    'revertbot',
     'shell',
     'unusedfiles',
     'upload',
@@ -98,6 +101,7 @@ no_args_expected_results = {
     # TODO: until done here, remember to set editor = None in user-config.py
     'change_pagelang': 'No -setlang parameter given',
     'checkimages': 'Execution time: 0 seconds',
+    'dataextend': 'No item page specified',
     'harvest_template': 'ERROR: Please specify',
     # script_input['interwiki'] above lists a title that should not exist
     'interwiki': 'does not exist. Skipping.',
@@ -190,6 +194,17 @@ def load_tests(loader=unittest.loader.defaultTestLoader,
                tests=None, pattern=None):
     """Load the default modules."""
     return collector(loader)
+
+
+def import_script(script_name: str):
+    """Import script for coverage only (T305795)."""
+    if not ci_test_run:
+        return
+    if script_name in framework_scripts:
+        prefix = 'pywikibot.scripts.'
+    else:
+        prefix = 'scripts.'
+    import_module(prefix + script_name)
 
 
 class TestScriptMeta(MetaTestCaseClass):
@@ -306,6 +321,8 @@ class TestScriptMeta(MetaTestCaseClass):
         arguments = dct['_arguments']
 
         for script_name in script_list:
+            import_script(script_name)
+
             # force login to be the first, alphabetically, so the login
             # message does not unexpectedly occur during execution of
             # another script.
@@ -405,6 +422,7 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
         'category',
         'change_pagelang',
         'claimit',
+        'dataextend',
         'data_ingestion',
         'delete',
         'djvutext',
@@ -425,10 +443,21 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
     }
 
     _allowed_failures = [
+        'basic',
+        'commonscat',
+        'commons_information',
         'coordinate_import',
+        'cosmetic_changes',
+        'fixing_redirects',
         'illustrate_wikidata',
+        'image',
+        'imagetransfer',
+        'interwikidata',
         'newitem',
+        'replace',
         'solve_disambiguation',
+        'touch',
+        'weblinkchecker',
     ]
 
     _arguments = '-simulate -page:Foo -always'

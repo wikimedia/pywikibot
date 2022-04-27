@@ -38,7 +38,7 @@ For example to go through all categories:
 # *Found one template. Add this template
 # *Found more templates. Ask the user <- still have to implement this
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -46,7 +46,7 @@ import re
 
 import pywikibot
 from pywikibot import i18n, pagegenerators
-from pywikibot.bot import ConfigParserBot, ExistingPageBot, NoRedirectPageBot
+from pywikibot.bot import ConfigParserBot, ExistingPageBot
 from pywikibot.exceptions import InvalidTitleError
 from pywikibot.textlib import add_text
 
@@ -225,7 +225,7 @@ ignoreTemplates = {
 }
 
 
-class CommonscatBot(ConfigParserBot, ExistingPageBot, NoRedirectPageBot):
+class CommonscatBot(ConfigParserBot, ExistingPageBot):
 
     """Commons categorisation bot.
 
@@ -233,18 +233,15 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot, NoRedirectPageBot):
        CommonscatBot is a ConfigParserBot
     """
 
+    use_disambigs = False
+    use_redirects = False
     update_options = {'summary': ''}
 
     def skip_page(self, page):
-        """Skip category redirects or disambigs."""
+        """Skip category redirects."""
         if page.isCategoryRedirect():
             pywikibot.warning(
                 'Page {page} on {page.site} is a category redirect. '
-                'Skipping.'.format(page=page))
-            return True
-        if page.isDisambig():
-            pywikibot.warning(
-                'Page {page} on {page.site} is a disambiguation. '
                 'Skipping.'.format(page=page))
             return True
         return super().skip_page(page)

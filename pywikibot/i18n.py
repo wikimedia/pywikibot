@@ -15,7 +15,7 @@ __init__.py, and a message bundle called 'pywikibot' containing messages.
 See :py:obj:`twtranslate` for more information on the messages.
 """
 #
-# (C) Pywikibot team, 2004-2021
+# (C) Pywikibot team, 2004-2022
 #
 # Distributed under the terms of the MIT license.
 #

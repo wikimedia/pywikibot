@@ -64,7 +64,7 @@ class TestClearCookies(TestCase):
     code = 'zh'
 
     def test_clear_cookies(self):
-        """Test cookies are cleared (T224712)."""
+        """Test cookies are cleared (:phab:`T224712`)."""
         site = self.get_site()
         site.login()
         site2 = pywikibot.Site('mul', 'wikisource', user=site.username())

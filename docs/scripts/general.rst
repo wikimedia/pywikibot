@@ -1,20 +1,20 @@
 General pages changes scripts
 =============================
 
-archivebot script
------------------
+archivebot script description description
+-----------------------------------------
 
 .. automodule:: scripts.archivebot
    :no-members:
 
-movepages script
-----------------
+movepages script description description
+----------------------------------------
 
 .. automodule:: scripts.movepages
    :no-members:
 
-pagefromfile script
--------------------
+pagefromfile script description description
+-------------------------------------------
 
 .. automodule:: scripts.pagefromfile
    :no-members:

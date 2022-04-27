@@ -153,7 +153,6 @@ from pywikibot.exceptions import (
     PageSaveRelatedError,
 )
 from pywikibot.tools import open_archive
-from pywikibot.tools.formatter import color_format
 
 
 # This is required for the text that is shown when you run this script
@@ -1062,8 +1061,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
                         if cat != original_cat:
                             text += cat.title(as_link=True)
                         else:
-                            text += color_format(
-                                '{lightpurple}{0}{default}',
+                            text += '<<lightpurple>>{}<<default>>'.format(
                                 current_cat.title(as_link=True))
                         text += '\n'
                 return text
@@ -1116,9 +1114,8 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
                     pywikibot.output(line)
 
         # show the title of the page where the link was found.
-        pywikibot.output('')
-        pywikibot.output(color_format(
-            '>>> {lightpurple}{0}{default} <<<', member.title()))
+        pywikibot.output('\n>>> <<lightpurple>>{}<<default>> <<<'
+                         .format(member.title()))
 
         # determine a reasonable amount of context.
         try:
@@ -1153,8 +1150,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
                             key=methodcaller('title'))
 
         # show categories as possible choices with numbers
-        pywikibot.output('')
-
+        pywikibot.output()
         supercat_option = CatIntegerOption(0, len(supercatlist), 'u')
         if not supercatlist:
             pywikibot.output('This category has no supercategories.')
@@ -1173,20 +1169,19 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
             subcat_option.list_categories(cat_list)
 
         # show possible options for the user
-        pywikibot.output('')
+        pywikibot.output()
         options = (supercat_option,
                    subcat_option,
-                   StandardOption(color_format(
-                       'save page to category {lightpurple}{0}{default}',
-                       current_cat.title(with_ns=False)), 'c'),
+                   StandardOption(
+                       'save page to category <<lightpurple>>{}<<default>>'
+                       .format(current_cat.title(with_ns=False)), 'c'),
                    StandardOption('remove the category from page', 'r'),
                    StandardOption('skip page', 's'),
                    context_option,
-                   StandardOption('jump to custom category', 'j'),
-                   )
-        choice = pywikibot.input_choice(color_format(
-            'Choice for page {lightpurple}{0}{default}:', member.title()),
-            options, default='c')
+                   StandardOption('jump to custom category', 'j'))
+        choice = pywikibot.input_choice(
+            'Choice for page <<lightpurple>>{}<<default>>:'
+            .format(member.title()), options, default='c')
 
         if choice == 'c':
             pywikibot.output('Saving page to {}'.format(current_cat.title()))
@@ -1251,7 +1246,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
 
     def treat(self, page) -> None:
         """Process page."""
-        pywikibot.output('')
+        pywikibot.output()
         self.move_to_category(page, self.cat, self.cat)
 
 
@@ -1346,7 +1341,7 @@ class CategoryTreeRobot:
         cat = pywikibot.Category(self.site, self.cat_title)
         pywikibot.output('Generating tree...', newline=False)
         tree = self.treeview(cat)
-        pywikibot.output('')
+        pywikibot.output()
         if self.filename:
             pywikibot.output('Saving results in ' + self.filename)
             with codecs.open(self.filename, 'a', 'utf-8') as f:
@@ -1414,13 +1409,11 @@ class CleanBot(Bot):
                 pywikibot.output('\t{}'.format(grandchild.title()))
 
         for grandchild in overcategorized:
-            msg = color_format(
-                'Remove "{lightpurple}{}{default}" from "{}" '
-                'because it is already under '
-                'subcategory "{green}{}{default}"?',
-                grandchild.title(with_ns=False),
-                self.cat.title(with_ns=False),
-                child.title(with_ns=False))
+            msg = ('Remove "<<lightpurple>>{}<<default>>" from "{}" because '
+                   'it is already under subcategory "<<green>>{}<<default>>"?'
+                   .format(grandchild.title(with_ns=False),
+                           self.cat.title(with_ns=False),
+                           child.title(with_ns=False)))
 
             if not self.user_confirm(msg):
                 continue

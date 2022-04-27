@@ -2309,7 +2309,7 @@ class TestSiteSysopWrite(TestCase):
 
         self.assertIsNotNone(fileid)
 
-        site.undelet(fp, 'pywikibot unit tests', fileids=[fileid])
+        site.undelete(fp, 'pywikibot unit tests', fileids=[fileid])
 
 
 class TestUsernameInUsers(DefaultSiteTestCase):
@@ -3487,11 +3487,12 @@ class TestPropertyNames(DefaultSiteTestCase):
         pnames = mysite.get_property_names()
         self.assertIsInstance(pnames, list)
         for item in ('defaultsort', 'disambiguation', 'displaytitle',
-                     'forcetoc', 'hiddencat', 'index', 'newsectionlink',
-                     'noeditsection', 'noexternallanglinks', 'nogallery',
-                     'noindex', 'nonewsectionlink', 'notoc', 'score',
-                     'templatedata', 'wikibase-badge-Q17437796',
-                     'wikibase-badge-Q17437798', 'wikibase_item'):
+                     'expectunusedcategory', 'forcetoc', 'hiddencat', 'index',
+                     'jsonconfig_getdata', 'newsectionlink', 'noeditsection',
+                     'nogallery', 'noindex', 'nonewsectionlink', 'notoc',
+                     'score', 'templatedata', 'unexpectedUnconnectedPage',
+                     'wikibase-badge-Q17437796', 'wikibase-badge-Q17437798',
+                     'wikibase-badge-Q70894304', 'wikibase_item'):
             with self.subTest(item=item):
                 self.assertIn(item, pnames)
 

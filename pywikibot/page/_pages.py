@@ -1,9 +1,14 @@
-"""
-Objects representing various types of MediaWiki, excluding Wikibase, pages.
+"""Objects representing various types of MediaWiki pages.
 
-This module also includes objects:
+This module includes objects:
 
-* FileInfo: a structure holding imageinfo of latest rev. of FilePage
+- BasePage: Base object for a MediaWiki page
+- Page: A MediaWiki page
+- Category: A page in the Category: namespace
+
+Various Wikibase pages are defined in ``page._wikibase.py``,
+various pages for Proofread Extensions are defines in
+``pywikibot.proofreadpage``.
 
 ..note::
   `Link` objects represent a wiki-page's title, while
@@ -15,24 +20,20 @@ This module also includes objects:
 #
 # Distributed under the terms of the MIT license.
 #
-import os.path
 import re
 from collections import Counter, defaultdict
 from contextlib import suppress
-from http import HTTPStatus
+from itertools import islice
 from textwrap import shorten, wrap
 from typing import Optional, Union
 from urllib.parse import quote_from_bytes
 from warnings import warn
 
 import pywikibot
-from pywikibot import config, date, i18n, textlib
-from pywikibot.backports import Generator, Iterable, List, Tuple
-from pywikibot.comms import http
+from pywikibot import Timestamp, config, date, i18n, textlib
+from pywikibot.backports import Generator, Iterable, List
 from pywikibot.cosmetic_changes import CANCEL, CosmeticChangesToolkit
 from pywikibot.exceptions import (
-    APIError,
-    AutoblockUserError,
     Error,
     InterwikiRedirectPageError,
     InvalidPageError,
@@ -40,24 +41,18 @@ from pywikibot.exceptions import (
     IsRedirectPageError,
     NoMoveTargetError,
     NoPageError,
-    NotEmailableError,
     NoUsernameError,
     OtherPageSaveError,
     PageSaveRelatedError,
     SectionError,
     UnknownExtensionError,
-    UserRightsError,
 )
 from pywikibot.page._decorators import allow_asynchronous
 from pywikibot.page._links import BaseLink, Link
-from pywikibot.page._revision import Revision
 from pywikibot.site import Namespace, NamespaceArgType
 from pywikibot.tools import (
     ComparableMixin,
-    compute_file_hash,
-    deprecated,
     first_upper,
-    is_ip_address,
     issue_deprecation_warning,
     remove_last_args,
 )
@@ -68,10 +63,7 @@ PROTOCOL_REGEX = r'\Ahttps?://'
 __all__ = (
     'BasePage',
     'Category',
-    'FileInfo',
-    'FilePage',
     'Page',
-    'User',
 )
 
 
@@ -178,12 +170,11 @@ class BasePage(ComparableMixin):
         """Return the Site object for the data repository."""
         return self.site.data_repository()
 
-    def namespace(self):
+    def namespace(self) -> Namespace:
         """
         Return the namespace of the page.
 
         :return: namespace of the page
-        :rtype: pywikibot.Namespace
         """
         return self._link.namespace
 
@@ -737,11 +728,8 @@ class BasePage(ComparableMixin):
 
         return self._lastNonBotUser
 
-    def editTime(self):
-        """Return timestamp of last revision to page.
-
-        :rtype: pywikibot.Timestamp
-        """
+    def editTime(self) -> pywikibot.Timestamp:
+        """Return timestamp of last revision to page."""
         return self.latest_revision.timestamp
 
     def exists(self) -> bool:
@@ -820,12 +808,8 @@ class BasePage(ComparableMixin):
 
         return bool(self._catredirect)
 
-    def getCategoryRedirectTarget(self):
-        """
-        If this is a category redirect, return the target category title.
-
-        :rtype: pywikibot.page.Category
-        """
+    def getCategoryRedirectTarget(self) -> 'Category':
+        """If this is a category redirect, return the target category title."""
         if self.isCategoryRedirect():
             return Category(Link(self._catredirect, self.site))
         raise IsNotRedirectPageError(self)
@@ -835,7 +819,7 @@ class BasePage(ComparableMixin):
         ns = self.namespace()
         return ns >= 0 and ns % 2 == 1
 
-    def toggleTalkPage(self):
+    def toggleTalkPage(self) -> Optional['Page']:
         """
         Return other member of the article-talk page pair for this Page.
 
@@ -844,7 +828,6 @@ class BasePage(ComparableMixin):
         not actually exist on the wiki.
 
         :return: Page or None if self is a special page.
-        :rtype: typing.Optional[pywikibot.Page]
         """
         ns = self.namespace()
         if ns < 0:  # Special page
@@ -1434,7 +1417,7 @@ class BasePage(ComparableMixin):
         .. deprecated:: 7.0
            the positional arguments
 
-        .. seealso:: https://www.mediawiki.org/wiki/API:Links
+        .. seealso:: :api:`Links`
 
         :keyword namespaces: Only iterate pages in these namespaces
             (default: all)
@@ -1697,8 +1680,24 @@ class BasePage(ComparableMixin):
         self.site.loadrevisions(self, content=content, rvdir=reverse,
                                 starttime=starttime, endtime=endtime,
                                 total=total)
-        return (self._revisions[rev] for rev in
-                sorted(self._revisions, reverse=not reverse)[:total])
+
+        revs = self._revisions.values()
+
+        if starttime or endtime:
+            t_min, t_max = Timestamp.min, Timestamp.max
+
+            if reverse:
+                t0 = Timestamp.fromISOformat(starttime) if starttime else t_min
+                t1 = Timestamp.fromISOformat(endtime) if endtime else t_max
+            else:
+                t0 = Timestamp.fromISOformat(endtime) if endtime else t_min
+                t1 = Timestamp.fromISOformat(starttime) if starttime else t_max
+
+            revs = [rev for rev in revs if t0 <= rev.timestamp <= t1]
+
+        revs = sorted(revs, reverse=not reverse, key=lambda rev: rev.timestamp)
+
+        return islice(revs, total)
 
     def getVersionHistoryTable(self,
                                reverse: bool = False,
@@ -1743,13 +1742,14 @@ class BasePage(ComparableMixin):
         if not contributors:
             return sum(cnt.values())
 
-        if isinstance(contributors, User):
+        if isinstance(contributors, pywikibot.User):
             contributors = contributors.username
 
         if isinstance(contributors, str):
             return cnt[contributors]
 
-        return sum(cnt[user.username] if isinstance(user, User) else cnt[user]
+        return sum(cnt[user.username]
+                   if isinstance(user, pywikibot.User) else cnt[user]
                    for user in contributors)
 
     def merge_history(self, dest, timestamp=None, reason=None) -> None:
@@ -1773,15 +1773,20 @@ class BasePage(ComparableMixin):
              newtitle: str,
              reason: Optional[str] = None,
              movetalk: bool = True,
-             noredirect: bool = False):
+             noredirect: bool = False,
+             movesubpages: bool = True) -> None:
         """
         Move this page to a new title.
+
+        .. versionchanged:: 7.2
+           The `movesubpages` parameter was added
 
         :param newtitle: The new page title.
         :param reason: The edit summary for the move.
         :param movetalk: If true, move this page's talk page (if it exists)
         :param noredirect: if move succeeds, delete the old page
             (usually requires sysop privileges, depending on wiki settings)
+        :param movesubpages: Rename subpages, if applicable.
         """
         if reason is None:
             pywikibot.output('Moving {} to [[{}]].'
@@ -1789,7 +1794,8 @@ class BasePage(ComparableMixin):
             reason = pywikibot.input('Please enter a reason for the move:')
         return self.site.movepage(self, newtitle, reason,
                                   movetalk=movetalk,
-                                  noredirect=noredirect)
+                                  noredirect=noredirect,
+                                  movesubpages=movesubpages)
 
     def delete(
         self,
@@ -1901,11 +1907,10 @@ class BasePage(ComparableMixin):
             been retrieved earlier). If timestamp is not found, returns
             empty list.
         """
-        if hasattr(self, '_deletedRevs'):
-            if timestamp in self._deletedRevs and (
-                    not content
-                    or 'content' in self._deletedRevs[timestamp]):
-                return self._deletedRevs[timestamp]
+        if hasattr(self, '_deletedRevs') \
+           and timestamp in self._deletedRevs \
+           and (not content or 'content' in self._deletedRevs[timestamp]):
+            return self._deletedRevs[timestamp]
 
         for item in self.site.deletedrevs(self, start=timestamp,
                                           content=content, total=1, **kwargs):
@@ -2327,283 +2332,6 @@ class Page(BasePage):
         return None
 
 
-class FilePage(Page):
-
-    """
-    A subclass of Page representing a file description page.
-
-    Supports the same interface as Page, with some added methods.
-    """
-
-    def __init__(self, source, title: str = '') -> None:
-        """Initializer."""
-        self._file_revisions = {}  # dictionary to cache File history.
-        super().__init__(source, title, 6)
-        if self.namespace() != 6:
-            raise ValueError("'{}' is not in the file namespace!"
-                             .format(self.title()))
-
-    def _load_file_revisions(self, imageinfo) -> None:
-        for file_rev in imageinfo:
-            # filemissing in API response indicates most fields are missing
-            # see https://gerrit.wikimedia.org/r/c/mediawiki/core/+/533482/
-            if 'filemissing' in file_rev:
-                pywikibot.warning("File '{}' contains missing revisions"
-                                  .format(self.title()))
-                continue
-            file_revision = FileInfo(file_rev)
-            self._file_revisions[file_revision.timestamp] = file_revision
-
-    @property
-    def latest_file_info(self):
-        """
-        Retrieve and store information of latest Image rev. of FilePage.
-
-        At the same time, the whole history of Image is fetched and cached in
-        self._file_revisions
-
-        :return: instance of FileInfo()
-        """
-        if not self._file_revisions:
-            self.site.loadimageinfo(self, history=True)
-        latest_ts = max(self._file_revisions)
-        return self._file_revisions[latest_ts]
-
-    @property
-    def oldest_file_info(self):
-        """
-        Retrieve and store information of oldest Image rev. of FilePage.
-
-        At the same time, the whole history of Image is fetched and cached in
-        self._file_revisions
-
-        :return: instance of FileInfo()
-        """
-        if not self._file_revisions:
-            self.site.loadimageinfo(self, history=True)
-        oldest_ts = min(self._file_revisions)
-        return self._file_revisions[oldest_ts]
-
-    def get_file_history(self) -> dict:
-        """
-        Return the file's version history.
-
-        :return: dictionary with:
-            key: timestamp of the entry
-            value: instance of FileInfo()
-        """
-        if not self._file_revisions:
-            self.site.loadimageinfo(self, history=True)
-        return self._file_revisions
-
-    def getImagePageHtml(self) -> str:
-        """Download the file page, and return the HTML, as a string.
-
-        Caches the HTML code, so that if you run this method twice on the
-        same FilePage object, the page will only be downloaded once.
-        """
-        if not hasattr(self, '_imagePageHtml'):
-            path = '{}/index.php?title={}'.format(self.site.scriptpath(),
-                                                  self.title(as_url=True))
-            self._imagePageHtml = http.request(self.site, path).text
-        return self._imagePageHtml
-
-    def get_file_url(self, url_width=None, url_height=None,
-                     url_param=None) -> str:
-        """
-        Return the url or the thumburl of the file described on this page.
-
-        Fetch the information if not available.
-
-        Once retrieved, thumburl information will also be accessible as
-        latest_file_info attributes, named as in [1]:
-        - url, thumburl, thumbwidth and thumbheight
-
-        Parameters correspond to iiprops in:
-        [1] https://www.mediawiki.org/wiki/API:Imageinfo
-
-        Parameters validation and error handling left to the API call.
-
-        :param url_width: see iiurlwidth in [1]
-        :param url_height: see iiurlheigth in [1]
-        :param url_param: see iiurlparam in [1]
-        :return: latest file url or thumburl
-        """
-        # Plain url is requested.
-        if url_width is None and url_height is None and url_param is None:
-            return self.latest_file_info.url
-
-        # Thumburl is requested.
-        self.site.loadimageinfo(self, history=not self._file_revisions,
-                                url_width=url_width, url_height=url_height,
-                                url_param=url_param)
-        return self.latest_file_info.thumburl
-
-    def file_is_shared(self) -> bool:
-        """Check if the file is stored on any known shared repository."""
-        # as of now, the only known repositories are commons and wikitravel
-        # TODO: put the URLs to family file
-        if not self.site.has_image_repository:
-            return False
-
-        if 'wikitravel_shared' in self.site.shared_image_repository():
-            return self.latest_file_info.url.startswith(
-                'https://wikitravel.org/upload/shared/')
-        # default to commons
-        return self.latest_file_info.url.startswith(
-            'https://upload.wikimedia.org/wikipedia/commons/')
-
-    def getFileVersionHistoryTable(self):
-        """Return the version history in the form of a wiki table."""
-        lines = []
-        for info in self.get_file_history().values():
-            dimension = '{width}×{height} px ({size} bytes)'.format(
-                **info.__dict__)
-            lines.append('| {timestamp} || {user} || {dimension} |'
-                         '| <nowiki>{comment}</nowiki>'
-                         .format(dimension=dimension, **info.__dict__))
-        return ('{| class="wikitable"\n'
-                '! {{int:filehist-datetime}} || {{int:filehist-user}} |'
-                '| {{int:filehist-dimensions}} || {{int:filehist-comment}}\n'
-                '|-\n%s\n|}\n' % '\n|-\n'.join(lines))
-
-    def usingPages(self, total: Optional[int] = None, content: bool = False):
-        """Yield Pages on which the file is displayed.
-
-        :param total: iterate no more than this number of pages in total
-        :param content: if True, load the current content of each iterated page
-            (default False)
-        """
-        return self.site.imageusage(self, total=total, content=content)
-
-    @property
-    def file_is_used(self) -> bool:
-        """Check whether the file is used at this site.
-
-        .. versionadded:: 7.1
-        """
-        return bool(list(self.usingPages(total=1)))
-
-    def upload(self, source: str, **kwargs) -> bool:
-        """
-        Upload this file to the wiki.
-
-        keyword arguments are from site.upload() method.
-
-        :param source: Path or URL to the file to be uploaded.
-
-        :keyword comment: Edit summary; if this is not provided, then
-            filepage.text will be used. An empty summary is not permitted.
-            This may also serve as the initial page text (see below).
-        :keyword text: Initial page text; if this is not set, then
-            filepage.text will be used, or comment.
-        :keyword watch: If true, add filepage to the bot user's watchlist
-        :keyword ignore_warnings: It may be a static boolean, a callable
-            returning a boolean or an iterable. The callable gets a list of
-            UploadError instances and the iterable should contain the warning
-            codes for which an equivalent callable would return True if all
-            UploadError codes are in thet list. If the result is False it'll
-            not continue uploading the file and otherwise disable any warning
-            and reattempt to upload the file. NOTE: If report_success is True
-            or None it'll raise an UploadError exception if the static
-            boolean is False.
-        :type ignore_warnings: bool or callable or iterable of str
-        :keyword chunk_size: The chunk size in bytesfor chunked uploading (see
-            https://www.mediawiki.org/wiki/API:Upload#Chunked_uploading). It
-            will only upload in chunks, if the chunk size is positive but lower
-            than the file size.
-        :type chunk_size: int
-        :keyword report_success: If the upload was successful it'll print a
-            success message and if ignore_warnings is set to False it'll
-            raise an UploadError if a warning occurred. If it's
-            None (default) it'll be True if ignore_warnings is a bool and False
-            otherwise. If it's True or None ignore_warnings must be a bool.
-        :return: It returns True if the upload was successful and False
-            otherwise.
-        """
-        filename = url = None
-        if '://' in source:
-            url = source
-        else:
-            filename = source
-        return self.site.upload(self, source_filename=filename, source_url=url,
-                                **kwargs)
-
-    def download(self, filename=None, chunk_size=100 * 1024, revision=None):
-        """
-        Download to filename file of FilePage.
-
-        :param filename: filename where to save file:
-            None: self.title(as_filename=True, with_ns=False)
-            will be used
-            str: provided filename will be used.
-        :type filename: None or str
-        :param chunk_size: the size of each chunk to be received and
-            written to file.
-        :type chunk_size: int
-        :param revision: file revision to download:
-            None: self.latest_file_info will be used
-            FileInfo: provided revision will be used.
-        :type revision: None or FileInfo
-        :return: True if download is successful, False otherwise.
-        :raise IOError: if filename cannot be written for any reason.
-        """
-        if filename is None:
-            filename = self.title(as_filename=True, with_ns=False)
-
-        filename = os.path.expanduser(filename)
-
-        if revision is None:
-            revision = self.latest_file_info
-
-        req = http.fetch(revision.url, stream=True)
-        if req.status_code == HTTPStatus.OK:
-            try:
-                with open(filename, 'wb') as f:
-                    for chunk in req.iter_content(chunk_size):
-                        f.write(chunk)
-            except OSError as e:
-                raise e
-
-            sha1 = compute_file_hash(filename)
-            return sha1 == revision.sha1
-        pywikibot.warning(
-            'Unsuccessfull request ({}): {}'
-            .format(req.status_code, req.url))
-        return False
-
-    def globalusage(self, total=None):
-        """
-        Iterate all global usage for this page.
-
-        :param total: iterate no more than this number of pages in total
-        :return: a generator that yields Pages also on sites different from
-            self.site.
-        :rtype: generator
-        """
-        return self.site.globalusage(self, total=total)
-
-    def data_item(self):
-        """
-        Convenience function to get the associated Wikibase item of the file.
-
-        If WikibaseMediaInfo extension is available (e.g. on Commons),
-        the method returns the associated mediainfo entity. Otherwise,
-        it falls back to behavior of BasePage.data_item.
-
-        .. versionadded:: 6.5
-
-        :rtype: pywikibot.page.WikibaseEntity
-        """
-        if self.site.has_extension('WikibaseMediaInfo'):
-            if not hasattr(self, '_item'):
-                self._item = pywikibot.MediaInfo(self.site)
-                self._item._file = self
-            return self._item
-
-        return super().data_item()
-
-
 class Category(Page):
 
     """A page in the Category: namespace."""
@@ -2894,443 +2622,3 @@ class Category(Page):
             assert total is None or total > 0, \
                 'As many items as given in total already returned'
             yield from check_cache(pywikibot.Timestamp.min)
-
-
-class User(Page):
-
-    """
-    A class that represents a Wiki user.
-
-    This class also represents the Wiki page User:<username>
-    """
-
-    def __init__(self, source, title: str = '') -> None:
-        """
-        Initializer for a User object.
-
-        All parameters are the same as for Page() Initializer.
-        """
-        self._isAutoblock = True
-        if title.startswith('#'):
-            title = title[1:]
-        elif ':#' in title:
-            title = title.replace(':#', ':')
-        else:
-            self._isAutoblock = False
-        super().__init__(source, title, ns=2)
-        if self.namespace() != 2:
-            raise ValueError("'{}' is not in the user namespace!"
-                             .format(self.title()))
-        if self._isAutoblock:
-            # This user is probably being queried for purpose of lifting
-            # an autoblock.
-            pywikibot.output(
-                'This is an autoblock ID, you can only use to unblock it.')
-
-    @property
-    def username(self) -> str:
-        """
-        The username.
-
-        Convenience method that returns the title of the page with
-        namespace prefix omitted, which is the username.
-        """
-        if self._isAutoblock:
-            return '#' + self.title(with_ns=False)
-        return self.title(with_ns=False)
-
-    def isRegistered(self, force: bool = False) -> bool:
-        """
-        Determine if the user is registered on the site.
-
-        It is possible to have a page named User:xyz and not have
-        a corresponding user with username xyz.
-
-        The page does not need to exist for this method to return
-        True.
-
-        :param force: if True, forces reloading the data from API
-        """
-        # T135828: the registration timestamp may be None but the key exists
-        return (not self.isAnonymous()
-                and 'registration' in self.getprops(force))
-
-    def isAnonymous(self) -> bool:
-        """Determine if the user is editing as an IP address."""
-        return is_ip_address(self.username)
-
-    def getprops(self, force: bool = False) -> dict:
-        """
-        Return a properties about the user.
-
-        :param force: if True, forces reloading the data from API
-        """
-        if force and hasattr(self, '_userprops'):
-            del self._userprops
-        if not hasattr(self, '_userprops'):
-            self._userprops = list(self.site.users([self.username, ]))[0]
-            if self.isAnonymous():
-                r = list(self.site.blocks(iprange=self.username, total=1))
-                if r:
-                    self._userprops['blockedby'] = r[0]['by']
-                    self._userprops['blockreason'] = r[0]['reason']
-        return self._userprops
-
-    def registration(self, force: bool = False):
-        """
-        Fetch registration date for this user.
-
-        :param force: if True, forces reloading the data from API
-        :rtype: pywikibot.Timestamp or None
-        """
-        if not self.isAnonymous():
-            reg = self.getprops(force).get('registration')
-            if reg:
-                return pywikibot.Timestamp.fromISOformat(reg)
-        return None
-
-    def editCount(self, force: bool = False) -> int:
-        """
-        Return edit count for a registered user.
-
-        Always returns 0 for 'anonymous' users.
-
-        :param force: if True, forces reloading the data from API
-        """
-        return self.getprops(force).get('editcount', 0)
-
-    def is_blocked(self, force: bool = False) -> bool:
-        """Determine whether the user is currently blocked.
-
-        .. versionchanged:: 7.0
-           renamed from :meth:`isBlocked` method,
-           can also detect range blocks.
-
-        :param force: if True, forces reloading the data from API
-        """
-        return 'blockedby' in self.getprops(force)
-
-    @deprecated('is_blocked', since='7.0.0')
-    def isBlocked(self, force: bool = False) -> bool:
-        """Determine whether the user is currently blocked.
-
-        .. deprecated:: 7.0
-           use :meth:`is_blocked` instead
-
-        :param force: if True, forces reloading the data from API
-        """
-        return self.is_blocked(force)
-
-    def is_locked(self, force: bool = False) -> bool:
-        """Determine whether the user is currently locked globally.
-
-        .. versionadded:: 7.0
-
-        :param force: if True, forces reloading the data from API
-        """
-        return self.site.is_locked(self.username, force)
-
-    def isEmailable(self, force: bool = False) -> bool:
-        """
-        Determine whether emails may be send to this user through MediaWiki.
-
-        :param force: if True, forces reloading the data from API
-        """
-        return not self.isAnonymous() and 'emailable' in self.getprops(force)
-
-    def groups(self, force: bool = False) -> list:
-        """
-        Return a list of groups to which this user belongs.
-
-        The list of groups may be empty.
-
-        :param force: if True, forces reloading the data from API
-        :return: groups property
-        """
-        return self.getprops(force).get('groups', [])
-
-    def gender(self, force: bool = False) -> str:
-        """Return the gender of the user.
-
-        :param force: if True, forces reloading the data from API
-        :return: return 'male', 'female', or 'unknown'
-        """
-        if self.isAnonymous():
-            return 'unknown'
-        return self.getprops(force).get('gender', 'unknown')
-
-    def rights(self, force: bool = False) -> list:
-        """Return user rights.
-
-        :param force: if True, forces reloading the data from API
-        :return: return user rights
-        """
-        return self.getprops(force).get('rights', [])
-
-    def getUserPage(self, subpage: str = ''):
-        """
-        Return a Page object relative to this user's main page.
-
-        :param subpage: subpage part to be appended to the main
-                            page title (optional)
-        :type subpage: str
-        :return: Page object of user page or user subpage
-        :rtype: pywikibot.Page
-        """
-        if self._isAutoblock:
-            # This user is probably being queried for purpose of lifting
-            # an autoblock, so has no user pages per se.
-            raise AutoblockUserError(
-                'This is an autoblock ID, you can only use to unblock it.')
-        if subpage:
-            subpage = '/' + subpage
-        return Page(Link(self.title() + subpage, self.site))
-
-    def getUserTalkPage(self, subpage: str = ''):
-        """
-        Return a Page object relative to this user's main talk page.
-
-        :param subpage: subpage part to be appended to the main
-                            talk page title (optional)
-        :type subpage: str
-        :return: Page object of user talk page or user talk subpage
-        :rtype: pywikibot.Page
-        """
-        if self._isAutoblock:
-            # This user is probably being queried for purpose of lifting
-            # an autoblock, so has no user talk pages per se.
-            raise AutoblockUserError(
-                'This is an autoblock ID, you can only use to unblock it.')
-        if subpage:
-            subpage = '/' + subpage
-        return Page(Link(self.username + subpage,
-                         self.site, default_namespace=3))
-
-    def send_email(self, subject: str, text: str, ccme: bool = False) -> bool:
-        """
-        Send an email to this user via MediaWiki's email interface.
-
-        :param subject: the subject header of the mail
-        :param text: mail body
-        :param ccme: if True, sends a copy of this email to the bot
-        :raises NotEmailableError: the user of this User is not emailable
-        :raises UserRightsError: logged in user does not have 'sendemail' right
-        :return: operation successful indicator
-        """
-        if not self.isEmailable():
-            raise NotEmailableError(self)
-
-        if not self.site.has_right('sendemail'):
-            raise UserRightsError("You don't have permission to send mail")
-
-        params = {
-            'action': 'emailuser',
-            'target': self.username,
-            'token': self.site.tokens['email'],
-            'subject': subject,
-            'text': text,
-        }
-        if ccme:
-            params['ccme'] = 1
-        mailrequest = self.site.simple_request(**params)
-        maildata = mailrequest.submit()
-
-        if 'emailuser' in maildata \
-           and maildata['emailuser']['result'] == 'Success':
-            return True
-        return False
-
-    def block(self, *args, **kwargs):
-        """
-        Block user.
-
-        Refer :py:obj:`APISite.blockuser` method for parameters.
-
-        :return: None
-        """
-        try:
-            self.site.blockuser(self, *args, **kwargs)
-        except APIError as err:
-            if err.code == 'invalidrange':
-                raise ValueError('{} is not a valid IP range.'
-                                 .format(self.username))
-
-            raise err
-
-    def unblock(self, reason: Optional[str] = None) -> None:
-        """
-        Remove the block for the user.
-
-        :param reason: Reason for the unblock.
-        """
-        self.site.unblockuser(self, reason)
-
-    def logevents(self, **kwargs):
-        """Yield user activities.
-
-        :keyword logtype: only iterate entries of this type
-            (see mediawiki api documentation for available types)
-        :type logtype: str
-        :keyword page: only iterate entries affecting this page
-        :type page: Page or str
-        :keyword namespace: namespace to retrieve logevents from
-        :type namespace: int or Namespace
-        :keyword start: only iterate entries from and after this Timestamp
-        :type start: Timestamp or ISO date string
-        :keyword end: only iterate entries up to and through this Timestamp
-        :type end: Timestamp or ISO date string
-        :keyword reverse: if True, iterate oldest entries first
-            (default: newest)
-        :type reverse: bool
-        :keyword tag: only iterate entries tagged with this tag
-        :type tag: str
-        :keyword total: maximum number of events to iterate
-        :type total: int
-        :rtype: iterable
-        """
-        return self.site.logevents(user=self.username, **kwargs)
-
-    @property
-    def last_event(self):
-        """Return last user activity.
-
-        :return: last user log entry
-        :rtype: LogEntry or None
-        """
-        return next(iter(self.logevents(total=1)), None)
-
-    def contributions(self, total: int = 500, **kwargs) -> tuple:
-        """
-        Yield tuples describing this user edits.
-
-        Each tuple is composed of a pywikibot.Page object,
-        the revision id (int), the edit timestamp (as a pywikibot.Timestamp
-        object), and the comment (str).
-        Pages returned are not guaranteed to be unique.
-
-        :param total: limit result to this number of pages
-        :keyword start: Iterate contributions starting at this Timestamp
-        :keyword end: Iterate contributions ending at this Timestamp
-        :keyword reverse: Iterate oldest contributions first (default: newest)
-        :keyword namespaces: only iterate pages in these namespaces
-        :type namespaces: iterable of str or Namespace key,
-            or a single instance of those types. May be a '|' separated
-            list of namespace identifiers.
-        :keyword showMinor: if True, iterate only minor edits; if False and
-            not None, iterate only non-minor edits (default: iterate both)
-        :keyword top_only: if True, iterate only edits which are the latest
-            revision (default: False)
-        :return: tuple of pywikibot.Page, revid, pywikibot.Timestamp, comment
-        """
-        for contrib in self.site.usercontribs(
-                user=self.username, total=total, **kwargs):
-            ts = pywikibot.Timestamp.fromISOformat(contrib['timestamp'])
-            yield (Page(self.site, contrib['title'], contrib['ns']),
-                   contrib['revid'],
-                   ts,
-                   contrib.get('comment'))
-
-    @property
-    def first_edit(self):
-        """Return first user contribution.
-
-        :return: first user contribution entry
-        :return: tuple of pywikibot.Page, revid, pywikibot.Timestamp, comment
-        :rtype: tuple or None
-        """
-        return next(self.contributions(reverse=True, total=1), None)
-
-    @property
-    def last_edit(self):
-        """Return last user contribution.
-
-        :return: last user contribution entry
-        :return: tuple of pywikibot.Page, revid, pywikibot.Timestamp, comment
-        :rtype: tuple or None
-        """
-        return next(self.contributions(total=1), None)
-
-    def deleted_contributions(
-        self, *, total: int = 500, **kwargs
-    ) -> Iterable[Tuple[Page, Revision]]:
-        """Yield tuples describing this user's deleted edits.
-
-        .. versionadded:: 5.5
-
-        :param total: Limit results to this number of pages
-        :keyword start: Iterate contributions starting at this Timestamp
-        :keyword end: Iterate contributions ending at this Timestamp
-        :keyword reverse: Iterate oldest contributions first (default: newest)
-        :keyword namespaces: Only iterate pages in these namespaces
-        """
-        for data in self.site.alldeletedrevisions(user=self.username,
-                                                  total=total, **kwargs):
-            page = Page(self.site, data['title'], data['ns'])
-            for contrib in data['revisions']:
-                yield page, Revision(**contrib)
-
-    def uploadedImages(self, total=10):
-        """
-        Yield tuples describing files uploaded by this user.
-
-        Each tuple is composed of a pywikibot.Page, the timestamp (str in
-        ISO8601 format), comment (str) and a bool for pageid > 0.
-        Pages returned are not guaranteed to be unique.
-
-        :param total: limit result to this number of pages
-        :type total: int
-        """
-        if not self.isRegistered():
-            return
-        for item in self.logevents(logtype='upload', total=total):
-            yield (item.page(),
-                   str(item.timestamp()),
-                   item.comment(),
-                   item.pageid() > 0)
-
-    @property
-    def is_thankable(self) -> bool:
-        """
-        Determine if the user has thanks notifications enabled.
-
-        NOTE: This doesn't accurately determine if thanks is enabled for user.
-              Privacy of thanks preferences is under discussion, please see
-              https://phabricator.wikimedia.org/T57401#2216861, and
-              https://phabricator.wikimedia.org/T120753#1863894
-        """
-        return self.isRegistered() and 'bot' not in self.groups()
-
-
-class FileInfo:
-
-    """
-    A structure holding imageinfo of latest rev. of FilePage.
-
-    All keys of API imageinfo dictionary are mapped to FileInfo attributes.
-    Attributes can be retrieved both as self['key'] or self.key.
-
-    Following attributes will be returned:
-        - timestamp, user, comment, url, size, sha1, mime, metadata
-        - archivename (not for latest revision)
-
-    See Site.loadimageinfo() for details.
-
-    Note: timestamp will be casted to pywikibot.Timestamp.
-    """
-
-    def __init__(self, file_revision) -> None:
-        """Initiate the class using the dict from L{APISite.loadimageinfo}."""
-        self.__dict__.update(file_revision)
-        self.timestamp = pywikibot.Timestamp.fromISOformat(self.timestamp)
-
-    def __getitem__(self, key):
-        """Give access to class values by key."""
-        return getattr(self, key)
-
-    def __repr__(self) -> str:
-        """Return a more complete string representation."""
-        return repr(self.__dict__)
-
-    def __eq__(self, other):
-        """Test if two File_info objects are equal."""
-        return self.__dict__ == other.__dict__

@@ -60,6 +60,7 @@ from pywikibot.logging import (
     debug,
     error,
     exception,
+    info,
     log,
     output,
     stdout,
@@ -67,7 +68,6 @@ from pywikibot.logging import (
 )
 from pywikibot.site import APISite, BaseSite, DataSite
 from pywikibot.tools import classproperty, normalize_username
-from pywikibot.tools.formatter import color_format
 
 
 ItemPageStrNoneType = Union[str, 'ItemPage', None]
@@ -79,11 +79,12 @@ __all__ = (
     '__version__',
     'Bot', 'calledModuleName', 'Category', 'Claim', 'Coordinate', 'critical',
     'CurrentPageBot', 'debug', 'error', 'exception', 'FilePage', 'handle_args',
-    'html2unicode', 'input', 'input_choice', 'input_yn', 'ItemPage', 'Link',
-    'log', 'MediaInfo', 'output', 'Page', 'PropertyPage', 'showDiff',
-    'show_help', 'Site', 'SiteLink', 'stdout', 'Timestamp', 'translate', 'ui',
-    'url2unicode', 'User', 'warning', 'WbGeoShape', 'WbMonolingualText',
-    'WbQuantity', 'WbTabularData', 'WbTime', 'WbUnknown', 'WikidataBot',
+    'html2unicode', 'info', 'input', 'input_choice', 'input_yn', 'ItemPage',
+    'LexemeForm', 'LexemePage', 'LexemeSense', 'Link', 'log', 'MediaInfo',
+    'output', 'Page', 'PropertyPage', 'showDiff', 'show_help', 'Site',
+    'SiteLink', 'stdout', 'Timestamp', 'translate', 'ui', 'url2unicode',
+    'User', 'warning', 'WbGeoShape', 'WbMonolingualText', 'WbQuantity',
+    'WbTabularData', 'WbTime', 'WbUnknown', 'WikidataBot',
 )
 
 # argvu is set by pywikibot.bot when it's imported
@@ -291,10 +292,7 @@ class Coordinate(_WbRepresentation):
         globe = None
 
         if data['globe']:
-            globes = {}
-            for name, entity in site.globes().items():
-                globes[entity] = name
-
+            globes = {entity: name for name, entity in site.globes().items()}
             globe = globes.get(data['globe'])
 
         return cls(data['latitude'], data['longitude'],
@@ -1155,8 +1153,6 @@ def Site(code: Optional[str] = None,
     :raises ValueError: Missing Site code
     :raises ValueError: Missing Site family
     """
-    _logger = 'wiki'
-
     if url:
         # Either code and fam or url with optional fam for AutoFamily name
         if code:
@@ -1210,7 +1206,7 @@ def Site(code: Optional[str] = None,
     if key not in _sites or not isinstance(_sites[key], interface):
         _sites[key] = interface(code=code, fam=fam, user=user)
         debug("Instantiated {} object '{}'"
-              .format(interface.__name__, _sites[key]), _logger)
+              .format(interface.__name__, _sites[key]))
 
         if _sites[key].code != code:
             warn('Site {} instantiated using different code "{}"'
@@ -1225,6 +1221,9 @@ from pywikibot.page import (  # noqa: E402
     Claim,
     FilePage,
     ItemPage,
+    LexemeForm,
+    LexemePage,
+    LexemeSense,
     Link,
     MediaInfo,
     Page,
@@ -1282,9 +1281,7 @@ def _flush(stop: bool = True) -> None:
     Wait for the page-putter to flush its queue. Also drop this process from
     the throttle log. Called automatically at Python exit.
     """
-    _logger = 'wiki'
-
-    debug('_flush() called', _logger)
+    debug('_flush() called')
 
     def remaining() -> Tuple[int, datetime.timedelta]:
         remainingPages = page_put_queue.qsize()
@@ -1302,9 +1299,9 @@ def _flush(stop: bool = True) -> None:
 
     num, sec = remaining()
     if num > 0 and sec.total_seconds() > _config.noisysleep:
-        output(color_format(
-            '{lightblue}Waiting for {num} pages to be put. '
-            'Estimated time remaining: {sec}{default}', num=num, sec=sec))
+        output('<<lightblue>>Waiting for {num} pages to be put. '
+               'Estimated time remaining: {sec}<<default>>'
+               .format(num=num, sec=sec))
 
     if _putthread is not threading.current_thread():
         while (_putthread.is_alive()

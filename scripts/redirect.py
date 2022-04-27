@@ -78,12 +78,7 @@ import pywikibot
 import pywikibot.data
 from pywikibot import i18n, pagegenerators, xmlreader
 from pywikibot.backports import Dict, List, Set, Tuple
-from pywikibot.bot import (
-    ExistingPageBot,
-    OptionHandler,
-    RedirectPageBot,
-    suggest_help,
-)
+from pywikibot.bot import ExistingPageBot, OptionHandler, suggest_help
 from pywikibot.exceptions import (
     CircularRedirectError,
     InterwikiRedirectPageError,
@@ -153,7 +148,7 @@ class RedirectGenerator(OptionHandler):
         xmlFilename = self.opt.xml
         redict = {}
         # open xml dump and read page titles out of it
-        dump = xmlreader.XmlDump(xmlFilename)
+        dump = xmlreader.XmlDump(xmlFilename, on_error=pywikibot.error)
         redirR = self.site.redirect_regex
         readPagesCount = 0
         pageTitles = set()
@@ -388,9 +383,11 @@ class RedirectGenerator(OptionHandler):
                 continue
 
 
-class RedirectRobot(ExistingPageBot, RedirectPageBot):
+class RedirectRobot(ExistingPageBot):
 
     """Redirect bot."""
+
+    use_redirects = True
 
     update_options = {
         'limit': float('inf'),

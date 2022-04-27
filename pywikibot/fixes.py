@@ -1,6 +1,6 @@
 """File containing all standard fixes."""
 #
-# (C) Pywikibot team, 2008-2020
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -81,7 +81,8 @@ fixes = {
                 'nowiki',
                 'comment',
                 'math',
-                'pre'
+                'pre',
+                'syntaxhighlight',
             ],
         }
     },
@@ -381,7 +382,7 @@ fixes = {
             r'-search:insource:/nowiki\>ISBN:? *(?:&nbsp;|&\#160;)? *[0-9]/',
             '-namespace:0'],
         'regex': True,
-        'msg': 'isbn-formatting',  # use i18n translations
+        'msg': 'pywikibot-fixes-isbn',
         'replacements': [
             # Remove colon between the word ISBN and the number
             (r'ISBN: (\d+)', r'ISBN \1'),

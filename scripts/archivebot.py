@@ -72,9 +72,9 @@ week, which is in the year before if January 1st is not a Monday. If it's
 between Friday or Sunday (including) the following week is then the first week
 of the year. So up to three days are still counted as the year before.
 
-See also:
- - https://webspace.science.uu.nl/~gent0113/calendar/isocalendar.htm
- - https://docs.python.org/3/library/datetime.html#datetime.date.isocalendar
+.. seealso:: Python :python:`datetime.date.isocalendar
+   <library/datetime.html#datetime.date.isocalendar>`,
+   https://webspace.science.uu.nl/~gent0113/calendar/isocalendar.htm
 
 Options (may be omitted):
 
@@ -497,7 +497,7 @@ class DiscussionPage(pywikibot.Page):
         if sort_threads:
             pywikibot.output('Sorting threads...')
             self.threads.sort(key=lambda t: t.timestamp)
-        newtext = re.sub('\n*$', '\n\n', self.header)  # Fix trailing newlines
+        newtext = self.header.strip() + '\n\n'  # Fix trailing newlines
         for t in self.threads:
             newtext += t.to_text()
         if self.full:
@@ -910,9 +910,8 @@ def main(*args: str) -> None:
                 pywikibot.error('Missing or malformed template in page {}: {}'
                                 .format(pg, e))
             except Exception:
-                pywikibot.error('Error occurred while processing page {}'
-                                .format(pg))
-                pywikibot.exception(tb=True)
+                pywikibot.exception('Error occurred while processing page {}'
+                                    .format(pg), exc_info=True)
 
 
 if __name__ == '__main__':

@@ -1,22 +1,18 @@
 #!/usr/bin/python3
 r"""
-This is a Bot to add text to the top or bottom of a page.
+Append text to the top or bottom of a page.
 
 By default this adds the text to the bottom above the categories and interwiki.
 
-These command line parameters can be used to specify which pages to work on:
+Use the following command line parameters to specify what to add:
 
-&params;
+-text             Text to append. "\n" are interpreted as newlines.
 
-Furthermore, the following command line parameters are supported:
+-textfile         Path to a file with text to append
 
--text             Define what text to add. "\n" are interpreted as newlines.
+-summary          Change summary to use
 
--textfile         Define a texfile name which contains the text to add
-
--summary          Define the summary to use
-
--up               If used, put the text at the top of the page
+-up               Append text to the top of the page rather than the bottom
 
 -create           Create the page if necessary. Note that talk pages are
                   created already without of this option.
@@ -31,13 +27,16 @@ Furthermore, the following command line parameters are supported:
 -talkpage         Put the text onto the talk page instead
 -talk
 
--excepturl        Use the html page as text where you want to see if there's
-                  the text, not the wiki-page.
+-excepturl        Skip pages with a url that matches this regular expression
 
--noreorder        Avoid reordering cats and interwiki
+-noreorder        Place the text beneath the categories and interwiki
 
-Example
--------
+Furthermore, the following can be used to specify which pages to process...
+
+&params;
+
+Examples
+--------
 
 1. Append 'hello world' to the bottom of the sandbox:
 
@@ -57,7 +56,7 @@ Example
         -summary:"Bot: Aggiungo template Categorizzare"
 """
 #
-# (C) Pywikibot team, 2007-2021
+# (C) Pywikibot team, 2007-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -68,11 +67,7 @@ from typing import Union
 import pywikibot
 from pywikibot import config, pagegenerators, textlib
 from pywikibot.backports import Dict, Sequence
-from pywikibot.bot import (
-    AutomaticTWSummaryBot,
-    ExistingPageBot,
-    NoRedirectPageBot,
-)
+from pywikibot.bot import AutomaticTWSummaryBot, ExistingPageBot
 
 
 ARGS_TYPE = Dict[str, Union[bool, str]]
@@ -97,14 +92,14 @@ ARG_PROMPT = {
     '-excepturl': 'What url pattern should we skip?',
 }
 
-
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
-class AddTextBot(AutomaticTWSummaryBot, ExistingPageBot, NoRedirectPageBot):
+class AddTextBot(AutomaticTWSummaryBot, ExistingPageBot):
 
     """A bot which adds a text to a page."""
 
+    use_redirects = False
     summary_key = 'add_text-adding'
     update_options = DEFAULT_ARGS
 
@@ -202,12 +197,13 @@ def parse(argv: Sequence[str],
           generator_factory: pagegenerators.GeneratorFactory
           ) -> ARGS_TYPE:
     """
-    Parses our arguments and provide a named tuple with their values.
+    Parses our arguments and provide a dictionary with their values.
 
     :param argv: input arguments to be parsed
-    :param generator_factory: factory that will determine the page to edit
+    :param generator_factory: factory that will determine what pages to
+        process
     :return: dictionary with our parsed arguments
-    :raise ValueError: invalid arguments received
+    :raise ValueError: if we receive invalid arguments
     """
     args = dict(DEFAULT_ARGS)
     argv = pywikibot.handle_args(argv)

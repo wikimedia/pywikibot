@@ -10,7 +10,7 @@ Glossary
       Often seen for code examples which can be executed interactively
       in the interpreter. The :mod:`pywikibot` module is preloaded. The
       :mod:`pywikibot.scripts.shell` script is part of the
-      :ref:`Pywikibot Utility Scripts<utility_scripts>`.
+      :ref:`Pywikibot Utility Scripts<Utility Scripts>`.
 
    compat
       The first Pywikibot package formerly known as *Pywikipediabot*
@@ -57,7 +57,8 @@ Glossary
 
    tag
       A marker of particular revisions (e.g. a release version). Each
-      Pywikibot release is tagged with its release version number.
+      Pywikibot release is tagged with its release version number. The
+      current last tag is |version|.
 
    trunk
       A former name of :term:`compat`.

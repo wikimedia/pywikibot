@@ -1,4 +1,8 @@
-"""Stdout, stderr and argv support for unicode."""
+"""Unicode support for stdout, stderr and argv with Python 3.5.
+
+.. deprecated:: 7.1
+   will be removed with Pywikibot 8 when Python 3.5 support is dropped.
+"""
 #
 # (C) Pywikibot team, 2012-2022
 #

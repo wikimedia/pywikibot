@@ -26,3 +26,6 @@ Scripts descriptions
    nonedit
    other
    unsorted
+   maintenance
+   archive
+   outdated

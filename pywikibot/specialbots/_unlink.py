@@ -13,7 +13,6 @@ from pywikibot.bot import (
     ChoiceException,
     ExistingPageBot,
     InteractiveReplace,
-    NoRedirectPageBot,
 )
 from pywikibot.bot_choice import UnhandledAnswer
 from pywikibot.editor import TextEditor
@@ -54,9 +53,11 @@ class InteractiveUnlink(InteractiveReplace):
         return answer
 
 
-class BaseUnlinkBot(ExistingPageBot, NoRedirectPageBot, AutomaticTWSummaryBot):
+class BaseUnlinkBot(ExistingPageBot, AutomaticTWSummaryBot):
 
     """A basic bot unlinking a given link from the current page."""
+
+    use_redirects = False
 
     def __init__(self, **kwargs) -> None:
         """Redirect all parameters and add namespace as an available option."""

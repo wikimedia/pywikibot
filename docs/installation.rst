@@ -27,7 +27,7 @@ Internationalisation (i18n)
 Some of the framework input interaction is translated. The user interface
 language to be used can be set as follows:
 
-#. set the `userinterface_lang` in your :ref:`user-config.py<user-interface-settings>` to your preferred language
+#. set the `userinterface_lang` in your :ref:`user-config.py<User Interface Settings>` to your preferred language
 #. set environment variable `PYWIKIBOT_USERINTERFACE_LANG` to your preferred language
 #. default is obtained from `locale.getdefaultlocale`
 #. fallback is `'en'` for english if all other options fails

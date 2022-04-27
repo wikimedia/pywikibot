@@ -2,21 +2,19 @@
 """
 Spawns an interactive Python shell and imports the pywikibot library.
 
-The following local option is supported:
+The following local option is supported::
 
--noimport Do not import the pywikibot library. All other arguments are
-          ignored in this case.
+ -noimport Do not import the pywikibot library. All other arguments are
+           ignored in this case.
 
-Usage:
+Usage::
 
     python pwb.py shell [args]
-
-If no arguments are given, the pywikibot library will not be loaded.
 
 .. versionchanged:: 7.0
    moved to pywikibot.scripts
 """
-# (C) Pywikibot team, 2014-2021
+# (C) Pywikibot team, 2014-2022
 #
 # Distributed under the terms of the MIT license.
 #
