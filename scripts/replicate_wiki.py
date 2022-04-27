@@ -94,7 +94,7 @@ class SyncSites:
         for s in self.sites:
             s.login()
             pywikibot.output(str(s), newline=False)
-        pywikibot.output('')
+        pywikibot.output()
 
     def check_sysops(self) -> None:
         """Check if sysops are the same on all wikis."""
@@ -145,9 +145,8 @@ class SyncSites:
                     pywikibot.output('Bizarre NoPageError that we are '
                                      'just going to ignore')
                 except IsRedirectPageError:
-                    pywikibot.output(
-                        'error: Redirectpage - todo: handle gracefully')
-        pywikibot.output('')
+                    pywikibot.error('Redirectpage - todo: handle gracefully')
+        pywikibot.output()
 
     def generate_overviews(self) -> None:
         """Create page on wikis with overview of bot results."""

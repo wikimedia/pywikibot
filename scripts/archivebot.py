@@ -910,9 +910,8 @@ def main(*args: str) -> None:
                 pywikibot.error('Missing or malformed template in page {}: {}'
                                 .format(pg, e))
             except Exception:
-                pywikibot.error('Error occurred while processing page {}'
-                                .format(pg))
-                pywikibot.exception(tb=True)
+                pywikibot.exception('Error occurred while processing page {}'
+                                    .format(pg), exc_info=True)
 
 
 if __name__ == '__main__':

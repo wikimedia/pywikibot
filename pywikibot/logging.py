@@ -1,21 +1,21 @@
 """User output/logging functions.
 
-Six output functions are defined. Each requires a string argument
+Six output functions are defined. Each requires a ``msg`` argument
 All of these functions generate a message to the log file if
 logging is enabled (`-log` or `-debug` command line arguments).
 
-The functions :func:`output()`, :func:`stdout()`, :func:`warning()` and
-:func:`error()` all display a message to the user through the logger
-object; the only difference is the priority level, which can be used by
-the application layer to alter the display. The :func:`stdout()`
-function should be used only for data that is the "result" of a script,
-as opposed to information messages to the user.
+The functions :func:`info` (alias :func:`output`), :func:`stdout`,
+:func:`warning` and :func:`error` all display a message to the user
+through the logger object; the only difference is the priority level,
+which can be used by the application layer to alter the display. The
+:func:`stdout` function should be used only for data that is the
+"result" of a script, as opposed to information messages to the user.
 
-The function :func:`log()` by default does not display a message to the
+The function :func:`log` by default does not display a message to the
 user, but this can be altered by using the `-verbose` command line
 option.
 
-The function :func:`debug()` only logs its messages, they are never
+The function :func:`debug` only logs its messages, they are never
 displayed on the user console. :func:`debug()` takes a required second
 argument, which is a string indicating the debugging layer.
 """
@@ -30,16 +30,17 @@ import sys
 
 # logging levels
 from logging import CRITICAL, DEBUG, ERROR, INFO, WARNING
-from typing import Any, Optional, Union
+from typing import Any
 
 from pywikibot.backports import Callable, List
-
+from pywikibot.tools import deprecated_args, issue_deprecation_warning
 
 STDOUT = 16  #:
 VERBOSE = 18  #:
 INPUT = 25  #:
 """Three additional logging levels which are implemented beside
-`CRITICAL`, `DEBUG`, `ERROR`, `INFO` and `WARNING`.
+:const:`CRITICAL`, :const:`DEBUG`, :const:`ERROR`, :const:`INFO` and
+:const:`WARNING`.
 
 .. seealso:: :python:`Python Logging Levels<logging.html#logging-levels>`
 """
@@ -65,212 +66,266 @@ def _init() -> None:
     _init_routines[:] = []  # the global variable is used with slice operator
 
 
-def logoutput(text: object, decoder: Optional[str] = None,
-              newline: bool = True, _level: int = INFO, _logger: str = '',
+# Note: The frame must be updated if this decorator is removed
+@deprecated_args(text='msg')  # since 7.2
+def logoutput(msg: Any,
+              *args: Any,
+              level: int = INFO,
               **kwargs: Any) -> None:
     """Format output and send to the logging module.
 
     Helper function used by all the user-output convenience functions.
     It can be used to implement your own high-level output function with
-    a different lgging level.
-    """
-    if _logger:
-        logger = logging.getLogger('pywiki.' + _logger)
-    else:
-        logger = logging.getLogger('pywiki')
+    a different logging level.
 
+    `msg` can contain special sequences to create colored output. These
+    consist of the color name in angle bracket, e. g. <<lightpurple>>.
+    <<default>> resets the color.
+
+    Other keyword arguments are passed unchanged to the logger; so far,
+    the only argument that is useful is ``exc_info=True``, which causes
+    the log message to include an exception traceback.
+
+    :param msg: The message to be printed.
+    :param args: Not used yet; prevents positinal arguments except `msg`.
+    :param level: The logging level; supported by :func:`logoutput` only.
+    :keyword newline: If newline is True (default), a line feed will be
+        added after printing the msg.
+    :type newline: bool
+    :keyword layer: Suffix of the logger name separated by dot. By
+        default no suffix is used.
+    :type layer: str
+    :keyword decoder: If msg is bytes, this decoder is used to deccode.
+        Default is 'utf-8', fallback is 'iso8859-1'
+    :type decoder: str
+    :param kwargs: For the other keyword arguments refer
+        :python:`Logger.debug()<library/logging.html#logging.Logger.debug>`
+        and :pyhow:`logging-cookbook`
+    """
     # invoke any init routines
     if _init_routines:
         _init()
 
-    # frame 0 is logoutput() in this module,
-    # frame 1 is the convenience function (output(), etc.)
-    # frame 2 is whatever called the convenience function
-    frame = sys._getframe(2)
+    # cleanup positional args
+    if level == ERROR:
+        keys = ('decoder', 'newline', 'exc_info')
+    elif level == DEBUG:
+        keys = ('layer', 'decoder', 'newline')
+    else:
+        keys = ('decoder', 'newline')
+    for i, arg in enumerate(args):
+        key = keys[i]
+        issue_deprecation_warning(
+            'Positional argument {} ({})'.format(i + 1, arg),
+            'keyword argument "{}={}"'.format(key, arg),
+            since='7.2.0')
+        if key in kwargs:
+            warning('{!r} is given as keyword argument {!r} already; ignoring '
+                    '{!r}'.format(key, arg, kwargs[key]))
+        else:
+            kwargs[key] = arg
 
+    # frame 0 is logoutput() in this module,
+    # frame 1 is the deprecation wrapper of this function
+    # frame 2 is the convenience function (output(), etc.)
+    # frame 3 is the deprecation wrapper the convenience function
+    # frame 4 is whatever called the convenience function
+    newline = kwargs.pop('newline', True)
+    frame = sys._getframe(4)
     module = os.path.basename(frame.f_code.co_filename)
     context = {'caller_name': frame.f_code.co_name,
                'caller_file': module,
                'caller_line': frame.f_lineno,
                'newline': ('\n' if newline else '')}
+    context.update(kwargs.pop('extra', {}))
 
-    if isinstance(text, str):
-        decoded_text = text
-    elif isinstance(text, bytes):
-        if decoder:
-            decoded_text = text.decode(decoder)
-        else:
-            try:
-                decoded_text = text.decode('utf-8')
-            except UnicodeDecodeError:
-                decoded_text = text.decode('iso8859-1')
-    else:
-        # looks like text is a non-text object.
-        # Maybe it has a __str__ builtin ?
-        # (allows to print Page, Site...)
-        decoded_text = str(text)
+    decoder = kwargs.pop('decoder', 'utf-8')
+    if isinstance(msg, bytes):
+        try:
+            msg = msg.decode(decoder)
+        except UnicodeDecodeError:
+            msg = msg.decode('iso8859-1')
 
-    logger.log(_level, decoded_text, extra=context, **kwargs)
+    layer = kwargs.pop('layer', '')
+    logger = logging.getLogger(('pywiki.' + layer).strip('.'))
+    logger.log(level, msg, extra=context, **kwargs)
 
 
-def output(text: object, decoder: Optional[str] = None, newline: bool = True,
-           **kwargs: Any) -> None:
-    """Output a message to the user via the userinterface.
+# Note: The logoutput frame must be updated if this decorator is removed
+@deprecated_args(text='msg')  # since 7.2
+def info(msg: Any = '', *args: Any, **kwargs: Any) -> None:
+    """Output a message to the user with level :const:`INFO`.
 
-    Works like print, but uses the encoding used by the user's console
-    (console_encoding in the configuration file) instead of ASCII.
+    ``msg`` will be sent to stderr via :mod:`pywikibot.userinterfaces`.
+    It may be omitted and a newline is printed in that case.
+    The arguments are interpreted as for :func:`logoutput`.
 
-    If decoder is None, text should be a unicode string. Otherwise it
-    should be encoded in the given encoding.
+    .. versionadded:: 7.2
+       was renamed from :func:`output`.
 
-    If newline is True, a line feed will be added after printing the text.
-
-    text can contain special sequences to create colored output. These
-    consist of the color name in angle bracket, e. g. <<lightpurple>>.
-    <<default>> resets the color.
-
-    Other keyword arguments are passed unchanged to the logger; so far, the
-    only argument that is useful is "exc_info=True", which causes the
-    log message to include an exception traceback.
+    .. seealso::
+       :python:`Logger.info()<library/logging.html#logging.Logger.info>`
     """
-    logoutput(text, decoder, newline, INFO, **kwargs)
+    logoutput(msg, *args, **kwargs)
 
 
-def stdout(text: object, decoder: Optional[str] = None, newline: bool = True,
-           **kwargs: Any) -> None:
-    """Output script results to the user via the userinterface.
+output = info
+"""Synomym for :func:`info` for backward compatibility. The arguments
+are interpreted as for :func:`logoutput`.
 
-    The text will be sent to standard output, so that it can be piped to
-    another process. All other text will be sent to stderr.
-    See: https://en.wikipedia.org/wiki/Pipeline_%28Unix%29
-
-    :param text: the message printed via stdout logger to the user.
-    :param decoder: If None, text should be a unicode string else it should
-        be encoded in the given encoding.
-    :param newline: If True, a line feed will be added after printing the text.
-    :param kwargs: The keyword arguments can be found in the python doc:
-        :pyhow:`logging-cookbook`
-    """
-    logoutput(text, decoder, newline, STDOUT, **kwargs)
+.. versionchanged:: 7.2
+   was renamed to :func:`info`; `text`was renamed to `msg`; `msg`
+   paramerer may be omitted; only keyword arguments are allowed except
+   for `msg`.
+.. seealso::
+   :python:`Logger.info()<library/logging.html#logging.Logger.info>`
+"""
 
 
-def warning(text: object, decoder: Optional[str] = None,
-            newline: bool = True, **kwargs: Any) -> None:
-    """Output a warning message to the user via the userinterface.
+# Note: The logoutput frame must be updated if this decorator is removed
+@deprecated_args(text='msg')  # since 7.2
+def stdout(msg: Any = '', *args: Any, **kwargs: Any) -> None:
+    """Output script results to the user with level :const:`STDOUT`.
 
-    :param text: the message the user wants to display.
-    :param decoder: If None, text should be a unicode string else it
-        should be encoded in the given encoding.
-    :param newline: If True, a line feed will be added after printing the text.
-    :param kwargs: The keyword arguments can be found in the python doc:
-        :pyhow:`logging-cookbook`
-    """
-    logoutput(text, decoder, newline, WARNING, **kwargs)
+    ``msg`` will be sent to standard output (stdout) via
+    :mod:`pywikibot.userinterfaces`, so that it can be piped to another
+    process. All other functions will sent to stderr.
+    `msg` may be omitted and a newline is printed in that case.
 
-
-def error(text: object, decoder: Optional[str] = None, newline: bool = True,
-          **kwargs: Any) -> None:
-    """Output an error message to the user via the userinterface.
-
-    :param text: the message containing the error which occurred.
-    :param decoder: If None, text should be a unicode string else it should
-        be encoded in the given encoding.
-    :param newline: If True, a line feed will be added after printing the text.
-    :param kwargs: The keyword arguments can be found in the python doc:
-        :pyhow:`logging-cookbook`
-    """
-    logoutput(text, decoder, newline, ERROR, **kwargs)
-
-
-def log(text: object, decoder: Optional[str] = None, newline: bool = True,
-        **kwargs: Any) -> None:
-    """Output a record to the log file.
-
-    :param text: the message which is to be logged to the log file.
-    :param decoder: If None, text should be a unicode string else it should
-        be encoded in the given encoding.
-    :param newline: If True, a line feed will be added after printing the text.
-    :param kwargs: The keyword arguments can be found in the python doc:
-        :pyhow:`logging-cookbook`
-    """
-    logoutput(text, decoder, newline, VERBOSE, **kwargs)
-
-
-def critical(text: object, decoder: Optional[str] = None, newline: bool = True,
-             **kwargs: Any) -> None:
-    """Output a critical record to the user via the userinterface.
-
-    :param text: the critical message which is to be displayed to the user.
-    :param decoder: If None, text should be a unicode string else it should
-        be encoded in the given encoding.
-    :param newline: If True, a line feed will be added after printing the text.
-    :param kwargs: The keyword arguments can be found in the python doc:
-        :pyhow:`logging-cookbook`
-    """
-    logoutput(text, decoder, newline, CRITICAL, **kwargs)
-
-
-def debug(text: object, layer: str = '', decoder: Optional[str] = None,
-          newline: bool = True, **kwargs: Any) -> None:
-    """Output a debug record to the log file.
+    The arguments are interpreted as for :func:`logoutput`.
 
     .. versionchanged:: 7.2
-       `layer` parameter is optional.
-
-    :param text: the message of the debug record to be logged to the log file.
-    :param layer: dot-separated logger suffix to record this message
-        upon. If not given only 'pywiki' is used as logger name.
-    :param decoder: If None, text should be a unicode string else it should
-        be encoded in the given encoding.
-    :param newline: If True, a line feed will be added after printing the text.
-    :param kwargs: The keyword arguments can be found in the python doc:
-        :pyhow:`logging-cookbook`
+       `text`was renamed to `msg`; `msg` paramerer may be omitted;
+       only keyword arguments are allowed except for `msg`.
+    .. seealso::
+       - :python:`Logger.log()<library/logging.html#logging.Logger.log>`
+       - https://en.wikipedia.org/wiki/Pipeline_%28Unix%29
     """
-    logoutput(text, decoder, newline, DEBUG, layer, **kwargs)
+    logoutput(msg, *args, level=STDOUT, **kwargs)
 
 
-def exception(
-    msg: Union[Exception, str, None] = None,
-    decoder: Optional[str] = None,
-    newline: bool = True,
-    tb: bool = False,
-    **kwargs: Any
-) -> None:
-    """Output an error traceback to the user via the userinterface.
+# Note: The logoutput frame must be updated if this decorator is removed
+@deprecated_args(text='msg')  # since 7.2
+def warning(msg: Any, *args: Any, **kwargs: Any) -> None:
+    """Output a warning message to the user with level :const:`WARNING`.
+
+    ``msg`` will be sent to stderr via :mod:`pywikibot.userinterfaces`.
+    The arguments are interpreted as for :func:`logoutput`.
+
+    .. versionchanged:: 7.2
+       `text`was renamed to `msg`; only keyword arguments are allowed
+       except for `msg`.
+    .. seealso::
+       :python:`Logger.warning()<library/logging.html#logging.Logger.warning>`
+    """
+    logoutput(msg, *args, level=WARNING, **kwargs)
+
+
+# Note: The logoutput frame must be updated if this decorator is removed
+@deprecated_args(text='msg')  # since 7.2
+def error(msg: Any, *args: Any, **kwargs: Any) -> None:
+    """Output an error message to the user with level :const:`ERROR`.
+
+    ``msg`` will be sent to stderr via :mod:`pywikibot.userinterfaces`.
+    The arguments are interpreted as for :func:`logoutput`.
+
+    .. versionchanged:: 7.2
+       `text`was renamed to `msg`; only keyword arguments are allowed
+       except for `msg`.
+    .. seealso::
+       :python:`Logger.error()<library/logging.html#logging.Logger.error>`
+    """
+    logoutput(msg, *args, level=ERROR, **kwargs)
+
+
+# Note: The logoutput frame must be updated if this decorator is removed
+@deprecated_args(text='msg')  # since 7.2
+def log(msg: Any, *args: Any, **kwargs: Any) -> None:
+    """Output a record to the log file with level :const:`VERBOSE`.
+
+    The arguments are interpreted as for :func:`logoutput`.
+
+    .. versionchanged:: 7.2
+       `text`was renamed to `msg`; only keyword arguments are allowed
+       except for `msg`.
+    .. seealso::
+       :python:`Logger.log()<library/logging.html#logging.Logger.log>`
+    """
+    logoutput(msg, *args, level=VERBOSE, **kwargs)
+
+
+# Note: The logoutput frame must be updated if this decorator is removed
+@deprecated_args(text='msg')  # since 7.2
+def critical(msg: Any, *args: Any, **kwargs: Any) -> None:
+    """Output a critical record to the user with level :const:`CRITICAL`.
+
+    ``msg`` will be sent to stderr via :mod:`pywikibot.userinterfaces`.
+    The arguments are interpreted as for :func:`logoutput`.
+
+    .. versionchanged:: 7.2
+       `text`was renamed to `msg`; only keyword arguments are allowed
+       except for `msg`.
+    .. seealso::
+       :python:`Logger.critical()
+       <library/logging.html#logging.Logger.critical>`
+    """
+    logoutput(msg, *args, level=CRITICAL, **kwargs)
+
+
+# Note: The logoutput frame must be updated if this decorator is removed
+@deprecated_args(text='msg')  # since 7.2
+def debug(msg: Any, *args: Any, **kwargs: Any) -> None:
+    """Output a debug record to the log file with level :const:`DEBUG`.
+
+    The arguments are interpreted as for :func:`logoutput`.
+
+    .. versionchanged:: 7.2
+       `layer` parameter is optional; `text`was renamed to `msg`;
+       only keyword arguments are allowed except for `msg`.
+    .. seealso::
+       :python:`Logger.debug()<library/logging.html#logging.Logger.debug>`
+    """
+    logoutput(msg, *args, level=DEBUG, **kwargs)
+
+
+# Note: The logoutput frame must be updated if this decorator is removed
+@deprecated_args(tb='exc_info')  # since 7.2
+def exception(msg: Any = None, *args: Any, **kwargs: Any) -> None:
+    """Output an error traceback to the user with level :const:`ERROR`.
 
     Use directly after an 'except' statement::
 
         ...
         except Exception:
-            pywikibot.exception()
+            pywikibot.exception('exc_info'=True)
         ...
 
     or alternatively::
 
         ...
         except Exception as e:
-            pywikibot.exception(e)
+            pywikibot.exception(e, 'exc_info'=True)
         ...
 
+    Without `exc_info` parameter this function works like :func:`error`
+    except that the `msg` parameter may be omitted.
     This function should only be called from an Exception handler.
+    ``msg`` will be sent to stderr via :mod:`pywikibot.userinterfaces`.
+    The arguments are interpreted as for :func:`logoutput`.
 
-    :param msg: If not None, contains the description of the exception
-        that occurred.
-    :param decoder: If None, text should be a unicode string else it should
-        be encoded in the given encoding.
-    :param newline: If True, a line feed will be added after printing the text.
-    :param kwargs: The keyword arguments can be found in the python doc:
-        :pyhow:`logging-cookbook`
-    :param tb: Set to True in order to output traceback also.
+    .. versionchanged:: 7.2
+       only keyword arguments are allowed except for `msg`;
+       `exc_info` keyword is to be used instead of `tb`.
+    .. seealso::
+       :python:`Logger.exception()
+       <library/logging.html#logging.Logger.exception>`
+
+    The arguments are interpreted as for :meth:`output`.
     """
-    if isinstance(msg, BaseException):
-        if tb:
-            kwargs['exc_info'] = 1
-    else:
-        exc_info = sys.exc_info()
-        msg = '{}: {}'.format(repr(exc_info[1]).split('(')[0],
-                              str(exc_info[1]).strip())
-        if tb:
-            kwargs['exc_info'] = exc_info
+    if msg is None:
+        exc_type, value, _tb = sys.exc_info()
+        msg = str(value)
+        if not kwargs.get('exc_info', False):
+            msg += ' ({})'.format(exc_type.__name__)
     assert msg is not None
-    logoutput(msg, decoder, newline, ERROR, **kwargs)
+    error(msg, *args, **kwargs)

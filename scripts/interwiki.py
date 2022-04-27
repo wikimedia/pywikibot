@@ -1823,7 +1823,7 @@ class Subject(interwiki_graph.Subject):
                                                   page, linkedPage))
 
         except OSError:
-            pywikibot.output('ERROR: could not report backlinks')
+            pywikibot.error('could not report backlinks')
 
 
 class InterwikiBot:

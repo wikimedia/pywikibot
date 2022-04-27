@@ -745,7 +745,7 @@ class CheckImagesBot:
                 self.num_notify[self.talk_page.title()] -= 1
             err = None
         if err:
-            pywikibot.exception(err)
+            pywikibot.error(err)
             pywikibot.output('Skipping saving talk page {}'
                              .format(self.talk_page))
 
@@ -1351,9 +1351,9 @@ class CheckImagesBot:
             pywikibot.output('Skipping {}...'.format(self.image_name))
             self.skip_list.append(self.image_name)
             if skip_number == 1:
-                pywikibot.output('')
+                pywikibot.output()
             return True
-        pywikibot.output('')
+        pywikibot.output()
         return False
 
     @staticmethod

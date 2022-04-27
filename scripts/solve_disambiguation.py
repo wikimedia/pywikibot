@@ -1084,7 +1084,7 @@ DisambiguationRobot""".format(options=added_keys,
             else:
                 pywikibot.output('\nThe following changes have been made:\n')
                 pywikibot.showDiff(original_text, text)
-                pywikibot.output('')
+                pywikibot.output()
                 # save the page
                 self.setSummaryMessage(disamb_page, new_targets,
                                        unlink_counter, dn)

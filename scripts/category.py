@@ -1114,8 +1114,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
                     pywikibot.output(line)
 
         # show the title of the page where the link was found.
-        pywikibot.output('')
-        pywikibot.output('>>> <<lightpurple>>{}<<default>> <<<'
+        pywikibot.output('\n>>> <<lightpurple>>{}<<default>> <<<'
                          .format(member.title()))
 
         # determine a reasonable amount of context.
@@ -1151,8 +1150,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
                             key=methodcaller('title'))
 
         # show categories as possible choices with numbers
-        pywikibot.output('')
-
+        pywikibot.output()
         supercat_option = CatIntegerOption(0, len(supercatlist), 'u')
         if not supercatlist:
             pywikibot.output('This category has no supercategories.')
@@ -1171,7 +1169,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
             subcat_option.list_categories(cat_list)
 
         # show possible options for the user
-        pywikibot.output('')
+        pywikibot.output()
         options = (supercat_option,
                    subcat_option,
                    StandardOption(
@@ -1248,7 +1246,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
 
     def treat(self, page) -> None:
         """Process page."""
-        pywikibot.output('')
+        pywikibot.output()
         self.move_to_category(page, self.cat, self.cat)
 
 
@@ -1343,7 +1341,7 @@ class CategoryTreeRobot:
         cat = pywikibot.Category(self.site, self.cat_title)
         pywikibot.output('Generating tree...', newline=False)
         tree = self.treeview(cat)
-        pywikibot.output('')
+        pywikibot.output()
         if self.filename:
             pywikibot.output('Saving results in ' + self.filename)
             with codecs.open(self.filename, 'a', 'utf-8') as f:

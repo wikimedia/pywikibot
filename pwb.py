@@ -291,7 +291,7 @@ except ImportError as e:  # raised in textlib
 
 def find_alternates(filename, script_paths):
     """Search for similar filenames in the given script paths."""
-    from pywikibot import config, input_choice, output
+    from pywikibot import config, input_choice, info
     from pywikibot.bot import QuitKeyboardInterrupt, ShowingListOption
 
     assert config.pwb_close_matches > 0, \
@@ -323,10 +323,10 @@ def find_alternates(filename, script_paths):
     if len(similar_scripts) == 1:
         script = similar_scripts[0]
         wait_time = config.pwb_autostart_waittime
-        output('NOTE: Starting the most similar script '
-               '<<lightyellow>>{}.py<<default>>\n'
-               '      in {} seconds; type CTRL-C to stop.'
-               .format(script, wait_time))
+        info('NOTE: Starting the most similar script '
+             '<<lightyellow>>{}.py<<default>>\n'
+             '      in {} seconds; type CTRL-C to stop.'
+             .format(script, wait_time))
         try:
             sleep(wait_time)  # Wait a bit to let it be cancelled
         except KeyboardInterrupt:

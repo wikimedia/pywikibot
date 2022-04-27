@@ -60,6 +60,7 @@ from pywikibot.logging import (
     debug,
     error,
     exception,
+    info,
     log,
     output,
     stdout,
@@ -78,12 +79,12 @@ __all__ = (
     '__version__',
     'Bot', 'calledModuleName', 'Category', 'Claim', 'Coordinate', 'critical',
     'CurrentPageBot', 'debug', 'error', 'exception', 'FilePage', 'handle_args',
-    'html2unicode', 'input', 'input_choice', 'input_yn', 'ItemPage',
-    'LexemeForm', 'LexemePage', 'LexemeSense', 'Link',
-    'log', 'MediaInfo', 'output', 'Page', 'PropertyPage', 'showDiff',
-    'show_help', 'Site', 'SiteLink', 'stdout', 'Timestamp', 'translate', 'ui',
-    'url2unicode', 'User', 'warning', 'WbGeoShape', 'WbMonolingualText',
-    'WbQuantity', 'WbTabularData', 'WbTime', 'WbUnknown', 'WikidataBot',
+    'html2unicode', 'info', 'input', 'input_choice', 'input_yn', 'ItemPage',
+    'LexemeForm', 'LexemePage', 'LexemeSense', 'Link', 'log', 'MediaInfo',
+    'output', 'Page', 'PropertyPage', 'showDiff', 'show_help', 'Site',
+    'SiteLink', 'stdout', 'Timestamp', 'translate', 'ui', 'url2unicode',
+    'User', 'warning', 'WbGeoShape', 'WbMonolingualText', 'WbQuantity',
+    'WbTabularData', 'WbTime', 'WbUnknown', 'WikidataBot',
 )
 
 # argvu is set by pywikibot.bot when it's imported
