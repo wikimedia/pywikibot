@@ -15437,8 +15437,8 @@ def main(*args: Tuple[str, ...]) -> None:
     repo = pywikibot.Site().data_repository()
     try:
         item = pywikibot.ItemPage(repo, item)
-    except InvalidTitleError:
-        pywikibot.exception()
+    except InvalidTitleError as e:
+        pywikibot.error(e)
     else:
         bot = DataExtendBot(site=repo, generator=[item], **options)
         bot.run()

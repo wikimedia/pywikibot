@@ -143,7 +143,7 @@ class BaseRevertBot(OptionHandler):
             return 'The edit(s) made in {} by {} was rollbacked'.format(
                 page.title(), self.user)
 
-        pywikibot.exception()
+        pywikibot.exception(exc_info=False)
         return False
 
     def log(self, msg) -> None:

@@ -97,8 +97,8 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, AutomaticTWSummaryBot):
             # Check whether the link found is to page.
             try:
                 actual_link_page.title()
-            except InvalidTitleError:
-                pywikibot.exception()
+            except InvalidTitleError as e:
+                pywikibot.error(e)
                 continue
             if actual_link_page != linked_page:
                 continue
@@ -172,8 +172,8 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, AutomaticTWSummaryBot):
                     InvalidTitleError,
                     InterwikiRedirectPageError):
                 pass
-            except RuntimeError:
-                pywikibot.exception()
+            except RuntimeError as e:
+                pywikibot.error(e)
             else:
                 section = target.section()
                 if section and not does_text_contain_section(target.text,
@@ -193,8 +193,8 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, AutomaticTWSummaryBot):
         """Change all redirects from the current page to actual links."""
         try:
             newtext = self.current_page.text
-        except InvalidPageError:
-            pywikibot.exception()
+        except InvalidPageError as e:
+            pywikibot.error(e)
             return
 
         with ThreadPoolExecutor() as executor:

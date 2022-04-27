@@ -401,8 +401,8 @@ class UploadRobot(BaseBot):
                and (not site.has_right('upload_by_url') or download):
                 try:
                     file_url = self.read_file_content(file_url)
-                except FatalServerError:
-                    pywikibot.exception()
+                except FatalServerError as e:
+                    pywikibot.error(e)
                     return None
 
             try:
@@ -418,14 +418,14 @@ class UploadRobot(BaseBot):
                         .format(site))
                 elif error.code == 'copyuploadbaddomain' and not download \
                         and '://' in file_url:
-                    pywikibot.exception()
+                    pywikibot.error(error)
                     pywikibot.output('Downloading the file and retry...')
                     download = True
                     continue
                 else:
-                    pywikibot.error('Upload error: ', exc_info=True)
+                    pywikibot.exception('Upload error: ')
             except Exception:
-                pywikibot.error('Upload error: ', exc_info=True)
+                pywikibot.exception('Upload error: ')
             else:
                 if success:
                     # No warning, upload complete.

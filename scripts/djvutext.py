@@ -214,4 +214,4 @@ if __name__ == '__main__':
     try:
         main()
     except Exception:
-        pywikibot.error('Fatal error:', exc_info=True)
+        pywikibot.exception('Fatal error:')

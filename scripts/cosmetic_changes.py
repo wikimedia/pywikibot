@@ -77,8 +77,8 @@ class CosmeticChangesBot(AutomaticTWSummaryBot, ExistingPageBot):
                                             ignore=self.opt.ignore)
         try:
             old_text = self.current_page.text
-        except InvalidPageError:
-            pywikibot.exception()
+        except InvalidPageError as e:
+            pywikibot.error(e)
             return
 
         new_text = cc_toolkit.change(old_text)

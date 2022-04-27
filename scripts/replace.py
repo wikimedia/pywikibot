@@ -664,8 +664,8 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
         """Work on each page retrieved from generator."""
         try:
             original_text = page.text
-        except InvalidPageError:
-            pywikibot.exception()
+        except InvalidPageError as e:
+            pywikibot.error(e)
             return
         applied = set()
         new_text = original_text
