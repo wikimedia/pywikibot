@@ -34,4 +34,4 @@ exclude_patterns:
 - "!docs/conf.py"
 - "*.rst"
 - "*.txt"
-
+- "scripts/dataextend.py"

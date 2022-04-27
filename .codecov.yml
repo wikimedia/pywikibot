@@ -32,13 +32,14 @@ coverage:
     - pywikibot/families/__init__.py
     - pywikibot/scripts/version.py
     - pywikibot/userinterfaces/win32_unicode.py
-    - scripts/userscripts/
+    - scripts/dataextend.py
     - scripts/maintenance/colors.py
     - scripts/maintenance/make_i18n_dict.py
     - scripts/maintenance/preload_sites.py
     - scripts/maintenance/sorting_order.py
     - scripts/maintenance/update_linktrails.py
     - scripts/maintenance/wikimedia_sites.py
+    - scripts/userscripts/
     - tests/pwb/
 
   notify:
