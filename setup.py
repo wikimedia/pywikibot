@@ -252,19 +252,47 @@ def main():  # pragma: no cover
         version=version,
         description=metadata.__description__,
         long_description=read_desc('README.rst'),
-        keywords=metadata.__keywords__.split(),
+        # long_description_content_type
+        # author
+        # author_email
         maintainer=metadata.__maintainer__,
         maintainer_email=metadata.__maintainer_email__,
-        license=metadata.__license__,
-        packages=get_packages(name),
-        python_requires='>=3.5.3',
-        install_requires=dependencies,
-        extras_require=extra_deps,
         url=metadata.__url__,
         download_url=metadata.__download_url__,
+        packages=get_packages(name),
+        # py_modules
+        # scripts
+        # ext_package
+        # ext_modules
+        # distclass
+        # script_name
+        # script_args
+        # options
+        license=metadata.__license__,
+        # license_files
+        keywords=metadata.__keywords__.split(),
+        # platforms
+        # cmdclass
+        # package_dir
+        include_package_data=True,
+        # exclude_package_data
+        # package_data
+        # zip_safe
+        install_requires=dependencies,
+        extras_require=extra_deps,
+        python_requires='>=3.5.3',
+        # namespace_packages
         test_suite='tests.collector',
         tests_require=test_deps,
-        include_package_data=True,
+        # test_loader
+        # eager_resources
+        project_urls={
+            'Documentation': 'https://doc.wikimedia.org/pywikibot/stable/',
+            'Source':
+                'https://gerrit.wikimedia.org/r/plugins/gitiles/pywikibot/core/',  # noqa: E501
+            'Github Mirror': 'https://github.com/wikimedia/pywikibot',
+            'Tracker': 'https://phabricator.wikimedia.org/tag/pywikibot/',
+        },
         entry_points={
             'console_scripts': [
                 'pwb = pywikibot.scripts.pwb:run',
