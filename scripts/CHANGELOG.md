@@ -1,7 +1,11 @@
 # Scripts Changelog
 
-## 7.2.0
+## 7.3.0
 *In development*
+
+
+## 7.2.0
+*26 April 2022*
 
 ### general
 * Archived scripts were removed
