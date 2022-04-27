@@ -1,6 +1,7 @@
 Current release 7.2.0
 ^^^^^^^^^^^^^^^^^^^^^
 
+* Make logging system consistent, add pywikibot.info() alias for pywikibot.output() (:phab:`T85620`)
 * L10N updates
 * Circumvent circular import in tools module (:phab:`T306760`)
 * Don't fix html inside syntaxhighlight parts in fixes.py (:phab:`T306723`)
@@ -24,6 +25,7 @@ Current release 7.2.0
 * Re-enable scripts package version check with pwb wrapper (:phab:`T305799`)
 * Provide textlib.ignore_case() as a public method
 * Don't try to upcast timestamp from global userinfo if global account does not exists (:phab:`T305351`)
+* Archived scripts were removed; create a Phabricator task to restore some (:phab:`T223826`)
 * Add Lexeme support for Lexicographical data (:phab:`T189321`, :phab:`T305297`)
 * enable all parameters of `APISite.imageusage()` with `FilePage.usingPages()`
 * Don't raise `NoPageError` with `file_is_shared` (:phab:`T305182`)
