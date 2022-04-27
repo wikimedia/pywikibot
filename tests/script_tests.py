@@ -445,14 +445,19 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
     _allowed_failures = [
         'basic',
         'commonscat',
+        'commons_information',
         'coordinate_import',
         'cosmetic_changes',
-        'fixing_redircts',
+        'fixing_redirects',
         'illustrate_wikidata',
+        'image',
+        'imagetransfer',
+        'interwikidata',
         'newitem',
         'replace',
         'solve_disambiguation',
         'touch',
+        'weblinkchecker',
     ]
 
     _arguments = '-simulate -page:Foo -always'
