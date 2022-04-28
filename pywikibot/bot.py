@@ -387,6 +387,8 @@ def init_handlers() -> None:
             warnings.filterwarnings('module')
         warnings.filterwarnings('once', category=FutureWarning)
 
+    for handler in root_logger.handlers:
+        handler.close()
     root_logger.handlers.clear()  # remove any old handlers
     root_logger.propagate = False  # T281643
 
