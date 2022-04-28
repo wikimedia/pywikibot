@@ -10,9 +10,8 @@ from contextlib import suppress
 
 import pywikibot
 from pywikibot import fixes
-from pywikibot.tools import suppress_warnings
 from scripts import replace
-from tests import WARN_SITE_OBJ, join_data_path
+from tests import join_data_path
 from tests.bot_tests import TWNBotTestCase
 from tests.utils import empty_sites
 
@@ -90,13 +89,11 @@ class TestReplacementsMain(TWNBotTestCase):
     def _run(self, *args):
         """Run the :py:obj:`replace.main` with the given args.
 
-        It also adds -site and -page parameter.
+        It also adds -site and -page parameters:
+            -page to not have an empty generator
+            -site as it will use Site() otherwise
         """
-        # -page to not have an empty generator
-        # -site as it will use Site() otherwise
-        with suppress_warnings(WARN_SITE_OBJ, category=UserWarning):
-            return replace.main(*(args + ('-site:wikipedia:test',
-                                          '-page:TEST')))
+        return replace.main(*(args + ('-site:wikipedia:test', '-page:TEST')))
 
     def test_invalid_replacements(self):
         """Test invalid command line replacement configurations."""
