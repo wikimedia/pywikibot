@@ -293,12 +293,12 @@ def set_interface(module_name: str) -> None:
     pywikibot.argvu = ui.argvu()
 
     # re-initialize
-
     if _handlers_initialized:
+        _handlers_initialized.clear()
         init_handlers()
 
 
-_handlers_initialized = False
+_handlers_initialized = []  # we can have a script and the script wrapper
 
 
 def handler_namer(name: str) -> str:
@@ -355,8 +355,6 @@ def init_handlers() -> None:
       Different logfiles are used if multiple processes of the same
       script are running.
     """
-    global _handlers_initialized
-
     module_name = calledModuleName()
     if not module_name:
         module_name = 'terminal-interface'
@@ -372,6 +370,8 @@ def init_handlers() -> None:
     # for prompts requiring user response
 
     root_logger = logging.getLogger('pywiki')
+    if root_logger.hasHandlers() and module_name in _handlers_initialized:
+        return
     root_logger.setLevel(DEBUG + 1)  # all records except DEBUG go to logger
 
     warnings_logger = logging.getLogger('py.warnings')
@@ -387,7 +387,7 @@ def init_handlers() -> None:
             warnings.filterwarnings('module')
         warnings.filterwarnings('once', category=FutureWarning)
 
-    root_logger.handlers = []  # remove any old handlers
+    root_logger.handlers.clear()  # remove any old handlers
     root_logger.propagate = False  # T281643
 
     # configure handler(s) for display to user interface
@@ -448,7 +448,7 @@ def init_handlers() -> None:
 
         warnings_logger.addHandler(file_handler)
 
-    _handlers_initialized = True
+    _handlers_initialized.append(module_name)
 
     writelogheader()
 
