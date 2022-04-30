@@ -36,7 +36,7 @@ def main(*args: str) -> None:
         warn_type = 'Unknown'
 
     if args:
-        print('{} arguments: {}\n'  # noqa: T001
+        print('{} arguments: {}\n'  # noqa: T001, T201
               .format(warn_type, ', '.join(args)))
 
     # Various stuffs in Python 3.4+, such as history file.

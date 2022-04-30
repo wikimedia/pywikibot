@@ -74,4 +74,4 @@ class ABUIC(ABC):
     @abstractmethod
     def output(self, *args, **kwargs) -> None:
         """Output text to a stream."""
-        print(*args, **kwargs)  # noqa: T001
+        print(*args, **kwargs)  # noqa: T001, T201
