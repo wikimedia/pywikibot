@@ -115,13 +115,6 @@ class Pre119SiteTestCase(SiteDetectionTestCase):
         """Test detection of MediaWiki sites for www.wikifon.org."""
         self.assertNoSite('http://www.wikifon.org/$1')  # v1.11.0
 
-    def test_ecoreality(self):
-        """Test detection of MediaWiki sites for www.ecoreality.org.
-
-        api.php is not available. Anyway the wiki is outdated.
-        """
-        self.assertNoSite('http://ecoreality.org/wiki/$1')  # v1.16.2
-
 
 class PreAPISiteTestCase(SiteDetectionTestCase):
 
@@ -155,14 +148,6 @@ class APIHiddenTestCase(SiteDetectionTestCase):
         but the API is also hidden.
         """
         self.assertNoSite('http://wikisophia.org/index.php?title=$1')
-
-    def test_ecoreality(self):
-        """Test detection of MediaWiki sites for www.EcoReality.org.
-
-        api.php is not available. HTML looks like it has an API, but redirect
-        rules prevent access.
-        """
-        self.assertNoSite('http://EcoReality.org/wiki/$1')
 
 
 class FailingSiteTestCase(SiteDetectionTestCase):
