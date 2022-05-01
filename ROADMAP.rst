@@ -1,7 +1,9 @@
 Current release 7.3.0
 ^^^^^^^^^^^^^^^^^^^^^
 
-* *(no changes yet)*
+* Do not print log header twice in log files (:phab:`T264235`)
+* Do not delegate logging output to the root logger (:phab:`T281643`)
+* Add `get_charset_from_content_type` to extract the charset from the content-type response header
 
 
 Deprecations
