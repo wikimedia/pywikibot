@@ -826,6 +826,9 @@ class IndexPage(pywikibot.Page):
 
         self._all_page_links = set(
             self.site.pagelinks(self, namespaces=site.proofread_page_ns))
+        # bug T307280
+        self._all_page_links |= set(
+            self.site.pagetemplates(self, namespaces=site.proofread_page_ns))
 
         self._cached = False
 
