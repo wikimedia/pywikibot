@@ -6,10 +6,4 @@ tests.i18n package
     :undoc-members:
     :show-inheritance:
 
-Submodules
-----------
-
-.. toctree::
-
-   i18n.pywikibot
 

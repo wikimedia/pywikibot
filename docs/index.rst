@@ -65,9 +65,10 @@ For framework developers:
 .. toctree::
    :maxdepth: 1
 
-   utilities/scripts_ref
-   scripts_ref/scripts.maintenance
+   Utility Scripts Reference<utilities/scripts_ref>
    scripts_ref/index
+   tests_ref/index
+   Maintenance Scripts<scripts_ref/scripts.maintenance>
 
 
 Miscellaneous

@@ -1,4 +1,4 @@
-Scripts reference
+Scripts Reference
 -----------------
 
 Provided scripts by Pywikibot
