@@ -1723,8 +1723,8 @@ class Subject(interwiki_graph.Subject):
                 page.save(summary=mcomment,
                           asynchronous=self.conf.asynchronous,
                           nocreate=True)
-            except NoCreateError:
-                pywikibot.exception()
+            except NoCreateError as e:
+                pywikibot.error(e)
                 return False
             except LockedPageError:
                 pywikibot.output('Page {} is locked. Skipping.'
@@ -2430,7 +2430,7 @@ def main(*args: str) -> None:
     except KeyboardInterrupt:
         dump.write_dump(bot.dump_titles, append)
     except Exception:
-        pywikibot.exception(tb=bool(config.verbose_output))
+        pywikibot.exception(exc_info=bool(config.verbose_output))
         dump.write_dump(bot.dump_titles, append)
     else:
         pywikibot.output('Script terminated sucessfully.')

@@ -290,25 +290,26 @@ def debug(msg: Any, *args: Any, **kwargs: Any) -> None:
 
 # Note: The logoutput frame must be updated if this decorator is removed
 @deprecated_args(tb='exc_info')  # since 7.2
-def exception(msg: Any = None, *args: Any, **kwargs: Any) -> None:
+def exception(msg: Any = None, *args: Any,
+              exc_info: bool = True, **kwargs: Any) -> None:
     """Output an error traceback to the user with level :const:`ERROR`.
 
     Use directly after an 'except' statement::
 
         ...
         except Exception:
-            pywikibot.exception('exc_info'=True)
+            pywikibot.exception()
         ...
 
     or alternatively::
 
         ...
         except Exception as e:
-            pywikibot.exception(e, 'exc_info'=True)
+            pywikibot.exception(e)
         ...
 
-    Without `exc_info` parameter this function works like :func:`error`
-    except that the `msg` parameter may be omitted.
+    With `exc_info=False` this function works like :func:`error` except
+    that the `msg` parameter may be omitted.
     This function should only be called from an Exception handler.
     ``msg`` will be sent to stderr via :mod:`pywikibot.userinterfaces`.
     The arguments are interpreted as for :func:`logoutput`.
@@ -316,6 +317,8 @@ def exception(msg: Any = None, *args: Any, **kwargs: Any) -> None:
     .. versionchanged:: 7.2
        only keyword arguments are allowed except for `msg`;
        `exc_info` keyword is to be used instead of `tb`.
+    .. versionchanged:: 7.3
+       `exc_info` is True by default
     .. seealso::
        :python:`Logger.exception()
        <library/logging.html#logging.Logger.exception>`
@@ -325,7 +328,7 @@ def exception(msg: Any = None, *args: Any, **kwargs: Any) -> None:
     if msg is None:
         exc_type, value, _tb = sys.exc_info()
         msg = str(value)
-        if not kwargs.get('exc_info', False):
+        if not exc_info:
             msg += ' ({})'.format(exc_type.__name__)
     assert msg is not None
-    error(msg, *args, **kwargs)
+    error(msg, *args, exc_info=exc_info, **kwargs)

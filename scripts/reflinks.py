@@ -510,9 +510,9 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
             pywikibot.output('pdfinfo value error.')
         except OSError:
             pywikibot.output('pdfinfo OS error.')
-        except Exception:  # Ignore errors
+        except Exception as e:  # Ignore errors
             pywikibot.output('PDF processing error.')
-            pywikibot.exception()
+            pywikibot.error(e)
         else:
             for aline in pdfinfo_out.splitlines():
                 if isinstance(aline, bytes):

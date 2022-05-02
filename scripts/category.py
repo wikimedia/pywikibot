@@ -1619,7 +1619,7 @@ def main(*args: str) -> None:
         try:
             bot.run()
         except Error:
-            pywikibot.error('Fatal error:', exc_info=True)
+            pywikibot.exception('Fatal error:')
         finally:
             if cat_db:
                 cat_db.dump()

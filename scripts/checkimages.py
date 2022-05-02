@@ -602,8 +602,8 @@ class CheckImagesBot:
                 pywikibot.output('Edit Conflict! Retrying...')
                 try:
                     self.put_mex_in_talk()
-                except Exception:
-                    pywikibot.exception()
+                except Exception as e:
+                    pywikibot.error(e)
                     pywikibot.output(
                         'Another error... skipping the user...')
 

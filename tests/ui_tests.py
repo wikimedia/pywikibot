@@ -157,7 +157,7 @@ class TestTerminalOutput(UITestCase):
         try:
             raise TestExceptionError('Testing Exception')
         except TestExceptionError:
-            pywikibot.exception('exception')
+            pywikibot.error('exception', exc_info=False)
         self.assertEqual(self.strout.getvalue(), '')
         self.assertEqual(self.strerr.getvalue(),
                          'ERROR: exception\n')
@@ -166,7 +166,7 @@ class TestTerminalOutput(UITestCase):
         try:
             raise TestExceptionError('Testing Exception')
         except TestExceptionError:
-            pywikibot.exception()
+            pywikibot.exception(exc_info=False)
         self.assertEqual(self.strout.getvalue(), '')
         self.assertEqual(self.strerr.getvalue(),
                          'ERROR: Testing Exception (TestExceptionError)\n')
@@ -175,7 +175,7 @@ class TestTerminalOutput(UITestCase):
         try:
             raise TestExceptionError('Testing Exception')
         except TestExceptionError:
-            pywikibot.exception(exc_info=True)
+            pywikibot.exception()
         self.assertEqual(self.strout.getvalue(), '')
         stderrlines = self.strerr.getvalue().split('\n')
         self.assertEqual(stderrlines[0],

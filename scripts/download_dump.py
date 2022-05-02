@@ -164,13 +164,13 @@ class DownloadDumpBot(Bot, ConfigParserBot):
                     replace(file_current_storepath, file_final_storepath)
                     break
 
-            except OSError:
-                pywikibot.exception()
+            except OSError as e:
+                pywikibot.error(e)
 
                 try:
                     remove(file_current_storepath)
-                except OSError:
-                    pywikibot.exception()
+                except OSError as e:
+                    pywikibot.error(e)
 
                 # If the atomic download fails, try without a temporary file
                 # If the non-atomic download also fails, exit the script

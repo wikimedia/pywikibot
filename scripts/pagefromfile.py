@@ -209,8 +209,8 @@ class PageFromFileReader(OptionHandler):
                              encoding=config.textfile_encoding) as f:
                 text = f.read()
 
-        except OSError:
-            pywikibot.exception()
+        except OSError as e:
+            pywikibot.error(e)
             return
 
         position = 0

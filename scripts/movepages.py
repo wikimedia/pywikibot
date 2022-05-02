@@ -86,8 +86,8 @@ class MovePagesBot(CurrentPageBot):
                       movetalk=self.opt.movetalkpage,
                       movesubpages=self.opt.movesubpages,
                       noredirect=self.opt.noredirect)
-        except PageRelatedError:
-            pywikibot.exception()
+        except PageRelatedError as e:
+            pywikibot.error(e)
 
     def skip_page(self, page):
         """Treat only non-redirect pages if 'skipredirects' is set."""

@@ -964,7 +964,7 @@ def handle_args(args: Optional[Iterable[str]] = None,
         try:
             pywikibot.Site()
         except (UnknownFamilyError, UnknownSiteError):
-            pywikibot.exception()
+            pywikibot.exception(exc_info=False)
             sys.exit(1)
 
     if username:
@@ -1516,7 +1516,7 @@ class BaseBot(OptionHandler):
             pywikibot.output('successfully.')
         else:
             pywikibot.output('by exception:\n')
-            pywikibot.exception()
+            pywikibot.exception(exc_info=False)
 
     def init_page(self, item: Any) -> 'pywikibot.page.BasePage':
         """Initialize a generator item before treating.
