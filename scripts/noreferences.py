@@ -233,9 +233,9 @@ placeBeforeSections = {
 }
 
 # Titles of sections where a reference tag would fit into.
-# The first title should be the preferred one: It's the one that
-# will be used when a new section has to be created.
-# Except for the first, others are tested as regexes.
+# The first title should be the preferred one: It's the one that will be
+# used when a new section has to be created. Section titles can be regex
+# patterns except of the first.
 referencesSections = {
     'wikipedia': {
         'ar': [             # not sure about which ones are preferred.
