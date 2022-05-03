@@ -1,6 +1,6 @@
-===============
+***************
 Pywikibot tests
-===============
+***************
 
 The Pywikibot tests are based on the `unittest framework
 <https://docs.python.org/3/library/unittest.html>`_.
@@ -22,8 +22,7 @@ All tests
 
 The entire suite of tests may be run in the following ways from the root directory:
 
-setup.py
-~~~~~~~~
+**setup.py**
 
 ::
 
@@ -31,22 +30,19 @@ setup.py
     pip install pytest-runner
     python setup.py pytest
 
-Module unittest
-~~~~~~~~~~~~~~~
+**Module unittest**
 
 ::
 
     python -m unittest discover -v -p "*_tests.py"
 
-pytest
-~~~~~~
+**pytest**
 
 ::
 
     py.test
 
-tox
-~~~
+**tox**
 
 ::
 
@@ -59,24 +55,21 @@ Individual test components can be run using unittest, pytest or pwb.
 With -lang and -family or -site options pwb can be used to specify a site.
 
 
-unittest
-~~~~~~~~
+**unittest**
 
 ::
 
     python -m unittest -v tests.api_tests tests.site_tests
     python -m unittest -v tests.api_tests.TestParamInfo.test_init
 
-pytest
-~~~~~~
+**pytest**
 
 ::
 
     py.test -s -v tests/api_tests.py tests/site_tests.py
     py.test -s -v tests/api_tests.py::TestParamInfo::test_init
 
-pwb
-~~~
+**pwb**
 
 ::
 
@@ -85,8 +78,7 @@ pwb
     python pwb.py tests/api_tests -v TestParamInfo.test_init
     python pwb.py -lang:de -family:wikipedia tests/page_tests -v TestPageObject
 
-env
-~~~
+**env**
 
 ::
 

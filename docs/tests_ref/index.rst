@@ -1,15 +1,21 @@
-===========
+===============
+Tests Reference
+===============
+
+.. include:: ../../tests/README.rst
+
+***********
 Subpackages
-===========
+***********
 
 .. toctree::
 
     i18n
     pwb
 
-=============
+*************
 Library tests
-=============
+*************
 
     Tests in this project:
 
@@ -18,7 +24,7 @@ Library tests
 
     api<./api_tests>
     aspects
-    basepage<./basepage_tests>
+    basepage
     bot<./bot_tests>
     cache<./cache_tests>
     category<./category_tests>
@@ -33,7 +39,6 @@ Library tests
     edit_failure<./edit_failure_tests>
     edit<./edit_tests>
     eventstreams<./eventstreams_tests>
-    exceptions<./exceptions_tests>
     family<./family_tests>
     file<./file_tests>
     fixes<./fixes_tests>
@@ -46,7 +51,7 @@ Library tests
     interwiki_link<./interwiki_link_tests>
     l10n<./l10n_tests>
     link<./link_tests>
-    logentry<./logentry_tests>
+    logentries<./logentries_tests>
     login<./login_tests>
     mediawikiversion<./mediawikiversion_tests>
     namespace<./namespace_tests>
@@ -56,7 +61,6 @@ Library tests
     paraminfo<./paraminfo_tests>
     plural<./plural_tests>
     proofreadpage<./proofreadpage_tests>
-    python<./python_tests>
     site_detect<./site_detect_tests>
     site<./site_tests>
     sparql<./sparql_tests>
@@ -69,21 +73,19 @@ Library tests
     tk<./tk_tests>
     tools_chars<./tools_chars_tests>
     tools_formatter<./tools_formatter_tests>
-    tools_ip<./tools_ip_tests>
     tools<./tools_tests>
     ui_options<./ui_options_tests>
     ui<./ui_tests>
     user<./user_tests>
     utils
-    weblib<./weblib_tests>
     wikibase_edit<./wikibase_edit_tests>
     wikibase<./wikibase_tests>
     wikistats<./wikistats_tests>
     xmlreader<./xmlreader_tests>
 
-============
+************
 Script tests
-============
+************
 
     Tests in this project:
 
@@ -96,13 +98,10 @@ Script tests
     checkimages<./checkimages_tests>
     data_ingestion<./data_ingestion_tests>
     deletionbot<./deletionbot_tests>
-    disambredir<./disambredir_tests>
     fixing_redirects<./fixing_redirects_tests>
-    generate_family_files<./generate_family_files_tests>
+    generate_family_file<./generate_family_file_tests>
     generate_user_files<./generate_user_files_tests>
-    imagecopy<./imagecopy_tests>
     interwikidata<./interwikidata_tests>
-    isbn<./isbn_tests>
     noreferences<./noreferences_tests>
     patrolbot<./patrolbot_tests>
     protectbot<./protectbot_tests>

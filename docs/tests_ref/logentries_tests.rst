@@ -1,7 +1,7 @@
-tests.exceptions\_tests module
+tests.logentries\_tests module
 ==============================
 
-.. automodule:: tests.exceptions_tests
+.. automodule:: tests.logentries_tests
     :members:
     :undoc-members:
     :show-inheritance:
