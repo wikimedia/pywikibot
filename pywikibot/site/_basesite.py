@@ -22,6 +22,7 @@ from pywikibot.exceptions import (
 from pywikibot.site._namespace import Namespace, NamespacesDict
 from pywikibot.throttle import Throttle
 from pywikibot.tools import (
+    cached,
     ComparableMixin,
     SelfCallString,
     first_upper,
@@ -98,11 +99,10 @@ class BaseSite(ComparableMixin):
         self._locked_pages = set()
 
     @property
+    @cached
     def throttle(self):
         """Return this Site's throttle. Initialize a new one if needed."""
-        if not hasattr(self, '_throttle'):
-            self._throttle = Throttle(self)
-        return self._throttle
+        return Throttle(self)
 
     @property
     def family(self):
@@ -128,36 +128,31 @@ class BaseSite(ComparableMixin):
         return self.__code
 
     @property
-    def doc_subpage(self):
-        """
-        Return the documentation subpage for this Site.
+    @cached
+    def doc_subpage(self) -> tuple:
+        """Return the documentation subpage for this Site."""
+        try:
+            doc, codes = self.family.doc_subpages.get('_default', ((), []))
+            if self.code not in codes:
+                try:
+                    doc = self.family.doc_subpages[self.code]
+                # Language not defined in doc_subpages in x_family.py file
+                # It will use default for the family.
+                # should it just raise an Exception and fail?
+                # this will help to check the dictionary ...
+                except KeyError:
+                    warn('Site {} has no language defined in '
+                         'doc_subpages dict in {}_family.py file'
+                         .format(self, self.family.name),
+                         FamilyMaintenanceWarning, 2)
+        # doc_subpages not defined in x_family.py file
+        except AttributeError:
+            doc = ()  # default
+            warn('Site {} has no doc_subpages dict in {}_family.py file'
+                 .format(self, self.family.name),
+                 FamilyMaintenanceWarning, 2)
 
-        :rtype: tuple
-        """
-        if not hasattr(self, '_doc_subpage'):
-            try:
-                doc, codes = self.family.doc_subpages.get('_default', ((), []))
-                if self.code not in codes:
-                    try:
-                        doc = self.family.doc_subpages[self.code]
-                    # Language not defined in doc_subpages in x_family.py file
-                    # It will use default for the family.
-                    # should it just raise an Exception and fail?
-                    # this will help to check the dictionary ...
-                    except KeyError:
-                        warn('Site {} has no language defined in '
-                             'doc_subpages dict in {}_family.py file'
-                             .format(self, self.family.name),
-                             FamilyMaintenanceWarning, 2)
-            # doc_subpages not defined in x_family.py file
-            except AttributeError:
-                doc = ()  # default
-                warn('Site {} has no doc_subpages dict in {}_family.py file'
-                     .format(self, self.family.name),
-                     FamilyMaintenanceWarning, 2)
-            self._doc_subpage = doc
-
-        return self._doc_subpage
+        return doc
 
     def _cmpkey(self):
         """Perform equality and inequality tests on Site objects."""
@@ -245,11 +240,10 @@ class BaseSite(ComparableMixin):
         return Namespace.builtin_namespaces()
 
     @property
+    @cached
     def namespaces(self):
         """Return dict of valid namespaces on this wiki."""
-        if not hasattr(self, '_namespaces'):
-            self._namespaces = NamespacesDict(self._build_namespaces())
-        return self._namespaces
+        return NamespacesDict(self._build_namespaces())
 
     def ns_normalize(self, value):
         """

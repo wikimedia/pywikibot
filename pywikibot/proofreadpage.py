@@ -50,6 +50,7 @@ from pywikibot.comms import http
 from pywikibot.data.api import Request
 from pywikibot.exceptions import Error, OtherPageSaveError
 from pywikibot.page import PageSourceType
+from pywikibot.tools import cached
 
 
 try:
@@ -557,6 +558,7 @@ class ProofreadPage(pywikibot.Page):
         return '/* {0.status} */ '.format(self)
 
     @property
+    @cached
     def url_image(self) -> str:
         """Get the file url of the scan of ProofreadPage.
 
@@ -567,35 +569,33 @@ class ProofreadPage(pywikibot.Page):
         :raises ValueError: in case of no prp_page_image src found for scan
         """
         # wrong link fails with various possible Exceptions.
-        if not hasattr(self, '_url_image'):
+        if self.exists():
+            url = self.full_url()
+        else:
+            path = 'w/index.php?title={}&action=edit&redlink=1'
+            url = self.site.base_url(path.format(self.title(as_url=True)))
 
-            if self.exists():
-                url = self.full_url()
-            else:
-                path = 'w/index.php?title={}&action=edit&redlink=1'
-                url = self.site.base_url(path.format(self.title(as_url=True)))
+        try:
+            response = http.fetch(url, charset='utf-8')
+        except Exception:
+            pywikibot.error('Error fetching HTML for {}.'.format(self))
+            raise
 
-            try:
-                response = http.fetch(url, charset='utf-8')
-            except Exception:
-                pywikibot.error('Error fetching HTML for {}.'.format(self))
-                raise
+        soup = _bs4_soup(response.text)  # type: ignore
 
-            soup = _bs4_soup(response.text)  # type: ignore
+        try:
+            url_image = soup.find(class_='prp-page-image')
+            # if None raises AttributeError
+            url_image = url_image.find('img')
+            # if None raises TypeError.
+            url_image = url_image['src']
+        except (TypeError, AttributeError):
+            raise ValueError('No prp-page-image src found for {}.'
+                             .format(self))
+        else:
+            url_image = 'https:' + url_image
 
-            try:
-                self._url_image = soup.find(class_='prp-page-image')
-                # if None raises AttributeError
-                self._url_image = self._url_image.find('img')
-                # if None raises TypeError.
-                self._url_image = self._url_image['src']
-            except (TypeError, AttributeError):
-                raise ValueError('No prp-page-image src found for {}.'
-                                 .format(self))
-            else:
-                self._url_image = 'https:' + self._url_image
-
-        return self._url_image
+        return url_image
 
     def _ocr_callback(self, cmd_uri: str,
                       parser_func: Optional[Callable[[str], str]] = None,

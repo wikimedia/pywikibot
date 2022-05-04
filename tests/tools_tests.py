@@ -17,6 +17,7 @@ from unittest import mock
 
 from pywikibot import tools
 from pywikibot.tools import (
+    cached,
     classproperty,
     has_module,
     intersect_generators,
@@ -922,6 +923,112 @@ class TestStringFunctions(TestCase):
                 self.assertFalse(tools.strtobool(string))
         with self.assertRaises(ValueError):
             tools.strtobool('okay')
+
+
+class DecoratedMethods:
+
+    """Test class to verify cached decorator."""
+
+    def __init__(self):
+        """Initializer, reset read counter."""
+        self.read = 0
+
+    @cached
+    def foo(self):
+        """A method."""
+        self.read += 1
+        return 'foo'
+
+    @property
+    @cached
+    def bar(self):
+        """A property."""
+        self.read += 1
+        return 'bar'
+
+    def baz(self):
+        """An undecorated method."""
+        self.read += 1
+        return 'baz'
+
+    @cached
+    def quux(self, force=False):
+        """Method with force."""
+        self.read += 1
+        return 'quux'
+
+    @cached
+    def method_with_args(self, *args, **kwargs):
+        """Method with force."""
+        self.read += 1
+        return 'method_with_args'
+
+
+class TestTinyCache(TestCase):
+
+    """Test cached decorator."""
+
+    net = False
+
+    def setUp(self):
+        """Setup tests."""
+        self.foo = DecoratedMethods()
+        super().setUp()
+
+    def test_cached(self):
+        """Test for cached decorator."""
+        self.assertEqual(self.foo.foo(), 'foo')  # check computed value
+        self.assertEqual(self.foo.read, 1)
+        self.assertTrue(hasattr(self.foo, '_foo'))
+        self.assertEqual(self.foo.foo(), 'foo')  # check cached value
+        self.assertEqual(self.foo.read, 1)  # bar() was called only once
+        del self.foo._foo
+        self.assertFalse(hasattr(self.foo, '_foo'))
+        self.assertEqual(self.foo.foo(), 'foo')  # check computed value
+        self.assertEqual(self.foo.__doc__,
+                         'Test class to verify cached decorator.')
+        self.assertEqual(self.foo.foo.__doc__, 'A method.')
+
+    def test_cached_property(self):
+        """Test for cached property decorator."""
+        self.assertEqual(self.foo.bar, 'bar')
+        self.assertEqual(self.foo.read, 1)
+        self.assertTrue(hasattr(self.foo, '_bar'))
+        self.assertEqual(self.foo.bar, 'bar')
+        self.assertEqual(self.foo.read, 1)
+
+    def test_cached_with_paramters(self):
+        """Test for cached decorator with parameters."""
+        msg = '"cached" decorator must be used without arguments'
+        with self.assertRaisesRegex(TypeError, msg):
+            cached(42)(self.foo.baz())
+        with self.assertRaisesRegex(TypeError, msg):
+            cached()(self.foo.baz())
+
+    def test_cached_with_force(self):
+        """Test for cached decorator with force enabled."""
+        self.assertEqual(self.foo.quux(), 'quux')
+        self.assertEqual(self.foo.read, 1)
+        self.assertTrue(hasattr(self.foo, '_quux'))
+        self.assertEqual(self.foo.quux(force=True), 'quux')
+        self.assertEqual(self.foo.read, 2)
+
+    def test_cached_with_argse(self):
+        """Test method with args."""
+        self.assertEqual(self.foo.method_with_args(force=False),
+                         'method_with_args')
+        self.assertEqual(self.foo.read, 1)
+        self.assertTrue(hasattr(self.foo, '_method_with_args'))
+        with self.assertRaises(TypeError):
+            self.foo.method_with_args(True)
+        with self.assertRaises(TypeError):
+            self.foo.method_with_args(bar='baz')
+        with self.assertRaises(TypeError):
+            self.foo.method_with_args(1, 2, foo='bar')
+        self.assertEqual(self.foo.method_with_args(force=True),
+                         'method_with_args')
+        self.assertEqual(self.foo.method_with_args(), 'method_with_args')
+        self.assertEqual(self.foo.read, 2)
 
 
 if __name__ == '__main__':  # pragma: no cover
