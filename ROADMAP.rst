@@ -1,6 +1,12 @@
 Current release 7.3.0
 ^^^^^^^^^^^^^^^^^^^^^
 
+* Preserve more workers than families are handled for preload_sites.py
+* Close logging handlers before deleting them (:phab:`T91375`, :phab:`T286127`)
+* Clear _sites cache if called with pwb wrapper (:phab:`T225594`)
+* Enable short creation of a site if family name is equal to site code
+* Use `exc_info=True` with pywikibot.exception() by default (:phab:`T306762`)
+* Make IndexPage more robust when getting links in Page ns (:phab:`T307280`)
 * Do not print log header twice in log files (:phab:`T264235`)
 * Do not delegate logging output to the root logger (:phab:`T281643`)
 * Add `get_charset_from_content_type` to extract the charset from the content-type response header
