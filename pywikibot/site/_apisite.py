@@ -69,6 +69,7 @@ from pywikibot.site._siteinfo import Siteinfo
 from pywikibot.site._tokenwallet import TokenWallet
 from pywikibot.site._upload import Uploader
 from pywikibot.tools import (
+    cached,
     MediaWikiVersion,
     deprecated,
     merge_unique_dicts,
@@ -670,6 +671,47 @@ class APISite(
         path = self.siteinfo['general']['articlepath']
         assert '$1' in path, 'articlepath must contain "$1" placeholder'
         return path.replace('$1', '{}')
+
+    @cached
+    def linktrail(self) -> str:
+        """Build linktrail regex from siteinfo linktrail.
+
+        Letters that can follow a wikilink and are regarded as part of
+        this link. This depends on the linktrail setting in LanguageXx.php
+
+        .. versionadded:: 7.3
+
+        :return: The linktrail regex.
+        """
+        unresolved_linktrails = {
+            'br': '(?:[a-zA-ZàâçéèêîôûäëïöüùñÇÉÂÊÎÔÛÄËÏÖÜÀÈÙÑ]'
+                  "|[cC]['’]h|C['’]H)*",
+            'ca': "(?:[a-zàèéíòóúç·ïü]|'(?!'))*",
+            'kaa': "(?:[a-zıʼ’“»]|'(?!'))*",
+        }
+        linktrail = self.siteinfo['general']['linktrail']
+        if linktrail == '/^()(.*)$/sD':  # empty linktrail
+            return ''
+
+        match = re.search(r'\((?:\:\?|\?\:)?\[(?P<pattern>.+?)\]'
+                          r'(?P<letters>(\|.)*)\)?\+\)', linktrail)
+        if not match:
+            with suppress(KeyError):
+                return unresolved_linktrails[self.code]
+            raise KeyError(
+                '"{}": No linktrail pattern extracted from "{}"'
+                .format(self.code, linktrail))
+
+        pattern = match.group('pattern')
+        letters = match.group('letters')
+
+        if r'x{' in pattern:
+            pattern = re.sub(r'\\x\{([A-F0-9]{4})\}',
+                             lambda match: chr(int(match.group(1), 16)),
+                             pattern)
+        if letters:
+            pattern += ''.join(letters.split('|'))
+        return '[{}]*'.format(pattern)
 
     @staticmethod
     def assert_valid_iter_params(

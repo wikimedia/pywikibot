@@ -43,7 +43,7 @@ from urllib.parse import urlparse
 # Legal characters for Family name and Family langs keys
 NAME_CHARACTERS = string.ascii_letters + string.digits
 # nds_nl code alias requires "_"n
-# dash must be the last char to be reused as regex in update_linktrails
+# dash must be the last char to be reused as regex
 CODE_CHARACTERS = string.ascii_lowercase + string.digits + '_-'
 
 
