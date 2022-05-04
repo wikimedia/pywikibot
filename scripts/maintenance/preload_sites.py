@@ -16,18 +16,21 @@ To force preloading, change the global expiry value to 0:
 
 """
 #
-# (C) Pywikibot team, 2022
+# (C) Pywikibot team, 2021-2022
 #
 # Distributed under the terms of the MIT license.
 #
+import os
 from concurrent.futures import ThreadPoolExecutor, wait
 from datetime import datetime
+from typing import Optional, Union
 
 import pywikibot
+from pywikibot.backports import List, Set
 from pywikibot.family import Family
 
 
-# supported families by this script
+#: supported families by this script
 families_list = [
     'wikibooks',
     'wikinews',
@@ -43,7 +46,7 @@ exceptions = {
 }
 
 
-def preload_family(family, executor):
+def preload_family(family: str, executor: ThreadPoolExecutor) -> None:
     """Preload all sites of a single family file."""
     msg = 'Preloading sites of {} family{}'
     pywikibot.output(msg.format(family, '...'))
@@ -64,9 +67,21 @@ def preload_family(family, executor):
     pywikibot.output(msg.format(family, ' completed.'))
 
 
-def preload_families(families, worker):
-    """Preload all sites of all given family files."""
+def preload_families(families: Union[List[str], Set[str]],
+                     worker: Optional[int]) -> None:
+    """Preload all sites of all given family files.
+
+    .. versionchanged:: 7.3
+       Default of worker is calculated like for Python 3.8 but preserves
+       at least one worker more than families_list elements to ensure a
+       worker can be added in :func:`preload_family`.
+    """
     start = datetime.now()
+    if worker is None:
+        # Python 3.8 default
+        worker = min(32, (os.cpu_count() or 1) + 4)
+    # allow to add futures in preload_family
+    worker = max(len(families) + 1, worker)
     with ThreadPoolExecutor(worker) as executor:
         futures = {executor.submit(preload_family, family, executor)
                    for family in families}
