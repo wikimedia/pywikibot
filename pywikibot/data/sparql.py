@@ -49,7 +49,7 @@ class SparqlQuery:
         """
         # default to Wikidata
         if not repo and not endpoint:
-            repo = Site('wikidata', 'wikidata')
+            repo = Site('wikidata')
 
         if repo:
             try:

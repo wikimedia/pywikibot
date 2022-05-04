@@ -57,7 +57,7 @@ class IllustrateRobot(WikidataBot):
             return
 
         newclaim = pywikibot.Claim(self.repo, self.wdproperty)
-        commonssite = pywikibot.Site('commons', 'commons')
+        commonssite = pywikibot.Site('commons')
         imagelink = pywikibot.Link(imagename, source=commonssite,
                                    default_namespace=6)
         image = pywikibot.FilePage(imagelink)

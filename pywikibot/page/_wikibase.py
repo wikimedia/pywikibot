@@ -1304,7 +1304,7 @@ class Claim(Property):
         'wikibase-form': lambda value, site: LexemeForm(site, value['id']),
         'wikibase-sense': lambda value, site: LexemeSense(site, value['id']),
         'commonsMedia': lambda value, site:
-            FilePage(pywikibot.Site('commons', 'commons'), value),  # T90492
+            FilePage(pywikibot.Site('commons'), value),  # T90492
         'globe-coordinate': pywikibot.Coordinate.fromWikibase,
         'geo-shape': pywikibot.WbGeoShape.fromWikibase,
         'tabular-data': pywikibot.WbTabularData.fromWikibase,
@@ -1882,7 +1882,7 @@ class LexemePage(WikibasePage):
     Basic usage sample:
 
     >>> import pywikibot
-    >>> repo = pywikibot.Site('wikidata:wikidata')
+    >>> repo = pywikibot.Site('wikidata')
     >>> L2 = pywikibot.LexemePage(repo, 'L2')  # create a Lexeme page
     >>> list(L2.claims.keys())  # access the claims
     ['P5831', 'P5402']

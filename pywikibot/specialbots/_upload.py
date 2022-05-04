@@ -113,7 +113,7 @@ class UploadRobot(BaseBot):
         self.force_if_shared = force_if_shared
 
         if config.upload_to_commons:
-            default_site = pywikibot.Site('commons:commons')
+            default_site = pywikibot.Site('commons')
         else:
             default_site = pywikibot.Site()
         self.target_site = target_site or default_site

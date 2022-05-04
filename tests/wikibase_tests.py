@@ -640,7 +640,7 @@ class TestWbGeoShapeNonDry(WbRepresentationTestCase):
 
     def setUp(self):
         """Setup tests."""
-        self.commons = pywikibot.Site('commons', 'commons')
+        self.commons = pywikibot.Site('commons')
         self.page = Page(self.commons, 'Data:Lyngby Hovedgade.map')
         super().setUp()
 
@@ -716,7 +716,7 @@ class TestWbTabularDataNonDry(WbRepresentationTestCase):
 
     def setUp(self):
         """Setup tests."""
-        self.commons = pywikibot.Site('commons', 'commons')
+        self.commons = pywikibot.Site('commons')
         self.page = Page(self.commons, 'Data:Bea.gov/GDP by state.tab')
         super().setUp()
 

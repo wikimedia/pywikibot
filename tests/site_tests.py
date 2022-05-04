@@ -3346,7 +3346,7 @@ class TestSubdomainFamilySite(TestCase):
         with self.assertRaises(KeyError):
             site.family.hostname('wowwiki')
         with self.assertRaises(UnknownSiteError):
-            pywikibot.Site('wowwiki', 'wowwiki')
+            pywikibot.Site('wowwiki')
         with self.assertRaises(UnknownSiteError):
             pywikibot.Site('ceb', 'wowwiki')
 

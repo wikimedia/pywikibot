@@ -1113,7 +1113,7 @@ def Site(code: Optional[str] = None,
 
     Override default family::
 
-        site = pywikibot.Site(family='wikisource')
+        site = pywikibot.Site(fam='wikisource')
 
     Setting a specific site::
 
@@ -1139,6 +1139,10 @@ def Site(code: Optional[str] = None,
 
     **Never create a site object via interface class directly.**
     Always use this factory method.
+
+    .. versionchanged:: 7.3
+       Short creation if site code is equal to family name like
+       `Site('commons')`, `Site('meta')` or `Site('wikidata')`.
 
     :param code: language code (override config.mylang)
         code may also be a sitename like 'wikipedia:test'
@@ -1167,6 +1171,9 @@ def Site(code: Optional[str] = None,
                 'should be provided')
         fam, _, code = code.partition(':')
     else:
+        if not fam:  # try code as family
+            with suppress(exceptions.UnknownFamilyError):
+                fam = Family.load(code)
         # Fallback to config defaults
         code = code or _config.mylang
         fam = fam or _config.family

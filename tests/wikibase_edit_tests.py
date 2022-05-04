@@ -349,7 +349,7 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
 
         # set new claim
         claim = pywikibot.page.Claim(testsite, 'P27199', datatype='geo-shape')
-        commons_site = pywikibot.Site('commons', 'commons')
+        commons_site = pywikibot.Site('commons')
         page = pywikibot.Page(commons_site, 'Data:Lyngby Hovedgade.map')
         target = pywikibot.WbGeoShape(page)
         claim.setTarget(target)
@@ -369,7 +369,7 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         # set new claim
         claim = pywikibot.page.Claim(
             testsite, 'P30175', datatype='tabular-data')
-        commons_site = pywikibot.Site('commons', 'commons')
+        commons_site = pywikibot.Site('commons')
         page = pywikibot.Page(commons_site, 'Data:Bea.gov/GDP by state.tab')
         target = pywikibot.WbGeoShape(page)
         claim.setTarget(target)
