@@ -12,6 +12,7 @@ from typing import Any, Optional, Type, Union
 import pywikibot
 from pywikibot.backports import Dict, List, Tuple
 from pywikibot.exceptions import Error, HiddenKeyError
+from pywikibot.tools import cached
 
 
 class LogEntry(UserDict):
@@ -100,22 +101,19 @@ class LogEntry(UserDict):
             return self[self._expected_type]  # old behaviour
         return self.get('params', {})
 
+    @cached
     def page(self) -> Union[int, 'pywikibot.page.Page']:
         """
         Page on which action was performed.
 
         :return: page on action was performed
         """
-        if not hasattr(self, '_page'):
-            self._page = pywikibot.Page(self.site, self['title'])
-        return self._page
+        return pywikibot.Page(self.site, self['title'])
 
+    @cached
     def timestamp(self) -> 'pywikibot.Timestamp':
         """Timestamp object corresponding to event timestamp."""
-        if not hasattr(self, '_timestamp'):
-            self._timestamp = pywikibot.Timestamp.fromISOformat(
-                self['timestamp'])
-        return self._timestamp
+        return pywikibot.Timestamp.fromISOformat(self['timestamp'])
 
 
 class OtherLogEntry(LogEntry):
@@ -127,6 +125,7 @@ class UserTargetLogEntry(LogEntry):
 
     """A log entry whose target is a user page."""
 
+    @cached
     def page(self) -> 'pywikibot.page.User':
         """Return the target user.
 
@@ -135,9 +134,7 @@ class UserTargetLogEntry(LogEntry):
 
         :return: target user
         """
-        if not hasattr(self, '_page'):
-            self._page = pywikibot.User(self.site, self['title'])
-        return self._page
+        return pywikibot.User(self.site, self['title'])
 
 
 class BlockEntry(LogEntry):
@@ -176,6 +173,7 @@ class BlockEntry(LogEntry):
 
         return super().page()
 
+    @cached
     def flags(self) -> List[str]:
         """
         Return a list of (str) flags associated with the block entry.
@@ -186,36 +184,29 @@ class BlockEntry(LogEntry):
         """
         if self.action() == 'unblock':
             return []
-        if not hasattr(self, '_flags'):
-            self._flags = self._params.get('flags', [])
-            # pre mw 1.25 returned a delimited string.
-            if isinstance(self._flags, str):
-                self._flags = self._flags.split(',') if self._flags else []
-        return self._flags
 
+        flags = self._params.get('flags', [])
+        # pre mw 1.25 returned a delimited string.
+        if isinstance(flags, str):
+            flags = flags.split(',') if flags else []
+        return flags
+
+    @cached
     def duration(self) -> Optional[datetime.timedelta]:
         """
         Return a datetime.timedelta representing the block duration.
 
         :return: datetime.timedelta, or None if block is indefinite.
         """
-        if not hasattr(self, '_duration'):
-            if self.expiry() is None:
-                self._duration = None
-            else:
-                # Doing the difference is easier than parsing the string
-                self._duration = self.expiry() - self.timestamp()
-        return self._duration
+        # Doing the difference is easier than parsing the string
+        return (self.expiry() - self.timestamp()
+                if self.expiry() is not None else None)
 
+    @cached
     def expiry(self) -> Optional['pywikibot.Timestamp']:
         """Return a Timestamp representing the block expiry date."""
-        if not hasattr(self, '_expiry'):
-            details = self._params.get('expiry')
-            if details:
-                self._expiry = pywikibot.Timestamp.fromISOformat(details)
-            else:
-                self._expiry = None  # for infinite blocks
-        return self._expiry
+        details = self._params.get('expiry')
+        return pywikibot.Timestamp.fromISOformat(details) if details else None
 
 
 class RightsEntry(LogEntry):
@@ -249,11 +240,10 @@ class UploadEntry(LogEntry):
 
     _expected_type = 'upload'
 
+    @cached
     def page(self) -> 'pywikibot.page.FilePage':
         """Return FilePage on which action was performed."""
-        if not hasattr(self, '_page'):
-            self._page = pywikibot.FilePage(self.site, self['title'])
-        return self._page
+        return pywikibot.FilePage(self.site, self['title'])
 
 
 class MoveEntry(LogEntry):
@@ -279,11 +269,10 @@ class MoveEntry(LogEntry):
                 else self._params['new_title'])
 
     @property
+    @cached
     def target_page(self) -> 'pywikibot.page.Page':
         """Return target page object."""
-        if not hasattr(self, '_target_page'):
-            self._target_page = pywikibot.Page(self.site, self.target_title)
-        return self._target_page
+        return pywikibot.Page(self.site, self.target_title)
 
     def suppressedredirect(self) -> bool:
         """Return True if no redirect was created during the move."""

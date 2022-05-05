@@ -46,6 +46,7 @@ from pywikibot.page._decorators import allow_asynchronous
 from pywikibot.page._filepage import FilePage
 from pywikibot.page._pages import BasePage
 from pywikibot.site import DataSite, Namespace
+from pywikibot.tools import cached
 
 
 __all__ = (
@@ -1167,11 +1168,10 @@ class Property:
             self._type = datatype
 
     @property
+    @cached
     def type(self) -> str:
         """Return the type of this property."""
-        if not hasattr(self, '_type'):
-            self._type = self.repo.getPropertyType(self)
-        return self._type
+        return self.repo.getPropertyType(self)
 
     def getID(self, numeric: bool = False):
         """

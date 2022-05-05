@@ -18,6 +18,7 @@ from pywikibot.exceptions import (
     UnknownExtensionError,
 )
 from pywikibot.page import BasePage, PageSourceType, User
+from pywikibot.tools import cached
 
 
 logger = logging.getLogger('pywiki.wiki.flow')
@@ -55,14 +56,13 @@ class FlowPage(BasePage, abc.ABC):
         raise NotImplementedError
 
     @property
+    @cached
     def uuid(self) -> str:
         """Return the UUID of the page.
 
         :return: UUID of the page
         """
-        if not hasattr(self, '_uuid'):
-            self._uuid = self._load()['workflowId']
-        return self._uuid
+        return self._load()['workflowId']
 
     def get(self, force: bool = False, get_redirect: bool = False
             ) -> Dict[str, Any]:

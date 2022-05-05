@@ -24,6 +24,7 @@ from requests.packages.urllib3.exceptions import ProtocolError
 from requests.packages.urllib3.util.response import httplib
 
 from pywikibot import Site, Timestamp, config, debug, warning
+from pywikibot.tools import cached
 
 
 try:
@@ -137,23 +138,20 @@ class EventStreams:
             '{}={!r}'.format(k, v) for k, v in kwargs.items()))
 
     @property
+    @cached
     def url(self):
         """Get the EventStream's url.
 
         :raises NotImplementedError: no stream types specified
         """
-        if not hasattr(self, '_url'):
-            if self._streams is None:
-                raise NotImplementedError(
-                    'No streams specified for class {}'
-                    .format(self.__class__.__name__))
-            self._url = ('{host}{path}/{streams}{since}'
-                         .format(host=self._site.eventstreams_host(),
-                                 path=self._site.eventstreams_path(),
-                                 streams=self._streams,
-                                 since=('?since={}'.format(self._since)
-                                        if self._since else '')))
-        return self._url
+        if self._streams is None:
+            raise NotImplementedError('No streams specified for class {}'
+                                      .format(self.__class__.__name__))
+        return '{host}{path}/{streams}{since}'.format(
+            host=self._site.eventstreams_host(),
+            path=self._site.eventstreams_path(),
+            streams=self._streams,
+            since='?since={}'.format(self._since) if self._since else '')
 
     def set_maximum_items(self, value: int) -> None:
         """

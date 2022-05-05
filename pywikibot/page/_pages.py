@@ -51,6 +51,7 @@ from pywikibot.page._decorators import allow_asynchronous
 from pywikibot.page._links import BaseLink, Link
 from pywikibot.site import Namespace, NamespaceArgType
 from pywikibot.tools import (
+    cached,
     ComparableMixin,
     first_upper,
     issue_deprecation_warning,
@@ -191,17 +192,14 @@ class BasePage(ComparableMixin):
         return self._contentmodel
 
     @property
-    def depth(self):
-        """Return the depth/subpage level of the page."""
-        if not hasattr(self, '_depth'):
-            # Check if the namespace allows subpages
-            if self.namespace().subpages:
-                self._depth = self.title().count('/')
-            else:
-                # Does not allow subpages, which means depth is always 0
-                self._depth = 0
+    @cached
+    def depth(self) -> int:
+        """Return the depth/subpage level of the page.
 
-        return self._depth
+        Check if the namespace allows subpages.
+        Not allowed subpages means depth is always 0.
+        """
+        return self.title().count('/') if self.namespace().subpages else 0
 
     @property
     def pageid(self) -> int:
@@ -357,6 +355,7 @@ class BasePage(ComparableMixin):
         return self.site.base_url(
             self.site.articlepath.format(self.title(as_url=True)))
 
+    @cached
     def autoFormat(self):
         """
         Return :py:obj:`date.getAutoFormat` dictName and value, if any.
@@ -367,12 +366,7 @@ class BasePage(ComparableMixin):
         different namespaces, as some sites have categories with the
         same names. Regular titles return (None, None).
         """
-        if not hasattr(self, '_autoFormat'):
-            self._autoFormat = date.getAutoFormat(
-                self.site.lang,
-                self.title(with_ns=False)
-            )
-        return self._autoFormat
+        return date.getAutoFormat(self.site.lang, self.title(with_ns=False))
 
     def isAutoTitle(self):
         """Return True if title of this Page is in the autoFormat dict."""
@@ -706,6 +700,7 @@ class BasePage(ComparableMixin):
         """Return True if last editor was unregistered."""
         return self.latest_revision.anon
 
+    @cached
     def lastNonBotUser(self) -> str:
         """
         Return name or IP address of last human/non-bot user to edit page.
@@ -717,16 +712,11 @@ class BasePage(ComparableMixin):
         i.e. which is not returned by Site.botusers(), it will be returned
         as a non-bot edit.
         """
-        if hasattr(self, '_lastNonBotUser'):
-            return self._lastNonBotUser
-
-        self._lastNonBotUser = None
         for entry in self.revisions():
             if entry.user and (not self.site.isBot(entry.user)):
-                self._lastNonBotUser = entry.user
-                break
+                return entry.user
 
-        return self._lastNonBotUser
+        return None
 
     def editTime(self) -> pywikibot.Timestamp:
         """Return timestamp of last revision to page."""
@@ -2146,6 +2136,7 @@ class Page(BasePage):
         super().__init__(source, title, ns)
 
     @property
+    @cached
     def raw_extracted_templates(self):
         """
         Extract templates using :py:obj:`textlib.extract_templates_and_params`.
@@ -2153,16 +2144,9 @@ class Page(BasePage):
         Disabled parts and whitespace are stripped, except for
         whitespace in anonymous positional arguments.
 
-        This value is cached.
-
         :rtype: list of (str, OrderedDict)
         """
-        if not hasattr(self, '_raw_extracted_templates'):
-            templates = textlib.extract_templates_and_params(
-                self.text, True, True)
-            self._raw_extracted_templates = templates
-
-        return self._raw_extracted_templates
+        return textlib.extract_templates_and_params(self.text, True, True)
 
     def templatesWithParams(self):
         """
