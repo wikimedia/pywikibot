@@ -235,6 +235,9 @@ def weblinks_from_text(
     """
     Yield web links from text.
 
+    Only used as text predicate for XmlDumpPageGenerator to speed up
+    generator.
+
     TODO: move to textlib
     """
     text = textlib.removeDisabledParts(text)
@@ -568,6 +571,8 @@ class WeblinkCheckerRobot(SingleSiteBot, ExistingPageBot):
     It uses several LinkCheckThreads at once to process pages from generator.
     """
 
+    use_redirects = False
+
     def __init__(self, http_ignores=None, day: int = 7, **kwargs) -> None:
         """Initializer."""
         super().__init__(**kwargs)
@@ -589,7 +594,7 @@ class WeblinkCheckerRobot(SingleSiteBot, ExistingPageBot):
     def treat_page(self) -> None:
         """Process one page."""
         page = self.current_page
-        for url in weblinks_from_text(page.text):
+        for url in page.extlinks():
             for ignore_regex in ignorelist:
                 if ignore_regex.match(url):
                     break
@@ -679,12 +684,6 @@ def main(*args: str) -> None:
     if not gen:
         gen = gen_factory.getCombinedGenerator()
     if gen:
-        if not gen_factory.nopreload:
-            # fetch at least 240 pages simultaneously from the wiki, but more
-            # if a high thread number is set.
-            num_pages = max(240, config.max_external_links * 2)
-            gen = pagegenerators.PreloadingGenerator(gen, groupsize=num_pages)
-        gen = pagegenerators.RedirectFilterPageGenerator(gen)
         bot = WeblinkCheckerRobot(http_ignores, config.weblink_dead_days,
                                   generator=gen)
         try:
