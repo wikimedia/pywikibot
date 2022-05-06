@@ -477,6 +477,14 @@ class CharsetTestCase(TestCase):
                                                 resp.apparent_encoding,
                                                 errors='replace'))
 
+    def test_get_charset_from_content_type(self):
+        """Test get_charset_from_content_type function."""
+        self.assertEqual(
+            http.get_charset_from_content_type('charset="cp-1251"'), 'cp1251')
+        self.assertEqual(
+            http.get_charset_from_content_type('charset="ru-win1251"'),
+            'cp1251')
+
 
 class BinaryTestCase(TestCase):
 
