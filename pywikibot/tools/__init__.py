@@ -809,16 +809,6 @@ class ThreadList(list):
         pywikibot.logging.debug("thread {} ('{}') started"
                                 .format(len(self), type(thd)))
 
-    def stop_all(self) -> None:
-        """Stop all threads the pool."""
-        if self:
-            pywikibot.logging.debug('EARLY QUIT: Threads: {}'
-                                    .format(len(self)))
-        for thd in self:
-            thd.stop()
-            pywikibot.logging.debug('EARLY QUIT: Queue size left in {}: {}'
-                                    .format(thd, thd.queue.qsize()))
-
 
 def intersect_generators(*iterables, allow_duplicates: bool = False):
     """Generator of intersect iterables.
