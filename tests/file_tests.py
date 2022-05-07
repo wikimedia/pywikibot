@@ -106,24 +106,24 @@ class TestShareFiles(TestCase):
                 page_doesnt_exist_exc_regex):
             commons_file.get()
 
-    def testOnBoth(self):
+    def test_on_both(self):
         """Test file_is_shared() on file page with local and shared file."""
-        title = 'File:Pulsante spam.png'
+        title = 'Pywikibot MW gear icon.svg'
 
         commons = self.get_site('commons')
-        itwp = self.get_site('itwiki')
-        itwp_file = pywikibot.FilePage(itwp, title)
-        for using in itwp_file.usingPages():
+        testwp = self.get_site('testwiki')
+        testwp_file = pywikibot.FilePage(testwp, title)
+        for using in testwp_file.usingPages():
             self.assertIsInstance(using, pywikibot.Page)
 
         commons_file = pywikibot.FilePage(commons, title)
 
-        self.assertTrue(itwp_file.get_file_url())
-        self.assertTrue(itwp_file.exists())
+        self.assertTrue(testwp_file.get_file_url())
+        self.assertTrue(testwp_file.exists())
         self.assertTrue(commons_file.exists())
 
-        self.assertFalse(itwp_file.file_is_shared())
-        self.assertTrue(itwp_file.file_is_used)
+        self.assertFalse(testwp_file.file_is_shared())
+        self.assertTrue(testwp_file.file_is_used)
         self.assertTrue(commons_file.file_is_shared())
         self.assertTrue(commons_file.file_is_used)
 

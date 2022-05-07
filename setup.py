@@ -89,7 +89,7 @@ extra_deps = {
         'flake8-comprehensions>=2.2.0; python_version < "3.8"',
         'flake8-docstrings>=1.3.1',
         'flake8-mock>=0.3',
-        'flake8-print>=2.0.1',
+        'flake8-print>=2.0.1,<5.0.0',
         'flake8-quotes>=2.0.1',
         'flake8-string-format',
         'flake8-tuple>=0.2.8',
