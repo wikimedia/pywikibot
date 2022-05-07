@@ -73,15 +73,18 @@ def preload_families(families: Union[List[str], Set[str]],
 
     .. versionchanged:: 7.3
        Default of worker is calculated like for Python 3.8 but preserves
-       at least one worker more than families_list elements to ensure a
-       worker can be added in :func:`preload_family`.
+       at least one worker for each element in families_list for better
+       performance.
     """
     start = datetime.now()
     if worker is None:
         # Python 3.8 default
         worker = min(32, (os.cpu_count() or 1) + 4)
-    # allow to add futures in preload_family
-    worker = max(len(families) + 1, worker)
+    # to allow adding futures in preload_family the workers must be one
+    # more than families are handled
+    worker = max(len(families) * 2, worker)
+    pywikibot.output('Using {} workers to process {} families'
+                     .format(worker, len(families)))
     with ThreadPoolExecutor(worker) as executor:
         futures = {executor.submit(preload_family, family, executor)
                    for family in families}
