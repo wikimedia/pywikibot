@@ -61,6 +61,8 @@ class TouchBot(MultipleSitesBot):
                             .format(page.title(as_link=True)))
         except PageSaveRelatedError as e:
             pywikibot.error('Page {} not saved:\n{}'.format(page, e.args))
+        else:
+            self.counter['touch'] += 1
 
 
 class PurgeBot(MultipleSitesBot):
@@ -76,9 +78,11 @@ class PurgeBot(MultipleSitesBot):
 
     def treat(self, page) -> None:
         """Purge the given page."""
+        done = page.purge(**self.opt)
+        if done:
+            self.counter['purge'] += 1
         pywikibot.output('Page {}{} purged'
-                         .format(page,
-                                 '' if page.purge(**self.opt) else ' not'))
+                         .format(page, '' if done else ' not'))
 
 
 def main(*args: str) -> None:
