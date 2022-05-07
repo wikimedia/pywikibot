@@ -197,7 +197,7 @@ def main(*args: str) -> None:
 
     for arg in local_args:
         opt, _, value = arg.partition(':')
-        if opt.startswith('-'):
+        if not opt.startswith('-'):
             continue
         opt = opt[1:]
         if opt == 'pairsfile':
