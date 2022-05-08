@@ -648,6 +648,9 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
 
     def skip_page(self, page):
         """Check whether treat should be skipped for the page."""
+        if super().skip_page(page):
+            return True
+
         if self.isTitleExcepted(page.title()):
             pywikibot.warning(
                 'Skipping {} because the title is on the exceptions list.'
@@ -658,7 +661,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             pywikibot.warning("You can't edit page {}".format(page))
             return True
 
-        return super().skip_page(page)
+        return False
 
     def treat(self, page) -> None:
         """Work on each page retrieved from generator."""
