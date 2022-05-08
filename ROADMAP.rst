@@ -1,7 +1,11 @@
 Current release 7.3.0
 ^^^^^^^^^^^^^^^^^^^^^
 
-* Preserve more workers than families are handled for preload_sites.py
+* Remove `ThreadList.stop_all()` method (:phab:`T307830`)
+* L10N updates
+* Improve get_charset_from_content_type function (:phab:`T307760`)
+* A tiny cache wrapper was added to hold results of parameterless methods and properties
+* Increase workers in preload_sites.py
 * Close logging handlers before deleting them (:phab:`T91375`, :phab:`T286127`)
 * Clear _sites cache if called with pwb wrapper (:phab:`T225594`)
 * Enable short creation of a site if family name is equal to site code

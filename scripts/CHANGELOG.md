@@ -3,6 +3,17 @@
 ## 7.3.0
 *In development*
 
+### weblinkchecker
+* Do not kill threads after generator is exhausted (:phab:`T113139`)
+* Use Page.extlinks() to get external links (:phab:`T60812`)
+
+
+## 7.2.1
+*07 May 2022**
+
+### movepages
+* Fix regression of option parsing (:phab:`T307826`)
+
 
 ## 7.2.0
 *26 April 2022*
@@ -33,6 +44,13 @@
 
 ### replace
 * A -quiet option was added to omit message when no change was made
+
+
+## 7.1.1
+*15 April 2022*
+
+### replace
+* Fix regression of XmlDumpPageGenerator
 
 
 ## 7.1.0
