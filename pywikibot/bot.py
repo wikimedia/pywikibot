@@ -1996,7 +1996,8 @@ class RedirectPageBot(CurrentPageBot):
     """A RedirectPageBot class which only treats redirects.
 
     .. deprecated:: 7.2
-       use BaseBot attribute 'use_redirects = True' instead
+       use BaseBot attribute
+       :attr:`use_redirects  = True<BaseBot.use_redirects>` instead
     """
 
     def __init__(self, *args, **kwargs):
@@ -2021,7 +2022,8 @@ class NoRedirectPageBot(CurrentPageBot):
     """A NoRedirectPageBot class which only treats non-redirects.
 
     .. deprecated:: 7.2
-       use BaseBot attribute 'use_redirects = False' instead
+       use BaseBot attribute
+       :attr:`use_redirects  = False<BaseBot.use_redirects>` instead
     """
 
     def __init__(self, *args, **kwargs):
