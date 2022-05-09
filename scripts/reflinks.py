@@ -541,10 +541,14 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
 
     def skip_page(self, page):
         """Skip unwanted pages."""
+        if super().skip_page(page):
+            return True
+
         if not page.has_permission():
             pywikibot.warning("You can't edit page {page}" .format(page=page))
             return True
-        return super().skip_page(page)
+
+        return False
 
     def treat(self, page) -> None:
         """Process one page."""

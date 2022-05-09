@@ -1959,7 +1959,12 @@ class ExistingPageBot(CurrentPageBot):
     """A CurrentPageBot class which only treats existing pages."""
 
     def skip_page(self, page: 'pywikibot.page.BasePage') -> bool:
-        """Treat page if it exists and handle NoPageError."""
+        """Treat page if it exists and handle NoPageError.
+
+        .. warning:: If subclassed, call `super().skip_page()` first to
+           ensure that non existent pages are filtered before other
+           calls are made
+        """
         if not page.exists():
             pywikibot.warning('Page {page} does not exist on {page.site}.'
                               .format(page=page))

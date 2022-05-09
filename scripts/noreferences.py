@@ -709,13 +709,16 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot):
 
     def skip_page(self, page):
         """Check whether the page could be processed."""
+        if super().skip_page(page):
+            return True
+
         if self.site.sitename == 'wikipedia:en' and page.isIpEdit():
             pywikibot.warning(
                 'Page {} is edited by IP. Possible vandalized'
                 .format(page.title(as_link=True)))
             return True
 
-        return super().skip_page(page)
+        return False
 
     def treat_page(self) -> None:
         """Run the bot."""
