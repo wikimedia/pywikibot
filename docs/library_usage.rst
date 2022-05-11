@@ -30,7 +30,7 @@ is a minimal example script which shows their usage:
         options = {}
         gen_factory = pagegenerators.GeneratorFactory()
         # Option parsing
-        local_args = pywikibot.handle_args(args)  # global options
+        local_args = pywikibot.handle_args()  # global options
         local_args = gen_factory.handle_args(local_args)  # generators options
         for arg in local_args:
             opt, sep, value = arg.partition(':')
@@ -38,7 +38,7 @@ is a minimal example script which shows their usage:
                 options[opt[1:]] = value
         MyBot(generator=gen_factory.getCombinedGenerator(), **options).run()
 
-    if __name == '__main__':
+    if __name__ == '__main__':
         main()
 
 The script can be invoked from commandline like::
