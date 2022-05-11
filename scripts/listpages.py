@@ -24,7 +24,7 @@ These parameters are supported to specify which pages titles to print:
             4 - '[[{page.title}]]'
                 --> [[PageTitle]]
 
-            5 - '{num:4d} \03{{lightred}}{page.loc_title:<40}\03{{default}}'
+            5 - '{num:4d} <<lightred>>{page.loc_title:<40}<<default>>'
                 --> 10 localised_Namespace:PageTitle (colorised in lightred)
 
             6 - '{num:4d} {page.loc_title:<40} {page.can_title:<40}'
@@ -96,8 +96,9 @@ import re
 
 import pywikibot
 from pywikibot import config, i18n
-from pywikibot.exceptions import Error
+from pywikibot.exceptions import ArgumentDeprecationWarning, Error
 from pywikibot.pagegenerators import GeneratorFactory, parameterHelp
+from pywikibot.tools import issue_deprecation_warning
 
 
 docuReplacements = {'&params;': parameterHelp}  # noqa: N816
@@ -112,7 +113,7 @@ class Formatter:
         '2': '{num:4d} [[{page.title}]]',
         '3': '{page.title}',
         '4': '[[{page.title}]]',
-        '5': '{num:4d} \03{{lightred}}{page.loc_title:<40}\03{{default}}',
+        '5': '{num:4d} <<lightred>>{page.loc_title:<40}<<default>>',
         '6': '{num:4d} {page.loc_title:<40} {page.can_title:<40}',
         '7': '{num:4d} {page.loc_title:<40} {page.trs_title:<40}',
     }
@@ -193,7 +194,13 @@ def main(*args: str) -> None:
         if option == '-notitle':
             notitle = True
         elif option == '-format':
-            fmt = value.replace('\\03{{', '\03{{')
+            if '\\03{{' in value:
+                fmt = value.replace('\\03{{', '\03{{')
+                issue_deprecation_warning(
+                    'old color format variant like \03{color}',
+                    'new color format like <<color>>',
+                    warning_class=ArgumentDeprecationWarning,
+                    since='7.3.0')
             if not fmt.strip():
                 notitle = True
         elif option == '-outputlang':

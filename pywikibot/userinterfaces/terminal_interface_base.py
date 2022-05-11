@@ -22,7 +22,7 @@ from pywikibot.bot_choice import (
     StandardOption,
 )
 from pywikibot.logging import INFO, INPUT, STDOUT, VERBOSE, WARNING
-from pywikibot.tools import RLock
+from pywikibot.tools import issue_deprecation_warning, RLock
 from pywikibot.userinterfaces import transliteration
 from pywikibot.userinterfaces._interface_base import ABUIC
 
@@ -201,7 +201,14 @@ class UI(ABUIC):
             raise ValueError('Old color format must not be mixed with new '
                              'color format. Found:\n'
                              + text.replace('\03', '\\03'))
-        text_parts = old_parts if len(old_parts) > 1 else new_parts
+        if len(old_parts) > 1:
+            issue_deprecation_warning(
+                'old color format variant like \03{color}',
+                'new color format like <<color>>',
+                since='7.3.0')
+            text_parts = old_parts
+        else:
+            text_parts = new_parts
         text_parts += ['default']
         # match.split() includes every regex group; for each matched color
         # fg_col:b_col, fg_col and bg_col are added to the resulting list.
@@ -311,9 +318,9 @@ class UI(ABUIC):
                     # could consist of multiple letters.
                     # mark the transliterated letters in yellow.
                     transliteratedText = ''.join((transliteratedText,
-                                                  '\03{lightyellow}',
+                                                  '<<lightyellow>>',
                                                   transliterated,
-                                                  '\03{previous}'))
+                                                  '<<previous>>'))
                     # memorize if we replaced a single letter by multiple
                     # letters.
                     if transliterated:

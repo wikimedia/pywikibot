@@ -281,7 +281,7 @@ class TestTerminalOutputColorUnix(UITestCase):
 
     """Terminal output color tests."""
 
-    str1 = 'text \03{lightpurple}light purple text\03{default} text'
+    str1 = 'text <<lightpurple>>light purple text<<default>> text'
 
     def testOutputColorizedText(self):
         pywikibot.output(self.str1)
@@ -298,9 +298,9 @@ class TestTerminalOutputColorUnix(UITestCase):
             self.strerr.getvalue(),
             'text light purple text text ***\n')
 
-    str2 = ('normal text \03{lightpurple} light purple '
-            '\03{lightblue} light blue \03{previous} light purple '
-            '\03{default} normal text')
+    str2 = ('normal text <<lightpurple>> light purple '
+            '<<lightblue>> light blue <<previous>> light purple '
+            '<<default>> normal text')
 
     def testOutputColorCascade_incorrect(self):
         """Test incorrect behavior of testOutputColorCascade."""
@@ -420,7 +420,7 @@ class FakeUITest(TestCase):
         """Test a string using one color."""
         self._colors = (('red', 6), ('default', 10))
         with redirect_stdout(self.redirect) as f:
-            self.ui_obj._print('Hello \03{red}world you!', self.ui_obj.stdout)
+            self.ui_obj._print('Hello <<red>>world you!', self.ui_obj.stdout)
         self.assertEqual(f.getvalue(), self.expected)
 
     def test_flat_color(self):
@@ -429,7 +429,7 @@ class FakeUITest(TestCase):
                         ('default', 1))
         with redirect_stdout(self.redirect) as f:
             self.ui_obj._print(
-                'Hello \03{red}world \03{default}you\03{yellow}!',
+                'Hello <<red>>world <<default>>you<<yellow>>!',
                 self.ui_obj.stdout)
         self.assertEqual(f.getvalue(), self.expected)
 
@@ -438,7 +438,7 @@ class FakeUITest(TestCase):
         self._colors = (('red', 6), ('yellow', 6), ('red', 3), ('default', 1))
         with redirect_stdout(self.redirect) as f:
             self.ui_obj._print(
-                'Hello \03{red}world \03{yellow}you\03{previous}!',
+                'Hello <<red>>world <<yellow>>you<<previous>>!',
                 self.ui_obj.stdout)
         self.assertEqual(f.getvalue(), self.expected)
 
@@ -446,7 +446,7 @@ class FakeUITest(TestCase):
         """Test using stacked colors without popping any."""
         self._colors = (('red', 6), ('yellow', 6), ('default', 4))
         with redirect_stdout(self.redirect) as f:
-            self.ui_obj._print('Hello \03{red}world \03{yellow}you!',
+            self.ui_obj._print('Hello <<red>>world <<yellow>>you!',
                                self.ui_obj.stdout)
         self.assertEqual(f.getvalue(), self.expected)
 
@@ -454,7 +454,7 @@ class FakeUITest(TestCase):
         """Test with trailing new line and one color."""
         self._colors = (('red', 6), ('default', 11))
         with redirect_stdout(self.redirect) as f:
-            self.ui_obj._print('Hello \03{red}world you!\n',
+            self.ui_obj._print('Hello <<red>>world you!\n',
                                self.ui_obj.stdout)
         self.assertEqual(f.getvalue(), self.expected + '\n')
 
