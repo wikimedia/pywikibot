@@ -172,8 +172,6 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | sorting_order.py       | Updates interwiki sorting order in family.py file.      |
     +------------------------+---------------------------------------------------------+
-    | update_linktrails.py   | Script that updates the linktrails in family.py file.   |
-    +------------------------+---------------------------------------------------------+
     | wikimedia_sites.py     | Updates the language lists in Wikimedia family files.   |
     +------------------------+---------------------------------------------------------+
 

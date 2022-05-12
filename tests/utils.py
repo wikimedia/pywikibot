@@ -342,6 +342,10 @@ class DrySite(pywikibot.site.APISite):
                     author_ns, 'Author', case=self.siteinfo['case'])
         return ns_dict
 
+    def linktrail(self):
+        """Return default linkrail."""
+        return '[a-z]*'
+
     @property
     def userinfo(self):
         """Return dry data."""

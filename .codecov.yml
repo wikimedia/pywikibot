@@ -37,7 +37,6 @@ coverage:
     - scripts/maintenance/make_i18n_dict.py
     - scripts/maintenance/preload_sites.py
     - scripts/maintenance/sorting_order.py
-    - scripts/maintenance/update_linktrails.py
     - scripts/maintenance/wikimedia_sites.py
     - scripts/userscripts/
     - tests/pwb/
