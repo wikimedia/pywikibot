@@ -194,7 +194,9 @@ def main(*args: str) -> None:
         if option == '-notitle':
             notitle = True
         elif option == '-format':
-            if '\\03{{' in value:
+            if '\\03{{' not in value:
+                fmt = value
+            else:
                 fmt = value.replace('\\03{{', '\03{{')
                 issue_deprecation_warning(
                     'old color format variant like \03{color}',
