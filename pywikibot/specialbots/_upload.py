@@ -431,7 +431,7 @@ class UploadRobot(BaseBot):
                     # No warning, upload complete.
                     pywikibot.output('Upload of {} successful.'
                                      .format(filename))
-                    self.counter['write'] += 1
+                    self.counter['upload'] += 1
                     return filename  # data['filename']
                 pywikibot.output('Upload aborted.')
             break

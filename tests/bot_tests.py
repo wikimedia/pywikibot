@@ -195,7 +195,7 @@ class TestDrySiteBot(TestBotTreatExit, SiteAttributeTestCase):
                                       pywikibot.Page(self.en, 'Page 2'),
                                       pywikibot.Page(self.de, 'Page 3')],
                                      post_treat)
-        self.bot.exit = self._exit(2, exception=ValueError)
+        self.bot.exit = self._exit(3, exception=ValueError)
         with self.assertRaisesRegex(ValueError, 'Whatever'):
             self.bot.run()
 
@@ -212,7 +212,7 @@ class TestDrySiteBot(TestBotTreatExit, SiteAttributeTestCase):
                                       pywikibot.Page(self.de, 'Page 3')],
                                      post_treat)
 
-        self.bot.exit = self._exit(2, exception=None)
+        self.bot.exit = self._exit(3, exception=None)
         self.bot.run()
 
 
