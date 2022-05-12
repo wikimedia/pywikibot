@@ -534,6 +534,67 @@ class TestWikibaseDataSiteWbsetActions(WikibaseTestCase):
         self.assertIsNone(self.item.sitelinks.get('enwikisource'))
 
 
+class TestWikibaseAddClaimToExisting(WikibaseTestCase):
+
+    """Run wikibase write tests for claims."""
+
+    family = 'wikidata'
+    code = 'test'
+
+    login = True
+    write = True
+
+    @staticmethod
+    def _clean_item_temp(repo, prop: str):
+        """
+        Return an item without any existing claims of the given property.
+
+        :param repo: repository to fetch item from
+        :type repo: pywikibot.site.DataSite
+        :param prop: P-value of the property to scrub
+        :return: scrubbed item
+        :rtype: pywikibot.ItemPage
+        """
+        item = pywikibot.ItemPage(repo, 'Q68')
+        item.get()
+        if prop in item.claims:
+            item.removeClaims(item.claims[prop])
+        item.get(force=True)
+        return item
+
+    def test_multiple_changes(self):
+        """Make multiple changes with EditEntity."""
+        testsite = self.get_repo()
+        prop = 'P95931'
+        item = self._clean_item_temp(testsite, prop)
+
+        # set initial claim
+        claim0 = pywikibot.page.Claim(testsite, prop)
+        target0 = 'treccid0'
+        claim0.setTarget(target0)
+        item.claims[prop] = [claim0]
+        item.editEntity(summary='Set initial claim')
+
+        # confirm initial claim
+        item.get(force=True)
+        claim1 = item.claims[prop][0]
+        self.assertEqual(claim1.getTarget(), target0)
+
+        # set second claim
+        claim1 = pywikibot.page.Claim(testsite, prop)
+        target1 = 'treccid1'
+        claim1.setTarget(target1)
+        item.claims[prop].append(claim1)
+        item.editEntity(summary='Set second claim')
+
+        # confirm two claims
+        item.get(force=True)
+        claim0 = item.claims[prop][0]
+        self.assertEqual(claim0.getTarget(), target0)
+        claim1 = item.claims[prop][1]
+        self.assertEqual(claim1.getTarget(), target1)
+
+
 if __name__ == '__main__':  # pragma: no cover
     with suppress(SystemExit):
         unittest.main()
