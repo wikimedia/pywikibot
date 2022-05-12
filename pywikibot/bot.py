@@ -1172,6 +1172,9 @@ class OptionHandler:
 
     >>> 'Option opt.{foo} is {bar}'.format_map(bot.opt)
     'Option opt.bar is 4711'
+
+    .. warning:: You must not access bot options as an attribute if the
+       keyword is a :python:`dict method<library/stdtypes.html#dict.clear>`.
     """
 
     available_options = {}  # type: Dict[str, Any]

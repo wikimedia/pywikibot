@@ -3,6 +3,12 @@
 ## 7.3.0
 *In development*
 
+### general
+* Call ExistingPageBot.skip_page() first (:phab:`T86491`)
+
+### replace
+* A -nopreload option was added
+
 ### weblinkchecker
 * Do not kill threads after generator is exhausted (:phab:`T113139`)
 * Use Page.extlinks() to get external links (:phab:`T60812`)

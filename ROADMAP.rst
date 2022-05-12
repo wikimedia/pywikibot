@@ -1,6 +1,10 @@
 Current release 7.3.0
 ^^^^^^^^^^^^^^^^^^^^^
 
+* use linktrail via siteinfo and remove `update_linkrtrails` maintenance script
+* Print counter statistic for all counters (:phab:`T307834`)
+* Use proofreadpagesinindex query module
+* Prioritize -namespaces options in `pagegenerators.handle_args` (:phab:`T222519`)
 * Remove `ThreadList.stop_all()` method (:phab:`T307830`)
 * L10N updates
 * Improve get_charset_from_content_type function (:phab:`T307760`)

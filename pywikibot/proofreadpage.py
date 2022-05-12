@@ -832,7 +832,16 @@ class IndexPage(pywikibot.Page):
         self._cached = False
 
     def _get_prp_index_pagelist(self):
-        """Get all pages in an IndexPage page list."""
+        """Get all pages in an IndexPage page list.
+
+        .. note:: This method is called by initializer and should not be used.
+
+        .. seealso::
+           `ProofreadPage Index Pagination API
+           <https://www.mediawiki.org/wiki/Extension:ProofreadPage/Index_pagination_API>`_
+
+        :meta public:
+        """
         site = self.site
         ppi_args = {}
         if hasattr(self, '_pageid'):
