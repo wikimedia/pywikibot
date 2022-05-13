@@ -114,6 +114,7 @@ import pickle
 import re
 import threading
 import time
+import urllib.parse as urlparse
 from contextlib import suppress
 from functools import partial
 from http import HTTPStatus
@@ -122,6 +123,7 @@ import requests
 
 import pywikibot
 from pywikibot import comms, config, i18n, pagegenerators, textlib
+from pywikibot.backports import Dict, removeprefix
 from pywikibot.bot import ExistingPageBot, SingleSiteBot, suggest_help
 from pywikibot.exceptions import (
     IsRedirectPageError,
@@ -290,6 +292,10 @@ class LinkCheckThread(threading.Thread):
     After checking the page, it will die.
     """
 
+    #: Collecting start time of a thread for any host
+    hosts = {}  # type: Dict[str, float]
+    lock = threading.Lock()
+
     def __init__(self, page, url, history, http_ignores, day) -> None:
         """Initializer."""
         self.page = page
@@ -308,12 +314,28 @@ class LinkCheckThread(threading.Thread):
         self._use_fake_user_agent = config.fake_user_agent_default.get(
             'weblinkchecker', False)
         self.day = day
+        super().__init__()
 
-        name = '{} - {}'.format(page.title(), url.encode('utf-8', 'replace'))
-        super().__init__(name=name)
+    @classmethod
+    def get_delay(cls, name: str) -> float:
+        """Determine delay from class attribute.
+
+        Store the last call for a given hostname with an offset of
+        6 seconds to ensure there are no more than 10 calls per minute
+        for the same host. Calculate the delay to start the run.
+
+        :param name: The key for the hosts class attribute
+        :return: The calulated delay to start the run
+        """
+        now = time.monotonic()
+        with cls.lock:
+            timestamp = cls.hosts.get(name, now)
+            cls.hosts[name] = max(now, timestamp) + 6
+        return max(0, timestamp - now)
 
     def run(self):
         """Run the bot."""
+        time.sleep(self.get_delay(self.name))
         try:
             header = self.header
             r = comms.http.fetch(
@@ -602,6 +624,9 @@ class WeblinkCheckerRobot(SingleSiteBot, ExistingPageBot):
                                          self.http_ignores, self.day)
                 # thread dies when program terminates
                 thread.daemon = True
+                # use hostname as thread.name
+                thread.name = removeprefix(
+                    urlparse.urlparse(url).hostname, 'www.')
                 self.threads.append(thread)
 
     def teardown(self) -> None:
