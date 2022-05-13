@@ -3275,8 +3275,7 @@ class TestLinktrails(TestCase):
         size = 20
         small_wikis = self.site.family.languages_by_size[-size:]
         great_wikis = self.site.family.languages_by_size[:-size]
-        random.shuffle(great_wikis)
-        great_wikis = great_wikis[:size]
+        great_wikis = random.sample(great_wikis, size)
         for code in sorted(small_wikis + great_wikis):
             site = pywikibot.Site(code, self.family)
             with self.subTest(site=site):
