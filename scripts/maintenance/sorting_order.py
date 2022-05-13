@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Script that updates interwiki sorting order in family.py file."""
 #
-# (C) Pywikibot team, 2020-2021
+# (C) Pywikibot team, 2020-2022
 #
 # Distributed under the terms of the MIT license.
 #

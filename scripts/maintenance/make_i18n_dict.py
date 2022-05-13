@@ -28,7 +28,7 @@ instantiating the bot. It also calls ``bot.run()`` to create the dictionaries:
 >>> bot.to_json()
 """
 #
-# (C) Pywikibot team, 2013-2020
+# (C) Pywikibot team, 2013-2022
 #
 # Distributed under the terms of the MIT license.
 #
