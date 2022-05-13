@@ -21,7 +21,7 @@ class LoggingFormatter(logging.Formatter):
                 'Arguments for record is not correctly set'
             msg = record.args[0]
 
-            record.__dict__['caller_file'] = record.pathname
+            record.__dict__['caller_file'] = record.filename
             record.__dict__['caller_name'] = record.module
             record.__dict__['caller_line'] = record.lineno
 
