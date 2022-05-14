@@ -51,8 +51,8 @@ from pywikibot.page._decorators import allow_asynchronous
 from pywikibot.page._links import BaseLink, Link
 from pywikibot.site import Namespace, NamespaceArgType
 from pywikibot.tools import (
-    cached,
     ComparableMixin,
+    cached,
     first_upper,
     issue_deprecation_warning,
     remove_last_args,
@@ -1795,7 +1795,7 @@ class BasePage(ComparableMixin):
         automatic_quit: bool = False,
         *,
         deletetalk: bool = False
-    ) -> None:
+    ) -> int:
         """
         Delete the page from the wiki. Requires administrator status.
 
@@ -1811,6 +1811,12 @@ class BasePage(ComparableMixin):
             will be asked before marking pages for deletion.
         :param automatic_quit: show also the quit option, when asking
             for confirmation.
+
+        :return: the function returns an integer, with values as follows:
+            value    meaning
+            0        no action was done
+            1        page was deleted
+            -1       page was marked for deletion
         """
         if reason is None:
             pywikibot.output('Deleting {}.'.format(self.title(as_link=True)))
@@ -1830,7 +1836,9 @@ class BasePage(ComparableMixin):
                     self.site._noDeletePrompt = True
             if answer == 'y':
                 self.site.delete(self, reason, deletetalk=deletetalk)
-            return
+                return 1
+            else:
+                return 0
 
         # Otherwise mark it for deletion
         if mark or hasattr(self.site, '_noMarkDeletePrompt'):
@@ -1854,6 +1862,9 @@ class BasePage(ComparableMixin):
                 target = self
             target.text = template + target.text
             target.save(summary=reason)
+            return -1
+        else:
+            return 0
 
     def has_deleted_revisions(self) -> bool:
         """Return True if the page has deleted revisions.
