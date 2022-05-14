@@ -897,7 +897,7 @@ def main(*args: str) -> None:
     edit_summary = ''
     # Array which will collect commandline parameters.
     # First element is original text, second element is replacement text.
-    preload = False  # preload pages
+    preload = True  # preload pages
     commandline_replacements = []
     file_replacements = []
     # A list of 2-tuples of original text and replacement text.
