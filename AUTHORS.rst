@@ -349,6 +349,7 @@ W
     Wikihermit
     Wikipedian
     WikiWichtel
+    William Avery
     withoutaname
 
 X
