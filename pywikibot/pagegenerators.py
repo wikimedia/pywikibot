@@ -468,8 +468,8 @@ class GeneratorFactory:
     This factory is responsible for processing command line arguments
     that are used by many scripts and that determine which pages to work on.
 
-    :Note: GeneratorFactory must be instantiated after global arguments are
-        parsed except if site parameter is given.
+    .. note:: GeneratorFactory must be instantiated after global
+       arguments are parsed except if site parameter is given.
     """
 
     def __init__(self, site: OPT_SITE_TYPE = None,
@@ -504,6 +504,21 @@ class GeneratorFactory:
         self._sparql = None  # type: Optional[str]
         self.nopreload = False
         self._validate_options(enabled_options, disabled_options)
+
+        self.is_preloading = None  # type: Optional[bool]
+        """Return whether Page objects are preloaded. You may use this
+        instance variable after :meth:`getCombinedGenerator` is called
+        e.g.::
+
+            gen_factory = GeneratorFactory()
+            print(gen_factory.is_preloading)  # None
+            gen = gen_factory.getCombinedGenerator()
+            print(gen_factory.is_preloading)  # True or False
+
+        Otherwise the value is undefined and gives None.
+
+        .. versionadded:: 7.3
+        """
 
     def _validate_options(self,
                           enable: Optional[Iterable[str]],
@@ -573,6 +588,9 @@ class GeneratorFactory:
         """Return the combination of all accumulated generators.
 
         Only call this after all arguments have been parsed.
+
+        .. versionchanged:: 7.3
+           set the instance variable :attr:`is_preloading` to True or False.
 
         :param gen: Another generator to be combined with
         :param preload: preload pages using PreloadingGenerator
@@ -649,7 +667,10 @@ class GeneratorFactory:
             dupfiltergen = CategoryFilterPageGenerator(
                 dupfiltergen, self.catfilter_list)
 
-        if (preload or self.articlefilter_list) and not self.nopreload:
+        self.is_preloading = not self.nopreload and bool(
+            preload or self.articlefilter_list or self.articlenotfilter_list)
+
+        if self.is_preloading:
             if isinstance(dupfiltergen, DequeGenerator):
                 dupfiltergen = DequePreloadingGenerator(dupfiltergen)
             else:
