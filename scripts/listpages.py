@@ -181,6 +181,7 @@ class ListPagesBot(AutomaticTWSummaryBot, SingleSiteBot):
         'notitle': False,
         'outputlang': None,
         'overwrite': False,
+        'preloading': None,
         'summary': '',
         'get': False,
         'put': None,
@@ -206,6 +207,10 @@ class ListPagesBot(AutomaticTWSummaryBot, SingleSiteBot):
             with open(filename, mode='wb') as f:
                 f.write(page.text.encode(self.opt.encode))
             self.counter['save'] += 1
+
+        if self.opt.preloading is False:
+            pywikibot.stdout(self.output_list[-1]
+                             if self.opt.put else self.output_list.pop())
 
     def setup(self) -> None:
         """Initialize `output_list` and `num` and adjust base directory."""
@@ -240,7 +245,9 @@ class ListPagesBot(AutomaticTWSummaryBot, SingleSiteBot):
         if self.opt.put:
             self.current_page = self.opt.put
             self.put_current(text, summary=self.opt.summary, show_diff=False)
-        pywikibot.stdout(text)
+
+        if self.opt.preloading is True:
+            pywikibot.stdout(text)
 
 
 def main(*args: str) -> None:
@@ -297,6 +304,7 @@ def main(*args: str) -> None:
                                .format(page_target))
 
     gen = gen_factory.getCombinedGenerator()
+    options['preloading'] = gen_factory.is_preloading
     if not suggest_help(missing_generator=not gen,
                         unknown_parameters=unknown_args,
                         additional_text=additional_text):
