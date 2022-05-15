@@ -114,6 +114,7 @@ def delete_dummy(self, reason, prompt, mark, automatic_quit):
     """Dummy delete method."""
     TestDeletionBot.delete_args = [self.title(as_link=True), reason, prompt,
                                    mark, automatic_quit]
+    return 0
 
 
 def undelete_dummy(self, reason):
