@@ -48,7 +48,7 @@ from pywikibot.backports import (
 )
 from pywikibot.comms import http
 from pywikibot.data.api import ListGenerator, Request
-from pywikibot.exceptions import Error, OtherPageSaveError
+from pywikibot.exceptions import Error, InvalidTitleError, OtherPageSaveError
 from pywikibot.page import PageSourceType
 from pywikibot.tools import cached
 
@@ -247,7 +247,11 @@ class ProofreadPage(pywikibot.Page):
 
         if sep:
             base = left
-            num = int(right)
+            try:
+                num = int(right)
+            except ValueError:
+                raise InvalidTitleError('{} containts invalid index {!r}'
+                                        .format(self, right))
         else:
             base = right
 
