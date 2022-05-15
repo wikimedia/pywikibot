@@ -369,9 +369,11 @@ def first_upper(string: str) -> str:
 
     .. versionadded:: 3.0
 
-    :note: MediaWiki doesn't capitalize some characters the same way as Python.
-        This function tries to be close to MediaWiki's capitalize function in
-        title.php. See T179115 and T200357.
+    .. note:: MediaWiki doesn't capitalize
+       some characters the same way as Python.
+       This function tries to be close to
+       MediaWiki's capitalize function in
+       title.php. See T179115 and T200357.
     """
     first = string[:1]
     return (_first_upper_exception(first) or first.upper()) + string[1:]

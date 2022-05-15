@@ -1039,8 +1039,8 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
         to move it to one of original_cat's sub- or super-categories.
         Recursively run through subcategories' subcategories.
 
-        :note: current_cat is only used for internal recursion. You
-            should always use ``current_cat = original_cat``.
+        .. note:: current_cat is only used for internal recursion. You
+           should always use ``current_cat = original_cat``.
         :param member: a page to process.
         :param original_cat: original category to replace.
         :param current_cat: a category which is questioned.
