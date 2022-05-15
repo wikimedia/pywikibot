@@ -250,7 +250,7 @@ class ProofreadPage(pywikibot.Page):
             try:
                 num = int(right)
             except ValueError:
-                raise InvalidTitleError('{} containts invalid index {!r}'
+                raise InvalidTitleError('{} contains invalid index {!r}'
                                         .format(self, right))
         else:
             base = right
