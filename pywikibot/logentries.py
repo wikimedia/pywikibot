@@ -372,9 +372,10 @@ class LogEntryFactory:
         Return the class corresponding to the @logtype string parameter.
 
         :return: specified subclass of LogEntry
-        :note: this class method cannot verify whether the given logtype
-            already exits for a given site; to verify use Site.logtypes
-            or use the get_valid_entry_class instance method instead.
+
+        .. note:: this class method cannot verify whether the given logtype
+           already exits for a given site; to verify use Site.logtypes
+           or use the get_valid_entry_class instance method instead.
         """
         if logtype not in cls._logtypes:
             bases = (OtherLogEntry, )  # type: Tuple['LogEntry', ...]

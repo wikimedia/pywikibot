@@ -1097,9 +1097,9 @@ class GeneratorsMixin:
 
         .. seealso:: :api:`Blocks`
 
-        .. note::
-           logevents only logs user blocks, while this method iterates
-           all blocks including IP ranges.
+        .. note:: logevents only logs user blocks,
+           while this method iterates all blocks
+           including IP ranges.
         .. warning::
            ``iprange`` parameter cannot be used together with ``users``.
 
@@ -1226,8 +1226,7 @@ class GeneratorsMixin:
 
         .. seealso:: :api:`Logevents`
 
-        .. note::
-           logevents with `logtype='block'` only logs user blocks
+        .. note:: logevents with `logtype='block'` only logs user blocks
            whereas `site.blocks` iterates all blocks including IP ranges.
 
         :param logtype: only iterate entries of this type
@@ -1237,9 +1236,11 @@ class GeneratorsMixin:
         :type page: pywikibot.Page or str
         :param namespace: namespace(s) to retrieve logevents from
         :type namespace: int or Namespace or an iterable of them
-        :note: due to an API limitation, if namespace param contains multiple
-            namespaces, log entries from all namespaces will be fetched from
-            the API and will be filtered later during iteration.
+
+        .. note:: due to an API limitation,
+           if namespace param contains multiple namespaces,
+           log entries from all namespaces will be fetched from
+           the API and will be filtered later during iteration.
         :param start: only iterate entries from and after this Timestamp
         :type start: Timestamp or ISO date string
         :param end: only iterate entries up to and through this Timestamp
@@ -1548,7 +1549,7 @@ class GeneratorsMixin:
             or typing.Iterable[str]
         :keyword revids: Get revisions by their ID
 
-        :note: either titles or revids must be set but not both
+        .. note:: either titles or revids must be set but not both
 
         :param start: Iterate revisions starting at this Timestamp
         :param end: Iterate revisions ending at this Timestamp

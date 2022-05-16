@@ -536,9 +536,10 @@ class WikibasePage(BasePage, WikibaseEntity):
         :param force: override caching
         :raise NotImplementedError: a value in args or kwargs
         :return: actual data which entity holds
-        :note: dicts returned by this method are references to content
-            of this entity and their modifying may indirectly cause
-            unwanted change to the live content
+
+        .. note:: dicts returned by this method are references to content
+           of this entity and their modifying may indirectly cause
+           unwanted change to the live content
         """
         if args or kwargs:
             raise NotImplementedError(
@@ -942,9 +943,11 @@ class ItemPage(WikibasePage):
                              redirect, do not raise an exception.
         :raise NotImplementedError: a value in args or kwargs
         :return: actual data which entity holds
-        :note: dicts returned by this method are references to content of this
-            entity and their modifying may indirectly cause unwanted change to
-            the live content
+
+        .. note:: dicts returned by this method are
+           references to content of this entity and
+           their modifying may indirectly cause
+           unwanted change to the live content
         """
         data = super().get(force, *args, **kwargs)
 
@@ -1245,9 +1248,11 @@ class PropertyPage(WikibasePage, Property):
         :param force: override caching
         :raise NotImplementedError: a value in args or kwargs
         :return: actual data which entity holds
-        :note: dicts returned by this method are references to content of this
-            entity and their modifying may indirectly cause unwanted change to
-            the live content
+
+        .. note:: dicts returned by this method are
+           references to content of this entity and
+           their modifying may indirectly cause
+           unwanted change to the live content
         """
         if args or kwargs:
             raise NotImplementedError(
@@ -1968,9 +1973,10 @@ class LexemePage(WikibasePage):
             redirect, do not raise an exception.
         :type get_redirect: bool
         :raise NotImplementedError: a value in args or kwargs
-        :note: dicts returned by this method are references to content
-            of this entity and their modifying may indirectly cause
-            unwanted change to the live content
+
+        .. note:: dicts returned by this method are references to content
+           of this entity and their modifying may indirectly cause
+           unwanted change to the live content
         """
         data = super().get(force, *args, **kwargs)
 
@@ -2202,9 +2208,10 @@ class LexemeForm(LexemeSubEntity):
         Fetch all form data, and cache it.
 
         :param force: override caching
-        :note: dicts returned by this method are references to content
-            of this entity and their modifying may indirectly cause
-            unwanted change to the live content
+
+        .. note:: dicts returned by this method are references to content
+           of this entity and their modifying may indirectly cause
+           unwanted change to the live content
         """
         data = super().get(force=force)
 

@@ -10,8 +10,7 @@ Various Wikibase pages are defined in ``page._wikibase.py``,
 various pages for Proofread Extensions are defines in
 ``pywikibot.proofreadpage``.
 
-..note::
-  `Link` objects represent a wiki-page's title, while
+..note:: `Link` objects represent a wiki-page's title, while
   :class:`pywikibot.Page` objects (defined here) represent the page
   itself, including its contents.
 """
@@ -1377,7 +1376,7 @@ class BasePage(ComparableMixin):
         minor and botflag parameters are set to False which prevents hiding
         the edit when it becomes a real edit due to a bug.
 
-        :note: This discards content saved to self.text.
+        .. note:: This discards content saved to self.text.
         """
         if self.exists():
             # ensure always get the page text and not to change it.
