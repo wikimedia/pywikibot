@@ -20,6 +20,8 @@ The contents of the package
     +---------------------------+-----------------------------------------------------------+
     | LICENSE                   | Reference to the MIT license                              |
     +---------------------------+-----------------------------------------------------------+
+    | make_dist.py              | Script to create a Pywikibot distribution                 |
+    +---------------------------+-----------------------------------------------------------+
     | MANIFEST.in               | Setup file for package data                               |
     +---------------------------+-----------------------------------------------------------+
     | pwb.py                    | Code entry wrapper script (directory mode only)           |

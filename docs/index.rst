@@ -69,6 +69,7 @@ For framework developers:
    scripts_ref/index
    tests_ref/index
    Maintenance Scripts<scripts_ref/scripts.maintenance>
+   utilities/install
 
 
 Miscellaneous

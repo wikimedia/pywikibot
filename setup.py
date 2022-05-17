@@ -2,22 +2,13 @@
 # -*- coding: utf-8 -*-
 """Installer script for Pywikibot framework.
 
-To create a new distribution:
------------------------------
+**How to create a new distribution:**
 
 - replace the developmental version string in ``pywikibot.__metadata__.py``
-  by the corresponing final release
-- copy pwb.py to pywikibot/scripts folder
-- copy scripts/i18n/pywikibot folder to pywikibot/scripts/i18n/pywikibot
+  by the corresponding final release
 - create the package with::
 
-    python setup.py sdist
-
-- remove copied files
-- push the change to Gerrit and merge it to the repository
-- upload the package to PyPy by::
-
-    twine upload dist/*
+    make_dist remote
 
 - create a new tag with the version number of the final release
 - synchronize the local tags with the remote repositoy
@@ -26,6 +17,8 @@ To create a new distribution:
 - prepare the next master release by increasing the version number in
   ``pywikibot.__metadata__.py`` and adding developmental identifier
 - upload this patchset to Gerrit and merge it.
+
+.. warning: do not upload a development release to pypi.
 """
 #
 # (C) Pywikibot team, 2009-2022
@@ -185,9 +178,6 @@ def get_validated_version():  # pragma: no cover
     last_tag = tags[-1]
 
     warnings = []
-    if 'dev' in version:
-        warnings.append('Distribution must not be a developmental release.')
-
     if parse_version(version) < parse_version('0'):
         # any version which is not a valid PEP 440 version will be considered
         # less than any valid PEP 440 version
