@@ -309,7 +309,7 @@ class Family:
     }
 
     # LDAP domain if your wiki uses LDAP authentication,
-    # https://www.mediawiki.org/wiki/Extension:LDAP_Authentication
+    # https://www.mediawiki.org/wiki/Extension:LDAPAuthentication2
     ldapDomain = ()
 
     # Allows crossnamespace interwiki linking.
