@@ -108,8 +108,8 @@ class Family:
         'sq', 'scn', 'si', 'simple', 'sd', 'ss', 'sk', 'sl', 'cu', 'szl', 'so',
         'ckb', 'srn', 'sr', 'sh', 'su', 'fi', 'sv', 'shi', 'tl', 'shn', 'ta',
         'kab', 'roa-tara', 'tt', 'tay', 'te', 'tet', 'th', 'ti', 'tg', 'to',
-        'chr', 'chy', 've', 'tcy', 'tr', 'azb', 'tk', 'tw', 'tyv', 'din',
-        'udm', 'bug', 'uk', 'ur', 'ug', 'za', 'vec', 'vep', 'vi', 'vo',
+        'chr', 'chy', 've', 'tcy', 'tr', 'azb', 'tk', 'tw', 'kcg', 'tyv',
+        'din', 'udm', 'bug', 'uk', 'ur', 'ug', 'za', 'vec', 'vep', 'vi', 'vo',
         'fiu-vro', 'wa', 'zh-classical', 'vls', 'war', 'wo', 'wuu', 'ts', 'yi',
         'yo', 'zh-yue', 'diq', 'zea', 'bat-smg', 'zh', 'zh-tw', 'zh-cn',
     ]
@@ -117,9 +117,9 @@ class Family:
     # The revised sorting order by first word from meta
     # MediaWiki:Interwiki_config-sorting_order-native-languagename-firstword
     alphabetic_revised = [
-        'ace', 'ady', 'kbd', 'af', 'ak', 'als', 'alt', 'am', 'smn', 'ang',
-        'ab', 'ar', 'an', 'arc', 'roa-rup', 'frp', 'as', 'ast', 'atj', 'awa',
-        'gn', 'av', 'ay', 'az', 'bjn', 'id', 'ms', 'ban', 'bm', 'bn',
+        'ace', 'ady', 'kbd', 'af', 'ak', 'als', 'alt', 'kcg', 'am', 'smn',
+        'ang', 'ab', 'ar', 'an', 'arc', 'roa-rup', 'frp', 'as', 'ast', 'atj',
+        'awa', 'gn', 'av', 'ay', 'az', 'bjn', 'id', 'ms', 'ban', 'bm', 'bn',
         'zh-min-nan', 'nan', 'map-bms', 'jv', 'su', 'ba', 'min', 'be',
         'be-tarask', 'mnw', 'mad', 'bh', 'bcl', 'bi', 'bar', 'bo', 'bs', 'br',
         'bug', 'bg', 'bxr', 'ca', 'ceb', 'cv', 'cs', 'ch', 'cbk-zam', 'ny',
