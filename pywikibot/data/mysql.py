@@ -12,6 +12,7 @@ import pkg_resources
 import pywikibot
 from pywikibot import config
 from pywikibot.backports import removesuffix
+from pywikibot.tools import issue_deprecation_warning
 
 
 try:
@@ -31,6 +32,8 @@ class _OldConnection(pymysql.connections.Connection):
     toolforge (:phab:`T216741`).
 
     .. versionadded:: 7.0
+    .. deprecated:: 7.4
+       Update your pymysql package
     """
 
     def close(self) -> None:  # pragma: no cover
@@ -94,6 +97,9 @@ def mysql_query(query: str, params=None,
     }
 
     if pymysql_version < pkg_resources.parse_version('0.7.11'):
+        issue_deprecation_warning(
+            'pymysql package release {}'.format(pymysql_version),
+            instead='pymysql >= 0.7.11', since='7.4.0')
         connection = _OldConnection(**args, **credentials)
     else:
         connection = pymysql.connect(**args, **credentials)
