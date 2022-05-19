@@ -28,8 +28,6 @@ The contents of the package
     +---------------------------+-----------------------------------------------------------+
     | README.rst                | Short info string used by Pywikibot Nightlies             |
     +---------------------------+-----------------------------------------------------------+
-    | README-conversion.txt     | Compat to Core branch conversion hints                    |
-    +---------------------------+-----------------------------------------------------------+
     | requirements.txt          | General PIP requirements file                             |
     +---------------------------+-----------------------------------------------------------+
     | ROADMAP.rst               | PyPI version roadmap file                                 |
