@@ -1,21 +1,25 @@
 # Scripts Changelog
 
 ## 7.3.0
-*In development*
+*20 May 2022*
 
 ### general
 * Call ExistingPageBot.skip_page() first (:phab:`T86491`)
+
+### delete
+* Count deleted pages and other actions (:phab:`T212040`)
 
 ### replace
 * A -nopreload option was added
 
 ### weblinkchecker
+* Throttle connections to the same host (:phab:`T152350`)
 * Do not kill threads after generator is exhausted (:phab:`T113139`)
 * Use Page.extlinks() to get external links (:phab:`T60812`)
 
 
 ## 7.2.1
-*07 May 2022**
+*07 May 2022*
 
 ### movepages
 * Fix regression of option parsing (:phab:`T307826`)

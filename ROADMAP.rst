@@ -1,6 +1,10 @@
 Current release 7.3.0
 ^^^^^^^^^^^^^^^^^^^^^
 
+* Add support for kcgwiki (:phab:`T305282`)
+* Raise InvalidTitleError instead of unspecific ValueError in ProofreadPage (:phab:`T308016`)
+* Preload pages if GeneratorFactory.articlenotfilter_list is not empty; also set attribute ``is_preloading``.
+* ClaimCollection.toJSON() should not ignore new claim (:phab:`T308245`)
 * use linktrail via siteinfo and remove `update_linkrtrails` maintenance script
 * Print counter statistic for all counters (:phab:`T307834`)
 * Use proofreadpagesinindex query module
@@ -23,7 +27,7 @@ Current release 7.3.0
 Deprecations
 ^^^^^^^^^^^^
 
-* Python 3.5 support will be dropped with Python 8 (:phab:`T301908`)
+* 7.3.0: Python 3.5 support will be dropped with Python 8 (:phab:`T301908`)
 * 7.2.0: XMLDumpOldPageGenerator is deprecated in favour of a `content` parameter (:phab:`T306134`)
 * 7.2.0: RedirectPageBot and NoRedirectPageBot bot classes are deprecated in favour of `use_redirects` attribute
 * 7.2.0: `tools.formatter.color_format` is deprecated and will be removed
