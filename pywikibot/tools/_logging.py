@@ -6,6 +6,8 @@
 #
 import logging
 
+from pywikibot.userinterfaces.terminal_interface_base import new_colorTagR
+
 
 class LoggingFormatter(logging.Formatter):
 
@@ -26,5 +28,9 @@ class LoggingFormatter(logging.Formatter):
             record.__dict__['caller_line'] = record.lineno
 
             record.args = (msg,)
+
+        # remove color tags
+        if record.msg:
+            record.msg = new_colorTagR.sub('', record.msg)
 
         return super().format(record).rstrip()
