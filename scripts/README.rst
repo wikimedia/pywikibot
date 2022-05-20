@@ -162,9 +162,6 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | colors.py              | Utility to show pywikibot colors.                       |
     +------------------------+---------------------------------------------------------+
-    | update_script.py       | Helper script to update scripts and replace deprecated  |
-    |                        | code parts.                                             |
-    +------------------------+---------------------------------------------------------+
     | make_i18n_dict.py      | Generate an i18n file from a given script.              |
     +------------------------+---------------------------------------------------------+
     | preload_sites.py       | Preload and cache site information for each WikiMedia   |

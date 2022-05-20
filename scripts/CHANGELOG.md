@@ -17,6 +17,9 @@
 * Do not kill threads after generator is exhausted (:phab:`T113139`)
 * Use Page.extlinks() to get external links (:phab:`T60812`)
 
+### update_script
+* update_script script was removed
+
 
 ## 7.2.1
 *07 May 2022*
