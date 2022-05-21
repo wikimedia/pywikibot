@@ -129,6 +129,10 @@ The contents of the package
     +----------------------------+------------------------------------------------------+
     | generate_user_files.py     | Creates user-config.py or user-fixes.py              |
     +----------------------------+------------------------------------------------------+
+    | preload_sites.py           | Preload and cache site information for each          |
+    |                            | WikiMedia family within seconds. Useful for bots     |
+    |                            | running on multiple sites.                           |
+    +----------------------------+------------------------------------------------------+
     | pwb.py                     | Code entry wrapper script (site-package only)        |
     +----------------------------+------------------------------------------------------+
     | shell.py                   | Spawns an interactive Python shell with pywikibot    |

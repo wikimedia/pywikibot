@@ -2,7 +2,7 @@ Frequent Asked Questions
 ========================
 **How to speed up Pywikibot?**
   1. The first time you are using Pywikibot for multiple Wikimedia sites you
-     can run :py:mod:`preload_sites <scripts.maintenance.preload_sites>` script
+     can run :py:mod:`preload_sites <pywikibot.scripts.preload_sites>` script
      to preload site info quickly.
   2. If you need the content, use :py:mod:`PreloadingGenerator
      <pywikibot.pagegenerators.PreloadingGenerator>` with page generators,
