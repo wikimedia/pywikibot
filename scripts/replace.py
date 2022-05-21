@@ -93,7 +93,7 @@ Furthermore, the following command line parameters are supported:
 
 -quiet            Don't prompt a message if a page keeps unchanged
 
--nopreload        Do not preload pages. Usefull if disabled on a wiki.
+-nopreload        Do not preload pages. Useful if disabled on a wiki.
 
 -recursive        Recurse replacement as long as possible. Be careful, this
                   might lead to an infinite loop.
