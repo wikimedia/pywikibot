@@ -709,8 +709,8 @@ class WelcomeBot(SingleSiteBot):
                    or ue.action() == 'autocreate' and globalvar.welcome_auto:
                     try:
                         user = ue.page()
-                    except HiddenKeyError:
-                        pywikibot.exception()
+                    except HiddenKeyError as e:
+                        pywikibot.error(e)
                     else:
                         yield user
 

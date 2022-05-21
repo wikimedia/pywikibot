@@ -162,17 +162,12 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | colors.py              | Utility to show pywikibot colors.                       |
     +------------------------+---------------------------------------------------------+
-    | update_script.py       | Helper script to update scripts and replace deprecated  |
-    |                        | code parts.                                             |
-    +------------------------+---------------------------------------------------------+
     | make_i18n_dict.py      | Generate an i18n file from a given script.              |
     +------------------------+---------------------------------------------------------+
     | preload_sites.py       | Preload and cache site information for each WikiMedia   |
     |                        | family. Usefull for bots running on multiple sites.     |
     +------------------------+---------------------------------------------------------+
     | sorting_order.py       | Updates interwiki sorting order in family.py file.      |
-    +------------------------+---------------------------------------------------------+
-    | update_linktrails.py   | Script that updates the linktrails in family.py file.   |
     +------------------------+---------------------------------------------------------+
     | wikimedia_sites.py     | Updates the language lists in Wikimedia family files.   |
     +------------------------+---------------------------------------------------------+

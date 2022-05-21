@@ -35,13 +35,7 @@ from pywikibot.tools import PYTHON_VERSION
 
 _root_dir = os.path.split(os.path.split(__file__)[0])[0]
 
-# common warn() clauses...
-#
-#   WARN_SITE_CODE is from T234147
-#   WARN_SITE_OBJ is from T225594
-
-WARN_SITE_CODE = r'^Site .*:.* instantiated using different code *'
-WARN_SITE_OBJ = 'Site objects have been created before arguments were handled'
+WARN_SITE_CODE = '^Site .*:.* instantiated using different code *'  # T234147
 
 
 def join_root_path(*names):
@@ -163,7 +157,6 @@ script_test_modules = {
     'replacebot',
     'script',
     'template_bot',
-    'update_script',
     'uploadscript',
     'weblinkchecker'
 }
@@ -199,7 +192,7 @@ if 'PYWIKIBOT_TEST_MODULES' in os.environ:
 
 def unittest_print(*args, **kwargs):
     """Print information in test log."""
-    print(*args, **kwargs)  # noqa: T001
+    print(*args, **kwargs)  # noqa: T001, T201
 
 
 def collector(loader=unittest.loader.defaultTestLoader):

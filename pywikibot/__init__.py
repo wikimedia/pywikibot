@@ -67,7 +67,7 @@ from pywikibot.logging import (
     warning,
 )
 from pywikibot.site import APISite, BaseSite, DataSite
-from pywikibot.tools import classproperty, normalize_username
+from pywikibot.tools import classproperty, normalize_username, PYTHON_VERSION
 
 
 ItemPageStrNoneType = Union[str, 'ItemPage', None]
@@ -91,6 +91,15 @@ __all__ = (
 
 if not hasattr(sys.modules[__name__], 'argvu'):
     argvu = []  # type: List[str]
+
+
+if PYTHON_VERSION < (3, 6):
+    warn("""
+Python {version} will be dropped with release 8.0 soon.
+It is recommended to use Python 3.6 or above.
+See T301908 for further information.
+""".format(version=sys.version.split(maxsplit=1)[0]),
+         FutureWarning)  # adjust this line no in utils.execute()
 
 
 class Timestamp(datetime.datetime):
@@ -1113,7 +1122,7 @@ def Site(code: Optional[str] = None,
 
     Override default family::
 
-        site = pywikibot.Site(family='wikisource')
+        site = pywikibot.Site(fam='wikisource')
 
     Setting a specific site::
 
@@ -1139,6 +1148,10 @@ def Site(code: Optional[str] = None,
 
     **Never create a site object via interface class directly.**
     Always use this factory method.
+
+    .. versionchanged:: 7.3
+       Short creation if site code is equal to family name like
+       `Site('commons')`, `Site('meta')` or `Site('wikidata')`.
 
     :param code: language code (override config.mylang)
         code may also be a sitename like 'wikipedia:test'
@@ -1167,6 +1180,9 @@ def Site(code: Optional[str] = None,
                 'should be provided')
         fam, _, code = code.partition(':')
     else:
+        if not fam:  # try code as family
+            with suppress(exceptions.UnknownFamilyError):
+                fam = Family.load(code)
         # Fallback to config defaults
         code = code or _config.mylang
         fam = fam or _config.family

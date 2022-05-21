@@ -265,10 +265,10 @@ def process_entries(cache_path, func, use_accesstime=None, output_func=None,
 
         try:
             entry._load_cache()
-        except ValueError as e:
+        except ValueError:
             pywikibot.error('Failed loading {}'.format(
                 entry._cachefile_path()))
-            pywikibot.exception(e, exc_info=True)
+            pywikibot.exception()
             continue
 
         if use_accesstime is None:
@@ -282,19 +282,19 @@ def process_entries(cache_path, func, use_accesstime=None, output_func=None,
 
         try:
             entry.parse_key()
-        except ParseError:
+        except ParseError as e:
             pywikibot.error('Problems parsing {} with key {}'
                             .format(entry.filename, entry.key))
-            pywikibot.exception()
+            pywikibot.error(e)
             continue
 
         try:
             entry._rebuild()
-        except Exception as e:
+        except Exception:
             pywikibot.error('Problems loading {} with key {}, {!r}'
                             .format(entry.filename, entry.key,
                                     entry._parsed_key))
-            pywikibot.exception(e, exc_info=True)
+            pywikibot.exception()
             continue
 
         if func is None or func(entry):
@@ -317,8 +317,8 @@ def _parse_command(command, name):
 
     try:
         return eval('lambda entry: ' + command)
-    except Exception:
-        pywikibot.exception()
+    except Exception as e:
+        pywikibot.error(e)
         pywikibot.error(
             'Cannot compile {} command: {}'.format(name, command))
         return None

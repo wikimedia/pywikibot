@@ -20,7 +20,7 @@ whether you have Python installed and to find its version, just type
 ``python`` at the CMD or shell prompt.
 
 Python 3.5.3 or higher is currently required to run the bot, but Python 3.6
-or higher is recommended. Python 3.5 support will be dropped with Python 8.
+or higher is recommended. Python 3.5 support will be dropped with Pywikibot 8.
 
 Pywikibot and this documentation are licensed under the
 :ref:`MIT license`;
@@ -65,9 +65,11 @@ For framework developers:
 .. toctree::
    :maxdepth: 1
 
-   utilities/scripts_ref
-   scripts_ref/scripts.maintenance
+   Utility Scripts Reference<utilities/scripts_ref>
    scripts_ref/index
+   tests_ref/index
+   Maintenance Scripts<scripts_ref/scripts.maintenance>
+   utilities/install
 
 
 Miscellaneous

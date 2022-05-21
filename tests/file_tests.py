@@ -20,7 +20,7 @@ from tests import join_images_path
 from tests.aspects import TestCase
 
 
-class TestShareFiles(TestCase):
+class TestSharedFiles(TestCase):
 
     """Test file_is_shared, exists, fileUrl/get_file_url with shared files."""
 
@@ -45,7 +45,7 @@ class TestShareFiles(TestCase):
 
     cached = True
 
-    def testSharedOnly(self):
+    def test_shared_only(self):
         """Test file_is_shared() on file page with shared file only."""
         title = 'File:Sepp Maier 1.JPG'
 
@@ -73,7 +73,7 @@ class TestShareFiles(TestCase):
                 .format(title)):
             itwp_file.get()
 
-    def testLocalOnly(self):
+    def test_local_only(self):
         """Test file_is_shared() on file page with local file only."""
         title = 'File:Untitled (Three Forms), stainless steel sculpture by ' \
                 '--James Rosati--, 1975-1976, --Honolulu Academy of Arts--.JPG'
@@ -127,7 +127,7 @@ class TestShareFiles(TestCase):
         self.assertTrue(commons_file.file_is_shared())
         self.assertTrue(commons_file.file_is_used)
 
-    def testNonFileLocal(self):
+    def test_non_file_local(self):
         """Test file page, without local file, existing on the local wiki."""
         title = 'File:Sepp Maier 1.JPG'
 

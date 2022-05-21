@@ -139,7 +139,7 @@ class Photo(pywikibot.FilePage):
         self.contents = None
 
         if not site:
-            site = pywikibot.Site('commons:commons')
+            site = pywikibot.Site('commons')
 
         # default title
         super().__init__(site, self.get_title('%(_filename)s.%(_ext)s'))

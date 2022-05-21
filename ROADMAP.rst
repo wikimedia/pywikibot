@@ -1,44 +1,33 @@
-Current release 7.2.0
+Current release 7.3.0
 ^^^^^^^^^^^^^^^^^^^^^
 
-* Make logging system consistent, add pywikibot.info() alias for pywikibot.output() (:phab:`T85620`)
+* Add support for kcgwiki (:phab:`T305282`)
+* Raise InvalidTitleError instead of unspecific ValueError in ProofreadPage (:phab:`T308016`)
+* Preload pages if GeneratorFactory.articlenotfilter_list is not empty; also set attribute ``is_preloading``.
+* ClaimCollection.toJSON() should not ignore new claim (:phab:`T308245`)
+* use linktrail via siteinfo and remove `update_linkrtrails` maintenance script
+* Print counter statistic for all counters (:phab:`T307834`)
+* Use proofreadpagesinindex query module
+* Prioritize -namespaces options in `pagegenerators.handle_args` (:phab:`T222519`)
+* Remove `ThreadList.stop_all()` method (:phab:`T307830`)
 * L10N updates
-* Circumvent circular import in tools module (:phab:`T306760`)
-* Don't fix html inside syntaxhighlight parts in fixes.py (:phab:`T306723`)
-* Make layer parameter optional in `pywikibot.debug()` (:phab:`T85620`)
-* Retry for internal_api_error_DBQueryTimeoutError errors due to :phab:`T297708`
-* Handle ParserError within xmlreader.XmlDump.parse() instead of raising an exception (:phab:`T306134`)
-* XMLDumpOldPageGenerator is deprecated in favour of a `content` parameter (:phab:`T306134`)
-* `use_disambig` BaseBot attribute was added to hande disambig skipping
-* Deprecate RedirectPageBot and NoRedirectPageBot in favour of `use_redirects` attribute
-* tools.formatter.color_format is deprecated and will be removed
-* A new and easier color format was implemented; colors can be used like:
-    ``'this is a <<green>>colored<<default>> text'``
-* Unused and unsupported `xmlreader.XmlParserThread` was removed
-* Use upercased IP user titles (:phab:`T306291`)
-* Use pathlib to extract filename and file_package in pwb.py
-* Fix isbn messages in fixes.py (:phab:`T306166`)
-* Fix Page.revisions() with starttime (:phab:`T109181`)
-* Use stream_output for messages inside input_list_choice method (:phab:`T305940`)
-* Expand simulate query result (:phab:`T305918`)
-* Do not delete text when updating a Revision (:phab:`T304786`)
-* Re-enable scripts package version check with pwb wrapper (:phab:`T305799`)
-* Provide textlib.ignore_case() as a public method
-* Don't try to upcast timestamp from global userinfo if global account does not exists (:phab:`T305351`)
-* Archived scripts were removed; create a Phabricator task to restore some (:phab:`T223826`)
-* Add Lexeme support for Lexicographical data (:phab:`T189321`, :phab:`T305297`)
-* enable all parameters of `APISite.imageusage()` with `FilePage.usingPages()`
-* Don't raise `NoPageError` with `file_is_shared` (:phab:`T305182`)
-* Fix URL of GoogleOCR
-* Handle ratelimit with purgepages() (:phab:`T152597`)
-* Add movesubpages parameter to Page.move() and APISite.movepage() (:phab:`T57084`)
-* Do not iterate over sys.modules (:phab:`T304785`)
+* Improve get_charset_from_content_type function (:phab:`T307760`)
+* A tiny cache wrapper was added to hold results of parameterless methods and properties
+* Increase workers in preload_sites.py
+* Close logging handlers before deleting them (:phab:`T91375`, :phab:`T286127`)
+* Clear _sites cache if called with pwb wrapper (:phab:`T225594`)
+* Enable short creation of a site if family name is equal to site code
+* Use `exc_info=True` with pywikibot.exception() by default (:phab:`T306762`)
+* Make IndexPage more robust when getting links in Page ns (:phab:`T307280`)
+* Do not print log header twice in log files (:phab:`T264235`)
+* Do not delegate logging output to the root logger (:phab:`T281643`)
+* Add `get_charset_from_content_type` to extract the charset from the content-type response header
 
 
 Deprecations
 ^^^^^^^^^^^^
 
-* Python 3.5 support will be dropped with Python 8 (:phab:`T301908`)
+* 7.3.0: Python 3.5 support will be dropped with Python 8 (:phab:`T301908`)
 * 7.2.0: XMLDumpOldPageGenerator is deprecated in favour of a `content` parameter (:phab:`T306134`)
 * 7.2.0: RedirectPageBot and NoRedirectPageBot bot classes are deprecated in favour of `use_redirects` attribute
 * 7.2.0: `tools.formatter.color_format` is deprecated and will be removed

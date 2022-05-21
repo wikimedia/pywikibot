@@ -667,6 +667,7 @@ class WikibaseItemFilterPageGeneratorTestCase(TestCase):
         gen = WikibaseItemFilterPageGenerator(pages, has_item=False)
         self.assertLength(list(gen), 0)
 
+    @unittest.expectedFailure
     def test_filter_pages_without_item(self):
         """Test WikibaseItemFilterPageGenerator on pages without item."""
         gf = pagegenerators.GeneratorFactory(site=self.site)

@@ -10,8 +10,7 @@ Various Wikibase pages are defined in ``page._wikibase.py``,
 various pages for Proofread Extensions are defines in
 ``pywikibot.proofreadpage``.
 
-..note::
-  `Link` objects represent a wiki-page's title, while
+..note:: `Link` objects represent a wiki-page's title, while
   :class:`pywikibot.Page` objects (defined here) represent the page
   itself, including its contents.
 """
@@ -52,6 +51,7 @@ from pywikibot.page._links import BaseLink, Link
 from pywikibot.site import Namespace, NamespaceArgType
 from pywikibot.tools import (
     ComparableMixin,
+    cached,
     first_upper,
     issue_deprecation_warning,
     remove_last_args,
@@ -191,17 +191,14 @@ class BasePage(ComparableMixin):
         return self._contentmodel
 
     @property
-    def depth(self):
-        """Return the depth/subpage level of the page."""
-        if not hasattr(self, '_depth'):
-            # Check if the namespace allows subpages
-            if self.namespace().subpages:
-                self._depth = self.title().count('/')
-            else:
-                # Does not allow subpages, which means depth is always 0
-                self._depth = 0
+    @cached
+    def depth(self) -> int:
+        """Return the depth/subpage level of the page.
 
-        return self._depth
+        Check if the namespace allows subpages.
+        Not allowed subpages means depth is always 0.
+        """
+        return self.title().count('/') if self.namespace().subpages else 0
 
     @property
     def pageid(self) -> int:
@@ -357,6 +354,7 @@ class BasePage(ComparableMixin):
         return self.site.base_url(
             self.site.articlepath.format(self.title(as_url=True)))
 
+    @cached
     def autoFormat(self):
         """
         Return :py:obj:`date.getAutoFormat` dictName and value, if any.
@@ -367,12 +365,7 @@ class BasePage(ComparableMixin):
         different namespaces, as some sites have categories with the
         same names. Regular titles return (None, None).
         """
-        if not hasattr(self, '_autoFormat'):
-            self._autoFormat = date.getAutoFormat(
-                self.site.lang,
-                self.title(with_ns=False)
-            )
-        return self._autoFormat
+        return date.getAutoFormat(self.site.lang, self.title(with_ns=False))
 
     def isAutoTitle(self):
         """Return True if title of this Page is in the autoFormat dict."""
@@ -706,6 +699,7 @@ class BasePage(ComparableMixin):
         """Return True if last editor was unregistered."""
         return self.latest_revision.anon
 
+    @cached
     def lastNonBotUser(self) -> str:
         """
         Return name or IP address of last human/non-bot user to edit page.
@@ -717,16 +711,11 @@ class BasePage(ComparableMixin):
         i.e. which is not returned by Site.botusers(), it will be returned
         as a non-bot edit.
         """
-        if hasattr(self, '_lastNonBotUser'):
-            return self._lastNonBotUser
-
-        self._lastNonBotUser = None
         for entry in self.revisions():
             if entry.user and (not self.site.isBot(entry.user)):
-                self._lastNonBotUser = entry.user
-                break
+                return entry.user
 
-        return self._lastNonBotUser
+        return None
 
     def editTime(self) -> pywikibot.Timestamp:
         """Return timestamp of last revision to page."""
@@ -1387,7 +1376,7 @@ class BasePage(ComparableMixin):
         minor and botflag parameters are set to False which prevents hiding
         the edit when it becomes a real edit due to a bug.
 
-        :note: This discards content saved to self.text.
+        .. note:: This discards content saved to self.text.
         """
         if self.exists():
             # ensure always get the page text and not to change it.
@@ -1805,7 +1794,7 @@ class BasePage(ComparableMixin):
         automatic_quit: bool = False,
         *,
         deletetalk: bool = False
-    ) -> None:
+    ) -> int:
         """
         Delete the page from the wiki. Requires administrator status.
 
@@ -1821,6 +1810,12 @@ class BasePage(ComparableMixin):
             will be asked before marking pages for deletion.
         :param automatic_quit: show also the quit option, when asking
             for confirmation.
+
+        :return: the function returns an integer, with values as follows:
+            value    meaning
+            0        no action was done
+            1        page was deleted
+            -1       page was marked for deletion
         """
         if reason is None:
             pywikibot.output('Deleting {}.'.format(self.title(as_link=True)))
@@ -1840,7 +1835,9 @@ class BasePage(ComparableMixin):
                     self.site._noDeletePrompt = True
             if answer == 'y':
                 self.site.delete(self, reason, deletetalk=deletetalk)
-            return
+                return 1
+            else:
+                return 0
 
         # Otherwise mark it for deletion
         if mark or hasattr(self.site, '_noMarkDeletePrompt'):
@@ -1864,6 +1861,9 @@ class BasePage(ComparableMixin):
                 target = self
             target.text = template + target.text
             target.save(summary=reason)
+            return -1
+        else:
+            return 0
 
     def has_deleted_revisions(self) -> bool:
         """Return True if the page has deleted revisions.
@@ -2146,6 +2146,7 @@ class Page(BasePage):
         super().__init__(source, title, ns)
 
     @property
+    @cached
     def raw_extracted_templates(self):
         """
         Extract templates using :py:obj:`textlib.extract_templates_and_params`.
@@ -2153,16 +2154,9 @@ class Page(BasePage):
         Disabled parts and whitespace are stripped, except for
         whitespace in anonymous positional arguments.
 
-        This value is cached.
-
         :rtype: list of (str, OrderedDict)
         """
-        if not hasattr(self, '_raw_extracted_templates'):
-            templates = textlib.extract_templates_and_params(
-                self.text, True, True)
-            self._raw_extracted_templates = templates
-
-        return self._raw_extracted_templates
+        return textlib.extract_templates_and_params(self.text, True, True)
 
     def templatesWithParams(self):
         """

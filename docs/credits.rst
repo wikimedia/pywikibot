@@ -1,4 +1,4 @@
 Credits
 =======
 
-.. include:: ../CREDITS.rst
+.. include:: ../AUTHORS.rst

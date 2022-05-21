@@ -168,8 +168,8 @@ class ParserFunctionCountBot(SingleSiteBot, ExistingPageBot):
                 with codecs.open(
                         self.opt.save, encoding='utf-8', mode='a') as f:
                     f.write(resultlist)
-            except OSError:
-                pywikibot.exception()
+            except OSError as e:
+                pywikibot.error(e)
 
         if self.opt.upload:
             page = pywikibot.Page(self.site, self.opt.upload)

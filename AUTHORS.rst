@@ -130,10 +130,17 @@ H
     Hazard-SJ
     Huji
     Homeboy445
+
+I
+-
+
+::
+
+
     Inductiveload
 
-I/J
----
+J
+-
 
 ::
 
@@ -168,6 +175,7 @@ K
     kenrick95
     Keichwa
     Kim Bruning
+    Klein Muçi
     Kunal Mehta
     Kyle Moore
 
@@ -342,6 +350,7 @@ W
     Wikihermit
     Wikipedian
     WikiWichtel
+    William Avery
     withoutaname
 
 X

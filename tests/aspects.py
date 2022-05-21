@@ -468,8 +468,7 @@ class CheckHostnameMixin(TestCaseBase):
                             r.status_code, HTTPStatus(r.status_code).phrase))
             except Exception as e:
                 pywikibot.exception('{}: accessing {} caused exception:'
-                                    .format(cls.__name__, hostname),
-                                    exc_info=True)
+                                    .format(cls.__name__, hostname))
 
                 cls._checked_hostnames[hostname] = e
                 raise unittest.SkipTest(

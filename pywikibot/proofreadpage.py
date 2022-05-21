@@ -47,9 +47,10 @@ from pywikibot.backports import (
     Tuple,
 )
 from pywikibot.comms import http
-from pywikibot.data.api import Request
-from pywikibot.exceptions import Error, OtherPageSaveError
+from pywikibot.data.api import ListGenerator, Request
+from pywikibot.exceptions import Error, InvalidTitleError, OtherPageSaveError
 from pywikibot.page import PageSourceType
+from pywikibot.tools import cached
 
 
 try:
@@ -246,7 +247,11 @@ class ProofreadPage(pywikibot.Page):
 
         if sep:
             base = left
-            num = int(right)
+            try:
+                num = int(right)
+            except ValueError:
+                raise InvalidTitleError('{} contains invalid index {!r}'
+                                        .format(self, right))
         else:
             base = right
 
@@ -557,6 +562,7 @@ class ProofreadPage(pywikibot.Page):
         return '/* {0.status} */ '.format(self)
 
     @property
+    @cached
     def url_image(self) -> str:
         """Get the file url of the scan of ProofreadPage.
 
@@ -567,35 +573,33 @@ class ProofreadPage(pywikibot.Page):
         :raises ValueError: in case of no prp_page_image src found for scan
         """
         # wrong link fails with various possible Exceptions.
-        if not hasattr(self, '_url_image'):
+        if self.exists():
+            url = self.full_url()
+        else:
+            path = 'w/index.php?title={}&action=edit&redlink=1'
+            url = self.site.base_url(path.format(self.title(as_url=True)))
 
-            if self.exists():
-                url = self.full_url()
-            else:
-                path = 'w/index.php?title={}&action=edit&redlink=1'
-                url = self.site.base_url(path.format(self.title(as_url=True)))
+        try:
+            response = http.fetch(url, charset='utf-8')
+        except Exception:
+            pywikibot.error('Error fetching HTML for {}.'.format(self))
+            raise
 
-            try:
-                response = http.fetch(url, charset='utf-8')
-            except Exception:
-                pywikibot.error('Error fetching HTML for {}.'.format(self))
-                raise
+        soup = _bs4_soup(response.text)  # type: ignore
 
-            soup = _bs4_soup(response.text)  # type: ignore
+        try:
+            url_image = soup.find(class_='prp-page-image')
+            # if None raises AttributeError
+            url_image = url_image.find('img')
+            # if None raises TypeError.
+            url_image = url_image['src']
+        except (TypeError, AttributeError):
+            raise ValueError('No prp-page-image src found for {}.'
+                             .format(self))
+        else:
+            url_image = 'https:' + url_image
 
-            try:
-                self._url_image = soup.find(class_='prp-page-image')
-                # if None raises AttributeError
-                self._url_image = self._url_image.find('img')
-                # if None raises TypeError.
-                self._url_image = self._url_image['src']
-            except (TypeError, AttributeError):
-                raise ValueError('No prp-page-image src found for {}.'
-                                 .format(self))
-            else:
-                self._url_image = 'https:' + self._url_image
-
-        return self._url_image
+        return url_image
 
     def _ocr_callback(self, cmd_uri: str,
                       parser_func: Optional[Callable[[str], str]] = None,
@@ -824,10 +828,38 @@ class IndexPage(pywikibot.Page):
             raise ValueError('Page {} must belong to {} namespace'
                              .format(self.title(), site.proofread_index_ns))
 
-        self._all_page_links = set(
-            self.site.pagelinks(self, namespaces=site.proofread_page_ns))
+        self._all_page_links = {}
+
+        for page in self._get_prp_index_pagelist():
+            self._all_page_links[page.title()] = page
 
         self._cached = False
+
+    def _get_prp_index_pagelist(self):
+        """Get all pages in an IndexPage page list.
+
+        .. note:: This method is called by initializer and should not be used.
+
+        .. seealso::
+           `ProofreadPage Index Pagination API
+           <https://www.mediawiki.org/wiki/Extension:ProofreadPage/Index_pagination_API>`_
+
+        :meta public:
+        """
+        site = self.site
+        ppi_args = {}
+        if hasattr(self, '_pageid'):
+            ppi_args['prppiipageid'] = str(self._pageid)
+        else:
+            ppi_args['prppiititle'] = self.title().encode(site.encoding())
+
+        ppi_gen = site._generator(ListGenerator, 'proofreadpagesinindex',
+                                  **ppi_args)
+        for item in ppi_gen:
+            page = ProofreadPage(site, item['title'])
+            page.page_offset = item['pageoffset']
+            page.index = self
+            yield page
 
     @staticmethod
     def _parse_redlink(href: str) -> Optional[str]:
@@ -836,7 +868,7 @@ class IndexPage(pywikibot.Page):
             r'/w/index\.php\?title=(.+?)&action=edit&redlink=1')
         title = p_href.search(href)
         if title:
-            return title.group(1)
+            return title.group(1).replace('_', ' ')
         return None
 
     def save(self, *args: Any, **kwargs: Any) -> None:  # See Page.save().
@@ -904,23 +936,27 @@ class IndexPage(pywikibot.Page):
         self._soup = _bs4_soup(self.get_parsed_page(True))  # type: ignore
         # Do not search for "new" here, to avoid to skip purging if links
         # to non-existing pages are present.
-        attrs = {'class': re.compile('prp-pagequality')}
+        attrs = {'class': re.compile('prp-pagequality-[0-4]')}
 
         # Search for attribute "prp-pagequality" in tags:
         # Existing pages:
         # <a href="/wiki/Page:xxx.djvu/n"
+        #    class="prp-pagequality-0 quality0" or
+        #    class="prp-index-pagelist-page prp-pagequality-0 quality0"
         #    title="Page:xxx.djvu/n">m
-        #    class="quality1 prp-pagequality-1"
         # </a>
         # Non-existing pages:
         # <a href="/w/index.php?title=xxx&amp;action=edit&amp;redlink=1"
-        #    class="new"
+        #    class="new prp-index-pagelist-page"
         #    title="Page:xxx.djvu/n (page does not exist)">m
         # </a>
 
         # Try to purge or raise ValueError.
         found = self._soup.find_all('a', attrs=attrs)
-        attrs = {'class': re.compile('prp-pagequality|new')}
+        attrs = {'class': re.compile('prp-pagequality-[0-4]|'
+                                     'new prp-index-pagelist-page|'
+                                     'prp-index-pagelist-page')
+                 }
         if not found:
             self.purge()
             self._soup = _bs4_soup(self.get_parsed_page(True))  # type: ignore
@@ -929,7 +965,6 @@ class IndexPage(pywikibot.Page):
                     'Missing class="qualityN prp-pagequality-N" or '
                     'class="new" in: {}.'.format(self))
 
-        # Search for attribute "prp-pagequality" or "new" in tags:
         page_cnt = 0
         for a_tag in self._soup.find_all('a', attrs=attrs):
             label = a_tag.text.lstrip('0')  # Label is not converted to int.
@@ -944,16 +979,12 @@ class IndexPage(pywikibot.Page):
                 title = a_tag.get('title')   # existing page
 
             assert title is not None
-            try:
-                page = ProofreadPage(self.site, title)
-                page.index = self  # set index property for page
-                page_cnt += 1
-            except ValueError:
-                # title is not in site.proofread_page_ns; do not consider it
-                continue
 
-            if page not in self._all_page_links:
-                raise Error('Page {} not recognised.'.format(page))
+            try:
+                page = self._all_page_links[title]
+                page_cnt += 1
+            except KeyError:
+                continue
 
             # In order to avoid to fetch other Page:title links outside
             # the Pages section of the Index page; these should hopefully be
@@ -979,7 +1010,8 @@ class IndexPage(pywikibot.Page):
             self._pages_from_label.setdefault(label, set()).add(page)
 
         # Sanity check: all links to Page: ns must have been considered.
-        assert set(self._labels_from_page) == set(self._all_page_links)
+        assert (set(self._labels_from_page)
+                == set(self._all_page_links.values()))
 
         # Info cached.
         self._cached = True
@@ -1033,8 +1065,8 @@ class IndexPage(pywikibot.Page):
         # Decorate and sort by page number because preloadpages does not
         # guarantee order.
         # TODO: remove if preloadpages will guarantee order.
-        gen = ((p, self.get_number(p)) for p in gen)
-        gen = (p[0] for p in sorted(gen, key=lambda x: x[1]))
+        gen = ((self.get_number(p), p) for p in gen)
+        gen = (p for n, p in sorted(gen))
 
         return gen
 

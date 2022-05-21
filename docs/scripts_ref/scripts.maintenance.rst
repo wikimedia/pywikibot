@@ -32,11 +32,6 @@ scripts.maintenance.sorting\_order script
 
 .. automodule:: scripts.maintenance.sorting_order
 
-scripts.maintenance.update\_linktrails script
----------------------------------------------
-
-.. automodule:: scripts.maintenance.update_linktrails
-
 scripts.maintenance.wikimedia\_sites script
 -------------------------------------------
 

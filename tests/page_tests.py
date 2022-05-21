@@ -1047,8 +1047,9 @@ class TestPageDelete(TestCase):
         p.save('Pywikibot unit test', botflag=True)
 
         # Test deletion
-        p.delete(reason='Pywikibot unit test', prompt=False, mark=False)
+        res = p.delete(reason='Pywikibot unit test', prompt=False, mark=False)
         self.assertEqual(p._pageid, 0)
+        self.assertEqual(res, 1)
         with self.assertRaisesRegex(NoPageError, NO_PAGE_RE):
             p.get(force=True)
 
@@ -1238,7 +1239,7 @@ class TestShortLink(TestCase):
     def test_create_short_link(self):
         """Test create_short_link function."""
         # Make sure test user is logged in on meta:meta (T244062)
-        meta = pywikibot.Site('meta:meta')
+        meta = pywikibot.Site('meta')
         if not meta.logged_in():
             meta.login()
         if not meta.user():

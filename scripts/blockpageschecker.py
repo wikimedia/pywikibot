@@ -233,6 +233,9 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
         #        "{} is sysop-protected : this account can't edit "
         #        "it! Skipping...".format(pagename))
         #    continue
+        if super().skip_page(page):
+            return True
+
         page.protection()
         if not page.has_permission():
             pywikibot.warning(
@@ -240,7 +243,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                 .format(page))
             return True
 
-        return super().skip_page(page)
+        return False
 
     def remove_templates(self):
         """Understand if the page is blocked has the right template."""

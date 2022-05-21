@@ -29,6 +29,7 @@ from warnings import catch_warnings, showwarning, warn
 import pkg_resources
 
 import pywikibot  # T306760
+from pywikibot.backports import Callable
 from pywikibot.tools._deprecate import (  # noqa: F401 skipcq: PY-W2000
     ModuleDeprecationWrapper,
     add_decorated_full_name,
@@ -368,9 +369,11 @@ def first_upper(string: str) -> str:
 
     .. versionadded:: 3.0
 
-    :note: MediaWiki doesn't capitalize some characters the same way as Python.
-        This function tries to be close to MediaWiki's capitalize function in
-        title.php. See T179115 and T200357.
+    .. note:: MediaWiki doesn't capitalize
+       some characters the same way as Python.
+       This function tries to be close to
+       MediaWiki's capitalize function in
+       title.php. See T179115 and T200357.
     """
     first = string[:1]
     return (_first_upper_exception(first) or first.upper()) + string[1:]
@@ -807,16 +810,6 @@ class ThreadList(list):
         thd.start()
         pywikibot.logging.debug("thread {} ('{}') started"
                                 .format(len(self), type(thd)))
-
-    def stop_all(self) -> None:
-        """Stop all threads the pool."""
-        if self:
-            pywikibot.logging.debug('EARLY QUIT: Threads: {}'
-                                    .format(len(self)))
-        for thd in self:
-            thd.stop()
-            pywikibot.logging.debug('EARLY QUIT: Queue size left in {}: {}'
-                                    .format(thd, thd.queue.qsize()))
 
 
 def intersect_generators(*iterables, allow_duplicates: bool = False):
@@ -1319,3 +1312,50 @@ def compute_file_hash(filename: str, sha: str = 'sha1', bytes_to_read=None):
             bytes_to_read -= len(read_bytes)
             sha.update(read_bytes)
     return sha.hexdigest()
+
+
+def cached(*arg: Callable) -> Any:
+    """Decorator to cache information of an object.
+
+    The wrapper adds an attribute to the instance which holds the result
+    of the decorated method. The attribute's name is the method name
+    with preleading underscore.
+
+    Usage::
+
+        @cached
+        def this_method(self)
+
+        @cached
+        def that_method(self, force=False)
+
+    No parameter may be used with this decorator. Only a force parameter
+    may be used with the decorated method. All other parameters are
+    discarded and lead to a TypeError.
+
+    .. note:: A property must be decorated on top of the property method
+       below other decorators. This decorator must not be used with
+       functions.
+    .. versionadded:: 7.3
+
+    :raises TypeError: decorator must be used without arguments
+    """
+    fn = arg and arg[0]
+    if not callable(fn):
+        raise TypeError(
+            '"cached" decorator must be used without arguments.') from None
+
+    @wraps(fn)
+    def wrapper(obj: object, *, force=False) -> Any:
+        cache_name = '_' + fn.__name__
+        if force:
+            with suppress(AttributeError):
+                delattr(obj, cache_name)
+        try:
+            return getattr(obj, cache_name)
+        except AttributeError:
+            val = fn(obj)
+            setattr(obj, cache_name, val)
+            return val
+
+    return wrapper

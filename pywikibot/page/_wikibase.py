@@ -46,6 +46,7 @@ from pywikibot.page._decorators import allow_asynchronous
 from pywikibot.page._filepage import FilePage
 from pywikibot.page._pages import BasePage
 from pywikibot.site import DataSite, Namespace
+from pywikibot.tools import cached
 
 
 __all__ = (
@@ -535,9 +536,10 @@ class WikibasePage(BasePage, WikibaseEntity):
         :param force: override caching
         :raise NotImplementedError: a value in args or kwargs
         :return: actual data which entity holds
-        :note: dicts returned by this method are references to content
-            of this entity and their modifying may indirectly cause
-            unwanted change to the live content
+
+        .. note:: dicts returned by this method are references to content
+           of this entity and their modifying may indirectly cause
+           unwanted change to the live content
         """
         if args or kwargs:
             raise NotImplementedError(
@@ -941,9 +943,11 @@ class ItemPage(WikibasePage):
                              redirect, do not raise an exception.
         :raise NotImplementedError: a value in args or kwargs
         :return: actual data which entity holds
-        :note: dicts returned by this method are references to content of this
-            entity and their modifying may indirectly cause unwanted change to
-            the live content
+
+        .. note:: dicts returned by this method are
+           references to content of this entity and
+           their modifying may indirectly cause
+           unwanted change to the live content
         """
         data = super().get(force, *args, **kwargs)
 
@@ -1167,11 +1171,10 @@ class Property:
             self._type = datatype
 
     @property
+    @cached
     def type(self) -> str:
         """Return the type of this property."""
-        if not hasattr(self, '_type'):
-            self._type = self.repo.getPropertyType(self)
-        return self._type
+        return self.repo.getPropertyType(self)
 
     def getID(self, numeric: bool = False):
         """
@@ -1245,9 +1248,11 @@ class PropertyPage(WikibasePage, Property):
         :param force: override caching
         :raise NotImplementedError: a value in args or kwargs
         :return: actual data which entity holds
-        :note: dicts returned by this method are references to content of this
-            entity and their modifying may indirectly cause unwanted change to
-            the live content
+
+        .. note:: dicts returned by this method are
+           references to content of this entity and
+           their modifying may indirectly cause
+           unwanted change to the live content
         """
         if args or kwargs:
             raise NotImplementedError(
@@ -1304,7 +1309,7 @@ class Claim(Property):
         'wikibase-form': lambda value, site: LexemeForm(site, value['id']),
         'wikibase-sense': lambda value, site: LexemeSense(site, value['id']),
         'commonsMedia': lambda value, site:
-            FilePage(pywikibot.Site('commons', 'commons'), value),  # T90492
+            FilePage(pywikibot.Site('commons'), value),  # T90492
         'globe-coordinate': pywikibot.Coordinate.fromWikibase,
         'geo-shape': pywikibot.WbGeoShape.fromWikibase,
         'tabular-data': pywikibot.WbTabularData.fromWikibase,
@@ -1882,7 +1887,7 @@ class LexemePage(WikibasePage):
     Basic usage sample:
 
     >>> import pywikibot
-    >>> repo = pywikibot.Site('wikidata:wikidata')
+    >>> repo = pywikibot.Site('wikidata')
     >>> L2 = pywikibot.LexemePage(repo, 'L2')  # create a Lexeme page
     >>> list(L2.claims.keys())  # access the claims
     ['P5831', 'P5402']
@@ -1968,9 +1973,10 @@ class LexemePage(WikibasePage):
             redirect, do not raise an exception.
         :type get_redirect: bool
         :raise NotImplementedError: a value in args or kwargs
-        :note: dicts returned by this method are references to content
-            of this entity and their modifying may indirectly cause
-            unwanted change to the live content
+
+        .. note:: dicts returned by this method are references to content
+           of this entity and their modifying may indirectly cause
+           unwanted change to the live content
         """
         data = super().get(force, *args, **kwargs)
 
@@ -2202,9 +2208,10 @@ class LexemeForm(LexemeSubEntity):
         Fetch all form data, and cache it.
 
         :param force: override caching
-        :note: dicts returned by this method are references to content
-            of this entity and their modifying may indirectly cause
-            unwanted change to the live content
+
+        .. note:: dicts returned by this method are references to content
+           of this entity and their modifying may indirectly cause
+           unwanted change to the live content
         """
         data = super().get(force=force)
 

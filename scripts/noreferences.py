@@ -233,9 +233,9 @@ placeBeforeSections = {
 }
 
 # Titles of sections where a reference tag would fit into.
-# The first title should be the preferred one: It's the one that
-# will be used when a new section has to be created.
-# Except for the first, others are tested as regexes.
+# The first title should be the preferred one: It's the one that will be
+# used when a new section has to be created. Section titles can be regex
+# patterns except of the first.
 referencesSections = {
     'wikipedia': {
         'ar': [             # not sure about which ones are preferred.
@@ -709,13 +709,16 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot):
 
     def skip_page(self, page):
         """Check whether the page could be processed."""
+        if super().skip_page(page):
+            return True
+
         if self.site.sitename == 'wikipedia:en' and page.isIpEdit():
             pywikibot.warning(
                 'Page {} is edited by IP. Possible vandalized'
                 .format(page.title(as_link=True)))
             return True
 
-        return super().skip_page(page)
+        return False
 
     def treat_page(self) -> None:
         """Run the bot."""

@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Script that updates interwiki sorting order in family.py file."""
 #
-# (C) Pywikibot team, 2020-2021
+# (C) Pywikibot team, 2020-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -68,7 +68,7 @@ def update_family(list_name, page):
 
 def main():
     """Main entry function."""
-    site = pywikibot.Site('meta', 'meta')
+    site = pywikibot.Site('meta')
     for list_name, page_name in pages.items():
         page = pywikibot.Page(site, page_name, ns=site.namespaces.MEDIAWIKI)
         update_family(list_name, page)

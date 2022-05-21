@@ -162,12 +162,12 @@ def main(*args: str) -> None:
     # The preloading option is responsible for downloading multiple
     # pages from the wiki simultaneously.
     gen = gen_factory.getCombinedGenerator(preload=True)
-    if gen:
+
+    # check if further help is needed
+    if not pywikibot.bot.suggest_help(missing_generator=not gen):
         # pass generator and private options to the bot
         bot = BasicBot(generator=gen, **options)
         bot.run()  # guess what it does
-    else:
-        pywikibot.bot.suggest_help(missing_generator=True)
 
 
 if __name__ == '__main__':

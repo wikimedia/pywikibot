@@ -6,6 +6,8 @@
 #
 import logging
 
+from pywikibot.userinterfaces.terminal_interface_base import new_colorTagR
+
 
 class LoggingFormatter(logging.Formatter):
 
@@ -21,10 +23,14 @@ class LoggingFormatter(logging.Formatter):
                 'Arguments for record is not correctly set'
             msg = record.args[0]
 
-            record.__dict__['caller_file'] = record.pathname
+            record.__dict__['caller_file'] = record.filename
             record.__dict__['caller_name'] = record.module
             record.__dict__['caller_line'] = record.lineno
 
             record.args = (msg,)
+
+        # remove color tags
+        if record.msg:
+            record.msg = new_colorTagR.sub('', record.msg)
 
         return super().format(record).rstrip()

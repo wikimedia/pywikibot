@@ -602,8 +602,8 @@ class CheckImagesBot:
                 pywikibot.output('Edit Conflict! Retrying...')
                 try:
                     self.put_mex_in_talk()
-                except Exception:
-                    pywikibot.exception()
+                except Exception as e:
+                    pywikibot.error(e)
                     pywikibot.output(
                         'Another error... skipping the user...')
 
@@ -831,7 +831,7 @@ class CheckImagesBot:
         except NoPageError:
             return False  # Image deleted, no hash found. Skip the image.
 
-        site = pywikibot.Site('commons', 'commons')
+        site = pywikibot.Site('commons')
         commons_image_with_this_hash = next(
             iter(site.allimages(sha1=hash_found, total=1)), None)
         if commons_image_with_this_hash:

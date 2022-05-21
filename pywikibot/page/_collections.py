@@ -277,6 +277,7 @@ class ClaimCollection(MutableMapping):
 
             for claim, json in zip(self[prop], claims[prop]):
                 if 'id' not in json:
+                    temp[prop].append(json)
                     continue
 
                 claim_ids.add(json['id'])

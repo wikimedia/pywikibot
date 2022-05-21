@@ -1,6 +1,44 @@
 Release history
 ^^^^^^^^^^^^^^^
 
+7.2.0
+-----
+*26 April 2022*
+
+* Make logging system consistent, add pywikibot.info() alias for pywikibot.output() (:phab:`T85620`)
+* L10N updates
+* Circumvent circular import in tools module (:phab:`T306760`)
+* Don't fix html inside syntaxhighlight parts in fixes.py (:phab:`T306723`)
+* Make layer parameter optional in `pywikibot.debug()` (:phab:`T85620`)
+* Retry for internal_api_error_DBQueryTimeoutError errors due to :phab:`T297708`
+* Handle ParserError within xmlreader.XmlDump.parse() instead of raising an exception (:phab:`T306134`)
+* XMLDumpOldPageGenerator is deprecated in favour of a `content` parameter (:phab:`T306134`)
+* `use_disambig` BaseBot attribute was added to hande disambig skipping
+* Deprecate RedirectPageBot and NoRedirectPageBot in favour of `use_redirects` attribute
+* tools.formatter.color_format is deprecated and will be removed
+* A new and easier color format was implemented; colors can be used like: 
+    ``'this is a <<green>>colored<<default>> text'``
+* Unused and unsupported `xmlreader.XmlParserThread` was removed
+* Use upercased IP user titles (:phab:`T306291`)
+* Use pathlib to extract filename and file_package in pwb.py
+* Fix isbn messages in fixes.py (:phab:`T306166`)
+* Fix Page.revisions() with starttime (:phab:`T109181`)
+* Use stream_output for messages inside input_list_choice method (:phab:`T305940`)
+* Expand simulate query result (:phab:`T305918`)
+* Do not delete text when updating a Revision (:phab:`T304786`)
+* Re-enable scripts package version check with pwb wrapper (:phab:`T305799`)
+* Provide textlib.ignore_case() as a public method
+* Don't try to upcast timestamp from global userinfo if global account does not exists (:phab:`T305351`)
+* Archived scripts were removed; create a Phabricator task to restore some (:phab:`T223826`)
+* Add Lexeme support for Lexicographical data (:phab:`T189321`, :phab:`T305297`)
+* enable all parameters of `APISite.imageusage()` with `FilePage.usingPages()`
+* Don't raise `NoPageError` with `file_is_shared` (:phab:`T305182`)
+* Fix URL of GoogleOCR
+* Handle ratelimit with purgepages() (:phab:`T152597`)
+* Add movesubpages parameter to Page.move() and APISite.movepage() (:phab:`T57084`)
+* Do not iterate over sys.modules (:phab:`T304785`)
+
+
 7.1.0
 -----
 *26 March 2022*

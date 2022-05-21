@@ -3260,6 +3260,66 @@ class TestSametitleSite(TestCase):
         self.assertFalse(site.sametitle('Invalid:Foo', 'Invalid:foo'))
 
 
+class TestLinktrails(TestCase):
+
+    """Test linktrail method."""
+
+    family = 'wikipedia'
+    code = 'test'
+
+    def test_has_linktrail(self):
+        """Verify that every code has a linktrail.
+
+        Test all smallest wikis and the others randomly.
+        """
+        size = 20
+        small_wikis = self.site.family.languages_by_size[-size:]
+        great_wikis = self.site.family.languages_by_size[:-size]
+        great_wikis = random.sample(great_wikis, size)
+        for code in sorted(small_wikis + great_wikis):
+            site = pywikibot.Site(code, self.family)
+            with self.subTest(site=site):
+                self.assertIsInstance(site.linktrail(), str)
+
+    def test_linktrails(self):
+        """Test special linktrails.
+
+        This is a subset of the old `family.linktrails` dict.
+        """
+        linktrails = {
+            'ami': '',
+            'bug': '[a-z]*',
+            'ca': "(?:[a-zàèéíòóúç·ïü]|'(?!'))*",
+            'da': '[a-zæøå]*',
+            'ext': '[a-záéíóúñ]*',
+            'fa': '[ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیآأئؤة‌]*',
+            'gu': '[઀-૿]*',
+            'he': '[a-zא-ת]*',
+            'ii': '',
+            'jv': '[a-z]*',
+            'kaa': "(?:[a-zıʼ’“»]|'(?!'))*",
+            'lez': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюяӀ]*',
+            'mai': '[a-zऀ-ॣ०-꣠-ꣿ]*',
+            'nds-nl': '[a-zäöüïëéèà]*',
+            'or': '[a-z଀-୿]*',
+            'pt': '[áâãàéêẽçíòóôõq̃úüűũa-z]*',
+            'qu': '[a-záéíóúñ]*',
+            'roa-rup': '[a-zăâîşţșțĂÂÎŞŢȘȚ]*',
+            'sa': '[a-zऀ-ॣ०-꣠-ꣿ]*',
+            'te': '[ఁ-౯]*',
+            'uz': '[a-zʻʼ“»]*',
+            'vec': '[a-zàéèíîìóòúù]*',
+            'wuu': '',
+            'xmf': '[a-zაბგდევზთიკლმნოპჟრსტუფქღყშჩცძწჭხჯჰ“»]*',
+            'yi': '[a-zא-ת]*',
+            'zh-cn': ''
+        }
+        for code, linktrail in linktrails.items():
+            site = pywikibot.Site(code, self.family)
+            with self.subTest(site=site):
+                self.assertEqual(site.linktrail(), linktrail)
+
+
 class TestObsoleteSite(DefaultSiteTestCase):
 
     """Test 'closed' and obsolete code sites."""
@@ -3346,7 +3406,7 @@ class TestSubdomainFamilySite(TestCase):
         with self.assertRaises(KeyError):
             site.family.hostname('wowwiki')
         with self.assertRaises(UnknownSiteError):
-            pywikibot.Site('wowwiki', 'wowwiki')
+            pywikibot.Site('wowwiki')
         with self.assertRaises(UnknownSiteError):
             pywikibot.Site('ceb', 'wowwiki')
 

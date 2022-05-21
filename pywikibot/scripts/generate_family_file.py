@@ -43,7 +43,7 @@ from urllib.parse import urlparse
 # Legal characters for Family name and Family langs keys
 NAME_CHARACTERS = string.ascii_letters + string.digits
 # nds_nl code alias requires "_"n
-# dash must be the last char to be reused as regex in update_linktrails
+# dash must be the last char to be reused as regex
 CODE_CHARACTERS = string.ascii_lowercase + string.digits + '_-'
 
 
@@ -116,8 +116,8 @@ class FamilyFileGenerator:
             try:
                 w = self.Wiki(self.base_url, verify=verify)
             except FatalServerError:  # pragma: no cover
-                print('ERROR: '
-                      + pywikibot.comms.http.SSL_CERT_VERIFY_FAILED_MSG)
+                pywikibot.error(
+                    pywikibot.comms.http.SSL_CERT_VERIFY_FAILED_MSG)
                 pywikibot.exception()
                 if not pywikibot.bot.input_yn(
                     'Retry with disabled ssl certificate validation',

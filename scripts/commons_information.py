@@ -69,10 +69,10 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
                 tmp_page2 = pywikibot.Page(self.site, langs[0].lang, ns=10)
                 if tmp_page2 != tmp_page:
                     pywikibot.output(
-                        '\03{{lightblue}}The language template {before!r} '
+                        '<<lightblue>>The language template {before!r} '
                         'was found, but langdetect thinks {after!r} is the '
                         'most appropriate with a probability of {prob}:'
-                        '\03{{default}}\n{text}'
+                        '<<default>>\n{text}'
                         .format(before=tmp_page.title(with_ns=False),
                                 after=tmp_page2.title(with_ns=False),
                                 prob=langs[0].prob,

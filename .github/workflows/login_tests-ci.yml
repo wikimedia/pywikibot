@@ -7,7 +7,7 @@ name: Login CI
 on:
   workflow_run:
     workflows: [ "Pywikibot CI" ]
-    branches: [ master, stable ]
+    branches: [ master ]
     types:
       - completed
 

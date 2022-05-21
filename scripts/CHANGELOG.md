@@ -1,7 +1,35 @@
 # Scripts Changelog
 
+## 7.3.0
+*20 May 2022*
+
+### general
+* Call ExistingPageBot.skip_page() first (:phab:`T86491`)
+
+### delete
+* Count deleted pages and other actions (:phab:`T212040`)
+
+### replace
+* A -nopreload option was added
+
+### weblinkchecker
+* Throttle connections to the same host (:phab:`T152350`)
+* Do not kill threads after generator is exhausted (:phab:`T113139`)
+* Use Page.extlinks() to get external links (:phab:`T60812`)
+
+### update_script
+* update_script script was removed
+
+
+## 7.2.1
+*07 May 2022*
+
+### movepages
+* Fix regression of option parsing (:phab:`T307826`)
+
+
 ## 7.2.0
-*In development*
+*26 April 2022*
 
 ### general
 * Archived scripts were removed
@@ -29,6 +57,13 @@
 
 ### replace
 * A -quiet option was added to omit message when no change was made
+
+
+## 7.1.1
+*15 April 2022*
+
+### replace
+* Fix regression of XmlDumpPageGenerator
 
 
 ## 7.1.0

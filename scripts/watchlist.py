@@ -135,8 +135,8 @@ def main(*args: str) -> None:
         for page in watchlist:
             try:
                 pywikibot.stdout(page.title())
-            except InvalidTitleError:
-                pywikibot.exception()
+            except InvalidTitleError as e:
+                pywikibot.error(e)
 
 
 if __name__ == '__main__':

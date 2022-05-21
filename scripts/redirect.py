@@ -489,8 +489,8 @@ class RedirectRobot(ExistingPageBot):
         """Get redirect target page and handle some exceptions."""
         try:
             return page.getRedirectTarget()
-        except (CircularRedirectError, RuntimeError):
-            pywikibot.exception()
+        except (CircularRedirectError, RuntimeError) as e:
+            pywikibot.error(e)
             pywikibot.output('Skipping {}.'.format(page))
         except InterwikiRedirectPageError:
             pywikibot.output('{} is on another site, skipping.'.format(page))
@@ -502,8 +502,8 @@ class RedirectRobot(ExistingPageBot):
         done = not self.opt.delete
         try:
             targetPage = self.get_redirect_target(redir_page)
-        except InvalidTitleError:
-            pywikibot.exception()
+        except InvalidTitleError as e:
+            pywikibot.error(e)
             targetPage = None
 
         if not targetPage:
@@ -511,8 +511,8 @@ class RedirectRobot(ExistingPageBot):
 
         try:
             targetPage.get()
-        except InvalidTitleError:
-            pywikibot.exception()
+        except InvalidTitleError as e:
+            pywikibot.error(e)
         except NoPageError:
             movedTarget = None
             with suppress(NoMoveTargetError):
@@ -582,8 +582,8 @@ class RedirectRobot(ExistingPageBot):
                 pywikibot.warning(
                     "Redirect target section {} doesn't exist."
                     .format(newRedir.title(as_link=True)))
-            except UnsupportedPageError:
-                pywikibot.exception()
+            except UnsupportedPageError as e:
+                pywikibot.error(e)
                 pywikibot.output('Skipping {}.'.format(newRedir))
                 break
             except NoPageError:

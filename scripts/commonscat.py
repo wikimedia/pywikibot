@@ -381,8 +381,8 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
             pywikibot.log('Looking for template on ' + ipage.title())
             try:  # T291783
                 ipage_exists = ipage.exists()
-            except InvalidTitleError:
-                pywikibot.exception()
+            except InvalidTitleError as e:
+                pywikibot.error(e)
                 continue
 
             if (not ipage_exists or ipage.isRedirectPage()

@@ -1,0 +1,9 @@
+tests.i18n package
+==================
+
+.. automodule:: tests.i18n
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+

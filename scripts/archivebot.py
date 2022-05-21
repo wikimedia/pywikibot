@@ -911,7 +911,7 @@ def main(*args: str) -> None:
                                 .format(pg, e))
             except Exception:
                 pywikibot.exception('Error occurred while processing page {}'
-                                    .format(pg), exc_info=True)
+                                    .format(pg))
 
 
 if __name__ == '__main__':

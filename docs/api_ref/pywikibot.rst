@@ -29,6 +29,7 @@ pywikibot.bot module
 --------------------
 
 .. automodule:: pywikibot.bot
+  :member-order: bysource
 
 pywikibot.bot\_choice module
 ----------------------------

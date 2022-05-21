@@ -264,8 +264,8 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
                 message = i18n.twtranslate(
                     self.site, 'category_redirect-log-added', params)
                 self.log_text.append(message)
-            except Error:
-                pywikibot.exception()
+            except Error as e:
+                pywikibot.error(e)
                 message = i18n.twtranslate(
                     self.site, 'category_redirect-log-add-failed', params)
                 self.log_text.append(message)

@@ -1,6 +1,6 @@
 """Helper function which holds data from unicodedata library."""
 #
-# (C) Pywikibot team, 2018-2020
+# (C) Pywikibot team, 2018-2021
 #
 # Distributed under the terms of the MIT license.
 #

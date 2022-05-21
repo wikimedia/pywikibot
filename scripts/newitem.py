@@ -139,6 +139,9 @@ class NewItemRobot(WikidataBot):
 
     def skip_page(self, page) -> bool:
         """Skip pages which are unwanted to treat."""
+        if super().skip_page(page):
+            return True
+
         if page.editTime() > self.lastEditBefore:
             pywikibot.output(
                 'Last edit on {page} was on {page.latest_revision.timestamp}.'
@@ -170,7 +173,7 @@ class NewItemRobot(WikidataBot):
                              % (page, template))
             return True
 
-        return super().skip_page(page)
+        return False
 
     def treat_page_and_item(self, page, item) -> None:
         """Treat page/item."""

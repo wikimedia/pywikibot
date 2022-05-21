@@ -293,12 +293,12 @@ def set_interface(module_name: str) -> None:
     pywikibot.argvu = ui.argvu()
 
     # re-initialize
-
     if _handlers_initialized:
+        _handlers_initialized.clear()
         init_handlers()
 
 
-_handlers_initialized = False
+_handlers_initialized = []  # we can have a script and the script wrapper
 
 
 def handler_namer(name: str) -> str:
@@ -355,8 +355,6 @@ def init_handlers() -> None:
       Different logfiles are used if multiple processes of the same
       script are running.
     """
-    global _handlers_initialized
-
     module_name = calledModuleName()
     if not module_name:
         module_name = 'terminal-interface'
@@ -372,6 +370,8 @@ def init_handlers() -> None:
     # for prompts requiring user response
 
     root_logger = logging.getLogger('pywiki')
+    if root_logger.hasHandlers() and module_name in _handlers_initialized:
+        return
     root_logger.setLevel(DEBUG + 1)  # all records except DEBUG go to logger
 
     warnings_logger = logging.getLogger('py.warnings')
@@ -387,7 +387,10 @@ def init_handlers() -> None:
             warnings.filterwarnings('module')
         warnings.filterwarnings('once', category=FutureWarning)
 
-    root_logger.handlers = []  # remove any old handlers
+    for handler in root_logger.handlers:
+        handler.close()
+    root_logger.handlers.clear()  # remove any old handlers
+    root_logger.propagate = False  # T281643
 
     # configure handler(s) for display to user interface
     assert ui is not None
@@ -447,7 +450,7 @@ def init_handlers() -> None:
 
         warnings_logger.addHandler(file_handler)
 
-    _handlers_initialized = True
+    _handlers_initialized.append(module_name)
 
     writelogheader()
 
@@ -963,8 +966,10 @@ def handle_args(args: Optional[Iterable[str]] = None,
         try:
             pywikibot.Site()
         except (UnknownFamilyError, UnknownSiteError):
-            pywikibot.exception()
+            pywikibot.exception(exc_info=False)
             sys.exit(1)
+        if calledModuleName() == 'pwb':
+            pywikibot._sites.clear()
 
     if username:
         config.usernames[config.family][config.mylang] = username
@@ -1167,18 +1172,19 @@ class OptionHandler:
 
     >>> 'Option opt.{foo} is {bar}'.format_map(bot.opt)
     'Option opt.bar is 4711'
+
+    .. warning:: You must not access bot options as an attribute if the
+       keyword is a :python:`dict method<library/stdtypes.html#dict.clear>`.
     """
 
-    # Handler configuration.
-    # Only the keys of the dict can be passed as init options
-    # The values are the default values
-    # Overwrite this in subclasses!
-
     available_options = {}  # type: Dict[str, Any]
+    """ Handler configuration attribute.
+    Only the keys of the dict can be passed as `__init__` options.
+    The values are the default values. Overwrite this in subclasses!
+    """
 
     def __init__(self, **kwargs: Any) -> None:
-        """
-        Only accept options defined in available_options.
+        """Only accept options defined in available_options.
 
         :param kwargs: bot options
         """
@@ -1201,8 +1207,10 @@ class OptionHandler:
 
 class BaseBot(OptionHandler):
 
-    """
-    Generic Bot to be subclassed.
+    """Generic Bot to be subclassed.
+
+    Only accepts `generator` and options defined in
+    :attr:`available_options`.
 
     This class provides a :meth:`run` method for basic processing of a
     generator one page at a time.
@@ -1220,13 +1228,12 @@ class BaseBot(OptionHandler):
     properties.
 
     If the subclass does not set a generator, or does not override
-    :meth:`treat` or :meth:`run`, NotImplementedError is raised.
+    :meth:`treat` or :meth:`run`, `NotImplementedError` is raised.
 
     For bot options handling refer :class:`OptionHandler` class above.
 
     .. versionchanged:: 7.0
-       A counter attribute is provided which is a `collections.Counter`;
-       The default counters are 'read', 'write' and 'skip'.
+       A :attr:`counter` instance variable is provided.
     """
 
     use_disambigs = None  # type: Optional[bool]
@@ -1245,18 +1252,14 @@ class BaseBot(OptionHandler):
     .. versionadded:: 7.2
     """
 
-    # Handler configuration.
-    # The values are the default values
-    # Extend this in subclasses!
-
     available_options = {
         'always': False,  # By default ask for confirmation when putting a page
     }
 
     update_options = {}  # type: Dict[str, Any]
-    """update_options can be used to update available_options;
+    """`update_options` can be used to update :attr:`available_options`;
     do not use it if the bot class is to be derived but use
-    self.available_options.update(<dict>) initializer in such case.
+    `self.available_options.update(<dict>)` initializer in such case.
 
     .. versionadded:: 6.4
     """
@@ -1264,7 +1267,7 @@ class BaseBot(OptionHandler):
     _current_page = None  # type: Optional[pywikibot.page.BasePage]
 
     def __init__(self, **kwargs: Any) -> None:
-        """Only accept 'generator' and options defined in available_options.
+        """Initializer.
 
         :param kwargs: bot options
         :keyword generator: a :attr:`generator` processed by :meth:`run` method
@@ -1274,14 +1277,26 @@ class BaseBot(OptionHandler):
                 pywikibot.warn('{} has a generator already. Ignoring argument.'
                                .format(self.__class__.__name__))
             else:
-                #: generator processed by :meth:`run` method
+                #: instance variable to hold the generator processed by
+                #: :meth:`run` method
                 self.generator = kwargs.pop('generator')
 
         self.available_options.update(self.update_options)
         super().__init__(**kwargs)
 
-        self.counter = Counter()
+        self.counter = Counter()  # type: Counter
+        """Instance variable which holds counters. The default counters
+        are 'read', 'write' and 'skip'. You can use your own counters like::
+
+            self.counter['delete'] += 1
+
+        .. versionadded:: 7.0
+        .. versionchanged:: 7.3
+           Your additional counters are also printed during :meth:`exit`
+        """
+
         self._generator_completed = False
+
         #: instance variable to hold the default page type
         self.treat_page_type = pywikibot.page.BasePage  # type: Any
 
@@ -1373,21 +1388,18 @@ class BaseBot(OptionHandler):
         """
         Save a new revision of a page, with user confirmation as required.
 
-        Print differences, ask user for confirmation,
-        and puts the page if needed.
+        Print differences, ask user for confirmation, and puts the page
+        if needed.
 
         Option used:
 
         * 'always'
 
-        Keyword args used:
-
-        * 'asynchronous' - passed to page.save
-        * 'summary' - passed to page.save
-        * 'show_diff' - show changes between oldtext and newtext (enabled)
-        * 'ignore_save_related_errors' - report and ignore (disabled)
-        * 'ignore_server_errors' - report and ignore (disabled)
-
+        :keyword asynchronous: passed to page.save
+        :keyword summary: passed to page.save
+        :keyword show_diff: show changes between oldtext and newtext (enabled)
+        :keyword ignore_save_related_errors: report and ignore (disabled)
+        :keyword ignore_server_errors: report and ignore (disabled)
         :return: whether the page was saved successfully
         """
         if oldtext.rstrip() == newtext.rstrip():
@@ -1398,7 +1410,6 @@ class BaseBot(OptionHandler):
         self.current_page = page
 
         show_diff = kwargs.pop('show_diff', True)
-
         if show_diff:
             pywikibot.showDiff(oldtext, newtext)
 
@@ -1414,6 +1425,8 @@ class BaseBot(OptionHandler):
         """
         Helper function to handle page save-related option error handling.
 
+        .. note:: Do no use it directly. Use :meth:`userPut` instead.
+
         :param page: currently edited page
         :param func: the function to call
         :param args: passed to the function
@@ -1425,6 +1438,8 @@ class BaseBot(OptionHandler):
             page save will be reported and ignored (default: False)
         :kwtype ignore_save_related_errors: bool
         :return: whether the page was saved successfully
+
+        :meta public:
         """
         if not self.user_confirm('Do you want to accept these changes?'):
             return False
@@ -1468,13 +1483,17 @@ class BaseBot(OptionHandler):
         raise QuitKeyboardInterrupt
 
     def exit(self) -> None:
-        """
-        Cleanup and exit processing.
+        """Cleanup and exit processing.
 
-        Invoked when Bot.run() is finished.
-        Prints treat and save counters and informs whether the script
+        Invoked when :meth:`run` is finished. Waits for pending threads,
+        prints counter statistics and informs whether the script
         terminated gracefully or was halted by exception.
-        May be overridden by subclasses.
+
+        .. note:: Do not overwrite it by subclasses; :meth:`teardown`
+           should be used instead.
+
+        .. versionchanged:: 7.3
+           Statistics are printed for all entries in :attr:`counter`
         """
         self.teardown()
         if hasattr(self, '_start_ts'):
@@ -1484,10 +1503,10 @@ class BaseBot(OptionHandler):
         # wait until pending threads finished but don't close the queue
         pywikibot.stopme()
 
-        pywikibot.output('\n{read} pages read'
-                         '\n{write} pages written'
-                         '\n{skip} pages skipped'
-                         .format_map(self.counter))
+        pywikibot.info()
+        for op, count in self.counter.items():
+            pywikibot.info('{} {} operation{}'
+                           .format(count, op, 's' if count > 1 else ''))
 
         if hasattr(self, '_start_ts'):
             write_delta = pywikibot.Timestamp.now() - self._start_ts
@@ -1503,10 +1522,12 @@ class BaseBot(OptionHandler):
             if self.counter['read']:
                 pywikibot.output('Read operation time: {:.1f} seconds'
                                  .format(read_seconds / self.counter['read']))
-            if self.counter['write']:
-                pywikibot.output(
-                    'Write operation time: {:.1f} seconds'
-                    .format(write_seconds / self.counter['write']))
+
+            for op, count in self.counter.items():
+                if not count or op == 'read':
+                    continue
+                pywikibot.info('{} operation time: {:.1f} seconds'
+                               .format(op.capitalize(), write_seconds / count))
 
         # exc_info contains exception from self.run() while terminating
         exc_info = sys.exc_info()
@@ -1515,18 +1536,20 @@ class BaseBot(OptionHandler):
             pywikibot.output('successfully.')
         else:
             pywikibot.output('by exception:\n')
-            pywikibot.exception()
+            pywikibot.exception(exc_info=False)
 
     def init_page(self, item: Any) -> 'pywikibot.page.BasePage':
         """Initialize a generator item before treating.
 
-        Ensure that the result of init_page is always a pywikibot.Page object
-        even when the generator returns something else.
+        Ensure that the result of `init_page` is always a
+        pywikibot.Page object or any other type given by the
+        :attr:`treat_page_type` even when the generator returns
+        something else.
 
-        Also used to set the arrange the current site. This is called before
-        skip_page and treat.
+        Also used to set the arrange the current site. This is called
+        before :meth:`skip_page` and :meth:`treat`.
 
-        :param item: any item from self.generator
+        :param item: any item from :attr:`generator`
         :return: return the page object to be processed further
         """
         return item
@@ -1571,17 +1594,18 @@ class BaseBot(OptionHandler):
                                   .format(self.__class__.__name__))
 
     def setup(self) -> None:
-        """Some initial setup before run operation starts.
+        """Some initial setup before :meth:`run` operation starts.
 
         This can be used for reading huge parts from life wiki or file
         operation which is more than just initialize the instance.
-        Invoked by run() before running through generator loop.
+        Invoked by :meth:`run` before running through :attr:`generator`
+        loop.
 
         .. versionadded:: 3.0
         """
 
     def teardown(self) -> None:
-        """Some cleanups after run operation. Invoked by exit().
+        """Some cleanups after :meth:`run` operation. Invoked by :meth:`exit`.
 
         .. versionadded:: 3.0
         """
@@ -1616,8 +1640,8 @@ class BaseBot(OptionHandler):
                     continue
 
                 # Process the page
-                self.treat(page)
                 self.counter['read'] += 1
+                self.treat(page)
 
             self._generator_completed = True
         except QuitKeyboardInterrupt:
@@ -1954,7 +1978,12 @@ class ExistingPageBot(CurrentPageBot):
     """A CurrentPageBot class which only treats existing pages."""
 
     def skip_page(self, page: 'pywikibot.page.BasePage') -> bool:
-        """Treat page if it exists and handle NoPageError."""
+        """Treat page if it exists and handle NoPageError.
+
+        .. warning:: If subclassed, call `super().skip_page()` first to
+           ensure that non existent pages are filtered before other
+           calls are made
+        """
         if not page.exists():
             pywikibot.warning('Page {page} does not exist on {page.site}.'
                               .format(page=page))
@@ -1991,7 +2020,8 @@ class RedirectPageBot(CurrentPageBot):
     """A RedirectPageBot class which only treats redirects.
 
     .. deprecated:: 7.2
-       use BaseBot attribute 'use_redirects = True' instead
+       use BaseBot attribute
+       :attr:`use_redirects  = True<BaseBot.use_redirects>` instead
     """
 
     def __init__(self, *args, **kwargs):
@@ -2016,7 +2046,8 @@ class NoRedirectPageBot(CurrentPageBot):
     """A NoRedirectPageBot class which only treats non-redirects.
 
     .. deprecated:: 7.2
-       use BaseBot attribute 'use_redirects = False' instead
+       use BaseBot attribute
+       :attr:`use_redirects  = False<BaseBot.use_redirects>` instead
     """
 
     def __init__(self, *args, **kwargs):

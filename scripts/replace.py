@@ -93,6 +93,8 @@ Furthermore, the following command line parameters are supported:
 
 -quiet            Don't prompt a message if a page keeps unchanged
 
+-nopreload        Do not preload pages. Usefull if disabled on a wiki.
+
 -recursive        Recurse replacement as long as possible. Be careful, this
                   might lead to an infinite loop.
 
@@ -648,6 +650,9 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
 
     def skip_page(self, page):
         """Check whether treat should be skipped for the page."""
+        if super().skip_page(page):
+            return True
+
         if self.isTitleExcepted(page.title()):
             pywikibot.warning(
                 'Skipping {} because the title is on the exceptions list.'
@@ -658,14 +663,14 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             pywikibot.warning("You can't edit page {}".format(page))
             return True
 
-        return super().skip_page(page)
+        return False
 
     def treat(self, page) -> None:
         """Work on each page retrieved from generator."""
         try:
             original_text = page.text
-        except InvalidPageError:
-            pywikibot.exception()
+        except InvalidPageError as e:
+            pywikibot.error(e)
             return
         applied = set()
         new_text = original_text
@@ -892,6 +897,7 @@ def main(*args: str) -> None:
     edit_summary = ''
     # Array which will collect commandline parameters.
     # First element is original text, second element is replacement text.
+    preload = True  # preload pages
     commandline_replacements = []
     file_replacements = []
     # A list of 2-tuples of original text and replacement text.
@@ -952,6 +958,8 @@ def main(*args: str) -> None:
             manual_input = True
         elif opt == '-pairsfile':
             file_replacements = handle_pairsfile(value)
+        elif opt == '-nopreload':
+            preload = False
         else:
             commandline_replacements.append(arg)
 
@@ -1087,7 +1095,7 @@ def main(*args: str) -> None:
         # exceptions are taken into account by the ReplaceRobot
         gen = handle_sql(sql_query, replacements, exceptions['text-contains'])
 
-    gen = genFactory.getCombinedGenerator(gen, preload=True)
+    gen = genFactory.getCombinedGenerator(gen, preload=preload)
     if pywikibot.bot.suggest_help(missing_generator=not gen):
         return
 

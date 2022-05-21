@@ -5,13 +5,11 @@
 # Distributed under the terms of the MIT license.
 #
 import math
-import platform
-from string import Formatter
-from typing import Any, Mapping, Sequence
+import re
 
 from pywikibot.logging import output
 from pywikibot.tools import deprecated
-from pywikibot.userinterfaces.terminal_interface_base import colors
+from pywikibot.userinterfaces import terminal_interface_base
 
 
 class SequenceOutputter:
@@ -65,64 +63,6 @@ class SequenceOutputter:
         output(self.out)
 
 
-class _ColorFormatter(Formatter):
-
-    """Special string formatter which skips colors."""
-
-    colors = set(colors)
-    # Dot.product of colors to create all possible combinations of foreground
-    # and background colors.
-    colors |= {'{};{}'.format(c1, c2) for c1 in colors for c2 in colors}
-
-    def get_value(self, key, args, kwargs):
-        """Get value, filling in 'color' when it is a valid color."""
-        if key == 'color' and kwargs.get('color') in self.colors:
-            return '\03{{{}}}'.format(kwargs[key])
-        return super().get_value(key, args, kwargs)
-
-    def parse(self, format_string: str):
-        """Yield results similar to parse but skip colors."""
-        previous_literal = ''
-        for literal, field, spec, conv in super().parse(format_string):
-            if field in self.colors:
-                if spec:
-                    raise ValueError(
-                        'Color field "{}" in "{}" uses format spec '
-                        'information "{}"'.format(field, format_string, spec))
-                if conv:
-                    raise ValueError(
-                        'Color field "{}" in "{}" uses conversion '
-                        'information "{}"'.format(field, format_string, conv))
-                if not literal or literal[-1] != '\03':
-                    literal += '\03'
-                if '\03' in literal[:-1]:
-                    raise ValueError(r'Literal text in {} contains '
-                                     r'\03'.format(format_string))
-                previous_literal += literal + '{' + field + '}'
-            else:
-                if '\03' in literal:
-                    raise ValueError(r'Literal text in {} contains '
-                                     r'\03'.format(format_string))
-                yield previous_literal + literal, field, spec, conv
-                previous_literal = ''
-        if previous_literal:
-            yield previous_literal, None, None, None
-
-    def vformat(self, format_string: str, args: Sequence,
-                kwargs: Mapping[str, Any]) -> str:
-        """Return the format result but verify no colors are keywords.
-
-        :param format_string: The format template string
-        :param args: The positional field values
-        :param kwargs: The named field values
-        :return: The formatted string
-        """
-        if self.colors.intersection(kwargs):  # kwargs use colors
-            raise ValueError('Keyword argument(s) use valid color(s): '
-                             + '", "'.join(self.colors.intersection(kwargs)))
-        return super().vformat(format_string, args, kwargs)
-
-
 @deprecated('New color format pattern like <<color>>colored text<<default>>',
             since='7.2.0')
 def color_format(text: str, *args, **kwargs) -> str:
@@ -142,8 +82,29 @@ def color_format(text: str, *args, **kwargs) -> str:
 
     :param text: The format template string
     :return: The formatted string
+    :raises ValueError: Wrong format string or wrong keywords
     """
-    if platform.python_implementation() == 'PyPy' \
-       and isinstance(text, bytes):  # T296830
-        raise TypeError("'text' parameter must be a str not bytes")
-    return _ColorFormatter().format(text, *args, **kwargs)
+    colors = set(terminal_interface_base.colors)
+    # Dot.product of colors to create all possible combinations of foreground
+    # and background colors.
+    colors |= {'{};{}'.format(c1, c2) for c1 in colors for c2 in colors}
+    col_pat = '|'.join(colors)
+    text = re.sub('(?:\03)?{{({})}}'.format(col_pat), r'<<\1>>', text)
+    replace_color = kwargs.get('color')
+    if replace_color in colors:
+        text = text.replace('{color}', '<<{}>>'.format(replace_color))
+    if '\03' in text:
+        raise ValueError('\\03 pattern found in color format')
+    intersect = colors.intersection(kwargs)  # kwargs use colors
+    if intersect:
+        raise ValueError('Keyword argument(s) use valid color(s): '
+                         + '", "'.join(intersect))
+    try:
+        text = text.format(*args, **kwargs)
+    except KeyError as e:
+        if str(e).strip("'") in colors:
+            raise ValueError(
+                'Color field "{}" in "{}" uses conversion information or '
+                'format spec'.format(e, text))
+        raise
+    return text
