@@ -1,7 +1,7 @@
 # Scripts Changelog
 
 ## 7.3.0
-*20 May 2022*
+*21 May 2022*
 
 ### general
 * Call ExistingPageBot.skip_page() first (:phab:`T86491`)
