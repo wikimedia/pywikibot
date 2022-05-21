@@ -18,6 +18,8 @@ Usage::
 
 .. note:: Requires Python 3.6+
 .. versionadded:: 7.3
+.. versionchanged:: 7.4
+   installs pre-releases over stable versions
 """
 #
 # (C) Pywikibot team, 2022
@@ -114,7 +116,8 @@ def main() -> None:
 
     if local:
         subprocess.run('pip uninstall pywikibot -y')
-        subprocess.run('pip install --no-index --find-links=dist pywikibot')
+        subprocess.run(
+            'pip install --no-index --pre --find-links=dist pywikibot')
 
     if remote and input_yn(
             '<<lightblue>>Upload dist to pypi', automatic_quit=False):
