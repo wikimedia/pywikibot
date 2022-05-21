@@ -819,8 +819,8 @@ def html2unicode(text: str, ignore=None, exceptions=None) -> str:
         ignore = []
     # ensuring that illegal &#129; &#141; and &#157, which have no known
     # values, don't get converted to chr(129), chr(141) or chr(157)
-    ignore = (set(map(lambda x: _ILLEGAL_HTML_ENTITIES_MAPPING.get(x, x),
-                      ignore)) | {129, 141, 157})
+    ignore = {_ILLEGAL_HTML_ENTITIES_MAPPING.get(x, x)
+              for x in ignore} | {129, 141, 157}
 
     def handle_entity(match):
         if textlib.isDisabled(match.string, match.start(), tags=exceptions):
