@@ -92,10 +92,10 @@ page object:
 # Distributed under the terms of the MIT license.
 #
 import os
-import re
 
 import pywikibot
-from pywikibot import config, i18n
+from pywikibot import config
+from pywikibot.bot import AutomaticTWSummaryBot, SingleSiteBot, suggest_help
 from pywikibot.exceptions import ArgumentDeprecationWarning, Error
 from pywikibot.pagegenerators import GeneratorFactory, parameterHelp
 from pywikibot.tools import issue_deprecation_warning
@@ -167,6 +167,82 @@ class Formatter:
         return fmt.format(num=num, page=self)
 
 
+class ListPagesBot(AutomaticTWSummaryBot, SingleSiteBot):
+
+    """Print a list of pages."""
+
+    summary_key = 'listpages-save-list'
+
+    available_options = {
+        'always': True,
+        'save': None,
+        'encode': config.textfile_encoding,
+        'format': '1',
+        'notitle': False,
+        'outputlang': None,
+        'overwrite': False,
+        'summary': '',
+        'get': False,
+        'put': None,
+    }
+
+    def treat(self, page) -> None:
+        """Process one page and add it to the `output_list`."""
+        self.num += 1
+        if not self.opt.notitle:
+            page_fmt = Formatter(page, self.opt.outputlang)
+            self.output_list += [page_fmt.output(num=self.num,
+                                                 fmt=self.opt.format)]
+        if self.opt['get']:
+            try:
+                pywikibot.stdout(page.text)
+            except Error as err:
+                pywikibot.error(err)
+
+        if self.opt.save:
+            filename = os.path.join(self.opt.save,
+                                    page.title(as_filename=True))
+            pywikibot.info('Saving {} to {}'.format(page.title(), filename))
+            with open(filename, mode='wb') as f:
+                f.write(page.text.encode(self.opt.encode))
+            self.counter['save'] += 1
+
+    def setup(self) -> None:
+        """Initialize `output_list` and `num` and adjust base directory."""
+        self.output_list = []
+        self.num = 0
+
+        if self.opt.save is not None:
+            base_dir = os.path.expanduser(self.opt.save or '.')
+            if not os.path.isabs(base_dir):
+                base_dir = os.path.normpath(os.path.join(os.getcwd(),
+                                                         base_dir))
+
+            if not os.path.exists(base_dir):
+                pywikibot.info('Directory "{}" does not exist.'
+                               .format(base_dir))
+                choice = pywikibot.input_yn('Do you want to create it ("No" '
+                                            'to continue without saving)?')
+                if choice:
+                    os.makedirs(base_dir, mode=0o744)
+                else:
+                    base_dir = None
+            elif not os.path.isdir(base_dir):
+                # base_dir is a file.
+                pywikibot.warning('Not a directory: "{}"\nSkipping saving ...'
+                                  .format(base_dir))
+                base_dir = None
+            self.opt.save = base_dir
+
+    def teardown(self) -> None:
+        """Print the list and put it to the target page if specified."""
+        text = '\n'.join(self.output_list)
+        if self.opt.put:
+            self.current_page = self.opt.put
+            self.put_current(text, summary=self.opt.summary, show_diff=False)
+        pywikibot.stdout(text)
+
+
 def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
@@ -175,24 +251,22 @@ def main(*args: str) -> None:
 
     :param args: command line arguments
     """
-    notitle = False
-    fmt = '1'
-    outputlang = None
-    page_get = False
-    base_dir = None
-    encoding = config.textfile_encoding
+    options = {}
     page_target = None
-    overwrite = False
-    summary = 'listpages-save-list'
 
-    # Process global args and prepare generator args parser
-    local_args = pywikibot.handle_args(args)
+    additional_text = ''
+    unknown_args = []
+
+    # Process global args and generator args
     gen_factory = GeneratorFactory()
+    local_args = pywikibot.handle_args(args)
+    local_args = gen_factory.handle_args(local_args)
 
     for arg in local_args:
         option, _, value = arg.partition(':')
-        if option == '-notitle':
-            notitle = True
+        opt = option[1:]
+        if option in ('-get', '-notitle', '-overwrite'):
+            options[opt] = True
         elif option == '-format':
             if '\\03{{' not in value:
                 fmt = value
@@ -204,87 +278,31 @@ def main(*args: str) -> None:
                     warning_class=ArgumentDeprecationWarning,
                     since='7.3.0')
             if not fmt.strip():
-                notitle = True
-        elif option == '-outputlang':
-            outputlang = value
-        elif option == '-get':
-            page_get = True
-        elif option == '-save':
-            base_dir = value or '.'
-        elif option == '-encode':
-            encoding = value
+                options['notitle'] = True
+            options['format'] = fmt
+        elif option in ('-encode', '-outputlang', '-save', '-summary'):
+            options[opt] = value
         elif option == '-put':
             page_target = value
-        elif option == '-overwrite':
-            overwrite = True
-        elif option == '-summary':
-            summary = value
         else:
-            gen_factory.handle_arg(arg)
+            unknown_args.append(arg)
 
-    if base_dir:
-        base_dir = os.path.expanduser(base_dir)
-        if not os.path.isabs(base_dir):
-            base_dir = os.path.normpath(os.path.join(os.getcwd(), base_dir))
-
-        if not os.path.exists(base_dir):
-            pywikibot.output('Directory "{}" does not exist.'
-                             .format(base_dir))
-            choice = pywikibot.input_yn(
-                'Do you want to create it ("No" to continue without saving)?')
-            if choice:
-                os.makedirs(base_dir, mode=0o744)
-            else:
-                base_dir = None
-        elif not os.path.isdir(base_dir):
-            # base_dir is a file.
-            pywikibot.warning('Not a directory: "{}"\n'
-                              'Skipping saving ...'
-                              .format(base_dir))
-            base_dir = None
-
+    site = pywikibot.Site()
     if page_target:
-        site = pywikibot.Site()
         page_target = pywikibot.Page(site, page_target)
-        if not overwrite and page_target.exists():
-            pywikibot.bot.suggest_help(
-                additional_text='Page {} already exists.\n'
-                                'You can use the -overwrite argument to '
-                                'replace the content of this page.'
-                                .format(page_target.title(as_link=True)))
-            return
-        if re.match('[a-z_-]+$', summary):
-            summary = i18n.twtranslate(site, summary)
+        if not options.get('overwrite') and page_target.exists():
+            additional_text = ('Page {} already exists.\n'
+                               'You can use the -overwrite argument to '
+                               'replace the content of this page.'
+                               .format(page_target))
 
     gen = gen_factory.getCombinedGenerator()
-    if gen:
-        i = 0
-        output_list = []
-        for i, page in enumerate(gen, start=1):
-            if not notitle:
-                page_fmt = Formatter(page, outputlang)
-                output_list += [page_fmt.output(num=i, fmt=fmt)]
-            if page_get:
-                if output_list:
-                    pywikibot.stdout(output_list.pop(-1))
-                try:
-                    pywikibot.stdout(page.text)
-                except Error as err:
-                    pywikibot.output(err)
-            if base_dir:
-                filename = os.path.join(base_dir, page.title(as_filename=True))
-                pywikibot.output('Saving {} to {}'
-                                 .format(page.title(), filename))
-                with open(filename, mode='wb') as f:
-                    f.write(page.text.encode(encoding))
-        text = '\n'.join(output_list)
-        if page_target:
-            page_target.text = text
-            page_target.save(summary=summary)
-        pywikibot.stdout(text)
-        pywikibot.output('{} page(s) found'.format(i))
-    else:
-        pywikibot.bot.suggest_help(missing_generator=True)
+    if not suggest_help(missing_generator=not gen,
+                        unknown_parameters=unknown_args,
+                        additional_text=additional_text):
+        bot = ListPagesBot(site=site, generator=gen, put=page_target,
+                           **options)
+        bot.run()
 
 
 if __name__ == '__main__':
