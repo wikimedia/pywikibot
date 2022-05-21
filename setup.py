@@ -56,7 +56,7 @@ if not python_is_supported():  # pragma: no cover
 # ------- setup extra_requires ------- #
 extra_deps = {
     # Core library dependencies
-    'eventstreams': ['sseclient!=0.0.23,!=0.0.24,>=0.0.18'],
+    'eventstreams': ['sseclient<0.0.23,>=0.0.18'],  # T222885
     'isbn': ['python-stdnum>=1.17'],
     'Graphviz': ['pydot>=1.2'],
     'Google': ['google>=1.7'],
