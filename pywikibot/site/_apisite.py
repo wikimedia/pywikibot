@@ -2499,7 +2499,7 @@ class APISite(
         """
         Block a user for certain amount of time and for a certain reason.
 
-        .. seealso:: :api:`Block
+        .. seealso:: :api:`Block`
 
         :param user: The username/IP to be blocked without a namespace.
         :param expiry: The length or date/time when the block expires. If
