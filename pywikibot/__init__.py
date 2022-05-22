@@ -1132,8 +1132,8 @@ def Site(code: Optional[str] = None,
 
         site = pywikibot.Site('wikisource:fr')
 
-    :Note: An already created site is cached an a new variable points to
-        the same object if interface, family, code and user are equal:
+    .. note:: An already created site is cached an a new variable points
+       to the same object if interface, family, code and user are equal:
 
     >>> import pywikibot
     >>> site_1 = pywikibot.Site('wikisource:fr')
@@ -1143,11 +1143,11 @@ def Site(code: Optional[str] = None,
     >>> site_1
     APISite("fr", "wikisource")
 
-    ``APISite`` is the default interface. Refer :py:obj:`pywikibot.site` for
-    other interface types.
+    :class:`APISite<pywikibot.site._apisite.APISite>` is the default
+    interface. Refer :py:obj:`pywikibot.site` for other interface types.
 
-    **Never create a site object via interface class directly.**
-    Always use this factory method.
+    .. warning:: Never create a site object via interface class directly.
+       Always use this factory method.
 
     .. versionchanged:: 7.3
        Short creation if site code is equal to family name like
