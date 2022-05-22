@@ -377,59 +377,6 @@ extlinks = {
 }
 
 
-TOKENS_WITH_PARAM = [
-    # sphinx
-    'param', 'parameter', 'arg', 'argument', 'key', 'keyword',
-    'type',
-    'raises', 'raise', 'except', 'exception',
-    'var', 'ivar', 'cvar',
-    'vartype',
-    'meta',
-    # epytext
-    'todo',
-]
-
-TOKENS = [
-    # sphinx
-    'return', 'returns', 'rtype',
-    # epytext
-    'attention', 'author', 'bug',
-    'change', 'changed',
-    'contact',
-    'copyright', '(c)',
-    'deprecated',
-    'invariant', 'license', 'note',
-    'organization', 'org',
-    'permission',
-    'postcondition', 'postcond',
-    'precondition', 'precond',
-    'requires', 'require', 'requirement',
-    'see', 'seealso',
-    'since', 'status', 'summary', 'todo',
-    'version',
-    'warn', 'warning',
-]
-
-
-def pywikibot_epytext_to_sphinx(app, what, name, obj, options, lines):
-    """Convert epytext tokens to sphinx."""
-    result = []
-    for line in lines:
-        line = re.sub(r'(\A *)@({}) '.format('|'.join(TOKENS_WITH_PARAM)),
-                      r'\1:\2 ', line)  # tokens with parameter
-        line = re.sub(r'(\A *)@({}):'.format('|'.join(TOKENS)),
-                      r'\1:\2:', line)  # short token
-        line = re.sub(r'(\A *)@(?:kwarg|kwparam) ',
-                      r'\1:keyword ', line)  # keyword
-        line = re.sub(r'(\A| )L\{([^}]*)\}', r'\1:py:obj:`\2`', line)  # Link
-        line = re.sub(r'(\A| )B\{([^}]*)\}', r'\1**\2**', line)  # Bold
-        line = re.sub(r'(\A| )I\{([^}]*)\}', r'\1*\2*', line)  # Italic
-        line = re.sub(r'(\A| )C\{([^}]*)\}', r'\1``\2``', line)  # Code
-        line = re.sub(r'(\A| )U\{([^}]*)\}', r'\1\2', line)  # Url
-        result.append(line)
-    lines[:] = result[:]  # assignment required in this way
-
-
 def pywikibot_fix_phab_tasks(app, what, name, obj, options, lines):
     """Convert Phabricator tasks id to a link using sphinx.ext.extlinks."""
     result = []
@@ -541,7 +488,6 @@ def pywikibot_family_classproperty_getattr(obj, name, *defargs):
 
 def setup(app):
     """Implicit Sphinx extension hook."""
-    app.connect('autodoc-process-docstring', pywikibot_epytext_to_sphinx)
     app.connect('autodoc-process-docstring', pywikibot_fix_phab_tasks)
     app.connect('autodoc-process-docstring', pywikibot_docstring_fixups)
     app.connect('autodoc-process-docstring', pywikibot_script_docstring_fixups)

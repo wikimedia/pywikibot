@@ -457,13 +457,12 @@ class RedirectRobot(ExistingPageBot):
         self.is_repo = self.repo if self.repo == page.site else None
         return page
 
-    def delete_redirect(self, page, summary_key) -> None:
+    def delete_redirect(self, page, summary_key: str) -> None:
         """Delete the redirect page.
 
-        @param page: The page to delete
-        @type page: pywikibot.page.BasePage
-        @param summary_key: The message key for the deletion summary
-        @type summary_key: str
+        :param page: The page to delete
+        :type page: pywikibot.page.BasePage
+        :param summary_key: The message key for the deletion summary
         """
         assert page.site == self.current_page.site, (
             'target page is on different site {}'.format(page.site))
@@ -666,8 +665,8 @@ class RedirectRobot(ExistingPageBot):
     def treat(self, page) -> None:
         """Treat a page.
 
-        @param page: Page to be treated.
-        @type page: pywikibot.page.BasePage
+        :param page: Page to be treated.
+        :type page: pywikibot.page.BasePage
         """
         if self.counter['read'] >= self.opt.limit:
             pywikibot.output('\nNumber of pages reached the limit. '
