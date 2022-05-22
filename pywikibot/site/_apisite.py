@@ -2481,8 +2481,6 @@ class APISite(
         finally:
             self.unlock_page(page)
 
-    # TODO: implement undelete
-
     @need_right('block')
     def blockuser(
         self,
