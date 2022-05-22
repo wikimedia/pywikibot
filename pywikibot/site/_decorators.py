@@ -81,8 +81,8 @@ def need_right(right=None):
             if self.obsolete:
                 if not self.has_group('steward'):
                     raise UserRightsError(
-                        'Site {} has been closed. Only steward '
-                        'can perform requested action.'
+                        'Site {} has been closed. Only stewards '
+                        'can perform the requested action.'
                         .format(self.sitename))
 
             elif right is not None and not self.has_right(right):
