@@ -215,7 +215,7 @@ class BaseSite(ComparableMixin):
             self.__class__.__name__, self.code, self.family)
 
     def __hash__(self):
-        """Return hashable key."""
+        """Return hash value of instance."""
         return hash(repr(self))
 
     def languages(self):
