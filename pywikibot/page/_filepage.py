@@ -282,7 +282,7 @@ class FilePage(Page):
             sha1 = compute_file_hash(filename)
             return sha1 == revision.sha1
         pywikibot.warning(
-            'Unsuccessfull request ({}): {}'
+            'Unsuccessful request ({}): {}'
             .format(req.status_code, req.url))
         return False
 

@@ -406,7 +406,7 @@ class APISite(
                 self._loginstatus = _LoginStatus.AS_USER
                 return
 
-            pywikibot.error('{} != {} after {}.login() and successfull '
+            pywikibot.error('{} != {} after {}.login() and successful '
                             '{}.login()'
                             .format(self.userinfo['name'],
                                     self.username(),
