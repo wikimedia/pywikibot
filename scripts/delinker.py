@@ -3,7 +3,7 @@
 
 This script keeps track of image deletions and delinks removed files
 from current wiki in namespace 0. This script is suitable to delink
-files from a image repository as well as for local images.
+files from an image repository as well as for local images.
 
 The following parameters are supported:
 
