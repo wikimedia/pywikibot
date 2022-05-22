@@ -1711,7 +1711,7 @@ class APISite(
     @need_right('edit')
     def editpage(
         self,
-        page: 'pywikibot.page.BasBaseePage',
+        page: 'pywikibot.page.BasePage',
         summary: Optional[str] = None,
         minor: bool = True,
         notminor: bool = False,
