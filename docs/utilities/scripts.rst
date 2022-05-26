@@ -22,6 +22,12 @@ generate\_user\_files script
 .. automodule:: pywikibot.scripts.generate_user_files
    :no-members:
 
+login script
+------------
+
+.. automodule:: pywikibot.scripts.login
+   :no-members:
+
 preload_sites script
 --------------------
 
