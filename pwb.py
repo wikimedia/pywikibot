@@ -291,7 +291,7 @@ except ImportError as e:  # raised in textlib
 
 def find_alternates(filename, script_paths):
     """Search for similar filenames in the given script paths."""
-    from pywikibot import config, input_choice, info
+    from pywikibot import config, input_choice, error, info, warning
     from pywikibot.bot import QuitKeyboardInterrupt, ShowingListOption
 
     assert config.pwb_close_matches > 0, \
@@ -299,14 +299,17 @@ def find_alternates(filename, script_paths):
     assert 0.0 < config.pwb_cut_off < 1.0, \
         'config.pwb_cut_off must be a float in range [0, 1]'
 
-    print('ERROR: {} not found! Misspelling?'.format(filename),
-          file=sys.stderr)
+    error('{} not found! Misspelling?'.format(filename))
 
     scripts = {}
 
     script_paths = [['.']] + script_paths  # add current directory
     for path in script_paths:
         folder = Path(_pwb_dir).joinpath(*path)
+        if not folder.exists():
+            warning('{} does not exists; remove it from user_script_paths'
+                    .format(folder))
+            continue
         for script_name in folder.iterdir():
             name, suffix = script_name.stem, script_name.suffix
             if suffix == '.py' and not name.startswith('__'):
