@@ -654,7 +654,7 @@ class DataSite(APISite):
         }
         if bot:
             params['bot'] = 1
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         data = req.submit()
         return data
 
@@ -881,7 +881,7 @@ class DataSite(APISite):
         }
         if baserevid:
             params['baserevid'] = baserevid
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         data = req.submit()
         return data
 
@@ -906,7 +906,7 @@ class DataSite(APISite):
         }
         if baserevid:
             params['baserevid'] = baserevid
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         data = req.submit()
         return data
 
@@ -936,6 +936,6 @@ class DataSite(APISite):
         }
         if baserevid:
             params['baserevid'] = baserevid
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         data = req.submit()
         return data

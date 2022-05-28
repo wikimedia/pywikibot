@@ -750,13 +750,13 @@ class TextExtractsMixin:
         """
         if not page.exists():
             raise NoPageError(page)
-        req = self._simple_request(action='query',
-                                   prop='extracts',
-                                   titles=page.title(with_section=False),
-                                   exchars=chars,
-                                   exsentences=sentences,
-                                   exintro=intro,
-                                   explaintext=plaintext)
+        req = self.simple_request(action='query',
+                                  prop='extracts',
+                                  titles=page.title(with_section=False),
+                                  exchars=chars,
+                                  exsentences=sentences,
+                                  exintro=intro,
+                                  explaintext=plaintext)
         data = req.submit()['query']['pages']
         if '-1' in data:
             msg = data['-1'].get('invalidreason',
