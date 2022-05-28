@@ -6,6 +6,7 @@
 # Distributed under the terms of the MIT license.
 #
 import re
+import unittest
 from contextlib import suppress
 
 import pywikibot
@@ -18,7 +19,6 @@ from tests.aspects import (
     DefaultDrySiteTestCase,
     TestCase,
     WikimediaDefaultSiteTestCase,
-    unittest,
 )
 
 
@@ -903,6 +903,7 @@ class TestForeignInterwikiLinks(WikimediaDefaultSiteTestCase):
         self.assertEqual(link.site.sitename, 'wikimedia:wikimedia')
         self.assertTrue(link._is_interwiki)
 
+    @unittest.expectedFailure  # T309442
     def test_other_wiki_prefix(self):
         """Test that Link fails if the interwiki prefix is a unknown family."""
         link = Link('bulba:title on auto-generated Site', source=self.site)
