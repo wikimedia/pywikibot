@@ -2456,13 +2456,12 @@ class QueryGenerator(_RequestWrapper):
             namespace identifiers. An empty iterator clears any
             namespace restriction.
         :raises KeyError: a namespace identifier was not resolved
-
+        """
         # TODO: T196619
-        # @raises TypeError: module does not support a namespace parameter
+        # :raises TypeError: module does not support a namespace parameter
         #    or a namespace identifier has an inappropriate
         #    type such as NoneType or bool, or more than one namespace
         #    if the API module does not support multiple namespaces
-        """
         assert self.limited_module  # some modules do not have a prefix
         param = self.site._paraminfo.parameter('query+' + self.limited_module,
                                                'namespace')

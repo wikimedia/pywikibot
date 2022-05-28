@@ -122,7 +122,7 @@ def deprecated_func_arg(foo=None):
 
 @deprecated
 def deprecated_func_docstring_arg(foo=None):
-    """@param foo: Foo. DEPRECATED."""
+    """:param foo: Foo. DEPRECATED."""
     return foo
 
 
@@ -308,12 +308,13 @@ class DeprecatorTestCase(DeprecationTestCase):
             (deprecated_func_instead_docstring, "DEPRECATED, don't use "
              'this. Deprecated function.'),
             (deprecated_func_docstring_arg, 'Deprecated.\n\n'
-             '@param foo: Foo. DEPRECATED.'),
+             ':param foo: Foo. DEPRECATED.'),
             (deprecated_func_docstring_arg2, '\n    DEPRECATED.\n\n'
              '    :param foo: Foo. DEPRECATED.\n    '),
         ]
         for rv, doc in testcases:
-            self.assertEqual(rv.__doc__, doc)
+            with self.subTest(function=rv.__name__):
+                self.assertEqual(rv.__doc__, doc)
 
     def test_deprecated_function_bad_args(self):
         """Test @deprecated function with bad arguments."""

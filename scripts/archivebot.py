@@ -268,7 +268,7 @@ def str2size(string: str) -> Size:
       150K - 150 kilobytes
       2M - 2 megabytes
 
-    @Returns: a tuple ``(size, unit)``, where ``size`` is an integer and
+    :Returns: a tuple ``(size, unit)``, where ``size`` is an integer and
         unit is ``'B'`` (bytes) or ``'T'`` (threads).
     """
     match = re.fullmatch(r'(\d{1,3}(?: \d{3})+|\d+) *([BkKMT]?)', string)

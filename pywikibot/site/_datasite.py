@@ -713,7 +713,8 @@ class DataSite(APISite):
         return gen
 
     @need_right('edit')
-    def _wbset_action(self, itemdef, action, action_data, **kwargs):
+    def _wbset_action(self, itemdef, action: str, action_data,
+                      **kwargs) -> dict:
         """
         Execute wbset{action} on a Wikibase entity.
 
@@ -724,9 +725,8 @@ class DataSite(APISite):
         :type itemdef: str, WikibaseEntity or Page connected to such item
         :param action: wbset{action} to perform:
             'wbsetaliases', 'wbsetdescription', 'wbsetlabel', 'wbsetsitelink'
-        :type action: str
-        :param data: data to be used in API request, see API help
-        :type data: SiteLink or dict
+        :param action_data: data to be used in API request, see API help
+        :type action_data: SiteLink or dict
             wbsetaliases:
                 dict shall have the following structure:
                 {'language': value (str),
@@ -740,12 +740,11 @@ class DataSite(APISite):
             wbsetsitelink:
                 dict shall have keys 'linksite', 'linktitle' and
                 optionally 'badges'
-        @kwargs bot: Whether to mark the edit as a bot edit, default is True
+        :keyword bot: Whether to mark the edit as a bot edit, default is True
         :type bot: bool
-        @kwargs tags: Change tags to apply with the edit
+        :keyword tags: Change tags to apply with the edit
         :type tags: list of str
         :return: query result
-        :rtype: dict
         :raises AssertionError, TypeError
         """
         def format_sitelink(sitelink):

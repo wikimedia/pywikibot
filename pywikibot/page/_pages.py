@@ -1077,8 +1077,8 @@ class BasePage(ComparableMixin):
     def _check_bot_may_edit(self, module: Optional[str] = None) -> bool:
         """A botMayEdit helper method.
 
-        @param module: The module name to be restricted. Defaults to
-            pywikibot.calledModuleName().
+        :param module: The module name to be restricted. Defaults to
+            :func:`pywikibot.calledModuleName`.
         """
         if not hasattr(self, 'templatesWithParams'):
             return True

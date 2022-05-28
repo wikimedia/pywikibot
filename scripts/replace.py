@@ -510,7 +510,6 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
     :type allowoverlap: bool
     :keyword recursive: Recurse replacement as long as possible.
     :type recursive: bool
-    :warning: Be careful, this might lead to an infinite loop.
     :keyword addcat: category to be added to every page touched
     :type addcat: pywikibot.Category or str or None
     :keyword sleep: slow down between processing multiple regexes
@@ -520,9 +519,12 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
     :keyword always: the user won't be prompted before changes are made
     :type keyword: bool
     :keyword site: Site the bot is working on.
-    :warning: site parameter should be passed to constructor.
-        Otherwise the bot takes the current site and warns the operator
-        about the missing site
+    .. warning::
+       - Be careful with `recursive` parameter, this might lead to an
+         infinite loop.
+       - `site` parameter should be passed to constructor.
+         Otherwise the bot takes the current site and warns the operator
+         about the missing site
     """
 
     def __init__(self, generator,
