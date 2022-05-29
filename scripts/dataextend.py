@@ -10350,7 +10350,8 @@ class ItauAnalyzer(Analyzer):
         if self.isperson:
             self.urlbase = 'https://enciclopedia.itaucultural.org.br/{id}'
         else:
-            # Analyzer only created for persons, for works and possible other it can be extended later
+            # Analyzer only created for persons,
+            # for works and possible other it can be extended later
             self.urlbase = None
         self.hrtre = r'<h1[^<>]*>\s*Outras informações.*?<div class="section_content">(.*?)</section>'
         self.language = 'pt'
@@ -13427,9 +13428,6 @@ class IntraTextAnalyzer(Analyzer):
     def findnames(self, html):
         return [self.findbyre(r'<b>(.*?)<', html)] + \
                self.findallbyre(r'<FONT[^<>]*>(.*?)<', html)
-
-    #    def findlanguagesspoken(self, html):
-    #        return self.findallbyre(r'<span class=LI>([^<>]*) - ', html, 'language')
 
     def findmixedrefs(self, html):
         return self.finddefaultmixedrefs(html, includesocial=False)
