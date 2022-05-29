@@ -811,7 +811,7 @@ class GeneratorFactory:
         if not value.startswith(self.site.namespace(6) + ':'):
             value = 'Image:' + value
         file_page = pywikibot.FilePage(self.site, value)
-        return file_page.usingPages()
+        return file_page.using_pages()
 
     def _handle_linter(self, value: str) -> HANDLER_RETURN_TYPE:
         """Handle `-linter` argument."""
@@ -1521,7 +1521,7 @@ def FileLinksGenerator(
     content: bool = False
 ) -> Iterable['pywikibot.page.Page']:
     """Yield Pages on which referredFilePage file is displayed."""
-    return referredFilePage.usingPages(total=total, content=content)
+    return referredFilePage.using_pages(total=total, content=content)
 
 
 def ImagesPageGenerator(

@@ -109,7 +109,7 @@ class CommonsDelinker(SingleSiteBot, ConfigParserBot, AutomaticTWSummaryBot):
             .format('|'.join(ignore_case(s) for s in namespace), escaped))
 
         shown = False
-        for page in file_page.usingPages(content=True, namespaces=0):
+        for page in file_page.using_pages(content=True, namespaces=0):
             if not shown:
                 pywikibot.output(
                     '\n>>> <<lightgreen>>Delinking {}<<default>> <<<'

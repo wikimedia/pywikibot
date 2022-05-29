@@ -52,7 +52,7 @@ class TestSharedFiles(TestCase):
         commons = self.get_site('commons')
         itwp = self.get_site('itwiki')
         itwp_file = pywikibot.FilePage(itwp, title)
-        for using in itwp_file.usingPages():
+        for using in itwp_file.using_pages():
             self.assertIsInstance(using, pywikibot.Page)
 
         commons_file = pywikibot.FilePage(commons, title)
@@ -81,7 +81,7 @@ class TestSharedFiles(TestCase):
         commons = self.get_site('commons')
         enwp = self.get_site('enwiki')
         enwp_file = pywikibot.FilePage(enwp, title)
-        for using in enwp_file.usingPages():
+        for using in enwp_file.using_pages():
             self.assertIsInstance(using, pywikibot.Page)
 
         commons_file = pywikibot.FilePage(commons, title)
@@ -113,7 +113,7 @@ class TestSharedFiles(TestCase):
         commons = self.get_site('commons')
         testwp = self.get_site('testwiki')
         testwp_file = pywikibot.FilePage(testwp, title)
-        for using in testwp_file.usingPages():
+        for using in testwp_file.using_pages():
             self.assertIsInstance(using, pywikibot.Page)
 
         commons_file = pywikibot.FilePage(commons, title)

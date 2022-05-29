@@ -58,7 +58,7 @@ Release history
 * Don't try to upcast timestamp from global userinfo if global account does not exists (:phab:`T305351`)
 * Archived scripts were removed; create a Phabricator task to restore some (:phab:`T223826`)
 * Add Lexeme support for Lexicographical data (:phab:`T189321`, :phab:`T305297`)
-* enable all parameters of `APISite.imageusage()` with `FilePage.usingPages()`
+* enable all parameters of `APISite.imageusage()` with `FilePage.using_pages()`
 * Don't raise `NoPageError` with `file_is_shared` (:phab:`T305182`)
 * Fix URL of GoogleOCR
 * Handle ratelimit with purgepages() (:phab:`T152597`)

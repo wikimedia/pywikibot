@@ -6,6 +6,7 @@ Current release 7.4.0
 Deprecations
 ^^^^^^^^^^^^
 
+* 7.4.0: `FilePage.usingPages()` was renamed to `using_pages()`
 * 7.2.0: ``tb`` parameter of ``exception()`` function was renamed to ``exc_info``
 * 7.2.0: XMLDumpOldPageGenerator is deprecated in favour of a `content` parameter (:phab:`T306134`)
 * 7.2.0: RedirectPageBot and NoRedirectPageBot bot classes are deprecated in favour of `use_redirects` attribute

@@ -281,7 +281,7 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
                                                'File:' + file_on_commons)
         if (local_file_page.title(with_ns=False)
                 != commons_file_page.title(with_ns=False)):
-            using_pages = list(local_file_page.usingPages())
+            using_pages = list(local_file_page.using_pages())
 
             if using_pages and using_pages != [local_file_page]:
                 pywikibot.output(
@@ -296,7 +296,7 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
                         .format(local_file_page.title(with_ns=False),
                                 commons_file_page.title(with_ns=False)))
 
-                    bot = ImageBot(local_file_page.usingPages(),
+                    bot = ImageBot(local_file_page.using_pages(),
                                    local_file_page.title(with_ns=False),
                                    commons_file_page.title(with_ns=False),
                                    always=self.opt.replacealways,
@@ -306,7 +306,7 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
                     # If the image is used with the urlname
                     # the previous function won't work
                     if local_file_page.file_is_used and self.opt.replaceloose:
-                        bot = ImageBot(local_file_page.usingPages(),
+                        bot = ImageBot(local_file_page.using_pages(),
                                        local_file_page.title(with_ns=False,
                                                              as_url=True),
                                        commons_file_page.title(with_ns=False),

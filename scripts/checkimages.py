@@ -806,7 +806,7 @@ class CheckImagesBot:
         """
         # find the most used image
         images = [image for _, image in list_given]
-        iterables = [image.usingPages() for image in images]
+        iterables = [image.using_pages() for image in images]
         curr_images = []
         for values in zip_longest(*iterables, fillvalue=False):
             curr_images = values
