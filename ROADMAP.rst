@@ -1,7 +1,7 @@
 Current release 7.4.0
 ^^^^^^^^^^^^^^^^^^^^^
 
-* *(no changes yet)*
+* Return gracefully from pwb.find_alternates if folder in user_script_paths does not exist (:phab:`T308910`)
 
 Deprecations
 ^^^^^^^^^^^^
@@ -36,7 +36,7 @@ Will be removed in Pywikibot 8
 * 7.3.0: Python 3.5 support will be dropped (:phab:`T301908`)
 * 7.1.0: win32_unicode.py will be removed
 * 7.0.0: The i18n identifier 'cosmetic_changes-append' will be removed in favour of 'pywikibot-cosmetic-changes'
-* 7.0.0: Require mysql >= 0.7.11 (:phab:`T216741`)
+* 7.0.0: pymysql < 0.7.11 will be dropped; require pymysql >= 0.7.11 (:phab:`T216741`)
 * 5.5.0: APISite.redirectRegex() will be removed in favour of APISite.redirect_regex()
 * 4.0.0: Revision.parent_id will be removed in favour of Revision.parentid
 * 4.0.0: Revision.content_model will be removed in favour of Revision.contentmodel
