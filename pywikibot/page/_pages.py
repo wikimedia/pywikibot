@@ -1836,8 +1836,7 @@ class BasePage(ComparableMixin):
             if answer == 'y':
                 self.site.delete(self, reason, deletetalk=deletetalk)
                 return 1
-            else:
-                return 0
+            return 0
 
         # Otherwise mark it for deletion
         if mark or hasattr(self.site, '_noMarkDeletePrompt'):
@@ -1862,8 +1861,7 @@ class BasePage(ComparableMixin):
             target.text = template + target.text
             target.save(summary=reason)
             return -1
-        else:
-            return 0
+        return 0
 
     def has_deleted_revisions(self) -> bool:
         """Return True if the page has deleted revisions.
