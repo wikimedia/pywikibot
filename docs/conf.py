@@ -417,9 +417,6 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
                             'in :py:mod:`pywikibot.fixes`.')
         elif name == 'scripts.cosmetic_changes' and line == '&warning;':
             lines[index] = warning
-        elif name == 'scripts.login' and '*' in line:
-            # Escape star wildcard in scripts/login.py
-            lines[index] = line.replace('*', '\\*')
         elif (line.endswith(':') and not line.lstrip().startswith(':')
                 and 'Traceback (most recent call last)' not in line):
             # Initiate code block except pagegenerator arguments follows

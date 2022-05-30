@@ -19,7 +19,9 @@ from tests.utils import execute_pwb
 
 ci_test_run = os.environ.get('PYWIKIBOT_TESTS_RUNNING', '0') == '1'
 scripts_path = join_root_path('scripts')
-framework_scripts = ['shell']
+
+# login scritpt should be the first to test
+framework_scripts = ['login', 'shell']
 
 # These dependencies are not always the package name which is in setup.py.
 # Here, the name given to the module which will be imported is required.
@@ -58,8 +60,7 @@ def list_scripts(path, exclude=None):
     return scripts
 
 
-script_list = ['login'] + list_scripts(scripts_path,
-                                       exclude='login.py') + framework_scripts
+script_list = framework_scripts + list_scripts(scripts_path)
 
 script_input = {
     'interwiki': 'Test page that should not exist\n',
