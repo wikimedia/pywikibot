@@ -21,7 +21,6 @@ import codecs
 import datetime
 import io
 import itertools
-import json
 import re
 import sys
 from collections import abc, namedtuple
@@ -53,6 +52,7 @@ from pywikibot.bot import ShowingListOption
 from pywikibot.comms import http
 from pywikibot.data import api
 from pywikibot.exceptions import (
+    APIError,
     NoPageError,
     ServerError,
     UnknownExtensionError,
@@ -3002,7 +3002,11 @@ def WikibaseSearchItemPageGenerator(text: str,
 
 
 class PetScanPageGenerator:
-    """Queries PetScan (https://petscan.wmflabs.org/) to generate pages."""
+    """Queries PetScan to generate pages.
+
+    .. seealso:: https://petscan.wmflabs.org/
+    .. versionadded:: 3.0
+    """
 
     def __init__(self, categories: Sequence[str],
                  subset_combination: bool = True,
@@ -3012,8 +3016,7 @@ class PetScanPageGenerator:
         """
         Initializer.
 
-        :param categories: List of categories to retrieve pages from
-            (as strings)
+        :param categories: List of category names to retrieve pages from
         :param subset_combination: Combination mode.
             If True, returns the intersection of the results of the categories,
             else returns the union of the results of the categories
@@ -3065,7 +3068,14 @@ class PetScanPageGenerator:
         return query_final
 
     def query(self) -> Iterator[Dict[str, Any]]:
-        """Query PetScan."""
+        """Query PetScan.
+
+        .. versionchanged:: 7.4
+           raises :class:`APIError` if query returns an error message.
+
+        :raises ServerError: Either ReadTimeout or server status error
+        :raises APIError: error response from petscan
+        """
         url = 'https://petscan.wmflabs.org'
 
         try:
@@ -3078,8 +3088,11 @@ class PetScanPageGenerator:
             raise ServerError(
                 'received {} status from {}'.format(req.status_code, req.url))
 
-        j = json.loads(req.text)
-        raw_pages = j['*'][0]['a']['*']
+        data = req.json()
+        if 'error' in data:
+            raise APIError('Petscan', data['error'], **self.opts)
+
+        raw_pages = data['*'][0]['a']['*']
         yield from raw_pages
 
     def __iter__(self) -> Iterator['pywikibot.page.Page']:
