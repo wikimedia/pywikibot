@@ -5,7 +5,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-import json
 import re
 import warnings
 from contextlib import suppress
@@ -541,9 +540,7 @@ class QueryStringParamsTestCase(HttpbinTestCase):
                           .format(status=fail_status, url=self.url))
 
         self.assertEqual(r.status_code, HTTPStatus.OK)
-
-        content = json.loads(r.text)
-        self.assertEqual(content['args'], {})
+        self.assertEqual(r.json()['args'], {})
 
     def test_unencoded_params(self):
         """
@@ -560,9 +557,7 @@ class QueryStringParamsTestCase(HttpbinTestCase):
                           .format(status=fail_status, url=self.url))
 
         self.assertEqual(r.status_code, HTTPStatus.OK)
-
-        content = json.loads(r.text)
-        self.assertEqual(content['args'], {'fish&chips': 'delicious'})
+        self.assertEqual(r.json()['args'], {'fish&chips': 'delicious'})
 
     def test_encoded_params(self):
         """
@@ -579,9 +574,7 @@ class QueryStringParamsTestCase(HttpbinTestCase):
                           .format(status=fail_status, url=self.url))
 
         self.assertEqual(r.status_code, HTTPStatus.OK)
-
-        content = json.loads(r.text)
-        self.assertEqual(content['args'], {'fish%26chips': 'delicious'})
+        self.assertEqual(r.json()['args'], {'fish%26chips': 'delicious'})
 
 
 class DataBodyParameterTestCase(HttpbinTestCase):
@@ -602,8 +595,8 @@ class DataBodyParameterTestCase(HttpbinTestCase):
                                     method='POST',
                                     data={'fish&chips': 'delicious'})
 
-        r_data = json.loads(r_data_request.text)
-        r_body = json.loads(r_body_request.text)
+        r_data = r_data_request.json()
+        r_body = r_body_request.json()
 
         # remove tracker ids if present (T243662, T255862)
         for tracker_id in tracker:

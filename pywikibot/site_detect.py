@@ -20,6 +20,12 @@ from pywikibot.exceptions import ServerError
 from pywikibot.tools import MediaWikiVersion
 
 
+try:
+    from requests import JSONDecodeError
+except ImportError:  # requests < 2.27.0
+    from json import JSONDecodeError
+
+
 SERVER_DB_ERROR_MSG = \
     '<h1>Sorry! This site is experiencing technical difficulties.</h1>'
 
@@ -101,7 +107,7 @@ class MWSite:
             self.api
             + '?action=query&meta=siteinfo&siprop=interwikimap'
               '&sifilteriw=local&format=json')
-        iw = json.loads(response.text)
+        iw = response.json()
         if 'error' in iw:
             raise RuntimeError('{} - {}'.format(iw['error']['code'],
                                                 iw['error']['info']))
@@ -112,12 +118,12 @@ class MWSite:
         """Extract the version from API help with ?version enabled."""
         if self.version is None:
             try:
-                d = fetch(self.api + '?version&format=json').text
+                r = fetch(self.api + '?version&format=json')
                 try:
-                    d = json.loads(d)
-                except ValueError:
+                    d = r.json()
+                except JSONDecodeError:
                     # Fallback for old versions which didn't wrap help in json
-                    d = {'error': {'*': d}}
+                    d = {'error': {'*': r.text}}
 
                 self.version = list(filter(
                     lambda x: x.startswith('MediaWiki'),
