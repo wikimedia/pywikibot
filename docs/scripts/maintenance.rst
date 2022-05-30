@@ -13,12 +13,6 @@ colors script description
 .. automodule:: scripts.maintenance.colors
    :no-members:
 
-preload_sites script description
---------------------------------
-
-.. automodule:: scripts.maintenance.preload_sites
-   :no-members:
-
 sorting\_order script description
 ---------------------------------
 

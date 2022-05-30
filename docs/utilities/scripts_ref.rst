@@ -19,6 +19,11 @@ generate\_user\_files script
 
 .. automodule:: pywikibot.scripts.generate_user_files
 
+preload_sites script
+--------------------
+
+.. automodule:: pywikibot.scripts.preload_sites
+
 shell script
 ------------
 

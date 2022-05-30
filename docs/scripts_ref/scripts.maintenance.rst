@@ -22,11 +22,6 @@ scripts.maintenance.make\_i18n\_dict script
 
 .. automodule:: scripts.maintenance.make_i18n_dict
 
-scripts.maintenance.preload_sites script
------------------------------------------
-
-.. automodule:: scripts.maintenance.preload_sites
-
 scripts.maintenance.sorting\_order script
 -----------------------------------------
 
