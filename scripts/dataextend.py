@@ -12592,10 +12592,11 @@ class IgdbAnalyzer(Analyzer):
             '<label>{}:</label>(.*?)<(?:label|<h3 class="underscratch)'
             .format(field), html, dtype)
 
-    def getvalues(self, field, html, dtype=None) -> List[str]:
+    def getvalues(self, field, html, dtype=None, alt=None) -> List[str]:
         section = self.getvalue(field, html)
         if section:
-            return self.findallbyre('>([^<>]+)<', section, dtype)
+            return self.findallbyre('>([^<>]+)<', section,
+                                    dtype=dtype, alt=alt)
         return []
 
     def findinstanceof(self, html):
