@@ -277,7 +277,7 @@ class NowCommonsDeleteBot(Bot, ConfigParserBot):
                                                        + file_on_commons)
                 if (local_file_page.title(with_ns=False)
                         != commons_file_page.title(with_ns=False)):
-                    using_pages = list(local_file_page.using_pages())
+                    using_pages = list(local_file_page.usingPages())
                     if using_pages and using_pages != [local_file_page]:
                         pywikibot.output(
                             '"<<lightred>>{}<<default>>" is still used in {} '
@@ -301,10 +301,10 @@ class NowCommonsDeleteBot(Bot, ConfigParserBot):
                             # previous function won't work
                             is_used = bool(list(pywikibot.FilePage(
                                 self.site,
-                                page.title()).using_pages(total=1)))
+                                page.title()).usingPages(total=1)))
                             if is_used and self.opt.replaceloose:
                                 bot = ImageBot(
-                                    local_file_page.usimgPages(),
+                                    local_file_page.usingPages(),
                                     local_file_page.title(with_ns=False,
                                                           as_url=True),
                                     commons_file_page.title(with_ns=False),
@@ -313,7 +313,7 @@ class NowCommonsDeleteBot(Bot, ConfigParserBot):
                                 bot.run()
                             # refresh because we want the updated list
                             using_pages = len(list(pywikibot.FilePage(
-                                self.site, page.title()).using_pages()))
+                                self.site, page.title()).usingPages()))
 
                         else:
                             pywikibot.output('Please change them manually.')
