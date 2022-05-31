@@ -496,7 +496,7 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
         """Use pdfinfo to retrieve title from a PDF."""
         # pdfinfo is Unix-only
         pywikibot.output('Reading PDF file...')
-
+        infile = None
         try:
             fd, infile = tempfile.mkstemp()
             urlobj = os.fdopen(fd, 'w+')
@@ -524,8 +524,9 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
                         break
             pywikibot.output('PDF done.')
         finally:
-            urlobj.close()
-            os.unlink(infile)
+            if infile is not None:
+                urlobj.close()
+                os.unlink(infile)
 
     def setup(self):
         """Read dead links from file."""
