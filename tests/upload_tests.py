@@ -90,8 +90,7 @@ class TestUpload(TestCase):
         page = pywikibot.FilePage(self.site, 'MP_sounds-pwb.png')
         self.site.upload(page, source_filename=file_name,
                          comment='pywikibot test', chunk_size=chunk_size,
-                         ignore_warnings=True, report_success=False,
-                         _file_key=self._file_key, _offset=self._offset)
+                         ignore_warnings=True, report_success=False)
 
     def _test_continue_filekey(self, chunk_size):
         """Test uploading a chunk first and finish in a separate upload."""
