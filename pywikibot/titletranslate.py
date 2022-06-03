@@ -47,10 +47,8 @@ def translate(
             codes = site.family.languages_by_size[:int(codes)]
         elif codes == 'all':
             codes = site.family.languages_by_size
-        elif codes in site.family.language_groups:
-            codes = site.family.language_groups[codes]
         else:
-            codes = codes.split(',')
+            codes = site.family.language_groups.get(codes, codes.split(','))
 
         for newcode in codes:
             if newcode in site.languages():

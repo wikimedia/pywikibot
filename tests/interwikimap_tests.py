@@ -7,8 +7,11 @@
 #
 import unittest
 
+from contextlib import suppress
+
 import pywikibot
 from pywikibot.tools import suppress_warnings
+
 from tests import WARN_SITE_CODE
 from tests.aspects import TestCase
 
@@ -152,7 +155,5 @@ class TestInterwikiMapPrefix(TestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

@@ -1458,13 +1458,12 @@ class BasePage(ComparableMixin):
             # only yield links that are to a different site and that
             # are not language links
             try:
-                if link.site != self.site:
-                    if linktitle.lstrip().startswith(':'):
-                        # initial ":" indicates not a language link
-                        yield link
-                    elif link.site.family != self.site.family:
-                        # link to a different family is not a language link
-                        yield link
+                # initial ":" indicates not a language link
+                # link to a different family is not a language link
+                if link.site != self.site \
+                   and (linktitle.lstrip().startswith(':')
+                        or link.site.family != self.site.family):
+                    yield link
             except Error:
                 # ignore any links with invalid contents
                 continue

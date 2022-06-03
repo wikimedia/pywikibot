@@ -468,16 +468,16 @@ class PrimaryIgnoreManager:
         """
         filename = os.path.join(
             folder, self.disamb_page.title(as_filename=True) + '.txt')
-        with suppress(IOError):
-            # The file is stored in the disambiguation/ subdir.
-            # Create if necessary.
-            with codecs.open(filename, 'r', 'utf-8') as f:
-                for line in f:
-                    # remove trailing newlines and carriage returns
-                    line = line.rstrip('\r\n')
-                    # skip empty lines
-                    if line:
-                        self.ignorelist.add(line)
+
+        # The file is stored in the disambiguation/ subdir.
+        # Create if necessary.
+        with suppress(IOError), codecs.open(filename, 'r', 'utf-8') as f:
+            for line in f:
+                # remove trailing newlines and carriage returns
+                line = line.rstrip('\r\n')
+                # skip empty lines
+                if line:
+                    self.ignorelist.add(line)
 
     def isIgnored(self, ref_page) -> bool:  # noqa: N802
         """Return if ref_page is to be ignored.
@@ -500,10 +500,10 @@ class PrimaryIgnoreManager:
             filename = config.datafilepath(
                 'disambiguations',
                 self.disamb_page.title(as_url=True) + '.txt')
-            with suppress(IOError):
-                # Open file for appending. If none exists, create a new one.
-                with codecs.open(filename, 'a', 'utf-8') as f:
-                    f.write('\n'.join(page_titles) + '\n')
+
+            # Open file for appending. If none exists, create a new one.
+            with suppress(IOError), codecs.open(filename, 'a', 'utf-8') as f:
+                f.write('\n'.join(page_titles) + '\n')
 
 
 class AddAlternativeOption(OutputProxyOption):
@@ -1330,9 +1330,7 @@ def main(*args: str) -> None:
                 alternatives.append(value)
             else:
                 page = pywikibot.Page(pywikibot.Link(value, site))
-                if page.exists():
-                    alternatives.append(page.title())
-                elif pywikibot.input_yn(
+                if page.exists() or pywikibot.input_yn(
                     'Possibility {} does not actually exist. Use it anyway?'
                     .format(page.title()), default=False,
                         automatic_quit=False):

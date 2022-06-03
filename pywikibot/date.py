@@ -704,6 +704,7 @@ class MonthFormat(abc.MutableMapping):  # type: ignore[type-arg]
 
 
 formats = {
+    'MonthName': MonthNames(),
     'Number': {
         'ar': lambda v: dh_number(v, '%d (عدد)'),
         'ary': lambda v: dh_number(v, '%d'),
@@ -1676,7 +1677,6 @@ formats = {
     },
 }  # type: Dict[Union[str, int], Mapping[str, Callable[[int], str]]]
 
-formats['MonthName'] = MonthNames()
 #
 # Add auto-generated empty dictionaries for DayOfMonth and MonthOfYear articles
 #

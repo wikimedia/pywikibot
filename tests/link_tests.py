@@ -410,7 +410,7 @@ class TestFullyQualifiedLinkDifferentFamilyParser(LinkTestCase):
 
     def test_fully_qualified_NS0(self):
         """Test that fully qualified link is in namespace 0."""
-        family, code = 'wikipedia:en'.split(':')
+        family, code = 'wikipedia', 'en'
         for colon in ('', ':'):  # with or without preleading colon
             # switch code:family sequence en:wikipedia or wikipedia:en
             for first, second in [(family, code), (code, family)]:
@@ -428,7 +428,7 @@ class TestFullyQualifiedLinkDifferentFamilyParser(LinkTestCase):
 
     def test_fully_qualified_NS1(self):
         """Test that fully qualified link is in namespace 1."""
-        family, code = 'wikipedia:en'.split(':')
+        family, code = 'wikipedia', 'en'
         for colon in ('', ':'):  # with or without preleading colon
             # switch code:family sequence en:wikipedia or wikipedia:en
             for first, second in [(family, code), (code, family)]:

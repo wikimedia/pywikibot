@@ -1401,10 +1401,7 @@ class Claim(Property):
         for val in my_values:
             if val not in other_values:
                 return False
-        for val in other_values:
-            if val not in my_values:
-                return False
-        return True
+        return all(val in my_values for val in other_values)
 
     def same_as(
         self,
@@ -1507,10 +1504,7 @@ class Claim(Property):
 
         # Before #84516 Wikibase did not implement snaks-order.
         # https://gerrit.wikimedia.org/r/c/84516/
-        if 'snaks-order' in data:
-            prop_list = data['snaks-order']
-        else:
-            prop_list = data['snaks'].keys()
+        prop_list = data.get('snaks-order', data['snaks'].keys())
 
         for prop in prop_list:
             for claimsnak in data['snaks'][prop]:
@@ -1833,11 +1827,8 @@ class Claim(Property):
         if self.isQualifier or self.isReference:
             raise ValueError('Qualifiers and references cannot have '
                              'qualifiers.')
-
-        for qualifier in self.qualifiers.get(qualifier_id, []):
-            if qualifier.target_equals(target):
-                return True
-        return False
+        return any(qualifier.target_equals(target)
+                   for qualifier in self.qualifiers.get(qualifier_id, []))
 
     def _formatValue(self) -> dict:
         """

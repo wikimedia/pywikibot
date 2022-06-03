@@ -215,15 +215,12 @@ class FamilyFileGenerator:
         """Write the family file."""
         fn = os.path.join(self.base_dir, 'families',
                           '{}_family.py'.format(self.name))
-        print('Writing %s... ' % fn)
-        try:
-            open(fn)
-            if input('{} already exists. Overwrite? (y/n)'
-                     .format(fn)).lower() == 'n':
-                print('Terminating.')
-                sys.exit(1)
-        except OSError:  # file not found
-            pass
+        print('Writing {}... '.format(fn))
+
+        if os.path.exists(fn) and input('{} already exists. Overwrite? (y/n)'
+                                        .format(fn)).lower() == 'n':
+            print('Terminating.')
+            sys.exit(1)
 
         code_hostname_pairs = '\n        '.join(
             "'{code}': '{hostname}',".format(

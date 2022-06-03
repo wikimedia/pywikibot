@@ -702,11 +702,12 @@ class Subject(interwiki_graph.Subject):
             for page in tree.filter(site):
                 # -hintsonly: before we have an origin page, any namespace will
                 # do.
-                if self.origin and page.namespace() == self.origin.namespace():
-                    if page.exists() \
-                       and not page.isRedirectPage() \
-                       and not page.isCategoryRedirect():
-                        return page
+                if self.origin \
+                   and page.namespace() == self.origin.namespace() \
+                   and page.exists() \
+                   and not page.isRedirectPage() \
+                   and not page.isCategoryRedirect():
+                    return page
         return None
 
     def translate(self, hints=None, keephintedsites: bool = False) -> None:
@@ -1899,10 +1900,9 @@ class InterwikiBot:
                             'Skipping: {} is an auto entry {}({})'
                             .format(page, dictName, year))
                         continue
-                if self.conf.parenthesesonly:
-                    # Only yield pages that have ( ) in titles
-                    if '(' not in page.title():
-                        continue
+                # Only yield pages that have ( ) in titles
+                if self.conf.parenthesesonly and '(' not in page.title():
+                    continue
                 if page.isTalkPage():
                     pywikibot.output('Skipping: {} is a talk page'
                                      .format(page))

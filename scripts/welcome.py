@@ -788,7 +788,7 @@ class WelcomeBot(SingleSiteBot):
                              .format(user.username))
 
         elif user.editCount() < globalvar.attach_edit_count:
-            if not user.editCount() == 0:
+            if user.editCount() != 0:
                 self.show_status(Msg.IGNORE)
                 pywikibot.output('{} has only {} contributions.'
                                  .format(user.username, user.editCount()))
