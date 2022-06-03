@@ -53,7 +53,7 @@ class TestTkinter(DefaultSiteTestCase):
         self.assertIsNone(v)
 
 
-def setUpModule():  # noqa: N802
+def setUpModule():
     """Skip Travis tests if PYWIKIBOT_TEST_GUI variable is not set."""
     if os.environ.get('PYWIKIBOT_TEST_GUI', '0') != '1':
         raise unittest.SkipTest('Tkinter tests are disabled on Travis-CI')
