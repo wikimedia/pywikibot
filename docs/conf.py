@@ -440,10 +440,6 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
             # Reset length
             length = 0
 
-        if '|' in line:
-            # Escape vertical bars
-            lines[index] = line.replace('|', '\\|')
-
 
 def pywikibot_skip_members(app, what, name, obj, skip, options):
     """Skip certain members from documentation."""

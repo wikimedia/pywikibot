@@ -50,18 +50,18 @@ information about files to upload.
 
 Example 'Data ingestion' template
 =================================
-.. code::
+.. code-block:: python
 
-    {{Data ingestion
-    |sourceFormat=csv
-    |csvFile=csv_ingestion.csv
-    |sourceFileKey=%(StockNumber)
-    |csvDialect=
-    |csvDelimiter=,
-    |csvEncoding=utf8
-    |formattingTemplate=Template:Data ingestion test configuration
-    |titleFormat=%(name)s - %(set)s.%(_ext)s
-    }}
+   {{Data ingestion
+   |sourceFormat=csv
+   |csvFile=csv_ingestion.csv
+   |sourceFileKey=%(StockNumber)
+   |csvDialect=
+   |csvDelimiter=,
+   |csvEncoding=utf8
+   |formattingTemplate=Template:Data ingestion test configuration
+   |titleFormat=%(name)s - %(set)s.%(_ext)s
+   }}
 
 
 Csv file
@@ -76,22 +76,20 @@ csv field Headers::
 
 Usage
 =====
-.. code::
+.. code-block:: python
 
-    python pwb.py data_ingestion -csvdir:<local_dir/> -page:<cfg_page_on_wiki>
+   python pwb.py data_ingestion -csvdir:<local_dir/> -page:<cfg_page_on_wiki>
 
 
 Example
 =======
-Warning! Put it in one line, otherwise it won't work correctly.
+.. code-block:: python
 
-.. code::
+   pwb.py data_ingestion -csvdir:"test/data" -page:"User:<Your-Username>/data_ingestion_test_template"
 
-    python pwb.py data_ingestion \
-        -csvdir:"test/data" \
-        -page:"User:<Your-Username>/data_ingestion_test_template"
+.. warning:: Put it in one line, otherwise it won't work correctly.
 
-"""
+"""  # noqa: E501
 #
 # (C) Pywikibot team, 2012-2022
 #
