@@ -648,7 +648,7 @@ class ProofreadPage(pywikibot.Page):
         if HTTPStatus.BAD_REQUEST <= response.status_code < 600:
             return True, 'Http response status {}'.format(response.status_code)
 
-        data = json.loads(response.text)
+        data = response.json()
 
         if ocr_tool == self._PHETOOLS:  # phetools
             assert 'error' in data, 'Error from phetools: {}'.format(data)

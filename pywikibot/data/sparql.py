@@ -4,7 +4,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-import json
+from contextlib import suppress
 from typing import Optional
 from urllib.parse import quote
 
@@ -15,6 +15,11 @@ from pywikibot.backports import Dict, List
 from pywikibot.comms import http
 from pywikibot.exceptions import Error, TimeoutError
 
+
+try:
+    from requests import JSONDecodeError
+except ImportError:  # requests < 2.27.0
+    from json import JSONDecodeError
 
 DEFAULT_HEADERS = {'cache-control': 'no-cache',
                    'Accept': 'application/sparql-results+json'}
@@ -148,13 +153,9 @@ class SparqlQuery:
                 self.wait()
                 continue
 
-            if not self.last_response.text:
-                break
-
-            try:
-                return json.loads(self.last_response.text)
-            except ValueError:
-                break
+            with suppress(JSONDecodeError):
+                return self.last_response.json()
+            break
 
         return None
 
