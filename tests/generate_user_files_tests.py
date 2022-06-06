@@ -8,7 +8,10 @@
 import re
 import unittest
 
+from contextlib import suppress
+
 from pywikibot.scripts import generate_user_files as guf
+
 from tests.aspects import TestCase
 
 
@@ -102,7 +105,5 @@ class TestGenerateUserFiles(TestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

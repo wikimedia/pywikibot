@@ -226,9 +226,8 @@ class TestSiteObject(DefaultSiteTestCase):
             self.assertEqual(list(msg), months)
 
         # mediawiki_messages must be given a list; using a string will split it
-        with self.subTest(messages='about'):
-            with self.assertRaises(KeyError):
-                self.site.mediawiki_messages('about')
+        with self.subTest(messages='about'), self.assertRaises(KeyError):
+            self.site.mediawiki_messages('about')
 
         msg = ('nosuchmessage1', 'about', 'aboutpage', 'nosuchmessage')
         with self.subTest(messages=msg):
@@ -809,19 +808,14 @@ class TestSiteGenerators(DefaultSiteTestCase):
                     self.assertIn(prop, block)
 
         # starttime earlier than endtime
-        with self.subTest(starttime=low, endtime=high, reverse=False):
-            with self.assertRaises(AssertionError):
-                mysite.blocks(total=5,
-                              starttime=low,
-                              endtime=high)
+        with self.subTest(starttime=low, endtime=high, reverse=False), \
+             self.assertRaises(AssertionError):
+            mysite.blocks(total=5, starttime=low, endtime=high)
 
         # reverse: endtime earlier than starttime
-        with self.subTest(starttime=high, endtime=low, reverse=True):
-            with self.assertRaises(AssertionError):
-                mysite.blocks(total=5,
-                              starttime=high,
-                              endtime=low,
-                              reverse=True)
+        with self.subTest(starttime=high, endtime=low, reverse=True), \
+             self.assertRaises(AssertionError):
+            mysite.blocks(total=5, starttime=high, endtime=low, reverse=True)
 
     def test_exturl_usage(self):
         """Test the site.exturlusage() method."""
@@ -1985,23 +1979,21 @@ class SiteSysopTestCase(DefaultSiteTestCase):
         # start earlier than end
         with self.subTest(start='2008-09-03T00:00:01Z',
                           end='2008-09-03T23:59:59Z',
-                          reverse=False):
-            with self.assertRaises(AssertionError):
-                gen = mysite.deletedrevs(titles=mainpage,
-                                         start='2008-09-03T00:00:01Z',
-                                         end='2008-09-03T23:59:59Z', total=5)
-                next(gen)
+                          reverse=False), self.assertRaises(AssertionError):
+            gen = mysite.deletedrevs(titles=mainpage,
+                                     start='2008-09-03T00:00:01Z',
+                                     end='2008-09-03T23:59:59Z', total=5)
+            next(gen)
 
         # reverse: end earlier than start
         with self.subTest(start='2008-09-03T23:59:59Z',
                           end='2008-09-03T00:00:01Z',
-                          reverse=True):
-            with self.assertRaises(AssertionError):
-                gen = mysite.deletedrevs(titles=mainpage,
-                                         start='2008-09-03T23:59:59Z',
-                                         end='2008-09-03T00:00:01Z', total=5,
-                                         reverse=True)
-                next(gen)
+                          reverse=True), self.assertRaises(AssertionError):
+            gen = mysite.deletedrevs(titles=mainpage,
+                                     start='2008-09-03T23:59:59Z',
+                                     end='2008-09-03T00:00:01Z', total=5,
+                                     reverse=True)
+            next(gen)
 
     def test_alldeletedrevisions(self):
         """Test the site.alldeletedrevisions() method."""
@@ -2048,22 +2040,22 @@ class SiteSysopTestCase(DefaultSiteTestCase):
         # start earlier than end
         with self.subTest(start='2008-09-03T00:00:01Z',
                           end='2008-09-03T23:59:59Z',
-                          reverse=False, prop=prop):
-            with self.assertRaises(AssertionError):
-                gen = mysite.alldeletedrevisions(start='2008-09-03T00:00:01Z',
-                                                 end='2008-09-03T23:59:59Z',
-                                                 total=5)
-                next(gen)
+                          reverse=False,
+                          prop=prop), self.assertRaises(AssertionError):
+            gen = mysite.alldeletedrevisions(start='2008-09-03T00:00:01Z',
+                                             end='2008-09-03T23:59:59Z',
+                                             total=5)
+            next(gen)
 
         # reverse: end earlier than start
         with self.subTest(start='2008-09-03T23:59:59Z',
                           end='2008-09-03T00:00:01Z',
-                          reverse=True, prop=prop):
-            with self.assertRaises(AssertionError):
-                gen = mysite.alldeletedrevisions(start='2008-09-03T23:59:59Z',
-                                                 end='2008-09-03T00:00:01Z',
-                                                 total=5, reverse=True)
-                next(gen)
+                          reverse=True,
+                          prop=prop), self.assertRaises(AssertionError):
+            gen = mysite.alldeletedrevisions(start='2008-09-03T23:59:59Z',
+                                             end='2008-09-03T00:00:01Z',
+                                             total=5, reverse=True)
+            next(gen)
 
 
 class TestSiteSysopWrite(TestCase):
@@ -3008,7 +3000,6 @@ class TestPagePreloading(DefaultSiteTestCase):
         """Test preloading continuation with groupsize greater than total."""
         mysite = self.get_site()
         mainpage = self.get_mainpage()
-        count = 0
 
         # Determine if there are enough links on the main page,
         # for the test to be useful.
@@ -3019,21 +3010,21 @@ class TestPagePreloading(DefaultSiteTestCase):
         # get a fresh generator; we now know how many results it will have,
         # if it is less than 10.
         links = mysite.pagelinks(mainpage, total=10)
-        for page in mysite.preloadpages(links, groupsize=50):
+        count = 0
+        for count, page in enumerate(
+                mysite.preloadpages(links, groupsize=50), start=1):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             if page.exists():
                 self.assertLength(page._revisions, 1)
                 self.assertIsNotNone(page._revisions[page._revid].text)
                 self.assertFalse(hasattr(page, '_pageprops'))
-            count += 1
         self.assertEqual(count, link_count)
 
     def test_preload_low_groupsize(self):
         """Test preloading continuation with groupsize greater than total."""
         mysite = self.get_site()
         mainpage = self.get_mainpage()
-        count = 0
 
         # Determine if there are enough links on the main page,
         # for the test to be useful.
@@ -3044,14 +3035,15 @@ class TestPagePreloading(DefaultSiteTestCase):
         # get a fresh generator; we now know how many results it will have,
         # if it is less than 10.
         links = mysite.pagelinks(mainpage, total=10)
-        for page in mysite.preloadpages(links, groupsize=5):
+        count = 0
+        for count, page in enumerate(
+                mysite.preloadpages(links, groupsize=5), start=1):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             if page.exists():
                 self.assertLength(page._revisions, 1)
                 self.assertIsNotNone(page._revisions[page._revid].text)
                 self.assertFalse(hasattr(page, '_pageprops'))
-            count += 1
         self.assertEqual(count, link_count)
 
     def test_preload_unexpected_titles_using_pageids(self):

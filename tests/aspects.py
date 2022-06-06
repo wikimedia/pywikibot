@@ -620,11 +620,10 @@ class RequireLoginMixin(TestCaseBase):
         if not site:
             site = self.get_site()
 
-        if hasattr(self, '_userpage'):
-            # For multi-site test classes, or site is specified as a param,
-            # the cached userpage object may not be the desired site.
-            if self._userpage.site == site:
-                return self._userpage
+        # For multi-site test classes, or site is specified as a param,
+        # the cached userpage object may not be the desired site.
+        if hasattr(self, '_userpage') and self._userpage.site == site:
+            return self._userpage
 
         userpage = pywikibot.User(site, site.username())
         self._userpage = userpage
@@ -713,10 +712,8 @@ class MetaTestCaseClass(type):
         if 'hostname' in dct:
             hostnames = [dct['hostname']]
             del dct['hostname']
-        elif 'hostnames' in dct:
-            hostnames = dct['hostnames']
         else:
-            hostnames = []
+            hostnames = dct.get('hostnames', [])
 
         if dct.get('net') is False:
             dct['site'] = False
@@ -983,11 +980,11 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
         if not site:
             site = self.get_site()
 
-        if hasattr(self, '_mainpage') and not force:
-            # For multi-site test classes, or site is specified as a param,
-            # the cached mainpage object may not be the desired site.
-            if self._mainpage.site == site:
-                return self._mainpage
+        # For multi-site test classes, or site is specified as a param,
+        # the cached mainpage object may not be the desired site.
+        if hasattr(self, '_mainpage') and not force \
+           and self._mainpage.site == site:
+            return self._mainpage
 
         maintitle = site.siteinfo['mainpage']
         maintitle = removeprefix(maintitle, 'Special:MyLanguage/')  # T278702

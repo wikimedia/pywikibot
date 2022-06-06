@@ -45,9 +45,7 @@ class TextEditor:
         assert config.editor is not None
         if config.editor.startswith('kate'):
             command = ['-l', str(line + 1), '-c', str(column + 1)]
-        elif config.editor.startswith('gedit'):
-            command = ['+{}'.format(line + 1)]  # columns seem unsupported
-        elif config.editor.startswith('emacs'):
+        elif config.editor.startswith(('gedit', 'emacs')):
             command = ['+{}'.format(line + 1)]  # columns seem unsupported
         elif config.editor.startswith('jedit'):
             command = ['+line:{}'.format(line + 1)]  # columns seem unsupported

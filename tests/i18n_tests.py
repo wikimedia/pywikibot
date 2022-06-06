@@ -191,9 +191,8 @@ class TestFallbackTranslate(TestCase):
     def testNoEnglish(self):
         """Test translate with missing English text."""
         for code in ('en', 'fy', 'nl'):
-            with self.subTest(code=code):
-                with self.assertRaises(KeyError):
-                    i18n.translate(code, self.msg_no_english, fallback=True)
+            with self.subTest(code=code), self.assertRaises(KeyError):
+                i18n.translate(code, self.msg_no_english, fallback=True)
 
 
 class UserInterfaceLangTestCase(TestCase):

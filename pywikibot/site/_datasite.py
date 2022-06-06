@@ -420,14 +420,12 @@ class DataSite(APISite):
         snak = {}
         for sourceclaim in sources:
             datavalue = sourceclaim._formatDataValue()
-            valuesnaks = []
-            if sourceclaim.getID() in snak:
-                valuesnaks = snak[sourceclaim.getID()]
-            valuesnaks.append({'snaktype': 'value',
-                               'property': sourceclaim.getID(),
-                               'datavalue': datavalue,
-                               },
-                              )
+            valuesnaks = snak.get(sourceclaim.getID(), [])
+            valuesnaks.append({
+                'snaktype': 'value',
+                'property': sourceclaim.getID(),
+                'datavalue': datavalue,
+            })
 
             snak[sourceclaim.getID()] = valuesnaks
             # set the hash if the source should be changed.
@@ -768,8 +766,8 @@ class DataSite(APISite):
                 assert keys < {'language', 'add', 'remove', 'set'}
                 assert 'language' in keys
                 assert ({'add', 'remove', 'set'} & keys)
-                assert not ({'add', 'set'} < keys)
-                assert not ({'remove', 'set'} < keys)
+                assert ({'add', 'set'} >= keys)
+                assert ({'remove', 'set'} >= keys)
             elif action in ('wbsetlabel', 'wbsetdescription'):
                 res = data
                 keys = set(res)

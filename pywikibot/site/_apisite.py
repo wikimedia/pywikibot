@@ -1055,11 +1055,8 @@ class APISite(
         :param name: The extension to check for, case sensitive
         :return: If the extension is loaded
         """
-        extensions = self.siteinfo['extensions']
-        for ext in extensions:
-            if 'name' in ext and ext['name'] == name:
-                return True
-        return False
+        return any('name' in ext and ext['name'] == name
+                   for ext in self.siteinfo['extensions'])
 
     @property
     def siteinfo(self) -> Siteinfo:
@@ -1533,9 +1530,7 @@ class APISite(
 
         req._warning_handler = warn_handler
         data = req.submit()
-
-        if 'query' in data:
-            data = data['query']
+        data = data.get('query', data)
 
         if 'tokens' in data and data['tokens']:
             user_tokens = {key[:-5]: val

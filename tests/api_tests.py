@@ -241,9 +241,9 @@ class TestParamInfo(DefaultSiteTestCase):
             self.assertEqual(mod[6:], pi[mod]['name'])
             self.assertEqual(mod, pi[mod]['path'])
 
-        with patch.object(pywikibot, 'warning') as w:
-            with self.assertRaises(KeyError):
-                pi.__getitem__('query+foobar')
+        with patch.object(pywikibot, 'warning') as w, \
+             self.assertRaises(KeyError):
+            pi.__getitem__('query+foobar')
         # The warning message may be different with older MW versions.
         self.assertIn('API warning (paraminfo): ', w.call_args[0][0])
 
@@ -536,11 +536,10 @@ class TestPropertyGenerator(TestCase):
                                     parameters={'titles': '|'.join(titles)})
 
         count = 0
-        for pagedata in gen:
+        for count, pagedata in enumerate(gen, start=1):
             self.assertIsInstance(pagedata, dict)
             self.assertIn('pageid', pagedata)
             self.assertIn('lastrevid', pagedata)
-            count += 1
         self.assertLength(links, count)
 
     def test_one_continuation(self):
@@ -554,12 +553,11 @@ class TestPropertyGenerator(TestCase):
         gen.set_maximum_items(-1)  # suppress use of "rvlimit" parameter
 
         count = 0
-        for pagedata in gen:
+        for count, pagedata in enumerate(gen, start=1):
             self.assertIsInstance(pagedata, dict)
             self.assertIn('pageid', pagedata)
             self.assertIn('revisions', pagedata)
             self.assertIn('revid', pagedata['revisions'][0])
-            count += 1
         self.assertLength(links, count)
 
     def test_two_continuations(self):
@@ -573,12 +571,11 @@ class TestPropertyGenerator(TestCase):
         gen.set_maximum_items(-1)  # suppress use of "rvlimit" parameter
 
         count = 0
-        for pagedata in gen:
+        for count, pagedata in enumerate(gen, start=1):
             self.assertIsInstance(pagedata, dict)
             self.assertIn('pageid', pagedata)
             self.assertIn('revisions', pagedata)
             self.assertIn('revid', pagedata['revisions'][0])
-            count += 1
         self.assertLength(links, count)
 
     def test_many_continuations_limited(self):
@@ -602,13 +599,12 @@ class TestPropertyGenerator(TestCase):
         gen.set_query_increment(5)
 
         count = 0
-        for pagedata in gen:
+        for count, pagedata in enumerate(gen, start=1):
             self.assertIsInstance(pagedata, dict)
             if 'missing' in pagedata:
                 self.assertNotIn('pageid', pagedata)
             else:
                 self.assertIn('pageid', pagedata)
-            count += 1
         self.assertLength(links, count)
 
     def test_two_continuations_limited(self):
@@ -623,13 +619,12 @@ class TestPropertyGenerator(TestCase):
         gen.set_query_increment(5)
 
         count = 0
-        for pagedata in gen:
+        for count, pagedata in enumerate(gen, start=1):
             self.assertIsInstance(pagedata, dict)
             if 'missing' in pagedata:
                 self.assertNotIn('pageid', pagedata)
             else:
                 self.assertIn('pageid', pagedata)
-            count += 1
         self.assertLength(links, count)
 
 

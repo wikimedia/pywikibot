@@ -1112,8 +1112,8 @@ class DataExtendBot(SingleSiteBot):
                         self.noname.add(name)
             elif result[0].upper() != 'N':
                 returnvalue = [{}, {}]
-                for language in realnewnames.keys():
-                    if language in existinglabels.keys():
+                for language in realnewnames:
+                    if language in existinglabels:
                         returnvalue[1][language] = existingaliases.get(
                             language, []) + realnewnames[language]
                     else:
@@ -1531,13 +1531,10 @@ class Analyzer:
             (self.findeyecolor, 'P1340'),
         ]:
             result = function(self.html)
-            if result:
-                if prop == 'P856' and 'wikipedia.org' in result:
-                    pass
-                elif prop in ['P2013', 'P4003'] and result == 'pages':
-                    pass
-                else:
-                    newclaims.append((prop, result.strip(), self))
+            if result and not (
+                prop == 'P856' and 'wikipedia.org' in result
+                    or prop in ['P2013', 'P4003'] and result == 'pages'):
+                newclaims.append((prop, result.strip(), self))
 
         for (function, prop) in [
             (self.findbirthdate, 'P569'),
@@ -2419,7 +2416,7 @@ class Analyzer:
                 and not (r[0] == 'P3258' and r[1].lower() in ['users',
                                                               'comunity',
                                                               'www'])
-                and not r[1].lower() == 'search'
+                and r[1].lower() != 'search'
                 and not (r[0] == 'P3365' and ('(Dizionario_Biografico)' in r[1] or '(Enciclopedia-Italiana)' in r[1] or '(Enciclopedia-dei-Papi)' in r[1]))
                 and not (r[0] == 'P2013' and '.php' in r[1])]
 
@@ -5601,9 +5598,7 @@ class LnbAnalyzer(Analyzer):
             if status == 'active':
                 result.append(self.findbyre(r'(?s)(.*)', part.strip().rstrip('.'), dtype, alt=alt))
                 status = 'waiting'
-            elif field in part:
-                status = 'active'
-            elif status == 'waiting' and not part.strip():
+            elif field in part or status == 'waiting' and not part.strip():
                 status = 'active'
             else:
                 status = 'inactive'

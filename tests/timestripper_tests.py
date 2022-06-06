@@ -254,11 +254,8 @@ class TestTimeStripperLanguage(TestCase):
     def test_timestripper_nomatch(self, key):
         """Test that correct date is not matched."""
         self.ts = TimeStripper(self.get_site(key))
-
-        if 'nomatch' in self.sites[key]:
-            txt_no_match = self.sites[key]['nomatch']
-        else:
-            txt_no_match = '3 March 2011 19:48 (UTC) 7 March 2010 19:48 (UTC)'
+        txt_no_match = self.sites[key].get(
+            'nomatch', '3 March 2011 19:48 (UTC) 7 March 2010 19:48 (UTC)')
 
         self.assertIsNone(self.ts.timestripper(txt_no_match))
 

@@ -819,7 +819,7 @@ def replace_links(text: str, replace, site: 'pywikibot.site.BaseSite') -> str:
 
         new_title = new_link.canonical_title()
         # Make correct langlink if needed
-        if not new_link.site == site:
+        if new_link.site != site:
             new_title = ':' + new_link.site.code + ':' + new_title
 
         if is_link:
@@ -1055,8 +1055,7 @@ def getLanguageLinks(
         lang = lang.lower()
         # Check if it really is in fact an interwiki link to a known
         # language, or if it's e.g. a category tag or an internal link
-        if lang in fam.obsolete:
-            lang = fam.obsolete[lang]
+        lang = fam.obsolete.get(lang, lang)
         if lang in fam.langs:
             if '|' in pagetitle:
                 # ignore text after the pipe
@@ -1948,8 +1947,8 @@ class TimeStripper:
         """
         m = None
         cnt = 0
-        for m in pat.finditer(txt):
-            cnt += 1
+        for cnt, m in enumerate(pat.finditer(txt), start=1):
+            pass
 
         def marker(m):
             """
