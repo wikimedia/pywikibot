@@ -52,10 +52,8 @@ from warnings import warn
 
 try:
     from pathlib import Path
-except ImportError as e:
-    from setup import PYTHON_VERSION, VERSIONS_REQUIRED_MESSAGE
-    print(VERSIONS_REQUIRED_MESSAGE.format(version=PYTHON_VERSION))
-    sys.exit(e)
+except ImportError:
+    pass
 
 pwb = None
 site_package = False

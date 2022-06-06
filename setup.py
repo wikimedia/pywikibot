@@ -216,11 +216,11 @@ def read_desc(filename):  # pragma: no cover
                 include = os.path.relpath(line.rsplit('::')[1].strip())
                 if os.path.exists(include):
                     with open(include) as g:
-                        desc.append(re.sub(*pattern, g.read()))
+                        desc.append(re.sub(pattern[0], pattern[1], g.read()))
                 else:
                     print('Cannot include {}; file not found'.format(include))
             else:
-                desc.append(re.sub(*pattern, line))
+                desc.append(re.sub(pattern[0], pattern[1], line))
     return ''.join(desc)
 
 
