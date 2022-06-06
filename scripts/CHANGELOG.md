@@ -1,5 +1,16 @@
 # Scripts Changelog
 
+## 7.4.0
+*current release*
+
+### listpages
+* Print the page list immediately except pages are preloaded
+
+### nowcommons
+* Use treat_page method (:phab:`T309456`)
+* Fix several bugs  (:phab:`T309473`)
+
+
 ## 7.3.0
 *21 May 2022*
 

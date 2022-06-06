@@ -1,6 +1,11 @@
 Current release 7.4.0
 ^^^^^^^^^^^^^^^^^^^^^
 
+* Use Response.json() instead of json.loads(Response.text)
+* Show an APIError if PetScanPageGenerator.query() fails (:phab:`T309538`)
+* `login.py` is now a utiliy script even for site-package installation (:phab:`T309290`)
+* `preload_sites.py` is now a utiliy script even for site-package installation (:phab:`T308912`)
+* `generator_completed` became a public attribute
 * Return gracefully from pwb.find_alternates if folder in user_script_paths does not exist (:phab:`T308910`)
 
 Deprecations
