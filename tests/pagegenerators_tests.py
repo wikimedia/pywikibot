@@ -598,16 +598,15 @@ class TestPreloadingGenerator(DefaultSiteTestCase):
         mainpage = self.get_mainpage()
         links = [page for page in self.site.pagelinks(mainpage, total=20)
                  if page.exists()]
-        count = 0
-        for count, page in enumerate(
-                PreloadingGenerator(links, groupsize=10), start=1):
+        count = -1
+        for count, page in enumerate(PreloadingGenerator(links, groupsize=10)):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             self.assertLength(page._revisions, 1)
             self.assertIsNotNone(page._revisions[page._revid].text)
             self.assertFalse(hasattr(page, '_pageprops'))
             self.assertEqual(page, links[count])
-        self.assertLength(links, count)
+        self.assertLength(links, count + 1)
 
 
 class TestDequePreloadingGenerator(DefaultSiteTestCase):
