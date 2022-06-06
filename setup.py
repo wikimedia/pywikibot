@@ -60,6 +60,7 @@ extra_deps = {
     'isbn': ['python-stdnum>=1.17'],
     'Graphviz': ['pydot>=1.2'],
     'Google': ['google>=1.7'],
+    'memento': ['memento_client==0.6.1'],
     'mwparserfromhell': ['mwparserfromhell>=0.5.0'],
     'wikitextparser': ['wikitextparser>=0.47.5; python_version < "3.6"',
                        'wikitextparser>=0.47.0; python_version >= "3.6"'],
@@ -99,7 +100,7 @@ extra_deps = {
 script_deps = {
     'commons_information.py': extra_deps['mwparserfromhell'],
     'patrol.py': extra_deps['mwparserfromhell'],
-    'weblinkchecker.py': ['memento_client!=0.6.0,>=0.5.1'],
+    'weblinkchecker.py': extra_deps['memento'],
 }
 
 extra_deps.update(script_deps)

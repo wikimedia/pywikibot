@@ -12,7 +12,6 @@ from urllib.parse import urlparse
 
 from requests.exceptions import ConnectionError as RequestsConnectionError
 
-from scripts import weblinkchecker
 from tests.aspects import TestCase, require_modules
 
 
@@ -22,15 +21,17 @@ class MementoTestCase(TestCase):
     """Test memento client."""
 
     def _get_archive_url(self, url, date_string=None):
-        from memento_client.memento_client import MementoClientException
+        from pywikibot.data.memento import (
+            MementoClientException,
+            get_closest_memento_url,
+        )
 
         if date_string is None:
             when = datetime.datetime.now()
         else:
             when = datetime.datetime.strptime(date_string, '%Y%m%d')
         try:
-            result = weblinkchecker._get_closest_memento_url(
-                url, when, self.timegate_uri)
+            result = get_closest_memento_url(url, when, self.timegate_uri)
         except (RequestsConnectionError, MementoClientException) as e:
             self.skipTest(e)
         return result
@@ -72,8 +73,7 @@ class TestMementoDefault(MementoTestCase):
         """Test getting memento for invalid URL."""
         # memento_client raises 'Exception', not a subclass.
         with self.assertRaisesRegex(
-                Exception,
-                'Only HTTP URIs are supported'):
+                ValueError, 'Only HTTP URIs are supported'):
             self._get_archive_url('invalid')
 
 

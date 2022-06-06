@@ -103,6 +103,8 @@ The contents of the package
     |                            +----------------+-------------------------------------+
     |                            | _requests.py   | API Requests interface              |
     +----------------------------+----------------+-------------------------------------+
+    | memento.py                 | memento_client 0.6.1 package fix                     |
+    +----------------------------+------------------------------------------------------+
     | mysql.py                   | Miscellaneous helper functions for mysql queries     |
     +----------------------------+------------------------------------------------------+
     | sparql.py                  | Objects representing SPARQL query API                |
