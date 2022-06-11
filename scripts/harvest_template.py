@@ -423,10 +423,9 @@ def main(*args: str) -> None:
             'Please specify either -template or -transcludes argument')
         return
 
-    generator = gen.getCombinedGenerator(preload=True)
-    if not generator:
+    if not gen.gens:
         gen.handle_arg('-transcludes:' + template_title)
-        generator = gen.getCombinedGenerator(preload=True)
+    generator = gen.getCombinedGenerator(preload=True)
 
     bot = HarvestRobot(template_title, fields, generator=generator, **options)
     bot.run()
