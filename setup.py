@@ -208,7 +208,7 @@ def read_desc(filename):  # pragma: no cover
     Combine included restructured text files which must be done before
     uploading because the source isn't available after creating the package.
     """
-    pattern = r'\:phab\:`(T\d+)`', r'\1'
+    pattern = r'\:\w+\:`([^`]+?)(?:<.+>)?`', r'\1'
     desc = []
     with open(filename) as f:
         for line in f:

@@ -771,9 +771,8 @@ class PurgeRequest(Request):
 
     """Subclass of Request which skips the check on write rights.
 
-    Workaround for T128994.
-    # TODO: remove once bug is fixed.
-    """
+    Workaround for :phab:`T128994`.
+    """  # TODO: remove once bug is fixed.
 
     def __init__(self, **kwargs: Any) -> None:
         """Monkeypatch action in Request initializer."""

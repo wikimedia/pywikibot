@@ -846,7 +846,7 @@ class _WbDataPage(_WbRepresentation):
     """
     A Wikibase representation for data pages.
 
-    A temporary implementation until T162336 has been resolved.
+    A temporary implementation until :phab:`T162336` has been resolved.
 
     Note that this class cannot be used directly
     """

@@ -447,7 +447,7 @@ class InterwikiRedirectPageError(PageRelatedError):
     """
     Page is a redirect to another site.
 
-    This is considered invalid in Pywikibot. See bug T75184.
+    This is considered invalid in Pywikibot. See bug :phab:`T75184`.
 
     """
 

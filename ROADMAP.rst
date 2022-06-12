@@ -5,17 +5,17 @@ Current release 7.4.0
 * Show an APIError if PetScanPageGenerator.query() fails (:phab:`T309538`)
 * `login.py` is now a utiliy script even for site-package installation (:phab:`T309290`)
 * `preload_sites.py` is now a utiliy script even for site-package installation (:phab:`T308912`)
-* `generator_completed` became a public attribute
+* :attr:`generator_completed<pywikibot.bot.BaseBot.generator_completed>` became a public attribute
 * Return gracefully from pwb.find_alternates if folder in user_script_paths does not exist (:phab:`T308910`)
 
 Deprecations
 ^^^^^^^^^^^^
 
-* 7.4.0: `FilePage.usingPages()` was renamed to `using_pages()`
-* 7.2.0: ``tb`` parameter of ``exception()`` function was renamed to ``exc_info``
-* 7.2.0: XMLDumpOldPageGenerator is deprecated in favour of a `content` parameter (:phab:`T306134`)
-* 7.2.0: RedirectPageBot and NoRedirectPageBot bot classes are deprecated in favour of `use_redirects` attribute
-* 7.2.0: `tools.formatter.color_format` is deprecated and will be removed
+* 7.4.0: `FilePage.usingPages()` was renamed to :meth:`using_pages()<pywikibot.FilePage.using_pages>`
+* 7.2.0: ``tb`` parameter of :func:`exception()<pywikibot.exception>` function was renamed to ``exc_info``
+* 7.2.0: XMLDumpOldPageGenerator is deprecated in favour of a `content` parameter of `XMLDumpPageGenerator` (:phab:`T306134`)
+* 7.2.0: RedirectPageBot and NoRedirectPageBot bot classes are deprecated in favour of :attr:`use_redirects<pywikibot.bot.BaseBot.use_redirects>` attribute
+* 7.2.0: :func:`tools.formatter.color_format<pywikibot.tools.formatter.color_format>` is deprecated and will be removed
 * 7.1.0: Unused `get_redirect` parameter of Page.getOldVersion() will be removed
 * 7.1.0: APISite._simple_request() will be removed in favour of APISite.simple_request()
 * 7.0.0: User.isBlocked() method is renamed to is_blocked for consistency

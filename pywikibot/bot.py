@@ -1247,7 +1247,16 @@ class BaseBot(OptionHandler):
     use_redirects = None  # type: Optional[bool]
     """Attribute to determine whether to use redirect pages. Set it to
     True to use redirects only, set it to False to skip redirects. If
-    None both are processed.
+    None both are processed. For example to create a RedirectBot you may
+    define:
+
+    .. code-block:: python
+
+       class MyRedirectBot(ExistingPageBot):
+
+           '''Bot who only works on existing redirects.'''
+
+           use_redirects = True
 
     .. versionadded:: 7.2
     """
