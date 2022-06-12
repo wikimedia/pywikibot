@@ -182,6 +182,16 @@ class FilePage(Page):
         :meth:`APISite.imageusage()
         <pywikibot.site._generators.GeneratorsMixin.imageusage>`
 
+        Usage example:
+
+        >>> site = pywikibot.Site('wikipedia:test')
+        >>> file = pywikibot.FilePage(site, 'Pywikibot MW gear icon.svg')
+        >>> used = list(file.using_pages(total=10))
+        >>> len(used)
+        1
+        >>> used[0].title()
+        'Pywikibot'
+
         .. seealso:: :meth:`globalusage`
         .. versionchanged:: 7.2
            all parameters from :meth:`APISite.imageusage()

@@ -381,15 +381,6 @@ extlinks = {
 }
 
 
-def pywikibot_fix_phab_tasks(app, what, name, obj, options, lines):
-    """Convert Phabricator tasks id to a link using sphinx.ext.extlinks."""
-    result = []
-    for line in lines:
-        line = re.sub(r'(?<!:phab:`)(T\d{5,6})', r':phab:`\1`', line)
-        result.append(line)
-    lines[:] = result[:]
-
-
 def pywikibot_docstring_fixups(app, what, name, obj, options, lines):
     """Fixup docstrings."""
     if what not in ('class', 'exception'):
@@ -445,20 +436,6 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
             length = 0
 
 
-def pywikibot_skip_members(app, what, name, obj, skip, options):
-    """Skip certain members from documentation."""
-    inclusions = ()
-    exclusions = ()
-    if name in inclusions and len(str.splitlines(obj.__doc__ or '')) >= 3:
-        return False
-    if name.startswith('__') and name.endswith('__'):
-        return True
-    if obj.__doc__ is not None \
-       and ('DEPRECATED' in obj.__doc__ or 'Deprecated' in obj.__doc__):
-        return True
-    return skip or name in exclusions
-
-
 def pywikibot_family_classproperty_getattr(obj, name, *defargs):
     """Custom getattr() to get classproperty instances."""
     from sphinx.util.inspect import safe_getattr
@@ -485,10 +462,8 @@ def pywikibot_family_classproperty_getattr(obj, name, *defargs):
 
 def setup(app):
     """Implicit Sphinx extension hook."""
-    app.connect('autodoc-process-docstring', pywikibot_fix_phab_tasks)
     app.connect('autodoc-process-docstring', pywikibot_docstring_fixups)
     app.connect('autodoc-process-docstring', pywikibot_script_docstring_fixups)
-    app.connect('autodoc-skip-member', pywikibot_skip_members)
     app.add_autodoc_attrgetter(type, pywikibot_family_classproperty_getattr)
 
 
