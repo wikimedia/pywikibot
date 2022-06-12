@@ -41,7 +41,7 @@ import re
 import stat
 import sys
 import types
-from locale import getdefaultlocale
+from locale import getlocale
 from os import environ, getenv
 from pathlib import Path
 from textwrap import fill
@@ -497,7 +497,7 @@ userinterface = 'terminal'
 userinterface_init_kwargs = {}  # type: Dict[str, str]
 
 # i18n setting for user interface language
-# default is obtained from :py:obj:`locale.getdefaultlocale`
+# default is obtained from locale.getlocale
 userinterface_lang = None
 
 # Should we transliterate characters that do not exist in the console
@@ -1095,7 +1095,7 @@ if OSWIN32 and editor and set(editor) & set('\a\b\f\n\r\t\v'):
 
 if userinterface_lang is None:
     userinterface_lang = os.getenv('PYWIKIBOT_USERINTERFACE_LANG') \
-        or getdefaultlocale()[0]
+        or getlocale()[0]
     if userinterface_lang is None or userinterface_lang == 'C':
         userinterface_lang = 'en'
     else:
