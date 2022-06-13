@@ -7,7 +7,7 @@ This module includes objects:
 - Category: A page in the Category: namespace
 
 Various Wikibase pages are defined in ``page._wikibase.py``,
-various pages for Proofread Extensions are defines in
+various pages for Proofread Extensions are defined in
 ``pywikibot.proofreadpage``.
 
 ..note:: `Link` objects represent a wiki-page's title, while
