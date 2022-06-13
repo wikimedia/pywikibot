@@ -108,8 +108,10 @@ extra_deps.update({'scripts': [i for k, v in script_deps.items() for i in v]})
 # ------- setup install_requires ------- #
 # packages which are mandatory
 dependencies = [
-    'requests>=2.20.1,<2.26.0;python_version<"3.6"',
-    'requests>=2.20.1;python_version>="3.6"',
+    'requests>=2.20.1, <2.26.0; python_version < "3.6"',
+    'requests>=2.20.1, <2.28.0; '
+    'python_version >= "3.6" and python_version < "3.10"',
+    'requests>=2.20.1; python_version>="3.7"',
     # PEP 440
     'setuptools>=48.0.0 ; python_version >= "3.10"',
     'setuptools>=38.5.2 ; python_version >= "3.7" and python_version < "3.10"',
