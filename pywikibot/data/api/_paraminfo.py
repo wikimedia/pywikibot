@@ -9,7 +9,7 @@ from typing import Any, Optional, Union
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Dict
+from pywikibot.backports import Dict, removeprefix
 from pywikibot.tools import itergroup
 
 
@@ -394,11 +394,8 @@ class ParamInfo(Sized, Container):
                 php_class = mod_data.get('classname')
 
                 if not name and php_class:
-                    if php_class == 'ApiMain':
-                        name = 'main'
-                    elif php_class == 'ApiPageSet':
-                        name = 'pageset'
-                    else:
+                    name = removeprefix(php_class, 'Api').lower()
+                    if name not in ('main', 'pageset'):
                         pywikibot.warning('Unknown paraminfo module "{}"'
                                           .format(php_class))
                         name = '<unknown>:' + php_class
