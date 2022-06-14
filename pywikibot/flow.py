@@ -91,7 +91,12 @@ class Board(FlowPage):
 
     def _parse_url(self, links: Mapping[str, Any]) -> Dict[str, Any]:
         """Parse a URL retrieved from the API."""
-        rule = links['fwd']
+        if 'fwd' in links:
+            rule = links['fwd']
+        elif 'rev' in links:
+            rule = links['rev']
+        else:
+            raise ValueError('Illegal board data (missing required data).')
         parsed_url = urlparse(rule['url'])
         params = parse_qs(parsed_url.query)
         new_params = {}  # type: Dict[str, Any]
