@@ -6,29 +6,26 @@
 #
 import abc
 import datetime
-import logging
-from typing import Any, Type, Union
+from typing import Any, Type, Optional, Union
 from urllib.parse import parse_qs, urlparse
 
 import pywikibot
 from pywikibot.backports import Dict, Iterator, List, Mapping
+from pywikibot import config
 from pywikibot.exceptions import (
     LockedPageError,
     NoPageError,
     UnknownExtensionError,
 )
 from pywikibot.page import BasePage, PageSourceType, User
-from pywikibot.tools import cached
+from pywikibot.tools import cached, deprecated_args
 
 
-logger = logging.getLogger('pywiki.wiki.flow')
-
-
-# Flow page-like objects (boards and topics)
 class FlowPage(BasePage, abc.ABC):
 
     """The base page meta class for the Flow extension.
 
+    Defines Flow page-like object for :class:`Board` and :class:`Topic`.
     It cannot be instantiated directly.
     """
 
@@ -109,17 +106,29 @@ class Board(FlowPage):
                     new_params[key] = value
         return new_params
 
-    def topics(self, content_format: str = 'wikitext', limit: int = 100,
+    @deprecated_args(limit='total')  # since 7.4.0
+    def topics(self, *,
+               content_format: str = 'wikitext',
+               total: Optional[int] = None,
                sort_by: str = 'newest',
                offset: Union[str, datetime.datetime, None] = None,
-               offset_uuid: str = '', reverse: bool = False,
-               include_offset: bool = False, toc_only: bool = False
+               offset_uuid: str = '',
+               reverse: bool = False,
+               include_offset: bool = False,
+               toc_only: bool = False
                ) -> Iterator['Topic']:
         """Load this board's topics.
 
+        .. versionchanged:: 7.4
+           The *total* parameter was added as a per request limit.
+           All parameters are keyword only parameters.
+        .. deprecated:: 7.4
+           The *limit* parameter. Use `-step` global option or
+           `config.step` instead.
+
         :param content_format: The content format to request the data in;
             must be either 'wikitext', 'html', or 'fixed-html'
-        :param limit: The number of topics to fetch in each request.
+        :param total: The number of topics to fetch.
         :param sort_by: Algorithm to sort topics by;
             must be either 'newest' or 'updated'
         :param offset: The timestamp to start at (when sortby is 'updated').
@@ -129,17 +138,25 @@ class Board(FlowPage):
         :param toc_only: Whether to only include information for the TOC.
         :yield: A generator of this board's topics.
         """
+        maxlimit = min(config.step, 100) if config.step > 0 else 100
+        request_limit = min(total, maxlimit)
         data = self.site.load_topiclist(self, content_format=content_format,
-                                        limit=limit, sortby=sort_by,
+                                        limit=request_limit, sortby=sort_by,
                                         toconly=toc_only, offset=offset,
                                         offset_id=offset_uuid, reverse=reverse,
                                         include_offset=include_offset)
+        count = 0
         while data['roots']:
             for root in data['roots']:
                 topic = Topic.from_topiclist_data(self, root, data)
                 yield topic
-            cont_args = self._parse_url(data['links']['pagination'])
-            data = self.site.load_topiclist(self, **cont_args)
+
+                count += 1
+                if count >= total:
+                    return
+
+            continue_args = self._parse_url(data['links']['pagination'])
+            data = self.site.load_topiclist(self, **continue_args)
 
     def new_topic(self, title: str, content: str,
                   content_format: str = 'wikitext') -> 'Topic':
