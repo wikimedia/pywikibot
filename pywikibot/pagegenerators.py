@@ -4,8 +4,9 @@ This module offers a wide variety of page generators.
 A page generator is an object that is iterable (see :pep:`255`) and
 that yields page objects on which other scripts can then work.
 
-Pagegenerators.py cannot be run as script. For testing purposes listpages.py
-can be used instead, to print page titles to standard output.
+Most of these functions just wrap a Site or Page method that returns a
+generator. For testing purposes listpages.py can be used, to print page
+titles to standard output.
 
 These parameters are supported to specify which pages titles to print:
 
@@ -66,10 +67,6 @@ from pywikibot.tools import (
     itergroup,
 )
 
-
-# ported from version 1 for backwards-compatibility
-# most of these functions just wrap a Site or Page method that returns
-# a generator
 
 parameterHelp = """\
 GENERATOR OPTIONS
