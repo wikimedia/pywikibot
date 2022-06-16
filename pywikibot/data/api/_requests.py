@@ -376,10 +376,6 @@ class Request(MutableMapping):
         """Implement dict interface."""
         return list(self._params.keys())
 
-    def __contains__(self, key) -> bool:
-        """Implement dict interface."""
-        return key in self._params
-
     def __iter__(self):
         """Implement dict interface."""
         return iter(self._params)
