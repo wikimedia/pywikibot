@@ -471,6 +471,6 @@ autoclass_content = 'both'
 autodoc_default_options = {
     'members': True,
     'undoc-members': True,
-    'special-members': True,
+    'special-members': False,
     'show-inheritance': True,
 }
