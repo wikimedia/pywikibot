@@ -1467,7 +1467,7 @@ class Subject(interwiki_graph.Subject):
         # Process all languages here
         self.conf.always = False
         if self.conf.limittwo:
-            self.process_limittwo(new, updatedSites)
+            self.process_limit_two(new, updatedSites)
         else:
             self.process_unlimited(new, updatedSites)
 
@@ -1616,7 +1616,7 @@ class Subject(interwiki_graph.Subject):
             old[page2.site] = page2
 
         # Check what needs to get done
-        mods, _comment, _adding, removing, modifying = compareLanguages(
+        mods, mcomment, adding, removing, modifying = compareLanguages(
             old, new, page.site, self.conf.summary)
 
         # When running in autonomous mode without -force switch, make sure we
@@ -1637,11 +1637,7 @@ class Subject(interwiki_graph.Subject):
                         'disambiguation state.'.format(rmPage))
             # Re-Check what needs to get done
             mods, mcomment, adding, removing, modifying = compareLanguages(
-                old,
-                new,
-                page.site,
-                self.conf.summary
-            )
+                old, new, page.site, self.conf.summary)
         if not mods:
             self.conf.note('No changes needed on page {}'.format(page))
             return False
@@ -2430,7 +2426,7 @@ def main(*args: str) -> None:
     except KeyboardInterrupt:
         dump.write_dump(bot.dump_titles, append)
     except Exception:
-        pywikibot.exception(exc_info=bool(config.verbose_output))
+        pywikibot.exception()
         dump.write_dump(bot.dump_titles, append)
     else:
         pywikibot.output('Script terminated sucessfully.')
