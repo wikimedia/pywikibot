@@ -110,7 +110,7 @@ extra_deps.update({'scripts': [i for k, v in script_deps.items() for i in v]})
 dependencies = [
     'requests>=2.20.1, <2.26.0; python_version < "3.6"',
     'requests>=2.20.1, <2.28.0; '
-    'python_version >= "3.6" and python_version < "3.10"',
+    'python_version >= "3.6" and python_version < "3.7"',
     'requests>=2.20.1; python_version>="3.7"',
     # PEP 440
     'setuptools>=48.0.0 ; python_version >= "3.10"',
