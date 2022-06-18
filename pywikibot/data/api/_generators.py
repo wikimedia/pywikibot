@@ -11,6 +11,16 @@ import pywikibot
 from pywikibot import config
 from pywikibot.exceptions import Error, InvalidTitleError, UnsupportedPageError
 
+__all__ = (
+    'APIGenerator',
+    'ListGenerator',
+    'LogEntryListGenerator',
+    'PageGenerator',
+    'PropertyGenerator',
+    'QueryGenerator',
+    'update_page',
+)
+
 
 class _RequestWrapper:
 

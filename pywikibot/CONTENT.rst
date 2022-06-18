@@ -95,6 +95,8 @@ The contents of the package
     |                            +----------------+-------------------------------------+
     |                            | _generators.py | API/Query generators                |
     |                            +----------------+-------------------------------------+
+    |                            | _login.py      | API login interface                 |
+    |                            +----------------+-------------------------------------+
     |                            | _optionset.py  | Boolean API option                  |
     |                            +----------------+-------------------------------------+
     |                            | _paraminfo.py  | API information data object         |

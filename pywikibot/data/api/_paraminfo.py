@@ -12,6 +12,8 @@ from pywikibot import config
 from pywikibot.backports import Dict, removeprefix
 from pywikibot.tools import itergroup
 
+__all__ = ['ParamInfo']
+
 
 class ParamInfo(Sized, Container):
 

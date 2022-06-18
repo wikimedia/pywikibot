@@ -7,6 +7,8 @@
 from collections.abc import MutableMapping
 from typing import Optional
 
+__all__ = ['OptionSet']
+
 
 class OptionSet(MutableMapping):
 
