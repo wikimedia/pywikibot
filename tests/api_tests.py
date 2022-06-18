@@ -959,7 +959,7 @@ class TestLagpattern(DefaultSiteTestCase):
     cached = False
 
     def test_valid_lagpattern(self):
-        """Test whether api.lagpattern is valid."""
+        """Test whether api lagpattern is valid."""
         mysite = self.get_site()
         if ('dbrepllag' not in mysite.siteinfo
                 or mysite.siteinfo['dbrepllag'][0]['lag'] == -1):
@@ -979,7 +979,7 @@ class TestLagpattern(DefaultSiteTestCase):
             pass  # expected exception from DummyThrottle instance
         except APIError as e:
             pywikibot.warning(
-                'Wrong api.lagpattern regex, cannot retrieve lag value')
+                'Wrong api lagpattern regex, cannot retrieve lag value')
             raise e
         self.assertIsInstance(mythrottle._lagvalue, (int, float))
         self.assertGreaterEqual(mythrottle._lagvalue, 0)
@@ -987,7 +987,7 @@ class TestLagpattern(DefaultSiteTestCase):
         self.assertGreaterEqual(mythrottle.retry_after, 0)
 
     def test_individual_patterns(self):
-        """Test api.lagpattern with example patterns."""
+        """Test api lagpattern with example patterns."""
         patterns = {
             'Waiting for 10.64.32.115: 0.14024019241333 seconds lagged':
                 0.14024019241333,
@@ -995,7 +995,7 @@ class TestLagpattern(DefaultSiteTestCase):
             'Waiting for 127.0.0.1: 1.7 seconds lagged': 1.7
         }
         for info, time in patterns.items():
-            lag = api.lagpattern.search(info)
+            lag = api._requests.lagpattern.search(info)
             self.assertIsNotNone(lag)
             self.assertEqual(float(lag.group('lag')), time)
 

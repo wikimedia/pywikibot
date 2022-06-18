@@ -1,4 +1,4 @@
-"""Interface to Mediawiki's api.php."""
+"""Objects representing API requests."""
 #
 # (C) Pywikibot team, 2007-2022
 #

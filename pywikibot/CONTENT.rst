@@ -100,6 +100,8 @@ The contents of the package
     |                            | _optionset.py  | Boolean API option                  |
     |                            +----------------+-------------------------------------+
     |                            | _paraminfo.py  | API information data object         |
+    |                            +----------------+-------------------------------------+
+    |                            | _requests.py   | API Requests interface              |
     +----------------------------+----------------+-------------------------------------+
     | mysql.py                   | Miscellaneous helper functions for mysql queries     |
     +----------------------------+------------------------------------------------------+
