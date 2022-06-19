@@ -197,6 +197,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'he': ('בעבודה',),
         'hr': ('Radovi',),
         'hy': ('Խմբագրում եմ',),
+        'ru': ('Редактирую',),
         'sr': ('Радови у току', 'Рут',),
         'test': ('In use',),
         'ur': ('زیر ترمیم',),
