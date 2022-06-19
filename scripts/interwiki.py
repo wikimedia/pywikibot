@@ -1224,7 +1224,7 @@ class Subject(interwiki_graph.Subject):
                 break
 
             if not self.skipPage(page, linkedPage, counter) \
-               and self.conf.followinterwiki or page == self.origin \
+               and (self.conf.followinterwiki or page == self.origin) \
                and self.addIfNew(linkedPage, counter, page):
                 # It is new. Also verify whether it is the second on the
                 # same site
