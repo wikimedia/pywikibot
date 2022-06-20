@@ -10,15 +10,6 @@ coverage:
     project:
       default:
         enabled: yes
-      framework:
-        flags:
-          - framework
-      tests:
-        flags:
-          - tests
-      scripts:
-        flags:
-          - scripts
     patch:
       default:
         enabled: yes
@@ -27,6 +18,7 @@ coverage:
         enabled: yes
 
   ignore:
+    - make_dist.py
     - pywikibot/backports.py
     - pywikibot/daemonize.py
     - pywikibot/families/__init__.py
@@ -50,19 +42,3 @@ coverage:
     gitter:
       default:
         url: https://webhooks.gitter.im/e/f312b840da1c40d9f4be
-
-flags:
-  framework:
-    carryforward: true
-    paths:
-      - pywikibot
-
-  tests:
-    carryforward: true
-    paths:
-      - tests
-
-  scripts:
-    carryforward: true
-    paths:
-      - scripts

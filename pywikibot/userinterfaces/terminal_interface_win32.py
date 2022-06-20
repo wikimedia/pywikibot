@@ -38,7 +38,8 @@ class Win32UI(terminal_interface_base.UI):
     def __init__(self) -> None:
         """Initializer."""
         super().__init__()
-        if PYTHON_VERSION == (3, 5):  # issue1602 solved in Python 3.6
+        # issue1602 solved in Python 3.6
+        if PYTHON_VERSION == (3, 5):  # pragma: no cover
             from pywikibot.userinterfaces import win32_unicode
             stdin, stdout, stderr, argv = win32_unicode.get_unicode_console()
             self.stdin = stdin

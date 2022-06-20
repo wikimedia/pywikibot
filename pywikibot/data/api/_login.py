@@ -95,7 +95,7 @@ class LoginManager(login.LoginManager):
             # try to login
             try:
                 login_result = login_request.submit()
-            except pywikibot.exceptions.APIError as e:
+            except pywikibot.exceptions.APIError as e:  # pragma: no cover
                 login_result = {'error': e.__dict__}
 
             # clientlogin response can be clientlogin or error
@@ -115,7 +115,7 @@ class LoginManager(login.LoginManager):
 
             if status in ('NeedToken', 'WrongToken', 'badtoken'):
                 token = response.get('token')
-                if token and self.below_mw_1_27:
+                if token and self.below_mw_1_27:  # pragma: no cover
                     # fetched token using action=login
                     login_request['lgtoken'] = token
                     pywikibot.log('Received login token, proceed with login.')
@@ -170,5 +170,5 @@ class LoginManager(login.LoginManager):
         if 'query' in login_token_result:
             return login_token_result['query']['tokens'].get('logintoken')
 
-        self.below_mw_1_27 = True
+        self.below_mw_1_27 = True  # pragma: no cover
         return None

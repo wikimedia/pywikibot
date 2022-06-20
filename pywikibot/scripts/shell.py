@@ -48,7 +48,7 @@ def main(*args: str) -> None:
     code.interact("""Welcome to the Pywikibot interactive shell!""", local=env)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     if sys.platform == 'win32':
         import platform
         import subprocess
