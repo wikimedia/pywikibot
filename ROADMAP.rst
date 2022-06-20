@@ -1,6 +1,11 @@
 Current release 7.4.0
 ^^^^^^^^^^^^^^^^^^^^^
 
+* Move :func:`get_closest_memento_url<pywikibot.data.memento.get_closest_memento_url>` from weblinkchecker script to memento module.
+* Add :mod:`memento module<pywikibot.data.memento>` to fix memento_client package (:phab:`T185561`)
+* L10N and i18n updates
+* Fix Flow board topic continuation when iterating in reverse (:phab:`T138323`)
+* Add Avestan transliteration
 * Use Response.json() instead of json.loads(Response.text)
 * Show an APIError if PetScanPageGenerator.query() fails (:phab:`T309538`)
 * `login.py` is now a utiliy script even for site-package installation (:phab:`T309290`)

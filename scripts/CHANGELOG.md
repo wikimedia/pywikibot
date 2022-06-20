@@ -3,6 +3,14 @@
 ## 7.4.0
 *current release*
 
+### harvest_templates
+* Add -confirm option which sets 'always' option to False  (:phab:`T310356`)
+* Do not show a warning if generator is specified later (:phab:`T310418`)
+
+### interwiki
+* Fix regression where interwiki script removes all interwiki links (:phab:`T310964`)
+* Assign compareLanguages to be reused and fix process_limit_two call (:phab:`T310908`)
+
 ### listpages
 * Print the page list immediately except pages are preloaded
 
