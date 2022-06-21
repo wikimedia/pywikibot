@@ -243,6 +243,7 @@ class Uploader:
         if file_key and file_size is None:
             assert offset is False
 
+        data = {}
         if file_key and offset is False or offset == file_size:
             pywikibot.log('Reused already upload file using filekey "{}"'
                           .format(file_key))
@@ -437,12 +438,13 @@ class Uploader:
                 action='upload', filename=file_page_title, url=self.url,
                 comment=self.comment, text=self.text, token=token)
 
-        return self.submit(final_request, result, data['result'],
+        return self.submit(final_request, result, data.get('result'),
                            ignore_warnings, ignore_all_warnings,
                            report_success, file_key)
 
-    def submit(self, request, result, data_result, ignore_warnings,
-               ignore_all_warnings, report_success, file_key) -> bool:
+    def submit(self, request, result, data_result: Optional[str],
+               ignore_warnings, ignore_all_warnings, report_success,
+               file_key) -> bool:
         """Submit request and return whether upload was successful."""
         # some warning keys have been changed
         warning_keys = {
@@ -534,4 +536,5 @@ class Uploader:
                     self.filepage._load_file_revisions([result['imageinfo']])
                 return True
 
-            raise Error('Unrecognized result: {}'.format(data_result))
+            raise Error('Unrecognized result: {}'
+                        .format(data_result or result['result']))
