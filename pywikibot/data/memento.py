@@ -334,4 +334,4 @@ def get_closest_memento_url(url: str,
         err_msg = 'closest memento uri not found for {} via {}'
     else:
         return mementos['closest']['uri'][0]
-    raise Exception(err_msg)
+    raise Exception(err_msg.format(url, timegate_uri))
