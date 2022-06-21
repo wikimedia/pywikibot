@@ -42,17 +42,27 @@ __all__ = ('CachedRequest', 'Request', 'encode_url')
 # things like throttling or skipping actions when we're in simulation
 # mode
 WRITE_ACTIONS = {
-    'block', 'clearhasmsg', 'createaccount', 'delete', 'edit', 'emailuser',
-    'filerevert', 'flowthank', 'imagerotate', 'import', 'managetags',
-    'mergehistory', 'move', 'options', 'patrol', 'protect', 'purge',
-    'resetpassword', 'revisiondelete', 'rollback', 'setnotificationtimestamp',
-    'setpagelanguage', 'tag', 'thank', 'unblock', 'undelete', 'upload',
-    'userrights', 'watch', 'wbcreateclaim', 'wbcreateredirect', 'wbeditentity',
-    'wblinktitles', 'wbmergeitems', 'wbremoveclaims', 'wbremovequalifiers',
+    # main actions, see https://www.mediawiki.org/wiki/API:Main_page
+    'block', 'clearhasmsg', 'createaccount', 'createlocalaccount', 'delete',
+    'deleteglobalaccount', 'edit', 'editmassmessagelist', 'emailuser',
+    'filerevert', 'flowthank', 'globalblock', 'globalpreferenceoverrides',
+    'globalpreferences', 'globaluserrights', 'imagerotate', 'import',
+    'linkaccount', 'managetags', 'massmessage', 'mergehistory', 'move',
+    'newslettersubscribe', 'options', 'patrol', 'protect', 'purge',
+    'removeauthenticationdata', 'resetpassword', 'revisiondelete', 'rollback',
+    'setglobalaccountstatus', 'setnotificationtimestamp', 'setpagelanguage',
+    'strikevote', 'tag', 'thank', 'threadaction', 'transcodereset',
+    'translationreview', 'unblock', 'undelete', 'unlinkaccount', 'upload',
+    'userrights', 'watch', 'wikilove',
+    # wikibase actions, see https://www.mediawiki.org/wiki/Wikibase/API
+    'wbcreateclaim', 'wbcreateredirect', 'wbeditentity', 'wblinktitles',
+    'wbmergeitems', 'wbremoveclaims', 'wbremovequalifiers',
     'wbremovereferences', 'wbsetaliases', 'wbsetclaim', 'wbsetclaimvalue',
     'wbsetdescription', 'wbsetlabel', 'wbsetqualifier', 'wbsetreference',
-    'wbsetsitelink', 'wbladdform', 'wbleditformelements', 'wblmergelexemes',
-    'wblremoveform',
+    'wbsetsitelink',
+    # lexeme (internal) actions
+    'wbladdform', 'wbladdsense', 'wbleditformelements', 'wbleditsenseelements',
+    'wblmergelexemes', 'wblremoveform', 'wblremovesense',
 }
 
 lagpattern = re.compile(
