@@ -124,11 +124,6 @@ class OptionSet(MutableMapping):
         self._enabled = enabled | (self._enabled - disabled - removed)
         self._disabled = disabled | (self._disabled - enabled - removed)
 
-    def clear(self) -> None:
-        """Clear all enabled and disabled options."""
-        self._enabled.clear()
-        self._disabled.clear()
-
     def __setitem__(self, name, value):
         """Set option to enabled, disabled or neither."""
         if value is True:
@@ -171,10 +166,6 @@ class OptionSet(MutableMapping):
     def __delitem__(self, name) -> None:
         """Remove the item by setting it to None."""
         self[name] = None
-
-    def __contains__(self, name) -> bool:
-        """Return True if option has been set."""
-        return name in self._enabled or name in self._disabled
 
     def __iter__(self):
         """Iterate over each enabled and disabled option."""
