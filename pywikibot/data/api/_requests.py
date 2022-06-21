@@ -38,6 +38,22 @@ from pywikibot.tools import PYTHON_VERSION
 
 __all__ = ('CachedRequest', 'Request', 'encode_url')
 
+# Actions that imply database updates on the server, used for various
+# things like throttling or skipping actions when we're in simulation
+# mode
+WRITE_ACTIONS = {
+    'block', 'clearhasmsg', 'createaccount', 'delete', 'edit', 'emailuser',
+    'filerevert', 'flowthank', 'imagerotate', 'import', 'managetags',
+    'mergehistory', 'move', 'options', 'patrol', 'protect', 'purge',
+    'resetpassword', 'revisiondelete', 'rollback', 'setnotificationtimestamp',
+    'setpagelanguage', 'tag', 'thank', 'unblock', 'undelete', 'upload',
+    'userrights', 'watch', 'wbcreateclaim', 'wbcreateredirect', 'wbeditentity',
+    'wblinktitles', 'wbmergeitems', 'wbremoveclaims', 'wbremovequalifiers',
+    'wbremovereferences', 'wbsetaliases', 'wbsetclaim', 'wbsetclaimvalue',
+    'wbsetdescription', 'wbsetlabel', 'wbsetqualifier', 'wbsetreference',
+    'wbsetsitelink', 'wbladdform', 'wbleditformelements', 'wblmergelexemes',
+    'wblremoveform',
+}
 
 lagpattern = re.compile(
     r'Waiting for [\w.: ]+: (?P<lag>\d+(?:\.\d+)?) seconds? lagged')
@@ -200,24 +216,7 @@ class Request(MutableMapping):
         self.action = parameters['action']
         self.update(parameters)  # also convert all parameter values to lists
         self._warning_handler = None  # type: Optional[Callable[[str, str], Union[Match[str], bool, None]]]  # noqa: E501
-        # Actions that imply database updates on the server, used for various
-        # things like throttling or skipping actions when we're in simulation
-        # mode
-        self.write = self.action in {
-            'block', 'clearhasmsg', 'createaccount', 'delete', 'edit',
-            'emailuser', 'filerevert', 'flowthank', 'imagerotate', 'import',
-            'managetags', 'mergehistory', 'move', 'options', 'patrol',
-            'protect', 'purge', 'resetpassword', 'revisiondelete', 'rollback',
-            'setnotificationtimestamp', 'setpagelanguage', 'tag', 'thank',
-            'unblock', 'undelete', 'upload', 'userrights', 'watch',
-            'wbcreateclaim', 'wbcreateredirect', 'wbeditentity',
-            'wblinktitles', 'wbmergeitems', 'wbremoveclaims',
-            'wbremovequalifiers', 'wbremovereferences', 'wbsetaliases',
-            'wbsetclaim', 'wbsetclaimvalue', 'wbsetdescription', 'wbsetlabel',
-            'wbsetqualifier', 'wbsetreference', 'wbsetsitelink',
-            'wbladdform', 'wbleditformelements', 'wblmergelexemes',
-            'wblremoveform',
-        }
+        self.write = self.action in WRITE_ACTIONS
         # Client side verification that the request is being performed
         # by a logged in user, and warn if it isn't a config username.
         if self.write:
