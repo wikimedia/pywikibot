@@ -485,8 +485,6 @@ def writelogheader() -> None:
     # config file dir
     log('CONFIG FILE DIR: {}'.format(pywikibot.config.base_dir))
 
-    all_modules = sys.modules.keys()
-
     # These are the main dependencies of pywikibot.
     check_package_list = [
         'requests',
@@ -495,7 +493,7 @@ def writelogheader() -> None:
 
     # report all imported packages
     if config.verbose_output:
-        check_package_list += all_modules
+        check_package_list += sys.modules
 
     log('PACKAGES:')
     packages = version.package_versions(check_package_list)

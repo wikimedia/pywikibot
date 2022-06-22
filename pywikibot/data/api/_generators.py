@@ -521,7 +521,7 @@ class QueryGenerator(_RequestWrapper):
         """Get resultdata and verify result."""
         resultdata = keys = self.data['query'][self.resultkey]
         if isinstance(resultdata, dict):
-            keys = list(resultdata.keys())
+            keys = list(resultdata)
             if 'results' in resultdata:
                 resultdata = resultdata['results']
             elif 'pageids' in self.data['query']:
@@ -531,7 +531,7 @@ class QueryGenerator(_RequestWrapper):
                               for k in self.data['query']['pageids']]
             else:
                 resultdata = [resultdata[k]
-                              for k in sorted(resultdata.keys())]
+                              for k in sorted(resultdata)]
         pywikibot.debug('{name} received {keys}; limit={limit}'
                         .format(name=type(self).__name__, keys=keys,
                                 limit=self.limit))
@@ -545,13 +545,12 @@ class QueryGenerator(_RequestWrapper):
                 continue
 
             yield result
-            if isinstance(item, dict) \
-                    and set(self.continuekey) & set(item.keys()):
+            if isinstance(item, dict) and set(self.continuekey) & set(item):
                 # if we need to count elements contained in items in
                 # self.data["query"]["pages"], we want to count
                 # item[self.continuekey] (e.g. 'revisions') and not
                 # self.resultkey (i.e. 'pages')
-                for key in set(self.continuekey) & set(item.keys()):
+                for key in set(self.continuekey) & set(item):
                     self._count += len(item[key])
             # otherwise we proceed as usual
             else:

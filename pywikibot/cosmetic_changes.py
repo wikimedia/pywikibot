@@ -810,8 +810,9 @@ class CosmeticChangesToolkit:
         def replace_link(match: Match[str]) -> str:
             """Create a string to replace a single link."""
             replacement = '[['
-            if re.match(r'(?:' + '|'.join(list(self.site.namespaces[6])
-                        + list(self.site.namespaces[14])) + '):',
+            if re.match(r'(?:{}):'
+                        .format('|'.join((*self.site.namespaces[6],
+                                          *self.site.namespaces[14]))),
                         match.group('link')):
                 replacement += ':'
             replacement += match.group('link')
