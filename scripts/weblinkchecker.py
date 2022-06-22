@@ -175,17 +175,12 @@ ignorelist = [
 def get_archive_url(url):
     """Get archive URL."""
     try:
-        archive = get_closest_memento_url(
+        return get_closest_memento_url(
             url, timegate_uri='http://web.archive.org/web/')
     except Exception:
-        archive = get_closest_memento_url(
+        return get_closest_memento_url(
             url,
             timegate_uri='http://timetravel.mementoweb.org/webcite/timegate/')
-
-    # FIXME: Hack for T167463: Use https instead of http for archive.org links
-    if archive.startswith('http://web.archive.org'):
-        archive = archive.replace('http://', 'https://', 1)
-    return archive
 
 
 def weblinks_from_text(
