@@ -12,14 +12,21 @@ The following options are supported:
 -remote  Upload the package to pypi. This cannot be done if the
          Pywikibot version is a development release.
 
+-upgrade Upgrade distribution packages pip, setuptools, wheel and twine
+         first
+
 Usage::
 
     [pwb] make_dist [options]
 
-.. note:: Requires Python 3.6+
+.. note:: Requires Python 3.6+.
 .. versionadded:: 7.3
 .. versionchanged:: 7.4
-   installs pre-releases over stable versions
+
+   - updates pip, setuptools, wheel and twine packages first
+   - installs pre-releases over stable versions
+   - also creates built distribution together with source distribution
+   - `-upgrade` option was added
 """
 #
 # (C) Pywikibot team, 2022
@@ -91,20 +98,24 @@ def handle_args() -> Tuple[bool, bool]:
 
     local = '-local' in sys.argv
     remote = '-remote' in sys.argv
+    upgrade = '-upgrade' in sys.argv
 
     if remote and 'dev' in __version__:
         warning('Distribution must not be a developmental release to upload.')
         remote = False
 
-    sys.argv = [sys.argv[0], 'sdist']
-    return local, remote
+    sys.argv = [sys.argv[0], 'sdist', 'bdist_wheel']
+    return local, remote, upgrade
 
 
 def main() -> None:
     """Script entry point."""
-    local, remote = handle_args()
+    local, remote, upgrade = handle_args()
 
     copy_files()
+    if upgrade:
+        subprocess.run('python -m pip install --upgrade pip')
+        subprocess.run('pip install --upgrade setuptools wheel twine ')
 
     try:
         setup.main()  # create a new package
