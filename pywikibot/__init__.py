@@ -1345,8 +1345,8 @@ def _flush(stop: bool = True) -> None:
             page_put_queue.not_full.notify_all()
 
     # only need one drop() call because all throttles use the same global pid
-    with suppress(IndexError):
-        list(_sites.values())[0].throttle.drop()
+    with suppress(KeyError):
+        _sites.popitem()[1].throttle.drop()
         log('Dropped throttle(s).')
 
 
