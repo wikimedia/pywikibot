@@ -55,6 +55,7 @@ or by adding a list to the given one::
 # Distributed under the terms of the MIT license.
 #
 import re
+from contextlib import suppress
 from enum import IntEnum
 from typing import Any, Union
 from urllib.parse import urlparse, urlunparse
@@ -403,17 +404,17 @@ class CosmeticChangesToolkit:
             if namespace == 6 and self.site.family.name == 'wikipedia':
                 if self.site.code in ('en', 'fr'):
                     # do not change "Image" on en-wiki and fr-wiki
-                    assert 'Image' in namespaces
-                    namespaces.remove('Image')
+                    with suppress(ValueError):
+                        namespaces.remove('Image')
                 if self.site.code == 'hu':
                     # do not change "Kép" on hu-wiki
-                    assert 'Kép' in namespaces
-                    namespaces.remove('Kép')
+                    with suppress(ValueError):
+                        namespaces.remove('Kép')
                 elif self.site.code == 'pt':
                     # use "Imagem" by default on pt-wiki (per T57242)
-                    assert 'Imagem' in namespaces
-                    namespaces.insert(
-                        0, namespaces.pop(namespaces.index('Imagem')))
+                    with suppress(ValueError):
+                        namespaces.insert(
+                            0, namespaces.pop(namespaces.index('Imagem')))
             # final namespace variant
             final_ns = namespaces.pop(0)
             if namespace in (2, 3):
