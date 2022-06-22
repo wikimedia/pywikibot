@@ -149,7 +149,7 @@ class AddTextBot(AutomaticTWSummaryBot, ExistingPageBot):
             pywikibot.output("{} doesn't exist, creating it!".format(page))
             return False
 
-        elif self.opt.create:
+        elif self.opt.create or self.opt.createonly:
             return False
 
         return super().skip_page(page)
@@ -217,7 +217,7 @@ def parse(argv: Sequence[str],
 
         if option in ('-text', '-textfile', '-summary'):
             args[option[1:]] = value
-        elif option in ('-up', '-always', '-create', 'createonly'):
+        elif option in ('-up', '-always', '-create', '-createonly'):
             args[option[1:]] = True
         elif option in ('-talk', '-talkpage'):
             args['talk_page'] = True
