@@ -2604,6 +2604,8 @@ class ViafAnalyzer(Analyzer):
         result = self.findbyre(r'>{}\|([^<>]+)'.format(name), html)
         if result:
             return result.replace(' ', '')
+        else:
+            return None
 
     def findlanguagenames(self, html):
         languagenames = set()
@@ -2636,11 +2638,15 @@ class ViafAnalyzer(Analyzer):
         section = self.findbyre(r'<ns1:nationalityOfEntity>(.*?)</ns1:nationalityOfEntity>', html)
         if section:
             return self.findallbyre(r'<ns1:text>([^<>]+)</ns1:text>', section, 'country')
+        else:
+            return None
 
     def findlanguagesspoken(self, html):
         section = self.findbyre(r'<ns1:languageOfEntity>(.*?)</ns1:languageOfEntity>', html)
         if section:
             return self.findallbyre(r'<ns1:text>([^<>]+)</ns1:text>', section, 'language')
+        else:
+            return None
 
     def findoccupations(self, html):
         sections = self.findallbyre(r'<ns1:occupation>(.*?)</ns1:occupation>', html)
