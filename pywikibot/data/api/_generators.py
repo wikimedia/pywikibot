@@ -763,14 +763,14 @@ class PropertyGenerator(QueryGenerator):
     def _update_old_result_dict(old_dict, new_dict) -> None:
         """Update old result dict with new_dict."""
         for k, v in new_dict.items():
-            if k not in old_dict:
-                old_dict[k] = v
-                continue
-            if isinstance(v, list):
-                old_dict[k].extend(v)
-                continue
-            assert isinstance(v, (str, int)), (
-                'continued API result had an unexpected type: {}'.format(v))
+            if isinstance(v, (str, int)):
+                old_dict.setdefault(k, v)
+            elif isinstance(v, list):
+                old_dict.setdefault(k, []).extend(v)
+            else:
+                raise ValueError(
+                    'continued API result had an unexpected type: {}'
+                    .format(type(v).__name__))
 
 
 class ListGenerator(QueryGenerator):
