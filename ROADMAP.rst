@@ -1,6 +1,8 @@
 Current release 7.4.0
 ^^^^^^^^^^^^^^^^^^^^^
 
+* Provide Built Distribution with Pywikibot (:pep:`427`)
+* Update `WRITE_ACTIONS` in used by :class:`api.Request<pywikibot.data.api.Request>`
 * Move :func:`get_closest_memento_url<pywikibot.data.memento.get_closest_memento_url>` from weblinkchecker script to memento module.
 * Add :mod:`memento module<pywikibot.data.memento>` to fix memento_client package (:phab:`T185561`)
 * L10N and i18n updates

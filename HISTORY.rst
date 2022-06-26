@@ -324,7 +324,7 @@ Code cleanups
 * Check bot/nobots templates for cosmetic_changes hook (:phab:`T283989`)
 * Remove outdated opt._option which is already dropped (:phab:`T284005`)
 * Use IntEnum with cosmetic_changes CANCEL
-* Remove lru_cahce from botMayEdit method and fix it's logic (:phab:`T283957`)
+* Remove lru_cache from botMayEdit method and fix it's logic (:phab:`T283957`)
 * DataSite.createNewItemFromPage() method was removed in favour of ImagePage.fromPage() (:phab:`T98663`)
 * mwparserfromhell or wikitextparser MediaWiki markup parser is mandatory (:phab:`T106763`)
 

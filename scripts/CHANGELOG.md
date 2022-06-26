@@ -1,10 +1,13 @@
 # Scripts Changelog
 
 ## 7.4.0
-*current release*
+*26 June 2022*
+
+### addtext
+* Fix for -createonly option (:phab:`T311173`)
 
 ### harvest_templates
-* Add -confirm option which sets 'always' option to False  (:phab:`T310356`)
+* Add -confirm option which sets 'always' option to False (:phab:`T310356`)
 * Do not show a warning if generator is specified later (:phab:`T310418`)
 
 ### interwiki
