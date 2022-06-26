@@ -247,18 +247,15 @@ class DryWriteAssertTests(DefaultDrySiteTestCase):
     def test_no_user(self):
         """Test Request object when not a user."""
         self.site._userinfo = {}
-        with self.subTest(userinfo=self.site._userinfo):
-            with self.assertRaisesRegex(
-                    Error,
-                    'API write action attempted without user'):
-                Request(site=self.site, parameters={'action': 'edit'})
+        with self.subTest(userinfo=self.site._userinfo), \
+             self.assertRaisesRegex(Error,
+                                    'API write action attempted without user'):
+            Request(site=self.site, parameters={'action': 'edit'})
 
         self.site._userinfo = {'name': '1.2.3.4', 'groups': [], 'anon': ''}
-        with self.subTest(userinfo=self.site._userinfo):
-            with self.assertRaisesRegex(
-                    Error,
-                    " as IP '1.2.3.4'"):
-                Request(site=self.site, parameters={'action': 'edit'})
+        with self.subTest(userinfo=self.site._userinfo), \
+             self.assertRaisesRegex(Error, " as IP '1.2.3.4'"):
+            Request(site=self.site, parameters={'action': 'edit'})
 
     def test_unexpected_user(self):
         """Test Request object when username is not correct."""

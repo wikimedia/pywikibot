@@ -1247,7 +1247,16 @@ class BaseBot(OptionHandler):
     use_redirects = None  # type: Optional[bool]
     """Attribute to determine whether to use redirect pages. Set it to
     True to use redirects only, set it to False to skip redirects. If
-    None both are processed.
+    None both are processed. For example to create a RedirectBot you may
+    define:
+
+    .. code-block:: python
+
+       class MyRedirectBot(ExistingPageBot):
+
+           '''Bot who only works on existing redirects.'''
+
+           use_redirects = True
 
     .. versionadded:: 7.2
     """
@@ -1279,7 +1288,7 @@ class BaseBot(OptionHandler):
             else:
                 #: instance variable to hold the generator processed by
                 #: :meth:`run` method
-                self.generator = kwargs.pop('generator')
+                self.generator = kwargs.pop('generator')  # type: Iterable
 
         self.available_options.update(self.update_options)
         super().__init__(**kwargs)
@@ -1295,7 +1304,19 @@ class BaseBot(OptionHandler):
            Your additional counters are also printed during :meth:`exit`
         """
 
-        self._generator_completed = False
+        self.generator_completed = False  # type: bool
+        """Instance attribute which is True if the generator is completed.
+
+        To check for an empty generator you may use::
+
+            if self.generator_completed and not self.counter['read']:
+                print('generator was emtpty')
+
+        .. note:: An empty generator remains False.
+        .. versionadded:: 3.0
+        .. versionchanged:: 7.4
+           renamed to `generator_completed` to become a public attribute.
+        """
 
         #: instance variable to hold the default page type
         self.treat_page_type = pywikibot.page.BasePage  # type: Any
@@ -1643,7 +1664,7 @@ class BaseBot(OptionHandler):
                 self.counter['read'] += 1
                 self.treat(page)
 
-            self._generator_completed = True
+            self.generator_completed = True
         except QuitKeyboardInterrupt:
             pywikibot.output('\nUser quit {} bot run...'
                              .format(self.__class__.__name__))

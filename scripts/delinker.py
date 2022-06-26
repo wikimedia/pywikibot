@@ -3,7 +3,7 @@
 
 This script keeps track of image deletions and delinks removed files
 from current wiki in namespace 0. This script is suitable to delink
-files from a image repository as well as for local images.
+files from an image repository as well as for local images.
 
 The following parameters are supported:
 
@@ -109,7 +109,7 @@ class CommonsDelinker(SingleSiteBot, ConfigParserBot, AutomaticTWSummaryBot):
             .format('|'.join(ignore_case(s) for s in namespace), escaped))
 
         shown = False
-        for page in file_page.usingPages(content=True, namespaces=0):
+        for page in file_page.using_pages(content=True, namespaces=0):
             if not shown:
                 pywikibot.output(
                     '\n>>> <<lightgreen>>Delinking {}<<default>> <<<'

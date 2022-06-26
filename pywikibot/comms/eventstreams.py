@@ -5,7 +5,7 @@ This file is part of the Pywikibot framework.
 
 This module requires sseclient to be installed::
 
-    pip install sseclient
+    pip install "sseclient<0.0.23,>=0.0.18"
 
 .. versionadded:: 3.0
 """
@@ -44,7 +44,6 @@ class EventStreams:
     """Basic EventStreams iterator class for Server-Sent Events (SSE) protocol.
 
     It provides access to arbitrary streams of data including recent changes.
-    It replaces rcstream.py implementation.
 
     Usage:
 
@@ -75,28 +74,31 @@ class EventStreams:
     def __init__(self, **kwargs) -> None:
         """Initializer.
 
-        :keyword site: a project site object. Used when no url is given
-        :type site: APISite
-        :keyword since: a timestamp for older events; there will likely be
-            between 7 and 31 days of history available but is not guaranteed.
-            It may be given as a pywikibot.Timestamp, an ISO 8601 string
-            or a mediawiki timestamp string.
-        :type since: pywikibot.Timestamp or str
-        :keyword streams: event stream types. Mandatory when no url is given.
-            Multiple streams may be given as a string with comma separated
-            stream types or an iterable of strings
-            Refer https://stream.wikimedia.org/?doc for available
-            Wikimedia stream types.
-        :type streams: str or iterable
-        :keyword timeout: a timeout value indication how long to wait to send
-            data before giving up
-        :type timeout: int, float or a tuple of two values of int or float
-        :keyword url: an url retrieving events from. Will be set up to a
-            default url using _site.family settings, stream types and timestamp
-        :type url: str
-        :param kwargs: keyword arguments passed to SSEClient and requests lib
+        :keyword APISite site: a project site object. Used if no url is
+            given
+        :keyword pywikibot.Timestamp or str since: a timestamp for older
+            events; there will likely be between 7 and 31 days of
+            history available but is not guaranteed. It may be given as
+            a pywikibot.Timestamp, an ISO 8601 string or a mediawiki
+            timestamp string.
+        :keyword Iterable[str] or str streams: event stream types.
+            Mandatory when no url is given. Multiple streams may be
+            given as a string with comma separated stream types or an
+            iterable of strings
+        :keyword int or float or Tuple[int or float, int or float] timeout:
+            a timeout value indication how long to wait to send data
+            before giving up
+        :keyword str url: an url retrieving events from. Will be set up
+            to a default url using _site.family settings, stream types
+            and timestamp
+        :param kwargs: keyword arguments passed to `SSEClient` and
+            `requests` library
         :raises ImportError: sseclient is not installed
         :raises NotImplementedError: no stream types specified
+
+        .. seealso:: https://stream.wikimedia.org/?doc#streams for
+           available Wikimedia stream types to be passed with `streams`
+           parameter.
         """
         if isinstance(EventSource, Exception):
             raise ImportError('sseclient is required for EventStreams;\n'

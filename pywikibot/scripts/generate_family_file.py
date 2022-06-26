@@ -37,6 +37,7 @@ import string
 import sys
 from typing import Optional
 from urllib.parse import urlparse
+from contextlib import suppress
 
 
 # see pywikibot.family.py
@@ -91,12 +92,14 @@ class FamilyFileGenerator:
     def get_params(self) -> bool:  # pragma: no cover
         """Ask for parameters if necessary."""
         if self.base_url is None:
-            self.base_url = input('Please insert URL to wiki: ')
+            with suppress(KeyboardInterrupt):
+                self.base_url = input('Please insert URL to wiki: ')
             if not self.base_url:
                 return False
 
         if self.name is None:
-            self.name = input('Please insert a short name (eg: freeciv): ')
+            with suppress(KeyboardInterrupt):
+                self.name = input('Please insert a short name (eg: freeciv): ')
             if not self.name:
                 return False
 
@@ -212,15 +215,12 @@ class FamilyFileGenerator:
         """Write the family file."""
         fn = os.path.join(self.base_dir, 'families',
                           '{}_family.py'.format(self.name))
-        print('Writing %s... ' % fn)
-        try:
-            open(fn)
-            if input('{} already exists. Overwrite? (y/n)'
-                     .format(fn)).lower() == 'n':
-                print('Terminating.')
-                sys.exit(1)
-        except OSError:  # file not found
-            pass
+        print('Writing {}... '.format(fn))
+
+        if os.path.exists(fn) and input('{} already exists. Overwrite? (y/n)'
+                                        .format(fn)).lower() == 'n':
+            print('Terminating.')
+            sys.exit(1)
 
         code_hostname_pairs = '\n        '.join(
             "'{code}': '{hostname}',".format(

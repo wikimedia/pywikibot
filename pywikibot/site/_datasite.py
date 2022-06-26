@@ -420,14 +420,12 @@ class DataSite(APISite):
         snak = {}
         for sourceclaim in sources:
             datavalue = sourceclaim._formatDataValue()
-            valuesnaks = []
-            if sourceclaim.getID() in snak:
-                valuesnaks = snak[sourceclaim.getID()]
-            valuesnaks.append({'snaktype': 'value',
-                               'property': sourceclaim.getID(),
-                               'datavalue': datavalue,
-                               },
-                              )
+            valuesnaks = snak.get(sourceclaim.getID(), [])
+            valuesnaks.append({
+                'snaktype': 'value',
+                'property': sourceclaim.getID(),
+                'datavalue': datavalue,
+            })
 
             snak[sourceclaim.getID()] = valuesnaks
             # set the hash if the source should be changed.
@@ -654,7 +652,7 @@ class DataSite(APISite):
         }
         if bot:
             params['bot'] = 1
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         data = req.submit()
         return data
 
@@ -713,7 +711,8 @@ class DataSite(APISite):
         return gen
 
     @need_right('edit')
-    def _wbset_action(self, itemdef, action, action_data, **kwargs):
+    def _wbset_action(self, itemdef, action: str, action_data,
+                      **kwargs) -> dict:
         """
         Execute wbset{action} on a Wikibase entity.
 
@@ -724,9 +723,8 @@ class DataSite(APISite):
         :type itemdef: str, WikibaseEntity or Page connected to such item
         :param action: wbset{action} to perform:
             'wbsetaliases', 'wbsetdescription', 'wbsetlabel', 'wbsetsitelink'
-        :type action: str
-        :param data: data to be used in API request, see API help
-        :type data: SiteLink or dict
+        :param action_data: data to be used in API request, see API help
+        :type action_data: SiteLink or dict
             wbsetaliases:
                 dict shall have the following structure:
                 {'language': value (str),
@@ -740,12 +738,11 @@ class DataSite(APISite):
             wbsetsitelink:
                 dict shall have keys 'linksite', 'linktitle' and
                 optionally 'badges'
-        @kwargs bot: Whether to mark the edit as a bot edit, default is True
+        :keyword bot: Whether to mark the edit as a bot edit, default is True
         :type bot: bool
-        @kwargs tags: Change tags to apply with the edit
+        :keyword tags: Change tags to apply with the edit
         :type tags: list of str
         :return: query result
-        :rtype: dict
         :raises AssertionError, TypeError
         """
         def format_sitelink(sitelink):
@@ -769,8 +766,8 @@ class DataSite(APISite):
                 assert keys < {'language', 'add', 'remove', 'set'}
                 assert 'language' in keys
                 assert ({'add', 'remove', 'set'} & keys)
-                assert not ({'add', 'set'} < keys)
-                assert not ({'remove', 'set'} < keys)
+                assert ({'add', 'set'} >= keys)
+                assert ({'remove', 'set'} >= keys)
             elif action in ('wbsetlabel', 'wbsetdescription'):
                 res = data
                 keys = set(res)
@@ -881,7 +878,7 @@ class DataSite(APISite):
         }
         if baserevid:
             params['baserevid'] = baserevid
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         data = req.submit()
         return data
 
@@ -906,7 +903,7 @@ class DataSite(APISite):
         }
         if baserevid:
             params['baserevid'] = baserevid
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         data = req.submit()
         return data
 
@@ -936,6 +933,6 @@ class DataSite(APISite):
         }
         if baserevid:
             params['baserevid'] = baserevid
-        req = self._simple_request(**params)
+        req = self.simple_request(**params)
         data = req.submit()
         return data

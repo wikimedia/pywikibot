@@ -17,7 +17,7 @@ import pywikibot
 from pywikibot.comms import http
 from pywikibot.exceptions import NoPageError
 from pywikibot.page._pages import Page
-from pywikibot.tools import compute_file_hash
+from pywikibot.tools import compute_file_hash, deprecated
 
 __all__ = (
     'FileInfo',
@@ -175,20 +175,41 @@ class FilePage(Page):
                 '| {{int:filehist-dimensions}} || {{int:filehist-comment}}\n'
                 '|-\n%s\n|}\n' % '\n|-\n'.join(lines))
 
-    def usingPages(self, **kwargs):  # noqa: N802
+    def using_pages(self, **kwargs):
         """Yield Pages on which the file is displayed.
 
         For parameters refer
         :meth:`APISite.imageusage()
         <pywikibot.site._generators.GeneratorsMixin.imageusage>`
 
+        Usage example:
+
+        >>> site = pywikibot.Site('wikipedia:test')
+        >>> file = pywikibot.FilePage(site, 'Pywikibot MW gear icon.svg')
+        >>> used = list(file.using_pages(total=10))
+        >>> len(used)
+        1
+        >>> used[0].title()
+        'Pywikibot'
+
         .. seealso:: :meth:`globalusage`
         .. versionchanged:: 7.2
            all parameters from :meth:`APISite.imageusage()
            <pywikibot.site._generators.GeneratorsMixin.imageusage>`
            are available.
+        .. versionchanged:: 7.4
+           renamed from :meth:`usingPages`.
         """
         return self.site.imageusage(self, **kwargs)
+
+    @deprecated('using_pages', since='7.4.0')
+    def usingPages(self, **kwargs):  # noqa: N802
+        """Yield Pages on which the file is displayed.
+
+        .. deprecated:: 7.4.0
+           Use :meth:`using_pages` instead.
+        """
+        return self.using_pages(**kwargs)
 
     @property
     def file_is_used(self) -> bool:
@@ -282,7 +303,7 @@ class FilePage(Page):
             sha1 = compute_file_hash(filename)
             return sha1 == revision.sha1
         pywikibot.warning(
-            'Unsuccessfull request ({}): {}'
+            'Unsuccessful request ({}): {}'
             .format(req.status_code, req.url))
         return False
 

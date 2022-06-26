@@ -412,9 +412,9 @@ class CategoryDatabase:
                 'superclass_db': self.superclass_db
             }
             # store dump to disk in binary format
-            with open_archive(filename, 'wb') as f:
-                with suppress(pickle.PicklingError):
-                    pickle.dump(databases, f, protocol=config.pickle_protocol)
+            with open_archive(filename, 'wb') as f, \
+                 suppress(pickle.PicklingError):
+                pickle.dump(databases, f, protocol=config.pickle_protocol)
         else:
             with suppress(EnvironmentError):
                 os.remove(filename)
@@ -1240,7 +1240,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
 
     def teardown(self) -> None:
         """Cleanups after run operation."""
-        if self._generator_completed and not self.counter['read']:
+        if self.generator_completed and not self.counter['read']:
             pywikibot.output('There are no pages or files in category {}.'
                              .format(self.cat_title))
 

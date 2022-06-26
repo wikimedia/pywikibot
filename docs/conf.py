@@ -45,7 +45,7 @@ import pywikibot  # noqa: E402
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #
-needs_sphinx = '4.1'
+needs_sphinx = '4.5'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -173,13 +173,13 @@ html_theme = 'nature'
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
 #
-html_logo = 'Pywikibot_MW_gear_icon.svg'
+html_logo = '_static/Pywikibot_MW_gear_icon.svg'
 
 # The name of an image file (relative to this directory) to use as a favicon of
 # the docs. This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
 #
-html_favicon = 'Pywikibot.ico'
+html_favicon = '_static/Pywikibot.ico'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -356,6 +356,10 @@ texinfo_documents = [
 # Other settings
 autodoc_typehints = 'description'
 
+# Pywikibot theme style
+html_static_path = ['_static']
+html_style = 'css/pywikibot.css'
+
 extlinks = {
     # MediaWiki API
     'api': ('https://www.mediawiki.org/wiki/API:%s', 'API:%s'),
@@ -375,68 +379,6 @@ extlinks = {
     # Generic Python link; should be used with explicit title
     'python': ('https://docs.python.org/3/%s', None),
 }
-
-
-TOKENS_WITH_PARAM = [
-    # sphinx
-    'param', 'parameter', 'arg', 'argument', 'key', 'keyword',
-    'type',
-    'raises', 'raise', 'except', 'exception',
-    'var', 'ivar', 'cvar',
-    'vartype',
-    'meta',
-    # epytext
-    'todo',
-]
-
-TOKENS = [
-    # sphinx
-    'return', 'returns', 'rtype',
-    # epytext
-    'attention', 'author', 'bug',
-    'change', 'changed',
-    'contact',
-    'copyright', '(c)',
-    'deprecated',
-    'invariant', 'license', 'note',
-    'organization', 'org',
-    'permission',
-    'postcondition', 'postcond',
-    'precondition', 'precond',
-    'requires', 'require', 'requirement',
-    'see', 'seealso',
-    'since', 'status', 'summary', 'todo',
-    'version',
-    'warn', 'warning',
-]
-
-
-def pywikibot_epytext_to_sphinx(app, what, name, obj, options, lines):
-    """Convert epytext tokens to sphinx."""
-    result = []
-    for line in lines:
-        line = re.sub(r'(\A *)@({}) '.format('|'.join(TOKENS_WITH_PARAM)),
-                      r'\1:\2 ', line)  # tokens with parameter
-        line = re.sub(r'(\A *)@({}):'.format('|'.join(TOKENS)),
-                      r'\1:\2:', line)  # short token
-        line = re.sub(r'(\A *)@(?:kwarg|kwparam) ',
-                      r'\1:keyword ', line)  # keyword
-        line = re.sub(r'(\A| )L\{([^}]*)\}', r'\1:py:obj:`\2`', line)  # Link
-        line = re.sub(r'(\A| )B\{([^}]*)\}', r'\1**\2**', line)  # Bold
-        line = re.sub(r'(\A| )I\{([^}]*)\}', r'\1*\2*', line)  # Italic
-        line = re.sub(r'(\A| )C\{([^}]*)\}', r'\1``\2``', line)  # Code
-        line = re.sub(r'(\A| )U\{([^}]*)\}', r'\1\2', line)  # Url
-        result.append(line)
-    lines[:] = result[:]  # assignment required in this way
-
-
-def pywikibot_fix_phab_tasks(app, what, name, obj, options, lines):
-    """Convert Phabricator tasks id to a link using sphinx.ext.extlinks."""
-    result = []
-    for line in lines:
-        line = re.sub(r'(?<!:phab:`)(T\d{5,6})', r':phab:`\1`', line)
-        result.append(line)
-    lines[:] = result[:]
 
 
 def pywikibot_docstring_fixups(app, what, name, obj, options, lines):
@@ -470,9 +412,6 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
                             'in :py:mod:`pywikibot.fixes`.')
         elif name == 'scripts.cosmetic_changes' and line == '&warning;':
             lines[index] = warning
-        elif name == 'scripts.login' and '*' in line:
-            # Escape star wildcard in scripts/login.py
-            lines[index] = line.replace('*', '\\*')
         elif (line.endswith(':') and not line.lstrip().startswith(':')
                 and 'Traceback (most recent call last)' not in line):
             # Initiate code block except pagegenerator arguments follows
@@ -495,24 +434,6 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
         elif line:
             # Reset length
             length = 0
-
-        if '|' in line:
-            # Escape vertical bars
-            lines[index] = line.replace('|', '\\|')
-
-
-def pywikibot_skip_members(app, what, name, obj, skip, options):
-    """Skip certain members from documentation."""
-    inclusions = ()
-    exclusions = ()
-    if name in inclusions and len(str.splitlines(obj.__doc__ or '')) >= 3:
-        return False
-    if name.startswith('__') and name.endswith('__'):
-        return True
-    if obj.__doc__ is not None \
-       and ('DEPRECATED' in obj.__doc__ or 'Deprecated' in obj.__doc__):
-        return True
-    return skip or name in exclusions
 
 
 def pywikibot_family_classproperty_getattr(obj, name, *defargs):
@@ -541,11 +462,8 @@ def pywikibot_family_classproperty_getattr(obj, name, *defargs):
 
 def setup(app):
     """Implicit Sphinx extension hook."""
-    app.connect('autodoc-process-docstring', pywikibot_epytext_to_sphinx)
-    app.connect('autodoc-process-docstring', pywikibot_fix_phab_tasks)
     app.connect('autodoc-process-docstring', pywikibot_docstring_fixups)
     app.connect('autodoc-process-docstring', pywikibot_script_docstring_fixups)
-    app.connect('autodoc-skip-member', pywikibot_skip_members)
     app.add_autodoc_attrgetter(type, pywikibot_family_classproperty_getattr)
 
 
@@ -553,6 +471,6 @@ autoclass_content = 'both'
 autodoc_default_options = {
     'members': True,
     'undoc-members': True,
-    'special-members': True,
+    'special-members': False,
     'show-inheritance': True,
 }

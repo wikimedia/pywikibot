@@ -6,8 +6,10 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
+from contextlib import suppress
 
 from pywikibot.flow import Topic
+
 from tests.aspects import TestCase
 
 
@@ -62,7 +64,5 @@ class TestThankFlowPost(TestCase):
 
 
 if __name__ == '__main__':  # pragma: no cover
-    try:
+    with suppress(SystemExit):
         unittest.main()
-    except SystemExit:
-        pass

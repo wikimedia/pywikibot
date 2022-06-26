@@ -241,9 +241,9 @@ class TestParamInfo(DefaultSiteTestCase):
             self.assertEqual(mod[6:], pi[mod]['name'])
             self.assertEqual(mod, pi[mod]['path'])
 
-        with patch.object(pywikibot, 'warning') as w:
-            with self.assertRaises(KeyError):
-                pi.__getitem__('query+foobar')
+        with patch.object(pywikibot, 'warning') as w, \
+             self.assertRaises(KeyError):
+            pi.__getitem__('query+foobar')
         # The warning message may be different with older MW versions.
         self.assertIn('API warning (paraminfo): ', w.call_args[0][0])
 
@@ -536,11 +536,10 @@ class TestPropertyGenerator(TestCase):
                                     parameters={'titles': '|'.join(titles)})
 
         count = 0
-        for pagedata in gen:
+        for count, pagedata in enumerate(gen, start=1):
             self.assertIsInstance(pagedata, dict)
             self.assertIn('pageid', pagedata)
             self.assertIn('lastrevid', pagedata)
-            count += 1
         self.assertLength(links, count)
 
     def test_one_continuation(self):
@@ -554,12 +553,11 @@ class TestPropertyGenerator(TestCase):
         gen.set_maximum_items(-1)  # suppress use of "rvlimit" parameter
 
         count = 0
-        for pagedata in gen:
+        for count, pagedata in enumerate(gen, start=1):
             self.assertIsInstance(pagedata, dict)
             self.assertIn('pageid', pagedata)
             self.assertIn('revisions', pagedata)
             self.assertIn('revid', pagedata['revisions'][0])
-            count += 1
         self.assertLength(links, count)
 
     def test_two_continuations(self):
@@ -573,12 +571,11 @@ class TestPropertyGenerator(TestCase):
         gen.set_maximum_items(-1)  # suppress use of "rvlimit" parameter
 
         count = 0
-        for pagedata in gen:
+        for count, pagedata in enumerate(gen, start=1):
             self.assertIsInstance(pagedata, dict)
             self.assertIn('pageid', pagedata)
             self.assertIn('revisions', pagedata)
             self.assertIn('revid', pagedata['revisions'][0])
-            count += 1
         self.assertLength(links, count)
 
     def test_many_continuations_limited(self):
@@ -602,35 +599,39 @@ class TestPropertyGenerator(TestCase):
         gen.set_query_increment(5)
 
         count = 0
-        for pagedata in gen:
+        for count, pagedata in enumerate(gen, start=1):
             self.assertIsInstance(pagedata, dict)
             if 'missing' in pagedata:
                 self.assertNotIn('pageid', pagedata)
             else:
                 self.assertIn('pageid', pagedata)
-            count += 1
         self.assertLength(links, count)
 
     def test_two_continuations_limited(self):
         """Test PropertyGenerator with many limited props and continuations."""
+        total = 20
+        increment = total // 4
         mainpage = self.get_mainpage()
-        links = list(self.site.pagelinks(mainpage, total=30))
-        titles = [link.title(with_section=False) for link in links]
+        links = tuple(self.site.pagelinks(mainpage, total=total))
+        titles = (link.title(with_section=False) for link in links)
         gen = api.PropertyGenerator(
-            site=self.site, prop='info|categoryinfo|langlinks|templates',
+            site=self.site,
+            prop='info|categoryinfo|langlinks|templates',
             parameters={'titles': '|'.join(titles)})
         # Force the generator into continuation mode
-        gen.set_query_increment(5)
+        gen.set_query_increment(increment)
 
         count = 0
-        for pagedata in gen:
+        for count, pagedata in enumerate(gen, start=1):
             self.assertIsInstance(pagedata, dict)
             if 'missing' in pagedata:
                 self.assertNotIn('pageid', pagedata)
             else:
                 self.assertIn('pageid', pagedata)
-            count += 1
         self.assertLength(links, count)
+        self.assertGreaterEqual(total, count)
+        # ensure we have enough continuations
+        self.assertGreater(count, total // 2 + 1)
 
 
 class TestDryQueryGeneratorNamespaceParam(TestCase):
@@ -964,7 +965,7 @@ class TestLagpattern(DefaultSiteTestCase):
     cached = False
 
     def test_valid_lagpattern(self):
-        """Test whether api.lagpattern is valid."""
+        """Test whether api lagpattern is valid."""
         mysite = self.get_site()
         if ('dbrepllag' not in mysite.siteinfo
                 or mysite.siteinfo['dbrepllag'][0]['lag'] == -1):
@@ -984,7 +985,7 @@ class TestLagpattern(DefaultSiteTestCase):
             pass  # expected exception from DummyThrottle instance
         except APIError as e:
             pywikibot.warning(
-                'Wrong api.lagpattern regex, cannot retrieve lag value')
+                'Wrong api lagpattern regex, cannot retrieve lag value')
             raise e
         self.assertIsInstance(mythrottle._lagvalue, (int, float))
         self.assertGreaterEqual(mythrottle._lagvalue, 0)
@@ -992,7 +993,7 @@ class TestLagpattern(DefaultSiteTestCase):
         self.assertGreaterEqual(mythrottle.retry_after, 0)
 
     def test_individual_patterns(self):
-        """Test api.lagpattern with example patterns."""
+        """Test api lagpattern with example patterns."""
         patterns = {
             'Waiting for 10.64.32.115: 0.14024019241333 seconds lagged':
                 0.14024019241333,
@@ -1000,7 +1001,7 @@ class TestLagpattern(DefaultSiteTestCase):
             'Waiting for 127.0.0.1: 1.7 seconds lagged': 1.7
         }
         for info, time in patterns.items():
-            lag = api.lagpattern.search(info)
+            lag = api._requests.lagpattern.search(info)
             self.assertIsNotNone(lag)
             self.assertEqual(float(lag.group('lag')), time)
 

@@ -5,27 +5,27 @@ Script to log the bot in to a wiki account.
 Suggestion is to make a special account to use for bot use only. Make
 sure this bot account is well known on your home wiki before using.
 
-The following parameters are supported:
+The following parameters are supported::
 
-   -family:FF   Log in to the LL language of the FF family.
-   -lang:LL     Example: -family:wiktionary -lang:fr will log you in at
-                fr.wiktionary.org.
+ -family:FF   Log in to the LL language of the FF family.
+ -lang:LL     Example: -family:wiktionary -lang:fr will log you in at
+              fr.wiktionary.org.
 
-   -site:FF:LL  Log in to the LL language of the FF family
+ -site:FF:LL  Log in to the LL language of the FF family
 
-   -all         Try to log in on all sites where a username is defined in
-                user-config.py.
+ -all         Try to log in on all sites where a username is defined in
+              user-config.py.
 
-   -logout      Log out of the current site. Combine with -all to log out of
-                all sites, or with -family and -lang to log out of a specific
-                site.
+ -logout      Log out of the current site. Combine with -all to log out of
+              all sites, or with -family and -lang to log out of a specific
+              site.
 
-   -oauth       Generate OAuth authentication information.
-                NOTE: Need to copy OAuth tokens to your user-config.py
-                manually. -logout is not compatible with -oauth.
+ -oauth       Generate OAuth authentication information.
+              NOTE: Need to copy OAuth tokens to your user-config.py
+              manually. -logout is not compatible with -oauth.
 
-   -autocreate  Auto-create an account using unified login when necessary.
-                Note: the global account must exist already before using this.
+ -autocreate  Auto-create an account using unified login when necessary.
+              Note: the global account must exist already before using this.
 
 If not given as parameter, the script will ask for your username and
 password (password entry will be hidden), log in to your home wiki using
@@ -37,14 +37,16 @@ use the login information if it is present.
 
 To log out, throw away the *.lwp file that is created in the data
 subdirectory.
+
+.. versionchanged:: 7.4
+   moved to :mod:`pywikibot.scripts` folder
 """
 #
-# (C) Pywikibot team, 2003-2021
+# (C) Pywikibot team, 2003-2022
 #
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-import pywikibot.bot
 from pywikibot import config
 from pywikibot.backports import Tuple
 from pywikibot.exceptions import SiteDefinitionError

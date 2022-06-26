@@ -18,6 +18,7 @@ jobs:
   build:
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     continue-on-error: ${{ matrix.experimental || false }}
+    timeout-minutes: 120
 
     strategy:
       fail-fast: false
@@ -114,6 +115,7 @@ jobs:
     - name: Test with unittest or pytest
       id: ci_test
       continue-on-error: true
+      timeout-minutes: 90
       env:
         PYWIKIBOT_TEST_NO_RC:
           ${{ (matrix.site == 'wikisource:zh' || matrix.test_no_rc) && 1 || 0 }}

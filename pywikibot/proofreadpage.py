@@ -648,7 +648,7 @@ class ProofreadPage(pywikibot.Page):
         if HTTPStatus.BAD_REQUEST <= response.status_code < 600:
             return True, 'Http response status {}'.format(response.status_code)
 
-        data = json.loads(response.text)
+        data = response.json()
 
         if ocr_tool == self._PHETOOLS:  # phetools
             assert 'error' in data, 'Error from phetools: {}'.format(data)
@@ -751,14 +751,13 @@ class ProofreadPage(pywikibot.Page):
                 "ocr_tool must be in {}, not '{}'."
                 .format(self._OCR_METHODS, ocr_tool))
 
-        if ocr_tool == self._PHETOOLS:
-            # if _multi_page, try _do_hocr() first and fall back to _do_ocr()
-            if self._multi_page:
-                error, text = self._do_hocr()
-                if not error and isinstance(text, str):
-                    return text
-                pywikibot.warning('{}: phetools hocr failed, '
-                                  'falling back to ocr.'.format(self))
+        # if _multi_page, try _do_hocr() first and fall back to _do_ocr()
+        if ocr_tool == self._PHETOOLS and self._multi_page:
+            error, text = self._do_hocr()
+            if not error and isinstance(text, str):
+                return text
+            pywikibot.warning('{}: phetools hocr failed, falling back to ocr.'
+                              .format(self))
 
         error, text = self._do_ocr(ocr_tool=ocr_tool)
 
@@ -772,9 +771,8 @@ class PurgeRequest(Request):
 
     """Subclass of Request which skips the check on write rights.
 
-    Workaround for T128994.
-    # TODO: remove once bug is fixed.
-    """
+    Workaround for :phab:`T128994`.
+    """  # TODO: remove once bug is fixed.
 
     def __init__(self, **kwargs: Any) -> None:
         """Monkeypatch action in Request initializer."""

@@ -140,7 +140,7 @@ def main(*args: str) -> None:
     if old_image:
         site = pywikibot.Site()
         old_imagepage = pywikibot.FilePage(site, old_image)
-        gen = old_imagepage.usingPages()
+        gen = old_imagepage.using_pages()
         preloading_gen = pagegenerators.PreloadingGenerator(gen)
         bot = ImageRobot(preloading_gen, old_image, new_image,
                          site=site, **options)

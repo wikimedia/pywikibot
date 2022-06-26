@@ -1,42 +1,31 @@
-Current release 7.3.0
+Current release 7.4.0
 ^^^^^^^^^^^^^^^^^^^^^
 
-* Add support for kcgwiki (:phab:`T305282`)
-* Raise InvalidTitleError instead of unspecific ValueError in ProofreadPage (:phab:`T308016`)
-* Preload pages if GeneratorFactory.articlenotfilter_list is not empty; also set attribute ``is_preloading``.
-* ClaimCollection.toJSON() should not ignore new claim (:phab:`T308245`)
-* use linktrail via siteinfo and remove `update_linkrtrails` maintenance script
-* Print counter statistic for all counters (:phab:`T307834`)
-* Use proofreadpagesinindex query module
-* Prioritize -namespaces options in `pagegenerators.handle_args` (:phab:`T222519`)
-* Remove `ThreadList.stop_all()` method (:phab:`T307830`)
-* L10N updates
-* Improve get_charset_from_content_type function (:phab:`T307760`)
-* A tiny cache wrapper was added to hold results of parameterless methods and properties
-* Increase workers in preload_sites.py
-* Close logging handlers before deleting them (:phab:`T91375`, :phab:`T286127`)
-* Clear _sites cache if called with pwb wrapper (:phab:`T225594`)
-* Enable short creation of a site if family name is equal to site code
-* Use `exc_info=True` with pywikibot.exception() by default (:phab:`T306762`)
-* Make IndexPage more robust when getting links in Page ns (:phab:`T307280`)
-* Do not print log header twice in log files (:phab:`T264235`)
-* Do not delegate logging output to the root logger (:phab:`T281643`)
-* Add `get_charset_from_content_type` to extract the charset from the content-type response header
-
+* Provide Built Distribution with Pywikibot (:pep:`427`)
+* Update `WRITE_ACTIONS` in used by :class:`api.Request<pywikibot.data.api.Request>`
+* Move :func:`get_closest_memento_url<pywikibot.data.memento.get_closest_memento_url>` from weblinkchecker script to memento module.
+* Add :mod:`memento module<pywikibot.data.memento>` to fix memento_client package (:phab:`T185561`)
+* L10N and i18n updates
+* Fix Flow board topic continuation when iterating in reverse (:phab:`T138323`)
+* Add Avestan transliteration
+* Use Response.json() instead of json.loads(Response.text)
+* Show an APIError if PetScanPageGenerator.query() fails (:phab:`T309538`)
+* `login.py` is now a utiliy script even for site-package installation (:phab:`T309290`)
+* `preload_sites.py` is now a utiliy script even for site-package installation (:phab:`T308912`)
+* :attr:`generator_completed<pywikibot.bot.BaseBot.generator_completed>` became a public attribute
+* Return gracefully from pwb.find_alternates if folder in user_script_paths does not exist (:phab:`T308910`)
 
 Deprecations
 ^^^^^^^^^^^^
 
-* 7.3.0: Python 3.5 support will be dropped with Python 8 (:phab:`T301908`)
-* 7.2.0: XMLDumpOldPageGenerator is deprecated in favour of a `content` parameter (:phab:`T306134`)
-* 7.2.0: RedirectPageBot and NoRedirectPageBot bot classes are deprecated in favour of `use_redirects` attribute
-* 7.2.0: `tools.formatter.color_format` is deprecated and will be removed
-* 7.1.0: win32_unicode.py will be removed with Pywikibot 8
+* 7.4.0: `FilePage.usingPages()` was renamed to :meth:`using_pages()<pywikibot.FilePage.using_pages>`
+* 7.2.0: ``tb`` parameter of :func:`exception()<pywikibot.exception>` function was renamed to ``exc_info``
+* 7.2.0: XMLDumpOldPageGenerator is deprecated in favour of a `content` parameter of `XMLDumpPageGenerator` (:phab:`T306134`)
+* 7.2.0: RedirectPageBot and NoRedirectPageBot bot classes are deprecated in favour of :attr:`use_redirects<pywikibot.bot.BaseBot.use_redirects>` attribute
+* 7.2.0: :func:`tools.formatter.color_format<pywikibot.tools.formatter.color_format>` is deprecated and will be removed
 * 7.1.0: Unused `get_redirect` parameter of Page.getOldVersion() will be removed
 * 7.1.0: APISite._simple_request() will be removed in favour of APISite.simple_request()
-* 7.0.0: The i18n identifier 'cosmetic_changes-append' will be removed in favour of 'pywikibot-cosmetic-changes'
 * 7.0.0: User.isBlocked() method is renamed to is_blocked for consistency
-* 7.0.0: Require mysql >= 0.7.11 (:phab:`T216741`)
 * 7.0.0: Private BaseBot counters _treat_counter, _save_counter, _skip_counter will be removed in favour of collections.Counter counter attribute
 * 7.0.0: A boolean watch parameter in Page.save() is deprecated and will be desupported
 * 7.0.0: baserevid parameter of editSource(), editQualifier(), removeClaims(), removeSources(), remove_qualifiers() DataSite methods will be removed
@@ -52,6 +41,15 @@ Deprecations
 * 6.2.0: Throttle.multiplydelay attribute is deprecated
 * 6.2.0: SequenceOutputter.format_list() is deprecated in favour of 'out' property
 * 6.0.0: config.register_family_file() is deprecated
-* 5.5.0: APISite.redirectRegex() is deprecated in favour of APISite.redirect_regex() and will be removed with Pywikibot 8
-* 4.0.0: Revision.parent_id is deprecated in favour of Revision.parentid and will be removed with Pywikibot 8
-* 4.0.0: Revision.content_model is deprecated in favour of Revision.contentmodel and will be removed with Pywikibot 8
+
+
+Will be removed in Pywikibot 8
+------------------------------
+
+* 7.3.0: Python 3.5 support will be dropped (:phab:`T301908`)
+* 7.1.0: win32_unicode.py will be removed
+* 7.0.0: The i18n identifier 'cosmetic_changes-append' will be removed in favour of 'pywikibot-cosmetic-changes'
+* 7.0.0: pymysql < 0.7.11 will be dropped; require pymysql >= 0.7.11 (:phab:`T216741`)
+* 5.5.0: APISite.redirectRegex() will be removed in favour of APISite.redirect_regex()
+* 4.0.0: Revision.parent_id will be removed in favour of Revision.parentid
+* 4.0.0: Revision.content_model will be removed in favour of Revision.contentmodel

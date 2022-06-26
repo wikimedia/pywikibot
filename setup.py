@@ -56,10 +56,11 @@ if not python_is_supported():  # pragma: no cover
 # ------- setup extra_requires ------- #
 extra_deps = {
     # Core library dependencies
-    'eventstreams': ['sseclient!=0.0.23,!=0.0.24,>=0.0.18'],
+    'eventstreams': ['sseclient<0.0.23,>=0.0.18'],  # T222885
     'isbn': ['python-stdnum>=1.17'],
     'Graphviz': ['pydot>=1.2'],
     'Google': ['google>=1.7'],
+    'memento': ['memento_client==0.6.1'],
     'mwparserfromhell': ['mwparserfromhell>=0.5.0'],
     'wikitextparser': ['wikitextparser>=0.47.5; python_version < "3.6"',
                        'wikitextparser>=0.47.0; python_version >= "3.6"'],
@@ -87,7 +88,8 @@ extra_deps = {
         'flake8-string-format',
         'flake8-tuple>=0.2.8',
         'flake8-no-u-prefixed-strings>=0.2',
-        'pep8-naming>=0.7',
+        'pep8-naming>=0.12.1, <0.13.0; python_version < "3.7"',
+        'pep8-naming>=0.12.1; python_version >= "3.7"',
         'pyflakes>=2.1.0',
     ],
     'hacking': ['hacking'],
@@ -98,7 +100,7 @@ extra_deps = {
 script_deps = {
     'commons_information.py': extra_deps['mwparserfromhell'],
     'patrol.py': extra_deps['mwparserfromhell'],
-    'weblinkchecker.py': ['memento_client!=0.6.0,>=0.5.1'],
+    'weblinkchecker.py': extra_deps['memento'],
 }
 
 extra_deps.update(script_deps)
@@ -107,8 +109,10 @@ extra_deps.update({'scripts': [i for k, v in script_deps.items() for i in v]})
 # ------- setup install_requires ------- #
 # packages which are mandatory
 dependencies = [
-    'requests>=2.20.1,<2.26.0;python_version<"3.6"',
-    'requests>=2.20.1;python_version>="3.6"',
+    'requests>=2.20.1, <2.26.0; python_version < "3.6"',
+    'requests>=2.20.1, <2.28.0; '
+    'python_version >= "3.6" and python_version < "3.7"',
+    'requests>=2.20.1; python_version>="3.7"',
     # PEP 440
     'setuptools>=48.0.0 ; python_version >= "3.10"',
     'setuptools>=38.5.2 ; python_version >= "3.7" and python_version < "3.10"',
@@ -207,7 +211,7 @@ def read_desc(filename):  # pragma: no cover
     Combine included restructured text files which must be done before
     uploading because the source isn't available after creating the package.
     """
-    pattern = r'\:phab\:`(T\d+)`', r'\1'
+    pattern = r'\:\w+\:`([^`]+?)(?:<.+>)?`', r'\1'
     desc = []
     with open(filename) as f:
         for line in f:
@@ -215,11 +219,11 @@ def read_desc(filename):  # pragma: no cover
                 include = os.path.relpath(line.rsplit('::')[1].strip())
                 if os.path.exists(include):
                     with open(include) as g:
-                        desc.append(re.sub(*pattern, g.read()))
+                        desc.append(re.sub(pattern[0], pattern[1], g.read()))
                 else:
                     print('Cannot include {}; file not found'.format(include))
             else:
-                desc.append(re.sub(*pattern, line))
+                desc.append(re.sub(pattern[0], pattern[1], line))
     return ''.join(desc)
 
 

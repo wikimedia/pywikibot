@@ -1,7 +1,7 @@
 tests.weblinkchecker\_tests module
 ==================================
 
-.. automodule:: tests.weblinkchecker_tests
+.. automodule:: tests.memento_tests
     :members:
     :undoc-members:
     :show-inheritance:

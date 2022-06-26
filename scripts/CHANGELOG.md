@@ -1,7 +1,29 @@
 # Scripts Changelog
 
+## 7.4.0
+*26 June 2022*
+
+### addtext
+* Fix for -createonly option (:phab:`T311173`)
+
+### harvest_templates
+* Add -confirm option which sets 'always' option to False (:phab:`T310356`)
+* Do not show a warning if generator is specified later (:phab:`T310418`)
+
+### interwiki
+* Fix regression where interwiki script removes all interwiki links (:phab:`T310964`)
+* Assign compareLanguages to be reused and fix process_limit_two call (:phab:`T310908`)
+
+### listpages
+* Print the page list immediately except pages are preloaded
+
+### nowcommons
+* Use treat_page method (:phab:`T309456`)
+* Fix several bugs  (:phab:`T309473`)
+
+
 ## 7.3.0
-*20 May 2022*
+*21 May 2022*
 
 ### general
 * Call ExistingPageBot.skip_page() first (:phab:`T86491`)

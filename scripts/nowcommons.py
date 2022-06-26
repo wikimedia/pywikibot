@@ -53,7 +53,7 @@ from itertools import chain
 import pywikibot
 from pywikibot import i18n
 from pywikibot import pagegenerators as pg
-from pywikibot.bot import Bot, ConfigParserBot
+from pywikibot.bot import ConfigParserBot, CurrentPageBot
 from pywikibot.exceptions import IsRedirectPageError, NoPageError
 from pywikibot.tools import filter_unique
 from scripts.image import ImageRobot as ImageBot
@@ -172,7 +172,7 @@ namespace_in_template = [
 ]
 
 
-class NowCommonsDeleteBot(Bot, ConfigParserBot):
+class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
 
     """Bot to delete migrated files.
 
@@ -256,119 +256,120 @@ class NowCommonsDeleteBot(Bot, ConfigParserBot):
                     file_on_commons = val[1].strip()
             return file_on_commons
 
-    def run(self) -> None:
-        """Run the bot."""
-        commons = self.commons
-        comment = self.summary
+    def init_page(self, item: pywikibot.Page) -> pywikibot.FilePage:
+        """Ensure that generator retrieves FilePage objects."""
+        return pywikibot.FilePage(item)
 
-        for page in self.generator:
-            self.current_page = page
-            try:
-                local_file_page = pywikibot.FilePage(self.site, page.title())
-                if local_file_page.file_is_shared():
-                    pywikibot.output('File is already on Commons.')
-                    continue
-                sha1 = local_file_page.latest_file_info.sha1
-                file_on_commons = self.find_file_on_commons(local_file_page)
-                if not file_on_commons:
-                    pywikibot.output('NowCommons template not found.')
-                    continue
-                commons_file_page = pywikibot.FilePage(commons, 'File:'
-                                                       + file_on_commons)
-                if (local_file_page.title(with_ns=False)
-                        != commons_file_page.title(with_ns=False)):
-                    using_pages = list(local_file_page.using_pages())
-                    if using_pages and using_pages != [local_file_page]:
-                        pywikibot.output(
-                            '"<<lightred>>{}<<default>>" is still used in {} '
-                            'pages.'.format(
-                                local_file_page.title(with_ns=False),
-                                len(using_pages)))
-                        if self.opt.replace:
-                            pywikibot.output(
-                                'Replacing "<<lightred>>{}<<default>>" by '
-                                '"<<lightgreen>>{}<<default>>".'.format(
-                                    local_file_page.title(with_ns=False),
-                                    commons_file_page.title(with_ns=False)))
-                            bot = ImageBot(
-                                local_file_page.usingPages(),
-                                local_file_page.title(with_ns=False),
-                                commons_file_page.title(with_ns=False),
-                                always=self.opt.replacealways,
-                                loose=self.opt.replaceloose)
-                            bot.run()
-                            # If the image is used with the urlname the
-                            # previous function won't work
-                            is_used = bool(list(pywikibot.FilePage(
-                                self.site,
-                                page.title()).using_pages(total=1)))
-                            if is_used and self.opt.replaceloose:
-                                bot = ImageBot(
-                                    local_file_page.usimgPages(),
-                                    local_file_page.title(with_ns=False,
-                                                          as_url=True),
-                                    commons_file_page.title(with_ns=False),
-                                    always=self.opt.replacealways,
-                                    loose=self.opt.replaceloose)
-                                bot.run()
-                            # refresh because we want the updated list
-                            using_pages = len(list(pywikibot.FilePage(
-                                self.site, page.title()).using_pages()))
+    def skip_page(self, page) -> bool:
+        """Skip shared files."""
+        if page.file_is_shared():
+            pywikibot.output('File is already on Commons.')
+            return True
 
-                        else:
-                            pywikibot.output('Please change them manually.')
-                        continue
+        return super().skip_page(page)
+
+    def treat_page(self) -> None:
+        """Treat a single page."""
+        local_file_page = self.current_page
+        file_on_commons = self.find_file_on_commons(local_file_page)
+
+        if not file_on_commons:
+            pywikibot.output('NowCommons template not found.')
+            return
+
+        commons_file_page = pywikibot.FilePage(self.commons,
+                                               'File:' + file_on_commons)
+        if (local_file_page.title(with_ns=False)
+                != commons_file_page.title(with_ns=False)):
+            using_pages = list(local_file_page.using_pages())
+
+            if using_pages and using_pages != [local_file_page]:
+                pywikibot.output(
+                    '"<<lightred>>{}<<default>>" is still used in {} pages.'
+                    .format(local_file_page.title(with_ns=False),
+                            len(using_pages)))
+
+                if self.opt.replace:
                     pywikibot.output(
-                        'No page is using "<<lightgreen>>{}<<default>>" '
-                        'anymore.'.format(
-                            local_file_page.title(with_ns=False)))
-                commons_text = commons_file_page.get()
-                if not self.opt.replaceonly:
-                    if sha1 == commons_file_page.latest_file_info.sha1:
-                        pywikibot.output(
-                            'The file is identical to the one on Commons.')
-                        if len(local_file_page.get_file_history()) > 1:
-                            pywikibot.output(
-                                'This file has a version history. Please '
-                                'delete it manually after making sure that '
-                                'the old versions are not worth keeping.')
-                            continue
-                        if self.opt.always is False:
-                            format_str = (
-                                '\n\n>>>> Description on '
-                                '<<<lightpurple>>{}<<default>> <<<<\n'
-                            )
-                            pywikibot.output(format_str.format(page.title()))
-                            pywikibot.output(local_file_page.get())
-                            pywikibot.output(
-                                format_str.format(commons_file_page.title()))
-                            pywikibot.output(commons_text)
-                            if pywikibot.input_yn(
-                                    'Does the description on Commons contain '
-                                    'all required source and license\n'
-                                    'information?',
-                                    default=False, automatic_quit=False):
-                                local_file_page.delete(
-                                    '{} [[:commons:File:{}]]'
-                                    .format(comment, file_on_commons),
-                                    prompt=False)
-                        else:
-                            local_file_page.delete(
-                                comment + ' [[:commons:File:{}]]'
-                                          .format(file_on_commons),
-                                          prompt=False)
-                    else:
-                        pywikibot.output('The file is not identical to '
-                                         'the one on Commons.')
-            except (NoPageError, IsRedirectPageError) as e:
-                pywikibot.output(str(e[0]))
-                continue
+                        'Replacing "<<lightred>>{}<<default>>" by '
+                        '"<<lightgreen>>{}<<default>>".'
+                        .format(local_file_page.title(with_ns=False),
+                                commons_file_page.title(with_ns=False)))
+
+                    bot = ImageBot(local_file_page.using_pages(),
+                                   local_file_page.title(with_ns=False),
+                                   commons_file_page.title(with_ns=False),
+                                   always=self.opt.replacealways,
+                                   loose=self.opt.replaceloose)
+                    bot.run()
+
+                    # If the image is used with the urlname
+                    # the previous function won't work
+                    if local_file_page.file_is_used and self.opt.replaceloose:
+                        bot = ImageBot(local_file_page.using_pages(),
+                                       local_file_page.title(with_ns=False,
+                                                             as_url=True),
+                                       commons_file_page.title(with_ns=False),
+                                       always=self.opt.replacealways,
+                                       loose=self.opt.replaceloose)
+                        bot.run()
+                    self.counter['replace'] += 1
+                else:
+                    pywikibot.output('Please change them manually.')
+                return
+
+            pywikibot.output('No page is using "<<lightgreen>>{}<<default>>" '
+                             'anymore.'
+                             .format(local_file_page.title(with_ns=False)))
+
+        try:
+            commons_text = commons_file_page.get()
+        except (NoPageError, IsRedirectPageError) as e:
+            pywikibot.error(e)
+            return
+
+        if not self.opt.replaceonly:
+            sha1 = local_file_page.latest_file_info.sha1
+            if sha1 == commons_file_page.latest_file_info.sha1:
+                pywikibot.output(
+                    'The file is identical to the one on Commons.')
+
+                if len(local_file_page.get_file_history()) > 1:
+                    pywikibot.output(
+                        'This file has a version history. Please '
+                        'delete it manually after making sure that '
+                        'the old versions are not worth keeping.')
+                    return
+
+                if self.opt.always is False:
+                    format_str = (
+                        '\n\n>>>> Description on '
+                        '<<<lightpurple>>{}<<default>> <<<<\n'
+                    )
+                    pywikibot.output(
+                        format_str.format(local_file_page.title()))
+                    pywikibot.output(local_file_page.get())
+                    pywikibot.output(
+                        format_str.format(commons_file_page.title()))
+                    pywikibot.output(commons_text)
+
+                if self.opt.always or pywikibot.input_yn(
+                    'Does the description on Commons contain all required '
+                        'source and license\ninformation?', default=False):
+                    local_file_page.delete(
+                        '{} [[:commons:File:{}]]'
+                        .format(self.summary, file_on_commons),
+                        prompt=False)
+                    self.counter['delete'] += 1
             else:
-                self.counter['read'] += 1
-        if not self.counter['read']:
+                pywikibot.output(
+                    'The file is not identical to the one on Commons.')
+
+    def teardown(self):
+        """Show a message if no files were found."""
+        if self.generator_completed and not self.counter['read']:
             pywikibot.output('No transcluded files found for {}.'
                              .format(self.nc_templates_list()[0]))
-        self.exit()
 
 
 def main(*args: str) -> None:

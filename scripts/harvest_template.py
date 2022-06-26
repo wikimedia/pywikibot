@@ -22,8 +22,7 @@ These command line parameters can be used to specify which pages to work on:
 
 You can also use additional parameters:
 
--always             If used, the bot won't ask if it should add the specified
-                    text
+-confirm            If used, the bot will ask if it should make changes
 
 -create             Create missing items before importing.
 
@@ -375,26 +374,26 @@ def main(*args: str) -> None:
     fields = {}
     options = {}
     for arg in local_args:
-        if arg.startswith('-template'):
-            if len(arg) == 9:
-                template_title = pywikibot.input(
-                    'Please enter the template to work on:')
-            else:
-                template_title = arg[10:]
+        opt, _, value = arg.partition(':')
+        if opt == '-template':
+            template_title = value or pywikibot.input(
+                'Please enter the template to work on:')
+        elif opt == '-confirm':
+            options['always'] = False
         elif arg.startswith('-create'):
             options['create'] = True
         elif gen.handle_arg(arg):
             if arg.startswith('-transcludes:'):
-                template_title = arg[13:]
+                template_title = value
         else:
-            optional = arg.startswith('-')
+            optional = opt.startswith('-')
             complete = len(current_args) == 3
             if optional:
                 needs_second = len(current_args) == 1
                 if needs_second:
                     break  # will stop below
 
-                arg, _, value = arg[1:].partition(':')
+                arg = opt[1:]
                 if len(current_args) == 0:
                     assert not fields
                     options[arg] = value or True
@@ -423,10 +422,9 @@ def main(*args: str) -> None:
             'Please specify either -template or -transcludes argument')
         return
 
-    generator = gen.getCombinedGenerator(preload=True)
-    if not generator:
+    if not gen.gens:
         gen.handle_arg('-transcludes:' + template_title)
-        generator = gen.getCombinedGenerator(preload=True)
+    generator = gen.getCombinedGenerator(preload=True)
 
     bot = HarvestRobot(template_title, fields, generator=generator, **options)
     bot.run()

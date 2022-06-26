@@ -1,0 +1,37 @@
+/** css/pywikibot.css **/
+
+/* This line is theme specific - it includes the base theme CSS */
+@import '../nature.css';  /* for Nature */
+
+
+div.related {
+    background-color: #396;
+    line-height: 32px;
+    color: #fff;
+    text-shadow: 0px 1px 0 #444;
+    font-size: 0.9em;
+}
+
+a:hover {
+    color: #900;
+    text-decoration: underline;
+}
+
+a.headerlink {
+    color: #069;
+    font-size: 0.8em;
+    padding: 0 4px 0 4px;
+    text-decoration: none;
+}
+
+a.headerlink:hover {
+    background-color: #069;
+    color: white;
+}
+code.xref {
+    color: #069;
+    font-size: 1.2em
+}
+code.xref:hover {
+    color: #900;
+}

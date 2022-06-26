@@ -806,7 +806,7 @@ class CheckImagesBot:
         """
         # find the most used image
         images = [image for _, image in list_given]
-        iterables = [image.usingPages() for image in images]
+        iterables = [image.using_pages() for image in images]
         curr_images = []
         for values in zip_longest(*iterables, fillvalue=False):
             curr_images = values
@@ -1098,9 +1098,9 @@ class CheckImagesBot:
                 self.settings_data = []
                 try:
                     testo = page.get()
-                    number = 1
 
-                    for m in SETTINGS_REGEX.finditer(testo):
+                    for number, m in enumerate(SETTINGS_REGEX.finditer(testo),
+                                               start=1):
                         name = str(m.group(1))
                         find_tipe = str(m.group(2))
                         find = str(m.group(3))
@@ -1112,7 +1112,6 @@ class CheckImagesBot:
                         tupla = [number, name, find_tipe, find, imagechanges,
                                  summary, head, text, mexcatched]
                         self.settings_data += [tupla]
-                        number += 1
 
                     if not self.settings_data:
                         pywikibot.output(

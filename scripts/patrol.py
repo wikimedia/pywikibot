@@ -297,13 +297,12 @@ class PatrolBot(BaseBot):
             pywikibot.output('User {} has created or modified page {}'
                              .format(username, title))
 
-        if (self.opt.autopatroluserns
-                and page['ns'] in (2, 3)):
-            # simple rule to whitelist any user editing their own userspace
-            if title.partition(':')[2].split('/')[0].startswith(username):
-                verbose_output('{} is whitelisted to modify {}'
-                               .format(username, title))
-                choice = True
+        # simple rule to whitelist any user editing their own userspace
+        if self.opt.autopatroluserns and page['ns'] in (2, 3) \
+           and title.partition(':')[2].split('/')[0].startswith(username):
+            verbose_output('{} is whitelisted to modify {}'
+                           .format(username, title))
+            choice = True
 
         if not choice and username in self.whitelist \
            and self.in_list(self.whitelist[username], title):

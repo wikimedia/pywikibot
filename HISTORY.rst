@@ -1,6 +1,33 @@
 Release history
 ^^^^^^^^^^^^^^^
 
+7.3.0
+-----
+*21 May 2022*
+
+* Add support for kcgwiki (:phab:`T305282`)
+* Raise InvalidTitleError instead of unspecific ValueError in ProofreadPage (:phab:`T308016`)
+* Preload pages if GeneratorFactory.articlenotfilter_list is not empty; also set attribute ``is_preloading``.
+* ClaimCollection.toJSON() should not ignore new claim (:phab:`T308245`)
+* use linktrail via siteinfo and remove `update_linkrtrails` maintenance script
+* Print counter statistic for all counters (:phab:`T307834`)
+* Use proofreadpagesinindex query module
+* Prioritize -namespaces options in `pagegenerators.handle_args` (:phab:`T222519`)
+* Remove `ThreadList.stop_all()` method (:phab:`T307830`)
+* L10N updates
+* Improve get_charset_from_content_type function (:phab:`T307760`)
+* A tiny cache wrapper was added to hold results of parameterless methods and properties
+* Increase workers in preload_sites.py
+* Close logging handlers before deleting them (:phab:`T91375`, :phab:`T286127`)
+* Clear _sites cache if called with pwb wrapper (:phab:`T225594`)
+* Enable short creation of a site if family name is equal to site code
+* Use `exc_info=True` with pywikibot.exception() by default (:phab:`T306762`)
+* Make IndexPage more robust when getting links in Page ns (:phab:`T307280`)
+* Do not print log header twice in log files (:phab:`T264235`)
+* Do not delegate logging output to the root logger (:phab:`T281643`)
+* Add `get_charset_from_content_type` to extract the charset from the content-type response header
+
+
 7.2.0
 -----
 *26 April 2022*
@@ -31,7 +58,7 @@ Release history
 * Don't try to upcast timestamp from global userinfo if global account does not exists (:phab:`T305351`)
 * Archived scripts were removed; create a Phabricator task to restore some (:phab:`T223826`)
 * Add Lexeme support for Lexicographical data (:phab:`T189321`, :phab:`T305297`)
-* enable all parameters of `APISite.imageusage()` with `FilePage.usingPages()`
+* enable all parameters of `APISite.imageusage()` with `FilePage.using_pages()`
 * Don't raise `NoPageError` with `file_is_shared` (:phab:`T305182`)
 * Fix URL of GoogleOCR
 * Handle ratelimit with purgepages() (:phab:`T152597`)
@@ -297,7 +324,7 @@ Code cleanups
 * Check bot/nobots templates for cosmetic_changes hook (:phab:`T283989`)
 * Remove outdated opt._option which is already dropped (:phab:`T284005`)
 * Use IntEnum with cosmetic_changes CANCEL
-* Remove lru_cahce from botMayEdit method and fix it's logic (:phab:`T283957`)
+* Remove lru_cache from botMayEdit method and fix it's logic (:phab:`T283957`)
 * DataSite.createNewItemFromPage() method was removed in favour of ImagePage.fromPage() (:phab:`T98663`)
 * mwparserfromhell or wikitextparser MediaWiki markup parser is mandatory (:phab:`T106763`)
 

@@ -11,6 +11,11 @@ pywikibot.data.api module
 
 .. automodule:: pywikibot.data.api
 
+pywikibot.data.memento module
+-----------------------------
+
+.. automodule:: pywikibot.data.memento
+
 pywikibot.data.mysql module
 ---------------------------
 

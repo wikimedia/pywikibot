@@ -54,6 +54,7 @@ Library tests
     logentries<./logentries_tests>
     login<./login_tests>
     mediawikiversion<./mediawikiversion_tests>
+    memento<./memento_tests>
     namespace<./namespace_tests>
     oauth<./oauth_tests>
     page<./page_tests>
@@ -113,4 +114,3 @@ Script tests
     template_bot<./template_bot_tests>
     upload<./upload_tests>
     uploadbot<./uploadbot_tests>
-    weblinkchecker<./weblinkchecker_tests>

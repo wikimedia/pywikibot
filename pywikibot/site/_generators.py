@@ -694,8 +694,10 @@ class GeneratorsMixin:
                 raise ValueError(
                     'loadrevisions: endid > startid with rvdir=False')
 
-        rvargs = {'type_arg': 'info|revisions'}
-        rvargs['rvprop'] = self._rvprops(content=content)
+        rvargs = {
+            'type_arg': 'info|revisions',
+            'rvprop': self._rvprops(content=content),
+        }
 
         if content and section is not None:
             rvargs['rvsection'] = str(section)

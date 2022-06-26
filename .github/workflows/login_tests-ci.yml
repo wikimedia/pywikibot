@@ -20,6 +20,7 @@ jobs:
   build:
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     continue-on-error: ${{ matrix.experimental || false }}
+    timeout-minutes: 2
 
     strategy:
       fail-fast: false
@@ -109,6 +110,7 @@ jobs:
         echo "('${{ env.PYWIKIBOT_USERNAME }}', '${{ secrets.PYWIKIBOT_USERPWD }}')" > passwordfile
 
     - name: Test with unittest
+      timeout-minutes: 1
       env:
         PYWIKIBOT_TEST_NO_RC:
           ${{ (matrix.site == 'wikisource:zh' || matrix.test_no_rc) && 1 || 0 }}

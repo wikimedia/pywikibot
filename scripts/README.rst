@@ -84,8 +84,6 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | listpages.py           | Print a list of pages, defined by a page generator.     |
     +------------------------+---------------------------------------------------------+
-    | login.py               | Script to log the bot in to a wiki account.             |
-    +------------------------+---------------------------------------------------------+
     | misspelling.py         | Similar to solve_disambiguation.py. It is supposed to   |
     |                        | fix links that contain common spelling mistakes.        |
     +------------------------+---------------------------------------------------------+
@@ -163,9 +161,6 @@ The contents of the package
     | colors.py              | Utility to show pywikibot colors.                       |
     +------------------------+---------------------------------------------------------+
     | make_i18n_dict.py      | Generate an i18n file from a given script.              |
-    +------------------------+---------------------------------------------------------+
-    | preload_sites.py       | Preload and cache site information for each WikiMedia   |
-    |                        | family. Usefull for bots running on multiple sites.     |
     +------------------------+---------------------------------------------------------+
     | sorting_order.py       | Updates interwiki sorting order in family.py file.      |
     +------------------------+---------------------------------------------------------+

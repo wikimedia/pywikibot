@@ -10,15 +10,6 @@ coverage:
     project:
       default:
         enabled: yes
-      framework:
-        flags:
-          - framework
-      tests:
-        flags:
-          - tests
-      scripts:
-        flags:
-          - scripts
     patch:
       default:
         enabled: yes
@@ -27,15 +18,16 @@ coverage:
         enabled: yes
 
   ignore:
+    - make_dist.py
     - pywikibot/backports.py
     - pywikibot/daemonize.py
     - pywikibot/families/__init__.py
+    - pywikibot/scripts/preload_sites.py
     - pywikibot/scripts/version.py
     - pywikibot/userinterfaces/win32_unicode.py
     - scripts/dataextend.py
     - scripts/maintenance/colors.py
     - scripts/maintenance/make_i18n_dict.py
-    - scripts/maintenance/preload_sites.py
     - scripts/maintenance/sorting_order.py
     - scripts/maintenance/wikimedia_sites.py
     - scripts/userscripts/
@@ -50,19 +42,3 @@ coverage:
     gitter:
       default:
         url: https://webhooks.gitter.im/e/f312b840da1c40d9f4be
-
-flags:
-  framework:
-    carryforward: true
-    paths:
-      - pywikibot
-
-  tests:
-    carryforward: true
-    paths:
-      - tests
-
-  scripts:
-    carryforward: true
-    paths:
-      - scripts

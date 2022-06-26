@@ -125,7 +125,9 @@ class OutputOption(Option):
     def out(self) -> str:
         """String to be used when selected before or after the question.
 
-        :Note: This method is used by ui.input_choice instead of output().
+        .. note:: This method is used by :meth:`ui.input_choice
+           <pywikibot.userinterfaces._interface_base.ABUIC.input_choice>`
+           instead of deprecated :meth:`output`.
 
         .. versionadded:: 6.2
         """
@@ -136,7 +138,7 @@ class OutputOption(Option):
         """Output string.
 
         .. deprecated:: 6.5
-           This method was replaced by :py:obj:`out` property and is no
+           This method was replaced by :attr:`out` property and is no
            no longer used by the
            :py:mod:`userinterfaces <pywikibot.userinterfaces>` system.
         """

@@ -6,14 +6,16 @@ The following parameters are supported:
 -worker:<num>     The number of parallel tasks to be run. Default is the
                   number of processors on the machine
 
-Usage:
+Usage::
 
     python pwb.py preload_sites [{<family>}] [-worker:{<num>}]
 
-To force preloading, change the global expiry value to 0:
+To force preloading, change the global expiry value to 0::
 
     python pwb.py -API_config_expiry:0 preload_sites [{<family>}]
 
+.. versionchanged:: 7.4
+   script was moved to the framework scripts folder.
 """
 #
 # (C) Pywikibot team, 2021-2022

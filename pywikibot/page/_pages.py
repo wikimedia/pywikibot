@@ -7,7 +7,7 @@ This module includes objects:
 - Category: A page in the Category: namespace
 
 Various Wikibase pages are defined in ``page._wikibase.py``,
-various pages for Proofread Extensions are defines in
+various pages for Proofread Extensions are defined in
 ``pywikibot.proofreadpage``.
 
 ..note:: `Link` objects represent a wiki-page's title, while
@@ -1077,8 +1077,8 @@ class BasePage(ComparableMixin):
     def _check_bot_may_edit(self, module: Optional[str] = None) -> bool:
         """A botMayEdit helper method.
 
-        @param module: The module name to be restricted. Defaults to
-            pywikibot.calledModuleName().
+        :param module: The module name to be restricted. Defaults to
+            :func:`pywikibot.calledModuleName`.
         """
         if not hasattr(self, 'templatesWithParams'):
             return True
@@ -1458,13 +1458,12 @@ class BasePage(ComparableMixin):
             # only yield links that are to a different site and that
             # are not language links
             try:
-                if link.site != self.site:
-                    if linktitle.lstrip().startswith(':'):
-                        # initial ":" indicates not a language link
-                        yield link
-                    elif link.site.family != self.site.family:
-                        # link to a different family is not a language link
-                        yield link
+                # initial ":" indicates not a language link
+                # link to a different family is not a language link
+                if link.site != self.site \
+                   and (linktitle.lstrip().startswith(':')
+                        or link.site.family != self.site.family):
+                    yield link
             except Error:
                 # ignore any links with invalid contents
                 continue
@@ -1836,8 +1835,7 @@ class BasePage(ComparableMixin):
             if answer == 'y':
                 self.site.delete(self, reason, deletetalk=deletetalk)
                 return 1
-            else:
-                return 0
+            return 0
 
         # Otherwise mark it for deletion
         if mark or hasattr(self.site, '_noMarkDeletePrompt'):
@@ -1862,8 +1860,7 @@ class BasePage(ComparableMixin):
             target.text = template + target.text
             target.save(summary=reason)
             return -1
-        else:
-            return 0
+        return 0
 
     def has_deleted_revisions(self) -> bool:
         """Return True if the page has deleted revisions.

@@ -89,7 +89,21 @@ The contents of the package
     +----------------------------+------------------------------------------------------+
     | data                       | Module providing layers of data access to wiki       |
     +============================+======================================================+
-    | api.py                     | Interface to MediaWiki's api.php                     |
+    | api.py                     | Interface Module to MediaWiki's api                  |
+    |                            +----------------+-------------------------------------+
+    |                            | __init__.py    | Interface to MediaWiki's api.php    |
+    |                            +----------------+-------------------------------------+
+    |                            | _generators.py | API/Query generators                |
+    |                            +----------------+-------------------------------------+
+    |                            | _login.py      | API login interface                 |
+    |                            +----------------+-------------------------------------+
+    |                            | _optionset.py  | Boolean API option                  |
+    |                            +----------------+-------------------------------------+
+    |                            | _paraminfo.py  | API information data object         |
+    |                            +----------------+-------------------------------------+
+    |                            | _requests.py   | API Requests interface              |
+    +----------------------------+----------------+-------------------------------------+
+    | memento.py                 | memento_client 0.6.1 package fix                     |
     +----------------------------+------------------------------------------------------+
     | mysql.py                   | Miscellaneous helper functions for mysql queries     |
     +----------------------------+------------------------------------------------------+
@@ -128,6 +142,12 @@ The contents of the package
     | generate_family_file.py    | Creates a new family file                            |
     +----------------------------+------------------------------------------------------+
     | generate_user_files.py     | Creates user-config.py or user-fixes.py              |
+    +----------------------------+------------------------------------------------------+
+    | login.py                   | Script to log the bot in to a wiki account.          |
+    +----------------------------+------------------------------------------------------+
+    | preload_sites.py           | Preload and cache site information for each          |
+    |                            | WikiMedia family within seconds. Useful for bots     |
+    |                            | running on multiple sites.                           |
     +----------------------------+------------------------------------------------------+
     | pwb.py                     | Code entry wrapper script (site-package only)        |
     +----------------------------+------------------------------------------------------+

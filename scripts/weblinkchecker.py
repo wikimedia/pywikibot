@@ -109,7 +109,6 @@ Loads all wiki pages where dead links were found during a prior run:
 # Distributed under the terms of the MIT license.
 #
 import codecs
-import datetime
 import pickle
 import re
 import threading
@@ -137,9 +136,8 @@ from pywikibot.tools import ThreadList
 
 
 try:
-    import memento_client
-    from memento_client.memento_client import MementoClientException
-    missing_dependencies = None
+    from pywikibot.data.memento import get_closest_memento_url
+    missing_dependencies = []
 except ImportError:
     missing_dependencies = ['memento_client']
 
@@ -174,57 +172,15 @@ ignorelist = [
 ]
 
 
-def _get_closest_memento_url(url, when=None, timegate_uri=None):
-    """Get most recent memento for url."""
-    if not when:
-        when = datetime.datetime.now()
-
-    mc = memento_client.MementoClient()
-    if timegate_uri:
-        mc.timegate_uri = timegate_uri
-
-    retry_count = 0
-    while retry_count <= config.max_retries:
-        try:
-            memento_info = mc.get_memento_info(url, when)
-            break
-        except (requests.ConnectionError, MementoClientException) as e:
-            error = e
-            retry_count += 1
-            pywikibot.sleep(config.retry_wait)
-    else:
-        raise error
-
-    mementos = memento_info.get('mementos')
-    if not mementos:
-        raise Exception(
-            'mementos not found for {} via {}'.format(url, timegate_uri))
-    if 'closest' not in mementos:
-        raise Exception(
-            'closest memento not found for {} via {}'.format(
-                url, timegate_uri))
-    if 'uri' not in mementos['closest']:
-        raise Exception(
-            'closest memento uri not found for {} via {}'.format(
-                url, timegate_uri))
-    return mementos['closest']['uri'][0]
-
-
 def get_archive_url(url):
     """Get archive URL."""
     try:
-        archive = _get_closest_memento_url(
-            url,
-            timegate_uri='http://web.archive.org/web/')
+        return get_closest_memento_url(
+            url, timegate_uri='http://web.archive.org/web/')
     except Exception:
-        archive = _get_closest_memento_url(
+        return get_closest_memento_url(
             url,
             timegate_uri='http://timetravel.mementoweb.org/webcite/timegate/')
-
-    # FIXME: Hack for T167463: Use https instead of http for archive.org links
-    if archive.startswith('http://web.archive.org'):
-        archive = archive.replace('http://', 'https://', 1)
-    return archive
 
 
 def weblinks_from_text(

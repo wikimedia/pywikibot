@@ -1112,8 +1112,8 @@ class DataExtendBot(SingleSiteBot):
                         self.noname.add(name)
             elif result[0].upper() != 'N':
                 returnvalue = [{}, {}]
-                for language in realnewnames.keys():
-                    if language in existinglabels.keys():
+                for language in realnewnames:
+                    if language in existinglabels:
                         returnvalue[1][language] = existingaliases.get(
                             language, []) + realnewnames[language]
                     else:
@@ -1531,13 +1531,10 @@ class Analyzer:
             (self.findeyecolor, 'P1340'),
         ]:
             result = function(self.html)
-            if result:
-                if prop == 'P856' and 'wikipedia.org' in result:
-                    pass
-                elif prop in ['P2013', 'P4003'] and result == 'pages':
-                    pass
-                else:
-                    newclaims.append((prop, result.strip(), self))
+            if result and not (
+                prop == 'P856' and 'wikipedia.org' in result
+                    or prop in ['P2013', 'P4003'] and result == 'pages'):
+                newclaims.append((prop, result.strip(), self))
 
         for (function, prop) in [
             (self.findbirthdate, 'P569'),
@@ -2419,7 +2416,7 @@ class Analyzer:
                 and not (r[0] == 'P3258' and r[1].lower() in ['users',
                                                               'comunity',
                                                               'www'])
-                and not r[1].lower() == 'search'
+                and r[1].lower() != 'search'
                 and not (r[0] == 'P3365' and ('(Dizionario_Biografico)' in r[1] or '(Enciclopedia-Italiana)' in r[1] or '(Enciclopedia-dei-Papi)' in r[1]))
                 and not (r[0] == 'P2013' and '.php' in r[1])]
 
@@ -2607,6 +2604,8 @@ class ViafAnalyzer(Analyzer):
         result = self.findbyre(r'>{}\|([^<>]+)'.format(name), html)
         if result:
             return result.replace(' ', '')
+        else:
+            return None
 
     def findlanguagenames(self, html):
         languagenames = set()
@@ -2639,11 +2638,15 @@ class ViafAnalyzer(Analyzer):
         section = self.findbyre(r'<ns1:nationalityOfEntity>(.*?)</ns1:nationalityOfEntity>', html)
         if section:
             return self.findallbyre(r'<ns1:text>([^<>]+)</ns1:text>', section, 'country')
+        else:
+            return None
 
     def findlanguagesspoken(self, html):
         section = self.findbyre(r'<ns1:languageOfEntity>(.*?)</ns1:languageOfEntity>', html)
         if section:
             return self.findallbyre(r'<ns1:text>([^<>]+)</ns1:text>', section, 'language')
+        else:
+            return None
 
     def findoccupations(self, html):
         sections = self.findallbyre(r'<ns1:occupation>(.*?)</ns1:occupation>', html)
@@ -5601,9 +5604,7 @@ class LnbAnalyzer(Analyzer):
             if status == 'active':
                 result.append(self.findbyre(r'(?s)(.*)', part.strip().rstrip('.'), dtype, alt=alt))
                 status = 'waiting'
-            elif field in part:
-                status = 'active'
-            elif status == 'waiting' and not part.strip():
+            elif field in part or status == 'waiting' and not part.strip():
                 status = 'active'
             else:
                 status = 'inactive'
@@ -10350,7 +10351,8 @@ class ItauAnalyzer(Analyzer):
         if self.isperson:
             self.urlbase = 'https://enciclopedia.itaucultural.org.br/{id}'
         else:
-            # Analyzer only created for persons, for works and possible other it can be extended later
+            # Analyzer only created for persons,
+            # for works and possible other it can be extended later
             self.urlbase = None
         self.hrtre = r'<h1[^<>]*>\s*Outras informações.*?<div class="section_content">(.*?)</section>'
         self.language = 'pt'
@@ -12591,10 +12593,11 @@ class IgdbAnalyzer(Analyzer):
             '<label>{}:</label>(.*?)<(?:label|<h3 class="underscratch)'
             .format(field), html, dtype)
 
-    def getvalues(self, field, html, dtype=None) -> List[str]:
+    def getvalues(self, field, html, dtype=None, alt=None) -> List[str]:
         section = self.getvalue(field, html)
         if section:
-            return self.findallbyre('>([^<>]+)<', section, dtype)
+            return self.findallbyre('>([^<>]+)<', section,
+                                    dtype=dtype, alt=alt)
         return []
 
     def findinstanceof(self, html):
@@ -13427,9 +13430,6 @@ class IntraTextAnalyzer(Analyzer):
     def findnames(self, html):
         return [self.findbyre(r'<b>(.*?)<', html)] + \
                self.findallbyre(r'<FONT[^<>]*>(.*?)<', html)
-
-    #    def findlanguagesspoken(self, html):
-    #        return self.findallbyre(r'<span class=LI>([^<>]*) - ', html, 'language')
 
     def findmixedrefs(self, html):
         return self.finddefaultmixedrefs(html, includesocial=False)
@@ -15413,7 +15413,7 @@ def main(*args: Tuple[str, ...]) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    @param args: command line arguments
+    :param args: command line arguments
     """
     item = None
     options = {}

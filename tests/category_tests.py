@@ -248,11 +248,10 @@ class CategoryNewestPages(TestCase):
         cat = pywikibot.Category(self.get_site(), 'Catégorie:Yukon Quest 2015')
         last = pywikibot.Timestamp.max
         count = 0
-        for page in cat.newest_pages():
+        for count, page in enumerate(cat.newest_pages(), start=1):
             creation_stamp = page.oldest_revision.timestamp
             self.assertLessEqual(creation_stamp, last)
             last = creation_stamp
-            count += 1
         self.assertEqual(count, cat.categoryinfo['size'])
 
 

@@ -569,13 +569,13 @@ class TestPreloadingGenerator(DefaultSiteTestCase):
         links = [page for page in self.site.pagelinks(mainpage, total=20)
                  if page.exists()]
         count = 0
-        for page in PreloadingGenerator(links, groupsize=20):
+        for count, page in enumerate(
+                PreloadingGenerator(links, groupsize=20), start=1):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             self.assertLength(page._revisions, 1)
             self.assertIsNotNone(page._revisions[page._revid].text)
             self.assertFalse(hasattr(page, '_pageprops'))
-            count += 1
         self.assertLength(links, count)
 
     def test_low_step(self):
@@ -584,13 +584,13 @@ class TestPreloadingGenerator(DefaultSiteTestCase):
         links = [page for page in self.site.pagelinks(mainpage, total=20)
                  if page.exists()]
         count = 0
-        for page in PreloadingGenerator(links, groupsize=10):
+        for count, page in enumerate(
+                PreloadingGenerator(links, groupsize=10), start=1):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             self.assertLength(page._revisions, 1)
             self.assertIsNotNone(page._revisions[page._revid].text)
             self.assertFalse(hasattr(page, '_pageprops'))
-            count += 1
         self.assertLength(links, count)
 
     def test_order(self):
@@ -598,16 +598,15 @@ class TestPreloadingGenerator(DefaultSiteTestCase):
         mainpage = self.get_mainpage()
         links = [page for page in self.site.pagelinks(mainpage, total=20)
                  if page.exists()]
-        count = 0
-        for page in PreloadingGenerator(links, groupsize=10):
+        count = -1
+        for count, page in enumerate(PreloadingGenerator(links, groupsize=10)):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             self.assertLength(page._revisions, 1)
             self.assertIsNotNone(page._revisions[page._revid].text)
             self.assertFalse(hasattr(page, '_pageprops'))
             self.assertEqual(page, links[count])
-            count += 1
-        self.assertLength(links, count)
+        self.assertLength(links, count + 1)
 
 
 class TestDequePreloadingGenerator(DefaultSiteTestCase):
@@ -667,7 +666,6 @@ class WikibaseItemFilterPageGeneratorTestCase(TestCase):
         gen = WikibaseItemFilterPageGenerator(pages, has_item=False)
         self.assertLength(list(gen), 0)
 
-    @unittest.expectedFailure
     def test_filter_pages_without_item(self):
         """Test WikibaseItemFilterPageGenerator on pages without item."""
         gf = pagegenerators.GeneratorFactory(site=self.site)

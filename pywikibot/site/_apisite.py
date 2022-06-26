@@ -406,7 +406,7 @@ class APISite(
                 self._loginstatus = _LoginStatus.AS_USER
                 return
 
-            pywikibot.error('{} != {} after {}.login() and successfull '
+            pywikibot.error('{} != {} after {}.login() and successful '
                             '{}.login()'
                             .format(self.userinfo['name'],
                                     self.username(),
@@ -1055,11 +1055,8 @@ class APISite(
         :param name: The extension to check for, case sensitive
         :return: If the extension is loaded
         """
-        extensions = self.siteinfo['extensions']
-        for ext in extensions:
-            if 'name' in ext and ext['name'] == name:
-                return True
-        return False
+        return any('name' in ext and ext['name'] == name
+                   for ext in self.siteinfo['extensions'])
 
     @property
     def siteinfo(self) -> Siteinfo:
@@ -1533,9 +1530,7 @@ class APISite(
 
         req._warning_handler = warn_handler
         data = req.submit()
-
-        if 'query' in data:
-            data = data['query']
+        data = data.get('query', data)
 
         if 'tokens' in data and data['tokens']:
             user_tokens = {key[:-5]: val
@@ -1711,7 +1706,7 @@ class APISite(
     @need_right('edit')
     def editpage(
         self,
-        page: 'pywikibot.page.BasBaseePage',
+        page: 'pywikibot.page.BasePage',
         summary: Optional[str] = None,
         minor: bool = True,
         notminor: bool = False,
@@ -2481,8 +2476,6 @@ class APISite(
         finally:
             self.unlock_page(page)
 
-    # TODO: implement undelete
-
     @need_right('block')
     def blockuser(
         self,
@@ -2499,7 +2492,7 @@ class APISite(
         """
         Block a user for certain amount of time and for a certain reason.
 
-        .. seealso:: :api:`Block
+        .. seealso:: :api:`Block`
 
         :param user: The username/IP to be blocked without a namespace.
         :param expiry: The length or date/time when the block expires. If

@@ -41,7 +41,7 @@ import re
 import stat
 import sys
 import types
-from locale import getdefaultlocale
+from locale import getlocale
 from os import environ, getenv
 from pathlib import Path
 from textwrap import fill
@@ -497,7 +497,7 @@ userinterface = 'terminal'
 userinterface_init_kwargs = {}  # type: Dict[str, str]
 
 # i18n setting for user interface language
-# default is obtained from :py:obj:`locale.getdefaultlocale`
+# default is obtained from locale.getlocale
 userinterface_lang = None
 
 # Should we transliterate characters that do not exist in the console
@@ -1084,20 +1084,18 @@ if console_encoding is None:
 if OSWIN32 and editor is None:
     editor = _detect_win32_editor()
 
-if OSWIN32 and editor:
-    # single character string literals from
-    # https://docs.python.org/3/reference/lexical_analysis.html#string-and-bytes-literals
-    # encode('unicode-escape') also changes Unicode characters
-    if set(editor) & set('\a\b\f\n\r\t\v'):
-        warning(
-            'The editor path contains probably invalid escaped '
-            'characters. Make sure to use a raw-string (r"..." or '
-            "r'...'), forward slashes as a path delimiter or to escape the "
-            'normal path delimiter.')
+# single character string literals from
+# https://docs.python.org/3/reference/lexical_analysis.html#string-and-bytes-literals
+# encode('unicode-escape') also changes Unicode characters
+if OSWIN32 and editor and set(editor) & set('\a\b\f\n\r\t\v'):
+    warning(
+        'The editor path contains probably invalid escaped characters. Make '
+        'sure to use a raw-string (r"..." or r\'...\'), forward slashes as a '
+        'path delimiter or to escape the normal path delimiter.')
 
 if userinterface_lang is None:
     userinterface_lang = os.getenv('PYWIKIBOT_USERINTERFACE_LANG') \
-        or getdefaultlocale()[0]
+        or getlocale()[0]
     if userinterface_lang is None or userinterface_lang == 'C':
         userinterface_lang = 'en'
     else:
@@ -1139,7 +1137,7 @@ if __name__ == '__main__':  # pragma: no cover
 
     for _name in sorted(globals().keys()):
         if _name[0] != '_' \
-           and not type(globals()[_name]) in [types.FunctionType,
+           and type(globals()[_name]) not in [types.FunctionType,
                                               types.ModuleType] \
            and (_all or _name in _modified):
             _value = globals()[_name]

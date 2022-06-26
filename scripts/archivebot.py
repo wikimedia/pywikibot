@@ -268,7 +268,7 @@ def str2size(string: str) -> Size:
       150K - 150 kilobytes
       2M - 2 megabytes
 
-    @Returns: a tuple ``(size, unit)``, where ``size`` is an integer and
+    :Returns: a tuple ``(size, unit)``, where ``size`` is an integer and
         unit is ``'B'`` (bytes) or ``'T'`` (threads).
     """
     match = re.fullmatch(r'(\d{1,3}(?: \d{3})+|\d+) *([BkKMT]?)', string)
@@ -464,14 +464,10 @@ class DiscussionPage(pywikibot.Page):
     def is_full(self, max_archive_size: Size) -> bool:
         """Check whether archive size exceeded."""
         size, unit = max_archive_size
-        if self.size() > self.archiver.maxsize:
+        if (self.size() > self.archiver.maxsize
+            or unit == 'B' and self.size() >= size
+                or unit == 'T' and len(self.threads) >= size):
             self.full = True  # xxx: this is one-way flag
-        elif unit == 'B':
-            if self.size() >= size:
-                self.full = True
-        elif unit == 'T':
-            if len(self.threads) >= size:
-                self.full = True
         return self.full
 
     def feed_thread(self, thread: DiscussionThread,
@@ -564,12 +560,11 @@ class PageArchiver:
             value = value.replace('_', ' ')
         elif attr == 'maxarchivesize':
             size, unit = str2size(value)
-            if unit == 'B':
-                if size > self.maxsize:
-                    value = '{} K'.format(self.maxsize // 1024)
-                    warn('Siteinfo "maxarticlesize" exceeded. Decreasing '
-                         '"maxarchivesize" to ' + value,
-                         ResourceWarning, stacklevel=2)
+            if unit == 'B' and size > self.maxsize:
+                value = '{} K'.format(self.maxsize // 1024)
+                warn('Siteinfo "maxarticlesize" exceeded. Decreasing '
+                     '"maxarchivesize" to ' + value,
+                     ResourceWarning, stacklevel=2)
         self.attributes[attr] = [value, out]
 
     def saveables(self) -> List[str]:
@@ -893,8 +888,9 @@ def main(*args: str) -> None:
                                                follow_redirects=False,
                                                namespaces=ns))
         if filename:
-            for pg in open(filename).readlines():
-                pagelist.append(pywikibot.Page(site, pg, ns=10))
+            with open(filename) as f:
+                for pg in f.readlines():
+                    pagelist.append(pywikibot.Page(site, pg, ns=10))
         if pagename:
             pagelist.append(pywikibot.Page(site, pagename, ns=3))
         pagelist.sort()

@@ -30,7 +30,7 @@ class LoggingFormatter(logging.Formatter):
             record.args = (msg,)
 
         # remove color tags
-        if record.msg:
+        if record.msg and isinstance(record.msg, str):
             record.msg = new_colorTagR.sub('', record.msg)
 
         return super().format(record).rstrip()

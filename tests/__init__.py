@@ -101,6 +101,7 @@ library_test_modules = {
     'logentries',
     'login',
     'mediawikiversion',
+    'memento',
     'mysql',
     'namespace',
     'oauth',
@@ -158,7 +159,6 @@ script_test_modules = {
     'script',
     'template_bot',
     'uploadscript',
-    'weblinkchecker'
 }
 
 disabled_test_modules = {
