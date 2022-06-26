@@ -609,14 +609,17 @@ class TestPropertyGenerator(TestCase):
 
     def test_two_continuations_limited(self):
         """Test PropertyGenerator with many limited props and continuations."""
+        total = 20
+        increment = total // 4
         mainpage = self.get_mainpage()
-        links = list(self.site.pagelinks(mainpage, total=30))
-        titles = [link.title(with_section=False) for link in links]
+        links = tuple(self.site.pagelinks(mainpage, total=total))
+        titles = (link.title(with_section=False) for link in links)
         gen = api.PropertyGenerator(
-            site=self.site, prop='info|categoryinfo|langlinks|templates',
+            site=self.site,
+            prop='info|categoryinfo|langlinks|templates',
             parameters={'titles': '|'.join(titles)})
         # Force the generator into continuation mode
-        gen.set_query_increment(5)
+        gen.set_query_increment(increment)
 
         count = 0
         for count, pagedata in enumerate(gen, start=1):
@@ -626,6 +629,9 @@ class TestPropertyGenerator(TestCase):
             else:
                 self.assertIn('pageid', pagedata)
         self.assertLength(links, count)
+        self.assertGreaterEqual(total, count)
+        # ensure we have enough continuations
+        self.assertGreater(count, total // 2 + 1)
 
 
 class TestDryQueryGeneratorNamespaceParam(TestCase):
