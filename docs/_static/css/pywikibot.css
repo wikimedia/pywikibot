@@ -28,3 +28,10 @@ a.headerlink:hover {
     background-color: #069;
     color: white;
 }
+code.xref {
+    color: #069;
+    font-size: 1.2em
+}
+code.xref:hover {
+    color: #900;
+}
