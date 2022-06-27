@@ -14592,6 +14592,7 @@ class WikiAnalyzer(Analyzer):
                                ], html)
         if result:
             return self.findbyre(r'(\w+://[\w/\.\-_]+)', result)
+        return None
 
     def findwebpages(self, html):
         return self.getinfos(['קישור'], html)
@@ -14650,6 +14651,7 @@ class WikiAnalyzer(Analyzer):
                                ], html)
         if result and '.' in result:
             return result.split(':')[-1]
+        return None
 
     def findcoatarms(self, html):
         return self.getinfo(['герб', 'herb', 'escudo', 'icone', 'пасада', 'герб'], html)
@@ -14859,6 +14861,7 @@ class BibliotecaNacionalAnalyzer(UrlAnalyzer):
         if section:
             section = self.findbyre(r'(?s)>([^<>]*\w[^<>]*)<', section)
             return [','.join(section.split(',')[:1])]
+        return None
 
     def findworkfields(self, html):
         return self.getvalues('Campo de actividad', html, 'subject')
@@ -14944,6 +14947,7 @@ class IasAnalyzer(UrlAnalyzer):
             .format(field), html)
         if prevalue:
             return self.findbyre(r'(?s)^(?:<[^<>]*>|\s)*(.*?)(?:<[^<>]*>|\s)*$', prevalue, dtype, alt=alt)
+        return None
 
     def getvalues(self, field, html, dtype=None, alt=None) -> List[str]:
         if alt is None:
@@ -15024,21 +15028,25 @@ class KunstaspekteAnalyzer(UrlAnalyzer):
         section = self.description(html)
         if section:
             return section.split('\n')
+        return None
 
     def findbirthdate(self, html):
         section = self.description(html)
         if section:
             return self.findbyre(r'\*\s*(\d+)', section)
+        return None
 
     def findbirthplace(self, html):
         section = self.description(html)
         if section:
             return self.findbyre(r'\*\s*\d+(?: in)? ([^-!]*)', section.replace('\n', '!'), 'city')
+        return None
 
     def findincollections(self, html):
         section = self.findbyre(r'(?s)<h3>collection/s</h3>(.*?)</div>', html)
         if section:
             return self.findallbyre(r'">(.*?)<', section, 'museum')
+        return None
 
 
 class FotomuseumAnalyzer(UrlAnalyzer):
