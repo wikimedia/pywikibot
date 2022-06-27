@@ -10940,6 +10940,7 @@ class WebumeniaAnalyzer(Analyzer):
         section = self.findbyre(r'(?s)Externé odkazy</h4>(.*?)</div>', html)
         if section:
             return self.findallbyre(r'href="([^"]*)" target="_blank"', section)
+        return None
 
 
 class InvaluableAnalyzer(Analyzer):
