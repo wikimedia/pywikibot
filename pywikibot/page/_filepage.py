@@ -217,7 +217,7 @@ class FilePage(Page):
 
         .. versionadded:: 7.1
         """
-        return bool(list(self.usingPages(total=1)))
+        return bool(list(self.using_pages(total=1)))
 
     def upload(self, source: str, **kwargs) -> bool:
         """
@@ -311,7 +311,7 @@ class FilePage(Page):
         """
         Iterate all global usage for this page.
 
-        .. seealso:: :meth:`usingPages`
+        .. seealso:: :meth:`using_pages`
 
         :param total: iterate no more than this number of pages in total
         :return: a generator that yields Pages also on sites different from
