@@ -1053,7 +1053,7 @@ def _check_user_config_types(
 _check_user_config_types(_exec_globals, _public_globals, _imports)
 
 # Copy the user config settings into globals
-_modified = {_key for _key in _public_globals.keys()
+_modified = {_key for _key in _public_globals
              if _exec_globals[_key] != globals()[_key]}
 
 if 'user_agent_format' in _modified:
@@ -1135,7 +1135,7 @@ if __name__ == '__main__':  # pragma: no cover
         else:
             warning('Unknown arg {} ignored'.format(_arg))
 
-    for _name in sorted(globals().keys()):
+    for _name in sorted(globals()):
         if _name[0] != '_' \
            and type(globals()[_name]) not in [types.FunctionType,
                                               types.ModuleType] \
@@ -1154,7 +1154,7 @@ if __name__ == '__main__':  # pragma: no cover
             output('{}={}'.format(_name, _value))
 
 # cleanup all locally-defined variables
-for __var in list(globals().keys()):
+for __var in list(globals()):
     if __var.startswith('_') and not __var.startswith('__'):
         del sys.modules[__name__].__dict__[__var]
 

@@ -77,18 +77,18 @@ class Request(MutableMapping):
     below) get passed as commands to api.php, and can be get or set
     using the dict interface. All attributes must be strings. Use an
     empty string for parameters that don't require a value. For example,
-    Request(action="query", titles="Foo bar", prop="info", redirects="")
+    ``Request(action="query", titles="Foo bar", prop="info", redirects="")``
     corresponds to the API request
-    "api.php?action=query&titles=Foo%20bar&prop=info&redirects"
+    ``api.php?action=query&titles=Foo%20bar&prop=info&redirects``
 
     This is the lowest-level interface to the API, and can be used for any
     request that a particular site's API supports. See the API documentation
     (https://www.mediawiki.org/wiki/API) and site-specific settings for
     details on what parameters are accepted for each request type.
 
-    Uploading files is a special case: to upload, the parameter "mime" must
-    contain a dict, and the parameter "file" must be set equal to a valid
-    filename on the local computer, _not_ to the content of the file.
+    Uploading files is a special case: to upload, the parameter `mime` must
+    contain a dict, and the parameter `file` must be set equal to a valid
+    filename on the local computer, *not* to the content of the file.
 
     Returns a dict containing the JSON data returned by the wiki. Normally,
     one of the dict keys will be equal to the value of the 'action'
@@ -104,15 +104,15 @@ class Request(MutableMapping):
     >>> # add a new parameter
     >>> r['siprop'] = "namespaces"
     >>> # note that "uiprop" param gets added automatically
-    >>> str(r.action)
+    >>> r.action
     'query'
-    >>> sorted(str(key) for key in r._params.keys())
+    >>> sorted(r._params)
     ['action', 'meta', 'siprop']
-    >>> [str(key) for key in r._params['action']]
+    >>> r._params['action']
     ['query']
-    >>> [str(key) for key in r._params['meta']]
+    >>> r._params['meta']
     ['userinfo', 'siteinfo']
-    >>> [str(key) for key in r._params['siprop']]
+    >>> r._params['siprop']
     ['namespaces']
     >>> data = r.submit()
     >>> isinstance(data, dict)
@@ -121,9 +121,8 @@ class Request(MutableMapping):
     True
     >>> 'query' in data
     True
-    >>> sorted(str(key) for key in data['query'].keys())
+    >>> sorted(data['query'])
     ['namespaces', 'userinfo']
-
     """
 
     # To make sure the default value of 'parameters' can be identified.
@@ -383,7 +382,7 @@ class Request(MutableMapping):
 
     def keys(self):
         """Implement dict interface."""
-        return list(self._params.keys())
+        return list(self._params)
 
     def __iter__(self):
         """Implement dict interface."""
@@ -410,8 +409,7 @@ class Request(MutableMapping):
         if hasattr(self, '__defaulted'):
             return
 
-        if self.mime is not None \
-           and set(self._params.keys()) & set(self.mime.keys()):
+        if self.mime is not None and set(self._params) & set(self.mime):
             raise ValueError('The mime and params shall not share the '
                              'same keys.')
 
