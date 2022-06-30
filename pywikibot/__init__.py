@@ -1319,23 +1319,30 @@ def _flush(stop: bool = True) -> None:
                'Estimated time remaining: {sec}<<default>>'
                .format(num=num, sec=sec))
 
+    exit_queue = None
     if _putthread is not threading.current_thread():
-        while (_putthread.is_alive()
-               and (page_put_queue.qsize() > 0
-                    or page_put_queue_busy.qsize() > 0)):
+        while _putthread.is_alive() and not (page_put_queue.empty()
+                                             and page_put_queue_busy.empty()):
             try:
                 _putthread.join(1)
             except KeyboardInterrupt:
-                if input_yn('There are {} pages remaining in the queue. '
-                            'Estimated time remaining: {}\nReally exit?'
-                            .format(*remaining()),
-                            default=False, automatic_quit=False):
-                    # delete the put queue
-                    with page_put_queue.mutex:
-                        page_put_queue.all_tasks_done.notify_all()
-                        page_put_queue.queue.clear()
-                        page_put_queue.not_full.notify_all()
-                    break
+                exit_queue = input_yn(
+                    'There are {} pages remaining in the queue. Estimated '
+                    'time remaining: {}\nReally exit?'.format(*remaining()),
+                    default=False, automatic_quit=False)
+                break
+
+    if exit_queue is False:
+        # handle the queue when _putthread is stopped after KeyboardInterrupt
+        with suppress(KeyboardInterrupt):
+            async_manager(block=False)
+
+    if not stop:
+        # delete the put queue
+        with page_put_queue.mutex:
+            page_put_queue.all_tasks_done.notify_all()
+            page_put_queue.queue.clear()
+            page_put_queue.not_full.notify_all()
 
     # only need one drop() call because all throttles use the same global pid
     with suppress(IndexError):
@@ -1343,14 +1350,13 @@ def _flush(stop: bool = True) -> None:
         log('Dropped throttle(s).')
 
 
-atexit.register(_flush)
-
-
 # Create a separate thread for asynchronous page saves (and other requests)
-def async_manager() -> None:
+def async_manager(block=True) -> None:
     """Daemon; take requests from the queue and execute them in background."""
     while True:
-        (request, args, kwargs) = page_put_queue.get()
+        if not block and page_put_queue.empty():
+            break
+        (request, args, kwargs) = page_put_queue.get(block)
         page_put_queue_busy.put(None)
         if request is None:
             break
@@ -1375,3 +1381,4 @@ page_put_queue_busy = Queue(_config.max_queue_size)  # type: Queue
 _putthread = threading.Thread(target=async_manager,
                               name='Put-Thread',  # for debugging purposes
                               daemon=True)
+atexit.register(_flush)
