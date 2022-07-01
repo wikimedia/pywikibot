@@ -180,7 +180,8 @@ class TestUserMethods(DefaultSiteTestCase):
             self.skipTest('User {} has no contributions on site {}.'
                           .format(mysite.user(), mysite))
         self.assertLessEqual(len(uc), 10)
-        last = uc[0]
+        self.assertEqual(uc[0], user.last_edit)
+        self.assertEqual(uc[-1], user.first_edit)
         for contrib in uc:
             self.assertIsInstance(contrib, tuple)
             self.assertLength(contrib, 4)
@@ -189,7 +190,6 @@ class TestUserMethods(DefaultSiteTestCase):
             self.assertIsInstance(i, int)
             self.assertIsInstance(t, Timestamp)
             self.assertIsInstance(c, str)
-        self.assertEqual(last, user.last_edit)
 
     def test_logevents(self):
         """Test the User.logevents() method."""
