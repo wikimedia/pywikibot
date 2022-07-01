@@ -13831,21 +13831,25 @@ class BelgianPhotographerAnalyzer(Analyzer):
         section = self.getvalue('Life dates', html)
         if section:
             return self.findbyre(r', (\d+) - ', section)
+        return None
 
     def finddeathdate(self, html):
         section = self.getvalue('Life dates', html)
         if section:
             return self.findbyre(r', \d+ - [\w\s]+, (\d{4})', section)
+        return None
 
     def findbirthplace(self, html):
         section = self.getvalue('Life dates', html)
         if section:
             return self.findbyre(r'(.*), \d+ - ', section, 'city')
+        return None
 
     def finddeathplace(self, html):
         section = self.getvalue('Life dates', html)
         if section:
             return self.findbyre(r', \d+ - ([^<>]+), \d{4}', section, 'city')
+        return None
 
     def findworkplaces(self, html):
         return [self.findbyre(r'[\d\s\-\+]+(.*)', section) for section in self.getvalues('Locations', html)]
@@ -13857,6 +13861,7 @@ class BelgianPhotographerAnalyzer(Analyzer):
         section = self.getvalue('Affiliated entity', html)
         if section:
             return self.findallbyre('<a[^<>]+title="(.*?)"', section, 'organization')
+        return None
 
     def findoccupations(self, html):
         return ['Q33231']
@@ -13903,6 +13908,7 @@ class AlkindiAnalyzer(Analyzer):
         section = self.getvalue('Language', html)
         if section:
             return self.findallbyre(r'([\w\s]+)', section, 'language')
+        return None
 
     def findbirthplace(self, html):
         return self.getvalue('Place of birth', html, 'city')
@@ -13945,6 +13951,7 @@ class ZobodatAnalyzer(Analyzer):
         result = self.findbyre(r'(?s)</h1>\s*<p>(.*?)</p>', html)
         if result:
             return self.TAGRE.sub(' ', result)
+        return None
 
     def findbirthdate(self, html):
         return self.findbyre(r'>\*\s*([^\s<>]+)', html)
@@ -13965,6 +13972,7 @@ class ZobodatAnalyzer(Analyzer):
         section = self.findbyre(r'</h1>\s*<p>(.*?)</p>', html)
         if section:
             return self.findallbyre('href="(.*?)"', section)
+        return None
 
 
 class OxfordMedievalAnalyzer(Analyzer):
@@ -14048,6 +14056,7 @@ class PatrinumAnalyzer(Analyzer):
         section = self.getvalue('Autre site web', html)
         if section:
             return self.findallbyre(r'"(\w+://[^"<>]*)"', section)
+        return None
 
 
 class JwaAnalyzer(Analyzer):
