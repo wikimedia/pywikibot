@@ -106,7 +106,11 @@ from pywikibot import pagegenerators as pg
 from pywikibot import textlib
 from pywikibot.backports import List
 from pywikibot.bot import ConfigParserBot, OptionHandler, WikidataBot
-from pywikibot.exceptions import InvalidTitleError, NoPageError
+from pywikibot.exceptions import (
+    InvalidPageError,
+    InvalidTitleError,
+    NoPageError,
+)
 
 
 willstop = False
@@ -203,15 +207,23 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         titles.append(temp.title(with_ns=False))
         return titles
 
-    def _template_link_target(self, item, link_text
-                              ) -> Optional[pywikibot.ItemPage]:
+    @staticmethod
+    def template_link_target(item: pywikibot.ItemPage,
+                             link_text: str) -> Optional[pywikibot.ItemPage]:
+        """Find the ItemPage target for a given link text.
+
+        .. versionchanged:: 7.4
+           Only follow the redirect target if redirect page has no
+           wikibase item.
+        """
         link = pywikibot.Link(link_text)
         linked_page = pywikibot.Page(link)
         try:
             exists = linked_page.exists()
-        except InvalidTitleError:
-            pywikibot.error('"{}" is not a valid title so it cannot be linked.'
-                            ' Skipping.'.format(link_text))
+        except (InvalidTitleError, InvalidPageError):
+            pywikibot.error('"{}" is not a valid title or the page itself is '
+                            'invalid so it cannot be linked. Skipping.'
+                            .format(link_text))
             return None
 
         if not exists:
@@ -219,23 +231,24 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
                              'Skipping.'.format(linked_page))
             return None
 
-        if linked_page.isRedirectPage():
-            linked_page = linked_page.getRedirectTarget()
-
-        try:
-            linked_item = pywikibot.ItemPage.fromPage(linked_page)
-        except NoPageError:
-            linked_item = None
+        while True:
+            try:
+                linked_item = pywikibot.ItemPage.fromPage(linked_page)
+            except NoPageError:
+                if linked_page.isRedirectPage():
+                    linked_page = linked_page.getRedirectTarget()
+                    continue
+                linked_item = None
+            break
 
         if not linked_item or not linked_item.exists():
             pywikibot.output('{} does not have a wikidata item to link with. '
                              'Skipping.'.format(linked_page))
-            return None
-
-        if linked_item.title() == item.title():
+            linked_item = None
+        elif linked_item.title() == item.title():
             pywikibot.output('{} links to itself. Skipping.'
                              .format(linked_page))
-            return None
+            linked_item = None
 
         return linked_item
 
@@ -295,7 +308,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
                     for match in pywikibot.link_regex.finditer(value):
                         matched = True
                         link_text = match.group(1)
-                        linked_item = self._template_link_target(
+                        linked_item = self.template_link_target(
                             item, link_text)
                         added = False
                         if linked_item:
@@ -321,7 +334,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
                             .format(claim.getID(), field, value))
                         continue
 
-                    linked_item = self._template_link_target(item, value)
+                    linked_item = self.template_link_target(item, value)
                     if not linked_item:
                         continue
 
