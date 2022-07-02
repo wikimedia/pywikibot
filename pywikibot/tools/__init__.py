@@ -978,7 +978,7 @@ def filter_unique(iterable, container=None, key=None, add=None):
 
     Beware that key=id is only useful for cases where id() is not unique.
 
-    Note: This is not thread safe.
+    .. warning:: This is not thread safe.
 
     .. versionadded: 3.0
 

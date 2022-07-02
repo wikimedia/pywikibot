@@ -110,22 +110,22 @@ GENERATOR OPTIONS
                     across all namespaces.
 
 -logevents          Work on articles that were on a specified Special:Log.
-                    The value may be a comma separated list of these values:
+                    The value may be a comma separated list of these values::
 
                         logevent,username,start,end
 
-                    or for backward compatibility:
+                    or for backward compatibility::
 
                         logevent,username,total
 
-                    Note: 'start' is the most recent date and log events are
-                    iterated from present to past. If 'start'' is not provided,
-                    it means 'now'; if 'end' is not provided, it means 'since
-                    the beginning'.
+                    .. note:: 'start' is the most recent date and log
+                       events are iterated from present to past. If
+                       'start' is not provided, it means 'now'; if 'end'
+                       is not provided, it means 'since the beginning'.
 
                     To use the default value, use an empty string.
                     You have options for every type of logs given by the
-                    log event parameter which could be one of the following:
+                    log event parameter which could be one of the following::
 
                         spamblacklist, titleblacklist, gblblock, renameuser,
                         globalauth, gblrights, gblrename, abusefilter,
@@ -251,7 +251,7 @@ GENERATOR OPTIONS
                     and works on the resulting pages.
 
 -sparqlendpoint     Specify SPARQL endpoint URL (optional).
-                    (Example : -sparqlendpoint:http://myserver.com/sparql)
+                    (Example: -sparqlendpoint:http://myserver.com/sparql)
 
 -searchitem         Takes a search string and works on Wikibase pages that
                     contain it.
@@ -350,14 +350,14 @@ FILTER OPTIONS
 -namespace          specified namespaces. Separate multiple namespace
 -ns                 numbers or names with commas.
 
-                    Examples:
+                    Examples::
 
                     -ns:0,2,4
                     -ns:Help,MediaWiki
 
                     You may use a preleading "not" to exclude the namespace.
 
-                    Examples:
+                    Examples::
 
                     -ns:not:2,3
                     -ns:not:Help,File
@@ -378,19 +378,23 @@ FILTER OPTIONS
 
                     Examples:
 
-                    P1=Q2 (property P1 must contain value Q2),
-                    P3=Q4,P5=Q6,P6=Q7 (property P3 with value Q4 and
-                    qualifiers: P5 with value Q6 and P6 with value Q7).
+                    .. code-block:: shell
+
+                       P1=Q2 (property P1 must contain value Q2),
+                       P3=Q4,P5=Q6,P6=Q7 (property P3 with value Q4 and
+                       qualifiers: P5 with value Q6 and P6 with value Q7).
+
                     Value can be page ID, coordinate in format:
                     latitude,longitude[,precision] (all values are in decimal
                     degrees), year, or plain string.
+
                     The argument can be provided multiple times and the item
                     page will be returned only if all claims are present.
                     Argument can be also given as "-onlyif:expression".
 
--onlyifnot          A claim the page must not contain, otherwise the item won't
-                    be returned.
-                    For usage and examples, see -onlyif above.
+-onlyifnot          A claim the page must not contain, otherwise the
+                    item won't be returned. For usage and examples, see
+                    `-onlyif` above.
 
 -ql                 Filter pages based on page quality.
                     This is only applicable if contentmodel equals
@@ -1743,13 +1747,13 @@ def UserContributionsGenerator(username: str,
     return gen
 
 
-def NamespaceFilterPageGenerator(generator: Iterable['pywikibot.page.Page'],
-                                 namespaces: Union[
-                                     FrozenSet['pywikibot.site.Namespace'],
-                                     NAMESPACE_OR_STR_TYPE,
-                                     Sequence[NAMESPACE_OR_STR_TYPE]],
-                                 site: OPT_SITE_TYPE = None
-                                 ) -> Iterator['pywikibot.page.Page']:
+def NamespaceFilterPageGenerator(
+    generator: Iterable['pywikibot.page.Page'],
+    namespaces: Union[FrozenSet['pywikibot.site.Namespace'],
+                      NAMESPACE_OR_STR_TYPE,
+                      Sequence[NAMESPACE_OR_STR_TYPE]],
+    site: OPT_SITE_TYPE = None
+) -> Iterator['pywikibot.page.Page']:
     """
     A generator yielding pages from another generator in given namespaces.
 
@@ -1757,8 +1761,8 @@ def NamespaceFilterPageGenerator(generator: Iterable['pywikibot.page.Page'],
     of that site, otherwise the namespaces are validated using the default
     site.
 
-    NOTE: API-based generators that have a "namespaces" parameter perform
-    namespace filtering more efficiently than this generator.
+    .. note:: API-based generators that have a "namespaces" parameter
+       perform namespace filtering more efficiently than this generator.
 
     :param namespaces: list of namespace identifiers to limit results
     :param site: Site for generator results; mandatory if
@@ -1977,8 +1981,9 @@ class RegexFilter:
         Uses regex option re.IGNORECASE depending on the quantifier parameter.
 
         If ignore_namespace is False, the whole page title is compared.
-        NOTE: if you want to check for a match at the beginning of the title,
-        you have to start the regex with "^"
+
+        .. note:: if you want to check for a match at the beginning of
+           the title, you have to start the regex with "^"
 
         :param generator: another generator
         :param regex: a regex which should match the page title

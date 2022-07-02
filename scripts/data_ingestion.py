@@ -172,8 +172,8 @@ class Photo(pywikibot.FilePage):
         """
         Populate format string with %(name)s entries using metadata.
 
-        Note: this does not clean the title, so it may be unusable as
-        a MediaWiki page title, and cause an API exception when used.
+        .. note:: this does not clean the title, so it may be unusable as
+           a MediaWiki page title, and cause an API exception when used.
 
         :param fmt: format string
         :return: formatted string
