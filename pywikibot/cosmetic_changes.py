@@ -748,11 +748,11 @@ class CosmeticChangesToolkit:
 
         == Section title ==
 
-        :NOTE: This space is recommended in the syntax help on the
-            English and German Wikipedias. It is not wanted on Lojban and
-            English Wiktionaries (T168399, T169064) and it might be that
-            it is not wanted on other wikis. If there are any complaints,
-            please file a bug report.
+        .. note:: This space is recommended in the syntax help on the
+           English and German Wikipedias. It is not wanted on Lojban and
+           English Wiktionaries (:phab:`T168399`, :phab:`T169064`) and
+           it might be that it is not wanted on other wikis. If there
+           are any complaints, please file a bug report.
         """
         if self.site.sitename in ['wiktionary:jbo', 'wiktionary:en']:
             return text
@@ -766,10 +766,10 @@ class CosmeticChangesToolkit:
         """
         Add a space between the * or # and the text.
 
-        :NOTE: This space is recommended in the syntax help on the
-            English, German and French Wikipedias. It might be that it
-            is not wanted on other wikis. If there are any complaints,
-            please file a bug report.
+        .. note:: This space is recommended in the syntax help on the
+           English, German and French Wikipedias. It might be that it
+           is not wanted on other wikis. If there are any complaints,
+           please file a bug report.
         """
         if not self.template:
             exceptions = ['comment', 'math', 'nowiki', 'pre',

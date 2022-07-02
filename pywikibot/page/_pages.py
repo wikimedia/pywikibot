@@ -2543,7 +2543,10 @@ class Category(Page):
         """
         return self.site.categoryinfo(self)
 
-    def newest_pages(self, total=None):
+    def newest_pages(
+        self,
+        total: Optional[int] = None
+    ) -> Generator[Page, None, None]:
         """
         Return pages in a category ordered by the creation date.
 
@@ -2560,12 +2563,12 @@ class Category(Page):
         checked).
 
         :param total: The total number of pages queried.
-        :type total: int
         :return: A page generator of all pages in a category ordered by the
-            creation date. From newest to oldest. Note: It currently only
-            returns Page instances and not a subclass of it if possible. This
-            might change so don't expect to only get Page instances.
-        :rtype: generator
+            creation date. From newest to oldest.
+
+            .. note:: It currently only returns Page instances and not a
+               subclass of it if possible. This might change so don't
+               expect to only get Page instances.
         """
         def check_cache(latest):
             """Return the cached pages in order and not more than total."""

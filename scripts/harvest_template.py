@@ -243,7 +243,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         """
         Compare bot's (global) and provided (local) options.
 
-        :see: :py:obj:`OptionHandler`
+        .. seealso:: :class:`OptionHandler`
         """
         default = self.opt[option]
         local = handler.opt[option]

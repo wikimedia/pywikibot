@@ -384,9 +384,9 @@ class QueryGenerator(_RequestWrapper):
     def support_namespace(self) -> bool:
         """Check if namespace is a supported parameter on this query.
 
-        Note: this function will be removed when self.set_namespace() will
-              throw TypeError() instead of just giving a warning.
-              See T196619.
+        .. note:: this function will be removed when
+           :meth:`set_namespace` will throw TypeError() instead of just
+           giving a warning. See :phab:`T196619`.
 
         :return: True if yes, False otherwise
         """

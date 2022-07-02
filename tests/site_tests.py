@@ -1060,9 +1060,9 @@ class TestImageUsage(DefaultSiteTestCase):
 
         If there are no images included in main page it'll skip all tests.
 
-        Note: This is not implemented as setUpClass which would be invoked
-        while initialising all tests, to reduce chance of an error preventing
-        all tests from running.
+        .. note:: This is not implemented as setUpClass which would be
+           invoked while initialising all tests, to reduce chance of an
+           error preventing all tests from running.
         """
         if hasattr(self.__class__, '_image_page'):
             return self.__class__._image_page

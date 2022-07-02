@@ -239,9 +239,11 @@ class FilePage(Page):
             codes for which an equivalent callable would return True if all
             UploadError codes are in thet list. If the result is False it'll
             not continue uploading the file and otherwise disable any warning
-            and reattempt to upload the file. NOTE: If report_success is True
-            or None it'll raise an UploadError exception if the static
-            boolean is False.
+            and reattempt to upload the file.
+
+            .. note:: NOTE: If report_success is True or None it'll
+               raise an UploadError exception if the static boolean is
+               False.
         :type ignore_warnings: bool or callable or iterable of str
         :keyword chunk_size: The chunk size in bytesfor chunked
             uploading (see :api:`Upload#Chunked_uploading`). It will

@@ -247,11 +247,11 @@ class DataSite(APISite):
 
     @need_right('edit')
     def editEntity(self, entity, data, bot: bool = True, **kwargs):
-        """
-        Edit entity.
+        """Edit entity.
 
-        Note: This method is unable to create entities other than 'item'
-        if dict with API parameters was passed to 'entity' parameter.
+        .. note:: This method is unable to create entities other than
+           'item' if dict with API parameters was passed to 'entity'
+           parameter.
 
         :param entity: Page to edit, or dict with API parameters
             to use for entity identification
