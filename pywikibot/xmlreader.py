@@ -81,7 +81,8 @@ class XmlDump:
     Usage example:
 
     >>> from pywikibot import xmlreader
-    >>> dump = xmlreader.XmlDump('tests/data/xml/article-pear.xml')
+    >>> name = 'tests/data/xml/article-pear.xml'
+    >>> dump = xmlreader.XmlDump(name, allrevisions=True)
     >>> for elem in dump.parse():
     ...     print(elem.title, elem.revisionid)
     ...
