@@ -104,7 +104,7 @@ from typing import Any, Optional
 import pywikibot
 from pywikibot import pagegenerators as pg
 from pywikibot import textlib
-from pywikibot.backports import List
+from pywikibot.backports import List, Tuple
 from pywikibot.bot import ConfigParserBot, OptionHandler, WikidataBot
 from pywikibot.exceptions import (
     InvalidPageError,
@@ -264,7 +264,9 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
             return default is not local
         return local or default
 
-    def treat_page_and_item(self, page, item) -> None:
+    def treat_page_and_item(self,
+                            page: pywikibot.page.BasePage,
+                            item: pywikibot.page.ItemPage) -> None:
         """Process a single page/item."""
         if willstop:
             raise KeyboardInterrupt
@@ -287,7 +289,10 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
             for field_item in fielddict.items():
                 self.treat_field(page, item, field_item)
 
-    def treat_field(self, page, item, field_item):
+    def treat_field(self,
+                    page: pywikibot.page.BasePage,
+                    item: pywikibot.page.ItemPage,
+                    field_item: Tuple[str, str]) -> None:
         """Process a single field of template fileddict."""
         field, value = field_item
         field = field.strip()
