@@ -1,5 +1,11 @@
 # Scripts Changelog
 
+## 7.5.0
+*current release*
+
+### harvest_templates
+* Only follow redirects in harvest_template.py if no wikibase item exists (:phab:`T311883`)
+
 ## 7.4.0
 *26 June 2022*
 

@@ -1,7 +1,10 @@
 Current release 7.5.0
 ^^^^^^^^^^^^^^^^^^^^^
 
-* *No changes yet*
+* Handle asynchronous page_put_queue after KeyboardInterrupt in Python 3.9+ (:phab:`T311076`)
+* No longer expect a specific namespace alias in cosmetic_changes
+  :meth:`translateAndCapitalizeNamespaces
+  <pywikibot.cosmetic_changes.CosmeticChangesToolkit.translateAndCapitalizeNamespaces>`
 
 Deprecations
 ^^^^^^^^^^^^

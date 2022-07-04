@@ -388,7 +388,11 @@ class CosmeticChangesToolkit:
         return text
 
     def translateAndCapitalizeNamespaces(self, text: str) -> str:
-        """Use localized namespace names."""
+        """Use localized namespace names.
+
+        .. versionchanged:: 7.4
+           No longer expect a specific namespace alias for File:
+        """
         # arz uses English stylish codes
         if self.site.sitename == 'wikipedia:arz':
             return text
