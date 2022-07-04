@@ -938,7 +938,7 @@ def _extract_sections(text: str, headings) -> list:
 def extract_sections(
     text: str, site=None
 ) -> NamedTuple('_Content', [('header', str),  # noqa: F821
-                             ('body', List[Tuple[str, str]]),  # noqa: F821
+                             ('sections', List[Tuple[str, str]]),  # noqa: F821
                              ('footer', str)]):  # noqa: F821
     """
     Return section headings and contents found in text.
@@ -965,8 +965,8 @@ def extract_sections(
 
             result = extract_sections(text, site)
             result.header = "'''A''' is a thing."
-            result.body = [('== History of A ==', 'Some history...'),
-                           ('== Usage of A ==', 'Some usage...')]
+            result.sections = [('== History of A ==', 'Some history...'),
+                               ('== Usage of A ==', 'Some usage...')]
             result.footer = '[[Category:Things starting with A]]'
 
     .. versionadded:: 3.0
