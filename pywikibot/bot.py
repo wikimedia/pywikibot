@@ -98,7 +98,7 @@ import time
 import warnings
 import webbrowser
 from collections import Counter
-from collections.abc import Generator
+from collections.abc import Container, Generator
 from contextlib import closing
 from functools import wraps
 from importlib import import_module
@@ -2247,7 +2247,7 @@ class WikidataBot(Bot, ExistingPageBot):
     def user_add_claim_unless_exists(
             self, item: 'pywikibot.page.ItemPage',
             claim: 'pywikibot.page.Claim',
-            exists_arg: str = '',
+            exists_arg: Container = '',
             source: Optional['BaseSite'] = None,
             logger_callback: Callable[[str], Any] = log,
             **kwargs: Any) -> bool:
