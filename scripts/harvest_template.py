@@ -99,7 +99,7 @@ will not add duplicate claims for the same member:
 #
 import signal
 import sys
-from typing import Any, Optional
+from typing import Any, Iterator, Optional
 
 import pywikibot
 from pywikibot import pagegenerators as pg
@@ -177,7 +177,6 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         :type multi: bool
         """
         super().__init__(**kwargs)
-        # TODO: Make it a list including the redirects to the template
         self.fields = {}
         for key, value in fields.items():
             if isinstance(value, tuple):
@@ -185,6 +184,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
             else:  # backwards compatibility
                 self.fields[key] = (value, PropertyOptionHandler())
         self.cacheSources()
+        # TODO: Make it a list including the redirects to the template
         template_title = template_title.replace('_', ' ')
         self.templateTitles = self.getTemplateSynonyms(template_title)
         self.linkR = textlib.compileLinkR()
@@ -296,12 +296,15 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
     def treat_field(self,
                     item: pywikibot.page.ItemPage,
                     field_item: Tuple[str, str]) -> None:
-        """Process a single field of template fileddict.
+        """Process a single field of template fielddict.
 
         .. versionadded:: 7.4
         """
         field, value = field_item
         field = field.strip()
+        if not field or field not in self.fields:
+            return
+
         site = self.current_page.site
 
         # todo: extend the list of tags to ignore
@@ -309,37 +312,46 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
             # todo: eventually we may want to import the references
             value, tags=['ref'], site=site).strip()
 
-        if not field or not value or field not in self.fields:
+        if not value:
             return
 
         # This field contains something useful for us
         prop, options = self.fields[field]
-        exists_arg = list(self._get_option_with_fallback(options, 'exists'))
-        claim = pywikibot.Claim(self.repo, prop)
+        ppage = pywikibot.PropertyPage(self.repo, prop)
         handler = getattr(self, 'handle_'
-                          + claim.type.lower().replace('-', '_'), None)
+                          + ppage.type.lower().replace('-', '_'), None)
         if not handler:
             pywikibot.info('{} is not a supported datatype.'
-                           .format(claim.type))
+                           .format(ppage.type))
             return
 
-        if handler(claim, value, item, field, exists_arg):
+        exists_arg = set(self._get_option_with_fallback(options, 'exists'))
+        do_multi = self._get_option_with_fallback(options, 'multi')
+
+        for target in handler(value, item, field):
+            claim = ppage.newClaim()
+            claim.setTarget(target)
             # A generator might yield pages from multiple sites
-            self.user_add_claim_unless_exists(
+            added = self.user_add_claim_unless_exists(
                 item, claim, ''.join(exists_arg), site, pywikibot.info)
 
-    def handle_wikibase_item(self, claim, value: str,
+            # Stop after the first match if not supposed to add
+            # multiple values
+            if not do_multi:
+                break
+
+            # Update exists_arg, so we can add more values
+            if added:
+                exists_arg.add('p')
+
+    def handle_wikibase_item(self, value: str,
                              item: pywikibot.page.ItemPage,
-                             field: str,
-                             exists_arg: List[str]) -> bool:
+                             field: str) -> Iterator[pywikibot.ItemPage]:
         """Handle 'wikibase-item' claim type.
 
-        .. note:: `exists_arg` may be modified in place which is reused
-           by the caller method
         .. versionadded:: 7.4
         """
         prop, options = self.fields[field]
-        do_multi = self._get_option_with_fallback(options, 'multi')
         matched = False
 
         # Try to extract a valid page
@@ -347,63 +359,41 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
             matched = True
             link_text = match.group(1)
             linked_item = self.template_link_target(item, link_text)
-            added = False
-
             if linked_item:
-                claim.setTarget(linked_item)
-                added = self.user_add_claim_unless_exists(
-                    item, claim, exists_arg, self.current_page.site,
-                    pywikibot.info)
-                claim = pywikibot.Claim(self.repo, prop)
-
-            # stop after the first match if not supposed to add
-            # multiple values
-            if not do_multi:
-                break
-
-            # update exists_arg, so we can add more values
-            if 'p' not in exists_arg and added:
-                exists_arg += 'p'
+                yield linked_item
 
         if matched:
-            return False
+            return
 
         if not self._get_option_with_fallback(options, 'islink'):
             pywikibot.info(
-                '{} field {} value {} is not a wikilink. Skipping.'
-                .format(claim.getID(), field, value))
-            return False
+                '{} field {} value "{}" is not a wikilink. Skipping.'
+                .format(prop, field, value))
+            return
 
         linked_item = self.template_link_target(item, value)
-        if not linked_item:
-            return False
+        if linked_item:
+            yield linked_item
 
-        claim.setTarget(linked_item)
-        return True
-
-    def handle_string(self, claim, value, *args) -> bool:
+    def handle_string(self, value, *args) -> Iterator[str]:
         """Handle 'string' and 'external-id' claim type.
 
         .. versionadded:: 7.4
         """
-        claim.setTarget(value.strip())
-        return True
+        yield value.strip()
 
     handle_external_id = handle_string
 
-    def handle_url(self, claim, value, *args) -> bool:
+    def handle_url(self, value, *args) -> Iterator[str]:
         """Handle 'url' claim type.
 
         .. versionadded:: 7.4
         """
-        match = self.linkR.search(value)
-        if not match:
-            return False
+        for match in self.linkR.finditer(value):
+            yield match.group('url')
 
-        claim.setTarget(match.group('url'))
-        return True
-
-    def handle_commonsmedia(self, claim, value, *args) -> bool:
+    def handle_commonsmedia(self, value, *args
+                            ) -> Iterator[pywikibot.FilePage]:
         """Handle 'commonsMedia' claim type.
 
         .. versionadded:: 7.4
@@ -414,12 +404,11 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
             image = pywikibot.FilePage(image.getRedirectTarget())
 
         if not image.exists():
-            pywikibot.info("{} doesn't exist. I can't link to it"
+            pywikibot.info("{} doesn't exist so it cannot be linked"
                            .format(image.title(as_link=True)))
-            return False
+            return
 
-        claim.setTarget(image)
-        return True
+        yield image
 
 
 def main(*args: str) -> None:
