@@ -119,7 +119,7 @@ library_test_modules = {
     'textlib',
     'thanks',
     'thread',
-    'timestamp',
+    'time',
     'timestripper',
     'tk',
     'token',

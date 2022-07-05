@@ -11,7 +11,7 @@ import re
 import unittest
 from contextlib import suppress
 
-from pywikibot import Timestamp
+from pywikibot.time import Timestamp
 from tests.aspects import TestCase
 
 
