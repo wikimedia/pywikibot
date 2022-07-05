@@ -1,7 +1,7 @@
 tests.timestamp\_tests module
 =============================
 
-.. automodule:: tests.timestamp_tests
+.. automodule:: tests.time_tests
     :members:
     :undoc-members:
     :show-inheritance:

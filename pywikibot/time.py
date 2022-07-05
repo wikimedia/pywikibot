@@ -1,4 +1,7 @@
-"""Time handling module."""
+"""Time handling module.
+
+.. versionadded:: 7.4
+"""
 #
 # (C) Pywikibot team, 2007-2022
 #
@@ -22,7 +25,7 @@ __all__ = (
     'TZoneUTC',
 )
 
-
+#: ..versionadded:: 7.4
 MW_KEYS = types.MappingProxyType({
     's': 'seconds',
     'h': 'hours',
@@ -57,6 +60,9 @@ class Timestamp(datetime.datetime):
 
     Use Site.server_time() for the current time; this is more reliable
     than using Timestamp.utcnow().
+
+    .. versionchanged:: 7.4
+       moved to :mod:`time` module
     """
 
     mediawikiTSFormat = '%Y%m%d%H%M%S'  # noqa: N815
@@ -74,6 +80,8 @@ class Timestamp(datetime.datetime):
         - ISO8601 format: YYYY-MM-DD[T ]HH:MM:SS[Z|±HH[MM[SS[.ffffff]]]]
         - POSIX format: seconds from Unix epoch S{1,13}[.ffffff]]
 
+        .. versionadded: 7.4
+
         :param ts: Timestamp, datetime.datetime or str
         :return: Timestamp object
         :raises ValueError: conversion failed
@@ -89,7 +97,10 @@ class Timestamp(datetime.datetime):
 
     @staticmethod
     def _from_datetime(dt: datetime.datetime) -> 'Timestamp':
-        """Convert a datetime.datetime timestamp to a Timestamp object."""
+        """Convert a datetime.datetime timestamp to a Timestamp object.
+
+        .. versionadded: 7.4
+        """
         return Timestamp(dt.year, dt.month, dt.day, dt.hour,
                          dt.minute, dt.second, dt.microsecond,
                          dt.tzinfo)
@@ -99,6 +110,8 @@ class Timestamp(datetime.datetime):
         """Convert a string in MW format to a Timestamp object.
 
         Mediwiki timestamp format: YYYYMMDDHHMMSS
+
+        .. versionadded: 7.4
         """
         RE_MW = r'\d{14}$'  # noqa: N806
         m = re.match(RE_MW, timestr)
@@ -115,6 +128,8 @@ class Timestamp(datetime.datetime):
 
         ISO8601 format:
         - YYYY-MM-DD[T ]HH:MM:SS[[.,]ffffff][Z|±HH[MM[SS[.ffffff]]]]
+
+        .. versionadded: 7.4
         """
         RE_ISO8601 = (r'(?:\d{4}-\d{2}-\d{2})(?P<sep>[T ])'  # noqa: N806
                       r'(?:\d{2}:\d{2}:\d{2})(?P<u>[.,]\d{1,6})?'
@@ -155,6 +170,8 @@ class Timestamp(datetime.datetime):
         """Convert a string in POSIX format to a Timestamp object.
 
         POSIX format: SECONDS[.ffffff]]
+
+        .. versionadded: 7.4
         """
         RE_POSIX = r'(?P<S>-?\d{1,13})(?:\.(?P<u>\d{1,6}))?$'  # noqa: N806
         m = re.match(RE_POSIX, timestr)
@@ -176,7 +193,10 @@ class Timestamp(datetime.datetime):
 
     @classmethod
     def _from_string(cls: Type['Timestamp'], timestr: str) -> 'Timestamp':
-        """Convert a string to a Timestamp object."""
+        """Convert a string to a Timestamp object.
+
+        .. versionadded: 7.4
+        """
         handlers = [
             cls._from_mw,
             cls._from_iso8601,
@@ -260,11 +280,16 @@ class Timestamp(datetime.datetime):
         Convert object to a POSIX timestamp.
 
         See Note in datetime.timestamp().
+
+        .. versionadded: 7.4
         """
         return self.replace(tzinfo=datetime.timezone.utc).timestamp()
 
     def posix_timestamp_format(self) -> str:
-        """Convert object to a POSIX timestamp format."""
+        """Convert object to a POSIX timestamp format.
+
+        .. versionadded: 7.4
+        """
         return '{ts:.6f}'.format(ts=self.posix_timestamp())
 
     def __str__(self) -> str:

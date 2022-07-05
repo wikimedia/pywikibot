@@ -1,6 +1,13 @@
 Current release 7.5.0
 ^^^^^^^^^^^^^^^^^^^^^
 
+* New :mod:`pywikibot.time` module with new functions and timezone class in addition to `Timestamp`
+* :meth:`Page.revisions()<pywikibot.page.BasePage.revisions>` supports more formats/types for
+  starttime and endtime parameters, in addition to those allowed by
+  :meth:`Timestamp.fromISOformat()<pywikibot.Timestamp.fromISOformat>`.
+* New :meth:`Timestamp.set_timestamp()<pywikibot.Timestamp.set_timestamp>` method
+* Fully ISO8601 and POSIX format support with :class:`pywikibot.Timestamp`;
+  formats are compliant with MediaWiki supported formats
 * Handle asynchronous page_put_queue after KeyboardInterrupt in Python 3.9+ (:phab:`T311076`)
 * No longer expect a specific namespace alias in cosmetic_changes
   :meth:`translateAndCapitalizeNamespaces

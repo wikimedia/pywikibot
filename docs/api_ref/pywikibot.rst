@@ -144,6 +144,11 @@ pywikibot.throttle module
 
 .. automodule:: pywikibot.throttle
 
+pywikibot.time module
+---------------------
+
+.. automodule:: pywikibot.time
+
 pywikibot.titletranslate module
 -------------------------------
 

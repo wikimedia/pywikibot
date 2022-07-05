@@ -4,6 +4,7 @@
 *current release*
 
 ### harvest_templates
+* Add `-inverse` option for inverse claims  (:phab:`T173238`)
 * Only follow redirects in harvest_template.py if no wikibase item exists (:phab:`T311883`)
 
 ## 7.4.0

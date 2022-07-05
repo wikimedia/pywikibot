@@ -69,7 +69,7 @@ Library tests
     textlib<./textlib_tests>
     thanks<./thanks_tests>
     thread<./thread_tests>
-    timestamp<./timestamp_tests>
+    time<./time_tests>
     timestripper<./timestripper_tests>
     tk<./tk_tests>
     tools_chars<./tools_chars_tests>
