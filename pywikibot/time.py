@@ -19,7 +19,6 @@ __all__ = (
     'str2timedelta',
     'MW_KEYS',
     'Timestamp',
-    'TZoneUTC',
 )
 
 
@@ -351,24 +350,3 @@ def parse_duration(string: str) -> Tuple[str, int]:
                          .format(string))
 
     return key, int(duration)
-
-
-class TZoneUTC(datetime.tzinfo):
-
-    """Class building a UTC tzinfo object."""
-
-    def utcoffset(self, dt) -> datetime.timedelta:
-        """Subclass implementation, return timedelta(0)."""
-        return ZERO
-
-    def tzname(self, dt) -> str:
-        """Subclass implementation."""
-        return 'UTC'
-
-    def dst(self, dt) -> datetime.timedelta:
-        """Subclass implementation, return timedelta(0)."""
-        return ZERO
-
-    def __repr__(self) -> str:
-        """Return a string representation."""
-        return '{}()'.format(self.__class__.__name__)
