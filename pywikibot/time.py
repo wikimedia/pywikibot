@@ -1,16 +1,44 @@
 """Time handling module."""
 #
-# (C) Pywikibot team, 2009-2022
+# (C) Pywikibot team, 2007-2022
 #
 # Distributed under the terms of the MIT license.
 #
 import datetime
+import math
 import re
+import types
 from typing import Type, Union
 
+import pywikibot
+from pywikibot.backports import Tuple
 from pywikibot.tools import classproperty
 
-__all__ = ['Timestamp']
+__all__ = (
+    'parse_duration',
+    'str2timedelta',
+    'MalformedConfigError',
+    'MW_KEYS',
+    'Timestamp',
+    'TZoneUTC',
+)
+
+
+MW_KEYS = types.MappingProxyType({
+    's': 'seconds',
+    'h': 'hours',
+    'd': 'days',
+    'w': 'weeks',
+    'y': 'years',
+    # 'months' and 'minutes' were removed because confusion outweighs merit
+})
+
+ZERO = datetime.timedelta(0)
+
+
+class MalformedConfigError(pywikibot.exceptions.Error):
+
+    """There is an error in the configuration template."""
 
 
 class Timestamp(datetime.datetime):
@@ -261,3 +289,90 @@ class Timestamp(datetime.datetime):
         if isinstance(newdt, datetime.datetime):
             return self._from_datetime(newdt)
         return newdt
+
+
+def str2timedelta(string: str, timestamp=None) -> datetime.timedelta:
+    """
+    Return a timedelta for a shorthand duration.
+
+    :param string: a string defining a time period:
+
+    Examples::
+
+        300s - 300 seconds
+        36h - 36 hours
+        7d - 7 days
+        2w - 2 weeks (14 days)
+        1y - 1 year
+
+    :param timestamp: a timestamp to calculate a more accurate duration offset
+        used by years
+    :type timestamp: datetime.datetime
+    :return: the corresponding timedelta object
+    """
+    key, duration = parse_duration(string)
+
+    if key == 'y':  # years
+        days = math.ceil(duration * 365.25)
+        duration *= 12
+
+        if timestamp:
+            return pywikibot.date.apply_month_delta(
+                timestamp.date(), month_delta=duration) - timestamp.date()
+        return datetime.timedelta(days=days)
+
+    # days, seconds, hours, weeks
+    return datetime.timedelta(**{MW_KEYS[key]: duration})
+
+
+def parse_duration(string: str) -> Tuple[str, int]:
+    """
+    Return the key and duration extracted from the string.
+
+    :param string: a string defining a time period
+
+    Examples::
+
+        300s - 300 seconds
+        36h - 36 hours
+        7d - 7 days
+        2w - 2 weeks (14 days)
+        1y - 1 year
+
+    :return: key and duration extracted form the string
+    """
+    if len(string) < 2:
+        raise ValueError('Time period should be a numeric value followed by '
+                         'its qualifier')
+
+    key, duration = string[-1], string[:-1]
+
+    if key not in MW_KEYS:
+        raise ValueError('Time period qualifier is unrecognized: {}'
+                         .format(string))
+    if not duration.isdigit():
+        raise ValueError("Time period's duration should be numeric: {}"
+                         .format(string))
+
+    return key, int(duration)
+
+
+class TZoneUTC(datetime.tzinfo):
+
+    """Class building a UTC tzinfo object."""
+
+    def utcoffset(self, dt) -> datetime.timedelta:
+        """Subclass implementation, return timedelta(0)."""
+        return ZERO
+
+    def tzname(self, dt) -> str:
+        """Subclass implementation."""
+        return 'UTC'
+
+    def dst(self, dt) -> datetime.timedelta:
+        """Subclass implementation, return timedelta(0)."""
+        return ZERO
+
+    def __repr__(self) -> str:
+        """Return a string representation."""
+        return '{}()'.format(self.__class__.__name__)

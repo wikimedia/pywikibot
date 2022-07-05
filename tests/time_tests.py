@@ -6,12 +6,12 @@
 # Distributed under the terms of the MIT license.
 #
 import calendar
-import datetime
 import re
 import unittest
 from contextlib import suppress
+from datetime import datetime, timedelta
 
-from pywikibot.time import Timestamp
+from pywikibot.time import parse_duration, str2timedelta, Timestamp
 from tests.aspects import TestCase
 
 
@@ -71,10 +71,10 @@ class TestTimestamp(TestCase):
 
     def test_set_from_datetime(self):
         """Test creating instance from datetime.datetime string."""
-        t1 = datetime.datetime.utcnow()
+        t1 = datetime.utcnow()
         t2 = Timestamp.set_timestamp(t1)
         self.assertEqual(t1, t2)
-        self.assertIsInstance(t2, datetime.datetime)
+        self.assertIsInstance(t2, datetime)
 
     @staticmethod
     def _compute_posix(timestr):
@@ -85,8 +85,7 @@ class TestTimestamp(TestCase):
             sec = sec - 1
             usec = 1000000 - usec
 
-        return (datetime.datetime(1970, 1, 1)
-                + datetime.timedelta(seconds=sec, microseconds=usec))
+        return datetime(1970, 1, 1) + timedelta(seconds=sec, microseconds=usec)
 
     def _test_set_from_string_fmt(self, fmt):
         """Test creating instance from <FMT> string."""
@@ -200,7 +199,7 @@ class TestTimestamp(TestCase):
     def test_add_timedelta(self):
         """Test addin a timedelta to a Timestamp."""
         t1 = Timestamp.utcnow()
-        t2 = t1 + datetime.timedelta(days=1)
+        t2 = t1 + timedelta(days=1)
         if t1.month != t2.month:
             self.assertEqual(1, t2.day)
         else:
@@ -209,21 +208,21 @@ class TestTimestamp(TestCase):
 
     def test_add_timedate(self):
         """Test unsupported additions raise NotImplemented."""
-        t1 = datetime.datetime.utcnow()
-        t2 = t1 + datetime.timedelta(days=1)
+        t1 = datetime.utcnow()
+        t2 = t1 + timedelta(days=1)
         t3 = t1.__add__(t2)
         self.assertIs(t3, NotImplemented)
 
         # Now check that the pywikibot sub-class behaves the same way
         t1 = Timestamp.utcnow()
-        t2 = t1 + datetime.timedelta(days=1)
+        t2 = t1 + timedelta(days=1)
         t3 = t1.__add__(t2)
         self.assertIs(t3, NotImplemented)
 
     def test_sub_timedelta(self):
         """Test subtracting a timedelta from a Timestamp."""
         t1 = Timestamp.utcnow()
-        t2 = t1 - datetime.timedelta(days=1)
+        t2 = t1 - timedelta(days=1)
         if t1.month != t2.month:
             self.assertEqual(calendar.monthrange(t2.year, t2.month)[1], t2.day)
         else:
@@ -233,10 +232,42 @@ class TestTimestamp(TestCase):
     def test_sub_timedate(self):
         """Test subtracting two timestamps."""
         t1 = Timestamp.utcnow()
-        t2 = t1 - datetime.timedelta(days=1)
+        t2 = t1 - timedelta(days=1)
         td = t1 - t2
-        self.assertIsInstance(td, datetime.timedelta)
+        self.assertIsInstance(td, timedelta)
         self.assertEqual(t2 + td, t1)
+
+
+class TestTimeFunctions(TestCase):
+
+    """Test functions in time module."""
+
+    net = False
+
+    def test_str2timedelta(self):
+        """Test for parsing the shorthand notation of durations."""
+        date = datetime(2017, 1, 1)  # non leap year
+        self.assertEqual(str2timedelta('0d'), timedelta(0))
+        self.assertEqual(str2timedelta('4000s'), timedelta(seconds=4000))
+        self.assertEqual(str2timedelta('4000h'), timedelta(hours=4000))
+        self.assertEqual(str2timedelta('7d'), str2timedelta('1w'))
+        self.assertEqual(str2timedelta('3y'), timedelta(1096))
+        self.assertEqual(str2timedelta('3y', date), timedelta(1095))
+        with self.assertRaises(ValueError):
+            str2timedelta('4000@')
+        with self.assertRaises(ValueError):
+            str2timedelta('$1')
+
+    def test_parse_duration(self):
+        """Test for extracting key and duration from shorthand notation."""
+        self.assertEqual(parse_duration('400s'), ('s', 400))
+        self.assertEqual(parse_duration('7d'), ('d', 7))
+        self.assertEqual(parse_duration('3y'), ('y', 3))
+
+        for invalid_value in ('', '3000', '4000@'):
+            with self.subTest(value=invalid_value), \
+                 self.assertRaises(ValueError):
+                parse_duration(invalid_value)
 
 
 if __name__ == '__main__':  # pragma: no cover

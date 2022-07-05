@@ -94,11 +94,9 @@ Options (may be omitted):
 #
 import datetime
 import locale
-import math
 import os
 import re
 import time
-import types
 from collections import OrderedDict, defaultdict
 from hashlib import md5
 from math import ceil
@@ -108,7 +106,6 @@ from warnings import warn
 import pywikibot
 from pywikibot import i18n
 from pywikibot.backports import List, Set, Tuple
-from pywikibot.date import apply_month_delta
 from pywikibot.exceptions import Error, NoPageError
 from pywikibot.textlib import (
     TimeStripper,
@@ -117,21 +114,11 @@ from pywikibot.textlib import (
     findmarker,
     to_local_digits,
 )
+from pywikibot.time import parse_duration, str2timedelta, MW_KEYS, TZoneUTC
 
 
 ShouldArchive = Tuple[str, str]
 Size = Tuple[int, str]
-
-ZERO = datetime.timedelta(0)
-
-MW_KEYS = types.MappingProxyType({
-    's': 'seconds',
-    'h': 'hours',
-    'd': 'days',
-    'w': 'weeks',
-    'y': 'years',
-    # 'months' and 'minutes' were removed because confusion outweighs merit
-})
 
 
 class ArchiveBotSiteConfigError(Error):
@@ -175,87 +162,16 @@ def str2localized_duration(site, string: str) -> str:
     Translates a duration written in the shorthand notation (ex. "24h", "7d")
     into an expression in the local wiki language ("24 hours", "7 days").
     """
-    key, duration = checkstr(string)
+    try:
+        key, duration = parse_duration(string)
+    except ValueError as e:
+        raise MalformedConfigError(e) from None
     template = site.mediawiki_message(MW_KEYS[key])
     if template:
         # replace plural variants
-        exp = i18n.translate(site.code, template, {'$1': int(duration)})
+        exp = i18n.translate(site.code, template, {'$1': duration})
         return exp.replace('$1', to_local_digits(duration, site.code))
     return to_local_digits(string, site.code)
-
-
-def str2time(string: str, timestamp=None) -> datetime.timedelta:
-    """
-    Return a timedelta for a shorthand duration.
-
-    :param string: a string defining a time period:
-
-    Examples::
-
-        300s - 300 seconds
-        36h - 36 hours
-        7d - 7 days
-        2w - 2 weeks (14 days)
-        1y - 1 year
-
-    :param timestamp: a timestamp to calculate a more accurate duration offset
-        used by years
-    :type timestamp: datetime.datetime
-    :return: the corresponding timedelta object
-    """
-    key, duration = checkstr(string)
-
-    if duration.isdigit():
-        duration = int(duration)
-    else:
-        key = ''
-
-    if key in ['d', 's', 'h', 'w']:  # days, seconds, hours, weeks
-        return datetime.timedelta(**{MW_KEYS[key]: duration})
-
-    if key == 'y':  # years
-        days = math.ceil(duration * 365.25)
-        duration *= 12
-    else:
-        raise MalformedConfigError(
-            'Unrecognized parameter in template: {}'.format(string))
-
-    if timestamp:
-        return apply_month_delta(
-            timestamp.date(), month_delta=duration) - timestamp.date()
-    return datetime.timedelta(days=days)
-
-
-def checkstr(string: str) -> Tuple[str, str]:
-    """
-    Return the key and duration extracted from the string.
-
-    :param string: a string defining a time period
-
-    Examples::
-
-        300s - 300 seconds
-        36h - 36 hours
-        7d - 7 days
-        2w - 2 weeks (14 days)
-        1y - 1 year
-
-    :return: key and duration extracted form the string
-    """
-    if len(string) < 2:
-        raise MalformedConfigError('Time period should be a numeric value '
-                                   'followed by its qualifier')
-
-    key, duration = string[-1], string[:-1]
-
-    if key not in MW_KEYS:
-        raise MalformedConfigError('Time period qualifier is unrecognized: {}'
-                                   .format(string))
-    if not duration.isdigit():
-        raise MalformedConfigError("Time period's duration should be "
-                                   'numeric: {}'.format(string))
-
-    return key, duration
 
 
 def str2size(string: str) -> Size:
@@ -311,27 +227,6 @@ def calc_md5_hexdigest(txt, salt) -> str:
     s.update(txt.encode('utf8'))
     s.update(b'\n')
     return s.hexdigest()
-
-
-class TZoneUTC(datetime.tzinfo):
-
-    """Class building a UTC tzinfo object."""
-
-    def utcoffset(self, dt) -> datetime.timedelta:
-        """Subclass implementation, return timedelta(0)."""
-        return ZERO
-
-    def tzname(self, dt) -> str:
-        """Subclass implementation."""
-        return 'UTC'
-
-    def dst(self, dt) -> datetime.timedelta:
-        """Subclass implementation, return timedelta(0)."""
-        return ZERO
-
-    def __repr__(self) -> str:
-        """Return a string representation."""
-        return '{}()'.format(self.__class__.__name__)
 
 
 class DiscussionThread:
@@ -619,7 +514,10 @@ class PageArchiver:
             if not thread.timestamp:
                 return None
             # TODO: handle unsigned
-            maxage = str2time(re_t.group(1), thread.timestamp)
+            try:
+                maxage = str2timedelta(re_t.group(1), thread.timestamp)
+            except ValueError as e:
+                raise MalformedConfigError(e) from None
             if self.now - thread.timestamp > maxage:
                 duration = str2localized_duration(self.site, re_t.group(1))
                 return ('duration', duration)
