@@ -118,7 +118,7 @@ from pywikibot.exceptions import (
 willstop = False
 
 
-def _signal_handler(signal, frame) -> None:
+def _signal_handler(signum, frame) -> None:
     global willstop
     if not willstop:
         willstop = True
@@ -394,7 +394,8 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         if linked_item:
             yield linked_item
 
-    def handle_string(self, value, *args) -> Iterator[str]:
+    @staticmethod
+    def handle_string(value, *args) -> Iterator[str]:
         """Handle 'string' and 'external-id' claim type.
 
         .. versionadded:: 7.4

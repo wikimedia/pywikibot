@@ -76,7 +76,7 @@ class Timestamp(datetime.datetime):
 
         :param ts: Timestamp, datetime.datetime or str
         :return: Timestamp object
-        :raises ValuError: conversion failed
+        :raises ValueError: conversion failed
         """
         if isinstance(ts, cls):
             return ts
@@ -84,6 +84,8 @@ class Timestamp(datetime.datetime):
             return cls._from_datetime(ts)
         if isinstance(ts, str):
             return cls._from_string(ts)
+        raise ValueError('Unsupported "ts" type, got "{}" ({})'
+                         .format(ts, type(ts).__name__))
 
     @staticmethod
     def _from_datetime(dt: datetime.datetime) -> 'Timestamp':
@@ -164,7 +166,7 @@ class Timestamp(datetime.datetime):
         sec = int(m.group('S'))
         usec = m.group('u')
         usec = int(usec.ljust(6, '0')) if usec else 0
-        if sec < 0 and usec > 0:
+        if sec < 0 < usec:
             sec = sec - 1
             usec = 1000000 - usec
 
