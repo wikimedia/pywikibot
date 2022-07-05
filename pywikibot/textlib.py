@@ -132,8 +132,8 @@ def to_local_digits(phrase: Union[str, int], lang: str) -> str:
     :return: The localized version
     """
     digits = NON_LATIN_DIGITS.get(lang)
+    phrase = str(phrase)
     if digits:
-        phrase = str(phrase)
         trans = str.maketrans('0123456789', digits)
         phrase = phrase.translate(trans)
     return phrase

@@ -7,7 +7,7 @@
 #
 import unittest
 from contextlib import suppress
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import pywikibot
 from pywikibot.exceptions import Error
@@ -78,30 +78,6 @@ class TestArchiveBotFunctions(TestCase):
     """Test functions in archivebot."""
 
     net = False
-
-    def test_str2time(self):
-        """Test for parsing the shorthand notation of durations."""
-        date = datetime(2017, 1, 1)  # non leap year
-        self.assertEqual(archivebot.str2time('0d'), timedelta(0))
-        self.assertEqual(archivebot.str2time('4000s'), timedelta(seconds=4000))
-        self.assertEqual(archivebot.str2time('4000h'), timedelta(hours=4000))
-        self.assertEqual(archivebot.str2time('7d'), archivebot.str2time('1w'))
-        self.assertEqual(archivebot.str2time('3y'), timedelta(1096))
-        self.assertEqual(archivebot.str2time('3y', date), timedelta(1095))
-        with self.assertRaises(archivebot.MalformedConfigError):
-            archivebot.str2time('4000@')
-        with self.assertRaises(archivebot.MalformedConfigError):
-            archivebot.str2time('$1')
-
-    def test_checkstr(self):
-        """Test for extracting key and duration from shorthand notation."""
-        self.assertEqual(archivebot.checkstr('400s'), ('s', '400'))
-        self.assertEqual(archivebot.checkstr('7d'), ('d', '7'))
-        self.assertEqual(archivebot.checkstr('3y'), ('y', '3'))
-
-        for invalid_value in ('', '3000', '4000@'):
-            with self.assertRaises(archivebot.MalformedConfigError):
-                archivebot.checkstr(invalid_value)
 
     def test_str2size(self):
         """Test for parsing the shorthand notation of sizes."""
