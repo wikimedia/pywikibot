@@ -43,6 +43,8 @@ argument as both local and global, the local argument overrides the global one
 
 -multi            If set, try to match multiple values from parameter.
 
+-inverse          Import this property as the inverse claim.
+
 Examples
 --------
 
@@ -139,6 +141,7 @@ class PropertyOptionHandler(OptionHandler):
         'exists': '',
         'islink': False,
         'multi': False,
+        'inverse': None,
     }
 
 
@@ -156,6 +159,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         'exists': '',
         'islink': False,
         'multi': False,
+        'inverse': None,
     }
 
     def __init__(self, template_title, fields, **kwargs) -> None:
@@ -175,6 +179,9 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         :keyword multi: Whether multiple values should be extracted from a
             single parameter
         :type multi: bool
+        :keyword inverse: a property to populate on the target, pointing to
+            the page item
+        :type inverse: str
         """
         super().__init__(**kwargs)
         self.fields = {}
@@ -327,13 +334,25 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
 
         exists_arg = set(self._get_option_with_fallback(options, 'exists'))
         do_multi = self._get_option_with_fallback(options, 'multi')
+        inverse_prop = self._get_option_with_fallback(options, 'inverse')
 
         for target in handler(value, item, field):
             claim = ppage.newClaim()
             claim.setTarget(target)
             # A generator might yield pages from multiple sites
             added = self.user_add_claim_unless_exists(
-                item, claim, ''.join(exists_arg), site, pywikibot.info)
+                item, claim, exists_arg, site, pywikibot.info)
+
+            if (added and inverse_prop
+                    and isinstance(target, pywikibot.ItemPage)):
+                inverse_ppage = pywikibot.PropertyPage(self.repo, inverse_prop)
+                if inverse_ppage.type != 'wikibase-item':
+                    raise ValueError("{} does not have 'wikibase-item' type"
+                                     .format(inverse_ppage))
+                inverse_claim = inverse_ppage.newClaim()
+                inverse_claim.setTarget(item)
+                self.user_add_claim_unless_exists(
+                    target, inverse_claim, exists_arg, site, pywikibot.info)
 
             # Stop after the first match if not supposed to add
             # multiple values
