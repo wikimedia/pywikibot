@@ -148,7 +148,6 @@ script_test_modules = {
     'fixing_redirects',
     'generate_family_file',
     'generate_user_files',
-    'harvest_templates',
     'interwikidata',
     'l10n',
     'patrolbot',
