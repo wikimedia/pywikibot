@@ -17,7 +17,6 @@ from pywikibot.tools import classproperty
 __all__ = (
     'parse_duration',
     'str2timedelta',
-    'MalformedConfigError',
     'MW_KEYS',
     'Timestamp',
     'TZoneUTC',
@@ -34,11 +33,6 @@ MW_KEYS = types.MappingProxyType({
 })
 
 ZERO = datetime.timedelta(0)
-
-
-class MalformedConfigError(pywikibot.exceptions.Error):
-
-    """There is an error in the configuration template."""
 
 
 class Timestamp(datetime.datetime):
