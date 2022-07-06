@@ -481,6 +481,8 @@ class CharsetTestCase(TestCase):
         self.assertEqual(
             http.get_charset_from_content_type('charset="cp-1251"'), 'cp1251')
         self.assertEqual(
+            http.get_charset_from_content_type('charset="win-1251"'), 'cp1251')
+        self.assertEqual(
             http.get_charset_from_content_type('charset="ru-win1251"'),
             'cp1251')
 
