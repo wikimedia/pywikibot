@@ -127,6 +127,9 @@ def to_local_digits(phrase: Union[str, int], lang: str) -> str:
     Be aware that this function only works for several languages, and that it
     returns an unchanged string if an unsupported language is given.
 
+    .. versionchanged:: 7.5
+       always return a string even `phrase` is an int.
+
     :param phrase: The phrase to convert to localized numerical
     :param lang: language code
     :return: The localized version

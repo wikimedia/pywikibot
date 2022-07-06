@@ -93,6 +93,8 @@ will not add duplicate claims for the same member:
 .. note:: This script is a
    :py:obj:`ConfigParserBot <pywikibot.bot.ConfigParserBot>`. All options
    can be set within a settings file which is scripts.ini by default.
+.. versionadded:: 7.5
+   the -inverse option.
 """
 #
 # (C) Pywikibot team, 2013-2022
@@ -219,7 +221,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
                              link_text: str) -> Optional[pywikibot.ItemPage]:
         """Find the ItemPage target for a given link text.
 
-        .. versionchanged:: 7.4
+        .. versionchanged:: 7.5
            Only follow the redirect target if redirect page has no
            wikibase item.
         """
@@ -305,7 +307,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
                     field_item: Tuple[str, str]) -> None:
         """Process a single field of template fielddict.
 
-        .. versionadded:: 7.4
+        .. versionadded:: 7.5
         """
         field, value = field_item
         field = field.strip()
@@ -368,7 +370,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
                              field: str) -> Iterator[pywikibot.ItemPage]:
         """Handle 'wikibase-item' claim type.
 
-        .. versionadded:: 7.4
+        .. versionadded:: 7.5
         """
         prop, options = self.fields[field]
         matched = False
@@ -398,7 +400,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
     def handle_string(value, *args) -> Iterator[str]:
         """Handle 'string' and 'external-id' claim type.
 
-        .. versionadded:: 7.4
+        .. versionadded:: 7.5
         """
         yield value.strip()
 
@@ -407,7 +409,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
     def handle_url(self, value, *args) -> Iterator[str]:
         """Handle 'url' claim type.
 
-        .. versionadded:: 7.4
+        .. versionadded:: 7.5
         """
         for match in self.linkR.finditer(value):
             yield match.group('url')
@@ -416,7 +418,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
                             ) -> Iterator[pywikibot.FilePage]:
         """Handle 'commonsMedia' claim type.
 
-        .. versionadded:: 7.4
+        .. versionadded:: 7.5
         """
         repo = self.current_page.site.image_repository()
         image = pywikibot.FilePage(repo, value)
