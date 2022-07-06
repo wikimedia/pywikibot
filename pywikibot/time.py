@@ -34,8 +34,6 @@ MW_KEYS = types.MappingProxyType({
     # 'months' and 'minutes' were removed because confusion outweighs merit
 })
 
-ZERO = datetime.timedelta(0)
-
 
 class Timestamp(datetime.datetime):
 
@@ -211,7 +209,7 @@ class Timestamp(datetime.datetime):
         msg = "time data '{timestr}' does not match any format."
         raise ValueError(msg.format(timestr=timestr))
 
-    def clone(self) -> datetime.datetime:
+    def clone(self) -> 'Timestamp':
         """Clone this instance."""
         return self.replace(microsecond=self.microsecond)
 
