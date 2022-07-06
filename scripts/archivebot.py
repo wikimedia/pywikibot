@@ -114,7 +114,7 @@ from pywikibot.textlib import (
     findmarker,
     to_local_digits,
 )
-from pywikibot.time import parse_duration, str2timedelta, MW_KEYS, TZoneUTC
+from pywikibot.time import parse_duration, str2timedelta, MW_KEYS
 
 
 ShouldArchive = Tuple[str, str]
@@ -438,7 +438,7 @@ class PageArchiver:
         self.comment_params = {
             'from': self.page.title(),
         }
-        self.now = datetime.datetime.utcnow().replace(tzinfo=TZoneUTC())
+        self.now = datetime.datetime.now(datetime.timezone.utc)
         self.archives = {}
         self.archived_threads = 0
         self.month_num2orig_names = {}
