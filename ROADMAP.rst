@@ -1,7 +1,7 @@
 Current release 7.5.0
 ^^^^^^^^^^^^^^^^^^^^^
 
-* New :mod:`pywikibot.time` module with new functions and timezone class in addition to `Timestamp`
+* New :mod:`pywikibot.time` module with new functions in addition to `Timestamp`
 * :meth:`Page.revisions()<pywikibot.page.BasePage.revisions>` supports more formats/types for
   starttime and endtime parameters, in addition to those allowed by
   :meth:`Timestamp.fromISOformat()<pywikibot.Timestamp.fromISOformat>`.
