@@ -266,11 +266,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
 
         .. seealso:: :class:`OptionHandler`
         """
-        default = self.opt[option]
-        local = handler.opt[option]
-        if isinstance(default, bool) and isinstance(local, bool):
-            return default is not local
-        return local or default
+        return handler.opt[option] or self.opt[option]
 
     def treat_page_and_item(self,
                             page: Optional[pywikibot.page.BasePage],
