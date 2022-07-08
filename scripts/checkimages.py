@@ -833,7 +833,7 @@ class CheckImagesBot:
 
         site = pywikibot.Site('commons')
         commons_image_with_this_hash = next(
-            iter(site.allimages(sha1=hash_found, total=1)), None)
+            site.allimages(sha1=hash_found, total=1), None)
         if commons_image_with_this_hash:
             service_template = pywikibot.translate(self.site,
                                                    SERVICE_TEMPLATES)

@@ -1075,10 +1075,10 @@ class TestImageUsage(DefaultSiteTestCase):
         with skipping(
             StopIteration,
                 msg='No images on the main page of site {!r}'.format(mysite)):
-            imagepage = next(iter(page.imagelinks()))  # 1st image of page
+            imagepage = next(page.imagelinks())  # 1st image of page
 
-        pywikibot.output('site_tests.TestImageUsage found {} on {}'
-                         .format(imagepage, page))
+        unittest_print('site_tests.TestImageUsage found {} on {}'
+                       .format(imagepage, page))
 
         self.__class__._image_page = imagepage
         return imagepage
@@ -1233,19 +1233,6 @@ class TestLogEvents(DefaultSiteTestCase):
 class TestRecentChanges(DefaultSiteTestCase):
 
     """Test recentchanges method."""
-
-    @classmethod
-    def setUpClass(cls):
-        """Test up test class."""
-        super().setUpClass()
-        mysite = cls.get_site()
-        try:
-            # 1st image on main page
-            imagepage = next(iter(mysite.allimages()))
-        except StopIteration:
-            unittest_print('No images on site {!r}'.format(mysite))
-            imagepage = None
-        cls.imagepage = imagepage
 
     def test_basic(self):
         """Test the site.recentchanges() method."""
@@ -2719,7 +2706,7 @@ class TestFileArchive(DeprecationTestCase):
         """Test properties."""
         gen = self.site.filearchive(prop=['sha1', 'size', 'user'], total=1)
         self.assertIn('faprop=sha1|size|user', str(gen.request))
-        item = next(iter(gen))
+        item = next(gen)
         self.assertIn('sha1', item)
         self.assertIn('size', item)
         self.assertIn('user', item)
@@ -2730,8 +2717,8 @@ class TestFileArchive(DeprecationTestCase):
         gen2 = self.site.filearchive(reverse=True, total=1)
         self.assertNotIn('fadir=', str(gen1.request))
         self.assertIn('fadir=descending', str(gen2.request))
-        fa1 = next(iter(gen1))
-        fa2 = next(iter(gen2))
+        fa1 = next(gen1)
+        fa2 = next(gen2)
         self.assertLess(fa1['name'], fa2['name'])
 
     def test_filearchive_start(self):
@@ -2739,7 +2726,7 @@ class TestFileArchive(DeprecationTestCase):
         gen = self.site.filearchive(start='py', end='wiki', total=1)
         self.assertIn('fafrom=py', str(gen.request))
         self.assertIn('fato=wiki', str(gen.request))
-        item = next(iter(gen))
+        item = next(gen)
         self.assertGreaterEqual(item['name'], 'Py')
 
     def test_filearchive_sha1(self):
@@ -2747,7 +2734,7 @@ class TestFileArchive(DeprecationTestCase):
         sha1 = '0d5a00aa774100408e60da09f5fb21f253b366f1'
         gen = self.site.filearchive(sha1=sha1, prop='sha1', total=1)
         self.assertIn('fasha1=' + sha1, str(gen.request))
-        item = next(iter(gen))
+        item = next(gen)
         self.assertEqual(item['sha1'], sha1)
 
 

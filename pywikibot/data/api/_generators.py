@@ -1,15 +1,23 @@
-"""Objects representing API/Query generators."""
+"""Objects representing API/Query generators.
+
+.. versionchanged:: 7.6
+   All Objects were changed from Iterable object to a Generator object.
+   They are subclassed from
+   :class:`pywikibot.tools.collections.GeneratorWrapper`
+"""
 #
 # (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
+from abc import abstractmethod, ABC
 from typing import Union
 from warnings import warn
 
 import pywikibot
 from pywikibot import config
 from pywikibot.exceptions import Error, InvalidTitleError, UnsupportedPageError
+from pywikibot.tools.collections import GeneratorWrapper
 
 __all__ = (
     'APIGenerator',
@@ -22,9 +30,13 @@ __all__ = (
 )
 
 
-class _RequestWrapper:
+class APIGeneratorBase(ABC):
 
-    """A wrapper class to handle the usage of the ``parameters`` parameter."""
+    """A wrapper class to handle the usage of the ``parameters`` parameter.
+
+    .. versionchanged:: 7.6
+       renamed from _RequestWrapper
+    """
 
     def _clean_kwargs(self, kwargs, **mw_api_args):
         """Clean kwargs, define site and request class."""
@@ -39,19 +51,28 @@ class _RequestWrapper:
         kwargs['parameters'].update(mw_api_args)
         return kwargs
 
+    @abstractmethod
     def set_maximum_items(self, value: Union[int, str, None]) -> None:
+        """Set the maximum number of items to be retrieved from the wiki.
+
+        .. versionadded:: 7.1
+        .. versionchanged:: 7.6
+           become an abstract method
+        """
         raise NotImplementedError
 
 
-class APIGenerator(_RequestWrapper):
+class APIGenerator(APIGeneratorBase, GeneratorWrapper):
 
-    """
-    Iterator that handle API responses containing lists.
+    """Generator that handle API responses containing lists.
 
-    The iterator will iterate each item in the query response and use the
-    continue request parameter to retrieve the next portion of items
+    The generator will iterate each item in the query response and use
+    the continue request parameter to retrieve the next portion of items
     automatically. If the limit attribute is set, the iterator will stop
     after iterating that many values.
+
+    .. versionchanged:: 7.6
+       subclassed from :class:`pywikibot.tools.collections.GeneratorWrapper`
     """
 
     def __init__(
@@ -121,11 +142,15 @@ class APIGenerator(_RequestWrapper):
             pywikibot.debug('{}: Set limit (maximum_items) to {}.'
                             .format(type(self).__name__, self.limit))
 
-    def __iter__(self):
+    @property
+    def generator(self):
         """
         Submit request and iterate the response.
 
         Continues response as needed until limit (if defined) is reached.
+
+        .. versionchanged:: 7.6
+           changed from iterator method to generator property
         """
         offset = self.starting_offset
         n = 0
@@ -154,23 +179,26 @@ class APIGenerator(_RequestWrapper):
                 break
 
 
-class QueryGenerator(_RequestWrapper):
+class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
 
-    """
-    Base class for iterators that handle responses to API action=query.
+    """Base class for generators that handle responses to API action=query.
 
-    By default, the iterator will iterate each item in the query response,
-    and use the (query-)continue element, if present, to continue iterating as
-    long as the wiki returns additional values. However, if the iterator's
-    limit attribute is set to a positive int, the iterator will stop after
-    iterating that many values. If limit is negative, the limit parameter
-    will not be passed to the API at all.
+    By default, the generator will iterate each item in the query
+    response, and use the (query-)continue element, if present, to
+    continue iterating as long as the wiki returns additional values.
+    However, if the generators's limit attribute is set to a positive
+    int, the generators will stop after iterating that many values. If
+    limit is negative, the limit parameter will not be passed to the API
+    at all.
 
-    Most common query types are more efficiently handled by subclasses, but
-    this class can be used directly for custom queries and miscellaneous
-    types (such as "meta=...") that don't return the usual list of pages or
-    links. See the API documentation for specific query options.
+    Most common query types are more efficiently handled by subclasses,
+    but this class can be used directly for custom queries and
+    miscellaneous types (such as "meta=...") that don't return the usual
+    list of pages or links. See the API documentation for specific query
+    options.
 
+    .. versionchanged:: 7.6
+       subclassed from :class:`pywikibot.tools.collections.GeneratorWrapper`
     """
 
     # Should results be filtered during iteration according to set_namespace?
@@ -560,11 +588,14 @@ class QueryGenerator(_RequestWrapper):
                 raise RuntimeError(
                     'QueryGenerator._extract_results reached the limit')
 
-    def __iter__(self):
+    @property
+    def generator(self):
         """Submit request and iterate the response based on self.resultkey.
 
         Continues response as needed until limit (if any) is reached.
 
+        .. versionchanged:: 7.6
+           changed from iterator method to generator property
         """
         previous_result_had_data = True
         prev_limit = new_limit = None
@@ -627,12 +658,11 @@ class QueryGenerator(_RequestWrapper):
 
 class PageGenerator(QueryGenerator):
 
-    """Iterator for response to a request of type action=query&generator=foo.
+    """Generator for response to a request of type action=query&generator=foo.
 
-    This class can be used for any of the query types that are listed in the
-    API documentation as being able to be used as a generator. Instances of
-    this class iterate Page objects.
-
+    This class can be used for any of the query types that are listed in
+    the API documentation as being able to be used as a generator.
+    Instances of this class iterate Page objects.
     """
 
     def __init__(
@@ -700,17 +730,16 @@ class PageGenerator(QueryGenerator):
 
 class PropertyGenerator(QueryGenerator):
 
-    """Iterator for queries of type action=query&prop=foo.
+    """Generator for queries of type action=query&prop=foo.
 
     See the API documentation for types of page properties that can be
     queried.
 
-    This iterator yields one or more dict object(s) corresponding
-    to each "page" item(s) from the API response; the calling module has to
+    This generator yields one or more dict object(s) corresponding to
+    each "page" item(s) from the API response; the calling module has to
     decide what to do with the contents of the dict. There will be one
     dict for each page queried via a titles= or ids= parameter (which must
     be supplied when instantiating this class).
-
     """
 
     def __init__(self, prop: str, **kwargs) -> None:
@@ -732,10 +761,15 @@ class PropertyGenerator(QueryGenerator):
         """The requested property names."""
         return self._props
 
-    def __iter__(self):
-        """Yield results."""
+    @property
+    def generator(self):
+        """Yield results.
+
+        .. versionchanged:: 7.6
+           changed from iterator method to generator property
+        """
         self._previous_dicts = {}
-        yield from super().__iter__()
+        yield from super().generator
         yield from self._previous_dicts.values()
 
     def _extract_results(self, resultdata):
@@ -775,18 +809,18 @@ class PropertyGenerator(QueryGenerator):
 
 class ListGenerator(QueryGenerator):
 
-    """Iterator for queries of type action=query&list=foo.
+    """Generator for queries of type action=query&list=foo.
 
-    See the API documentation for types of lists that can be queried. Lists
-    include both site-wide information (such as 'allpages') and page-specific
-    information (such as 'backlinks').
+    See the API documentation for types of lists that can be queried.
+    Lists include both site-wide information (such as 'allpages') and
+    page-specific information (such as 'backlinks').
 
-    This iterator yields a dict object for each member of the list returned
-    by the API, with the format of the dict depending on the particular list
-    command used. For those lists that contain page information, it may be
-    easier to use the PageGenerator class instead, as that will convert the
-    returned information into a Page object.
-
+    This generator yields a dict object for each member of the list
+    returned by the API, with the format of the dict depending on the
+    particular list command used. For those lists that contain page
+    information, it may be easier to use the PageGenerator class
+    instead, as that will convert the returned information into a Page
+    object.
     """
 
     def __init__(self, listaction: str, **kwargs) -> None:
@@ -804,8 +838,7 @@ class ListGenerator(QueryGenerator):
 
 class LogEntryListGenerator(ListGenerator):
 
-    """
-    Iterator for queries of list 'logevents'.
+    """Generator for queries of list 'logevents'.
 
     Yields LogEntry objects instead of dicts.
     """

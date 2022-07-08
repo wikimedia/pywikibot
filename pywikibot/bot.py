@@ -1642,6 +1642,8 @@ class BaseBot(OptionHandler):
                                       .format(self.__class__.__name__))
         if not isinstance(self.generator, Generator):
             # to provide close() method
+            pywikibot.info('wrapping {} type to a Generator type'
+                           .format(type(self.generator).__name__))
             self.generator = (item for item in self.generator)
         try:
             for item in self.generator:

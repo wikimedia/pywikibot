@@ -5,15 +5,28 @@
 # Distributed under the terms of the MIT license.
 #
 import collections
-from collections.abc import Container, Iterable, Iterator, Mapping, Sized
+
+from abc import abstractmethod, ABC
+from collections.abc import (
+    Container,
+    Generator,
+    Iterable,
+    Iterator,
+    Mapping,
+    Sized,
+)
 from contextlib import suppress
 from itertools import chain
+from typing import Any
+
+from pywikibot.backports import Generator as GeneratorType
 
 
 __all__ = (
     'CombinedError',
     'DequeGenerator',
     'EmptyDefault',
+    'GeneratorWrapper',
     'SizedKeyCollection',
     'EMPTY_DEFAULT',
 )
@@ -193,3 +206,96 @@ class DequeGenerator(Iterator, collections.deque):
         result = '{}({})'.format(self.__class__.__name__, items)
         self.extend(items)
         return result
+
+
+class GeneratorWrapper(ABC, Generator):
+
+    """A Generator base class which wraps the internal `generator` property.
+
+    This generator iterator also has :python:`generator.close()
+    <reference/expressions.html#generator.close>` mixin method and it can
+    be used as Iterable and Iterator as well.
+
+    .. versionadded:: 7.6
+
+    Example:
+
+    >>> class Gen(GeneratorWrapper):
+    ...     @property
+    ...     def generator(self):
+    ...         return (c for c in 'Pywikibot')
+    >>> gen = Gen()
+    >>> next(gen)  # can be used as Iterator ...
+    'P'
+    >>> next(gen)
+    'y'
+    >>> ''.join(c for c in gen)  # ... or as Iterable
+    'wikibot'
+    >>> next(gen)  # the generator is exhausted ...
+    Traceback (most recent call last):
+        ...
+    StopIteration
+    >>> gen.restart()  # ... but can be restarted
+    >>> next(gen) + next(gen)
+    'Py'
+    >>> gen.close()  # the generator may be closed
+    >>> next(gen)
+    Traceback (most recent call last):
+        ...
+    StopIteration
+    >>> gen.restart()  # restart a closed generator
+    >>> # also send() and throw() works
+    >>> gen.send(None) + gen.send(None)
+    'Py'
+    >>> gen.throw(RuntimeError('Foo'))
+    Traceback (most recent call last):
+        ...
+    RuntimeError: Foo
+
+    .. seealso:: :pep:`342`
+    """
+
+    @abstractmethod
+    def generator(self) -> GeneratorType[Any, Any, Any]:
+        """Abstract generator property."""
+        return iter(())
+
+    def send(self, value: Any) -> Any:
+        """Return next yielded value from generator or raise StopIteration.
+
+        The `value` parameter is ignored yet; usually it should be ``None``.
+        If the wrapped generator property exits without yielding another
+        value this method raises `StopIteration`. The send method works
+        like the `next`function with a GeneratorWrapper instance as
+        parameter.
+
+        Refer :python:`generator.send()
+        <reference/expressions.html#generator.send>` for its usage.
+
+        :raises TypeError: generator property is not a generator
+        """
+        if not isinstance(self.generator, GeneratorType):
+            raise TypeError('generator property is not a generator but {}'
+                            .format(type(self.generator).__name__))
+        if not hasattr(self, '_started_gen'):
+            # start the generator
+            self._started_gen = self.generator
+        return next(self._started_gen)
+
+    def throw(self, typ: Exception, val=None, tb=None) -> None:
+        """Raise an exception inside the wrapped generator.
+
+        Refer :python:`generator.throw()
+        <reference/expressions.html#generator.throw>` for various
+        parameter usage.
+
+        :raises RuntimeError: No generator started
+        """
+        if not hasattr(self, '_started_gen'):
+            raise RuntimeError('No generator was started')
+        self._started_gen.throw(typ, val, tb)
+
+    def restart(self) -> None:
+        """Restart the generator."""
+        with suppress(AttributeError):
+            del self._started_gen

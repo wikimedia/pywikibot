@@ -500,6 +500,7 @@ class TestDryPageGenerator(TestCase):
             with self.subTest(amount=i):
                 self.gen.set_maximum_items(i)
                 self.assertPageTitlesEqual(self.gen, self.titles[:i])
+                self.gen.restart()
 
     def test_limit_zero(self):
         """Test that a limit of zero is the same as limit None."""

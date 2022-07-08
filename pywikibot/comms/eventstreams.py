@@ -25,6 +25,7 @@ from requests.packages.urllib3.util.response import httplib
 
 from pywikibot import Site, Timestamp, config, debug, warning
 from pywikibot.tools import cached
+from pywikibot.tools.collections import GeneratorWrapper
 
 
 try:
@@ -39,36 +40,73 @@ if parse_version(requests_version) < parse_version('2.20.1'):
         "install it with 'pip install \"requests>=2.20.1\"'\n")
 
 
-class EventStreams:
+class EventStreams(GeneratorWrapper):
 
-    """Basic EventStreams iterator class for Server-Sent Events (SSE) protocol.
+    """Generator class for Server-Sent Events (SSE) protocol.
 
     It provides access to arbitrary streams of data including recent changes.
 
     Usage:
 
     >>> stream = EventStreams(streams='recentchange')
-    >>> stream.register_filter(type='edit', wiki='wikidatawiki')
-    >>> change = next(iter(stream))
-    >>> print('{type} on page {title} by {user}.'.format_map(change))
-    edit on page Q32857263 by XXN-bot.
-    >>> change
-    {'comment': '/* wbcreateclaim-create:1| */ [[Property:P31]]: [[Q4167836]]',
-     'wiki': 'wikidatawiki', 'type': 'edit', 'server_name': 'www.wikidata.org',
-     'server_script_path': '/w', 'namespace': 0, 'title': 'Q32857263',
-     'bot': True, 'server_url': 'https://www.wikidata.org',
-     'length': {'new': 1223, 'old': 793},
-     'meta': {'domain': 'www.wikidata.org', 'partition': 0,
-              'uri': 'https://www.wikidata.org/wiki/Q32857263',
-              'offset': 288986585, 'topic': 'eqiad.mediawiki.recentchange',
-              'request_id': '1305a006-8204-4f51-a27b-0f2df58289f4',
-              'schema_uri': 'mediawiki/recentchange/1',
-              'dt': '2017-07-13T10:55:31+00:00',
-              'id': 'ca13742b-67b9-11e7-935d-141877614a33'},
-     'user': 'XXN-bot', 'timestamp': 1499943331, 'patrolled': True,
-     'id': 551158959, 'minor': False,
-     'revision': {'new': 518751558, 'old': 517180066}}
+    >>> stream.register_filter(type='edit', wiki='wikidatawiki', bot=True)
+    >>> change = next(stream)
+    >>> msg = '{type} on page {title} by {user}.'.format_map(change)
+    >>> print(msg)  # doctest: +SKIP
+    edit on page Q2190037 by KrBot.
+    >>> from pprint import pprint
+    >>> pprint(change, width=75)  # doctest: +SKIP
+    {'$schema': '/mediawiki/recentchange/1.0.0',
+     'bot': True,
+     'comment': '/* wbsetreference-set:2| */ [[Property:P10585]]: 96FPN, см. '
+                '/ see [[Template:Autofix|autofix]] на / on [[Property '
+                'talk:P356]]',
+     'id': 1728475074,
+     'length': {'new': 8871, 'old': 8871},
+     'meta': {'domain': 'www.wikidata.org',
+              'dt': '2022-07-12T17:54:15Z',
+              'id': '2cdec62f-a2b3-49b8-9a52-85a42236fb99',
+              'offset': 4000957901,
+              'partition': 0,
+              'request_id': 'f7896e77-fd2b-4a95-a9e4-44c1e3ad818b',
+              'stream': 'mediawiki.recentchange',
+              'topic': 'eqiad.mediawiki.recentchange',
+              'uri': 'https://www.wikidata.org/wiki/Q2190037'},
+     'minor': False,
+     'namespace': 0,
+     'parsedcomment': '\u200e<span dir="auto"><span '
+                      'class="autocomment">Изменена ссылка на заявление: '
+                      '</span></span> <a href="/wiki/Property:P10585" '
+                      'title="Property:P10585">Property:P10585</a>: 96FPN, '
+                      'см. / see <a href="/wiki/Template:Autofix" '
+                      'title="Template:Autofix">autofix</a> на / on <a '
+                      'href="/wiki/Property_talk:P356" title="Property '
+                      'talk:P356">Property talk:P356</a>',
+     'patrolled': True,
+     'revision': {'new': 1676015019, 'old': 1675697125},
+     'server_name': 'www.wikidata.org',
+     'server_script_path': '/w',
+     'server_url': 'https://www.wikidata.org',
+     'timestamp': 1657648455,
+     'title': 'Q2190037',
+     'type': 'edit',
+     'user': 'KrBot',
+     'wiki': 'wikidatawiki'}
+    >>> pprint(next(stream), width=75)  # doctest: +ELLIPSIS
+    {'$schema': '/mediawiki/recentchange/1.0.0',
+     'bot': True,
+     ...
+     'server_name': 'www.wikidata.org',
+     'server_script_path': '/w',
+     'server_url': 'https://www.wikidata.org',
+     ...
+     'type': 'edit',
+     'user': '...',
+     'wiki': 'wikidatawiki'}
     >>> del stream
+
+    .. versionchanged:: 7.6
+       subclassed from :class:`pywikibot.tools.collections.GeneratorWrapper`
     """
 
     def __init__(self, **kwargs) -> None:
@@ -273,8 +311,13 @@ class EventStreams:
             return True
         return any(function(data) for function in self.filter['any'])
 
-    def __iter__(self):
-        """Iterator."""
+    @property
+    def generator(self):
+        """Inner generator.
+
+        .. versionchanged:: 7.6
+           changed from iterator method to generator property
+        """
         n = 0
         event = None
         ignore_first_empty_warning = True

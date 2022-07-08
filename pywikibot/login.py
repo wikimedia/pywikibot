@@ -132,7 +132,7 @@ class LoginManager:
 
         try:
             data = self.site.allusers(start=main_username, total=1)
-            user = next(iter(data))
+            user = next(data)
         except APIError as e:
             if e.code == 'readapidenied':
                 pywikibot.warning("Could not check user '{}' exists on {}"
