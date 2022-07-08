@@ -10,7 +10,6 @@ and return a unicode string.
 #
 # Distributed under the terms of the MIT license.
 #
-import datetime
 import re
 from collections import OrderedDict, namedtuple
 from collections.abc import Sequence
@@ -25,7 +24,8 @@ from pywikibot.backports import Sequence as SequenceType
 from pywikibot.backports import Tuple
 from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.family import Family
-from pywikibot.tools import deprecated
+from pywikibot.time import TZoneFixedOffset
+from pywikibot.tools import deprecated, ModuleDeprecationWrapper
 from pywikibot.userinterfaces.transliteration import NON_LATIN_DIGITS
 
 
@@ -1829,41 +1829,6 @@ def reformat_ISBNs(text: str, match_func) -> str:
 # Time parsing functionality (Archivebot)
 # ---------------------------------------
 
-class tzoneFixedOffset(datetime.tzinfo):
-
-    """
-    Class building tzinfo objects for fixed-offset time zones.
-
-    :param offset: a number indicating fixed offset in minutes east from UTC
-    :param name: a string with name of the timezone
-    """
-
-    def __init__(self, offset: int, name: str) -> None:
-        """Initializer."""
-        self.__offset = datetime.timedelta(minutes=offset)
-        self.__name = name
-
-    def utcoffset(self, dt):
-        """Return the offset to UTC."""
-        return self.__offset
-
-    def tzname(self, dt):
-        """Return the name of the timezone."""
-        return self.__name
-
-    def dst(self, dt):
-        """Return no daylight savings time."""
-        return datetime.timedelta(0)
-
-    def __repr__(self) -> str:
-        """Return the internal representation of the timezone."""
-        return '{}({}, {})'.format(
-            self.__class__.__name__,
-            self.__offset.days * 86400 + self.__offset.seconds,
-            self.__name
-        )
-
-
 class TimeStripper:
 
     """Find timestamp in page and return it as pywikibot.Timestamp object."""
@@ -1929,7 +1894,7 @@ class TimeStripper:
         self._wikilink_pat = re.compile(
             r'\[\[(?P<link>[^\]\|]*?)(?P<anchor>\|[^\]]*)?\]\]')
 
-        self.tzinfo = tzoneFixedOffset(self.site.siteinfo['timeoffset'],
+        self.tzinfo = TZoneFixedOffset(self.site.siteinfo['timeoffset'],
                                        self.site.siteinfo['timezone'])
 
     @staticmethod
@@ -2108,3 +2073,10 @@ class TimeStripper:
             timestamp = None
 
         return timestamp
+
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper.add_deprecated_attr(
+    'tzoneFixedOffset',
+    replacement_name='pywikibot.time.TZoneFixedOffset',
+    since='7.5.0')
