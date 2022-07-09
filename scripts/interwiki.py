@@ -2398,7 +2398,7 @@ def main(*args: str) -> None:
         bot.run()
     except KeyboardInterrupt:
         dump.write_dump(bot.dump_titles, append)
-    except Exception:
+    except Exception:  # pragma: no cover
         pywikibot.exception()
         dump.write_dump(bot.dump_titles, append)
     else:
