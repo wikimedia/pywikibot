@@ -1007,8 +1007,6 @@ The text message is:
                 if key in ('error', 'warnings'):
                     continue
                 assert key not in error
-                assert isinstance(result[key], str), \
-                    'Unexpected {}: {!r}'.format(key, result[key])
                 error[key] = result[key]
 
             if '*' in result['error']:
