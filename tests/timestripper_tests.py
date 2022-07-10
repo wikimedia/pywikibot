@@ -9,7 +9,8 @@ import datetime
 import re
 from contextlib import suppress
 
-from pywikibot.textlib import TimeStripper, tzoneFixedOffset
+from pywikibot.textlib import TimeStripper
+from pywikibot.time import TZoneFixedOffset
 from tests.aspects import TestCase, unittest
 
 
@@ -152,7 +153,7 @@ class TestTimeStripperNumberAndDate(TestTimeStripperCase):
             self.ts.timestripper(
                 '2000 people will attend. --12:12, 14 December 2015 (UTC)'),
             datetime.datetime(
-                2015, 12, 14, 12, 12, tzinfo=tzoneFixedOffset(0, 'UTC')))
+                2015, 12, 14, 12, 12, tzinfo=TZoneFixedOffset(0, 'UTC')))
 
 
 class TestTimeStripperLanguage(TestCase):
@@ -224,7 +225,7 @@ class TestTimeStripperLanguage(TestCase):
         """Test that correct date is matched."""
         self.ts = TimeStripper(self.get_site(key))
 
-        tzone = tzoneFixedOffset(self.ts.site.siteinfo['timeoffset'],
+        tzone = TZoneFixedOffset(self.ts.site.siteinfo['timeoffset'],
                                  self.ts.site.siteinfo['timezone'])
 
         txt_match = self.sites[key]['match']
@@ -275,7 +276,7 @@ class TestTimeStripperTreatSpecialText(TestTimeStripperCase):
 
     date = '06:57 06 June 2015 (UTC)'
     fake_date = '05:57 06 June 2015 (UTC)'
-    tzone = tzoneFixedOffset(0, 'UTC')
+    tzone = TZoneFixedOffset(0, 'UTC')
     expected_date = datetime.datetime(2015, 6, 6, 6, 57, tzinfo=tzone)
 
     def test_timestripper_match_comment(self):
@@ -391,7 +392,7 @@ class TestTimeStripperDoNotArchiveUntil(TestTimeStripperCase):
     username = '[[User:DoNotArchiveUntil]]'
     date = '06:57 06 June 2015 (UTC)'
     user_and_date = username + ' ' + date
-    tzone = tzoneFixedOffset(0, 'UTC')
+    tzone = TZoneFixedOffset(0, 'UTC')
 
     def test_timestripper_match(self):
         """Test that dates in comments are correctly recognised."""

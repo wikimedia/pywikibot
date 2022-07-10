@@ -22,6 +22,7 @@ __all__ = (
     'str2timedelta',
     'MW_KEYS',
     'Timestamp',
+    'TZoneFixedOffset'
 )
 
 #: ..versionadded:: 7.5
@@ -307,6 +308,41 @@ class Timestamp(datetime.datetime):
         if isinstance(newdt, datetime.datetime):
             return self._from_datetime(newdt)
         return newdt
+
+
+class TZoneFixedOffset(datetime.tzinfo):
+
+    """
+    Class building tzinfo objects for fixed-offset time zones.
+
+    :param offset: a number indicating fixed offset in minutes east from UTC
+    :param name: a string with name of the timezone
+    """
+
+    def __init__(self, offset: int, name: str) -> None:
+        """Initializer."""
+        self._offset = datetime.timedelta(minutes=offset)
+        self._name = name
+
+    def utcoffset(self, dt):
+        """Return the offset to UTC."""
+        return self._offset
+
+    def tzname(self, dt):
+        """Return the name of the timezone."""
+        return self._name
+
+    def dst(self, dt):
+        """Return no daylight savings time."""
+        return datetime.timedelta(0)
+
+    def __repr__(self) -> str:
+        """Return the internal representation of the timezone."""
+        return '{}({}, {})'.format(
+            self.__class__.__name__,
+            self._offset.days * 86400 + self._offset.seconds,
+            self._name
+        )
 
 
 def str2timedelta(string: str, timestamp=None) -> datetime.timedelta:
