@@ -1002,18 +1002,18 @@ The text message is:
             if 'error' not in result:
                 return result
 
-            error = result['error'].copy()
+            error = result['error']
             for key in result:
                 if key in ('error', 'warnings'):
                     continue
                 assert key not in error
                 error[key] = result[key]
 
-            if '*' in result['error']:
+            if '*' in error:
                 # help text returned
-                result['error']['help'] = result['error'].pop('*')
-            code = result['error'].setdefault('code', 'Unknown')
-            info = result['error'].setdefault('info', None)
+                error['help'] = error.pop('*')
+            code = error.setdefault('code', 'Unknown')
+            info = error.setdefault('info', None)
 
             if not self._logged_in(code):
                 continue
@@ -1025,7 +1025,7 @@ The text message is:
                 pywikibot.log('Pausing due to database lag: ' + info)
 
                 try:
-                    lag = result['error']['lag']
+                    lag = error['lag']
                 except KeyError:
                     lag = lagpattern.search(info)
                     lag = float(lag.group('lag')) if lag else 0.0
@@ -1038,17 +1038,17 @@ The text message is:
                 # API information. As this data was requested, return the
                 # data instead of raising an exception.
                 return {'help': {'mime': 'text/plain',
-                                 'help': result['error']['help']}}
+                                 'help': error['help']}}
 
             pywikibot.warning('API error {}: {}'.format(code, info))
             pywikibot.log('           headers=\n{}'.format(response.headers))
 
-            if self._internal_api_error(code, error, result):
+            if self._internal_api_error(code, error.copy(), result):
                 continue
 
             # Phab. tickets T48535, T64126, T68494, T68619
             if code == 'failed-save' \
-               and self._is_wikibase_error_retryable(result['error']):
+               and self._is_wikibase_error_retryable(error):
                 self.wait()
                 continue
 
@@ -1090,13 +1090,13 @@ The text message is:
                 continue
 
             if code == 'urlshortener-blocked':  # T244062
-                # add additional informations to result['error']
-                result['error']['current site'] = self.site
+                # add additional informations to error dict
+                error['current site'] = self.site
                 if self.site.user():
-                    result['error']['current user'] = self.site.user()
+                    error['current user'] = self.site.user()
                 else:  # not logged in; show the IP
                     uinfo = self.site.userinfo
-                    result['error']['current user'] = uinfo['name']
+                    error['current user'] = uinfo['name']
 
             # raise error
             try:
@@ -1105,7 +1105,7 @@ The text message is:
                               .format(pprint.pformat(param_repr)))
                 pywikibot.log('           response=\n{}'.format(result))
 
-                raise pywikibot.exceptions.APIError(**result['error'])
+                raise pywikibot.exceptions.APIError(**error)
             except TypeError:
                 raise RuntimeError(result)
 
