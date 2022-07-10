@@ -715,9 +715,12 @@ class DataSite(APISite):
         """
         Send data values to the wikibase parser for interpretation.
 
-        :param datatype: datatype of the values being parsed. Refer to
-            https://www.wikidata.org/w/api.php?action=help&modules=wbparsevalue
-            for a valid datatype.
+        .. versionadded:: 7.5
+        .. seealso:: `wbparsevalue API
+           <https://www.wikidata.org/w/api.php?action=help&modules=wbparsevalue>`_
+
+        :param datatype: datatype of the values being parsed. Refer the
+            API for a valid datatype.
         :param values: list of values to be parsed
         :param options: any additional options for wikibase parser
             (for time, 'precision' should be specified)

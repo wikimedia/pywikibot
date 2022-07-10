@@ -1243,6 +1243,7 @@ class GeneratorsMixin:
            if namespace param contains multiple namespaces,
            log entries from all namespaces will be fetched from
            the API and will be filtered later during iteration.
+
         :param start: only iterate entries from and after this Timestamp
         :type start: Timestamp or ISO date string
         :param end: only iterate entries up to and through this Timestamp

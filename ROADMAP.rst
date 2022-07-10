@@ -1,6 +1,11 @@
 Current release 7.5.0
 ^^^^^^^^^^^^^^^^^^^^^
 
+* Wrapper method :meth:`parsevalue()<pywikibot.site._datasite.DataSite.parsevalue>`
+  around wbparsevalue was added (:phab:`T112140`)
+* L10N updates
+* Fix cp encodings in :func:`get_charset_from_content_type()
+  <pywikibot.comms.http.get_charset_from_content_type>` (:phab:`T312230`)
 * New :mod:`pywikibot.time` module with new functions in addition to `Timestamp`
 * :meth:`Page.revisions()<pywikibot.page.BasePage.revisions>` supports more formats/types for
   starttime and endtime parameters, in addition to those allowed by
