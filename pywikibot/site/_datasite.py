@@ -711,7 +711,8 @@ class DataSite(APISite):
         return gen
 
     def parsevalue(self, datatype: str, values: List[str],
-                   options: Dict[str, Any], validate: bool) -> List[Any]:
+                   options: Optional[Dict[str, Any]] = None,
+                   validate: bool = False) -> List[Any]:
         """
         Send data values to the wikibase parser for interpretation.
 
@@ -732,8 +733,9 @@ class DataSite(APISite):
         params = {
             'datatype': datatype,
             'values': values,
-            'options': json.dumps(options),
+            'options': json.dumps(options or {}),
             'validate': validate,
+            'uselang': 'en',
         }
         req = self.simple_request(action='wbparsevalue', **params)
         try:

@@ -636,13 +636,13 @@ class TestWikibaseParser(WikidataTestCase):
     def test_wbparse_strings(self):
         """Test that strings return unchanged."""
         test_list = ['test string', 'second test']
-        parsed_strings = self.site.parsevalue('string', test_list, {}, False)
+        parsed_strings = self.site.parsevalue('string', test_list)
         self.assertEqual(parsed_strings, test_list)
 
     def test_wbparse_time(self):
         """Test parsing of a time value."""
         parsed_date = self.site.parsevalue(
-            'time', ['1994-02-08'], {'precision': 9}, False)[0]
+            'time', ['1994-02-08'], {'precision': 9})[0]
         self.assertEqual(parsed_date['time'], '+1994-02-08T00:00:00Z')
         self.assertEqual(parsed_date['precision'], 9)
 
@@ -651,7 +651,7 @@ class TestWikibaseParser(WikidataTestCase):
         parsed_quantities = self.site.parsevalue(
             'quantity',
             ['1.90e-9+-0.20e-9', '1000000.00000000054321+-0', '-123+-1',
-             '2.70e34+-1e32'], {}, False)
+             '2.70e34+-1e32'])
         self.assertEqual(parsed_quantities[0]['amount'], '+0.00000000190')
         self.assertEqual(parsed_quantities[0]['upperBound'], '+0.00000000210')
         self.assertEqual(parsed_quantities[0]['lowerBound'], '+0.00000000170')
@@ -674,7 +674,7 @@ class TestWikibaseParser(WikidataTestCase):
     def test_wbparse_raises_valueerror(self):
         """Test invalid value condition."""
         with self.assertRaises(ValueError):
-            self.site.parsevalue('quantity', ['Not a quantity'], {}, False)
+            self.site.parsevalue('quantity', ['Not a quantity'])
 
 
 class TestWbGeoShapeNonDry(WbRepresentationTestCase):
