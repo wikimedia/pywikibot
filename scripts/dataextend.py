@@ -15095,31 +15095,37 @@ class FotomuseumAnalyzer(UrlAnalyzer):
         section = self.getvalue('Life dates', html)
         if section:
             return self.findbyre(r'(\d{4}) - ', section)
+        return None
 
     def finddeathdate(self, html):
         section = self.getvalue('Life dates', html)
         if section:
             return self.findbyre(r'(\d{4})\s*$', section)
+        return None
 
     def findbirthplace(self, html):
         section = self.getvalue('Life dates', html)
         if section:
             return self.findbyre(r'(.*?), \d{4} - ', section, 'city')
+        return None
 
     def finddeathplace(self, html):
         section = self.getvalue('Life dates', html)
         if section:
             return self.findbyre(r', \d{4} - (.*), \d{4}', section, 'city')
+        return None
 
     def findworkplaces(self, html):
         section = self.getvalue('Locations', html)
         if section:
             return self.findallbyre('([A-Z][^<>]*)', section, 'city')
+        return None
 
     def findgenres(self, html):
         section = self.getvalue('Genres / subject matter', html)
         if section:
             return self.findallbyre('[^<>]+', section, 'art-genre', alt=['genre'])
+        return None
 
     def findmixedrefs(self, html):
         return self.finddefaultmixedrefs(html, includesocial=False)
@@ -15131,6 +15137,7 @@ class FotomuseumAnalyzer(UrlAnalyzer):
         section = self.getvalue('Affiliated entity', html)
         if section:
             return self.findallbyre('<a [^<>]*>(.*?)<', section, 'organization')
+        return None
 
 
 class NationalTrustAnalyzer(UrlAnalyzer):
@@ -15154,21 +15161,25 @@ class NationalTrustAnalyzer(UrlAnalyzer):
         section = self.finddatesection(html)
         if section:
             return self.findbyre(r'^([\w\s]*?) [\-\d]', section, 'city')
+        return None
 
     def findbirthdate(self, html):
         section = self.finddatesection(html)
         if section:
             return self.findbyre(r' (\d*) -', section)
+        return None
 
     def finddeathplace(self, html):
         section = self.finddatesection(html)
         if section:
             return self.findbyre(r' - ([\w\s]*?)(?: \d|\))', section, 'city')
+        return None
 
     def finddeathdate(self, html):
         section = self.finddatesection(html)
         if section:
             return self.findbyre(r' (\d*)\s*\)', section)
+        return None
 
     def findincollections(self, html):
         return self.findallbyre(r'(?s)<label for="[^<>"]+">([^<>]*)</label>\s*<span class="item-bubble">[1-9]', html,
@@ -15274,6 +15285,7 @@ class UnivieAnalyzer(UrlAnalyzer):
         section = self.findbyre(r'"birthPlace":{(.*?)}', html)
         if section:
             return self.findbyre(r'"name":"(.*?)"', section, 'city')
+        return None
 
     def finddeathdate(self, html):
         return self.findbyre(r'"deathDate":"(.*?)"', html)
@@ -15343,6 +15355,7 @@ class WeberAnalyzer(UrlAnalyzer):
             subsection = self.findbyre(r'(?s)<div class="media-body">(.*?)<', section)
             if subsection:
                 return self.findallbyre(r'([^,]*)', subsection, 'occupation')
+        return None
 
     def findresidences(self, html):
         section = self.findbyre(r'(?s)<li class="media residences">(.*?)</li>', html)
@@ -15350,6 +15363,7 @@ class WeberAnalyzer(UrlAnalyzer):
             subsection = self.findbyre(r'(?s)<div class="media-body">(.*?)<', section)
             if subsection:
                 return self.findallbyre(r'([^,]*)', subsection, 'city')
+        return None
 
 
 class BacklinkAnalyzer(Analyzer):
