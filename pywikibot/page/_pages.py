@@ -2198,6 +2198,7 @@ class Page(BasePage):
                     intkeys[int(key)] = args[key]
                 except ValueError:
                     named[key] = args[key]
+
             for i in range(1, len(intkeys) + 1):
                 # only those args with consecutive integer keys can be
                 # treated as positional; an integer could also be used
@@ -2205,11 +2206,13 @@ class Page(BasePage):
                 # example: {{tmp|one|two|5=five|three}}
                 if i in intkeys:
                     positional.append(intkeys[i])
-                else:
-                    for k in intkeys:
-                        if k < 1 or k >= i:
-                            named[str(k)] = intkeys[k]
-                    break
+                    continue
+
+                for k in intkeys:
+                    if k < 1 or k >= i:
+                        named[str(k)] = intkeys[k]
+                break
+
             for item in named.items():
                 positional.append('{}={}'.format(*item))
             result.append((pywikibot.Page(link, self.site), positional))
@@ -2374,6 +2377,7 @@ class Category(Page):
         """
         if not isinstance(recurse, bool) and recurse:
             recurse = recurse - 1
+
         if not hasattr(self, '_subcats'):
             self._subcats = []
             for member in self.site.categorymembers(
@@ -2385,14 +2389,17 @@ class Category(Page):
                     total -= 1
                     if total == 0:
                         return
+
                 if recurse:
                     for item in subcat.subcategories(
                             recurse, total=total, content=content):
                         yield item
-                        if total is not None:
-                            total -= 1
-                            if total == 0:
-                                return
+                        if total is None:
+                            continue
+
+                        total -= 1
+                        if total == 0:
+                            return
         else:
             for subcat in self._subcats:
                 yield subcat
@@ -2400,14 +2407,17 @@ class Category(Page):
                     total -= 1
                     if total == 0:
                         return
+
                 if recurse:
                     for item in subcat.subcategories(
                             recurse, total=total, content=content):
                         yield item
-                        if total is not None:
-                            total -= 1
-                            if total == 0:
-                                return
+                        if total is None:
+                            continue
+
+                        total -= 1
+                        if total == 0:
+                            return
 
     def articles(self,
                  recurse: Union[int, bool] = False,
@@ -2489,12 +2499,15 @@ class Category(Page):
                     hash_value = hash(article)
                     if hash_value in seen:
                         continue
+
                     seen.add(hash_value)
                     yield article
-                    if total is not None:
-                        total -= 1
-                        if total == 0:
-                            return
+                    if total is None:
+                        continue
+
+                    total -= 1
+                    if total == 0:
+                        return
 
     def members(self, recurse: bool = False,
                 namespaces=None,
@@ -2518,10 +2531,12 @@ class Category(Page):
                 for article in subcat.members(
                         recurse, namespaces, total=total, content=content):
                     yield article
-                    if total is not None:
-                        total -= 1
-                        if total == 0:
-                            return
+                    if total is None:
+                        continue
+
+                    total -= 1
+                    if total == 0:
+                        return
 
     def isEmptyCategory(self) -> bool:
         """Return True if category has no members (including subcategories)."""
