@@ -49,7 +49,7 @@ class TestMementoArchive(MementoTestCase):
         archivedversion = self._get_archive_url('https://google.com')
         parsed = urlparse(archivedversion)
         self.assertIn(parsed.scheme, ['http', 'https'])
-        self.assertEqual(parsed.netloc, 'archive.ph')
+        self.assertEqual(parsed.netloc, 'arquivo.pt')
 
 
 class TestMementoDefault(MementoTestCase):
