@@ -217,21 +217,33 @@ class RightsEntry(LogEntry):
 
     @property
     def oldgroups(self) -> List[str]:
-        """Return old rights groups."""
+        """Return old rights groups.
+
+        .. versionchanged:: 7.5
+           No longer raise KeyError if `oldgroups` does not exists or
+           LogEntry has no additional data e.g. due to hidden data and
+           insufficient rights.
+        """
         params = self._params
         if 'old' in params:  # old mw style (mw < 1.25)
             return params['old'].split(',') if params['old'] else []
 
-        return params['oldgroups']
+        return params.get('oldgroups', [])
 
     @property
     def newgroups(self) -> List[str]:
-        """Return new rights groups."""
+        """Return new rights groups.
+
+        .. versionchanged:: 7.5
+           No longer raise KeyError if `oldgroups` does not exists or
+           LogEntry has no additional data e.g. due to hidden data and
+           insufficient rights.
+        """
         params = self._params
         if 'new' in params:  # old mw style (mw < 1.25)
             return params['new'].split(',') if params['new'] else []
 
-        return params['newgroups']
+        return params.get('newgroups', [])
 
 
 class UploadEntry(LogEntry):
