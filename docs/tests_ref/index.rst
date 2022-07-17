@@ -31,7 +31,6 @@ Library tests
     conftest
     cosmetic_changes<./cosmetic_changes_tests>
     date<./date_tests>
-    deprecation<./deprecation_tests>
     diff<./diff_tests>
     djvu<./djvu_tests>
     dry_api<./dry_api_tests>
@@ -73,6 +72,7 @@ Library tests
     timestripper<./timestripper_tests>
     tk<./tk_tests>
     tools_chars<./tools_chars_tests>
+    tools_deprecate<./tools_deprecate_tests>
     tools_formatter<./tools_formatter_tests>
     tools<./tools_tests>
     ui_options<./ui_options_tests>
