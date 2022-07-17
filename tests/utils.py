@@ -170,16 +170,21 @@ class AssertAPIErrorContextManager:
     object given or calls the callable object.
     """
 
-    def __init__(self, code, info, msg, test_case):
+    def __init__(self, code, info, msg, test_case, regex=None):
         """Create instance expecting the code and info."""
         self.code = code
         self.info = info
         self.msg = msg
         self.test_case = test_case
+        self.regex = regex
 
     def __enter__(self):
         """Enter this context manager and the unittest's context manager."""
-        self.cm = self.test_case.assertRaises(APIError, msg=self.msg)
+        if self.regex:
+            self.cm = self.test_case.assertRaisesRegex(APIError, self.regex,
+                                                       msg=self.msg)
+        else:
+            self.cm = self.test_case.assertRaises(APIError, msg=self.msg)
         self.cm.__enter__()
         return self.cm
 
