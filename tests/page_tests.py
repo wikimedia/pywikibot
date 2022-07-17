@@ -20,6 +20,7 @@ from pywikibot.exceptions import (
     IsNotRedirectPageError,
     IsRedirectPageError,
     NoPageError,
+    TimeoutError,
     UnknownExtensionError,
 )
 from pywikibot.tools import suppress_warnings
@@ -502,8 +503,9 @@ class TestPageObject(DefaultSiteTestCase):
         for p in mainpage.backlinks(follow_redirects=False, total=10):
             self.assertIsInstance(p, pywikibot.Page)
 
-        for p in mainpage.embeddedin(total=10):
-            self.assertIsInstance(p, pywikibot.Page)
+        with skipping(TimeoutError):
+            for p in mainpage.embeddedin(total=10):
+                self.assertIsInstance(p, pywikibot.Page)
 
     def testLinks(self):
         """Test the different types of links from a page."""

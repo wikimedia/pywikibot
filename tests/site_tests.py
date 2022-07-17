@@ -26,6 +26,7 @@ from pywikibot.exceptions import (
     IsNotRedirectPageError,
     NoPageError,
     PageInUseError,
+    TimeoutError,
     UnknownExtensionError,
     UnknownSiteError,
 )
@@ -311,8 +312,9 @@ class TestSiteGenerators(DefaultSiteTestCase):
         """Test Site.pagereferences."""
         # pagereferences includes both backlinks and embeddedin
         backlinks = set(self.site.pagebacklinks(self.mainpage, namespaces=[0]))
-        embedded = set(self.site.page_embeddedin(self.mainpage,
-                                                 namespaces=[0]))
+        with skipping(TimeoutError):
+            embedded = set(self.site.page_embeddedin(self.mainpage,
+                                                     namespaces=[0]))
         refs = set(self.site.pagereferences(self.mainpage, namespaces=[0]))
 
         self.assertLessEqual(backlinks, refs)
@@ -350,14 +352,15 @@ class TestSiteGenerators(DefaultSiteTestCase):
 
     def test_embeddedin(self):
         """Test Site.page_embeddedin."""
-        embedded_ns_0 = set(self.site.page_embeddedin(
-            self.mainpage, namespaces=[0]))
-        embedded_ns_0_2 = set(self.site.page_embeddedin(
-            self.mainpage, namespaces=[0, 2]))
-        redirs = set(self.site.page_embeddedin(
-            self.mainpage, filter_redirects=True, namespaces=[0]))
-        no_redirs = set(self.site.page_embeddedin(
-            self.mainpage, filter_redirects=False, namespaces=[0]))
+        with skipping(TimeoutError):
+            embedded_ns_0 = set(self.site.page_embeddedin(
+                self.mainpage, namespaces=[0]))
+            embedded_ns_0_2 = set(self.site.page_embeddedin(
+                self.mainpage, namespaces=[0, 2]))
+            redirs = set(self.site.page_embeddedin(
+                self.mainpage, filter_redirects=True, namespaces=[0]))
+            no_redirs = set(self.site.page_embeddedin(
+                self.mainpage, filter_redirects=False, namespaces=[0]))
 
         for ei in embedded_ns_0:
             self.assertIsInstance(ei, pywikibot.Page)
