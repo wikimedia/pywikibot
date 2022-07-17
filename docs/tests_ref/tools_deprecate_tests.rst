@@ -1,7 +1,7 @@
-tests.deprecation\_tests module
-===============================
+tests.tools\_deprecate\_tests module
+====================================
 
-.. automodule:: tests.deprecation_tests
+.. automodule:: tests.tools_deprecate_tests
     :members:
     :undoc-members:
     :show-inheritance:
