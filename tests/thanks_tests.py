@@ -103,11 +103,18 @@ class TestThankRevisionErrors(TestCase):
     def test_invalid_revision(self):
         """Test that passing an invalid revision ID causes an error."""
         site = self.get_site()
-        invalid_revids = (0, -1, 0.99, 'zero, minus one, and point nine nine',
-                          (0, -1, 0.99), [0, -1, 0.99])
+        invalid_revids = (0.99, (0, -1), (0, -1, 0.99,), [0, -1, 0.99], 'zero',
+                          'minus one, and point nine nine')
+        code = 'invalidrevision' if site.mw_version < '1.35' else 'badinteger'
         for invalid_revid in invalid_revids:
-            self.assertAPIError('invalidrevision', None, site.thank_revision,
-                                invalid_revid, source='pywikibot test')
+            with self.subTest(revids=invalid_revid):
+                self.assertAPIError(code, None, site.thank_revision,
+                                    invalid_revid, source='pywikibot test')
+        for invalid_revid in [0, -1, [0], [-1]]:
+            with self.subTest(revids=invalid_revid):
+                self.assertAPIError('invalidrevision', None,
+                                    site.thank_revision, invalid_revid,
+                                    source='pywikibot test')
 
 
 if __name__ == '__main__':  # pragma: no cover
