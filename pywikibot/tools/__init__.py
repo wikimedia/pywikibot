@@ -1188,12 +1188,12 @@ def open_archive(filename: str, mode: str = 'rb', use_extension: bool = True):
     if extension == 'bz2':
         if isinstance(bz2, ImportError):
             raise bz2
-        return bz2.BZ2File(filename, mode)
+        binary = bz2.BZ2File(filename, mode)
 
-    if extension == 'gz':
-        return gzip.open(filename, mode)
+    elif extension == 'gz':
+        binary = gzip.open(filename, mode)
 
-    if extension == '7z':
+    elif extension == '7z':
         if mode != 'rb':
             raise NotImplementedError('It is not possible to write a 7z file.')
 
@@ -1203,25 +1203,27 @@ def open_archive(filename: str, mode: str = 'rb', use_extension: bool = True):
                                        stderr=subprocess.PIPE,
                                        bufsize=65535)
         except OSError:
-            raise ValueError('7za is not installed or cannot '
-                             'uncompress "{}"'.format(filename))
-        else:
-            stderr = process.stderr.read()
-            process.stderr.close()
-            if stderr != b'':
-                process.stdout.close()
-                raise OSError(
-                    'Unexpected STDERR output from 7za {}'.format(stderr))
-            return process.stdout
+            raise ValueError('7za is not installed or cannot uncompress "{}"'
+                             .format(filename))
 
-    if extension in ('lzma', 'xz'):
+        stderr = process.stderr.read()
+        process.stderr.close()
+        if stderr != b'':
+            process.stdout.close()
+            raise OSError(
+                'Unexpected STDERR output from 7za {}'.format(stderr))
+        binary = process.stdout
+
+    elif extension in ('lzma', 'xz'):
         if isinstance(lzma, ImportError):
             raise lzma
         lzma_fmts = {'lzma': lzma.FORMAT_ALONE, 'xz': lzma.FORMAT_XZ}
-        return lzma.open(filename, mode, format=lzma_fmts[extension])
+        binary = lzma.open(filename, mode, format=lzma_fmts[extension])
 
-    # assume it's an uncompressed file
-    return open(filename, 'rb')
+    else:  # assume it's an uncompressed file
+        binary = open(filename, 'rb')
+
+    return binary
 
 
 def merge_unique_dicts(*args, **kwargs):
