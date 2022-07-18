@@ -712,6 +712,7 @@ class DataSite(APISite):
 
     def parsevalue(self, datatype: str, values: List[str],
                    options: Optional[Dict[str, Any]] = None,
+                   language: Optional[str] = None,
                    validate: bool = False) -> List[Any]:
         """
         Send data values to the wikibase parser for interpretation.
@@ -725,19 +726,21 @@ class DataSite(APISite):
         :param values: list of values to be parsed
         :param options: any additional options for wikibase parser
             (for time, 'precision' should be specified)
+        :param language: code of the language to parse the value in
         :param validate: whether parser should provide data validation as well
             as parsing
         :return: list of parsed values
         :raises ValueError: parsing failed due to some invalid input values
         """
         params = {
+            'action': 'wbparsevalue',
             'datatype': datatype,
             'values': values,
             'options': json.dumps(options or {}),
             'validate': validate,
-            'uselang': 'en',
+            'uselang': language or 'en',
         }
-        req = self.simple_request(action='wbparsevalue', **params)
+        req = self.simple_request(**params)
         try:
             data = req.submit()
         except APIError as e:

@@ -101,6 +101,7 @@ will not add duplicate claims for the same member:
 #
 # Distributed under the terms of MIT License.
 #
+import re
 import signal
 import sys
 from typing import Any, Iterator, Optional
@@ -108,9 +109,11 @@ from typing import Any, Iterator, Optional
 import pywikibot
 from pywikibot import pagegenerators as pg
 from pywikibot import textlib
+from pywikibot import WbTime
 from pywikibot.backports import List, Tuple
 from pywikibot.bot import ConfigParserBot, OptionHandler, WikidataBot
 from pywikibot.exceptions import (
+    APIError,
     InvalidPageError,
     InvalidTitleError,
     NoPageError,
@@ -192,12 +195,14 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
                 self.fields[key] = value
             else:  # backwards compatibility
                 self.fields[key] = (value, PropertyOptionHandler())
-        self.cacheSources()
-        # TODO: Make it a list including the redirects to the template
-        template_title = template_title.replace('_', ' ')
-        self.templateTitles = self.getTemplateSynonyms(template_title)
+        self.template_title = template_title.replace('_', ' ')
         self.linkR = textlib.compileLinkR()
         self.create_missing_item = self.opt.create
+
+    def setup(self):
+        """Cache some static data from wikis."""
+        self.cacheSources()
+        self.templateTitles = self.getTemplateSynonyms(self.template_title)
 
     def getTemplateSynonyms(self, title) -> List[str]:
         """Fetch redirects of the title, so we can check against them."""
@@ -369,6 +374,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
 
         .. versionadded:: 7.5
         """
+        value = value.replace('{{!}}', '|')
         prop, options = self.fields[field]
         matched = False
 
@@ -392,6 +398,61 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         linked_item = self.template_link_target(item, site, value)
         if linked_item:
             yield linked_item
+
+    def handle_time(self, value: str,
+                    site: pywikibot.site.BaseSite,
+                    *args) -> Iterator[WbTime]:
+        """Handle 'time' claim type.
+
+        .. versionadded:: 7.5
+        """
+        value = value.replace('{{!}}', '|')
+        value = value.replace('&nbsp;', ' ')
+        value = re.sub('</?sup>', '', value)
+
+        # Some wikis format dates using wikilinks. We construct
+        # all possible texts, e.g., "[[A|B]] of [[C]]" becomes
+        # "A of C" and "B of C", and parse them using the API.
+        # If the result is same for all the values, we import
+        # the value.
+        to_parse = {''}
+        prev_end = 0
+        for match in pywikibot.link_regex.finditer(value):
+            start, end = match.span()
+            since_prev_match = value[prev_end:start]
+
+            title = match.group('title').strip()
+            text = match.group(2)
+            if text:
+                text = text[1:].strip()  # remove '|'
+
+            new_to_parse = set()
+            for fragment in to_parse:
+                fragment += since_prev_match
+                new_to_parse.add(fragment + title)
+                if text:
+                    new_to_parse.add(fragment + text)
+
+            to_parse = new_to_parse
+            prev_end = end
+
+        rest = value[prev_end:]
+        to_parse = [text + rest for text in to_parse]
+
+        try:
+            result = self.repo.parsevalue('time', to_parse, language=site.lang)
+        except (APIError, ValueError):
+            return
+
+        out = None
+        for data in result:
+            if out is None:
+                out = data
+            elif out != data:
+                pywikibot.output('Found ambiguous date: "{}"'.format(value))
+                return
+
+        yield WbTime.fromWikibase(out, self.repo)
 
     @staticmethod
     def handle_string(value, *args) -> Iterator[str]:
@@ -494,6 +555,10 @@ def main(*args: str) -> None:
     if not template_title:
         pywikibot.error(
             'Please specify either -template or -transcludes argument')
+        return
+
+    if not fields:
+        pywikibot.error('No template parameters to harvest specified.')
         return
 
     if not gen.gens:
