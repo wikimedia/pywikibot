@@ -6,8 +6,8 @@ Scripts Changelog
 
 *current release*
 
-harvest_templates
-~~~~~~~~~~~~~~~~~
+harvest_template
+~~~~~~~~~~~~~~~~
 
 *  Add ``-inverse`` option for inverse claims (:phab:`T173238`)
 *  Only follow redirects in harvest_template.py if no wikibase item
@@ -23,8 +23,8 @@ addtext
 
 *  Fix for -createonly option (:phab:`T311173`)
 
-harvest_templates
-~~~~~~~~~~~~~~~~~
+harvest_template
+~~~~~~~~~~~~~~~~
 
 *  Add -confirm option which sets ‘always’ option to False
    (:phab:`T310356`)

@@ -1,7 +1,7 @@
-tests.harvest\_templates\_tests module
+tests.harvest\_template\_tests module
 ======================================
 
-.. automodule:: tests.harvest_templates_tests
+.. automodule:: tests.harvest_template_tests
     :members:
     :undoc-members:
     :show-inheritance:

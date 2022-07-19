@@ -102,7 +102,7 @@ Script tests
     fixing_redirects<./fixing_redirects_tests>
     generate_family_file<./generate_family_file_tests>
     generate_user_files<./generate_user_files_tests>
-    harvest_templates<./harvest_templates_tests>
+    harvest_template<./harvest_template_tests>
     interwikidata<./interwikidata_tests>
     noreferences<./noreferences_tests>
     patrolbot<./patrolbot_tests>
