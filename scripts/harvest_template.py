@@ -218,6 +218,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
 
     def template_link_target(self,
                              item: pywikibot.ItemPage,
+                             site: pywikibot.site.BaseSite,
                              link_text: str) -> Optional[pywikibot.ItemPage]:
         """Find the ItemPage target for a given link text.
 
@@ -225,7 +226,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
            Only follow the redirect target if redirect page has no
            wikibase item.
         """
-        linked_page = pywikibot.Page(self.current_page.site, link_text)
+        linked_page = pywikibot.Page(site, link_text)
         try:
             exists = linked_page.exists()
         except (InvalidTitleError, InvalidPageError):
@@ -296,10 +297,11 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
 
             # We found the template we were looking for
             for field_item in fielddict.items():
-                self.treat_field(item, field_item)
+                self.treat_field(item, page.site, field_item)
 
     def treat_field(self,
                     item: pywikibot.page.ItemPage,
+                    site: pywikibot.site.BaseSite,
                     field_item: Tuple[str, str]) -> None:
         """Process a single field of template fielddict.
 
@@ -309,8 +311,6 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         field = field.strip()
         if not field or field not in self.fields:
             return
-
-        site = self.current_page.site
 
         # todo: extend the list of tags to ignore
         value = textlib.removeDisabledParts(
@@ -334,7 +334,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         do_multi = self._get_option_with_fallback(options, 'multi')
         inverse_prop = self._get_option_with_fallback(options, 'inverse')
 
-        for target in handler(value, item, field):
+        for target in handler(value, site, item, field):
             claim = ppage.newClaim()
             claim.setTarget(target)
             # A generator might yield pages from multiple sites
@@ -362,6 +362,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
                 exists_arg.add('p')
 
     def handle_wikibase_item(self, value: str,
+                             site: pywikibot.site.BaseSite,
                              item: pywikibot.page.ItemPage,
                              field: str) -> Iterator[pywikibot.ItemPage]:
         """Handle 'wikibase-item' claim type.
@@ -375,7 +376,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         for match in pywikibot.link_regex.finditer(value):
             matched = True
             link_text = match.group(1)
-            linked_item = self.template_link_target(item, link_text)
+            linked_item = self.template_link_target(item, site, link_text)
             if linked_item:
                 yield linked_item
 
@@ -388,7 +389,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
                 .format(prop, field, value))
             return
 
-        linked_item = self.template_link_target(item, value)
+        linked_item = self.template_link_target(item, site, value)
         if linked_item:
             yield linked_item
 
@@ -410,13 +411,13 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         for match in self.linkR.finditer(value):
             yield match.group('url')
 
-    def handle_commonsmedia(self, value, *args
+    def handle_commonsmedia(self, value, site, *args
                             ) -> Iterator[pywikibot.FilePage]:
         """Handle 'commonsMedia' claim type.
 
         .. versionadded:: 7.5
         """
-        repo = self.current_page.site.image_repository()
+        repo = site.image_repository()
         image = pywikibot.FilePage(repo, value)
         if image.isRedirectPage():
             image = pywikibot.FilePage(image.getRedirectTarget())
