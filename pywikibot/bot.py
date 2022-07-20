@@ -2218,6 +2218,9 @@ class WikidataBot(Bot, ExistingPageBot):
           page save will be reported and ignored (default: False)
         :return: whether the item was saved successfully
 
+        .. note:: calling this method sets the current_page property
+           to the item which changes the site property
+
         .. note:: calling this method with the 'source' argument modifies
            the provided claim object in place
         """
@@ -2265,6 +2268,9 @@ class WikidataBot(Bot, ExistingPageBot):
         :param exists_arg: pattern for merging existing claims with new ones
         :param logger_callback: function logging the output of the method
         :return: whether the claim could be added
+
+        .. note:: calling this method may change the current_page property
+           to the item which will also change the site property
 
         .. note:: calling this method with the 'source' argument modifies
            the provided claim object in place

@@ -44,7 +44,7 @@ class TestHarvestRobot(ScriptMainTestCase):
             with self.subTest(link=link, item=item):
                 dummy_item = ItemPage(self.site.data_repository(), 'Q1')
                 target = HarvestRobot.template_link_target(
-                    DummyBot(self.site), dummy_item, link)
+                    DummyBot(self.site), dummy_item, self.site, link)
                 self.assertIsInstance(target, ItemPage)
                 self.assertEqual(target.title(), item)
 
