@@ -1,8 +1,12 @@
 Current release 7.5.0
 ^^^^^^^^^^^^^^^^^^^^^
 
+* Add support for blkwiki (:phab:`T310875`)
+* L10N Updates
+* Fix duplicate source detection in :meth:`pywikibot.WikidataBot.user_add_claim_unless_exists`
+* :mod:`pywikibot.textlib`.tzoneFixedOffset class was renamed to :class:`pywikibot.time.TZoneFixedOffset`
 * Wrapper method :meth:`parsevalue()<pywikibot.site._datasite.DataSite.parsevalue>`
-  around wbparsevalue was added (:phab:`T112140`)
+  around wbparsevalue was added (:phab:`T112140`, :phab:`T312755`)
 * L10N updates
 * Fix cp encodings in :func:`get_charset_from_content_type()
   <pywikibot.comms.http.get_charset_from_content_type>` (:phab:`T312230`)
@@ -21,6 +25,7 @@ Current release 7.5.0
 Deprecations
 ^^^^^^^^^^^^
 
+* 7.5.0: :mod:`pywikibot.textlib`.tzoneFixedOffset class will be removed in favour of :class:`pywikibot.time.TZoneFixedOffset`
 * 7.4.0: `FilePage.usingPages()` was renamed to :meth:`using_pages()<pywikibot.FilePage.using_pages>`
 * 7.2.0: ``tb`` parameter of :func:`exception()<pywikibot.exception>` function was renamed to ``exc_info``
 * 7.2.0: XMLDumpOldPageGenerator is deprecated in favour of a `content` parameter of `XMLDumpPageGenerator` (:phab:`T306134`)
