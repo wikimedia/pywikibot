@@ -143,13 +143,6 @@ Pywikibot provides bot classes to develop your own script easily:
 For more documentation on Pywikibot see our `docs <https://doc.wikimedia.org/pywikibot/>`_.
 
 
-Required external programs
----------------------------
-
-It may require the following programs to function properly:
-
-* `7za`: To extract 7z files
-
 Roadmap
 -------
 
