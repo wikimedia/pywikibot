@@ -1193,7 +1193,7 @@ class Subject(interwiki_graph.Subject):
         elif self.conf.autonomous and duplicate and not skip:
             pywikibot.output('Stopping work on {} because duplicate pages'
                              ' {} and {} are found'
-                             .format(self.originP, duplicate, page))
+                             .format(self.origin, duplicate, page))
             self.makeForcedStop(counter)
             try:
                 with codecs.open(
