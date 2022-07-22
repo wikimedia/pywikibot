@@ -1,26 +1,8 @@
-Current release 7.5.0
+Current release 7.6.0
 ^^^^^^^^^^^^^^^^^^^^^
 
-* Add support for blkwiki (:phab:`T310875`)
-* L10N Updates
-* Fix duplicate source detection in :meth:`pywikibot.WikidataBot.user_add_claim_unless_exists`
-* :mod:`pywikibot.textlib`.tzoneFixedOffset class was renamed to :class:`pywikibot.time.TZoneFixedOffset`
-* Wrapper method :meth:`parsevalue()<pywikibot.site._datasite.DataSite.parsevalue>`
-  around wbparsevalue was added (:phab:`T112140`, :phab:`T312755`)
-* L10N updates
-* Fix cp encodings in :func:`get_charset_from_content_type()
-  <pywikibot.comms.http.get_charset_from_content_type>` (:phab:`T312230`)
-* New :mod:`pywikibot.time` module with new functions in addition to `Timestamp`
-* :meth:`Page.revisions()<pywikibot.page.BasePage.revisions>` supports more formats/types for
-  starttime and endtime parameters, in addition to those allowed by
-  :meth:`Timestamp.fromISOformat()<pywikibot.Timestamp.fromISOformat>`.
-* New :meth:`Timestamp.set_timestamp()<pywikibot.Timestamp.set_timestamp>` method
-* Fully ISO8601 and POSIX format support with :class:`pywikibot.Timestamp`;
-  formats are compliant with MediaWiki supported formats
-* Handle asynchronous page_put_queue after KeyboardInterrupt in Python 3.9+ (:phab:`T311076`)
-* No longer expect a specific namespace alias in cosmetic_changes
-  :meth:`translateAndCapitalizeNamespaces
-  <pywikibot.cosmetic_changes.CosmeticChangesToolkit.translateAndCapitalizeNamespaces>`
+*(No changes yet)*
+
 
 Deprecations
 ^^^^^^^^^^^^
