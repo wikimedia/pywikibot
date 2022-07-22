@@ -25,7 +25,7 @@ __all__ = (
     'TZoneFixedOffset'
 )
 
-#: ..versionadded:: 7.5
+#: .. versionadded:: 7.5
 MW_KEYS = types.MappingProxyType({
     's': 'seconds',
     'h': 'hours',

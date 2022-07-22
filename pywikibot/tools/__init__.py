@@ -634,7 +634,7 @@ class ThreadedGenerator(threading.Thread):
     >>> data
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
 
-    ..versionadded:: 3.0
+    .. versionadded:: 3.0
     """
 
     def __init__(self, group=None, target=None, name: str = 'GeneratorThread',

@@ -10,9 +10,9 @@ Various Wikibase pages are defined in ``page._wikibase.py``,
 various pages for Proofread Extensions are defined in
 ``pywikibot.proofreadpage``.
 
-..note:: `Link` objects represent a wiki-page's title, while
-  :class:`pywikibot.Page` objects (defined here) represent the page
-  itself, including its contents.
+.. note:: `Link` objects represent a wiki-page's title, while
+   :class:`pywikibot.Page` objects (defined here) represent the page
+   itself, including its contents.
 """
 #
 # (C) Pywikibot team, 2008-2022

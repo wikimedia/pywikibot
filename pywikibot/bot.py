@@ -2263,7 +2263,7 @@ class WikidataBot(Bot, ExistingPageBot):
         Before adding a new claim, it checks if we can add it, using provided
         filters.
 
-        ..seealso:: documentation of :py:obj:`claimit.py<scripts.claimit>`
+        .. seealso:: documentation of :py:obj:`claimit.py<scripts.claimit>`
 
         :param exists_arg: pattern for merging existing claims with new ones
         :param logger_callback: function logging the output of the method
