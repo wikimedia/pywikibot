@@ -366,6 +366,7 @@ class APISite(
         try:
             del self.userinfo  # force reload
             if self.userinfo['name'] == self.user():
+                self._loginstatus = _LoginStatus.AS_USER
                 return
 
         # May occur if you are not logged in (no API read permissions).
