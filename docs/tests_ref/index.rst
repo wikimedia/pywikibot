@@ -31,7 +31,6 @@ Library tests
     conftest
     cosmetic_changes<./cosmetic_changes_tests>
     date<./date_tests>
-    deprecation<./deprecation_tests>
     diff<./diff_tests>
     djvu<./djvu_tests>
     dry_api<./dry_api_tests>
@@ -69,10 +68,11 @@ Library tests
     textlib<./textlib_tests>
     thanks<./thanks_tests>
     thread<./thread_tests>
-    timestamp<./timestamp_tests>
+    time<./time_tests>
     timestripper<./timestripper_tests>
     tk<./tk_tests>
     tools_chars<./tools_chars_tests>
+    tools_deprecate<./tools_deprecate_tests>
     tools_formatter<./tools_formatter_tests>
     tools<./tools_tests>
     ui_options<./ui_options_tests>
@@ -102,6 +102,7 @@ Script tests
     fixing_redirects<./fixing_redirects_tests>
     generate_family_file<./generate_family_file_tests>
     generate_user_files<./generate_user_files_tests>
+    harvest_template<./harvest_template_tests>
     interwikidata<./interwikidata_tests>
     noreferences<./noreferences_tests>
     patrolbot<./patrolbot_tests>

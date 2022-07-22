@@ -264,7 +264,7 @@ class TestCaseBase(TestTimerMixin):
         self.assertCountEqual(gen_titles, titles)
 
     def assertAPIError(self, code, info=None, callable_obj=None, *args,
-                       **kwargs):
+                       regex=None, **kwargs):
         """
         Assert that a specific APIError wrapped around :py:obj:`assertRaises`.
 
@@ -288,7 +288,7 @@ class TestCaseBase(TestTimerMixin):
         """
         msg = kwargs.pop('msg', None)
         return AssertAPIErrorContextManager(
-            code, info, msg, self).handle(callable_obj, args, kwargs)
+            code, info, msg, self, regex).handle(callable_obj, args, kwargs)
 
 
 def require_modules(*required_modules):

@@ -265,6 +265,8 @@ class Siteinfo(Container):
         It will never throw an APIError if it only stated, that the siteinfo
         property doesn't exist. Instead it will use the default value.
 
+        .. seealso:: :py:obj:`_get_siteinfo`
+
         :param key: The name of the siteinfo property.
         :param get_default: Whether to throw an KeyError if the key is invalid.
         :param cache: Caches the result internally so that future accesses via
@@ -274,7 +276,6 @@ class Siteinfo(Container):
         :return: The gathered property
         :raises KeyError: If the key is not a valid siteinfo property and the
             get_default option is set to False.
-        :see: :py:obj:`_get_siteinfo`
         """
         # If expiry is True, convert it to 0 to be coherent with
         # _get_siteinfo() and _get_general() docstring.

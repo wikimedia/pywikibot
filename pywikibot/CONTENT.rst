@@ -67,6 +67,8 @@ The contents of the package
     +----------------------------+------------------------------------------------------+
     | throttle.py                | Mechanics to slow down wiki read and/or write rate   |
     +----------------------------+------------------------------------------------------+
+    | time.py                    | Timesstamp and time functions                        |
+    +----------------------------+------------------------------------------------------+
     | titletranslate.py          | Rules and tricks to auto-translate wikipage titles   |
     |                            | articles                                             |
     +----------------------------+------------------------------------------------------+

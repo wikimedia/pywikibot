@@ -23,7 +23,6 @@ from pywikibot.bot import (
     VERBOSE,
     WARNING,
 )
-from pywikibot.tools import PYTHON_VERSION
 from pywikibot.userinterfaces import (
     terminal_interface_base,
     terminal_interface_unix,
@@ -185,12 +184,9 @@ class TestTerminalOutput(UITestCase):
                          "    raise TestExceptionError('Testing Exception')")
 
         end_str = ': Testing Exception'
-        traceback_line = stderrlines[4 + (PYTHON_VERSION >= (3, 11))]
-        self.assertTrue(traceback_line.endswith(end_str),
+        self.assertTrue(stderrlines[-1].endswith(end_str),
                         '\n{!r} does not end with {!r}'
-                        .format(traceback_line, end_str))
-
-        self.assertNotEqual(stderrlines[-1], '\n')
+                        .format(stderrlines[-1], end_str))
 
 
 class TestTerminalInput(UITestCase):

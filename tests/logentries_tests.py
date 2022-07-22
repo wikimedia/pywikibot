@@ -88,10 +88,12 @@ class TestLogentriesBase(TestCase):
 
         try:
             self.assertIsInstance(logentry.comment(), str)
+            self.assertIsInstance(logentry.user(), str)
+            self.assertEqual(logentry.user(), logentry['user'])
         except HiddenKeyError as e:
             self.assertRegex(
                 str(e),
-                r"Log entry \([^)]+\) has a hidden 'comment' key and you "
+                r"Log entry \([^)]+\) has a hidden '\w+' key and you "
                 r"don't have permission to view it")
         except KeyError as e:
             self.assertRegex(str(e), "Log entry ([^)]+) has no 'comment' key")
@@ -125,12 +127,10 @@ class TestLogentriesBase(TestCase):
                 logentry.page()
 
         self.assertEqual(logentry.type(), logtype)
-        self.assertIsInstance(logentry.user(), str)
         self.assertGreaterEqual(logentry.logid(), 0)
 
         # test new UserDict style
         self.assertEqual(logentry.type(), logentry['type'])
-        self.assertEqual(logentry.user(), logentry['user'])
         self.assertEqual(logentry.logid(), logentry['logid'])
 
 

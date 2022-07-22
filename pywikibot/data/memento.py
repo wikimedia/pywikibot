@@ -54,10 +54,10 @@ class MementoClient(OldMementoClient):
     ['closest', 'first', 'last', 'next', 'prev']
     >>> del mc['mementos']['last']
     >>> from pprint import pprint
-    >>> pprint(mc['mementos'])
-    {'closest': {'datetime': datetime.datetime(2010, 2, 28, 8, 5, 38),
+    >>> pprint(mc['mementos'])  # doctest: +ELLIPSIS
+    {'closest': {'datetime': datetime.datetime(2010, 2, 28, ...),
                  'http_status_code': 200,
-                 'uri': ['https://swap.stanford.edu/20100228080538/http://www.bbc.co.uk/']},
+                 'uri': ['https://swap.stanford.edu/.../']},
      'first': {'datetime': datetime.datetime(1998, 12, 2, 21, 26, 10),
                'uri': ['http://wayback.nli.org.il:8080/19981202212610/http://bbc.com/']},
      'next': {'datetime': datetime.datetime(2010, 5, 23, 13, 47, 38),

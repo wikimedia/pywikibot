@@ -1,23 +1,31 @@
-Current release 7.4.0
+Current release 7.5.0
 ^^^^^^^^^^^^^^^^^^^^^
 
-* Provide Built Distribution with Pywikibot (:pep:`427`)
-* Update `WRITE_ACTIONS` in used by :class:`api.Request<pywikibot.data.api.Request>`
-* Move :func:`get_closest_memento_url<pywikibot.data.memento.get_closest_memento_url>` from weblinkchecker script to memento module.
-* Add :mod:`memento module<pywikibot.data.memento>` to fix memento_client package (:phab:`T185561`)
-* L10N and i18n updates
-* Fix Flow board topic continuation when iterating in reverse (:phab:`T138323`)
-* Add Avestan transliteration
-* Use Response.json() instead of json.loads(Response.text)
-* Show an APIError if PetScanPageGenerator.query() fails (:phab:`T309538`)
-* `login.py` is now a utiliy script even for site-package installation (:phab:`T309290`)
-* `preload_sites.py` is now a utiliy script even for site-package installation (:phab:`T308912`)
-* :attr:`generator_completed<pywikibot.bot.BaseBot.generator_completed>` became a public attribute
-* Return gracefully from pwb.find_alternates if folder in user_script_paths does not exist (:phab:`T308910`)
+* Add support for blkwiki (:phab:`T310875`)
+* L10N Updates
+* Fix duplicate source detection in :meth:`pywikibot.WikidataBot.user_add_claim_unless_exists`
+* :mod:`pywikibot.textlib`.tzoneFixedOffset class was renamed to :class:`pywikibot.time.TZoneFixedOffset`
+* Wrapper method :meth:`parsevalue()<pywikibot.site._datasite.DataSite.parsevalue>`
+  around wbparsevalue was added (:phab:`T112140`, :phab:`T312755`)
+* L10N updates
+* Fix cp encodings in :func:`get_charset_from_content_type()
+  <pywikibot.comms.http.get_charset_from_content_type>` (:phab:`T312230`)
+* New :mod:`pywikibot.time` module with new functions in addition to `Timestamp`
+* :meth:`Page.revisions()<pywikibot.page.BasePage.revisions>` supports more formats/types for
+  starttime and endtime parameters, in addition to those allowed by
+  :meth:`Timestamp.fromISOformat()<pywikibot.Timestamp.fromISOformat>`.
+* New :meth:`Timestamp.set_timestamp()<pywikibot.Timestamp.set_timestamp>` method
+* Fully ISO8601 and POSIX format support with :class:`pywikibot.Timestamp`;
+  formats are compliant with MediaWiki supported formats
+* Handle asynchronous page_put_queue after KeyboardInterrupt in Python 3.9+ (:phab:`T311076`)
+* No longer expect a specific namespace alias in cosmetic_changes
+  :meth:`translateAndCapitalizeNamespaces
+  <pywikibot.cosmetic_changes.CosmeticChangesToolkit.translateAndCapitalizeNamespaces>`
 
 Deprecations
 ^^^^^^^^^^^^
 
+* 7.5.0: :mod:`pywikibot.textlib`.tzoneFixedOffset class will be removed in favour of :class:`pywikibot.time.TZoneFixedOffset`
 * 7.4.0: `FilePage.usingPages()` was renamed to :meth:`using_pages()<pywikibot.FilePage.using_pages>`
 * 7.2.0: ``tb`` parameter of :func:`exception()<pywikibot.exception>` function was renamed to ``exc_info``
 * 7.2.0: XMLDumpOldPageGenerator is deprecated in favour of a `content` parameter of `XMLDumpPageGenerator` (:phab:`T306134`)

@@ -22,7 +22,8 @@ class Hunk:
 
     """One change hunk between a and b.
 
-    Note: parts of this code are taken from by difflib.get_grouped_opcodes().
+    .. note:: parts of this code are taken from by
+       `difflib.get_grouped_opcodes()`.
 
     """
 

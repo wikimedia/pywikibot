@@ -139,8 +139,8 @@ Example of signatures:
  * [[User:Rock|Rock]]
  </pre>
 
-NOTE: The white space and <pre></pre> aren't required but I suggest you to
-      use them.
+.. note:: The white space and <pre></pre> aren't required but I suggest
+   you to use them.
 
 ******************************** Badwords **********************************
 

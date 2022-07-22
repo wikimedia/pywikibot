@@ -170,16 +170,21 @@ class AssertAPIErrorContextManager:
     object given or calls the callable object.
     """
 
-    def __init__(self, code, info, msg, test_case):
+    def __init__(self, code, info, msg, test_case, regex=None):
         """Create instance expecting the code and info."""
         self.code = code
         self.info = info
         self.msg = msg
         self.test_case = test_case
+        self.regex = regex
 
     def __enter__(self):
         """Enter this context manager and the unittest's context manager."""
-        self.cm = self.test_case.assertRaises(APIError, msg=self.msg)
+        if self.regex:
+            self.cm = self.test_case.assertRaisesRegex(APIError, self.regex,
+                                                       msg=self.msg)
+        else:
+            self.cm = self.test_case.assertRaises(APIError, msg=self.msg)
         self.cm.__enter__()
         return self.cm
 
@@ -436,7 +441,7 @@ def execute(command, data_in=None, timeout=None, error=None):
     :type command: list of str
     """
     if PYTHON_VERSION < (3, 6):
-        command.insert(1, '-W ignore::FutureWarning:pywikibot:102')
+        command.insert(1, '-W ignore::FutureWarning:pywikibot:103')
     if cryptography_version and cryptography_version < [1, 3, 4]:
         command.insert(1, '-W ignore:Old version of cryptography:Warning')
 

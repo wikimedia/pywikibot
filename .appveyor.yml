@@ -1,7 +1,7 @@
 image: Visual Studio 2019
 clone_depth: 50
 skip_tags: true
-version: 7.4.{build}
+version: 7.5.{build}
 environment:
 
   PYWIKIBOT_DIR: "%appdata%\\Pywikibot"

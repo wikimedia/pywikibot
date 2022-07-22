@@ -43,6 +43,8 @@ argument as both local and global, the local argument overrides the global one
 
 -multi            If set, try to match multiple values from parameter.
 
+-inverse          Import this property as the inverse claim.
+
 Examples
 --------
 
@@ -91,28 +93,37 @@ will not add duplicate claims for the same member:
 .. note:: This script is a
    :py:obj:`ConfigParserBot <pywikibot.bot.ConfigParserBot>`. All options
    can be set within a settings file which is scripts.ini by default.
+.. versionadded:: 7.5
+   the -inverse option.
 """
 #
 # (C) Pywikibot team, 2013-2022
 #
 # Distributed under the terms of MIT License.
 #
+import re
 import signal
 import sys
-from typing import Any, Optional
+from typing import Any, Iterator, Optional
 
 import pywikibot
 from pywikibot import pagegenerators as pg
 from pywikibot import textlib
-from pywikibot.backports import List
+from pywikibot import WbTime
+from pywikibot.backports import List, Tuple
 from pywikibot.bot import ConfigParserBot, OptionHandler, WikidataBot
-from pywikibot.exceptions import InvalidTitleError, NoPageError
+from pywikibot.exceptions import (
+    APIError,
+    InvalidPageError,
+    InvalidTitleError,
+    NoPageError,
+)
 
 
 willstop = False
 
 
-def _signal_handler(signal, frame) -> None:
+def _signal_handler(signum, frame) -> None:
     global willstop
     if not willstop:
         willstop = True
@@ -135,6 +146,7 @@ class PropertyOptionHandler(OptionHandler):
         'exists': '',
         'islink': False,
         'multi': False,
+        'inverse': None,
     }
 
 
@@ -152,6 +164,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         'exists': '',
         'islink': False,
         'multi': False,
+        'inverse': None,
     }
 
     def __init__(self, template_title, fields, **kwargs) -> None:
@@ -171,20 +184,25 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         :keyword multi: Whether multiple values should be extracted from a
             single parameter
         :type multi: bool
+        :keyword inverse: a property to populate on the target, pointing to
+            the page item
+        :type inverse: str
         """
         super().__init__(**kwargs)
-        # TODO: Make it a list including the redirects to the template
         self.fields = {}
         for key, value in fields.items():
             if isinstance(value, tuple):
                 self.fields[key] = value
             else:  # backwards compatibility
                 self.fields[key] = (value, PropertyOptionHandler())
-        self.cacheSources()
-        template_title = template_title.replace('_', ' ')
-        self.templateTitles = self.getTemplateSynonyms(template_title)
+        self.template_title = template_title.replace('_', ' ')
         self.linkR = textlib.compileLinkR()
         self.create_missing_item = self.opt.create
+
+    def setup(self):
+        """Cache some static data from wikis."""
+        self.cacheSources()
+        self.templateTitles = self.getTemplateSynonyms(self.template_title)
 
     def getTemplateSynonyms(self, title) -> List[str]:
         """Fetch redirects of the title, so we can check against them."""
@@ -203,15 +221,23 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         titles.append(temp.title(with_ns=False))
         return titles
 
-    def _template_link_target(self, item, link_text
-                              ) -> Optional[pywikibot.ItemPage]:
-        link = pywikibot.Link(link_text)
-        linked_page = pywikibot.Page(link)
+    def template_link_target(self,
+                             item: pywikibot.ItemPage,
+                             site: pywikibot.site.BaseSite,
+                             link_text: str) -> Optional[pywikibot.ItemPage]:
+        """Find the ItemPage target for a given link text.
+
+        .. versionchanged:: 7.5
+           Only follow the redirect target if redirect page has no
+           wikibase item.
+        """
+        linked_page = pywikibot.Page(site, link_text)
         try:
             exists = linked_page.exists()
-        except InvalidTitleError:
-            pywikibot.error('"{}" is not a valid title so it cannot be linked.'
-                            ' Skipping.'.format(link_text))
+        except (InvalidTitleError, InvalidPageError):
+            pywikibot.error('"{}" is not a valid title or the page itself is '
+                            'invalid so it cannot be linked. Skipping.'
+                            .format(link_text))
             return None
 
         if not exists:
@@ -219,23 +245,24 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
                              'Skipping.'.format(linked_page))
             return None
 
-        if linked_page.isRedirectPage():
-            linked_page = linked_page.getRedirectTarget()
-
-        try:
-            linked_item = pywikibot.ItemPage.fromPage(linked_page)
-        except NoPageError:
-            linked_item = None
+        while True:
+            try:
+                linked_item = pywikibot.ItemPage.fromPage(linked_page)
+            except NoPageError:
+                if linked_page.isRedirectPage():
+                    linked_page = linked_page.getRedirectTarget()
+                    continue
+                linked_item = None
+            break
 
         if not linked_item or not linked_item.exists():
             pywikibot.output('{} does not have a wikidata item to link with. '
                              'Skipping.'.format(linked_page))
-            return None
-
-        if linked_item.title() == item.title():
+            linked_item = None
+        elif linked_item.title() == item.title():
             pywikibot.output('{} links to itself. Skipping.'
                              .format(linked_page))
-            return None
+            linked_item = None
 
         return linked_item
 
@@ -243,117 +270,225 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         """
         Compare bot's (global) and provided (local) options.
 
-        :see: :py:obj:`OptionHandler`
+        .. seealso:: :class:`OptionHandler`
         """
-        default = self.opt[option]
-        local = handler.opt[option]
-        if isinstance(default, bool) and isinstance(local, bool):
-            return default is not local
-        return local or default
+        return handler.opt[option] or self.opt[option]
 
-    def treat_page_and_item(self, page, item) -> None:
+    def treat_page_and_item(self,
+                            page: Optional[pywikibot.page.BasePage],
+                            item: Optional[pywikibot.page.ItemPage]) -> None:
         """Process a single page/item."""
         if willstop:
             raise KeyboardInterrupt
 
+        if page is None:
+            return
+
+        assert page is self.current_page
+
         templates = page.raw_extracted_templates
-        for (template, fielddict) in templates:
+        for template, fielddict in templates:
             # Clean up template
             try:
-                template = pywikibot.Page(page.site, template,
-                                          ns=10).title(with_ns=False)
+                template = pywikibot.Page(page.site, template, ns=10)
             except InvalidTitleError:
                 pywikibot.error(
-                    "Failed parsing template; '{}' should be "
+                    'Failed parsing template; {!r} should be '
                     'the template name.'.format(template))
                 continue
 
-            if template not in self.templateTitles:
+            if template.title(with_ns=False) not in self.templateTitles:
                 continue
+
             # We found the template we were looking for
-            for field, value in fielddict.items():
-                field = field.strip()
-                # todo: extend the list of tags to ignore
-                value = textlib.removeDisabledParts(
-                    # todo: eventually we may want to import the references
-                    value, tags=['ref'], site=page.site).strip()
-                if not field or not value:
-                    continue
+            for field_item in fielddict.items():
+                self.treat_field(item, page.site, field_item)
 
-                if field not in self.fields:
-                    continue
+    def treat_field(self,
+                    item: pywikibot.page.ItemPage,
+                    site: pywikibot.site.BaseSite,
+                    field_item: Tuple[str, str]) -> None:
+        """Process a single field of template fielddict.
 
-                # This field contains something useful for us
-                prop, options = self.fields[field]
-                claim = pywikibot.Claim(self.repo, prop)
-                exists_arg = self._get_option_with_fallback(options, 'exists')
-                if claim.type == 'wikibase-item':
-                    do_multi = self._get_option_with_fallback(
-                        options, 'multi')
-                    matched = False
-                    # Try to extract a valid page
-                    for match in pywikibot.link_regex.finditer(value):
-                        matched = True
-                        link_text = match.group(1)
-                        linked_item = self._template_link_target(
-                            item, link_text)
-                        added = False
-                        if linked_item:
-                            claim.setTarget(linked_item)
-                            added = self.user_add_claim_unless_exists(
-                                item, claim, exists_arg, page.site,
-                                pywikibot.output)
-                            claim = pywikibot.Claim(self.repo, prop)
-                        # stop after the first match if not supposed to add
-                        # multiple values
-                        if not do_multi:
-                            break
-                        # update exists_arg, so we can add more values
-                        if 'p' not in exists_arg and added:
-                            exists_arg += 'p'
+        .. versionadded:: 7.5
+        """
+        field, value = field_item
+        field = field.strip()
+        if not field or field not in self.fields:
+            return
 
-                    if matched:
-                        continue
+        # todo: extend the list of tags to ignore
+        value = textlib.removeDisabledParts(
+            # todo: eventually we may want to import the references
+            value, tags=['ref'], site=site).strip()
 
-                    if not self._get_option_with_fallback(options, 'islink'):
-                        pywikibot.output(
-                            '{} field {} value {} is not a wikilink. Skipping.'
-                            .format(claim.getID(), field, value))
-                        continue
+        if not value:
+            return
 
-                    linked_item = self._template_link_target(item, value)
-                    if not linked_item:
-                        continue
+        # This field contains something useful for us
+        prop, options = self.fields[field]
+        ppage = pywikibot.PropertyPage(self.repo, prop)
+        handler = getattr(self, 'handle_'
+                          + ppage.type.lower().replace('-', '_'), None)
+        if not handler:
+            pywikibot.info('{} is not a supported datatype.'
+                           .format(ppage.type))
+            return
 
-                    claim.setTarget(linked_item)
-                elif claim.type in ('string', 'external-id'):
-                    claim.setTarget(value.strip())
-                elif claim.type == 'url':
-                    match = self.linkR.search(value)
-                    if not match:
-                        continue
-                    claim.setTarget(match.group('url'))
-                elif claim.type == 'commonsMedia':
-                    commonssite = pywikibot.Site('commons')
-                    imagelink = pywikibot.Link(
-                        value, source=commonssite, default_namespace=6)
-                    image = pywikibot.FilePage(imagelink)
-                    if image.isRedirectPage():
-                        image = pywikibot.FilePage(image.getRedirectTarget())
-                    if not image.exists():
-                        pywikibot.output(
-                            "{} doesn't exist. I can't link to it"
-                            .format(image.title(as_link=True)))
-                        continue
-                    claim.setTarget(image)
-                else:
-                    pywikibot.output('{} is not a supported datatype.'
-                                     .format(claim.type))
-                    continue
+        exists_arg = set(self._get_option_with_fallback(options, 'exists'))
+        do_multi = self._get_option_with_fallback(options, 'multi')
+        inverse_prop = self._get_option_with_fallback(options, 'inverse')
 
-                # A generator might yield pages from multiple sites
+        for target in handler(value, site, item, field):
+            claim = ppage.newClaim()
+            claim.setTarget(target)
+            # A generator might yield pages from multiple sites
+            added = self.user_add_claim_unless_exists(
+                item, claim, exists_arg, site, pywikibot.info)
+
+            if (added and inverse_prop
+                    and isinstance(target, pywikibot.ItemPage)):
+                inverse_ppage = pywikibot.PropertyPage(self.repo, inverse_prop)
+                if inverse_ppage.type != 'wikibase-item':
+                    raise ValueError("{} does not have 'wikibase-item' type"
+                                     .format(inverse_ppage))
+                inverse_claim = inverse_ppage.newClaim()
+                inverse_claim.setTarget(item)
                 self.user_add_claim_unless_exists(
-                    item, claim, exists_arg, page.site, pywikibot.output)
+                    target, inverse_claim, exists_arg, site, pywikibot.info)
+
+            # Stop after the first match if not supposed to add
+            # multiple values
+            if not do_multi:
+                break
+
+            # Update exists_arg, so we can add more values
+            if added:
+                exists_arg.add('p')
+
+    def handle_wikibase_item(self, value: str,
+                             site: pywikibot.site.BaseSite,
+                             item: pywikibot.page.ItemPage,
+                             field: str) -> Iterator[pywikibot.ItemPage]:
+        """Handle 'wikibase-item' claim type.
+
+        .. versionadded:: 7.5
+        """
+        value = value.replace('{{!}}', '|')
+        prop, options = self.fields[field]
+        matched = False
+
+        # Try to extract a valid page
+        for match in pywikibot.link_regex.finditer(value):
+            matched = True
+            link_text = match.group(1)
+            linked_item = self.template_link_target(item, site, link_text)
+            if linked_item:
+                yield linked_item
+
+        if matched:
+            return
+
+        if not self._get_option_with_fallback(options, 'islink'):
+            pywikibot.info(
+                '{} field {} value "{}" is not a wikilink. Skipping.'
+                .format(prop, field, value))
+            return
+
+        linked_item = self.template_link_target(item, site, value)
+        if linked_item:
+            yield linked_item
+
+    def handle_time(self, value: str,
+                    site: pywikibot.site.BaseSite,
+                    *args) -> Iterator[WbTime]:
+        """Handle 'time' claim type.
+
+        .. versionadded:: 7.5
+        """
+        value = value.replace('{{!}}', '|')
+        value = value.replace('&nbsp;', ' ')
+        value = re.sub('</?sup>', '', value)
+
+        # Some wikis format dates using wikilinks. We construct
+        # all possible texts, e.g., "[[A|B]] of [[C]]" becomes
+        # "A of C" and "B of C", and parse them using the API.
+        # If the result is same for all the values, we import
+        # the value.
+        to_parse = {''}
+        prev_end = 0
+        for match in pywikibot.link_regex.finditer(value):
+            start, end = match.span()
+            since_prev_match = value[prev_end:start]
+
+            title = match.group('title').strip()
+            text = match.group(2)
+            if text:
+                text = text[1:].strip()  # remove '|'
+
+            new_to_parse = set()
+            for fragment in to_parse:
+                fragment += since_prev_match
+                new_to_parse.add(fragment + title)
+                if text:
+                    new_to_parse.add(fragment + text)
+
+            to_parse = new_to_parse
+            prev_end = end
+
+        rest = value[prev_end:]
+        to_parse = [text + rest for text in to_parse]
+
+        try:
+            result = self.repo.parsevalue('time', to_parse, language=site.lang)
+        except (APIError, ValueError):
+            return
+
+        out = None
+        for data in result:
+            if out is None:
+                out = data
+            elif out != data:
+                pywikibot.output('Found ambiguous date: "{}"'.format(value))
+                return
+
+        yield WbTime.fromWikibase(out, self.repo)
+
+    @staticmethod
+    def handle_string(value, *args) -> Iterator[str]:
+        """Handle 'string' and 'external-id' claim type.
+
+        .. versionadded:: 7.5
+        """
+        yield value.strip()
+
+    handle_external_id = handle_string
+
+    def handle_url(self, value, *args) -> Iterator[str]:
+        """Handle 'url' claim type.
+
+        .. versionadded:: 7.5
+        """
+        for match in self.linkR.finditer(value):
+            yield match.group('url')
+
+    def handle_commonsmedia(self, value, site, *args
+                            ) -> Iterator[pywikibot.FilePage]:
+        """Handle 'commonsMedia' claim type.
+
+        .. versionadded:: 7.5
+        """
+        repo = site.image_repository()
+        image = pywikibot.FilePage(repo, value)
+        if image.isRedirectPage():
+            image = pywikibot.FilePage(image.getRedirectTarget())
+
+        if not image.exists():
+            pywikibot.info("{} doesn't exist so it cannot be linked"
+                           .format(image.title(as_link=True)))
+            return
+
+        yield image
 
 
 def main(*args: str) -> None:
@@ -420,6 +555,10 @@ def main(*args: str) -> None:
     if not template_title:
         pywikibot.error(
             'Please specify either -template or -transcludes argument')
+        return
+
+    if not fields:
+        pywikibot.error('No template parameters to harvest specified.')
         return
 
     if not gen.gens:

@@ -10940,6 +10940,7 @@ class WebumeniaAnalyzer(Analyzer):
         section = self.findbyre(r'(?s)Externé odkazy</h4>(.*?)</div>', html)
         if section:
             return self.findallbyre(r'href="([^"]*)" target="_blank"', section)
+        return None
 
 
 class InvaluableAnalyzer(Analyzer):
@@ -13830,21 +13831,25 @@ class BelgianPhotographerAnalyzer(Analyzer):
         section = self.getvalue('Life dates', html)
         if section:
             return self.findbyre(r', (\d+) - ', section)
+        return None
 
     def finddeathdate(self, html):
         section = self.getvalue('Life dates', html)
         if section:
             return self.findbyre(r', \d+ - [\w\s]+, (\d{4})', section)
+        return None
 
     def findbirthplace(self, html):
         section = self.getvalue('Life dates', html)
         if section:
             return self.findbyre(r'(.*), \d+ - ', section, 'city')
+        return None
 
     def finddeathplace(self, html):
         section = self.getvalue('Life dates', html)
         if section:
             return self.findbyre(r', \d+ - ([^<>]+), \d{4}', section, 'city')
+        return None
 
     def findworkplaces(self, html):
         return [self.findbyre(r'[\d\s\-\+]+(.*)', section) for section in self.getvalues('Locations', html)]
@@ -13856,6 +13861,7 @@ class BelgianPhotographerAnalyzer(Analyzer):
         section = self.getvalue('Affiliated entity', html)
         if section:
             return self.findallbyre('<a[^<>]+title="(.*?)"', section, 'organization')
+        return None
 
     def findoccupations(self, html):
         return ['Q33231']
@@ -13902,6 +13908,7 @@ class AlkindiAnalyzer(Analyzer):
         section = self.getvalue('Language', html)
         if section:
             return self.findallbyre(r'([\w\s]+)', section, 'language')
+        return None
 
     def findbirthplace(self, html):
         return self.getvalue('Place of birth', html, 'city')
@@ -13944,6 +13951,7 @@ class ZobodatAnalyzer(Analyzer):
         result = self.findbyre(r'(?s)</h1>\s*<p>(.*?)</p>', html)
         if result:
             return self.TAGRE.sub(' ', result)
+        return None
 
     def findbirthdate(self, html):
         return self.findbyre(r'>\*\s*([^\s<>]+)', html)
@@ -13964,6 +13972,7 @@ class ZobodatAnalyzer(Analyzer):
         section = self.findbyre(r'</h1>\s*<p>(.*?)</p>', html)
         if section:
             return self.findallbyre('href="(.*?)"', section)
+        return None
 
 
 class OxfordMedievalAnalyzer(Analyzer):
@@ -14047,6 +14056,7 @@ class PatrinumAnalyzer(Analyzer):
         section = self.getvalue('Autre site web', html)
         if section:
             return self.findallbyre(r'"(\w+://[^"<>]*)"', section)
+        return None
 
 
 class JwaAnalyzer(Analyzer):
@@ -14592,6 +14602,7 @@ class WikiAnalyzer(Analyzer):
                                ], html)
         if result:
             return self.findbyre(r'(\w+://[\w/\.\-_]+)', result)
+        return None
 
     def findwebpages(self, html):
         return self.getinfos(['קישור'], html)
@@ -14650,6 +14661,7 @@ class WikiAnalyzer(Analyzer):
                                ], html)
         if result and '.' in result:
             return result.split(':')[-1]
+        return None
 
     def findcoatarms(self, html):
         return self.getinfo(['герб', 'herb', 'escudo', 'icone', 'пасада', 'герб'], html)
@@ -14859,6 +14871,7 @@ class BibliotecaNacionalAnalyzer(UrlAnalyzer):
         if section:
             section = self.findbyre(r'(?s)>([^<>]*\w[^<>]*)<', section)
             return [','.join(section.split(',')[:1])]
+        return None
 
     def findworkfields(self, html):
         return self.getvalues('Campo de actividad', html, 'subject')
@@ -14944,6 +14957,7 @@ class IasAnalyzer(UrlAnalyzer):
             .format(field), html)
         if prevalue:
             return self.findbyre(r'(?s)^(?:<[^<>]*>|\s)*(.*?)(?:<[^<>]*>|\s)*$', prevalue, dtype, alt=alt)
+        return None
 
     def getvalues(self, field, html, dtype=None, alt=None) -> List[str]:
         if alt is None:
@@ -15024,21 +15038,25 @@ class KunstaspekteAnalyzer(UrlAnalyzer):
         section = self.description(html)
         if section:
             return section.split('\n')
+        return None
 
     def findbirthdate(self, html):
         section = self.description(html)
         if section:
             return self.findbyre(r'\*\s*(\d+)', section)
+        return None
 
     def findbirthplace(self, html):
         section = self.description(html)
         if section:
             return self.findbyre(r'\*\s*\d+(?: in)? ([^-!]*)', section.replace('\n', '!'), 'city')
+        return None
 
     def findincollections(self, html):
         section = self.findbyre(r'(?s)<h3>collection/s</h3>(.*?)</div>', html)
         if section:
             return self.findallbyre(r'">(.*?)<', section, 'museum')
+        return None
 
 
 class FotomuseumAnalyzer(UrlAnalyzer):
@@ -15077,31 +15095,37 @@ class FotomuseumAnalyzer(UrlAnalyzer):
         section = self.getvalue('Life dates', html)
         if section:
             return self.findbyre(r'(\d{4}) - ', section)
+        return None
 
     def finddeathdate(self, html):
         section = self.getvalue('Life dates', html)
         if section:
             return self.findbyre(r'(\d{4})\s*$', section)
+        return None
 
     def findbirthplace(self, html):
         section = self.getvalue('Life dates', html)
         if section:
             return self.findbyre(r'(.*?), \d{4} - ', section, 'city')
+        return None
 
     def finddeathplace(self, html):
         section = self.getvalue('Life dates', html)
         if section:
             return self.findbyre(r', \d{4} - (.*), \d{4}', section, 'city')
+        return None
 
     def findworkplaces(self, html):
         section = self.getvalue('Locations', html)
         if section:
             return self.findallbyre('([A-Z][^<>]*)', section, 'city')
+        return None
 
     def findgenres(self, html):
         section = self.getvalue('Genres / subject matter', html)
         if section:
             return self.findallbyre('[^<>]+', section, 'art-genre', alt=['genre'])
+        return None
 
     def findmixedrefs(self, html):
         return self.finddefaultmixedrefs(html, includesocial=False)
@@ -15113,6 +15137,7 @@ class FotomuseumAnalyzer(UrlAnalyzer):
         section = self.getvalue('Affiliated entity', html)
         if section:
             return self.findallbyre('<a [^<>]*>(.*?)<', section, 'organization')
+        return None
 
 
 class NationalTrustAnalyzer(UrlAnalyzer):
@@ -15136,21 +15161,25 @@ class NationalTrustAnalyzer(UrlAnalyzer):
         section = self.finddatesection(html)
         if section:
             return self.findbyre(r'^([\w\s]*?) [\-\d]', section, 'city')
+        return None
 
     def findbirthdate(self, html):
         section = self.finddatesection(html)
         if section:
             return self.findbyre(r' (\d*) -', section)
+        return None
 
     def finddeathplace(self, html):
         section = self.finddatesection(html)
         if section:
             return self.findbyre(r' - ([\w\s]*?)(?: \d|\))', section, 'city')
+        return None
 
     def finddeathdate(self, html):
         section = self.finddatesection(html)
         if section:
             return self.findbyre(r' (\d*)\s*\)', section)
+        return None
 
     def findincollections(self, html):
         return self.findallbyre(r'(?s)<label for="[^<>"]+">([^<>]*)</label>\s*<span class="item-bubble">[1-9]', html,
@@ -15256,6 +15285,7 @@ class UnivieAnalyzer(UrlAnalyzer):
         section = self.findbyre(r'"birthPlace":{(.*?)}', html)
         if section:
             return self.findbyre(r'"name":"(.*?)"', section, 'city')
+        return None
 
     def finddeathdate(self, html):
         return self.findbyre(r'"deathDate":"(.*?)"', html)
@@ -15325,6 +15355,7 @@ class WeberAnalyzer(UrlAnalyzer):
             subsection = self.findbyre(r'(?s)<div class="media-body">(.*?)<', section)
             if subsection:
                 return self.findallbyre(r'([^,]*)', subsection, 'occupation')
+        return None
 
     def findresidences(self, html):
         section = self.findbyre(r'(?s)<li class="media residences">(.*?)</li>', html)
@@ -15332,6 +15363,7 @@ class WeberAnalyzer(UrlAnalyzer):
             subsection = self.findbyre(r'(?s)<div class="media-body">(.*?)<', section)
             if subsection:
                 return self.findallbyre(r'([^,]*)', subsection, 'city')
+        return None
 
 
 class BacklinkAnalyzer(Analyzer):

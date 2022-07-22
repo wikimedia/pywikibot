@@ -12,8 +12,12 @@ The following options are supported:
 -remote  Upload the package to pypi. This cannot be done if the
          Pywikibot version is a development release.
 
+-clear   Clear old dist folders
+
 -upgrade Upgrade distribution packages pip, setuptools, wheel and twine
          first
+
+-nodist  Do not create a distribution. Useful to -clear or -upgrade only.
 
 Usage::
 
@@ -27,6 +31,11 @@ Usage::
    - installs pre-releases over stable versions
    - also creates built distribution together with source distribution
    - `-upgrade` option was added
+
+.. versionchanged:: 7.5
+
+   - `clear` option was added
+   - `nodist` option was added
 """
 #
 # (C) Pywikibot team, 2022
@@ -41,6 +50,19 @@ from pathlib import Path
 from pywikibot import __version__, error, info, input_yn, warning
 from pywikibot.backports import Tuple
 import setup
+
+
+def clear_old_dist() -> None:
+    """Delete old dist folders.
+
+    .. versionadded:: 7.5
+    """
+    info('Removing old dist folders... ', newline=False)
+    folder = Path().resolve()
+    shutil.rmtree(folder / 'build', ignore_errors=True)
+    shutil.rmtree(folder / 'dist', ignore_errors=True)
+    shutil.rmtree(folder / 'pywikibot.egg-info', ignore_errors=True)
+    info('done')
 
 
 def copy_files() -> None:
@@ -98,25 +120,36 @@ def handle_args() -> Tuple[bool, bool]:
 
     local = '-local' in sys.argv
     remote = '-remote' in sys.argv
+    clear = '-clear' in sys.argv
     upgrade = '-upgrade' in sys.argv
+    nodist = '-nodist' in sys.argv
+
+    if nodist:
+        local, remote = False, False
 
     if remote and 'dev' in __version__:
         warning('Distribution must not be a developmental release to upload.')
         remote = False
 
     sys.argv = [sys.argv[0], 'sdist', 'bdist_wheel']
-    return local, remote, upgrade
+    return local, remote, clear, upgrade, nodist
 
 
 def main() -> None:
     """Script entry point."""
-    local, remote, upgrade = handle_args()
+    local, remote, clear, upgrade, nodist = handle_args()
 
-    copy_files()
     if upgrade:
         subprocess.run('python -m pip install --upgrade pip')
         subprocess.run('pip install --upgrade setuptools wheel twine ')
 
+    if clear:
+        clear_old_dist()
+
+    if nodist:
+        return
+
+    copy_files()
     try:
         setup.main()  # create a new package
     except SystemExit as e:

@@ -415,12 +415,12 @@ def get_charset_from_content_type(content_type: str) -> Optional[str]:
     if re.sub(r'[ _\-]', '', charset) == 'xeucjp':
         charset = 'euc_jp'
     else:
-        # fix cp encodings (T304830, T307760)
+        # fix cp encodings (T304830, T307760, T312230)
         # remove delimiter in front of the code number
         # replace win/windows with cp
         # remove language code in font of win/windows
         charset = re.sub(
-            r'\A(?:cp[ _\-]|(?:[a-z]+[_\-]?)?win(?:dows[_\-]?)?)(\d{3,4})',
+            r'\A(?:cp[ _\-]|(?:[a-z]+[_\-]?)?win(?:dows)?[_\-]?)(\d{3,4})',
             r'cp\1', charset)
     return charset
 

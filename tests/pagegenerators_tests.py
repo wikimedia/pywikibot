@@ -548,14 +548,16 @@ class TestDayPageGenerator(DefaultSiteTestCase):
 
     def test_start_0(self):
         """Test for day page generator with startMonth 0."""
-        with self.assertRaises(
-                calendar.IllegalMonthError):
+        with self.assertRaisesRegex(
+                calendar.IllegalMonthError,
+                'bad month number 0; must be 1-12'):
             self._run_test(0)
 
     def test_end_13(self):
         """Test for day page generator with endMonth 13."""
-        with self.assertRaises(
-                calendar.IllegalMonthError):
+        with self.assertRaisesRegex(
+                calendar.IllegalMonthError,
+                'bad month number 13; must be 1-12'):
             self._run_test(12, 13)
 
 

@@ -51,9 +51,10 @@ class Uploader:
         codes for which an equivalent callable would return True if all
         UploadError codes are in thet list. If the result is False it'll
         not continue uploading the file and otherwise disable any warning
-        and reattempt to upload the file. NOTE: If report_success is True
-        or None it'll raise an UploadError exception if the static
-        boolean is False.
+        and reattempt to upload the file.
+
+        .. note:: If report_success is True or None it'll raise an
+           UploadError exception if the static boolean is False.
     :type ignore_warnings: bool or callable or iterable of str
     :param report_success: If the upload was successful it'll print a
         success message and if ignore_warnings is set to False it'll

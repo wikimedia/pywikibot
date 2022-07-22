@@ -1001,15 +1001,14 @@ class TestDigitsConversion(TestCase):
 
     def test_to_local(self):
         """Test converting Latin digits to local digits."""
-        self.assertEqual(textlib.to_local_digits(299792458, 'en'), 299792458)
+        self.assertEqual(textlib.to_local_digits(299792458, 'en'), '299792458')
         self.assertEqual(
             textlib.to_local_digits(299792458, 'fa'), '۲۹۹۷۹۲۴۵۸')
         self.assertEqual(
             textlib.to_local_digits(
                 '299792458 flash', 'fa'), '۲۹۹۷۹۲۴۵۸ flash')
         self.assertEqual(
-            textlib.to_local_digits(
-                '299792458', 'km'), '២៩៩៧៩២៤៥៨')
+            textlib.to_local_digits('299792458', 'km'), '២៩៩៧៩២៤៥៨')
 
     def test_to_latin(self):
         """Test converting local digits to Latin digits."""

@@ -384,9 +384,9 @@ class QueryGenerator(_RequestWrapper):
     def support_namespace(self) -> bool:
         """Check if namespace is a supported parameter on this query.
 
-        Note: this function will be removed when self.set_namespace() will
-              throw TypeError() instead of just giving a warning.
-              See T196619.
+        .. note:: this function will be removed when
+           :meth:`set_namespace` will throw TypeError() instead of just
+           giving a warning. See :phab:`T196619`.
 
         :return: True if yes, False otherwise
         """
@@ -521,7 +521,7 @@ class QueryGenerator(_RequestWrapper):
         """Get resultdata and verify result."""
         resultdata = keys = self.data['query'][self.resultkey]
         if isinstance(resultdata, dict):
-            keys = list(resultdata.keys())
+            keys = list(resultdata)
             if 'results' in resultdata:
                 resultdata = resultdata['results']
             elif 'pageids' in self.data['query']:
@@ -531,7 +531,7 @@ class QueryGenerator(_RequestWrapper):
                               for k in self.data['query']['pageids']]
             else:
                 resultdata = [resultdata[k]
-                              for k in sorted(resultdata.keys())]
+                              for k in sorted(resultdata)]
         pywikibot.debug('{name} received {keys}; limit={limit}'
                         .format(name=type(self).__name__, keys=keys,
                                 limit=self.limit))
@@ -545,13 +545,12 @@ class QueryGenerator(_RequestWrapper):
                 continue
 
             yield result
-            if isinstance(item, dict) \
-                    and set(self.continuekey) & set(item.keys()):
+            if isinstance(item, dict) and set(self.continuekey) & set(item):
                 # if we need to count elements contained in items in
                 # self.data["query"]["pages"], we want to count
                 # item[self.continuekey] (e.g. 'revisions') and not
                 # self.resultkey (i.e. 'pages')
-                for key in set(self.continuekey) & set(item.keys()):
+                for key in set(self.continuekey) & set(item):
                     self._count += len(item[key])
             # otherwise we proceed as usual
             else:
@@ -764,14 +763,14 @@ class PropertyGenerator(QueryGenerator):
     def _update_old_result_dict(old_dict, new_dict) -> None:
         """Update old result dict with new_dict."""
         for k, v in new_dict.items():
-            if k not in old_dict:
-                old_dict[k] = v
-                continue
-            if isinstance(v, list):
-                old_dict[k].extend(v)
-                continue
-            assert isinstance(v, (str, int)), (
-                'continued API result had an unexpected type: {}'.format(v))
+            if isinstance(v, (str, int)):
+                old_dict.setdefault(k, v)
+            elif isinstance(v, list):
+                old_dict.setdefault(k, []).extend(v)
+            else:
+                raise ValueError(
+                    'continued API result had an unexpected type: {}'
+                    .format(type(v).__name__))
 
 
 class ListGenerator(QueryGenerator):

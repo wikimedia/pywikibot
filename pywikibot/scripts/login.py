@@ -21,11 +21,14 @@ The following parameters are supported::
               site.
 
  -oauth       Generate OAuth authentication information.
-              NOTE: Need to copy OAuth tokens to your user-config.py
-              manually. -logout is not compatible with -oauth.
+
+              .. note:: Need to copy OAuth tokens to your user-config.py
+                 manually. -logout is not compatible with -oauth.
 
  -autocreate  Auto-create an account using unified login when necessary.
-              Note: the global account must exist already before using this.
+
+              .. note:: the global account must exist already before
+                 using this.
 
 If not given as parameter, the script will ask for your username and
 password (password entry will be hidden), log in to your home wiki using

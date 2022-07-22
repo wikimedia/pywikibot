@@ -8,9 +8,10 @@
 import unittest
 from contextlib import contextmanager, suppress
 
-from pywikibot.exceptions import LockedPageError
+from pywikibot.exceptions import LockedPageError, TimeoutError
 from pywikibot.flow import Board, Post, Topic
 from tests.aspects import TestCase
+from tests.utils import skipping
 
 
 MODERATION_REASON = 'Pywikibot test'
@@ -60,7 +61,8 @@ class TestFlowReply(TestCase):
         # Setup
         content = 'I am a reply to the topic. Replying works!'
         topic = Topic(self.site, self._topic_title)
-        old_replies = topic.replies(force=True)[:]
+        with skipping(TimeoutError):
+            old_replies = topic.replies(force=True)[:]
         # Reply
         reply_post = topic.reply(content, 'wikitext')
         # Test content
@@ -79,7 +81,8 @@ class TestFlowReply(TestCase):
         content = ("I am a reply to the topic's root post. "
                    'Replying still works!')
         topic = Topic(self.site, self._topic_title)
-        topic_root = topic.root
+        with skipping(TimeoutError):
+            topic_root = topic.root
         old_replies = topic_root.replies(force=True)[:]
         # Reply
         reply_post = topic_root.reply(content, 'wikitext')
@@ -99,7 +102,8 @@ class TestFlowReply(TestCase):
         content = 'I am a nested reply to a regular post. Still going strong!'
         topic = Topic(self.site, self._topic_title)
         root_post = Post(topic, 'stf5bamzx32rj1gt')
-        old_replies = root_post.replies(force=True)[:]
+        with skipping(TimeoutError):
+            old_replies = root_post.replies(force=True)[:]
         # Reply
         reply_post = root_post.reply(content, 'wikitext')
         # Test content
@@ -119,7 +123,8 @@ class TestFlowReply(TestCase):
         second_content = ('I am a nested reply. This conversation is '
                           'getting pretty good!')
         topic = Topic(self.site, self._topic_title)
-        topic_root = topic.root
+        with skipping(TimeoutError):
+            topic_root = topic.root
         # First reply
         old_root_replies = topic_root.replies(force=True)[:]
         first_reply_post = topic_root.reply(first_content, 'wikitext')

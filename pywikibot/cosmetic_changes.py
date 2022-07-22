@@ -55,6 +55,7 @@ or by adding a list to the given one::
 # Distributed under the terms of the MIT license.
 #
 import re
+from contextlib import suppress
 from enum import IntEnum
 from typing import Any, Union
 from urllib.parse import urlparse, urlunparse
@@ -387,7 +388,11 @@ class CosmeticChangesToolkit:
         return text
 
     def translateAndCapitalizeNamespaces(self, text: str) -> str:
-        """Use localized namespace names."""
+        """Use localized namespace names.
+
+        .. versionchanged:: 7.4
+           No longer expect a specific namespace alias for File:
+        """
         # arz uses English stylish codes
         if self.site.sitename == 'wikipedia:arz':
             return text
@@ -403,17 +408,17 @@ class CosmeticChangesToolkit:
             if namespace == 6 and self.site.family.name == 'wikipedia':
                 if self.site.code in ('en', 'fr'):
                     # do not change "Image" on en-wiki and fr-wiki
-                    assert 'Image' in namespaces
-                    namespaces.remove('Image')
+                    with suppress(ValueError):
+                        namespaces.remove('Image')
                 if self.site.code == 'hu':
                     # do not change "Kép" on hu-wiki
-                    assert 'Kép' in namespaces
-                    namespaces.remove('Kép')
+                    with suppress(ValueError):
+                        namespaces.remove('Kép')
                 elif self.site.code == 'pt':
                     # use "Imagem" by default on pt-wiki (per T57242)
-                    assert 'Imagem' in namespaces
-                    namespaces.insert(
-                        0, namespaces.pop(namespaces.index('Imagem')))
+                    with suppress(ValueError):
+                        namespaces.insert(
+                            0, namespaces.pop(namespaces.index('Imagem')))
             # final namespace variant
             final_ns = namespaces.pop(0)
             if namespace in (2, 3):
@@ -747,11 +752,11 @@ class CosmeticChangesToolkit:
 
         == Section title ==
 
-        :NOTE: This space is recommended in the syntax help on the
-            English and German Wikipedias. It is not wanted on Lojban and
-            English Wiktionaries (T168399, T169064) and it might be that
-            it is not wanted on other wikis. If there are any complaints,
-            please file a bug report.
+        .. note:: This space is recommended in the syntax help on the
+           English and German Wikipedias. It is not wanted on Lojban and
+           English Wiktionaries (:phab:`T168399`, :phab:`T169064`) and
+           it might be that it is not wanted on other wikis. If there
+           are any complaints, please file a bug report.
         """
         if self.site.sitename in ['wiktionary:jbo', 'wiktionary:en']:
             return text
@@ -765,10 +770,10 @@ class CosmeticChangesToolkit:
         """
         Add a space between the * or # and the text.
 
-        :NOTE: This space is recommended in the syntax help on the
-            English, German and French Wikipedias. It might be that it
-            is not wanted on other wikis. If there are any complaints,
-            please file a bug report.
+        .. note:: This space is recommended in the syntax help on the
+           English, German and French Wikipedias. It might be that it
+           is not wanted on other wikis. If there are any complaints,
+           please file a bug report.
         """
         if not self.template:
             exceptions = ['comment', 'math', 'nowiki', 'pre',
@@ -810,8 +815,9 @@ class CosmeticChangesToolkit:
         def replace_link(match: Match[str]) -> str:
             """Create a string to replace a single link."""
             replacement = '[['
-            if re.match(r'(?:' + '|'.join(list(self.site.namespaces[6])
-                        + list(self.site.namespaces[14])) + '):',
+            if re.match(r'(?:{}):'
+                        .format('|'.join((*self.site.namespaces[6],
+                                          *self.site.namespaces[14]))),
                         match.group('link')):
                 replacement += ':'
             replacement += match.group('link')

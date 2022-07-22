@@ -13,12 +13,13 @@ Proposed Deletion (see [[en:WP:PROD]] for more details).  Also, if the article
 text is long, to prevent terminal spamming, it might be a good idea to truncate
 it just to the first so many bytes.
 
-WARNING: This tool shows the contents of the top revision only.  It is possible
-that a vandal has replaced a perfectly good article with nonsense, which has
-subsequently been tagged by someone who didn't realize it was previously a good
-article.  The onus is on you to avoid making these mistakes.
+.. warning:: This tool shows the contents of the top revision only.  It
+   is possible that a vandal has replaced a perfectly good article with
+   nonsense, which has subsequently been tagged by someone who didn't
+   realize it was previously a good article. The onus is on you to avoid
+   making these mistakes.
 
-NOTE: This script currently only works for the Wikipedia project.
+.. note:: This script currently only works for the Wikipedia project.
 """
 #
 # (C) Pywikibot team, 2007-2022
@@ -42,7 +43,7 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
     prompt to decide whether each should be deleted or not.
     """
 
-    LINES = 22
+    LINES = 22  #: maximum lines to extract from wiki page
 
     csd_cat_item = 'Q5964'
 
@@ -56,9 +57,9 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
         'incubator': {'incubator': 'Category:Maintenance:Delete'},
     }
 
-    # If the site has several templates for speedy deletion, it might be
-    # possible to find out the reason for deletion by the template used.
-    # _default will be used if no such semantic template was used.
+    #: If the site has several templates for speedy deletion, it might be
+    #: possible to find out the reason for deletion by the template used.
+    #: _default will be used if no such semantic template was used.
     deletion_messages = {
         'wikipedia': {
             'ar': {
@@ -199,7 +200,7 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
         },
     }
 
-    # Default reason for deleting a talk page.
+    #: Default reason for deleting a talk page.
     talk_deletion_msg = {
         'wikipedia': {
             'ar': 'صفحة نقاش يتيمة',
@@ -221,9 +222,9 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
         }
     }
 
-    # A list of often-used reasons for deletion. Shortcuts are keys, and
-    # reasons are values. If the user enters a shortcut, the associated reason
-    # will be used.
+    #: A list of often-used reasons for deletion. Shortcuts are keys, and
+    #: reasons are values. If the user enters a shortcut, the associated reason
+    #: will be used.
     delete_reasons = {
         'wikipedia': {
             'de': {
@@ -322,8 +323,7 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
     def __init__(self, **kwargs) -> None:
         """Initializer.
 
-        :keyword site: the site to work on
-        :type site: pywikibot.APISite
+        :keyword pywikibot.APISite site: the site to work on
         """
         super().__init__(**kwargs)
         csd_cat = i18n.translate(self.site, self.csd_cat_title)
@@ -373,8 +373,8 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
     def get_reason_for_deletion(self, page):
         """Get a reason for speedy deletion from operator."""
         suggested_reason = self.guess_reason_for_deletion(page)
-        pywikibot.output('The suggested reason is: <<lightred>>{}<<default>>'
-                         .format(suggested_reason))
+        pywikibot.info('The suggested reason is: <<lightred>>{}'
+                       .format(suggested_reason))
 
         # We don't use i18n.translate() here because for some languages the
         # entry is intentionally left out.
@@ -382,10 +382,10 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
            and page.site.lang in self.delete_reasons[self.site.family.name]:
             local_reasons = i18n.translate(page.site.lang,
                                            self.delete_reasons)
-            pywikibot.output('')
+            pywikibot.info()
             for key in sorted(local_reasons.keys()):
                 pywikibot.output((key + ':').ljust(8) + local_reasons[key])
-            pywikibot.output('')
+            pywikibot.info()
             reason = pywikibot.input(fill(
                 'Please enter the reason for deletion, choose a default '
                 'reason, or press enter for the suggested message:'))

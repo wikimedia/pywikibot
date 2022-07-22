@@ -98,7 +98,7 @@ import time
 import warnings
 import webbrowser
 from collections import Counter
-from collections.abc import Generator
+from collections.abc import Container, Generator
 from contextlib import closing
 from functools import wraps
 from importlib import import_module
@@ -485,8 +485,6 @@ def writelogheader() -> None:
     # config file dir
     log('CONFIG FILE DIR: {}'.format(pywikibot.config.base_dir))
 
-    all_modules = sys.modules.keys()
-
     # These are the main dependencies of pywikibot.
     check_package_list = [
         'requests',
@@ -495,7 +493,7 @@ def writelogheader() -> None:
 
     # report all imported packages
     if config.verbose_output:
-        check_package_list += all_modules
+        check_package_list += sys.modules
 
     log('PACKAGES:')
     packages = version.package_versions(check_package_list)
@@ -2219,6 +2217,12 @@ class WikidataBot(Bot, ExistingPageBot):
         :keyword ignore_save_related_errors: if True, errors related to
           page save will be reported and ignored (default: False)
         :return: whether the item was saved successfully
+
+        .. note:: calling this method sets the current_page property
+           to the item which changes the site property
+
+        .. note:: calling this method with the 'source' argument modifies
+           the provided claim object in place
         """
         self.current_page = item
 
@@ -2249,7 +2253,7 @@ class WikidataBot(Bot, ExistingPageBot):
     def user_add_claim_unless_exists(
             self, item: 'pywikibot.page.ItemPage',
             claim: 'pywikibot.page.Claim',
-            exists_arg: str = '',
+            exists_arg: Container = '',
             source: Optional['BaseSite'] = None,
             logger_callback: Callable[[str], Any] = log,
             **kwargs: Any) -> bool:
@@ -2259,14 +2263,29 @@ class WikidataBot(Bot, ExistingPageBot):
         Before adding a new claim, it checks if we can add it, using provided
         filters.
 
-        :see: documentation of :py:obj:`claimit.py<scripts.claimit>`
+        ..seealso:: documentation of :py:obj:`claimit.py<scripts.claimit>`
+
         :param exists_arg: pattern for merging existing claims with new ones
         :param logger_callback: function logging the output of the method
         :return: whether the claim could be added
+
+        .. note:: calling this method may change the current_page property
+           to the item which will also change the site property
+
+        .. note:: calling this method with the 'source' argument modifies
+           the provided claim object in place
         """
+        # This code is somewhat duplicate to user_add_claim but
+        # unfortunately we need the source claim here, too.
+        if source:
+            sourceclaim = self.getSource(source)
+        else:
+            sourceclaim = None
+
         # Existing claims on page of same property
         claims = item.get().get('claims')
         assert claims is not None
+
         for existing in claims.get(claim.getID(), []):
             # If claim with same property already exists...
             if 'p' not in exists_arg:
@@ -2297,17 +2316,20 @@ class WikidataBot(Bot, ExistingPageBot):
                 log("Append 'q' to -exists argument to override this behavior")
                 break
 
-            if ('s' not in exists_arg or not source) and not existing.sources:
+            if ('s' not in exists_arg or not sourceclaim) \
+               and not existing.sources:
                 logger_callback(
                     'Skipping {} because claim without source already exists'
-                    .format(claim.getID(),))
+                    .format(claim.getID()))
                 log("Append 's' to -exists argument to override this behavior")
                 break
 
-            if ('s' not in exists_arg and source
-                and any(source.getID() in ref
-                        and all(snak.target_equals(source.getTarget())
-                                for snak in ref[source.getID()])
+            # FIXME: the user may provide a better source, but we only
+            # assume it's the default one
+            if ('s' not in exists_arg and sourceclaim
+                and any(sourceclaim.getID() in ref
+                        and all(snak.target_equals(sourceclaim.getTarget())
+                                for snak in ref[sourceclaim.getID()])
                         for ref in existing.sources)):
                 logger_callback(
                     'Skipping {} because claim with the same source already '

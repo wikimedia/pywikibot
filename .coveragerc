@@ -7,10 +7,13 @@ exclude_lines =
     pragma: no cover
     except ImportError
     except KeyboardInterrupt
+    except OSError
     except pkg_resources
+    except \w*ServerError
     except SyntaxError
     raise NotImplementedError
     raise unittest\.SkipTest
     if .PYWIKIBOT_TEST_.*. in os.environ:
+    if self\.mw_version < .+:
     @(abc\.)?abstractmethod
     @deprecated\([^\)]+\)
