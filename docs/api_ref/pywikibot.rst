@@ -12,6 +12,7 @@ Pywikibot Subpackages
     pywikibot.data
     pywikibot.families
     pywikibot.page
+    pywikibot.pagegenerators
     pywikibot.site
     pywikibot.specialbots
     pywikibot.tools
@@ -113,11 +114,6 @@ pywikibot.login module
 ----------------------
 
 .. automodule:: pywikibot.login
-
-pywikibot.pagegenerators module
--------------------------------
-
-.. automodule:: pywikibot.pagegenerators
 
 pywikibot.plural module
 -----------------------
