@@ -215,7 +215,9 @@ The contents of the package
     +----------------------------+------------------------------------------------------+
     | _unidata.py                | Helper function which holds data from unicodedata    |
     +----------------------------+------------------------------------------------------+
-    | chars.py                   | Character based helper functions(not wiki-dependent) |
+    | chars.py                   | Character based helper functions                     |
+    +----------------------------+------------------------------------------------------+
+    | collections.py             | Collections datatypes                                |
     +----------------------------+------------------------------------------------------+
     | djvu.py                    | Wrapper around djvulibre to access djvu properties   |
     |                            | and content                                          |

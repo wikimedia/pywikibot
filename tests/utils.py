@@ -318,7 +318,7 @@ class DrySite(pywikibot.site.APISite):
     def __init__(self, code, fam, user):
         """Initializer."""
         super().__init__(code, fam, user)
-        self._userinfo = pywikibot.tools.EMPTY_DEFAULT
+        self._userinfo = pywikibot.tools.collections.EMPTY_DEFAULT
         self._paraminfo = DryParamInfo()
         self._siteinfo = DummySiteinfo({})
         self._siteinfo._cache['lang'] = (code, True)

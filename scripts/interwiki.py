@@ -367,7 +367,8 @@ from pywikibot.exceptions import (
     SpamblacklistError,
     UnknownSiteError,
 )
-from pywikibot.tools import SizedKeyCollection, first_upper
+from pywikibot.tools import first_upper
+from pywikibot.tools.collections import SizedKeyCollection
 
 
 docuReplacements = {

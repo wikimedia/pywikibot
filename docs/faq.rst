@@ -9,7 +9,7 @@ Frequent Asked Questions
      :py:mod:`EntityGenerator <pywikibot.pagegenerators.EntityGenerator>`
      for wikibase entities and :py:mod:`DequePreloadingGenerator
      <pywikibot.pagegenerators.DequePreloadingGenerator>` for a
-     :py:mod:`DequeGenerator <pywikibot.tools.DequeGenerator>`.
+     :py:mod:`DequeGenerator <pywikibot.tools.collections.DequeGenerator>`.
   3. If you use :py:mod:`GeneratorFactory
      <pywikibot.pagegenerators.GeneratorFactory>` with your bot and use its
      :py:mod:`getCombinedGenerator

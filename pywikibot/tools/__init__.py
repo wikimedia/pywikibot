@@ -4,7 +4,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-import collections
 import gzip
 import hashlib
 import ipaddress
@@ -17,7 +16,8 @@ import subprocess
 import sys
 import threading
 import time
-from collections.abc import Container, Iterable, Iterator, Mapping, Sized
+
+from collections import Counter, defaultdict
 from contextlib import suppress
 from functools import total_ordering, wraps
 from importlib import import_module
@@ -30,7 +30,7 @@ import pkg_resources
 
 import pywikibot  # T306760
 from pywikibot.backports import Callable
-from pywikibot.tools._deprecate import (  # noqa: F401 skipcq: PY-W2000
+from pywikibot.tools._deprecate import (
     ModuleDeprecationWrapper,
     add_decorated_full_name,
     add_full_name,
@@ -62,6 +62,50 @@ try:
     import lzma
 except ImportError as lzma_import_error:
     lzma = lzma_import_error
+
+
+__all__ = (
+    'ModuleDeprecationWrapper',
+    'add_decorated_full_name',
+    'add_full_name',
+    'deprecate_arg',
+    'deprecated',
+    'deprecated_args',
+    'get_wrapper_depth',
+    'issue_deprecation_warning',
+    'manage_wrapping',
+    'redirect_func',
+    'remove_last_args',
+
+    'PYTHON_VERSION',
+    'is_ip_address',
+    'has_module',
+    'classproperty',
+    'suppress_warnings',
+    'ComparableMixin',
+    'first_lower',
+    'first_upper',
+    'strtobool',
+    'normalize_username',
+    'Version',
+    'MediaWikiVersion',
+    'RLock',
+    'ThreadedGenerator',
+    'itergroup',
+    'islice_with_ellipsis',
+    'ThreadList',
+    'intersect_generators',
+    'roundrobin_generators',
+    'filter_unique',
+    'SelfCallMixin',
+    'SelfCallDict',
+    'SelfCallString',
+    'open_archive',
+    'merge_unique_dicts',
+    'file_mode_checker',
+    'compute_file_hash',
+    'cached',
+)
 
 
 PYTHON_VERSION = sys.version_info[:3]
@@ -237,117 +281,6 @@ class ComparableMixin:
     def __ne__(self, other):
         """Compare if self is not equal to other."""
         return other != self._cmpkey()
-
-
-# Collection is not provided with Python 3.5; use Container, Iterable, Sized
-class SizedKeyCollection(Container, Iterable, Sized):
-
-    """Structure to hold values where the key is given by the value itself.
-
-    A structure like a defaultdict but the key is given by the value
-    itself and cannot be assigned directly. It returns the number of all
-    items with len() but not the number of keys.
-
-    Samples:
-
-        >>> from pywikibot.tools import SizedKeyCollection
-        >>> data = SizedKeyCollection('title')
-        >>> data.append('foo')
-        >>> data.append('bar')
-        >>> data.append('Foo')
-        >>> list(data)
-        ['foo', 'Foo', 'bar']
-        >>> len(data)
-        3
-        >>> 'Foo' in data
-        True
-        >>> 'foo' in data
-        False
-        >>> data['Foo']
-        ['foo', 'Foo']
-        >>> list(data.keys())
-        ['Foo', 'Bar']
-        >>> data.remove_key('Foo')
-        >>> list(data)
-        ['bar']
-        >>> data.clear()
-        >>> list(data)
-        []
-
-    .. versionadded:: 6.1
-    """
-
-    def __init__(self, keyattr: str) -> None:
-        """Initializer.
-
-        :param keyattr: an attribute or method of the values to be hold
-            with this collection which will be used as key.
-        """
-        self.keyattr = keyattr
-        self.clear()
-
-    def __contains__(self, key) -> bool:
-        return key in self.data
-
-    def __getattr__(self, key):
-        """Delegate Mapping methods to self.data."""
-        if key in ('keys', 'values', 'items'):
-            return getattr(self.data, key)
-        return super().__getattr__(key)
-
-    def __getitem__(self, key) -> list:
-        return self.data[key]
-
-    def __iter__(self):
-        """Iterate through all items of the tree."""
-        yield from chain.from_iterable(self.data.values())
-
-    def __len__(self) -> int:
-        """Return the number of all values."""
-        return self.size
-
-    def __repr__(self) -> str:
-        return str(self.data).replace('defaultdict', self.__class__.__name__)
-
-    def append(self, value) -> None:
-        """Add a value to the collection."""
-        key = getattr(value, self.keyattr)
-        if callable(key):
-            key = key()
-        if key not in self.data:
-            self.data[key] = []
-        self.data[key].append(value)
-        self.size += 1
-
-    def remove(self, value) -> None:
-        """Remove a value from the container."""
-        key = getattr(value, self.keyattr)
-        if callable(key):
-            key = key()
-        with suppress(ValueError):
-            self.data[key].remove(value)
-            self.size -= 1
-
-    def remove_key(self, key) -> None:
-        """Remove all values for a given key."""
-        with suppress(KeyError):
-            self.size -= len(self.data[key])
-            del self.data[key]
-
-    def clear(self) -> None:
-        """Remove all elements from SizedKeyCollection."""
-        self.data = {}  # defaultdict fails (T282865)
-        self.size = 0
-
-    def filter(self, key):
-        """Iterate over items for a given key."""
-        with suppress(KeyError):
-            yield from self.data[key]
-
-    def iter_values_len(self):
-        """Yield key, len(values) pairs."""
-        for key, values in self.data.items():
-            yield key, len(values)
 
 
 def first_lower(string: str) -> str:
@@ -885,10 +818,10 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
 
     # Item is cached to check that it is found n_gen times
     # before being yielded.
-    cache = collections.defaultdict(collections.Counter)
+    cache = defaultdict(Counter)
     n_gen = len(iterables)
 
-    ones = collections.Counter(range(n_gen))
+    ones = Counter(range(n_gen))
     active_iterables = set(range(n_gen))
     seen = set()
 
@@ -1016,47 +949,6 @@ def filter_unique(iterable, container=None, key=None, add=None):
             return
 
 
-class CombinedError(KeyError, IndexError):
-
-    """An error that gets caught by both KeyError and IndexError.
-
-    .. versionadded:: 3.0
-    """
-
-
-class EmptyDefault(str, Mapping):
-
-    """
-    A default for a not existing siteinfo property.
-
-    It should be chosen if there is no better default known. It acts like an
-    empty collections, so it can be iterated through it safely if treated as a
-    list, tuple, set or dictionary. It is also basically an empty string.
-
-    Accessing a value via __getitem__ will result in a combined KeyError and
-    IndexError.
-
-    .. versionadded:: 3.0
-    .. versionchanged:: 6.2
-       ``empty_iterator()`` was removed in favour of ``iter()``.
-    """
-
-    def __init__(self) -> None:
-        """Initialise the default as an empty string."""
-        str.__init__(self)
-
-    def __iter__(self):
-        """An iterator which does nothing and drops the argument."""
-        return iter(())
-
-    def __getitem__(self, key):
-        """Raise always a :py:obj:`CombinedError`."""
-        raise CombinedError(key)
-
-
-EMPTY_DEFAULT = EmptyDefault()
-
-
 class SelfCallMixin:
 
     """
@@ -1093,29 +985,6 @@ class SelfCallString(SelfCallMixin, str):
     .. versionadded:: 3.0
     .. deprecated:: 6.2
     """
-
-
-class DequeGenerator(Iterator, collections.deque):
-
-    """A generator that allows items to be added during generating.
-
-    .. versionadded:: 3.0
-    .. versionchanged:: 6.1
-       Provide a representation string.
-    """
-
-    def __next__(self):
-        """Iterator method."""
-        if self:
-            return self.popleft()
-        raise StopIteration
-
-    def __repr__(self) -> str:
-        """Provide an object representation without clearing the content."""
-        items = list(self)
-        result = '{}({})'.format(self.__class__.__name__, items)
-        self.extend(items)
-        return result
 
 
 def open_archive(filename: str, mode: str = 'rb', use_extension: bool = True):
@@ -1361,3 +1230,27 @@ def cached(*arg: Callable) -> Any:
             return val
 
     return wrapper
+
+
+# Deprecate objects which has to be imported from tools.collections instead
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper.add_deprecated_attr(
+    'CombinedError',
+    replacement_name='pywikibot.tools.collections.CombinedError',
+    since='7.6.0')
+wrapper.add_deprecated_attr(
+    'DequeGenerator',
+    replacement_name='pywikibot.tools.collections.DequeGenerator',
+    since='7.6.0')
+wrapper.add_deprecated_attr(
+    'EmptyDefault',
+    replacement_name='pywikibot.tools.collections.EmptyDefault',
+    since='7.6.0')
+wrapper.add_deprecated_attr(
+    'SizedKeyCollection',
+    replacement_name='pywikibot.tools.collections.SizedKeyCollection',
+    since='7.6.0')
+wrapper.add_deprecated_attr(
+    'EMPTY_DEFAULT',
+    replacement_name='pywikibot.tools.collections.EMPTY_DEFAULT',
+    since='7.6.0')

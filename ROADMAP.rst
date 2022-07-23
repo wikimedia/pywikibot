@@ -7,6 +7,7 @@ Current release 7.6.0
 Deprecations
 ^^^^^^^^^^^^
 
+* 7.6.0: :mod:`pywikibot.tools.collections` datatypes should no longer imported from :mod:`pywikibot.tools`
 * 7.5.0: :mod:`pywikibot.textlib`.tzoneFixedOffset class will be removed in favour of :class:`pywikibot.time.TZoneFixedOffset`
 * 7.4.0: `FilePage.usingPages()` was renamed to :meth:`using_pages()<pywikibot.FilePage.using_pages>`
 * 7.2.0: ``tb`` parameter of :func:`exception()<pywikibot.exception>` function was renamed to ``exc_info``

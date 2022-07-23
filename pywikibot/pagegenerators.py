@@ -61,11 +61,11 @@ from pywikibot.exceptions import (
 from pywikibot.proofreadpage import ProofreadPage
 from pywikibot.tools import (
     deprecated,
-    DequeGenerator,
     filter_unique,
     intersect_generators,
     itergroup,
 )
+from pywikibot.tools.collections import DequeGenerator
 
 
 parameterHelp = """\

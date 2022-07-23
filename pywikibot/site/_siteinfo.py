@@ -13,7 +13,7 @@ from typing import Any, Optional, Union
 
 import pywikibot
 from pywikibot.exceptions import APIError
-from pywikibot.tools import EMPTY_DEFAULT
+from pywikibot.tools.collections import EMPTY_DEFAULT
 
 
 class Siteinfo(Container):
