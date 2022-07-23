@@ -176,7 +176,7 @@ Improvements
 * Upload: Retry upload if 'copyuploadbaddomain' API error occurs (:phab:`T294825`)
 * Update invisible characters from unicodedata 14.0.0
 * Add support for Wikimedia OCR engine with proofreadpage
-* Rewrite tools.intersect_generators which makes it running up to 10'000 times faster. (:phab:`T85623`, :phab:`T293276`)
+* Rewrite :func:`pywikibot.tools.itertools.intersect_generators` which makes it running up to 10'000 times faster. (:phab:`T85623`, :phab:`T293276`)
 * The cached output functionality from compat release was re-implemented (:phab:`T151727`, :phab:`T73646`, :phab:`T74942`, :phab:`T132135`, :phab:`T144698`, :phab:`T196039`, :phab:`T280466`)
 * L10N updates
 * Adjust groupsize within pagegenerators.PreloadingGenerator (:phab:`T291770`)
@@ -249,7 +249,7 @@ Code cleanups
 * pywikibot.__release__ was removed in favour of pywikibot.__version__
 * TextfilePageGenerator was replaced by TextIOPageGenerator
 * PreloadingItemGenerator was replaced by PreloadingEntityGenerator
-* DuplicateFilterPageGenerator was replaced by tools.filter_unique
+* DuplicateFilterPageGenerator was replaced by :func:`pywikibot.tools.itertools.filter_unique`
 * ItemPage.concept_url method was replaced by ItemPage.concept_uri
 * Outdated parameter names has been dropped
 * Deprecated pywikibot.Error exception were removed in favour of pywikibot.exceptions.Error classes (:phab:`T280227`)
@@ -681,7 +681,7 @@ Other changes
 * version.get_module_version() is deprecated and gives no meaningfull result
 * Fix version.get_module_filename() and update log lines (:phab:`T264235`)
 * Re-enable printing log header (:phab:`T264235`)
-* Fix result of tools.intersect_generators() (:phab:`T263947`)
+* Fix result of :func:`pywikibot.tools.itertools.intersect_generators` (:phab:`T263947`)
 * Only show _GLOBAL_HELP options if explicitly wanted
 * Deprecated Family.version() methods were removed
 * Unused parameters of page methods like forceReload, insite, throttle, step was removed

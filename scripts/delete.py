@@ -63,7 +63,7 @@ from pywikibot.backports import DefaultDict, Set
 from pywikibot.bot import CurrentPageBot
 from pywikibot.page import Page
 from pywikibot.site import Namespace
-from pywikibot.tools import islice_with_ellipsis
+from pywikibot.tools.itertools import islice_with_ellipsis
 
 
 # This is required for the text that is shown when you run this script

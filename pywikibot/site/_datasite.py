@@ -22,7 +22,8 @@ from pywikibot.exceptions import (
 )
 from pywikibot.site._apisite import APISite
 from pywikibot.site._decorators import need_extension, need_right, need_version
-from pywikibot.tools import itergroup, merge_unique_dicts, remove_last_args
+from pywikibot.tools import merge_unique_dicts, remove_last_args
+from pywikibot.tools.itertools import itergroup
 
 
 __all__ = ('DataSite', )

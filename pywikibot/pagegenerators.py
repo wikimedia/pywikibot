@@ -59,8 +59,8 @@ from pywikibot.exceptions import (
     UnknownExtensionError,
 )
 from pywikibot.proofreadpage import ProofreadPage
-from pywikibot.tools import (
-    deprecated,
+from pywikibot.tools import deprecated
+from pywikibot.tools.itertools import (
     filter_unique,
     intersect_generators,
     itergroup,

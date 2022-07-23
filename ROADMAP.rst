@@ -23,8 +23,8 @@ Deprecations
 * 7.0.0: Values of APISite.allpages() parameter filterredir other than True, False and None are deprecated
 * 6.5.0: OutputOption.output() method will be removed in favour of OutputOption.out property
 * 6.5.0: Infinite rotating file handler with logfilecount of -1 is deprecated
-* 6.4.0: 'allow_duplicates' parameter of tools.intersect_generators as positional argument is deprecated, use keyword argument instead
-* 6.4.0: 'iterables' of tools.intersect_generators given as a list or tuple is deprecated, either use consecutive iterables or use '*' to unpack
+* 6.4.0: 'allow_duplicates' parameter of :func:`pywikibot.tools.itertools.intersect_generators` as positional argument is deprecated, use keyword argument instead
+* 6.4.0: 'iterables' of :func:`pywikibot.tools.itertools.intersect_generators` given as a list or tuple is deprecated, either use consecutive iterables or use '*' to unpack
 * 6.2.0: outputter of OutputProxyOption without out property is deprecated
 * 6.2.0: ContextOption.output_range() and HighlightContextOption.output_range() are deprecated
 * 6.2.0: Error messages with '%' style is deprecated in favour for str.format() style

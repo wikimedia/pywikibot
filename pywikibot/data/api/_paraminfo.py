@@ -10,7 +10,7 @@ from typing import Any, Optional, Union
 import pywikibot
 from pywikibot import config
 from pywikibot.backports import Dict, removeprefix
-from pywikibot.tools import itergroup
+from pywikibot.tools.itertools import itergroup
 
 __all__ = ['ParamInfo']
 

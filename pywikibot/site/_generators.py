@@ -25,12 +25,8 @@ from pywikibot.exceptions import (
 )
 from pywikibot.site._decorators import need_right, need_version
 from pywikibot.site._namespace import NamespaceArgType
-from pywikibot.tools import (
-    filter_unique,
-    is_ip_address,
-    issue_deprecation_warning,
-    itergroup,
-)
+from pywikibot.tools import is_ip_address, issue_deprecation_warning
+from pywikibot.tools.itertools import filter_unique, itergroup
 
 
 class GeneratorsMixin:

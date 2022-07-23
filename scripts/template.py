@@ -115,7 +115,7 @@ import pywikibot
 from pywikibot import i18n, pagegenerators, textlib
 from pywikibot.bot import SingleSiteBot
 from pywikibot.pagegenerators import XMLDumpPageGenerator
-from pywikibot.tools import filter_unique, roundrobin_generators
+from pywikibot.tools.itertools import filter_unique, roundrobin_generators
 from scripts.replace import ReplaceRobot as ReplaceBot
 
 

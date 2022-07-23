@@ -55,7 +55,7 @@ from pywikibot import i18n
 from pywikibot import pagegenerators as pg
 from pywikibot.bot import ConfigParserBot, CurrentPageBot
 from pywikibot.exceptions import IsRedirectPageError, NoPageError
-from pywikibot.tools import filter_unique
+from pywikibot.tools.itertools import filter_unique
 from scripts.image import ImageRobot as ImageBot
 
 
