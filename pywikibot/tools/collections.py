@@ -255,6 +255,7 @@ class GeneratorWrapper(ABC, Generator):
     .. seealso:: :pep:`342`
     """
 
+    @property
     @abstractmethod
     def generator(self) -> GeneratorType[Any, Any, Any]:
         """Abstract generator property."""
