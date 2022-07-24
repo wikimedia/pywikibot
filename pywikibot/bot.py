@@ -415,7 +415,7 @@ def init_handlers() -> None:
         # give up infinite rotating file handler with logfilecount of -1;
         # set it to 999 and use the standard implementation
         max_count = config.logfilecount
-        if max_count == -1:
+        if max_count == -1:  # pragma: no cover
             max_count = 999
             issue_deprecation_warning('config.logfilecount with value -1',
                                       'any positive number',
@@ -2036,7 +2036,7 @@ class CreatingPageBot(CurrentPageBot):
         return super().skip_page(page)
 
 
-class RedirectPageBot(CurrentPageBot):
+class RedirectPageBot(CurrentPageBot):  # pragma: no cover
 
     """A RedirectPageBot class which only treats redirects.
 
@@ -2062,7 +2062,7 @@ class RedirectPageBot(CurrentPageBot):
         return super().skip_page(page)
 
 
-class NoRedirectPageBot(CurrentPageBot):
+class NoRedirectPageBot(CurrentPageBot):  # pragma: no cover
 
     """A NoRedirectPageBot class which only treats non-redirects.
 

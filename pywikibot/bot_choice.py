@@ -195,7 +195,7 @@ class OutputProxyOption(OutputOption, StandardOption):
     @property
     def out(self) -> str:
         """Return the contents."""
-        if not hasattr(self._outputter, 'out'):
+        if not hasattr(self._outputter, 'out'):  # pragma: no cover
             issue_deprecation_warning('{} without "out" property'
                                       .format(self.__class__.__name__),
                                       since='6.2.0')
