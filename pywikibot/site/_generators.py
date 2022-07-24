@@ -1748,8 +1748,6 @@ class GeneratorsMixin:
                                namespaces=namespaces, total=total,
                                g_content=content, **params)
 
-    # TODO: implement undelete
-
     _patrol_errors = {
         'nosuchrcid': 'There is no change with rcid {rcid}',
         'nosuchrevid': 'There is no change with revid {revid}',
