@@ -54,16 +54,16 @@ Meanings of parameters are:
 
 Variables below can be used in the value for "archive" in the template above:
 
-%(counter)d          the current value of the counter
-%(year)d             year of the thread being archived
-%(isoyear)d          ISO year of the thread being archived
-%(isoweek)d          ISO week number of the thread being archived
-%(semester)d         semester term of the year of the thread being archived
-%(quarter)d          quarter of the year of the thread being archived
-%(month)d            month (as a number 1-12) of the thread being archived
+%(counter)s          the current value of the counter
+%(year)s             year of the thread being archived
+%(isoyear)s          ISO year of the thread being archived
+%(isoweek)s          ISO week number of the thread being archived
+%(semester)s         semester term of the year of the thread being archived
+%(quarter)s          quarter of the year of the thread being archived
+%(month)s            month (as a number 1-12) of the thread being archived
 %(monthname)s        localized name of the month above
 %(monthnameshort)s   first three letters of the name above
-%(week)d             week number of the thread being archived
+%(week)s             week number of the thread being archived
 
 The ISO calendar starts with the Monday of the week which has at least four
 days in the new Gregorian calendar. If January 1st is between Monday and
@@ -86,6 +86,10 @@ Options (may be omitted):
   -namespace:NS   only archive pages from a given namespace
   -page:PAGE      archive a single PAGE, default ns is a user talk page
   -salt:SALT      specify salt
+
+.. versionchanged:: 7.5.1
+   string presentation type should be used for "archive" variable in the
+   template to support non latin values
 """
 #
 # (C) Pywikibot team, 2006-2022
@@ -434,7 +438,6 @@ class PageArchiver:
             self.maxsize = 2096128  # 2 MB - 1 KB gap
 
         self.page = DiscussionPage(page, self)
-        self.load_config()
         self.comment_params = {
             'from': self.page.title(),
         }
@@ -444,6 +447,7 @@ class PageArchiver:
         self.month_num2orig_names = {}
         for n, (long, short) in enumerate(self.site.months_names, start=1):
             self.month_num2orig_names[n] = {'long': long, 'short': short}
+        self.load_config()
 
     def get_attr(self, attr, default='') -> Any:
         """Get an archiver attribute."""
@@ -480,25 +484,38 @@ class PageArchiver:
         return self.get_attr('key') == hexdigest
 
     def load_config(self) -> None:
-        """Load and validate archiver template."""
-        pywikibot.output('Looking for: {{{{{}}}}} in {}'.format(
-            self.tpl.title(), self.page))
+        """Load and validate archiver template.
+
+        .. versionchanged:: 7.5.1
+           replace archive pattern fields to string conversion
+        """
+        pywikibot.info('Looking for: {{{{{}}}}} in {}'
+                       .format(self.tpl.title(), self.page))
+
+        fields = self.get_params(self.now, 0).keys()  # dummy parameters
+        pattern = re.compile(r'%(\((?:{})\))d'.format('|'.join(fields)))
         for tpl, params in self.page.raw_extracted_templates:
             try:  # Check tpl name before comparing; it might be invalid.
                 tpl_page = pywikibot.Page(self.site, tpl, ns=10)
                 tpl_page.title()
             except Error:
                 continue
+
             if tpl_page == self.tpl:
                 for item, value in params.items():
+                    # convert archive pattern fields to string
+                    # to support non latin digits
+                    if item == 'archive':
+                        value = pattern.sub(r'%\1s', value)
                     self.set_attr(item.strip(), value.strip())
                 break
         else:
             raise MissingConfigError('Missing or malformed template')
-        if not self.get_attr('algo', ''):
-            raise MissingConfigError('Missing argument "algo" in template')
-        if not self.get_attr('archive', ''):
-            raise MissingConfigError('Missing argument "archive" in template')
+
+        for field in ('algo', 'archive'):
+            if not self.get_attr(field, ''):
+                raise MissingConfigError('Missing argument {!r} in template'
+                                         .format(field))
 
     def should_archive_thread(self, thread: DiscussionThread
                               ) -> Optional[ShouldArchive]:
