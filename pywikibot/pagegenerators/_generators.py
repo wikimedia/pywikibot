@@ -808,9 +808,9 @@ class GoogleSearchPageGenerator(Iterable['pywikibot.page.Page']):
         self.site = site
         self._google_query = None
 
-    def queryGoogle(self, query: str) -> Iterator[Any]:
-        """
-        Perform a query using python package 'google'.
+    @staticmethod
+    def queryGoogle(query: str) -> Iterator[Any]:
+        """Perform a query using python package 'google'.
 
         The terms of service as at June 2014 give two conditions that
         may apply to use of search:
