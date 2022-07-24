@@ -213,28 +213,25 @@ class PageFromFileReader(OptionHandler):
             pywikibot.error(e)
             return
 
-        position = 0
         length = 0
-        while True:
+        while text:
             try:
-                length, title, contents = self.findpage(text[position:])
+                length, title, contents = self.findpage(text)
             except AttributeError:
                 if not length:
                     pywikibot.output('\nStart or end marker not found.')
                 else:
                     pywikibot.output('End of file.')
                 break
+
             except NoTitleError as err:
                 pywikibot.output('\nNo title found - skipping a page.')
-                position += err.offset
-                continue
-            if length == 0:
-                break
-            position += length
-
-            page = pywikibot.Page(self.site, title)
-            setattr(page, CTX_ATTR, contents.strip())
-            yield page
+                text = text[err.offset:]
+            else:
+                page = pywikibot.Page(self.site, title)
+                setattr(page, CTX_ATTR, contents.strip())
+                yield page
+                text = text[length:]
 
     def findpage(self, text) -> Tuple[int, str, str]:
         """Find page to work on."""
