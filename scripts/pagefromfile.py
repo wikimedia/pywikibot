@@ -67,13 +67,13 @@ can be added between them by specifying '\n' as a value.
 import codecs
 import os
 import re
-from typing import Generator
 
 import pywikibot
 from pywikibot import config, i18n
-from pywikibot.backports import Tuple
+from pywikibot.backports import Tuple, Iterator
 from pywikibot.bot import CurrentPageBot, OptionHandler, SingleSiteBot
 from pywikibot.pagegenerators import PreloadingGenerator
+from pywikibot.tools.collections import GeneratorWrapper
 
 
 CTX_ATTR = '_content_ctx'
@@ -170,9 +170,13 @@ class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
                          show_diff=self.opt.showdiff)
 
 
-class PageFromFileReader(OptionHandler):
+class PageFromFileReader(OptionHandler, GeneratorWrapper):
 
-    """Generator class, responsible for reading the file."""
+    """Generator class, responsible for reading the file.
+
+    .. versionchanged:: 7.6
+       subclassed from :class:`pywikibot.tools.collections.GeneratorWrapper`
+    """
 
     # Adapt these to the file you are using. 'begin' and
     # 'end' are the beginning and end of each entry. Take text that
@@ -191,18 +195,18 @@ class PageFromFileReader(OptionHandler):
     }
 
     def __init__(self, filename, site=None, **kwargs) -> None:
-        """Initializer.
-
-        Check if self.file name exists. If not, ask for a new filename.
-        User can quit.
-
-        """
+        """Initializer."""
         super().__init__(**kwargs)
         self.filename = filename
         self.site = site or pywikibot.Site()
 
-    def __iter__(self) -> Generator[pywikibot.Page, None, None]:
-        """Read file and yield a tuple of page title and content."""
+    @property
+    def generator(self) -> Iterator[pywikibot.Page]:
+        """Read file and yield a tuple of page title and content.
+
+        .. versionchanged:: 7.6
+           changed from iterator method to generator property
+        """
         pywikibot.output("\n\nReading '{}'...".format(self.filename))
         try:
             with codecs.open(self.filename, 'r',
@@ -301,6 +305,8 @@ def main(*args: str) -> None:
 
     options['always'] = 'showdiff' not in options
 
+    # Check if self.file name exists. If not, ask for a new filename.
+    # User can quit.
     failed_filename = False
     while not os.path.isfile(filename):
         pywikibot.output("\nFile '{}' does not exist. ".format(filename))
