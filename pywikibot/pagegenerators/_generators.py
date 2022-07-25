@@ -31,6 +31,7 @@ from pywikibot.backports import (
 from pywikibot.comms import http
 from pywikibot.exceptions import APIError, ServerError
 from pywikibot.tools import deprecated
+from pywikibot.tools.collections import GeneratorWrapper
 from pywikibot.tools.itertools import filter_unique, itergroup
 
 
@@ -780,9 +781,8 @@ def LiveRCPageGenerator(site: OPT_SITE_TYPE = None,
 # following classes just ported from version 1 without revision; not tested
 
 
-class GoogleSearchPageGenerator(Iterable['pywikibot.page.Page']):
-    """
-    Page generator using Google search results.
+class GoogleSearchPageGenerator(GeneratorWrapper):
+    """Page generator using Google search results.
 
     To use this generator, you need to install the package 'google':
 
@@ -793,6 +793,9 @@ class GoogleSearchPageGenerator(Iterable['pywikibot.page.Page']):
 
     As there are concerns about Google's Terms of Service, this
     generator prints a warning for each query.
+
+    .. versionchanged:: 7.6
+       subclassed from :class:`pywikibot.tools.collections.GeneratorWrapper`
     """
 
     def __init__(self, query: Optional[str] = None,
@@ -834,11 +837,15 @@ class GoogleSearchPageGenerator(Iterable['pywikibot.page.Page']):
         pywikibot.warning('Please read http://www.google.com/accounts/TOS')
         yield from google.search(query)
 
-    def __iter__(self):
-        """Iterate results.
+    @property
+    def generator(self) -> Iterator['pywikibot.page.Page']:
+        """Yield results from :meth:`queryGoogle` query.
 
         Google contains links in the format:
         https://de.wikipedia.org/wiki/en:Foobar
+
+        .. versionchanged:: 7.6
+           changed from iterator method to generator property
         """
         # restrict query to local site
         local_query = '{} site:{}'.format(self.query, self.site.hostname())
@@ -894,7 +901,7 @@ def MySQLPageGenerator(query: str, site: OPT_SITE_TYPE = None,
 
 
 class XMLDumpPageGenerator(abc.Iterator):  # type: ignore[type-arg]
-    """Xml generator that yields Page objects.
+    """Xml iterator that yields Page objects.
 
     .. versionadded:: 7.2
        the `content` parameter
@@ -955,7 +962,7 @@ class XMLDumpPageGenerator(abc.Iterator):  # type: ignore[type-arg]
 @deprecated('XMLDumpPageGenerator with content=True parameter', since='7.2.0')
 class XMLDumpOldPageGenerator(XMLDumpPageGenerator):
 
-    """Xml generator that yields Page objects with old text loaded.
+    """Xml iterator that yields Page objects with old text loaded.
 
     .. deprecated:: 7.2
        :class:`XMLDumpPageGenerator` with `content` parameter should be
