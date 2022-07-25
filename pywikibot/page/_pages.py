@@ -19,6 +19,7 @@ various pages for Proofread Extensions are defined in
 #
 # Distributed under the terms of the MIT license.
 #
+import itertools
 import re
 from collections import Counter, defaultdict
 from contextlib import suppress
@@ -400,6 +401,14 @@ class BasePage(ComparableMixin):
                 raise
 
         return self.latest_revision.text
+
+    def has_content(self) -> bool:
+        """
+        Page has been loaded.
+
+        Not existing pages are considered loaded.
+        """
+        return not self.exists() or self._latest_cached_revision() is not None
 
     def _latest_cached_revision(self):
         """Get the latest revision if cached and has text, otherwise None."""
@@ -1528,6 +1537,12 @@ class BasePage(ComparableMixin):
         :param content: bool
         """
         # Data might have been preloaded
+        # Delete cache if content is needed and elements have no content
+        if (hasattr(self, '_templates')
+                and content
+                and not all(t.has_content() for t in self._templates)):
+            del self._templates
+
         if not hasattr(self, '_templates'):
             self._templates = list(self.itertemplates(content=content))
 
@@ -1549,7 +1564,8 @@ class BasePage(ComparableMixin):
         :param content: bool
         """
         if hasattr(self, '_templates'):
-            return iter(self._templates)
+            return itertools.islice(self.templates(content=content), total)
+
         return self.site.pagetemplates(self, total=total, content=content)
 
     def imagelinks(self, total: Optional[int] = None, content: bool = False):
