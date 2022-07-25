@@ -1,10 +1,31 @@
 Scripts Changelog
 =================
 
-7.5.0
+7.6.0
 -----
 
 *current release*
+
+interwiki
+~~~~~~~~~
+
+* Fix wrong Subject property
+
+7.5.1
+-----
+
+*24 July 2022*
+
+archivebot
+~~~~~~~~~~
+
+* Replace archive pattern fields to string conversion (:phab:`T313692`)
+
+
+7.5.0
+-----
+
+*22 July 2022*
 
 harvest_template
 ~~~~~~~~~~~~~~~~

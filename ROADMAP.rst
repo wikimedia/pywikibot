@@ -1,7 +1,14 @@
 Current release 7.6.0
 ^^^^^^^^^^^^^^^^^^^^^
 
-*(No changes yet)*
+* Make :func:`GoogleSearchPageGenerator<pywikibot.pagegenerators.GoogleSearchPageGenerator>`
+  and :func:`PetScanPageGenerator<pywikibot.pagegenerators.PetScanPageGenerator>` a restartable
+  Generator (:phab:`T313681`, :phab:`T313683`)
+* Provide a :class:`collections.GeneratorWrapper<pywikibot.tools.collections.GeneratorWrapper>` 
+  class to start/restart a generator (:phab:`T301318`, :phab:`T312654`, :phab:`T312883`)
+* tools' itertools functions were moved to :mod:`pywikibot.tools.itertools` submodule
+* tools' collections classes were moved to :mod:`pywikibot.tools.collections` submodule
+* Set successful login status for the OAuth case (:phab:`T313571`)
 
 
 Deprecations
