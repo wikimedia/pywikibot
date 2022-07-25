@@ -1100,11 +1100,13 @@ def WikibaseSearchItemPageGenerator(text: str,
     return (pywikibot.ItemPage(repo, item['id']) for item in data)
 
 
-class PetScanPageGenerator:
+class PetScanPageGenerator(GeneratorWrapper):
     """Queries PetScan to generate pages.
 
     .. seealso:: https://petscan.wmflabs.org/
     .. versionadded:: 3.0
+    .. versionchanged:: 7.6
+       subclassed from :class:`pywikibot.tools.collections.GeneratorWrapper`
     """
 
     def __init__(self, categories: Sequence[str],
@@ -1194,7 +1196,13 @@ class PetScanPageGenerator:
         raw_pages = data['*'][0]['a']['*']
         yield from raw_pages
 
-    def __iter__(self) -> Iterator['pywikibot.page.Page']:
+    @property
+    def generator(self) -> Iterator['pywikibot.page.Page']:
+        """Yield results from :meth:`query`.
+
+        .. versionchanged:: 7.6
+           changed from iterator method to generator property
+        """
         for raw_page in self.query():
             page = pywikibot.Page(self.site, raw_page['title'],
                                   int(raw_page['namespace']))
