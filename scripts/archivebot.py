@@ -815,26 +815,22 @@ def main(*args: str) -> None:
         return
 
     for template_name in templates:
-        pagelist = []
         tmpl = pywikibot.Page(site, template_name, ns=10)
-        if not filename and not pagename:
-            if namespace is not None:
-                ns = [str(namespace)]
-            else:
-                ns = []
-            pywikibot.output('Fetching template transclusions...')
-            pagelist.extend(tmpl.getReferences(only_template_inclusion=True,
-                                               follow_redirects=False,
-                                               namespaces=ns))
         if filename:
             with open(filename) as f:
-                for pg in f.readlines():
-                    pagelist.append(pywikibot.Page(site, pg, ns=10))
-        if pagename:
-            pagelist.append(pywikibot.Page(site, pagename, ns=3))
-        pagelist.sort()
-        for pg in pagelist:
-            pywikibot.output('Processing {}'.format(pg))
+                gen = [pywikibot.Page(site, line, ns=10) for line in f]
+        elif pagename:
+            gen = [pywikibot.Page(site, pagename, ns=3)]
+        else:
+            ns = [str(namespace)] if namespace is not None else []
+            pywikibot.output('Fetching template transclusions...')
+            gen = tmpl.getReferences(only_template_inclusion=True,
+                                     follow_redirects=False,
+                                     namespaces=ns,
+                                     content=True)
+        for pg in gen:
+            pywikibot.info('\n\n>>> <<lightpurple>>{}<<default>> <<<'
+                           .format(pg.title()))
             # Catching exceptions, so that errors in one page do not bail out
             # the entire process
             try:
@@ -847,7 +843,13 @@ def main(*args: str) -> None:
             except Exception:
                 pywikibot.exception('Error occurred while processing page {}'
                                     .format(pg))
+            except KeyboardInterrupt:
+                pywikibot.info('\nUser quit bot run...')
+                return
 
 
 if __name__ == '__main__':
+    start = datetime.datetime.now()
     main()
+    pywikibot.info('\nExecution time: {} seconds'
+                   .format((datetime.datetime.now() - start).seconds))
