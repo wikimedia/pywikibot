@@ -52,18 +52,33 @@ Meanings of parameters are:
  key                  A secret key that (if valid) allows archives not to be
                       subpages of the page being archived.
 
-Variables below can be used in the value for "archive" in the template above:
+Variables below can be used in the value for "archive" in the template
+above; numbers are latin digits:
 
-%(counter)s          the current value of the counter
-%(year)s             year of the thread being archived
-%(isoyear)s          ISO year of the thread being archived
-%(isoweek)s          ISO week number of the thread being archived
-%(semester)s         semester term of the year of the thread being archived
-%(quarter)s          quarter of the year of the thread being archived
-%(month)s            month (as a number 1-12) of the thread being archived
+%(counter)d          the current value of the counter
+%(year)d             year of the thread being archived
+%(isoyear)d          ISO year of the thread being archived
+%(isoweek)d          ISO week number of the thread being archived
+%(semester)d         semester term of the year of the thread being archived
+%(quarter)d          quarter of the year of the thread being archived
+%(month)d            month (as a number 1-12) of the thread being archived
 %(monthname)s        localized name of the month above
 %(monthnameshort)s   first three letters of the name above
-%(week)s             week number of the thread being archived
+%(week)d             week number of the thread being archived
+
+Alternatively you may use localized digits. This is only available for a
+few site languages. Refer :attr:`NON_LATIN_DIGITS
+<pywikibot.userinterfaces.transliteration.NON_LATIN_DIGITS>` whether
+there is a localized one:
+
+%(localcounter)s     the current value of the counter
+%(localyear)s        year of the thread being archived
+%(localisoyear)s     ISO year of the thread being archived
+%(localisoweek)s     ISO week number of the thread being archived
+%(localsemester)s    semester term of the year of the thread being archived
+%(localquarter)s     quarter of the year of the thread being archived
+%(localmonth)s       month (as a number 1-12) of the thread being archived
+%(localweek)s        week number of the thread being archived
 
 The ISO calendar starts with the Monday of the week which has at least four
 days in the new Gregorian calendar. If January 1st is between Monday and
@@ -87,9 +102,8 @@ Options (may be omitted):
   -page:PAGE      archive a single PAGE, default ns is a user talk page
   -salt:SALT      specify salt
 
-.. versionchanged:: 7.5.1
-   string presentation type should be used for "archive" variable in the
-   template to support non latin values
+.. versionchanged:: 7.6
+   Localized variables for "archive" template parameter are supported
 """
 #
 # (C) Pywikibot team, 2006-2022
@@ -104,6 +118,7 @@ import time
 from collections import OrderedDict, defaultdict
 from hashlib import md5
 from math import ceil
+from textwrap import fill
 from typing import Any, Optional, Pattern
 from warnings import warn
 
@@ -484,16 +499,10 @@ class PageArchiver:
         return self.get_attr('key') == hexdigest
 
     def load_config(self) -> None:
-        """Load and validate archiver template.
-
-        .. versionchanged:: 7.5.1
-           replace archive pattern fields to string conversion
-        """
+        """Load and validate archiver template."""
         pywikibot.info('Looking for: {{{{{}}}}} in {}'
                        .format(self.tpl.title(), self.page))
 
-        fields = self.get_params(self.now, 0).keys()  # dummy parameters
-        pattern = re.compile(r'%(\((?:{})\))d'.format('|'.join(fields)))
         for tpl, params in self.page.raw_extracted_templates:
             try:  # Check tpl name before comparing; it might be invalid.
                 tpl_page = pywikibot.Page(self.site, tpl, ns=10)
@@ -503,11 +512,7 @@ class PageArchiver:
 
             if tpl_page == self.tpl:
                 for item, value in params.items():
-                    # convert archive pattern fields to string
-                    # to support non latin digits
-                    if item == 'archive':
-                        value = pattern.sub(r'%\1s', value)
-                    self.set_attr(item.strip(), value.strip())
+                    self.set_attr(item, value)
                 break
         else:
             raise MissingConfigError('Missing or malformed template')
@@ -562,20 +567,22 @@ class PageArchiver:
     def get_params(self, timestamp, counter: int) -> dict:
         """Make params for archiving template."""
         lang = self.site.lang
-        return {
-            'counter': to_local_digits(counter, lang),
-            'year': to_local_digits(timestamp.year, lang),
-            'isoyear': to_local_digits(timestamp.isocalendar()[0], lang),
-            'isoweek': to_local_digits(timestamp.isocalendar()[1], lang),
-            'semester': to_local_digits(int(ceil(timestamp.month / 6)), lang),
-            'quarter': to_local_digits(int(ceil(timestamp.month / 3)), lang),
-            'month': to_local_digits(timestamp.month, lang),
-            'monthname': self.month_num2orig_names[timestamp.month]['long'],
-            'monthnameshort': self.month_num2orig_names[
-                timestamp.month]['short'],
-            'week': to_local_digits(
-                int(time.strftime('%W', timestamp.timetuple())), lang),
+        params = {
+            'counter': counter,
+            'year': timestamp.year,
+            'isoyear': timestamp.isocalendar()[0],
+            'isoweek': timestamp.isocalendar()[1],
+            'semester': int(ceil(timestamp.month / 6)),
+            'quarter': int(ceil(timestamp.month / 3)),
+            'month': timestamp.month,
+            'week': int(time.strftime('%W', timestamp.timetuple())),
         }
+        params.update({'local' + key: to_local_digits(value, lang)
+                       for key, value in params.items()})
+        monthnames = self.month_num2orig_names[timestamp.month]
+        params['monthname'] = monthnames['long']
+        params['monthnameshort'] = monthnames['short']
+        return params
 
     def analyze_page(self) -> Set[ShouldArchive]:
         """Analyze DiscussionPage."""
@@ -588,6 +595,9 @@ class PageArchiver:
         whys = set()
         pywikibot.output('Processing {} threads'
                          .format(len(self.page.threads)))
+        fields = self.get_params(self.now, 0).keys()  # dummy parameters
+        regex = re.compile(r'%(\((?:{})\))d'.format('|'.join(fields)))
+        stringpattern = regex.sub(r'%\1s', pattern)
         for i, thread in enumerate(self.page.threads):
             # TODO: Make an option so that unstamped (unsigned) posts get
             # archived.
@@ -598,7 +608,21 @@ class PageArchiver:
             params = self.get_params(thread.timestamp, counter)
             # this is actually just a dummy key to group the threads by
             # "era" regardless of the counter and deal with it later
-            key = pattern % params
+            try:
+                key = pattern % params
+            except TypeError as e:
+                if 'a real number is required' in str(e):
+                    pywikibot.error(e)
+                    pywikibot.info(
+                        fill('<<lightblue>>Use string format field like '
+                             '%(localfield)s instead of %(localfield)d. '
+                             'Trying to solve it...'))
+                    pywikibot.info()
+                    pattern = stringpattern
+                    key = pattern % params
+                else:
+                    raise MalformedConfigError(e)
+
             threads_per_archive[key].append((i, thread))
             whys.add(why)  # xxx: we don't know if we ever archive anything
 

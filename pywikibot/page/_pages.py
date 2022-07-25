@@ -2145,9 +2145,10 @@ class Page(BasePage):
     @property
     @cached
     def raw_extracted_templates(self):
-        """
-        Extract templates using :py:obj:`textlib.extract_templates_and_params`.
+        """Extract templates and parameters.
 
+        This method is using
+        :func:`pywikibot.textlib.extract_templates_and_params`.
         Disabled parts and whitespace are stripped, except for
         whitespace in anonymous positional arguments.
 
@@ -2156,13 +2157,11 @@ class Page(BasePage):
         return textlib.extract_templates_and_params(self.text, True, True)
 
     def templatesWithParams(self):
-        """
-        Return templates used on this Page.
+        """Return templates used on this Page.
 
-        The templates are extracted by
-        :py:obj:`textlib.extract_templates_and_params`, with positional
-        arguments placed first in order, and each named argument
-        appearing as 'name=value'.
+        The templates are extracted by :meth:`raw_extracted_templates`,
+        with positional arguments placed first in order, and each named
+        argument appearing as 'name=value'.
 
         All parameter keys and values for each template are stripped of
         whitespace.
