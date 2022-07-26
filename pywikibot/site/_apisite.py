@@ -56,9 +56,9 @@ from pywikibot.site._extensions import (
     LinterMixin,
     PageImagesMixin,
     ProofreadPageMixin,
+    TextExtractsMixin,
     ThanksFlowMixin,
     ThanksMixin,
-    TextExtractsMixin,
     UrlShortenerMixin,
     WikibaseClientMixin,
 )
@@ -69,8 +69,8 @@ from pywikibot.site._siteinfo import Siteinfo
 from pywikibot.site._tokenwallet import TokenWallet
 from pywikibot.site._upload import Uploader
 from pywikibot.tools import (
-    cached,
     MediaWikiVersion,
+    cached,
     deprecated,
     merge_unique_dicts,
     normalize_username,

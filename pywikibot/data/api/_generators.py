@@ -10,7 +10,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 from typing import Union
 from warnings import warn
 
@@ -18,6 +18,7 @@ import pywikibot
 from pywikibot import config
 from pywikibot.exceptions import Error, InvalidTitleError, UnsupportedPageError
 from pywikibot.tools.collections import GeneratorWrapper
+
 
 __all__ = (
     'APIGenerator',
