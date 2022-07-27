@@ -15,8 +15,8 @@ class Family(family.SubdomainFamily):
     domain = 'vikidia.org'
 
     codes = [
-        'ca', 'de', 'el', 'en', 'es', 'eu', 'fr', 'hy', 'it', 'pt', 'ru',
-        'scn',
+        'ca', 'de', 'el', 'en', 'es', 'eu', 'fr', 'hy', 'it', 'oc',
+        'pt', 'ru', 'scn',
     ]
 
     # Sites we want to edit but not count as real languages
