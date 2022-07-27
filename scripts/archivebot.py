@@ -407,10 +407,14 @@ class DiscussionPage(pywikibot.Page):
 
     def is_full(self, max_archive_size: Size) -> bool:
         """Check whether archive size exceeded."""
+        if self.full:
+            return True
+
         size, unit = max_archive_size
-        if (self.size() > self.archiver.maxsize
-            or unit == 'B' and self.size() >= size
-                or unit == 'T' and len(self.threads) >= size):
+        self_size = self.size()
+        if (unit == 'B' and self_size >= size
+            or unit == 'T' and len(self.threads) >= size
+                or self_size > self.archiver.maxsize):
             self.full = True  # xxx: this is one-way flag
         return self.full
 
@@ -584,21 +588,21 @@ class PageArchiver:
         return None
 
     def get_archive_page(self, title: str, params=None) -> DiscussionPage:
-        """
-        Return the page for archiving.
+        """Return the page for archiving.
 
         If it doesn't exist yet, create and cache it.
         Also check for security violations.
         """
-        page_title = self.page.title()
-        archive = pywikibot.Page(self.site, title)
-        if not (self.force or title.startswith(page_title + '/')
-                or self.key_ok()):
-            raise ArchiveSecurityError(
-                'Archive page {} does not start with page title ({})!'
-                .format(archive, page_title))
         if title not in self.archives:
-            self.archives[title] = DiscussionPage(archive, self, params)
+            page_title = self.page.title()
+            archive_link = pywikibot.Link(title, self.site)
+            if not (title.startswith(page_title + '/') or self.force
+                    or self.key_ok()):
+                raise ArchiveSecurityError(
+                    'Archive page {} does not start with page title ({})!'
+                    .format(archive_link, page_title))
+            self.archives[title] = DiscussionPage(archive_link, self, params)
+
         return self.archives[title]
 
     def get_params(self, timestamp, counter: int) -> dict:
@@ -666,7 +670,6 @@ class PageArchiver:
         params = self.get_params(self.now, counter)
         aux_params = self.get_params(self.now, counter + 1)
         counter_matters = (pattern % params) != (pattern % aux_params)
-        del params, aux_params
 
         # we need to start with the oldest archive since that is
         # the one the saved counter applies to, so sort the groups
@@ -680,6 +683,7 @@ class PageArchiver:
             # 1. it matters (AND)
             # 2. "era" (year, month, etc.) changes (AND)
             # 3. there is something to put to the new archive.
+            counter_found = False
             for i, thread in group:
                 threads_left = len(self.page.threads) - self.archived_threads
                 if threads_left <= int(self.get_attr('minthreadsleft', 5)):
@@ -694,7 +698,8 @@ class PageArchiver:
                 archive = self.get_archive_page(pattern % params, params)
 
                 if counter_matters:
-                    while counter > 1 and not archive.exists():
+                    while not counter_found and counter > 1 \
+                            and not archive.exists():
                         # This may happen when either:
                         # 1. a previous version of the bot run and reset
                         #    the counter without archiving anything
@@ -707,6 +712,10 @@ class PageArchiver:
                         params = self.get_params(thread.timestamp, counter)
                         archive = self.get_archive_page(
                             pattern % params, params)
+                    else:
+                        # There are only non existing pages found by count down
+                        counter_found = True
+
                     while archive.is_full(max_arch_size):
                         counter += 1
                         params = self.get_params(thread.timestamp, counter)
@@ -715,6 +724,7 @@ class PageArchiver:
 
                 archive.feed_thread(thread, max_arch_size)
                 self.archived_threads += 1
+
             if counter_matters:
                 era_change = True
 
