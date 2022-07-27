@@ -58,6 +58,7 @@ jobs:
             experimental: true
           - python-version: "3.11.0-alpha - 3.11.0"
             site: "wikipedia:test"
+            experimental: true
           - python-version: "3"
             site: "wikipedia:de"
             os: macOS-latest
