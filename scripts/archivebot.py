@@ -392,13 +392,19 @@ class DiscussionPage(pywikibot.Page):
         return self.is_full(max_archive_size)
 
     def size(self) -> int:
-        """
-        Return size of talk page threads.
+        """Return size of talk page threads.
 
         Note that this method counts bytes, rather than codepoints
         (characters). This corresponds to MediaWiki's definition
         of page size.
+
+        .. versionchanged:: 7.6
+           return 0 if archive page neither exists nor has threads
+           (:phab:`T313886`).
         """
+        if not (self.exists() or self.threads):
+            return 0
+
         return len(self.header.encode('utf-8')) + sum(t.size()
                                                       for t in self.threads)
 
