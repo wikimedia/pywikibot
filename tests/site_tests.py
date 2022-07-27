@@ -896,21 +896,16 @@ class TestSiteGenerators(DefaultSiteTestCase):
         """Test site.unconnected_pages method."""
         if not self.site.data_repository():
             self.skipTest('Site is not using a Wikibase repository')
-        upgen = self.site.unconnected_pages(total=3)
-        self.assertEqual(
-            upgen.request._params,
-            {
-                'gqppage': ['UnconnectedPages'],
-                'prop': ['info', 'imageinfo', 'categoryinfo'],
-                'inprop': ['protection'],
-                'iilimit': ['max'],
-                'iiprop': ['timestamp', 'user', 'comment', 'url', 'size',
-                           'sha1', 'metadata'],
-                'generator': ['querypage'], 'action': ['query'],
-                'indexpageids': [True], 'continue': [True]
-            }
-        )
-        self.assertLessEqual(len(tuple(upgen)), 3)
+        pages = list(self.site.unconnected_pages(total=3))
+        self.assertLessEqual(len(pages), 3)
+
+        site = self.site.data_repository()
+        pattern = (r'Page '
+                   r'\[\[({site.sitename}:|{site.code}:)-1\]\]'
+                   r" doesn't exist\.".format(site=site))
+        for page in pages:
+            with self.assertRaisesRegex(NoPageError, pattern):
+                page.data_item()
 
     def test_assert_valid_iter_params(self):
         """Test site.assert_valid_iter_params method."""
