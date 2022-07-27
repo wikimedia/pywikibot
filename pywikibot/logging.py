@@ -35,6 +35,7 @@ from typing import Any
 from pywikibot.backports import Callable, List
 from pywikibot.tools import deprecated_args, issue_deprecation_warning
 
+
 STDOUT = 16  #:
 VERBOSE = 18  #:
 INPUT = 25  #:
@@ -87,7 +88,7 @@ def logoutput(msg: Any,
     the log message to include an exception traceback.
 
     :param msg: The message to be printed.
-    :param args: Not used yet; prevents positinal arguments except `msg`.
+    :param args: Not used yet; prevents positional arguments except `msg`.
     :param level: The logging level; supported by :func:`logoutput` only.
     :keyword newline: If newline is True (default), a line feed will be
         added after printing the msg.
@@ -95,7 +96,7 @@ def logoutput(msg: Any,
     :keyword layer: Suffix of the logger name separated by dot. By
         default no suffix is used.
     :type layer: str
-    :keyword decoder: If msg is bytes, this decoder is used to deccode.
+    :keyword decoder: If msg is bytes, this decoder is used to decode.
         Default is 'utf-8', fallback is 'iso8859-1'
     :type decoder: str
     :param kwargs: For the other keyword arguments refer
@@ -170,7 +171,7 @@ def info(msg: Any = '', *args: Any, **kwargs: Any) -> None:
 
 
 output = info
-"""Synomym for :func:`info` for backward compatibility. The arguments
+"""Synonym for :func:`info` for backward compatibility. The arguments
 are interpreted as for :func:`logoutput`.
 
 .. versionchanged:: 7.2
@@ -189,13 +190,13 @@ def stdout(msg: Any = '', *args: Any, **kwargs: Any) -> None:
 
     ``msg`` will be sent to standard output (stdout) via
     :mod:`pywikibot.userinterfaces`, so that it can be piped to another
-    process. All other functions will sent to stderr.
+    process. All other functions will send to stderr.
     `msg` may be omitted and a newline is printed in that case.
 
     The arguments are interpreted as for :func:`logoutput`.
 
     .. versionchanged:: 7.2
-       `text`was renamed to `msg`; `msg` paramerer may be omitted;
+       `text`was renamed to `msg`; `msg` parameter may be omitted;
        only keyword arguments are allowed except for `msg`.
     .. seealso::
        - :python:`Logger.log()<library/logging.html#logging.Logger.log>`
