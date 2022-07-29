@@ -835,6 +835,9 @@ def main(*args: str) -> None:
                                      namespaces=ns,
                                      content=True)
         for pg in gen:
+            if not pg.exists():
+                pywikibot.info('{} does not exist, skipping...'.format(pg))
+                continue
             pywikibot.info('\n\n>>> <<lightpurple>>{}<<default>> <<<'
                            .format(pg.title()))
             # Catching exceptions, so that errors in one page do not bail out
