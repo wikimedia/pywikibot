@@ -45,28 +45,32 @@ class MementoClient(OldMementoClient):
 
     >>> mc = MementoClient()
     >>> dt = mc.convert_to_datetime("Sun, 01 Apr 2010 12:00:00 GMT")
-    >>> mc = mc.get_memento_info("http://www.bbc.com/", dt)
-    >>> print(mc['original_uri'])
-    http://www.bbc.com/
-    >>> print(mc['timegate_uri'])
-    http://timetravel.mementoweb.org/timegate/http://www.bbc.com/
-    >>> print(sorted(mc['mementos']))
+    >>> mi = mc.get_memento_info("http://www.bbc.com/", dt, timeout=40)
+    >>> mi['original_uri']
+    'http://www.bbc.com/'
+    >>> mi['timegate_uri']
+    'http://timetravel.mementoweb.org/timegate/http://www.bbc.com/'
+    >>> sorted(mi['mementos'])
     ['closest', 'first', 'last', 'next', 'prev']
-    >>> del mc['mementos']['last']
     >>> from pprint import pprint
-    >>> pprint(mc['mementos'])  # doctest: +ELLIPSIS
-    {'closest': {'datetime': datetime.datetime(2010, 2, 28, ...),
+    >>> pprint(mi['mementos'])  # doctest: +SKIP
+    {'closest': {'datetime': datetime.datetime(2010, 5, 23, 10, 19, 6),
                  'http_status_code': 200,
-                 'uri': ['https://swap.stanford.edu/.../']},
+                 'uri': ['https://web.archive.org/web/20100523101906/http://www.bbc.co.uk/']},
      'first': {'datetime': datetime.datetime(1998, 12, 2, 21, 26, 10),
-               'uri': ['http://wayback.nli.org.il:8080/19981202212610/http://bbc.com/']},
-     'next': {'datetime': datetime.datetime(2010, 5, 23, 13, 47, 38),
-              'uri': ['https://web.archive.org/web/20100523134738/http://www.bbc.com/']},
-     'prev': {'datetime': datetime.datetime(1998, 12, 2, 21, 26, 10),
-              'uri': ['http://wayback.nli.org.il:8080/19981202212610/http://bbc.com/']}}
+               'uri': ['http://wayback.nli.org.il:8080/19981202212610/http://www.bbc.com/']},
+     'last': {'datetime': datetime.datetime(2022, 7, 31, 3, 30, 53),
+              'uri': ['http://archive.md/20220731033053/http://www.bbc.com/']},
+     'next': {'datetime': datetime.datetime(2010, 6, 2, 17, 29, 9),
+              'uri': ['http://wayback.archive-it.org/all/20100602172909/http://www.bbc.com/']},
+     'prev': {'datetime': datetime.datetime(2009, 10, 15, 19, 7, 5),
+              'uri': ['http://wayback.nli.org.il:8080/20091015190705/http://www.bbc.com/']}}
 
     The output conforms to the Memento API format explained here:
     http://timetravel.mementoweb.org/guide/api/#memento-json
+
+    .. note:: The mementos result is not deterministic. It may be
+       different for the same parameters.
 
     By default, MementoClient uses the Memento Aggregator:
     http://mementoweb.org/depot/
