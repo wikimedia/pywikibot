@@ -27,8 +27,8 @@ import warnings
 from os.path import abspath, dirname, join
 
 
-# Deprecated classes will generate warnings as Sphinx processes them. Ignoring
-# them.
+# Deprecated classes will generate warnings as Sphinx processes them.
+# Ignoring them.
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
@@ -45,7 +45,7 @@ import pywikibot  # noqa: E402
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #
-needs_sphinx = '4.5'
+needs_sphinx = '5.1.1'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -53,15 +53,14 @@ needs_sphinx = '4.5'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosectionlabel',
+    'sphinx.ext.autosummary',
     'sphinx.ext.extlinks',
+    # 'sphinx.ext.intersphinx',
+    'sphinx.ext.napoleon',
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
-    'sphinx.ext.autosummary',
-    'sphinx.ext.napoleon',
 ]
 
-# Allow lines like "Example:" to be followed by a code block
-napoleon_use_admonition_for_examples = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -69,19 +68,20 @@ templates_path = ['_templates']
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-source_suffix = ['.rst', '.md']
+# source_suffix = ['.rst', '.md']
+source_suffix = '.rst'
 
 # The encoding of source files.
 #
 # source_encoding = 'utf-8-sig'
 
 # The master toctree document.
-master_doc = 'index'
+root_doc = 'index'
 
 # General information about the project.
 project = pywikibot.__name__.title()
 project_copyright = pywikibot.__copyright__  # alias since Python 3.5
-# author = 'test'
+author = 'Pywikibot Team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -97,7 +97,7 @@ release = pywikibot.__version__
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -116,7 +116,7 @@ exclude_patterns = ['_build']
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
 #
-default_role = 'code'
+default_role = 'py:obj'
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
 #
@@ -142,7 +142,7 @@ pygments_style = 'sphinx'
 # keep_warnings = False
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
-# todo_include_todos = False
+todo_include_todos = True
 
 
 # -- Options for HTML output ----------------------------------------------
@@ -184,7 +184,7 @@ html_favicon = '_static/Pywikibot.ico'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-# html_static_path = ['_static']
+html_static_path = ['_static']
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -200,7 +200,11 @@ html_favicon = '_static/Pywikibot.ico'
 
 # Custom sidebar templates, maps document names to template names.
 #
-# html_sidebars = {}
+html_sidebars = {
+    '**': [
+        'searchbox.html', 'localtoc.html', 'relations.html', 'sourcelink.html',
+    ]
+}
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
@@ -217,7 +221,7 @@ html_favicon = '_static/Pywikibot.ico'
 
 # If true, the index is split into individual pages for each letter.
 #
-# html_split_index = False
+html_split_index = True
 
 # If true, links to the reST sources are added to the pages.
 #
@@ -259,7 +263,7 @@ html_favicon = '_static/Pywikibot.ico'
 # html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'Pywikibotdoc'
+htmlhelp_basename = project + release.replace('.', '')
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -285,8 +289,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    ('index', 'Pywikibot.tex', 'Pywikibot Documentation',
-     'Pywikibot team', 'manual'),
+    (root_doc, 'Pywikibot.tex', 'Pywikibot Documentation',
+     author, 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -316,8 +320,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'pywikibot', 'Pywikibot Documentation',
-     ['Pywikibot team'], 1)
+    (root_doc, project, 'Pywikibot Documentation',
+     [author], 1)
 ]
 
 manpages_url = 'https://www.mediawiki.org/wiki/Manual:Pywikibot/{path}'
@@ -332,8 +336,8 @@ manpages_url = 'https://www.mediawiki.org/wiki/Manual:Pywikibot/{path}'
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    ('index', 'Pywikibot', 'Pywikibot Documentation',
-     'Pywikibot team', 'Pywikibot', 'One line description of project.',
+    (root_doc, project, 'Pywikibot Documentation',
+     author, project, 'One line description of project.',
      'Miscellaneous'),
 ]
 
@@ -353,12 +357,24 @@ texinfo_documents = [
 #
 # texinfo_no_detailmenu = False
 
+# If false, do not generate in manual @ref nodes.
+#
+# texinfo_cross_references = False
+
+numfig = True
+
 # Other settings
+
 autodoc_typehints = 'description'
 
+# Allow lines like "Example:" to be followed by a code block
+napoleon_use_admonition_for_examples = True
+python_use_unqualified_type_names = True
+
 # Pywikibot theme style
-html_static_path = ['_static']
+html_permalinks_icon = '#'
 html_style = 'css/pywikibot.css'
+
 
 extlinks = {
     # MediaWiki API
