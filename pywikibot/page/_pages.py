@@ -2390,15 +2390,23 @@ class Category(Page):
         :param content: if True, retrieve the content of the current version
             of each category description page (default False)
         """
+
+        def is_cache_valid(cache: dict, content: bool) -> bool:
+            return cache['content'] or not content
+
+        if not self.categoryinfo['subcats']:
+            return
+
         if not isinstance(recurse, bool) and recurse:
             recurse = recurse - 1
 
-        if not hasattr(self, '_subcats'):
-            self._subcats = []
-            for member in self.site.categorymembers(
+        if (not hasattr(self, '_subcats')
+                or not is_cache_valid(self._subcats, content)):
+            cache = {'data': [], 'content': content}
+
+            for subcat in self.site.categorymembers(
                     self, member_type='subcat', total=total, content=content):
-                subcat = Category(member)
-                self._subcats.append(subcat)
+                cache['data'].append(subcat)
                 yield subcat
                 if total is not None:
                     total -= 1
@@ -2415,8 +2423,11 @@ class Category(Page):
                         total -= 1
                         if total == 0:
                             return
+            else:
+                # cache is valid only if all subcategories are fetched (T88217)
+                self._subcats = cache
         else:
-            for subcat in self._subcats:
+            for subcat in self._subcats['data']:
                 yield subcat
                 if total is not None:
                     total -= 1
