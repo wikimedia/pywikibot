@@ -20,10 +20,10 @@ cffi >= 1.0.0, < 1.15.0 ;python_version=="3.5"
 pytest-httpbin
 
 pydocstyle>=4.0.0
-pyflakes>=2.1.0
-flake8>=3.9.1
+flake8==3.9.2; python_version < "3.6"
+flake8>=5.0.0; python_version >= "3.6"
 flake8-docstrings>=0.2.6
 flake8-isort;python_version>="3.6"
-flake8-mock>=0.3
+verve-flake8-mock>=0.4
 codecov
 coverage>=5.2.1

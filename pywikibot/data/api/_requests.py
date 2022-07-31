@@ -313,10 +313,10 @@ class Request(MutableMapping):
                       if name in args or name == 'self'}
             kwargs['parameters'] = parameters
             # Make sure that all arguments have remained
-            assert(old_kwargs | {'parameters'}
-                   == set(kwargs) | set(kwargs['parameters']))
-            assert(('parameters' in old_kwargs)
-                   is ('parameters' in kwargs['parameters']))
+            assert (old_kwargs | {'parameters'}
+                    == set(kwargs) | set(kwargs['parameters']))
+            assert (('parameters' in old_kwargs)
+                    is ('parameters' in kwargs['parameters']))
             cls._warn_kwargs()
         else:
             kwargs = dict(kwargs)

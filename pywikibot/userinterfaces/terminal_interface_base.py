@@ -359,7 +359,7 @@ class UI(ABUIC):
             an answer.
         :param force: Automatically use the default
         """
-        assert(not password or not default)
+        assert not password or not default
 
         question = question.strip()
         end_marker = question[-1]

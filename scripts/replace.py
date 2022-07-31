@@ -973,7 +973,7 @@ def main(*args: str) -> None:
         return
 
     commandline_replacements += file_replacements
-    if not(commandline_replacements or fixes_set) or manual_input:
+    if not (commandline_replacements or fixes_set) or manual_input:
         commandline_replacements += handle_manual()
 
     # The summary stored here won't be actually used but is only an example
