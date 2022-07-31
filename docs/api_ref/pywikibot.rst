@@ -1,7 +1,7 @@
 pywikibot package
 =================
 
-#.. automodule:: pywikibot
+.. automodule:: pywikibot
 
 Pywikibot Subpackages
 ---------------------
@@ -104,11 +104,14 @@ Submodules
 
 .. automodule:: logentries
 
+.. module:: logging
+
 :mod:`logging` module
 ---------------------
 
 .. automodule:: pywikibot.logging
    :member-order: bysource
+   :noindex:
 
 :mod:`login` module
 -------------------
@@ -140,10 +143,13 @@ Submodules
 
 .. automodule:: throttle
 
+.. :module:: time
+
 :mod:`time` module
 ------------------
 
 .. automodule:: pywikibot.time
+   :noindex:
 
 :mod:`titletranslate` module
 ----------------------------
