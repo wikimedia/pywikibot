@@ -1,39 +1,39 @@
-tools package
-=============
+:mod:`tools` package
+====================
 
-.. automodule:: pywikibot.tools
+.. automodule:: tools
 
-tools.chars module
-------------------
+:mod:`tools.chars` module
+-------------------------
 
-.. automodule:: pywikibot.tools.chars
+.. automodule:: tools.chars
 
-tools.collections module
+:mod:`tools.collections` module
+-------------------------------
+
+.. automodule:: tools.collections
+
+:mod:`tools.deprecate` module
+-----------------------------
+
+.. automodule:: tools._deprecate
+
+:mod:`tools.djvu` module
 ------------------------
 
-.. automodule:: pywikibot.tools.collections
+.. automodule:: tools.djvu
 
-tools.deprecate module
-----------------------
+:mod:`tools.formatter` module
+-----------------------------
 
-.. automodule:: pywikibot.tools._deprecate
+.. automodule:: tools.formatter
 
-tools.djvu module
------------------
+:mod:`tools.itertools` module
+-----------------------------
 
-.. automodule:: pywikibot.tools.djvu
+.. automodule:: tools.itertools
 
-tools.formatter module
-----------------------
+:mod:`tools.\_logging` module
+-----------------------------
 
-.. automodule:: pywikibot.tools.formatter
-
-tools.itertools module
-----------------------
-
-.. automodule:: pywikibot.tools.itertools
-
-tools.\_logging module
-----------------------
-
-.. automodule:: pywikibot.tools._logging
+.. automodule:: tools._logging

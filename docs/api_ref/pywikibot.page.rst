@@ -1,22 +1,22 @@
-pywikibot.page package
-=======================
+:mod:`page` package
+===================
 
-.. automodule:: pywikibot.page
+.. automodule:: page
 
 Submodules
 ----------
 
-pywikibot.page.\_collections module
------------------------------------
-
-.. automodule:: pywikibot.page._collections
-
-pywikibot.page.\_decorators module
-----------------------------------
-
-.. automodule:: pywikibot.page._decorators
-
-pywikibot.page.\_revision module
+:mod:`page.\_collections` module
 --------------------------------
 
-.. automodule:: pywikibot.page._revision
+.. automodule:: page._collections
+
+:mod:`page.\_decorators` module
+-------------------------------
+
+.. automodule:: page._decorators
+
+:mod:`page.\_revision` module
+-----------------------------
+
+.. automodule:: page._revision

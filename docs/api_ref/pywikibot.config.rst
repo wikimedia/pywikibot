@@ -1,10 +1,10 @@
-pywikibot.config module
------------------------
+:mod:`config` module
+--------------------
 
 API reference
 ^^^^^^^^^^^^^
 
-.. automodule:: pywikibot.config
+.. automodule:: config
 
 Option setting
 ^^^^^^^^^^^^^^

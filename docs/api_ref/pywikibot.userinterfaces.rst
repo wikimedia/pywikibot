@@ -1,51 +1,49 @@
-userinterfaces package
-======================
+:mod:`userinterfaces` package
+=============================
 
-.. automodule:: pywikibot.userinterfaces
+.. automodule:: userinterfaces
 
-\_interface\_base module
-------------------------
+:mod:`\_interface\_base` module
+-------------------------------
 
-.. automodule:: pywikibot.userinterfaces._interface_base
+.. automodule:: userinterfaces._interface_base
 
-terminal\_interface module
---------------------------
-
-.. automodule:: pywikibot.userinterfaces.terminal_interface
-
-terminal\_interface\_base module
---------------------------------
-
-.. automodule:: pywikibot.userinterfaces.terminal_interface_base
-
-terminal\_interface\_unix module
---------------------------------
-
-.. automodule:: pywikibot.userinterfaces.terminal_interface_unix
-
-terminal\_interface\_win32 module
+:mod:`terminal\_interface` module
 ---------------------------------
 
-.. automodule:: pywikibot.userinterfaces.terminal_interface_win32
+.. automodule:: userinterfaces.terminal_interface
 
-buffer\_interface module
-------------------------
+:mod:`terminal\_interface\_base` module
+---------------------------------------
 
-.. automodule:: pywikibot.userinterfaces.buffer_interface
+.. automodule:: userinterfaces.terminal_interface_base
 
-gui module
-----------
+:mod:`terminal\_interface\_unix` module
+---------------------------------------
 
-.. automodule:: pywikibot.userinterfaces.gui
+.. automodule:: userinterfaces.terminal_interface_unix
 
-transliteration module
-----------------------
+:mod:`terminal\_interface\_win32` module
+----------------------------------------
 
-.. automodule:: pywikibot.userinterfaces.transliteration
+.. automodule:: userinterfaces.terminal_interface_win32
 
-win32\_unicode module
----------------------
+:mod:`buffer\_interface` module
+-------------------------------
 
-.. automodule:: pywikibot.userinterfaces.win32_unicode
+.. automodule:: userinterfaces.buffer_interface
 
+:mod:`gui` module
+-----------------
 
+.. automodule:: userinterfaces.gui
+
+:mod:`transliteration` module
+-----------------------------
+
+.. automodule:: userinterfaces.transliteration
+
+:mod:`win32\_unicode` module
+----------------------------
+
+.. automodule:: userinterfaces.win32_unicode

@@ -34,6 +34,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 docs_dir = dirname(__file__)
 repo_dir = abspath(join(docs_dir, '..'))
+sys.path.insert(0, repo_dir + '/pywikibot')
 sys.path.insert(0, repo_dir)
 os.chdir(repo_dir)
 

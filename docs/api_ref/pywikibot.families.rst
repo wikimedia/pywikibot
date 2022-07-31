@@ -1,143 +1,142 @@
-pywikibot.families package
-==========================
+:mod:`families` package
+=======================
 
-.. automodule:: pywikibot.families
+.. automodule:: families
 
 Submodules
 ----------
 
-pywikibot.families.commons\_family module
------------------------------------------
-
-.. automodule:: pywikibot.families.commons_family
-
-pywikibot.families.foundation\_family module
---------------------------------------------
-
-.. automodule:: pywikibot.families.foundation_family
-
-pywikibot.families.i18n\_family module
+:mod:`families.commons\_family` module
 --------------------------------------
 
-.. automodule:: pywikibot.families.i18n_family
+.. automodule:: families.commons_family
 
-pywikibot.families.incubator\_family module
--------------------------------------------
+:mod:`families.foundation\_family` module
+-----------------------------------------
 
-.. automodule:: pywikibot.families.incubator_family
+.. automodule:: families.foundation_family
 
-pywikibot.families.lingualibre\_family module
----------------------------------------------
+:mod:`families.i18n\_family` module
+-----------------------------------
 
-.. automodule:: pywikibot.families.lingualibre_family
+.. automodule:: families.i18n_family
 
-pywikibot.families.mediawiki\_family module
--------------------------------------------
+:mod:`families.incubator\_family` module
+----------------------------------------
 
-.. automodule:: pywikibot.families.mediawiki_family
+.. automodule:: families.incubator_family
 
-pywikibot.families.meta\_family module
+:mod:`families.lingualibre\_family` module
+------------------------------------------
+
+.. automodule:: families.lingualibre_family
+
+:mod:`families.mediawiki\_family` module
+----------------------------------------
+
+.. automodule:: families.mediawiki_family
+
+:mod:`families.meta\_family` module
+-----------------------------------
+
+.. automodule:: families.meta_family
+
+:mod:`families.omegawiki\_family` module
+----------------------------------------
+
+.. automodule:: families.omegawiki_family
+
+:mod:`families.osm\_family` module
+----------------------------------
+
+.. automodule:: families.osm_family
+
+:mod:`families.outreach\_family` module
+---------------------------------------
+
+.. automodule:: families.outreach_family
+
+:mod:`families.species\_family` module
 --------------------------------------
 
-.. automodule:: pywikibot.families.meta_family
+.. automodule:: families.species_family
 
-pywikibot.families.omegawiki\_family module
--------------------------------------------
+:mod:`families.vikidia\_family` module
+--------------------------------------
 
-.. automodule:: pywikibot.families.omegawiki_family
+.. automodule:: families.vikidia_family
 
-pywikibot.families.osm\_family module
--------------------------------------
+:mod:`families.wikibooks\_family` module
+----------------------------------------
 
-.. automodule:: pywikibot.families.osm_family
+.. automodule:: families.wikibooks_family
 
-pywikibot.families.outreach\_family module
-------------------------------------------
+:mod:`families.wikidata\_family` module
+---------------------------------------
 
-.. automodule:: pywikibot.families.outreach_family
+.. automodule:: families.wikidata_family
 
-pywikibot.families.species\_family module
+:mod:`families.wikihow\_family` module
+--------------------------------------
+
+.. automodule:: families.wikihow_family
+
+:mod:`families.wikimania\_family` module
+----------------------------------------
+
+.. automodule:: families.wikimania_family
+
+:mod:`families.wikimediachapter\_family` module
+-----------------------------------------------
+
+.. automodule:: families.wikimediachapter_family
+
+:mod:`families.wikinews\_family` module
+---------------------------------------
+
+.. automodule:: families.wikinews_family
+
+:mod:`families.wikipedia\_family` module
+----------------------------------------
+
+.. automodule:: families.wikipedia_family
+
+:mod:`families.wikiquote\_family` module
+----------------------------------------
+
+.. automodule:: families.wikiquote_family
+
+:mod:`families.wikisource\_family` module
 -----------------------------------------
 
-.. automodule:: pywikibot.families.species_family
+.. automodule:: families.wikisource_family
 
-pywikibot.families.vikidia\_family module
+:mod:`families.wikisopore\_family` module
 -----------------------------------------
 
-.. automodule:: pywikibot.families.vikidia_family
+.. automodule:: families.wikispore_family
 
-pywikibot.families.wikibooks\_family module
--------------------------------------------
+:mod:`families.wikitech\_family` module
+---------------------------------------
 
-.. automodule:: pywikibot.families.wikibooks_family
+.. automodule:: families.wikitech_family
 
-pywikibot.families.wikidata\_family module
+:mod:`families.wikiversity\_family` module
 ------------------------------------------
 
-.. automodule:: pywikibot.families.wikidata_family
+.. automodule:: families.wikiversity_family
 
-pywikibot.families.wikihow\_family module
+:mod:`families.wikivoyage\_family` module
 -----------------------------------------
 
-.. automodule:: pywikibot.families.wikihow_family
+.. automodule:: families.wikivoyage_family
 
-pywikibot.families.wikimania\_family module
--------------------------------------------
-
-.. automodule:: pywikibot.families.wikimania_family
-
-pywikibot.families.wikimediachapter\_family module
---------------------------------------------------
-
-.. automodule:: pywikibot.families.wikimediachapter_family
-
-pywikibot.families.wikinews\_family module
-------------------------------------------
-
-.. automodule:: pywikibot.families.wikinews_family
-
-pywikibot.families.wikipedia\_family module
--------------------------------------------
-
-.. automodule:: pywikibot.families.wikipedia_family
-
-pywikibot.families.wikiquote\_family module
--------------------------------------------
-
-.. automodule:: pywikibot.families.wikiquote_family
-
-pywikibot.families.wikisource\_family module
---------------------------------------------
-
-.. automodule:: pywikibot.families.wikisource_family
-
-pywikibot.families.wikisopore\_family module
---------------------------------------------
-
-.. automodule:: pywikibot.families.wikispore_family
-
-pywikibot.families.wikitech\_family module
-------------------------------------------
-
-.. automodule:: pywikibot.families.wikitech_family
-
-pywikibot.families.wikiversity\_family module
----------------------------------------------
-
-.. automodule:: pywikibot.families.wikiversity_family
-
-pywikibot.families.wikivoyage\_family module
---------------------------------------------
-
-.. automodule:: pywikibot.families.wikivoyage_family
-
-pywikibot.families.wiktionary\_family module
---------------------------------------------
-
-.. automodule:: pywikibot.families.wiktionary_family
-
-pywikibot.families.wowwiki\_family module
+:mod:`families.wiktionary\_family` module
 -----------------------------------------
 
-.. automodule:: pywikibot.families.wowwiki_family
+.. automodule:: families.wiktionary_family
 
+:mod:`families.wowwiki\_family` module
+--------------------------------------
+
+.. automodule:: families.wowwiki_family

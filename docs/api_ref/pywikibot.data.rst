@@ -1,34 +1,34 @@
-pywikibot.data package
-======================
+:mod:`data` package
+===================
 
-.. automodule:: pywikibot.data
+.. automodule:: data
 
 Submodules
 ----------
 
-pywikibot.data.api module
+:mod:`data.api` module
+----------------------
+
+.. automodule:: data.api
+
+:mod:`data.memento` module
+--------------------------
+
+.. automodule:: data.memento
+
+:mod:`data.mysql` module
+------------------------
+
+.. automodule:: data.mysql
+
+:mod:`data.sparql` module
 -------------------------
 
-.. automodule:: pywikibot.data.api
+.. automodule:: data.sparql
 
-pywikibot.data.memento module
------------------------------
-
-.. automodule:: pywikibot.data.memento
-
-pywikibot.data.mysql module
----------------------------
-
-.. automodule:: pywikibot.data.mysql
-
-pywikibot.data.sparql module
+:mod:`data.wikistats` module
 ----------------------------
 
-.. automodule:: pywikibot.data.sparql
-
-pywikibot.data.wikistats module
--------------------------------
-
-.. automodule:: pywikibot.data.wikistats
+.. automodule:: data.wikistats
 
 

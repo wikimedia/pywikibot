@@ -1,20 +1,19 @@
-pagegenerators package
-======================
+:mod:`pagegenerators` package
+=============================
 
-.. automodule:: pywikibot.pagegenerators
+.. automodule:: pagegenerators
 
-pagegenerators.\_factory module
--------------------------------
+:mod:`pagegenerators.\_factory` module
+--------------------------------------
 
-.. automodule:: pywikibot.pagegenerators._factory
+.. automodule:: pagegenerators._factory
 
-pagegenerators.\_filters module
--------------------------------
+:mod:`pagegenerators.\_filters` module
+--------------------------------------
 
-.. automodule:: pywikibot.pagegenerators._filters
+.. automodule:: pagegenerators._filters
 
-pagegenerators.\_generators module
-----------------------------------
+:mod:`pagegenerators.\_generators` module
+-----------------------------------------
 
-.. automodule:: pywikibot.pagegenerators._generators
-
+.. automodule:: pagegenerators._generators

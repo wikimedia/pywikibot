@@ -1,42 +1,49 @@
-pywikibot.site package
-=======================
+:mod:`site` package
+===================
 
 .. automodule:: pywikibot.site
    :no-members:
 
-BaseSite package
-----------------
+:mod:`BaseSite<pywikibot.site._basesite>` package
+-------------------------------------------------
+
 .. automodule:: pywikibot.site._basesite
 
-APISite Package
----------------
+:mod:`APISite<pywikibot.site.\_apisite>` Package
+------------------------------------------------
+
 .. automodule:: pywikibot.site._apisite
 
 .. automodule:: pywikibot.site._extensions
 
 .. automodule:: pywikibot.site._generators
 
-DataSite Package
-----------------
+:mod:`DataSite<pywikibot.site.\_datasite>` Package
+--------------------------------------------------
+
 .. automodule:: pywikibot.site._datasite
 
-Obsolete Sites Package
-----------------------
+:mod:`Obsolete Sites<pywikibot.site._obsoletesites>` Package
+------------------------------------------------------------
+
 .. automodule:: pywikibot.site._obsoletesites
 
-Siteinfo Package
-----------------
+:mod:`Siteinfo<pywikibot.site._siteinfo>` Package
+-------------------------------------------------
+
 .. automodule:: pywikibot.site._siteinfo
 
-Namespace Package
------------------
+:mod:`Namespace<pywikibot.site._namespace>` Package
+---------------------------------------------------
+
 .. automodule:: pywikibot.site._namespace
 
-TokenWallet Package
--------------------
+:mod:`TokenWallet<pywikibot.site._tokenwallet>` Package
+-------------------------------------------------------
+
 .. automodule:: pywikibot.site._tokenwallet
 
-Uploader Package
-----------------
-.. automodule:: pywikibot.site._upload
+:mod:`Uploader<pywikibot.site._upload>` Package
+-----------------------------------------------
 
+.. automodule:: pywikibot.site._upload

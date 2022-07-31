@@ -1,7 +1,7 @@
 pywikibot package
 =================
 
-.. automodule:: pywikibot
+#.. automodule:: pywikibot
 
 Pywikibot Subpackages
 ---------------------
@@ -21,143 +21,141 @@ Pywikibot Subpackages
 Submodules
 ----------
 
-pywikibot.backports module
---------------------------
+:mod:`backports` module
+-----------------------
 
-.. automodule:: pywikibot.backports
+.. automodule:: backports
 
-pywikibot.bot module
---------------------
+:mod:`bot` module
+-----------------
 
-.. automodule:: pywikibot.bot
+.. automodule:: bot
   :member-order: bysource
 
-pywikibot.bot\_choice module
-----------------------------
+:mod:`bot\_choice` module
+-------------------------
 
-.. automodule:: pywikibot.bot_choice
+.. automodule:: bot_choice
 
 .. include:: pywikibot.config.rst
 
-pywikibot.cosmetic\_changes module
-----------------------------------
+:mod:`cosmetic\_changes` module
+-------------------------------
 
-.. automodule:: pywikibot.cosmetic_changes
+.. automodule:: cosmetic_changes
 
-pywikibot.daemonize module
---------------------------
-
-.. automodule:: pywikibot.daemonize
-
-pywikibot.date module
----------------------
-
-.. automodule:: pywikibot.date
-
-pywikibot.diff module
----------------------
-
-.. automodule:: pywikibot.diff
-
-pywikibot.echo module
----------------------
-
-.. automodule:: pywikibot.echo
-
-pywikibot.editor module
+:mod:`daemonize` module
 -----------------------
 
-.. automodule:: pywikibot.editor
+.. automodule:: daemonize
 
-pywikibot.exceptions module
----------------------------
+:mod:`date` module
+------------------
 
-.. automodule:: pywikibot.exceptions
+.. automodule:: date
 
-pywikibot.family module
------------------------
+:mod:`diff` module
+------------------
 
-.. automodule:: pywikibot.family
+.. automodule:: diff
 
-pywikibot.fixes module
-----------------------
+:mod:`echo` module
+------------------
 
-.. automodule:: pywikibot.fixes
+.. automodule:: echo
 
-pywikibot.flow module
----------------------
+:mod:`editor` module
+--------------------
 
-.. automodule:: pywikibot.flow
+.. automodule:: editor
 
-pywikibot.i18n module
----------------------
-
-.. automodule:: pywikibot.i18n
-
-pywikibot.interwiki\_graph module
----------------------------------
-
-.. automodule:: pywikibot.interwiki_graph
-
-pywikibot.logentries module
----------------------------
-
-.. automodule:: pywikibot.logentries
-
-pywikibot.logging module
+:mod:`exceptions` module
 ------------------------
+
+.. automodule:: exceptions
+
+:mod:`family` module
+--------------------
+
+.. automodule:: family
+
+:mod:`fixes` module
+-------------------
+
+.. automodule:: fixes
+
+:mod:`flow` module
+------------------
+
+.. automodule:: flow
+
+:mod:`i18n` module
+------------------
+
+.. automodule:: i18n
+
+:mod:`interwiki\_graph` module
+------------------------------
+
+.. automodule:: interwiki_graph
+
+:mod:`logentries` module
+------------------------
+
+.. automodule:: logentries
+
+:mod:`logging` module
+---------------------
 
 .. automodule:: pywikibot.logging
    :member-order: bysource
 
-pywikibot.login module
+:mod:`login` module
+-------------------
+
+.. automodule:: login
+
+:mod:`plural` module
+--------------------
+
+.. automodule:: plural
+
+:mod:`proofreadpage` module
+---------------------------
+
+.. automodule:: proofreadpage
+
+:mod:`site\_detect` module
+--------------------------
+
+.. automodule:: site_detect
+
+:mod:`textlib` module
+---------------------
+
+.. automodule:: textlib
+
+:mod:`throttle` module
 ----------------------
 
-.. automodule:: pywikibot.login
+.. automodule:: throttle
 
-pywikibot.plural module
------------------------
-
-.. automodule:: pywikibot.plural
-
-pywikibot.proofreadpage module
-------------------------------
-
-.. automodule:: pywikibot.proofreadpage
-
-pywikibot.site\_detect module
------------------------------
-
-.. automodule:: pywikibot.site_detect
-
-pywikibot.textlib module
-------------------------
-
-.. automodule:: pywikibot.textlib
-
-pywikibot.throttle module
--------------------------
-
-.. automodule:: pywikibot.throttle
-
-pywikibot.time module
----------------------
+:mod:`time` module
+------------------
 
 .. automodule:: pywikibot.time
 
-pywikibot.titletranslate module
--------------------------------
+:mod:`titletranslate` module
+----------------------------
 
-.. automodule:: pywikibot.titletranslate
+.. automodule:: titletranslate
 
-pywikibot.version module
-------------------------
+:mod:`version` module
+---------------------
 
-.. automodule:: pywikibot.version
+.. automodule:: version
 
-pywikibot.xmlreader module
---------------------------
+:mod:`xmlreader` module
+-----------------------
 
-.. automodule:: pywikibot.xmlreader
-
-
+.. automodule:: xmlreader

@@ -1,19 +1,19 @@
-pywikibot.comms package
-=======================
+:mod:`comms` package
+====================
 
-.. automodule:: pywikibot.comms
+.. automodule:: comms
 
 Submodules
 ----------
 
-pywikibot.comms.eventstreams module
------------------------------------
+:mod:`comms.eventstreams` module
+--------------------------------
 
-.. automodule:: pywikibot.comms.eventstreams
+.. automodule:: comms.eventstreams
 
-pywikibot.comms.http module
----------------------------
+:mod:`comms.http` module
+------------------------
 
-.. automodule:: pywikibot.comms.http
+.. automodule:: comms.http
 
 
