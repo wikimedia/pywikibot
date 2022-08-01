@@ -105,7 +105,7 @@ class OutputOption(Option):
     .. note:: OutputOption must have an :py:obj:`out` property which
        returns a string for
        :py:meth:`userinterface output()
-       <pywikibot.userinterfaces._interface_base.ABUIC.output>`
+       <userinterfaces._interface_base.ABUIC.output>`
        method.
     """
 
@@ -126,7 +126,7 @@ class OutputOption(Option):
         """String to be used when selected before or after the question.
 
         .. note:: This method is used by :meth:`ui.input_choice
-           <pywikibot.userinterfaces._interface_base.ABUIC.input_choice>`
+           <userinterfaces._interface_base.ABUIC.input_choice>`
            instead of deprecated :meth:`output`.
 
         .. versionadded:: 6.2

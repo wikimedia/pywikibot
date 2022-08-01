@@ -68,7 +68,7 @@ above; numbers are latin digits:
 
 Alternatively you may use localized digits. This is only available for a
 few site languages. Refer :attr:`NON_LATIN_DIGITS
-<pywikibot.userinterfaces.transliteration.NON_LATIN_DIGITS>` whether
+<userinterfaces.transliteration.NON_LATIN_DIGITS>` whether
 there is a localized one:
 
 %(localcounter)s     the current value of the counter

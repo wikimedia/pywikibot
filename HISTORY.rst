@@ -13,9 +13,9 @@ Release history
   around wbparsevalue was added (:phab:`T112140`, :phab:`T312755`)
 * L10N updates
 * Fix cp encodings in :func:`get_charset_from_content_type()
-  <pywikibot.comms.http.get_charset_from_content_type>` (:phab:`T312230`)
+  <comms.http.get_charset_from_content_type>` (:phab:`T312230`)
 * New :mod:`pywikibot.time` module with new functions in addition to `Timestamp`
-* :meth:`Page.revisions()<pywikibot.page.BasePage.revisions>` supports more formats/types for
+* :meth:`Page.revisions()<page.BasePage.revisions>` supports more formats/types for
   starttime and endtime parameters, in addition to those allowed by
   :meth:`Timestamp.fromISOformat()<pywikibot.Timestamp.fromISOformat>`.
 * New :meth:`Timestamp.set_timestamp()<pywikibot.Timestamp.set_timestamp>` method
@@ -24,7 +24,7 @@ Release history
 * Handle asynchronous page_put_queue after KeyboardInterrupt in Python 3.9+ (:phab:`T311076`)
 * No longer expect a specific namespace alias in cosmetic_changes
   :meth:`translateAndCapitalizeNamespaces
-  <pywikibot.cosmetic_changes.CosmeticChangesToolkit.translateAndCapitalizeNamespaces>`
+  <cosmetic_changes.CosmeticChangesToolkit.translateAndCapitalizeNamespaces>`
 
 
 7.4.0
@@ -32,9 +32,9 @@ Release history
 *26 June 2022*
 
 * Provide Built Distribution with Pywikibot (:pep:`427`)
-* Update `WRITE_ACTIONS` in used by :class:`api.Request<pywikibot.data.api.Request>`
-* Move :func:`get_closest_memento_url<pywikibot.data.memento.get_closest_memento_url>` from weblinkchecker script to memento module.
-* Add :mod:`memento module<pywikibot.data.memento>` to fix memento_client package (:phab:`T185561`)
+* Update `WRITE_ACTIONS` in used by :class:`api.Request<data.api.Request>`
+* Move :func:`get_closest_memento_url<data.memento.get_closest_memento_url>` from weblinkchecker script to memento module.
+* Add :mod:`memento module<data.memento>` to fix memento_client package (:phab:`T185561`)
 * L10N and i18n updates
 * Fix Flow board topic continuation when iterating in reverse (:phab:`T138323`)
 * Add Avestan transliteration
@@ -42,7 +42,7 @@ Release history
 * Show an APIError if PetScanPageGenerator.query() fails (:phab:`T309538`)
 * `login.py` is now a utiliy script even for site-package installation (:phab:`T309290`)
 * `preload_sites.py` is now a utiliy script even for site-package installation (:phab:`T308912`)
-* :attr:`generator_completed<pywikibot.bot.BaseBot.generator_completed>` became a public attribute
+* :attr:`generator_completed<bot.BaseBot.generator_completed>` became a public attribute
 * Return gracefully from pwb.find_alternates if folder in user_script_paths does not exist (:phab:`T308910`)
 
 
@@ -176,7 +176,7 @@ Improvements
 * Upload: Retry upload if 'copyuploadbaddomain' API error occurs (:phab:`T294825`)
 * Update invisible characters from unicodedata 14.0.0
 * Add support for Wikimedia OCR engine with proofreadpage
-* Rewrite :func:`pywikibot.tools.itertools.intersect_generators` which makes it running up to 10'000 times faster. (:phab:`T85623`, :phab:`T293276`)
+* Rewrite :func:`tools.itertools.intersect_generators` which makes it running up to 10'000 times faster. (:phab:`T85623`, :phab:`T293276`)
 * The cached output functionality from compat release was re-implemented (:phab:`T151727`, :phab:`T73646`, :phab:`T74942`, :phab:`T132135`, :phab:`T144698`, :phab:`T196039`, :phab:`T280466`)
 * L10N updates
 * Adjust groupsize within pagegenerators.PreloadingGenerator (:phab:`T291770`)
@@ -249,7 +249,7 @@ Code cleanups
 * pywikibot.__release__ was removed in favour of pywikibot.__version__
 * TextfilePageGenerator was replaced by TextIOPageGenerator
 * PreloadingItemGenerator was replaced by PreloadingEntityGenerator
-* DuplicateFilterPageGenerator was replaced by :func:`pywikibot.tools.itertools.filter_unique`
+* DuplicateFilterPageGenerator was replaced by :func:`tools.itertools.filter_unique`
 * ItemPage.concept_url method was replaced by ItemPage.concept_uri
 * Outdated parameter names has been dropped
 * Deprecated pywikibot.Error exception were removed in favour of pywikibot.exceptions.Error classes (:phab:`T280227`)
@@ -681,7 +681,7 @@ Other changes
 * version.get_module_version() is deprecated and gives no meaningfull result
 * Fix version.get_module_filename() and update log lines (:phab:`T264235`)
 * Re-enable printing log header (:phab:`T264235`)
-* Fix result of :func:`pywikibot.tools.itertools.intersect_generators` (:phab:`T263947`)
+* Fix result of :func:`tools.itertools.intersect_generators` (:phab:`T263947`)
 * Only show _GLOBAL_HELP options if explicitly wanted
 * Deprecated Family.version() methods were removed
 * Unused parameters of page methods like forceReload, insite, throttle, step was removed

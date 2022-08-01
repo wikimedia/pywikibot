@@ -5,19 +5,19 @@ Frequent Asked Questions
      can run :py:mod:`preload_sites <pywikibot.scripts.preload_sites>` script
      to preload site info quickly.
   2. If you need the content, use :py:mod:`PreloadingGenerator
-     <pywikibot.pagegenerators.PreloadingGenerator>` with page generators,
-     :py:mod:`EntityGenerator <pywikibot.pagegenerators.EntityGenerator>`
+     <pagegenerators.PreloadingGenerator>` with page generators,
+     :py:mod:`EntityGenerator <pagegenerators.EntityGenerator>`
      for wikibase entities and :py:mod:`DequePreloadingGenerator
-     <pywikibot.pagegenerators.DequePreloadingGenerator>` for a
-     :py:mod:`DequeGenerator <pywikibot.tools.collections.DequeGenerator>`.
+     <pagegenerators.DequePreloadingGenerator>` for a
+     :py:mod:`DequeGenerator <tools.collections.DequeGenerator>`.
   3. If you use :py:mod:`GeneratorFactory
-     <pywikibot.pagegenerators.GeneratorFactory>` with your bot and use its
+     <pagegenerators.GeneratorFactory>` with your bot and use its
      :py:mod:`getCombinedGenerator
-     <pywikibot.pagegenerators.GeneratorFactory.getCombinedGenerator>` method
+     <pagegenerators.GeneratorFactory.getCombinedGenerator>` method
      you can set ``preload=True`` to preload page content. This is an alternate
      to the ``PreloadingGenerator`` function mentioned above.
   4. Use :py:mod:`MySQLPageGenerator
-     <pywikibot.pagegenerators.MySQLPageGenerator >` if direct DB access is
+     <pagegenerators.MySQLPageGenerator >` if direct DB access is
      available and appropriate. See also: :manpage:`MySQL`
 
 **The bot cannot delete pages**

@@ -106,7 +106,7 @@ class EventStreams(GeneratorWrapper):
     >>> del stream
 
     .. versionchanged:: 7.6
-       subclassed from :class:`pywikibot.tools.collections.GeneratorWrapper`
+       subclassed from :class:`tools.collections.GeneratorWrapper`
     """
 
     def __init__(self, **kwargs) -> None:

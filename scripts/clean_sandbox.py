@@ -23,7 +23,7 @@ Furthermore, the following command line parameters are supported:
     -summary       Summary of the edit made by bot. Overrides the default
                    from i18n.
 
-This script is a :py:obj:`ConfigParserBot <pywikibot.bot.ConfigParserBot>`.
+This script is a :py:obj:`ConfigParserBot <bot.ConfigParserBot>`.
 All local parameters can be given inside a scripts.ini file. Options
 passed to the script are priorized over options read from ini file.
 

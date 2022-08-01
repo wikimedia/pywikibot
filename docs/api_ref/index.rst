@@ -10,7 +10,7 @@ on their associated :class:`pywikibot.Site` object, which represents a specific
 wiki.
 
 The :class:`pywikibot.Site` object then calls the MediaWiki API using the
-functions provided by :mod:`pywikibot.data.api`. This layer then uses :func:`pywikibot.comms.http.request`
+functions provided by :mod:`data.api`. This layer then uses :func:`comms.http.request`
 to do the actual HTTP request.
 
 Contents

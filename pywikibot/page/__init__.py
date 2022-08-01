@@ -67,7 +67,7 @@ def url2unicode(title: str, encodings='utf-8') -> str:
     Uses the first encoding that doesn't cause an error.
 
     .. deprecated:: 6.2
-       Use :func:`pywikibot.tools.chars.url2string` instead.
+       Use :func:`tools.chars.url2string` instead.
 
     :param title: URL-encoded character data to convert
     :param encodings: Encodings to attempt to use during conversion.

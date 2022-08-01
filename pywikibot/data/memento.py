@@ -45,7 +45,7 @@ class MementoClient(OldMementoClient):
 
     >>> mc = MementoClient()
     >>> dt = mc.convert_to_datetime("Sun, 01 Apr 2010 12:00:00 GMT")
-    >>> mi = mc.get_memento_info("http://www.bbc.com/", dt, timeout=40)
+    >>> mi = mc.get_memento_info("http://www.bbc.com/", dt, timeout=60)
     >>> mi['original_uri']
     'http://www.bbc.com/'
     >>> mi['timegate_uri']
