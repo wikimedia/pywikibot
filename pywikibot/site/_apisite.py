@@ -1549,7 +1549,7 @@ class APISite(
 
         .. seealso::
            - :api:`Parse`
-           - :meth:`pywikibot.page.BasePage.get_parsed_page`.
+           - :meth:`page.BasePage.get_parsed_page`.
         """
         req = self.simple_request(action='parse', page=page)
         data = req.submit()

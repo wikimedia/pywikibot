@@ -1219,7 +1219,7 @@ class BaseBot(OptionHandler):
     implemented by subclasses.
 
     Each item processed by :meth:`treat` must be a
-    :class:`pywikibot.page.BasePage` type. Use :meth:`init_page` to
+    :class:`page.BasePage` type. Use :meth:`init_page` to
     upcast the type. To enable other types, set
     :attr:`BaseBot.treat_page_type` to an appropriate type; your bot
     should derive from :class:`BaseBot` in that case and handle site
@@ -1606,7 +1606,7 @@ class BaseBot(OptionHandler):
         """Process one page (abstract method).
 
         :param page: Object to be processed, usually a
-            :class:`pywikibot.page.BasePage`. For other page types the
+            :class:`page.BasePage`. For other page types the
             :attr:`treat_page_type` must be set.
         """
         raise NotImplementedError('Method {}.treat() not implemented.'
@@ -1953,7 +1953,7 @@ class AutomaticTWSummaryBot(CurrentPageBot):
     A class which automatically defines ``summary`` for ``put_current``.
 
     The class must defined a ``summary_key`` string which contains the
-    i18n key for :py:obj:`pywikibot.i18n.twtranslate`. It can also
+    i18n key for :py:obj:`i18n.twtranslate`. It can also
     override the ``summary_parameters`` property to specify any
     parameters for the translated message.
     """

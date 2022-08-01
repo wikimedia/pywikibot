@@ -24,7 +24,7 @@ level. This is "sysop" or "all" if -unprotect was selected. If multiple
 parameters -unprotect or -default are used, only the last occurrence
 is applied.
 
-This script is a :py:obj:`ConfigParserBot <pywikibot.bot.ConfigParserBot>`.
+This script is a :py:obj:`ConfigParserBot <bot.ConfigParserBot>`.
 The following options can be set within a settings file which is scripts.ini
 by default::
 

@@ -77,11 +77,11 @@ class Siteinfo(Container):
          - 'semiprotectedlevels': 'autoconfirmed'
          - 'levels': '' (everybody), 'autoconfirmed', 'sysop'
          - 'types': 'create', 'edit', 'move', 'upload'
-        Otherwise it returns :py:obj:`pywikibot.tools.EMPTY_DEFAULT`.
+        Otherwise it returns :py:obj:`tools.EMPTY_DEFAULT`.
 
         :param key: The property name
         :return: The default value
-        :rtype: dict or :py:obj:`pywikibot.tools.EmptyDefault`
+        :rtype: dict or :py:obj:`tools.EmptyDefault`
         """
         if key == 'restrictions':
             # implemented in b73b5883d486db0e9278ef16733551f28d9e096d

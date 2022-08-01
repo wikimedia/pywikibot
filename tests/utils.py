@@ -209,7 +209,7 @@ class AssertAPIErrorContextManager:
 
 class DryParamInfo(dict):
 
-    """Dummy class to use instead of :py:obj:`pywikibot.data.api.ParamInfo`."""
+    """Dummy class to use instead of :py:obj:`data.api.ParamInfo`."""
 
     def __init__(self, *args, **kwargs):
         """Initializer."""
@@ -284,7 +284,7 @@ class DummySiteinfo:
 
 class DryRequest(CachedRequest):
 
-    """Dummy class to use instead of :py:obj:`pywikibot.data.api.Request`."""
+    """Dummy class to use instead of :py:obj:`data.api.Request`."""
 
     def __init__(self, *args, **kwargs):
         """Initializer."""

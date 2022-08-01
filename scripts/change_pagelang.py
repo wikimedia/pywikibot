@@ -17,7 +17,7 @@ Furthermore, the following command line parameters are supported:
                   the one set in -setlang (keep the current language).
 
 .. note:: This script is a
-   :py:obj:`ConfigParserBot <pywikibot.bot.ConfigParserBot>`. All options
+   :py:obj:`ConfigParserBot <bot.ConfigParserBot>`. All options
    can be set within a settings file which is scripts.ini by default.
 """
 #

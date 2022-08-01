@@ -746,7 +746,7 @@ class TextExtractsMixin:
 
            - https://www.mediawiki.org/wiki/Extension:TextExtracts
 
-           - :meth:`pywikibot.page.BasePage.extract`.
+           - :meth:`page.BasePage.extract`.
         """
         if not page.exists():
             raise NoPageError(page)

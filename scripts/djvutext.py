@@ -20,7 +20,7 @@ The following parameters are supported:
                      A   -> just page A
                      -B  -> pages 1 until B
 
-This script is a :py:obj:`ConfigParserBot <pywikibot.bot.ConfigParserBot>`.
+This script is a :py:obj:`ConfigParserBot <bot.ConfigParserBot>`.
 The following options can be set within a settings file which is scripts.ini
 by default:
 

@@ -2164,7 +2164,7 @@ class Page(BasePage):
         """Extract templates and parameters.
 
         This method is using
-        :func:`pywikibot.textlib.extract_templates_and_params`.
+        :func:`textlib.extract_templates_and_params`.
         Disabled parts and whitespace are stripped, except for
         whitespace in anonymous positional arguments.
 

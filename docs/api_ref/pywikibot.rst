@@ -143,7 +143,7 @@ Submodules
 
 .. automodule:: throttle
 
-.. :module:: time
+.. module:: time
 
 :mod:`time` module
 ------------------

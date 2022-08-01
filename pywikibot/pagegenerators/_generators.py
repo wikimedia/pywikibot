@@ -305,7 +305,7 @@ def LinkedPageGenerator(
 ) -> Iterable['pywikibot.page.Page']:
     """Yield all pages linked from a specific page.
 
-    See :py:obj:`pywikibot.page.BasePage.linkedPages` for details.
+    See :py:obj:`page.BasePage.linkedPages` for details.
 
     :param linkingPage: the page that links to the pages we want
     :param total: the total number of pages to iterate
@@ -795,7 +795,7 @@ class GoogleSearchPageGenerator(GeneratorWrapper):
     generator prints a warning for each query.
 
     .. versionchanged:: 7.6
-       subclassed from :class:`pywikibot.tools.collections.GeneratorWrapper`
+       subclassed from :class:`tools.collections.GeneratorWrapper`
     """
 
     def __init__(self, query: Optional[str] = None,
@@ -1106,7 +1106,7 @@ class PetScanPageGenerator(GeneratorWrapper):
     .. seealso:: https://petscan.wmflabs.org/
     .. versionadded:: 3.0
     .. versionchanged:: 7.6
-       subclassed from :class:`pywikibot.tools.collections.GeneratorWrapper`
+       subclassed from :class:`tools.collections.GeneratorWrapper`
     """
 
     def __init__(self, categories: Sequence[str],

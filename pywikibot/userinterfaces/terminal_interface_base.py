@@ -61,7 +61,7 @@ class UI(ABUIC):
 
     .. versionchanged:: 6.2:
        subclassed from
-       :py:obj:`pywikibot.userinterfaces._interface_base.ABUIC`
+       :py:obj:`userinterfaces._interface_base.ABUIC`
     """
 
     split_col_pat = re.compile(r'(\w+);?(\w+)?')

@@ -3,7 +3,7 @@
 .. versionchanged:: 7.6
    All Objects were changed from Iterable object to a Generator object.
    They are subclassed from
-   :class:`pywikibot.tools.collections.GeneratorWrapper`
+   :class:`tools.collections.GeneratorWrapper`
 """
 #
 # (C) Pywikibot team, 2008-2022
@@ -73,7 +73,7 @@ class APIGenerator(APIGeneratorBase, GeneratorWrapper):
     after iterating that many values.
 
     .. versionchanged:: 7.6
-       subclassed from :class:`pywikibot.tools.collections.GeneratorWrapper`
+       subclassed from :class:`tools.collections.GeneratorWrapper`
     """
 
     def __init__(
@@ -199,7 +199,7 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
     options.
 
     .. versionchanged:: 7.6
-       subclassed from :class:`pywikibot.tools.collections.GeneratorWrapper`
+       subclassed from :class:`tools.collections.GeneratorWrapper`
     """
 
     # Should results be filtered during iteration according to set_namespace?

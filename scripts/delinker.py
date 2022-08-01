@@ -20,7 +20,7 @@ The following parameters are supported:
             the next script call starts there if no `-since` is given.
 
 .. note:: This sample script is a
-   :class:`ConfigParserBot <pywikibot.bot.ConfigParserBot>`. All
+   :class:`ConfigParserBot <bot.ConfigParserBot>`. All
    settings can be made either by giving option with the command line or
    with a settings file which is scripts.ini by default. If you don't
    want the default values you can add any option you want to change to
