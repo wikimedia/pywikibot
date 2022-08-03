@@ -407,6 +407,8 @@ class BasePage(ComparableMixin):
         Page has been loaded.
 
         Not existing pages are considered loaded.
+
+        .. versionadded:: 7.6
         """
         return not self.exists() or self._latest_cached_revision() is not None
 

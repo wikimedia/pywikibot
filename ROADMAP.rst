@@ -1,6 +1,13 @@
 Current release 7.6.0
 ^^^^^^^^^^^^^^^^^^^^^
 
+* Fix partial caching in :meth:`Category.subcategories()<page.Category.subcategories>` (:phab:`T88217`)
+* Method :meth:`Page.has_content()<page.BasePage.has_content>` was added (:phab:`T313736`)
+* Discard cache and reload it if cache was loaded without content and content is required
+  in :meth:`Page.templates()<page.BasePage.templates>` (:phab:`T313736`)
+* Add support for vikidia:oc
+* Exit loop in PageFromFileReader if match.end() <= 0 (:phab:`T313684`)
+* Allow Exception as parameter of pywikibot.exceptions.Error
 * Make :func:`GoogleSearchPageGenerator<pagegenerators.GoogleSearchPageGenerator>`
   and :func:`PetScanPageGenerator<pagegenerators.PetScanPageGenerator>` a restartable
   Generator (:phab:`T313681`, :phab:`T313683`)

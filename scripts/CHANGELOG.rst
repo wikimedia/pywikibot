@@ -6,10 +6,32 @@ Scripts Changelog
 
 *current release*
 
+archivebot
+~~~~~~~~~~
+
+* Skip the page if it does not exist
+* Fix for DiscussionPage.size() (:phab:`T313886`)
+* Decrease memory usage and improve processing speed
+
 interwiki
 ~~~~~~~~~
 
 * Fix wrong Subject property
+
+pagefromfile
+~~~~~~~~~~~~
+
+* Derive PageFromFileReader from tools.collections.GeneratorWrapper
+
+7.5.2
+-----
+
+*26 July 2022*
+
+archivebot
+~~~~~~~~~~
+
+* Add localized "archive" variables  (:phab:`T71551`, :phab:`T313682`, :phab:`T313692`)
 
 7.5.1
 -----
@@ -20,7 +42,6 @@ archivebot
 ~~~~~~~~~~
 
 * Replace archive pattern fields to string conversion (:phab:`T313692`)
-
 
 7.5.0
 -----
