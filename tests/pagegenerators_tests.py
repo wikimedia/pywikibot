@@ -15,7 +15,11 @@ from unittest import mock
 
 import pywikibot
 from pywikibot import date, pagegenerators
-from pywikibot.exceptions import ServerError, UnknownExtensionError
+from pywikibot.exceptions import (
+    NoPageError,
+    ServerError,
+    UnknownExtensionError,
+)
 from pywikibot.pagegenerators import (
     CategorizedPageGenerator,
     PagesFromTitlesGenerator,
@@ -1680,18 +1684,16 @@ class TestUnconnectedPageGenerator(DefaultSiteTestCase):
         """Test UnconnectedPageGenerator."""
         if not self.site.data_repository():
             self.skipTest('Site is not using a Wikibase repository')
-        upgen = pagegenerators.UnconnectedPageGenerator(self.site, 3)
-        self.assertDictEqual(
-            upgen.request._params, {
-                'gqppage': ['UnconnectedPages'],
-                'prop': ['info', 'imageinfo', 'categoryinfo'],
-                'inprop': ['protection'],
-                'iilimit': ['max'],
-                'iiprop': ['timestamp', 'user', 'comment', 'url', 'size',
-                           'sha1', 'metadata'],
-                'generator': ['querypage'], 'action': ['query'],
-                'indexpageids': [True], 'continue': [True]})
-        self.assertLessEqual(len(tuple(upgen)), 3)
+        pages = list(pagegenerators.UnconnectedPageGenerator(self.site, 3))
+        self.assertLessEqual(len(pages), 3)
+
+        site = self.site.data_repository()
+        pattern = (r'Page '
+                   r'\[\[({site.sitename}:|{site.code}:)-1\]\]'
+                   r" doesn't exist\.".format(site=site))
+        for page in pages:
+            with self.assertRaisesRegex(NoPageError, pattern):
+                page.data_item()
 
     def test_unconnected_without_repo(self):
         """Test that it raises a ValueError on sites without repository."""
