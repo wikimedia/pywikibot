@@ -101,9 +101,12 @@ Options (may be omitted):
   -namespace:NS   only archive pages from a given namespace
   -page:PAGE      archive a single PAGE, default ns is a user talk page
   -salt:SALT      specify salt
+  -keep           Preserve thread order in archive even if threads are
+                  archived later
 
 .. versionchanged:: 7.6
-   Localized variables for "archive" template parameter are supported
+   Localized variables for "archive" template parameter are supported.
+   `-keep` option was added.
 """
 #
 # (C) Pywikibot team, 2006-2022
@@ -314,7 +317,7 @@ class DiscussionPage(pywikibot.Page):
     Feed threads to it and run an update() afterwards.
     """
 
-    def __init__(self, source, archiver, params=None) -> None:
+    def __init__(self, source, archiver, params=None, keep=False) -> None:
         """Initializer."""
         super().__init__(source)
         self.threads = []
@@ -330,6 +333,7 @@ class DiscussionPage(pywikibot.Page):
         else:
             self.timestripper = self.archiver.timestripper
         self.params = params
+        self.keep = keep
         try:
             self.load_page()
         except NoPageError:
@@ -340,8 +344,28 @@ class DiscussionPage(pywikibot.Page):
             if self.params:
                 self.header = self.header % self.params
 
+    @staticmethod
+    def max(
+        ts1: Optional[pywikibot.Timestamp],
+        ts2: Optional[pywikibot.Timestamp]
+    ) -> Optional[pywikibot.Timestamp]:
+        """Calculate the maximum of two timestamps but allow None as value.
+
+        .. versionadded:: 7.6
+        """
+        if ts1 is None:
+            return ts2
+        if ts2 is None:
+            return ts1
+        return max(ts1, ts2)
+
     def load_page(self) -> None:
-        """Load the page to be archived and break it up into threads."""
+        """Load the page to be archived and break it up into threads.
+
+        .. versionchanged:: 7.6
+           If `-keep` option is given run through all threads and set
+           the current timestamp to the previous if the current is lower.
+        """
         self.header = ''
         self.threads = []
         self.archives = {}
@@ -368,6 +392,13 @@ class DiscussionPage(pywikibot.Page):
             for line in lines:
                 cur_thread.feed_line(line)
             self.threads.append(cur_thread)
+
+        if self.keep and len(self.threads) > 1:
+            # set the timestamp to the previous if the current is lower
+            prev = self.threads[0].timestamp
+            for thread in self.threads:
+                thread.timestamp = self.max(prev, thread.timestamp)
+                prev = thread.timestamp
 
         # This extra info is not desirable when run under the unittest
         # framework, which may be run either directly or via setup.py
@@ -429,7 +460,8 @@ class PageArchiver:
 
     algo = 'none'
 
-    def __init__(self, page, template, salt: str, force: bool = False) -> None:
+    def __init__(self, page, template, salt: str, force: bool = False,
+                 keep=False) -> None:
         """Initializer.
 
         :param page: a page object to be archived
@@ -458,7 +490,7 @@ class PageArchiver:
         except KeyError:  # mw < 1.28
             self.maxsize = 2096128  # 2 MB - 1 KB gap
 
-        self.page = DiscussionPage(page, self)
+        self.page = DiscussionPage(page, self, keep=keep)
         self.comment_params = {
             'from': self.page.title(),
         }
@@ -769,6 +801,7 @@ def main(*args: str) -> None:
     salt = ''
     force = False
     calc = None
+    keep = False
     templates = []
 
     local_args = pywikibot.handle_args(args)
@@ -798,6 +831,8 @@ def main(*args: str) -> None:
             pagename = value
         elif option == 'namespace':
             namespace = value
+        elif option == 'keep':
+            keep = True
 
     site = pywikibot.Site()
 
@@ -843,7 +878,7 @@ def main(*args: str) -> None:
             # Catching exceptions, so that errors in one page do not bail out
             # the entire process
             try:
-                archiver = PageArchiver(pg, tmpl, salt, force)
+                archiver = PageArchiver(pg, tmpl, salt, force, keep)
                 archiver.run()
             except ArchiveBotSiteConfigError as e:
                 # no stack trace for errors originated by pages on-site
