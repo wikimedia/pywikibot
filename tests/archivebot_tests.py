@@ -112,6 +112,7 @@ class TestArchiveBot(TestCase):
     sites = {code: {'family': 'wikipedia', 'code': code} for code in THREADS}
 
     cached = True
+    expected_failures = ['ar', 'scn', 'th']
 
     def test_archivebot(self, code=None):
         """Test archivebot for one site."""
@@ -142,7 +143,6 @@ class TestArchiveBot(TestCase):
                 self.assertIsInstance(thread.content, str)
                 self.assertIsInstance(thread.timestamp, datetime)
 
-    expected_failures = ['ar', 'eo', 'pdc', 'scn', 'th']
     # FIXME: see TestArchiveBotAfterDateUpdate()
     # 'ar': Uses Arabic acronym for TZ
     # 'eo': changed month name setting in wiki from Sep to sep

@@ -389,6 +389,11 @@ class DiscussionPage(pywikibot.Page):
                 cur_thread.feed_line(line)
             self.threads.append(cur_thread)
 
+        # add latter timestamp to predecessor if it is None
+        for last, prev in pairwise(reversed(self.threads)):
+            if not prev.timestamp:
+                prev.timestamp = last.timestamp
+
         if self.keep:
             # set the timestamp to the previous if the current is lower
             for first, second in pairwise(self.threads):
