@@ -114,6 +114,7 @@ Options (may be omitted):
 # Distributed under the terms of the MIT license.
 #
 import datetime
+import itertools
 import locale
 import os
 import re
@@ -393,12 +394,10 @@ class DiscussionPage(pywikibot.Page):
                 cur_thread.feed_line(line)
             self.threads.append(cur_thread)
 
-        if self.keep and len(self.threads) > 1:
+        if self.keep:
             # set the timestamp to the previous if the current is lower
-            prev = self.threads[0].timestamp
-            for thread in self.threads:
-                thread.timestamp = self.max(prev, thread.timestamp)
-                prev = thread.timestamp
+            for first, second in itertools.pairwise(self.threads):
+                second.timestamp = self.max(first.timestamp, second.timestamp)
 
         # This extra info is not desirable when run under the unittest
         # framework, which may be run either directly or via setup.py
