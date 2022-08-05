@@ -365,42 +365,29 @@ class CharsetTestCase(TestCase):
         resp.encoding = http._decide_encoding(resp, charset)
         self.assertEqual('utf-8', resp.encoding)
 
-    def test_content_type_xml_without_charset(self):
-        """Test decoding without explicit charset but xml content."""
-        charset = None
-        resp = CharsetTestCase._create_response(
-            headers={'content-type': 'application/xml'},
-            data=CharsetTestCase.UTF8_BYTES)
-        resp.encoding = http._decide_encoding(resp, charset)
-        self.assertEqual('utf-8', resp.encoding)
+    def test_content_type_xml(self):
+        """Test xml content with encoding given in content."""
+        tests = [
+            ('Test decoding without explicit charset but xml content',
+             self.UTF8_BYTES, 'utf-8'),
 
-    def test_content_type_xml_with_charset(self):
-        """Test xml content with utf-8 encoding given in content."""
-        charset = None
-        resp = CharsetTestCase._create_response(
-            headers={'content-type': 'application/xml'},
-            data=b'<?xml version="1.0" encoding="UTF-8"?>')
-        resp.encoding = http._decide_encoding(resp, charset)
-        self.assertEqual('UTF-8', resp.encoding)
+            ('Test xml content with utf-8 encoding given in content',
+             b'<?xml version="1.0" encoding="UTF-8"?>', 'UTF-8'),
 
-    def test_content_type_xml_with_charset_and_more_data(self):
-        """Test xml content with utf-8 encoding given in content."""
-        charset = None
-        resp = CharsetTestCase._create_response(
-            headers={'content-type': 'application/xml'},
-            data=b'<?xml version="1.0" encoding="UTF-8" '
-                 b'someparam="ignored"?>')
-        resp.encoding = http._decide_encoding(resp, charset)
-        self.assertEqual('UTF-8', resp.encoding)
+            ('Test xml content with utf-8 encoding given in content',
+             b'<?xml version="1.0" encoding="UTF-8" someparam="ignored"?>',
+             'UTF-8'),
 
-    def test_content_type_xml_with_variant_charset(self):
-        """Test xml content with latin1 encoding given in content."""
+            ('Test xml content with latin1 encoding given in content',
+             b"<?xml version='1.0' encoding='latin1'?>", 'latin1')
+        ]
         charset = None
-        resp = CharsetTestCase._create_response(
-            headers={'content-type': 'application/xml'},
-            data=b"<?xml version='1.0' encoding='latin1'?>")
-        resp.encoding = http._decide_encoding(resp, charset)
-        self.assertEqual('latin1', resp.encoding)
+        for msg, data, result in tests:
+            with self.subTest(msg=msg):
+                resp = CharsetTestCase._create_response(
+                    headers={'content-type': 'application/xml'}, data=data)
+                resp.encoding = http._decide_encoding(resp, charset)
+                self.assertEqual(resp.encoding, result)
 
     def test_charset_not_last(self):
         """Test charset not last part of content-type header."""
