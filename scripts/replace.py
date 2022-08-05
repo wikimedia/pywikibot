@@ -154,7 +154,7 @@ from typing import Any, Optional
 
 import pywikibot
 from pywikibot import editor, fixes, i18n, pagegenerators, textlib
-from pywikibot.backports import Dict, Generator, List, Pattern, Tuple
+from pywikibot.backports import pairwise, Dict, Generator, List, Pattern, Tuple
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 from pywikibot.exceptions import InvalidPageError, NoPageError
 from pywikibot.tools import chars
@@ -979,9 +979,9 @@ def main(*args: str) -> None:
     # The summary stored here won't be actually used but is only an example
     site = pywikibot.Site()
     single_summary = None
-    for i in range(0, len(commandline_replacements), 2):
-        replacement = Replacement(commandline_replacements[i],
-                                  commandline_replacements[i + 1])
+
+    for old, new in pairwise(commandline_replacements):
+        replacement = Replacement(old, new)
         if not single_summary:
             single_summary = i18n.twtranslate(
                 site, 'replace-replacing',
