@@ -787,6 +787,37 @@ class PageArchiver:
             self.page.update(comment)
 
 
+def process_page(pg, tmpl, salt: str, force: bool, keep: bool) -> bool:
+    """Call PageArchiver for a single page.
+
+    :return: Return True to continue with the next page, False to break
+        the loop.
+
+    .. versionadded:: 7.6
+    """
+    if not pg.exists():
+        pywikibot.info('{} does not exist, skipping...'.format(pg))
+        return True
+
+    pywikibot.info('\n\n>>> <<lightpurple>>{}<<default>> <<<'.format(pg))
+    # Catching exceptions, so that errors in one page do not bail out
+    # the entire process
+    try:
+        archiver = PageArchiver(pg, tmpl, salt, force, keep)
+        archiver.run()
+    except ArchiveBotSiteConfigError as e:
+        # no stack trace for errors originated by pages on-site
+        pywikibot.error('Missing or malformed template in page {}: {}'
+                        .format(pg, e))
+    except Exception:
+        pywikibot.exception('Error occurred while processing page {}'
+                            .format(pg))
+    except KeyboardInterrupt:
+        pywikibot.info('\nUser quit bot run...')
+        return False
+    return True
+
+
 def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
@@ -870,25 +901,7 @@ def main(*args: str) -> None:
                                      namespaces=ns,
                                      content=True)
         for pg in gen:
-            if not pg.exists():
-                pywikibot.info('{} does not exist, skipping...'.format(pg))
-                continue
-            pywikibot.info('\n\n>>> <<lightpurple>>{}<<default>> <<<'
-                           .format(pg.title()))
-            # Catching exceptions, so that errors in one page do not bail out
-            # the entire process
-            try:
-                archiver = PageArchiver(pg, tmpl, salt, force, keep)
-                archiver.run()
-            except ArchiveBotSiteConfigError as e:
-                # no stack trace for errors originated by pages on-site
-                pywikibot.error('Missing or malformed template in page {}: {}'
-                                .format(pg, e))
-            except Exception:
-                pywikibot.exception('Error occurred while processing page {}'
-                                    .format(pg))
-            except KeyboardInterrupt:
-                pywikibot.info('\nUser quit bot run...')
+            if not process_page(pg, tmpl, salt, force, keep):
                 return
 
 
