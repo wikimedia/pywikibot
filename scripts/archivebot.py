@@ -627,7 +627,12 @@ class PageArchiver:
 
     def analyze_page(self) -> Set[ShouldArchive]:
         """Analyze DiscussionPage."""
-        max_arch_size = str2size(self.get_attr('maxarchivesize'))
+        max_size = self.get_attr('maxarchivesize')
+        max_arch_size = str2size(max_size)
+        if not max_arch_size[0]:
+            raise MalformedConfigError('invalid maxarchivesize {!r}'
+                                       .format(max_size))
+
         counter = int(self.get_attr('counter', '1'))
         pattern = self.get_attr('archive')
 
