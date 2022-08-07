@@ -163,11 +163,6 @@ class MissingConfigError(ArchiveBotSiteConfigError):
     """
 
 
-class AlgorithmError(MalformedConfigError):
-
-    """Invalid specification of archiving algorithm."""
-
-
 class ArchiveSecurityError(ArchiveBotSiteConfigError):
 
     """
