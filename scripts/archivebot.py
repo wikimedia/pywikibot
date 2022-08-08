@@ -1,18 +1,19 @@
 #!/usr/bin/python3
-"""
-archivebot.py - discussion page archiving bot.
+"""archivebot.py - discussion page archiving bot.
 
 usage:
 
-    python pwb.py archivebot [OPTIONS] TEMPLATE_PAGE
+    python pwb.py archivebot [OPTIONS] [TEMPLATE_PAGE]
 
-Bot examines backlinks (Special:WhatLinksHere) to TEMPLATE_PAGE.
-Then goes through all pages (unless a specific page specified using options)
-and archives old discussions. This is done by breaking a page into threads,
-then scanning each thread for timestamps. Threads older than a specified
-threshold are then moved to another page (the archive), which can be named
-either basing on the thread's name or then name can contain a counter which
-will be incremented when the archive reaches a certain size.
+Several TEMPLATE_PAGE templates can be given at once. Default is
+`User:MiszaBot/config`. Bot examines backlinks (Special:WhatLinksHere)
+to all TEMPLATE_PAGE templates. Then goes through all pages (unless a
+specific page specified using options) and archives old discussions.
+This is done by breaking a page into threads, then scanning each thread
+for timestamps. Threads older than a specified threshold are then moved
+to another page (the archive), which can be named either basing on the
+thread's name or then name can contain a counter which will be
+incremented when the archive reaches a certain size.
 
 Transcluded template may contain the following parameters:
 
@@ -891,9 +892,9 @@ def main(*args: str) -> None:
         return
 
     if not templates:
-        pywikibot.bot.suggest_help(
-            additional_text='No template was specified.')
-        return
+        templates = ['User:MiszaBot/config']
+        pywikibot.info('No template was specified, using default {{{{{}}}}}.'
+                       .format(templates[0]))
 
     for template_name in templates:
         tmpl = pywikibot.Page(site, template_name, ns=10)
