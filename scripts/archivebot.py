@@ -115,7 +115,6 @@ Options (may be omitted):
 # Distributed under the terms of the MIT license.
 #
 import datetime
-import itertools
 import locale
 import os
 import re
@@ -129,7 +128,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import i18n
-from pywikibot.backports import List, Set, Tuple
+from pywikibot.backports import List, Set, Tuple, pairwise
 from pywikibot.exceptions import Error, NoPageError
 from pywikibot.textlib import (
     TimeStripper,
@@ -138,7 +137,7 @@ from pywikibot.textlib import (
     findmarker,
     to_local_digits,
 )
-from pywikibot.time import parse_duration, str2timedelta, MW_KEYS
+from pywikibot.time import MW_KEYS, parse_duration, str2timedelta
 
 
 ShouldArchive = Tuple[str, str]
@@ -392,7 +391,7 @@ class DiscussionPage(pywikibot.Page):
 
         if self.keep:
             # set the timestamp to the previous if the current is lower
-            for first, second in itertools.pairwise(self.threads):
+            for first, second in pairwise(self.threads):
                 second.timestamp = self.max(first.timestamp, second.timestamp)
 
         # This extra info is not desirable when run under the unittest
