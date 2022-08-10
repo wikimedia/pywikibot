@@ -377,6 +377,16 @@ class TestTimeStripperTreatSpecialText(TestTimeStripperCase):
         txt_match = self.date[:9] + '[[foo]]' + self.date[9:]
         self.assertEqual(ts(txt_match), self.expected_date)
 
+    def test_timestripper_skip_html(self):
+        """Test dates in html are correctly skipped."""
+        ts = self.ts.timestripper
+
+        txt_match = '<div ' + self.fake_date + '>'
+        self.assertIsNone(ts(txt_match))
+
+        txt_match = self.date + '<div ' + self.fake_date + '>'
+        self.assertEqual(ts(txt_match), self.expected_date)
+
 
 class TestTimeStripperDoNotArchiveUntil(TestTimeStripperCase):
 
