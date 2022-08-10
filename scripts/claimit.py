@@ -52,7 +52,6 @@ but 'p' must be included.
 #
 import pywikibot
 from pywikibot import WikidataBot, pagegenerators
-from pywikibot.backports import pairwise
 
 
 # This is required for the text that is shown when you run this script
@@ -127,15 +126,15 @@ def main(*args: str) -> None:
 
     claims = []
     repo = pywikibot.Site().data_repository()
-    for source_str, target_str in pairwise(commandline_claims):
-        claim = pywikibot.Claim(repo, source_str)
+    for i in range(0, len(commandline_claims), 2):
+        claim = pywikibot.Claim(repo, commandline_claims[i])
         if claim.type == 'wikibase-item':
-            target = pywikibot.ItemPage(repo, target_str)
+            target = pywikibot.ItemPage(repo, commandline_claims[i + 1])
         elif claim.type == 'string':
-            target = target_str
+            target = commandline_claims[i + 1]
         elif claim.type == 'globe-coordinate':
             coord_args = [
-                float(c) for c in target_str.split(',')]
+                float(c) for c in commandline_claims[i + 1].split(',')]
             if len(coord_args) >= 3:
                 precision = coord_args[2]
             else:

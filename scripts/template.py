@@ -113,7 +113,6 @@ import re
 
 import pywikibot
 from pywikibot import i18n, pagegenerators, textlib
-from pywikibot.backports import pairwise
 from pywikibot.bot import SingleSiteBot
 from pywikibot.pagegenerators import XMLDumpPageGenerator
 from pywikibot.tools.itertools import filter_unique, roundrobin_generators
@@ -216,6 +215,7 @@ def main(*args: str) -> None:
     :param args: command line arguments
     """
     template_names = []
+    templates = {}
     options = {}
     # If xmlfilename is None, references will be loaded from the live wiki.
     xmlfilename = None
@@ -266,15 +266,16 @@ def main(*args: str) -> None:
         return
 
     if bool(options.get('subst', False)) ^ options.get('remove', False):
-        templates = {name: None for name in template_names}
+        for template_name in template_names:
+            templates[template_name] = None
     else:
-        if len(template_names) % 2:
-            pywikibot.warning('Unless using solely -subst or -remove, you'
-                              'must give an even number of template names.')
+        try:
+            for i in range(0, len(template_names), 2):
+                templates[template_names[i]] = template_names[i + 1]
+        except IndexError:
+            pywikibot.output('Unless using solely -subst or -remove, '
+                             'you must give an even number of template names.')
             return
-
-        templates = {key: value
-                     for key, value in pairwise(template_names)}
 
     old_templates = [pywikibot.Page(site, template_name, ns=10)
                      for template_name in templates]
