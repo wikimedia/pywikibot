@@ -48,47 +48,58 @@ argument as both local and global, the local argument overrides the global one
 Examples
 --------
 
-This will try to import existing images from "image" parameter of "Infobox
-person" on English Wikipedia as Wikidata property "P18" (image):
+The following command will try to import existing images from "image"
+parameter of "Infobox person" on English Wikipedia as Wikidata property
+"P18" (image):
 
     python pwb.py harvest_template -lang:en -family:wikipedia -namespace:0 \
         -template:"Infobox person" image P18
 
-This will behave the same as the previous example and also try to import
-[[links]] from "birth_place" parameter of the same template as Wikidata
-property "P19" (place of birth):
+The following command will behave the same as the previous example and also
+try to import [[links]] from "birth_place" parameter of the same template
+as Wikidata property "P19" (place of birth):
 
     python pwb.py harvest_template -lang:en -family:wikipedia -namespace:0 \
         -template:"Infobox person" image P18 birth_place P19
 
-This will import both "birth_place" and "death_place" params with -islink
-modifier, ie. the bot will try to import values, even if it doesn't find
-a [[link]]:
+The following command will import both "birth_place" and "death_place"
+params with -islink modifier, ie. the bot will try to import values, even
+if it doesn't find a [[link]]:
 
     python pwb.py harvest_template -lang:en -family:wikipedia -namespace:0 \
         -template:"Infobox person" -islink birth_place P19 death_place P20
 
-This will do the same but only "birth_place" can be imported without a link:
+The following command will do the same but only "birth_place" can be
+imported without a link:
 
     python pwb.py harvest_template -lang:en -family:wikipedia -namespace:0 \
         -template:"Infobox person" birth_place P19 -islink death_place P20
 
-This will import an occupation from "occupation" parameter of "Infobox
-person" on English Wikipedia as Wikidata property "P106" (occupation). The
-page won't be skipped if the item already has that property but there is
-not the new value:
+The following command will import an occupation from "occupation" parameter
+of "Infobox person" on English Wikipedia as Wikidata property "P106"
+(occupation). The page won't be skipped if the item already has that
+property but there is not the new value:
 
     python pwb.py harvest_template -lang:en -family:wikipedia -namespace:0 \
         -template:"Infobox person" occupation P106 -exists:p
 
-This will import band members from the "current_members" parameter of "Infobox
-musical artist" on English Wikipedia as Wikidata property "P527" (has
-part). This will only extract multiple band members if each is linked, and
-will not add duplicate claims for the same member:
+The following command will import band members from the "current_members"
+parameter of "Infobox musical artist" on English Wikipedia as Wikidata
+property "P527" (has part). This will only extract multiple band members
+if each is linked, and will not add duplicate claims for the same member:
 
     python pwb.py harvest_template -lang:en -family:wikipedia -namespace:0 \
         -template:"Infobox musical artist" current_members P527 -exists:p \
         -multi
+
+The following command will import the category's main topic from the first
+anonymous parameter of "Cat main" on English Wikipedia as Wikidata property
+"P301" (category's main topic) and whenever a new value is imported,
+the inverse claim is imported to the topic item as Wikidata property "P910"
+(topic's main category) unless a claim of that property is already there:
+
+    python pwb.py harvest_template -lang:en -family:wikipedia -namespace:14 \
+        -template:"Cat main" 1 P301 -inverse:P910 -islink
 
 .. note:: This script is a
    :py:obj:`ConfigParserBot <bot.ConfigParserBot>`. All options
