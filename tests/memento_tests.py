@@ -46,7 +46,9 @@ class TestMementoArchive(MementoTestCase):
 
     def test_newest(self):
         """Test Archive for newest https://google.com."""
-        archivedversion = self._get_archive_url('https://google.com')
+        dt = '20220715'
+        archivedversion = self._get_archive_url('https://google.com',
+                                                date_string=dt)
         parsed = urlparse(archivedversion)
         self.assertIn(parsed.scheme, ['http', 'https'])
         self.assertEqual(parsed.netloc, 'arquivo.pt')
