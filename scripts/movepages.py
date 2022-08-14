@@ -38,6 +38,7 @@ Furthermore, the following command line parameters are supported:
 # Distributed under the terms of the MIT license.
 #
 import re
+from functools import partial
 from itertools import zip_longest
 
 import pywikibot
@@ -71,9 +72,7 @@ class MovePagesBot(CurrentPageBot):
     def __init__(self, **kwargs) -> None:
         """Initializer."""
         super().__init__(**kwargs)
-        self.appendAll = False
-        self.regexAll = False
-        self.noNamespace = False
+        self.create_title = None
 
     def move_one(self, page, new_page_tite) -> None:
         """Move one page to new_page_tite."""
@@ -99,84 +98,114 @@ class MovePagesBot(CurrentPageBot):
             return True
         return super().skip_page(page)
 
-    def treat_page(self) -> None:
-        """Treat a single page."""
-        page = self.current_page
-        pagetitle = page.title(with_ns=False)
-        namesp = page.site.namespace(page.namespace())
+    @staticmethod
+    def _select_action(page):
+        """Manage interactive choices."""
 
-        if self.appendAll:
-            new_page_tite = '{}{}{}'.format(self.pagestart, pagetitle,
-                                            self.pageend)
-            if not self.noNamespace and namesp:
-                new_page_tite = '{}:{}'.format(namesp, new_page_tite)
-        elif self.regexAll:
-            new_page_tite = self.regex.sub(self.replacePattern, pagetitle)
-            if not self.noNamespace and namesp:
-                new_page_tite = '{}:{}'.format(namesp, new_page_tite)
-        if self.opt.prefix:
-            new_page_tite = '{}{}'.format(self.opt.prefix, pagetitle)
-        if self.opt.prefix or self.appendAll or self.regexAll:
-            if self.user_confirm('Change the page title to {!r}?'
-                                 .format(new_page_tite)):
-                self.move_one(page, new_page_tite)
-            return
+        def create_new_title_change(page, new_title=None):
+            """Change helper function."""
+            if new_title is None:
+                return pywikibot.input('New page name:')
+            return new_title
 
-        # else:
+        def create_new_title_append(start, end, page, namespace=None):
+            """Append helper function."""
+            page_title = page.title(with_ns=False)
+            new_page_tite = '{}{}{}'.format(start, page_title, end)
+            if namespace is not None:
+                new_page_tite = '{}:{}'.format(namespace, new_page_tite)
+            return new_page_tite
+
+        def create_new_title_regex(regex, replacement, page, namespace=None):
+            """Replace helper function."""
+            page_title = page.title(with_ns=False)
+            new_page_title = regex.sub(replacement, page_title)
+            if namespace is not None:
+                new_page_title = '{}:{}'.format(namespace, new_page_title)
+            return new_page_title
+
+        def manage_namespace(page):
+            """Manage interactive choices for namespace prefix."""
+            namespace = page.site.namespace(page.namespace())
+            q = pywikibot.input_yn('Do you want to remove the '
+                                   'namespace prefix "{}:"?'.format(namespace),
+                                   automatic_quit=False)
+            return None if q else namespace
+
         choice = pywikibot.input_choice('What do you want to do?',
                                         [('change page name', 'c'),
                                          ('append to page name', 'a'),
                                          ('use a regular expression', 'r'),
                                          ('next page', 'n')])
         if choice == 'c':
-            new_page_tite = pywikibot.input('New page name:')
-            self.move_one(page, new_page_tite)
+            handler = partial(create_new_title_change,
+                              new_title=create_new_title_change(page))
+            choices = [('yes', 'y'), ('no', 'n')]
         elif choice == 'a':
-            self.pagestart = pywikibot.input('Append this to the start:')
-            self.pageend = pywikibot.input('Append this to the end:')
-            new_page_tite = ('{}{}{}'.format(self.pagestart, pagetitle,
-                                             self.pageend))
-            if namesp:
-                if pywikibot.input_yn('Do you want to remove the '
-                                      'namespace prefix "{}:"?'.format(namesp),
-                                      automatic_quit=False):
-                    self.noNamespace = True
-                else:
-                    new_page_tite = ('{}:{}'.format(namesp, new_page_tite))
-            choice2 = pywikibot.input_choice(
-                'Change the page title to {!r}?'.format(new_page_tite),
-                [('yes', 'y'), ('no', 'n'), ('all', 'a')])
-            if choice2 == 'y':
-                self.move_one(page, new_page_tite)
-            elif choice2 == 'a':
-                self.appendAll = True
-                self.move_one(page, new_page_tite)
+            start = pywikibot.input('Append this to the start:')
+            end = pywikibot.input('Append this to the end:')
+            ns = manage_namespace(page)
+
+            handler = partial(create_new_title_append,
+                              start, end, namespace=ns)
+            choices = [('yes', 'y'), ('no', 'n'), ('all', 'a')]
         elif choice == 'r':
             search_pattern = pywikibot.input('Enter the search pattern:')
-            self.replacePattern = pywikibot.input(
-                'Enter the replace pattern:')
-            self.regex = re.compile(search_pattern)
-            if page.title() == page.title(with_ns=False):
-                new_page_tite = self.regex.sub(self.replacePattern,
-                                               page.title())
+            regex = re.compile(search_pattern)
+            replacement = pywikibot.input('Enter the replace pattern:')
+            ns = manage_namespace(page)
+
+            handler = partial(create_new_title_regex,
+                              regex, replacement, namespace=ns)
+            choices = [('yes', 'y'), ('no', 'n'), ('all', 'a')]
+        else:
+            handler = None
+            choices = []
+
+        return handler, choices
+
+    def _title_creator(self, page, prefix):
+        """Create function to generate new title."""
+
+        def create_new_title_prefix(prefix, page):
+            """Replace prefix helper function."""
+            page_title = page.title(with_ns=False)
+            return '{}{}'.format(prefix, page_title)
+
+        if prefix:
+            handler = partial(create_new_title_prefix, prefix)
+            choices = [('yes', 'y'), ('no', 'n'), ('all', 'a')]
+        else:
+            handler, choices = self._select_action(page)
+
+        return choices, handler
+
+    def treat_page(self) -> None:
+        """Treat a single page."""
+        page = self.current_page
+
+        if not self.opt.always:
+            choices, create_title = self._title_creator(page, self.opt.prefix)
+
+            if create_title is None:
+                return
+
+            self.create_title = create_title
+
+            choice = pywikibot.input_choice(
+                'Change the page title '
+                'to {!r}?'.format(create_title(page)),
+                choices)
+
+            if choice == 'y':
+                pass
+            elif choice == 'a':
+                self.opt.always = True
             else:
-                if pywikibot.input_yn('Do you want to remove the '
-                                      'namespace prefix "{}:"?'.format(namesp),
-                                      automatic_quit=False):
-                    new_page_tite = self.regex.sub(
-                        self.replacePattern, page.title(with_ns=False))
-                    self.noNamespace = True
-                else:
-                    new_page_tite = self.regex.sub(self.replacePattern,
-                                                   page.title())
-            choice2 = pywikibot.input_choice(
-                'Change the page title to {!r}?'.format(new_page_tite),
-                [('yes', 'y'), ('no', 'n'), ('all', 'a')])
-            if choice2 == 'y':
-                self.move_one(page, new_page_tite)
-            elif choice2 == 'a':
-                self.regexAll = True
-                self.move_one(page, new_page_tite)
+                return
+
+        new_page_title = self.create_title(page)
+        self.move_one(page, new_page_title)
 
 
 def main(*args: str) -> None:
@@ -220,7 +249,7 @@ def main(*args: str) -> None:
             if old_name:
                 pywikibot.warning('-from:{} without -to:'.format(old_name))
             old_name = value
-        elif opt == 'to:':
+        elif opt == 'to':
             if old_name:
                 from_to_pairs.append([old_name, value])
                 old_name = None
