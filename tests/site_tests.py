@@ -3183,6 +3183,16 @@ class TestPagePreloading(DefaultSiteTestCase):
             if count >= 5:
                 break
 
+    def test_preload_content(self):
+        """Test preloading templates and langlinks works."""
+        mysite = self.get_site()
+
+        page = next(mysite.preloadpages([self.get_mainpage()], content=False))
+        self.assertFalse(page.has_content())
+
+        page = next(mysite.preloadpages([self.get_mainpage()], content=True))
+        self.assertTrue(page.has_content())
+
 
 class TestSametitleSite(TestCase):
 
