@@ -1,4 +1,8 @@
-"""Iterator functions."""
+"""Iterator functions.
+
+.. note:: ``pairwise()`` function introduced in Python 3.10 is backported
+   in :mod:`backports`
+"""
 #
 # (C) Pywikibot team, 2008-2022
 #
@@ -9,21 +13,25 @@ import itertools
 
 from contextlib import suppress
 from itertools import chain, zip_longest
+from typing import Any
 
+from pywikibot.backports import Generator
 from pywikibot.logging import debug
 from pywikibot.tools import issue_deprecation_warning
 
 
 __all__ = (
-    'itergroup',
-    'islice_with_ellipsis',
-    'intersect_generators',
-    'roundrobin_generators',
     'filter_unique',
+    'intersect_generators',
+    'islice_with_ellipsis',
+    'itergroup',
+    'roundrobin_generators',
 )
 
 
-def itergroup(iterable, size: int):
+def itergroup(iterable,
+              size: int,
+              strict: bool = False) -> Generator[Any, None, None]:
     """Make an iterator that returns lists of (up to) size items from iterable.
 
     Example:
@@ -39,6 +47,11 @@ def itergroup(iterable, size: int):
     Traceback (most recent call last):
      ...
     StopIteration
+
+    :param size: How many items of the iterable to get in one chunk
+    :param strict: If True, raise a ValueError if length of iterable is
+        not divisible by `size`.
+    :raises ValueError: iterable is not divisible by size
     """
     group = []
     for item in iterable:
@@ -47,6 +60,8 @@ def itergroup(iterable, size: int):
             yield group
             group = []
     if group:
+        if strict:
+            raise ValueError('iterable is not divisible by size.')
         yield group
 
 
@@ -192,7 +207,7 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
                 return
 
 
-def roundrobin_generators(*iterables):
+def roundrobin_generators(*iterables) -> Generator[Any, None, None]:
     """Yield simultaneous from each iterable.
 
     Sample:
