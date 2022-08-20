@@ -9,6 +9,9 @@ Scripts Changelog
 archivebot
 ~~~~~~~~~~
 
+* use ``User:MiszaBot/config`` as default template
+* raise MalformedConfigError if 'maxarchivesize' is 0 (:phab:`T313886`)
+* Preserve thread order in archive even if threads are archived later (:phab:`T312773`, :phab:`T314560`)
 * Skip the page if it does not exist
 * Fix for DiscussionPage.size() (:phab:`T313886`)
 * Decrease memory usage and improve processing speed

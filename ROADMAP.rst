@@ -1,6 +1,12 @@
 Current release 7.6.0
 ^^^^^^^^^^^^^^^^^^^^^
 
+* Add support for pcmwiki, guvwikt and bjnwikt (:phab:`T309059`, :phab:`T310882`, :phab:`T312217`)
+* support *not* loading text :meth:`site.APISite.preloadpages` (:phab:`T67163`)
+* :func:`textlib.TimeStripper.timestripper` removes HTML elements before searching for
+  timestamp in text (:phab:`T302496`)
+* backport :mod:`backports.pairwise()<backports>` from Python 3.10
+* L10N updates
 * Fix partial caching in :meth:`Category.subcategories()<page.Category.subcategories>` (:phab:`T88217`)
 * Method :meth:`Page.has_content()<page.BasePage.has_content>` was added (:phab:`T313736`)
 * Discard cache and reload it if cache was loaded without content and content is required
