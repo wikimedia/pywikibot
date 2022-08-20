@@ -28,20 +28,20 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     languages_by_size = [
         'en', 'fr', 'mg', 'zh', 'ru', 'de', 'es', 'sh', 'sv', 'nl', 'el', 'pl',
-        'ku', 'lt', 'ca', 'it', 'fi', 'ta', 'hu', 'tr', 'io', 'hy', 'ja', 'ko',
+        'ku', 'lt', 'ca', 'it', 'fi', 'ta', 'hu', 'tr', 'io', 'ja', 'hy', 'ko',
         'pt', 'kn', 'vi', 'sr', 'th', 'hi', 'ro', 'no', 'et', 'id', 'cs', 'ml',
         'my', 'uz', 'li', 'or', 'eo', 'te', 'fa', 'skr', 'gl', 'ar', 'oc',
         'jv', 'az', 'eu', 'uk', 'br', 'ast', 'is', 'da', 'lo', 'simple', 'bn',
         'la', 'hr', 'sg', 'fj', 'tg', 'sk', 'ky', 'bg', 'wa', 'shn', 'ur',
-        'ps', 'cy', 'mnw', 'vo', 'om', 'he', 'sl', 'af', 'zh-min-nan', 'scn',
-        'tl', 'pa', 'lmo', 'sw', 'fy', 'nn', 'ms', 'ka', 'lv', 'min', 'sq',
+        'mnw', 'ps', 'cy', 'vo', 'om', 'he', 'sl', 'af', 'zh-min-nan', 'scn',
+        'tl', 'lmo', 'pa', 'sw', 'fy', 'nn', 'ms', 'ka', 'lv', 'min', 'sq',
         'nds', 'lb', 'co', 'mn', 'pnb', 'bs', 'nah', 'yue', 'sa', 'kk', 'km',
         'diq', 'vec', 'be', 'tk', 'mk', 'nia', 'sm', 'hsb', 'ks', 'shy', 'su',
         'gd', 'ga', 'bcl', 'mr', 'gom', 'an', 'wo', 'mni', 'ia', 'ang', 'mt',
-        'fo', 'sd', 'tt', 'gn', 'ie', 'so', 'csb', 'ug', 'si', 'st', 'roa-rup',
-        'tpi', 'hif', 'kl', 'ha', 'zu', 'mi', 'ay', 'jbo', 'yi', 'ln', 'gu',
+        'sd', 'fo', 'tt', 'gn', 'ie', 'so', 'csb', 'ug', 'si', 'st', 'roa-rup',
+        'mi', 'tpi', 'hif', 'kl', 'ha', 'zu', 'ay', 'jbo', 'yi', 'ln', 'gu',
         'na', 'gv', 'kw', 'am', 'ne', 'rw', 'ts', 'qu', 'ss', 'iu', 'chr',
-        'dv', 'ti', 'tn', 'guw', 'bjn',
+        'dv', 'ti', 'tn', 'bjn', 'guw',
     ]
 
     category_redirect_templates = {
