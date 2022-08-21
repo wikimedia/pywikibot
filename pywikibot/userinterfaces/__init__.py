@@ -1,4 +1,4 @@
-"""User interfaces Module.
+"""User interfaces module.
 
 The user interface object must define its own `init_handlers()` method
 which takes the root logger as its only argument, and which adds to that

@@ -1,4 +1,4 @@
-"""Family module for WOW Wiki."""
+"""Family module for WOW wiki."""
 #
 # (C) Pywikibot team, 2009-2021
 #

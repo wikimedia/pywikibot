@@ -1,4 +1,4 @@
-"""Family module for Wikihow Wiki.
+"""Family module for Wikihow wiki.
 
 .. versionadded:: 3.0
 """

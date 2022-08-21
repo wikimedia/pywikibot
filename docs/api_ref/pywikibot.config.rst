@@ -5,6 +5,7 @@ API reference
 ^^^^^^^^^^^^^
 
 .. automodule:: config
+   :synopsis: Module to define and load pywikibot configuration default and user preferences
 
 Option setting
 ^^^^^^^^^^^^^^

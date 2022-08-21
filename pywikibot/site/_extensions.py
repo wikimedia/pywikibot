@@ -86,12 +86,15 @@ class ProofreadPageMixin:
         The following info is returned by the query and cached:
         - self._proofread_index_ns: Index Namespace
         - self._proofread_page_ns: Page Namespace
-        - self._proofread_levels: a dictionary with:
-                keys: int in the range [0, 1, ..., 4]
-                values: category name corresponding to the 'key' quality level
+        - self._proofread_levels: a dictionary with::
+
+            keys: int in the range [0, 1, ..., 4]
+            values: category name corresponding to the 'key' quality level
             e.g. on en.wikisource:
-            {0: 'Without text', 1: 'Not proofread', 2: 'Problematic',
-             3: 'Proofread', 4: 'Validated'}
+
+            .. code-block::
+                {0: 'Without text', 1: 'Not proofread', 2: 'Problematic',
+                 3: 'Proofread', 4: 'Validated'}
 
         :param expiry: either a number of days or a datetime.timedelta object
         :type expiry: int (days), :py:obj:`datetime.timedelta`, False (config)

@@ -859,7 +859,7 @@ The text message is:
         return False
 
     def _internal_api_error(self, code, error, result) -> bool:
-        """Check for internal_api_error_ or readonly and retry.
+        """Check for ``internal_api_error_`` or readonly and retry.
 
         :raises pywikibot.exceptions.APIMWError: internal_api_error or readonly
         """

@@ -2,6 +2,8 @@
 ===================
 
 .. py:module:: site
+   :synopsis: Library module representing MediaWiki sites (wikis)
+
 .. automodule:: pywikibot.site
    :no-members:
    :noindex:
@@ -10,61 +12,68 @@
 -------------------------------------------------
 
 .. py:module:: site._basesite
+   :synopsis: Objects with site methods independent of the communication interface
+
 .. automodule:: pywikibot.site._basesite
-   :noindex:
 
 .. py:module:: site._apisite
+   :synopsis: Objects representing API interface to MediaWiki site
 
 :mod:`APISite<pywikibot.site.\_apisite>` Package
 ------------------------------------------------
 
 .. automodule:: pywikibot.site._apisite
-   :noindex:
 
 .. automodule:: pywikibot.site._extensions
-   :noindex:
+   :synopsis: Objects representing API interface to MediaWiki site extenstions
 
 .. automodule:: pywikibot.site._generators
-   :noindex:
+   :synopsis: Objects representing API generators to MediaWiki site
 
 :mod:`DataSite<pywikibot.site.\_datasite>` Package
 --------------------------------------------------
 
 .. py:module:: site._datasite
+   :synopsis: Objects representing API interface to Wikibase site
+
 .. automodule:: pywikibot.site._datasite
-   :noindex:
 
 :mod:`Obsolete Sites<pywikibot.site._obsoletesites>` Package
 ------------------------------------------------------------
 
 .. py:module:: site._obsoletesites
+   :synopsis: Objects representing obsolete MediaWiki sites
+
 .. automodule:: pywikibot.site._obsoletesites
-   :noindex:
 
 :mod:`Siteinfo<pywikibot.site._siteinfo>` Package
 -------------------------------------------------
 
 .. py:module:: site._siteinfo
+   :synopsis: Objects representing site info data contents
+
 .. automodule:: pywikibot.site._siteinfo
-   :noindex:
 
 :mod:`Namespace<pywikibot.site._namespace>` Package
 ---------------------------------------------------
 
 .. py:module:: site._namespace
+   :synopsis: Objects representing Namespaces of MediaWiki site
+
 .. automodule:: pywikibot.site._namespace
-   :noindex:
 
 :mod:`TokenWallet<pywikibot.site._tokenwallet>` Package
 -------------------------------------------------------
 
 .. py:module:: site._tokenwallet
+   :synopsis: Objects representing api tokens
+
 .. automodule:: pywikibot.site._tokenwallet
-   :noindex:
 
 :mod:`Uploader<pywikibot.site._upload>` Package
 -----------------------------------------------
 
 .. py:module:: site._upload
+   :synopsis: Objects representing API upload to MediaWiki site
+
 .. automodule:: pywikibot.site._upload
-   :noindex:

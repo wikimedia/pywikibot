@@ -2,6 +2,7 @@
 ====================
 
 .. automodule:: comms
+   :synopsis: Communication layer
 
 Submodules
 ----------
@@ -10,10 +11,10 @@ Submodules
 --------------------------------
 
 .. automodule:: comms.eventstreams
+   :synopsis: Server-Sent Events client
 
 :mod:`comms.http` module
 ------------------------
 
 .. automodule:: comms.http
-
-
+   :synopsis: Basic HTTP access interface
