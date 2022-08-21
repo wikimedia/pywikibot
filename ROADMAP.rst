@@ -1,27 +1,7 @@
-Current release 7.6.0
+Current release 7.7.0
 ^^^^^^^^^^^^^^^^^^^^^
 
-* Add support for pcmwiki, guvwikt and bjnwikt (:phab:`T309059`, :phab:`T310882`, :phab:`T312217`)
-* support *not* loading text :meth:`site.APISite.preloadpages` (:phab:`T67163`)
-* :func:`textlib.TimeStripper.timestripper` removes HTML elements before searching for
-  timestamp in text (:phab:`T302496`)
-* backport :mod:`backports.pairwise()<backports>` from Python 3.10
-* L10N updates
-* Fix partial caching in :meth:`Category.subcategories()<page.Category.subcategories>` (:phab:`T88217`)
-* Method :meth:`Page.has_content()<page.BasePage.has_content>` was added (:phab:`T313736`)
-* Discard cache and reload it if cache was loaded without content and content is required
-  in :meth:`Page.templates()<page.BasePage.templates>` (:phab:`T313736`)
-* Add support for vikidia:oc
-* Exit loop in PageFromFileReader if match.end() <= 0 (:phab:`T313684`)
-* Allow Exception as parameter of pywikibot.exceptions.Error
-* Make :func:`GoogleSearchPageGenerator<pagegenerators.GoogleSearchPageGenerator>`
-  and :func:`PetScanPageGenerator<pagegenerators.PetScanPageGenerator>` a restartable
-  Generator (:phab:`T313681`, :phab:`T313683`)
-* Provide a :class:`collections.GeneratorWrapper<tools.collections.GeneratorWrapper>` 
-  class to start/restart a generator (:phab:`T301318`, :phab:`T312654`, :phab:`T312883`)
-* tools' itertools functions were moved to :mod:`tools.itertools` submodule
-* tools' collections classes were moved to :mod:`tools.collections` submodule
-* Set successful login status for the OAuth case (:phab:`T313571`)
+*(no changes yet)*
 
 
 Deprecations
