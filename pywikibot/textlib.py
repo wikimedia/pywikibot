@@ -1966,14 +1966,17 @@ class TimeStripper:
             return False
         return True
 
-    def timestripper(self, line):
+    def timestripper(self, line: str) -> Optional['pywikibot.Timestamp']:
         """
         Find timestamp in line and convert it to time zone aware datetime.
 
-        All the following items must be matched, otherwise None is returned:
-        -. year, month, hour, time, day, minute, tzinfo
+        All the following items must be matched, otherwise None is
+        returned: -. year, month, hour, time, day, minute, tzinfo
+
+        .. versionchanged:: 7.6
+           HTML parts are removed from line
+
         :return: A timestamp found on the given line
-        :rtype: pywikibot.Timestamp
         """
         # Try to maintain gaps that are used in _valid_date_dict_positions()
         def censor_match(match):

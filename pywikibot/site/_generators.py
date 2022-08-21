@@ -101,6 +101,9 @@ class GeneratorsMixin:
         Pages are iterated in the same order than in the underlying pagelist.
         In case of duplicates in a groupsize batch, return the first entry.
 
+        .. versionchanged:: 7.6
+           ``content`` parameter was added.
+
         :param pagelist: an iterable that returns Page objects
         :param groupsize: how many Pages to query at a time
         :param templates: preload pages (typically templates) transcluded in
