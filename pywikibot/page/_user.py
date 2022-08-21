@@ -320,7 +320,7 @@ class User(Page):
         :return: last user log entry
         :rtype: LogEntry or None
         """
-        return next(iter(self.logevents(total=1)), None)
+        return next(self.logevents(total=1), None)
 
     def contributions(self, total: int = 500, **kwargs) -> tuple:
         """

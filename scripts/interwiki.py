@@ -367,7 +367,8 @@ from pywikibot.exceptions import (
     SpamblacklistError,
     UnknownSiteError,
 )
-from pywikibot.tools import SizedKeyCollection, first_upper
+from pywikibot.tools import first_upper
+from pywikibot.tools.collections import SizedKeyCollection
 
 
 docuReplacements = {
@@ -1193,7 +1194,7 @@ class Subject(interwiki_graph.Subject):
         elif self.conf.autonomous and duplicate and not skip:
             pywikibot.output('Stopping work on {} because duplicate pages'
                              ' {} and {} are found'
-                             .format(self.originP, duplicate, page))
+                             .format(self.origin, duplicate, page))
             self.makeForcedStop(counter)
             try:
                 with codecs.open(

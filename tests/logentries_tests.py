@@ -19,6 +19,7 @@ from pywikibot.logentries import (
 )
 from tests import unittest_print
 from tests.aspects import MetaTestCaseClass, TestCase
+from tests.utils import skipping
 
 
 class TestLogentriesBase(TestCase):
@@ -64,10 +65,10 @@ class TestLogentriesBase(TestCase):
             # MW versions and otherwise it might not be visible that the test
             # isn't run on an older wiki.
             self.assertLess(self.site.mw_version, '1.25')
-        try:
-            le = next(iter(self.site.logevents(logtype=logtype, total=1)))
-        except StopIteration:
-            self.skipTest('No entry found for {!r}'.format(logtype))
+
+        with skipping(StopIteration,
+                      msg='No entry found for {!r}'.format(logtype)):
+            le = next(self.site.logevents(logtype=logtype, total=1))
         return le
 
     def _test_logevent(self, logtype):
@@ -271,11 +272,11 @@ class TestLogentryParams(TestLogentriesBase):
         """Test equality of LogEntry instances."""
         site = self.get_site('dewp')
         other_site = self.get_site('tewp')
-        gen1 = iter(site.logevents(reverse=True, total=2))
-        gen2 = iter(site.logevents(reverse=True, total=2))
+        gen1 = site.logevents(reverse=True, total=2)
+        gen2 = site.logevents(reverse=True, total=2)
         le1 = next(gen1)
         le2 = next(gen2)
-        le3 = next(iter(other_site.logevents(reverse=True, total=1)))
+        le3 = next(other_site.logevents(reverse=True, total=1))
         le4 = next(gen1)
         le5 = next(gen2)
         self.assertEqual(le1, le2)

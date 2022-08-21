@@ -38,6 +38,7 @@ Furthermore, the following command line parameters are supported:
 # Distributed under the terms of the MIT license.
 #
 import re
+from itertools import zip_longest
 
 import pywikibot
 from pywikibot import i18n, pagegenerators
@@ -203,16 +204,14 @@ def main(*args: str) -> None:
         if opt == 'pairsfile':
             filename = value or pywikibot.input(
                 'Enter the name of the file containing pairs:')
-            old_name1 = None
-            for page in pagegenerators.TextIOPageGenerator(filename):
-                if old_name1:
-                    from_to_pairs.append([old_name1, page.title()])
-                    old_name1 = None
+            page_gen = [pagegenerators.TextIOPageGenerator(filename)] * 2
+            for old_page, new_page in zip_longest(*page_gen, fillvalue=None):
+                if new_page is None:
+                    pywikibot.warning(
+                        'file {} contains odd number '
+                        'of links'.format(filename))
                 else:
-                    old_name1 = page.title()
-            if old_name1:
-                pywikibot.warning(
-                    'file {} contains odd number of links'.format(filename))
+                    from_to_pairs.append([old_page.title(), new_page.title()])
         elif opt in ('always', 'noredirect', 'skipredirects'):
             options[opt] = True
         elif opt in ('notalkpage', 'nosubpages'):
@@ -240,10 +239,9 @@ def main(*args: str) -> None:
     if not site.logged_in():
         site.login()
 
-    for pair in from_to_pairs:
-        page = pywikibot.Page(site, pair[0])
-        bot = MovePagesBot(**options)
-        bot.move_one(page, pair[1])
+    bot = MovePagesBot(**options)
+    for old_title, new_title in from_to_pairs:
+        bot.move_one(pywikibot.Page(site, old_title), new_title)
 
     gen = gen_factory.getCombinedGenerator(preload=True)
     if gen:

@@ -193,9 +193,9 @@ class Error(Exception):
 
     """Pywikibot error."""
 
-    def __init__(self, arg: str) -> None:
+    def __init__(self, arg: Union[Exception, str]) -> None:
         """Initializer."""
-        self.unicode = arg
+        self.unicode = str(arg)
 
     def __str__(self) -> str:
         """Return a string representation."""

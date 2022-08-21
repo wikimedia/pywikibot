@@ -1,34 +1,38 @@
-pywikibot.data package
-======================
+:mod:`data` package
+===================
 
-.. automodule:: pywikibot.data
+.. automodule:: data
+   :synopsis: 
 
 Submodules
 ----------
 
-pywikibot.data.api module
+:mod:`data.api` module
+----------------------
+
+.. automodule:: data.api
+   :synopsis: Module providing several layers of data access to the wiki
+
+:mod:`data.memento` module
+--------------------------
+
+.. automodule:: data.memento
+   :synopsis: Fix ups for memento-client package version 0.6.1
+
+:mod:`data.mysql` module
+------------------------
+
+.. automodule:: data.mysql
+   :synopsis: Miscellaneous helper functions for mysql queries
+
+:mod:`data.sparql` module
 -------------------------
 
-.. automodule:: pywikibot.data.api
+.. automodule:: data.sparql
+   :synopsis: SPARQL Query interface
 
-pywikibot.data.memento module
------------------------------
-
-.. automodule:: pywikibot.data.memento
-
-pywikibot.data.mysql module
----------------------------
-
-.. automodule:: pywikibot.data.mysql
-
-pywikibot.data.sparql module
+:mod:`data.wikistats` module
 ----------------------------
 
-.. automodule:: pywikibot.data.sparql
-
-pywikibot.data.wikistats module
--------------------------------
-
-.. automodule:: pywikibot.data.wikistats
-
-
+.. automodule:: data.wikistats
+   :synopsis: Objects representing WikiStats API

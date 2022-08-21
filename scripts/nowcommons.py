@@ -39,7 +39,7 @@ Example
     python pwb.py nowcommons -replaceonly -replaceloose -replacealways -replace
 
 .. note:: This script is a
-   :py:obj:`ConfigParserBot <pywikibot.bot.ConfigParserBot>`. All options
+   :py:obj:`ConfigParserBot <bot.ConfigParserBot>`. All options
    can be set within a settings file which is scripts.ini by default.
 """
 #
@@ -55,7 +55,7 @@ from pywikibot import i18n
 from pywikibot import pagegenerators as pg
 from pywikibot.bot import ConfigParserBot, CurrentPageBot
 from pywikibot.exceptions import IsRedirectPageError, NoPageError
-from pywikibot.tools import filter_unique
+from pywikibot.tools.itertools import filter_unique
 from scripts.image import ImageRobot as ImageBot
 
 

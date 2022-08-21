@@ -313,10 +313,10 @@ class Request(MutableMapping):
                       if name in args or name == 'self'}
             kwargs['parameters'] = parameters
             # Make sure that all arguments have remained
-            assert(old_kwargs | {'parameters'}
-                   == set(kwargs) | set(kwargs['parameters']))
-            assert(('parameters' in old_kwargs)
-                   is ('parameters' in kwargs['parameters']))
+            assert (old_kwargs | {'parameters'}
+                    == set(kwargs) | set(kwargs['parameters']))
+            assert (('parameters' in old_kwargs)
+                    is ('parameters' in kwargs['parameters']))
             cls._warn_kwargs()
         else:
             kwargs = dict(kwargs)
@@ -859,7 +859,7 @@ The text message is:
         return False
 
     def _internal_api_error(self, code, error, result) -> bool:
-        """Check for internal_api_error_ or readonly and retry.
+        """Check for ``internal_api_error_`` or readonly and retry.
 
         :raises pywikibot.exceptions.APIMWError: internal_api_error or readonly
         """

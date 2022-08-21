@@ -12,6 +12,7 @@ Pywikibot Subpackages
     pywikibot.data
     pywikibot.families
     pywikibot.page
+    pywikibot.pagegenerators
     pywikibot.site
     pywikibot.specialbots
     pywikibot.tools
@@ -20,148 +21,172 @@ Pywikibot Subpackages
 Submodules
 ----------
 
-pywikibot.backports module
---------------------------
+:mod:`backports` module
+-----------------------
 
-.. automodule:: pywikibot.backports
+.. automodule:: backports
+   :synopsis: This module contains backports to support older Python versions
 
-pywikibot.bot module
---------------------
+:mod:`bot` module
+-----------------
 
-.. automodule:: pywikibot.bot
-  :member-order: bysource
+.. automodule:: bot
+   :synopsis: User-interface related functions for building bots
+   :member-order: bysource
 
-pywikibot.bot\_choice module
-----------------------------
+:mod:`bot\_choice` module
+-------------------------
 
-.. automodule:: pywikibot.bot_choice
+.. automodule:: bot_choice
+   :synopsis: Options and Choices for :func:`pywikibot.input_choice`
 
 .. include:: pywikibot.config.rst
 
-pywikibot.cosmetic\_changes module
-----------------------------------
+:mod:`cosmetic\_changes` module
+-------------------------------
 
-.. automodule:: pywikibot.cosmetic_changes
+.. automodule:: cosmetic_changes
+   :synopsis: This module can do slight modifications to tidy a wiki page's source code
 
-pywikibot.daemonize module
---------------------------
-
-.. automodule:: pywikibot.daemonize
-
-pywikibot.date module
----------------------
-
-.. automodule:: pywikibot.date
-
-pywikibot.diff module
----------------------
-
-.. automodule:: pywikibot.diff
-
-pywikibot.echo module
----------------------
-
-.. automodule:: pywikibot.echo
-
-pywikibot.editor module
+:mod:`daemonize` module
 -----------------------
 
-.. automodule:: pywikibot.editor
+.. automodule:: daemonize
+   :synopsis: Module to daemonize the current process on Unix.
 
-pywikibot.exceptions module
----------------------------
+:mod:`date` module
+------------------
 
-.. automodule:: pywikibot.exceptions
+.. automodule:: date
+   :synopsis: Date data and manipulation module
 
-pywikibot.family module
------------------------
+:mod:`diff` module
+------------------
 
-.. automodule:: pywikibot.family
+.. automodule:: diff
+   :synopsis: Diff module
 
-pywikibot.fixes module
-----------------------
+:mod:`echo` module
+------------------
 
-.. automodule:: pywikibot.fixes
+.. automodule:: echo
+   :synopsis: Classes and functions for working with the Echo extension
 
-pywikibot.flow module
----------------------
+:mod:`editor` module
+--------------------
 
-.. automodule:: pywikibot.flow
+.. automodule:: editor
+   :synopsis: Text editor class for your favourite editor
 
-pywikibot.i18n module
----------------------
-
-.. automodule:: pywikibot.i18n
-
-pywikibot.interwiki\_graph module
----------------------------------
-
-.. automodule:: pywikibot.interwiki_graph
-
-pywikibot.logentries module
----------------------------
-
-.. automodule:: pywikibot.logentries
-
-pywikibot.logging module
+:mod:`exceptions` module
 ------------------------
+
+.. automodule:: exceptions
+   :synopsis: Pywikibot exceptions and warning classes
+
+:mod:`family` module
+--------------------
+
+.. automodule:: family
+   :synopsis: Objects representing MediaWiki families
+
+:mod:`fixes` module
+-------------------
+
+.. automodule:: fixes
+   :synopsis: File containing all standard fixes
+
+:mod:`flow` module
+------------------
+
+.. automodule:: flow
+   :synopsis: Objects representing Flow entities, like boards, topics, and posts
+
+:mod:`i18n` module
+------------------
+
+.. automodule:: i18n
+   :synopsis: Various i18n functions
+
+:mod:`interwiki\_graph` module
+------------------------------
+
+.. automodule:: interwiki_graph
+   :synopsis: Module with the Graphviz drawing calls
+
+:mod:`logentries` module
+------------------------
+
+.. automodule:: logentries
+   :synopsis: Objects representing Mediawiki log entries
+
+.. module:: logging
+   :synopsis: User output/logging functions
+
+:mod:`logging` module
+---------------------
 
 .. automodule:: pywikibot.logging
    :member-order: bysource
 
-pywikibot.login module
+:mod:`login` module
+-------------------
+
+.. automodule:: login
+   :synopsis: Library to log the bot in to a wiki account
+
+:mod:`plural` module
+--------------------
+
+.. automodule:: plural
+   :synopsis: Module containing plural rules of various languages
+
+:mod:`proofreadpage` module
+---------------------------
+
+.. automodule:: proofreadpage
+   :synopsis: Objects used with ProofreadPage Extension
+
+:mod:`site\_detect` module
+--------------------------
+
+.. automodule:: site_detect
+   :synopsis: Classes for detecting a MediaWiki site
+
+:mod:`textlib` module
+---------------------
+
+.. automodule:: textlib
+   :synopsis: Functions for manipulating wiki-text
+
+:mod:`throttle` module
 ----------------------
 
-.. automodule:: pywikibot.login
+.. automodule:: throttle
+   :synopsis: Mechanics to slow down wiki read and/or write rate
 
-pywikibot.pagegenerators module
--------------------------------
+.. module:: time
+   :synopsis: Time handling module
 
-.. automodule:: pywikibot.pagegenerators
-
-pywikibot.plural module
------------------------
-
-.. automodule:: pywikibot.plural
-
-pywikibot.proofreadpage module
-------------------------------
-
-.. automodule:: pywikibot.proofreadpage
-
-pywikibot.site\_detect module
------------------------------
-
-.. automodule:: pywikibot.site_detect
-
-pywikibot.textlib module
-------------------------
-
-.. automodule:: pywikibot.textlib
-
-pywikibot.throttle module
--------------------------
-
-.. automodule:: pywikibot.throttle
-
-pywikibot.time module
----------------------
+:mod:`time` module
+------------------
 
 .. automodule:: pywikibot.time
 
-pywikibot.titletranslate module
--------------------------------
+:mod:`titletranslate` module
+----------------------------
 
-.. automodule:: pywikibot.titletranslate
+.. automodule:: titletranslate
+   :synopsis: Title translate module
 
-pywikibot.version module
-------------------------
+:mod:`version` module
+---------------------
 
-.. automodule:: pywikibot.version
+.. automodule:: version
+   :synopsis: Module to determine the pywikibot version (tag, revision and date)
 
-pywikibot.xmlreader module
---------------------------
+:mod:`xmlreader` module
+-----------------------
 
-.. automodule:: pywikibot.xmlreader
-
-
+.. automodule:: xmlreader
+   :synopsis: XML reading module

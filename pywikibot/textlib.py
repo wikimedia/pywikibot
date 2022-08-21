@@ -25,7 +25,7 @@ from pywikibot.backports import Tuple
 from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.family import Family
 from pywikibot.time import TZoneFixedOffset
-from pywikibot.tools import deprecated, ModuleDeprecationWrapper
+from pywikibot.tools import ModuleDeprecationWrapper, deprecated
 from pywikibot.userinterfaces.transliteration import NON_LATIN_DIGITS
 
 
@@ -2016,6 +2016,7 @@ class TimeStripper:
         # Remove parts that are not supposed to contain the timestamp, in order
         # to reduce false positives.
         line = removeDisabledParts(line)
+        line = removeHTMLParts(line)
 
         line = to_latin_digits(line)
         for pat in self.patterns:

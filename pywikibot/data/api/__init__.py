@@ -10,6 +10,7 @@ from io import BytesIO
 
 from pywikibot.comms import http
 from pywikibot.data.api._generators import (
+    APIGeneratorBase,
     APIGenerator,
     ListGenerator,
     LogEntryListGenerator,
@@ -25,6 +26,7 @@ from pywikibot.data.api._requests import CachedRequest, Request, encode_url
 from pywikibot.family import SubdomainFamily
 
 __all__ = (
+    'APIGeneratorBase',
     'APIGenerator',
     'CachedRequest',
     'ListGenerator',

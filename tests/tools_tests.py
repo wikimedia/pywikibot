@@ -20,10 +20,16 @@ from pywikibot.tools import (
     cached,
     classproperty,
     has_module,
-    intersect_generators,
     is_ip_address,
     suppress_warnings,
 )
+from pywikibot.tools.itertools import (
+    filter_unique,
+    intersect_generators,
+    islice_with_ellipsis,
+    roundrobin_generators,
+)
+
 from tests import join_xml_data_path
 from tests.aspects import TestCase, require_modules
 
@@ -286,7 +292,7 @@ class TestIsSliceWithEllipsis(TestCase):
     def test_show_default_marker(self):
         """Test marker is shown without kwargs."""
         stop = 2
-        it = list(tools.islice_with_ellipsis(self.it, stop))
+        it = list(islice_with_ellipsis(self.it, stop))
         self.assertLength(it, stop + 1)  # +1 to consider marker.
         self.assertEqual(it[:-1], self.it[:stop])
         self.assertEqual(it[-1], '…')
@@ -294,7 +300,7 @@ class TestIsSliceWithEllipsis(TestCase):
     def test_show_custom_marker(self):
         """Test correct marker is shown with kwargs.."""
         stop = 2
-        it = list(tools.islice_with_ellipsis(self.it, stop, marker='new'))
+        it = list(islice_with_ellipsis(self.it, stop, marker='new'))
         self.assertLength(it, stop + 1)  # +1 to consider marker.
         self.assertEqual(it[:-1], self.it[:stop])
         self.assertNotEqual(it[-1], '…')
@@ -304,7 +310,7 @@ class TestIsSliceWithEllipsis(TestCase):
         """Test marker is shown with start and stop without kwargs."""
         start = 1
         stop = 3
-        it = list(tools.islice_with_ellipsis(self.it, start, stop))
+        it = list(islice_with_ellipsis(self.it, start, stop))
         self.assertLength(it, stop - start + 1)  # +1 to consider marker.
         self.assertEqual(it[:-1], self.it[start:stop])
         self.assertEqual(it[-1], '…')
@@ -313,8 +319,7 @@ class TestIsSliceWithEllipsis(TestCase):
         """Test marker is shown with start and stop with kwargs."""
         start = 1
         stop = 3
-        it = list(tools.islice_with_ellipsis(
-            self.it, start, stop, marker='new'))
+        it = list(islice_with_ellipsis(self.it, start, stop, marker='new'))
         self.assertLength(it, stop - start + 1)  # +1 to consider marker.
         self.assertEqual(it[:-1], self.it[start:stop])
         self.assertNotEqual(it[-1], '…')
@@ -323,28 +328,28 @@ class TestIsSliceWithEllipsis(TestCase):
     def test_show_marker_with_stop_zero(self):
         """Test marker is shown with stop for non empty iterable."""
         stop = 0
-        it = list(tools.islice_with_ellipsis(self.it, stop))
+        it = list(islice_with_ellipsis(self.it, stop))
         self.assertLength(it, stop + 1)  # +1 to consider marker.
         self.assertEqual(it[-1], '…')
 
     def test_do_not_show_marker_with_stop_zero(self):
         """Test marker is shown with stop for empty iterable."""
         stop = 0
-        it = list(tools.islice_with_ellipsis(self.it_null, stop))
+        it = list(islice_with_ellipsis(self.it_null, stop))
         self.assertLength(it, stop)
 
     def test_do_not_show_marker(self):
         """Test marker is not shown when no marker is specified."""
         import itertools
         stop = 2
-        it_1 = list(tools.islice_with_ellipsis(self.it, stop, marker=None))
+        it_1 = list(islice_with_ellipsis(self.it, stop, marker=None))
         it_2 = list(itertools.islice(self.it, stop))
         self.assertEqual(it_1, it_2)  # same behavior as islice().
 
     def test_do_not_show_marker_when_get_all(self):
         """Test marker is not shown when all elements are retrieved."""
         stop = None
-        it = list(tools.islice_with_ellipsis(self.it, stop))
+        it = list(islice_with_ellipsis(self.it, stop))
         self.assertLength(it, len(self.it))
         self.assertEqual(it, self.it)
         self.assertNotEqual(it[-1], '…')
@@ -484,74 +489,74 @@ class TestFilterUnique(TestCase):
     def test_set(self):
         """Test filter_unique with a set."""
         deduped = set()
-        deduper = tools.filter_unique(self.ints, container=deduped)
+        deduper = filter_unique(self.ints, container=deduped)
         self._test_dedup_int(deduped, deduper)
 
     def test_dict(self):
         """Test filter_unique with a dict."""
         deduped = {}
-        deduper = tools.filter_unique(self.ints, container=deduped)
+        deduper = filter_unique(self.ints, container=deduped)
         self._test_dedup_int(deduped, deduper)
 
     def test_OrderedDict(self):
         """Test filter_unique with an OrderedDict."""
         deduped = OrderedDict()
-        deduper = tools.filter_unique(self.ints, container=deduped)
+        deduper = filter_unique(self.ints, container=deduped)
         self._test_dedup_int(deduped, deduper)
 
     def test_int_hash(self):
         """Test filter_unique with ints using hash as key."""
         deduped = set()
-        deduper = tools.filter_unique(self.ints, container=deduped, key=hash)
+        deduper = filter_unique(self.ints, container=deduped, key=hash)
         self._test_dedup_int(deduped, deduper, hash)
 
     def test_int_id(self):
         """Test filter_unique with ints using id as key."""
         deduped = set()
-        deduper = tools.filter_unique(self.ints, container=deduped, key=id)
+        deduper = filter_unique(self.ints, container=deduped, key=id)
         self._test_dedup_int(deduped, deduper, id)
 
     def test_obj(self):
         """Test filter_unique with objects."""
         deduped = set()
-        deduper = tools.filter_unique(self.decs, container=deduped)
+        deduper = filter_unique(self.decs, container=deduped)
         self._test_dedup_int(deduped, deduper)
 
     def test_obj_hash(self):
         """Test filter_unique with objects using hash as key."""
         deduped = set()
-        deduper = tools.filter_unique(self.decs, container=deduped, key=hash)
+        deduper = filter_unique(self.decs, container=deduped, key=hash)
         self._test_dedup_int(deduped, deduper, hash)
 
     def test_obj_id(self):
         """Test filter_unique with objects using id as key, which fails."""
         # Two objects which may be equal do not necessary have the same id.
         deduped = set()
-        deduper = tools.filter_unique(self.decs, container=deduped, key=id)
+        deduper = filter_unique(self.decs, container=deduped, key=id)
         self.assertIsEmpty(deduped)
         for _ in self.decs:
             self.assertEqual(id(next(deduper)), deduped.pop())
         with self.assertRaises(StopIteration):
             next(deduper)
         # len(Decimal with distinct ids) != len(Decimal with distinct value).
-        deduper_ids = list(tools.filter_unique(self.decs, key=id))
+        deduper_ids = list(filter_unique(self.decs, key=id))
         self.assertNotEqual(len(deduper_ids), len(set(deduper_ids)))
 
     def test_str(self):
         """Test filter_unique with str."""
         deduped = set()
-        deduper = tools.filter_unique(self.strs, container=deduped)
+        deduper = filter_unique(self.strs, container=deduped)
         self._test_dedup_str(deduped, deduper)
 
     def test_str_hash(self):
         """Test filter_unique with str using hash as key."""
         deduped = set()
-        deduper = tools.filter_unique(self.strs, container=deduped, key=hash)
+        deduper = filter_unique(self.strs, container=deduped, key=hash)
         self._test_dedup_str(deduped, deduper, hash)
 
     def test_for_resumable(self):
         """Test filter_unique is resumable after a for loop."""
-        gen2 = tools.filter_unique(self.ints)
+        gen2 = filter_unique(self.ints)
         deduped = []
         for item in gen2:
             deduped.append(item)
@@ -566,7 +571,7 @@ class TestFilterUnique(TestCase):
     def test_skip(self):
         """Test filter_unique with a container that skips items."""
         deduped = SkipList()
-        deduper = tools.filter_unique(self.ints, container=deduped)
+        deduper = filter_unique(self.ints, container=deduped)
         deduped_out = list(deduper)
         self.assertCountEqual(deduped, deduped_out)
         self.assertEqual(deduped, {2, 4})
@@ -574,7 +579,7 @@ class TestFilterUnique(TestCase):
     def test_process_again(self):
         """Test filter_unique with an ignoring container."""
         deduped = ProcessAgainList()
-        deduper = tools.filter_unique(self.ints, container=deduped)
+        deduper = filter_unique(self.ints, container=deduped)
         deduped_out = list(deduper)
         self.assertEqual(deduped_out, [1, 3, 2, 1, 1, 4])
         self.assertEqual(deduped, {2, 4})
@@ -583,7 +588,7 @@ class TestFilterUnique(TestCase):
         """Test filter_unique with an ignoring container."""
         deduped = ContainsStopList()
         deduped.stop_list = [2]
-        deduper = tools.filter_unique(self.ints, container=deduped)
+        deduper = filter_unique(self.ints, container=deduped)
         deduped_out = list(deduper)
         self.assertCountEqual(deduped, deduped_out)
         self.assertEqual(deduped, {1, 3})
@@ -596,7 +601,7 @@ class TestFilterUnique(TestCase):
         """Test filter_unique with an ignoring container during add call."""
         deduped = AddStopList()
         deduped.stop_list = [4]
-        deduper = tools.filter_unique(self.ints, container=deduped)
+        deduper = filter_unique(self.ints, container=deduped)
         deduped_out = list(deduper)
         self.assertCountEqual(deduped, deduped_out)
         self.assertEqual(deduped, {1, 2, 3})
@@ -797,9 +802,9 @@ class TestMergeGenerator(TestCase):
     def test_roundrobin_generators(self):
         """Test merge_generators generator."""
         gen = range(5)
-        result = list(tools.roundrobin_generators(gen, 'ABC'))
+        result = list(roundrobin_generators(gen, 'ABC'))
         self.assertEqual(result, [0, 'A', 1, 'B', 2, 'C', 3, 4])
-        result = ''.join(tools.roundrobin_generators('HlWrd', 'e', 'lool'))
+        result = ''.join(roundrobin_generators('HlWrd', 'e', 'lool'))
         self.assertEqual(result, 'HelloWorld')
 
 

@@ -158,6 +158,7 @@ from pywikibot.backports import Dict, Generator, List, Pattern, Tuple
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 from pywikibot.exceptions import InvalidPageError, NoPageError
 from pywikibot.tools import chars
+from pywikibot.tools.itertools import itergroup
 
 
 # This is required for the text that is shown when you run this script
@@ -973,15 +974,14 @@ def main(*args: str) -> None:
         return
 
     commandline_replacements += file_replacements
-    if not(commandline_replacements or fixes_set) or manual_input:
+    if not (commandline_replacements or fixes_set) or manual_input:
         commandline_replacements += handle_manual()
 
     # The summary stored here won't be actually used but is only an example
     site = pywikibot.Site()
     single_summary = None
-    for i in range(0, len(commandline_replacements), 2):
-        replacement = Replacement(commandline_replacements[i],
-                                  commandline_replacements[i + 1])
+    for old, new in itergroup(commandline_replacements, 2):
+        replacement = Replacement(old, new)
         if not single_summary:
             single_summary = i18n.twtranslate(
                 site, 'replace-replacing',

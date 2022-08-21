@@ -46,13 +46,7 @@ class TestThankRevision(TestCase):
         site.thank_revision(revid, source='pywikibot test')
         log_entries = site.logevents(logtype='thanks', total=5, page=user,
                                      start=before_time, reverse=True)
-        try:
-            next(iter(log_entries))
-        except StopIteration:
-            found_log = False
-        else:
-            found_log = True
-        self.assertTrue(found_log)
+        self.assertTrue(bool(next(log_entries, None)))
 
     def test_self_thank(self):
         """Test that thanking oneself causes an error.

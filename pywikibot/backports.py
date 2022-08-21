@@ -123,3 +123,19 @@ else:
         if string.endswith(suffix):
             return string[:-len(suffix)]
         return string
+
+
+# bpo-38200
+if PYTHON_VERSION >= (3, 10):
+    from itertools import pairwise
+else:
+    from itertools import tee
+
+    def pairwise(iterable):
+        """Return successive overlapping pairs taken from the input iterable.
+
+        .. versionadded:: 7.6
+        """
+        a, b = tee(iterable)
+        next(b, None)
+        return zip(a, b)

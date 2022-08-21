@@ -1,14 +1,40 @@
 Release history
 ^^^^^^^^^^^^^^^
 
+7.5.0
+-----
+*22 July 2022*
+
+* Add support for blkwiki (:phab:`T310875`)
+* L10N Updates
+* Fix duplicate source detection in :meth:`pywikibot.WikidataBot.user_add_claim_unless_exists`
+* :mod:`pywikibot.textlib`.tzoneFixedOffset class was renamed to :class:`pywikibot.time.TZoneFixedOffset`
+* Wrapper method :meth:`parsevalue()<pywikibot.site._datasite.DataSite.parsevalue>`
+  around wbparsevalue was added (:phab:`T112140`, :phab:`T312755`)
+* L10N updates
+* Fix cp encodings in :func:`get_charset_from_content_type()
+  <comms.http.get_charset_from_content_type>` (:phab:`T312230`)
+* New :mod:`pywikibot.time` module with new functions in addition to `Timestamp`
+* :meth:`Page.revisions()<page.BasePage.revisions>` supports more formats/types for
+  starttime and endtime parameters, in addition to those allowed by
+  :meth:`Timestamp.fromISOformat()<pywikibot.Timestamp.fromISOformat>`.
+* New :meth:`Timestamp.set_timestamp()<pywikibot.Timestamp.set_timestamp>` method
+* Fully ISO8601 and POSIX format support with :class:`pywikibot.Timestamp`;
+  formats are compliant with MediaWiki supported formats
+* Handle asynchronous page_put_queue after KeyboardInterrupt in Python 3.9+ (:phab:`T311076`)
+* No longer expect a specific namespace alias in cosmetic_changes
+  :meth:`translateAndCapitalizeNamespaces
+  <cosmetic_changes.CosmeticChangesToolkit.translateAndCapitalizeNamespaces>`
+
+
 7.4.0
 -----
 *26 June 2022*
 
 * Provide Built Distribution with Pywikibot (:pep:`427`)
-* Update `WRITE_ACTIONS` in used by :class:`api.Request<pywikibot.data.api.Request>`
-* Move :func:`get_closest_memento_url<pywikibot.data.memento.get_closest_memento_url>` from weblinkchecker script to memento module.
-* Add :mod:`memento module<pywikibot.data.memento>` to fix memento_client package (:phab:`T185561`)
+* Update `WRITE_ACTIONS` in used by :class:`api.Request<data.api.Request>`
+* Move :func:`get_closest_memento_url<data.memento.get_closest_memento_url>` from weblinkchecker script to memento module.
+* Add :mod:`memento module<data.memento>` to fix memento_client package (:phab:`T185561`)
 * L10N and i18n updates
 * Fix Flow board topic continuation when iterating in reverse (:phab:`T138323`)
 * Add Avestan transliteration
@@ -16,7 +42,7 @@ Release history
 * Show an APIError if PetScanPageGenerator.query() fails (:phab:`T309538`)
 * `login.py` is now a utiliy script even for site-package installation (:phab:`T309290`)
 * `preload_sites.py` is now a utiliy script even for site-package installation (:phab:`T308912`)
-* :attr:`generator_completed<pywikibot.bot.BaseBot.generator_completed>` became a public attribute
+* :attr:`generator_completed<bot.BaseBot.generator_completed>` became a public attribute
 * Return gracefully from pwb.find_alternates if folder in user_script_paths does not exist (:phab:`T308910`)
 
 
@@ -150,7 +176,7 @@ Improvements
 * Upload: Retry upload if 'copyuploadbaddomain' API error occurs (:phab:`T294825`)
 * Update invisible characters from unicodedata 14.0.0
 * Add support for Wikimedia OCR engine with proofreadpage
-* Rewrite tools.intersect_generators which makes it running up to 10'000 times faster. (:phab:`T85623`, :phab:`T293276`)
+* Rewrite :func:`tools.itertools.intersect_generators` which makes it running up to 10'000 times faster. (:phab:`T85623`, :phab:`T293276`)
 * The cached output functionality from compat release was re-implemented (:phab:`T151727`, :phab:`T73646`, :phab:`T74942`, :phab:`T132135`, :phab:`T144698`, :phab:`T196039`, :phab:`T280466`)
 * L10N updates
 * Adjust groupsize within pagegenerators.PreloadingGenerator (:phab:`T291770`)
@@ -223,7 +249,7 @@ Code cleanups
 * pywikibot.__release__ was removed in favour of pywikibot.__version__
 * TextfilePageGenerator was replaced by TextIOPageGenerator
 * PreloadingItemGenerator was replaced by PreloadingEntityGenerator
-* DuplicateFilterPageGenerator was replaced by tools.filter_unique
+* DuplicateFilterPageGenerator was replaced by :func:`tools.itertools.filter_unique`
 * ItemPage.concept_url method was replaced by ItemPage.concept_uri
 * Outdated parameter names has been dropped
 * Deprecated pywikibot.Error exception were removed in favour of pywikibot.exceptions.Error classes (:phab:`T280227`)
@@ -655,7 +681,7 @@ Other changes
 * version.get_module_version() is deprecated and gives no meaningfull result
 * Fix version.get_module_filename() and update log lines (:phab:`T264235`)
 * Re-enable printing log header (:phab:`T264235`)
-* Fix result of tools.intersect_generators() (:phab:`T263947`)
+* Fix result of :func:`tools.itertools.intersect_generators` (:phab:`T263947`)
 * Only show _GLOBAL_HELP options if explicitly wanted
 * Deprecated Family.version() methods were removed
 * Unused parameters of page methods like forceReload, insite, throttle, step was removed
@@ -768,6 +794,8 @@ Other changes
 3.0.20200703
 ------------
 
+*3 July 2020*
+
 * Page.botMayEdit() method was improved (:phab:`T253709`)
 * PageNotFound, SpamfilterError, UserActionRefuse exceptions were removed (:phab:`T253681`)
 * tools.ip submodule has been removed (:phab:`T243171`)
@@ -783,6 +811,8 @@ Other changes
 3.0.20200609
 ------------
 
+*9 June 2020*
+
 * Fix page_can_be_edited for MediaWiki < 1.23 (:phab:`T254623`)
 * Show global options with pwb.py -help
 * Usage of SkipPageError with BaseBot has been removed
@@ -797,6 +827,8 @@ Other changes
 
 3.0.20200508
 ------------
+
+*8 May 2020*
 
 * Unify and extend formats for setting sitelinks (:phab:`T225863`, :phab:`T251512`)
 * Do not return a random i18n.translation() result (:phab:`T220099`)
@@ -815,6 +847,8 @@ Other changes
 3.0.20200405
 ------------
 
+*5 April 2020*
+
 * Fix regression of combining sys.path in pwb.py wrapper (:phab:`T249427`)
 * Site and Page methods deprecated for 10 years or longer are desupported and may be removed (:phab:`T106121`)
 * Usage of SkipPageError with BaseBot is desupported and may be removed
@@ -828,6 +862,9 @@ Other changes
 
 3.0.20200326
 ------------
+
+*26 March 2020*
+
 * site.py and page.py files were moved to their own folders and will be split in the future
 * Refactor data attributes of Wikibase entities (:phab:`T233406`)
 * Functions dealing with stars list are desupported and may be removed
@@ -852,6 +889,8 @@ Other changes
 
 3.0.20200306
 ------------
+
+*6 March 2020*
 
 * Fix mul Wikisource aliases (:phab:`T242537`, :phab:`T241413`)
 * Let Site('test', 'test) be equal to Site('test', 'wikipedia') (:phab:`T228839`)
@@ -880,6 +919,8 @@ Other changes
 
 3.0.20200111
 ------------
+
+*11 January 2020*
 
 * Fix broken get_version() in setup.py (:phab:`T198374`)
 * Rewrite site.log_page/site.unlock_page implementation
@@ -920,6 +961,8 @@ Other changes
 3.0.20190722
 ------------
 
+*22 July 2019*
+
 * Increase the throttling delay if maxlag >> retry-after (:phab:`T210606`)
 * deprecate test_family: Site('test', 'test'), use wikipedia_family: Site('test', 'wikipedia') instead (:phab:`T228375`, :phab:`T228300`)
 * Add "user_agent_description" option in config.py
@@ -956,6 +999,8 @@ Other changes
 3.0.20190430
 ------------
 
+*30 April 2019*
+
 * Unicode literals are required for all scripts; the usage of ASCII bytes may fail (:phab:`T219095`)
 * Don't fail if the number of forms of a plural string is less than required (:phab:`T99057`, :phab:`T219097`)
 * Implement create_short_link Page method to use Extension:UrlShortener (:phab:`T220876`)
@@ -970,6 +1015,9 @@ Other changes
 
 3.0.20190301
 ------------
+
+*1 March 2019*
+
 * Fix version comparison (:phab:`T164163`)
 * Remove pre MediaWiki 1.14 code
 * Dropped support for Python 2.7.2 and 2.7.3 (:phab:`T191192`)
@@ -983,6 +1031,8 @@ Other changes
 3.0.20190204
 ------------
 
+*4 February 2019*
+
 * Support python version 3.7
 * pagegenerators.py: add -querypage parameter to yield pages provided by any special page (:phab:`T214234`)
 * Fix comparison of str, bytes and int literal
@@ -993,6 +1043,8 @@ Other changes
 
 3.0.20190106
 ------------
+
+*6 January 2019*
 
 * Ensure "modules" parameter of ParamInfo._fetch is a set (:phab:`T122763`)
 * Support adding new claims with qualifiers and/or references (:phab:`T112577`, :phab:`T170432`)
@@ -1007,6 +1059,8 @@ Other changes
 
 3.0.20181203
 ------------
+
+*3 December 2018*
 
 * Remove compat module references from autogenerated docs (:phab:`T183085`)
 * site.preloadpages: split pagelist in most max_ids elements (:phab:`T209111`)
@@ -1028,6 +1082,8 @@ Other changes
 
 3.0.20180922
 ------------
+
+*22 September 2018*
 
 * Enable multiple streams for EventStreams (:phab:`T205114`)
 * Fix Wikibase aliases handling (:phab:`T194512`)
@@ -1051,6 +1107,8 @@ Other changes
 
 3.0.20180823
 ------------
+
+*23 August 2018*
 
 * Don't reset Bot._site to None if we have already a site object (:phab:`T125046`)
 * pywikibot.site.Siteinfo: Fix the bug in cache_time when loading a CachedRequest (:phab:`T202227`)
@@ -1077,6 +1135,8 @@ Other changes
 3.0.20180710
 ------------
 
+*10 July 2018*
+
 * Enable any LogEntry subclass for each logevent type (:phab:`T199013`)
 * Deprecated pagegenerators options -<logtype>log aren't supported any longer (:phab:`T199013`)
 * Open RotatingFileHandler with utf-8 encoding (:phab:`T188231`)
@@ -1093,6 +1153,8 @@ Other changes
 
 3.0.20180603
 ------------
+
+*3 June 2018*
 
 * Move main categories to top in cosmetic_changes
 * shell.py always imports pywikibot as default
@@ -1116,6 +1178,8 @@ Other changes
 3.0.20180505
 ------------
 
+*5 May 2018*
+
 * Enable makepath and datafilepath not to create the directory
 * Use API's retry-after value (:phab:`T144023`)
 * Provide startprefix parameter for Category.articles() (:phab:`T74101`, :phab:`T143120`)
@@ -1128,6 +1192,8 @@ Other changes
 3.0.20180403
 ------------
 
+*3 April 2018*
+
 * Deprecation warning: support for Python 2.7.2 and 2.7.3 will be dropped (:phab:`T191192`)
 * Dropped support for Python 2.6 (:phab:`T154771`)
 * Dropped support for Python 3.3 (:phab:`T184508`)
@@ -1137,11 +1203,15 @@ Other changes
 3.0.20180304
 ------------
 
+*4 March 2018*
+
 * Bugfixes and improvements
 * Localisation updates
 
 3.0.20180302
 ------------
+
+*2 March 2018*
 
 * Changed requirements for requests and sseclient
 * Bugfixes and improvements
@@ -1150,6 +1220,8 @@ Other changes
 3.0.20180204
 ------------
 
+*4 February 2018*
+
 * Deprecation warning: support for py2.6 and py3.3 will be dropped
 * Changed requirements for cryprography, Pillow and pyOpenSSL
 * Bugfixes and improvements
@@ -1157,6 +1229,8 @@ Other changes
 
 3.0.20180108
 ------------
+
+*8 January 2018*
 
 * Maintenance script to download Wikimedia database dump
 * Option to auto-create accounts when logging in
@@ -1167,6 +1241,8 @@ Other changes
 
 3.0.20171212
 ------------
+
+*12 December 2017*
 
 * Introduce userscripts directory
 * Generator settings inside (user-)fixes.py
@@ -1180,11 +1256,15 @@ Other changes
 3.0.20170801
 ------------
 
+*1 August 2017*
+
 * Bugfixes and improvements
 * Localisation updates
 
 3.0.20170713
 ------------
+
+*13 July 2017*
 
 * Deprecate APISite.newfiles()
 * Inverse of pagegenerators -namespace option
@@ -1244,6 +1324,8 @@ Updates
 3.0.20170521
 ------------
 
+*21 May 2017*
+
 * Support for Python 2.6 but higher releases are strictly recommended
 * Bugfixes and improvements
 * Localisation updates
@@ -1296,6 +1378,8 @@ Updates
 
 3.0.20170403
 ------------
+
+*3 April 2017*
 
 * First major release from master branch
 * requests package is mandatory
@@ -1537,8 +1621,6 @@ Other changes include:
 
 *30 November 2014*
 
-Major changes include:
-
 * Library initialisation no longer connects to servers
 * generate_user_files.py rewritten
 * API Version 1.14 support
@@ -1575,6 +1657,9 @@ Major changes include:
 
 1.0 rv 2007-06-19
 -----------------
+
+*19 June 2007*
+
 * BeautifulSoup becomes mandatory
 * new scripts were added
 * new family files were supported

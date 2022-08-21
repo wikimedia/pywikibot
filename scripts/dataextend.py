@@ -82,7 +82,7 @@ from pywikibot.exceptions import (
     NoPageError,
     OtherPageSaveError,
 )
-from pywikibot.tools import DequeGenerator
+from pywikibot.tools.collections import DequeGenerator
 
 
 class DataExtendBot(SingleSiteBot):

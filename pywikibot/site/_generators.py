@@ -25,12 +25,8 @@ from pywikibot.exceptions import (
 )
 from pywikibot.site._decorators import need_right, need_version
 from pywikibot.site._namespace import NamespaceArgType
-from pywikibot.tools import (
-    filter_unique,
-    is_ip_address,
-    issue_deprecation_warning,
-    itergroup,
-)
+from pywikibot.tools import is_ip_address, issue_deprecation_warning
+from pywikibot.tools.itertools import filter_unique, itergroup
 
 
 class GeneratorsMixin:
@@ -97,7 +93,8 @@ class GeneratorsMixin:
         groupsize: int = 50,
         templates: bool = False,
         langlinks: bool = False,
-        pageprops: bool = False
+        pageprops: bool = False,
+        content: bool = True
     ):
         """Return a generator to a list of preloaded pages.
 
@@ -111,6 +108,7 @@ class GeneratorsMixin:
         :param langlinks: preload all language links from the provided pages
             to other languages
         :param pageprops: preload various properties defined in page content
+        :param content: preload page content
         """
         props = 'revisions|info|categoryinfo'
         if templates:
@@ -144,7 +142,7 @@ class GeneratorsMixin:
                 rvgen.request['pageids'] = set(pageids)
             else:
                 rvgen.request['titles'] = list(cache.keys())
-            rvgen.request['rvprop'] = self._rvprops(content=True)
+            rvgen.request['rvprop'] = self._rvprops(content=content)
             pywikibot.output('Retrieving {} pages from {}.'
                              .format(len(cache), self))
 
@@ -1751,8 +1749,6 @@ class GeneratorsMixin:
         return self._generator(api.PageGenerator, type_arg='random',
                                namespaces=namespaces, total=total,
                                g_content=content, **params)
-
-    # TODO: implement undelete
 
     _patrol_errors = {
         'nosuchrcid': 'There is no change with rcid {rcid}',

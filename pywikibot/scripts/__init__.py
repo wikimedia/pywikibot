@@ -5,11 +5,16 @@ pywikibot i18n package are copied here.
 
 .. versionadded:: 7.0
 """
+#
+# (C) Pywikibot team, 2021-2022
+#
+# Distributed under the terms of the MIT license
+#
 from os import environ, getenv
 
 
 def _import_with_no_user_config(*import_args):
-    """Return __import__(*import_args) without loading user-config.py.
+    """Return ``__import__(*import_args)`` without loading user-config.py.
 
     .. versionadded:: 3.0
     .. versionchanged:: 7.0

@@ -103,8 +103,61 @@ class TestCategoryObject(TestCase):
         self.assertIn(c1, subcategories)
         self.assertNotIn(c2, subcategories)
 
+        cat = pywikibot.Category(site, 'Category:Wikipedians by gender')
         subcategories_total = list(cat.subcategories(total=2))
         self.assertLength(subcategories_total, 2)
+
+    def test_subcategories_cache_length(self):
+        """Test the subcategories cache length."""
+        site = self.get_site()
+
+        # test cache is valid only if all members of cat are iterated.
+        cat = pywikibot.Category(site, 'Category:Wikipedians by gender')
+        subcategories = list(cat.subcategories(total=2))
+        self.assertLength(subcategories, 2)
+        self.assertFalse(hasattr(cat, '_subcats'))
+
+        subcategories = list(cat.subcategories())
+        self.assertGreater(len(subcategories), 2)
+        self.assertTrue(hasattr(cat, '_subcats'))
+
+        # new cat, no cached data.
+        cat = pywikibot.Category(site, 'Category:Wikipedians by gender')
+
+        # cache not available yet due to partial iteration.
+        gen = cat.subcategories()
+        _ = next(gen)
+        self.assertFalse(hasattr(cat, '_subcats'))
+
+        # cache available.
+        _ = list(gen)
+        self.assertTrue(hasattr(cat, '_subcats'))
+
+    def test_subcategories_cache_content(self):
+        """Test the subcategories cache content."""
+        site = self.get_site()
+        cat = pywikibot.Category(site, 'Category:Wikipedians by gender')
+
+        subcategories = list(cat.subcategories(content=False))
+        cache_id_1 = id(cat._subcats)
+        cache_len_1 = len(subcategories)
+        subcat = subcategories[0]
+        self.assertFalse(subcat.has_content())
+
+        # toggle content.
+        subcategories = list(cat.subcategories(content=True))
+        cache_len_2 = len(subcategories)
+        cache_id_2 = id(cat._subcats)
+        subcat = subcategories[0]
+        self.assertTrue(subcat.has_content())
+        # cache reloaded.
+        self.assertNotEqual(cache_id_1, cache_id_2)
+        self.assertTrue(cache_len_1, cache_len_2)
+
+        # cache not reloaded.
+        _ = list(cat.subcategories(content=True))
+        cache_id_3 = id(cat._subcats)
+        self.assertEqual(cache_id_2, cache_id_3)
 
     def test_subcategories_recurse(self):
         """Test the subcategories method with recurse=True."""

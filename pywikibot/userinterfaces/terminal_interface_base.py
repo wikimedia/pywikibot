@@ -61,7 +61,7 @@ class UI(ABUIC):
 
     .. versionchanged:: 6.2:
        subclassed from
-       :py:obj:`pywikibot.userinterfaces._interface_base.ABUIC`
+       :py:obj:`userinterfaces._interface_base.ABUIC`
     """
 
     split_col_pat = re.compile(r'(\w+);?(\w+)?')
@@ -359,7 +359,7 @@ class UI(ABUIC):
             an answer.
         :param force: Automatically use the default
         """
-        assert(not password or not default)
+        assert not password or not default
 
         question = question.strip()
         end_marker = question[-1]

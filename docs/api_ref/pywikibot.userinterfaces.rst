@@ -1,51 +1,59 @@
-userinterfaces package
-======================
+:mod:`userinterfaces` package
+=============================
 
-.. automodule:: pywikibot.userinterfaces
+.. automodule:: userinterfaces
+   :synopsis: User interfaces module
 
-\_interface\_base module
-------------------------
+:mod:`\_interface\_base` module
+-------------------------------
 
-.. automodule:: pywikibot.userinterfaces._interface_base
+.. automodule:: userinterfaces._interface_base
+   :synopsis: Abstract base user interface module
 
-terminal\_interface module
---------------------------
-
-.. automodule:: pywikibot.userinterfaces.terminal_interface
-
-terminal\_interface\_base module
---------------------------------
-
-.. automodule:: pywikibot.userinterfaces.terminal_interface_base
-
-terminal\_interface\_unix module
---------------------------------
-
-.. automodule:: pywikibot.userinterfaces.terminal_interface_unix
-
-terminal\_interface\_win32 module
+:mod:`terminal\_interface` module
 ---------------------------------
 
-.. automodule:: pywikibot.userinterfaces.terminal_interface_win32
+.. automodule:: userinterfaces.terminal_interface
+   :synopsis: Platform independent terminal interface module
 
-buffer\_interface module
-------------------------
+:mod:`terminal\_interface\_base` module
+---------------------------------------
 
-.. automodule:: pywikibot.userinterfaces.buffer_interface
+.. automodule:: userinterfaces.terminal_interface_base
+   :synopsis: Base for terminal user interfaces
 
-gui module
-----------
+:mod:`terminal\_interface\_unix` module
+---------------------------------------
 
-.. automodule:: pywikibot.userinterfaces.gui
+.. automodule:: userinterfaces.terminal_interface_unix
+   :synopsis: User interface for Unix terminals
 
-transliteration module
-----------------------
+:mod:`terminal\_interface\_win32` module
+----------------------------------------
 
-.. automodule:: pywikibot.userinterfaces.transliteration
+.. automodule:: userinterfaces.terminal_interface_win32
+   :synopsis: User interface for Win32 terminals
 
-win32\_unicode module
----------------------
+:mod:`buffer\_interface` module
+-------------------------------
 
-.. automodule:: pywikibot.userinterfaces.win32_unicode
+.. automodule:: userinterfaces.buffer_interface
+   :synopsis: Non-interactive interface that stores output
 
+:mod:`gui` module
+-----------------
 
+.. automodule:: userinterfaces.gui
+   :synopsis: A window with a textfield where the user can edit
+
+:mod:`transliteration` module
+-----------------------------
+
+.. automodule:: userinterfaces.transliteration
+   :synopsis: Module to transliterate text
+
+:mod:`win32\_unicode` module
+----------------------------
+
+.. automodule:: userinterfaces.win32_unicode
+   :synopsis: Unicode support for stdout, stderr and argv with Python 3.5.

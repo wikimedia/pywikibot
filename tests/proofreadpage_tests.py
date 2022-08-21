@@ -297,7 +297,7 @@ class TestProofreadPageValidSite(TestCase):
         rvgen.set_maximum_items(-1)  # suppress use of rvlimit parameter
 
         try:
-            pagedict = next(iter(rvgen))
+            pagedict = next(rvgen)
             loaded_text = pagedict.get('revisions')[0].get('*')
         except (StopIteration, TypeError, KeyError, ValueError, IndexError):
             loaded_text = ''

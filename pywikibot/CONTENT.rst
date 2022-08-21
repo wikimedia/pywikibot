@@ -54,8 +54,6 @@ The contents of the package
     | login.py                   | Log in to an account on your "home" wiki, or check   |
     |                            | login status                                         |
     +----------------------------+------------------------------------------------------+
-    | pagegenerators.py          | Generator pages                                      |
-    +----------------------------+------------------------------------------------------+
     | plural.py                  | Module containing plural rules of various languages  |
     +----------------------------+------------------------------------------------------+
     | proofreadpage.py           | Objects representing objects used with ProofreadPage |
@@ -137,6 +135,15 @@ The contents of the package
     | _wikibase.py               | Objects representing wikibase structures             |
     +----------------------------+------------------------------------------------------+
 
+    +----------------------------+------------------------------------------------------+
+    | pagegenerators             | Page generators module                               |
+    +============================+======================================================+
+    | _factory.py                | Generator factory class to handle options            |
+    +----------------------------+------------------------------------------------------+
+    | _filter.py                 | Filter functions                                     |
+    +----------------------------+------------------------------------------------------+
+    | _generators.py             | Generator functions                                  |
+    +----------------------------+------------------------------------------------------+
 
     +----------------------------+------------------------------------------------------+
     | scripts                    | Framework helper scripts and entry points            |
@@ -215,12 +222,16 @@ The contents of the package
     +----------------------------+------------------------------------------------------+
     | _unidata.py                | Helper function which holds data from unicodedata    |
     +----------------------------+------------------------------------------------------+
-    | chars.py                   | Character based helper functions(not wiki-dependent) |
+    | chars.py                   | Character based helper functions                     |
+    +----------------------------+------------------------------------------------------+
+    | collections.py             | Collections datatypes                                |
     +----------------------------+------------------------------------------------------+
     | djvu.py                    | Wrapper around djvulibre to access djvu properties   |
     |                            | and content                                          |
     +----------------------------+------------------------------------------------------+
     | formatter.py               | Various formatting related utilities                 |
+    +----------------------------+------------------------------------------------------+
+    | itertools.py               | Iterator functions                                   |
     +----------------------------+------------------------------------------------------+
 
 

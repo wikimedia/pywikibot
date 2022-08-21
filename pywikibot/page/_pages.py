@@ -10,15 +10,16 @@ Various Wikibase pages are defined in ``page._wikibase.py``,
 various pages for Proofread Extensions are defined in
 ``pywikibot.proofreadpage``.
 
-..note:: `Link` objects represent a wiki-page's title, while
-  :class:`pywikibot.Page` objects (defined here) represent the page
-  itself, including its contents.
+.. note:: `Link` objects represent a wiki-page's title, while
+   :class:`pywikibot.Page` objects (defined here) represent the page
+   itself, including its contents.
 """
 #
 # (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
+import itertools
 import re
 from collections import Counter, defaultdict
 from contextlib import suppress
@@ -400,6 +401,16 @@ class BasePage(ComparableMixin):
                 raise
 
         return self.latest_revision.text
+
+    def has_content(self) -> bool:
+        """
+        Page has been loaded.
+
+        Not existing pages are considered loaded.
+
+        .. versionadded:: 7.6
+        """
+        return not self.exists() or self._latest_cached_revision() is not None
 
     def _latest_cached_revision(self):
         """Get the latest revision if cached and has text, otherwise None."""
@@ -1223,7 +1234,7 @@ class BasePage(ComparableMixin):
         if not summary:
             summary = config.default_edit_summary
 
-        if isinstance(watch, bool):
+        if isinstance(watch, bool):  # pragma: no cover
             issue_deprecation_warning(
                 'boolean watch parameter',
                 '"watch", "unwatch", "preferences" or "nochange" value',
@@ -1420,7 +1431,7 @@ class BasePage(ComparableMixin):
         """
         # Deprecate positional arguments and synchronize with Site.pagelinks
         keys = ('namespaces', 'total', 'content')
-        for i, arg in enumerate(args):
+        for i, arg in enumerate(args):  # pragma: no cover
             key = keys[i]
             issue_deprecation_warning(
                 'Positional argument {} ({})'.format(i + 1, arg),
@@ -1528,6 +1539,12 @@ class BasePage(ComparableMixin):
         :param content: bool
         """
         # Data might have been preloaded
+        # Delete cache if content is needed and elements have no content
+        if (hasattr(self, '_templates')
+                and content
+                and not all(t.has_content() for t in self._templates)):
+            del self._templates
+
         if not hasattr(self, '_templates'):
             self._templates = list(self.itertemplates(content=content))
 
@@ -1549,7 +1566,8 @@ class BasePage(ComparableMixin):
         :param content: bool
         """
         if hasattr(self, '_templates'):
-            return iter(self._templates)
+            return itertools.islice(self.templates(content=content), total)
+
         return self.site.pagetemplates(self, total=total, content=content)
 
     def imagelinks(self, total: Optional[int] = None, content: bool = False):
@@ -2145,9 +2163,10 @@ class Page(BasePage):
     @property
     @cached
     def raw_extracted_templates(self):
-        """
-        Extract templates using :py:obj:`textlib.extract_templates_and_params`.
+        """Extract templates and parameters.
 
+        This method is using
+        :func:`textlib.extract_templates_and_params`.
         Disabled parts and whitespace are stripped, except for
         whitespace in anonymous positional arguments.
 
@@ -2156,13 +2175,11 @@ class Page(BasePage):
         return textlib.extract_templates_and_params(self.text, True, True)
 
     def templatesWithParams(self):
-        """
-        Return templates used on this Page.
+        """Return templates used on this Page.
 
-        The templates are extracted by
-        :py:obj:`textlib.extract_templates_and_params`, with positional
-        arguments placed first in order, and each named argument
-        appearing as 'name=value'.
+        The templates are extracted by :meth:`raw_extracted_templates`,
+        with positional arguments placed first in order, and each named
+        argument appearing as 'name=value'.
 
         All parameter keys and values for each template are stripped of
         whitespace.
@@ -2375,15 +2392,23 @@ class Category(Page):
         :param content: if True, retrieve the content of the current version
             of each category description page (default False)
         """
+
+        def is_cache_valid(cache: dict, content: bool) -> bool:
+            return cache['content'] or not content
+
+        if not self.categoryinfo['subcats']:
+            return
+
         if not isinstance(recurse, bool) and recurse:
             recurse = recurse - 1
 
-        if not hasattr(self, '_subcats'):
-            self._subcats = []
-            for member in self.site.categorymembers(
+        if (not hasattr(self, '_subcats')
+                or not is_cache_valid(self._subcats, content)):
+            cache = {'data': [], 'content': content}
+
+            for subcat in self.site.categorymembers(
                     self, member_type='subcat', total=total, content=content):
-                subcat = Category(member)
-                self._subcats.append(subcat)
+                cache['data'].append(subcat)
                 yield subcat
                 if total is not None:
                     total -= 1
@@ -2400,8 +2425,11 @@ class Category(Page):
                         total -= 1
                         if total == 0:
                             return
+            else:
+                # cache is valid only if all subcategories are fetched (T88217)
+                self._subcats = cache
         else:
-            for subcat in self._subcats:
+            for subcat in self._subcats['data']:
                 yield subcat
                 if total is not None:
                     total -= 1

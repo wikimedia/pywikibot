@@ -160,7 +160,7 @@ class Uploader:
         :return: Whether the upload was successful.
         """
         # An offset != 0 doesn't make sense without a file key
-        assert(offset == 0 or file_key is not None)
+        assert offset == 0 or file_key is not None
 
         if report_success is None:
             report_success = isinstance(ignore_warnings, bool)
@@ -359,8 +359,8 @@ class Uploader:
                         # Polls may not contain file key in response
                         file_key = data.get('filekey', file_key)
                         if data['result'] == 'Warning':
-                            assert('warnings' in data
-                                   and not ignore_all_warnings)
+                            assert ('warnings' in data
+                                    and not ignore_all_warnings)
                             if callable(ignore_warnings):
                                 restart = False
                                 if 'offset' not in data:

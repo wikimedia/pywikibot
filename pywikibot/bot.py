@@ -415,7 +415,7 @@ def init_handlers() -> None:
         # give up infinite rotating file handler with logfilecount of -1;
         # set it to 999 and use the standard implementation
         max_count = config.logfilecount
-        if max_count == -1:
+        if max_count == -1:  # pragma: no cover
             max_count = 999
             issue_deprecation_warning('config.logfilecount with value -1',
                                       'any positive number',
@@ -1219,7 +1219,7 @@ class BaseBot(OptionHandler):
     implemented by subclasses.
 
     Each item processed by :meth:`treat` must be a
-    :class:`pywikibot.page.BasePage` type. Use :meth:`init_page` to
+    :class:`page.BasePage` type. Use :meth:`init_page` to
     upcast the type. To enable other types, set
     :attr:`BaseBot.treat_page_type` to an appropriate type; your bot
     should derive from :class:`BaseBot` in that case and handle site
@@ -1606,7 +1606,7 @@ class BaseBot(OptionHandler):
         """Process one page (abstract method).
 
         :param page: Object to be processed, usually a
-            :class:`pywikibot.page.BasePage`. For other page types the
+            :class:`page.BasePage`. For other page types the
             :attr:`treat_page_type` must be set.
         """
         raise NotImplementedError('Method {}.treat() not implemented.'
@@ -1642,6 +1642,8 @@ class BaseBot(OptionHandler):
                                       .format(self.__class__.__name__))
         if not isinstance(self.generator, Generator):
             # to provide close() method
+            pywikibot.info('wrapping {} type to a Generator type'
+                           .format(type(self.generator).__name__))
             self.generator = (item for item in self.generator)
         try:
             for item in self.generator:
@@ -1951,7 +1953,7 @@ class AutomaticTWSummaryBot(CurrentPageBot):
     A class which automatically defines ``summary`` for ``put_current``.
 
     The class must defined a ``summary_key`` string which contains the
-    i18n key for :py:obj:`pywikibot.i18n.twtranslate`. It can also
+    i18n key for :py:obj:`i18n.twtranslate`. It can also
     override the ``summary_parameters`` property to specify any
     parameters for the translated message.
     """
@@ -2034,7 +2036,7 @@ class CreatingPageBot(CurrentPageBot):
         return super().skip_page(page)
 
 
-class RedirectPageBot(CurrentPageBot):
+class RedirectPageBot(CurrentPageBot):  # pragma: no cover
 
     """A RedirectPageBot class which only treats redirects.
 
@@ -2060,7 +2062,7 @@ class RedirectPageBot(CurrentPageBot):
         return super().skip_page(page)
 
 
-class NoRedirectPageBot(CurrentPageBot):
+class NoRedirectPageBot(CurrentPageBot):  # pragma: no cover
 
     """A NoRedirectPageBot class which only treats non-redirects.
 
@@ -2263,7 +2265,7 @@ class WikidataBot(Bot, ExistingPageBot):
         Before adding a new claim, it checks if we can add it, using provided
         filters.
 
-        ..seealso:: documentation of :py:obj:`claimit.py<scripts.claimit>`
+        .. seealso:: documentation of :py:obj:`claimit.py<scripts.claimit>`
 
         :param exists_arg: pattern for merging existing claims with new ones
         :param logger_callback: function logging the output of the method

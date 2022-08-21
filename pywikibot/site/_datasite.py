@@ -22,7 +22,8 @@ from pywikibot.exceptions import (
 )
 from pywikibot.site._apisite import APISite
 from pywikibot.site._decorators import need_extension, need_right, need_version
-from pywikibot.tools import itergroup, merge_unique_dicts, remove_last_args
+from pywikibot.tools import merge_unique_dicts, remove_last_args
+from pywikibot.tools.itertools import itergroup
 
 
 __all__ = ('DataSite', )
@@ -298,17 +299,18 @@ class DataSite(APISite):
         return req.submit()
 
     @need_right('edit')
-    def addClaim(self, entity, claim, bot: bool = True, summary=None) -> None:
+    def addClaim(self,
+                 entity: 'pywikibot.page.WikibaseEntity',
+                 claim: 'pywikibot.page.Claim',
+                 bot: bool = True,
+                 summary: Optional[str] = None) -> None:
         """
         Add a claim.
 
         :param entity: Entity to modify
-        :type entity: WikibaseEntity
         :param claim: Claim to be added
-        :type claim: pywikibot.Claim
         :param bot: Whether to mark the edit as a bot edit
         :param summary: Edit summary
-        :type summary: str
         """
         claim.snak = entity.getID() + '$' + str(uuid.uuid4())
         params = {'action': 'wbsetclaim',
@@ -358,15 +360,15 @@ class DataSite(APISite):
         return req.submit()
 
     @need_right('edit')
-    def save_claim(self, claim, summary=None, bot: bool = True):
+    def save_claim(self, claim: 'pywikibot.page.Claim',
+                   summary: Optional[str] = None,
+                   bot: bool = True):
         """
         Save the whole claim to the wikibase site.
 
         :param claim: The claim to save
-        :type claim: pywikibot.Claim
         :param bot: Whether to mark the edit as a bot edit
         :param summary: Edit summary
-        :type summary: str
         """
         if claim.isReference or claim.isQualifier:
             raise NotImplementedError
@@ -744,18 +746,25 @@ class DataSite(APISite):
         try:
             data = req.submit()
         except APIError as e:
-            if e.code == 'wikibase-parse-error-quantity':
+            if e.code.startswith('wikibase-parse-error'):
+                for err in e.other['results']:
+                    if 'error' in err:
+                        pywikibot.error('{error-info} for value {raw!r}, '
+                                        '{expected-format!r} format expected'
+                                        .format_map(err))
                 raise ValueError(e) from None
             raise
+
         if 'results' not in data:
-            raise ValueError('Parsing via wikibase wbparsevalue failed.')
+            raise RuntimeError("Unexpected missing 'results' in query data\n{}"
+                               .format(data))
 
         results = []
         for result_hash in data['results']:
             if 'value' not in result_hash:
-                raise ValueError(
-                    'Parsing via wikibase wbparsevalue failed: {}'
-                    .format(result_hash['error-info']))
+                # There should be an APIError occurred already
+                raise RuntimeError("Unexpected missing 'value' in query data:"
+                                   '\n{}'.format(result_hash))
             results.append(result_hash['value'])
         return results
 
@@ -768,31 +777,39 @@ class DataSite(APISite):
         Supported actions are:
             wbsetaliases, wbsetdescription, wbsetlabel and wbsetsitelink
 
+        wbsetaliases:
+            dict shall have the following structure:
+
+            .. code-block::
+
+               {
+                   'language': value (str),
+                   'add': list of language codes (str),
+                   'remove': list of language codes (str),
+                   'set' list of language codes (str)
+                }
+
+            'add' and 'remove' are alternative to 'set'
+
+        wbsetdescription and wbsetlabel:
+            dict shall have keys 'language', 'value'
+
+        wbsetsitelink:
+            dict shall have keys 'linksite', 'linktitle' and
+            optionally 'badges'
+
         :param itemdef: Entity to modify or create
         :type itemdef: str, WikibaseEntity or Page connected to such item
         :param action: wbset{action} to perform:
             'wbsetaliases', 'wbsetdescription', 'wbsetlabel', 'wbsetsitelink'
         :param action_data: data to be used in API request, see API help
         :type action_data: SiteLink or dict
-            wbsetaliases:
-                dict shall have the following structure:
-                {'language': value (str),
-                 'add': list of language codes (str),
-                 'remove': list of language codes (str),
-                 'set' list of language codes (str)
-                  }
-                'add' and 'remove' are alternative to 'set'
-            wbsetdescription and wbsetlabel:
-                dict shall have keys 'language', 'value'
-            wbsetsitelink:
-                dict shall have keys 'linksite', 'linktitle' and
-                optionally 'badges'
         :keyword bot: Whether to mark the edit as a bot edit, default is True
         :type bot: bool
         :keyword tags: Change tags to apply with the edit
         :type tags: list of str
         :return: query result
-        :raises AssertionError, TypeError
+        :raises: AssertionError, TypeError
         """
         def format_sitelink(sitelink):
             """Convert SiteLink to a dict accepted by wbsetsitelink API."""

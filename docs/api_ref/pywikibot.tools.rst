@@ -1,29 +1,47 @@
-tools package
-=============
+:mod:`tools` package
+====================
 
-.. automodule:: pywikibot.tools
+.. automodule:: tools
+   :synopsis: Miscellaneous helper functions (not wiki-dependent)
 
-tools.chars module
-------------------
+:mod:`tools.chars` module
+-------------------------
 
-.. automodule:: pywikibot.tools.chars
+.. automodule:: tools.chars
+   :synopsis: Character based helper functions (not wiki-dependent)
 
-tools.deprecate module
-----------------------
+:mod:`tools.collections` module
+-------------------------------
 
-.. automodule:: pywikibot.tools._deprecate
+.. automodule:: tools.collections
+   :synopsis: Collections datatypes
 
-tools.djvu module
------------------
+:mod:`tools.deprecate` module
+-----------------------------
 
-.. automodule:: pywikibot.tools.djvu
+.. automodule:: tools._deprecate
+   :synopsis: Module providing deprecation decorators
 
-tools.formatter module
-----------------------
+:mod:`tools.djvu` module
+------------------------
 
-.. automodule:: pywikibot.tools.formatter
+.. automodule:: tools.djvu
+   :synopsis: Wrapper around djvulibre to access djvu files properties and content
 
-tools.\_logging module
-----------------------
+:mod:`tools.formatter` module
+-----------------------------
 
-.. automodule:: pywikibot.tools._logging
+.. automodule:: tools.formatter
+   :synopsis: Module containing various formatting related utilities
+
+:mod:`tools.itertools` module
+-----------------------------
+
+.. automodule:: tools.itertools
+   :synopsis: Iterator functions
+
+:mod:`tools.\_logging` module
+-----------------------------
+
+.. automodule:: tools._logging
+   :synopsis: Logging tools

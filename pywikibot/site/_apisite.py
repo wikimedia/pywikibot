@@ -56,9 +56,9 @@ from pywikibot.site._extensions import (
     LinterMixin,
     PageImagesMixin,
     ProofreadPageMixin,
+    TextExtractsMixin,
     ThanksFlowMixin,
     ThanksMixin,
-    TextExtractsMixin,
     UrlShortenerMixin,
     WikibaseClientMixin,
 )
@@ -69,8 +69,8 @@ from pywikibot.site._siteinfo import Siteinfo
 from pywikibot.site._tokenwallet import TokenWallet
 from pywikibot.site._upload import Uploader
 from pywikibot.tools import (
-    cached,
     MediaWikiVersion,
+    cached,
     deprecated,
     merge_unique_dicts,
     normalize_username,
@@ -366,6 +366,7 @@ class APISite(
         try:
             del self.userinfo  # force reload
             if self.userinfo['name'] == self.user():
+                self._loginstatus = _LoginStatus.AS_USER
                 return
 
         # May occur if you are not logged in (no API read permissions).
@@ -508,7 +509,7 @@ class APISite(
     def userinfo(self) -> None:
         """Delete cached userinfo.
 
-        ..versionadded:: 5.5
+        .. versionadded:: 5.5
         """
         if hasattr(self, '_userinfo'):
             del self._userinfo
@@ -580,7 +581,7 @@ class APISite(
     def globaluserinfo(self) -> None:
         """Delete cached globaluserinfo of current user.
 
-        ..versionadded:: 7.0
+        .. versionadded:: 7.0
         """
         username = self.username()
         assert username is not None
@@ -1548,7 +1549,7 @@ class APISite(
 
         .. seealso::
            - :api:`Parse`
-           - :meth:`pywikibot.page.BasePage.get_parsed_page`.
+           - :meth:`page.BasePage.get_parsed_page`.
         """
         req = self.simple_request(action='parse', page=page)
         data = req.submit()

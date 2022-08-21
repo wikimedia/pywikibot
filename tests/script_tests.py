@@ -76,6 +76,7 @@ script_input = {
 }
 
 auto_run_script_list = [
+    'archivebot',
     'blockpageschecker',
     'category_redirect',
     'checkimages',
@@ -99,6 +100,7 @@ auto_run_script_list = [
 # Some of these are not pretty, but at least they are informative
 # and not backtraces starting deep in the pywikibot package.
 no_args_expected_results = {
+    'archivebot': 'No template was specified, using default',
     # TODO: until done here, remember to set editor = None in user-config.py
     'change_pagelang': 'No -setlang parameter given',
     'checkimages': 'Execution time: 0 seconds',

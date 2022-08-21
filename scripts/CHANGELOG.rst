@@ -1,10 +1,55 @@
 Scripts Changelog
 =================
 
-7.5.0
+7.6.0
 -----
 
 *current release*
+
+archivebot
+~~~~~~~~~~
+
+* use ``User:MiszaBot/config`` as default template
+* raise MalformedConfigError if 'maxarchivesize' is 0 (:phab:`T313886`)
+* Preserve thread order in archive even if threads are archived later (:phab:`T312773`, :phab:`T314560`)
+* Skip the page if it does not exist
+* Fix for DiscussionPage.size() (:phab:`T313886`)
+* Decrease memory usage and improve processing speed
+
+interwiki
+~~~~~~~~~
+
+* Fix wrong Subject property
+
+pagefromfile
+~~~~~~~~~~~~
+
+* Derive PageFromFileReader from tools.collections.GeneratorWrapper
+
+7.5.2
+-----
+
+*26 July 2022*
+
+archivebot
+~~~~~~~~~~
+
+* Add localized "archive" variables  (:phab:`T71551`, :phab:`T313682`, :phab:`T313692`)
+
+7.5.1
+-----
+
+*24 July 2022*
+
+archivebot
+~~~~~~~~~~
+
+* Replace archive pattern fields to string conversion (:phab:`T313692`)
+
+7.5.0
+-----
+
+*22 July 2022*
 
 harvest_template
 ~~~~~~~~~~~~~~~~

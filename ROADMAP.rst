@@ -1,36 +1,39 @@
-Current release 7.5.0
+Current release 7.6.0
 ^^^^^^^^^^^^^^^^^^^^^
 
-* Add support for blkwiki (:phab:`T310875`)
-* L10N Updates
-* Fix duplicate source detection in :meth:`pywikibot.WikidataBot.user_add_claim_unless_exists`
-* :mod:`pywikibot.textlib`.tzoneFixedOffset class was renamed to :class:`pywikibot.time.TZoneFixedOffset`
-* Wrapper method :meth:`parsevalue()<pywikibot.site._datasite.DataSite.parsevalue>`
-  around wbparsevalue was added (:phab:`T112140`, :phab:`T312755`)
+* Add support for pcmwiki, guvwikt and bjnwikt (:phab:`T309059`, :phab:`T310882`, :phab:`T312217`)
+* support *not* loading text :meth:`site.APISite.preloadpages` (:phab:`T67163`)
+* :func:`textlib.TimeStripper.timestripper` removes HTML elements before searching for
+  timestamp in text (:phab:`T302496`)
+* backport :mod:`backports.pairwise()<backports>` from Python 3.10
 * L10N updates
-* Fix cp encodings in :func:`get_charset_from_content_type()
-  <pywikibot.comms.http.get_charset_from_content_type>` (:phab:`T312230`)
-* New :mod:`pywikibot.time` module with new functions in addition to `Timestamp`
-* :meth:`Page.revisions()<pywikibot.page.BasePage.revisions>` supports more formats/types for
-  starttime and endtime parameters, in addition to those allowed by
-  :meth:`Timestamp.fromISOformat()<pywikibot.Timestamp.fromISOformat>`.
-* New :meth:`Timestamp.set_timestamp()<pywikibot.Timestamp.set_timestamp>` method
-* Fully ISO8601 and POSIX format support with :class:`pywikibot.Timestamp`;
-  formats are compliant with MediaWiki supported formats
-* Handle asynchronous page_put_queue after KeyboardInterrupt in Python 3.9+ (:phab:`T311076`)
-* No longer expect a specific namespace alias in cosmetic_changes
-  :meth:`translateAndCapitalizeNamespaces
-  <pywikibot.cosmetic_changes.CosmeticChangesToolkit.translateAndCapitalizeNamespaces>`
+* Fix partial caching in :meth:`Category.subcategories()<page.Category.subcategories>` (:phab:`T88217`)
+* Method :meth:`Page.has_content()<page.BasePage.has_content>` was added (:phab:`T313736`)
+* Discard cache and reload it if cache was loaded without content and content is required
+  in :meth:`Page.templates()<page.BasePage.templates>` (:phab:`T313736`)
+* Add support for vikidia:oc
+* Exit loop in PageFromFileReader if match.end() <= 0 (:phab:`T313684`)
+* Allow Exception as parameter of pywikibot.exceptions.Error
+* Make :func:`GoogleSearchPageGenerator<pagegenerators.GoogleSearchPageGenerator>`
+  and :func:`PetScanPageGenerator<pagegenerators.PetScanPageGenerator>` a restartable
+  Generator (:phab:`T313681`, :phab:`T313683`)
+* Provide a :class:`collections.GeneratorWrapper<tools.collections.GeneratorWrapper>` 
+  class to start/restart a generator (:phab:`T301318`, :phab:`T312654`, :phab:`T312883`)
+* tools' itertools functions were moved to :mod:`tools.itertools` submodule
+* tools' collections classes were moved to :mod:`tools.collections` submodule
+* Set successful login status for the OAuth case (:phab:`T313571`)
+
 
 Deprecations
 ^^^^^^^^^^^^
 
+* 7.6.0: :mod:`tools.collections` datatypes should no longer imported from :mod:`pywikibot.tools`
 * 7.5.0: :mod:`pywikibot.textlib`.tzoneFixedOffset class will be removed in favour of :class:`pywikibot.time.TZoneFixedOffset`
 * 7.4.0: `FilePage.usingPages()` was renamed to :meth:`using_pages()<pywikibot.FilePage.using_pages>`
 * 7.2.0: ``tb`` parameter of :func:`exception()<pywikibot.exception>` function was renamed to ``exc_info``
 * 7.2.0: XMLDumpOldPageGenerator is deprecated in favour of a `content` parameter of `XMLDumpPageGenerator` (:phab:`T306134`)
-* 7.2.0: RedirectPageBot and NoRedirectPageBot bot classes are deprecated in favour of :attr:`use_redirects<pywikibot.bot.BaseBot.use_redirects>` attribute
-* 7.2.0: :func:`tools.formatter.color_format<pywikibot.tools.formatter.color_format>` is deprecated and will be removed
+* 7.2.0: RedirectPageBot and NoRedirectPageBot bot classes are deprecated in favour of :attr:`use_redirects<bot.BaseBot.use_redirects>` attribute
+* 7.2.0: :func:`tools.formatter.color_format<tools.formatter.color_format>` is deprecated and will be removed
 * 7.1.0: Unused `get_redirect` parameter of Page.getOldVersion() will be removed
 * 7.1.0: APISite._simple_request() will be removed in favour of APISite.simple_request()
 * 7.0.0: User.isBlocked() method is renamed to is_blocked for consistency
@@ -40,8 +43,8 @@ Deprecations
 * 7.0.0: Values of APISite.allpages() parameter filterredir other than True, False and None are deprecated
 * 6.5.0: OutputOption.output() method will be removed in favour of OutputOption.out property
 * 6.5.0: Infinite rotating file handler with logfilecount of -1 is deprecated
-* 6.4.0: 'allow_duplicates' parameter of tools.intersect_generators as positional argument is deprecated, use keyword argument instead
-* 6.4.0: 'iterables' of tools.intersect_generators given as a list or tuple is deprecated, either use consecutive iterables or use '*' to unpack
+* 6.4.0: 'allow_duplicates' parameter of :func:`tools.itertools.intersect_generators` as positional argument is deprecated, use keyword argument instead
+* 6.4.0: 'iterables' of :func:`tools.itertools.intersect_generators` given as a list or tuple is deprecated, either use consecutive iterables or use '*' to unpack
 * 6.2.0: outputter of OutputProxyOption without out property is deprecated
 * 6.2.0: ContextOption.output_range() and HighlightContextOption.output_range() are deprecated
 * 6.2.0: Error messages with '%' style is deprecated in favour for str.format() style

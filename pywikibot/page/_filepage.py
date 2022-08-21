@@ -19,6 +19,7 @@ from pywikibot.exceptions import NoPageError
 from pywikibot.page._pages import Page
 from pywikibot.tools import compute_file_hash, deprecated
 
+
 __all__ = (
     'FileInfo',
     'FilePage',

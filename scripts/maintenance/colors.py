@@ -6,7 +6,7 @@
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-from pywikibot.tools import itergroup
+from pywikibot.tools.itertools import itergroup
 from pywikibot.userinterfaces.terminal_interface_base import colors
 
 

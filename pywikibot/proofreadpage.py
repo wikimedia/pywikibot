@@ -736,7 +736,8 @@ class ProofreadPage(pywikibot.Page):
 
         It is the user's responsibility to reset quality level accordingly.
 
-        :param ocr_tool: 'phetools' or 'googleOCR', default is 'phetools'
+        :param ocr_tool: 'phetools', 'wmfOCR' or 'googleOCR';
+            default is 'phetools'
 
         :return: OCR text for the page.
 

@@ -4,6 +4,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
+#: Non latin digits used by the framework
 NON_LATIN_DIGITS = {
     'bn': '০১২৩৪৫৬৭৮৯',
     'ckb': '٠١٢٣٤٥٦٧٨٩',
@@ -18,6 +19,7 @@ NON_LATIN_DIGITS = {
     'pa': '੦੧੨੩੪੫੬੭੮੯',
     'te': '౦౧౨౩౪౫౬౭౮౯',
 }
+
 
 _trans = {
     'À': 'A', 'Á': 'A', 'Â': 'A', 'Ầ': 'A', 'Ấ': 'A', 'Ẫ': 'A', 'Ẩ': 'A',
