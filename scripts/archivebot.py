@@ -107,7 +107,8 @@ Options (may be omitted):
 
 .. versionchanged:: 7.6
    Localized variables for "archive" template parameter are supported.
-   `-keep` option was added.
+   `User:MiszaBot/config` is the default template. `-keep` option was
+   added.
 """
 #
 # (C) Pywikibot team, 2006-2022
