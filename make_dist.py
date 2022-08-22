@@ -43,8 +43,8 @@ Usage::
 # Distributed under the terms of the MIT license.
 #
 import shutil
-import subprocess
 import sys
+from subprocess import check_call
 from pathlib import Path
 
 from pywikibot import __version__, error, info, input_yn, warning
@@ -140,8 +140,8 @@ def main() -> None:
     local, remote, clear, upgrade, nodist = handle_args()
 
     if upgrade:
-        subprocess.run('python -m pip install --upgrade pip')
-        subprocess.run('pip install --upgrade setuptools wheel twine ')
+        check_call('python -m pip install --upgrade pip', shell=True)
+        check_call('pip install --upgrade setuptools wheel twine ', shell=True)
 
     if clear:
         clear_old_dist()
@@ -159,13 +159,13 @@ def main() -> None:
         cleanup()
 
     if local:
-        subprocess.run('pip uninstall pywikibot -y')
-        subprocess.run(
-            'pip install --no-index --pre --find-links=dist pywikibot')
+        check_call('pip uninstall pywikibot -y', shell=True)
+        check_call('pip install --no-index --pre --find-links=dist pywikibot',
+                   shell=True)
 
     if remote and input_yn(
             '<<lightblue>>Upload dist to pypi', automatic_quit=False):
-        subprocess.run('twine upload dist/*')
+        check_call('twine upload dist/*', shell=True)
 
 
 if __name__ == '__main__':
