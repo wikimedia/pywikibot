@@ -362,6 +362,8 @@ class DiscussionPage(pywikibot.Page):
         .. versionchanged:: 7.6
            If `-keep` option is given run through all threads and set
            the current timestamp to the previous if the current is lower.
+        .. versionchanged:: 7.7
+           Load unsigned threads using timestamp of the next thread.
         """
         self.header = ''
         self.threads = []
