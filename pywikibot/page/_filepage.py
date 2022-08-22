@@ -360,21 +360,29 @@ class FileInfo:
     <pywikibot.site._apisite.APISite.loadimageinfo>` for details.
 
     .. note:: timestamp will be casted to :func:`pywikibot.Timestamp`.
+
+    .. versionchanged:: 7.7
+       raises KeyError instead of AttributeError if FileInfo is used as
+       Mapping.
     """
 
     def __init__(self, file_revision) -> None:
-        """Initiate the class using the dict from `APISite.loadimageinfo`."""
+        """Initiate the class using the dict from ``APISite.loadimageinfo``."""
         self.__dict__.update(file_revision)
         self.timestamp = pywikibot.Timestamp.fromISOformat(self.timestamp)
 
     def __getitem__(self, key):
         """Give access to class values by key."""
-        return getattr(self, key)
+        try:
+            result = getattr(self, key)
+        except AttributeError as e:
+            raise KeyError(str(e).replace('attribute', 'key')) from None
+        return result
 
     def __repr__(self) -> str:
         """Return a more complete string representation."""
         return repr(self.__dict__)
 
     def __eq__(self, other) -> bool:
-        """Test if two File_info objects are equal."""
+        """Test if two FileInfo objects are equal."""
         return self.__dict__ == other.__dict__
