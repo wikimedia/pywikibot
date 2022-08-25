@@ -196,7 +196,8 @@ class DjVuFile:
             self._get_page_info(force=force)
         return self._has_text
 
-    def _remove_control_chars(self, data):
+    @staticmethod
+    def _remove_control_chars(data):
         """Remove djvu format control characters.
 
         See http://djvu.sourceforge.net/doc/man/djvused.html for control chars.

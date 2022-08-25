@@ -540,7 +540,9 @@ class UI(ABUIC):
 
                 self.stream_output('Error: Invalid response\n')
 
-    def editText(self, text: str, jumpIndex: Optional[int] = None,
+    @staticmethod
+    def editText(text: str,
+                 jumpIndex: Optional[int] = None,
                  highlight: Optional[str] = None) -> Optional[str]:
         """Return the text as edited by the user.
 

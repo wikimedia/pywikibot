@@ -28,7 +28,8 @@ class TextEditor:
 
     """Text editor."""
 
-    def _command(self, file_name: str, text: str,
+    @staticmethod
+    def _command(file_name: str, text: str,
                  jump_index: Optional[int] = None) -> List[str]:
         """Return editor selected in user-config.py."""
         if jump_index:

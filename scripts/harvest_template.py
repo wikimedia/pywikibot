@@ -215,9 +215,9 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         self.cacheSources()
         self.templateTitles = self.getTemplateSynonyms(self.template_title)
 
-    def getTemplateSynonyms(self, title) -> List[str]:
+    def getTemplateSynonyms(self, title: str) -> List[str]:
         """Fetch redirects of the title, so we can check against them."""
-        temp = pywikibot.Page(pywikibot.Site(), title, ns=10)
+        temp = pywikibot.Page(self.site, title, ns=10)
         if not temp.exists():
             sys.exit('Template {} does not exist.'.format(temp.title()))
 
@@ -232,8 +232,8 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         titles.append(temp.title(with_ns=False))
         return titles
 
-    def template_link_target(self,
-                             item: pywikibot.ItemPage,
+    @staticmethod
+    def template_link_target(item: pywikibot.ItemPage,
                              site: pywikibot.site.BaseSite,
                              link_text: str) -> Optional[pywikibot.ItemPage]:
         """Find the ItemPage target for a given link text.
@@ -483,8 +483,9 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         for match in self.linkR.finditer(value):
             yield match.group('url')
 
-    def handle_commonsmedia(self, value, site, *args
-                            ) -> Iterator[pywikibot.FilePage]:
+    @staticmethod
+    def handle_commonsmedia(value, site,
+                            *args) -> Iterator[pywikibot.FilePage]:
         """Handle 'commonsMedia' claim type.
 
         .. versionadded:: 7.5

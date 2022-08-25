@@ -14,18 +14,6 @@ from scripts.harvest_template import HarvestRobot
 from tests.aspects import ScriptMainTestCase
 
 
-class DummyBot:
-
-    """Dummy HarvestRobot."""
-
-    class current_page:  # noqa: D106, N801
-        pass
-
-    def __init__(self, site):  # noqa: D107
-        """Add a site object to current_page attribute."""
-        self.current_page.site = site
-
-
 class TestHarvestRobot(ScriptMainTestCase):
 
     """Test HarvestRobot."""
@@ -44,7 +32,7 @@ class TestHarvestRobot(ScriptMainTestCase):
             with self.subTest(link=link, item=item):
                 dummy_item = ItemPage(self.site.data_repository(), 'Q1')
                 target = HarvestRobot.template_link_target(
-                    DummyBot(self.site), dummy_item, self.site, link)
+                    dummy_item, self.site, link)
                 self.assertIsInstance(target, ItemPage)
                 self.assertEqual(target.title(), item)
 

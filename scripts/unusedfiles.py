@@ -145,7 +145,8 @@ class UnusedFilesBot(SingleSiteBot,
         self.current_page = page
         self.put_current(text)
 
-    def post_to_flow_board(self, page, post) -> None:
+    @staticmethod
+    def post_to_flow_board(page, post) -> None:
         """Post message as a Flow topic."""
         board = Board(page)
         header, rest = post.split('\n', 1)

@@ -442,7 +442,8 @@ class CategoryAddBot(CategoryPreprocess):
         self.always = False
         self.comment = comment
 
-    def sorted_by_last_name(self, catlink, pagelink) -> pywikibot.Page:
+    @staticmethod
+    def sorted_by_last_name(catlink, pagelink) -> pywikibot.Page:
         """Return a Category with key that sorts persons by their last name.
 
         Parameters: catlink - The Category to be linked.
@@ -452,7 +453,6 @@ class CategoryAddBot(CategoryPreprocess):
         category_name is 'Author' and pl is a Page to [[Alexandre Dumas
         (senior)]], this function will return this Category:
         [[Category:Author|Dumas, Alexandre]].
-
         """
         page_name = pagelink.title()
         site = pagelink.site
@@ -1069,9 +1069,9 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
         class CatIntegerOption(IntegerOption):
             """An option allowing a range of integers."""
 
-            def list_categories(self, cat_list, prefix: str = '') -> None:
-                """
-                Output categories in one or two columns.
+            @staticmethod
+            def list_categories(cat_list, prefix: str = '') -> None:
+                """Output categories in one or two columns.
 
                 Determine whether the list contains long or short
                 category titles and output category titles as enumerated

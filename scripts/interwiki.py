@@ -1750,7 +1750,8 @@ class Subject(interwiki_graph.Subject):
                 break
         return True
 
-    def reportBacklinks(self, new, updatedSites) -> None:
+    @staticmethod
+    def reportBacklinks(new, updatedSites) -> None:
         """
         Report missing back links. This will be called from finish() if needed.
 
