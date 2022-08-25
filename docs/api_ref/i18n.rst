@@ -1,0 +1,11 @@
+:mod:`i18n` --- i18n Support
+----------------------------
+
+.. automodule:: i18n
+   :synopsis: Various i18n functions
+
+:mod:`plural` --- i18n Plural rules
+-----------------------------------
+
+.. automodule:: plural
+   :synopsis: Module containing plural rules of various languages

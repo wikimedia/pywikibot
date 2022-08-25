@@ -14,8 +14,8 @@ from pywikibot.exceptions import (
 from pywikibot.tools import add_full_name, manage_wrapping
 
 
-@add_full_name
-def allow_asynchronous(func):
+# decorating this function leads sphinx to hide it
+def _allow_asynchronous(func):
     """
     Decorator to make it possible to run a BasePage method asynchronously.
 
@@ -23,6 +23,8 @@ def allow_asynchronous(func):
     Optionally, you can also provide kwarg callback, which, if provided, is
     a callable that gets the page as the first and a possible exception that
     occurred during saving in the second thread or None as the second argument.
+
+    :meta public:
     """
     def handle(func, self, *args, **kwargs):
         do_async = kwargs.pop('asynchronous', False)
@@ -55,3 +57,7 @@ def allow_asynchronous(func):
     manage_wrapping(wrapper, func)
 
     return wrapper
+
+
+#: `_allow_asynchronous` decorated with :func:`tools.add_full_name`
+allow_asynchronous = add_full_name(_allow_asynchronous)

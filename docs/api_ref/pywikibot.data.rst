@@ -1,38 +1,35 @@
-:mod:`data` package
-===================
+:mod:`data` --- Data Exchange
+=============================
 
 .. automodule:: data
-   :synopsis: 
+   :synopsis: Data Exchange
 
-Submodules
-----------
-
-:mod:`data.api` module
-----------------------
+:mod:`data.api` --- MediaWiki API Requests
+------------------------------------------
 
 .. automodule:: data.api
    :synopsis: Module providing several layers of data access to the wiki
 
-:mod:`data.memento` module
---------------------------
+:mod:`data.memento` --- Memento Requests
+----------------------------------------
 
 .. automodule:: data.memento
    :synopsis: Fix ups for memento-client package version 0.6.1
 
-:mod:`data.mysql` module
-------------------------
+:mod:`data.mysql` --- Mysql Requests
+------------------------------------
 
 .. automodule:: data.mysql
    :synopsis: Miscellaneous helper functions for mysql queries
 
-:mod:`data.sparql` module
--------------------------
+:mod:`data.sparql` --- SPARQL requests
+--------------------------------------
 
 .. automodule:: data.sparql
    :synopsis: SPARQL Query interface
 
-:mod:`data.wikistats` module
-----------------------------
+:mod:`data.wikistats` --- WikiStats requests
+--------------------------------------------
 
 .. automodule:: data.wikistats
    :synopsis: Objects representing WikiStats API

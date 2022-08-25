@@ -1,5 +1,5 @@
-:mod:`page` package
-===================
+:mod:`page` --- MediaWiki Pages
+===============================
 
 .. automodule:: page
    :synopsis: Interface of various types of MediaWiki pages
@@ -7,20 +7,21 @@
 Submodules
 ----------
 
-:mod:`page.\_collections` module
---------------------------------
+:mod:`page.\_collections` Wikibase Entity Structures
+----------------------------------------------------
 
-.. automodule:: page._collections
+.. automodule:: pywikibot.page._collections
    :synopsis: Structures holding data for Wikibase entities
 
-:mod:`page.\_decorators` module
--------------------------------
+:mod:`page.\_decorators` --- Page Decorators
+--------------------------------------------
 
 .. automodule:: page._decorators
    :synopsis: Decorators for Page objects
+   :private-members:
 
-:mod:`page.\_revision` module
------------------------------
+:mod:`page.\_revision` --- Page Revision
+----------------------------------------
 
 .. automodule:: page._revision
    :synopsis: Object representing page revision
