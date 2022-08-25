@@ -374,7 +374,7 @@ class TestScriptHelp(PwbTestCase, metaclass=TestScriptMeta):
     # Here come scripts requiring and missing dependencies, that haven't been
     # fixed to output -help in that case.
     _expected_failures = {'version'}
-    _allowed_failures = ['create_isbn_edition.py']
+    _allowed_failures = ['create_isbn_edition']
 
     _arguments = '-help'
     _results = None
