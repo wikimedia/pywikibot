@@ -84,7 +84,14 @@ def refresh_all() -> None:
         entry._load_cache()
         entry.parse_key()
         entry._rebuild()
-        if entry.site not in seen and 'watchlistraw' in entry._data:
+        if entry.site in seen:
+            continue
+
+        # for generator API usage we have to check the modules
+        modules = entry._params.get('modules', [])
+        modules_found = any(mod.endswith('watchlistraw') for mod in modules)
+        # for list API usage 'watchlistraw' is directly found
+        if modules_found or 'watchlistraw' in entry._data:
             refresh(entry.site)
             seen.add(entry.site)
 
