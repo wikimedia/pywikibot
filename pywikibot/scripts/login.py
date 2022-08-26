@@ -30,6 +30,8 @@ The following parameters are supported::
               .. note:: the global account must exist already before
                  using this.
 
+ -async       Run the bot in parallel tasks
+
 If not given as parameter, the script will ask for your username and
 password (password entry will be hidden), log in to your home wiki using
 this combination, and store the resulting cookies (containing your password
@@ -49,9 +51,13 @@ subdirectory.
 #
 # Distributed under the terms of the MIT license.
 #
+import datetime
+from contextlib import suppress
+from concurrent.futures import ThreadPoolExecutor
+
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Tuple
+from pywikibot.backports import Tuple, nullcontext
 from pywikibot.exceptions import SiteDefinitionError
 from pywikibot.login import OauthLoginManager
 
@@ -90,6 +96,34 @@ def _oauth_login(site) -> None:
                                  oauth_token=oauth_token))
 
 
+def login_one_site(code, family, oauth, logout, autocreate):
+    """Login on one site."""
+    try:
+        site = pywikibot.Site(code, family)
+    except SiteDefinitionError:
+        pywikibot.error('{}:{} is not a valid site, '
+                        'please remove it from your user-config'
+                        .format(family, code))
+        return
+
+    if oauth:
+        _oauth_login(site)
+        return
+
+    if logout:
+        site.logout()
+    else:
+        site.login(autocreate=autocreate)
+
+    user = site.user()
+    if user:
+        pywikibot.info('Logged in on {} as {}.'.format(site, user))
+    elif logout:
+        pywikibot.info('Logged out of {}.'.format(site))
+    else:
+        pywikibot.info('Not logged in on {}.'.format(site))
+
+
 def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
@@ -102,6 +136,7 @@ def main(*args: str) -> None:
     logout = False
     oauth = False
     autocreate = False
+    asyncronous = False
     unknown_args = []
     for arg in pywikibot.handle_args(args):
         if arg == '-all':
@@ -112,6 +147,8 @@ def main(*args: str) -> None:
             oauth = True
         elif arg == '-autocreate':
             autocreate = True
+        elif arg == '-async':
+            asyncronous = True
         else:
             unknown_args += [arg]
 
@@ -123,33 +160,21 @@ def main(*args: str) -> None:
     else:
         site = pywikibot.Site()
         namedict = {site.family.name: {site.code: None}}
-    for family_name in namedict:
-        for lang in namedict[family_name]:
-            try:
-                site = pywikibot.Site(code=lang, fam=family_name)
-            except SiteDefinitionError:
-                pywikibot.output('{}:{} is not a valid site, '
-                                 'please remove it from your user-config'
-                                 .format(family_name, lang))
-                continue
 
-            if oauth:
-                _oauth_login(site)
-                continue
-
-            if logout:
-                site.logout()
-            else:
-                site.login(autocreate=autocreate)
-
-            user = site.user()
-            if user:
-                pywikibot.output('Logged in on {} as {}.'.format(site, user))
-            elif logout:
-                pywikibot.output('Logged out of {}.'.format(site))
-            else:
-                pywikibot.output('Not logged in on {}.'.format(site))
+    params = oauth, logout, autocreate
+    context = ThreadPoolExecutor if asyncronous else nullcontext
+    with context() as executor:
+        for family_name in namedict:
+            for lang in namedict[family_name]:
+                if asyncronous:
+                    executor.submit(login_one_site, lang, family_name, *params)
+                else:
+                    login_one_site(lang, family_name, *params)
 
 
 if __name__ == '__main__':
-    main()
+    start = datetime.datetime.now()
+    with suppress(KeyboardInterrupt):
+        main()
+    pywikibot.info('\nExecution time: {} seconds'
+                   .format((datetime.datetime.now() - start).seconds))
