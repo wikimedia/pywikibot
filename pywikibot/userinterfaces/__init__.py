@@ -14,3 +14,8 @@ UserInterface objects must also define methods `input()`,
 all of which are documented in the abstract class
 :class:`userinterfaces._interface_base.ABUIC`.
 """
+#
+# (C) Pywikibot team, 2008-2022
+#
+# Distributed under the terms of the MIT license.
+#
