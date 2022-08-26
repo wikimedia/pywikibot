@@ -2,3 +2,4 @@
 # requirements.txt is also needed
 
 sphinx >= 5.1.1
+rstcheck >=3.5.0
