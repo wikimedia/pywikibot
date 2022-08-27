@@ -97,6 +97,7 @@ extra_deps = {
 
 # ------- setup extra_requires for scripts ------- #
 script_deps = {
+    'create_isbn_edition.py': ['isbnlib', 'unidecode'],
     'commons_information.py': extra_deps['mwparserfromhell'],
     'patrol.py': extra_deps['mwparserfromhell'],
     'weblinkchecker.py': extra_deps['memento'],

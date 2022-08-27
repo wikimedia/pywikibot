@@ -26,6 +26,7 @@ framework_scripts = ['login', 'shell']
 # These dependencies are not always the package name which is in setup.py.
 # Here, the name given to the module which will be imported is required.
 script_deps = {
+    'create_isbn_edition': ['isbnlib', 'unidecode'],
     'commons_information': ['mwparserfromhell'],
     'patrol': ['mwparserfromhell'],
     'weblinkchecker': ['memento_client'],
@@ -374,7 +375,7 @@ class TestScriptHelp(PwbTestCase, metaclass=TestScriptMeta):
     # Here come scripts requiring and missing dependencies, that haven't been
     # fixed to output -help in that case.
     _expected_failures = {'version'}
-    _allowed_failures = ['create_isbn_edition']
+    _allowed_failures = []
 
     _arguments = '-help'
     _results = None
