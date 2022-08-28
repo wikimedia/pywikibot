@@ -282,10 +282,12 @@ Other systems:
 #
 import os               # Operating system
 import re               # Regular expressions (very handy!)
+from itertools import islice
 
 import pywikibot        # API interface to Wikidata
 from pywikibot import pagegenerators as pg  # Wikidata Query interface
 from pywikibot.backports import List
+from pywikibot.config import verbose_output as verbose
 from pywikibot.data import api
 
 try:
@@ -299,9 +301,6 @@ except ImportError as e:
     unidecode = e
 
 # Initialisation
-debug = True            # Show debugging information
-verbose = True          # Verbose mode
-
 booklib = 'goob'        # Default digital library
 
 # ISBN number: 10 or 13 digits with optional dashes (-)
@@ -336,10 +335,7 @@ def is_in_list(statement_list, checklist: List[str]) -> bool:
     :param checklist: List of values
     :Returns: True when match
     """
-    for seq in statement_list:
-        if seq.getTarget().getID() in checklist:
-            return True
-    return False
+    return any(seq.getTarget().getID() in checklist for seq in statement_list)
 
 
 def get_item_list(item_name, instance_id):
@@ -395,12 +391,8 @@ def amend_isbn_edition(isbn_number):  # noqa: C901
     global targetx
 
     isbn_number = isbn_number.strip()
-    if isbn_number == '':
+    if not isbn_number:
         return  # Do nothing when the ISBN number is missing
-
-    # Validate ISBN data
-    if verbose:
-        pywikibot.info()
 
     try:
         isbn_data = isbnlib.meta(isbn_number, service=booklib)
@@ -420,36 +412,37 @@ def amend_isbn_edition(isbn_number):  # noqa: C901
 
     if len(isbn_data) < 6:
         pywikibot.error(
-            'Unknown or incomplete digital library registration for %s'
-            % isbn_number)
+            'Unknown or incomplete digital library registration for {}'
+            .format(isbn_number))
         return
 
     # Show the raw results
     if verbose:
+        pywikibot.info()
         for i in isbn_data:
-            pywikibot.info('%s:\t%s' % (i, isbn_data[i]))
+            pywikibot.info('{}:\t{}'.format(i, isbn_data[i]))
 
     # Get the book language from the ISBN book reference
     booklang = mainlang         # Default language
-    if isbn_data['Language'] != '':
+    if isbn_data['Language']:
         booklang = isbn_data['Language'].strip()
         if booklang == 'iw':    # Obsolete codes
             booklang = 'he'
         lang_list = list(get_item_list(booklang, propreqinst['P407']))
-        if len(lang_list) == 1:
-            target['P407'] = lang_list[0]
-        elif len(lang_list) == 0:
-            pywikibot.warning('Unknown language %s' % booklang)
+
+        if not lang_list:
+            pywikibot.warning('Unknown language ' + booklang)
             return
-        else:
-            pywikibot.warning('Ambiguous language %s' % booklang)
+
+        if len(lang_list) != 1:
+            pywikibot.warning('Ambiguous language ' + booklang)
             return
+
+        target['P407'] = lang_list[0]
 
     # Get formatted ISBN number
     isbn_number = isbn_data['ISBN-13']  # Numeric format
     isbn_fmtd = isbnlib.mask(isbn_number)       # Canonical format
-    if verbose:
-        pywikibot.info()
     pywikibot.info(isbn_fmtd)                    # First one
 
     # Get (sub)title when there is a dot
@@ -464,25 +457,25 @@ def amend_isbn_edition(isbn_number):  # noqa: C901
         subtitle = titles[1].strip()
 
     # pywikibot.info book titles
-    if debug:
-        pywikibot.info(objectname)
-        pywikibot.info(subtitle)  # Optional
-        # print subsequent subtitles, when available
-        for i in range(2, len(titles)):
-            # Not stored in Wikidata...
-            pywikibot.info(titles[i].strip())
+    pywikibot.debug(objectname)
+    pywikibot.debug(subtitle)  # Optional
+
+    # print subsequent subtitles, when available
+    for title in islice(titles, 2, None):
+        # Not stored in Wikidata...
+        pywikibot.debug(title.strip())
 
     # Search the ISBN number in Wikidata both canonical and numeric
     # P212 should have canonical hyphenated format
     isbn_query = ("""# Get ISBN number
-SELECT ?item WHERE {
-  VALUES ?isbn_number {
-    "%s"
-    "%s"
-  }
+SELECT ?item WHERE {{
+  VALUES ?isbn_number {{
+    "{}"
+    "{}"
+  }}
   ?item wdt:P212 ?isbn_number.
-}
-""" % (isbn_fmtd, isbn_number))
+}}
+""".format(isbn_fmtd, isbn_number))
 
     pywikibot.info(isbn_query)
     generator = pg.WikidataSPARQLPageGenerator(isbn_query, site=repo)
@@ -491,26 +484,25 @@ SELECT ?item WHERE {
     rescnt = 0
     for rescnt, item in enumerate(generator, start=1):
         qnumber = item.getID()
-        pywikibot.warning('Found item: %s' % qnumber)
+        pywikibot.warning('Found item: {}'.format(qnumber))
 
     # Create or amend the item
     if rescnt == 1:
         item.get(get_redirect=True)         # Update item
-    elif rescnt == 0:
+    elif not rescnt:
         label = {}
         label[booklang] = objectname
         item = pywikibot.ItemPage(repo)     # Create item
         item.editEntity({'labels': label}, summary=transcmt)
         qnumber = item.getID()
-        pywikibot.warning('Creating item: %s' % qnumber)
+        pywikibot.warning('Creating item: {}'.format(qnumber))
     else:
-        pywikibot.critical('Ambiguous ISBN number %s' % isbn_fmtd)
+        pywikibot.critical('Ambiguous ISBN number {}'.format(isbn_fmtd))
         return
 
     # Add all P/Q values
     # Make sure that labels are known in the native language
-    if debug:
-        pywikibot.info(target)
+    pywikibot.debug(target)
 
     # Register statements
     for propty in target:
@@ -520,12 +512,13 @@ SELECT ?item WHERE {
             targetx[propty] = pywikibot.ItemPage(repo, target[propty])
 
             try:
-                pywikibot.warning('Add %s (%s): %s (%s)'
-                                  % (proptyx[propty].labels[booklang], propty,
-                                     targetx[propty].labels[booklang],
-                                     target[propty]))
+                pywikibot.warning('Add {} ({}): {} ({})'
+                                  .format(proptyx[propty].labels[booklang],
+                                          propty,
+                                          targetx[propty].labels[booklang],
+                                          target[propty]))
             except:  # noqa: B001, E722, H201
-                pywikibot.warning('Add %s:%s' % (propty, target[propty]))
+                pywikibot.warning('Add {}:{}'.format(propty, target[propty]))
 
             claim = pywikibot.Claim(repo, propty)
             claim.setTarget(targetx[propty])
@@ -533,22 +526,22 @@ SELECT ?item WHERE {
 
     # Set formatted ISBN number
     if 'P212' not in item.claims:
-        pywikibot.warning('Add ISBN number (P212): %s' % (isbn_fmtd))
+        pywikibot.warning('Add ISBN number (P212): {}'.format(isbn_fmtd))
         claim = pywikibot.Claim(repo, 'P212')
         claim.setTarget(isbn_fmtd)
         item.addClaim(claim, bot=True, summary=transcmt)
 
     # Title
     if 'P1476' not in item.claims:
-        pywikibot.warning('Add Title (P1476): %s' % (objectname))
+        pywikibot.warning('Add Title (P1476): {}'.format(objectname))
         claim = pywikibot.Claim(repo, 'P1476')
         claim.setTarget(pywikibot.WbMonolingualText(text=objectname,
                                                     language=booklang))
         item.addClaim(claim, bot=True, summary=transcmt)
 
     # Subtitle
-    if subtitle != '' and 'P1680' not in item.claims:
-        pywikibot.warning('Add Subtitle (P1680): %s' % (subtitle))
+    if subtitle and 'P1680' not in item.claims:
+        pywikibot.warning('Add Subtitle (P1680): {}'.format(subtitle))
         claim = pywikibot.Claim(repo, 'P1680')
         claim.setTarget(pywikibot.WbMonolingualText(text=subtitle,
                                                     language=booklang))
@@ -556,9 +549,9 @@ SELECT ?item WHERE {
 
     # Date of publication
     pub_year = isbn_data['Year']
-    if pub_year != '' and 'P577' not in item.claims:
-        pywikibot.warning('Add Year of publication (P577): %s'
-                          % (isbn_data['Year']))
+    if pub_year and 'P577' not in item.claims:
+        pywikibot.warning('Add Year of publication (P577): {}'
+                          .format(isbn_data['Year']))
         claim = pywikibot.Claim(repo, 'P577')
         claim.setTarget(pywikibot.WbTime(year=int(pub_year), precision='year'))
         item.addClaim(claim, bot=True, summary=transcmt)
@@ -567,7 +560,7 @@ SELECT ?item WHERE {
     author_cnt = 0
     for author_name in isbn_data['Authors']:
         author_name = author_name.strip()
-        if author_name != '':
+        if author_name:
             author_cnt += 1
             author_list = list(get_item_list(author_name, propreqinst['P50']))
 
@@ -580,9 +573,9 @@ SELECT ?item WHERE {
                             break
 
                 if add_author:
-                    pywikibot.warning('Add author %d (P50): %s (%s)'
-                                      % (author_cnt, author_name,
-                                         author_list[0]))
+                    pywikibot.warning('Add author {} (P50): {} ({})'
+                                      .format(author_cnt, author_name,
+                                              author_list[0]))
                     claim = pywikibot.Claim(repo, 'P50')
                     claim.setTarget(pywikibot.ItemPage(repo, author_list[0]))
                     item.addClaim(claim, bot=True, summary=transcmt)
@@ -590,28 +583,28 @@ SELECT ?item WHERE {
                     qualifier = pywikibot.Claim(repo, 'P1545')
                     qualifier.setTarget(str(author_cnt))
                     claim.addQualifier(qualifier, summary=transcmt)
-            elif len(author_list) == 0:
-                pywikibot.warning('Unknown author: %s' % author_name)
+            elif not author_list:
+                pywikibot.warning('Unknown author: {}'.format(author_name))
             else:
-                pywikibot.warning('Ambiguous author: %s' % author_name)
+                pywikibot.warning('Ambiguous author: {}'.format(author_name))
 
     # Get the publisher
     publisher_name = isbn_data['Publisher'].strip()
-    if publisher_name != '':
+    if publisher_name:
         publisher_list = list(get_item_list(publisher_name,
                                             propreqinst['P123']))
 
         if len(publisher_list) == 1:
             if 'P123' not in item.claims:
-                pywikibot.warning('Add publisher (P123): %s (%s)'
-                                  % (publisher_name, publisher_list[0]))
+                pywikibot.warning('Add publisher (P123): {} ({})'
+                                  .format(publisher_name, publisher_list[0]))
                 claim = pywikibot.Claim(repo, 'P123')
                 claim.setTarget(pywikibot.ItemPage(repo, publisher_list[0]))
                 item.addClaim(claim, bot=True, summary=transcmt)
-        elif len(publisher_list) == 0:
-            pywikibot.warning('Unknown publisher: %s' % publisher_name)
+        elif not publisher_list:
+            pywikibot.warning('Unknown publisher: ' + publisher_name)
         else:
-            pywikibot.warning('Ambiguous publisher: %s' % publisher_name)
+            pywikibot.warning('Ambiguous publisher: ' + publisher_name)
 
     # Get addional data from the digital library
     isbn_cover = isbnlib.cover(isbn_number)
@@ -627,13 +620,13 @@ SELECT ?item WHERE {
 
     # Book cover images
     for i in isbn_cover:
-        pywikibot.info('%s:\t%s' % (i, isbn_cover[i]))
+        pywikibot.info('{}:\t{}'.format(i, isbn_cover[i]))
 
     # Handle ISBN classification
     isbn_classify = isbnlib.classify(isbn_number)
-    if debug:
-        for i in isbn_classify:
-            pywikibot.info('%s:\t%s' % (i, isbn_classify[i]))
+
+    for i in isbn_classify:
+        pywikibot.debug('{}:\t{}'.format(i, isbn_classify[i]))
 
     # ./create_isbn_edition.py '978-3-8376-5645-9' - de P407 Q188
     # Q113460204
@@ -644,7 +637,8 @@ SELECT ?item WHERE {
 
     # Set the OCLC ID
     if 'oclc' in isbn_classify and 'P243' not in item.claims:
-        pywikibot.warning('Add OCLC ID (P243): %s' % (isbn_classify['oclc']))
+        pywikibot.warning('Add OCLC ID (P243): {}'
+                          .format(isbn_classify['oclc']))
         claim = pywikibot.Claim(repo, 'P243')
         claim.setTarget(isbn_classify['oclc'])
         item.addClaim(claim, bot=True, summary=transcmt)
@@ -658,8 +652,8 @@ SELECT ?item WHERE {
             # Edition should belong to only one single work
             work = item.claims['P629'][0].getTarget()
             # There doesn't exist a moveClaim method?
-            pywikibot.warning('Move OCLC Work ID %s to work %s'
-                              % (oclcworkid, work.getID()))
+            pywikibot.warning('Move OCLC Work ID {} to work {}'
+                              .format(oclcworkid, work.getID()))
             # Keep current OCLC Work ID if present
             if 'P5331' not in work.claims:
                 claim = pywikibot.Claim(repo, 'P5331')
@@ -668,10 +662,10 @@ SELECT ?item WHERE {
             # OCLC Work ID does not belong to edition
             item.removeClaims(oclcwork, bot=True, summary=transcmt)
         else:
-            pywikibot.error('OCLC Work ID %s conflicts with OCLC ID %s and no '
+            pywikibot.error('OCLC Work ID {} conflicts with OCLC ID {} and no '
                             'work available'
-                            % (item.claims['P5331'][0].getTarget(),
-                               item.claims['P243'][0].getTarget()))
+                            .format(item.claims['P5331'][0].getTarget(),
+                                    item.claims['P243'][0].getTarget()))
 
     # OCLC work ID should not be registered for editions, only for works
     if 'owi' not in isbn_classify:
@@ -680,20 +674,20 @@ SELECT ?item WHERE {
         # Edition should only have one single work
         work = item.claims['P629'][0].getTarget()
         if 'P5331' not in work.claims:  # Assign the OCLC work ID if missing
-            pywikibot.warning('Add OCLC work ID (P5331): %s to work %s'
-                              % (isbn_classify['owi'], work.getID()))
+            pywikibot.warning('Add OCLC work ID (P5331): {} to work {}'
+                              .format(isbn_classify['owi'], work.getID()))
             claim = pywikibot.Claim(repo, 'P5331')
             claim.setTarget(isbn_classify['owi'])
             work.addClaim(claim, bot=True, summary=transcmt)
     elif 'P243' in item.claims:
-        pywikibot.warning('OCLC Work ID %s ignored because of OCLC ID %s'
-                          % (isbn_classify['owi'],
-                             item.claims['P243'][0].getTarget()))
+        pywikibot.warning('OCLC Work ID {} ignored because of OCLC ID {}'
+                          .format(isbn_classify['owi'],
+                                  item.claims['P243'][0].getTarget()))
     # Assign the OCLC work ID only if there is no work, and no OCLC ID
     # for edition
     elif 'P5331' not in item.claims:
-        pywikibot.warning('Add OCLC work ID (P5331): %s to edition'
-                          % (isbn_classify['owi']))
+        pywikibot.warning('Add OCLC work ID (P5331): {} to edition'
+                          .format(isbn_classify['owi']))
         claim = pywikibot.Claim(repo, 'P5331')
         claim.setTarget(isbn_classify['owi'])
         item.addClaim(claim, bot=True, summary=transcmt)
@@ -711,16 +705,16 @@ SELECT ?item WHERE {
     # Library of Congress Classification (works and editions)
     if 'lcc' in isbn_classify and 'P8360' not in item.claims:
         pywikibot.warning(
-            'Add Library of Congress Classification for edition (P8360): %s'
-            % (isbn_classify['lcc']))
+            'Add Library of Congress Classification for edition (P8360): {}'
+            .format(isbn_classify['lcc']))
         claim = pywikibot.Claim(repo, 'P8360')
         claim.setTarget(isbn_classify['lcc'])
         item.addClaim(claim, bot=True, summary=transcmt)
 
     # Dewey Decimale Classificatie
     if 'ddc' in isbn_classify and 'P1036' not in item.claims:
-        pywikibot.warning('Add Dewey Decimale Classificatie (P1036): %s'
-                          % (isbn_classify['ddc']))
+        pywikibot.warning('Add Dewey Decimale Classificatie (P1036): {}'
+                          .format(isbn_classify['ddc']))
         claim = pywikibot.Claim(repo, 'P1036')
         claim.setTarget(isbn_classify['ddc'])
         item.addClaim(claim, bot=True, summary=transcmt)
@@ -739,10 +733,10 @@ SELECT ?item WHERE {
 
             # Get the main subject
             main_subject_query = ("""# Search the main subject
-SELECT ?item WHERE {
-  ?item wdt:P2163 "%s".
-}
-""" % (fast_id))
+SELECT ?item WHERE {{
+  ?item wdt:P2163 "{}".
+}}
+""".format(fast_id))
 
             pywikibot.info(main_subject_query)
             generator = pg.WikidataSPARQLPageGenerator(main_subject_query,
@@ -754,20 +748,20 @@ SELECT ?item WHERE {
                 qmain_subject = main_subject.getID()
                 try:
                     main_subject_label = main_subject.labels[booklang]
-                    pywikibot.info('Found main subject %s (%s) for Fast ID %s'
-                                   % (main_subject_label, qmain_subject,
-                                      fast_id))
+                    pywikibot.info('Found main subject {} ({}) for Fast ID {}'
+                                   .format(main_subject_label, qmain_subject,
+                                           fast_id))
                 except:  # noqa B001, E722, H201
                     main_subject_label = ''
-                    pywikibot.info('Found main subject (%s) for Fast ID %s'
-                                   % (qmain_subject, fast_id))
-                    pywikibot.error('Missing label for item %s'
-                                    % qmain_subject)
+                    pywikibot.info('Found main subject ({}) for Fast ID {}'
+                                   .format(qmain_subject, fast_id))
+                    pywikibot.error('Missing label for item {}'
+                                    .format(qmain_subject))
 
             # Create or amend P921 statement
-            if rescnt == 0:
-                pywikibot.error('Main subject not found for Fast ID %s'
-                                % (fast_id))
+            if not rescnt:
+                pywikibot.error('Main subject not found for Fast ID {}'
+                                .format(fast_id))
             elif rescnt == 1:
                 add_main_subject = True
                 if 'P921' in item.claims:  # Check for duplicates
@@ -777,21 +771,22 @@ SELECT ?item WHERE {
                             break
 
                 if add_main_subject:
-                    pywikibot.warning('Add main subject (P921) %s (%s)'
-                                      % (main_subject_label, qmain_subject))
+                    pywikibot.warning('Add main subject (P921) {} ({})'
+                                      .format(main_subject_label,
+                                              qmain_subject))
                     claim = pywikibot.Claim(repo, 'P921')
                     claim.setTarget(main_subject)
                     item.addClaim(claim, bot=True, summary=transcmt)
                 else:
-                    pywikibot.info('Skipping main subject %s (%s)'
-                                   % (main_subject_label, qmain_subject))
+                    pywikibot.info('Skipping main subject {} ({})'
+                                   .format(main_subject_label, qmain_subject))
             else:
-                pywikibot.error('Ambiguous main subject for Fast ID %s'
-                                % (fast_id))
+                pywikibot.error('Ambiguous main subject for Fast ID {}'
+                                .format(fast_id))
 
     # Book description
     isbn_description = isbnlib.desc(isbn_number)
-    if isbn_description != '':
+    if isbn_description:
         pywikibot.info()
         pywikibot.info(isbn_description)
 
@@ -858,9 +853,9 @@ def main(*args: str) -> None:
             'P31' not in targetx[propty].claims
             or not is_in_list(targetx[propty].claims['P31'],
                               propreqinst[propty])):
-            pywikibot.critical('%s (%s) is not a language'
-                               % (targetx[propty].labels[mainlang],
-                                  target[propty]))
+            pywikibot.critical('{} ({}) is not a language'
+                               .format(targetx[propty].labels[mainlang],
+                                       target[propty]))
             return
 
     # check dependencies
