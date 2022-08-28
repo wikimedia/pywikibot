@@ -104,11 +104,14 @@ Options (may be omitted):
   -salt:SALT      specify salt
   -keep           Preserve thread order in archive even if threads are
                   archived later
+  -sort           Sort archive by timestamp; should not be used with -keep
 
 .. versionchanged:: 7.6
    Localized variables for "archive" template parameter are supported.
    `User:MiszaBot/config` is the default template. `-keep` option was
    added.
+.. versionchanged:: 7.7
+   `-sort` option was added.
 """
 #
 # (C) Pywikibot team, 2006-2022
@@ -467,7 +470,7 @@ class PageArchiver:
     algo = 'none'
 
     def __init__(self, page, template, salt: str, force: bool = False,
-                 keep=False) -> None:
+                 keep: bool = False, sort: bool = False) -> None:
         """Initializer.
 
         :param page: a page object to be archived
@@ -485,6 +488,7 @@ class PageArchiver:
         ])
         self.salt = salt
         self.force = force
+        self.sort = sort
         self.site = page.site
         self.tpl = template
         self.timestripper = TimeStripper(site=self.site)
@@ -776,7 +780,7 @@ class PageArchiver:
                 comment = i18n.twtranslate(self.site.code,
                                            'archivebot-archive-summary',
                                            self.comment_params)
-                archive.update(comment)
+                archive.update(comment, sort_threads=self.sort)
 
             # Save the page itself
             self.page.header = rx.sub(self.attr2text(), self.page.header)
@@ -804,31 +808,33 @@ class PageArchiver:
             self.page.update(comment)
 
 
-def process_page(pg, tmpl, salt: str, force: bool, keep: bool) -> bool:
+def process_page(page, *args: Any) -> bool:
     """Call PageArchiver for a single page.
 
     :return: Return True to continue with the next page, False to break
         the loop.
 
     .. versionadded:: 7.6
+    .. versionchanged:: 7.7
+       pass an unspecified number of arguments to the bot using ``*args``
     """
-    if not pg.exists():
-        pywikibot.info('{} does not exist, skipping...'.format(pg))
+    if not page.exists():
+        pywikibot.info('{} does not exist, skipping...'.format(page))
         return True
 
-    pywikibot.info('\n\n>>> <<lightpurple>>{}<<default>> <<<'.format(pg))
+    pywikibot.info('\n\n>>> <<lightpurple>>{}<<default>> <<<'.format(page))
     # Catching exceptions, so that errors in one page do not bail out
     # the entire process
     try:
-        archiver = PageArchiver(pg, tmpl, salt, force, keep)
+        archiver = PageArchiver(page, *args)
         archiver.run()
     except ArchiveBotSiteConfigError as e:
         # no stack trace for errors originated by pages on-site
         pywikibot.error('Missing or malformed template in page {}: {}'
-                        .format(pg, e))
+                        .format(page, e))
     except Exception:
         pywikibot.exception('Error occurred while processing page {}'
-                            .format(pg))
+                            .format(page))
     except KeyboardInterrupt:
         pywikibot.info('\nUser quit bot run...')
         return False
@@ -850,6 +856,7 @@ def main(*args: str) -> None:
     force = False
     calc = None
     keep = False
+    sort = False
     templates = []
 
     local_args = pywikibot.handle_args(args)
@@ -881,6 +888,8 @@ def main(*args: str) -> None:
             namespace = value
         elif option == 'keep':
             keep = True
+        elif option == 'sort':
+            sort = True
 
     site = pywikibot.Site()
 
@@ -918,7 +927,7 @@ def main(*args: str) -> None:
                                      namespaces=ns,
                                      content=True)
         for pg in gen:
-            if not process_page(pg, tmpl, salt, force, keep):
+            if not process_page(pg, tmpl, salt, force, keep, sort):
                 return
 
 
