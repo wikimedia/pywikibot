@@ -7,6 +7,12 @@ claimit script description
 .. automodule:: scripts.claimit
    :no-members:
 
+create\_isbn\_edition script description
+----------------------------------------
+
+.. automodule:: scripts.create_isbn_edition
+   :no-members:
+
 dataextend script description
 -----------------------------
 
