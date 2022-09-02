@@ -42,8 +42,7 @@ Parameters:
         Free text (e.g. Wikipedia references list, or publication list)
         is accepted. Identification is done via an ISBN regex expression.
 
-Functionality:
-
+**Functionality:**
     * The ISBN number is used as a primary key (P212 where no duplicates
       are allowed. The item update is not performed when there is no
       unique match
@@ -53,39 +52,29 @@ Functionality:
       (ambiguous items are skipped)
     * Book title and subtitle are separated with '.', ':', or '-'
     * This script can be run incrementally with the same parameters
-        Caveat: Take into account the Wikidata Query database
-        replication delay. Wait for minimum 5 minutes to avoid creating
-        duplicate objects.
+      Caveat: Take into account the Wikidata Query database
+      replication delay. Wait for minimum 5 minutes to avoid creating
+      duplicate objects.
 
-Data quality:
-
+**Data quality:**
     * Use https://query.wikidata.org/querybuilder/ to identify P212
-        duplicates. Merge duplicate items before running the script
-        again.
+      duplicates. Merge duplicate items before running the script
+      again.
     * The following properties should only be used for written works
-        P5331:  OCLC work ID (editions should only have P243)
-        P8383:  Goodreads-identificatiecode for work (editions should
-        only have P2969)
+      P5331:  OCLC work ID (editions should only have P243)
+      P8383:  Goodreads-identificatiecode for work (editions should
+      only have P2969)
 
 Examples:
 
-    # Default library (Google Books), language (LANG), no additional
-      statements
+    Default library (Google Books), language (LANG), no additional
+    statements:
 
-    ./create_isbn_edition.py
-    9789042925564
+        pwb create_isbn_edition.py 9789042925564
 
-    # Wikimedia, language Dutch, main subject: database management
+    Wikimedia, language Dutch, main subject: database management:
 
-    ./create_isbn_edition.py wiki en P921 Q107643461
-    978-0-596-10089-6
-
-Return status:
-
-    The following status codes are returned to the shell:
-
-        3   Invalid or missing parameter
-        12  Item does not exist
+        pwb create_isbn_edition.py wiki en P921 Q107643461 978-0-596-10089-6
 
 Standard ISBN properties:
 
@@ -125,40 +114,38 @@ External identifiers:
     P8383:  Goodreads-identificatiecode for work (editions should only
             have P2969)
 
-Author:
+**Author:**
+   Geert Van Pamel, 2022-08-04,
+   GNU General Public License v3.0, User:Geertivp
 
-    Geert Van Pamel, 2022-08-04, GNU General Public License v3.0, User:Geertivp
+**Documentation:**
+    * https://en.wikipedia.org/wiki/ISBN
+    * https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
+    * https://www.geeksforgeeks.org/searching-books-with-python/
+    * https://www.freecodecamp.org/news/python-json-how-to-convert-a-string-to-json/
+    * https://pypi.org/project/isbnlib/
+    * https://buildmedia.readthedocs.org/media/pdf/isbnlib/v3.4.5/isbnlib.pdf
+    * https://isbntools.readthedocs.io/en/latest/info.html
+    * https://www.wikidata.org/wiki/Property:P212
+    * https://www.wikidata.org/wiki/Wikidata:WikiProject_Books
+    * WikiProject Books:  https://www.wikidata.org/wiki/Q21831105
+    * https://www.wikidata.org/wiki/Wikidata:List_of_properties/work
+    * https://www.wikidata.org/wiki/Template:Book_properties
+    * https://www.wikidata.org/wiki/Template:Bibliographic_properties
+    * http://classify.oclc.org/classify2/ClassifyDemo
+    * https://www.wikidata.org/wiki/Wikidata:WikiProject_Source_MetaData
+    * https://www.wikidata.org/wiki/Help:Sources
+    * https://www.wikidata.org/wiki/Q22696135
+    * https://meta.wikimedia.org/wiki/Community_Wishlist_Survey_2021/Wikidata/Bibliographical_references/sources_for_wikidataitems
+    * https://doc.wikimedia.org/pywikibot/master/api_ref/pywikibot.html
+    * https://doc.wikimedia.org/pywikibot/master/
+    * https://docs.python.org/3/howto/logging.html
+    * https://wikitech.wikimedia.org/wiki/Portal:Toolforge
+    * http://www.isbn.org/standards/home/isbn/international/hyphenation-instructions.asp
+    * https://www.wikidata.org/wiki/Wikidata:Pywikibot\_-_Python_3_Tutorial/Setting_qualifiers
+    * https://www.wikidata.org/wiki/Wikidata:Pywikibot\_-_Python_3_Tutorial/Setting_statements
 
-Documentation:
-
-    https://en.wikipedia.org/wiki/ISBN
-    https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
-    https://www.geeksforgeeks.org/searching-books-with-python/
-    https://www.freecodecamp.org/news/python-json-how-to-convert-a-string-to-json/
-    https://pypi.org/project/isbnlib/
-    https://buildmedia.readthedocs.org/media/pdf/isbnlib/v3.4.5/isbnlib.pdf
-    https://isbntools.readthedocs.io/en/latest/info.html
-    https://www.wikidata.org/wiki/Property:P212
-    https://www.wikidata.org/wiki/Wikidata:WikiProject_Books
-    WikiProject Books:  https://www.wikidata.org/wiki/Q21831105
-    https://www.wikidata.org/wiki/Wikidata:List_of_properties/work
-    https://www.wikidata.org/wiki/Template:Book_properties
-    https://www.wikidata.org/wiki/Template:Bibliographic_properties
-    http://classify.oclc.org/classify2/ClassifyDemo
-    https://www.wikidata.org/wiki/Wikidata:WikiProject_Source_MetaData
-    https://www.wikidata.org/wiki/Help:Sources
-    https://www.wikidata.org/wiki/Q22696135
-    https://meta.wikimedia.org/wiki/Community_Wishlist_Survey_2021/Wikidata/Bibliographical_references/sources_for_wikidataitems
-    https://doc.wikimedia.org/pywikibot/master/api_ref/pywikibot.html
-    https://doc.wikimedia.org/pywikibot/master/
-    https://docs.python.org/3/howto/logging.html
-    https://wikitech.wikimedia.org/wiki/Portal:Toolforge
-    http://www.isbn.org/standards/home/isbn/international/hyphenation-instructions.asp
-    https://www.wikidata.org/wiki/Wikidata:Pywikibot_-_Python_3_Tutorial/Setting_qualifiers
-    https://www.wikidata.org/wiki/Wikidata:Pywikibot_-_Python_3_Tutorial/Setting_statements
-
-Prerequisites:
-
+**Prerequisites:**
     pywikibot
 
     Install the following ISBN lib packages:
@@ -175,22 +162,20 @@ Prerequisites:
         pip install isbnlib-worldcat2
         etc.
 
-Restrictions:
-
+**Restrictions:**
     * Better use the ISO 639-1 language code parameter as a default
         The language code is not always available from the digital library.
     * SPARQL queries run on a replicated database
         Possible important replication delay; wait 5 minutes before retry
         -- otherwise risk for creating duplicates.
 
-Known problems:
-
+**Known problems:**
     * Unknown ISBN, e.g. 9789400012820
     * No ISBN data available for an edition either causes no output
-        (goob = Google Books), or an error message (wiki, openl)
-        The script is taking care of both
+      (goob = Google Books), or an error message (wiki, openl)
+      The script is taking care of both
     * Only 6 ISBN attributes are listed by the webservice(s)
-        missing are e.g.: place of publication, number of pages
+      missing are e.g.: place of publication, number of pages
     * Not all ISBN atttributes have data (authos, publisher, date of
       publication, language)
     * The script uses multiple webservice calls (script might take time,
@@ -201,25 +186,23 @@ Known problems:
         * Does the KBR has a public ISBN service (Koninklijke
           Bibliotheek van België)?
     * Filter for work properties -- need to amend Q47461344 (written
-        work) instance and P629 (edition of) + P747 (has edition)
-        statements https://www.wikidata.org/wiki/Q63413107
-        ['9781282557246', '9786612557248', '9781847196057', '9781847196040']
-        P8383: Goodreads-identificatiecode voor work 13957943 (should
-               have P2969)
-        P5331: OCLC-identificatiecode voor work 793965595 (should have P243)
+      work) instance and P629 (edition of) + P747 (has edition)
+      statements https://www.wikidata.org/wiki/Q63413107
+      ['9781282557246', '9786612557248', '9781847196057', '9781847196040']
+      P8383: Goodreads-identificatiecode voor work 13957943 (should
+      have P2969)
+      P5331: OCLC-identificatiecode voor work 793965595 (should have P243)
 
-To do:
+.. todo::
+   * Add source reference (digital library instance)
 
-    * Add source reference (digital library instance)
-
-Algorithm:
-
-    Get parameters
-    Validate parameters
-    Get ISBN data
-    Convert ISBN data
-    Get additional data
-    Register ISBN data into Wikidata (create or amend items or claims)
+**Algorithm:**
+    # Get parameters
+    # Validate parameters
+    # Get ISBN data
+    # Convert ISBN data
+    # Get additional data
+    # Register ISBN data into Wikidata (create or amend items or claims)
 
 Environment:
 
@@ -232,9 +215,6 @@ Environment:
 
     LANG: ISO 639-1 language code
 
-Source code:
-
-    https://github.com/geertivp/Pywikibot/blob/main/create_isbn_edition.py
 
 Applications:
 
@@ -249,32 +229,27 @@ Applications:
             https://phabricator.wikimedia.org/tag/wikicite/
             https://meta.wikimedia.org/wiki/WikiCite/Shared_Citations
 
-Wikidata Query:
+**Wikidata Query:**
+    * List of editions about musicians: https://w.wiki/5aaz
+    * List of editions having ISBN number: https://w.wiki/5akq
 
-    List of editions about musicians:       https://w.wiki/5aaz
-    List of editions having ISBN number:    https://w.wiki/5akq
+**Related projects:**
+    * :phab:`T314942` (this script)
+    * :phab:`T282719`
+    * :phab:`T214802`
+    * :phab:`T208134`
+    * :phab:`T138911`
+    * :phab:`T20814`
+    * https://en.wikipedia.org/wiki/User:Citation_bot
+    * https://meta.wikimedia.org/wiki/Community_Wishlist_Survey_2021/Wikidata/Bibliographical_references/sources_for_wikidataitems
+    * https://zenodo.org/record/55004#.YvwO4hTP1D8
 
-Related projects:
-
-    https://phabricator.wikimedia.org/T314942 (this script)
-
-    (other projects)
-    https://phabricator.wikimedia.org/T282719
-    https://phabricator.wikimedia.org/T214802
-    https://phabricator.wikimedia.org/T208134
-    https://phabricator.wikimedia.org/T138911
-    https://phabricator.wikimedia.org/T20814
-    https://en.wikipedia.org/wiki/User:Citation_bot
-    https://meta.wikimedia.org/wiki/Community_Wishlist_Survey_2021/Wikidata/Bibliographical_references/sources_for_wikidataitems
-    https://zenodo.org/record/55004#.YvwO4hTP1D8
-
-Other systems:
-
-    https://en.wikipedia.org/wiki/bibliographic_database
-    https://www.titelbank.nl/pls/ttb/f?p=103:4012:::NO::P4012_TTEL_ID:3496019&cs=19BB8084860E3314502A1F777F875FE61
+**Other systems:**
+    * https://en.wikipedia.org/wiki/bibliographic_database
+    * https://www.titelbank.nl/pls/ttb/f?p=103:4012:::NO::P4012_TTEL_ID:3496019&cs=19BB8084860E3314502A1F777F875FE61
 
 .. versionadded:: 7.7
-"""
+"""  # noqa E501, W605
 #
 # (C) Pywikibot team, 2022
 #
@@ -338,11 +313,11 @@ def is_in_list(statement_list, checklist: List[str]) -> bool:
     return any(seq.getTarget().getID() in checklist for seq in statement_list)
 
 
-def get_item_list(item_name, instance_id):
+def get_item_list(item_name: str, instance_id):
     """Get list of items by name, belonging to an instance (list).
 
-    :param item_name: Item name (string; case sensitive)
-    :param instance_id:    Instance ID (string, set, or list)
+    :param item_name: Item name (case sensitive)
+    :param instance_id: Instance ID (string, set, or list)
     :Returns: Set of items (Q-numbers)
     """
     item_list = set()       # Empty set
@@ -378,14 +353,13 @@ def get_item_list(item_name, instance_id):
     return item_list
 
 
-def amend_isbn_edition(isbn_number):  # noqa: C901
+def amend_isbn_edition(isbn_number: str):  # noqa: C901
     """Amend ISBN registration.
 
     Amend Wikidata, by registering the ISBN-13 data via P212,
     depending on the data obtained from the digital library.
 
-    :param isbn_number:  ISBN number (string; 10 or 13 digits with
-        optional hyphens)
+    :param isbn_number:  ISBN number (10 or 13 digits with optional hyphens)
     """
     global proptyx
     global targetx

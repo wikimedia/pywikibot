@@ -365,6 +365,8 @@ texinfo_documents = [
 numfig = True
 
 # Other settings
+show_authors = True
+todo_include_todos = True
 
 autodoc_typehints = 'description'
 
