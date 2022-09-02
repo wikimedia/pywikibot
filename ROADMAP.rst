@@ -1,7 +1,8 @@
 Current release 7.7.0
 ^^^^^^^^^^^^^^^^^^^^^
 
-*(no changes yet)*
+* Raise KeyError instead of AttributeError if :class:`page.FileInfo` is used as Mapping
+* L10N updates
 
 
 Deprecations
