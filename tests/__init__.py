@@ -133,6 +133,7 @@ library_test_modules = {
     'user',
     'wikibase',
     'wikibase_edit',
+    'wikiblame',
     'wikistats',
     'xmlreader'
 }

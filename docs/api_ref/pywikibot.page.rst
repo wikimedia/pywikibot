@@ -25,3 +25,9 @@ Submodules
 
 .. automodule:: page._revision
    :synopsis: Object representing page revision
+
+:mod:`page.\_toolforge` module
+---------------------------------
+
+.. automodule:: page._toolforge
+   :synopsis: Object representing interface to toolforge tools
