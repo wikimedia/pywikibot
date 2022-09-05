@@ -1676,17 +1676,8 @@ class Analyzer:
             result = result.replace('\n\n', '\n')
         return result.strip()
 
-    def findlongtext(self, html):
-        return None
-
     def finddescriptions(self, html):
         return [self.finddescription(html)]
-
-    def findlanguagedescriptions(self, html):
-        return None
-
-    def finddescription(self, html):
-        return None
 
     def getlanguage(self, code):
         if not code:
@@ -1720,464 +1711,48 @@ class Analyzer:
                    for (language, term) in self.findlanguagenames(self.html) or [] if term and term.strip()] \
                    + self.findwikipedianames(self.html)
 
-    def findnames(self, html):
-        return None
-
-    def findlanguagenames(self, html):
-        return None
-
-    def findinstanceof(self, html):
-        return None
-
-    def findgender(self, html):
-        return None
-
-    def findfather(self, html):
-        return None
-
-    def findmother(self, html):
-        return None
-
-    def findspouses(self, html):
-        return None
-
-    def findpartners(self, html):
-        return None
-
-    def findreligion(self, html):
-        return None
-
-    def findreligions(self, html):
-        return None
-
-    def findchildren(self, html):
-        return None
-
-    def findsiblings(self, html):
-        return None
-
-    def findkins(self, html):
-        return None
-
-    def findcountry(self, html):
-        return None
-
-    def findcountries(self, html):
-        return None
-
-    def findorigcountry(self, html):
-        return None
-
-    def findadminloc(self, html):
-        return None
-
-    def findlocation(self, html):
-        return None
-
-    def findformationlocation(self, html):
-        return None
-
-    def findbirthplace(self, html):
-        return None
-
-    def finddeathplace(self, html):
-        return None
-
-    def findburialplace(self, html):
-        return None
-
-    def findmannerdeath(self, html):
-        return None
-
-    def findcausedeath(self, html):
-        return None
-
-    def findchoriginplace(self, html):
-        return None
-
-    def findchoriginplaces(self, html):
-        return None
-
-    def findworkplaces(self, html):
-        return None
-
-    def findresidences(self, html):
-        return None
-
-    def findnationality(self, html):
-        return None
-
-    def findethnicity(self, html):
-        return None
-
-    def findethnicities(self, html):
-        return None
-
-    def findorientation(self, html):
-        return None
-
-    def findnationalities(self, html):
-        return None
-
-    def findsportcountries(self, html):
-        return None
-
-    def findfirstname(self, html):
-        return None
-
-    def findlastname(self, html):
-        return None
-
-    def findfirstnames(self, html):
-        return None
-
-    def findlastnames(self, html):
-        return None
-
-    def findaddress(self, html):
-        return None
-
-    def findhaircolor(self, html):
-        return None
-
-    def findcoords(self, html):
-        return None
-
-    def findbirthdate(self, html):
-        return None
-
-    def finddeathdate(self, html):
-        return None
-
-    def findbaptismdate(self, html):
-        return None
-
-    def findburialdate(self, html):
-        return None
-
-    def findinception(self, html):
-        return None
-
-    def findpremiere(self, html):
-        return None
-
-    def finddissolution(self, html):
-        return None
-
-    def findpubdate(self, html):
-        return None
-
-    def findpubdates(self, html):
-        return None
-
-    def findfloruit(self, html):
-        return None
-
-    def findfloruitstart(self, html):
-        return None
-
-    def findfloruitend(self, html):
-        return None
-
-    def findheights(self, html):
-        return [self.findheight(html)]
-
-    def findheight(self, html):
-        return None
-
-    def findweights(self, html):
-        return [self.findweight(html)]
-
-    def findweight(self, html):
-        return None
-
-    def findoccupations(self, html):
-        return None
-
-    def findworkfields(self, html):
-        return None
-
-    def findpositions(self, html):
-        return None
-
-    def findtitles(self, html):
-        return None
-
-    def findemployers(self, html):
-        return None
-
-    def findranks(self, html):
-        return None
-
-    def findschools(self, html):
-        return None
-
-    def findcrimes(self, html):
-        return None
-
-    def findmoviedirectors(self, html):
-        return None
-
-    def findartdirectors(self, html):
-        return None
-
-    def findscreenwriters(self, html):
-        return None
-
-    def findproducers(self, html):
-        return None
-
-    def finddirectorsphotography(self, html):
-        return None
-
-    def findmovieeditors(self, html):
-        return None
-
-    def findproductiondesigners(self, html):
-        return None
-
-    def findsounddesigners(self, html):
-        return None
-
-    def findcostumedesigners(self, html):
-        return None
-
-    def findmakeupartists(self, html):
-        return None
-
-    def findcomposers(self, html):
-        return None
-
-    def findarchitects(self, html):
-        return None
-
-    def findgenres(self, html):
-        return None
-
-    def findengines(self, html):
-        return None
-
-    def findgamemodes(self, html):
-        return None
-
-    def findcast(self, html):
-        return None
-
-    def findmaterials(self, html):
-        return None
-
-    def finddevelopers(self, html):
-        return None
-
-    def findpublishers(self, html):
-        return None
-
-    def findprodcoms(self, html):
-        return None
-
-    def finddistcoms(self, html):
-        return None
-
-    def findoriglanguages(self, html):
-        return None
-
-    def finddurations(self, html):
-        return None
-
-    def findprominences(self, html):
-        return None
-
-    def findisolations(self, html):
-        return None
-
-    def findlanguagesspoken(self, html):
-        return None
-
-    def findlanguages(self, html):
-        return None
-
-    def findnativelanguages(self, html):
-        return None
-
-    def findcolors(self, html):
-        return None
-
-    def finduse(self, html):
-        return None
-
-    def findfloorsabove(self, html):
-        return None
-
-    def findfloorsbelow(self, html):
-        return None
-
-    def findelevations(self, html):
-        return None
-
-    def findmountainrange(self, html):
-        return None
-
-    def findrelorder(self, html):
-        return None
-
-    def findwebsite(self, html):
-        return None
-
-    def findwebpages(self, html):
-        return None
-
-    def findsources(self, html):
-        return None
-
-    def findvoice(self, html):
-        return None
-
-    def findvoices(self, html):
-        return None
-
-    def findfamily(self, html):
-        return None
-
-    def findgens(self, html):
-        return None
-
-    def findpseudonyms(self, html):
-        return None
-
-    def findparts(self, html):
-        return None
-
-    def findpartofs(self, html):
-        return None
-
-    def findinstruments(self, html):
-        return None
-
-    def findlabels(self, html):
-        return None
-
-    def findsports(self, html):
-        return None
-
-    def findawards(self, html):
-        return None
-
-    def findnominations(self, html):
-        return None
-
-    def findmemberships(self, html):
-        return None
-
-    def findsportteams(self, html):
-        return None
-
-    def findparties(self, html):
-        return None
-
-    def findbranches(self, html):
-        return None
-
-    def findconflicts(self, html):
-        return None
-
-    def findteampositions(self, html):
-        return None
-
-    def findpolitical(self, html):
-        return None
-
-    def findstudents(self, html):
-        return None
-
-    def finddocstudents(self, html):
-        return None
-
-    def findteachers(self, html):
-        return None
-
-    def findadvisors(self, html):
-        return None
-
-    def findinfluences(self, html):
-        return None
-
-    def finddegrees(self, html):
-        return None
-
-    def findmajors(self, html):
-        return None
-
-    def findparticipations(self, html):
-        return None
-
-    def findviaf(self, html):
-        return None
-
-    def findisni(self, html):
-        return None
-
-    def findtwitter(self, html):
-        return None
-
-    def findfacebook(self, html):
-        return None
-
-    def findfacebookpage(self, html):
-        return None
-
-    def findincollections(self, html):
-        return None
-
-    def findinworks(self, html):
-        return None
-
-    def findmovements(self, html):
-        return None
-
-    def findorigcountries(self, html):
-        return None
-
-    def findchesstitle(self, html):
-        return None
-
-    def findfeastday(self, html):
-        return None
-
-    def findbloodtype(self, html):
-        return None
-
-    def findeyecolor(self, html):
-        return None
-
-    def findpatronof(self, html):
-        return None
-
-    def findnotableworks(self, html):
-        return None
-
-    def findparticipantins(self, html):
-        return None
-
-    def findplatforms(self, html):
-        return None
-
-    def findfranchises(self, html):
-        return None
-
-    def findimage(self, html):
-        return None
-
-    def findcoatarms(self, html):
-        return None
-
-    def findsignature(self, html):
-        return None
-
-    def findlogo(self, html):
-        return None
-
-    def findmixedrefs(self, html):
-        return None
+    def __getattr__(self, name):
+        """Return None if the function is not defined in subclass."""
+        prefix = 'find'
+        funcnames = {
+            'address', 'adminloc', 'advisors', 'architects', 'artdirectors',
+            'awards', 'baptismdate', 'birthdate', 'birthplace', 'bloodtype',
+            'branches', 'burialdate', 'burialplace', 'cast', 'causedeath',
+            'chesstitle', 'children', 'choriginplace', 'choriginplaces',
+            'coatarms', 'colors', 'composers', 'conflicts', 'coords',
+            'costumedesigners', 'countries', 'country', 'crimes', 'deathdate',
+            'deathplace', 'degrees', 'developers', 'directorsphotography',
+            'dissolution', 'distcoms', 'docstudents', 'durations',
+            'elevations', 'employers', 'engines', 'ethnicities', 'ethnicity',
+            'eyecolor', 'facebook', 'facebookpage', 'family', 'father',
+            'feastday', 'firstname', 'firstnames', 'floorsabove',
+            'floorsbelow', 'floruit', 'floruitend', 'floruitstart',
+            'formationlocation', 'franchises', 'gamemodes', 'gender',
+            'genres', 'gens', 'haircolor', 'height', 'heights', 'image',
+            'inception', 'incollections', 'influences', 'instanceof',
+            'instruments', 'inworks', 'isni', 'isolations', 'kins', 'labels',
+            'languages', 'languagesspoken', 'lastname', 'lastnames',
+            'location', 'logo', 'majors', 'makeupartists', 'mannerdeath',
+            'materials', 'memberships', 'mixedrefs', 'mother', 'mountainrange',
+            'movements', 'moviedirectors', 'movieeditors', 'nationalities',
+            'nationality', 'nativelanguages', 'nominations', 'notableworks',
+            'occupations', 'orientation', 'origcountries', 'origcountry',
+            'origlanguages', 'participantins', 'participations', 'parties',
+            'partners', 'partofs', 'parts', 'patronof', 'platforms',
+            'political', 'positions', 'premiere', 'prodcoms', 'producers',
+            'productiondesigners', 'prominences', 'pseudonyms', 'pubdate',
+            'pubdates', 'publishers', 'ranks', 'religion', 'religions',
+            'relorder', 'residences', 'schools', 'screenwriters', 'siblings',
+            'signature', 'sounddesigners', 'sources', 'sportcountries',
+            'sports', 'sportteams', 'spouses', 'students', 'teachers',
+            'teampositions', 'titles', 'twitter', 'use', 'viaf', 'voice',
+            'voices', 'webpages', 'website', 'weight', 'weights', 'workfields',
+            'workplaces',
+        }
+        pre, sep, post = name.partition(prefix)
+        if not pre and sep == prefix and post in funcnames:
+            return lambda html: None
+        return super().__getattribute__(name)
 
     def finddefaultmixedrefs(self, html, includesocial=True):
         defaultmixedrefs = [
