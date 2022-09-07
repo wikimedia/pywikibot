@@ -61,26 +61,25 @@ included.
 import codecs
 import datetime
 import re
-import ssl
 
 from collections import defaultdict
 from contextlib import suppress
 from html import unescape
 from textwrap import shorten
 from typing import Optional
-from urllib.error import HTTPError, URLError
 from urllib.parse import quote, unquote
-from urllib.request import urlopen
 
 import pywikibot
 from pywikibot.backports import List, Tuple
 from pywikibot.bot import input_yn, SingleSiteBot, suggest_help
+from pywikibot.comms import http
 from pywikibot.data import sparql
 from pywikibot.exceptions import (
     APIError,
     InvalidTitleError,
     NoPageError,
     OtherPageSaveError,
+    ServerError,
 )
 from pywikibot.tools.collections import DequeGenerator
 
@@ -1292,55 +1291,29 @@ class Analyzer:
         pywikibot.info()
         pagerequest = None
         if not self.skipfirst:
-            try:
-                pywikibot.output('Getting {}'.format(self.url))
-                if 'https' in self.url:
-                    context = ssl._create_unverified_context()
-                    pagerequest = urlopen(self.url, context=context)
-                else:
-                    pagerequest = urlopen(self.url)
-            except (HTTPError, URLError, ConnectionResetError):
-                if self.urlbase2:
-                    self.urlbase = self.urlbase2
-                    pywikibot.output('Getting {}'.format(self.url))
-                    if 'https' in self.url:
-                        context = ssl._create_unverified_context()
-                        pagerequest = urlopen(self.url, context=context)
-                    else:
-                        pagerequest = urlopen(self.url)
-                else:
-                    pywikibot.output('Unable to load {}'.format(self.url))
-                    return []
-            except UnicodeEncodeError:
-                pywikibot.output('Unable to receive page {} - not unicode?'
-                                 .format(self.url))
-                pagerequest = None
+            for used, base in enumerate(self.urlbase, self.urlbase2):
+                if used and not base:
+                    continue
+                self.urlbase = base
+                pywikibot.info('Getting {}'.format(self.url))
+                with suppress(ServerError, ConnectionError):
+                    pagerequest = http.fetch(self.url)
+                    break
+            else:
+                pywikibot.info('Unable to load {}'.format(self.url))
+                return []
 
         if pagerequest:
-            pagebytes = pagerequest.read()
-            try:
-                self.html = pagebytes.decode('utf-8')
-            except UnicodeDecodeError:
-                self.html = str(pagebytes)
+            self.html = pagerequest.text
 
         for extraurl in self.extraurls:
+            pywikibot.info('Getting {}'.format(extraurl))
             try:
-                pywikibot.output('Getting {}'.format(extraurl))
-                if 'https' in self.url:
-                    context = ssl._create_unverified_context()
-                    # validate server certificate's hostname is recommened
-                    context.check_hostname = True
-                    pagerequest = urlopen(extraurl, context=context)
-                else:
-                    pagerequest = urlopen(extraurl)
-            except (HTTPError, URLError, UnicodeEncodeError):
-                pywikibot.output('Unable to receive altpage')
+                pagerequest = http.fetch(extraurl)
+            except (ServerError, ConnectionError):
+                pywikibot.info('Unable to receive altpage')
             else:
-                pagebytes = pagerequest.read()
-                try:
-                    self.html += '\n' + pagebytes.decode('utf-8')
-                except UnicodeDecodeError:
-                    self.html += '\n' + str(pagebytes)
+                self.html += '\n' + pagerequest.text
 
         if self.sparqlquery:
             self.html = str(sparql.SparqlQuery().select(self.sparqlquery))
