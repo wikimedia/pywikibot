@@ -67,13 +67,13 @@ from collections import defaultdict
 from contextlib import suppress
 from html import unescape
 from textwrap import shorten
-from typing import Tuple
+from typing import Optional
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, unquote
 from urllib.request import urlopen
 
 import pywikibot
-from pywikibot.backports import List
+from pywikibot.backports import List, Tuple
 from pywikibot.bot import input_yn, SingleSiteBot, suggest_help
 from pywikibot.data import sparql
 from pywikibot.exceptions import (
@@ -1242,7 +1242,7 @@ class Analyzer:
         term = term.split('(')[0]
         if ',' in term:
             if term.split(',')[1].strip().lower() in ['jr', 'sr']:
-                term = term + '.'
+                term += '.'
             else:
                 if term.strip()[-1] != term.strip()[-1].lower():
                     term = term.strip() + '.'
@@ -1283,14 +1283,13 @@ class Analyzer:
             answer = None
         return answer
 
-    def findclaims(self):
-        if not self.id:
-            return
+    def findclaims(self) -> List[Tuple[str, str, Optional['Analyzer']]]:
+        if not self.id or not (self.url or self.sparqlquery):
+            return []
+
         self.html = ''
-        if not self.url and not self.sparqlquery:
-            return
         newclaims = []
-        pywikibot.output()
+        pywikibot.info()
         pagerequest = None
         if not self.skipfirst:
             try:
@@ -1316,7 +1315,6 @@ class Analyzer:
                 pywikibot.output('Unable to receive page {} - not unicode?'
                                  .format(self.url))
                 pagerequest = None
-                self.html = ''
 
         if pagerequest:
             pagebytes = pagerequest.read()
@@ -1330,6 +1328,8 @@ class Analyzer:
                 pywikibot.output('Getting {}'.format(extraurl))
                 if 'https' in self.url:
                     context = ssl._create_unverified_context()
+                    # validate server certificate's hostname is recommened
+                    context.check_hostname = True
                     pagerequest = urlopen(extraurl, context=context)
                 else:
                     pagerequest = urlopen(extraurl)
@@ -1338,14 +1338,15 @@ class Analyzer:
             else:
                 pagebytes = pagerequest.read()
                 try:
-                    self.html = self.html + '\n' + pagebytes.decode('utf-8')
+                    self.html += '\n' + pagebytes.decode('utf-8')
                 except UnicodeDecodeError:
-                    self.html = self.html + '\n' + str(pagebytes)
+                    self.html += '\n' + str(pagebytes)
 
         if self.sparqlquery:
             self.html = str(sparql.SparqlQuery().select(self.sparqlquery))
+
         if not self.html:
-            return
+            return []
 
         if self.escapeunicode:
             self.html = self.html.encode().decode('unicode-escape')
@@ -5722,11 +5723,11 @@ class ClaraAnalyzer(Analyzer):
         section = self.findbyre(
             r'(?s)<div class="detail_label">Artistic Role\(s\):</div>\s*<div class="detail_text">(.*?)<', html)
         if section:
-            result = result + self.findallbyre(r'([^,]*)', section, 'occupation')
+            result += self.findallbyre(r'([^,]*)', section, 'occupation')
         section = self.findbyre(
             r'(?s)<div class="detail_label">Other Occupation\(s\):</div>\s*<div class="detail_text">(.*?)<', html)
         if section:
-            result = result + self.findallbyre(r'([^,]*)', section, 'occupation')
+            result += self.findallbyre(r'([^,]*)', section, 'occupation')
         return result
 
     def findresidences(self, html: str):
