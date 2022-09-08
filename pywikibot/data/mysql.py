@@ -76,7 +76,7 @@ def mysql_query(query: str, params=None,
         if None, config.verbose_output will be used.
     :return: generator which yield tuples
     """
-    # These are specified in config.py or user-config.py
+    # These are specified in config.py or your user config file
     if verbose is None:
         verbose = config.verbose_output
 

@@ -7,7 +7,7 @@ If you wish to run this as an stand-alone script, use::
 
     scripts/cosmetic_changes.py
 
-For regular use, it is recommended to put this line into your user-config.py::
+For regular use, it is recommended to put this line into your user config::
 
     cosmetic_changes = True
 
@@ -15,7 +15,7 @@ You may enable cosmetic changes for additional languages by adding the
 dictionary cosmetic_changes_enable to your user-config.py. It should contain
 a tuple of languages for each site where you wish to enable in addition to
 your own langlanguage if cosmetic_changes_mylang_only is True (see below).
-Please set your dictionary by adding such lines to your user-config.py::
+Please set your dictionary by adding such lines to your user config::
 
     cosmetic_changes_enable['wikipedia'] = ('de', 'en', 'fr')
 
@@ -26,13 +26,14 @@ There is another config variable: You can set::
 if you're running a bot on multiple sites and want to do cosmetic changes on
 all of them, but be careful if you do.
 
-You may disable cosmetic changes by adding the all unwanted languages to the
-dictionary cosmetic_changes_disable in your user-config.py. It should contain
-a tuple of languages for each site where you wish to disable cosmetic changes.
-You may use it with cosmetic_changes_mylang_only is False, but you can also
-disable your own language. This also overrides the settings in the dictionary
-cosmetic_changes_enable. Please set this dictionary by adding such lines to
-your user-config.py::
+You may disable cosmetic changes by adding the all unwanted languages to
+the `dictionary cosmetic_changes_disable` in your user config file
+(`user_config.py`). It should contain a tuple of languages for each site
+where you wish to disable cosmetic changes. You may use it with
+`cosmetic_changes_mylang_only` is False, but you can also disable your
+own language. This also overrides the settings in the dictionary
+`cosmetic_changes_enable`. Please set this dictionary by adding such
+lines to your user config file::
 
     cosmetic_changes_disable['wikipedia'] = ('de', 'en', 'fr')
 

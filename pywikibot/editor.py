@@ -30,7 +30,7 @@ class TextEditor:
 
     def _command(self, file_name: str, text: str,
                  jump_index: Optional[int] = None) -> List[str]:
-        """Return editor selected in user-config.py."""
+        """Return editor selected in user config file (user-config.py)."""
         if jump_index:
             # Some editors make it possible to mark occurrences of substrings,
             # or to jump to the line of the first occurrence.

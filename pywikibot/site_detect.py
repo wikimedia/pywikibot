@@ -144,7 +144,7 @@ class MWSite:
         self.private_wiki = ('error' in info
                              and info['error']['code'] == 'readapidenied')
         if self.private_wiki:
-            # user-config.py is not loaded because PYWIKIBOT_NO_USER_CONFIG
+            # user config is not loaded because PYWIKIBOT_NO_USER_CONFIG
             # is set to '2' by generate_family_file.py.
             # Prepare a temporary config for login.
             username = pywikibot.input(

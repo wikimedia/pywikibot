@@ -14,8 +14,8 @@ to copy all templates from nlwiki to liwiki and fywiki. It will show which
 pages have to be changed if -r is not present, and will only actually write
 pages if -r /is/ present.
 
-You can add replicate_replace to your user-config.py, which has the following
-format:
+You can add replicate_replace to your user config file (user-config.py),
+which has the following format:
 
  replicate_replace = {
      'wikipedia:li': {'Hoofdpagina': 'Veurblaad'}

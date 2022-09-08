@@ -17,8 +17,8 @@ The advantages of pwb.py wrapper script are:
 
 - check for framework and script depedencies and show a warning if a
   package is missing or outdated or if the Python release does not fit
-- check whether user-config.py config file is available and ask to
-  create it by starting the generate_user_files.py script
+- check whether user config file (user-config.py) is available and ask
+  to create it by starting the generate_user_files.py script
 - enable global options even if a script does not support them
 - start private scripts located in userscripts sub-folder
 - find a script even if given script name does not match a filename e.g.

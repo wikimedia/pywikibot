@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Script to create user-config.py.
+"""Script to create user-config.py. Other file names are not supported.
 
 .. versionchanged:: 7.0
    moved to pywikibot.scripts folder

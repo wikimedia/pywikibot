@@ -195,20 +195,22 @@ GLOBAL OPTIONS
 ==============
 (Global arguments available for all bots)
 
--dir:PATH         Read the bot's configuration data from directory given by
-                  PATH, instead of from the default directory.
+-dir:PATH         Read the bot's configuration data from directory given
+                  by PATH, instead of from the default directory.
 
--lang:xx          Set the language of the wiki you want to work on, overriding
-                  the configuration in user-config.py. xx should be the
-                  site code.
+-config:xyn       The user config filename. Default is user-config.py.
+
+-lang:xx          Set the language of the wiki you want to work on,
+                  overriding the configuration in user config file.
+                  xx should be the site code.
 
 -family:xyz       Set the family of the wiki you want to work on, e.g.
-                  wikipedia, wiktionary, wikivoyage, ...
-                  This will override the configuration in user-config.py.
+                  wikipedia, wiktionary, wikivoyage, ... This will
+                  override the configuration in user config file.
 
 -site:xyz:xx      Set the wiki site you want to work on, e.g.
-                  wikipedia:test, wiktionary:de, wikivoyage:en, ...
-                  This will override the configuration in user-config.py.
+                  wikipedia:test, wiktionary:de, wikivoyage:en, ... This
+                  will override the configuration in user config file.
 
 -user:xyz         Log in as user 'xyz' instead of the default username.
 
@@ -226,24 +228,24 @@ GLOBAL OPTIONS
 
 -nolog            Disable the log file (if it is enabled by default).
 
--maxlag           Sets a new maxlag parameter to a number of seconds. Defer bot
-                  edits during periods of database server lag. Default is set
-                  by config.py
+-maxlag           Sets a new maxlag parameter to a number of seconds.
+                  Defer bot edits during periods of database server lag.
+                  Default is set by config.py
 
--putthrottle:n    Set the minimum time (in seconds) the bot will wait between
--pt:n             saving pages.
+-putthrottle:n    Set the minimum time (in seconds) the bot will wait
+-pt:n             between saving pages.
 -put_throttle:n
 
--debug:item       Enable the log file and include extensive debugging data
--debug            for component "item" (for all components if the second form
-                  is used).
+-debug:item       Enable the log file and include extensive debugging
+-debug            data for component "item" (for all components if the
+                  second form is used).
 
 -verbose          Have the bot provide additional console output that may be
 -v                useful in debugging.
 
 -cosmeticchanges  Toggles the cosmetic_changes setting made in config.py
--cc               or user-config.py to its inverse and overrules it. All
-                  other settings and restrictions are untouched. The
+-cc               or user config file to its inverse and overrules it.
+                  All other settings and restrictions are untouched. The
                   setting may also be given directly like `-cc:True`;
                   accepted values for the option are `1`, `yes`, `true`,
                   `on`, `y`, `t` for True and `0`, `no`, `false`, `off`,
@@ -255,8 +257,8 @@ GLOBAL OPTIONS
                   An integer or float value may be given to simulate a
                   processing time; the bot just waits for given seconds.
 
--<config var>:n   You may use all given numeric config variables as option and
-                  modify it with command line.
+-<config var>:n   You may use all given numeric config variables as
+                  option and modify it with command line.
 
 """
 
@@ -849,18 +851,35 @@ def calledModuleName() -> str:
 def handle_args(args: Optional[Iterable[str]] = None,
                 do_help: bool = True) -> List[str]:
     """
-    Handle standard command line arguments, and return the rest as a list.
+    Handle global command line arguments and return the rest as a list.
 
-    Takes the command line arguments as strings, processes all global
-    parameters such as -lang or -log, initialises the logging layer,
-    which emits startup information into log at level 'verbose'.
+    Takes the command line arguments as strings, processes all
+    :ref:`global parameters<global options>` such as ``-lang`` or
+    ``-log``, initialises the logging layer, which emits startup
+    information into log at level 'verbose'. This function makes sure
+    that global arguments are applied first, regardless of the order in
+    which the arguments were given. ``args`` may be passed as an
+    argument, thereby overriding ``sys.argv``.
 
-    This makes sure that global arguments are applied first,
-    regardless of the order in which the arguments were given.
+    >>> local_args = pywikibot.handle_args()  # sys.argv is used
+    >>> local_args  # doctest: +SKIP
+    []
+    >>> local_args = pywikibot.handle_args(['-simulate', '-myoption'])
+    >>> local_args  # global optons are handled, show the remaining
+    ['-myoption']
+    >>> for arg in local_args: pass  # do whatever is wanted with local_args
 
-    args may be passed as an argument, thereby overriding sys.argv
+    .. versionchanged:: 5.2
+       *-site* global option was added
+    .. versionchanged:: 7.1
+       *-cosmetic_changes* and *-cc* may be set directly instead of
+       toggling the value. Refer :func:`tools.strtobool` for valid values.
+    .. versionchanged:: 7.7
+       *-config* global option was added.
 
-    :param args: Command line arguments
+    :param args: Command line arguments. If None,
+        :meth:`pywikibot.argvu<userinterfaces._interface_base.ABUIC.argvu>`
+        is used which is a copy of ``sys.argv``
     :param do_help: Handle parameter '-help' to show help and invoke sys.exit
     :return: list of arguments not recognised globally
     """
@@ -886,7 +905,8 @@ def handle_args(args: Optional[Iterable[str]] = None,
         option, _, value = arg.partition(':')
         if do_help_val is not False and option == '-help':
             do_help_val = value or True
-        elif option == '-dir':
+        # these are handled by config.py
+        elif option in ('-config', '-dir'):
             pass
         elif option == '-site':
             config.family, config.mylang = value.split(':')

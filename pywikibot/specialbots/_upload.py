@@ -68,7 +68,7 @@ class UploadRobot(BaseBot):
             would be overwritten or another mistake would be risked. Set it to
             an array of warning codes to selectively ignore specific warnings.
         :param target_site: Set the site to upload to. If target site is not
-            given it's taken from user-config.py.
+            given it's taken from user config file (user_config.py).
         :type target_site: object
         :param aborts: List of the warning types to abort upload on. Set to
             True to abort on any warning.

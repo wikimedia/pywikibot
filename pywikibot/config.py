@@ -5,21 +5,23 @@ User preferences are loaded from a python file called `user-config.py`,
 which may be located in directory specified by the environment variable
 `PYWIKIBOT_DIR`, or the same directory as `pwb.py`, or in a directory
 within the users home. See :py:obj:`get_base_dir` for more information.
+The different file name can specified with global `-config` option.
 
-If user-config.py cannot be found in any of those locations, this module
-will fail to load unless the environment variable `PYWIKIBOT_NO_USER_CONFIG`
-is set to a value other than `'0'`. i.e. `PYWIKIBOT_NO_USER_CONFIG=1` will
-allow config to load without a `user-config.py`. However, warnings will be
-shown if `user-config.py` was not loaded. To prevent these warnings, set
-`PYWIKIBOT_NO_USER_CONFIG=2`. If Pywikibot is installed as a site-package
-the behaviour is like `PYWIKIBOT_NO_USER_CONFIG=2` is set.
+If user config file cannot be found in any of those locations, this
+module will fail to load unless the environment variable
+`PYWIKIBOT_NO_USER_CONFIG` is set to a value other than `'0'`. i.e.
+`PYWIKIBOT_NO_USER_CONFIG=1` will allow config to load without a user
+config file. However, warnings will be shown if a user config file was
+not loaded. To prevent these warnings, set `PYWIKIBOT_NO_USER_CONFIG=2`.
+If Pywikibot is installed as a site-package the behaviour is like
+`PYWIKIBOT_NO_USER_CONFIG=2` is set.
 
-Functions made available to `user-config`:
+Functions made available to user config file:
 
  - user_home_path
 
-Sets module global base_dir and provides utility methods to
-build paths relative to base_dir:
+Sets module global `base_dir` and `user_config_file` and provides
+utility methods to build paths relative to base_dir:
 
  - makepath
  - datafilepath
@@ -90,14 +92,14 @@ class _ConfigurationDeprecationWarning(UserWarning):
 
 
 # IMPORTANT:
-# Do not change any of the variables in this file. Instead, make
-# a file user-config.py, and overwrite values in there.
+# Do not change any of the variables in this file. Instead, make a
+# user config file (user-config.py), and overwrite values in there.
 
-# Note: all variables defined in this module are made available to bots as
-# configuration settings, *except* variable names beginning with an
+# Note: all variables defined in this module are made available to bots
+# as configuration settings, *except* variable names beginning with an
 # underscore (example: _variable). Be sure to use an underscore on any
-# variables that are intended only for internal use and not to be exported
-# to other modules.
+# variables that are intended only for internal use and not to be
+# exported to other modules.
 
 _private_values = {'authenticate', 'db_password'}
 _deprecated_variables = {
@@ -129,7 +131,7 @@ mylang = 'language'
 
 # The dictionary usernames should contain a username for each site where you
 # have a bot account. Please set your usernames by adding such lines to your
-# user-config.py:
+# user config file (user-config.py):
 #
 # usernames['wikipedia']['de'] = 'myGermanUsername'
 # usernames['wiktionary']['en'] = 'myEnglishUsername'
@@ -185,9 +187,9 @@ enable_GET_without_SSL = False
 # exception CaptchaError being thrown if a captcha is encountered.
 solve_captcha = True
 
-# Some sites will require password authentication to access the HTML pages at
-# the site. If you have any such site, add lines to your user-config.py of
-# the following form:
+# Some sites will require password authentication to access the HTML
+# pages at the site. If you have any such site, add lines to your user
+# config file of the following form:
 #
 # authenticate['en.wikipedia.org'] = ('John','XXXXX')
 # authenticate['*.wikipedia.org'] = ('John','XXXXX')
@@ -205,7 +207,7 @@ solve_captcha = True
 # Pywikibot also support OAuth 1.0a via mwoauth
 # https://pypi.org/project/mwoauth
 #
-# You can add OAuth tokens to your user-config.py of the following form:
+# You can add OAuth tokens to your user config file of this form:
 #
 # authenticate['en.wikipedia.org'] = ('consumer_key','consumer_secret',
 #                                     'access_key', 'access_secret')
@@ -279,7 +281,22 @@ def user_home_path(path: str) -> str:
     return os.path.join(os.path.expanduser('~'), path)
 
 
-def get_base_dir(test_directory: Optional[str] = None) -> str:
+def get_user_config_file() -> str:
+    """Return user config file name.
+
+    .. versionadded:: 7.7
+    """
+    for arg in sys.argv[1:]:
+        opt, _, value = arg.partition(':')
+        if opt == '-config':
+            if not value.endswith('.py'):
+                value += '.py'
+            return value
+    return 'user-config.py'
+
+
+def get_base_dir(test_directory: Optional[str] = None,
+                 config_file: str = 'user-config.py') -> str:
     r"""Return the directory in which user-specific information is stored.
 
     This is determined in the following order:
@@ -296,18 +313,22 @@ def get_base_dir(test_directory: Optional[str] = None) -> str:
          `'.pywikibot'` directory (Unix and similar) under the user's
          home directory.
 
-    Set `PYWIKIBOT_NO_USER_CONFIG=1` to disable loading `user-config.py`
-    or install Pywikibot as a site-package.
+    Set `PYWIKIBOT_NO_USER_CONFIG=1` to disable loading user config file
+    (`user-config.py`) or install Pywikibot as a site-package.
+
+    .. versionchanged:: 7.7
+       Added the *config_file* parameter.
 
     :param test_directory: Assume that a user config file exists in this
         directory. Used to test whether placing a user config file in this
         directory will cause it to be selected as the base directory.
+    :param config_file: filename of the user config file
     """
     def exists(directory: str) -> bool:
         directory = os.path.abspath(directory)
         if directory == test_directory:
             return True
-        return os.path.exists(os.path.join(directory, 'user-config.py'))
+        return os.path.exists(os.path.join(directory, config_file))
 
     if test_directory is not None:
         test_directory = os.path.abspath(test_directory)
@@ -358,18 +379,17 @@ def get_base_dir(test_directory: Optional[str] = None) -> str:
     # make sure this path is valid and that it contains user-config file
     if not os.path.isdir(base_dir):
         raise RuntimeError("Directory '{}' does not exist.".format(base_dir))
-    # check if user-config.py is in base_dir
+    # check if config_file is in base_dir
     if not exists(base_dir):
-        exc_text = 'No user-config.py found in directory {!r}.\n'.format(
-            base_dir)
+        exc_text = 'No {} found in directory {!r}.\n'.format(
+            config_file, base_dir)
 
         if __no_user_config is None:
             assert get_base_dir.__doc__ is not None
             exc_text += (
-                '  Please check that user-config.py is stored in the correct '
-                'location.\n'
-                '  Directory where user-config.py is searched is determined '
-                'as follows:\n\n    ') + get_base_dir.__doc__
+                '  Please check that {0} is stored in the correct location.\n'
+                '  Directory where {0} is searched is determined as follows:'
+                '\n\n    '.format(config_file)) + get_base_dir.__doc__
             raise RuntimeError(exc_text)
 
         if __no_user_config != '2':
@@ -378,12 +398,15 @@ def get_base_dir(test_directory: Optional[str] = None) -> str:
     return base_dir
 
 
+user_config_file = get_user_config_file()
+
 # Save base_dir for use by other modules
-base_dir = get_base_dir()
+base_dir = get_base_dir(config_file=user_config_file)
 
 for arg in sys.argv[1:]:
     if arg.startswith('-verbose') or arg == '-v':
         output('The base directory is ' + base_dir)
+        output('The user config file is ' + user_config_file)
         break
 family_files = {}
 
@@ -648,7 +671,7 @@ interwiki_min_subjects = 100
 # Supported formats include png, jpg, ps, and svg. See:
 # http://www.graphviz.org/doc/info/output.html
 # If you want to also dump the dot files, you can use this in your
-# user-config.py:
+# user config file:
 # interwiki_graph_formats = ['dot', 'png']
 # If you need a PNG image with an HTML image map, use this:
 # interwiki_graph_formats = ['png', 'cmap']
@@ -785,7 +808,7 @@ cosmetic_changes_mylang_only = True
 # The dictionary cosmetic_changes_enable should contain a tuple of languages
 # for each site where you wish to enable in addition to your own langlanguage
 # (if cosmetic_changes_mylang_only is set)
-# Please set your dictionary by adding such lines to your user-config.py:
+# Please set your dictionary by adding such lines to your user config file:
 # cosmetic_changes_enable['wikipedia'] = ('de', 'en', 'fr')
 cosmetic_changes_enable = {}  # type: Dict[str, Tuple[str, ...]]
 
@@ -793,13 +816,13 @@ cosmetic_changes_enable = {}  # type: Dict[str, Tuple[str, ...]]
 # for each site where you wish to disable cosmetic changes. You may use it with
 # cosmetic_changes_mylang_only is False, but you can also disable your own
 # language. This also overrides the settings in the cosmetic_changes_enable
-# dictionary. Please set your dict by adding such lines to your user-config.py:
+# dictionary. Please set your dict by adding such lines to your user config:
 # cosmetic_changes_disable['wikipedia'] = ('de', 'en', 'fr')
 cosmetic_changes_disable = {}  # type: Dict[str, Tuple[str, ...]]
 
 # cosmetic_changes_deny_script is a list of scripts for which cosmetic changes
 # are disabled. You may add additional scripts by appending script names in
-# your user-config.py ("+=" operator is strictly recommended):
+# your user config file ("+=" operator is strictly recommended):
 # cosmetic_changes_deny_script += ['your_script_name_1', 'your_script_name_2']
 # Appending the script name also works:
 # cosmetic_changes_deny_script.append('your_script_name')
@@ -807,7 +830,7 @@ cosmetic_changes_deny_script = ['category_redirect', 'cosmetic_changes',
                                 'newitem', 'touch']
 
 # ############# REPLICATION BOT SETTINGS ################
-# You can add replicate_replace to your user-config.py.
+# You can add replicate_replace to your user config file.
 #
 # Use has the following format:
 #
@@ -826,7 +849,7 @@ replicate_replace = {}  # type: Dict[str, Dict[str, str]]
 # Defines what additional actions the bots are NOT allowed to do (e.g. 'edit')
 # on the wiki server. Allows simulation runs of bots to be carried out without
 # changing any page on the server side. Use this setting to add more actions
-# in user-config.py for wikis with extra write actions.
+# into user config file for wikis with extra write actions.
 actions_to_block = []  # type: List[str]
 
 # Set simulate to True or use -simulate option to block all actions given
@@ -956,7 +979,7 @@ _public_globals = {
 _exec_globals = copy.deepcopy(_public_globals)
 
 # Always try to get the user files
-_filename = os.path.join(base_dir, 'user-config.py')
+_filename = os.path.join(base_dir, user_config_file)
 if os.path.exists(_filename):
     _filestatus = os.stat(_filename)
     _filemode = _filestatus[0]
@@ -969,7 +992,7 @@ if os.path.exists(_filename):
     else:
         warning('Skipped {fn!r}: writeable by others.'.format(fn=_filename))
 elif __no_user_config and __no_user_config != '2':
-    warning('user-config.py cannot be loaded.')
+    warning('{} cannot be loaded.'.format(user_config_file))
 
 
 class _DifferentTypeError(UserWarning, TypeError):
@@ -984,8 +1007,8 @@ class _DifferentTypeError(UserWarning, TypeError):
     ) -> None:
         super().__init__(
             'Configuration variable "{}" is defined as "{}" in '
-            'your user-config.py but expected "{}".'
-            .format(name, actual_type.__name__,
+            'your {} but expected "{}".'
+            .format(name, actual_type.__name__, user_config_file,
                     '", "'.join(t.__name__ for t in allowed_types)))
 
 
@@ -1015,9 +1038,9 @@ def _assert_types(
 
 
 DEPRECATED_VARIABLE = (
-    '"{}" present in our user-config.py is no longer a supported '
-    'configuration variable and should be removed. Please inform the '
-    'maintainers if you depend on it.')
+    '"{{}}" present in our {} is no longer a supported configuration variable '
+    'and should be removed. Please inform the maintainers if you depend on it.'
+    .format(user_config_file))
 
 
 def _check_user_config_types(
@@ -1044,9 +1067,9 @@ def _check_user_config_types(
                      _ConfigurationDeprecationWarning)
             elif name not in _future_variables:
                 warn('\n' + fill('Configuration variable "{}" is defined in '
-                                 'your user-config.py but unknown. It can be '
-                                 'a misspelled one or a variable that is no '
-                                 'longer supported.'.format(name)),
+                                 'your {} but unknown. It can be a misspelled '
+                                 'one or a variable that is no longer '
+                                 'supported.'.format(name, user_config_file)),
                      UserWarning)
 
 

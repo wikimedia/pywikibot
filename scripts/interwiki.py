@@ -317,7 +317,7 @@ Some configuration option can be used to change the working of this bot:
 
  without_interwiki:  save file with local articles without interwikis
 
-All these options can be changed through the user-config.py configuration file.
+All these options can be changed through the user configuration file.
 
 If interwiki.py is terminated before it is finished, it will write a dump file
 to the interwiki-dumps subdirectory. The program will read it if invoked with
