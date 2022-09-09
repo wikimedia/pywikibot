@@ -11,7 +11,7 @@ on:
     branches: [ master ]
 
 env:
-  PYWIKIBOT_TESTS_RUNNING: 1
+  PYWIKIBOT_TEST_RUNNING: 1
   PYWIKIBOT_USERNAME: Pywikibot-test
 
 jobs:

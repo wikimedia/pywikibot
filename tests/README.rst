@@ -105,29 +105,39 @@ The 'user' tests are not yet enabled on AppVeyor builds.
 Environment variables
 =====================
 
-PYWIKIBOT_TEST_WRITE_FAIL
-    There are a set of 'edit failure' tests, which attempt to write to the wikis
-    and **should** fail. If there is a bug in pywikibot or MediaWiki, these
-    tests **may** actually perform a write operation.
+**PYWIKIBOT_TEST_RUNNING**
+  This environment variable skips tests instead of raising
+  :exc:`exceptions.MaxlagTimeoutError` when maximum retries attempted due to
+  maxlag without success. It is also used by :mod:`tests.script_tests` for code
+  coverage. Github actions and Appveyor tests activate this variable.
 
-    These 'edit failure' tests are disabled by default. On Travis they are enabled
-    by default on builds by any other GitHub account except 'wikimedia'.
+**PYWIKIBOT_TEST_WRITE**
+  There are also several other 'write' tests which also attempt to perform
+  write operations successfully.  These **will** write to the wikis, and they
+  should always only write to 'test' wikis.
 
-    To disable 'edit failure' tests, set PYWIKIBOT_TEST_WRITE_FAIL=0
+  These 'write' tests are disabled by default, and currently cannot be
+  run on Travis or AppVeyor as they require interaction using a terminal. Also
+  enabling them won't enable 'edit failure' tests.
 
-PYWIKIBOT_TEST_WRITE
-    There are also several other 'write' tests which also attempt to perform
-    write operations successfully.  These **will** write to the wikis, and they
-    should always only write to 'test' wikis.
+  To enable 'write' tests, set::
 
-    These 'write' tests are disabled by default, and currently cannot be
-    run on Travis or AppVeyor as they require interaction using a terminal. Also
-    enabling them won't enable 'edit failure' tests.
+    PYWIKIBOT_TEST_WRITE=1
 
-    To enable 'write' tests, set PYWIKIBOT_TEST_WRITE=1
+**PYWIKIBOT_TEST_WRITE_FAIL**
+  There are a set of 'edit failure' tests, which attempt to write to the wikis
+  and **should** fail. If there is a bug in pywikibot or MediaWiki, these
+  tests **may** actually perform a write operation.
 
-Enabling only 'edit failure' tests or 'write' tests won't enable the other tests
-automatically.
+  These 'edit failure' tests are disabled by default. On Travis they are enabled
+  by default on builds by any other GitHub account except 'wikimedia'.
+
+  To disable 'edit failure' tests, set::
+
+    PYWIKIBOT_TEST_WRITE_FAIL=0
+
+.. note:: Enabling only 'edit failure' tests or 'write' tests won't enable the other tests
+   automatically.
 
 Decorators
 ==========

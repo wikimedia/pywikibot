@@ -1110,7 +1110,7 @@ The text message is:
                 raise RuntimeError(result)
 
         msg = 'Maximum retries attempted due to maxlag without success.'
-        if os.environ.get('PYWIKIBOT_TESTS_RUNNING', '0') == '1':
+        if os.environ.get('PYWIKIBOT_TEST_RUNNING', '0') == '1':
             import unittest
             raise unittest.SkipTest(msg)
 

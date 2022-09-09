@@ -12,7 +12,7 @@ on:
       - completed
 
 env:
-  PYWIKIBOT_TESTS_RUNNING: 1
+  PYWIKIBOT_TEST_RUNNING: 1
   PYWIKIBOT_LOGIN_LOGOUT: 1
   PYWIKIBOT_USERNAME: Pywikibot-test
 
