@@ -5,6 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
+import os
 import unittest
 from contextlib import suppress
 
@@ -12,11 +13,32 @@ import pywikibot
 from tests.aspects import DefaultSiteTestCase, TestCase, require_modules
 
 
-class TestTkdialog(TestCase):
+class TkinterTestsBase(TestCase):
 
-    """Test Tkdialog."""
+    """TestCase base for Tkinter tests."""
 
     net = True
+
+    @classmethod
+    def setUpClass(cls):
+        """Set virtual display environment."""
+        super().setUpClass()
+        cls.env = os.environ.get('DISPLAY')
+        os.environ['DISPLAY'] = ':0.0'
+
+    @classmethod
+    def tearDownClass(cls):
+        """Restore the display environment value."""
+        if not cls.env:
+            del os.environ['DISPLAY']
+        else:
+            os.environ['DISPLAY'] = cls.env
+        super().tearDownClass()
+
+
+class TestTkdialog(TkinterTestsBase):
+
+    """Test Tkdialog."""
 
     def testTkdialog(self):
         """Test Tk dialog."""
@@ -27,11 +49,9 @@ class TestTkdialog(TestCase):
             pywikibot.warning(e)
 
 
-class TestTkinter(DefaultSiteTestCase):
+class TestTkinter(TkinterTestsBase, DefaultSiteTestCase):
 
     """Test Tkinter."""
-
-    net = True
 
     def testTkinter(self):
         """Test Tkinter window."""
