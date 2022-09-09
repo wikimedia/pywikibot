@@ -24,7 +24,7 @@ class TkinterTestsBase(TestCase):
         """Set virtual display environment."""
         super().setUpClass()
         cls.env = os.environ.get('DISPLAY')
-        os.environ['DISPLAY'] = ':0.0'
+        os.environ['DISPLAY'] = ':1.0'
 
     @classmethod
     def tearDownClass(cls):
