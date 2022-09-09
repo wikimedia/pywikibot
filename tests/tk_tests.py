@@ -42,11 +42,16 @@ class TestTkdialog(TkinterTestsBase):
 
     def testTkdialog(self):
         """Test Tk dialog."""
-        try:
-            box = Tkdialog('foo', 'tests/data/MP_sounds.png', 'MP_sounds.png')
-            box.show_dialog()
-        except ImportError as e:
-            pywikibot.warning(e)
+        desc = 'foo'
+        image = 'tests/data/images/MP_sounds.png'
+        filename = image.rsplit('/', 1)[1]
+        box = Tkdialog(desc, image, filename)
+        # skip after ~100 ms
+        box.root.after(100, lambda: box.skip_file())
+        description, name, skip = box.show_dialog()
+        self.assertEqual(description, desc)
+        self.assertEqual(name, filename)
+        self.assertTrue(skip)
 
 
 class TestTkinter(TkinterTestsBase, DefaultSiteTestCase):
@@ -58,15 +63,17 @@ class TestTkinter(TkinterTestsBase, DefaultSiteTestCase):
         root = tkinter.Tk()
         root.resizable(width=tkinter.FALSE, height=tkinter.FALSE)
         root.title('pywikibot GUI')
-        page = pywikibot.Page(pywikibot.Site(), 'Main Page')
+        page = pywikibot.Page(self.site, 'Main Page')
         content = page.get()
         myapp = EditBoxWindow(root)
-        myapp.bind('<Control-d>', myapp.debug)
-        v = myapp.edit(content, highlight=page.title())
-        self.assertIsNone(v)
+        root.after(100, lambda: myapp.pressedOK())
+        text = myapp.edit(content, highlight=page.title())
+        self.assertIsNotNone(text)
+        self.assertIn('Main Page', text)
 
 
 @require_modules('tkinter')
+@require_modules('PIL')
 def setUpModule():
     """Skip tests if tkinter is not installed. Otherwise import it."""
     global EditBoxWindow, Tkdialog, tkinter

@@ -538,8 +538,8 @@ except AttributeError:
 
 # An indication of the size of your screen, or rather the size of the screen
 # to be shown, for flickrripper
-tkhorsize = 1600
-tkvertsize = 1000
+tkhorsize = 1280
+tkvertsize = 800
 
 # ############# EXTERNAL EDITOR SETTINGS ##############
 # The command for the editor you want to use. If set to None, a simple Tkinter
