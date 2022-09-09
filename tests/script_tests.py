@@ -76,6 +76,7 @@ script_input = {
         '8/80/Wikipedia-logo-v2.svg\n\n\n',
 }
 
+#:
 auto_run_script_list = [
     'archivebot',
     'blockpageschecker',

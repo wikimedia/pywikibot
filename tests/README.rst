@@ -105,11 +105,29 @@ The 'user' tests are not yet enabled on AppVeyor builds.
 Environment variables
 =====================
 
+**PYWIKIBOT_TEST_AUTORUN**
+  Enable script tests running automatically without specifying a generator.
+  The scripts are listed in :attr:`tests.script_tests.auto_run_script_list`.
+  Currently only *deeptest* uses it.
+
+**PYWIKIBOT_TEST_MODULES**
+  Only run tests given with this environment variable. Multiple tests must be
+  separated by a ``,`` without any white space. Available library tests are
+  listed in :ref:`Library tests` and script tests can be found in
+  :ref:`Script tests`. To enable only :mod:`tests.site_tests` and
+  :mod:`tests.wikibase_tests` set the environment variable as::
+
+    PYWIKIBOT_TEST_MODULES=site,wikibase
+
+  .. note:: test names must be given without subsequent ``_tests``.
+
 **PYWIKIBOT_TEST_RUNNING**
   This environment variable skips tests instead of raising
   :exc:`exceptions.MaxlagTimeoutError` when maximum retries attempted due to
   maxlag without success. It is also used by :mod:`tests.script_tests` for code
-  coverage. Github actions and Appveyor tests activate this variable.
+  coverage. Github actions and Appveyor tests activate this variable::
+
+    PYWIKIBOT_TEST_RUNNING=1
 
 **PYWIKIBOT_TEST_WRITE**
   There are also several other 'write' tests which also attempt to perform
