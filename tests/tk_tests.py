@@ -5,18 +5,11 @@
 #
 # Distributed under the terms of the MIT license.
 #
-import os
 import unittest
 from contextlib import suppress
 
 import pywikibot
-from tests.aspects import DefaultSiteTestCase, TestCase
-
-
-if os.environ.get('PYWIKIBOT_TEST_GUI', '0') == '1':
-    import tkinter
-
-    from pywikibot.userinterfaces.gui import EditBoxWindow, Tkdialog
+from tests.aspects import DefaultSiteTestCase, TestCase, require_modules
 
 
 class TestTkdialog(TestCase):
@@ -53,10 +46,12 @@ class TestTkinter(DefaultSiteTestCase):
         self.assertIsNone(v)
 
 
+@require_modules('tkinter')
 def setUpModule():
-    """Skip Travis tests if PYWIKIBOT_TEST_GUI variable is not set."""
-    if os.environ.get('PYWIKIBOT_TEST_GUI', '0') != '1':
-        raise unittest.SkipTest('Tkinter tests are disabled on Travis-CI')
+    """Skip tests if tkinter is not installed. Otherwise import it."""
+    global EditBoxWindow, Tkdialog, tkinter
+    import tkinter
+    from pywikibot.userinterfaces.gui import EditBoxWindow, Tkdialog
 
 
 if __name__ == '__main__':  # pragma: no cover
