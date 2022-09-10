@@ -36,6 +36,7 @@ from tests.aspects import (
     WikidataTestCase,
 )
 from tests.tools_tests import GeneratorIntersectTestCase
+from tests.utils import skipping
 
 
 en_wp_page_titles = (
@@ -376,12 +377,10 @@ class PetScanPageGeneratorTestCase(TestCase):
         site = self.get_site()
         gen = pagegenerators.PetScanPageGenerator(['Pywikibot Protect Test'],
                                                   True, None, site)
-        try:
+        with skipping(ServerError):
             self.assertPageTitlesEqual(gen, titles=(
                 'User:Sn1per/ProtectTest1', 'User:Sn1per/ProtectTest2'),
                 site=site)
-        except ServerError as e:
-            self.skipTest(e)
 
         gen = pagegenerators.PetScanPageGenerator(['Pywikibot Protect Test'],
                                                   False, None, site)

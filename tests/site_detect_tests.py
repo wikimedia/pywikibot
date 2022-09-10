@@ -17,7 +17,7 @@ from pywikibot.exceptions import ServerError
 from pywikibot.site_detect import MWSite
 from tests import unittest_print
 from tests.aspects import PatchingTestCase, TestCase
-from tests.utils import DrySite
+from tests.utils import DrySite, skipping
 
 
 class SiteDetectionTestCase(TestCase):
@@ -33,10 +33,8 @@ class SiteDetectionTestCase(TestCase):
         :param url: Url of tested site
         :raises AssertionError: Site under url is not MediaWiki powered
         """
-        try:
+        with skipping(ServerError, requests_exceptions.Timeout):
             self.assertIsInstance(MWSite(url), MWSite)
-        except (ServerError, requests_exceptions.Timeout) as e:
-            self.skipTest(e)
 
     def assertNoSite(self, url: str):
         """
