@@ -112,6 +112,7 @@ library_test_modules = {
     'proofreadpage',
     'site',
     'site_decorators',
+    'site_generators',
     'site_detect',
     'siteinfo',
     'sparql',

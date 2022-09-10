@@ -62,8 +62,10 @@ Library tests
     paraminfo<./paraminfo_tests>
     plural<./plural_tests>
     proofreadpage<./proofreadpage_tests>
-    site_detect<./site_detect_tests>
     site<./site_tests>
+    site_decorators<./site_decorators_tests>
+    site_generators<./site_generators_tests>
+    site_detect<./site_detect_tests>
     sparql<./sparql_tests>
     tests<./tests_tests>
     textlib<./textlib_tests>
