@@ -47,7 +47,7 @@ class TestTkdialog(TkinterTestsBase):
         filename = image.rsplit('/', 1)[1]
         box = Tkdialog(desc, image, filename)
         # skip after ~100 ms
-        box.root.after(100, lambda: box.skip_file())
+        box.root.after(100, box.skip_file)
         description, name, skip = box.show_dialog()
         self.assertEqual(description, desc)
         self.assertEqual(name, filename)
@@ -66,7 +66,7 @@ class TestTkinter(TkinterTestsBase, DefaultSiteTestCase):
         page = pywikibot.Page(self.site, 'Main Page')
         content = page.get()
         myapp = EditBoxWindow(root)
-        root.after(100, lambda: myapp.pressedOK())
+        root.after(100, myapp.pressedOK)
         text = myapp.edit(content, highlight=page.title())
         self.assertIsNotNone(text)
         self.assertIn('Main Page', text)
