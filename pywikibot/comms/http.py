@@ -480,25 +480,19 @@ def _decide_encoding(response, charset) -> Optional[str]:
 
     # No charset requested, or in request headers or response headers.
     # Defaults to latin1.
-    if charset is None and header_encoding is None:
-        return _try_decode(response.content, 'latin1')
+    if charset is None:
+        return _try_decode(response.content, header_encoding or 'latin1')
 
-    if charset is None and header_encoding is not None:
-        return _try_decode(response.content, header_encoding)
-
-    if charset is not None and header_encoding is None:
+    if header_encoding is None:
         return _try_decode(response.content, charset)
 
     # Both charset and header_encoding are available.
-    try:
+    header_codecs = charset_codecs = None
+    with suppress(LookupError):
         header_codecs = codecs.lookup(header_encoding)
-    except LookupError:
-        header_codecs = None
 
-    try:
+    with suppress(LookupError):
         charset_codecs = codecs.lookup(charset)
-    except LookupError:
-        charset_codecs = None
 
     if header_codecs and charset_codecs and header_codecs != charset_codecs:
         pywikibot.warning(
