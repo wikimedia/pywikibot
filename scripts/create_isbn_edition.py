@@ -464,8 +464,7 @@ SELECT ?item WHERE {{
     if rescnt == 1:
         item.get(get_redirect=True)         # Update item
     elif not rescnt:
-        label = {}
-        label[booklang] = objectname
+        label = {booklang: objectname}
         item = pywikibot.ItemPage(repo)     # Create item
         item.editEntity({'labels': label}, summary=transcmt)
         qnumber = item.getID()
