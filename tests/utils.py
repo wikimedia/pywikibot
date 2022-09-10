@@ -11,6 +11,7 @@ import unittest
 import warnings
 from contextlib import contextmanager
 from subprocess import PIPE, Popen, TimeoutExpired
+from typing import Optional
 
 import pywikibot
 from pywikibot import config
@@ -517,8 +518,38 @@ def empty_sites():
 
 
 @contextmanager
-def skipping(*exceptions, msg=None):
-    """Context manager to skip test on specified exceptions."""
+def skipping(*exceptions: BaseException, msg: Optional[str] = None):
+    """Context manager to skip test on specified exceptions.
+
+    For example Eventstreams raises ``NotImplementedError`` if no
+    ``streams`` parameter was given. Skip the following tests in that
+    case::
+
+        with skipping(NotImplementedError):
+            self.es = comms.eventstreams.EventStreams(streams=None)
+        self.assertIsInstance(self.es, tools.collections.GeneratorWrapper)
+
+    The exception message is used for the ``SkipTest`` reason. To use a
+    custom message, add a ``msg`` parameter::
+
+        with skipping(AssertionError, msg='T304786'):
+            self.assertEqual(self.get_mainpage().oldest_revision.text, text)
+
+    Multiple context expressions may also be used::
+
+        with (
+            skipping(OtherPageSaveError),
+            self.assertRaisesRegex(SpamblacklistError, 'badsite.com'),
+        ):
+            page.save()
+
+    .. note:: The last sample uses Python 3.10 syntax.
+
+    .. versionadded:: 6.2
+
+    :param msg: Optional skipping reason
+    :param exceptions: Exceptions to let test skip
+    """
     try:
         yield
     except exceptions as e:
