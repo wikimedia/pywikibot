@@ -105,13 +105,15 @@ Options (may be omitted):
   -keep           Preserve thread order in archive even if threads are
                   archived later
   -sort           Sort archive by timestamp; should not be used with -keep
+  -async          Run the bot in parallel tasks. This is experimental
+                  and the bot cannot be stopped with KeyboardInterrupt
 
 .. versionchanged:: 7.6
    Localized variables for "archive" template parameter are supported.
    `User:MiszaBot/config` is the default template. `-keep` option was
    added.
 .. versionchanged:: 7.7
-   `-sort` option was added.
+   `-sort` and `-async` options were added.
 """
 #
 # (C) Pywikibot team, 2006-2022
@@ -124,6 +126,7 @@ import os
 import re
 import time
 from collections import OrderedDict, defaultdict
+from concurrent.futures import ThreadPoolExecutor
 from hashlib import md5
 from math import ceil
 from textwrap import fill
@@ -132,7 +135,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import i18n
-from pywikibot.backports import List, Set, Tuple, pairwise
+from pywikibot.backports import List, Set, Tuple, nullcontext, pairwise
 from pywikibot.exceptions import Error, NoPageError
 from pywikibot.textlib import (
     TimeStripper,
@@ -857,6 +860,7 @@ def main(*args: str) -> None:
     calc = None
     keep = False
     sort = False
+    asyncronous = False
     templates = []
 
     local_args = pywikibot.handle_args(args)
@@ -890,6 +894,8 @@ def main(*args: str) -> None:
             keep = True
         elif option == 'sort':
             sort = True
+        elif option == 'async':
+            asyncronous = True
 
     site = pywikibot.Site()
 
@@ -920,15 +926,22 @@ def main(*args: str) -> None:
         elif pagename:
             gen = [pywikibot.Page(site, pagename, ns=3)]
         else:
+
             ns = [str(namespace)] if namespace is not None else []
             pywikibot.output('Fetching template transclusions...')
             gen = tmpl.getReferences(only_template_inclusion=True,
                                      follow_redirects=False,
                                      namespaces=ns,
                                      content=True)
-        for pg in gen:
-            if not process_page(pg, tmpl, salt, force, keep, sort):
-                return
+
+        botargs = tmpl, salt, force, keep, sort
+        context = ThreadPoolExecutor if asyncronous else nullcontext
+        with context() as executor:
+            for pg in gen:
+                if asyncronous:
+                    executor.submit(process_page, pg, *botargs)
+                elif not process_page(pg, *botargs):
+                    return
 
 
 if __name__ == '__main__':
