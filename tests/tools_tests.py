@@ -32,6 +32,7 @@ from pywikibot.tools.itertools import (
 
 from tests import join_xml_data_path
 from tests.aspects import TestCase, require_modules
+from tests.utils import skipping
 
 
 class OpenArchiveTestCase(TestCase):
@@ -109,10 +110,9 @@ class OpenArchiveTestCase(TestCase):
 
     def test_open_archive_7z(self):
         """Test open_archive with 7za if installed."""
-        try:
+        with skipping(OSError, msg='7za not installed'):
             subprocess.Popen(['7za'], stdout=subprocess.PIPE).stdout.close()
-        except OSError:
-            self.skipTest('7za not installed')
+
         self.assertEqual(
             self._get_content(self.base_file + '.7z'), self.original_content)
         with self.assertRaisesRegex(
