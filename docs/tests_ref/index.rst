@@ -44,6 +44,7 @@ Library tests
     flow_edit<./flow_edit_tests>
     flow<./flow_tests>
     flow_thanks<./flow_thanks_tests>
+    gui<./gui_tests>
     http<./http_tests>
     i18n<./i18n_tests>
     interwiki_graph<./interwiki_graph_tests>
@@ -70,7 +71,6 @@ Library tests
     thread<./thread_tests>
     time<./time_tests>
     timestripper<./timestripper_tests>
-    tk<./tk_tests>
     tools_chars<./tools_chars_tests>
     tools_deprecate<./tools_deprecate_tests>
     tools_formatter<./tools_formatter_tests>

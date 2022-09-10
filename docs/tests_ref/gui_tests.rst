@@ -1,7 +1,7 @@
 tests.tk\_tests module
 ======================
 
-.. automodule:: tests.tk_tests
+.. automodule:: tests.gui_tests
     :members:
     :undoc-members:
     :show-inheritance:

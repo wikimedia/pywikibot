@@ -40,7 +40,7 @@ class TestTkdialog(TkinterTestsBase):
 
     """Test Tkdialog."""
 
-    def testTkdialog(self):
+    def test_tk_dialog(self):
         """Test Tk dialog."""
         desc = 'foo'
         image = 'tests/data/images/MP_sounds.png'
@@ -58,7 +58,7 @@ class TestTkinter(TkinterTestsBase, DefaultSiteTestCase):
 
     """Test Tkinter."""
 
-    def testTkinter(self):
+    def test_tkinter(self):
         """Test Tkinter window."""
         root = tkinter.Tk()
         root.resizable(width=tkinter.FALSE, height=tkinter.FALSE)
@@ -75,7 +75,10 @@ class TestTkinter(TkinterTestsBase, DefaultSiteTestCase):
 @require_modules('tkinter')
 @require_modules('PIL')
 def setUpModule():
-    """Skip tests if tkinter is not installed. Otherwise import it."""
+    """Skip tests if tkinter or PIL is not installed.
+
+    Otherwise import modules.
+    """
     global EditBoxWindow, Tkdialog, tkinter
     import tkinter
     from pywikibot.userinterfaces.gui import EditBoxWindow, Tkdialog
