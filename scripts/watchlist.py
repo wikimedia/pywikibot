@@ -18,13 +18,18 @@ Command line options:
              that the bot is connected to.
 -new         Load watchlists for all wikis where accounts is setting in
              user-config.py
+
+.. versionchanged:: 7.7
+   watchlist is retrieved in parallel tasks.
 """
 #
 # (C) Pywikibot team, 2005-2022
 #
 # Distributed under the terms of the MIT license.
 #
+import datetime
 import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import pywikibot
 from pywikibot import config
@@ -50,16 +55,20 @@ def count_watchlist(site=None) -> None:
                      .format(watchlist_count))
 
 
-def count_watchlist_all() -> None:
+def count_watchlist_all(quiet=False) -> None:
     """Count only the total number of page(s) in watchlist for all wikis."""
-    wl_count_all = 0
-    pywikibot.output('Counting pages in watchlists of all wikis...')
-    for family in config.usernames:
-        for lang in config.usernames[family]:
-            site = pywikibot.Site(lang, family)
-            wl_count_all += len(refresh(site))
-    pywikibot.output('There are a total of {} page(s) in the watchlists'
-                     'for all wikis.'.format(wl_count_all))
+    if not quiet:
+        pywikibot.info('Counting pages in watchlists of all wikis...')
+
+    with ThreadPoolExecutor() as executor:
+        futures = {executor.submit(refresh, pywikibot.Site(lang, family))
+                   for family in config.usernames
+                   for lang in config.usernames[family]}
+        wl_count_all = sum(len(future.result())
+                           for future in as_completed(futures))
+    if not quiet:
+        pywikibot.info('There are a total of {} page(s) in the watchlists for '
+                       'all wikis.'.format(wl_count_all))
 
 
 def isWatched(pageName, site=None):  # noqa: N802, N803
@@ -79,31 +88,30 @@ def refresh_all() -> None:
     cache_path = CachedRequest._get_cache_dir()
     files = os.scandir(cache_path)
     seen = set()
-    for filename in files:
-        entry = CacheEntry(cache_path, filename)
-        entry._load_cache()
-        entry.parse_key()
-        entry._rebuild()
-        if entry.site in seen:
-            continue
+    with ThreadPoolExecutor() as executor:
+        for filename in files:
+            entry = CacheEntry(cache_path, filename)
+            entry._load_cache()
+            entry.parse_key()
+            entry._rebuild()
+            if entry.site in seen:
+                continue
 
-        # for generator API usage we have to check the modules
-        modules = entry._params.get('modules', [])
-        modules_found = any(mod.endswith('watchlistraw') for mod in modules)
-        # for list API usage 'watchlistraw' is directly found
-        if modules_found or 'watchlistraw' in entry._data:
-            refresh(entry.site)
-            seen.add(entry.site)
+            # for generator API usage we have to check the modules
+            modules = entry._params.get('modules', [])
+            modules_found = any(module.endswith('watchlistraw')
+                                for module in modules)
+            # for list API usage 'watchlistraw' is directly found
+            if modules_found or 'watchlistraw' in entry._data:
+                executor.submit(refresh, entry.site)
+                seen.add(entry.site)
 
 
 def refresh_new() -> None:
     """Load watchlists of all wikis for accounts set in user-config.py."""
     pywikibot.output(
         'Downloading all watchlists for your accounts in user-config.py')
-    for family in config.usernames:
-        for lang in config.usernames[family]:
-            site = pywikibot.Site(lang, family)
-            refresh(site)
+    count_watchlist_all(quiet=True)
 
 
 def main(*args: str) -> None:
@@ -147,4 +155,7 @@ def main(*args: str) -> None:
 
 
 if __name__ == '__main__':
+    start = datetime.datetime.now()
     main()
+    pywikibot.info('\nExecution time: {} seconds'
+                   .format((datetime.datetime.now() - start).seconds))
