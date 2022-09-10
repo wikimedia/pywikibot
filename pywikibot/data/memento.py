@@ -311,7 +311,7 @@ def get_closest_memento_url(url: str,
                             timegate_uri: Optional[str] = None):
     """Get most recent memento for url."""
     if not when:
-        when = datetime.datetime.now()
+        when = datetime.now()
 
     mc = MementoClient()
     if timegate_uri:

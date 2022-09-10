@@ -1,18 +1,19 @@
 #!/usr/bin/python3
-"""weblinkchecker test module."""
+"""memento client test module."""
 #
 # (C) Pywikibot team, 2015-2022
 #
 # Distributed under the terms of the MIT license.
 #
-import datetime
 import unittest
 from contextlib import suppress
+from datetime import datetime
 from urllib.parse import urlparse
 
 from requests.exceptions import ConnectionError as RequestsConnectionError
 
 from tests.aspects import TestCase, require_modules
+from tests.utils import skipping
 
 
 @require_modules('memento_client')
@@ -26,14 +27,10 @@ class MementoTestCase(TestCase):
             get_closest_memento_url,
         )
 
-        if date_string is None:
-            when = datetime.datetime.now()
-        else:
-            when = datetime.datetime.strptime(date_string, '%Y%m%d')
-        try:
+        when = (datetime.strptime(date_string, '%Y%m%d')
+                if date_string else None)
+        with skipping(RequestsConnectionError, MementoClientException):
             result = get_closest_memento_url(url, when, self.timegate_uri)
-        except (RequestsConnectionError, MementoClientException) as e:
-            self.skipTest(e)
         return result
 
 
