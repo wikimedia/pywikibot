@@ -30,6 +30,7 @@ from pywikibot.exceptions import (
     TitleblacklistError,
 )
 from tests.aspects import TestCase, WikibaseTestCase
+from tests.utils import skipping
 
 
 class TestSaveFailure(TestCase):
@@ -55,13 +56,9 @@ class TestSaveFailure(TestCase):
         """Test that spam in content raise the appropriate exception."""
         page = pywikibot.Page(self.site, 'Wikipedia:Sandbox')
         page.text = 'http://badsite.com'
-        try:
-            with self.assertRaisesRegex(
-                    SpamblacklistError,
-                    'badsite.com'):
-                page.save()
-        except OtherPageSaveError as e:
-            self.skipTest(e)
+        with skipping(OtherPageSaveError), self.assertRaisesRegex(
+                SpamblacklistError, 'badsite.com'):
+            page.save()
 
     def test_titleblacklist(self):
         """Test that title blacklist raise the appropriate exception."""
