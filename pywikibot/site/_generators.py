@@ -94,6 +94,7 @@ class GeneratorsMixin:
         templates: bool = False,
         langlinks: bool = False,
         pageprops: bool = False,
+        categories: bool = False,
         content: bool = True
     ):
         """Return a generator to a list of preloaded pages.
@@ -111,6 +112,7 @@ class GeneratorsMixin:
         :param langlinks: preload all language links from the provided pages
             to other languages
         :param pageprops: preload various properties defined in page content
+        @param categories: preload page categories
         :param content: preload page content
         """
         props = 'revisions|info|categoryinfo'
@@ -120,6 +122,8 @@ class GeneratorsMixin:
             props += '|langlinks'
         if pageprops:
             props += '|pageprops'
+        if categories:
+            props += '|categories'
 
         for sublist in itergroup(pagelist, min(groupsize, self.maxlimit)):
             # Do not use p.pageid property as it will force page loading.

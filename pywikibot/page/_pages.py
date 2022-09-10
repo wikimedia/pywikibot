@@ -31,7 +31,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import Timestamp, config, date, i18n, textlib
-from pywikibot.backports import Generator, Iterable, List
+from pywikibot.backports import Generator, Iterable, Iterator, List
 from pywikibot.cosmetic_changes import CANCEL, CosmeticChangesToolkit
 from pywikibot.exceptions import (
     Error,
@@ -1493,10 +1493,10 @@ class BasePage(ComparableMixin):
         # this list if the method was called with include_obsolete=False
         # (which is the default)
         if not hasattr(self, '_langlinks'):
-            self._langlinks = list(self.iterlanglinks(include_obsolete=True))
+            self._langlinks = set(self.iterlanglinks(include_obsolete=True))
 
         if include_obsolete:
-            return self._langlinks
+            return list(self._langlinks)
         return [i for i in self._langlinks if not i.site.obsolete]
 
     def iterlanglinks(self,
@@ -1527,7 +1527,7 @@ class BasePage(ComparableMixin):
         """
         return pywikibot.ItemPage.fromPage(self)
 
-    def templates(self, content: bool = False):
+    def templates(self, content: bool = False) -> List['pywikibot.Page']:
         """
         Return a list of Page objects for templates used on this Page.
 
@@ -1547,9 +1547,9 @@ class BasePage(ComparableMixin):
             del self._templates
 
         if not hasattr(self, '_templates'):
-            self._templates = list(self.itertemplates(content=content))
+            self._templates = set(self.itertemplates(content=content))
 
-        return self._templates
+        return list(self._templates)
 
     def itertemplates(self,
                       total: Optional[int] = None,
@@ -1585,7 +1585,7 @@ class BasePage(ComparableMixin):
     def categories(self,
                    with_sort_key: bool = False,
                    total: Optional[int] = None,
-                   content: bool = False):
+                   content: bool = False) -> Iterator['pywikibot.Page']:
         """
         Iterate categories that the article is in.
 
@@ -1599,6 +1599,15 @@ class BasePage(ComparableMixin):
         # FIXME: bug T75561: with_sort_key is ignored by Site.pagecategories
         if with_sort_key:
             raise NotImplementedError('with_sort_key is not implemented')
+
+        # Data might have been preloaded
+        # Delete cache if content is needed and elements have no content
+        if hasattr(self, '_categories'):
+            if (content
+                    and not all(c.has_content() for c in self._categories)):
+                del self._categories
+            else:
+                return itertools.islice(self._categories, total)
 
         return self.site.pagecategories(self, total=total, content=content)
 

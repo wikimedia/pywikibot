@@ -914,21 +914,30 @@ def _update_revisions(page, revisions) -> None:
 
 def _update_templates(page, templates) -> None:
     """Update page templates."""
-    templ_pages = [pywikibot.Page(page.site, tl['title']) for tl in templates]
+    templ_pages = {pywikibot.Page(page.site, tl['title']) for tl in templates}
     if hasattr(page, '_templates'):
-        page._templates.extend(templ_pages)
+        page._templates |= templ_pages
     else:
         page._templates = templ_pages
 
 
+def _update_categories(page, categories):
+    """Update page categories."""
+    cat_pages = {pywikibot.Page(page.site, ct['title']) for ct in categories}
+    if hasattr(page, '_categories'):
+        page._categories |= cat_pages
+    else:
+        page._categories = cat_pages
+
+
 def _update_langlinks(page, langlinks) -> None:
     """Update page langlinks."""
-    links = [pywikibot.Link.langlinkUnsafe(link['lang'], link['*'],
+    links = {pywikibot.Link.langlinkUnsafe(link['lang'], link['*'],
                                            source=page.site)
-             for link in langlinks]
+             for link in langlinks}
 
     if hasattr(page, '_langlinks'):
-        page._langlinks.extend(links)
+        page._langlinks |= links
     else:
         page._langlinks = links
 
@@ -996,12 +1005,17 @@ def update_page(page, pagedict: dict, props=None):
     if 'templates' in pagedict:
         _update_templates(page, pagedict['templates'])
     elif 'templates' in props:
-        page._templates = []
+        page._templates = set()
+
+    if 'categories' in pagedict:
+        _update_categories(page, pagedict['categories'])
+    elif 'categories' in props:
+        page._categories = set()
 
     if 'langlinks' in pagedict:
         _update_langlinks(page, pagedict['langlinks'])
     elif 'langlinks' in props:
-        page._langlinks = []
+        page._langlinks = set()
 
     if 'coordinates' in pagedict:
         _update_coordinates(page, pagedict['coordinates'])
