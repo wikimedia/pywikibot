@@ -3,7 +3,7 @@
 Change log
 ==========
 
-**Current version:** |release|
+What is new with Pywikibot |release|? What are the main changes of older version?
 
 .. include:: ../ROADMAP.rst
 

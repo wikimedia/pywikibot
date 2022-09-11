@@ -7,6 +7,7 @@ Scripts Changelog
 archivebot
 ~~~~~~~~~~
 
+* Process pages in parallel tasks with ``-async`` option (:phab:`T57899`)
 * Add -sort option to sort archives by (latest) timestamp
 * Archive unsigned threads using timestamp of the next thread (:phab:`T69663`, :phab:`T182685`)
 
@@ -18,6 +19,7 @@ create_isbn_edition
 watchlist
 ~~~~~~~~~
 
+* Watchlist is retrieved faster in parallel tasks (:phab:`T57899`)
 * Enable watchlist.refresh_all for API generator access (:phab:`T316359`)
 
 7.6.0

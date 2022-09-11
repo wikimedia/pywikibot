@@ -103,7 +103,9 @@ class GeneratorsMixin:
         In case of duplicates in a groupsize batch, return the first entry.
 
         .. versionchanged:: 7.6
-           ``content`` parameter was added.
+           *content* parameter was added.
+        .. versionchanged:: 7.7
+           *categories* parameter was added.
 
         :param pagelist: an iterable that returns Page objects
         :param groupsize: how many Pages to query at a time
@@ -112,7 +114,7 @@ class GeneratorsMixin:
         :param langlinks: preload all language links from the provided pages
             to other languages
         :param pageprops: preload various properties defined in page content
-        @param categories: preload page categories
+        :param categories: preload page categories
         :param content: preload page content
         """
         props = 'revisions|info|categoryinfo'
@@ -173,11 +175,13 @@ class GeneratorsMixin:
                                 'preloadpages: Query returned unexpected '
                                 "title '{}'".format(pagedata['title']))
                             continue
+
                 except KeyError:
                     pywikibot.debug("No 'title' in {}".format(pagedata))
                     pywikibot.debug('pageids={}'.format(pageids))
                     pywikibot.debug('titles={}'.format(list(cache.keys())))
                     continue
+
                 priority, page = cache[pagedata['title']]
                 api.update_page(page, pagedata, rvgen.props)
                 priority, page = heapq.heappushpop(prio_queue,

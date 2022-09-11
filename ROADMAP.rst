@@ -1,6 +1,10 @@
 Current release 7.7.0
 ^^^^^^^^^^^^^^^^^^^^^
 
+* Run :mod:`pywikibot.scripts.login` script in parallel tasks if ``-async`` option is given (:phab:`T57899`)
+* Ability to preload categories was added to :meth:`APISite.preloadpages
+  <pywikibot.site._generators.GeneratorsMixin.preloadpages>` (:phab:`T241689`)
+* Add :class:`WikiBlame<page._toolforge.WikiBlameMixin>` support was added to get the five topmost authors
 * Raise KeyError instead of AttributeError if :class:`page.FileInfo` is used as Mapping
 * L10N updates
 
@@ -8,13 +12,15 @@ Current release 7.7.0
 Deprecations
 ^^^^^^^^^^^^
 
-* 7.6.0: :mod:`tools.itertools` datatypes should no longer imported from :mod:`pywikibot.tools`
-* 7.6.0: :mod:`tools.collections` datatypes should no longer imported from :mod:`pywikibot.tools`
-* 7.5.0: :mod:`pywikibot.textlib`.tzoneFixedOffset class will be removed in favour of :class:`pywikibot.time.TZoneFixedOffset`
-* 7.4.0: `FilePage.usingPages()` was renamed to :meth:`using_pages()<pywikibot.FilePage.using_pages>`
+* 7.6.0: :mod:`tools.itertools` datatypes should no longer imported from :mod:`tools`
+* 7.6.0: :mod:`tools.collections` datatypes should no longer imported from :mod:`tools`
+* 7.5.0: :mod:`textlib`.tzoneFixedOffset class will be removed in favour of :class:`time.TZoneFixedOffset`
+* 7.4.0: ``FilePage.usingPages()`` was renamed to :meth:`using_pages()<pywikibot.FilePage.using_pages>`
 * 7.2.0: ``tb`` parameter of :func:`exception()<pywikibot.exception>` function was renamed to ``exc_info``
-* 7.2.0: XMLDumpOldPageGenerator is deprecated in favour of a `content` parameter of `XMLDumpPageGenerator` (:phab:`T306134`)
-* 7.2.0: RedirectPageBot and NoRedirectPageBot bot classes are deprecated in favour of :attr:`use_redirects<bot.BaseBot.use_redirects>` attribute
+* 7.2.0: XMLDumpOldPageGenerator is deprecated in favour of a ``content`` parameter of 
+  :func:`XMLDumpPageGenerator<pagegenerators.XMLDumpPageGenerator>` (:phab:`T306134`)
+* 7.2.0: RedirectPageBot and NoRedirectPageBot bot classes are deprecated in favour of 
+  :attr:`use_redirects<bot.BaseBot.use_redirects>` attribute
 * 7.2.0: :func:`tools.formatter.color_format<tools.formatter.color_format>` is deprecated and will be removed
 * 7.1.0: Unused `get_redirect` parameter of Page.getOldVersion() will be removed
 * 7.1.0: APISite._simple_request() will be removed in favour of APISite.simple_request()
