@@ -304,7 +304,7 @@ def find_alternates(filename, script_paths):
     script_paths = [['.']] + script_paths  # add current directory
     for path in script_paths:
         folder = Path(_pwb_dir).joinpath(*path)
-        if not folder.exists():
+        if not folder.exists():  # pragma: no cover
             warning('{} does not exists; remove it from user_script_paths'
                     .format(folder))
             continue
