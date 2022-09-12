@@ -1,4 +1,4 @@
-"""Family module for Wikihow wiki.
+"""Family module for wikiHow wiki.
 
 .. versionadded:: 3.0
 """
@@ -13,7 +13,7 @@ from pywikibot.tools import classproperty
 
 class Family(family.SubdomainFamily):
 
-    """Family class for Wikihow Wiki.
+    """Family class for wikiHow Wiki.
 
     .. versionadded:: 3.0
     """
@@ -33,7 +33,7 @@ class Family(family.SubdomainFamily):
 
     @classproperty
     def domains(cls):
-        """List of domains used by family wikihow."""
+        """List of domains used by family wikiHow."""
         return [
             cls.domain,
             'wikihow.cz',  # cs
