@@ -15,6 +15,7 @@ from typing import Optional
 
 import pywikibot
 from pywikibot import config
+from pywikibot.backports import List
 from pywikibot.data.api import CachedRequest
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.exceptions import APIError
@@ -23,13 +24,6 @@ from pywikibot.site import Namespace
 from pywikibot.tools import PYTHON_VERSION
 
 from tests import _pwb_py
-
-
-try:
-    from cryptography import __version__ as cryptography_version
-    cryptography_version = list(map(int, cryptography_version.split('.')))
-except ImportError:
-    cryptography_version = None
 
 
 OSWIN32 = (sys.platform == 'win32')
@@ -434,17 +428,14 @@ class FakeLoginManager(pywikibot.data.api.LoginManager):
         """Ignore password changes."""
 
 
-def execute(command, data_in=None, timeout=None, error=None):
+def execute(command: List[str], data_in=None, timeout=None, error=None):
     """
     Execute a command and capture outputs.
 
     :param command: executable to run and arguments to use
-    :type command: list of str
     """
     if PYTHON_VERSION < (3, 6):
         command.insert(1, '-W ignore::FutureWarning:pywikibot:103')
-    if cryptography_version and cryptography_version < [1, 3, 4]:
-        command.insert(1, '-W ignore:Old version of cryptography:Warning')
 
     env = os.environ.copy()
 
