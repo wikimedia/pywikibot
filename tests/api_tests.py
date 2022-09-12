@@ -295,7 +295,7 @@ class TestParamInfo(DefaultSiteTestCase):
     def test_new_mode(self):
         """Test the new modules-only mode explicitly."""
         site = self.get_site()
-        if site.mw_version < '1.25wmf4':
+        if site.mw_version < '1.25wmf4':  # pragma: no cover
             self.skipTest(
                 "version {} doesn't support the new paraminfo api"
                 .format(site.mw_version))
