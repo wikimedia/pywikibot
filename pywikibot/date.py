@@ -714,6 +714,14 @@ def _en_period(period: str):
         (lambda v: dh_centuryAD(v, '%dth ' + period), alwaysTrue)])
 
 
+def _period_with_pattern(period: str, pattern: str):
+    """Create century and millenium format function with pattern."""
+    return lambda m: multi(m, [
+        (lambda v: dh_constVal(v, 1, period), lambda p: p == 1),
+        (lambda v: dh(v, pattern, lambda i: i - 1, lambda ii: ii[0] + 1),
+         alwaysTrue)])
+
+
 formats = {
     'MonthName': MonthNames(),
     'Number': {
@@ -1087,12 +1095,7 @@ formats = {
             # Later, it should be replaced with a proper 'fa' titles
             (lambda v: dh_centuryAD(v, 'سده %d (میلادی)'),
              alwaysTrue)]),  # ********** ERROR!!!
-        'fi': lambda m: multi(m, [
-            (lambda v: dh_constVal(v, 1, 'Ensimmäinen vuosisata'),
-             lambda p: p == 1),
-            (lambda v: dh(v, '%d00-luku',
-                          lambda i: i - 1,
-                          lambda ii: ii[0] + 1), alwaysTrue)]),
+        'fi': _period_with_pattern('Ensimmäinen vuosisata', '%d00-luku'),
         'fo': lambda v: dh_centuryAD(v, '%d. øld'),
         'fr': lambda m: multi(m, [
             (lambda v: dh_centuryAD(v, '%Rer siècle'), lambda p: p == 1),
@@ -1149,10 +1152,7 @@ formats = {
         'nan': lambda v: dh_centuryAD(v, '%d sè-kí'),
         'nds': lambda v: dh_centuryAD(v, '%d. Johrhunnert'),
         'nl': lambda v: dh_centuryAD(v, '%de eeuw'),
-        'nn': lambda m: multi(m, [
-            (lambda v: dh_constVal(v, 1, '1. århundret'), lambda p: p == 1),
-            (lambda v: dh(v, '%d00-talet', lambda i: i - 1,
-                          lambda ii: ii[0] + 1), alwaysTrue)]),
+        'nn': _period_with_pattern('1. århundret', '%d00-talet'),
         'nb': lambda v: dh_centuryAD(v, '%d. århundre'),
         'os': lambda v: dh_centuryAD(v, '%R æнус'),
         'pl': lambda v: dh_centuryAD(v, '%R wiek'),
@@ -1200,11 +1200,8 @@ formats = {
         'eo': lambda v: dh_centuryBC(v, '%d-a jarcento a.K.'),
         'es': lambda v: dh_centuryBC(v, 'Siglo %R adC'),
         'et': lambda v: dh_centuryBC(v, '%d. aastatuhat eKr'),
-        'fi': lambda m: multi(m, [
-            (lambda v: dh_constVal(v, 1, 'Ensimmäinen vuosisata eaa.'),
-             lambda p: p == 1),
-            (lambda v: dh(v, '%d00-luku eaa.', lambda i: i - 1,
-                          lambda ii: ii[0] + 1), alwaysTrue)]),
+        'fi': _period_with_pattern('Ensimmäinen vuosisata eaa.',
+                                   '%d00-luku eaa.'),
         'fr': lambda m: multi(m, [
             (lambda v: dh_centuryBC(v, '%Rer siècle av. J.-C.'),
              lambda p: p == 1),
@@ -1223,11 +1220,7 @@ formats = {
         'la': lambda v: dh_centuryBC(v, 'Saeculum %d a.C.n.'),
         'lb': lambda v: dh_centuryBC(v, '%d. Joerhonnert v. Chr.'),
         'nl': lambda v: dh_centuryBC(v, '%de eeuw v.Chr.'),
-        'nn': lambda m: multi(m, [
-            (lambda v: dh_constVal(v, 1, '1. århundret fvt.'),
-             lambda p: p == 1),
-            (lambda v: dh(v, '%d00-talet fvt.', lambda i: i - 1,
-                          lambda ii: ii[0] + 1), alwaysTrue)]),
+        'nn': _period_with_pattern('1. århundret fvt.', '%d00-talet fvt.'),
         'nb': lambda v: dh_centuryBC(v, '%d. århundre f.Kr.'),
         'pl': lambda v: dh_centuryBC(v, '%R wiek p.n.e.'),
         'pt': lambda v: dh_centuryBC(v, 'Século %R a.C.'),
@@ -1355,11 +1348,8 @@ formats = {
         'el': lambda v: dh_millenniumBC(v, '%dη χιλιετία π.Χ.'),
         'en': lambda v: dh_millenniumBC(v, '%dst millennium BC'),
         'es': lambda v: dh_millenniumBC(v, '%R milenio adC'),
-        'fi': lambda m: multi(m, [
-            (lambda v: dh_constVal(v, 1, 'Ensimmäinen vuosituhat eaa.'),
-             lambda p: p == 1),
-            (lambda v: dh(v, '%d000-vuosituhat eaa.', lambda i: i - 1,
-                          lambda ii: ii[0] + 1), alwaysTrue)]),
+        'fi': _period_with_pattern('Ensimmäinen vuosituhat eaa.',
+                                   '%d000-vuosituhat eaa.'),
         'fr': lambda v: dh_millenniumBC(v, '%Rer millénaire av. J.-C.'),
         'he': lambda m: multi(m, [
             (lambda v: dh_millenniumAD(v, 'האלף הראשון %d לפני הספירה'),
