@@ -109,6 +109,13 @@ Environment variables
   Enable script tests running automatically without specifying a generator.
   The scripts are listed in :attr:`tests.script_tests.auto_run_script_list`.
   Currently only *deeptest* uses it.
+  
+**PYWIKIBOT_TEST_GUI**
+  Enable :mod:`tests.gui_tests`. Used for Appveyor tests. Github actions would
+  fail due to ``couldn't connect to display ":1.0"`` error. Set this environment
+  variable to run this test locally::
+
+    PYWIKIBOT_TEST_GUI=1
 
 **PYWIKIBOT_TEST_MODULES**
   Only run tests given with this environment variable. Multiple tests must be
