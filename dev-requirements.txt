@@ -27,3 +27,6 @@ flake8-isort;python_version>="3.6"
 verve-flake8-mock>=0.4
 codecov
 coverage>=5.2.1
+
+# optional but needed for tests
+fake-useragent
