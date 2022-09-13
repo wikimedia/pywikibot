@@ -13,32 +13,11 @@ import pywikibot
 from tests.aspects import DefaultSiteTestCase, TestCase, require_modules
 
 
-class TkinterTestsBase(TestCase):
-
-    """TestCase base for Tkinter tests."""
-
-    net = True
-
-    @classmethod
-    def setUpClass(cls):
-        """Set virtual display environment."""
-        super().setUpClass()
-        cls.env = os.environ.get('DISPLAY')
-        os.environ['DISPLAY'] = ':1.0'
-
-    @classmethod
-    def tearDownClass(cls):
-        """Restore the display environment value."""
-        if not cls.env:
-            del os.environ['DISPLAY']
-        else:
-            os.environ['DISPLAY'] = cls.env
-        super().tearDownClass()
-
-
-class TestTkdialog(TkinterTestsBase):
+class TestTkdialog(TestCase):
 
     """Test Tkdialog."""
+
+    net = True
 
     def test_tk_dialog(self):
         """Test Tk dialog."""
@@ -54,9 +33,11 @@ class TestTkdialog(TkinterTestsBase):
         self.assertTrue(skip)
 
 
-class TestTkinter(TkinterTestsBase, DefaultSiteTestCase):
+class TestTkinter(DefaultSiteTestCase):
 
     """Test Tkinter."""
+
+    net = True
 
     def test_tkinter(self):
         """Test Tkinter window."""
@@ -77,8 +58,13 @@ class TestTkinter(TkinterTestsBase, DefaultSiteTestCase):
 def setUpModule():
     """Skip tests if tkinter or PIL is not installed.
 
-    Otherwise import modules.
+    Also skip test if ``PYWIKIBOT_TEST_GUI`` environment variable is not
+    set. Otherwise import modules and run tests.
     """
+    if os.environ.get('PYWIKIBOT_TEST_GUI', '0') != '1':
+        raise unittest.SkipTest('Tkinter tests are not enabled. '
+                                '(set PYWIKIBOT_TEST_GUI=1 to enable)')
+
     global EditBoxWindow, Tkdialog, tkinter
     import tkinter
     from pywikibot.userinterfaces.gui import EditBoxWindow, Tkdialog
