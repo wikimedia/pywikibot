@@ -42,7 +42,23 @@ def expected_failure_if(expect):
 
 
 def fixed_generator(iterable):
-    """Return a dummy generator ignoring all parameters."""
+    """Return a dummy generator ignoring all parameters.
+
+    This can be used to overwrite a generator method and yield
+    predefined items:
+
+    >>> from tests.utils import fixed_generator
+    >>> site = pywikibot.Site()
+    >>> page = pywikibot.Page(site, 'Any page')
+    >>> list(page.linkedPages(total=1))
+    []
+    >>> gen = fixed_generator([
+    ...     pywikibot.Page(site, 'User:BobBot/Redir'),
+    ...     pywikibot.Page(site, 'Main Page')])
+    >>> page.linkedPages = gen
+    >>> list(page.linkedPages(total=1))
+    [Page('Benutzer:BobBot/Redir'), Page('Main Page')]
+    """
     def gen(*args, **kwargs):
         yield from iterable
 
