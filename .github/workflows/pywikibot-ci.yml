@@ -11,6 +11,7 @@ on:
     branches: [ master ]
 
 env:
+  PYWIKIBOT_TEST_AUTORUN: 1
   PYWIKIBOT_TEST_RUNNING: 1
   PYWIKIBOT_USERNAME: Pywikibot-test
 

@@ -64,6 +64,7 @@ def list_scripts(path, exclude=None):
 script_list = framework_scripts + list_scripts(scripts_path)
 
 script_input = {
+    'create_isbn_edition': '\n',
     'interwiki': 'Test page that should not exist\n',
     'misspelling': 'q\n',
     'pagefromfile': 'q\n',
@@ -71,6 +72,7 @@ script_input = {
                                   # Enter to begin, Enter for default summary.
     'shell': '\n',  # exits on end of stdin
     'solve_disambiguation': 'Test page\nq\n',
+    'unusedfiles': 'q\n',
     'upload':
         'https://upload.wikimedia.org/wikipedia/commons/'
         '8/80/Wikipedia-logo-v2.svg\n\n\n',
@@ -400,13 +402,13 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
 
     _expected_failures = {
         'catall',          # stdout user interaction
+        'unusedfiles',     # not localized for default sites
         'upload',          # raises custom ValueError
     }
 
     _allowed_failures = [
         'disambredir',
         'misspelling',   # T94681
-        'watchlist',     # T77965
     ]
 
     _arguments = '-simulate'
