@@ -159,6 +159,15 @@ Environment variables
 .. note:: Enabling only 'edit failure' tests or 'write' tests won't enable the other tests
    automatically.
 
+Instead of setting the environment by the os (or `os.environ` as well) you can use the :mod:`pwb`
+wrapper script to set it::
+
+    pwb PYWIKIBOT_TEST_AUTORUN=1 script_tests -v TestScriptSimulate.test_archivebot
+
+The assignment can be omitted and defaults to 1. The following is equal to the line above::
+
+    pwb PYWIKIBOT_TEST_AUTORUN script_tests -v TestScriptSimulate.test_archivebot
+
 Decorators
 ==========
 
