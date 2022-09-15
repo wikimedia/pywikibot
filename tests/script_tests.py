@@ -402,6 +402,10 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
 
     _expected_failures = {
         'catall',          # stdout user interaction
+        'checkimages',
+        'noreferences',
+        'patrol',
+        'revertbot',
         'unusedfiles',     # not localized for default sites
         'upload',          # raises custom ValueError
     }
@@ -425,29 +429,43 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
     login = True
 
     _expected_failures = {
+        '_login',
         'add_text',
         'archivebot',
+        'blockpageschecker',
         'category',
         'change_pagelang',
+        'checkimages',
         'claimit',
+        'clean_sandbox',
         'dataextend',
         'data_ingestion',
         'delete',
+        'delinker',
         'djvutext',
         'download_dump',
         'harvest_template',
         'interwiki',
         'listpages',
+        'misspelling',
         'movepages',
         'pagefromfile',
+        'parser_function_count',
+        'patrol',
         'protect',
         'redirect',
         'reflinks',
         'replicate_wiki',
+        'revertbot',
+        'shell',
         'speedy_delete',
         'template',
         'templatecount',
         'transferbot',
+        'unusedfiles',
+        'upload',
+        'watchlist',
+        'welcome',
     }
 
     _allowed_failures = [
