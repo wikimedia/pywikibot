@@ -4,8 +4,8 @@
 
 This wrapper script invokes script by its name in this search order:
 
-1. Scripts listed in `user_script_paths` list inside your `user-config.py`
-   settings file in the given order. Refer
+1. Scripts listed in `user_script_paths` list inside your user config
+   settings file (usually `user-config.py`) in the given order. Refer
    :ref:`External Script Path Settings`.
 2. User scripts residing in `scripts/userscripts` (directory mode only).
 3. Scripts residing in `scripts` folder (directory mode only).
@@ -260,22 +260,27 @@ def check_modules(script=None):
 
 filename, script_args, global_args = handle_args(*sys.argv)
 
-# Search for user-config.py before creating one.
-# If successful, user-config.py already exists in one of the candidate
+# Search for user config file (user-config.py) before creating one.
+# If successful, user config file already exists in one of the candidate
 # directories. See config.py for details on search order.
 # Use env var to communicate to config.py pwb.py location (bug T74918).
 _pwb_dir = os.path.split(__file__)[0]
 os.environ['PYWIKIBOT_DIR_PWB'] = _pwb_dir
 try:
     import pywikibot as pwb
-except RuntimeError:  # pragma: no cover
+except RuntimeError as e:  # pragma: no cover
     os.environ['PYWIKIBOT_NO_USER_CONFIG'] = '2'
     import pywikibot as pwb
 
-    # user-config.py to be created
+    # user config file to be created
     if filename is not None and not (filename.startswith('generate_')
                                      or filename == 'version.py'):
-        print("NOTE: 'user-config.py' was not found!")
+        from pywikibot.config import user_config_file
+        if user_config_file != 'user-config.py':
+            # do not create a user config file if name is not default
+            sys.exit(e)
+
+        print('NOTE: user-config.py was not found!')
         print('Please follow the prompts to create it:')
         run_python_file(os.path.join(
             _pwb_dir, 'pywikibot', 'scripts', 'generate_user_files.py'), [])

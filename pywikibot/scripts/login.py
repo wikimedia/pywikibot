@@ -14,7 +14,7 @@ The following parameters are supported::
  -site:FF:LL  Log in to the LL language of the FF family
 
  -all         Try to log in on all sites where a username is defined in
-              user-config.py.
+              user config file (user-config.py).
 
  -logout      Log out of the current site. Combine with -all to log out of
               all sites, or with -family and -lang to log out of a specific
@@ -22,8 +22,8 @@ The following parameters are supported::
 
  -oauth       Generate OAuth authentication information.
 
-              .. note:: Need to copy OAuth tokens to your user-config.py
-                 manually. -logout is not compatible with -oauth.
+              .. note:: Need to copy OAuth tokens to your user config
+                 file manually. -logout is not compatible with -oauth.
 
  -autocreate  Auto-create an account using unified login when necessary.
 
@@ -87,7 +87,7 @@ def _oauth_login(site) -> None:
         pywikibot.output('Logged in on {site} as {username}'
                          'via OAuth consumer {consumer}\n'
                          'NOTE: To use OAuth, you need to copy the '
-                         'following line to your user-config.py:\n'
+                         'following line to your user config file:\n'
                          'authenticate[{hostname!r}] = {oauth_token}'
                          .format(site=site,
                                  username=site.username(),

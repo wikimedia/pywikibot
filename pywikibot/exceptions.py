@@ -68,7 +68,7 @@ the framework::
 
 Error: Base class, all exceptions should the subclass of this class.
 
-  - NoUsernameError: Username is not in user-config.py, or it is invalid.
+  - NoUsernameError: Username is not in user config file, or it is invalid.
   - AutoblockUserError: requested action on a virtual autoblock user not valid
   - TranslationError: no language translation found
   - UserRightsError: insufficient rights for requested action
@@ -343,7 +343,7 @@ class OtherPageSaveError(PageSaveRelatedError):
 
 class NoUsernameError(Error):
 
-    """Username is not in user-config.py."""
+    """Username is not in user config file (user-config.py)."""
 
 
 class NoPageError(PageRelatedError):

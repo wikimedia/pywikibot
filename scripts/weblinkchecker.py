@@ -21,11 +21,11 @@ page is named Broken Links, exclude it with '-titleregexnot:^Broken Links$'
 After running the bot and waiting for at least one week, you can re-check those
 pages where dead links were found, using the -repeat parameter.
 
-In addition to the logging step, it is possible to automatically report dead
-links to the talk page of the article where the link was found. To use this
-feature, set report_dead_links_on_talk = True in your user-config.py, or
-specify "-talk" on the command line. Adding "-notalk" switches this off
-irrespective of the configuration variable.
+In addition to the logging step, it is possible to automatically report
+dead links to the talk page of the article where the link was found. To
+use this feature, set report_dead_links_on_talk = True in your user
+config file, or specify "-talk" on the command line. Adding "-notalk"
+switches this off irrespective of the configuration variable.
 
 When a link is found alive, it will be removed from the .dat file.
 

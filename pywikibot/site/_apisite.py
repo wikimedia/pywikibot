@@ -333,7 +333,7 @@ class APISite(
         :param autocreate: if true, allow auto-creation of the account
             using unified login
         :param user: bot user name. Overrides the username set by
-            BaseSite initializer parameter or user-config.py setting
+            BaseSite initializer parameter or user config setting
 
         :raises pywikibot.exceptions.NoUsernameError: Username is not
             recognised by the site.
@@ -382,7 +382,7 @@ class APISite(
                              .format(self))
             elif self.username() is None:
                 error_msg = ('No username has been defined in your '
-                             'user-config.py: you have to add in this '
+                             'user config file: you have to add in this '
                              'file the following line:\n'
                              'usernames[{family!r}][{lang!r}]= {username!r}'
                              .format(family=self.family,

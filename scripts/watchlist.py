@@ -16,8 +16,8 @@ Command line options:
              account the bot has access to
 -count:all   Count only the total number of pages on all wikis watchlists
              that the bot is connected to.
--new         Load watchlists for all wikis where accounts is setting in
-             user-config.py
+-new         Load watchlists for all wikis where accounts is set in user
+             config file
 
 .. versionchanged:: 7.7
    watchlist is retrieved in parallel tasks.
@@ -108,9 +108,9 @@ def refresh_all() -> None:
 
 
 def refresh_new() -> None:
-    """Load watchlists of all wikis for accounts set in user-config.py."""
-    pywikibot.output(
-        'Downloading all watchlists for your accounts in user-config.py')
+    """Load watchlists of all wikis for accounts set in user config."""
+    pywikibot.output('Downloading all watchlists for your accounts in {}'
+                     .format(config.user_config_file))
     count_watchlist_all(quiet=True)
 
 
