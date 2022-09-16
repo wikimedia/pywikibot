@@ -429,11 +429,12 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
     login = True
 
     _expected_failures = {
-        '_login',
+        'login',
         'add_text',
         'archivebot',
         'blockpageschecker',
         'category',
+        'category_redirect',
         'change_pagelang',
         'checkimages',
         'claimit',
