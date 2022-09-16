@@ -411,8 +411,10 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
     }
 
     _allowed_failures = [
+        'blockpageschecker',  # not localized for some test sites
         'disambredir',
         'misspelling',   # T94681
+        'watchlist',  # not logged in
     ]
 
     _arguments = '-simulate'
