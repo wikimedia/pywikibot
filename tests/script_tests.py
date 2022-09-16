@@ -403,17 +403,17 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
     _expected_failures = {
         'catall',          # stdout user interaction
         'checkimages',
-        'noreferences',
         'patrol',
         'revertbot',
         'unusedfiles',     # not localized for default sites
-        'upload',          # raises custom ValueError
     }
 
     _allowed_failures = [
         'blockpageschecker',  # not localized for some test sites
         'disambredir',
         'misspelling',   # T94681
+        'noreferences',
+        'upload',  # raises custom ValueError
         'watchlist',  # not logged in
     ]
 
@@ -434,7 +434,6 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
         'login',
         'add_text',
         'archivebot',
-        'blockpageschecker',
         'category',
         'category_redirect',
         'change_pagelang',
@@ -473,6 +472,7 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
 
     _allowed_failures = [
         'basic',
+        'blockpageschecker',
         'commonscat',
         'commons_information',
         'coordinate_import',
