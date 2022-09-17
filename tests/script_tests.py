@@ -139,10 +139,6 @@ skip_on_results = {
 }
 
 
-enable_autorun_tests = (
-    os.environ.get('PYWIKIBOT_TEST_AUTORUN', '0') == '1')
-
-
 def collector(loader=unittest.loader.defaultTestLoader):
     """Load the default tests."""
     # Note: Raising SkipTest during load_tests will
@@ -153,43 +149,18 @@ def collector(loader=unittest.loader.defaultTestLoader):
         unittest_print('Skipping execution of unrunnable scripts:\n  {!r}'
                        .format(unrunnable_script_set))
 
-    if not enable_autorun_tests:
-        unittest_print('Skipping execution of auto-run scripts '
-                       '(set PYWIKIBOT_TEST_AUTORUN=1 to enable):\n  {!r}'
-                       .format(auto_run_script_list))
-
-    tests = (['test__login']
-             + ['test_' + name
-                 for name in sorted(script_list)
-                 if name != 'login'
-                 and name not in unrunnable_script_set
-                ])
-
-    test_list = ['tests.script_tests.TestScriptHelp.' + name
+    tests = ['_login'] + [name for name in sorted(script_list)
+                          if name != 'login'
+                          and name not in unrunnable_script_set]
+    test_list = ['tests.script_tests.TestScriptHelp.test_' + name
                  for name in tests]
 
-    tests = (['test__login']
-             + ['test_' + name
-                 for name in sorted(script_list)
-                 if name != 'login'
-                 and name not in failed_dep_script_set
-                 and name not in unrunnable_script_set
-                 and (enable_autorun_tests or name not in auto_run_script_list)
-                ])
-
-    test_list += ['tests.script_tests.TestScriptSimulate.' + name
+    tests = [name for name in tests if name not in failed_dep_script_set]
+    test_list += ['tests.script_tests.TestScriptSimulate.test_' + name
                   for name in tests]
 
-    tests = (['test__login']
-             + ['test_' + name
-                 for name in sorted(script_list)
-                 if name != 'login'
-                 and name not in failed_dep_script_set
-                 and name not in unrunnable_script_set
-                 and (enable_autorun_tests or name not in auto_run_script_list)
-                ])
-
-    test_list += ['tests.script_tests.TestScriptGenerator.' + name
+    tests = [name for name in tests if name not in auto_run_script_list]
+    test_list += ['tests.script_tests.TestScriptGenerator.test_' + name
                   for name in tests]
 
     tests = loader.loadTestsFromNames(test_list)
@@ -227,12 +198,6 @@ class TestScriptMeta(MetaTestCaseClass):
 
             is_autorun = ('-help' not in args
                           and script_name in auto_run_script_list)
-
-            def test_skip_script(self):
-                raise unittest.SkipTest(
-                    'Skipping execution of auto-run scripts (set '
-                    'PYWIKIBOT_TEST_AUTORUN=1 to enable) "{}"'
-                    .format(script_name))
 
             def test_script(self):
                 global_args_msg = \
@@ -322,8 +287,6 @@ class TestScriptMeta(MetaTestCaseClass):
                 self.assertIn(result['exit_code'], exit_codes)
                 sys.stdout.flush()
 
-            if not enable_autorun_tests and is_autorun:
-                return test_skip_script
             return test_script
 
         arguments = dct['_arguments']
@@ -433,46 +396,32 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
     _expected_failures = {
         'login',
         'add_text',
-        'archivebot',
         'category',
-        'category_redirect',
         'change_pagelang',
-        'checkimages',
         'claimit',
-        'clean_sandbox',
         'dataextend',
         'data_ingestion',
         'delete',
-        'delinker',
         'djvutext',
         'download_dump',
         'harvest_template',
         'interwiki',
         'listpages',
-        'misspelling',
         'movepages',
         'pagefromfile',
-        'parser_function_count',
-        'patrol',
         'protect',
         'redirect',
         'reflinks',
         'replicate_wiki',
         'revertbot',
-        'shell',
         'speedy_delete',
         'template',
         'templatecount',
         'transferbot',
-        'unusedfiles',
-        'upload',
-        'watchlist',
-        'welcome',
     }
 
     _allowed_failures = [
         'basic',
-        'blockpageschecker',
         'commonscat',
         'commons_information',
         'coordinate_import',

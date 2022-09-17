@@ -105,11 +105,6 @@ The 'user' tests are not yet enabled on AppVeyor builds.
 Environment variables
 =====================
 
-**PYWIKIBOT_TEST_AUTORUN**
-  Enable script tests running automatically without specifying a generator.
-  The scripts are listed in :attr:`tests.script_tests.auto_run_script_list`.
-  Currently only *deeptest* uses it.
-  
 **PYWIKIBOT_TEST_GUI**
   Enable :mod:`tests.gui_tests`. Used for Appveyor tests. Github actions would
   fail due to ``couldn't connect to display ":1.0"`` error. Set this environment
