@@ -1177,21 +1177,51 @@ class APISite(
         """
         Return a Page for this site object specified by Wikibase item.
 
+        Usage:
+
+        >>> site = pywikibot.Site('wikipedia:zh')
+        >>> page = site.page_from_repository('Q131303')
+        >>> page.title()
+        'Hello World'
+
+        This method is able to upcast categories:
+
+        >>> site = pywikibot.Site('commons')
+        >>> page = site.page_from_repository('Q131303')
+        >>> page.title()
+        'Category:Hello World'
+        >>> page
+        Category('Category:Hello World')
+
+        It also works for wikibase repositories:
+
+        >>> site = pywikibot.Site('wikidata')
+        >>> page = site.page_from_repository('Q5296')
+        >>> page.title()
+        'Wikidata:Main Page'
+
+        If no page exists for a given site, None is returned:
+
+        >>> site = pywikibot.Site('wikidata')
+        >>> page = site.page_from_repository('Q131303')
+        >>> page is None
+        True
+
+        .. versionchanged:: 7.7
+           No longer raise NotimplementedError if used with a Wikibase
+           site.
+
         :param item: id number of item, "Q###",
         :return: Page, or Category object given by Wikibase item number
             for this site object.
 
         :raises pywikibot.exceptions.UnknownExtensionError: site has no
             Wikibase extension
-        :raises NotimplementedError: method not implemented for a Wikibase site
         """
         if not self.has_data_repository:
             raise UnknownExtensionError(
                 'Wikibase is not implemented for {}.'.format(self))
-        if self.is_data_repository():
-            raise NotImplementedError(
-                'page_from_repository method is not implemented for '
-                'Wikibase {}.'.format(self))
+
         repo = self.data_repository()
         dp = pywikibot.ItemPage(repo, item)
         try:
