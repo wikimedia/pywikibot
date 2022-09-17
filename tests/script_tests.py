@@ -79,7 +79,7 @@ script_input = {
 }
 
 #:
-auto_run_script_list = [
+auto_run_script_set = {
     'archivebot',
     'blockpageschecker',
     'category_redirect',
@@ -99,7 +99,7 @@ auto_run_script_list = [
     'upload',
     'watchlist',
     'welcome',
-]
+}
 
 # Expected result for no arguments
 # Some of these are not pretty, but at least they are informative
@@ -144,28 +144,25 @@ def collector(loader=unittest.loader.defaultTestLoader):
     # Note: Raising SkipTest during load_tests will
     # cause the loader to fallback to its own
     # discover() ordering of unit tests.
-
     if unrunnable_script_set:
         unittest_print('Skipping execution of unrunnable scripts:\n  {!r}'
                        .format(unrunnable_script_set))
 
+    test_pattern = 'tests.script_tests.TestScript{}.test_{}'
+
     tests = ['_login'] + [name for name in sorted(script_list)
                           if name != 'login'
                           and name not in unrunnable_script_set]
-    test_list = ['tests.script_tests.TestScriptHelp.test_' + name
-                 for name in tests]
+    test_list = [test_pattern.format('Help', name) for name in tests]
 
     tests = [name for name in tests if name not in failed_dep_script_set]
-    test_list += ['tests.script_tests.TestScriptSimulate.test_' + name
-                  for name in tests]
+    test_list += [test_pattern.format('Simulate', name) for name in tests]
 
-    tests = [name for name in tests if name not in auto_run_script_list]
-    test_list += ['tests.script_tests.TestScriptGenerator.test_' + name
-                  for name in tests]
+    tests = [name for name in tests if name not in auto_run_script_set]
+    test_list += [test_pattern.format('Generator', name) for name in tests]
 
-    tests = loader.loadTestsFromNames(test_list)
     suite = unittest.TestSuite()
-    suite.addTests(tests)
+    suite.addTests(loader.loadTestsFromNames(test_list))
     return suite
 
 
@@ -178,11 +175,11 @@ def load_tests(loader=unittest.loader.defaultTestLoader,
 def import_script(script_name: str):
     """Import script for coverage only (T305795)."""
     if not ci_test_run:
-        return
+        return  # pragma: no cover
+
+    prefix = 'scripts.'
     if script_name in framework_scripts:
-        prefix = 'pywikibot.scripts.'
-    else:
-        prefix = 'scripts.'
+        prefix = 'pywikibot.' + prefix
     import_module(prefix + script_name)
 
 
@@ -197,7 +194,7 @@ class TestScriptMeta(MetaTestCaseClass):
                 args = []
 
             is_autorun = ('-help' not in args
-                          and script_name in auto_run_script_list)
+                          and script_name in auto_run_script_set)
 
             def test_script(self):
                 global_args_msg = \
@@ -313,7 +310,7 @@ class TestScriptMeta(MetaTestCaseClass):
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
             elif script_name in dct['_allowed_failures']:
                 dct[test_name] = unittest.skip(
-                    '{} is in _allowed_failures list'
+                    '{} is in _allowed_failures set'
                     .format(script_name))(dct[test_name])
             elif script_name in failed_dep_script_set \
                     and arguments == '-simulate':
@@ -342,7 +339,7 @@ class TestScriptHelp(PwbTestCase, metaclass=TestScriptMeta):
     # Here come scripts requiring and missing dependencies, that haven't been
     # fixed to output -help in that case.
     _expected_failures = {'version'}
-    _allowed_failures = []
+    _allowed_failures = set()
 
     _arguments = '-help'
     _results = None
@@ -371,19 +368,19 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
         'unusedfiles',     # not localized for default sites
     }
 
-    _allowed_failures = [
+    _allowed_failures = {
         'blockpageschecker',  # not localized for some test sites
         'disambredir',
         'misspelling',   # T94681
         'noreferences',
         'upload',  # raises custom ValueError
         'watchlist',  # not logged in
-    ]
+    }
 
     _arguments = '-simulate'
     _results = no_args_expected_results
     _skip_results = skip_on_results
-    _timeout = auto_run_script_list
+    _timeout = auto_run_script_set
 
 
 class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
@@ -420,7 +417,7 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
         'transferbot',
     }
 
-    _allowed_failures = [
+    _allowed_failures = {
         'basic',
         'commonscat',
         'commons_information',
@@ -436,7 +433,7 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
         'solve_disambiguation',
         'touch',
         'weblinkchecker',
-    ]
+    }
 
     _arguments = '-simulate -page:Foo -always'
     _results = ("Working on 'Foo", 'Script terminated successfully')
