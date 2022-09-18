@@ -11,6 +11,7 @@ from datetime import datetime
 from urllib.parse import urlparse
 
 from requests.exceptions import ConnectionError as RequestsConnectionError
+from requests.exceptions import ReadTimeout
 
 from tests.aspects import TestCase, require_modules
 from tests.utils import skipping
@@ -29,7 +30,8 @@ class MementoTestCase(TestCase):
 
         when = (datetime.strptime(date_string, '%Y%m%d')
                 if date_string else None)
-        with skipping(RequestsConnectionError, MementoClientException):
+        with skipping(ReadTimeout, RequestsConnectionError,
+                      MementoClientException):
             result = get_closest_memento_url(url, when, self.timegate_uri)
         return result
 
