@@ -1079,23 +1079,23 @@ class TestSingleCodeFamilySite(AlteredDefaultSiteTestCase):
     """Test single code family sites."""
 
     sites = {
-        'omegawiki': {
-            'family': 'omegawiki',
-            'code': 'omegawiki',
+        'i18n': {
+            'family': 'i18n',
+            'code': 'i18n',
         },
     }
 
     def test_omega(self):
-        """Test www.omegawiki.org."""
-        url = 'www.omegawiki.org'
-        site = self.get_site('omegawiki')
+        """Test translatewiki.net."""
+        url = 'translatewiki.net'
+        site = self.get_site('i18n')
         self.assertEqual(site.hostname(), url)
-        self.assertEqual(site.code, 'omegawiki')
+        self.assertEqual(site.code, 'i18n')
         self.assertIsInstance(site.namespaces, Mapping)
         self.assertFalse(site.obsolete)
         self.assertEqual(site.family.hostname('en'), url)
-        self.assertEqual(site.family.hostname('omega'), url)
-        self.assertEqual(site.family.hostname('omegawiki'), url)
+        self.assertEqual(site.family.hostname('i18n'), url)
+        self.assertEqual(site.family.hostname('translatewiki'), url)
 
 
 class TestSubdomainFamilySite(TestCase):
