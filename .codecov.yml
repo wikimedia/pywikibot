@@ -18,7 +18,6 @@ coverage:
         enabled: yes
 
   ignore:
-    - make_dist.py
     - pywikibot/backports.py
     - pywikibot/daemonize.py
     - pywikibot/families/__init__.py

@@ -153,6 +153,7 @@ script_test_modules = {
     'harvest_template',
     'interwikidata',
     'l10n',
+    'make_dist',
     'patrolbot',
     'protectbot',
     'pwb',

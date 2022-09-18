@@ -51,7 +51,7 @@ from pywikibot.backports import Tuple
 import setup
 
 
-def clear_old_dist() -> None:
+def clear_old_dist() -> None:  # pragma: no cover
     """Delete old dist folders.
 
     .. versionadded:: 7.5
@@ -64,7 +64,7 @@ def clear_old_dist() -> None:
     info('done')
 
 
-def copy_files() -> None:
+def copy_files() -> None:  # pragma: no cover
     """Copy code entry point and i18n files to pywikibot.scripts folder.
 
     pwb.py wrapper script is a console script entry point for the
@@ -92,7 +92,7 @@ def copy_files() -> None:
     info('done')
 
 
-def cleanup() -> None:
+def cleanup() -> None:  # pragma: no cover
     """Remove all files which were copied to the pywikibot scripts folder."""
     info('Remove copied files... ', newline=False)
     folder = Path().resolve()
@@ -103,7 +103,7 @@ def cleanup() -> None:
     info('done')
 
 
-def handle_args() -> Tuple[bool, bool]:
+def handle_args() -> Tuple[bool, bool, bool, bool, bool]:
     """Handle arguments and print documentation if requested.
 
     Read arguments from `sys.argv` and adjust it passing `sdist` to
@@ -134,7 +134,7 @@ def handle_args() -> Tuple[bool, bool]:
     return local, remote, clear, upgrade, nodist
 
 
-def main() -> None:
+def main() -> None:  # pragma: no cover
     """Script entry point."""
     local, remote, clear, upgrade, nodist = handle_args()
 
@@ -167,5 +167,5 @@ def main() -> None:
         check_call('twine upload dist/*', shell=True)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     main()
