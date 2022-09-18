@@ -46,12 +46,6 @@
 .. automodule:: families.meta_family
    :synopsis: Family module for Meta Wiki
 
-:mod:`families.omegawiki\_family` --- Omega
--------------------------------------------
-
-.. automodule:: families.omegawiki_family
-   :synopsis: Family module for Omega Wiki
-
 :mod:`families.osm\_family` --- OpenStreetMap
 ---------------------------------------------
 
