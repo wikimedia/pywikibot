@@ -473,6 +473,8 @@ def main():
     # setup.py may also raise RuntimeError
     except RuntimeError as e:  # pragma: no cover
         sys.exit(e)
+    except SyntaxError as e:  # pragma: no cover
+        sys.exit(str(e) + '\nProbably outdated Python version')
 
     if not execute():
         print(__doc__)
