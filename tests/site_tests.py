@@ -1085,7 +1085,7 @@ class TestSingleCodeFamilySite(AlteredDefaultSiteTestCase):
         },
     }
 
-    def test_omega(self):
+    def test_twn(self):
         """Test translatewiki.net."""
         url = 'translatewiki.net'
         site = self.get_site('i18n')
