@@ -1,12 +1,14 @@
 Current release 7.7.0
 ^^^^^^^^^^^^^^^^^^^^^
 
+* OmegaWiki family was removed
+* Provide global ``-config`` option to specify the user config file name
 * Run :mod:`pywikibot.scripts.login` script in parallel tasks if ``-async`` option is given (:phab:`T57899`)
 * Ability to preload categories was added to :meth:`APISite.preloadpages
   <pywikibot.site._generators.GeneratorsMixin.preloadpages>` (:phab:`T241689`)
 * Add :class:`WikiBlame<page._toolforge.WikiBlameMixin>` support was added to get the five topmost authors
 * Raise KeyError instead of AttributeError if :class:`page.FileInfo` is used as Mapping
-* L10N updates
+* i28n and L10N updates
 
 
 Deprecations
