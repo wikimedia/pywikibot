@@ -876,6 +876,9 @@ def handle_args(args: Optional[Iterable[str]] = None,
        toggling the value. Refer :func:`tools.strtobool` for valid values.
     .. versionchanged:: 7.7
        *-config* global option was added.
+    .. versionchanged:: 8.0
+       Short site value can be given if site code is equal to family
+       like ``-site:meta``.
 
     :param args: Command line arguments. If None,
         :meth:`pywikibot.argvu<userinterfaces._interface_base.ABUIC.argvu>`
@@ -909,7 +912,10 @@ def handle_args(args: Optional[Iterable[str]] = None,
         elif option in ('-config', '-dir'):
             pass
         elif option == '-site':
-            config.family, config.mylang = value.split(':')
+            if ':' in value:
+                config.family, config.mylang = value.split(':')
+            else:
+                config.family = config.mylang = value
         elif option == '-family':
             config.family = value
         elif option == '-lang':
