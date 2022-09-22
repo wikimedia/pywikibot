@@ -1,6 +1,5 @@
 #!/usr/bin/python3
-"""
-Script to manage categories.
+"""Script to manage categories.
 
 Syntax:
 
@@ -8,13 +7,22 @@ Syntax:
 
 where action can be one of these
 
- * add          - mass-add a category to a list of pages.
- * remove       - remove category tag from all pages in a category.
- * move         - move all pages in a category to another category.
- * tidy         - tidy up a category by moving its pages into subcategories.
- * tree         - show a tree of subcategories of a given category.
- * listify      - make a list of all of the articles that are in a category.
- * clean        - automatically clean specified category.
+*add*
+    mass-add a category to a list of pages.
+*remove*
+    remove category tag from all pages in a category.
+*move*
+    move all pages in a category to another category.
+*tidy*
+    tidy up a category by moving its pages into subcategories.
+*tree*
+    show a tree of subcategories of a given category.
+*listify*
+    make a list of all of the articles that are in a category.
+*clean*
+    Removes redundant grandchildren from specified category by removing
+    direct link to grandparent. In another words a grandchildren should
+    not be also a children.
 
 and option can be one of these
 
@@ -1361,11 +1369,13 @@ class CleanBot(Bot):
 
     Stubs categories are exception.
 
-    .. versionadded:: 7.0
+    .. note:: For details please read:
 
-    For details please read:
-    https://en.wikipedia.org/wiki/WP:SUBCAT
-    https://en.wikipedia.org/wiki/WP:DIFFUSE
+       - https://en.wikipedia.org/wiki/WP:SUBCAT
+
+       - https://en.wikipedia.org/wiki/WP:DIFFUSE
+
+    .. versionadded:: 7.0
     """
 
     update_options = {
