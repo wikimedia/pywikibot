@@ -1553,14 +1553,11 @@ def main(*args: str) -> None:
     cat_db = CategoryDatabase(rebuild=rebuild)
 
     if action == 'add':
-        gen = gen_factory.getCombinedGenerator()
+        gen = gen_factory.getCombinedGenerator(preload=True)
         if not gen:
             # default for backwards compatibility
             gen_factory.handle_arg('-links')
-            gen = gen_factory.getCombinedGenerator()
-        # The preloading generator is responsible for downloading multiple
-        # pages from the wiki simultaneously.
-        gen = pagegenerators.PreloadingGenerator(gen)
+            gen = gen_factory.getCombinedGenerator(preload=True)
         bot = CategoryAddBot(gen,
                              newcat=options.get('to'),
                              sort_by_last_name=sort_by_last_name,
