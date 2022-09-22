@@ -40,7 +40,7 @@ hash, so keep it secured!) in a file in the data subdirectory.
 All scripts in this library will be looking for this cookie file and will
 use the login information if it is present.
 
-To log out, throw away the *.lwp file that is created in the data
+To log out, throw away the ``*.lwp`` file that is created in the data
 subdirectory.
 
 .. versionchanged:: 7.4
