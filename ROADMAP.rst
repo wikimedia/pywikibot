@@ -8,7 +8,7 @@ Current release 7.7.0
   <pywikibot.site._generators.GeneratorsMixin.preloadpages>` (:phab:`T241689`)
 * Add :class:`WikiBlame<page._toolforge.WikiBlameMixin>` support was added to get the five topmost authors
 * Raise KeyError instead of AttributeError if :class:`page.FileInfo` is used as Mapping
-* i28n and L10N updates
+* i18n and L10N updates
 
 
 Deprecations
