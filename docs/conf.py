@@ -426,7 +426,7 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
             lines[0] = '**{}**'.format(line.strip('.'))
         elif line == '&params;':
             lines[index] = ('This script supports use of '
-                            ':py:mod:`pywikibot.pagegenerators` arguments.')
+                            ':py:mod:`pagegenerators` arguments.')
         elif name == 'scripts.replace' and line == '&fixes-help;':
             lines[index] = ('                  The available fixes are listed '
                             'in :py:mod:`pywikibot.fixes`.')
