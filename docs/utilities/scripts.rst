@@ -1,5 +1,5 @@
-Utility scripts description
-===========================
+Framework Utility Scripts Description
+=====================================
 
 .. automodule:: pywikibot.scripts
    :no-members:

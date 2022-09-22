@@ -1,5 +1,5 @@
-Utility scripts
-===============
+Framework Utility Scripts
+=========================
 
 .. automodule:: pywikibot.scripts
    :synopsis: Folder which holds framework scripts
