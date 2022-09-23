@@ -290,6 +290,8 @@ except RuntimeError as e:  # pragma: no cover
         sys.exit(1)
 except ImportError as e:  # raised in textlib
     sys.exit(e)
+except SyntaxError as e:  # pragma: no cover
+    sys.exit(str(e) + '\nProbably outdated Python version')
 
 
 def find_alternates(filename, script_paths):
