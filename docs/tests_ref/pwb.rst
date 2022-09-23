@@ -6,8 +6,8 @@ tests.pwb package
     :undoc-members:
     :show-inheritance:
 
-Submodules
-----------
+pwb submodules
+--------------
 
 .. toctree::
 

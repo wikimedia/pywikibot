@@ -398,7 +398,7 @@ class FlowMixin:
         :param toconly: Whether to only include information for the TOC.
         :type toconly: bool
         :param offset: The timestamp to start at (when sortby is 'updated').
-        :type offset: Timestamp or equivalent str
+        :type offset: time.Timestamp or equivalent str
         :param offset_id: The topic UUID to start at (when sortby is 'newest').
         :type offset_id: str (in the form of a UUID)
         :param reverse: Whether to reverse the topic ordering.

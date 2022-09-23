@@ -367,8 +367,9 @@ numfig = True
 # Other settings
 show_authors = True
 todo_include_todos = True
-
 autodoc_typehints = 'description'
+# autosectionlabel_prefix_document = True
+suppress_warnings = ['autosectionlabel.*']
 
 # Allow lines like "Example:" to be followed by a code block
 napoleon_use_admonition_for_examples = True

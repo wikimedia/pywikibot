@@ -520,12 +520,14 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
     :keyword always: the user won't be prompted before changes are made
     :type keyword: bool
     :keyword site: Site the bot is working on.
+
     .. warning::
        - Be careful with `recursive` parameter, this might lead to an
          infinite loop.
        - `site` parameter should be passed to constructor.
          Otherwise the bot takes the current site and warns the operator
          about the missing site
+
     """
 
     def __init__(self, generator,

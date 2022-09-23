@@ -295,12 +295,12 @@ class TestPageArchiverObject(TestCase):
     def testLoadConfigInTemplateNamespace(self):
         """Test loading of config with TEMPLATE_PAGE in Template ns.
 
-        Talk:For-pywikibot-archivebot-01 must have:
+        Talk:For-pywikibot-archivebot-01 must have::
 
-         {{Pywikibot_archivebot
-         |archive = Talk:Main_Page/archive
-         |algo = old(30d)
-         }}
+            {{Pywikibot_archivebot
+            |archive = Talk:Main_Page/archive
+            |algo = old(30d)
+            }}
         """
         site = self.get_site()
         page = pywikibot.Page(site, 'Talk:For-pywikibot-archivebot-01')
@@ -322,12 +322,12 @@ class TestPageArchiverObject(TestCase):
     def testLoadConfigInOtherNamespace(self):
         """Test loading of config with TEMPLATE_PAGE not in Template ns.
 
-        Talk:For-pywikibot-archivebot must have:
+        Talk:For-pywikibot-archivebot must have::
 
-         {{User:MiszaBot/config
-         |archive = Talk:Main_Page/archive
-         |algo = old(30d)
-         }}
+            {{User:MiszaBot/config
+            |archive = Talk:Main_Page/archive
+            |algo = old(30d)
+            }}
         """
         site = self.get_site()
         page = pywikibot.Page(site, 'Talk:For-pywikibot-archivebot')
