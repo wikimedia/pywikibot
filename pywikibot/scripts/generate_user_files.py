@@ -231,9 +231,6 @@ def parse_sections() -> list:
     ConfigSection = namedtuple('ConfigSection', 'head, info, section')
 
     config_path = Path(__file__).resolve().parents[1].joinpath('config.py')
-    if PYTHON_VERSION < (3, 6):
-        config_path = str(config_path)
-
     with codecs.open(config_path, 'r', 'utf-8') as config_f:
         config_file = config_f.read()
 

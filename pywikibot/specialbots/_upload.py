@@ -135,7 +135,7 @@ class UploadRobot(BaseBot):
             else:
                 headers = {}
 
-            with open(str(path), 'ab') as fd:  # T272345: Python 3.5 needs str
+            with open(path, 'ab') as fd:
                 os.lseek(handle, file_len, 0)
                 try:
                     response = http.fetch(file_url, stream=True,

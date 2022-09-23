@@ -7,14 +7,7 @@
 import collections
 
 from abc import abstractmethod, ABC
-from collections.abc import (
-    Container,
-    Generator,
-    Iterable,
-    Iterator,
-    Mapping,
-    Sized,
-)
+from collections.abc import Collection, Generator, Iterator, Mapping
 from contextlib import suppress
 from itertools import chain
 from typing import Any
@@ -32,8 +25,7 @@ __all__ = (
 )
 
 
-# Collection is not provided with Python 3.5; use Container, Iterable, Sized
-class SizedKeyCollection(Container, Iterable, Sized):
+class SizedKeyCollection(Collection):
 
     """Structure to hold values where the key is given by the value itself.
 

@@ -10,18 +10,12 @@ import threading
 import time
 from collections import Counter, namedtuple
 from contextlib import suppress
+from hashlib import blake2b
 from typing import Optional, Union
 
 import pywikibot
 from pywikibot import config
-from pywikibot.tools import PYTHON_VERSION, deprecated
-
-
-if PYTHON_VERSION < (3, 6):
-    from hashlib import md5
-    blake2b = None
-else:
-    from hashlib import blake2b
+from pywikibot.tools import deprecated
 
 
 FORMAT_LINE = '{module_id} {pid} {time} {site}\n'
@@ -103,11 +97,8 @@ class Throttle:
         if module is None:
             module = pywikibot.calledModuleName()
         module = module.encode()
-        if blake2b:
-            hashobj = blake2b(module, digest_size=2)
-        else:
-            hashobj = md5(module)
-        return hashobj.hexdigest()[:4]  # slice for Python 3.5
+        hashobj = blake2b(module, digest_size=2)
+        return hashobj.hexdigest()
 
     def _read_file(self, raise_exc: bool = False):
         """Yield process entries from file."""

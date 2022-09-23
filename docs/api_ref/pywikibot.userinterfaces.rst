@@ -51,9 +51,3 @@
 
 .. automodule:: userinterfaces.transliteration
    :synopsis: Module to transliterate text
-
-:mod:`win32\_unicode` --- Unicode Interface for Python 3.5
-----------------------------------------------------------
-
-.. automodule:: userinterfaces.win32_unicode
-   :synopsis: Unicode support for stdout, stderr and argv with Python 3.5.

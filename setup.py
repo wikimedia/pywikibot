@@ -38,7 +38,7 @@ VERSIONS_REQUIRED_MESSAGE = """
 Pywikibot is not available on:
 {version}
 
-This version of Pywikibot only supports Python 3.5.3+.
+This version of Pywikibot only supports Python 3.6+.
 """
 
 try:
@@ -49,7 +49,7 @@ except SyntaxError:
 
 def python_is_supported() -> bool:
     """Check that Python is supported."""
-    return sys.version_info[:3] >= (3, 5, 3)
+    return sys.version_info[:3] >= (3, 6)
 
 
 if not python_is_supported():  # pragma: no cover
@@ -65,19 +65,15 @@ extra_deps = {
     'Google': ['google>=1.7'],
     'memento': ['memento_client==0.6.1'],
     'mwparserfromhell': ['mwparserfromhell>=0.5.0'],
-    'wikitextparser': ['wikitextparser>=0.47.5; python_version < "3.6"',
-                       'wikitextparser>=0.47.0; python_version >= "3.6"'],
-    'mysql': ['PyMySQL >= 0.7.11, < 1.0.0 ; python_version < "3.6"',
-              'PyMySQL >= 1.0.0 ; python_version >= "3.6"'],
-    'Tkinter': [  # vulnerability found in Pillow<8.1.1
-        'Pillow>=8.1.1;python_version>="3.6"',
-    ],
+    'wikitextparser': ['wikitextparser>=0.47.0'],
+    'mysql': ['PyMySQL >= 0.9.3'],  # toolforge
+    # vulnerability found in Pillow<8.1.1 but toolforge uses 5.4.1
+    'Tkinter': ['Pillow>=8.1.1'],
     'mwoauth': ['mwoauth!=0.3.1,>=0.2.4'],
     'html': ['BeautifulSoup4'],
     'http': ['fake_useragent'],
     'flake8': [  # Due to incompatibilities between packages the order matters.
-        'flake8==3.9.2,<5.0.0; python_version < "3.6"',
-        'flake8>=5.0.2; python_version >= "3.6"',
+        'flake8>=5.0.2',
         'darglint',
         'pydocstyle>=4.0.0',
         'flake8-bugbear!=21.4.1,!=21.11.28',
@@ -112,16 +108,12 @@ extra_deps.update({'scripts': [i for k, v in script_deps.items() for i in v]})
 # ------- setup install_requires ------- #
 # packages which are mandatory
 dependencies = [
-    'requests>=2.20.1, <2.26.0; python_version < "3.6"',
-    'requests>=2.20.1, <2.28.0; '
-    'python_version >= "3.6" and python_version < "3.7"',
+    'requests>=2.20.1, <2.28.0; python_version < "3.7"',
     'requests>=2.20.1; python_version>="3.7"',
     # PEP 440
     'setuptools>=48.0.0 ; python_version >= "3.10"',
     'setuptools>=38.5.2 ; python_version >= "3.7" and python_version < "3.10"',
-    'setuptools>=20.8.1, <59.7.0 '
-    '; python_version >= "3.6" and python_version < "3.7"',
-    'setuptools>=20.8.1, !=50.0.0, <51.0.0 ; python_version < "3.6"',
+    'setuptools>=20.8.1, <59.7.0 ; python_version < "3.7"',
 ]
 # in addition either mwparserfromhell or wikitextparser is required
 
@@ -277,7 +269,7 @@ def main() -> None:  # pragma: no cover
         # zip_safe
         install_requires=dependencies,
         extras_require=extra_deps,
-        python_requires='>=3.5.3',
+        python_requires='>=3.6',
         # namespace_packages
         test_suite='tests.collector',
         tests_require=test_deps,
@@ -363,7 +355,6 @@ def main() -> None:  # pragma: no cover
             'Programming Language :: Python',
             'Programming Language :: Python :: 3',
             'Programming Language :: Python :: 3 :: Only',
-            'Programming Language :: Python :: 3.5',
             'Programming Language :: Python :: 3.6',
             'Programming Language :: Python :: 3.7',
             'Programming Language :: Python :: 3.8',

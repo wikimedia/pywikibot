@@ -68,7 +68,7 @@ from pywikibot.logging import (
 )
 from pywikibot.site import APISite, BaseSite, DataSite
 from pywikibot.time import Timestamp
-from pywikibot.tools import normalize_username, PYTHON_VERSION
+from pywikibot.tools import normalize_username
 
 
 ItemPageStrNoneType = Union[str, 'ItemPage', None]
@@ -93,15 +93,6 @@ __all__ = (
 
 if not hasattr(sys.modules[__name__], 'argvu'):
     argvu = []  # type: List[str]
-
-
-if PYTHON_VERSION < (3, 6):
-    warn("""
-Python {version} will be dropped with release 8.0 soon.
-It is recommended to use Python 3.6 or above.
-See T301908 for further information.
-""".format(version=sys.version.split(maxsplit=1)[0]),
-         FutureWarning)  # adjust this line no in utils.execute()
 
 
 class Coordinate(_WbRepresentation):

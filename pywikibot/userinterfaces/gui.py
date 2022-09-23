@@ -12,6 +12,11 @@ Useful for editing the contents of an article.
 # Distributed under the terms of the MIT license.
 #
 import tkinter
+from idlelib import replace as ReplaceDialog
+from idlelib import search as SearchDialog
+from idlelib.config import idleConf
+from idlelib.configdialog import ConfigDialog
+from idlelib.multicall import MultiCallCreator
 from tkinter import simpledialog as tkSimpleDialog
 from tkinter.scrolledtext import ScrolledText
 from typing import Optional
@@ -20,20 +25,6 @@ import pywikibot
 from pywikibot import __url__
 from pywikibot.backports import Tuple
 from pywikibot.tools import PYTHON_VERSION
-
-
-# T164163: Fix idlelib import in Python 3.6
-if PYTHON_VERSION >= (3, 6):
-    from idlelib import replace as ReplaceDialog
-    from idlelib import search as SearchDialog
-    from idlelib.config import idleConf
-    from idlelib.configdialog import ConfigDialog
-    from idlelib.multicall import MultiCallCreator
-else:
-    from idlelib import ReplaceDialog, SearchDialog
-    from idlelib.configDialog import ConfigDialog
-    from idlelib.configHandler import idleConf
-    from idlelib.MultiCall import MultiCallCreator
 
 
 class TextEditor(ScrolledText):
@@ -562,15 +553,6 @@ class Tkdialog:
     @staticmethod
     def get_image(photo, width, height):
         """Take the BytesIO object and build an imageTK thumbnail."""
-        if PYTHON_VERSION < (3, 6):
-            # vulnerability found in Pillow<8.1.1
-            from sys import version
-            raise RuntimeError(
-                'This script requires Python 3.6+ for GUI support.\n'
-                '{version} is not supported. Please update your Python.'
-                .format(version=version.split(maxsplit=1)[0])
-            )
-
         try:
             from PIL import Image, ImageTk
         except ImportError:
