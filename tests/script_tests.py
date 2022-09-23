@@ -363,7 +363,6 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
     _expected_failures = {
         'catall',          # stdout user interaction
         'checkimages',
-        'patrol',
         'revertbot',
         'unusedfiles',     # not localized for default sites
     }
@@ -373,6 +372,7 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
         'disambredir',
         'misspelling',   # T94681
         'noreferences',
+        'patrol',
         'upload',  # raises custom ValueError
         'watchlist',  # not logged in
     }
