@@ -1049,6 +1049,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
 
         .. note:: current_cat is only used for internal recursion. You
            should always use ``current_cat = original_cat``.
+
         :param member: a page to process.
         :param original_cat: original category to replace.
         :param current_cat: a category which is questioned.

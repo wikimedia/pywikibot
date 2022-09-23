@@ -4,8 +4,8 @@
 .. automodule:: page
    :synopsis: Interface of various types of MediaWiki pages
 
-Submodules
-----------
+Page Submodules
+---------------
 
 :mod:`page.\_collections` Wikibase Entity Structures
 ----------------------------------------------------

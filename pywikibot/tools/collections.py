@@ -267,7 +267,7 @@ class GeneratorWrapper(ABC, Generator):
         The `value` parameter is ignored yet; usually it should be ``None``.
         If the wrapped generator property exits without yielding another
         value this method raises `StopIteration`. The send method works
-        like the `next`function with a GeneratorWrapper instance as
+        like the `next` function with a GeneratorWrapper instance as
         parameter.
 
         Refer :python:`generator.send()

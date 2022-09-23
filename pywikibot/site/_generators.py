@@ -493,7 +493,7 @@ class GeneratorsMixin:
             (default False)
         :param starttime: if provided, only generate pages added after this
             time; not valid unless sortby="timestamp"
-        :type starttime: pywikibot.Timestamp
+        :type starttime: time.Timestamp
         :param endtime: if provided, only generate pages added before this
             time; not valid unless sortby="timestamp"
         :param startprefix: if provided, only generate pages >= this title
@@ -1115,9 +1115,9 @@ class GeneratorsMixin:
            ``iprange`` parameter cannot be used together with ``users``.
 
         :param starttime: start iterating at this Timestamp
-        :type starttime: pywikibot.Timestamp
+        :type starttime: time.Timestamp
         :param endtime: stop iterating at this Timestamp
-        :type endtime: pywikibot.Timestamp
+        :type endtime: time.Timestamp
         :param reverse: if True, iterate oldest blocks first (default: newest)
         :param blockids: only iterate blocks with these id numbers. Numbers
             must be separated by '|' if given by a str.
@@ -1254,9 +1254,9 @@ class GeneratorsMixin:
            the API and will be filtered later during iteration.
 
         :param start: only iterate entries from and after this Timestamp
-        :type start: Timestamp or ISO date string
+        :type start: time.Timestamp or ISO date string
         :param end: only iterate entries up to and through this Timestamp
-        :type end: Timestamp or ISO date string
+        :type end: time.Timestamp or ISO date string
         :param reverse: if True, iterate oldest entries first (default: newest)
         :param tag: only iterate entries tagged with this tag
         :param total: maximum number of events to iterate
