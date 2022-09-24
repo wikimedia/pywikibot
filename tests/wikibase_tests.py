@@ -2056,11 +2056,13 @@ class TestOwnClient(TestCase):
         'wikidata': {
             'family': 'wikidata',
             'code': 'wikidata',
+            'title': 'Wikidata:Main Page',
         },
         # test.wikidata is also
         'wikidatatest': {
             'family': 'wikidata',
             'code': 'test',
+            'title': r'Page \[\[wikidata:test:Q5296\]\] is a redirect page'
         },
     }
 
@@ -2072,14 +2074,17 @@ class TestOwnClient(TestCase):
         item = ItemPage.fromPage(page)
         self.assertEqual(item.site, site)
 
-    def test_page_from_repository_fails(self, key):
-        """Test that page_from_repository method fails."""
+    def test_page_from_repository(self, key):
+        """Test that page_from_repository method works for wikibase too."""
         site = self.get_site(key)
-        dummy_item = 'Q1'
-        regex = (r'^page_from_repository method is not implemented '
-                 r'for Wikibase .+\.$')
-        with self.assertRaisesRegex(NotImplementedError, regex):
-            site.page_from_repository(dummy_item)
+        try:
+            page = site.page_from_repository('Q5296')
+        except IsRedirectPageError:
+            with self.assertRaisesRegex(IsRedirectPageError,
+                                        self.sites[key]['title']):
+                raise
+        else:
+            self.assertEqual(page.title(), self.sites[key]['title'])
 
 
 class TestUnconnectedClient(TestCase):
