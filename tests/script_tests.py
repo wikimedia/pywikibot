@@ -364,7 +364,6 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
         'catall',          # stdout user interaction
         'checkimages',
         'revertbot',
-        'unusedfiles',     # not localized for default sites
     }
 
     _allowed_failures = {
@@ -372,12 +371,12 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
         'clean_sandbox',
         'delinker',
         'disambredir',
-        'misspelling',   # T94681
+        'misspelling',  # T94681
         'noreferences',
         'nowcommons',
         'patrol',
         'shell',
-        'unusedfiles',
+        'unusedfiles',  # not localized for default sites
         'upload',  # raises custom ValueError
         'watchlist',  # not logged in
     }
@@ -423,21 +422,35 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
     }
 
     _allowed_failures = {
+        'archivebot',
         'basic',
+        'blockpageschecker',
+        'category_redirect',
+        'checkimages',
+        'clean_sandbox',
         'commonscat',
         'commons_information',
         'coordinate_import',
         'cosmetic_changes',
+        'create_isbn_edition',
+        'delinker',
         'fixing_redirects',
         'illustrate_wikidata',
         'image',
         'imagetransfer',
         'interwikidata',
+        'misspelling',
         'newitem',
+        'parser_function_count',
+        'patrol',
         'replace',
+        'shell',
         'solve_disambiguation',
         'touch',
+        'unusedfiles',
+        'watchlist',
         'weblinkchecker',
+        'welcome',
     }
 
     _arguments = '-simulate -page:Foo -always'
