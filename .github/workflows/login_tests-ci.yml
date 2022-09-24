@@ -19,6 +19,7 @@ env:
 jobs:
   build:
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     continue-on-error: ${{ matrix.experimental || false }}
     timeout-minutes: 2
 
