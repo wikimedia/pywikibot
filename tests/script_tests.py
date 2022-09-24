@@ -364,7 +364,6 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
         'catall',          # stdout user interaction
         'checkimages',
         'revertbot',
-        'shell',
         'unusedfiles',     # not localized for default sites
     }
 
@@ -377,6 +376,7 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
         'noreferences',
         'nowcommons',
         'patrol',
+        'shell',
         'unusedfiles',
         'upload',  # raises custom ValueError
         'watchlist',  # not logged in
