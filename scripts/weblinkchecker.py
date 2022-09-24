@@ -132,7 +132,7 @@ from pywikibot.exceptions import (
 from pywikibot.pagegenerators import (
     XMLDumpPageGenerator as _XMLDumpPageGenerator,
 )
-from pywikibot.tools import ThreadList
+from pywikibot.tools.threading import ThreadList
 
 
 try:

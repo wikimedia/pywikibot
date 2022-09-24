@@ -22,7 +22,8 @@ from pywikibot.bot_choice import (
     StandardOption,
 )
 from pywikibot.logging import INFO, INPUT, STDOUT, VERBOSE, WARNING
-from pywikibot.tools import issue_deprecation_warning, RLock
+from pywikibot.tools import issue_deprecation_warning
+from pywikibot.tools.threading import RLock
 from pywikibot.userinterfaces import transliteration
 from pywikibot.userinterfaces._interface_base import ABUIC
 
