@@ -254,7 +254,7 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
                        % {'cat': target.title(with_ns=False),
                           'template': self.template_list[0]})
             params = {
-                'ns': self.site.namespaces.TEMPLATE,
+                'ns': self.site.namespaces.TEMPLATE.custom_prefix(),
                 'template': self.template_list[0],
                 'oldcat': page.title(as_link=True, textlink=True)
             }
