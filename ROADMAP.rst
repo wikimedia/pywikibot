@@ -1,6 +1,7 @@
 Current release 7.7.0
 ^^^^^^^^^^^^^^^^^^^^^
 
+* tools' threading classes were moved to :mod:`tools.threading` submodule
 * OmegaWiki family was removed
 * Provide global ``-config`` option to specify the user config file name
 * Run :mod:`pywikibot.scripts.login` script in parallel tasks if ``-async`` option is given (:phab:`T57899`)
@@ -14,6 +15,7 @@ Current release 7.7.0
 Deprecations
 ^^^^^^^^^^^^
 
+* 7.7.0: :mod:`tools.threading` classes should no longer imported from :mod:`tools`
 * 7.6.0: :mod:`tools.itertools` datatypes should no longer imported from :mod:`tools`
 * 7.6.0: :mod:`tools.collections` datatypes should no longer imported from :mod:`tools`
 * 7.5.0: :mod:`textlib`.tzoneFixedOffset class will be removed in favour of :class:`time.TZoneFixedOffset`

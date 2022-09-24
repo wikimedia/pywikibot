@@ -70,12 +70,12 @@ Library tests
     tests<./tests_tests>
     textlib<./textlib_tests>
     thanks<./thanks_tests>
-    thread<./thread_tests>
     time<./time_tests>
     timestripper<./timestripper_tests>
     tools_chars<./tools_chars_tests>
     tools_deprecate<./tools_deprecate_tests>
     tools_formatter<./tools_formatter_tests>
+    threading<./tools_threading_tests>
     tools<./tools_tests>
     ui_options<./ui_options_tests>
     ui<./ui_tests>

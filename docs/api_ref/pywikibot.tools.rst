@@ -40,6 +40,12 @@
 .. automodule:: tools.itertools
    :synopsis: Iterator functions
 
+:mod:`tools.threading` --- Thread-based Classes
+-----------------------------------------------
+
+.. automodule:: tools.threading
+   :synopsis: Threading classes
+
 :mod:`tools.\_logging` --- logging.Formatter Subclass
 -----------------------------------------------------
 
