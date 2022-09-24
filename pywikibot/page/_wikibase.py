@@ -1322,15 +1322,11 @@ class PropertyPage(WikibasePage, Property):
         data['datatype'] = self._type
         return data
 
-    def newClaim(self, *args, **kwargs):
-        """
-        Helper function to create a new claim object for this property.
-
-        :rtype: pywikibot.page.Claim
-        """
+    def newClaim(self, *args, **kwargs) -> 'Claim':
+        """Helper function to create a new claim object for this property."""
         # todo: raise when self.id is -1
-        return Claim(self.site, self.getID(), datatype=self.type,
-                     *args, **kwargs)
+        return Claim(self.site, self.getID(), *args, datatype=self.type,
+                     **kwargs)
 
     def getID(self, numeric: bool = False):
         """
