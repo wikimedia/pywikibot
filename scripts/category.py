@@ -447,7 +447,6 @@ class CategoryAddBot(CategoryPreprocess):
         self.sort = sort_by_last_name
         self.create = create
         self.follow_redirects = follow_redirects
-        self.always = False
         self.comment = comment
 
     @staticmethod
