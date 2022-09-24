@@ -33,6 +33,8 @@ for tests to set the default site (see :phab:`T216825`)::
 
 .. versionchanged:: 7.0
    pwb wrapper was added to the Python site package lib
+.. versionchanged:: 7.7
+   pwb wrapper is able to set ``PYWIKIBOT_TEST_...`` environment variables
 """
 # (C) Pywikibot team, 2012-2022
 #
@@ -109,6 +111,9 @@ def check_pwb_versions(package):
 def run_python_file(filename, args, package=None):
     """Run a python file as if it were the main program on the command line.
 
+    .. versionchanged:: 7.7
+       Set and restore ``PYWIKIBOT_TEST_...`` environment variables.
+
     :param filename: The path to the file to execute, it need not be a
         .py file.
     :type filename: str
@@ -131,6 +136,11 @@ def run_python_file(filename, args, package=None):
     old_argv = sys.argv
     old_argvu = pwb.argvu
 
+    # set environment values
+    old_env = os.environ.copy()
+    for key, value in environ:
+        os.environ[key] = value
+
     sys.argv = [filename] + args
     pwb.argvu = [Path(filename).stem] + args
     sys.path.insert(0, os.path.dirname(filename))
@@ -151,27 +161,44 @@ def run_python_file(filename, args, package=None):
 
 # end of snippet from coverage
 
+        # Restore environment values
+        for key, value in environ:
+            if key in old_env:
+                os.environ[key] = old_env[key]
+            else:
+                del os.environ[key]
+
 
 def handle_args(pwb_py, *args):
     """Handle args and get filename.
 
-    :return: filename, script args, local args for pwb.py
-    :rtype: tuple
+    .. versionchanged:: 7.7
+       Catch ``PYWIKIBOT_TEST_...`` environment variables.
+
+    :return: filename, script args, local pwb args, environment variables
+    :rtype: Tuple[str, List[str], List[str], [List[str]]
     """
     fname = None
-    index = 0
-    for arg in args:
+    local = []
+    env = []
+    for index, arg in enumerate(args, start=1):
         if arg in ('-version', '--version'):
             fname = 'version.py'
         elif arg.startswith('-'):
-            index += 1
-            continue
+            local.append(arg)
+        elif arg.startswith('PYWIKIBOT_TEST_'):
+            var, _, val = arg.partition('=')
+            env.append((var, val or '1'))
         else:
             fname = arg
             if not fname.endswith('.py'):
                 fname += '.py'
-        break
-    return fname, list(args[index + int(bool(fname)):]), args[:index]
+        if fname:
+            break
+    else:
+        index = 0
+
+    return fname, list(args[index:]), local, env
 
 
 def _print_requirements(requirements, script, variant):  # pragma: no cover
@@ -258,7 +285,7 @@ def check_modules(script=None):
     return not missing_requirements
 
 
-filename, script_args, global_args = handle_args(*sys.argv)
+filename, script_args, global_args, environ = handle_args(*sys.argv)
 
 # Search for user config file (user-config.py) before creating one.
 # If successful, user config file already exists in one of the candidate
