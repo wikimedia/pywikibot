@@ -150,7 +150,7 @@ class AliasesDict(BaseDataDict):
         """Helper function to expand data into the Wikibase API structure.
 
         .. versionchanged:: 7.7
-           raises TypeError *data* value is not a list.
+           raises TypeError if *data* value is not a list.
 
         :param data: Data to normalize
         :return: The dict with normalized data

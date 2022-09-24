@@ -11,6 +11,10 @@ archivebot
 * Add -sort option to sort archives by (latest) timestamp
 * Archive unsigned threads using timestamp of the next thread (:phab:`T69663`, :phab:`T182685`)
 
+category_redirect
+~~~~~~~~~~~~~~~~~
+* Use localized template prefix (:phab:`T318049`)
+
 create_isbn_edition
 ~~~~~~~~~~~~~~~~~~~
 

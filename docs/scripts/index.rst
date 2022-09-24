@@ -3,6 +3,7 @@ Scripts Package Description
 
 .. automodule:: scripts
    :no-members:
+   :noindex:
 
 .. include:: ../../scripts/README.rst
    :start-after: included.

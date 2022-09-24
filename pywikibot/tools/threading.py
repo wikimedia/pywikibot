@@ -1,4 +1,4 @@
-"""Miscellaneous helper functions (not wiki-dependent)."""
+"""Classes which can be used for threading."""
 #
 # (C) Pywikibot team, 2008-2022
 #
