@@ -104,10 +104,16 @@ Options (may be omitted):
   -salt:SALT      specify salt
   -keep           Preserve thread order in archive even if threads are
                   archived later
+  -sort           Sort archive by timestamp; should not be used with -keep
+  -async          Run the bot in parallel tasks. This is experimental
+                  and the bot cannot be stopped with KeyboardInterrupt
 
 .. versionchanged:: 7.6
    Localized variables for "archive" template parameter are supported.
-   `-keep` option was added.
+   `User:MiszaBot/config` is the default template. `-keep` option was
+   added.
+.. versionchanged:: 7.7
+   `-sort` and `-async` options were added.
 """
 #
 # (C) Pywikibot team, 2006-2022
@@ -120,6 +126,7 @@ import os
 import re
 import time
 from collections import OrderedDict, defaultdict
+from concurrent.futures import ThreadPoolExecutor
 from hashlib import md5
 from math import ceil
 from textwrap import fill
@@ -128,7 +135,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import i18n
-from pywikibot.backports import List, Set, Tuple, pairwise
+from pywikibot.backports import List, Set, Tuple, nullcontext, pairwise
 from pywikibot.exceptions import Error, NoPageError
 from pywikibot.textlib import (
     TimeStripper,
@@ -361,6 +368,8 @@ class DiscussionPage(pywikibot.Page):
         .. versionchanged:: 7.6
            If `-keep` option is given run through all threads and set
            the current timestamp to the previous if the current is lower.
+        .. versionchanged:: 7.7
+           Load unsigned threads using timestamp of the next thread.
         """
         self.header = ''
         self.threads = []
@@ -388,6 +397,11 @@ class DiscussionPage(pywikibot.Page):
             for line in lines:
                 cur_thread.feed_line(line)
             self.threads.append(cur_thread)
+
+        # add latter timestamp to predecessor if it is None
+        for last, prev in pairwise(reversed(self.threads)):
+            if not prev.timestamp:
+                prev.timestamp = last.timestamp
 
         if self.keep:
             # set the timestamp to the previous if the current is lower
@@ -459,7 +473,7 @@ class PageArchiver:
     algo = 'none'
 
     def __init__(self, page, template, salt: str, force: bool = False,
-                 keep=False) -> None:
+                 keep: bool = False, sort: bool = False) -> None:
         """Initializer.
 
         :param page: a page object to be archived
@@ -477,6 +491,7 @@ class PageArchiver:
         ])
         self.salt = salt
         self.force = force
+        self.sort = sort
         self.site = page.site
         self.tpl = template
         self.timestripper = TimeStripper(site=self.site)
@@ -768,7 +783,7 @@ class PageArchiver:
                 comment = i18n.twtranslate(self.site.code,
                                            'archivebot-archive-summary',
                                            self.comment_params)
-                archive.update(comment)
+                archive.update(comment, sort_threads=self.sort)
 
             # Save the page itself
             self.page.header = rx.sub(self.attr2text(), self.page.header)
@@ -796,31 +811,33 @@ class PageArchiver:
             self.page.update(comment)
 
 
-def process_page(pg, tmpl, salt: str, force: bool, keep: bool) -> bool:
+def process_page(page, *args: Any) -> bool:
     """Call PageArchiver for a single page.
 
     :return: Return True to continue with the next page, False to break
         the loop.
 
     .. versionadded:: 7.6
+    .. versionchanged:: 7.7
+       pass an unspecified number of arguments to the bot using ``*args``
     """
-    if not pg.exists():
-        pywikibot.info('{} does not exist, skipping...'.format(pg))
+    if not page.exists():
+        pywikibot.info('{} does not exist, skipping...'.format(page))
         return True
 
-    pywikibot.info('\n\n>>> <<lightpurple>>{}<<default>> <<<'.format(pg))
+    pywikibot.info('\n\n>>> <<lightpurple>>{}<<default>> <<<'.format(page))
     # Catching exceptions, so that errors in one page do not bail out
     # the entire process
     try:
-        archiver = PageArchiver(pg, tmpl, salt, force, keep)
+        archiver = PageArchiver(page, *args)
         archiver.run()
     except ArchiveBotSiteConfigError as e:
         # no stack trace for errors originated by pages on-site
         pywikibot.error('Missing or malformed template in page {}: {}'
-                        .format(pg, e))
+                        .format(page, e))
     except Exception:
         pywikibot.exception('Error occurred while processing page {}'
-                            .format(pg))
+                            .format(page))
     except KeyboardInterrupt:
         pywikibot.info('\nUser quit bot run...')
         return False
@@ -842,6 +859,8 @@ def main(*args: str) -> None:
     force = False
     calc = None
     keep = False
+    sort = False
+    asyncronous = False
     templates = []
 
     local_args = pywikibot.handle_args(args)
@@ -873,6 +892,10 @@ def main(*args: str) -> None:
             namespace = value
         elif option == 'keep':
             keep = True
+        elif option == 'sort':
+            sort = True
+        elif option == 'async':
+            asyncronous = True
 
     site = pywikibot.Site()
 
@@ -903,15 +926,22 @@ def main(*args: str) -> None:
         elif pagename:
             gen = [pywikibot.Page(site, pagename, ns=3)]
         else:
+
             ns = [str(namespace)] if namespace is not None else []
             pywikibot.output('Fetching template transclusions...')
             gen = tmpl.getReferences(only_template_inclusion=True,
                                      follow_redirects=False,
                                      namespaces=ns,
                                      content=True)
-        for pg in gen:
-            if not process_page(pg, tmpl, salt, force, keep):
-                return
+
+        botargs = tmpl, salt, force, keep, sort
+        context = ThreadPoolExecutor if asyncronous else nullcontext
+        with context() as executor:
+            for pg in gen:
+                if asyncronous:
+                    executor.submit(process_page, pg, *botargs)
+                elif not process_page(pg, *botargs):
+                    return
 
 
 if __name__ == '__main__':

@@ -22,7 +22,8 @@ from pywikibot.bot_choice import (
     StandardOption,
 )
 from pywikibot.logging import INFO, INPUT, STDOUT, VERBOSE, WARNING
-from pywikibot.tools import issue_deprecation_warning, RLock
+from pywikibot.tools import issue_deprecation_warning
+from pywikibot.tools.threading import RLock
 from pywikibot.userinterfaces import transliteration
 from pywikibot.userinterfaces._interface_base import ABUIC
 
@@ -540,7 +541,9 @@ class UI(ABUIC):
 
                 self.stream_output('Error: Invalid response\n')
 
-    def editText(self, text: str, jumpIndex: Optional[int] = None,
+    @staticmethod
+    def editText(text: str,
+                 jumpIndex: Optional[int] = None,
                  highlight: Optional[str] = None) -> Optional[str]:
         """Return the text as edited by the user.
 

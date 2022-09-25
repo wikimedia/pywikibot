@@ -8,6 +8,7 @@ import unittest
 from contextlib import suppress
 
 from tests.aspects import TestCase
+from tests import utils
 
 
 class HttpServerProblemTestCase(TestCase):
@@ -21,13 +22,18 @@ class HttpServerProblemTestCase(TestCase):
     }
 
     def test_502(self):
-        """Test a HTTP 502 response using http://httpbin.org/status/502."""
-        self.fail('The test framework should skip this test.')
+        """Test that framework is skipping this test due to HTTP status 502."""
+        self.fail("The test framework should skip this test but it hasn't.")
 
 
-class TestLengthAssert(TestCase):
+class TestLengthAssertion(TestCase):
 
-    """Test length assertion methods."""
+    """Test length assertion methods.
+
+    ``@unittest.expectedFailure`` is used to test the failure of a test;
+    this is intentional. If the decorated test passes unexpectedly the
+    test will fail.
+    """
 
     net = False
 
@@ -68,6 +74,24 @@ class TestLengthAssert(TestCase):
         self.assertLength([], 1)
         self.assertLength(self.seq1, 0)
         self.assertLength(None, self.seq)
+
+
+class UtilsTests(TestCase):
+
+    """Tests for tests.utils."""
+
+    net = False
+    pattern = 'Hello World'
+
+    def test_fixed_generator(self):
+        """Test utils.fixed_generator."""
+        gen = utils.fixed_generator(self.pattern)
+        self.assertEqual(list(gen(1, 'foo', bar='baz')), list(self.pattern))
+
+    def test_entered_loop(self):
+        """Test utils.entered_loop."""
+        self.assertTrue(utils.entered_loop(self.pattern))
+        self.assertFalse(utils.entered_loop(''))
 
 
 if __name__ == '__main__':  # pragma: no cover

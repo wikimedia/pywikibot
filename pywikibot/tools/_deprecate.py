@@ -5,9 +5,9 @@ decorator functions with function syntax. For example, @deprecated causes
 a different invocation to @deprecated().
 
 The former is invoked with the decorated function as args[0].
-The latter is invoked with the decorator arguments as *args & **kwargs,
-and it must return a callable which will be invoked with the decorated
-function as args[0].
+The latter is invoked with the decorator arguments as ``*args`` &
+``**kwargs``, and it must return a callable which will be invoked with
+the decorated function as args[0].
 
 The follow deprecators may support both syntax, e.g. @deprecated and
 @deprecated() both work. In order to achieve that, the code inspects
@@ -500,7 +500,7 @@ def redirect_func(target, source_module: Optional[str] = None,
     parameters.
 
     .. versionchanged:: 7.0
-       `since`parameter must be a release number, not a timestamp.
+       ``since`` parameter must be a release number, not a timestamp.
 
     :param target: The targeted function which is to be executed.
     :type target: callable
@@ -579,7 +579,7 @@ class ModuleDeprecationWrapper(types.ModuleType):
         Add the name to the local deprecated names dict.
 
         .. versionchanged:: 7.0
-           `since`parameter must be a release number, not a timestamp.
+           ``since`` parameter must be a release number, not a timestamp.
 
         :param name: The name of the deprecated class or variable. It may not
             be already deprecated.

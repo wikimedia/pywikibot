@@ -259,7 +259,8 @@ class Throttle:
 
         self._write_file(processes)
 
-    def wait(self, seconds) -> None:
+    @staticmethod
+    def wait(seconds: Union[int, float]) -> None:
         """Wait for seconds seconds.
 
         Announce the delay if it exceeds a preset limit.

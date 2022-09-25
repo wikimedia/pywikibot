@@ -89,7 +89,8 @@ class Board(FlowPage):
             self._data = self.site.load_board(self)
         return self._data
 
-    def _parse_url(self, links: Mapping[str, Any]) -> Dict[str, Any]:
+    @staticmethod
+    def _parse_url(links: Mapping[str, Any]) -> Dict[str, Any]:
         """Parse a URL retrieved from the API."""
         if 'fwd' in links:
             rule = links['fwd']

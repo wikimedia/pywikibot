@@ -33,12 +33,13 @@ from pywikibot.tools import first_lower, first_upper
 #
 # Different collections of well known formats
 #
+brMonthNames = ['Genver', "C'hwevrer", 'Meurzh', 'Ebrel', 'Mae', 'Mezheven',
+                'Gouere', 'Eost', 'Gwengolo', 'Here', 'Du', 'Kerzu']
 enMonthNames = ['January', 'February', 'March', 'April', 'May', 'June',
                 'July', 'August', 'September', 'October', 'November',
                 'December']
 waMonthNames = ['djanvî', 'fevrî', 'måss', 'avri', 'may', 'djun', 'djulete',
                 'awousse', 'setimbe', 'octôbe', 'nôvimbe', 'decimbe']
-
 dayMnthFmts = ['Day_' + str(s) for s in enMonthNames]  # e.g. 'Day_January'
 yrMnthFmts = ['Year_' + str(s) for s in enMonthNames]  # e.g. 'Year_January'
 
@@ -558,9 +559,7 @@ class MonthNames(abc.Mapping):
 
     # Predefined month names which are needed at import time
     months = {
-        'br': lambda v: slh(v, ['Genver', "C'hwevrer", 'Meurzh', 'Ebrel',
-                                'Mae', 'Mezheven', 'Gouere', 'Eost',
-                                'Gwengolo', 'Here', 'Du', 'Kerzu']),
+        'br': lambda v: slh(v, brMonthNames),
         'en': lambda v: slh(v, enMonthNames),
         'ja': lambda v: slh(v, makeMonthList('%d月')),
         'ko': lambda v: slh(v, makeMonthList('%d월')),
@@ -701,6 +700,26 @@ class MonthFormat(abc.MutableMapping):  # type: ignore[type-arg]
 
     def __len__(self) -> int:
         return len(self.data)
+
+
+def _en_period(period: str):
+    """Create century and millenium format function for ``en`` language."""
+    return lambda m: multi(m, [
+        (lambda v: dh_centuryAD(v, '%dst ' + period),
+         lambda p: p == 1 or (p > 20 and p % 10 == 1)),
+        (lambda v: dh_centuryAD(v, '%dnd ' + period),
+         lambda p: p == 2 or (p > 20 and p % 10 == 2)),
+        (lambda v: dh_centuryAD(v, '%drd ' + period),
+         lambda p: p == 3 or (p > 20 and p % 10 == 3)),
+        (lambda v: dh_centuryAD(v, '%dth ' + period), alwaysTrue)])
+
+
+def _period_with_pattern(period: str, pattern: str):
+    """Create century and millenium format function with pattern."""
+    return lambda m: multi(m, [
+        (lambda v: dh_constVal(v, 1, period), lambda p: p == 1),
+        (lambda v: dh(v, pattern, lambda i: i - 1, lambda ii: ii[0] + 1),
+         alwaysTrue)])
 
 
 formats = {
@@ -1064,14 +1083,7 @@ formats = {
         'el': lambda m: multi(m, [
             (lambda v: dh_centuryAD(v, '%dός αιώνας'), lambda p: p == 20),
             (lambda v: dh_centuryAD(v, '%dος αιώνας'), alwaysTrue)]),
-        'en': lambda m: multi(m, [
-            (lambda v: dh_centuryAD(v, '%dst century'),
-             lambda p: p == 1 or (p > 20 and p % 10 == 1)),
-            (lambda v: dh_centuryAD(v, '%dnd century'),
-             lambda p: p == 2 or (p > 20 and p % 10 == 2)),
-            (lambda v: dh_centuryAD(v, '%drd century'),
-             lambda p: p == 3 or (p > 20 and p % 10 == 3)),
-            (lambda v: dh_centuryAD(v, '%dth century'), alwaysTrue)]),
+        'en': _en_period('century'),
         'eo': lambda v: dh_centuryAD(v, '%d-a jarcento'),
         'es': lambda v: dh_centuryAD(v, 'Siglo %R'),
         'et': lambda v: dh_centuryAD(v, '%d. sajand'),
@@ -1083,12 +1095,7 @@ formats = {
             # Later, it should be replaced with a proper 'fa' titles
             (lambda v: dh_centuryAD(v, 'سده %d (میلادی)'),
              alwaysTrue)]),  # ********** ERROR!!!
-        'fi': lambda m: multi(m, [
-            (lambda v: dh_constVal(v, 1, 'Ensimmäinen vuosisata'),
-             lambda p: p == 1),
-            (lambda v: dh(v, '%d00-luku',
-                          lambda i: i - 1,
-                          lambda ii: ii[0] + 1), alwaysTrue)]),
+        'fi': _period_with_pattern('Ensimmäinen vuosisata', '%d00-luku'),
         'fo': lambda v: dh_centuryAD(v, '%d. øld'),
         'fr': lambda m: multi(m, [
             (lambda v: dh_centuryAD(v, '%Rer siècle'), lambda p: p == 1),
@@ -1145,10 +1152,7 @@ formats = {
         'nan': lambda v: dh_centuryAD(v, '%d sè-kí'),
         'nds': lambda v: dh_centuryAD(v, '%d. Johrhunnert'),
         'nl': lambda v: dh_centuryAD(v, '%de eeuw'),
-        'nn': lambda m: multi(m, [
-            (lambda v: dh_constVal(v, 1, '1. århundret'), lambda p: p == 1),
-            (lambda v: dh(v, '%d00-talet', lambda i: i - 1,
-                          lambda ii: ii[0] + 1), alwaysTrue)]),
+        'nn': _period_with_pattern('1. århundret', '%d00-talet'),
         'nb': lambda v: dh_centuryAD(v, '%d. århundre'),
         'os': lambda v: dh_centuryAD(v, '%R æнус'),
         'pl': lambda v: dh_centuryAD(v, '%R wiek'),
@@ -1192,22 +1196,12 @@ formats = {
         'da': lambda v: dh_centuryBC(v, '%d. århundrede f.Kr.'),
         'de': lambda v: dh_centuryBC(v, '%d. Jahrhundert v. Chr.'),
         'el': lambda v: dh_centuryBC(v, '%dος αιώνας π.Χ.'),
-        'en': lambda m: multi(m, [
-            (lambda v: dh_centuryBC(v, '%dst century BC'),
-             lambda p: p == 1 or (p > 20 and p % 10 == 1)),
-            (lambda v: dh_centuryBC(v, '%dnd century BC'),
-             lambda p: p == 2 or (p > 20 and p % 10 == 2)),
-            (lambda v: dh_centuryBC(v, '%drd century BC'),
-             lambda p: p == 3 or (p > 20 and p % 10 == 3)),
-            (lambda v: dh_centuryBC(v, '%dth century BC'), alwaysTrue)]),
+        'en': _en_period('century BC'),
         'eo': lambda v: dh_centuryBC(v, '%d-a jarcento a.K.'),
         'es': lambda v: dh_centuryBC(v, 'Siglo %R adC'),
         'et': lambda v: dh_centuryBC(v, '%d. aastatuhat eKr'),
-        'fi': lambda m: multi(m, [
-            (lambda v: dh_constVal(v, 1, 'Ensimmäinen vuosisata eaa.'),
-             lambda p: p == 1),
-            (lambda v: dh(v, '%d00-luku eaa.', lambda i: i - 1,
-                          lambda ii: ii[0] + 1), alwaysTrue)]),
+        'fi': _period_with_pattern('Ensimmäinen vuosisata eaa.',
+                                   '%d00-luku eaa.'),
         'fr': lambda m: multi(m, [
             (lambda v: dh_centuryBC(v, '%Rer siècle av. J.-C.'),
              lambda p: p == 1),
@@ -1226,11 +1220,7 @@ formats = {
         'la': lambda v: dh_centuryBC(v, 'Saeculum %d a.C.n.'),
         'lb': lambda v: dh_centuryBC(v, '%d. Joerhonnert v. Chr.'),
         'nl': lambda v: dh_centuryBC(v, '%de eeuw v.Chr.'),
-        'nn': lambda m: multi(m, [
-            (lambda v: dh_constVal(v, 1, '1. århundret fvt.'),
-             lambda p: p == 1),
-            (lambda v: dh(v, '%d00-talet fvt.', lambda i: i - 1,
-                          lambda ii: ii[0] + 1), alwaysTrue)]),
+        'nn': _period_with_pattern('1. århundret fvt.', '%d00-talet fvt.'),
         'nb': lambda v: dh_centuryBC(v, '%d. århundre f.Kr.'),
         'pl': lambda v: dh_centuryBC(v, '%R wiek p.n.e.'),
         'pt': lambda v: dh_centuryBC(v, 'Século %R a.C.'),
@@ -1276,15 +1266,7 @@ formats = {
         'cs': lambda v: dh_millenniumAD(v, '%d. tisíciletí'),
         'de': lambda v: dh_millenniumAD(v, '%d. Jahrtausend'),
         'el': lambda v: dh_millenniumAD(v, '%dη χιλιετία'),
-        'en': lambda m: multi(m, [
-            (lambda v: dh_millenniumAD(v, '%dst millennium'),
-             lambda p: p == 1 or (p > 20 and p % 10 == 1)),
-            (lambda v: dh_millenniumAD(v, '%dnd millennium'),
-             lambda p: p == 2 or (p > 20 and p % 10 == 2)),
-            (lambda v: dh_millenniumAD(v, '%drd millennium'),
-             lambda p: p == 3 or (p > 20 and p % 10 == 3)),
-            (lambda v: dh_millenniumAD(v, '%dth millennium'),
-             alwaysTrue)]),
+        'en': _en_period('millennium'),
         'es': lambda v: dh_millenniumAD(v, '%R milenio'),
 
         'fa': lambda v: dh_millenniumAD(v, 'هزاره %R (میلادی)'),
@@ -1366,11 +1348,8 @@ formats = {
         'el': lambda v: dh_millenniumBC(v, '%dη χιλιετία π.Χ.'),
         'en': lambda v: dh_millenniumBC(v, '%dst millennium BC'),
         'es': lambda v: dh_millenniumBC(v, '%R milenio adC'),
-        'fi': lambda m: multi(m, [
-            (lambda v: dh_constVal(v, 1, 'Ensimmäinen vuosituhat eaa.'),
-             lambda p: p == 1),
-            (lambda v: dh(v, '%d000-vuosituhat eaa.', lambda i: i - 1,
-                          lambda ii: ii[0] + 1), alwaysTrue)]),
+        'fi': _period_with_pattern('Ensimmäinen vuosituhat eaa.',
+                                   '%d000-vuosituhat eaa.'),
         'fr': lambda v: dh_millenniumBC(v, '%Rer millénaire av. J.-C.'),
         'he': lambda m: multi(m, [
             (lambda v: dh_millenniumAD(v, 'האלף הראשון %d לפני הספירה'),
@@ -1715,23 +1694,20 @@ def makeMonthList(pattern: str) -> List[str]:
     return [pattern % m for m in range(1, 13)]
 
 
-def makeMonthNamedList(lang: str, pattern: str,
+def makeMonthNamedList(lang: str, pattern: str = '%s',
                        makeUpperCase: Optional[bool] = None) -> List[str]:
     """Create a list of 12 elements based on the name of the month.
 
-    The language-dependent month name is used as a formatting argument to the
-    pattern. The pattern must be have one %s that will be replaced by the
-    localized month name.
-    Use %%d for any other parameters that should be preserved.
-
+    The language-dependent month name is used as a formatting argument
+    to the *pattern*. The *pattern* must be have one ``%s`` that will be
+    replaced by the localized month name. Use ``%%`` for any other
+    parameters that should be preserved.
     """
     if makeUpperCase is None:
         return [pattern % monthName(lang, m) for m in range(1, 13)]
-    if makeUpperCase:
-        f = first_upper
-    else:
-        f = first_lower
-    return [pattern % f(monthName(lang, m)) for m in range(1, 13)]
+
+    func = first_upper if makeUpperCase else first_lower
+    return [pattern % func(monthName(lang, m)) for m in range(1, 13)]
 
 
 # Add day of the month formats to the formatting table: "en:May 15"
@@ -1864,13 +1840,11 @@ _vowel_pattern = (
     '(lambda v: dh_dayOfMnth(v, "%d d\' {mname}"), alwaysTrue)])'
 )
 
-# Brazil uses '1añ' for the 1st of every month, and number without suffix for
-# all other days
-brMonthNames = makeMonthNamedList('br', '%s', True)
-
 for i in range(12):
     pattern = _vowel_pattern if i in (3, 7, 9) else _consonant_pattern
     formats[dayMnthFmts[i]]['wa'] = eval(pattern.format(mname=waMonthNames[i]))
+    # Brazil uses '1añ' for the 1st of every month, and number without suffix
+    # for all other days
     formats[dayMnthFmts[i]]['br'] = eval(
         'lambda m: multi(m, ['
         '(lambda v: dh_dayOfMnth(v, "%dañ {mname}"), lambda p: p == 1), '

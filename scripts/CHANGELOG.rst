@@ -1,16 +1,41 @@
 Scripts Changelog
 =================
 
-7.6.0
+7.7.0
 -----
-
-*current release*
 
 archivebot
 ~~~~~~~~~~
 
-* use ``User:MiszaBot/config`` as default template
-* raise MalformedConfigError if 'maxarchivesize' is 0 (:phab:`T313886`)
+* Process pages in parallel tasks with ``-async`` option (:phab:`T57899`)
+* Add -sort option to sort archives by (latest) timestamp
+* Archive unsigned threads using timestamp of the next thread (:phab:`T69663`, :phab:`T182685`)
+
+category_redirect
+~~~~~~~~~~~~~~~~~
+* Use localized template prefix (:phab:`T318049`)
+
+create_isbn_edition
+~~~~~~~~~~~~~~~~~~~
+
+* New script to load ISBN related data into Wikidata (:phab:`T314942`)
+
+watchlist
+~~~~~~~~~
+
+* Watchlist is retrieved faster in parallel tasks (:phab:`T57899`)
+* Enable watchlist.refresh_all for API generator access (:phab:`T316359`)
+
+7.6.0
+-----
+
+*21 August 2022*
+
+archivebot
+~~~~~~~~~~
+
+* Use ``User:MiszaBot/config`` as default template
+* Raise MalformedConfigError if 'maxarchivesize' is 0 (:phab:`T313886`)
 * Preserve thread order in archive even if threads are archived later (:phab:`T312773`, :phab:`T314560`)
 * Skip the page if it does not exist
 * Fix for DiscussionPage.size() (:phab:`T313886`)

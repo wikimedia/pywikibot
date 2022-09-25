@@ -184,7 +184,8 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
         'move': False,
     }
 
-    def invoke_editor(self, page) -> None:
+    @staticmethod
+    def invoke_editor(page) -> None:
         """Ask for an editor and invoke it."""
         choice = pywikibot.input_choice(
             'Do you want to open the page?',

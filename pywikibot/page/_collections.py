@@ -149,8 +149,12 @@ class AliasesDict(BaseDataDict):
     def normalizeData(cls, data: dict) -> dict:
         """Helper function to expand data into the Wikibase API structure.
 
+        .. versionchanged:: 7.7
+           raises TypeError if *data* value is not a list.
+
         :param data: Data to normalize
         :return: The dict with normalized data
+        :raises TypeError: data values must be a list
         """
         norm_data = {}
         for key, values in data.items():
@@ -162,6 +166,11 @@ class AliasesDict(BaseDataDict):
                     else:
                         strings.append(value)
                 norm_data[key] = strings
+            else:
+                raise TypeError(
+                    "Unsupported value type {!r} for '{}'; list expected."
+                    .format(type(values).__name__, values))
+
         return norm_data
 
     def toJSON(self, diffto: Optional[dict] = None) -> dict:

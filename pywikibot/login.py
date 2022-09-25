@@ -101,11 +101,10 @@ class LoginManager:
                 raise NoUsernameError(
                     'ERROR: '
                     'username for {site.family.name}:{site.code} is undefined.'
-                    '\nIf you have a username for that site, '
-                    'please add a line to user-config.py as follows:\n'
+                    '\nIf you have a username for that site, please add a '
+                    'line to user config file (user_config.py) as follows:\n'
                     "usernames['{site.family.name}']['{site.code}'] = "
-                    "'myUsername'"
-                    .format(site=site))
+                    "'myUsername'".format(site=site))
         self.password = password
         self.login_name = self.username = user
         if getattr(config, 'password_file', ''):

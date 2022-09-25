@@ -13,6 +13,7 @@ from urllib.parse import urlparse
 from pywikibot import Site
 from pywikibot.scripts import generate_family_file
 from tests.aspects import DefaultSiteTestCase
+from tests.utils import skipping
 
 
 class FamilyTestGenerator(generate_family_file.FamilyFileGenerator):
@@ -94,15 +95,14 @@ class TestGenerateFamilyFiles(DefaultSiteTestCase):
 
                 site = Site(url=url)
 
-                try:  # T194138 to be solved
+                with skipping(AssertionError,
+                              msg='KNOWN BUG (T194138): url has lang "{lang}" '
+                                  'but Site {site} has lang "{site.lang}"'
+                                  .format(site=site, lang=lang)):
                     self.assertEqual(site.lang, lang,
                                      'url has lang "{lang}" '
                                      'but Site {site} has lang "{site.lang}"'
                                      .format(site=site, lang=lang))
-                except AssertionError:
-                    self.skipTest('KNOWN BUG: url has lang "{lang}" '
-                                  'but Site {site} has lang "{site.lang}"'
-                                  .format(site=site, lang=lang))
 
 
 if __name__ == '__main__':  # pragma: no cover

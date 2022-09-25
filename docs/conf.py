@@ -365,8 +365,11 @@ texinfo_documents = [
 numfig = True
 
 # Other settings
-
+show_authors = True
+todo_include_todos = True
 autodoc_typehints = 'description'
+# autosectionlabel_prefix_document = True
+suppress_warnings = ['autosectionlabel.*']
 
 # Allow lines like "Example:" to be followed by a code block
 napoleon_use_admonition_for_examples = True
@@ -424,7 +427,7 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
             lines[0] = '**{}**'.format(line.strip('.'))
         elif line == '&params;':
             lines[index] = ('This script supports use of '
-                            ':py:mod:`pywikibot.pagegenerators` arguments.')
+                            ':py:mod:`pagegenerators` arguments.')
         elif name == 'scripts.replace' and line == '&fixes-help;':
             lines[index] = ('                  The available fixes are listed '
                             'in :py:mod:`pywikibot.fixes`.')

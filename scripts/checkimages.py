@@ -607,11 +607,8 @@ class CheckImagesBot:
                     pywikibot.output(
                         'Another error... skipping the user...')
 
-    def upload_bot_change_function(
-        self,
-        report_page_text,
-        upload_bot_array
-    ) -> str:
+    @staticmethod
+    def upload_bot_change_function(report_page_text, upload_bot_array) -> str:
         """Detect the user that has uploaded the file through upload bot."""
         regex = upload_bot_array[1]
         results = re.findall(regex, report_page_text)
@@ -1316,7 +1313,8 @@ class CheckImagesBot:
                                  % (self.image_name, self.license_found))
         return (self.license_found, self.white_templates_found)
 
-    def load(self, raw) -> List[str]:
+    @staticmethod
+    def load(raw) -> List[str]:
         """Load a list of objects from a string using regex."""
         list_loaded = []
         # I search with a regex how many user have not the talk page

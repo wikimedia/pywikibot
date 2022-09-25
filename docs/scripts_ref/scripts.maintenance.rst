@@ -3,8 +3,8 @@ scripts.maintenance utility scripts
 
 .. automodule:: scripts.maintenance
 
-Submodules
-----------
+Maintenance Submodules
+----------------------
 
 scripts.maintenance.cache script
 --------------------------------

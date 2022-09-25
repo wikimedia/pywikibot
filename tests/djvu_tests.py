@@ -31,16 +31,6 @@ class TestDjVuFile(TestCase):
     file_djvu_wo_text = join_djvu_data_path('myfile_wo_text.djvu')
     test_txt = 'A file with non-ASCII characters, \nlike é or ç'
 
-    @classmethod
-    def setUpClass(cls):
-        """Setup tests."""
-        super().setUpClass()
-        with skipping(OSError, msg='djvulibre library not installed.'):
-            dp = subprocess.Popen(['djvudump'],
-                                  stdout=subprocess.PIPE,
-                                  stderr=subprocess.PIPE)
-            dp.communicate()
-
     def test_repr_method(self):
         """Test __repr__() method."""
         djvu = DjVuFile(self.file_djvu)
@@ -123,6 +113,15 @@ class TestDjVuFile(TestCase):
         djvu._has_text = False
         self.assertFalse(djvu.has_text())
         self.assertTrue(djvu.has_text(force=True))
+
+
+def setUpModule():
+    """Sekip if djvulibre library not installed."""
+    with skipping(OSError, msg='djvulibre library not installed.'):
+        dp = subprocess.Popen(['djvudump'],
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE)
+        dp.communicate()
 
 
 if __name__ == '__main__':  # pragma: no cover

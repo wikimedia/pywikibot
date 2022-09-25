@@ -8,7 +8,7 @@
 import unittest
 from contextlib import suppress
 
-from pywikibot.tools import ThreadedGenerator
+from pywikibot.tools.threading import ThreadedGenerator
 from tests.aspects import TestCase
 
 

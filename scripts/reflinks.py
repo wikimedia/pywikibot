@@ -64,11 +64,7 @@ from pywikibot import comms, config, i18n, pagegenerators, textlib
 from pywikibot.backports import removeprefix
 from pywikibot.bot import ConfigParserBot, ExistingPageBot, SingleSiteBot
 from pywikibot.comms.http import get_charset_from_content_type
-from pywikibot.exceptions import (
-    FatalServerError,
-    Server414Error,
-    Server504Error,
-)
+from pywikibot.exceptions import ServerError
 from pywikibot.pagegenerators import (
     XMLDumpPageGenerator as _XMLDumpPageGenerator,
 )
@@ -638,9 +634,7 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
             except (ValueError,  # urllib3.LocationParseError derives from it
                     OSError,
                     httplib.error,
-                    FatalServerError,
-                    Server414Error,
-                    Server504Error) as e:
+                    ServerError) as e:
                 pywikibot.output(
                     "{err.__class__.__name__}: Can't retrieve url {url}: {err}"
                     .format(url=ref.url, err=e))

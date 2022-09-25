@@ -67,7 +67,8 @@ class TextEditor(ScrolledText):
         textcf.update(kwargs)
         super().__init__(master, **textcf)
 
-    def _initialize_config(self, Theme):
+    @staticmethod
+    def _initialize_config(Theme):
         """Fix idleConf.GetHighlight method for different Python releases."""
         config = {
             'padx': 5,
@@ -558,7 +559,8 @@ class Tkdialog:
         self.description_field.grid(row=14, column=1, columnspan=3)
         self.description_scrollbar.grid(row=14, column=5)
 
-    def get_image(self, photo, width, height):
+    @staticmethod
+    def get_image(photo, width, height):
         """Take the BytesIO object and build an imageTK thumbnail."""
         if PYTHON_VERSION < (3, 6):
             # vulnerability found in Pillow<8.1.1

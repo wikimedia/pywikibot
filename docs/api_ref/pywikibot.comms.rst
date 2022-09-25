@@ -1,20 +1,18 @@
-:mod:`comms` package
-====================
+:mod:`comms` --- Communication layer
+====================================
 
 .. automodule:: comms
    :synopsis: Communication layer
 
-Submodules
-----------
 
-:mod:`comms.eventstreams` module
---------------------------------
+:mod:`comms.eventstreams` --- Server-Sent Events Client
+-------------------------------------------------------
 
 .. automodule:: comms.eventstreams
    :synopsis: Server-Sent Events client
 
-:mod:`comms.http` module
-------------------------
+:mod:`comms.http` --- HTTP access interface
+-------------------------------------------
 
 .. automodule:: comms.http
    :synopsis: Basic HTTP access interface

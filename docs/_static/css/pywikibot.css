@@ -35,3 +35,9 @@ code.xref {
 code.xref:hover {
     color: #900;
 }
+div.sphinxsidebar {
+    width: 250px
+}
+div.bodywrapper {
+  margin: 0 0 0 250px;
+}

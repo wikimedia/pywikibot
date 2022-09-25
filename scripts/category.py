@@ -1,6 +1,5 @@
 #!/usr/bin/python3
-"""
-Script to manage categories.
+"""Script to manage categories.
 
 Syntax:
 
@@ -8,13 +7,22 @@ Syntax:
 
 where action can be one of these
 
- * add          - mass-add a category to a list of pages.
- * remove       - remove category tag from all pages in a category.
- * move         - move all pages in a category to another category.
- * tidy         - tidy up a category by moving its pages into subcategories.
- * tree         - show a tree of subcategories of a given category.
- * listify      - make a list of all of the articles that are in a category.
- * clean        - automatically clean specified category.
+*add*
+    mass-add a category to a list of pages.
+*remove*
+    remove category tag from all pages in a category.
+*move*
+    move all pages in a category to another category.
+*tidy*
+    tidy up a category by moving its pages into subcategories.
+*tree*
+    show a tree of subcategories of a given category.
+*listify*
+    make a list of all of the articles that are in a category.
+*clean*
+    Removes redundant grandchildren from specified category by removing
+    direct link to grandparent. In another words a grandchildren should
+    not be also a children.
 
 and option can be one of these
 
@@ -199,46 +207,48 @@ class CategoryPreprocess(BaseBot):
         self.edit_redirects = edit_redirects
         self.create = create
 
-    def determine_type_target(self, page) -> Optional[pywikibot.Page]:
+    def determine_type_target(
+        self,
+        page: pywikibot.Page
+    ) -> Optional[pywikibot.Page]:
         """
         Return page to be categorized by type.
 
         :param page: Existing, missing or redirect page to be processed.
-        :type page: pywikibot.Page
         :return: Page to be categorized.
         """
         if page.exists():
-            if page.isRedirectPage():
-                # if it is a redirect, use the redirect target instead
-                redir_target = page.getRedirectTarget()
-                if self.follow_redirects:
-                    if redir_target.exists():
-                        return redir_target
+            if not page.isRedirectPage():
+                return page
 
-                    if self.create:
-                        redir_target.text = ''
-                        pywikibot.output('Redirect target {} does not exist '
-                                         'yet; creating.'.format(
-                                             redir_target.title(as_link=True)))
-                        return redir_target
+            # if it is a redirect, use the redirect target instead
+            redir_target = page.getRedirectTarget()
+            if self.follow_redirects:
+                if redir_target.exists():
+                    return redir_target
 
-                    if self.edit_redirects:
-                        return page
-
-                    pywikibot.warning(
-                        'Redirect target {} cannot be modified; skipping.'
-                        .format(redir_target))
-                    return None
+                if self.create:
+                    redir_target.text = ''
+                    pywikibot.output('Redirect target {} does not exist yet; '
+                                     'creating.'.format(
+                                         redir_target.title(as_link=True)))
+                    return redir_target
 
                 if self.edit_redirects:
                     return page
 
-                pywikibot.warning('Page {} is a redirect to {}; skipping.'
-                                  .format(page.title(as_link=True),
-                                          redir_target.title(as_link=True)))
+                pywikibot.warning(
+                    'Redirect target {} cannot be modified; skipping.'
+                    .format(redir_target))
                 return None
 
-            return page
+            if self.edit_redirects:
+                return page
+
+            pywikibot.warning('Page {} is a redirect to {}; skipping.'
+                              .format(page.title(as_link=True),
+                                      redir_target.title(as_link=True)))
+            return None
 
         if self.create:
             page.text = ''
@@ -439,10 +449,10 @@ class CategoryAddBot(CategoryPreprocess):
         self.sort = sort_by_last_name
         self.create = create
         self.follow_redirects = follow_redirects
-        self.always = False
         self.comment = comment
 
-    def sorted_by_last_name(self, catlink, pagelink) -> pywikibot.Page:
+    @staticmethod
+    def sorted_by_last_name(catlink, pagelink) -> pywikibot.Page:
         """Return a Category with key that sorts persons by their last name.
 
         Parameters: catlink - The Category to be linked.
@@ -452,7 +462,6 @@ class CategoryAddBot(CategoryPreprocess):
         category_name is 'Author' and pl is a Page to [[Alexandre Dumas
         (senior)]], this function will return this Category:
         [[Category:Author|Dumas, Alexandre]].
-
         """
         page_name = pagelink.title()
         site = pagelink.site
@@ -1041,6 +1050,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
 
         .. note:: current_cat is only used for internal recursion. You
            should always use ``current_cat = original_cat``.
+
         :param member: a page to process.
         :param original_cat: original category to replace.
         :param current_cat: a category which is questioned.
@@ -1069,9 +1079,9 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
         class CatIntegerOption(IntegerOption):
             """An option allowing a range of integers."""
 
-            def list_categories(self, cat_list, prefix: str = '') -> None:
-                """
-                Output categories in one or two columns.
+            @staticmethod
+            def list_categories(cat_list, prefix: str = '') -> None:
+                """Output categories in one or two columns.
 
                 Determine whether the list contains long or short
                 category titles and output category titles as enumerated
@@ -1361,11 +1371,13 @@ class CleanBot(Bot):
 
     Stubs categories are exception.
 
-    .. versionadded:: 7.0
+    .. note:: For details please read:
 
-    For details please read:
-    https://en.wikipedia.org/wiki/WP:SUBCAT
-    https://en.wikipedia.org/wiki/WP:DIFFUSE
+       - https://en.wikipedia.org/wiki/WP:SUBCAT
+
+       - https://en.wikipedia.org/wiki/WP:DIFFUSE
+
+    .. versionadded:: 7.0
     """
 
     update_options = {
@@ -1543,14 +1555,11 @@ def main(*args: str) -> None:
     cat_db = CategoryDatabase(rebuild=rebuild)
 
     if action == 'add':
-        gen = gen_factory.getCombinedGenerator()
+        gen = gen_factory.getCombinedGenerator(preload=True)
         if not gen:
             # default for backwards compatibility
             gen_factory.handle_arg('-links')
-            gen = gen_factory.getCombinedGenerator()
-        # The preloading generator is responsible for downloading multiple
-        # pages from the wiki simultaneously.
-        gen = pagegenerators.PreloadingGenerator(gen)
+            gen = gen_factory.getCombinedGenerator(preload=True)
         bot = CategoryAddBot(gen,
                              newcat=options.get('to'),
                              sort_by_last_name=sort_by_last_name,

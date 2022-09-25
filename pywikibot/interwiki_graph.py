@@ -102,7 +102,8 @@ class GraphDrawer:
         self.graph = None  # type: Optional[pydot.Dot]
         self.subject = subject
 
-    def getLabel(self, page: 'pywikibot.page.Page') -> str:
+    @staticmethod
+    def getLabel(page: 'pywikibot.page.Page') -> str:
         """Get label for page."""
         return '"{}:{}"'.format(page.site.code, page.title())
 

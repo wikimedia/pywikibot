@@ -181,7 +181,8 @@ class TestCaseBase(TestTimerMixin):
         gen_titles = [page.title() for page in gen_pages]
         return gen_titles
 
-    def _get_canonical_titles(self, titles, site=None):
+    @staticmethod
+    def _get_canonical_titles(titles, site=None):
         if site:
             titles = [pywikibot.Link(title, site).canonical_title()
                       for title in titles]

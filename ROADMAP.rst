@@ -1,38 +1,37 @@
-Current release 7.6.0
+Current release 7.7.0
 ^^^^^^^^^^^^^^^^^^^^^
 
-* Add support for pcmwiki, guvwikt and bjnwikt (:phab:`T309059`, :phab:`T310882`, :phab:`T312217`)
-* support *not* loading text :meth:`site.APISite.preloadpages` (:phab:`T67163`)
-* :func:`textlib.TimeStripper.timestripper` removes HTML elements before searching for
-  timestamp in text (:phab:`T302496`)
-* backport :mod:`backports.pairwise()<backports>` from Python 3.10
-* L10N updates
-* Fix partial caching in :meth:`Category.subcategories()<page.Category.subcategories>` (:phab:`T88217`)
-* Method :meth:`Page.has_content()<page.BasePage.has_content>` was added (:phab:`T313736`)
-* Discard cache and reload it if cache was loaded without content and content is required
-  in :meth:`Page.templates()<page.BasePage.templates>` (:phab:`T313736`)
-* Add support for vikidia:oc
-* Exit loop in PageFromFileReader if match.end() <= 0 (:phab:`T313684`)
-* Allow Exception as parameter of pywikibot.exceptions.Error
-* Make :func:`GoogleSearchPageGenerator<pagegenerators.GoogleSearchPageGenerator>`
-  and :func:`PetScanPageGenerator<pagegenerators.PetScanPageGenerator>` a restartable
-  Generator (:phab:`T313681`, :phab:`T313683`)
-* Provide a :class:`collections.GeneratorWrapper<tools.collections.GeneratorWrapper>` 
-  class to start/restart a generator (:phab:`T301318`, :phab:`T312654`, :phab:`T312883`)
-* tools' itertools functions were moved to :mod:`tools.itertools` submodule
-* tools' collections classes were moved to :mod:`tools.collections` submodule
-* Set successful login status for the OAuth case (:phab:`T313571`)
+* TypeError is raised if *aliases* parameter of :meth:`WikibasePage.editAliases
+  <page.WikibasePage.editEntity>` method is not a list (:phab:`T318034`)
+* Raise TypeError in :meth:`AliasesDict.normalizeData
+  <pywikibot.page._collections.AliasesDict.normalizeData>` if *data* value is not a list (:phab:`T318034`)
+* tools' threading classes were moved to :mod:`tools.threading` submodule
+* No longer raise NotimplementedError in :meth:`APISite.page_from_repository
+  <pywikibot.site._apisite.APISite.page_from_repository>` (:phab:`T318033`)
+* Ability to set ``PYWIKIBOT_TEST_...`` environment variables with pwb wrapper (:phab:`T139847`)
+* OmegaWiki family was removed
+* Provide global ``-config`` option to specify the user config file name
+* Run :mod:`pywikibot.scripts.login` script in parallel tasks if ``-async`` option is given (:phab:`T57899`)
+* Ability to preload categories was added to :meth:`APISite.preloadpages
+  <pywikibot.site._generators.GeneratorsMixin.preloadpages>` (:phab:`T241689`)
+* Add :class:`WikiBlame<page._toolforge.WikiBlameMixin>` support was added to get the five topmost authors
+* Raise KeyError instead of AttributeError if :class:`page.FileInfo` is used as Mapping
+* i18n and L10N updates
 
 
 Deprecations
 ^^^^^^^^^^^^
 
-* 7.6.0: :mod:`tools.collections` datatypes should no longer imported from :mod:`pywikibot.tools`
-* 7.5.0: :mod:`pywikibot.textlib`.tzoneFixedOffset class will be removed in favour of :class:`pywikibot.time.TZoneFixedOffset`
-* 7.4.0: `FilePage.usingPages()` was renamed to :meth:`using_pages()<pywikibot.FilePage.using_pages>`
+* 7.7.0: :mod:`tools.threading` classes should no longer imported from :mod:`tools`
+* 7.6.0: :mod:`tools.itertools` datatypes should no longer imported from :mod:`tools`
+* 7.6.0: :mod:`tools.collections` datatypes should no longer imported from :mod:`tools`
+* 7.5.0: :mod:`textlib`.tzoneFixedOffset class will be removed in favour of :class:`time.TZoneFixedOffset`
+* 7.4.0: ``FilePage.usingPages()`` was renamed to :meth:`using_pages()<pywikibot.FilePage.using_pages>`
 * 7.2.0: ``tb`` parameter of :func:`exception()<pywikibot.exception>` function was renamed to ``exc_info``
-* 7.2.0: XMLDumpOldPageGenerator is deprecated in favour of a `content` parameter of `XMLDumpPageGenerator` (:phab:`T306134`)
-* 7.2.0: RedirectPageBot and NoRedirectPageBot bot classes are deprecated in favour of :attr:`use_redirects<bot.BaseBot.use_redirects>` attribute
+* 7.2.0: XMLDumpOldPageGenerator is deprecated in favour of a ``content`` parameter of 
+  :func:`XMLDumpPageGenerator<pagegenerators.XMLDumpPageGenerator>` (:phab:`T306134`)
+* 7.2.0: RedirectPageBot and NoRedirectPageBot bot classes are deprecated in favour of 
+  :attr:`use_redirects<bot.BaseBot.use_redirects>` attribute
 * 7.2.0: :func:`tools.formatter.color_format<tools.formatter.color_format>` is deprecated and will be removed
 * 7.1.0: Unused `get_redirect` parameter of Page.getOldVersion() will be removed
 * 7.1.0: APISite._simple_request() will be removed in favour of APISite.simple_request()

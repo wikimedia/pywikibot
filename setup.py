@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-# -*- coding: utf-8 -*-
 """Installer script for Pywikibot framework.
 
 **How to create a new distribution:**
@@ -25,10 +24,14 @@
 #
 # Distributed under the terms of the MIT license.
 #
-# ## KEEP PYTHON 2 SUPPORT FOR THIS SCRIPT ## #
 import os
 import re
 import sys
+
+if sys.version_info[:3] >= (3, 9):
+    List = list
+else:
+    from typing import List
 
 
 VERSIONS_REQUIRED_MESSAGE = """
@@ -44,7 +47,7 @@ except SyntaxError:
     raise RuntimeError(VERSIONS_REQUIRED_MESSAGE.format(version=sys.version))
 
 
-def python_is_supported():
+def python_is_supported() -> bool:
     """Check that Python is supported."""
     return sys.version_info[:3] >= (3, 5, 3)
 
@@ -74,7 +77,7 @@ extra_deps = {
     'http': ['fake_useragent'],
     'flake8': [  # Due to incompatibilities between packages the order matters.
         'flake8==3.9.2,<5.0.0; python_version < "3.6"',
-        'flake8>=5.0.0; python_version >= "3.6"',
+        'flake8>=5.0.2; python_version >= "3.6"',
         'darglint',
         'pydocstyle>=4.0.0',
         'flake8-bugbear!=21.4.1,!=21.11.28',
@@ -97,6 +100,7 @@ extra_deps = {
 
 # ------- setup extra_requires for scripts ------- #
 script_deps = {
+    'create_isbn_edition.py': ['isbnlib', 'unidecode'],
     'commons_information.py': extra_deps['mwparserfromhell'],
     'patrol.py': extra_deps['mwparserfromhell'],
     'weblinkchecker.py': extra_deps['memento'],
@@ -146,7 +150,7 @@ with open(os.path.join(path, name, '__metadata__.py')) as f:
 assert metadata.__name__ == name
 
 
-def get_validated_version():  # pragma: no cover
+def get_validated_version() -> str:  # pragma: no cover
     """Get a validated pywikibot module version string.
 
     The version number from pywikibot.__metadata__.__version__ is used.
@@ -204,7 +208,7 @@ def get_validated_version():  # pragma: no cover
     return version
 
 
-def read_desc(filename):  # pragma: no cover
+def read_desc(filename) -> str:  # pragma: no cover
     """Read long description.
 
     Combine included restructured text files which must be done before
@@ -226,7 +230,7 @@ def read_desc(filename):  # pragma: no cover
     return ''.join(desc)
 
 
-def get_packages(name):  # pragma: no cover
+def get_packages(name) -> List[str]:  # pragma: no cover
     """Find framework packages."""
     try:
         from setuptools import find_namespace_packages
@@ -237,7 +241,7 @@ def get_packages(name):  # pragma: no cover
     return [str(name)] + packages
 
 
-def main():  # pragma: no cover
+def main() -> None:  # pragma: no cover
     """Setup entry point."""
     version = get_validated_version()
     setup(

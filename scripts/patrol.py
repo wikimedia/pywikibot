@@ -52,7 +52,7 @@ from contextlib import suppress
 
 import pywikibot
 from pywikibot import pagegenerators
-from pywikibot.backports import removeprefix
+from pywikibot.backports import Container, removeprefix
 from pywikibot.bot import BaseBot, suggest_help
 
 
@@ -165,7 +165,8 @@ class PatrolBot(BaseBot):
                 raise
             pywikibot.error(str(e))
 
-    def in_list(self, pagelist, title) -> bool:
+    @staticmethod
+    def in_list(pagelist: Container, title: str) -> bool:
         """Check if title present in pagelist."""
         verbose_output('Checking whitelist for: ' + title)
 

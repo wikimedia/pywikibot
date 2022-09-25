@@ -94,12 +94,18 @@ class GeneratorsMixin:
         templates: bool = False,
         langlinks: bool = False,
         pageprops: bool = False,
+        categories: bool = False,
         content: bool = True
     ):
         """Return a generator to a list of preloaded pages.
 
         Pages are iterated in the same order than in the underlying pagelist.
         In case of duplicates in a groupsize batch, return the first entry.
+
+        .. versionchanged:: 7.6
+           *content* parameter was added.
+        .. versionchanged:: 7.7
+           *categories* parameter was added.
 
         :param pagelist: an iterable that returns Page objects
         :param groupsize: how many Pages to query at a time
@@ -108,6 +114,7 @@ class GeneratorsMixin:
         :param langlinks: preload all language links from the provided pages
             to other languages
         :param pageprops: preload various properties defined in page content
+        :param categories: preload page categories
         :param content: preload page content
         """
         props = 'revisions|info|categoryinfo'
@@ -117,6 +124,8 @@ class GeneratorsMixin:
             props += '|langlinks'
         if pageprops:
             props += '|pageprops'
+        if categories:
+            props += '|categories'
 
         for sublist in itergroup(pagelist, min(groupsize, self.maxlimit)):
             # Do not use p.pageid property as it will force page loading.
@@ -166,11 +175,13 @@ class GeneratorsMixin:
                                 'preloadpages: Query returned unexpected '
                                 "title '{}'".format(pagedata['title']))
                             continue
+
                 except KeyError:
                     pywikibot.debug("No 'title' in {}".format(pagedata))
                     pywikibot.debug('pageids={}'.format(pageids))
                     pywikibot.debug('titles={}'.format(list(cache.keys())))
                     continue
+
                 priority, page = cache[pagedata['title']]
                 api.update_page(page, pagedata, rvgen.props)
                 priority, page = heapq.heappushpop(prio_queue,
@@ -482,7 +493,7 @@ class GeneratorsMixin:
             (default False)
         :param starttime: if provided, only generate pages added after this
             time; not valid unless sortby="timestamp"
-        :type starttime: pywikibot.Timestamp
+        :type starttime: time.Timestamp
         :param endtime: if provided, only generate pages added before this
             time; not valid unless sortby="timestamp"
         :param startprefix: if provided, only generate pages >= this title
@@ -1104,9 +1115,9 @@ class GeneratorsMixin:
            ``iprange`` parameter cannot be used together with ``users``.
 
         :param starttime: start iterating at this Timestamp
-        :type starttime: pywikibot.Timestamp
+        :type starttime: time.Timestamp
         :param endtime: stop iterating at this Timestamp
-        :type endtime: pywikibot.Timestamp
+        :type endtime: time.Timestamp
         :param reverse: if True, iterate oldest blocks first (default: newest)
         :param blockids: only iterate blocks with these id numbers. Numbers
             must be separated by '|' if given by a str.
@@ -1243,9 +1254,9 @@ class GeneratorsMixin:
            the API and will be filtered later during iteration.
 
         :param start: only iterate entries from and after this Timestamp
-        :type start: Timestamp or ISO date string
+        :type start: time.Timestamp or ISO date string
         :param end: only iterate entries up to and through this Timestamp
-        :type end: Timestamp or ISO date string
+        :type end: time.Timestamp or ISO date string
         :param reverse: if True, iterate oldest entries first (default: newest)
         :param tag: only iterate entries tagged with this tag
         :param total: maximum number of events to iterate

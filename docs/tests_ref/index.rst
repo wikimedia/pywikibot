@@ -44,6 +44,7 @@ Library tests
     flow_edit<./flow_edit_tests>
     flow<./flow_tests>
     flow_thanks<./flow_thanks_tests>
+    gui<./gui_tests>
     http<./http_tests>
     i18n<./i18n_tests>
     interwiki_graph<./interwiki_graph_tests>
@@ -61,19 +62,20 @@ Library tests
     paraminfo<./paraminfo_tests>
     plural<./plural_tests>
     proofreadpage<./proofreadpage_tests>
-    site_detect<./site_detect_tests>
     site<./site_tests>
+    site_decorators<./site_decorators_tests>
+    site_generators<./site_generators_tests>
+    site_detect<./site_detect_tests>
     sparql<./sparql_tests>
     tests<./tests_tests>
     textlib<./textlib_tests>
     thanks<./thanks_tests>
-    thread<./thread_tests>
     time<./time_tests>
     timestripper<./timestripper_tests>
-    tk<./tk_tests>
     tools_chars<./tools_chars_tests>
     tools_deprecate<./tools_deprecate_tests>
     tools_formatter<./tools_formatter_tests>
+    threading<./tools_threading_tests>
     tools<./tools_tests>
     ui_options<./ui_options_tests>
     ui<./ui_tests>

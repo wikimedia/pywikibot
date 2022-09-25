@@ -16,6 +16,7 @@ from pywikibot.family import WikimediaFamily
 from pywikibot.tools import PYTHON_VERSION
 
 from tests.aspects import DefaultSiteTestCase, TestCase, require_modules
+from tests.utils import skipping
 
 
 @mock.patch('pywikibot.comms.eventstreams.EventSource', new=mock.MagicMock())
@@ -309,10 +310,8 @@ class TestEventSource(TestCase):
         ValueError 'Unterminated string' when json.load is processed
         if the limit is high enough.
         """
-        try:
+        with skipping(NotImplementedError):
             self.es = EventStreamsTestClass(streams='recentchange')
-        except NotImplementedError as e:
-            self.skipTest(e)
         limit = 50
         self.es.set_maximum_items(limit)
         self.assertLength(list(self.es), limit)

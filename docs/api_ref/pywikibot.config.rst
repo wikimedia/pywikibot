@@ -1,5 +1,5 @@
-:mod:`config` module
---------------------
+:mod:`config` --- Pywikibot Config File
+---------------------------------------
 
 API reference
 ^^^^^^^^^^^^^

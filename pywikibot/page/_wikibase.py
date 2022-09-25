@@ -18,10 +18,10 @@ import re
 from collections import OrderedDict, defaultdict
 from contextlib import suppress
 from itertools import chain
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 import pywikibot
-from pywikibot.backports import Dict
+from pywikibot.backports import Dict, List
 from pywikibot.exceptions import (
     APIError,
     EntityTypeUnknownError,
@@ -61,6 +61,12 @@ __all__ = (
     'WikibaseEntity',
     'WikibasePage',
 )
+
+
+ALIASES_TYPE = Dict[Union[str, pywikibot.APISite], List[str]]
+LANGUAGE_TYPE = Dict[Union[str, pywikibot.APISite], str]
+SITELINK_TYPE = Union['pywikibot.page.BasePage', 'pywikibot.page.BaseLink',
+                      Dict[str, str]]
 
 
 class WikibaseEntity:
@@ -272,12 +278,22 @@ class WikibaseEntity:
             data[key] = value
         return data
 
-    def editEntity(self, data=None, **kwargs) -> None:
-        """
-        Edit an entity using Wikibase wbeditentity API.
+    def editEntity(
+        self,
+        data: Union[LANGUAGE_TYPE, ALIASES_TYPE, SITELINK_TYPE, None] = None,
+        **kwargs
+    ) -> None:
+        """Edit an entity using Wikibase ``wbeditentity`` API.
+
+        This function is wrapped around by:
+         - :meth:`WikibasePage.editLabels`
+         - :meth:`WikibasePage.editDescriptions`
+         - :meth:`WikibasePage.editAliases`
+         - :meth:`ItemPage.setSitelinks`
+
+         .. seealso:: :meth:`WikibasePage.editEntity`
 
         :param data: Data to be saved
-        :type data: dict, or None to save the current content of the entity.
         """
         if data is None:
             data = self.toJSON(diffto=getattr(self, '_content', None))
@@ -589,62 +605,96 @@ class WikibasePage(BasePage, WikibaseEntity):
         self.clear_cache()
 
     @allow_asynchronous
-    def editEntity(self, data=None, **kwargs) -> None:
-        """
-        Edit an entity using Wikibase wbeditentity API.
+    def editEntity(
+        self,
+        data: Union[LANGUAGE_TYPE, ALIASES_TYPE, SITELINK_TYPE, None] = None,
+        **kwargs: Any
+    ) -> None:
+        """Edit an entity using Wikibase ``wbeditentity`` API.
 
         This function is wrapped around by:
-         - editLabels
-         - editDescriptions
-         - editAliases
-         - ItemPage.setSitelinks
+         - :meth:`editLabels`
+         - :meth:`editDescriptions`
+         - :meth:`editAliases`
+         - :meth:`ItemPage.setSitelinks`
+
+        It supports *asynchronous* and *callback* keyword arguments. The
+        callback function is intended for use by bots that need to keep
+        track of which saves were successful. The minimal callback
+        function signature is::
+
+          def my_callback(page: WikibasePage, err: Optional[Exception]) -> Any:
+
+        The arguments are:
+
+        ``page``
+            a :class:`WikibasePage` object
+
+        ``err``
+            an Exception instance, which will be None if the page was
+            saved successfully
+
+        .. seealso:: :meth:`WikibaseEntity.editEntity`
 
         :param data: Data to be saved
-        :type data: dict, or None to save the current content of the entity.
-        :keyword asynchronous: if True, launch a separate thread to edit
-            asynchronously
-        :type asynchronous: bool
-        :keyword callback: a callable object that will be called after the
-            entity has been updated. It must take two arguments: (1) a
-            WikibasePage object, and (2) an exception instance, which will be
-            None if the page was saved successfully. This is intended for use
-            by bots that need to keep track of which saves were successful.
-        :type callback: callable
+        :keyword bool asynchronous: if True, launch a separate thread to
+            edit asynchronously
+        :keyword Callable[[WikibasePage, Optional[Exception]], Any] callback:
+            a callable object that will be called after the entity has
+            been updated. It must take two arguments, see above.
         """
-        # kept for the decorator
+        # kept for the decorator which provides the keyword arguments
         super().editEntity(data, **kwargs)
 
-    def editLabels(self, labels, **kwargs) -> None:
-        """
-        Edit entity labels.
+    def editLabels(self, labels: LANGUAGE_TYPE, **kwargs) -> None:
+        """Edit entity labels.
 
-        Labels should be a dict, with the key
-        as a language or a site object. The
-        value should be the string to set it to.
-        You can set it to '' to remove the label.
+        *labels* should be a dict, with the key as a language or a site
+        object. The value should be the string to set it to. You can set
+        it to ``''`` to remove the label.
+
+        Refer :meth:`editEntity` for *asynchronous* and *callback* usage.
+
+        Usage:
+
+        >>> repo = pywikibot.Site('wikidata:test')
+        >>> item = pywikibot.ItemPage(repo, 'Q68')
+        >>> item.editLabels({'en': 'Test123'})  # doctest: +SKIP
         """
         data = {'labels': labels}
         self.editEntity(data, **kwargs)
 
-    def editDescriptions(self, descriptions, **kwargs) -> None:
-        """
-        Edit entity descriptions.
+    def editDescriptions(self, descriptions: LANGUAGE_TYPE, **kwargs) -> None:
+        """Edit entity descriptions.
 
-        Descriptions should be a dict, with the key
-        as a language or a site object. The
-        value should be the string to set it to.
-        You can set it to '' to remove the description.
+        *descriptions* should be a dict, with the key as a language or a
+        site object. The value should be the string to set it to. You
+        can set it to ``''`` to remove the description.
+
+        Refer :meth:`editEntity` for *asynchronous* and *callback* usage.
+
+        Usage:
+
+        >>> repo = pywikibot.Site('wikidata:test')
+        >>> item = pywikibot.ItemPage(repo, 'Q68')
+        >>> item.editDescriptions({'en': 'Pywikibot test'})  # doctest: +SKIP
         """
         data = {'descriptions': descriptions}
         self.editEntity(data, **kwargs)
 
-    def editAliases(self, aliases, **kwargs) -> None:
-        """
-        Edit entity aliases.
+    def editAliases(self, aliases: ALIASES_TYPE, **kwargs) -> None:
+        """Edit entity aliases.
 
-        Aliases should be a dict, with the key
-        as a language or a site object. The
-        value should be a list of strings.
+        *aliases* should be a dict, with the key as a language or a site
+        object. The value should be a list of strings.
+
+        Refer :meth:`editEntity` for *asynchronous* and *callback* usage.
+
+        Usage:
+
+        >>> repo = pywikibot.Site('wikidata:test')
+        >>> item = pywikibot.ItemPage(repo, 'Q68')
+        >>> item.editAliases({'en': ['pwb test item']})  # doctest: +SKIP
         """
         data = {'aliases': aliases}
         self.editEntity(data, **kwargs)
@@ -942,6 +992,8 @@ class ItemPage(WikibasePage):
         :param get_redirect: return the item content, do not follow the
                              redirect, do not raise an exception.
         :raise NotImplementedError: a value in args or kwargs
+        :raise IsRedirectPageError: instance is a redirect page and
+            get_redirect is not True
         :return: actual data which entity holds
 
         .. note:: dicts returned by this method are
@@ -995,6 +1047,10 @@ class ItemPage(WikibasePage):
         :param site: Site to find the linked page of.
         :type site: pywikibot.Site or database name
         :param force: override caching
+        :param get_redirect: return the item content, do not follow the
+                             redirect, do not raise an exception.
+        :raise IsRedirectPageError: instance is a redirect page
+        :raise NoPageError: site is not in :attr:`sitelinks`
         """
         if force or not hasattr(self, '_content'):
             self.get(force=force)
@@ -1004,12 +1060,14 @@ class ItemPage(WikibasePage):
 
         return self.sitelinks[site].canonical_title()
 
-    def setSitelink(self, sitelink, **kwargs) -> None:
-        """
-        Set sitelinks. Calls setSitelinks().
+    def setSitelink(self, sitelink: SITELINK_TYPE, **kwargs) -> None:
+        """Set sitelinks. Calls :meth:`setSitelinks`.
 
-        A sitelink can be a Page object, a BaseLink object
-        or a {'site':dbname,'title':title} dictionary.
+        A *sitelink* can be a Page object, a BaseLink object or a
+        ``{'site': dbname, 'title': title}`` dictionary.
+
+        Refer :meth:`WikibasePage.editEntity` for *asynchronous* and
+        *callback* usage.
         """
         self.setSitelinks([sitelink], **kwargs)
 
@@ -1034,13 +1092,14 @@ class ItemPage(WikibasePage):
             data.append({'site': site, 'title': ''})
         self.setSitelinks(data, **kwargs)
 
-    def setSitelinks(self, sitelinks, **kwargs) -> None:
-        """
-        Set sitelinks.
+    def setSitelinks(self, sitelinks: List[SITELINK_TYPE], **kwargs) -> None:
+        """Set sitelinks.
 
-        Sitelinks should be a list. Each item in the
-        list can either be a Page object, a BaseLink object, or a dict
-        with a value for 'site' and 'title'.
+        *sitelinks* should be a list. Each item in the list can either
+        be a Page object, a BaseLink object, or a dict with key for
+        'site' and a value for 'title'.
+
+        Refer :meth:`editEntity` for *asynchronous* and *callback* usage.
         """
         data = {'sitelinks': sitelinks}
         self.editEntity(data, **kwargs)
@@ -1264,15 +1323,11 @@ class PropertyPage(WikibasePage, Property):
         data['datatype'] = self._type
         return data
 
-    def newClaim(self, *args, **kwargs):
-        """
-        Helper function to create a new claim object for this property.
-
-        :rtype: pywikibot.page.Claim
-        """
+    def newClaim(self, *args, **kwargs) -> 'Claim':
+        """Helper function to create a new claim object for this property."""
         # todo: raise when self.id is -1
-        return Claim(self.site, self.getID(), datatype=self.type,
-                     *args, **kwargs)
+        return Claim(self.site, self.getID(), *args, datatype=self.type,
+                     **kwargs)
 
     def getID(self, numeric: bool = False):
         """
