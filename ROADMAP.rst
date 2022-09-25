@@ -1,8 +1,7 @@
 Current release 7.7.0
 ^^^^^^^^^^^^^^^^^^^^^
 
-* TypeError is raised if *aliases* parameter of :meth:`WikibaseEntity.editEntity
-  <page.WikibaseEntity.editEntity>` or :meth:`WikibasePage.editEntity
+* TypeError is raised if *aliases* parameter of :meth:`WikibasePage.editAliases
   <page.WikibasePage.editEntity>` method is not a list (:phab:`T318034`)
 * Raise TypeError in :meth:`AliasesDict.normalizeData
   <pywikibot.page._collections.AliasesDict.normalizeData>` if *data* value is not a list (:phab:`T318034`)

@@ -286,9 +286,9 @@ class WikibaseEntity:
         """Edit an entity using Wikibase ``wbeditentity`` API.
 
         This function is wrapped around by:
-         - :meth:`editLabels`
-         - :meth:`editDescriptions`
-         - :meth:`editAliases`
+         - :meth:`WikibasePage.editLabels`
+         - :meth:`WikibasePage.editDescriptions`
+         - :meth:`WikibasePage.editAliases`
          - :meth:`ItemPage.setSitelinks`
 
          .. seealso:: :meth:`WikibasePage.editEntity`
@@ -1066,7 +1066,8 @@ class ItemPage(WikibasePage):
         A *sitelink* can be a Page object, a BaseLink object or a
         ``{'site': dbname, 'title': title}`` dictionary.
 
-        Refer :meth:`editEntity` for *asynchronous* and *callback* usage.
+        Refer :meth:`WikibasePage.editEntity` for *asynchronous* and
+        *callback* usage.
         """
         self.setSitelinks([sitelink], **kwargs)
 
