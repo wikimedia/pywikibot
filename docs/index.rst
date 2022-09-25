@@ -58,6 +58,7 @@ For bot developers:
    library_usage
    recipes
    api_ref/index
+   mwapi
 
 For framework developers:
 -------------------------
