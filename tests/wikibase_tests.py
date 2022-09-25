@@ -2062,7 +2062,8 @@ class TestOwnClient(TestCase):
         'wikidatatest': {
             'family': 'wikidata',
             'code': 'test',
-            'title': r'Page \[\[wikidata:test:Q5296\]\] is a redirect page'
+            'title': r'Page \[\[(wikidata\:)?test\:Q5296\]\] '
+                     r'is a redirect page\.'
         },
     }
 
