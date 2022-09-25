@@ -1,6 +1,28 @@
 Release history
 ^^^^^^^^^^^^^^^
 
+7.7.0
+-----
+*25 September 2022*
+
+* TypeError is raised if *aliases* parameter of :meth:`WikibasePage.editAliases
+  <page.WikibasePage.editEntity>` method is not a list (:phab:`T318034`)
+* Raise TypeError in :meth:`AliasesDict.normalizeData
+  <pywikibot.page._collections.AliasesDict.normalizeData>` if *data* value is not a list (:phab:`T318034`)
+* tools' threading classes were moved to :mod:`tools.threading` submodule
+* No longer raise NotimplementedError in :meth:`APISite.page_from_repository
+  <pywikibot.site._apisite.APISite.page_from_repository>` (:phab:`T318033`)
+* Ability to set ``PYWIKIBOT_TEST_...`` environment variables with pwb wrapper (:phab:`T139847`)
+* OmegaWiki family was removed
+* Provide global ``-config`` option to specify the user config file name
+* Run :mod:`pywikibot.scripts.login` script in parallel tasks if ``-async`` option is given (:phab:`T57899`)
+* Ability to preload categories was added to :meth:`APISite.preloadpages
+  <pywikibot.site._generators.GeneratorsMixin.preloadpages>` (:phab:`T241689`)
+* Add :class:`WikiBlame<page._toolforge.WikiBlameMixin>` support was added to get the five topmost authors
+* Raise KeyError instead of AttributeError if :class:`page.FileInfo` is used as Mapping
+* i18n and L10N updates
+
+
 7.6.0
 -----
 *21 August 2022*
@@ -453,6 +475,7 @@ Code cleanups
 Improvements and Bugfixes
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
+* interwiki_graph module was restored (:phab:`T223826`)
 * proofreadpage: search for "new" class after purge (:phab:`T280357`)
 * Enable different types with BaseBot.treat()
 * Context manager depends on pymysql version, not Python release (:phab:`T279753`)

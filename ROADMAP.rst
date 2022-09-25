@@ -1,23 +1,7 @@
-Current release 7.7.0
+Current release 8.0.0
 ^^^^^^^^^^^^^^^^^^^^^
 
-* TypeError is raised if *aliases* parameter of :meth:`WikibasePage.editAliases
-  <page.WikibasePage.editEntity>` method is not a list (:phab:`T318034`)
-* Raise TypeError in :meth:`AliasesDict.normalizeData
-  <pywikibot.page._collections.AliasesDict.normalizeData>` if *data* value is not a list (:phab:`T318034`)
-* tools' threading classes were moved to :mod:`tools.threading` submodule
-* No longer raise NotimplementedError in :meth:`APISite.page_from_repository
-  <pywikibot.site._apisite.APISite.page_from_repository>` (:phab:`T318033`)
-* Ability to set ``PYWIKIBOT_TEST_...`` environment variables with pwb wrapper (:phab:`T139847`)
-* OmegaWiki family was removed
-* Provide global ``-config`` option to specify the user config file name
-* Run :mod:`pywikibot.scripts.login` script in parallel tasks if ``-async`` option is given (:phab:`T57899`)
-* Ability to preload categories was added to :meth:`APISite.preloadpages
-  <pywikibot.site._generators.GeneratorsMixin.preloadpages>` (:phab:`T241689`)
-* Add :class:`WikiBlame<page._toolforge.WikiBlameMixin>` support was added to get the five topmost authors
-* Raise KeyError instead of AttributeError if :class:`page.FileInfo` is used as Mapping
-* i18n and L10N updates
-
+*(no changes yet)*
 
 Deprecations
 ^^^^^^^^^^^^
@@ -28,9 +12,9 @@ Deprecations
 * 7.5.0: :mod:`textlib`.tzoneFixedOffset class will be removed in favour of :class:`time.TZoneFixedOffset`
 * 7.4.0: ``FilePage.usingPages()`` was renamed to :meth:`using_pages()<pywikibot.FilePage.using_pages>`
 * 7.2.0: ``tb`` parameter of :func:`exception()<pywikibot.exception>` function was renamed to ``exc_info``
-* 7.2.0: XMLDumpOldPageGenerator is deprecated in favour of a ``content`` parameter of 
+* 7.2.0: XMLDumpOldPageGenerator is deprecated in favour of a ``content`` parameter of
   :func:`XMLDumpPageGenerator<pagegenerators.XMLDumpPageGenerator>` (:phab:`T306134`)
-* 7.2.0: RedirectPageBot and NoRedirectPageBot bot classes are deprecated in favour of 
+* 7.2.0: RedirectPageBot and NoRedirectPageBot bot classes are deprecated in favour of
   :attr:`use_redirects<bot.BaseBot.use_redirects>` attribute
 * 7.2.0: :func:`tools.formatter.color_format<tools.formatter.color_format>` is deprecated and will be removed
 * 7.1.0: Unused `get_redirect` parameter of Page.getOldVersion() will be removed
