@@ -73,7 +73,8 @@ extra_deps = {
     'html': ['BeautifulSoup4'],
     'http': ['fake_useragent'],
     'flake8': [  # Due to incompatibilities between packages the order matters.
-        'flake8>=5.0.2',
+        'flake8==3.9.2; python_version < "3.6.1"',
+        'flake8>=5.0.2; python_version >= "3.6.1"',
         'darglint',
         'pydocstyle>=4.0.0',
         'flake8-bugbear!=21.4.1,!=21.11.28',
