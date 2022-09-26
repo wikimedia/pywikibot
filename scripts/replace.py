@@ -221,7 +221,7 @@ class ReplacementBase:
         changes to the MediaWiki server, the edit summary includes the
         descriptions of each replacement that you applied to the page.
         """
-        return '-{} +{}'.format(self.old, self.new)
+        return f'-{self.old} +{self.new}'
 
     @property
     def container(self):
@@ -647,7 +647,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             default_summary = comma.join(
                 '-{} +{}'.format(*default_summary)
                 for default_summary in default_summaries)
-            desc = {'description': ' ({})'.format(default_summary)}
+            desc = {'description': f' ({default_summary})'}
             summary_messages.insert(0, msg % desc)
 
         semicolon = self.site.mediawiki_message('semicolon-separator')
@@ -665,7 +665,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             return True
 
         if not page.has_permission():
-            pywikibot.warning("You can't edit page {}".format(page))
+            pywikibot.warning(f"You can't edit page {page}")
             return True
 
         return False
@@ -824,9 +824,9 @@ def handle_pairsfile(filename: str) -> List[str]:
             # strip newlines, but not other characters
             replacements = f.read().splitlines()
         if not replacements:
-            raise OSError('{} is empty.'.format(filename))
+            raise OSError(f'{filename} is empty.')
     except OSError as e:
-        pywikibot.error('Error loading {}: {}'.format(filename, e))
+        pywikibot.error(f'Error loading {filename}: {e}')
         return None
 
     if len(replacements) % 2:
@@ -988,7 +988,7 @@ def main(*args: str) -> None:
             single_summary = i18n.twtranslate(
                 site, 'replace-replacing',
                 {'description':
-                 ' (-{} +{})'.format(replacement.old, replacement.new)}
+                 f' (-{replacement.old} +{replacement.new})'}
             )
         replacements.append(replacement)
 
@@ -1034,7 +1034,7 @@ def main(*args: str) -> None:
             summary = None if len(replacement) < 3 else replacement[2]
             if not set_summary and not summary:
                 missing_fix_summaries.append(
-                    '"{}" (replacement #{})'.format(fix_name, index))
+                    f'"{fix_name}" (replacement #{index})')
             if chars.contains_invisible(replacement[0]):
                 pywikibot.warning('The old string "{}" contains formatting '
                                   'characters like U+200E'.format(
@@ -1063,7 +1063,7 @@ def main(*args: str) -> None:
 
         if len(fix['replacements']) == len(missing_fix_summaries):
             missing_fixes_summaries.append(
-                '"{}" (all replacements)'.format(fix_name))
+                f'"{fix_name}" (all replacements)')
         else:
             missing_fixes_summaries += missing_fix_summaries
 

@@ -358,10 +358,10 @@ class LinkedPagesRule:
                 linkedpages.append(linkedpage.title())
 
             self.linkedpages = linkedpages
-            verbose_output('Loaded {} page links'.format(len(linkedpages)))
+            verbose_output(f'Loaded {len(linkedpages)} page links')
 
         for p in self.linkedpages:
-            verbose_output("Checking against '{}'".format(p))
+            verbose_output(f"Checking against '{p}'")
             if page_title.startswith(p):
                 verbose_output('Matched.')
                 return True
@@ -389,7 +389,7 @@ def api_feed_repeater(
             else:
                 yield page[1]
         if repeat:
-            pywikibot.output('Sleeping for {} seconds'.format(delay))
+            pywikibot.output(f'Sleeping for {delay} seconds')
             pywikibot.sleep(delay)
         else:
             break
@@ -437,7 +437,7 @@ def main(*args: str) -> None:
     if usercontribs:
         user = pywikibot.User(site, usercontribs)
         if user.isAnonymous() or user.isRegistered():
-            pywikibot.output('Processing user: {}'.format(usercontribs))
+            pywikibot.output(f'Processing user: {usercontribs}')
         else:
             pywikibot.warning('User {} does not exist on site {}.'
                               .format(usercontribs, site))

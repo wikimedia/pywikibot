@@ -42,7 +42,7 @@ class APIGeneratorBase(ABC):
     def _clean_kwargs(self, kwargs, **mw_api_args):
         """Clean kwargs, define site and request class."""
         if 'site' not in kwargs:
-            warn('{} invoked without a site'.format(self.__class__.__name__),
+            warn(f'{self.__class__.__name__} invoked without a site',
                  RuntimeWarning, 3)
             kwargs['site'] = pywikibot.Site()
         assert not hasattr(self, 'site') or self.site == kwargs['site']

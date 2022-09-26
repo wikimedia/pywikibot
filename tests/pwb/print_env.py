@@ -25,7 +25,7 @@ def main() -> None:
         # This only appears in subprocesses
         if k == 'PYWIKIBOT_DIR_PWB':
             continue
-        print('{}: {}'.format(k, v))
+        print(f'{k}: {v}')
 
     print('sys.path:')
     for path in sys.path:

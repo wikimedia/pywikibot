@@ -97,9 +97,9 @@ def main(*args: str) -> None:
     for family, usernames in pywikibot.config.usernames.items():
         if not usernames:
             continue
-        pywikibot.output('Usernames for family {!r}:'.format(family))
+        pywikibot.output(f'Usernames for family {family!r}:')
         for lang, username in usernames.items():
-            pywikibot.output('\t{}: {}'.format(lang, username))
+            pywikibot.output(f'\t{lang}: {username}')
 
 
 if __name__ == '__main__':

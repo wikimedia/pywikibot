@@ -203,12 +203,12 @@ class MultiTemplateMatchBuilder:
                 old = template.title(with_ns=False)
             else:
                 raise ValueError(
-                    '{} is not a template Page object'.format(template))
+                    f'{template} is not a template Page object')
         elif isinstance(template, str):
             old = template
         else:
             raise ValueError(
-                '{!r} is not a valid template'.format(template))
+                f'{template!r} is not a valid template')
 
         pattern = case_escape(namespace.case, old)
         # namespaces may be any mixed case
@@ -237,7 +237,7 @@ def ignore_case(string: str) -> str:
        `_ignore_case` becomes a public method
     """
     return ''.join(
-        '[{}{}]'.format(c, s) if c != s else c
+        f'[{c}{s}]' if c != s else c
         for s, c in zip(string, string.swapcase()))
 
 
@@ -562,12 +562,12 @@ class _GetDataHTML(HTMLParser):
     def handle_starttag(self, tag, attrs) -> None:
         """Add start tag to text if tag should be kept."""
         if tag in self.keeptags:
-            self.textdata += '<{}>'.format(tag)
+            self.textdata += f'<{tag}>'
 
     def handle_endtag(self, tag) -> None:
         """Add end tag to text if tag should be kept."""
         if tag in self.keeptags:
-            self.textdata += '</{}>'.format(tag)
+            self.textdata += f'</{tag}>'
 
 
 def isDisabled(text: str, index: int, tags=None) -> bool:
@@ -723,7 +723,7 @@ def replace_links(text: str, replace, site: 'pywikibot.site.BaseSite') -> str:
     link_pattern = re.compile(
         r'\[\[(?P<title>.*?)(#(?P<section>.*?))?(\|(?P<label>.*?))?\]\]'
         r'(?P<linktrail>{})'.format(linktrail))
-    extended_label_pattern = re.compile(r'(.*?\]\])({})'.format(linktrail))
+    extended_label_pattern = re.compile(fr'(.*?\]\])({linktrail})')
     linktrail = re.compile(linktrail)
     curpos = 0
     # This loop will run until we have finished the current page
@@ -859,7 +859,7 @@ def replace_links(text: str, replace, site: 'pywikibot.site.BaseSite') -> str:
                     or parsed_new_label.namespace != new_link.namespace)
 
         if must_piped:
-            new_text = '[[{}|{}]]'.format(new_title, new_label)
+            new_text = f'[[{new_title}|{new_label}]]'
         else:
             new_text = '[[{}]]{}'.format(new_label[:len(new_title)],
                                          new_label[len(new_title):])
@@ -1215,15 +1215,15 @@ def replaceLanguageLinks(oldtext: str, new: dict, site=None,
             # Do we have a noinclude at the end of the template?
             parts = s2.split(includeOff)
             lastpart = parts[-1]
-            if re.match(r'\s*{}'.format(marker), lastpart):
+            if re.match(fr'\s*{marker}', lastpart):
                 # Put the langlinks back into the noinclude's
-                regexp = re.compile(r'{}\s*{}'.format(includeOff, marker))
+                regexp = re.compile(fr'{includeOff}\s*{marker}')
                 newtext = regexp.sub(s + includeOff, s2)
             else:
                 # Put the langlinks at the end, inside noinclude's
                 newtext = (s2.replace(marker, '').strip()
                            + separator
-                           + '{}\n{}{}\n'.format(includeOn, s, includeOff))
+                           + f'{includeOn}\n{s}{includeOff}\n')
         else:
             newtext = s2.replace(marker, '').strip() + separator + s
 
@@ -1390,7 +1390,7 @@ def removeCategoryLinks(text: str, site=None, marker: str = '') -> str:
                          site=site)
     if marker:
         # avoid having multiple linefeeds at the end of the text
-        text = re.sub(r'\s*{}'.format(re.escape(marker)), '\n' + marker,
+        text = re.sub(fr'\s*{re.escape(marker)}', '\n' + marker,
                       text.strip())
     return text.strip()
 
@@ -1593,7 +1593,7 @@ def categoryFormat(categories, insite=None) -> str:
             # whole word if no ":" is present
             prefix = category.split(':', 1)[0]
             if prefix not in insite.namespaces[14]:
-                category = '{}:{}'.format(insite.namespace(14), category)
+                category = f'{insite.namespace(14)}:{category}'
             category = pywikibot.Category(pywikibot.Link(category,
                                                          insite,
                                                          default_namespace=14),
@@ -1698,7 +1698,7 @@ def extract_templates_and_params(text: str,
         text = removeDisabledParts(text)
 
     parser_name = wikitextparser.__name__
-    pywikibot.debug('Using {!r} wikitext parser'.format(parser_name))
+    pywikibot.debug(f'Using {parser_name!r} wikitext parser')
 
     result = []
     parsed = wikitextparser.parse(text)
@@ -1783,7 +1783,7 @@ def glue_template_and_params(template_and_params) -> str:
     for items in params.items():
         text += '|{}={}\n'.format(*items)
 
-    return '{{{{{}\n{}}}}}'.format(template, text)
+    return f'{{{{{template}\n{text}}}}}'
 
 
 # --------------------------
@@ -1808,7 +1808,7 @@ def does_text_contain_section(pagetext: str, section: str) -> bool:
     section = re.sub(r'\\\[\\\[(\\?:)?', r'\[\[\:?', re.escape(section))
     # match underscores and white spaces
     section = re.sub(r'\\?[ _]', '[ _]', section)
-    m = re.search("=+[ ']*{}[ ']*=+".format(section), pagetext)
+    m = re.search(f"=+[ ']*{section}[ ']*=+", pagetext)
     return bool(m)
 
 

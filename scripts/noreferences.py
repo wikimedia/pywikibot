@@ -598,7 +598,7 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot):
         # Set the edit summary for this case
         self.comment = i18n.twtranslate(self.site, 'noreferences-add-tag')
         for section in i18n.translate(self.site, referencesSections):
-            sectionR = re.compile(r'\r?\n=+ *{} *=+ *\r?\n'.format(section))
+            sectionR = re.compile(fr'\r?\n=+ *{section} *=+ *\r?\n')
             index = 0
             while index < len(oldText):
                 match = sectionR.search(oldText, index)
@@ -617,7 +617,7 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot):
                         new_text = (
                             oldText[:match.end() - 1]
                             + templates_or_comments.sub(
-                                r'\1\n{}\n'.format(self.referencesText),
+                                fr'\1\n{self.referencesText}\n',
                                 oldText[match.end() - 1:]))
                         return new_text
                 else:
@@ -658,7 +658,7 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot):
         # At the end, look at the length of the temp text. That's the position
         # where we'll insert the references section.
         catNamespaces = '|'.join(self.site.namespaces.CATEGORY)
-        categoryPattern = r'\[\[\s*({})\s*:[^\n]*\]\]\s*'.format(catNamespaces)
+        categoryPattern = fr'\[\[\s*({catNamespaces})\s*:[^\n]*\]\]\s*'
         interwikiPattern = r'\[\[([a-zA-Z\-]+)\s?:([^\[\]\n]*)\]\]\s*'
         # won't work with nested templates
         # the negative lookahead assures that we'll match the last template
@@ -700,7 +700,7 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot):
         :return: the amended page text with reference section added
         """
         if self.site.code in noTitleRequired:
-            ref_section = '\n\n{}\n'.format(self.referencesText)
+            ref_section = f'\n\n{self.referencesText}\n'
         else:
             ref_section = '\n\n{ident} {title} {ident}\n{text}\n'.format(
                 title=i18n.translate(self.site, referencesSections)[0],

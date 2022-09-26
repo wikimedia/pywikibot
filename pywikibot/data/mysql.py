@@ -98,7 +98,7 @@ def mysql_query(query: str, params=None,
 
     if pymysql_version < pkg_resources.parse_version('0.7.11'):
         issue_deprecation_warning(
-            'pymysql package release {}'.format(pymysql_version),
+            f'pymysql package release {pymysql_version}',
             instead='pymysql >= 0.7.11', since='7.4.0')
         connection = _OldConnection(**args, **credentials)
     else:
@@ -115,7 +115,7 @@ def mysql_query(query: str, params=None,
             if not isinstance(_query, str):
                 _query = str(_query, encoding='utf-8')
             _query = _query.strip()
-            _query = '\n'.join('    {}'.format(line)
+            _query = '\n'.join(f'    {line}'
                                for line in _query.splitlines())
             pywikibot.output('Executing query:\n' + _query)
 

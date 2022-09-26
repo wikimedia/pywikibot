@@ -7,6 +7,7 @@
 from collections.abc import MutableMapping
 from typing import Optional
 
+
 __all__ = ['OptionSet']
 
 
@@ -128,22 +129,22 @@ class OptionSet(MutableMapping):
         """Set option to enabled, disabled or neither."""
         if value is True:
             if self._site_set and name not in self._valid_enable:
-                raise KeyError('Invalid name "{}"'.format(name))
+                raise KeyError(f'Invalid name "{name}"')
             self._enabled.add(name)
             self._disabled.discard(name)
         elif value is False:
             if self._site_set and name not in self._valid_disable:
-                raise KeyError('Invalid name "{}"'.format(name))
+                raise KeyError(f'Invalid name "{name}"')
             self._disabled.add(name)
             self._enabled.discard(name)
         elif value is None:
             if self._site_set and (name not in self._valid_enable
                                    or name not in self._valid_disable):
-                raise KeyError('Invalid name "{}"'.format(name))
+                raise KeyError(f'Invalid name "{name}"')
             self._enabled.discard(name)
             self._disabled.discard(name)
         else:
-            raise ValueError('Invalid value "{}"'.format(value))
+            raise ValueError(f'Invalid value "{value}"')
 
     def __getitem__(self, name) -> Optional[bool]:
         """
@@ -161,7 +162,7 @@ class OptionSet(MutableMapping):
         if (self._site_set or name in self._valid_enable
                 or name in self._valid_disable):
             return None
-        raise KeyError('Invalid name "{}"'.format(name))
+        raise KeyError(f'Invalid name "{name}"')
 
     def __delitem__(self, name) -> None:
         """Remove the item by setting it to None."""
@@ -176,7 +177,7 @@ class OptionSet(MutableMapping):
         """Iterate over each option as they appear in the URL."""
         yield from self._enabled
         for disabled in self._disabled:
-            yield '!{}'.format(disabled)
+            yield f'!{disabled}'
 
     def __len__(self) -> int:
         """Return the number of enabled and disabled options."""

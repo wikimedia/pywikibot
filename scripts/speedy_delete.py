@@ -457,7 +457,7 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
 
         # skip this page
         else:
-            pywikibot.output('Skipping page {}'.format(page))
+            pywikibot.output(f'Skipping page {page}')
 
     def setup(self) -> None:
         """Refresh generator."""

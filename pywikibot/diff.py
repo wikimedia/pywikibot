@@ -7,9 +7,7 @@
 import difflib
 import math
 from collections import abc
-from difflib import (  # type: ignore[attr-defined]
-    _format_range_unified as format_range_unified,
-)
+from difflib import _format_range_unified  # type: ignore[attr-defined]
 from itertools import zip_longest
 from typing import Optional, Union
 
@@ -82,8 +80,8 @@ class Hunk:
     def get_header_text(a_rng: Tuple[int, int], b_rng: Tuple[int, int],
                         affix: str = '@@') -> str:
         """Provide header for any ranges."""
-        a_rng = format_range_unified(*a_rng)
-        b_rng = format_range_unified(*b_rng)
+        a_rng = _format_range_unified(*a_rng)
+        b_rng = _format_range_unified(*b_rng)
         return '{0} -{1} +{2} {0}'.format(affix, a_rng, b_rng)
 
     def create_diff(self) -> Iterable[str]:
@@ -192,7 +190,7 @@ class Hunk:
                     color_closed = False
             else:
                 if char_ref == ' ':
-                    char_tagged = '<<default>>{}'.format(char)
+                    char_tagged = f'<<default>>{char}'
                     color_closed = True
             colored_line += char_tagged
 
@@ -212,7 +210,7 @@ class Hunk:
     def __repr__(self) -> str:
         """Return a reconstructable representation."""
         # TODO
-        return '{}(a, b, {})'.format(self.__class__.__name__, self.group)
+        return f'{self.__class__.__name__}(a, b, {self.group})'
 
 
 class _SuperHunk(abc.Sequence):
@@ -372,7 +370,7 @@ class PatchManager:
         """Generate a diff text for the given hunks."""
         def extend_context(start: int, end: int) -> str:
             """Add context lines."""
-            return ''.join('  {}\n'.format(line.rstrip())
+            return ''.join(f'  {line.rstrip()}\n'
                            for line in self.a[start:end])
 
         context_range = self._get_context_range(hunks)
@@ -512,7 +510,7 @@ class PatchManager:
                     position = next_hunk_position
                 elif next_hunk:  # nothing entered is silently ignored
                     pywikibot.error(
-                        'Invalid hunk number "{}"'.format(next_hunk))
+                        f'Invalid hunk number "{next_hunk}"')
             elif choice == 'j':
                 assert next_pending is not None
                 position = next_pending
@@ -528,11 +526,11 @@ class PatchManager:
                                + super_hunks[position].split()
                                + super_hunks[position + 1:])
                 pywikibot.output(
-                    'Split into {} hunks'.format(len(super_hunk._hunks)))
+                    f'Split into {len(super_hunk._hunks)} hunks')
             else:  # choice == '?':
                 pywikibot.output(
                     '<<purple>>{}<<default>>'.format('\n'.join(
-                        '{} -> {}'.format(answer, help_msg[answer])
+                        f'{answer} -> {help_msg[answer]}'
                         for answer in answers)))
 
     def apply(self) -> List[str]:

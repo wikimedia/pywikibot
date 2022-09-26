@@ -118,9 +118,9 @@ import sys
 from typing import Any, Iterator, Optional
 
 import pywikibot
+from pywikibot import WbTime
 from pywikibot import pagegenerators as pg
 from pywikibot import textlib
-from pywikibot import WbTime
 from pywikibot.backports import List, Tuple
 from pywikibot.bot import ConfigParserBot, OptionHandler, WikidataBot
 from pywikibot.exceptions import (
@@ -219,7 +219,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         """Fetch redirects of the title, so we can check against them."""
         temp = pywikibot.Page(self.site, title, ns=10)
         if not temp.exists():
-            sys.exit('Template {} does not exist.'.format(temp.title()))
+            sys.exit(f'Template {temp.title()} does not exist.')
 
         # Put some output here since it can take a while
         pywikibot.output('Finding redirects...')
@@ -460,7 +460,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
             if out is None:
                 out = data
             elif out != data:
-                pywikibot.output('Found ambiguous date: "{}"'.format(value))
+                pywikibot.output(f'Found ambiguous date: "{value}"')
                 return
 
         yield WbTime.fromWikibase(out, self.repo)

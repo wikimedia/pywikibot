@@ -546,7 +546,7 @@ class TestPageObject(DefaultSiteTestCase):
         for page in site.allpages(filterredir=True, total=1):
             break
         else:
-            self.skipTest('No redirect pages on site {!r}'.format(site))
+            self.skipTest(f'No redirect pages on site {site!r}')
         # This page is already initialised
         self.assertTrue(hasattr(page, '_isredir'))
         # call api.update_page without prop=info
@@ -675,7 +675,7 @@ class TestPageRepr(DefaultDrySiteTestCase):
         """Test to capture actual Python result pre unicode_literals."""
         self.assertEqual(repr(self.page), "Page('Ō')")
         self.assertEqual('%r' % self.page, "Page('Ō')")
-        self.assertEqual('{!r}'.format(self.page), "Page('Ō')")
+        self.assertEqual(f'{self.page!r}', "Page('Ō')")
 
 
 class TestPageBotMayEdit(TestCase):

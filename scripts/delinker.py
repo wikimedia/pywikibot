@@ -41,8 +41,8 @@ import re
 import pywikibot
 from pywikibot.backports import removeprefix
 from pywikibot.bot import (
-    ConfigParserBot,
     AutomaticTWSummaryBot,
+    ConfigParserBot,
     SingleSiteBot,
     calledModuleName,
 )
@@ -127,7 +127,7 @@ class CommonsDelinker(SingleSiteBot, ConfigParserBot, AutomaticTWSummaryBot):
         if not hasattr(self, 'last_ts'):
             return
 
-        pywikibot.output("\nUpdate 'since' to {} file".format(self.INI))
+        pywikibot.output(f"\nUpdate 'since' to {self.INI} file")
         conf = configparser.ConfigParser(inline_comment_prefixes=[';'])
         conf.read(self.INI)
         section = calledModuleName()

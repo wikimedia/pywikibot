@@ -378,7 +378,7 @@ def get_base_dir(test_directory: Optional[str] = None,
         base_dir = os.path.normpath(os.path.join(os.getcwd(), base_dir))
     # make sure this path is valid and that it contains user-config file
     if not os.path.isdir(base_dir):
-        raise RuntimeError("Directory '{}' does not exist.".format(base_dir))
+        raise RuntimeError(f"Directory '{base_dir}' does not exist.")
     # check if config_file is in base_dir
     if not exists(base_dir):
         exc_text = 'No {} found in directory {!r}.\n'.format(
@@ -931,7 +931,7 @@ def _win32_extension_command(extension: str) -> Optional[str]:
         key1 = winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_name)
         _prog_id = winreg.EnumValue(key1, 0)[0]
         _key2 = winreg.OpenKey(winreg.HKEY_CLASSES_ROOT,
-                               r'{}\shell\open\command'.format(_prog_id))
+                               fr'{_prog_id}\shell\open\command')
         _cmd = winreg.QueryValueEx(_key2, '')[0]
         # See T102465 for issues relating to using this value.
         cmd = _cmd
@@ -985,14 +985,14 @@ if os.path.exists(_filename):
     _filemode = _filestatus[0]
     _fileuid = _filestatus[4]
     if not OSWIN32 and _fileuid not in [os.getuid(), 0]:
-        warning('Skipped {fn!r}: owned by someone else.'.format(fn=_filename))
+        warning(f'Skipped {_filename!r}: owned by someone else.')
     elif OSWIN32 or _filemode & 0o02 == 0:
         with open(_filename, 'rb') as f:
             exec(compile(f.read(), _filename, 'exec'), _exec_globals)
     else:
-        warning('Skipped {fn!r}: writeable by others.'.format(fn=_filename))
+        warning(f'Skipped {_filename!r}: writeable by others.')
 elif __no_user_config and __no_user_config != '2':
-    warning('{} cannot be loaded.'.format(user_config_file))
+    warning(f'{user_config_file} cannot be loaded.')
 
 
 class _DifferentTypeError(UserWarning, TypeError):
@@ -1156,7 +1156,7 @@ if __name__ == '__main__':  # pragma: no cover
         if _arg == 'modified':
             _all = False
         else:
-            warning('Unknown arg {} ignored'.format(_arg))
+            warning(f'Unknown arg {_arg} ignored')
 
     for _name in sorted(globals()):
         if _name[0] != '_' \
@@ -1174,7 +1174,7 @@ if __name__ == '__main__':  # pragma: no cover
                           + '( ...xxxxxxxx... )')
             else:
                 _value = repr('xxxxxxxx')
-            output('{}={}'.format(_name, _value))
+            output(f'{_name}={_value}')
 
 # cleanup all locally-defined variables
 for __var in list(globals()):

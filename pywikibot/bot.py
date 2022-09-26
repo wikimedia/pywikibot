@@ -310,7 +310,7 @@ def handler_namer(name: str) -> str:
     """
     path, qualifier = name.rsplit('.', 1)
     root, ext = os.path.splitext(path)
-    return '{}.{}{}'.format(root, qualifier, ext)
+    return f'{root}.{qualifier}{ext}'
 
 
 def init_handlers() -> None:
@@ -468,10 +468,10 @@ def writelogheader() -> None:
         .format(pywikibot.__version__))
 
     # script call
-    log('COMMAND: {}'.format(sys.argv))
+    log(f'COMMAND: {sys.argv}')
 
     # script call time stamp
-    log('DATE: {} UTC'.format(datetime.datetime.utcnow()))
+    log(f'DATE: {datetime.datetime.utcnow()} UTC')
 
     # new framework release/revision? (handle_args needs to be called first)
     try:
@@ -482,10 +482,10 @@ def writelogheader() -> None:
 
     # system
     if hasattr(os, 'uname'):
-        log('SYSTEM: {}'.format(os.uname()))
+        log(f'SYSTEM: {os.uname()}')
 
     # config file dir
-    log('CONFIG FILE DIR: {}'.format(pywikibot.config.base_dir))
+    log(f'CONFIG FILE DIR: {pywikibot.config.base_dir}')
 
     # These are the main dependencies of pywikibot.
     check_package_list = [
@@ -521,10 +521,10 @@ def writelogheader() -> None:
             param['timespec'] = 'seconds'
         mtime = version.get_module_mtime(module).isoformat(**param)
 
-        log('  {} {}'.format(mtime, filename))
+        log(f'  {mtime} {filename}')
 
     if config.log_pywiki_repo_version:
-        log('PYWIKI REPO VERSION: {}'.format(version.getversion_onlinerepo()))
+        log(f'PYWIKI REPO VERSION: {version.getversion_onlinerepo()}')
 
     log('=' * 57)
 
@@ -740,7 +740,7 @@ class InteractiveReplace:
             if isinstance(c, Choice) and c.shortcut == choice:
                 return c.handle()
 
-        raise ValueError('Invalid choice "{}"'.format(choice))
+        raise ValueError(f'Invalid choice "{choice}"')
 
     def __call__(self, link: PageLinkType,
                  text: str, groups: Mapping[str, str],
@@ -1064,7 +1064,7 @@ def suggest_help(missing_parameters: Optional[Sequence[str]] = None,
     """
     messages = []
     if exception:
-        messages.append('An error occurred: "{}".'.format(exception))
+        messages.append(f'An error occurred: "{exception}".')
     if missing_generator:
         messages.append(
             'Unable to execute script because no generator was defined.')
@@ -1100,7 +1100,7 @@ def writeToCommandLogFile() -> None:
     """
     modname = calledModuleName()
     # put quotation marks around all parameters
-    args = [modname] + ['"{}"'.format(s) for s in pywikibot.argvu[1:]]
+    args = [modname] + [f'"{s}"' for s in pywikibot.argvu[1:]]
     command_log_filename = config.datafilepath('logs', 'commands.log')
     try:
         command_log_file = codecs.open(command_log_filename, 'a', 'utf-8')
@@ -1389,7 +1389,7 @@ class BaseBot(OptionHandler):
         """
         if page != self._current_page:
             self._current_page = page
-            msg = 'Working on {!r}'.format(page.title())
+            msg = f'Working on {page.title()!r}'
             if config.colorized_output:
                 log(msg)
                 stdout('\n\n>>> <<lightpurple>>{}<<default>> <<<'
@@ -1725,7 +1725,7 @@ class Bot(BaseBot):
         if not self._site:
             warning('Bot.site was not set before being retrieved.')
             self.site = pywikibot.Site()
-            warning('Using the default site: {}'.format(self.site))
+            warning(f'Using the default site: {self.site}')
         assert self._site is not None
         return self._site
 
@@ -1742,11 +1742,11 @@ class Bot(BaseBot):
             return
 
         if site not in self._sites:
-            log('LOADING SITE {} VERSION: {}'.format(site, site.mw_version))
+            log(f'LOADING SITE {site} VERSION: {site.mw_version}')
 
             self._sites.add(site)
             if len(self._sites) == 2:
-                log('{} uses multiple sites'.format(self.__class__.__name__))
+                log(f'{self.__class__.__name__} uses multiple sites')
         if self._site and self._site != site:
             log('{}: changing site from {} to {}'
                 .format(self.__class__.__name__, self._site, site))
@@ -1893,7 +1893,7 @@ class ConfigParserBot(BaseBot):
         section = calledModuleName()
 
         if (conf.read(self.INI) == [self.INI] and conf.has_section(section)):
-            pywikibot.output('Reading settings from {} file.'.format(self.INI))
+            pywikibot.output(f'Reading settings from {self.INI} file.')
             options = {}
             for option, value in self.available_options.items():
                 if not conf.has_option(section, option):
@@ -1908,7 +1908,7 @@ class ConfigParserBot(BaseBot):
                 options[option] = method(section, option)
             for opt in set(conf.options(section)) - set(options):
                 pywikibot.warning(
-                    '"{}" is not a valid option. It was ignored.'.format(opt))
+                    f'"{opt}" is not a valid option. It was ignored.')
             options.update(kwargs)
         else:
             options = kwargs
@@ -2009,7 +2009,7 @@ class AutomaticTWSummaryBot(CurrentPageBot):
             summary = i18n.twtranslate(self.current_page.site,
                                        self.summary_key,
                                        self.summary_parameters)
-            pywikibot.log('Use automatic summary message "{}"'.format(summary))
+            pywikibot.log(f'Use automatic summary message "{summary}"')
             kwargs['summary'] = summary
         super().put_current(*args, **kwargs)
 
@@ -2146,7 +2146,7 @@ class WikidataBot(Bot, ExistingPageBot):
         self.repo = self.site.data_repository()
         if self.repo is None:
             raise WikiBaseError(
-                '{} is not connected to a data repository'.format(self.site))
+                f'{self.site} is not connected to a data repository')
 
     def cacheSources(self) -> None:
         """
@@ -2397,7 +2397,7 @@ class WikidataBot(Bot, ExistingPageBot):
                 'value': page.title(without_brackets=page.namespace() == 0)
             }
         })
-        pywikibot.output('Creating item for {}...'.format(page))
+        pywikibot.output(f'Creating item for {page}...')
         item = pywikibot.ItemPage(page.site.data_repository())
         kwargs.setdefault('show_diff', False)
         result = self.user_edit_entity(item, data, summary=summary, **kwargs)
@@ -2446,7 +2446,7 @@ class WikidataBot(Bot, ExistingPageBot):
             item = self.create_item_for_page(page, asynchronous=False)
 
         if not item and not self.treat_missing_item:
-            pywikibot.output("{} doesn't have a Wikidata item.".format(page))
+            pywikibot.output(f"{page} doesn't have a Wikidata item.")
             return
 
         self.treat_page_and_item(page, item)

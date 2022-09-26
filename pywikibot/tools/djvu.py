@@ -32,11 +32,11 @@ def _call_cmd(args, lib: str = 'djvulibre') -> tuple:
     stdoutdata, stderrdata = dp.communicate()
 
     if dp.returncode != 0:
-        pywikibot.error('{} error; {}'.format(lib, cmd))
+        pywikibot.error(f'{lib} error; {cmd}')
         pywikibot.error(str(stderrdata))
         return (False, stdoutdata)
 
-    pywikibot.log('SUCCESS: {} (PID: {})'.format(cmd, dp.pid))
+    pywikibot.log(f'SUCCESS: {cmd} (PID: {dp.pid})')
 
     return (True, stdoutdata)
 
@@ -81,7 +81,7 @@ class DjVuFile:
 
     def __str__(self) -> str:
         """Return a string representation."""
-        return "{}('{}')".format(self.__class__.__name__, self._filename)
+        return f"{self.__class__.__name__}('{self._filename}')"
 
     def check_cache(fn):
         """Decorator to check if cache shall be cleared."""
@@ -227,7 +227,7 @@ class DjVuFile:
         if not self.has_text(force=force):
             raise ValueError('Djvu file {} has no text layer.'
                              .format(self.file))
-        res, stdoutdata = _call_cmd(['djvutxt', '--page={}'.format(int(n)),
+        res, stdoutdata = _call_cmd(['djvutxt', f'--page={int(n)}',
                                      self.file])
         if not res:
             return False

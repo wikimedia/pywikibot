@@ -12,14 +12,15 @@ Useful for editing the contents of an article.
 # Distributed under the terms of the MIT license.
 #
 import tkinter
+from tkinter import simpledialog as tkSimpleDialog
+from tkinter.scrolledtext import ScrolledText
+from typing import Optional
+
 from idlelib import replace as ReplaceDialog
 from idlelib import search as SearchDialog
 from idlelib.config import idleConf
 from idlelib.configdialog import ConfigDialog
 from idlelib.multicall import MultiCallCreator
-from tkinter import simpledialog as tkSimpleDialog
-from tkinter.scrolledtext import ScrolledText
-from typing import Optional
 
 import pywikibot
 from pywikibot import __url__
@@ -233,7 +234,7 @@ class TextEditor(ScrolledText):
                     if not idx:
                         break
                     # index right after the end of the occurrence
-                    lastidx = '{}+{}c'.format(idx, len(s))
+                    lastidx = f'{idx}+{len(s)}c'
                     # tag the whole occurrence (start included, stop excluded)
                     self.tag_add('found', idx, lastidx)
                     # prepare to search for next occurrence
@@ -261,7 +262,7 @@ class TextEditor(ScrolledText):
         if lineno <= 0:
             self.bell()
             return 'break'
-        self.mark_set('insert', '{}.0'.format(lineno))
+        self.mark_set('insert', f'{lineno}.0')
         self.see('insert')
         return None
 
@@ -391,7 +392,7 @@ class EditBoxWindow(tkinter.Frame):
             column = jumpIndex - (text[:jumpIndex].rfind('\n') + 1)
             # don't know how to place the caret, but scrolling to the right
             # line should already be helpful.
-            self.editbox.see('{}.{}'.format(line, column))
+            self.editbox.see(f'{line}.{column}')
         # wait for user to push a button which will destroy (close) the window
         self.parent.mainloop()
         return self.text

@@ -67,7 +67,7 @@ class TestLogentriesBase(TestCase):
             self.assertLess(self.site.mw_version, '1.25')
 
         with skipping(StopIteration,
-                      msg='No entry found for {!r}'.format(logtype)):
+                      msg=f'No entry found for {logtype!r}'):
             le = next(self.site.logevents(logtype=logtype, total=1))
         return le
 
@@ -154,7 +154,7 @@ class TestLogentriesMeta(MetaTestCaseClass):
 
         # create test methods for the support logtype classes
         for logtype in LogEntryFactory._logtypes:
-            cls.add_method(dct, 'test_{}Entry'.format(logtype.title()),
+            cls.add_method(dct, f'test_{logtype.title()}Entry',
                            test_method(logtype))
 
         return super().__new__(cls, name, bases, dct)

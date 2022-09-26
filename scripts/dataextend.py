@@ -61,7 +61,6 @@ included.
 import codecs
 import datetime
 import re
-
 from collections import defaultdict
 from contextlib import suppress
 from html import unescape
@@ -71,7 +70,7 @@ from urllib.parse import quote, unquote
 
 import pywikibot
 from pywikibot.backports import List, Tuple
-from pywikibot.bot import input_yn, SingleSiteBot, suggest_help
+from pywikibot.bot import SingleSiteBot, input_yn, suggest_help
 from pywikibot.comms import http
 from pywikibot.data import sparql
 from pywikibot.exceptions import (
@@ -410,7 +409,7 @@ class DataExtendBot(SingleSiteBot):
 
         with codecs.open(self.labelfile, **param) as f:
             for item in self.labels:
-                f.write('{}:{}\n'.format(item, self.labels[item]))
+                f.write(f'{item}:{self.labels[item]}\n')
 
         with codecs.open(self.datafile, **param) as f:
             for dtype in self.data:
@@ -420,7 +419,7 @@ class DataExtendBot(SingleSiteBot):
 
         with codecs.open(self.nonamefile, **param) as f:
             for noname in self.noname:
-                f.write('{}\n'.format(noname))
+                f.write(f'{noname}\n')
 
     def page(self, title):
         """Dispatch title and return the appropriate Page object."""
@@ -429,7 +428,7 @@ class DataExtendBot(SingleSiteBot):
             return pywikibot.ItemPage(self.site, title)
         if title.startswith('P'):
             return pywikibot.PropertyPage(self.site, title)
-        raise ValueError('Invalid title {}'.format(title))
+        raise ValueError(f'Invalid title {title}')
 
     @staticmethod
     def showtime(time):
@@ -439,15 +438,15 @@ class DataExtendBot(SingleSiteBot):
         if time.precision < 9:
             result = 'ca. ' + result
         if time.precision >= 10:
-            result = '{}-{}'.format(time.month, result)
+            result = f'{time.month}-{result}'
         if time.precision >= 11:
-            result = '{}-{}'.format(time.day, result)
+            result = f'{time.day}-{result}'
         if time.precision >= 12:
-            result = '{} {}'.format(result, time.hour)
+            result = f'{result} {time.hour}'
         if time.precision >= 13:
-            result = '{}:{}'.format(result, time.minute)
+            result = f'{result}:{time.minute}'
         if time.precision >= 14:
-            result = '{}:{}'.format(result, time.second)
+            result = f'{result}:{time.second}'
         return result
 
     def showclaims(self, claims):
@@ -627,7 +626,7 @@ class DataExtendBot(SingleSiteBot):
             try:
                 month = self.MONTHNUMBER[m.group(2).lower()]
             except KeyError:
-                raise ValueError("Don't know month {}".format(m.group(2)))
+                raise ValueError(f"Don't know month {m.group(2)}")
             day = int(m.group(1))
         m = re.match(r"(\d+)(?:\.|er|eme|ème)?[\s.]\s*(?:d'|d[aei] )?"
                      r'([^\s.]{2,})\.?[\s.]\s*(\d+)$', text)
@@ -636,7 +635,7 @@ class DataExtendBot(SingleSiteBot):
             try:
                 month = self.MONTHNUMBER[m.group(2).lower()]
             except KeyError:
-                raise ValueError("Don't know month {}".format(m.group(2)))
+                raise ValueError(f"Don't know month {m.group(2)}")
             day = int(m.group(1))
         m = re.match(r'(\d{4})\.?[\s.]\s*([^\s.]{3,})\.?[\s.]\s*(\d+)$', text)
         if m:
@@ -644,7 +643,7 @@ class DataExtendBot(SingleSiteBot):
             try:
                 month = self.MONTHNUMBER[m.group(2).lower()]
             except KeyError:
-                raise ValueError("Don't know month {}".format(m.group(2)))
+                raise ValueError(f"Don't know month {m.group(2)}")
             day = int(m.group(3))
         m = re.match(r"(\d+) (?:de |d')?(\w+[a-z]\w+) de (\d+)", text)
         if m:
@@ -652,7 +651,7 @@ class DataExtendBot(SingleSiteBot):
             try:
                 month = self.MONTHNUMBER[m.group(2).lower()]
             except KeyError:
-                raise ValueError("Don't know month {}".format(m.group(2)))
+                raise ValueError(f"Don't know month {m.group(2)}")
             day = int(m.group(1))
         m = re.match(r'(\w*[a-zA-Z]\w*)\.? (\d+)$', text)
         if m:
@@ -660,7 +659,7 @@ class DataExtendBot(SingleSiteBot):
             try:
                 month = self.MONTHNUMBER[m.group(1).lower()]
             except KeyError:
-                raise ValueError("Don't know month {}".format(m.group(1)))
+                raise ValueError(f"Don't know month {m.group(1)}")
         m = re.match(r'(\w+)\.? (\d{1,2})(?:st|nd|rd|th)?\.?\s*,\s*(\d{3,4})$',
                      text)
         if m:
@@ -668,7 +667,7 @@ class DataExtendBot(SingleSiteBot):
             try:
                 month = self.MONTHNUMBER[m.group(1).lower()]
             except KeyError:
-                raise ValueError("Don't know month {}".format(m.group(1)))
+                raise ValueError(f"Don't know month {m.group(1)}")
             day = int(m.group(2))
         m = re.match(r'(\d{4}),? (\d{1,2}) (\w+)', text)
         if m:
@@ -676,7 +675,7 @@ class DataExtendBot(SingleSiteBot):
             try:
                 month = self.MONTHNUMBER[m.group(3).lower()]
             except KeyError:
-                raise ValueError("Don't know month {}".format(m.group(1)))
+                raise ValueError(f"Don't know month {m.group(1)}")
             day = int(m.group(2))
         m = re.match(r'(\d+)年(\d+)月(\d+)日', text)
         if m:
@@ -697,7 +696,7 @@ class DataExtendBot(SingleSiteBot):
             raise ValueError('Date seems to have an invalid day number {}'
                              .format(day))
         if not year:
-            raise ValueError("Can't interpret date {}".format(text))
+            raise ValueError(f"Can't interpret date {text}")
         return pywikibot.WbTime(year=year, month=month, day=day, precision=9
                                 if month is None
                                 else 10 if day is None else 11)
@@ -1047,7 +1046,7 @@ class DataExtendBot(SingleSiteBot):
                 pywikibot.input('Press Enter to continue')
             pywikibot.output('== longtexts ==')
             for longtext in longtexts:
-                pywikibot.output('\n== {} =='.format(longtext[0]))
+                pywikibot.output(f'\n== {longtext[0]} ==')
                 pywikibot.output(longtext[1])
                 pywikibot.input('(press enter)')
 
@@ -1060,9 +1059,9 @@ class DataExtendBot(SingleSiteBot):
         pywikibot.output('Default is to keep the old value (0)')
         for i, pos in enumerate(possibilities):
             if pos is None:
-                pywikibot.output('{}: No description'.format(i))
+                pywikibot.output(f'{i}: No description')
             else:
-                pywikibot.output('{}: {}'.format(i, pos))
+                pywikibot.output(f'{i}: {pos}')
         answer = pywikibot.input('Which one to choose? ')
         try:
             answer = int(answer)
@@ -1091,14 +1090,14 @@ class DataExtendBot(SingleSiteBot):
             pywikibot.output('New names found:')
             for language in realnewnames.keys():
                 for name in realnewnames[language]:
-                    pywikibot.output('{}: {}'.format(language, name))
+                    pywikibot.output(f'{language}: {name}')
             result = pywikibot.input('Add these names? (y/n/[S]elect/x) ')
             if not result or result[0].upper() not in 'YNX':
                 chosennewnames = defaultdict(list)
                 for language in realnewnames.keys():
                     for name in realnewnames[language]:
                         result = pywikibot.input(
-                            '{}: {} - '.format(language, name))
+                            f'{language}: {name} - ')
                         if (not result) or result[0].upper() == 'Y':
                             chosennewnames[language].append(name)
                         elif result[0].upper() == 'X':
@@ -1266,7 +1265,7 @@ class Analyzer:
         if not ask:
             return None
 
-        pywikibot.output("Trying to get a {} out of '{}'".format(dtype, text))
+        pywikibot.output(f"Trying to get a {dtype} out of '{text}'")
         answer = pywikibot.input(
             'Type Qnnn to let it point to Qnnn from now on,\n'
             'Xnnn to let it point to Qnnn only now,\n'
@@ -1295,19 +1294,19 @@ class Analyzer:
                 if used and not base:
                     continue
                 self.urlbase = base
-                pywikibot.info('Getting {}'.format(self.url))
+                pywikibot.info(f'Getting {self.url}')
                 with suppress(ServerError, ConnectionError):
                     pagerequest = http.fetch(self.url)
                     break
             else:
-                pywikibot.info('Unable to load {}'.format(self.url))
+                pywikibot.info(f'Unable to load {self.url}')
                 return []
 
         if pagerequest:
             self.html = pagerequest.text
 
         for extraurl in self.extraurls:
-            pywikibot.info('Getting {}'.format(extraurl))
+            pywikibot.info(f'Getting {extraurl}')
             try:
                 pagerequest = http.fetch(extraurl)
             except (ServerError, ConnectionError):
@@ -1541,7 +1540,7 @@ class Analyzer:
                 result = result.strip().lstrip('(').rstrip(')')
                 result = result.replace('–', '-').replace('‑', '-')
                 if '-' in result:
-                    (start, end) = [r.strip() for r in result.split('-', 1)]
+                    (start, end) = (r.strip() for r in result.split('-', 1))
                     if start == end:
                         newclaims.append(('P1317', '!date!' + start, self))
                     else:
@@ -2045,7 +2044,7 @@ class IsniAnalyzer(Analyzer):
     @property
     def url(self):
         # TODO: check whether this is right or needed
-        return 'http://www.isni.org/{id}'.format(id=self.id).replace(' ', '')
+        return f'http://www.isni.org/{self.id}'.replace(' ', '')
 
     def findlanguagenames(self, html: str):
         # TODO: check whether this is right or needed
@@ -2158,7 +2157,7 @@ class ViafAnalyzer(Analyzer):
         }
 
     def getid(self, name, html):
-        result = self.findbyre(r'>{}\|([^<>]+)'.format(name), html)
+        result = self.findbyre(fr'>{name}\|([^<>]+)', html)
         if result:
             return result.replace(' ', '')
         return None
@@ -2256,7 +2255,7 @@ class ViafAnalyzer(Analyzer):
         ]
         iccu = self.getid('ICCU', html)
         if iccu:
-            result += [('P396', r'IT\ICCU\{}\{}'.format(iccu[:4], iccu[4:]))]
+            result += [('P396', fr'IT\ICCU\{iccu[:4]}\{iccu[4:]}')]
         result += self.finddefaultmixedrefs(html)
         return result
 
@@ -2538,7 +2537,7 @@ class LcAuthAnalyzer(Analyzer):
     def findbirthdate(self, html: str):
         result = self.findbyre(r'<li><h3>Birth Date</h3><ul[^<>]*>(\d{8})<', html)
         if result:
-            return '{}-{}-{}'.format(result[6:], result[4:6], result[:4])
+            return f'{result[6:]}-{result[4:6]}-{result[:4]}'
 
         result = (
             self.findbyre(r'(?s)Birth Date</h3><.*?>(?:\(.*?\))?([^<>]*?)</ul>', html)
@@ -2560,7 +2559,7 @@ class LcAuthAnalyzer(Analyzer):
     def finddeathdate(self, html: str):
         result = self.findbyre(r'<li><h3>Death Date</h3><ul[^<>]*>(\d{8})<', html)
         if result:
-            return '{}-{}-{}'.format(result[6:], result[4:6], result[:4])
+            return f'{result[6:]}-{result[4:6]}-{result[:4]}'
 
         result = (
             self.findbyre(r'(?s)Death Date</h3><.*?>(?:\(.*?\))?([^<>]*?)</ul>', html)
@@ -2963,9 +2962,9 @@ class ImdbAnalyzer(Analyzer):
     @property
     def url(self):
         if self.isfilm:
-            return 'https://www.imdb.com/title/{id}/'.format(id=self.id)
+            return f'https://www.imdb.com/title/{self.id}/'
         if self.isperson:
-            return 'https://www.imdb.com/name/{id}/'.format(id=self.id)
+            return f'https://www.imdb.com/name/{self.id}/'
         return None
 
     @property
@@ -3336,7 +3335,7 @@ class StructuraeAnalyzer(Analyzer):
         lat = self.findbyre(r'itemprop="latitude" content="(.*?)"', html)
         lon = self.findbyre(r'itemprop="longitude" content="(.*?)"', html)
         if lat and lon:
-            return '{} {}'.format(lat, lon)
+            return f'{lat} {lon}'
 
     def findheights(self, html: str):
         return [self.findbyre(r'(?s)<td>height</td>.*<td>(.*?)</td>', html)]
@@ -3524,7 +3523,7 @@ class FindGraveAnalyzer(Analyzer):
         self.hrtre = r'(<h1.*?</table>)'
 
     def getvalue(self, name, html, category=None):
-        return self.findbyre(r'{}: "(.*?)"'.format(name), html, category)
+        return self.findbyre(fr'{name}: "(.*?)"', html, category)
 
     def findnames(self, html) -> List[str]:
         return [self.getvalue('shareTitle', html)]
@@ -3687,7 +3686,7 @@ class GnisAnalyzer(Analyzer):
         lat = self.findbyre(r'"LAT">(.*?)<', html)
         lon = self.findbyre(r'"LONGI">(.*?)<', html)
         if lat and lon:
-            return '{} {}'.format(lat, lon)
+            return f'{lat} {lon}'
 
 
 class MathGenAnalyzer(Analyzer):
@@ -3962,7 +3961,7 @@ class NkcrAnalyzer(Analyzer):
         return html.replace('&nbsp;', ' ')
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre(r'(?s)<td[^<>]*>\s*{}\s*</td>\s*<td[^<>]*>(?:<[^<>]*>)*(.*?)<'.format(field), html, dtype)
+        return self.findbyre(fr'(?s)<td[^<>]*>\s*{field}\s*</td>\s*<td[^<>]*>(?:<[^<>]*>)*(.*?)<', html, dtype)
 
     def findlongtext(self, html: str):
         return self.getvalue(r'Biogr\./Hist\. .daje', html)
@@ -4223,7 +4222,7 @@ class ImslpAnalyzer(Analyzer):
 
 class HdsAnalyzer(Analyzer):
     def setup(self):
-        self.id = '{:06d}'.format(int(self.id))
+        self.id = f'{int(self.id):06d}'
         self.dbproperty = 'P902'
         self.dbid = 'Q642074'
         self.dbname = 'Historical Dictionary of Switzerland'
@@ -5813,7 +5812,7 @@ class TgnAnalyzer(Analyzer):
         lat = self.findbyre(r'Lat:\s*(-?\d+\.\d+)', html)
         lon = self.findbyre(r'Long:\s*(-?\d+\.\d+)', html)
         if lat and lon:
-            return '{} {}'.format(lat, lon)
+            return f'{lat} {lon}'
 
 
 class NlpAnalyzer(Analyzer):
@@ -6377,7 +6376,7 @@ class CerlAnalyzer(Analyzer):
     def getvalues(self, field, html, dtype=None, link=False) -> List[str]:
         section = self.findbyre(r'(?s)>{}</span>(.*?>)[^<>]+</span><span'
                                 .format(field), html) or \
-                  self.findbyre(r'(?s)>{}</span>(.*)'.format(field), html)
+                  self.findbyre(fr'(?s)>{field}</span>(.*)', html)
         if section:
             return self.findallbyre(r'<{}[^<>]*>(.*?)[\(<]'
                                     .format('a ' if link else 'span'),
@@ -6752,7 +6751,7 @@ class AcademiaeGroninganaeAnalyzer(Analyzer):
         self.language = 'nl'
 
     def getentry(self, naam, html, dtype=None):
-        return self.findbyre(r'(?s){}<.*?>([^<>]*)</div>'.format(naam), html, dtype)
+        return self.findbyre(fr'(?s){naam}<.*?>([^<>]*)</div>', html, dtype)
 
     def finddescription(self, html: str):
         return self.findbyre(r'<h1>(.*?)<', html)
@@ -7907,7 +7906,7 @@ class CageMatchAnalyzer(Analyzer):
 
     def getvalue(self, field, html, dtype=None):
         return self.findbyre(
-            r'(?s)<div class="InformationBoxTitle">{}:</div>\s*<div class="InformationBoxContents">(.*?)</div>'.format(field),
+            fr'(?s)<div class="InformationBoxTitle">{field}:</div>\s*<div class="InformationBoxContents">(.*?)</div>',
             html, dtype)
 
     def getvalues(self, field, html, dtype=None) -> List[str]:
@@ -11830,15 +11829,15 @@ class Edit16Analyzer(Analyzer):
         section = self.getvalue('Nome', html)
         if section:
             result.append(self.findbyre(r'([^&]+)', section).replace(':', ''))
-        pywikibot.info('section: {}, result: {}'.format(section, result))
+        pywikibot.info(f'section: {section}, result: {result}')
         section = self.getvalue('Nome su edizioni', html)
         if section:
             result += self.findallbyre(r'([^;]+)', section)
-        pywikibot.info('section: {}, result: {}'.format(section, result))
+        pywikibot.info(f'section: {section}, result: {result}')
         section = self.getvalue('Fonti', html)
         if section:
             result += self.findallbyre(r'\((.*?)\)', section)
-        pywikibot.info('section: {}, result: {}'.format(section, result))
+        pywikibot.info(f'section: {section}, result: {result}')
         return result
 
     def finddescriptions(self, html: str):
@@ -11886,7 +11885,7 @@ class RismAnalyzer(Analyzer):
         if field:
             if splitter == '<':
                 return self.findallbyre('>(.*?)<', '>' + field + '<', dtype)
-            return self.findallbyre('[^{}]+'.format(splitter), field, dtype)
+            return self.findallbyre(f'[^{splitter}]+', field, dtype)
         return []
 
     def findnames(self, html) -> List[str]:
@@ -13868,7 +13867,7 @@ class WikiAnalyzer(Analyzer):
         self.id = self.id.replace(' ', '_')
         if self.language in ['commons', 'species']:
             site = 'wikimedia'
-        self.dbname = '{} {}'.format(site.title(), self.language.upper())
+        self.dbname = f'{site.title()} {self.language.upper()}'
         self.urlbase = 'https://{}.{}.org/wiki/{{id}}'.format(
             self.language, site)
         self.urlbase3 = 'https://{}.{}.org/w/index.php?title={{id}}&veswitched=1&action=edit'.format(
@@ -13927,7 +13926,7 @@ class WikiAnalyzer(Analyzer):
                     sections = self.findallbyre(r'(?is)[\b\|_\s]%s\s*=((?:[^\|、\{\}]|\{\{[^\{\}]*\}\})+)' % name, box, alt=alt)
                     for section in sections:
                         result += self.findallbyre(
-                            r'([^{}]+)'.format(splitters), section, dtype)
+                            fr'([^{splitters}]+)', section, dtype)
         return result
 
     def getinfo(self, names, html, dtype=None, splitters=None, alt=None) -> str:
@@ -13946,7 +13945,7 @@ class WikiAnalyzer(Analyzer):
                     preresult = self.findallbyre(r'(?is)[\b\|_\s]%s\s*=((?:[^\|\{\}]|\{\{[^\{\}]*\}\})+)' % name, box, alt=alt)
                     for section in preresult:
                         result += self.findallbyre(
-                            r'([^{}]+)'.format(splitters), section, dtype)
+                            fr'([^{splitters}]+)', section, dtype)
                 if result:
                     return result[0]
 
@@ -15099,7 +15098,7 @@ class BacklinkAnalyzer(Analyzer):
         self.dbproperty = None
         self.dbid = 'Q2013'
         self.urlbase = None
-        self.sparqlquery = 'SELECT ?a ?b WHERE {{ ?a ?b wd:{} }}'.format(self.id)
+        self.sparqlquery = f'SELECT ?a ?b WHERE {{ ?a ?b wd:{self.id} }}'
         self.skipfirst = True
         self.hrtre = '()'
         self.language = 'en'
@@ -15112,7 +15111,7 @@ class BacklinkAnalyzer(Analyzer):
 
     def findlongtext(self, html: str):
         matches = re.findall(r'statement/([qQ]\d+)[^{}]+statement/([pP]\d+)', html)
-        return '\n'.join('{} of: {}'.format(self.bot.label(m[1]), self.bot.label(m[0])) for m in matches)
+        return '\n'.join(f'{self.bot.label(m[1])} of: {self.bot.label(m[0])}' for m in matches)
 
     def findspouses(self, html: str):
         return self.getrelations('P26', html)

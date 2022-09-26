@@ -53,8 +53,8 @@ from pywikibot.pagegenerators._generators import (
     WikibaseSearchItemPageGenerator,
     WikidataSPARQLPageGenerator,
 )
-from pywikibot.tools.itertools import filter_unique, intersect_generators
 from pywikibot.tools.collections import DequeGenerator
+from pywikibot.tools.itertools import filter_unique, intersect_generators
 
 
 HANDLER_RETURN_TYPE = Union[None, bool, Iterable['pywikibot.page.BasePage']]
@@ -388,7 +388,7 @@ class GeneratorFactory:
             assert total is None or total > 0
         except ValueError as err:
             pywikibot.error(
-                '{}. Start parameter has wrong format!'.format(err))
+                f'{err}. Start parameter has wrong format!')
             return None
         except AssertionError:
             pywikibot.error('Total number of log ({}) events must be a '
@@ -399,7 +399,7 @@ class GeneratorFactory:
             end = pywikibot.Timestamp.fromtimestampformat(end)
         except ValueError as err:
             pywikibot.error(
-                '{}. End parameter has wrong format!'.format(err))
+                f'{err}. End parameter has wrong format!')
             return None
         except TypeError:  # end is None
             pass
@@ -443,9 +443,9 @@ class GeneratorFactory:
             _2i = 2 * _i
             txt = 'Available categories of lint errors:\n'
             for prio, _list in cats.items():
-                txt += '{indent}{prio}\n'.format(indent=_i, prio=prio)
+                txt += f'{_i}{prio}\n'
                 txt += ''.join(
-                    '{indent}{cat}\n'.format(indent=_2i, cat=c) for c in _list)
+                    f'{_2i}{c}\n' for c in _list)
             pywikibot.output(txt)
 
         if cat == 'show':  # Display categories of lint errors.
@@ -459,7 +459,7 @@ class GeneratorFactory:
         else:
             lint_cats = cat.split(',')
             assert set(lint_cats) <= set(valid_cats), \
-                'Invalid category of lint errors: {}'.format(cat)
+                f'Invalid category of lint errors: {cat}'
 
         return self.site.linter_pages(
             lint_categories='|'.join(lint_cats), namespaces=self.namespaces,
@@ -891,7 +891,7 @@ class GeneratorFactory:
         params = value.split(',')
         if params[0] not in self.site.logtypes:
             raise NotImplementedError(
-                'Invalid -logevents parameter "{}"'.format(params[0]))
+                f'Invalid -logevents parameter "{params[0]}"')
         return self._parse_log_events(*params)
 
     def handle_args(self, args: Iterable[str]) -> List[str]:

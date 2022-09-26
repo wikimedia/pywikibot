@@ -169,7 +169,7 @@ class Siteinfo(Container):
             if e.code == 'siunknown_siprop':
                 if len(props) == 1:
                     pywikibot.log(
-                        "Unable to get siprop '{}'".format(props[0]))
+                        f"Unable to get siprop '{props[0]}'")
                     return {props[0]: (Siteinfo._get_default(props[0]), False)}
                 pywikibot.log('Unable to get siteinfo, because at least '
                               "one property is unknown: '{}'".format(

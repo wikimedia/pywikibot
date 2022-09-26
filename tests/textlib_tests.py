@@ -737,7 +737,7 @@ class TestReplaceLinks(TestCase):
                     return pywikibot.Link(
                         '{}#{}'
                         .format(self._count, link.section), link.site)
-                return pywikibot.Link('{}'.format(self._count), link.site)
+                return pywikibot.Link(f'{self._count}', link.site)
 
             return None
 
@@ -1276,18 +1276,18 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
     def test_replace_tag_category(self):
         """Test replacing not inside category links."""
         for ns_name in self.site.namespaces[14]:
-            self.assertEqual(textlib.replaceExcept('[[{}:x]]'.format(ns_name),
+            self.assertEqual(textlib.replaceExcept(f'[[{ns_name}:x]]',
                                                    'x', 'y', ['category'],
                                                    site=self.site),
-                             '[[{}:x]]'.format(ns_name))
+                             f'[[{ns_name}:x]]')
 
     def test_replace_tag_file(self):
         """Test replacing not inside file links."""
         for ns_name in self.site.namespaces[6]:
-            self.assertEqual(textlib.replaceExcept('[[{}:x]]'.format(ns_name),
+            self.assertEqual(textlib.replaceExcept(f'[[{ns_name}:x]]',
                                                    'x', 'y', ['file'],
                                                    site=self.site),
-                             '[[{}:x]]'.format(ns_name))
+                             f'[[{ns_name}:x]]')
 
         self.assertEqual(
             textlib.replaceExcept(

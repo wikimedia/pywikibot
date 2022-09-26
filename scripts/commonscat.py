@@ -359,7 +359,7 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
         elif oldcat.strip() != newcat:  # strip trailing white space
             newtext = re.sub(r'(?i)\{\{%s\|?[^{}]*(?:\{\{.*\}\})?\}\}'
                              % oldtemplate,
-                             '{{{{{}|{}}}}}'.format(newtemplate, newcat),
+                             f'{{{{{newtemplate}|{newcat}}}}}',
                              page.get())
         else:  # nothing left to do
             return

@@ -83,7 +83,7 @@ class SyncSites:
         if options.namespace and 'help' in options.namespace:
             for namespace in self.original.namespaces.values():
                 pywikibot.output(
-                    '{} {}'.format(namespace.id, namespace.custom_name))
+                    f'{namespace.id} {namespace.custom_name}')
             sys.exit()
 
         self.sites = [pywikibot.Site(s, family) for s in sites]
@@ -133,7 +133,7 @@ class SyncSites:
 
     def check_namespace(self, namespace) -> None:
         """Check an entire namespace."""
-        pywikibot.output('\nCHECKING NAMESPACE {}'.format(namespace))
+        pywikibot.output(f'\nCHECKING NAMESPACE {namespace}')
         pages = (p.title() for p in self.original.allpages(
             '!', namespace=namespace))
         for p in pages:
@@ -156,7 +156,7 @@ class SyncSites:
                                       .format(site.user()))
             output = '== Pages that differ from original ==\n\n'
             if self.differences[site]:
-                output += ''.join('* [[:{}]]\n'.format(page_title)
+                output += ''.join(f'* [[:{page_title}]]\n'
                                   for page_title in self.differences[site])
             else:
                 output += 'All important pages are the same'
@@ -206,11 +206,11 @@ class SyncSites:
                 if txt1 != txt_new:
                     pywikibot.output(
                         'NOTE: text replaced using config.sync_replace')
-                    pywikibot.output('{} {} {}'.format(txt1, txt_new, txt2))
+                    pywikibot.output(f'{txt1} {txt_new} {txt2}')
                     txt1 = txt_new
 
             if txt1 != txt2:
-                pywikibot.output('\n {} DIFFERS'.format(site))
+                pywikibot.output(f'\n {site} DIFFERS')
                 self.differences[site].append(pagename)
 
             if self.options.replace:

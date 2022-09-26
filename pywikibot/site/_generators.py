@@ -156,7 +156,7 @@ class GeneratorsMixin:
                              .format(len(cache), self))
 
             for pagedata in rvgen:
-                pywikibot.debug('Preloading {}'.format(pagedata))
+                pywikibot.debug(f'Preloading {pagedata}')
                 try:
                     if pagedata['title'] not in cache:
                         # API always returns a "normalized" title which is
@@ -177,9 +177,9 @@ class GeneratorsMixin:
                             continue
 
                 except KeyError:
-                    pywikibot.debug("No 'title' in {}".format(pagedata))
-                    pywikibot.debug('pageids={}'.format(pageids))
-                    pywikibot.debug('titles={}'.format(list(cache.keys())))
+                    pywikibot.debug(f"No 'title' in {pagedata}")
+                    pywikibot.debug(f'pageids={pageids}')
+                    pywikibot.debug(f'titles={list(cache.keys())}')
                     continue
 
                 priority, page = cache[pagedata['title']]
@@ -866,8 +866,8 @@ class GeneratorsMixin:
             else:
                 filterredir = None
             issue_deprecation_warning(
-                'The value "{}" for "filterredir"'.format(old),
-                '"{}"'.format(filterredir), since='7.0.0')
+                f'The value "{old}" for "filterredir"',
+                f'"{filterredir}"', since='7.0.0')
 
         apgen = self._generator(api.PageGenerator, type_arg='allpages',
                                 namespaces=namespace,
@@ -2135,7 +2135,7 @@ class GeneratorsMixin:
         """
         if propname not in self.get_property_names():
             raise NotImplementedError(
-                '"{}" is not a valid page property'.format(propname))
+                f'"{propname}" is not a valid page property')
         return self._generator(api.PageGenerator, type_arg='pageswithprop',
                                gpwppropname=propname, total=total)
 

@@ -22,7 +22,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import cache, Dict, List, Tuple
+from pywikibot.backports import Dict, List, Tuple, cache
 from pywikibot.comms.http import fetch
 from pywikibot.exceptions import VersionParseError
 
@@ -181,7 +181,7 @@ def github_svn_rev2hash(tag: str, rev):  # pragma: no cover
     :param rev: Subversion revision identifier
     :return: the git hash
     """
-    uri = 'https://github.com/wikimedia/{}/!svn/vcc/default'.format(tag)
+    uri = f'https://github.com/wikimedia/{tag}/!svn/vcc/default'
     request = fetch(uri, method='PROPFIND',
                     data="<?xml version='1.0' encoding='utf-8'?>"
                          '<propfind xmlns=\"DAV:\"><allprop/></propfind>',
@@ -216,7 +216,7 @@ def getversion_svn(path=None):  # pragma: no cover
         for i in range(len(date) - 1):
             assert date[i] == date2[i], 'Date of version is not consistent'
 
-    rev = 's{}'.format(rev)
+    rev = f's{rev}'
     if (not date or not tag or not rev) and not path:
         raise VersionParseError
     return (tag, rev, date, hsh)
@@ -270,7 +270,7 @@ def getversion_git(path=None):
                           cwd=_program_dir,
                           stdout=subprocess.PIPE)
     rev, stderr = dp.communicate()
-    rev = 'g{}'.format(len(rev.splitlines()))
+    rev = f'g{len(rev.splitlines())}'
     hsh = info[3]  # also stored in '.git/refs/heads/master'
     if (not date or not tag or not rev) and not path:
         raise VersionParseError
@@ -333,7 +333,7 @@ def getversion_onlinerepo(path: str = 'branches/master'):
         hsh = json.loads(buf)['revision']
         return hsh
     except Exception as e:
-        raise VersionParseError('{!r} while parsing {!r}'.format(e, buf))
+        raise VersionParseError(f'{e!r} while parsing {buf!r}')
 
 
 def get_module_filename(module) -> Optional[str]:

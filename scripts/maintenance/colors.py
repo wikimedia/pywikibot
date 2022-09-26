@@ -32,9 +32,9 @@ def main():
                 line += ' '
                 line += '<<{color}>>{}<<default>>'.format(
                     fg_col.ljust(max_len_fg_colors),
-                    color='{};{}'.format(fg_col, bg_col))
+                    color=f'{fg_col};{bg_col}')
 
-            line = '{} {}'.format(bg_col.ljust(max_len_bc_color), line)
+            line = f'{bg_col.ljust(max_len_bc_color)} {line}'
             pywikibot.output(line)
 
         pywikibot.output()

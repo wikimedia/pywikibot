@@ -99,7 +99,7 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
         lstrip = param.value.lstrip()
         lspaces = param.value[:len(param.value) - len(lstrip)]
         rspaces = lstrip[len(lstrip.rstrip()):]
-        param.value = '{}{}{}'.format(lspaces, value, rspaces)
+        param.value = f'{lspaces}{value}{rspaces}'
 
     def setup(self):
         """Raise exception if needed modules are missing."""

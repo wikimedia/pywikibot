@@ -385,7 +385,7 @@ def correctcap(link, text: str) -> str:
     """
     linkupper = link.title()
     linklower = first_lower(linkupper)
-    if '[[{}]]'.format(linklower) in text or '[[{}|'.format(linklower) in text:
+    if f'[[{linklower}]]' in text or f'[[{linklower}|' in text:
         return linklower
     return linkupper
 
@@ -417,7 +417,7 @@ class ReferringPageGeneratorWithIgnore:
         refs = list(self.page.getReferences(with_template_inclusion=False,
                                             namespaces=0 if self.main_only
                                             else None))
-        pywikibot.output('Found {} references.'.format(len(refs)))
+        pywikibot.output(f'Found {len(refs)} references.')
         # Remove ignorables
         site = self.page.site
         if site.family.name in ignore_title \
@@ -433,7 +433,7 @@ class ReferringPageGeneratorWithIgnore:
             pywikibot.output('Found only {} pages to work on; skipping.'
                              .format(len(refs)))
             return
-        pywikibot.output('Will work on {} pages.'.format(len(refs)))
+        pywikibot.output(f'Will work on {len(refs)} pages.')
         yield from refs
 
 
@@ -662,8 +662,8 @@ class DisambiguationRobot(SingleSiteBot):
         for i, arg in enumerate(args):
             key = keys[i]
             issue_deprecation_warning(
-                'Positional argument {} ({})'.format(i + 1, arg),
-                'keyword argument "{}={}"'.format(key, arg),
+                f'Positional argument {i + 1} ({arg})',
+                f'keyword argument "{key}={arg}"',
                 since='6.0.0')
             if key in kwargs:
                 pywikibot.warning('{!r} is given as keyword argument {!r} '
@@ -677,7 +677,7 @@ class DisambiguationRobot(SingleSiteBot):
             if key in keymap:
                 newkey = keymap[key]
                 issue_deprecation_warning(
-                    '{!r} argument of {}'.format(key, self.__class__.__name__),
+                    f'{key!r} argument of {self.__class__.__name__}',
                     repr(newkey), since='6.0.0')
                 kwargs[newkey] = kwargs.pop(key)
 
@@ -1059,7 +1059,7 @@ DisambiguationRobot""".format(options=added_keys,
                                                   trailing_chars)
                 elif replaceit or (new_page_title == link_text
                                    and not section):
-                    newlink = '[[{}]]'.format(new_page_title)
+                    newlink = f'[[{new_page_title}]]'
                 # check if we can create a link with trailing characters
                 # instead of a pipelink
                 elif (
@@ -1093,7 +1093,7 @@ DisambiguationRobot""".format(options=added_keys,
                 except LockedPageError:
                     pywikibot.output('Page not saved: page is locked')
                 except PageSaveRelatedError as error:
-                    pywikibot.output('Page not saved: {}'.format(error.args))
+                    pywikibot.output(f'Page not saved: {error.args}')
 
         return 'done'
 
@@ -1199,7 +1199,7 @@ or press enter to quit:""")
         new_targets = new_targets or []
         # make list of new targets
         comma = self.site.mediawiki_message('comma-separator')
-        targets = comma.join('[[{}]]'.format(page_title)
+        targets = comma.join(f'[[{page_title}]]'
                              for page_title in new_targets)
 
         if not targets:
@@ -1271,7 +1271,7 @@ or press enter to quit:""")
         if not self.findAlternatives(page):
             return
 
-        pywikibot.output('\nAlternatives for {}'.format(page))
+        pywikibot.output(f'\nAlternatives for {page}')
         self.makeAlternativesUnique()
         # sort possible choices
         if config.sort_ignore_case:

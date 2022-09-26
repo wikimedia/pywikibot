@@ -145,7 +145,7 @@ class SparqlQuery:
         if headers is None:
             headers = DEFAULT_HEADERS
 
-        url = '{}?query={}'.format(self.endpoint, quote(query))
+        url = f'{self.endpoint}?query={quote(query)}'
         while True:
             try:
                 self.last_response = http.fetch(url, headers=headers)
@@ -164,7 +164,7 @@ class SparqlQuery:
         self.max_retries -= 1
         if self.max_retries < 0:
             raise TimeoutError('Maximum retries attempted without success.')
-        warning('Waiting {} seconds before retrying.'.format(self.retry_wait))
+        warning(f'Waiting {self.retry_wait} seconds before retrying.')
         sleep(self.retry_wait)
         # double the next wait, but do not exceed config.retry_max seconds
         self.retry_wait = min(config.retry_max, self.retry_wait * 2)

@@ -377,7 +377,7 @@ class MissingPackageTestCase(TWNSetMessagePackageBase,
             self.skipTest('Wrong content model {!r} for cosmetic_changes'
                           .format(page.content_model))
 
-        summary = 'Working on Test page at site {}'.format(self.site)
+        summary = f'Working on Test page at site {self.site}'
         msg = page._cosmetic_changes_hook(summary)
         self.assertEqual(msg, summary + '; cosmetic changes')
 

@@ -205,11 +205,11 @@ class OAuthEditTest(OAuthSiteTestCase):
         self.assertTrue(self.site.logged_in())
         ts = str(time.time())
         p = pywikibot.Page(self.site,
-                           'User:{}/edit test'.format(self.site.username()))
+                           f'User:{self.site.username()}/edit test')
         p.site.editpage(p, appendtext=ts)
         revision_id = p.latest_revision_id
         p = pywikibot.Page(self.site,
-                           'User:{}/edit test'.format(self.site.username()))
+                           f'User:{self.site.username()}/edit test')
         self.assertEqual(revision_id, p.latest_revision_id)
         self.assertTrue(p.text.endswith(ts))
 

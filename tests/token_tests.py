@@ -150,7 +150,7 @@ class PatrolTestCase(TokenTestBase, TestCase):
             raise
 
         if hasattr(mysite, '_patroldisabled') and mysite._patroldisabled:
-            self.skipTest('Patrolling is disabled on {} wiki.'.format(mysite))
+            self.skipTest(f'Patrolling is disabled on {mysite} wiki.')
 
         result = result[0]
         self.assertIsInstance(result, dict)

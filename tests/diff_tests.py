@@ -203,7 +203,7 @@ class TestCherryPick(TestCase):
     # output messages expected during testing
     diff_message = ('<<lightred>>- old\n<<default>><<lightgreen>>+ '
                     'new\n<<default>>')
-    none_message = '<<lightpurple>>{0: ^50}<<default>>'.format('None.')
+    none_message = '<<lightpurple>>{: ^50}<<default>>'.format('None.')
     header_base = '\n<<lightpurple>>{0:*^50}<<default>>\n'
     headers = ['  ALL CHANGES  ', '  REVIEW CHANGES  ', '  APPROVED CHANGES  ']
     diff_by_letter_message = ('<<lightred>>- o\n<<default>>'

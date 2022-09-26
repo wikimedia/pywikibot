@@ -199,7 +199,7 @@ def main(*args: str) -> None:
             protections[option] = value
         else:
             if not gen_factory.handle_arg(arg):
-                raise ValueError('Unknown parameter "{}"'.format(arg))
+                raise ValueError(f'Unknown parameter "{arg}"')
             if value:
                 message_properties.update({'cat': value, 'page': value})
             if 'summary' not in options:
@@ -210,11 +210,11 @@ def main(*args: str) -> None:
         if message_type == 'simple' or message_properties:
             if default_level == 'all':
                 options['summary'] = i18n.twtranslate(
-                    site, 'unprotect-{}'.format(message_type),
+                    site, f'unprotect-{message_type}',
                     message_properties)
             else:
                 options['summary'] = i18n.twtranslate(
-                    site, 'protect-{}'.format(message_type),
+                    site, f'protect-{message_type}',
                     message_properties)
 
     generator = gen_factory.getCombinedGenerator()

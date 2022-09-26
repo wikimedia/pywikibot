@@ -40,7 +40,7 @@ def update_family(families):
     """Update family files."""
     ws = wikistats.WikiStats()
     for family in families or families_list:
-        pywikibot.output('\nChecking family {}:'.format(family))
+        pywikibot.output(f'\nChecking family {family}:')
 
         original = Family.load(family).languages_by_size
         for code in exceptions.get(family, []):
@@ -78,11 +78,11 @@ def update_family(families):
             if len(line) + len(code) >= 76:
                 text += line + '\n'
                 line = ' ' * 7
-            line += " '{}',".format(code)
+            line += f" '{code}',"
         text += line + '\n'
         text += '    ]'
         pywikibot.output(text)
-        family_file_name = 'pywikibot/families/{}_family.py'.format(family)
+        family_file_name = f'pywikibot/families/{family}_family.py'
         with codecs.open(family_file_name, 'r', 'utf8') as family_file:
             family_text = family_file.read()
         family_text = re.sub(r'(?ms)^ {4}languages_by_size.+?\]',

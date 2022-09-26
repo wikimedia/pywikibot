@@ -21,7 +21,6 @@ from pywikibot.data.api import Request as _original_Request
 from pywikibot.exceptions import APIError
 from pywikibot.login import LoginStatus
 from pywikibot.site import Namespace
-
 from tests import _pwb_py
 
 
@@ -501,7 +500,7 @@ def execute_pwb(args, data_in=None, timeout=None, error=None, overrides=None):
     if overrides:
         command.append('-c')
         overrides = '; '.join(
-            '{} = {}'.format(key, value) for key, value in overrides.items())
+            f'{key} = {value}' for key, value in overrides.items())
         command.append(
             'import pwb; import pywikibot; {}; pwb.main()'
             .format(overrides))

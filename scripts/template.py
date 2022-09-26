@@ -120,7 +120,6 @@ from pywikibot.tools.itertools import (
     itergroup,
     roundrobin_generators,
 )
-
 from scripts.replace import ReplaceRobot as ReplaceBot
 
 
@@ -182,12 +181,12 @@ class TemplateRobot(ReplaceBot):
                                              'pagelist', ]
             elif self.opt.remove:
                 separate_line_regex = re.compile(
-                    r'^[*#:]* *{} *\n'.format(template_regex.pattern),
+                    fr'^[*#:]* *{template_regex.pattern} *\n',
                     re.DOTALL | re.MULTILINE)
                 replacements.append((separate_line_regex, ''))
 
                 spaced_regex = re.compile(
-                    r' +{} +'.format(template_regex.pattern),
+                    fr' +{template_regex.pattern} +',
                     re.DOTALL)
                 replacements.append((spaced_regex, ' '))
 

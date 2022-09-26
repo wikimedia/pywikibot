@@ -289,7 +289,7 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
         localtime = time.localtime()
         today = '{:04d}-{:02d}-{:02d}'.format(*localtime[:3])
         self.datafile = pywikibot.config.datafilepath(
-            '{}-catmovebot-data'.format(self.site.dbName()))
+            f'{self.site.dbName()}-catmovebot-data')
         try:
             with open(self.datafile, 'rb') as inp:
                 self.record = pickle.load(inp)
@@ -472,7 +472,7 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
         self.log_page.save(comment)
         if self.edit_requests:
             edit_request_page = pywikibot.Page(
-                self.site, 'User:{}/category edit requests'.format(self.user))
+                self.site, f'User:{self.user}/category edit requests')
             edit_request_page.text = (self.edit_request_text
                                       % {'itemlist': '\n' + '\n'.join(
                                           (self.edit_request_item % item)

@@ -201,7 +201,7 @@ class GlobalUsageMixin:
             defined for a returned entry in API response.
         """
         if not isinstance(page, pywikibot.FilePage):
-            raise TypeError('Page {} must be a FilePage.'.format(page))
+            raise TypeError(f'Page {page} must be a FilePage.')
 
         title = page.title(with_section=False)
         args = {'titles': title,

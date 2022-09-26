@@ -131,7 +131,7 @@ class UploadRobot(BaseBot):
             file_len = path.stat().st_size
             if file_len:
                 pywikibot.output('Download resumed.')
-                headers = {'Range': 'bytes={}-'.format(file_len)}
+                headers = {'Range': f'bytes={file_len}-'}
             else:
                 headers = {}
 
@@ -174,12 +174,12 @@ class UploadRobot(BaseBot):
                 break
             try:
                 dt = next(dt_gen)
-                pywikibot.output('Sleeping for {} seconds ...'.format(dt))
+                pywikibot.output(f'Sleeping for {dt} seconds ...')
                 pywikibot.sleep(dt)
             except StopIteration:
                 raise FatalServerError('Download failed, too many retries!')
 
-        pywikibot.output('Downloaded {} bytes'.format(path.stat().st_size))
+        pywikibot.output(f'Downloaded {path.stat().st_size} bytes')
         return tempname
 
     def _handle_warning(self, warning: str) -> Optional[bool]:
@@ -268,7 +268,7 @@ class UploadRobot(BaseBot):
             if invalid:
                 c = ''.join(invalid)
                 pywikibot.output(
-                    'Invalid character(s): {}. Please try again'.format(c))
+                    f'Invalid character(s): {c}. Please try again')
                 continue
 
             if allowed_formats and ext not in allowed_formats:
@@ -391,7 +391,7 @@ class UploadRobot(BaseBot):
         imagepage = pywikibot.FilePage(site, filename)  # normalizes filename
         imagepage.text = self.description
 
-        pywikibot.output('Uploading file to {}...'.format(site))
+        pywikibot.output(f'Uploading file to {site}...')
 
         ignore_warnings = self.ignore_warning is True or self._handle_warnings
 

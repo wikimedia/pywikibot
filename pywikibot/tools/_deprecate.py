@@ -64,7 +64,7 @@ def add_decorated_full_name(obj, stacklevel: int = 1) -> None:
         obj.__full_name__ = '{}.{}.{}'.format(obj.__module__,
                                               class_name, obj.__name__)
     else:
-        obj.__full_name__ = '{}.{}'.format(obj.__module__, obj.__name__)
+        obj.__full_name__ = f'{obj.__module__}.{obj.__name__}'
 
 
 def manage_wrapping(wrapper, obj) -> None:
@@ -174,7 +174,7 @@ def _build_msg_string(instead: str, since: str) -> str:
     :param since: a version string string when the method was deprecated
     """
     if since and '.' not in since:
-        raise ValueError('{} is not a valid release number'.format(since))
+        raise ValueError(f'{since} is not a valid release number')
 
     if instead:
         msg = '{{0}} is deprecated{since}; use {{1}} instead.'
@@ -411,7 +411,7 @@ def deprecated_args(**arg_pairs):
             for old_arg, new_arg in arg_pairs.items():
                 params[old_arg] = inspect.Parameter(
                     old_arg, kind=inspect._POSITIONAL_OR_KEYWORD,
-                    default='[deprecated name of {}]'.format(new_arg)
+                    default=f'[deprecated name of {new_arg}]'
                     if new_arg not in [True, False, None, '']
                     else NotImplemented)
             params = collections.OrderedDict(sorted(params.items(),
@@ -600,7 +600,7 @@ class ModuleDeprecationWrapper(types.ModuleType):
             raise ValueError('Deprecated name "{}" may not contain '
                              '".".'.format(name))
         if name in self._deprecated:
-            raise ValueError('Name "{}" is already deprecated.'.format(name))
+            raise ValueError(f'Name "{name}" is already deprecated.')
         if replacement is not None and hasattr(self._module, name):
             raise ValueError('Module has already an attribute named '
                              '"{}".'.format(name))

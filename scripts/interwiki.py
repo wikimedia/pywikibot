@@ -1023,7 +1023,7 @@ class Subject(interwiki_graph.Subject):
             with codecs.open(
                     pywikibot.config.datafilepath('without_interwiki.txt'),
                     'a', 'utf-8') as f:
-                f.write('# {} \n'.format(page))
+                f.write(f'# {page} \n')
 
     def askForHints(self, counter) -> None:
         """Ask for hints to other sites."""
@@ -1101,9 +1101,9 @@ class Subject(interwiki_graph.Subject):
                     counter.minus(site, count)
                 self.todo.clear()
         elif not self.conf.followredirect:
-            self.conf.note('not following {}redirects.'.format(redir))
+            self.conf.note(f'not following {redir}redirects.')
         elif page.isStaticRedirect():
-            self.conf.note('not following static {}redirects.'.format(redir))
+            self.conf.note(f'not following static {redir}redirects.')
         elif (page.site.family == redirect_target.site.family
               and not self.skipPage(page, redirect_target, counter)
               and self.addIfNew(redirect_target, counter, page)
@@ -1117,7 +1117,7 @@ class Subject(interwiki_graph.Subject):
         """Check whether any iw links should be added to the todo list."""
         if not page.exists():
             self.conf.remove.append(str(page))
-            self.conf.note('{} does not exist. Skipping.'.format(page))
+            self.conf.note(f'{page} does not exist. Skipping.')
             if page == self.origin:
                 # The page we are working on is the page that does not
                 # exist. No use in doing any work on it in that case.
@@ -1136,7 +1136,7 @@ class Subject(interwiki_graph.Subject):
         # otherwise a redirect error would be raised
         if page_empty_check(page):
             self.conf.remove.append(str(page))
-            self.conf.note('{} is empty. Skipping.'.format(page))
+            self.conf.note(f'{page} is empty. Skipping.')
             if page == self.origin:
                 for site, count in self.todo.iter_values_len():
                     counter.minus(site, count)
@@ -1146,7 +1146,7 @@ class Subject(interwiki_graph.Subject):
             return
 
         if page.section():
-            self.conf.note('{} is a page section. Skipping.'.format(page))
+            self.conf.note(f'{page} is a page section. Skipping.')
             return
 
         # Page exists, isn't a redirect, and is a plain link (no section)
@@ -1158,7 +1158,7 @@ class Subject(interwiki_graph.Subject):
         try:
             iw = page.langlinks()
         except UnknownSiteError:
-            self.conf.note('site {} does not exist.'.format(page.site))
+            self.conf.note(f'site {page.site} does not exist.')
             return
 
         (skip, alternativePage) = self.disambigMismatch(page, counter)
@@ -1392,7 +1392,7 @@ class Subject(interwiki_graph.Subject):
             if not acceptall:
                 pywikibot.output('=' * 30)
                 page2 = pages[0]
-                pywikibot.output('Found link to {} in:'.format(page2))
+                pywikibot.output(f'Found link to {page2} in:')
                 self.whereReport(page2, indent=4)
 
             # TODO: allow answer to repeat previous or go back
@@ -1442,7 +1442,7 @@ class Subject(interwiki_graph.Subject):
 
     def post_processing(self):
         """Some finishing processes to be done."""
-        pywikibot.output('======Post-processing {}======'.format(self.origin))
+        pywikibot.output(f'======Post-processing {self.origin}======')
         # Assemble list of accepted interwiki links
         new = self.assemble()
         if new is None:  # User said give up
@@ -1503,7 +1503,7 @@ class Subject(interwiki_graph.Subject):
                         page = pywikibot.Page(link)
                         old[page.site] = page
                 except NoPageError:
-                    pywikibot.error('{} no longer exists?'.format(new[site]))
+                    pywikibot.error(f'{new[site]} no longer exists?')
                     continue
                 *_, adding, removing, modifying = compareLanguages(
                     old, new, lclSite, self.conf.summary)
@@ -1558,7 +1558,7 @@ class Subject(interwiki_graph.Subject):
             raise SaveError("Page doesn't exist")
 
         if page_empty_check(page):
-            pywikibot.output('Not editing {}: page is empty'.format(page))
+            pywikibot.output(f'Not editing {page}: page is empty')
             raise SaveError('Page is empty.')
 
         # clone original newPages dictionary, so that we can modify it to the
@@ -1629,12 +1629,12 @@ class Subject(interwiki_graph.Subject):
             mods, mcomment, adding, removing, modifying = compareLanguages(
                 old, new, page.site, self.conf.summary)
         if not mods:
-            self.conf.note('No changes needed on page {}'.format(page))
+            self.conf.note(f'No changes needed on page {page}')
             return False
 
         pywikibot.info('<<lightpurple>>Updating links on page {}.'
                        .format(page))
-        pywikibot.info('Changes to be made: {}'.format(mods))
+        pywikibot.info(f'Changes to be made: {mods}')
         oldtext = page.get()
         template = (page.namespace() == 10)
         newtext = textlib.replaceLanguageLinks(oldtext, new,
@@ -1643,7 +1643,7 @@ class Subject(interwiki_graph.Subject):
         # This is for now. Later there should be different funktions for each
         # kind
         if not botMayEdit(page):
-            pywikibot.info('SKIPPING: {} '.format(page), newline=False)
+            pywikibot.info(f'SKIPPING: {page} ', newline=False)
             if template:
                 msg = 'should have interwiki links on subpage.'
             else:
@@ -2265,7 +2265,7 @@ class InterwikiDumps(OptionHandler):
                 pywikibot.error('Cannot delete {} due to\n{}\nDo it manually.'
                                 .format(tail, e))
             else:
-                pywikibot.output('Dumpfile {} deleted'.format(tail))
+                pywikibot.output(f'Dumpfile {tail} deleted')
 
 
 def main(*args: str) -> None:

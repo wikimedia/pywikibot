@@ -10,10 +10,9 @@ import unittest
 from contextlib import suppress
 from unittest import mock
 
-from pywikibot import config, Site
+from pywikibot import Site, config
 from pywikibot.comms.eventstreams import EventSource, EventStreams
 from pywikibot.family import WikimediaFamily
-
 from tests.aspects import DefaultSiteTestCase, TestCase, require_modules
 from tests.utils import skipping
 
@@ -59,7 +58,7 @@ class TestEventStreamsUrlTests(TestCase):
         self.assertEqual(e._url, e.sse_kwargs.get('url'))
         self.assertIsNone(e._total)
         self.assertEqual(e._streams, streams)
-        site_repr = 'site={}, '.format(repr(site)) if site != Site() else ''
+        site_repr = f'site={repr(site)}, ' if site != Site() else ''
         self.assertEqual(repr(e),
                          "EventStreams({}streams='{}')"
                          .format(site_repr, streams))

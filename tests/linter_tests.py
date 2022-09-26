@@ -21,7 +21,7 @@ class TestLinterPages(DefaultSiteTestCase):
         super().setUp()
         if not self.site.has_extension('Linter'):
             self.skipTest(
-                'The site {} does not use Linter extension'.format(self.site))
+                f'The site {self.site} does not use Linter extension')
 
     def test_linter_pages(self):
         """Test the deprecated site.logpages() method."""

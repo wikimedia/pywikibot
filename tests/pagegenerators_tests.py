@@ -178,7 +178,7 @@ class TestDryPageGenerators(TestCase):
                                                       site=self.site)
         pages = []
         for p in gen:
-            p.text = 'This is the content of {} as a sample'.format(p.title())
+            p.text = f'This is the content of {p.title()} as a sample'
             pages.append(p)
         gen = pagegenerators.RegexBodyFilterPageGenerator(iter(pages), '/doc')
         self.assertPageTitlesEqual(gen,
@@ -1144,7 +1144,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
 
         # Get by pageids.
         gf = pagegenerators.GeneratorFactory(site=self.get_site())
-        gf.handle_arg('-pageid:{}'.format(pageids))
+        gf.handle_arg(f'-pageid:{pageids}')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages_from_pageid = list(gen)
@@ -1224,7 +1224,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
                      'hiddencat', 'invalid_property'):
             if item in mysite.get_property_names():
                 gf = pagegenerators.GeneratorFactory()
-                gf.handle_arg('-property:{}'.format(item))
+                gf.handle_arg(f'-property:{item}')
                 gf.handle_arg('-limit:10')
                 gen = gf.getCombinedGenerator()
                 self.assertIsNotNone(gen)
@@ -1238,7 +1238,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
                 with self.assertRaises(NotImplementedError):
                     mysite.pages_with_property(item)
                     self.fail(
-                        'NotImplementedError not raised for {}'.format(item))
+                        f'NotImplementedError not raised for {item}')
 
     def test_empty_generator(self):
         """Test empty generator."""
@@ -1644,7 +1644,7 @@ class EventStreamsPageGeneratorTestCase(RecentChangesTestCase):
         super().setUpClass()
         cls.client = 'sseclient'
         if not has_module(cls.client):
-            raise unittest.SkipTest('{} is not available'.format(cls.client))
+            raise unittest.SkipTest(f'{cls.client} is not available')
 
     def test_RC_pagegenerator_result(self):
         """Test RC pagegenerator."""
@@ -1720,7 +1720,7 @@ class TestLinksearchPageGenerator(TestCase):
 
         for search, expected in cases:
             gf = pagegenerators.GeneratorFactory(site=self.site)
-            gf.handle_arg('-weblink:{}'.format(search))
+            gf.handle_arg(f'-weblink:{search}')
             gf.handle_arg('-ns:2')
             gf.handle_arg('-limit:1')
             gen = gf.getCombinedGenerator()

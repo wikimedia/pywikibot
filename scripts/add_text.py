@@ -146,7 +146,7 @@ class AddTextBot(AutomaticTWSummaryBot, ExistingPageBot):
                     return True
 
         elif page.isTalkPage():
-            pywikibot.output("{} doesn't exist, creating it!".format(page))
+            pywikibot.output(f"{page} doesn't exist, creating it!")
             return False
 
         elif self.opt.create or self.opt.createonly:
@@ -228,7 +228,7 @@ def parse(argv: Sequence[str],
         elif option == '-major':
             args['minor'] = False
         else:
-            raise ValueError("Argument '{}' is unrecognized".format(option))
+            raise ValueError(f"Argument '{option}' is unrecognized")
 
     if not args['text'] and not args['textfile']:
         raise ValueError("Either the '-text' or '-textfile' is required")

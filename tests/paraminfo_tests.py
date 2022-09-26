@@ -26,12 +26,12 @@ class KnownTypesTestBase(TestCaseBase):
         """Perform check that a parameter matches the expected list."""
         with skipping(
             ValueError,
-                msg='Paraminfo for {} could not be loaded'.format(module)):
+                msg=f'Paraminfo for {module} could not be loaded'):
             param = site._paraminfo.parameter(module, parameter)
 
         if not param or 'type' not in param:
             raise unittest.SkipTest(
-                'No defined values for {}.{}'.format(module, parameter))
+                f'No defined values for {module}.{parameter}')
         return param['type']
 
     def _check_param_values(self, site, module, parameter, expected):
@@ -86,7 +86,7 @@ class MediaWikiKnownTypesTestCase(KnownTypesTestBase,
         if self.site.mw_version >= '1.24':
             types.append('unread')
 
-        known = types + ['!{}'.format(item) for item in types]
+        known = types + [f'!{item}' for item in types]
 
         self._check_param_subset(self.site, 'query+watchlist', 'show', known)
 

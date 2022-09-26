@@ -20,11 +20,7 @@ from pywikibot.exceptions import (
 )
 from pywikibot.tools import suppress_warnings
 from tests import WARN_SITE_CODE, unittest_print
-from tests.aspects import (
-    DefaultSiteTestCase,
-    DeprecationTestCase,
-    TestCase,
-)
+from tests.aspects import DefaultSiteTestCase, DeprecationTestCase, TestCase
 from tests.utils import skipping
 
 
@@ -633,7 +629,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
                 with self.assertRaises(NotImplementedError):
                     mysite.pages_with_property(item)
                     self.fail(
-                        'NotImplementedError not raised for {}'.format(item))
+                        f'NotImplementedError not raised for {item}')
 
     def test_unconnected(self):
         """Test site.unconnected_pages method."""
@@ -767,7 +763,7 @@ class TestImageUsage(DefaultSiteTestCase):
         page = pywikibot.Page(mysite, mysite.siteinfo['mainpage'])
         with skipping(
             StopIteration,
-                msg='No images on the main page of site {!r}'.format(mysite)):
+                msg=f'No images on the main page of site {mysite!r}'):
             imagepage = next(page.imagelinks())  # 1st image of page
 
         unittest_print('site_tests.TestImageUsage found {} on {}'
@@ -2201,7 +2197,7 @@ class TestPagePreloading(DefaultSiteTestCase):
         for count, page in enumerate(gen):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
-            self.assertFalse(page.exists(), 'page {} exists'.format(page))
+            self.assertFalse(page.exists(), f'page {page} exists')
             if count >= 5:
                 break
 

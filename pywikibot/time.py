@@ -17,6 +17,7 @@ import pywikibot
 from pywikibot.backports import Tuple
 from pywikibot.tools import classproperty
 
+
 __all__ = (
     'parse_duration',
     'str2timedelta',
@@ -228,7 +229,7 @@ class Timestamp(datetime.datetime):
         :return: ISO8601 format string
         """
         assert len(sep) == 1
-        return '%Y-%m-%d{}%H:%M:%SZ'.format(sep)
+        return f'%Y-%m-%d{sep}%H:%M:%SZ'
 
     @classmethod
     def fromISOformat(cls: Type['Timestamp'],  # noqa: N802
@@ -244,7 +245,7 @@ class Timestamp(datetime.datetime):
         # to create a clone.
         if isinstance(ts, cls):
             return ts.clone()
-        _ts = '{pre}{sep}{post}'.format(pre=ts[:10], sep=sep, post=ts[11:])
+        _ts = f'{ts[:10]}{sep}{ts[11:]}'
         return cls._from_iso8601(_ts)
 
     @classmethod
@@ -288,7 +289,7 @@ class Timestamp(datetime.datetime):
 
         .. versionadded: 7.5
         """
-        return '{ts:.6f}'.format(ts=self.posix_timestamp())
+        return f'{self.posix_timestamp():.6f}'
 
     def __str__(self) -> str:
         """Return a string format recognized by the API."""

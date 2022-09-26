@@ -35,9 +35,9 @@ import codecs
 import os
 import string
 import sys
+from contextlib import suppress
 from typing import Optional
 from urllib.parse import urlparse
-from contextlib import suppress
 
 
 # see pywikibot.family.py
@@ -201,7 +201,7 @@ class FamilyFileGenerator:
         print('Loading wikis... ')
         for lang in self.langs:
             key = lang['prefix']
-            print('  * {}... '.format(key), end='')
+            print(f'  * {key}... ', end='')
             if key not in self.wikis:
                 try:
                     self.wikis[key] = self.Wiki(lang['url'])
@@ -214,8 +214,8 @@ class FamilyFileGenerator:
     def writefile(self, verify) -> None:
         """Write the family file."""
         fn = os.path.join(self.base_dir, 'families',
-                          '{}_family.py'.format(self.name))
-        print('Writing {}... '.format(fn))
+                          f'{self.name}_family.py')
+        print(f'Writing {fn}... ')
 
         if os.path.exists(fn) and input('{} already exists. Overwrite? (y/n)'
                                         .format(fn)).lower() == 'n':
@@ -228,7 +228,7 @@ class FamilyFileGenerator:
             ) for k, w in self.wikis.items())
 
         code_path_pairs = '\n            '.join(
-            "'{code}': '{path}',".format(code=k, path=w.scriptpath)
+            f"'{k}': '{w.scriptpath}',"
             for k, w in self.wikis.items())
 
         code_protocol_pairs = '\n            '.join(

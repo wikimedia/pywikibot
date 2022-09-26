@@ -47,7 +47,7 @@ def create_path_func(base_func, subpath):
     """Return a function returning a path relative to the given directory."""
     func = functools.partial(base_func, subpath)
     func.path = base_func.path + '/' + subpath
-    func.__doc__ = 'Return a path relative to `{}/`.'.format(func.path)
+    func.__doc__ = f'Return a path relative to `{func.path}/`.'
     return func
 
 

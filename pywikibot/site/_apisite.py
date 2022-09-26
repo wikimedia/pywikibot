@@ -164,7 +164,7 @@ class APISite(
             prefixes.update(self._interwikimap.get_by_url(url))
         if not prefixes:
             raise KeyError(
-                "There is no interwiki prefix to '{}'".format(site))
+                f"There is no interwiki prefix to '{site}'")
         return sorted(prefixes, key=lambda p: (len(p), p))
 
     def local_interwiki(self, prefix: str) -> bool:
@@ -215,7 +215,7 @@ class APISite(
                     if m_site['dbname'] == dbname:
                         url = m_site['url'] + '/w/index.php'
                         return pywikibot.Site(url=url)
-        raise ValueError('Cannot parse a site out of {}.'.format(dbname))
+        raise ValueError(f'Cannot parse a site out of {dbname}.')
 
     def _generator(
         self,
@@ -648,7 +648,7 @@ class APISite(
                 None if 'anon' in uidata['query']['userinfo'] else
                 uidata['query']['userinfo']['name'])
         return {ns for ns in self.namespaces.values() if ns.id >= 0
-                and self._useroptions['searchNs{}'.format(ns.id)]
+                and self._useroptions[f'searchNs{ns.id}']
                 in ['1', True]}
 
     @property  # type: ignore[misc]
@@ -712,7 +712,7 @@ class APISite(
                              pattern)
         if letters:
             pattern += ''.join(letters.split('|'))
-        return '[{}]*'.format(pattern)
+        return f'[{pattern}]*'
 
     @staticmethod
     def assert_valid_iter_params(
@@ -905,7 +905,7 @@ class APISite(
             msgs = self.mediawiki_messages(needed_mw_messages)
         except KeyError:
             raise NotImplementedError(
-                'MediaWiki messages missing: {}'.format(needed_mw_messages))
+                f'MediaWiki messages missing: {needed_mw_messages}')
 
         args = list(args)
         concat = msgs['and'] + msgs['word-separator']
@@ -1220,7 +1220,7 @@ class APISite(
         """
         if not self.has_data_repository:
             raise UnknownExtensionError(
-                'Wikibase is not implemented for {}.'.format(self))
+                f'Wikibase is not implemented for {self}.')
 
         repo = self.data_repository()
         dp = pywikibot.ItemPage(repo, item)
@@ -1586,7 +1586,7 @@ class APISite(
         try:
             parsed_text = data['parse']['text']['*']
         except KeyError as e:
-            raise KeyError('API parse response lacks {} key'.format(e))
+            raise KeyError(f'API parse response lacks {e} key')
         return parsed_text
 
     def getcategoryinfo(self, category: 'pywikibot.page.Category') -> None:
@@ -1847,7 +1847,7 @@ class APISite(
             while True:
                 try:
                     result = req.submit()
-                    pywikibot.debug('editpage response: {}'.format(result))
+                    pywikibot.debug(f'editpage response: {result}')
                 except APIError as err:
                     if err.code.endswith('anon') and self.logged_in():
                         pywikibot.debug("editpage: received '{}' even though "
@@ -2048,7 +2048,7 @@ class APISite(
             self.unlock_page(dest)
 
         if 'mergehistory' not in result:
-            pywikibot.error('mergehistory: {error}'.format(error=result))
+            pywikibot.error(f'mergehistory: {result}')
             raise Error('mergehistory: unexpected response')
 
     # catalog of move errors for use in error messages
@@ -2135,7 +2135,7 @@ class APISite(
         req['from'] = oldtitle  # "from" is a python keyword
         try:
             result = req.submit()
-            pywikibot.debug('movepage response: {}'.format(result))
+            pywikibot.debug(f'movepage response: {result}')
         except APIError as err:
             if err.code.endswith('anon') and self.logged_in():
                 pywikibot.debug(
@@ -2179,7 +2179,7 @@ class APISite(
         finally:
             self.unlock_page(page)
         if 'move' not in result:
-            pywikibot.error('movepage: {}'.format(result))
+            pywikibot.error(f'movepage: {result}')
             raise Error('movepage: unexpected response')
         # TODO: Check for talkmove-error messages
         if 'talkmove-error-code' in result['move']:
@@ -2330,7 +2330,7 @@ class APISite(
         if deletetalk:
             if self.mw_version < '1.38wmf24':
                 pywikibot.warning(
-                    'deletetalk is not available on {}'.format(self.mw_version)
+                    f'deletetalk is not available on {self.mw_version}'
                 )
             else:
                 params['deletetalk'] = deletetalk
@@ -2650,7 +2650,7 @@ class APISite(
             result = result['purge']
         except KeyError:
             pywikibot.error(
-                'purgepages: Unexpected API response:\n{}'.format(result))
+                f'purgepages: Unexpected API response:\n{result}')
             return False
         if not all('purged' in page for page in result):
             return False
@@ -2783,8 +2783,8 @@ class APISite(
             raise TypeError('diff parameter is of invalid type')
 
         params = {'action': 'compare',
-                  'from{}'.format(old_t[0]): old_t[1],
-                  'to{}'.format(diff_t[0]): diff_t[1]}
+                  f'from{old_t[0]}': old_t[1],
+                  f'to{diff_t[0]}': diff_t[1]}
 
         req = self.simple_request(**params)
         data = req.submit()

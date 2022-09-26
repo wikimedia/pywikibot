@@ -170,7 +170,7 @@ class StandardOption(Option):
             return '{}[{}]{}'.format(
                 self.option[:index], shortcut,
                 self.option[index + len(self.shortcut):])
-        return '{} [{}]'.format(self.option, shortcut)
+        return f'{self.option} [{shortcut}]'
 
     def result(self, value: str) -> Any:
         """Return the lowercased shortcut."""
@@ -434,7 +434,7 @@ class IntegerOption(Option):
 
         if default is not None and self.test(default):
             value = self.parse(default)
-            default = '[{}]'.format(value)
+            default = f'[{value}]'
         else:
             default = ''
 
@@ -449,14 +449,14 @@ class IntegerOption(Option):
                 default = ''
             else:
                 maximum = '' if self.maximum is None else str(self.maximum)
-            default = '-{}-'.format(default) if default else '-'
+            default = f'-{default}-' if default else '-'
             if self.minimum == self.maximum:
                 rng = minimum
             else:
                 rng = minimum + default + maximum
         else:
             rng = 'any' + default
-        return '{}<number> [{}]'.format(self.prefix, rng)
+        return f'{self.prefix}<number> [{rng}]'
 
     def parse(self, value: str) -> int:
         """Return integer from value with prefix removed."""

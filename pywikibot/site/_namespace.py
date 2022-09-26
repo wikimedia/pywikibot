@@ -8,9 +8,10 @@ from collections.abc import Iterable, Mapping
 from enum import IntEnum
 from typing import Optional, Union
 
+from pywikibot.backports import Dict
 from pywikibot.backports import Iterable as IterableType
-from pywikibot.backports import Dict, List
-from pywikibot.tools import classproperty, ComparableMixin, SelfCallMixin
+from pywikibot.backports import List
+from pywikibot.tools import ComparableMixin, SelfCallMixin, classproperty
 
 
 NamespaceIDType = Union[int, str, 'Namespace']
@@ -248,7 +249,7 @@ class Namespace(Iterable, ComparableMixin):
 
         if extra:
             kwargs = ', ' + ', '.join(
-                key + '={!r}'.format(value) for key, value in extra)
+                key + f'={value!r}' for key, value in extra)
         else:
             kwargs = ''
 

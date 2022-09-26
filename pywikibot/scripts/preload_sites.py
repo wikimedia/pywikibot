@@ -91,7 +91,7 @@ def preload_families(families: Union[List[str], Set[str]],
         futures = {executor.submit(preload_family, family, executor)
                    for family in families}
         wait(futures)
-    pywikibot.output('Loading time used: {}'.format(datetime.now() - start))
+    pywikibot.output(f'Loading time used: {datetime.now() - start}')
 
 
 if __name__ == '__main__':

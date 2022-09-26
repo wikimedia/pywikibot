@@ -52,8 +52,8 @@ colors = [
 ]
 
 _color_pat = '((:?{0});?(:?{0})?)'.format('|'.join(colors + ['previous']))
-old_colorTagR = re.compile('\03{{{cpat}}}'.format(cpat=_color_pat))
-new_colorTagR = re.compile('<<{cpat}>>'.format(cpat=_color_pat))
+old_colorTagR = re.compile(f'\03{{{_color_pat}}}')
+new_colorTagR = re.compile(f'<<{_color_pat}>>')
 
 
 class UI(ABUIC):
@@ -370,7 +370,7 @@ class UI(ABUIC):
             end_marker = ':'
 
         if default:
-            question += ' (default: {})'.format(default)
+            question += f' (default: {default})'
         question += end_marker
 
         # lock stream output
@@ -558,7 +558,7 @@ class UI(ABUIC):
         try:
             from pywikibot.userinterfaces import gui
         except ImportError as e:
-            pywikibot.warning('Could not load GUI modules: {}'.format(e))
+            pywikibot.warning(f'Could not load GUI modules: {e}')
             return text
         editor = gui.EditBoxWindow()
         return editor.edit(text, jumpIndex=jumpIndex, highlight=highlight)

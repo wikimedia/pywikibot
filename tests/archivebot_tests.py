@@ -312,12 +312,12 @@ class TestPageArchiverObject(TestCase):
         try:
             archivebot.PageArchiver(page, tmpl_with_ns, '')
         except Error as e:
-            self.fail('PageArchiver() raised {}!'.format(e))
+            self.fail(f'PageArchiver() raised {e}!')
 
         try:
             archivebot.PageArchiver(page, tmpl_without_ns, '')
         except Error as e:
-            self.fail('PageArchiver() raised {}!'.format(e))
+            self.fail(f'PageArchiver() raised {e}!')
 
     def testLoadConfigInOtherNamespace(self):
         """Test loading of config with TEMPLATE_PAGE not in Template ns.
@@ -339,7 +339,7 @@ class TestPageArchiverObject(TestCase):
         try:
             archivebot.PageArchiver(page, tmpl_with_ns, '')
         except Error as e:
-            self.fail('PageArchiver() raised {}!'.format(e))
+            self.fail(f'PageArchiver() raised {e}!')
 
         with self.assertRaises(archivebot.MissingConfigError):
             archivebot.PageArchiver(page, tmpl_without_ns, '')

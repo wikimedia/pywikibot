@@ -84,7 +84,7 @@ class TestTimerMixin(unittest.TestCase):
         self.test_completed = time.time()
         duration = self.test_completed - self.test_start
         if duration > self.test_duration_warning_interval:
-            unittest_print(' {:.3f}s'.format(duration), end=' ')
+            unittest_print(f' {duration:.3f}s', end=' ')
             sys.stdout.flush()
 
 
@@ -123,7 +123,7 @@ class TestCaseBase(TestTimerMixin):
 
         if first_len != second_len:
             msg = self._formatMessage(
-                msg, 'len({}) != {}'.format(safe_repr(seq), second_len))
+                msg, f'len({safe_repr(seq)}) != {second_len}')
             self.fail(msg)
 
     def assertPageInNamespaces(self, page, namespaces):
@@ -139,7 +139,7 @@ class TestCaseBase(TestTimerMixin):
             namespaces = {namespaces}
 
         self.assertIn(page.namespace(), namespaces,
-                      '{} not in namespace {!r}'.format(page, namespaces))
+                      f'{page} not in namespace {namespaces!r}')
 
     def _get_gen_pages(self, gen, count=None, site=None):
         """
@@ -326,7 +326,7 @@ class DisableSiteMixin(TestCaseBase):
         """Set up test."""
         self.old_Site_lookup_method = pywikibot.Site
         pywikibot.Site = lambda *args: self.fail(
-            '{}: Site() not permitted'.format(self.__class__.__name__))
+            f'{self.__class__.__name__}: Site() not permitted')
 
         super().setUp()
 
@@ -950,9 +950,9 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
     def has_site_user(cls, family, code):
         """Check the user config has a user for the site."""
         if not family:
-            raise Exception('no family defined for {}'.format(cls.__name__))
+            raise Exception(f'no family defined for {cls.__name__}')
         if not code:
-            raise Exception('no site code defined for {}'.format(cls.__name__))
+            raise Exception(f'no site code defined for {cls.__name__}')
 
         usernames = config.usernames
 
@@ -1396,9 +1396,9 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
     @classmethod
     def _build_message(cls, deprecated, instead):
         if deprecated is not None:
-            msg = '{} is deprecated'.format(deprecated)
+            msg = f'{deprecated} is deprecated'
             if instead:
-                msg += '; use {} instead.'.format(instead)
+                msg += f'; use {instead} instead.'
         elif instead is None:
             msg = None
         elif instead is True:
@@ -1552,5 +1552,5 @@ class HttpbinTestCase(TestCase):
         Otherwise, returns: httpbin.org
         """
         if hasattr(self, 'httpbin'):
-            return '{}:{}'.format(self.httpbin.host, self.httpbin.port)
+            return f'{self.httpbin.host}:{self.httpbin.port}'
         return 'httpbin.org'

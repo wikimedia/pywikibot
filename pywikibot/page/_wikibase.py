@@ -327,7 +327,7 @@ class WikibaseEntity:
         entity_id = self.getID()
         if entity_id == '-1':
             raise NoWikibaseEntityError(self)
-        return '{}{}'.format(self.repo.concept_base_uri, entity_id)
+        return f'{self.repo.concept_base_uri}{entity_id}'
 
 
 class MediaInfo(WikibaseEntity):
@@ -365,7 +365,7 @@ class MediaInfo(WikibaseEntity):
 
             page = result.pop()
             if page.namespace() != page.site.namespaces.FILE:
-                raise Error('Page with id "{}" is not a file'.format(page_id))
+                raise Error(f'Page with id "{page_id}" is not a file')
 
             self._file = FilePage(page)
 
@@ -962,7 +962,7 @@ class ItemPage(WikibasePage):
             item.
         """
         if not isinstance(site, DataSite):
-            raise TypeError('{} is not a data repository.'.format(site))
+            raise TypeError(f'{site} is not a data repository.')
 
         base_uri, _, qid = uri.rpartition('/')
         if base_uri != site.concept_base_uri.rstrip('/'):
@@ -1533,7 +1533,7 @@ class Claim(Property):
                     claim.type, lambda value, site: value)(value, site)
             else:
                 pywikibot.warning(
-                    '{} datatype is not supported yet.'.format(claim.type))
+                    f'{claim.type} datatype is not supported yet.')
                 claim.target = pywikibot.WbUnknown.fromWikibase(value)
         if 'rank' in data:  # References/Qualifiers don't have ranks
             claim.rank = data['rank']
@@ -1910,7 +1910,7 @@ class Claim(Property):
             value = self.getTarget().toWikibase()
         else:  # WbUnknown
             pywikibot.warning(
-                '{} datatype is not supported yet.'.format(self.type))
+                f'{self.type} datatype is not supported yet.')
             value = self.getTarget().toWikibase()
         return value
 

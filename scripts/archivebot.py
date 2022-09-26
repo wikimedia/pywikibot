@@ -214,7 +214,7 @@ def str2size(string: str) -> Size:
     """
     match = re.fullmatch(r'(\d{1,3}(?: \d{3})+|\d+) *([BkKMT]?)', string)
     if not match:
-        raise MalformedConfigError("Couldn't parse size: {}".format(string))
+        raise MalformedConfigError(f"Couldn't parse size: {string}")
     val, unit = (int(match.group(1).replace(' ', '')), match.group(2))
     if unit == 'M':
         val *= 1024
@@ -309,7 +309,7 @@ class DiscussionThread:
 
     def to_text(self) -> str:
         """Return wikitext discussion thread."""
-        return '== {} ==\n\n{}'.format(self.title, self.content)
+        return f'== {self.title} ==\n\n{self.content}'
 
 
 class DiscussionPage(pywikibot.Page):
@@ -526,7 +526,7 @@ class PageArchiver:
         elif attr == 'maxarchivesize':
             size, unit = str2size(value)
             if unit == 'B' and size > self.maxsize:
-                value = '{} K'.format(self.maxsize // 1024)
+                value = f'{self.maxsize // 1024} K'
                 warn('Siteinfo "maxarticlesize" exceeded. Decreasing '
                      '"maxarchivesize" to ' + value,
                      ResourceWarning, stacklevel=2)
@@ -541,7 +541,7 @@ class PageArchiver:
         """Return a template with archiver saveable attributes."""
         return '{{%s\n%s\n}}' \
                % (self.tpl.title(with_ns=(self.tpl.namespace() != 10)),
-                  '\n'.join('|{} = {}'.format(a, self.get_attr(a))
+                  '\n'.join(f'|{a} = {self.get_attr(a)}'
                             for a in self.saveables()))
 
     def key_ok(self) -> bool:
@@ -822,10 +822,10 @@ def process_page(page, *args: Any) -> bool:
        pass an unspecified number of arguments to the bot using ``*args``
     """
     if not page.exists():
-        pywikibot.info('{} does not exist, skipping...'.format(page))
+        pywikibot.info(f'{page} does not exist, skipping...')
         return True
 
-    pywikibot.info('\n\n>>> <<lightpurple>>{}<<default>> <<<'.format(page))
+    pywikibot.info(f'\n\n>>> <<lightpurple>>{page}<<default>> <<<')
     # Catching exceptions, so that errors in one page do not bail out
     # the entire process
     try:
@@ -910,7 +910,7 @@ def main(*args: str) -> None:
             pywikibot.output(
                 'NOTE: the specified page "{}" does not (yet) exist.'
                 .format(calc))
-        pywikibot.output('key = {}'.format(calc_md5_hexdigest(calc, salt)))
+        pywikibot.output(f'key = {calc_md5_hexdigest(calc, salt)}')
         return
 
     if not templates:

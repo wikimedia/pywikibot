@@ -157,7 +157,7 @@ class ParserFunctionCountBot(SingleSiteBot, ExistingPageBot):
             .format(result=result)
             for result in self.results.most_common(self.opt.first))
         pywikibot.output(resultlist)
-        pywikibot.output('{} templates were found.'.format(len(self.results)))
+        pywikibot.output(f'{len(self.results)} templates were found.')
 
         # File operations:
         if self.opt.save:

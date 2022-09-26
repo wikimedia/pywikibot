@@ -409,7 +409,7 @@ class WbTime(_WbRepresentation):
                 assert isinstance(precision, str)
                 self.precision = self.PRECISION[precision]
             else:
-                raise ValueError('Invalid precision: "{}"'.format(precision))
+                raise ValueError(f'Invalid precision: "{precision}"')
 
     @classmethod
     def fromTimestr(cls: Type['WbTime'],
@@ -443,7 +443,7 @@ class WbTime(_WbRepresentation):
         match = re.match(r'([-+]?\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)Z',
                          datetimestr)
         if not match:
-            raise ValueError("Invalid format: '{}'".format(datetimestr))
+            raise ValueError(f"Invalid format: '{datetimestr}'")
         t = match.groups()
         return cls(int(t[0]), int(t[1]), int(t[2]),
                    int(t[3]), int(t[4]), int(t[5]),
@@ -790,15 +790,15 @@ class _WbDataPage(_WbRepresentation):
 
         # validate page exists
         if not page.exists():
-            raise ValueError('Page {} must exist.'.format(page))
+            raise ValueError(f'Page {page} must exist.')
 
         # validate page is on the right site, and that site supports the type
         if not data_site:
             raise ValueError(
-                'The provided site does not support {}.'.format(label))
+                f'The provided site does not support {label}.')
         if page.site != data_site:
             raise ValueError(
-                'Page must be on the {} repository site.'.format(label))
+                f'Page must be on the {label} repository site.')
 
         # validate page title fulfills hard-coded Wikibase requirement
         # pcre regexp: '/^Data:[^\\[\\]#\\\:{|}]+\.map$/u' for geo-shape
@@ -1096,15 +1096,15 @@ def Site(code: Optional[str] = None,
         try:
             tmp = __import__('pywikibot.site', fromlist=[interface])
         except ImportError:
-            raise ValueError('Invalid interface name: {}'.format(interface))
+            raise ValueError(f'Invalid interface name: {interface}')
         else:
             interface = getattr(tmp, interface)
 
     if not issubclass(interface, BaseSite):
-        warning('Site called with interface={}'.format(interface.__name__))
+        warning(f'Site called with interface={interface.__name__}')
 
     user = normalize_username(user)
-    key = '{}:{}:{}:{}'.format(interface.__name__, fam, code, user)
+    key = f'{interface.__name__}:{fam}:{code}:{user}'
     if key not in _sites or not isinstance(_sites[key], interface):
         _sites[key] = interface(code=code, fam=fam, user=user)
         debug("Instantiated {} object '{}'"

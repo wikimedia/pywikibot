@@ -169,21 +169,21 @@ class DeletionRobot(CurrentPageBot):
             n_pages_in_ns = len(refs[ns])
             plural = '' if n_pages_in_ns == 1 else 's'
             ns_name = ns.canonical_prefix() if ns != ns.MAIN else 'Main:'
-            ns_id = '[{}]'.format(ns.id)
+            ns_id = f'[{ns.id}]'
             pywikibot.output(
                 '    {0!s:<{width}} {1:>6} {2:>10} page{pl}'.format(
                     ns_name, ns_id, n_pages_in_ns, width=width, pl=plural))
             if show_n_pages:  # do not show marker if 0 pages are requested.
                 for page in islice_with_ellipsis(refs[ns], show_n_pages):
-                    pywikibot.output('      {!s}'.format(page.title()))
+                    pywikibot.output(f'      {page.title()!s}')
 
     def skip_page(self, page) -> bool:
         """Skip the page under some conditions."""
         if self.opt.undelete and page.exists():
-            pywikibot.output('Skipping: {} already exists.'.format(page))
+            pywikibot.output(f'Skipping: {page} already exists.')
             return True
         if not self.opt.undelete and not page.exists():
-            pywikibot.output('Skipping: {} does not exist.'.format(page))
+            pywikibot.output(f'Skipping: {page} does not exist.')
             return True
         return super().skip_page(page)
 

@@ -52,8 +52,8 @@ subdirectory.
 # Distributed under the terms of the MIT license.
 #
 import datetime
-from contextlib import suppress
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import suppress
 
 import pywikibot
 from pywikibot import config
@@ -63,9 +63,9 @@ from pywikibot.login import OauthLoginManager
 
 
 def _get_consumer_token(site) -> Tuple[str, str]:
-    key_msg = 'OAuth consumer key on {}:{}'.format(site.code, site.family)
+    key_msg = f'OAuth consumer key on {site.code}:{site.family}'
     key = pywikibot.input(key_msg)
-    secret_msg = 'OAuth consumer secret for consumer {}'.format(key)
+    secret_msg = f'OAuth consumer secret for consumer {key}'
     secret = pywikibot.input(secret_msg, password=True)
     return key, secret
 
@@ -76,7 +76,7 @@ def _oauth_login(site) -> None:
     login_manager.login()
     identity = login_manager.identity
     if identity is None:
-        pywikibot.error('Invalid OAuth info for {site}.'.format(site=site))
+        pywikibot.error(f'Invalid OAuth info for {site}.')
     elif site.username() != identity['username']:
         pywikibot.error(
             'Logged in on {site} via OAuth as {wrong}, but expect as {right}'
@@ -117,11 +117,11 @@ def login_one_site(code, family, oauth, logout, autocreate):
 
     user = site.user()
     if user:
-        pywikibot.info('Logged in on {} as {}.'.format(site, user))
+        pywikibot.info(f'Logged in on {site} as {user}.')
     elif logout:
-        pywikibot.info('Logged out of {}.'.format(site))
+        pywikibot.info(f'Logged out of {site}.')
     else:
-        pywikibot.info('Not logged in on {}.'.format(site))
+        pywikibot.info(f'Not logged in on {site}.')
 
 
 def main(*args: str) -> None:

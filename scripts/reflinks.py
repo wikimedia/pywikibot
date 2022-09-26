@@ -227,7 +227,7 @@ class RefLink:
         else:
             if '%s' in tag:
                 tag %= self.link
-            dead_link = '<ref{}>{}</ref>'.format(self.name, tag)
+            dead_link = f'<ref{self.name}>{tag}</ref>'
         return dead_link
 
     def transform(self, ispdf: bool = False) -> None:
@@ -370,7 +370,7 @@ class DuplicateReferences:
 
         # Fix references
         for groupname, references in found_refs.items():
-            group = 'group="{}" '.format(groupname) if groupname else ''
+            group = f'group="{groupname}" ' if groupname else ''
 
             for ref, v in references.items():
                 if len(v[IX.reflist]) == 1 and not v[IX.change_needed]:
@@ -378,11 +378,11 @@ class DuplicateReferences:
 
                 name = v[IX.name]
                 if not name:
-                    name = '"{}{}"'.format(self.autogen, next(free_number))
+                    name = f'"{self.autogen}{next(free_number)}"'
                 elif v[IX.quoted]:
-                    name = '"{}"'.format(name)
+                    name = f'"{name}"'
 
-                named = '<ref {}name={}>{}</ref>'.format(group, name, ref)
+                named = f'<ref {group}name={name}>{ref}</ref>'
                 text = text.replace(v[IX.reflist][0], named, 1)
 
                 # make sure that the first (named ref) is not removed later
@@ -391,7 +391,7 @@ class DuplicateReferences:
                 end = text[pos:]
 
                 # replace multiple identical references with repeated ref
-                repeated_ref = '<ref {}name={} />'.format(group, name)
+                repeated_ref = f'<ref {group}name={name} />'
                 for ref in v[IX.reflist][1:]:
                     # Don't replace inside templates (T266411)
                     end = replaceExcept(end, re.escape(ref), repeated_ref,
@@ -403,12 +403,12 @@ class DuplicateReferences:
             # TODO : Support ref groups
             name = v[IX.name]
             if v[IX.reflist]:
-                name = '"{}"'.format(name)
+                name = f'"{name}"'
 
             text = re.sub(
                 r'<ref name\s*=\s*(?P<quote>["\']?)\s*{}\s*(?P=quote)\s*/>'
                 .format(ref),
-                '<ref name={} />'.format(name), text)
+                f'<ref name={name} />', text)
         return text
 
 
@@ -441,7 +441,7 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
                 code = alt
                 break
         if code:
-            manual += '/{}'.format(code)
+            manual += f'/{code}'
 
         if self.opt.summary:
             self.msg = self.opt.summary
@@ -450,7 +450,7 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
 
         local = i18n.translate(self.site, badtitles)
         if local:
-            bad = '({}|{})'.format(globalbadtitles, local)
+            bad = f'({globalbadtitles}|{local})'
         else:
             bad = globalbadtitles
 
@@ -618,7 +618,7 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
                     # purposely removed
                     if r.status_code == HTTPStatus.GONE \
                        or (r.status_code == HTTPStatus.NOT_FOUND
-                           and '\t{}\t'.format(ref.url) in self.dead_links):
+                           and f'\t{ref.url}\t' in self.dead_links):
                         repl = ref.refDead()
                         new_text = new_text.replace(match.group(), repl)
                     continue
@@ -690,7 +690,7 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
             if not ref.title:
                 repl = ref.refLink()
                 new_text = new_text.replace(match.group(), repl)
-                pywikibot.output('{} : No title found...'.format(ref.link))
+                pywikibot.output(f'{ref.link} : No title found...')
                 continue
 
             if self.titleBlackList.match(ref.title):

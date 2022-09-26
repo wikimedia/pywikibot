@@ -213,7 +213,7 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
             description += sourceImagePage.getFileVersionHistoryTable()
             # add interwiki link
             if sourceSite.family == self.opt.target.family:
-                description += '\n\n{}'.format(sourceImagePage)
+                description += f'\n\n{sourceImagePage}'
         except NoPageError:
             pywikibot.output(
                 'Image does not exist or description page is empty.')

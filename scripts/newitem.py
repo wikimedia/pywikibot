@@ -90,7 +90,7 @@ class NewItemRobot(WikidataBot):
             pywikibot.error('Page {} is locked.'.format(
                 page.title(as_link=True)))
         except PageSaveRelatedError as e:
-            pywikibot.error('Page {} not saved:\n{}'.format(page, e.args))
+            pywikibot.error(f'Page {page} not saved:\n{e.args}')
 
     def _callback(self, page, exc) -> None:
         if exc is None and self.opt.touch:

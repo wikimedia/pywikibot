@@ -34,13 +34,13 @@ class TestDjVuFile(TestCase):
     def test_repr_method(self):
         """Test __repr__() method."""
         djvu = DjVuFile(self.file_djvu)
-        expected = "pywikibot.tools.djvu.DjVuFile('{}')".format(self.file_djvu)
+        expected = f"pywikibot.tools.djvu.DjVuFile('{self.file_djvu}')"
         self.assertEqual(repr(djvu), expected)
 
     def test_str_method(self):
         """Test __str__() method."""
         djvu = DjVuFile(self.file_djvu)
-        expected = "DjVuFile('{}')".format(self.file_djvu)
+        expected = f"DjVuFile('{self.file_djvu}')"
         self.assertEqual(str(djvu), expected)
 
     def test_file_existence(self):

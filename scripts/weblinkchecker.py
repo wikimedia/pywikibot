@@ -370,9 +370,9 @@ class History:
     def log(self, url, error, containing_page, archive_url) -> None:
         """Log an error report to a text file in the deadlinks subdirectory."""
         if archive_url:
-            error_report = '* {} ([{} archive])\n'.format(url, archive_url)
+            error_report = f'* {url} ([{archive_url} archive])\n'
         else:
-            error_report = '* {}\n'.format(url)
+            error_report = f'* {url}\n'
         for (page_title, date, error) in self.history_dict[url]:
             # ISO 8601 formulation
             iso_date = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(date))

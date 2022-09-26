@@ -81,7 +81,7 @@ class Revision(Mapping):
 
     def __repr__(self) -> str:
         """String representation of Revision."""
-        return '{}({})'.format(self.__class__.__name__, self._data)
+        return f'{self.__class__.__name__}({self._data})'
 
     def __str__(self) -> str:
         """Printable representation of Revision data."""

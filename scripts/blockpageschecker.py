@@ -191,7 +191,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
             'Do you want to open the page?',
             [('with browser', 'b'), ('with gui', 'g'), ('no', 'n')], 'n')
         if choice == 'b':
-            webbrowser.open('{}?redirect=no'.format(page.full_url()))
+            webbrowser.open(f'{page.full_url()}?redirect=no')
         elif choice == 'g':
             editor = TextEditor()
             editor.edit(page.text)
@@ -210,7 +210,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
         page = self.current_page
         if page.isRedirectPage():
             if self.opt.always:
-                pywikibot.warning('{} is a redirect; skipping'.format(page))
+                pywikibot.warning(f'{page} is a redirect; skipping')
             elif self.opt.show:
                 self.invoke_editor(page)
             return
@@ -314,11 +314,11 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
 
                 replacement = '|'.join(ttp + tsp + (tu or ''))
                 text, changes = re.subn(
-                    '<noinclude>({})</noinclude>'.format(replacement),
+                    f'<noinclude>({replacement})</noinclude>',
                     '', text)
                 if not changes:
                     text, changes = re.subn(
-                        '({})'.format(replacement), '', text)
+                        f'({replacement})', '', text)
                 msg = 'The page is editable for all'
                 if not self.opt.move:
                     msg += ', deleting the template..'
@@ -385,11 +385,11 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                     # Deleting the template because the page doesn't need it.
                     replacement = '|'.join(tsmp + ttmp + (tu or ''))
                     text, changes = re.subn(
-                        '<noinclude>({})</noinclude>'.format(replacement),
+                        f'<noinclude>({replacement})</noinclude>',
                         '', text)
                     if not changes:
                         text, changes = re.subn(
-                            '({})'.format(replacement), '', text)
+                            f'({replacement})', '', text)
                     msg_type = 'deleting'
                 elif move_restriction[0] == 'sysop':
                     # move-total-protection

@@ -147,7 +147,7 @@ class CoordImportRobot(ConfigParserBot, WikidataBot):
         try:
             item.addClaim(newclaim)
         except CoordinateGlobeUnknownError as e:
-            pywikibot.output('Skipping unsupported globe: {}'.format(e.args))
+            pywikibot.output(f'Skipping unsupported globe: {e.args}')
             return False
         else:
             return True

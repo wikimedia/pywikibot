@@ -87,12 +87,12 @@ def color_format(text: str, *args, **kwargs) -> str:
     colors = set(terminal_interface_base.colors)
     # Dot.product of colors to create all possible combinations of foreground
     # and background colors.
-    colors |= {'{};{}'.format(c1, c2) for c1 in colors for c2 in colors}
+    colors |= {f'{c1};{c2}' for c1 in colors for c2 in colors}
     col_pat = '|'.join(colors)
-    text = re.sub('(?:\03)?{{({})}}'.format(col_pat), r'<<\1>>', text)
+    text = re.sub(f'(?:\03)?{{({col_pat})}}', r'<<\1>>', text)
     replace_color = kwargs.get('color')
     if replace_color in colors:
-        text = text.replace('{color}', '<<{}>>'.format(replace_color))
+        text = text.replace('{color}', f'<<{replace_color}>>')
     if '\03' in text:
         raise ValueError('\\03 pattern found in color format')
     intersect = colors.intersection(kwargs)  # kwargs use colors

@@ -415,7 +415,7 @@ class TestFullyQualifiedLinkDifferentFamilyParser(LinkTestCase):
             # switch code:family sequence en:wikipedia or wikipedia:en
             for first, second in [(family, code), (code, family)]:
                 with self.subTest(colon=colon,
-                                  site='{}:{}'.format(first, second)):
+                                  site=f'{first}:{second}'):
                     link_title = self.PATTERN.format(colon=colon,
                                                      first=first,
                                                      second=second,
@@ -433,7 +433,7 @@ class TestFullyQualifiedLinkDifferentFamilyParser(LinkTestCase):
             # switch code:family sequence en:wikipedia or wikipedia:en
             for first, second in [(family, code), (code, family)]:
                 with self.subTest(colon=colon,
-                                  site='{}:{}'.format(first, second)):
+                                  site=f'{first}:{second}'):
                     link_title = self.PATTERN.format(colon=colon,
                                                      first=first,
                                                      second=second,

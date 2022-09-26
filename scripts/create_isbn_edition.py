@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Pywikibot script to load ISBN related data into Wikidata.
+r"""Pywikibot script to load ISBN related data into Wikidata.
 
 Pywikibot script to get ISBN data from a digital library,
 and create or amend the related Wikidata item for edition
@@ -255,15 +255,16 @@ Applications:
 #
 # Distributed under the terms of the MIT license.
 #
-import os               # Operating system
-import re               # Regular expressions (very handy!)
+import os  # Operating system
+import re  # Regular expressions (very handy!)
 from itertools import islice
 
-import pywikibot        # API interface to Wikidata
+import pywikibot  # API interface to Wikidata
 from pywikibot import pagegenerators as pg  # Wikidata Query interface
 from pywikibot.backports import List
 from pywikibot.config import verbose_output as verbose
 from pywikibot.data import api
+
 
 try:
     import isbnlib
@@ -394,7 +395,7 @@ def amend_isbn_edition(isbn_number: str):  # noqa: C901
     if verbose:
         pywikibot.info()
         for i in isbn_data:
-            pywikibot.info('{}:\t{}'.format(i, isbn_data[i]))
+            pywikibot.info(f'{i}:\t{isbn_data[i]}')
 
     # Get the book language from the ISBN book reference
     booklang = mainlang         # Default language
@@ -458,7 +459,7 @@ SELECT ?item WHERE {{
     rescnt = 0
     for rescnt, item in enumerate(generator, start=1):
         qnumber = item.getID()
-        pywikibot.warning('Found item: {}'.format(qnumber))
+        pywikibot.warning(f'Found item: {qnumber}')
 
     # Create or amend the item
     if rescnt == 1:
@@ -468,9 +469,9 @@ SELECT ?item WHERE {{
         item = pywikibot.ItemPage(repo)     # Create item
         item.editEntity({'labels': label}, summary=transcmt)
         qnumber = item.getID()
-        pywikibot.warning('Creating item: {}'.format(qnumber))
+        pywikibot.warning(f'Creating item: {qnumber}')
     else:
-        pywikibot.critical('Ambiguous ISBN number {}'.format(isbn_fmtd))
+        pywikibot.critical(f'Ambiguous ISBN number {isbn_fmtd}')
         return
 
     # Add all P/Q values
@@ -491,7 +492,7 @@ SELECT ?item WHERE {{
                                           targetx[propty].labels[booklang],
                                           target[propty]))
             except:  # noqa: B001, E722, H201
-                pywikibot.warning('Add {}:{}'.format(propty, target[propty]))
+                pywikibot.warning(f'Add {propty}:{target[propty]}')
 
             claim = pywikibot.Claim(repo, propty)
             claim.setTarget(targetx[propty])
@@ -499,14 +500,14 @@ SELECT ?item WHERE {{
 
     # Set formatted ISBN number
     if 'P212' not in item.claims:
-        pywikibot.warning('Add ISBN number (P212): {}'.format(isbn_fmtd))
+        pywikibot.warning(f'Add ISBN number (P212): {isbn_fmtd}')
         claim = pywikibot.Claim(repo, 'P212')
         claim.setTarget(isbn_fmtd)
         item.addClaim(claim, bot=True, summary=transcmt)
 
     # Title
     if 'P1476' not in item.claims:
-        pywikibot.warning('Add Title (P1476): {}'.format(objectname))
+        pywikibot.warning(f'Add Title (P1476): {objectname}')
         claim = pywikibot.Claim(repo, 'P1476')
         claim.setTarget(pywikibot.WbMonolingualText(text=objectname,
                                                     language=booklang))
@@ -514,7 +515,7 @@ SELECT ?item WHERE {{
 
     # Subtitle
     if subtitle and 'P1680' not in item.claims:
-        pywikibot.warning('Add Subtitle (P1680): {}'.format(subtitle))
+        pywikibot.warning(f'Add Subtitle (P1680): {subtitle}')
         claim = pywikibot.Claim(repo, 'P1680')
         claim.setTarget(pywikibot.WbMonolingualText(text=subtitle,
                                                     language=booklang))
@@ -557,9 +558,9 @@ SELECT ?item WHERE {{
                     qualifier.setTarget(str(author_cnt))
                     claim.addQualifier(qualifier, summary=transcmt)
             elif not author_list:
-                pywikibot.warning('Unknown author: {}'.format(author_name))
+                pywikibot.warning(f'Unknown author: {author_name}')
             else:
-                pywikibot.warning('Ambiguous author: {}'.format(author_name))
+                pywikibot.warning(f'Ambiguous author: {author_name}')
 
     # Get the publisher
     publisher_name = isbn_data['Publisher'].strip()
@@ -593,13 +594,13 @@ SELECT ?item WHERE {{
 
     # Book cover images
     for i in isbn_cover:
-        pywikibot.info('{}:\t{}'.format(i, isbn_cover[i]))
+        pywikibot.info(f'{i}:\t{isbn_cover[i]}')
 
     # Handle ISBN classification
     isbn_classify = isbnlib.classify(isbn_number)
 
     for i in isbn_classify:
-        pywikibot.debug('{}:\t{}'.format(i, isbn_classify[i]))
+        pywikibot.debug(f'{i}:\t{isbn_classify[i]}')
 
     # ./create_isbn_edition.py '978-3-8376-5645-9' - de P407 Q188
     # Q113460204

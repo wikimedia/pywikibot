@@ -94,7 +94,7 @@ class TestSharedFiles(TestCase):
         self.assertFalse(commons_file.file_is_shared())
 
         page_doesnt_exist_exc_regex = re.escape(
-            "Page [[commons:{}]] doesn't exist.".format(title))
+            f"Page [[commons:{title}]] doesn't exist.")
 
         with self.assertRaisesRegex(
                 NoPageError,

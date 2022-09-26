@@ -37,7 +37,7 @@ def replace_invisible(text):
             codepoint = (ord(match[0]) & mask) << 10 | (ord(match[1]) & mask)
         else:
             codepoint = ord(match)
-        return '<{:x}>'.format(codepoint)
+        return f'<{codepoint:x}>'
 
     return INVISIBLE_REGEX.sub(replace, text)
 
@@ -53,7 +53,7 @@ def string_to_ascii_html(string: str) -> str:
         if 31 < cord < 127:
             html.append(c)
         else:
-            html.append('&#{};'.format(cord))
+            html.append(f'&#{cord};')
     return ''.join(html)
 
 

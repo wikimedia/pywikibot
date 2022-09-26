@@ -229,10 +229,10 @@ def process_entries(cache_path, func, use_accesstime=None, output_func=None,
     """
     if not cache_path:
         cache_path = os.path.join(pywikibot.config.base_dir,
-                                  'apicache-py{:d}'.format(PYTHON_VERSION[0]))
+                                  f'apicache-py{PYTHON_VERSION[0]:d}')
 
     if not os.path.exists(cache_path):
-        pywikibot.error('{}: no such file or directory'.format(cache_path))
+        pywikibot.error(f'{cache_path}: no such file or directory')
         return
 
     if os.path.isdir(cache_path):
@@ -320,7 +320,7 @@ def _parse_command(command, name):
     except Exception as e:
         pywikibot.error(e)
         pywikibot.error(
-            'Cannot compile {} command: {}'.format(name, command))
+            f'Cannot compile {name} command: {command}')
         return None
 
 
@@ -469,7 +469,7 @@ def main():
 
     for cache_path in cache_paths:
         if len(cache_paths) > 1:
-            pywikibot.output('Processing {}'.format(cache_path))
+            pywikibot.output(f'Processing {cache_path}')
         process_entries(cache_path, filter_func, output_func=output_func,
                         action_func=action_func)
 

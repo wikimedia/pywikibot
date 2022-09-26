@@ -48,7 +48,7 @@ class DownloadDumpBot(Bot, ConfigParserBot):
     @staticmethod
     def get_dump_name(db_name, typ, dumpdate):
         """Check if dump file exists locally in a Toolforge server."""
-        db_path = '/public/dumps/public/{}/'.format(db_name)
+        db_path = f'/public/dumps/public/{db_name}/'
         if os.path.isdir(db_path):
             dump_filepath_template = (
                 '/public/dumps/public/{db_name}/{date}/{db_name}-{date}-{typ}')

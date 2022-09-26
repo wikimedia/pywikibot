@@ -175,7 +175,7 @@ class EventStreams(GeneratorWrapper):
         if kwargs['timeout'] == config.socket_timeout:
             kwargs.pop('timeout')
         return '{}({})'.format(self.__class__.__name__, ', '.join(
-            '{}={!r}'.format(k, v) for k, v in kwargs.items()))
+            f'{k}={v!r}' for k, v in kwargs.items()))
 
     @property
     @cached
@@ -191,7 +191,7 @@ class EventStreams(GeneratorWrapper):
             host=self._site.eventstreams_host(),
             path=self._site.eventstreams_path(),
             streams=self._streams,
-            since='?since={}'.format(self._since) if self._since else '')
+            since=f'?since={self._since}' if self._since else '')
 
     def set_maximum_items(self, value: int) -> None:
         """
@@ -282,7 +282,7 @@ class EventStreams(GeneratorWrapper):
             if callable(func):
                 self.filter[ftype].append(func)
             else:
-                raise TypeError('{} is not a callable'.format(func))
+                raise TypeError(f'{func} is not a callable')
 
         # register pairs of keys and items as a filter function
         for key, value in kwargs.items():
@@ -357,9 +357,9 @@ class EventStreams(GeneratorWrapper):
                 else:
                     ignore_first_empty_warning = False
             elif event.event == 'error':
-                warning('Encountered error: {}'.format(event.data))
+                warning(f'Encountered error: {event.data}')
             else:
-                warning('Unknown event {} occurred.'.format(event.event))
+                warning(f'Unknown event {event.event} occurred.')
 
         debug('{}: Stopped iterating due to exceeding item limit.'
               .format(self.__class__.__name__))

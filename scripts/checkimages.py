@@ -84,7 +84,6 @@ Todo
 import collections
 import re
 import time
-
 from itertools import zip_longest
 from typing import Generator
 
@@ -483,7 +482,7 @@ class LogIsFull(Error):
 def print_with_time_zone(message) -> None:
     """Print the messages followed by the TimeZone encoded correctly."""
     time_zone = time.strftime('%d %b %Y %H:%M:%S (UTC)', time.gmtime())
-    pywikibot.output('{} {}'.format(message.rstrip(), time_zone))
+    pywikibot.output(f'{message.rstrip()} {time_zone}')
 
 
 class CheckImagesBot:
@@ -512,7 +511,7 @@ class CheckImagesBot:
                 'No report page provided in "REPORT_PAGE" dict '
                 'for your project!')
         self.image_namespace = site.namespaces.FILE.custom_name + ':'
-        self.list_entry = '\n* [[:{}%s]] '.format(self.image_namespace)
+        self.list_entry = f'\n* [[:{self.image_namespace}%s]] '
 
         # The summary of the report
         self.com = i18n.twtranslate(self.site, 'checkimages-log-comment')
@@ -716,7 +715,7 @@ class CheckImagesBot:
             commentox = commento2
 
         if second_text:
-            new_text = '{}\n\n{}'.format(testoattuale, self.notification2)
+            new_text = f'{testoattuale}\n\n{self.notification2}'
         else:
             new_text = '{}\n\n== {} ==\n{}'.format(testoattuale, self.head,
                                                    self.notification)
@@ -764,7 +763,7 @@ class CheckImagesBot:
     def regex_generator(self, regexp, textrun) -> Generator[pywikibot.FilePage,
                                                             None, None]:
         """Find page to yield using regex to parse text."""
-        regex = re.compile(r'{}'.format(regexp), re.DOTALL)
+        regex = re.compile(fr'{regexp}', re.DOTALL)
         results = regex.findall(textrun)
         for image in results:
             yield pywikibot.FilePage(self.site, image)
@@ -775,7 +774,7 @@ class CheckImagesBot:
         # whitelist template...
         for key in Family.load('wikipedia').langs.keys():
             self.hiddentemplates.add(pywikibot.Page(
-                self.site, 'Template:{}'.format(key)))
+                self.site, f'Template:{key}'))
         # Hidden template loading
         if self.page_hidden:
             try:
@@ -979,7 +978,7 @@ class CheckImagesBot:
                     # Delete the image in the list where we're write on
                     image = self.image_namespace + image_to_tag
                     text_for_the_report = re.sub(
-                        r'\n\*\[\[:{}\]\]'.format(re.escape(image)),
+                        fr'\n\*\[\[:{re.escape(image)}\]\]',
                         '', text_for_the_report)
                     self.report(text_for_the_report, image_to_tag,
                                 comm_image=dup_comment_image, unver=True)
@@ -1345,7 +1344,7 @@ class CheckImagesBot:
                     {'num': skip_number}))
         # If we still have pages to skip:
         if len(self.skip_list) < skip_number:
-            pywikibot.output('Skipping {}...'.format(self.image_name))
+            pywikibot.output(f'Skipping {self.image_name}...')
             self.skip_list.append(self.image_name)
             if skip_number == 1:
                 pywikibot.output()
@@ -1429,7 +1428,7 @@ class CheckImagesBot:
             mex_catched = tupla[8]
             for k in find_list:
                 if find_tipe.lower() == 'findonly':
-                    search_results = re.findall(r'{}'.format(k.lower()),
+                    search_results = re.findall(fr'{k.lower()}',
                                                 self.image_check_text.lower())
                     if search_results \
                        and search_results[0] == self.image_check_text.lower():
@@ -1442,7 +1441,7 @@ class CheckImagesBot:
                         self.mex_used = mex_catched
                         break
                 elif find_tipe.lower() == 'find' \
-                    and re.findall(r'{}'.format(k.lower()),
+                    and re.findall(fr'{k.lower()}',
                                    self.image_check_text.lower()):
                     self.some_problem = True
                     self.text_used = text
@@ -1535,7 +1534,7 @@ class CheckImagesBot:
             return
 
         if delete:
-            pywikibot.output('{} is not a file!'.format(self.image_name))
+            pywikibot.output(f'{self.image_name} is not a file!')
             if not di:
                 pywikibot.output('No localized message given for '
                                  "'DELETE_IMMEDIATELY'. Skipping.")
@@ -1717,7 +1716,7 @@ def main(*args: str) -> bool:
             try:
                 text_regex = page.get()
             except NoPageError:
-                pywikibot.output("{} doesn't exist!".format(page.title()))
+                pywikibot.output(f"{page.title()} doesn't exist!")
                 text_regex = ''  # No source, so the bot will quit later.
         # If generator is the regex' one, use your own Generator using an url
         # or page and a regex.
@@ -1747,7 +1746,7 @@ def main(*args: str) -> bool:
             bot.check_step()
 
         if repeat:
-            pywikibot.output('Waiting for {} seconds,'.format(time_sleep))
+            pywikibot.output(f'Waiting for {time_sleep} seconds,')
             pywikibot.sleep(time_sleep)
         else:
             break
@@ -1765,4 +1764,4 @@ if __name__ == '__main__':
         if ret is not False:
             final = time.time()
             delta = int(final - start)
-            pywikibot.output('Execution time: {} seconds\n'.format(delta))
+            pywikibot.output(f'Execution time: {delta} seconds\n')

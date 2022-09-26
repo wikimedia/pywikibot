@@ -82,7 +82,7 @@ def flush() -> None:  # pragma: no cover
     session.close()
 
     if hasattr(sys, 'last_type'):
-        critical('Exiting due to uncaught exception {}'.format(sys.last_type))
+        critical(f'Exiting due to uncaught exception {sys.last_type}')
 
     log('Network session closed.')
 
@@ -295,7 +295,7 @@ def error_handling_callback(response):
     # HTTP status 207 is also a success status for Webdav FINDPROP,
     # used by the version module.
     if response.status_code not in (HTTPStatus.OK, HTTPStatus.MULTI_STATUS):
-        warning('Http response status {}'.format(response.status_code))
+        warning(f'Http response status {response.status_code}')
 
 
 def fetch(uri: str, method: str = 'GET', headers: Optional[dict] = None,
@@ -465,7 +465,7 @@ def _decide_encoding(response, charset) -> Optional[str]:
             pywikibot.warning('Unknown or invalid encoding {!r}'
                               .format(encoding))
         except UnicodeDecodeError as e:
-            pywikibot.warning('{} found in {}'.format(e, content))
+            pywikibot.warning(f'{e} found in {content}')
         else:
             return encoding
 

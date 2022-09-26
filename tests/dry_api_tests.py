@@ -81,7 +81,7 @@ class DryCachedRequestTests(SiteAttributeTestCase):
         self.assertFalse(self.req._expired(now))
         self.assertTrue(
             self.req._expired(now - datetime.timedelta(days=2)),
-            msg='\nreq.expiry: {}, now: {}'.format(self.req.expiry, now))
+            msg=f'\nreq.expiry: {self.req.expiry}, now: {now}')
 
     def test_parameter_types(self):
         """Test _uniquedescriptionstr is identical using different ways."""
@@ -185,7 +185,7 @@ class MockCachedRequestKeyTests(TestCase):
                 return 'MockSite()'
 
             def __getattr__(self, attr):
-                raise Exception('Attribute {!r} not defined'.format(attr))
+                raise Exception(f'Attribute {attr!r} not defined')
 
         self.mocksite = MockSite()
         super().setUp()

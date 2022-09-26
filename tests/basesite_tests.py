@@ -87,7 +87,7 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertIsInstance(mysite.lang, str)
         self.assertEqual(mysite, pywikibot.Site(self.code, self.family))
         self.assertIsInstance(mysite.user(), (str, type(None)))
-        self.assertEqual(mysite.sitename, '{}:{}'.format(self.family, code))
+        self.assertEqual(mysite.sitename, f'{self.family}:{code}')
         self.assertIsInstance(mysite.linktrail(), str)
         self.assertIsInstance(mysite.redirect(), str)
 

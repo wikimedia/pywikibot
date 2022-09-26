@@ -47,27 +47,27 @@ class TextEditor:
         if config.editor.startswith('kate'):
             command = ['-l', str(line + 1), '-c', str(column + 1)]
         elif config.editor.startswith(('gedit', 'emacs')):
-            command = ['+{}'.format(line + 1)]  # columns seem unsupported
+            command = [f'+{line + 1}']  # columns seem unsupported
         elif config.editor.startswith('jedit'):
-            command = ['+line:{}'.format(line + 1)]  # columns seem unsupported
+            command = [f'+line:{line + 1}']  # columns seem unsupported
         elif config.editor.startswith('vim'):
-            command = ['+{}'.format(line + 1)]  # columns seem unsupported
+            command = [f'+{line + 1}']  # columns seem unsupported
         elif config.editor.startswith('nano'):
-            command = ['+{},{}'.format(line + 1, column + 1)]
+            command = [f'+{line + 1},{column + 1}']
         # Windows editors
         elif config.editor.lower().endswith('notepad++.exe'):
-            command = ['-n{}'.format(line + 1)]  # seems not to support columns
+            command = [f'-n{line + 1}']  # seems not to support columns
         else:
             command = []
 
         # See T102465 for problems relating to using config.editor unparsed.
         command = [config.editor] + command + [file_name]
-        pywikibot.log('Running editor: {}'.format(TextEditor._concat(command)))
+        pywikibot.log(f'Running editor: {TextEditor._concat(command)}')
         return command
 
     @staticmethod
     def _concat(command: Sequence[str]) -> str:
-        return ' '.join('{!r}'.format(part) if ' ' in part else part
+        return ' '.join(f'{part!r}' if ' ' in part else part
                         for part in command)
 
     def edit(self, text: str, jumpIndex: Optional[int] = None,

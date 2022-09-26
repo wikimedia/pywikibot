@@ -70,7 +70,7 @@ import re
 
 import pywikibot
 from pywikibot import config, i18n
-from pywikibot.backports import Tuple, Iterator
+from pywikibot.backports import Iterator, Tuple
 from pywikibot.bot import CurrentPageBot, OptionHandler, SingleSiteBot
 from pywikibot.pagegenerators import PreloadingGenerator
 from pywikibot.tools.collections import GeneratorWrapper
@@ -207,7 +207,7 @@ class PageFromFileReader(OptionHandler, GeneratorWrapper):
         .. versionchanged:: 7.6
            changed from iterator method to generator property
         """
-        pywikibot.output("\n\nReading '{}'...".format(self.filename))
+        pywikibot.output(f"\n\nReading '{self.filename}'...")
         try:
             with codecs.open(self.filename, 'r',
                              encoding=config.textfile_encoding) as f:
@@ -301,7 +301,7 @@ def main(*args: str) -> None:
         elif option in ('nocontent', 'summary'):
             options[option] = value
         else:
-            pywikibot.output('Disregarding unknown argument {}.'.format(arg))
+            pywikibot.output(f'Disregarding unknown argument {arg}.')
 
     options['always'] = 'showdiff' not in options
 
@@ -309,7 +309,7 @@ def main(*args: str) -> None:
     # User can quit.
     failed_filename = False
     while not os.path.isfile(filename):
-        pywikibot.output("\nFile '{}' does not exist. ".format(filename))
+        pywikibot.output(f"\nFile '{filename}' does not exist. ")
         _input = pywikibot.input(
             'Please enter the file name [q to quit]:')
         if _input == 'q':

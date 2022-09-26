@@ -96,9 +96,9 @@ class TestChoiceOptions(TestCase):
         self.assertFalse(option.test('r6'))
         self.assertIsNone(option.handled('r6'))
         for i in range(1, 6):
-            self.assertTrue(option.test('r{}'.format(i)))
-            self.assertEqual(option.handled('r{}'.format(i)), option)
-            self.assertEqual(option.result('r{}'.format(i)), ('r', i))
+            self.assertTrue(option.test(f'r{i}'))
+            self.assertEqual(option.handled(f'r{i}'), option)
+            self.assertEqual(option.result(f'r{i}'), ('r', i))
 
     def test_List(self):
         """Test ListOption."""
@@ -132,12 +132,12 @@ class TestChoiceOptions(TestCase):
         for prefix in ('', 'r', 'st'):
             option = bot.ListOption(options, prefix=prefix)
             self.assertEqual(message('?', [option]),
-                             '? ({}<number> [1-3])'.format(prefix))
+                             f'? ({prefix}<number> [1-3])')
             for i, elem in enumerate(options, 1):
-                self.assertTrue(option.test('{}{}'.format(prefix, i)))
+                self.assertTrue(option.test(f'{prefix}{i}'))
                 self.assertIs(option.handled('{}{}'
                                              .format(prefix, i)), option)
-                self.assertEqual(option.result('{}{}'.format(prefix, i)),
+                self.assertEqual(option.result(f'{prefix}{i}'),
                                  (prefix, elem))
             self.assertFalse(option.test('{}{}'
                                          .format(prefix, len(options) + 1)))

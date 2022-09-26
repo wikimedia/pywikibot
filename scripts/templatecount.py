@@ -97,7 +97,7 @@ class TemplateCountRobot:
             for page in template_dict[key]:
                 pywikibot.stdout(page.title())
                 total += 1
-        pywikibot.output('Total page count: {}'.format(total))
+        pywikibot.output(f'Total page count: {total}')
         pywikibot.stdout('Report generated on {}'
                          .format(datetime.datetime.utcnow().isoformat()))
 

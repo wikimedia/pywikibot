@@ -64,7 +64,7 @@ class BaseDataDict(MutableMapping):
         return key in self._data
 
     def __repr__(self) -> str:
-        return '{}({})'.format(type(self), self._data)
+        return f'{type(self)}({self._data})'
 
     @staticmethod
     def normalizeKey(key) -> str:
@@ -239,7 +239,7 @@ class ClaimCollection(MutableMapping):
         return key in self._data
 
     def __repr__(self) -> str:
-        return '{}({})'.format(type(self), self._data)
+        return f'{type(self)}({self._data})'
 
     @classmethod
     def normalizeData(cls, data) -> dict:

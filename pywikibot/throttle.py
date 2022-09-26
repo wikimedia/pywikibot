@@ -147,7 +147,7 @@ class Throttle:
         """
         global pid
         mysite = self.mysite
-        pywikibot.debug('Checking multiplicity: pid = {pid}'.format(pid=pid))
+        pywikibot.debug(f'Checking multiplicity: pid = {pid}')
         with self.lock:
             processes = []
             used_pids = set()

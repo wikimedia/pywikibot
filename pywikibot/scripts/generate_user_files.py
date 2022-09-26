@@ -70,7 +70,7 @@ def change_base_dir():
             try:
                 os.mkdir(new_base, pywikibot.config.private_files_permission)
             except Exception as e:
-                pywikibot.error('directory creation failed: {}'.format(e))
+                pywikibot.error(f'directory creation failed: {e}')
                 continue
             pywikibot.output('Created new directory.')
         break
@@ -142,7 +142,7 @@ def get_site_and_lang(
                          .format(fam.name))
         default_lang = None
     elif len(known_langs) == 1:
-        pywikibot.output('The only known site code: {}'.format(known_langs[0]))
+        pywikibot.output(f'The only known site code: {known_langs[0]}')
         default_lang = known_langs[0]
     else:
         pywikibot.output('This is the list of known site oodes:')
@@ -164,7 +164,7 @@ def get_site_and_lang(
                default=False, automatic_quit=False):
             mycode = None
 
-    message = 'Username on {}:{}'.format(mycode, fam.name)
+    message = f'Username on {mycode}:{fam.name}'
     username = pywikibot.input(message, default=default_username, force=force)
     # Escape ''s
     if username:
@@ -305,7 +305,7 @@ def create_user_config(
             if msg:
                 pywikibot.output(msg)
             msg = None
-            message = 'BotPassword\'s "bot name" for {}'.format(username)
+            message = f'BotPassword\'s "bot name" for {username}'
             botpasswordname = pywikibot.input(message, force=force)
             message = 'BotPassword\'s "password" for "{}" ' \
                       '(no characters will be shown)' \
@@ -344,10 +344,10 @@ def create_user_config(
                 main_code=main_code,
                 usernames=usernames,
                 config_text=config_text,
-                botpasswords='password_file = ' + ('"{}"'.format(PASS_BASENAME)
+                botpasswords='password_file = ' + (f'"{PASS_BASENAME}"'
                                                    if botpasswords
                                                    else 'None')))
-        pywikibot.output("'{}' written.".format(_fnc))
+        pywikibot.output(f"'{_fnc}' written.")
     except BaseException:
         if os.path.exists(_fnc):
             os.remove(_fnc)
@@ -372,7 +372,7 @@ def save_botpasswords(botpasswords, _fncpass):
             with codecs.open(_fncpass, 'w', 'utf-8') as f:
                 f.write(PASSFILE_CONFIG.format(botpasswords=botpasswords))
                 file_mode_checker(_fncpass, mode=0o600)
-                pywikibot.output("'{}' written.".format(_fncpass))
+                pywikibot.output(f"'{_fncpass}' written.")
         except OSError:
             os.remove(_fncpass)
             raise
@@ -391,7 +391,7 @@ def ask_for_dir_change(force) -> Tuple[bool, bool]:
     """
     global base_dir
 
-    pywikibot.output('\nYour default user directory is "{}"'.format(base_dir))
+    pywikibot.output(f'\nYour default user directory is "{base_dir}"')
     while True:
         # Show whether file exists
         userfile = file_exists(os.path.join(base_dir, USER_BASENAME))

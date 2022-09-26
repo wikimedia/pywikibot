@@ -504,12 +504,12 @@ class CategoryAddBot(CategoryPreprocess):
         else:
             if self.sort:
                 catpl = self.sorted_by_last_name(catpl, self.current_page)
-            pywikibot.output('Adding {}'.format(catpl.title(as_link=True)))
+            pywikibot.output(f'Adding {catpl.title(as_link=True)}')
             if page.namespace() == page.site.namespaces.TEMPLATE:
                 tagname = 'noinclude'
                 if self.includeonly == ['includeonly']:
                     tagname = 'includeonly'
-                tagnameregexp = re.compile(r'(.*)(<\/{}>)'.format(tagname),
+                tagnameregexp = re.compile(fr'(.*)(<\/{tagname}>)',
                                            re.I | re.DOTALL)
                 categorytitle = catpl.title(
                     as_link=True, allow_interwiki=False)
@@ -519,7 +519,7 @@ class CategoryAddBot(CategoryPreprocess):
                     # in the template page
                     text = textlib.replaceExcept(
                         text, tagnameregexp,
-                        r'\1{}\n\2'.format(categorytitle),
+                        fr'\1{categorytitle}\n\2',
                         ['comment', 'math', 'nowiki', 'pre',
                          'syntaxhighlight'],
                         site=self.current_page.site)
@@ -1131,7 +1131,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
         try:
             full_text = member.get()
         except NoPageError:
-            pywikibot.output('Page {} not found.'.format(member.title()))
+            pywikibot.output(f'Page {member.title()} not found.')
             return
 
         # skip initial templates, images and comments for articles.
@@ -1194,7 +1194,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
             .format(member.title()), options, default='c')
 
         if choice == 'c':
-            pywikibot.output('Saving page to {}'.format(current_cat.title()))
+            pywikibot.output(f'Saving page to {current_cat.title()}')
             if current_cat == original_cat:
                 pywikibot.output('No changes necessary.')
             else:
@@ -1418,7 +1418,7 @@ class CleanBot(Bot):
                              .format(child.title(with_ns=False)))
 
             for grandchild in overcategorized:
-                pywikibot.output('\t{}'.format(grandchild.title()))
+                pywikibot.output(f'\t{grandchild.title()}')
 
         for grandchild in overcategorized:
             msg = ('Remove "<<lightpurple>>{}<<default>>" from "{}" because '

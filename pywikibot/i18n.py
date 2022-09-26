@@ -420,7 +420,7 @@ def _get_bundle(lang: str, dirname: str) -> Dict[str, str]:
 
     .. versionadded:: 7.0
     """
-    filename = '{}/{}.json'.format(dirname, lang)
+    filename = f'{dirname}/{lang}.json'
     try:
         data = pkgutil.get_data(_messages_package_name, filename)
         assert data is not None
@@ -495,7 +495,7 @@ def _extract_plural(lang: str, message: str, parameters: Mapping[str, int]
         return plural_entries[index]
 
     assert isinstance(parameters, Mapping), \
-        'parameters is not Mapping but {}'.format(type(parameters))
+        f'parameters is not Mapping but {type(parameters)}'
 
     rule = plural_rule(lang)
 
@@ -750,7 +750,7 @@ def twtranslate(source: STR_OR_SITE_TYPE,
             'No {} translation has been defined for TranslateWiki key "{}". '
             'It can happen due to lack of i18n submodule or files or an '
             'outdated submodule. See {}/i18n'
-            .format('English' if 'en' in langs else "'{}'".format(lang),
+            .format('English' if 'en' in langs else f"'{lang}'",
                     twtitle, __url__)))
 
     if '{{PLURAL:' in trans:

@@ -87,7 +87,7 @@ class TestSiteObject(DefaultSiteTestCase):
     def test_repr(self):
         """Test __repr__."""
         code = self.site.family.obsolete.get(self.code) or self.code
-        expect = 'Site("{}", "{}")'.format(code, self.family)
+        expect = f'Site("{code}", "{self.family}")'
         self.assertTrue(repr(self.site).endswith(expect))
 
     def test_constructors(self):
@@ -251,7 +251,7 @@ class TestSiteObject(DefaultSiteTestCase):
         mysite = self.get_site()
         if mysite.lang != 'en':
             self.skipTest(
-                'English-specific tests not valid on {}'.format(mysite))
+                f'English-specific tests not valid on {mysite}')
 
         self.assertEqual(mysite.months_names[4], ('May', 'May'))
         self.assertEqual(mysite.list_to_text(('Pride', 'Prejudice')),
@@ -381,7 +381,7 @@ class SiteSysopTestCase(DefaultSiteTestCase):
             break
         else:
             self.skipTest(
-                '{} contains no deleted revisions.'.format(mainpage))
+                f'{mainpage} contains no deleted revisions.')
         self.assertLessEqual(len(dr['revisions']), 10)
         for rev in dr['revisions']:
             self.assertIsInstance(rev, dict)
@@ -480,7 +480,7 @@ class SiteSysopTestCase(DefaultSiteTestCase):
         for data in gen:
             break
         else:
-            self.skipTest('{} does not have deleted edits.'.format(myuser))
+            self.skipTest(f'{myuser} does not have deleted edits.')
         self.assertIn('revisions', data)
         for drev in data['revisions']:
             for key in ('revid', 'timestamp', 'user', 'comment'):

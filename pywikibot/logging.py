@@ -117,8 +117,8 @@ def logoutput(msg: Any,
     for i, arg in enumerate(args):
         key = keys[i]
         issue_deprecation_warning(
-            'Positional argument {} ({})'.format(i + 1, arg),
-            'keyword argument "{}={}"'.format(key, arg),
+            f'Positional argument {i + 1} ({arg})',
+            f'keyword argument "{key}={arg}"',
             since='7.2.0')
         if key in kwargs:
             warning('{!r} is given as keyword argument {!r} already; ignoring '
@@ -330,6 +330,6 @@ def exception(msg: Any = None, *args: Any,
         exc_type, value, _tb = sys.exc_info()
         msg = str(value)
         if not exc_info:
-            msg += ' ({})'.format(exc_type.__name__)
+            msg += f' ({exc_type.__name__})'
     assert msg is not None
     error(msg, *args, exc_info=exc_info, **kwargs)

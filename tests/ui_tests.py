@@ -266,7 +266,7 @@ class TestTerminalInput(UITestCase):
         self.assertEqual(self.strout.getvalue(), '')
         self.assertEqual(
             self.strerr.getvalue(),
-            ''.join('{}: {}\n'.format(num, items)
+            ''.join(f'{num}: {items}\n'
                     for num, items in enumerate(options, start=1))
             + 'question (default: 2): ')
         self.assertEqual(rv, 'answer 2')

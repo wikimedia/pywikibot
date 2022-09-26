@@ -47,13 +47,13 @@ def update_family(list_name, page):
         return
 
     pywikibot.output("The lists don't match, the new list is:")
-    text = '    {} = [\n'.format(list_name)
+    text = f'    {list_name} = [\n'
     line = ' ' * 7
     for code in new:
         if len(line) + len(code) >= 76:
             text += line + '\n'
             line = ' ' * 7
-        line += " '{}',".format(code)
+        line += f" '{code}',"
     text += line + '\n'
     text += '    ]'
     pywikibot.output(text)

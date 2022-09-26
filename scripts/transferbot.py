@@ -170,7 +170,7 @@ def main(*args: str) -> None:
              'history': edithistpage.title(as_link=True,
                                            insite=targetpage.site)}
         )
-        text += '<noinclude>\n\n<small>{}</small></noinclude>'.format(note)
+        text += f'<noinclude>\n\n<small>{note}</small></noinclude>'
 
         pywikibot.log('Getting edit history.')
         historytable = page.getVersionHistoryTable()

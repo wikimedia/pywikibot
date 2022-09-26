@@ -79,7 +79,7 @@ class BaseLink(ComparableMixin):
         assert isinstance(self._items, tuple)
         assert all(isinstance(item, str) for item in self._items)
 
-        attrs = ('{!r}'.format(getattr(self, attr)) for attr in self._items)
+        attrs = (f'{getattr(self, attr)!r}' for attr in self._items)
         return 'pywikibot.page.{}({})'.format(type(self).__name__,
                                               ', '.join(attrs))
 
@@ -165,7 +165,7 @@ class BaseLink(ComparableMixin):
                     .format(self.namespace, onsite))
 
         if self.namespace != Namespace.MAIN:
-            return '{}:{}'.format(name, self.title)
+            return f'{name}:{self.title}'
         return self.title
 
     def astext(self, onsite=None) -> str:
@@ -182,14 +182,14 @@ class BaseLink(ComparableMixin):
         if self.namespace != Namespace.MAIN:
             title = onsite.namespace(self.namespace) + ':' + title
         if onsite == self.site:
-            return '[[{}]]'.format(title)
+            return f'[[{title}]]'
         if onsite.family == self.site.family:
-            return '[[{}:{}]]'.format(self.site.code, title)
+            return f'[[{self.site.code}:{title}]]'
         if self.site.family.name == self.site.code:
             # use this form for sites like commons, where the
             # code is the same as the family name
-            return '[[{}:{}]]'.format(self.site.code, title)
-        return '[[{}:{}]]'.format(self.site.sitename, title)
+            return f'[[{self.site.code}:{title}]]'
+        return f'[[{self.site.sitename}:{title}]]'
 
     def _cmpkey(self):
         """
@@ -396,7 +396,7 @@ class Link(BaseLink):
             if ns:
                 if len(self._text) <= colon_position:
                     raise InvalidTitleError(
-                        "'{}' has no title.".format(self._text))
+                        f"'{self._text}' has no title.")
                 self._namespace = ns
                 ns_prefix = True
                 old_position = colon_position
@@ -438,7 +438,7 @@ class Link(BaseLink):
             # 'namespace:' is not a valid title
             if not t:
                 raise InvalidTitleError(
-                    "'{}' has no title.".format(self._text))
+                    f"'{self._text}' has no title.")
 
             if ':' in t and self._namespace >= 0:  # < 0 don't have talk
                 other_ns = self._site.namespaces[self._namespace - 1
@@ -476,7 +476,7 @@ class Link(BaseLink):
                                     .format(self._text))
 
         if self._namespace != -1 and len(t) > 255:
-            raise InvalidTitleError("(over 255 bytes): '{}'".format(t))
+            raise InvalidTitleError(f"(over 255 bytes): '{t}'")
 
         # "empty" local links can only be self-links
         # with a fragment identifier.

@@ -41,9 +41,9 @@ class TestPatrolBot(DefaultDrySiteTestCase):
         """Test parsing the page tuples from a dummy text."""
         tuples = self.bot.parse_page_tuples(DUMMY_PAGE_TUPLES)
         for gen_user in (1, 2):
-            user = 'Test {}'.format(gen_user)
+            user = f'Test {gen_user}'
             self.assertIn(user, tuples)
-            self.assertEqual(tuples[user], {'Page {}'.format(i * gen_user)
+            self.assertEqual(tuples[user], {f'Page {i * gen_user}'
                                             for i in range(1, 4)})
         self.assertIn('Prefixed', tuples)
         self.assertEqual(tuples['Prefixed'], {'Page 1', 'Page 2'})

@@ -866,17 +866,17 @@ class TestIndexPageHasValidContent(BS4TestCase):
 
     def test_has_valid_content_prefixed(self):
         """Test prefixing Index template is invalid."""
-        self.index.text = 'pre {}'.format(self.valid_template)
+        self.index.text = f'pre {self.valid_template}'
         self.assertFalse(self.index.has_valid_content())
 
     def test_has_valid_content_postfixed(self):
         """Test postfixing Index template is invalid."""
-        self.index.text = '{}post'.format(self.valid_template)
+        self.index.text = f'{self.valid_template}post'
         self.assertFalse(self.index.has_valid_content())
 
     def test_has_valid_content_pre_and_postfixed(self):
         """Test pre- and postfixing Index template is invalid."""
-        self.index.text = 'pre{}post'.format(self.valid_template)
+        self.index.text = f'pre{self.valid_template}post'
         self.assertFalse(self.index.has_valid_content())
 
     def test_has_valid_content_second_template(self):

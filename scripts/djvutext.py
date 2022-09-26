@@ -181,7 +181,7 @@ def main(*args: str) -> None:
     djvu = DjVuFile(djvu_path)
 
     if not djvu.has_text():
-        pywikibot.error('No text layer in djvu file {}'.format(djvu.file))
+        pywikibot.error(f'No text layer in djvu file {djvu.file}')
         return
 
     # Parse pages param.

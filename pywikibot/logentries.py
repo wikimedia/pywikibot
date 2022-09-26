@@ -50,7 +50,7 @@ class LogEntry(UserDict):
 
         It also logs debugging information when a key is missing.
         """
-        pywikibot.debug('API log entry received:\n{!r}'.format(self))
+        pywikibot.debug(f'API log entry received:\n{self!r}')
         hidden = {
             'actionhidden': [
                 'action', 'logpage', 'ns', 'pageid', 'params', 'title',
@@ -373,7 +373,7 @@ class LogEntryFactory:
         :raise KeyError: logtype is not valid
         """
         if logtype not in self._site.logtypes:
-            raise KeyError('{} is not a valid logtype'.format(logtype))
+            raise KeyError(f'{logtype} is not a valid logtype')
 
         return LogEntryFactory.get_entry_class(logtype)
 
@@ -410,7 +410,7 @@ class LogEntryFactory:
         try:
             logtype = logdata['type']
         except KeyError:
-            pywikibot.debug('API log entry received:\n{}'.format(logdata))
+            pywikibot.debug(f'API log entry received:\n{logdata}')
             raise Error("Log entry has no 'type' key")
 
         return LogEntryFactory.get_entry_class(logtype)(logdata, self._site)

@@ -143,7 +143,7 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
 
         item = pywikibot.ItemPage(self.repo)
         item.editEntity(data, new='item', summary=summary)
-        output('Created item {item}'.format(item=item.getID()))
+        output(f'Created item {item.getID()}')
         return item
 
     def handle_complicated(self) -> bool:

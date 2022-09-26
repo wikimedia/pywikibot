@@ -52,7 +52,7 @@ class MWSite:
         check_response(r)
 
         if fromurl != r.url:
-            pywikibot.log('{} redirected to {}'.format(fromurl, r.url))
+            pywikibot.log(f'{fromurl} redirected to {r.url}')
             fromurl = r.url
 
         self.fromurl = fromurl
@@ -73,16 +73,16 @@ class MWSite:
             except (ServerError, RequestException):
                 raise
             except Exception as e:
-                pywikibot.log('MW detection failed: {!r}'.format(e))
+                pywikibot.log(f'MW detection failed: {e!r}')
 
             if not self.version:
                 self._fetch_old_version()
 
         if not self.api:
-            raise RuntimeError('Unsupported url: {}'.format(self.fromurl))
+            raise RuntimeError(f'Unsupported url: {self.fromurl}')
 
         if not self.version or self.version < MIN_VERSION:
-            raise RuntimeError('Unsupported version: {}'.format(self.version))
+            raise RuntimeError(f'Unsupported version: {self.version}')
 
         if not self.articlepath:
             if self.private_wiki:
@@ -296,7 +296,7 @@ def check_response(response):
             m = re.search(r'\d{3}', err.args[0], flags=re.ASCII)
             if not m:
                 raise err
-            msg = 'Generic Server Error ({})'.format(m.group())
+            msg = f'Generic Server Error ({m.group()})'
 
         raise ServerError(msg)
 

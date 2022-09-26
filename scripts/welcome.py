@@ -776,11 +776,11 @@ class WelcomeBot(SingleSiteBot):
         """
         if user.is_blocked() or user.is_locked():
             self.show_status(Msg.SKIP)
-            pywikibot.output('{} has been blocked!'.format(user.username))
+            pywikibot.output(f'{user.username} has been blocked!')
 
         elif 'bot' in user.groups():
             self.show_status(Msg.SKIP)
-            pywikibot.output('{} is a bot!'.format(user.username))
+            pywikibot.output(f'{user.username} is a bot!')
 
         elif 'bot' in user.username.lower():
             self.show_status(Msg.SKIP)
@@ -848,7 +848,7 @@ class WelcomeBot(SingleSiteBot):
             elif welcomed_count == 1:
                 count = 'One user has'
             else:
-                count = '{} users have'.format(welcomed_count)
+                count = f'{welcomed_count} users have'
             pywikibot.output(count + ' been welcomed.')
 
             if welcomed_count >= globalvar.dump_to_log:
@@ -988,7 +988,7 @@ def handle_args(args) -> None:
         elif arg in mapping:
             setattr(globalvar, *mapping[arg])
         else:
-            pywikibot.warning('Unknown option "{}"'.format(arg))
+            pywikibot.warning(f'Unknown option "{arg}"')
 
 
 def main(*args: str) -> None:

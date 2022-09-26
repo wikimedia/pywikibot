@@ -156,7 +156,7 @@ class RedirectGenerator(OptionHandler):
             readPagesCount += 1
             # always print status message after 10000 pages
             if readPagesCount % 10000 == 0:
-                pywikibot.output('{} pages read...'.format(readPagesCount))
+                pywikibot.output(f'{readPagesCount} pages read...')
             if self.opt.namespaces and pywikibot.Page(
                     self.site,
                     entry.title).namespace() not in self.opt.namespaces:
@@ -265,7 +265,7 @@ class RedirectGenerator(OptionHandler):
                                             'pageids': apiQ})
             data = gen.submit()
             if 'error' in data:
-                raise RuntimeError('API query error: {}'.format(data))
+                raise RuntimeError(f'API query error: {data}')
             if data == [] or 'query' not in data:
                 raise RuntimeError('No results given.')
             pages = {}
@@ -435,7 +435,7 @@ class RedirectRobot(ExistingPageBot):
 
         pywikibot.warning(
             'No speedy deletion template {}available.'
-            .format('"{}" '.format(title) if title else ''))
+            .format(f'"{title}" ' if title else ''))
         return None
 
     @property
@@ -465,7 +465,7 @@ class RedirectRobot(ExistingPageBot):
         :param summary_key: The message key for the deletion summary
         """
         assert page.site == self.current_page.site, (
-            'target page is on different site {}'.format(page.site))
+            f'target page is on different site {page.site}')
         reason = i18n.twtranslate(page.site, summary_key)
         if page.site.has_right('delete'):
             page.delete(reason, prompt=False)
@@ -490,9 +490,9 @@ class RedirectRobot(ExistingPageBot):
             return page.getRedirectTarget()
         except (CircularRedirectError, RuntimeError) as e:
             pywikibot.error(e)
-            pywikibot.output('Skipping {}.'.format(page))
+            pywikibot.output(f'Skipping {page}.')
         except InterwikiRedirectPageError:
-            pywikibot.output('{} is on another site, skipping.'.format(page))
+            pywikibot.output(f'{page} is on another site, skipping.')
         return None
 
     def delete_1_broken_redirect(self) -> None:
@@ -583,7 +583,7 @@ class RedirectRobot(ExistingPageBot):
                     .format(newRedir.title(as_link=True)))
             except UnsupportedPageError as e:
                 pywikibot.error(e)
-                pywikibot.output('Skipping {}.'.format(newRedir))
+                pywikibot.output(f'Skipping {newRedir}.')
                 break
             except NoPageError:
                 title = newRedir.title(as_link=True)
@@ -593,7 +593,7 @@ class RedirectRobot(ExistingPageBot):
                         .format(title))
                     break  # skip if automatic
                 pywikibot.warning(
-                    "Redirect target {} doesn't exist.".format(title))
+                    f"Redirect target {title} doesn't exist.")
             except ServerError:
                 pywikibot.output('Skipping due to server error: '
                                  'No textarea found')

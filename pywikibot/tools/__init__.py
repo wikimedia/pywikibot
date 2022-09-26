@@ -12,7 +12,6 @@ import re
 import stat
 import subprocess
 import sys
-
 from contextlib import suppress
 from functools import total_ordering, wraps
 from importlib import import_module
@@ -317,7 +316,7 @@ def strtobool(val: str) -> bool:
         return True
     if val in ('n', 'no', 'f', 'false', 'off', '0'):
         return False
-    raise ValueError('invalid truth value {!r}'.format(val))
+    raise ValueError(f'invalid truth value {val!r}')
 
 
 def normalize_username(username) -> Optional[str]:
@@ -405,7 +404,7 @@ class MediaWikiVersion:
         version_match = MediaWikiVersion.MEDIAWIKI_VERSION.match(version_str)
 
         if not version_match:
-            raise ValueError('Invalid version number "{}"'.format(version_str))
+            raise ValueError(f'Invalid version number "{version_str}"')
 
         components = [int(n) for n in version_match.group(1).split('.')]
 
@@ -557,7 +556,7 @@ def open_archive(filename: str, mode: str = 'rb', use_extension: bool = True):
     if mode in ('r', 'a', 'w'):
         mode += 'b'
     elif mode not in ('rb', 'ab', 'wb'):
-        raise ValueError('Invalid mode: "{}"'.format(mode))
+        raise ValueError(f'Invalid mode: "{mode}"')
 
     if use_extension:
         # if '.' not in filename, it'll be 1 character long but otherwise
@@ -602,7 +601,7 @@ def open_archive(filename: str, mode: str = 'rb', use_extension: bool = True):
         if stderr != b'':
             process.stdout.close()
             raise OSError(
-                'Unexpected STDERR output from 7za {}'.format(stderr))
+                f'Unexpected STDERR output from 7za {stderr}')
         binary = process.stdout
 
     elif extension in ('lzma', 'xz'):

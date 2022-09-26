@@ -291,7 +291,7 @@ class DataSite(APISite):
             if arg in ['clear', 'summary']:
                 params[arg] = kwargs[arg]
             elif arg != 'baserevid':
-                warn('Unknown wbeditentity parameter {} ignored'.format(arg),
+                warn(f'Unknown wbeditentity parameter {arg} ignored',
                      UserWarning, 2)
 
         params['data'] = json.dumps(data)
@@ -851,7 +851,7 @@ class DataSite(APISite):
         # Supported actions
         assert action in ('wbsetaliases', 'wbsetdescription',
                           'wbsetlabel', 'wbsetsitelink'), \
-            'action {} not supported.'.format(action)
+            f'action {action} not supported.'
 
         # prefer ID over (site, title)
         if isinstance(itemdef, str):

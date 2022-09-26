@@ -11,11 +11,7 @@ from typing import Optional
 from warnings import warn
 
 import pywikibot
-from pywikibot.exceptions import (
-    APIError,
-    Error,
-    UploadError,
-)
+from pywikibot.exceptions import APIError, Error, UploadError
 from pywikibot.tools import compute_file_hash
 
 
@@ -232,7 +228,7 @@ class Uploader:
             if verify_stash:
                 # The SHA1 was also requested so calculate and compare it
                 assert 'sha1' in stash_info, \
-                    'sha1 not in stash info: {}'.format(stash_info)
+                    f'sha1 not in stash info: {stash_info}'
                 sha1 = compute_file_hash(self.filename, bytes_to_read=offset)
                 if sha1 != stash_info['sha1']:
                     raise ValueError(
@@ -471,7 +467,7 @@ class Uploader:
                 pywikibot.debug(result)
 
             if 'result' not in result:
-                raise Error('Upload: unrecognized response: {}'.format(result))
+                raise Error(f'Upload: unrecognized response: {result}')
 
             if result['result'] == 'Warning':
                 assert 'warnings' in result and not ignore_all_warnings
