@@ -362,6 +362,14 @@ class MissingPackageTestCase(TWNSetMessagePackageBase,
                               fallback_prompt='dummy message')
         self.assertEqual(rv, 'dummy message')
 
+
+class PywikibotPackageTestCase(TestCase):
+
+    """Test pywikibot i18n package."""
+
+    family = 'wikipedia'
+    code = 'de'
+
     def test_cosmetic_changes_hook(self):
         """Test summary result of Page._cosmetic_changes_hook."""
         page = pywikibot.Page(self.site, 'Test')
@@ -379,7 +387,7 @@ class MissingPackageTestCase(TWNSetMessagePackageBase,
 
         summary = f'Working on Test page at site {self.site}'
         msg = page._cosmetic_changes_hook(summary)
-        self.assertEqual(msg, summary + '; cosmetic changes')
+        self.assertEqual(msg, summary + '; kosmetische Änderungen')
 
 
 class TestExtractPlural(TestCase):

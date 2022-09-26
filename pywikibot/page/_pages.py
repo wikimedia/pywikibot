@@ -1299,14 +1299,10 @@ class BasePage(ComparableMixin):
         cc_toolkit = CosmeticChangesToolkit(self, ignore=CANCEL.MATCH)
         self.text = cc_toolkit.change(old)
 
-        # i18n package changed in Pywikibot 7.0.0
-        old_i18n = i18n.twtranslate(self.site, 'cosmetic_changes-append',
-                                    fallback_prompt='; cosmetic changes')
         if summary and old.strip().replace(
                 '\r\n', '\n') != self.text.strip().replace('\r\n', '\n'):
             summary += i18n.twtranslate(self.site,
-                                        'pywikibot-cosmetic-changes',
-                                        fallback_prompt=old_i18n)
+                                        'pywikibot-cosmetic-changes')
         return summary
 
     def put(self, newtext: str,
