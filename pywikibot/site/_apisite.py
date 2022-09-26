@@ -439,10 +439,8 @@ class APISite(
         """
         if self.is_oauth_token_available():
             pywikibot.warning('Using OAuth suppresses logout function')
-        req_params = {'action': 'logout'}
-        # csrf token introduced in MW 1.24
-        with suppress(Error):
-            req_params['token'] = self.tokens['csrf']
+
+        req_params = {'action': 'logout', 'token': self.tokens['csrf']}
         uirequest = self.simple_request(**req_params)
         uirequest.submit()
         self._loginstatus = _LoginStatus.NOT_LOGGED_IN
@@ -931,19 +929,18 @@ class APISite(
         """
         if not isinstance(text, str):
             raise ValueError('text must be a string')
+
         if not text:
             return ''
-        req = self.simple_request(action='expandtemplates', text=text)
+
+        req = self.simple_request(action='expandtemplates',
+                                  text=text, prop='wikitext')
         if title is not None:
             req['title'] = title
         if includecomments is True:
             req['includecomments'] = ''
-        if self.mw_version > '1.24wmf7':
-            key = 'wikitext'
-            req['prop'] = key
-        else:
-            key = '*'
-        return req.submit()['expandtemplates'][key]
+
+        return req.submit()['expandtemplates']['wikitext']
 
     def getcurrenttimestamp(self) -> str:
         """
@@ -1087,10 +1084,10 @@ class APISite(
             pywikibot.error(msg)
             raise
 
-        if MediaWikiVersion(version) < '1.23':
+        if MediaWikiVersion(version) < '1.27':
             raise RuntimeError(
                 'Pywikibot "{}" does not support MediaWiki "{}".\n'
-                'Use Pywikibot prior to "6.0" branch instead.'
+                'Use Pywikibot prior to "8.0" branch instead.'
                 .format(pywikibot.__version__, version))
         return version
 
@@ -1496,12 +1493,8 @@ class APISite(
         return page._redirtarget
 
     def validate_tokens(self, types: List[str]) -> List[str]:
-        """Validate if requested tokens are acceptable.
-
-        Valid tokens depend on mw version.
-        """
-        query = 'tokens' if self.mw_version < '1.24wmf19' else 'query+tokens'
-        data = self._paraminfo.parameter(query, 'type')
+        """Validate if requested tokens are acceptable."""
+        data = self._paraminfo.parameter('query+tokens', 'type')
         assert data is not None
         return [token for token in types if token in data['type']]
 
@@ -1512,7 +1505,6 @@ class APISite(
     ) -> Dict[str, str]:
         """Preload one or multiple tokens.
 
-        For MediaWiki version 1.23, only one token can be retrieved at once.
         For MediaWiki versions since 1.24wmfXXX a new token
         system was introduced which reduced the amount of tokens available.
         Most of them were merged into the 'csrf' token. If the token type in
@@ -1543,21 +1535,13 @@ class APISite(
                 r'Action \'\w+\' is not allowed for the current user', text)
 
         user_tokens = {}
-        if self.mw_version < '1.24wmf19':
-            if all is not False:
-                pdata = self._paraminfo.parameter('tokens', 'type')
-                assert pdata is not None
-                types.extend(pdata['type'])
-            req = self.simple_request(action='tokens',
-                                      type=self.validate_tokens(types))
-        else:
-            if all is not False:
-                pdata = self._paraminfo.parameter('query+tokens', 'type')
-                assert pdata is not None
-                types.extend(pdata['type'])
+        if all is not False:
+            pdata = self._paraminfo.parameter('query+tokens', 'type')
+            assert pdata is not None
+            types.extend(pdata['type'])
 
-            req = self.simple_request(action='query', meta='tokens',
-                                      type=self.validate_tokens(types))
+        req = self.simple_request(action='query', meta='tokens',
+                                  type=self.validate_tokens(types))
 
         req._warning_handler = warn_handler
         data = req.submit()
@@ -2665,7 +2649,6 @@ class APISite(
         When the version is at least 1.27wmf9, uses general siteinfo.
         If not called directly, it is cached by the first attempted
         upload action.
-
         """
         if self.mw_version >= '1.27wmf9':
             return not self._siteinfo.get('general')['uploadsenabled']
@@ -2677,10 +2660,10 @@ class APISite(
         # missingparam: One of the parameters
         #    filekey, file, url, statuskey is required
         # TODO: is there another way?
+        req = self._request(throttle=False,
+                            parameters={'action': 'upload',
+                                        'token': self.tokens['edit']})
         try:
-            req = self._request(throttle=False,
-                                parameters={'action': 'upload',
-                                            'token': self.tokens['edit']})
             req.submit()
         except APIError as error:
             if error.code == 'uploaddisabled':
@@ -2694,6 +2677,7 @@ class APISite(
                 # Unexpected error
                 raise
             return self._uploaddisabled
+
         raise RuntimeError(
             'Unexpected success of upload action without parameters.')
 

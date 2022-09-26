@@ -1082,7 +1082,6 @@ class TestApplicablePageProtections(TestCase):
         p2 = pywikibot.Page(site, 'User:Unicodesnowman/ProtectTest')
         p3 = pywikibot.Page(site, 'File:Wiki.png')
 
-        # from the API, since 1.25wmf14
         pp1 = p1.applicable_protections()
         pp2 = p2.applicable_protections()
         pp3 = p3.applicable_protections()
@@ -1092,12 +1091,6 @@ class TestApplicablePageProtections(TestCase):
         self.assertNotIn('create', pp2)
         self.assertNotIn('upload', pp2)
         self.assertIn('upload', pp3)
-
-        # inferred
-        site.version = lambda: '1.24'
-        self.assertEqual(pp1, p1.applicable_protections())
-        self.assertEqual(pp2, p2.applicable_protections())
-        self.assertEqual(pp3, p3.applicable_protections())
 
 
 class TestPageProtect(TestCase):

@@ -440,7 +440,8 @@ class Request(MutableMapping):
             if ('tokens' not in meta and 'continue' not in self._params
                     and self.site.mw_version >= '1.25wmf5'):
                 self._params.setdefault('rawcontinue', [''])
-        elif self.action == 'help' and self.site.mw_version > '1.24':
+
+        elif self.action == 'help':
             self['wrap'] = ''
 
         if config.maxlag:

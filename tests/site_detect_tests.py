@@ -79,10 +79,6 @@ class StandardVersionSiteTestCase(SiteDetectionTestCase):
         """
         self.assertSite('http://www.wikichristian.org/index.php?title=$1')
 
-    def test_wikifur(self):
-        """Test detection of MediaWiki sites for en.wikifur.com."""
-        self.assertSite('https://en.wikifur.com/wiki/$1')
-
 
 class NonStandardVersionSiteTestCase(SiteDetectionTestCase):
 
@@ -96,14 +92,10 @@ class NonStandardVersionSiteTestCase(SiteDetectionTestCase):
         """Test detection of MediaWiki sites for www.arabeyes.org."""
         self.assertSite('https://www.arabeyes.org/$1')
 
-    def test_tfwiki(self):
-        """Test detection of MediaWiki sites for tfwiki.net."""
-        self.assertNoSite('http://tfwiki.net/wiki/$1')  # 1.19.5-1+deb7u1
 
+class UnsupportedSiteTestCase(SiteDetectionTestCase):
 
-class Pre119SiteTestCase(SiteDetectionTestCase):
-
-    """Test pre 1.19 sites which should be detected as unsupported."""
+    """Test pre 1.27 sites which should be detected as unsupported."""
 
     def test_hrwiki(self):
         """Test detection of MediaWiki sites for www.hrwiki.org."""
@@ -112,6 +104,14 @@ class Pre119SiteTestCase(SiteDetectionTestCase):
     def test_wikifon(self):
         """Test detection of MediaWiki sites for www.wikifon.org."""
         self.assertNoSite('http://www.wikifon.org/$1')  # v1.11.0
+
+    def test_tfwiki(self):
+        """Test detection of MediaWiki sites for tfwiki.net."""
+        self.assertNoSite('http://tfwiki.net/wiki/$1')  # 1.19.5-1+deb7u1
+
+    def test_wikifur(self):
+        """Test detection of MediaWiki sites for en.wikifur.com."""
+        self.assertNoSite('https://en.wikifur.com/wiki/$1')  # 1.23.16
 
 
 class PreAPISiteTestCase(SiteDetectionTestCase):
