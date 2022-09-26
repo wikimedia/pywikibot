@@ -918,21 +918,11 @@ but {scheme!r} is required. Please add the following code to your family file:
         return True
 
     def _ratelimited(self) -> None:
-        """Handle ratelimited warning."""
-        ratelimits = self.site.userinfo['ratelimits']
-        delay = None
+        """Handle ratelimited warning.
 
-        ratelimit = ratelimits.get(self.action, {})
-        # find the lowest wait time for the given action
-        for limit in ratelimit.values():
-            seconds = limit['seconds']
-            hits = limit['hits']
-            delay = min(delay or seconds, seconds / hits)
-
-        if not delay:
-            pywikibot.warning(
-                f'No rate limit found for action {self.action}')
-        self.wait(delay)
+        This is also called from :meth:`_default_warning_handler`.
+        """
+        self.wait(self.site.ratelimit(self.action).delay)
 
     def _bad_token(self, code) -> bool:
         """Check for bad token.
