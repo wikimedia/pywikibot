@@ -321,7 +321,7 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
                 # remove the selected image from the list
                 imagelist.pop(todo)
             else:
-                pywikibot.info('<<yellow>>No such image number.<<default>>')
+                pywikibot.info('<<yellow>>No such image number.')
 
     def transfer_allowed(self, image) -> bool:
         """Check whether transfer is allowed."""

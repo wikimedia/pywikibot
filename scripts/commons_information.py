@@ -131,12 +131,10 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
             pywikibot.info(value)
             langs = self.detect_langs(value)
             if langs:
-                pywikibot.info(
-                    '<<lightblue>>Hints from langdetect:<<default>>')
+                pywikibot.info('<<lightblue>>Hints from langdetect:')
                 for language in langs:
                     pywikibot.info(
-                        '<<lightblue>>{obj.lang}: {obj.prob}<<default>>'
-                        .format(obj=language))
+                        f'<<lightblue>>{language.lang}: {language.prob}')
             lang = pywikibot.input(
                 'Enter the language of the displayed text:').strip()
             if lang != '':

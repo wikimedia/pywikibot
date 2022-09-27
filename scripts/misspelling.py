@@ -64,7 +64,7 @@ class MisspellingRobot(BaseDisambigBot):
                       if cat is not None]
 
         if templates:
-            pywikibot.info('<<yellow>>Working on templates...<<default>>')
+            pywikibot.info('<<yellow>>Working on templates...')
             if isinstance(templates, str):
                 templates = (templates, )
 
@@ -80,7 +80,7 @@ class MisspellingRobot(BaseDisambigBot):
                     '-start parameter is not supported on this wiki\n'
                     'because templates are used for misspellings.')
         elif categories:
-            pywikibot.info('<<yellow>>Working on categories...<<default>>')
+            pywikibot.info('<<yellow>>Working on categories...')
             generators = (
                 pagegenerators.CategorizedPageGenerator(
                     cat, recurse=True, start=self.opt.start

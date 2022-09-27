@@ -240,7 +240,7 @@ def main(*args: str) -> None:
     if mysite.sitename == 'wikipedia:nl':
         pywikibot.info(
             '<<lightred>>There is consensus on the Dutch Wikipedia that '
-            'bots should not be used to fix redirects.<<default>>')
+            'bots should not be used to fix redirects.')
         return
 
     if featured:
