@@ -450,35 +450,34 @@ class DataExtendBot(SingleSiteBot):
         return result
 
     def showclaims(self, claims):
-        pywikibot.output('Current information:')
+        pywikibot.info('Current information:')
         for prop in claims:
             for claim in claims[prop]:
                 if claim.type == 'wikibase-item':
                     if claim.getTarget() is None:
-                        pywikibot.output('{}: unknown'
-                                         .format(self.label(prop)))
+                        pywikibot.info('{}: unknown'.format(self.label(prop)))
                     else:
-                        pywikibot.output(
+                        pywikibot.info(
                             '{}: {}'
                             .format(self.label(prop),
                                     self.label(claim.getTarget().title())))
                 elif claim.type == 'time':
-                    pywikibot.output('{}: {}'
-                                     .format(self.label(prop),
-                                             self.showtime(claim.getTarget())))
+                    pywikibot.info('{}: {}'
+                                   .format(self.label(prop),
+                                           self.showtime(claim.getTarget())))
                 elif claim.type in ['external-id', 'commonsMedia']:
-                    pywikibot.output('{}: {}'.format(self.label(prop),
-                                                     claim.getTarget()))
+                    pywikibot.info('{}: {}'.format(self.label(prop),
+                                                   claim.getTarget()))
                 elif claim.type == 'quantity':
-                    pywikibot.output(
+                    pywikibot.info(
                         '{}: {} {}'
                         .format(self.label(prop),
                                 claim.getTarget().amount,
                                 self.label(
                                     claim.getTarget().unit.split('/')[-1])))
                 else:
-                    pywikibot.output('Unknown type {} for property {}'
-                                     .format(claim.type, self.label(prop)))
+                    pywikibot.info('Unknown type {} for property {}'
+                                   .format(claim.type, self.label(prop)))
 
     MONTHNUMBER = {
         '1': 1, '01': 1, 'i': 1,
@@ -794,10 +793,10 @@ class DataExtendBot(SingleSiteBot):
                     newclaims = []
 
                 if not self.opt.always:
-                    pywikibot.output('Found here:')
+                    pywikibot.info('Found here:')
                     for claim in newclaims:
                         try:
-                            pywikibot.output(
+                            pywikibot.info(
                                 '{}: {}'.format(self.label(claim[0]),
                                                 self.label(claim[1])))
                         except ValueError:
@@ -853,9 +852,9 @@ class DataExtendBot(SingleSiteBot):
                                               for sourcepart in sourceparts
                                               if sourcepart is not None]
 
-                                pywikibot.output('Sourcing {}: {}'
-                                                 .format(self.label(claim[0]),
-                                                         self.label(claim[1])))
+                                pywikibot.info('Sourcing {}: {}'
+                                               .format(self.label(claim[0]),
+                                                       self.label(claim[1])))
 
                                 # probably means the sourcing is already there
                                 with suppress(APIError):
@@ -877,7 +876,7 @@ class DataExtendBot(SingleSiteBot):
                                 try:
                                     target = self.createdateclaim(claim[1][6:])
                                 except ValueError as ex:
-                                    pywikibot.output(
+                                    pywikibot.info(
                                         'Unable to analyze date "{}" for {}: {}'
                                         .format(claim[1][6:],
                                                 self.label(claim[0]), ex))
@@ -905,15 +904,15 @@ class DataExtendBot(SingleSiteBot):
                             else:
                                 createdclaim.setTarget(claim[1])
 
-                            pywikibot.output('Adding {}: {}'
-                                             .format(self.label(claim[0]),
-                                                     self.label(claim[1])))
+                            pywikibot.info('Adding {}: {}'
+                                           .format(self.label(claim[0]),
+                                                   self.label(claim[1])))
 
                             try:
                                 item.addClaim(createdclaim)
                             except OtherPageSaveError as ex:
                                 if claim[1].startswith('!i!'):
-                                    pywikibot.output(
+                                    pywikibot.info(
                                         'Unable to save image {}: {}'
                                         .format(claim[1][3:], ex))
                                     continue
@@ -973,9 +972,9 @@ class DataExtendBot(SingleSiteBot):
                                 sourcedata = [sourcepart
                                               for sourcepart in sourcedata
                                               if sourcepart is not None]
-                                pywikibot.output('Sourcing {}: {}'
-                                                 .format(self.label(claim[0]),
-                                                         self.label(claim[1])))
+                                pywikibot.info('Sourcing {}: {}'
+                                               .format(self.label(claim[0]),
+                                                       self.label(claim[1])))
 
                                 try:
                                     createdclaim.addSources(
@@ -991,7 +990,7 @@ class DataExtendBot(SingleSiteBot):
                                     except AttributeError:
                                         if prop not in propsdone:
                                             propstodo.append(prop)
-                                        pywikibot.output('Sourcing failed')
+                                        pywikibot.info('Sourcing failed')
 
                 for language, description in analyzer.getdescriptions():
                     newdescriptions[language].add(
@@ -1007,9 +1006,12 @@ class DataExtendBot(SingleSiteBot):
                 if newlabels or newaliases:
                     item.get(force=True)
                     claims = item.claims
-                    claims['Wiki'] = [Quasiclaim(page.title(
-                        force_interwiki=True, as_link=True)[2:-2])
-                                      for page in item.iterlinks()]
+                    claims['Wiki'] = [
+                        Quasiclaim(
+                            page.title(force_interwiki=True,
+                                       as_link=True)[2:-2])
+                        for page in item.iterlinks()
+                    ]
                     claims['Data'] = [Quasiclaim(item.title())]
                     descriptions = item.descriptions
                     labels = item.labels
@@ -1036,32 +1038,30 @@ class DataExtendBot(SingleSiteBot):
         if editdescriptions:
             item.editDescriptions(editdescriptions)
         for prop in unidentifiedprops:
-            pywikibot.output('Unknown external {} ({})'
-                             .format(prop, self.label(prop)))
+            pywikibot.info('Unknown external {} ({})'
+                           .format(prop, self.label(prop)))
         for prop in failedprops:
-            pywikibot.output('External failed to load: {} ({})'
-                             .format(prop, self.label(prop)))
+            pywikibot.info('External failed to load: {} ({})'
+                           .format(prop, self.label(prop)))
         if longtexts:
             if unidentifiedprops or failedprops:
                 pywikibot.input('Press Enter to continue')
-            pywikibot.output('== longtexts ==')
+            pywikibot.info('== longtexts ==')
             for longtext in longtexts:
-                pywikibot.output(f'\n== {longtext[0]} ==')
-                pywikibot.output(longtext[1])
+                pywikibot.info(f'\n== {longtext[0]} ==\n{longtext[1]}')
                 pywikibot.input('(press enter)')
 
     @staticmethod
     def definedescription(language, existingdescription, suggestions):
         possibilities = [existingdescription] + list(suggestions)
 
-        pywikibot.output('\nSelect a description for language {}:'
-                         .format(language))
-        pywikibot.output('Default is to keep the old value (0)')
+        pywikibot.info(f'\nSelect a description for language {language}:')
+        pywikibot.info('Default is to keep the old value (0)')
         for i, pos in enumerate(possibilities):
             if pos is None:
-                pywikibot.output(f'{i}: No description')
+                pywikibot.info(f'{i}: No description')
             else:
-                pywikibot.output(f'{i}: {pos}')
+                pywikibot.info(f'{i}: {pos}')
         answer = pywikibot.input('Which one to choose? ')
         try:
             answer = int(answer)
@@ -1086,18 +1086,16 @@ class DataExtendBot(SingleSiteBot):
                 anythingfound = True
 
         if anythingfound:
-            pywikibot.output(' ')
-            pywikibot.output('New names found:')
+            pywikibot.info('\nNew names found:')
             for language in realnewnames.keys():
                 for name in realnewnames[language]:
-                    pywikibot.output(f'{language}: {name}')
+                    pywikibot.info(f'{language}: {name}')
             result = pywikibot.input('Add these names? (y/n/[S]elect/x) ')
             if not result or result[0].upper() not in 'YNX':
                 chosennewnames = defaultdict(list)
                 for language in realnewnames.keys():
                     for name in realnewnames[language]:
-                        result = pywikibot.input(
-                            f'{language}: {name} - ')
+                        result = pywikibot.input(f'{language}: {name} - ')
                         if (not result) or result[0].upper() == 'Y':
                             chosennewnames[language].append(name)
                         elif result[0].upper() == 'X':
@@ -1211,8 +1209,8 @@ class Analyzer:
         usedurl = self.urlbase
         if usedurl is None:
             if not self.sparqlquery:
-                pywikibot.output('\n### Skipping {} ({}) ###'
-                                 .format(self.dbname, self.dbproperty))
+                pywikibot.info(
+                    f'\n### Skipping {self.dbname} ({self.dbproperty}) ###')
             return None
         return usedurl.format(id=quote(self.id))
 
@@ -1265,7 +1263,7 @@ class Analyzer:
         if not ask:
             return None
 
-        pywikibot.output(f"Trying to get a {dtype} out of '{text}'")
+        pywikibot.info(f"Trying to get a {dtype} out of '{text}'")
         answer = pywikibot.input(
             'Type Qnnn to let it point to Qnnn from now on,\n'
             'Xnnn to let it point to Qnnn only now,\n'
@@ -1328,8 +1326,7 @@ class Analyzer:
             self.html = unquote(self.html)
         self.html = self.prepare(self.html)
 
-        pywikibot.output('\n=== {} ({}) ===='.format(self.dbname,
-                                                     self.dbproperty))
+        pywikibot.info(f'\n=== {self.dbname} ({self.dbproperty}) ====')
         if self.hrtre:
             match = re.compile('(?s)' + self.hrtre).search(self.html)
             if match:
@@ -1356,8 +1353,8 @@ class Analyzer:
                 while '\n\n' in text:
                     text = text.replace('\n\n', '\n')
                 text = text.strip()
-                pywikibot.output(text)
-        pywikibot.output('-' * (len(self.dbname) + 8))
+                pywikibot.info(text)
+        pywikibot.info('-' * (len(self.dbname) + 8))
         for (function, prop) in [
             (self.findinstanceof, 'P31'),
             (self.findfirstname, 'P735'),
@@ -1608,14 +1605,13 @@ class Analyzer:
                 if result:
                     newclaims.append((prop, result, self))
 
-        pywikibot.output()
+        pywikibot.info()
         for (function, prop) in [
             (self.findcoords, 'coordinates'),
         ]:
             result = function(self.html)
             if result:
-                pywikibot.output('Please add yourself: {} - {}'
-                                 .format(prop, result))
+                pywikibot.info(f'Please add yourself: {prop} - {result}')
         return newclaims
 
     def prepare(self, html: str):
@@ -1629,12 +1625,14 @@ class Analyzer:
         return text.strip()
 
     def getdescriptions(self):
-        return [(self.language,
-                 self.singlespace(unescape(self.TAGRE.sub(' ', x))))
-                for x in self.finddescriptions(self.html) or [] if x] \
-                + [(language,
-                    self.singlespace(unescape(self.TAGRE.sub(' ', x))))
-                   for (language, x) in self.findlanguagedescriptions(self.html) or [] if x]
+        return [
+            (self.language, self.singlespace(unescape(self.TAGRE.sub(' ', x))))
+            for x in self.finddescriptions(self.html) or [] if x
+        ] + [
+            (language, self.singlespace(unescape(self.TAGRE.sub(' ', x))))
+            for (language, x) in self.findlanguagedescriptions(self.html) or []
+            if x
+        ]
 
     def longtext(self):
         result = self.TAGRE.sub(' ', self.findlongtext(self.html) or '')
@@ -2345,12 +2343,18 @@ class GndAnalyzer(Analyzer):
             self.findbyre(r'(?s)([\s\w]+)\(Geburtsort\)', html, 'city')
 
     def finddeathplace(self, html: str):
-        return self.findbyre(r'(?s)Sterbeort:\s*(?:<[^<>]*>)?([^<>&]*)', html, 'city')
+        return self.findbyre(r'(?s)Sterbeort:\s*(?:<[^<>]*>)?([^<>&]*)',
+                             html, 'city')
 
     def findworkplaces(self, html: str):
-        return (self.findallbyre(r'(?s)Wirkungsort:\s*(?:<[^<>]*>)?([^<>]*)\(\d{3}', html, 'city')
-                or self.findallbyre(r'(?s)Wirkungsort:\s*(?:<[^<>]*>)?([^<>]*)', html, 'city')) \
-                + self.findallbyre(r'(?s)([\s\w]+)\(Wirkungsort\)', html, 'city')
+        return (
+            self.findallbyre(
+                r'(?s)Wirkungsort:\s*(?:<[^<>]*>)?([^<>]*)\(\d{3}',
+                html, 'city')
+            or self.findallbyre(
+                r'(?s)Wirkungsort:\s*(?:<[^<>]*>)?([^<>]*)', html, 'city')) \
+                + self.findallbyre(r'(?s)([\s\w]+)\(Wirkungsort\)',
+                                   html, 'city')
 
     def findoccupations(self, html: str):
         result = []
@@ -2819,6 +2823,7 @@ class BnfAnalyzer(Analyzer):
             for text in texts[:8]:
                 result.append(self.findbyre(r'(.+)', text, 'occupation'))
             return result
+        return None
 
     def findworkfields(self, html: str):
         return self.findallbyre(r"[Pp]rofesseur d[eu']([\w\s]+)? [àa]u?x? ", html, 'subject') + \
@@ -3174,7 +3179,7 @@ class LibrariesAustraliaAnalyzer(Analyzer):
 
     def findfirstname(self, html: str):
         section = self.findbyre(r'(?s)<dt>Heading:</dt>.*?>([^<>]*)</a', html)
-        pywikibot.output(section)
+        pywikibot.info(section)
         if section:
             return self.findbyre(r',\s*(\w+)', section, 'firstname')
 
@@ -3476,7 +3481,7 @@ class OrcidAnalyzer(Analyzer):
         return self.findallbyre(r'"country">(.*?)<', html, 'country')
 
     def findschools(self, html: str):
-        pywikibot.output('Check education and affiliations by hand!')
+        pywikibot.info('Check education and affiliations by hand!')
 
 
 class CbdbAnalyzer(Analyzer):
@@ -13297,7 +13302,7 @@ class BewebAnalyzer(Analyzer):
             result += [(self.languagetranslate.get(lang, lang[:2]), name) for (name, lang) in re.findall(r'([^<>\(\)&]*)\(([^<>\(\)&]*)\)', section)]
             result += [('it', name) for name in self.findallbyre(r'([^<>\(\)&]*?)[<&]', section)]
         else:
-            pywikibot.output('section not found')
+            pywikibot.info('section not found')
         return result
 
     def finddescriptions(self, html: str):
@@ -14751,8 +14756,9 @@ class KunstaspekteAnalyzer(UrlAnalyzer):
         self.language = 'de'
 
     def description(self, html: str):
-        return self.findbyre(r'(?s)"description": "(.*?)"', html) or \
-               self.findbyre(r'(?s)<h3>short biography</h3>(.*?)</div>', html)
+        return (self.findbyre(r'(?s)"description": "(.*?)"', html)
+                or self.findbyre(r'(?s)<h3>short biography</h3>(.*?)</div>',
+                                 html))
 
     def findlongtext(self, html: str):
         return self.description(html)

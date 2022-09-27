@@ -51,7 +51,7 @@ class User(Page):
         if self._isAutoblock:
             # This user is probably being queried for purpose of lifting
             # an autoblock.
-            pywikibot.output(
+            pywikibot.info(
                 'This is an autoblock ID, you can only use to unblock it.')
 
     @property

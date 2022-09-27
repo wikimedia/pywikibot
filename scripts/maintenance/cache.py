@@ -304,7 +304,7 @@ def process_entries(cache_path, func, use_accesstime=None, output_func=None,
                 else:
                     output = output_func(entry)
                 if output is not None:
-                    pywikibot.output(output)
+                    pywikibot.info(output)
             if action_func:
                 action_func(entry)
 
@@ -469,7 +469,7 @@ def main():
 
     for cache_path in cache_paths:
         if len(cache_paths) > 1:
-            pywikibot.output(f'Processing {cache_path}')
+            pywikibot.info(f'Processing {cache_path}')
         process_entries(cache_path, filter_func, output_func=output_func,
                         action_func=action_func)
 

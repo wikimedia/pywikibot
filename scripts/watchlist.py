@@ -51,8 +51,7 @@ def count_watchlist(site=None) -> None:
     if site is None:
         site = pywikibot.Site()
     watchlist_count = len(refresh(site))
-    pywikibot.output('There are {} page(s) in the watchlist.'
-                     .format(watchlist_count))
+    pywikibot.info(f'There are {watchlist_count} page(s) in the watchlist.')
 
 
 def count_watchlist_all(quiet=False) -> None:
@@ -79,7 +78,7 @@ def isWatched(pageName, site=None):  # noqa: N802, N803
 
 def refresh(site):
     """Fetch the watchlist."""
-    pywikibot.output(f'Retrieving watchlist for {str(site)}.')
+    pywikibot.info(f'Retrieving watchlist for {str(site)}.')
     return list(site.watched_pages(force=True))
 
 
@@ -109,8 +108,8 @@ def refresh_all() -> None:
 
 def refresh_new() -> None:
     """Load watchlists of all wikis for accounts set in user config."""
-    pywikibot.output('Downloading all watchlists for your accounts in {}'
-                     .format(config.user_config_file))
+    pywikibot.info(f'Downloading all watchlists for your accounts in '
+                   f'{config.user_config_file}')
     count_watchlist_all(quiet=True)
 
 

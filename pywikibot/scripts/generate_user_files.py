@@ -65,14 +65,14 @@ def change_base_dir():
             if not os.access(new_base, os.R_OK | os.W_OK):
                 pywikibot.error('directory access restricted')
                 continue
-            pywikibot.output('Using existing directory')
+            pywikibot.info('Using existing directory')
         else:
             try:
                 os.mkdir(new_base, pywikibot.config.private_files_permission)
             except Exception as e:
                 pywikibot.error(f'directory creation failed: {e}')
                 continue
-            pywikibot.output('Created new directory.')
+            pywikibot.info('Created new directory.')
         break
 
     if new_base == pywikibot.config.get_base_dir(new_base):
@@ -85,18 +85,18 @@ to use the argument "-dir:{new_base}" every time you run the bot, or set
 the environment variable "PYWIKIBOT_DIR" equal to this directory name in
 your operating system. See your operating system documentation for how to
 set environment variables.""".format(new_base=new_base), width=76)
-    pywikibot.output(msg)
+    pywikibot.info(msg)
     if pywikibot.input_yn('Is this OK?', default=False, automatic_quit=False):
         return new_base
-    pywikibot.output('Aborting changes.')
+    pywikibot.info('Aborting changes.')
     return False
 
 
 def file_exists(filename) -> bool:
     """Return whether the file exists and print a message if it exists."""
     if os.path.exists(filename):
-        pywikibot.output('{1} already exists in the target directory "{0}".'
-                         .format(*os.path.split(filename)))
+        pywikibot.info('{1} already exists in the target directory "{0}".'
+                       .format(*os.path.split(filename)))
         return True
     return False
 
@@ -138,15 +138,14 @@ def get_site_and_lang(
         known_langs = []
 
     if not known_langs:
-        pywikibot.output('There were no known site codes found in {}.'
-                         .format(fam.name))
+        pywikibot.info(f'There were no known site codes found in {fam.name}.')
         default_lang = None
     elif len(known_langs) == 1:
-        pywikibot.output(f'The only known site code: {known_langs[0]}')
+        pywikibot.info(f'The only known site code: {known_langs[0]}')
         default_lang = known_langs[0]
     else:
-        pywikibot.output('This is the list of known site oodes:')
-        pywikibot.output(', '.join(known_langs))
+        pywikibot.info('This is the list of known site oodes:')
+        pywikibot.info(', '.join(known_langs))
         if default_lang not in known_langs:
             if default_lang != 'en' and 'en' in known_langs:
                 default_lang = 'en'
@@ -306,7 +305,7 @@ def create_user_config(
         if pywikibot.input_yn('Do you want to add a BotPassword for {}?'
                               .format(username), force=force, default=False):
             if msg:
-                pywikibot.output(msg)
+                pywikibot.info(msg)
             msg = None
             message = f'BotPassword\'s "bot name" for {username}'
             botpasswordname = pywikibot.input(message, force=force)
@@ -336,7 +335,7 @@ def create_user_config(
     if config_text:
         config_content = EXTENDED_CONFIG
     else:
-        pywikibot.output('Creating a small variant of user-config.py')
+        pywikibot.info('Creating a small variant of user-config.py')
         config_content = SMALL_CONFIG
 
     try:
@@ -350,7 +349,7 @@ def create_user_config(
                 botpasswords='password_file = ' + (f'"{PASS_BASENAME}"'
                                                    if botpasswords
                                                    else 'None')))
-        pywikibot.output(f"'{_fnc}' written.")
+        pywikibot.info(f"'{_fnc}' written.")
     except BaseException:
         if os.path.exists(_fnc):
             os.remove(_fnc)
@@ -375,7 +374,7 @@ def save_botpasswords(botpasswords, _fncpass):
             with codecs.open(_fncpass, 'w', 'utf-8') as f:
                 f.write(PASSFILE_CONFIG.format(botpasswords=botpasswords))
                 file_mode_checker(_fncpass, mode=0o600)
-                pywikibot.output(f"'{_fncpass}' written.")
+                pywikibot.info(f"'{_fncpass}' written.")
         except OSError:
             os.remove(_fncpass)
             raise
@@ -394,7 +393,7 @@ def ask_for_dir_change(force) -> Tuple[bool, bool]:
     """
     global base_dir
 
-    pywikibot.output(f'\nYour default user directory is "{base_dir}"')
+    pywikibot.info(f'\nYour default user directory is "{base_dir}"')
     while True:
         # Show whether file exists
         userfile = file_exists(os.path.join(base_dir, USER_BASENAME))
@@ -428,15 +427,15 @@ def main(*args: str) -> None:
 
     local_args = pywikibot.handle_args(args)
     if local_args:
-        pywikibot.output('Unknown argument{}: {}'
-                         .format('s' if len(local_args) > 1 else '',
-                                 ', '.join(local_args)))
+        pywikibot.info('Unknown argument{}: {}'
+                       .format('s' if len(local_args) > 1 else '',
+                               ', '.join(local_args)))
         return
 
-    pywikibot.output('You can abort at any time by pressing ctrl-c')
+    pywikibot.info('You can abort at any time by pressing ctrl-c')
     if config.mylang is not None:
         force = True
-        pywikibot.output('Automatically generating user-config.py')
+        pywikibot.info('Automatically generating user-config.py')
     else:
         force = False
         # Force default site of en.wikipedia
@@ -450,7 +449,7 @@ def main(*args: str) -> None:
             create_user_config(config.family, config.mylang, username,
                                force=force)
     except KeyboardInterrupt:
-        pywikibot.output('\nScript terminated by user.')
+        pywikibot.info('\nScript terminated by user.')
 
     # Creation of user-fixes.py has been replaced by an example file.
 

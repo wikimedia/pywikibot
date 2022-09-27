@@ -856,7 +856,7 @@ class TestLazyLoginNotExistUsername(TestLazyLoginBase):
         pywikibot.data.api.LoginManager = self.orig_login_manager
         super().tearDown()
 
-    @patch.object(pywikibot, 'output')
+    @patch.object(pywikibot, 'info')
     @patch.object(pywikibot, 'warning')
     @patch.object(pywikibot, 'error')
     def test_access_denied_notexist_username(self, error, warning, output):

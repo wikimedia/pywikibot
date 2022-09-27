@@ -1535,7 +1535,7 @@ class TestGetLanguageLinks(SiteAttributeTestCase):
 
     def test_getLanguageLinks(self, key):
         """Test if the function returns the correct titles and sites."""
-        with mock.patch('pywikibot.output') as m:
+        with mock.patch('pywikibot.info') as m:
             lang_links = textlib.getLanguageLinks(self.example_text,
                                                   self.site)
         m.assert_called_once_with(

@@ -527,8 +527,8 @@ class Request(MutableMapping):
         """Simulate action."""
         if action and config.simulate and (
                 self.write or action in config.actions_to_block):
-            pywikibot.output('<<black;yellow>>SIMULATION: {} action blocked.'
-                             '<<default>>'.format(action))
+            pywikibot.info(
+                f'<<black;yellow>>SIMULATION: {action} action blocked.')
             # for more realistic simulation
             if config.simulate is not True:
                 pywikibot.sleep(float(config.simulate))
@@ -746,8 +746,7 @@ The text message is:
                     value = self[param][0]
                     if value.isdigit():
                         self[param] = [str(int(value) // 2)]
-                        pywikibot.output('Set {} = {}'
-                                         .format(param, self[param]))
+                        pywikibot.info(f'Set {param} = {self[param]}')
         else:
             return result or {}
         self.wait()
@@ -1243,7 +1242,7 @@ class CachedRequest(Request):
             # file not found
             return False
         except Exception as e:
-            pywikibot.output(f'Could not load cache: {e!r}')
+            pywikibot.info(f'Could not load cache: {e!r}')
             return False
 
     def _write_cache(self, data) -> None:

@@ -84,7 +84,7 @@ class TestArchiveBotFunctions(TestCase):
         self.assertEqual(archivebot.str2size('0'), (0, 'B'))
         self.assertEqual(archivebot.str2size('3000'), (3000, 'B'))
         self.assertEqual(archivebot.str2size('4 K'), (4096, 'B'))
-        self.assertEqual(archivebot.str2size('1 M'), (1048576, 'B'))
+        self.assertEqual(archivebot.str2size('1 M'), (1_048_576, 'B'))
         self.assertEqual(archivebot.str2size('2T'), (2, 'T'))
         self.assertEqual(archivebot.str2size('2 000'), (2000, 'B'))
         self.assertEqual(archivebot.str2size('2 000B'), (2000, 'B'))
@@ -269,7 +269,7 @@ class TestDiscussionPageObject(TestCase):
         """Test DiscussionPage.is_full method."""
         self.load_page('Talk:For-pywikibot-archivebot')
         page = self.page
-        self.assertEqual(page.archiver.maxsize, 2096128)
+        self.assertEqual(page.archiver.maxsize, 2_096_128)
         self.assertEqual(page.size(), 181)
         self.assertTrue(page.is_full((100, 'B')))
         page.full = False

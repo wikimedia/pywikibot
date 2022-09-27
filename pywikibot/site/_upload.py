@@ -526,7 +526,7 @@ class Uploader:
 
             if result['result'] == 'Success':
                 if report_success:
-                    pywikibot.output('Upload successful.')
+                    pywikibot.info('Upload successful.')
                 # If we receive a nochange, that would mean we're in simulation
                 # mode, don't attempt to access imageinfo
                 if 'nochange' not in result:

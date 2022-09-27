@@ -195,8 +195,8 @@ class SandboxBot(Bot, ConfigParserBot):
             wait = False
             now = time.strftime('%d %b %Y %H:%M:%S (UTC)', time.gmtime())
             for sandbox_page in self.generator:
-                pywikibot.output('Preparing to process sandbox page '
-                                 + sandbox_page.title(as_link=True))
+                pywikibot.info('Preparing to process sandbox page '
+                               + sandbox_page.title(as_link=True))
                 if sandbox_page.isRedirectPage():
                     pywikibot.warning(
                         '{} is a redirect page, cleaning it anyway'
@@ -211,17 +211,17 @@ class SandboxBot(Bot, ConfigParserBot):
                     subst = 'subst:' in self.translated_content
                     pos = text.find(self.translated_content.strip())
                     if text.strip() == self.translated_content.strip():
-                        pywikibot.output(
+                        pywikibot.info(
                             'The sandbox is still clean, no change necessary.')
                     elif subst and sandbox_page.userName() == self.site.user():
-                        pywikibot.output(
+                        pywikibot.info(
                             'The sandbox might be clean, no change necessary.')
                     elif pos != 0 and not subst:
                         sandbox_page.put(self.translated_content,
                                          translated_msg)
                         pywikibot.showDiff(text, self.translated_content)
-                        pywikibot.output('Standard content was changed, '
-                                         'sandbox cleaned.')
+                        pywikibot.info(
+                            'Standard content was changed, sandbox cleaned.')
                     else:
                         edit_delta = (datetime.datetime.utcnow()
                                       - sandbox_page.editTime())
@@ -231,35 +231,35 @@ class SandboxBot(Bot, ConfigParserBot):
                             sandbox_page.put(
                                 self.translated_content, translated_msg)
                             pywikibot.showDiff(text, self.translated_content)
-                            pywikibot.output('Standard content was changed, '
-                                             'sandbox cleaned.')
+                            pywikibot.info('Standard content was changed, '
+                                           'sandbox cleaned.')
                         else:  # wait for the rest
-                            pywikibot.output(
+                            pywikibot.info(
                                 'Sandbox edited {:.1f} minutes ago...'
                                 .format(edit_delta.seconds / 60.0))
-                            pywikibot.output('Sleeping for {} minutes.'
-                                             .format(delta.seconds // 60))
+                            pywikibot.info(
+                                f'Sleeping for {delta.seconds // 60} minutes.')
                             pywikibot.sleep(delta.seconds)
                             wait = True
                 except EditConflictError:
-                    pywikibot.output(
+                    pywikibot.info(
                         '*** Loading again because of edit conflict.\n')
                 except NoPageError:
-                    pywikibot.output(
+                    pywikibot.info(
                         '*** The sandbox is not existent, skipping.')
                     continue
 
             if self.opt.hours < 0:
-                pywikibot.output('\nDone.')
+                pywikibot.info('\nDone.')
                 return
 
             if not wait:
                 if self.opt.hours < 1.0:
-                    pywikibot.output('\nSleeping {} minutes, now {}'.format(
-                        (self.opt.hours * 60), now))
+                    pywikibot.info(
+                        f'\nSleeping {self.opt.hours * 60} minutes, now {now}')
                 else:
-                    pywikibot.output('\nSleeping {} hours, now {}'
-                                     .format(self.opt.hours, now))
+                    pywikibot.info(
+                        f'\nSleeping {self.opt.hours} hours, now {now}')
                 pywikibot.sleep(self.opt.hours * 60 * 60)
 
 

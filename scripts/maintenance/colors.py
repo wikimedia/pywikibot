@@ -35,9 +35,9 @@ def main():
                     color=f'{fg_col};{bg_col}')
 
             line = f'{bg_col.ljust(max_len_bc_color)} {line}'
-            pywikibot.output(line)
+            pywikibot.info(line)
 
-        pywikibot.output()
+        pywikibot.info()
 
 
 if __name__ == '__main__':

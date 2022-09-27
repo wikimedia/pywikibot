@@ -138,8 +138,8 @@ def _signal_handler(signum, frame) -> None:
     global willstop
     if not willstop:
         willstop = True
-        pywikibot.output('Received ctrl-c. Finishing current item; '
-                         'press ctrl-c again to abort.')
+        pywikibot.info('Received ctrl-c. Finishing current item; '
+                       'press ctrl-c again to abort.')
     else:
         raise KeyboardInterrupt
 
@@ -222,7 +222,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
             sys.exit(f'Template {temp.title()} does not exist.')
 
         # Put some output here since it can take a while
-        pywikibot.output('Finding redirects...')
+        pywikibot.info('Finding redirects...')
         if temp.isRedirectPage():
             temp = temp.getRedirectTarget()
         titles = [page.title(with_ns=False)
@@ -246,14 +246,14 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         try:
             exists = linked_page.exists()
         except (InvalidTitleError, InvalidPageError):
-            pywikibot.error('"{}" is not a valid title or the page itself is '
-                            'invalid so it cannot be linked. Skipping.'
-                            .format(link_text))
+            pywikibot.error(
+                f'"{link_text}" is not a valid title or the page itself is '
+                f'invalid so it cannot be linked. Skipping.')
             return None
 
         if not exists:
-            pywikibot.output('{} does not exist so it cannot be linked. '
-                             'Skipping.'.format(linked_page))
+            pywikibot.info(f'{linked_page} does not exist so it cannot be '
+                           f'linked. Skipping.')
             return None
 
         while True:
@@ -267,12 +267,11 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
             break
 
         if not linked_item or not linked_item.exists():
-            pywikibot.output('{} does not have a wikidata item to link with. '
-                             'Skipping.'.format(linked_page))
+            pywikibot.info(f'{linked_page} does not have a wikidata item to '
+                           f'link with. Skipping.')
             linked_item = None
         elif linked_item.title() == item.title():
-            pywikibot.output('{} links to itself. Skipping.'
-                             .format(linked_page))
+            pywikibot.info(f'{linked_page} links to itself. Skipping.')
             linked_item = None
 
         return linked_item
@@ -460,7 +459,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
             if out is None:
                 out = data
             elif out != data:
-                pywikibot.output(f'Found ambiguous date: "{value}"')
+                pywikibot.info(f'Found ambiguous date: "{value}"')
                 return
 
         yield WbTime.fromWikibase(out, self.repo)

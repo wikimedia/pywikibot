@@ -152,8 +152,8 @@ class GeneratorsMixin:
             else:
                 rvgen.request['titles'] = list(cache.keys())
             rvgen.request['rvprop'] = self._rvprops(content=content)
-            pywikibot.output('Retrieving {} pages from {}.'
-                             .format(len(cache), self))
+            pywikibot.info('Retrieving {} pages from {}.'
+                           .format(len(cache), self))
 
             for pagedata in rvgen:
                 pywikibot.debug(f'Preloading {pagedata}')

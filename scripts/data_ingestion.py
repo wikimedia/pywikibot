@@ -234,7 +234,7 @@ class DataIngestionBot(pywikibot.Bot):
         """
         duplicates = page.find_duplicate_images()
         if duplicates:
-            pywikibot.output(f'Skipping duplicate of {duplicates!r}')
+            pywikibot.info(f'Skipping duplicate of {duplicates!r}')
             return
 
         title = page.get_title(self.titlefmt)

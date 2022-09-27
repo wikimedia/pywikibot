@@ -1265,7 +1265,7 @@ class BasePage(ComparableMixin):
                 pywikibot.warning(f'Page {link} not saved')
             raise PageSaveRelatedError(self)
         if not quiet:
-            pywikibot.output(f'Page {link} saved')
+            pywikibot.info(f'Page {link} saved')
 
     def _cosmetic_changes_hook(self, summary: str) -> str:
         """The cosmetic changes hook.
@@ -1805,8 +1805,7 @@ class BasePage(ComparableMixin):
         :param movesubpages: Rename subpages, if applicable.
         """
         if reason is None:
-            pywikibot.output('Moving {} to [[{}]].'
-                             .format(self.title(as_link=True), newtitle))
+            pywikibot.info(f'Moving {self} to [[{newtitle}]].')
             reason = pywikibot.input('Please enter a reason for the move:')
         return self.site.movepage(self, newtitle, reason,
                                   movetalk=movetalk,
@@ -1845,7 +1844,7 @@ class BasePage(ComparableMixin):
             -1       page was marked for deletion
         """
         if reason is None:
-            pywikibot.output(f'Deleting {self.title(as_link=True)}.')
+            pywikibot.info(f'Deleting {self.title(as_link=True)}.')
             reason = pywikibot.input('Please enter a reason for the deletion:')
 
         # If user has 'delete' right, delete the page
@@ -1988,7 +1987,7 @@ class BasePage(ComparableMixin):
         if reason is None:
             warn('Not passing a reason for undelete() is deprecated.',
                  DeprecationWarning)
-            pywikibot.output(f'Undeleting {self.title(as_link=True)}.')
+            pywikibot.info(f'Undeleting {self.title(as_link=True)}.')
             reason = pywikibot.input(
                 'Please enter a reason for the undeletion:')
         self.site.undelete(self, reason, revision=undelete_revs)
@@ -2067,19 +2066,16 @@ class BasePage(ComparableMixin):
                 cats.append(cat)
 
         if not self.has_permission():
-            pywikibot.output("Can't edit {}, skipping it..."
-                             .format(self.title(as_link=True)))
+            pywikibot.info(f"Can't edit {self}, skipping it...")
             return False
 
         if old_cat not in cats:
             if self.namespace() != 10:
                 pywikibot.error('{} is not in category {}!'
-                                .format(self.title(as_link=True),
-                                        old_cat.title()))
+                                .format(self, old_cat.title()))
             else:
-                pywikibot.output('{} is not in category {}, skipping...'
-                                 .format(self.title(as_link=True),
-                                         old_cat.title()))
+                pywikibot.info('{} is not in category {}, skipping...'
+                               .format(self, old_cat.title()))
             return False
 
         # This prevents the bot from adding new_cat if it is already present.
@@ -2106,19 +2102,18 @@ class BasePage(ComparableMixin):
             except ValueError:
                 # Make sure that the only way replaceCategoryLinks() can return
                 # a ValueError is in the case of interwiki links to self.
-                pywikibot.output('Skipping {} because of interwiki link to '
-                                 'self'.format(self.title()))
+                pywikibot.info(
+                    f'Skipping {self} because of interwiki link to self')
                 return False
 
         if oldtext != newtext:
             try:
                 self.put(newtext, summary, show_diff=show_diff)
             except PageSaveRelatedError as error:
-                pywikibot.output('Page {} not saved: {}'
-                                 .format(self.title(as_link=True), error))
+                pywikibot.info(f'Page {self} not saved: {error}')
             except NoUsernameError:
-                pywikibot.output('Page {} not saved; sysop privileges '
-                                 'required.'.format(self.title(as_link=True)))
+                pywikibot.info(
+                    f'Page {self} not saved; sysop privileges required.')
             else:
                 return True
 

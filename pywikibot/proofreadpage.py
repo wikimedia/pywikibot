@@ -295,12 +295,12 @@ class ProofreadPage(pywikibot.Page):
         index_page, others = self._index
         if others:
             pywikibot.warning(f'{self} linked to several Index pages.')
-            pywikibot.output('{}{!s}'.format(' ' * 9, [index_page] + others))
+            pywikibot.info('{}{!s}'.format(' ' * 9, [index_page] + others))
 
             if index_page:
-                pywikibot.output(
+                pywikibot.info(
                     '{}Selected Index: {}'.format(' ' * 9, index_page))
-                pywikibot.output('{}remaining: {!s}'.format(' ' * 9, others))
+                pywikibot.info('{}remaining: {!s}'.format(' ' * 9, others))
 
         if not index_page:
             pywikibot.warning('Page {} is not linked to any Index page.'

@@ -2218,7 +2218,7 @@ class TestPagePreloading(DefaultSiteTestCase):
             if count >= 5:
                 break
 
-    @patch.object(pywikibot, 'output')
+    @patch.object(pywikibot, 'info')
     def test_preload_langlinks_count(self, output_mock):
         """Test preloading continuation works."""
         mysite = self.get_site()

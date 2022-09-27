@@ -325,8 +325,8 @@ class PatchManager:
     def print_hunks(self) -> None:
         """Print the headers and diff texts of all hunks to the output."""
         if self.hunks:
-            pywikibot.output('\n'.join(self._generate_diff(super_hunk)
-                                       for super_hunk in self._super_hunks))
+            pywikibot.info('\n'.join(self._generate_diff(super_hunk)
+                                     for super_hunk in self._super_hunks))
 
     def _generate_super_hunks(self, hunks: Optional[Iterable[Hunk]] = None
                               ) -> List[_SuperHunk]:
@@ -441,7 +441,7 @@ class PatchManager:
                 answers += ['s']
             answers += ['?']
 
-            pywikibot.output(self._generate_diff(super_hunk))
+            pywikibot.info(self._generate_diff(super_hunk))
             choice = pywikibot.input('Accept this hunk [{}]?'.format(
                 ','.join(answers)))
             if choice not in answers:
@@ -499,7 +499,7 @@ class PatchManager:
                     for hunk_entry in hunk_list)
                 if hunk_list_str.endswith('\n'):
                     hunk_list_str = hunk_list_str[:-1]
-                pywikibot.output(hunk_list_str)
+                pywikibot.info(hunk_list_str)
                 next_hunk = pywikibot.input('Go to which hunk?')
                 try:
                     next_hunk_position = int(next_hunk) - 1
@@ -525,10 +525,10 @@ class PatchManager:
                 super_hunks = (super_hunks[:position]
                                + super_hunks[position].split()
                                + super_hunks[position + 1:])
-                pywikibot.output(
+                pywikibot.info(
                     f'Split into {len(super_hunk._hunks)} hunks')
             else:  # choice == '?':
-                pywikibot.output(
+                pywikibot.info(
                     '<<purple>>{}<<default>>'.format('\n'.join(
                         f'{answer} -> {help_msg[answer]}'
                         for answer in answers)))
@@ -536,8 +536,8 @@ class PatchManager:
     def apply(self) -> List[str]:
         """Apply changes. If there are undecided changes, ask to review."""
         if any(h.reviewed == h.PENDING for h in self.hunks):
-            pywikibot.output('There are unreviewed hunks.\n'
-                             'Please review them before proceeding.\n')
+            pywikibot.info('There are unreviewed hunks.\n'
+                           'Please review them before proceeding.\n')
             self.review_hunks()
 
         l_text: List[str] = []
@@ -571,21 +571,21 @@ def cherry_pick(oldtext: str, newtext: str, n: int = 0,
     template = '{2}<<lightpurple>>{0:{1}^50}<<default>>{2}'
 
     patch = PatchManager(oldtext, newtext, context=n, by_letter=by_letter)
-    pywikibot.output(template.format('  ALL CHANGES  ', '*', '\n'))
+    pywikibot.info(template.format('  ALL CHANGES  ', '*', '\n'))
 
     for hunk in patch.hunks:
-        pywikibot.output(hunk.diff_text)
-    pywikibot.output(template.format('  REVIEW CHANGES  ', '*', '\n'))
+        pywikibot.info(hunk.diff_text)
+    pywikibot.info(template.format('  REVIEW CHANGES  ', '*', '\n'))
 
     text_list = patch.apply()
-    pywikibot.output(template.format('  APPROVED CHANGES  ', '*', '\n'))
+    pywikibot.info(template.format('  APPROVED CHANGES  ', '*', '\n'))
 
     if any(hunk.reviewed == hunk.APPR for hunk in patch.hunks):
         for hunk in patch.hunks:
             if hunk.reviewed == hunk.APPR:
-                pywikibot.output(hunk.diff_text)
+                pywikibot.info(hunk.diff_text)
     else:
-        pywikibot.output(template.format('None.', '', ''))
+        pywikibot.info(template.format('None.', '', ''))
 
     text = ''.join(text_list)
 

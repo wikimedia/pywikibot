@@ -79,8 +79,7 @@ class ClaimRobot(WikidataBot):
         self.exists_arg = ''.join(x for x in exists_arg.lower() if x in 'pqst')
         self.cacheSources()
         if self.exists_arg:
-            pywikibot.output("'exists' argument set to '{}'"
-                             .format(self.exists_arg))
+            pywikibot.info(f"'exists' argument set to '{self.exists_arg}'")
 
     def treat_page_and_item(self, page, item) -> None:
         """Treat each page.

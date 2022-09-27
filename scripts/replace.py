@@ -454,7 +454,7 @@ class XmlDumpReplacePageGenerator:
         except KeyboardInterrupt:
             with suppress(NameError):
                 if not self.skipping:
-                    pywikibot.output(
+                    pywikibot.info(
                         'To resume, use "-xmlstart:{}" on the command line.'
                         .format(entry.title))
 
@@ -603,14 +603,14 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             if page is not None and self.isTitleExcepted(
                     page.title(), replacement.exceptions):
                 if replacement.container:
-                    pywikibot.output(
+                    pywikibot.info(
                         'Skipping fix "{}" on {} because the title is on '
                         'the exceptions list.'.format(
                             replacement.container.name,
                             page.title(as_link=True)))
                     skipped_containers.add(replacement.container.name)
                 else:
-                    pywikibot.output(
+                    pywikibot.info(
                         'Skipping unnamed replacement ({}) on {} because '
                         'the title is on the exceptions list.'.format(
                             replacement.description, page.title(as_link=True)))
@@ -683,22 +683,19 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
         context = 0
         while True:
             if self.isTextExcepted(new_text):
-                pywikibot.output('Skipping {} because it contains text '
-                                 'that is on the exceptions list.'
-                                 .format(page))
+                pywikibot.info(f'Skipping {page} because it contains text '
+                               f'that is on the exceptions list.')
                 return
 
             while new_text != last_text:
                 last_text = new_text
-                new_text = self.apply_replacements(last_text, applied,
-                                                   page)
+                new_text = self.apply_replacements(last_text, applied, page)
                 if not self.opt.recursive:
                     break
 
             if new_text == original_text:
                 if not self.opt.quiet:
-                    pywikibot.output('No changes were necessary in '
-                                     + page.title(as_link=True))
+                    pywikibot.info(f'No changes were necessary in {page}')
                 return
 
             if self.opt.addcat:
@@ -742,8 +739,8 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                 try:
                     original_text = page.get(get_redirect=True, force=True)
                 except NoPageError:
-                    pywikibot.output('Page {} has been deleted.'
-                                     .format(page.title()))
+                    pywikibot.info('Page {} has been deleted.'
+                                   .format(page.title()))
                     break
                 new_text = original_text
                 last_text = None
@@ -999,15 +996,14 @@ def main(*args: str) -> None:
         try:
             fix = fixes.fixes[fix_name]
         except KeyError:
-            pywikibot.output('Available predefined fixes are: {}'
-                             .format(', '.join(fixes.fixes.keys())))
+            pywikibot.info('Available predefined fixes are: {}'
+                           .format(', '.join(fixes.fixes.keys())))
             if not fixes.user_fixes_loaded:
-                pywikibot.output('The user fixes file could not be found: {}'
-                                 .format(fixes.filename))
+                pywikibot.info(f'The user fixes file could not be found: '
+                               f'{fixes.filename}')
             return
         if not fix['replacements']:
-            pywikibot.warning('No replacements defined for fix "{}"'
-                              .format(fix_name))
+            pywikibot.warning(f'No replacements defined for fix {fix_name!r}')
             continue
         if 'msg' in fix:
             if isinstance(fix['msg'], str):
@@ -1070,14 +1066,14 @@ def main(*args: str) -> None:
     if ((not edit_summary or edit_summary is True)
             and (missing_fixes_summaries or single_summary)):
         if single_summary:
-            pywikibot.output('The summary message for the command line '
-                             'replacements will be something like: '
-                             + single_summary)
+            pywikibot.info('The summary message for the command line '
+                           'replacements will be something like: '
+                           + single_summary)
         if missing_fixes_summaries:
-            pywikibot.output('The summary will not be used when the fix has '
-                             'one defined but the following fix(es) do(es) '
-                             'not have a summary defined: {}'
-                             .format(', '.join(missing_fixes_summaries)))
+            pywikibot.info('The summary will not be used when the fix has '
+                           'one defined but the following fix(es) do(es) '
+                           'not have a summary defined: {}'
+                           .format(', '.join(missing_fixes_summaries)))
         if edit_summary is not True:
             edit_summary = pywikibot.input(
                 'Press Enter to use this automatic message, or enter a '

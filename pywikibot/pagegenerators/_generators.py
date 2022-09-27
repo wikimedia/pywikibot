@@ -984,10 +984,10 @@ def YearPageGenerator(start: int = 1, end: int = 2050,
     """
     if site is None:
         site = pywikibot.Site()
-    pywikibot.output(f'Starting with year {start}')
+    pywikibot.info(f'Starting with year {start}')
     for i in range(start, end + 1):
         if i % 100 == 0:
-            pywikibot.output(f'Preparing {i}...')
+            pywikibot.info(f'Preparing {i}...')
         # There is no year 0
         if i != 0:
             current_year = date.formatYear(site.lang, i)
@@ -1007,7 +1007,7 @@ def DayPageGenerator(start_month: int = 1, end_month: int = 12,
         site = pywikibot.Site()
     lang = site.lang
     first_page = pywikibot.Page(site, date.format_date(start_month, 1, lang))
-    pywikibot.output(f'Starting with {first_page.title(as_link=True)}')
+    pywikibot.info(f'Starting with {first_page.title(as_link=True)}')
     for month in range(start_month, end_month + 1):
         for day in range(1, calendar.monthrange(year, month)[1] + 1):
             yield pywikibot.Page(

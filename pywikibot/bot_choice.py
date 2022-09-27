@@ -133,7 +133,7 @@ class OutputOption(Option):
         """
         return ''
 
-    @deprecated('pywikibot.output(OutputOption.out)', since='6.5')
+    @deprecated('pywikibot.info(OutputOption.out)', since='6.5')
     def output(self) -> None:
         """Output string.
 
@@ -142,7 +142,7 @@ class OutputOption(Option):
            no longer used by the
            :py:mod:`userinterfaces <pywikibot.userinterfaces>` system.
         """
-        pywikibot.output(self.out)
+        pywikibot.info(self.out)
 
 
 class StandardOption(Option):
@@ -266,10 +266,10 @@ class ContextOption(OutputOption, StandardOption):
         end = min(len(self.text), self.end + self.context)
         return self.text[start:end]
 
-    @deprecated('pywikibot.output(ContextOption.out)', since='6.2.0')
+    @deprecated('pywikibot.info(ContextOption.out)', since='6.2.0')
     def output_range(self, start: int, end: int) -> None:
         """DEPRECATED. Output a section from the text."""
-        pywikibot.output(self.text[start:end])
+        pywikibot.info(self.text[start:end])
 
 
 class Choice(StandardOption):
@@ -596,7 +596,7 @@ class HighlightContextOption(ContextOption):
             self.text[self.end:end],
             color=self.color)
 
-    @deprecated('pywikibot.output(HighlightContextOption.out)', since='6.2.0')
+    @deprecated('pywikibot.info(HighlightContextOption.out)', since='6.2.0')
     def output_range(self, start: int, end: int) -> None:
         """Show normal context with a highlighted center region.
 
@@ -608,7 +608,7 @@ class HighlightContextOption(ContextOption):
             self.text[self.start:self.end],
             self.text[self.end:end],
             color=self.color)
-        pywikibot.output(text)
+        pywikibot.info(text)
 
 
 class UnhandledAnswer(Exception):  # noqa: N818

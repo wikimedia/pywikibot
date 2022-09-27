@@ -405,9 +405,8 @@ class GeneratorFactory:
             pass
 
         if start or end:
-            pywikibot.output('Fetching log events in range: {} - {}.'
-                             .format(end or 'beginning of time',
-                                     start or 'now'))
+            pywikibot.info('Fetching log events in range: {} - {}.'
+                           .format(end or 'beginning of time', start or 'now'))
 
         # 'user or None', because user might be an empty string when
         # 'foo,,bar' was used.
@@ -446,7 +445,7 @@ class GeneratorFactory:
                 txt += f'{_i}{prio}\n'
                 txt += ''.join(
                     f'{_2i}{c}\n' for c in _list)
-            pywikibot.output(txt)
+            pywikibot.info(txt)
 
         if cat == 'show':  # Display categories of lint errors.
             show_available_categories(cats)
@@ -480,7 +479,7 @@ class GeneratorFactory:
                 txt += '    {a:<{max_w}}{b}\n'.format(a=a, b=b, max_w=max_w)
             txt += ('\nMaximum number of pages to return is {max} '
                     '({highmax} for bots).\n'.format_map(limit))
-            pywikibot.output(txt)
+            pywikibot.info(txt)
             sys.exit(0)
 
         return self.site.querypage(value)

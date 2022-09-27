@@ -116,7 +116,7 @@ class TestUserClass(TestCase):
 
     def test_autoblocked_user(self):
         """Test autoblocked user."""
-        with patch.object(pywikibot, 'output') as p:
+        with patch.object(pywikibot, 'info') as p:
             user = User(self.site, '#1242976')
         p.assert_called_once_with(
             'This is an autoblock ID, you can only use to unblock it.')
@@ -140,7 +140,7 @@ class TestUserClass(TestCase):
     def test_autoblocked_user_with_namespace(self):
         """Test autoblocked user."""
         # Suppress output: This is an autoblock ID, you can only use to unblock
-        with patch.object(pywikibot, 'output'):
+        with patch.object(pywikibot, 'info'):
             user = User(self.site, 'User:#1242976')
         self.assertEqual('#1242976', user.username)
         self.assertEqual(user.title(with_ns=False), user.username[1:])

@@ -787,10 +787,10 @@ class InteractiveReplace:
             text = self.current_text
             # at the beginning of the link, start red color.
             # at the end of the link, reset the color to default
-            pywikibot.output(text[max(0, rng[0] - self.context): rng[0]]
-                             + '<<lightred>>{}<<default>>'.format(
-                                 text[rng[0]: rng[1]])
-                             + text[rng[1]: rng[1] + self.context])
+            pywikibot.info(text[max(0, rng[0] - self.context): rng[0]]
+                           + '<<lightred>>{}<<default>>'.format(
+                               text[rng[0]: rng[1]])
+                           + text[rng[1]: rng[1] + self.context])
         else:
             question += '<<lightred>>{}<<default>> '.format(
                 self._old.canonical_title())
@@ -996,7 +996,7 @@ def handle_args(args: Optional[Iterable[str]] = None,
     writeToCommandLogFile()
 
     if config.verbose_output:
-        pywikibot.output('Python ' + sys.version)
+        pywikibot.info('Python ' + sys.version)
 
     if do_help_val:
         show_help(show_global=do_help_val == 'global')
@@ -1442,8 +1442,7 @@ class BaseBot(OptionHandler):
         :return: whether the page was saved successfully
         """
         if oldtext.rstrip() == newtext.rstrip():
-            pywikibot.output('No changes were needed on {}'
-                             .format(page.title(as_link=True)))
+            pywikibot.info(f'No changes were needed on {page}')
             return False
 
         self.current_page = page
@@ -1453,7 +1452,7 @@ class BaseBot(OptionHandler):
             pywikibot.showDiff(oldtext, newtext)
 
         if 'summary' in kwargs:
-            pywikibot.output('Edit summary: {}'.format(kwargs['summary']))
+            pywikibot.info('Edit summary: {}'.format(kwargs['summary']))
 
         page.text = newtext
         return self._save_page(page, page.save, **kwargs)
@@ -1497,14 +1496,14 @@ class BaseBot(OptionHandler):
             if not ignore_save_related_errors:
                 raise
             if isinstance(e, EditConflictError):
-                pywikibot.output('Skipping {} because of edit conflict'
-                                 .format(page.title()))
+                pywikibot.info('Skipping {} because of edit conflict'
+                               .format(page.title()))
             elif isinstance(e, SpamblacklistError):
-                pywikibot.output('Cannot change {} because of blacklist '
-                                 'entry {}'.format(page.title(), e.url))
+                pywikibot.info('Cannot change {} because of blacklist '
+                               'entry {}'.format(page.title(), e.url))
             elif isinstance(e, LockedPageError):
-                pywikibot.output('Skipping {} (locked page)'
-                                 .format(page.title()))
+                pywikibot.info('Skipping {} (locked page)'
+                               .format(page.title()))
             else:
                 pywikibot.error('Skipping {} because of a save related '
                                 'error: {}'.format(page.title(), e))
@@ -1551,16 +1550,16 @@ class BaseBot(OptionHandler):
             write_delta = pywikibot.Timestamp.now() - self._start_ts
             write_seconds = int(write_delta.total_seconds())
             if write_delta.days:
-                pywikibot.output(
+                pywikibot.info(
                     'Execution time: {d.days} days, {d.seconds} seconds'
                     .format(d=write_delta))
             else:
-                pywikibot.output('Execution time: {} seconds'
-                                 .format(write_delta.seconds))
+                pywikibot.info(
+                    f'Execution time: {write_delta.seconds} seconds')
 
             if self.counter['read']:
-                pywikibot.output('Read operation time: {:.1f} seconds'
-                                 .format(read_seconds / self.counter['read']))
+                pywikibot.info('Read operation time: {:.1f} seconds'
+                               .format(read_seconds / self.counter['read']))
 
             for op, count in self.counter.items():
                 if not count or op == 'read':
@@ -1570,11 +1569,11 @@ class BaseBot(OptionHandler):
 
         # exc_info contains exception from self.run() while terminating
         exc_info = sys.exc_info()
-        pywikibot.output('Script terminated ', newline=False)
+        pywikibot.info('Script terminated ', newline=False)
         if exc_info[0] is None or exc_info[0] is KeyboardInterrupt:
-            pywikibot.output('successfully.')
+            pywikibot.info('successfully.')
         else:
-            pywikibot.output('by exception:\n')
+            pywikibot.info('by exception:\n')
             pywikibot.exception(exc_info=False)
 
     def init_page(self, item: Any) -> 'pywikibot.page.BasePage':
@@ -1686,14 +1685,14 @@ class BaseBot(OptionHandler):
 
             self.generator_completed = True
         except QuitKeyboardInterrupt:
-            pywikibot.output('\nUser quit {} bot run...'
-                             .format(self.__class__.__name__))
+            pywikibot.info('\nUser quit {} bot run...'
+                           .format(self.__class__.__name__))
         except KeyboardInterrupt:
             if config.verbose_output:
                 raise
 
-            pywikibot.output('\nKeyboardInterrupt during {} bot run...'
-                             .format(self.__class__.__name__))
+            pywikibot.info('\nKeyboardInterrupt during {} bot run...'
+                           .format(self.__class__.__name__))
         finally:
             self.exit()
 
@@ -1893,7 +1892,7 @@ class ConfigParserBot(BaseBot):
         section = calledModuleName()
 
         if (conf.read(self.INI) == [self.INI] and conf.has_section(section)):
-            pywikibot.output(f'Reading settings from {self.INI} file.')
+            pywikibot.info(f'Reading settings from {self.INI} file.')
             options = {}
             for option, value in self.available_options.items():
                 if not conf.has_option(section, option):
@@ -2174,12 +2173,12 @@ class WikidataBot(Bot, ExistingPageBot):
         ns = self.repo.property_namespace
         for page in self.repo.search(property_name, total=1, namespaces=ns):
             page = pywikibot.PropertyPage(self.repo, page.title())
-            pywikibot.output('Assuming that {} property is {}.'
-                             .format(property_name, page.id))
+            pywikibot.info(
+                f'Assuming that {property_name} property is {page.id}.')
             return page.id
-        return pywikibot.input('Property {} was not found. Please enter the '
-                               'property ID (e.g. P123) of it:'
-                               .format(property_name)).upper()
+        return pywikibot.input(
+            f'Property {property_name} was not found. Please enter the '
+            f'property ID (e.g. P123) of it:').upper()
 
     def user_edit_entity(self, entity: 'pywikibot.page.WikibasePage',
                          data: Optional[Dict[str, str]] = None,
@@ -2211,10 +2210,10 @@ class WikidataBot(Bot, ExistingPageBot):
                 diff = entity.toJSON(diffto=getattr(entity, '_content', None))
             else:
                 diff = entity._normalizeData(data)
-            pywikibot.output(json.dumps(diff, indent=4, sort_keys=True))
+            pywikibot.info(json.dumps(diff, indent=4, sort_keys=True))
 
         if 'summary' in kwargs:
-            pywikibot.output('Change summary: {}'.format(kwargs['summary']))
+            pywikibot.info('Change summary: {}'.format(kwargs['summary']))
 
         # TODO PageSaveRelatedErrors should be actually raised in editEntity
         # (bug T86083)
@@ -2253,8 +2252,8 @@ class WikidataBot(Bot, ExistingPageBot):
             if sourceclaim:
                 claim.addSource(sourceclaim)
 
-        pywikibot.output('Adding {} --> {}'.format(claim.getID(),
-                                                   claim.getTarget()))
+        pywikibot.info('Adding {} --> {}'.format(claim.getID(),
+                                                 claim.getTarget()))
         return self._save_page(item, item.addClaim, claim, bot=bot, **kwargs)
 
     def getSource(self, site: 'BaseSite') -> Optional['pywikibot.page.Claim']:
@@ -2397,7 +2396,7 @@ class WikidataBot(Bot, ExistingPageBot):
                 'value': page.title(without_brackets=page.namespace() == 0)
             }
         })
-        pywikibot.output(f'Creating item for {page}...')
+        pywikibot.info(f'Creating item for {page}...')
         item = pywikibot.ItemPage(page.site.data_repository())
         kwargs.setdefault('show_diff', False)
         result = self.user_edit_entity(item, data, summary=summary, **kwargs)
@@ -2446,7 +2445,7 @@ class WikidataBot(Bot, ExistingPageBot):
             item = self.create_item_for_page(page, asynchronous=False)
 
         if not item and not self.treat_missing_item:
-            pywikibot.output(f"{page} doesn't have a Wikidata item.")
+            pywikibot.info(f"{page} doesn't have a Wikidata item.")
             return
 
         self.treat_page_and_item(page, item)

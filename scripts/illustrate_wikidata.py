@@ -44,7 +44,7 @@ class IllustrateRobot(WikidataBot):
 
     def treat_page_and_item(self, page, item) -> None:
         """Treat a page / item."""
-        pywikibot.output('Found ' + item.title())
+        pywikibot.info('Found ' + item.title())
         imagename = page.properties().get('page_image_free')
 
         if not imagename:
@@ -52,8 +52,8 @@ class IllustrateRobot(WikidataBot):
 
         claims = item.get().get('claims')
         if self.wdproperty in claims:
-            pywikibot.output('Item {} already contains image ({})'
-                             .format(item.title(), self.wdproperty))
+            pywikibot.info('Item {} already contains image ({})'
+                           .format(item.title(), self.wdproperty))
             return
 
         newclaim = pywikibot.Claim(self.repo, self.wdproperty)
@@ -65,8 +65,7 @@ class IllustrateRobot(WikidataBot):
             image = pywikibot.FilePage(image.getRedirectTarget())
 
         if not image.exists():
-            pywikibot.output("{} doesn't exist so I can't link to it"
-                             .format(image.title(as_link=True)))
+            pywikibot.info(f"{image} doesn't exist so I can't link to it")
             return
 
         newclaim.setTarget(image)

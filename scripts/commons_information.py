@@ -68,7 +68,7 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
             if langs and langs[0].prob > 0.9:
                 tmp_page2 = pywikibot.Page(self.site, langs[0].lang, ns=10)
                 if tmp_page2 != tmp_page:
-                    pywikibot.output(
+                    pywikibot.info(
                         '<<lightblue>>The language template {before!r} '
                         'was found, but langdetect thinks {after!r} is the '
                         'most appropriate with a probability of {prob}:'
@@ -126,15 +126,15 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
                 desc_clean.remove(tmp)
             value = desc_clean.strip()
             if value == '':
-                pywikibot.output('Empty description')
+                pywikibot.info('Empty description')
                 continue
-            pywikibot.output(value)
+            pywikibot.info(value)
             langs = self.detect_langs(value)
             if langs:
-                pywikibot.output(
+                pywikibot.info(
                     '<<lightblue>>Hints from langdetect:<<default>>')
                 for language in langs:
-                    pywikibot.output(
+                    pywikibot.info(
                         '<<lightblue>>{obj.lang}: {obj.prob}<<default>>'
                         .format(obj=language))
             lang = pywikibot.input(

@@ -286,8 +286,8 @@ class LoginManager:
                 'shown):'.format(name=self.login_name, site=self.site),
                 password=True)
 
-        pywikibot.output('Logging in to {site} as {name}'
-                         .format(name=self.login_name, site=self.site))
+        pywikibot.info('Logging in to {site} as {name}'
+                       .format(name=self.login_name, site=self.site))
         try:
             self.login_to_site()
         except APIError as e:
@@ -390,7 +390,7 @@ class OauthLoginManager(LoginManager):
         :param force: force to re-authenticate
         """
         if self.access_token is None or force:
-            pywikibot.output(
+            pywikibot.info(
                 'Logging in to {site} via OAuth consumer {key}'
                 .format(key=self.consumer_token[0], site=self.site))
             consumer_token = mwoauth.ConsumerToken(*self.consumer_token)
@@ -413,9 +413,8 @@ class OauthLoginManager(LoginManager):
                     return self.login(retry=True, force=force)
                 return False
         else:
-            pywikibot.output('Logged in to {site} via consumer {key}'
-                             .format(key=self.consumer_token[0],
-                                     site=self.site))
+            pywikibot.info('Logged in to {site} via consumer {key}'
+                           .format(key=self.consumer_token[0], site=self.site))
             return True
 
     @property

@@ -40,7 +40,7 @@ def update_family(families):
     """Update family files."""
     ws = wikistats.WikiStats()
     for family in families or families_list:
-        pywikibot.output(f'\nChecking family {family}:')
+        pywikibot.info(f'\nChecking family {family}:')
 
         original = Family.load(family).languages_by_size
         for code in exceptions.get(family, []):
@@ -68,10 +68,10 @@ def update_family(families):
                 i -= 1
 
         if original == new:
-            pywikibot.output('The lists match!')
+            pywikibot.info('The lists match!')
             continue
 
-        pywikibot.output("The lists don't match, the new list is:")
+        pywikibot.info("The lists don't match, the new list is:")
         text = '    languages_by_size = [\n'
         line = ' ' * 7
         for code in new:
@@ -81,7 +81,7 @@ def update_family(families):
             line += f" '{code}',"
         text += line + '\n'
         text += '    ]'
-        pywikibot.output(text)
+        pywikibot.info(text)
         family_file_name = f'pywikibot/families/{family}_family.py'
         with codecs.open(family_file_name, 'r', 'utf8') as family_file:
             family_text = family_file.read()

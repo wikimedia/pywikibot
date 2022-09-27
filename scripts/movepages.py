@@ -79,8 +79,7 @@ class MovePagesBot(CurrentPageBot):
         msg = self.opt.summary
         if not msg:
             msg = i18n.twtranslate(page.site, 'movepages-moving')
-        pywikibot.output('Moving page {} to [[{}]]'
-                         .format(page, new_page_tite))
+        pywikibot.info(f'Moving page {page} to [[{new_page_tite}]]')
         try:
             page.move(new_page_tite, reason=msg,
                       movetalk=self.opt.movetalkpage,

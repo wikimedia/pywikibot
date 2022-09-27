@@ -84,16 +84,12 @@ def _oauth_login(site) -> None:
                     wrong=identity['username'], right=site.username()))
     else:
         oauth_token = login_manager.consumer_token + login_manager.access_token
-        pywikibot.output('Logged in on {site} as {username}'
-                         'via OAuth consumer {consumer}\n'
-                         'NOTE: To use OAuth, you need to copy the '
-                         'following line to your user config file:\n'
-                         'authenticate[{hostname!r}] = {oauth_token}'
-                         .format(site=site,
-                                 username=site.username(),
-                                 consumer=consumer_key,
-                                 hostname=site.hostname(),
-                                 oauth_token=oauth_token))
+        pywikibot.info(
+            'Logged in on {site} as {username} via OAuth consumer {consumer}\n'
+            'NOTE: To use OAuth, you need to copy the  following line to your '
+            'user config file:\n authenticate[{hostname!r}] = {oauth_token}'
+            .format(site=site, username=site.username(), consumer=consumer_key,
+                    hostname=site.hostname(), oauth_token=oauth_token))
 
 
 def login_one_site(code, family, oauth, logout, autocreate):

@@ -265,7 +265,7 @@ class Throttle:
                       'now': time.strftime('%Y-%m-%d %H:%M:%S',
                                            time.localtime())})
         if seconds > config.noisysleep:
-            pywikibot.output(message)
+            pywikibot.info(message)
         else:
             pywikibot.log(message)
 

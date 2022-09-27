@@ -146,7 +146,7 @@ class AddTextBot(AutomaticTWSummaryBot, ExistingPageBot):
                     return True
 
         elif page.isTalkPage():
-            pywikibot.output(f"{page} doesn't exist, creating it!")
+            pywikibot.info(f"{page} doesn't exist, creating it!")
             return False
 
         elif self.opt.create or self.opt.createonly:

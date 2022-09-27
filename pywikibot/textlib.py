@@ -1073,13 +1073,12 @@ def getLanguageLinks(
             try:
                 result[page.site] = page  # need to trigger page._link.parse()
             except InvalidTitleError:
-                pywikibot.output('[getLanguageLinks] Text contains invalid '
-                                 'interwiki link [[{}:{}]].'
-                                 .format(lang, pagetitle))
+                pywikibot.info(f'[getLanguageLinks] Text contains invalid '
+                               f'interwiki link [[{lang}:{pagetitle}]].')
                 continue
             if previous_key_count == len(result):
-                pywikibot.warning('[getLanguageLinks] 2 or more interwiki '
-                                  'links point to site {}.'.format(site))
+                pywikibot.warning(f'[getLanguageLinks] 2 or more interwiki '
+                                  f'links point to site {site}.')
     return result
 
 
@@ -2044,9 +2043,8 @@ class TimeStripper:
             try:
                 value = self.origNames2monthNum[dateDict['month']['value']]
             except KeyError:
-                pywikibot.output('incorrect month name "{}" in page in site {}'
-                                 .format(dateDict['month']['value'],
-                                         self.site))
+                pywikibot.info('incorrect month name "{}" in page in site {}'
+                               .format(dateDict['month']['value'], self.site))
                 raise KeyError
             else:
                 dateDict['month']['value'] = value

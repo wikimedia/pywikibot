@@ -546,24 +546,24 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot):
         if self.referencesR.search(oldTextCleaned) \
            or self.referencesTagR.search(oldTextCleaned):
             if self.opt.verbose:
-                pywikibot.output('No changes necessary: references tag found.')
+                pywikibot.info('No changes necessary: references tag found.')
             return False
 
         if self.referencesTemplates:
             templateR = '{{(' + '|'.join(self.referencesTemplates) + ')'
             if re.search(templateR, oldTextCleaned, re.IGNORECASE):
                 if self.opt.verbose:
-                    pywikibot.output(
+                    pywikibot.info(
                         'No changes necessary: references template found.')
                 return False
 
         if not self.refR.search(oldTextCleaned):
             if self.opt.verbose:
-                pywikibot.output('No changes necessary: no ref tags found.')
+                pywikibot.info('No changes necessary: no ref tags found.')
             return False
 
         if self.opt.verbose:
-            pywikibot.output('Found ref without references.')
+            pywikibot.info('Found ref without references.')
         return True
 
     def addReferences(self, oldText) -> str:
@@ -586,12 +586,12 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot):
         pattern = re.compile(r'< *references *>(.*?)'
                              r'< */?\s*references */? *>', re.DOTALL)
         if pattern.search(oldText):
-            pywikibot.output('Repairing references tag')
+            pywikibot.info('Repairing references tag')
             return re.sub(pattern, r'<references>\1</references>', oldText)
         # Repair single unclosed references tag
         pattern = re.compile(r'< *references *>')
         if pattern.search(oldText):
-            pywikibot.output('Repairing references tag')
+            pywikibot.info('Repairing references tag')
             return re.sub(pattern, '<references />', oldText)
 
         # Is there an existing section where we can add the references tag?
@@ -604,13 +604,12 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot):
                 match = sectionR.search(oldText, index)
                 if match:
                     if textlib.isDisabled(oldText, match.start()):
-                        pywikibot.output(
-                            'Existing {} section is commented out, skipping.'
-                            .format(section))
+                        pywikibot.info(f'Existing {section} section is '
+                                       f'commented out, skipping.')
                         index = match.end()
                     else:
-                        pywikibot.output('Adding references tag to existing'
-                                         '{} section...\n'.format(section))
+                        pywikibot.info(f'Adding references tag to existing'
+                                       f'{section} section...\n')
                         templates_or_comments = re.compile(
                             r'^((?:\s*(?:\{\{[^\{\}]*?\}\}|<!--.*?-->))*)',
                             flags=re.DOTALL)
@@ -633,13 +632,13 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot):
                 match = sectionR.search(oldText, index)
                 if match:
                     if textlib.isDisabled(oldText, match.start()):
-                        pywikibot.output(
+                        pywikibot.info(
                             'Existing {} section is commented out, '
                             "won't add the references in front of it."
                             .format(section))
                         index = match.end()
                     else:
-                        pywikibot.output(
+                        pywikibot.info(
                             'Adding references section before {} section...\n'
                             .format(section))
                         index = match.start()
@@ -680,7 +679,7 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot):
                 tmpText = tmpText[:match.start()]
             else:
                 break
-        pywikibot.output(
+        pywikibot.info(
             'Found no section that can be preceded by a new references '
             'section.\nPlacing it before interwiki links, categories, and '
             'bottom templates.')

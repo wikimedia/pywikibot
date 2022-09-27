@@ -117,7 +117,7 @@ def mysql_query(query: str, params=None,
             _query = _query.strip()
             _query = '\n'.join(f'    {line}'
                                for line in _query.splitlines())
-            pywikibot.output('Executing query:\n' + _query)
+            pywikibot.info('Executing query:\n' + _query)
 
         if query == 'test':  # for tests only
             yield query

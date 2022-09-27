@@ -50,9 +50,9 @@ class GraphSavingThread(threading.Thread):
             filename = config.datafilepath(
                 'interwiki-graphs/' + getFilename(self.origin, fmt))
             if self.graph.write(filename, prog='dot', format=fmt):
-                pywikibot.output('Graph saved as ' + filename)
+                pywikibot.info('Graph saved as ' + filename)
             else:
-                pywikibot.output('Graph could not be saved as ' + filename)
+                pywikibot.info('Graph could not be saved as ' + filename)
 
 
 class Subject:
@@ -194,8 +194,8 @@ class GraphDrawer:
 
         For more info see https://meta.wikimedia.org/wiki/Interwiki_graphs
         """
-        pywikibot.output('Preparing graph for {}'
-                         .format(self.subject.origin.title()))
+        pywikibot.info('Preparing graph for {}'
+                       .format(self.subject.origin.title()))
         # create empty graph
         self.graph = pydot.Dot()
 

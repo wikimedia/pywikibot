@@ -106,7 +106,7 @@ def main(*args: str) -> None:
         return
 
     gen_args = ' '.join(gen_args)
-    pywikibot.output("""
+    pywikibot.info("""
     Page transfer configuration
     ---------------------------
     Source: {fromsite}
@@ -155,11 +155,7 @@ def main(*args: str) -> None:
             )
             continue
 
-        pywikibot.output('Moving {} to {}...'
-                         .format(page.title(as_link=True,
-                                            force_interwiki=True),
-                                 targetpage.title(as_link=True)))
-
+        pywikibot.info(f'Moving {page} to {targetpage}...')
         pywikibot.log('Getting page text.')
         text = page.get(get_redirect=True)
         source_link = page.title(as_link=True, insite=targetpage.site)

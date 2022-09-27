@@ -411,8 +411,8 @@ class DiscussionPage(pywikibot.Page):
         # This extra info is not desirable when run under the unittest
         # framework, which may be run either directly or via setup.py
         if pywikibot.calledModuleName() not in ['archivebot_tests', 'setup']:
-            pywikibot.output('{} thread(s) found on {}'
-                             .format(len(self.threads), self))
+            pywikibot.info('{} thread(s) found on {}'
+                           .format(len(self.threads), self))
 
     def is_full(self, max_archive_size: Size) -> bool:
         """Check whether archive size exceeded."""
@@ -454,7 +454,7 @@ class DiscussionPage(pywikibot.Page):
     def update(self, summary, sort_threads: bool = False) -> None:
         """Recombine threads and save page."""
         if sort_threads:
-            pywikibot.output('Sorting threads...')
+            pywikibot.info('Sorting threads...')
             self.threads.sort(key=lambda t: t.timestamp)
         newtext = self.header.strip() + '\n\n'  # Fix trailing newlines
         for t in self.threads:
@@ -649,8 +649,7 @@ class PageArchiver:
         keep_threads = []
         threads_per_archive = defaultdict(list)
         whys = set()
-        pywikibot.output('Processing {} threads'
-                         .format(len(self.page.threads)))
+        pywikibot.info('Processing {} threads'.format(len(self.page.threads)))
         fields = self.get_params(self.now, 0).keys()  # dummy parameters
         regex = re.compile(r'%(\((?:{})\))d'.format('|'.join(fields)))
         stringpattern = regex.sub(r'%\1s', pattern)
@@ -759,8 +758,8 @@ class PageArchiver:
         if self.archived_threads < mintoarchive:
             # We might not want to archive a measly few threads
             # (lowers edit frequency)
-            pywikibot.output('Only {} (< {}) threads are old enough. Skipping'
-                             .format(self.archived_threads, mintoarchive))
+            pywikibot.info(f'Only {self.archived_threads} (< {mintoarchive}) '
+                           f'threads are old enough. Skipping')
             return
         if whys:
             # Search for the marker template
@@ -772,8 +771,7 @@ class PageArchiver:
                     "Couldn't find the template in the header"
                 )
 
-            pywikibot.output('Archiving {} thread(s).'
-                             .format(self.archived_threads))
+            pywikibot.info(f'Archiving {self.archived_threads} thread(s).')
             # Save the archives first (so that bugs don't cause a loss of data)
             for _title, archive in sorted(self.archives.items()):
                 count = archive.archived_threads
@@ -907,10 +905,10 @@ def main(*args: str) -> None:
         if page.exists():
             calc = page.title()
         else:
-            pywikibot.output(
+            pywikibot.info(
                 'NOTE: the specified page "{}" does not (yet) exist.'
                 .format(calc))
-        pywikibot.output(f'key = {calc_md5_hexdigest(calc, salt)}')
+        pywikibot.info(f'key = {calc_md5_hexdigest(calc, salt)}')
         return
 
     if not templates:
@@ -928,7 +926,7 @@ def main(*args: str) -> None:
         else:
 
             ns = [str(namespace)] if namespace is not None else []
-            pywikibot.output('Fetching template transclusions...')
+            pywikibot.info('Fetching template transclusions...')
             gen = tmpl.getReferences(only_template_inclusion=True,
                                      follow_redirects=False,
                                      namespaces=ns,

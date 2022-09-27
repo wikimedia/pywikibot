@@ -274,8 +274,8 @@ def main(*args: str) -> None:
         try:
             templates = dict(itergroup(template_names, 2, strict=True))
         except ValueError:
-            pywikibot.output('Unless using solely -subst or -remove, '
-                             'you must give an even number of template names.')
+            pywikibot.info('Unless using solely -subst or -remove, you must '
+                           'give an even number of template names.')
             return
 
     old_templates = [pywikibot.Page(site, template_name, ns=10)
