@@ -501,7 +501,7 @@ class PageArchiver:
             # keep a gap of 1 KB not to block later changes
             self.maxsize = self.site.siteinfo['maxarticlesize'] - 1024
         except KeyError:  # mw < 1.28
-            self.maxsize = 2096128  # 2 MB - 1 KB gap
+            self.maxsize = 2_096_128  # 2 MB - 1 KB gap
 
         self.page = DiscussionPage(page, self, keep=keep)
         self.comment_params = {

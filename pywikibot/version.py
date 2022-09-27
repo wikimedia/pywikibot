@@ -170,7 +170,7 @@ order by revision desc, changed_date desc""")
         tag, = cur.fetchone()
 
     tag = os.path.split(tag)[1]
-    date = time.gmtime(date / 1000000)
+    date = time.gmtime(date / 1_000_000)
     return tag, rev, date
 
 
