@@ -65,7 +65,7 @@ def AllpagesPageGenerator(
     if site is None:
         site = pywikibot.Site()
 
-    filterredir = None  # type: Optional[bool]
+    filterredir: Optional[bool] = None
     if not includeredirects:
         filterredir = False
     elif includeredirects == 'only':
@@ -104,7 +104,7 @@ def PrefixingPageGenerator(prefix: str,
         namespace = prefixlink.namespace
     title = prefixlink.title
 
-    filterredir = None  # type: Optional[bool]
+    filterredir: Optional[bool] = None
     if not includeredirects:
         filterredir = False
     elif includeredirects == 'only':
@@ -930,7 +930,7 @@ class XMLDumpPageGenerator(abc.Iterator):  # type: ignore[type-arg]
         self.content = content
         self.skipping = bool(start)
 
-        self.start = None  # type: Optional[str]
+        self.start: Optional[str] = None
         if start is not None and self.skipping:
             self.start = start.replace('_', ' ')
 

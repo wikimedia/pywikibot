@@ -377,7 +377,7 @@ class OauthLoginManager(LoginManager):
                            'should be removed if OAuth enabled.'
                            .format(login=self))
         self._consumer_token = (user, password)
-        self._access_token = None  # type: Optional[Tuple[str, str]]
+        self._access_token: Optional[Tuple[str, str]] = None
 
     def login(self, retry: bool = False, force: bool = False) -> bool:
         """

@@ -249,7 +249,7 @@ class LinkCheckThread(threading.Thread):
     """
 
     #: Collecting start time of a thread for any host
-    hosts = {}  # type: Dict[str, float]
+    hosts: Dict[str, float] = {}
     lock = threading.Lock()
 
     def __init__(self, page, url, history, http_ignores, day) -> None:

@@ -46,7 +46,7 @@ INPUT = 25  #:
 .. seealso:: :python:`Python Logging Levels<logging.html#logging-levels>`
 """
 
-_init_routines = []  # type: List[Callable[[], Any]]
+_init_routines: List[Callable[[], Any]] = []
 _inited_routines = set()
 
 

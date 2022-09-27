@@ -92,7 +92,7 @@ __all__ = (
 # argvu is set by pywikibot.bot when it's imported
 
 if not hasattr(sys.modules[__name__], 'argvu'):
-    argvu = []  # type: List[str]
+    argvu: List[str] = []
 
 
 class Coordinate(_WbRepresentation):
@@ -609,7 +609,8 @@ class WbQuantity(_WbRepresentation):
             self.upperBound = self.lowerBound = None
         else:
             if error is None:
-                upperError = lowerError = Decimal(0)  # type: Optional[Decimal]
+                upperError: Optional[Decimal] = Decimal(0)
+                lowerError: Optional[Decimal] = Decimal(0)
             elif isinstance(error, tuple):
                 upperError = self._todecimal(error[0])
                 lowerError = self._todecimal(error[1])
@@ -952,7 +953,7 @@ class WbUnknown(_WbRepresentation):
         return cls(data)
 
 
-_sites = {}  # type: Dict[str, APISite]
+_sites: Dict[str, APISite] = {}
 
 
 @cache
@@ -1260,9 +1261,9 @@ def async_request(request: Callable, *args: Any, **kwargs: Any) -> None:
 
 
 # queue to hold pending requests
-page_put_queue = Queue(_config.max_queue_size)  # type: Queue
+page_put_queue: Queue = Queue(_config.max_queue_size)
 # queue to signal that async_manager is working on a request. See T147178.
-page_put_queue_busy = Queue(_config.max_queue_size)  # type: Queue
+page_put_queue_busy: Queue = Queue(_config.max_queue_size)
 # set up the background thread
 _putthread = threading.Thread(target=async_manager,
                               name='Put-Thread',  # for debugging purposes

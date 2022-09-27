@@ -141,8 +141,8 @@ mylang = 'language'
 # usernames['wikibooks']['*'] = 'mySingleUsername'
 # You may use '*' for family name in a similar manner.
 #
-usernames = collections.defaultdict(dict)  # type: Dict[str, Dict[str, str]]
-disambiguation_comment = collections.defaultdict(dict)  # type: _DabComDict
+usernames: Dict[str, Dict[str, str]] = collections.defaultdict(dict)
+disambiguation_comment: _DabComDict = collections.defaultdict(dict)
 
 # User agent format.
 # For the meaning and more help in customization see:
@@ -167,7 +167,7 @@ fake_user_agent_default = {'reflinks': False, 'weblinkchecker': False}
 # True for enabling, False for disabling, str to hardcode a UA.
 # Example: {'problematic.site.example': True,
 #           'prefers.specific.ua.example': 'snakeoil/4.2'}
-fake_user_agent_exceptions = {}  # type: Dict[str, Union[bool, str]]
+fake_user_agent_exceptions: Dict[str, Union[bool, str]] = {}
 
 # The default interface for communicating with the site
 # currently the only defined interface is 'APISite', so don't change this!
@@ -215,7 +215,7 @@ solve_captcha = True
 #                                    'access_key', 'access_secret')
 #
 # Note: the target wiki site must install OAuth extension
-authenticate = {}  # type: Dict[str, Tuple[str, ...]]
+authenticate: Dict[str, Tuple[str, ...]] = {}
 
 # By default you are asked for a password on the terminal.
 # A password file may be used, e.g. password_file = '.passwd'
@@ -268,7 +268,7 @@ ignore_file_security_warnings = False
 #
 # Note that these headers will be sent with all requests,
 # not just MediaWiki API calls.
-extra_headers = {}  # type: Mapping[str, str]
+extra_headers: Mapping[str, str] = {}
 
 # Set to True to override the {{bots}} exclusion protocol (at your own risk!)
 ignore_bot_templates = False
@@ -517,7 +517,7 @@ userinterface = 'terminal'
 # this can be used to pass variables to the UI init function
 # useful for e.g.
 # userinterface_init_kwargs = {'default_stream': 'stdout'}
-userinterface_init_kwargs = {}  # type: Dict[str, str]
+userinterface_init_kwargs: Dict[str, str] = {}
 
 # i18n setting for user interface language
 # default is obtained from locale.getlocale
@@ -590,9 +590,9 @@ editor_filename_extension = 'wiki'
 #     log = []
 # Per default, no logging is enabled.
 # This setting can be overridden by the -log or -nolog command-line arguments.
-log = []  # type: List[str]
+log: List[str] = []
 # filename defaults to modulename-bot.log
-logfilename = None  # type: Optional[str]
+logfilename: Optional[str] = None
 # maximal size of a logfile in kilobytes. If the size reached that limit the
 # logfile will be renamed (if logfilecount is not 0) and the old file is filled
 # again. logfilesize must be an integer value
@@ -610,7 +610,7 @@ verbose_output = 0
 log_pywiki_repo_version = False
 # if True, include a lot of debugging info in logfile
 # (overrides log setting above)
-debug_log = []  # type: List[str]
+debug_log: List[str] = []
 
 # ############# EXTERNAL SCRIPT PATH SETTINGS ##############
 # Set your own script path to lookup for your script files.
@@ -630,7 +630,7 @@ debug_log = []  # type: List[str]
 #
 # sample:
 # user_script_paths = ['scripts.myscripts']
-user_script_paths = []  # type: List[str]
+user_script_paths: List[str] = []
 
 # ############# EXTERNAL FAMILIES SETTINGS ##############
 # Set your own family path to lookup for your family files.
@@ -645,7 +645,7 @@ user_script_paths = []  # type: List[str]
 # samples:
 # family_files['mywiki'] = 'https://de.wikipedia.org'
 # user_families_paths = ['data/families']
-user_families_paths = []  # type: List[str]
+user_families_paths: List[str] = []
 
 # ############# INTERWIKI SETTINGS ##############
 
@@ -723,7 +723,7 @@ maxthrottle = 60
 
 # Slow down the robot such that it never makes a second page edit within
 # 'put_throttle' seconds.
-put_throttle = 10  # type: Union[int, float]
+put_throttle: Union[int, float] = 10
 
 # Sometimes you want to know when a delay is inserted. If a delay is larger
 # than 'noisysleep' seconds, it is logged on the screen.
@@ -810,7 +810,7 @@ cosmetic_changes_mylang_only = True
 # (if cosmetic_changes_mylang_only is set)
 # Please set your dictionary by adding such lines to your user config file:
 # cosmetic_changes_enable['wikipedia'] = ('de', 'en', 'fr')
-cosmetic_changes_enable = {}  # type: Dict[str, Tuple[str, ...]]
+cosmetic_changes_enable: Dict[str, Tuple[str, ...]] = {}
 
 # The dictionary cosmetic_changes_disable should contain a tuple of languages
 # for each site where you wish to disable cosmetic changes. You may use it with
@@ -818,7 +818,7 @@ cosmetic_changes_enable = {}  # type: Dict[str, Tuple[str, ...]]
 # language. This also overrides the settings in the cosmetic_changes_enable
 # dictionary. Please set your dict by adding such lines to your user config:
 # cosmetic_changes_disable['wikipedia'] = ('de', 'en', 'fr')
-cosmetic_changes_disable = {}  # type: Dict[str, Tuple[str, ...]]
+cosmetic_changes_disable: Dict[str, Tuple[str, ...]] = {}
 
 # cosmetic_changes_deny_script is a list of scripts for which cosmetic changes
 # are disabled. You may add additional scripts by appending script names in
@@ -840,7 +840,7 @@ cosmetic_changes_deny_script = ['category_redirect', 'cosmetic_changes',
 #
 # to replace all occurrences of 'Hoofdpagina' with 'Veurblaad' when writing to
 # liwiki. Note that this does not take the origin wiki into account.
-replicate_replace = {}  # type: Dict[str, Dict[str, str]]
+replicate_replace: Dict[str, Dict[str, str]] = {}
 
 # ############# FURTHER SETTINGS ##############
 
@@ -850,11 +850,11 @@ replicate_replace = {}  # type: Dict[str, Dict[str, str]]
 # on the wiki server. Allows simulation runs of bots to be carried out without
 # changing any page on the server side. Use this setting to add more actions
 # into user config file for wikis with extra write actions.
-actions_to_block = []  # type: List[str]
+actions_to_block: List[str] = []
 
 # Set simulate to True or use -simulate option to block all actions given
 # above.
-simulate = False  # type: Union[bool, str]
+simulate: Union[bool, str] = False
 
 # How many pages should be put to a queue in asynchronous mode.
 # If maxsize is <= 0, the queue size is infinite.

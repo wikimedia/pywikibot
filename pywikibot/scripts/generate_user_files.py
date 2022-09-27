@@ -176,6 +176,9 @@ EXTENDED_CONFIG = """\
 # This is an automatically generated file. You can find more
 # configuration parameters in 'config.py' file or refer
 # https://doc.wikimedia.org/pywikibot/master/api_ref/pywikibot.config.html
+from typing import Optional, Union
+
+from pywikibot.backports import Dict, List, Tuple
 
 # The family of sites to be working on.
 # Pywikibot will import families/xxx_family.py so if you want to change

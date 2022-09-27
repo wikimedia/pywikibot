@@ -78,7 +78,7 @@ from pywikibot.tools import (
 
 
 __all__ = ('APISite', )
-_mw_msg_cache = defaultdict(dict)  # type: DefaultDict[str, Dict[str, str]]
+_mw_msg_cache: DefaultDict[str, Dict[str, str]] = defaultdict(dict)
 
 
 _CompType = Union[int, str, 'pywikibot.page.Page', 'pywikibot.page.Revision']
@@ -115,10 +115,10 @@ class APISite(
     ) -> None:
         """Initializer."""
         super().__init__(code, fam, user)
-        self._globaluserinfo = {}  # type: Dict[Union[int, str], Any]
+        self._globaluserinfo: Dict[Union[int, str], Any] = {}
         self._interwikimap = _InterwikiMap(self)
         self._loginstatus = _LoginStatus.NOT_ATTEMPTED
-        self._msgcache = {}  # type: Dict[str, str]
+        self._msgcache: Dict[str, str] = {}
         self._paraminfo = api.ParamInfo(self)
         self._siteinfo = Siteinfo(self)
         self.tokens = TokenWallet(self)
@@ -244,7 +244,7 @@ class APISite(
         :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
         """
-        req_args = {'site': self}  # type: Dict[str, Any]
+        req_args: Dict[str, Any] = {'site': self}
         if 'g_content' in args:
             req_args['g_content'] = args.pop('g_content')
         if 'parameters' in args:
@@ -535,7 +535,7 @@ class APISite(
 
         :raises TypeError: Inappropriate argument type of 'user'
         """
-        param = {}  # type: Dict[str, Union[int, str]]
+        param: Dict[str, Union[int, str]] = {}
         if user is None:
             user = self.username()
             assert isinstance(user, str)
@@ -642,7 +642,7 @@ class APISite(
                    "API userinfo response lacks 'query' key"
             assert 'userinfo' in uidata['query'], \
                    "API userinfo response lacks 'userinfo' key"
-            self._useroptions = uidata['query']['userinfo']['options']  # type: Dict[str, Any]  # noqa: E501
+            self._useroptions: Dict[str, Any] = uidata['query']['userinfo']['options']  # noqa: E501
             # To determine if user name has changed
             self._useroptions['_name'] = (
                 None if 'anon' in uidata['query']['userinfo'] else
@@ -881,7 +881,7 @@ class APISite(
 
         months = self.mediawiki_messages(months_long + months_short)
 
-        self._months_names = []  # type: List[Tuple[str, str]]
+        self._months_names: List[Tuple[str, str]] = []
         for m_l, m_s in zip(months_long, months_short):
             self._months_names.append((months[m_l], months[m_s]))
 
@@ -1700,7 +1700,7 @@ class APISite(
 
     # Catalog of editpage error codes, for use in generating messages.
     # The block at the bottom are page related errors.
-    _ep_errors = {
+    _ep_errors: Dict[str, Union[str, Type[PageSaveRelatedError]]] = {
         'noapiwrite': 'API editing not enabled on {site} wiki',
         'writeapidenied':
             'User {user} is not authorized to edit on {site} wiki',
@@ -1731,7 +1731,7 @@ class APISite(
         'titleblacklist-forbidden': TitleblacklistError,
         'spamblacklist': SpamblacklistError,
         'abusefilter-disallowed': AbuseFilterDisallowedError,
-    }  # type: Dict[str, Union[str, Type[PageSaveRelatedError]]]
+    }
     _ep_text_overrides = {'appendtext', 'prependtext', 'undo'}
 
     @need_right('edit')
@@ -2052,7 +2052,7 @@ class APISite(
             raise Error('mergehistory: unexpected response')
 
     # catalog of move errors for use in error messages
-    _mv_errors = {
+    _mv_errors: Dict[str, Union[str, OnErrorExc]] = {
         'noapiwrite': 'API editing not enabled on {site} wiki',
         'writeapidenied':
             'User {user} is not authorized to edit on {site} wiki',
@@ -2081,7 +2081,7 @@ class APISite(
             '[[{newtitle}]] file extension does not match content of '
             '[[{oldtitle}]]',
         'missingtitle': "{oldtitle} doesn't exist",
-    }  # type: Dict[str, Union[str, OnErrorExc]]
+    }
 
     @need_right('move')
     def movepage(

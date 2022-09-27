@@ -110,7 +110,7 @@ class OutputOption(Option):
     """
 
     #: Place output before or after the question
-    before_question = False  # type: bool
+    before_question: bool = False
 
     @property
     def stop(self) -> bool:
@@ -430,7 +430,7 @@ class IntegerOption(Option):
 
     def format(self, default: Optional[str] = None) -> str:
         """Return a formatted string showing the range."""
-        value = None  # type: Optional[int]
+        value: Optional[int] = None
 
         if default is not None and self.test(default):
             value = self.parse(default)

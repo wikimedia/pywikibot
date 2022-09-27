@@ -489,7 +489,7 @@ class CosmeticChangesToolkit:
             return '{}|{}]]'.format(
                 split[0], '|'.join(cache.get(x.strip(), x) for x in split[1:]))
 
-        cache = {}  # type: Dict[Union[bool, str], Any]
+        cache: Dict[Union[bool, str], Any] = {}
         exceptions = ['comment', 'nowiki', 'pre', 'syntaxhighlight']
         regex = re.compile(
             FILE_LINK_REGEX % '|'.join(self.site.namespaces[6]),
@@ -956,7 +956,7 @@ class CosmeticChangesToolkit:
 
     def fixTypo(self, text: str) -> str:
         """Fix units."""
-        exceptions = [
+        exceptions: List[Union[str, Pattern[str]]] = [
             'comment',
             'gallery',
             'hyperlink',
@@ -967,7 +967,7 @@ class CosmeticChangesToolkit:
             'pre',
             'startspace',
             'syntaxhighlight',
-        ]  # type: List[Union[str, Pattern[str]]]
+        ]
 
         # change <number> ccm -> <number> cm³
         text = textlib.replaceExcept(text, r'(\d)\s*(?:&nbsp;)?ccm',
@@ -990,7 +990,7 @@ class CosmeticChangesToolkit:
         if self.site.code not in ['ckb', 'fa']:
             return text
 
-        exceptions = [
+        exceptions: List[Union[str, Pattern[str]]] = [
             'file',
             'gallery',
             'hyperlink',
@@ -1005,7 +1005,7 @@ class CosmeticChangesToolkit:
             'ref',
             'startspace',
             'syntaxhighlight',
-        ]  # type: List[Union[str, Pattern[str]]]
+        ]
 
         digits = textlib.NON_LATIN_DIGITS
         faChrs = 'ءاآأإئؤبپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیةيك' + digits['fa']

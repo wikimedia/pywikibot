@@ -100,7 +100,7 @@ class Board(FlowPage):
             raise ValueError('Illegal board data (missing required data).')
         parsed_url = urlparse(rule['url'])
         params = parse_qs(parsed_url.query)
-        new_params = {}  # type: Dict[str, Any]
+        new_params: Dict[str, Any] = {}
         for key, value in params.items():
             if key != 'title':
                 key = key.replace('topiclist_', '').replace('-', '_')
@@ -326,7 +326,7 @@ class Post:
         self._page = page
         self._uuid = uuid
 
-        self._content = {}  # type: Dict[str, Any]
+        self._content: Dict[str, Any] = {}
 
     @classmethod
     def fromJSON(cls, page: 'Topic', post_uuid: str,  # noqa: N802

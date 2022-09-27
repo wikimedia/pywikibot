@@ -243,7 +243,7 @@ class ProofreadPage(pywikibot.Page):
         :return: (base, ext, num).
         """
         left, sep, right = self.title(with_ns=False).rpartition('/')
-        num = None  # type: Optional[int]
+        num: Optional[int] = None
 
         if sep:
             base = left
@@ -279,7 +279,7 @@ class ProofreadPage(pywikibot.Page):
                                set(self.getReferences(namespaces=index_ns))]
 
             if not what_links_here:
-                self._index = (None, [])  # type: _IndexType
+                self._index: _IndexType = (None, [])
             elif len(what_links_here) == 1:
                 self._index = (what_links_here.pop(), [])
             else:
@@ -927,11 +927,11 @@ class IndexPage(pywikibot.Page):
         """Associate label and number for each page linked to the index."""
         # Clean cache, if any.
         self._page_from_numbers = {}
-        self._numbers_from_page = {}  # type: Dict[pywikibot.page.Page, int]
-        self._page_numbers_from_label = {}  # type: Dict[str, Set[int]]
-        self._pages_from_label = {}  # type: PagesFromLabelType
-        self._labels_from_page_number = {}  # type: Dict[int, str]
-        self._labels_from_page = {}  # type: Dict[pywikibot.page.Page, str]
+        self._numbers_from_page: Dict[pywikibot.page.Page, int] = {}
+        self._page_numbers_from_label: Dict[str, Set[int]] = {}
+        self._pages_from_label: PagesFromLabelType = {}
+        self._labels_from_page_number: Dict[int, str] = {}
+        self._labels_from_page: Dict[pywikibot.page.Page, str] = {}
         self._soup = _bs4_soup(self.get_parsed_page(True))  # type: ignore
         # Do not search for "new" here, to avoid to skip purging if links
         # to non-existing pages are present.

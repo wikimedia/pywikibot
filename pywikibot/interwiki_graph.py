@@ -71,7 +71,7 @@ class Subject:
         # pages are values. It stores where we found each page.
         # As we haven't yet found a page that links to the origin page, we
         # start with an empty list for it.
-        self.found_in = {}  # type: FoundInType
+        self.found_in: FoundInType = {}
         if origin:
             self.found_in = {origin: []}
 
@@ -99,7 +99,7 @@ class GraphDrawer:
         if PYDOT_ERROR:
             msg = f'pydot is not installed: {PYDOT_ERROR}.'
             raise ImportError(msg)
-        self.graph = None  # type: Optional[pydot.Dot]
+        self.graph: Optional[pydot.Dot] = None
         self.subject = subject
 
     @staticmethod

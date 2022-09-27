@@ -114,7 +114,7 @@ class Hunk:
         """Color diff lines."""
         diff = iter(self.diff)
 
-        fmt = ''  # type: Optional[str]
+        fmt: Optional[str] = ''
         line1, line2 = '', next(diff)
         for line in diff:
             fmt, line1, line2 = line1, line2, line
@@ -263,8 +263,8 @@ class PatchManager:
         :param replace_invisible: Replace invisible characters like U+200e with
             the charnumber in brackets (e.g. <200e>).
         """
-        self.a = text_a.splitlines(True)  # type: Union[str, List[str]]
-        self.b = text_b.splitlines(True)  # type: Union[str, List[str]]
+        self.a: Union[str, List[str]] = text_a.splitlines(True)
+        self.b: Union[str, List[str]] = text_b.splitlines(True)
         if by_letter and len(self.a) <= 1 and len(self.b) <= 1:
             self.a = text_a
             self.b = text_b
@@ -338,7 +338,7 @@ class PatchManager:
 
         if self.context:
             # Determine if two hunks are connected by self.context
-            super_hunk = []  # type: List[Hunk]
+            super_hunk: List[Hunk] = []
             super_hunks = [super_hunk]
             for hunk in hunks:
                 # self.context * 2, because if self.context is 2 the hunks
@@ -417,7 +417,7 @@ class PatchManager:
 
         super_hunks = self._generate_super_hunks(
             h for h in self.hunks if h.reviewed == Hunk.PENDING)
-        position = 0  # type: Optional[int]
+        position: Optional[int] = 0
 
         while any(any(hunk.reviewed == Hunk.PENDING for hunk in super_hunk)
                   for super_hunk in super_hunks):
@@ -540,7 +540,7 @@ class PatchManager:
                              'Please review them before proceeding.\n')
             self.review_hunks()
 
-        l_text = []  # type: List[str]
+        l_text: List[str] = []
         for hunk_idx, (i1, i2), (j1, j2) in self.blocks:
             # unchanged text.
             if hunk_idx < 0:
@@ -604,8 +604,8 @@ def html_comparator(compare_string: str) -> Dict[str, List[str]]:
     """
     from bs4 import BeautifulSoup
 
-    comparands = {'deleted-context': [],
-                  'added-context': []}  # type: Dict[str, List[str]]
+    comparands: Dict[str, List[str]] = {'deleted-context': [],
+                                        'added-context': []}
     soup = BeautifulSoup(compare_string, 'html.parser')
     for change_type, css_class in (('deleted-context', 'diff-deletedline'),
                                    ('added-context', 'diff-addedline')):

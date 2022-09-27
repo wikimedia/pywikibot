@@ -683,8 +683,8 @@ def main(*args: str) -> None:
 
     :param args: command line arguments
     """
-    options = {}  # type: Dict[str, Any]
-    gen_options = {}  # type: Dict[str, Any]
+    options: Dict[str, Any] = {}
+    gen_options: Dict[str, Any] = {}
     # what the bot should do (either resolve double redirs, or process broken
     # redirs)
     action = None

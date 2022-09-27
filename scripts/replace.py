@@ -917,7 +917,7 @@ def main(*args: str) -> None:
     # if -xml flag is present
     xmlFilename = None
     xmlStart = None
-    sql_query = None  # type: Optional[str]
+    sql_query: Optional[str] = None
     # Set the default regular expression flags
     flags = 0
     # Request manual replacements even if replacements are already defined

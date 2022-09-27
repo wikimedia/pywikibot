@@ -96,25 +96,25 @@ class GeneratorFactory:
         :param disabled_options: disable these given options and let them
             be handled by scripts options handler
         """
-        self.gens = []  # type: List[Iterable['pywikibot.page.Page']]
-        self._namespaces = []  # type: GEN_FACTORY_NAMESPACE_TYPE
-        self.limit = None  # type: Optional[int]
-        self.qualityfilter_list = []  # type: List[int]
-        self.articlefilter_list = []  # type: List[str]
-        self.articlenotfilter_list = []  # type: List[str]
-        self.titlefilter_list = []  # type: List[str]
-        self.titlenotfilter_list = []  # type: List[str]
-        self.claimfilter_list = []  # type: GEN_FACTORY_CLAIM_TYPE
-        self.catfilter_list = []  # type: List['pywikibot.Category']
+        self.gens: List[Iterable['pywikibot.page.Page']] = []
+        self._namespaces: GEN_FACTORY_NAMESPACE_TYPE = []
+        self.limit: Optional[int] = None
+        self.qualityfilter_list: List[int] = []
+        self.articlefilter_list: List[str] = []
+        self.articlenotfilter_list: List[str] = []
+        self.titlefilter_list: List[str] = []
+        self.titlenotfilter_list: List[str] = []
+        self.claimfilter_list: GEN_FACTORY_CLAIM_TYPE = []
+        self.catfilter_list: List['pywikibot.Category'] = []
         self.intersect = False
-        self.subpage_max_depth = None  # type: Optional[int]
+        self.subpage_max_depth: Optional[int] = None
         self._site = site
         self._positional_arg_name = positional_arg_name
-        self._sparql = None  # type: Optional[str]
+        self._sparql: Optional[str] = None
         self.nopreload = False
         self._validate_options(enabled_options, disabled_options)
 
-        self.is_preloading = None  # type: Optional[bool]
+        self.is_preloading: Optional[bool] = None
         """Return whether Page objects are preloaded. You may use this
         instance variable after :meth:`getCombinedGenerator` is called
         e.g.::
@@ -307,7 +307,7 @@ class GeneratorFactory:
             category = i18n.input('pywikibot-enter-category-name')
         category = category.replace('#', '|')
 
-        startfrom = None  # type: Optional[str]
+        startfrom: Optional[str] = None
         category, _, startfrom = category.partition('|')
 
         if not startfrom:
@@ -432,7 +432,7 @@ class GeneratorFactory:
         valid_cats = [c for _list in cats.values() for c in _list]
 
         value = value or ''
-        lint_from = None  # type: Optional[str]
+        lint_from: Optional[str] = None
         cat, _, lint_from = value.partition('/')
         lint_from = lint_from or None
 
@@ -923,7 +923,7 @@ class GeneratorFactory:
         :param arg: Pywikibot argument consisting of -name:value
         :return: True if the argument supplied was recognised by the factory
         """
-        value = None  # type: Optional[str]
+        value: Optional[str] = None
 
         if not arg.startswith('-') and self._positional_arg_name:
             value = arg

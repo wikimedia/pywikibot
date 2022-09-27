@@ -350,7 +350,7 @@ def romanNumToInt(v: str) -> int:
 
 # Each tuple must 3 parts: a list of all possible digits (symbols), encoder
 # (from int to a str) and decoder (from str to an int)
-_digitDecoders = {
+_digitDecoders: Dict[str, decoder_type] = {
     # %% is a %
     '%': '%',
     # %d is a decimal
@@ -381,7 +381,7 @@ _digitDecoders = {
     # %T is a year in TH: -- all years are shifted: 2005 => 'พ.ศ. 2548'
     'T': (_decimalDigits, lambda v: str(v + 543),
           lambda v: int(v) - 543),
-}  # type: Dict[str, decoder_type]
+}
 
 # Allows to search for '(%%)|(%d)|(%R)|...", and allows one digit 1-9 to set
 # the size of zero-padding for numbers
@@ -434,7 +434,7 @@ def escapePattern2(pattern: str
     if pattern not in _escPtrnCache2:
         newPattern = ''  # match starts at the beginning of the string
         strPattern = ''
-        decoders = []  # type: List[decoder_type]
+        decoders: List[decoder_type] = []
         for s in _reParameters.split(pattern):
             if s is None:
                 continue
@@ -663,7 +663,7 @@ class MonthFormat(abc.MutableMapping):  # type: ignore[type-arg]
         """
         self.index = index
         self.variant, _, self.month = format_key.partition('_')
-        self.data = {}  # type: Dict[str, Callable[[int], str]]
+        self.data: Dict[str, Callable[[int], str]] = {}
 
     def __getitem__(self, key: str) -> Callable[[int], str]:
         if key not in self.data:
@@ -722,7 +722,7 @@ def _period_with_pattern(period: str, pattern: str):
          alwaysTrue)])
 
 
-formats = {
+formats: Dict[Union[str, int], Mapping[str, Callable[[int], str]]] = {
     'MonthName': MonthNames(),
     'Number': {
         'ar': lambda v: dh_number(v, '%d (عدد)'),
@@ -1654,7 +1654,7 @@ formats = {
         'yo': lambda v: dh_singVal(v, 'Current events'),
         'zh': lambda v: dh_singVal(v, '新闻动态'),
     },
-}  # type: Dict[Union[str, int], Mapping[str, Callable[[int], str]]]
+}
 
 #
 # Add auto-generated empty dictionaries for DayOfMonth and MonthOfYear articles

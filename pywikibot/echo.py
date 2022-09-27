@@ -21,13 +21,13 @@ class Notification:
         """Initialize an empty Notification object."""
         self.site = site
 
-        self.event_id = None  # type: Optional[int]
+        self.event_id: Optional[int] = None
         self.type = None
         self.category = None
         self.timestamp = None
         self.page = None
         self.agent = None
-        self.read = None  # type: Optional[bool]
+        self.read: Optional[bool] = None
         self.content = None
         self.revid = None
 

@@ -89,7 +89,7 @@ class WikibaseEntity:
     :type title_pattern: str
     """
 
-    DATA_ATTRIBUTES = {}  # type: Dict[str, Any]
+    DATA_ATTRIBUTES: Dict[str, Any] = {}
 
     def __init__(self, repo, id_=None) -> None:
         """

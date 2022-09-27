@@ -269,7 +269,7 @@ For global options use -help:global or run pwb.py -help
 
 """
 
-ui = None  # type: Optional[pywikibot.userinterfaces._interface_base.ABUIC]
+ui: Optional[pywikibot.userinterfaces._interface_base.ABUIC] = None
 """Holds a user interface object defined in
 :mod:`pywikibot.userinterfaces` subpackage.
 """
@@ -706,7 +706,7 @@ class InteractiveReplace:
             Tuple[int, int]
         ]]
 
-        self._current_match = None  # type: current_match_type
+        self._current_match: current_match_type = None
         self.context = 30
         self.context_delta = 0
         self.allow_skip_link = True
@@ -716,10 +716,10 @@ class InteractiveReplace:
         self.allow_replace_label = False
         self.allow_replace_all = False
         # Use list to preserve order
-        self._own_choices = [
+        self._own_choices: List[Tuple[str, StandardOption]] = [
             ('skip_link', StaticChoice('Do not change', 'n', None)),
             ('unlink', StaticChoice('Unlink', 'u', False)),
-        ]  # type: List[Tuple[str, StandardOption]]
+        ]
         if self._new:
             self._own_choices += [
                 ('replace', LinkChoice('Change link target', 't', self,
@@ -732,7 +732,7 @@ class InteractiveReplace:
                                            True, True)),
             ]
 
-        self.additional_choices = []  # type: List[StandardOption]
+        self.additional_choices: List[StandardOption] = []
 
     def handle_answer(self, choice: str) -> Any:
         """Return the result for replace_links."""
@@ -899,7 +899,7 @@ def handle_args(args: Optional[Iterable[str]] = None,
     module_name = calledModuleName() or 'terminal-interface'
     non_global_args = []
     username = None
-    do_help_val = None if do_help else False  # type: Union[bool, str, None]
+    do_help_val: Union[bool, str, None] = None if do_help else False
     assert args is not None
     for arg in args:
         option, _, value = arg.partition(':')
@@ -1025,7 +1025,7 @@ def show_help(module_name: Optional[str] = None,
 
     try:
         module = import_module(module_name)
-        help_text = module.__doc__  # type: str # type: ignore[assignment]
+        help_text: str = module.__doc__  # type: ignore[assignment]
         if hasattr(module, 'docuReplacements'):
             for key, value in module.docuReplacements.items():
                 help_text = help_text.replace(key, value.strip('\n\r'))
@@ -1195,7 +1195,7 @@ class OptionHandler:
        keyword is a :python:`dict method<library/stdtypes.html#dict.clear>`.
     """
 
-    available_options = {}  # type: Dict[str, Any]
+    available_options: Dict[str, Any] = {}
     """ Handler configuration attribute.
     Only the keys of the dict can be passed as `__init__` options.
     The values are the default values. Overwrite this in subclasses!
@@ -1254,7 +1254,7 @@ class BaseBot(OptionHandler):
        A :attr:`counter` instance variable is provided.
     """
 
-    use_disambigs = None  # type: Optional[bool]
+    use_disambigs: Optional[bool] = None
     """Attribute to determine whether to use disambiguation pages. Set
     it to True to use disambigs only, set it to False to skip disambigs.
     If None both are processed.
@@ -1262,7 +1262,7 @@ class BaseBot(OptionHandler):
     .. versionadded:: 7.2
     """
 
-    use_redirects = None  # type: Optional[bool]
+    use_redirects: Optional[bool] = None
     """Attribute to determine whether to use redirect pages. Set it to
     True to use redirects only, set it to False to skip redirects. If
     None both are processed. For example to create a RedirectBot you may
@@ -1283,7 +1283,7 @@ class BaseBot(OptionHandler):
         'always': False,  # By default ask for confirmation when putting a page
     }
 
-    update_options = {}  # type: Dict[str, Any]
+    update_options: Dict[str, Any] = {}
     """`update_options` can be used to update :attr:`available_options`;
     do not use it if the bot class is to be derived but use
     `self.available_options.update(<dict>)` initializer in such case.
@@ -1291,7 +1291,7 @@ class BaseBot(OptionHandler):
     .. versionadded:: 6.4
     """
 
-    _current_page = None  # type: Optional[pywikibot.page.BasePage]
+    _current_page: Optional['pywikibot.page.BasePage'] = None
 
     def __init__(self, **kwargs: Any) -> None:
         """Initializer.
@@ -1306,12 +1306,12 @@ class BaseBot(OptionHandler):
             else:
                 #: instance variable to hold the generator processed by
                 #: :meth:`run` method
-                self.generator = kwargs.pop('generator')  # type: Iterable
+                self.generator: Iterable = kwargs.pop('generator')
 
         self.available_options.update(self.update_options)
         super().__init__(**kwargs)
 
-        self.counter = Counter()  # type: Counter
+        self.counter: Counter = Counter()
         """Instance variable which holds counters. The default counters
         are 'read', 'write' and 'skip'. You can use your own counters like::
 
@@ -1322,7 +1322,7 @@ class BaseBot(OptionHandler):
            Your additional counters are also printed during :meth:`exit`
         """
 
-        self.generator_completed = False  # type: bool
+        self.generator_completed: bool = False
         """Instance attribute which is True if the generator is completed.
 
         To check for an empty generator you may use::
@@ -1337,7 +1337,7 @@ class BaseBot(OptionHandler):
         """
 
         #: instance variable to hold the default page type
-        self.treat_page_type = pywikibot.page.BasePage  # type: Any
+        self.treat_page_type: Any = pywikibot.page.BasePage
 
     @property
     @deprecated("self.counter['read']", since='7.0.0')
@@ -1801,7 +1801,7 @@ class SingleSiteBot(BaseBot):
             pywikibot.Site.
         """
         if site is True:
-            self._site = pywikibot.Site()  # type: Optional[BaseSite]
+            self._site: Optional[BaseSite] = pywikibot.Site()
         elif site is False:
             raise ValueError("'site' must be a site, True, or None")
         else:
@@ -1979,7 +1979,7 @@ class AutomaticTWSummaryBot(CurrentPageBot):
     """
 
     #: Must be defined in subclasses.
-    summary_key = None  # type: Optional[str]
+    summary_key: Optional[str] = None
 
     @property
     def summary_parameters(self) -> Dict[str, str]:
@@ -2407,7 +2407,7 @@ class WikidataBot(Bot, ExistingPageBot):
 
     def treat_page(self) -> None:
         """Treat a page."""
-        page = self.current_page  # type: Optional[pywikibot.page.BasePage]
+        page: Optional[pywikibot.page.BasePage] = self.current_page
         if self.use_from_page is True:
             try:
                 item = pywikibot.ItemPage.fromPage(page)

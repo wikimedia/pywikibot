@@ -30,7 +30,7 @@ class LogEntry(UserDict):
     # Log type expected. None for every type, or one of the (letype) str :
     # block/patrol/etc...
     # Overridden in subclasses.
-    _expected_type = None  # type: Optional[str]
+    _expected_type: Optional[str] = None
 
     def __init__(self, apidata: Dict[str, Any],
                  site: 'pywikibot.site.BaseSite') -> None:
@@ -390,7 +390,7 @@ class LogEntryFactory:
            or use the get_valid_entry_class instance method instead.
         """
         if logtype not in cls._logtypes:
-            bases = (OtherLogEntry, )  # type: Tuple['LogEntry', ...]
+            bases: Tuple['LogEntry', ...] = (OtherLogEntry, )
             if logtype in ('newusers', 'thanks'):
                 bases = (UserTargetLogEntry, OtherLogEntry)
 

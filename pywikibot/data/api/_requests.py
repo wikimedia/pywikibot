@@ -225,7 +225,7 @@ class Request(MutableMapping):
             raise ValueError("'action' specification missing from Request.")
         self.action = parameters['action']
         self.update(parameters)  # also convert all parameter values to lists
-        self._warning_handler = None  # type: Optional[Callable[[str, str], Union[Match[str], bool, None]]]  # noqa: E501
+        self._warning_handler: Optional[Callable[[str, str], Union[Match[str], bool, None]]] = None  # noqa: E501
         self.write = self.action in WRITE_ACTIONS
         # Client side verification that the request is being performed
         # by a logged in user, and warn if it isn't a config username.

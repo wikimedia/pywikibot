@@ -71,7 +71,7 @@ from pywikibot.bot import AutomaticTWSummaryBot, ExistingPageBot
 
 
 ARGS_TYPE = Dict[str, Union[bool, str]]
-DEFAULT_ARGS = {
+DEFAULT_ARGS: ARGS_TYPE = {
     'text': '',
     'textfile': '',
     'summary': '',
@@ -83,7 +83,7 @@ DEFAULT_ARGS = {
     'talk_page': False,
     'reorder': True,
     'regex_skip_url': '',
-}  # type: ARGS_TYPE
+}
 
 ARG_PROMPT = {
     '-text': 'What text do you want to add?',

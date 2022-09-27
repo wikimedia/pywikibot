@@ -467,9 +467,9 @@ class WelcomeBot(SingleSiteBot):
         """Initializer."""
         super().__init__(**kwargs)
         self.check_managed_sites()
-        self.bname = {}  # type: Dict[str, str]
+        self.bname: Dict[str, str] = {}
 
-        self.welcomed_users = []  # type: List[str]
+        self.welcomed_users: List[str] = []
         self.log_name = i18n.translate(self.site, logbook)
 
         if not self.log_name:

@@ -300,7 +300,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
             # keep track of the changes for each step (edit then move)
             changes = -1
 
-            msg_type = None  # type: Optional[str]
+            msg_type: Optional[str] = None
             edit_restriction = restrictions.get('edit')
             if not edit_restriction:
                 # page is not edit-protected

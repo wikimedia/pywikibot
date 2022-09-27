@@ -275,7 +275,7 @@ _LANG_TO_GROUP_NAME = defaultdict(str, {
     'zh-tw': 'zh-classical',
     'zh-yue': 'cdo'})
 
-_GROUP_NAME_TO_FALLBACKS = {
+_GROUP_NAME_TO_FALLBACKS: Dict[str, List[str]] = {
     '': [],
     'aa': ['am'],
     'ab': ['ru'],
@@ -358,7 +358,7 @@ _GROUP_NAME_TO_FALLBACKS = {
     'zh-classical': ['zh', 'zh-hans', 'zh-tw', 'zh-cn', 'zh-classical', 'lzh'],
     'zh-min-nan': [
         'cdo', 'zh', 'zh-hans', 'zh-tw', 'zh-cn', 'zh-classical', 'lzh']
-}  # type: Dict[str, List[str]]
+}
 
 
 def set_messages_package(package_name: str) -> None:

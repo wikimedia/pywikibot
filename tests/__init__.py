@@ -170,7 +170,7 @@ disabled_test_modules = {
 }
 
 # remove "# pragma: no cover" below if this set is not empty
-disabled_tests = {}  # type: Dict[str, List[str]]
+disabled_tests: Dict[str, List[str]] = {}
 
 
 def _unknown_test_modules():

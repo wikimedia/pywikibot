@@ -279,7 +279,7 @@ class CategoryPreprocess(BaseBot):
             self.includeonly = []
             return page
 
-        tmpl = []  # type: Sequence
+        tmpl: Sequence = []
         with suppress(KeyError):
             tmpl, _loc = moved_links[page.site.code]
 
@@ -620,7 +620,7 @@ class CategoryMoveRobot(CategoryPreprocess):
         self.oldtalk = self.oldcat.toggleTalkPage()
 
         if newcat:
-            self.newcat = self._makecat(newcat)  # type: Optional[pywikibot.Category]  # noqa: E501
+            self.newcat: Optional[pywikibot.Category] = self._makecat(newcat)  # noqa: E501
             self.newtalk = self.newcat.toggleTalkPage()
         else:
             self.newcat = None
