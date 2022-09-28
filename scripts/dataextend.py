@@ -590,9 +590,9 @@ class DataExtendBot(SingleSiteBot):
         day = None
         m = re.search(r'[{\|](\d{4})\|(\d+)\|(\d+)[\|}]', text)
         if m:
-            year = int(m.group(1))
-            month = int(m.group(2))
-            day = int(m.group(3))
+            year = int(m[1])
+            month = int(m[2])
+            day = int(m[3])
         if re.match(r'\d{,4}(?:年頃|\.)?$', text):
             year = int(text)
             month = None
@@ -606,84 +606,84 @@ class DataExtendBot(SingleSiteBot):
             month = int(text[-2:])
         m = re.match(r'(\d{1,2})[-/](\d{4})', text)
         if m:
-            year = int(m.group(2))
-            month = int(m.group(1))
+            year = int(m[2])
+            month = int(m[1])
         m = re.match(r'(\d+)[-./|](\d{1,2})[-./|](\d{1,2})$', text)
         if m:
-            year = int(m.group(1))
-            month = int(m.group(2))
-            day = int(m.group(3))
+            year = int(m[1])
+            month = int(m[2])
+            day = int(m[3])
         m = re.match(
             r'(\d{1,2})[-./|]\s*(\d{1,2})[-./|]\s*(\d{3,4})\.?$', text)
         if m:
-            year = int(m.group(3))
-            month = int(m.group(2))
-            day = int(m.group(1))
+            year = int(m[3])
+            month = int(m[2])
+            day = int(m[1])
         m = re.match(r'(\d{1,2})[-./\s]([iIvVxX]+)[-./\s](\d{4})$', text)
         if m:
-            year = int(m.group(3))
+            year = int(m[3])
             try:
-                month = self.MONTHNUMBER[m.group(2).lower()]
+                month = self.MONTHNUMBER[m[2].lower()]
             except KeyError:
-                raise ValueError(f"Don't know month {m.group(2)}")
-            day = int(m.group(1))
+                raise ValueError(f"Don't know month {m[2]}")
+            day = int(m[1])
         m = re.match(r"(\d+)(?:\.|er|eme|ème)?[\s.]\s*(?:d'|d[aei] )?"
                      r'([^\s.]{2,})\.?[\s.]\s*(\d+)$', text)
         if m:
-            year = int(m.group(3))
+            year = int(m[3])
             try:
-                month = self.MONTHNUMBER[m.group(2).lower()]
+                month = self.MONTHNUMBER[m[2].lower()]
             except KeyError:
-                raise ValueError(f"Don't know month {m.group(2)}")
-            day = int(m.group(1))
+                raise ValueError(f"Don't know month {m[2]}")
+            day = int(m[1])
         m = re.match(r'(\d{4})\.?[\s.]\s*([^\s.]{3,})\.?[\s.]\s*(\d+)$', text)
         if m:
-            year = int(m.group(1))
+            year = int(m[1])
             try:
-                month = self.MONTHNUMBER[m.group(2).lower()]
+                month = self.MONTHNUMBER[m[2].lower()]
             except KeyError:
-                raise ValueError(f"Don't know month {m.group(2)}")
-            day = int(m.group(3))
+                raise ValueError(f"Don't know month {m[2]}")
+            day = int(m[3])
         m = re.match(r"(\d+) (?:de |d')?(\w+[a-z]\w+) de (\d+)", text)
         if m:
-            year = int(m.group(3))
+            year = int(m[3])
             try:
-                month = self.MONTHNUMBER[m.group(2).lower()]
+                month = self.MONTHNUMBER[m[2].lower()]
             except KeyError:
-                raise ValueError(f"Don't know month {m.group(2)}")
-            day = int(m.group(1))
+                raise ValueError(f"Don't know month {m[2]}")
+            day = int(m[1])
         m = re.match(r'(\w*[a-zA-Z]\w*)\.? (\d+)$', text)
         if m:
-            year = int(m.group(2))
+            year = int(m[2])
             try:
-                month = self.MONTHNUMBER[m.group(1).lower()]
+                month = self.MONTHNUMBER[m[1].lower()]
             except KeyError:
-                raise ValueError(f"Don't know month {m.group(1)}")
+                raise ValueError(f"Don't know month {m[1]}")
         m = re.match(r'(\w+)\.? (\d{1,2})(?:st|nd|rd|th)?\.?\s*,\s*(\d{3,4})$',
                      text)
         if m:
-            year = int(m.group(3))
+            year = int(m[3])
             try:
-                month = self.MONTHNUMBER[m.group(1).lower()]
+                month = self.MONTHNUMBER[m[1].lower()]
             except KeyError:
-                raise ValueError(f"Don't know month {m.group(1)}")
-            day = int(m.group(2))
+                raise ValueError(f"Don't know month {m[1]}")
+            day = int(m[2])
         m = re.match(r'(\d{4}),? (\d{1,2}) (\w+)', text)
         if m:
-            year = int(m.group(1))
+            year = int(m[1])
             try:
-                month = self.MONTHNUMBER[m.group(3).lower()]
+                month = self.MONTHNUMBER[m[3].lower()]
             except KeyError:
-                raise ValueError(f"Don't know month {m.group(1)}")
-            day = int(m.group(2))
+                raise ValueError(f"Don't know month {m[1]}")
+            day = int(m[2])
         m = re.match(r'(\d+)年(\d+)月(\d+)日', text)
         if m:
-            year = int(m.group(1))
-            month = int(m.group(2))
-            day = int(m.group(3))
+            year = int(m[1])
+            month = int(m[2])
+            day = int(m[3])
         m = re.match(r'(\d+)年$', text)
         if m:
-            year = int(m.group(1))
+            year = int(m[1])
         if day == 0:
             day = None
         if day is None and month == 0:
@@ -716,8 +716,8 @@ class DataExtendBot(SingleSiteBot):
 
     def createquantityclaim(self, text):
         m = re.match(r'(\d+(?:\.\d+)?)\s*([a-z]\w*)', text.replace(',', '.'))
-        amount = m.group(1)
-        name = m.group(2).lower()
+        amount = m[1]
+        name = m[2].lower()
         return pywikibot.WbQuantity(amount,
                                     unit=pywikibot.ItemPage(
                                         self.site, self.QUANTITYTYPE[name]),
@@ -1125,7 +1125,7 @@ class DataExtendBot(SingleSiteBot):
             if value.startswith('!date!'):
                 value = value[6:]
             if value.startswith('!q!'):
-                value = re.search(r'\d+(?:\.\d+)?', value).group(0)
+                value = re.search(r'\d+(?:\.\d+)?', value)[0]
             elif value.startswith('!i!'):
                 value = value[3:].strip()
 
@@ -1330,7 +1330,7 @@ class Analyzer:
         if self.hrtre:
             match = re.compile('(?s)' + self.hrtre).search(self.html)
             if match:
-                text = match.group(1)
+                text = match[1]
                 text = text.replace('\\n', '\n')
                 text = text.replace('\\t', '\t')
                 text = text.replace('\\r', '\n')
@@ -1981,16 +1981,16 @@ class Analyzer:
         if dtype:
             alt = [dtype] + alt
         for alttype in alt:
-            if self.getdata(alttype, m.group(1), ask=False) \
-               and self.getdata(alttype, m.group(1), ask=False) != 'XXX':
-                return self.getdata(alttype, m.group(1), ask=False)
+            if self.getdata(alttype, m[1], ask=False) \
+               and self.getdata(alttype, m[1], ask=False) != 'XXX':
+                return self.getdata(alttype, m[1], ask=False)
         for skip in skips:
-            if self.getdata(skip, m.group(1), ask=False) \
-               and self.getdata(skip, m.group(1), ask=False) != 'XXX':
+            if self.getdata(skip, m[1], ask=False) \
+               and self.getdata(skip, m[1], ask=False) != 'XXX':
                 return None
         if dtype:
-            return self.getdata(dtype, m.group(1))
-        return m.group(1)
+            return self.getdata(dtype, m[1])
+        return m[1]
 
     def findallbyre(self, regex, html, dtype=None, skips=None,
                     alt=None) -> List[str]:
@@ -2552,9 +2552,7 @@ class LcAuthAnalyzer(Analyzer):
             m = re.match(r'(\d+)[/\-](\d+)[/\-](\d+)', result)
             if m:
                 result = '{}-{}-{}'.format(
-                    m.group(2),
-                    m.group(1),
-                    m.group(3) if len(m.group(3)) > 2 else '19' + m.group(3)
+                    m[2], m[1], m[3] if len(m[3]) > 2 else '19' + m[3]
                 )
             return result
 
@@ -2573,9 +2571,7 @@ class LcAuthAnalyzer(Analyzer):
             m = re.match(r'(\d+)[/\-](\d+)[/\-](\d+)', result)
             if m:
                 result = '{}-{}-{}'.format(
-                    m.group(2),
-                    m.group(1),
-                    m.group(3) if len(m.group(3)) > 2 else '19' + m.group(3)
+                    m[2], m[1], m[3] if len(m[3]) > 2 else '19' + m[3]
                 )
             return result
 
@@ -13885,21 +13881,22 @@ class WikiAnalyzer(Analyzer):
 
     def prepare(self, html: str):
         def reworkwikilink(wikipart):
-            parts = wikipart.group(1).split('|')
+            parts = wikipart[1].split('|')
             return '[[{}]]'.format(parts[0] if ':' in parts[0] else parts[-1])
 
         if not html:
             return None
+
         f = codecs.open('result.html', 'w', 'utf-8')
         f.write(html)
         f.close()
-        html = re.search(self.mainRE, html).group(1)
+        html = re.search(self.mainRE, html)[1]
         html = re.sub(r'{{nowrap\|([^{}]*)}}', r'\1', html)
         return re.sub(r'\[\[([^\[\]]*)\]\]', reworkwikilink, html)
 
     @staticmethod
     def excludetemplatelight(text):
-        templatetype = re.search('([^{|]*)', text).group(0).lower().strip()
+        templatetype = re.search('([^{|]*)', text)[0].lower().strip()
         firstword = templatetype.split()[0]
         lastword = templatetype.split()[-1]
         return (
@@ -13996,7 +13993,7 @@ class WikiAnalyzer(Analyzer):
 
     @staticmethod
     def excludetemplate(text):
-        templatetype = re.search('([^{|]+)', text).group(0).lower().strip()
+        templatetype = re.search('([^{|]+)', text)[0].lower().strip()
         firstword = templatetype.split()[0]
         lastword = templatetype.split()[-1]
         return (

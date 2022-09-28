@@ -40,10 +40,10 @@ def parseRestrictions(restrictions):
     moveRestriction = None
     editLockMatch = re.search('edit=([^:]*)', restrictions)
     if editLockMatch:
-        editRestriction = editLockMatch.group(1)
+        editRestriction = editLockMatch[1]
     moveLockMatch = re.search('move=([^:]*)', restrictions)
     if moveLockMatch:
-        moveRestriction = moveLockMatch.group(1)
+        moveRestriction = moveLockMatch[1]
     if restrictions == 'sysop':
         editRestriction = 'sysop'
         moveRestriction = 'sysop'

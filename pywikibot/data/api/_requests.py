@@ -1028,7 +1028,7 @@ The text message is:
                     lag = error['lag']
                 except KeyError:
                     lag = lagpattern.search(info)
-                    lag = float(lag.group('lag')) if lag else 0.0
+                    lag = float(lag['lag']) if lag else 0.0
 
                 self.site.throttle.lag(lag * retries)
                 continue

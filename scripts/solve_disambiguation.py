@@ -762,7 +762,7 @@ DisambiguationRobot""".format(options=added_keys,
         for line in page.text.splitlines():
             found = reg.match(line)
             if found:
-                yield found.group(1)
+                yield found[1]
 
     def firstize(self, page, links) -> List[pywikibot.Page]:
         """Call firstlinks and remove extra links.
@@ -893,8 +893,7 @@ DisambiguationRobot""".format(options=added_keys,
                 # Ensure that next time around we will not find this same hit.
                 curpos = m.start() + 1
                 try:
-                    foundlink = pywikibot.Link(m.group('title'),
-                                               disamb_page.site)
+                    foundlink = pywikibot.Link(m['title'], disamb_page.site)
                     foundlink.parse()
                 except Error:
                     continue
@@ -911,7 +910,7 @@ DisambiguationRobot""".format(options=added_keys,
                 except Error:
                     # must be a broken link
                     pywikibot.log('Invalid link [[{}]] in page [[{}]]'
-                                  .format(m.group('title'), ref_page.title()))
+                                  .format(m['title'], ref_page.title()))
                     continue
 
                 n += 1
@@ -989,19 +988,19 @@ DisambiguationRobot""".format(options=added_keys,
 
                 # The link looks like this:
                 # [[page_title|link_text]]trailing_chars
-                page_title = m.group('title')
-                link_text = m.group('label')
+                page_title = m['title']
+                link_text = m['label']
 
                 if not link_text:
                     # or like this: [[page_title]]trailing_chars
                     link_text = page_title
 
-                if m.group('section') is None:
+                if m['section'] is None:
                     section = ''
                 else:
-                    section = m.group('section')
+                    section = m['section']
 
-                trailing_chars = m.group('linktrail')
+                trailing_chars = m['linktrail']
                 if trailing_chars:
                     link_text += trailing_chars
 

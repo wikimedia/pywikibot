@@ -168,7 +168,7 @@ class RedirectGenerator(OptionHandler):
 
             m = redirR.match(entry.text)
             if m:
-                target = m.group(1)
+                target = m[1]
                 # There might be redirects to another wiki. Ignore these.
                 target_link = pywikibot.Link(target, self.site)
                 try:

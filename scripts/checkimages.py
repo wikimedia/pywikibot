@@ -1089,14 +1089,14 @@ class CheckImagesBot:
 
                     for number, m in enumerate(SETTINGS_REGEX.finditer(testo),
                                                start=1):
-                        name = str(m.group(1))
-                        find_tipe = str(m.group(2))
-                        find = str(m.group(3))
-                        imagechanges = str(m.group(4))
-                        summary = str(m.group(5))
-                        head = str(m.group(6))
-                        text = str(m.group(7))
-                        mexcatched = str(m.group(8))
+                        name = str(m[1])
+                        find_tipe = str(m[2])
+                        find = str(m[3])
+                        imagechanges = str(m[4])
+                        summary = str(m[5])
+                        head = str(m[6])
+                        text = str(m[7])
+                        mexcatched = str(m[8])
                         tupla = [number, name, find_tipe, find, imagechanges,
                                  summary, head, text, mexcatched]
                         self.settings_data += [tupla]
@@ -1312,7 +1312,7 @@ class CheckImagesBot:
         regl = r"(\"|\')(.*?)\1(?:,|\])"
         pl = re.compile(regl)
         for xl in pl.finditer(raw):
-            word = xl.group(2).replace('\\\\', '\\')
+            word = xl[2].replace('\\\\', '\\')
             if word not in list_loaded:
                 list_loaded.append(word)
         return list_loaded

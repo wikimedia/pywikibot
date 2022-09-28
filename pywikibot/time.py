@@ -143,18 +143,18 @@ class Timestamp(datetime.datetime):
         strpfmt = '%Y-%m-%d{sep}%H:%M:%S'.format(sep=m.group('sep'))
         strpstr = timestr[:19]
 
-        if m.group('u'):
+        if m['u']:
             strpfmt += '.%f'
-            strpstr += m.group('u').replace(',', '.')  # .ljust(7, '0')
+            strpstr += m['u'].replace(',', '.')  # .ljust(7, '0')
 
-        if m.group('tz'):
-            if m.group('tz') == 'Z':
+        if m['tz']:
+            if m['tz'] == 'Z':
                 strpfmt += 'Z'
                 strpstr += 'Z'
             else:
                 strpfmt += '%z'
                 # strptime wants HHMM, without ':'
-                strpstr += (m.group('tz').replace(':', '')).ljust(5, '0')
+                strpstr += (m['tz'].replace(':', '')).ljust(5, '0')
 
         ts = cls.strptime(strpstr, strpfmt)
         if ts.tzinfo is not None:
@@ -179,15 +179,15 @@ class Timestamp(datetime.datetime):
             msg = "time data '{timestr}' does not match POSIX format."
             raise ValueError(msg.format(timestr=timestr))
 
-        sec = int(m.group('S'))
-        usec = m.group('u')
+        sec = int(m['S'])
+        usec = m['u']
         usec = int(usec.ljust(6, '0')) if usec else 0
         if sec < 0 < usec:
             sec = sec - 1
-            usec = 1000000 - usec
+            usec = 1_000_000 - usec
 
-        ts = (cls(1970, 1, 1)
-              + datetime.timedelta(seconds=sec, microseconds=usec))
+        ts = cls(1970, 1, 1) + datetime.timedelta(seconds=sec,
+                                                  microseconds=usec)
         return ts
 
     @classmethod

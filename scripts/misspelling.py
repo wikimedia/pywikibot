@@ -122,7 +122,7 @@ class MisspellingRobot(BaseDisambigBot):
                 # misspelling is ambiguous, see for example:
                 # https://de.wikipedia.org/wiki/Buthan
                 for match in self.linkR.finditer(correct_spelling):
-                    self.opt.pos.append(match.group('title'))
+                    self.opt.pos.append(match['title'])
 
                 if not self.opt.pos:
                     # There were no links in the parameter, so there is

@@ -456,8 +456,8 @@ def _extract_plural(lang: str, message: str, parameters: Mapping[str, int]
         return plural_rule
 
     def replace_plural(match: Match[str]) -> str:
-        selector = match.group(1)
-        variants = match.group(2)
+        selector = match[1]
+        variants = match[2]
         num = parameters[selector]
         if not isinstance(num, int):
             raise ValueError("'{}' must be a number, not a {} ({})"

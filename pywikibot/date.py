@@ -515,8 +515,7 @@ def _(value: str, pattern: str, encf: encf_type, decf: decf_type,
     m = compPattern.match(value)
     if m:
         # decode each found value using provided decoder
-        values = [decoder[2](m.group(i + 1))
-                  for i, decoder in enumerate(decoders)]
+        values = [decoder[2](m[i + 1]) for i, decoder in enumerate(decoders)]
         decValue = decf(values)
 
         assert not isinstance(decValue, str), \

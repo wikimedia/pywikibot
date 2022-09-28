@@ -226,10 +226,10 @@ def weblinks_from_text(
     text = textlib.removeDisabledParts(text)
     link_regex = textlib.compileLinkR(without_bracketed, only_bracketed)
     for m in link_regex.finditer(text):
-        if m.group('url'):
-            yield m.group('url')
+        if m['url']:
+            yield m['url']
         else:
-            yield m.group('urlb')
+            yield m['urlb']
 
 
 XmlDumpPageGenerator = partial(

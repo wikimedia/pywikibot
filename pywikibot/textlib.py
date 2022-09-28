@@ -440,13 +440,13 @@ def replaceExcept(text: str, old, new, exceptions: list,
                 group_regex = re.compile(r'\\(\d+)|\\g<(.+?)>')
                 last = 0
                 for group_match in group_regex.finditer(new):
-                    group_id = group_match.group(1) or group_match.group(2)
+                    group_id = group_match[1] or group_match[2]
                     with suppress(ValueError):
                         group_id = int(group_id)
 
                     try:
                         replacement += new[last:group_match.start()]
-                        replacement += match.group(group_id) or ''
+                        replacement += match[group_id] or ''
                     except IndexError:
                         raise IndexError('Invalid group reference: {}\n'
                                          'Groups found: {}'
@@ -732,14 +732,15 @@ def replace_links(text: str, replace, site: 'pywikibot.site.BaseSite') -> str:
         if not m:
             break
 
+        m_title = m['title'].strip()
+
         # Ignore links to sections of the same page
-        if not m.group('title').strip():
+        if not m_title:
             curpos = m.end()
             continue
 
         # Ignore interwiki links
-        if (site.isInterwikiLink(m.group('title').strip())
-                and not m.group('title').strip().startswith(':')):
+        if site.isInterwikiLink(m_title) and not m_title.startswith(':'):
             curpos = m.end()
             continue
 
@@ -752,8 +753,8 @@ def replace_links(text: str, replace, site: 'pywikibot.site.BaseSite') -> str:
                 # TODO: Unclosed link label, what happens there?
                 curpos = m.end()
                 continue
-            groups['label'] += groups['linktrail'] + extended_match.group(1)
-            groups['linktrail'] = extended_match.group(2)
+            groups['label'] += groups['linktrail'] + extended_match[1]
+            groups['linktrail'] = extended_match[2]
             end = extended_match.end()
         else:
             end = m.end()
@@ -1338,19 +1339,18 @@ def getCategoryLinks(text: str, site=None,
     R = re.compile(r'\[\[\s*(?P<namespace>{})\s*:\s*(?P<rest>.+?)\]\]'
                    .format(catNamespace), re.I)
     for match in R.finditer(text):
-        if expand_text and '{{' in match.group('rest'):
-            rest = site.expand_text(match.group('rest'))
+        match_rest = match['rest']
+        if expand_text and '{{' in match_rest:
+            rest = site.expand_text(match_rest)
         else:
-            rest = match.group('rest')
+            rest = match_rest
         if '|' in rest:
             title, sortKey = rest.split('|', 1)
         else:
             title, sortKey = rest, None
         try:
-            cat = pywikibot.Category(pywikibot.Link(
-                                     '%s:%s' %
-                                     (match.group('namespace'), title),
-                                     site),
+            cat = pywikibot.Category(site,
+                                     '{}:{}'.format(match['namespace'], title),
                                      sort_key=sortKey)
         except InvalidTitleError:
             # Category title extracted contains invalid characters
@@ -1749,7 +1749,7 @@ def extract_templates_and_params_regex_simple(text: str):
     result = []
 
     for match in NESTED_TEMPLATE_REGEX.finditer(text):
-        name, params = match.group(1), match.group(2)
+        name, params = match[1], match[2]
 
         # Special case for {{a}}
         if params is None:
@@ -1992,7 +1992,7 @@ class TimeStripper:
             # Recursion levels can be maximum two. If a comment is found, it
             # will not for sure be found in the next level.
             # Nested comments are excluded by design.
-            timestamp = self.timestripper(comment.group(1))
+            timestamp = self.timestripper(comment[1])
             most_recent.append(timestamp)
 
         # Censor comments.
@@ -2005,7 +2005,7 @@ class TimeStripper:
             # Recursion levels can be maximum two. If a link is found, it will
             # not for sure be found in the next level.
             # Nested links are excluded by design.
-            link, anchor = wikilink.group('link'), wikilink.group('anchor')
+            link, anchor = wikilink['link'], wikilink['anchor']
             timestamp = self.timestripper(link)
             most_recent.append(timestamp)
             if anchor:

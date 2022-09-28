@@ -406,32 +406,31 @@ class MediaWikiVersion:
         if not version_match:
             raise ValueError(f'Invalid version number "{version_str}"')
 
-        components = [int(n) for n in version_match.group(1).split('.')]
+        components = [int(n) for n in version_match[1].split('.')]
 
         # The _dev_version numbering scheme might change. E.g. if a stage
         # between 'alpha' and 'beta' is added, 'beta', 'rc' and stable releases
         # are reassigned (beta=3, rc=4, stable=5).
 
-        if version_match.group(3):  # wmf version
-            self._dev_version = (0, int(version_match.group(3)))
-        elif version_match.group(4):
-            self._dev_version = (2, int(version_match.group(4)))
-        elif version_match.group(5):
-            self._dev_version = (3, int(version_match.group(5)))
-        elif version_match.group(2) in ('alpha', '-alpha'):
+        if version_match[3]:  # wmf version
+            self._dev_version = (0, int(version_match[3]))
+        elif version_match[4]:
+            self._dev_version = (2, int(version_match[4]))
+        elif version_match[5]:
+            self._dev_version = (3, int(version_match[5]))
+        elif version_match[2] in ('alpha', '-alpha'):
             self._dev_version = (1, )
         else:
             for handled in ('wmf', 'alpha', 'beta', 'rc'):
                 # if any of those pops up here our parser has failed
-                assert handled not in version_match.group(2), \
-                    'Found "{}" in "{}"'.format(handled,
-                                                version_match.group(2))
-            if version_match.group(2):
-                pywikibot.logging.debug('Additional unused version part '
-                                        '"{}"'.format(version_match.group(2)))
+                assert handled not in version_match[2], \
+                    f'Found "{handled}" in "{version_match[2]}"'
+            if version_match[2]:
+                pywikibot.logging.debug(
+                    'Additional unused version part {version_match[2]!r}')
             self._dev_version = (4, )
 
-        self.suffix = version_match.group(2) or ''
+        self.suffix = version_match[2] or ''
         self.version = tuple(components)
 
     @staticmethod

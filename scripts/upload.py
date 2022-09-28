@@ -75,10 +75,10 @@ def get_chunk_size(match) -> int:
     if not match:
         pywikibot.error('Chunk size parameter is not valid.')
         chunk_size = 0
-    elif match.group(1):  # number was in there
-        base = float(match.group(1))
-        if match.group(2):  # suffix too
-            suffix = match.group(2).lower()
+    elif match[1]:  # number was in there
+        base = float(match[1])
+        if match[2]:  # suffix too
+            suffix = match[2].lower()
             if suffix == 'k':
                 suffix = 1000
             elif suffix == 'm':

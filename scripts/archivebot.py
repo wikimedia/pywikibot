@@ -215,7 +215,7 @@ def str2size(string: str) -> Size:
     match = re.fullmatch(r'(\d{1,3}(?: \d{3})+|\d+) *([BkKMT]?)', string)
     if not match:
         raise MalformedConfigError(f"Couldn't parse size: {string}")
-    val, unit = (int(match.group(1).replace(' ', '')), match.group(2))
+    val, unit = (int(match[1].replace(' ', '')), match[2])
     if unit == 'M':
         val *= 1024
         unit = 'K'
@@ -588,11 +588,11 @@ class PageArchiver:
                 return None
             # TODO: handle unsigned
             try:
-                maxage = str2timedelta(re_t.group(1), thread.timestamp)
+                maxage = str2timedelta(re_t[1], thread.timestamp)
             except ValueError as e:
                 raise MalformedConfigError(e) from None
             if self.now - thread.timestamp > maxage:
-                duration = str2localized_duration(self.site, re_t.group(1))
+                duration = str2localized_duration(self.site, re_t[1])
                 return ('duration', duration)
         # TODO: handle marked with template
         return None

@@ -320,11 +320,11 @@ class DuplicateReferences:
 
         # Parse references
         for match in self.REFS.finditer(text):
-            content = match.group('content')
+            content = match['content']
             if not content.strip():
                 continue
 
-            params = match.group('params')
+            params = match['params']
             group = self.GROUPS.search(params) or ''
             if group not in found_refs:
                 found_refs[group] = {}
@@ -338,8 +338,8 @@ class DuplicateReferences:
 
             found = self.NAMES.search(params)
             if found:
-                quoted = found.group('quote') in ['"', "'"]
-                name = found.group('name')
+                quoted = found['quote'] in ['"', "'"]
+                name = found['name']
 
                 if not v[IX.name]:
                     # First name associated with this content
@@ -555,12 +555,12 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
         # for each link to change
         for match in linksInRef.finditer(raw_text):
 
-            link = match.group('url')
+            link = match['url']
             if 'jstor.org' in link:
                 # TODO: Clean URL blacklist
                 continue
 
-            ref = RefLink(link, match.group('name'), site=self.site)
+            ref = RefLink(link, match['name'], site=self.site)
 
             try:
                 r = comms.http.fetch(

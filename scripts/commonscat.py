@@ -491,10 +491,10 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
                         .format(commonsPage, loguser, logcomment))
                     break
 
-                if m.group('newcat1'):
-                    return self.checkCommonscatLink(m.group('newcat1'))
-                if m.group('newcat2'):
-                    return self.checkCommonscatLink(m.group('newcat2'))
+                if m['newcat1']:
+                    return self.checkCommonscatLink(m['newcat1'])
+                if m['newcat2']:
+                    return self.checkCommonscatLink(m['newcat2'])
 
             return ''
 

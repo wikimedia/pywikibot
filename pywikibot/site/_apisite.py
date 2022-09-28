@@ -703,12 +703,12 @@ class APISite(
                 '"{}": No linktrail pattern extracted from "{}"'
                 .format(self.code, linktrail))
 
-        pattern = match.group('pattern')
-        letters = match.group('letters')
+        pattern = match['pattern']
+        letters = match['letters']
 
         if r'x{' in pattern:
             pattern = re.sub(r'\\x\{([A-F0-9]{4})\}',
-                             lambda match: chr(int(match.group(1), 16)),
+                             lambda match: chr(int(match[1], 16)),
                              pattern)
         if letters:
             pattern += ''.join(letters.split('|'))

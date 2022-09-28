@@ -194,7 +194,7 @@ def _format_isbn_match(match: Match[str], strict: bool = True) -> str:
         raise NotImplementedError(
             'ISBN functionality not available. Install stdnum package.')
 
-    isbn = match.group('code')
+    isbn = match['code']
     try:
         stdnum_isbn.validate(isbn)
     except stdnum_isbn.ValidationError as e:
@@ -519,10 +519,10 @@ class CosmeticChangesToolkit:
         # helper function which works on one link and either returns it
         # unmodified, or returns a replacement.
         def handleOneLink(match: Match[str]) -> str:
-            titleWithSection = match.group('titleWithSection')
-            label = match.group('label')
-            trailingChars = match.group('linktrail')
-            newline = match.group('newline')
+            titleWithSection = match['titleWithSection']
+            label = match['label']
+            trailingChars = match['linktrail']
+            newline = match['newline']
 
             is_interwiki = self.site.isInterwikiLink(titleWithSection)
             if is_interwiki:
@@ -819,11 +819,13 @@ class CosmeticChangesToolkit:
             if re.match(r'(?:{}):'
                         .format('|'.join((*self.site.namespaces[6],
                                           *self.site.namespaces[14]))),
-                        match.group('link')):
+                        match['link']):
                 replacement += ':'
-            replacement += match.group('link')
-            if match.group('title'):
-                replacement += '|' + match.group('title')
+
+            replacement += match['link']
+            if match['title']:
+                replacement += '|' + match['title']
+
             return replacement + ']]'
 
         exceptions = ['comment', 'math', 'nowiki', 'pre', 'startspace',
@@ -898,8 +900,8 @@ class CosmeticChangesToolkit:
         """Relace html markups with wikitext markups."""
         def replace_header(match: Match[str]) -> str:
             """Create a header string for replacing."""
-            depth = int(match.group(1))
-            return r'{0} {1} {0}'.format('=' * depth, match.group(2))
+            depth = int(match[1])
+            return r'{0} {1} {0}'.format('=' * depth, match[2])
 
         # Everything case-insensitive (?i)
         # Keep in mind that MediaWiki automatically converts <br> to <br />

@@ -333,8 +333,8 @@ def _yield_titles(f: Union[codecs.StreamReaderWriter, io.StringIO],
         # This makes it possible to work on different wikis using a single
         # text file, but also could be dangerous because you might
         # inadvertently change pages on another wiki!
-        yield pywikibot.Page(pywikibot.Link(linkmatch.group('title'),
-                                            site))
+        yield pywikibot.Page(pywikibot.Link(linkmatch['title'], site))
+
     if linkmatch is not None:
         return
 
@@ -855,7 +855,7 @@ class GoogleSearchPageGenerator(GeneratorWrapper):
         for url in self.queryGoogle(local_query):
             m = re.search(pattern, url)
             if m:
-                page = pywikibot.Page(pywikibot.Link(m.group(1), self.site))
+                page = pywikibot.Page(pywikibot.Link(m[1], self.site))
                 if page.site == self.site:
                     yield page
 

@@ -1004,7 +1004,7 @@ class TestLagpattern(DefaultSiteTestCase):
         for info, time in patterns.items():
             lag = api._requests.lagpattern.search(info)
             self.assertIsNotNone(lag)
-            self.assertEqual(float(lag.group('lag')), time)
+            self.assertEqual(float(lag['lag']), time)
 
 
 if __name__ == '__main__':  # pragma: no cover

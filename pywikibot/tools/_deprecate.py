@@ -273,7 +273,7 @@ def deprecated(*args, **kwargs):
                 # Get docstring up to :params so deprecation notices for
                 # parameters don't disrupt it
                 trim_params = re.compile(r'^.*?((?=:param)|$)', re.DOTALL)
-                trimmed_doc = trim_params.match(wrapper.__doc__).group(0)
+                trimmed_doc = trim_params.match(wrapper.__doc__)[0]
 
                 if not deprecated_notice.search(trimmed_doc):  # No notice
                     add_docstring(wrapper)

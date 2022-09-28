@@ -1440,7 +1440,7 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
             deprecation_messages = self.deprecation_messages
             for deprecation_message in deprecation_messages:
                 match = self._generic_match.match(deprecation_message)
-                if (match and bool(match.group(1)) == (msg is self.INSTEAD)
+                if (match and bool(match[1]) == (msg is self.INSTEAD)
                         or msg is None):
                     break
             else:

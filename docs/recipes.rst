@@ -17,7 +17,7 @@ Page content
   >>> site = pywikibot.Site('wikipedia:en')  # create a Site object
   >>> page = pywikibot.Page(site, 'Deep learning')  # create a Page object
   >>> sect = textlib.extract_sections(page.text, site)  # divide content into sections
-  >>> links = sorted(link.group('title') for link in pywikibot.link_regex.finditer(sect.head))
+  >>> links = sorted(link['title'] for link in pywikibot.link_regex.finditer(sect.header))
   >>> pages = [pywikibot.Page(site, title) for title in links]
 
   ``links`` is a list containing all link titles in alphabethical order.

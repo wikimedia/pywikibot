@@ -642,7 +642,7 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot):
                             'Adding references section before {} section...\n'
                             .format(section))
                         index = match.start()
-                        ident = match.group('ident')
+                        ident = match['ident']
                         return self.createReferenceSection(oldText, index,
                                                            ident)
                 else:

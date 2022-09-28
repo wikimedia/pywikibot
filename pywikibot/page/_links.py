@@ -826,14 +826,14 @@ def html2unicode(text: str, ignore=None, exceptions=None) -> str:
         if textlib.isDisabled(match.string, match.start(), tags=exceptions):
             # match.string stores original text so we do not need
             # to pass it to handle_entity, ♥ Python
-            return match.group(0)
+            return match[0]
 
-        if match.group('decimal'):
-            unicode_codepoint = int(match.group('decimal'))
-        elif match.group('hex'):
-            unicode_codepoint = int(match.group('hex'), 16)
-        elif match.group('name'):
-            name = match.group('name')
+        if match['decimal']:
+            unicode_codepoint = int(match['decimal'])
+        elif match['hex']:
+            unicode_codepoint = int(match['hex'], 16)
+        elif match['name']:
+            name = match['name']
             unicode_codepoint = name2codepoint.get(name, False)
 
         unicode_codepoint = _ILLEGAL_HTML_ENTITIES_MAPPING.get(
@@ -843,6 +843,6 @@ def html2unicode(text: str, ignore=None, exceptions=None) -> str:
             return chr(unicode_codepoint)
 
         # Leave the entity unchanged
-        return match.group(0)
+        return match[0]
 
     return _ENTITY_SUB(handle_entity, text)

@@ -248,12 +248,12 @@ class PageFromFileReader(OptionHandler, GeneratorWrapper):
         if self.opt.include:
             contents = location.group()
         else:
-            contents = location.group(1)
+            contents = location[1]
 
         title = self.opt.title
         if not title:
             try:
-                title = title_regex.search(contents).group(1)
+                title = title_regex.search(contents)[1]
                 if self.opt.notitle:
                     # Remove title (to allow creation of redirects)
                     contents = title_regex.sub('', contents, count=1)

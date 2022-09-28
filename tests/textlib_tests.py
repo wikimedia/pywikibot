@@ -630,13 +630,13 @@ class TestTemplateParams(TestCase):
         for pattern in patterns:
             m = func(pattern)
             self.assertIsNotNone(m)
-            self.assertIsNotNone(m.group(0))
-            self.assertIsNone(m.group('name'))
-            self.assertIsNone(m.group(1))
-            self.assertIsNone(m.group('params'))
-            self.assertIsNone(m.group(2))
-            self.assertIsNotNone(m.group('unhandled_depth'))
-            self.assertTrue(m.group(0).endswith('foo {{bar}}'))
+            self.assertIsNotNone(m[0])
+            self.assertIsNone(m['name'])
+            self.assertIsNone(m[1])
+            self.assertIsNone(m['params'])
+            self.assertIsNone(m[2])
+            self.assertIsNotNone(m['unhandled_depth'])
+            self.assertTrue(m[0].endswith('foo {{bar}}'))
 
 
 class TestDisabledParts(DefaultDrySiteTestCase):

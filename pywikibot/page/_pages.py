@@ -1465,7 +1465,7 @@ class BasePage(ComparableMixin):
             text = self.text
         for linkmatch in pywikibot.link_regex.finditer(
                 textlib.removeDisabledParts(text)):
-            linktitle = linkmatch.group('title')
+            linktitle = linkmatch['title']
             link = Link(linktitle, self.site)
             # only yield links that are to a different site and that
             # are not language links
@@ -2279,7 +2279,7 @@ class Page(BasePage, WikiBlameMixin):
             old_text = ''
         result = redirect_regex.search(old_text)
         if result:
-            oldlink = result.group(1)
+            oldlink = result[1]
             if (keep_section and '#' in oldlink
                     and target_page.section() is None):
                 sectionlink = oldlink[oldlink.index('#'):]

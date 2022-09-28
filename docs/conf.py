@@ -447,7 +447,7 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
             # Indent options
             match = re.match(r'-[^ ]+? +', line)
             if match:
-                length = len(match.group(0))
+                length = len(match[0])
             lines[index] = ' ' + line
         elif length and line.startswith(' ' * length):
             # Indent descriptions of options (as options are indented)

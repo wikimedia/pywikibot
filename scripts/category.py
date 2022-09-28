@@ -465,7 +465,7 @@ class CategoryAddBot(CategoryPreprocess):
         brackets_regex = re.compile(r'(.*) \(.+?\)')
         match_object = brackets_regex.match(page_name)
         if match_object:
-            page_name = match_object.group(1)
+            page_name = match_object[1]
         split_string = page_name.rsplit(' ', 1)
         if len(split_string) > 1:
             # pull last part of the name to the beginning, and append the

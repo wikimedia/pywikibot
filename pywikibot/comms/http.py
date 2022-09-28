@@ -410,7 +410,7 @@ def get_charset_from_content_type(content_type: str) -> Optional[str]:
     m = CHARSET_RE.search(content_type)
     if not m:
         return None
-    charset = m.group('charset').strip('"\' ').lower()
+    charset = m['charset'].strip('"\' ').lower()
     # Convert to python correct encoding names
     if re.sub(r'[ _\-]', '', charset) == 'xeucjp':
         charset = 'euc_jp'
@@ -443,7 +443,7 @@ def _get_encoding_from_response_headers(response) -> Optional[str]:
         m = re.search(
             br'encoding=(["\'])(?P<encoding>.+?)\1', header)
         if m:
-            header_encoding = m.group('encoding').decode('utf-8')
+            header_encoding = m['encoding'].decode('utf-8')
         else:
             header_encoding = 'utf-8'
     else:

@@ -391,7 +391,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         # Try to extract a valid page
         for match in pywikibot.link_regex.finditer(value):
             matched = True
-            link_text = match.group(1)
+            link_text = match[1]
             linked_item = self.template_link_target(item, site, link_text)
             if linked_item:
                 yield linked_item
@@ -431,8 +431,8 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
             start, end = match.span()
             since_prev_match = value[prev_end:start]
 
-            title = match.group('title').strip()
-            text = match.group(2)
+            title = match['title'].strip()
+            text = match[2]
             if text:
                 text = text[1:].strip()  # remove '|'
 
@@ -480,7 +480,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         .. versionadded:: 7.5
         """
         for match in self.linkR.finditer(value):
-            yield match.group('url')
+            yield match['url']
 
     @staticmethod
     def handle_commonsmedia(value, site,

@@ -160,7 +160,7 @@ class DjVuFile:
                 if 'FORM:DJVU' in line:
                     m = self._pat_form.search(line)
                     if m:
-                        key, id = int(m.group('n')), m.group('id')
+                        key, id = int(m['n']), m['id']
                     else:
                         # If djvu doc has only one page,
                         # FORM:DJVU line in djvudump has no id
@@ -169,7 +169,7 @@ class DjVuFile:
                 if 'INFO' in line:
                     m = self._pat_info.search(line)
                     if m:
-                        size, dpi = m.group('size'), int(m.group('dpi'))
+                        size, dpi = m['size'], int(m['dpi'])
                     else:
                         size, dpi = None, None
                 else:

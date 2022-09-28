@@ -285,8 +285,7 @@ class TestTimeStripperTreatSpecialText(TestTimeStripperCase):
 
         txt_match = self.date + '<!--a test comment-->'
         exp_match = 'a test comment'
-        self.assertEqual(ts._comment_pat.search(txt_match).group(1),
-                         exp_match)
+        self.assertEqual(ts._comment_pat.search(txt_match)[1], exp_match)
 
     def test_timestripper_match_hyperlink(self):
         """Test that hyperlinks are correctly matched."""
@@ -304,9 +303,9 @@ class TestTimeStripperTreatSpecialText(TestTimeStripperCase):
         txt_match = '[[wikilink|a wikilink with no date]]'
         exp_match_link = 'wikilink'
         exp_match_anchor = '|a wikilink with no date'
-        self.assertEqual(ts._wikilink_pat.search(txt_match).group('link'),
+        self.assertEqual(ts._wikilink_pat.search(txt_match)['link'],
                          exp_match_link)
-        self.assertEqual(ts._wikilink_pat.search(txt_match).group('anchor'),
+        self.assertEqual(ts._wikilink_pat.search(txt_match)['anchor'],
                          exp_match_anchor)
 
     def test_timestripper_match_comment_with_date(self):

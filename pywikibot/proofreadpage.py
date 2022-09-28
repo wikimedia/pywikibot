@@ -121,10 +121,10 @@ class FullHeader:
 
         m = self.p_header.search(self._text)
         if m:
-            self.ql = int(m.group('ql'))
-            self.user = m.group('user')
-            self.header = m.group('header')
-            if not m.group('has_div'):
+            self.ql = int(m['ql'])
+            self.user = m['user']
+            self.header = m['header']
+            if not m['has_div']:
                 self._has_div = False
         else:
             self.ql = ProofreadPage.NOT_PROOFREAD
@@ -867,7 +867,7 @@ class IndexPage(pywikibot.Page):
             r'/w/index\.php\?title=(.+?)&action=edit&redlink=1')
         title = p_href.search(href)
         if title:
-            return title.group(1).replace('_', ' ')
+            return title[1].replace('_', ' ')
         return None
 
     def save(self, *args: Any, **kwargs: Any) -> None:  # See Page.save().

@@ -142,7 +142,7 @@ class Siteinfo(Container):
             matched = Siteinfo.WARNING_REGEX.match(message)
             if mod == 'siteinfo' and matched:
                 invalid_properties.extend(
-                    prop.strip() for prop in matched.group(1).split(','))
+                    prop.strip() for prop in matched[1].split(','))
                 return True
             return False
 
