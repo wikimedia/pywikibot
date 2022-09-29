@@ -53,7 +53,7 @@ class MementoClient(OldMementoClient):
     >>> sorted(mi['mementos'])
     ['closest', 'first', 'last', 'next', 'prev']
     >>> from pprint import pprint
-    >>> pprint(mi['mementos'])  # doctest: +SKIP
+    >>> pprint(mi['mementos'])
     {'closest': {'datetime': datetime.datetime(2010, 5, 23, 10, 19, 6),
                  'http_status_code': 200,
                  'uri': ['https://web.archive.org/web/20100523101906/http://www.bbc.co.uk/']},
