@@ -2,9 +2,6 @@
 A window with a textfield where the user can edit.
 
 Useful for editing the contents of an article.
-
-.. versionchanged:: 6.1
-   Python 3.6 or highter is required.
 """
 #
 # (C) Pywikibot team, 2003-2022

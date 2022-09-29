@@ -23,7 +23,6 @@ Usage::
 
     [pwb] make_dist [options]
 
-.. note:: Requires Python 3.6+.
 .. versionadded:: 7.3
 .. versionchanged:: 7.4
 

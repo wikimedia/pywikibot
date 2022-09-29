@@ -38,7 +38,7 @@ VERSIONS_REQUIRED_MESSAGE = """
 Pywikibot is not available on:
 {version}
 
-This version of Pywikibot only supports Python 3.6+.
+This version of Pywikibot only supports Python 3.6.1+.
 """
 
 try:
@@ -49,7 +49,7 @@ except SyntaxError:
 
 def python_is_supported() -> bool:
     """Check that Python is supported."""
-    return sys.version_info[:3] >= (3, 6)
+    return sys.version_info[:3] >= (3, 6, 1)
 
 
 if not python_is_supported():  # pragma: no cover
@@ -73,8 +73,7 @@ extra_deps = {
     'html': ['BeautifulSoup4'],
     'http': ['fake_useragent'],
     'flake8': [  # Due to incompatibilities between packages the order matters.
-        'flake8==3.9.2; python_version < "3.6.1"',
-        'flake8>=5.0.2; python_version >= "3.6.1"',
+        'flake8>=5.0.2',
         'darglint',
         'pydocstyle>=4.0.0',
         'flake8-bugbear!=21.4.1,!=21.11.28',
@@ -270,7 +269,7 @@ def main() -> None:  # pragma: no cover
         # zip_safe
         install_requires=dependencies,
         extras_require=extra_deps,
-        python_requires='>=3.6',
+        python_requires='>=3.6.1',
         # namespace_packages
         test_suite='tests.collector',
         tests_require=test_deps,
