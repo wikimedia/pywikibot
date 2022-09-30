@@ -1,0 +1,66 @@
+# This workflow will install Python dependencies, run Pywikibot tests
+# with a variety of Python versions. For more information see:
+# https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Doctest CI
+
+on:
+  push:
+    branches: [ master ]
+
+
+env:
+  PYWIKIBOT_TEST_RUNNING: 1
+  PYWIKIBOT_USERNAME: Pywikibot-test
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 2
+
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+
+      matrix:
+        python-version: ["3.6", "3.9"]
+        os: [ "ubuntu-latest", "macOS-latest" ]
+        include:
+          - python-version: "pypy3"
+            os: "ubuntu-latest"
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip --version
+        pip install -U setuptools
+        pip install nose
+        pip install "sseclient<0.0.23,>=0.0.18"
+        pip install "mwparserfromhell>=0.5.0"
+        pip install "PyMySQL >= 0.9.3"
+        pip install codecov
+        pip install "coverage>=5.2.1"
+        python -c "import setuptools; print('setuptools:', setuptools.__version__)"
+
+    - name: Generate user files
+      run: |
+        python -Werror::UserWarning -m pwb generate_user_files -site:wikipedia:test -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
+
+    - name: doctest with nose
+      timeout-minutes: 1
+      run: |
+        python pwb.py version
+        nosetests --version
+        nosetests -v --with-doctest --with-coverage pywikibot --ignore-files="(gui|memento)\.py"
+    - name: Upload coverage to Codecov
+      run: codecov
