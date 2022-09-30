@@ -16,7 +16,7 @@ env:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 2
+    timeout-minutes: 5
 
     strategy:
       fail-fast: false
@@ -57,7 +57,7 @@ jobs:
         python -Werror::UserWarning -m pwb generate_user_files -site:wikipedia:test -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
 
     - name: doctest with nose
-      timeout-minutes: 1
+      timeout-minutes: 3
       run: |
         python pwb.py version
         nosetests --version
