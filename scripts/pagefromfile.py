@@ -217,7 +217,7 @@ class PageFromFileReader(OptionHandler, GeneratorWrapper):
         while text:
             try:
                 length, title, contents = self.findpage(text)
-            except AttributeError:
+            except TypeError:
                 if not length:
                     pywikibot.info('\nStart or end marker not found.')
                 else:
@@ -246,7 +246,7 @@ class PageFromFileReader(OptionHandler, GeneratorWrapper):
             + re.escape(self.opt.titleend))
         location = page_regex.search(text)
         if self.opt.include:
-            contents = location.group()
+            contents = location[0]
         else:
             contents = location[1]
 
@@ -257,7 +257,7 @@ class PageFromFileReader(OptionHandler, GeneratorWrapper):
                 if self.opt.notitle:
                     # Remove title (to allow creation of redirects)
                     contents = title_regex.sub('', contents, count=1)
-            except AttributeError:
+            except TypeError:
                 raise NoTitleError(location.end())
 
         return location.end(), title, contents
