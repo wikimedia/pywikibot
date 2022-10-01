@@ -56,7 +56,6 @@ from pywikibot.pagegenerators._generators import (
     MySQLPageGenerator,
     NewimagesPageGenerator,
     NewpagesPageGenerator,
-    page_with_property_generator,
     PagesFromPageidGenerator,
     PagesFromTitlesGenerator,
     PetScanPageGenerator,
@@ -85,8 +84,10 @@ from pywikibot.pagegenerators._generators import (
     XMLDumpOldPageGenerator,
     XMLDumpPageGenerator,
     YearPageGenerator,
+    page_with_property_generator,
 )
 from pywikibot.tools.collections import DequeGenerator
+
 
 __all__ = (
     'GeneratorFactory',
@@ -128,6 +129,7 @@ __all__ = (
     'PagesFromTitlesGenerator',
     'PetScanPageGenerator',
     'PrefixingPageGenerator',
+    'PreloadingGenerator',
     'RandomPageGenerator',
     'RandomRedirectPageGenerator',
     'RecentChangesPageGenerator',
