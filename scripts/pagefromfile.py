@@ -195,10 +195,26 @@ class PageFromFileReader(OptionHandler, GeneratorWrapper):
         super().__init__(**kwargs)
         self.filename = filename
         self.site = site or pywikibot.Site()
+        self.page_regex, self.title_regex = self._make_regexes()
+
+    def _make_regexes(self):
+        """Make regex from options."""
+        if self.opt.textonly:
+            pattern = '^(.*)$'
+        else:
+            pattern = (re.escape(self.opt.begin) + '(.*?)'
+                       + re.escape(self.opt.end))
+        page_regex = re.compile(pattern, re.DOTALL)
+        title_regex = re.compile(
+            re.escape(self.opt.titlestart) + '(.*?)'
+            + re.escape(self.opt.titleend))
+        return page_regex, title_regex
 
     @property
     def generator(self) -> Iterator[pywikibot.Page]:
-        """Read file and yield a tuple of page title and content.
+        """Read file and yield a page with content from file.
+
+        content is stored as a page attribute defined by CTX_ATTR.
 
         .. versionchanged:: 7.6
            changed from iterator method to generator property
@@ -216,7 +232,7 @@ class PageFromFileReader(OptionHandler, GeneratorWrapper):
         length = 0
         while text:
             try:
-                length, title, contents = self.findpage(text)
+                length, title, contents = self.find_page(text)
             except TypeError:
                 if not length:
                     pywikibot.info('\nStart or end marker not found.')
@@ -233,18 +249,9 @@ class PageFromFileReader(OptionHandler, GeneratorWrapper):
                 yield page
                 text = text[length:]
 
-    def findpage(self, text) -> Tuple[int, str, str]:
+    def find_page(self, text) -> Tuple[int, str, str]:
         """Find page to work on."""
-        if self.opt.textonly:
-            pattern = '^(.*)$'
-        else:
-            pattern = (re.escape(self.opt.begin) + '(.*?)'
-                       + re.escape(self.opt.end))
-        page_regex = re.compile(pattern, re.DOTALL)
-        title_regex = re.compile(
-            re.escape(self.opt.titlestart) + '(.*?)'
-            + re.escape(self.opt.titleend))
-        location = page_regex.search(text)
+        location = self.page_regex.search(text)
         if self.opt.include:
             contents = location[0]
         else:
@@ -253,10 +260,10 @@ class PageFromFileReader(OptionHandler, GeneratorWrapper):
         title = self.opt.title
         if not title:
             try:
-                title = title_regex.search(contents)[1]
+                title = self.title_regex.search(contents)[1]
                 if self.opt.notitle:
                     # Remove title (to allow creation of redirects)
-                    contents = title_regex.sub('', contents, count=1)
+                    contents = self.title_regex.sub('', contents, count=1)
             except TypeError:
                 raise NoTitleError(location.end())
 
