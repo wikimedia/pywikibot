@@ -227,7 +227,7 @@ class DjVuFile:
         if not self.has_text(force=force):
             raise ValueError('Djvu file {} has no text layer.'
                              .format(self.file))
-        res, stdoutdata = _call_cmd(['djvutxt', f'--page={int(n)}',
+        res, stdoutdata = _call_cmd(['djvutxt', f'--page={n}',
                                      self.file])
         if not res:
             return False
@@ -258,7 +258,7 @@ class DjVuFile:
             return False
 
         # Convert white_page to djvu.
-        res, data = _call_cmd(['c44', white_ppm, '-dpi', dpi])
+        res, data = _call_cmd(['c44', white_ppm, '-dpi', str(dpi)])
         os.unlink(white_ppm)  # rm white_page.ppm before returning.
         if not res:
             return False
@@ -266,12 +266,12 @@ class DjVuFile:
         # Delete page n.
         # Get ref page info for later checks.
         info_ref_page = self.page_info(ref_page)
-        res, data = _call_cmd(['djvm', '-d', self.file, n])
+        res, data = _call_cmd(['djvm', '-d', self.file, str(n)])
         if not res:
             return False
 
         # Insert new page
-        res, data = _call_cmd(['djvm', '-i', self.file, white_djvu, n])
+        res, data = _call_cmd(['djvm', '-i', self.file, white_djvu, str(n)])
         os.unlink(white_djvu)  # rm white_page.djvu before returning.
         if not res:
             return False
@@ -300,7 +300,7 @@ class DjVuFile:
         # Delete page n.
         # Get ref page info for later checks.
         info_ref_page = self.page_info(ref_page)
-        res, _ = _call_cmd(['djvm', '-d', self.file, n])
+        res, _ = _call_cmd(['djvm', '-d', self.file, str(n)])
         if not res:
             return False
 
