@@ -16,18 +16,15 @@ env:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 5
+    timeout-minutes: 15
 
     strategy:
       fail-fast: false
-      max-parallel: 3
+      max-parallel: 6
 
       matrix:
-        python-version: ["3.6", "3.9"]
-        os: [ "ubuntu-latest", "macOS-latest" ]
-        include:
-          - python-version: "pypy3"
-            os: "ubuntu-latest"
+        os: [ "windows-latest", "macOS-latest", "ubuntu-latest" ]
+        python-version: ["pypy3.7", "3.11.0-dev - 3.11", "3.6" ]
 
     steps:
     - uses: actions/checkout@v3
@@ -44,7 +41,7 @@ jobs:
         python -m pip install --upgrade pip
         pip --version
         pip install -U setuptools
-        pip install nose
+        pip install pytest
         pip install "sseclient<0.0.23,>=0.0.18"
         pip install "mwparserfromhell>=0.5.0"
         pip install "PyMySQL >= 0.9.3"
@@ -56,11 +53,11 @@ jobs:
       run: |
         python -Werror::UserWarning -m pwb generate_user_files -site:wikipedia:test -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
 
-    - name: doctest with nose
-      timeout-minutes: 3
+    - name: doctest with pytest
+      timeout-minutes: 10
       run: |
         python pwb.py version
-        nosetests --version
-        nosetests -v --with-doctest --with-coverage pywikibot --ignore-files="(gui|memento)\.py"
+        pytest --version
+        coverage run -m pytest pywikibot --doctest-modules --ignore-glob="*gui.py" --ignore-glob="*memento.py"
     - name: Upload coverage to Codecov
       run: codecov
