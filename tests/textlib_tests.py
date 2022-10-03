@@ -895,14 +895,16 @@ class TestReplaceLinks(TestCase):
         # These tests require to get the actual part which is before the title
         # (interwiki and namespace prefixes) which could be then compared
         # case insensitive.
-        self.assertEqual(
-            textlib.replace_links('[[Image:Foobar]]',
-                                  ('File:Foobar', 'File:Foo'), self.wp_site),
-            '[[File:Foo|Image:Foobar]]')
-        self.assertEqual(
-            textlib.replace_links('[[en:File:Foobar]]',
-                                  ('File:Foobar', 'File:Foo'), self.wp_site),
-            '[[File:Foo|en:File:Foobar]]')
+        tests = [
+            ('[[Image:Foobar]]', '[[File:Foo|Image:Foobar]]'),
+            ('[[en:File:Foobar]]', '[[File:Foo|en:File:Foobar]]'),
+        ]
+        for link, result in tests:
+            with self.subTest(link=link):
+                self.assertEqual(
+                    textlib.replace_links(
+                        link, ('File:Foobar', 'File:Foo'), self.wp_site),
+                    result)
 
     def test_linktrails(self):
         """Test that the linktrails are used or applied."""

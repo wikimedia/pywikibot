@@ -1701,7 +1701,8 @@ class TestUnconnectedPageGenerator(DefaultSiteTestCase):
         with self.assertRaises(ValueError):
             for _ in pagegenerators.UnconnectedPageGenerator(self.site,
                                                              total=5):
-                raise AssertionError("this shouldn't be reached")
+                raise AssertionError(
+                    "this shouldn't be reached")  # pragma: no cover
 
 
 class TestLinksearchPageGenerator(TestCase):

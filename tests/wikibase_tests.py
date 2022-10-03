@@ -42,7 +42,7 @@ def _get_test_unconnected_page(site):
     for page in gen:
         if not page.properties().get('wikibase_item'):
             return page
-    return None
+    return None  # pragma: no cover
 
 
 class WbRepresentationTestCase(WikidataTestCase):

@@ -112,7 +112,7 @@ def handle_args() -> Tuple[bool, bool, bool, bool, bool]:
     :return: Return whether dist is to be installed locally or to be
         uploaded
     """
-    if '-help' in sys.argv:
+    if '-help' in sys.argv:  # pragma: no cover
         info(__doc__)
         info(setup.__doc__)
         sys.exit()

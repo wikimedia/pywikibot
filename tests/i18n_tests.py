@@ -238,7 +238,7 @@ class TWNTestCaseBase(TWNSetMessagePackageBase):
         """Verify that the test translations are not empty."""
         if not isinstance(cls.message_package, str):
             raise TypeError('{}.message_package must be a package name'
-                            .format(cls.__name__))
+                            .format(cls.__name__))  # pragma: no cover
         # The call to set_messages_package below exists only to confirm
         # that the package exists and messages are available, so
         # that tests can be skipped if the i18n data doesn't exist.

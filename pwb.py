@@ -79,12 +79,12 @@ def check_pwb_versions(package):
               'misconfigured.\n'.format(wikibot_version, scripts_version))
 
     # calculate previous minor release
-    if wikibot_version.minor > 0:
+    if wikibot_version.minor > 0:  # pragma: no cover
         prev_wikibot = Version('{v.major}.{}.{v.micro}'
                                .format(wikibot_version.minor - 1,
                                        v=wikibot_version))
 
-        if scripts_version.release < prev_wikibot.release:  # pragma: no cover
+        if scripts_version.release < prev_wikibot.release:
             print('WARNING: Scripts package version {} is behind legacy '
                   'Pywikibot version {} and current version {}\nYour scripts '
                   'may need an update or be misconfigured.\n'
@@ -138,7 +138,7 @@ def run_python_file(filename, args, package=None):
 
     # set environment values
     old_env = os.environ.copy()
-    for key, value in environ:
+    for key, value in environ:  # pragma: no cover
         os.environ[key] = value
 
     sys.argv = [filename] + args
@@ -162,7 +162,7 @@ def run_python_file(filename, args, package=None):
 # end of snippet from coverage
 
         # Restore environment values
-        for key, value in environ:
+        for key, value in environ:  # pragma: no cover
             if key in old_env:
                 os.environ[key] = old_env[key]
             else:

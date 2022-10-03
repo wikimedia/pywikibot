@@ -244,7 +244,7 @@ class TestTimeStripperLanguage(TestCase):
         self.assertEqual(self.ts.timestripper(txt_match), res)
 
         if 'match3' not in self.sites[key]:
-            return
+            return  # pragma: no cover
 
         txt_match = self.sites[key]['match3']
 
