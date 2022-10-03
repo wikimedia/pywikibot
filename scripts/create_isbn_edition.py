@@ -811,7 +811,7 @@ def main(*args: str) -> None:
     # Get additional P/Q parameters
     while local_args:
         inpar = PROPRE.findall(local_args.pop(0).upper())[0]
-        target[inpar] = QSUFFRE.findall(local_args(0).upper())[0]
+        target[inpar] = QSUFFRE.findall(local_args.pop(0).upper())[0]
 
     # Validate P/Q list
     proptyx = {}
