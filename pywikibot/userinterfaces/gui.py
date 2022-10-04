@@ -426,60 +426,6 @@ class EditBoxWindow(tkinter.Frame):
         return 'break'
 
 
-# the following class isn't used anywhere in the framework: ####
-class ListBoxWindow:
-
-    """List box window."""
-
-    # called when user pushes the OK button.
-    # closes the window.
-    def pressedOK(self) -> None:
-        """
-        Perform OK operation.
-
-        Closes listbox.
-        """
-        self.parent.destroy()
-
-    def __init__(self, parent=None) -> None:
-        """Initializer."""
-        if parent is None:
-            # create a new window
-            parent = tkinter.Tk()
-        self.parent = parent
-
-        # selectable: only one item
-        self.listbox = tkinter.Listbox(parent, selectmode=tkinter.SINGLE)
-        # put list into main frame, using all available space
-        self.listbox.pack(anchor=tkinter.CENTER, fill=tkinter.BOTH)
-
-        # lower subframe which will contain one button
-        self.bottom_frame = tkinter.Frame(parent)
-        self.bottom_frame.pack(side=tkinter.BOTTOM)
-
-        buttonOK = tkinter.Button(self.bottom_frame, text='OK',
-                                  command=self.pressedOK)
-        buttonOK.pack(side=tkinter.LEFT, fill=tkinter.X)
-        # idea: set title to cur_disambiguation
-
-    def list(self, list):
-        """Put list of alternatives into listbox."""
-        self.list = list
-        # find required area
-        laenge = len(list)
-        maxbreite = 0
-        for i in range(laenge):
-            # cycle through all listitems to find maxlength
-            if len(list[i]) + len(str(i)) > maxbreite:
-                maxbreite = len(list[i]) + len(str(i))
-            # show list as formerly in DOS-window
-            self.listbox.insert(tkinter.END, str(i) + ' - ' + list[i])
-        # set optimized height & width
-        self.listbox.config(height=laenge, width=maxbreite + 2)
-        # wait for user to push a button which will destroy (close) the window
-        return self.list
-
-
 class Tkdialog:
 
     """The dialog window for image info."""
