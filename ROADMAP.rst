@@ -1,6 +1,12 @@
 Current release 8.0.0
 ^^^^^^^^^^^^^^^^^^^^^
 
+* Enable pagegenerators options with ``move`` and ``remove`` actions (:phab:`T318239`)
+* ListBoxWindows class of :mod:`userinterfaces.gui` was removed
+* L10N and i18n updates
+* Adjust subprocess args in :mod:`tools.djvu`
+* Short site value can be given if site code is equal to family like ``-site:meta`` or ``-site:commons``
+* Require Python 3.6.1+ with Pywikibot and drop support for Python 3.6.0 (:phab:`T318912`)
 * pymysql >= 0.9.3 is required (:phab:`T216741`)
 * Python 3.5 support was dropped (:phab:`T301908`)
 

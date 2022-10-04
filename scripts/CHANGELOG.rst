@@ -1,6 +1,14 @@
 Scripts Changelog
 =================
 
+8.0.0
+-----
+
+create_isbn_edition
+~~~~~~~~~~~~~~~~~~~
+
+* Fix argument parsing
+
 7.7.0
 -----
 
@@ -13,6 +21,7 @@ archivebot
 
 category_redirect
 ~~~~~~~~~~~~~~~~~
+
 * Use localized template prefix (:phab:`T318049`)
 
 create_isbn_edition
