@@ -12,7 +12,6 @@ import unittest
 from collections import Counter, OrderedDict
 from collections.abc import Mapping
 from contextlib import suppress
-from importlib import import_module
 from unittest import mock
 
 from pywikibot import tools
@@ -31,7 +30,7 @@ from pywikibot.tools.itertools import (
 )
 
 from tests import join_xml_data_path
-from tests.aspects import TestCase, require_modules
+from tests.aspects import TestCase
 from tests.utils import skipping
 
 
@@ -75,34 +74,6 @@ class OpenArchiveTestCase(TestCase):
             self._get_content(self.base_file + '.bz2', use_extension=False),
             self.original_content)
 
-    @require_modules('bz2file')
-    def test_open_archive_with_bz2file(self):
-        """Test open_archive when bz2file library."""
-        old_bz2 = tools.bz2
-        try:
-            tools.bz2 = import_module('bz2file')
-            self.assertEqual(self._get_content(self.base_file + '.bz2'),
-                             self.original_content)
-            self.assertEqual(self._get_content(self.base_file + '.bz2',
-                                               use_extension=False),
-                             self.original_content)
-        finally:
-            tools.bz2 = old_bz2
-
-    def test_open_archive_without_bz2(self):
-        """Test open_archive when bz2 and bz2file are not available."""
-        old_bz2 = tools.bz2
-        bz2_import_error = ('This is a fake exception message that is '
-                            'used when bz2 and bz2file are not importable')
-        try:
-            tools.bz2 = ImportError(bz2_import_error)
-            with self.assertRaisesRegex(
-                    ImportError,
-                    bz2_import_error):
-                self._get_content(self.base_file + '.bz2')
-        finally:
-            tools.bz2 = old_bz2
-
     def test_open_archive_gz(self):
         """Test open_archive with gz compressor in the standard library."""
         self.assertEqual(
@@ -123,8 +94,6 @@ class OpenArchiveTestCase(TestCase):
 
     def test_open_archive_lzma(self):
         """Test open_archive with lzma compressor in the standard library."""
-        if isinstance(tools.lzma, ImportError):
-            self.skipTest('lzma not importable')
         self.assertEqual(
             self._get_content(self.base_file + '.lzma'), self.original_content)
         # Legacy LZMA container formet has no magic, skipping
@@ -134,24 +103,6 @@ class OpenArchiveTestCase(TestCase):
         self.assertEqual(
             self._get_content(self.base_file + '.xz', use_extension=False),
             self.original_content)
-
-    def test_open_archive_without_lzma(self):
-        """Test open_archive when lzma is not available."""
-        old_lzma = tools.lzma
-        lzma_import_error = ('This is a fake exception message that is '
-                             'used when lzma is not importable')
-        try:
-            tools.lzma = ImportError(lzma_import_error)
-            with self.assertRaisesRegex(
-                    ImportError,
-                    lzma_import_error):
-                self._get_content(self.base_file + '.lzma')
-            with self.assertRaisesRegex(
-                    ImportError,
-                    lzma_import_error):
-                self._get_content(self.base_file + '.xz')
-        finally:
-            tools.lzma = old_lzma
 
 
 class OpenArchiveWriteTestCase(TestCase):
@@ -227,18 +178,12 @@ class OpenArchiveWriteTestCase(TestCase):
 
     def test_write_archive_lzma(self):
         """Test writing a lzma archive."""
-        if isinstance(tools.lzma, ImportError):
-            self.skipTest('lzma not importable')
-
         content = self._write_content('.lzma')
         with open(self.base_file + '.lzma', 'rb') as f:
             self.assertEqual(content, f.read())
 
     def test_write_archive_xz(self):
         """Test writing a xz archive."""
-        if isinstance(tools.lzma, ImportError):
-            self.skipTest('lzma not importable')
-
         content = self._write_content('.xz')
         self.assertEqual(content[:6], b'\xFD7zXZ\x00')
 

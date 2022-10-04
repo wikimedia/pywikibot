@@ -4,9 +4,11 @@
 #
 # Distributed under the terms of the MIT license.
 #
+import bz2
 import gzip
 import hashlib
 import ipaddress
+import lzma
 import os
 import re
 import stat
@@ -40,21 +42,6 @@ from pywikibot.tools._unidata import _first_upper_exception
 
 
 pkg_Version = pkg_resources.packaging.version.Version  # noqa: N816
-
-try:
-    import bz2
-except ImportError as bz2_import_error:
-    try:
-        import bz2file as bz2
-        warn('package bz2 was not found; using bz2file', ImportWarning)
-    except ImportError:
-        warn('package bz2 and bz2file were not found', ImportWarning)
-        bz2 = bz2_import_error
-
-try:
-    import lzma
-except ImportError as lzma_import_error:
-    lzma = lzma_import_error
 
 
 __all__ = (
@@ -537,9 +524,6 @@ def open_archive(filename: str, mode: str = 'rb', use_extension: bool = True):
         immediately raise that error but only on reading it.
     :raises lzma.LZMAError: When error occurs during compression or
         decompression or when initializing the state with lzma or xz.
-    :raises ImportError: When file is compressed with bz2 but neither bz2 nor
-        bz2file is importable, or when file is compressed with lzma or xz but
-        lzma is not importable.
     :return: A file-like object returning the uncompressed data in binary mode.
     :rtype: file-like object
     """
@@ -575,8 +559,6 @@ def open_archive(filename: str, mode: str = 'rb', use_extension: bool = True):
             extension = ''
 
     if extension == 'bz2':
-        if isinstance(bz2, ImportError):
-            raise bz2
         binary = bz2.BZ2File(filename, mode)
 
     elif extension == 'gz':
@@ -604,8 +586,6 @@ def open_archive(filename: str, mode: str = 'rb', use_extension: bool = True):
         binary = process.stdout
 
     elif extension in ('lzma', 'xz'):
-        if isinstance(lzma, ImportError):
-            raise lzma
         lzma_fmts = {'lzma': lzma.FORMAT_ALONE, 'xz': lzma.FORMAT_XZ}
         binary = lzma.open(filename, mode, format=lzma_fmts[extension])
 
