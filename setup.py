@@ -143,7 +143,7 @@ metadata = _DottedDict()
 name = 'pywikibot'
 path = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(path, name, '__metadata__.py')) as f:
-    exec(f.read(), metadata)
+    exec(f.read(), None, metadata)
 assert metadata.__name__ == name
 
 
