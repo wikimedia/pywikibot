@@ -44,7 +44,7 @@ from pywikibot.page._collections import (
 )
 from pywikibot.page._decorators import allow_asynchronous
 from pywikibot.page._filepage import FilePage
-from pywikibot.page._pages import BasePage
+from pywikibot.page._page import BasePage
 from pywikibot.site import DataSite, Namespace
 from pywikibot.tools import cached
 

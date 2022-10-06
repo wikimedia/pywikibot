@@ -6,9 +6,10 @@
 #
 from typing import Union
 
+from pywikibot.page._category import Category
 from pywikibot.page._filepage import FileInfo, FilePage
 from pywikibot.page._links import BaseLink, Link, SiteLink, html2unicode
-from pywikibot.page._pages import BasePage, Category, Page
+from pywikibot.page._page import BasePage, Page
 from pywikibot.page._revision import Revision
 from pywikibot.page._user import User
 from pywikibot.page._wikibase import (

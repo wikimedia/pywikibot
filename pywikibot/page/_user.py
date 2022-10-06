@@ -15,7 +15,7 @@ from pywikibot.exceptions import (
     UserRightsError,
 )
 from pywikibot.page._links import Link
-from pywikibot.page._pages import Page
+from pywikibot.page._page import Page
 from pywikibot.page._revision import Revision
 from pywikibot.tools import deprecated, is_ip_address
 

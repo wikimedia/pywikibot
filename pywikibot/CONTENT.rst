@@ -118,6 +118,8 @@ The contents of the package
     +============================+======================================================+
     | __init__.py                | Interface representing MediaWiki pages               |
     +----------------------------+------------------------------------------------------+
+    | _category.py               | Object representing MediaWiki categories             |
+    +----------------------------+------------------------------------------------------+
     | _collections.py            | Structures holding data for Wikibase entities        |
     +----------------------------+------------------------------------------------------+
     | _decorators.py             | Decorators used by page objects                      |
@@ -126,7 +128,7 @@ The contents of the package
     +----------------------------+------------------------------------------------------+
     | _links.py                  | Objects representing link objects                    |
     +----------------------------+------------------------------------------------------+
-    | _pages.py                  | Objects representing MediaWiki pages                 |
+    | _page.py                   | Objects representing MediaWiki pages                 |
     +----------------------------+------------------------------------------------------+
     | _revision.py               | Object representing page revision                    |
     +----------------------------+------------------------------------------------------+
