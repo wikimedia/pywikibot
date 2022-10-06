@@ -1,7 +1,6 @@
 Current release 8.0.0
 ^^^^^^^^^^^^^^^^^^^^^
 
-* Enable pagegenerators options with ``move`` and ``remove`` actions (:phab:`T318239`)
 * ListBoxWindows class of :mod:`userinterfaces.gui` was removed
 * L10N and i18n updates
 * Adjust subprocess args in :mod:`tools.djvu`

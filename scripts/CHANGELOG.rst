@@ -4,6 +4,11 @@ Scripts Changelog
 8.0.0
 -----
 
+category
+~~~~~~~~
+
+* Enable pagegenerators options with ``move`` and ``remove`` actions (:phab:`T318239`)
+
 create_isbn_edition
 ~~~~~~~~~~~~~~~~~~~
 
