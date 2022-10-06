@@ -1,28 +1,37 @@
-"""
-A window with a textfield where the user can edit.
+"""A window with a textfield where the user can edit.
 
 Useful for editing the contents of an article.
+
+.. note:: tkinter module is required
 """
 #
 # (C) Pywikibot team, 2003-2022
 #
 # Distributed under the terms of the MIT license.
 #
-import tkinter
-from tkinter import simpledialog as tkSimpleDialog
-from tkinter.scrolledtext import ScrolledText
 from typing import Optional
 
-from idlelib import replace as ReplaceDialog
-from idlelib import search as SearchDialog
+from idlelib import replace as ReplaceDialog  # noqa: N812
+from idlelib import search as SearchDialog  # noqa: N812
 from idlelib.config import idleConf
 from idlelib.configdialog import ConfigDialog
 from idlelib.multicall import MultiCallCreator
 
 import pywikibot
-from pywikibot import __url__
 from pywikibot.backports import Tuple
 from pywikibot.tools import PYTHON_VERSION
+
+try:
+    import tkinter
+except ImportError as e:
+    tkinter = e
+    Frame = simpledialog = ScrolledText = object
+else:
+    from tkinter import Frame, simpledialog
+    from tkinter.scrolledtext import ScrolledText
+
+
+__all__ = ('EditBoxWindow', 'TextEditor', 'Tkdialog')
 
 
 class TextEditor(ScrolledText):
@@ -40,6 +49,9 @@ class TextEditor(ScrolledText):
 
         Get default settings from user's IDLE configuration.
         """
+        if isinstance(tkinter, ImportError):
+            raise tkinter
+
         textcf = self._initialize_config(idleConf.CurrentTheme())
 
         if idleConf.GetOption('main', 'EditorWindow', 'font-bold',
@@ -57,7 +69,7 @@ class TextEditor(ScrolledText):
         super().__init__(master, **textcf)
 
     @staticmethod
-    def _initialize_config(Theme):
+    def _initialize_config(theme):
         """Fix idleConf.GetHighlight method for different Python releases."""
         config = {
             'padx': 5,
@@ -68,26 +80,26 @@ class TextEditor(ScrolledText):
         }
         if PYTHON_VERSION >= (3, 7, 4):  # T241216
             config['foreground'] = idleConf.GetHighlight(
-                Theme, 'normal')['foreground']
+                theme, 'normal')['foreground']
             config['background'] = idleConf.GetHighlight(
-                Theme, 'normal')['background']
+                theme, 'normal')['background']
             config['highlightcolor'] = idleConf.GetHighlight(
-                Theme, 'hilite')['foreground']
+                theme, 'hilite')['foreground']
             config['highlightbackground'] = idleConf.GetHighlight(
-                Theme, 'hilite')['background']
+                theme, 'hilite')['background']
             config['insertbackground'] = idleConf.GetHighlight(
-                Theme, 'cursor')['foreground']
+                theme, 'cursor')['foreground']
         else:
             config['foreground'] = idleConf.GetHighlight(
-                Theme, 'normal', fgBg='fg')
+                theme, 'normal', fgBg='fg')
             config['background'] = idleConf.GetHighlight(
-                Theme, 'normal', fgBg='bg')
+                theme, 'normal', fgBg='bg')
             config['highlightcolor'] = idleConf.GetHighlight(
-                Theme, 'hilite', fgBg='fg')
+                theme, 'hilite', fgBg='fg')
             config['highlightbackground'] = idleConf.GetHighlight(
-                Theme, 'hilite', fgBg='bg')
+                theme, 'hilite', fgBg='bg')
             config['insertbackground'] = idleConf.GetHighlight(
-                Theme, 'cursor', fgBg='fg')
+                theme, 'cursor', fgBg='fg')
         return config
 
     def add_bindings(self) -> None:
@@ -252,8 +264,8 @@ class TextEditor(ScrolledText):
 
     def goto_line_event(self, event):
         """Perform goto line operation."""
-        lineno = tkSimpleDialog.askinteger('Goto', 'Go to line number:',
-                                           parent=self)
+        lineno = simpledialog.askinteger('Goto', 'Go to line number:',
+                                         parent=self)
         if lineno is None:
             return 'break'
         if lineno <= 0:
@@ -264,12 +276,15 @@ class TextEditor(ScrolledText):
         return None
 
 
-class EditBoxWindow(tkinter.Frame):
+class EditBoxWindow(Frame):
 
     """Edit box window."""
 
     def __init__(self, parent=None, **kwargs) -> None:
         """Initializer."""
+        if isinstance(tkinter, ImportError):
+            raise tkinter
+
         if parent is None:
             # create a new window
             parent = tkinter.Tk()
@@ -286,20 +301,20 @@ class EditBoxWindow(tkinter.Frame):
         self.textfield = tkinter.Entry(bottom_left_frame)
         self.textfield.pack(side=tkinter.LEFT, fill=tkinter.X, expand=1)
 
-        buttonSearch = tkinter.Button(bottom_left_frame, text='Find next',
-                                      command=self.find)
-        buttonSearch.pack(side=tkinter.RIGHT)
+        button_search = tkinter.Button(bottom_left_frame, text='Find next',
+                                       command=self.find)
+        button_search.pack(side=tkinter.RIGHT)
         bottom_left_frame.pack(side=tkinter.LEFT, expand=1)
 
         # lower right subframe which will contain OK and Cancel buttons
         bottom_right_frame = tkinter.Frame(bottom)
 
-        buttonOK = tkinter.Button(bottom_right_frame, text='OK',
-                                  command=self.pressedOK)
-        buttonCancel = tkinter.Button(bottom_right_frame, text='Cancel',
-                                      command=parent.destroy)
-        buttonOK.pack(side=tkinter.LEFT, fill=tkinter.X)
-        buttonCancel.pack(side=tkinter.RIGHT, fill=tkinter.X)
+        button_ok = tkinter.Button(bottom_right_frame, text='OK',
+                                   command=self.pressedOK)
+        button_cancel = tkinter.Button(bottom_right_frame, text='Cancel',
+                                       command=parent.destroy)
+        button_ok.pack(side=tkinter.LEFT, fill=tkinter.X)
+        button_cancel.pack(side=tkinter.RIGHT, fill=tkinter.X)
         bottom_right_frame.pack(side=tkinter.RIGHT, expand=1)
 
         bottom.pack(side=tkinter.TOP)
@@ -362,7 +377,7 @@ class EditBoxWindow(tkinter.Frame):
         self.parent.config(menu=menubar)
         self.pack()
 
-    def edit(self, text: str, jumpIndex: Optional[int] = None,
+    def edit(self, text: str, jumpIndex: Optional[int] = None,  # noqa: N803
              highlight: Optional[str] = None) -> Optional[str]:
         """
         Provide user with editor to modify text.
@@ -410,7 +425,7 @@ class EditBoxWindow(tkinter.Frame):
         """Show config dialog."""
         ConfigDialog(self, 'Settings')
 
-    def pressedOK(self) -> None:
+    def pressedOK(self) -> None:  # noqa: N802
         """
         Perform OK operation.
 
@@ -432,6 +447,9 @@ class Tkdialog:
 
     def __init__(self, photo_description, photo, filename) -> None:
         """Initializer."""
+        if isinstance(tkinter, ImportError):
+            raise tkinter
+
         self.root = tkinter.Tk()
         # "%dx%d%+d%+d" % (width, height, xoffset, yoffset)
         self.root.geometry('{}x{}+10-10'
@@ -501,14 +519,12 @@ class Tkdialog:
             from PIL import Image, ImageTk
         except ImportError:
             pywikibot.warning('This script requires ImageTk from the'
-                              'Python Imaging Library (PIL).\n'
-                              'See: {}/flickrripper.py'.format(__url__))
+                              'Python Imaging Library (PIL).')
             raise
 
         image = Image.open(photo)
         image.thumbnail((width, height))
-        imageTk = ImageTk.PhotoImage(image)
-        return imageTk
+        return ImageTk.PhotoImage(image)
 
     def ok_file(self) -> None:
         """The user pressed the OK button."""
