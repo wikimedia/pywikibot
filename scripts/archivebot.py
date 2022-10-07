@@ -726,9 +726,9 @@ class PageArchiver:
                         params = self.get_params(thread.timestamp, counter)
                         archive = self.get_archive_page(
                             pattern % params, params)
-                    else:
-                        # There are only non existing pages found by count down
-                        counter_found = True
+
+                    # There are only non existing pages found by countdown
+                    counter_found = True
 
                     while archive.is_full(max_arch_size):
                         counter += 1

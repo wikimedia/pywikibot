@@ -97,9 +97,9 @@ class Category(Page):
                         total -= 1
                         if total == 0:
                             return
-            else:
-                # cache is valid only if all subcategories are fetched (T88217)
-                self._subcats = cache
+
+            # cache is valid only if all subcategories are fetched (T88217)
+            self._subcats = cache
         else:
             for subcat in self._subcats['data']:
                 yield subcat
