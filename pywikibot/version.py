@@ -175,9 +175,9 @@ order by revision desc, changed_date desc""")
 
 
 def github_svn_rev2hash(tag: str, rev):  # pragma: no cover
-    """Convert a Subversion revision to a Git hash using Github.
+    """Convert a Subversion revision to a Git hash using GitHub.
 
-    :param tag: name of the Subversion repo on Github
+    :param tag: name of the Subversion repo on GitHub
     :param rev: Subversion revision identifier
     :return: the git hash
     """

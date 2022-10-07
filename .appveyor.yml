@@ -20,7 +20,7 @@ environment:
       PYTHON_VERSION: "3.6.1"
       PYTHON_ARCH: "64"
 
-    # Appveyor pre-installs these versions onto build machines
+    # AppVeyor pre-installs these versions onto build machines
 
     - PYTHON: "C:\\Python36"
       PYTHON_VERSION: "3.6.x"
@@ -51,7 +51,7 @@ init:
 
 install:
   - git submodule update --init
-  # Download the Appveyor Python build accessories into subdirectory .\appveyor
+  # Download the AppVeyor Python build accessories into subdirectory .\appveyor
   - mkdir appveyor
   # Download Python 3.6.1 which isn't pre-installed
   - ps: ./appveyor_install.ps1

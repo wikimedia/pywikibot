@@ -263,7 +263,7 @@ CachedRequest._get_cache_dir = classmethod(
     lambda cls, *args: cls._make_dir(join_cache_path()))
 
 
-# Appveyor and Github action builds are set to retry twice or thrice, which
+# AppVeyor and GitHub action builds are set to retry twice or thrice, which
 # aims to reduce the number of 'red' builds caused by intermittent server
 # problems, while also avoiding the builds taking a long time due to retries.
 # The following allows builds to retry up to three times, but higher default

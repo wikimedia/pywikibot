@@ -106,7 +106,7 @@ Environment variables
 =====================
 
 **PYWIKIBOT_TEST_GUI**
-  Enable :mod:`tests.gui_tests`. Used for Appveyor tests. Github actions would
+  Enable :mod:`tests.gui_tests`. Used for AppVeyor tests. GitHub actions would
   fail due to ``couldn't connect to display ":1.0"`` error. Set this environment
   variable to run this test locally::
 
@@ -127,7 +127,7 @@ Environment variables
   This environment variable skips tests instead of raising
   :exc:`exceptions.MaxlagTimeoutError` when maximum retries attempted due to
   maxlag without success. It is also used by :mod:`tests.script_tests` for code
-  coverage. Github actions and Appveyor tests activate this variable::
+  coverage. GitHub actions and AppVeyor tests activate this variable::
 
     PYWIKIBOT_TEST_RUNNING=1
 
