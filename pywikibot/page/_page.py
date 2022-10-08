@@ -1056,9 +1056,25 @@ class BasePage(ComparableMixin):
         """Determine whether the page can be modified.
 
         Return True if the bot has the permission of needed restriction level
-        for the given action type.
+        for the given action type:
 
-        :param action: a valid restriction type like 'edit', 'move'
+        >>> site = pywikibot.Site('test')
+        >>> page = pywikibot.Page(site, 'Main Page')
+        >>> page.has_permission()
+        False
+        >>> page.has_permission('move')
+        False
+        >>> page.has_permission('invalid')
+        Traceback (most recent call last):
+        ...
+        ValueError: APISite.page_can_be_edited(): Invalid value "invalid" ...
+
+        .. seealso:: :meth:`APISite.page_can_be_edited()
+           <pywikibot.site._apisite.APISite.page_can_be_edited>`
+
+
+        :param action: a valid restriction type like 'edit', 'move';
+            default is ``edit``.
         :raises ValueError: invalid action parameter
         """
         return self.site.page_can_be_edited(self, action)

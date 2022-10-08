@@ -1365,6 +1365,8 @@ class APISite(
         Return True if the bot has the permission of needed restriction level
         for the given action type.
 
+        .. seealso:: :meth:`page.BasePage.has_permission` (should be preferred)
+
         :param page: a pywikibot.page.BasePage object
         :param action: a valid restriction type like 'edit', 'move'
 
@@ -1381,10 +1383,7 @@ class APISite(
             'steward': 'editprotected'
         }
         restriction = self.page_restrictions(page).get(action, ('', None))[0]
-        user_rights = self.userinfo['rights']
-        if prot_rights.get(restriction, restriction) in user_rights:
-            return True
-        return False
+        return self.has_right(prot_rights.get(restriction, restriction))
 
     def page_isredirect(self, page: 'pywikibot.page.BasePage') -> bool:
         """Return True if and only if page is a redirect."""
