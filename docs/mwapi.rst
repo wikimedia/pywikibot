@@ -1,3 +1,8 @@
+.. # define a hard line break for HTML
+.. |br| raw:: html
+
+   <br />
+
 MediaWiki API Cross Reference
 =============================
 
@@ -40,8 +45,7 @@ MediaWiki API Cross Reference
        :meth:`proofreadpage.IndexPage.save`
        :meth:`bot.BaseBot.userPut`
        :meth:`bot.CurrentPageBot.put_current`
-       :meth:`bot.AutomaticTWSummaryBot.put_current`
-       :meth:`specialbots.BaseUnlinkBot.unlink`
+       :meth:`BaseUnlinkBot.unlink()<specialbots.BaseUnlinkBot.unlink>`
    * - :api:`emailuser<emailuser>`
      -
      - :meth:`User.send_email()<page.User.send_email>`
@@ -56,16 +60,16 @@ MediaWiki API Cross Reference
        :meth:`load_topic()<pywikibot.site._extensions.FlowMixin.load_topic>`
        :meth:`load_post_current_revision()<pywikibot.site._extensions.FlowMixin.load_post_current_revision>`
        :meth:`create_new_topic()<pywikibot.site._extensions.FlowMixin.create_new_topic>`
-       :meth:`reply_to_post()<pywikibot.site._extensions.FlowMixin.reply_to_post>`
+       :meth:`reply_to_post()<pywikibot.site._extensions.FlowMixin.reply_to_post>` |br|
        :meth:`lock_topic()<pywikibot.site._extensions.FlowMixin.lock_topic>`
        :meth:`moderate_topic()<pywikibot.site._extensions.FlowMixin.moderate_topic>`
-       :meth:`delete_topic()<pywikibot.site._extensions.FlowMixin.delete_topic>`
+       :meth:`delete_topic()<pywikibot.site._extensions.FlowMixin.delete_topic>` |br|
        :meth:`hide_topic()<pywikibot.site._extensions.FlowMixin.hide_topic>`
        :meth:`suppress_topic()<pywikibot.site._extensions.FlowMixin.suppress_topic>`
        :meth:`restore_topic()<pywikibot.site._extensions.FlowMixin.restore_topic>`
        :meth:`moderate_post()<pywikibot.site._extensions.FlowMixin.moderate_post>`
-       :meth:`delete_post()<pywikibot.site._extensions.FlowMixin.delete_post>`
-       :meth:`hide_post()<pywikibot.site._extensions.FlowMixin.hide_post>`
+       :meth:`delete_post()<pywikibot.site._extensions.FlowMixin.delete_post>` |br|
+       :meth:`hide_post()<pywikibot.site._extensions.FlowMixin.hide_post>` |br|
        :meth:`suppress_post()<pywikibot.site._extensions.FlowMixin.suppress_post>`
        :meth:`restore_post()<pywikibot.site._extensions.FlowMixin.restore_post>`
      -
@@ -150,7 +154,7 @@ MediaWiki API Cross Reference
      - :meth:`upload()<pywikibot.site._apisite.APISite.upload>`
        :meth:`site.Uploader.upload()<pywikibot.site._upload.Uploader.upload>`
      - :meth:`FilePage.upload()<page.FilePage.upload>`
-     - :meth:`specialbots.UploadRobot.upload_file`
+     - :meth:`UploadRobot.upload_file()<specialbots.UploadRobot.upload_file>`
    * - :api:`watch<watch>`
      - :meth:`watch()<pywikibot.site._apisite.APISite.watch>`
      - :meth:`BasePage.watch()<page.BasePage.watch>`
