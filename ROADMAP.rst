@@ -46,7 +46,6 @@ Deprecations
 Will be removed in Pywikibot 8
 ------------------------------
 
-* 7.0.0: The i18n identifier 'cosmetic_changes-append' will be removed in favour of 'pywikibot-cosmetic-changes'
 * 5.5.0: APISite.redirectRegex() will be removed in favour of APISite.redirect_regex()
 * 4.0.0: Revision.parent_id will be removed in favour of Revision.parentid
 * 4.0.0: Revision.content_model will be removed in favour of Revision.contentmodel
