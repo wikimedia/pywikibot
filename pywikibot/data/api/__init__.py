@@ -47,7 +47,7 @@ def _invalidate_superior_cookies(family) -> None:
     """
     Clear cookies for site's second level domain.
 
-    get_login_token() will generate new cookies needed.
+    The http module takes care of all the cookie stuff.
     This is a workaround for requests bug, see :phab:`T224712`
     and https://github.com/psf/requests/issues/5411
     for more details.

@@ -171,7 +171,7 @@ class Uploader:
 
         ignore_all_warnings = not callable(ignore_warnings) and ignore_warnings
 
-        token = self.site.tokens['edit']
+        token = self.site.tokens['csrf']
         result = None
         file_page_title = self.filepage.title(with_ns=False)
         file_size = None

@@ -12,6 +12,7 @@ import pywikibot
 from pywikibot import login
 from pywikibot.backports import Dict
 from pywikibot.login import LoginStatus
+from pywikibot.tools import deprecated
 
 __all__ = ['LoginManager']
 
@@ -39,14 +40,11 @@ class LoginManager(login.LoginManager):
     def _login_parameters(self, *, botpassword: bool = False
                           ) -> Dict[str, str]:
         """Return login parameters."""
-        # Since MW 1.27 only for bot passwords.
-        self.action = 'login'
-        if not botpassword:
-            # get token using meta=tokens if supported
-            token = self.get_login_token()
-            if token:
-                # Standard login request since MW 1.27
-                self.action = 'clientlogin'
+        if botpassword:
+            self.action = 'login'
+        else:
+            token = self.site.tokens['login']
+            self.action = 'clientlogin'
 
         # prepare default login parameters
         parameters = {'action': self.action,
@@ -70,7 +68,6 @@ class LoginManager(login.LoginManager):
         Note, this doesn't do anything with cookies. The http module
         takes care of all the cookie stuff. Throws exception on failure.
         """
-        self.below_mw_1_27 = False
         if hasattr(self, '_waituntil') \
            and datetime.datetime.now() < self._waituntil:
             diff = self._waituntil - datetime.datetime.now()
@@ -114,21 +111,16 @@ class LoginManager(login.LoginManager):
                 return
 
             if status in ('NeedToken', 'WrongToken', 'badtoken'):
-                token = response.get('token')
-                if token and self.below_mw_1_27:  # pragma: no cover
-                    # fetched token using action=login
-                    login_request['lgtoken'] = token
-                    pywikibot.log('Received login token, proceed with login.')
-                else:
-                    # if incorrect login token was used,
-                    # force relogin and generate fresh one
-                    pywikibot.error('Received incorrect login token. '
-                                    'Forcing re-login.')
-                    # invalidate superior wiki cookies (T224712)
-                    pywikibot.data.api._invalidate_superior_cookies(
-                        self.site.family)
-                    login_request[
-                        self.keyword('token')] = self.get_login_token()
+                # if incorrect login token was used,
+                # force relogin and generate fresh one
+                pywikibot.error('Received incorrect login token. '
+                                'Forcing re-login.')
+                # invalidate superior wiki cookies (T224712)
+                pywikibot.data.api._invalidate_superior_cookies(
+                    self.site.family)
+                self.site.tokens.clear()
+                login_request[
+                    self.keyword('token')] = self.site.tokens['login']
                 continue
 
             # messagecode was introduced with 1.29.0-wmf.14
@@ -155,19 +147,12 @@ class LoginManager(login.LoginManager):
 
         raise pywikibot.exceptions.APIError(code=status, info=fail_reason)
 
+    @deprecated("site.tokens['login']", since='8.0.0')
     def get_login_token(self) -> Optional[str]:
         """Fetch login token for MediaWiki 1.27+.
 
+        .. deprecated:: 8.0
+
         :return: login token
         """
-        login_token_request = self.site._request(
-            use_get=False,
-            parameters={'action': 'query', 'meta': 'tokens', 'type': 'login'},
-        )
-        login_token_result = login_token_request.submit()
-        # check if we have to use old implementation of mw < 1.27
-        if 'query' in login_token_result:
-            return login_token_result['query']['tokens'].get('logintoken')
-
-        self.below_mw_1_27 = True  # pragma: no cover
-        return None
+        return self.site.tokens['login']

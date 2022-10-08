@@ -60,11 +60,10 @@ class ChangeLangBot(ConfigParserBot, SingleSiteBot):
         :param page: The page to update and save
         :type page: pywikibot.page.BasePage
         """
-        token = self.site.get_tokens(['csrf']).get('csrf')
         parameters = {'action': 'setpagelanguage',
                       'title': page.title(),
                       'lang': self.opt.setlang,
-                      'token': token}
+                      'token': self.site.tokens['csrf']}
         r = self.site.simple_request(**parameters)
         r.submit()
         pywikibot.info(f'<<lightpurple>>{page}<<default>>: Setting '

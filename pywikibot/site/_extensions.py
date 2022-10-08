@@ -65,7 +65,7 @@ class EchoMixin:
         # TODO: ensure that the 'echomarkread' action
         # is supported by the site
         kwargs = merge_unique_dicts(kwargs, action='echomarkread',
-                                    token=self.tokens['edit'])
+                                    token=self.tokens['csrf'])
         req = self.simple_request(**kwargs)
         data = req.submit()
         try:
