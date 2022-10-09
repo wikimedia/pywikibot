@@ -10,7 +10,6 @@ import typing
 from contextlib import suppress
 from itertools import zip_longest
 from typing import Any, Optional, Union
-from warnings import warn
 
 import pywikibot
 from pywikibot.backports import Dict, Generator, Iterable, List  # skipcq
@@ -23,7 +22,7 @@ from pywikibot.exceptions import (
     NoPageError,
     UserRightsError,
 )
-from pywikibot.site._decorators import need_right, need_version
+from pywikibot.site._decorators import need_right
 from pywikibot.site._namespace import NamespaceArgType
 from pywikibot.tools import is_ip_address, issue_deprecation_warning
 from pywikibot.tools.itertools import filter_unique, itergroup
@@ -293,7 +292,6 @@ class GeneratorsMixin:
                                namespaces=namespaces, total=total,
                                g_content=content, **eiargs)
 
-    @need_version('1.24')
     def page_redirects(
         self,
         page: 'pywikibot.Page',
@@ -1574,28 +1572,11 @@ class GeneratorsMixin:
         :keyword prop: Which properties to get. Defaults are ids, user,
             comment, flags and timestamp
         """
-        def handle_props(props):
-            """Translate deletedrev props to deletedrevisions props."""
-            if isinstance(props, str):
-                props = props.split('|')
-            if self.mw_version >= '1.25':
-                return props
-
-            old_props = []
-            for item in props:
-                if item == 'ids':
-                    old_props += ['revid', 'parentid']
-                elif item == 'flags':
-                    old_props.append('minor')
-                elif item != 'timestamp':
-                    old_props.append(item)
-                    if item == 'content' and self.mw_version < '1.24':
-                        old_props.append('token')
-            return old_props
-
         # set default properties
         prop = kwargs.pop('prop',
                           ['ids', 'user', 'comment', 'flags', 'timestamp'])
+        if isinstance(prop, str):
+            prop = prop.split('|')
         if content:
             prop.append('content')
 
@@ -1608,46 +1589,26 @@ class GeneratorsMixin:
         if not bool(titles) ^ (revids is not None):
             raise Error('deletedrevs: either "titles" or "revids" parameter '
                         'must be given.')
-        if revids and self.mw_version < '1.25':
-            raise NotImplementedError(
-                'deletedrevs: "revid" is not implemented with MediaWiki {}'
-                .format(self.mw_version))
 
-        if self.mw_version >= '1.25':
-            pre = 'drv'
-            type_arg = 'deletedrevisions'
-            generator = api.PropertyGenerator
-        else:
-            pre = 'dr'
-            type_arg = 'deletedrevs'
-            generator = api.ListGenerator
+        gen = self._generator(api.PropertyGenerator,
+                              type_arg='deletedrevisions',
+                              titles=titles, revids=revids, total=total)
 
-        gen = self._generator(generator, type_arg=type_arg,
-                              titles=titles, revids=revids,
-                              total=total)
-
-        gen.request[pre + 'start'] = start
-        gen.request[pre + 'end'] = end
-        gen.request[pre + 'prop'] = handle_props(prop)
+        gen.request['drvstart'] = start
+        gen.request['drvend'] = end
+        gen.request['drvprop'] = prop
+        if reverse:
+            gen.request['drvdir'] = 'newer'
 
         # handle other parameters like user
         for k, v in kwargs.items():
-            gen.request[pre + k] = v
+            gen.request['drv' + k] = v
 
-        if reverse:
-            gen.request[pre + 'dir'] = 'newer'
+        for data in gen:
+            with suppress(KeyError):
+                data['revisions'] = data.pop('deletedrevisions')
+                yield data
 
-        if self.mw_version < '1.25':
-            yield from gen
-
-        else:
-            # The dict result is different for both generators
-            for data in gen:
-                with suppress(KeyError):
-                    data['revisions'] = data.pop('deletedrevisions')
-                    yield data
-
-    @need_version('1.25')
     def alldeletedrevisions(
         self,
         *,
@@ -1748,15 +1709,7 @@ class GeneratorsMixin:
         redirects = mapping[redirects]
         params = {}
         if redirects is not None:
-            if self.mw_version < '1.26':
-                if redirects == 'all':
-                    warn("parameter redirects=None to retrieve 'all' random"
-                         'page types is not supported by mw version {}. '
-                         'Using default.'.format(self.mw_version),
-                         UserWarning)
-                params['grnredirect'] = redirects == 'redirects'
-            else:
-                params['grnfilterredir'] = redirects
+            params['grnfilterredir'] = redirects
         return self._generator(api.PageGenerator, type_arg='random',
                                namespaces=namespaces, total=total,
                                g_content=content, **params)

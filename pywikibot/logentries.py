@@ -6,7 +6,6 @@
 #
 import datetime
 from collections import UserDict
-from contextlib import suppress
 from typing import Any, Optional, Type, Union
 
 import pywikibot
@@ -97,8 +96,6 @@ class LogEntry(UserDict):
     @property
     def _params(self) -> Dict[str, Any]:
         """Additional data for some log entry types."""
-        with suppress(KeyError):
-            return self[self._expected_type]  # old behaviour
         return self.get('params', {})
 
     @cached
@@ -185,11 +182,7 @@ class BlockEntry(LogEntry):
         if self.action() == 'unblock':
             return []
 
-        flags = self._params.get('flags', [])
-        # pre mw 1.25 returned a delimited string.
-        if isinstance(flags, str):
-            flags = flags.split(',') if flags else []
-        return flags
+        return self._params.get('flags', [])
 
     @cached
     def duration(self) -> Optional[datetime.timedelta]:
@@ -224,11 +217,7 @@ class RightsEntry(LogEntry):
            LogEntry has no additional data e.g. due to hidden data and
            insufficient rights.
         """
-        params = self._params
-        if 'old' in params:  # old mw style (mw < 1.25)
-            return params['old'].split(',') if params['old'] else []
-
-        return params.get('oldgroups', [])
+        return self._params.get('oldgroups', [])
 
     @property
     def newgroups(self) -> List[str]:
@@ -239,11 +228,7 @@ class RightsEntry(LogEntry):
            LogEntry has no additional data e.g. due to hidden data and
            insufficient rights.
         """
-        params = self._params
-        if 'new' in params:  # old mw style (mw < 1.25)
-            return params['new'].split(',') if params['new'] else []
-
-        return params.get('newgroups', [])
+        return self._params.get('newgroups', [])
 
 
 class UploadEntry(LogEntry):
@@ -267,18 +252,12 @@ class MoveEntry(LogEntry):
     @property
     def target_ns(self) -> 'pywikibot.site._namespace.Namespace':
         """Return namespace object of target page."""
-        # key has been changed in mw 1.25 to 'target_ns'
-        return self.site.namespaces[self._params['target_ns']
-                                    if 'target_ns' in self._params
-                                    else self._params['new_ns']]
+        return self.site.namespaces[self._params['target_ns']]
 
     @property
     def target_title(self) -> str:
         """Return the target title."""
-        # key has been changed in mw 1.25 to 'target_title'
-        return (self._params['target_title']
-                if 'target_title' in self._params
-                else self._params['new_title'])
+        return self._params['target_title']
 
     @property
     @cached
@@ -301,18 +280,12 @@ class PatrolEntry(LogEntry):
     @property
     def current_id(self) -> int:
         """Return the current id."""
-        # key has been changed in mw 1.25; try the new mw style first
-        # sometimes it returns strs sometimes ints
-        return int(self._params['curid']
-                   if 'curid' in self._params else self._params['cur'])
+        return int(self._params['curid'])
 
     @property
     def previous_id(self) -> int:
         """Return the previous id."""
-        # key has been changed in mw 1.25; try the new mw style first
-        # sometimes it returns strs sometimes ints
-        return int(self._params['previd']
-                   if 'previd' in self._params else self._params['prev'])
+        return int(self._params['previd'])
 
     @property
     def auto(self) -> bool:

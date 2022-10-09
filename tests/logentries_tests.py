@@ -29,9 +29,9 @@ class TestLogentriesBase(TestCase):
 
     It uses the German Wikipedia for a current representation of the
     log entries and the test Wikipedia for the future representation.
-    It also tests on a wiki with MW < 1.25 to check that it can still
-    read the older format. It currently uses portalwiki which as of this
-    commit uses 1.23.16.
+    It also tests on a wiki with MW <= 1.27 to check that the module
+    works with older wikis. It currently uses infogalacticwiki which as
+    of this commit uses 1.27.1.
     """
 
     sites = {
@@ -51,8 +51,8 @@ class TestLogentriesBase(TestCase):
             'target': None,
         },
         'old': {
-            'family': AutoFamily('portalwiki',
-                                 'https://theportalwiki.com/wiki/Main_Page'),
+            'family': AutoFamily('infogalactic',
+                                 'https://infogalactic.com/info/Main_Page'),
             'code': 'en',
             'target': None,
         }
@@ -64,7 +64,7 @@ class TestLogentriesBase(TestCase):
             # This is an assertion as the tests don't make sense with newer
             # MW versions and otherwise it might not be visible that the test
             # isn't run on an older wiki.
-            self.assertLess(self.site.mw_version, '1.25')
+            self.assertEqual(self.site.mw_version, '1.27.1')
 
         with skipping(StopIteration,
                       msg=f'No entry found for {logtype!r}'):
@@ -80,11 +80,8 @@ class TestLogentriesBase(TestCase):
         if logtype not in LogEntryFactory._logtypes:
             self.assertIsInstance(logentry, OtherLogEntry)
 
-        if self.site_key == 'old':
-            self.assertNotIn('params', logentry.data)
-        else:
-            self.assertNotIn(logentry.type(), logentry.data)
-
+        # check that we only have the new implementation
+        self.assertNotIn(logentry.type(), logentry.data)
         self.assertIsInstance(logentry.action(), str)
 
         try:

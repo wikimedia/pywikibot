@@ -31,7 +31,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import Timestamp, config, date, i18n, textlib
-from pywikibot.backports import Generator, Iterable, Iterator, List
+from pywikibot.backports import Generator, Iterable, Iterator, List, Set
 from pywikibot.cosmetic_changes import CANCEL, CosmeticChangesToolkit
 from pywikibot.exceptions import (
     Error,
@@ -1026,31 +1026,10 @@ class BasePage(ComparableMixin):
         """Return a dictionary reflecting page protections."""
         return self.site.page_restrictions(self)
 
-    def applicable_protections(self) -> set:
-        """
-        Return the protection types allowed for that page.
-
-        If the page doesn't exist it only returns "create". Otherwise it
-        returns all protection types provided by the site, except "create".
-        It also removes "upload" if that page is not in the File namespace.
-
-        It is possible, that it returns an empty set, but only if original
-        protection types were removed.
-
-        :return: set of str
-        """
-        # New API since commit 32083235eb332c419df2063cf966b3400be7ee8a
-        if self.site.mw_version >= '1.25wmf14':
-            self.site.loadpageinfo(self)
-            return self._applicable_protections
-
-        p_types = set(self.site.protection_types())
-        if not self.exists():
-            return {'create'} if 'create' in p_types else set()
-        p_types.remove('create')  # no existing page allows that
-        if not self.is_filepage():  # only file pages allow upload
-            p_types.remove('upload')
-        return p_types
+    def applicable_protections(self) -> Set[str]:
+        """Return the protection types allowed for that page."""
+        self.site.loadpageinfo(self)
+        return self._applicable_protections
 
     def has_permission(self, action: str = 'edit') -> bool:
         """Determine whether the page can be modified.

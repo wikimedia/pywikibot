@@ -29,7 +29,7 @@ except ImportError:  # requests < 2.27.0
 SERVER_DB_ERROR_MSG = \
     '<h1>Sorry! This site is experiencing technical difficulties.</h1>'
 
-MIN_VERSION = MediaWikiVersion('1.23')
+MIN_VERSION = MediaWikiVersion('1.27')
 
 
 class MWSite:
@@ -43,7 +43,7 @@ class MWSite:
         :raises pywikibot.exceptions.ServerError: a server error occurred
             while loading the site
         :raises Timeout: a timeout occurred while loading the site
-        :raises RuntimeError: Version not found or version less than 1.23
+        :raises RuntimeError: Version not found or version less than 1.27
         """
         if fromurl.endswith('$1'):
             fromurl = fromurl[:-2]
