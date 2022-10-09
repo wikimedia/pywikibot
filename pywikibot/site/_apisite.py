@@ -473,16 +473,47 @@ class APISite(
         To force retrieving userinfo ignoring cache, just delete this
         property.
 
+        **Usage**
+
+        >>> site = pywikibot.Site('test')
+        >>> info = site.userinfo
+        >>> info['id']  # returns 0 if no ip user
+        ... # doctest: +SKIP
+        0
+        >>> info['name']  # username or ip
+        ...
+        ... # doctest: +SKIP
+        '92.198.174.192'
+        >>> info['groups']
+        ['*']
+        >>> info['rights']  # doctest: +ELLIPSIS
+        ['createaccount', 'read', 'edit', 'createpage', 'createtalk', ...]
+        >>> info['messages']
+        False
+        >>> del site.userinfo  # delete userinfo cache
+        >>> 'blockinfo' in site.userinfo
+        False
+        >>> 'anon' in site.userinfo
+        True
+
+        **Usefull alternatives to userinfo property**
+
+        - :meth:`has_group` to verify the group membership
+        - :meth:`has_right` to verify that the user has a given right
+        - :meth:`logged_in` to verify the user is loggend in to a site
+
         .. seealso:: :api:`Userinfo`
+        .. versionchanged:: 8.0.0
+           Use API formatversion 2.
 
         :return: A dict with the following keys and values:
 
-          - id: user id (numeric str)
+          - id: user id (int)
           - name: username (if user is logged in)
           - anon: present if user is not logged in
           - groups: list of groups (could be empty)
           - rights: list of rights (could be empty)
-          - message: present if user has a new message on talk page
+          - messages: True if user has a new message on talk page (bool)
           - blockinfo: present if user is blocked (dict)
 
         """
@@ -490,7 +521,8 @@ class APISite(
             uirequest = self.simple_request(
                 action='query',
                 meta='userinfo',
-                uiprop='blockinfo|hasmsg|groups|rights|ratelimits'
+                uiprop='blockinfo|hasmsg|groups|rights|ratelimits',
+                formatversion=2,
             )
             uidata = uirequest.submit()
             assert 'query' in uidata, \
@@ -774,9 +806,14 @@ class APISite(
         """
         return group.lower() in self.userinfo['groups']
 
+    @deprecated("userinfo['messages']", since='8.0.0')
     def messages(self) -> bool:
-        """Return true if the user has new messages, and false otherwise."""
-        return 'messages' in self.userinfo
+        """Return true if the user has new messages, and false otherwise.
+
+        .. deprecated:: 8.0
+           Replaced by :attr:`userinfo['messages']<userinfo>`.
+        """
+        return self.userinfo['messages']
 
     def mediawiki_messages(
         self,
