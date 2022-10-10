@@ -284,7 +284,7 @@ def main() -> None:  # pragma: no cover
             'Documentation': 'https://doc.wikimedia.org/pywikibot/stable/',
             'Source':
                 'https://gerrit.wikimedia.org/r/plugins/gitiles/pywikibot/core/',  # noqa: E501
-            'Github Mirror': 'https://github.com/wikimedia/pywikibot',
+            'GitHub Mirror': 'https://github.com/wikimedia/pywikibot',
             'Tracker': 'https://phabricator.wikimedia.org/tag/pywikibot/',
         },
         entry_points={

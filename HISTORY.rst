@@ -1661,7 +1661,7 @@ Other changes include:
 * Python 3 support fixes
 * Daemonize support
 * Allow pywikibot to load without i18n data
-* Appveyor CI Win32 builds
+* AppVeyor CI Win32 builds
 * New scripts patrol.py and piper.py ported from old compat branch
 * Bugfixes and improvements
 * Localisation updates
