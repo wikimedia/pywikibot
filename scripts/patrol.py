@@ -157,7 +157,7 @@ class PatrolBot(BaseBot):
             # Parse whitelist
             self.whitelist = self.parse_page_tuples(wikitext, self.user)
             # Record timestamp
-            self.whitelist_ts = whitelist_page.editTime()
+            self.whitelist_ts = whitelist_page.latest_revision.timestamp
             self.whitelist_load_ts = time.time()
         except Exception as e:
             # cascade if there isn't a whitelist to fallback on

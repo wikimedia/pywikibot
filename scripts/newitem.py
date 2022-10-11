@@ -141,7 +141,7 @@ class NewItemRobot(WikidataBot):
         if super().skip_page(page):
             return True
 
-        if page.editTime() > self.lastEditBefore:
+        if page.latest_revision.timestamp > self.lastEditBefore:
             pywikibot.info(
                 f'Last edit on {page} was on {page.latest_revision.timestamp}.'
                 f'\nToo recent. Skipping.')

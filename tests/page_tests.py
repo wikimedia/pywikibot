@@ -462,7 +462,8 @@ class TestPageObject(DefaultSiteTestCase):
         self.assertIsInstance(mainpage.isDisambig(), bool)
         self.assertIsInstance(mainpage.has_permission(), bool)
         self.assertIsInstance(mainpage.botMayEdit(), bool)
-        self.assertIsInstance(mainpage.editTime(), pywikibot.Timestamp)
+        self.assertIsInstance(mainpage.latest_revision.timestamp,
+                              pywikibot.Timestamp)
         self.assertIsInstance(mainpage.permalink(), str)
 
     def test_talk_page(self):
