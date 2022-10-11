@@ -5,10 +5,10 @@
 # Distributed under the terms of the MIT license.
 #
 from collections import defaultdict
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 import pywikibot
-from pywikibot.backports import Generator, List
+from pywikibot.backports import Generator, Iterable
 from pywikibot.page._page import Page
 
 
@@ -119,61 +119,52 @@ class Category(Page):
                         if total == 0:
                             return
 
-    def articles(self,
+    def articles(self, *,
                  recurse: Union[int, bool] = False,
                  total: Optional[int] = None,
-                 content: bool = False,
-                 namespaces: Union[int, List[int]] = None,
-                 sortby: Optional[str] = None,
-                 reverse: bool = False,
-                 starttime=None, endtime=None,
-                 startprefix: Optional[str] = None,
-                 endprefix: Optional[str] = None):
+                 **kwargs: Any) -> Iterable[Page]:
         """
         Yield all articles in the current category.
 
-        By default, yields all *pages* in the category that are not
-        subcategories!
+        By default, yields all pages in the category that are not
+        subcategories.
+
+        **Usage:**
+
+        >>> site = pywikibot.Site('wikipedia:test')
+        >>> cat = pywikibot.Category(site, 'Pywikibot')
+        >>> list(cat.articles())
+        [Page('Pywikibot nobots test')]
+        >>> for p in cat.articles(recurse=1, namespaces=2, total=3):
+        ...     print(p.depth)
+        ...
+        2
+        3
+        4
+
+        .. versionchanged:: 8.0.0
+           all parameters are keyword arguments only.
 
         :param recurse: if not False or 0, also iterate articles in
             subcategories. If an int, limit recursion to this number of
-            levels. (Example: recurse=1 will iterate articles in first-level
-            subcats, but no deeper.)
+            levels. (Example: ``recurse=1`` will iterate articles in
+            first-level subcats, but no deeper.)
         :param total: iterate no more than this number of pages in
             total (at all levels)
-        :param namespaces: only yield pages in the specified namespaces
-        :param content: if True, retrieve the content of the current version
-            of each page (default False)
-        :param sortby: determines the order in which results are generated,
-            valid values are "sortkey" (default, results ordered by category
-            sort key) or "timestamp" (results ordered by time page was
-            added to the category). This applies recursively.
-        :param reverse: if True, generate results in reverse order
-            (default False)
-        :param starttime: if provided, only generate pages added after this
-            time; not valid unless sortby="timestamp"
-        :type starttime: pywikibot.Timestamp
-        :param endtime: if provided, only generate pages added before this
-            time; not valid unless sortby="timestamp"
-        :type endtime: pywikibot.Timestamp
-        :param startprefix: if provided, only generate pages >= this title
-            lexically; not valid if sortby="timestamp"
-        :param endprefix: if provided, only generate pages < this title
-            lexically; not valid if sortby="timestamp"
-        :rtype: typing.Iterable[pywikibot.Page]
+        :param kwargs: Additional parameters. Refer
+            :meth:`APISite.categorymembers()
+            <pywikibot.site._generators.GeneratorsMixin.categorymembers>`
+            for them except of *member_type*.
         """
+        if kwargs.pop('member_type', False):
+            raise TypeError(
+                "articles() got an unexpected keyword argument 'member_type'")
+
         seen = set()
         for member in self.site.categorymembers(self,
-                                                namespaces=namespaces,
                                                 total=total,
-                                                content=content,
-                                                sortby=sortby,
-                                                reverse=reverse,
-                                                starttime=starttime,
-                                                endtime=endtime,
-                                                startprefix=startprefix,
-                                                endprefix=endprefix,
-                                                member_type=['page', 'file']):
+                                                member_type=['page', 'file'],
+                                                **kwargs):
             if recurse:
                 seen.add(hash(member))
             yield member
@@ -188,14 +179,7 @@ class Category(Page):
             for subcat in self.subcategories():
                 for article in subcat.articles(recurse=recurse,
                                                total=total,
-                                               content=content,
-                                               namespaces=namespaces,
-                                               sortby=sortby,
-                                               reverse=reverse,
-                                               starttime=starttime,
-                                               endtime=endtime,
-                                               startprefix=startprefix,
-                                               endprefix=endprefix):
+                                               **kwargs):
                     hash_value = hash(article)
                     if hash_value in seen:
                         continue

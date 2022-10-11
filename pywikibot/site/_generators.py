@@ -461,19 +461,33 @@ class GeneratorsMixin:
                                titles=tltitle, namespaces=namespaces,
                                total=total, g_content=content)
 
-    def categorymembers(self, category, *,
-                        namespaces=None,
-                        sortby: Optional[str] = None,
-                        reverse: bool = False,
-                        starttime=None,
-                        endtime=None,
-                        total: Optional[int] = None,
-                        content: bool = False,
-                        member_type=None,
-                        startprefix: Optional[str] = None,
-                        endprefix: Optional[str] = None):
+    def categorymembers(
+        self,
+        category: 'pywikibot.Category', *,
+        namespaces=None,
+        sortby: Optional[str] = None,
+        reverse: bool = False,
+        starttime: Optional[pywikibot.time.Timestamp] = None,
+        endtime: Optional[pywikibot.time.Timestamp] = None,
+        total: Optional[int] = None,
+        startprefix: Optional[str] = None,
+        endprefix: Optional[str] = None,
+        content: bool = False,
+        member_type: Union[str, Iterable[str], None] = None
+    ) -> Iterable['pywikibot.Page']:
         """Iterate members of specified category.
 
+        You should not use this method directly; instead use one of the
+        following:
+
+        - :meth:`pywikibot.Category.articles`
+        - :meth:`pywikibot.Category.members`
+        - :meth:`pywikibot.Category.subcategories`
+
+        .. versionchanged:: 4.0.0
+           parameters except *category* are keyword arguments only.
+        .. versionchanged:: 8.0.0
+           raises TypeError instead of Error if no Category is specified
         .. seealso:: :api:`Categorymembers`
 
         :param category: The Category to iterate.
@@ -491,7 +505,6 @@ class GeneratorsMixin:
             (default False)
         :param starttime: if provided, only generate pages added after this
             time; not valid unless sortby="timestamp"
-        :type starttime: time.Timestamp
         :param endtime: if provided, only generate pages added before this
             time; not valid unless sortby="timestamp"
         :param startprefix: if provided, only generate pages >= this title
@@ -500,19 +513,20 @@ class GeneratorsMixin:
             lexically; not valid if sortby="timestamp"
         :param content: if True, load the current content of each iterated page
             (default False)
-        :param member_type: member type; if member_type includes 'page' and is
-            used in conjunction with sortby="timestamp", the API may limit
-            results to only pages in the first 50 namespaces.
-        :type member_type: str or iterable of str;
-            values: page, subcat, file
-        :rtype: typing.Iterable[pywikibot.Page]
+        :param member_type: member type; values must be ``page``,
+            ``subcat``, ``file``. If member_type includes ``page`` and
+            is used in conjunction with sortby="timestamp", the API may
+            limit results to only pages in the first 50 namespaces.
+
         :raises KeyError: a namespace identifier was not resolved
         :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
+        :raises TypeError: no Category is specified
+        :raises ValueError: invalid values given
         """
         if category.namespace() != 14:
-            raise Error('categorymembers: non-Category page {!r} specified'
-                        .format(category))
+            raise TypeError(
+                f'categorymembers: non-Category page {category!r} specified')
 
         cmtitle = category.title(with_section=False).encode(self.encoding())
         cmargs = {
@@ -524,12 +538,13 @@ class GeneratorsMixin:
         if sortby in ['sortkey', 'timestamp']:
             cmargs['gcmsort'] = sortby
         elif sortby:
-            raise ValueError('categorymembers: invalid sortby value {!r}'
-                             .format(sortby))
+            raise ValueError(
+                f'categorymembers: invalid sortby value {sortby!r}')
 
         if starttime and endtime and starttime > endtime:
             raise ValueError(
                 'categorymembers: starttime must be before endtime')
+
         if startprefix and endprefix and startprefix > endprefix:
             raise ValueError(
                 'categorymembers: startprefix must be less than endprefix')
@@ -543,6 +558,7 @@ class GeneratorsMixin:
 
             if 'page' in member_type:
                 excluded_namespaces = set()
+
                 if 'file' not in member_type:
                     excluded_namespaces.add(6)
                 if 'subcat' not in member_type:
@@ -551,8 +567,8 @@ class GeneratorsMixin:
                 if namespaces:
                     if excluded_namespaces.intersection(namespaces):
                         raise ValueError(
-                            'incompatible namespaces {!r} and member_type {!r}'
-                            .format(namespaces, member_type))
+                            f'incompatible namespaces {namespaces!r} and '
+                            f'member_type {member_type!r}')
                     # All excluded namespaces are not present in `namespaces`.
                 else:
                     # If the number of namespaces is greater than permitted by
