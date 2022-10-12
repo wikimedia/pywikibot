@@ -255,6 +255,7 @@ default_edit_summary = 'Pywikibot ' + pwb_version
 # stat.S_IWOTH 0o002 write permission for others
 # stat.S_IXOTH 0o001 execute permission for others
 private_files_permission = stat.S_IRUSR | stat.S_IWUSR
+private_folder_permission = stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR
 
 # Allow user to stop warnings about file security
 # by setting this to true.
@@ -368,7 +369,7 @@ def get_base_dir(test_directory: Optional[str] = None,
             for dir_ in base_dir_cand:
                 dir_s = os.path.join(*dir_)
                 try:
-                    os.makedirs(dir_s, mode=private_files_permission)
+                    os.makedirs(dir_s, mode=private_folder_permission)
                 except OSError:  # PermissionError or already exists
                     if exists(dir_s):
                         base_dir = dir_s
@@ -1132,15 +1133,18 @@ if family == 'wikipedia' and mylang == 'language':
     mylang = 'test'
 
 # SECURITY WARNINGS
-if (not ignore_file_security_warnings
-        and private_files_permission & (stat.S_IRWXG | stat.S_IRWXO) != 0):
-    error("CRITICAL SECURITY WARNING: 'private_files_permission' is set"
-          ' to allow access from the group/others which'
-          ' could give them access to the sensitive files.'
-          ' To avoid giving others access to sensitive files, pywikibot'
-          " won't run with this setting. Choose a more restrictive"
-          " permission or set 'ignore_file_security_warnings' to true.")
-    sys.exit(1)
+if not ignore_file_security_warnings:
+    for _permission in ('private_files_permission',
+                        'private_folder_permission'):
+        if locals()[_permission] & (stat.S_IRWXG | stat.S_IRWXO) != 0:
+            error('\n' + fill(
+                f'CRITICAL SECURITY WARNING: {_permission!r} is set to allow'
+                ' access from the group/others which could give them access'
+                ' to the sensitive files. To avoid giving others access to'
+                " sensitive files, pywikibot won't run with this setting."
+                ' Choose a more restrictive permission or set'
+                " 'ignore_file_security_warnings' to true."))
+            sys.exit(1)
 
 # Setup custom family files
 for file_path in user_families_paths:

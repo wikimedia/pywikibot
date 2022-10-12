@@ -229,7 +229,8 @@ class ListPagesBot(AutomaticTWSummaryBot, SingleSiteBot):
                 choice = pywikibot.input_yn('Do you want to create it ("No" '
                                             'to continue without saving)?')
                 if choice:
-                    os.makedirs(base_dir, mode=0o744)
+                    os.makedirs(base_dir,
+                                mode=config.private_folder_permission)
                 else:
                     base_dir = None
             elif not os.path.isdir(base_dir):

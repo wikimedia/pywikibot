@@ -370,10 +370,13 @@ def save_botpasswords(botpasswords, _fncpass):
             # in it
             with codecs.open(_fncpass, 'w', 'utf-8') as f:
                 f.write('')
-                file_mode_checker(_fncpass, mode=0o600, quiet=True)
+                file_mode_checker(_fncpass,
+                                  mode=config.private_files_permission,
+                                  quiet=True)
             with codecs.open(_fncpass, 'w', 'utf-8') as f:
                 f.write(PASSFILE_CONFIG.format(botpasswords=botpasswords))
-                file_mode_checker(_fncpass, mode=0o600)
+                file_mode_checker(_fncpass,
+                                  mode=config.private_files_permission)
                 pywikibot.info(f"'{_fncpass}' written.")
         except OSError:
             os.remove(_fncpass)
