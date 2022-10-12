@@ -399,7 +399,7 @@ def find_filename(filename):
         return None
 
     if site_package:  # pragma: no cover
-        script_paths = [_pwb_dir]
+        script_paths = ['']  # only use the root as path
     else:
         script_paths = [
             'scripts.userscripts',
