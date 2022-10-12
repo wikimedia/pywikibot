@@ -207,6 +207,17 @@ Require that the given list of modules can be imported.
   @require_modules(['important1', 'musthave2'])
   def test_require_modules(self):
 
+@tests.aspects.require_version
+------------------------------
+Require a given MediaWiki version
+
+::
+
+  from tests.aspects import require_version
+  [......]
+  @require_version('>=1.27.0')
+  def test_require_version(self):
+
 @unittest.mock.patch
 -----------------------
 Replaces `target` with object specified in `new`. Refer to mock's documentation.

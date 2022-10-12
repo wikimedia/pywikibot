@@ -110,9 +110,6 @@ class TestSiteGenerators(DefaultSiteTestCase):
 
     def test_page_redirects(self):
         """Test Site.page_redirects."""
-        if self.get_site().mw_version < '1.24':
-            self.skipTest('site.page_redirects() needs mw 1.24')
-
         redirects_ns_0 = set(self.site.page_redirects(
             self.mainpage,
             namespaces=0,
@@ -1262,13 +1259,6 @@ class TestAlldeletedrevisionsAsUser(DefaultSiteTestCase):
 
     login = True
 
-    @classmethod
-    def setUpClass(cls):
-        """Skip test if necessary."""
-        super().setUpClass()
-        if cls.site.mw_version < '1.25':
-            cls.skipTest(cls, 'site.alldeletedrevisions() needs mw 1.25')
-
     def test_basic(self):
         """Test the site.alldeletedrevisions() method."""
         mysite = self.get_site()
@@ -1430,9 +1420,6 @@ class TestAlldeletedrevisionsWithoutUser(DefaultSiteTestCase):
     def test_prefix(self):
         """Test the site.alldeletedrevisions() method with prefix."""
         mysite = self.get_site()
-        if mysite.mw_version < '1.25':
-            self.skipTest('site.alldeletedrevisions() needs mw 1.25')
-
         for data in mysite.alldeletedrevisions(prefix='John', total=5):
             self.assertIsInstance(data, dict)
             for key in ('title', 'ns', 'revisions'):
