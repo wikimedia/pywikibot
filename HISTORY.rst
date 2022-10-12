@@ -1,6 +1,14 @@
 Release history
 ^^^^^^^^^^^^^^^
 
+7.7.1
+-----
+
+*10 October 2022*
+
+* New wikis are supported (:phab:`T314642`, :phab:`T314648`, :phab:`T316459`, :phab:`T317115`, :phab:`T319193`)
+
+
 7.7.0
 -----
 *25 September 2022*

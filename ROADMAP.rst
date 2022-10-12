@@ -1,6 +1,8 @@
 Current release 8.0.0
 ^^^^^^^^^^^^^^^^^^^^^
 
+* The ``parent_id`` and ``content_model`` attributes of :class:`page.Revision` were removed in favour of ``parentid`` and ``contentmodel``
+* Support for MediaWiki < 1.27 was dropped
 * ListBoxWindows class of :mod:`userinterfaces.gui` was removed
 * L10N and i18n updates
 * Adjust subprocess args in :mod:`tools.djvu`
@@ -8,6 +10,7 @@ Current release 8.0.0
 * Require Python 3.6.1+ with Pywikibot and drop support for Python 3.6.0 (:phab:`T318912`)
 * pymysql >= 0.9.3 is required (:phab:`T216741`)
 * Python 3.5 support was dropped (:phab:`T301908`)
+* MediaWiki API cross reference was added to the documentation
 
 Deprecations
 ^^^^^^^^^^^^
@@ -47,5 +50,3 @@ Will be removed in Pywikibot 8
 ------------------------------
 
 * 5.5.0: APISite.redirectRegex() will be removed in favour of APISite.redirect_regex()
-* 4.0.0: Revision.parent_id will be removed in favour of Revision.parentid
-* 4.0.0: Revision.content_model will be removed in favour of Revision.contentmodel
