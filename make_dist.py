@@ -3,21 +3,21 @@
 
 The following options are supported:
 
--help    Print documentation of this file and of setup.py
+-help     Print documentation of this file and of setup.py
 
--local   Install the distribution as a local site-package. If a
-         Pywikibot package is already there, it will be uninstalled
-         first.
+-local    Install the distribution as a local site-package. If a
+          Pywikibot package is already there, it will be uninstalled
+          first.
 
--remote  Upload the package to pypi. This cannot be done if the
-         Pywikibot version is a development release.
+-remote   Upload the package to pypi. This cannot be done if the
+          Pywikibot version is a development release.
 
--clear   Clear old dist folders
+-clear    Clear old dist folders
 
--upgrade Upgrade distribution packages pip, setuptools, wheel and twine
-         first
+-upgrade  Upgrade distribution packages pip, setuptools, wheel and twine
+          first
 
--nodist  Do not create a distribution. Useful to -clear or -upgrade only.
+-nodist   Do not create a distribution. Useful to -clear or -upgrade only.
 
 Usage::
 
