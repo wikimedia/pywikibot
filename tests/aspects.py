@@ -1303,8 +1303,7 @@ class PwbTestCase(TestCase):
     def _execute(self, args, data_in=None, timeout=None, error=None):
         site = self.get_site()
 
-        args = args + ['-family:' + site.family.name,
-                       '-lang:' + site.code]
+        args += ['-family:' + site.family.name, '-lang:' + site.code]
 
         return execute_pwb(args, data_in, timeout, error)
 

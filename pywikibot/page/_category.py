@@ -72,7 +72,7 @@ class Category(Page):
             return
 
         if not isinstance(recurse, bool) and recurse:
-            recurse = recurse - 1
+            recurse -= 1
 
         if (not hasattr(self, '_subcats')
                 or not is_cache_valid(self._subcats, content)):
@@ -226,7 +226,7 @@ class Category(Page):
                     return
         if recurse:
             if not isinstance(recurse, bool) and recurse:
-                recurse = recurse - 1
+                recurse -= 1
             for subcat in self.subcategories():
                 for article in subcat.members(
                         recurse, namespaces, total=total, content=content):

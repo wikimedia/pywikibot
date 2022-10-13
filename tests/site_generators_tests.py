@@ -1961,7 +1961,7 @@ class TestLoadPagesFromPageids(DefaultSiteTestCase):
     def test_load_from_pageids_iterable_with_duplicate(self):
         """Test loading with duplicate pageids."""
         pageids = [page.pageid for page in self.links]
-        pageids = pageids + pageids
+        pageids += pageids
         gen = self.site.load_pages_from_pageids(pageids)
         count = 0
         for count, page in enumerate(gen, start=1):

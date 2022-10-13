@@ -203,7 +203,7 @@ class ParamInfo(Sized, Container):
                 del failed_modules[:]
                 yield batch
 
-        modules = modules - set(self._paraminfo)
+        modules -= set(self._paraminfo)
         if not modules:
             return
 

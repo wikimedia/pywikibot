@@ -401,7 +401,7 @@ def package_versions(
 
     # Improve performance by removing builtins from the list if possible.
     if builtins is False:
-        root_packages = root_packages - builtin_packages
+        root_packages -= builtin_packages
 
     std_lib_packages = []
 

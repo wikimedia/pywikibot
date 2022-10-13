@@ -183,7 +183,7 @@ class Timestamp(datetime.datetime):
         usec = m['u']
         usec = int(usec.ljust(6, '0')) if usec else 0
         if sec < 0 < usec:
-            sec = sec - 1
+            sec -= 1
             usec = 1_000_000 - usec
 
         ts = cls(1970, 1, 1) + datetime.timedelta(seconds=sec,

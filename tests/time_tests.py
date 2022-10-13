@@ -82,7 +82,7 @@ class TestTimestamp(TestCase):
         sec, usec = map(int, timestr.split('.'))
 
         if sec < 0 < usec:
-            sec = sec - 1
+            sec -= 1
             usec = 1000000 - usec
 
         return datetime(1970, 1, 1) + timedelta(seconds=sec, microseconds=usec)
