@@ -306,6 +306,14 @@ _handlers_initialized = []  # we can have a script and the script wrapper
 def handler_namer(name: str) -> str:
     """Modify the filename of a log file when rotating.
 
+    RotatingFileHandler will save old log files by appending the
+    extensions ``.1``, ``.2`` etc., to the filename. To keep the
+    original extension, which is usually ``.log``, this function
+    swaps the appended counter with the log extension:
+
+    >>> handler_namer('add_text.log.1')
+    'add_text.1.log'
+
     .. versionadded:: 6.5
     """
     path, qualifier = name.rsplit('.', 1)
