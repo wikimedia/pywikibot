@@ -90,6 +90,10 @@ MediaWiki API Cross Reference
      - :meth:`thank_post()<pywikibot.site._extensions.ThanksFlowMixin.thank_post>`
      -
      - :meth:`flow.Post.thank`
+   * - :api:`login<login>`
+     - :meth:`login()<pywikibot.site._apisite.APISite.login>`
+     -
+     -
    * - :api:`logout<logout>`
      - :meth:`logout()<pywikibot.site._apisite.APISite.logout>`
      -
