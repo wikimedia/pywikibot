@@ -8,6 +8,7 @@
 import unittest
 from contextlib import suppress
 
+from pywikibot import config
 from pywikibot.exceptions import NoPageError
 from pywikibot.flow import Board, Post, Topic
 from tests.aspects import TestCase
@@ -141,10 +142,16 @@ class TestFlowLoading(TestMediaWikiFlowSandbox):
     def test_topiclist(self):
         """Test loading of topiclist."""
         board = self._page
-        for i, _ in enumerate(board.topics(limit=7), start=1):
-            if i == 10:
-                break
-        self.assertEqual(i, 10)
+        total = 7
+        saved_step = config.step
+        for step in (-1, 5, 100):
+            with self.subTest(step=step):
+                config.step = step
+                for i, _ in enumerate(board.topics(total=total), start=1):
+                    if i > total:
+                        break
+                self.assertEqual(i, total)
+        config.step = saved_step
 
 
 class TestFlowFactoryErrors(TestCase):
