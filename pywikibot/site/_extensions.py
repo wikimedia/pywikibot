@@ -4,9 +4,10 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from typing import Optional
+from typing import Any, Optional, Union
 
 import pywikibot
+from pywikibot.backports import Dict
 from pywikibot.data import api
 from pywikibot.echo import Notification
 from pywikibot.exceptions import (
@@ -374,39 +375,34 @@ class FlowMixin:
         return data['flow']['view-topiclist']['result']['topiclist']
 
     @need_extension('Flow')
-    def load_topiclist(
-        self,
-        page,
-        content_format: str = 'wikitext',
-        limit: int = 100,
-        sortby: str = 'newest',
-        toconly: bool = False,
-        offset=None,
-        offset_id=None,
-        reverse: bool = False,
-        include_offset: bool = False
-    ):
+    def load_topiclist(self,
+                       page: 'pywikibot.flow.Board',
+                       *,
+                       content_format: str = 'wikitext',
+                       limit: int = 100,
+                       sortby: str = 'newest',
+                       toconly: bool = False,
+                       offset: Union['pywikibot.Timestamp', str, None] = None,
+                       offset_id: Optional[str] = None,
+                       reverse: bool = False,
+                       include_offset: bool = False) -> Dict[str, Any]:
         """
         Retrieve the topiclist of a Flow board.
 
+        .. versionchanged:: 8.0
+           All parameters except *page* are keyword only parameters.
+
         :param page: A Flow board
-        :type page: Board
         :param content_format: The content format to request the data in.
             must be either 'wikitext', 'html', or 'fixed-html'
-        :param limit: The number of topics to fetch in each request.
+        :param limit: The number of topics to fetch in each single request.
         :param sortby: Algorithm to sort topics by ('newest' or 'updated').
         :param toconly: Whether to only include information for the TOC.
-        :type toconly: bool
         :param offset: The timestamp to start at (when sortby is 'updated').
-        :type offset: time.Timestamp or equivalent str
         :param offset_id: The topic UUID to start at (when sortby is 'newest').
-        :type offset_id: str (in the form of a UUID)
         :param reverse: Whether to reverse the topic ordering.
-        :type reverse: bool
         :param include_offset: Whether to include the offset topic.
-        :type include_offset: bool
         :return: A dict representing the board's topiclist.
-        :rtype: dict
         """
         if offset:
             offset = pywikibot.Timestamp.fromtimestampformat(offset)
