@@ -10,3 +10,8 @@ setup script
 ------------
 
 .. automodule:: setup
+
+entry point
+-----------
+
+.. automodule:: pwb

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """Wrapper script to invoke pywikibot-based scripts.
 
 This wrapper script invokes script by its name in this search order:
@@ -35,27 +34,24 @@ for tests to set the default site (see :phab:`T216825`)::
    pwb wrapper was added to the Python site package lib
 .. versionchanged:: 7.7
    pwb wrapper is able to set ``PYWIKIBOT_TEST_...`` environment variables
+.. versionchanged:: 8.0
+   renamed to wrapper.py
 """
+#
 # (C) Pywikibot team, 2012-2022
 #
 # Distributed under the terms of the MIT license.
 #
-# ## KEEP PYTHON 2 SUPPORT FOR THIS SCRIPT ## #
-from __future__ import print_function
-
+#
 import os
 import sys
 import types
 from difflib import get_close_matches
 from importlib import import_module
+from pathlib import Path
 from time import sleep
 from warnings import warn
 
-
-try:
-    from pathlib import Path
-except ImportError:
-    pass
 
 pwb = None
 site_package = False
@@ -184,6 +180,8 @@ def handle_args(pwb_py, *args):
     for index, arg in enumerate(args, start=1):
         if arg in ('-version', '--version'):
             fname = 'version.py'
+        elif arg in ('pwb', 'pwb.py', 'wrapper', 'wrapper.py'):
+            pass
         elif arg.startswith('-'):
             local.append(arg)
         elif arg.startswith('PYWIKIBOT_TEST_'):
@@ -291,8 +289,9 @@ filename, script_args, global_args, environ = handle_args(*sys.argv)
 # If successful, user config file already exists in one of the candidate
 # directories. See config.py for details on search order.
 # Use env var to communicate to config.py pwb.py location (bug T74918).
-_pwb_dir = os.path.split(__file__)[0]
-os.environ['PYWIKIBOT_DIR_PWB'] = _pwb_dir
+wrapper_dir = Path(__file__).parent
+os.environ['PYWIKIBOT_DIR_PWB'] = str(wrapper_dir)
+
 try:
     import pywikibot as pwb
 except RuntimeError as e:  # pragma: no cover
@@ -309,8 +308,8 @@ except RuntimeError as e:  # pragma: no cover
 
         print('NOTE: user-config.py was not found!')
         print('Please follow the prompts to create it:')
-        run_python_file(os.path.join(
-            _pwb_dir, 'pywikibot', 'scripts', 'generate_user_files.py'), [])
+        run_python_file(str(wrapper_dir.joinpath(
+            'pywikibot', 'scripts', 'generate_user_files.py')), [])
         # because we have loaded pywikibot without user-config.py loaded,
         # we need to re-start the entire process. Ask the user to do so.
         print('Now, you have to re-execute the command to start your script.')
@@ -335,12 +334,10 @@ def find_alternates(filename, script_paths):
 
     scripts = {}
 
-    script_paths = [['.']] + script_paths  # add current directory
-    for path in script_paths:
-        folder = Path(_pwb_dir).joinpath(*path)
+    for folder in script_paths:
         if not folder.exists():  # pragma: no cover
-            warning('{} does not exists; remove it from user_script_paths'
-                    .format(folder))
+            warning(
+                f'{folder} does not exists; remove it from user_script_paths')
             continue
         for script_name in folder.iterdir():
             name, suffix = script_name.stem, script_name.suffix
@@ -387,26 +384,16 @@ def find_filename(filename):
     from pywikibot import config
     path_list = []  # paths to find misspellings
 
-    def test_paths(paths, root):
+    def test_paths(paths, root: Path):
         """Search for filename in given paths within 'root' base directory."""
         for file_package in paths:
             package = file_package.split('.')
             path = package + [filename]
-            testpath = os.path.join(root, *path)
-            if os.path.exists(testpath):
-                return testpath
-            path_list.append(package)
+            testpath = root.joinpath(*path)
+            if testpath.exists():
+                return str(testpath)
+            path_list.append(testpath.parent)
         return None
-
-    if site_package:  # pragma: no cover
-        script_paths = ['']  # only use the root as path
-    else:
-        script_paths = [
-            'scripts.userscripts',
-            'scripts',
-            'scripts.maintenance',
-            'pywikibot.scripts',
-        ]
 
     user_script_paths = []
     if config.user_script_paths:  # pragma: no cover
@@ -417,13 +404,24 @@ def find_filename(filename):
                  'found: {}. Ignoring this setting.'
                  .format(type(config.user_script_paths)))
 
-    found = test_paths(user_script_paths, config.base_dir)
+    found = test_paths(user_script_paths, Path(config.base_dir))
     if found:  # pragma: no cover
         return found
 
-    found = test_paths(script_paths, _pwb_dir)
+    # search for system scripts in pywikibot.scripts directory
+    found = test_paths([''], wrapper_dir)
     if found:
         return found
+
+    if not site_package:
+        script_paths = [
+            'scripts',
+            'scripts.maintenance',
+            'pywikibot.scripts',
+        ]
+        found = test_paths(script_paths, wrapper_dir.parents[1])
+        if found:
+            return found
 
     return find_alternates(filename, path_list)
 
@@ -496,14 +494,8 @@ def main():
     .. versionchanged:: 7.0
        previous implementation was renamed to :func:`execute`
     """
-    try:
-        if not check_modules():  # pragma: no cover
-            raise RuntimeError('')  # no further output needed
-    # setup.py may also raise RuntimeError
-    except RuntimeError as e:  # pragma: no cover
-        sys.exit(e)
-    except SyntaxError as e:  # pragma: no cover
-        sys.exit(str(e) + '\nProbably outdated Python version')
+    if not check_modules():  # pragma: no cover
+        sys.exit()
 
     if not execute():
         print(__doc__)
