@@ -8,7 +8,7 @@ Framework Utility Scripts
 pwb wrapper script
 ------------------
 
-.. automodule:: pwb
+.. automodule:: pywikibot.scripts.wrapper
    :synopsis: Wrapper script to invoke pywikibot-based scripts
 
 generate\_family\_file script
