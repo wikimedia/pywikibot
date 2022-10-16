@@ -7,7 +7,7 @@
   by the corresponding final release
 - create the package with::
 
-    make_dist remote
+    make_dist -remote
 
 - create a new tag with the version number of the final release
 - synchronize the local tags with the remote repositoy
