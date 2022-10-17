@@ -624,7 +624,7 @@ class CosmeticChangesToolkit:
             if hadLeadingSpaces and not newline:
                 newLink = ' ' + newLink
             if hadTrailingSpaces:
-                newLink = newLink + ' '
+                newLink += ' '
             if newline:
                 newLink = newline + newLink
             return newLink

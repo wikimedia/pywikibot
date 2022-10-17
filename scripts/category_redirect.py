@@ -420,7 +420,7 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
                     newtext = ('{{%(redirtemp)s|%(ncat)s}}'
                                % {'redirtemp': self.template_list[0],
                                   'ncat': double.title(with_ns=False)})
-                    newtext = newtext + oldtext.strip()
+                    newtext += oldtext.strip()
                     try:
                         cat.text = newtext
                         cat.save(i18n.twtranslate(self.site,
