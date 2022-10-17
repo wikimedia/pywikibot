@@ -14,7 +14,7 @@ from collections.abc import Mapping
 from contextlib import suppress
 from unittest import mock
 
-from pywikibot import tools
+from pywikibot import config, tools
 from pywikibot.tools import (
     cached,
     classproperty,
@@ -578,21 +578,24 @@ class TestFileModeChecker(TestCase):
     def test_auto_chmod_for_dir(self):
         """Do not chmod files that have mode private_files_permission."""
         self.stat.return_value.st_mode = 0o040600  # dir
-        tools.file_mode_checker(self.file, mode=0o600)
+        tools.file_mode_checker(self.file,
+                                mode=config.private_folder_permission)
         self.stat.assert_called_with(self.file)
         self.assertFalse(self.chmod.called)
 
     def test_auto_chmod_OK(self):
         """Do not chmod files that have mode private_files_permission."""
         self.stat.return_value.st_mode = 0o100600  # regular file
-        tools.file_mode_checker(self.file, mode=0o600)
+        tools.file_mode_checker(self.file,
+                                mode=config.private_files_permission)
         self.stat.assert_called_with(self.file)
         self.assertFalse(self.chmod.called)
 
     def test_auto_chmod_not_OK(self):
         """Chmod files that do not have mode private_files_permission."""
         self.stat.return_value.st_mode = 0o100644  # regular file
-        tools.file_mode_checker(self.file, mode=0o600)
+        tools.file_mode_checker(self.file,
+                                mode=config.private_files_permission)
         self.stat.assert_called_with(self.file)
         self.chmod.assert_called_once_with(self.file, 0o600)
 
