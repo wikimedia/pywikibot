@@ -151,10 +151,10 @@ class Category(Page):
             first-level subcats, but no deeper.)
         :param total: iterate no more than this number of pages in
             total (at all levels)
-        :param kwargs: Additional parameters. Refer
+        :param kwargs: Additional parameters. Refer to
             :meth:`APISite.categorymembers()
             <pywikibot.site._generators.GeneratorsMixin.categorymembers>`
-            for them except of *member_type*.
+            for complete list (*member_type* excluded).
         """
         if kwargs.pop('member_type', False):
             raise TypeError(
