@@ -18,7 +18,9 @@ from pywikibot.data import api
 from pywikibot.exceptions import APIError, NoUsernameError
 from pywikibot.throttle import Throttle
 from pywikibot.tools import suppress_warnings
+
 from tests.aspects import (
+    require_version,
     DefaultDrySiteTestCase,
     DefaultSiteTestCase,
     TestCase,
@@ -292,13 +294,10 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertIn('query+revisions', pi.prefix_map)
 
+    @require_version('>=1.25wmf4', 'support the new paraminfo api')
     def test_new_mode(self):
         """Test the new modules-only mode explicitly."""
         site = self.get_site()
-        if site.mw_version < '1.25wmf4':
-            self.skipTest(
-                "version {} doesn't support the new paraminfo api"
-                .format(site.mw_version))
         pi = api.ParamInfo(site, modules_only_mode=True)
         pi.fetch(['info'])
         self.assertIn('query+info', pi._paraminfo)

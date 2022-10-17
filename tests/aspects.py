@@ -19,6 +19,7 @@ import unittest
 import warnings
 from collections.abc import Sized
 from contextlib import contextmanager, suppress
+from functools import wraps
 from http import HTTPStatus
 from unittest.util import safe_repr
 
@@ -35,6 +36,7 @@ from pywikibot.exceptions import (
 from pywikibot.family import WikimediaFamily
 from pywikibot.site import BaseSite
 from pywikibot.tools import suppress_warnings
+from pywikibot.tools import MediaWikiVersion  # noqa: F401 (used by f-string)
 from tests import (
     WARN_SITE_CODE,
     patch_request,
@@ -307,6 +309,59 @@ def require_modules(*required_modules):
         skip_decorator = unittest.skip('{} not installed'.format(
             ', '.join(missing)))
         return skip_decorator(obj)
+
+    return test_requirement
+
+
+def require_version(version_needed: str, reason: str = ''):
+    """Require minimum MediaWiki version to be queried.
+
+    The version needed for the test; must be given with a preleading rich
+    comparisons operator like ``<1.27wmf4`` or ``>=1.39``. If the
+    comparison does not match the test will be skipped.
+
+    This decorator can only be used for TestCase having a single site.
+    It cannot be used for DrySite tests. In addition version comparison
+    for other than the current site e.g. for the related data or image
+    repositoy of the current site is ot possible.
+
+    .. versionadded:: 8.0.0
+
+    :param version_needed: The version needed
+    :param reason: A reason for skipping the test.
+    :raises Exception: Usage validation fails
+    """
+    def test_requirement(method):
+        """Test the requirement and return an optionally decorated object."""
+        @wraps(method)
+        def wrapper(self, *args, **kwargs):
+            """Validate environment."""
+            if not isinstance(self.site, BaseSite) \
+               or isinstance(self.site, DrySite):
+                raise Exception(
+                    f'{type(self).__name__}.site must be a BaseSite not '
+                    f'{type(self.site).__name__}.')
+
+            if args or kwargs:
+                raise Exception(
+                    f'Test method {method.__name__!r} has parameters which is '
+                    f'not supported with require_version decorator.')
+
+            _, op, version = re.split('([<>]=?)', version_needed)
+            if not op:
+                raise Exception(f'There is no valid operator given with '
+                                f'version {version_needed!r}')
+
+            skip = not eval(
+                f'self.site.mw_version {op} MediaWikiVersion(version)')
+            if not skip:
+                return method(self, *args, **kwargs)
+
+            myreason = ' to ' + reason if reason else ''
+            raise unittest.SkipTest(
+                f'MediaWiki {op} v{version} required{myreason}.')
+
+        return wrapper
 
     return test_requirement
 

@@ -12,7 +12,7 @@ from contextlib import suppress
 import pywikibot
 from pywikibot import config, page_put_queue
 from pywikibot.exceptions import Error
-from tests.aspects import TestCase
+from tests.aspects import TestCase, require_version
 from tests.oauth_tests import OAuthSiteTestCase
 
 
@@ -79,16 +79,12 @@ class TestSiteMergeHistory(TestCase):
     write = True
     rights = 'mergehistory'
 
+    @require_version('>=1.27.0wmf.13', 'support the history merge API')
     def setup_test_pages(self):
         """Helper function to set up pages that we will use in these tests."""
         site = self.get_site()
         source = pywikibot.Page(site, 'User:Sn1per/MergeTest1')
         dest = pywikibot.Page(site, 'User:Sn1per/MergeTest2')
-
-        # Make sure the wiki supports action=mergehistory
-        if site.mw_version < '1.27.0-wmf.13':
-            self.skipTest('Wiki version must be 1.27.0-wmf.13 or newer to '
-                          'support the history merge API.')
 
         if source.exists():
             source.delete('Pywikibot merge history unit test')
