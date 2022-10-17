@@ -44,6 +44,7 @@ from pywikibot import config
 from pywikibot.backports import Tuple
 from pywikibot.exceptions import (
     FatalServerError,
+    ServerError,
     Server414Error,
     Server504Error,
 )
@@ -282,12 +283,17 @@ def error_handling_callback(response):
             error('An error occurred for uri ' + response.request.url)
         raise response from None
 
+    if response.status_code == HTTPStatus.REQUEST_URI_TOO_LONG:
+        raise Server414Error('Too long GET request')
+
     if response.status_code == HTTPStatus.GATEWAY_TIMEOUT:
         raise Server504Error('Server {} timed out'
                              .format(urlparse(response.url).netloc))
 
-    if response.status_code == HTTPStatus.REQUEST_URI_TOO_LONG:
-        raise Server414Error('Too long GET request')
+    if (not response.ok
+            and response.status_code >= HTTPStatus.INTERNAL_SERVER_ERROR):
+        raise ServerError(
+            f'{response.status_code} Server Error: {response.reason}')
 
     # TODO: shall it raise? this might break some code, TBC
     # response.raise_for_status()
