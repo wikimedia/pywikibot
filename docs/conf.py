@@ -18,13 +18,13 @@
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
+# documentation root, use Path.resolve() to make it absolute, like shown here.
 #
 import os
 import re
 import sys
 import warnings
-from os.path import abspath, dirname, join
+from pathlib import Path
 
 
 # Deprecated classes will generate warnings as Sphinx processes them.
@@ -32,11 +32,8 @@ from os.path import abspath, dirname, join
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
-docs_dir = dirname(__file__)
-repo_dir = abspath(join(docs_dir, '..'))
-sys.path.insert(0, repo_dir + '/pywikibot')
-sys.path.insert(0, repo_dir)
-os.chdir(repo_dir)
+repo_dir = Path(__file__).resolve().parents[1]
+sys.path = [str(repo_dir), str(repo_dir / 'pywikibot')] + sys.path
 
 os.environ['PYWIKIBOT_NO_USER_CONFIG'] = '1'
 import pywikibot  # noqa: E402
