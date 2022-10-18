@@ -285,7 +285,7 @@ class DataSite(APISite):
             params['bot'] = 1
         if 'baserevid' in kwargs and kwargs['baserevid']:
             params['baserevid'] = kwargs['baserevid']
-        params['token'] = self.tokens['edit']
+        params['token'] = self.tokens['csrf']
 
         for arg in kwargs:
             if arg in ['clear', 'summary']:
@@ -317,7 +317,7 @@ class DataSite(APISite):
                   'claim': json.dumps(claim.toJSON()),
                   'baserevid': entity.latest_revision_id,
                   'summary': summary,
-                  'token': self.tokens['edit'],
+                  'token': self.tokens['csrf'],
                   'bot': bot,
                   }
         req = self.simple_request(**params)
@@ -350,7 +350,7 @@ class DataSite(APISite):
             raise NoPageError(claim)
         params = {'action': 'wbsetclaimvalue', 'claim': claim.snak,
                   'snaktype': snaktype, 'summary': summary, 'bot': bot,
-                  'token': self.tokens['edit']}
+                  'token': self.tokens['csrf']}
 
         if snaktype == 'value':
             params['value'] = json.dumps(claim._formatValue())
@@ -377,7 +377,7 @@ class DataSite(APISite):
             raise NoPageError(claim)
         params = {'action': 'wbsetclaim',
                   'claim': json.dumps(claim.toJSON()),
-                  'token': self.tokens['edit'],
+                  'token': self.tokens['csrf'],
                   'baserevid': claim.on_item.latest_revision_id,
                   'summary': summary,
                   'bot': bot,
@@ -411,7 +411,7 @@ class DataSite(APISite):
             raise ValueError('The claim cannot have a source.')
         params = {'action': 'wbsetreference', 'statement': claim.snak,
                   'baserevid': claim.on_item.latest_revision_id,
-                  'summary': summary, 'bot': bot, 'token': self.tokens['edit']}
+                  'summary': summary, 'bot': bot, 'token': self.tokens['csrf']}
 
         # build up the snak
         if isinstance(source, list):
@@ -468,7 +468,7 @@ class DataSite(APISite):
         if (not new and hasattr(qualifier, 'hash')
                 and qualifier.hash is not None):
             params['snakhash'] = qualifier.hash
-        params['token'] = self.tokens['edit']
+        params['token'] = self.tokens['csrf']
         # build up the snak
         if qualifier.getSnakType() == 'value':
             params['value'] = json.dumps(qualifier._formatValue())
@@ -505,7 +505,7 @@ class DataSite(APISite):
             'summary': summary,
             'bot': bot,
             'claim': '|'.join(claim.snak for claim in claims),
-            'token': self.tokens['edit'],
+            'token': self.tokens['csrf'],
         }
 
         req = self.simple_request(**params)
@@ -534,7 +534,7 @@ class DataSite(APISite):
             'summary': summary, 'bot': bot,
             'statement': claim.snak,
             'references': '|'.join(source.hash for source in sources),
-            'token': self.tokens['edit'],
+            'token': self.tokens['csrf'],
         }
 
         req = self.simple_request(**params)
@@ -564,7 +564,7 @@ class DataSite(APISite):
             'summary': summary,
             'bot': bot,
             'qualifiers': [qualifier.hash for qualifier in qualifiers],
-            'token': self.tokens['edit']
+            'token': self.tokens['csrf']
         }
 
         req = self.simple_request(**params)
@@ -589,7 +589,7 @@ class DataSite(APISite):
             'totitle': page1.title(),
             'fromsite': page2.site.dbName(),
             'fromtitle': page2.title(),
-            'token': self.tokens['edit']
+            'token': self.tokens['csrf']
         }
         if bot:
             params['bot'] = 1
@@ -621,7 +621,7 @@ class DataSite(APISite):
             'fromid': from_item.getID(),
             'toid': to_item.getID(),
             'ignoreconflicts': ignore_conflicts,
-            'token': self.tokens['edit'],
+            'token': self.tokens['csrf'],
             'summary': summary,
         }
         if bot:
@@ -649,7 +649,7 @@ class DataSite(APISite):
             'action': 'wblmergelexemes',
             'source': from_lexeme.getID(),
             'target': to_lexeme.getID(),
-            'token': self.tokens['edit'],
+            'token': self.tokens['csrf'],
             'summary': summary,
         }
         if bot:
@@ -673,7 +673,7 @@ class DataSite(APISite):
             'action': 'wbcreateredirect',
             'from': from_item.getID(),
             'to': to_item.getID(),
-            'token': self.tokens['edit'],
+            'token': self.tokens['csrf'],
             'bot': bot,
         }
         req = self.simple_request(**params)
@@ -870,7 +870,7 @@ class DataSite(APISite):
         params.update(
             {'baserevid': baserevid,
              'action': action,
-             'token': self.tokens['edit'],
+             'token': self.tokens['csrf'],
              'bot': kwargs.pop('bot', True),
              })
         params.update(prepare_data(action, action_data))
@@ -940,7 +940,7 @@ class DataSite(APISite):
             'lexemeId': lexeme.getID(),
             'data': json.dumps(form.toJSON()),
             'bot': bot,
-            'token': self.tokens['edit'],
+            'token': self.tokens['csrf'],
         }
         if baserevid:
             params['baserevid'] = baserevid
@@ -965,7 +965,7 @@ class DataSite(APISite):
             'action': 'wblremoveform',
             'id': form.getID(),
             'bot': bot,
-            'token': self.tokens['edit'],
+            'token': self.tokens['csrf'],
         }
         if baserevid:
             params['baserevid'] = baserevid
@@ -995,7 +995,7 @@ class DataSite(APISite):
             'formId': form.getID(),
             'data': json.dumps(data),
             'bot': bot,
-            'token': self.tokens['edit'],
+            'token': self.tokens['csrf'],
         }
         if baserevid:
             params['baserevid'] = baserevid

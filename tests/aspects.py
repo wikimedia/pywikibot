@@ -1404,7 +1404,8 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
     """Test cases for deprecation function in the tools module."""
 
     _generic_match = re.compile(
-        r'.* is deprecated(?: for \d+ [^;]*)?(; use .* instead)?\.')
+        r'.* is deprecated(?: since release [\d.]+ [^;]*)?'
+        r'(; use .* instead)?\.')
 
     source_adjustment_skips = [
         unittest.case._AssertRaisesContext,

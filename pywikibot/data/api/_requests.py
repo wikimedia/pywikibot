@@ -917,7 +917,12 @@ The text message is:
         self.wait(delay)
 
     def _bad_token(self, code) -> bool:
-        """Check for bad token."""
+        """Check for bad token.
+
+        Check for bad tokens, call :meth:`TokenWallet.update_tokens()
+        <pywikibot.site._tokenwallet.TokenWallet.update_tokens>` method
+        to update the bunch of tokens and continue loop in :meth:`submit`.
+        """
         if code != 'badtoken':  # Other code not handled here
             return False
 
@@ -926,40 +931,12 @@ The text message is:
                           .format(self.site._loginstatus.name))
             return False
 
-        user_tokens = self.site.tokens._tokens[self.site.user()]
-        # all token values mapped to their type
-        tokens = {token: t_type for t_type, token in user_tokens.items()}
-        # determine which tokens are bad
-        invalid_param = {name: tokens[param[0]]
-                         for name, param in self._params.items()
-                         if len(param) == 1 and param[0] in tokens}
-        # doesn't care about the cache so can directly load them
-        if invalid_param:
-            pywikibot.log(
-                'Bad token error for {}. Tokens for "{}" used in request; '
-                'invalidated them.'
-                .format(self.site.user(),
-                        '", "'.join(sorted(set(invalid_param.values())))))
-            # invalidate superior wiki cookies (T224712)
-            pywikibot.data.api._invalidate_superior_cookies(self.site.family)
-            # request new token(s) instead of invalid
-            self.site.tokens.load_tokens(set(invalid_param.values()))
-            # fix parameters; lets hope that it doesn't mistake actual
-            # parameters as tokens
-            for name, t_type in invalid_param.items():
-                self[name] = self.site.tokens[t_type]
-            return True
-
-        # otherwise couldn't find any … weird there is nothing what
-        # can be done here because it doesn't know which parameters
-        # to fix
-        pywikibot.log(
-            'Bad token error for {} but no parameter is using a '
-            'token. Current tokens: {}'
-            .format(self.site.user(),
-                    ', '.join('{}: {}'.format(*e)
-                              for e in user_tokens.items())))
-        return False
+        # invalidate superior wiki cookies (T224712)
+        pywikibot.data.api._invalidate_superior_cookies(self.site.family)
+        # update tokens
+        tokens = self.site.tokens.update_tokens(self._params['token'])
+        self._params['token'] = tokens
+        return True
 
     def submit(self) -> dict:
         """

@@ -249,7 +249,7 @@ class User(Page):
         params = {
             'action': 'emailuser',
             'target': self.username,
-            'token': self.site.tokens['email'],
+            'token': self.site.tokens['csrf'],
             'subject': subject,
             'text': text,
         }
