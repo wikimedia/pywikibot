@@ -224,7 +224,7 @@ class SandboxBot(Bot, ConfigParserBot):
                             'Standard content was changed, sandbox cleaned.')
                     else:
                         edit_delta = (datetime.datetime.utcnow()
-                                      - sandbox_page.editTime())
+                                      - sandbox_page.latest_revision.timestamp)
                         delta = self.delay_td - edit_delta
                         # Is the last edit more than 'delay' minutes ago?
                         if delta <= datetime.timedelta(0):

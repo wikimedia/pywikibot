@@ -93,11 +93,11 @@ class TestSiteMergeHistory(TestCase):
 
         source.text = 'Lorem ipsum dolor sit amet'
         source.save()
-        first_rev = source.editTime()
+        first_rev = source.latest_revision.timestamp
 
         source.text = 'Lorem ipsum dolor sit amet is a common test phrase'
         source.save()
-        second_rev = source.editTime()
+        second_rev = source.latest_revision.timestamp
 
         dest.text = 'Merge history page unit test destination'
         dest.save()

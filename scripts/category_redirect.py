@@ -174,9 +174,7 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
         """Return True if cat not edited during cooldown period, else False."""
         today = pywikibot.Timestamp.now()
         deadline = today + timedelta(days=-self.opt.delay)
-        if cat.editTime() is None:
-            raise RuntimeError
-        return deadline > cat.editTime()
+        return deadline > cat.latest_revision.timestamp
 
     def get_log_text(self):
         """Rotate log text and return the most recent text."""

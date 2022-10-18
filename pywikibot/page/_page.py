@@ -54,6 +54,7 @@ from pywikibot.site import Namespace, NamespaceArgType
 from pywikibot.tools import (
     ComparableMixin,
     cached,
+    deprecated,
     first_upper,
     issue_deprecation_warning,
     remove_last_args,
@@ -510,8 +511,20 @@ class BasePage(ComparableMixin):
         self._revid = value
 
     @property
-    def latest_revision(self):
-        """Return the current revision for this page."""
+    def latest_revision(self) -> 'pywikibot.page.Revision':
+        """Return the current revision for this page.
+
+        **Example:**
+
+        >>> site = pywikibot.Site()
+        >>> page = pywikibot.Page(site, 'Main Page')
+        ... # get the latest timestamp of that page
+        >>> edit_time = page.latest_revision.timestamp
+        >>> type(edit_time)
+        <class 'pywikibot.time.Timestamp'>
+
+        .. seealso:: :attr:`oldest_revision`
+        """
         rev = self._latest_cached_revision()
         if rev is not None:
             return rev
@@ -725,8 +738,14 @@ class BasePage(ComparableMixin):
 
         return None
 
+    @deprecated('latest_revision.timestamp', since='8.0.0')
     def editTime(self) -> pywikibot.Timestamp:
-        """Return timestamp of last revision to page."""
+        """Return timestamp of last revision to page.
+
+        .. deprecated:: 8.0.0
+           Use :attr:`latest_revision.timestamp<latest_revision>`
+           instead.
+        """
         return self.latest_revision.timestamp
 
     def exists(self) -> bool:
@@ -740,11 +759,19 @@ class BasePage(ComparableMixin):
         raise InvalidPageError(self)
 
     @property
-    def oldest_revision(self):
-        """
-        Return the first revision of this page.
+    def oldest_revision(self) -> 'pywikibot.page.Revision':
+        """Return the first revision of this page.
 
-        :rtype: :py:obj:`Revision`
+        **Example:**
+
+        >>> site = pywikibot.Site()
+        >>> page = pywikibot.Page(site, 'Main Page')
+        ... # get the creation timestamp of that page
+        >>> creation_time = page.oldest_revision.timestamp
+        >>> type(creation_time)
+        <class 'pywikibot.time.Timestamp'>
+
+        .. seealso:: :attr:`latest_revision`
         """
         return next(self.revisions(reverse=True, total=1))
 
