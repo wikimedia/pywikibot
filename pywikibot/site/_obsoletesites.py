@@ -19,10 +19,6 @@ class RemovedSite(BaseSite):
 class ClosedSite(APISite):
     """Site closed to read-only mode."""
 
-    def __init__(self, code, fam, user=None) -> None:
-        """Initializer."""
-        super().__init__(code, fam, user)
-
     def _closed_error(self, notice: str = '') -> None:
         """An error instead of pointless API call."""
         pywikibot.error('Site {} has been closed. {}'.format(self.sitename,
@@ -44,10 +40,8 @@ class ClosedSite(APISite):
         self._closed_error('No recent changes can be returned.')
 
     def is_uploaddisabled(self) -> bool:
-        """Return True if upload is disabled on site."""
-        if not hasattr(self, '_uploaddisabled'):
-            self._uploaddisabled = True
-        return self._uploaddisabled
+        """Upload is disabled on site."""
+        return True
 
     def newpages(self, **kwargs) -> None:
         """An error instead of pointless API call."""

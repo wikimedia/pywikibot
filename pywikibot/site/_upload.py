@@ -318,12 +318,9 @@ class Uploader:
 
                         try:
                             data = req.submit()['upload']
-                            self.site._uploaddisabled = False
                         except APIError as error:
                             # TODO: catch and process foreseeable errors
-                            if error.code == 'uploaddisabled':
-                                self.site._uploaddisabled = True
-                            elif error.code == 'stashfailed' \
+                            if error.code == 'stashfailed' \
                                     and 'offset' in error.other:
                                 # TODO: Ask MediaWiki to change this
                                 # ambiguous error code.
@@ -455,15 +452,7 @@ class Uploader:
             if not result:
                 request['watch'] = self.watch
                 request['ignorewarnings'] = ignore_all_warnings
-                try:
-                    result = request.submit()
-                    self.site._uploaddisabled = False
-                except APIError as error:
-                    # TODO: catch and process foreseeable errors
-                    if error.code == 'uploaddisabled':
-                        self.site._uploaddisabled = True
-                    raise error
-                result = result['upload']
+                result = request.submit()['upload']
                 pywikibot.debug(result)
 
             if 'result' not in result:
