@@ -375,23 +375,31 @@ def messages_available() -> bool:
 
     To determine if messages are available, it looks for the package name
     set using :py:obj:`set_messages_package` for a message bundle called
-    'pywikibot' containing messages.
+    ``pywikibot`` containing messages.
+
+    >>> from pywikibot import i18n
+    >>> i18n.messages_available()
+    True
+    >>> old_package = i18n._messages_package_name  # save the old package name
+    >>> i18n.set_messages_package('foo')
+    >>> i18n.messages_available()
+    False
+    >>> i18n.set_messages_package(old_package)
+    >>> i18n.messages_available()
+    True
     """
     global _messages_available
     if _messages_available is not None:
         return _messages_available
+
     try:
         mod = __import__(_messages_package_name, fromlist=['__path__'])
     except ImportError:
         _messages_available = False
         return False
 
-    if not os.listdir(next(iter(mod.__path__))):
-        _messages_available = False
-        return False
-
-    _messages_available = True
-    return True
+    _messages_available = bool(os.listdir(next(iter(mod.__path__))))
+    return _messages_available
 
 
 def _altlang(lang: str) -> List[str]:
@@ -815,9 +823,33 @@ def twget_keys(twtitle: str) -> List[str]:
 def bundles(stem: bool = False) -> Generator[Union[Path, str], None, None]:
     """A generator which yields message bundle names or its path objects.
 
-    :param stem: yield the Path.stem if True and the Path object otherwise
+    The bundle name usually corresponds with the script name which is
+    localized.
+
+    With ``stem=True`` the bundle names are given:
+
+    >>> from pywikibot import i18n
+    >>> bundles = sorted(i18n.bundles(stem=True))
+    >>> len(bundles)
+    37
+    >>> bundles[:4]
+    ['add_text', 'archivebot', 'basic', 'blockpageschecker']
+    >>> bundles[-5:]
+    ['undelete', 'unprotect', 'unusedfiles', 'weblinkchecker', 'welcome']
+    >>> 'pywikibot' in bundles
+    True
+
+    With ``stem=False`` we get Path objects:
+
+    >>> path = next(i18n.bundles())
+    >>> path.is_dir()
+    True
+    >>> path.parent.as_posix()
+    'scripts/i18n'
 
     .. versionadded:: 7.0
+
+    :param stem: yield the Path.stem if True and the Path object otherwise
     """
     for dirpath in Path(*_messages_package_name.split('.')).iterdir():
         if dirpath.is_dir() and not dirpath.match('*__'):  # ignore cache
@@ -830,14 +862,31 @@ def bundles(stem: bool = False) -> Generator[Union[Path, str], None, None]:
 def known_languages() -> List[str]:
     """All languages we have localizations for.
 
+    >>> from pywikibot import i18n
+    >>> i18n.known_languages()[:10]
+    ['ab', 'aeb', 'af', 'am', 'an', 'ang', 'anp', 'ar', 'arc', 'ary']
+    >>> i18n.known_languages()[-10:]
+    ['vo', 'vro', 'wa', 'war', 'xal', 'xmf', 'yi', 'yo', 'yue', 'zh']
+    >>> len(i18n.known_languages())
+    253
+
+    The implementation is roughly equivalent to:
+
+    .. code-block:: Python
+
+       langs = set()
+       for dirpath in bundles():
+           for fname in dirpath.iterdir():
+               if fname.suffix == '.json':
+                   langs.add(fname.stem)
+        return sorted(langs)
+
     .. versionadded:: 7.0
     """
-    langs = set()
-    for dirpath in bundles():
-        for fname in dirpath.iterdir():
-            if fname.suffix == '.json':
-                langs.add(fname.stem)
-    return sorted(langs)
+    return sorted(
+        {fname.stem for dirpath in bundles() for fname in dirpath.iterdir()
+         if fname.suffix == '.json'}
+    )
 
 
 def input(twtitle: str,
