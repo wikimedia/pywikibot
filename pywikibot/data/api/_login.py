@@ -19,7 +19,11 @@ __all__ = ['LoginManager']
 
 class LoginManager(login.LoginManager):
 
-    """Supply login_to_site method to use API interface."""
+    """Supply login_to_site method to use API interface.
+
+    .. versionchanged:: 8.0
+       2FA login was enabled.
+    """
 
     # API login parameters mapping
     mapping = {
@@ -67,6 +71,9 @@ class LoginManager(login.LoginManager):
 
         Note, this doesn't do anything with cookies. The http module
         takes care of all the cookie stuff. Throws exception on failure.
+
+        .. versionchanged:: 8.0
+           2FA login was enabled.
         """
         if hasattr(self, '_waituntil') \
            and datetime.datetime.now() < self._waituntil:
@@ -121,6 +128,15 @@ class LoginManager(login.LoginManager):
                 self.site.tokens.clear()
                 login_request[
                     self.keyword('token')] = self.site.tokens['login']
+                continue
+
+            if status == 'UI':
+                oathtoken = pywikibot.input(response['message'], password=True)
+                login_request['OATHToken'] = oathtoken
+                login_request['logincontinue'] = True
+                del login_request['username']
+                del login_request['password']
+                del login_request['rememberMe']
                 continue
 
             # messagecode was introduced with 1.29.0-wmf.14
