@@ -431,7 +431,9 @@ def get_charset_from_content_type(content_type: str) -> Optional[str]:
     return charset
 
 
-def _get_encoding_from_response_headers(response) -> Optional[str]:
+def _get_encoding_from_response_headers(
+    response: requests.Response
+) -> Optional[str]:
     """Return charset given by the response header."""
     content_type = response.headers.get('content-type')
 
@@ -458,9 +460,10 @@ def _get_encoding_from_response_headers(response) -> Optional[str]:
     return header_encoding
 
 
-def _decide_encoding(response, charset) -> Optional[str]:
+def _decide_encoding(response: requests.Response,
+                     charset: Optional[str] = None) -> Optional[str]:
     """Detect the response encoding."""
-    def _try_decode(content, encoding):
+    def _try_decode(content: bytes, encoding: Optional[str]) -> Optional[str]:
         """Helper function to try decoding."""
         if encoding is None:
             return None
