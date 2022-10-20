@@ -66,7 +66,7 @@ class TestDryApiFunctions(DefaultDrySiteTestCase):
 
     @suppress_warnings(
         'Instead of using kwargs |Both kwargs and parameters are set',
-        FutureWarning)
+        DeprecationWarning)
     def test_mixed_mode(self):
         """Test if parameters is used with kwargs."""
         req1 = api.Request(site=self.site, action='test', parameters='foo')

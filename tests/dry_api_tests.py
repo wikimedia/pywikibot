@@ -61,8 +61,8 @@ class DryCachedRequestTests(SiteAttributeTestCase):
         self.diffsite = CachedRequest(
             expiry=1, site=self.altsite,
             parameters={'action': 'query', 'meta': 'userinfo'})
-        # When using ** the parameters are still unicode
-        with suppress_warnings('Instead of using kwargs ', FutureWarning):
+
+        with suppress_warnings('Instead of using kwargs ', DeprecationWarning):
             self.deprecated_explicit = CachedRequest(
                 expiry=1, site=self.basesite, action='query', meta='userinfo')
             self.deprecated_asterisks = CachedRequest(
