@@ -1,6 +1,13 @@
 Current release 8.0.0
 ^^^^^^^^^^^^^^^^^^^^^
 
+* Enable 2FA login (:phab:`T186274`)
+* :meth:`Page.editTime()<page.BasePage.editTime>` was replaced by
+  :attr:`Page.latest_revision.timestamp<page.BasePage.latest_revision>`
+* Raise a generic ServerError if requests response is a ServerError (:phab:`T320590`)
+* Add a new variable 'private_folder_permission' to config.py (:phab:`T315045`)
+* Fix disolving script_paths for site-package (:phab:`T320530`)
+* Respect limit argument with Board.topics() (:phab:`T138215`, :phab:`T138307`)
 * The ``parent_id`` and ``content_model`` attributes of :class:`page.Revision` were removed in favour of ``parentid`` and ``contentmodel``
 * Support for MediaWiki < 1.27 was dropped
 * ListBoxWindows class of :mod:`userinterfaces.gui` was removed
@@ -15,6 +22,8 @@ Current release 8.0.0
 Deprecations
 ^^^^^^^^^^^^
 
+* 8.0.0: :meth:`Page.editTime()<page.BasePage.editTime>` method is deprecated and should be replaced by
+  :attr:`Page.latest_revision.timestamp<page.BasePage.latest_revision>`
 * 7.7.0: :mod:`tools.threading` classes should no longer imported from :mod:`tools`
 * 7.6.0: :mod:`tools.itertools` datatypes should no longer imported from :mod:`tools`
 * 7.6.0: :mod:`tools.collections` datatypes should no longer imported from :mod:`tools`
