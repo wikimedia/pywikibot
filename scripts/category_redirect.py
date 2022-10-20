@@ -358,27 +358,33 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
                        .format(len(nonemptypages)))
 
         for cat in pagegenerators.PreloadingGenerator(nonemptypages):
+            i18n_param = {'oldcat': cat.title(as_link=True, textlink=True)}
+
             try:
                 if not cat.isCategoryRedirect():
                     message = i18n.twtranslate(
-                        self.site, 'category_redirect-log-false-positive',
-                        {'oldcat': cat.title(as_link=True, textlink=True)})
+                        self.site,
+                        'category_redirect-log-false-positive',
+                        i18n_param
+                    )
                     self.log_text.append(message)
                     continue
             except Error:
-                message = i18n.twtranslate(
-                    self.site, 'category_redirect-log-not-loaded',
-                    {'oldcat': cat.title(as_link=True, textlink=True)})
+                message = i18n.twtranslate(self.site,
+                                           'category_redirect-log-not-loaded',
+                                           i18n_param)
                 self.log_text.append(message)
                 continue
+
             cat_title = cat.title(with_ns=False)
             if not self.ready_to_edit(cat):
                 counts[cat_title] = None
-                message = i18n.twtranslate(
-                    self.site, 'category_redirect-log-skipping',
-                    {'oldcat': cat.title(as_link=True, textlink=True)})
+                message = i18n.twtranslate(self.site,
+                                           'category_redirect-log-skipping',
+                                           i18n_param)
                 self.log_text.append(message)
                 continue
+
             dest = cat.getCategoryRedirectTarget()
             if not dest.exists():
                 message = i18n.twtranslate(
@@ -392,12 +398,13 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
                 with suppress(Exception):
                     cat.save()
                 continue
+
             if dest.isCategoryRedirect():
                 double = dest.getCategoryRedirectTarget()
                 if double in (dest, cat):
-                    message = i18n.twtranslate(
-                        self.site, 'category_redirect-log-loop',
-                        {'oldcat': dest.title(as_link=True, textlink=True)})
+                    message = i18n.twtranslate(self.site,
+                                               'category_redirect-log-loop',
+                                               i18n_param)
                     self.log_text.append(message)
                     # do a null edit on cat
                     with suppress(Exception):
