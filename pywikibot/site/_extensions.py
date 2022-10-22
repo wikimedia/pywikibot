@@ -29,12 +29,11 @@ class EchoMixin:
     def notifications(self, **kwargs):
         """Yield Notification objects from the Echo extension.
 
-        :keyword format: If specified, notifications will be returned formatted
-            this way. Its value is either 'model', 'special' or None. Default
-            is 'special'.
-        :type format: str or None
+        :keyword Optional[str] format: If specified, notifications will
+            be returned formatted this way. Its value is either ``model``,
+            ``special`` or ``None``. Default is ``special``.
 
-        Refer API reference for other keywords.
+        .. seealso:: :api:`Notifications` for other keywords.
         """
         params = {
             'action': 'query',
@@ -48,19 +47,16 @@ class EchoMixin:
         data = self.simple_request(**params).submit()
         notifications = data['query']['notifications']['list']
 
-        # Support API before 1.27.0-wmf.22
-        if hasattr(notifications, 'values'):
-            notifications = notifications.values()
-
         return (Notification.fromJSON(self, notification)
                 for notification in notifications)
 
     @need_extension('Echo')
-    def notifications_mark_read(self, **kwargs):
+    def notifications_mark_read(self, **kwargs) -> bool:
         """Mark selected notifications as read.
 
+        .. seealso:: :api:`echomarkread`
+
         :return: whether the action was successful
-        :rtype: bool
         """
         # TODO: ensure that the 'echomarkread' action
         # is supported by the site
