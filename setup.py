@@ -27,34 +27,13 @@
 import os
 import re
 import sys
+from setuptools import setup
 
 if sys.version_info[:3] >= (3, 9):
     List = list
 else:
     from typing import List
 
-
-VERSIONS_REQUIRED_MESSAGE = """
-Pywikibot is not available on:
-{version}
-
-This version of Pywikibot only supports Python 3.6.1+.
-"""
-
-try:
-    from setuptools import setup
-except SyntaxError:
-    raise RuntimeError(VERSIONS_REQUIRED_MESSAGE.format(version=sys.version))
-
-
-def python_is_supported() -> bool:
-    """Check that Python is supported."""
-    return sys.version_info[:3] >= (3, 6, 1)
-
-
-if not python_is_supported():  # pragma: no cover
-    # pwb.py checks this exception
-    raise RuntimeError(VERSIONS_REQUIRED_MESSAGE.format(version=sys.version))
 
 # ------- setup extra_requires ------- #
 extra_deps = {
