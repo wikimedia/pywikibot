@@ -312,7 +312,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                         '"template_total_protection"'
                         .format(self.site.sitename))
 
-                replacement = '|'.join(ttp + tsp + (tu or ''))
+                replacement = '|'.join(ttp + tsp + (tu or []))
                 text, changes = re.subn(
                     f'<noinclude>({replacement})</noinclude>',
                     '', text)
@@ -383,7 +383,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                     pywikibot.info('The page is movable for all, deleting the '
                                    'template...')
                     # Deleting the template because the page doesn't need it.
-                    replacement = '|'.join(tsmp + ttmp + (tu or ''))
+                    replacement = '|'.join(tsmp + ttmp + (tu or []))
                     text, changes = re.subn(
                         f'<noinclude>({replacement})</noinclude>',
                         '', text)
