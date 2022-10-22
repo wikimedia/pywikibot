@@ -48,7 +48,7 @@ from pywikibot.page._decorators import allow_asynchronous
 from pywikibot.page._filepage import FilePage
 from pywikibot.page._page import BasePage
 from pywikibot.site import DataSite, Namespace
-from pywikibot.tools import cached, first_upper
+from pywikibot.tools import cached, deprecated_args, first_upper
 
 
 __all__ = (
@@ -1288,22 +1288,26 @@ class ItemPage(WikibasePage):
             self._isredir = True
             self._redirtarget = item
 
+    @deprecated_args(botflag='bot')  # since 9.3.0
     def set_redirect_target(
         self,
-        target_page,
+        target_page: 'ItemPage' | str,
         create: bool = False,
         force: bool = False,
         keep_section: bool = False,
         save: bool = True,
         **kwargs
-    ):
-        """
-        Make the item redirect to another item.
+    ) -> None:
+        """Make the item redirect to another item.
 
-        You need to define an extra argument to make this work, like save=True
+        You need to define an extra argument to make this work, like
+        :code:`save=True`.
 
-        :param target_page: target of the redirect, this argument is required.
-        :type target_page: pywikibot.page.ItemPage or string
+        .. versionchanged:: 9.3
+           *botflag* keyword parameter was renamed to *bot*.
+
+        :param target_page: target of the redirect, this argument is
+            required.
         :param force: if true, it sets the redirect target even the page
             is not redirect.
         """
@@ -1311,13 +1315,16 @@ class ItemPage(WikibasePage):
             target_page = pywikibot.ItemPage(self.repo, target_page)
         elif self.repo != target_page.repo:
             raise InterwikiRedirectPageError(self, target_page)
+
         if self.exists() and not self.isRedirectPage() and not force:
             raise IsNotRedirectPageError(self)
+
         if not save or keep_section or create:
             raise NotImplementedError
+
         data = self.repo.set_redirect_target(
             from_item=self, to_item=target_page,
-            bot=kwargs.get('botflag', True))
+            bot=kwargs.get('bot', True))
         if data.get('success', 0):
             del self.latest_revision_id
             self._isredir = True

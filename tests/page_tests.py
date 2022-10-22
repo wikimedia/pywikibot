@@ -1073,7 +1073,7 @@ class TestPageDelete(TestCase):
         p = pywikibot.Page(site, 'User:Unicodesnowman/DeleteTest')
         # Ensure the page exists
         p.text = 'pywikibot unit test page'
-        p.save('Pywikibot unit test', botflag=True)
+        p.save('Pywikibot unit test', bot=True)
 
         # Test deletion
         res = p.delete(reason='Pywikibot unit test', prompt=False, mark=False)
