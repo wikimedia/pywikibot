@@ -55,7 +55,7 @@ from pywikibot.exceptions import (
 )
 from pywikibot.login import LoginStatus as _LoginStatus
 from pywikibot.site._basesite import BaseSite
-from pywikibot.site._decorators import need_right, need_version
+from pywikibot.site._decorators import need_right
 from pywikibot.site._extensions import (
     EchoMixin,
     FlowMixin,
@@ -2056,7 +2056,6 @@ class APISite(
     }
 
     @need_right('mergehistory')
-    @need_version('1.27.0-wmf.13')
     def merge_history(
         self,
         source: 'pywikibot.page.BasePage',
@@ -2066,7 +2065,10 @@ class APISite(
     ) -> None:
         """Merge revisions from one page into another.
 
-        .. seealso:: :api:`Mergehistory`
+        .. seealso::
+
+           - :api:`Mergehistory`
+           - :meth:`page.BasePage.merge_history` (should be preferred)
 
         Revisions dating up to the given timestamp in the source will be
         moved into the destination page history. History merge fails if
@@ -2079,6 +2081,10 @@ class APISite(
             will be merged into the destination page (if not given or False,
             all revisions will be merged)
         :param reason: Optional reason for the history merge
+        :raises APIError: unexpected APIError
+        :raises Error: expected APIError or unexpected response
+        :raises NoPageError: *source* or *dest* does not exist
+        :raises PageSaveRelatedError: *source* is equal to *dest*
         """
         # Data for error messages
         errdata = {
