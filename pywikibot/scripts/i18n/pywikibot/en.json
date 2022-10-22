@@ -1,0 +1,25 @@
+{
+	"@metadata": {
+		"authors": [
+			"Daniel Herding",
+			"Huji",
+			"Siebrand",
+			"Revi",
+			"Russell Blau",
+			"Xqt"
+		]
+	},
+	"pywikibot-cosmetic-changes": "; cosmetic changes",
+	"pywikibot-enter-category-name": "Please enter the category name:",
+	"pywikibot-enter-file-links-processing": "Links to which file page should be processed?",
+	"pywikibot-enter-finished-browser": "Press Enter when finished in browser.",
+	"pywikibot-enter-namespace-number": "Please enter a namespace by its number:",
+	"pywikibot-enter-new-text": "Please enter the new text:",
+	"pywikibot-enter-page-processing": "Which page should be processed?",
+	"pywikibot-enter-xml-filename": "Please enter the XML dump's filename:",
+	"pywikibot-fixes-fckeditor": "Bot: Fixing rich-editor html",
+	"pywikibot-fixes-isbn": "Bot: Formatting ISBN",
+	"pywikibot-fixes-html": "Bot: Converting/fixing HTML",
+	"pywikibot-fixes-syntax": "Bot: Fixing wiki syntax",
+	"pywikibot-touch": "Pywikibot touch edit"
+}

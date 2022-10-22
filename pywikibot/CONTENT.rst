@@ -162,15 +162,15 @@ The contents of the package
     |                            | WikiMedia family within seconds. Useful for bots     |
     |                            | running on multiple sites.                           |
     +----------------------------+------------------------------------------------------+
-    | pwb.py                     | Code entry wrapper script (site-package only)        |
-    +----------------------------+------------------------------------------------------+
     | shell.py                   | Spawns an interactive Python shell with pywikibot    |
     |                            | imported                                             |
     +----------------------------+------------------------------------------------------+
     | version.py                 | Outputs Pywikibot's revision number, Python's        |
     |                            | version and OS used.                                 |
     +----------------------------+------------------------------------------------------+
-    | i18n (folder)              | Contains i18n translations (site-package only)       |
+    | wrapper.py                 | Code entry wrapper script                            |
+    +----------------------------+------------------------------------------------------+
+    | i18n (folder)              | Contains i18n translations                           |
     +----------------------------+------------------------------------------------------+
 
 

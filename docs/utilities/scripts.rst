@@ -8,7 +8,7 @@ Framework Utility Scripts Description
 pwb wrapper script description
 ------------------------------
 
-.. automodule:: pwb
+.. automodule:: pywikibot.scripts.wrapper
    :no-members:
    :noindex:
 

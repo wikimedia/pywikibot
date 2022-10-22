@@ -289,7 +289,7 @@ def main() -> None:  # pragma: no cover
         },
         entry_points={
             'console_scripts': [
-                'pwb = pywikibot.scripts.pwb:run',
+                'pwb = pywikibot.scripts.wrapper:run',
             ],
         },
         classifiers=[
