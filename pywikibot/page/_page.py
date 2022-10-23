@@ -1782,20 +1782,20 @@ class BasePage(ComparableMixin):
                    if isinstance(user, pywikibot.User) else cnt[user]
                    for user in contributors)
 
-    def merge_history(self, dest, timestamp=None, reason=None) -> None:
-        """
-        Merge revisions from this page into another page.
+    def merge_history(self,
+                      dest: 'BasePage',
+                      timestamp: Optional[pywikibot.Timestamp] = None,
+                      reason: Optional[str] = None) -> None:
+        """Merge revisions from this page into another page.
 
-        See :py:obj:`APISite.merge_history` for details.
+        .. seealso:: :meth:`APISite.merge_history()
+           <pywikibot.site._apisite.APISite.merge_history>` for details.
 
         :param dest: Destination page to which revisions will be merged
-        :type dest: pywikibot.Page
         :param timestamp: Revisions from this page dating up to this timestamp
             will be merged into the destination page (if not given or False,
             all revisions will be merged)
-        :type timestamp: pywikibot.Timestamp
         :param reason: Optional reason for the history merge
-        :type reason: str
         """
         self.site.merge_history(self, dest, timestamp, reason)
 
@@ -1809,7 +1809,7 @@ class BasePage(ComparableMixin):
         Move this page to a new title.
 
         .. versionchanged:: 7.2
-           The `movesubpages` parameter was added
+           The *movesubpages* parameter was added
 
         :param newtitle: The new page title.
         :param reason: The edit summary for the move.
