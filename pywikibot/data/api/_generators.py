@@ -605,13 +605,15 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
         while True:
             prev_limit, new_limit = self._handle_query_limit(
                 prev_limit, new_limit, previous_result_had_data)
+
             if not hasattr(self, 'data'):
                 self.data = self.request.submit()
+
             if not self.data or not isinstance(self.data, dict):
                 pywikibot.debug(
                     '{}: stopped iteration because no dict retrieved from api.'
                     .format(type(self).__name__))
-                return
+                break
 
             if 'query' in self.data and self.resultkey in self.data['query']:
                 resultdata = self._get_resultdata()
@@ -621,10 +623,12 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
                         for item in self.data['query']['normalized']}
                 else:
                     self.normalized = {}
+
                 try:
                     yield from self._extract_results(resultdata)
                 except RuntimeError:
-                    return
+                    break
+
                 # self.resultkey in data in last request.submit()
                 previous_result_had_data = True
             else:
@@ -632,23 +636,27 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
                     pywikibot.log("%s: 'query' not found in api response." %
                                   self.__class__.__name__)
                     pywikibot.log(str(self.data))
+
                 # if (query-)continue is present, self.resultkey might not have
                 # been fetched yet
                 if self.continue_name not in self.data:
-                    # No results.
-                    return
+                    break  # No results.
+
                 # self.resultkey not in data in last request.submit()
                 # only "(query-)continue" was retrieved.
                 previous_result_had_data = False
+
             if self.modules[0] == 'random':
                 # "random" module does not return "(query-)continue"
                 # now we loop for a new random query
                 del self.data  # a new request is needed
                 continue
+
             if self.continue_name not in self.data:
-                return
+                break
+
             if self.continue_update():
-                return
+                break
 
             del self.data  # a new request with (query-)continue is needed
 
