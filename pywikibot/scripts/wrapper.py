@@ -308,8 +308,8 @@ except RuntimeError as e:  # pragma: no cover
 
         print('NOTE: user-config.py was not found!')
         print('Please follow the prompts to create it:')
-        run_python_file(str(wrapper_dir.joinpath(
-            'pywikibot', 'scripts', 'generate_user_files.py')), [])
+        run_python_file(
+            str(wrapper_dir.joinpath('generate_user_files.py')), [])
         # because we have loaded pywikibot without user-config.py loaded,
         # we need to re-start the entire process. Ask the user to do so.
         print('Now, you have to re-execute the command to start your script.')

@@ -377,20 +377,22 @@ def get_base_dir(test_directory: Optional[str] = None,
 
     if not os.path.isabs(base_dir):
         base_dir = os.path.normpath(os.path.join(os.getcwd(), base_dir))
+
     # make sure this path is valid and that it contains user-config file
     if not os.path.isdir(base_dir):
         raise RuntimeError(f"Directory '{base_dir}' does not exist.")
+
     # check if config_file is in base_dir
     if not exists(base_dir):
-        exc_text = 'No {} found in directory {!r}.\n'.format(
-            config_file, base_dir)
+        exc_text = f'No {config_file} found in directory {base_dir!r}.\n'
 
         if __no_user_config is None:
             assert get_base_dir.__doc__ is not None
             exc_text += (
-                '  Please check that {0} is stored in the correct location.\n'
-                '  Directory where {0} is searched is determined as follows:'
-                '\n\n    '.format(config_file)) + get_base_dir.__doc__
+                '\nPlease check that {0} is stored in the correct location.'
+                '\nDirectory where {0} is searched is determined as follows:'
+                '\n\n    '.format(config_file)
+            ) + get_base_dir.__doc__
             raise RuntimeError(exc_text)
 
         if __no_user_config != '2':

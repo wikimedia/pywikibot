@@ -7,7 +7,9 @@
 #
 # Distributed under the terms of the MIT license.
 #
+import runpy
 import sys
+from pathlib import Path
 
 VERSIONS_REQUIRED_MESSAGE = """
 Pywikibot is not available on:
@@ -28,8 +30,8 @@ if not python_is_supported():  # pragma: no cover
 
 def main():
     """Entry point for :func:`tests.utils.execute_pwb`."""
-    from pywikibot.scripts import wrapper
-    wrapper.main()
+    path = Path().resolve() / 'pywikibot' / 'scripts' / 'wrapper.py'
+    runpy.run_path(str(path), run_name='__main__')
 
 
 if __name__ == '__main__':
