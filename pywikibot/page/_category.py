@@ -32,20 +32,30 @@ class Category(Page):
                              .format(self.title()))
 
     def aslink(self, sort_key: Optional[str] = None) -> str:
-        """
-        Return a link to place a page in this Category.
+        """Return a link to place a page in this Category.
 
-        Use this only to generate a "true" category link, not for interwikis
-        or text links to category pages.
+        .. warning:: Use this only to generate a "true" category link,
+           not for interwikis or text links to category pages.
+
+        **Usage:**
+
+        >>> site = pywikibot.Site('wikipedia:test')
+        >>> cat = pywikibot.Category(site, 'Foo')
+        >>> cat.aslink()
+        '[[Category:Foo]]'
+        >>> cat = pywikibot.Category(site, 'Foo', sort_key='bar')
+        >>> cat.aslink()
+        '[[Category:Foo|bar]]'
+        >>> cat.aslink('baz')
+        '[[Category:Foo|baz]]'
 
         :param sort_key: The sort key for the article to be placed in this
             Category; if omitted, default sort key is used.
         """
         key = sort_key or self.sortKey
+        title_with_sort_key = self.title(with_section=False)
         if key is not None:
-            title_with_sort_key = self.title(with_section=False) + '|' + key
-        else:
-            title_with_sort_key = self.title(with_section=False)
+            title_with_sort_key += '|' + key
         return f'[[{title_with_sort_key}]]'
 
     def subcategories(self,
