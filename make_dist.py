@@ -68,7 +68,7 @@ class SetupBase(abc.ABC):
         self.nodist = nodist
         self.folder = Path().resolve()
 
-    def clear_old_dist(self) -> None:
+    def clear_old_dist(self) -> None:  # pragma: no cover
         """Delete old dist folders.
 
         .. versionadded:: 7.5
@@ -87,7 +87,7 @@ class SetupBase(abc.ABC):
     def cleanup(self) -> None:
         """Cleanup copied files."""
 
-    def run(self) -> None:
+    def run(self) -> None:  # pragma: no cover
         """Run the installer script."""
         if self.upgrade:
             check_call('python -m pip install --upgrade pip', shell=True)
@@ -190,7 +190,7 @@ def handle_args() -> Tuple[bool, bool, bool, bool, bool]:
     return local, remote, clear, upgrade, nodist
 
 
-def main() -> None:
+def main() -> None:  # pragma: no cover
     """Script entry point."""
     args = handle_args()
     SetupPywikibot(*args).run()
