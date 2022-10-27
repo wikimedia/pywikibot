@@ -111,20 +111,16 @@ class Throttle:
             return
 
         for line in lines:
-            # parse line; format is "pid timestamp site"
+            # parse line; format is "module_id pid timestamp site"
             try:
-                items = line.split(' ')
-                if len(items) == 3:  # read legacy format
-                    _id, _pid, _time, _site = self._module_hash(), *items
-                else:
-                    _id, _pid, _time, _site = items
+                _id, _pid, _time, _site = line.split(' ')
                 proc_entry = ProcEntry(
                     module_id=_id,
                     pid=int(_pid),
                     time=int(float(_time)),
                     site=_site.rstrip()
                 )
-            except (IndexError, ValueError):
+            except (IndexError, ValueError):  # pragma: no cover
                 # Sometimes the file gets corrupted ignore that line
                 continue
             yield proc_entry
