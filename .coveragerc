@@ -14,7 +14,8 @@ exclude_lines =
     raise NotImplementedError
     raise unittest\.SkipTest
     self\.skipTest
-    if .PYWIKIBOT_TEST_.*. in os.environ:
+    if .+PYWIKIBOT_TEST_\w+.+:
     if self\.mw_version < .+:
+    if TYPE_CHECKING:
     @(abc\.)?abstractmethod
     @deprecated\([^\)]+\)
