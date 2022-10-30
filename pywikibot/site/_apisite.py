@@ -2756,40 +2756,16 @@ class APISite(
     def is_uploaddisabled(self) -> bool:
         """Return True if upload is disabled on site.
 
-        When the version is at least 1.27wmf9, uses general siteinfo.
-        If not called directly, it is cached by the first attempted
-        upload action.
+        **Example:**
+
+        >>> site = pywikibot.Site('commons')
+        >>> site.is_uploaddisabled()
+        False
+        >>> site = pywikibot.Site('wikidata')
+        >>> site.is_uploaddisabled()
+        True
         """
-        if self.mw_version >= '1.27wmf9':
-            return not self._siteinfo.get('general')['uploadsenabled']
-
-        if hasattr(self, '_uploaddisabled'):
-            return self._uploaddisabled
-
-        # attempt a fake upload; on enabled sites will fail for:
-        # missingparam: One of the parameters
-        #    filekey, file, url, statuskey is required
-        # TODO: is there another way?
-        req = self._request(throttle=False,
-                            parameters={'action': 'upload',
-                                        'token': self.tokens['csrf']})
-        try:
-            req.submit()
-        except APIError as error:
-            if error.code == 'uploaddisabled':
-                self._uploaddisabled = True
-            elif error.code == 'missingparam':
-                # If the upload module is enabled, the above dummy request
-                # does not have sufficient parameters and will cause a
-                # 'missingparam' error.
-                self._uploaddisabled = False
-            else:
-                # Unexpected error
-                raise
-            return self._uploaddisabled
-
-        raise RuntimeError(
-            'Unexpected success of upload action without parameters.')
+        return not self.siteinfo.get('general')['uploadsenabled']
 
     def stash_info(
         self,
@@ -2830,6 +2806,11 @@ class APISite(
         :return: It returns True if the upload was successful and False
             otherwise.
         """
+        if self.is_uploaddisabled():
+            pywikibot.error(
+                f'Upload error: Local file uploads are disabled on {self}.')
+            return False
+
         return Uploader(self, filepage, **kwargs).upload()
 
     def get_property_names(self, force: bool = False) -> List[str]:

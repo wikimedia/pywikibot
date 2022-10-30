@@ -901,12 +901,12 @@ class TestUploadEnabledSite(TestCase):
         'wikidatatest': {
             'family': 'wikidata',
             'code': 'test',
-            'enabled': False,
+            'disabled': True,
         },
         'wikipediatest': {
             'family': 'wikipedia',
             'code': 'test',
-            'enabled': True,
+            'disabled': False,
         }
     }
 
@@ -915,10 +915,7 @@ class TestUploadEnabledSite(TestCase):
     def test_is_uploaddisabled(self, key):
         """Test is_uploaddisabled()."""
         site = self.get_site(key)
-        if self.sites[key]['enabled']:
-            self.assertFalse(site.is_uploaddisabled())
-        else:
-            self.assertTrue(site.is_uploaddisabled())
+        self.assertEqual(site.is_uploaddisabled(), self.sites[key]['disabled'])
 
 
 class TestSametitleSite(TestCase):
