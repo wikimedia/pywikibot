@@ -131,7 +131,6 @@ class Category(Page):
 
     def articles(self, *,
                  recurse: Union[int, bool] = False,
-                 total: Optional[int] = None,
                  **kwargs: Any) -> Iterable[Page]:
         """
         Yield all articles in the current category.
@@ -152,8 +151,48 @@ class Category(Page):
         3
         4
 
-        .. versionchanged:: 8.0.0
+        .. versionchanged:: 8.0
            all parameters are keyword arguments only.
+
+        :param recurse: if not False or 0, also iterate articles in
+            subcategories. If an int, limit recursion to this number of
+            levels. (Example: ``recurse=1`` will iterate articles in
+            first-level subcats, but no deeper.)
+        :param kwargs: Additional parameters. Refer to
+            :meth:`APISite.categorymembers()
+            <pywikibot.site._generators.GeneratorsMixin.categorymembers>`
+            for complete list (*member_type* excluded).
+        """
+        if kwargs.pop('member_type', False):
+            raise TypeError(
+                "articles() got an unexpected keyword argument 'member_type'")
+
+        return self.members(
+            member_type=['page', 'file'], recurse=recurse, **kwargs)
+
+    def members(self, *,
+                recurse: bool = False,
+                total: Optional[int] = None,
+                **kwargs: Any) -> Iterable[Page]:
+        """Yield all category contents (subcats, pages, and files).
+
+        **Usage:**
+
+        >>> site = pywikibot.Site('wikipedia:test')
+        >>> cat = pywikibot.Category(site, 'Pywikibot')
+        >>> list(cat.members(member_type='subcat'))
+        [Category('Category:Subpage testing')]
+        >>> list(cat.members(member_type=['page', 'file']))
+        [Page('Pywikibot nobots test')]
+
+        Calling this method with ``member_type='subcat'`` is *almost*
+        equal to calling :meth:`subcategories`. Calling this method with
+        ``member_type=['page', 'file']`` is equal to calling
+        :meth:`articles`.
+
+        .. versionchanged:: 8.0
+           all parameters are keyword arguments only. Additional
+           parameters are supported.
 
         :param recurse: if not False or 0, also iterate articles in
             subcategories. If an int, limit recursion to this number of
@@ -164,17 +203,10 @@ class Category(Page):
         :param kwargs: Additional parameters. Refer to
             :meth:`APISite.categorymembers()
             <pywikibot.site._generators.GeneratorsMixin.categorymembers>`
-            for complete list (*member_type* excluded).
+            for complete list.
         """
-        if kwargs.pop('member_type', False):
-            raise TypeError(
-                "articles() got an unexpected keyword argument 'member_type'")
-
         seen = set()
-        for member in self.site.categorymembers(self,
-                                                total=total,
-                                                member_type=['page', 'file'],
-                                                **kwargs):
+        for member in self.site.categorymembers(self, total=total, **kwargs):
             if recurse:
                 seen.add(hash(member))
             yield member
@@ -186,45 +218,16 @@ class Category(Page):
         if recurse:
             if not isinstance(recurse, bool) and recurse:
                 recurse -= 1
+
             for subcat in self.subcategories():
-                for article in subcat.articles(recurse=recurse,
-                                               total=total,
-                                               **kwargs):
-                    hash_value = hash(article)
+                for member in subcat.members(
+                        recurse=recurse, total=total, **kwargs):
+                    hash_value = hash(member)
                     if hash_value in seen:
                         continue
 
                     seen.add(hash_value)
-                    yield article
-                    if total is None:
-                        continue
-
-                    total -= 1
-                    if total == 0:
-                        return
-
-    def members(self, recurse: bool = False,
-                namespaces=None,
-                total: Optional[int] = None,
-                content: bool = False):
-        """Yield all category contents (subcats, pages, and files).
-
-        :rtype: typing.Iterable[pywikibot.Page]
-        """
-        for member in self.site.categorymembers(
-                self, namespaces=namespaces, total=total, content=content):
-            yield member
-            if total is not None:
-                total -= 1
-                if total == 0:
-                    return
-        if recurse:
-            if not isinstance(recurse, bool) and recurse:
-                recurse -= 1
-            for subcat in self.subcategories():
-                for article in subcat.members(
-                        recurse, namespaces, total=total, content=content):
-                    yield article
+                    yield member
                     if total is None:
                         continue
 
