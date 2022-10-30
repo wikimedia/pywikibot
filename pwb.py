@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """pwb caller script to invoke the :mod:`pywikibot.scripts.wrapper` script.
 
 .. versionadded:: 8.0
