@@ -8,6 +8,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
+import runpy
 import sys
 
 VERSIONS_REQUIRED_MESSAGE = """
@@ -29,9 +30,8 @@ if not python_is_supported():  # pragma: no cover
 
 def main():
     """Entry point for :func:`tests.utils.execute_pwb`."""
-    import runpy
     from pathlib import Path
-    path = Path().resolve() / 'pywikibot' / 'scripts' / 'wrapper.py'
+    path = Path(__file__).parent / 'pywikibot' / 'scripts' / 'wrapper.py'
     runpy.run_path(str(path), run_name='__main__')
 
 
