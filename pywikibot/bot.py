@@ -1000,7 +1000,7 @@ def handle_args(args: Optional[Iterable[str]] = None,
         except (UnknownFamilyError, UnknownSiteError):
             pywikibot.exception(exc_info=False)
             sys.exit(1)
-        if calledModuleName() == 'pwb':
+        if calledModuleName() == 'wrapper':
             pywikibot._sites.clear()
 
     if username:
