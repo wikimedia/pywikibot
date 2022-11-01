@@ -58,25 +58,38 @@ class Category(Page):
             title_with_sort_key += '|' + key
         return f'[[{title_with_sort_key}]]'
 
-    def subcategories(self,
+    def subcategories(self, *,
                       recurse: Union[int, bool] = False,
-                      total: Optional[int] = None,
-                      content: bool = False):
-        """
-        Iterate all subcategories of the current category.
+                      **kwargs: Any) -> Iterable[Page]:
+        """Iterate all subcategories of the current category.
 
-        :param recurse: if not False or 0, also iterate subcategories of
+        **Usage:**
+
+        >>> site = pywikibot.Site('wikipedia:en')
+        >>> cat = pywikibot.Category(site, 'Contents')
+        >>> next(cat.subcategories())
+        Category('Category:Wikipedia administration')
+        >>> len(list(cat.subcategories(recurse=2, total=50)))
+        50
+
+        .. seealso:: :attr:`categoryinfo`
+
+        .. versionchanged:: 8.0
+           all parameters are keyword arguments only. Additional
+           parameters are supported.
+
+        :param recurse: if not False or 0, also iterate articles in
             subcategories. If an int, limit recursion to this number of
-            levels. (Example: recurse=1 will iterate direct subcats and
-            first-level sub-sub-cats, but no deeper.)
-        :param total: iterate no more than this number of
-            subcategories in total (at all levels)
-        :param content: if True, retrieve the content of the current version
-            of each category description page (default False)
+            levels. (Example: ``recurse=1`` will iterate articles in
+            first-level subcats, but no deeper.)
+        :param kwargs: Additional parameters. Refer to
+            :meth:`APISite.categorymembers()
+            <pywikibot.site._generators.GeneratorsMixin.categorymembers>`
+            for complete list (*member_type* excluded).
         """
-
-        def is_cache_valid(cache: dict, content: bool) -> bool:
-            return cache['content'] or not content
+        if kwargs.pop('member_type', False):
+            raise TypeError('subcategories() got an unexpected keyword '
+                            "argument 'member_type'")
 
         if not self.categoryinfo['subcats']:
             return
@@ -84,50 +97,8 @@ class Category(Page):
         if not isinstance(recurse, bool) and recurse:
             recurse -= 1
 
-        if (not hasattr(self, '_subcats')
-                or not is_cache_valid(self._subcats, content)):
-            cache = {'data': [], 'content': content}
-
-            for subcat in self.site.categorymembers(
-                    self, member_type='subcat', total=total, content=content):
-                cache['data'].append(subcat)
-                yield subcat
-                if total is not None:
-                    total -= 1
-                    if total == 0:
-                        return
-
-                if recurse:
-                    for item in subcat.subcategories(
-                            recurse, total=total, content=content):
-                        yield item
-                        if total is None:
-                            continue
-
-                        total -= 1
-                        if total == 0:
-                            return
-
-            # cache is valid only if all subcategories are fetched (T88217)
-            self._subcats = cache
-        else:
-            for subcat in self._subcats['data']:
-                yield subcat
-                if total is not None:
-                    total -= 1
-                    if total == 0:
-                        return
-
-                if recurse:
-                    for item in subcat.subcategories(
-                            recurse, total=total, content=content):
-                        yield item
-                        if total is None:
-                            continue
-
-                        total -= 1
-                        if total == 0:
-                            return
+        yield from self.members(member_type='subcat', recurse=recurse,
+                                **kwargs)
 
     def articles(self, *,
                  recurse: Union[int, bool] = False,
