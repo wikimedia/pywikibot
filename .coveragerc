@@ -11,6 +11,7 @@ exclude_lines =
     except pkg_resources
     except \w*ServerError
     except SyntaxError
+    raise ImportError
     raise NotImplementedError
     raise unittest\.SkipTest
     self\.skipTest
