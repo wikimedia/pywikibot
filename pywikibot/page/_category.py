@@ -8,7 +8,7 @@ from collections import defaultdict
 from typing import Any, Optional, Union
 
 import pywikibot
-from pywikibot.backports import Generator, Iterable
+from pywikibot.backports import Dict, Generator, Iterable
 from pywikibot.page._page import Page
 
 
@@ -185,10 +185,13 @@ class Category(Page):
         >>> list(cat.members(member_type=['page', 'file']))
         [Page('Pywikibot nobots test')]
 
-        Calling this method with ``member_type='subcat'`` is *almost*
-        equal to calling :meth:`subcategories`. Calling this method with
+        Calling this method with ``member_type='subcat'`` is equal to
+        calling :meth:`subcategories`. Calling this method with
         ``member_type=['page', 'file']`` is equal to calling
         :meth:`articles`.
+
+        .. seealso:: :meth:`APISite.categorymembers()
+           <pywikibot.site._generators.GeneratorsMixin.categorymembers>`
 
         .. versionchanged:: 8.0
            all parameters are keyword arguments only. Additional
@@ -245,13 +248,14 @@ class Category(Page):
         return 'hiddencat' in self.properties()
 
     @property
-    def categoryinfo(self) -> dict:
-        """
-        Return a dict containing information about the category.
+    def categoryinfo(self) -> Dict[str, Any]:
+        """Return a dict containing information about the category.
 
-        The dict contains values for:
+        The dict contains values for numbers of pages, subcategories,
+        files, and total contents.
 
-        Numbers of pages, subcategories, files, and total contents.
+        .. seealso:: :meth:`APISite.categoryinfo()
+           <pywikibot.site._apisite.APISite.categoryinfo>`
         """
         return self.site.categoryinfo(self)
 
