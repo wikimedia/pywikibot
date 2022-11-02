@@ -1293,7 +1293,7 @@ class Subject(interwiki_graph.Subject):
         """Return True if all the work for this subject has completed."""
         return not self.todo
 
-    def problem(self, txt, createneed: bool = True) -> None:
+    def problem(self, txt: str, createneed: bool = True) -> None:
         """Report a problem with the resolution of this subject."""
         pywikibot.error(txt)
         self.confirm = True
@@ -1328,7 +1328,7 @@ class Subject(interwiki_graph.Subject):
                 if site != self.origin.site:
                     new[site].append(page)
                 elif page != self.origin:
-                    self.problem('Found link to ' + page)
+                    self.problem(f'Found link to {page}')
                     self.whereReport(page)
                     errorCount += 1
 
@@ -1336,7 +1336,7 @@ class Subject(interwiki_graph.Subject):
         for site, pages in new.items():
             if len(pages) > 1:
                 errorCount += 1
-                self.problem('Found more than one link for ' + site)
+                self.problem(f'Found more than one link for {site}')
 
         if not errorCount and not self.conf.select:
             # no errors, so all lists have only one item
@@ -1359,7 +1359,7 @@ class Subject(interwiki_graph.Subject):
                 continue
 
             pywikibot.info('=' * 30)
-            pywikibot.info('Links to ' + site)
+            pywikibot.info(f'Links to {site}')
             for i, page2 in enumerate(pages, 1):
                 pywikibot.info(f'  ({i}) Found link to {page2} in:')
                 self.whereReport(page2, indent=8)
