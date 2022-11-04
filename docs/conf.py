@@ -43,7 +43,7 @@ import pywikibot  # noqa: E402
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #
-needs_sphinx = '5.1.1'
+needs_sphinx = '5.2.3'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -367,6 +367,7 @@ todo_include_todos = True
 autodoc_typehints = 'description'
 # autosectionlabel_prefix_document = True
 suppress_warnings = ['autosectionlabel.*']
+toc_object_entries_show_parents = 'hide'
 
 # Allow lines like "Example:" to be followed by a code block
 napoleon_use_admonition_for_examples = True
