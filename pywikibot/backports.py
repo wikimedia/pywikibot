@@ -9,6 +9,7 @@ from typing import Any
 
 
 PYTHON_VERSION = sys.version_info[:3]
+SPHINX_RUNNING = 'sphinx' in sys.modules
 
 # functools.cache
 if PYTHON_VERSION >= (3, 9):
@@ -19,19 +20,24 @@ else:
 
 
 # context
-if PYTHON_VERSION < (3, 7):
+if PYTHON_VERSION < (3, 7) or SPHINX_RUNNING:
 
     class nullcontext:  # noqa: N801
 
-        """Dummy context manager for Python 3.5/3.6 that does nothing."""
+        """Context manager that does no additional processing.
 
-        def __init__(self, result: Any = None) -> None:  # noqa: D107
-            self.result = result
+        .. seealso:: :python:`contextlib.nullcontext
+           <library/contextlib.html#contextlib.nullcontext>`,
+           backported from Python 3.7.
+        """
+
+        def __init__(self, enter_result: Any = None) -> None:  # noqa: D107
+            self.enter_result = enter_result
 
         def __enter__(self) -> Any:
-            return self.result
+            return self.enter_result
 
-        def __exit__(self, *args: Any) -> None:
+        def __exit__(self, *excinfo: Any) -> None:
             pass
 else:
     from contextlib import nullcontext  # type: ignore[misc]
@@ -102,13 +108,18 @@ else:
 
 
 # PEP 616 string methods
-if PYTHON_VERSION >= (3, 9):
-    removeprefix = str.removeprefix  # type: ignore[attr-defined]
-    removesuffix = str.removesuffix  # type: ignore[attr-defined]
-else:
+if PYTHON_VERSION < (3, 9) or SPHINX_RUNNING:
     def removeprefix(string: str, prefix: str) -> str:  # skipcq: TYP-053
         """Remove prefix from a string or return a copy otherwise.
 
+        >>> removeprefix('TestHook', 'Test')
+        'Hook'
+        >>> removeprefix('BaseTestCase', 'Test')
+        'BaseTestCase'
+
+        .. seealso:: :python:`str.removeprefix
+           <library/stdtypes.html#str.removeprefix>`,
+           backported from Python 3.9.
         .. versionadded:: 5.4
         """
         if string.startswith(prefix):
@@ -116,26 +127,40 @@ else:
         return string
 
     def removesuffix(string: str, suffix: str) -> str:  # skipcq: TYP-053
-        """Remove prefix from a string or return a copy otherwise.
+        """Remove suffix from a string or return a copy otherwise.
 
+        >>> removesuffix('MiscTests', 'Tests')
+        'Misc'
+        >>> removesuffix('TmpDirMixin', 'Tests')
+        'TmpDirMixin'
+
+        .. seealso:: :python:`str.removesuffix
+           <library/stdtypes.html#str.removesuffix>`,
+           backported from Python 3.9.
         .. versionadded:: 5.4
         """
         if string.endswith(suffix):
             return string[:-len(suffix)]
         return string
+else:
+    removeprefix = str.removeprefix  # type: ignore[attr-defined]
+    removesuffix = str.removesuffix  # type: ignore[attr-defined]
 
 
 # bpo-38200
-if PYTHON_VERSION >= (3, 10):
-    from itertools import pairwise
-else:
+if PYTHON_VERSION < (3, 10) or SPHINX_RUNNING:
     from itertools import tee
 
     def pairwise(iterable):
         """Return successive overlapping pairs taken from the input iterable.
 
+        .. seealso:: :python:`itertools.pairwise
+           <library/itertools.html#itertools.pairwise>`,
+           backported from Python 3.10.
         .. versionadded:: 7.6
         """
         a, b = tee(iterable)
         next(b, None)
         return zip(a, b)
+else:
+    from itertools import pairwise

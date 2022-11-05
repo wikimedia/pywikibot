@@ -18,7 +18,6 @@ coverage:
         enabled: yes
 
   ignore:
-    - pywikibot/backports.py
     - pywikibot/daemonize.py
     - pywikibot/families/__init__.py
     - pywikibot/scripts/preload_sites.py
