@@ -28,7 +28,7 @@ jobs:
       max-parallel: 1
 
       matrix:
-        python-version: ["pypy3.7", "3.6", "3.7", "3.8", "3.9", "3.10"]
+        python-version: ["pypy3.7", "3.6", "3.7", "3.8", "3.9", "3.10", "3.11"]
         site: ["wikipedia:en", "wikisource:zh"]
         test_prod_only: [true]
         include:
@@ -53,19 +53,28 @@ jobs:
             site: "wikidata:wikidata"
           - python-version: "3.8"
             site: "wowwiki:uk"
-          - python-version: "3.11.0-alpha - 3.11.0"
+          - python-version: "3.12"
             site: "wikipedia:test"
           - python-version: "3"
             site: "wikipedia:de"
             os: macOS-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout Repository
+      uses: actions/checkout@v3
       with:
         submodules: true
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
+      if: ${{ matrix.python-version != '3.12' }}
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    # use deadsnakes/action until actions/setup-python supports Python 3.12
+    - name: Set up development Python ${{ matrix.python-version }}
+      uses: deadsnakes/action@v2.1.1
+      if: ${{ matrix.python-version == '3.12' }}
       with:
         python-version: ${{ matrix.python-version }}
 
