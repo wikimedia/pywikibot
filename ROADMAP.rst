@@ -1,6 +1,15 @@
 Current release 8.0.0
 ^^^^^^^^^^^^^^^^^^^^^
 
+* All parameters of :meth:`Category.members()<page.Category.members>`,
+  :meth:`Category.subcategories()<page.Category.subcategories>` and
+  :meth:`Category.articles()<page.Category.articles>` are keyword only
+* All parameters of :meth:`APISite.categorymembers()
+  <pywikibot.site._generators.GeneratorsMixin.categorymembers>` are provided with
+  :meth:`Category.members()<page.Category.members>`,
+  :meth:`Category.subcategories()<page.Category.subcategories>` (*member_type* excluded) and
+  :meth:`Category.articles()<page.Category.articles>` (*member_type* excluded)
+* Enable site-package installation from git repository (:phab:`T320851`)
 * Enable 2FA login (:phab:`T186274`)
 * :meth:`Page.editTime()<page.BasePage.editTime>` was replaced by
   :attr:`Page.latest_revision.timestamp<page.BasePage.latest_revision>`
@@ -22,6 +31,8 @@ Current release 8.0.0
 Deprecations
 ^^^^^^^^^^^^
 
+* 8.0.0: :meth:`APISite.messages()<pywikibot.site._apisite.APISite.messages>` method is deprecated in favour of
+  :attr:`userinfo['messages']<pywikibot.site._apisite.APISite.userinfo>`
 * 8.0.0: :meth:`Page.editTime()<page.BasePage.editTime>` method is deprecated and should be replaced by
   :attr:`Page.latest_revision.timestamp<page.BasePage.latest_revision>`
 * 7.7.0: :mod:`tools.threading` classes should no longer imported from :mod:`tools`

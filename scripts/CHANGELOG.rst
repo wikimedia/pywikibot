@@ -4,6 +4,11 @@ Scripts Changelog
 8.0.0
 -----
 
+blockpageschecker
+~~~~~~~~~~~~~~~~~
+
+* Fix neutral additive element
+
 category
 ~~~~~~~~
 
@@ -13,6 +18,12 @@ create_isbn_edition
 ~~~~~~~~~~~~~~~~~~~
 
 * Fix argument parsing
+
+interwiki
+~~~~~~~~~
+
+Fix string concatenation (:phab:`T322180`)
+
 
 7.7.0
 -----
