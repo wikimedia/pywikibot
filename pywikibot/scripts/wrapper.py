@@ -408,20 +408,20 @@ def find_filename(filename):
     if found:  # pragma: no cover
         return found
 
-    # search for system scripts in pywikibot.scripts directory
-    found = test_paths([''], wrapper_dir)
-    if found:
-        return found
-
     if not site_package:
         script_paths = [
+            'scripts.userscripts',
             'scripts',
             'scripts.maintenance',
-            'pywikibot.scripts',
         ]
         found = test_paths(script_paths, wrapper_dir.parents[1])
         if found:
             return found
+
+    # search for system scripts in pywikibot.scripts directory
+    found = test_paths([''], wrapper_dir)
+    if found:
+        return found
 
     return find_alternates(filename, path_list)
 
