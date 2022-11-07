@@ -130,7 +130,7 @@ class LoginManager(login.LoginManager):
                     self.keyword('token')] = self.site.tokens['login']
                 continue
 
-            if status == 'UI':
+            if status == 'UI':  # pragma: no cover
                 oathtoken = pywikibot.input(response['message'], password=True)
                 login_request['OATHToken'] = oathtoken
                 login_request['logincontinue'] = True
