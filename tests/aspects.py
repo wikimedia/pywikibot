@@ -944,8 +944,8 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
         if dry:
             interface = DrySite
 
+        prod_only = os.environ.get('PYWIKIBOT_TEST_PROD_ONLY', '0') == '1'
         for data in cls.sites.values():
-            prod_only = os.environ.get('PYWIKIBOT_TEST_PROD_ONLY', '0') == '1'
             if (data.get('code') in ('test', 'mediawiki')
                     and prod_only and not dry):
                 raise unittest.SkipTest(
