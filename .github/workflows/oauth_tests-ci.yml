@@ -1,5 +1,5 @@
 name: Oauth CI
-description: Run login tests using OAuth
+# Run login tests using OAuth
 
 on:
   workflow_run:

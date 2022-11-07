@@ -1,5 +1,5 @@
 name: Login CI
-description: Run login/logout tests
+# Run login/logout tests
 
 on:
   workflow_run:
