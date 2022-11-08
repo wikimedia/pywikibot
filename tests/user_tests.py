@@ -175,13 +175,15 @@ class TestUserMethods(DefaultSiteTestCase):
         """Test the User.usercontribs() method."""
         mysite = self.get_site()
         user = User(mysite, mysite.user())
-        uc = list(user.contributions(total=10))
+        uc = list(user.contributions(total=50))
         if not uc:
             self.skipTest('User {} has no contributions on site {}.'
                           .format(mysite.user(), mysite))
         self.assertLessEqual(len(uc), 10)
         self.assertEqual(uc[0], user.last_edit)
-        self.assertEqual(uc[-1], user.first_edit)
+        first_edit = uc[-1] if len(uc) < 50 else list(
+            user.contributions(total=1, reverse=True))[0]
+        self.assertEqual(first_edit, user.first_edit)
         for contrib in uc:
             self.assertIsInstance(contrib, tuple)
             self.assertLength(contrib, 4)
