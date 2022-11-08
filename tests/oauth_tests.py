@@ -26,7 +26,7 @@ class OAuthSiteTestCase(TestCase):
 
     def _get_oauth_tokens(self):
         """Get valid OAuth tokens from environment variables."""
-        tokens_env = 'OAUTH_TOKENS_' + self.family.upper()
+        tokens_env = 'OAUTH_TOKEN_' + self.family.upper()
         tokens = os.environ.get(tokens_env + '_' + self.code.upper())
         tokens = tokens or os.environ.get(tokens_env)
         return tuple(tokens.split(':')) if tokens is not None else None
@@ -45,12 +45,7 @@ class OAuthSiteTestCase(TestCase):
         self.access_token = tokens[2:]
 
 
-class DefaultOAuthSiteTestCase(DefaultSiteTestCase, OAuthSiteTestCase):
-
-    """Default OAuth site test."""
-
-
-class TestOauthLoginManger(DefaultOAuthSiteTestCase):
+class TestOauthLoginManger(DefaultSiteTestCase, OAuthSiteTestCase):
 
     """Test OAuth login manager."""
 

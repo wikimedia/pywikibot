@@ -69,7 +69,6 @@ jobs:
       uses: jungwinter/split@v2
       id: split
       with:
-        # msg: ${{ env._oauth_token_val }}
         msg: ${{ secrets[format('{0}', steps.token.outputs.uppercase)] }}
         separator: ":"
 
@@ -98,15 +97,15 @@ jobs:
         echo "noisysleep = float('inf')" >> user-config.py
         echo "maximum_GET_length = 5000" >> user-config.py
         echo "console_encoding = 'utf8'" >> user-config.py
-        echo "import os" >> user-config.py
-        echo "password_file = os.path.expanduser('passwordfile')" >> user-config.py
-        echo "('${{ env.PYWIKIBOT_USERNAME }}', '${{ secrets.PYWIKIBOT_OAUTHPWD }}')" > passwordfile
 
     - name: Test with unittest
       timeout-minutes: 1
+      env:
+        ${{ steps.token.outputs.uppercase }}: ${{ secrets[format('{0}', steps.token.outputs.uppercase)] }}
       run: |
         python pwb.py version
         coverage run -m unittest -vv tests/site_login_logout_tests.py
+        coverage run -m unittest -vv tests/oauth_tests.py
 
     - name: Upload coverage to Codecov
       run: codecov

@@ -104,7 +104,6 @@ library_test_modules = {
     'memento',
     'mysql',
     'namespace',
-    'oauth',
     'page',
     'pagegenerators',
     'paraminfo',
