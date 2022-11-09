@@ -23,10 +23,10 @@ jobs:
 
     strategy:
       fail-fast: false
-      max-parallel: 11
+      max-parallel: 15
 
       matrix:
-        python-version: ["pypy3.7", "3.6", "3.7", "3.8", "3.9", "3.10", "3.11"]
+        python-version: ["pypy3.7", "3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
         site: ['wikipedia:en', 'wikisource:zh']
         test_prod_only: [true]
         include:
@@ -46,7 +46,6 @@ jobs:
           - python-version: 3.7
             site: wikipedia:test
             write-test: true
-            experimental: true
           - python-version: 3.7
             site: wikidata:test
           - python-version: 3.9
@@ -57,8 +56,6 @@ jobs:
           - python-version: 3.8
             site: wowwiki:uk
             experimental: true
-          - python-version: 3.12
-            site: wikipedia:test
           - python-version: 3
             site: wikipedia:de
             os: macOS-latest
