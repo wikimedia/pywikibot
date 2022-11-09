@@ -80,10 +80,12 @@ class Timestamp(datetime.datetime):
         - POSIX format: seconds from Unix epoch S{1,13}[.ffffff]]
 
         .. versionadded:: 7.5
+        .. versionchanged:: 8.0
+           raises *TypeError* instead of *ValueError*.
 
         :param ts: Timestamp, datetime.datetime or str
         :return: Timestamp object
-        :raises ValueError: conversion failed
+        :raises TypeError: conversion failed
         """
         if isinstance(ts, cls):
             return ts
@@ -91,8 +93,8 @@ class Timestamp(datetime.datetime):
             return cls._from_datetime(ts)
         if isinstance(ts, str):
             return cls._from_string(ts)
-        raise ValueError('Unsupported "ts" type, got "{}" ({})'
-                         .format(ts, type(ts).__name__))
+        raise TypeError(
+            f'Unsupported "ts" type, got "{ts}" ({type(ts).__name__})')
 
     @staticmethod
     def _from_datetime(dt: datetime.datetime) -> 'Timestamp':
