@@ -123,6 +123,15 @@ Environment variables
 
   .. note:: test names must be given without subsequent ``_tests``.
 
+**PYWIKIBOT_TEST_OAUTH**
+  This environment variable holds the Oauth token. It is set by
+  ``oauth_tests-ci.yml`` CI config file and is solely used by
+  :mod:`tests.oauth_tests`. You can use it for your private tests. The
+  environment variabke must contain consumer key and secret and access
+  key and secret delimited by ``:`` as::
+
+    PYWIKIBOT_TEST_OAUTH=consumer_key:consumer_secret:access_key:access:secret
+
 **PYWIKIBOT_TEST_RUNNING**
   This environment variable skips tests instead of raising
   :exc:`exceptions.MaxlagTimeoutError` when maximum retries attempted due to
