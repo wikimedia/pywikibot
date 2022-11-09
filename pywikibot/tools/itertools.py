@@ -259,7 +259,7 @@ def filter_unique(iterable, container=None, key=None, add=None):
 
     .. warning:: This is not thread safe.
 
-    .. versionadded: 3.0
+    .. versionadded:: 3.0
 
     :param iterable: the source iterable
     :type iterable: collections.abc.Iterable

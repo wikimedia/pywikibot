@@ -602,7 +602,7 @@ def merge_unique_dicts(*args, **kwargs):
     The positional arguments are the dictionaries to be merged. It is also
     possible to define an additional dict using the keyword arguments.
 
-    .. versionadded: 3.0
+    .. versionadded:: 3.0
     """
     args = list(args) + [dict(kwargs)]
     conflicts = set()
@@ -625,7 +625,7 @@ def file_mode_checker(
 ):
     """Check file mode and update it, if needed.
 
-    .. versionadded: 3.0
+    .. versionadded:: 3.0
 
     :param filename: filename path
     :param mode: requested file mode
@@ -654,7 +654,7 @@ def compute_file_hash(filename: str, sha: str = 'sha1', bytes_to_read=None):
 
     Result is expressed as hexdigest().
 
-    .. versionadded: 3.0
+    .. versionadded:: 3.0
 
     :param filename: filename path
     :param sha: hashing function among the following in hashlib:

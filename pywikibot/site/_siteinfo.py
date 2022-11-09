@@ -63,7 +63,7 @@ class Siteinfo(Container):
     def clear(self) -> None:
         """Remove all items from Siteinfo.
 
-        .. versionadded: 7.1
+        .. versionadded:: 7.1
         """
         self._cache.clear()
 

@@ -791,7 +791,7 @@ class CheckImagesBot:
         """
         Get tuples of image and time, return the most used or oldest image.
 
-        .. versionchanged: 7.2
+        .. versionchanged:: 7.2
            itertools.zip_longest is used to stop `using_pages` as soon as
            possible.
 
