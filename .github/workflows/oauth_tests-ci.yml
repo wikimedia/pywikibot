@@ -6,7 +6,7 @@ on:
     branches: [ master ]
 
 concurrency:
-  group: ${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
@@ -16,7 +16,7 @@ env:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     timeout-minutes: 2
 
     strategy:
@@ -24,7 +24,6 @@ jobs:
       max-parallel: 15
 
       matrix:
-        os: [ "windows-latest", "macOS-latest", "ubuntu-latest" ]
         python-version: ["pypy3.7", "3.11", "3.10", "3.9", "3.8", "3.7", "3.6"]
         family: ['wikipedia']
         code: ['test']
