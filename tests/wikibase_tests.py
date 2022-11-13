@@ -92,7 +92,9 @@ class TestGeneral(WikidataTestCase):
         self.assertEqual(item.getID(), 'Q5296')
         self.assertEqual(item.title(), 'Q5296')
         self.assertIn('en', item.labels)
-        self.assertTrue(item.labels['en'].lower().endswith('main page'))
+        self.assertTrue(
+            item.labels['en'].lower().endswith('main page'),
+            msg=f"\nitem.labels['en'] of item Q5296 is {item.labels['en']!r}")
         self.assertIn('en', item.aliases)
         self.assertIn('home page', (a.lower() for a in item.aliases['en']))
         self.assertEqual(item.namespace(), 0)
