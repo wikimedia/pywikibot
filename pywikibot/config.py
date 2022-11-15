@@ -29,6 +29,9 @@ utility methods to build paths relative to base_dir:
 
 .. versionchanged:: 6.2
    config2 was renamed to config
+.. versionchanged:: 8.0
+   Editor settings has been revised. *editor* variable is None by
+   default. Editor detection functions were moved to :mod:`editor`.
 """
 #
 # (C) Pywikibot team, 2003-2022
@@ -71,8 +74,6 @@ _ValueType = TypeVar('_ValueType')
 
 OSWIN32 = (sys.platform == 'win32')
 
-if OSWIN32:
-    import winreg
 
 # This frozen set should contain all imported modules/variables, so it must
 # occur directly after the imports. At that point globals() only contains the
@@ -568,9 +569,14 @@ tkhorsize = 1280
 tkvertsize = 800
 
 # ############# EXTERNAL EDITOR SETTINGS ##############
-# The command for the editor you want to use. If set to None, a simple Tkinter
-# editor will be used.
-editor = os.environ.get('EDITOR')
+# The command for the editor you want to use. If set to True, Tkinter
+# editor will be used. If set to False, no editor will be used. In
+# script tests to be a noop (like /bin/true) so the script continues.
+# If set to None, the EDITOR environment variable will be used as
+# command. If EDITOR is not set, on windows plattforms it tries to
+# determine the default text editor from registry. Finally, Tkinter is
+# used as fallback.
+editor: Union[bool, str, None] = None
 
 # Warning: DO NOT use an editor which doesn't support Unicode to edit pages!
 # You will BREAK non-ASCII symbols!
@@ -925,51 +931,6 @@ def shortpath(path: str) -> str:
     return path
 
 
-def _win32_extension_command(extension: str) -> Optional[str]:
-    """Get the command from the Win32 registry for an extension."""
-    fileexts_key = \
-        r'Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts'
-    key_name = fileexts_key + r'\.' + extension + r'\OpenWithProgids'
-    try:
-        key1 = winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_name)
-        _prog_id = winreg.EnumValue(key1, 0)[0]
-        _key2 = winreg.OpenKey(winreg.HKEY_CLASSES_ROOT,
-                               fr'{_prog_id}\shell\open\command')
-        _cmd = winreg.QueryValueEx(_key2, '')[0]
-        # See T102465 for issues relating to using this value.
-        cmd = _cmd
-        if cmd.find('%1'):
-            cmd = cmd[:cmd.find('%1')]
-            # Remove any trailing character, which should be a quote or space
-            # and then remove all whitespace.
-            return cmd[:-1].strip()
-    except OSError as e:
-        # Catch any key lookup errors
-        output('Unable to detect program for file extension "{}": {!r}'
-               .format(extension, e))
-    return None
-
-
-def _detect_win32_editor() -> Optional[str]:
-    """Detect the best Win32 editor."""
-    # Notepad is even worse than our Tkinter editor.
-    unusable_exes = ['notepad.exe',
-                     'py.exe',
-                     'pyw.exe',
-                     'python.exe',
-                     'pythonw.exe']
-
-    for ext in ['py', 'txt']:
-        editor = _win32_extension_command(ext)
-        if editor:
-            for unusable in unusable_exes:
-                if unusable in editor.lower():
-                    break
-            else:
-                return editor
-    return None
-
-
 # System-level and User-level changes.
 # Store current variables and their types.
 _public_globals = {
@@ -1106,18 +1067,6 @@ for _key in _modified:
 
 if console_encoding is None:
     console_encoding = 'utf-8'
-
-if OSWIN32 and editor is None:
-    editor = _detect_win32_editor()
-
-# single character string literals from
-# https://docs.python.org/3/reference/lexical_analysis.html#string-and-bytes-literals
-# encode('unicode-escape') also changes Unicode characters
-if OSWIN32 and editor and set(editor) & set('\a\b\f\n\r\t\v'):
-    warning(
-        'The editor path contains probably invalid escaped characters. Make '
-        'sure to use a raw-string (r"..." or r\'...\'), forward slashes as a '
-        'path delimiter or to escape the normal path delimiter.')
 
 if userinterface_lang is None:
     userinterface_lang = os.getenv('PYWIKIBOT_USERINTERFACE_LANG') \

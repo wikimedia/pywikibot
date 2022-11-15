@@ -5,6 +5,7 @@
    moved to pywikibot.scripts folder.
 .. versionchanged:: 8.0
    let user the choice which section to be copied.
+...Also EXTERNAL EDITOR SETTINGS section can be copied.
 """
 #
 # (C) Pywikibot team, 2010-2022
@@ -30,7 +31,6 @@ PYTHON_VERSION = sys.version_info[:2]
 # DISABLED_SECTIONS cannot be copied; variables must be set manually
 DISABLED_SECTIONS = {
     'USER INTERFACE SETTINGS',  # uses sys
-    'EXTERNAL EDITOR SETTINGS',  # uses os
 }
 OBSOLETE_SECTIONS = {
     'ACCOUNT SETTINGS',  # already set
