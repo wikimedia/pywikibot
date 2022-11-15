@@ -27,7 +27,7 @@ utility methods to build paths relative to base_dir:
  - datafilepath
  - shortpath
 
-.. versionchanged 6.2::
+.. versionchanged:: 6.2
    config2 was renamed to config
 """
 #

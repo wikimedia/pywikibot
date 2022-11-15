@@ -544,7 +544,7 @@ class MultipleChoiceList(ListOption):
 
     """An option to select multiple items from a list.
 
-    .. versionadded 3.0
+    .. versionadded:: 3.0
     """
 
     def test(self, value: str) -> bool:
@@ -575,7 +575,7 @@ class ShowingMultipleChoiceList(ShowingListOption, MultipleChoiceList):
 
     """An option to show a list and select multiple items.
 
-    .. versionadded 3.0
+    .. versionadded:: 3.0
     """
 
 

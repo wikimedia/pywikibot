@@ -1,9 +1,9 @@
 """Family module for Foundation wiki.
 
-.. versionadded 3.0
+.. versionadded:: 3.0
 """
 #
-# (C) Pywikibot team, 2019-2021
+# (C) Pywikibot team, 2019-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -14,7 +14,7 @@ class Family(family.WikimediaFamily, family.SingleSiteFamily):
 
     """Family class for Foundation wiki.
 
-    .. versionadded 3.0
+    .. versionadded:: 3.0
     """
 
     name = 'foundation'
