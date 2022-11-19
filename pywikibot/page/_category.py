@@ -72,11 +72,43 @@ class Category(Page):
         >>> len(list(cat.subcategories(recurse=2, total=50)))
         50
 
-        .. seealso:: :attr:`categoryinfo`
+        Subcategories of the same level of each subtree are yielded
+        first before the next subcategories level are yielded. For example
+        having this category tree:
 
+        .. code-block:: text
+
+           A
+           +-- B
+           |   +-- E
+           |   |   +-- H
+           |   +-- F
+           |   +-- G
+           +-- C
+           |   +-- I
+           |   |   +-- E
+           |   |       +-- H
+           |   +-- J
+           |       +-- K
+           |       +-- L
+           |           +-- G
+           +-- D
+
+        Subcategories are yields in the following order:
+        *B, C, D, E, F, G, H, I, J, E, H, K, L, G*
+
+        .. seealso:: :attr:`categoryinfo`
+        .. warning:: Categories may have infinite recursions of
+           subcategories. If ``recurse`` option is given as ``True`` or
+           an ``int`` value and this value is less than
+           `sys.getrecursionlimit()`, an ``RecursionError`` may be
+           raised. Be careful if passing this generator to a collection
+           in such case.
         .. versionchanged:: 8.0
            all parameters are keyword arguments only. Additional
-           parameters are supported.
+           parameters are supported. The order of subcategories are
+           yielded was changed. The old order was
+           *B, E, H, F, G, C, I, E, H, J, K, L, G, D*
 
         :param recurse: if not False or 0, also iterate articles in
             subcategories. If an int, limit recursion to this number of
@@ -102,12 +134,14 @@ class Category(Page):
 
     def articles(self, *,
                  recurse: Union[int, bool] = False,
+                 total: Optional[int] = None,
                  **kwargs: Any) -> Iterable[Page]:
         """
         Yield all articles in the current category.
 
-        By default, yields all pages in the category that are not
-        subcategories.
+        Yields all pages in the category that are not subcategories.
+        Duplicates are filtered. To enable duplicates use :meth:`members`
+        with ``member_type=['page', 'file']`` instead.
 
         **Usage:**
 
@@ -122,6 +156,12 @@ class Category(Page):
         3
         4
 
+        .. warning:: Categories may have infinite recursions of
+           subcategories. If ``recurse`` option is given as ``True`` or
+           an ``int`` value and this value is less than
+           `sys.getrecursionlimit()`, an ``RecursionError`` may be
+           raised. Be careful if passing this generator to a collection
+           in such case.
         .. versionchanged:: 8.0
            all parameters are keyword arguments only.
 
@@ -129,6 +169,8 @@ class Category(Page):
             subcategories. If an int, limit recursion to this number of
             levels. (Example: ``recurse=1`` will iterate articles in
             first-level subcats, but no deeper.)
+        :param total: iterate no more than this number of pages in
+            total (at all levels)
         :param kwargs: Additional parameters. Refer to
             :meth:`APISite.categorymembers()
             <pywikibot.site._generators.GeneratorsMixin.categorymembers>`
@@ -138,8 +180,24 @@ class Category(Page):
             raise TypeError(
                 "articles() got an unexpected keyword argument 'member_type'")
 
-        return self.members(
-            member_type=['page', 'file'], recurse=recurse, **kwargs)
+        member_type = ['page', 'file']
+        if not recurse:
+            yield from self.members(
+                member_type=member_type, total=total, **kwargs)
+            return
+
+        seen = set()
+        for member in self.members(
+                member_type=member_type, recurse=recurse, **kwargs):
+            if member.pageid in seen:
+                continue
+
+            seen.add(member.pageid)
+            yield member
+            if total is not None:
+                total -= 1
+                if total == 0:
+                    return
 
     def members(self, *,
                 recurse: bool = False,
@@ -159,11 +217,16 @@ class Category(Page):
         Calling this method with ``member_type='subcat'`` is equal to
         calling :meth:`subcategories`. Calling this method with
         ``member_type=['page', 'file']`` is equal to calling
-        :meth:`articles`.
+        :meth:`articles` except that the later will filter duplicates.
 
         .. seealso:: :meth:`APISite.categorymembers()
            <pywikibot.site._generators.GeneratorsMixin.categorymembers>`
-
+        .. warning:: Categories may have infinite recursions of
+           subcategories. If ``recurse`` option is given as ``True`` or
+           an ``int`` value and this value is less than
+           `sys.getrecursionlimit()`, an ``RecursionError`` may be
+           raised. Be careful if passing this generator to a collection
+           in such case.
         .. versionchanged:: 8.0
            all parameters are keyword arguments only. Additional
            parameters are supported.
@@ -179,10 +242,7 @@ class Category(Page):
             <pywikibot.site._generators.GeneratorsMixin.categorymembers>`
             for complete list.
         """
-        seen = set()
         for member in self.site.categorymembers(self, total=total, **kwargs):
-            if recurse:
-                seen.add(hash(member))
             yield member
             if total is not None:
                 total -= 1
@@ -190,24 +250,17 @@ class Category(Page):
                     return
 
         if recurse:
-            if not isinstance(recurse, bool) and recurse:
+            if not isinstance(recurse, bool):
                 recurse -= 1
 
             for subcat in self.subcategories():
                 for member in subcat.members(
                         recurse=recurse, total=total, **kwargs):
-                    hash_value = hash(member)
-                    if hash_value in seen:
-                        continue
-
-                    seen.add(hash_value)
                     yield member
-                    if total is None:
-                        continue
-
-                    total -= 1
-                    if total == 0:
-                        return
+                    if total is not None:
+                        total -= 1
+                        if total == 0:
+                            return
 
     def isEmptyCategory(self) -> bool:  # noqa: N802
         """Return True if category has no members (including subcategories)."""

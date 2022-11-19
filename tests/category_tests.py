@@ -20,20 +20,28 @@ class TestCategoryObject(TestCase):
     NOCATEGORYNAMESPACE_RE = "'(.*?)' is not in the category namespace!"
     NOREDIRECTPAGE_RE = r'Page \[\[(.*?)\]\] is not a redirect page.'
 
-    family = 'wikipedia'
-    code = 'en'
+    sites = {
+        'enwp': {
+            'family': 'wikipedia',
+            'code': 'en',
+        },
+        'test2': {
+            'family': 'wikipedia',
+            'code': 'test2',
+        },
+    }
 
     cached = True
 
     def test_init(self):
         """Test the category's __init__ for one condition that can't be dry."""
-        site = self.get_site()
+        site = self.get_site('enwp')
         with self.assertRaisesRegex(ValueError, self.NOCATEGORYNAMESPACE_RE):
             pywikibot.Category(site, 'Wikipedia:Test')
 
     def test_is_empty(self):
         """Test if category is empty or not."""
-        site = self.get_site()
+        site = self.get_site('enwp')
         cat_empty = pywikibot.Category(site, 'Category:foooooo')
         cat_not_empty = pywikibot.Category(site,
                                            'Category:Wikipedia categories')
@@ -42,7 +50,7 @@ class TestCategoryObject(TestCase):
 
     def test_is_hidden(self):
         """Test isHiddenCategory."""
-        site = self.get_site()
+        site = self.get_site('enwp')
         cat_hidden = pywikibot.Category(site, 'Category:Hidden categories')
         cat_not_hidden = pywikibot.Category(site, 'Category:Wikipedia')
         self.assertTrue(cat_hidden.isHiddenCategory())
@@ -50,7 +58,7 @@ class TestCategoryObject(TestCase):
 
     def test_categoryinfo(self):
         """Test the categoryinfo property."""
-        site = self.get_site()
+        site = self.get_site('enwp')
         cat = pywikibot.Category(site, 'Category:Female Wikipedians')
         categoryinfo = cat.categoryinfo
         self.assertGreaterEqual(categoryinfo['files'], 0)
@@ -68,7 +76,7 @@ class TestCategoryObject(TestCase):
 
     def test_members(self):
         """Test the members method."""
-        site = self.get_site()
+        site = self.get_site('enwp')
         cat = pywikibot.Category(site, 'Category:Wikipedia legal policies')
         p1 = pywikibot.Page(site, 'Category:Wikipedia disclaimers')
         p2 = pywikibot.Page(site, 'Wikipedia:Privacy policy')
@@ -94,7 +102,7 @@ class TestCategoryObject(TestCase):
 
     def test_subcategories(self):
         """Test the subcategories method."""
-        site = self.get_site()
+        site = self.get_site('enwp')
         cat = pywikibot.Category(site, 'Category:Wikipedians by gender')
         c1 = pywikibot.Category(site, 'Category:Female Wikipedians')
         c2 = pywikibot.Category(site, 'Category:Lesbian Wikipedians')
@@ -109,7 +117,7 @@ class TestCategoryObject(TestCase):
 
     def test_subcategories_recurse(self):
         """Test the subcategories method with recurse=True."""
-        site = self.get_site()
+        site = self.get_site('enwp')
         cat = pywikibot.Category(site, 'Category:Wikipedians by gender')
         c1 = pywikibot.Category(site, 'Category:Female Wikipedians')
         c2 = pywikibot.Category(site, 'Category:Lesbian Wikipedians')
@@ -118,9 +126,24 @@ class TestCategoryObject(TestCase):
         self.assertIn(c1, subcategories_recurse)
         self.assertIn(c2, subcategories_recurse)
 
+    def test_subcategories_infinite_recurse(self):
+        """Test infinite subcategories method with recurse."""
+        site = self.get_site('test2')
+        cat = pywikibot.Category(site, 'Categories')
+        big = pywikibot.Category(site, 'Really big category')
+        result = list(cat.subcategories(recurse=3))
+        self.assertEqual(result.count(cat), 2)
+        self.assertEqual(result.count(big), 4)
+        # check that the result is balanced
+        self.assertEqual(result[:4].count(cat), 1)
+        self.assertEqual(result[:4].count(big), 2)
+
+        for member in set(result):
+            self.assertIsInstance(member, pywikibot.Category)
+
     def test_articles(self):
         """Test the articles method."""
-        site = self.get_site()
+        site = self.get_site('enwp')
         cat = pywikibot.Category(site, 'Category:Wikipedia legal policies')
         p1 = pywikibot.Page(site, 'Wikipedia:Privacy policy')
         p2 = pywikibot.Page(site, 'Wikipedia:Risk disclaimer')
@@ -142,7 +165,7 @@ class TestCategoryObject(TestCase):
 
     def test_redirects(self):
         """Test the redirects method."""
-        site = self.get_site()
+        site = self.get_site('enwp')
         cat1 = pywikibot.Category(site, 'Category:Fonts')
         cat2 = pywikibot.Category(site, 'Category:Typefaces')
 
