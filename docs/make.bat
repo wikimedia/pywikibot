@@ -10,8 +10,10 @@ if "%SPHINXBUILD%" == "" (
 set SOURCEDIR=.
 set BUILDDIR=_build
 set SPHINXPROJ=Pywikibot
+set SPHINXOPTS=%~2 %~3 %~4 %~5 %~6 %~7 %~8 %~9
 
 if "%1" == "" goto help
+if "%1" == "help" goto help
 
 %SPHINXBUILD% >NUL 2>NUL
 if errorlevel 9009 (
@@ -30,7 +32,12 @@ if errorlevel 9009 (
 goto end
 
 :help
-%SPHINXBUILD% -M help %SOURCEDIR% %BUILDDIR% %SPHINXOPTS%
+echo.
+echo make has the following options:
+echo     make ^<target^> [^<sphinx options^>]
+echo     make html -D "html_theme=basic"
+echo.
+%SPHINXBUILD% -M help %SOURCEDIR% %BUILDDIR%
 
 :end
 popd
