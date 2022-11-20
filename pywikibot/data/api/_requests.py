@@ -13,7 +13,9 @@ import pprint
 import re
 import traceback
 from collections.abc import MutableMapping
+from contextlib import suppress
 from email.mime.nonmultipart import MIMENonMultipart
+from pathlib import Path
 from typing import Any, Optional, Union
 from urllib.parse import unquote, urlencode
 from warnings import warn
@@ -1133,32 +1135,39 @@ class CachedRequest(Request):
         raise NotImplementedError('CachedRequest cannot be created simply.')
 
     @classmethod
-    def _get_cache_dir(cls) -> str:
+    def _get_cache_dir(cls) -> Path:
         """
         Return the base directory path for cache entries.
 
         The directory will be created if it does not already exist.
 
+        .. versionchanged:: 8.0
+           return a `pathlib.Path` object.
+
         :return: base directory path for cache entries
         """
-        path = os.path.join(config.base_dir,
-                            f'apicache-py{PYTHON_VERSION[0]:d}')
+        path = Path(config.base_dir, f'apicache-py{PYTHON_VERSION[0]:d}')
         cls._make_dir(path)
         cls._get_cache_dir = classmethod(lambda c: path)  # cache the result
         return path
 
     @staticmethod
-    def _make_dir(dir_name: str) -> str:
+    def _make_dir(dir_name: Union[str, Path]) -> Path:
         """Create directory if it does not exist already.
 
         .. versionchanged:: 7.0
            Only `FileExistsError` is ignored but other OS exceptions can
            be still raised
+        .. versionchanged:: 8.0
+           use *dir_name* as str or `pathlib.Path` object but always
+           return a Path object.
 
         :param dir_name: directory path
-        :return: unmodified directory name for test purpose
+        :return: directory path as `pathlib.Path` object for test purpose
         """
-        os.makedirs(dir_name, exist_ok=True)
+        if isinstance(dir_name, str):
+            dir_name = Path(dir_name)
+        dir_name.mkdir(exist_ok=True)
         return dir_name
 
     def _uniquedescriptionstr(self) -> str:
@@ -1189,9 +1198,13 @@ class CachedRequest(Request):
             self._uniquedescriptionstr().encode('utf-8')
         ).hexdigest()
 
-    def _cachefile_path(self):
-        return os.path.join(CachedRequest._get_cache_dir(),
-                            self._create_file_name())
+    def _cachefile_path(self) -> Path:
+        """Create the cachefile path.
+
+        .. versionchanged:: 8.0
+           return a `pathlib.Path` object.
+        """
+        return CachedRequest._get_cache_dir() / self._create_file_name()
 
     def _expired(self, dt):
         return dt + self.expiry < datetime.datetime.utcnow()
@@ -1204,30 +1217,39 @@ class CachedRequest(Request):
         self._add_defaults()
         try:
             filename = self._cachefile_path()
-            with open(filename, 'rb') as f:
+            with filename.open('rb') as f:
                 uniquedescr, self._data, self._cachetime = pickle.load(f)
+
             if uniquedescr != self._uniquedescriptionstr():
                 raise RuntimeError('Expected unique description for the cache '
                                    'entry is different from file entry.')
+
             if self._expired(self._cachetime):
                 self._data = None
                 return False
-            pywikibot.debug('{}: cache hit ({}) for API request: {}'
-                            .format(self.__class__.__name__, filename,
-                                    uniquedescr))
-            return True
+
+            pywikibot.debug(
+                f'{type(self).__name__}: cache ({filename.parent}) hit\n'
+                f'{filename.name}, API request:\n{uniquedescr}')
+
         except OSError:
-            # file not found
-            return False
+            pass  # file not found
         except Exception as e:
             pywikibot.info(f'Could not load cache: {e!r}')
-            return False
+        else:
+            return True
+
+        return False
 
     def _write_cache(self, data) -> None:
         """Write data to self._cachefile_path()."""
         data = (self._uniquedescriptionstr(), data, datetime.datetime.utcnow())
-        with open(self._cachefile_path(), 'wb') as f:
+        path = self._cachefile_path()
+        with suppress(OSError), path.open('wb') as f:
             pickle.dump(data, f, protocol=config.pickle_protocol)
+            return
+        # delete invalid cache entry
+        path.unlink()
 
     def submit(self):
         """Submit cached request."""

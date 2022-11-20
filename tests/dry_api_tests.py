@@ -6,6 +6,7 @@
 # Distributed under the terms of the MIT license.
 #
 import datetime
+from pathlib import Path
 from unittest.mock import patch
 
 import pywikibot
@@ -18,7 +19,7 @@ from pywikibot.data.api import (
 from pywikibot.exceptions import Error
 from pywikibot.family import Family
 from pywikibot.login import LoginStatus
-from pywikibot.tools import suppress_warnings
+from pywikibot.tools import suppress_warnings, PYTHON_VERSION
 from tests import join_images_path
 from tests.aspects import (
     DefaultDrySiteTestCase,
@@ -103,7 +104,8 @@ class DryCachedRequestTests(SiteAttributeTestCase):
     def test_get_cache_dir(self):
         """Test that 'apicache' is in the cache dir."""
         retval = self.req._get_cache_dir()
-        self.assertIn('apicache', retval)
+        self.assertIsInstance(retval, Path)
+        self.assertIn(f'apicache-py{PYTHON_VERSION[0]:d}', retval.parts)
 
     def test_create_file_name(self):
         """Test the file names for the cache."""

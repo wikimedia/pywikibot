@@ -73,6 +73,7 @@ import hashlib
 import os
 import pickle
 import sys
+from pathlib import Path
 
 import pywikibot
 from pywikibot.data import api
@@ -93,7 +94,7 @@ class CacheEntry(api.CachedRequest):
 
     """A Request cache entry."""
 
-    def __init__(self, directory, filename):
+    def __init__(self, directory: str, filename: str):
         """Initializer."""
         self.directory = directory
         self.filename = filename
@@ -104,24 +105,31 @@ class CacheEntry(api.CachedRequest):
 
     def __repr__(self):
         """Representation of object."""
-        return self._cachefile_path()
+        return str(self._cachefile_path())
 
     def _create_file_name(self):
         """Filename of the cached entry."""
         return self.filename
 
-    def _get_cache_dir(self):
-        """Directory of the cached entry."""
-        return self.directory
+    def _get_cache_dir(self) -> Path:
+        """Directory of the cached entry.
 
-    def _cachefile_path(self):
-        """Return cache file path."""
-        return os.path.join(self._get_cache_dir(),
-                            self._create_file_name())
+        .. versionchanged:: 8.0
+           return a `pathlib.Path` object.
+        """
+        return Path(self.directory)
+
+    def _cachefile_path(self) -> Path:
+        """Return cache file path.
+
+        .. versionchanged:: 8.0
+           return a `pathlib.Path` object.
+        """
+        return self._get_cache_dir() / self._create_file_name()
 
     def _load_cache(self):
         """Load the cache entry."""
-        with open(self._cachefile_path(), 'rb') as f:
+        with self._cachefile_path().open('rb') as f:
             self.key, self._data, self._cachetime = pickle.load(f)
         return True
 
@@ -206,7 +214,7 @@ class CacheEntry(api.CachedRequest):
 
     def _delete(self):
         """Delete the cache entry."""
-        os.remove(self._cachefile_path())
+        self._cachefile_path().unlink()
 
 
 def process_entries(cache_path, func, use_accesstime=None, output_func=None,
@@ -266,8 +274,7 @@ def process_entries(cache_path, func, use_accesstime=None, output_func=None,
         try:
             entry._load_cache()
         except ValueError:
-            pywikibot.error('Failed loading {}'.format(
-                entry._cachefile_path()))
+            pywikibot.error(f'Failed loading {entry._cachefile_path()}')
             pywikibot.exception()
             continue
 
