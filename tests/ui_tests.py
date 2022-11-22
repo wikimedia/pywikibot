@@ -84,7 +84,7 @@ class UITestCase(TestCaseBase):
         return self.strin.readline().strip()
 
 
-class TestExceptionError(Exception):
+class ExceptionTestError(Exception):
 
     """Test exception."""
 
@@ -154,8 +154,8 @@ class TestTerminalOutput(UITestCase):
 
     def test_exception(self):
         try:
-            raise TestExceptionError('Testing Exception')
-        except TestExceptionError:
+            raise ExceptionTestError('Testing Exception')
+        except ExceptionTestError:
             pywikibot.error('exception', exc_info=False)
         self.assertEqual(self.strout.getvalue(), '')
         self.assertEqual(self.strerr.getvalue(),
@@ -163,17 +163,17 @@ class TestTerminalOutput(UITestCase):
 
     def test_exception_empty(self):
         try:
-            raise TestExceptionError('Testing Exception')
-        except TestExceptionError:
+            raise ExceptionTestError('Testing Exception')
+        except ExceptionTestError:
             pywikibot.exception(exc_info=False)
         self.assertEqual(self.strout.getvalue(), '')
         self.assertEqual(self.strerr.getvalue(),
-                         'ERROR: Testing Exception (TestExceptionError)\n')
+                         'ERROR: Testing Exception (ExceptionTestError)\n')
 
     def test_exception_tb(self):
         try:
-            raise TestExceptionError('Testing Exception')
-        except TestExceptionError:
+            raise ExceptionTestError('Testing Exception')
+        except ExceptionTestError:
             pywikibot.exception()
         self.assertEqual(self.strout.getvalue(), '')
         stderrlines = self.strerr.getvalue().split('\n')
@@ -181,7 +181,7 @@ class TestTerminalOutput(UITestCase):
                          'ERROR: Testing Exception')
         self.assertEqual(stderrlines[1], 'Traceback (most recent call last):')
         self.assertEqual(stderrlines[3],
-                         "    raise TestExceptionError('Testing Exception')")
+                         "    raise ExceptionTestError('Testing Exception')")
 
         end_str = ': Testing Exception'
         self.assertTrue(stderrlines[-1].endswith(end_str),

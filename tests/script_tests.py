@@ -183,7 +183,7 @@ def import_script(script_name: str):
     import_module(prefix + script_name)
 
 
-class TestScriptMeta(MetaTestCaseClass):
+class ScriptTestMeta(MetaTestCaseClass):
 
     """Test meta class."""
 
@@ -327,7 +327,7 @@ class TestScriptMeta(MetaTestCaseClass):
         return super().__new__(cls, name, bases, dct)
 
 
-class TestScriptHelp(PwbTestCase, metaclass=TestScriptMeta):
+class TestScriptHelp(PwbTestCase, metaclass=ScriptTestMeta):
 
     """Test cases for running scripts with -help.
 
@@ -348,7 +348,7 @@ class TestScriptHelp(PwbTestCase, metaclass=TestScriptMeta):
 
 
 class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
-                         metaclass=TestScriptMeta):
+                         metaclass=ScriptTestMeta):
 
     """Test cases for running scripts with -siumlate.
 
@@ -388,7 +388,7 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
 
 
 class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
-                          metaclass=TestScriptMeta):
+                          metaclass=ScriptTestMeta):
 
     """Test cases for running scripts with a generator."""
 

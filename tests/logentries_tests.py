@@ -132,7 +132,7 @@ class TestLogentriesBase(TestCase):
         self.assertEqual(logentry.logid(), logentry['logid'])
 
 
-class TestLogentriesMeta(MetaTestCaseClass):
+class LogentriesTestMeta(MetaTestCaseClass):
 
     """Test meta class for TestLogentries."""
 
@@ -157,7 +157,7 @@ class TestLogentriesMeta(MetaTestCaseClass):
         return super().__new__(cls, name, bases, dct)
 
 
-class TestLogentries(TestLogentriesBase, metaclass=TestLogentriesMeta):
+class TestLogentries(TestLogentriesBase, metaclass=LogentriesTestMeta):
 
     """Test general LogEntry properties."""
 
