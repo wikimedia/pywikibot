@@ -144,8 +144,9 @@ def get_site_and_lang(
         pywikibot.info(f'The only known site code: {known_langs[0]}')
         default_lang = known_langs[0]
     else:
-        pywikibot.info('This is the list of known site oodes:')
-        pywikibot.info(', '.join(known_langs))
+        if not force:
+            pywikibot.info('This is the list of known site codes:')
+            pywikibot.info(', '.join(known_langs))
         if default_lang not in known_langs:
             if default_lang != 'en' and 'en' in known_langs:
                 default_lang = 'en'
