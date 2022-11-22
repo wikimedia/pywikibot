@@ -2,7 +2,8 @@
 #
 
 # You can set these variables from the command line.
-SPHINXOPTS    = -a
+SPHINXOPTS    = -a -j auto
+SPHINXOPTSMINI= -j auto
 SPHINXBUILD   = sphinx-build
 SPHINXPROJ    = Pywikibot
 SOURCEDIR     = .
@@ -11,6 +12,11 @@ BUILDDIR      = _build
 # Put it first so that "make" without argument is like "make help".
 help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+
+# make mini only rebuilds what has changed
+# make html and others rebuild all content (because of the -a flag)
+mini:
+	@$(SPHINXBUILD) -M html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTSMINI) $(O)
 
 .PHONY: help Makefile
 

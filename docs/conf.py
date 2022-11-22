@@ -57,6 +57,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
+    'sphinxext.opengraph',
 ]
 
 
@@ -131,7 +132,8 @@ default_role = 'py:obj'
 # show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = 'default'
+
 
 # A list of ignored prefixes for module index sorting.
 # modindex_common_prefix = []
@@ -154,7 +156,7 @@ html_theme = 'furo'
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+
 
 # Add any paths that contain custom themes here, relative to this directory.
 # html_theme_path = []
@@ -221,6 +223,12 @@ html_static_path = ['_static']
 # If true, the index is split into individual pages for each letter.
 #
 html_split_index = True
+
+docs_url = 'https://gerrit.wikimedia.org/g/pywikibot/core/%2B/HEAD/docs/'
+html_theme_options = {
+    'source_edit_link': docs_url + '{filename}',
+    'navigation_with_keys': True,
+}
 
 # If true, links to the reST sources are added to the pages.
 #
@@ -377,7 +385,9 @@ modindex_common_prefix = ['pywikibot.scripts.']
 
 # Pywikibot theme style
 html_permalinks_icon = '#'
-# html_style = 'css/pywikibot.css'
+html_css_files = [
+    'css/pywikibot.css',
+]
 
 
 extlinks = {
