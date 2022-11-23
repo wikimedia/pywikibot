@@ -424,9 +424,10 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
         'newitem',
         'pagefromfile',
         'parser_function_count',
-        'patrol'
+        'patrol',
         'protect',
         'redirect',
+        'reflinks',  # 404-links.txt is required
         'replace',
         'replicate_wiki',
         'revertbot',
