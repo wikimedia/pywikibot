@@ -86,7 +86,8 @@ NESTED_TEMPLATE_REGEX = re.compile(r"""
 # and correctly matches the end of the file link if the wikilink contains
 # [[ or ]].
 # The namespace names must be substituted into this regex.
-# e.g. FILE_LINK_REGEX % 'File' or FILE_LINK_REGEX % '|'.join(site.namespaces)
+# e.g. FILE_LINK_REGEX % 'File'
+# or FILE_LINK_REGEX % '|'.join(site.namespaces[6])
 FILE_LINK_REGEX = r"""
     \[\[\s*
     (?:%s)  # namespace aliases
