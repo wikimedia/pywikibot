@@ -62,7 +62,9 @@ extra_deps = {
         'flake8-docstrings>=1.3.1',
         'verve-flake8-mock>=0.4',
         'flake8-print>=2.0.1',
-        'flake8-quotes>=2.0.1',
+        # flake8-quotes is incompatible with flake8 6 (T323752),
+        # jenkins CI ignores "3.8.1"
+        'flake8-quotes>=3.3.0; python_version < "3.8"',
         'flake8-string-format',
         'flake8-tuple>=0.2.8',
         'flake8-no-u-prefixed-strings>=0.2',
@@ -72,8 +74,8 @@ extra_deps = {
     'hacking': [
         'hacking',
         # importlib-metadata module already installed with hacking 4.1.0
-        # but importlib-metadata 5.0.0 fails, so adjust it
-        'importlib-metadata!=5.0.0',
+        # but importlib-metadata 5 fails, so adjust it
+        'importlib-metadata<5.0.0; python_version < "3.8"',
     ],
 }
 
