@@ -93,6 +93,7 @@ import json
 import logging
 import logging.handlers
 import os
+import re
 import sys
 import time
 import warnings
@@ -1026,6 +1027,8 @@ def show_help(module_name: Optional[str] = None,
 
     .. versionchanged:: 4.0
        Renamed from showHelp() to show_help().
+    .. versionchanged:: 8.0
+       Do not show version changes.
     """
     if not module_name:
         module_name = calledModuleName()
@@ -1039,16 +1042,17 @@ def show_help(module_name: Optional[str] = None,
 
     try:
         module = import_module(module_name)
-        help_text: str = module.__doc__  # type: ignore[assignment]
-        if hasattr(module, 'docuReplacements'):
-            for key, value in module.docuReplacements.items():
-                help_text = help_text.replace(key, value.strip('\n\r'))
-    except Exception:
+    except ModuleNotFoundError:
         if module_name:
             pywikibot.stdout('Sorry, no help available for ' + module_name)
         pywikibot.log('show_help:', exc_info=True)
     else:
-        pywikibot.stdout(help_text)  # output to STDOUT
+        help_text = re.sub(r'^\.\. version(added|changed)::.+', '',
+                           module.__doc__, flags=re.MULTILINE | re.DOTALL)
+        if hasattr(module, 'docuReplacements'):
+            for key, value in module.docuReplacements.items():
+                help_text = help_text.replace(key, value.strip())
+        pywikibot.stdout(help_text)
 
     if show_global or module_name == 'pwb':
         pywikibot.stdout(_GLOBAL_HELP.format(module_name))
