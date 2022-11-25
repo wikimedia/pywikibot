@@ -54,7 +54,11 @@ from pywikibot.pagegenerators._generators import (
     WikidataSPARQLPageGenerator,
 )
 from pywikibot.tools.collections import DequeGenerator
-from pywikibot.tools.itertools import filter_unique, intersect_generators
+from pywikibot.tools.itertools import (
+    filter_unique,
+    intersect_generators,
+    roundrobin_generators,
+)
 
 
 HANDLER_RETURN_TYPE = Union[None, bool, Iterable['pywikibot.page.BasePage']]
@@ -200,6 +204,10 @@ class GeneratorFactory:
 
         .. versionchanged:: 7.3
            set the instance variable :attr:`is_preloading` to True or False.
+        .. versionchanged:: 8.0
+           if ``limit`` option is set and multiple generators are given,
+           pages are yieded in a :func:`roundrobin
+           <tools.itertools.roundrobin_generators>` way.
 
         :param gen: Another generator to be combined with
         :param preload: preload pages using PreloadingGenerator
@@ -247,7 +255,8 @@ class GeneratorFactory:
             # By definition no duplicates are possible.
             dupfiltergen = intersect_generators(*self.gens)
         else:
-            dupfiltergen = _filter_unique_pages(itertools.chain(*self.gens))
+            combine = roundrobin_generators if self.limit else itertools.chain
+            dupfiltergen = _filter_unique_pages(combine(*self.gens))
 
         # Add on subpage filter generator
         if self.subpage_max_depth is not None:

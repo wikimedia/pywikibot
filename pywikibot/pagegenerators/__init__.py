@@ -432,8 +432,10 @@ FILTER OPTIONS
 
 -intersect          Work on the intersection of all the provided generators.
 
--limit              When used with any other argument -limit:n specifies a set
-                    of pages, work on no more than n pages in total.
+-limit              When used with any other argument ``-limit:n``
+                    specifies a set of pages, work on no more than n
+                    pages in total. If used with multiple generators,
+                    pages are yielded in a roundrobin way.
 
 -namespaces         Filter the page generator to only yield pages in the
 -namespace          specified namespaces. Separate multiple namespace
