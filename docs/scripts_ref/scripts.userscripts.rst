@@ -1,5 +1,4 @@
-scripts.userscripts user scripts
-================================
+User scripts - scripts.userscripts
+==================================
 
 .. automodule:: scripts.userscripts
-

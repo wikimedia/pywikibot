@@ -3,8 +3,10 @@
 
    <br />
 
-MediaWiki API Cross Reference
+MediaWiki API cross reference
 =============================
+
+See the table below for a cross reference between MediaWiki's API and Pywikibot's API.
 
 .. list-table::
    :header-rows: 1

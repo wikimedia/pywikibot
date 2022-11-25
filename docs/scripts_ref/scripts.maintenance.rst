@@ -1,34 +1,35 @@
-scripts.maintenance utility scripts
-===================================
+Maintenance scripts
+===================
+
+This page contains documentation of the `scripts.maintenance` module:
 
 .. automodule:: scripts.maintenance
 
-Maintenance Submodules
+Maintenance submodules
 ----------------------
 
-scripts.maintenance.cache script
+scripts.maintenance.cache
 --------------------------------
 
 .. automodule:: scripts.maintenance.cache
    :ignore-module-all:
 
-scripts.maintenance.colors script
+scripts.maintenance.colors
 ---------------------------------
 
 .. automodule:: scripts.maintenance.colors
 
-scripts.maintenance.make\_i18n\_dict script
+scripts.maintenance.make\_i18n\_dict
 -------------------------------------------
 
 .. automodule:: scripts.maintenance.make_i18n_dict
 
-scripts.maintenance.sorting\_order script
+scripts.maintenance.sorting\_order
 -----------------------------------------
 
 .. automodule:: scripts.maintenance.sorting_order
 
-scripts.maintenance.wikimedia\_sites script
+scripts.maintenance.wikimedia\_sites
 -------------------------------------------
 
 .. automodule:: scripts.maintenance.wikimedia_sites
-

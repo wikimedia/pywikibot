@@ -1,4 +1,4 @@
-Installer Scripts
+Installer scripts
 =================
 
 make\_dist script

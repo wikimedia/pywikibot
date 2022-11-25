@@ -1,5 +1,6 @@
-Frequent Asked Questions
+Frequent asked questions
 ========================
+
 **How to speed up Pywikibot?**
   1. The first time you are using Pywikibot for multiple Wikimedia sites you
      can run :py:mod:`preload_sites <pywikibot.scripts.preload_sites>` script
@@ -35,4 +36,3 @@ Frequent Asked Questions
 **pywikibot.i18n.TranslationError: No English translation has been defined**
   It can happen due to lack of i18n submodule or files. Update i18n submodule
   or download these files first. See also: :manpage:`i18n` manual.
-

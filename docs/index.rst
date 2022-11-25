@@ -36,13 +36,14 @@ Framework Modules Overview
    :alt: Framework modules dependency network
 
 
-For bot users:
---------------
+Contents
+--------
 
 .. toctree::
    :maxdepth: 1
+   :caption: User guide
 
-   installation
+   introduction
    utilities/scripts
    scripts/index
    global_options
@@ -50,34 +51,27 @@ For bot users:
    getting_help
 
 
-For bot developers:
--------------------
-
 .. toctree::
    :maxdepth: 1
+   :caption: Bot developer guide
 
    library_usage
    recipes
    api_ref/index
    mwapi
 
-For framework developers:
--------------------------
-
 .. toctree::
    :maxdepth: 1
+   :caption: Pywikibot contributor guide
 
-   Utility Scripts Reference<utilities/scripts_ref>
+   utilities/scripts_ref
    scripts_ref/index
-   tests_ref/index
-   Maintenance Scripts<scripts_ref/scripts.maintenance>
    utilities/install
+   tests_ref/index
 
-
-Miscellaneous
--------------
 .. toctree::
    :maxdepth: 1
+   :caption: About
 
    glossary
    changelog

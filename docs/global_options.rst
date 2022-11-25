@@ -1,4 +1,4 @@
-Global Options
+Global options
 --------------
 
 Global arguments available for all bots:

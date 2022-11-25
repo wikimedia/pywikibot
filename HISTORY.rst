@@ -1,5 +1,5 @@
 Release history
-^^^^^^^^^^^^^^^
+===============
 
 7.7.1
 -----
@@ -197,7 +197,7 @@ Release history
 *26 February 2022*
 
 Improvements
-~~~~~~~~~~~~
+^^^^^^^^^^^^
 
 * i18n updates for date.py
 * Add number transliteration of 'lo', 'ml', 'pa', 'te' to NON_LATIN_DIGITS
@@ -240,7 +240,7 @@ Improvements
 * New "maxlimit" property was added to APISite (:phab:`T291770`)
 
 Bugfixes
-~~~~~~~~
+^^^^^^^^
 
 * Don't raise an exception if BlockEntry initializer found a hidden title (:phab:`T78152`)
 * Fix KeyError in create_warnings_list (:phab:`T301610`)
@@ -261,14 +261,14 @@ Bugfixes
 * Raise a generic ServerError if the http status code is unofficial (:phab:`T293208`)
 
 Breaking changes
-~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^
 
 * Support of Python 3.5.0 - 3.5.2 has been dropped (:phab:`T286867`)
 * generate_user_files.py, generate_user_files.py, shell.py and version.py were moved to pywikibot/scripts and must be used with pwb wrapper script
 * *See also Code cleanups below*
 
 Code cleanups
-~~~~~~~~~~~~~
+^^^^^^^^^^^^^
 
 * Deprecated  http.get_fake_user_agent() function was removed
 * FilePage.fileIsShared() was removed in favour of FilePage.file_is_shared()
@@ -436,7 +436,7 @@ Code cleanups
 *28 May 2021*
 
 Improvements and Bugfixes
-~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * Use different logfiles for multiple processes of the same script (:phab:`T56685`)
 * throttle.pip will be reused as soon as possbile
@@ -452,7 +452,7 @@ Improvements and Bugfixes
 * Handle abusefilter-{disallow,warning} codes (:phab:`T85656`)
 
 Code cleanups
-~~~~~~~~~~~~~
+^^^^^^^^^^^^^
 
 * MultipleSitesBot.site attribute was removed (:phab:`T283209`)
 * Deprecated BaseSite.category_namespaces() method was removed
@@ -481,7 +481,7 @@ Code cleanups
 *17 April 2021*
 
 Improvements and Bugfixes
-~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * interwiki_graph module was restored (:phab:`T223826`)
 * proofreadpage: search for "new" class after purge (:phab:`T280357`)
@@ -496,7 +496,7 @@ Improvements and Bugfixes
 * Family files can be collected from a zip folder (:phab:`T278076`)
 
 Dependencies
-~~~~~~~~~~~~
+^^^^^^^^^^^^
 
 * **mwparserfromhell** or **wikitextparser** are strictly recommended (:phab:`T106763`)
 * Require **Pillow**>=8.1.1 due to vulnerability found (:phab:`T278743`)
@@ -505,7 +505,7 @@ Dependencies
 * Add support for **PyMySQL** 1.0.0+
 
 Code cleanups
-~~~~~~~~~~~~~
+^^^^^^^^^^^^^
 
 * APISite.resolvemagicwords(), BaseSite.ns_index() and remove BaseSite.getNamespaceIndex() were removed
 * Deprecated MoveEntry.new_ns() and new_title() methods were removed
@@ -528,7 +528,7 @@ Code cleanups
 *16 March 2021*
 
 Breaking changes
-~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^
 
 * interwiki_graph module was removed (:phab:`T223826`)
 * Require setuptools >= 20.2 due to :pep:`440`
@@ -538,7 +538,7 @@ Breaking changes
 * config.db_hostname has been renamed to db_hostname_format
 
 Code cleanups
-~~~~~~~~~~~~~
+^^^^^^^^^^^^^
 
 * tools.PY2 was removed (:phab:`T213287`)
 * Site.language() method was removed in favour of Site.lang property
@@ -555,7 +555,7 @@ Code cleanups
 * Unused comms.threadedhttp module was removed; threadedhttp.HttpRequest was already replaced with requests.Response (:phab:`T265206`)
 
 Other changes
-~~~~~~~~~~~~~
+^^^^^^^^^^^^^
 
 * Raise a SiteDefinitionError if api request response is Non-JSON and site is AutoFamily (:phab:`T272911`)
 * Support deleting and undeleting specific file versions (:phab:`T276725`)
@@ -1331,7 +1331,7 @@ Other changes
 * CODE_OF_CONDUCT included
 
 Bugfixes
-~~~~~~~~
+^^^^^^^^
 * Manage temporary readonly error (:phab:`T154011`)
 * Unbreak wbGeoShape and WbTabularData (:phab:`T166362`)
 * Clean up issue with _WbDataPage (:phab:`T166362`)
@@ -1343,7 +1343,7 @@ Bugfixes
 * Fix TestLazyLoginNotExistUsername test for Stewardwiki (:phab:`T169458`)
 
 Improvements
-~~~~~~~~~~~~
+^^^^^^^^^^^^
 * Introduce the new WbUnknown data type for Wikibase (:phab:`T165961`)
 * djvu.py: add replace_page() and delete_page()
 * Build GeoShape and TabularData from shared base class
@@ -1367,7 +1367,7 @@ Improvements
 * Make WbRepresentations hashable (:phab:`T167827`)
 
 Updates
-~~~~~~~
+^^^^^^^
 * Update linktails
 * Update languages_by_size
 * Update cross_allowed (global bot wikis group)
@@ -1389,7 +1389,7 @@ Updates
 * Localisation updates
 
 Bugfixes
-~~~~~~~~
+^^^^^^^^
 * Increase the default socket_timeout to 75 seconds (:phab:`T163635`)
 * use repr() of exceptions to prevent UnicodeDecodeErrors (:phab:`T120222`)
 * Handle offset mismatches during chunked upload (:phab:`T156402`)
@@ -1402,7 +1402,7 @@ Bugfixes
 * Remove wikidataquery from pywikibot (:phab:`T162585`)
 
 Improvements
-~~~~~~~~~~~~
+^^^^^^^^^^^^
 * Introduce user_add_claim and allow asynchronous ItemPage.addClaim (:phab:`T87493`)
 * Enable private edit summary in specialbots (:phab:`T162527`)
 * Make a decorator for asynchronous methods
@@ -1429,7 +1429,7 @@ Improvements
 * Get thumburl information in FilePage() (:phab:`T137011`)
 
 Updates
-~~~~~~~
+^^^^^^^
 * Update languages_by_size in family files
 * wikisource_family.py: Add "pa" to languages_by_size
 * Config2: limit the number of retries to 15 (:phab:`T165898`)
@@ -1444,7 +1444,7 @@ Updates
 * Deprecate previous 2.0 branches and tags
 
 Bugfixes
-~~~~~~~~
+^^^^^^^^
 * Use default summary when summary value does not contain a string (:phab:`T160823`)
 * Enable specialbots.py for PY3 (:phab:`T161457`)
 * Change tw(n)translate from Site.code to Site.lang dependency (:phab:`T140624`)
@@ -1466,7 +1466,7 @@ Bugfixes
 * Fix broken LDAP based login (:phab:`T90149`)
 
 Improvements
-~~~~~~~~~~~~
+^^^^^^^^^^^^
 * Simplify User class
 * Renamed isImage and isCategory
 * Add -property option to pagegenerators.py
@@ -1485,7 +1485,7 @@ Improvements
 * Fix and improve default regexes
 
 Updates
-~~~~~~~
+^^^^^^^
 * Update linktrails
 * Update languages_by_size
 * Updating global bot wikis, closed wikis and deleted wikis
@@ -1507,7 +1507,7 @@ Updates
 * Last stable 2.0 branch
 
 Bugfixes
-~~~~~~~~
+^^^^^^^^
 * Establish the project's name, once and for all
 * setup.py: Add Python 3.4 and 3.5 to pypi classifiers
 * Remove item count output in page generators
@@ -1543,7 +1543,7 @@ Bugfixes
 *15 December 2015*
 
 Bugfixes
-~~~~~~~~
+^^^^^^^^
 * Remove dependency on pYsearch
 * Require google>=0.7
 * Desupport Python 2.6 for Pywikibot 2.0 release branch
@@ -1577,7 +1577,7 @@ Bugfixes
 *30 September 2015*
 
 Bugfixes
-~~~~~~~~
+^^^^^^^^
 * New Wikipedia site: azb
 * Indexes in str.format
 * MediaWikiVersion: Accept new wmf style
@@ -1593,18 +1593,18 @@ Bugfixes
 *9 July 2015*
 
 Configuration updates
-~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^
 * Changing the sandbox content template on Fa WP
 
 Family file updates
-~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^
 * Remove broken wikis from battlestarwiki family
 * Adding euskara and sicilianu languages to Vikidia family
 * WOW Wiki subdomains hr, ro & sr deleted
 * Add new Wikipedia languages gom and lrc
 
 Bugfixes
-~~~~~~~~
+^^^^^^^^
 * fix UnicodeDecodeError on api error
 * pwb.py now correctly passes arguments to generate_family_file
 * Fix Win32 config.editor detection

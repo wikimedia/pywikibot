@@ -1,5 +1,6 @@
-Scripts Package Description
----------------------------
+===============
+Scripts package
+===============
 
 .. automodule:: scripts
    :no-members:
@@ -9,8 +10,8 @@ Scripts Package Description
    :start-after: included.
    :end-before: More precise
 
-Scripts Descriptions
---------------------
+Script descriptions
+===================
 
 .. toctree::
    :maxdepth: 1

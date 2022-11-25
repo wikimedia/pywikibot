@@ -1,8 +1,13 @@
+**************************
 Using pywikibot as library
---------------------------
+**************************
 
-Pywikibot provides bot classes to develop your own script easily. Here
-is a minimal example script which shows their usage:
+Pywikibot provides bot classes to develop your own script easily.
+
+Minimal example
+===============
+
+Here is a minimal example script which shows their usage:
 
 ..  code-block:: python
     :linenos:
@@ -45,7 +50,8 @@ The script can be invoked from commandline like::
 
     python mybot -site:wikipedia:test -page:Sandbox -text:"A text added to the sandbox"
 
-**Explanations:**
+Explanation
+-----------
 
 :1-3: Import necessary framework code parts:
       :mod:`pywikibot`, :mod:`pywikibot.pagegenerators`,
@@ -89,7 +95,7 @@ The script can be invoked from commandline like::
 :29:  Create the bot passing keyword only parameters and run it.
 
 Basic script
-~~~~~~~~~~~~
+============
 
 :py:obj:`scripts.basic` is a more advanced sample script and shipped
 with the scripts folder. Here is the content:
@@ -98,4 +104,4 @@ with the scripts folder. Here is the content:
    :language: python
 
 .. note::
-   Please also see the documentation at :manpage:`Create your own script`
+   Also see the documentation at :manpage:`Create your own script`
