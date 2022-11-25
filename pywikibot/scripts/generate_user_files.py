@@ -2,7 +2,9 @@
 """Script to create user-config.py. Other file names are not supported.
 
 .. versionchanged:: 7.0
-   moved to pywikibot.scripts folder
+   moved to pywikibot.scripts folder.
+.. versionchanged:: 8.0
+   let user the choice which section to be copied.
 """
 #
 # (C) Pywikibot team, 2010-2022
@@ -18,7 +20,7 @@ from pathlib import Path
 from textwrap import fill
 from typing import Optional
 
-from pywikibot.backports import Tuple
+from pywikibot.backports import Callable, List, Tuple
 from pywikibot.scripts import _import_with_no_user_config
 
 
@@ -32,6 +34,12 @@ DISABLED_SECTIONS = {
 }
 OBSOLETE_SECTIONS = {
     'ACCOUNT SETTINGS',  # already set
+}
+SCRIPT_SECTIONS = {
+    'INTERWIKI SETTINGS',
+    'SOLVE_DISAMBIGUATION SETTINGS',
+    'WEBLINK CHECKER SETTINGS',
+    'REPLICATION BOT SETTINGS',
 }
 
 # Disable user-config usage as we are creating it here
@@ -222,6 +230,9 @@ PASSFILE_CONFIG = """\
 {botpasswords}"""
 
 
+ConfigSection = namedtuple('ConfigSection', 'head, info, section')
+
+
 def parse_sections() -> list:
     """Parse sections from config.py file.
 
@@ -231,7 +242,6 @@ def parse_sections() -> list:
     :return: a list of ConfigSection named tuples.
     """
     data = []
-    ConfigSection = namedtuple('ConfigSection', 'head, info, section')
 
     config_path = Path(__file__).resolve().parents[1].joinpath('config.py')
     with codecs.open(config_path, 'r', 'utf-8') as config_f:
@@ -251,19 +261,84 @@ def parse_sections() -> list:
     return data
 
 
-def copy_sections() -> str:
+def copy_sections(force: bool = False, default: str = 'n') -> str:
     """Take config sections and copy them to user-config.py.
 
+    .. versionchanged:: 8.0
+       *force* and *default* options were added.
+
+    :param force: Copy all sections if force is True
+    :param default: Default answer for input_sections.
+        Should be 'a' for all or 'n' for none to copy.
     :return: config text of all selected sections.
     """
-    result = []
     sections = parse_sections()
-    # copy settings
-    for section in filter(lambda x: x.head not in (DISABLED_SECTIONS
-                                                   | OBSOLETE_SECTIONS),
-                          sections):
-        result.append(section.section)
-    return ''.join(result)
+    if not sections:  # Something is wrong with the regex
+        return None
+
+    # copy framework settings
+    copies = input_sections(
+        'framework', sections, force=force, default=default,
+        skip=lambda x: x.head not in (DISABLED_SECTIONS
+                                      | OBSOLETE_SECTIONS
+                                      | SCRIPT_SECTIONS))
+
+    # copy scripts settings
+    copies += input_sections(
+        'scripts', sections, force=force, default=default,
+        skip=lambda x: x.head in SCRIPT_SECTIONS)
+
+    return ''.join(copies)
+
+
+def input_sections(variant: str,
+                   sections: List['ConfigSection'],
+                   skip: Optional[Callable] = None,
+                   force: bool = False,
+                   default: str = 'n') -> None:
+    """Ask for settings to copy.
+
+    .. versionadded:: 8.0
+
+    :param variant: Variant of the setting section. Either 'framework'
+        or 'scripts'
+    :param sections: A sections list previously read from the config file
+    :param skip: a filter function
+    :param force: Force input if True
+    """
+    # First ask what to do which the whole section type variant
+    select = 'h'
+    answers = [('Yes', 'y'), ('All', 'a'), ('None', 'n'), ('Help', 'h')]
+    while select == 'h':
+        select = pywikibot.input_choice(
+            f'Do you want to select {variant} setting sections?',
+            answers, default=default, force=force, automatic_quit=False)
+        if select == 'h':
+            answers.pop(-1)
+            pywikibot.info(
+                f'The following {variant} setting sections are provided:')
+            for item in filter(skip, sections):
+                pywikibot.output(item.head)
+
+    copies = []
+    # Now ask for a single section of the given variant
+    # or use all or none of them
+    choice = {'a': 'all', 'n': 'none', 'y': 'h'}[select]  # mapping
+    for item in filter(skip, sections):
+        answers = [('Yes', 'y'), ('No', 'n'), ('Help', 'h')]
+        while choice == 'h':
+            choice = pywikibot.input_choice(
+                f'Do you want to add {item.head} section?',
+                answers, default='n', force=force, automatic_quit=False)
+            if choice == 'h':
+                answers.pop(-1)
+                pywikibot.info(fill(item.info))
+        if choice in ('all', 'y'):
+            copies.append(item.section)  # Fill the mutable directly
+        if choice not in ('all', 'none'):
+            choice = 'h'
+
+    return copies
 
 
 def create_user_config(
@@ -332,7 +407,7 @@ def create_user_config(
         "('{}', BotPassword('{}', {!r}))".format(*botpassword)
         for botpassword in botpasswords)
 
-    config_text = copy_sections()
+    config_text = copy_sections(force=force)
     if config_text:
         config_content = EXTENDED_CONFIG
     else:

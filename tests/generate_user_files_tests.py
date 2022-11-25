@@ -84,24 +84,23 @@ class TestGenerateUserFiles(TestCase):
 
     def test_copy_sections_not_found(self):
         """Test copy_sections function for sections not in config text."""
-        config_text = guf.copy_sections()
+        config_text = guf.copy_sections(force=True, default='a')
         for section in guf.DISABLED_SECTIONS | guf.OBSOLETE_SECTIONS:
             self.assertNotIn(section, config_text)
 
     def test_copy_sections_found(self):
         """Test copy_sections function for sections found in config text."""
-        config_text = guf.copy_sections()
+        config_text = guf.copy_sections(force=True, default='a')
         self.assertIsNotNone(config_text)
-        for section in ('LOGFILE SETTINGS',
-                        'EXTERNAL SCRIPT PATH SETTINGS',
-                        'INTERWIKI SETTINGS',
-                        'FURTHER SETTINGS',
-                        'HTTP SETTINGS',
-                        'REPLICATION BOT SETTINGS',
-                        ):
+        for section in guf.SCRIPT_SECTIONS:
             self.assertIn(section, config_text)
         lines = config_text.splitlines()
         self.assertGreater(len(lines), 200)
+
+    def test_copy_sections_none(self):
+        """Test read_sections function."""
+        config_text = guf.copy_sections(force=True)
+        self.assertEqual(config_text, '')
 
 
 if __name__ == '__main__':  # pragma: no cover
