@@ -1,8 +1,5 @@
-Scripts Reference
+Scripts reference
 -----------------
-
-Provided scripts by Pywikibot
-=============================
 
 Pywikibot framework has a lot of ready-to-use scripts for several tasks.
 In general the usage and options of all scripts may be shown by using the command
@@ -15,4 +12,7 @@ Contents
 .. toctree::
    :glob:
 
-   *
+   scripts
+   scripts.i18n
+   scripts.maintenance
+   scripts.userscripts

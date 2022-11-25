@@ -13,7 +13,7 @@ The :class:`pywikibot.Site` object then calls the MediaWiki API using the
 functions provided by :mod:`data.api`. This layer then uses :func:`comms.http.request`
 to do the actual HTTP request.
 
-Table of Contents
+Table of contents
 =================
 
 .. toctree::

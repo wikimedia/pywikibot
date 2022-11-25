@@ -1,5 +1,5 @@
 ===============
-Tests Reference
+Tests reference
 ===============
 
 .. include:: ../../tests/README.rst
@@ -17,7 +17,7 @@ Subpackages
 Library tests
 *************
 
-    Tests in this project:
+Tests in this project:
 
 .. toctree::
     :maxdepth: 1
@@ -90,7 +90,7 @@ Library tests
 Script tests
 ************
 
-    Tests in this project:
+Tests in this project:
 
 .. toctree::
     :maxdepth: 1

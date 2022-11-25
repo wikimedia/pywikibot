@@ -35,9 +35,9 @@
    :alt: Last commit
    :target: https://gerrit.wikimedia.org/r/plugins/gitiles/pywikibot/core/
 
-
+*********
 Pywikibot
-=========
+*********
 
 The Pywikibot framework is a Python library that interfaces with the
 `MediaWiki API <https://www.mediawiki.org/wiki/API:Main_page>`_
@@ -50,9 +50,9 @@ For further information about the library excluding scripts see
 the full `code documentation <https://doc.wikimedia.org/pywikibot/>`_.
 
 Quick start
------------
+===========
 
-::
+.. code:: text
 
     pip install requests
     git clone https://gerrit.wikimedia.org/r/pywikibot/core.git
@@ -62,7 +62,7 @@ Quick start
 
 Or to install using PyPI (excluding scripts)
 
-::
+.. code:: text
 
     pip install -U setuptools
     pip install pywikibot
@@ -70,13 +70,13 @@ Or to install using PyPI (excluding scripts)
 
 In addition a MediaWiki markup parser is required. Please install one of them:
 
-::
+.. code:: text
 
     pip install mwparserfromhell
 
 or
 
-::
+.. code:: text
 
     pip install wikitextparser
 
@@ -85,11 +85,11 @@ guide <https://www.mediawiki.org/wiki/Manual:Pywikibot/Installation>`_
 has more details for advanced usage.
 
 Basic Usage
------------
+===========
 
 If you wish to write your own script it's very easy to get started:
 
-::
+.. code:: python
 
     import pywikibot
     site = pywikibot.Site('en', 'wikipedia')  # The site we want to run our bot on
@@ -98,12 +98,12 @@ If you wish to write your own script it's very easy to get started:
     page.save('Replacing "foo" with "bar"')  # Saves the page
 
 Wikibase Usage
---------------
+==============
 
 Wikibase is a flexible knowledge base software that drives Wikidata.
 A sample pywikibot script for getting data from Wikibase:
 
-::
+.. code:: python
 
     import pywikibot
     site = pywikibot.Site('wikipedia:en')
@@ -113,11 +113,11 @@ A sample pywikibot script for getting data from Wikibase:
     data = item.get()  # get all item data from repository for this item
 
 Script example
---------------
+==============
 
 Pywikibot provides bot classes to develop your own script easily:
 
-::
+.. code:: python
 
     import pywikibot
     from pywikibot import pagegenerators
@@ -157,17 +157,17 @@ For more documentation on Pywikibot see our `docs <https://doc.wikimedia.org/pyw
 
 
 Roadmap
--------
+=======
 
 .. include:: ROADMAP.rst
 
 Release history
----------------
+===============
 
 See https://github.com/wikimedia/pywikibot/blob/stable/HISTORY.rst
 
 Contributing
-------------
+============
 
 Our code is maintained on Wikimedia's `Gerrit installation <https://gerrit.wikimedia.org/>`_,
 `learn <https://www.mediawiki.org/wiki/Developer_account>`_ how to get

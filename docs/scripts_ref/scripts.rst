@@ -1,16 +1,7 @@
-scripts package
+Scripts package
 ===============
 
 .. automodule:: scripts
-
-Scripts Subpackages
--------------------
-
-.. toctree::
-
-    scripts.i18n
-    scripts.maintenance
-    scripts.userscripts
 
 add\_text script
 ----------------
@@ -281,4 +272,11 @@ welcome script
 
 .. automodule:: scripts.welcome
 
+Script subpackages
+------------------
 
+For information on contents of subpackages, see
+
+* :doc:`./scripts.i18n`
+* :doc:`./scripts.maintenance`
+* :doc:`./scripts.userscripts`

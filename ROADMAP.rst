@@ -1,5 +1,5 @@
 Current release 8.0.0
-^^^^^^^^^^^^^^^^^^^^^
+---------------------
 
 * All parameters of :meth:`Category.members()<page.Category.members>`,
   :meth:`Category.subcategories()<page.Category.subcategories>` and
@@ -29,7 +29,7 @@ Current release 8.0.0
 * MediaWiki API cross reference was added to the documentation
 
 Deprecations
-^^^^^^^^^^^^
+------------
 
 * 8.0.0: :meth:`APISite.messages()<pywikibot.site._apisite.APISite.messages>` method is deprecated in favour of
   :attr:`userinfo['messages']<pywikibot.site._apisite.APISite.userinfo>`
@@ -67,6 +67,6 @@ Deprecations
 
 
 Will be removed in Pywikibot 8
-------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * 5.5.0: APISite.redirectRegex() will be removed in favour of APISite.redirect_regex()
