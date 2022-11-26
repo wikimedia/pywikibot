@@ -27,10 +27,8 @@ from pywikibot.comms.http import fetch
 from pywikibot.exceptions import VersionParseError
 
 
-def _get_program_dir():
-    _program_dir = os.path.normpath(
-        os.path.split(os.path.dirname(__file__))[0])
-    return _program_dir
+def _get_program_dir() -> str:
+    return os.path.normpath(os.path.split(os.path.dirname(__file__))[0])
 
 
 def get_toolforge_hostname() -> Optional[str]:
@@ -322,16 +320,13 @@ def getversion_package(path=None) -> Tuple[str, str, str, str]:
 
 def getversion_onlinerepo(path: str = 'branches/master'):
     """Retrieve current framework git hash from Gerrit."""
-    from pywikibot.comms import http
-
     # Gerrit API responses include )]}' at the beginning,
     # make sure to strip it out
-    buf = http.fetch(
+    buf = fetch(
         'https://gerrit.wikimedia.org/r/projects/pywikibot%2Fcore/' + path,
         headers={'user-agent': '{pwb}'}).text[4:]
     try:
-        hsh = json.loads(buf)['revision']
-        return hsh
+        return json.loads(buf)['revision']
     except Exception as e:
         raise VersionParseError(f'{e!r} while parsing {buf!r}')
 

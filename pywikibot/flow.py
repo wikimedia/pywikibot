@@ -503,8 +503,7 @@ class Post:
             del self._replies
         data = self.site.reply_to_post(self.page, reply_to, content,
                                        content_format)
-        post = Post(self.page, data['post-id'])
-        return post
+        return Post(self.page, data['post-id'])
 
     # Moderation
     def delete(self, reason: str) -> None:

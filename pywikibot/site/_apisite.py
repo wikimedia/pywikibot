@@ -2652,9 +2652,7 @@ class APISite(
                                   anononly=anononly, nocreate=nocreate,
                                   autoblock=autoblock, noemail=noemail,
                                   reblock=reblock, allowusertalk=allowusertalk)
-
-        data = req.submit()
-        return data
+        return req.submit()
 
     @need_right('unblock')
     def unblockuser(
@@ -2674,9 +2672,7 @@ class APISite(
                                   user=user.username,
                                   token=self.tokens['csrf'],
                                   reason=reason)
-
-        data = req.submit()
-        return data
+        return req.submit()
 
     @need_right('editmywatchlist')
     def watch(
@@ -2863,5 +2859,4 @@ class APISite(
 
         req = self.simple_request(**params)
         data = req.submit()
-        comparison = data['compare']['*']
-        return comparison
+        return data['compare']['*']

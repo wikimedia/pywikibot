@@ -222,8 +222,7 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
                 for t in self.nc_templates)
         gen = chain(*gens)
         gen = filter_unique(gen, key=lambda p: '{}:{}:{}'.format(*p._cmpkey()))
-        gen = pg.PreloadingGenerator(gen)
-        return gen
+        return pg.PreloadingGenerator(gen)
 
     def find_file_on_commons(self, local_file_page):
         """Find filename on Commons."""

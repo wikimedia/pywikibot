@@ -467,8 +467,8 @@ def replaceExcept(text: str, old, new, exceptions: list,
                 index += 1
             markerpos = match.start() + len(replacement)
             replaced += 1
-    text = text[:markerpos] + marker + text[markerpos:]
-    return text
+
+    return text[:markerpos] + marker + text[markerpos:]
 
 
 def removeDisabledParts(text: str,
@@ -1641,8 +1641,7 @@ def compileLinkR(withoutBracketed: bool = False, onlyBracketed: bool = False):
         regex = r'(?<!\[)' + regex
     elif onlyBracketed:
         regex = r'\[' + regex
-    linkR = re.compile(regex)
-    return linkR
+    return re.compile(regex)
 
 
 # --------------------------------
@@ -1821,8 +1820,7 @@ def reformat_ISBNs(text: str, match_func) -> str:
     :return: reformatted text
     """
     isbnR = re.compile(r'(?<=ISBN )(?P<code>[\d\-]+[\dXx])')
-    text = isbnR.sub(match_func, text)
-    return text
+    return isbnR.sub(match_func, text)
 
 
 # ---------------------------------------
