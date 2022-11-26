@@ -323,7 +323,7 @@ class TestLockingPage(DefaultSiteTestCase):
         site.unlock_page(page=p1)
 
 
-class SiteUserTestCase(DefaultSiteTestCase):
+class SiteUserTestCase(DefaultSiteTestCase, DeprecationTestCase):
 
     """Test site method using a user."""
 
@@ -333,7 +333,6 @@ class SiteUserTestCase(DefaultSiteTestCase):
         """Test user related methods."""
         mysite = self.get_site()
         self.assertIsInstance(mysite.is_blocked(), bool)
-        self.assertIsInstance(mysite.messages(), bool)
         self.assertIsInstance(mysite.has_right('edit'), bool)
         self.assertFalse(mysite.has_right('nonexistent_right'))
         self.assertIsInstance(mysite.has_group('bots'), bool)
@@ -343,6 +342,12 @@ class SiteUserTestCase(DefaultSiteTestCase):
         for rgt in ('read', 'edit', 'move', 'delete', 'rollback', 'block',
                     'nosuchright'):
             self.assertIsInstance(mysite.has_right(rgt), bool)
+
+    def test_deprected_methods(self):
+        """Test deprecated user related methods."""
+        mysite = self.get_site()
+        self.assertIsInstance(mysite.messages(), bool)
+        self.assertOneDeprecation()
 
     def test_logevents(self):
         """Test the site.logevents() method."""
