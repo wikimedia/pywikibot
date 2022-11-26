@@ -1687,11 +1687,11 @@ class TestUnconnectedPageGenerator(DefaultSiteTestCase):
         self.assertLessEqual(len(pages), 3)
 
         site = self.site.data_repository()
-        pattern = (r'Page '
-                   r'\[\[({site.sitename}:|{site.code}:)-1\]\]'
-                   r" doesn't exist\.".format(site=site))
+        pattern = (fr'Page \[\[({site.sitename}:|{site.code}:)-1\]\]'
+                   r" doesn't exist\.")
         for page in pages:
-            with self.assertRaisesRegex(NoPageError, pattern):
+            with self.subTest(page=page), self.assertRaisesRegex(
+                    NoPageError, pattern):
                 page.data_item()
 
     def test_unconnected_without_repo(self):
