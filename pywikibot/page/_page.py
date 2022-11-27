@@ -31,7 +31,15 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import Timestamp, config, date, i18n, textlib
-from pywikibot.backports import Generator, Iterable, Iterator, List, Set
+from pywikibot.backports import (
+    Dict,
+    Generator,
+    Iterable,
+    Iterator,
+    List,
+    Set,
+    Tuple,
+)
 from pywikibot.cosmetic_changes import CANCEL, CosmeticChangesToolkit
 from pywikibot.exceptions import (
     Error,
@@ -1049,12 +1057,38 @@ class BasePage(ComparableMixin):
             content=content,
         )
 
-    def protection(self) -> dict:
-        """Return a dictionary reflecting page protections."""
+    def protection(self) -> Dict[str, Tuple[str, str]]:
+        """Return a dictionary reflecting page protections.
+
+        **Example:**
+
+        >>> site = pywikibot.Site('wikipedia:test')
+        >>> page = pywikibot.Page(site, 'Main Page')
+        >>> page.protection()
+        {'edit': ('sysop', 'infinity'), 'move': ('sysop', 'infinity')}
+
+        .. seealso::
+           - :meth:`Site.page_restrictions()
+             <pywikibot.site._apisite.APISite.page_restrictions>`
+           - :meth:`applicable_protections`
+           - :meth:`protect`
+        """
         return self.site.page_restrictions(self)
 
     def applicable_protections(self) -> Set[str]:
-        """Return the protection types allowed for that page."""
+        """Return the protection types allowed for that page.
+
+        **Example:**
+
+        >>> site = pywikibot.Site('wikipedia:test')
+        >>> page = pywikibot.Page(site, 'Main Page')
+        >>> sorted(page.applicable_protections())
+        ['edit', 'move']
+
+        .. seealso::
+           - :meth:`protect`
+           - :meth:`protection`
+        """
         self.site.loadpageinfo(self)
         return self._applicable_protections
 
@@ -2008,27 +2042,35 @@ class BasePage(ComparableMixin):
 
     def protect(self,
                 reason: Optional[str] = None,
-                protections: Optional[dict] = None,
+                protections: Optional[Dict[str, Optional[str]]] = None,
                 **kwargs) -> None:
-        """
-        Protect or unprotect a wiki page. Requires administrator status.
+        """Protect or unprotect a wiki page. Requires  *protect* right.
 
-        Valid protection levels are '' (equivalent to 'none'),
-        'autoconfirmed', 'sysop' and 'all'. 'all' means 'everyone is allowed',
-        i.e. that protection type will be unprotected.
+        Valid protection levels are ``''`` (equivalent to ``None``),
+        ``'autoconfirmed'``, ``'sysop'`` and ``'all'``. ``'all'`` means
+        everyone is allowed, i.e. that protection type will be
+        unprotected.
 
-        In order to unprotect a type of permission, the protection level shall
-        be either set to 'all' or '' or skipped in the protections dictionary.
+        In order to unprotect a type of permission, the protection level
+        shall be either set to ``'all'`` or ``''`` or skipped in the
+        protections dictionary.
 
-        Expiry of protections can be set via kwargs, see Site.protect() for
+        Expiry of protections can be set via *kwargs*, see
+        :meth:`Site.protect()<pywikibot.site._apisite.APISite.protect>` for
         details. By default there is no expiry for the protection types.
 
-        :param protections: A dict mapping type of protection to protection
-            level of that type. Allowed protection types for a page can be
-            retrieved by Page.self.applicable_protections()
+        .. seealso::
+           - :meth:`Site.protect()
+             <pywikibot.site._apisite.APISite.protect>`
+           - :meth:`applicable_protections`
+
+        :param protections: A dict mapping type of protection to
+            protection level of that type. Allowed protection types for
+            a page can be retrieved by :meth:`applicable_protections`.
             Defaults to protections is None, which means unprotect all
             protection types.
-            Example: {'move': 'sysop', 'edit': 'autoconfirmed'}
+
+            Example: ``{'move': 'sysop', 'edit': 'autoconfirmed'}``
 
         :param reason: Reason for the action, default is None and will set an
             empty string.

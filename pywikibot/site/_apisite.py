@@ -55,7 +55,7 @@ from pywikibot.exceptions import (
 )
 from pywikibot.login import LoginStatus as _LoginStatus
 from pywikibot.site._basesite import BaseSite
-from pywikibot.site._decorators import need_right
+from pywikibot.site._decorators import need_right, need_version
 from pywikibot.site._extensions import (
     EchoMixin,
     FlowMixin,
@@ -1393,7 +1393,17 @@ class APISite(
         self,
         page: 'pywikibot.page.BasePage'
     ) -> Dict[str, Tuple[str, str]]:
-        """Return a dictionary reflecting page protections."""
+        """Return a dictionary reflecting page protections.
+
+        **Example:**
+
+        >>> site = pywikibot.Site('wikipedia:test')
+        >>> page = pywikibot.Page(site, 'Main Page')
+        >>> site.page_restrictions(page)
+        {'edit': ('sysop', 'infinity'), 'move': ('sysop', 'infinity')}
+
+        .. seealso:: :meth:`page.BasePage.protection` (should be preferred)
+        """
         if not hasattr(page, '_protection'):
             self.loadpageinfo(page)
         return page._protection
@@ -2523,21 +2533,33 @@ class APISite(
         """
         Return the protection types available on this site.
 
+        **Example:**
+
+        >>> site = pywikibot.Site('wikipedia:test')
+        >>> sorted(site.protection_types())
+        ['create', 'edit', 'move', 'upload']
+
         .. seealso:: :py:obj:`Siteinfo._get_default()`
 
         :return: protection types available
         """
         return set(self.siteinfo.get('restrictions')['types'])
 
+    @need_version('1.27.3')
     def protection_levels(self) -> Set[str]:
         """
         Return the protection levels available on this site.
+
+        **Example:**
+
+        >>> site = pywikibot.Site('wikipedia:test')
+        >>> sorted(site.protection_levels())
+        ['', 'autoconfirmed', ... 'sysop', 'templateeditor']
 
         .. seealso:: :py:obj:`Siteinfo._get_default()`
 
         :return: protection types available
         """
-        # implemented in b73b5883d486db0e9278ef16733551f28d9e096d
         return set(self.siteinfo.get('restrictions')['levels'])
 
     @need_right('protect')
@@ -2549,19 +2571,23 @@ class APISite(
         expiry: Union[datetime.datetime, str, None] = None,
         **kwargs: Any
     ) -> None:
-        """(Un)protect a wiki page. Requires administrator status.
+        """(Un)protect a wiki page. Requires *protect* right.
 
-        .. seealso:: :api:`Protect`
+        .. seealso::
+           - :api:`Protect`
+           - :meth:`protection_types`
+           - :meth:`protection_levels`
 
-        :param protections: A dict mapping type of protection to protection
-            level of that type. Valid restriction types are 'edit', 'create',
-            'move' and 'upload'. Valid restriction levels are '' (equivalent
-            to 'none' or 'all'), 'autoconfirmed', and 'sysop'.
-            If None is given, however, that protection will be skipped.
+        :param protections: A dict mapping type of protection to
+            protection level of that type. Refer :meth:`protection_types`
+            for valid restriction types and :meth:`protection_levels`
+            for valid restriction levels. If None is given, however,
+            that protection will be skipped.
         :param reason: Reason for the action
         :param expiry: When the block should expire. This expiry will be
-            applied to all protections. If None, 'infinite', 'indefinite',
-            'never', or '' is given, there is no expiry.
+            applied to all protections. If ``None``, ``'infinite'``,
+            ``'indefinite'``, ``'never'``, or ``''`` is given, there is
+            no expiry.
         """
         token = self.tokens['csrf']
         self.lock_page(page)
