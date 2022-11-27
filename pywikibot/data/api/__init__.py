@@ -19,11 +19,11 @@ from pywikibot.data.api._generators import (
     QueryGenerator,
     update_page,
 )
-from pywikibot.data.api._login import LoginManager
 from pywikibot.data.api._paraminfo import ParamInfo
 from pywikibot.data.api._optionset import OptionSet
 from pywikibot.data.api._requests import CachedRequest, Request, encode_url
 from pywikibot.family import SubdomainFamily
+from pywikibot.tools import ModuleDeprecationWrapper
 
 __all__ = (
     'APIGeneratorBase',
@@ -31,7 +31,6 @@ __all__ = (
     'CachedRequest',
     'ListGenerator',
     'LogEntryListGenerator',
-    'LoginManager',
     'OptionSet',
     'PageGenerator',
     'ParamInfo',
@@ -95,3 +94,9 @@ class CTEBinaryMIMEMultipart(MIMEMultipartOrig):
 
 
 MIMEMultipart = CTEBinaryMIMEMultipart
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper.add_deprecated_attr(
+    'LoginManager',
+    replacement_name='pywikibot.login.ClientLoginManager',
+    since='8.0.0')
