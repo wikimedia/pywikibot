@@ -25,7 +25,7 @@ from unittest.util import safe_repr
 
 import pywikibot
 from pywikibot import Site, config
-from pywikibot.backports import removeprefix, removesuffix
+from pywikibot.backports import removeprefix, removesuffix, List
 from pywikibot.comms import http
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.exceptions import (
@@ -143,7 +143,7 @@ class TestCaseBase(TestTimerMixin):
         self.assertIn(page.namespace(), namespaces,
                       f'{page} not in namespace {namespaces!r}')
 
-    def _get_gen_pages(self, gen, count=None, site=None):
+    def _get_gen_pages(self, gen, count: int = None, site=None):
         """
         Get pages from gen, asserting they are Page from site.
 
@@ -154,7 +154,6 @@ class TestCaseBase(TestTimerMixin):
         :param gen: Page generator
         :type gen: typing.Iterable[pywikibot.Page]
         :param count: number of pages to get
-        :type count: int
         :param site: Site of expected pages
         :type site: pywikibot.site.APISite
         """
@@ -178,10 +177,9 @@ class TestCaseBase(TestTimerMixin):
 
         return gen_pages
 
-    def _get_gen_titles(self, gen, count, site=None):
-        gen_pages = self._get_gen_pages(gen, count, site)
-        gen_titles = [page.title() for page in gen_pages]
-        return gen_titles
+    def _get_gen_titles(self, gen, count: int, site=None) -> List[str]:
+        """Return a list of page titles of given iterable."""
+        return [page.title() for page in self._get_gen_pages(gen, count, site)]
 
     @staticmethod
     def _get_canonical_titles(titles, site=None):
@@ -1445,8 +1443,7 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
     @property
     def deprecation_messages(self):
         """Return captured deprecation warnings."""
-        messages = [str(item.message) for item in self.warning_log]
-        return messages
+        return [str(item.message) for item in self.warning_log]
 
     @classmethod
     def _build_message(cls, deprecated, instead):

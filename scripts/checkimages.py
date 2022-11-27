@@ -613,8 +613,8 @@ class CheckImagesBot:
         results = re.findall(regex, report_page_text)
 
         if results:
-            luser = results[0]
-            return luser
+            return results[0]
+
         # we can't find the user, report the problem to the bot
         return upload_bot_array[0]
 

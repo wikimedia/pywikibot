@@ -267,17 +267,18 @@ class ClaimCollection(MutableMapping):
         if not diffto:
             return claims
 
-        temp = defaultdict(list)
-        props_add = set(claims.keys())
-        props_orig = set(diffto.keys())
+        diff_claims = defaultdict(list)
+        props_add = set(claims)
+        props_orig = set(diffto)
         for prop in (props_orig | props_add):
             if prop not in props_orig:
-                temp[prop].extend(claims[prop])
+                diff_claims[prop].extend(claims[prop])
                 continue
 
             if prop not in props_add:
-                temp[prop].extend({'id': claim['id'], 'remove': ''}
-                                  for claim in diffto[prop] if 'id' in claim)
+                diff_claims[prop].extend(
+                    {'id': claim['id'], 'remove': ''}
+                    for claim in diffto[prop] if 'id' in claim)
                 continue
 
             claim_ids = set()
@@ -286,24 +287,25 @@ class ClaimCollection(MutableMapping):
 
             for claim, json in zip(self[prop], claims[prop]):
                 if 'id' not in json:
-                    temp[prop].append(json)
+                    diff_claims[prop].append(json)
                     continue
 
                 claim_ids.add(json['id'])
                 if json['id'] in claim_map:
                     other = pywikibot.page.Claim.fromJSON(
                         self.repo, claim_map[json['id']])
+
                     if claim.same_as(other, ignore_rank=False,
                                      ignore_refs=False):
                         continue
-                temp[prop].append(json)
+
+                diff_claims[prop].append(json)
 
             for claim in diffto[prop]:
                 if 'id' in claim and claim['id'] not in claim_ids:
-                    temp[prop].append({'id': claim['id'], 'remove': ''})
+                    diff_claims[prop].append({'id': claim['id'], 'remove': ''})
 
-        claims = temp
-        return claims
+        return diff_claims
 
     def set_on_item(self, item) -> None:
         """Set Claim.on_item attribute for all claims in this collection."""

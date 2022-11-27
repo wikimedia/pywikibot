@@ -92,8 +92,7 @@ class DjVuFile:
             if force:
                 for el in cache:
                     obj.__dict__.pop(el, None)
-            _res = fn(obj, *args, **kwargs)
-            return _res
+            return fn(obj, *args, **kwargs)
         return wrapper
 
     def check_page_number(fn):
@@ -108,8 +107,7 @@ class DjVuFile:
                 raise ValueError('Page {} not in file {} [{}-{}]'
                                  .format(int(n), obj.file, int(n),
                                          int(obj.number_of_images())))
-            _res = fn(obj, *args, **kwargs)
-            return _res
+            return fn(obj, *args, **kwargs)
         return wrapper
 
     @check_cache

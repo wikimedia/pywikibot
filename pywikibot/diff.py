@@ -587,9 +587,7 @@ def cherry_pick(oldtext: str, newtext: str, n: int = 0,
     else:
         pywikibot.info(template.format('None.', '', ''))
 
-    text = ''.join(text_list)
-
-    return text
+    return ''.join(text_list)
 
 
 def html_comparator(compare_string: str) -> Dict[str, List[str]]:

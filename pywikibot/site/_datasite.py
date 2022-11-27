@@ -655,8 +655,7 @@ class DataSite(APISite):
         if bot:
             params['bot'] = 1
         req = self.simple_request(**params)
-        data = req.submit()
-        return data
+        return req.submit()
 
     @need_right('item-redirect')
     def set_redirect_target(self, from_item, to_item, bot: bool = True):
@@ -883,8 +882,7 @@ class DataSite(APISite):
                      .format(arg, action), UserWarning, 2)
 
         req = self.simple_request(**params)
-        data = req.submit()
-        return data
+        return req.submit()
 
     def wbsetaliases(self, itemdef, aliases, **kwargs):
         """
@@ -945,8 +943,7 @@ class DataSite(APISite):
         if baserevid:
             params['baserevid'] = baserevid
         req = self.simple_request(**params)
-        data = req.submit()
-        return data
+        return req.submit()
 
     @need_right('edit')
     @need_extension('WikibaseLexeme')
@@ -970,8 +967,7 @@ class DataSite(APISite):
         if baserevid:
             params['baserevid'] = baserevid
         req = self.simple_request(**params)
-        data = req.submit()
-        return data
+        return req.submit()
 
     @need_right('edit')
     @need_extension('WikibaseLexeme')
@@ -1000,5 +996,4 @@ class DataSite(APISite):
         if baserevid:
             params['baserevid'] = baserevid
         req = self.simple_request(**params)
-        data = req.submit()
-        return data
+        return req.submit()

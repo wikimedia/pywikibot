@@ -33,17 +33,17 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import pywikibot
 from pywikibot import config
+from pywikibot.backports import List
 from pywikibot.data.api import CachedRequest
 from pywikibot.exceptions import InvalidTitleError
 from scripts.maintenance.cache import CacheEntry
 
 
-def get(site=None):
+def get(site=None) -> List[str]:
     """Load the watchlist, fetching it if necessary."""
     if site is None:
         site = pywikibot.Site()
-    watchlist = [p.title() for p in site.watched_pages()]
-    return watchlist
+    return [p.title() for p in site.watched_pages()]
 
 
 def count_watchlist(site=None) -> None:
