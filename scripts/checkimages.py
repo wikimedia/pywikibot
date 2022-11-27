@@ -610,10 +610,10 @@ class CheckImagesBot:
     def upload_bot_change_function(report_page_text, upload_bot_array) -> str:
         """Detect the user that has uploaded the file through upload bot."""
         regex = upload_bot_array[1]
-        results = re.findall(regex, report_page_text)
+        result = re.search(regex, report_page_text)
 
-        if results:
-            return results[0]
+        if result:
+            return result.group()
 
         # we can't find the user, report the problem to the bot
         return upload_bot_array[0]
