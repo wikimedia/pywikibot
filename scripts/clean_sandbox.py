@@ -18,7 +18,10 @@ Furthermore, the following command line parameters are supported:
                    The minimum delay time is 5 minutes.
 
     -text          The text that substitutes in the sandbox, you can use this
-                   when you haven't configured clean_candbox for your wiki.
+                   when you haven't configured clean_sandbox for your wiki.
+
+    -textfile      As an alternative to -text, you can use this to provide
+                   a file containing the text to be used.
 
     -summary       Summary of the edit made by bot. Overrides the default
                    from i18n.
@@ -272,6 +275,7 @@ def main(*args: str) -> None:
     :param args: command line arguments
     """
     opts = {}
+    textfile_opt = None
     local_args = pywikibot.handle_args(args)
     gen_factory = pagegenerators.GeneratorFactory()
     for arg in local_args:
@@ -287,10 +291,26 @@ def main(*args: str) -> None:
         elif opt == 'text':
             opts[opt] = value or pywikibot.input(
                 'What text do you want to substitute?')
+        elif opt == 'textfile':
+            textfile_opt = value or pywikibot.input(
+                'What file contains the text you want to substitute with?')
         elif opt == 'summary':
             opts[opt] = value or pywikibot.input('Enter the summary:')
         else:
             gen_factory.handle_arg(arg)
+
+    if textfile_opt:
+        if 'text' in opts:
+            pywikibot.error(
+                'Arguments -text and -textfile '
+                "can't be provided at the same time")
+            return
+        try:
+            with open(textfile_opt, 'r', encoding='utf-8') as textfile:
+                opts['text'] = textfile.read()
+        except OSError as e:
+            pywikibot.error(f'Error loading {opts["textfile"]}: {e}')
+            return
 
     generator = gen_factory.getCombinedGenerator()
 
