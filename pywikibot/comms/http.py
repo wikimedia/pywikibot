@@ -11,15 +11,19 @@ This module is responsible for
     - Basic HTTP error handling
 
 This module creates and uses its own ``requests.Session`` object.
-The session is closed if the module terminates.
-If required you can use your own Session object passing it to the
-``http.session`` variable::
+The session is closed if the module terminates. If required you can use
+your own Session object passing it to the ``http.session`` variable::
 
     from pywikibot.comms import http
     session = requests.Session()
     http.session = session
 
-:py:obj:`flush()` can be called to close the session object.
+To enable access via cookies, assign cookie handling class::
+
+    session.cookies = http.cookie_jar
+
+.. versionchanged:: 8.0
+   Cookies are lazy loaded when logging to site.
 """
 #
 # (C) Pywikibot team, 2007-2022
@@ -40,7 +44,7 @@ from warnings import warn
 import requests
 
 import pywikibot
-from pywikibot import config
+from pywikibot import config, tools
 from pywikibot.backports import Tuple
 from pywikibot.exceptions import (
     FatalServerError,
@@ -58,20 +62,48 @@ except ImportError as e:
     requests_oauthlib = e
 
 
-# The error message for failed SSL certificate verification
-# 'certificate verify failed' is a commonly detectable string
-SSL_CERT_VERIFY_FAILED_MSG = 'certificate verify failed'
+class PywikibotCookieJar(cookiejar.LWPCookieJar):
 
-cookie_file_path = config.datafilepath('pywikibot.lwp')
-file_mode_checker(cookie_file_path, create=True)
-cookie_jar = cookiejar.LWPCookieJar(cookie_file_path)
-try:
-    cookie_jar.load(ignore_discard=True)
-except cookiejar.LoadError:
-    debug('Loading cookies failed.')
-else:
-    debug('Loaded cookies from file.')
+    """CookieJar which create the filename and checks file permissions.
 
+    .. versionadded:: 8.0
+    """
+
+    def load(self, user: str = '', *args, **kwargs) -> None:
+        """Loads cookies from a file.
+
+        Insert the account name to the cookie filename, set the
+        instance`s filename and load the cookies.
+
+        :param user: account name to be part of the cookie filename.
+        """
+        _user = '-' + tools.as_filename(user) if user else ''
+        self.filename = config.datafilepath(f'pywikibot{_user}.lwp')
+
+        try:
+            super().load(*args, **kwargs)
+        except (cookiejar.LoadError, FileNotFoundError):
+            debug(f'Loading cookies for user {user} failed.')
+        else:
+            debug(f'Loaded cookies for user {user} from file.')
+
+    def save(self, *args, **kwargs) -> None:
+        """Check the file mode and save cookies to a file.
+
+        .. note:: *PywikibotCookieJar* must be loaded previously to set
+           the filename.
+
+        :raises ValueError: a filename was not supplied; :meth:`load`
+            must be called first.
+        """
+        if self.filename:
+            file_mode_checker(self.filename, create=True)
+        super().save(*args, **kwargs)
+
+
+#: global :class:`PywikibotCookieJar` instance.
+cookie_jar = PywikibotCookieJar()
+#: global :class:`requests.Session`.
 session = requests.Session()
 session.cookies = cookie_jar
 
@@ -268,7 +300,7 @@ def error_handling_callback(response):
     """
     # TODO: do some error correcting stuff
     if isinstance(response, requests.exceptions.SSLError) \
-       and SSL_CERT_VERIFY_FAILED_MSG in str(response):
+       and 'certificate verify failed' in str(response):
         raise FatalServerError(str(response))
 
     if isinstance(response, requests.ConnectionError):

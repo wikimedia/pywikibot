@@ -30,7 +30,7 @@ from urllib.parse import quote_from_bytes
 from warnings import warn
 
 import pywikibot
-from pywikibot import Timestamp, config, date, i18n, textlib
+from pywikibot import Timestamp, config, date, i18n, textlib, tools
 from pywikibot.backports import (
     Dict,
     Generator,
@@ -305,14 +305,7 @@ class BasePage(ComparableMixin):
             encoded_title = title.encode(self.site.encoding())
             title = quote_from_bytes(encoded_title, safe='')
         if as_filename:
-            # Replace characters that are not possible in file names on some
-            # systems, but still are valid in MediaWiki titles:
-            # Unix: /
-            # MediaWiki: /:\
-            # Windows: /:\"?*
-            # Spaces are possible on most systems, but are bad for URLs.
-            for forbidden in ':*?/\\" ':
-                title = title.replace(forbidden, '_')
+            title = tools.as_filename(title)
         return title
 
     def section(self) -> Optional[str]:

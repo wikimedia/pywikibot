@@ -25,7 +25,7 @@ from pywikibot.backports import (
     removesuffix,
 )
 from pywikibot.backports import OrderedDict as OrderedDictType
-from pywikibot.comms.http import get_authentication
+from pywikibot.comms import http
 from pywikibot.data import api
 from pywikibot.exceptions import (
     AbuseFilterDisallowedError,
@@ -326,7 +326,7 @@ class APISite(
 
     def is_oauth_token_available(self) -> bool:
         """Check whether OAuth token is set for this site."""
-        auth_token = get_authentication(self.base_url(''))
+        auth_token = http.get_authentication(self.base_url(''))
         return auth_token is not None and len(auth_token) == 4
 
     def login(
@@ -334,8 +334,10 @@ class APISite(
         autocreate: bool = False,
         user: Optional[str] = None
     ) -> None:
-        """
-        Log the user in if not already logged in.
+        """Log the user in if not already logged in.
+
+        .. versionchanged:: 8.0
+           lazy load cookies when logging in.
 
         .. seealso:: :api:`Login`
 
@@ -372,6 +374,10 @@ class APISite(
         self._loginstatus = _LoginStatus.IN_PROGRESS
         if user:
             self._username = normalize_username(user)
+
+        # load the password for self.username from cookie file
+        http.cookie_jar.load(self.username(), ignore_discard=True)
+
         try:
             del self.userinfo  # force reload
             if self.userinfo['name'] == self.user():
