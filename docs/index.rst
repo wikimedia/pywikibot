@@ -1,5 +1,6 @@
-Pywikibot Documentation
-=======================
+#######################
+Pywikibot documentation
+#######################
 
 Welcome! This is the documentation for Pywikibot |release|.
 
@@ -29,15 +30,16 @@ manual pages on mediawiki.org are licensed under the `CC-BY-SA 3.0`_ license.
 
 .. seealso:: `Pywikibot Manual`_ at https://www.mediawiki.org
 
+**************************
+Framework modules overview
+**************************
 
-Framework Modules Overview
---------------------------
 .. image:: framework.png
    :alt: Framework modules dependency network
 
-
+********
 Contents
---------
+********
 
 .. toctree::
    :maxdepth: 1

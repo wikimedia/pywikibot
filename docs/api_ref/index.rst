@@ -1,8 +1,10 @@
+#############
 API reference
--------------
+#############
 
+****************************
 High-level request structure
-============================
+****************************
 
 User code mainly interacts with :class:`pywikibot.Page` objects, which represent
 pages on a specific wiki. These objects get their properties by calling functions
@@ -13,8 +15,9 @@ The :class:`pywikibot.Site` object then calls the MediaWiki API using the
 functions provided by :mod:`data.api`. This layer then uses :func:`comms.http.request`
 to do the actual HTTP request.
 
+*****************
 Table of contents
-=================
+*****************
 
 .. toctree::
    :glob:

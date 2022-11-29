@@ -1,5 +1,6 @@
-Frequent asked questions
-========================
+**************************
+Frequently asked questions
+**************************
 
 **How to speed up Pywikibot?**
   1. The first time you are using Pywikibot for multiple Wikimedia sites you

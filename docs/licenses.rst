@@ -1,7 +1,8 @@
 :tocdepth: 1
 
+********
 Licenses
-========
+********
 
 **The framework itself and this documentation** are available under the
 :ref:`MIT license`; translations by translators and manual pages on
@@ -14,7 +15,7 @@ http://mementoweb.github.io/SiteStory/license.html.
 
 
 MIT License
------------
+===========
 **The framework is available under the MIT license.**
 
 .. include:: ../LICENSE

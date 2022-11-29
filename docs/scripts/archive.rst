@@ -1,5 +1,6 @@
+*********************
 Outdated core scripts
-=====================
+*********************
 
 This list contains outdated scripts from :term:`core` banch which
 aren't supported any longer. They are either archived or deleted.
@@ -13,7 +14,7 @@ Pywikibot%20script:%20>`
 
 
 capitalize\_redirects script
-----------------------------
+============================
 
 **Bot to create capitalized redirects**
 
@@ -22,12 +23,12 @@ word is uppercase and the remaining characters and words are lowercase.
 
 
 casechecker script
-------------------
+==================
 
 **Bot to find all pages on the wiki with mixed latin and cyrilic alphabets**
 
 catall script
--------------
+=============
 
 **This script shows the categories on each page and lets you change them**
 
@@ -40,7 +41,7 @@ For each page in the target wiki:
 
 
 commons\_link script
---------------------
+====================
 
 **Include Commons template in home wiki**
 
@@ -51,7 +52,7 @@ an article in Commons will not be in English but with
 redirect, this also functions.
 
 create_categories script
-------------------------
+========================
 
 **Program to batch create categories**
 
@@ -60,25 +61,25 @@ as suffix for creating new categories with a different base.
 
 
 disambredirs script
--------------------
+===================
 
 **User assisted updating redirect links on disambiguation pages**
 
 
 editarticle script
-------------------
+==================
 
 **Edit a Wikipedia article with your favourite editor**
 
 
 flickrripper script
--------------------
+===================
 
 **A tool to transfer flickr photos to Wikimedia Commons**
 
 
 followlive
-----------
+==========
 
 **Periodically grab list of new articles and analyze to blank or flag them**
 
@@ -87,7 +88,7 @@ with a template or eventually blank them.
 
 
 freebasemappingupload script
-----------------------------
+============================
 
 **Script to upload the mappings of Freebase to Wikidata**
 
@@ -98,7 +99,7 @@ https://developers.google.com/freebase/data#freebase-wikidata-mappings
 
 
 imagecopy script
-----------------
+================
 
 **Script to copy files from a local Wikimedia wiki to Wikimedia Commons**
 
@@ -113,7 +114,7 @@ only environment.
 
 
 imagecopy\_self script
-----------------------
+======================
 
 **Script to copy self published files from English Wikipedia to Commons**
 
@@ -125,7 +126,7 @@ only environment.
 
 
 imageharvest script
--------------------
+===================
 
 **Bot for getting multiple images from an external site**
 
@@ -141,7 +142,7 @@ itself, you will have to change the bot code, my apologies).
 
 
 imagerecat script
------------------
+=================
 
 **Program to re-categorize images at commons**
 
@@ -150,7 +151,7 @@ some filters and adds the result.
 
 
 imageuncat script
------------------
+=================
 
 **Program to add uncat template to images without categories at commons**
 
@@ -160,7 +161,7 @@ This script is working on the given site, so if the commons should be handled,
 the site commons should be given and not a Wikipedia or similar.
 
 isbn script
------------
+===========
 
 **This script reports and fixes invalid ISBN numbers**
 
@@ -169,13 +170,13 @@ correct the ISBN format by placing hyphens.
 
 
 lonelypages script
-------------------
+==================
 
 **This is a script written to add the template "orphan" to pages**
 
 
 makecat script
---------------
+==============
 
 **Bot to add new or existing categories to pages**
 
@@ -186,13 +187,13 @@ asking the user which pages to include and which not.
 
 
 match\_images script
---------------------
+====================
 
 **Program to match two images based on histograms**
 
 
 ndashredir script
------------------
+=================
 
 **A script to create hyphenated redirects for n or m dash pages**
 
@@ -206,31 +207,31 @@ or categories and in this case this option can be handy.
 
 
 piper script
-------------
+============
 
 **This bot uses external filtering programs for munging text**
 
 
 selflink script
----------------
+===============
 
 **This bot searches for selflinks and allows removing them**
 
 
 spamremove script
------------------
+=================
 
 **Script to remove links that are being or have been spammed**
 
 
 standardize\_interwiki script
------------------------------
+=============================
 
 **Loop over all pages in the home wiki, standardizing the interwiki links**
 
 
 states\_redirect script
------------------------
+=======================
 
 **Create country sub-division redirect pages**
 
@@ -239,7 +240,7 @@ from `Something, ST`.
 
 
 surnames\_redirects script
---------------------------
+==========================
 
 **Bot to create redirects based on name order**
 
@@ -248,19 +249,19 @@ version of a given page where title consists of 2 or 3 titlecased words.
 
 
 table2wiki script
------------------
+=================
 
 **Nifty script to convert HTML-tables to MediaWiki's own syntax**
 
 
 unlink script
--------------
+=============
 
 **This bot unlinks a page on every page that links to it**
 
 
 wikisourcetext script
----------------------
+=====================
 
 **This bot applies to Wikisource sites to upload text**
 

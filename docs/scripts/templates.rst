@@ -1,15 +1,16 @@
+****************
 Template scripts
-================
+****************
 
-template script description
----------------------------
+template script
+===============
 
 .. automodule:: scripts.template
    :no-members:
    :noindex:
 
-templatecount script description
---------------------------------
+templatecount script
+====================
 
 .. automodule:: scripts.templatecount
    :no-members:
