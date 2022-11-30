@@ -14,6 +14,11 @@ category
 
 * Enable pagegenerators options with ``move`` and ``remove`` actions (:phab:`T318239`)
 
+clean_sandbox
+~~~~~~~~~~~~~
+
+* A `-textfile` option was addet to fetch the text from a file
+
 create_isbn_edition
 ~~~~~~~~~~~~~~~~~~~
 

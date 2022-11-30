@@ -1,6 +1,15 @@
 Current release 8.0.0
 ---------------------
 
+* Let user the choice which section to be copied with :mod:`generate_user_files
+  <pywikibot.scripts.generate_user_files>` (:phab:`T145372`)
+* use :func:`roundrobin_generators<tools.itertools.roundrobin_generators>` to combine generators
+  when limit option is given
+* Ignore OSError if API cache cannot be written
+* Update tools._unidata._category_cf from Unicodedata version 15.0.0
+* :meth:`Timestamp.set_timestamp()<pywikibot.time.Timestamp.set_timestamp>` raises TypeError
+  instead of ValueError if conversion fails
+* Python 3.12 is supported
 * All parameters of :meth:`Category.members()<page.Category.members>`,
   :meth:`Category.subcategories()<page.Category.subcategories>` and
   :meth:`Category.articles()<page.Category.articles>` are keyword only
