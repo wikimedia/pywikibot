@@ -1,5 +1,6 @@
+********************************
 tests.noreferences\_tests module
-================================
+********************************
 
 .. automodule:: tests.noreferences_tests
     :members:

@@ -1,5 +1,6 @@
+***************************
 tests.textlib\_tests module
-===========================
+***************************
 
 .. automodule:: tests.textlib_tests
     :members:

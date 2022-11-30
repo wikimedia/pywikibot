@@ -1,5 +1,6 @@
+**************************
 tests.sparql\_tests module
-==========================
+**************************
 
 .. automodule:: tests.sparql_tests
     :members:

@@ -1,5 +1,6 @@
+********************
 tests.aspects module
-====================
+********************
 
 .. automodule:: tests.aspects
     :members:

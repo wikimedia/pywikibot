@@ -1,5 +1,6 @@
+*****************************
 tests.add\_text\_tests module
-=============================
+*****************************
 
 .. automodule:: tests.add_text_tests
     :members:
