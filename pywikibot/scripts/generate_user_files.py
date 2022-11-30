@@ -5,7 +5,7 @@
    moved to pywikibot.scripts folder.
 .. versionchanged:: 8.0
    let user the choice which section to be copied.
-...Also EXTERNAL EDITOR SETTINGS section can be copied.
+   Also EXTERNAL EDITOR SETTINGS section can be copied.
 """
 #
 # (C) Pywikibot team, 2010-2022
