@@ -146,10 +146,10 @@ the top of the help.
 #
 # Distributed under the terms of the MIT license.
 #
-import codecs
 import re
 from collections.abc import Sequence
 from contextlib import suppress
+from pathlib import Path
 from typing import Any, Optional
 
 import pywikibot
@@ -807,7 +807,7 @@ def handle_exceptions(*args: str) -> Tuple[List[str], Dict[str, str]]:
     return local_args, exceptions
 
 
-def handle_pairsfile(filename: str) -> List[str]:
+def handle_pairsfile(filename: str) -> Optional[List[str]]:
     """Handle -pairsfile argument.
 
     .. versionadded:: 7.0
@@ -817,9 +817,8 @@ def handle_pairsfile(filename: str) -> List[str]:
             'Please enter the filename to read replacements from:')
 
     try:
-        with codecs.open(filename, 'r', 'utf-8') as f:
-            # strip newlines, but not other characters
-            replacements = f.read().splitlines()
+        with Path(filename).open(encoding='utf-8') as f:
+            replacements = f.readlines()
         if not replacements:
             raise OSError(f'{filename} is empty.')
     except OSError as e:
@@ -828,8 +827,7 @@ def handle_pairsfile(filename: str) -> List[str]:
 
     if len(replacements) % 2:
         pywikibot.error(
-            '{} contains an incomplete pattern replacement pair.'.format(
-                filename))
+            f'{filename} contains an incomplete pattern replacement pair.')
         return None
 
     # Strip BOM from first line
