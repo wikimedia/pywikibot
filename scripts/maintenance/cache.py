@@ -74,6 +74,7 @@ import os
 import pickle
 import sys
 from pathlib import Path
+from typing import Optional
 
 import pywikibot
 from pywikibot.data import api
@@ -217,23 +218,18 @@ class CacheEntry(api.CachedRequest):
         self._cachefile_path().unlink()
 
 
-def process_entries(cache_path, func, use_accesstime=None, output_func=None,
-                    action_func=None):
-    """
-    Check the contents of the cache.
+def process_entries(cache_path, func, use_accesstime: Optional[bool] = None,
+                    output_func=None, action_func=None):
+    """Check the contents of the cache.
 
-    This program tries to use file access times to determine
-    whether cache files are being used.
-    However file access times are not always usable.
-    On many modern filesystems, they have been disabled.
-    On Unix, check the filesystem mount options. You may
-    need to remount with 'strictatime'.
+    This program tries to use file access times to determine whether
+    cache files are being used. However file access times are not always
+    usable. On many modern filesystems, they have been disabled. On Unix,
+    check the filesystem mount options. You may need to remount with
+    'strictatime'.
 
-    :param use_accesstime: Whether access times should be used.
-    :type use_accesstime: bool tristate:
-         - None  = detect
-         - False = don't use
-         - True  = always use
+    :param use_accesstime: Whether access times should be used. `None`
+        for detect, `False` for don't use and `True` for always use.
     """
     if not cache_path:
         cache_path = os.path.join(pywikibot.config.base_dir,
