@@ -32,6 +32,7 @@ import time
 from functools import partial
 from http import HTTPStatus
 from typing import Any, Optional, Union
+from urllib.parse import unquote
 
 from requests.exceptions import ReadTimeout
 
@@ -974,6 +975,7 @@ class IndexPage(pywikibot.Page):
                 title = self._parse_redlink(href)  # non-existing page
                 if title is None:  # title not conforming to required format
                     continue
+                title = unquote(title)
             else:
                 title = a_tag.get('title')   # existing page
 
