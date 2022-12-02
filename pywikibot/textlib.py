@@ -25,7 +25,12 @@ from pywikibot.backports import Tuple
 from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.family import Family
 from pywikibot.time import TZoneFixedOffset
-from pywikibot.tools import ModuleDeprecationWrapper, deprecated
+from pywikibot.tools import (
+    ModuleDeprecationWrapper,
+    deprecated,
+    first_lower,
+    first_upper,
+)
 from pywikibot.userinterfaces.transliteration import NON_LATIN_DIGITS
 
 
@@ -1836,13 +1841,18 @@ class TimeStripper:
         self.site = pywikibot.Site() if site is None else site
 
         self.origNames2monthNum = {}
-        for n, (_long, _short) in enumerate(self.site.months_names, start=1):
-            self.origNames2monthNum[_long] = n
-            self.origNames2monthNum[_short] = n
-            # in some cases month in ~~~~ might end without dot even if
-            # site.months_names do not.
-            if _short.endswith('.'):
-                self.origNames2monthNum[_short[:-1]] = n
+        # use first_lower/first_upper for 'vi' language because monthsnames
+        # were changed: T324310
+        functions = [first_upper,
+                     first_lower] if self.site.lang == 'vi' else [str]
+        for n, (long, short) in enumerate(self.site.months_names, start=1):
+            for func in functions:
+                self.origNames2monthNum[func(long)] = n
+                self.origNames2monthNum[func(short)] = n
+                # in some cases month in ~~~~ might end without dot even if
+                # site.months_names do not.
+                if short.endswith('.'):
+                    self.origNames2monthNum[func(short[:-1])] = n
 
         self.groups = ['year', 'month', 'hour', 'time', 'day', 'minute',
                        'tzinfo']
