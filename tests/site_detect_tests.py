@@ -78,6 +78,7 @@ class MediaWikiSiteTestCase(SiteDetectionTestCase):
         'http://www.otterstedt.de/wiki/index.php/$1',
         'http://kb.mozillazine.org/$1',
         'https://en.wikifur.com/wiki/$1',  # 1.23.16
+        'http://kb.mozillazine.org/$1'  # 1.26.4
     )
 
     no_sites = (
