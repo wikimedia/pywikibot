@@ -7,12 +7,12 @@ Usage:
 
 """
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
-import codecs
 import re
+from pathlib import Path
 
 import pywikibot
 from pywikibot.data import wikistats
@@ -82,13 +82,12 @@ def update_family(families):
         text += line + '\n'
         text += '    ]'
         pywikibot.info(text)
-        family_file_name = f'pywikibot/families/{family}_family.py'
-        with codecs.open(family_file_name, 'r', 'utf8') as family_file:
-            family_text = family_file.read()
+
+        filepath = Path(f'pywikibot/families/{family}_family.py')
+        family_text = filepath.read_text(encoding='utf8')
         family_text = re.sub(r'(?ms)^ {4}languages_by_size.+?\]',
                              text, family_text, 1)
-        with codecs.open(family_file_name, 'w', 'utf8') as family_file:
-            family_file.write(family_text)
+        filepath.write_text(family_text, encoding='utf8')
 
 
 if __name__ == '__main__':
