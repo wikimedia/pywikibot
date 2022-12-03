@@ -5,8 +5,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
-import codecs
 import re
+from pathlib import Path
 
 import pywikibot
 from pywikibot.family import Family
@@ -23,8 +23,8 @@ pages = {
 
 def update_family(list_name, page):
     """Update family.py file."""
-    pywikibot.info('\nReading {} sorting order from\nfrom {}...'
-                   .format(list_name, page.title(with_ns=False)))
+    pywikibot.info(f'\nReading {list_name} sorting order from\n'
+                   f'{page.title(with_ns=False)!r}...')
 
     original = getattr(Family, list_name)
     new = page.text.split()
@@ -57,13 +57,11 @@ def update_family(list_name, page):
     text += line + '\n'
     text += '    ]'
     pywikibot.info(text)
-    family_file_name = 'pywikibot/family.py'
-    with codecs.open(family_file_name, 'r', 'utf8') as family_file:
-        family_text = family_file.read()
+    filepath = Path('pywikibot/family.py')
+    family_text = filepath.read_text(encoding='utf8')
     family_text = re.sub(r'(?ms)^ {4}%s.+?\]' % list_name,
                          text, family_text, 1)
-    with codecs.open(family_file_name, 'w', 'utf8') as family_file:
-        family_file.write(family_text)
+    filepath.write_text(family_text, encoding='utf8')
 
 
 def main():
