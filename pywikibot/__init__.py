@@ -350,19 +350,21 @@ class WbTime(_WbRepresentation):
           to minutes.
 
         :param year: The year as a signed integer of between 1 and 16 digits.
-        :param month: Month
-        :param day: Day
-        :param hour: Hour
-        :param minute: Minute
-        :param second: Second
+        :param month: Month of the timestamp, if it exists.
+        :param day: Day of the timestamp, if it exists.
+        :param hour: Hour of the timestamp, if it exists.
+        :param minute: Minute of the timestamp, if it exists.
+        :param second: Second of the timestamp, if it exists.
         :param precision: The unit of the precision of the time.
         :param before: Number of units after the given time it could be, if
             uncertain. The unit is given by the precision.
         :param after: Number of units before the given time it could be, if
             uncertain. The unit is given by the precision.
         :param timezone: Timezone information in minutes.
-        :param calendarmodel: URI identifying the calendar model
-        :param site: The Wikibase site
+        :param calendarmodel: URI identifying the calendar model.
+        :param site: The Wikibase site. If not provided, retrieves the data
+            repository from the default site from user-config.py.
+            Only used if calendarmodel is not given.
         """
         if year is None:
             raise ValueError('no year given')
@@ -431,14 +433,17 @@ class WbTime(_WbRepresentation):
 
         :param datetimestr: Timestamp in a format resembling ISO 8601,
             e.g. +2013-01-01T00:00:00Z
-        :param precision: The unit of the precision of the time.
+        :param precision: The unit of the precision of the time. Defaults to
+            14 (second).
         :param before: Number of units after the given time it could be, if
             uncertain. The unit is given by the precision.
         :param after: Number of units before the given time it could be, if
             uncertain. The unit is given by the precision.
         :param timezone: Timezone information in minutes.
-        :param calendarmodel: URI identifying the calendar model
-        :param site: The Wikibase site
+        :param calendarmodel: URI identifying the calendar model.
+        :param site: The Wikibase site. If not provided, retrieves the data
+            repository from the default site from user-config.py.
+            Only used if calendarmodel is not given.
         """
         match = re.match(r'([-+]?\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)Z',
                          datetimestr)
@@ -459,14 +464,17 @@ class WbTime(_WbRepresentation):
         Create a new WbTime object from a pywikibot.Timestamp.
 
         :param timestamp: Timestamp
-        :param precision: The unit of the precision of the time.
+        :param precision: The unit of the precision of the time. Defaults to
+            14 (second).
         :param before: Number of units after the given time it could be, if
             uncertain. The unit is given by the precision.
         :param after: Number of units before the given time it could be, if
             uncertain. The unit is given by the precision.
         :param timezone: Timezone information in minutes.
-        :param calendarmodel: URI identifying the calendar model
-        :param site: The Wikibase site
+        :param calendarmodel: URI identifying the calendar model.
+        :param site: The Wikibase site. If not provided, retrieves the data
+            repository from the default site from user-config.py.
+            Only used if calendarmodel is not given.
         """
         return cls.fromTimestr(timestamp.isoformat(), precision=precision,
                                before=before, after=after,
@@ -524,7 +532,8 @@ class WbTime(_WbRepresentation):
         Create a WbTime from the JSON data given by the Wikibase API.
 
         :param data: Wikibase JSON
-        :param site: The Wikibase site
+        :param site: The Wikibase site. If not provided, retrieves the data
+            repository from the default site from user-config.py.
         """
         return cls.fromTimestr(data['time'], data['precision'],
                                data['before'], data['after'],
