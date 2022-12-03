@@ -46,7 +46,6 @@ The following generators and filters are supported:
 #
 # Distributed under the terms of the MIT license.
 #
-import codecs
 import http.client as httplib
 import itertools
 import os
@@ -57,6 +56,7 @@ from contextlib import suppress
 from enum import IntEnum
 from functools import partial
 from http import HTTPStatus
+from pathlib import Path
 from textwrap import shorten
 
 import pywikibot
@@ -527,8 +527,8 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
     def setup(self):
         """Read dead links from file."""
         try:
-            with codecs.open(listof404pages, 'r', 'latin_1') as f:
-                self.dead_links = f.read()
+            path = Path(listof404pages)
+            self.dead_links = path.read_text(encoding='latin_1')
         except OSError:
             raise NotImplementedError(
                 '404-links.txt is required for reflinks.py\n'
