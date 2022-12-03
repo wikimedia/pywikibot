@@ -130,10 +130,6 @@ class PreAPISiteTestCase(SiteDetectionTestCase):
         """Test detection of MediaWiki sites for www.otterstedt.de."""
         self.assertNoSite('http://www.otterstedt.de/wiki/index.php/$1')
 
-    def test_mozillazine(self):
-        """Test detection of MediaWiki sites for kb.mozillazine.org."""
-        self.assertNoSite('http://kb.mozillazine.org/$1')
-
 
 class APIHiddenTestCase(SiteDetectionTestCase):
 

@@ -28,20 +28,20 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     languages_by_size = [
         'en', 'fr', 'mg', 'zh', 'ru', 'de', 'es', 'sh', 'sv', 'nl', 'el', 'pl',
-        'ku', 'lt', 'ca', 'it', 'fi', 'ta', 'hu', 'tr', 'io', 'ja', 'hy', 'ko',
+        'ku', 'lt', 'ca', 'it', 'fi', 'ta', 'hu', 'tr', 'ja', 'io', 'hy', 'ko',
         'pt', 'kn', 'vi', 'sr', 'th', 'hi', 'ro', 'no', 'id', 'et', 'cs', 'ml',
-        'my', 'uz', 'li', 'or', 'eo', 'te', 'fa', 'skr', 'gl', 'ar', 'oc',
-        'jv', 'az', 'eu', 'uk', 'br', 'ast', 'is', 'da', 'lo', 'simple', 'bn',
-        'sg', 'la', 'hr', 'fj', 'tg', 'sk', 'ky', 'mnw', 'bg', 'wa', 'shn',
-        'ur', 'ps', 'cy', 'vo', 'he', 'om', 'sl', 'af', 'zh-min-nan', 'scn',
-        'lmo', 'tl', 'pa', 'sw', 'fy', 'ms', 'nn', 'ka', 'lv', 'min', 'sq',
+        'my', 'uz', 'li', 'skr', 'or', 'eo', 'te', 'fa', 'gl', 'ar', 'oc',
+        'jv', 'az', 'eu', 'uk', 'br', 'ast', 'is', 'sg', 'bn', 'da', 'lo',
+        'simple', 'la', 'hr', 'mnw', 'fj', 'sk', 'tg', 'shn', 'ky', 'bg', 'wa',
+        'ur', 'ps', 'cy', 'vo', 'he', 'om', 'sl', 'af', 'zh-min-nan', 'lmo',
+        'scn', 'tl', 'pa', 'ms', 'sw', 'fy', 'nn', 'ka', 'lv', 'min', 'sq',
         'nds', 'lb', 'co', 'mn', 'pnb', 'bs', 'nah', 'yue', 'sa', 'kk', 'km',
-        'diq', 'vec', 'be', 'tk', 'mk', 'nia', 'sm', 'hsb', 'ks', 'shy', 'su',
+        'vec', 'be', 'diq', 'tk', 'mk', 'nia', 'sm', 'hsb', 'ks', 'shy', 'su',
         'gd', 'ga', 'bcl', 'an', 'gom', 'mr', 'wo', 'mni', 'ia', 'ang', 'mt',
-        'sd', 'fo', 'tt', 'gn', 'so', 'ie', 'mi', 'csb', 'ug', 'si', 'st',
-        'roa-rup', 'tpi', 'hif', 'kl', 'bjn', 'ha', 'zu', 'guw', 'ay', 'jbo',
-        'yi', 'ln', 'gu', 'na', 'gv', 'kw', 'am', 'ne', 'rw', 'ts', 'qu', 'ss',
-        'iu', 'chr', 'dv', 'ti', 'tn', 'ig',
+        'fo', 'sd', 'tt', 'gn', 'bjn', 'so', 'ie', 'mi', 'csb', 'ug', 'si',
+        'st', 'ha', 'roa-rup', 'tpi', 'hif', 'guw', 'kl', 'zu', 'ay', 'jbo',
+        'yi', 'ln', 'gu', 'na', 'gv', 'kw', 'am', 'ne', 'rw', 'ts', 'ig', 'qu',
+        'ss', 'iu', 'chr', 'dv', 'ti', 'tn',
     ]
 
     category_redirect_templates = {

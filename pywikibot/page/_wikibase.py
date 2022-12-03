@@ -1936,7 +1936,7 @@ class LexemePage(WikibasePage):
     >>> repo = pywikibot.Site('wikidata')
     >>> L2 = pywikibot.LexemePage(repo, 'L2')  # create a Lexeme page
     >>> list(L2.claims.keys())  # access the claims
-    ['P5831', 'P5402']
+    ['P5402', 'P5831']
     >>> len(L2.forms)  # access the forms
     2
     >>> F1 = L2.forms[0]  # access the first form
