@@ -28,9 +28,6 @@
 .. image:: https://static.pepy.tech/personalized-badge/pywikibot?period=month&units=international_system&left_color=black&right_color=blue&left_text=monthly
    :alt: Monthly downloads
    :target: https://pepy.tech/project/pywikibot
-.. image:: https://img.shields.io/tokei/lines/github/wikimedia/pywikibot
-   :alt: Lines of Code
-   :target: https://gerrit.wikimedia.org/r/plugins/gitiles/pywikibot/core/
 .. image:: https://img.shields.io/github/last-commit/wikimedia/pywikibot
    :alt: Last commit
    :target: https://gerrit.wikimedia.org/r/plugins/gitiles/pywikibot/core/
