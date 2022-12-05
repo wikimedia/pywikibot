@@ -29,3 +29,17 @@ table.align-default {
     margin-left: unset;
     margin-right: unset;
 }
+
+.sidebar-rellinks {
+    margin-top: -0.25rem;
+    padding-bottom: 0.25rem;
+    font-size: 75%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+}
+
+.sidebar-rellinks a {
+    padding: 0.25rem;
+}
