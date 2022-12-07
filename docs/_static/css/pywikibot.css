@@ -30,6 +30,7 @@ table.align-default {
     margin-right: unset;
 }
 
+/** previous, next, modules, index links in sidebar **/
 .sidebar-rellinks {
     margin-top: -0.25rem;
     padding-bottom: 0.25rem;
@@ -42,4 +43,36 @@ table.align-default {
 
 .sidebar-rellinks a {
     padding: 0.25rem;
+}
+
+/** code highlights for light and dark mode **/
+
+/** light mode by default or if OS picks it **/
+.highlight .viewcode-block:target {
+    background-color: #3331;
+    padding: 0.2rem 0;
+    border: 1px solid #1115;
+}
+
+/** dark mode chosen by the OS **/
+@media (prefers-color-scheme: dark) {
+    .highlight .viewcode-block:target {
+        background-color: #ccc1;
+        padding: 0.2rem 0;
+        border: 1px solid #fff5;
+    }
+}
+
+/** light mode via toggle **/
+[data-theme='light'] .highlight .viewcode-block:target {
+    background-color: #3331;
+    padding: 0.2rem 0;
+    border: 1px solid #1115;
+}
+
+/** dark mode via toggle **/
+[data-theme='dark'] .highlight .viewcode-block:target {
+    background-color: #ccc1;
+    padding: 0.2rem 0;
+    border: 1px solid #fff5;
 }
