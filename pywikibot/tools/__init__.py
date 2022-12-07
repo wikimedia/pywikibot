@@ -60,6 +60,7 @@ __all__ = (
 
     # other tools
     'PYTHON_VERSION',
+    'as_filename',
     'is_ip_address',
     'has_module',
     'classproperty',
@@ -284,6 +285,47 @@ def first_upper(string: str) -> str:
     """
     first = string[:1]
     return (_first_upper_exception(first) or first.upper()) + string[1:]
+
+
+def as_filename(string: str, repl: str = '_') -> str:
+    r"""Return a string with characters are valid for filenames.
+
+    Replace characters that are not possible in file names on some
+    systems, but still are valid in MediaWiki titles:
+
+        - Unix: ``/``
+        - MediaWiki: ``/:\\``
+        - Windows: ``/:\\"?*``
+
+    Spaces are possible on most systems, but are bad for URLs.
+
+    **Example**:
+
+    >>> as_filename('How are you?')
+    'How_are_you_'
+    >>> as_filename('Say: "Hello"')
+    'Say___Hello_'
+    >>> as_filename('foo*bar', '')
+    'foobar'
+    >>> as_filename('foo', 'bar')
+    Traceback (most recent call last):
+    ...
+    ValueError: Invalid repl parameter 'bar'
+    >>> as_filename('foo', '?')
+    Traceback (most recent call last):
+    ...
+    ValueError: Invalid repl parameter '?'
+
+    .. versionadded:: 8.0
+
+    :param string: the string to be modified
+    :param repl: the replacement character
+    :raises ValueError: Invalid repl parameter
+    """
+    pattern = r':*?/\\" '
+    if len(repl) > 1 or len(repl) == 1 and repl in pattern:
+        raise ValueError(f'Invalid repl parameter {repl!r}')
+    return re.sub(f'[{pattern}]', repl, string)
 
 
 def strtobool(val: str) -> bool:

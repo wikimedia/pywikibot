@@ -119,8 +119,6 @@ class FamilyFileGenerator:
             try:
                 w = self.Wiki(self.base_url, verify=verify)
             except FatalServerError:
-                pywikibot.error(
-                    pywikibot.comms.http.SSL_CERT_VERIFY_FAILED_MSG)
                 pywikibot.exception()
                 if not pywikibot.bot.input_yn(
                     'Retry with disabled ssl certificate validation',
