@@ -314,7 +314,7 @@ class Link(BaseLink):
         # This code was adapted from Title.php : secureAndSplit()
         if '\ufffd' in t:
             raise InvalidTitleError(
-                '{!r} contains illegal char {!r}'.format(t, '\ufffd'))
+                fr'{t!r} contains illegal replacement char \ufffd')
 
         # Cleanup whitespace
         sep = self._source.family.title_delimiter_and_aliases[0]

@@ -84,7 +84,10 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, AutomaticTWSummaryBot):
             # Make sure that next time around we will not find this same hit.
             curpos = m.start() + 1
 
-            is_interwikilink = mysite.isInterwikiLink(m['title'])
+            try:
+                is_interwikilink = mysite.isInterwikiLink(m['title'])
+            except InvalidTitleError:
+                continue  # skip invalid title
 
             # ignore interwiki links, links in the disabled area
             # and links to sections of the same page
