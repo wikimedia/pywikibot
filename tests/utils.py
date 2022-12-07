@@ -428,7 +428,7 @@ class DryPage(pywikibot.Page):
         return self._disambig
 
 
-class FakeLoginManager(pywikibot.data.api.LoginManager):
+class FakeLoginManager(pywikibot.login.ClientLoginManager):
 
     """Loads a fake password."""
 

@@ -53,7 +53,7 @@ from pywikibot.exceptions import (
     TitleblacklistError,
     UnknownExtensionError,
 )
-from pywikibot.login import LoginStatus as _LoginStatus
+from pywikibot import login
 from pywikibot.site._basesite import BaseSite
 from pywikibot.site._decorators import need_right, need_version
 from pywikibot.site._extensions import (
@@ -126,7 +126,7 @@ class APISite(
         super().__init__(code, fam, user)
         self._globaluserinfo: Dict[Union[int, str], Any] = {}
         self._interwikimap = _InterwikiMap(self)
-        self._loginstatus = _LoginStatus.NOT_ATTEMPTED
+        self._loginstatus = login.LoginStatus.NOT_ATTEMPTED
         self._msgcache: Dict[str, str] = {}
         self._paraminfo = api.ParamInfo(self)
         self._siteinfo = Siteinfo(self)
@@ -354,7 +354,7 @@ class APISite(
         #       (below) is successful. Instead, log the problem,
         #       to be increased to 'warning' level once majority
         #       of issues are resolved.
-        if self._loginstatus == _LoginStatus.IN_PROGRESS:
+        if self._loginstatus == login.LoginStatus.IN_PROGRESS:
             pywikibot.log(
                 '{!r}.login() called when a previous login was in progress.'
                 .format(self))
@@ -364,18 +364,18 @@ class APISite(
         # logged_in() is False if _userinfo exists, which means this
         # will have no effect for the invocation from api.py
         if self.logged_in():
-            self._loginstatus = _LoginStatus.AS_USER
+            self._loginstatus = login.LoginStatus.AS_USER
             return
 
         # check whether a login cookie already exists for this user
         # or check user identity when OAuth enabled
-        self._loginstatus = _LoginStatus.IN_PROGRESS
+        self._loginstatus = login.LoginStatus.IN_PROGRESS
         if user:
             self._username = normalize_username(user)
         try:
             del self.userinfo  # force reload
             if self.userinfo['name'] == self.user():
-                self._loginstatus = _LoginStatus.AS_USER
+                self._loginstatus = login.LoginStatus.AS_USER
                 return
 
         # May occur if you are not logged in (no API read permissions).
@@ -406,14 +406,15 @@ class APISite(
 
             raise NoUsernameError(error_msg)
 
-        login_manager = api.LoginManager(site=self, user=self.username())
+        login_manager = login.ClientLoginManager(site=self,
+                                                 user=self.username())
         if login_manager.login(retry=True, autocreate=autocreate):
             self._username = login_manager.username
             del self.userinfo  # force reloading
 
             # load userinfo
             if self.userinfo['name'] == self.username():
-                self._loginstatus = _LoginStatus.AS_USER
+                self._loginstatus = login.LoginStatus.AS_USER
                 return
 
             pywikibot.error('{} != {} after {}.login() and successful '
@@ -423,7 +424,7 @@ class APISite(
                                     type(self).__name__,
                                     type(login_manager).__name__))
 
-        self._loginstatus = _LoginStatus.NOT_LOGGED_IN  # failure
+        self._loginstatus = login.LoginStatus.NOT_LOGGED_IN  # failure
 
     def _relogin(self) -> None:
         """Force a login sequence without logging out, using the current user.
@@ -433,7 +434,7 @@ class APISite(
         from the site.
         """
         del self.userinfo
-        self._loginstatus = _LoginStatus.NOT_LOGGED_IN
+        self._loginstatus = login.LoginStatus.NOT_LOGGED_IN
         self.login()
 
     def logout(self) -> None:
@@ -452,7 +453,7 @@ class APISite(
         req_params = {'action': 'logout', 'token': self.tokens['csrf']}
         uirequest = self.simple_request(**req_params)
         uirequest.submit()
-        self._loginstatus = _LoginStatus.NOT_LOGGED_IN
+        self._loginstatus = login.LoginStatus.NOT_LOGGED_IN
 
         # Reset tokens and user properties
         del self.userinfo

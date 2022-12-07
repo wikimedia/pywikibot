@@ -847,12 +847,12 @@ class TestLazyLoginNotExistUsername(TestLazyLoginBase):
     def setUp(self):
         """Patch the LoginManager to avoid UI interaction."""
         super().setUp()
-        self.orig_login_manager = pywikibot.data.api.LoginManager
-        pywikibot.data.api.LoginManager = FakeLoginManager
+        self.orig_login_manager = pywikibot.login.ClientLoginManager
+        pywikibot.login.ClientLoginManager = FakeLoginManager
 
     def tearDown(self):
         """Restore the original LoginManager."""
-        pywikibot.data.api.LoginManager = self.orig_login_manager
+        pywikibot.login.ClientLoginManager = self.orig_login_manager
         super().tearDown()
 
     @patch.object(pywikibot, 'info')
