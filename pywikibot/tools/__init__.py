@@ -264,6 +264,11 @@ def first_lower(string: str) -> str:
 
     Empty strings are supported. The original string is not changed.
 
+    **Example**:
+
+    >>> first_lower('Hello World')
+    'hello World'
+
     .. versionadded:: 3.0
     """
     return string[:1].lower() + string[1:]
@@ -275,13 +280,16 @@ def first_upper(string: str) -> str:
 
     Empty strings are supported. The original string is not changed.
 
-    .. versionadded:: 3.0
+    **Example**:
 
-    .. note:: MediaWiki doesn't capitalize
-       some characters the same way as Python.
-       This function tries to be close to
-       MediaWiki's capitalize function in
-       title.php. See T179115 and T200357.
+    >>> first_upper('hello World')
+    'Hello World'
+
+    .. versionadded:: 3.0
+    .. note:: MediaWiki doesn't capitalize some characters the same way
+       as Python. This function tries to be close to MediaWiki's
+       capitalize function in title.php. See :phab:`T179115` and
+       :phab:`T200357`.
     """
     first = string[:1]
     return (_first_upper_exception(first) or first.upper()) + string[1:]
@@ -333,6 +341,17 @@ def strtobool(val: str) -> bool:
 
     This is a reimplementation of distutils.util.strtobool due to
     :pep:`632#Migration Advice`
+
+    **Example**:
+
+    >>> strtobool('yes')
+    True
+    >>> strtobool('Off')
+    False
+    >>> strtobool('aye')
+    Traceback (most recent call last):
+    ...
+    ValueError: invalid truth value 'aye'
 
     .. versionadded:: 7.1
 
