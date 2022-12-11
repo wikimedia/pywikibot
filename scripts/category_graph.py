@@ -163,10 +163,10 @@ class CategoryGraphBot(SingleSiteBot):
                         break
                     n = self.rev[n][0]
         pywikibot.output('Saving results')
-        pywikibot.output(self.to + '.dot')
-        self.dot.write(self.to + '.dot')
+        pywikibot.output(self.to + '.gv')
+        self.dot.write(self.to + '.gv', encoding='utf-8')
         pywikibot.output(self.to + '.svg')
-        self.dot.write_svg(self.to + '.svg')
+        self.dot.write_svg(self.to + '.svg', encoding='utf-8')
         pywikibot.output(self.to + '.html')
         header = ('<head><meta charset="UTF-8"/>'
                   '<title>' + self.cat.title(with_ns=False)
@@ -181,7 +181,7 @@ class CategoryGraphBot(SingleSiteBot):
                   '<style> svg { height:100%; width:100%; } </style>\n')
         with io.open(self.to + '.html', mode='wb') as o:
             o.write(header.encode())
-            o.write(self.dot.create('dot', 'svg'))
+            o.write(self.dot.create('dot', 'svg', encoding='utf-8'))
 
 
 if __name__ == '__main__':
