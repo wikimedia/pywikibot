@@ -13,14 +13,15 @@ actions:
 
 optional arguments:
   -to TO         base file name to save, "?" to ask.
-  -style STYLE   graphviz style definitions in dot format.
+  -style STYLE   graphviz style definitions in dot format:
+                 https://graphviz.org/doc/info/attrs.html
   -depth DEPTH   maximal hierarchy depth. 2 by default.
   -downsize K    font size divider for subcategories. 4 by default.
                  Use 1 for the same font size.
 
 Examples:
 
-pwb.py -v graph category
+pwb.py -v category_graph -from
 pwb.py category_graph -from Life -downsize 1.5 \
         -style 'graph[rankdir=BT ranksep=0.5] node[shape=circle
         style=filled fillcolor=green] edge[style=dashed penwidth=3]'
