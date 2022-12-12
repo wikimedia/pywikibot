@@ -73,11 +73,11 @@ class CategoryGraphBot(SingleSiteBot):
         self.leaves = set()
         self.counter = 0
         font = 'fontname="Helvetica,Arial,sans-serif"'
-        style = 'rankdir=LR ranksep=2 concentrate=true ' + font + \
-                'node [newrank=true shape=plaintext ' + font + ']' \
+        style = 'graph [rankdir=LR ranksep=2 concentrate=true %s] ' \
+                'node [newrank=true shape=plaintext %s] ' \
                 'edge [arrowhead=open labeldistance=3 ' \
-                'labelfontcolor="#00000080" ' + font + '] ' \
-                + args.style
+                'labelfontcolor="#00000080" %s] ' \
+                % (font, font, font) + args.style
         self.dot = pydot.graph_from_dot_data('digraph {' + style + '}')[0]
         self.dot.set_name('"' + cat_title + '"')
 
