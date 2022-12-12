@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-"""
+r"""
 Visualizes category hierarchy.
 
 Generates graphical representation in formats dot, svg and html5
@@ -15,11 +15,16 @@ optional arguments:
   -to TO         base file name to save, "?" to ask.
   -style STYLE   graphviz style definitions in dot format.
   -depth DEPTH   maximal hierarchy depth. 2 by default.
+  -downsize K    font size divider for subcategories. 4 by default.
+                 Use 1 for the same font size.
 
 Examples:
 
 pwb.py -v graph category
-pwb.py -v graph category Life --style rankdir=BT
+pwb.py category_graph -from Life -downsize 1.5 \
+        -style 'graph[rankdir=BT ranksep=0.5] node[shape=circle
+        style=filled fillcolor=green] edge[style=dashed penwidth=3]'
+
 """
 
 import argparse
@@ -40,6 +45,7 @@ class CategoryGraphBot(SingleSiteBot):
         ap.add_argument('-to', nargs='?', default='')
         ap.add_argument('-style', nargs='?', default='')
         ap.add_argument('-depth', nargs='?', default=2)
+        ap.add_argument('-downsize', nargs='?', default=4)
 
     def __init__(self, ap, args: argparse.Namespace) -> None:
         """Initializer."""
@@ -85,7 +91,7 @@ class CategoryGraphBot(SingleSiteBot):
 
         """
         title = cat.title(with_ns=False)
-        size = 4 ** level
+        size = float(args.downsize) ** level
         subcats = sorted(cat.subcategories())
 
         def node():
