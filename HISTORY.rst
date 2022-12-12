@@ -1,6 +1,12 @@
 Release history
 ===============
 
+7.7.2
+-----
+*03 December 2022*
+
+* Fix :class:`textlib.TimeStripper` for ``vi`` site code (:phab:`T324310`)
+
 7.7.1
 -----
 

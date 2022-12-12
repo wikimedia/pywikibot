@@ -1,6 +1,9 @@
 Current release 8.0.0
 ---------------------
 
+* Create a cookie file for each account (:phab:`T324000`)
+* Move data.api._login.LoginManager to :class:`login.ClientLoginManager`
+* Unquote title for red-links in class:`proofreadpage.IndexPage`
 * Let user the choice which section to be copied with :mod:`generate_user_files
   <pywikibot.scripts.generate_user_files>` (:phab:`T145372`)
 * use :func:`roundrobin_generators<tools.itertools.roundrobin_generators>` to combine generators
@@ -40,6 +43,9 @@ Current release 8.0.0
 Deprecations
 ------------
 
+* 8.0.0: :meth:`LoginManager.get_login_token<login.ClientLoginManager.get_login_token>` was 
+  replaced by ``login.ClientLoginManager.site.tokens['login']``
+* 8.0.0: ``data.api.LoginManager()`` is deprecated in favour of :class:`login.ClientLoginManager`
 * 8.0.0: :meth:`APISite.messages()<pywikibot.site._apisite.APISite.messages>` method is deprecated in favour of
   :attr:`userinfo['messages']<pywikibot.site._apisite.APISite.userinfo>`
 * 8.0.0: :meth:`Page.editTime()<page.BasePage.editTime>` method is deprecated and should be replaced by
@@ -73,9 +79,4 @@ Deprecations
 * 6.2.0: Throttle.multiplydelay attribute is deprecated
 * 6.2.0: SequenceOutputter.format_list() is deprecated in favour of 'out' property
 * 6.0.0: config.register_family_file() is deprecated
-
-
-Will be removed in Pywikibot 8
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 * 5.5.0: APISite.redirectRegex() will be removed in favour of APISite.redirect_regex()
