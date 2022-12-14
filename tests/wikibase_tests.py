@@ -301,6 +301,48 @@ class TestWbTime(WbRepresentationTestCase):
                                              day=0, hour=12, minute=43,
                                              precision=14))
 
+    def test_WbTime_skip_params_precision(self):
+        """Test skipping units (such as day, month) when creating WbTimes."""
+        repo = self.get_repo()
+        t = pywikibot.WbTime(year=2020, day=2, site=repo)
+        self.assertEqual(t, pywikibot.WbTime(year=2020, month=1, day=2,
+                                             site=repo))
+        self.assertEqual(t.precision, pywikibot.WbTime.PRECISION['day'])
+        t2 = pywikibot.WbTime(year=2020, hour=5, site=repo)
+        self.assertEqual(t2, pywikibot.WbTime(year=2020, month=1, day=1,
+                                              hour=5, site=repo))
+        self.assertEqual(t2.precision, pywikibot.WbTime.PRECISION['hour'])
+        t3 = pywikibot.WbTime(year=2020, minute=5, site=repo)
+        self.assertEqual(t3, pywikibot.WbTime(year=2020, month=1, day=1,
+                                              hour=0, minute=5, site=repo))
+        self.assertEqual(t3.precision, pywikibot.WbTime.PRECISION['minute'])
+        t4 = pywikibot.WbTime(year=2020, second=5, site=repo)
+        self.assertEqual(t4, pywikibot.WbTime(year=2020, month=1, day=1,
+                                              hour=0, minute=0, second=5,
+                                              site=repo))
+        self.assertEqual(t4.precision, pywikibot.WbTime.PRECISION['second'])
+        t5 = pywikibot.WbTime(year=2020, month=2, hour=5, site=repo)
+        self.assertEqual(t5, pywikibot.WbTime(year=2020, month=2, day=1,
+                                              hour=5, site=repo))
+        self.assertEqual(t5.precision, pywikibot.WbTime.PRECISION['hour'])
+        t6 = pywikibot.WbTime(year=2020, month=2, minute=5, site=repo)
+        self.assertEqual(t6, pywikibot.WbTime(year=2020, month=2, day=1,
+                                              hour=0, minute=5, site=repo))
+        self.assertEqual(t6.precision, pywikibot.WbTime.PRECISION['minute'])
+        t7 = pywikibot.WbTime(year=2020, month=2, second=5, site=repo)
+        self.assertEqual(t7, pywikibot.WbTime(year=2020, month=2, day=1,
+                                              hour=0, minute=0, second=5,
+                                              site=repo))
+        self.assertEqual(t7.precision, pywikibot.WbTime.PRECISION['second'])
+        t8 = pywikibot.WbTime(year=2020, day=2, hour=5, site=repo)
+        self.assertEqual(t8, pywikibot.WbTime(year=2020, month=1, day=2,
+                                              hour=5, site=repo))
+        self.assertEqual(t8.precision, pywikibot.WbTime.PRECISION['hour'])
+        t9 = pywikibot.WbTime(year=2020, month=3, day=2, minute=5, site=repo)
+        self.assertEqual(t9, pywikibot.WbTime(year=2020, month=3, day=2,
+                                              hour=0, minute=5, site=repo))
+        self.assertEqual(t9.precision, pywikibot.WbTime.PRECISION['minute'])
+
     def test_WbTime_timestamp(self):
         """Test timestamp functions of WbTime."""
         repo = self.get_repo()
