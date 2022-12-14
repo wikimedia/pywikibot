@@ -186,8 +186,6 @@ class BaseSite(ComparableMixin):
 
     def __getattr__(self, attr):
         """Delegate undefined methods calls to the Family object."""
-        if hasattr(self.__class__, attr):
-            return getattr(self.__class__, attr)
         try:
             method = getattr(self.family, attr)
             if not callable(method):
