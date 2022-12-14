@@ -368,22 +368,27 @@ class WbTime(_WbRepresentation):
         """
         if year is None:
             raise ValueError('no year given')
-        self.precision = self.PRECISION['second']
-        if second is None:
-            self.precision = self.PRECISION['minute']
-            second = 0
-        if minute is None:
-            self.precision = self.PRECISION['hour']
-            minute = 0
-        if hour is None:
-            self.precision = self.PRECISION['day']
-            hour = 0
-        if day is None:
+        self.precision = self.PRECISION['year']
+        if month is not None:
             self.precision = self.PRECISION['month']
-            day = 1
-        if month is None:
-            self.precision = self.PRECISION['year']
+        else:
             month = 1
+        if day is not None:
+            self.precision = self.PRECISION['day']
+        else:
+            day = 1
+        if hour is not None:
+            self.precision = self.PRECISION['hour']
+        else:
+            hour = 0
+        if minute is not None:
+            self.precision = self.PRECISION['minute']
+        else:
+            minute = 0
+        if second is not None:
+            self.precision = self.PRECISION['second']
+        else:
+            second = 0
         self.year = year
         self.month = month
         self.day = day
