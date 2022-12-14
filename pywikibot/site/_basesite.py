@@ -195,8 +195,8 @@ class BaseSite(ComparableMixin):
                 f.__doc__ = method.__doc__
             return f
         except AttributeError:
-            raise AttributeError("{} instance has no attribute '{}'"
-                                 .format(self.__class__.__name__, attr))
+            raise AttributeError(f'{type(self).__name__} instance has no '
+                                 f'attribute {attr!r}') from None
 
     def __str__(self) -> str:
         """Return string representing this Site's name and code."""
