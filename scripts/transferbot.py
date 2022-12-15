@@ -45,7 +45,7 @@ Copy 10 wanted templates of German Wikipedia from English Wikipedia to German
 
 """
 #
-# (C) Pywikibot team, 2014-2021
+# (C) Pywikibot team, 2014-2022
 #
 # Distributed under the terms of the MIT license.
 #

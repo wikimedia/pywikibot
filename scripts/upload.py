@@ -52,7 +52,7 @@ The script will ask for the location of an image(s), if not given as a
 parameter, and for a description.
 """
 #
-# (C) Pywikibot team, 2003-2021
+# (C) Pywikibot team, 2003-2022
 #
 # Distributed under the terms of the MIT license.
 #
