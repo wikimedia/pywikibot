@@ -319,6 +319,21 @@ class WbTime(_WbRepresentation):
     _items = ('year', 'month', 'day', 'hour', 'minute', 'second',
               'precision', 'before', 'after', 'timezone', 'calendarmodel')
 
+    _month_offset = {
+        1: 0,
+        2: 31,  # Jan -> Feb: 31 days
+        3: 59,  # Feb -> Mar: 28 days, plus 31 days in Jan -> Feb
+        4: 90,  # Mar -> Apr: 31 days, plus 59 days in Jan -> Mar
+        5: 120,  # Apr -> May: 30 days, plus 90 days in Jan -> Apr
+        6: 151,  # May -> Jun: 31 days, plus 120 days in Jan -> May
+        7: 181,  # Jun -> Jul: 30 days, plus 151 days in Jan -> Jun
+        8: 212,  # Jul -> Aug: 31 days, plus 181 days in Jan -> Jul
+        9: 243,  # Aug -> Sep: 31 days, plus 212 days in Jan -> Aug
+        10: 273,  # Sep -> Oct: 30 days, plus 243 days in Jan -> Sep
+        11: 304,  # Oct -> Nov: 31 days, plus 273 days in Jan -> Oct
+        12: 334,  # Nov -> Dec: 30 days, plus 304 days in Jan -> Nov
+    }
+
     def __init__(self,
                  year: Optional[int] = None,
                  month: Optional[int] = None,
@@ -348,6 +363,12 @@ class WbTime(_WbRepresentation):
         * Before the implementation of time zones: The longitude of the place
           of the event, in the range −180° to 180°, multiplied by 4 to convert
           to minutes.
+
+        Comparison information: When using the greater than or equal to
+        operator, or the less than or equal to operator, two different time
+        objects with the same UTC time after factoring in timezones are
+        considered equal. However, the equality operator will return false
+        if the timezone is different.
 
         :param year: The year as a signed integer of between 1 and 16 digits.
         :param month: Month of the timestamp, if it exists.
@@ -406,7 +427,6 @@ class WbTime(_WbRepresentation):
                                      .format(Site()))
             calendarmodel = site.calendarmodel()
         self.calendarmodel = calendarmodel
-
         # if precision is given it overwrites the autodetection above
         if precision is not None:
             if (isinstance(precision, int)
@@ -417,6 +437,61 @@ class WbTime(_WbRepresentation):
                 self.precision = self.PRECISION[precision]
             else:
                 raise ValueError(f'Invalid precision: "{precision}"')
+
+    def _getSecondsAdjusted(self) -> int:
+        """Return an internal representation of the time object as seconds.
+
+        The value adjusts itself for timezones. It is not compatible with
+        before/after.
+
+        This value should *only* be used for comparisons, and
+        its value may change without warning.
+
+        :return: An integer roughly representing the number of seconds
+            since January 1, 0000 AD, adjusted for leap years.
+        """
+        # This function ignores leap seconds. Since it is not required
+        # to correlate to an actual UNIX timestamp, this is acceptable.
+
+        # We are always required to have a year.
+        elapsed_seconds = int(self.year * 365.25 * 24 * 60 * 60)
+        if self.month > 1:
+            elapsed_seconds += self._month_offset[self.month] * 24 * 60 * 60
+            # The greogrian calendar
+            if self.calendarmodel == 'http://www.wikidata.org/entity/Q1985727':
+                if (self.year % 400 == 0
+                        or (self.year % 4 == 0 and self.year % 100 != 0)
+                        and self.month > 2):
+                    elapsed_seconds += 24 * 60 * 60  # Leap year
+            # The julian calendar
+            if self.calendarmodel == 'http://www.wikidata.org/entity/Q1985786':
+                if self.year % 4 == 0 and self.month > 2:
+                    elapsed_seconds += 24 * 60 * 60
+        if self.day > 1:
+            # Days start at 1, not 0.
+            elapsed_seconds += (self.day - 1) * 24 * 60 * 60
+        elapsed_seconds += self.hour * 60 * 60
+        elapsed_seconds += self.minute * 60
+        elapsed_seconds += self.second
+        if self.timezone is not None:
+            elapsed_seconds += self.timezone * 60
+        return elapsed_seconds
+
+    def __lt__(self, other):
+        """Compare if self is less than other."""
+        return self._getSecondsAdjusted() < other._getSecondsAdjusted()
+
+    def __le__(self, other):
+        """Compare if self is less equals other."""
+        return self._getSecondsAdjusted() <= other._getSecondsAdjusted()
+
+    def __gt__(self, other):
+        """Compare if self is greater than other."""
+        return self._getSecondsAdjusted() > other._getSecondsAdjusted()
+
+    def __ge__(self, other):
+        """Compare if self is greater equals other."""
+        return self._getSecondsAdjusted() >= other._getSecondsAdjusted()
 
     @classmethod
     def fromTimestr(cls: Type['WbTime'],
