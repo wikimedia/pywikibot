@@ -295,7 +295,18 @@ class Coordinate(_WbRepresentation):
 
 class WbTime(_WbRepresentation):
 
-    """A Wikibase time representation."""
+    """A Wikibase time representation.
+
+    Make a WbTime object from the current time:
+
+    .. code-block:: python
+
+        current_ts = pywikibot.Timestamp.now()
+        wbtime = pywikibot.WbTime.fromTimestamp(current_ts)
+
+    For converting python datetime objects to WbTime objects, see
+    :class:`pywikibot.Timestamp` and :meth:`fromTimestamp`.
+    """
 
     PRECISION = {'1000000000': 0,
                  '100000000': 1,
