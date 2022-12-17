@@ -165,8 +165,6 @@ Maintenance
 +------------------------+---------------------------------------------------------+
 | make_i18n_dict.py      | Generate an i18n file from a given script.              |
 +------------------------+---------------------------------------------------------+
-| sorting_order.py       | Updates interwiki sorting order in family.py file.      |
-+------------------------+---------------------------------------------------------+
 | wikimedia_sites.py     | Updates the language lists in Wikimedia family files.   |
 +------------------------+---------------------------------------------------------+
 

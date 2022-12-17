@@ -41,7 +41,12 @@ CODE_CHARACTERS = string.ascii_lowercase + string.digits + '_-'
 
 class Family:
 
-    """Parent singleton class for all wiki families."""
+    """Parent singleton class for all wiki families.
+
+    .. versionchanged:: 8.0
+       ``alphabetic``, ``alphabetic_revised`` and ``fyinterwiki``
+       attributes where removed.
+    """
 
     def __new__(cls):
         """Allocator."""
@@ -79,90 +84,6 @@ class Family:
     name = None
 
     langs: Dict[str, str] = {}
-
-    # For interwiki sorting order see
-    # https://meta.wikimedia.org/wiki/Interwiki_sorting_order
-
-    # The sorting order by language name from meta
-    # MediaWiki:Interwiki_config-sorting_order-native-languagename
-    alphabetic = [
-        'ace', 'kbd', 'ady', 'af', 'ak', 'als', 'alt', 'am', 'smn', 'ang',
-        'ab', 'ar', 'an', 'arc', 'roa-rup', 'frp', 'as', 'ast', 'atj', 'awa',
-        'gn', 'av', 'ay', 'az', 'ban', 'bm', 'bn', 'bjn', 'zh-min-nan', 'nan',
-        'map-bms', 'ba', 'be', 'be-tarask', 'mnw', 'bh', 'bcl', 'bi', 'bg',
-        'bar', 'blk', 'bo', 'bs', 'br', 'bxr', 'ca', 'cv', 'ceb', 'cs', 'ch',
-        'cbk-zam', 'ny', 'sn', 'tum', 'cho', 'co', 'cy', 'dag', 'da', 'dk',
-        'ary', 'pdc', 'de', 'dv', 'nv', 'dsb', 'dty', 'dz', 'mh', 'et', 'el',
-        'eml', 'en', 'myv', 'es', 'eo', 'ext', 'eu', 'ee', 'fa', 'hif', 'fo',
-        'fr', 'fy', 'ff', 'fur', 'ga', 'gv', 'gag', 'gd', 'gl', 'gan', 'ki',
-        'glk', 'guw', 'gu', 'gor', 'got', 'hak', 'xal', 'ko', 'ha', 'haw',
-        'hy', 'hi', 'ho', 'hsb', 'hr', 'hyw', 'io', 'ig', 'ilo', 'inh', 'bpy',
-        'id', 'ia', 'ie', 'iu', 'ik', 'os', 'xh', 'zu', 'is', 'it', 'he', 'jv',
-        'kbp', 'kl', 'kn', 'kr', 'pam', 'krc', 'ka', 'ks', 'csb', 'kk', 'kw',
-        'rw', 'rn', 'sw', 'kv', 'kg', 'gom', 'avk', 'ht', 'gcr', 'ku', 'kj',
-        'ky', 'mrj', 'lld', 'lad', 'lbe', 'lo', 'ltg', 'la', 'lv', 'lb', 'lez',
-        'lfn', 'lt', 'lij', 'li', 'ln', 'olo', 'jbo', 'lg', 'lmo', 'lrc',
-        'mad', 'hu', 'mai', 'mk', 'mg', 'ml', 'mt', 'mi', 'mr', 'xmf', 'arz',
-        'mzn', 'mni', 'ms', 'min', 'cdo', 'mwl', 'mdf', 'mo', 'mn', 'mus',
-        'my', 'nah', 'na', 'fj', 'nl', 'nds-nl', 'cr', 'ne', 'new', 'nia',
-        'ja', 'nqo', 'nap', 'ce', 'frr', 'pih', 'no', 'nb', 'nn', 'nrm', 'nov',
-        'ii', 'oc', 'mhr', 'or', 'om', 'ng', 'hz', 'uz', 'pa', 'pi', 'pfl',
-        'pag', 'ami', 'pnb', 'pap', 'ps', 'jam', 'koi', 'km', 'pcd', 'pcm',
-        'pms', 'pwn', 'tpi', 'nds', 'pl', 'pnt', 'pt', 'aa', 'kaa', 'crh',
-        'ty', 'ksh', 'ro', 'rmy', 'rm', 'qu', 'rue', 'ru', 'sah', 'szy', 'se',
-        'sm', 'sa', 'sg', 'sat', 'skr', 'sc', 'sco', 'trv', 'stq', 'st', 'nso',
-        'tn', 'sq', 'scn', 'si', 'simple', 'sd', 'ss', 'sk', 'sl', 'cu', 'szl',
-        'so', 'ckb', 'srn', 'sr', 'sh', 'su', 'fi', 'sv', 'shi', 'tl', 'shn',
-        'ta', 'kab', 'roa-tara', 'tt', 'tay', 'te', 'tet', 'th', 'ti', 'tg',
-        'to', 'chr', 'chy', 've', 'tcy', 'tr', 'azb', 'tk', 'tw', 'kcg', 'tyv',
-        'din', 'udm', 'bug', 'uk', 'ur', 'ug', 'za', 'vec', 'vep', 'vi', 'vo',
-        'fiu-vro', 'wa', 'zh-classical', 'vls', 'war', 'wo', 'wuu', 'ts', 'yi',
-        'yo', 'zh-yue', 'diq', 'zea', 'bat-smg', 'zh', 'zh-tw', 'zh-cn',
-    ]
-
-    # The revised sorting order by first word from meta
-    # MediaWiki:Interwiki_config-sorting_order-native-languagename-firstword
-    alphabetic_revised = [
-        'ace', 'ady', 'kbd', 'af', 'ak', 'als', 'alt', 'kcg', 'am', 'smn',
-        'ang', 'ab', 'ar', 'an', 'arc', 'roa-rup', 'frp', 'as', 'ast', 'atj',
-        'awa', 'gn', 'av', 'ay', 'az', 'bjn', 'id', 'ms', 'ban', 'bm', 'bn',
-        'zh-min-nan', 'nan', 'map-bms', 'jv', 'su', 'ba', 'min', 'be',
-        'be-tarask', 'mnw', 'mad', 'bh', 'bcl', 'bi', 'bar', 'blk', 'bo', 'bs',
-        'br', 'bug', 'bg', 'bxr', 'ca', 'ceb', 'cv', 'cs', 'ch', 'cbk-zam',
-        'ny', 'sn', 'tum', 'cho', 'co', 'cy', 'dag', 'da', 'dk', 'ary', 'pdc',
-        'de', 'dv', 'nv', 'dsb', 'na', 'dty', 'dz', 'mh', 'et', 'el', 'eml',
-        'en', 'myv', 'es', 'eo', 'ext', 'eu', 'ee', 'fa', 'hif', 'fo', 'fr',
-        'fy', 'ff', 'fur', 'ga', 'gv', 'sm', 'gag', 'gd', 'gl', 'gan', 'ki',
-        'glk', 'guw', 'gu', 'got', 'hak', 'xal', 'ko', 'ha', 'haw', 'hy', 'hi',
-        'ho', 'hsb', 'hr', 'hyw', 'io', 'ig', 'ilo', 'inh', 'bpy', 'ia', 'ie',
-        'iu', 'ik', 'os', 'xh', 'zu', 'is', 'it', 'he', 'kl', 'kn', 'kr',
-        'pam', 'ka', 'ks', 'csb', 'kk', 'kw', 'rw', 'ky', 'rn', 'mrj', 'sw',
-        'kv', 'kg', 'gom', 'avk', 'gor', 'ht', 'gcr', 'ku', 'shn', 'kj', 'lld',
-        'lad', 'lbe', 'lez', 'lfn', 'lo', 'la', 'ltg', 'lv', 'to', 'lb', 'lt',
-        'lij', 'li', 'ln', 'nia', 'olo', 'jbo', 'lg', 'lmo', 'lrc', 'hu',
-        'mai', 'mk', 'mg', 'ml', 'krc', 'mt', 'mi', 'mr', 'xmf', 'arz', 'mzn',
-        'mni', 'cdo', 'mwl', 'koi', 'mdf', 'mo', 'mn', 'mus', 'my', 'nah',
-        'fj', 'nl', 'nds-nl', 'cr', 'ne', 'new', 'ja', 'nqo', 'nap', 'ce',
-        'frr', 'pih', 'no', 'nb', 'nn', 'nrm', 'nov', 'ii', 'oc', 'mhr', 'or',
-        'om', 'ng', 'hz', 'uz', 'pa', 'pi', 'pfl', 'pag', 'ami', 'pnb', 'pap',
-        'ps', 'jam', 'km', 'pcd', 'pcm', 'pms', 'pwn', 'nds', 'pl', 'pnt',
-        'pt', 'aa', 'kaa', 'crh', 'ty', 'ksh', 'ro', 'rmy', 'rm', 'qu', 'ru',
-        'rue', 'sah', 'szy', 'se', 'sa', 'sg', 'sat', 'skr', 'sc', 'sco',
-        'trv', 'stq', 'st', 'nso', 'tn', 'sq', 'scn', 'si', 'simple', 'sd',
-        'ss', 'sk', 'sl', 'cu', 'szl', 'so', 'ckb', 'srn', 'sr', 'sh', 'fi',
-        'sv', 'shi', 'tl', 'ta', 'kab', 'kbp', 'roa-tara', 'tt', 'tay', 'te',
-        'tet', 'th', 'vi', 'ti', 'tg', 'tpi', 'chr', 'chy', 've', 'tcy', 'tr',
-        'azb', 'tk', 'tw', 'tyv', 'din', 'udm', 'uk', 'ur', 'ug', 'za', 'vec',
-        'vep', 'vo', 'fiu-vro', 'wa', 'zh-classical', 'vls', 'war', 'wo',
-        'wuu', 'ts', 'yi', 'yo', 'zh-yue', 'diq', 'zea', 'bat-smg', 'zh',
-        'zh-tw', 'zh-cn',
-    ]
-
-    # Order for fy: alphabetical by code, but y counts as i
-    fyinterwiki = alphabetic[:]
-    fyinterwiki.remove('nb')
-    fyinterwiki.sort(key=lambda x:
-                     x.replace('y', 'i') + x.count('y') * '!')
 
     # A list of category redirect template names in different languages
     category_redirect_templates = {
@@ -884,7 +805,11 @@ class FandomFamily(Family):
 
 class WikimediaFamily(Family):
 
-    """Class for all wikimedia families."""
+    """Class for all wikimedia families.
+
+    .. versionchanged:: 8.0
+       :attr:`knows_codes` attribute was added.
+    """
 
     multi_language_content_families = [
         'wikipedia', 'wiktionary',
@@ -931,6 +856,42 @@ class WikimediaFamily(Family):
         + wikimedia_org_meta_families
         + other_content_families
     )
+
+    # Known Wikimedia site codes
+    known_codes = [
+        'aa', 'ab', 'ace', 'ady', 'af', 'ak', 'als', 'alt', 'am', 'ami', 'an',
+        'ang', 'ar', 'arc', 'ary', 'arz', 'as', 'ast', 'atj', 'av', 'avk',
+        'awa', 'ay', 'az', 'azb', 'ba', 'ban', 'bar', 'bat-smg', 'bcl', 'be',
+        'be-tarask', 'bg', 'bh', 'bi', 'bjn', 'blk', 'bm', 'bn', 'bo', 'bpy',
+        'br', 'bs', 'bug', 'bxr', 'ca', 'cbk-zam', 'cdo', 'ce', 'ceb', 'ch',
+        'cho', 'chr', 'chy', 'ckb', 'co', 'cr', 'crh', 'cs', 'csb', 'cu', 'cv',
+        'cy', 'da', 'dag', 'de', 'din', 'diq', 'dk', 'dsb', 'dty', 'dv', 'dz',
+        'ee', 'el', 'eml', 'en', 'eo', 'es', 'et', 'eu', 'ext', 'fa', 'ff',
+        'fi', 'fiu-vro', 'fj', 'fo', 'fr', 'frp', 'frr', 'fur', 'fy', 'ga',
+        'gag', 'gan', 'gcr', 'gd', 'gl', 'glk', 'gn', 'gom', 'gor', 'got',
+        'gu', 'guw', 'gv', 'ha', 'hak', 'haw', 'he', 'hi', 'hif', 'ho', 'hr',
+        'hsb', 'ht', 'hu', 'hy', 'hyw', 'hz', 'ia', 'id', 'ie', 'ig', 'ii',
+        'ik', 'ilo', 'inh', 'io', 'is', 'it', 'iu', 'ja', 'jam', 'jbo', 'jv',
+        'ka', 'kaa', 'kab', 'kbd', 'kbp', 'kcg', 'kg', 'ki', 'kj', 'kk', 'kl',
+        'km', 'kn', 'ko', 'koi', 'kr', 'krc', 'ks', 'ksh', 'ku', 'kv', 'kw',
+        'ky', 'la', 'lad', 'lb', 'lbe', 'lez', 'lfn', 'lg', 'li', 'lij', 'lld',
+        'lmo', 'ln', 'lo', 'lrc', 'lt', 'ltg', 'lv', 'mad', 'mai', 'map-bms',
+        'mdf', 'mg', 'mh', 'mhr', 'mi', 'min', 'mk', 'ml', 'mn', 'mni', 'mnw',
+        'mo', 'mr', 'mrj', 'ms', 'mt', 'mus', 'mwl', 'my', 'myv', 'mzn', 'na',
+        'nah', 'nan', 'nap', 'nb', 'nds', 'nds-nl', 'ne', 'new', 'ng', 'nia',
+        'nl', 'nn', 'no', 'nov', 'nqo', 'nrm', 'nso', 'nv', 'ny', 'oc', 'olo',
+        'om', 'or', 'os', 'pa', 'pag', 'pam', 'pap', 'pcd', 'pcm', 'pdc',
+        'pfl', 'pi', 'pih', 'pl', 'pms', 'pnb', 'pnt', 'ps', 'pt', 'pwn', 'qu',
+        'rm', 'rmy', 'rn', 'ro', 'roa-rup', 'roa-tara', 'ru', 'rue', 'rw',
+        'sa', 'sah', 'sat', 'sc', 'scn', 'sco', 'sd', 'se', 'sg', 'sh', 'shi',
+        'shn', 'si', 'simple', 'sk', 'skr', 'sl', 'sm', 'smn', 'sn', 'so',
+        'sq', 'sr', 'srn', 'ss', 'st', 'stq', 'su', 'sv', 'sw', 'szl', 'szy',
+        'ta', 'tay', 'tcy', 'te', 'tet', 'tg', 'th', 'ti', 'tk', 'tl', 'tn',
+        'to', 'tpi', 'tr', 'trv', 'ts', 'tt', 'tum', 'tw', 'ty', 'tyv', 'udm',
+        'ug', 'uk', 'ur', 'uz', 've', 'vec', 'vep', 'vi', 'vls', 'vo', 'wa',
+        'war', 'wo', 'wuu', 'xal', 'xh', 'xmf', 'yi', 'yo', 'za', 'zea', 'zh',
+        'zh-classical', 'zh-cn', 'zh-min-nan', 'zh-tw', 'zh-yue', 'zu',
+    ]
 
     # Code mappings which are only an alias, and there is no 'old' wiki.
     # For all except 'nl_nds', subdomains do exist as a redirect, but that

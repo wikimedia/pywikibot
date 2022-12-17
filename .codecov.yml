@@ -26,7 +26,6 @@ coverage:
     - scripts/dataextend.py
     - scripts/maintenance/colors.py
     - scripts/maintenance/make_i18n_dict.py
-    - scripts/maintenance/sorting_order.py
     - scripts/maintenance/wikimedia_sites.py
     - scripts/userscripts/
     - tests/pwb/

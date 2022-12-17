@@ -123,8 +123,8 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertIn(mysite.code, langs)
         self.assertIsInstance(mysite.obsolete, bool)
         ipf = mysite.interwiki_putfirst()
-        if ipf:  # Not all languages use this
-            self.assertIsInstance(ipf, list)
+        if ipf:  # no languages use this anymore, keep it for foreign families
+            self.assertIsInstance(ipf, list)  # pragma: no cover
         else:
             self.assertIsNone(ipf)
 

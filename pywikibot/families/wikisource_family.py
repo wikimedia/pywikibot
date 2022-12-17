@@ -68,7 +68,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     @classproperty
     def code_aliases(cls):
         cls.code_aliases = super().code_aliases.copy()
-        aliases = cls.alphabetic + ['-', 'www']
+        aliases = cls.known_codes + ['-', 'www']
         for code in aliases:
             if (code not in cls.languages_by_size
                     and code not in cls.closed_wikis

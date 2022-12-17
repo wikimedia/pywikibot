@@ -25,11 +25,6 @@ scripts.maintenance.make\_i18n\_dict
 
 .. automodule:: scripts.maintenance.make_i18n_dict
 
-scripts.maintenance.sorting\_order
-----------------------------------
-
-.. automodule:: scripts.maintenance.sorting_order
-
 scripts.maintenance.wikimedia\_sites
 ------------------------------------
 

@@ -5,7 +5,6 @@
 # Distributed under the terms of the MIT license.
 #
 from pywikibot import family
-from pywikibot.tools import classproperty
 
 
 # The Wikimedia family that is known as Wiktionary
@@ -67,49 +66,6 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'tl', 'tn', 'tpi', 'tr', 'ts', 'tt', 'ug', 'uk', 'ur', 'uz', 'vec',
         'vi', 'vo', 'wa', 'wo', 'yi', 'zh', 'zh-min-nan', 'zu',
     ]
-
-    # Which languages have a special order for putting interlanguage links,
-    # and what order is it? If a language is not in interwiki_putfirst,
-    # alphabetical order on language code is used. For languages that are in
-    # interwiki_putfirst, interwiki_putfirst is checked first, and
-    # languages are put in the order given there. All other languages are
-    # put after those, in code-alphabetical order.
-
-    alphabetic_sv = [
-        'aa', 'af', 'ak', 'als', 'an', 'roa-rup', 'ast', 'gn', 'ay', 'az',
-        'id', 'ms', 'bm', 'zh-min-nan', 'jv', 'su', 'mt', 'bi', 'bo', 'bs',
-        'br', 'ca', 'cs', 'ch', 'sn', 'co', 'za', 'cy', 'da', 'de', 'na', 'mh',
-        'et', 'ang', 'en', 'es', 'eo', 'eu', 'to', 'fr', 'fy', 'fo', 'ga',
-        'gv', 'sm', 'gd', 'gl', 'hr', 'io', 'ia', 'ie', 'ik', 'xh', 'is', 'zu',
-        'it', 'kl', 'csb', 'kw', 'rw', 'rn', 'sw', 'ky', 'ku', 'la', 'lv',
-        'lb', 'lt', 'li', 'ln', 'jbo', 'hu', 'mg', 'mi', 'mo', 'my', 'fj',
-        'nah', 'nl', 'cr', 'no', 'nn', 'hsb', 'oc', 'om', 'ug', 'uz', 'nds',
-        'pl', 'pt', 'ro', 'rm', 'qu', 'sg', 'sc', 'st', 'tn', 'sq', 'scn',
-        'simple', 'ss', 'sk', 'sl', 'so', 'sh', 'fi', 'sv', 'tl', 'tt', 'vi',
-        'tpi', 'tr', 'tw', 'vo', 'wa', 'wo', 'ts', 'yo', 'el', 'av', 'ab',
-        'ba', 'be', 'bg', 'mk', 'mn', 'ru', 'sr', 'tg', 'uk', 'kk', 'hy', 'yi',
-        'he', 'ur', 'ar', 'tk', 'sd', 'fa', 'ha', 'ps', 'dv', 'ks', 'ne', 'pi',
-        'bh', 'mr', 'sa', 'hi', 'as', 'bn', 'pa', 'pnb', 'gu', 'or', 'ta',
-        'te', 'kn', 'ml', 'si', 'th', 'lo', 'dz', 'ka', 'ti', 'am', 'chr',
-        'iu', 'km', 'zh', 'ja', 'ko', 'shn',
-    ]
-
-    @classproperty
-    def interwiki_putfirst(cls):
-        cls.interwiki_putfirst = {
-            'da': cls.alphabetic,
-            'en': cls.alphabetic,
-            'et': cls.alphabetic,
-            'fi': cls.alphabetic,
-            'fy': cls.fyinterwiki,
-            'he': ['en'],
-            'hu': ['en'],
-            'ms': cls.alphabetic_revised,
-            'pl': cls.alphabetic_revised,
-            'sv': cls.alphabetic_sv,
-            'simple': cls.alphabetic,
-        }
-        return cls.interwiki_putfirst
 
     interwiki_on_one_line = ['pl']
 

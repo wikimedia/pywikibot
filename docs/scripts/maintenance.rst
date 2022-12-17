@@ -16,13 +16,6 @@ colors script
    :no-members:
    :noindex:
 
-sorting\_order script
-=====================
-
-.. automodule:: scripts.maintenance.sorting_order
-   :no-members:
-   :noindex:
-
 wikimedia\_sites script
 =======================
 
