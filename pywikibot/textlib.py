@@ -28,6 +28,7 @@ from pywikibot.time import TZoneFixedOffset
 from pywikibot.tools import (
     ModuleDeprecationWrapper,
     deprecated,
+    deprecated_args,
     first_lower,
     first_upper,
 )
@@ -904,7 +905,7 @@ def add_text(text: str, add: str, *, site=None) -> str:
     # Adding the text
     text += '\n' + add
     # Reputting the categories
-    text = replaceCategoryLinks(text, categories_inside, site, addOnly=True)
+    text = replaceCategoryLinks(text, categories_inside, site, add_only=True)
     # Adding the interwiki
     return replaceLanguageLinks(text, interwiki_inside, site)
 
@@ -1145,19 +1146,22 @@ def removeLanguageLinksAndSeparator(text: str, site=None, marker: str = '',
     return removeLanguageLinks(text, site, marker)
 
 
-def replaceLanguageLinks(oldtext: str, new: dict, site=None,
-                         addOnly: bool = False, template: bool = False,
+@deprecated_args(addOnly='add_only')  # since 8.0
+def replaceLanguageLinks(oldtext: str,
+                         new: dict,
+                         site: Optional['pywikibot.site.BaseSite'] = None,
+                         add_only: bool = False,
+                         template: bool = False,
                          template_subpage: bool = False) -> str:
     """Replace inter-language links in the text with a new set of links.
 
     :param oldtext: The text that needs to be modified.
-    :param new: A dict with the Site objects as keys, and Page or Link objects
-        as values (i.e., just like the dict returned by getLanguageLinks
-        function).
+    :param new: A dict with the Site objects as keys, and Page or Link
+        objects as values (i.e., just like the dict returned by
+        :func:`getLanguageLinks` function).
     :param site: The site that the text is from.
-    :type site: pywikibot.Site
-    :param addOnly: If True, do not remove old language links, only add new
-        ones.
+    :param add_only: If True, do not remove old language links, only add
+        new ones.
     :param template: Indicates if text belongs to a template page or not.
     :param template_subpage: Indicates if text belongs to a template sub-page
         or not.
@@ -1171,7 +1175,7 @@ def replaceLanguageLinks(oldtext: str, new: dict, site=None,
     cseparator = site.family.category_text_separator
     separatorstripped = separator.strip()
     cseparatorstripped = cseparator.strip()
-    if addOnly:
+    if add_only:
         s2 = oldtext
     else:
         s2 = removeLanguageLinksAndSeparator(oldtext, site=site, marker=marker,
@@ -1203,7 +1207,7 @@ def replaceLanguageLinks(oldtext: str, new: dict, site=None,
             s2 = removeCategoryLinksAndSeparator(
                 s2.replace(marker, cseparatorstripped).strip(), site) \
                 + separator + s
-            newtext = replaceCategoryLinks(s2, cats, site=site, addOnly=True)
+            newtext = replaceCategoryLinks(s2, cats, site=site, add_only=True)
         # for Wikitravel's language links position.
         # (not supported by rewrite - no API)
         elif site.family.name == 'wikitravel':
@@ -1480,19 +1484,21 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None,
     return text
 
 
-def replaceCategoryLinks(oldtext: str, new, site=None,
-                         addOnly: bool = False) -> str:
+@deprecated_args(addOnly='add_only')  # since 8.0
+def replaceCategoryLinks(oldtext: str,
+                         new: Iterable,
+                         site: Optional['pywikibot.site.BaseSite'] = None,
+                         add_only: bool = False) -> str:
     """
     Replace all existing category links with new category links.
 
     :param oldtext: The text that needs to be replaced.
     :param new: Should be a list of Category objects or strings
-        which can be either the raw name or [[Category:..]].
-    :type new: iterable
+        which can be either the raw name or ``[[Category:..]]``.
     :param site: The site that the text is from.
-    :type site: pywikibot.Site
-    :param addOnly: If addOnly is True, the old category won't be deleted and
-        the category(s) given will be added (and they won't replace anything).
+    :param add_only: If add_only is True, the old category won't be
+        deleted and the category(s) given will be added (and they won't
+        replace anything).
     :return: The modified text.
     """
     # Find a marker that is not already in the text.
@@ -1507,41 +1513,40 @@ def replaceCategoryLinks(oldtext: str, new, site=None,
     iseparator = site.family.interwiki_text_separator
     separatorstripped = separator.strip()
     iseparatorstripped = iseparator.strip()
-    if addOnly:
+    if add_only:
         cats_removed_text = oldtext
     else:
         cats_removed_text = removeCategoryLinksAndSeparator(
             oldtext, site=site, marker=marker, separator=separatorstripped)
     new_cats = categoryFormat(new, insite=site)
-    if new_cats:
-        if site.code in site.family.category_attop:
-            newtext = new_cats + separator + cats_removed_text
-        else:
-            # calculate what was after the categories links on the page
-            firstafter = cats_removed_text.find(marker)
-            if firstafter < 0:
-                firstafter = len(cats_removed_text)
-            else:
-                firstafter += len(marker)
-            # Is there text in the 'after' part that means we should keep it
-            # after?
-            if '</noinclude>' in cats_removed_text[firstafter:]:
-                if separatorstripped:
-                    new_cats = separator + new_cats
-                newtext = (cats_removed_text[:firstafter].replace(marker, '')
-                           + new_cats + cats_removed_text[firstafter:])
-            elif site.code in site.family.categories_last:
-                newtext = (cats_removed_text.replace(marker, '').strip()
-                           + separator + new_cats)
-            else:
-                interwiki = getLanguageLinks(cats_removed_text, insite=site)
-                langs_removed_text = removeLanguageLinksAndSeparator(
-                    cats_removed_text.replace(marker, ''), site, '',
-                    iseparatorstripped) + separator + new_cats
-                newtext = replaceLanguageLinks(
-                    langs_removed_text, interwiki, site, addOnly=True)
-    else:
+    if not new_cats:
         newtext = cats_removed_text.replace(marker, '')
+    elif site.code in site.family.category_attop:
+        newtext = new_cats + separator + cats_removed_text
+    else:
+        # calculate what was after the categories links on the page
+        firstafter = cats_removed_text.find(marker)
+        if firstafter < 0:
+            firstafter = len(cats_removed_text)
+        else:
+            firstafter += len(marker)
+        # Is there text in the 'after' part that means we should keep it
+        # after?
+        if '</noinclude>' in cats_removed_text[firstafter:]:
+            if separatorstripped:
+                new_cats = separator + new_cats
+            newtext = (cats_removed_text[:firstafter].replace(marker, '')
+                       + new_cats + cats_removed_text[firstafter:])
+        elif site.code in site.family.categories_last:
+            newtext = (cats_removed_text.replace(marker, '').strip()
+                       + separator + new_cats)
+        else:
+            interwiki = getLanguageLinks(cats_removed_text, insite=site)
+            langs_removed_text = removeLanguageLinksAndSeparator(
+                cats_removed_text.replace(marker, ''), site, '',
+                iseparatorstripped) + separator + new_cats
+            newtext = replaceLanguageLinks(
+                langs_removed_text, interwiki, site, add_only=True)
 
     # special parts under categories
     under_categories = []
