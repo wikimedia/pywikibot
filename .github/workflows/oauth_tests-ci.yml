@@ -16,7 +16,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     timeout-minutes: 2
 
     strategy:
@@ -24,23 +24,26 @@ jobs:
       max-parallel: 15
 
       matrix:
-        python-version: ["pypy3.7", "3.11", "3.10", "3.9", "3.8", "3.7", "3.6"]
+        python-version: ["pypy3.7", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12.0-alpha - 3.12.0"]
         family: ['wikipedia']
         code: ['test']
         domain:  ['test.wikipedia.org']
         include:
-          - python-version: "3.12.0-alpha - 3.12.0"
-            family: wikipedia
-            code: test
-            domain: test.wikipedia.org
           - python-version: 3.6
             family: wpbeta
             code: en
             domain: en.wikipedia.beta.wmflabs.org
+            os: ubuntu-20.04
           - python-version: 3.7
             family: wpbeta
             code: zh
             domain: zh.wikipedia.beta.wmflabs.org
+          # ubuntu-20.04 required for Python 3.6
+          - python-version: 3.6
+            family: wikipedia
+            code: test
+            domain: test.wikipedia.org
+            os: ubuntu-20.04
 
     steps:
     - name: Checkout Repository
@@ -100,7 +103,6 @@ jobs:
         PYWIKIBOT_TEST_OAUTH: ${{ secrets[format('{0}', steps.token.outputs.uppercase)] }}
       run: |
         python pwb.py version
-        coverage run -m unittest -vv tests/site_login_logout_tests.py
         coverage run -m unittest -vv tests/oauth_tests.py
 
     - name: Upload coverage to Codecov
