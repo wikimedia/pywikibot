@@ -30,6 +30,7 @@ jobs:
         site: ['wikipedia:en', 'wikisource:zh']
         test_prod_only: [true]
         include:
+          # ubuntu-20.04 required for Python 3.6
           - python-version: 3.6
             site: False
             family: wpbeta
@@ -62,7 +63,6 @@ jobs:
           - python-version: 3
             site: wikipedia:de
             os: macOS-latest
-          # ubuntu-20.04 required for Python 3.6
           - python-version: 3.6
             site: wikipedia:en
             test_prod_only: true

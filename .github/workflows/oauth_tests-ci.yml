@@ -29,6 +29,7 @@ jobs:
         code: ['test']
         domain:  ['test.wikipedia.org']
         include:
+          # ubuntu-20.04 required for Python 3.6
           - python-version: 3.6
             family: wpbeta
             code: en
@@ -38,7 +39,6 @@ jobs:
             family: wpbeta
             code: zh
             domain: zh.wikipedia.beta.wmflabs.org
-          # ubuntu-20.04 required for Python 3.6
           - python-version: 3.6
             family: wikipedia
             code: test

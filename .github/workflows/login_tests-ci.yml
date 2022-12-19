@@ -26,14 +26,17 @@ jobs:
         python-version: ["pypy3.7", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12.0-alpha - 3.12.0"]
         site: ['wikipedia:en', 'wikisource:zh']
         include:
+          # ubuntu-20.04 required for Python 3.6
           - python-version: 3.6
             site: False
             family: wpbeta
             code: en
+            os: ubuntu-20.04
           - python-version: 3.6
             site: False
             family: wpbeta
             code: zh
+            os: ubuntu-20.04
           - python-version: 3.8
             site: wsbeta:en
           - python-version: 3.7
@@ -44,6 +47,7 @@ jobs:
             site: wiktionary:ar
           - python-version: 3.6
             site: wikidata:wikidata
+            os: ubuntu-20.04
           - python-version: 3.8
             site: wowwiki:uk
           - python-version: "3.12.0-alpha - 3.12.0"
@@ -51,7 +55,6 @@ jobs:
           - python-version: 3
             site: wikipedia:de
             os: macOS-latest
-          # ubuntu-20.04 required for Python 3.6
           - python-version: 3.6
             site: wikipedia:en
             os: ubuntu-20.04
