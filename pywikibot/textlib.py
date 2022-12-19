@@ -1832,9 +1832,32 @@ def reformat_ISBNs(text: str, match_func) -> str:
 # Time parsing functionality (Archivebot)
 # ---------------------------------------
 
+TIMEGROUPS = ('time', 'tzinfo', 'year', 'month', 'day', 'hour', 'minute')
+
+#: Hold precompiled timestamp patterns for :class:`TimeStripper`.
+#: Order of TimeStripperPatterns is important to avoid mismatch when searching.
+#:
+#: .. versionadded:: 8.0
+TimeStripperPatterns = namedtuple('TimeStripperPatterns', TIMEGROUPS[:-2])
+
+
 class TimeStripper:
 
-    """Find timestamp in page and return it as pywikibot.Timestamp object."""
+    """Find timestamp in page and return it as pywikibot.Timestamp object.
+
+    .. versionchanged:: 8.0
+       *group* attribute is a set instead of a list.
+       *patterns* is a :class:`TimeStripperPatterns` namedtuple instead
+       of a list.
+
+    **Example**:
+
+    >>> site = pywikibot.Site('wikipedia:fr')
+    >>> sign = 'Merci bien Xqt (d) 15 mai 2013 à 20:34 (CEST)'
+    >>> ts = TimeStripper(site)
+    >>> ts.timestripper(sign)
+    Timestamp(2013, 5, 15, 20, 34, tzinfo=TZoneFixedOffset(3600, Europe/Paris))
+    """
 
     def __init__(self, site=None) -> None:
         """Initializer."""
@@ -1854,24 +1877,21 @@ class TimeStripper:
                 if short.endswith('.'):
                     self.origNames2monthNum[func(short[:-1])] = n
 
-        self.groups = ['year', 'month', 'hour', 'time', 'day', 'minute',
-                       'tzinfo']
-
         timeR = (r'(?P<time>(?P<hour>([0-1]\d|2[0-3]))[:\.h]'
                  r'(?P<minute>[0-5]\d))')
         timeznR = r'\((?P<tzinfo>[A-Z]+)\)'
         yearR = r'(?P<year>(19|20)\d\d)(?:{})?'.format('\ub144')
         # if months have 'digits' as names, they need to be
         # removed; will be handled as digits in regex, adding d+{1,2}\.?
-        escaped_months = [_ for _ in self.origNames2monthNum if
-                          not _.strip('.').isdigit()]
+        escaped_months = [month for month in self.origNames2monthNum if
+                          not month.strip('.').isdigit()]
         # match longest names first.
-        escaped_months = [re.escape(_) for
-                          _ in sorted(escaped_months, reverse=True)]
+        escaped_months = [re.escape(month) for
+                          month in sorted(escaped_months, reverse=True)]
         # work around for cs wiki: if month are in digits, we assume
         # that format is dd. mm. (with dot and spaces optional)
         # the last one is workaround for Korean
-        if any(_.isdigit() for _ in self.origNames2monthNum):
+        if any(month.isdigit() for month in self.origNames2monthNum):
             self.is_digit_month = True
             monthR = r'(?P<month>({})|(?:1[012]|0?[1-9])\.)' \
                      .format('|'.join(escaped_months))
@@ -1882,20 +1902,13 @@ class TimeStripper:
             monthR = r'(?P<month>({}))'.format('|'.join(escaped_months))
             dayR = r'(?P<day>(3[01]|[12]\d|0?[1-9]))\.?'
 
-        self.ptimeR = re.compile(timeR)
-        self.ptimeznR = re.compile(timeznR)
-        self.pyearR = re.compile(yearR)
-        self.pmonthR = re.compile(monthR)
-        self.pdayR = re.compile(dayR)
-
-        # order is important to avoid mismatch when searching
-        self.patterns = [
-            self.ptimeR,
-            self.ptimeznR,
-            self.pyearR,
-            self.pmonthR,
-            self.pdayR,
-        ]
+        self.patterns = TimeStripperPatterns(
+            re.compile(timeR),
+            re.compile(timeznR),
+            re.compile(yearR),
+            re.compile(monthR),
+            re.compile(dayR),
+        )
 
         self._hyperlink_pat = re.compile(r'\[\s*?http[s]?://[^\]]*?\]')
         self._comment_pat = re.compile(r'<!--(.*?)-->')
@@ -1904,6 +1917,66 @@ class TimeStripper:
 
         self.tzinfo = TZoneFixedOffset(self.site.siteinfo['timeoffset'],
                                        self.site.siteinfo['timezone'])
+
+    @property
+    @deprecated('patterns.time', since='8.0.0')
+    def ptimeR(self):
+        """Deprecated time pattern attribute.
+
+        .. deprecated:: 8.0
+           use pattern.time instead
+        """
+        return self.patterns.time
+
+    @property
+    @deprecated('patterns.tzinfo', since='8.0.0')
+    def ptimeznR(self):
+        """Deprecated tzinfo pattern attribute.
+
+        .. deprecated:: 8.0
+           use patterns.tzinfo instead
+        """
+        return self.patterns.tzinfo
+
+    @property
+    @deprecated('patterns.year', since='8.0.0')
+    def pyearR(self):
+        """Deprecated year pattern attribute.
+
+        .. deprecated:: 8.0
+           use patterns.year instead
+        """
+        return self.patterns.year
+
+    @property
+    @deprecated('patterns.month', since='8.0.0')
+    def pmonthR(self):
+        """Deprecated month pattern attribute.
+
+        .. deprecated:: 8.0
+           use patterns.month instead
+        """
+        return self.patterns.month
+
+    @property
+    @deprecated('patterns.day', since='8.0.0')
+    def pdayR(self):
+        """Deprecated day pattern attribute.
+
+        .. deprecated:: 8.0
+           use patterns.day instead
+        """
+        return self.patterns.day
+
+    @property
+    @deprecated('textlib.TIMEGROUPS', since='8.0.0')
+    def groups(self):
+        """Deprecated groups attribute.
+
+        .. deprecated:: 8.0
+           use textlib.TIMEGROUPS instead
+        """
+        return TIMEGROUPS
 
     @staticmethod
     @deprecated('to_latin_digits() function', since='7.0.0')
@@ -1916,8 +1989,7 @@ class TimeStripper:
         return to_latin_digits(line)
 
     def _last_match_and_replace(self, txt: str, pat):
-        """
-        Take the rightmost match and replace with marker.
+        """Take the rightmost match and replace with marker.
 
         It does so to prevent spurious earlier matches.
         """
@@ -1936,21 +2008,21 @@ class TimeStripper:
             """
             return '@' * (m.end() - m.start())
 
-        if m:
-            # month and day format might be identical (e.g. see bug T71315),
-            # avoid to wipe out day, after month is matched.
-            # replace all matches but the last two
-            # (i.e. allow to search for dd. mm.)
-            if pat == self.pmonthR:
-                if self.is_digit_month:
-                    if cnt > 2:
-                        txt = pat.sub(marker, txt, cnt - 2)
-                else:
-                    txt = pat.sub(marker, txt)
-            else:
-                txt = pat.sub(marker, txt)
-            return (txt, m)
-        return (txt, None)
+        if not m:
+            return (txt, None)
+
+        # month and day format might be identical (e.g. see bug T71315),
+        # avoid to wipe out day, after month is matched. Replace all matches
+        # but the last two (i.e. allow to search for dd. mm.)
+        if pat != self.patterns.month:
+            txt = pat.sub(marker, txt)
+        elif self.is_digit_month:
+            if cnt > 2:
+                txt = pat.sub(marker, txt, cnt - 2)
+        else:
+            txt = pat.sub(marker, txt)
+
+        return (txt, m)
 
     @staticmethod
     def _valid_date_dict_positions(dateDict) -> bool:
@@ -2042,7 +2114,7 @@ class TimeStripper:
 
         # all fields matched -> date valid
         # groups are in a reasonable order.
-        if (all(g in dateDict for g in self.groups)
+        if (all(g in dateDict for g in TIMEGROUPS)
                 and self._valid_date_dict_positions(dateDict)):
             # remove 'time' key, now split in hour/minute and not needed
             # by datetime.
@@ -2052,9 +2124,10 @@ class TimeStripper:
             try:
                 value = self.origNames2monthNum[dateDict['month']['value']]
             except KeyError:
-                pywikibot.info('incorrect month name "{}" in page in site {}'
-                               .format(dateDict['month']['value'], self.site))
-                raise KeyError
+                raise KeyError(
+                    f"incorrect month name {dateDict['month']['value']!r} "
+                    f'in page in site {self.site}'
+                )
             else:
                 dateDict['month']['value'] = value
 
@@ -2065,9 +2138,8 @@ class TimeStripper:
                 try:
                     dateDict[k] = int(v['value'])
                 except ValueError:
-                    raise ValueError(
-                        'Value: {} could not be converted for key: {}.'
-                        .format(v['value'], k))
+                    raise ValueError(f"Value: {v['value']} could not be "
+                                     f'converted for key: {k}.')
 
             # find timezone
             dateDict['tzinfo'] = self.tzinfo
