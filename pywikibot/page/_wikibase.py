@@ -46,7 +46,7 @@ from pywikibot.page._decorators import allow_asynchronous
 from pywikibot.page._filepage import FilePage
 from pywikibot.page._page import BasePage
 from pywikibot.site import DataSite, Namespace
-from pywikibot.tools import cached
+from pywikibot.tools import cached, first_upper
 
 
 __all__ = (
@@ -271,7 +271,7 @@ class WikibaseEntity:
 
         data = {}
 
-        # This initializes all data,
+        # This initializes all data
         for key, cls in self.DATA_ATTRIBUTES.items():
             value = cls.fromJSON(self._content.get(key, {}), self.repo)
             setattr(self, key, value)
@@ -1416,8 +1416,8 @@ class Claim(Property):
         self._on_item = None  # The item it's on
 
     @property
-    def on_item(self):
-        """Return item this claim is attached to."""
+    def on_item(self) -> Optional[WikibaseEntity]:
+        """Return entity this claim is attached to."""
         return self._on_item
 
     @on_item.setter
@@ -1430,6 +1430,16 @@ class Claim(Property):
             for values in source.values():
                 for source in values:
                     source.on_item = item
+
+    def _assert_attached(self) -> None:
+        if self.on_item is None:
+            raise RuntimeError('The claim is not attached to an entity')
+
+    def _assert_mainsnak(self, message: str) -> None:
+        if self.isQualifier:
+            raise RuntimeError(first_upper(message.format('qualifier')))
+        if self.isReference:
+            raise RuntimeError(first_upper(message.format('reference')))
 
     def __repr__(self) -> str:
         """Return the representation string."""
@@ -1664,6 +1674,7 @@ class Claim(Property):
         :param snaktype: The new snak type ('value', 'somevalue', or
             'novalue').
         """
+        self._assert_attached()
         if value:
             self.setTarget(value)
 
@@ -1710,10 +1721,13 @@ class Claim(Property):
 
     def setRank(self, rank) -> None:
         """Set the rank of the Claim."""
+        self._assert_mainsnak('Cannot set rank on a {}')
         self.rank = rank
 
     def changeRank(self, rank, **kwargs):
         """Change the rank of the Claim and save."""
+        self._assert_mainsnak('Cannot change rank on a {}')
+        self._assert_attached()
         self.rank = rank
         return self.repo.save_claim(self, **kwargs)
 
@@ -1747,6 +1761,7 @@ class Claim(Property):
         :param claims: the claims to add
         :type claims: list of pywikibot.Claim
         """
+        self._assert_mainsnak('Cannot add sources to a {}')
         for claim in claims:
             if claim.on_item is not None:
                 raise ValueError(
@@ -1779,6 +1794,8 @@ class Claim(Property):
         :param sources: the sources to remove
         :type sources: list of pywikibot.Claim
         """
+        self._assert_mainsnak('Cannot remove sources from a {}')
+        self._assert_attached()
         data = self.repo.removeSources(self, sources, **kwargs)
         self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
         for source in sources:
@@ -1792,6 +1809,7 @@ class Claim(Property):
         :param qualifier: the qualifier to add
         :type qualifier: pywikibot.page.Claim
         """
+        self._assert_mainsnak('Cannot add qualifiers to a {}')
         if qualifier.on_item is not None:
             raise ValueError(
                 'The provided Claim instance is already used in an entity')
@@ -1819,8 +1837,10 @@ class Claim(Property):
         Remove the qualifiers.
 
         :param qualifiers: the qualifiers to remove
-        :type qualifiers: list Claim
+        :type qualifiers: list of pywikibot.Claim
         """
+        self._assert_mainsnak('Cannot remove qualifiers from a {}')
+        self._assert_attached()
         data = self.repo.remove_qualifiers(self, qualifiers, **kwargs)
         self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
         for qualifier in qualifiers:
@@ -1879,9 +1899,7 @@ class Claim(Property):
         :param target: qualifier target to check presence of
         :return: true if the qualifier was found, false otherwise
         """
-        if self.isQualifier or self.isReference:
-            raise ValueError('Qualifiers and references cannot have '
-                             'qualifiers.')
+        self._assert_mainsnak('{}s cannot have qualifiers')
         return any(qualifier.target_equals(target)
                    for qualifier in self.qualifiers.get(qualifier_id, []))
 
