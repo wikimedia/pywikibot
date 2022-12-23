@@ -7,6 +7,7 @@
 #
 import copy
 import json
+import operator
 import unittest
 from contextlib import suppress
 from decimal import Decimal
@@ -408,6 +409,17 @@ class TestWbTime(WbRepresentationTestCase):
                           precision='invalid_precision')
         self.assertIsInstance(t1.toTimestamp(), pywikibot.Timestamp)
         self.assertRaises(ValueError, t2.toTimestamp)
+
+    def test_comparison_types(self):
+        """Test WbTime comparison with different types."""
+        repo = self.get_repo()
+        t1 = pywikibot.WbTime(site=repo, year=2010, hour=12, minute=43)
+        t2 = pywikibot.WbTime(site=repo, year=-2005, hour=16, minute=45)
+        self.assertGreater(t1, t2)
+        self.assertRaises(TypeError, operator.lt, t1, 5)
+        self.assertRaises(TypeError, operator.gt, t1, 5)
+        self.assertRaises(TypeError, operator.le, t1, 5)
+        self.assertRaises(TypeError, operator.ge, t1, 5)
 
 
 class TestWbQuantity(WbRepresentationTestCase):
