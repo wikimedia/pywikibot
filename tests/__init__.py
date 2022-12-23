@@ -27,7 +27,7 @@ import requests  # noqa: F401
 
 import pywikibot.data.api
 from pywikibot import config
-from pywikibot.backports import Dict, List
+from pywikibot.backports import Dict, List, removesuffix
 from pywikibot.data.api import CachedRequest
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.tools import PYTHON_VERSION
@@ -176,7 +176,7 @@ disabled_tests: Dict[str, List[str]] = {}
 def _unknown_test_modules():
     """List tests which are to be executed."""
     dir_list = os.listdir(join_tests_path())
-    all_test_set = {name[0:-9] for name in dir_list  # strip '_tests.py'
+    all_test_set = {removesuffix(name, '_tests.py') for name in dir_list
                     if name.endswith('_tests.py')
                     and not name.startswith('_')}  # skip __init__.py and _*
 

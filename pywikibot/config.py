@@ -62,6 +62,7 @@ from pywikibot.backports import (
     List,
     Mapping,
     Tuple,
+    removeprefix,
     removesuffix,
 )
 from pywikibot.logging import error, output, warning
@@ -338,7 +339,7 @@ def get_base_dir(test_directory: Optional[str] = None,
     base_dir = ''
     for arg in sys.argv[1:]:
         if arg.startswith('-dir:'):
-            base_dir = arg[5:]
+            base_dir = removeprefix(arg, '-dir:')
             base_dir = os.path.expanduser(base_dir)
             break
     else:

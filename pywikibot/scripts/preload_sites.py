@@ -28,7 +28,7 @@ from datetime import datetime
 from typing import Optional, Union
 
 import pywikibot
-from pywikibot.backports import List, Set
+from pywikibot.backports import List, Set, removeprefix
 from pywikibot.family import Family
 
 
@@ -100,6 +100,6 @@ if __name__ == '__main__':
     for arg in pywikibot.handle_args():
         if arg in families_list:
             fam.add(arg)
-        elif arg.startswith('-worker'):
-            worker = int(arg.partition(':')[2])
+        elif arg.startswith('-worker:'):
+            worker = int(removeprefix(arg, '-worker:'))
     preload_families(fam or families_list, worker)

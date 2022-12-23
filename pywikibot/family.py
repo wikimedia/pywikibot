@@ -19,7 +19,13 @@ from typing import Optional
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Dict, List, Set, Tuple  # skipcq: PY-W2000
+from pywikibot.backports import (  # skipcq: PY-W2000
+    Dict,
+    List,
+    Set,
+    Tuple,
+    removesuffix,
+)
 from pywikibot.exceptions import FamilyMaintenanceWarning, UnknownFamilyError
 from pywikibot.tools import classproperty, deprecated, remove_last_args
 
@@ -1035,7 +1041,7 @@ def AutoFamily(name: str, url: str) -> SingleSiteFamily:
     def scriptpath(self, code):
         """Extract the script path from the URL."""
         if self.url.path.endswith('/api.php'):
-            return self.url.path[0:-8]
+            return removesuffix(self.url.path, '/api.php')
 
         # AutoFamily refers to the variable set below, not the function
         # but the reference must be given here

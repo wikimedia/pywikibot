@@ -23,6 +23,7 @@ from pywikibot.backports import (
     List,
     Sequence,
     Tuple,
+    removeprefix,
 )
 from pywikibot.bot import ShowingListOption
 from pywikibot.data import api
@@ -622,7 +623,7 @@ class GeneratorFactory:
             value = pywikibot.input('What namespace are you filtering on?')
         not_key = 'not:'
         if value.startswith(not_key):
-            value = value[len(not_key):]
+            value = removeprefix(value, not_key)
             resolve = self.site.namespaces.resolve
             not_ns = set(resolve(value.split(',')))
             if not self._namespaces:

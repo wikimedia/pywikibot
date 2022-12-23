@@ -691,7 +691,7 @@ class WbQuantity(_WbRepresentation):
 
         # also allow entity URIs to be provided via unit parameter
         if isinstance(unit, str) \
-           and unit.partition('://')[0] not in ('http', 'https'):
+           and not unit.startswith(('http://', 'https://')):
             raise ValueError("'unit' must be an ItemPage or entity uri.")
 
         if error is None and not self._require_errors(site):

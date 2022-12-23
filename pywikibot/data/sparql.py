@@ -11,7 +11,7 @@ from urllib.parse import quote
 from requests.exceptions import Timeout
 
 from pywikibot import Site, config, sleep, warning
-from pywikibot.backports import Dict, List
+from pywikibot.backports import Dict, List, removeprefix
 from pywikibot.comms import http
 from pywikibot.exceptions import Error, TimeoutError
 
@@ -227,9 +227,8 @@ class URI(SparqlNode):
 
         :return: ID of Wikibase object, e.g. Q1234
         """
-        urllen = len(self.entity_url)
         if self.value.startswith(self.entity_url):
-            return self.value[urllen:]
+            return removeprefix(self.value, self.entity_url)
         return None
 
     def __repr__(self) -> str:
