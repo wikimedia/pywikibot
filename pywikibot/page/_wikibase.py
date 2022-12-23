@@ -276,6 +276,10 @@ class WikibaseEntity:
             value = cls.fromJSON(self._content.get(key, {}), self.repo)
             setattr(self, key, value)
             data[key] = value
+            # xxx: need better handling for this
+            if key in ['claims', 'statements']:
+                value.set_on_item(self)
+
         return data
 
     def editEntity(
@@ -340,8 +344,16 @@ class MediaInfo(WikibaseEntity):
     title_pattern = r'M[1-9]\d*'
     DATA_ATTRIBUTES = {
         'labels': LanguageDict,
-        # TODO: 'statements': ClaimCollection,
+        'statements': ClaimCollection,
     }
+
+    def __getattr__(self, name):
+        if name == 'claims':  # T149410
+            name = 'statements'
+            if hasattr(self, name):
+                return getattr(self, name)
+
+        return super().__getattr__(name)
 
     @property
     def file(self) -> FilePage:
@@ -576,10 +588,6 @@ class WikibasePage(BasePage, WikibaseEntity):
 
         if 'pageid' in self._content:
             self._pageid = self._content['pageid']
-
-        # xxx: this is ugly
-        if 'claims' in data:
-            self.claims.set_on_item(self)
 
         return data
 
@@ -1357,12 +1365,17 @@ class Claim(Property):
 
     TARGET_CONVERTER = {
         'wikibase-item': lambda value, site:
-            ItemPage(site, 'Q' + str(value['numeric-id'])),
+            ItemPage(site.get_repo_for_entity_type('item'),
+                     'Q' + str(value['numeric-id'])),
         'wikibase-property': lambda value, site:
-            PropertyPage(site, 'P' + str(value['numeric-id'])),
-        'wikibase-lexeme': lambda value, site: LexemePage(site, value['id']),
-        'wikibase-form': lambda value, site: LexemeForm(site, value['id']),
-        'wikibase-sense': lambda value, site: LexemeSense(site, value['id']),
+            PropertyPage(site.get_repo_for_entity_type('property'),
+                         'P' + str(value['numeric-id'])),
+        'wikibase-lexeme': lambda value, site:
+            LexemePage(site.get_repo_for_entity_type('lexeme'), value['id']),
+        'wikibase-form': lambda value, site:
+            LexemeForm(site.get_repo_for_entity_type('lexeme'), value['id']),
+        'wikibase-sense': lambda value, site:
+            LexemeSense(site.get_repo_for_entity_type('lexeme'), value['id']),
         'commonsMedia': lambda value, site:
             FilePage(pywikibot.Site('commons'), value),  # T90492
         'globe-coordinate': pywikibot.Coordinate.fromWikibase,
@@ -1392,7 +1405,9 @@ class Claim(Property):
 
         Defined by the "snak" value, supplemented by site + pid
 
-        :param site: repository the claim is on
+        :param site: Repository where the property of the claim is defined.
+            Note that this does not have to correspond to the repository
+            where the claim has been stored.
         :type site: pywikibot.site.DataSite
         :param pid: property id, with "P" prefix
         :param snak: snak identifier for claim
@@ -1528,7 +1543,8 @@ class Claim(Property):
 
         :rtype: pywikibot.page.Claim
         """
-        claim = cls(site, data['mainsnak']['property'],
+        claim_repo = site.get_repo_for_entity_type('property')
+        claim = cls(claim_repo, data['mainsnak']['property'],
                     datatype=data['mainsnak'].get('datatype', None))
         if 'id' in data:
             claim.snak = data['id']
@@ -1538,7 +1554,7 @@ class Claim(Property):
         if claim.getSnakType() == 'value':
             value = data['mainsnak']['datavalue']['value']
             # The default covers string, url types
-            if claim.type in cls.types or claim.type == 'wikibase-property':
+            if claim.type in cls.types:
                 claim.target = cls.TARGET_CONVERTER.get(
                     claim.type, lambda value, site: value)(value, site)
             else:
@@ -1678,8 +1694,8 @@ class Claim(Property):
         if value:
             self.setTarget(value)
 
-        data = self.repo.changeClaimTarget(self, snaktype=snaktype,
-                                           **kwargs)
+        data = self.on_item.repo.changeClaimTarget(self, snaktype=snaktype,
+                                                   **kwargs)
         # TODO: Re-create the entire item from JSON, not just id
         self.snak = data['claim']['id']
         self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
@@ -1729,7 +1745,7 @@ class Claim(Property):
         self._assert_mainsnak('Cannot change rank on a {}')
         self._assert_attached()
         self.rank = rank
-        return self.repo.save_claim(self, **kwargs)
+        return self.on_item.repo.save_claim(self, **kwargs)
 
     def changeSnakType(self, value=None, **kwargs) -> None:
         """
@@ -1767,7 +1783,8 @@ class Claim(Property):
                 raise ValueError(
                     'The provided Claim instance is already used in an entity')
         if self.on_item is not None:
-            data = self.repo.editSource(self, claims, new=True, **kwargs)
+            data = self.on_item.repo.editSource(self, claims, new=True,
+                                                **kwargs)
             self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
             for claim in claims:
                 claim.hash = data['reference']['hash']
@@ -1796,7 +1813,7 @@ class Claim(Property):
         """
         self._assert_mainsnak('Cannot remove sources from a {}')
         self._assert_attached()
-        data = self.repo.removeSources(self, sources, **kwargs)
+        data = self.on_item.repo.removeSources(self, sources, **kwargs)
         self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
         for source in sources:
             source_dict = defaultdict(list)
@@ -1814,7 +1831,7 @@ class Claim(Property):
             raise ValueError(
                 'The provided Claim instance is already used in an entity')
         if self.on_item is not None:
-            data = self.repo.editQualifier(self, qualifier, **kwargs)
+            data = self.on_item.repo.editQualifier(self, qualifier, **kwargs)
             self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
             qualifier.on_item = self.on_item
         qualifier.isQualifier = True
@@ -1841,7 +1858,7 @@ class Claim(Property):
         """
         self._assert_mainsnak('Cannot remove qualifiers from a {}')
         self._assert_attached()
-        data = self.repo.remove_qualifiers(self, qualifiers, **kwargs)
+        data = self.on_item.repo.remove_qualifiers(self, qualifiers, **kwargs)
         self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
         for qualifier in qualifiers:
             self.qualifiers[qualifier.getID()].remove(qualifier)
