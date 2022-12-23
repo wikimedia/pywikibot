@@ -52,6 +52,7 @@ but 'p' must be included.
 #
 import pywikibot
 from pywikibot import WikidataBot, pagegenerators
+from pywikibot.backports import removeprefix
 from pywikibot.tools.itertools import itergroup
 
 
@@ -114,7 +115,7 @@ def main(*args: str) -> None:
     for arg in local_args:
         # Handle args specifying how to handle duplicate claims
         if arg.startswith('-exists:'):
-            exists_arg = arg.split(':')[1]
+            exists_arg = removeprefix(arg, '-exists:')
             continue
         # Handle page generator args
         if gen.handle_arg(arg):

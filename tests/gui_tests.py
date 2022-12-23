@@ -22,8 +22,8 @@ class TestTkdialog(TestCase):
     def test_tk_dialog(self):
         """Test Tk dialog."""
         desc = 'foo'
-        image = 'tests/data/images/MP_sounds.png'
-        filename = image.rsplit('/', 1)[1]
+        filename = 'MP_sounds.png'
+        image = f'tests/data/images/{filename}'
         box = Tkdialog(desc, image, filename)
         # skip after ~100 ms
         box.root.after(100, box.skip_file)

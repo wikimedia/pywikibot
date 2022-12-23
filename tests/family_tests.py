@@ -36,7 +36,7 @@ class TestFamily(TestCase):
                 self.assertTrue(iter(f.domains))
                 for domain in f.domains:
                     self.assertIsInstance(domain, str)
-                    if domain.split(':', 1)[0] != 'localhost':
+                    if not domain.startswith('localhost:'):
                         self.assertIn('.', domain)
 
                 self.assertEqual(f.name, name)

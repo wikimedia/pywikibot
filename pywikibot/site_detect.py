@@ -16,6 +16,7 @@ from requests.exceptions import RequestException
 
 import pywikibot
 from pywikibot.comms.http import fetch
+from pywikibot.backports import removesuffix
 from pywikibot.exceptions import ServerError
 from pywikibot.tools import MediaWikiVersion
 
@@ -45,8 +46,7 @@ class MWSite:
         :raises Timeout: a timeout occurred while loading the site
         :raises RuntimeError: Version not found or version less than 1.27
         """
-        if fromurl.endswith('$1'):
-            fromurl = fromurl[:-2]
+        fromurl = removesuffix(fromurl, '$1')
 
         r = fetch(fromurl, **kwargs)
         check_response(r)

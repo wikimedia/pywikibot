@@ -42,7 +42,7 @@ from datetime import timedelta
 
 import pywikibot
 from pywikibot import config, i18n, pagegenerators
-from pywikibot.backports import Tuple
+from pywikibot.backports import Tuple, removeprefix
 from pywikibot.bot import ConfigParserBot, SingleSiteBot
 from pywikibot.exceptions import CircularRedirectError, Error, NoPageError
 
@@ -495,8 +495,7 @@ def main(*args: str) -> None:
     options = {}
     for arg in pywikibot.handle_args(args):
         if arg.startswith('-delay:'):
-            pos = arg.find(':')
-            options[arg[1:pos]] = int(arg[pos + 1:])
+            options['delay'] = int(removeprefix(arg, '-delay:'))
         else:
             # generic handling of we have boolean options
             options[arg[1:]] = True

@@ -41,6 +41,7 @@ from pywikibot.backports import (
     Match,
     Sequence,
     cache,
+    removesuffix,
 )
 from pywikibot.plural import plural_rule
 
@@ -810,7 +811,7 @@ def twget_keys(twtitle: str) -> List[str]:
     pathname = os.path.join(next(iter(mod.__path__)), package)
 
     # build a list of languages in that directory
-    langs = [filename.partition('.')[0]
+    langs = [removesuffix(filename, '.json')
              for filename in sorted(os.listdir(pathname))
              if filename.endswith('.json')]
 

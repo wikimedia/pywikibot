@@ -243,7 +243,8 @@ class ParamInfo(Sized, Container):
                 params['modules'] = [mod for mod in module_batch
                                      if not mod.startswith('query+')
                                      and mod not in self.root_modules]
-                params['querymodules'] = [mod[6:] for mod in module_batch
+                params['querymodules'] = [removeprefix(mod, 'query+')
+                                          for mod in module_batch
                                           if mod.startswith('query+')]
 
                 for mod in set(module_batch) & self.root_modules:
