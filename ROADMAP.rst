@@ -79,9 +79,4 @@ Deprecations
 * 6.2.0: Throttle.multiplydelay attribute is deprecated
 * 6.2.0: SequenceOutputter.format_list() is deprecated in favour of 'out' property
 * 6.0.0: config.register_family_file() is deprecated
-
-
-Will be removed in Pywikibot 8
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 * 5.5.0: APISite.redirectRegex() will be removed in favour of APISite.redirect_regex()
