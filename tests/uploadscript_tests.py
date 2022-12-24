@@ -21,7 +21,7 @@ def match(value: str = '') -> int:
     option = '-chunked'
     if value:
         option += ':' + value
-    match = CHUNK_SIZE_REGEX.match(option)
+    match = CHUNK_SIZE_REGEX.fullmatch(option)
     return get_chunk_size(match)
 
 

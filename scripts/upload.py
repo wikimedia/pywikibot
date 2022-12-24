@@ -67,7 +67,7 @@ from pywikibot.specialbots import UploadRobot
 
 
 CHUNK_SIZE_REGEX = re.compile(
-    r'-chunked(?::(\d+(?:\.\d+)?)[ \t]*(k|ki|m|mi)?b?)?$', re.I)
+    r'-chunked(?::(\d+(?:\.\d+)?)[ \t]*(k|ki|m|mi)?b?)?', re.I)
 
 
 def get_chunk_size(match) -> int:
@@ -150,7 +150,7 @@ def main(*args: str) -> None:
             else:
                 ignorewarn = True
         elif arg == '-chunked':
-            match = CHUNK_SIZE_REGEX.match(option)
+            match = CHUNK_SIZE_REGEX.fullmatch(option)
             chunk_size = get_chunk_size(match)
         elif arg == '-async':
             asynchronous = True

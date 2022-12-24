@@ -438,7 +438,7 @@ class MediaWikiVersion:
     """
 
     MEDIAWIKI_VERSION = re.compile(
-        r'(\d+(?:\.\d+)+)(-?wmf\.?(\d+)|alpha|beta(\d+)|-?rc\.?(\d+)|.*)?$')
+        r'(\d+(?:\.\d+)+)(-?wmf\.?(\d+)|alpha|beta(\d+)|-?rc\.?(\d+)|.*)?')
 
     def __init__(self, version_str: str) -> None:
         """
@@ -449,7 +449,8 @@ class MediaWikiVersion:
         self._parse(version_str)
 
     def _parse(self, version_str: str) -> None:
-        version_match = MediaWikiVersion.MEDIAWIKI_VERSION.match(version_str)
+        version_match = MediaWikiVersion.MEDIAWIKI_VERSION.fullmatch(
+            version_str)
 
         if not version_match:
             raise ValueError(f'Invalid version number "{version_str}"')

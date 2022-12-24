@@ -6,7 +6,6 @@
 #
 import collections
 import logging
-import re
 import string
 import sys
 import types
@@ -555,7 +554,7 @@ class Family:
             which would work with the given URL.
         """
         parsed = urlparse.urlparse(url)
-        if not re.match('(https?)?$', parsed.scheme):
+        if parsed.scheme not in {'http', 'https', ''}:
             return None
 
         path = parsed.path

@@ -124,10 +124,10 @@ soft404 = re.compile(
 # matches an URL at the index of a website
 dirIndex = re.compile(
     r'\w+://[^/]+/((default|index)\.'
-    r'(asp|aspx|cgi|htm|html|phtml|mpx|mspx|php|shtml|var))?$',
+    r'(asp|aspx|cgi|htm|html|phtml|mpx|mspx|php|shtml|var))?',
     re.IGNORECASE)
 # Extracts the domain name
-domain = re.compile(r'^(\w+)://(?:www.|)([^/]+)')
+domain = re.compile(r'^(\w+)://(?:www\.|)([^/]+)')
 
 globalbadtitles = r"""
 # is
@@ -601,8 +601,8 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
                                        f'Redirect 404 : {ref.link} ')
                         continue
 
-                    if dirIndex.match(redir) \
-                       and not dirIndex.match(ref.link):
+                    if dirIndex.fullmatch(redir) \
+                       and not dirIndex.fullmatch(ref.link):
                         pywikibot.info(f'<<lightyellow>>WARNING<<default>> : '
                                        f'Redirect to root : {ref.link} ')
                         continue

@@ -92,8 +92,8 @@ class DataExtendBot(SingleSiteBot):
 
     """The Bot."""
 
-    QRE = re.compile(r'Q\d+$')
-    PQRE = re.compile(r'[PQ]\d+$')
+    QRE = re.compile(r'Q\d+')
+    PQRE = re.compile(r'[PQ]\d+')
 
     def __init__(self, **kwargs):
         """Initializer."""
@@ -358,7 +358,7 @@ class DataExtendBot(SingleSiteBot):
             return self.showtime(self.createdateclaim(title[6:]))
         if title.startswith('!q!'):
             return title[3:]
-        if not self.PQRE.match(title):
+        if not self.PQRE.fullmatch(title):
             return title
 
         if title in self.labels:
@@ -593,33 +593,34 @@ class DataExtendBot(SingleSiteBot):
             year = int(m[1])
             month = int(m[2])
             day = int(m[3])
-        if re.match(r'\d{,4}(?:年頃|\.)?$', text):
-            year = int(text)
+        m = re.fullmatch(r'(\d{1,4})(?:年頃|\.)?', text)
+        if m:
+            year = int(m[1])
             month = None
             day = None
-        if re.match(r'(?:1\d{3}|20[01]\d)[01]\d[0123]\d$', text):
+        if re.fullmatch(r'(?:1\d{3}|20[01]\d)[01]\d[0123]\d', text):
             year = int(text[:4])
             month = int(text[4:6])
             day = int(text[6:])
-        if re.match(r'\d{4}-\d{2}$', text):
+        if re.fullmatch(r'\d{4}-\d{2}', text):
             year = int(text[:4])
             month = int(text[-2:])
         m = re.match(r'(\d{1,2})[-/](\d{4})', text)
         if m:
             year = int(m[2])
             month = int(m[1])
-        m = re.match(r'(\d+)[-./|](\d{1,2})[-./|](\d{1,2})$', text)
+        m = re.fullmatch(r'(\d+)[-./|](\d{1,2})[-./|](\d{1,2})', text)
         if m:
             year = int(m[1])
             month = int(m[2])
             day = int(m[3])
-        m = re.match(
-            r'(\d{1,2})[-./|]\s*(\d{1,2})[-./|]\s*(\d{3,4})\.?$', text)
+        m = re.fullmatch(
+            r'(\d{1,2})[-./|]\s*(\d{1,2})[-./|]\s*(\d{3,4})\.?', text)
         if m:
             year = int(m[3])
             month = int(m[2])
             day = int(m[1])
-        m = re.match(r'(\d{1,2})[-./\s]([iIvVxX]+)[-./\s](\d{4})$', text)
+        m = re.fullmatch(r'(\d{1,2})[-./\s]([iIvVxX]+)[-./\s](\d{4})', text)
         if m:
             year = int(m[3])
             try:
@@ -627,8 +628,8 @@ class DataExtendBot(SingleSiteBot):
             except KeyError:
                 raise ValueError(f"Don't know month {m[2]}")
             day = int(m[1])
-        m = re.match(r"(\d+)(?:\.|er|eme|ème)?[\s.]\s*(?:d'|d[aei] )?"
-                     r'([^\s.]{2,})\.?[\s.]\s*(\d+)$', text)
+        m = re.fullmatch(r"(\d+)(?:\.|er|eme|ème)?[\s.]\s*(?:d'|d[aei] )?"
+                         r'([^\s.]{2,})\.?[\s.]\s*(\d+)', text)
         if m:
             year = int(m[3])
             try:
@@ -636,7 +637,8 @@ class DataExtendBot(SingleSiteBot):
             except KeyError:
                 raise ValueError(f"Don't know month {m[2]}")
             day = int(m[1])
-        m = re.match(r'(\d{4})\.?[\s.]\s*([^\s.]{3,})\.?[\s.]\s*(\d+)$', text)
+        m = re.fullmatch(
+            r'(\d{4})\.?[\s.]\s*([^\s.]{3,})\.?[\s.]\s*(\d+)', text)
         if m:
             year = int(m[1])
             try:
@@ -652,15 +654,15 @@ class DataExtendBot(SingleSiteBot):
             except KeyError:
                 raise ValueError(f"Don't know month {m[2]}")
             day = int(m[1])
-        m = re.match(r'(\w*[a-zA-Z]\w*)\.? (\d+)$', text)
+        m = re.fullmatch(r'(\w*[a-zA-Z]\w*)\.? (\d+)', text)
         if m:
             year = int(m[2])
             try:
                 month = self.MONTHNUMBER[m[1].lower()]
             except KeyError:
                 raise ValueError(f"Don't know month {m[1]}")
-        m = re.match(r'(\w+)\.? (\d{1,2})(?:st|nd|rd|th)?\.?\s*,\s*(\d{3,4})$',
-                     text)
+        m = re.fullmatch(
+            r'(\w+)\.? (\d{1,2})(?:st|nd|rd|th)?\.?\s*,\s*(\d{3,4})', text)
         if m:
             year = int(m[3])
             try:
@@ -681,7 +683,7 @@ class DataExtendBot(SingleSiteBot):
             year = int(m[1])
             month = int(m[2])
             day = int(m[3])
-        m = re.match(r'(\d+)年$', text)
+        m = re.fullmatch(r'(\d+)年', text)
         if m:
             year = int(m[1])
         if day == 0:
@@ -868,7 +870,7 @@ class DataExtendBot(SingleSiteBot):
 
                             createdclaim = pywikibot.Claim(self.site, claim[0])
 
-                            if self.QRE.match(claim[1]):
+                            if self.QRE.fullmatch(claim[1]):
                                 createdclaim.setTarget(pywikibot.ItemPage(
                                     self.site, claim[1]))
 

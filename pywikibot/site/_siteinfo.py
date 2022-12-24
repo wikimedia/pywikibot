@@ -29,7 +29,7 @@ class Siteinfo(Container):
     """
 
     WARNING_REGEX = re.compile(r'Unrecognized values? for parameter '
-                               r'["\']siprop["\']: (.+?)\.?$')
+                               r'["\']siprop["\']: (.+?)\.?')
 
     # Until we get formatversion=2, we have to convert empty-string properties
     # into booleans so they are easier to use.
@@ -139,7 +139,7 @@ class Siteinfo(Container):
         """
         def warn_handler(mod, message) -> bool:
             """Return True if the warning is handled."""
-            matched = Siteinfo.WARNING_REGEX.match(message)
+            matched = Siteinfo.WARNING_REGEX.fullmatch(message)
             if mod == 'siteinfo' and matched:
                 invalid_properties.extend(
                     prop.strip() for prop in matched[1].split(','))

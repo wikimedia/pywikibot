@@ -114,8 +114,8 @@ class Timestamp(datetime.datetime):
 
         .. versionadded:: 7.5
         """
-        RE_MW = r'\d{14}$'  # noqa: N806
-        m = re.match(RE_MW, timestr)
+        RE_MW = r'\d{14}'  # noqa: N806
+        m = re.fullmatch(RE_MW, timestr)
 
         if not m:
             msg = "time data '{timestr}' does not match MW format."
@@ -134,9 +134,9 @@ class Timestamp(datetime.datetime):
         """
         RE_ISO8601 = (r'(?:\d{4}-\d{2}-\d{2})(?P<sep>[T ])'  # noqa: N806
                       r'(?:\d{2}:\d{2}:\d{2})(?P<u>[.,]\d{1,6})?'
-                      r'(?P<tz>Z|[+\-]\d{2}:?\d{,2})?$'
+                      r'(?P<tz>Z|[+\-]\d{2}:?\d{,2})?'
                       )
-        m = re.match(RE_ISO8601, timestr)
+        m = re.fullmatch(RE_ISO8601, timestr)
 
         if not m:
             msg = "time data '{timestr}' does not match ISO8601 format."
@@ -174,8 +174,8 @@ class Timestamp(datetime.datetime):
 
         .. versionadded:: 7.5
         """
-        RE_POSIX = r'(?P<S>-?\d{1,13})(?:\.(?P<u>\d{1,6}))?$'  # noqa: N806
-        m = re.match(RE_POSIX, timestr)
+        RE_POSIX = r'(?P<S>-?\d{1,13})(?:\.(?P<u>\d{1,6}))?'  # noqa: N806
+        m = re.fullmatch(RE_POSIX, timestr)
 
         if not m:
             msg = "time data '{timestr}' does not match POSIX format."
