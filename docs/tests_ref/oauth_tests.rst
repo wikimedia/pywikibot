@@ -1,5 +1,6 @@
+*************************
 tests.oauth\_tests module
-=========================
+*************************
 
 .. automodule:: tests.oauth_tests
     :members:

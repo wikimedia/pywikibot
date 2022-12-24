@@ -57,6 +57,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
+    'sphinxext.opengraph',
 ]
 
 
@@ -131,7 +132,8 @@ default_role = 'py:obj'
 # show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = 'default'
+
 
 # A list of ignored prefixes for module index sorting.
 # modindex_common_prefix = []
@@ -148,13 +150,13 @@ todo_include_todos = True
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'nature'
+html_theme = 'furo'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+
 
 # Add any paths that contain custom themes here, relative to this directory.
 # html_theme_path = []
@@ -198,11 +200,12 @@ html_static_path = ['_static']
 
 # Custom sidebar templates, maps document names to template names.
 #
-html_sidebars = {
-    '**': [
-        'searchbox.html', 'localtoc.html', 'relations.html', 'sourcelink.html',
-    ]
-}
+# html_sidebars = {
+#     '**': [
+#         'searchbox.html', 'localtoc.html', 'relations.html',
+#         'sourcelink.html',
+#     ]
+# }
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
@@ -220,6 +223,98 @@ html_sidebars = {
 # If true, the index is split into individual pages for each letter.
 #
 html_split_index = True
+
+docs_url = 'https://gerrit.wikimedia.org/g/pywikibot/core/%2B/HEAD/docs/'
+
+# HTML Theme Colors
+# changed to match the palette as described on
+# https://meta.wikimedia.org/wiki/Brand/colours
+
+color_primary_blue = '#0C57A8'
+color_blue_bg_light = '#0C57A81B'
+color_blue_bg_dark = '#0C57A822'
+
+color_blue_text_dark = '#94D5FF'
+
+color_primary_red = '#990000'
+color_red_bg_light = '#99000011'
+color_red_bg_dark = '#99000014'
+
+color_red_text_dark = '#FF5151'
+
+color_primary_green = '#339966'
+color_green_bg_light = '#33996612'
+color_green_bg_dark = '#33996633'
+
+color_yellow = '#F0BC00'
+color_yellow_bg = '#F0BC0022'
+
+color_brightblue = '#049DFF'
+color_brightblue_bg = '#049DFF22'
+
+color_purple = '#5748B5'
+color_purple_bg = '#5748B52A'
+
+html_theme_options = {
+    'source_edit_link': docs_url + '{filename}',
+    'navigation_with_keys': True,
+    'light_css_variables': {
+        'color-brand-primary': color_primary_blue,
+        'color-link': color_primary_blue,
+        'color-link--hover': color_primary_blue,
+        'color-problematic': color_primary_red,
+        'color-admonition-title--note': color_primary_blue,
+        'color-admonition-title-background--note': color_blue_bg_light,
+        'color-admonition-title--seealso': color_primary_blue,
+        'color-admonition-title-background--seealso': color_blue_bg_light,
+        'color-admonition-title--caution': color_yellow,
+        'color-admonition-title-background--caution': color_yellow_bg,
+        'color-admonition-title--warning': color_yellow,
+        'color-admonition-title-background--warning': color_yellow_bg,
+        'color-admonition-title--danger': color_primary_red,
+        'color-admonition-title-background--danger': color_red_bg_light,
+        'color-admonition-title--error': color_primary_red,
+        'color-admonition-title-background--error': color_red_bg_light,
+        'color-admonition-title--attention': color_primary_red,
+        'color-admonition-title-background--attention': color_red_bg_light,
+        'color-admonition-title--hint': color_primary_green,
+        'color-admonition-title-background--hint': color_green_bg_light,
+        'color-admonition-title--tip': color_primary_green,
+        'color-admonition-title-background--tip': color_green_bg_light,
+        'color-admonition-title--important': color_brightblue,
+        'color-admonition-title-background--important': color_brightblue_bg,
+        'color-admonition-title': color_purple,
+        'color-admonition-title-background': color_purple_bg,
+    },
+    'dark_css_variables': {
+        'color-brand-primary': color_blue_text_dark,
+        'color-link': color_blue_text_dark,
+        'color-link--hover': color_blue_text_dark,
+        'color-problematic': color_red_text_dark,
+        'color-admonition-title--note': color_primary_blue,
+        'color-admonition-title-background--note': color_blue_bg_dark,
+        'color-admonition-title--seealso': color_primary_blue,
+        'color-admonition-title-background--seealso': color_blue_bg_dark,
+        'color-admonition-title--caution': color_yellow,
+        'color-admonition-title-background--caution': color_yellow_bg,
+        'color-admonition-title--warning': color_yellow,
+        'color-admonition-title-background--warning': color_yellow_bg,
+        'color-admonition-title--danger': color_primary_red,
+        'color-admonition-title-background--danger': color_red_bg_dark,
+        'color-admonition-title--error': color_primary_red,
+        'color-admonition-title-background--error': color_red_bg_dark,
+        'color-admonition-title--attention': color_primary_red,
+        'color-admonition-title-background--attention': color_red_bg_dark,
+        'color-admonition-title--hint': color_primary_green,
+        'color-admonition-title-background--hint': color_green_bg_dark,
+        'color-admonition-title--tip': color_primary_green,
+        'color-admonition-title-background--tip': color_green_bg_dark,
+        'color-admonition-title--important': color_brightblue,
+        'color-admonition-title-background--important': color_brightblue_bg,
+        'color-admonition-title': color_purple,
+        'color-admonition-title-background': color_purple_bg,
+    }
+}
 
 # If true, links to the reST sources are added to the pages.
 #
@@ -376,7 +471,9 @@ modindex_common_prefix = ['pywikibot.scripts.']
 
 # Pywikibot theme style
 html_permalinks_icon = '#'
-html_style = 'css/pywikibot.css'
+html_css_files = [
+    'css/pywikibot.css',
+]
 
 
 extlinks = {

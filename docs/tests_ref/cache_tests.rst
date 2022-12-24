@@ -1,5 +1,6 @@
+*************************
 tests.cache\_tests module
-=========================
+*************************
 
 .. automodule:: tests.cache_tests
     :members:

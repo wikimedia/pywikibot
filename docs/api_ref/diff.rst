@@ -1,5 +1,6 @@
-:mod:`diff` --- Helpers for computing deltas 
---------------------------------------------
+********************************************
+:mod:`diff` --- Helpers for computing deltas
+********************************************
 
 .. automodule:: diff
    :synopsis: Diff module

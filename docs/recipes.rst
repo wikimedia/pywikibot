@@ -1,8 +1,9 @@
+*******
 Recipes
-=======
+*******
 
 How to modify a page
---------------------
+====================
 
 >>> page = pywikibot.Page(pywikibot.Site(), 'Sample page')
 >>> new_content = page.text.replace('this', 'that')
@@ -11,7 +12,7 @@ How to modify a page
 See :doc:`library_usage` for more advanced samples.
 
 How to get links from summary section of page
----------------------------------------------
+=============================================
 
 >>> import pywikibot
 >>> from pwikibot import textlib

@@ -1,90 +1,91 @@
+****************
 Unsorted scripts
-================
+****************
 
-basic script description
-------------------------
+basic script
+============
 
 .. automodule:: scripts.basic
    :no-members:
    :noindex:
 
-change\_pagelang script description
------------------------------------
+change\_pagelang script
+=======================
 
 .. automodule:: scripts.change_pagelang
    :no-members:
    :noindex:
 
-coordinate\_import script description
--------------------------------------
+coordinate\_import script
+=========================
 
 .. automodule:: scripts.coordinate_import
    :no-members:
    :noindex:
 
-delinker script description
----------------------------
+delinker script
+===============
 .. automodule:: scripts.delinker
    :no-members:
    :noindex:
 
-djvutext script description
----------------------------
+djvutext script
+===============
 .. automodule:: scripts.djvutext
    :no-members:
    :noindex:
 
-download\_dump script description
----------------------------------
+download\_dump script
+=====================
 
 .. automodule:: scripts.download_dump
    :no-members:
    :noindex:
 
-fixing\_redirects script description
-------------------------------------
+fixing\_redirects script
+========================
 
 .. automodule:: scripts.fixing_redirects
    :no-members:
    :noindex:
 
-misspelling script description
-------------------------------
+misspelling script
+==================
 
 .. automodule:: scripts.misspelling
    :no-members:
    :noindex:
 
-noreferences script description
--------------------------------
+noreferences script
+===================
 
 .. automodule:: scripts.noreferences
    :no-members:
    :noindex:
 
-parser\_function\_count script description
-------------------------------------------
+parser\_function\_count script
+==============================
 
 .. automodule:: scripts.parser_function_count
    :no-members:
    :noindex:
 
-reflinks script description
----------------------------
+reflinks script
+===============
 
 .. automodule:: scripts.reflinks
    :no-members:
    :noindex:
 
-replicate\_wiki script description
-----------------------------------
+replicate\_wiki script
+=======================
 
 .. automodule:: scripts.replicate_wiki
    :no-members:
    :noindex:
 
-watchlist script description
-----------------------------
+watchlist script
+================
 
 .. automodule:: scripts.watchlist
    :no-members:

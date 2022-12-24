@@ -10,7 +10,7 @@ if "%SPHINXBUILD%" == "" (
 set SOURCEDIR=.
 set BUILDDIR=_build
 set SPHINXPROJ=Pywikibot
-set SPHINXOPTS=%~2 %~3 %~4 %~5 %~6 %~7 %~8 %~9
+set SPHINXOPTS=-j auto
 
 if "%1" == "" goto help
 if "%1" == "help" goto help

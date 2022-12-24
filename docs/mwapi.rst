@@ -3,8 +3,9 @@
 
    <br />
 
+*****************************
 MediaWiki API cross reference
-=============================
+*****************************
 
 See the table below for a cross reference between MediaWiki's API and Pywikibot's API.
 

@@ -1,5 +1,6 @@
 # This is a PIP requirements file for building Sphinx documentation of pywikibot
 # requirements.txt is also needed
-
 sphinx >= 5.2.3
 rstcheck >=6.1.0
+sphinxext-opengraph >= 0.7.2
+furo >= 2022.9.29

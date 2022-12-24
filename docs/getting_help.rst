@@ -1,5 +1,6 @@
+************
 Getting help
-------------
+************
 
 .. note::
    For information on how to connect with Pywikibot developers and users, see :manpage:`Communication`.

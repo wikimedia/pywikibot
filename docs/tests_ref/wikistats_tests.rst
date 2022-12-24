@@ -1,5 +1,6 @@
+*****************************
 tests.wikistats\_tests module
-=============================
+*****************************
 
 .. automodule:: tests.wikistats_tests
     :members:

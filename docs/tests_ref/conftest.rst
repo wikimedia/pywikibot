@@ -1,5 +1,6 @@
+*********************
 tests.conftest module
-=====================
+*********************
 
 .. automodule:: tests.conftest
     :members:

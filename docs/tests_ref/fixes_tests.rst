@@ -1,5 +1,6 @@
+*************************
 tests.fixes\_tests module
-=========================
+*************************
 
 .. automodule:: tests.fixes_tests
     :members:

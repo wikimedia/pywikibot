@@ -1,5 +1,6 @@
+*************************
 tests.login\_tests module
-=========================
+*************************
 
 .. automodule:: tests.login_tests
     :members:

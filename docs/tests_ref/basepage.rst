@@ -1,5 +1,6 @@
+*********************
 tests.basepage module
-=====================
+*********************
 
 .. automodule:: tests.basepage
     :members:

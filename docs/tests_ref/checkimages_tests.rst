@@ -1,5 +1,6 @@
+*******************************
 tests.checkimages\_tests module
-===============================
+*******************************
 
 .. automodule:: tests.checkimages_tests
     :members:

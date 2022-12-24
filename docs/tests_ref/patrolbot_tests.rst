@@ -1,5 +1,6 @@
+*****************************
 tests.patrolbot\_tests module
-=============================
+*****************************
 
 .. automodule:: tests.patrolbot_tests
     :members:

@@ -1,0 +1,20 @@
+{% extends "!page.html" %}
+{% block left_sidebar %}
+<div class="sidebar-sticky">
+  {%- for sidebar_section in sidebars %}
+  {# Add rellinks under logo and version info #}
+    {% if loop.index == 2 %}
+      <div class="sidebar-rellinks"
+           role="navigation"
+           aria-label="related navigation">
+        {%- for rellink in rellinks|reverse %}
+        <a href="{{ pathto(rellink[0])|e }}"
+           title="{{ rellink[1]|striptags|e }}"
+           {{ accesskey(rellink[2]) }}>{{ rellink[3] }}</a>
+        {%- endfor %}
+      </div>
+    {% endif %}
+    {%- include sidebar_section %}
+  {%- endfor %}
+</div>
+{% endblock left_sidebar %}
