@@ -293,6 +293,11 @@ class Timestamp(datetime.datetime):
         """
         return f'{self.posix_timestamp():.6f}'
 
+    def __repr__(self) -> str:
+        """Unify repr string between CPython and Pypy (T325905)."""
+        s = super().__repr__()
+        return f'{type(self).__name__}{s[s.find("("):]}'
+
     def __str__(self) -> str:
         """Return a string format recognized by the API."""
         return self.isoformat()
