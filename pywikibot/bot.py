@@ -2110,7 +2110,7 @@ class NoRedirectPageBot(CurrentPageBot):  # pragma: no cover
 
     def __init__(self, *args, **kwargs):
         """Deprecate NoRedirectPageBot."""
-        issue_deprecation_warning('RedirectPageBot',
+        issue_deprecation_warning('NoRedirectPageBot',
                                   "BaseBot attribute 'use_redirects = False'",
                                   since='7.2.0')
         super().__init__(*args, **kwargs)
