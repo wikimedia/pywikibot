@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Tests for the Timestamp class."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -114,13 +114,6 @@ class TestTimestamp(TestCase):
             with self.subTest(timestr), \
                  self.assertRaisesRegex(ValueError, regex):
                 Timestamp.set_timestamp(timestr)
-
-    def test_clone(self):
-        """Test cloning a Timestamp instance."""
-        t1 = Timestamp.utcnow()
-        t2 = t1.clone()
-        self.assertEqual(t1, t2)
-        self.assertIsInstance(t2, Timestamp)
 
     def test_instantiate_from_instance(self):
         """Test passing instance to factory methods works."""

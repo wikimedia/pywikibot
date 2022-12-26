@@ -3,7 +3,7 @@
 .. versionadded:: 7.5
 """
 #
-# (C) Pywikibot team, 2007-2022
+# (C) Pywikibot team, 2007-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -16,7 +16,7 @@ from typing import Type, Union
 
 import pywikibot
 from pywikibot.backports import Tuple
-from pywikibot.tools import classproperty
+from pywikibot.tools import classproperty, deprecated
 
 
 __all__ = (
@@ -211,9 +211,14 @@ class Timestamp(datetime.datetime):
 
         raise ValueError(f'time data {timestr!r} does not match any format.')
 
+    @deprecated('replace method', since='8.0.0')
     def clone(self) -> 'Timestamp':
-        """Clone this instance."""
-        return self.replace(microsecond=self.microsecond)
+        """Clone this instance.
+
+        .. deprecated:: 8.0
+           Use :meth:`replace` method instead.
+        """
+        return self.replace()
 
     @classproperty
     def ISO8601Format(cls: Type['Timestamp']) -> str:  # noqa: N802
@@ -244,9 +249,9 @@ class Timestamp(datetime.datetime):
         # If inadvertently passed a Timestamp object, use replace()
         # to create a clone.
         if isinstance(ts, cls):
-            return ts.clone()
-        _ts = f'{ts[:10]}{sep}{ts[11:]}'
-        return cls._from_iso8601(_ts)
+            return ts.replace()
+
+        return cls._from_iso8601(f'{ts[:10]}{sep}{ts[11:]}')
 
     @classmethod
     def fromtimestampformat(cls: Type['Timestamp'],
@@ -282,7 +287,7 @@ class Timestamp(datetime.datetime):
         # If inadvertently passed a Timestamp object, use replace()
         # to create a clone.
         if isinstance(ts, cls):
-            return ts.clone()
+            return ts.replace()
 
         if len(ts) == 8 and not strict:
             # year, month and day are given only
