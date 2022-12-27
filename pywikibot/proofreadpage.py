@@ -26,6 +26,7 @@ OCR support of page scans via:
 #
 # Distributed under the terms of the MIT license.
 #
+import collections.abc
 import json
 import re
 import time
@@ -33,6 +34,7 @@ from functools import partial
 from http import HTTPStatus
 from typing import Any, Optional, Union
 from urllib.parse import unquote
+from weakref import WeakKeyDictionary
 
 from requests.exceptions import ReadTimeout
 
@@ -46,6 +48,7 @@ from pywikibot.backports import (
     Sequence,
     Set,
     Tuple,
+    pairwise,
 )
 from pywikibot.comms import http
 from pywikibot.data.api import ListGenerator, Request
@@ -74,6 +77,248 @@ else:
 
 PagesFromLabelType = Dict[str, Set['pywikibot.page.Page']]
 _IndexType = Tuple[Optional['IndexPage'], List['IndexPage']]
+
+
+class TagAttr:
+    """Tag attribute of <pages />.
+
+    Represent a single attribute.
+    It is used internally in PagesTagParser() and shall not be used
+    stand-alone.
+
+    It manages string formatting output and conversion str <--> int and quotes.
+    Input value can only be srt or int and shall have quotes or nothing.
+
+    >>> a = TagAttr('to', 3.0)
+    Traceback (most recent call last):
+      ...
+    TypeError: value=3.0 must be str or int.
+
+    >>> a = TagAttr('to', 'A123"')
+    Traceback (most recent call last):
+      ...
+    ValueError: value=A123" has wrong quotes.
+
+    >>> a = TagAttr('to', 3)
+    >>> a
+    TagAttr('to', 3)
+    >>> str(a)
+    'to=3'
+    >>> a.attr
+    'to'
+    >>> a.value
+    3
+
+    >>> a = TagAttr('to', '3')
+    >>> a
+    TagAttr('to', '3')
+    >>> str(a)
+    'to=3'
+    >>> a.attr
+    'to'
+    >>> a.value
+    3
+
+    >>> a = TagAttr('to', '"3"')
+    >>> a
+    TagAttr('to', '"3"')
+    >>> str(a)
+    'to="3"'
+    >>> a.value
+    3
+
+    >>> a = TagAttr('to', "'3'")
+    >>> a
+    TagAttr('to', "'3'")
+    >>> str(a)
+    "to='3'"
+    >>> a.value
+    3
+
+    >>> a = TagAttr('to', 'A123')
+    >>> a
+    TagAttr('to', 'A123')
+    >>> str(a)
+    'to=A123'
+    >>> a.value
+    'A123'
+    """
+
+    def __init__(self, attr, value):
+        """Initializer."""
+        self.attr = attr
+        self._value = self._convert(value)
+
+    def _convert(self, value):
+        """Handle conversion from str to int and quotes."""
+        if not isinstance(value, (str, int)):
+            raise TypeError(f'value={value} must be str or int.')
+
+        self._orig_value = value
+
+        if isinstance(value, str):
+            if (value.startswith('"') != value.endswith('"')
+                    or value.startswith("'") != value.endswith("'")):
+                raise ValueError(f'value={value} has wrong quotes.')
+            value = value.strip('"\'')
+            value = int(value) if value.isdigit() else value
+
+        return value
+
+    @property
+    def value(self):
+        """Attribute value."""
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        self._value = self._convert(value)
+
+    def __str__(self):
+        attr = 'from' if self.attr == 'ffrom' else self.attr
+        return f'{attr}={self._orig_value}'
+
+    def __repr__(self):
+        attr = 'from' if self.attr == 'ffrom' else self.attr
+        return f"{self.__class__.__name__}('{attr}', {repr(self._orig_value)})"
+
+
+class TagAttrDesc:
+    """A descriptor tag."""
+
+    def __init__(self):
+        """Initializer."""
+        self.attrs = WeakKeyDictionary()
+
+    def __set_name__(self, owner, name):
+        self.public_name = name
+
+    def __get__(self, obj, objtype=None):
+        attr = self.attrs.get(obj)
+        return attr.value if attr is not None else None
+
+    def __set__(self, obj, value):
+        attr = self.attrs.get(obj)
+        if attr is not None:
+            attr.value = value
+        else:
+            self.attrs[obj] = TagAttr(self.public_name, value)
+
+    def __delete__(self, obj):
+        self.attrs.pop(obj, None)
+
+
+class PagesTagParser(collections.abc.Container):
+    """Parser for tag <pages />.
+
+    See https://www.mediawiki.org/wiki/Help:Extension:ProofreadPage/Pages_tag
+
+    Parse text and extract the first <pages ... /> tag.
+    Individual attributes will be accessible with dot notation.
+
+    >>> tp = PagesTagParser(
+    ... 'Text: <pages index="Index.pdf" from="first" to="last" />')
+    >>> tp
+    PagesTagParser('<pages index="Index.pdf" from="first" to="last" />')
+
+    Atttributes can be modified via dot notation.
+    If an attribute is a number, it is converted to int.
+    Note: 'from' is represented as 'ffrom' due to conflict with keyword.
+    >>> tp.ffrom = 1; tp.to = '"3"'
+    >>> tp.ffrom
+    1
+    >>> tp.to
+    3
+
+    Quotes are stripped in the value and added back in the str representation.
+    Note that quotes are not mandatory.
+    >>> tp
+    PagesTagParser('<pages index="Index.pdf" from=1 to="3" />')
+
+    Atttributes can be added via dot notation.
+    Order is fixed (same order as attribute definition in the class).
+    >>> tp.fromsection = '"A"'
+    >>> tp.fromsection
+    'A'
+    >>> tp
+    PagesTagParser('<pages index="Index.pdf" from=1 to="3" fromsection="A" />')
+
+    Atttributes can be deleted.
+    >>> del tp.fromsection
+    >>> tp
+    PagesTagParser('<pages index="Index.pdf" from=1 to="3" />')
+
+    Attribute presence can be checked.
+    >>> 'to' in tp
+    True
+
+    >>> 'step' in tp
+    False
+    """
+
+    pat_tag = re.compile(r'<pages (?P<attrs>[^/]*?)/>')
+    tokens = (
+        'index',
+        'from',
+        'to',
+        'include',
+        'exclude',
+        'step',
+        'header',
+        'tosection',
+        'fromsection',
+        'onlysection',
+    )
+    tokens = '(' + '=|'.join(tokens) + '=)'
+    pat_attr = re.compile(tokens)
+
+    index = TagAttrDesc()
+    ffrom = TagAttrDesc()
+    to = TagAttrDesc()
+    include = TagAttrDesc()
+    exclude = TagAttrDesc()
+    step = TagAttrDesc()
+    header = TagAttrDesc()
+    tosection = TagAttrDesc()
+    fromsection = TagAttrDesc()
+    onlysection = TagAttrDesc()
+
+    def __init__(self, text):
+        """Initializer."""
+        m = self.pat_tag.search(text)
+        if m is None:
+            raise ValueError(f'Invalid text={text}')
+
+        tag = m['attrs']
+        matches = list(self.pat_attr.finditer(tag))
+        positions = [m.span()[0] for m in matches] + [len(tag)]
+
+        for begin, end in pairwise(positions):
+            attribute = tag[begin:end - 1]
+            attr, _, value = attribute.partition('=')
+            if attr == 'from':
+                attr = 'f' + attr
+            setattr(self, attr, value)
+
+    @classmethod
+    def get_descriptors(cls):
+        """Get TagAttrDesc descriptors."""
+        res = {k: v for k, v in cls.__dict__.items()
+               if isinstance(v, TagAttrDesc)}
+        return res
+
+    def __contains__(self, attr):
+        return getattr(self, attr) is not None
+
+    def __str__(self):
+        descriptors = self.get_descriptors().items()
+        attrs = [v.attrs.get(self) for k, v in descriptors
+                 if v.attrs.get(self) is not None]
+        attrs = ' '.join(str(attr) for attr in attrs)
+        return f'<pages {attrs} />' if attrs else '<pages />'
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}('{self}')"
 
 
 def decompose(fn: Callable) -> Callable:  # type: ignore
