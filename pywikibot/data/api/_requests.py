@@ -658,9 +658,10 @@ class Request(MutableMapping):
             use_get = False  # MIME requests require HTTP POST
         else:
             headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-            if (not self.site.maximum_GET_length()
-                    or self.site.maximum_GET_length() < len(paramstring)):
+            if (not config.maximum_GET_length
+                    or config.maximum_GET_length < len(paramstring)):
                 use_get = False
+
             if use_get:
                 uri = f'{uri}?{paramstring}'
                 body = None
