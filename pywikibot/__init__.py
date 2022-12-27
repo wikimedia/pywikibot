@@ -569,6 +569,75 @@ class WbTime(_WbRepresentation):
                                timezone=timezone, calendarmodel=calendarmodel,
                                site=site)
 
+    def normalize(self) -> 'WbTime':
+        """Normalizes the WbTime object to account for precision.
+
+        Normalization is needed because WbTime objects can have hidden
+        values that affect naive comparisons, such as an object set to
+        a precision of YEAR but containing a month and day value.
+
+        This function returns a new normalized object and does not do
+        any modification in place.
+
+        Note: Normalized WbTime objects can only be compared to other
+        normalized WbTime objects of the same precision. Normalization
+        might make a WbTime object that was less than another WbTime object
+        before normalization, greater than it after normalization, or vice
+        versa.
+        """
+        year = self.year
+        # This is going to get messy.
+        if self.PRECISION['1000000000'] <= self.precision <= self.PRECISION['10000']:  # noqa: E501
+            # 1000000000 == 10^9
+            power_of_10 = 10 ** (9 - self.precision)
+            # Wikidata rounds the number based on the first non-decimal digit.
+            # Python's round function will round -15.5 to -16, and +15.5 to +16
+            # so we don't need to do anything complicated like the other
+            # examples.
+            year = round(year / power_of_10) * power_of_10
+        elif self.precision == self.PRECISION['millenia']:
+            # Similar situation with centuries
+            year_float = year / 1000
+            if year_float < 0:
+                year = math.floor(year_float)
+            else:
+                year = math.ceil(year_float)
+            year *= 1000
+        elif self.precision == self.PRECISION['century']:
+            # For century, -1301 is the same century as -1400 but not -1401.
+            # Similar for 1901 and 2000 vs 2001.
+            year_float = year / 100
+            if year_float < 0:
+                year = math.floor(year_float)
+            else:
+                year = math.ceil(year_float)
+            year *= 100
+        elif self.precision == self.PRECISION['decade']:
+            # For decade, -1340 is the same decade as -1349 but not -1350.
+            # Similar for 2010 and 2019 vs 2020
+            year_float = year / 10
+            year = math.trunc(year_float)
+            year *= 10
+        kwargs = {
+            'precision': self.precision,
+            'before': self.before,
+            'after': self.after,
+            'timezone': self.timezone,
+            'calendarmodel': self.calendarmodel,
+            'year': year
+        }
+        if self.precision >= self.PRECISION['month']:
+            kwargs['month'] = self.month
+        if self.precision >= self.PRECISION['day']:
+            kwargs['day'] = self.day
+        if self.precision >= self.PRECISION['hour']:
+            kwargs['hour'] = self.hour
+        if self.precision >= self.PRECISION['minute']:
+            kwargs['minute'] = self.minute
+        if self.precision >= self.PRECISION['second']:
+            kwargs['second'] = self.second
+        return type(self)(**kwargs)
+
     def toTimestr(self, force_iso: bool = False) -> str:
         """
         Convert the data to a UTC date/time string.
