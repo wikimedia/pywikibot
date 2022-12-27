@@ -11,6 +11,7 @@ import datetime
 import math
 import re
 import types
+from contextlib import suppress
 from typing import Type, Union
 
 import pywikibot
@@ -118,8 +119,8 @@ class Timestamp(datetime.datetime):
         m = re.fullmatch(RE_MW, timestr)
 
         if not m:
-            msg = "time data '{timestr}' does not match MW format."
-            raise ValueError(msg.format(timestr=timestr))
+            raise ValueError(
+                f'time data {timestr!r} does not match MW format.')
 
         return cls.strptime(timestr, cls.mediawikiTSFormat)
 
@@ -139,8 +140,8 @@ class Timestamp(datetime.datetime):
         m = re.fullmatch(RE_ISO8601, timestr)
 
         if not m:
-            msg = "time data '{timestr}' does not match ISO8601 format."
-            raise ValueError(msg.format(timestr=timestr))
+            raise ValueError(
+                f'time data {timestr!r} does not match ISO8601 format.')
 
         strpfmt = '%Y-%m-%d{sep}%H:%M:%S'.format(sep=m.group('sep'))
         strpstr = timestr[:19]
@@ -205,13 +206,10 @@ class Timestamp(datetime.datetime):
         ]
 
         for handler in handlers:
-            try:
+            with suppress(ValueError):
                 return handler(timestr)
-            except ValueError:
-                continue
 
-        msg = "time data '{timestr}' does not match any format."
-        raise ValueError(msg.format(timestr=timestr))
+        raise ValueError(f'time data {timestr!r} does not match any format.')
 
     def clone(self) -> 'Timestamp':
         """Clone this instance."""
@@ -251,14 +249,43 @@ class Timestamp(datetime.datetime):
         return cls._from_iso8601(_ts)
 
     @classmethod
-    def fromtimestampformat(cls: Type['Timestamp'], ts: Union[str, 'Timestamp']
-                            ) -> 'Timestamp':
-        """Convert a MediaWiki internal timestamp to a Timestamp object."""
+    def fromtimestampformat(cls: Type['Timestamp'],
+                            ts: Union[str, 'Timestamp'],
+                            strict: bool = False) -> 'Timestamp':
+        """Convert a MediaWiki internal timestamp to a Timestamp object.
+
+        .. versionchanged:: 3.0
+           create a Timestamp if only year, month and day are given.
+        .. versionchanged:: 8.0
+           the *strict* parameter was added which discards missing
+           element tolerance.
+
+        Example
+        -------
+
+        >>> Timestamp.fromtimestampformat('20220705082234')
+        Timestamp(2022, 7, 5, 8, 22, 34)
+        >>> Timestamp.fromtimestampformat('20220927')
+        Timestamp(2022, 9, 27, 0, 0)
+        >>> Timestamp.fromtimestampformat('20221109', strict=True)
+        Traceback (most recent call last):
+        ...
+        ValueError: time data '20221109' does not match MW format.
+
+        :param ts: the timestamp to be converted
+        :param strict: If true, do not ignore missing timestamp elements
+            for hours, minutes or seconds
+        :return: return the *Timestamp* object from given *ts*.
+        :raises ValueError: The timestamp is invalid, e.g. missing or
+            invalid timestamp component.
+        """
         # If inadvertently passed a Timestamp object, use replace()
         # to create a clone.
         if isinstance(ts, cls):
             return ts.clone()
-        if len(ts) == 8:  # year, month and day are given only
+
+        if len(ts) == 8 and not strict:
+            # year, month and day are given only
             ts += '000000'
         return cls._from_mw(ts)
 

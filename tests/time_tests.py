@@ -196,6 +196,33 @@ class TestTimestamp(TestCase):
         self.assertEqual(t1, t2)
         self.assertEqual(ts1, ts2)
 
+        tests = [
+            ('202211', None),
+            ('2022112', None),
+            ('20221127', (2022, 11, 27)),
+            ('202211271', None),
+            ('2022112712', None),
+            ('20221127123', None),
+            ('202211271234', None),
+            ('2022112712345', None),
+            ('20221127123456', (2022, 11, 27, 12, 34, 56)),
+        ]
+        for mw_ts, ts in tests:
+            with self.subTest(timestamp=mw_ts):
+                if ts is None:
+                    with self.assertRaisesRegex(
+                        ValueError,
+                            f'time data {mw_ts!r} does not match MW format'):
+                        Timestamp.fromtimestampformat(mw_ts)
+                else:
+                    self.assertEqual(Timestamp.fromtimestampformat(mw_ts),
+                                     Timestamp(*ts))
+
+        for mw_ts, ts in tests[1:-1]:
+            with self.subTest(timestamp=mw_ts), self.assertRaisesRegex(
+                    ValueError, f'time data {mw_ts!r} does not match MW'):
+                Timestamp.fromtimestampformat(mw_ts, strict=True)
+
     def test_add_timedelta(self):
         """Test addin a timedelta to a Timestamp."""
         t1 = Timestamp.utcnow()
