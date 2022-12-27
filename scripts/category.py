@@ -1451,7 +1451,7 @@ class CleanBot(Bot):
 
     def treat(self, child) -> None:
         """Process the category."""
-        grandchildren = set(child.articles(self.opt.recurse))
+        grandchildren = set(child.articles(recurse=self.opt.recurse))
         # For advanced usage uncomment the next line to
         # check not only grandchildren articles but
         # grandchildren categories too:
