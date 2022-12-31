@@ -474,7 +474,8 @@ class WbTime(_WbRepresentation):
         elapsed_seconds += self.minute * 60
         elapsed_seconds += self.second
         if self.timezone is not None:
-            elapsed_seconds += self.timezone * 60
+            # See T325866
+            elapsed_seconds -= self.timezone * 60
         return elapsed_seconds
 
     def __lt__(self, other: object) -> bool:

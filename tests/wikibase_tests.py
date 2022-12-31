@@ -6,6 +6,7 @@
 # Distributed under the terms of the MIT license.
 #
 import copy
+import datetime
 import json
 import operator
 import unittest
@@ -420,6 +421,21 @@ class TestWbTime(WbRepresentationTestCase):
         self.assertRaises(TypeError, operator.gt, t1, 5)
         self.assertRaises(TypeError, operator.le, t1, 5)
         self.assertRaises(TypeError, operator.ge, t1, 5)
+
+    def test_comparison_timezones(self):
+        """Test comparisons with timezones."""
+        repo = self.get_repo()
+        ts1 = pywikibot.Timestamp(
+            year=2022, month=12, day=21, hour=13,
+            tzinfo=datetime.timezone(datetime.timedelta(hours=-5)))
+        ts2 = pywikibot.Timestamp(
+            year=2022, month=12, day=21, hour=17,
+            tzinfo=datetime.timezone.utc)
+        self.assertGreater(ts1.timestamp(), ts2.timestamp())
+
+        t1 = pywikibot.WbTime.fromTimestamp(ts1, timezone=-300, site=repo)
+        t2 = pywikibot.WbTime.fromTimestamp(ts2, timezone=0, site=repo)
+        self.assertGreater(t1, t2)
 
 
 class TestWbQuantity(WbRepresentationTestCase):
