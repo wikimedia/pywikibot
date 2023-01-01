@@ -1,6 +1,6 @@
 """Library to log the bot in to a wiki account."""
 #
-# (C) Pywikibot team, 2003-2022
+# (C) Pywikibot team, 2003-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -133,7 +133,7 @@ class LoginManager:
 
         try:
             data = self.site.allusers(start=main_username, total=1)
-            user = next(data)
+            user = next(data, {'name': None})
         except APIError as e:
             if e.code == 'readapidenied':
                 pywikibot.warning("Could not check user '{}' exists on {}"
@@ -294,15 +294,16 @@ class LoginManager:
             self.login_to_site()
         except APIError as e:
             error_code = e.code
-            pywikibot.error(f'Login failed ({error_code}).')
+
+            # TODO: investigate other unhandled API codes
             if error_code in self._api_error:
-                error_msg = 'Username "{}" {} on {}'.format(
+                error_msg = 'Username {!r} {} on {}'.format(
                     self.login_name, self._api_error[error_code], self.site)
                 if error_code in ('Failed', 'FAIL'):
-                    error_msg += f'\n.{e.info}'
+                    error_msg += f'.\n{e.info}'
                 raise NoUsernameError(error_msg)
 
-            # TODO: investigate other unhandled API codes (bug T75539)
+            pywikibot.error(f'Login failed ({error_code}).')
             if retry:
                 self.password = None
                 return self.login(retry=False)
