@@ -1,6 +1,6 @@
 """Objects representing API requests."""
 #
-# (C) Pywikibot team, 2007-2022
+# (C) Pywikibot team, 2007-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -35,7 +35,7 @@ from pywikibot.exceptions import (
     TimeoutError,
 )
 from pywikibot.login import LoginStatus
-from pywikibot.textlib import removeHTMLParts
+from pywikibot.textlib import removeDisabledParts, removeHTMLParts
 from pywikibot.tools import PYTHON_VERSION
 
 
@@ -203,6 +203,7 @@ class Request(MutableMapping):
             self.retry_wait = pywikibot.config.retry_wait
         else:
             self.retry_wait = retry_wait
+        self.json_warning = False
         # The only problem with that system is that it won't detect when
         # 'parameters' is actually the only parameter for the request as it
         # then assumes it's using the new mode (and the parameters are actually
@@ -720,19 +721,21 @@ class Request(MutableMapping):
         try:
             result = response.json()
         except ValueError:
-            # if the result isn't valid JSON, there may be a server
-            # problem. Wait a few seconds and try again
-            # Show 20 lines of bare text
-            text = '\n'.join(removeHTMLParts(response.text).splitlines()[:20])
-            msg = """\
-Non-JSON response received from server {site} for url
-{resp.url}
+            # if the result isn't valid JSON, there may be a server problem.
+            # Wait a few seconds and try again.
+            # Show 20 lines of bare text without script parts
+            text = removeDisabledParts(response.text, ['script'])
+            text = re.sub('\n{2,}', '\n',
+                          '\n'.join(removeHTMLParts(text).splitlines()[:20]))
+            msg = f"""\
+Non-JSON response received from server {self.site} for url
+{response.url}
 The server may be down.
-Status code: {resp.status_code}
+Status code: {response.status_code}
 
 The text message is:
 {text}
-""".format(site=self.site, resp=response, text=text)
+"""
 
             # Do not retry for AutoFamily but raise a SiteDefinitionError
             # Note: family.AutoFamily is a function to create that class
@@ -741,7 +744,9 @@ The text message is:
                 raise SiteDefinitionError('Invalid AutoFamily({!r})'
                                           .format(self.site.family.domain))
 
-            pywikibot.warning(msg)
+            if not self.json_warning:  # warn only once
+                pywikibot.warning(msg)
+                self.json_warning = True
 
             # there might also be an overflow, so try a smaller limit
             for param in self._params:
