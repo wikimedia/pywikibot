@@ -318,7 +318,7 @@ def input_sections(variant: str,
             pywikibot.info(
                 f'The following {variant} setting sections are provided:')
             for item in filter(skip, sections):
-                pywikibot.output(item.head)
+                pywikibot.info(item.head)
 
     copies = []
     # Now ask for a single section of the given variant
