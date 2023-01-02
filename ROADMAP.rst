@@ -1,9 +1,18 @@
 Current release 8.0.0
 ---------------------
 
+Improvements
+^^^^^^^^^^^^
+
+* Allow normalization of :class:`pywikibot.WbTime` objects (:phab:`T123888`)
+* Add parser for ``<pages />`` tag to :mod:`proofreadpage`
+* ``addOnly`` parameter of :func:`textlib.replaceLanguageLinks` and :func:`textlib.replaceCategoryLinks`
+  were renamed to ``add_only``
+* ``known_codes`` attribute was added to :class:`family.WikimediaFamily` (:phab:`T325426`)
+* Unify representation for :class:`time.Timestamp` between  CPython and Pypy (:phab:`T325905`)
+* Implement comparison for :class:`pywikibot.WbTime` object (:phab:`T148280`, :phab:`T325863`)
 * Create a cookie file for each account (:phab:`T324000`)
 * Move data.api._login.LoginManager to :class:`login.ClientLoginManager`
-* Unquote title for red-links in class:`proofreadpage.IndexPage`
 * Let user the choice which section to be copied with :mod:`generate_user_files
   <pywikibot.scripts.generate_user_files>` (:phab:`T145372`)
 * use :func:`roundrobin_generators<tools.itertools.roundrobin_generators>` to combine generators
@@ -13,9 +22,6 @@ Current release 8.0.0
 * :meth:`Timestamp.set_timestamp()<pywikibot.time.Timestamp.set_timestamp>` raises TypeError
   instead of ValueError if conversion fails
 * Python 3.12 is supported
-* All parameters of :meth:`Category.members()<page.Category.members>`,
-  :meth:`Category.subcategories()<page.Category.subcategories>` and
-  :meth:`Category.articles()<page.Category.articles>` are keyword only
 * All parameters of :meth:`APISite.categorymembers()
   <pywikibot.site._generators.GeneratorsMixin.categorymembers>` are provided with
   :meth:`Category.members()<page.Category.members>`,
@@ -27,23 +33,67 @@ Current release 8.0.0
   :attr:`Page.latest_revision.timestamp<page.BasePage.latest_revision>`
 * Raise a generic ServerError if requests response is a ServerError (:phab:`T320590`)
 * Add a new variable 'private_folder_permission' to config.py (:phab:`T315045`)
-* Fix disolving script_paths for site-package (:phab:`T320530`)
-* Respect limit argument with Board.topics() (:phab:`T138215`, :phab:`T138307`)
-* The ``parent_id`` and ``content_model`` attributes of :class:`page.Revision` were removed in favour of ``parentid`` and ``contentmodel``
-* Support for MediaWiki < 1.27 was dropped
-* ListBoxWindows class of :mod:`userinterfaces.gui` was removed
 * L10N and i18n updates
 * Adjust subprocess args in :mod:`tools.djvu`
 * Short site value can be given if site code is equal to family like ``-site:meta`` or ``-site:commons``
+
+Documentation improvements
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Add highlighting to targeted code snippet within documentation (:phab:`T323800`)
+* Add previous, next, index, and modules links to documentation sidebar (:phab:`T323803`)
+* Introduce standard colors (legacy palette) in Furo theme (:phab:`T323802`)
+* Improve basic content structure and navigation of documentation (:phab:`T323812`)
+* Use ``Furo`` sphinx theme instead of ``Natural`` and improve documentation look and feel (:phab:`T322212`)
+* MediaWiki API cross reference was added to the documentation
+
+Bugfixes
+^^^^^^^^
+
+* Fix :class:`pywikibot.WbTime` precision (:phab:`T324798`)
+* Unquote title for red-links in class:`proofreadpage.IndexPage`
+* Find month with first letter uppercase or lowercase with :class:`textlib.TimeStripper` (:phab:`T324310`)
+* Fix disolving script_paths for site-package (:phab:`T320530`)
+* Respect limit argument with Board.topics() (:phab:`T138215`, :phab:`T138307`)
+
+Breaking changes
+^^^^^^^^^^^^^^^^
+
+* All parameters of :meth:`Category.members()<page.Category.members>`,
+  :meth:`Category.subcategories()<page.Category.subcategories>` and
+  :meth:`Category.articles()<page.Category.articles>` are keyword only
+* The ``parent_id`` and ``content_model`` attributes of :class:`page.Revision` were removed in favour
+  of ``parentid`` and ``contentmodel``
+* Support for MediaWiki < 1.27 was dropped
+* ListBoxWindows class of :mod:`userinterfaces.gui` was removed
 * Require Python 3.6.1+ with Pywikibot and drop support for Python 3.6.0 (:phab:`T318912`)
 * pymysql >= 0.9.3 is required (:phab:`T216741`)
 * Python 3.5 support was dropped (:phab:`T301908`)
-* MediaWiki API cross reference was added to the documentation
+* *See also Code cleanups below*
+
+Code cleanups
+^^^^^^^^^^^^^
+* ``maintenance/sorting_order`` script was removed (:phab:`T325426`)
+* ``alphabetic_sv`` and ``interwiki_putfirst`` attributes of
+  :class:`Wiktionary<families.wiktionary_family.Family>` family were removed (:phab:`T325426`)
+* ``alphabetic``, ``alphabetic_revised`` and ``fyinterwiki`` attributes of :class:`family.Family`
+  were removed (:phab:`T325426`)
+* *See also Deprecations below*
 
 Deprecations
 ------------
 
-* 8.0.0: :meth:`LoginManager.get_login_token<login.ClientLoginManager.get_login_token>` was 
+* 8.0.0: :meth:`Timestamp.clone()<pywikibot.time.Timestamp.clone>` method is deprecated
+  in favour of ``Timestamp.replace()`` method.
+* 8.0.0: :meth:`family.Family.maximum_GET_length` method is deprecated in favour of
+  :ref:`config.maximum_GET_length<Account Settings>` (:phab:`T325957`)
+* 8.0.0: ``addOnly`` parameter of :func:`textlib.replaceLanguageLinks` and
+  :func:`textlib.replaceCategoryLinks` are deprecated in favour of ``add_only``
+* 8.0.0: :class:`textlib.TimeStripper` regex attributes ``ptimeR``, ``ptimeznR``, ``pyearR``, ``pmonthR``,
+  ``pdayR`` are deprecated in favour of ``patterns`` attribute which is a
+  :class:`textlib.TimeStripperPatterns`.
+* 8.0.0: :class:`textlib.TimeStripper` ``groups`` attribute is deprecated in favour of ``textlib.TIMEGROUPS``
+* 8.0.0: :meth:`LoginManager.get_login_token<login.ClientLoginManager.get_login_token>` was
   replaced by ``login.ClientLoginManager.site.tokens['login']``
 * 8.0.0: ``data.api.LoginManager()`` is deprecated in favour of :class:`login.ClientLoginManager`
 * 8.0.0: :meth:`APISite.messages()<pywikibot.site._apisite.APISite.messages>` method is deprecated in favour of

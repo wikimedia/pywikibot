@@ -29,6 +29,11 @@ category script
 
 .. automodule:: scripts.category
 
+category\_graph script
+======================
+
+.. automodule:: scripts.category_graph
+
 category\_redirect script
 =========================
 

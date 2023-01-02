@@ -31,6 +31,8 @@ Bots and scripts
 | category.py              | Add a category link to all pages mentioned on a page,   |
 |                          | change or remove category tags.                         |
 +--------------------------+---------------------------------------------------------+
+| category_graph.py        | Visualizes category hierarchy                           |
++--------------------------+---------------------------------------------------------+
 | category_redirect.py     | Maintain category redirects and replace links to        |
 |                          | redirected categories.                                  |
 +--------------------------+---------------------------------------------------------+

@@ -1,33 +1,45 @@
 #!/usr/bin/python3
-
-r"""
-Visualizes category hierarchy.
+r"""Visualizes category hierarchy.
 
 Generates graphical representation in formats dot, svg and html5
 of category hierarchy.
 
-usage: pwb.py graph [-style STYLE] [-depth DEPTH] [-from FROM] [-to TO]
+Usage:
+
+    pwb.py graph [-style STYLE] [-depth DEPTH] [-from FROM] [-to TO]
 
 actions:
-  -from [FROM]   Category name to scan, default is main category, "?" to ask.
+
+-from [FROM]   Category name to scan, default is main category, "?" to ask.
 
 optional arguments:
-  -to TO         base file name to save, "?" to ask.
-  -style STYLE   graphviz style definitions in dot format:
-                 https://graphviz.org/doc/info/attrs.html
-  -depth DEPTH   maximal hierarchy depth. 2 by default.
-  -downsize K    font size divider for subcategories. 4 by default.
-                 Use 1 for the same font size.
 
-Examples:
+-to TO         base file name to save, "?" to ask
+-style STYLE   graphviz style definitions in dot format (see below)
+-depth DEPTH   maximal hierarchy depth. 2 by default
+-downsize K    font size divider for subcategories. 4 by default
+               Use 1 for the same font size
 
-pwb.py -v category_graph -from
-pwb.py category_graph -from Life -downsize 1.5 \
-        -style 'graph[rankdir=BT ranksep=0.5] node[shape=circle
-        style=filled fillcolor=green] edge[style=dashed penwidth=3]'
+.. seealso:: https://graphviz.org/doc/info/attrs.html
+   for graphviz style definitions.
 
+Example::
+
+    pwb.py -v category_graph -from
+
+Extended example with style settings::
+
+    pwb.py category_graph -from Life -downsize 1.5 \
+    -style 'graph[rankdir=BT ranksep=0.5] node[shape=circle
+    style=filled fillcolor=green] edge[style=dashed penwidth=3]'
+
+.. versionadded:: 8.0
 """
-
+#
+# (C) Pywikibot team, 2022-2023
+#
+# Distributed under the terms of the MIT license.
+#
 import argparse
 import io
 from collections import defaultdict
@@ -82,14 +94,11 @@ class CategoryGraphBot(SingleSiteBot):
         self.dot.set_name('"' + cat_title + '"')
 
     def scan_level(self, cat, level, hue=None) -> str:
-        """
-        Recursive function to fill dot graph.
+        """Recursive function to fill dot graph.
 
-        Parameters:
-            * cat - the Category of the node we're currently opening.
-            * level - the current decreasing from depth to zero
-                      level in the tree (for recursion), opposite of depth.
-
+        :param cat: the Category of the node we're currently opening.
+        :param level: the current decreasing from depth to zero level in
+            the tree (for recursion), opposite of depth.
         """
         title = cat.title(with_ns=False)
         size = float(args.downsize) ** level

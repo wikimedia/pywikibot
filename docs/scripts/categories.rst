@@ -9,6 +9,13 @@ category\_redirect script
    :no-members:
    :noindex:
 
+category\_graph script
+======================
+
+.. automodule:: scripts.category_graph
+   :no-members:
+   :noindex:
+
 commonscat script
 =================
 
