@@ -1922,7 +1922,9 @@ class Claim(Property):
             value = self.getTarget()
         elif self.type == 'commonsMedia':
             value = self.getTarget().title(with_ns=False)
-        elif self.type in ('globe-coordinate', 'time',
+        elif self.type == 'time':
+            value = self.getTarget().toWikibase(normalize=True)
+        elif self.type in ('globe-coordinate',
                            'quantity', 'monolingualtext',
                            'geo-shape', 'tabular-data'):
             value = self.getTarget().toWikibase()
