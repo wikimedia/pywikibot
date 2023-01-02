@@ -14,6 +14,11 @@ category
 
 * Enable pagegenerators options with ``move`` and ``remove`` actions (:phab:`T318239`)
 
+category_graph
+~~~~~~~~~~~~~~
+
+* :mod:`category_graph` script was added which creates category graph in formats dot, svg and html5
+
 clean_sandbox
 ~~~~~~~~~~~~~
 
@@ -23,6 +28,11 @@ create_isbn_edition
 ~~~~~~~~~~~~~~~~~~~
 
 * Fix argument parsing
+
+fixing_redirects
+~~~~~~~~~~~~~~~~
+
+* Skip invalid link titles (:phab:`T324434`)
 
 interwiki
 ~~~~~~~~~

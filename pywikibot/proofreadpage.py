@@ -22,7 +22,7 @@ OCR support of page scans via:
 
 """
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -82,12 +82,12 @@ _IndexType = Tuple[Optional['IndexPage'], List['IndexPage']]
 class TagAttr:
     """Tag attribute of <pages />.
 
-    Represent a single attribute.
-    It is used internally in PagesTagParser() and shall not be used
-    stand-alone.
+    Represent a single attribute. It is used internally in
+    :class:`PagesTagParser` and shall not be used stand-alone.
 
-    It manages string formatting output and conversion str <--> int and quotes.
-    Input value can only be srt or int and shall have quotes or nothing.
+    It manages string formatting output and conversion str <--> int and
+    quotes. Input value can only be str or int and shall have quotes or
+    nothing.
 
     >>> a = TagAttr('to', 3.0)
     Traceback (most recent call last):
@@ -142,6 +142,8 @@ class TagAttr:
     'to=A123'
     >>> a.value
     'A123'
+
+    .. versionadded:: 8.0
     """
 
     def __init__(self, attr, value):
@@ -184,7 +186,10 @@ class TagAttr:
 
 
 class TagAttrDesc:
-    """A descriptor tag."""
+    """A descriptor tag.
+
+    .. versionadded:: 8.0
+    """
 
     def __init__(self):
         """Initializer."""
@@ -209,11 +214,12 @@ class TagAttrDesc:
 
 
 class PagesTagParser(collections.abc.Container):
-    """Parser for tag <pages />.
+    """Parser for tag ``<pages />``.
 
-    See https://www.mediawiki.org/wiki/Help:Extension:ProofreadPage/Pages_tag
+    .. seealso::
+       https://www.mediawiki.org/wiki/Help:Extension:ProofreadPage/Pages_tag
 
-    Parse text and extract the first <pages ... /> tag.
+    Parse text and extract the first ``<pages ... />`` tag.
     Individual attributes will be accessible with dot notation.
 
     >>> tp = PagesTagParser(
@@ -221,29 +227,36 @@ class PagesTagParser(collections.abc.Container):
     >>> tp
     PagesTagParser('<pages index="Index.pdf" from="first" to="last" />')
 
-    Atttributes can be modified via dot notation.
-    If an attribute is a number, it is converted to int.
-    Note: 'from' is represented as 'ffrom' due to conflict with keyword.
+    Attributes can be modified via dot notation. If an attribute is a
+    number, it is converted to int.
+
+    .. note:: ``from`` is represented as ``ffrom`` due to conflict with
+       keyword.
+
     >>> tp.ffrom = 1; tp.to = '"3"'
     >>> tp.ffrom
     1
     >>> tp.to
     3
 
-    Quotes are stripped in the value and added back in the str representation.
-    Note that quotes are not mandatory.
+    Quotes are stripped in the value and added back in the str
+    representation.
+
+    .. note:: Quotes are not mandatory.
+
     >>> tp
     PagesTagParser('<pages index="Index.pdf" from=1 to="3" />')
 
-    Atttributes can be added via dot notation.
-    Order is fixed (same order as attribute definition in the class).
+    Attributes can be added via dot notation. Order is fixed (same order
+    as attribute definition in the class).
+
     >>> tp.fromsection = '"A"'
     >>> tp.fromsection
     'A'
     >>> tp
     PagesTagParser('<pages index="Index.pdf" from=1 to="3" fromsection="A" />')
 
-    Atttributes can be deleted.
+    Attributes can be deleted.
     >>> del tp.fromsection
     >>> tp
     PagesTagParser('<pages index="Index.pdf" from=1 to="3" />')
@@ -254,6 +267,8 @@ class PagesTagParser(collections.abc.Container):
 
     >>> 'step' in tp
     False
+
+    .. versionadded:: 8.0
     """
 
     pat_tag = re.compile(r'<pages (?P<attrs>[^/]*?)/>')

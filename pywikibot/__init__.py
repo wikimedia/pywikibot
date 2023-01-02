@@ -1,6 +1,6 @@
 """The initialization file for the Pywikibot framework."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -360,26 +360,27 @@ class WbTime(_WbRepresentation):
                  site: Optional[DataSite] = None) -> None:
         """Create a new WbTime object.
 
-        The precision can be set by the Wikibase int value (0-14) or by a human
-        readable string, e.g., 'hour'. If no precision is given, it is set
-        according to the given time units.
+        The precision can be set by the Wikibase int value (0-14) or by
+        a human readable string, e.g., ``hour``. If no precision is
+        given, it is set according to the given time units.
 
-        Timezone information is given in three different ways depending on the
-        time:
+        Timezone information is given in three different ways depending
+        on the time:
 
-        * Times after the implementation of UTC (1972): as an offset from UTC
-          in minutes;
-        * Times before the implementation of UTC: the offset of the time zone
-          from universal time;
-        * Before the implementation of time zones: The longitude of the place
-          of the event, in the range −180° to 180°, multiplied by 4 to convert
-          to minutes.
+        * Times after the implementation of UTC (1972): as an offset
+          from UTC in minutes;
+        * Times before the implementation of UTC: the offset of the time
+          zone from universal time;
+        * Before the implementation of time zones: The longitude of the
+          place of the event, in the range −180° to 180°, multiplied by
+          4 to convert to minutes.
 
-        Comparison information: When using the greater than or equal to
-        operator, or the less than or equal to operator, two different time
-        objects with the same UTC time after factoring in timezones are
-        considered equal. However, the equality operator will return false
-        if the timezone is different.
+        .. note::  **Comparison information:** When using the greater
+           than or equal to operator, or the less than or equal to
+           operator, two different time objects with the same UTC time
+           after factoring in timezones are considered equal. However,
+           the equality operator will return false if the timezone is
+           different.
 
         :param year: The year as a signed integer of between 1 and 16 digits.
         :param month: Month of the timestamp, if it exists.
@@ -452,11 +453,13 @@ class WbTime(_WbRepresentation):
     def _getSecondsAdjusted(self) -> int:
         """Return an internal representation of the time object as seconds.
 
-        The value adjusts itself for timezones. It is not compatible with
-        before/after.
+        The value adjusts itself for timezones. It is not compatible
+        with before/after.
 
-        This value should *only* be used for comparisons, and
-        its value may change without warning.
+        This value should *only* be used for comparisons, and its value
+        may change without warning.
+
+        .. versionadded:: 8.0
 
         :return: An integer roughly representing the number of seconds
             since January 1, 0000 AD, adjusted for leap years.
@@ -490,25 +493,37 @@ class WbTime(_WbRepresentation):
         return elapsed_seconds
 
     def __lt__(self, other: object) -> bool:
-        """Compare if self is less than other."""
+        """Compare if self is less than other.
+
+        .. versionadded:: 8.0
+        """
         if isinstance(other, WbTime):
             return self._getSecondsAdjusted() < other._getSecondsAdjusted()
         return NotImplemented
 
     def __le__(self, other: object) -> bool:
-        """Compare if self is less equals other."""
+        """Compare if self is less equals other.
+
+        .. versionadded:: 8.0
+        """
         if isinstance(other, WbTime):
             return self._getSecondsAdjusted() <= other._getSecondsAdjusted()
         return NotImplemented
 
     def __gt__(self, other: object) -> bool:
-        """Compare if self is greater than other."""
+        """Compare if self is greater than other.
+
+        .. versionadded:: 8.0
+        """
         if isinstance(other, WbTime):
             return self._getSecondsAdjusted() > other._getSecondsAdjusted()
         return NotImplemented
 
     def __ge__(self, other: object) -> bool:
-        """Compare if self is greater equals other."""
+        """Compare if self is greater equals other.
+
+        .. versionadded:: 8.0
+        """
         if isinstance(other, WbTime):
             return self._getSecondsAdjusted() >= other._getSecondsAdjusted()
         return NotImplemented

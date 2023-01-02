@@ -1,6 +1,6 @@
 """Family module for Wiktionary."""
 #
-# (C) Pywikibot team, 2005-2022
+# (C) Pywikibot team, 2005-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -10,7 +10,13 @@ from pywikibot import family
 # The Wikimedia family that is known as Wiktionary
 class Family(family.SubdomainFamily, family.WikimediaFamily):
 
-    """Family class for Wiktionary."""
+    """Family class for Wiktionary.
+
+    .. versionchanged:: 8.0
+       ``alphabetic_sv`` attribute was removed; ``interwiki_putfirst``
+       attribute was removed and default setting from parent class is
+       used.
+    """
 
     name = 'wiktionary'
 
