@@ -9,7 +9,7 @@ This module also includes objects:
 * WikibaseEntity: base interface for Wikibase entities.
 """
 #
-# (C) Pywikibot team, 2013-2022
+# (C) Pywikibot team, 2013-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1904,8 +1904,10 @@ class Claim(Property):
                    for qualifier in self.qualifiers.get(qualifier_id, []))
 
     def _formatValue(self) -> dict:
-        """
-        Format the target into the proper JSON value that Wikibase wants.
+        """Format the target into the proper JSON value that Wikibase wants.
+
+        .. versionchanges:: 8.0
+           normalize the result if type is ``time``.
 
         :return: JSON value
         """

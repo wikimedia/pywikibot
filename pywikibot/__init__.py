@@ -667,11 +667,13 @@ class WbTime(_WbRepresentation):
 
     def toTimestr(self, force_iso: bool = False,
                   normalize: bool = False) -> str:
-        """
-        Convert the data to a UTC date/time string.
+        """Convert the data to a UTC date/time string.
 
-        See fromTimestr() for differences between output with and without
-        force_iso.
+        .. seealso:: :meth:`fromTimestr` for differences between output
+           with and without *force_iso* parameter.
+
+        .. versionchanged:: 8.0
+           *normalize* parameter was added.
 
         :param force_iso: whether the output should be forced to ISO 8601
         :param normalize: whether the output should be normalized (see
@@ -701,8 +703,10 @@ class WbTime(_WbRepresentation):
             self.toTimestr(force_iso=True).lstrip('+'))
 
     def toWikibase(self, normalize: bool = False) -> Dict[str, Any]:
-        """
-        Convert the data to a JSON object for the Wikibase API.
+        """Convert the data to a JSON object for the Wikibase API.
+
+        .. versionchanged:: 8.0
+           *normalize* parameter was added.
 
         :param normalize: Whether to normalize the WbTime object before
             converting it to a JSON object (see :func:`normalize` for details)

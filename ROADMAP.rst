@@ -50,6 +50,7 @@ Documentation improvements
 Bugfixes
 ^^^^^^^^
 
+* Normalize :class:`WbTimes<pywikibot.WbTime>` sent to Wikidata (:phab:`T325860`)
 * Fix :class:`pywikibot.WbTime` precision (:phab:`T324798`)
 * Unquote title for red-links in class:`proofreadpage.IndexPage`
 * Find month with first letter uppercase or lowercase with :class:`textlib.TimeStripper` (:phab:`T324310`)
