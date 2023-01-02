@@ -665,7 +665,8 @@ class WbTime(_WbRepresentation):
             kwargs['second'] = self.second
         return type(self)(**kwargs)
 
-    def toTimestr(self, force_iso: bool = False) -> str:
+    def toTimestr(self, force_iso: bool = False,
+                  normalize: bool = False) -> str:
         """
         Convert the data to a UTC date/time string.
 
@@ -673,8 +674,13 @@ class WbTime(_WbRepresentation):
         force_iso.
 
         :param force_iso: whether the output should be forced to ISO 8601
+        :param normalize: whether the output should be normalized (see
+            :meth:`normalize` for details)
         :return: Timestamp in a format resembling ISO 8601
         """
+        if normalize:
+            return self.normalize().toTimestr(force_iso=force_iso,
+                                              normalize=False)
         if force_iso:
             return Timestamp._ISO8601Format_new.format(
                 self.year, max(1, self.month), max(1, self.day),
@@ -694,13 +700,15 @@ class WbTime(_WbRepresentation):
         return Timestamp.fromISOformat(
             self.toTimestr(force_iso=True).lstrip('+'))
 
-    def toWikibase(self) -> Dict[str, Any]:
+    def toWikibase(self, normalize: bool = False) -> Dict[str, Any]:
         """
         Convert the data to a JSON object for the Wikibase API.
 
+        :param normalize: Whether to normalize the WbTime object before
+            converting it to a JSON object (see :func:`normalize` for details)
         :return: Wikibase JSON
         """
-        json = {'time': self.toTimestr(),
+        json = {'time': self.toTimestr(normalize=normalize),
                 'precision': self.precision,
                 'after': self.after,
                 'before': self.before,

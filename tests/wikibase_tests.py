@@ -285,6 +285,15 @@ class TestWbTime(WbRepresentationTestCase):
         self.assertEqual(t.toTimestr(), '-00000002010-01-01T12:43:00Z')
         self.assertEqual(t.toTimestr(force_iso=True), '-2010-01-01T12:43:00Z')
 
+        t = pywikibot.WbTime(site=repo, year=2010, hour=12, minute=43,
+                             precision=pywikibot.WbTime.PRECISION['day'])
+        self.assertEqual(t.toTimestr(), '+00000002010-01-01T12:43:00Z')
+        self.assertEqual(t.toTimestr(force_iso=True), '+2010-01-01T12:43:00Z')
+        self.assertEqual(t.toTimestr(normalize=True),
+                         '+00000002010-01-01T00:00:00Z')
+        self.assertEqual(t.toTimestr(force_iso=True, normalize=True),
+                         '+2010-01-01T00:00:00Z')
+
     def test_WbTime_fromTimestr(self):
         """Test WbTime creation from UTC date/time string."""
         repo = self.get_repo()
