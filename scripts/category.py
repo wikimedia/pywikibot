@@ -982,8 +982,8 @@ class CategoryListifyRobot:
                  show_images: bool = False, *,
                  talk_pages: bool = False,
                  recurse: Union[int, bool] = False,
-                 prefix: str = '*',
-                 namespaces=None) -> None:
+                 namespaces=None,
+                 **kwargs) -> None:
         """Initializer."""
         self.edit_summary = edit_summary
         self.append = append
@@ -1000,7 +1000,7 @@ class CategoryListifyRobot:
         self.list = pywikibot.Page(self.site, list_title)
         self.talk_pages = talk_pages
         self.recurse = recurse
-        self.prefix = prefix
+        self.prefix = kwargs.pop('prefix', '*')
         self.namespaces = self.site.namespaces.resolve(namespaces or [])
         self.subcats = not self.namespaces or 'Category' in self.namespaces
 
@@ -1510,7 +1510,6 @@ def main(*args: str) -> None:
     move_together = False
     keep_sortkey = None
     depth = 5
-    prefix = '*'
 
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)
@@ -1585,7 +1584,7 @@ def main(*args: str) -> None:
         elif option == 'keepsortkey':
             keep_sortkey = True
         elif option == 'prefix':
-            prefix = value
+            options[option] = value
         elif option == 'always':
             options[option] = True
         else:
@@ -1669,8 +1668,8 @@ def main(*args: str) -> None:
                                    append, overwrite, showimages,
                                    talk_pages=talkpages,
                                    recurse=options.get('recurse', False),
-                                   prefix=prefix,
-                                   namespaces=gen_factory.namespaces)
+                                   namespaces=gen_factory.namespaces,
+                                   **options)
     elif action == 'clean':
         bot = CleanBot(**options)
 
