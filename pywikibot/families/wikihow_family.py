@@ -60,7 +60,3 @@ class Family(family.SubdomainFamily):
     def scriptpath(self, code) -> str:
         """Return the script path for this family."""
         return ''
-
-    def protocol(self, code) -> str:
-        """Return 'https' as the protocol."""
-        return 'https'

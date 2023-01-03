@@ -428,15 +428,18 @@ class Family:
 
     # Methods
     def protocol(self, code: str) -> str:
-        """
-        The protocol to use to connect to the site.
+        """The protocol to use to connect to the site.
 
-        May be overridden to return 'https'. Other protocols are not supported.
+        May be overridden to return 'http'. Other protocols are not
+        supported.
+
+        .. versionchanged:: 8.2
+           ``https`` is returned instead of ``http``.
 
         :param code: language code
         :return: protocol that this family uses
         """
-        return 'http'
+        return 'https'
 
     def verify_SSL_certificate(self, code: str) -> bool:
         """
@@ -828,10 +831,6 @@ class FandomFamily(Family):
 
         return {code: cls.domain for code in codes}
 
-    def protocol(self, code) -> str:
-        """Return 'https' as the protocol."""
-        return 'https'
-
     def scriptpath(self, code):
         """Return the script path for this family."""
         return '' if code == 'en' else ('/' + code)
@@ -979,10 +978,6 @@ class WikimediaFamily(Family):
     def shared_image_repository(self, code):
         """Return Wikimedia Commons as the shared image repository."""
         return ('commons', 'commons')
-
-    def protocol(self, code) -> str:
-        """Return 'https' as the protocol."""
-        return 'https'
 
     def eventstreams_host(self, code) -> str:
         """Return 'https://stream.wikimedia.org' as the stream hostname."""
