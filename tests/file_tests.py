@@ -9,6 +9,7 @@ import os
 import re
 import unittest
 from contextlib import suppress
+from itertools import chain
 
 import pywikibot
 from pywikibot.exceptions import (
@@ -320,6 +321,20 @@ class TestFilePageDataItem(TestCase):
         self.assertEqual('M14634781', item.getID())
         self.assertIsInstance(
             item.labels, pywikibot.page._collections.LanguageDict)
+        self.assertIsInstance(
+            item.statements, pywikibot.page._collections.ClaimCollection)
+        self.assertTrue(item.claims is item.statements)
+
+        all_claims = list(chain.from_iterable(item.statements.values()))
+        self.assertEqual({claim.on_item for claim in all_claims}, {item})
+
+        claims = [claim for claim in all_claims
+                  if isinstance(claim.target, pywikibot.page.WikibaseEntity)]
+        self.assertEqual({str(claim.repo) for claim in claims},
+                         {'wikidata:wikidata'})
+        self.assertEqual({str(claim.target.repo) for claim in claims},
+                         {'wikidata:wikidata'})
+
         del item._file
         self.assertEqual(page, item.file)
 

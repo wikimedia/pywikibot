@@ -93,3 +93,6 @@ class Family(family.WikimediaFamily):
             'venus': 'http://www.wikidata.org/entity/Q313',
             'vesta': 'http://www.wikidata.org/entity/Q3030',
         }
+
+    def entity_sources(self, code):
+        return {}
