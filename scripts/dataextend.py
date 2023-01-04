@@ -13220,6 +13220,7 @@ class PlwabnAnalyzer(Analyzer):
         if row:
             return self.findbyre(r'<I>\s*{}\s*</TT></I>(.*?)<'
                                  .fomat(letter), row, dtype)
+        return None
 
     def getvalues(self, field, letter, html, dtype=None) -> List[str]:
         result = []
@@ -13247,11 +13248,13 @@ class PlwabnAnalyzer(Analyzer):
         life = self.getvalue('100', 'd', html)
         if life:
             return self.findbyre(r'\((.*?)-', life)
+        return None
 
     def finddeathdate(self, html: str):
         life = self.getvalue('100', 'd', html)
         if life:
             return self.findbyre(r'-(.*?)\)', life)
+        return None
 
     def findnationalities(self, html: str):
         return self.getvalues('370', 'c', html, 'country')
@@ -13387,21 +13390,25 @@ class DeutscheBiographieAnalyzer(Analyzer):
         section = self.getvalue('Lebensdaten', html)
         if section:
             return self.findbyre(r'(.*?\d+)', section)
+        return None
 
     def findbirthplace(self, html: str):
         section = self.getvalue('Geburtsort', html)
         if section:
             return self.findbyre(r'>(.*?)<', section, 'city')
+        return None
 
     def finddeathdate(self, html: str):
         section = self.getvalue('Lebensdaten', html)
         if section:
             return self.findbyre(r'bis (.*)', section)
+        return None
 
     def finddeathplace(self, html: str):
         section = self.getvalue('Sterbeort', html)
         if section:
             return self.findbyre(r'>(.*?)<', section, 'city')
+        return None
 
     def findoccupations(self, html: str):
         section = self.getvalue('Beruf/Funktion', html)
@@ -13411,16 +13418,19 @@ class DeutscheBiographieAnalyzer(Analyzer):
             for subsection in subsections:
                 result += self.findallbyre(r'([^,]*)', subsection, 'occupation')
             return result
+        return None
 
     def findreligions(self, html: str):
         section = self.getvalue('Konfession', html)
         if section:
             return self.findallbyre(r'([^,]+)', section, 'religion')
+        return None
 
     def findwebpages(self, html: str):
         section = self.findbyre(r'(?s)<h4[^<>]*>\s*Quellen\s*\(nachweise\).*?<ul>(.*?)</ul>', html)
         if section:
             return self.findallbyre(r'href="(.*?)"', section)
+        return None
 
     def findfloruit(self, html: str):
         return self.findbyre('Wirkungsdaten ([^<>]*)', html)
@@ -13456,21 +13466,25 @@ class WorldsWithoutEndAnalyzer(Analyzer):
         section = self.getvalue('Born', html)
         if section:
             return self.findbyre('([^<>]*)', section)
+        return None
 
     def findbirthplace(self, html: str):
         section = self.getvalue('Born', html)
         if section:
             return self.findbyre('>([^<>]*)', section, 'city')
+        return None
 
     def finddeathdate(self, html: str):
         section = self.getvalue('Died', html)
         if section:
             return self.findbyre('([^<>]*)', section)
+        return None
 
     def finddeathplace(self, html: str):
         section = self.getvalue('Died', html)
         if section:
             return self.findbyre('>([^<>]*)', section, 'city')
+        return None
 
     def findoccupations(self, html: str):
         section = self.getvalue('Occupation', html)
@@ -13480,6 +13494,7 @@ class WorldsWithoutEndAnalyzer(Analyzer):
             for subsection in subsections:
                 result += self.findallbyre('([^,]*)', subsection, 'occupation')
             return result
+        return None
 
     def findnationalities(self, html: str):
         section = self.getvalue('Nationality', html)
@@ -13489,11 +13504,13 @@ class WorldsWithoutEndAnalyzer(Analyzer):
             for subsection in subsections:
                 result += self.findallbyre('([^,]*)', subsection, 'country')
             return result
+        return None
 
     def findwebpages(self, html: str):
         section = self.getvalue('Links', html)
         if section:
             return self.findallbyre('"([^<>"]*://[^<>"]*)"', section)
+        return None
 
 
 class BelgianPhotographerAnalyzer(Analyzer):
@@ -13815,6 +13832,7 @@ class JwaAnalyzer(Analyzer):
         section = self.findbyre('(?s)<div class="field-label">Occupations</div(>.*?<)/div>', html)
         if section:
             return self.findallbyre('>([^<>]*)<', section, 'occupation')
+        return None
 
 
 class WikiAnalyzer(Analyzer):
@@ -13952,6 +13970,7 @@ class WikiAnalyzer(Analyzer):
                             fr'([^{splitters}]+)', section, dtype)
                 if result:
                     return result[0]
+        return None
 
     def findinstanceof(self, html: str):
         return self.getinfo([
@@ -15024,6 +15043,7 @@ class UnivieAnalyzer(UrlAnalyzer):
         section = self.findbyre(r'"deathPlace":{(.*?)}', html)
         if section:
             return self.findbyre(r'"name":"(.*?)"', section, 'city')
+        return None
 
     def findnationalities(self, html: str):
         section = self.findbyre(r'(?s)<div class="artist-information-label">Nationality:</div>'
