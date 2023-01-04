@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Test i18n module."""
 #
-# (C) Pywikibot team, 2007-2022
+# (C) Pywikibot team, 2007-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -26,9 +26,6 @@ class Site:
         self.code = code
         self.family = self.Family()
         self.family.name = family
-
-    def __repr__(self):
-        return "'{site.family.name}:{site.code}'".format(site=self)
 
 
 class TestTranslate(TestCase):

@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Test confirming paraminfo contains expected values."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -119,13 +119,12 @@ class MediaWikiKnownTypesTestCase(KnownTypesTestBase,
     def test_content_format(self):
         """Test content format."""
         base = [
+            'application/json',
             'text/x-wiki',
             'text/javascript',
             'text/css',
             'text/plain',
         ]
-        if self.site.mw_version >= '1.24':
-            base.append('application/json')
         if self.site.mw_version >= '1.36.0-wmf.2':
             base.extend([
                 'application/octet-stream',

@@ -1442,7 +1442,9 @@ class GeneratorsMixin:
 
         Iterated values are in the same format as recentchanges.
 
-        .. seealso:: :api:`Usercontribs`
+        .. seealso::
+           - :api:`Usercontribs`
+           - :meth:`pywikibot.User.contributions`
 
         :param user: Iterate contributions by this user (name or IP)
         :param userprefix: Iterate contributions by all users whose names

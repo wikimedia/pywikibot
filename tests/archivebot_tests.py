@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Tests for archivebot scripts."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -311,12 +311,12 @@ class TestPageArchiverObject(TestCase):
 
         try:
             archivebot.PageArchiver(page, tmpl_with_ns, '')
-        except Error as e:
+        except Error as e:  # pragma: no cover
             self.fail(f'PageArchiver() raised {e}!')
 
         try:
             archivebot.PageArchiver(page, tmpl_without_ns, '')
-        except Error as e:
+        except Error as e:  # pragma: no cover
             self.fail(f'PageArchiver() raised {e}!')
 
     def testLoadConfigInOtherNamespace(self):
@@ -338,7 +338,7 @@ class TestPageArchiverObject(TestCase):
         # TEMPLATE_PAGE assumed in ns=10 if ns is not explicit.
         try:
             archivebot.PageArchiver(page, tmpl_with_ns, '')
-        except Error as e:
+        except Error as e:  # pragma: no cover
             self.fail(f'PageArchiver() raised {e}!')
 
         with self.assertRaises(archivebot.MissingConfigError):

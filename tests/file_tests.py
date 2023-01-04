@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """FilePage tests."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -53,9 +53,6 @@ class TestSharedFiles(TestCase):
         commons = self.get_site('commons')
         itwp = self.get_site('itwiki')
         itwp_file = pywikibot.FilePage(itwp, title)
-        for using in itwp_file.using_pages():
-            self.assertIsInstance(using, pywikibot.Page)
-
         commons_file = pywikibot.FilePage(commons, title)
 
         self.assertFalse(itwp_file.exists())
@@ -66,6 +63,9 @@ class TestSharedFiles(TestCase):
         self.assertTrue(commons_file.file_is_shared())
         self.assertTrue(commons_file.file_is_used)
         self.assertTrue(commons_file.get_file_url())
+
+        for using in commons_file.using_pages():
+            self.assertIsInstance(using, pywikibot.Page)
 
         self.assertIn('/wikipedia/commons/', itwp_file.get_file_url())
         with self.assertRaisesRegex(

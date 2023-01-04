@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Test textlib module."""
 #
-# (C) Pywikibot team, 2011-2022
+# (C) Pywikibot team, 2011-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -943,7 +943,9 @@ class TestReplaceLinks(TestCase):
             if link.title == 'World':
                 # This must be a bytes instance not unicode
                 return b'homeworlder'
-            return None
+
+            # 'World' is the first link and leads to ValueError
+            return None  # pragma: no cover
 
         with self.assertRaisesRegex(ValueError,
                                     r'The result must be str and not bytes\.'):

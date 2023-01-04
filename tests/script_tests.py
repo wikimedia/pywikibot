@@ -140,11 +140,12 @@ skip_on_results = {
 
 
 def collector(loader=unittest.loader.defaultTestLoader):
-    """Load the default tests."""
-    # Note: Raising SkipTest during load_tests will
-    # cause the loader to fallback to its own
-    # discover() ordering of unit tests.
-    if unrunnable_script_set:
+    """Load the default tests.
+
+    .. note:: Raising SkipTest during load_tests will cause the loader
+       to fallback to its own discover() ordering of unit tests.
+    """
+    if unrunnable_script_set:  # pragma: no cover
         unittest_print('Skipping execution of unrunnable scripts:\n  {!r}'
                        .format(unrunnable_script_set))
 

@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Tests for the flow module."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -149,7 +149,7 @@ class TestFlowLoading(TestMediaWikiFlowSandbox):
                 config.step = step
                 for i, _ in enumerate(board.topics(total=total), start=1):
                     if i > total:
-                        break
+                        break  # pragma: no cover
                 self.assertEqual(i, total)
         config.step = saved_step
 
