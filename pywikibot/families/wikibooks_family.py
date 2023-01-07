@@ -1,6 +1,6 @@
 """Family module for Wikibooks."""
 #
-# (C) Pywikibot team, 2005-2022
+# (C) Pywikibot team, 2005-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -32,10 +32,10 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'en', 'hu', 'de', 'vi', 'fr', 'it', 'ja', 'pt', 'es', 'nl', 'pl', 'id',
         'he', 'fi', 'zh', 'fa', 'sq', 'az', 'ru', 'ca', 'eu', 'th', 'cs', 'da',
         'ko', 'ba', 'sv', 'gl', 'hi', 'sr', 'uk', 'hr', 'no', 'tr', 'sa', 'ar',
-        'ta', 'bn', 'eo', 'sk', 'is', 'ro', 'si', 'bg', 'ms', 'ka', 'mk', 'tt',
-        'lt', 'el', 'li', 'sl', 'tl', 'ur', 'km', 'la', 'mr', 'kk', 'te', 'et',
-        'be', 'ia', 'ml', 'oc', 'hy', 'ne', 'pa', 'cv', 'tg', 'ku', 'fy', 'af',
-        'bs', 'cy', 'mg', 'ky', 'shn',
+        'ta', 'bn', 'eo', 'sk', 'is', 'ro', 'shn', 'si', 'bg', 'ms', 'ka',
+        'mk', 'tt', 'lt', 'el', 'li', 'sl', 'tl', 'ur', 'km', 'la', 'mr', 'kk',
+        'te', 'et', 'be', 'ia', 'ml', 'oc', 'hy', 'ne', 'pa', 'cv', 'tg', 'ku',
+        'fy', 'af', 'bs', 'cy', 'mg', 'ky',
     ]
 
     category_redirect_templates = {
