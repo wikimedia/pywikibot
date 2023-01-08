@@ -4,6 +4,8 @@ Current release 8.0.0
 Improvements
 ^^^^^^^^^^^^
 
+* Support federated Wikibase (:phab:`T173195`)
+* Improve warning if a Non-JSON response was received from server (:phab:`T326046`)
 * Allow normalization of :class:`pywikibot.WbTime` objects (:phab:`T123888`)
 * Add parser for ``<pages />`` tag to :mod:`proofreadpage`
 * ``addOnly`` parameter of :func:`textlib.replaceLanguageLinks` and :func:`textlib.replaceCategoryLinks`
@@ -50,6 +52,8 @@ Documentation improvements
 Bugfixes
 ^^^^^^^^
 
+* Don't raise StopIteration in :meth:`login.LoginManager.check_user_exists`
+  if given user is behind the last user (:phab:`T326063`)
 * Normalize :class:`WbTimes<pywikibot.WbTime>` sent to Wikidata (:phab:`T325860`)
 * Fix :class:`pywikibot.WbTime` precision (:phab:`T324798`)
 * Unquote title for red-links in class:`proofreadpage.IndexPage`
