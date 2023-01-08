@@ -54,7 +54,7 @@ included.
 .. versionadded:: 7.2
 """
 #
-# (C) Pywikibot team, 2020-2022
+# (C) Pywikibot team, 2020-2023
 #
 # Distributed under the terms of the MIT license.
 #
