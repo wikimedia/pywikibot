@@ -47,7 +47,7 @@ subdirectory.
    moved to :mod:`pywikibot.scripts` folder
 """
 #
-# (C) Pywikibot team, 2003-2022
+# (C) Pywikibot team, 2003-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -58,7 +58,7 @@ from contextlib import suppress
 import pywikibot
 from pywikibot import config
 from pywikibot.backports import Tuple, nullcontext
-from pywikibot.exceptions import SiteDefinitionError
+from pywikibot.exceptions import NoUsernameError, SiteDefinitionError
 from pywikibot.login import OauthLoginManager
 
 
@@ -109,7 +109,10 @@ def login_one_site(code, family, oauth, logout, autocreate):
     if logout:
         site.logout()
     else:
-        site.login(autocreate=autocreate)
+        try:
+            site.login(autocreate=autocreate)
+        except NoUsernameError as e:
+            pywikibot.error(e)
 
     user = site.user()
     if user:
