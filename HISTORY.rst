@@ -1,6 +1,13 @@
 Release history
 ===============
 
+7.7.3
+-----
+*08 January 2023*
+
+* Add support for shn-wikibooks, as quote, guw quote, got-wikt families
+  (:phab:`T148280`, :phab:`T326141`, :phab:`T321285`, :phab:`T321297`)
+
 7.7.2
 -----
 *03 December 2022*
