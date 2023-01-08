@@ -20,7 +20,7 @@
 .. warning: do not upload a development release to pypi.
 """
 #
-# (C) Pywikibot team, 2009-2022
+# (C) Pywikibot team, 2009-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -74,7 +74,10 @@ extra_deps = {
     ],
     'mwoauth': ['mwoauth!=0.3.1,>=0.2.4'],
     'html': ['BeautifulSoup4'],
-    'http': ['fake_useragent'],
+    'http': [
+        'fake_useragent<0.1.14; python_version < "3.7"',
+        'fake_useragent>1.0.1; python_version >= "3.7"',
+    ],
     'flake8': [  # Due to incompatibilities between packages the order matters.
         'flake8==3.9.2,<5.0.0; python_version < "3.6"',
         'flake8>=5.0.2; python_version >= "3.6"',
