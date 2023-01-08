@@ -20,7 +20,7 @@
 .. warning: do not upload a development release to pypi.
 """
 #
-# (C) Pywikibot team, 2009-2022
+# (C) Pywikibot team, 2009-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -40,7 +40,7 @@ extra_deps = {
     # Core library dependencies
     'eventstreams': ['sseclient<0.0.23,>=0.0.18'],  # T222885
     'isbn': ['python-stdnum>=1.17'],
-    'Graphviz': ['pydot>=1.2'],
+    'Graphviz': ['pydot>=1.4.1'],
     'Google': ['google>=1.7'],
     'memento': ['memento_client==0.6.1'],
     'mwparserfromhell': ['mwparserfromhell>=0.5.0'],
@@ -49,8 +49,11 @@ extra_deps = {
     # vulnerability found in Pillow<8.1.1 but toolforge uses 5.4.1
     'Tkinter': ['Pillow>=8.1.1'],
     'mwoauth': ['mwoauth!=0.3.1,>=0.2.4'],
-    'html': ['BeautifulSoup4'],
-    'http': ['fake_useragent'],
+    'html': ['beautifulsoup4>=4.7.1'],
+    'http': [
+        'fake_useragent<0.1.14; python_version < "3.7"',
+        'fake_useragent>1.0.1; python_version >= "3.7"',
+    ],
     'flake8': [  # Due to incompatibilities between packages the order matters.
         'flake8>=5.0.2',
         'darglint',
@@ -94,12 +97,12 @@ extra_deps.update({'scripts': [i for k, v in script_deps.items() for i in v]})
 # ------- setup install_requires ------- #
 # packages which are mandatory
 dependencies = [
-    'requests>=2.20.1, <2.28.0; python_version < "3.7"',
-    'requests>=2.20.1; python_version>="3.7"',
+    'requests>=2.21.0, <2.28.0; python_version < "3.7"',
+    'requests>=2.21.0; python_version>="3.7"',
     # PEP 440
     'setuptools>=48.0.0 ; python_version >= "3.10"',
-    'setuptools>=38.5.2 ; python_version >= "3.7" and python_version < "3.10"',
-    'setuptools>=20.8.1, <59.7.0 ; python_version < "3.7"',
+    'setuptools>=40.8.0 ; python_version >= "3.7" and python_version < "3.10"',
+    'setuptools>=40.8.0, <59.7.0 ; python_version < "3.7"',
 ]
 # in addition either mwparserfromhell or wikitextparser is required
 
