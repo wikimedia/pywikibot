@@ -1,12 +1,10 @@
-"""
-Functions for manipulating wiki-text.
+"""Functions for manipulating wiki-text.
 
-Unless otherwise noted, all functions take a unicode string as the argument
-and return a unicode string.
-
+Unless otherwise noted, all functions take a unicode string as the
+argument and return a unicode string.
 """
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -34,24 +32,11 @@ from pywikibot.tools import (
 )
 from pywikibot.userinterfaces.transliteration import NON_LATIN_DIGITS
 
-
 try:
     import wikitextparser
 except ImportError:
-    try:
-        import mwparserfromhell as wikitextparser
-    except ImportError:
-        # print required because pywikibot is not imported completely
-        raise ImportError("""
-Pywikibot is missing a MediaWiki markup parser which is necessary.
-Please update the required module with either
+    import mwparserfromhell as wikitextparser
 
-    pip install "mwparserfromhell>=0.5.0"
-
-or
-
-    pip install "wikitextparser>=0.47.5"
-""") from None
 
 ETPType = List[Tuple[str, OrderedDictType[str, str]]]
 
@@ -1672,8 +1657,8 @@ def extract_templates_and_params(text: str,
     only the last value provided will be returned.
 
     This uses the package :py:obj:`mwparserfromhell` or
-    :py:obj:`wikitextparser` as MediaWiki markup parser. It is mandatory
-    that one of them is installed.
+    :py:obj:`wikitextparser` as MediaWiki markup parser.
+    ``mwparserfromhell`` is installed by default.
 
     There are minor differences between the two implementations.
 

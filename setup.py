@@ -43,7 +43,6 @@ extra_deps = {
     'Graphviz': ['pydot>=1.4.1'],
     'Google': ['google>=1.7'],
     'memento': ['memento_client==0.6.1'],
-    'mwparserfromhell': ['mwparserfromhell>=0.5.0'],
     'wikitextparser': ['wikitextparser>=0.47.0'],
     'mysql': ['PyMySQL >= 0.9.3'],  # toolforge
     # vulnerability found in Pillow<8.1.1 but toolforge uses 5.4.1
@@ -86,8 +85,6 @@ extra_deps = {
 # ------- setup extra_requires for scripts ------- #
 script_deps = {
     'create_isbn_edition.py': ['isbnlib', 'unidecode'],
-    'commons_information.py': extra_deps['mwparserfromhell'],
-    'patrol.py': extra_deps['mwparserfromhell'],
     'weblinkchecker.py': extra_deps['memento'],
 }
 
@@ -97,6 +94,7 @@ extra_deps.update({'scripts': [i for k, v in script_deps.items() for i in v]})
 # ------- setup install_requires ------- #
 # packages which are mandatory
 dependencies = [
+    'mwparserfromhell>=0.6.3',
     'requests>=2.21.0, <2.28.0; python_version < "3.7"',
     'requests>=2.21.0; python_version>="3.7"',
     # PEP 440
@@ -104,7 +102,6 @@ dependencies = [
     'setuptools>=40.8.0 ; python_version >= "3.7" and python_version < "3.10"',
     'setuptools>=40.8.0, <59.7.0 ; python_version < "3.7"',
 ]
-# in addition either mwparserfromhell or wikitextparser is required
 
 # ------- setup tests_require ------- #
 test_deps = ['mock']
