@@ -1,21 +1,17 @@
 #!/usr/bin/python3
 """Insert a language template into the description field."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2023
 #
 # Distributed under the terms of the MIT license.
 #
 import copy
 
+import mwparserfromhell
+
 import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
-
-
-try:
-    import mwparserfromhell
-except ImportError as e:
-    mwparserfromhell = e
 
 try:
     import langdetect
@@ -100,11 +96,6 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
         lspaces = param.value[:len(param.value) - len(lstrip)]
         rspaces = lstrip[len(lstrip.rstrip()):]
         param.value = f'{lspaces}{value}{rspaces}'
-
-    def setup(self):
-        """Raise exception if needed modules are missing."""
-        if isinstance(mwparserfromhell, Exception):
-            raise mwparserfromhell
 
     def treat_page(self) -> None:
         """Treat current page."""

@@ -42,7 +42,7 @@ Commandline parameters:
 
 """
 #
-# (C) Pywikibot team, 2011-2022
+# (C) Pywikibot team, 2011-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -50,16 +50,12 @@ import time
 from collections import defaultdict
 from contextlib import suppress
 
+import mwparserfromhell
+
 import pywikibot
 from pywikibot import pagegenerators
 from pywikibot.backports import Container, removeprefix
-from pywikibot.bot import BaseBot, suggest_help
-
-
-try:
-    import mwparserfromhell
-except ImportError as e:
-    mwparserfromhell = e
+from pywikibot.bot import BaseBot
 
 
 def verbose_output(string) -> None:
@@ -446,10 +442,6 @@ def main(*args: str) -> None:
             newpages = True
         else:
             recentchanges = True
-
-    if isinstance(mwparserfromhell, ImportError):
-        suggest_help(missing_dependencies=('mwparserfromhell',))
-        return
 
     if newpages or usercontribs:
         pywikibot.info('Newpages:')

@@ -65,18 +65,6 @@ Or to install using PyPI (excluding scripts)
     pip install pywikibot
     pwb <scriptname>
 
-In addition a MediaWiki markup parser is required. Please install one of them:
-
-.. code:: text
-
-    pip install mwparserfromhell
-
-or
-
-.. code:: text
-
-    pip install wikitextparser
-
 Our `installation
 guide <https://www.mediawiki.org/wiki/Manual:Pywikibot/Installation>`_
 has more details for advanced usage.

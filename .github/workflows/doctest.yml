@@ -54,10 +54,10 @@ jobs:
         pip install -U setuptools
         pip install pytest
         pip install "sseclient<0.0.23,>=0.0.18"
-        pip install "mwparserfromhell>=0.5.0"
+        pip install mwparserfromhell
         pip install "PyMySQL >= 0.9.3"
         pip install codecov
-        pip install "coverage>=5.2.1"
+        pip install coverage
         python -c "import setuptools; print('setuptools:', setuptools.__version__)"
 
     - name: Generate user files
