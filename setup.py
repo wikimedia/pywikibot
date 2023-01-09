@@ -71,12 +71,7 @@ extra_deps = {
         'pep8-naming>=0.12.1, <0.13.0; python_version < "3.7"',
         'pep8-naming>=0.12.1; python_version >= "3.7"',
     ],
-    'hacking': [
-        'hacking',
-        # importlib-metadata module already installed with hacking 4.1.0
-        # but importlib-metadata 5 fails, so adjust it
-        'importlib-metadata<5.0.0; python_version < "3.8"',
-    ],
+    'hacking': ['hacking'],
 }
 
 
