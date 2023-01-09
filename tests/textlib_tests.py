@@ -484,7 +484,6 @@ class TestTemplateParams(TestCase):
                     self.assertEqual(func(template),
                                      [(name, OrderedDict((('b', 'c'), )))])
 
-    @require_modules('mwparserfromhell')
     def test_extract_templates_params_mwpfh(self):
         """Test using mwparserfromhell."""
         func = textlib.extract_templates_and_params
@@ -506,7 +505,6 @@ class TestTemplateParams(TestCase):
                                ('d', OrderedDict([('1', '')]))
                                ])
 
-    @require_modules('mwparserfromhell')
     def test_extract_templates_params_parser_stripped(self):
         """Test using mwparserfromhell with stripping."""
         func = functools.partial(textlib.extract_templates_and_params,
@@ -538,7 +536,6 @@ class TestTemplateParams(TestCase):
                                ('d', OrderedDict([('1', '')]))
                                ])
 
-    @require_modules('mwparserfromhell')
     def test_extract_templates_params(self):
         """Test that the normal entry point works."""
         func = functools.partial(textlib.extract_templates_and_params,

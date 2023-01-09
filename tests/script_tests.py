@@ -27,8 +27,6 @@ framework_scripts = ['login', 'shell']
 # Here, the name given to the module which will be imported is required.
 script_deps = {
     'create_isbn_edition': ['isbnlib', 'unidecode'],
-    'commons_information': ['mwparserfromhell'],
-    'patrol': ['mwparserfromhell'],
     'weblinkchecker': ['memento_client'],
 }
 
