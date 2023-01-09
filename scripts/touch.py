@@ -23,12 +23,15 @@ Purge mode:
 &params;
 """
 #
-# (C) Pywikibot team, 2009-2022
+# (C) Pywikibot team, 2009-2023
 #
 # Distributed under the terms of the MIT license.
 #
+from collections import defaultdict
+from contextlib import suppress
+
 import pywikibot
-from pywikibot import pagegenerators
+from pywikibot import config, pagegenerators
 from pywikibot.bot import MultipleSitesBot
 from pywikibot.exceptions import (
     LockedPageError,
@@ -76,12 +79,57 @@ class PurgeBot(MultipleSitesBot):
         'redirects': None
     }
 
+    def __init__(self, *args, **kwargs):
+        """Initializer."""
+        super().__init__(*args, **kwargs)
+        self.pages = defaultdict(list)
+
     def treat(self, page) -> None:
-        """Purge the given page."""
-        done = page.purge(**self.opt)
-        if done:
-            self.counter['purge'] += 1
-        pywikibot.info('Page {}{} purged'.format(page, '' if done else ' not'))
+        """Purge the given page.
+
+        .. versionchanged:: 8.0
+           Enable batch purge using :meth:`APISite.purgepages()
+           <pywikibot.site._apisite.APISite.purgepages>`
+        """
+        # We can have mutiple sites, save pages and cache rate limit
+        self.pages[page.site].append(page)
+        self.purgepages()
+
+    def teardown(self):
+        """Purge remaining pages if no KeyboardInterrupt was made.
+
+        .. versionadded:: 8.0
+        """
+        if self.generator_completed:
+            with suppress(KeyboardInterrupt):
+                self.purgepages(flush=True)
+
+        # show the counter even no purges were made
+        self.counter['purge'] += 0
+
+    def purgepages(self, flush=False):
+        """Purge a bulk of page if rate limit exceeded.
+
+        Use default rate limit for purging pages which is 30/60.
+
+        .. versionadded:: 8.0
+        """
+        for site, pagelist in self.pages.items():
+            length = len(pagelist)
+            if flush or length >= 30:
+                done = site.purgepages(pagelist, **self.opt)
+                if done:
+                    self.counter['purge'] += length
+                self.pages[site].clear()
+
+                pywikibot.info('{} pages{} purged'
+                               .format(length, '' if done else ' not'))
+                if not flush:
+                    delay = 60 + 2
+                    if delay:
+                        pywikibot.info(
+                            f'Waiting {delay} seconds due to purge rate limit')
+                        pywikibot.sleep(0 if config.simulate else delay)
 
 
 def main(*args: str) -> None:
@@ -93,6 +141,7 @@ def main(*args: str) -> None:
     :param args: command line arguments
     """
     options = {}
+    unknown = []
 
     # Process global and pagegenerators args
     local_args = pywikibot.handle_args(args)
@@ -101,17 +150,18 @@ def main(*args: str) -> None:
 
     bot_class = TouchBot
     for arg in local_args:
+        option, _, value = arg[1:].partition(':')
         if arg == '-purge':
             bot_class = PurgeBot
         elif arg.startswith('-'):
-            options[arg[1:].lower()] = True
+            options[option.lower()] = True
+        else:
+            unknown.append(arg)
 
-    if gen_factory.gens:
-        gen = gen_factory.getCombinedGenerator(preload=True)
-        pywikibot.Site().login()
+    if not pywikibot.bot.suggest_help(missing_generator=not gen_factory.gens,
+                                      unknown_parameters=unknown):
+        gen = gen_factory.getCombinedGenerator(preload=bot_class == TouchBot)
         bot_class(generator=gen, **options).run()
-    else:
-        pywikibot.bot.suggest_help(missing_generator=True)
 
 
 if __name__ == '__main__':
