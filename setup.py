@@ -39,7 +39,7 @@ else:
 extra_deps = {
     # Core library dependencies
     'eventstreams': ['sseclient<0.0.23,>=0.0.18'],  # T222885
-    'isbn': ['python-stdnum>=1.17'],
+    'isbn': ['python-stdnum>=1.18'],
     'Graphviz': ['pydot>=1.4.1'],
     'Google': ['google>=1.7'],
     'memento': ['memento_client==0.6.1'],
