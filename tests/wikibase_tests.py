@@ -499,6 +499,13 @@ class TestWbTime(WbRepresentationTestCase):
             pywikibot.WbTime(site=repo, precision=15)
         with self.assertRaisesRegex(ValueError, regex):
             pywikibot.WbTime(site=repo, precision='invalid_precision')
+        regex = r'^Invalid precision: "15"$'
+        with self.assertRaisesRegex(ValueError, regex):
+            pywikibot.WbTime(site=repo, year=2020, precision=15)
+        regex = r'^Invalid precision: "invalid_precision"$'
+        with self.assertRaisesRegex(ValueError, regex):
+            pywikibot.WbTime(site=repo, year=2020,
+                             precision='invalid_precision')
 
     def test_comparison(self):
         """Test WbTime comparison."""
