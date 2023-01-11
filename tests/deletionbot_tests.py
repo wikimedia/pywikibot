@@ -79,7 +79,7 @@ class TestDeletionBotUser(ScriptMainTestCase):
     def test_delete_mark(self):
         """Test marking User:Unicodesnowman/DeleteMark for deletion."""
         delete.main('-page:User:Unicodesnowman/DeleteMark', '-always',
-                    '-summary=pywikibot unit test. Do NOT actually delete.')
+                    '-summary:pywikibot unit test. Do NOT actually delete.')
         text = self.page.get(force=True)
         self.assertEqual(
             text,
