@@ -606,6 +606,9 @@ class WbTime(_WbRepresentation):
         This function returns a new normalized object and does not do
         any modification in place.
 
+        Normalization will delete timezone information if the precision
+        is less than or equal to DAY.
+
         Note: Normalized WbTime objects can only be compared to other
         normalized WbTime objects of the same precision. Normalization
         might make a WbTime object that was less than another WbTime object
@@ -649,7 +652,6 @@ class WbTime(_WbRepresentation):
             'precision': self.precision,
             'before': self.before,
             'after': self.after,
-            'timezone': self.timezone,
             'calendarmodel': self.calendarmodel,
             'year': year
         }
@@ -658,6 +660,8 @@ class WbTime(_WbRepresentation):
         if self.precision >= self.PRECISION['day']:
             kwargs['day'] = self.day
         if self.precision >= self.PRECISION['hour']:
+            # See T326693
+            kwargs['timezone'] = self.timezone
             kwargs['hour'] = self.hour
         if self.precision >= self.PRECISION['minute']:
             kwargs['minute'] = self.minute
