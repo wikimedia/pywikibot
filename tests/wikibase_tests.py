@@ -391,6 +391,15 @@ class TestWbTime(WbRepresentationTestCase):
         t10 = pywikibot.WbTime(site=repo, year=2010, month=1, day=1, hour=12,
                                minute=43, second=12,
                                precision=millenia)
+        t11 = pywikibot.WbTime(site=repo, year=2010, month=1, day=1, hour=12,
+                               minute=43, second=12, timezone=-300,
+                               precision=pywikibot.WbTime.PRECISION['day'])
+        t12 = pywikibot.WbTime(site=repo, year=2010, month=1, day=1, hour=12,
+                               minute=43, second=12, timezone=300,
+                               precision=pywikibot.WbTime.PRECISION['day'])
+        t13 = pywikibot.WbTime(site=repo, year=2010, month=1, day=1, hour=12,
+                               minute=43, second=12, timezone=-300,
+                               precision=pywikibot.WbTime.PRECISION['hour'])
         self.assertEqual(t.normalize(), t)
         self.assertEqual(t2.normalize(), t.normalize())
         self.assertEqual(t3.normalize(),
@@ -422,6 +431,13 @@ class TestWbTime(WbRepresentationTestCase):
         self.assertEqual(t10.normalize(),
                          pywikibot.WbTime(site=repo, year=2010,
                                           precision=millenia).normalize())
+        t11_normalized = t11.normalize()
+        t12_normalized = t12.normalize()
+        self.assertEqual(t11_normalized.timezone, 0)
+        self.assertEqual(t12_normalized.timezone, 0)
+        self.assertNotEqual(t11, t12)
+        self.assertEqual(t11_normalized, t12_normalized)
+        self.assertEqual(t13.normalize().timezone, -300)
 
     def test_WbTime_normalization_very_low_precision(self):
         """Test WbTime normalization with very low precision."""
