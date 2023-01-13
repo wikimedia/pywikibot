@@ -86,6 +86,7 @@ content = {
           '<!-- AŞAĞIDAKI XƏTTİN ALTINDAN YAZA BİLƏRSİNİZ --->',
     'bar': '{{Bitte erst NACH dieser Zeile schreiben! (Begrüßungskasten)}}\n',
     'bn': '{{খেলাঘর}}<!-- অনুগ্রহপূর্বক এই লাইনটি অপসারণ করবেন না -->',
+    'ckb': '{{subst:تکایە دەستکاریی سەری خۆڵەپەتانێ مەکە}}',
     'cs': '{{Tento řádek neměňte}}\n<!-- ************  Prosíme, '
           'NEMĚŇTE nic nad tímto řádkem.  Díky.  ************ -->\n\n'
           "== Bábovičky ==\n#'''první'''\n#''druhá''\n*třetí\n"
