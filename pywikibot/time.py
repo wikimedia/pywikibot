@@ -143,7 +143,7 @@ class Timestamp(datetime.datetime):
             raise ValueError(
                 f'time data {timestr!r} does not match ISO8601 format.')
 
-        strpfmt = '%Y-%m-%d{sep}%H:%M:%S'.format(sep=m.group('sep'))
+        strpfmt = f'%Y-%m-%d{m["sep"]}%H:%M:%S'
         strpstr = timestr[:19]
 
         if m['u']:
