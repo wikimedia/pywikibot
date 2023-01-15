@@ -41,7 +41,6 @@ Extended example with style settings::
 # Distributed under the terms of the MIT license.
 #
 import argparse
-import io
 from collections import defaultdict
 
 import pywikibot
@@ -192,7 +191,7 @@ class CategoryGraphBot(SingleSiteBot):
                   'src="https://unpkg.com/panzoom@9.4.0/dist/panzoom.min.js" '
                   'query="#graph0" name="pz"></script>\n'
                   '<style> svg { height:100%; width:100%; } </style>\n')
-        with io.open(self.to + '.html', mode='wb') as o:
+        with open(self.to + '.html', mode='wb') as o:
             o.write(header.encode())
             o.write(self.dot.create('dot', 'svg', encoding='utf-8'))
 
