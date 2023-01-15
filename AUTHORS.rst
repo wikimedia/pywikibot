@@ -1,4 +1,4 @@
-﻿**Pywikibot is an open-source project** that cannot exist without your
+**Pywikibot is an open-source project** that cannot exist without your
 contributions. We would therefore like to thank everyone who has
 contributed:
 
