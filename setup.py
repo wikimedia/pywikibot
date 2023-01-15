@@ -195,6 +195,8 @@ def read_desc(filename) -> str:  # pragma: no cover
                         desc.append(re.sub(pattern[0], pattern[1], g.read()))
                 else:
                     print('Cannot include {}; file not found'.format(include))
+            elif line.strip().startswith('.. code::'):
+                desc.append('::\n')
             else:
                 desc.append(re.sub(pattern[0], pattern[1], line))
     return ''.join(desc)
