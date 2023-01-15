@@ -249,7 +249,7 @@ Applications:
     * https://www.titelbank.nl/pls/ttb/f?p=103:4012:::NO::P4012_TTEL_ID:3496019&cs=19BB8084860E3314502A1F777F875FE61
 
 .. versionadded:: 7.7
-"""  # noqa E501, W605
+"""  # noqa: E501, W605
 #
 # (C) Pywikibot team, 2022
 #
@@ -725,7 +725,7 @@ SELECT ?item WHERE {{
                     pywikibot.info('Found main subject {} ({}) for Fast ID {}'
                                    .format(main_subject_label, qmain_subject,
                                            fast_id))
-                except:  # noqa B001, E722, H201
+                except:  # noqa: B001, E722, H201
                     main_subject_label = ''
                     pywikibot.info('Found main subject ({}) for Fast ID {}'
                                    .format(qmain_subject, fast_id))
