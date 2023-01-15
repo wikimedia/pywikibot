@@ -13,4 +13,3 @@ fixes['example'] = {
         (r'\bword\b', 'two words'),
     ]
 }
-
