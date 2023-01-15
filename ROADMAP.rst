@@ -52,6 +52,7 @@ Documentation improvements
 Bugfixes
 ^^^^^^^^
 
+* Fix representation string for :class:`page.Claim` stub instances (:phab:`T326453`)
 * Don't raise StopIteration in :meth:`login.LoginManager.check_user_exists`
   if given user is behind the last user (:phab:`T326063`)
 * Normalize :class:`WbTimes<pywikibot.WbTime>` sent to Wikidata (:phab:`T325860`)
@@ -64,6 +65,8 @@ Bugfixes
 Breaking changes
 ^^^^^^^^^^^^^^^^
 
+* ``mwparserfromhell`` package is mandatory (:phab:`T326498`)
+* Several package dependencies were updated
 * All parameters of :meth:`Category.members()<page.Category.members>`,
   :meth:`Category.subcategories()<page.Category.subcategories>` and
   :meth:`Category.articles()<page.Category.articles>` are keyword only
@@ -78,6 +81,7 @@ Breaking changes
 
 Code cleanups
 ^^^^^^^^^^^^^
+
 * ``maintenance/sorting_order`` script was removed (:phab:`T325426`)
 * ``alphabetic_sv`` and ``interwiki_putfirst`` attributes of
   :class:`Wiktionary<families.wiktionary_family.Family>` family were removed (:phab:`T325426`)
