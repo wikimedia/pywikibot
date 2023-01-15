@@ -11005,10 +11005,8 @@ class PornhubAnalyzer(Analyzer):
         section = self.findbyre(r'(?s)class="aboutMeSection(.*?)</section>', html)
         if section:
             result += self.findallbyre(r'>([^<>]*)<', section)
-        section = self.findlongtext(html)
-        if section:
-            lines = section.split('.')
-            result += [lines[0], lines[:1].join(','), lines[:2].join(',')]
+        # this would also analyze self.findlongtext(html)
+        # but the code was removed
         return result
 
     def findlongtext(self, html: str):
