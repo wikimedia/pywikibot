@@ -22,6 +22,7 @@ category_graph
 clean_sandbox
 ~~~~~~~~~~~~~
 
+* L10N updates
 * A `-textfile` option was addet to fetch the text from a file
 
 create_isbn_edition
@@ -38,6 +39,11 @@ interwiki
 ~~~~~~~~~
 
 Fix string concatenation (:phab:`T322180`)
+
+touch
+~~~~~
+
+Provide bulk purge to run upto 1000 times faster
 
 
 7.7.0
