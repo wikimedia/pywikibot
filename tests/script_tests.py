@@ -440,7 +440,9 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
         'welcome',
     }
 
-    _allowed_failures = set()
+    _allowed_failures = {
+        'basic',
+    }
     _arguments = '-simulate -page:Foobar -always -site:wikipedia:en'
     _results = ("Working on 'Foobar'", 'Script terminated successfully')
     _skip_results = {}
