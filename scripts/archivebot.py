@@ -649,7 +649,7 @@ class PageArchiver:
         keep_threads = []
         threads_per_archive = defaultdict(list)
         whys = set()
-        pywikibot.info('Processing {} threads'.format(len(self.page.threads)))
+        pywikibot.info(f'Processing {len(self.page.threads)} threads')
         fields = self.get_params(self.now, 0).keys()  # dummy parameters
         regex = re.compile(r'%(\((?:{})\))d'.format('|'.join(fields)))
         stringpattern = regex.sub(r'%\1s', pattern)

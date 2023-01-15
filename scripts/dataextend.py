@@ -455,7 +455,7 @@ class DataExtendBot(SingleSiteBot):
             for claim in claims[prop]:
                 if claim.type == 'wikibase-item':
                     if claim.getTarget() is None:
-                        pywikibot.info('{}: unknown'.format(self.label(prop)))
+                        pywikibot.info(f'{self.label(prop)}: unknown')
                     else:
                         pywikibot.info(
                             '{}: {}'

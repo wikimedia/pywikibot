@@ -307,7 +307,7 @@ def main(*args: str) -> None:
                 "can't be provided at the same time")
             return
         try:
-            with open(textfile_opt, 'r', encoding='utf-8') as textfile:
+            with open(textfile_opt, encoding='utf-8') as textfile:
                 opts['text'] = textfile.read()
         except OSError as e:
             pywikibot.error(f'Error loading {opts["textfile"]}: {e}')

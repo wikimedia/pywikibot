@@ -250,7 +250,7 @@ def check_modules(script=None):
                 # print the minimal requirement
                 _print_requirements(
                     ['setuptools>=20.8.1'], None,
-                    'outdated ({})'.format(setuptools.__version__))
+                    f'outdated ({setuptools.__version__})')
                 return False
             raise e
 
@@ -330,7 +330,7 @@ def find_alternates(filename, script_paths):
     assert 0.0 < config.pwb_cut_off < 1.0, \
         'config.pwb_cut_off must be a float in range [0, 1]'
 
-    error('{} not found! Misspelling?'.format(filename))
+    error(f'{filename} not found! Misspelling?')
 
     scripts = {}
 

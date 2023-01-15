@@ -125,7 +125,7 @@ class SyncSites:
         if self.options.namespace:
             pywikibot.info(str(self.options.namespace))
             namespaces = [int(self.options.namespace)]
-        pywikibot.info('Checking these namespaces: {}\n'.format((namespaces,)))
+        pywikibot.info(f'Checking these namespaces: {namespaces}\n')
 
         for ns in namespaces:
             self.check_namespace(ns)
