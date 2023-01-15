@@ -13,6 +13,7 @@ import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 
+
 try:
     import langdetect
 except ImportError:

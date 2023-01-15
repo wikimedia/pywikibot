@@ -19,7 +19,7 @@ from pywikibot.data.api import (
 from pywikibot.exceptions import Error
 from pywikibot.family import Family
 from pywikibot.login import LoginStatus
-from pywikibot.tools import suppress_warnings, PYTHON_VERSION
+from pywikibot.tools import PYTHON_VERSION, suppress_warnings
 from tests import join_images_path
 from tests.aspects import (
     DefaultDrySiteTestCase,

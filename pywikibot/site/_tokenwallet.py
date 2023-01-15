@@ -5,10 +5,11 @@
 # Distributed under the terms of the MIT license.
 #
 from collections.abc import Container
-from typing import Any, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Optional
 
 from pywikibot.backports import Dict, List
-from pywikibot.tools import issue_deprecation_warning, deprecated
+from pywikibot.tools import deprecated, issue_deprecation_warning
+
 
 if TYPE_CHECKING:
     from pywikibot.site import APISite

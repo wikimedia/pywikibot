@@ -18,12 +18,11 @@ from pywikibot.data import api
 from pywikibot.exceptions import APIError, NoUsernameError
 from pywikibot.throttle import Throttle
 from pywikibot.tools import suppress_warnings
-
 from tests.aspects import (
-    require_version,
     DefaultDrySiteTestCase,
     DefaultSiteTestCase,
     TestCase,
+    require_version,
 )
 from tests.utils import FakeLoginManager
 

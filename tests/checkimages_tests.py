@@ -8,7 +8,6 @@
 import unittest
 
 from pywikibot import FilePage
-
 from scripts import checkimages
 from tests.aspects import DefaultSiteTestCase, TestCase
 

@@ -18,8 +18,9 @@ XmlEntry objects which can be used by other bots.
 import re
 from typing import Optional
 
+
 try:
-    from defusedxml.ElementTree import iterparse, ParseError
+    from defusedxml.ElementTree import ParseError, iterparse
 except ImportError:
     from xml.etree.ElementTree import iterparse, ParseError
 

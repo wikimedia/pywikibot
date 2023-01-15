@@ -9,17 +9,17 @@ Useful for editing the contents of an article.
 #
 # Distributed under the terms of the MIT license.
 #
-from typing import Optional
-
 from idlelib import replace as ReplaceDialog  # noqa: N812
 from idlelib import search as SearchDialog  # noqa: N812
 from idlelib.config import idleConf
 from idlelib.configdialog import ConfigDialog
 from idlelib.multicall import MultiCallCreator
+from typing import Optional
 
 import pywikibot
 from pywikibot.backports import Tuple
 from pywikibot.tools import PYTHON_VERSION
+
 
 try:
     import tkinter

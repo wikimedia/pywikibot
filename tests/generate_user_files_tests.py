@@ -7,11 +7,9 @@
 #
 import re
 import unittest
-
 from contextlib import suppress
 
 from pywikibot.scripts import generate_user_files as guf
-
 from tests.aspects import TestCase
 
 

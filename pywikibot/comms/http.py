@@ -48,9 +48,9 @@ from pywikibot import config, tools
 from pywikibot.backports import Tuple
 from pywikibot.exceptions import (
     FatalServerError,
-    ServerError,
     Server414Error,
     Server504Error,
+    ServerError,
 )
 from pywikibot.logging import critical, debug, error, log, warning
 from pywikibot.tools import file_mode_checker

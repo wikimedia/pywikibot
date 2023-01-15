@@ -7,8 +7,8 @@
 import unittest
 from contextlib import suppress
 
-from tests.aspects import TestCase
 from tests import utils
+from tests.aspects import TestCase
 
 
 class HttpServerProblemTestCase(TestCase):

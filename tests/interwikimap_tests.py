@@ -6,12 +6,10 @@
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 
 import pywikibot
 from pywikibot.tools import suppress_warnings
-
 from tests import WARN_SITE_CODE
 from tests.aspects import TestCase
 

@@ -44,12 +44,12 @@ Usage::
 import abc
 import shutil
 import sys
-from subprocess import check_call
 from pathlib import Path
+from subprocess import check_call
 
+import setup
 from pywikibot import __version__, error, info, input_yn, warning
 from pywikibot.backports import Tuple
-import setup
 
 
 class SetupBase(abc.ABC):

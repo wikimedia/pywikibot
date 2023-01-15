@@ -28,7 +28,6 @@ from pywikibot.tools.itertools import (
     islice_with_ellipsis,
     roundrobin_generators,
 )
-
 from tests import join_xml_data_path
 from tests.aspects import TestCase
 from tests.utils import skipping

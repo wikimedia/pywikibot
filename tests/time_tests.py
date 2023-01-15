@@ -11,7 +11,7 @@ import unittest
 from contextlib import suppress
 from datetime import datetime, timedelta
 
-from pywikibot.time import parse_duration, str2timedelta, Timestamp
+from pywikibot.time import Timestamp, parse_duration, str2timedelta
 from tests.aspects import TestCase
 
 

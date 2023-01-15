@@ -6,12 +6,12 @@
 #
 import abc
 import datetime
-from typing import Any, Type, Optional, Union
+from typing import Any, Optional, Type, Union
 from urllib.parse import parse_qs, urlparse
 
 import pywikibot
-from pywikibot.backports import Dict, Iterator, List, Mapping
 from pywikibot import config
+from pywikibot.backports import Dict, Iterator, List, Mapping
 from pywikibot.exceptions import (
     LockedPageError,
     NoPageError,

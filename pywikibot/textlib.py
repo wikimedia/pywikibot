@@ -32,6 +32,7 @@ from pywikibot.tools import (
 )
 from pywikibot.userinterfaces.transliteration import NON_LATIN_DIGITS
 
+
 try:
     import wikitextparser
 except ImportError:

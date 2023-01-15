@@ -10,7 +10,6 @@
 #
 import collections
 import itertools
-
 from contextlib import suppress
 from itertools import chain, zip_longest
 from typing import Any

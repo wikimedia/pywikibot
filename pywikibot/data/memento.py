@@ -16,13 +16,13 @@
 from datetime import datetime
 from typing import Optional
 
+import requests
 from memento_client.memento_client import MementoClient as OldMementoClient
 from memento_client.memento_client import MementoClientException
-
-import requests
 from requests.exceptions import InvalidSchema, MissingSchema
 
 from pywikibot import config, debug, sleep, warning
+
 
 __all__ = (
     'MementoClient',

@@ -25,7 +25,7 @@ from unittest.util import safe_repr
 
 import pywikibot
 from pywikibot import Site, config
-from pywikibot.backports import removeprefix, removesuffix, List
+from pywikibot.backports import List, removeprefix, removesuffix
 from pywikibot.comms import http
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.exceptions import (
@@ -35,8 +35,8 @@ from pywikibot.exceptions import (
 )
 from pywikibot.family import WikimediaFamily
 from pywikibot.site import BaseSite
-from pywikibot.tools import suppress_warnings
 from pywikibot.tools import MediaWikiVersion  # noqa: F401 (used by f-string)
+from pywikibot.tools import suppress_warnings
 from tests import (
     WARN_SITE_CODE,
     patch_request,

@@ -14,17 +14,10 @@ from textwrap import fill
 from typing import Any, Iterable, Optional, Type, TypeVar, Union
 
 import pywikibot
-from pywikibot.backports import (
-    DefaultDict,
-    Dict,
-    List,
-    Match,
-    Pattern,
-    Set,
-    Tuple,
-    removesuffix,
-)
+from pywikibot import login
+from pywikibot.backports import DefaultDict, Dict, List, Match
 from pywikibot.backports import OrderedDict as OrderedDictType
+from pywikibot.backports import Pattern, Set, Tuple, removesuffix
 from pywikibot.comms import http
 from pywikibot.data import api
 from pywikibot.exceptions import (
@@ -53,7 +46,6 @@ from pywikibot.exceptions import (
     TitleblacklistError,
     UnknownExtensionError,
 )
-from pywikibot import login
 from pywikibot.site._basesite import BaseSite
 from pywikibot.site._decorators import need_right, need_version
 from pywikibot.site._extensions import (

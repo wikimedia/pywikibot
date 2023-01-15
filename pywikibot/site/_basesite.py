@@ -22,9 +22,9 @@ from pywikibot.exceptions import (
 from pywikibot.site._namespace import Namespace, NamespacesDict
 from pywikibot.throttle import Throttle
 from pywikibot.tools import (
-    cached,
     ComparableMixin,
     SelfCallString,
+    cached,
     first_upper,
     normalize_username,
 )

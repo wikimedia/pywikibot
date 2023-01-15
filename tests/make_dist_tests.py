@@ -9,9 +9,8 @@ import os
 import sys
 import unittest
 
-from pywikibot import __version__
 from make_dist import handle_args
-
+from pywikibot import __version__
 from tests.aspects import TestCase
 
 

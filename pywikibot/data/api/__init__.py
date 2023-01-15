@@ -10,8 +10,8 @@ from io import BytesIO
 
 from pywikibot.comms import http
 from pywikibot.data.api._generators import (
-    APIGeneratorBase,
     APIGenerator,
+    APIGeneratorBase,
     ListGenerator,
     LogEntryListGenerator,
     PageGenerator,
@@ -19,11 +19,12 @@ from pywikibot.data.api._generators import (
     QueryGenerator,
     update_page,
 )
-from pywikibot.data.api._paraminfo import ParamInfo
 from pywikibot.data.api._optionset import OptionSet
+from pywikibot.data.api._paraminfo import ParamInfo
 from pywikibot.data.api._requests import CachedRequest, Request, encode_url
 from pywikibot.family import SubdomainFamily
 from pywikibot.tools import ModuleDeprecationWrapper
+
 
 __all__ = (
     'APIGeneratorBase',

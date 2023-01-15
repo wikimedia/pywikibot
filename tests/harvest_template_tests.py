@@ -10,7 +10,6 @@ from contextlib import suppress
 
 from pywikibot import ItemPage, WbTime
 from scripts.harvest_template import HarvestRobot
-
 from tests.aspects import ScriptMainTestCase
 
 

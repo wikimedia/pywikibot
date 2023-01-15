@@ -67,6 +67,7 @@ def setUpModule():
 
     global EditBoxWindow, Tkdialog, tkinter
     import tkinter
+
     from pywikibot.userinterfaces.gui import EditBoxWindow, Tkdialog
 
 

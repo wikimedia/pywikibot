@@ -9,11 +9,9 @@
 #
 import collections
 import re
-
 from typing import Optional
 
 import pywikibot
-
 from pywikibot import config
 
 

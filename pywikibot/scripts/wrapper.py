@@ -322,7 +322,7 @@ except SyntaxError as e:  # pragma: no cover
 
 def find_alternates(filename, script_paths):
     """Search for similar filenames in the given script paths."""
-    from pywikibot import config, input_choice, error, info, warning
+    from pywikibot import config, error, info, input_choice, warning
     from pywikibot.bot import QuitKeyboardInterrupt, ShowingListOption
 
     assert config.pwb_close_matches > 0, \

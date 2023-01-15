@@ -15,14 +15,14 @@ from pywikibot.page._user import User
 from pywikibot.page._wikibase import (
     Claim,
     ItemPage,
+    LexemeForm,
+    LexemePage,
+    LexemeSense,
     MediaInfo,
     Property,
     PropertyPage,
     WikibaseEntity,
     WikibasePage,
-    LexemePage,
-    LexemeForm,
-    LexemeSense,
 )
 from pywikibot.site import BaseSite as _BaseSite
 from pywikibot.tools import deprecated, issue_deprecation_warning
