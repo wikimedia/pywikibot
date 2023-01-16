@@ -9,7 +9,7 @@
 # Parts of MementoClient class codes are
 # licensed under the BSD open source software license.
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2023
 #
 # Distributed under the terms of the MIT license.
 #

@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Test generate_user_files script."""
 #
-# (C) Pywikibot team, 2018-2022
+# (C) Pywikibot team, 2018-2023
 #
 # Distributed under the terms of the MIT license.
 #

@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Test tools package alone which don't fit into other tests."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2023
 #
 # Distributed under the terms of the MIT license.
 import decimal

@@ -38,7 +38,7 @@ for tests to set the default site (see :phab:`T216825`)::
    renamed to wrapper.py
 """
 #
-# (C) Pywikibot team, 2012-2022
+# (C) Pywikibot team, 2012-2023
 #
 # Distributed under the terms of the MIT license.
 #

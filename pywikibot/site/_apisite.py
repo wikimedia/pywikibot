@@ -1,6 +1,6 @@
 """Objects representing API interface to MediaWiki site."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #

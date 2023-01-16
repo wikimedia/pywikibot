@@ -5,7 +5,7 @@ Several parts of the test infrastructure are implemented as mixins,
 such as API result caching and excessive test durations.
 """
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2023
 #
 # Distributed under the terms of the MIT license.
 #

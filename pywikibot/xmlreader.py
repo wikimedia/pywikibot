@@ -11,7 +11,7 @@ XmlEntry objects which can be used by other bots.
    vulnerable XML attacks. *defusedxml* 0.7.1 or higher is recommended.
 """
 #
-# (C) Pywikibot team, 2005-2022
+# (C) Pywikibot team, 2005-2023
 #
 # Distributed under the terms of the MIT license.
 #

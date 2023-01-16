@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Tests for the tests package."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2023
 #
 # Distributed under the terms of the MIT license.
 import unittest

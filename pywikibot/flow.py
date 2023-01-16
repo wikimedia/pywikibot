@@ -1,6 +1,6 @@
 """Objects representing Flow entities, like boards, topics, and posts."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2023
 #
 # Distributed under the terms of the MIT license.
 #

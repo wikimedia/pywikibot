@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """API tests which do not interact with a site."""
 #
-# (C) Pywikibot team, 2012-2022
+# (C) Pywikibot team, 2012-2023
 #
 # Distributed under the terms of the MIT license.
 #

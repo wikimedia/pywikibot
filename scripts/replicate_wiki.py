@@ -38,7 +38,7 @@ The following parameters are supported:
  destination_wiki       destination wiki(s)
 """
 #
-# (C) Pywikibot team, 2012-2022
+# (C) Pywikibot team, 2012-2023
 #
 # Distributed under the terms of the MIT license.
 #
