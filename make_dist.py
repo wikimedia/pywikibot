@@ -45,7 +45,7 @@ import abc
 import shutil
 import sys
 from pathlib import Path
-from subprocess import check_call
+from subprocess import check_call, run
 
 import setup
 from pywikibot import __version__, error, info, input_yn, warning
@@ -108,6 +108,10 @@ class SetupBase(abc.ABC):
             return
         finally:
             self.cleanup()
+
+        # check description
+        if run('twine check dist/*', shell=True).returncode:
+            return
 
         if self.local:
             check_call('pip uninstall pywikibot -y', shell=True)
