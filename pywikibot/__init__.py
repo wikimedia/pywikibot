@@ -574,7 +574,8 @@ class WbTime(_WbRepresentation):
                       precision: Union[int, str] = 14,
                       before: int = 0, after: int = 0,
                       timezone: int = 0, calendarmodel: Optional[str] = None,
-                      site: Optional[DataSite] = None) -> 'WbTime':
+                      site: Optional[DataSite] = None,
+                      copy_timezone: bool = False) -> 'WbTime':
         """
         Create a new WbTime object from a pywikibot.Timestamp.
 
@@ -590,7 +591,13 @@ class WbTime(_WbRepresentation):
         :param site: The Wikibase site. If not provided, retrieves the data
             repository from the default site from user-config.py.
             Only used if calendarmodel is not given.
+        :param copy_timezone: Whether to copy the timezone from the Timestamp
+            if it has timezone information. Defaults to False to maintain
+            backwards compatibility. If a timezone is given, timezone
+            information is discarded.
         """
+        if not timezone and timestamp.tzinfo and copy_timezone:
+            timezone = int(timestamp.utcoffset().total_seconds() / 60)
         return cls.fromTimestr(timestamp.isoformat(), precision=precision,
                                before=before, after=after,
                                timezone=timezone, calendarmodel=calendarmodel,
