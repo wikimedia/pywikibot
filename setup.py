@@ -184,7 +184,7 @@ def read_desc(filename) -> str:  # pragma: no cover
     Combine included restructured text files which must be done before
     uploading because the source isn't available after creating the package.
     """
-    pattern = r'\:\w+\:`([^`]+?)(?:<.+>)?`', r'\1'
+    pattern = r'(?:\:\w+\:`([^`]+?)(?:<.+>)?` *)', r'\1'
     desc = []
     with open(filename) as f:
         for line in f:
@@ -219,7 +219,7 @@ def main() -> None:  # pragma: no cover
         version=version,
         description=metadata.__description__,
         long_description=read_desc('README.rst'),
-        # long_description_content_type
+        long_description_content_type='text/x-rst',
         # author
         # author_email
         maintainer=metadata.__maintainer__,
