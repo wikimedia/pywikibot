@@ -57,7 +57,7 @@ extra_deps = {
         'flake8>=5.0.4',
         'darglint',
         'pydocstyle>=6.2.3',
-        'flake8-bugbear',
+        'flake8-bugbear!=23.1.14',
         'flake8-coding',
         'flake8-comprehensions',
         'flake8-docstrings>=1.4.0',
