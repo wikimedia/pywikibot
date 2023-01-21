@@ -4,7 +4,6 @@ This module includes objects:
 
 - BasePage: Base object for a MediaWiki page
 - Page: A MediaWiki page
-- Category: A page in the Category: namespace
 
 Various Wikibase pages are defined in ``page._wikibase.py``,
 various pages for Proofread Extensions are defined in
