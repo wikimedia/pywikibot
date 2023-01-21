@@ -4,6 +4,7 @@ Current release 8.0.0
 Improvements
 ^^^^^^^^^^^^
 
+* Allow copying timezone from timestamp in :class:`pywikibot.WbTime` (:phab:`T325864`)
 * Support federated Wikibase (:phab:`T173195`)
 * Improve warning if a Non-JSON response was received from server (:phab:`T326046`)
 * Allow normalization of :class:`pywikibot.WbTime` objects (:phab:`T123888`)

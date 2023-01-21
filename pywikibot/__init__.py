@@ -570,38 +570,42 @@ class WbTime(_WbRepresentation):
                    precision, before, after, timezone, calendarmodel, site)
 
     @classmethod
-    def fromTimestamp(cls: Type['WbTime'], timestamp: 'Timestamp',
+    def fromTimestamp(cls: Type['WbTime'],
+                      timestamp: 'Timestamp',
                       precision: Union[int, str] = 14,
-                      before: int = 0, after: int = 0,
-                      timezone: int = 0, calendarmodel: Optional[str] = None,
+                      before: int = 0,
+                      after: int = 0,
+                      timezone: int = 0,
+                      calendarmodel: Optional[str] = None,
                       site: Optional[DataSite] = None,
                       copy_timezone: bool = False) -> 'WbTime':
-        """
-        Create a new WbTime object from a pywikibot.Timestamp.
+        """Create a new WbTime object from a pywikibot.Timestamp.
+
+        .. versionchanged:: 8.0
+           Added *copy_timezone* parameter.
 
         :param timestamp: Timestamp
-        :param precision: The unit of the precision of the time. Defaults to
-            14 (second).
-        :param before: Number of units after the given time it could be, if
-            uncertain. The unit is given by the precision.
-        :param after: Number of units before the given time it could be, if
-            uncertain. The unit is given by the precision.
+        :param precision: The unit of the precision of the time.
+            Defaults to 14 (second).
+        :param before: Number of units after the given time it could be,
+            if uncertain. The unit is given by the precision.
+        :param after: Number of units before the given time it could be,
+            if uncertain. The unit is given by the precision.
         :param timezone: Timezone information in minutes.
         :param calendarmodel: URI identifying the calendar model.
-        :param site: The Wikibase site. If not provided, retrieves the data
-            repository from the default site from user-config.py.
+        :param site: The Wikibase site. If not provided, retrieves the
+            data repository from the default site from user-config.py.
             Only used if calendarmodel is not given.
-        :param copy_timezone: Whether to copy the timezone from the Timestamp
-            if it has timezone information. Defaults to False to maintain
-            backwards compatibility. If a timezone is given, timezone
-            information is discarded.
+        :param copy_timezone: Whether to copy the timezone from the
+            timestamp if it has timezone information. Defaults to False
+            to maintain backwards compatibility. If a timezone is given,
+            timezone information is discarded.
         """
         if not timezone and timestamp.tzinfo and copy_timezone:
             timezone = int(timestamp.utcoffset().total_seconds() / 60)
         return cls.fromTimestr(timestamp.isoformat(), precision=precision,
-                               before=before, after=after,
-                               timezone=timezone, calendarmodel=calendarmodel,
-                               site=site)
+                               before=before, after=after, timezone=timezone,
+                               calendarmodel=calendarmodel, site=site)
 
     def normalize(self) -> 'WbTime':
         """Normalizes the WbTime object to account for precision.
