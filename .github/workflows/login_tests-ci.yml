@@ -1,8 +1,5 @@
-# This workflow will install Python dependencies, run Pywikibot tests
-# with a variety of Python versions. For more information see:
-# https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
-
 name: Login CI
+# Run login/logout tests
 
 on:
   workflow_run:
@@ -13,14 +10,12 @@ on:
 
 env:
   PYWIKIBOT_TEST_RUNNING: 1
-  PYWIKIBOT_LOGIN_LOGOUT: 1
   PYWIKIBOT_USERNAME: Pywikibot-test
+  PYWIKIBOT_LOGIN_LOGOUT: 1
 
 jobs:
   build:
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    continue-on-error: ${{ matrix.experimental || false }}
     timeout-minutes: 2
 
     strategy:
@@ -28,44 +23,53 @@ jobs:
       max-parallel: 1
 
       matrix:
-        python-version: ["pypy3", "3.5", "3.6", "3.7", "3.8", "3.9", "3.10"]
-        site: ["wikipedia:en", "wikisource:zh"]
-        test_prod_only: [true]
+        python-version: ["pypy3.7", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12.0-alpha - 3.12.0"]
+        site: ['wikipedia:en', 'wikisource:zh']
         include:
-          - python-version: "3.6"
+          # ubuntu-20.04 required for Python 3.6
+          - python-version: 3.6
             site: False
             family: wpbeta
             code: en
-          - python-version: "3.6"
+            os: ubuntu-20.04
+          - python-version: 3.6
             site: False
             family: wpbeta
             code: zh
-          - python-version: "3.5"
+            os: ubuntu-20.04
+          - python-version: 3.8
             site: wsbeta:en
-          - python-version: "3.7"
-            site: "wikipedia:test"
-          - python-version: "3.7"
-            site: "wikidata:test"
-          - python-version: "3.9"
-            site: "wiktionary:ar"
-            test_no_rc: true
-          - python-version: "3.6"
-            site: "wikidata:wikidata"
-          - python-version: "3.8"
-            site: "wowwiki:uk"
-          - python-version: "3.11.0-alpha - 3.11.0"
-            site: "wikipedia:test"
-          - python-version: "3"
-            site: "wikipedia:de"
+          - python-version: 3.7
+            site: wikipedia:test
+          - python-version: 3.7
+            site: wikidata:test
+          - python-version: 3.9
+            site: wiktionary:ar
+          - python-version: 3.6
+            site: wikidata:wikidata
+            os: ubuntu-20.04
+          - python-version: 3.8
+            site: wowwiki:uk
+          - python-version: "3.12.0-alpha - 3.12.0"
+            site: wikipedia:test
+          - python-version: 3
+            site: wikipedia:de
             os: macOS-latest
+          - python-version: 3.6
+            site: wikipedia:en
+            os: ubuntu-20.04
+          - python-version: 3.6
+            site: wikisource:zh
+            os: ubuntu-20.04
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout Repository
+      uses: actions/checkout@v3
       with:
         submodules: true
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -77,7 +81,7 @@ jobs:
         pip install requests
         pip install mwparserfromhell
         pip install codecov
-        pip install "coverage>=5.2.1"
+        pip install coverage
         python -c "import setuptools; print('setuptools:', setuptools.__version__)"
 
     - name: Generate family files
@@ -112,12 +116,9 @@ jobs:
 
     - name: Test with unittest
       timeout-minutes: 1
-      env:
-        PYWIKIBOT_TEST_NO_RC:
-          ${{ (matrix.site == 'wikisource:zh' || matrix.test_no_rc) && 1 || 0 }}
-        PYWIKIBOT_TEST_PROD_ONLY: ${{ matrix.test_prod_only && 1 || 0 }}
       run: |
         python pwb.py version
         coverage run -m unittest -vv tests/site_login_logout_tests.py
+
     - name: Upload coverage to Codecov
       run: codecov

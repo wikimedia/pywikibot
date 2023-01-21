@@ -57,7 +57,7 @@ class i18nBot:  # noqa: N801
             if hasattr(self.script, msg):
                 self.messages[msg] = msg
             else:
-                print('message {} not found'.format(msg))
+                print(f'message {msg} not found')
         for new, old in kwargs.items():
             self.messages[old] = new.replace('_', '-')
         self.dict = {}
@@ -78,9 +78,9 @@ class i18nBot:  # noqa: N801
 
         print('msg = {')
         for code in keys:
-            print("    '{}': {{".format(code))
+            print(f"    '{code}': {{")
             for msg in sorted(self.messages.values()):
-                label = '{}-{}'.format(self.scriptname, msg)
+                label = f'{self.scriptname}-{msg}'
                 if label in self.dict[code]:
                     print("        '{}': '{}',"
                           .format(label, self.dict[code][label]))
@@ -95,7 +95,7 @@ class i18nBot:  # noqa: N801
         if newmsg is None:
             newmsg = oldmsg
         for code in keys:
-            label = '{}-{}'.format(self.scriptname, newmsg)
+            label = f'{self.scriptname}-{newmsg}'
             if code == 'qqq':
                 if code not in self.dict:
                     self.dict[code] = {}
@@ -137,7 +137,7 @@ class i18nBot:  # noqa: N801
         if not os.path.exists(json_dir):
             os.makedirs(json_dir)
         for lang in self.dict:
-            file_name = os.path.join(json_dir, '{}.json'.format(lang))
+            file_name = os.path.join(json_dir, f'{lang}.json')
             if os.path.isfile(file_name):
                 with codecs.open(file_name, 'r', 'utf-8') as json_file:
                     new_dict = json.loads(json_file.read())

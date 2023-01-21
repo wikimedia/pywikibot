@@ -52,7 +52,7 @@ The script will ask for the location of an image(s), if not given as a
 parameter, and for a description.
 """
 #
-# (C) Pywikibot team, 2003-2021
+# (C) Pywikibot team, 2003-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -67,7 +67,7 @@ from pywikibot.specialbots import UploadRobot
 
 
 CHUNK_SIZE_REGEX = re.compile(
-    r'-chunked(?::(\d+(?:\.\d+)?)[ \t]*(k|ki|m|mi)?b?)?$', re.I)
+    r'-chunked(?::(\d+(?:\.\d+)?)[ \t]*(k|ki|m|mi)?b?)?', re.I)
 
 
 def get_chunk_size(match) -> int:
@@ -75,10 +75,10 @@ def get_chunk_size(match) -> int:
     if not match:
         pywikibot.error('Chunk size parameter is not valid.')
         chunk_size = 0
-    elif match.group(1):  # number was in there
-        base = float(match.group(1))
-        if match.group(2):  # suffix too
-            suffix = match.group(2).lower()
+    elif match[1]:  # number was in there
+        base = float(match[1])
+        if match[2]:  # suffix too
+            suffix = match[2].lower()
             if suffix == 'k':
                 suffix = 1000
             elif suffix == 'm':
@@ -150,7 +150,7 @@ def main(*args: str) -> None:
             else:
                 ignorewarn = True
         elif arg == '-chunked':
-            match = CHUNK_SIZE_REGEX.match(option)
+            match = CHUNK_SIZE_REGEX.fullmatch(option)
             chunk_size = get_chunk_size(match)
         elif arg == '-async':
             asynchronous = True
@@ -182,7 +182,7 @@ def main(*args: str) -> None:
         if always:
             url = None
             break
-        pywikibot.output(error)
+        pywikibot.info(error)
         url = pywikibot.input('URL, file or directory where files are now:')
 
     if always and (aborts is not True and ignorewarn is not True

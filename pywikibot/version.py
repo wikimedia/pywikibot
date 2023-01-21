@@ -22,15 +22,13 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import cache, Dict, List, Tuple
+from pywikibot.backports import Dict, List, Tuple, cache
 from pywikibot.comms.http import fetch
 from pywikibot.exceptions import VersionParseError
 
 
-def _get_program_dir():
-    _program_dir = os.path.normpath(
-        os.path.split(os.path.dirname(__file__))[0])
-    return _program_dir
+def _get_program_dir() -> str:
+    return os.path.normpath(os.path.split(os.path.dirname(__file__))[0])
 
 
 def get_toolforge_hostname() -> Optional[str]:
@@ -170,18 +168,18 @@ order by revision desc, changed_date desc""")
         tag, = cur.fetchone()
 
     tag = os.path.split(tag)[1]
-    date = time.gmtime(date / 1000000)
+    date = time.gmtime(date / 1_000_000)
     return tag, rev, date
 
 
 def github_svn_rev2hash(tag: str, rev):  # pragma: no cover
-    """Convert a Subversion revision to a Git hash using Github.
+    """Convert a Subversion revision to a Git hash using GitHub.
 
-    :param tag: name of the Subversion repo on Github
+    :param tag: name of the Subversion repo on GitHub
     :param rev: Subversion revision identifier
     :return: the git hash
     """
-    uri = 'https://github.com/wikimedia/{}/!svn/vcc/default'.format(tag)
+    uri = f'https://github.com/wikimedia/{tag}/!svn/vcc/default'
     request = fetch(uri, method='PROPFIND',
                     data="<?xml version='1.0' encoding='utf-8'?>"
                          '<propfind xmlns=\"DAV:\"><allprop/></propfind>',
@@ -216,7 +214,7 @@ def getversion_svn(path=None):  # pragma: no cover
         for i in range(len(date) - 1):
             assert date[i] == date2[i], 'Date of version is not consistent'
 
-    rev = 's{}'.format(rev)
+    rev = f's{rev}'
     if (not date or not tag or not rev) and not path:
         raise VersionParseError
     return (tag, rev, date, hsh)
@@ -270,7 +268,7 @@ def getversion_git(path=None):
                           cwd=_program_dir,
                           stdout=subprocess.PIPE)
     rev, stderr = dp.communicate()
-    rev = 'g{}'.format(len(rev.splitlines()))
+    rev = f'g{len(rev.splitlines())}'
     hsh = info[3]  # also stored in '.git/refs/heads/master'
     if (not date or not tag or not rev) and not path:
         raise VersionParseError
@@ -322,18 +320,15 @@ def getversion_package(path=None) -> Tuple[str, str, str, str]:
 
 def getversion_onlinerepo(path: str = 'branches/master'):
     """Retrieve current framework git hash from Gerrit."""
-    from pywikibot.comms import http
-
     # Gerrit API responses include )]}' at the beginning,
     # make sure to strip it out
-    buf = http.fetch(
+    buf = fetch(
         'https://gerrit.wikimedia.org/r/projects/pywikibot%2Fcore/' + path,
         headers={'user-agent': '{pwb}'}).text[4:]
     try:
-        hsh = json.loads(buf)['revision']
-        return hsh
+        return json.loads(buf)['revision']
     except Exception as e:
-        raise VersionParseError('{!r} while parsing {!r}'.format(e, buf))
+        raise VersionParseError(f'{e!r} while parsing {buf!r}')
 
 
 def get_module_filename(module) -> Optional[str]:
@@ -401,7 +396,7 @@ def package_versions(
 
     # Improve performance by removing builtins from the list if possible.
     if builtins is False:
-        root_packages = root_packages - builtin_packages
+        root_packages -= builtin_packages
 
     std_lib_packages = []
 

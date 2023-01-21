@@ -30,7 +30,7 @@ The following parameters are supported:
    This script is completely rewriten from compat branch.
 """
 #
-# (C) Pywikibot team, 2006-2022
+# (C) Pywikibot team, 2006-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -41,8 +41,8 @@ import re
 import pywikibot
 from pywikibot.backports import removeprefix
 from pywikibot.bot import (
-    ConfigParserBot,
     AutomaticTWSummaryBot,
+    ConfigParserBot,
     SingleSiteBot,
     calledModuleName,
 )
@@ -91,7 +91,7 @@ class CommonsDelinker(SingleSiteBot, ConfigParserBot, AutomaticTWSummaryBot):
 
     def skip_page(self, page) -> bool:
         """Skip pages which neither exists locally nor on shared repository."""
-        pywikibot.output('.', newline=False)
+        pywikibot.info('.', newline=False)
         if page.file_is_shared() or page.exists():
             return True
         return super().skip_page(page)
@@ -111,7 +111,7 @@ class CommonsDelinker(SingleSiteBot, ConfigParserBot, AutomaticTWSummaryBot):
         shown = False
         for page in file_page.using_pages(content=True, namespaces=0):
             if not shown:
-                pywikibot.output(
+                pywikibot.info(
                     '\n>>> <<lightgreen>>Delinking {}<<default>> <<<'
                     .format(file_page.title()))
                 shown = True
@@ -127,7 +127,7 @@ class CommonsDelinker(SingleSiteBot, ConfigParserBot, AutomaticTWSummaryBot):
         if not hasattr(self, 'last_ts'):
             return
 
-        pywikibot.output("\nUpdate 'since' to {} file".format(self.INI))
+        pywikibot.info(f"\nUpdate 'since' to {self.INI} file")
         conf = configparser.ConfigParser(inline_comment_prefixes=[';'])
         conf.read(self.INI)
         section = calledModuleName()

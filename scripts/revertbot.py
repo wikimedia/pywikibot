@@ -112,10 +112,9 @@ class BaseRevertBot(OptionHandler):
 
         rev = history[1]
 
-        pywikibot.output('\n\n>>> <<lightpurple>>{0}<<default>> <<<'
-                         .format(page.title(as_link=True,
-                                            force_interwiki=True,
-                                            textlink=True)))
+        pywikibot.info('\n\n>>> <<lightpurple>>{}<<default>> <<<'
+                       .format(page.title(as_link=True, force_interwiki=True,
+                                          textlink=True)))
 
         if not self.opt.rollback:
             comment = i18n.twtranslate(

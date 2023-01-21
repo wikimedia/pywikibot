@@ -119,7 +119,7 @@ class TestPwb(PwbTestCase):
             text = stderr.readline().strip()
             self.assertTrue(
                 text.startswith(result[1]),
-                msg='"{}" does not start with "{}"'.format(text, result[1]))
+                msg=f'"{text}" does not start with "{result[1]}"')
         with self.subTest(line=2):
             self.assertEqual(stderr.readline().strip(), result[2])
 

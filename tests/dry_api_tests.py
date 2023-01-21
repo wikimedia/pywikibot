@@ -1,11 +1,12 @@
 #!/usr/bin/python3
 """API tests which do not interact with a site."""
 #
-# (C) Pywikibot team, 2012-2022
+# (C) Pywikibot team, 2012-2023
 #
 # Distributed under the terms of the MIT license.
 #
 import datetime
+from pathlib import Path
 from unittest.mock import patch
 
 import pywikibot
@@ -18,7 +19,7 @@ from pywikibot.data.api import (
 from pywikibot.exceptions import Error
 from pywikibot.family import Family
 from pywikibot.login import LoginStatus
-from pywikibot.tools import suppress_warnings
+from pywikibot.tools import PYTHON_VERSION, suppress_warnings
 from tests import join_images_path
 from tests.aspects import (
     DefaultDrySiteTestCase,
@@ -61,8 +62,8 @@ class DryCachedRequestTests(SiteAttributeTestCase):
         self.diffsite = CachedRequest(
             expiry=1, site=self.altsite,
             parameters={'action': 'query', 'meta': 'userinfo'})
-        # When using ** the parameters are still unicode
-        with suppress_warnings('Instead of using kwargs ', FutureWarning):
+
+        with suppress_warnings('Instead of using kwargs ', DeprecationWarning):
             self.deprecated_explicit = CachedRequest(
                 expiry=1, site=self.basesite, action='query', meta='userinfo')
             self.deprecated_asterisks = CachedRequest(
@@ -81,7 +82,7 @@ class DryCachedRequestTests(SiteAttributeTestCase):
         self.assertFalse(self.req._expired(now))
         self.assertTrue(
             self.req._expired(now - datetime.timedelta(days=2)),
-            msg='\nreq.expiry: {}, now: {}'.format(self.req.expiry, now))
+            msg=f'\nreq.expiry: {self.req.expiry}, now: {now}')
 
     def test_parameter_types(self):
         """Test _uniquedescriptionstr is identical using different ways."""
@@ -103,7 +104,8 @@ class DryCachedRequestTests(SiteAttributeTestCase):
     def test_get_cache_dir(self):
         """Test that 'apicache' is in the cache dir."""
         retval = self.req._get_cache_dir()
-        self.assertIn('apicache', retval)
+        self.assertIsInstance(retval, Path)
+        self.assertIn(f'apicache-py{PYTHON_VERSION[0]:d}', retval.parts)
 
     def test_create_file_name(self):
         """Test the file names for the cache."""
@@ -160,7 +162,7 @@ class MockCachedRequestKeyTests(TestCase):
                 self._siteinfo = DummySiteinfo({'case': 'first-letter'})
 
             def version(self):
-                return '1.23'  # lowest supported release
+                return '1.27'  # lowest supported release
 
             def protocol(self):
                 return 'http'
@@ -185,7 +187,7 @@ class MockCachedRequestKeyTests(TestCase):
                 return 'MockSite()'
 
             def __getattr__(self, attr):
-                raise Exception('Attribute {!r} not defined'.format(attr))
+                raise Exception(f'Attribute {attr!r} not defined')
 
         self.mocksite = MockSite()
         super().setUp()

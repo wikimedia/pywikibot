@@ -1,9 +1,9 @@
 .. image:: https://github.com/wikimedia/pywikibot/actions/workflows/pywikibot-ci.yml/badge.svg?branch=master
-   :alt: Github CI
+   :alt: GitHub CI
    :target: https://github.com/wikimedia/pywikibot/actions/workflows/pywikibot-ci.yml
 .. image:: https://ci.appveyor.com/api/projects/status/xo2g4ctoom8k6yvw/branch/master?svg=true
    :alt: AppVeyor Build Status
-   :target: https://ci.appveyor.com/project/ladsgroup/pywikibot-g4xqx
+   :target: https://ci.appveyor.com/project/pywikibot-core/pywikibot
 .. image:: https://codecov.io/gh/wikimedia/pywikibot/branch/master/graph/badge.svg
    :alt: Code coverage
    :target: https://app.codecov.io/gh/wikimedia/pywikibot
@@ -28,20 +28,17 @@
 .. image:: https://static.pepy.tech/personalized-badge/pywikibot?period=month&units=international_system&left_color=black&right_color=blue&left_text=monthly
    :alt: Monthly downloads
    :target: https://pepy.tech/project/pywikibot
-.. image:: https://img.shields.io/tokei/lines/github/wikimedia/pywikibot
-   :alt: Lines of Code
-   :target: https://gerrit.wikimedia.org/r/plugins/gitiles/pywikibot/core/
 .. image:: https://img.shields.io/github/last-commit/wikimedia/pywikibot
    :alt: Last commit
    :target: https://gerrit.wikimedia.org/r/plugins/gitiles/pywikibot/core/
 
-
+*********
 Pywikibot
-=========
+*********
 
 The Pywikibot framework is a Python library that interfaces with the
 `MediaWiki API <https://www.mediawiki.org/wiki/API:Main_page>`_
-version 1.23 or higher.
+version 1.27 or higher.
 
 Also included are various general function scripts that can be adapted for
 different tasks.
@@ -50,9 +47,9 @@ For further information about the library excluding scripts see
 the full `code documentation <https://doc.wikimedia.org/pywikibot/>`_.
 
 Quick start
------------
+===========
 
-::
+.. code:: text
 
     pip install requests
     git clone https://gerrit.wikimedia.org/r/pywikibot/core.git
@@ -62,34 +59,22 @@ Quick start
 
 Or to install using PyPI (excluding scripts)
 
-::
+.. code:: text
 
     pip install -U setuptools
     pip install pywikibot
     pwb <scriptname>
-
-In addition a MediaWiki markup parser is required. Please install one of them:
-
-::
-
-    pip install mwparserfromhell
-
-or
-
-::
-
-    pip install wikitextparser
 
 Our `installation
 guide <https://www.mediawiki.org/wiki/Manual:Pywikibot/Installation>`_
 has more details for advanced usage.
 
 Basic Usage
------------
+===========
 
 If you wish to write your own script it's very easy to get started:
 
-::
+.. code:: python
 
     import pywikibot
     site = pywikibot.Site('en', 'wikipedia')  # The site we want to run our bot on
@@ -98,12 +83,12 @@ If you wish to write your own script it's very easy to get started:
     page.save('Replacing "foo" with "bar"')  # Saves the page
 
 Wikibase Usage
---------------
+==============
 
 Wikibase is a flexible knowledge base software that drives Wikidata.
 A sample pywikibot script for getting data from Wikibase:
 
-::
+.. code:: python
 
     import pywikibot
     site = pywikibot.Site('wikipedia:en')
@@ -113,11 +98,11 @@ A sample pywikibot script for getting data from Wikibase:
     data = item.get()  # get all item data from repository for this item
 
 Script example
---------------
+==============
 
 Pywikibot provides bot classes to develop your own script easily:
 
-::
+.. code:: python
 
     import pywikibot
     from pywikibot import pagegenerators
@@ -157,17 +142,17 @@ For more documentation on Pywikibot see our `docs <https://doc.wikimedia.org/pyw
 
 
 Roadmap
--------
+=======
 
 .. include:: ROADMAP.rst
 
 Release history
----------------
+===============
 
 See https://github.com/wikimedia/pywikibot/blob/stable/HISTORY.rst
 
 Contributing
-------------
+============
 
 Our code is maintained on Wikimedia's `Gerrit installation <https://gerrit.wikimedia.org/>`_,
 `learn <https://www.mediawiki.org/wiki/Developer_account>`_ how to get

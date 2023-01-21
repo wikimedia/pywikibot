@@ -1,14 +1,13 @@
 #!/usr/bin/python3
 """Unit tests for checkimages script."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2023
 #
 # Distributed under the terms of the MIT license.
 #
 import unittest
 
 from pywikibot import FilePage
-
 from scripts import checkimages
 from tests.aspects import DefaultSiteTestCase, TestCase
 

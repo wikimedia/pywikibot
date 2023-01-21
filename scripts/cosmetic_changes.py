@@ -114,7 +114,7 @@ def main(*args: str) -> None:
             try:
                 options['ignore'] = getattr(CANCEL, value)
             except AttributeError:
-                raise ValueError('Unknown ignore mode {!r}!'.format(value))
+                raise ValueError(f'Unknown ignore mode {value!r}!')
 
     gen = gen_factory.getCombinedGenerator(preload=True)
     if not pywikibot.bot.suggest_help(missing_generator=not gen) \

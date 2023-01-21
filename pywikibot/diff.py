@@ -7,9 +7,7 @@
 import difflib
 import math
 from collections import abc
-from difflib import (  # type: ignore[attr-defined]
-    _format_range_unified as format_range_unified,
-)
+from difflib import _format_range_unified  # type: ignore[attr-defined]
 from itertools import zip_longest
 from typing import Optional, Union
 
@@ -82,8 +80,8 @@ class Hunk:
     def get_header_text(a_rng: Tuple[int, int], b_rng: Tuple[int, int],
                         affix: str = '@@') -> str:
         """Provide header for any ranges."""
-        a_rng = format_range_unified(*a_rng)
-        b_rng = format_range_unified(*b_rng)
+        a_rng = _format_range_unified(*a_rng)
+        b_rng = _format_range_unified(*b_rng)
         return '{0} -{1} +{2} {0}'.format(affix, a_rng, b_rng)
 
     def create_diff(self) -> Iterable[str]:
@@ -116,7 +114,7 @@ class Hunk:
         """Color diff lines."""
         diff = iter(self.diff)
 
-        fmt = ''  # type: Optional[str]
+        fmt: Optional[str] = ''
         line1, line2 = '', next(diff)
         for line in diff:
             fmt, line1, line2 = line1, line2, line
@@ -192,7 +190,7 @@ class Hunk:
                     color_closed = False
             else:
                 if char_ref == ' ':
-                    char_tagged = '<<default>>{}'.format(char)
+                    char_tagged = f'<<default>>{char}'
                     color_closed = True
             colored_line += char_tagged
 
@@ -212,7 +210,7 @@ class Hunk:
     def __repr__(self) -> str:
         """Return a reconstructable representation."""
         # TODO
-        return '{}(a, b, {})'.format(self.__class__.__name__, self.group)
+        return f'{self.__class__.__name__}(a, b, {self.group})'
 
 
 class _SuperHunk(abc.Sequence):
@@ -265,8 +263,8 @@ class PatchManager:
         :param replace_invisible: Replace invisible characters like U+200e with
             the charnumber in brackets (e.g. <200e>).
         """
-        self.a = text_a.splitlines(True)  # type: Union[str, List[str]]
-        self.b = text_b.splitlines(True)  # type: Union[str, List[str]]
+        self.a: Union[str, List[str]] = text_a.splitlines(True)
+        self.b: Union[str, List[str]] = text_b.splitlines(True)
         if by_letter and len(self.a) <= 1 and len(self.b) <= 1:
             self.a = text_a
             self.b = text_b
@@ -327,8 +325,8 @@ class PatchManager:
     def print_hunks(self) -> None:
         """Print the headers and diff texts of all hunks to the output."""
         if self.hunks:
-            pywikibot.output('\n'.join(self._generate_diff(super_hunk)
-                                       for super_hunk in self._super_hunks))
+            pywikibot.info('\n'.join(self._generate_diff(super_hunk)
+                                     for super_hunk in self._super_hunks))
 
     def _generate_super_hunks(self, hunks: Optional[Iterable[Hunk]] = None
                               ) -> List[_SuperHunk]:
@@ -340,7 +338,7 @@ class PatchManager:
 
         if self.context:
             # Determine if two hunks are connected by self.context
-            super_hunk = []  # type: List[Hunk]
+            super_hunk: List[Hunk] = []
             super_hunks = [super_hunk]
             for hunk in hunks:
                 # self.context * 2, because if self.context is 2 the hunks
@@ -372,7 +370,7 @@ class PatchManager:
         """Generate a diff text for the given hunks."""
         def extend_context(start: int, end: int) -> str:
             """Add context lines."""
-            return ''.join('  {}\n'.format(line.rstrip())
+            return ''.join(f'  {line.rstrip()}\n'
                            for line in self.a[start:end])
 
         context_range = self._get_context_range(hunks)
@@ -419,7 +417,7 @@ class PatchManager:
 
         super_hunks = self._generate_super_hunks(
             h for h in self.hunks if h.reviewed == Hunk.PENDING)
-        position = 0  # type: Optional[int]
+        position: Optional[int] = 0
 
         while any(any(hunk.reviewed == Hunk.PENDING for hunk in super_hunk)
                   for super_hunk in super_hunks):
@@ -443,7 +441,7 @@ class PatchManager:
                 answers += ['s']
             answers += ['?']
 
-            pywikibot.output(self._generate_diff(super_hunk))
+            pywikibot.info(self._generate_diff(super_hunk))
             choice = pywikibot.input('Accept this hunk [{}]?'.format(
                 ','.join(answers)))
             if choice not in answers:
@@ -501,7 +499,7 @@ class PatchManager:
                     for hunk_entry in hunk_list)
                 if hunk_list_str.endswith('\n'):
                     hunk_list_str = hunk_list_str[:-1]
-                pywikibot.output(hunk_list_str)
+                pywikibot.info(hunk_list_str)
                 next_hunk = pywikibot.input('Go to which hunk?')
                 try:
                     next_hunk_position = int(next_hunk) - 1
@@ -512,7 +510,7 @@ class PatchManager:
                     position = next_hunk_position
                 elif next_hunk:  # nothing entered is silently ignored
                     pywikibot.error(
-                        'Invalid hunk number "{}"'.format(next_hunk))
+                        f'Invalid hunk number "{next_hunk}"')
             elif choice == 'j':
                 assert next_pending is not None
                 position = next_pending
@@ -527,22 +525,22 @@ class PatchManager:
                 super_hunks = (super_hunks[:position]
                                + super_hunks[position].split()
                                + super_hunks[position + 1:])
-                pywikibot.output(
-                    'Split into {} hunks'.format(len(super_hunk._hunks)))
+                pywikibot.info(
+                    f'Split into {len(super_hunk._hunks)} hunks')
             else:  # choice == '?':
-                pywikibot.output(
+                pywikibot.info(
                     '<<purple>>{}<<default>>'.format('\n'.join(
-                        '{} -> {}'.format(answer, help_msg[answer])
+                        f'{answer} -> {help_msg[answer]}'
                         for answer in answers)))
 
     def apply(self) -> List[str]:
         """Apply changes. If there are undecided changes, ask to review."""
         if any(h.reviewed == h.PENDING for h in self.hunks):
-            pywikibot.output('There are unreviewed hunks.\n'
-                             'Please review them before proceeding.\n')
+            pywikibot.info('There are unreviewed hunks.\n'
+                           'Please review them before proceeding.\n')
             self.review_hunks()
 
-        l_text = []  # type: List[str]
+        l_text: List[str] = []
         for hunk_idx, (i1, i2), (j1, j2) in self.blocks:
             # unchanged text.
             if hunk_idx < 0:
@@ -573,25 +571,23 @@ def cherry_pick(oldtext: str, newtext: str, n: int = 0,
     template = '{2}<<lightpurple>>{0:{1}^50}<<default>>{2}'
 
     patch = PatchManager(oldtext, newtext, context=n, by_letter=by_letter)
-    pywikibot.output(template.format('  ALL CHANGES  ', '*', '\n'))
+    pywikibot.info(template.format('  ALL CHANGES  ', '*', '\n'))
 
     for hunk in patch.hunks:
-        pywikibot.output(hunk.diff_text)
-    pywikibot.output(template.format('  REVIEW CHANGES  ', '*', '\n'))
+        pywikibot.info(hunk.diff_text)
+    pywikibot.info(template.format('  REVIEW CHANGES  ', '*', '\n'))
 
     text_list = patch.apply()
-    pywikibot.output(template.format('  APPROVED CHANGES  ', '*', '\n'))
+    pywikibot.info(template.format('  APPROVED CHANGES  ', '*', '\n'))
 
     if any(hunk.reviewed == hunk.APPR for hunk in patch.hunks):
         for hunk in patch.hunks:
             if hunk.reviewed == hunk.APPR:
-                pywikibot.output(hunk.diff_text)
+                pywikibot.info(hunk.diff_text)
     else:
-        pywikibot.output(template.format('None.', '', ''))
+        pywikibot.info(template.format('None.', '', ''))
 
-    text = ''.join(text_list)
-
-    return text
+    return ''.join(text_list)
 
 
 def html_comparator(compare_string: str) -> Dict[str, List[str]]:
@@ -606,8 +602,8 @@ def html_comparator(compare_string: str) -> Dict[str, List[str]]:
     """
     from bs4 import BeautifulSoup
 
-    comparands = {'deleted-context': [],
-                  'added-context': []}  # type: Dict[str, List[str]]
+    comparands: Dict[str, List[str]] = {'deleted-context': [],
+                                        'added-context': []}
     soup = BeautifulSoup(compare_string, 'html.parser')
     for change_type, css_class in (('deleted-context', 'diff-deletedline'),
                                    ('added-context', 'diff-addedline')):

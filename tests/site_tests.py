@@ -87,7 +87,7 @@ class TestSiteObject(DefaultSiteTestCase):
     def test_repr(self):
         """Test __repr__."""
         code = self.site.family.obsolete.get(self.code) or self.code
-        expect = 'Site("{}", "{}")'.format(code, self.family)
+        expect = f'Site("{code}", "{self.family}")'
         self.assertTrue(repr(self.site).endswith(expect))
 
     def test_constructors(self):
@@ -123,8 +123,8 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertIn(mysite.code, langs)
         self.assertIsInstance(mysite.obsolete, bool)
         ipf = mysite.interwiki_putfirst()
-        if ipf:  # Not all languages use this
-            self.assertIsInstance(ipf, list)
+        if ipf:  # no languages use this anymore, keep it for foreign families
+            self.assertIsInstance(ipf, list)  # pragma: no cover
         else:
             self.assertIsNone(ipf)
 
@@ -251,7 +251,7 @@ class TestSiteObject(DefaultSiteTestCase):
         mysite = self.get_site()
         if mysite.lang != 'en':
             self.skipTest(
-                'English-specific tests not valid on {}'.format(mysite))
+                f'English-specific tests not valid on {mysite}')
 
         self.assertEqual(mysite.months_names[4], ('May', 'May'))
         self.assertEqual(mysite.list_to_text(('Pride', 'Prejudice')),
@@ -323,7 +323,7 @@ class TestLockingPage(DefaultSiteTestCase):
         site.unlock_page(page=p1)
 
 
-class SiteUserTestCase(DefaultSiteTestCase):
+class SiteUserTestCase(DefaultSiteTestCase, DeprecationTestCase):
 
     """Test site method using a user."""
 
@@ -333,7 +333,6 @@ class SiteUserTestCase(DefaultSiteTestCase):
         """Test user related methods."""
         mysite = self.get_site()
         self.assertIsInstance(mysite.is_blocked(), bool)
-        self.assertIsInstance(mysite.messages(), bool)
         self.assertIsInstance(mysite.has_right('edit'), bool)
         self.assertFalse(mysite.has_right('nonexistent_right'))
         self.assertIsInstance(mysite.has_group('bots'), bool)
@@ -343,6 +342,12 @@ class SiteUserTestCase(DefaultSiteTestCase):
         for rgt in ('read', 'edit', 'move', 'delete', 'rollback', 'block',
                     'nosuchright'):
             self.assertIsInstance(mysite.has_right(rgt), bool)
+
+    def test_deprected_methods(self):
+        """Test deprecated user related methods."""
+        mysite = self.get_site()
+        self.assertIsInstance(mysite.messages(), bool)
+        self.assertOneDeprecation()
 
     def test_logevents(self):
         """Test the site.logevents() method."""
@@ -381,7 +386,7 @@ class SiteSysopTestCase(DefaultSiteTestCase):
             break
         else:
             self.skipTest(
-                '{} contains no deleted revisions.'.format(mainpage))
+                f'{mainpage} contains no deleted revisions.')
         self.assertLessEqual(len(dr['revisions']), 10)
         for rev in dr['revisions']:
             self.assertIsInstance(rev, dict)
@@ -480,7 +485,7 @@ class SiteSysopTestCase(DefaultSiteTestCase):
         for data in gen:
             break
         else:
-            self.skipTest('{} does not have deleted edits.'.format(myuser))
+            self.skipTest(f'{myuser} does not have deleted edits.')
         self.assertIn('revisions', data)
         for drev in data['revisions']:
             for key in ('revid', 'timestamp', 'user', 'comment'):
@@ -901,12 +906,12 @@ class TestUploadEnabledSite(TestCase):
         'wikidatatest': {
             'family': 'wikidata',
             'code': 'test',
-            'enabled': False,
+            'disabled': True,
         },
         'wikipediatest': {
             'family': 'wikipedia',
             'code': 'test',
-            'enabled': True,
+            'disabled': False,
         }
     }
 
@@ -915,10 +920,7 @@ class TestUploadEnabledSite(TestCase):
     def test_is_uploaddisabled(self, key):
         """Test is_uploaddisabled()."""
         site = self.get_site(key)
-        if self.sites[key]['enabled']:
-            self.assertFalse(site.is_uploaddisabled())
-        else:
-            self.assertTrue(site.is_uploaddisabled())
+        self.assertEqual(site.is_uploaddisabled(), self.sites[key]['disabled'])
 
 
 class TestSametitleSite(TestCase):

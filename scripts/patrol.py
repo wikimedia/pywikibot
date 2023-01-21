@@ -42,7 +42,7 @@ Commandline parameters:
 
 """
 #
-# (C) Pywikibot team, 2011-2022
+# (C) Pywikibot team, 2011-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -50,22 +50,18 @@ import time
 from collections import defaultdict
 from contextlib import suppress
 
+import mwparserfromhell
+
 import pywikibot
 from pywikibot import pagegenerators
 from pywikibot.backports import Container, removeprefix
-from pywikibot.bot import BaseBot, suggest_help
-
-
-try:
-    import mwparserfromhell
-except ImportError as e:
-    mwparserfromhell = e
+from pywikibot.bot import BaseBot
 
 
 def verbose_output(string) -> None:
     """Verbose output."""
     if pywikibot.config.verbose_output:
-        pywikibot.output(string)
+        pywikibot.info(string)
 
 
 class PatrolBot(BaseBot):
@@ -135,7 +131,7 @@ class PatrolBot(BaseBot):
                                         self.whitelist_pagename)
 
         if not self.whitelist:
-            pywikibot.output('Loading ' + self.whitelist_pagename)
+            pywikibot.info('Loading ' + self.whitelist_pagename)
 
         try:
             if self.whitelist_ts:
@@ -150,14 +146,14 @@ class PatrolBot(BaseBot):
                     return
 
             if self.whitelist:
-                pywikibot.output('Reloading whitelist')
+                pywikibot.info('Reloading whitelist')
 
             # Fetch whitelist
             wikitext = whitelist_page.get()
             # Parse whitelist
             self.whitelist = self.parse_page_tuples(wikitext, self.user)
             # Record timestamp
-            self.whitelist_ts = whitelist_page.editTime()
+            self.whitelist_ts = whitelist_page.latest_revision.timestamp
             self.whitelist_load_ts = time.time()
         except Exception as e:
             # cascade if there isn't a whitelist to fallback on
@@ -295,20 +291,18 @@ class PatrolBot(BaseBot):
             self.setup()
 
         if pywikibot.config.verbose_output or self.opt.ask:
-            pywikibot.output('User {} has created or modified page {}'
-                             .format(username, title))
+            pywikibot.info(
+                f'User {username} has created or modified page {title}')
 
         # simple rule to whitelist any user editing their own userspace
         if self.opt.autopatroluserns and page['ns'] in (2, 3) \
            and title.partition(':')[2].split('/')[0].startswith(username):
-            verbose_output('{} is whitelisted to modify {}'
-                           .format(username, title))
+            verbose_output(f'{username} is whitelisted to modify {title}')
             choice = True
 
         if not choice and username in self.whitelist \
            and self.in_list(self.whitelist[username], title):
-            verbose_output('{} is whitelisted to modify {}'
-                           .format(username, title))
+            verbose_output(f'{username} is whitelisted to modify {title}')
             choice = True
 
         if self.opt.ask:
@@ -319,8 +313,8 @@ class PatrolBot(BaseBot):
         if choice:
             # list() iterates over patrol() which returns a generator
             list(self.site.patrol(rcid))
-            pywikibot.output('Patrolled {} (rcid {}) by user {}'
-                             .format(title, rcid, username))
+            pywikibot.info(
+                f'Patrolled {title} (rcid {rcid}) by user {username}')
         else:
             verbose_output('Skipped')
 
@@ -358,10 +352,10 @@ class LinkedPagesRule:
                 linkedpages.append(linkedpage.title())
 
             self.linkedpages = linkedpages
-            verbose_output('Loaded {} page links'.format(len(linkedpages)))
+            verbose_output(f'Loaded {len(linkedpages)} page links')
 
         for p in self.linkedpages:
-            verbose_output("Checking against '{}'".format(p))
+            verbose_output(f"Checking against '{p}'")
             if page_title.startswith(p):
                 verbose_output('Matched.')
                 return True
@@ -389,7 +383,7 @@ def api_feed_repeater(
             else:
                 yield page[1]
         if repeat:
-            pywikibot.output('Sleeping for {} seconds'.format(delay))
+            pywikibot.info(f'Sleeping for {delay} seconds')
             pywikibot.sleep(delay)
         else:
             break
@@ -437,7 +431,7 @@ def main(*args: str) -> None:
     if usercontribs:
         user = pywikibot.User(site, usercontribs)
         if user.isAnonymous() or user.isRegistered():
-            pywikibot.output('Processing user: {}'.format(usercontribs))
+            pywikibot.info(f'Processing user: {usercontribs}')
         else:
             pywikibot.warning('User {} does not exist on site {}.'
                               .format(usercontribs, site))
@@ -449,12 +443,8 @@ def main(*args: str) -> None:
         else:
             recentchanges = True
 
-    if isinstance(mwparserfromhell, ImportError):
-        suggest_help(missing_dependencies=('mwparserfromhell',))
-        return
-
     if newpages or usercontribs:
-        pywikibot.output('Newpages:')
+        pywikibot.info('Newpages:')
         gen = site.newpages
         feed = api_feed_repeater(gen, delay=60, repeat=repeat,
                                  user=usercontribs,
@@ -465,7 +455,7 @@ def main(*args: str) -> None:
         bot.run()
 
     if recentchanges or usercontribs:
-        pywikibot.output('Recentchanges:')
+        pywikibot.info('Recentchanges:')
         gen = site.recentchanges
         feed = api_feed_repeater(gen, delay=60, repeat=repeat,
                                  namespaces=gen_factory.namespaces,

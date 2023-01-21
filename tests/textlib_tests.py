@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Test textlib module."""
 #
-# (C) Pywikibot team, 2011-2022
+# (C) Pywikibot team, 2011-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -484,7 +484,6 @@ class TestTemplateParams(TestCase):
                     self.assertEqual(func(template),
                                      [(name, OrderedDict((('b', 'c'), )))])
 
-    @require_modules('mwparserfromhell')
     def test_extract_templates_params_mwpfh(self):
         """Test using mwparserfromhell."""
         func = textlib.extract_templates_and_params
@@ -506,7 +505,6 @@ class TestTemplateParams(TestCase):
                                ('d', OrderedDict([('1', '')]))
                                ])
 
-    @require_modules('mwparserfromhell')
     def test_extract_templates_params_parser_stripped(self):
         """Test using mwparserfromhell with stripping."""
         func = functools.partial(textlib.extract_templates_and_params,
@@ -538,7 +536,6 @@ class TestTemplateParams(TestCase):
                                ('d', OrderedDict([('1', '')]))
                                ])
 
-    @require_modules('mwparserfromhell')
     def test_extract_templates_params(self):
         """Test that the normal entry point works."""
         func = functools.partial(textlib.extract_templates_and_params,
@@ -630,13 +627,13 @@ class TestTemplateParams(TestCase):
         for pattern in patterns:
             m = func(pattern)
             self.assertIsNotNone(m)
-            self.assertIsNotNone(m.group(0))
-            self.assertIsNone(m.group('name'))
-            self.assertIsNone(m.group(1))
-            self.assertIsNone(m.group('params'))
-            self.assertIsNone(m.group(2))
-            self.assertIsNotNone(m.group('unhandled_depth'))
-            self.assertTrue(m.group(0).endswith('foo {{bar}}'))
+            self.assertIsNotNone(m[0])
+            self.assertIsNone(m['name'])
+            self.assertIsNone(m[1])
+            self.assertIsNone(m['params'])
+            self.assertIsNone(m[2])
+            self.assertIsNotNone(m['unhandled_depth'])
+            self.assertTrue(m[0].endswith('foo {{bar}}'))
 
 
 class TestDisabledParts(DefaultDrySiteTestCase):
@@ -737,7 +734,7 @@ class TestReplaceLinks(TestCase):
                     return pywikibot.Link(
                         '{}#{}'
                         .format(self._count, link.section), link.site)
-                return pywikibot.Link('{}'.format(self._count), link.site)
+                return pywikibot.Link(f'{self._count}', link.site)
 
             return None
 
@@ -895,14 +892,16 @@ class TestReplaceLinks(TestCase):
         # These tests require to get the actual part which is before the title
         # (interwiki and namespace prefixes) which could be then compared
         # case insensitive.
-        self.assertEqual(
-            textlib.replace_links('[[Image:Foobar]]',
-                                  ('File:Foobar', 'File:Foo'), self.wp_site),
-            '[[File:Foo|Image:Foobar]]')
-        self.assertEqual(
-            textlib.replace_links('[[en:File:Foobar]]',
-                                  ('File:Foobar', 'File:Foo'), self.wp_site),
-            '[[File:Foo|en:File:Foobar]]')
+        tests = [
+            ('[[Image:Foobar]]', '[[File:Foo|Image:Foobar]]'),
+            ('[[en:File:Foobar]]', '[[File:Foo|en:File:Foobar]]'),
+        ]
+        for link, result in tests:
+            with self.subTest(link=link):
+                self.assertEqual(
+                    textlib.replace_links(
+                        link, ('File:Foobar', 'File:Foo'), self.wp_site),
+                    result)
 
     def test_linktrails(self):
         """Test that the linktrails are used or applied."""
@@ -941,7 +940,9 @@ class TestReplaceLinks(TestCase):
             if link.title == 'World':
                 # This must be a bytes instance not unicode
                 return b'homeworlder'
-            return None
+
+            # 'World' is the first link and leads to ValueError
+            return None  # pragma: no cover
 
         with self.assertRaisesRegex(ValueError,
                                     r'The result must be str and not bytes\.'):
@@ -1276,18 +1277,18 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
     def test_replace_tag_category(self):
         """Test replacing not inside category links."""
         for ns_name in self.site.namespaces[14]:
-            self.assertEqual(textlib.replaceExcept('[[{}:x]]'.format(ns_name),
+            self.assertEqual(textlib.replaceExcept(f'[[{ns_name}:x]]',
                                                    'x', 'y', ['category'],
                                                    site=self.site),
-                             '[[{}:x]]'.format(ns_name))
+                             f'[[{ns_name}:x]]')
 
     def test_replace_tag_file(self):
         """Test replacing not inside file links."""
         for ns_name in self.site.namespaces[6]:
-            self.assertEqual(textlib.replaceExcept('[[{}:x]]'.format(ns_name),
+            self.assertEqual(textlib.replaceExcept(f'[[{ns_name}:x]]',
                                                    'x', 'y', ['file'],
                                                    site=self.site),
-                             '[[{}:x]]'.format(ns_name))
+                             f'[[{ns_name}:x]]')
 
         self.assertEqual(
             textlib.replaceExcept(
@@ -1535,7 +1536,7 @@ class TestGetLanguageLinks(SiteAttributeTestCase):
 
     def test_getLanguageLinks(self, key):
         """Test if the function returns the correct titles and sites."""
-        with mock.patch('pywikibot.output') as m:
+        with mock.patch('pywikibot.info') as m:
             lang_links = textlib.getLanguageLinks(self.example_text,
                                                   self.site)
         m.assert_called_once_with(

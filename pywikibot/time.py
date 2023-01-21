@@ -3,7 +3,7 @@
 .. versionadded:: 7.5
 """
 #
-# (C) Pywikibot team, 2007-2022
+# (C) Pywikibot team, 2007-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,11 +11,13 @@ import datetime
 import math
 import re
 import types
+from contextlib import suppress
 from typing import Type, Union
 
 import pywikibot
 from pywikibot.backports import Tuple
-from pywikibot.tools import classproperty
+from pywikibot.tools import classproperty, deprecated
+
 
 __all__ = (
     'parse_duration',
@@ -78,11 +80,13 @@ class Timestamp(datetime.datetime):
         - ISO8601 format: YYYY-MM-DD[T ]HH:MM:SS[Z|±HH[MM[SS[.ffffff]]]]
         - POSIX format: seconds from Unix epoch S{1,13}[.ffffff]]
 
-        .. versionadded: 7.5
+        .. versionadded:: 7.5
+        .. versionchanged:: 8.0
+           raises *TypeError* instead of *ValueError*.
 
         :param ts: Timestamp, datetime.datetime or str
         :return: Timestamp object
-        :raises ValueError: conversion failed
+        :raises TypeError: conversion failed
         """
         if isinstance(ts, cls):
             return ts
@@ -90,14 +94,14 @@ class Timestamp(datetime.datetime):
             return cls._from_datetime(ts)
         if isinstance(ts, str):
             return cls._from_string(ts)
-        raise ValueError('Unsupported "ts" type, got "{}" ({})'
-                         .format(ts, type(ts).__name__))
+        raise TypeError(
+            f'Unsupported "ts" type, got "{ts}" ({type(ts).__name__})')
 
     @staticmethod
     def _from_datetime(dt: datetime.datetime) -> 'Timestamp':
         """Convert a datetime.datetime timestamp to a Timestamp object.
 
-        .. versionadded: 7.5
+        .. versionadded:: 7.5
         """
         return Timestamp(dt.year, dt.month, dt.day, dt.hour,
                          dt.minute, dt.second, dt.microsecond,
@@ -109,14 +113,14 @@ class Timestamp(datetime.datetime):
 
         Mediwiki timestamp format: YYYYMMDDHHMMSS
 
-        .. versionadded: 7.5
+        .. versionadded:: 7.5
         """
-        RE_MW = r'\d{14}$'  # noqa: N806
-        m = re.match(RE_MW, timestr)
+        RE_MW = r'\d{14}'  # noqa: N806
+        m = re.fullmatch(RE_MW, timestr)
 
         if not m:
-            msg = "time data '{timestr}' does not match MW format."
-            raise ValueError(msg.format(timestr=timestr))
+            raise ValueError(
+                f'time data {timestr!r} does not match MW format.')
 
         return cls.strptime(timestr, cls.mediawikiTSFormat)
 
@@ -127,33 +131,33 @@ class Timestamp(datetime.datetime):
         ISO8601 format:
         - YYYY-MM-DD[T ]HH:MM:SS[[.,]ffffff][Z|±HH[MM[SS[.ffffff]]]]
 
-        .. versionadded: 7.5
+        .. versionadded:: 7.5
         """
         RE_ISO8601 = (r'(?:\d{4}-\d{2}-\d{2})(?P<sep>[T ])'  # noqa: N806
                       r'(?:\d{2}:\d{2}:\d{2})(?P<u>[.,]\d{1,6})?'
-                      r'(?P<tz>Z|[+\-]\d{2}:?\d{,2})?$'
+                      r'(?P<tz>Z|[+\-]\d{2}:?\d{,2})?'
                       )
-        m = re.match(RE_ISO8601, timestr)
+        m = re.fullmatch(RE_ISO8601, timestr)
 
         if not m:
-            msg = "time data '{timestr}' does not match ISO8601 format."
-            raise ValueError(msg.format(timestr=timestr))
+            raise ValueError(
+                f'time data {timestr!r} does not match ISO8601 format.')
 
-        strpfmt = '%Y-%m-%d{sep}%H:%M:%S'.format(sep=m.group('sep'))
+        strpfmt = f'%Y-%m-%d{m["sep"]}%H:%M:%S'
         strpstr = timestr[:19]
 
-        if m.group('u'):
+        if m['u']:
             strpfmt += '.%f'
-            strpstr += m.group('u').replace(',', '.')  # .ljust(7, '0')
+            strpstr += m['u'].replace(',', '.')  # .ljust(7, '0')
 
-        if m.group('tz'):
-            if m.group('tz') == 'Z':
+        if m['tz']:
+            if m['tz'] == 'Z':
                 strpfmt += 'Z'
                 strpstr += 'Z'
             else:
                 strpfmt += '%z'
                 # strptime wants HHMM, without ':'
-                strpstr += (m.group('tz').replace(':', '')).ljust(5, '0')
+                strpstr += (m['tz'].replace(':', '')).ljust(5, '0')
 
         ts = cls.strptime(strpstr, strpfmt)
         if ts.tzinfo is not None:
@@ -169,31 +173,31 @@ class Timestamp(datetime.datetime):
 
         POSIX format: SECONDS[.ffffff]]
 
-        .. versionadded: 7.5
+        .. versionadded:: 7.5
         """
-        RE_POSIX = r'(?P<S>-?\d{1,13})(?:\.(?P<u>\d{1,6}))?$'  # noqa: N806
-        m = re.match(RE_POSIX, timestr)
+        RE_POSIX = r'(?P<S>-?\d{1,13})(?:\.(?P<u>\d{1,6}))?'  # noqa: N806
+        m = re.fullmatch(RE_POSIX, timestr)
 
         if not m:
             msg = "time data '{timestr}' does not match POSIX format."
             raise ValueError(msg.format(timestr=timestr))
 
-        sec = int(m.group('S'))
-        usec = m.group('u')
+        sec = int(m['S'])
+        usec = m['u']
         usec = int(usec.ljust(6, '0')) if usec else 0
         if sec < 0 < usec:
-            sec = sec - 1
-            usec = 1000000 - usec
+            sec -= 1
+            usec = 1_000_000 - usec
 
-        ts = (cls(1970, 1, 1)
-              + datetime.timedelta(seconds=sec, microseconds=usec))
+        ts = cls(1970, 1, 1) + datetime.timedelta(seconds=sec,
+                                                  microseconds=usec)
         return ts
 
     @classmethod
     def _from_string(cls: Type['Timestamp'], timestr: str) -> 'Timestamp':
         """Convert a string to a Timestamp object.
 
-        .. versionadded: 7.5
+        .. versionadded:: 7.5
         """
         handlers = [
             cls._from_mw,
@@ -202,17 +206,19 @@ class Timestamp(datetime.datetime):
         ]
 
         for handler in handlers:
-            try:
+            with suppress(ValueError):
                 return handler(timestr)
-            except ValueError:
-                continue
 
-        msg = "time data '{timestr}' does not match any format."
-        raise ValueError(msg.format(timestr=timestr))
+        raise ValueError(f'time data {timestr!r} does not match any format.')
 
+    @deprecated('replace method', since='8.0.0')
     def clone(self) -> 'Timestamp':
-        """Clone this instance."""
-        return self.replace(microsecond=self.microsecond)
+        """Clone this instance.
+
+        .. deprecated:: 8.0
+           Use :meth:`replace` method instead.
+        """
+        return self.replace()
 
     @classproperty
     def ISO8601Format(cls: Type['Timestamp']) -> str:  # noqa: N802
@@ -228,7 +234,7 @@ class Timestamp(datetime.datetime):
         :return: ISO8601 format string
         """
         assert len(sep) == 1
-        return '%Y-%m-%d{}%H:%M:%SZ'.format(sep)
+        return f'%Y-%m-%d{sep}%H:%M:%SZ'
 
     @classmethod
     def fromISOformat(cls: Type['Timestamp'],  # noqa: N802
@@ -243,19 +249,48 @@ class Timestamp(datetime.datetime):
         # If inadvertently passed a Timestamp object, use replace()
         # to create a clone.
         if isinstance(ts, cls):
-            return ts.clone()
-        _ts = '{pre}{sep}{post}'.format(pre=ts[:10], sep=sep, post=ts[11:])
-        return cls._from_iso8601(_ts)
+            return ts.replace()
+
+        return cls._from_iso8601(f'{ts[:10]}{sep}{ts[11:]}')
 
     @classmethod
-    def fromtimestampformat(cls: Type['Timestamp'], ts: Union[str, 'Timestamp']
-                            ) -> 'Timestamp':
-        """Convert a MediaWiki internal timestamp to a Timestamp object."""
+    def fromtimestampformat(cls: Type['Timestamp'],
+                            ts: Union[str, 'Timestamp'],
+                            strict: bool = False) -> 'Timestamp':
+        """Convert a MediaWiki internal timestamp to a Timestamp object.
+
+        .. versionchanged:: 3.0
+           create a Timestamp if only year, month and day are given.
+        .. versionchanged:: 8.0
+           the *strict* parameter was added which discards missing
+           element tolerance.
+
+        Example
+        -------
+
+        >>> Timestamp.fromtimestampformat('20220705082234')
+        Timestamp(2022, 7, 5, 8, 22, 34)
+        >>> Timestamp.fromtimestampformat('20220927')
+        Timestamp(2022, 9, 27, 0, 0)
+        >>> Timestamp.fromtimestampformat('20221109', strict=True)
+        Traceback (most recent call last):
+        ...
+        ValueError: time data '20221109' does not match MW format.
+
+        :param ts: the timestamp to be converted
+        :param strict: If true, do not ignore missing timestamp elements
+            for hours, minutes or seconds
+        :return: return the *Timestamp* object from given *ts*.
+        :raises ValueError: The timestamp is invalid, e.g. missing or
+            invalid timestamp component.
+        """
         # If inadvertently passed a Timestamp object, use replace()
         # to create a clone.
         if isinstance(ts, cls):
-            return ts.clone()
-        if len(ts) == 8:  # year, month and day are given only
+            return ts.replace()
+
+        if len(ts) == 8 and not strict:
+            # year, month and day are given only
             ts += '000000'
         return cls._from_mw(ts)
 
@@ -279,16 +314,24 @@ class Timestamp(datetime.datetime):
 
         See Note in datetime.timestamp().
 
-        .. versionadded: 7.5
+        .. versionadded:: 7.5
         """
         return self.replace(tzinfo=datetime.timezone.utc).timestamp()
 
     def posix_timestamp_format(self) -> str:
         """Convert object to a POSIX timestamp format.
 
-        .. versionadded: 7.5
+        .. versionadded:: 7.5
         """
-        return '{ts:.6f}'.format(ts=self.posix_timestamp())
+        return f'{self.posix_timestamp():.6f}'
+
+    def __repr__(self) -> str:
+        """Unify repr string between CPython and Pypy (T325905).
+
+        .. versionadded:: 8.0
+        """
+        s = super().__repr__()
+        return f'{type(self).__name__}{s[s.find("("):]}'
 
     def __str__(self) -> str:
         """Return a string format recognized by the API."""

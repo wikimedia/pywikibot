@@ -7,7 +7,7 @@
   by the corresponding final release
 - create the package with::
 
-    make_dist remote
+    make_dist -remote
 
 - create a new tag with the version number of the final release
 - synchronize the local tags with the remote repositoy
@@ -27,6 +27,7 @@
 import os
 import re
 import sys
+from setuptools import setup
 
 if sys.version_info[:3] >= (3, 9):
     List = list
@@ -34,85 +35,48 @@ else:
     from typing import List
 
 
-VERSIONS_REQUIRED_MESSAGE = """
-Pywikibot is not available on:
-{version}
-
-This version of Pywikibot only supports Python 3.5.3+.
-"""
-
-try:
-    from setuptools import setup
-except SyntaxError:
-    raise RuntimeError(VERSIONS_REQUIRED_MESSAGE.format(version=sys.version))
-
-
-def python_is_supported() -> bool:
-    """Check that Python is supported."""
-    return sys.version_info[:3] >= (3, 5, 3)
-
-
-if not python_is_supported():  # pragma: no cover
-    # pwb.py checks this exception
-    raise RuntimeError(VERSIONS_REQUIRED_MESSAGE.format(version=sys.version))
-
 # ------- setup extra_requires ------- #
 extra_deps = {
     # Core library dependencies
     'eventstreams': ['sseclient<0.0.23,>=0.0.18'],  # T222885
-    'isbn': ['python-stdnum>=1.17'],
-    'Graphviz': ['pydot>=1.2'],
+    'isbn': ['python-stdnum>=1.18'],
+    'Graphviz': ['pydot>=1.4.1'],
     'Google': ['google>=1.7'],
     'memento': ['memento_client==0.6.1'],
-    'mwparserfromhell': ['mwparserfromhell>=0.5.0'],
-    'wikitextparser': ['wikitextparser>=0.47.5; python_version < "3.6"',
-                       'wikitextparser>=0.47.0; python_version >= "3.6"'],
-    'mysql': ['PyMySQL >= 0.7.11, < 1.0.0 ; python_version < "3.6"',
-              'PyMySQL >= 1.0.0 ; python_version >= "3.6"'],
-    'Tkinter': [  # vulnerability found in Pillow<8.1.1
-        'Pillow>=8.1.1;python_version>="3.6"',
-    ],
+    'wikitextparser': ['wikitextparser>=0.47.0'],
+    'mysql': ['PyMySQL >= 0.9.3'],  # toolforge
+    # vulnerability found in Pillow<8.1.1 but toolforge uses 5.4.1
+    'Tkinter': ['Pillow>=8.1.1'],
     'mwoauth': ['mwoauth!=0.3.1,>=0.2.4'],
-    'html': ['BeautifulSoup4'],
+    'html': ['beautifulsoup4>=4.7.1'],
     'http': [
         'fake_useragent<0.1.14; python_version < "3.7"',
         'fake_useragent>1.0.1; python_version >= "3.7"',
     ],
     'flake8': [  # Due to incompatibilities between packages the order matters.
-        'flake8==3.9.2,<5.0.0; python_version < "3.6"',
-        'flake8>=5.0.2; python_version >= "3.6"',
+        'flake8>=5.0.4',
         'darglint',
-        'pydocstyle>=4.0.0',
-        'flake8-bugbear!=21.4.1,!=21.11.28',
+        'pydocstyle>=6.2.3',
+        'flake8-bugbear!=23.1.14',
         'flake8-coding',
-        'flake8-comprehensions>=3.1.4; python_version >= "3.8"',
-        'flake8-comprehensions>=2.2.0; python_version < "3.8"',
-        'flake8-docstrings>=1.3.1',
-        'verve-flake8-mock>=0.4',
-        'flake8-print>=2.0.1',
-        # flake8-quotes is incompatible with flake8 6 (T323752),
-        # jenkins CI ignores "3.8.1"
-        'flake8-quotes>=3.3.0; python_version < "3.8"',
+        'flake8-comprehensions',
+        'flake8-docstrings>=1.4.0',
+        'flake8-mock-x2',
+        'flake8-print>=4.0.1',
+        'flake8-quotes>=3.3.2',
         'flake8-string-format',
-        'flake8-tuple>=0.2.8',
+        'flake8-tuple>=0.4.1',
         'flake8-no-u-prefixed-strings>=0.2',
         'pep8-naming>=0.12.1, <0.13.0; python_version < "3.7"',
-        'pep8-naming>=0.12.1; python_version >= "3.7"',
+        'pep8-naming>=0.13.3; python_version >= "3.7"',
     ],
-    'hacking': [
-        'hacking',
-        # importlib-metadata module already installed with hacking 4.1.0
-        # but importlib-metadata 5 fails, so adjust it
-        'importlib-metadata<5.0.0; python_version < "3.8"',
-    ],
+    'hacking': ['hacking'],
 }
 
 
 # ------- setup extra_requires for scripts ------- #
 script_deps = {
     'create_isbn_edition.py': ['isbnlib', 'unidecode'],
-    'commons_information.py': extra_deps['mwparserfromhell'],
-    'patrol.py': extra_deps['mwparserfromhell'],
     'weblinkchecker.py': extra_deps['memento'],
 }
 
@@ -122,18 +86,14 @@ extra_deps.update({'scripts': [i for k, v in script_deps.items() for i in v]})
 # ------- setup install_requires ------- #
 # packages which are mandatory
 dependencies = [
-    'requests>=2.20.1, <2.26.0; python_version < "3.6"',
-    'requests>=2.20.1, <2.28.0; '
-    'python_version >= "3.6" and python_version < "3.7"',
-    'requests>=2.20.1; python_version>="3.7"',
+    'mwparserfromhell>=0.6.3',
+    'requests>=2.21.0, <2.28.0; python_version < "3.7"',
+    'requests>=2.21.0; python_version>="3.7"',
     # PEP 440
     'setuptools>=48.0.0 ; python_version >= "3.10"',
-    'setuptools>=38.5.2 ; python_version >= "3.7" and python_version < "3.10"',
-    'setuptools>=20.8.1, <59.7.0 '
-    '; python_version >= "3.6" and python_version < "3.7"',
-    'setuptools>=20.8.1, !=50.0.0, <51.0.0 ; python_version < "3.6"',
+    'setuptools>=40.8.0 ; python_version >= "3.7" and python_version < "3.10"',
+    'setuptools>=40.8.0, <59.7.0 ; python_version < "3.7"',
 ]
-# in addition either mwparserfromhell or wikitextparser is required
 
 # ------- setup tests_require ------- #
 test_deps = ['mock']
@@ -156,7 +116,7 @@ metadata = _DottedDict()
 name = 'pywikibot'
 path = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(path, name, '__metadata__.py')) as f:
-    exec(f.read(), metadata)
+    exec(f.read(), None, metadata)
 assert metadata.__name__ == name
 
 
@@ -224,7 +184,7 @@ def read_desc(filename) -> str:  # pragma: no cover
     Combine included restructured text files which must be done before
     uploading because the source isn't available after creating the package.
     """
-    pattern = r'\:\w+\:`([^`]+?)(?:<.+>)?`', r'\1'
+    pattern = r'(?:\:\w+\:`([^`]+?)(?:<.+>)?` *)', r'\1'
     desc = []
     with open(filename) as f:
         for line in f:
@@ -259,7 +219,7 @@ def main() -> None:  # pragma: no cover
         version=version,
         description=metadata.__description__,
         long_description=read_desc('README.rst'),
-        # long_description_content_type
+        long_description_content_type='text/x-rst',
         # author
         # author_email
         maintainer=metadata.__maintainer__,
@@ -287,7 +247,7 @@ def main() -> None:  # pragma: no cover
         # zip_safe
         install_requires=dependencies,
         extras_require=extra_deps,
-        python_requires='>=3.5.3',
+        python_requires='>=3.6.1',
         # namespace_packages
         test_suite='tests.collector',
         tests_require=test_deps,
@@ -297,12 +257,12 @@ def main() -> None:  # pragma: no cover
             'Documentation': 'https://doc.wikimedia.org/pywikibot/stable/',
             'Source':
                 'https://gerrit.wikimedia.org/r/plugins/gitiles/pywikibot/core/',  # noqa: E501
-            'Github Mirror': 'https://github.com/wikimedia/pywikibot',
+            'GitHub Mirror': 'https://github.com/wikimedia/pywikibot',
             'Tracker': 'https://phabricator.wikimedia.org/tag/pywikibot/',
         },
         entry_points={
             'console_scripts': [
-                'pwb = pywikibot.scripts.pwb:run',
+                'pwb = pywikibot.scripts.wrapper:run',
             ],
         },
         classifiers=[
@@ -373,13 +333,13 @@ def main() -> None:  # pragma: no cover
             'Programming Language :: Python',
             'Programming Language :: Python :: 3',
             'Programming Language :: Python :: 3 :: Only',
-            'Programming Language :: Python :: 3.5',
             'Programming Language :: Python :: 3.6',
             'Programming Language :: Python :: 3.7',
             'Programming Language :: Python :: 3.8',
             'Programming Language :: Python :: 3.9',
             'Programming Language :: Python :: 3.10',
             'Programming Language :: Python :: 3.11',
+            'Programming Language :: Python :: 3.12',
             'Programming Language :: Python :: Implementation :: CPython',
             'Programming Language :: Python :: Implementation :: PyPy',
             'Topic :: Internet :: WWW/HTTP :: Dynamic Content :: Wiki',

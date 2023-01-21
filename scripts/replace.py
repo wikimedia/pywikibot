@@ -146,10 +146,10 @@ the top of the help.
 #
 # Distributed under the terms of the MIT license.
 #
-import codecs
 import re
 from collections.abc import Sequence
 from contextlib import suppress
+from pathlib import Path
 from typing import Any, Optional
 
 import pywikibot
@@ -221,7 +221,7 @@ class ReplacementBase:
         changes to the MediaWiki server, the edit summary includes the
         descriptions of each replacement that you applied to the page.
         """
-        return '-{} +{}'.format(self.old, self.new)
+        return f'-{self.old} +{self.new}'
 
     @property
     def container(self):
@@ -454,7 +454,7 @@ class XmlDumpReplacePageGenerator:
         except KeyboardInterrupt:
             with suppress(NameError):
                 if not self.skipping:
-                    pywikibot.output(
+                    pywikibot.info(
                         'To resume, use "-xmlstart:{}" on the command line.'
                         .format(entry.title))
 
@@ -603,14 +603,14 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             if page is not None and self.isTitleExcepted(
                     page.title(), replacement.exceptions):
                 if replacement.container:
-                    pywikibot.output(
+                    pywikibot.info(
                         'Skipping fix "{}" on {} because the title is on '
                         'the exceptions list.'.format(
                             replacement.container.name,
                             page.title(as_link=True)))
                     skipped_containers.add(replacement.container.name)
                 else:
-                    pywikibot.output(
+                    pywikibot.info(
                         'Skipping unnamed replacement ({}) on {} because '
                         'the title is on the exceptions list.'.format(
                             replacement.description, page.title(as_link=True)))
@@ -647,7 +647,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             default_summary = comma.join(
                 '-{} +{}'.format(*default_summary)
                 for default_summary in default_summaries)
-            desc = {'description': ' ({})'.format(default_summary)}
+            desc = {'description': f' ({default_summary})'}
             summary_messages.insert(0, msg % desc)
 
         semicolon = self.site.mediawiki_message('semicolon-separator')
@@ -665,7 +665,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             return True
 
         if not page.has_permission():
-            pywikibot.warning("You can't edit page {}".format(page))
+            pywikibot.warning(f"You can't edit page {page}")
             return True
 
         return False
@@ -683,22 +683,19 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
         context = 0
         while True:
             if self.isTextExcepted(new_text):
-                pywikibot.output('Skipping {} because it contains text '
-                                 'that is on the exceptions list.'
-                                 .format(page))
+                pywikibot.info(f'Skipping {page} because it contains text '
+                               f'that is on the exceptions list.')
                 return
 
             while new_text != last_text:
                 last_text = new_text
-                new_text = self.apply_replacements(last_text, applied,
-                                                   page)
+                new_text = self.apply_replacements(last_text, applied, page)
                 if not self.opt.recursive:
                     break
 
             if new_text == original_text:
                 if not self.opt.quiet:
-                    pywikibot.output('No changes were necessary in '
-                                     + page.title(as_link=True))
+                    pywikibot.info(f'No changes were necessary in {page}')
                 return
 
             if self.opt.addcat:
@@ -742,8 +739,8 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                 try:
                     original_text = page.get(get_redirect=True, force=True)
                 except NoPageError:
-                    pywikibot.output('Page {} has been deleted.'
-                                     .format(page.title()))
+                    pywikibot.info('Page {} has been deleted.'
+                                   .format(page.title()))
                     break
                 new_text = original_text
                 last_text = None
@@ -810,7 +807,7 @@ def handle_exceptions(*args: str) -> Tuple[List[str], Dict[str, str]]:
     return local_args, exceptions
 
 
-def handle_pairsfile(filename: str) -> List[str]:
+def handle_pairsfile(filename: str) -> Optional[List[str]]:
     """Handle -pairsfile argument.
 
     .. versionadded:: 7.0
@@ -820,19 +817,17 @@ def handle_pairsfile(filename: str) -> List[str]:
             'Please enter the filename to read replacements from:')
 
     try:
-        with codecs.open(filename, 'r', 'utf-8') as f:
-            # strip newlines, but not other characters
-            replacements = f.read().splitlines()
+        with Path(filename).open(encoding='utf-8') as f:
+            replacements = f.readlines()
         if not replacements:
-            raise OSError('{} is empty.'.format(filename))
+            raise OSError(f'{filename} is empty.')
     except OSError as e:
-        pywikibot.error('Error loading {}: {}'.format(filename, e))
+        pywikibot.error(f'Error loading {filename}: {e}')
         return None
 
     if len(replacements) % 2:
         pywikibot.error(
-            '{} contains an incomplete pattern replacement pair.'.format(
-                filename))
+            f'{filename} contains an incomplete pattern replacement pair.')
         return None
 
     # Strip BOM from first line
@@ -917,7 +912,7 @@ def main(*args: str) -> None:
     # if -xml flag is present
     xmlFilename = None
     xmlStart = None
-    sql_query = None  # type: Optional[str]
+    sql_query: Optional[str] = None
     # Set the default regular expression flags
     flags = 0
     # Request manual replacements even if replacements are already defined
@@ -988,7 +983,7 @@ def main(*args: str) -> None:
             single_summary = i18n.twtranslate(
                 site, 'replace-replacing',
                 {'description':
-                 ' (-{} +{})'.format(replacement.old, replacement.new)}
+                 f' (-{replacement.old} +{replacement.new})'}
             )
         replacements.append(replacement)
 
@@ -999,15 +994,14 @@ def main(*args: str) -> None:
         try:
             fix = fixes.fixes[fix_name]
         except KeyError:
-            pywikibot.output('Available predefined fixes are: {}'
-                             .format(', '.join(fixes.fixes.keys())))
+            pywikibot.info('Available predefined fixes are: {}'
+                           .format(', '.join(fixes.fixes.keys())))
             if not fixes.user_fixes_loaded:
-                pywikibot.output('The user fixes file could not be found: {}'
-                                 .format(fixes.filename))
+                pywikibot.info(f'The user fixes file could not be found: '
+                               f'{fixes.filename}')
             return
         if not fix['replacements']:
-            pywikibot.warning('No replacements defined for fix "{}"'
-                              .format(fix_name))
+            pywikibot.warning(f'No replacements defined for fix {fix_name!r}')
             continue
         if 'msg' in fix:
             if isinstance(fix['msg'], str):
@@ -1034,7 +1028,7 @@ def main(*args: str) -> None:
             summary = None if len(replacement) < 3 else replacement[2]
             if not set_summary and not summary:
                 missing_fix_summaries.append(
-                    '"{}" (replacement #{})'.format(fix_name, index))
+                    f'"{fix_name}" (replacement #{index})')
             if chars.contains_invisible(replacement[0]):
                 pywikibot.warning('The old string "{}" contains formatting '
                                   'characters like U+200E'.format(
@@ -1063,21 +1057,21 @@ def main(*args: str) -> None:
 
         if len(fix['replacements']) == len(missing_fix_summaries):
             missing_fixes_summaries.append(
-                '"{}" (all replacements)'.format(fix_name))
+                f'"{fix_name}" (all replacements)')
         else:
             missing_fixes_summaries += missing_fix_summaries
 
     if ((not edit_summary or edit_summary is True)
             and (missing_fixes_summaries or single_summary)):
         if single_summary:
-            pywikibot.output('The summary message for the command line '
-                             'replacements will be something like: '
-                             + single_summary)
+            pywikibot.info('The summary message for the command line '
+                           'replacements will be something like: '
+                           + single_summary)
         if missing_fixes_summaries:
-            pywikibot.output('The summary will not be used when the fix has '
-                             'one defined but the following fix(es) do(es) '
-                             'not have a summary defined: {}'
-                             .format(', '.join(missing_fixes_summaries)))
+            pywikibot.info('The summary will not be used when the fix has '
+                           'one defined but the following fix(es) do(es) '
+                           'not have a summary defined: {}'
+                           .format(', '.join(missing_fixes_summaries)))
         if edit_summary is not True:
             edit_summary = pywikibot.input(
                 'Press Enter to use this automatic message, or enter a '

@@ -1,21 +1,18 @@
 #!/usr/bin/python3
 """Insert a language template into the description field."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2023
 #
 # Distributed under the terms of the MIT license.
 #
 import copy
 
+import mwparserfromhell
+
 import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 
-
-try:
-    import mwparserfromhell
-except ImportError as e:
-    mwparserfromhell = e
 
 try:
     import langdetect
@@ -68,7 +65,7 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
             if langs and langs[0].prob > 0.9:
                 tmp_page2 = pywikibot.Page(self.site, langs[0].lang, ns=10)
                 if tmp_page2 != tmp_page:
-                    pywikibot.output(
+                    pywikibot.info(
                         '<<lightblue>>The language template {before!r} '
                         'was found, but langdetect thinks {after!r} is the '
                         'most appropriate with a probability of {prob}:'
@@ -99,12 +96,7 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
         lstrip = param.value.lstrip()
         lspaces = param.value[:len(param.value) - len(lstrip)]
         rspaces = lstrip[len(lstrip.rstrip()):]
-        param.value = '{}{}{}'.format(lspaces, value, rspaces)
-
-    def setup(self):
-        """Raise exception if needed modules are missing."""
-        if isinstance(mwparserfromhell, Exception):
-            raise mwparserfromhell
+        param.value = f'{lspaces}{value}{rspaces}'
 
     def treat_page(self) -> None:
         """Treat current page."""
@@ -126,17 +118,15 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
                 desc_clean.remove(tmp)
             value = desc_clean.strip()
             if value == '':
-                pywikibot.output('Empty description')
+                pywikibot.info('Empty description')
                 continue
-            pywikibot.output(value)
+            pywikibot.info(value)
             langs = self.detect_langs(value)
             if langs:
-                pywikibot.output(
-                    '<<lightblue>>Hints from langdetect:<<default>>')
+                pywikibot.info('<<lightblue>>Hints from langdetect:')
                 for language in langs:
-                    pywikibot.output(
-                        '<<lightblue>>{obj.lang}: {obj.prob}<<default>>'
-                        .format(obj=language))
+                    pywikibot.info(
+                        f'<<lightblue>>{language.lang}: {language.prob}')
             lang = pywikibot.input(
                 'Enter the language of the displayed text:').strip()
             if lang != '':

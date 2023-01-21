@@ -1,4 +1,5 @@
-scripts.i18n translation files
-==============================
+********************************
+Translation files - scripts.i18n
+********************************
 
 .. automodule:: scripts.i18n

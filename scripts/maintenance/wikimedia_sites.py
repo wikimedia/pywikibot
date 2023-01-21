@@ -7,12 +7,12 @@ Usage:
 
 """
 #
-# (C) Pywikibot team, 2008-2021
+# (C) Pywikibot team, 2008-2022
 #
 # Distributed under the terms of the MIT license.
 #
-import codecs
 import re
+from pathlib import Path
 
 import pywikibot
 from pywikibot.data import wikistats
@@ -40,7 +40,7 @@ def update_family(families):
     """Update family files."""
     ws = wikistats.WikiStats()
     for family in families or families_list:
-        pywikibot.output('\nChecking family {}:'.format(family))
+        pywikibot.info(f'\nChecking family {family}:')
 
         original = Family.load(family).languages_by_size
         for code in exceptions.get(family, []):
@@ -68,27 +68,26 @@ def update_family(families):
                 i -= 1
 
         if original == new:
-            pywikibot.output('The lists match!')
+            pywikibot.info('The lists match!')
             continue
 
-        pywikibot.output("The lists don't match, the new list is:")
+        pywikibot.info("The lists don't match, the new list is:")
         text = '    languages_by_size = [\n'
         line = ' ' * 7
         for code in new:
             if len(line) + len(code) >= 76:
                 text += line + '\n'
                 line = ' ' * 7
-            line += " '{}',".format(code)
+            line += f" '{code}',"
         text += line + '\n'
         text += '    ]'
-        pywikibot.output(text)
-        family_file_name = 'pywikibot/families/{}_family.py'.format(family)
-        with codecs.open(family_file_name, 'r', 'utf8') as family_file:
-            family_text = family_file.read()
+        pywikibot.info(text)
+
+        filepath = Path(f'pywikibot/families/{family}_family.py')
+        family_text = filepath.read_text(encoding='utf8')
         family_text = re.sub(r'(?ms)^ {4}languages_by_size.+?\]',
                              text, family_text, 1)
-        with codecs.open(family_file_name, 'w', 'utf8') as family_file:
-            family_file.write(family_text)
+        filepath.write_text(family_text, encoding='utf8')
 
 
 if __name__ == '__main__':

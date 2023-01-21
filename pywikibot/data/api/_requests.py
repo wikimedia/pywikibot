@@ -1,6 +1,6 @@
 """Objects representing API requests."""
 #
-# (C) Pywikibot team, 2007-2022
+# (C) Pywikibot team, 2007-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -13,7 +13,9 @@ import pprint
 import re
 import traceback
 from collections.abc import MutableMapping
+from contextlib import suppress
 from email.mime.nonmultipart import MIMENonMultipart
+from pathlib import Path
 from typing import Any, Optional, Union
 from urllib.parse import unquote, urlencode
 from warnings import warn
@@ -33,8 +35,9 @@ from pywikibot.exceptions import (
     TimeoutError,
 )
 from pywikibot.login import LoginStatus
-from pywikibot.textlib import removeHTMLParts
+from pywikibot.textlib import removeDisabledParts, removeHTMLParts
 from pywikibot.tools import PYTHON_VERSION
+
 
 __all__ = ('CachedRequest', 'Request', 'encode_url')
 
@@ -200,6 +203,7 @@ class Request(MutableMapping):
             self.retry_wait = pywikibot.config.retry_wait
         else:
             self.retry_wait = retry_wait
+        self.json_warning = False
         # The only problem with that system is that it won't detect when
         # 'parameters' is actually the only parameter for the request as it
         # then assumes it's using the new mode (and the parameters are actually
@@ -224,7 +228,7 @@ class Request(MutableMapping):
             raise ValueError("'action' specification missing from Request.")
         self.action = parameters['action']
         self.update(parameters)  # also convert all parameter values to lists
-        self._warning_handler = None  # type: Optional[Callable[[str, str], Union[Match[str], bool, None]]]  # noqa: E501
+        self._warning_handler: Optional[Callable[[str, str], Union[Match[str], bool, None]]] = None  # noqa: E501
         self.write = self.action in WRITE_ACTIONS
         # Client side verification that the request is being performed
         # by a logged in user, and warn if it isn't a config username.
@@ -439,7 +443,8 @@ class Request(MutableMapping):
             if ('tokens' not in meta and 'continue' not in self._params
                     and self.site.mw_version >= '1.25wmf5'):
                 self._params.setdefault('rawcontinue', [''])
-        elif self.action == 'help' and self.site.mw_version > '1.24':
+
+        elif self.action == 'help':
             self['wrap'] = ''
 
         if config.maxlag:
@@ -526,8 +531,8 @@ class Request(MutableMapping):
         """Simulate action."""
         if action and config.simulate and (
                 self.write or action in config.actions_to_block):
-            pywikibot.output('<<black;yellow>>SIMULATION: {} action blocked.'
-                             '<<default>>'.format(action))
+            pywikibot.info(
+                f'<<black;yellow>>SIMULATION: {action} action blocked.')
             # for more realistic simulation
             if config.simulate is not True:
                 pywikibot.sleep(float(config.simulate))
@@ -654,11 +659,12 @@ class Request(MutableMapping):
             use_get = False  # MIME requests require HTTP POST
         else:
             headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-            if (not self.site.maximum_GET_length()
-                    or self.site.maximum_GET_length() < len(paramstring)):
+            if (not config.maximum_GET_length
+                    or config.maximum_GET_length < len(paramstring)):
                 use_get = False
+
             if use_get:
-                uri = '{}?{}'.format(uri, paramstring)
+                uri = f'{uri}?{paramstring}'
                 body = None
             else:
                 body = paramstring
@@ -697,7 +703,7 @@ class Request(MutableMapping):
         except Exception:
             # for any other error on the http request, wait and retry
             pywikibot.error(traceback.format_exc())
-            pywikibot.log('{}, {}'.format(uri, paramstring))
+            pywikibot.log(f'{uri}, {paramstring}')
         else:
             return response, use_get
         self.wait()
@@ -715,19 +721,21 @@ class Request(MutableMapping):
         try:
             result = response.json()
         except ValueError:
-            # if the result isn't valid JSON, there may be a server
-            # problem. Wait a few seconds and try again
-            # Show 20 lines of bare text
-            text = '\n'.join(removeHTMLParts(response.text).splitlines()[:20])
-            msg = """\
-Non-JSON response received from server {site} for url
-{resp.url}
+            # if the result isn't valid JSON, there may be a server problem.
+            # Wait a few seconds and try again.
+            # Show 20 lines of bare text without script parts
+            text = removeDisabledParts(response.text, ['script'])
+            text = re.sub('\n{2,}', '\n',
+                          '\n'.join(removeHTMLParts(text).splitlines()[:20]))
+            msg = f"""\
+Non-JSON response received from server {self.site} for url
+{response.url}
 The server may be down.
-Status code: {resp.status_code}
+Status code: {response.status_code}
 
 The text message is:
 {text}
-""".format(site=self.site, resp=response, text=text)
+"""
 
             # Do not retry for AutoFamily but raise a SiteDefinitionError
             # Note: family.AutoFamily is a function to create that class
@@ -736,7 +744,9 @@ The text message is:
                 raise SiteDefinitionError('Invalid AutoFamily({!r})'
                                           .format(self.site.family.domain))
 
-            pywikibot.warning(msg)
+            if not self.json_warning:  # warn only once
+                pywikibot.warning(msg)
+                self.json_warning = True
 
             # there might also be an overflow, so try a smaller limit
             for param in self._params:
@@ -745,8 +755,7 @@ The text message is:
                     value = self[param][0]
                     if value.isdigit():
                         self[param] = [str(int(value) // 2)]
-                        pywikibot.output('Set {} = {}'
-                                         .format(param, self[param]))
+                        pywikibot.info(f'Set {param} = {self[param]}')
         else:
             return result or {}
         self.wait()
@@ -912,11 +921,16 @@ The text message is:
 
         if not delay:
             pywikibot.warning(
-                'No rate limit found for action {}'.format(self.action))
+                f'No rate limit found for action {self.action}')
         self.wait(delay)
 
     def _bad_token(self, code) -> bool:
-        """Check for bad token."""
+        """Check for bad token.
+
+        Check for bad tokens, call :meth:`TokenWallet.update_tokens()
+        <pywikibot.site._tokenwallet.TokenWallet.update_tokens>` method
+        to update the bunch of tokens and continue loop in :meth:`submit`.
+        """
         if code != 'badtoken':  # Other code not handled here
             return False
 
@@ -925,40 +939,12 @@ The text message is:
                           .format(self.site._loginstatus.name))
             return False
 
-        user_tokens = self.site.tokens._tokens[self.site.user()]
-        # all token values mapped to their type
-        tokens = {token: t_type for t_type, token in user_tokens.items()}
-        # determine which tokens are bad
-        invalid_param = {name: tokens[param[0]]
-                         for name, param in self._params.items()
-                         if len(param) == 1 and param[0] in tokens}
-        # doesn't care about the cache so can directly load them
-        if invalid_param:
-            pywikibot.log(
-                'Bad token error for {}. Tokens for "{}" used in request; '
-                'invalidated them.'
-                .format(self.site.user(),
-                        '", "'.join(sorted(set(invalid_param.values())))))
-            # invalidate superior wiki cookies (T224712)
-            pywikibot.data.api._invalidate_superior_cookies(self.site.family)
-            # request new token(s) instead of invalid
-            self.site.tokens.load_tokens(set(invalid_param.values()))
-            # fix parameters; lets hope that it doesn't mistake actual
-            # parameters as tokens
-            for name, t_type in invalid_param.items():
-                self[name] = self.site.tokens[t_type]
-            return True
-
-        # otherwise couldn't find any … weird there is nothing what
-        # can be done here because it doesn't know which parameters
-        # to fix
-        pywikibot.log(
-            'Bad token error for {} but no parameter is using a '
-            'token. Current tokens: {}'
-            .format(self.site.user(),
-                    ', '.join('{}: {}'.format(*e)
-                              for e in user_tokens.items())))
-        return False
+        # invalidate superior wiki cookies (T224712)
+        pywikibot.data.api._invalidate_superior_cookies(self.site.family)
+        # update tokens
+        tokens = self.site.tokens.update_tokens(self._params['token'])
+        self._params['token'] = tokens
+        return True
 
     def submit(self) -> dict:
         """
@@ -980,7 +966,7 @@ The text message is:
                 self.site.throttle(write=self.write)
             else:
                 pywikibot.log(
-                    "Submitting unthrottled action '{}'.".format(self.action))
+                    f"Submitting unthrottled action '{self.action}'.")
 
             use_get, uri, body, headers = self._get_request_params(use_get,
                                                                    paramstring)
@@ -1028,7 +1014,7 @@ The text message is:
                     lag = error['lag']
                 except KeyError:
                     lag = lagpattern.search(info)
-                    lag = float(lag.group('lag')) if lag else 0.0
+                    lag = float(lag['lag']) if lag else 0.0
 
                 self.site.throttle.lag(lag * retries)
                 continue
@@ -1040,8 +1026,8 @@ The text message is:
                 return {'help': {'mime': 'text/plain',
                                  'help': error['help']}}
 
-            pywikibot.warning('API error {}: {}'.format(code, info))
-            pywikibot.log('           headers=\n{}'.format(response.headers))
+            pywikibot.warning(f'API error {code}: {info}')
+            pywikibot.log(f'           headers=\n{response.headers}')
 
             if self._internal_api_error(code, error.copy(), result):
                 continue
@@ -1103,7 +1089,7 @@ The text message is:
                 param_repr = str(self._params)
                 pywikibot.log('API Error: query=\n{}'
                               .format(pprint.pformat(param_repr)))
-                pywikibot.log('           response=\n{}'.format(result))
+                pywikibot.log(f'           response=\n{result}')
 
                 raise pywikibot.exceptions.APIError(**error)
             except TypeError:
@@ -1155,32 +1141,39 @@ class CachedRequest(Request):
         raise NotImplementedError('CachedRequest cannot be created simply.')
 
     @classmethod
-    def _get_cache_dir(cls) -> str:
+    def _get_cache_dir(cls) -> Path:
         """
         Return the base directory path for cache entries.
 
         The directory will be created if it does not already exist.
 
+        .. versionchanged:: 8.0
+           return a `pathlib.Path` object.
+
         :return: base directory path for cache entries
         """
-        path = os.path.join(config.base_dir,
-                            'apicache-py{:d}'.format(PYTHON_VERSION[0]))
+        path = Path(config.base_dir, f'apicache-py{PYTHON_VERSION[0]:d}')
         cls._make_dir(path)
         cls._get_cache_dir = classmethod(lambda c: path)  # cache the result
         return path
 
     @staticmethod
-    def _make_dir(dir_name: str) -> str:
+    def _make_dir(dir_name: Union[str, Path]) -> Path:
         """Create directory if it does not exist already.
 
         .. versionchanged:: 7.0
            Only `FileExistsError` is ignored but other OS exceptions can
            be still raised
+        .. versionchanged:: 8.0
+           use *dir_name* as str or `pathlib.Path` object but always
+           return a Path object.
 
         :param dir_name: directory path
-        :return: unmodified directory name for test purpose
+        :return: directory path as `pathlib.Path` object for test purpose
         """
-        os.makedirs(dir_name, exist_ok=True)
+        if isinstance(dir_name, str):
+            dir_name = Path(dir_name)
+        dir_name.mkdir(exist_ok=True)
         return dir_name
 
     def _uniquedescriptionstr(self) -> str:
@@ -1203,7 +1196,7 @@ class CachedRequest(Request):
             user_key = repr(LoginStatus(LoginStatus.NOT_LOGGED_IN))
 
         request_key = repr(sorted(self._encoded_items().items()))
-        return '{!r}{}{}'.format(self.site, user_key, request_key)
+        return f'{self.site!r}{user_key}{request_key}'
 
     def _create_file_name(self) -> str:
         """Return a unique ascii identifier for the cache entry."""
@@ -1211,9 +1204,13 @@ class CachedRequest(Request):
             self._uniquedescriptionstr().encode('utf-8')
         ).hexdigest()
 
-    def _cachefile_path(self):
-        return os.path.join(CachedRequest._get_cache_dir(),
-                            self._create_file_name())
+    def _cachefile_path(self) -> Path:
+        """Create the cachefile path.
+
+        .. versionchanged:: 8.0
+           return a `pathlib.Path` object.
+        """
+        return CachedRequest._get_cache_dir() / self._create_file_name()
 
     def _expired(self, dt):
         return dt + self.expiry < datetime.datetime.utcnow()
@@ -1226,30 +1223,39 @@ class CachedRequest(Request):
         self._add_defaults()
         try:
             filename = self._cachefile_path()
-            with open(filename, 'rb') as f:
+            with filename.open('rb') as f:
                 uniquedescr, self._data, self._cachetime = pickle.load(f)
+
             if uniquedescr != self._uniquedescriptionstr():
                 raise RuntimeError('Expected unique description for the cache '
                                    'entry is different from file entry.')
+
             if self._expired(self._cachetime):
                 self._data = None
                 return False
-            pywikibot.debug('{}: cache hit ({}) for API request: {}'
-                            .format(self.__class__.__name__, filename,
-                                    uniquedescr))
-            return True
+
+            pywikibot.debug(
+                f'{type(self).__name__}: cache ({filename.parent}) hit\n'
+                f'{filename.name}, API request:\n{uniquedescr}')
+
         except OSError:
-            # file not found
-            return False
+            pass  # file not found
         except Exception as e:
-            pywikibot.output('Could not load cache: {!r}'.format(e))
-            return False
+            pywikibot.info(f'Could not load cache: {e!r}')
+        else:
+            return True
+
+        return False
 
     def _write_cache(self, data) -> None:
         """Write data to self._cachefile_path()."""
         data = (self._uniquedescriptionstr(), data, datetime.datetime.utcnow())
-        with open(self._cachefile_path(), 'wb') as f:
+        path = self._cachefile_path()
+        with suppress(OSError), path.open('wb') as f:
             pickle.dump(data, f, protocol=config.pickle_protocol)
+            return
+        # delete invalid cache entry
+        path.unlink()
 
     def submit(self):
         """Submit cached request."""

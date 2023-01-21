@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """API test module."""
 #
-# (C) Pywikibot team, 2007-2022
+# (C) Pywikibot team, 2007-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -22,6 +22,7 @@ from tests.aspects import (
     DefaultDrySiteTestCase,
     DefaultSiteTestCase,
     TestCase,
+    require_version,
 )
 from tests.utils import FakeLoginManager
 
@@ -64,7 +65,7 @@ class TestDryApiFunctions(DefaultDrySiteTestCase):
 
     @suppress_warnings(
         'Instead of using kwargs |Both kwargs and parameters are set',
-        FutureWarning)
+        DeprecationWarning)
     def test_mixed_mode(self):
         """Test if parameters is used with kwargs."""
         req1 = api.Request(site=self.site, action='test', parameters='foo')
@@ -292,13 +293,10 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertIn('query+revisions', pi.prefix_map)
 
+    @require_version('>=1.25wmf4', 'support the new paraminfo api')
     def test_new_mode(self):
         """Test the new modules-only mode explicitly."""
         site = self.get_site()
-        if site.mw_version < '1.25wmf4':
-            self.skipTest(
-                "version {} doesn't support the new paraminfo api"
-                .format(site.mw_version))
         pi = api.ParamInfo(site, modules_only_mode=True)
         pi.fetch(['info'])
         self.assertIn('query+info', pi._paraminfo)
@@ -848,15 +846,15 @@ class TestLazyLoginNotExistUsername(TestLazyLoginBase):
     def setUp(self):
         """Patch the LoginManager to avoid UI interaction."""
         super().setUp()
-        self.orig_login_manager = pywikibot.data.api.LoginManager
-        pywikibot.data.api.LoginManager = FakeLoginManager
+        self.orig_login_manager = pywikibot.login.ClientLoginManager
+        pywikibot.login.ClientLoginManager = FakeLoginManager
 
     def tearDown(self):
         """Restore the original LoginManager."""
-        pywikibot.data.api.LoginManager = self.orig_login_manager
+        pywikibot.login.ClientLoginManager = self.orig_login_manager
         super().tearDown()
 
-    @patch.object(pywikibot, 'output')
+    @patch.object(pywikibot, 'info')
     @patch.object(pywikibot, 'warning')
     @patch.object(pywikibot, 'error')
     def test_access_denied_notexist_username(self, error, warning, output):
@@ -1004,7 +1002,7 @@ class TestLagpattern(DefaultSiteTestCase):
         for info, time in patterns.items():
             lag = api._requests.lagpattern.search(info)
             self.assertIsNotNone(lag)
-            self.assertEqual(float(lag.group('lag')), time)
+            self.assertEqual(float(lag['lag']), time)
 
 
 if __name__ == '__main__':  # pragma: no cover

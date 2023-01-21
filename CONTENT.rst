@@ -24,7 +24,7 @@ The contents of the package
     +---------------------------+-----------------------------------------------------------+
     | MANIFEST.in               | Setup file for package data                               |
     +---------------------------+-----------------------------------------------------------+
-    | pwb.py                    | Code entry wrapper script (directory mode only)           |
+    | pwb.py                    | Caller script for pwb wrapper script                      |
     +---------------------------+-----------------------------------------------------------+
     | README.rst                | Short info string used by Pywikibot Nightlies             |
     +---------------------------+-----------------------------------------------------------+

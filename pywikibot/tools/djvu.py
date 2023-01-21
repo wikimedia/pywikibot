@@ -32,11 +32,11 @@ def _call_cmd(args, lib: str = 'djvulibre') -> tuple:
     stdoutdata, stderrdata = dp.communicate()
 
     if dp.returncode != 0:
-        pywikibot.error('{} error; {}'.format(lib, cmd))
+        pywikibot.error(f'{lib} error; {cmd}')
         pywikibot.error(str(stderrdata))
         return (False, stdoutdata)
 
-    pywikibot.log('SUCCESS: {} (PID: {})'.format(cmd, dp.pid))
+    pywikibot.log(f'SUCCESS: {cmd} (PID: {dp.pid})')
 
     return (True, stdoutdata)
 
@@ -81,7 +81,7 @@ class DjVuFile:
 
     def __str__(self) -> str:
         """Return a string representation."""
-        return "{}('{}')".format(self.__class__.__name__, self._filename)
+        return f"{self.__class__.__name__}('{self._filename}')"
 
     def check_cache(fn):
         """Decorator to check if cache shall be cleared."""
@@ -92,8 +92,7 @@ class DjVuFile:
             if force:
                 for el in cache:
                     obj.__dict__.pop(el, None)
-            _res = fn(obj, *args, **kwargs)
-            return _res
+            return fn(obj, *args, **kwargs)
         return wrapper
 
     def check_page_number(fn):
@@ -108,8 +107,7 @@ class DjVuFile:
                 raise ValueError('Page {} not in file {} [{}-{}]'
                                  .format(int(n), obj.file, int(n),
                                          int(obj.number_of_images())))
-            _res = fn(obj, *args, **kwargs)
-            return _res
+            return fn(obj, *args, **kwargs)
         return wrapper
 
     @check_cache
@@ -160,7 +158,7 @@ class DjVuFile:
                 if 'FORM:DJVU' in line:
                     m = self._pat_form.search(line)
                     if m:
-                        key, id = int(m.group('n')), m.group('id')
+                        key, id = int(m['n']), m['id']
                     else:
                         # If djvu doc has only one page,
                         # FORM:DJVU line in djvudump has no id
@@ -169,7 +167,7 @@ class DjVuFile:
                 if 'INFO' in line:
                     m = self._pat_info.search(line)
                     if m:
-                        size, dpi = m.group('size'), int(m.group('dpi'))
+                        size, dpi = m['size'], int(m['dpi'])
                     else:
                         size, dpi = None, None
                 else:
@@ -227,7 +225,7 @@ class DjVuFile:
         if not self.has_text(force=force):
             raise ValueError('Djvu file {} has no text layer.'
                              .format(self.file))
-        res, stdoutdata = _call_cmd(['djvutxt', '--page={}'.format(int(n)),
+        res, stdoutdata = _call_cmd(['djvutxt', f'--page={n}',
                                      self.file])
         if not res:
             return False
@@ -258,7 +256,7 @@ class DjVuFile:
             return False
 
         # Convert white_page to djvu.
-        res, data = _call_cmd(['c44', white_ppm, '-dpi', dpi])
+        res, data = _call_cmd(['c44', white_ppm, '-dpi', str(dpi)])
         os.unlink(white_ppm)  # rm white_page.ppm before returning.
         if not res:
             return False
@@ -266,12 +264,12 @@ class DjVuFile:
         # Delete page n.
         # Get ref page info for later checks.
         info_ref_page = self.page_info(ref_page)
-        res, data = _call_cmd(['djvm', '-d', self.file, n])
+        res, data = _call_cmd(['djvm', '-d', self.file, str(n)])
         if not res:
             return False
 
         # Insert new page
-        res, data = _call_cmd(['djvm', '-i', self.file, white_djvu, n])
+        res, data = _call_cmd(['djvm', '-i', self.file, white_djvu, str(n)])
         os.unlink(white_djvu)  # rm white_page.djvu before returning.
         if not res:
             return False
@@ -300,7 +298,7 @@ class DjVuFile:
         # Delete page n.
         # Get ref page info for later checks.
         info_ref_page = self.page_info(ref_page)
-        res, _ = _call_cmd(['djvm', '-d', self.file, n])
+        res, _ = _call_cmd(['djvm', '-d', self.file, str(n)])
         if not res:
             return False
 

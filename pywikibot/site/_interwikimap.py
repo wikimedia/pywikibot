@@ -71,7 +71,7 @@ class _InterwikiMap:
         :raises TypeError: Site for the prefix is of wrong type
         """
         if prefix not in self._iw_sites:
-            raise KeyError("'{}' is not an interwiki prefix.".format(prefix))
+            raise KeyError(f"'{prefix}' is not an interwiki prefix.")
         if isinstance(self._iw_sites[prefix].site, pywikibot.site.BaseSite):
             return self._iw_sites[prefix]
         if isinstance(self._iw_sites[prefix].site, Exception):

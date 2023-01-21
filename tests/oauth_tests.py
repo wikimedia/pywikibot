@@ -26,9 +26,7 @@ class OAuthSiteTestCase(TestCase):
 
     def _get_oauth_tokens(self):
         """Get valid OAuth tokens from environment variables."""
-        tokens_env = 'OAUTH_TOKENS_' + self.family.upper()
-        tokens = os.environ.get(tokens_env + '_' + self.code.upper())
-        tokens = tokens or os.environ.get(tokens_env)
+        tokens = os.environ.get('PYWIKIBOT_TEST_OAUTH')
         return tuple(tokens.split(':')) if tokens is not None else None
 
     def setUp(self):
@@ -45,12 +43,7 @@ class OAuthSiteTestCase(TestCase):
         self.access_token = tokens[2:]
 
 
-class DefaultOAuthSiteTestCase(DefaultSiteTestCase, OAuthSiteTestCase):
-
-    """Default OAuth site test."""
-
-
-class TestOauthLoginManger(DefaultOAuthSiteTestCase):
+class TestOauthLoginManger(DefaultSiteTestCase, OAuthSiteTestCase):
 
     """Test OAuth login manager."""
 

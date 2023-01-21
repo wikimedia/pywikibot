@@ -385,7 +385,7 @@ def correctcap(link, text: str) -> str:
     """
     linkupper = link.title()
     linklower = first_lower(linkupper)
-    if '[[{}]]'.format(linklower) in text or '[[{}|'.format(linklower) in text:
+    if f'[[{linklower}]]' in text or f'[[{linklower}|' in text:
         return linklower
     return linkupper
 
@@ -417,7 +417,7 @@ class ReferringPageGeneratorWithIgnore:
         refs = list(self.page.getReferences(with_template_inclusion=False,
                                             namespaces=0 if self.main_only
                                             else None))
-        pywikibot.output('Found {} references.'.format(len(refs)))
+        pywikibot.info(f'Found {len(refs)} references.')
         # Remove ignorables
         site = self.page.site
         if site.family.name in ignore_title \
@@ -430,10 +430,10 @@ class ReferringPageGeneratorWithIgnore:
                     elif self.primaryIgnoreManager.isIgnored(refs[i]):
                         del refs[i]
         if len(refs) < self.minimum:
-            pywikibot.output('Found only {} pages to work on; skipping.'
-                             .format(len(refs)))
+            pywikibot.info('Found only {} pages to work on; skipping.'
+                           .format(len(refs)))
             return
-        pywikibot.output('Will work on {} pages.'.format(len(refs)))
+        pywikibot.info(f'Will work on {len(refs)} pages.')
         yield from refs
 
 
@@ -662,8 +662,8 @@ class DisambiguationRobot(SingleSiteBot):
         for i, arg in enumerate(args):
             key = keys[i]
             issue_deprecation_warning(
-                'Positional argument {} ({})'.format(i + 1, arg),
-                'keyword argument "{}={}"'.format(key, arg),
+                f'Positional argument {i + 1} ({arg})',
+                f'keyword argument "{key}={arg}"',
                 since='6.0.0')
             if key in kwargs:
                 pywikibot.warning('{!r} is given as keyword argument {!r} '
@@ -677,7 +677,7 @@ class DisambiguationRobot(SingleSiteBot):
             if key in keymap:
                 newkey = keymap[key]
                 issue_deprecation_warning(
-                    '{!r} argument of {}'.format(key, self.__class__.__name__),
+                    f'{key!r} argument of {self.__class__.__name__}',
                     repr(newkey), since='6.0.0')
                 kwargs[newkey] = kwargs.pop(key)
 
@@ -762,7 +762,7 @@ DisambiguationRobot""".format(options=added_keys,
         for line in page.text.splitlines():
             found = reg.match(line)
             if found:
-                yield found.group(1)
+                yield found[1]
 
     def firstize(self, page, links) -> List[pywikibot.Page]:
         """Call firstlinks and remove extra links.
@@ -803,7 +803,7 @@ DisambiguationRobot""".format(options=added_keys,
                 nochange = False
 
         if nochange:
-            pywikibot.output('No changes necessary in ' + ref_page.title())
+            pywikibot.info('No changes necessary in ' + ref_page.title())
         return True
 
     def treat_disamb_only(self, ref_page, disamb_page) -> str:
@@ -827,8 +827,8 @@ DisambiguationRobot""".format(options=added_keys,
         try:
             text = ref_page.get()
         except IsRedirectPageError:
-            pywikibot.output('{} is a redirect to {}'
-                             .format(ref_page.title(), disamb_page.title()))
+            pywikibot.info('{} is a redirect to {}'
+                           .format(ref_page.title(), disamb_page.title()))
             if disamb_page.isRedirectPage():
                 target = self.opt.pos[0]
                 if pywikibot.input_yn(
@@ -841,8 +841,7 @@ DisambiguationRobot""".format(options=added_keys,
                         ref_page.put(redir_text, summary=self.summary,
                                      asynchronous=True)
                     except PageSaveRelatedError as error:
-                        pywikibot.output('Page not saved: {}'
-                                         .format(error.args))
+                        pywikibot.info(f'Page not saved: {error.args}')
             else:
                 choice = pywikibot.input_choice(
                     'Do you want to work on pages linking to {}?'
@@ -861,13 +860,13 @@ DisambiguationRobot""".format(options=added_keys,
                     text = ref_page.get(get_redirect=True)
                     include = 'redirect'
         except NoPageError:
-            pywikibot.output(
+            pywikibot.info(
                 'Page [[{}]] does not seem to exist?! Skipping.'
                 .format(ref_page.title()))
         else:
             ignore_reason = self.checkContents(text)
             if ignore_reason:
-                pywikibot.output(
+                pywikibot.info(
                     '\n\nSkipping {} because it contains {}.\n\n'
                     .format(ref_page.title(), ignore_reason))
             else:
@@ -894,8 +893,7 @@ DisambiguationRobot""".format(options=added_keys,
                 # Ensure that next time around we will not find this same hit.
                 curpos = m.start() + 1
                 try:
-                    foundlink = pywikibot.Link(m.group('title'),
-                                               disamb_page.site)
+                    foundlink = pywikibot.Link(m['title'], disamb_page.site)
                     foundlink.parse()
                 except Error:
                     continue
@@ -912,7 +910,7 @@ DisambiguationRobot""".format(options=added_keys,
                 except Error:
                     # must be a broken link
                     pywikibot.log('Invalid link [[{}]] in page [[{}]]'
-                                  .format(m.group('title'), ref_page.title()))
+                                  .format(m['title'], ref_page.title()))
                     continue
 
                 n += 1
@@ -990,19 +988,19 @@ DisambiguationRobot""".format(options=added_keys,
 
                 # The link looks like this:
                 # [[page_title|link_text]]trailing_chars
-                page_title = m.group('title')
-                link_text = m.group('label')
+                page_title = m['title']
+                link_text = m['label']
 
                 if not link_text:
                     # or like this: [[page_title]]trailing_chars
                     link_text = page_title
 
-                if m.group('section') is None:
+                if m['section'] is None:
                     section = ''
                 else:
-                    section = m.group('section')
+                    section = m['section']
 
-                trailing_chars = m.group('linktrail')
+                trailing_chars = m['linktrail']
                 if trailing_chars:
                     link_text += trailing_chars
 
@@ -1059,7 +1057,7 @@ DisambiguationRobot""".format(options=added_keys,
                                                   trailing_chars)
                 elif replaceit or (new_page_title == link_text
                                    and not section):
-                    newlink = '[[{}]]'.format(new_page_title)
+                    newlink = f'[[{new_page_title}]]'
                 # check if we can create a link with trailing characters
                 # instead of a pipelink
                 elif (
@@ -1080,20 +1078,20 @@ DisambiguationRobot""".format(options=added_keys,
                 continue
 
             if text == original_text:
-                pywikibot.output('\nNo changes have been made:\n')
+                pywikibot.info('\nNo changes have been made:\n')
             else:
-                pywikibot.output('\nThe following changes have been made:\n')
+                pywikibot.info('\nThe following changes have been made:\n')
                 pywikibot.showDiff(original_text, text)
-                pywikibot.output()
+                pywikibot.info()
                 # save the page
                 self.setSummaryMessage(disamb_page, new_targets,
                                        unlink_counter, dn)
                 try:
                     ref_page.put(text, summary=self.summary, asynchronous=True)
                 except LockedPageError:
-                    pywikibot.output('Page not saved: page is locked')
+                    pywikibot.info('Page not saved: page is locked')
                 except PageSaveRelatedError as error:
-                    pywikibot.output('Page not saved: {}'.format(error.args))
+                    pywikibot.info(f'Page not saved: {error.args}')
 
         return 'done'
 
@@ -1126,8 +1124,8 @@ DisambiguationRobot""".format(options=added_keys,
                     links = [correctcap(link, page2.get())
                              for link in links]
                 except NoPageError:
-                    pywikibot.output('No page at {}, using redirect target.'
-                                     .format(disambTitle))
+                    pywikibot.info(
+                        f'No page at {disambTitle}, using redirect target.')
                     links = page.linkedPages()[:1]
                     links = [correctcap(link,
                                         page.get(get_redirect=True))
@@ -1138,7 +1136,7 @@ DisambiguationRobot""".format(options=added_keys,
                     target = page.getRedirectTarget().title()
                     self.opt.pos.append(target)
                 except NoPageError:
-                    pywikibot.output('The specified page was not found.')
+                    pywikibot.info('The specified page was not found.')
                     user_input = pywikibot.input("""\
 Please enter the name of the page where the redirect should have pointed at,
 or press enter to quit:""")
@@ -1147,7 +1145,7 @@ or press enter to quit:""")
                     else:
                         self.opt.pos.append(user_input)
                 except IsNotRedirectPageError:
-                    pywikibot.output(
+                    pywikibot.info(
                         'The specified page is not a redirect. Skipping.')
                     return False
         elif self.opt.just:
@@ -1166,7 +1164,7 @@ or press enter to quit:""")
                         links = [correctcap(link, page2.get())
                                  for link in links]
                     except NoPageError:
-                        pywikibot.output(
+                        pywikibot.info(
                             'Page does not exist; using first '
                             'link in page {}.'.format(page.title()))
                         links = page.linkedPages()[:1]
@@ -1180,10 +1178,10 @@ or press enter to quit:""")
                         links = [correctcap(link, page.get())
                                  for link in links]
                     except NoPageError:
-                        pywikibot.output('Page does not exist, skipping.')
+                        pywikibot.info('Page does not exist, skipping.')
                         return False
             except IsRedirectPageError:
-                pywikibot.output('Page is a redirect, skipping.')
+                pywikibot.info('Page is a redirect, skipping.')
                 return False
             self.opt.pos += links
         return True
@@ -1199,7 +1197,7 @@ or press enter to quit:""")
         new_targets = new_targets or []
         # make list of new targets
         comma = self.site.mediawiki_message('comma-separator')
-        targets = comma.join('[[{}]]'.format(page_title)
+        targets = comma.join(f'[[{page_title}]]'
                              for page_title in new_targets)
 
         if not targets:
@@ -1271,7 +1269,7 @@ or press enter to quit:""")
         if not self.findAlternatives(page):
             return
 
-        pywikibot.output('\nAlternatives for {}'.format(page))
+        pywikibot.info(f'\nAlternatives for {page}')
         self.makeAlternativesUnique()
         # sort possible choices
         if config.sort_ignore_case:
@@ -1347,7 +1345,7 @@ def main(*args: str) -> None:
                     pywikibot.Site().disambcategory(),
                     start=value, namespaces=[0])
             except NoPageError:
-                pywikibot.output(
+                pywikibot.info(
                     'Disambiguation category for your wiki is not known.')
                 raise
         else:

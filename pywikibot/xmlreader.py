@@ -11,15 +11,16 @@ XmlEntry objects which can be used by other bots.
    vulnerable XML attacks. *defusedxml* 0.7.1 or higher is recommended.
 """
 #
-# (C) Pywikibot team, 2005-2022
+# (C) Pywikibot team, 2005-2023
 #
 # Distributed under the terms of the MIT license.
 #
 import re
 from typing import Optional
 
+
 try:
-    from defusedxml.ElementTree import iterparse, ParseError
+    from defusedxml.ElementTree import ParseError, iterparse
 except ImportError:
     from xml.etree.ElementTree import iterparse, ParseError
 
@@ -40,10 +41,10 @@ def parseRestrictions(restrictions):
     moveRestriction = None
     editLockMatch = re.search('edit=([^:]*)', restrictions)
     if editLockMatch:
-        editRestriction = editLockMatch.group(1)
+        editRestriction = editLockMatch[1]
     moveLockMatch = re.search('move=([^:]*)', restrictions)
     if moveLockMatch:
-        moveRestriction = moveLockMatch.group(1)
+        moveRestriction = moveLockMatch[1]
     if restrictions == 'sysop':
         editRestriction = 'sysop'
         moveRestriction = 'sysop'

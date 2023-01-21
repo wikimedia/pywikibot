@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Tests for thanks-related code."""
 #
-# (C) Pywikibot team, 2016-2022
+# (C) Pywikibot team, 2016-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,7 +9,6 @@ import unittest
 from contextlib import suppress
 
 from pywikibot.flow import Topic
-
 from tests.aspects import TestCase
 
 

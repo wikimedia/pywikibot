@@ -56,19 +56,35 @@ class TestDeletionBotUser(ScriptMainTestCase):
 
     write = True
 
+    @classmethod
+    def setUpClass(cls):
+        """Set up test class."""
+        super().setUpClass()
+        cls.page = pywikibot.Page(cls.site, 'User:Unicodesnowman/DeleteMark')
+        if not cls.page.exists():
+            cls.save_page()  # pragma: no cover
+
+    @classmethod
+    def tearDownClass(cls):
+        """Tear down test class."""
+        cls.save_page()
+        super().tearDownClass()
+
+    @classmethod
+    def save_page(cls):
+        """Reset the test page content."""
+        cls.page.text = 'Pywikibot deletion test.'
+        cls.page.save('Pywikibot unit test', botflag=True)
+
     def test_delete_mark(self):
         """Test marking User:Unicodesnowman/DeleteMark for deletion."""
-        site = self.get_site()
-        p1 = pywikibot.Page(site, 'User:Unicodesnowman/DeleteMark')
-        if not p1.exists():
-            p1.text = 'foo'
-            p1.save('unit test', botflag=True)
         delete.main('-page:User:Unicodesnowman/DeleteMark', '-always',
-                    '-summary=pywikibot unit test. Do NOT actually delete.')
-        self.assertEqual(p1.get(force=True), '{{delete|1=pywikibot unit test. '
-                         'Do NOT actually delete.}}\nfoo')
-        p1.text = 'foo'
-        p1.save('unit test', botflag=True)
+                    '-summary:pywikibot unit test. Do NOT actually delete.')
+        text = self.page.get(force=True)
+        self.assertEqual(
+            text,
+            '{{delete|1=pywikibot unit test. Do NOT actually delete.}}\n'
+            'Pywikibot deletion test.')
 
 
 class TestDeletionBot(ScriptMainTestCase):

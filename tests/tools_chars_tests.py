@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Test tools.chars package."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2023
 #
 # Distributed under the terms of the MIT license.
 import unicodedata
@@ -37,8 +37,8 @@ class CharsTestCase(TestCase):
         for char in chars._category_cf:
             cat = unicodedata.category(char)
             if cat not in ('Cf', 'Cn'):
-                invalid[char] = cat
-        self.assertCountEqual(invalid.items(), [])
+                invalid[char] = cat  # pragma: no cover
+        self.assertIsEmpty(invalid.items())
 
 
 if __name__ == '__main__':  # pragma: no cover

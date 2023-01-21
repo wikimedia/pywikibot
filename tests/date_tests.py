@@ -13,7 +13,7 @@ from pywikibot import date
 from tests.aspects import MetaTestCaseClass, TestCase
 
 
-class TestDateMeta(MetaTestCaseClass):
+class DateTestMeta(MetaTestCaseClass):
 
     """Date test meta class."""
 
@@ -48,12 +48,12 @@ class TestDateMeta(MetaTestCaseClass):
 
         for formatname in date.formats:
             cls.add_method(dct, 'test_' + formatname, test_method(formatname),
-                           doc_suffix='using {} format'.format(formatname))
+                           doc_suffix=f'using {formatname} format')
 
         return super().__new__(cls, name, bases, dct)
 
 
-class TestDate(TestCase, metaclass=TestDateMeta):
+class TestDate(TestCase, metaclass=DateTestMeta):
 
     """Test cases for date library processed by unittest."""
 

@@ -1,11 +1,13 @@
 """Library to log the bot in to a wiki account."""
 #
-# (C) Pywikibot team, 2003-2022
+# (C) Pywikibot team, 2003-2023
 #
 # Distributed under the terms of the MIT license.
 #
 import codecs
+import datetime
 import os
+import re
 import webbrowser
 from enum import IntEnum
 from typing import Any, Optional
@@ -16,7 +18,7 @@ from pywikibot import __url__, config
 from pywikibot.backports import Dict, Tuple
 from pywikibot.comms import http
 from pywikibot.exceptions import APIError, NoUsernameError
-from pywikibot.tools import file_mode_checker, normalize_username
+from pywikibot.tools import deprecated, file_mode_checker, normalize_username
 
 
 try:
@@ -67,7 +69,7 @@ class LoginStatus(IntEnum):
 
     def __repr__(self) -> str:
         """Return internal representation."""
-        return 'LoginStatus({})'.format(self)
+        return f'LoginStatus({self})'
 
 
 class LoginManager:
@@ -131,7 +133,7 @@ class LoginManager:
 
         try:
             data = self.site.allusers(start=main_username, total=1)
-            user = next(data)
+            user = next(data, {'name': None})
         except APIError as e:
             if e.code == 'readapidenied':
                 pywikibot.warning("Could not check user '{}' exists on {}"
@@ -170,7 +172,7 @@ class LoginManager:
 
     def login_to_site(self) -> None:
         """Login to the site."""
-        # THIS IS OVERRIDDEN IN data/api.py
+        # This is overridden in ClientLoginManager
         raise NotImplementedError
 
     def storecookiedata(self) -> None:
@@ -178,30 +180,29 @@ class LoginManager:
         http.cookie_jar.save(ignore_discard=True)
 
     def readPassword(self) -> None:
-        """
-        Read passwords from a file.
+        """Read passwords from a file.
 
-        DO NOT FORGET TO REMOVE READ ACCESS FOR OTHER USERS!!!
-        Use chmod 600 password-file.
+        .. warning:: **Do not forget to remove read access for other
+           users!** Use chmod 600 for password-file.
 
         All lines below should be valid Python tuples in the form
-        (code, family, username, password),
-        (family, username, password) or
-        (username, password)
-        to set a default password for an username. The last matching entry will
-        be used, so default usernames should occur above specific usernames.
+        ``(code, family, username, password)``,
+        ``(family, username, password)`` or ``(username, password)`` to
+        set a default password for an username. The last matching entry
+        will be used, so default usernames should occur above specific
+        usernames.
 
-        For BotPasswords the password should be given as a BotPassword object.
+        .. note:: For BotPasswords the password should be given as a
+           :class:`BotPassword` object.
 
         The file must be either encoded in ASCII or UTF-8.
 
-        Example::
+        **Example**::
 
          ('my_username', 'my_default_password')
          ('wikipedia', 'my_wikipedia_user', 'my_wikipedia_pass')
          ('en', 'wikipedia', 'my_en_wikipedia_user', 'my_en_wikipedia_pass')
-         ('my_username', BotPassword(
-          'my_BotPassword_suffix', 'my_BotPassword_password'))
+         ('my_username', BotPassword('my_suffix', 'my_password'))
         """
         # Set path to password file relative to the user_config
         # but fall back on absolute path for backwards compatibility
@@ -215,6 +216,7 @@ class LoginManager:
 
         with codecs.open(password_file, encoding='utf-8') as f:
             lines = f.readlines()
+
         line_nr = len(lines) + 1
         for line in reversed(lines):
             line_nr -= 1
@@ -227,13 +229,13 @@ class LoginManager:
                 entry = None
 
             if not isinstance(entry, tuple):
-                warn('Invalid tuple in line {}'.format(line_nr),
+                warn(f'Invalid tuple in line {line_nr}',
                      _PasswordFileWarning)
                 continue
 
             if not 2 <= len(entry) <= 4:
-                warn('The length of tuple in line {} should be 2 to 4 ({} '
-                     'given)'.format(line_nr, entry), _PasswordFileWarning)
+                warn(f'The length of tuple in line {line_nr} should be 2 to 4 '
+                     f'({entry} given)', _PasswordFileWarning)
                 continue
 
             code, family, username, password = (
@@ -286,21 +288,22 @@ class LoginManager:
                 'shown):'.format(name=self.login_name, site=self.site),
                 password=True)
 
-        pywikibot.output('Logging in to {site} as {name}'
-                         .format(name=self.login_name, site=self.site))
+        pywikibot.info('Logging in to {site} as {name}'
+                       .format(name=self.login_name, site=self.site))
         try:
             self.login_to_site()
         except APIError as e:
             error_code = e.code
-            pywikibot.error('Login failed ({}).'.format(error_code))
+
+            # TODO: investigate other unhandled API codes
             if error_code in self._api_error:
-                error_msg = 'Username "{}" {} on {}'.format(
+                error_msg = 'Username {!r} {} on {}'.format(
                     self.login_name, self._api_error[error_code], self.site)
                 if error_code in ('Failed', 'FAIL'):
-                    error_msg += '\n.{}'.format(e.info)
+                    error_msg += f'.\n{e.info}'
                 raise NoUsernameError(error_msg)
 
-            # TODO: investigate other unhandled API codes (bug T75539)
+            pywikibot.error(f'Login failed ({error_code}).')
             if retry:
                 self.password = None
                 return self.login(retry=False)
@@ -311,6 +314,164 @@ class LoginManager:
             return True
 
         return False
+
+
+class ClientLoginManager(LoginManager):
+
+    """Supply login_to_site method to use API interface.
+
+    .. versionchanged:: 8.0
+       2FA login was enabled. LoginManager was moved from :mod:`data.api`
+       to :mod:`login` module and renamed to *ClientLoginManager*.
+    """
+
+    # API login parameters mapping
+    mapping = {
+        'user': ('lgname', 'username'),
+        'password': ('lgpassword', 'password'),
+        'ldap': ('lgdomain', 'domain'),
+        'token': ('lgtoken', 'logintoken'),
+        'result': ('result', 'status'),
+        'success': ('Success', 'PASS'),
+        'fail': ('Failed', 'FAIL'),
+        'reason': ('reason', 'message')
+    }
+
+    def keyword(self, key):
+        """Get API keyword from mapping."""
+        return self.mapping[key][self.action != 'login']
+
+    def _login_parameters(self, *, botpassword: bool = False
+                          ) -> Dict[str, str]:
+        """Return login parameters."""
+        if botpassword:
+            self.action = 'login'
+        else:
+            token = self.site.tokens['login']
+            self.action = 'clientlogin'
+
+        # prepare default login parameters
+        parameters = {'action': self.action,
+                      self.keyword('user'): self.login_name,
+                      self.keyword('password'): self.password}
+
+        if self.action == 'clientlogin':
+            # clientlogin requires non-empty loginreturnurl
+            parameters['loginreturnurl'] = 'https://example.com'
+            parameters['rememberMe'] = '1'
+            parameters['logintoken'] = token
+
+        if self.site.family.ldapDomain:
+            parameters[self.keyword('ldap')] = self.site.family.ldapDomain
+
+        return parameters
+
+    def login_to_site(self) -> None:
+        """Login to the site.
+
+        Note, this doesn't do anything with cookies. The http module
+        takes care of all the cookie stuff. Throws exception on failure.
+
+        .. versionchanged:: 8.0
+           2FA login was enabled.
+        """
+        if hasattr(self, '_waituntil') \
+           and datetime.datetime.now() < self._waituntil:
+            diff = self._waituntil - datetime.datetime.now()
+            pywikibot.warning(
+                'Too many tries, waiting {} seconds before retrying.'
+                .format(diff.seconds))
+            pywikibot.sleep(diff.seconds)
+
+        self.site._loginstatus = LoginStatus.IN_PROGRESS
+
+        # Bot passwords username contains @,
+        # otherwise @ is not allowed in usernames.
+        # @ in bot password is deprecated,
+        # but we don't want to break bots using it.
+        parameters = self._login_parameters(
+            botpassword='@' in self.login_name or '@' in self.password)
+
+        # base login request
+        login_request = self.site._request(use_get=False,
+                                           parameters=parameters)
+        while True:
+            # try to login
+            try:
+                login_result = login_request.submit()
+            except pywikibot.exceptions.APIError as e:  # pragma: no cover
+                login_result = {'error': e.__dict__}
+
+            # clientlogin response can be clientlogin or error
+            if self.action in login_result:
+                response = login_result[self.action]
+                result_key = self.keyword('result')
+            elif 'error' in login_result:
+                response = login_result['error']
+                result_key = 'code'
+            else:
+                raise RuntimeError('Unexpected API login response key.')
+
+            status = response[result_key]
+            fail_reason = response.get(self.keyword('reason'), '')
+            if status == self.keyword('success'):
+                return
+
+            if status in ('NeedToken', 'WrongToken', 'badtoken'):
+                # if incorrect login token was used,
+                # force relogin and generate fresh one
+                pywikibot.error('Received incorrect login token. '
+                                'Forcing re-login.')
+                # invalidate superior wiki cookies (T224712)
+                pywikibot.data.api._invalidate_superior_cookies(
+                    self.site.family)
+                self.site.tokens.clear()
+                login_request[
+                    self.keyword('token')] = self.site.tokens['login']
+                continue
+
+            if status == 'UI':  # pragma: no cover
+                oathtoken = pywikibot.input(response['message'], password=True)
+                login_request['OATHToken'] = oathtoken
+                login_request['logincontinue'] = True
+                del login_request['username']
+                del login_request['password']
+                del login_request['rememberMe']
+                continue
+
+            # messagecode was introduced with 1.29.0-wmf.14
+            # but older wikis are still supported
+            login_throttled = response.get('messagecode') == 'login-throttled'
+
+            if (status == 'Throttled' or status == self.keyword('fail')
+                    and (login_throttled or 'wait' in fail_reason)):
+                wait = response.get('wait')
+                if wait:
+                    delta = datetime.timedelta(seconds=int(wait))
+                else:
+                    match = re.search(r'(\d+) (seconds|minutes)', fail_reason)
+                    if match:
+                        delta = datetime.timedelta(**{match[2]: int(match[1])})
+                    else:
+                        delta = datetime.timedelta()
+                self._waituntil = datetime.datetime.now() + delta
+
+            break
+
+        if 'error' in login_result:
+            raise pywikibot.exceptions.APIError(**response)
+
+        raise pywikibot.exceptions.APIError(code=status, info=fail_reason)
+
+    @deprecated("site.tokens['login']", since='8.0.0')
+    def get_login_token(self) -> Optional[str]:
+        """Fetch login token for MediaWiki 1.27+.
+
+        .. deprecated:: 8.0
+
+        :return: login token
+        """
+        return self.site.tokens['login']
 
 
 class BotPassword:
@@ -341,7 +502,7 @@ class BotPassword:
 
         :param user: username (without suffix)
         """
-        return '{}@{}'.format(username, self.suffix)
+        return f'{username}@{self.suffix}'
 
 
 class OauthLoginManager(LoginManager):
@@ -368,7 +529,7 @@ class OauthLoginManager(LoginManager):
         :raises ImportError: mwoauth isn't installed
         """
         if isinstance(mwoauth, ImportError):
-            raise ImportError('mwoauth is not installed: {}.'.format(mwoauth))
+            raise ImportError(f'mwoauth is not installed: {mwoauth}.')
         assert password is not None and user is not None
         super().__init__(password=None, site=site, user=None)
         if self.password:
@@ -377,7 +538,7 @@ class OauthLoginManager(LoginManager):
                            'should be removed if OAuth enabled.'
                            .format(login=self))
         self._consumer_token = (user, password)
-        self._access_token = None  # type: Optional[Tuple[str, str]]
+        self._access_token: Optional[Tuple[str, str]] = None
 
     def login(self, retry: bool = False, force: bool = False) -> bool:
         """
@@ -390,7 +551,7 @@ class OauthLoginManager(LoginManager):
         :param force: force to re-authenticate
         """
         if self.access_token is None or force:
-            pywikibot.output(
+            pywikibot.info(
                 'Logging in to {site} via OAuth consumer {key}'
                 .format(key=self.consumer_token[0], site=self.site))
             consumer_token = mwoauth.ConsumerToken(*self.consumer_token)
@@ -413,9 +574,8 @@ class OauthLoginManager(LoginManager):
                     return self.login(retry=True, force=force)
                 return False
         else:
-            pywikibot.output('Logged in to {site} via consumer {key}'
-                             .format(key=self.consumer_token[0],
-                                     site=self.site))
+            pywikibot.info('Logged in to {site} via consumer {key}'
+                           .format(key=self.consumer_token[0], site=self.site))
             return True
 
     @property

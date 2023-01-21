@@ -28,7 +28,7 @@ from datetime import datetime
 from typing import Optional, Union
 
 import pywikibot
-from pywikibot.backports import List, Set
+from pywikibot.backports import List, Set, removeprefix
 from pywikibot.family import Family
 
 
@@ -51,7 +51,7 @@ exceptions = {
 def preload_family(family: str, executor: ThreadPoolExecutor) -> None:
     """Preload all sites of a single family file."""
     msg = 'Preloading sites of {} family{}'
-    pywikibot.output(msg.format(family, '...'))
+    pywikibot.info(msg.format(family, '...'))
 
     codes = Family.load(family).languages_by_size
     for code in exceptions.get(family, []):
@@ -66,7 +66,7 @@ def preload_family(family: str, executor: ThreadPoolExecutor) -> None:
             # page title does not care
             futures.add(executor.submit(pywikibot.Page, site, 'Main page'))
     wait(futures)
-    pywikibot.output(msg.format(family, ' completed.'))
+    pywikibot.info(msg.format(family, ' completed.'))
 
 
 def preload_families(families: Union[List[str], Set[str]],
@@ -85,13 +85,13 @@ def preload_families(families: Union[List[str], Set[str]],
     # to allow adding futures in preload_family the workers must be one
     # more than families are handled
     worker = max(len(families) * 2, worker)
-    pywikibot.output('Using {} workers to process {} families'
-                     .format(worker, len(families)))
+    pywikibot.info('Using {} workers to process {} families'
+                   .format(worker, len(families)))
     with ThreadPoolExecutor(worker) as executor:
         futures = {executor.submit(preload_family, family, executor)
                    for family in families}
         wait(futures)
-    pywikibot.output('Loading time used: {}'.format(datetime.now() - start))
+    pywikibot.info(f'Loading time used: {datetime.now() - start}')
 
 
 if __name__ == '__main__':
@@ -100,6 +100,6 @@ if __name__ == '__main__':
     for arg in pywikibot.handle_args():
         if arg in families_list:
             fam.add(arg)
-        elif arg.startswith('-worker'):
-            worker = int(arg.partition(':')[2])
+        elif arg.startswith('-worker:'):
+            worker = int(removeprefix(arg, '-worker:'))
     preload_families(fam or families_list, worker)

@@ -79,8 +79,7 @@ class MovePagesBot(CurrentPageBot):
         msg = self.opt.summary
         if not msg:
             msg = i18n.twtranslate(page.site, 'movepages-moving')
-        pywikibot.output('Moving page {} to [[{}]]'
-                         .format(page, new_page_tite))
+        pywikibot.info(f'Moving page {page} to [[{new_page_tite}]]')
         try:
             page.move(new_page_tite, reason=msg,
                       movetalk=self.opt.movetalkpage,
@@ -111,9 +110,9 @@ class MovePagesBot(CurrentPageBot):
         def create_new_title_append(start, end, page, namespace=None):
             """Append helper function."""
             page_title = page.title(with_ns=False)
-            new_page_tite = '{}{}{}'.format(start, page_title, end)
+            new_page_tite = f'{start}{page_title}{end}'
             if namespace is not None:
-                new_page_tite = '{}:{}'.format(namespace, new_page_tite)
+                new_page_tite = f'{namespace}:{new_page_tite}'
             return new_page_tite
 
         def create_new_title_regex(regex, replacement, page, namespace=None):
@@ -121,7 +120,7 @@ class MovePagesBot(CurrentPageBot):
             page_title = page.title(with_ns=False)
             new_page_title = regex.sub(replacement, page_title)
             if namespace is not None:
-                new_page_title = '{}:{}'.format(namespace, new_page_title)
+                new_page_title = f'{namespace}:{new_page_title}'
             return new_page_title
 
         def manage_namespace(page):
@@ -170,7 +169,7 @@ class MovePagesBot(CurrentPageBot):
         def create_new_title_prefix(prefix, page):
             """Replace prefix helper function."""
             page_title = page.title(with_ns=False)
-            return '{}{}'.format(prefix, page_title)
+            return f'{prefix}{page_title}'
 
         if prefix:
             handler = partial(create_new_title_prefix, prefix)
@@ -247,21 +246,21 @@ def main(*args: str) -> None:
             options[opt.replace('no', 'move', 1)] = False
         elif opt == 'from':
             if old_name:
-                pywikibot.warning('-from:{} without -to:'.format(old_name))
+                pywikibot.warning(f'-from:{old_name} without -to:')
             old_name = value
         elif opt == 'to':
             if old_name:
                 from_to_pairs.append([old_name, value])
                 old_name = None
             else:
-                pywikibot.warning('{} without -from'.format(arg))
+                pywikibot.warning(f'{arg} without -from')
         elif opt == 'prefix':
             options[opt] = value or pywikibot.input('Enter the prefix:')
         elif opt == 'summary':
             options[opt] = value or pywikibot.input('Enter the summary:')
 
     if old_name:
-        pywikibot.warning('-from:{} without -to:'.format(old_name))
+        pywikibot.warning(f'-from:{old_name} without -to:')
 
     site = pywikibot.Site()
 

@@ -42,7 +42,7 @@ from datetime import timedelta
 
 import pywikibot
 from pywikibot import config, i18n, pagegenerators
-from pywikibot.backports import Tuple
+from pywikibot.backports import Tuple, removeprefix
 from pywikibot.bot import ConfigParserBot, SingleSiteBot
 from pywikibot.exceptions import CircularRedirectError, Error, NoPageError
 
@@ -167,17 +167,14 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
                                                  summary=summary)
 
         if found:
-            pywikibot.output('{}: {} found, {} moved'
-                             .format(old_cat, found, moved))
+            pywikibot.info(f'{old_cat}: {found} found, {moved} moved')
         return found, moved
 
     def ready_to_edit(self, cat):
         """Return True if cat not edited during cooldown period, else False."""
         today = pywikibot.Timestamp.now()
         deadline = today + timedelta(days=-self.opt.delay)
-        if cat.editTime() is None:
-            raise RuntimeError
-        return deadline > cat.editTime()
+        return deadline > cat.latest_revision.timestamp
 
     def get_log_text(self):
         """Rotate log text and return the most recent text."""
@@ -218,7 +215,7 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
         Check categories that are not already marked with an appropriate
         softredirect template.
         """
-        pywikibot.output('Checking hard-redirect category pages.')
+        pywikibot.info('Checking hard-redirect category pages.')
         comment = i18n.twtranslate(self.site, self.redir_comment)
 
         # generator yields all hard redirect pages in namespace 14
@@ -289,7 +286,7 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
         localtime = time.localtime()
         today = '{:04d}-{:02d}-{:02d}'.format(*localtime[:3])
         self.datafile = pywikibot.config.datafilepath(
-            '{}-catmovebot-data'.format(self.site.dbName()))
+            f'{self.site.dbName()}-catmovebot-data')
         try:
             with open(self.datafile, 'rb') as inp:
                 self.record = pickle.load(inp)
@@ -321,8 +318,8 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
         nonemptypages = []
         redircat = self.cat
 
-        pywikibot.output('\nChecking {} category redirect pages'
-                         .format(redircat.categoryinfo['subcats']))
+        pywikibot.info('\nChecking {} category redirect pages'
+                       .format(redircat.categoryinfo['subcats']))
         catpages = set()
         for cat in redircat.subcategories():
             catpages.add(cat)
@@ -357,31 +354,37 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
                                   self.catprefix + cat_name) not in catpages:
                 del self.record[cat_name]
 
-        pywikibot.output('\nMoving pages out of {} redirected categories.'
-                         .format(len(nonemptypages)))
+        pywikibot.info('\nMoving pages out of {} redirected categories.'
+                       .format(len(nonemptypages)))
 
         for cat in pagegenerators.PreloadingGenerator(nonemptypages):
+            i18n_param = {'oldcat': cat.title(as_link=True, textlink=True)}
+
             try:
                 if not cat.isCategoryRedirect():
                     message = i18n.twtranslate(
-                        self.site, 'category_redirect-log-false-positive',
-                        {'oldcat': cat.title(as_link=True, textlink=True)})
+                        self.site,
+                        'category_redirect-log-false-positive',
+                        i18n_param
+                    )
                     self.log_text.append(message)
                     continue
             except Error:
-                message = i18n.twtranslate(
-                    self.site, 'category_redirect-log-not-loaded',
-                    {'oldcat': cat.title(as_link=True, textlink=True)})
+                message = i18n.twtranslate(self.site,
+                                           'category_redirect-log-not-loaded',
+                                           i18n_param)
                 self.log_text.append(message)
                 continue
+
             cat_title = cat.title(with_ns=False)
             if not self.ready_to_edit(cat):
                 counts[cat_title] = None
-                message = i18n.twtranslate(
-                    self.site, 'category_redirect-log-skipping',
-                    {'oldcat': cat.title(as_link=True, textlink=True)})
+                message = i18n.twtranslate(self.site,
+                                           'category_redirect-log-skipping',
+                                           i18n_param)
                 self.log_text.append(message)
                 continue
+
             dest = cat.getCategoryRedirectTarget()
             if not dest.exists():
                 message = i18n.twtranslate(
@@ -395,12 +398,13 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
                 with suppress(Exception):
                     cat.save()
                 continue
+
             if dest.isCategoryRedirect():
                 double = dest.getCategoryRedirectTarget()
                 if double in (dest, cat):
-                    message = i18n.twtranslate(
-                        self.site, 'category_redirect-log-loop',
-                        {'oldcat': dest.title(as_link=True, textlink=True)})
+                    message = i18n.twtranslate(self.site,
+                                               'category_redirect-log-loop',
+                                               i18n_param)
                     self.log_text.append(message)
                     # do a null edit on cat
                     with suppress(Exception):
@@ -421,7 +425,7 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
                     newtext = ('{{%(redirtemp)s|%(ncat)s}}'
                                % {'redirtemp': self.template_list[0],
                                   'ncat': double.title(with_ns=False)})
-                    newtext = newtext + oldtext.strip()
+                    newtext += oldtext.strip()
                     try:
                         cat.text = newtext
                         cat.save(i18n.twtranslate(self.site,
@@ -472,7 +476,7 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
         self.log_page.save(comment)
         if self.edit_requests:
             edit_request_page = pywikibot.Page(
-                self.site, 'User:{}/category edit requests'.format(self.user))
+                self.site, f'User:{self.user}/category edit requests')
             edit_request_page.text = (self.edit_request_text
                                       % {'itemlist': '\n' + '\n'.join(
                                           (self.edit_request_item % item)
@@ -491,8 +495,7 @@ def main(*args: str) -> None:
     options = {}
     for arg in pywikibot.handle_args(args):
         if arg.startswith('-delay:'):
-            pos = arg.find(':')
-            options[arg[1:pos]] = int(arg[pos + 1:])
+            options['delay'] = int(removeprefix(arg, '-delay:'))
         else:
             # generic handling of we have boolean options
             options[arg[1:]] = True

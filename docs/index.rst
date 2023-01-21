@@ -1,5 +1,6 @@
-Pywikibot Documentation
-=======================
+#######################
+Pywikibot documentation
+#######################
 
 Welcome! This is the documentation for Pywikibot |release|.
 
@@ -11,7 +12,8 @@ on many other MediaWiki wikis.
 The project started in 2003 and is currently on core version |version|.
 It features full API usage and is up-to-date with new MediaWiki features and
 a Pythonic package layout. But it also works with older installations of
-MediaWiki 1.23 or higher.
+MediaWiki 1.27 or higher. For older MediaWiki versions you have to use older
+Pywikibot releases; refer :manpage:`Compatibility`.
 
 Pywikibot supports Microsoft Windows, macOS and Linux when used with a
 compatible version of Python. It should also work on any other operating
@@ -19,8 +21,8 @@ system that has a compatible version of Python installed. To check
 whether you have Python installed and to find its version, just type
 ``python`` at the CMD or shell prompt.
 
-Python 3.5.3 or higher is currently required to run the bot, but Python 3.6
-or higher is recommended. Python 3.5 support will be dropped with Pywikibot 8.
+Python 3.6.1 or higher is currently required to run the bot, but Python 3.7
+or higher is recommended. Python 3.6 support will be dropped with Pywikibot 9.
 
 Pywikibot and this documentation are licensed under the
 :ref:`MIT license`;
@@ -28,20 +30,22 @@ manual pages on mediawiki.org are licensed under the `CC-BY-SA 3.0`_ license.
 
 .. seealso:: `Pywikibot Manual`_ at https://www.mediawiki.org
 
+**************************
+Framework modules overview
+**************************
 
-Framework Modules Overview
---------------------------
 .. image:: framework.png
    :alt: Framework modules dependency network
 
-
-For bot users:
---------------
+********
+Contents
+********
 
 .. toctree::
    :maxdepth: 1
+   :caption: User guide
 
-   installation
+   introduction
    utilities/scripts
    scripts/index
    global_options
@@ -49,33 +53,27 @@ For bot users:
    getting_help
 
 
-For bot developers:
--------------------
-
 .. toctree::
    :maxdepth: 1
+   :caption: Bot developer guide
 
    library_usage
    recipes
    api_ref/index
-
-For framework developers:
--------------------------
+   mwapi
 
 .. toctree::
    :maxdepth: 1
+   :caption: Pywikibot contributor guide
 
-   Utility Scripts Reference<utilities/scripts_ref>
+   utilities/scripts_ref
    scripts_ref/index
-   tests_ref/index
-   Maintenance Scripts<scripts_ref/scripts.maintenance>
    utilities/install
+   tests_ref/index
 
-
-Miscellaneous
--------------
 .. toctree::
    :maxdepth: 1
+   :caption: About
 
    glossary
    changelog

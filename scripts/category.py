@@ -10,9 +10,11 @@ where action can be one of these
 *add*
     mass-add a category to a list of pages.
 *remove*
-    remove category tag from all pages in a category.
+    remove category tag from all pages in a category. If a pagegenerators
+    option is given, the intersection with category pages is processed.
 *move*
-    move all pages in a category to another category.
+    move all pages in a category to another category. If a pagegenerators
+    option is given, the intersection with category pages is processed.
 *tidy*
     tidy up a category by moving its pages into subcategories.
 *tree*
@@ -87,10 +89,7 @@ Options for several actions:
                 Also, the category to make a list of in the listify option.
  -to:         - The category to move to (for the move option).
               - Also, the name of the list to make in the listify option.
-       NOTE: If the category names have spaces in them you may need to use
-       a special syntax in your shell so that the names aren't treated as
-       separate parameters. For instance, in BASH, use single quotes,
-       e.g. -from:'Polar bears'.
+
  -batch       - Don't prompt to delete emptied categories (do it
                 automatically).
  -summary:    - Pick a custom edit summary for the bot.
@@ -106,7 +105,13 @@ Options for several actions:
  -depth:      - The max depth limit beyond which no subcategories will be
                 listed.
 
-If action is "add", the following additional options are supported:
+.. note:: If the category names have spaces in them you may need to use
+   a special syntax in your shell so that the names aren't treated as
+   separate parameters. For instance, in BASH, use single quotes, e.g.
+   ``-from:'Polar bears'``.
+
+If action is "add", "move" or "remove, the following additional options are
+supported:
 
 &params;
 
@@ -126,6 +131,16 @@ Or to do it all from the command-line, use the following syntax:
     python pwb.py category move -from:US -to:"United States"
 
 This will move all pages in the category US to the category United States.
+
+A pagegenerators option can be given with ``move`` and ``remove`` action:
+
+    pwb category -site:wikipedia:en remove -from:Hydraulics -cat:Pneumatics
+
+The sample above would remove 'Hydraulics' category from all pages which
+are also in 'Pneumatics' category.
+
+.. versionchanged:: 8.0
+   :mod:`pagegenerators` are supported with "move" and "remove" action.
 """
 #
 # (C) Pywikibot team, 2004-2022
@@ -138,6 +153,7 @@ import os
 import pickle
 import re
 from contextlib import suppress
+from itertools import chain
 from operator import methodcaller
 from textwrap import fill
 from typing import Optional, Union
@@ -161,6 +177,7 @@ from pywikibot.exceptions import (
     PageSaveRelatedError,
 )
 from pywikibot.tools import open_archive
+from pywikibot.tools.itertools import intersect_generators
 
 
 # This is required for the text that is shown when you run this script
@@ -229,35 +246,30 @@ class CategoryPreprocess(BaseBot):
 
                 if self.create:
                     redir_target.text = ''
-                    pywikibot.output('Redirect target {} does not exist yet; '
-                                     'creating.'.format(
-                                         redir_target.title(as_link=True)))
+                    pywikibot.info(f'Redirect target {redir_target} does not '
+                                   f'exist yet; creating.')
                     return redir_target
 
                 if self.edit_redirects:
                     return page
 
-                pywikibot.warning(
-                    'Redirect target {} cannot be modified; skipping.'
-                    .format(redir_target))
+                pywikibot.warning(f'Redirect target {redir_target} cannot be '
+                                  f'modified; skipping.')
                 return None
 
             if self.edit_redirects:
                 return page
 
-            pywikibot.warning('Page {} is a redirect to {}; skipping.'
-                              .format(page.title(as_link=True),
-                                      redir_target.title(as_link=True)))
+            pywikibot.warning(
+                f'Page {page} is a redirect to {redir_target}; skipping.')
             return None
 
         if self.create:
             page.text = ''
-            pywikibot.output('Page {} does not exist yet; creating.'
-                             .format(page.title(as_link=True)))
+            pywikibot.info(f'Page {page} does not exist yet; creating.')
             return page
 
-        pywikibot.warning('Page {} does not exist; skipping.'
-                          .format(page.title(as_link=True)))
+        pywikibot.warning(f'Page {page} does not exist; skipping.')
         return None
 
     def determine_template_target(self, page) -> pywikibot.Page:
@@ -279,7 +291,7 @@ class CategoryPreprocess(BaseBot):
             self.includeonly = []
             return page
 
-        tmpl = []  # type: Sequence
+        tmpl: Sequence = []
         with suppress(KeyError):
             tmpl, _loc = moved_links[page.site.code]
 
@@ -339,8 +351,8 @@ class CategoryDatabase:
         if not self.is_loaded:
             try:
                 if config.verbose_output:
-                    pywikibot.output('Reading dump from '
-                                     + config.shortpath(self.filename))
+                    pywikibot.info('Reading dump from '
+                                   + config.shortpath(self.filename))
                 with open_archive(self.filename, 'rb') as f:
                     databases = pickle.load(f)
                 # keys are categories, values are 2-tuples with lists as
@@ -415,8 +427,8 @@ class CategoryDatabase:
         elif not os.path.isabs(filename):
             filename = config.datafilepath(filename)
         if self.is_loaded and (self.cat_content_db or self.superclass_db):
-            pywikibot.output('Dumping to {}, please wait...'
-                             .format(config.shortpath(filename)))
+            pywikibot.info('Dumping to {}, please wait...'
+                           .format(config.shortpath(filename)))
             databases = {
                 'cat_content_db': self.cat_content_db,
                 'superclass_db': self.superclass_db
@@ -428,8 +440,8 @@ class CategoryDatabase:
         else:
             with suppress(EnvironmentError):
                 os.remove(filename)
-                pywikibot.output('Database is empty. {} removed'
-                                 .format(config.shortpath(filename)))
+                pywikibot.info('Database is empty. {} removed'
+                               .format(config.shortpath(filename)))
 
 
 class CategoryAddBot(CategoryPreprocess):
@@ -470,7 +482,7 @@ class CategoryAddBot(CategoryPreprocess):
         brackets_regex = re.compile(r'(.*) \(.+?\)')
         match_object = brackets_regex.match(page_name)
         if match_object:
-            page_name = match_object.group(1)
+            page_name = match_object[1]
         split_string = page_name.rsplit(' ', 1)
         if len(split_string) > 1:
             # pull last part of the name to the beginning, and append the
@@ -494,22 +506,22 @@ class CategoryAddBot(CategoryPreprocess):
         old_text = text
         cats = textlib.getCategoryLinks(
             text, self.current_page.site, include=self.includeonly)
-        pywikibot.output('Current categories:')
+        pywikibot.info('Current categories:')
         for cat in cats:
-            pywikibot.output('* ' + cat.title())
+            pywikibot.info('* ' + cat.title())
         catpl = pywikibot.Category(self.current_page.site, self.newcat)
         if catpl in cats:
-            pywikibot.output('{} is already in {}.'
-                             .format(self.current_page.title(), catpl.title()))
+            pywikibot.info('{} is already in {}.'
+                           .format(self.current_page.title(), catpl.title()))
         else:
             if self.sort:
                 catpl = self.sorted_by_last_name(catpl, self.current_page)
-            pywikibot.output('Adding {}'.format(catpl.title(as_link=True)))
+            pywikibot.info(f'Adding {catpl.title(as_link=True)}')
             if page.namespace() == page.site.namespaces.TEMPLATE:
                 tagname = 'noinclude'
                 if self.includeonly == ['includeonly']:
                     tagname = 'includeonly'
-                tagnameregexp = re.compile(r'(.*)(<\/{}>)'.format(tagname),
+                tagnameregexp = re.compile(fr'(.*)(<\/{tagname}>)',
                                            re.I | re.DOTALL)
                 categorytitle = catpl.title(
                     as_link=True, allow_interwiki=False)
@@ -519,7 +531,7 @@ class CategoryAddBot(CategoryPreprocess):
                     # in the template page
                     text = textlib.replaceExcept(
                         text, tagnameregexp,
-                        r'\1{}\n\2'.format(categorytitle),
+                        fr'\1{categorytitle}\n\2',
                         ['comment', 'math', 'nowiki', 'pre',
                          'syntaxhighlight'],
                         site=self.current_page.site)
@@ -542,9 +554,7 @@ class CategoryAddBot(CategoryPreprocess):
                 self.userPut(self.current_page, old_text, text,
                              summary=comment)
             except PageSaveRelatedError as error:
-                pywikibot.output('Page {} not saved: {}'
-                                 .format(self.current_page.title(as_link=True),
-                                         error))
+                pywikibot.info(f'Page {self.current_page} not saved: {error}')
 
 
 class CategoryMoveRobot(CategoryPreprocess):
@@ -556,6 +566,9 @@ class CategoryMoveRobot(CategoryPreprocess):
     empty.
 
     Per default the operation applies to pages and subcategories.
+
+    .. versionadded:: 8.0
+       The ``generator`` parameter.
     """
 
     DELETION_COMMENT_AUTOMATIC = 0
@@ -571,13 +584,14 @@ class CategoryMoveRobot(CategoryPreprocess):
                  title_regex=None,
                  history: bool = False,
                  pagesonly: bool = False,
-                 deletion_comment: Union[int,
-                                         str] = DELETION_COMMENT_AUTOMATIC,
+                 deletion_comment: Union[
+                     int, str] = DELETION_COMMENT_AUTOMATIC,
                  move_comment=None,
                  wikibase: bool = True,
                  allow_split: bool = False,
                  move_together: bool = False,
-                 keep_sortkey=None) -> None:
+                 keep_sortkey=None,
+                 generator=None) -> None:
         """Store all given parameters in the objects attributes.
 
         :param oldcat: The move source.
@@ -610,7 +624,10 @@ class CategoryMoveRobot(CategoryPreprocess):
         :param move_together: If True moves the pages/subcategories only if
             page and talk page could be moved or both source page and target
             page don't exist.
+        :param generator: a generator from pagegenerators.GeneratorFactory.
+            If given an intersection to the oldcat category members is used.
         """
+        super().__init__()
         self.site = pywikibot.Site()
         self.can_move_cats = self.site.has_right('move-categorypages')
         self.noredirect = delete_oldcat \
@@ -620,7 +637,7 @@ class CategoryMoveRobot(CategoryPreprocess):
         self.oldtalk = self.oldcat.toggleTalkPage()
 
         if newcat:
-            self.newcat = self._makecat(newcat)  # type: Optional[pywikibot.Category]  # noqa: E501
+            self.newcat: Optional[pywikibot.Category] = self._makecat(newcat)  # noqa: E501
             self.newtalk = self.newcat.toggleTalkPage()
         else:
             self.newcat = None
@@ -639,6 +656,7 @@ class CategoryMoveRobot(CategoryPreprocess):
         self.allow_split = allow_split
         self.move_together = move_together
         self.keep_sortkey = keep_sortkey
+        self.generator = generator
 
         if not self.can_move_cats:
             repo = self.site.data_repository()
@@ -698,7 +716,13 @@ class CategoryMoveRobot(CategoryPreprocess):
         - _hist()
         - _change()
         - _delete()
+
+        .. versionchanged:: 8.0
+           if a page generator is given to the bot, the intersection
+           with :func:`pagegenerators.CategorizedPageGenerator` or
+           :func:`pagegenerators.SubCategoriesPageGenerator` is used.
         """
+        self._start_ts = pywikibot.Timestamp.now()
         # can_move_* determines if the page can be moved safely (target
         # doesn't exist but source does), move_items determines if the
         # items (pages/subcategories) of the category could be moved into
@@ -707,6 +731,7 @@ class CategoryMoveRobot(CategoryPreprocess):
             'category page', self.oldcat, self.newcat)
         can_move_talk = CategoryMoveRobot.check_move(
             'category talk page', self.oldtalk, self.newtalk)
+
         if not self.newcat:  # delete
             move_items = True
         else:
@@ -714,6 +739,7 @@ class CategoryMoveRobot(CategoryPreprocess):
             if not self.allow_split:
                 can_move_page = can_move_page and move_items
                 can_move_talk = can_move_talk and move_items
+
         if self.newcat and self.move_oldcat:
             if self.can_move_cats:
                 if can_move_page:
@@ -737,20 +763,35 @@ class CategoryMoveRobot(CategoryPreprocess):
                     self._movetalk()
                 if self.wikibase:
                     self._update_wikibase_item()
+
             if self.history and can_move_page:
                 self._hist()
 
         if move_items:
-            self._change(pagegenerators.CategorizedPageGenerator(self.oldcat))
+            gens = [pagegenerators.CategorizedPageGenerator(self.oldcat)]
             if not self.pagesonly:
-                self._change(
+                gens.append(
                     pagegenerators.SubCategoriesPageGenerator(self.oldcat))
+            gen = chain(*gens)
+
+            if self.generator:
+                pywikibot.info('Retrieving intersection of generators.')
+                # Allow duplicates if no subcategories are loaded to reduce
+                # memory usage. We can assume that there are no duplicates
+                # retrieved from CategorizedPageGenerator.
+                gen = intersect_generators(gen, self.generator,
+                                           allow_duplicates=self.pagesonly)
+            self._change(gen)
+
         else:
             pywikibot.log("Didn't move pages/subcategories, because the "
                           "category page hasn't been moved.")
+
         if self.oldcat.isEmptyCategory() and self.delete_oldcat \
            and (self.newcat and self.move_oldcat or not self.newcat):
             self._delete(can_move_page, can_move_talk)
+
+        self.exit()
 
     def _delete(self, moved_page, moved_talk) -> None:
         """Private function to delete the category page and its talk page.
@@ -767,9 +808,11 @@ class CategoryMoveRobot(CategoryPreprocess):
         if moved_page and self.oldcat.exists():
             self.oldcat.delete(self.deletion_comment, not self.batch,
                                mark=True)
+        self.counter['delete'] += 1
         if moved_talk and self.oldtalk.exists():
             self.oldtalk.delete(self.deletion_comment, not self.batch,
                                 mark=True)
+        self.counter['delete talk'] += 1
 
     def _change(self, gen) -> None:
         """
@@ -780,6 +823,9 @@ class CategoryMoveRobot(CategoryPreprocess):
         :param gen: Generator containing pages or categories.
         """
         for page in pagegenerators.PreloadingGenerator(gen):
+            self.counter['read'] += 1
+            count_key = 'move' if self.newcat else 'remove'
+
             if not self.title_regex or re.search(self.title_regex,
                                                  page.title()):
 
@@ -787,6 +833,7 @@ class CategoryMoveRobot(CategoryPreprocess):
                                      summary=self.comment,
                                      in_place=self.inplace,
                                      sort_key=self.keep_sortkey)
+                self.counter[count_key] += 1
 
                 doc_page = self.determine_template_target(page)
                 if doc_page != page and (not self.title_regex
@@ -797,13 +844,13 @@ class CategoryMoveRobot(CategoryPreprocess):
                                              in_place=self.inplace,
                                              include=self.includeonly,
                                              sort_key=self.keep_sortkey)
+                    self.counter[count_key + ' talk'] += 1
 
     @staticmethod
-    def check_move(name, old_page, new_page) -> bool:
+    def check_move(name: str, old_page, new_page) -> bool:
         """Return if the old page can be safely moved to the new page.
 
         :param name: Title of the new page
-        :type name: str
         :param old_page: Page to be moved
         :type old_page: pywikibot.page.BasePage
         :param new_page: Page to be moved to
@@ -836,7 +883,7 @@ class CategoryMoveRobot(CategoryPreprocess):
         Do not use this function from outside the class.
         """
         # Some preparing
-        pywikibot.output('Moving text from {} to {}.'.format(
+        pywikibot.info('Moving text from {} to {}.'.format(
             self.oldcat.title(), self.newcat.title()))
         comma = self.site.mediawiki_message('comma-separator')
         authors = comma.join(self.oldcat.contributors().keys())
@@ -935,8 +982,8 @@ class CategoryListifyRobot:
                  show_images: bool = False, *,
                  talk_pages: bool = False,
                  recurse: Union[int, bool] = False,
-                 prefix: str = '*',
-                 namespaces=None) -> None:
+                 namespaces=None,
+                 **kwargs) -> None:
         """Initializer."""
         self.edit_summary = edit_summary
         self.append = append
@@ -953,16 +1000,16 @@ class CategoryListifyRobot:
         self.list = pywikibot.Page(self.site, list_title)
         self.talk_pages = talk_pages
         self.recurse = recurse
-        self.prefix = prefix
+        self.prefix = kwargs.pop('prefix', '*')
         self.namespaces = self.site.namespaces.resolve(namespaces or [])
         self.subcats = not self.namespaces or 'Category' in self.namespaces
 
     def run(self) -> None:
         """Start bot."""
         if self.list.exists() and not (self.append or self.overwrite):
-            pywikibot.output('Page {} already exists, aborting.\n'
-                             .format(self.list.title()))
-            pywikibot.output(fill(
+            pywikibot.info('Page {} already exists, aborting.\n'
+                           .format(self.list.title()))
+            pywikibot.info(fill(
                 'Use -append option to append the list to the output page or '
                 '-overwrite option to overwrite the output page.'))
             return
@@ -985,7 +1032,7 @@ class CategoryListifyRobot:
         if self.list.text and self.append:
             # append content by default at the bottom
             list_string = self.list.text + '\n' + list_string
-            pywikibot.output('Category list appending...')
+            pywikibot.info('Category list appending...')
 
         if not self.edit_summary:
             self.edit_summary = i18n.twtranslate(
@@ -1025,8 +1072,8 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
     def __init__(self, cat_title: Optional[str], cat_db, namespaces=None,
                  comment: Optional[str] = None) -> None:
         """Initializer."""
-        self.cat_title = cat_title or \
-            pywikibot.input('Which category do you want to tidy up?')
+        self.cat_title = cat_title or pywikibot.input(
+            'Which category do you want to tidy up?')
         self.cat_db = cat_db
         self.edit_summary = comment
         if not comment:
@@ -1121,17 +1168,17 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
 
                 # output the result
                 for line in lines:
-                    pywikibot.output(line)
+                    pywikibot.info(line)
 
         # show the title of the page where the link was found.
-        pywikibot.output('\n>>> <<lightpurple>>{}<<default>> <<<'
-                         .format(member.title()))
+        pywikibot.info('\n>>> <<lightpurple>>{}<<default>> <<<'
+                       .format(member.title()))
 
         # determine a reasonable amount of context.
         try:
             full_text = member.get()
         except NoPageError:
-            pywikibot.output('Page {} not found.'.format(member.title()))
+            pywikibot.info(f'Page {member.title()} not found.')
             return
 
         # skip initial templates, images and comments for articles.
@@ -1160,26 +1207,26 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
                             key=methodcaller('title'))
 
         # show categories as possible choices with numbers
-        pywikibot.output()
+        pywikibot.info()
         supercat_option = CatIntegerOption(0, len(supercatlist), 'u')
         if not supercatlist:
-            pywikibot.output('This category has no supercategories.')
+            pywikibot.info('This category has no supercategories.')
         else:
-            pywikibot.output('Move up to category:')
+            pywikibot.info('Move up to category:')
             cat_list = [cat.title(
                 with_ns=False) for cat in supercatlist]
             supercat_option.list_categories(cat_list, 'u')
 
         subcat_option = CatIntegerOption(0, len(subcatlist))
         if not subcatlist:
-            pywikibot.output('This category has no subcategories.')
+            pywikibot.info('This category has no subcategories.')
         else:
-            pywikibot.output('Move down to category:')
+            pywikibot.info('Move down to category:')
             cat_list = [cat.title(with_ns=False) for cat in subcatlist]
             subcat_option.list_categories(cat_list)
 
         # show possible options for the user
-        pywikibot.output()
+        pywikibot.info()
         options = (supercat_option,
                    subcat_option,
                    StandardOption(
@@ -1194,9 +1241,9 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
             .format(member.title()), options, default='c')
 
         if choice == 'c':
-            pywikibot.output('Saving page to {}'.format(current_cat.title()))
+            pywikibot.info(f'Saving page to {current_cat.title()}')
             if current_cat == original_cat:
-                pywikibot.output('No changes necessary.')
+                pywikibot.info('No changes necessary.')
             else:
                 if not self.edit_summary:
                     self.template_vars.update({
@@ -1251,12 +1298,12 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
     def teardown(self) -> None:
         """Cleanups after run operation."""
         if self.generator_completed and not self.counter['read']:
-            pywikibot.output('There are no pages or files in category {}.'
-                             .format(self.cat_title))
+            pywikibot.info(
+                f'There are no pages or files in category {self.cat_title}.')
 
     def treat(self, page) -> None:
         """Process page."""
-        pywikibot.output()
+        pywikibot.info()
         self.move_to_category(page, self.cat, self.cat)
 
 
@@ -1316,7 +1363,7 @@ class CategoryTreeRobot:
         result += ' ({})'.format(int(cat.categoryinfo['pages']))
         if current_depth < self.max_depth // 2:
             # noisy dots
-            pywikibot.output('.', newline=False)
+            pywikibot.info('.', newline=False)
         # Create a list of other cats which are supercats of the current cat
         supercat_names = [super_cat.title(as_link=True,
                                           textlink=True,
@@ -1349,11 +1396,11 @@ class CategoryTreeRobot:
         console or saved it to a file.
         """
         cat = pywikibot.Category(self.site, self.cat_title)
-        pywikibot.output('Generating tree...', newline=False)
+        pywikibot.info('Generating tree...', newline=False)
         tree = self.treeview(cat)
-        pywikibot.output()
+        pywikibot.info()
         if self.filename:
-            pywikibot.output('Saving results in ' + self.filename)
+            pywikibot.info('Saving results in ' + self.filename)
             with codecs.open(self.filename, 'a', 'utf-8') as f:
                 f.write(tree)
         else:
@@ -1404,7 +1451,7 @@ class CleanBot(Bot):
 
     def treat(self, child) -> None:
         """Process the category."""
-        grandchildren = set(child.articles(self.opt.recurse))
+        grandchildren = set(child.articles(recurse=self.opt.recurse))
         # For advanced usage uncomment the next line to
         # check not only grandchildren articles but
         # grandchildren categories too:
@@ -1414,11 +1461,11 @@ class CleanBot(Bot):
             return
 
         if config.verbose_output:
-            pywikibot.output('Subcategory "{}" is parent for:'
-                             .format(child.title(with_ns=False)))
+            pywikibot.info('Subcategory "{}" is parent for:'
+                           .format(child.title(with_ns=False)))
 
             for grandchild in overcategorized:
-                pywikibot.output('\t{}'.format(grandchild.title()))
+                pywikibot.info(f'\t{grandchild.title()}')
 
         for grandchild in overcategorized:
             msg = ('Remove "<<lightpurple>>{}<<default>>" from "{}" because '
@@ -1463,7 +1510,6 @@ def main(*args: str) -> None:
     move_together = False
     keep_sortkey = None
     depth = 5
-    prefix = '*'
 
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)
@@ -1538,14 +1584,14 @@ def main(*args: str) -> None:
         elif option == 'keepsortkey':
             keep_sortkey = True
         elif option == 'prefix':
-            prefix = value
+            options[option] = value
         elif option == 'always':
             options[option] = True
         else:
             pg_options.append(arg)
 
     enabled = ['namespace'] if action in ('tidy', 'listify') else None
-    if action in ('add', 'listify', 'tidy'):
+    if action in ('add', 'listify', 'move', 'remove', 'tidy'):
         gen_factory = pagegenerators.GeneratorFactory(enabled_options=enabled)
         unknown += gen_factory.handle_args(pg_options)
     else:
@@ -1571,6 +1617,7 @@ def main(*args: str) -> None:
             options['from'] = \
                 pywikibot.input('Please enter the name of the '
                                 'category that should be removed:')
+        gen = gen_factory.getCombinedGenerator()
         bot = CategoryMoveRobot(oldcat=options.get('from'),
                                 batch=batch,
                                 comment=summary,
@@ -1579,7 +1626,8 @@ def main(*args: str) -> None:
                                 title_regex=title_regex,
                                 history=history,
                                 pagesonly=pagesonly,
-                                deletion_comment=use_deletion_summary)
+                                deletion_comment=use_deletion_summary,
+                                generator=gen)
     elif action == 'move':
         if 'from' not in options:
             options['from'] = pywikibot.input(
@@ -1592,6 +1640,7 @@ def main(*args: str) -> None:
                 CategoryMoveRobot.DELETION_COMMENT_SAME_AS_EDIT_COMMENT
         else:
             deletion_comment = CategoryMoveRobot.DELETION_COMMENT_AUTOMATIC
+        gen = gen_factory.getCombinedGenerator()
         bot = CategoryMoveRobot(oldcat=options.get('from'),
                                 newcat=options.get('to'),
                                 batch=batch,
@@ -1605,7 +1654,8 @@ def main(*args: str) -> None:
                                 wikibase=wikibase,
                                 allow_split=allow_split,
                                 move_together=move_together,
-                                keep_sortkey=keep_sortkey)
+                                keep_sortkey=keep_sortkey,
+                                generator=gen)
     elif action == 'tidy':
         bot = CategoryTidyRobot(options.get('from'), cat_db,
                                 gen_factory.namespaces, summary)
@@ -1618,8 +1668,8 @@ def main(*args: str) -> None:
                                    append, overwrite, showimages,
                                    talk_pages=talkpages,
                                    recurse=options.get('recurse', False),
-                                   prefix=prefix,
-                                   namespaces=gen_factory.namespaces)
+                                   namespaces=gen_factory.namespaces,
+                                   **options)
     elif action == 'clean':
         bot = CleanBot(**options)
 

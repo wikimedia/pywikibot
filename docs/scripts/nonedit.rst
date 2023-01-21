@@ -1,15 +1,16 @@
+*******************
 Non editing scripts
-===================
+*******************
 
-listpages script description
-----------------------------
+listpages script
+================
 
 .. automodule:: scripts.listpages
    :no-members:
    :noindex:
 
-touch script description
-------------------------
+touch script
+============
 
 .. automodule:: scripts.touch
    :no-members:

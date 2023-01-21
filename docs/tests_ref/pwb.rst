@@ -1,5 +1,6 @@
+*****************
 tests.pwb package
-=================
+*****************
 
 .. automodule:: tests.pwb
     :members:
@@ -7,7 +8,7 @@ tests.pwb package
     :show-inheritance:
 
 pwb submodules
---------------
+==============
 
 .. toctree::
 

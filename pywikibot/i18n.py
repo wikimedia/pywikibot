@@ -41,6 +41,7 @@ from pywikibot.backports import (
     Match,
     Sequence,
     cache,
+    removesuffix,
 )
 from pywikibot.plural import plural_rule
 
@@ -275,7 +276,7 @@ _LANG_TO_GROUP_NAME = defaultdict(str, {
     'zh-tw': 'zh-classical',
     'zh-yue': 'cdo'})
 
-_GROUP_NAME_TO_FALLBACKS = {
+_GROUP_NAME_TO_FALLBACKS: Dict[str, List[str]] = {
     '': [],
     'aa': ['am'],
     'ab': ['ru'],
@@ -358,7 +359,7 @@ _GROUP_NAME_TO_FALLBACKS = {
     'zh-classical': ['zh', 'zh-hans', 'zh-tw', 'zh-cn', 'zh-classical', 'lzh'],
     'zh-min-nan': [
         'cdo', 'zh', 'zh-hans', 'zh-tw', 'zh-cn', 'zh-classical', 'lzh']
-}  # type: Dict[str, List[str]]
+}
 
 
 def set_messages_package(package_name: str) -> None:
@@ -375,23 +376,31 @@ def messages_available() -> bool:
 
     To determine if messages are available, it looks for the package name
     set using :py:obj:`set_messages_package` for a message bundle called
-    'pywikibot' containing messages.
+    ``pywikibot`` containing messages.
+
+    >>> from pywikibot import i18n
+    >>> i18n.messages_available()
+    True
+    >>> old_package = i18n._messages_package_name  # save the old package name
+    >>> i18n.set_messages_package('foo')
+    >>> i18n.messages_available()
+    False
+    >>> i18n.set_messages_package(old_package)
+    >>> i18n.messages_available()
+    True
     """
     global _messages_available
     if _messages_available is not None:
         return _messages_available
+
     try:
         mod = __import__(_messages_package_name, fromlist=['__path__'])
     except ImportError:
         _messages_available = False
         return False
 
-    if not os.listdir(next(iter(mod.__path__))):
-        _messages_available = False
-        return False
-
-    _messages_available = True
-    return True
+    _messages_available = bool(os.listdir(next(iter(mod.__path__))))
+    return _messages_available
 
 
 def _altlang(lang: str) -> List[str]:
@@ -420,7 +429,7 @@ def _get_bundle(lang: str, dirname: str) -> Dict[str, str]:
 
     .. versionadded:: 7.0
     """
-    filename = '{}/{}.json'.format(dirname, lang)
+    filename = f'{dirname}/{lang}.json'
     try:
         data = pkgutil.get_data(_messages_package_name, filename)
         assert data is not None
@@ -456,8 +465,8 @@ def _extract_plural(lang: str, message: str, parameters: Mapping[str, int]
         return plural_rule
 
     def replace_plural(match: Match[str]) -> str:
-        selector = match.group(1)
-        variants = match.group(2)
+        selector = match[1]
+        variants = match[2]
         num = parameters[selector]
         if not isinstance(num, int):
             raise ValueError("'{}' must be a number, not a {} ({})"
@@ -495,7 +504,7 @@ def _extract_plural(lang: str, message: str, parameters: Mapping[str, int]
         return plural_entries[index]
 
     assert isinstance(parameters, Mapping), \
-        'parameters is not Mapping but {}'.format(type(parameters))
+        f'parameters is not Mapping but {type(parameters)}'
 
     rule = plural_rule(lang)
 
@@ -750,7 +759,7 @@ def twtranslate(source: STR_OR_SITE_TYPE,
             'No {} translation has been defined for TranslateWiki key "{}". '
             'It can happen due to lack of i18n submodule or files or an '
             'outdated submodule. See {}/i18n'
-            .format('English' if 'en' in langs else "'{}'".format(lang),
+            .format('English' if 'en' in langs else f"'{lang}'",
                     twtitle, __url__)))
 
     if '{{PLURAL:' in trans:
@@ -802,7 +811,7 @@ def twget_keys(twtitle: str) -> List[str]:
     pathname = os.path.join(next(iter(mod.__path__)), package)
 
     # build a list of languages in that directory
-    langs = [filename.partition('.')[0]
+    langs = [removesuffix(filename, '.json')
              for filename in sorted(os.listdir(pathname))
              if filename.endswith('.json')]
 
@@ -815,9 +824,33 @@ def twget_keys(twtitle: str) -> List[str]:
 def bundles(stem: bool = False) -> Generator[Union[Path, str], None, None]:
     """A generator which yields message bundle names or its path objects.
 
-    :param stem: yield the Path.stem if True and the Path object otherwise
+    The bundle name usually corresponds with the script name which is
+    localized.
+
+    With ``stem=True`` the bundle names are given:
+
+    >>> from pywikibot import i18n
+    >>> bundles = sorted(i18n.bundles(stem=True))
+    >>> len(bundles)
+    37
+    >>> bundles[:4]
+    ['add_text', 'archivebot', 'basic', 'blockpageschecker']
+    >>> bundles[-5:]
+    ['undelete', 'unprotect', 'unusedfiles', 'weblinkchecker', 'welcome']
+    >>> 'pywikibot' in bundles
+    True
+
+    With ``stem=False`` we get Path objects:
+
+    >>> path = next(i18n.bundles())
+    >>> path.is_dir()
+    True
+    >>> path.parent.as_posix()
+    'scripts/i18n'
 
     .. versionadded:: 7.0
+
+    :param stem: yield the Path.stem if True and the Path object otherwise
     """
     for dirpath in Path(*_messages_package_name.split('.')).iterdir():
         if dirpath.is_dir() and not dirpath.match('*__'):  # ignore cache
@@ -830,14 +863,31 @@ def bundles(stem: bool = False) -> Generator[Union[Path, str], None, None]:
 def known_languages() -> List[str]:
     """All languages we have localizations for.
 
+    >>> from pywikibot import i18n
+    >>> i18n.known_languages()[:10]
+    ['ab', 'aeb', 'af', 'am', 'an', 'ang', 'anp', 'ar', 'arc', 'ary']
+    >>> i18n.known_languages()[-10:]
+    ['vo', 'vro', 'wa', 'war', 'xal', 'xmf', 'yi', 'yo', 'yue', 'zh']
+    >>> len(i18n.known_languages())
+    253
+
+    The implementation is roughly equivalent to:
+
+    .. code-block:: Python
+
+       langs = set()
+       for dirpath in bundles():
+           for fname in dirpath.iterdir():
+               if fname.suffix == '.json':
+                   langs.add(fname.stem)
+        return sorted(langs)
+
     .. versionadded:: 7.0
     """
-    langs = set()
-    for dirpath in bundles():
-        for fname in dirpath.iterdir():
-            if fname.suffix == '.json':
-                langs.add(fname.stem)
-    return sorted(langs)
+    return sorted(
+        {fname.stem for dirpath in bundles() for fname in dirpath.iterdir()
+         if fname.suffix == '.json'}
+    )
 
 
 def input(twtitle: str,

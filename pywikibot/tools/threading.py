@@ -70,7 +70,7 @@ class RLock:
         """Return number of acquired locks."""
         with self._block:
             counter = re.search(r'count=(\d+) ', repr(self))
-            return int(counter.group(1))
+            return int(counter[1])
 
     def locked(self):
         """Return true if the lock is acquired."""

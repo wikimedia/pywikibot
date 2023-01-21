@@ -1,43 +1,78 @@
 /** css/pywikibot.css **/
 
-/* This line is theme specific - it includes the base theme CSS */
-@import '../nature.css';  /* for Nature */
-
-
-div.related {
-    background-color: #396;
-    line-height: 32px;
-    color: #fff;
-    text-shadow: 0px 1px 0 #444;
-    font-size: 0.9em;
+/** logo slightly smaller than default to preserve vertical space **/
+.sidebar-logo {
+    max-width: 75%;
 }
 
-a:hover {
-    color: #900;
-    text-decoration: underline;
+/** brand text in the sidebar smaller than default **/
+.sidebar-brand-text {
+    font-size: 1rem;
 }
 
-a.headerlink {
-    color: #069;
-    font-size: 0.8em;
-    padding: 0 4px 0 4px;
+/** border highlight for links in article content **/
+article a:hover {
+    box-shadow: 0 0 0 .125rem var(--color-link);
+    border-radius: .125rem;
     text-decoration: none;
+    padding-bottom: .110rem;
 }
 
-a.headerlink:hover {
-    background-color: #069;
-    color: white;
+/** better readability of toctree captions **/
+.toctree-wrapper .caption {
+    font-weight: bolder;
+    margin-bottom: .5rem !important;
 }
-code.xref {
-    color: #069;
-    font-size: 1.2em
+
+/** disable centering of tables by default in regular content **/
+table.align-default {
+    margin-left: unset;
+    margin-right: unset;
 }
-code.xref:hover {
-    color: #900;
+
+/** previous, next, modules, index links in sidebar **/
+.sidebar-rellinks {
+    margin-top: -0.25rem;
+    padding-bottom: 0.25rem;
+    font-size: 75%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
 }
-div.sphinxsidebar {
-    width: 250px
+
+.sidebar-rellinks a {
+    padding: 0.25rem;
 }
-div.bodywrapper {
-  margin: 0 0 0 250px;
+
+/** code highlights for light and dark mode **/
+
+/** light mode by default or if OS picks it **/
+.highlight .viewcode-block:target {
+    background-color: #3331;
+    padding: 0.2rem 0;
+    border: 1px solid #1115;
+}
+
+/** dark mode chosen by the OS **/
+@media (prefers-color-scheme: dark) {
+    .highlight .viewcode-block:target {
+        background-color: #ccc1;
+        padding: 0.2rem 0;
+        border: 1px solid #fff5;
+    }
+}
+
+/** light mode via toggle **/
+[data-theme='light'] .highlight .viewcode-block:target {
+    background-color: #3331;
+    padding: 0.2rem 0;
+    border: 1px solid #1115;
+}
+
+/** dark mode via toggle **/
+[data-theme='dark'] .highlight .viewcode-block:target {
+    background-color: #ccc1;
+    padding: 0.2rem 0;
+    border: 1px solid #fff5;
 }

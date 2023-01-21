@@ -1,6 +1,6 @@
 """Family module for Wikidata."""
 #
-# (C) Pywikibot team, 2012-2022
+# (C) Pywikibot team, 2012-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -93,3 +93,6 @@ class Family(family.WikimediaFamily):
             'venus': 'http://www.wikidata.org/entity/Q313',
             'vesta': 'http://www.wikidata.org/entity/Q3030',
         }
+
+    def entity_sources(self, code):
+        return {}

@@ -27,7 +27,7 @@ are not installed by default on some Linux distributions:
   * python-tkinter (optional, used by some experimental GUI stuff)
 
 
-You need to have at least Python version `3.5.3 <https://www.python.org/downloads/>`_
+You need to have at least Python version `3.6.1 <https://www.python.org/downloads/>`_
 or newer installed on your computer to be able to run any of the code in this
 package. Please refer the manual at mediawiki for further details and
 restrictions.

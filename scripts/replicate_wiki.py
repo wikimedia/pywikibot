@@ -38,7 +38,7 @@ The following parameters are supported:
  destination_wiki       destination wiki(s)
 """
 #
-# (C) Pywikibot team, 2012-2022
+# (C) Pywikibot team, 2012-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -71,7 +71,7 @@ class SyncSites:
         else:
             original_wiki = config.mylang
 
-        pywikibot.output('Syncing from ' + original_wiki)
+        pywikibot.info('Syncing from ' + original_wiki)
 
         family = config.family
 
@@ -82,19 +82,19 @@ class SyncSites:
 
         if options.namespace and 'help' in options.namespace:
             for namespace in self.original.namespaces.values():
-                pywikibot.output(
-                    '{} {}'.format(namespace.id, namespace.custom_name))
+                pywikibot.info(
+                    f'{namespace.id} {namespace.custom_name}')
             sys.exit()
 
         self.sites = [pywikibot.Site(s, family) for s in sites]
 
         self.differences = defaultdict(list)
         self.user_diff = defaultdict(list)
-        pywikibot.output('Syncing to ', newline=False)
+        pywikibot.info('Syncing to ', newline=False)
         for s in self.sites:
             s.login()
-            pywikibot.output(str(s), newline=False)
-        pywikibot.output()
+            pywikibot.info(str(s), newline=False)
+        pywikibot.info()
 
     def check_sysops(self) -> None:
         """Check if sysops are the same on all wikis."""
@@ -123,17 +123,16 @@ class SyncSites:
         ]
 
         if self.options.namespace:
-            pywikibot.output(str(self.options.namespace))
+            pywikibot.info(str(self.options.namespace))
             namespaces = [int(self.options.namespace)]
-        pywikibot.output('Checking these namespaces: {}\n'
-                         .format((namespaces,)))
+        pywikibot.info(f'Checking these namespaces: {namespaces}\n')
 
         for ns in namespaces:
             self.check_namespace(ns)
 
     def check_namespace(self, namespace) -> None:
         """Check an entire namespace."""
-        pywikibot.output('\nCHECKING NAMESPACE {}'.format(namespace))
+        pywikibot.info(f'\nCHECKING NAMESPACE {namespace}')
         pages = (p.title() for p in self.original.allpages(
             '!', namespace=namespace))
         for p in pages:
@@ -142,11 +141,11 @@ class SyncSites:
                 try:
                     self.check_page(p)
                 except NoPageError:
-                    pywikibot.output('Bizarre NoPageError that we are '
-                                     'just going to ignore')
+                    pywikibot.info(
+                        'Bizarre NoPageError that we are just going to ignore')
                 except IsRedirectPageError:
                     pywikibot.error('Redirectpage - todo: handle gracefully')
-        pywikibot.output()
+        pywikibot.info()
 
     def generate_overviews(self) -> None:
         """Create page on wikis with overview of bot results."""
@@ -156,7 +155,7 @@ class SyncSites:
                                       .format(site.user()))
             output = '== Pages that differ from original ==\n\n'
             if self.differences[site]:
-                output += ''.join('* [[:{}]]\n'.format(page_title)
+                output += ''.join(f'* [[:{page_title}]]\n'
                                   for page_title in self.differences[site])
             else:
                 output += 'All important pages are the same'
@@ -170,7 +169,7 @@ class SyncSites:
                 output += (
                     'All users from original are also present on this wiki')
 
-            pywikibot.output(output)
+            pywikibot.info(output)
             sync_overview_page.text = output
             sync_overview_page.save(self.put_message(site))
 
@@ -181,7 +180,7 @@ class SyncSites:
 
     def check_page(self, pagename) -> None:
         """Check one page."""
-        pywikibot.output('\nChecking ' + pagename)
+        pywikibot.info('\nChecking ' + pagename)
         page1 = Page(self.original, pagename)
         txt1 = page1.text
 
@@ -193,8 +192,8 @@ class SyncSites:
         for site in self.sites:
             if dest_ns is not None:
                 page2 = Page(site, page1.title(with_ns=False), dest_ns)
-                pywikibot.output('\nCross namespace, new title: '
-                                 + page2.title())
+                pywikibot.info('\nCross namespace, new title: '
+                               + page2.title())
             else:
                 page2 = Page(site, pagename)
 
@@ -204,13 +203,13 @@ class SyncSites:
                 txt_new = multiple_replace(txt1,
                                            config.replicate_replace[str(site)])
                 if txt1 != txt_new:
-                    pywikibot.output(
+                    pywikibot.info(
                         'NOTE: text replaced using config.sync_replace')
-                    pywikibot.output('{} {} {}'.format(txt1, txt_new, txt2))
+                    pywikibot.info(f'{txt1} {txt_new} {txt2}')
                     txt1 = txt_new
 
             if txt1 != txt2:
-                pywikibot.output('\n {} DIFFERS'.format(site))
+                pywikibot.info(f'\n {site} DIFFERS')
                 self.differences[site].append(pagename)
 
             if self.options.replace:

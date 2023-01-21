@@ -48,7 +48,7 @@ class DownloadDumpBot(Bot, ConfigParserBot):
     @staticmethod
     def get_dump_name(db_name, typ, dumpdate):
         """Check if dump file exists locally in a Toolforge server."""
-        db_path = '/public/dumps/public/{}/'.format(db_name)
+        db_path = f'/public/dumps/public/{db_name}/'
         if os.path.isdir(db_path):
             dump_filepath_template = (
                 '/public/dumps/public/{db_name}/{date}/{db_name}-{date}-{typ}')
@@ -79,7 +79,7 @@ class DownloadDumpBot(Bot, ConfigParserBot):
                 total_bytes = float(format(total_bytes / 1024.0, '.2f'))
             return str(total_bytes) + 'P'
 
-        pywikibot.output('Downloading dump from ' + self.opt.wikiname)
+        pywikibot.info('Downloading dump from ' + self.opt.wikiname)
 
         download_filename = '{wikiname}-{dumpdate}-{filename}'.format_map(
             self.opt)
@@ -100,8 +100,8 @@ class DownloadDumpBot(Bot, ConfigParserBot):
         for non_atomic in range(2):
             try:
                 if toolforge_dump_filepath:
-                    pywikibot.output('Symlinking file from '
-                                     + toolforge_dump_filepath)
+                    pywikibot.info('Symlinking file from '
+                                   + toolforge_dump_filepath)
                     if non_atomic and os.path.exists(file_final_storepath):
                         remove(file_final_storepath)
                     symlink(toolforge_dump_filepath, file_current_storepath)
@@ -109,18 +109,18 @@ class DownloadDumpBot(Bot, ConfigParserBot):
                     url = 'https://dumps.wikimedia.org/{}/{}/{}'.format(
                         self.opt.wikiname, self.opt.dumpdate,
                         download_filename)
-                    pywikibot.output('Downloading file from ' + url)
+                    pywikibot.info('Downloading file from ' + url)
                     response = fetch(url, stream=True)
 
                     if response.status_code != HTTPStatus.OK:
                         if response.status_code == HTTPStatus.NOT_FOUND:
-                            pywikibot.output(
+                            pywikibot.info(
                                 'File with name {filename!r}, from dumpdate '
                                 '{dumpdate!r}, and wiki {wikiname!r} ({url}) '
                                 "isn't available in the Wikimedia Dumps"
                                 .format(url=url, **self.opt))
                         else:
-                            pywikibot.output(
+                            pywikibot.info(
                                 HTTPStatus(response.status_code).description)
                         return
 
@@ -133,7 +133,7 @@ class DownloadDumpBot(Bot, ConfigParserBot):
                         parts = 50
                         display_string = ''
 
-                        pywikibot.output()
+                        pywikibot.info()
                         for data in response.iter_content(100 * 1024):
                             result_file.write(data)
 
@@ -155,8 +155,8 @@ class DownloadDumpBot(Bot, ConfigParserBot):
                                 len(prior_display.rstrip())
                                 - len(display_string.rstrip()))
 
-                            pywikibot.output(display_string, newline=False)
-                        pywikibot.output()
+                            pywikibot.info(display_string, newline=False)
+                        pywikibot.info()
 
                 # Rename the temporary file to the target file
                 # if the download completes successfully
@@ -177,11 +177,11 @@ class DownloadDumpBot(Bot, ConfigParserBot):
                 if non_atomic:
                     return
 
-                pywikibot.output('Cannot make temporary file, '
-                                 'falling back to non-atomic download')
+                pywikibot.info('Cannot make temporary file, '
+                               'falling back to non-atomic download')
                 file_current_storepath = file_final_storepath
 
-        pywikibot.output('Done! File stored as ' + file_final_storepath)
+        pywikibot.info('Done! File stored as ' + file_final_storepath)
 
 
 def main(*args: str) -> None:

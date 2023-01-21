@@ -5,16 +5,8 @@
 # Distributed under the terms of the MIT license.
 #
 import collections
-
-from abc import abstractmethod, ABC
-from collections.abc import (
-    Container,
-    Generator,
-    Iterable,
-    Iterator,
-    Mapping,
-    Sized,
-)
+from abc import ABC, abstractmethod
+from collections.abc import Collection, Generator, Iterator, Mapping
 from contextlib import suppress
 from itertools import chain
 from typing import Any
@@ -32,8 +24,7 @@ __all__ = (
 )
 
 
-# Collection is not provided with Python 3.5; use Container, Iterable, Sized
-class SizedKeyCollection(Container, Iterable, Sized):
+class SizedKeyCollection(Collection):
 
     """Structure to hold values where the key is given by the value itself.
 
@@ -203,7 +194,7 @@ class DequeGenerator(Iterator, collections.deque):
     def __repr__(self) -> str:
         """Provide an object representation without clearing the content."""
         items = list(self)
-        result = '{}({})'.format(self.__class__.__name__, items)
+        result = f'{self.__class__.__name__}({items})'
         self.extend(items)
         return result
 

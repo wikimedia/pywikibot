@@ -12,6 +12,7 @@ from pywikibot import config
 from pywikibot.backports import Dict, removeprefix
 from pywikibot.tools.itertools import itergroup
 
+
 __all__ = ['ParamInfo']
 
 
@@ -202,7 +203,7 @@ class ParamInfo(Sized, Container):
                 del failed_modules[:]
                 yield batch
 
-        modules = modules - set(self._paraminfo)
+        modules -= set(self._paraminfo)
         if not modules:
             return
 
@@ -242,7 +243,8 @@ class ParamInfo(Sized, Container):
                 params['modules'] = [mod for mod in module_batch
                                      if not mod.startswith('query+')
                                      and mod not in self.root_modules]
-                params['querymodules'] = [mod[6:] for mod in module_batch
+                params['querymodules'] = [removeprefix(mod, 'query+')
+                                          for mod in module_batch
                                           if mod.startswith('query+')]
 
                 for mod in set(module_batch) & self.root_modules:
@@ -422,7 +424,7 @@ class ParamInfo(Sized, Container):
                         pywikibot.warning('Path "{}" is ambiguous.'
                                           .format(path))
                     else:
-                        pywikibot.log('Found another path "{}"'.format(path))
+                        pywikibot.log(f'Found another path "{path}"')
                     result_data[path] = False
                 else:
                     result_data[path] = mod_data
@@ -482,12 +484,12 @@ class ParamInfo(Sized, Container):
         try:
             module = self[module]
         except KeyError:
-            raise ValueError("paraminfo for '{}' not loaded".format(module))
+            raise ValueError(f"paraminfo for '{module}' not loaded")
 
         try:
             params = module['parameters']
         except KeyError:
-            pywikibot.warning("module '{}' has no parameters".format(module))
+            pywikibot.warning(f"module '{module}' has no parameters")
             return None
 
         param_data = [param for param in params
@@ -548,7 +550,7 @@ class ParamInfo(Sized, Container):
     @staticmethod
     def _prefix_submodules(modules, prefix):
         """Prefix submodules with path."""
-        return {'{}+{}'.format(prefix, mod) for mod in modules}
+        return {f'{prefix}+{mod}' for mod in modules}
 
     @property
     def prefix_map(self):

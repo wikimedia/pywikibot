@@ -1,17 +1,15 @@
 #!/usr/bin/python3
 """Tests for the site module."""
 #
-# (C) Pywikibot team, 2018-2022
+# (C) Pywikibot team, 2018-2023
 #
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 
 import pywikibot
 from pywikibot.tools import suppress_warnings
-
 from tests import WARN_SITE_CODE
 from tests.aspects import TestCase
 

@@ -1,43 +1,44 @@
+****************
 Main bot scripts
-================
+****************
 
-add\_text script description
-----------------------------
+add\_text script
+================
 
 .. automodule:: scripts.add_text
    :no-members:
    :noindex:
 
-category script description
----------------------------
+category script
+===============
 
 .. automodule:: scripts.category
    :no-members:
    :noindex:
 
-replace script description
---------------------------
+replace script
+==============
 
 .. automodule:: scripts.replace
    :no-members:
    :noindex:
 
-solve\_disambiguation script description
-----------------------------------------
+solve\_disambiguation script
+============================
 
 .. automodule:: scripts.solve_disambiguation
    :no-members:
    :noindex:
 
-upload script description
--------------------------
+upload script
+=============
 
 .. automodule:: scripts.upload
    :no-members:
    :noindex:
 
-weblinkchecker script description
----------------------------------
+weblinkchecker script
+=====================
 
 .. automodule:: scripts.weblinkchecker
    :no-members:

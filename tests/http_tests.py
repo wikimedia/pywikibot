@@ -327,42 +327,38 @@ class CharsetTestCase(TestCase):
 
     def test_no_content_type(self):
         """Test decoding without content-type (and then no charset)."""
-        charset = None
         resp = CharsetTestCase._create_response(
             headers={},
             data=CharsetTestCase.LATIN1_BYTES)
-        resp.encoding = http._decide_encoding(resp, charset)
+        resp.encoding = http._decide_encoding(resp)
         self.assertEqual('latin1', resp.encoding)
         self.assertEqual(resp.content, CharsetTestCase.LATIN1_BYTES)
         self.assertEqual(resp.text, CharsetTestCase.STR)
 
     def test_no_charset(self):
         """Test decoding without explicit charset."""
-        charset = None
         resp = CharsetTestCase._create_response(
             headers={'content-type': ''},
             data=CharsetTestCase.LATIN1_BYTES)
-        resp.encoding = http._decide_encoding(resp, charset)
+        resp.encoding = http._decide_encoding(resp)
         self.assertEqual('latin1', resp.encoding)
         self.assertEqual(resp.content, CharsetTestCase.LATIN1_BYTES)
         self.assertEqual(resp.text, CharsetTestCase.STR)
 
     def test_content_type_application_json_without_charset(self):
         """Test decoding without explicit charset but JSON content."""
-        charset = None
         resp = CharsetTestCase._create_response(
             headers={'content-type': 'application/json'},
             data=CharsetTestCase.UTF8_BYTES)
-        resp.encoding = http._decide_encoding(resp, charset)
+        resp.encoding = http._decide_encoding(resp)
         self.assertEqual('utf-8', resp.encoding)
 
     def test_content_type_sparql_json_without_charset(self):
         """Test decoding without explicit charset but JSON content."""
-        charset = None
         resp = CharsetTestCase._create_response(
             headers={'content-type': 'application/sparql-results+json'},
             data=CharsetTestCase.UTF8_BYTES)
-        resp.encoding = http._decide_encoding(resp, charset)
+        resp.encoding = http._decide_encoding(resp)
         self.assertEqual('utf-8', resp.encoding)
 
     def test_content_type_xml(self):
@@ -381,17 +377,15 @@ class CharsetTestCase(TestCase):
             ('Test xml content with latin1 encoding given in content',
              b"<?xml version='1.0' encoding='latin1'?>", 'latin1')
         ]
-        charset = None
         for msg, data, result in tests:
             with self.subTest(msg=msg):
                 resp = CharsetTestCase._create_response(
                     headers={'content-type': 'application/xml'}, data=data)
-                resp.encoding = http._decide_encoding(resp, charset)
+                resp.encoding = http._decide_encoding(resp)
                 self.assertEqual(resp.encoding, result)
 
     def test_charset_not_last(self):
         """Test charset not last part of content-type header."""
-        charset = None
         resp = CharsetTestCase._create_response(
             headers={
                 'content-type': (
@@ -400,32 +394,29 @@ class CharsetTestCase(TestCase):
                 )
             },
             data=CharsetTestCase.UTF8_BYTES)
-        resp.encoding = http._decide_encoding(resp, charset)
+        resp.encoding = http._decide_encoding(resp)
         self.assertEqual('utf-8', resp.encoding)
 
     def test_server_charset(self):
         """Test decoding with server explicit charset."""
-        charset = None
         resp = CharsetTestCase._create_response()
-        resp.encoding = http._decide_encoding(resp, charset)
+        resp.encoding = http._decide_encoding(resp)
         self.assertEqual('utf-8', resp.encoding)
         self.assertEqual(resp.content, CharsetTestCase.UTF8_BYTES)
         self.assertEqual(resp.text, CharsetTestCase.STR)
 
     def test_same_charset(self):
         """Test decoding with explicit and equal charsets."""
-        charset = 'utf-8'
         resp = CharsetTestCase._create_response()
-        resp.encoding = http._decide_encoding(resp, charset)
+        resp.encoding = http._decide_encoding(resp, 'utf-8')
         self.assertEqual('utf-8', resp.encoding)
         self.assertEqual(resp.content, CharsetTestCase.UTF8_BYTES)
         self.assertEqual(resp.text, CharsetTestCase.STR)
 
     def test_header_charset(self):
         """Test decoding with different charsets and valid header charset."""
-        charset = 'latin1'
         resp = CharsetTestCase._create_response()
-        resp.encoding = http._decide_encoding(resp, charset)
+        resp.encoding = http._decide_encoding(resp, 'latin1')
         # Ignore WARNING: Encoding "latin1" requested but "utf-8" received
         with patch('pywikibot.warning'):
             self.assertEqual('utf-8', resp.encoding)
@@ -434,10 +425,9 @@ class CharsetTestCase(TestCase):
 
     def test_code_charset(self):
         """Test decoding with different charsets and invalid header charset."""
-        charset = 'latin1'
         resp = CharsetTestCase._create_response(
             data=CharsetTestCase.LATIN1_BYTES)
-        resp.encoding = http._decide_encoding(resp, charset)
+        resp.encoding = http._decide_encoding(resp, 'latin1')
         # Ignore WARNING: Encoding "latin1" requested but "utf-8" received
         with patch('pywikibot.warning'):
             self.assertEqual('latin1', resp.encoding)

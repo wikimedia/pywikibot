@@ -10,18 +10,12 @@ import threading
 import time
 from collections import Counter, namedtuple
 from contextlib import suppress
+from hashlib import blake2b
 from typing import Optional, Union
 
 import pywikibot
 from pywikibot import config
-from pywikibot.tools import PYTHON_VERSION, deprecated
-
-
-if PYTHON_VERSION < (3, 6):
-    from hashlib import md5
-    blake2b = None
-else:
-    from hashlib import blake2b
+from pywikibot.tools import deprecated
 
 
 FORMAT_LINE = '{module_id} {pid} {time} {site}\n'
@@ -103,11 +97,8 @@ class Throttle:
         if module is None:
             module = pywikibot.calledModuleName()
         module = module.encode()
-        if blake2b:
-            hashobj = blake2b(module, digest_size=2)
-        else:
-            hashobj = md5(module)
-        return hashobj.hexdigest()[:4]  # slice for Python 3.5
+        hashobj = blake2b(module, digest_size=2)
+        return hashobj.hexdigest()
 
     def _read_file(self, raise_exc: bool = False):
         """Yield process entries from file."""
@@ -120,20 +111,16 @@ class Throttle:
             return
 
         for line in lines:
-            # parse line; format is "pid timestamp site"
+            # parse line; format is "module_id pid timestamp site"
             try:
-                items = line.split(' ')
-                if len(items) == 3:  # read legacy format
-                    _id, _pid, _time, _site = self._module_hash(), *items
-                else:
-                    _id, _pid, _time, _site = items
+                _id, _pid, _time, _site = line.split(' ')
                 proc_entry = ProcEntry(
                     module_id=_id,
                     pid=int(_pid),
                     time=int(float(_time)),
                     site=_site.rstrip()
                 )
-            except (IndexError, ValueError):
+            except (IndexError, ValueError):  # pragma: no cover
                 # Sometimes the file gets corrupted ignore that line
                 continue
             yield proc_entry
@@ -156,7 +143,7 @@ class Throttle:
         """
         global pid
         mysite = self.mysite
-        pywikibot.debug('Checking multiplicity: pid = {pid}'.format(pid=pid))
+        pywikibot.debug(f'Checking multiplicity: pid = {pid}')
         with self.lock:
             processes = []
             used_pids = set()
@@ -274,7 +261,7 @@ class Throttle:
                       'now': time.strftime('%Y-%m-%d %H:%M:%S',
                                            time.localtime())})
         if seconds > config.noisysleep:
-            pywikibot.output(message)
+            pywikibot.info(message)
         else:
             pywikibot.log(message)
 

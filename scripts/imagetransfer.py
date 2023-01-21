@@ -185,11 +185,11 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
         :return: the filename which was used to upload the image
         """
         sourceSite = sourceImagePage.site
-        pywikibot.output(
+        pywikibot.info(
             '\n>>> Transfer {source} from {source.site} to {target}\n'
             .format(source=sourceImagePage, target=self.opt.target))
         url = sourceImagePage.get_file_url()
-        pywikibot.output('URL should be: ' + url)
+        pywikibot.info('URL should be: ' + url)
         # localize the text that should be printed on image description page
         try:
             description = sourceImagePage.get()
@@ -213,12 +213,12 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
             description += sourceImagePage.getFileVersionHistoryTable()
             # add interwiki link
             if sourceSite.family == self.opt.target.family:
-                description += '\n\n{}'.format(sourceImagePage)
+                description += f'\n\n{sourceImagePage}'
         except NoPageError:
-            pywikibot.output(
+            pywikibot.info(
                 'Image does not exist or description page is empty.')
         except IsRedirectPageError:
-            pywikibot.output('Image description page is redirect.')
+            pywikibot.info('Image description page is redirect.')
         else:
             bot = UploadRobot(url=url, description=description,
                               target_site=self.opt.target,
@@ -249,8 +249,8 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
                    and sourceSite.lang in \
                    config.usernames[sourceSite.family.name]:
                     # add the nowCommons template.
-                    pywikibot.output('Adding nowCommons template to '
-                                     + sourceImagePage.title())
+                    pywikibot.info('Adding nowCommons template to '
+                                   + sourceImagePage.title())
                     sourceImagePage.put(sourceImagePage.get() + '\n\n'
                                         + nowCommonsTemplate[sourceSite.lang]
                                         % target_filename,
@@ -258,13 +258,12 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
 
     def show_image_list(self, imagelist) -> None:
         """Print image list."""
-        pywikibot.output('-' * 60)
+        pywikibot.info('-' * 60)
         for i, image in enumerate(imagelist):
-            pywikibot.output('{}. Found image: {}'
-                             .format(i, image.title(as_link=True)))
+            pywikibot.info(f'{i}. Found image: {image}')
             try:
                 # Show the image description page's contents
-                pywikibot.output(image.get())
+                pywikibot.info(image.get())
             except NoPageError:
                 pass
             else:
@@ -277,19 +276,19 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
                     targetTitle = 'File:' + image.title().split(':', 1)[1]
                     targetImage = pywikibot.Page(self.opt.target, targetTitle)
                     targetImage.get()
-                    pywikibot.output('Image with this name is already on {}.'
-                                     .format(self.opt.target))
-                    pywikibot.output('-' * 60)
-                    pywikibot.output(targetImage.get())
+                    pywikibot.info(f'Image with this name is already on '
+                                   f'{self.opt.target}.')
+                    pywikibot.info('-' * 60)
+                    pywikibot.info(targetImage.get())
                     sys.exit()
                 except NoPageError:
                     # That's the normal case
                     pass
                 except IsRedirectPageError:
-                    pywikibot.output(
+                    pywikibot.info(
                         'Description page on target wiki is redirect?!')
 
-        pywikibot.output('=' * 60)
+        pywikibot.info('=' * 60)
 
     def treat(self, page) -> None:
         """Treat a single page."""
@@ -310,7 +309,7 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
                 # no need to query the user, only one possibility
                 todo = 0
             else:
-                pywikibot.output('Give the number of the image to transfer.')
+                pywikibot.info('Give the number of the image to transfer.')
                 todo = pywikibot.input('To end uploading, press enter:')
                 if not todo:
                     break
@@ -322,7 +321,7 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
                 # remove the selected image from the list
                 imagelist.pop(todo)
             else:
-                pywikibot.output('<<yellow>>No such image number.<<default>>')
+                pywikibot.info('<<yellow>>No such image number.')
 
     def transfer_allowed(self, image) -> bool:
         """Check whether transfer is allowed."""
@@ -331,8 +330,8 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
         if not self.opt.force_if_shared \
            and image.file_is_shared() \
            and image.site.image_repository() == target_repo:
-            pywikibot.output('<<yellow>>The image is already shared on {}.'
-                             '<<default>>'.format(target_repo))
+            pywikibot.info(
+                f'<<yellow>>The image is already shared on {target_repo}.')
             return False
         return True
 

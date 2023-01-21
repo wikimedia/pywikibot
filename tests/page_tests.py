@@ -462,7 +462,8 @@ class TestPageObject(DefaultSiteTestCase):
         self.assertIsInstance(mainpage.isDisambig(), bool)
         self.assertIsInstance(mainpage.has_permission(), bool)
         self.assertIsInstance(mainpage.botMayEdit(), bool)
-        self.assertIsInstance(mainpage.editTime(), pywikibot.Timestamp)
+        self.assertIsInstance(mainpage.latest_revision.timestamp,
+                              pywikibot.Timestamp)
         self.assertIsInstance(mainpage.permalink(), str)
 
     def test_talk_page(self):
@@ -546,7 +547,7 @@ class TestPageObject(DefaultSiteTestCase):
         for page in site.allpages(filterredir=True, total=1):
             break
         else:
-            self.skipTest('No redirect pages on site {!r}'.format(site))
+            self.skipTest(f'No redirect pages on site {site!r}')
         # This page is already initialised
         self.assertTrue(hasattr(page, '_isredir'))
         # call api.update_page without prop=info
@@ -675,7 +676,7 @@ class TestPageRepr(DefaultDrySiteTestCase):
         """Test to capture actual Python result pre unicode_literals."""
         self.assertEqual(repr(self.page), "Page('Ō')")
         self.assertEqual('%r' % self.page, "Page('Ō')")
-        self.assertEqual('{!r}'.format(self.page), "Page('Ō')")
+        self.assertEqual(f'{self.page!r}', "Page('Ō')")
 
 
 class TestPageBotMayEdit(TestCase):
@@ -1082,7 +1083,6 @@ class TestApplicablePageProtections(TestCase):
         p2 = pywikibot.Page(site, 'User:Unicodesnowman/ProtectTest')
         p3 = pywikibot.Page(site, 'File:Wiki.png')
 
-        # from the API, since 1.25wmf14
         pp1 = p1.applicable_protections()
         pp2 = p2.applicable_protections()
         pp3 = p3.applicable_protections()
@@ -1092,12 +1092,6 @@ class TestApplicablePageProtections(TestCase):
         self.assertNotIn('create', pp2)
         self.assertNotIn('upload', pp2)
         self.assertIn('upload', pp3)
-
-        # inferred
-        site.version = lambda: '1.24'
-        self.assertEqual(pp1, p1.applicable_protections())
-        self.assertEqual(pp2, p2.applicable_protections())
-        self.assertEqual(pp3, p3.applicable_protections())
 
 
 class TestPageProtect(TestCase):

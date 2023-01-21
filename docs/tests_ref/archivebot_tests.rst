@@ -1,5 +1,6 @@
+******************************
 tests.archivebot\_tests module
-==============================
+******************************
 
 .. automodule:: tests.archivebot_tests
     :members:

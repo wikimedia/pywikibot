@@ -128,7 +128,7 @@ class TestReplacementsMain(TWNBotTestCase):
                                offset)
         if msg:
             self.assertEqual(replacement.edit_summary,
-                             'M{}'.format(offset + 1))
+                             f'M{offset + 1}')
         else:
             self.assertIs(replacement.edit_summary,
                           replacement.fix_set.edit_summary)

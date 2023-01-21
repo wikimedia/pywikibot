@@ -9,7 +9,7 @@ This module also includes objects:
 * WikibaseEntity: base interface for Wikibase entities.
 """
 #
-# (C) Pywikibot team, 2013-2022
+# (C) Pywikibot team, 2013-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -44,9 +44,9 @@ from pywikibot.page._collections import (
 )
 from pywikibot.page._decorators import allow_asynchronous
 from pywikibot.page._filepage import FilePage
-from pywikibot.page._pages import BasePage
+from pywikibot.page._page import BasePage
 from pywikibot.site import DataSite, Namespace
-from pywikibot.tools import cached
+from pywikibot.tools import cached, first_upper
 
 
 __all__ = (
@@ -89,7 +89,7 @@ class WikibaseEntity:
     :type title_pattern: str
     """
 
-    DATA_ATTRIBUTES = {}  # type: Dict[str, Any]
+    DATA_ATTRIBUTES: Dict[str, Any] = {}
 
     def __init__(self, repo, id_=None) -> None:
         """
@@ -271,11 +271,15 @@ class WikibaseEntity:
 
         data = {}
 
-        # This initializes all data,
+        # This initializes all data
         for key, cls in self.DATA_ATTRIBUTES.items():
             value = cls.fromJSON(self._content.get(key, {}), self.repo)
             setattr(self, key, value)
             data[key] = value
+            # xxx: need better handling for this
+            if key in ['claims', 'statements']:
+                value.set_on_item(self)
+
         return data
 
     def editEntity(
@@ -327,7 +331,7 @@ class WikibaseEntity:
         entity_id = self.getID()
         if entity_id == '-1':
             raise NoWikibaseEntityError(self)
-        return '{}{}'.format(self.repo.concept_base_uri, entity_id)
+        return f'{self.repo.concept_base_uri}{entity_id}'
 
 
 class MediaInfo(WikibaseEntity):
@@ -340,8 +344,16 @@ class MediaInfo(WikibaseEntity):
     title_pattern = r'M[1-9]\d*'
     DATA_ATTRIBUTES = {
         'labels': LanguageDict,
-        # TODO: 'statements': ClaimCollection,
+        'statements': ClaimCollection,
     }
+
+    def __getattr__(self, name):
+        if name == 'claims':  # T149410
+            name = 'statements'
+            if hasattr(self, name):
+                return getattr(self, name)
+
+        return super().__getattr__(name)
 
     @property
     def file(self) -> FilePage:
@@ -365,7 +377,7 @@ class MediaInfo(WikibaseEntity):
 
             page = result.pop()
             if page.namespace() != page.site.namespaces.FILE:
-                raise Error('Page with id "{}" is not a file'.format(page_id))
+                raise Error(f'Page with id "{page_id}" is not a file')
 
             self._file = FilePage(page)
 
@@ -576,10 +588,6 @@ class WikibasePage(BasePage, WikibaseEntity):
 
         if 'pageid' in self._content:
             self._pageid = self._content['pageid']
-
-        # xxx: this is ugly
-        if 'claims' in data:
-            self.claims.set_on_item(self)
 
         return data
 
@@ -962,7 +970,7 @@ class ItemPage(WikibasePage):
             item.
         """
         if not isinstance(site, DataSite):
-            raise TypeError('{} is not a data repository.'.format(site))
+            raise TypeError(f'{site} is not a data repository.')
 
         base_uri, _, qid = uri.rpartition('/')
         if base_uri != site.concept_base_uri.rstrip('/'):
@@ -1357,12 +1365,17 @@ class Claim(Property):
 
     TARGET_CONVERTER = {
         'wikibase-item': lambda value, site:
-            ItemPage(site, 'Q' + str(value['numeric-id'])),
+            ItemPage(site.get_repo_for_entity_type('item'),
+                     'Q' + str(value['numeric-id'])),
         'wikibase-property': lambda value, site:
-            PropertyPage(site, 'P' + str(value['numeric-id'])),
-        'wikibase-lexeme': lambda value, site: LexemePage(site, value['id']),
-        'wikibase-form': lambda value, site: LexemeForm(site, value['id']),
-        'wikibase-sense': lambda value, site: LexemeSense(site, value['id']),
+            PropertyPage(site.get_repo_for_entity_type('property'),
+                         'P' + str(value['numeric-id'])),
+        'wikibase-lexeme': lambda value, site:
+            LexemePage(site.get_repo_for_entity_type('lexeme'), value['id']),
+        'wikibase-form': lambda value, site:
+            LexemeForm(site.get_repo_for_entity_type('lexeme'), value['id']),
+        'wikibase-sense': lambda value, site:
+            LexemeSense(site.get_repo_for_entity_type('lexeme'), value['id']),
         'commonsMedia': lambda value, site:
             FilePage(pywikibot.Site('commons'), value),  # T90492
         'globe-coordinate': pywikibot.Coordinate.fromWikibase,
@@ -1392,7 +1405,9 @@ class Claim(Property):
 
         Defined by the "snak" value, supplemented by site + pid
 
-        :param site: repository the claim is on
+        :param site: Repository where the property of the claim is defined.
+            Note that this does not have to correspond to the repository
+            where the claim has been stored.
         :type site: pywikibot.site.DataSite
         :param pid: property id, with "P" prefix
         :param snak: snak identifier for claim
@@ -1416,8 +1431,8 @@ class Claim(Property):
         self._on_item = None  # The item it's on
 
     @property
-    def on_item(self):
-        """Return item this claim is attached to."""
+    def on_item(self) -> Optional[WikibaseEntity]:
+        """Return entity this claim is attached to."""
         return self._on_item
 
     @on_item.setter
@@ -1431,10 +1446,23 @@ class Claim(Property):
                 for source in values:
                     source.on_item = item
 
+    def _assert_attached(self) -> None:
+        if self.on_item is None:
+            raise RuntimeError('The claim is not attached to an entity')
+
+    def _assert_mainsnak(self, message: str) -> None:
+        if self.isQualifier:
+            raise RuntimeError(first_upper(message.format('qualifier')))
+        if self.isReference:
+            raise RuntimeError(first_upper(message.format('reference')))
+
     def __repr__(self) -> str:
         """Return the representation string."""
-        return '{cls_name}.fromJSON({}, {})'.format(
-            repr(self.repo), self.toJSON(), cls_name=type(self).__name__)
+        cls_name = type(self).__name__
+        if self.target:
+            return f'{cls_name}.fromJSON({self.repo!r}, {self.toJSON()})'
+        else:
+            return f'{cls_name}({self.repo!r}, {self.id!r})'
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
@@ -1518,7 +1546,8 @@ class Claim(Property):
 
         :rtype: pywikibot.page.Claim
         """
-        claim = cls(site, data['mainsnak']['property'],
+        claim_repo = site.get_repo_for_entity_type('property')
+        claim = cls(claim_repo, data['mainsnak']['property'],
                     datatype=data['mainsnak'].get('datatype', None))
         if 'id' in data:
             claim.snak = data['id']
@@ -1528,12 +1557,12 @@ class Claim(Property):
         if claim.getSnakType() == 'value':
             value = data['mainsnak']['datavalue']['value']
             # The default covers string, url types
-            if claim.type in cls.types or claim.type == 'wikibase-property':
+            if claim.type in cls.types:
                 claim.target = cls.TARGET_CONVERTER.get(
                     claim.type, lambda value, site: value)(value, site)
             else:
                 pywikibot.warning(
-                    '{} datatype is not supported yet.'.format(claim.type))
+                    f'{claim.type} datatype is not supported yet.')
                 claim.target = pywikibot.WbUnknown.fromWikibase(value)
         if 'rank' in data:  # References/Qualifiers don't have ranks
             claim.rank = data['rank']
@@ -1664,11 +1693,12 @@ class Claim(Property):
         :param snaktype: The new snak type ('value', 'somevalue', or
             'novalue').
         """
+        self._assert_attached()
         if value:
             self.setTarget(value)
 
-        data = self.repo.changeClaimTarget(self, snaktype=snaktype,
-                                           **kwargs)
+        data = self.on_item.repo.changeClaimTarget(self, snaktype=snaktype,
+                                                   **kwargs)
         # TODO: Re-create the entire item from JSON, not just id
         self.snak = data['claim']['id']
         self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
@@ -1710,12 +1740,15 @@ class Claim(Property):
 
     def setRank(self, rank) -> None:
         """Set the rank of the Claim."""
+        self._assert_mainsnak('Cannot set rank on a {}')
         self.rank = rank
 
     def changeRank(self, rank, **kwargs):
         """Change the rank of the Claim and save."""
+        self._assert_mainsnak('Cannot change rank on a {}')
+        self._assert_attached()
         self.rank = rank
-        return self.repo.save_claim(self, **kwargs)
+        return self.on_item.repo.save_claim(self, **kwargs)
 
     def changeSnakType(self, value=None, **kwargs) -> None:
         """
@@ -1747,12 +1780,14 @@ class Claim(Property):
         :param claims: the claims to add
         :type claims: list of pywikibot.Claim
         """
+        self._assert_mainsnak('Cannot add sources to a {}')
         for claim in claims:
             if claim.on_item is not None:
                 raise ValueError(
                     'The provided Claim instance is already used in an entity')
         if self.on_item is not None:
-            data = self.repo.editSource(self, claims, new=True, **kwargs)
+            data = self.on_item.repo.editSource(self, claims, new=True,
+                                                **kwargs)
             self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
             for claim in claims:
                 claim.hash = data['reference']['hash']
@@ -1779,7 +1814,9 @@ class Claim(Property):
         :param sources: the sources to remove
         :type sources: list of pywikibot.Claim
         """
-        data = self.repo.removeSources(self, sources, **kwargs)
+        self._assert_mainsnak('Cannot remove sources from a {}')
+        self._assert_attached()
+        data = self.on_item.repo.removeSources(self, sources, **kwargs)
         self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
         for source in sources:
             source_dict = defaultdict(list)
@@ -1792,11 +1829,12 @@ class Claim(Property):
         :param qualifier: the qualifier to add
         :type qualifier: pywikibot.page.Claim
         """
+        self._assert_mainsnak('Cannot add qualifiers to a {}')
         if qualifier.on_item is not None:
             raise ValueError(
                 'The provided Claim instance is already used in an entity')
         if self.on_item is not None:
-            data = self.repo.editQualifier(self, qualifier, **kwargs)
+            data = self.on_item.repo.editQualifier(self, qualifier, **kwargs)
             self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
             qualifier.on_item = self.on_item
         qualifier.isQualifier = True
@@ -1819,9 +1857,11 @@ class Claim(Property):
         Remove the qualifiers.
 
         :param qualifiers: the qualifiers to remove
-        :type qualifiers: list Claim
+        :type qualifiers: list of pywikibot.Claim
         """
-        data = self.repo.remove_qualifiers(self, qualifiers, **kwargs)
+        self._assert_mainsnak('Cannot remove qualifiers from a {}')
+        self._assert_attached()
+        data = self.on_item.repo.remove_qualifiers(self, qualifiers, **kwargs)
         self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
         for qualifier in qualifiers:
             self.qualifiers[qualifier.getID()].remove(qualifier)
@@ -1879,15 +1919,15 @@ class Claim(Property):
         :param target: qualifier target to check presence of
         :return: true if the qualifier was found, false otherwise
         """
-        if self.isQualifier or self.isReference:
-            raise ValueError('Qualifiers and references cannot have '
-                             'qualifiers.')
+        self._assert_mainsnak('{}s cannot have qualifiers')
         return any(qualifier.target_equals(target)
                    for qualifier in self.qualifiers.get(qualifier_id, []))
 
     def _formatValue(self) -> dict:
-        """
-        Format the target into the proper JSON value that Wikibase wants.
+        """Format the target into the proper JSON value that Wikibase wants.
+
+        .. versionchanges:: 8.0
+           normalize the result if type is ``time``.
 
         :return: JSON value
         """
@@ -1904,13 +1944,15 @@ class Claim(Property):
             value = self.getTarget()
         elif self.type == 'commonsMedia':
             value = self.getTarget().title(with_ns=False)
-        elif self.type in ('globe-coordinate', 'time',
+        elif self.type == 'time':
+            value = self.getTarget().toWikibase(normalize=True)
+        elif self.type in ('globe-coordinate',
                            'quantity', 'monolingualtext',
                            'geo-shape', 'tabular-data'):
             value = self.getTarget().toWikibase()
         else:  # WbUnknown
             pywikibot.warning(
-                '{} datatype is not supported yet.'.format(self.type))
+                f'{self.type} datatype is not supported yet.')
             value = self.getTarget().toWikibase()
         return value
 

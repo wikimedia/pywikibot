@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Test that each script can be compiled and executed."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -27,8 +27,6 @@ framework_scripts = ['login', 'shell']
 # Here, the name given to the module which will be imported is required.
 script_deps = {
     'create_isbn_edition': ['isbnlib', 'unidecode'],
-    'commons_information': ['mwparserfromhell'],
-    'patrol': ['mwparserfromhell'],
     'weblinkchecker': ['memento_client'],
 }
 
@@ -140,11 +138,12 @@ skip_on_results = {
 
 
 def collector(loader=unittest.loader.defaultTestLoader):
-    """Load the default tests."""
-    # Note: Raising SkipTest during load_tests will
-    # cause the loader to fallback to its own
-    # discover() ordering of unit tests.
-    if unrunnable_script_set:
+    """Load the default tests.
+
+    .. note:: Raising SkipTest during load_tests will cause the loader
+       to fallback to its own discover() ordering of unit tests.
+    """
+    if unrunnable_script_set:  # pragma: no cover
         unittest_print('Skipping execution of unrunnable scripts:\n  {!r}'
                        .format(unrunnable_script_set))
 
@@ -183,7 +182,7 @@ def import_script(script_name: str):
     import_module(prefix + script_name)
 
 
-class TestScriptMeta(MetaTestCaseClass):
+class ScriptTestMeta(MetaTestCaseClass):
 
     """Test meta class."""
 
@@ -327,7 +326,7 @@ class TestScriptMeta(MetaTestCaseClass):
         return super().__new__(cls, name, bases, dct)
 
 
-class TestScriptHelp(PwbTestCase, metaclass=TestScriptMeta):
+class TestScriptHelp(PwbTestCase, metaclass=ScriptTestMeta):
 
     """Test cases for running scripts with -help.
 
@@ -348,7 +347,7 @@ class TestScriptHelp(PwbTestCase, metaclass=TestScriptMeta):
 
 
 class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
-                         metaclass=TestScriptMeta):
+                         metaclass=ScriptTestMeta):
 
     """Test cases for running scripts with -siumlate.
 
@@ -388,65 +387,52 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
 
 
 class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
-                          metaclass=TestScriptMeta):
+                          metaclass=ScriptTestMeta):
 
     """Test cases for running scripts with a generator."""
 
     login = True
 
     _expected_failures = {
-        'login',
         'add_text',
+        'archivebot',
+        'blockpageschecker',
         'category',
+        'category_graph',
+        'category_redirect',
         'change_pagelang',
+        'checkimages',
         'claimit',
+        'clean_sandbox',
+        'commonscat',
+        'create_isbn_edition',
         'dataextend',
         'data_ingestion',
         'delete',
+        'delinker',
         'djvutext',
         'download_dump',
         'harvest_template',
+        'imagetransfer',
         'interwiki',
         'listpages',
+        'login',
+        'misspelling',
         'movepages',
         'pagefromfile',
+        'parser_function_count',
+        'patrol',
         'protect',
         'redirect',
-        'reflinks',
+        'reflinks',  # 404-links.txt is required
         'replicate_wiki',
         'revertbot',
+        'shell',
+        'solve_disambiguation',
         'speedy_delete',
         'template',
         'templatecount',
         'transferbot',
-    }
-
-    _allowed_failures = {
-        'archivebot',
-        'basic',
-        'blockpageschecker',
-        'category_redirect',
-        'checkimages',
-        'clean_sandbox',
-        'commonscat',
-        'commons_information',
-        'coordinate_import',
-        'cosmetic_changes',
-        'create_isbn_edition',
-        'delinker',
-        'fixing_redirects',
-        'illustrate_wikidata',
-        'image',
-        'imagetransfer',
-        'interwikidata',
-        'misspelling',
-        'newitem',
-        'parser_function_count',
-        'patrol',
-        'replace',
-        'shell',
-        'solve_disambiguation',
-        'touch',
         'unusedfiles',
         'upload',
         'watchlist',
@@ -454,8 +440,11 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
         'welcome',
     }
 
-    _arguments = '-simulate -page:Foo -always'
-    _results = ("Working on 'Foo", 'Script terminated successfully')
+    _allowed_failures = {
+        'basic',
+    }
+    _arguments = '-simulate -page:Foobar -always -site:wikipedia:en'
+    _results = ("Working on 'Foobar'", 'Script terminated successfully')
     _skip_results = {}
     _timeout = True
 

@@ -5,15 +5,20 @@
 #
 # Distributed under the terms of the MIT license.
 #
+import unittest
 from contextlib import suppress
 
 from pywikibot.exceptions import APIError, Error
 from pywikibot.site import TokenWallet
-from pywikibot.tools import MediaWikiVersion
-from tests.aspects import DefaultSiteTestCase, TestCase, TestCaseBase, unittest
+from tests.aspects import (
+    DefaultSiteTestCase,
+    DeprecationTestCase,
+    TestCase,
+    TestCaseBase,
+)
 
 
-class TestSiteTokens(DefaultSiteTestCase):
+class TestSiteTokens(DeprecationTestCase, DefaultSiteTestCase):
 
     """Test cases for tokens in Site methods.
 
@@ -26,67 +31,22 @@ class TestSiteTokens(DefaultSiteTestCase):
 
     login = True
 
-    def setUp(self):
-        """Store version."""
-        super().setUp()
-        self.mysite = self.get_site()
-        self._version = self.mysite.mw_version
-        self.orig_version = self.mysite.version
-
-    def tearDown(self):
-        """Restore version."""
-        super().tearDown()
-        self.mysite.version = self.orig_version
-
-    def _test_tokens(self, version, test_version, additional_token):
+    def test_tokens(self):
         """Test tokens."""
-        if version and (self._version < version
-                        or self._version < test_version):
-            raise unittest.SkipTest(
-                'Site {} version {} is too low for this tests.'
-                .format(self.mysite, self._version))
-
-        self.mysite.version = lambda: test_version
-        del self.mysite._mw_version_time  # remove cached mw_version
-
         redirected_tokens = ['edit', 'move', 'delete']
-        for ttype in redirected_tokens + ['patrol', additional_token]:
-            try:
-                token = self.mysite.tokens[ttype]
-            except Error as error_msg:
-                if self.mysite.validate_tokens([ttype]):
-                    pattern = ("Action '[a-z]+' is not allowed "
-                               'for user .* on .* wiki.')
-                else:
-                    pattern = "Requested token '[a-z]+' is invalid on .* wiki."
-
-                self.assertRegex(str(error_msg), pattern)
-
-            else:
-                self.assertIsInstance(token, str)
-                self.assertEqual(token, self.mysite.tokens[ttype])
-                # test __contains__
-                if test_version < '1.24wmf19':
-                    self.assertIn(ttype, self.mysite.tokens)
-                elif ttype in redirected_tokens:
-                    self.assertEqual(self.mysite.tokens[ttype],
-                                     self.mysite.tokens['csrf'])
-
-    def test_tokens_in_mw_123_124wmf18(self):
-        """Test ability to get page tokens."""
-        if MediaWikiVersion(self.orig_version()) >= '1.37wmf24':
-            self.skipTest('Site {} version {} is too new for this tests.'
-                          .format(self.mysite, self._version))
-        self._test_tokens('1.23', '1.24wmf18', 'deleteglobalaccount')
-
-    def test_tokens_in_mw_124wmf19(self):
-        """Test ability to get page tokens."""
-        self._test_tokens('1.24wmf19', '1.24wmf20', 'deleteglobalaccount')
+        for ttype in redirected_tokens + ['patrol', 'deleteglobalaccount']:
+            self.assertIsInstance(self.site.tokens[ttype], str)
+            self.assertIn(ttype, self.site.tokens)  # test __contains__
+            if ttype in redirected_tokens:
+                self.assertEqual(self.site.tokens[ttype],
+                                 self.site.tokens['csrf'])
+                self._do_test_warning_filename = False
+                self.assertDeprecationParts(f'Token {ttype!r}', "'csrf'")
 
     def test_invalid_token(self):
         """Test invalid token."""
-        with self.assertRaises(Error):
-            self.mysite.tokens['invalidtype']
+        with self.assertRaises(KeyError):
+            self.site.tokens['invalidtype']
 
 
 class TokenTestBase(TestCaseBase):
@@ -100,11 +60,11 @@ class TokenTestBase(TestCaseBase):
         ttype = self.token_type
         try:
             token = mysite.tokens[ttype]
-        except Error as error_msg:
+        except KeyError as error_msg:
             self.assertRegex(
                 str(error_msg),
-                "Action '[a-z]+' is not allowed for user .* on .* wiki.")
-            self.assertNotIn(self.token_type, self.site.tokens)
+                f'Invalid token {ttype!r} for user .+ on {mysite} wiki.')
+            self.assertNotIn(ttype, self.site.tokens)
             self.skipTest(error_msg)
 
         self.token = token
@@ -150,7 +110,7 @@ class PatrolTestCase(TokenTestBase, TestCase):
             raise
 
         if hasattr(mysite, '_patroldisabled') and mysite._patroldisabled:
-            self.skipTest('Patrolling is disabled on {} wiki.'.format(mysite))
+            self.skipTest(f'Patrolling is disabled on {mysite} wiki.')
 
         result = result[0]
         self.assertIsInstance(result, dict)

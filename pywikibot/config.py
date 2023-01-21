@@ -27,8 +27,11 @@ utility methods to build paths relative to base_dir:
  - datafilepath
  - shortpath
 
-.. versionchanged 6.2::
+.. versionchanged:: 6.2
    config2 was renamed to config
+.. versionchanged:: 8.0
+   Editor settings has been revised. *editor* variable is None by
+   default. Editor detection functions were moved to :mod:`editor`.
 """
 #
 # (C) Pywikibot team, 2003-2022
@@ -59,6 +62,7 @@ from pywikibot.backports import (
     List,
     Mapping,
     Tuple,
+    removeprefix,
     removesuffix,
 )
 from pywikibot.logging import error, output, warning
@@ -71,8 +75,6 @@ _ValueType = TypeVar('_ValueType')
 
 OSWIN32 = (sys.platform == 'win32')
 
-if OSWIN32:
-    import winreg
 
 # This frozen set should contain all imported modules/variables, so it must
 # occur directly after the imports. At that point globals() only contains the
@@ -141,8 +143,8 @@ mylang = 'language'
 # usernames['wikibooks']['*'] = 'mySingleUsername'
 # You may use '*' for family name in a similar manner.
 #
-usernames = collections.defaultdict(dict)  # type: Dict[str, Dict[str, str]]
-disambiguation_comment = collections.defaultdict(dict)  # type: _DabComDict
+usernames: Dict[str, Dict[str, str]] = collections.defaultdict(dict)
+disambiguation_comment: _DabComDict = collections.defaultdict(dict)
 
 # User agent format.
 # For the meaning and more help in customization see:
@@ -167,7 +169,7 @@ fake_user_agent_default = {'reflinks': False, 'weblinkchecker': False}
 # True for enabling, False for disabling, str to hardcode a UA.
 # Example: {'problematic.site.example': True,
 #           'prefers.specific.ua.example': 'snakeoil/4.2'}
-fake_user_agent_exceptions = {}  # type: Dict[str, Union[bool, str]]
+fake_user_agent_exceptions: Dict[str, Union[bool, str]] = {}
 
 # The default interface for communicating with the site
 # currently the only defined interface is 'APISite', so don't change this!
@@ -215,7 +217,7 @@ solve_captcha = True
 #                                    'access_key', 'access_secret')
 #
 # Note: the target wiki site must install OAuth extension
-authenticate = {}  # type: Dict[str, Tuple[str, ...]]
+authenticate: Dict[str, Tuple[str, ...]] = {}
 
 # By default you are asked for a password on the terminal.
 # A password file may be used, e.g. password_file = '.passwd'
@@ -255,6 +257,7 @@ default_edit_summary = 'Pywikibot ' + pwb_version
 # stat.S_IWOTH 0o002 write permission for others
 # stat.S_IXOTH 0o001 execute permission for others
 private_files_permission = stat.S_IRUSR | stat.S_IWUSR
+private_folder_permission = stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR
 
 # Allow user to stop warnings about file security
 # by setting this to true.
@@ -268,7 +271,7 @@ ignore_file_security_warnings = False
 #
 # Note that these headers will be sent with all requests,
 # not just MediaWiki API calls.
-extra_headers = {}  # type: Mapping[str, str]
+extra_headers: Mapping[str, str] = {}
 
 # Set to True to override the {{bots}} exclusion protocol (at your own risk!)
 ignore_bot_templates = False
@@ -336,7 +339,7 @@ def get_base_dir(test_directory: Optional[str] = None,
     base_dir = ''
     for arg in sys.argv[1:]:
         if arg.startswith('-dir:'):
-            base_dir = arg[5:]
+            base_dir = removeprefix(arg, '-dir:')
             base_dir = os.path.expanduser(base_dir)
             break
     else:
@@ -368,7 +371,7 @@ def get_base_dir(test_directory: Optional[str] = None,
             for dir_ in base_dir_cand:
                 dir_s = os.path.join(*dir_)
                 try:
-                    os.makedirs(dir_s, mode=private_files_permission)
+                    os.makedirs(dir_s, mode=private_folder_permission)
                 except OSError:  # PermissionError or already exists
                     if exists(dir_s):
                         base_dir = dir_s
@@ -376,20 +379,22 @@ def get_base_dir(test_directory: Optional[str] = None,
 
     if not os.path.isabs(base_dir):
         base_dir = os.path.normpath(os.path.join(os.getcwd(), base_dir))
+
     # make sure this path is valid and that it contains user-config file
     if not os.path.isdir(base_dir):
-        raise RuntimeError("Directory '{}' does not exist.".format(base_dir))
+        raise RuntimeError(f"Directory '{base_dir}' does not exist.")
+
     # check if config_file is in base_dir
     if not exists(base_dir):
-        exc_text = 'No {} found in directory {!r}.\n'.format(
-            config_file, base_dir)
+        exc_text = f'No {config_file} found in directory {base_dir!r}.\n'
 
         if __no_user_config is None:
             assert get_base_dir.__doc__ is not None
             exc_text += (
-                '  Please check that {0} is stored in the correct location.\n'
-                '  Directory where {0} is searched is determined as follows:'
-                '\n\n    '.format(config_file)) + get_base_dir.__doc__
+                '\nPlease check that {0} is stored in the correct location.'
+                '\nDirectory where {0} is searched is determined as follows:'
+                '\n\n    '.format(config_file)
+            ) + get_base_dir.__doc__
             raise RuntimeError(exc_text)
 
         if __no_user_config != '2':
@@ -517,7 +522,7 @@ userinterface = 'terminal'
 # this can be used to pass variables to the UI init function
 # useful for e.g.
 # userinterface_init_kwargs = {'default_stream': 'stdout'}
-userinterface_init_kwargs = {}  # type: Dict[str, str]
+userinterface_init_kwargs: Dict[str, str] = {}
 
 # i18n setting for user interface language
 # default is obtained from locale.getlocale
@@ -565,9 +570,14 @@ tkhorsize = 1280
 tkvertsize = 800
 
 # ############# EXTERNAL EDITOR SETTINGS ##############
-# The command for the editor you want to use. If set to None, a simple Tkinter
-# editor will be used.
-editor = os.environ.get('EDITOR')
+# The command for the editor you want to use. If set to True, Tkinter
+# editor will be used. If set to False, no editor will be used. In
+# script tests to be a noop (like /bin/true) so the script continues.
+# If set to None, the EDITOR environment variable will be used as
+# command. If EDITOR is not set, on windows plattforms it tries to
+# determine the default text editor from registry. Finally, Tkinter is
+# used as fallback.
+editor: Union[bool, str, None] = None
 
 # Warning: DO NOT use an editor which doesn't support Unicode to edit pages!
 # You will BREAK non-ASCII symbols!
@@ -590,9 +600,9 @@ editor_filename_extension = 'wiki'
 #     log = []
 # Per default, no logging is enabled.
 # This setting can be overridden by the -log or -nolog command-line arguments.
-log = []  # type: List[str]
+log: List[str] = []
 # filename defaults to modulename-bot.log
-logfilename = None  # type: Optional[str]
+logfilename: Optional[str] = None
 # maximal size of a logfile in kilobytes. If the size reached that limit the
 # logfile will be renamed (if logfilecount is not 0) and the old file is filled
 # again. logfilesize must be an integer value
@@ -610,7 +620,7 @@ verbose_output = 0
 log_pywiki_repo_version = False
 # if True, include a lot of debugging info in logfile
 # (overrides log setting above)
-debug_log = []  # type: List[str]
+debug_log: List[str] = []
 
 # ############# EXTERNAL SCRIPT PATH SETTINGS ##############
 # Set your own script path to lookup for your script files.
@@ -630,7 +640,7 @@ debug_log = []  # type: List[str]
 #
 # sample:
 # user_script_paths = ['scripts.myscripts']
-user_script_paths = []  # type: List[str]
+user_script_paths: List[str] = []
 
 # ############# EXTERNAL FAMILIES SETTINGS ##############
 # Set your own family path to lookup for your family files.
@@ -645,7 +655,7 @@ user_script_paths = []  # type: List[str]
 # samples:
 # family_files['mywiki'] = 'https://de.wikipedia.org'
 # user_families_paths = ['data/families']
-user_families_paths = []  # type: List[str]
+user_families_paths: List[str] = []
 
 # ############# INTERWIKI SETTINGS ##############
 
@@ -723,7 +733,7 @@ maxthrottle = 60
 
 # Slow down the robot such that it never makes a second page edit within
 # 'put_throttle' seconds.
-put_throttle = 10  # type: Union[int, float]
+put_throttle: Union[int, float] = 10
 
 # Sometimes you want to know when a delay is inserted. If a delay is larger
 # than 'noisysleep' seconds, it is logged on the screen.
@@ -810,7 +820,7 @@ cosmetic_changes_mylang_only = True
 # (if cosmetic_changes_mylang_only is set)
 # Please set your dictionary by adding such lines to your user config file:
 # cosmetic_changes_enable['wikipedia'] = ('de', 'en', 'fr')
-cosmetic_changes_enable = {}  # type: Dict[str, Tuple[str, ...]]
+cosmetic_changes_enable: Dict[str, Tuple[str, ...]] = {}
 
 # The dictionary cosmetic_changes_disable should contain a tuple of languages
 # for each site where you wish to disable cosmetic changes. You may use it with
@@ -818,7 +828,7 @@ cosmetic_changes_enable = {}  # type: Dict[str, Tuple[str, ...]]
 # language. This also overrides the settings in the cosmetic_changes_enable
 # dictionary. Please set your dict by adding such lines to your user config:
 # cosmetic_changes_disable['wikipedia'] = ('de', 'en', 'fr')
-cosmetic_changes_disable = {}  # type: Dict[str, Tuple[str, ...]]
+cosmetic_changes_disable: Dict[str, Tuple[str, ...]] = {}
 
 # cosmetic_changes_deny_script is a list of scripts for which cosmetic changes
 # are disabled. You may add additional scripts by appending script names in
@@ -840,7 +850,7 @@ cosmetic_changes_deny_script = ['category_redirect', 'cosmetic_changes',
 #
 # to replace all occurrences of 'Hoofdpagina' with 'Veurblaad' when writing to
 # liwiki. Note that this does not take the origin wiki into account.
-replicate_replace = {}  # type: Dict[str, Dict[str, str]]
+replicate_replace: Dict[str, Dict[str, str]] = {}
 
 # ############# FURTHER SETTINGS ##############
 
@@ -850,11 +860,11 @@ replicate_replace = {}  # type: Dict[str, Dict[str, str]]
 # on the wiki server. Allows simulation runs of bots to be carried out without
 # changing any page on the server side. Use this setting to add more actions
 # into user config file for wikis with extra write actions.
-actions_to_block = []  # type: List[str]
+actions_to_block: List[str] = []
 
 # Set simulate to True or use -simulate option to block all actions given
 # above.
-simulate = False  # type: Union[bool, str]
+simulate: Union[bool, str] = False
 
 # How many pages should be put to a queue in asynchronous mode.
 # If maxsize is <= 0, the queue size is infinite.
@@ -922,51 +932,6 @@ def shortpath(path: str) -> str:
     return path
 
 
-def _win32_extension_command(extension: str) -> Optional[str]:
-    """Get the command from the Win32 registry for an extension."""
-    fileexts_key = \
-        r'Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts'
-    key_name = fileexts_key + r'\.' + extension + r'\OpenWithProgids'
-    try:
-        key1 = winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_name)
-        _prog_id = winreg.EnumValue(key1, 0)[0]
-        _key2 = winreg.OpenKey(winreg.HKEY_CLASSES_ROOT,
-                               r'{}\shell\open\command'.format(_prog_id))
-        _cmd = winreg.QueryValueEx(_key2, '')[0]
-        # See T102465 for issues relating to using this value.
-        cmd = _cmd
-        if cmd.find('%1'):
-            cmd = cmd[:cmd.find('%1')]
-            # Remove any trailing character, which should be a quote or space
-            # and then remove all whitespace.
-            return cmd[:-1].strip()
-    except OSError as e:
-        # Catch any key lookup errors
-        output('Unable to detect program for file extension "{}": {!r}'
-               .format(extension, e))
-    return None
-
-
-def _detect_win32_editor() -> Optional[str]:
-    """Detect the best Win32 editor."""
-    # Notepad is even worse than our Tkinter editor.
-    unusable_exes = ['notepad.exe',
-                     'py.exe',
-                     'pyw.exe',
-                     'python.exe',
-                     'pythonw.exe']
-
-    for ext in ['py', 'txt']:
-        editor = _win32_extension_command(ext)
-        if editor:
-            for unusable in unusable_exes:
-                if unusable in editor.lower():
-                    break
-            else:
-                return editor
-    return None
-
-
 # System-level and User-level changes.
 # Store current variables and their types.
 _public_globals = {
@@ -985,14 +950,14 @@ if os.path.exists(_filename):
     _filemode = _filestatus[0]
     _fileuid = _filestatus[4]
     if not OSWIN32 and _fileuid not in [os.getuid(), 0]:
-        warning('Skipped {fn!r}: owned by someone else.'.format(fn=_filename))
+        warning(f'Skipped {_filename!r}: owned by someone else.')
     elif OSWIN32 or _filemode & 0o02 == 0:
         with open(_filename, 'rb') as f:
             exec(compile(f.read(), _filename, 'exec'), _exec_globals)
     else:
-        warning('Skipped {fn!r}: writeable by others.'.format(fn=_filename))
+        warning(f'Skipped {_filename!r}: writeable by others.')
 elif __no_user_config and __no_user_config != '2':
-    warning('{} cannot be loaded.'.format(user_config_file))
+    warning(f'{user_config_file} cannot be loaded.')
 
 
 class _DifferentTypeError(UserWarning, TypeError):
@@ -1104,18 +1069,6 @@ for _key in _modified:
 if console_encoding is None:
     console_encoding = 'utf-8'
 
-if OSWIN32 and editor is None:
-    editor = _detect_win32_editor()
-
-# single character string literals from
-# https://docs.python.org/3/reference/lexical_analysis.html#string-and-bytes-literals
-# encode('unicode-escape') also changes Unicode characters
-if OSWIN32 and editor and set(editor) & set('\a\b\f\n\r\t\v'):
-    warning(
-        'The editor path contains probably invalid escaped characters. Make '
-        'sure to use a raw-string (r"..." or r\'...\'), forward slashes as a '
-        'path delimiter or to escape the normal path delimiter.')
-
 if userinterface_lang is None:
     userinterface_lang = os.getenv('PYWIKIBOT_USERINTERFACE_LANG') \
         or getlocale()[0]
@@ -1132,15 +1085,18 @@ if family == 'wikipedia' and mylang == 'language':
     mylang = 'test'
 
 # SECURITY WARNINGS
-if (not ignore_file_security_warnings
-        and private_files_permission & (stat.S_IRWXG | stat.S_IRWXO) != 0):
-    error("CRITICAL SECURITY WARNING: 'private_files_permission' is set"
-          ' to allow access from the group/others which'
-          ' could give them access to the sensitive files.'
-          ' To avoid giving others access to sensitive files, pywikibot'
-          " won't run with this setting. Choose a more restrictive"
-          " permission or set 'ignore_file_security_warnings' to true.")
-    sys.exit(1)
+if not ignore_file_security_warnings:
+    for _permission in ('private_files_permission',
+                        'private_folder_permission'):
+        if locals()[_permission] & (stat.S_IRWXG | stat.S_IRWXO) != 0:
+            error('\n' + fill(
+                f'CRITICAL SECURITY WARNING: {_permission!r} is set to allow'
+                ' access from the group/others which could give them access'
+                ' to the sensitive files. To avoid giving others access to'
+                " sensitive files, pywikibot won't run with this setting."
+                ' Choose a more restrictive permission or set'
+                " 'ignore_file_security_warnings' to true."))
+            sys.exit(1)
 
 # Setup custom family files
 for file_path in user_families_paths:
@@ -1156,7 +1112,7 @@ if __name__ == '__main__':  # pragma: no cover
         if _arg == 'modified':
             _all = False
         else:
-            warning('Unknown arg {} ignored'.format(_arg))
+            warning(f'Unknown arg {_arg} ignored')
 
     for _name in sorted(globals()):
         if _name[0] != '_' \
@@ -1174,7 +1130,7 @@ if __name__ == '__main__':  # pragma: no cover
                           + '( ...xxxxxxxx... )')
             else:
                 _value = repr('xxxxxxxx')
-            output('{}={}'.format(_name, _value))
+            output(f'{_name}={_value}')
 
 # cleanup all locally-defined variables
 for __var in list(globals()):

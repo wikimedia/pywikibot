@@ -10,7 +10,7 @@ import pywikibot
 
 def main() -> None:
     """Print umlauts."""
-    pywikibot.output('Häuser')
+    pywikibot.info('Häuser')
     print('Häuser')
 
 

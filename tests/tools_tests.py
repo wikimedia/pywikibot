@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Test tools package alone which don't fit into other tests."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2023
 #
 # Distributed under the terms of the MIT license.
 import decimal
@@ -12,10 +12,9 @@ import unittest
 from collections import Counter, OrderedDict
 from collections.abc import Mapping
 from contextlib import suppress
-from importlib import import_module
 from unittest import mock
 
-from pywikibot import tools
+from pywikibot import config, tools
 from pywikibot.tools import (
     cached,
     classproperty,
@@ -29,9 +28,8 @@ from pywikibot.tools.itertools import (
     islice_with_ellipsis,
     roundrobin_generators,
 )
-
 from tests import join_xml_data_path
-from tests.aspects import TestCase, require_modules
+from tests.aspects import TestCase
 from tests.utils import skipping
 
 
@@ -75,34 +73,6 @@ class OpenArchiveTestCase(TestCase):
             self._get_content(self.base_file + '.bz2', use_extension=False),
             self.original_content)
 
-    @require_modules('bz2file')
-    def test_open_archive_with_bz2file(self):
-        """Test open_archive when bz2file library."""
-        old_bz2 = tools.bz2
-        try:
-            tools.bz2 = import_module('bz2file')
-            self.assertEqual(self._get_content(self.base_file + '.bz2'),
-                             self.original_content)
-            self.assertEqual(self._get_content(self.base_file + '.bz2',
-                                               use_extension=False),
-                             self.original_content)
-        finally:
-            tools.bz2 = old_bz2
-
-    def test_open_archive_without_bz2(self):
-        """Test open_archive when bz2 and bz2file are not available."""
-        old_bz2 = tools.bz2
-        bz2_import_error = ('This is a fake exception message that is '
-                            'used when bz2 and bz2file are not importable')
-        try:
-            tools.bz2 = ImportError(bz2_import_error)
-            with self.assertRaisesRegex(
-                    ImportError,
-                    bz2_import_error):
-                self._get_content(self.base_file + '.bz2')
-        finally:
-            tools.bz2 = old_bz2
-
     def test_open_archive_gz(self):
         """Test open_archive with gz compressor in the standard library."""
         self.assertEqual(
@@ -123,8 +93,6 @@ class OpenArchiveTestCase(TestCase):
 
     def test_open_archive_lzma(self):
         """Test open_archive with lzma compressor in the standard library."""
-        if isinstance(tools.lzma, ImportError):
-            self.skipTest('lzma not importable')
         self.assertEqual(
             self._get_content(self.base_file + '.lzma'), self.original_content)
         # Legacy LZMA container formet has no magic, skipping
@@ -134,24 +102,6 @@ class OpenArchiveTestCase(TestCase):
         self.assertEqual(
             self._get_content(self.base_file + '.xz', use_extension=False),
             self.original_content)
-
-    def test_open_archive_without_lzma(self):
-        """Test open_archive when lzma is not available."""
-        old_lzma = tools.lzma
-        lzma_import_error = ('This is a fake exception message that is '
-                             'used when lzma is not importable')
-        try:
-            tools.lzma = ImportError(lzma_import_error)
-            with self.assertRaisesRegex(
-                    ImportError,
-                    lzma_import_error):
-                self._get_content(self.base_file + '.lzma')
-            with self.assertRaisesRegex(
-                    ImportError,
-                    lzma_import_error):
-                self._get_content(self.base_file + '.xz')
-        finally:
-            tools.lzma = old_lzma
 
 
 class OpenArchiveWriteTestCase(TestCase):
@@ -227,18 +177,12 @@ class OpenArchiveWriteTestCase(TestCase):
 
     def test_write_archive_lzma(self):
         """Test writing a lzma archive."""
-        if isinstance(tools.lzma, ImportError):
-            self.skipTest('lzma not importable')
-
         content = self._write_content('.lzma')
         with open(self.base_file + '.lzma', 'rb') as f:
             self.assertEqual(content, f.read())
 
     def test_write_archive_xz(self):
         """Test writing a xz archive."""
-        if isinstance(tools.lzma, ImportError):
-            self.skipTest('lzma not importable')
-
         content = self._write_content('.xz')
         self.assertEqual(content[:6], b'\xFD7zXZ\x00')
 
@@ -633,21 +577,24 @@ class TestFileModeChecker(TestCase):
     def test_auto_chmod_for_dir(self):
         """Do not chmod files that have mode private_files_permission."""
         self.stat.return_value.st_mode = 0o040600  # dir
-        tools.file_mode_checker(self.file, mode=0o600)
+        tools.file_mode_checker(self.file,
+                                mode=config.private_folder_permission)
         self.stat.assert_called_with(self.file)
         self.assertFalse(self.chmod.called)
 
     def test_auto_chmod_OK(self):
         """Do not chmod files that have mode private_files_permission."""
         self.stat.return_value.st_mode = 0o100600  # regular file
-        tools.file_mode_checker(self.file, mode=0o600)
+        tools.file_mode_checker(self.file,
+                                mode=config.private_files_permission)
         self.stat.assert_called_with(self.file)
         self.assertFalse(self.chmod.called)
 
     def test_auto_chmod_not_OK(self):
         """Chmod files that do not have mode private_files_permission."""
         self.stat.return_value.st_mode = 0o100644  # regular file
-        tools.file_mode_checker(self.file, mode=0o600)
+        tools.file_mode_checker(self.file,
+                                mode=config.private_files_permission)
         self.stat.assert_called_with(self.file)
         self.chmod.assert_called_once_with(self.file, 0o600)
 

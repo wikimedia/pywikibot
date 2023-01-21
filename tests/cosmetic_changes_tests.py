@@ -395,14 +395,14 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
             '==2<!--\n-->==\nt',
             self.cct.removeEmptySections('==1==\n==2<!--\n-->==\nt'))
 
-    def test_translateAndCapitalizeNamespaces(self):
+    def test_translate_and_capitalize_namespaces(self):
         """Test translateAndCapitalizeNamespaces method."""
         self.assertEqual(
             '[[Wikipedia:Test]], [[Wikipedia:Test]], [[Datei:Test]]',
             self.cct.translateAndCapitalizeNamespaces(
                 '[[Project:Test]], [[wikipedia:Test]], [[Image:Test]]'))
 
-    def test_translateMagicWords(self):
+    def test_translate_magic_words(self):
         """Test translateMagicWords method."""
         self.assertEqual(
             '[[File:Foo.bar|mini]]',
@@ -471,23 +471,23 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
                          self.cct.cleanUpLinks('[[Sand|sand]]box'))
 
     @unittest.expectedFailure
-    def test_cleanUpLinks(self):
-        """
-        Test cleanUpLinks method.
+    def test_cleanup_links(self):
+        """Test cleanUpLinks method.
 
         This method fails for the given samples from library. Either
         the method has to be changed or the examples must be fixed.
         """
-        self.assertEqual('text [[title]] text',
-                         self.cct.cleanUpLinks('text[[ title ]]text'))
-        self.assertEqual('text [[title|name]] text',
-                         self.cct.cleanUpLinks('text[[ title | name ]]text'))
-        self.assertEqual('text[[title|name]]text',
-                         self.cct.cleanUpLinks('text[[ title |name]]text'))
-        self.assertEqual('text [[title|name]]text',
-                         self.cct.cleanUpLinks('text[[title| name]]text'))
+        tests = [
+            ('text [[title]] text', 'text[[ title ]]text'),
+            ('text [[title|name]] text', 'text[[ title | name ]]text'),
+            ('text[[title|name]]text', 'text[[ title |name]]text'),
+            ('text [[title|name]]text', 'text[[title| name]]text'),
+        ]
+        for result, text in tests:
+            with self.subTest(text=text):
+                self.assertEqual(self.cct.cleanUpLinks(text), result)
 
-    def test_replaceDeprecatedTemplates(self):
+    def test_replace_deprecated_templates(self):
         """Test replaceDeprecatedTemplates method."""
         self.assertEqual('{{Belege fehlen}}',
                          self.cct.replaceDeprecatedTemplates('{{Belege}}'))
@@ -503,13 +503,13 @@ class TestCosmeticChangesPersian(TestCosmeticChanges):
     family = 'wikipedia'
     code = 'fa'
 
-    def test_fixArabicLetters_comma(self):
+    def test_fix_arabic_letters_comma(self):
         """Test fixArabicLetters comma replacements."""
         self.assertEqual(self.cct.fixArabicLetters(','), '،')
         self.assertEqual(self.cct.fixArabicLetters('A,b,ا,۴,'),
                          'A,b،ا،۴،')
 
-    def test_fixArabicLetters_comma_skip(self):
+    def test_fix_arabic_letters_comma_skip(self):
         """Test fixArabicLetters Latin comma not replaced."""
         self.assertEqual(self.cct.fixArabicLetters('a", b'), 'a", b')
         self.assertEqual(self.cct.fixArabicLetters('a, "b'), 'a, "b')
@@ -532,7 +532,7 @@ class TestCosmeticChangesPersian(TestCosmeticChanges):
         self.assertEqual(self.cct.fixArabicLetters('a", ۴'), 'a", ۴')
         self.assertEqual(self.cct.fixArabicLetters(' , '), ' , ')
 
-    def test_fixArabicLetters_letters(self):
+    def test_fix_arabic_letters_letters(self):
         """Test fixArabicLetters letter replacements."""
         self.assertEqual(self.cct.fixArabicLetters('ك'),
                          'ک')

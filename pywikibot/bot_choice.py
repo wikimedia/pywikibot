@@ -110,7 +110,7 @@ class OutputOption(Option):
     """
 
     #: Place output before or after the question
-    before_question = False  # type: bool
+    before_question: bool = False
 
     @property
     def stop(self) -> bool:
@@ -133,7 +133,7 @@ class OutputOption(Option):
         """
         return ''
 
-    @deprecated('pywikibot.output(OutputOption.out)', since='6.5')
+    @deprecated('pywikibot.info(OutputOption.out)', since='6.5')
     def output(self) -> None:
         """Output string.
 
@@ -142,7 +142,7 @@ class OutputOption(Option):
            no longer used by the
            :py:mod:`userinterfaces <pywikibot.userinterfaces>` system.
         """
-        pywikibot.output(self.out)
+        pywikibot.info(self.out)
 
 
 class StandardOption(Option):
@@ -170,7 +170,7 @@ class StandardOption(Option):
             return '{}[{}]{}'.format(
                 self.option[:index], shortcut,
                 self.option[index + len(self.shortcut):])
-        return '{} [{}]'.format(self.option, shortcut)
+        return f'{self.option} [{shortcut}]'
 
     def result(self, value: str) -> Any:
         """Return the lowercased shortcut."""
@@ -266,10 +266,10 @@ class ContextOption(OutputOption, StandardOption):
         end = min(len(self.text), self.end + self.context)
         return self.text[start:end]
 
-    @deprecated('pywikibot.output(ContextOption.out)', since='6.2.0')
+    @deprecated('pywikibot.info(ContextOption.out)', since='6.2.0')
     def output_range(self, start: int, end: int) -> None:
         """DEPRECATED. Output a section from the text."""
-        pywikibot.output(self.text[start:end])
+        pywikibot.info(self.text[start:end])
 
 
 class Choice(StandardOption):
@@ -430,11 +430,11 @@ class IntegerOption(Option):
 
     def format(self, default: Optional[str] = None) -> str:
         """Return a formatted string showing the range."""
-        value = None  # type: Optional[int]
+        value: Optional[int] = None
 
         if default is not None and self.test(default):
             value = self.parse(default)
-            default = '[{}]'.format(value)
+            default = f'[{value}]'
         else:
             default = ''
 
@@ -449,14 +449,14 @@ class IntegerOption(Option):
                 default = ''
             else:
                 maximum = '' if self.maximum is None else str(self.maximum)
-            default = '-{}-'.format(default) if default else '-'
+            default = f'-{default}-' if default else '-'
             if self.minimum == self.maximum:
                 rng = minimum
             else:
                 rng = minimum + default + maximum
         else:
             rng = 'any' + default
-        return '{}<number> [{}]'.format(self.prefix, rng)
+        return f'{self.prefix}<number> [{rng}]'
 
     def parse(self, value: str) -> int:
         """Return integer from value with prefix removed."""
@@ -544,7 +544,7 @@ class MultipleChoiceList(ListOption):
 
     """An option to select multiple items from a list.
 
-    .. versionadded 3.0
+    .. versionadded:: 3.0
     """
 
     def test(self, value: str) -> bool:
@@ -575,7 +575,7 @@ class ShowingMultipleChoiceList(ShowingListOption, MultipleChoiceList):
 
     """An option to show a list and select multiple items.
 
-    .. versionadded 3.0
+    .. versionadded:: 3.0
     """
 
 
@@ -596,7 +596,7 @@ class HighlightContextOption(ContextOption):
             self.text[self.end:end],
             color=self.color)
 
-    @deprecated('pywikibot.output(HighlightContextOption.out)', since='6.2.0')
+    @deprecated('pywikibot.info(HighlightContextOption.out)', since='6.2.0')
     def output_range(self, start: int, end: int) -> None:
         """Show normal context with a highlighted center region.
 
@@ -608,7 +608,7 @@ class HighlightContextOption(ContextOption):
             self.text[self.start:self.end],
             self.text[self.end:end],
             color=self.color)
-        pywikibot.output(text)
+        pywikibot.info(text)
 
 
 class UnhandledAnswer(Exception):  # noqa: N818

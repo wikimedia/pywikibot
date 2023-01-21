@@ -1,4 +1,5 @@
+*******
 Credits
-=======
+*******
 
 .. include:: ../AUTHORS.rst

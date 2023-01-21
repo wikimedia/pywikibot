@@ -84,7 +84,7 @@ class UITestCase(TestCaseBase):
         return self.strin.readline().strip()
 
 
-class TestExceptionError(Exception):
+class ExceptionTestError(Exception):
 
     """Test exception."""
 
@@ -118,7 +118,7 @@ class TestTerminalOutput(UITestCase):
                     stream.seek(0)
 
     def test_output(self):
-        pywikibot.output('output')
+        pywikibot.info('output')
         self.assertEqual(self.strout.getvalue(), '')
         self.assertEqual(self.strerr.getvalue(), 'output\n')
 
@@ -154,8 +154,8 @@ class TestTerminalOutput(UITestCase):
 
     def test_exception(self):
         try:
-            raise TestExceptionError('Testing Exception')
-        except TestExceptionError:
+            raise ExceptionTestError('Testing Exception')
+        except ExceptionTestError:
             pywikibot.error('exception', exc_info=False)
         self.assertEqual(self.strout.getvalue(), '')
         self.assertEqual(self.strerr.getvalue(),
@@ -163,17 +163,17 @@ class TestTerminalOutput(UITestCase):
 
     def test_exception_empty(self):
         try:
-            raise TestExceptionError('Testing Exception')
-        except TestExceptionError:
+            raise ExceptionTestError('Testing Exception')
+        except ExceptionTestError:
             pywikibot.exception(exc_info=False)
         self.assertEqual(self.strout.getvalue(), '')
         self.assertEqual(self.strerr.getvalue(),
-                         'ERROR: Testing Exception (TestExceptionError)\n')
+                         'ERROR: Testing Exception (ExceptionTestError)\n')
 
     def test_exception_tb(self):
         try:
-            raise TestExceptionError('Testing Exception')
-        except TestExceptionError:
+            raise ExceptionTestError('Testing Exception')
+        except ExceptionTestError:
             pywikibot.exception()
         self.assertEqual(self.strout.getvalue(), '')
         stderrlines = self.strerr.getvalue().split('\n')
@@ -181,7 +181,7 @@ class TestTerminalOutput(UITestCase):
                          'ERROR: Testing Exception')
         self.assertEqual(stderrlines[1], 'Traceback (most recent call last):')
         self.assertEqual(stderrlines[3],
-                         "    raise TestExceptionError('Testing Exception')")
+                         "    raise ExceptionTestError('Testing Exception')")
 
         end_str = ': Testing Exception'
         self.assertTrue(stderrlines[-1].endswith(end_str),
@@ -266,7 +266,7 @@ class TestTerminalInput(UITestCase):
         self.assertEqual(self.strout.getvalue(), '')
         self.assertEqual(
             self.strerr.getvalue(),
-            ''.join('{}: {}\n'.format(num, items)
+            ''.join(f'{num}: {items}\n'
                     for num, items in enumerate(options, start=1))
             + 'question (default: 2): ')
         self.assertEqual(rv, 'answer 2')
@@ -280,7 +280,7 @@ class TestTerminalOutputColorUnix(UITestCase):
     str1 = 'text <<lightpurple>>light purple text<<default>> text'
 
     def testOutputColorizedText(self):
-        pywikibot.output(self.str1)
+        pywikibot.info(self.str1)
         self.assertEqual(self.strout.getvalue(), '')
         self.assertEqual(
             self.strerr.getvalue(),
@@ -288,7 +288,7 @@ class TestTerminalOutputColorUnix(UITestCase):
 
     def testOutputNoncolorizedText(self):
         pywikibot.config.colorized_output = False
-        pywikibot.output(self.str1)
+        pywikibot.info(self.str1)
         self.assertEqual(self.strout.getvalue(), '')
         self.assertEqual(
             self.strerr.getvalue(),
@@ -300,7 +300,7 @@ class TestTerminalOutputColorUnix(UITestCase):
 
     def testOutputColorCascade_incorrect(self):
         """Test incorrect behavior of testOutputColorCascade."""
-        pywikibot.output(self.str2)
+        pywikibot.info(self.str2)
         self.assertEqual(self.strout.getvalue(), '')
         self.assertEqual(
             self.strerr.getvalue(),
@@ -315,7 +315,7 @@ class TestTerminalUnicodeUnix(UITestCase):
     """Terminal output tests for Unix."""
 
     def testOutputUnicodeText(self):
-        pywikibot.output('Заглавная_страница')
+        pywikibot.info('Заглавная_страница')
         self.assertEqual(self.strout.getvalue(), '')
         self.assertEqual(self.strerr.getvalue(), 'Заглавная_страница\n')
 
@@ -341,7 +341,7 @@ class TestTransliterationUnix(UITestCase):
     def testOutputTransliteratedUnicodeText(self):
         pywikibot.bot.ui.encoding = 'latin-1'
         pywikibot.config.transliterate = True
-        pywikibot.output('abcd АБГД αβγδ あいうえお')
+        pywikibot.info('abcd АБГД αβγδ あいうえお')
         self.assertEqual(self.strout.getvalue(), '')
         self.assertEqual(
             self.strerr.getvalue(),
@@ -403,7 +403,8 @@ class FakeUITest(TestCase):
 
     def _encounter_color(self, color, target_stream):
         """Patched encounter_color method."""
-        raise AssertionError('This method should not be invoked')
+        raise AssertionError(
+            'This method should not be invoked')  # pragma: no cover
 
     def test_no_color(self):
         """Test a string without any colors."""

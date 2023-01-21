@@ -47,7 +47,7 @@ class MetaPluralRulesTest(MetaTestCaseClass):
         for lang, rule in plural.plural_rules.items():
             cls.add_method(dct, 'test_{}'.format(lang.replace('-', '_')),
                            create_test(rule),
-                           doc_suffix='for "{}"'.format(lang))
+                           doc_suffix=f'for "{lang}"')
         return super().__new__(cls, name, bases, dct)
 
 

@@ -15,7 +15,7 @@ from pywikibot.exceptions import (
     UserRightsError,
 )
 from pywikibot.page._links import Link
-from pywikibot.page._pages import Page
+from pywikibot.page._page import Page
 from pywikibot.page._revision import Revision
 from pywikibot.tools import deprecated, is_ip_address
 
@@ -51,7 +51,7 @@ class User(Page):
         if self._isAutoblock:
             # This user is probably being queried for purpose of lifting
             # an autoblock.
-            pywikibot.output(
+            pywikibot.info(
                 'This is an autoblock ID, you can only use to unblock it.')
 
     @property
@@ -249,7 +249,7 @@ class User(Page):
         params = {
             'action': 'emailuser',
             'target': self.username,
-            'token': self.site.tokens['email'],
+            'token': self.site.tokens['csrf'],
             'subject': subject,
             'text': text,
         }
@@ -322,14 +322,35 @@ class User(Page):
         """
         return next(self.logevents(total=1), None)
 
-    def contributions(self, total: int = 500, **kwargs) -> tuple:
-        """
-        Yield tuples describing this user edits.
+    def contributions(
+        self,
+        total: int = 500,
+        **kwargs
+    ) -> Tuple[Page, int, pywikibot.Timestamp, Optional[str]]:
+        """Yield tuples describing this user edits.
 
-        Each tuple is composed of a pywikibot.Page object,
-        the revision id (int), the edit timestamp (as a pywikibot.Timestamp
-        object), and the comment (str).
-        Pages returned are not guaranteed to be unique.
+        Each tuple is composed of a pywikibot.Page object, the revision
+        id, the edit timestamp and the comment. Pages returned are not
+        guaranteed to be unique.
+
+        Example:
+
+        >>> site = pywikibot.Site('wikipedia:test')
+        >>> user = pywikibot.User(site, 'pywikibot-test')
+        >>> contrib = next(user.contributions(reverse=True))
+        >>> len(contrib)
+        4
+        >>> contrib[0].title()
+        'User:Unicodesnowman/DeleteMark'
+        >>> contrib[1]
+        504586
+        >>> str(contrib[2])
+        '2022-03-04T17:35:41Z'
+        >>> contrib[3]
+        'pywikibot unit test. Do NOT actually delete.'
+
+        .. seealso:: :meth:`Site.usercontribs()
+           <pywikibot.site._generators.GeneratorsMixin.usercontribs>`
 
         :param total: limit result to this number of pages
         :keyword start: Iterate contributions starting at this Timestamp

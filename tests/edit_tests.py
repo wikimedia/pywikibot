@@ -12,7 +12,7 @@ from contextlib import suppress
 import pywikibot
 from pywikibot import config, page_put_queue
 from pywikibot.exceptions import Error
-from tests.aspects import TestCase
+from tests.aspects import TestCase, require_version
 from tests.oauth_tests import OAuthSiteTestCase
 
 
@@ -79,16 +79,12 @@ class TestSiteMergeHistory(TestCase):
     write = True
     rights = 'mergehistory'
 
+    @require_version('>=1.27.0wmf.13', 'support the history merge API')
     def setup_test_pages(self):
         """Helper function to set up pages that we will use in these tests."""
         site = self.get_site()
         source = pywikibot.Page(site, 'User:Sn1per/MergeTest1')
         dest = pywikibot.Page(site, 'User:Sn1per/MergeTest2')
-
-        # Make sure the wiki supports action=mergehistory
-        if site.mw_version < '1.27.0-wmf.13':
-            self.skipTest('Wiki version must be 1.27.0-wmf.13 or newer to '
-                          'support the history merge API.')
 
         if source.exists():
             source.delete('Pywikibot merge history unit test')
@@ -97,11 +93,11 @@ class TestSiteMergeHistory(TestCase):
 
         source.text = 'Lorem ipsum dolor sit amet'
         source.save()
-        first_rev = source.editTime()
+        first_rev = source.latest_revision.timestamp
 
         source.text = 'Lorem ipsum dolor sit amet is a common test phrase'
         source.save()
-        second_rev = source.editTime()
+        second_rev = source.latest_revision.timestamp
 
         dest.text = 'Merge history page unit test destination'
         dest.save()
@@ -205,11 +201,11 @@ class OAuthEditTest(OAuthSiteTestCase):
         self.assertTrue(self.site.logged_in())
         ts = str(time.time())
         p = pywikibot.Page(self.site,
-                           'User:{}/edit test'.format(self.site.username()))
+                           f'User:{self.site.username()}/edit test')
         p.site.editpage(p, appendtext=ts)
         revision_id = p.latest_revision_id
         p = pywikibot.Page(self.site,
-                           'User:{}/edit test'.format(self.site.username()))
+                           f'User:{self.site.username()}/edit test')
         self.assertEqual(revision_id, p.latest_revision_id)
         self.assertTrue(p.text.endswith(ts))
 

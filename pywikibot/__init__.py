@@ -1,6 +1,6 @@
 """The initialization file for the Pywikibot framework."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -68,7 +68,7 @@ from pywikibot.logging import (
 )
 from pywikibot.site import APISite, BaseSite, DataSite
 from pywikibot.time import Timestamp
-from pywikibot.tools import normalize_username, PYTHON_VERSION
+from pywikibot.tools import normalize_username
 
 
 ItemPageStrNoneType = Union[str, 'ItemPage', None]
@@ -92,16 +92,7 @@ __all__ = (
 # argvu is set by pywikibot.bot when it's imported
 
 if not hasattr(sys.modules[__name__], 'argvu'):
-    argvu = []  # type: List[str]
-
-
-if PYTHON_VERSION < (3, 6):
-    warn("""
-Python {version} will be dropped with release 8.0 soon.
-It is recommended to use Python 3.6 or above.
-See T301908 for further information.
-""".format(version=sys.version.split(maxsplit=1)[0]),
-         FutureWarning)  # adjust this line no in utils.execute()
+    argvu: List[str] = []
 
 
 class Coordinate(_WbRepresentation):
@@ -304,7 +295,18 @@ class Coordinate(_WbRepresentation):
 
 class WbTime(_WbRepresentation):
 
-    """A Wikibase time representation."""
+    """A Wikibase time representation.
+
+    Make a WbTime object from the current time:
+
+    .. code-block:: python
+
+        current_ts = pywikibot.Timestamp.now()
+        wbtime = pywikibot.WbTime.fromTimestamp(current_ts)
+
+    For converting python datetime objects to WbTime objects, see
+    :class:`pywikibot.Timestamp` and :meth:`fromTimestamp`.
+    """
 
     PRECISION = {'1000000000': 0,
                  '100000000': 1,
@@ -328,6 +330,21 @@ class WbTime(_WbRepresentation):
     _items = ('year', 'month', 'day', 'hour', 'minute', 'second',
               'precision', 'before', 'after', 'timezone', 'calendarmodel')
 
+    _month_offset = {
+        1: 0,
+        2: 31,  # Jan -> Feb: 31 days
+        3: 59,  # Feb -> Mar: 28 days, plus 31 days in Jan -> Feb
+        4: 90,  # Mar -> Apr: 31 days, plus 59 days in Jan -> Mar
+        5: 120,  # Apr -> May: 30 days, plus 90 days in Jan -> Apr
+        6: 151,  # May -> Jun: 31 days, plus 120 days in Jan -> May
+        7: 181,  # Jun -> Jul: 30 days, plus 151 days in Jan -> Jun
+        8: 212,  # Jul -> Aug: 31 days, plus 181 days in Jan -> Jul
+        9: 243,  # Aug -> Sep: 31 days, plus 212 days in Jan -> Aug
+        10: 273,  # Sep -> Oct: 30 days, plus 243 days in Jan -> Sep
+        11: 304,  # Oct -> Nov: 31 days, plus 273 days in Jan -> Oct
+        12: 334,  # Nov -> Dec: 30 days, plus 304 days in Jan -> Nov
+    }
+
     def __init__(self,
                  year: Optional[int] = None,
                  month: Optional[int] = None,
@@ -343,54 +360,68 @@ class WbTime(_WbRepresentation):
                  site: Optional[DataSite] = None) -> None:
         """Create a new WbTime object.
 
-        The precision can be set by the Wikibase int value (0-14) or by a human
-        readable string, e.g., 'hour'. If no precision is given, it is set
-        according to the given time units.
+        The precision can be set by the Wikibase int value (0-14) or by
+        a human readable string, e.g., ``hour``. If no precision is
+        given, it is set according to the given time units.
 
-        Timezone information is given in three different ways depending on the
-        time:
+        Timezone information is given in three different ways depending
+        on the time:
 
-        * Times after the implementation of UTC (1972): as an offset from UTC
-          in minutes;
-        * Times before the implementation of UTC: the offset of the time zone
-          from universal time;
-        * Before the implementation of time zones: The longitude of the place
-          of the event, in the range −180° to 180°, multiplied by 4 to convert
-          to minutes.
+        * Times after the implementation of UTC (1972): as an offset
+          from UTC in minutes;
+        * Times before the implementation of UTC: the offset of the time
+          zone from universal time;
+        * Before the implementation of time zones: The longitude of the
+          place of the event, in the range −180° to 180°, multiplied by
+          4 to convert to minutes.
+
+        .. note::  **Comparison information:** When using the greater
+           than or equal to operator, or the less than or equal to
+           operator, two different time objects with the same UTC time
+           after factoring in timezones are considered equal. However,
+           the equality operator will return false if the timezone is
+           different.
 
         :param year: The year as a signed integer of between 1 and 16 digits.
-        :param month: Month
-        :param day: Day
-        :param hour: Hour
-        :param minute: Minute
-        :param second: Second
+        :param month: Month of the timestamp, if it exists.
+        :param day: Day of the timestamp, if it exists.
+        :param hour: Hour of the timestamp, if it exists.
+        :param minute: Minute of the timestamp, if it exists.
+        :param second: Second of the timestamp, if it exists.
         :param precision: The unit of the precision of the time.
         :param before: Number of units after the given time it could be, if
             uncertain. The unit is given by the precision.
         :param after: Number of units before the given time it could be, if
             uncertain. The unit is given by the precision.
         :param timezone: Timezone information in minutes.
-        :param calendarmodel: URI identifying the calendar model
-        :param site: The Wikibase site
+        :param calendarmodel: URI identifying the calendar model.
+        :param site: The Wikibase site. If not provided, retrieves the data
+            repository from the default site from user-config.py.
+            Only used if calendarmodel is not given.
         """
         if year is None:
             raise ValueError('no year given')
-        self.precision = self.PRECISION['second']
-        if second is None:
-            self.precision = self.PRECISION['minute']
-            second = 0
-        if minute is None:
-            self.precision = self.PRECISION['hour']
-            minute = 0
-        if hour is None:
-            self.precision = self.PRECISION['day']
-            hour = 0
-        if day is None:
+        self.precision = self.PRECISION['year']
+        if month is not None:
             self.precision = self.PRECISION['month']
-            day = 1
-        if month is None:
-            self.precision = self.PRECISION['year']
+        else:
             month = 1
+        if day is not None:
+            self.precision = self.PRECISION['day']
+        else:
+            day = 1
+        if hour is not None:
+            self.precision = self.PRECISION['hour']
+        else:
+            hour = 0
+        if minute is not None:
+            self.precision = self.PRECISION['minute']
+        else:
+            minute = 0
+        if second is not None:
+            self.precision = self.PRECISION['second']
+        else:
+            second = 0
         self.year = year
         self.month = month
         self.day = day
@@ -408,7 +439,6 @@ class WbTime(_WbRepresentation):
                                      .format(Site()))
             calendarmodel = site.calendarmodel()
         self.calendarmodel = calendarmodel
-
         # if precision is given it overwrites the autodetection above
         if precision is not None:
             if (isinstance(precision, int)
@@ -418,7 +448,85 @@ class WbTime(_WbRepresentation):
                 assert isinstance(precision, str)
                 self.precision = self.PRECISION[precision]
             else:
-                raise ValueError('Invalid precision: "{}"'.format(precision))
+                raise ValueError(f'Invalid precision: "{precision}"')
+
+    def _getSecondsAdjusted(self) -> int:
+        """Return an internal representation of the time object as seconds.
+
+        The value adjusts itself for timezones. It is not compatible
+        with before/after.
+
+        This value should *only* be used for comparisons, and its value
+        may change without warning.
+
+        .. versionadded:: 8.0
+
+        :return: An integer roughly representing the number of seconds
+            since January 1, 0000 AD, adjusted for leap years.
+        """
+        # This function ignores leap seconds. Since it is not required
+        # to correlate to an actual UNIX timestamp, this is acceptable.
+
+        # We are always required to have a year.
+        elapsed_seconds = int(self.year * 365.25 * 24 * 60 * 60)
+        if self.month > 1:
+            elapsed_seconds += self._month_offset[self.month] * 24 * 60 * 60
+            # The greogrian calendar
+            if self.calendarmodel == 'http://www.wikidata.org/entity/Q1985727':
+                if (self.year % 400 == 0
+                        or (self.year % 4 == 0 and self.year % 100 != 0)
+                        and self.month > 2):
+                    elapsed_seconds += 24 * 60 * 60  # Leap year
+            # The julian calendar
+            if self.calendarmodel == 'http://www.wikidata.org/entity/Q1985786':
+                if self.year % 4 == 0 and self.month > 2:
+                    elapsed_seconds += 24 * 60 * 60
+        if self.day > 1:
+            # Days start at 1, not 0.
+            elapsed_seconds += (self.day - 1) * 24 * 60 * 60
+        elapsed_seconds += self.hour * 60 * 60
+        elapsed_seconds += self.minute * 60
+        elapsed_seconds += self.second
+        if self.timezone is not None:
+            # See T325866
+            elapsed_seconds -= self.timezone * 60
+        return elapsed_seconds
+
+    def __lt__(self, other: object) -> bool:
+        """Compare if self is less than other.
+
+        .. versionadded:: 8.0
+        """
+        if isinstance(other, WbTime):
+            return self._getSecondsAdjusted() < other._getSecondsAdjusted()
+        return NotImplemented
+
+    def __le__(self, other: object) -> bool:
+        """Compare if self is less equals other.
+
+        .. versionadded:: 8.0
+        """
+        if isinstance(other, WbTime):
+            return self._getSecondsAdjusted() <= other._getSecondsAdjusted()
+        return NotImplemented
+
+    def __gt__(self, other: object) -> bool:
+        """Compare if self is greater than other.
+
+        .. versionadded:: 8.0
+        """
+        if isinstance(other, WbTime):
+            return self._getSecondsAdjusted() > other._getSecondsAdjusted()
+        return NotImplemented
+
+    def __ge__(self, other: object) -> bool:
+        """Compare if self is greater equals other.
+
+        .. versionadded:: 8.0
+        """
+        if isinstance(other, WbTime):
+            return self._getSecondsAdjusted() >= other._getSecondsAdjusted()
+        return NotImplemented
 
     @classmethod
     def fromTimestr(cls: Type['WbTime'],
@@ -440,58 +548,156 @@ class WbTime(_WbRepresentation):
 
         :param datetimestr: Timestamp in a format resembling ISO 8601,
             e.g. +2013-01-01T00:00:00Z
-        :param precision: The unit of the precision of the time.
+        :param precision: The unit of the precision of the time. Defaults to
+            14 (second).
         :param before: Number of units after the given time it could be, if
             uncertain. The unit is given by the precision.
         :param after: Number of units before the given time it could be, if
             uncertain. The unit is given by the precision.
         :param timezone: Timezone information in minutes.
-        :param calendarmodel: URI identifying the calendar model
-        :param site: The Wikibase site
+        :param calendarmodel: URI identifying the calendar model.
+        :param site: The Wikibase site. If not provided, retrieves the data
+            repository from the default site from user-config.py.
+            Only used if calendarmodel is not given.
         """
         match = re.match(r'([-+]?\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)Z',
                          datetimestr)
         if not match:
-            raise ValueError("Invalid format: '{}'".format(datetimestr))
+            raise ValueError(f"Invalid format: '{datetimestr}'")
         t = match.groups()
         return cls(int(t[0]), int(t[1]), int(t[2]),
                    int(t[3]), int(t[4]), int(t[5]),
                    precision, before, after, timezone, calendarmodel, site)
 
     @classmethod
-    def fromTimestamp(cls: Type['WbTime'], timestamp: 'Timestamp',
+    def fromTimestamp(cls: Type['WbTime'],
+                      timestamp: 'Timestamp',
                       precision: Union[int, str] = 14,
-                      before: int = 0, after: int = 0,
-                      timezone: int = 0, calendarmodel: Optional[str] = None,
-                      site: Optional[DataSite] = None) -> 'WbTime':
-        """
-        Create a new WbTime object from a pywikibot.Timestamp.
+                      before: int = 0,
+                      after: int = 0,
+                      timezone: int = 0,
+                      calendarmodel: Optional[str] = None,
+                      site: Optional[DataSite] = None,
+                      copy_timezone: bool = False) -> 'WbTime':
+        """Create a new WbTime object from a pywikibot.Timestamp.
+
+        .. versionchanged:: 8.0
+           Added *copy_timezone* parameter.
 
         :param timestamp: Timestamp
         :param precision: The unit of the precision of the time.
-        :param before: Number of units after the given time it could be, if
-            uncertain. The unit is given by the precision.
-        :param after: Number of units before the given time it could be, if
-            uncertain. The unit is given by the precision.
+            Defaults to 14 (second).
+        :param before: Number of units after the given time it could be,
+            if uncertain. The unit is given by the precision.
+        :param after: Number of units before the given time it could be,
+            if uncertain. The unit is given by the precision.
         :param timezone: Timezone information in minutes.
-        :param calendarmodel: URI identifying the calendar model
-        :param site: The Wikibase site
+        :param calendarmodel: URI identifying the calendar model.
+        :param site: The Wikibase site. If not provided, retrieves the
+            data repository from the default site from user-config.py.
+            Only used if calendarmodel is not given.
+        :param copy_timezone: Whether to copy the timezone from the
+            timestamp if it has timezone information. Defaults to False
+            to maintain backwards compatibility. If a timezone is given,
+            timezone information is discarded.
         """
+        if not timezone and timestamp.tzinfo and copy_timezone:
+            timezone = int(timestamp.utcoffset().total_seconds() / 60)
         return cls.fromTimestr(timestamp.isoformat(), precision=precision,
-                               before=before, after=after,
-                               timezone=timezone, calendarmodel=calendarmodel,
-                               site=site)
+                               before=before, after=after, timezone=timezone,
+                               calendarmodel=calendarmodel, site=site)
 
-    def toTimestr(self, force_iso: bool = False) -> str:
+    def normalize(self) -> 'WbTime':
+        """Normalizes the WbTime object to account for precision.
+
+        Normalization is needed because WbTime objects can have hidden
+        values that affect naive comparisons, such as an object set to
+        a precision of YEAR but containing a month and day value.
+
+        This function returns a new normalized object and does not do
+        any modification in place.
+
+        Normalization will delete timezone information if the precision
+        is less than or equal to DAY.
+
+        Note: Normalized WbTime objects can only be compared to other
+        normalized WbTime objects of the same precision. Normalization
+        might make a WbTime object that was less than another WbTime object
+        before normalization, greater than it after normalization, or vice
+        versa.
         """
-        Convert the data to a UTC date/time string.
+        year = self.year
+        # This is going to get messy.
+        if self.PRECISION['1000000000'] <= self.precision <= self.PRECISION['10000']:  # noqa: E501
+            # 1000000000 == 10^9
+            power_of_10 = 10 ** (9 - self.precision)
+            # Wikidata rounds the number based on the first non-decimal digit.
+            # Python's round function will round -15.5 to -16, and +15.5 to +16
+            # so we don't need to do anything complicated like the other
+            # examples.
+            year = round(year / power_of_10) * power_of_10
+        elif self.precision == self.PRECISION['millenia']:
+            # Similar situation with centuries
+            year_float = year / 1000
+            if year_float < 0:
+                year = math.floor(year_float)
+            else:
+                year = math.ceil(year_float)
+            year *= 1000
+        elif self.precision == self.PRECISION['century']:
+            # For century, -1301 is the same century as -1400 but not -1401.
+            # Similar for 1901 and 2000 vs 2001.
+            year_float = year / 100
+            if year_float < 0:
+                year = math.floor(year_float)
+            else:
+                year = math.ceil(year_float)
+            year *= 100
+        elif self.precision == self.PRECISION['decade']:
+            # For decade, -1340 is the same decade as -1349 but not -1350.
+            # Similar for 2010 and 2019 vs 2020
+            year_float = year / 10
+            year = math.trunc(year_float)
+            year *= 10
+        kwargs = {
+            'precision': self.precision,
+            'before': self.before,
+            'after': self.after,
+            'calendarmodel': self.calendarmodel,
+            'year': year
+        }
+        if self.precision >= self.PRECISION['month']:
+            kwargs['month'] = self.month
+        if self.precision >= self.PRECISION['day']:
+            kwargs['day'] = self.day
+        if self.precision >= self.PRECISION['hour']:
+            # See T326693
+            kwargs['timezone'] = self.timezone
+            kwargs['hour'] = self.hour
+        if self.precision >= self.PRECISION['minute']:
+            kwargs['minute'] = self.minute
+        if self.precision >= self.PRECISION['second']:
+            kwargs['second'] = self.second
+        return type(self)(**kwargs)
 
-        See fromTimestr() for differences between output with and without
-        force_iso.
+    def toTimestr(self, force_iso: bool = False,
+                  normalize: bool = False) -> str:
+        """Convert the data to a UTC date/time string.
+
+        .. seealso:: :meth:`fromTimestr` for differences between output
+           with and without *force_iso* parameter.
+
+        .. versionchanged:: 8.0
+           *normalize* parameter was added.
 
         :param force_iso: whether the output should be forced to ISO 8601
+        :param normalize: whether the output should be normalized (see
+            :meth:`normalize` for details)
         :return: Timestamp in a format resembling ISO 8601
         """
+        if normalize:
+            return self.normalize().toTimestr(force_iso=force_iso,
+                                              normalize=False)
         if force_iso:
             return Timestamp._ISO8601Format_new.format(
                 self.year, max(1, self.month), max(1, self.day),
@@ -511,13 +717,17 @@ class WbTime(_WbRepresentation):
         return Timestamp.fromISOformat(
             self.toTimestr(force_iso=True).lstrip('+'))
 
-    def toWikibase(self) -> Dict[str, Any]:
-        """
-        Convert the data to a JSON object for the Wikibase API.
+    def toWikibase(self, normalize: bool = False) -> Dict[str, Any]:
+        """Convert the data to a JSON object for the Wikibase API.
 
+        .. versionchanged:: 8.0
+           *normalize* parameter was added.
+
+        :param normalize: Whether to normalize the WbTime object before
+            converting it to a JSON object (see :func:`normalize` for details)
         :return: Wikibase JSON
         """
-        json = {'time': self.toTimestr(),
+        json = {'time': self.toTimestr(normalize=normalize),
                 'precision': self.precision,
                 'after': self.after,
                 'before': self.before,
@@ -533,7 +743,8 @@ class WbTime(_WbRepresentation):
         Create a WbTime from the JSON data given by the Wikibase API.
 
         :param data: Wikibase JSON
-        :param site: The Wikibase site
+        :param site: The Wikibase site. If not provided, retrieves the data
+            repository from the default site from user-config.py.
         """
         return cls.fromTimestr(data['time'], data['precision'],
                                data['before'], data['after'],
@@ -611,14 +822,15 @@ class WbQuantity(_WbRepresentation):
 
         # also allow entity URIs to be provided via unit parameter
         if isinstance(unit, str) \
-           and unit.partition('://')[0] not in ('http', 'https'):
+           and not unit.startswith(('http://', 'https://')):
             raise ValueError("'unit' must be an ItemPage or entity uri.")
 
         if error is None and not self._require_errors(site):
             self.upperBound = self.lowerBound = None
         else:
             if error is None:
-                upperError = lowerError = Decimal(0)  # type: Optional[Decimal]
+                upperError: Optional[Decimal] = Decimal(0)
+                lowerError: Optional[Decimal] = Decimal(0)
             elif isinstance(error, tuple):
                 upperError = self._todecimal(error[0])
                 lowerError = self._todecimal(error[1])
@@ -799,15 +1011,15 @@ class _WbDataPage(_WbRepresentation):
 
         # validate page exists
         if not page.exists():
-            raise ValueError('Page {} must exist.'.format(page))
+            raise ValueError(f'Page {page} must exist.')
 
         # validate page is on the right site, and that site supports the type
         if not data_site:
             raise ValueError(
-                'The provided site does not support {}.'.format(label))
+                f'The provided site does not support {label}.')
         if page.site != data_site:
             raise ValueError(
-                'Page must be on the {} repository site.'.format(label))
+                f'Page must be on the {label} repository site.')
 
         # validate page title fulfills hard-coded Wikibase requirement
         # pcre regexp: '/^Data:[^\\[\\]#\\\:{|}]+\.map$/u' for geo-shape
@@ -961,7 +1173,7 @@ class WbUnknown(_WbRepresentation):
         return cls(data)
 
 
-_sites = {}  # type: Dict[str, APISite]
+_sites: Dict[str, APISite] = {}
 
 
 @cache
@@ -1105,15 +1317,15 @@ def Site(code: Optional[str] = None,
         try:
             tmp = __import__('pywikibot.site', fromlist=[interface])
         except ImportError:
-            raise ValueError('Invalid interface name: {}'.format(interface))
+            raise ValueError(f'Invalid interface name: {interface}')
         else:
             interface = getattr(tmp, interface)
 
     if not issubclass(interface, BaseSite):
-        warning('Site called with interface={}'.format(interface.__name__))
+        warning(f'Site called with interface={interface.__name__}')
 
     user = normalize_username(user)
-    key = '{}:{}:{}:{}'.format(interface.__name__, fam, code, user)
+    key = f'{interface.__name__}:{fam}:{code}:{user}'
     if key not in _sites or not isinstance(_sites[key], interface):
         _sites[key] = interface(code=code, fam=fam, user=user)
         debug("Instantiated {} object '{}'"
@@ -1269,9 +1481,9 @@ def async_request(request: Callable, *args: Any, **kwargs: Any) -> None:
 
 
 # queue to hold pending requests
-page_put_queue = Queue(_config.max_queue_size)  # type: Queue
+page_put_queue: Queue = Queue(_config.max_queue_size)
 # queue to signal that async_manager is working on a request. See T147178.
-page_put_queue_busy = Queue(_config.max_queue_size)  # type: Queue
+page_put_queue_busy: Queue = Queue(_config.max_queue_size)
 # set up the background thread
 _putthread = threading.Thread(target=async_manager,
                               name='Put-Thread',  # for debugging purposes

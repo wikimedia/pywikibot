@@ -47,25 +47,25 @@ subdirectory.
    moved to :mod:`pywikibot.scripts` folder
 """
 #
-# (C) Pywikibot team, 2003-2022
+# (C) Pywikibot team, 2003-2023
 #
 # Distributed under the terms of the MIT license.
 #
 import datetime
-from contextlib import suppress
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import suppress
 
 import pywikibot
 from pywikibot import config
 from pywikibot.backports import Tuple, nullcontext
-from pywikibot.exceptions import SiteDefinitionError
+from pywikibot.exceptions import NoUsernameError, SiteDefinitionError
 from pywikibot.login import OauthLoginManager
 
 
 def _get_consumer_token(site) -> Tuple[str, str]:
-    key_msg = 'OAuth consumer key on {}:{}'.format(site.code, site.family)
+    key_msg = f'OAuth consumer key on {site.code}:{site.family}'
     key = pywikibot.input(key_msg)
-    secret_msg = 'OAuth consumer secret for consumer {}'.format(key)
+    secret_msg = f'OAuth consumer secret for consumer {key}'
     secret = pywikibot.input(secret_msg, password=True)
     return key, secret
 
@@ -76,7 +76,7 @@ def _oauth_login(site) -> None:
     login_manager.login()
     identity = login_manager.identity
     if identity is None:
-        pywikibot.error('Invalid OAuth info for {site}.'.format(site=site))
+        pywikibot.error(f'Invalid OAuth info for {site}.')
     elif site.username() != identity['username']:
         pywikibot.error(
             'Logged in on {site} via OAuth as {wrong}, but expect as {right}'
@@ -84,16 +84,12 @@ def _oauth_login(site) -> None:
                     wrong=identity['username'], right=site.username()))
     else:
         oauth_token = login_manager.consumer_token + login_manager.access_token
-        pywikibot.output('Logged in on {site} as {username}'
-                         'via OAuth consumer {consumer}\n'
-                         'NOTE: To use OAuth, you need to copy the '
-                         'following line to your user config file:\n'
-                         'authenticate[{hostname!r}] = {oauth_token}'
-                         .format(site=site,
-                                 username=site.username(),
-                                 consumer=consumer_key,
-                                 hostname=site.hostname(),
-                                 oauth_token=oauth_token))
+        pywikibot.info(
+            'Logged in on {site} as {username} via OAuth consumer {consumer}\n'
+            'NOTE: To use OAuth, you need to copy the  following line to your '
+            'user config file:\n authenticate[{hostname!r}] = {oauth_token}'
+            .format(site=site, username=site.username(), consumer=consumer_key,
+                    hostname=site.hostname(), oauth_token=oauth_token))
 
 
 def login_one_site(code, family, oauth, logout, autocreate):
@@ -113,15 +109,18 @@ def login_one_site(code, family, oauth, logout, autocreate):
     if logout:
         site.logout()
     else:
-        site.login(autocreate=autocreate)
+        try:
+            site.login(autocreate=autocreate)
+        except NoUsernameError as e:
+            pywikibot.error(e)
 
     user = site.user()
     if user:
-        pywikibot.info('Logged in on {} as {}.'.format(site, user))
+        pywikibot.info(f'Logged in on {site} as {user}.')
     elif logout:
-        pywikibot.info('Logged out of {}.'.format(site))
+        pywikibot.info(f'Logged out of {site}.')
     else:
-        pywikibot.info('Not logged in on {}.'.format(site))
+        pywikibot.info(f'Not logged in on {site}.')
 
 
 def main(*args: str) -> None:

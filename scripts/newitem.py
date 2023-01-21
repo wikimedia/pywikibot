@@ -69,11 +69,11 @@ class NewItemRobot(WikidataBot):
             days=self.opt.pageage)
         self.lastEditBefore = self.repo.server_time() - timedelta(
             days=self.opt.lastedit)
-        pywikibot.output('Page age is set to {} days so only pages created'
-                         '\nbefore {} will be considered.\n'
-                         .format(self.opt.pageage,
-                                 self.pageAgeBefore.isoformat()))
-        pywikibot.output(
+        pywikibot.info('Page age is set to {} days so only pages created'
+                       '\nbefore {} will be considered.\n'
+                       .format(self.opt.pageage,
+                               self.pageAgeBefore.isoformat()))
+        pywikibot.info(
             'Last edit is set to {} days so only pages last edited'
             '\nbefore {} will be considered.\n'
             .format(self.opt.lastedit, self.lastEditBefore.isoformat()))
@@ -81,7 +81,7 @@ class NewItemRobot(WikidataBot):
     @staticmethod
     def _touch_page(page) -> None:
         try:
-            pywikibot.output('Doing a null edit on the page.')
+            pywikibot.info('Doing a null edit on the page.')
             page.touch()
         except (NoCreateError, NoPageError):
             pywikibot.error('Page {} does not exist.'.format(
@@ -90,7 +90,7 @@ class NewItemRobot(WikidataBot):
             pywikibot.error('Page {} is locked.'.format(
                 page.title(as_link=True)))
         except PageSaveRelatedError as e:
-            pywikibot.error('Page {} not saved:\n{}'.format(page, e.args))
+            pywikibot.error(f'Page {page} not saved:\n{e.args}')
 
     def _callback(self, page, exc) -> None:
         if exc is None and self.opt.touch:
@@ -106,8 +106,7 @@ class NewItemRobot(WikidataBot):
             return self._skipping_templates[site]
 
         skipping_templates = set()
-        pywikibot.output('Retrieving skipping templates for site {}...'
-                         .format(site))
+        pywikibot.info(f'Retrieving skipping templates for site {site}...')
         for item in DELETION_TEMPLATES:
             template = site.page_from_repository(item)
 
@@ -142,35 +141,32 @@ class NewItemRobot(WikidataBot):
         if super().skip_page(page):
             return True
 
-        if page.editTime() > self.lastEditBefore:
-            pywikibot.output(
-                'Last edit on {page} was on {page.latest_revision.timestamp}.'
-                '\nToo recent. Skipping.'.format(page=page))
+        if page.latest_revision.timestamp > self.lastEditBefore:
+            pywikibot.info(
+                f'Last edit on {page} was on {page.latest_revision.timestamp}.'
+                f'\nToo recent. Skipping.')
             return True
 
         if page.oldest_revision.timestamp > self.pageAgeBefore:
-            pywikibot.output(
-                'Page creation of {page} on {page.oldest_revision.timestamp} '
-                'is too recent. Skipping.'.format(page=page))
+            pywikibot.info(
+                f'Page creation of {page} on {page.oldest_revision.timestamp} '
+                f'is too recent. Skipping.')
             return True
 
         if page.isCategoryRedirect():
-            pywikibot.output('{} is a category redirect. Skipping.'
-                             .format(page))
+            pywikibot.info(f'{page} is a category redirect. Skipping.')
             return True
 
         if page.langlinks():
             # FIXME: Implement this
-            pywikibot.output(
-                'Found language links (interwiki links) for {}.\n'
-                "Haven't implemented that yet so skipping."
-                .format(page))
+            pywikibot.info(
+                f'Found language links (interwiki links) for {page}.\n'
+                f"Haven't implemented that yet so skipping.")
             return True
 
         template = self.skip_templates(page)
         if template:
-            pywikibot.output('%s contains {{%s}}. Skipping.'
-                             % (page, template))
+            pywikibot.info(f'{page} contains {{{{{template}}}}}. Skipping.')
             return True
 
         return False
@@ -178,8 +174,7 @@ class NewItemRobot(WikidataBot):
     def treat_page_and_item(self, page, item) -> None:
         """Treat page/item."""
         if item and item.exists():
-            pywikibot.output('{} already has an item: {}.'
-                             .format(page, item))
+            pywikibot.info(f'{page} already has an item: {item}.')
             if self.opt.touch is True:
                 self._touch_page(page)
             return
@@ -221,12 +216,10 @@ def main(*args: str) -> None:
     user = pywikibot.User(bot.site, bot.site.username())
     if bot.opt.touch == 'newly' and 'autoconfirmed' not in user.groups():
         pywikibot.warning(fill(
-            'You are logged in as {}, an account that is '
-            'not in the autoconfirmed group on {}. Script '
-            'will not touch pages linked to newly created '
-            'items to avoid triggering edit rates or '
-            'captchas. Use -touch param to force this.'
-            .format(user.username, bot.site.sitename)))
+            f'You are logged in as {user.username}, an account that is not in '
+            f'the autoconfirmed group on {bot.site.sitename}. Script will not '
+            f'touch pages linked to newly created  items to avoid triggering '
+            f'edit rates or captchas. Use -touch param to force this.'))
         bot.opt.touch = False
     bot.run()
 

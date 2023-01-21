@@ -1,6 +1,6 @@
-===============
-Tests Reference
-===============
+###############
+Tests reference
+###############
 
 .. include:: ../../tests/README.rst
 
@@ -17,7 +17,7 @@ Subpackages
 Library tests
 *************
 
-    Tests in this project:
+Tests in this project:
 
 .. toctree::
     :maxdepth: 1
@@ -90,7 +90,7 @@ Library tests
 Script tests
 ************
 
-    Tests in this project:
+Tests in this project:
 
 .. toctree::
     :maxdepth: 1
@@ -106,6 +106,7 @@ Script tests
     generate_user_files<./generate_user_files_tests>
     harvest_template<./harvest_template_tests>
     interwikidata<./interwikidata_tests>
+    make_dist<./make_dist_tests>
     noreferences<./noreferences_tests>
     patrolbot<./patrolbot_tests>
     protectbot<./protectbot_tests>

@@ -71,7 +71,7 @@ from pywikibot.bot import AutomaticTWSummaryBot, ExistingPageBot
 
 
 ARGS_TYPE = Dict[str, Union[bool, str]]
-DEFAULT_ARGS = {
+DEFAULT_ARGS: ARGS_TYPE = {
     'text': '',
     'textfile': '',
     'summary': '',
@@ -83,7 +83,7 @@ DEFAULT_ARGS = {
     'talk_page': False,
     'reorder': True,
     'regex_skip_url': '',
-}  # type: ARGS_TYPE
+}
 
 ARG_PROMPT = {
     '-text': 'What text do you want to add?',
@@ -146,7 +146,7 @@ class AddTextBot(AutomaticTWSummaryBot, ExistingPageBot):
                     return True
 
         elif page.isTalkPage():
-            pywikibot.output("{} doesn't exist, creating it!".format(page))
+            pywikibot.info(f"{page} doesn't exist, creating it!")
             return False
 
         elif self.opt.create or self.opt.createonly:
@@ -228,7 +228,7 @@ def parse(argv: Sequence[str],
         elif option == '-major':
             args['minor'] = False
         else:
-            raise ValueError("Argument '{}' is unrecognized".format(option))
+            raise ValueError(f"Argument '{option}' is unrecognized")
 
     if not args['text'] and not args['textfile']:
         raise ValueError("Either the '-text' or '-textfile' is required")

@@ -467,9 +467,9 @@ class WelcomeBot(SingleSiteBot):
         """Initializer."""
         super().__init__(**kwargs)
         self.check_managed_sites()
-        self.bname = {}  # type: Dict[str, str]
+        self.bname: Dict[str, str] = {}
 
-        self.welcomed_users = []  # type: List[str]
+        self.welcomed_users: List[str] = []
         self.log_name = i18n.translate(self.site, logbook)
 
         if not self.log_name:
@@ -537,12 +537,12 @@ class WelcomeBot(SingleSiteBot):
                                                          bad_pag))
             list_loaded = []
             if badword_page.exists():
-                pywikibot.output('\nLoading the bad words list from {}...'
-                                 .format(self.site))
+                pywikibot.info(
+                    f'\nLoading the bad words list from {self.site}...')
                 list_loaded = load_word_function(badword_page.get())
             else:
                 self.show_status(Msg.WARN)
-                pywikibot.output("The bad word page doesn't exist!")
+                pywikibot.info("The bad word page doesn't exist!")
             self._blacklist = elenco + elenco_others + list_loaded
             del elenco, elenco_others, list_loaded
 
@@ -554,12 +554,12 @@ class WelcomeBot(SingleSiteBot):
             if wtlpg:
                 whitelist_page = pywikibot.Page(self.site, wtlpg)
                 if whitelist_page.exists():
-                    pywikibot.output('\nLoading the whitelist from {}...'
-                                     .format(self.site))
+                    pywikibot.info(
+                        f'\nLoading the whitelist from {self.site}...')
                     list_white = load_word_function(whitelist_page.get())
                 else:
                     self.show_status(Msg.WARN)
-                    pywikibot.output("The whitelist's page doesn't exist!")
+                    pywikibot.info("The whitelist's page doesn't exist!")
             else:
                 self.show_status(Msg.WARN)
                 pywikibot.warning("The whitelist hasn't been set!")
@@ -597,7 +597,7 @@ class WelcomeBot(SingleSiteBot):
 
         if answer.lower() in ['yes', 'y'] or not globalvar.confirm:
             self.show_status()
-            pywikibot.output(
+            pywikibot.info(
                 '{} is possibly an unwanted username. It will be reported.'
                 .format(name))
             if hasattr(self, '_BAQueue'):
@@ -612,7 +612,7 @@ class WelcomeBot(SingleSiteBot):
         """Report bad account."""
         rep_text = ''
         # name in queue is max, put detail to report page
-        pywikibot.output('Updating badname accounts to report page...')
+        pywikibot.info('Updating badname accounts to report page...')
         rep_page = pywikibot.Page(self.site,
                                   i18n.translate(self.site,
                                                  report_page))
@@ -629,22 +629,20 @@ class WelcomeBot(SingleSiteBot):
             n = re.compile(re.escape(username))
             y = n.search(text_get, pos)
             if y:
-                pywikibot.output('{} is already in the report page.'
-                                 .format(username))
+                pywikibot.info(f'{username} is already in the report page.')
             else:
                 # Adding the log.
                 rep_text += i18n.translate(self.site,
                                            report_text) % username
                 if self.site.code == 'it':
-                    rep_text = '{}{}}}}}'.format(rep_text,
-                                                 self.bname[username])
+                    rep_text = f'{rep_text}{self.bname[username]}}}}}'
 
         com = i18n.twtranslate(self.site, 'welcome-bad_username')
         if rep_text != '':
             rep_page.put(text_get + rep_text, summary=com, force=True,
                          minor=True)
             self.show_status(Msg.DONE)
-            pywikibot.output('Reported')
+            pywikibot.info('Reported')
         self.BAQueue = []
 
     def makelogpage(self) -> None:
@@ -665,7 +663,7 @@ class WelcomeBot(SingleSiteBot):
         else:
             # make new log page
             self.show_status()
-            pywikibot.output(
+            pywikibot.info(
                 'Log page is not exist, getting information for page creation')
             text = i18n.translate(self.site, logpage_header,
                                   fallback=i18n.DEFAULT_FALLBACK)
@@ -686,8 +684,8 @@ class WelcomeBot(SingleSiteBot):
                 log_page.put(text, i18n.twtranslate(self.site,
                                                     'welcome-updating'))
             except EditConflictError:
-                pywikibot.output('An edit conflict has occurred. Pausing for '
-                                 '10 seconds before continuing.')
+                pywikibot.info('An edit conflict has occurred. '
+                               'Pausing for 10 seconds before continuing.')
                 time.sleep(10)
             else:
                 break
@@ -721,8 +719,8 @@ class WelcomeBot(SingleSiteBot):
             # Wait some seconds and repeat retrieving new users
             self.show_status()
             strfstr = time.strftime('%d %b %Y %H:%M:%S (UTC)', time.gmtime())
-            pywikibot.output('Sleeping {} seconds before rerun. {}'
-                             .format(globalvar.time_recur, strfstr))
+            pywikibot.info(f'Sleeping {globalvar.time_recur} seconds before '
+                           f'rerun. {strfstr}')
             pywikibot.sleep(globalvar.time_recur)
 
     def define_sign(self, force: bool = False) -> List[str]:
@@ -736,7 +734,7 @@ class WelcomeBot(SingleSiteBot):
             sign_page_name = i18n.translate(self.site, random_sign)
             if not sign_page_name:
                 self.show_status(Msg.WARN)
-                pywikibot.output(
+                pywikibot.info(
                     "{} doesn't allow random signature, force disable."
                     .format(self.site))
                 globalvar.random_sign = False
@@ -744,11 +742,11 @@ class WelcomeBot(SingleSiteBot):
 
             sign_page = pywikibot.Page(self.site, sign_page_name)
             if sign_page.exists():
-                pywikibot.output('Loading signature list...')
+                pywikibot.info('Loading signature list...')
                 sign_text = sign_page.get()
             else:
-                pywikibot.output('The signature list page does not exist, '
-                                 'random signature will be disabled.')
+                pywikibot.info('The signature list page does not exist, '
+                               'random signature will be disabled.')
                 globalvar.random_sign = False
         else:
             try:
@@ -776,26 +774,24 @@ class WelcomeBot(SingleSiteBot):
         """
         if user.is_blocked() or user.is_locked():
             self.show_status(Msg.SKIP)
-            pywikibot.output('{} has been blocked!'.format(user.username))
+            pywikibot.info(f'{user.username} has been blocked!')
 
         elif 'bot' in user.groups():
             self.show_status(Msg.SKIP)
-            pywikibot.output('{} is a bot!'.format(user.username))
+            pywikibot.info(f'{user.username} is a bot!')
 
         elif 'bot' in user.username.lower():
             self.show_status(Msg.SKIP)
-            pywikibot.output('{} might be a global bot!'
-                             .format(user.username))
+            pywikibot.info(f'{user.username} might be a global bot!')
 
         elif user.editCount() < globalvar.attach_edit_count:
             if user.editCount() != 0:
                 self.show_status(Msg.IGNORE)
-                pywikibot.output('{} has only {} contributions.'
-                                 .format(user.username, user.editCount()))
+                pywikibot.info('{} has only {} contributions.'
+                               .format(user.username, user.editCount()))
             elif not globalvar.quiet:
                 self.show_status(Msg.IGNORE)
-                pywikibot.output('{} has no contributions.'
-                                 .format(user.username))
+                pywikibot.info(f'{user.username} has no contributions.')
         else:
             return super().skip_page(user)
 
@@ -804,13 +800,11 @@ class WelcomeBot(SingleSiteBot):
     def treat(self, user) -> None:
         """Run the bot."""
         self.show_status(Msg.MATCH)
-        pywikibot.output('{} has enough edits to be welcomed.'
-                         .format(user.username))
+        pywikibot.info(f'{user.username} has enough edits to be welcomed.')
         ustp = user.getUserTalkPage()
         if ustp.exists():
             self.show_status(Msg.SKIP)
-            pywikibot.output('{} has been already welcomed.'
-                             .format(user.username))
+            pywikibot.info(f'{user.username} has been already welcomed.')
             return
 
         if self.bad_name_filer(user.username):
@@ -835,7 +829,7 @@ class WelcomeBot(SingleSiteBot):
             ustp.put(welcome_text, welcome_comment, minor=False)
         except EditConflictError:
             self.show_status(Msg.WARN)
-            pywikibot.output(
+            pywikibot.info(
                 'An edit conflict has occurred, skipping this user.')
         else:
             self.welcomed_users.append(user)
@@ -848,8 +842,8 @@ class WelcomeBot(SingleSiteBot):
             elif welcomed_count == 1:
                 count = 'One user has'
             else:
-                count = '{} users have'.format(welcomed_count)
-            pywikibot.output(count + ' been welcomed.')
+                count = f'{welcomed_count} users have'
+            pywikibot.info(count + ' been welcomed.')
 
             if welcomed_count >= globalvar.dump_to_log:
                 self.makelogpage()
@@ -860,30 +854,29 @@ class WelcomeBot(SingleSiteBot):
         if globalvar.make_welcome_log and welcomed_count > 0:
             self.show_status()
             if welcomed_count == 1:
-                pywikibot.output('Putting the log of the latest user...')
+                pywikibot.info('Putting the log of the latest user...')
             else:
-                pywikibot.output(
+                pywikibot.info(
                     'Putting the log of the latest {} users...'
                     .format(welcomed_count))
             self.makelogpage()
 
         if hasattr(self, '_BAQueue'):
             self.show_status()
-            pywikibot.output('Putting bad name to report page...')
+            pywikibot.info('Putting bad name to report page...')
             self.report_bad_account()
 
     @staticmethod
     def show_status(message=Msg.DEFAULT) -> None:
         """Output colorized status."""
         msg, color = message.value
-        pywikibot.output('<<{color}>>[{msg:5}]<<default>> '
-                         .format(msg=msg, color=color), newline=False)
+        pywikibot.info(f'<<{color}>>[{msg:5}]<<default>> ', newline=False)
 
     def teardown(self) -> None:
         """Some cleanups after run operation."""
         if self.welcomed_users:
             self.show_status()
-            pywikibot.output('Put welcomed users before quit...')
+            pywikibot.info('Put welcomed users before quit...')
             self.makelogpage()
 
         # If there is the savedata, the script must save the number_user.
@@ -904,7 +897,7 @@ def load_word_function(raw) -> List[str]:
     page = re.compile(r'(?:\"|\')(.*?)(?:\"|\')(?:, |\))')
     list_loaded = page.findall(raw)
     if not list_loaded:
-        pywikibot.output('There was no input on the real-time page.')
+        pywikibot.info('There was no input on the real-time page.')
     return list_loaded
 
 
@@ -988,7 +981,7 @@ def handle_args(args) -> None:
         elif arg in mapping:
             setattr(globalvar, *mapping[arg])
         else:
-            pywikibot.warning('Unknown option "{}"'.format(arg))
+            pywikibot.warning(f'Unknown option "{arg}"')
 
 
 def main(*args: str) -> None:

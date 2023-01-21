@@ -56,7 +56,6 @@ from pywikibot.pagegenerators._generators import (
     MySQLPageGenerator,
     NewimagesPageGenerator,
     NewpagesPageGenerator,
-    page_with_property_generator,
     PagesFromPageidGenerator,
     PagesFromTitlesGenerator,
     PetScanPageGenerator,
@@ -85,8 +84,10 @@ from pywikibot.pagegenerators._generators import (
     XMLDumpOldPageGenerator,
     XMLDumpPageGenerator,
     YearPageGenerator,
+    page_with_property_generator,
 )
 from pywikibot.tools.collections import DequeGenerator
+
 
 __all__ = (
     'GeneratorFactory',
@@ -128,6 +129,7 @@ __all__ = (
     'PagesFromTitlesGenerator',
     'PetScanPageGenerator',
     'PrefixingPageGenerator',
+    'PreloadingGenerator',
     'RandomPageGenerator',
     'RandomRedirectPageGenerator',
     'RecentChangesPageGenerator',
@@ -430,8 +432,10 @@ FILTER OPTIONS
 
 -intersect          Work on the intersection of all the provided generators.
 
--limit              When used with any other argument -limit:n specifies a set
-                    of pages, work on no more than n pages in total.
+-limit              When used with any other argument ``-limit:n``
+                    specifies a set of pages, work on no more than n
+                    pages in total. If used with multiple generators,
+                    pages are yielded in a roundrobin way.
 
 -namespaces         Filter the page generator to only yield pages in the
 -namespace          specified namespaces. Separate multiple namespace
@@ -591,7 +595,7 @@ def RepeatingGenerator(generator: Callable,  # type: ignore[type-arg]
     kwargs.pop('start', None)  # don't set start time
     kwargs.pop('end', None)  # don't set stop time
 
-    seen = set()  # type: Set[Any]
+    seen: Set[Any] = set()
     while total is None or len(seen) < total:
         def filtered_generator() -> Iterable['pywikibot.page.Page']:
             for item in generator(total=None if seen else 1, **kwargs):
@@ -619,7 +623,7 @@ def PreloadingGenerator(generator: Iterable['pywikibot.page.Page'],
     """
     # pages may be on more than one site, for example if an interwiki
     # generator is used, so use a separate preloader for each site
-    sites = {}  # type: PRELOAD_SITE_TYPE
+    sites: PRELOAD_SITE_TYPE = {}
     # build a list of pages for each site found in the iterator
     for page in generator:
         site = page.site
@@ -662,7 +666,7 @@ def PreloadingEntityGenerator(generator: Iterable['pywikibot.page.Page'],
     :param generator: pages to iterate over
     :param groupsize: how many pages to preload at once
     """
-    sites = {}  # type: PRELOAD_SITE_TYPE
+    sites: PRELOAD_SITE_TYPE = {}
     for page in generator:
         site = page.site
         sites.setdefault(site, []).append(page)

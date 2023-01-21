@@ -6,7 +6,6 @@
 #
 import collections
 import logging
-import re
 import string
 import sys
 import types
@@ -19,7 +18,13 @@ from typing import Optional
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Dict, List, Set, Tuple  # skipcq: PY-W2000
+from pywikibot.backports import (  # skipcq: PY-W2000
+    Dict,
+    List,
+    Set,
+    Tuple,
+    removesuffix,
+)
 from pywikibot.exceptions import FamilyMaintenanceWarning, UnknownFamilyError
 from pywikibot.tools import classproperty, deprecated, remove_last_args
 
@@ -35,7 +40,12 @@ CODE_CHARACTERS = string.ascii_lowercase + string.digits + '_-'
 
 class Family:
 
-    """Parent singleton class for all wiki families."""
+    """Parent singleton class for all wiki families.
+
+    .. versionchanged:: 8.0
+       ``alphabetic``, ``alphabetic_revised`` and ``fyinterwiki``
+       attributes where removed.
+    """
 
     def __new__(cls):
         """Allocator."""
@@ -72,91 +82,7 @@ class Family:
 
     name = None
 
-    langs = {}  # type: Dict[str, str]
-
-    # For interwiki sorting order see
-    # https://meta.wikimedia.org/wiki/Interwiki_sorting_order
-
-    # The sorting order by language name from meta
-    # MediaWiki:Interwiki_config-sorting_order-native-languagename
-    alphabetic = [
-        'ace', 'kbd', 'ady', 'af', 'ak', 'als', 'alt', 'am', 'smn', 'ang',
-        'ab', 'ar', 'an', 'arc', 'roa-rup', 'frp', 'as', 'ast', 'atj', 'awa',
-        'gn', 'av', 'ay', 'az', 'ban', 'bm', 'bn', 'bjn', 'zh-min-nan', 'nan',
-        'map-bms', 'ba', 'be', 'be-tarask', 'mnw', 'bh', 'bcl', 'bi', 'bg',
-        'bar', 'blk', 'bo', 'bs', 'br', 'bxr', 'ca', 'cv', 'ceb', 'cs', 'ch',
-        'cbk-zam', 'ny', 'sn', 'tum', 'cho', 'co', 'cy', 'dag', 'da', 'dk',
-        'ary', 'pdc', 'de', 'dv', 'nv', 'dsb', 'dty', 'dz', 'mh', 'et', 'el',
-        'eml', 'en', 'myv', 'es', 'eo', 'ext', 'eu', 'ee', 'fa', 'hif', 'fo',
-        'fr', 'fy', 'ff', 'fur', 'ga', 'gv', 'gag', 'gd', 'gl', 'gan', 'ki',
-        'glk', 'guw', 'gu', 'gor', 'got', 'hak', 'xal', 'ko', 'ha', 'haw',
-        'hy', 'hi', 'ho', 'hsb', 'hr', 'hyw', 'io', 'ig', 'ilo', 'inh', 'bpy',
-        'id', 'ia', 'ie', 'iu', 'ik', 'os', 'xh', 'zu', 'is', 'it', 'he', 'jv',
-        'kbp', 'kl', 'kn', 'kr', 'pam', 'krc', 'ka', 'ks', 'csb', 'kk', 'kw',
-        'rw', 'rn', 'sw', 'kv', 'kg', 'gom', 'avk', 'ht', 'gcr', 'ku', 'kj',
-        'ky', 'mrj', 'lld', 'lad', 'lbe', 'lo', 'ltg', 'la', 'lv', 'lb', 'lez',
-        'lfn', 'lt', 'lij', 'li', 'ln', 'olo', 'jbo', 'lg', 'lmo', 'lrc',
-        'mad', 'hu', 'mai', 'mk', 'mg', 'ml', 'mt', 'mi', 'mr', 'xmf', 'arz',
-        'mzn', 'mni', 'ms', 'min', 'cdo', 'mwl', 'mdf', 'mo', 'mn', 'mus',
-        'my', 'nah', 'na', 'fj', 'nl', 'nds-nl', 'cr', 'ne', 'new', 'nia',
-        'ja', 'nqo', 'nap', 'ce', 'frr', 'pih', 'no', 'nb', 'nn', 'nrm', 'nov',
-        'ii', 'oc', 'mhr', 'or', 'om', 'ng', 'hz', 'uz', 'pa', 'pi', 'pfl',
-        'pag', 'ami', 'pnb', 'pap', 'ps', 'jam', 'koi', 'km', 'pcd', 'pcm',
-        'pms', 'pwn', 'tpi', 'nds', 'pl', 'pnt', 'pt', 'aa', 'kaa', 'crh',
-        'ty', 'ksh', 'ro', 'rmy', 'rm', 'qu', 'rue', 'ru', 'sah', 'szy', 'se',
-        'sm', 'sa', 'sg', 'sat', 'skr', 'sc', 'sco', 'trv', 'stq', 'st', 'nso',
-        'tn', 'sq', 'scn', 'si', 'simple', 'sd', 'ss', 'sk', 'sl', 'cu', 'szl',
-        'so', 'ckb', 'srn', 'sr', 'sh', 'su', 'fi', 'sv', 'shi', 'tl', 'shn',
-        'ta', 'kab', 'roa-tara', 'tt', 'tay', 'te', 'tet', 'th', 'ti', 'tg',
-        'to', 'chr', 'chy', 've', 'tcy', 'tr', 'azb', 'tk', 'tw', 'kcg', 'tyv',
-        'din', 'udm', 'bug', 'uk', 'ur', 'ug', 'za', 'vec', 'vep', 'vi', 'vo',
-        'fiu-vro', 'wa', 'zh-classical', 'vls', 'war', 'wo', 'wuu', 'ts', 'yi',
-        'yo', 'zh-yue', 'diq', 'zea', 'bat-smg', 'zh', 'zh-tw', 'zh-cn',
-    ]
-
-    # The revised sorting order by first word from meta
-    # MediaWiki:Interwiki_config-sorting_order-native-languagename-firstword
-    alphabetic_revised = [
-        'ace', 'ady', 'kbd', 'af', 'ak', 'als', 'alt', 'kcg', 'am', 'smn',
-        'ang', 'ab', 'ar', 'an', 'arc', 'roa-rup', 'frp', 'as', 'ast', 'atj',
-        'awa', 'gn', 'av', 'ay', 'az', 'bjn', 'id', 'ms', 'ban', 'bm', 'bn',
-        'zh-min-nan', 'nan', 'map-bms', 'jv', 'su', 'ba', 'min', 'be',
-        'be-tarask', 'mnw', 'mad', 'bh', 'bcl', 'bi', 'bar', 'blk', 'bo', 'bs',
-        'br', 'bug', 'bg', 'bxr', 'ca', 'ceb', 'cv', 'cs', 'ch', 'cbk-zam',
-        'ny', 'sn', 'tum', 'cho', 'co', 'cy', 'dag', 'da', 'dk', 'ary', 'pdc',
-        'de', 'dv', 'nv', 'dsb', 'na', 'dty', 'dz', 'mh', 'et', 'el', 'eml',
-        'en', 'myv', 'es', 'eo', 'ext', 'eu', 'ee', 'fa', 'hif', 'fo', 'fr',
-        'fy', 'ff', 'fur', 'ga', 'gv', 'sm', 'gag', 'gd', 'gl', 'gan', 'ki',
-        'glk', 'guw', 'gu', 'got', 'hak', 'xal', 'ko', 'ha', 'haw', 'hy', 'hi',
-        'ho', 'hsb', 'hr', 'hyw', 'io', 'ig', 'ilo', 'inh', 'bpy', 'ia', 'ie',
-        'iu', 'ik', 'os', 'xh', 'zu', 'is', 'it', 'he', 'kl', 'kn', 'kr',
-        'pam', 'ka', 'ks', 'csb', 'kk', 'kw', 'rw', 'ky', 'rn', 'mrj', 'sw',
-        'kv', 'kg', 'gom', 'avk', 'gor', 'ht', 'gcr', 'ku', 'shn', 'kj', 'lld',
-        'lad', 'lbe', 'lez', 'lfn', 'lo', 'la', 'ltg', 'lv', 'to', 'lb', 'lt',
-        'lij', 'li', 'ln', 'nia', 'olo', 'jbo', 'lg', 'lmo', 'lrc', 'hu',
-        'mai', 'mk', 'mg', 'ml', 'krc', 'mt', 'mi', 'mr', 'xmf', 'arz', 'mzn',
-        'mni', 'cdo', 'mwl', 'koi', 'mdf', 'mo', 'mn', 'mus', 'my', 'nah',
-        'fj', 'nl', 'nds-nl', 'cr', 'ne', 'new', 'ja', 'nqo', 'nap', 'ce',
-        'frr', 'pih', 'no', 'nb', 'nn', 'nrm', 'nov', 'ii', 'oc', 'mhr', 'or',
-        'om', 'ng', 'hz', 'uz', 'pa', 'pi', 'pfl', 'pag', 'ami', 'pnb', 'pap',
-        'ps', 'jam', 'km', 'pcd', 'pcm', 'pms', 'pwn', 'nds', 'pl', 'pnt',
-        'pt', 'aa', 'kaa', 'crh', 'ty', 'ksh', 'ro', 'rmy', 'rm', 'qu', 'ru',
-        'rue', 'sah', 'szy', 'se', 'sa', 'sg', 'sat', 'skr', 'sc', 'sco',
-        'trv', 'stq', 'st', 'nso', 'tn', 'sq', 'scn', 'si', 'simple', 'sd',
-        'ss', 'sk', 'sl', 'cu', 'szl', 'so', 'ckb', 'srn', 'sr', 'sh', 'fi',
-        'sv', 'shi', 'tl', 'ta', 'kab', 'kbp', 'roa-tara', 'tt', 'tay', 'te',
-        'tet', 'th', 'vi', 'ti', 'tg', 'tpi', 'chr', 'chy', 've', 'tcy', 'tr',
-        'azb', 'tk', 'tw', 'tyv', 'din', 'udm', 'uk', 'ur', 'ug', 'za', 'vec',
-        'vep', 'vo', 'fiu-vro', 'wa', 'zh-classical', 'vls', 'war', 'wo',
-        'wuu', 'ts', 'yi', 'yo', 'zh-yue', 'diq', 'zea', 'bat-smg', 'zh',
-        'zh-tw', 'zh-cn',
-    ]
-
-    # Order for fy: alphabetical by code, but y counts as i
-    fyinterwiki = alphabetic[:]
-    fyinterwiki.remove('nb')
-    fyinterwiki.sort(key=lambda x:
-                     x.replace('y', 'i') + x.count('y') * '!')
+    langs: Dict[str, str] = {}
 
     # A list of category redirect template names in different languages
     category_redirect_templates = {
@@ -173,12 +99,12 @@ class Family:
 
     # A dict of tuples for different sites with names of templates
     # that indicate an edit should be avoided
-    edit_restricted_templates = {}  # type: Dict[str, Tuple[str, ...]]
+    edit_restricted_templates: Dict[str, Tuple[str, ...]] = {}
 
     # A dict of tuples for different sites with names of archive
     # templates that indicate an edit of non-archive bots
     # should be avoided
-    archived_page_templates = {}  # type: Dict[str, Tuple[str, ...]]
+    archived_page_templates: Dict[str, Tuple[str, ...]] = {}
 
     # A list of projects that share cross-project sessions.
     cross_projects = []
@@ -191,34 +117,34 @@ class Family:
     cross_projects_cookie_username = 'centralauth_User'
 
     # A list with the name in the cross-language flag permissions
-    cross_allowed = []  # type: List[str]
+    cross_allowed: List[str] = []
 
     # A dict with the name of the category containing disambiguation
     # pages for the various languages. Only one category per language,
     # and without the namespace, so add things like:
     # 'en': "Disambiguation"
-    disambcatname = {}  # type: Dict[str, str]
+    disambcatname: Dict[str, str] = {}
 
     # attop is a list of languages that prefer to have the interwiki
     # links at the top of the page.
-    interwiki_attop = []  # type: List[str]
+    interwiki_attop: List[str] = []
     # on_one_line is a list of languages that want the interwiki links
     # one-after-another on a single line
-    interwiki_on_one_line = []  # type: List[str]
+    interwiki_on_one_line: List[str] = []
     # String used as separator between interwiki links and the text
     interwiki_text_separator = '\n\n'
 
     # Similar for category
-    category_attop = []  # type: List[str]
+    category_attop: List[str] = []
     # on_one_line is a list of languages that want the category links
     # one-after-another on a single line
-    category_on_one_line = []  # type: List[str]
+    category_on_one_line: List[str] = []
     # String used as separator between category links and the text
     category_text_separator = '\n\n'
     # When both at the bottom should categories come after interwikilinks?
     # TODO: T86284 Needed on Wikia sites, as it uses the CategorySelect
     # extension which puts categories last on all sites. TO BE DEPRECATED!
-    categories_last = []  # type: List[str]
+    categories_last: List[str] = []
 
     # Which languages have a special order for putting interlanguage
     # links, and what order is it? If a language is not in
@@ -238,15 +164,15 @@ class Family:
     # Which language codes no longer exist and by which language code
     # should they be replaced. If for example the language with code xx:
     # now should get code yy:, add {'xx':'yy'} to obsolete.
-    interwiki_replacements = {}  # type: Dict[str, str]
+    interwiki_replacements: Dict[str, str] = {}
 
     # Codes that should be removed, usually because the site has been
     # taken down.
-    interwiki_removals = []  # type: List[str]
+    interwiki_removals: List[str] = []
 
     # Language codes of the largest wikis. They should be roughly sorted
     # by size.
-    languages_by_size = []  # type: List[str]
+    languages_by_size: List[str] = []
 
     # Some languages belong to a group where the possibility is high that
     # equivalent articles have identical titles among the group.
@@ -339,7 +265,7 @@ class Family:
 
     # Some wiki farms have UrlShortener extension enabled only on the main
     # site. This value can specify this last one with (lang, family) tuple.
-    shared_urlshortner_wiki = None  # type: Optional[Tuple[str, str]]
+    shared_urlshortner_wiki: Optional[Tuple[str, str]] = None
 
     title_delimiter_and_aliases = ' _'
     """Titles usually are delimited by a space and the alias is replaced
@@ -380,7 +306,7 @@ class Family:
                 Family._families[fam] = myfamily
                 return Family._families[fam]
         else:
-            raise UnknownFamilyError('Family {} does not exist'.format(fam))
+            raise UnknownFamilyError(f'Family {fam} does not exist')
 
         try:
             # Ignore warnings due to dots in family names.
@@ -391,7 +317,7 @@ class Family:
                 sys.path.append(dirname(family_file))
                 mod = import_module(splitext(basename(family_file))[0])
         except ImportError:
-            raise UnknownFamilyError('Family {} does not exist'.format(fam))
+            raise UnknownFamilyError(f'Family {fam} does not exist')
         cls = mod.Family.instance
         if cls.name != fam:
             warnings.warn('Family name {} does not match family module name {}'
@@ -561,19 +487,19 @@ class Family:
         protocol, host = self._hostname(code, protocol)
         if protocol == 'https':
             uri = self.ssl_pathprefix(code) + uri
-        return urlparse.urljoin('{}://{}'.format(protocol, host), uri)
+        return urlparse.urljoin(f'{protocol}://{host}', uri)
 
     def path(self, code) -> str:
         """Return path to index.php."""
-        return '{}/index.php'.format(self.scriptpath(code))
+        return f'{self.scriptpath(code)}/index.php'
 
     def querypath(self, code) -> str:
         """Return path to query.php."""
-        return '{}/query.php'.format(self.scriptpath(code))
+        return f'{self.scriptpath(code)}/query.php'
 
     def apipath(self, code) -> str:
         """Return path to api.php."""
-        return '{}/api.php'.format(self.scriptpath(code))
+        return f'{self.scriptpath(code)}/api.php'
 
     def eventstreams_host(self, code):
         """Hostname for EventStreams.
@@ -591,7 +517,7 @@ class Family:
 
     def get_address(self, code, title) -> str:
         """Return the path to title using index.php with redirects disabled."""
-        return '{}?title={}&redirect=no'.format(self.path(code), title)
+        return f'{self.path(code)}?title={title}&redirect=no'
 
     def interface(self, code) -> str:
         """Return interface to use for code."""
@@ -628,7 +554,7 @@ class Family:
             which would work with the given URL.
         """
         parsed = urlparse.urlparse(url)
-        if not re.match('(https?)?$', parsed.scheme):
+        if parsed.scheme not in {'http', 'https', ''}:
             return None
 
         path = parsed.path
@@ -653,7 +579,7 @@ class Family:
                 # Use the code and family instead of the url
                 # This is only creating a Site instance if domain matches
                 site = pywikibot.Site(code, self.name)
-                pywikibot.log('Found candidate {}'.format(site))
+                pywikibot.log(f'Found candidate {site}')
 
                 for iw_url in site._interwiki_urls():
                     iw_url, *_ = iw_url.partition('{}')
@@ -671,13 +597,18 @@ class Family:
             'Found multiple matches for URL "{}": {}'
             .format(url, ', '.join(str(s) for s in matched_sites)))
 
+    @deprecated('config.maximum_GET_length', since='8.0.0')
     def maximum_GET_length(self, code):
-        """Return the maximum URL length for GET instead of POST."""
+        """Return the maximum URL length for GET instead of POST.
+
+        .. deprecated:: 8.0
+           Use :ref:`config.maximum_GET_length<Account Settings>` instead.
+        """
         return config.maximum_GET_length
 
     def dbName(self, code) -> str:
         """Return the name of the MySQL database."""
-        return '{}{}'.format(code, self.name)
+        return f'{code}{self.name}'
 
     def encoding(self, code) -> str:
         """Return the encoding for a specific language wiki."""
@@ -710,7 +641,7 @@ class Family:
         return self.name
 
     def __repr__(self) -> str:
-        return 'Family("{}")'.format(self.name)
+        return f'Family("{self.name}")'
 
     def shared_image_repository(self, code):
         """Return the shared image repository, if any."""
@@ -825,11 +756,11 @@ class SubdomainFamily(Family):
             codes += cls.closed_wikis
 
         # shortcut this classproperty
-        cls.langs = {code: '{}.{}'.format(code, cls.domain)
+        cls.langs = {code: f'{code}.{cls.domain}'
                      for code in codes}
 
         if hasattr(cls, 'code_aliases'):
-            cls.langs.update({alias: '{}.{}'.format(code, cls.domain)
+            cls.langs.update({alias: f'{code}.{cls.domain}'
                               for alias, code in cls.code_aliases.items()})
 
         return cls.langs
@@ -878,7 +809,11 @@ class FandomFamily(Family):
 
 class WikimediaFamily(Family):
 
-    """Class for all wikimedia families."""
+    """Class for all wikimedia families.
+
+    .. versionchanged:: 8.0
+       :attr:`knows_codes` attribute was added.
+    """
 
     multi_language_content_families = [
         'wikipedia', 'wiktionary',
@@ -926,6 +861,42 @@ class WikimediaFamily(Family):
         + other_content_families
     )
 
+    # Known Wikimedia site codes
+    known_codes = [
+        'aa', 'ab', 'ace', 'ady', 'af', 'ak', 'als', 'alt', 'am', 'ami', 'an',
+        'ang', 'ar', 'arc', 'ary', 'arz', 'as', 'ast', 'atj', 'av', 'avk',
+        'awa', 'ay', 'az', 'azb', 'ba', 'ban', 'bar', 'bat-smg', 'bcl', 'be',
+        'be-tarask', 'bg', 'bh', 'bi', 'bjn', 'blk', 'bm', 'bn', 'bo', 'bpy',
+        'br', 'bs', 'bug', 'bxr', 'ca', 'cbk-zam', 'cdo', 'ce', 'ceb', 'ch',
+        'cho', 'chr', 'chy', 'ckb', 'co', 'cr', 'crh', 'cs', 'csb', 'cu', 'cv',
+        'cy', 'da', 'dag', 'de', 'din', 'diq', 'dk', 'dsb', 'dty', 'dv', 'dz',
+        'ee', 'el', 'eml', 'en', 'eo', 'es', 'et', 'eu', 'ext', 'fa', 'ff',
+        'fi', 'fiu-vro', 'fj', 'fo', 'fr', 'frp', 'frr', 'fur', 'fy', 'ga',
+        'gag', 'gan', 'gcr', 'gd', 'gl', 'glk', 'gn', 'gom', 'gor', 'got',
+        'gu', 'guw', 'gv', 'ha', 'hak', 'haw', 'he', 'hi', 'hif', 'ho', 'hr',
+        'hsb', 'ht', 'hu', 'hy', 'hyw', 'hz', 'ia', 'id', 'ie', 'ig', 'ii',
+        'ik', 'ilo', 'inh', 'io', 'is', 'it', 'iu', 'ja', 'jam', 'jbo', 'jv',
+        'ka', 'kaa', 'kab', 'kbd', 'kbp', 'kcg', 'kg', 'ki', 'kj', 'kk', 'kl',
+        'km', 'kn', 'ko', 'koi', 'kr', 'krc', 'ks', 'ksh', 'ku', 'kv', 'kw',
+        'ky', 'la', 'lad', 'lb', 'lbe', 'lez', 'lfn', 'lg', 'li', 'lij', 'lld',
+        'lmo', 'ln', 'lo', 'lrc', 'lt', 'ltg', 'lv', 'mad', 'mai', 'map-bms',
+        'mdf', 'mg', 'mh', 'mhr', 'mi', 'min', 'mk', 'ml', 'mn', 'mni', 'mnw',
+        'mo', 'mr', 'mrj', 'ms', 'mt', 'mus', 'mwl', 'my', 'myv', 'mzn', 'na',
+        'nah', 'nan', 'nap', 'nb', 'nds', 'nds-nl', 'ne', 'new', 'ng', 'nia',
+        'nl', 'nn', 'no', 'nov', 'nqo', 'nrm', 'nso', 'nv', 'ny', 'oc', 'olo',
+        'om', 'or', 'os', 'pa', 'pag', 'pam', 'pap', 'pcd', 'pcm', 'pdc',
+        'pfl', 'pi', 'pih', 'pl', 'pms', 'pnb', 'pnt', 'ps', 'pt', 'pwn', 'qu',
+        'rm', 'rmy', 'rn', 'ro', 'roa-rup', 'roa-tara', 'ru', 'rue', 'rw',
+        'sa', 'sah', 'sat', 'sc', 'scn', 'sco', 'sd', 'se', 'sg', 'sh', 'shi',
+        'shn', 'si', 'simple', 'sk', 'skr', 'sl', 'sm', 'smn', 'sn', 'so',
+        'sq', 'sr', 'srn', 'ss', 'st', 'stq', 'su', 'sv', 'sw', 'szl', 'szy',
+        'ta', 'tay', 'tcy', 'te', 'tet', 'tg', 'th', 'ti', 'tk', 'tl', 'tn',
+        'to', 'tpi', 'tr', 'trv', 'ts', 'tt', 'tum', 'tw', 'ty', 'tyv', 'udm',
+        'ug', 'uk', 'ur', 'uz', 've', 'vec', 'vep', 'vi', 'vls', 'vo', 'wa',
+        'war', 'wo', 'wuu', 'xal', 'xh', 'xmf', 'yi', 'yo', 'za', 'zea', 'zh',
+        'zh-classical', 'zh-cn', 'zh-min-nan', 'zh-tw', 'zh-yue', 'zu',
+    ]
+
     # Code mappings which are only an alias, and there is no 'old' wiki.
     # For all except 'nl_nds', subdomains do exist as a redirect, but that
     # should not be relied upon.
@@ -955,9 +926,9 @@ class WikimediaFamily(Family):
     }
 
     # Not open for edits; stewards can still edit.
-    closed_wikis = []  # type: List[str]
+    closed_wikis: List[str] = []
     # Completely removed
-    removed_wikis = []  # type: List[str]
+    removed_wikis: List[str] = []
 
     # WikimediaFamily uses Wikibase for the category name containing
     # disambiguation pages for the various languages. We need the
@@ -978,7 +949,7 @@ class WikimediaFamily(Family):
             return 'wikimedia.org'
 
         raise NotImplementedError(
-            "Family {} needs to define property 'domain'".format(cls.name))
+            f"Family {cls.name} needs to define property 'domain'")
 
     @classproperty
     def interwiki_removals(cls):
@@ -1014,7 +985,7 @@ class WikimediaOrgFamily(SingleSiteFamily, WikimediaFamily):
     @classproperty
     def domain(cls) -> str:
         """Return the parents domain with a subdomain prefix."""
-        return '{}.wikimedia.org'.format(cls.name)
+        return f'{cls.name}.wikimedia.org'
 
 
 def AutoFamily(name: str, url: str) -> SingleSiteFamily:
@@ -1035,7 +1006,7 @@ def AutoFamily(name: str, url: str) -> SingleSiteFamily:
     def scriptpath(self, code):
         """Extract the script path from the URL."""
         if self.url.path.endswith('/api.php'):
-            return self.url.path[0:-8]
+            return removesuffix(self.url.path, '/api.php')
 
         # AutoFamily refers to the variable set below, not the function
         # but the reference must be given here

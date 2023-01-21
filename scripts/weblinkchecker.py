@@ -226,10 +226,10 @@ def weblinks_from_text(
     text = textlib.removeDisabledParts(text)
     link_regex = textlib.compileLinkR(without_bracketed, only_bracketed)
     for m in link_regex.finditer(text):
-        if m.group('url'):
-            yield m.group('url')
+        if m['url']:
+            yield m['url']
         else:
-            yield m.group('urlb')
+            yield m['urlb']
 
 
 XmlDumpPageGenerator = partial(
@@ -249,7 +249,7 @@ class LinkCheckThread(threading.Thread):
     """
 
     #: Collecting start time of a thread for any host
-    hosts = {}  # type: Dict[str, float]
+    hosts: Dict[str, float] = {}
     lock = threading.Lock()
 
     def __init__(self, page, url, history, http_ignores, day) -> None:
@@ -302,8 +302,8 @@ class LinkCheckThread(threading.Thread):
                                        'weblinkchecker-badurl_msg',
                                        {'URL': self.url})
         except Exception:
-            pywikibot.output('Exception while processing URL {} in page {}'
-                             .format(self.url, self.page.title()))
+            pywikibot.info(f'Exception while processing URL {self.url} in '
+                           f'page {self.page}')
             raise
 
         if (
@@ -311,15 +311,12 @@ class LinkCheckThread(threading.Thread):
             or r.status_code in self.http_ignores
         ):
             message = HTTPStatus(r.status_code).phrase
-            pywikibot.output('*{} links to {} - {}.'
-                             .format(self.page.title(as_link=True), self.url,
-                                     message))
+            pywikibot.info(f'*{self.page} links to {self.url} - {message}.')
             self.history.set_dead_link(self.url, message, self.page,
                                        config.weblink_dead_days)
         elif self.history.set_link_alive(self.url):
-            pywikibot.output(
-                '*Link to {} in {} is back alive.'
-                .format(self.url, self.page.title(as_link=True)))
+            pywikibot.info(
+                f'*Link to {self.url} in {self.page} is back alive.')
 
 
 class History:
@@ -370,15 +367,15 @@ class History:
     def log(self, url, error, containing_page, archive_url) -> None:
         """Log an error report to a text file in the deadlinks subdirectory."""
         if archive_url:
-            error_report = '* {} ([{} archive])\n'.format(url, archive_url)
+            error_report = f'* {url} ([{archive_url} archive])\n'
         else:
-            error_report = '* {}\n'.format(url)
+            error_report = f'* {url}\n'
         for (page_title, date, error) in self.history_dict[url]:
             # ISO 8601 formulation
             iso_date = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(date))
             error_report += '** In [[{}]] on {}, {}\n'.format(
                 page_title, iso_date, error)
-        pywikibot.output('** Logging link for deletion.')
+        pywikibot.info('** Logging link for deletion.')
         txtfilename = pywikibot.config.datafilepath('deadlinks',
                                                     'results-{}-{}.txt'
                                                     .format(
@@ -489,14 +486,14 @@ class DeadLinkReportThread(threading.Thread):
                 url, error_report, containing_page, archive_url = self.queue[0]
                 self.queue = self.queue[1:]
                 talk_page = containing_page.toggleTalkPage()
-                pywikibot.output('<<lightaqua>>** Reporting dead link on {}...'
-                                 '<<default>>'.format(talk_page))
+                pywikibot.info(
+                    f'<<lightaqua>>** Reporting dead link on {talk_page}...')
                 try:
                     content = talk_page.get() + '\n\n\n'
                     if url in content:
-                        pywikibot.output('<<lightaqua>>** Dead link seems to '
-                                         'have already been reported on {}'
-                                         '<<default>>'.format(talk_page))
+                        pywikibot.info(
+                            f'<<lightaqua>>** Dead link seems to have already '
+                            f'been reported on {talk_page}')
                         continue
                 except (NoPageError, IsRedirectPageError):
                     content = ''
@@ -533,7 +530,7 @@ class DeadLinkReportThread(threading.Thread):
                 try:
                     talk_page.put(content, comment)
                 except SpamblacklistError as error:
-                    pywikibot.output(
+                    pywikibot.info(
                         '<<lightaqua>>** SpamblacklistError while trying to '
                         'change {}: {}<<default>>'
                         .format(talk_page, error.url))

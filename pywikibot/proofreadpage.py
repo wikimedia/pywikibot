@@ -22,16 +22,19 @@ OCR support of page scans via:
 
 """
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2023
 #
 # Distributed under the terms of the MIT license.
 #
+import collections.abc
 import json
 import re
 import time
 from functools import partial
 from http import HTTPStatus
 from typing import Any, Optional, Union
+from urllib.parse import unquote
+from weakref import WeakKeyDictionary
 
 from requests.exceptions import ReadTimeout
 
@@ -45,6 +48,7 @@ from pywikibot.backports import (
     Sequence,
     Set,
     Tuple,
+    pairwise,
 )
 from pywikibot.comms import http
 from pywikibot.data.api import ListGenerator, Request
@@ -73,6 +77,263 @@ else:
 
 PagesFromLabelType = Dict[str, Set['pywikibot.page.Page']]
 _IndexType = Tuple[Optional['IndexPage'], List['IndexPage']]
+
+
+class TagAttr:
+    """Tag attribute of <pages />.
+
+    Represent a single attribute. It is used internally in
+    :class:`PagesTagParser` and shall not be used stand-alone.
+
+    It manages string formatting output and conversion str <--> int and
+    quotes. Input value can only be str or int and shall have quotes or
+    nothing.
+
+    >>> a = TagAttr('to', 3.0)
+    Traceback (most recent call last):
+      ...
+    TypeError: value=3.0 must be str or int.
+
+    >>> a = TagAttr('to', 'A123"')
+    Traceback (most recent call last):
+      ...
+    ValueError: value=A123" has wrong quotes.
+
+    >>> a = TagAttr('to', 3)
+    >>> a
+    TagAttr('to', 3)
+    >>> str(a)
+    'to=3'
+    >>> a.attr
+    'to'
+    >>> a.value
+    3
+
+    >>> a = TagAttr('to', '3')
+    >>> a
+    TagAttr('to', '3')
+    >>> str(a)
+    'to=3'
+    >>> a.attr
+    'to'
+    >>> a.value
+    3
+
+    >>> a = TagAttr('to', '"3"')
+    >>> a
+    TagAttr('to', '"3"')
+    >>> str(a)
+    'to="3"'
+    >>> a.value
+    3
+
+    >>> a = TagAttr('to', "'3'")
+    >>> a
+    TagAttr('to', "'3'")
+    >>> str(a)
+    "to='3'"
+    >>> a.value
+    3
+
+    >>> a = TagAttr('to', 'A123')
+    >>> a
+    TagAttr('to', 'A123')
+    >>> str(a)
+    'to=A123'
+    >>> a.value
+    'A123'
+
+    .. versionadded:: 8.0
+    """
+
+    def __init__(self, attr, value):
+        """Initializer."""
+        self.attr = attr
+        self._value = self._convert(value)
+
+    def _convert(self, value):
+        """Handle conversion from str to int and quotes."""
+        if not isinstance(value, (str, int)):
+            raise TypeError(f'value={value} must be str or int.')
+
+        self._orig_value = value
+
+        if isinstance(value, str):
+            if (value.startswith('"') != value.endswith('"')
+                    or value.startswith("'") != value.endswith("'")):
+                raise ValueError(f'value={value} has wrong quotes.')
+            value = value.strip('"\'')
+            value = int(value) if value.isdigit() else value
+
+        return value
+
+    @property
+    def value(self):
+        """Attribute value."""
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        self._value = self._convert(value)
+
+    def __str__(self):
+        attr = 'from' if self.attr == 'ffrom' else self.attr
+        return f'{attr}={self._orig_value}'
+
+    def __repr__(self):
+        attr = 'from' if self.attr == 'ffrom' else self.attr
+        return f"{self.__class__.__name__}('{attr}', {repr(self._orig_value)})"
+
+
+class TagAttrDesc:
+    """A descriptor tag.
+
+    .. versionadded:: 8.0
+    """
+
+    def __init__(self):
+        """Initializer."""
+        self.attrs = WeakKeyDictionary()
+
+    def __set_name__(self, owner, name):
+        self.public_name = name
+
+    def __get__(self, obj, objtype=None):
+        attr = self.attrs.get(obj)
+        return attr.value if attr is not None else None
+
+    def __set__(self, obj, value):
+        attr = self.attrs.get(obj)
+        if attr is not None:
+            attr.value = value
+        else:
+            self.attrs[obj] = TagAttr(self.public_name, value)
+
+    def __delete__(self, obj):
+        self.attrs.pop(obj, None)
+
+
+class PagesTagParser(collections.abc.Container):
+    """Parser for tag ``<pages />``.
+
+    .. seealso::
+       https://www.mediawiki.org/wiki/Help:Extension:ProofreadPage/Pages_tag
+
+    Parse text and extract the first ``<pages ... />`` tag.
+    Individual attributes will be accessible with dot notation.
+
+    >>> tp = PagesTagParser(
+    ... 'Text: <pages index="Index.pdf" from="first" to="last" />')
+    >>> tp
+    PagesTagParser('<pages index="Index.pdf" from="first" to="last" />')
+
+    Attributes can be modified via dot notation. If an attribute is a
+    number, it is converted to int.
+
+    .. note:: ``from`` is represented as ``ffrom`` due to conflict with
+       keyword.
+
+    >>> tp.ffrom = 1; tp.to = '"3"'
+    >>> tp.ffrom
+    1
+    >>> tp.to
+    3
+
+    Quotes are stripped in the value and added back in the str
+    representation.
+
+    .. note:: Quotes are not mandatory.
+
+    >>> tp
+    PagesTagParser('<pages index="Index.pdf" from=1 to="3" />')
+
+    Attributes can be added via dot notation. Order is fixed (same order
+    as attribute definition in the class).
+
+    >>> tp.fromsection = '"A"'
+    >>> tp.fromsection
+    'A'
+    >>> tp
+    PagesTagParser('<pages index="Index.pdf" from=1 to="3" fromsection="A" />')
+
+    Attributes can be deleted.
+    >>> del tp.fromsection
+    >>> tp
+    PagesTagParser('<pages index="Index.pdf" from=1 to="3" />')
+
+    Attribute presence can be checked.
+    >>> 'to' in tp
+    True
+
+    >>> 'step' in tp
+    False
+
+    .. versionadded:: 8.0
+    """
+
+    pat_tag = re.compile(r'<pages (?P<attrs>[^/]*?)/>')
+    tokens = (
+        'index',
+        'from',
+        'to',
+        'include',
+        'exclude',
+        'step',
+        'header',
+        'tosection',
+        'fromsection',
+        'onlysection',
+    )
+    tokens = '(' + '=|'.join(tokens) + '=)'
+    pat_attr = re.compile(tokens)
+
+    index = TagAttrDesc()
+    ffrom = TagAttrDesc()
+    to = TagAttrDesc()
+    include = TagAttrDesc()
+    exclude = TagAttrDesc()
+    step = TagAttrDesc()
+    header = TagAttrDesc()
+    tosection = TagAttrDesc()
+    fromsection = TagAttrDesc()
+    onlysection = TagAttrDesc()
+
+    def __init__(self, text):
+        """Initializer."""
+        m = self.pat_tag.search(text)
+        if m is None:
+            raise ValueError(f'Invalid text={text}')
+
+        tag = m['attrs']
+        matches = list(self.pat_attr.finditer(tag))
+        positions = [m.span()[0] for m in matches] + [len(tag)]
+
+        for begin, end in pairwise(positions):
+            attribute = tag[begin:end - 1]
+            attr, _, value = attribute.partition('=')
+            if attr == 'from':
+                attr = 'f' + attr
+            setattr(self, attr, value)
+
+    @classmethod
+    def get_descriptors(cls):
+        """Get TagAttrDesc descriptors."""
+        res = {k: v for k, v in cls.__dict__.items()
+               if isinstance(v, TagAttrDesc)}
+        return res
+
+    def __contains__(self, attr):
+        return getattr(self, attr) is not None
+
+    def __str__(self):
+        descriptors = self.get_descriptors().items()
+        attrs = [v.attrs.get(self) for k, v in descriptors
+                 if v.attrs.get(self) is not None]
+        attrs = ' '.join(str(attr) for attr in attrs)
+        return f'<pages {attrs} />' if attrs else '<pages />'
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}('{self}')"
 
 
 def decompose(fn: Callable) -> Callable:  # type: ignore
@@ -121,10 +382,10 @@ class FullHeader:
 
         m = self.p_header.search(self._text)
         if m:
-            self.ql = int(m.group('ql'))
-            self.user = m.group('user')
-            self.header = m.group('header')
-            if not m.group('has_div'):
+            self.ql = int(m['ql'])
+            self.user = m['user']
+            self.header = m['header']
+            if not m['has_div']:
                 self._has_div = False
         else:
             self.ql = ProofreadPage.NOT_PROOFREAD
@@ -243,7 +504,7 @@ class ProofreadPage(pywikibot.Page):
         :return: (base, ext, num).
         """
         left, sep, right = self.title(with_ns=False).rpartition('/')
-        num = None  # type: Optional[int]
+        num: Optional[int] = None
 
         if sep:
             base = left
@@ -279,7 +540,7 @@ class ProofreadPage(pywikibot.Page):
                                set(self.getReferences(namespaces=index_ns))]
 
             if not what_links_here:
-                self._index = (None, [])  # type: _IndexType
+                self._index: _IndexType = (None, [])
             elif len(what_links_here) == 1:
                 self._index = (what_links_here.pop(), [])
             else:
@@ -294,13 +555,13 @@ class ProofreadPage(pywikibot.Page):
 
         index_page, others = self._index
         if others:
-            pywikibot.warning('{} linked to several Index pages.'.format(self))
-            pywikibot.output('{}{!s}'.format(' ' * 9, [index_page] + others))
+            pywikibot.warning(f'{self} linked to several Index pages.')
+            pywikibot.info('{}{!s}'.format(' ' * 9, [index_page] + others))
 
             if index_page:
-                pywikibot.output(
+                pywikibot.info(
                     '{}Selected Index: {}'.format(' ' * 9, index_page))
-                pywikibot.output('{}remaining: {!s}'.format(' ' * 9, others))
+                pywikibot.info('{}remaining: {!s}'.format(' ' * 9, others))
 
         if not index_page:
             pywikibot.warning('Page {} is not linked to any Index page.'
@@ -493,7 +754,7 @@ class ProofreadPage(pywikibot.Page):
         """
         def _assert_len(len_oq: int, len_cq: int, title: str) -> None:
             if (len_oq != len_cq) or (len_oq < 2 or len_cq < 2):
-                raise Error('ProofreadPage {}: invalid format'.format(title))
+                raise Error(f'ProofreadPage {title}: invalid format')
 
         # Property force page text loading.
         text = self.text
@@ -559,7 +820,7 @@ class ProofreadPage(pywikibot.Page):
         The edit summary shall be appended to pre_summary to highlight
         Status in the edit summary on wiki.
         """
-        return '/* {0.status} */ '.format(self)
+        return f'/* {self.status} */ '
 
     @property
     @cached
@@ -582,7 +843,7 @@ class ProofreadPage(pywikibot.Page):
         try:
             response = http.fetch(url, charset='utf-8')
         except Exception:
-            pywikibot.error('Error fetching HTML for {}.'.format(self))
+            pywikibot.error(f'Error fetching HTML for {self}.')
             raise
 
         soup = _bs4_soup(response.text)  # type: ignore
@@ -628,32 +889,32 @@ class ProofreadPage(pywikibot.Page):
 
         # wrong link fail with Exceptions
         for retry in range(5, 30, 5):
-            pywikibot.debug('{}: get URI {!r}'.format(ocr_tool, cmd_uri))
+            pywikibot.debug(f'{ocr_tool}: get URI {cmd_uri!r}')
             try:
                 response = http.fetch(cmd_uri)
             except ReadTimeout as e:
-                pywikibot.warning('ReadTimeout {}: {}'.format(cmd_uri, e))
+                pywikibot.warning(f'ReadTimeout {cmd_uri}: {e}')
             except Exception as e:
-                pywikibot.error('"{}": {}'.format(cmd_uri, e))
+                pywikibot.error(f'"{cmd_uri}": {e}')
                 return True, e
             else:
-                pywikibot.debug('{}: {}'.format(ocr_tool, response.text))
+                pywikibot.debug(f'{ocr_tool}: {response.text}')
                 break
 
-            pywikibot.warning('retrying in {} seconds ...'.format(retry))
+            pywikibot.warning(f'retrying in {retry} seconds ...')
             time.sleep(retry)
         else:
             return True, ReadTimeout('ReadTimeout: Could not perform OCR')
 
         if HTTPStatus.BAD_REQUEST <= response.status_code < 600:
-            return True, 'Http response status {}'.format(response.status_code)
+            return True, f'Http response status {response.status_code}'
 
         data = response.json()
 
         if ocr_tool == self._PHETOOLS:  # phetools
-            assert 'error' in data, 'Error from phetools: {}'.format(data)
+            assert 'error' in data, f'Error from phetools: {data}'
             assert data['error'] in [0, 1, 2, 3], \
-                'Error from phetools: {}'.format(data)
+                f'Error from phetools: {data}'
             error, _text = bool(data['error']), data['text']
         else:  # googleOCR
             if 'error' in data:
@@ -662,7 +923,7 @@ class ProofreadPage(pywikibot.Page):
                 error, _text = False, data['text']
 
         if error:
-            pywikibot.error('OCR query {}: {}'.format(cmd_uri, _text))
+            pywikibot.error(f'OCR query {cmd_uri}: {_text}')
             return error, _text
         return error, parser_func(_text)
 
@@ -704,7 +965,7 @@ class ProofreadPage(pywikibot.Page):
         try:
             url_image = self.url_image
         except ValueError:
-            error_text = 'No prp-page-image src found for {}.'.format(self)
+            error_text = f'No prp-page-image src found for {self}.'
             pywikibot.error(error_text)
             return True, error_text
 
@@ -765,7 +1026,7 @@ class ProofreadPage(pywikibot.Page):
         if not error and isinstance(text, str):
             return text
         raise ValueError(
-            '{}: not possible to perform OCR. {}'.format(self, text))
+            f'{self}: not possible to perform OCR. {text}')
 
 
 class PurgeRequest(Request):
@@ -867,7 +1128,7 @@ class IndexPage(pywikibot.Page):
             r'/w/index\.php\?title=(.+?)&action=edit&redlink=1')
         title = p_href.search(href)
         if title:
-            return title.group(1).replace('_', ' ')
+            return title[1].replace('_', ' ')
         return None
 
     def save(self, *args: Any, **kwargs: Any) -> None:  # See Page.save().
@@ -919,7 +1180,7 @@ class IndexPage(pywikibot.Page):
         params = {'action': 'purge', 'titles': [self.title()]}
         request = PurgeRequest(site=self.site, parameters=params)
         rawdata = request.submit()
-        error_message = 'Purge action failed for {}'.format(self)
+        error_message = f'Purge action failed for {self}'
         assert 'purge' in rawdata, error_message
         assert 'purged' in rawdata['purge'][0], error_message
 
@@ -927,11 +1188,11 @@ class IndexPage(pywikibot.Page):
         """Associate label and number for each page linked to the index."""
         # Clean cache, if any.
         self._page_from_numbers = {}
-        self._numbers_from_page = {}  # type: Dict[pywikibot.page.Page, int]
-        self._page_numbers_from_label = {}  # type: Dict[str, Set[int]]
-        self._pages_from_label = {}  # type: PagesFromLabelType
-        self._labels_from_page_number = {}  # type: Dict[int, str]
-        self._labels_from_page = {}  # type: Dict[pywikibot.page.Page, str]
+        self._numbers_from_page: Dict[pywikibot.page.Page, int] = {}
+        self._page_numbers_from_label: Dict[str, Set[int]] = {}
+        self._pages_from_label: PagesFromLabelType = {}
+        self._labels_from_page_number: Dict[int, str] = {}
+        self._labels_from_page: Dict[pywikibot.page.Page, str] = {}
         self._soup = _bs4_soup(self.get_parsed_page(True))  # type: ignore
         # Do not search for "new" here, to avoid to skip purging if links
         # to non-existing pages are present.
@@ -974,6 +1235,7 @@ class IndexPage(pywikibot.Page):
                 title = self._parse_redlink(href)  # non-existing page
                 if title is None:  # title not conforming to required format
                     continue
+                title = unquote(title)
             else:
                 title = a_tag.get('title')   # existing page
 
@@ -1081,7 +1343,7 @@ class IndexPage(pywikibot.Page):
         try:
             return self._labels_from_page[page]
         except KeyError:
-            raise KeyError('Invalid Page: {}.'.format(page))
+            raise KeyError(f'Invalid Page: {page}.')
 
     @check_if_cached
     def get_label_from_page_number(self, page_number: int) -> str:
@@ -1108,7 +1370,7 @@ class IndexPage(pywikibot.Page):
         try:
             return mapping_dict[label]
         except KeyError:
-            raise KeyError('No page has label: "{}".'.format(label))
+            raise KeyError(f'No page has label: "{label}".')
 
     @check_if_cached
     def get_page_number_from_label(self, label: str = '1') -> str:
@@ -1138,7 +1400,7 @@ class IndexPage(pywikibot.Page):
         try:
             return self._page_from_numbers[page_number]
         except KeyError:
-            raise KeyError('Invalid page number: {}.'.format(page_number))
+            raise KeyError(f'Invalid page number: {page_number}.')
 
     @check_if_cached
     def pages(self) -> List['pywikibot.page.Page']:
@@ -1155,4 +1417,4 @@ class IndexPage(pywikibot.Page):
         try:
             return self._numbers_from_page[page]
         except KeyError:
-            raise KeyError('Invalid page: {}.'.format(page))
+            raise KeyError(f'Invalid page: {page}.')

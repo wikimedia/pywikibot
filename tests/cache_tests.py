@@ -1,17 +1,15 @@
 #!/usr/bin/python3
 """API Request cache tests."""
 #
-# (C) Pywikibot team, 2012-2022
+# (C) Pywikibot team, 2012-2023
 #
 # Distributed under the terms of the MIT license.
 #
 import unittest
 
-from pywikibot.site import BaseSite
-from pywikibot.login import LoginStatus
-
 import scripts.maintenance.cache as cache
-
+from pywikibot.login import LoginStatus
+from pywikibot.site import BaseSite
 from tests import join_cache_path
 from tests.aspects import TestCase
 

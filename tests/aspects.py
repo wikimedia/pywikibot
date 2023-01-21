@@ -5,7 +5,7 @@ Several parts of the test infrastructure are implemented as mixins,
 such as API result caching and excessive test durations.
 """
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -19,12 +19,13 @@ import unittest
 import warnings
 from collections.abc import Sized
 from contextlib import contextmanager, suppress
+from functools import wraps
 from http import HTTPStatus
 from unittest.util import safe_repr
 
 import pywikibot
 from pywikibot import Site, config
-from pywikibot.backports import removeprefix, removesuffix
+from pywikibot.backports import List, removeprefix, removesuffix
 from pywikibot.comms import http
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.exceptions import (
@@ -34,6 +35,7 @@ from pywikibot.exceptions import (
 )
 from pywikibot.family import WikimediaFamily
 from pywikibot.site import BaseSite
+from pywikibot.tools import MediaWikiVersion  # noqa: F401 (used by f-string)
 from pywikibot.tools import suppress_warnings
 from tests import (
     WARN_SITE_CODE,
@@ -84,7 +86,7 @@ class TestTimerMixin(unittest.TestCase):
         self.test_completed = time.time()
         duration = self.test_completed - self.test_start
         if duration > self.test_duration_warning_interval:
-            unittest_print(' {:.3f}s'.format(duration), end=' ')
+            unittest_print(f' {duration:.3f}s', end=' ')
             sys.stdout.flush()
 
 
@@ -123,7 +125,7 @@ class TestCaseBase(TestTimerMixin):
 
         if first_len != second_len:
             msg = self._formatMessage(
-                msg, 'len({}) != {}'.format(safe_repr(seq), second_len))
+                msg, f'len({safe_repr(seq)}) != {second_len}')
             self.fail(msg)
 
     def assertPageInNamespaces(self, page, namespaces):
@@ -139,9 +141,9 @@ class TestCaseBase(TestTimerMixin):
             namespaces = {namespaces}
 
         self.assertIn(page.namespace(), namespaces,
-                      '{} not in namespace {!r}'.format(page, namespaces))
+                      f'{page} not in namespace {namespaces!r}')
 
-    def _get_gen_pages(self, gen, count=None, site=None):
+    def _get_gen_pages(self, gen, count: int = None, site=None):
         """
         Get pages from gen, asserting they are Page from site.
 
@@ -152,7 +154,6 @@ class TestCaseBase(TestTimerMixin):
         :param gen: Page generator
         :type gen: typing.Iterable[pywikibot.Page]
         :param count: number of pages to get
-        :type count: int
         :param site: Site of expected pages
         :type site: pywikibot.site.APISite
         """
@@ -176,10 +177,9 @@ class TestCaseBase(TestTimerMixin):
 
         return gen_pages
 
-    def _get_gen_titles(self, gen, count, site=None):
-        gen_pages = self._get_gen_pages(gen, count, site)
-        gen_titles = [page.title() for page in gen_pages]
-        return gen_titles
+    def _get_gen_titles(self, gen, count: int, site=None) -> List[str]:
+        """Return a list of page titles of given iterable."""
+        return [page.title() for page in self._get_gen_pages(gen, count, site)]
 
     @staticmethod
     def _get_canonical_titles(titles, site=None):
@@ -311,6 +311,59 @@ def require_modules(*required_modules):
     return test_requirement
 
 
+def require_version(version_needed: str, reason: str = ''):
+    """Require minimum MediaWiki version to be queried.
+
+    The version needed for the test; must be given with a preleading rich
+    comparisons operator like ``<1.27wmf4`` or ``>=1.39``. If the
+    comparison does not match the test will be skipped.
+
+    This decorator can only be used for TestCase having a single site.
+    It cannot be used for DrySite tests. In addition version comparison
+    for other than the current site e.g. for the related data or image
+    repositoy of the current site is ot possible.
+
+    .. versionadded:: 8.0.0
+
+    :param version_needed: The version needed
+    :param reason: A reason for skipping the test.
+    :raises Exception: Usage validation fails
+    """
+    def test_requirement(method):
+        """Test the requirement and return an optionally decorated object."""
+        @wraps(method)
+        def wrapper(self, *args, **kwargs):
+            """Validate environment."""
+            if not isinstance(self.site, BaseSite) \
+               or isinstance(self.site, DrySite):
+                raise Exception(
+                    f'{type(self).__name__}.site must be a BaseSite not '
+                    f'{type(self.site).__name__}.')
+
+            if args or kwargs:
+                raise Exception(
+                    f'Test method {method.__name__!r} has parameters which is '
+                    f'not supported with require_version decorator.')
+
+            _, op, version = re.split('([<>]=?)', version_needed)
+            if not op:
+                raise Exception(f'There is no valid operator given with '
+                                f'version {version_needed!r}')
+
+            skip = not eval(
+                f'self.site.mw_version {op} MediaWikiVersion(version)')
+            if not skip:
+                return method(self, *args, **kwargs)
+
+            myreason = ' to ' + reason if reason else ''
+            raise unittest.SkipTest(
+                f'MediaWiki {op} v{version} required{myreason}.')
+
+        return wrapper
+
+    return test_requirement
+
+
 class DisableSiteMixin(TestCaseBase):
 
     """Test cases not connected to a Site object.
@@ -326,7 +379,7 @@ class DisableSiteMixin(TestCaseBase):
         """Set up test."""
         self.old_Site_lookup_method = pywikibot.Site
         pywikibot.Site = lambda *args: self.fail(
-            '{}: Site() not permitted'.format(self.__class__.__name__))
+            f'{self.__class__.__name__}: Site() not permitted')
 
         super().setUp()
 
@@ -889,8 +942,8 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
         if dry:
             interface = DrySite
 
+        prod_only = os.environ.get('PYWIKIBOT_TEST_PROD_ONLY', '0') == '1'
         for data in cls.sites.values():
-            prod_only = os.environ.get('PYWIKIBOT_TEST_PROD_ONLY', '0') == '1'
             if (data.get('code') in ('test', 'mediawiki')
                     and prod_only and not dry):
                 raise unittest.SkipTest(
@@ -950,9 +1003,9 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
     def has_site_user(cls, family, code):
         """Check the user config has a user for the site."""
         if not family:
-            raise Exception('no family defined for {}'.format(cls.__name__))
+            raise Exception(f'no family defined for {cls.__name__}')
         if not code:
-            raise Exception('no site code defined for {}'.format(cls.__name__))
+            raise Exception(f'no site code defined for {cls.__name__}')
 
         usernames = config.usernames
 
@@ -1303,8 +1356,7 @@ class PwbTestCase(TestCase):
     def _execute(self, args, data_in=None, timeout=None, error=None):
         site = self.get_site()
 
-        args = args + ['-family:' + site.family.name,
-                       '-lang:' + site.code]
+        args += ['-family:' + site.family.name, '-lang:' + site.code]
 
         return execute_pwb(args, data_in, timeout, error)
 
@@ -1350,7 +1402,8 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
     """Test cases for deprecation function in the tools module."""
 
     _generic_match = re.compile(
-        r'.* is deprecated(?: for \d+ [^;]*)?(; use .* instead)?\.')
+        r'.* is deprecated(?: since release [\d.]+ [^;]*)?'
+        r'(; use .* instead)?\.')
 
     source_adjustment_skips = [
         unittest.case._AssertRaisesContext,
@@ -1390,15 +1443,14 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
     @property
     def deprecation_messages(self):
         """Return captured deprecation warnings."""
-        messages = [str(item.message) for item in self.warning_log]
-        return messages
+        return [str(item.message) for item in self.warning_log]
 
     @classmethod
     def _build_message(cls, deprecated, instead):
         if deprecated is not None:
-            msg = '{} is deprecated'.format(deprecated)
+            msg = f'{deprecated} is deprecated'
             if instead:
-                msg += '; use {} instead.'.format(instead)
+                msg += f'; use {instead} instead.'
         elif instead is None:
             msg = None
         elif instead is True:
@@ -1440,7 +1492,7 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
             deprecation_messages = self.deprecation_messages
             for deprecation_message in deprecation_messages:
                 match = self._generic_match.match(deprecation_message)
-                if (match and bool(match.group(1)) == (msg is self.INSTEAD)
+                if (match and bool(match[1]) == (msg is self.INSTEAD)
                         or msg is None):
                     break
             else:
@@ -1552,5 +1604,5 @@ class HttpbinTestCase(TestCase):
         Otherwise, returns: httpbin.org
         """
         if hasattr(self, 'httpbin'):
-            return '{}:{}'.format(self.httpbin.host, self.httpbin.port)
+            return f'{self.httpbin.host}:{self.httpbin.port}'
         return 'httpbin.org'

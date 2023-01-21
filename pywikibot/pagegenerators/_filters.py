@@ -45,7 +45,7 @@ _filter_unique_pages = partial(
 
 def _output_if(predicate: bool, msg: str) -> None:
     if predicate:
-        pywikibot.output(msg)
+        pywikibot.info(msg)
 
 
 def NamespaceFilterPageGenerator(
@@ -111,7 +111,7 @@ def PageTitleFilterPageGenerator(generator: Iterable['pywikibot.page.Page'],
             continue
 
         if config.verbose_output:
-            pywikibot.output('Ignoring page {}'.format(page.title()))
+            pywikibot.info(f'Ignoring page {page.title()}')
 
 
 def RedirectFilterPageGenerator(generator: Iterable['pywikibot.page.Page'],
@@ -135,7 +135,7 @@ def RedirectFilterPageGenerator(generator: Iterable['pywikibot.page.Page'],
             continue
 
         if show_filtered:
-            pywikibot.output(fmt.format(what=what, page=page))
+            pywikibot.info(fmt.format(what=what, page=page))
 
 
 class ItemClaimFilter:
@@ -231,7 +231,7 @@ def SubpageFilterGenerator(generator: Iterable['pywikibot.page.Page'],
             yield page
         else:
             if show_filtered:
-                pywikibot.output(
+                pywikibot.info(
                     'Page {} is a subpage that is too deep. Skipping.'
                     .format(page))
 
@@ -462,7 +462,7 @@ def UserEditFilterGenerator(generator: Iterable['pywikibot.page.Page'],
         if bool(contribs[username]) is not bool(skip):  # xor operation
             yield page
         elif show_filtered:
-            pywikibot.output('Skipping {}'.format(page.title(as_link=True)))
+            pywikibot.info(f'Skipping {page.title(as_link=True)}')
 
 
 def WikibaseItemFilterPageGenerator(generator: Iterable['pywikibot.page.Page'],
@@ -479,7 +479,7 @@ def WikibaseItemFilterPageGenerator(generator: Iterable['pywikibot.page.Page'],
     :return: Wrapped generator
     """
     why = "doesn't" if has_item else 'has'
-    msg = '{{page}} {why} a wikidata item. Skipping.'.format(why=why)
+    msg = f'{{page}} {why} a wikidata item. Skipping.'
 
     for page in generator or []:
         try:

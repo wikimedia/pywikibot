@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """FilePage tests."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,6 +9,7 @@ import os
 import re
 import unittest
 from contextlib import suppress
+from itertools import chain
 
 import pywikibot
 from pywikibot.exceptions import (
@@ -52,9 +53,6 @@ class TestSharedFiles(TestCase):
         commons = self.get_site('commons')
         itwp = self.get_site('itwiki')
         itwp_file = pywikibot.FilePage(itwp, title)
-        for using in itwp_file.using_pages():
-            self.assertIsInstance(using, pywikibot.Page)
-
         commons_file = pywikibot.FilePage(commons, title)
 
         self.assertFalse(itwp_file.exists())
@@ -65,6 +63,9 @@ class TestSharedFiles(TestCase):
         self.assertTrue(commons_file.file_is_shared())
         self.assertTrue(commons_file.file_is_used)
         self.assertTrue(commons_file.get_file_url())
+
+        for using in commons_file.using_pages():
+            self.assertIsInstance(using, pywikibot.Page)
 
         self.assertIn('/wikipedia/commons/', itwp_file.get_file_url())
         with self.assertRaisesRegex(
@@ -94,7 +95,7 @@ class TestSharedFiles(TestCase):
         self.assertFalse(commons_file.file_is_shared())
 
         page_doesnt_exist_exc_regex = re.escape(
-            "Page [[commons:{}]] doesn't exist.".format(title))
+            f"Page [[commons:{title}]] doesn't exist.")
 
         with self.assertRaisesRegex(
                 NoPageError,
@@ -320,6 +321,20 @@ class TestFilePageDataItem(TestCase):
         self.assertEqual('M14634781', item.getID())
         self.assertIsInstance(
             item.labels, pywikibot.page._collections.LanguageDict)
+        self.assertIsInstance(
+            item.statements, pywikibot.page._collections.ClaimCollection)
+        self.assertTrue(item.claims is item.statements)
+
+        all_claims = list(chain.from_iterable(item.statements.values()))
+        self.assertEqual({claim.on_item for claim in all_claims}, {item})
+
+        claims = [claim for claim in all_claims
+                  if isinstance(claim.target, pywikibot.page.WikibaseEntity)]
+        self.assertEqual({str(claim.repo) for claim in claims},
+                         {'wikidata:wikidata'})
+        self.assertEqual({str(claim.target.repo) for claim in claims},
+                         {'wikidata:wikidata'})
+
         del item._file
         self.assertEqual(page, item.file)
 

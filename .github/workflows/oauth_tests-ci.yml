@@ -1,0 +1,109 @@
+name: Oauth CI
+# Run login tests using OAuth
+
+on:
+  push:
+    branches: [ master ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYWIKIBOT_TEST_RUNNING: 1
+  PYWIKIBOT_USERNAME: Pywikibot-oauth
+  PYWIKIBOT_LOGIN_LOGOUT: 1
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os || 'ubuntu-latest' }}
+    timeout-minutes: 2
+
+    strategy:
+      fail-fast: false
+      max-parallel: 15
+
+      matrix:
+        python-version: ["pypy3.7", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12.0-alpha - 3.12.0"]
+        family: ['wikipedia']
+        code: ['test']
+        domain:  ['test.wikipedia.org']
+        include:
+          # ubuntu-20.04 required for Python 3.6
+          - python-version: 3.6
+            family: wpbeta
+            code: en
+            domain: en.wikipedia.beta.wmflabs.org
+            os: ubuntu-20.04
+          - python-version: 3.7
+            family: wpbeta
+            code: zh
+            domain: zh.wikipedia.beta.wmflabs.org
+          - python-version: 3.6
+            family: wikipedia
+            code: test
+            domain: test.wikipedia.org
+            os: ubuntu-20.04
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+      with:
+        submodules: true
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Get token name
+      env:
+        _oauth_token: OAUTH_TOKEN_${{ matrix.family }}_${{ matrix.code }}
+      uses: ASzc/change-string-case-action@v5
+      id: token
+      with:
+        string: ${{ env._oauth_token }}
+
+    - name: Split OAuth Token
+      uses: jungwinter/split@v2
+      id: split
+      with:
+        msg: ${{ secrets[format('{0}', steps.token.outputs.uppercase)] }}
+        separator: ":"
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip --version
+        pip install -U setuptools
+        pip install requests
+        pip install mwparserfromhell
+        pip install mwoauth
+        pip install codecov
+        pip install coverage
+        python -c "import setuptools; print('setuptools:', setuptools.__version__)"
+
+    - name: Generate family files
+      if:  ${{ matrix.family == 'wpbeta' }}
+      run: |
+        python pwb.py generate_family_file http://${{matrix.code}}.wikipedia.beta.wmflabs.org/ wpbeta y
+
+    - name: Generate user files
+      run: |
+        python -Werror::UserWarning -m pwb generate_user_files -family:${{matrix.family}} -lang:${{matrix.code}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
+        echo "authenticate['${{ matrix.domain }}'] = ('${{ steps.split.outputs._0 }}', '${{ steps.split.outputs._1 }}', '${{ steps.split.outputs._2 }}', '${{ steps.split.outputs._3 }}')" >> user-config.py
+        echo "max_retries = 3" >> user-config.py
+        echo "noisysleep = float('inf')" >> user-config.py
+        echo "maximum_GET_length = 5000" >> user-config.py
+        echo "console_encoding = 'utf8'" >> user-config.py
+
+    - name: Test with unittest
+      timeout-minutes: 1
+      env:
+        PYWIKIBOT_TEST_OAUTH: ${{ secrets[format('{0}', steps.token.outputs.uppercase)] }}
+      run: |
+        python pwb.py version
+        coverage run -m unittest -vv tests/oauth_tests.py
+
+    - name: Upload coverage to Codecov
+      run: codecov

@@ -84,16 +84,18 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, AutomaticTWSummaryBot):
             # Make sure that next time around we will not find this same hit.
             curpos = m.start() + 1
 
-            is_interwikilink = mysite.isInterwikiLink(m.group('title'))
+            try:
+                is_interwikilink = mysite.isInterwikiLink(m['title'])
+            except InvalidTitleError:
+                continue  # skip invalid title
 
             # ignore interwiki links, links in the disabled area
             # and links to sections of the same page
-            if (m.group('title').strip() == ''
+            if (m['title'].strip() == ''
                     or is_interwikilink
                     or isDisabled(text, m.start())):
                 continue
-            actual_link_page = pywikibot.Page(target_page.site,
-                                              m.group('title'))
+            actual_link_page = pywikibot.Page(target_page.site, m['title'])
             # Check whether the link found is to page.
             try:
                 actual_link_page.title()
@@ -105,22 +107,22 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, AutomaticTWSummaryBot):
 
             # The link looks like this:
             # [[page_title|link_text]]trailing_chars
-            page_title = m.group('title')
-            link_text = m.group('label')
+            page_title = m['title']
+            link_text = m['label']
 
             if not link_text:
                 # or like this: [[page_title]]trailing_chars
                 link_text = page_title
-            if m.group('section') is None:
+            if m['section'] is None:
                 section = ''
             else:
-                section = m.group('section')
+                section = m['section']
             if section and target_page.section():
                 pywikibot.warning(
                     'Source section {} and target section {} found. '
                     'Skipping.'.format(section, target_page))
                 continue
-            trailing_chars = m.group('linktrail')
+            trailing_chars = m['linktrail']
             if trailing_chars:
                 link_text += trailing_chars
 
@@ -138,7 +140,7 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, AutomaticTWSummaryBot):
 
             if ((new_page_title == link_text and not section)
                     or self.opt.overwrite):
-                newlink = '[[{}]]'.format(new_page_title)
+                newlink = f'[[{new_page_title}]]'
             # check if we can create a link with trailing characters instead of
             # a pipelink
             elif (len(new_page_title) <= len(link_text)
@@ -238,9 +240,9 @@ def main(*args: str) -> None:
 
     mysite = pywikibot.Site()
     if mysite.sitename == 'wikipedia:nl':
-        pywikibot.output(
+        pywikibot.info(
             '<<lightred>>There is consensus on the Dutch Wikipedia that '
-            'bots should not be used to fix redirects.<<default>>')
+            'bots should not be used to fix redirects.')
         return
 
     if featured:

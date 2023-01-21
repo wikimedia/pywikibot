@@ -124,8 +124,8 @@ class ParserFunctionCountBot(SingleSiteBot, ExistingPageBot):
 
     def setup(self) -> None:
         """Setup magic words, regex and result counter."""
-        pywikibot.output('Hold on, this will need some time. '
-                         'You will be notified by 50 templates.')
+        pywikibot.info('Hold on, this will need some time. '
+                       'You will be notified by 50 templates.')
         magicwords = []
         for magic_word in self.site.siteinfo['magicwords']:
             magicwords += magic_word['aliases']
@@ -137,8 +137,8 @@ class ParserFunctionCountBot(SingleSiteBot, ExistingPageBot):
         title = page.title()
         if (self.counter['read'] + 1) % 50 == 0:
             # Don't let the poor user panic in front of a black screen.
-            pywikibot.output('{}th template is being processed: {}'
-                             .format(self.counter['read'] + 1, title))
+            pywikibot.info('{}th template is being processed: {}'
+                           .format(self.counter['read'] + 1, title))
 
         text = page.text
         functions = self.regex.findall(text)
@@ -156,8 +156,8 @@ class ParserFunctionCountBot(SingleSiteBot, ExistingPageBot):
             '# [[{result[0]}]] ({result[1]})'
             .format(result=result)
             for result in self.results.most_common(self.opt.first))
-        pywikibot.output(resultlist)
-        pywikibot.output('{} templates were found.'.format(len(self.results)))
+        pywikibot.info(resultlist)
+        pywikibot.info(f'{len(self.results)} templates were found.')
 
         # File operations:
         if self.opt.save:

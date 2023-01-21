@@ -2,7 +2,10 @@
 """Script to create user-config.py. Other file names are not supported.
 
 .. versionchanged:: 7.0
-   moved to pywikibot.scripts folder
+   moved to pywikibot.scripts folder.
+.. versionchanged:: 8.0
+   let user the choice which section to be copied.
+   Also EXTERNAL EDITOR SETTINGS section can be copied.
 """
 #
 # (C) Pywikibot team, 2010-2022
@@ -18,7 +21,7 @@ from pathlib import Path
 from textwrap import fill
 from typing import Optional
 
-from pywikibot.backports import Tuple
+from pywikibot.backports import Callable, List, Tuple
 from pywikibot.scripts import _import_with_no_user_config
 
 
@@ -28,10 +31,15 @@ PYTHON_VERSION = sys.version_info[:2]
 # DISABLED_SECTIONS cannot be copied; variables must be set manually
 DISABLED_SECTIONS = {
     'USER INTERFACE SETTINGS',  # uses sys
-    'EXTERNAL EDITOR SETTINGS',  # uses os
 }
 OBSOLETE_SECTIONS = {
     'ACCOUNT SETTINGS',  # already set
+}
+SCRIPT_SECTIONS = {
+    'INTERWIKI SETTINGS',
+    'SOLVE_DISAMBIGUATION SETTINGS',
+    'WEBLINK CHECKER SETTINGS',
+    'REPLICATION BOT SETTINGS',
 }
 
 # Disable user-config usage as we are creating it here
@@ -65,14 +73,14 @@ def change_base_dir():
             if not os.access(new_base, os.R_OK | os.W_OK):
                 pywikibot.error('directory access restricted')
                 continue
-            pywikibot.output('Using existing directory')
+            pywikibot.info('Using existing directory')
         else:
             try:
                 os.mkdir(new_base, pywikibot.config.private_files_permission)
             except Exception as e:
-                pywikibot.error('directory creation failed: {}'.format(e))
+                pywikibot.error(f'directory creation failed: {e}')
                 continue
-            pywikibot.output('Created new directory.')
+            pywikibot.info('Created new directory.')
         break
 
     if new_base == pywikibot.config.get_base_dir(new_base):
@@ -85,18 +93,18 @@ to use the argument "-dir:{new_base}" every time you run the bot, or set
 the environment variable "PYWIKIBOT_DIR" equal to this directory name in
 your operating system. See your operating system documentation for how to
 set environment variables.""".format(new_base=new_base), width=76)
-    pywikibot.output(msg)
+    pywikibot.info(msg)
     if pywikibot.input_yn('Is this OK?', default=False, automatic_quit=False):
         return new_base
-    pywikibot.output('Aborting changes.')
+    pywikibot.info('Aborting changes.')
     return False
 
 
 def file_exists(filename) -> bool:
     """Return whether the file exists and print a message if it exists."""
     if os.path.exists(filename):
-        pywikibot.output('{1} already exists in the target directory "{0}".'
-                         .format(*os.path.split(filename)))
+        pywikibot.info('{1} already exists in the target directory "{0}".'
+                       .format(*os.path.split(filename)))
         return True
     return False
 
@@ -138,15 +146,15 @@ def get_site_and_lang(
         known_langs = []
 
     if not known_langs:
-        pywikibot.output('There were no known site codes found in {}.'
-                         .format(fam.name))
+        pywikibot.info(f'There were no known site codes found in {fam.name}.')
         default_lang = None
     elif len(known_langs) == 1:
-        pywikibot.output('The only known site code: {}'.format(known_langs[0]))
+        pywikibot.info(f'The only known site code: {known_langs[0]}')
         default_lang = known_langs[0]
     else:
-        pywikibot.output('This is the list of known site oodes:')
-        pywikibot.output(', '.join(known_langs))
+        if not force:
+            pywikibot.info('This is the list of known site codes:')
+            pywikibot.info(', '.join(known_langs))
         if default_lang not in known_langs:
             if default_lang != 'en' and 'en' in known_langs:
                 default_lang = 'en'
@@ -164,7 +172,7 @@ def get_site_and_lang(
                default=False, automatic_quit=False):
             mycode = None
 
-    message = 'Username on {}:{}'.format(mycode, fam.name)
+    message = f'Username on {mycode}:{fam.name}'
     username = pywikibot.input(message, default=default_username, force=force)
     # Escape ''s
     if username:
@@ -176,6 +184,9 @@ EXTENDED_CONFIG = """\
 # This is an automatically generated file. You can find more
 # configuration parameters in 'config.py' file or refer
 # https://doc.wikimedia.org/pywikibot/master/api_ref/pywikibot.config.html
+from typing import Optional, Union
+
+from pywikibot.backports import Dict, List, Tuple
 
 # The family of sites to be working on.
 # Pywikibot will import families/xxx_family.py so if you want to change
@@ -219,6 +230,9 @@ PASSFILE_CONFIG = """\
 {botpasswords}"""
 
 
+ConfigSection = namedtuple('ConfigSection', 'head, info, section')
+
+
 def parse_sections() -> list:
     """Parse sections from config.py file.
 
@@ -228,12 +242,8 @@ def parse_sections() -> list:
     :return: a list of ConfigSection named tuples.
     """
     data = []
-    ConfigSection = namedtuple('ConfigSection', 'head, info, section')
 
     config_path = Path(__file__).resolve().parents[1].joinpath('config.py')
-    if PYTHON_VERSION < (3, 6):
-        config_path = str(config_path)
-
     with codecs.open(config_path, 'r', 'utf-8') as config_f:
         config_file = config_f.read()
 
@@ -251,19 +261,84 @@ def parse_sections() -> list:
     return data
 
 
-def copy_sections() -> str:
+def copy_sections(force: bool = False, default: str = 'n') -> str:
     """Take config sections and copy them to user-config.py.
 
+    .. versionchanged:: 8.0
+       *force* and *default* options were added.
+
+    :param force: Copy all sections if force is True
+    :param default: Default answer for input_sections.
+        Should be 'a' for all or 'n' for none to copy.
     :return: config text of all selected sections.
     """
-    result = []
     sections = parse_sections()
-    # copy settings
-    for section in filter(lambda x: x.head not in (DISABLED_SECTIONS
-                                                   | OBSOLETE_SECTIONS),
-                          sections):
-        result.append(section.section)
-    return ''.join(result)
+    if not sections:  # Something is wrong with the regex
+        return None
+
+    # copy framework settings
+    copies = input_sections(
+        'framework', sections, force=force, default=default,
+        skip=lambda x: x.head not in (DISABLED_SECTIONS
+                                      | OBSOLETE_SECTIONS
+                                      | SCRIPT_SECTIONS))
+
+    # copy scripts settings
+    copies += input_sections(
+        'scripts', sections, force=force, default=default,
+        skip=lambda x: x.head in SCRIPT_SECTIONS)
+
+    return ''.join(copies)
+
+
+def input_sections(variant: str,
+                   sections: List['ConfigSection'],
+                   skip: Optional[Callable] = None,
+                   force: bool = False,
+                   default: str = 'n') -> None:
+    """Ask for settings to copy.
+
+    .. versionadded:: 8.0
+
+    :param variant: Variant of the setting section. Either 'framework'
+        or 'scripts'
+    :param sections: A sections list previously read from the config file
+    :param skip: a filter function
+    :param force: Force input if True
+    """
+    # First ask what to do which the whole section type variant
+    select = 'h'
+    answers = [('Yes', 'y'), ('All', 'a'), ('None', 'n'), ('Help', 'h')]
+    while select == 'h':
+        select = pywikibot.input_choice(
+            f'Do you want to select {variant} setting sections?',
+            answers, default=default, force=force, automatic_quit=False)
+        if select == 'h':
+            answers.pop(-1)
+            pywikibot.info(
+                f'The following {variant} setting sections are provided:')
+            for item in filter(skip, sections):
+                pywikibot.info(item.head)
+
+    copies = []
+    # Now ask for a single section of the given variant
+    # or use all or none of them
+    choice = {'a': 'all', 'n': 'none', 'y': 'h'}[select]  # mapping
+    for item in filter(skip, sections):
+        answers = [('Yes', 'y'), ('No', 'n'), ('Help', 'h')]
+        while choice == 'h':
+            choice = pywikibot.input_choice(
+                f'Do you want to add {item.head} section?',
+                answers, default='n', force=force, automatic_quit=False)
+            if choice == 'h':
+                answers.pop(-1)
+                pywikibot.info(fill(item.info))
+        if choice in ('all', 'y'):
+            copies.append(item.section)  # Fill the mutable directly
+        if choice not in ('all', 'none'):
+            choice = 'h'
+
+    return copies
 
 
 def create_user_config(
@@ -306,9 +381,9 @@ def create_user_config(
         if pywikibot.input_yn('Do you want to add a BotPassword for {}?'
                               .format(username), force=force, default=False):
             if msg:
-                pywikibot.output(msg)
+                pywikibot.info(msg)
             msg = None
-            message = 'BotPassword\'s "bot name" for {}'.format(username)
+            message = f'BotPassword\'s "bot name" for {username}'
             botpasswordname = pywikibot.input(message, force=force)
             message = 'BotPassword\'s "password" for "{}" ' \
                       '(no characters will be shown)' \
@@ -332,11 +407,11 @@ def create_user_config(
         "('{}', BotPassword('{}', {!r}))".format(*botpassword)
         for botpassword in botpasswords)
 
-    config_text = copy_sections()
+    config_text = copy_sections(force=force)
     if config_text:
         config_content = EXTENDED_CONFIG
     else:
-        pywikibot.output('Creating a small variant of user-config.py')
+        pywikibot.info('Creating a small variant of user-config.py')
         config_content = SMALL_CONFIG
 
     try:
@@ -347,10 +422,10 @@ def create_user_config(
                 main_code=main_code,
                 usernames=usernames,
                 config_text=config_text,
-                botpasswords='password_file = ' + ('"{}"'.format(PASS_BASENAME)
+                botpasswords='password_file = ' + (f'"{PASS_BASENAME}"'
                                                    if botpasswords
                                                    else 'None')))
-        pywikibot.output("'{}' written.".format(_fnc))
+        pywikibot.info(f"'{_fnc}' written.")
     except BaseException:
         if os.path.exists(_fnc):
             os.remove(_fnc)
@@ -371,11 +446,14 @@ def save_botpasswords(botpasswords, _fncpass):
             # in it
             with codecs.open(_fncpass, 'w', 'utf-8') as f:
                 f.write('')
-                file_mode_checker(_fncpass, mode=0o600, quiet=True)
+                file_mode_checker(_fncpass,
+                                  mode=config.private_files_permission,
+                                  quiet=True)
             with codecs.open(_fncpass, 'w', 'utf-8') as f:
                 f.write(PASSFILE_CONFIG.format(botpasswords=botpasswords))
-                file_mode_checker(_fncpass, mode=0o600)
-                pywikibot.output("'{}' written.".format(_fncpass))
+                file_mode_checker(_fncpass,
+                                  mode=config.private_files_permission)
+                pywikibot.info(f"'{_fncpass}' written.")
         except OSError:
             os.remove(_fncpass)
             raise
@@ -394,7 +472,7 @@ def ask_for_dir_change(force) -> Tuple[bool, bool]:
     """
     global base_dir
 
-    pywikibot.output('\nYour default user directory is "{}"'.format(base_dir))
+    pywikibot.info(f'\nYour default user directory is "{base_dir}"')
     while True:
         # Show whether file exists
         userfile = file_exists(os.path.join(base_dir, USER_BASENAME))
@@ -428,15 +506,15 @@ def main(*args: str) -> None:
 
     local_args = pywikibot.handle_args(args)
     if local_args:
-        pywikibot.output('Unknown argument{}: {}'
-                         .format('s' if len(local_args) > 1 else '',
-                                 ', '.join(local_args)))
+        pywikibot.info('Unknown argument{}: {}'
+                       .format('s' if len(local_args) > 1 else '',
+                               ', '.join(local_args)))
         return
 
-    pywikibot.output('You can abort at any time by pressing ctrl-c')
+    pywikibot.info('You can abort at any time by pressing ctrl-c')
     if config.mylang is not None:
         force = True
-        pywikibot.output('Automatically generating user-config.py')
+        pywikibot.info('Automatically generating user-config.py')
     else:
         force = False
         # Force default site of en.wikipedia
@@ -450,7 +528,7 @@ def main(*args: str) -> None:
             create_user_config(config.family, config.mylang, username,
                                force=force)
     except KeyboardInterrupt:
-        pywikibot.output('\nScript terminated by user.')
+        pywikibot.info('\nScript terminated by user.')
 
     # Creation of user-fixes.py has been replaced by an example file.
 

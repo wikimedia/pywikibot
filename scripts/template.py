@@ -105,7 +105,7 @@ user talk pages (namespace #3):
 
 """
 #
-# (C) Pywikibot team, 2003-2021
+# (C) Pywikibot team, 2003-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -120,7 +120,6 @@ from pywikibot.tools.itertools import (
     itergroup,
     roundrobin_generators,
 )
-
 from scripts.replace import ReplaceRobot as ReplaceBot
 
 
@@ -182,12 +181,12 @@ class TemplateRobot(ReplaceBot):
                                              'pagelist', ]
             elif self.opt.remove:
                 separate_line_regex = re.compile(
-                    r'^[*#:]* *{} *\n'.format(template_regex.pattern),
+                    fr'^[*#:]* *{template_regex.pattern} *\n',
                     re.DOTALL | re.MULTILINE)
                 replacements.append((separate_line_regex, ''))
 
                 spaced_regex = re.compile(
-                    r' +{} +'.format(template_regex.pattern),
+                    fr' +{template_regex.pattern} +',
                     re.DOTALL)
                 replacements.append((spaced_regex, ' '))
 
@@ -275,8 +274,8 @@ def main(*args: str) -> None:
         try:
             templates = dict(itergroup(template_names, 2, strict=True))
         except ValueError:
-            pywikibot.output('Unless using solely -subst or -remove, '
-                             'you must give an even number of template names.')
+            pywikibot.info('Unless using solely -subst or -remove, you must '
+                           'give an even number of template names.')
             return
 
     old_templates = [pywikibot.Page(site, template_name, ns=10)

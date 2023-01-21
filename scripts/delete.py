@@ -169,21 +169,21 @@ class DeletionRobot(CurrentPageBot):
             n_pages_in_ns = len(refs[ns])
             plural = '' if n_pages_in_ns == 1 else 's'
             ns_name = ns.canonical_prefix() if ns != ns.MAIN else 'Main:'
-            ns_id = '[{}]'.format(ns.id)
-            pywikibot.output(
+            ns_id = f'[{ns.id}]'
+            pywikibot.info(
                 '    {0!s:<{width}} {1:>6} {2:>10} page{pl}'.format(
                     ns_name, ns_id, n_pages_in_ns, width=width, pl=plural))
             if show_n_pages:  # do not show marker if 0 pages are requested.
                 for page in islice_with_ellipsis(refs[ns], show_n_pages):
-                    pywikibot.output('      {!s}'.format(page.title()))
+                    pywikibot.info(f'      {page.title()!s}')
 
     def skip_page(self, page) -> bool:
         """Skip the page under some conditions."""
         if self.opt.undelete and page.exists():
-            pywikibot.output('Skipping: {} already exists.'.format(page))
+            pywikibot.info(f'Skipping: {page} already exists.')
             return True
         if not self.opt.undelete and not page.exists():
-            pywikibot.output('Skipping: {} does not exist.'.format(page))
+            pywikibot.info(f'Skipping: {page} does not exist.')
             return True
         return super().skip_page(page)
 
@@ -204,7 +204,7 @@ class DeletionRobot(CurrentPageBot):
                 ns_with_ref = sorted(ns_with_ref)
                 if ns_with_ref:
                     ns_names = ', '.join(str(ns.id) for ns in ns_with_ref)
-                    pywikibot.output(
+                    pywikibot.info(
                         'Skipping: {} is not orphan in ns: {}.'.format(
                             self.current_page, ns_names))
                     return  # Not an orphan, do not delete.
@@ -224,8 +224,7 @@ class DeletionRobot(CurrentPageBot):
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
@@ -234,6 +233,7 @@ def main(*args: str) -> None:
     page_name = ''
     summary = None
     options = {}
+    pg_args = []
 
     # read command line parameters
     local_args = pywikibot.handle_args(args)
@@ -241,35 +241,31 @@ def main(*args: str) -> None:
     mysite = pywikibot.Site()
 
     for arg in local_args:
-
-        if arg == '-always':
-            options['always'] = True
-        elif arg.startswith('-summary'):
-            if len(arg) == len('-summary'):
-                summary = pywikibot.input('Enter a reason for the deletion:')
-            else:
-                summary = arg[len('-summary:'):]
-        elif arg.startswith('-undelete'):
-            options['undelete'] = True
-        elif arg.startswith('-isorphan'):
-            options['isorphan'] = int(arg[10:]) if arg[10:] != '' else 0
-            if options['isorphan'] < 0:
-                options['isorphan'] = False
-        elif arg.startswith('-orphansonly'):
-            if arg[13:]:
-                namespaces = mysite.namespaces.resolve(arg[13:].split(','))
+        opt, _, value = arg.partition(':')
+        if opt in ('-always', '-undelete'):
+            options[opt[1:]] = True
+        elif opt == '-summary':
+            summary = value or pywikibot.input(
+                'Enter a reason for the deletion:')
+        elif opt == '-isorphan':
+            value = int(value or 0)
+            options[opt[1:]] = value if value >= 0 else False
+        elif opt == '-orphansonly':
+            if value:
+                namespaces = mysite.namespaces.resolve(value.split(','))
             else:
                 namespaces = mysite.namespaces
-            options['orphansonly'] = namespaces
+            options[opt[1:]] = namespaces
         else:
-            gen_factory.handle_arg(arg)
-            found = arg.find(':') + 1
-            if found:
-                page_name = arg[found:]
+            pg_args.append(arg)
 
-        if not summary:
-            un = 'un' if 'undelete' in options else ''
-            if page_name:
+    un = 'un' if 'undelete' in options else ''
+    for arg in pg_args:
+        *_, page_name = arg.partition(':')
+        if gen_factory.handle_arg(arg) and not summary:
+            if arg.startswith('-file'):
+                summary = i18n.twtranslate(mysite, un + 'delete-from-file')
+            elif page_name:
                 if arg.startswith(('-cat', '-subcats')):
                     summary = i18n.twtranslate(mysite, 'delete-from-category',
                                                {'page': page_name})
@@ -283,21 +279,15 @@ def main(*args: str) -> None:
                 elif arg.startswith('-imageused'):
                     summary = i18n.twtranslate(mysite, un + 'delete-images',
                                                {'page': page_name})
-            elif arg.startswith('-file'):
-                summary = i18n.twtranslate(mysite, un + 'delete-from-file')
 
-    generator = gen_factory.getCombinedGenerator()
     # We are just deleting pages, so we have no need of using a preloading
     # page generator to actually get the text of those pages.
-    if generator:
+    generator = gen_factory.getCombinedGenerator()
+    if not pywikibot.bot.suggest_help(missing_generator=not generator):
         if summary is None:
-            summary = pywikibot.input('Enter a reason for the {}deletion:'
-                                      .format(['', 'un'][options
-                                              .get('undelete', False)]))
+            summary = pywikibot.input(f'Enter a reason for the {un}deletion:')
         bot = DeletionRobot(summary, generator=generator, **options)
         bot.run()
-    else:
-        pywikibot.bot.suggest_help(missing_generator=True)
 
 
 if __name__ == '__main__':

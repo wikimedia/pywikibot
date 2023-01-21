@@ -1,14 +1,14 @@
 #!/usr/bin/python3
 """Tests for the tests package."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2023
 #
 # Distributed under the terms of the MIT license.
 import unittest
 from contextlib import suppress
 
-from tests.aspects import TestCase
 from tests import utils
+from tests.aspects import TestCase
 
 
 class HttpServerProblemTestCase(TestCase):

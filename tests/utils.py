@@ -21,8 +21,6 @@ from pywikibot.data.api import Request as _original_Request
 from pywikibot.exceptions import APIError
 from pywikibot.login import LoginStatus
 from pywikibot.site import Namespace
-from pywikibot.tools import PYTHON_VERSION
-
 from tests import _pwb_py
 
 
@@ -430,7 +428,7 @@ class DryPage(pywikibot.Page):
         return self._disambig
 
 
-class FakeLoginManager(pywikibot.data.api.LoginManager):
+class FakeLoginManager(pywikibot.login.ClientLoginManager):
 
     """Loads a fake password."""
 
@@ -450,9 +448,6 @@ def execute(command: List[str], data_in=None, timeout=None, error=None):
 
     :param command: executable to run and arguments to use
     """
-    if PYTHON_VERSION < (3, 6):
-        command.insert(1, '-W ignore::FutureWarning:pywikibot:104')
-
     env = os.environ.copy()
 
     # Prevent output by test package; e.g. 'max_retries reduced from x to y'
@@ -505,7 +500,7 @@ def execute_pwb(args, data_in=None, timeout=None, error=None, overrides=None):
     if overrides:
         command.append('-c')
         overrides = '; '.join(
-            '{} = {}'.format(key, value) for key, value in overrides.items())
+            f'{key} = {value}' for key, value in overrides.items())
         command.append(
             'import pwb; import pywikibot; {}; pwb.main()'
             .format(overrides))

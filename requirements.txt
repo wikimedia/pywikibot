@@ -18,44 +18,42 @@
 # $ awk -F '[#>=]' '{print $1}' requirements.txt | xargs apt-cache search
 
 # mandatory dependencies, others are optional
-requests>=2.20.1, < 2.26.0; python_version < '3.6'
-requests>=2.20.1, < 2.28.0; python_version >= '3.6' and python_version < '3.7'
-requests>=2.20.1; python_version >= '3.7'
+mwparserfromhell>=0.6.3
+requests>=2.21.0, < 2.28.0; python_version < '3.7'
+requests>=2.21.0; python_version >= '3.7'
 setuptools>=48.0.0 ; python_version >= '3.10'
-setuptools>=38.5.2 ; python_version >= '3.7' and python_version < '3.10'
-setuptools>=20.8.1, <59.7.0 ; python_version >= '3.6' and python_version < '3.7'
-setuptools>=20.8.1, !=50.0.0, <51.0.0 ; python_version < '3.6'
+setuptools>=40.8.0 ; python_version >= '3.7' and python_version < '3.10'
+setuptools>=40.8.0, <59.7.0 ; python_version < '3.7'
 
 # MediaWiki markup parser
-# mwparserfromhell is default, wikitextparser can be used instead
+# mwparserfromhell is mandatory but wikitextparser can be used instead
 # mwparserfromhell is still required for commons_information.py and patrol.py
 # wikitextparser>=0.47.5
-mwparserfromhell>=0.5.0
 
 # OAuth support
 # mwoauth 0.2.4 is needed because it supports getting identity information
 # about the user
 mwoauth>=0.2.4,!=0.3.1
 
-# core interwiki_graph.py:
-pydot >= 1.2
+# interwiki_graph.py module and category_graph.py script:
+pydot >= 1.4.1
 
 # cosmetic_changes
-python-stdnum >= 1.17
+python-stdnum >= 1.18
 
 # GUI
-Pillow >= 8.1.1 ; python_version >= '3.6'
+Pillow >= 8.1.1
 
 # core pagegenerators
 google >= 1.7
 sseclient >= 0.0.18,< 0.0.23
 
 # The mysql generator in pagegenerators depends on PyMySQL
-PyMySQL >= 0.7.11, < 1.0.0 ; python_version < '3.6'
-PyMySQL >= 1.0.0 ; python_version >= '3.6'
+# toolforge uses 0.9.3
+PyMySQL >= 0.9.3
 
 # core HTML comparison parser in diff module
-beautifulsoup4
+beautifulsoup4>=4.7.1
 
 # scripts/weblinkchecker.py
 memento_client==0.6.1

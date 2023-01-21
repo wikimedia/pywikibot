@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Tests for generators of the site module."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -20,11 +20,7 @@ from pywikibot.exceptions import (
 )
 from pywikibot.tools import suppress_warnings
 from tests import WARN_SITE_CODE, unittest_print
-from tests.aspects import (
-    DefaultSiteTestCase,
-    DeprecationTestCase,
-    TestCase,
-)
+from tests.aspects import DefaultSiteTestCase, DeprecationTestCase, TestCase
 from tests.utils import skipping
 
 
@@ -114,9 +110,6 @@ class TestSiteGenerators(DefaultSiteTestCase):
 
     def test_page_redirects(self):
         """Test Site.page_redirects."""
-        if self.get_site().mw_version < '1.24':
-            self.skipTest('site.page_redirects() needs mw 1.24')
-
         redirects_ns_0 = set(self.site.page_redirects(
             self.mainpage,
             namespaces=0,
@@ -633,7 +626,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
                 with self.assertRaises(NotImplementedError):
                     mysite.pages_with_property(item)
                     self.fail(
-                        'NotImplementedError not raised for {}'.format(item))
+                        f'NotImplementedError not raised for {item}')
 
     def test_unconnected(self):
         """Test site.unconnected_pages method."""
@@ -767,7 +760,7 @@ class TestImageUsage(DefaultSiteTestCase):
         page = pywikibot.Page(mysite, mysite.siteinfo['mainpage'])
         with skipping(
             StopIteration,
-                msg='No images on the main page of site {!r}'.format(mysite)):
+                msg=f'No images on the main page of site {mysite!r}'):
             imagepage = next(page.imagelinks())  # 1st image of page
 
         unittest_print('site_tests.TestImageUsage found {} on {}'
@@ -1266,13 +1259,6 @@ class TestAlldeletedrevisionsAsUser(DefaultSiteTestCase):
 
     login = True
 
-    @classmethod
-    def setUpClass(cls):
-        """Skip test if necessary."""
-        super().setUpClass()
-        if cls.site.mw_version < '1.25':
-            cls.skipTest(cls, 'site.alldeletedrevisions() needs mw 1.25')
-
     def test_basic(self):
         """Test the site.alldeletedrevisions() method."""
         mysite = self.get_site()
@@ -1434,9 +1420,6 @@ class TestAlldeletedrevisionsWithoutUser(DefaultSiteTestCase):
     def test_prefix(self):
         """Test the site.alldeletedrevisions() method with prefix."""
         mysite = self.get_site()
-        if mysite.mw_version < '1.25':
-            self.skipTest('site.alldeletedrevisions() needs mw 1.25')
-
         for data in mysite.alldeletedrevisions(prefix='John', total=5):
             self.assertIsInstance(data, dict)
             for key in ('title', 'ns', 'revisions'):
@@ -1965,7 +1948,7 @@ class TestLoadPagesFromPageids(DefaultSiteTestCase):
     def test_load_from_pageids_iterable_with_duplicate(self):
         """Test loading with duplicate pageids."""
         pageids = [page.pageid for page in self.links]
-        pageids = pageids + pageids
+        pageids += pageids
         gen = self.site.load_pages_from_pageids(pageids)
         count = 0
         for count, page in enumerate(gen, start=1):
@@ -2201,7 +2184,7 @@ class TestPagePreloading(DefaultSiteTestCase):
         for count, page in enumerate(gen):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
-            self.assertFalse(page.exists(), 'page {} exists'.format(page))
+            self.assertFalse(page.exists(), f'page {page} exists')
             if count >= 5:
                 break
 
@@ -2222,7 +2205,7 @@ class TestPagePreloading(DefaultSiteTestCase):
             if count >= 5:
                 break
 
-    @patch.object(pywikibot, 'output')
+    @patch.object(pywikibot, 'info')
     def test_preload_langlinks_count(self, output_mock):
         """Test preloading continuation works."""
         mysite = self.get_site()

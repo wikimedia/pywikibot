@@ -4,20 +4,20 @@
 #
 # Distributed under the terms of the MIT license.
 #
-import codecs
 import os
 import stat
 import sys
+from pathlib import Path
 from typing import Optional
 
 
 is_daemon = False
 
 
-def daemonize(close_fd: bool = True, chdir: bool = True,
+def daemonize(close_fd: bool = True,
+              chdir: bool = True,
               redirect_std: Optional[str] = None) -> None:
-    """
-    Daemonize the current process.
+    """Daemonize the current process.
 
     Only works on POSIX compatible operating systems.
     The process will fork to the background and return control to terminal.
@@ -58,9 +58,9 @@ def daemonize(close_fd: bool = True, chdir: bool = True,
             return
 
         # Write out the pid
-        path = os.path.basename(sys.argv[0]) + '.pid'
-        with codecs.open(path, 'w', 'utf-8') as f:
-            f.write(str(pid))
+        path = Path(Path(sys.argv[0]).name).with_suffix('.pid')
+        path.write_text(str(pid), encoding='uft-8')
+
     # Exit to return control to the terminal
     # os._exit to prevent the cleanup to run
     os._exit(os.EX_OK)

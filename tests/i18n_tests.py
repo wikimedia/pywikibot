@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Test i18n module."""
 #
-# (C) Pywikibot team, 2007-2022
+# (C) Pywikibot team, 2007-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -26,9 +26,6 @@ class Site:
         self.code = code
         self.family = self.Family()
         self.family.name = family
-
-    def __repr__(self):
-        return "'{site.family.name}:{site.code}'".format(site=self)
 
 
 class TestTranslate(TestCase):
@@ -238,7 +235,7 @@ class TWNTestCaseBase(TWNSetMessagePackageBase):
         """Verify that the test translations are not empty."""
         if not isinstance(cls.message_package, str):
             raise TypeError('{}.message_package must be a package name'
-                            .format(cls.__name__))
+                            .format(cls.__name__))  # pragma: no cover
         # The call to set_messages_package below exists only to confirm
         # that the package exists and messages are available, so
         # that tests can be skipped if the i18n data doesn't exist.
@@ -362,6 +359,14 @@ class MissingPackageTestCase(TWNSetMessagePackageBase,
                               fallback_prompt='dummy message')
         self.assertEqual(rv, 'dummy message')
 
+
+class PywikibotPackageTestCase(TestCase):
+
+    """Test pywikibot i18n package."""
+
+    family = 'wikipedia'
+    code = 'de'
+
     def test_cosmetic_changes_hook(self):
         """Test summary result of Page._cosmetic_changes_hook."""
         page = pywikibot.Page(self.site, 'Test')
@@ -377,9 +382,9 @@ class MissingPackageTestCase(TWNSetMessagePackageBase,
             self.skipTest('Wrong content model {!r} for cosmetic_changes'
                           .format(page.content_model))
 
-        summary = 'Working on Test page at site {}'.format(self.site)
+        summary = f'Working on Test page at site {self.site}'
         msg = page._cosmetic_changes_hook(summary)
-        self.assertEqual(msg, summary + '; cosmetic changes')
+        self.assertEqual(msg, summary + '; kosmetische Änderungen')
 
 
 class TestExtractPlural(TestCase):

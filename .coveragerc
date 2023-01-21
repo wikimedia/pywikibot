@@ -11,10 +11,12 @@ exclude_lines =
     except pkg_resources
     except \w*ServerError
     except SyntaxError
+    raise ImportError
     raise NotImplementedError
     raise unittest\.SkipTest
     self\.skipTest
-    if .PYWIKIBOT_TEST_.*. in os.environ:
+    if .+PYWIKIBOT_TEST_\w+.+:
     if self\.mw_version < .+:
+    if TYPE_CHECKING:
     @(abc\.)?abstractmethod
     @deprecated\([^\)]+\)

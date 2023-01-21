@@ -1,6 +1,6 @@
 """Interface to Mediawiki's api.php."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -10,8 +10,8 @@ from io import BytesIO
 
 from pywikibot.comms import http
 from pywikibot.data.api._generators import (
-    APIGeneratorBase,
     APIGenerator,
+    APIGeneratorBase,
     ListGenerator,
     LogEntryListGenerator,
     PageGenerator,
@@ -19,11 +19,12 @@ from pywikibot.data.api._generators import (
     QueryGenerator,
     update_page,
 )
-from pywikibot.data.api._login import LoginManager
-from pywikibot.data.api._paraminfo import ParamInfo
 from pywikibot.data.api._optionset import OptionSet
+from pywikibot.data.api._paraminfo import ParamInfo
 from pywikibot.data.api._requests import CachedRequest, Request, encode_url
 from pywikibot.family import SubdomainFamily
+from pywikibot.tools import ModuleDeprecationWrapper
+
 
 __all__ = (
     'APIGeneratorBase',
@@ -31,7 +32,6 @@ __all__ = (
     'CachedRequest',
     'ListGenerator',
     'LogEntryListGenerator',
-    'LoginManager',
     'OptionSet',
     'PageGenerator',
     'ParamInfo',
@@ -47,7 +47,7 @@ def _invalidate_superior_cookies(family) -> None:
     """
     Clear cookies for site's second level domain.
 
-    get_login_token() will generate new cookies needed.
+    The http module takes care of all the cookie stuff.
     This is a workaround for requests bug, see :phab:`T224712`
     and https://github.com/psf/requests/issues/5411
     for more details.
@@ -95,3 +95,9 @@ class CTEBinaryMIMEMultipart(MIMEMultipartOrig):
 
 
 MIMEMultipart = CTEBinaryMIMEMultipart
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper.add_deprecated_attr(
+    'LoginManager',
+    replacement_name='pywikibot.login.ClientLoginManager',
+    since='8.0.0')

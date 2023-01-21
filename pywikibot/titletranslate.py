@@ -59,8 +59,7 @@ def translate(
                                        default_namespace=ns)
                     result.add(x)
             elif config.verbose_output:
-                pywikibot.output('Ignoring unknown language code {}'
-                                 .format(newcode))
+                pywikibot.info(f'Ignoring unknown language code {newcode}')
 
     # Autotranslate dates into all other languages, the rest will come from
     # existing interwiki links.
@@ -69,7 +68,7 @@ def translate(
         sitelang = page.site.lang
         dict_name, value = date.getAutoFormat(sitelang, page.title())
         if dict_name:
-            pywikibot.output(
+            pywikibot.info(
                 'TitleTranslate: {} was recognized as {} with value {}'
                 .format(page.title(), dict_name, value))
             for entry_lang, entry in date.formats[dict_name].items():

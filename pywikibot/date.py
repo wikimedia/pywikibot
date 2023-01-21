@@ -260,14 +260,14 @@ def dh_constVal(value: int, ind: int, match: str) -> str:
     """
     if value == ind:
         return match
-    raise ValueError('unknown value {}'.format(value))
+    raise ValueError(f'unknown value {value}')
 
 
 @dh_constVal.register(str)
 def _(value: str, ind: int, match: str) -> int:
     if value == match:
         return ind
-    raise ValueError('unknown value {}'.format(value))
+    raise ValueError(f'unknown value {value}')
 
 
 def alwaysTrue(x: Any) -> bool:
@@ -339,7 +339,7 @@ _romanNumbers = ['-', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX',
 def intToRomanNum(i: int) -> str:
     """Convert integer to roman numeral."""
     if i >= len(_romanNumbers):
-        raise IndexError('Roman value {} is not defined'.format(i))
+        raise IndexError(f'Roman value {i} is not defined')
     return _romanNumbers[i]
 
 
@@ -350,7 +350,7 @@ def romanNumToInt(v: str) -> int:
 
 # Each tuple must 3 parts: a list of all possible digits (symbols), encoder
 # (from int to a str) and decoder (from str to an int)
-_digitDecoders = {
+_digitDecoders: Dict[str, decoder_type] = {
     # %% is a %
     '%': '%',
     # %d is a decimal
@@ -381,11 +381,11 @@ _digitDecoders = {
     # %T is a year in TH: -- all years are shifted: 2005 => 'พ.ศ. 2548'
     'T': (_decimalDigits, lambda v: str(v + 543),
           lambda v: int(v) - 543),
-}  # type: Dict[str, decoder_type]
+}
 
 # Allows to search for '(%%)|(%d)|(%R)|...", and allows one digit 1-9 to set
 # the size of zero-padding for numbers
-_reParameters = re.compile('|'.join('(%[1-9]?{})'.format(s)
+_reParameters = re.compile('|'.join(f'(%[1-9]?{s})'
                                     for s in _digitDecoders))
 
 # A map of sitecode+pattern to (re matching object and corresponding decoders)
@@ -407,12 +407,12 @@ def escapePattern2(pattern: str
 
         if len(subpattern) == 3:
             # enforce mandatory field size
-            newpattern += '([{}]{{{}}})'.format(dec[0], subpattern[1])
+            newpattern += f'([{dec[0]}]{{{subpattern[1]}}})'
             # add the number of required digits as the last (4th)
             # part of the tuple
             decoders.append(dec + (int(s[1]),))
         else:
-            newpattern += '([{}]+)'.format(dec[0])
+            newpattern += f'([{dec[0]}]+)'
             decoders.append(dec)
 
         # All encoders produce a string for strpattern.
@@ -434,7 +434,7 @@ def escapePattern2(pattern: str
     if pattern not in _escPtrnCache2:
         newPattern = ''  # match starts at the beginning of the string
         strPattern = ''
-        decoders = []  # type: List[decoder_type]
+        decoders: List[decoder_type] = []
         for s in _reParameters.split(pattern):
             if s is None:
                 continue
@@ -488,7 +488,7 @@ def dh(value: int, pattern: str, encf: encf_type, decf: decf_type,
     # This will be called from outside as well as recursivelly to verify
     # parsed value
     if filter and not filter(value):
-        raise ValueError('value {} is not allowed'.format(value))
+        raise ValueError(f'value {value} is not allowed')
 
     params = encf(value)
 
@@ -515,8 +515,7 @@ def _(value: str, pattern: str, encf: encf_type, decf: decf_type,
     m = compPattern.match(value)
     if m:
         # decode each found value using provided decoder
-        values = [decoder[2](m.group(i + 1))
-                  for i, decoder in enumerate(decoders)]
+        values = [decoder[2](m[i + 1]) for i, decoder in enumerate(decoders)]
         decValue = decf(values)
 
         assert not isinstance(decValue, str), \
@@ -663,7 +662,7 @@ class MonthFormat(abc.MutableMapping):  # type: ignore[type-arg]
         """
         self.index = index
         self.variant, _, self.month = format_key.partition('_')
-        self.data = {}  # type: Dict[str, Callable[[int], str]]
+        self.data: Dict[str, Callable[[int], str]] = {}
 
     def __getitem__(self, key: str) -> Callable[[int], str]:
         if key not in self.data:
@@ -674,7 +673,7 @@ class MonthFormat(abc.MutableMapping):  # type: ignore[type-arg]
                 pattern, ucase = self.year_formats.get(key, ('{} %d', True))
                 func = 'dh_mnthOfYear'
             else:
-                raise KeyError("Wrong variant '{}'".format(self.variant))
+                raise KeyError(f"Wrong variant '{self.variant}'")
 
             if ucase:
                 f = first_upper
@@ -684,7 +683,7 @@ class MonthFormat(abc.MutableMapping):  # type: ignore[type-arg]
                 f = str
 
             month_pattern = pattern.format(f(monthName(key, self.index)))
-            expression = "lambda v: {}(v, '{}')".format(func, month_pattern)
+            expression = f"lambda v: {func}(v, '{month_pattern}')"
             self.data[key] = eval(expression)
         return self.data[key]
 
@@ -722,7 +721,7 @@ def _period_with_pattern(period: str, pattern: str):
          alwaysTrue)])
 
 
-formats = {
+formats: Dict[Union[str, int], Mapping[str, Callable[[int], str]]] = {
     'MonthName': MonthNames(),
     'Number': {
         'ar': lambda v: dh_number(v, '%d (عدد)'),
@@ -1654,7 +1653,7 @@ formats = {
         'yo': lambda v: dh_singVal(v, 'Current events'),
         'zh': lambda v: dh_singVal(v, '新闻动态'),
     },
-}  # type: Dict[Union[str, int], Mapping[str, Callable[[int], str]]]
+}
 
 #
 # Add auto-generated empty dictionaries for DayOfMonth and MonthOfYear articles
@@ -1683,10 +1682,10 @@ def addFmt1(lang: str, isMnthOfYear: bool,
         if patterns[i] is not None:
             if isMnthOfYear:
                 formats[yrMnthFmts[i]][lang] = eval(
-                    'lambda v: dh_mnthOfYear(v, "{}")'.format(patterns[i]))
+                    f'lambda v: dh_mnthOfYear(v, "{patterns[i]}")')
             else:
                 formats[dayMnthFmts[i]][lang] = eval(
-                    'lambda v: dh_dayOfMnth(v, "{}")'.format(patterns[i]))
+                    f'lambda v: dh_dayOfMnth(v, "{patterns[i]}")')
 
 
 def makeMonthList(pattern: str) -> List[str]:

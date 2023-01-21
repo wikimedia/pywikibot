@@ -1,14 +1,14 @@
 #!/usr/bin/python3
 """Tests for the patrol script."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2023
 #
 # Distributed under the terms of the MIT license.
 #
 from contextlib import suppress
 
 from scripts.patrol import PatrolBot
-from tests.aspects import DefaultDrySiteTestCase, require_modules, unittest
+from tests.aspects import DefaultDrySiteTestCase, unittest
 
 
 DUMMY_PAGE_TUPLES = """
@@ -27,7 +27,6 @@ This is some text above the entries:
 """
 
 
-@require_modules('mwparserfromhell')
 class TestPatrolBot(DefaultDrySiteTestCase):
 
     """Test the PatrolBot class."""
@@ -41,9 +40,9 @@ class TestPatrolBot(DefaultDrySiteTestCase):
         """Test parsing the page tuples from a dummy text."""
         tuples = self.bot.parse_page_tuples(DUMMY_PAGE_TUPLES)
         for gen_user in (1, 2):
-            user = 'Test {}'.format(gen_user)
+            user = f'Test {gen_user}'
             self.assertIn(user, tuples)
-            self.assertEqual(tuples[user], {'Page {}'.format(i * gen_user)
+            self.assertEqual(tuples[user], {f'Page {i * gen_user}'
                                             for i in range(1, 4)})
         self.assertIn('Prefixed', tuples)
         self.assertEqual(tuples['Prefixed'], {'Page 1', 'Page 2'})

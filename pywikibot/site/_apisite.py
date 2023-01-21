@@ -1,6 +1,6 @@
 """Objects representing API interface to MediaWiki site."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -14,10 +14,11 @@ from textwrap import fill
 from typing import Any, Iterable, Optional, Type, TypeVar, Union
 
 import pywikibot
+from pywikibot import login
 from pywikibot.backports import DefaultDict, Dict, List, Match
 from pywikibot.backports import OrderedDict as OrderedDictType
-from pywikibot.backports import Pattern, Set, Tuple
-from pywikibot.comms.http import get_authentication
+from pywikibot.backports import Pattern, Set, Tuple, removesuffix
+from pywikibot.comms import http
 from pywikibot.data import api
 from pywikibot.exceptions import (
     AbuseFilterDisallowedError,
@@ -45,7 +46,6 @@ from pywikibot.exceptions import (
     TitleblacklistError,
     UnknownExtensionError,
 )
-from pywikibot.login import LoginStatus as _LoginStatus
 from pywikibot.site._basesite import BaseSite
 from pywikibot.site._decorators import need_right, need_version
 from pywikibot.site._extensions import (
@@ -72,13 +72,14 @@ from pywikibot.tools import (
     MediaWikiVersion,
     cached,
     deprecated,
+    issue_deprecation_warning,
     merge_unique_dicts,
     normalize_username,
 )
 
 
 __all__ = ('APISite', )
-_mw_msg_cache = defaultdict(dict)  # type: DefaultDict[str, Dict[str, str]]
+_mw_msg_cache: DefaultDict[str, Dict[str, str]] = defaultdict(dict)
 
 
 _CompType = Union[int, str, 'pywikibot.page.Page', 'pywikibot.page.Revision']
@@ -115,26 +116,26 @@ class APISite(
     ) -> None:
         """Initializer."""
         super().__init__(code, fam, user)
-        self._globaluserinfo = {}  # type: Dict[Union[int, str], Any]
+        self._globaluserinfo: Dict[Union[int, str], Any] = {}
         self._interwikimap = _InterwikiMap(self)
-        self._loginstatus = _LoginStatus.NOT_ATTEMPTED
-        self._msgcache = {}  # type: Dict[str, str]
+        self._loginstatus = login.LoginStatus.NOT_ATTEMPTED
+        self._msgcache: Dict[str, str] = {}
         self._paraminfo = api.ParamInfo(self)
         self._siteinfo = Siteinfo(self)
-        self.tokens = TokenWallet(self)
+        self._tokens = TokenWallet(self)
 
     def __getstate__(self) -> Dict[str, Any]:
         """Remove TokenWallet before pickling, for security reasons."""
-        new = super().__getstate__()
-        del new['tokens']
-        del new['_interwikimap']
-        return new
+        state = super().__getstate__()
+        del state['_tokens']
+        del state['_interwikimap']
+        return state
 
-    def __setstate__(self, attrs: Dict[str, Any]) -> None:
+    def __setstate__(self, state: Dict[str, Any]) -> None:
         """Restore things removed in __getstate__."""
-        super().__setstate__(attrs)
+        super().__setstate__(state)
         self._interwikimap = _InterwikiMap(self)
-        self.tokens = TokenWallet(self)
+        self._tokens = TokenWallet(self)
 
     def interwiki(self, prefix: str) -> BaseSite:
         """
@@ -164,7 +165,7 @@ class APISite(
             prefixes.update(self._interwikimap.get_by_url(url))
         if not prefixes:
             raise KeyError(
-                "There is no interwiki prefix to '{}'".format(site))
+                f"There is no interwiki prefix to '{site}'")
         return sorted(prefixes, key=lambda p: (len(p), p))
 
     def local_interwiki(self, prefix: str) -> bool:
@@ -215,7 +216,7 @@ class APISite(
                     if m_site['dbname'] == dbname:
                         url = m_site['url'] + '/w/index.php'
                         return pywikibot.Site(url=url)
-        raise ValueError('Cannot parse a site out of {}.'.format(dbname))
+        raise ValueError(f'Cannot parse a site out of {dbname}.')
 
     def _generator(
         self,
@@ -244,7 +245,7 @@ class APISite(
         :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
         """
-        req_args = {'site': self}  # type: Dict[str, Any]
+        req_args: Dict[str, Any] = {'site': self}
         if 'g_content' in args:
             req_args['g_content'] = args.pop('g_content')
         if 'parameters' in args:
@@ -317,7 +318,7 @@ class APISite(
 
     def is_oauth_token_available(self) -> bool:
         """Check whether OAuth token is set for this site."""
-        auth_token = get_authentication(self.base_url(''))
+        auth_token = http.get_authentication(self.base_url(''))
         return auth_token is not None and len(auth_token) == 4
 
     def login(
@@ -325,8 +326,10 @@ class APISite(
         autocreate: bool = False,
         user: Optional[str] = None
     ) -> None:
-        """
-        Log the user in if not already logged in.
+        """Log the user in if not already logged in.
+
+        .. versionchanged:: 8.0
+           lazy load cookies when logging in.
 
         .. seealso:: :api:`Login`
 
@@ -345,7 +348,7 @@ class APISite(
         #       (below) is successful. Instead, log the problem,
         #       to be increased to 'warning' level once majority
         #       of issues are resolved.
-        if self._loginstatus == _LoginStatus.IN_PROGRESS:
+        if self._loginstatus == login.LoginStatus.IN_PROGRESS:
             pywikibot.log(
                 '{!r}.login() called when a previous login was in progress.'
                 .format(self))
@@ -355,18 +358,22 @@ class APISite(
         # logged_in() is False if _userinfo exists, which means this
         # will have no effect for the invocation from api.py
         if self.logged_in():
-            self._loginstatus = _LoginStatus.AS_USER
+            self._loginstatus = login.LoginStatus.AS_USER
             return
 
         # check whether a login cookie already exists for this user
         # or check user identity when OAuth enabled
-        self._loginstatus = _LoginStatus.IN_PROGRESS
+        self._loginstatus = login.LoginStatus.IN_PROGRESS
         if user:
             self._username = normalize_username(user)
+
+        # load the password for self.username from cookie file
+        http.cookie_jar.load(self.username(), ignore_discard=True)
+
         try:
             del self.userinfo  # force reload
             if self.userinfo['name'] == self.user():
-                self._loginstatus = _LoginStatus.AS_USER
+                self._loginstatus = login.LoginStatus.AS_USER
                 return
 
         # May occur if you are not logged in (no API read permissions).
@@ -397,14 +404,15 @@ class APISite(
 
             raise NoUsernameError(error_msg)
 
-        login_manager = api.LoginManager(site=self, user=self.username())
+        login_manager = login.ClientLoginManager(site=self,
+                                                 user=self.username())
         if login_manager.login(retry=True, autocreate=autocreate):
             self._username = login_manager.username
             del self.userinfo  # force reloading
 
             # load userinfo
             if self.userinfo['name'] == self.username():
-                self._loginstatus = _LoginStatus.AS_USER
+                self._loginstatus = login.LoginStatus.AS_USER
                 return
 
             pywikibot.error('{} != {} after {}.login() and successful '
@@ -414,7 +422,7 @@ class APISite(
                                     type(self).__name__,
                                     type(login_manager).__name__))
 
-        self._loginstatus = _LoginStatus.NOT_LOGGED_IN  # failure
+        self._loginstatus = login.LoginStatus.NOT_LOGGED_IN  # failure
 
     def _relogin(self) -> None:
         """Force a login sequence without logging out, using the current user.
@@ -424,7 +432,7 @@ class APISite(
         from the site.
         """
         del self.userinfo
-        self._loginstatus = _LoginStatus.NOT_LOGGED_IN
+        self._loginstatus = login.LoginStatus.NOT_LOGGED_IN
         self.login()
 
     def logout(self) -> None:
@@ -439,17 +447,15 @@ class APISite(
         """
         if self.is_oauth_token_available():
             pywikibot.warning('Using OAuth suppresses logout function')
-        req_params = {'action': 'logout'}
-        # csrf token introduced in MW 1.24
-        with suppress(Error):
-            req_params['token'] = self.tokens['csrf']
+
+        req_params = {'action': 'logout', 'token': self.tokens['csrf']}
         uirequest = self.simple_request(**req_params)
         uirequest.submit()
-        self._loginstatus = _LoginStatus.NOT_LOGGED_IN
+        self._loginstatus = login.LoginStatus.NOT_LOGGED_IN
 
         # Reset tokens and user properties
         del self.userinfo
-        self.tokens = TokenWallet(self)
+        self.tokens.clear()
         self._paraminfo = api.ParamInfo(self)
 
         # Clear also cookies for site's second level domain (T224712)
@@ -475,16 +481,47 @@ class APISite(
         To force retrieving userinfo ignoring cache, just delete this
         property.
 
+        **Usage**
+
+        >>> site = pywikibot.Site('test')
+        >>> info = site.userinfo
+        >>> info['id']  # returns 0 if no ip user
+        ... # doctest: +SKIP
+        0
+        >>> info['name']  # username or ip
+        ...
+        ... # doctest: +SKIP
+        '92.198.174.192'
+        >>> info['groups']
+        ['*']
+        >>> info['rights']  # doctest: +ELLIPSIS
+        ['createaccount', 'read', 'edit', 'createpage', 'createtalk', ...]
+        >>> info['messages']
+        False
+        >>> del site.userinfo  # delete userinfo cache
+        >>> 'blockinfo' in site.userinfo
+        False
+        >>> 'anon' in site.userinfo
+        True
+
+        **Usefull alternatives to userinfo property**
+
+        - :meth:`has_group` to verify the group membership
+        - :meth:`has_right` to verify that the user has a given right
+        - :meth:`logged_in` to verify the user is loggend in to a site
+
         .. seealso:: :api:`Userinfo`
+        .. versionchanged:: 8.0
+           Use API formatversion 2.
 
         :return: A dict with the following keys and values:
 
-          - id: user id (numeric str)
+          - id: user id (int)
           - name: username (if user is logged in)
           - anon: present if user is not logged in
           - groups: list of groups (could be empty)
           - rights: list of rights (could be empty)
-          - message: present if user has a new message on talk page
+          - messages: True if user has a new message on talk page (bool)
           - blockinfo: present if user is blocked (dict)
 
         """
@@ -492,7 +529,8 @@ class APISite(
             uirequest = self.simple_request(
                 action='query',
                 meta='userinfo',
-                uiprop='blockinfo|hasmsg|groups|rights|ratelimits'
+                uiprop='blockinfo|hasmsg|groups|rights|ratelimits',
+                formatversion=2,
             )
             uidata = uirequest.submit()
             assert 'query' in uidata, \
@@ -535,7 +573,7 @@ class APISite(
 
         :raises TypeError: Inappropriate argument type of 'user'
         """
-        param = {}  # type: Dict[str, Union[int, str]]
+        param: Dict[str, Union[int, str]] = {}
         if user is None:
             user = self.username()
             assert isinstance(user, str)
@@ -642,13 +680,13 @@ class APISite(
                    "API userinfo response lacks 'query' key"
             assert 'userinfo' in uidata['query'], \
                    "API userinfo response lacks 'userinfo' key"
-            self._useroptions = uidata['query']['userinfo']['options']  # type: Dict[str, Any]  # noqa: E501
+            self._useroptions: Dict[str, Any] = uidata['query']['userinfo']['options']  # noqa: E501
             # To determine if user name has changed
             self._useroptions['_name'] = (
                 None if 'anon' in uidata['query']['userinfo'] else
                 uidata['query']['userinfo']['name'])
         return {ns for ns in self.namespaces.values() if ns.id >= 0
-                and self._useroptions['searchNs{}'.format(ns.id)]
+                and self._useroptions[f'searchNs{ns.id}']
                 in ['1', True]}
 
     @property  # type: ignore[misc]
@@ -703,16 +741,16 @@ class APISite(
                 '"{}": No linktrail pattern extracted from "{}"'
                 .format(self.code, linktrail))
 
-        pattern = match.group('pattern')
-        letters = match.group('letters')
+        pattern = match['pattern']
+        letters = match['letters']
 
         if r'x{' in pattern:
             pattern = re.sub(r'\\x\{([A-F0-9]{4})\}',
-                             lambda match: chr(int(match.group(1), 16)),
+                             lambda match: chr(int(match[1], 16)),
                              pattern)
         if letters:
             pattern += ''.join(letters.split('|'))
-        return '[{}]*'.format(pattern)
+        return f'[{pattern}]*'
 
     @staticmethod
     def assert_valid_iter_params(
@@ -776,9 +814,14 @@ class APISite(
         """
         return group.lower() in self.userinfo['groups']
 
+    @deprecated("userinfo['messages']", since='8.0.0')
     def messages(self) -> bool:
-        """Return true if the user has new messages, and false otherwise."""
-        return 'messages' in self.userinfo
+        """Return true if the user has new messages, and false otherwise.
+
+        .. deprecated:: 8.0
+           Replaced by :attr:`userinfo['messages']<userinfo>`.
+        """
+        return self.userinfo['messages']
 
     def mediawiki_messages(
         self,
@@ -881,7 +924,7 @@ class APISite(
 
         months = self.mediawiki_messages(months_long + months_short)
 
-        self._months_names = []  # type: List[Tuple[str, str]]
+        self._months_names: List[Tuple[str, str]] = []
         for m_l, m_s in zip(months_long, months_short):
             self._months_names.append((months[m_l], months[m_s]))
 
@@ -905,7 +948,7 @@ class APISite(
             msgs = self.mediawiki_messages(needed_mw_messages)
         except KeyError:
             raise NotImplementedError(
-                'MediaWiki messages missing: {}'.format(needed_mw_messages))
+                f'MediaWiki messages missing: {needed_mw_messages}')
 
         args = list(args)
         concat = msgs['and'] + msgs['word-separator']
@@ -931,19 +974,18 @@ class APISite(
         """
         if not isinstance(text, str):
             raise ValueError('text must be a string')
+
         if not text:
             return ''
-        req = self.simple_request(action='expandtemplates', text=text)
+
+        req = self.simple_request(action='expandtemplates',
+                                  text=text, prop='wikitext')
         if title is not None:
             req['title'] = title
         if includecomments is True:
             req['includecomments'] = ''
-        if self.mw_version > '1.24wmf7':
-            key = 'wikitext'
-            req['prop'] = key
-        else:
-            key = '*'
-        return req.submit()['expandtemplates'][key]
+
+        return req.submit()['expandtemplates']['wikitext']
 
     def getcurrenttimestamp(self) -> str:
         """
@@ -1087,10 +1129,10 @@ class APISite(
             pywikibot.error(msg)
             raise
 
-        if MediaWikiVersion(version) < '1.23':
+        if MediaWikiVersion(version) < '1.27':
             raise RuntimeError(
                 'Pywikibot "{}" does not support MediaWiki "{}".\n'
-                'Use Pywikibot prior to "6.0" branch instead.'
+                'Use Pywikibot prior to "8.0" branch instead.'
                 .format(pywikibot.__version__, version))
         return version
 
@@ -1220,7 +1262,7 @@ class APISite(
         """
         if not self.has_data_repository:
             raise UnknownExtensionError(
-                'Wikibase is not implemented for {}.'.format(self))
+                f'Wikibase is not implemented for {self}.')
 
         repo = self.data_repository()
         dp = pywikibot.ItemPage(repo, item)
@@ -1350,7 +1392,17 @@ class APISite(
         self,
         page: 'pywikibot.page.BasePage'
     ) -> Dict[str, Tuple[str, str]]:
-        """Return a dictionary reflecting page protections."""
+        """Return a dictionary reflecting page protections.
+
+        **Example:**
+
+        >>> site = pywikibot.Site('wikipedia:test')
+        >>> page = pywikibot.Page(site, 'Main Page')
+        >>> site.page_restrictions(page)
+        {'edit': ('sysop', 'infinity'), 'move': ('sysop', 'infinity')}
+
+        .. seealso:: :meth:`page.BasePage.protection` (should be preferred)
+        """
         if not hasattr(page, '_protection'):
             self.loadpageinfo(page)
         return page._protection
@@ -1364,6 +1416,8 @@ class APISite(
 
         Return True if the bot has the permission of needed restriction level
         for the given action type.
+
+        .. seealso:: :meth:`page.BasePage.has_permission` (should be preferred)
 
         :param page: a pywikibot.page.BasePage object
         :param action: a valid restriction type like 'edit', 'move'
@@ -1381,10 +1435,7 @@ class APISite(
             'steward': 'editprotected'
         }
         restriction = self.page_restrictions(page).get(action, ('', None))[0]
-        user_rights = self.userinfo['rights']
-        if prot_rights.get(restriction, restriction) in user_rights:
-            return True
-        return False
+        return self.has_right(prot_rights.get(restriction, restriction))
 
     def page_isredirect(self, page: 'pywikibot.page.BasePage') -> bool:
         """Return True if and only if page is a redirect."""
@@ -1495,80 +1546,126 @@ class APISite(
 
         return page._redirtarget
 
+    @deprecated(since='8.0.0')
     def validate_tokens(self, types: List[str]) -> List[str]:
         """Validate if requested tokens are acceptable.
 
-        Valid tokens depend on mw version.
+        Valid tokens may depend on mw version.
+
+        .. deprecated:: 8.0
         """
-        query = 'tokens' if self.mw_version < '1.24wmf19' else 'query+tokens'
-        data = self._paraminfo.parameter(query, 'type')
+        data = self._paraminfo.parameter('query+tokens', 'type')
         assert data is not None
         return [token for token in types if token in data['type']]
 
-    def get_tokens(
-        self,
-        types: List[str],
-        all: bool = False
-    ) -> Dict[str, str]:
-        """Preload one or multiple tokens.
+    def get_tokens(self, types: List[str], *args, **kwargs) -> Dict[str, str]:
+        r"""Preload one or multiple tokens.
 
-        For MediaWiki version 1.23, only one token can be retrieved at once.
-        For MediaWiki versions since 1.24wmfXXX a new token
-        system was introduced which reduced the amount of tokens available.
-        Most of them were merged into the 'csrf' token. If the token type in
-        the parameter is not known it will default to the 'csrf' token.
+        **Usage**
 
-        The other token types available are:
-         - createaccount
-         - deleteglobalaccount
-         - login
-         - patrol
-         - rollback
-         - setglobalaccountstatus
-         - userrights
-         - watch
+        >>> site = pywikibot.Site()
+        >>> tokens = site.get_tokens([])  # get all tokens
+        >>> list(tokens.keys())  # result depends on user
+        ['createaccount', 'login']
+        >>> tokens = site.get_tokens(['csrf', 'patrol'])
+        >>> list(tokens.keys())  # doctest: +SKIP
+        ['csrf', 'patrol']
+        >>> token = site.get_tokens(['csrf']).get('csrf')  # get a single token
+        >>> token  # doctest: +SKIP
+        'a9f...0a0+\\'
+        >>> token = site.get_tokens(['unknown'])  # try an invalid token
+        ... # doctest: +SKIP
+        ... # invalid token names shows a warnig and the key is not in result
+        ...
+        WARNING: API warning (tokens) of unknown format:
+        ... {'warnings': 'Unrecognized value for parameter "type": foo'}
+        {}
 
+        You should not call this method directly, especially if you only
+        need a specific token. Use :attr:`tokens` property instead.
+
+        .. versionchanged:: 8.0
+           ``all`` parameter is deprecated. Use an empty list for
+           ``types`` instead.
+        .. note:: ``args`` and ``kwargs`` are not used for deprecation
+           warning only.
         .. seealso:: :api:`Tokens`
 
-        :param types: the types of token (e.g., "edit", "move", "delete");
-            see API documentation for full list of types
-        :param all: load all available tokens, if None only if it can be done
-            in one request.
-
-        return: a dict with retrieved valid tokens.
+        :param types: the types of token (e.g., "csrf", "login", "patrol").
+            If the list is empty all available tokens are loaded. See
+            API documentation for full list of types.
+        :return: a dict with retrieved valid tokens.
         """
-        def warn_handler(mod: str, text: str) -> Optional[Match[str]]:
-            """Filter warnings for not available tokens."""
-            return re.match(
-                r'Action \'\w+\' is not allowed for the current user', text)
-
-        user_tokens = {}
-        if self.mw_version < '1.24wmf19':
-            if all is not False:
-                pdata = self._paraminfo.parameter('tokens', 'type')
-                assert pdata is not None
-                types.extend(pdata['type'])
-            req = self.simple_request(action='tokens',
-                                      type=self.validate_tokens(types))
+        # deprecate 'all' parameter
+        if args or kwargs:
+            issue_deprecation_warning("'all' parameter",
+                                      "empty list for 'types' parameter",
+                                      since='8.0.0')
+            load_all = kwargs.get('all', args[0] if args else False)
         else:
-            if all is not False:
-                pdata = self._paraminfo.parameter('query+tokens', 'type')
-                assert pdata is not None
-                types.extend(pdata['type'])
+            load_all = False
 
-            req = self.simple_request(action='query', meta='tokens',
-                                      type=self.validate_tokens(types))
+        if not types or load_all is not False:
+            pdata = self._paraminfo.parameter('query+tokens', 'type')
+            assert pdata is not None
+            types = pdata['type']
 
-        req._warning_handler = warn_handler
+        req = self.simple_request(action='query', meta='tokens',
+                                  type=types, formatversion=2)
+
         data = req.submit()
         data = data.get('query', data)
 
+        user_tokens = {}
         if 'tokens' in data and data['tokens']:
-            user_tokens = {key[:-5]: val
+            user_tokens = {removesuffix(key, 'token'): val
                            for key, val in data['tokens'].items()
                            if val != '+\\'}
 
         return user_tokens
+
+    @property
+    def tokens(self) -> 'pywikibot.site._tokenwallet.TokenWallet':
+        r"""Return the TokenWallet collection.
+
+        :class:`TokenWallet<pywikibot.site._tokenwallet.TokenWallet>`
+        collection holds all available tokens. The tokens are loaded
+        via :meth:`get_tokens` method with the first token request and
+        is retained until the TokenWallet is cleared.
+
+        **Usage:**
+
+        >>> site = pywikibot.Site()
+        >>> token = site.tokens['csrf']  # doctest: +SKIP
+        >>> token  # doctest: +SKIP
+        'df8...9e6+\\'
+        >>> 'csrf' in site.tokens  # doctest: +SKIP
+        ... # Check whether the token exists
+        True
+        >>> 'invalid' in site.tokens  # doctest: +SKIP
+        False
+        >>> token = site.tokens['invalid']  # doctest: +SKIP
+        Traceback (most recent call last):
+        ...
+        KeyError: "Invalid token 'invalid' for user ...
+        >>> site.tokens.clear()  # clears the internal cache
+        >>> site.tokens['csrf']  # doctest: +SKIP
+        ... # get a new token
+        '1c8...9d3+\\'
+        >>> del site.tokens  # another variant to clear the cache
+
+        .. versionchanged:: 8.0
+           ``tokens`` attribute became a property to enable deleter.
+        .. warning:: A deprecation warning is shown if the token name is
+           outdated, see :api:`Tokens (action)`.
+        .. seealso:: :api:`Tokens` for valid token types
+        """
+        return self._tokens
+
+    @tokens.deleter
+    def tokens(self) -> None:
+        """Deleter method to clear the TokenWallet collection."""
+        self._tokens.clear()
 
     # TODO: expand support to other parameters of action=parse?
     def get_parsed_page(self, page: 'pywikibot.page.BasePage') -> str:
@@ -1586,7 +1683,7 @@ class APISite(
         try:
             parsed_text = data['parse']['text']['*']
         except KeyError as e:
-            raise KeyError('API parse response lacks {} key'.format(e))
+            raise KeyError(f'API parse response lacks {e} key')
         return parsed_text
 
     def getcategoryinfo(self, category: 'pywikibot.page.Category') -> None:
@@ -1660,7 +1757,7 @@ class APISite(
         elif target:
             page = pywikibot.Page(self, target)
 
-        token = self.tokens['delete']
+        token = self.tokens['csrf']
         params = {
             'action': 'revisiondelete',
             'token': token,
@@ -1700,7 +1797,7 @@ class APISite(
 
     # Catalog of editpage error codes, for use in generating messages.
     # The block at the bottom are page related errors.
-    _ep_errors = {
+    _ep_errors: Dict[str, Union[str, Type[PageSaveRelatedError]]] = {
         'noapiwrite': 'API editing not enabled on {site} wiki',
         'writeapidenied':
             'User {user} is not authorized to edit on {site} wiki',
@@ -1731,7 +1828,7 @@ class APISite(
         'titleblacklist-forbidden': TitleblacklistError,
         'spamblacklist': SpamblacklistError,
         'abusefilter-disallowed': AbuseFilterDisallowedError,
-    }  # type: Dict[str, Union[str, Type[PageSaveRelatedError]]]
+    }
     _ep_text_overrides = {'appendtext', 'prependtext', 'undo'}
 
     @need_right('edit')
@@ -1821,7 +1918,7 @@ class APISite(
                 if not recreate:
                     raise
 
-        token = self.tokens['edit']
+        token = self.tokens['csrf']
         if bot is None:
             bot = self.has_right('bot')
         params = dict(action='edit', title=page,
@@ -1847,7 +1944,7 @@ class APISite(
             while True:
                 try:
                     result = req.submit()
-                    pywikibot.debug('editpage response: {}'.format(result))
+                    pywikibot.debug(f'editpage response: {result}')
                 except APIError as err:
                     if err.code.endswith('anon') and self.logged_in():
                         pywikibot.debug("editpage: received '{}' even though "
@@ -1968,7 +2065,6 @@ class APISite(
     }
 
     @need_right('mergehistory')
-    @need_version('1.27.0-wmf.13')
     def merge_history(
         self,
         source: 'pywikibot.page.BasePage',
@@ -1978,7 +2074,10 @@ class APISite(
     ) -> None:
         """Merge revisions from one page into another.
 
-        .. seealso:: :api:`Mergehistory`
+        .. seealso::
+
+           - :api:`Mergehistory`
+           - :meth:`page.BasePage.merge_history` (should be preferred)
 
         Revisions dating up to the given timestamp in the source will be
         moved into the destination page history. History merge fails if
@@ -1991,6 +2090,10 @@ class APISite(
             will be merged into the destination page (if not given or False,
             all revisions will be merged)
         :param reason: Optional reason for the history merge
+        :raises APIError: unexpected APIError
+        :raises Error: expected APIError or unexpected response
+        :raises NoPageError: *source* or *dest* does not exist
+        :raises PageSaveRelatedError: *source* is equal to *dest*
         """
         # Data for error messages
         errdata = {
@@ -2048,11 +2151,11 @@ class APISite(
             self.unlock_page(dest)
 
         if 'mergehistory' not in result:
-            pywikibot.error('mergehistory: {error}'.format(error=result))
+            pywikibot.error(f'mergehistory: {result}')
             raise Error('mergehistory: unexpected response')
 
     # catalog of move errors for use in error messages
-    _mv_errors = {
+    _mv_errors: Dict[str, Union[str, OnErrorExc]] = {
         'noapiwrite': 'API editing not enabled on {site} wiki',
         'writeapidenied':
             'User {user} is not authorized to edit on {site} wiki',
@@ -2081,7 +2184,7 @@ class APISite(
             '[[{newtitle}]] file extension does not match content of '
             '[[{oldtitle}]]',
         'missingtitle': "{oldtitle} doesn't exist",
-    }  # type: Dict[str, Union[str, OnErrorExc]]
+    }
 
     @need_right('move')
     def movepage(
@@ -2123,7 +2226,7 @@ class APISite(
             raise NoPageError(page,
                               'Cannot move page {page} because it '
                               'does not exist on {site}.')
-        token = self.tokens['move']
+        token = self.tokens['csrf']
         self.lock_page(page)
         req = self.simple_request(action='move',
                                   noredirect=noredirect,
@@ -2135,7 +2238,7 @@ class APISite(
         req['from'] = oldtitle  # "from" is a python keyword
         try:
             result = req.submit()
-            pywikibot.debug('movepage response: {}'.format(result))
+            pywikibot.debug(f'movepage response: {result}')
         except APIError as err:
             if err.code.endswith('anon') and self.logged_in():
                 pywikibot.debug(
@@ -2179,7 +2282,7 @@ class APISite(
         finally:
             self.unlock_page(page)
         if 'move' not in result:
-            pywikibot.error('movepage: {}'.format(result))
+            pywikibot.error(f'movepage: {result}')
             raise Error('movepage: unexpected response')
         # TODO: Check for talkmove-error messages
         if 'talkmove-error-code' in result['move']:
@@ -2312,7 +2415,7 @@ class APISite(
             raise TypeError("'page' must be a FilePage not a '{}'"
                             .format(page.__class__.__name__))
 
-        token = self.tokens['delete']
+        token = self.tokens['csrf']
         params = {
             'action': 'delete',
             'token': token,
@@ -2330,7 +2433,7 @@ class APISite(
         if deletetalk:
             if self.mw_version < '1.38wmf24':
                 pywikibot.warning(
-                    'deletetalk is not available on {}'.format(self.mw_version)
+                    f'deletetalk is not available on {self.mw_version}'
                 )
             else:
                 params['deletetalk'] = deletetalk
@@ -2384,7 +2487,7 @@ class APISite(
             If None, restores all revisions.
         :param fileids: List of fileids to restore.
         """
-        token = self.tokens['delete']
+        token = self.tokens['csrf']
         params = {
             'action': 'undelete',
             'title': page,
@@ -2429,21 +2532,33 @@ class APISite(
         """
         Return the protection types available on this site.
 
+        **Example:**
+
+        >>> site = pywikibot.Site('wikipedia:test')
+        >>> sorted(site.protection_types())
+        ['create', 'edit', 'move', 'upload']
+
         .. seealso:: :py:obj:`Siteinfo._get_default()`
 
         :return: protection types available
         """
         return set(self.siteinfo.get('restrictions')['types'])
 
+    @need_version('1.27.3')
     def protection_levels(self) -> Set[str]:
         """
         Return the protection levels available on this site.
+
+        **Example:**
+
+        >>> site = pywikibot.Site('wikipedia:test')
+        >>> sorted(site.protection_levels())
+        ['', 'autoconfirmed', ... 'sysop', 'templateeditor']
 
         .. seealso:: :py:obj:`Siteinfo._get_default()`
 
         :return: protection types available
         """
-        # implemented in b73b5883d486db0e9278ef16733551f28d9e096d
         return set(self.siteinfo.get('restrictions')['levels'])
 
     @need_right('protect')
@@ -2455,21 +2570,25 @@ class APISite(
         expiry: Union[datetime.datetime, str, None] = None,
         **kwargs: Any
     ) -> None:
-        """(Un)protect a wiki page. Requires administrator status.
+        """(Un)protect a wiki page. Requires *protect* right.
 
-        .. seealso:: :api:`Protect`
+        .. seealso::
+           - :api:`Protect`
+           - :meth:`protection_types`
+           - :meth:`protection_levels`
 
-        :param protections: A dict mapping type of protection to protection
-            level of that type. Valid restriction types are 'edit', 'create',
-            'move' and 'upload'. Valid restriction levels are '' (equivalent
-            to 'none' or 'all'), 'autoconfirmed', and 'sysop'.
-            If None is given, however, that protection will be skipped.
+        :param protections: A dict mapping type of protection to
+            protection level of that type. Refer :meth:`protection_types`
+            for valid restriction types and :meth:`protection_levels`
+            for valid restriction levels. If None is given, however,
+            that protection will be skipped.
         :param reason: Reason for the action
         :param expiry: When the block should expire. This expiry will be
-            applied to all protections. If None, 'infinite', 'indefinite',
-            'never', or '' is given, there is no expiry.
+            applied to all protections. If ``None``, ``'infinite'``,
+            ``'indefinite'``, ``'never'``, or ``''`` is given, there is
+            no expiry.
         """
-        token = self.tokens['protect']
+        token = self.tokens['csrf']
         self.lock_page(page)
 
         protections_list = [ptype + '=' + level
@@ -2550,7 +2669,7 @@ class APISite(
             blocked.
         :return: The data retrieved from the API request.
         """
-        token = self.tokens['block']
+        token = self.tokens['csrf']
         if expiry is False:
             expiry = 'never'
         req = self.simple_request(action='block', user=user.username,
@@ -2558,9 +2677,7 @@ class APISite(
                                   anononly=anononly, nocreate=nocreate,
                                   autoblock=autoblock, noemail=noemail,
                                   reblock=reblock, allowusertalk=allowusertalk)
-
-        data = req.submit()
-        return data
+        return req.submit()
 
     @need_right('unblock')
     def unblockuser(
@@ -2578,11 +2695,9 @@ class APISite(
         """
         req = self.simple_request(action='unblock',
                                   user=user.username,
-                                  token=self.tokens['block'],
+                                  token=self.tokens['csrf'],
                                   reason=reason)
-
-        data = req.submit()
-        return data
+        return req.submit()
 
     @need_right('editmywatchlist')
     def watch(
@@ -2650,7 +2765,7 @@ class APISite(
             result = result['purge']
         except KeyError:
             pywikibot.error(
-                'purgepages: Unexpected API response:\n{}'.format(result))
+                f'purgepages: Unexpected API response:\n{result}')
             return False
         if not all('purged' in page for page in result):
             return False
@@ -2662,40 +2777,16 @@ class APISite(
     def is_uploaddisabled(self) -> bool:
         """Return True if upload is disabled on site.
 
-        When the version is at least 1.27wmf9, uses general siteinfo.
-        If not called directly, it is cached by the first attempted
-        upload action.
+        **Example:**
 
+        >>> site = pywikibot.Site('commons')
+        >>> site.is_uploaddisabled()
+        False
+        >>> site = pywikibot.Site('wikidata')
+        >>> site.is_uploaddisabled()
+        True
         """
-        if self.mw_version >= '1.27wmf9':
-            return not self._siteinfo.get('general')['uploadsenabled']
-
-        if hasattr(self, '_uploaddisabled'):
-            return self._uploaddisabled
-
-        # attempt a fake upload; on enabled sites will fail for:
-        # missingparam: One of the parameters
-        #    filekey, file, url, statuskey is required
-        # TODO: is there another way?
-        try:
-            req = self._request(throttle=False,
-                                parameters={'action': 'upload',
-                                            'token': self.tokens['edit']})
-            req.submit()
-        except APIError as error:
-            if error.code == 'uploaddisabled':
-                self._uploaddisabled = True
-            elif error.code == 'missingparam':
-                # If the upload module is enabled, the above dummy request
-                # does not have sufficient parameters and will cause a
-                # 'missingparam' error.
-                self._uploaddisabled = False
-            else:
-                # Unexpected error
-                raise
-            return self._uploaddisabled
-        raise RuntimeError(
-            'Unexpected success of upload action without parameters.')
+        return not self.siteinfo.get('general')['uploadsenabled']
 
     def stash_info(
         self,
@@ -2736,6 +2827,11 @@ class APISite(
         :return: It returns True if the upload was successful and False
             otherwise.
         """
+        if self.is_uploaddisabled():
+            pywikibot.error(
+                f'Upload error: Local file uploads are disabled on {self}.')
+            return False
+
         return Uploader(self, filepage, **kwargs).upload()
 
     def get_property_names(self, force: bool = False) -> List[str]:
@@ -2783,10 +2879,9 @@ class APISite(
             raise TypeError('diff parameter is of invalid type')
 
         params = {'action': 'compare',
-                  'from{}'.format(old_t[0]): old_t[1],
-                  'to{}'.format(diff_t[0]): diff_t[1]}
+                  f'from{old_t[0]}': old_t[1],
+                  f'to{diff_t[0]}': diff_t[1]}
 
         req = self.simple_request(**params)
         data = req.submit()
-        comparison = data['compare']['*']
-        return comparison
+        return data['compare']['*']

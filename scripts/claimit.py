@@ -52,6 +52,7 @@ but 'p' must be included.
 #
 import pywikibot
 from pywikibot import WikidataBot, pagegenerators
+from pywikibot.backports import removeprefix
 from pywikibot.tools.itertools import itergroup
 
 
@@ -79,8 +80,7 @@ class ClaimRobot(WikidataBot):
         self.exists_arg = ''.join(x for x in exists_arg.lower() if x in 'pqst')
         self.cacheSources()
         if self.exists_arg:
-            pywikibot.output("'exists' argument set to '{}'"
-                             .format(self.exists_arg))
+            pywikibot.info(f"'exists' argument set to '{self.exists_arg}'")
 
     def treat_page_and_item(self, page, item) -> None:
         """Treat each page.
@@ -115,7 +115,7 @@ def main(*args: str) -> None:
     for arg in local_args:
         # Handle args specifying how to handle duplicate claims
         if arg.startswith('-exists:'):
-            exists_arg = arg.split(':')[1]
+            exists_arg = removeprefix(arg, '-exists:')
             continue
         # Handle page generator args
         if gen.handle_arg(arg):

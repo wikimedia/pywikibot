@@ -124,7 +124,7 @@ class DjVuTextBot(SingleSiteBot):
         new_text = page.text
 
         if page.exists() and not self.opt.force:
-            pywikibot.output(
+            pywikibot.info(
                 'Page {} already exists, not adding!\n'
                 'Use -force option to overwrite the output page.'
                 .format(page))
@@ -160,7 +160,7 @@ def main(*args: str) -> None:
         elif opt in ('-force', '-always'):
             options[opt[1:]] = True
         else:
-            pywikibot.output('Unknown argument ' + arg)
+            pywikibot.info('Unknown argument ' + arg)
 
     # index is mandatory.
     if not index:
@@ -181,7 +181,7 @@ def main(*args: str) -> None:
     djvu = DjVuFile(djvu_path)
 
     if not djvu.has_text():
-        pywikibot.error('No text layer in djvu file {}'.format(djvu.file))
+        pywikibot.error(f'No text layer in djvu file {djvu.file}')
         return
 
     # Parse pages param.
@@ -203,8 +203,7 @@ def main(*args: str) -> None:
     if not index_page.exists():
         raise NoPageError(index)
 
-    pywikibot.output('uploading text from {} to {}'
-                     .format(djvu.file, index_page.title(as_link=True)))
+    pywikibot.info(f'uploading text from {djvu.file} to {index_page}')
 
     bot = DjVuTextBot(djvu, index_page, pages=pages, site=site, **options)
     bot.run()

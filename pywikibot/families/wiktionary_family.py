@@ -5,13 +5,18 @@
 # Distributed under the terms of the MIT license.
 #
 from pywikibot import family
-from pywikibot.tools import classproperty
 
 
 # The Wikimedia family that is known as Wiktionary
 class Family(family.SubdomainFamily, family.WikimediaFamily):
 
-    """Family class for Wiktionary."""
+    """Family class for Wiktionary.
+
+    .. versionchanged:: 8.0
+       ``alphabetic_sv`` attribute was removed; ``interwiki_putfirst``
+       attribute was removed and default setting from parent class is
+       used.
+    """
 
     name = 'wiktionary'
 
@@ -31,17 +36,17 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'ku', 'lt', 'ca', 'it', 'fi', 'ta', 'hu', 'tr', 'ja', 'io', 'hy', 'ko',
         'pt', 'kn', 'vi', 'sr', 'th', 'hi', 'ro', 'no', 'id', 'et', 'cs', 'ml',
         'my', 'skr', 'uz', 'li', 'or', 'eo', 'te', 'fa', 'gl', 'ar', 'oc',
-        'jv', 'az', 'eu', 'uk', 'ast', 'br', 'sg', 'is', 'bn', 'da', 'lo',
-        'simple', 'la', 'mnw', 'hr', 'fj', 'sk', 'shn', 'tg', 'ky', 'bg', 'wa',
-        'ur', 'ps', 'cy', 'vo', 'he', 'om', 'sl', 'lmo', 'af', 'zh-min-nan',
-        'scn', 'tl', 'pa', 'ms', 'sw', 'fy', 'nn', 'ka', 'lv', 'min', 'sq',
+        'jv', 'az', 'eu', 'uk', 'ast', 'br', 'is', 'sg', 'bn', 'da', 'lo',
+        'simple', 'mnw', 'la', 'hr', 'shn', 'fj', 'sk', 'tg', 'ky', 'bg', 'wa',
+        'ur', 'ps', 'cy', 'vo', 'he', 'lmo', 'om', 'sl', 'af', 'zh-min-nan',
+        'scn', 'tl', 'pa', 'ms', 'fy', 'sw', 'nn', 'ka', 'lv', 'min', 'sq',
         'nds', 'lb', 'co', 'mn', 'pnb', 'bs', 'nah', 'yue', 'sa', 'kk', 'km',
         'vec', 'be', 'diq', 'tk', 'mk', 'nia', 'sm', 'hsb', 'ks', 'shy', 'su',
-        'gd', 'ga', 'bcl', 'an', 'gom', 'mr', 'wo', 'mni', 'ia', 'ang', 'mt',
-        'bjn', 'fo', 'sd', 'tt', 'gn', 'so', 'ie', 'mi', 'csb', 'ug', 'si',
-        'ha', 'st', 'roa-rup', 'hif', 'tpi', 'guw', 'jbo', 'kl', 'zu', 'ay',
-        'yi', 'ln', 'gu', 'na', 'gv', 'kw', 'am', 'ne', 'rw', 'ts', 'ig', 'qu',
-        'ss', 'iu', 'chr', 'dv', 'gor', 'ti', 'tn',
+        'gd', 'ga', 'bcl', 'an', 'gom', 'mr', 'gor', 'wo', 'mni', 'ia', 'ang',
+        'bjn', 'mt', 'fo', 'sd', 'tt', 'gn', 'so', 'ie', 'mi', 'csb', 'ug',
+        'si', 'ha', 'st', 'roa-rup', 'hif', 'guw', 'tpi', 'jbo', 'kl', 'zu',
+        'ay', 'yi', 'ln', 'gu', 'na', 'gv', 'kw', 'am', 'ne', 'rw', 'ts', 'ig',
+        'qu', 'ss', 'iu', 'chr', 'dv', 'ti', 'tn',
     ]
 
     category_redirect_templates = {
@@ -67,49 +72,6 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'tl', 'tn', 'tpi', 'tr', 'ts', 'tt', 'ug', 'uk', 'ur', 'uz', 'vec',
         'vi', 'vo', 'wa', 'wo', 'yi', 'zh', 'zh-min-nan', 'zu',
     ]
-
-    # Which languages have a special order for putting interlanguage links,
-    # and what order is it? If a language is not in interwiki_putfirst,
-    # alphabetical order on language code is used. For languages that are in
-    # interwiki_putfirst, interwiki_putfirst is checked first, and
-    # languages are put in the order given there. All other languages are
-    # put after those, in code-alphabetical order.
-
-    alphabetic_sv = [
-        'aa', 'af', 'ak', 'als', 'an', 'roa-rup', 'ast', 'gn', 'ay', 'az',
-        'id', 'ms', 'bm', 'zh-min-nan', 'jv', 'su', 'mt', 'bi', 'bo', 'bs',
-        'br', 'ca', 'cs', 'ch', 'sn', 'co', 'za', 'cy', 'da', 'de', 'na', 'mh',
-        'et', 'ang', 'en', 'es', 'eo', 'eu', 'to', 'fr', 'fy', 'fo', 'ga',
-        'gv', 'sm', 'gd', 'gl', 'hr', 'io', 'ia', 'ie', 'ik', 'xh', 'is', 'zu',
-        'it', 'kl', 'csb', 'kw', 'rw', 'rn', 'sw', 'ky', 'ku', 'la', 'lv',
-        'lb', 'lt', 'li', 'ln', 'jbo', 'hu', 'mg', 'mi', 'mo', 'my', 'fj',
-        'nah', 'nl', 'cr', 'no', 'nn', 'hsb', 'oc', 'om', 'ug', 'uz', 'nds',
-        'pl', 'pt', 'ro', 'rm', 'qu', 'sg', 'sc', 'st', 'tn', 'sq', 'scn',
-        'simple', 'ss', 'sk', 'sl', 'so', 'sh', 'fi', 'sv', 'tl', 'tt', 'vi',
-        'tpi', 'tr', 'tw', 'vo', 'wa', 'wo', 'ts', 'yo', 'el', 'av', 'ab',
-        'ba', 'be', 'bg', 'mk', 'mn', 'ru', 'sr', 'tg', 'uk', 'kk', 'hy', 'yi',
-        'he', 'ur', 'ar', 'tk', 'sd', 'fa', 'ha', 'ps', 'dv', 'ks', 'ne', 'pi',
-        'bh', 'mr', 'sa', 'hi', 'as', 'bn', 'pa', 'pnb', 'gu', 'or', 'ta',
-        'te', 'kn', 'ml', 'si', 'th', 'lo', 'dz', 'ka', 'ti', 'am', 'chr',
-        'iu', 'km', 'zh', 'ja', 'ko', 'shn',
-    ]
-
-    @classproperty
-    def interwiki_putfirst(cls):
-        cls.interwiki_putfirst = {
-            'da': cls.alphabetic,
-            'en': cls.alphabetic,
-            'et': cls.alphabetic,
-            'fi': cls.alphabetic,
-            'fy': cls.fyinterwiki,
-            'he': ['en'],
-            'hu': ['en'],
-            'ms': cls.alphabetic_revised,
-            'pl': cls.alphabetic_revised,
-            'sv': cls.alphabetic_sv,
-            'simple': cls.alphabetic,
-        }
-        return cls.interwiki_putfirst
 
     interwiki_on_one_line = ['pl']
 

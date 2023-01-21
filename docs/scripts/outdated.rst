@@ -1,5 +1,6 @@
+***********************
 Outdated compat scripts
-=======================
+***********************
 
 This list contains outdated scripts from :term:`compat` banch which
 haven't ported to the :term:`core` branch of Pywikibot.

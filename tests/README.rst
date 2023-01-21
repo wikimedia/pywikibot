@@ -106,7 +106,7 @@ Environment variables
 =====================
 
 **PYWIKIBOT_TEST_GUI**
-  Enable :mod:`tests.gui_tests`. Used for Appveyor tests. Github actions would
+  Enable :mod:`tests.gui_tests`. Used for AppVeyor tests. GitHub actions would
   fail due to ``couldn't connect to display ":1.0"`` error. Set this environment
   variable to run this test locally::
 
@@ -123,11 +123,20 @@ Environment variables
 
   .. note:: test names must be given without subsequent ``_tests``.
 
+**PYWIKIBOT_TEST_OAUTH**
+  This environment variable holds the Oauth token. It is set by
+  ``oauth_tests-ci.yml`` CI config file and is solely used by
+  :mod:`tests.oauth_tests`. You can use it for your private tests. The
+  environment variabke must contain consumer key and secret and access
+  key and secret delimited by ``:`` as::
+
+    PYWIKIBOT_TEST_OAUTH=consumer_key:consumer_secret:access_key:access:secret
+
 **PYWIKIBOT_TEST_RUNNING**
   This environment variable skips tests instead of raising
   :exc:`exceptions.MaxlagTimeoutError` when maximum retries attempted due to
   maxlag without success. It is also used by :mod:`tests.script_tests` for code
-  coverage. Github actions and Appveyor tests activate this variable::
+  coverage. GitHub actions and AppVeyor tests activate this variable::
 
     PYWIKIBOT_TEST_RUNNING=1
 
@@ -206,6 +215,17 @@ Require that the given list of modules can be imported.
   [......]
   @require_modules(['important1', 'musthave2'])
   def test_require_modules(self):
+
+@tests.aspects.require_version
+------------------------------
+Require a given MediaWiki version
+
+::
+
+  from tests.aspects import require_version
+  [......]
+  @require_version('>=1.27.0')
+  def test_require_version(self):
 
 @unittest.mock.patch
 -----------------------

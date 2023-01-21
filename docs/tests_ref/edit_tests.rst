@@ -1,5 +1,6 @@
+************************
 tests.edit\_tests module
-========================
+************************
 
 .. automodule:: tests.edit_tests
     :members:

@@ -1,5 +1,6 @@
+********************************
 tests.timestripper\_tests module
-================================
+********************************
 
 .. automodule:: tests.timestripper_tests
     :members:

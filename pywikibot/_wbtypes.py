@@ -48,9 +48,9 @@ class WbRepresentation(abc.ABC):
         assert all(isinstance(item, str) for item in self._items)
 
         values = ((attr, getattr(self, attr)) for attr in self._items)
-        attrs = ', '.join('{}={}'.format(attr, value)
+        attrs = ', '.join(f'{attr}={value}'
                           for attr, value in values)
-        return '{}({})'.format(self.__class__.__name__, attrs)
+        return f'{self.__class__.__name__}({attrs})'
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, self.__class__):

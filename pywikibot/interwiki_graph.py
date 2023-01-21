@@ -50,9 +50,9 @@ class GraphSavingThread(threading.Thread):
             filename = config.datafilepath(
                 'interwiki-graphs/' + getFilename(self.origin, fmt))
             if self.graph.write(filename, prog='dot', format=fmt):
-                pywikibot.output('Graph saved as ' + filename)
+                pywikibot.info('Graph saved as ' + filename)
             else:
-                pywikibot.output('Graph could not be saved as ' + filename)
+                pywikibot.info('Graph could not be saved as ' + filename)
 
 
 class Subject:
@@ -71,7 +71,7 @@ class Subject:
         # pages are values. It stores where we found each page.
         # As we haven't yet found a page that links to the origin page, we
         # start with an empty list for it.
-        self.found_in = {}  # type: FoundInType
+        self.found_in: FoundInType = {}
         if origin:
             self.found_in = {origin: []}
 
@@ -97,15 +97,15 @@ class GraphDrawer:
         :raises ImportError if pydot is not installed
         """
         if PYDOT_ERROR:
-            msg = 'pydot is not installed: {}.'.format(PYDOT_ERROR)
+            msg = f'pydot is not installed: {PYDOT_ERROR}.'
             raise ImportError(msg)
-        self.graph = None  # type: Optional[pydot.Dot]
+        self.graph: Optional[pydot.Dot] = None
         self.subject = subject
 
     @staticmethod
     def getLabel(page: 'pywikibot.page.Page') -> str:
         """Get label for page."""
-        return '"{}:{}"'.format(page.site.code, page.title())
+        return f'"{page.site.code}:{page.title()}"'
 
     def _octagon_site_set(self) -> Set['pywikibot.site.BaseSite']:
         """Build a list of sites with more than one valid page."""
@@ -194,8 +194,8 @@ class GraphDrawer:
 
         For more info see https://meta.wikimedia.org/wiki/Interwiki_graphs
         """
-        pywikibot.output('Preparing graph for {}'
-                         .format(self.subject.origin.title()))
+        pywikibot.info('Preparing graph for {}'
+                       .format(self.subject.origin.title()))
         # create empty graph
         self.graph = pydot.Dot()
 
@@ -227,5 +227,5 @@ def getFilename(page: 'pywikibot.page.Page',
                          page.site.code,
                          page.title(as_filename=True)))
     if extension:
-        filename += '.{}'.format(extension)
+        filename += f'.{extension}'
     return filename

@@ -151,7 +151,7 @@ class Formatter:
                 self.trs_title = page._link.ns_title(onsite=self.onsite)
             # Fallback if no corresponding namespace is found in onsite.
             except Error:
-                self.trs_title = '{}:{}'.format(default, page._link.title)
+                self.trs_title = f'{default}:{page._link.title}'
 
     def output(self, num=None, fmt: str = '1') -> str:
         """Output formatted string."""
@@ -203,7 +203,7 @@ class ListPagesBot(AutomaticTWSummaryBot, SingleSiteBot):
         if self.opt.save:
             filename = os.path.join(self.opt.save,
                                     page.title(as_filename=True))
-            pywikibot.info('Saving {} to {}'.format(page.title(), filename))
+            pywikibot.info(f'Saving {page.title()} to {filename}')
             with open(filename, mode='wb') as f:
                 f.write(page.text.encode(self.opt.encode))
             self.counter['save'] += 1
@@ -229,7 +229,8 @@ class ListPagesBot(AutomaticTWSummaryBot, SingleSiteBot):
                 choice = pywikibot.input_yn('Do you want to create it ("No" '
                                             'to continue without saving)?')
                 if choice:
-                    os.makedirs(base_dir, mode=0o744)
+                    os.makedirs(base_dir,
+                                mode=config.private_folder_permission)
                 else:
                     base_dir = None
             elif not os.path.isdir(base_dir):

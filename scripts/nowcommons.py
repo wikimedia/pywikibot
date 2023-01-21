@@ -222,8 +222,7 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
                 for t in self.nc_templates)
         gen = chain(*gens)
         gen = filter_unique(gen, key=lambda p: '{}:{}:{}'.format(*p._cmpkey()))
-        gen = pg.PreloadingGenerator(gen)
-        return gen
+        return pg.PreloadingGenerator(gen)
 
     def find_file_on_commons(self, local_file_page):
         """Find filename on Commons."""
@@ -263,7 +262,7 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
     def skip_page(self, page) -> bool:
         """Skip shared files."""
         if page.file_is_shared():
-            pywikibot.output('File is already on Commons.')
+            pywikibot.info('File is already on Commons.')
             return True
 
         return super().skip_page(page)
@@ -274,7 +273,7 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
         file_on_commons = self.find_file_on_commons(local_file_page)
 
         if not file_on_commons:
-            pywikibot.output('NowCommons template not found.')
+            pywikibot.info('NowCommons template not found.')
             return
 
         commons_file_page = pywikibot.FilePage(self.commons,
@@ -284,13 +283,13 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
             using_pages = list(local_file_page.using_pages())
 
             if using_pages and using_pages != [local_file_page]:
-                pywikibot.output(
+                pywikibot.info(
                     '"<<lightred>>{}<<default>>" is still used in {} pages.'
                     .format(local_file_page.title(with_ns=False),
                             len(using_pages)))
 
                 if self.opt.replace:
-                    pywikibot.output(
+                    pywikibot.info(
                         'Replacing "<<lightred>>{}<<default>>" by '
                         '"<<lightgreen>>{}<<default>>".'
                         .format(local_file_page.title(with_ns=False),
@@ -315,12 +314,12 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
                         bot.run()
                     self.counter['replace'] += 1
                 else:
-                    pywikibot.output('Please change them manually.')
+                    pywikibot.info('Please change them manually.')
                 return
 
-            pywikibot.output('No page is using "<<lightgreen>>{}<<default>>" '
-                             'anymore.'
-                             .format(local_file_page.title(with_ns=False)))
+            pywikibot.info(
+                'No page is using "<<lightgreen>>{}<<default>>" anymore.'
+                .format(local_file_page.title(with_ns=False)))
 
         try:
             commons_text = commons_file_page.get()
@@ -331,11 +330,11 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
         if not self.opt.replaceonly:
             sha1 = local_file_page.latest_file_info.sha1
             if sha1 == commons_file_page.latest_file_info.sha1:
-                pywikibot.output(
+                pywikibot.info(
                     'The file is identical to the one on Commons.')
 
                 if len(local_file_page.get_file_history()) > 1:
-                    pywikibot.output(
+                    pywikibot.info(
                         'This file has a version history. Please '
                         'delete it manually after making sure that '
                         'the old versions are not worth keeping.')
@@ -346,12 +345,12 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
                         '\n\n>>>> Description on '
                         '<<<lightpurple>>{}<<default>> <<<<\n'
                     )
-                    pywikibot.output(
+                    pywikibot.info(
                         format_str.format(local_file_page.title()))
-                    pywikibot.output(local_file_page.get())
-                    pywikibot.output(
+                    pywikibot.info(local_file_page.get())
+                    pywikibot.info(
                         format_str.format(commons_file_page.title()))
-                    pywikibot.output(commons_text)
+                    pywikibot.info(commons_text)
 
                 if self.opt.always or pywikibot.input_yn(
                     'Does the description on Commons contain all required '
@@ -362,14 +361,14 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
                         prompt=False)
                     self.counter['delete'] += 1
             else:
-                pywikibot.output(
+                pywikibot.info(
                     'The file is not identical to the one on Commons.')
 
     def teardown(self):
         """Show a message if no files were found."""
         if self.generator_completed and not self.counter['read']:
-            pywikibot.output('No transcluded files found for {}.'
-                             .format(self.nc_templates_list()[0]))
+            pywikibot.info('No transcluded files found for {}.'
+                           .format(self.nc_templates_list()[0]))
 
 
 def main(*args: str) -> None:

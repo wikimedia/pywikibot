@@ -65,7 +65,7 @@ def AllpagesPageGenerator(
     if site is None:
         site = pywikibot.Site()
 
-    filterredir = None  # type: Optional[bool]
+    filterredir: Optional[bool] = None
     if not includeredirects:
         filterredir = False
     elif includeredirects == 'only':
@@ -104,7 +104,7 @@ def PrefixingPageGenerator(prefix: str,
         namespace = prefixlink.namespace
     title = prefixlink.title
 
-    filterredir = None  # type: Optional[bool]
+    filterredir: Optional[bool] = None
     if not includeredirects:
         filterredir = False
     elif includeredirects == 'only':
@@ -333,8 +333,8 @@ def _yield_titles(f: Union[codecs.StreamReaderWriter, io.StringIO],
         # This makes it possible to work on different wikis using a single
         # text file, but also could be dangerous because you might
         # inadvertently change pages on another wiki!
-        yield pywikibot.Page(pywikibot.Link(linkmatch.group('title'),
-                                            site))
+        yield pywikibot.Page(pywikibot.Link(linkmatch['title'], site))
+
     if linkmatch is not None:
         return
 
@@ -848,14 +848,14 @@ class GoogleSearchPageGenerator(GeneratorWrapper):
            changed from iterator method to generator property
         """
         # restrict query to local site
-        local_query = '{} site:{}'.format(self.query, self.site.hostname())
+        local_query = f'{self.query} site:{self.site.hostname()}'
         base = 'http://{}{}'.format(self.site.hostname(),
                                     self.site.articlepath)
         pattern = base.replace('{}', '(.+)')
         for url in self.queryGoogle(local_query):
             m = re.search(pattern, url)
             if m:
-                page = pywikibot.Page(pywikibot.Link(m.group(1), self.site))
+                page = pywikibot.Page(pywikibot.Link(m[1], self.site))
                 if page.site == self.site:
                     yield page
 
@@ -930,7 +930,7 @@ class XMLDumpPageGenerator(abc.Iterator):  # type: ignore[type-arg]
         self.content = content
         self.skipping = bool(start)
 
-        self.start = None  # type: Optional[str]
+        self.start: Optional[str] = None
         if start is not None and self.skipping:
             self.start = start.replace('_', ' ')
 
@@ -984,10 +984,10 @@ def YearPageGenerator(start: int = 1, end: int = 2050,
     """
     if site is None:
         site = pywikibot.Site()
-    pywikibot.output('Starting with year {}'.format(start))
+    pywikibot.info(f'Starting with year {start}')
     for i in range(start, end + 1):
         if i % 100 == 0:
-            pywikibot.output('Preparing {}...'.format(i))
+            pywikibot.info(f'Preparing {i}...')
         # There is no year 0
         if i != 0:
             current_year = date.formatYear(site.lang, i)
@@ -1007,7 +1007,7 @@ def DayPageGenerator(start_month: int = 1, end_month: int = 12,
         site = pywikibot.Site()
     lang = site.lang
     first_page = pywikibot.Page(site, date.format_date(start_month, 1, lang))
-    pywikibot.output('Starting with {}'.format(first_page.title(as_link=True)))
+    pywikibot.info(f'Starting with {first_page.title(as_link=True)}')
     for month in range(start_month, end_month + 1):
         for day in range(1, calendar.monthrange(year, month)[1] + 1):
             yield pywikibot.Page(
@@ -1161,7 +1161,7 @@ class PetScanPageGenerator(GeneratorWrapper):
 
         if namespaces:
             for namespace in namespaces:
-                query['ns[{}]'.format(int(namespace))] = 1
+                query[f'ns[{int(namespace)}]'] = 1
 
         query_final = query.copy()
         query_final.update(extra_options)
@@ -1182,12 +1182,12 @@ class PetScanPageGenerator(GeneratorWrapper):
         try:
             req = http.fetch(url, params=self.opts)
         except ReadTimeout:
-            raise ServerError('received ReadTimeout from {}'.format(url))
+            raise ServerError(f'received ReadTimeout from {url}')
 
         server_err = HTTPStatus.INTERNAL_SERVER_ERROR
         if server_err <= req.status_code < server_err + 100:
             raise ServerError(
-                'received {} status from {}'.format(req.status_code, req.url))
+                f'received {req.status_code} status from {req.url}')
 
         data = req.json()
         if 'error' in data:

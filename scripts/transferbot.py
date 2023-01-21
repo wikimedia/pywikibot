@@ -45,7 +45,7 @@ Copy 10 wanted templates of German Wikipedia from English Wikipedia to German
 
 """
 #
-# (C) Pywikibot team, 2014-2021
+# (C) Pywikibot team, 2014-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -106,7 +106,7 @@ def main(*args: str) -> None:
         return
 
     gen_args = ' '.join(gen_args)
-    pywikibot.output("""
+    pywikibot.info("""
     Page transfer configuration
     ---------------------------
     Source: {fromsite}
@@ -155,11 +155,7 @@ def main(*args: str) -> None:
             )
             continue
 
-        pywikibot.output('Moving {} to {}...'
-                         .format(page.title(as_link=True,
-                                            force_interwiki=True),
-                                 targetpage.title(as_link=True)))
-
+        pywikibot.info(f'Moving {page} to {targetpage}...')
         pywikibot.log('Getting page text.')
         text = page.get(get_redirect=True)
         source_link = page.title(as_link=True, insite=targetpage.site)
@@ -170,7 +166,7 @@ def main(*args: str) -> None:
              'history': edithistpage.title(as_link=True,
                                            insite=targetpage.site)}
         )
-        text += '<noinclude>\n\n<small>{}</small></noinclude>'.format(note)
+        text += f'<noinclude>\n\n<small>{note}</small></noinclude>'
 
         pywikibot.log('Getting edit history.')
         historytable = page.getVersionHistoryTable()

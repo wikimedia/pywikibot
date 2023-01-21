@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Tests for the User page."""
 #
-# (C) Pywikibot team, 2016-2022
+# (C) Pywikibot team, 2016-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -74,13 +74,14 @@ class TestUserClass(TestCase):
                          pywikibot.Page(self.site,
                                         'Benutzer Diskussion:Xqt/pwb'))
         self.assertTrue(user.is_thankable)
-        contribs = user.contributions(total=10)
-        self.assertLength(list(contribs), 10)
+        contribs = list(user.contributions(total=10))
+        self.assertLength(contribs, 10)
 
         for contrib in contribs:
             self.assertIsInstance(contrib, tuple)
-            self.assertIn('user', contrib)
-            self.assertIsEqual(contrib['user'], user.username)
+            self.assertIsInstance(contrib[0], pywikibot.Page)
+            self.assertIsInstance(contrib[1], int)
+            self.assertIsInstance(contrib[2], pywikibot.Timestamp)
 
         self.assertIn('user', user.groups())
         self.assertIn('edit', user.rights())
@@ -116,7 +117,7 @@ class TestUserClass(TestCase):
 
     def test_autoblocked_user(self):
         """Test autoblocked user."""
-        with patch.object(pywikibot, 'output') as p:
+        with patch.object(pywikibot, 'info') as p:
             user = User(self.site, '#1242976')
         p.assert_called_once_with(
             'This is an autoblock ID, you can only use to unblock it.')
@@ -140,7 +141,7 @@ class TestUserClass(TestCase):
     def test_autoblocked_user_with_namespace(self):
         """Test autoblocked user."""
         # Suppress output: This is an autoblock ID, you can only use to unblock
-        with patch.object(pywikibot, 'output'):
+        with patch.object(pywikibot, 'info'):
             user = User(self.site, 'User:#1242976')
         self.assertEqual('#1242976', user.username)
         self.assertEqual(user.title(with_ns=False), user.username[1:])
@@ -173,14 +174,18 @@ class TestUserMethods(DefaultSiteTestCase):
 
     def test_contribution(self):
         """Test the User.usercontribs() method."""
+        total = 50
         mysite = self.get_site()
         user = User(mysite, mysite.user())
-        uc = list(user.contributions(total=10))
+        uc = list(user.contributions(total=total))
         if not uc:
             self.skipTest('User {} has no contributions on site {}.'
                           .format(mysite.user(), mysite))
-        self.assertLessEqual(len(uc), 10)
-        last = uc[0]
+        self.assertLessEqual(len(uc), total)
+        self.assertEqual(uc[0], user.last_edit)
+        first_edit = uc[-1] if len(uc) < total else list(
+            user.contributions(total=1, reverse=True))[0]
+        self.assertEqual(first_edit, user.first_edit)
         for contrib in uc:
             self.assertIsInstance(contrib, tuple)
             self.assertLength(contrib, 4)
@@ -189,7 +194,6 @@ class TestUserMethods(DefaultSiteTestCase):
             self.assertIsInstance(i, int)
             self.assertIsInstance(t, Timestamp)
             self.assertIsInstance(c, str)
-        self.assertEqual(last, user.last_edit)
 
     def test_logevents(self):
         """Test the User.logevents() method."""

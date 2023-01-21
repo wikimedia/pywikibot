@@ -1,6 +1,6 @@
 """Classes for detecting a MediaWiki site."""
 #
-# (C) Pywikibot team, 2010-2022
+# (C) Pywikibot team, 2010-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -15,6 +15,7 @@ from urllib.parse import urljoin, urlparse
 from requests.exceptions import RequestException
 
 import pywikibot
+from pywikibot.backports import removesuffix
 from pywikibot.comms.http import fetch
 from pywikibot.exceptions import ServerError
 from pywikibot.tools import MediaWikiVersion
@@ -29,7 +30,7 @@ except ImportError:  # requests < 2.27.0
 SERVER_DB_ERROR_MSG = \
     '<h1>Sorry! This site is experiencing technical difficulties.</h1>'
 
-MIN_VERSION = MediaWikiVersion('1.23')
+MIN_VERSION = MediaWikiVersion('1.27')
 
 
 class MWSite:
@@ -43,16 +44,15 @@ class MWSite:
         :raises pywikibot.exceptions.ServerError: a server error occurred
             while loading the site
         :raises Timeout: a timeout occurred while loading the site
-        :raises RuntimeError: Version not found or version less than 1.23
+        :raises RuntimeError: Version not found or version less than 1.27
         """
-        if fromurl.endswith('$1'):
-            fromurl = fromurl[:-2]
+        fromurl = removesuffix(fromurl, '$1')
 
         r = fetch(fromurl, **kwargs)
         check_response(r)
 
         if fromurl != r.url:
-            pywikibot.log('{} redirected to {}'.format(fromurl, r.url))
+            pywikibot.log(f'{fromurl} redirected to {r.url}')
             fromurl = r.url
 
         self.fromurl = fromurl
@@ -73,16 +73,16 @@ class MWSite:
             except (ServerError, RequestException):
                 raise
             except Exception as e:
-                pywikibot.log('MW detection failed: {!r}'.format(e))
+                pywikibot.log(f'MW detection failed: {e!r}')
 
             if not self.version:
                 self._fetch_old_version()
 
         if not self.api:
-            raise RuntimeError('Unsupported url: {}'.format(self.fromurl))
+            raise RuntimeError(f'Unsupported url: {self.fromurl}')
 
         if not self.version or self.version < MIN_VERSION:
-            raise RuntimeError('Unsupported version: {}'.format(self.version))
+            raise RuntimeError(f'Unsupported version: {self.version}')
 
         if not self.articlepath:
             if self.private_wiki:
@@ -296,7 +296,7 @@ def check_response(response):
             m = re.search(r'\d{3}', err.args[0], flags=re.ASCII)
             if not m:
                 raise err
-            msg = 'Generic Server Error ({})'.format(m.group())
+            msg = f'Generic Server Error ({m.group()})'
 
         raise ServerError(msg)
 

@@ -225,10 +225,10 @@ class APIError(Error):
                 self.code,
                 self.info,
                 ';\n '.join(
-                    '{}: {}'.format(key, val)
+                    f'{key}: {val}'
                     for key, val in self.other.items()))
 
-        return '{}: {}'.format(self.code, self.info)
+        return f'{self.code}: {self.info}'
 
 
 class APIMWError(APIError):
@@ -386,7 +386,7 @@ class InconsistentTitleError(PageLoadRelatedError):
         :param actual: title obtained by query
 
         """
-        self.message = "Query on {{}} returned data on '{}'".format(actual)
+        self.message = f"Query on {{}} returned data on '{actual}'"
         super().__init__(page)
 
 

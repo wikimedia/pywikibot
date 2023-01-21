@@ -10,7 +10,6 @@ import typing
 from contextlib import suppress
 from itertools import zip_longest
 from typing import Any, Optional, Union
-from warnings import warn
 
 import pywikibot
 from pywikibot.backports import Dict, Generator, Iterable, List  # skipcq
@@ -23,7 +22,7 @@ from pywikibot.exceptions import (
     NoPageError,
     UserRightsError,
 )
-from pywikibot.site._decorators import need_right, need_version
+from pywikibot.site._decorators import need_right
 from pywikibot.site._namespace import NamespaceArgType
 from pywikibot.tools import is_ip_address, issue_deprecation_warning
 from pywikibot.tools.itertools import filter_unique, itergroup
@@ -152,11 +151,11 @@ class GeneratorsMixin:
             else:
                 rvgen.request['titles'] = list(cache.keys())
             rvgen.request['rvprop'] = self._rvprops(content=content)
-            pywikibot.output('Retrieving {} pages from {}.'
-                             .format(len(cache), self))
+            pywikibot.info('Retrieving {} pages from {}.'
+                           .format(len(cache), self))
 
             for pagedata in rvgen:
-                pywikibot.debug('Preloading {}'.format(pagedata))
+                pywikibot.debug(f'Preloading {pagedata}')
                 try:
                     if pagedata['title'] not in cache:
                         # API always returns a "normalized" title which is
@@ -177,9 +176,9 @@ class GeneratorsMixin:
                             continue
 
                 except KeyError:
-                    pywikibot.debug("No 'title' in {}".format(pagedata))
-                    pywikibot.debug('pageids={}'.format(pageids))
-                    pywikibot.debug('titles={}'.format(list(cache.keys())))
+                    pywikibot.debug(f"No 'title' in {pagedata}")
+                    pywikibot.debug(f'pageids={pageids}')
+                    pywikibot.debug(f'titles={list(cache.keys())}')
                     continue
 
                 priority, page = cache[pagedata['title']]
@@ -293,7 +292,6 @@ class GeneratorsMixin:
                                namespaces=namespaces, total=total,
                                g_content=content, **eiargs)
 
-    @need_version('1.24')
     def page_redirects(
         self,
         page: 'pywikibot.Page',
@@ -463,19 +461,33 @@ class GeneratorsMixin:
                                titles=tltitle, namespaces=namespaces,
                                total=total, g_content=content)
 
-    def categorymembers(self, category, *,
-                        namespaces=None,
-                        sortby: Optional[str] = None,
-                        reverse: bool = False,
-                        starttime=None,
-                        endtime=None,
-                        total: Optional[int] = None,
-                        content: bool = False,
-                        member_type=None,
-                        startprefix: Optional[str] = None,
-                        endprefix: Optional[str] = None):
+    def categorymembers(
+        self,
+        category: 'pywikibot.Category', *,
+        namespaces=None,
+        sortby: Optional[str] = None,
+        reverse: bool = False,
+        starttime: Optional[pywikibot.time.Timestamp] = None,
+        endtime: Optional[pywikibot.time.Timestamp] = None,
+        total: Optional[int] = None,
+        startprefix: Optional[str] = None,
+        endprefix: Optional[str] = None,
+        content: bool = False,
+        member_type: Union[str, Iterable[str], None] = None
+    ) -> Iterable['pywikibot.Page']:
         """Iterate members of specified category.
 
+        You should not use this method directly; instead use one of the
+        following:
+
+        - :meth:`pywikibot.Category.articles`
+        - :meth:`pywikibot.Category.members`
+        - :meth:`pywikibot.Category.subcategories`
+
+        .. versionchanged:: 4.0.0
+           parameters except *category* are keyword arguments only.
+        .. versionchanged:: 8.0.0
+           raises TypeError instead of Error if no Category is specified
         .. seealso:: :api:`Categorymembers`
 
         :param category: The Category to iterate.
@@ -493,7 +505,6 @@ class GeneratorsMixin:
             (default False)
         :param starttime: if provided, only generate pages added after this
             time; not valid unless sortby="timestamp"
-        :type starttime: time.Timestamp
         :param endtime: if provided, only generate pages added before this
             time; not valid unless sortby="timestamp"
         :param startprefix: if provided, only generate pages >= this title
@@ -502,19 +513,20 @@ class GeneratorsMixin:
             lexically; not valid if sortby="timestamp"
         :param content: if True, load the current content of each iterated page
             (default False)
-        :param member_type: member type; if member_type includes 'page' and is
-            used in conjunction with sortby="timestamp", the API may limit
-            results to only pages in the first 50 namespaces.
-        :type member_type: str or iterable of str;
-            values: page, subcat, file
-        :rtype: typing.Iterable[pywikibot.Page]
+        :param member_type: member type; values must be ``page``,
+            ``subcat``, ``file``. If member_type includes ``page`` and
+            is used in conjunction with sortby="timestamp", the API may
+            limit results to only pages in the first 50 namespaces.
+
         :raises KeyError: a namespace identifier was not resolved
         :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
+        :raises TypeError: no Category is specified
+        :raises ValueError: invalid values given
         """
         if category.namespace() != 14:
-            raise Error('categorymembers: non-Category page {!r} specified'
-                        .format(category))
+            raise TypeError(
+                f'categorymembers: non-Category page {category!r} specified')
 
         cmtitle = category.title(with_section=False).encode(self.encoding())
         cmargs = {
@@ -526,12 +538,13 @@ class GeneratorsMixin:
         if sortby in ['sortkey', 'timestamp']:
             cmargs['gcmsort'] = sortby
         elif sortby:
-            raise ValueError('categorymembers: invalid sortby value {!r}'
-                             .format(sortby))
+            raise ValueError(
+                f'categorymembers: invalid sortby value {sortby!r}')
 
         if starttime and endtime and starttime > endtime:
             raise ValueError(
                 'categorymembers: starttime must be before endtime')
+
         if startprefix and endprefix and startprefix > endprefix:
             raise ValueError(
                 'categorymembers: startprefix must be less than endprefix')
@@ -545,6 +558,7 @@ class GeneratorsMixin:
 
             if 'page' in member_type:
                 excluded_namespaces = set()
+
                 if 'file' not in member_type:
                     excluded_namespaces.add(6)
                 if 'subcat' not in member_type:
@@ -553,8 +567,8 @@ class GeneratorsMixin:
                 if namespaces:
                     if excluded_namespaces.intersection(namespaces):
                         raise ValueError(
-                            'incompatible namespaces {!r} and member_type {!r}'
-                            .format(namespaces, member_type))
+                            f'incompatible namespaces {namespaces!r} and '
+                            f'member_type {member_type!r}')
                     # All excluded namespaces are not present in `namespaces`.
                 else:
                     # If the number of namespaces is greater than permitted by
@@ -866,8 +880,8 @@ class GeneratorsMixin:
             else:
                 filterredir = None
             issue_deprecation_warning(
-                'The value "{}" for "filterredir"'.format(old),
-                '"{}"'.format(filterredir), since='7.0.0')
+                f'The value "{old}" for "filterredir"',
+                f'"{filterredir}"', since='7.0.0')
 
         apgen = self._generator(api.PageGenerator, type_arg='allpages',
                                 namespaces=namespace,
@@ -1428,7 +1442,9 @@ class GeneratorsMixin:
 
         Iterated values are in the same format as recentchanges.
 
-        .. seealso:: :api:`Usercontribs`
+        .. seealso::
+           - :api:`Usercontribs`
+           - :meth:`pywikibot.User.contributions`
 
         :param user: Iterate contributions by this user (name or IP)
         :param userprefix: Iterate contributions by all users whose names
@@ -1574,28 +1590,11 @@ class GeneratorsMixin:
         :keyword prop: Which properties to get. Defaults are ids, user,
             comment, flags and timestamp
         """
-        def handle_props(props):
-            """Translate deletedrev props to deletedrevisions props."""
-            if isinstance(props, str):
-                props = props.split('|')
-            if self.mw_version >= '1.25':
-                return props
-
-            old_props = []
-            for item in props:
-                if item == 'ids':
-                    old_props += ['revid', 'parentid']
-                elif item == 'flags':
-                    old_props.append('minor')
-                elif item != 'timestamp':
-                    old_props.append(item)
-                    if item == 'content' and self.mw_version < '1.24':
-                        old_props.append('token')
-            return old_props
-
         # set default properties
         prop = kwargs.pop('prop',
                           ['ids', 'user', 'comment', 'flags', 'timestamp'])
+        if isinstance(prop, str):
+            prop = prop.split('|')
         if content:
             prop.append('content')
 
@@ -1608,46 +1607,26 @@ class GeneratorsMixin:
         if not bool(titles) ^ (revids is not None):
             raise Error('deletedrevs: either "titles" or "revids" parameter '
                         'must be given.')
-        if revids and self.mw_version < '1.25':
-            raise NotImplementedError(
-                'deletedrevs: "revid" is not implemented with MediaWiki {}'
-                .format(self.mw_version))
 
-        if self.mw_version >= '1.25':
-            pre = 'drv'
-            type_arg = 'deletedrevisions'
-            generator = api.PropertyGenerator
-        else:
-            pre = 'dr'
-            type_arg = 'deletedrevs'
-            generator = api.ListGenerator
+        gen = self._generator(api.PropertyGenerator,
+                              type_arg='deletedrevisions',
+                              titles=titles, revids=revids, total=total)
 
-        gen = self._generator(generator, type_arg=type_arg,
-                              titles=titles, revids=revids,
-                              total=total)
-
-        gen.request[pre + 'start'] = start
-        gen.request[pre + 'end'] = end
-        gen.request[pre + 'prop'] = handle_props(prop)
+        gen.request['drvstart'] = start
+        gen.request['drvend'] = end
+        gen.request['drvprop'] = prop
+        if reverse:
+            gen.request['drvdir'] = 'newer'
 
         # handle other parameters like user
         for k, v in kwargs.items():
-            gen.request[pre + k] = v
+            gen.request['drv' + k] = v
 
-        if reverse:
-            gen.request[pre + 'dir'] = 'newer'
+        for data in gen:
+            with suppress(KeyError):
+                data['revisions'] = data.pop('deletedrevisions')
+                yield data
 
-        if self.mw_version < '1.25':
-            yield from gen
-
-        else:
-            # The dict result is different for both generators
-            for data in gen:
-                with suppress(KeyError):
-                    data['revisions'] = data.pop('deletedrevisions')
-                    yield data
-
-    @need_version('1.25')
     def alldeletedrevisions(
         self,
         *,
@@ -1748,15 +1727,7 @@ class GeneratorsMixin:
         redirects = mapping[redirects]
         params = {}
         if redirects is not None:
-            if self.mw_version < '1.26':
-                if redirects == 'all':
-                    warn("parameter redirects=None to retrieve 'all' random"
-                         'page types is not supported by mw version {}. '
-                         'Using default.'.format(self.mw_version),
-                         UserWarning)
-                params['grnredirect'] = redirects == 'redirects'
-            else:
-                params['grnfilterredir'] = redirects
+            params['grnfilterredir'] = redirects
         return self._generator(api.PageGenerator, type_arg='random',
                                namespaces=namespaces, total=total,
                                g_content=content, **params)
@@ -2135,7 +2106,7 @@ class GeneratorsMixin:
         """
         if propname not in self.get_property_names():
             raise NotImplementedError(
-                '"{}" is not a valid page property'.format(propname))
+                f'"{propname}" is not a valid page property')
         return self._generator(api.PageGenerator, type_arg='pageswithprop',
                                gpwppropname=propname, total=total)
 

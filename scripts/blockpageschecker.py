@@ -191,7 +191,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
             'Do you want to open the page?',
             [('with browser', 'b'), ('with gui', 'g'), ('no', 'n')], 'n')
         if choice == 'b':
-            webbrowser.open('{}?redirect=no'.format(page.full_url()))
+            webbrowser.open(f'{page.full_url()}?redirect=no')
         elif choice == 'g':
             editor = TextEditor()
             editor.edit(page.text)
@@ -210,7 +210,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
         page = self.current_page
         if page.isRedirectPage():
             if self.opt.always:
-                pywikibot.warning('{} is a redirect; skipping'.format(page))
+                pywikibot.warning(f'{page} is a redirect; skipping')
             elif self.opt.show:
                 self.invoke_editor(page)
             return
@@ -230,7 +230,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
         # PreloadingGenerator cannot set correctly page.edit_restrictioniction
         # (see bug T57322)
         # if not page.has_permission():
-        #    pywikibot.output(
+        #    pywikibot.info(
         #        "{} is sysop-protected : this account can't edit "
         #        "it! Skipping...".format(pagename))
         #    continue
@@ -300,7 +300,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
             # keep track of the changes for each step (edit then move)
             changes = -1
 
-            msg_type = None  # type: Optional[str]
+            msg_type: Optional[str] = None
             edit_restriction = restrictions.get('edit')
             if not edit_restriction:
                 # page is not edit-protected
@@ -312,17 +312,17 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                         '"template_total_protection"'
                         .format(self.site.sitename))
 
-                replacement = '|'.join(ttp + tsp + (tu or ''))
+                replacement = '|'.join(ttp + tsp + (tu or []))
                 text, changes = re.subn(
-                    '<noinclude>({})</noinclude>'.format(replacement),
+                    f'<noinclude>({replacement})</noinclude>',
                     '', text)
                 if not changes:
                     text, changes = re.subn(
-                        '({})'.format(replacement), '', text)
+                        f'({replacement})', '', text)
                 msg = 'The page is editable for all'
                 if not self.opt.move:
                     msg += ', deleting the template..'
-                pywikibot.output(msg + '.')
+                pywikibot.info(msg + '.')
                 msg_type = 'deleting'
 
             elif edit_restriction[0] == 'sysop':
@@ -332,7 +332,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                     msg = 'The page is protected to the sysop'
                     if not self.opt.move:
                         msg += ', skipping...'
-                    pywikibot.output(msg)
+                    pywikibot.info(msg)
                 else:
                     if not tnr or tu and not tnr[4] or not (tu or tnr[1]):
                         raise Error(
@@ -340,7 +340,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                             'Missing "template_no_regex"'
                             .format(self.site.sitename))
 
-                    pywikibot.output(
+                    pywikibot.info(
                         'The page is protected to the sysop, but the template '
                         'seems not correct. Fixing...')
                     text, changes = re.subn(
@@ -355,14 +355,14 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                            'users')
                     if not self.opt.move:
                         msg += ', skipping...'
-                    pywikibot.output(msg)
+                    pywikibot.info(msg)
                 else:
                     if not tnr or tu and not tnr[4] or not (tu or tnr[1]):
                         raise Error(
                             'This script is not localized to use it on \n'
                             '{}. Missing "template_no_regex"'
                             .format(self.site.sitename))
-                    pywikibot.output(
+                    pywikibot.info(
                         'The page is editable only for the autoconfirmed '
                         'users, but the template seems not correct. Fixing...')
                     text, changes = re.subn(
@@ -380,28 +380,28 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                 changes = -1
 
                 if not move_restriction:
-                    pywikibot.output('The page is movable for all, deleting '
-                                     'the template...')
+                    pywikibot.info('The page is movable for all, deleting the '
+                                   'template...')
                     # Deleting the template because the page doesn't need it.
-                    replacement = '|'.join(tsmp + ttmp + (tu or ''))
+                    replacement = '|'.join(tsmp + ttmp + (tu or []))
                     text, changes = re.subn(
-                        '<noinclude>({})</noinclude>'.format(replacement),
+                        f'<noinclude>({replacement})</noinclude>',
                         '', text)
                     if not changes:
                         text, changes = re.subn(
-                            '({})'.format(replacement), '', text)
+                            f'({replacement})', '', text)
                     msg_type = 'deleting'
                 elif move_restriction[0] == 'sysop':
                     # move-total-protection
                     if template_in_page.blocktype == 'sysop-move' and ttmp \
                        or template_in_page.blocktype == 'unique' and tu:
-                        pywikibot.output('The page is protected from moving '
-                                         'to the sysop, skipping...')
+                        pywikibot.info('The page is protected from moving to '
+                                       'the sysop, skipping...')
                         if tu:
                             # no changes needed, better to revert the old text.
                             text = oldtext
                     else:
-                        pywikibot.output(
+                        pywikibot.info(
                             'The page is protected from moving to the sysop, '
                             'but the template seems not correct. Fixing...')
                         text, changes = re.subn(
@@ -412,13 +412,13 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                     # implicitly move semi-protection
                     if template_in_page.blocktype in ('autoconfirmed-move',
                                                       'unique'):
-                        pywikibot.output('The page is movable only for the '
-                                         'autoconfirmed users, skipping...')
+                        pywikibot.info('The page is movable only for the '
+                                       'autoconfirmed users, skipping...')
                         if tu:
                             # no changes needed, better to revert the old text.
                             text = oldtext
                     else:
-                        pywikibot.output(
+                        pywikibot.info(
                             'The page is movable only for the autoconfirmed '
                             'users, but the template seems not correct. '
                             'Fixing...')
@@ -451,8 +451,8 @@ def main(*args: str) -> None:
     site = pywikibot.Site()
 
     if site.code not in project_inserted:
-        pywikibot.output('Your project is not supported by this script.\n'
-                         'You have to edit the script and add it!')
+        pywikibot.info('Your project is not supported by this script.\n'
+                       'You have to edit the script and add it!')
         return
 
     # Process pagegenerators arguments

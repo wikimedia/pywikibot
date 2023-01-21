@@ -1,5 +1,6 @@
+************************
 tests.link\_tests module
-========================
+************************
 
 .. automodule:: tests.link_tests
     :members:

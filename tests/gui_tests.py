@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Tests for the Tk UI."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -22,8 +22,8 @@ class TestTkdialog(TestCase):
     def test_tk_dialog(self):
         """Test Tk dialog."""
         desc = 'foo'
-        image = 'tests/data/images/MP_sounds.png'
-        filename = image.rsplit('/', 1)[1]
+        filename = 'MP_sounds.png'
+        image = f'tests/data/images/{filename}'
         box = Tkdialog(desc, image, filename)
         # skip after ~100 ms
         box.root.after(100, box.skip_file)
@@ -67,6 +67,7 @@ def setUpModule():
 
     global EditBoxWindow, Tkdialog, tkinter
     import tkinter
+
     from pywikibot.userinterfaces.gui import EditBoxWindow, Tkdialog
 
 

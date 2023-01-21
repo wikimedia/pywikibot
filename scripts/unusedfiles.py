@@ -111,13 +111,13 @@ class UnusedFilesBot(SingleSiteBot,
         if (image.get_file_url() and not image.file_is_shared()
                 and 'http://' not in image.text):
             if self.opt.filetemplate in image.text:
-                pywikibot.output('{} done already'
-                                 .format(image.title(as_link=True)))
+                pywikibot.info(f'{image} done already')
                 return
 
             self.append_text(image, '\n\n' + self.opt.filetemplate)
             if self.opt.nouserwarning:
                 return
+
             uploader = image.oldest_file_info.user
             user = pywikibot.User(image.site, uploader)
             usertalkpage = user.getUserTalkPage()

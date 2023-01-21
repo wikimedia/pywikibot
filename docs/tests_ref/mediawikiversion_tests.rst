@@ -1,5 +1,6 @@
+************************************
 tests.mediawikiversion\_tests module
-====================================
+************************************
 
 .. automodule:: tests.mediawikiversion_tests
     :members:

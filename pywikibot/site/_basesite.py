@@ -1,6 +1,6 @@
 """Objects with site methods independent of the communication interface."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -22,9 +22,9 @@ from pywikibot.exceptions import (
 from pywikibot.site._namespace import Namespace, NamespacesDict
 from pywikibot.throttle import Throttle
 from pywikibot.tools import (
-    cached,
     ComparableMixin,
     SelfCallString,
+    cached,
     first_upper,
     normalize_username,
 )
@@ -186,8 +186,6 @@ class BaseSite(ComparableMixin):
 
     def __getattr__(self, attr):
         """Delegate undefined methods calls to the Family object."""
-        if hasattr(self.__class__, attr):
-            return getattr(self.__class__, attr)
         try:
             method = getattr(self.family, attr)
             if not callable(method):
@@ -197,8 +195,8 @@ class BaseSite(ComparableMixin):
                 f.__doc__ = method.__doc__
             return f
         except AttributeError:
-            raise AttributeError("{} instance has no attribute '{}'"
-                                 .format(self.__class__.__name__, attr))
+            raise AttributeError(f'{type(self).__name__} instance has no '
+                                 f'attribute {attr!r}') from None
 
     def __str__(self) -> str:
         """Return string representing this Site's name and code."""

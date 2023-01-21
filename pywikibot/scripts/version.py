@@ -50,56 +50,55 @@ WMF_CACERT = 'MIIDxTCCAq2gAwIBAgIQAqxcJmoLQJuPC3nyrkYldzANBgkqhkiG9w0BAQUFADBs'
 
 def main(*args: str) -> None:
     """Print pywikibot version and important settings."""
-    pywikibot.output('Pywikibot: ' + getversion())
-    pywikibot.output('Release version: ' + pywikibot.__version__)
-    pywikibot.output('setuptools version: ' + setuptools.__version__)
-    pywikibot.output('mwparserfromhell version: '
-                     + mwparserfromhell.__version__)
-    pywikibot.output('wikitextparser version: ' + wikitextparser.__version__)
-    pywikibot.output('requests version: ' + requests.__version__)
+    pywikibot.info('Pywikibot: ' + getversion())
+    pywikibot.info('Release version: ' + pywikibot.__version__)
+    pywikibot.info('setuptools version: ' + setuptools.__version__)
+    pywikibot.info('mwparserfromhell version: ' + mwparserfromhell.__version__)
+    pywikibot.info('wikitextparser version: ' + wikitextparser.__version__)
+    pywikibot.info('requests version: ' + requests.__version__)
 
     has_wikimedia_cert = False
     if (not hasattr(requests, 'certs')
             or not hasattr(requests.certs, 'where')
             or not callable(requests.certs.where)):
-        pywikibot.output('  cacerts: not defined')
+        pywikibot.info('  cacerts: not defined')
     elif not os.path.isfile(requests.certs.where()):
-        pywikibot.output('  cacerts: {} (missing)'.format(
+        pywikibot.info('  cacerts: {} (missing)'.format(
             requests.certs.where()))
     else:
-        pywikibot.output('  cacerts: ' + requests.certs.where())
+        pywikibot.info('  cacerts: ' + requests.certs.where())
 
         with codecs.open(requests.certs.where(), 'r', 'utf-8') as cert_file:
             text = cert_file.read()
             if WMF_CACERT in text:
                 has_wikimedia_cert = True
-        pywikibot.output('    certificate test: {}'
-                         .format('ok' if has_wikimedia_cert else 'not ok'))
+        pywikibot.info('    certificate test: {}'
+                       .format('ok' if has_wikimedia_cert else 'not ok'))
     if not has_wikimedia_cert:
-        pywikibot.output('  Please reinstall requests!')
+        pywikibot.info('  Please reinstall requests!')
 
-    pywikibot.output('Python: ' + sys.version)
+    pywikibot.info('Python: ' + sys.version)
 
     toolforge_env_hostname = get_toolforge_hostname()
     if toolforge_env_hostname:
-        pywikibot.output('Toolforge hostname: ' + toolforge_env_hostname)
+        pywikibot.info('Toolforge hostname: ' + toolforge_env_hostname)
 
     # check environment settings
     settings = {key for key in os.environ if key.startswith('PYWIKIBOT')}
     settings.update(['PYWIKIBOT_DIR', 'PYWIKIBOT_DIR_PWB',
                      'PYWIKIBOT_NO_USER_CONFIG'])
     for environ_name in sorted(settings):
-        pywikibot.output(
+        pywikibot.info(
             '{}: {}'.format(environ_name,
                             os.environ.get(environ_name, 'Not set') or "''"))
 
-    pywikibot.output('Config base dir: ' + pywikibot.config.base_dir)
+    pywikibot.info('Config base dir: ' + pywikibot.config.base_dir)
     for family, usernames in pywikibot.config.usernames.items():
         if not usernames:
             continue
-        pywikibot.output('Usernames for family {!r}:'.format(family))
+        pywikibot.info(f'Usernames for family {family!r}:')
         for lang, username in usernames.items():
-            pywikibot.output('\t{}: {}'.format(lang, username))
+            pywikibot.info(f'\t{lang}: {username}')
 
 
 if __name__ == '__main__':

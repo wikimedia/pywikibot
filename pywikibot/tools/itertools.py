@@ -4,13 +4,12 @@
    in :mod:`backports`
 """
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
 import collections
 import itertools
-
 from contextlib import suppress
 from itertools import chain, zip_longest
 from typing import Any
@@ -259,7 +258,7 @@ def filter_unique(iterable, container=None, key=None, add=None):
 
     .. warning:: This is not thread safe.
 
-    .. versionadded: 3.0
+    .. versionadded:: 3.0
 
     :param iterable: the source iterable
     :type iterable: collections.abc.Iterable

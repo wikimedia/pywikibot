@@ -203,7 +203,7 @@ class TestCherryPick(TestCase):
     # output messages expected during testing
     diff_message = ('<<lightred>>- old\n<<default>><<lightgreen>>+ '
                     'new\n<<default>>')
-    none_message = '<<lightpurple>>{0: ^50}<<default>>'.format('None.')
+    none_message = '<<lightpurple>>{: ^50}<<default>>'.format('None.')
     header_base = '\n<<lightpurple>>{0:*^50}<<default>>\n'
     headers = ['  ALL CHANGES  ', '  REVIEW CHANGES  ', '  APPROVED CHANGES  ']
     diff_by_letter_message = ('<<lightred>>- o\n<<default>>'
@@ -218,7 +218,7 @@ class TestCherryPick(TestCase):
         for header in self.headers:
             mock.assert_any_call(self.header_base.format(header))
 
-    @patch('pywikibot.output')
+    @patch('pywikibot.info')
     @patch('pywikibot.userinterfaces.buffer_interface.UI.input',
            return_value='y')
     def test_accept(self, input, mock):
@@ -227,7 +227,7 @@ class TestCherryPick(TestCase):
         self.check_headers(mock)
         mock.assert_any_call(self.diff_message)
 
-    @patch('pywikibot.output')
+    @patch('pywikibot.info')
     @patch('pywikibot.userinterfaces.buffer_interface.UI.input',
            return_value='n')
     def test_reject(self, input, mock):
@@ -237,7 +237,7 @@ class TestCherryPick(TestCase):
         mock.assert_any_call(self.diff_message)
         mock.assert_any_call(self.none_message)
 
-    @patch('pywikibot.output')
+    @patch('pywikibot.info')
     @patch('pywikibot.userinterfaces.buffer_interface.UI.input',
            return_value='q')
     def test_quit(self, input, mock):
@@ -247,7 +247,7 @@ class TestCherryPick(TestCase):
         mock.assert_any_call(self.diff_message)
         mock.assert_any_call(self.none_message)
 
-    @patch('pywikibot.output')
+    @patch('pywikibot.info')
     @patch('pywikibot.userinterfaces.buffer_interface.UI.input',
            return_value='y')
     def test_by_letter_accept(self, input, mock):
@@ -260,7 +260,7 @@ class TestCherryPick(TestCase):
         self.check_headers(mock)
         mock.assert_any_call(self.diff_by_letter_message)
 
-    @patch('pywikibot.output')
+    @patch('pywikibot.info')
     @patch('pywikibot.userinterfaces.buffer_interface.UI.input',
            return_value='q')
     def test_by_letter_quit(self, input, mock):

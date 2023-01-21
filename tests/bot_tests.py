@@ -93,7 +93,7 @@ class TestBotTreatExit:
                 # When an AssertionError happened we shouldn't do these
                 # assertions as they are invalid anyway and hide the actual
                 # failed assertion
-                return
+                return  # pragma: no cover
             self.assertEqual(self.bot.counter['read'], treated)
             self.assertEqual(self.bot.counter['write'], written)
             if exception:

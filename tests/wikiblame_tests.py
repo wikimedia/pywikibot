@@ -1,15 +1,13 @@
 """Tests for the WikiHistoryMixin."""
 #
-# (C) Pywikibot team, 2022
+# (C) Pywikibot team, 2022-2023
 #
 # Distributed under the terms of the MIT license.
 #
 import unittest
-
 from contextlib import suppress
 
 import pywikibot
-
 from tests.aspects import TestCase
 
 

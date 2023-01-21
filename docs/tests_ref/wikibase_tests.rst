@@ -1,5 +1,6 @@
+****************************
 tests.wikibase\_tests module
-============================
+****************************
 
 .. automodule:: tests.wikibase_tests
     :members:

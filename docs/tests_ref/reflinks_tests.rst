@@ -1,5 +1,6 @@
+****************************
 tests.reflinks\_tests module
-============================
+****************************
 
 .. automodule:: tests.reflinks_tests
     :members:

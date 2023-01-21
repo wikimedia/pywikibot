@@ -1,5 +1,6 @@
+************************
 tests.file\_tests module
-========================
+************************
 
 .. automodule:: tests.file_tests
     :members:
