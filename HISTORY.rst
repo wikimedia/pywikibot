@@ -92,7 +92,6 @@ Code cleanups
   :class:`Wiktionary<families.wiktionary_family.Family>` family were removed (:phab:`T325426`)
 * ``alphabetic``, ``alphabetic_revised`` and ``fyinterwiki`` attributes of :class:`family.Family`
   were removed (:phab:`T325426`)
-* *See also Deprecations below*
 
 
 7.7.3
