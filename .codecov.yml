@@ -4,6 +4,7 @@ codecov:
   strict_yaml_branch: master
 
 coverage:
+  precision: 1
   round: up
   range: 75..95
   status:
@@ -35,7 +36,3 @@ coverage:
       default:
         server: libera.chat
         channel: pywikibot
-
-    gitter:
-      default:
-        url: https://webhooks.gitter.im/e/f312b840da1c40d9f4be
