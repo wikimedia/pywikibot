@@ -59,8 +59,8 @@ from pywikibot.exceptions import EditConflictError, NoPageError
 
 content = {
     'commons': '{{Sandbox}}\n<!-- Please edit only below this line. -->',
-    'meta': '{{Meta:Sandbox/Please do not edit this line}}'
-            '<!--Please edit below this line.-->',
+    'meta': '{{Meta:Sandbox/Please do not edit this line}}\n'
+            '<!-- Please edit below this line. -->',
     'test': '<noinclude>{{Sandbox}}</noinclude>\n'
             '== Please start your testing below this line ==',
     'wikidata': '{{Please leave this line alone (sandbox heading)}}',
