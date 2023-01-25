@@ -127,6 +127,37 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         item = pywikibot.ItemPage(testsite)
         item.editEntity(data)
 
+    def test_edit_entity_propogation(self):
+        """Test that ``ItemPage.editEntity`` propagates changes to claims."""
+        testsite = self.get_repo()
+        item = pywikibot.ItemPage(testsite)
+        claim = pywikibot.Claim(testsite, 'P97339')
+        claim.setTarget('test')
+        qual = pywikibot.Claim(testsite, 'P97339')
+        qual.setTarget('test')
+        ref = pywikibot.Claim(testsite, 'P97339')
+        ref.setTarget('test')
+        claim.addQualifier(qual)
+        claim.addSource(ref)
+        item.editEntity()
+        self.assertIsNotNone(claim.snak)
+        self.assertIsNotNone(qual.hash)
+        self.assertIsNotNone(ref.hash)
+        self.assertSame(claim.on_item, item)
+        self.assertSame(qual.on_item, item)
+        self.assertSame(ref.on_item, item)
+        qual = pywikibot.Claim(testsite, 'P97339')
+        qual.setTarget('test')
+        ref = pywikibot.Claim(testsite, 'P97339')
+        ref.setTarget('test')
+        claim.qualifiers[qual.id].append(qual)
+        claim.sources[0][ref.id].append(ref)
+        item.editEntity()
+        self.assertIsNotNone(qual.hash)
+        self.assertIsNotNone(ref.hash)
+        self.assertSame(qual.on_item, item)
+        self.assertSame(ref.on_item, item)
+
     def test_edit_entity_new_property(self):
         """Test creating a new property using ``PropertyPage.editEntity``."""
         testsite = self.get_repo()
