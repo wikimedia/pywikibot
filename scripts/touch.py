@@ -124,12 +124,9 @@ class PurgeBot(MultipleSitesBot):
 
                 pywikibot.info('{} pages{} purged'
                                .format(length, '' if done else ' not'))
-                if not flush:
-                    delay = 60 + 2
-                    if delay:
-                        pywikibot.info(
-                            f'Waiting {delay} seconds due to purge rate limit')
-                        pywikibot.sleep(0 if config.simulate else delay)
+                if not flush and not config.simulate:
+                    pywikibot.info('Waiting due to purge rate limit')
+                    pywikibot.sleep(62)
 
 
 def main(*args: str) -> None:
