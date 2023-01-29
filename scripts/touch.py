@@ -160,6 +160,7 @@ def main(*args: str) -> None:
 
     if not pywikibot.bot.suggest_help(missing_generator=not gen_factory.gens,
                                       unknown_parameters=unknown):
+        pywikibot.Site().login()
         gen = gen_factory.getCombinedGenerator(preload=bot_class == TouchBot)
         bot_class(generator=gen, **options).run()
 
