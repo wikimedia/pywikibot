@@ -427,7 +427,7 @@ class ClientLoginManager(LoginManager):
                     self.site.family)
                 self.site.tokens.clear()
                 login_request[
-                    self.keyword('token')] = self.site.tokens['login']
+                    self.keyword('token')] = response['token']
                 continue
 
             if status == 'UI':  # pragma: no cover
