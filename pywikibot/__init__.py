@@ -705,17 +705,23 @@ class WbTime(_WbRepresentation):
         return self.FORMATSTR.format(self.year, self.month, self.day,
                                      self.hour, self.minute, self.second)
 
-    def toTimestamp(self) -> Timestamp:
+    def toTimestamp(self, timezone_aware: bool = False) -> Timestamp:
         """
         Convert the data to a pywikibot.Timestamp.
 
+        :param timezone_aware: Whether the timezone should be passed to
+            the Timestamp object.
         :raises ValueError: instance value cannot be represented using
             Timestamp
         """
         if self.year <= 0:
             raise ValueError('You cannot turn BC dates into a Timestamp')
-        return Timestamp.fromISOformat(
+        ts = Timestamp.fromISOformat(
             self.toTimestr(force_iso=True).lstrip('+'))
+        if timezone_aware:
+            ts = ts.replace(tzinfo=datetime.timezone(
+                datetime.timedelta(minutes=self.timezone)))
+        return ts
 
     def toWikibase(self, normalize: bool = False) -> Dict[str, Any]:
         """Convert the data to a JSON object for the Wikibase API.

@@ -514,6 +514,15 @@ class TestWbTime(WbRepresentationTestCase):
                                            timezone=60)
         self.assertEqual(t.timezone, 60)
 
+        ts1 = pywikibot.Timestamp(
+            year=2022, month=12, day=21, hour=13,
+            tzinfo=datetime.timezone(datetime.timedelta(hours=-5)))
+        t1 = pywikibot.WbTime.fromTimestamp(ts1, timezone=-300, site=repo)
+        self.assertIsNotNone(t1.toTimestamp(timezone_aware=True).tzinfo)
+        self.assertIsNone(t1.toTimestamp(timezone_aware=False).tzinfo)
+        self.assertEqual(t1.toTimestamp(timezone_aware=True), ts1)
+        self.assertNotEqual(t1.toTimestamp(timezone_aware=False), ts1)
+
     def test_WbTime_errors(self):
         """Test WbTime precision errors."""
         repo = self.get_repo()
