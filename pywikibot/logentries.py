@@ -9,7 +9,7 @@ from collections import UserDict
 from typing import Any, Optional, Type, Union
 
 import pywikibot
-from pywikibot.backports import Dict, List, Tuple
+from pywikibot.backports import Dict, List
 from pywikibot.exceptions import Error, HiddenKeyError
 from pywikibot.tools import cached
 
@@ -363,15 +363,21 @@ class LogEntryFactory:
            or use the get_valid_entry_class instance method instead.
         """
         if logtype not in cls._logtypes:
-            bases: Tuple['LogEntry', ...] = (OtherLogEntry, )
-            if logtype in ('newusers', 'thanks'):
-                bases = (UserTargetLogEntry, OtherLogEntry)
-
-            classname = str(logtype.capitalize() + 'Entry'
-                            if logtype is not None
-                            else OtherLogEntry.__name__)
-            cls._logtypes[logtype] = type(
-                classname, bases, {'_expected_type': logtype})
+            if logtype is None:
+                cls._logtypes[logtype] = OtherLogEntry
+            else:
+                if logtype in ('newusers', 'thanks'):
+                    bases = (UserTargetLogEntry, OtherLogEntry)
+                else:
+                    bases = (OtherLogEntry,)
+                cls._logtypes[logtype] = type(
+                    f'{logtype.capitalize()}Entry',
+                    bases,
+                    {
+                        '__doc__': f'{logtype.capitalize()} log entry',
+                        '_expected_type': logtype,
+                    },
+                )
         return cls._logtypes[logtype]
 
     def _create_from_data(self, logdata: Dict[str, Any]) -> LogEntry:
