@@ -610,7 +610,7 @@ class BasePage(ComparableMixin):
         :param intro: Return only content before the first section
         :raises NoPageError: given page does not exist
         :raises NotImplementedError: "wiki" variant does not support
-            `sencence` parameter.
+            `sentences` parameter.
         :raises ValueError: `variant` parameter must be "plain", "html" or
             "wiki"
 
