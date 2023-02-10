@@ -115,6 +115,7 @@ def flush() -> None:  # pragma: no cover
     session.close()
 
     if hasattr(sys, 'last_type'):
+        log(sys.last_traceback)
         critical(f'Exiting due to uncaught exception {sys.last_type}')
 
     log('Network session closed.')
