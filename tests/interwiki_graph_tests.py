@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Test Interwiki Graph functionality."""
 #
 # (C) Pywikibot team, 2015-2022

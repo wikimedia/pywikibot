@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """
 The bot is meant to mark the edits based on info obtained by whitelist.
 

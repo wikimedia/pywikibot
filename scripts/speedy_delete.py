@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """
 Help sysops to quickly check and/or delete pages listed for speedy deletion.
 

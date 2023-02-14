@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Test cases for the SPARQL API."""
 #
 # (C) Pywikibot team, 2016-2022

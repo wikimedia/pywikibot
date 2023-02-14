@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Tests against a fake Site object."""
 #
 # (C) Pywikibot team, 2012-2022

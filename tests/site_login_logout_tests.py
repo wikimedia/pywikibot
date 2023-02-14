@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Test for login and logout methods.
 
 These tests are separated from others because they should not be runned

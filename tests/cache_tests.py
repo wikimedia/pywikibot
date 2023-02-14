@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """API Request cache tests."""
 #
 # (C) Pywikibot team, 2012-2023

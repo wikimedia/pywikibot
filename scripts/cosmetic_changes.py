@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """
 This module can do slight modifications to tidy a wiki page's source code.
 

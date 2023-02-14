@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Delink removed files from wiki.
 
 This script keeps track of image deletions and delinks removed files

@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 r"""
 A generic bot to do data ingestion (batch uploading) of photos or other files.
 

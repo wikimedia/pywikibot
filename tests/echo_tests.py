@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Test echo module."""
 #
 # (C) Pywikibot team, 2019-2022

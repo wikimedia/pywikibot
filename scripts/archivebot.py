@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """archivebot.py - discussion page archiving bot.
 
 usage:

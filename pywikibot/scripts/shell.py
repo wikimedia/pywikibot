@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """
 Spawns an interactive Python shell and imports the pywikibot library.
 

@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Test add_text script."""
 #
 # (C) Pywikibot team, 2016-2022
