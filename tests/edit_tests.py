@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Tests for editing pages."""
 #
 # (C) Pywikibot team, 2015-2022

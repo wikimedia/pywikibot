@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Unit tests for data_ingestion.py script."""
 #
 # (C) Pywikibot team, 2012-2022

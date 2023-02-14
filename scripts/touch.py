@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """
 This bot goes over multiple pages of a wiki, and edits them without changes.
 

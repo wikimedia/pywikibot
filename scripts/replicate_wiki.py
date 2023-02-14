@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """
 This bot replicates pages in a wiki to a second wiki within one family.
 

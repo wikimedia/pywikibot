@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Tests for the Timestamp class."""
 #
 # (C) Pywikibot team, 2014-2023

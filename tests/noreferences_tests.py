@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Test noreferences bot module."""
 #
 # (C) Pywikibot team, 2018-2022

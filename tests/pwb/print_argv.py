@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Script that forms part of pwb_tests.
 
 .. versionadded:: 7.0

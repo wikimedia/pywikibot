@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Test pagegenerators module."""
 #
 # (C) Pywikibot team, 2009-2022

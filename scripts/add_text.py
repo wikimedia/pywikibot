@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 r"""
 Append text to the top or bottom of a page.
 

@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """upload.py script test."""
 #
 # (C) Pywikibot team, 2019-2022

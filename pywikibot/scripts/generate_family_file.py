@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """This script generates a family file from a given URL.
 
 This script must be invoked with the pwb wrapper script/code entry point.

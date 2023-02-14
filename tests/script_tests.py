@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Test that each script can be compiled and executed."""
 #
 # (C) Pywikibot team, 2014-2023

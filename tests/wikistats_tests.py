@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Test cases for the WikiStats dataset."""
 #
 # (C) Pywikibot team, 2014-2022

@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Test generate_family_file script."""
 #
 # (C) Pywikibot team, 2018-2022

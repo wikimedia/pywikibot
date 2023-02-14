@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Bot tests for input_choice options."""
 #
 # (C) Pywikibot team, 2015-2022

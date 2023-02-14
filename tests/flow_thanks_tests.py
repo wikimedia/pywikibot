@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Tests for thanks-related code."""
 #
 # (C) Pywikibot team, 2016-2023

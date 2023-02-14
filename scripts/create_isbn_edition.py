@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 r"""Pywikibot script to load ISBN related data into Wikidata.
 
 Pywikibot script to get ISBN data from a digital library,

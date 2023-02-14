@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Script that preloads site and user info for all sites of given family.
 
 The following parameters are supported:

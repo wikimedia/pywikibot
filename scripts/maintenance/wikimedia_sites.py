@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Script that updates the language lists in Wikimedia family files.
 
 Usage:

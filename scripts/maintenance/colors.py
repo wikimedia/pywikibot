@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Utility to show pywikibot colors."""
 #
 # (C) Pywikibot team, 2016-2022

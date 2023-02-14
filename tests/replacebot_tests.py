@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Tests for the replace script and ReplaceRobot class."""
 #
 # (C) Pywikibot team, 2015-2022
