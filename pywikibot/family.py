@@ -340,7 +340,7 @@ class Family:
             if not all(x in CODE_CHARACTERS for x in code):
                 warnings.warn(
                     'Family {} code {} must be ASCII lowercase letters and '
-                    ' digits [a-z0-9] or underscore/dash [_-]'
+                    'digits [a-z0-9] or underscore/dash [_-]'
                     .format(cls.name, code),
                     FamilyMaintenanceWarning,
                     stacklevel=2,
