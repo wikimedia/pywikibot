@@ -1,7 +1,7 @@
 throttle.ctrl
-pywikibot.lwp
 user-*.py
 *.bak
+*.lwp
 *.pyc
 *.pyo
 *.*~
