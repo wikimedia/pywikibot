@@ -342,7 +342,7 @@ class WikibaseEntity:
                     for ref_grp_idx, ref_grp in enumerate(updated_references):
                         for ref_propid, reference in ref_grp['snaks'].items():
                             for ref_index, ref_stat in enumerate(reference):
-                                target_ref_grp = claim.references[ref_grp_idx]
+                                target_ref_grp = claim.sources[ref_grp_idx]
                                 target_ref_prop = target_ref_grp[ref_propid]
                                 target_ref = target_ref_prop[ref_index]
                                 target_ref.hash = ref_stat['hash']
