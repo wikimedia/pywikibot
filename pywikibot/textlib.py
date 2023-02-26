@@ -1214,7 +1214,8 @@ def replaceLanguageLinks(oldtext: str,
             if re.match(fr'\s*{marker}', lastpart):
                 # Put the langlinks back into the noinclude's
                 regexp = re.compile(fr'{includeOff}\s*{marker}')
-                newtext = regexp.sub(s + includeOff, s2)
+                # replace via lambda due to T330021
+                newtext = regexp.sub(lambda m: s + includeOff, s2)
             else:
                 # Put the langlinks at the end, inside noinclude's
                 newtext = (s2.replace(marker, '').strip()
