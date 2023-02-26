@@ -83,10 +83,10 @@ __all__ = (
     'exception', 'FilePage', 'handle_args', 'html2unicode', 'info', 'input',
     'input_choice', 'input_yn', 'ItemPage', 'LexemeForm', 'LexemePage',
     'LexemeSense', 'Link', 'log', 'MediaInfo', 'output', 'Page',
-    'PropertyPage', 'showDiff', 'show_help', 'Site', 'SiteLink', 'sleep',
-    'stdout', 'stopme', 'Timestamp', 'translate', 'ui', 'url2unicode',
-    'User', 'warning', 'WbGeoShape', 'WbMonolingualText', 'WbQuantity',
-    'WbTabularData', 'WbTime', 'WbUnknown', 'WikidataBot',
+    'page_put_queue', 'PropertyPage', 'showDiff', 'show_help', 'Site',
+    'SiteLink', 'sleep', 'stdout', 'stopme', 'Timestamp', 'translate', 'ui',
+    'url2unicode', 'User', 'warning', 'WbGeoShape', 'WbMonolingualText',
+    'WbQuantity', 'WbTabularData', 'WbTime', 'WbUnknown', 'WikidataBot',
 )
 
 # argvu is set by pywikibot.bot when it's imported
@@ -1384,7 +1384,7 @@ def sleep(secs: int) -> None:
     """Suspend execution of the current thread for the given number of seconds.
 
     Drop this process from the throttle log if wait time is greater than
-    30 seconds.
+    30 seconds by calling :func:`stopme`.
     """
     if secs >= 30:
         stopme()
@@ -1392,23 +1392,29 @@ def sleep(secs: int) -> None:
 
 
 def stopme() -> None:
-    """
-    Drop this process from the throttle log, after pending threads finish.
+    """Drop this process from the throttle log, after pending threads finish.
 
-    Can be called manually if desired. Does not clean async_manager.
-    This should be run when a bot does not interact with the Wiki, or
-    when it has stopped doing so. After a bot has run stopme() it will
-    not slow down other bots any more.
+    Can be called manually if desired but usually it is not necessary.
+    Does not clean :func:`async_manager`. This should be run when a bot
+    does not interact with the Wiki, or when it has stopped doing so.
+    After a bot has run ``stopme()`` it will not slow down other bots
+    instances any more.
+
+    ``stopme()`` is called with :func:`sleep` function during long
+    delays and with :meth:`bot.BaseBot.exit` to wait for pending write
+    threads.
     """
     _flush(False)
 
 
 def _flush(stop: bool = True) -> None:
-    """
-    Drop this process from the throttle log, after pending threads finish.
+    """Drop this process from the throttle log, after pending threads finish.
 
-    Wait for the page-putter to flush its queue. Also drop this process from
-    the throttle log. Called automatically at Python exit.
+    Wait for the page-putter to flush its queue. Also drop this process
+    from the throttle log. Called automatically at Python exit.
+
+    :param stop: Also clear :func:`async_manager`s put queue. This is
+        only done at exit time.
     """
     debug('_flush() called')
 
@@ -1465,7 +1471,12 @@ def _flush(stop: bool = True) -> None:
 
 # Create a separate thread for asynchronous page saves (and other requests)
 def async_manager(block=True) -> None:
-    """Daemon; take requests from the queue and execute them in background."""
+    """Daemon to take requests from the queue and execute them in background.
+
+    :param block: If true, block :attr:`page_put_queue` if necessary
+        until a request is available to process. Otherwise process a
+        request if one is immediately available, else leave the function.
+    """
     while True:
         if not block and page_put_queue.empty():
             break
@@ -1486,8 +1497,9 @@ def async_request(request: Callable, *args: Any, **kwargs: Any) -> None:
     page_put_queue.put((request, args, kwargs))
 
 
-# queue to hold pending requests
+#: Queue to hold pending requests
 page_put_queue: Queue = Queue(_config.max_queue_size)
+
 # queue to signal that async_manager is working on a request. See T147178.
 page_put_queue_busy: Queue = Queue(_config.max_queue_size)
 # set up the background thread
