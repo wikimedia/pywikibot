@@ -34,6 +34,7 @@ import atexit
 import codecs
 import re
 import sys
+import traceback
 from contextlib import suppress
 from http import HTTPStatus, cookiejar
 from string import Formatter
@@ -115,7 +116,19 @@ def flush() -> None:  # pragma: no cover
     session.close()
 
     if hasattr(sys, 'last_type'):
-        critical(f'Exiting due to uncaught exception {sys.last_type}')
+        log(
+            ''.join(
+                traceback.format_exception(
+                    sys.last_type,
+                    value=sys.last_value,
+                    tb=sys.last_traceback
+                )
+            )
+        )
+        critical(
+            f'Exiting due to uncaught exception {sys.last_type.__name__}: '
+            f'{sys.last_value}'
+        )
 
     log('Network session closed.')
 
