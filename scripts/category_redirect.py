@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """This bot will move pages out of redirected categories.
 
 The bot will look for categories that are marked with a category redirect

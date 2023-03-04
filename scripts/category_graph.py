@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 r"""Visualizes category hierarchy.
 
 Generates graphical representation in formats dot, svg and html5

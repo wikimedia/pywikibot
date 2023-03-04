@@ -6,7 +6,7 @@ This module includes objects:
 * FileInfo: a structure holding imageinfo of latest revision of FilePage
 """
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -189,7 +189,7 @@ class FilePage(Page):
         >>> file = pywikibot.FilePage(site, 'Pywikibot MW gear icon.svg')
         >>> used = list(file.using_pages(total=10))
         >>> len(used)
-        1
+        2
         >>> used[0].title()
         'Pywikibot'
 

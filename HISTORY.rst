@@ -1,6 +1,99 @@
 Release history
 ===============
 
+8.0.0
+-----
+*21 January 2023*
+
+Improvements
+^^^^^^^^^^^^
+
+* Allow copying timezone from timestamp in :class:`pywikibot.WbTime` (:phab:`T325864`)
+* Support federated Wikibase (:phab:`T173195`)
+* Improve warning if a Non-JSON response was received from server (:phab:`T326046`)
+* Allow normalization of :class:`pywikibot.WbTime` objects (:phab:`T123888`)
+* Add parser for ``<pages />`` tag to :mod:`proofreadpage`
+* ``addOnly`` parameter of :func:`textlib.replaceLanguageLinks` and :func:`textlib.replaceCategoryLinks`
+  were renamed to ``add_only``
+* ``known_codes`` attribute was added to :class:`family.WikimediaFamily` (:phab:`T325426`)
+* Unify representation for :class:`time.Timestamp` between  CPython and Pypy (:phab:`T325905`)
+* Implement comparison for :class:`pywikibot.WbTime` object (:phab:`T148280`, :phab:`T325863`)
+* Create a cookie file for each account (:phab:`T324000`)
+* Move data.api._login.LoginManager to :class:`login.ClientLoginManager`
+* Let user the choice which section to be copied with :mod:`generate_user_files
+  <pywikibot.scripts.generate_user_files>` (:phab:`T145372`)
+* use :func:`roundrobin_generators<tools.itertools.roundrobin_generators>` to combine generators
+  when limit option is given
+* Ignore OSError if API cache cannot be written
+* Update tools._unidata._category_cf from Unicodedata version 15.0.0
+* :meth:`Timestamp.set_timestamp()<pywikibot.time.Timestamp.set_timestamp>` raises TypeError
+  instead of ValueError if conversion fails
+* Python 3.12 is supported
+* All parameters of :meth:`APISite.categorymembers()
+  <pywikibot.site._generators.GeneratorsMixin.categorymembers>` are provided with
+  :meth:`Category.members()<page.Category.members>`,
+  :meth:`Category.subcategories()<page.Category.subcategories>` (*member_type* excluded) and
+  :meth:`Category.articles()<page.Category.articles>` (*member_type* excluded)
+* Enable site-package installation from git repository (:phab:`T320851`)
+* Enable 2FA login (:phab:`T186274`)
+* :meth:`Page.editTime()<page.BasePage.editTime>` was replaced by
+  :attr:`Page.latest_revision.timestamp<page.BasePage.latest_revision>`
+* Raise a generic ServerError if requests response is a ServerError (:phab:`T320590`)
+* Add a new variable 'private_folder_permission' to config.py (:phab:`T315045`)
+* L10N and i18n updates
+* Adjust subprocess args in :mod:`tools.djvu`
+* Short site value can be given if site code is equal to family like ``-site:meta`` or ``-site:commons``
+
+Documentation improvements
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Add highlighting to targeted code snippet within documentation (:phab:`T323800`)
+* Add previous, next, index, and modules links to documentation sidebar (:phab:`T323803`)
+* Introduce standard colors (legacy palette) in Furo theme (:phab:`T323802`)
+* Improve basic content structure and navigation of documentation (:phab:`T323812`)
+* Use ``Furo`` sphinx theme instead of ``Natural`` and improve documentation look and feel (:phab:`T322212`)
+* MediaWiki API cross reference was added to the documentation
+
+Bugfixes
+^^^^^^^^
+
+* Fix representation string for :class:`page.Claim` stub instances (:phab:`T326453`)
+* Don't raise StopIteration in :meth:`login.LoginManager.check_user_exists`
+  if given user is behind the last user (:phab:`T326063`)
+* Normalize :class:`WbTimes<pywikibot.WbTime>` sent to Wikidata (:phab:`T325860`)
+* Fix :class:`pywikibot.WbTime` precision (:phab:`T324798`)
+* Unquote title for red-links in class:`proofreadpage.IndexPage`
+* Find month with first letter uppercase or lowercase with :class:`textlib.TimeStripper` (:phab:`T324310`)
+* Fix disolving script_paths for site-package (:phab:`T320530`)
+* Respect limit argument with Board.topics() (:phab:`T138215`, :phab:`T138307`)
+
+Breaking changes
+^^^^^^^^^^^^^^^^
+
+* ``mwparserfromhell`` package is mandatory (:phab:`T326498`)
+* Several package dependencies were updated
+* All parameters of :meth:`Category.members()<page.Category.members>`,
+  :meth:`Category.subcategories()<page.Category.subcategories>` and
+  :meth:`Category.articles()<page.Category.articles>` are keyword only
+* The ``parent_id`` and ``content_model`` attributes of :class:`page.Revision` were removed in favour
+  of ``parentid`` and ``contentmodel``
+* Support for MediaWiki < 1.27 was dropped
+* ListBoxWindows class of :mod:`userinterfaces.gui` was removed
+* Require Python 3.6.1+ with Pywikibot and drop support for Python 3.6.0 (:phab:`T318912`)
+* pymysql >= 0.9.3 is required (:phab:`T216741`)
+* Python 3.5 support was dropped (:phab:`T301908`)
+* *See also Code cleanups below*
+
+Code cleanups
+^^^^^^^^^^^^^
+
+* ``maintenance/sorting_order`` script was removed (:phab:`T325426`)
+* ``alphabetic_sv`` and ``interwiki_putfirst`` attributes of
+  :class:`Wiktionary<families.wiktionary_family.Family>` family were removed (:phab:`T325426`)
+* ``alphabetic``, ``alphabetic_revised`` and ``fyinterwiki`` attributes of :class:`family.Family`
+  were removed (:phab:`T325426`)
+
+
 7.7.3
 -----
 *08 January 2023*

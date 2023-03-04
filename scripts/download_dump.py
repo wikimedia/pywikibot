@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """
 This bot downloads dump from dumps.wikimedia.org.
 
@@ -91,7 +91,7 @@ class DownloadDumpBot(Bot, ConfigParserBot):
         file_current_storepath = os.path.join(
             self.opt.storepath, temp_filename)
 
-        # https://wikitech.wikimedia.org/wiki/Help:Toolforge#Dumps
+        # https://wikitech.wikimedia.org/wiki/Help:Toolforge/Dumps
         toolforge_dump_filepath = self.get_dump_name(
             self.opt.wikiname, self.opt.filename, self.opt.dumpdate)
 

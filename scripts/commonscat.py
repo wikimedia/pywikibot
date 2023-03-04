@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """
 With this tool you can add the template {{commonscat}} to categories.
 

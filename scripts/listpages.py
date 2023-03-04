@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 r"""
 Print a list of pages, as defined by page generator parameters.
 

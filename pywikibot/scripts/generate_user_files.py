@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Script to create user-config.py. Other file names are not supported.
 
 .. versionchanged:: 7.0

@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Test confirming paraminfo contains expected values."""
 #
 # (C) Pywikibot team, 2015-2023

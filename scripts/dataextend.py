@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Script to add properties, identifiers and sources to WikiBase items.
 
 Usage:

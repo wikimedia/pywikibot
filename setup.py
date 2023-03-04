@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Installer script for Pywikibot framework.
 
 **How to create a new distribution:**

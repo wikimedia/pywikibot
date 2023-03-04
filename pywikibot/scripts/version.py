@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Script to determine the Pywikibot version (tag, revision and date).
 
 .. versionchanged:: 7.0

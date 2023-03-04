@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Tests for the site module."""
 #
 # (C) Pywikibot team, 2018-2022

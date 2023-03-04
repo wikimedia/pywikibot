@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Test generate_user_files script."""
 #
 # (C) Pywikibot team, 2018-2023

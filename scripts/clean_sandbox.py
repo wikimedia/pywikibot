@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """
 This bot resets a (user) sandbox with predefined text.
 
@@ -23,7 +23,7 @@ Furthermore, the following command line parameters are supported:
     -textfile      As an alternative to -text, you can use this to provide
                    a file containing the text to be used.
 
-    -summary       Summary of the edit made by bot. Overrides the default
+    -summary       Summary of the edit made by the bot. Overrides the default
                    from i18n.
 
 This script is a :py:obj:`ConfigParserBot <bot.ConfigParserBot>`.
@@ -59,26 +59,54 @@ from pywikibot.exceptions import EditConflictError, NoPageError
 
 content = {
     'commons': '{{Sandbox}}\n<!-- Please edit only below this line. -->',
-    'meta': '{{Meta:Sandbox/Please do not edit this line}}'
-            '<!--Please edit below this line.-->',
+    'meta': '{{Meta:Sandbox/Please do not edit this line}}\n'
+            '<!-- Please edit below this line. -->',
+    'species': '{{Sandbox}}\n'
+               '<!-- PLEASE ADD YOUR EDITS BELOW THIS LINE. THANK YOU. -->',
     'test': '<noinclude>{{Sandbox}}</noinclude>\n'
             '== Please start your testing below this line ==',
     'wikidata': '{{Please leave this line alone (sandbox heading)}}',
     'wikibooks': {
+        'es': '{{subst:ZDP/2}}',
         'ru': '{{/Шапка}}\n'
               '<!-- Не удаляйте, пожалуйста, эту строку, '
               'тестируйте ниже -->',
     },
-    'wikivoyage': {
+    'wikinews': {
+        'es': '{{ZDP}}\n== Haz tus pruebas bajo esta sección  ==',
+    },
+    'wikiquote': {
+        'es': '{{ZDP}}\n== Haz tus pruebas bajo esta sección  ==',
+    },
+    'wikisource': {
         'es': '<!--No borres este mensaje-->'
               '{{Zona de pruebas}}'
-              '<!--Haz las pruebas debajo. Gracias-->\n\n'
-              '== Las pruebas en esta sección ==\n',
+              '<!--Haz las pruebas debajo. Gracias-->\n',
+    },
+    'wikiversity': {
+        'es': '{{/encabezado}}\n'
+              '== Haz tus pruebas bajo esta sección  ==',
+    },
+    'wikivoyage': {
+        'es': '<!--No borres este mensaje-->{{Zona de pruebas}}'
+              '<!--Haz las pruebas debajo. Gracias-->\n'
+              '== Haz tus pruebas bajo esta sección ==',
+    },
+    'wiktionary': {
+        'es': '<!--No borres este mensaje-->{{Titular-zdp}}'
+              '<!--Haz las pruebas debajo. Gracias-->',
     },
     'als': '{{subst:/Vorlage}}',
     'ar': '{{عنوان الملعب}}\n<!-- مرحبا! خذ راحتك في تجربة مهارتك في التنسيق '
           'والتحرير أسفل هذا السطر. هذه الصفحة لتجارب التعديل ، سيتم تفريغ '
           'هذه الصفحة كل 12 ساعة. -->',
+    'ary': '{{راس تيران}}<!--'
+           '\n*               مرحبا بيك ف تّيران د رّملة!              *'
+           '\n*            عافاك خلي هاد لپارتية ف بلاصتها            *'
+           '\n*        هاد لپاج كيتّمحا لمحتوى ديالها بشكل معاود      *'
+           '\n*    تريني هنا ؤ تعلم معا راسك كيفاش تكتب ف ويكيپيديا  *'
+           '\n■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■-->'
+           '\n\n[[تصنيف:معاونة ف لكتابة علا ويكيپيديا]]',
     'arz': '{{عنوان السبوره}}\n<!-- مرحبا! خد راحتك فى تجريب مهاراتك فى'
            'التحرير تحت الخط ده. بما إن الصفحه دى لتجارب التعديل، فالصفحه دى '
            'حيتم تنضيفها اوتوماتيكيا كل 12 ساعه. -->',
@@ -97,6 +125,9 @@ content = {
           'and editing skills below this line. As this page is for editing '
           'experiments, this page will automatically be cleaned every 12 '
           'hours. -->',
+    'es': '<!--No borres este mensaje-->{{Titular-zdp}}'
+          '<!--Haz las pruebas debajo. Gracias-->\n'
+          '== Las pruebas en esta sección ==\n',
     'eo': '{{Bonvolu ne forigi tiun ĉi linion (Provejo)}}',
     'fa': '{{subst:Wikipedia:ربات/sandbox}}',
     'fi': '{{subst:Hiekka}}',

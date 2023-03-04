@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """API tests which do not interact with a site."""
 #
 # (C) Pywikibot team, 2012-2023

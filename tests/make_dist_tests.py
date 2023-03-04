@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Tests for fixes module."""
 #
 # (C) Pywikibot team, 2022-2023

@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """
 This bot goes over multiple pages of a wiki, and edits them without changes.
 
@@ -124,12 +124,9 @@ class PurgeBot(MultipleSitesBot):
 
                 pywikibot.info('{} pages{} purged'
                                .format(length, '' if done else ' not'))
-                if not flush:
-                    delay = 60 + 2
-                    if delay:
-                        pywikibot.info(
-                            f'Waiting {delay} seconds due to purge rate limit')
-                        pywikibot.sleep(0 if config.simulate else delay)
+                if not flush and not config.simulate:
+                    pywikibot.info('Waiting due to purge rate limit')
+                    pywikibot.sleep(62)
 
 
 def main(*args: str) -> None:
@@ -160,6 +157,7 @@ def main(*args: str) -> None:
 
     if not pywikibot.bot.suggest_help(missing_generator=not gen_factory.gens,
                                       unknown_parameters=unknown):
+        pywikibot.Site().login()
         gen = gen_factory.getCombinedGenerator(preload=bot_class == TouchBot)
         bot_class(generator=gen, **options).run()
 

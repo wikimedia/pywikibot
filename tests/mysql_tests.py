@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Tests for mysql module."""
 #
 # (C) Pywikibot team, 2022

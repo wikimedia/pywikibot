@@ -39,7 +39,7 @@ def get_toolforge_hostname() -> Optional[str]:
     :return: The hostname of the currently running host,
              if it is in Wikimedia Toolforge; otherwise return None.
     """
-    if socket.getfqdn().endswith('.tools.eqiad.wmflabs'):
+    if socket.getfqdn().endswith('.tools.eqiad1.wikimedia.cloud'):
         return socket.gethostname()
     return None
 

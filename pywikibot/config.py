@@ -679,7 +679,7 @@ interwiki_min_subjects = 100
 
 # If interwiki graphs are enabled, which format(s) should be used?
 # Supported formats include png, jpg, ps, and svg. See:
-# http://www.graphviz.org/doc/info/output.html
+# https://graphviz.org/docs/outputs/
 # If you want to also dump the dot files, you can use this in your
 # user config file:
 # interwiki_graph_formats = ['dot', 'png']
