@@ -1,6 +1,20 @@
 Scripts Changelog
 =================
 
+8.1.0
+-----
+
+clean_sandbox
+~~~~~~~~~~~~~
+
+* L10N for several wikis
+
+touch
+~~~~~
+
+* Login first when starting the script (:phab:`T328204`)
+
+
 8.0.0
 -----
 
