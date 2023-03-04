@@ -1,11 +1,7 @@
 Current release
 ---------------
 
-* Add support for azwikimedia, gucwiki, gurwiki (:phab:`T317121`, :phab:`T326238`, :phab:`T327844`)
-* Avoid error when replacement includes backslash (:phab:`T330021`)
-* Copy snak IDs/hashes when using :meth:`page.WikibaseEntity.editEntity` (:phab:`T327607`)
-* Add ``timezone_aware`` to :meth:`pywikibot.WbTime.toTimestamp` (:phab:`T325868`)
-* L10N and i18n updates
+* Improve flush exception logging
 
 
 Deprecations

@@ -109,9 +109,13 @@ session = requests.Session()
 session.cookies = cookie_jar
 
 
-# Prepare flush on quit
 def flush() -> None:  # pragma: no cover
-    """Close the session object. This is called when the module terminates."""
+    """Close the session object. This is called when the module terminates.
+
+    .. versionchanged:: 8.1
+       log the traceback and show the exception value in the critical
+       message
+    """
     log('Closing network session.')
     session.close()
 

@@ -297,6 +297,9 @@ class WikibaseEntity:
 
          .. seealso:: :meth:`WikibasePage.editEntity`
 
+         .. versionchanged:: 8.0.1
+            Copy snak IDs/hashes (:phab:`T327607`)
+
         :param data: Data to be saved
         """
         update_self = False

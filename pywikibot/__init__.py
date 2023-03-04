@@ -709,6 +709,9 @@ class WbTime(_WbRepresentation):
         """
         Convert the data to a pywikibot.Timestamp.
 
+        .. versionchanged:: 8.0.1
+           *timezone_aware* parameter was added.
+
         :param timezone_aware: Whether the timezone should be passed to
             the Timestamp object.
         :raises ValueError: instance value cannot be represented using
