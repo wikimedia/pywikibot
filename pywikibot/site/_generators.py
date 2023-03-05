@@ -2113,21 +2113,36 @@ class GeneratorsMixin:
     def watched_pages(
         self,
         force: bool = False,
-        total: Optional[int] = None
+        total: Optional[int] = None, *,
+        with_talkpage: bool = True
     ) -> Generator['pywikibot.Page', Any, None]:
         """Return watchlist.
 
         .. note:: ``watched_pages`` is a restartable generator. See
            :class:`tools.collections.GeneratorWrapper` for its usage.
         .. seealso:: :api:`Watchlistraw`
+        .. versionadded:: 8.1
+           the *with_talkpage* parameter.
 
         :param force: Reload watchlist
         :param total: if not None, limit the generator to yielding this many
             items in total
+        :param with_talkpage: if false, ignore talk pages and special
+            pages
         :return: generator of pages in watchlist
         """
+        def ignore_talkpages(page):
+            """Ignore talk pages and special pages."""
+            ns = page.namespace()
+            return ns >= 0 and not page.namespace() % 2
+
         expiry = None if force else pywikibot.config.API_config_expiry
         gen = api.PageGenerator(site=self, generator='watchlistraw',
                                 expiry=expiry)
         gen.set_maximum_items(total)
+
+        if not with_talkpage:
+            gen._namespaces = True
+            gen._check_result_namespace = ignore_talkpages
+
         return gen
