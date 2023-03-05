@@ -48,8 +48,8 @@ import pywikibot
 from pywikibot import config, tools
 from pywikibot.backports import Tuple
 from pywikibot.exceptions import (
+    Client414Error,
     FatalServerError,
-    Server414Error,
     Server504Error,
     ServerError,
 )
@@ -333,7 +333,7 @@ def error_handling_callback(response):
         raise response from None
 
     if response.status_code == HTTPStatus.REQUEST_URI_TOO_LONG:
-        raise Server414Error('Too long GET request')
+        raise Client414Error(HTTPStatus(response.status_code).description)
 
     if response.status_code == HTTPStatus.GATEWAY_TIMEOUT:
         raise Server504Error('Server {} timed out'

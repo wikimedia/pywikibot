@@ -25,11 +25,11 @@ from pywikibot import config
 from pywikibot.backports import Callable, Dict, Match, Tuple, removeprefix
 from pywikibot.comms import http
 from pywikibot.exceptions import (
+    Client414Error,
     Error,
     FatalServerError,
     MaxlagTimeoutError,
     NoUsernameError,
-    Server414Error,
     Server504Error,
     SiteDefinitionError,
     TimeoutError,
@@ -687,13 +687,13 @@ class Request(MutableMapping):
                                     data=data, headers=headers)
         except Server504Error:
             pywikibot.log('Caught HTTP 504 error; retrying')
-        except Server414Error:
+        except Client414Error:
             if use_get:
                 pywikibot.log('Caught HTTP 414 error; retrying')
                 use_get = False
             else:
-                pywikibot.warning('Caught HTTP 414 error, although not '
-                                  'using GET.')
+                pywikibot.warning(
+                    'Caught HTTP 414 error, although not using GET.')
                 raise
         except (ConnectionError, FatalServerError):
             # This error is not going to be fixed by just waiting
