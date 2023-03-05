@@ -2110,18 +2110,21 @@ class GeneratorsMixin:
         return self._generator(api.PageGenerator, type_arg='pageswithprop',
                                gpwppropname=propname, total=total)
 
-    def watched_pages(self, force: bool = False, total=None):
-        """
-        Return watchlist.
+    def watched_pages(
+        self,
+        force: bool = False,
+        total: Optional[int] = None
+    ) -> Generator['pywikibot.Page', Any, None]:
+        """Return watchlist.
 
+        .. note:: ``watched_pages`` is a restartable generator. See
+           :class:`tools.collections.GeneratorWrapper` for its usage.
         .. seealso:: :api:`Watchlistraw`
 
         :param force: Reload watchlist
         :param total: if not None, limit the generator to yielding this many
             items in total
-        :type total: int
-        :return: list of pages in watchlist
-        :rtype: list of pywikibot.Page objects
+        :return: generator of pages in watchlist
         """
         expiry = None if force else pywikibot.config.API_config_expiry
         gen = api.PageGenerator(site=self, generator='watchlistraw',
