@@ -1291,6 +1291,10 @@ class BasePage(ComparableMixin):
             if not quiet:
                 pywikibot.warning(f'Page {link} not saved')
             raise PageSaveRelatedError(self)
+
+        if not self.pageid:
+            self.site.loadpageinfo(self)
+
         if not quiet:
             pywikibot.info(f'Page {link} saved')
 
