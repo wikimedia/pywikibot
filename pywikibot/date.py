@@ -1,6 +1,6 @@
 """Date data and manipulation module."""
 #
-# (C) Pywikibot team, 2003-2022
+# (C) Pywikibot team, 2003-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -13,7 +13,6 @@ from functools import singledispatch
 from string import digits as _decimalDigits  # noqa: N812
 from typing import Optional, Union
 
-import pywikibot.site
 from pywikibot import Site
 from pywikibot.backports import (
     Any,
@@ -26,6 +25,7 @@ from pywikibot.backports import (
     Sequence,
     Tuple,
 )
+from pywikibot.site import BaseSite
 from pywikibot.textlib import NON_LATIN_DIGITS
 from pywikibot.tools import first_lower, first_upper
 
@@ -1970,7 +1970,7 @@ def getAutoFormat(lang: str, title: str, ignoreFirstLetterCase: bool = True
 
 
 def format_date(month: int, day: int,
-                lang: Union[None, str, 'pywikibot.site.BaseSite'] = None,
+                lang: Union[None, str, BaseSite] = None,
                 year: int = 2000) -> str:
     """Format a date localized to given lang.
 
