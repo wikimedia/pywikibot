@@ -1489,8 +1489,8 @@ class Claim(Property):
         cls_name = type(self).__name__
         if self.target:
             return f'{cls_name}.fromJSON({self.repo!r}, {self.toJSON()})'
-        else:
-            return f'{cls_name}({self.repo!r}, {self.id!r})'
+
+        return f'{cls_name}({self.repo!r}, {self.id!r})'
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
