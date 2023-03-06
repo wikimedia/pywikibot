@@ -601,8 +601,7 @@ class RequireLoginMixin(TestCaseBase):
 
     @classmethod
     def setUpClass(cls):
-        """
-        Set up the test class.
+        """Set up the test class.
 
         Skip the test class if the user config does not have
         a valid login to the site.
@@ -853,11 +852,15 @@ class MetaTestCaseClass(type):
             bases = cls.add_base(bases, SiteWriteMixin)
 
         if dct.get('rights'):
-            bases = cls.add_base(bases, NeedRightsMixin)
             dct.setdefault('login', True)
 
         if dct.get('login'):
             bases = cls.add_base(bases, RequireLoginMixin)
+
+        # Add NeedRightsMixin after RequireLoginMixin to ensure
+        # login is made prior to rights check
+        if dct.get('rights'):
+            bases = cls.add_base(bases, NeedRightsMixin)
 
         for test in tests:
             test_func = dct[test]
