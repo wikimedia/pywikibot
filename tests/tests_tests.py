@@ -58,19 +58,19 @@ class TestLengthAssertion(TestCase):
 
     @unittest.expectedFailure
     def test_assert_is_not_empty_fail(self):
-        """Test assertIsNotEmpty method."""
+        """Test that assertIsNotEmpty method may fail."""
         self.assertIsNotEmpty([])
         self.assertIsNotEmpty('')
 
     def test_assert_length(self):
-        """Test assertIsNotEmpty method."""
+        """Test assertLength method."""
         self.assertLength([], 0)
         self.assertLength(self.seq1, 3)
         self.assertLength(self.seq1, self.seq2)
 
     @unittest.expectedFailure
     def test_assert_length_fail(self):
-        """Test assertIsNotEmpty method."""
+        """Test that assertLength method is failing."""
         self.assertLength([], 1)
         self.assertLength(self.seq1, 0)
         self.assertLength(None, self.seq)
