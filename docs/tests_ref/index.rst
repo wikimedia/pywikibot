@@ -28,7 +28,6 @@ Tests in this project:
     bot<./bot_tests>
     cache<./cache_tests>
     category<./category_tests>
-    conftest
     cosmetic_changes<./cosmetic_changes_tests>
     date<./date_tests>
     diff<./diff_tests>

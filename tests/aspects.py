@@ -52,17 +52,6 @@ from tests.utils import (
 )
 
 
-try:
-    import pytest_httpbin
-    optional_pytest_httpbin_cls_decorator = (
-        pytest_httpbin.use_class_based_httpbin)
-except ImportError:
-    pytest_httpbin = None
-
-    def optional_pytest_httpbin_cls_decorator(f):
-        """Empty decorator in case pytest_httpbin is not installed."""
-        return f
-
 OSWIN32 = (sys.platform == 'win32')
 pywikibot.bot.set_interface('buffer')
 
@@ -473,20 +462,6 @@ class CheckHostnameMixin(TestCaseBase):
 
         if not hasattr(cls, 'sites'):
             return
-
-        if issubclass(cls, HttpbinTestCase):
-            # If test uses httpbin, then check is pytest test runner is used
-            # and pytest_httpbin module is installed.
-            httpbin_used = hasattr(sys,
-                                   '_test_runner_pytest') and pytest_httpbin
-        else:
-            httpbin_used = False
-
-        # If pytest_httpbin will be used during tests, then remove httpbin.org
-        # from sites.
-        if httpbin_used:
-            cls.sites = {k: v for k, v in cls.sites.items()
-                         if 'httpbin.org' not in v['hostname']}
 
         for key, data in cls.sites.items():
             if 'hostname' not in data:
@@ -1570,7 +1545,6 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
         super().tearDown()
 
 
-@optional_pytest_httpbin_cls_decorator
 class HttpbinTestCase(TestCase):
 
     """
@@ -1586,23 +1560,9 @@ class HttpbinTestCase(TestCase):
     }
 
     def get_httpbin_url(self, path=''):
-        """
-        Return url of httpbin.
-
-        If pytest is used, returns url of local httpbin server.
-        Otherwise, returns: http://httpbin.org
-        """
-        if hasattr(self, 'httpbin'):
-            return self.httpbin.url + path
+        """Return url of httpbin."""
         return 'http://httpbin.org' + path
 
     def get_httpbin_hostname(self):
-        """
-        Return httpbin hostname.
-
-        If pytest is used, returns hostname of local httpbin server.
-        Otherwise, returns: httpbin.org
-        """
-        if hasattr(self, 'httpbin'):
-            return f'{self.httpbin.host}:{self.httpbin.port}'
+        """Return httpbin hostname."""
         return 'httpbin.org'
