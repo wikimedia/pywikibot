@@ -8,13 +8,6 @@ pytest-timeout
 pytest-runner
 pytest-subtests >= 0.3.2
 pytest-attrib>=0.1.3
-# pytest-httpbin needs httpbin needs werkzeug >= 0.14.1
-# Python 3.8 needs werkzeug >= 0.15.5
-# httpbin 0.7 fails with werkzeug 2.1.0/1 (T305124)
-werkzeug>=0.14.1, <2.1.0; python_version<"3.8"
-werkzeug>=0.15.5, <2.1.0; python_version>="3.8"
-
-pytest-httpbin
 
 pydocstyle>=4.0.0
 flake8>=5.0.2
