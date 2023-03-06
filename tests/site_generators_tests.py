@@ -1027,18 +1027,18 @@ class TestUserRecentChanges(DefaultSiteTestCase):
     """Test recentchanges method requiring a user."""
 
     login = True
+    rights = 'patrol'
 
     def test_patrolled(self):
         """Test the site.recentchanges() with patrolled boolean flags."""
         mysite = self.site
         for change in mysite.recentchanges(patrolled=True, total=5):
             self.assertIsInstance(change, dict)
-            if mysite.has_right('patrol'):
-                self.assertIn('patrolled', change)
+            self.assertIn('patrolled', change)
+
         for change in mysite.recentchanges(patrolled=False, total=5):
             self.assertIsInstance(change, dict)
-            if mysite.has_right('patrol'):
-                self.assertNotIn('patrolled', change)
+            self.assertNotIn('patrolled', change)
 
 
 class TestUserWatchedPages(DefaultSiteTestCase):
@@ -1046,29 +1046,22 @@ class TestUserWatchedPages(DefaultSiteTestCase):
     """Test user watched pages."""
 
     login = True
+    rights = 'viewmywatchlist'
 
     def test_watched_pages(self):
         """Test the site.watched_pages() method."""
-        if not self.site.has_right('viewmywatchlist'):
-            self.skipTest('user {} cannot view its watch list'
-                          .format(self.site.user()))
-
         gen = self.site.watched_pages(total=5, force=False)
         self.assertIsInstance(gen.request, api.CachedRequest)
         for page in gen:
             self.assertIsInstance(page, pywikibot.Page)
-        # repeat to use the cache
-        gen = self.site.watched_pages(total=5, force=False)
+
+        gen.restart()  # repeat to use the cache
         self.assertIsInstance(gen.request, api.CachedRequest)
         for page in gen:
             self.assertIsInstance(page, pywikibot.Page)
 
     def test_watched_pages_uncached(self):
         """Test the site.watched_pages() method uncached."""
-        if not self.site.has_right('viewmywatchlist'):
-            self.skipTest('user {} cannot view its watch list'
-                          .format(self.site.user()))
-
         gen = self.site.watched_pages(total=5, force=True)
         self.assertIsInstance(gen.request, api.Request)
         self.assertFalse(issubclass(gen.request_class, api.CachedRequest))
@@ -1440,13 +1433,10 @@ class SiteWatchlistRevsTestCase(DefaultSiteTestCase):
     """Test site method watchlist_revs()."""
 
     login = True
+    rights = 'viewmywatchlist'
 
     def test_watchlist_revs(self):
         """Test the site.watchlist_revs() method."""
-        if not self.site.has_right('viewmywatchlist'):
-            self.skipTest('user {} cannot view its watch list'
-                          .format(self.site.user()))
-
         mysite = self.get_site()
         wl = list(mysite.watchlist_revs(total=10))
         self.assertLessEqual(len(wl), 10)
