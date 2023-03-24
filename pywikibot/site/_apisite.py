@@ -2371,7 +2371,6 @@ class APISite(
         'cantundelete': 'Could not undelete [[{title}]]. '
                         'Revision may not exist or was already undeleted.',
         'nodeleteablefile': 'No such old version of file',
-        'missingtitle': "[[{title}]] doesn't exist.",
     }  # other errors shouldn't occur because of pre-submission checks
 
     @need_right('delete')
@@ -2443,11 +2442,15 @@ class APISite(
         try:
             req.submit()
         except APIError as err:
+            if err.code == 'missingtitle':
+                raise NoPageError(page) from None
+
             errdata = {
                 'site': self,
                 'title': title,
                 'user': self.user(),
             }
+
             if err.code in self._dl_errors:
                 raise Error(
                     self._dl_errors[err.code].format_map(errdata)
