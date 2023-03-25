@@ -36,7 +36,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'ku', 'lt', 'ca', 'it', 'hu', 'fi', 'ta', 'tr', 'ja', 'io', 'hy', 'ko',
         'pt', 'kn', 'vi', 'sr', 'th', 'hi', 'ro', 'no', 'id', 'et', 'cs', 'ml',
         'skr', 'my', 'uz', 'li', 'or', 'eo', 'te', 'fa', 'gl', 'ar', 'oc',
-        'jv', 'az', 'uk', 'eu', 'sg', 'ast', 'is', 'br', 'bn', 'da', 'mnw',
+        'jv', 'az', 'uk', 'eu', 'sg', 'is', 'ast', 'br', 'bn', 'da', 'mnw',
         'lo', 'simple', 'la', 'hr', 'sk', 'fj', 'shn', 'ky', 'wa', 'bg', 'tg',
         'ur', 'ps', 'cy', 'lmo', 'he', 'vo', 'om', 'sl', 'af', 'zh-min-nan',
         'scn', 'tl', 'ms', 'pa', 'fy', 'sw', 'nn', 'ka', 'min', 'lv', 'sq',
@@ -44,7 +44,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'km', 'vec', 'be', 'diq', 'tk', 'mk', 'nia', 'sm', 'hsb', 'ks', 'shy',
         'su', 'gd', 'bcl', 'ga', 'an', 'gom', 'mr', 'wo', 'mni', 'bjn', 'ia',
         'ang', 'mt', 'fo', 'sd', 'tt', 'gn', 'so', 'ie', 'mi', 'csb', 'ug',
-        'si', 'ha', 'guw', 'st', 'hif', 'roa-rup', 'jbo', 'kl', 'zu', 'ay',
+        'ha', 'si', 'guw', 'st', 'hif', 'roa-rup', 'jbo', 'kl', 'zu', 'ay',
         'yi', 'ln', 'gu', 'na', 'gv', 'kw', 'tpi', 'am', 'ne', 'rw', 'ts',
         'ig', 'qu', 'ss', 'iu', 'chr', 'dv', 'ti', 'tn',
     ]
