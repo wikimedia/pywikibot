@@ -67,7 +67,7 @@ content = {
             '== Please start your testing below this line ==',
     'wikidata': '{{Please leave this line alone (sandbox heading)}}',
     'wikibooks': {
-        'es': '{{subst:ZDP/2}}',
+        'es': '{{ZDP}}\n== Haz tus pruebas bajo esta sección  ==',
         'ru': '{{/Шапка}}\n'
               '<!-- Не удаляйте, пожалуйста, эту строку, '
               'тестируйте ниже -->',
