@@ -1,12 +1,18 @@
 Current release
 ---------------
 
+* :exc:`exceptions.ClientError` was added
+* Raise :exc:`exceptions.NoPageError` when deleting a missing Page (:phab:`T332924`)
+* ``text`` parameter of :class:`proofreadpage.PagesTagParser` has a default value
+* Ignore talk pages with :meth:`APISite.watched_pages()<pywikibot.site._generators.GeneratorsMixin.watched_pages>` (:phab:`T330806`)
+* Load page info when creating a page if not updated previously (:phab:`T330980`)
 * Improve flush exception logging
 
 
 Deprecations
 ------------
 
+* 8.1.0: ``exceptions.Server414Error`` is deprecated in favour of :exc:`exceptions.Client414Error`
 * 8.0.0: :meth:`Timestamp.clone()<pywikibot.time.Timestamp.clone>` method is deprecated
   in favour of ``Timestamp.replace()`` method.
 * 8.0.0: :meth:`family.Family.maximum_GET_length` method is deprecated in favour of

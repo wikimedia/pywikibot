@@ -273,6 +273,8 @@ class PagesTagParser(collections.abc.Container):
     False
 
     .. versionadded:: 8.0
+    .. versionchanged:: 8.1
+       *text* parameter is defaulted to ``'<pages />'``.
     """
 
     pat_tag = re.compile(r'<pages (?P<attrs>[^/]*?)/>')

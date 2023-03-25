@@ -2401,6 +2401,9 @@ class APISite(
         .. versionchanged:: 7.1
            keyword only parameter `deletetalk` was added.
 
+        .. versionchanged:: 8.1
+           raises :exc:`exceptions.NoPageError` if page does not exist.
+
         :param page: Page to be deleted or its pageid.
         :param reason: Deletion reason.
         :param deletetalk: Also delete the talk page, if it exists.
