@@ -1,6 +1,14 @@
 Scripts Changelog
 =================
 
+8.0.2
+-----
+
+clean_sandbox
+~~~~~~~~~~~~~
+
+* L10N es-wikis
+
 8.0.1
 -----
 

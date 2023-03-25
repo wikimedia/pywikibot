@@ -1,6 +1,13 @@
 Release history
 ===============
 
+8.0.2
+-----
+*25 March 2023*
+
+* Add support for anpwiki (:phab:`T332115`)
+
+
 8.0.1
 -----
 *04 March 2023*
