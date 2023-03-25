@@ -2318,36 +2318,38 @@ class TestOwnClient(TestCase):
         'wikidata': {
             'family': 'wikidata',
             'code': 'wikidata',
-            'title': 'Wikidata:Main Page',
+            'item': 'Q32119',
         },
         # test.wikidata is also
         'wikidatatest': {
             'family': 'wikidata',
             'code': 'test',
-            'title': r'Page \[\[(wikidata\:)?test\:Q5296\]\] '
-                     r'is a redirect page\.'
+            'item': 'Q33',
         },
     }
 
     def test_own_client(self, key):
         """Test that a data repository family can be its own client."""
         site = self.get_site(key)
-
-        page = pywikibot.Page(site, 'Wikidata:Main Page')
+        page = self.get_mainpage(site)
         item = ItemPage.fromPage(page)
+        self.assertEqual(page.site, site)
         self.assertEqual(item.site, site)
 
     def test_page_from_repository(self, key):
         """Test that page_from_repository method works for wikibase too."""
         site = self.get_site(key)
-        try:
-            page = site.page_from_repository('Q5296')
-        except IsRedirectPageError:
-            with self.assertRaisesRegex(IsRedirectPageError,
-                                        self.sites[key]['title']):
-                raise
-        else:
-            self.assertEqual(page.title(), self.sites[key]['title'])
+        page = site.page_from_repository('Q5296')
+        self.assertEqual(page, self.get_mainpage(site))
+
+    def test_redirect_from_repository(self, key):
+        """Test page_from_repository method with redirects."""
+        site = self.get_site(key)
+        item = self.sites[key]['item']
+        with self.assertRaisesRegex(
+            IsRedirectPageError,
+                fr'{self.sites[key]["item"]}\]\] is a redirect'):
+            site.page_from_repository(item)
 
 
 class TestUnconnectedClient(TestCase):
