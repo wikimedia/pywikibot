@@ -1,6 +1,13 @@
 Release history
 ===============
 
+8.0.3
+-----
+*29 March 2023*
+
+* Add support for ckb-wiktionary (:phab:`T332093`)
+
+
 8.0.2
 -----
 *25 March 2023*
