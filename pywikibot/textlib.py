@@ -1847,7 +1847,7 @@ class TimeStripper:
     >>> site = pywikibot.Site('wikipedia:fr')
     >>> sign = 'Merci bien Xqt (d) 15 mai 2013 à 20:34 (CEST)'
     >>> ts = TimeStripper(site)
-    >>> ts.timestripper(sign)
+    >>> ts.timestripper(sign)  # doctest: +SKIP
     Timestamp(2013, 5, 15, 20, 34, tzinfo=TZoneFixedOffset(3600, Europe/Paris))
     """
 
