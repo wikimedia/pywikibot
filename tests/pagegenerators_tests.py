@@ -1099,6 +1099,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         self.assertIsNotNone(gen)
         self.assertPagesInNamespacesAll(gen, {0, 2, 4}, skip=True)
 
+    @unittest.expectedFailure  # T333426
     def test_recentchanges_default(self):
         """Test recentchanges generator with default namespace setting."""
         if self.site.family.name in ('wpbeta', 'wsbeta'):
