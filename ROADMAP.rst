@@ -1,7 +1,7 @@
 Current release
 ---------------
 
-* Add support for anpwiki (:phab:`T332115`)
+* Add support for ckb-wiktionary (:phab:`T332093`)
 
 
 Deprecations

@@ -39,14 +39,14 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'jv', 'az', 'uk', 'eu', 'sg', 'is', 'ast', 'br', 'bn', 'da', 'mnw',
         'lo', 'simple', 'la', 'hr', 'sk', 'fj', 'shn', 'ky', 'wa', 'bg', 'tg',
         'ur', 'ps', 'cy', 'lmo', 'he', 'vo', 'om', 'sl', 'af', 'zh-min-nan',
-        'scn', 'tl', 'ms', 'pa', 'fy', 'sw', 'nn', 'ka', 'min', 'lv', 'sq',
-        'nds', 'lb', 'gor', 'co', 'mn', 'pnb', 'bs', 'nah', 'yue', 'sa', 'kk',
+        'scn', 'ms', 'tl', 'pa', 'fy', 'sw', 'nn', 'ka', 'min', 'lv', 'sq',
+        'nds', 'gor', 'lb', 'co', 'mn', 'pnb', 'bs', 'nah', 'yue', 'sa', 'kk',
         'km', 'vec', 'be', 'diq', 'tk', 'mk', 'nia', 'sm', 'hsb', 'ks', 'shy',
         'su', 'gd', 'bcl', 'ga', 'an', 'gom', 'mr', 'wo', 'mni', 'bjn', 'ia',
-        'ang', 'mt', 'fo', 'sd', 'tt', 'gn', 'so', 'ie', 'mi', 'csb', 'ug',
-        'ha', 'si', 'guw', 'st', 'hif', 'roa-rup', 'jbo', 'kl', 'zu', 'ay',
+        'ang', 'mt', 'fo', 'sd', 'tt', 'gn', 'so', 'ie', 'mi', 'csb', 'ha',
+        'ug', 'si', 'guw', 'st', 'hif', 'roa-rup', 'jbo', 'kl', 'zu', 'ay',
         'yi', 'ln', 'gu', 'na', 'gv', 'kw', 'tpi', 'am', 'ne', 'rw', 'ts',
-        'ig', 'qu', 'ss', 'iu', 'chr', 'dv', 'ti', 'tn',
+        'ig', 'qu', 'ss', 'iu', 'chr', 'dv', 'ti', 'tn', 'ckb',
     ]
 
     category_redirect_templates = {
