@@ -316,29 +316,29 @@ class DiscussionPage(pywikibot.Page):
     def __init__(self, source, archiver, params=None, keep=False) -> None:
         """Initializer."""
         super().__init__(source)
-        self.threads = []
-        self.full = False
         self.archiver = archiver
         # for testing purposes we allow archiver to be None and we are able
         # to create the a DiscussionPage in this way:
         # >>> import pywikibot as py
         # >>> from scripts.archivebot import DiscussionPage
         # >>> d = DiscussionPage(py.Page(py.Site(), <talk page name>), None)
+        self.params = params
+        self.keep = keep
+        self.full = False
+        self.archived_threads = 0
         if archiver is None:
             self.timestripper = TimeStripper(self.site)
         else:
             self.timestripper = self.archiver.timestripper
-        self.params = params
-        self.keep = keep
-        try:
+
+    def __getattr__(self, name):
+        """Lazy load page if archives, header or threads attribute is missing.
+
+        .. versionadded:: 8.1
+        """
+        if name in ('archives', 'header', 'threads'):
             self.load_page()
-        except NoPageError:
-            self.header = archiver.get_attr('archiveheader',
-                                            i18n.twtranslate(
-                                                self.site.code,
-                                                'archivebot-archiveheader'))
-            if self.params:
-                self.header = self.header % self.params
+        return self.__getattribute__(name)
 
     @staticmethod
     def max(
@@ -367,11 +367,19 @@ class DiscussionPage(pywikibot.Page):
         self.header = ''
         self.threads = []
         self.archives = {}
-        self.archived_threads = 0
+
+        try:
+            text = self.get()
+        except NoPageError:
+            self.header = self.archiver.get_attr(
+                'archiveheader',
+                i18n.twtranslate(self.site.code, 'archivebot-archiveheader'))
+            if self.params:
+                self.header = self.header % self.params
+            return
 
         # Exclude unsupported headings (h1, h3, etc):
         # adding the marker will make them ignored by extract_sections()
-        text = self.get()
         marker = findmarker(text)
         text = re.sub(r'^((=|={3,})[^=])', marker + r'\1', text, flags=re.M)
 
@@ -382,6 +390,7 @@ class DiscussionPage(pywikibot.Page):
             self.header = '\n\n'.join((header.rstrip(), footer, ''))
         else:
             self.header = header + footer
+
         for thread_heading, thread_content in threads:
             cur_thread = DiscussionThread(thread_heading.strip('= '),
                                           self.timestripper)
@@ -702,6 +711,16 @@ class PageArchiver:
                 archive = self.get_archive_page(pattern % params, params)
 
                 if counter_matters:
+
+                    # preload pages
+                    if counter >= 25:
+                        for c in range(counter):
+                            params = self.get_params(thread.timestamp, c + 1)
+                            self.get_archive_page(pattern % params, params)
+                        list(self.site.preloadpages(
+                            self.archives.values(),
+                            groupsize=self.site.maxlimit))
+
                     while not counter_found and counter > 1 \
                             and not archive.exists():
                         # This may happen when either:
@@ -710,8 +729,6 @@ class PageArchiver:
                         #    (number #3 above)
                         # 2. era changed between runs.
                         # Decrease the counter.
-                        # TODO: This can be VERY slow, use preloading
-                        # or binary search.
                         counter -= 1
                         params = self.get_params(thread.timestamp, counter)
                         archive = self.get_archive_page(
@@ -743,6 +760,7 @@ class PageArchiver:
         """Process a single DiscussionPage object."""
         if not self.page.botMayEdit():
             return
+
         whys = self.analyze_page()
         mintoarchive = int(self.get_attr('minthreadstoarchive', 2))
         if self.archived_threads < mintoarchive:
@@ -751,6 +769,7 @@ class PageArchiver:
             pywikibot.info(f'Only {self.archived_threads} (< {mintoarchive}) '
                            f'threads are old enough. Skipping')
             return
+
         if whys:
             # Search for the marker template
             rx = re.compile(r'\{\{%s\s*?\n.*?\n\}\}'
@@ -763,9 +782,9 @@ class PageArchiver:
 
             pywikibot.info(f'Archiving {self.archived_threads} thread(s).')
             # Save the archives first (so that bugs don't cause a loss of data)
-            for _title, archive in sorted(self.archives.items()):
+            for archive in self.archives.values():
                 count = archive.archived_threads
-                if count == 0:
+                if not count:
                     continue
                 self.comment_params['count'] = count
                 comment = i18n.twtranslate(self.site.code,
