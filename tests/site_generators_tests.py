@@ -2203,8 +2203,8 @@ class TestPagePreloading(DefaultSiteTestCase):
         links = list(mysite.pagelinks(mainpage, total=20))
 
         with suppress_warnings(WARN_SITE_CODE, category=UserWarning):
-            gen = mysite.preloadpages(links, groupsize=5, langlinks=True)
-            pages = list(gen)
+            pages = list(mysite.preloadpages(links, groupsize=5,
+                                             langlinks=True, quiet=False))
 
         self.assertLength(links, pages)
         for page in pages:
