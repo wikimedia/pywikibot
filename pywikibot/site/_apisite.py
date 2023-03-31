@@ -1975,6 +1975,7 @@ class APISite(
                         "editpage: Unexpected error code '{}' received."
                         .format(err.code))
                     raise
+
                 assert 'edit' in result and 'result' in result['edit'], result
 
                 if result['edit']['result'] == 'Success':
@@ -2017,7 +2018,7 @@ class APISite(
                             'editpage: unknown CAPTCHA response {}, '
                             'page not saved'
                             .format(captcha))
-                        return False
+                        break
 
                     if 'spamblacklist' in result['edit']:
                         raise SpamblacklistError(
@@ -2028,20 +2029,22 @@ class APISite(
                             'editpage: {}\n{}, '
                             .format(result['edit']['code'],
                                     result['edit']['info']))
-                        return False
+                        break
 
                     pywikibot.error('editpage: unknown failure reason {}'
                                     .format(str(result)))
-                    return False
+                    break
 
                 pywikibot.error(
                     "editpage: Unknown result code '{}' received; "
                     'page not saved'.format(result['edit']['result']))
                 pywikibot.log(str(result))
-                return False
+                break
 
         finally:
             self.unlock_page(page)
+
+        return False
 
     OnErrorExc = namedtuple('OnErrorExc', 'exception on_new_page')
 
@@ -2867,15 +2870,16 @@ class APISite(
         """
         # check old and diff types
         def get_param(item: object) -> Optional[Tuple[str, Union[str, int]]]:
+            param = None
             if isinstance(item, str):
-                return 'title', item
-            if isinstance(item, pywikibot.Page):
-                return 'title', item.title()
-            if isinstance(item, int):
-                return 'rev', item
-            if isinstance(item, pywikibot.page.Revision):
-                return 'rev', item.revid
-            return None
+                param = 'title', item
+            elif isinstance(item, pywikibot.Page):
+                param = 'title', item.title()
+            elif isinstance(item, int):
+                param = 'rev', item
+            elif isinstance(item, pywikibot.page.Revision):
+                param = 'rev', item.revid
+            return param
 
         old_t = get_param(old)
         if not old_t:
