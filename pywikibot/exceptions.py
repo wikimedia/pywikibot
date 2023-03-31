@@ -26,6 +26,7 @@ the framework::
           |    +-- PageLoadRelatedError
           |    |    +-- InconsistentTitleError
           |    |    +-- InvalidPageError
+          |    |    +-- NoSiteLinkError
           |    +-- PageSaveRelatedError
           |    |    +-- EditConflictError
           |    |    |    +-- ArticleExistsConflictError
@@ -106,6 +107,7 @@ PageRelatedError: any exception which is caused by an operation on a Page.
 
 PageLoadRelatedError: any exception which happens while loading a Page.
   - InconsistentTitleError: Page receives a title inconsistent with query
+  - NoSiteLinkError: ItemPage has no sitelink to given language
 
 PageSaveRelatedError: page exceptions within the save operation on a Page
 
@@ -393,6 +395,21 @@ class InconsistentTitleError(PageLoadRelatedError):
 
         """
         self.message = f"Query on {{}} returned data on '{actual}'"
+        super().__init__(page)
+
+
+class NoSiteLinkError(PageLoadRelatedError, NoPageError):
+
+    """ItemPage has no sitelink to the given language."""
+
+    def __init__(self, page: 'pywikibot.page.ItemPage', lang: str) -> None:
+        """Initializer.
+
+        :param page: ItemPage that caused the exception
+        :param lang: language code of the queried sitelink
+
+        """
+        self.message = f'Item {{}} has no sitelink to language {lang!r}'
         super().__init__(page)
 
 
