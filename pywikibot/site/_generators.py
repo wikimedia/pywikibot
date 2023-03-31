@@ -1,6 +1,6 @@
 """Objects representing API generators to MediaWiki site."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1874,7 +1874,7 @@ class GeneratorsMixin:
                 yield (newpage, pageitem)
             else:
                 yield (newpage, pageitem['timestamp'], pageitem['newlen'],
-                       '', pageitem['user'], pageitem['comment'])
+                       '', pageitem['user'], pageitem.get('comment', ''))
 
     def querypage(self, special_page, total=True):
         """Yield Page objects retrieved from Special:{special_page}.
