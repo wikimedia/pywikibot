@@ -15,7 +15,7 @@ __init__.py, and a message bundle called 'pywikibot' containing messages.
 See :py:obj:`twtranslate` for more information on the messages.
 """
 #
-# (C) Pywikibot team, 2004-2022
+# (C) Pywikibot team, 2004-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -653,14 +653,51 @@ def translate(code: STR_OR_SITE_TYPE,
     return trans
 
 
-def twtranslate(source: STR_OR_SITE_TYPE,
-                twtitle: str,
-                parameters: Union[Sequence[str], Mapping[str, int],
-                                  None] = None,
-                *,
-                fallback: bool = True,
-                fallback_prompt: Optional[str] = None,
-                only_plural: bool = False) -> Optional[str]:
+def get_bot_prefix(source: STR_OR_SITE_TYPE, use_prefix: bool) -> str:
+    """Get the bot prefix string like 'Bot: ' including space delimiter.
+
+    .. note: If *source* is a str and ``config.bot_prefix`` is set to
+       None, it cannot be determined whether the current user is a bot
+       account. In this cas the prefix will be returned.
+    .. versionadded:: 8.1
+
+    :param source: When it's a site it's using the lang attribute and otherwise
+        it is using the value directly.
+    :param use_prefix: If True, return a bot prefix which depends on the
+        ``config.bot_prefix`` setting.
+    """
+    config_prefix = config.bot_prefix_summary
+    if not use_prefix or config_prefix is False:
+        return ''
+
+    if isinstance(config_prefix, str):
+        return config_prefix + ' '
+
+    try:
+        prefix = twtranslate(source, 'pywikibot-bot-prefix') + ' '
+    except pywikibot.exceptions.TranslationError:
+        # the 'pywikibot' package is available but the message key may
+        # be missing
+        prefix = 'Bot: '
+
+    if config_prefix is True \
+       or not hasattr(source, 'lang') \
+       or source.isBot(source.username()):
+        return prefix
+
+    return ''
+
+
+def twtranslate(
+    source: STR_OR_SITE_TYPE,
+    twtitle: str,
+    parameters: Union[Sequence[str], Mapping[str, int], None] = None,
+    *,
+    fallback: bool = True,
+    fallback_prompt: Optional[str] = None,
+    only_plural: bool = False,
+    bot_prefix: bool = False
+) -> Optional[str]:
     r"""
     Translate a message using JSON files in messages_package_name.
 
@@ -712,8 +749,11 @@ def twtranslate(source: STR_OR_SITE_TYPE,
     ... ) % {'descr': 'seulement'})
     'Robot: Changer seulement quelques pages.'
 
+    .. versionchanged:: 8.1
+       the *bot_prefix* parameter was added.
+
     :param source: When it's a site it's using the lang attribute and otherwise
-        it is using the value directly.
+        it is using the value directly. The site object is recommended.
     :param twtitle: The TranslateWiki string title, in <package>-<key> format
     :param parameters: For passing parameters. It should be a mapping but for
         backwards compatibility can also be a list, tuple or a single value.
@@ -725,9 +765,13 @@ def twtranslate(source: STR_OR_SITE_TYPE,
         plural instances. If this is False it will apply the parameters also
         to the resulting string. If this is True the placeholders must be
         manually applied afterwards.
+    :param bot_prefix: If True, prepend the message with a bot prefix
+        which depends on the ``config.bot_prefix`` setting
     :raise IndexError: If the language supports and requires more plurals than
         defined for the given translation template.
     """
+    prefix = get_bot_prefix(source, use_prefix=bot_prefix)
+
     if not messages_available():
         if fallback_prompt:
             if parameters and not only_plural:
@@ -741,7 +785,6 @@ def twtranslate(source: STR_OR_SITE_TYPE,
             .format(_messages_package_name, twtitle, __url__))
 
     # if source is a site then use its lang attribute, otherwise it's a str
-
     lang = getattr(source, 'lang', source)
 
     # There are two possible failure modes: the translation dict might not have
@@ -774,8 +817,8 @@ def twtranslate(source: STR_OR_SITE_TYPE,
                          .format(type(parameters).__name__))
 
     if not only_plural and parameters:
-        return trans % parameters
-    return trans
+        trans = trans % parameters
+    return prefix + trans
 
 
 def twhas_key(source: STR_OR_SITE_TYPE, twtitle: str) -> bool:
