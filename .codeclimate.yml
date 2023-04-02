@@ -19,6 +19,8 @@ checks:
   similar-code:
     config:
       threshold: 40
+      exclude_patterns:
+      - "tests/link_tests.py"
 
 plugins:
   duplication:
@@ -32,6 +34,10 @@ plugins:
 exclude_patterns:
 - "docs/"
 - "!docs/conf.py"
+- "*.json"
+- "*.png"
 - "*.rst"
 - "*.txt"
+- "*.xml"
+- "*.yml"
 - "scripts/dataextend.py"
