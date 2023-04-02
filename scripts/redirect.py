@@ -559,6 +559,48 @@ class RedirectRobot(ExistingPageBot):
                                    "Won't delete anything."
                                    if self.opt.delete else 'Skipping.'))
 
+    def _skip_on_exception(self,
+                           error: Exception,
+                           loop_length: int,
+                           new_redir: pywikibot.Page) -> bool:
+        """Handle exceptions of fix_1_double_redirect."""
+        if isinstance(error, IsNotRedirectPageError):
+            if loop_length != 2:
+                return False  # do nothing
+
+            pywikibot.info(
+                f'Skipping: Redirect target {new_redir} is not a  redirect.')
+
+        elif isinstance(error, SectionError):
+            pywikibot.warning(
+                f"Redirect target section {new_redir} doesn't exist.")
+            return False
+
+        elif isinstance(error, UnsupportedPageError):
+            pywikibot.error(error)
+            pywikibot.info(f'Skipping {new_redir}.')
+
+        elif isinstance(error, NoPageError):
+            if not self.opt.always:
+                pywikibot.warning(
+                    f"Redirect target {new_redir} doesn't exist.")
+                return False
+
+            # skip if automatic
+            pywikibot.info(
+                f"Skipping: Redirect target {new_redir} doesn't exist.")
+
+        elif isinstance(error, ServerError):
+            pywikibot.info('Skipping due to server error: No textarea found')
+
+        else:
+            # all uncatched exceptions
+            # Note: elif statements are necessary above because all Errors
+            # above derive from Exception class
+            raise
+
+        return True
+
     def fix_1_double_redirect(self) -> None:
         """Treat one double redirect."""
         newRedir = redir = self.current_page
@@ -569,48 +611,23 @@ class RedirectRobot(ExistingPageBot):
                                      newRedir.title(with_section=False)))
             try:
                 targetPage = self.get_redirect_target(newRedir)
-            except IsNotRedirectPageError:
-                if len(redirList) == 2:
-                    pywikibot.info(
-                        'Skipping: Redirect target {} is not a redirect.'
-                        .format(newRedir.title(as_link=True)))
-                    break  # do nothing
-            except SectionError:
-                pywikibot.warning(
-                    "Redirect target section {} doesn't exist."
-                    .format(newRedir.title(as_link=True)))
-            except UnsupportedPageError as e:
-                pywikibot.error(e)
-                pywikibot.info(f'Skipping {newRedir}.')
-                break
-            except NoPageError:
-                title = newRedir.title(as_link=True)
-                if self.opt.always:
-                    pywikibot.info(
-                        f"Skipping: Redirect target {title} doesn't exist.")
-                    break  # skip if automatic
-                pywikibot.warning(
-                    f"Redirect target {title} doesn't exist.")
-            except ServerError:
-                pywikibot.info(
-                    'Skipping due to server error: No textarea found')
-                break
+            except Exception as e:
+                if self._skip_on_exception(e, len(redirList), newRedir):
+                    break
             else:
                 if not targetPage:
                     break
 
                 pywikibot.info(f'   Links to: {targetPage}.')
-                try:
+                mw_msg = None
+                with suppress(KeyError):
                     mw_msg = targetPage.site.mediawiki_message(
                         'wikieditor-toolbar-tool-redirect-example')
-                except KeyError:
-                    pass
-                else:
-                    if targetPage.title() == mw_msg:
-                        pywikibot.info(
-                            'Skipping toolbar example: Redirect source is '
-                            'potentially vandalized.')
-                        break
+                if mw_msg and targetPage.title() == mw_msg:
+                    pywikibot.info('Skipping toolbar example: Redirect source '
+                                   'is potentially vandalized.')
+                    break
+
                 # watch out for redirect loops
                 if redirList.count('{}:{}'.format(
                     targetPage.site.lang,
@@ -618,6 +635,7 @@ class RedirectRobot(ExistingPageBot):
                     pywikibot.warning(
                         f'Redirect target {targetPage} forms a redirect loop.')
                     break  # FIXME: doesn't work. edits twice!
+
                     if self.opt.delete:
                         # Delete the two redirects
                         # TODO: Check whether pages aren't vandalized
@@ -626,12 +644,14 @@ class RedirectRobot(ExistingPageBot):
                                              'redirect-remove-loop')
                         self.delete_redirect(redir, 'redirect-remove-loop')
                     break
+
                 # redirect target found
                 if targetPage.isStaticRedirect():
                     pywikibot.info('   Redirect target is STATICREDIRECT.')
                 else:
                     newRedir = targetPage
                     continue
+
             oldText = redir.get(get_redirect=True)
             if self.is_repo and redir.namespace() == self.repo.item_namespace:
                 redir = pywikibot.ItemPage(self.repo, redir.title())
@@ -687,14 +707,13 @@ def main(*args: str) -> None:
     gen_factory = pagegenerators.GeneratorFactory()
 
     local_args = pywikibot.handle_args(args)
+    shorts = {'do': 'double', 'br': 'broken'}
     for argument in local_args:
         arg, _, value = argument.partition(':')
         option = arg.partition('-')[2]
         # bot options
-        if arg == 'do':
-            action = 'double'
-        elif arg == 'br':
-            action = 'broken'
+        if arg in shorts:
+            action = shorts[arg]
         elif arg in ('both', 'broken', 'double'):
             action = arg
         elif option in ('always', 'delete'):
