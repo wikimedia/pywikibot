@@ -49,6 +49,7 @@ from collections import defaultdict
 import pywikibot
 from pywikibot import Page, config
 from pywikibot.exceptions import IsRedirectPageError, NoPageError
+from pywikibot.i18n import twtranslate
 
 
 def multiple_replace(text, word_dict):
@@ -151,23 +152,22 @@ class SyncSites:
         """Create page on wikis with overview of bot results."""
         for site in self.sites:
             sync_overview_page = Page(site,
-                                      'User:{}/sync.py overview'
-                                      .format(site.user()))
-            output = '== Pages that differ from original ==\n\n'
+                                      f'User:{site.user()}/sync.py overview')
+            output = '== {} ==\n\n'.format(
+                twtranslate(site, 'replicate_wiki-headline'))
             if self.differences[site]:
                 output += ''.join(f'* [[:{page_title}]]\n'
                                   for page_title in self.differences[site])
             else:
-                output += 'All important pages are the same'
+                output += twtranslate(site, 'replicate_wiki-same-pages')
 
-            output += (
-                '\n\n== Admins from original that are missing here ==\n\n')
+            output += '\n\n== {} ==\n\n'.format(
+                twtranslate(site, 'replicate_wiki-missing-users'))
             if self.user_diff[site]:
                 output += ''.join('* {}\n'.format(user_name.replace('_', ' '))
                                   for user_name in self.user_diff[site])
             else:
-                output += (
-                    'All users from original are also present on this wiki')
+                output += twtranslate(site, 'replicate_wiki-same-users')
 
             pywikibot.info(output)
             sync_overview_page.text = output
@@ -175,8 +175,8 @@ class SyncSites:
 
     def put_message(self, site) -> str:
         """Return synchronization message."""
-        return ('{} replicate_wiki.py synchronization from {}'
-                .format(site.user(), str(self.original)))
+        return twtranslate(site, 'replicate_wiki-summary',
+                           {'source': str(self.original)})
 
     def check_page(self, pagename) -> None:
         """Check one page."""
