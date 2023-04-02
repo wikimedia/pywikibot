@@ -19,8 +19,6 @@ checks:
   similar-code:
     config:
       threshold: 40
-      exclude_patterns:
-      - "tests/"
 
 plugins:
   duplication:
@@ -30,8 +28,6 @@ plugins:
       languages:
         python:
             python_version: 3
-  sonar-python:
-    enabled: true
 
 exclude_patterns:
 - "docs/"
