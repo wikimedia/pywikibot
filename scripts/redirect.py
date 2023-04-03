@@ -275,8 +275,8 @@ class RedirectGenerator(OptionHandler):
             for pagetitle in data['query']['pages'].values():
                 pages[pagetitle['title']] = \
                     'missing' not in pagetitle or 'pageid' in pagetitle
-            for redirect in redirects:
-                target = redirects[redirect]
+
+            for redirect, target in redirects.items():
                 result = None
                 final = None
 
