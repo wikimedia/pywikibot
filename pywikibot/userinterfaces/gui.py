@@ -2,24 +2,31 @@
 
 Useful for editing the contents of an article.
 
-.. note:: tkinter module is required
+.. note:: idlelib and tkinter modules are required
 """
 #
 # (C) Pywikibot team, 2003-2023
 #
 # Distributed under the terms of the MIT license.
 #
-from idlelib import replace as ReplaceDialog  # noqa: N812
-from idlelib import search as SearchDialog  # noqa: N812
-from idlelib.config import idleConf
-from idlelib.configdialog import ConfigDialog
-from idlelib.multicall import MultiCallCreator
 from typing import Optional
 
 import pywikibot
 from pywikibot.backports import Tuple
 from pywikibot.tools import PYTHON_VERSION
 
+try:
+    import idlelib
+except ImportError as e:
+    idlelib = e
+    ConfigDialog = ReplaceDialog = SearchDialog = object()
+    idleConf = MultiCallCreator = object()  # noqa:  N816
+else:
+    from idlelib import replace as ReplaceDialog  # noqa: N812
+    from idlelib import search as SearchDialog  # noqa: N812
+    from idlelib.config import idleConf
+    from idlelib.configdialog import ConfigDialog
+    from idlelib.multicall import MultiCallCreator
 
 try:
     import tkinter
@@ -49,8 +56,9 @@ class TextEditor(ScrolledText):
 
         Get default settings from user's IDLE configuration.
         """
-        if isinstance(tkinter, ImportError):
-            raise tkinter
+        for module in (idlelib, tkinter):
+            if isinstance(module, ImportError):
+                raise module
 
         textcf = self._initialize_config(idleConf.CurrentTheme())
 
@@ -282,8 +290,9 @@ class EditBoxWindow(Frame):
 
     def __init__(self, parent=None, **kwargs) -> None:
         """Initializer."""
-        if isinstance(tkinter, ImportError):
-            raise tkinter
+        for module in (idlelib, tkinter):
+            if isinstance(module, ImportError):
+                raise module
 
         if parent is None:
             # create a new window
@@ -447,8 +456,9 @@ class Tkdialog:
 
     def __init__(self, photo_description, photo, filename) -> None:
         """Initializer."""
-        if isinstance(tkinter, ImportError):
-            raise tkinter
+        for module in (idlelib, tkinter):
+            if isinstance(module, ImportError):
+                raise module
 
         self.root = tkinter.Tk()
         # "%dx%d%+d%+d" % (width, height, xoffset, yoffset)
