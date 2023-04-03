@@ -1076,10 +1076,12 @@ class ItemPage(WikibasePage):
                 yield pg
 
     def getSitelink(self, site, force: bool = False) -> str:
-        """
-        Return the title for the specific site.
+        """Return the title for the specific site.
 
         If the item doesn't have that language, raise NoSiteLinkError.
+
+        .. versionchanged:: 8.1
+           raises NoSiteLinkError instead of NoPageError.
 
         :param site: Site to find the linked page of.
         :type site: pywikibot.Site or database name
