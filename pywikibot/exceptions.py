@@ -400,7 +400,12 @@ class InconsistentTitleError(PageLoadRelatedError):
 
 class NoSiteLinkError(PageLoadRelatedError, NoPageError):
 
-    """ItemPage has no sitelink to the given language."""
+    """ItemPage has no sitelink to the given language.
+
+    .. versionadded:: 8.1
+    .. deprecated:: 8.1
+       :exc:`NoPageError` dependency.
+    """
 
     def __init__(self, page: 'pywikibot.page.ItemPage', lang: str) -> None:
         """Initializer.

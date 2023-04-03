@@ -1,6 +1,15 @@
 Scripts Changelog
 =================
 
+8.1.0
+-----
+
+archivebot
+~~~~~~~~~~
+
+* Processing speed was improved and is up to 20 times faster, 2-3 times on average
+
+
 8.0.2
 -----
 
