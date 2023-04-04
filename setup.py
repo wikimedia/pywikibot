@@ -86,7 +86,7 @@ extra_deps.update({'scripts': [i for k, v in script_deps.items() for i in v]})
 # ------- setup install_requires ------- #
 # packages which are mandatory
 dependencies = [
-    'mwparserfromhell>=0.6.3',
+    'mwparserfromhell>=0.5.2',
     'requests>=2.21.0, <2.28.0; python_version < "3.7"',
     'requests>=2.21.0; python_version>="3.7"',
     # PEP 440
