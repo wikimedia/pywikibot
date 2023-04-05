@@ -183,8 +183,8 @@ class Request(MutableMapping):
         """
         if site is None:
             self.site = pywikibot.Site()
-            warn('Request() invoked without a site; setting to {}'
-                 .format(self.site), RuntimeWarning, 2)
+            warn(f'Request() invoked without a site; setting to {self.site}',
+                 RuntimeWarning, 2)
         else:
             self.site = site
 
@@ -239,13 +239,12 @@ class Request(MutableMapping):
                 raise Error('API write action attempted without user name')
 
             if 'anon' in self.site.userinfo:
-                raise Error("API write action attempted as IP '{}'"
-                            .format(username))
+                raise Error(f'API write action attempted as IP {username!r}')
 
             if not self.site.user() or self.site.username() != username:
                 pywikibot.warning(
-                    'API write action by unexpected username {} commenced.\n'
-                    'userinfo: {!r}'.format(username, self.site.userinfo))
+                    f'API write action by unexpected username {username} '
+                    f'commenced.\nuserinfo: {self.site.userinfo!r}')
 
         # Make sure user is logged in
         if self.write:
@@ -301,8 +300,8 @@ class Request(MutableMapping):
                 break
             args |= set(inspect.getfullargspec(super_cls.__init__).args)
         else:
-            raise ValueError('Request was not a super class of '
-                             '{!r}'.format(cls))
+            raise ValueError(f'Request was not a super class of {cls!r}')
+
         args -= {'self'}
         old_kwargs = set(kwargs)
         # all kwargs defined above but not in args indicate 'kwargs' mode
@@ -343,9 +342,8 @@ class Request(MutableMapping):
             return value.strftime(pywikibot.Timestamp.ISO8601Format)
         if isinstance(value, pywikibot.page.BasePage):
             if value.site != self.site:
-                raise RuntimeError(
-                    'value.site {!r} is different from Request.site {!r}'
-                    .format(value.site, self.site))
+                raise RuntimeError(f'value.site {value.site!r} is different '
+                                   f'from Request.site {self.site!r}')
             return value.title(with_section=False)
         return str(value)
 
@@ -452,7 +450,7 @@ class Request(MutableMapping):
         self._params.setdefault('format', ['json'])
         if self['format'] != ['json']:
             raise TypeError(
-                "Query format '{}' cannot be parsed.".format(self['format']))
+                f'Query format {self["format"]!r} cannot be parsed.')
 
         self.__defaulted = True  # skipcq: PTC-W0037
 
@@ -496,8 +494,8 @@ class Request(MutableMapping):
                     value = value.encode(self.site.encoding())
                 except Exception:
                     pywikibot.error(
-                        "_encoded_items: '{}' could not be encoded as '{}':"
-                        ' {!r}'.format(key, self.site.encoding(), value))
+                        f'_encoded_items: {key!r} could not be encoded as '
+                        f'{self.site.encoding()!r}: {value!r}')
             assert key.encode('ascii')
             assert isinstance(key, str)
             params[key] = value
@@ -523,9 +521,8 @@ class Request(MutableMapping):
 
     def __repr__(self) -> str:
         """Return internal representation."""
-        return '{}.{}<{}->{!r}>'.format(self.__class__.__module__,
-                                        self.__class__.__name__,
-                                        self.site, str(self))
+        cls = type(self)
+        return f"{cls.__module__}.{cls.__name__}<{self.site}->'{self}'>"
 
     def _simulate(self, action):
         """Simulate action."""
@@ -669,9 +666,8 @@ class Request(MutableMapping):
             else:
                 body = paramstring
 
-        pywikibot.debug('API request to {} (uses get: {}):\n'
-                        'Headers: {!r}\nURI: {!r}\nBody: {!r}'
-                        .format(self.site, use_get, headers, uri, body))
+        pywikibot.debug(f'API request to {self.site} (uses get: {use_get}):\n'
+                        f'Headers: {headers!r}\nURI: {uri!r}\nBody: {body!r}')
         return use_get, uri, body, headers
 
     def _http_request(self, use_get: bool, uri: str, data, headers,
@@ -741,8 +737,8 @@ The text message is:
             # Note: family.AutoFamily is a function to create that class
             if self.site.family.__class__.__name__ == 'AutoFamily':
                 pywikibot.debug(msg)
-                raise SiteDefinitionError('Invalid AutoFamily({!r})'
-                                          .format(self.site.family.domain))
+                raise SiteDefinitionError(
+                    f'Invalid AutoFamily({self.site.family.domain!r})')
 
             if not self.json_warning:  # warn only once
                 pywikibot.warning(msg)
@@ -763,8 +759,8 @@ The text message is:
 
     def _relogin(self, message: str = '') -> None:
         """Force re-login and inform user."""
-        pywikibot.error('{}{}Forcing re-login.'.format(message,
-                                                       ' ' if message else ''))
+        message += ' Forcing re-login.'
+        pywikibot.error(f'{message.strip()}')
         self.site._relogin()
 
     def _userinfo_query(self, result) -> bool:
@@ -776,9 +772,8 @@ The text message is:
             username = result['query']['userinfo']['name']
             if (self.site.user() is not None and self.site.user() != username
                     and self.site._loginstatus != LoginStatus.IN_PROGRESS):
-                message = ("Logged in as '{actual}' instead of '{expected}'."
-                           .format(actual=username, expected=self.site.user()))
-                self._relogin(message)
+                self._relogin(f'Logged in as {username!r} instead of '
+                              f'{self.site.user()!r}.')
                 return True
         return False
 
@@ -801,8 +796,8 @@ The text message is:
                 # bug T51978
                 text = warning['html']['*']
             else:
-                pywikibot.warning('API warning ({}) of unknown format: {}'
-                                  .format(mod, warning))
+                pywikibot.warning(
+                    f'API warning ({mod}) of unknown format: {warning}')
                 continue
 
             # multiple warnings are in text separated by a newline
@@ -812,8 +807,8 @@ The text message is:
                     handled = self._default_warning_handler(mod,
                                                             single_warning)
                     if handled is None:
-                        pywikibot.warning('API warning ({}): {}'
-                                          .format(mod, single_warning))
+                        pywikibot.warning(
+                            f'API warning ({mod}): {single_warning}')
                     else:
                         retry = retry or handled
         return retry
@@ -895,12 +890,9 @@ The text message is:
         pywikibot.error('Detected MediaWiki API exception {}{}'
                         .format(e, '; retrying' if retry else '; raising'))
         param_repr = str(self._params)
-        pywikibot.log('MediaWiki exception {} details:\n'
-                      '          query=\n{}\n'
-                      '          response=\n{}'
-                      .format(class_name,
-                              pprint.pformat(param_repr),
-                              result))
+        pywikibot.log(f'MediaWiki exception {class_name} details:\n'
+                      f'          query=\n{pprint.pformat(param_repr)}\n'
+                      f'          response=\n{result}')
         if not retry:
             raise e
 
@@ -935,8 +927,7 @@ The text message is:
             return False
 
         if self.site._loginstatus == LoginStatus.IN_PROGRESS:
-            pywikibot.log('Login status: {}'
-                          .format(self.site._loginstatus.name))
+            pywikibot.log(f'Login status: {self.site._loginstatus.name}')
             return False
 
         # invalidate superior wiki cookies (T224712)
@@ -1053,13 +1044,11 @@ The text message is:
                 continue
 
             if 'mwoauth-invalid-authorization' in code:
+                msg = f'OAuth authentication for {self.site}: {info}'
                 if 'Nonce already used' in info:
-                    pywikibot.error(
-                        'Retrying failed OAuth authentication for {}: {}'
-                        .format(self.site, info))
+                    pywikibot.error(f'Retrying failed {msg}')
                     continue
-                raise NoUsernameError('Failed OAuth authentication for {}: {}'
-                                      .format(self.site, info))
+                raise NoUsernameError(f'Failed {msg}')
             if code == 'cirrussearch-too-busy-error':  # T170647
                 self.wait()
                 continue
@@ -1087,8 +1076,8 @@ The text message is:
             # raise error
             try:
                 param_repr = str(self._params)
-                pywikibot.log('API Error: query=\n{}'
-                              .format(pprint.pformat(param_repr)))
+                pywikibot.log(
+                    f'API Error: query=\n{pprint.pformat(param_repr)}')
                 pywikibot.log(f'           response=\n{result}')
 
                 raise pywikibot.exceptions.APIError(**error)
@@ -1113,8 +1102,7 @@ The text message is:
         delay *= 2 ** (self.current_retries - 1)
         delay = min(delay, config.retry_max)
 
-        pywikibot.warning('Waiting {:.1f} seconds before retrying.'
-                          .format(delay))
+        pywikibot.warning(f'Waiting {delay:.1f} seconds before retrying.')
         pywikibot.sleep(delay)
 
 
@@ -1191,7 +1179,7 @@ class CachedRequest(Request):
             # The returned value can't be encoded to anything other than
             # ascii otherwise it creates an exception when _create_file_name()
             # tries to encode it as utf-8.
-            user_key = 'User(User:{})'.format(self.site.userinfo['name'])
+            user_key = f'User(User:{self.site.userinfo["name"]})'
         else:
             user_key = repr(LoginStatus(LoginStatus.NOT_LOGGED_IN))
 
