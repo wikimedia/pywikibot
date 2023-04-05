@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Script to create a new distribution.
+"""Script to create a new distribution. Requires Python 3.7+.
 
 The following options are supported:
 
@@ -37,6 +37,7 @@ Usage::
    - *nodist* option was added
 
 .. versionchanged:: 8.1
+   Python 3.7+ required because *dataclasses* module is used.
    *nodist* option was removed, *clear* option does not create a
    distribution. *local* and *remote* option clears old distributions
    first.
@@ -49,6 +50,7 @@ Usage::
 import abc
 import shutil
 import sys
+from dataclasses import dataclass, field
 from pathlib import Path
 from subprocess import check_call, run
 
@@ -57,19 +59,24 @@ from pywikibot import __version__, error, info, input_yn, warning
 from pywikibot.backports import Tuple
 
 
+@dataclass
 class SetupBase(abc.ABC):
 
     """Setup distribution base class.
 
     .. versionadded:: 8.0
+    .. versionchanged:: 8.1
+       *dataclass* is used.
     """
 
-    def __init__(self, local, remote, clear, upgrade) -> None:
-        """Initializer."""
-        self.local = local
-        self.remote = remote
-        self.clear = clear
-        self.upgrade = upgrade
+    local: bool
+    remote: bool
+    clear: bool
+    upgrade: bool
+    folder: Path = field(init=False)
+
+    def __post_init__(self) -> None:
+        """Post-init initializer."""
         self.folder = Path().resolve()
 
     def clear_old_dist(self) -> None:  # pragma: no cover
