@@ -30,7 +30,7 @@ and arguments can be:
                "-xml:filename.xml". Cannot be used with -fullscan or -moves.
 
 -fullscan      Retrieve redirect pages from live wiki, not from a special page
-               Cannot be used with -xml.
+               Cannot be used with -xml or 'both' action.
 
 -moves         Use the page move log to find double-redirect candidates. Only
                works with action "double", does not work with -xml.
@@ -72,6 +72,7 @@ Furthermore the following options are provided:
 #
 import datetime
 from contextlib import suppress
+from textwrap import fill
 from typing import Any, Generator, Optional, Union
 
 import pywikibot
@@ -742,7 +743,12 @@ def main(*args: str) -> None:
 
     problem = 'You can only use one of {} options.'.format(
         ' or '.join(source)) if len(source) > 1 else ''
-    if suggest_help(additional_text=problem,
+
+    if action == 'both' and '-fullscan' in source:
+        problem += (' You can only use either -fullscan together with '
+                    "broken/double action or 'both' action")
+
+    if suggest_help(additional_text=fill(problem),
                     unknown_parameters=unknown,
                     missing_action=not action):
         return
@@ -752,8 +758,12 @@ def main(*args: str) -> None:
         if gen_factory.namespaces:
             gen_options['namespaces'] = gen_factory.namespaces
         gen = RedirectGenerator(action, **gen_options)
-    options['generator'] = gen_factory.getCombinedGenerator(gen=gen)
-    bot = RedirectRobot(action, **options)
+
+    if gen_factory.gens \
+       or action != 'both' and source not in ('-fullscan', '-xml'):
+        gen = gen_factory.getCombinedGenerator(gen=gen)
+
+    bot = RedirectRobot(action, generator=gen, **options)
     bot.run()
 
 
