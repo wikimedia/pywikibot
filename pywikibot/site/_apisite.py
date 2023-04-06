@@ -118,11 +118,13 @@ class APISite(
         super().__init__(code, fam, user)
         self._globaluserinfo: Dict[Union[int, str], Any] = {}
         self._interwikimap = _InterwikiMap(self)
-        self._loginstatus = login.LoginStatus.NOT_ATTEMPTED
         self._msgcache: Dict[str, str] = {}
         self._paraminfo = api.ParamInfo(self)
         self._siteinfo = Siteinfo(self)
         self._tokens = TokenWallet(self)
+        self._loginstatus = login.LoginStatus.NOT_ATTEMPTED
+        with suppress(SiteDefinitionError):
+            self.login(cookie_only=True)
 
     def __getstate__(self) -> Dict[str, Any]:
         """Remove TokenWallet before pickling, for security reasons."""
@@ -324,12 +326,17 @@ class APISite(
     def login(
         self,
         autocreate: bool = False,
-        user: Optional[str] = None
+        user: Optional[str] = None,
+        *,
+        cookie_only: bool = False
     ) -> None:
         """Log the user in if not already logged in.
 
-        .. versionchanged:: 8.0
-           lazy load cookies when logging in.
+        .. versionchanged:: 8.0.0
+           lazy load cookies when logging in. This was dropped in 8.0.4
+        .. versionchanged:: 8.0.4
+           the *cookie_only* parameter was added and cookies are loaded
+           whenever the site is initialized.
 
         .. seealso:: :api:`Login`
 
@@ -337,6 +344,8 @@ class APISite(
             using unified login
         :param user: bot user name. Overrides the username set by
             BaseSite initializer parameter or user config setting
+        :param cookie_only: Only try to login from cookie but do not
+            force to login with username/password settings.
 
         :raises pywikibot.exceptions.NoUsernameError: Username is not
             recognised by the site.
@@ -404,23 +413,22 @@ class APISite(
 
             raise NoUsernameError(error_msg)
 
-        login_manager = login.ClientLoginManager(site=self,
-                                                 user=self.username())
-        if login_manager.login(retry=True, autocreate=autocreate):
-            self._username = login_manager.username
-            del self.userinfo  # force reloading
+        if not cookie_only:
+            login_manager = login.ClientLoginManager(site=self,
+                                                     user=self.username())
+            if login_manager.login(retry=True, autocreate=autocreate):
+                self._username = login_manager.username
+                del self.userinfo  # force reloading
 
-            # load userinfo
-            if self.userinfo['name'] == self.username():
-                self._loginstatus = login.LoginStatus.AS_USER
-                return
+                # load userinfo
+                if self.userinfo['name'] == self.username():
+                    self._loginstatus = login.LoginStatus.AS_USER
+                    return
 
-            pywikibot.error('{} != {} after {}.login() and successful '
-                            '{}.login()'
-                            .format(self.userinfo['name'],
-                                    self.username(),
-                                    type(self).__name__,
-                                    type(login_manager).__name__))
+                pywikibot.error(
+                    f"{self.userinfo['name']} != {self.username()} after "
+                    f'{type(self).__name__}.login() and successful '
+                    f'{type(login_manager).__name__}.login()')
 
         self._loginstatus = login.LoginStatus.NOT_LOGGED_IN  # failure
 
@@ -538,7 +546,8 @@ class APISite(
             assert 'userinfo' in uidata['query'], \
                    "API userinfo response lacks 'userinfo' key"
             self._userinfo = uidata['query']['userinfo']
-            if 'anon' in self._userinfo or not self._userinfo.get('id'):
+            if self._loginstatus != login.LoginStatus.IN_PROGRESS \
+               and ('anon' in self._userinfo or not self._userinfo.get('id')):
                 pywikibot.warning('No user is logged in on site {}'
                                   .format(self))
         return self._userinfo
