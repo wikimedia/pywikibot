@@ -938,8 +938,11 @@ The text message is:
         return True
 
     def submit(self) -> dict:
-        """
-        Submit a query and parse the response.
+        """Submit a query and parse the response.
+
+        .. versionchanged:: 8.1
+           in addition to *readapidenied* also try to login when API
+           response is *notloggedin*.
 
         :return: a dict containing data retrieved from api.php
         """
@@ -1033,8 +1036,8 @@ The text message is:
                 self._ratelimited()
                 continue
 
-            # If readapidenied is returned try to login
-            if code == 'readapidenied' \
+            # If notloggedin or readapidenied is returned try to login
+            if code in ('notloggedin', 'readapidenied') \
                and self.site._loginstatus in (LoginStatus.NOT_ATTEMPTED,
                                               LoginStatus.NOT_LOGGED_IN):
                 self.site.login()

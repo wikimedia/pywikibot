@@ -400,6 +400,15 @@ class DrySite(pywikibot.site.APISite):
                                   interface=DryDataSite)
         return None
 
+    def login(self, *args, cookie_only=False, **kwargs):
+        """Overwrite login which is called when a site is initialized.
+
+        .. versionadded: 8.1
+        """
+        if cookie_only:
+            return
+        raise Exception(f'Attempting to login with {type(self).__name__}')
+
 
 class DryDataSite(DrySite, pywikibot.site.DataSite):
 
