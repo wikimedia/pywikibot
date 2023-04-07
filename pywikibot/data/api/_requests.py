@@ -1083,7 +1083,9 @@ The text message is:
                     f'API Error: query=\n{pprint.pformat(param_repr)}')
                 pywikibot.log(f'           response=\n{result}')
 
-                raise pywikibot.exceptions.APIError(**error)
+                args = {'param': body} if body else {}
+                args.update(error)
+                raise pywikibot.exceptions.APIError(**args)
             except TypeError:
                 raise RuntimeError(result)
 
