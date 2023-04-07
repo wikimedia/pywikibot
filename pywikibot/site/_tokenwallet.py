@@ -29,6 +29,8 @@ class TokenWallet(Container):
         self.site: APISite = site
         self._tokens: Dict[str, str] = {}
         self._currentuser: Optional[str] = site.user()
+        # guess the needed token in update_tokens
+        self._last_token_key: Optional[str] = None
 
     def __getitem__(self, key: str) -> str:
         """Get token value for the given key."""
@@ -58,6 +60,7 @@ class TokenWallet(Container):
                 f'Invalid token {key!r} for user {self._currentuser!r} on '
                 f'{self.site} wiki.') from None
 
+        self._last_token_key = key
         return token
 
     def __contains__(self, key) -> bool:
@@ -119,7 +122,7 @@ class TokenWallet(Container):
         # find the token types
         types = [key
                  for key, value in self._tokens.items() for token in tokens
-                 if value == token]
+                 if value == token] or [self._last_token_key]
         self.clear()  # clear the cache
         return [self[token_type] for token_type in types]
 
