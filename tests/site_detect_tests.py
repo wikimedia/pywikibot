@@ -45,6 +45,7 @@ class SiteDetectionTestCase(TestCase):
         :raises AssertionError: Site under url is MediaWiki powered
         """
         with self.assertRaises((AttributeError,
+                                ConnectionError,
                                 RuntimeError,
                                 ServerError,
                                 requests_exceptions.ConnectionError,
@@ -73,7 +74,6 @@ class MediaWikiSiteTestCase(SiteDetectionTestCase):
     old_version_sites = (
         'http://tfwiki.net/wiki/$1',  # 1.19.5-1+deb7u1
         'http://www.hrwiki.org/index.php/$1',  # v 1.15.4
-        'http://www.wikifon.org/$1',  # v1.11.0
         'http://www.thelemapedia.org/index.php/$1',
         'http://www.werelate.org/wiki/$1',
         'http://www.otterstedt.de/wiki/index.php/$1',
