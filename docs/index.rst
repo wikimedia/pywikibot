@@ -28,8 +28,9 @@ Pywikibot and this documentation are licensed under the
 :ref:`MIT license`;
 manual pages on mediawiki.org are licensed under the `CC-BY-SA 3.0`_ license.
 
-.. seealso:: `Pywikibot Manual`_ on https://www.mediawiki.org, which includes additional resources, such as:
-   
+.. seealso:: `Pywikibot Manual`_ on https://www.mediawiki.org, which includes
+   additional resources, such as:
+
    * `Pywikibot Cookbook`_
    * `Pywikibot Workshop Materials`_
 
