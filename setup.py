@@ -247,7 +247,7 @@ def main() -> None:  # pragma: no cover
         # zip_safe
         install_requires=dependencies,
         extras_require=extra_deps,
-        python_requires='>=3.6.1,!=3.12.0-alpha.7',
+        python_requires='>=3.6.1',
         # namespace_packages
         test_suite='tests.collector',
         tests_require=test_deps,
