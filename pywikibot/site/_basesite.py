@@ -31,6 +31,9 @@ from pywikibot.tools import (
 )
 
 
+PYTHON_312A7 = sys.version.split()[0] == '3.12.0a7'  # T334378 workaround
+
+
 class BaseSite(ComparableMixin):
 
     """Site methods that are independent of the communication interface."""
@@ -187,7 +190,7 @@ class BaseSite(ComparableMixin):
 
     def __getattr__(self, attr):
         """Delegate undefined methods calls to the Family object."""
-        if sys.version.split()[0] == '3.12.0a7':  # T334378 workaround
+        if PYTHON_312A7:  # T334378 workaround
             print(end='')  # noqa: T001, T201
         try:
             method = getattr(self.family, attr)
