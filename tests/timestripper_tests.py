@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for archivebot.py/Timestripper."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -41,7 +41,7 @@ class TestTimeStripperWithNoDigitsAsMonths(TestTimeStripperCase):
         txt_with_one_match = 'this string has 3000, 1999 and 3000 in it'
         txt_with_two_match = 'this string has 1998, 1999 and 3000 in it'
         txt_with_no_match = 'this string has no match'
-        pat = self.ts.pyearR
+        pat = self.ts.patterns.year
 
         txt, m = self.ts._last_match_and_replace(txt_with_one_match, pat)
         self.assertEqual('this string has 3000, @@@@ and 3000 in it', txt)
@@ -63,7 +63,7 @@ class TestTimeStripperWithNoDigitsAsMonths(TestTimeStripperCase):
         txt_with_two_match = 'this string has XXX, mars and février in it'
         txt_with_three_match = 'this string has avr, mars and février in it'
         txt_with_no_match = 'this string has no match'
-        pat = self.ts.pmonthR
+        pat = self.ts.patterns.month
 
         txt, m = self.ts._last_match_and_replace(txt_with_one_match, pat)
         self.assertEqual('this string has XXX, YYY and @@@@@@@ in it', txt)
@@ -109,7 +109,7 @@ class TestTimeStripperWithDigitsAsMonths(TestTimeStripperCase):
         txt_with_two_match = 'this string has XX. 1. 12. in it'
         txt_with_three_match = 'this string has 1. 1. 12. in it'
         txt_with_no_match = 'this string has no match'
-        pat = self.ts.pmonthR
+        pat = self.ts.patterns.month
 
         txt, m = self.ts._last_match_and_replace(txt_with_one_match, pat)
         self.assertEqual('this string has XX. YY. 12. in it', txt)
