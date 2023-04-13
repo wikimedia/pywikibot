@@ -287,9 +287,9 @@ class LoginManager:
                 'Password for user {name} on {site} (no characters will be '
                 'shown):'.format(name=self.login_name, site=self.site),
                 password=True)
+        else:
+            pywikibot.info(f'Logging in to {self.site} as {self.login_name}')
 
-        pywikibot.info('Logging in to {site} as {name}'
-                       .format(name=self.login_name, site=self.site))
         try:
             self.login_to_site()
         except APIError as e:
