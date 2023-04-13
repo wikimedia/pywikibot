@@ -9,6 +9,11 @@ archivebot
 
 * Processing speed was improved and is up to 20 times faster, 2-3 times on average
 
+redirect
+~~~~~~~~
+
+* Fix -namespace usage if RedirectGenerator is used (:phab:`T331243`)
+
 
 8.0.2
 -----

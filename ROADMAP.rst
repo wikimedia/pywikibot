@@ -1,6 +1,9 @@
 Current release
 ---------------
 
+* Disable command.log if -nolog option is given (:phab:`T334381`)
+* Guess the last needed token key if the token is not found (:phab:`T334288`)
+* Show parameters with APIError (:phab:`T333957`)
 * Raise :exc:`exceptions.NoSiteLinkError` instead of :exc:`exceptions.NoPageError` when sitelink
   is missing in :meth:`ItemPage.getSitelink()<pywikibot.ItemPage.getSitelink>` (:phab:`T332341`)
 * :exc:`exceptions.ClientError` was added
