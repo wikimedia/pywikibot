@@ -466,7 +466,7 @@ class RedirectRobot(ExistingPageBot):
         """
         assert page.site == self.current_page.site, (
             f'target page is on different site {page.site}')
-        reason = i18n.twtranslate(page.site, summary_key)
+        reason = i18n.twtranslate(page.site, summary_key, bot_prefix=True)
         if page.site.has_right('delete'):
             page.delete(reason, prompt=False)
         elif self.sdtemplate:
@@ -529,7 +529,8 @@ class RedirectRobot(ExistingPageBot):
                     reason = i18n.twtranslate(
                         redir_page.site, 'redirect-fix-broken-moved',
                         {'to': movedTarget.title(as_link=True,
-                                                 allow_interwiki=False)})
+                                                 allow_interwiki=False)},
+                        bot_prefix=True)
                     content = redir_page.get(get_redirect=True)
                     redir_page.set_redirect_target(
                         movedTarget, keep_section=True, save=False)
@@ -664,7 +665,8 @@ class RedirectRobot(ExistingPageBot):
                                       save=False)
             summary = i18n.twtranslate(
                 redir.site, 'redirect-fix-double',
-                {'to': targetPage.title(as_link=True, allow_interwiki=False)})
+                {'to': targetPage.title(as_link=True, allow_interwiki=False)},
+                bot_prefix=True)
             self.userPut(redir, oldText, redir.text, summary=summary,
                          ignore_save_related_errors=True,
                          ignore_server_errors=True)
