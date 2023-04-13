@@ -1,7 +1,9 @@
 Current release
 ---------------
 
-* Add support for ckb-wiktionary (:phab:`T332093`)
+* L10N Updates
+* Minimal needed mwparserfromhell was decreased to 0.5.2 (:phab:`T326498`, :phab:`T327600`)
+* No longer lazy load password cookies (:phab:`T271858`, :phab:`T326779`, :phab:`T329132`, :phab:`T330488`, :phab:`T331315`)
 
 
 Deprecations
