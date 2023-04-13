@@ -80,7 +80,6 @@ jobs:
         pip install -U setuptools
         pip install requests
         pip install mwparserfromhell
-        pip install codecov
         pip install coverage
         python -c "import setuptools; print('setuptools:', setuptools.__version__)"
 

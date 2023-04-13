@@ -56,7 +56,6 @@ jobs:
         pip install "sseclient<0.0.23,>=0.0.18"
         pip install mwparserfromhell
         pip install "PyMySQL >= 0.9.3"
-        pip install codecov
         pip install coverage
         python -c "import setuptools; print('setuptools:', setuptools.__version__)"
 
