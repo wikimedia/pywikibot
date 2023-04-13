@@ -219,6 +219,9 @@ class TestLogentryParams(TestLogentriesBase):
     def test_move_entry(self, key):
         """Test MoveEntry methods."""
         logentry = self._get_logentry('move')
+        if 'actionhidden' in logentry:
+            self.skipTest(
+                f'move action was hidden due to {logentry.comment()}')
         self.assertIsInstance(logentry.target_ns, pywikibot.site.Namespace)
         self.assertEqual(logentry.target_page.namespace(),
                          logentry.target_ns.id)
