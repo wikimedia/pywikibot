@@ -71,4 +71,4 @@ jobs:
         pytest --version
         coverage run -m pytest pywikibot --doctest-modules --ignore-glob="*gui.py" --ignore-glob="*memento.py"
     - name: Upload coverage to Codecov
-      run: codecov
+      uses: codecov/codecov-action@v3

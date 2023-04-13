@@ -121,4 +121,4 @@ jobs:
         coverage run -m unittest -vv tests/site_login_logout_tests.py
 
     - name: Upload coverage to Codecov
-      run: codecov
+      uses: codecov/codecov-action@v3
