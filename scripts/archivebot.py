@@ -635,6 +635,16 @@ class PageArchiver:
         params['monthnameshort'] = monthnames['short']
         return params
 
+    def preload_pages(self, counter: int, thread, pattern) -> None:
+        """Preload pages if counter matters."""
+        if counter < 25:
+            return
+
+        for c in range(counter):
+            params = self.get_params(thread.timestamp, c + 1)
+            self.get_archive_page(pattern % params, params)
+        list(self.site.preloadpages(self.archives.values()))
+
     def analyze_page(self) -> Set[ShouldArchive]:
         """Analyze DiscussionPage."""
         max_size = self.get_attr('maxarchivesize')
@@ -712,13 +722,7 @@ class PageArchiver:
 
                 if counter_matters:
 
-                    # preload pages
-                    if counter >= 25:
-                        for c in range(counter):
-                            params = self.get_params(thread.timestamp, c + 1)
-                            self.get_archive_page(pattern % params, params)
-                        list(self.site.preloadpages(self.archives.values()))
-
+                    self.preload_pages(counter, thread, pattern)
                     while not counter_found and counter > 1 \
                             and not archive.exists():
                         # This may happen when either:
@@ -847,6 +851,24 @@ def process_page(page, *args: Any) -> bool:
     return True
 
 
+def show_md5_key(calc, salt, site) -> bool:
+    """Show calculated MD5 hexdigest."""
+    if not calc:
+        return False
+
+    if not salt:
+        pywikibot.bot.suggest_help(missing_parameters=['-salt'])
+    else:
+        page = pywikibot.Page(site, calc)
+        if page.exists():
+            calc = page.title()
+        else:
+            pywikibot.info(
+                f'NOTE: the specified page "{calc}" does not (yet) exist.')
+        pywikibot.info(f'key = {calc_md5_hexdigest(calc, salt)}')
+    return True
+
+
 def main(*args: str) -> None:
     """
     Process command line arguments and invoke bot.
@@ -902,18 +924,7 @@ def main(*args: str) -> None:
 
     site = pywikibot.Site()
 
-    if calc:
-        if not salt:
-            pywikibot.bot.suggest_help(missing_parameters=['-salt'])
-            return
-        page = pywikibot.Page(site, calc)
-        if page.exists():
-            calc = page.title()
-        else:
-            pywikibot.info(
-                'NOTE: the specified page "{}" does not (yet) exist.'
-                .format(calc))
-        pywikibot.info(f'key = {calc_md5_hexdigest(calc, salt)}')
+    if show_md5_key(calc, salt, site):
         return
 
     if not templates:
