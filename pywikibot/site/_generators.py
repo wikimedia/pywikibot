@@ -89,32 +89,43 @@ class GeneratorsMixin:
         self,
         pagelist,
         *,
-        groupsize: int = 50,
+        groupsize: Optional[int] = None,
         templates: bool = False,
         langlinks: bool = False,
         pageprops: bool = False,
         categories: bool = False,
-        content: bool = True
+        content: bool = True,
+        quiet: bool = True
     ):
         """Return a generator to a list of preloaded pages.
 
-        Pages are iterated in the same order than in the underlying pagelist.
-        In case of duplicates in a groupsize batch, return the first entry.
+        Pages are iterated in the same order than in the underlying
+        pagelist. In case of duplicates in a groupsize batch, return the
+        first entry.
 
         .. versionchanged:: 7.6
            *content* parameter was added.
         .. versionchanged:: 7.7
            *categories* parameter was added.
+        .. versionchanged:: 8.1
+           *groupsize* is maxlimit by default. *quiet* parameter was
+           added. No longer show the "Retrieving pages from site"
+           message by default.
 
         :param pagelist: an iterable that returns Page objects
-        :param groupsize: how many Pages to query at a time
-        :param templates: preload pages (typically templates) transcluded in
-            the provided pages
-        :param langlinks: preload all language links from the provided pages
-            to other languages
-        :param pageprops: preload various properties defined in page content
+        :param groupsize: how many Pages to query at a time. If None
+            (default), :attr:`maxlimit
+            <pywikibot.site._apisite.APISite.maxlimit>` is used.
+        :param templates: preload pages (typically templates)
+            transcluded in the provided pages
+        :param langlinks: preload all language links from the provided
+            pages to other languages
+        :param pageprops: preload various properties defined in page
+            content
         :param categories: preload page categories
         :param content: preload page content
+        :param quiet: If True (default), do not show the "Retrieving
+            pages" message
         """
         props = 'revisions|info|categoryinfo'
         if templates:
@@ -126,7 +137,8 @@ class GeneratorsMixin:
         if categories:
             props += '|categories'
 
-        for sublist in itergroup(pagelist, min(groupsize, self.maxlimit)):
+        groupsize = min(groupsize or self.maxlimit, self.maxlimit)
+        for sublist in itergroup(pagelist, groupsize):
             # Do not use p.pageid property as it will force page loading.
             pageids = [str(p._pageid) for p in sublist
                        if hasattr(p, '_pageid') and p._pageid > 0]
@@ -151,8 +163,8 @@ class GeneratorsMixin:
             else:
                 rvgen.request['titles'] = list(cache.keys())
             rvgen.request['rvprop'] = self._rvprops(content=content)
-            pywikibot.info('Retrieving {} pages from {}.'
-                           .format(len(cache), self))
+            if not quiet:
+                pywikibot.info(f'Retrieving {len(cache)} pages from {self}.')
 
             for pagedata in rvgen:
                 pywikibot.debug(f'Preloading {pagedata}')

@@ -328,7 +328,7 @@ that you have to break it off, use "-continue" next time.
 
 """
 #
-# (C) Pywikibot team, 2003-2022
+# (C) Pywikibot team, 2003-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1992,7 +1992,7 @@ class InterwikiBot:
 
         # Get the content of the assembled list in one blow
         gen = site.preloadpages(pageGroup, templates=True, langlinks=True,
-                                pageprops=True)
+                                pageprops=True, quiet=False)
         for _ in gen:
             # we don't want to do anything with them now. The
             # page contents will be read via the Subject class.

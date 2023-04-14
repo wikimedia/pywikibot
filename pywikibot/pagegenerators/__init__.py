@@ -13,7 +13,7 @@ These parameters are supported to specify which pages titles to print:
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -613,13 +613,15 @@ def RepeatingGenerator(generator: Callable,  # type: ignore[type-arg]
 
 
 def PreloadingGenerator(generator: Iterable['pywikibot.page.Page'],
-                        groupsize: int = 50
+                        groupsize: int = 50,
+                        quiet: bool = False
                         ) -> Iterator['pywikibot.page.Page']:
-    """
-    Yield preloaded pages taken from another generator.
+    """Yield preloaded pages taken from another generator.
 
     :param generator: pages to iterate over
     :param groupsize: how many pages to preload at once
+    :param quiet: If False (default), show the "Retrieving pages"
+        message
     """
     # pages may be on more than one site, for example if an interwiki
     # generator is used, so use a separate preloader for each site
@@ -633,17 +635,25 @@ def PreloadingGenerator(generator: Iterable['pywikibot.page.Page'],
         if len(sites[site]) >= groupsize:
             # if this site is at the groupsize, process it
             group = sites.pop(site)
-            yield from site.preloadpages(group, groupsize=groupsize)
+            yield from site.preloadpages(group, groupsize=groupsize,
+                                         quiet=quiet)
 
     for site, pages in sites.items():
         # process any leftover sites that never reached the groupsize
-        yield from site.preloadpages(pages, groupsize=groupsize)
+        yield from site.preloadpages(pages, groupsize=groupsize, quiet=quiet)
 
 
 def DequePreloadingGenerator(generator: Iterable['pywikibot.page.Page'],
-                             groupsize: int = 50
+                             groupsize: int = 50,
+                             quiet: bool = False
                              ) -> Iterator['pywikibot.page.Page']:
-    """Preload generator of type DequeGenerator."""
+    """Preload generator of type DequeGenerator.
+
+    :param generator: pages to iterate over
+    :param groupsize: how many pages to preload at once
+    :param quiet: If False (default), show the "Retrieving pages"
+        message
+    """
     assert isinstance(generator, DequeGenerator), \
         'generator must be a DequeGenerator object'
 
@@ -652,7 +662,7 @@ def DequePreloadingGenerator(generator: Iterable['pywikibot.page.Page'],
         if not page_count:
             return
 
-        yield from PreloadingGenerator(generator, page_count)
+        yield from PreloadingGenerator(generator, page_count, quiet)
 
 
 def PreloadingEntityGenerator(generator: Iterable['pywikibot.page.Page'],

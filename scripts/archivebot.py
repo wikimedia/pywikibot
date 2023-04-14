@@ -717,9 +717,7 @@ class PageArchiver:
                         for c in range(counter):
                             params = self.get_params(thread.timestamp, c + 1)
                             self.get_archive_page(pattern % params, params)
-                        list(self.site.preloadpages(
-                            self.archives.values(),
-                            groupsize=self.site.maxlimit))
+                        list(self.site.preloadpages(self.archives.values()))
 
                     while not counter_found and counter > 1 \
                             and not archive.exists():
