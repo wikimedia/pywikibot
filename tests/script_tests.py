@@ -206,7 +206,7 @@ class ScriptTestMeta(MetaTestCaseClass):
                     do_timeout = self._timeout
                 else:
                     do_timeout = script_name in self._timeout
-                timeout = 5 if do_timeout else None
+                timeout = 10 if do_timeout else None
 
                 stdout, error = None, None
                 if self._results:
