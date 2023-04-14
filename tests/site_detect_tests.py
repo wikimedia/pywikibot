@@ -14,7 +14,7 @@ from urllib.parse import urlparse
 import requests.exceptions as requests_exceptions
 
 import pywikibot
-from pywikibot.exceptions import ServerError
+from pywikibot.exceptions import ClientError, ServerError
 from pywikibot.site_detect import MWSite
 
 from tests.aspects import PatchingTestCase, TestCase
@@ -38,14 +38,14 @@ class SiteDetectionTestCase(TestCase):
             self.assertIsInstance(MWSite(url), MWSite)
 
     def assertNoSite(self, url: str):
-        """
-        Assert a url is not a MediaWiki site.
+        """Assert a url is not a MediaWiki site.
 
         :param url: Url of tested site
         :raises AssertionError: Site under url is MediaWiki powered
         """
         with self.assertRaises((AttributeError,
-                                ConnectionError,
+                                ClientError,
+                                ConnectionError,  # different from requests
                                 RuntimeError,
                                 ServerError,
                                 requests_exceptions.ConnectionError,

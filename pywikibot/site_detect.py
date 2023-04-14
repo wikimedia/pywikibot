@@ -295,7 +295,7 @@ def check_response(response):
     ]:  # highest http status code first
         if response.status_code >= status_code:
             try:
-                status = HTTPStatus(response.status_code).description
+                status = HTTPStatus(response.status_code)
             except ValueError as err:
                 m = re.search(r'\d{3}', err.args[0], flags=re.ASCII)
                 if not m:
