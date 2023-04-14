@@ -24,6 +24,11 @@ class FamilyTestGenerator(generate_family_file.FamilyFileGenerator):
         """Only load up to additional ten different wikis randomly."""
         save = self.langs
         self.langs = sample(save, min(len(save), 10))
+        for wiki in save:  # add closed wiki due to T334714
+            if wiki['prefix'] == 'ii' and 'ii' not in self.langs:
+                self.langs.append(wiki)
+                break
+
         self.prefixes = [item['prefix'] for item in self.langs]
         super().getapis()
         self.langs = save
@@ -74,8 +79,10 @@ class TestGenerateFamilyFiles(DefaultSiteTestCase):
         if self.site.family.name not in ('wsbeta', 'musicbrainz'):
             with self.subTest(test='Test element counts'):
                 if self.site.lang not in gen.prefixes:
-                    gen.prefixes += [self.site.lang]
-                self.assertCountEqual(gen.prefixes, gen.wikis)
+                    gen.prefixes.append(self.site.lang)
+                obsolete = self.site.family.interwiki_removals
+                self.assertCountEqual(set(gen.prefixes) - obsolete,
+                                      set(gen.wikis) - obsolete)
 
         # test creating Site from url
         # only test Sites for downloaded wikis (T241413)
