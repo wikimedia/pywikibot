@@ -34,7 +34,8 @@ class RequestCacheTests(TestCase):
 
     def test_cache(self):
         """Test the apicache by doing _check_cache_entry over each entry."""
-        cache.process_entries(join_cache_path(), self._check_cache_entry)
+        cache.process_entries(join_cache_path(), self._check_cache_entry,
+                              tests=25)
 
 
 if __name__ == '__main__':  # pragma: no cover
