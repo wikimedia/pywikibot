@@ -1579,7 +1579,7 @@ class Claim(Property):
         """
         claim_repo = site.get_repo_for_entity_type('property')
         claim = cls(claim_repo, data['mainsnak']['property'],
-                    datatype=data['mainsnak'].get('datatype', None))
+                    datatype=data['mainsnak'].get('datatype'))
         if 'id' in data:
             claim.snak = data['id']
         elif 'hash' in data:
