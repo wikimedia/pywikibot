@@ -11,6 +11,7 @@ from random import sample
 from urllib.parse import urlparse
 
 from pywikibot import Site
+from pywikibot.family import WikimediaFamily
 from pywikibot.scripts import generate_family_file
 from tests.aspects import DefaultSiteTestCase
 from tests.utils import skipping
@@ -29,15 +30,15 @@ class FamilyTestGenerator(generate_family_file.FamilyFileGenerator):
                 self.langs.append(wiki)
                 break
 
-        self.prefixes = [item['prefix'] for item in self.langs]
         super().getapis()
+        self.prefixes = [item['prefix'] for item in self.langs]
         self.langs = save
 
     def writefile(self, verify):
         """Pass writing."""
 
 
-class TestGenerateFamilyFiles(DefaultSiteTestCase):
+class TestGenerateFamilyFile(DefaultSiteTestCase):
 
     """Test generate_family_file functionality."""
 
@@ -55,15 +56,17 @@ class TestGenerateFamilyFiles(DefaultSiteTestCase):
     def setUp(self):
         """Set up tests."""
         super().setUp()
+        answer = 's' if isinstance(self.site.family, WikimediaFamily) else 'y'
         self.generator_instance = FamilyTestGenerator(
-            url=self.site.base_url(''), name=self.familyname, dointerwiki='y')
+            url=self.site.base_url(''), name=self.familyname,
+            dointerwiki=answer)
 
     def test_initial_attributes(self):
         """Test initial FamilyFileGenerator attributes."""
         self.assertEqual(self.generator_instance.base_url,
                          self.site.base_url(''))
         self.assertEqual(self.generator_instance.name, self.familyname)
-        self.assertEqual(self.generator_instance.dointerwiki, 'y')
+        self.assertIn(self.generator_instance.dointerwiki, ['s', 'y'])
         self.assertIsInstance(self.generator_instance.wikis, dict)
         self.assertIsInstance(self.generator_instance.langs, list)
 
@@ -80,9 +83,7 @@ class TestGenerateFamilyFiles(DefaultSiteTestCase):
             with self.subTest(test='Test element counts'):
                 if self.site.lang not in gen.prefixes:
                     gen.prefixes.append(self.site.lang)
-                obsolete = self.site.family.interwiki_removals
-                self.assertCountEqual(set(gen.prefixes) - obsolete,
-                                      set(gen.wikis) - obsolete)
+                self.assertCountEqual(gen.prefixes, gen.wikis)
 
         # test creating Site from url
         # only test Sites for downloaded wikis (T241413)

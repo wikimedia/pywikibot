@@ -12,7 +12,7 @@ omitted if there is no successor parameter. The parameters are::
 
     <url>:         an url from where the family settings are loaded
     <name>:        the family name without "_family.py" tail.
-    <dointerwiki>: predefined answer (y|n) to add multiple site codes
+    <dointerwiki>: predefined answer (y|s|n) to add multiple site codes
     <verify>:      disable certificate validaton `(y|n)
 
 Example::
@@ -25,14 +25,18 @@ base directory.
 .. versionchanged:: 7.0
    moved to pywikibot.scripts folder; create family files in families
    folder of your base directory instead of pywikibot/families.
+.. versionchanged:: 8.1
+   [s]trict can be given for <dointerwiki> parameter to ensure that
+   sites are from the given domain.
 """
 #
-# (C) Pywikibot team, 2010-2022
+# (C) Pywikibot team, 2010-2023
 #
 # Distributed under the terms of the MIT license
 #
 import codecs
 import os
+import re
 import string
 import sys
 from contextlib import suppress
@@ -63,8 +67,10 @@ class FamilyFileGenerator:
         :param url: an url from where the family settings are loaded
         :param name: the family name without "_family.py" tail.
         :param dointerwiki: Predefined answer to add multiple site
-            codes. Pass `Y` or `y` for yes `N` or `n` for no and
-            `E` or `e` if you want to edit the collection of sites.
+            codes. Pass `Y` or `y` for yes, `S` or `s` for strict which
+            only includes site of the same domain (usually for Wikimedia
+            sites), `N` or `n` for no and `E` or `e` if you want to edit
+            the collection of sites.
         :param verify: If a certificate verification failes, you may
             pass `Y` or `y` to disable certificate validaton `N` or `n`
             to keep it enabled.
@@ -149,7 +155,14 @@ class FamilyFileGenerator:
         self.writefile(verify)
 
     def getlangs(self, w) -> None:
-        """Determine site code of a family."""
+        """Determine site code of a family.
+
+        .. versionchanged:: 8.1
+           with [e]dit the interwiki list can be given delimited by
+           space or comma or both. With [s]trict only sites with the
+           same domain are collected. A [h]elp answer was added to show
+           more information about possible answers.
+        """
         print('Determining other sites...', end='')
         try:
             self.langs = w.langs
@@ -169,21 +182,39 @@ class FamilyFileGenerator:
         code_len = len(self.langs)
         if code_len > 1:
             if self.dointerwiki is None:
-                makeiw = input(
-                    '\nThere are {} sites available.'
-                    '\nDo you want to generate interwiki links? '
-                    'This might take a long time. ([y]es/[N]o/[e]dit)'
-                    .format(code_len)).lower()
+                while True:
+                    makeiw = input(
+                        '\n'
+                        f'There are {code_len} sites available.'
+                        ' Do you want to generate interwiki links?\n'
+                        'This might take a long time. '
+                        '([y]es, [s]trict, [N]o, [e]dit), [h]elp) ').lower()
+                    if makeiw in ('y', 's', 'n', 'e', ''):
+                        break
+                    print(
+                        '\n'
+                        '[y]es:    create interwiki links for all sites\n'
+                        '[s]trict: yes, but for sites with same domain only\n'
+                        '[N]o:     no, use the current site only (default)\n'
+                        '[e]dit:   get a list delimited with space or comma\n'
+                        '[h]elp:   this help message'
+                    )
             else:
                 makeiw = self.dointerwiki
 
-            if makeiw == 'n':
+            if makeiw in ('n', ''):
                 self.langs = [wiki for wiki in self.langs
                               if wiki['url'] == w.iwpath]
+            elif makeiw == 's':
+                domain = '.'.join(urlparse(w.server).hostname.split('.')[1:])
+                self.langs = [wiki for wiki in self.langs
+                              if domain in wiki['url']]
+
             elif makeiw == 'e':
                 for wiki in self.langs:
                     print(wiki['prefix'], wiki['url'])
-                do_langs = input('Which sites do you want: ')
+                do_langs = re.split(' *,| +',
+                                    input('Which sites do you want: '))
                 self.langs = [wiki for wiki in self.langs
                               if wiki['prefix'] in do_langs
                               or wiki['url'] == w.iwpath]
@@ -196,7 +227,8 @@ class FamilyFileGenerator:
 
     def getapis(self) -> None:
         """Load other site pages."""
-        print('Loading wikis... ')
+        print(f'Loading {len(self.langs)} wikis... ')
+        remove = []
         for lang in self.langs:
             key = lang['prefix']
             print(f'  * {key}... ', end='')
@@ -206,8 +238,12 @@ class FamilyFileGenerator:
                     print('downloaded')
                 except Exception as e:  # pragma: no cover
                     print(e)
+                    remove.append(lang)
             else:
                 print('in cache')
+
+        for lang in remove:
+            self.langs.remove(lang)
 
     def writefile(self, verify) -> None:
         """Write the family file."""
@@ -215,8 +251,8 @@ class FamilyFileGenerator:
                           f'{self.name}_family.py')
         print(f'Writing {fn}... ')
 
-        if os.path.exists(fn) and input('{} already exists. Overwrite? (y/n)'
-                                        .format(fn)).lower() == 'n':
+        if os.path.exists(fn) and input(
+                f'{fn} already exists. Overwrite? (y/n) ').lower() == 'n':
             print('Terminating.')
             sys.exit(1)
 
