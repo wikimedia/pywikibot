@@ -12,7 +12,8 @@ archivebot
 redirect
 ~~~~~~~~
 
-* Fix -namespace usage if RedirectGenerator is used (:phab:`T331243`)
+* Use ``Bot:`` prefixed summary (:phab:`T161459`)
+* Fix ``-namespace`` usage if RedirectGenerator is used (:phab:`T331243`)
 
 
 8.0.2

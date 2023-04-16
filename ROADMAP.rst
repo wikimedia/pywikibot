@@ -1,6 +1,12 @@
 Current release
 ---------------
 
+* :mod:`generate_family_file<pywikibot.scripts.generate_family_file>` script was improved (:phab:`T334775`)
+* A ``quiet`` parameter was added to :meth:`APISite.preloadpages()
+  <pywikibot.site._generators.GeneratorsMixin.preloadpages>` which is True by default
+* Fix getting HTTPStatus enum in site_detect check_response (:phab:`T334728`)
+* Do not show a logging in message if password is entered (:phab:`T178061`)
+* Enable preleading ``Bot:`` prefix with twtranslate messages (:phab:`T161459`)
 * Disable command.log if -nolog option is given (:phab:`T334381`)
 * Guess the last needed token key if the token is not found (:phab:`T334288`)
 * Show parameters with APIError (:phab:`T333957`)
