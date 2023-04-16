@@ -56,7 +56,6 @@ jobs:
         pip install "sseclient<0.0.23,>=0.0.18"
         pip install mwparserfromhell
         pip install "PyMySQL >= 0.9.3"
-        pip install codecov
         pip install coverage
         python -c "import setuptools; print('setuptools:', setuptools.__version__)"
 
@@ -71,4 +70,4 @@ jobs:
         pytest --version
         coverage run -m pytest pywikibot --doctest-modules --ignore-glob="*gui.py" --ignore-glob="*memento.py"
     - name: Upload coverage to Codecov
-      run: codecov
+      uses: codecov/codecov-action@v3

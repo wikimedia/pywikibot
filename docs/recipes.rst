@@ -2,6 +2,8 @@
 Recipes
 *******
 
+For more recipes, see the `Pywikibot Cookbook <https://www.mediawiki.org/wiki/Manual:Pywikibot/Cookbook>`_.
+
 How to modify a page
 ====================
 

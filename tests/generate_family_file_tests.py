@@ -11,6 +11,7 @@ from random import sample
 from urllib.parse import urlparse
 
 from pywikibot import Site
+from pywikibot.family import WikimediaFamily
 from pywikibot.scripts import generate_family_file
 from tests.aspects import DefaultSiteTestCase
 from tests.utils import skipping
@@ -24,15 +25,20 @@ class FamilyTestGenerator(generate_family_file.FamilyFileGenerator):
         """Only load up to additional ten different wikis randomly."""
         save = self.langs
         self.langs = sample(save, min(len(save), 10))
-        self.prefixes = [item['prefix'] for item in self.langs]
+        for wiki in save:  # add closed wiki due to T334714
+            if wiki['prefix'] == 'ii' and 'ii' not in self.langs:
+                self.langs.append(wiki)
+                break
+
         super().getapis()
+        self.prefixes = [item['prefix'] for item in self.langs]
         self.langs = save
 
     def writefile(self, verify):
         """Pass writing."""
 
 
-class TestGenerateFamilyFiles(DefaultSiteTestCase):
+class TestGenerateFamilyFile(DefaultSiteTestCase):
 
     """Test generate_family_file functionality."""
 
@@ -50,15 +56,17 @@ class TestGenerateFamilyFiles(DefaultSiteTestCase):
     def setUp(self):
         """Set up tests."""
         super().setUp()
+        answer = 's' if isinstance(self.site.family, WikimediaFamily) else 'y'
         self.generator_instance = FamilyTestGenerator(
-            url=self.site.base_url(''), name=self.familyname, dointerwiki='y')
+            url=self.site.base_url(''), name=self.familyname,
+            dointerwiki=answer)
 
     def test_initial_attributes(self):
         """Test initial FamilyFileGenerator attributes."""
         self.assertEqual(self.generator_instance.base_url,
                          self.site.base_url(''))
         self.assertEqual(self.generator_instance.name, self.familyname)
-        self.assertEqual(self.generator_instance.dointerwiki, 'y')
+        self.assertIn(self.generator_instance.dointerwiki, ['s', 'y'])
         self.assertIsInstance(self.generator_instance.wikis, dict)
         self.assertIsInstance(self.generator_instance.langs, list)
 
@@ -74,7 +82,7 @@ class TestGenerateFamilyFiles(DefaultSiteTestCase):
         if self.site.family.name not in ('wsbeta', 'musicbrainz'):
             with self.subTest(test='Test element counts'):
                 if self.site.lang not in gen.prefixes:
-                    gen.prefixes += [self.site.lang]
+                    gen.prefixes.append(self.site.lang)
                 self.assertCountEqual(gen.prefixes, gen.wikis)
 
         # test creating Site from url

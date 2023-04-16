@@ -9,11 +9,11 @@ import os
 import sys
 import unittest
 
-from make_dist import handle_args
 from pywikibot import __version__
-from tests.aspects import TestCase
+from tests.aspects import TestCase, require_modules
 
 
+@require_modules('dataclasses')  # Python 3.7+
 class TestMakeDist(TestCase):
 
     """Test the make_dist script."""
@@ -29,27 +29,20 @@ class TestMakeDist(TestCase):
 
     def test_handle_args_empty(self):
         """Test make_dist handle_args function."""
+        from make_dist import handle_args
         args = handle_args()
-        self.assertEqual(args, (False, ) * 5)
-        self._test_argv()
-
-    def test_handle_args_nodist(self):
-        """Test make_dist handle_args function."""
-        sys.argv += ['-local', '-nodist', '-remote']
-        *args, nodist = handle_args()
-        self.assertEqual(args, [False] * 4)
-        self.assertTrue(nodist)
+        self.assertEqual(args, (False, ) * 4)
         self._test_argv()
 
     def test_handle_args(self):
         """Test make_dist handle_args function."""
+        from make_dist import handle_args
         sys.argv += ['-clear', '-local', '-remote', '-upgrade']
-        local, remote, clear, upgrade, nodist = handle_args()
+        local, remote, clear, upgrade = handle_args()
         self.assertTrue(local)
         self.assertEqual(remote, 'dev' not in __version__)
         self.assertTrue(clear)
         self.assertTrue(upgrade)
-        self.assertFalse(nodist)
         self._test_argv()
 
 

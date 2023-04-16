@@ -64,7 +64,7 @@ Available output commands:
     uniquedesc(entry)
 """
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -74,6 +74,7 @@ import os
 import pickle
 import sys
 from pathlib import Path
+from random import sample
 from typing import Optional
 
 import pywikibot
@@ -219,7 +220,8 @@ class CacheEntry(api.CachedRequest):
 
 
 def process_entries(cache_path, func, use_accesstime: Optional[bool] = None,
-                    output_func=None, action_func=None):
+                    output_func=None, action_func=None, *,
+                    tests: Optional[int] = None):
     """Check the contents of the cache.
 
     This program tries to use file access times to determine whether
@@ -230,6 +232,7 @@ def process_entries(cache_path, func, use_accesstime: Optional[bool] = None,
 
     :param use_accesstime: Whether access times should be used. `None`
         for detect, `False` for don't use and `True` for always use.
+    :param tests: Only process a test sample of files
     """
     if not cache_path:
         cache_path = os.path.join(pywikibot.config.base_dir,
@@ -244,6 +247,9 @@ def process_entries(cache_path, func, use_accesstime: Optional[bool] = None,
                      for filename in os.listdir(cache_path)]
     else:
         filenames = [cache_path]
+
+    if tests:
+        filenames = sample(filenames, min(len(filenames), tests))
 
     for filepath in filenames:
         filename = os.path.basename(filepath)
@@ -260,7 +266,7 @@ def process_entries(cache_path, func, use_accesstime: Optional[bool] = None,
             continue
 
         # Skip foreign python specific directory
-        _, _, version = cache_path.partition('-')
+        *_, version = cache_path.partition('-')
         if version and version[-1] != str(PYTHON_VERSION[0]):
             pywikibot.error(
                 "Skipping {} directory, can't read content with python {}"

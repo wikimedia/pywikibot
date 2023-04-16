@@ -562,7 +562,7 @@ class TestCosmeticChangesISBN(TestCosmeticChanges):
     @classmethod
     def setUpClass(cls):
         """Skip tests if isbn libraries are missing."""
-        if not has_module('stdnum', version='1.17'):
+        if not has_module('stdnum', version='1.18'):
             raise unittest.SkipTest('python-stdnum is not available.')
         super().setUpClass()
 

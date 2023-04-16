@@ -12,6 +12,29 @@ clean_sandbox
 8.0.1
 -----
 
+archivebot
+~~~~~~~~~~
+
+* Processing speed was improved and is up to 20 times faster, 2-3 times on average
+
+redirect
+~~~~~~~~
+
+* Use ``Bot:`` prefixed summary (:phab:`T161459`)
+* Fix ``-namespace`` usage if RedirectGenerator is used (:phab:`T331243`)
+
+
+8.0.2
+-----
+
+clean_sandbox
+~~~~~~~~~~~~~
+
+* L10N es-wikis
+
+8.0.1
+-----
+
 clean_sandbox
 ~~~~~~~~~~~~~
 

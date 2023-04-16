@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Script to create a new distribution.
+"""Script to create a new distribution. Requires Python 3.7+.
 
 The following options are supported:
 
@@ -7,17 +7,17 @@ The following options are supported:
 
 -local     Install the distribution as a local site-package. If a
            Pywikibot package is already there, it will be uninstalled
-           first.
+           first. Clears old dist folders first.
 
 -remote    Upload the package to pypi. This cannot be done if the
-           Pywikibot version is a development release.
+           Pywikibot version is a development release.  Clears old dist
+           folders first.
 
--clear     Clear old dist folders
+-clear     Clear old dist folders and leave. Does not create a
+           distribution.
 
--upgrade   Upgrade distribution packages pip, setuptools, wheel and twine
-           first
-
--nodist    Do not create a distribution. Useful to -clear or -upgrade only.
+-upgrade   Upgrade distribution packages pip, setuptools, wheel and
+           twine first
 
 Usage::
 
@@ -29,12 +29,18 @@ Usage::
    - updates pip, setuptools, wheel and twine packages first
    - installs pre-releases over stable versions
    - also creates built distribution together with source distribution
-   - `-upgrade` option was added
+   - *-upgrade* option was added
 
 .. versionchanged:: 7.5
 
-   - `clear` option was added
-   - `nodist` option was added
+   - *clear* option was added
+   - *nodist* option was added
+
+.. versionchanged:: 8.1
+   Python 3.7+ required because *dataclasses* module is used.
+   *nodist* option was removed, *clear* option does not create a
+   distribution. *local* and *remote* option clears old distributions
+   first.
 """
 #
 # (C) Pywikibot team, 2022-2023
@@ -44,6 +50,7 @@ Usage::
 import abc
 import shutil
 import sys
+from dataclasses import dataclass, field
 from pathlib import Path
 from subprocess import check_call, run
 
@@ -52,20 +59,24 @@ from pywikibot import __version__, error, info, input_yn, warning
 from pywikibot.backports import Tuple
 
 
+@dataclass
 class SetupBase(abc.ABC):
 
     """Setup distribution base class.
 
     .. versionadded:: 8.0
+    .. versionchanged:: 8.1
+       *dataclass* is used.
     """
 
-    def __init__(self, local, remote, clear, upgrade, nodist) -> None:
-        """Initializer."""
-        self.local = local
-        self.remote = remote
-        self.clear = clear
-        self.upgrade = upgrade
-        self.nodist = nodist
+    local: bool
+    remote: bool
+    clear: bool
+    upgrade: bool
+    folder: Path = field(init=False)
+
+    def __post_init__(self) -> None:
+        """Post-init initializer."""
         self.folder = Path().resolve()
 
     def clear_old_dist(self) -> None:  # pragma: no cover
@@ -94,11 +105,10 @@ class SetupBase(abc.ABC):
             check_call(
                 'pip install --upgrade setuptools wheel twine ', shell=True)
 
-        if self.clear:
+        if self.local or self.remote or self.clear:
             self.clear_old_dist()
-
-        if self.nodist:
-            return
+            if self.clear:
+                return
 
         self.copy_files()
         try:
@@ -181,17 +191,13 @@ def handle_args() -> Tuple[bool, bool, bool, bool, bool]:
     remote = '-remote' in sys.argv
     clear = '-clear' in sys.argv
     upgrade = '-upgrade' in sys.argv
-    nodist = '-nodist' in sys.argv
-
-    if nodist:
-        local, remote = False, False
 
     if remote and 'dev' in __version__:
         warning('Distribution must not be a developmental release to upload.')
         remote = False
 
     sys.argv = [sys.argv[0], 'sdist', 'bdist_wheel']
-    return local, remote, clear, upgrade, nodist
+    return local, remote, clear, upgrade
 
 
 def main() -> None:  # pragma: no cover

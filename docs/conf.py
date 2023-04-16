@@ -175,6 +175,13 @@ html_theme = 'furo'
 #
 html_logo = '_static/Pywikibot_MW_gear_icon.svg'
 
+# Use a PNG version of the logo in OpenGraph social cards
+# (needed because SVG is not supported)
+
+ogp_social_cards = {
+    'image': '_static/Pywikibot_MW_gear_icon.png',
+}
+
 # The name of an image file (relative to this directory) to use as a favicon of
 # the docs. This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.

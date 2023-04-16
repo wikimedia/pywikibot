@@ -34,6 +34,7 @@ import atexit
 import codecs
 import re
 import sys
+import traceback
 from contextlib import suppress
 from http import HTTPStatus, cookiejar
 from string import Formatter
@@ -47,8 +48,8 @@ import pywikibot
 from pywikibot import config, tools
 from pywikibot.backports import Tuple
 from pywikibot.exceptions import (
+    Client414Error,
     FatalServerError,
-    Server414Error,
     Server504Error,
     ServerError,
 )
@@ -108,14 +109,30 @@ session = requests.Session()
 session.cookies = cookie_jar
 
 
-# Prepare flush on quit
 def flush() -> None:  # pragma: no cover
-    """Close the session object. This is called when the module terminates."""
+    """Close the session object. This is called when the module terminates.
+
+    .. versionchanged:: 8.1
+       log the traceback and show the exception value in the critical
+       message
+    """
     log('Closing network session.')
     session.close()
 
     if hasattr(sys, 'last_type'):
-        critical(f'Exiting due to uncaught exception {sys.last_type}')
+        log(
+            ''.join(
+                traceback.format_exception(
+                    sys.last_type,
+                    value=sys.last_value,
+                    tb=sys.last_traceback
+                )
+            )
+        )
+        critical(
+            f'Exiting due to uncaught exception {sys.last_type.__name__}: '
+            f'{sys.last_value}'
+        )
 
     log('Network session closed.')
 
@@ -316,7 +333,7 @@ def error_handling_callback(response):
         raise response from None
 
     if response.status_code == HTTPStatus.REQUEST_URI_TOO_LONG:
-        raise Server414Error('Too long GET request')
+        raise Client414Error(HTTPStatus(response.status_code).description)
 
     if response.status_code == HTTPStatus.GATEWAY_TIMEOUT:
         raise Server504Error('Server {} timed out'

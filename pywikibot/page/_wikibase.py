@@ -31,6 +31,7 @@ from pywikibot.exceptions import (
     IsNotRedirectPageError,
     IsRedirectPageError,
     NoPageError,
+    NoSiteLinkError,
     NoWikibaseEntityError,
     WikiBaseError,
 )
@@ -296,6 +297,9 @@ class WikibaseEntity:
          - :meth:`ItemPage.setSitelinks`
 
          .. seealso:: :meth:`WikibasePage.editEntity`
+
+         .. versionchanged:: 8.0.1
+            Copy snak IDs/hashes (:phab:`T327607`)
 
         :param data: Data to be saved
         """
@@ -1072,10 +1076,12 @@ class ItemPage(WikibasePage):
                 yield pg
 
     def getSitelink(self, site, force: bool = False) -> str:
-        """
-        Return the title for the specific site.
+        """Return the title for the specific site.
 
-        If the item doesn't have that language, raise NoPageError.
+        If the item doesn't have that language, raise NoSiteLinkError.
+
+        .. versionchanged:: 8.1
+           raises NoSiteLinkError instead of NoPageError.
 
         :param site: Site to find the linked page of.
         :type site: pywikibot.Site or database name
@@ -1083,13 +1089,13 @@ class ItemPage(WikibasePage):
         :param get_redirect: return the item content, do not follow the
                              redirect, do not raise an exception.
         :raise IsRedirectPageError: instance is a redirect page
-        :raise NoPageError: site is not in :attr:`sitelinks`
+        :raise NoSiteLinkError: site is not in :attr:`sitelinks`
         """
         if force or not hasattr(self, '_content'):
             self.get(force=force)
 
         if site not in self.sitelinks:
-            raise NoPageError(self)
+            raise NoSiteLinkError(self, site.lang)
 
         return self.sitelinks[site].canonical_title()
 
@@ -1486,8 +1492,8 @@ class Claim(Property):
         cls_name = type(self).__name__
         if self.target:
             return f'{cls_name}.fromJSON({self.repo!r}, {self.toJSON()})'
-        else:
-            return f'{cls_name}({self.repo!r}, {self.id!r})'
+
+        return f'{cls_name}({self.repo!r}, {self.id!r})'
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):

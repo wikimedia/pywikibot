@@ -228,6 +228,7 @@ GLOBAL OPTIONS
 -log:xyz          Enable the log file, using 'xyz' as the filename.
 
 -nolog            Disable the log file (if it is enabled by default).
+                  Also disable command.log.
 
 -maxlag           Sets a new maxlag parameter to a number of seconds.
                   Defer bot edits during periods of database server lag.
@@ -888,6 +889,8 @@ def handle_args(args: Optional[Iterable[str]] = None,
     .. versionchanged:: 8.0
        Short site value can be given if site code is equal to family
        like ``-site:meta``.
+    .. versionchanged:: 8.1
+       ``-nolog`` option also discards command.log.
 
     :param args: Command line arguments. If None,
         :meth:`pywikibot.argvu<userinterfaces._interface_base.ABUIC.argvu>`
@@ -911,6 +914,7 @@ def handle_args(args: Optional[Iterable[str]] = None,
     module_name = calledModuleName() or 'terminal-interface'
     non_global_args = []
     username = None
+    commandlog = True
     do_help_val: Union[bool, str, None] = None if do_help else False
     assert args is not None
     for arg in args:
@@ -939,6 +943,7 @@ def handle_args(args: Optional[Iterable[str]] = None,
             if value:
                 config.logfilename = value
         elif option == '-nolog':
+            commandlog = False
             config.log = []
         elif option in ('-cosmeticchanges', '-cc'):
             config.cosmetic_changes = (strtobool(value) if value
@@ -1008,7 +1013,8 @@ def handle_args(args: Optional[Iterable[str]] = None,
         config.usernames[config.family][config.mylang] = username
 
     init_handlers()
-    writeToCommandLogFile()
+    if commandlog:
+        writeToCommandLogFile()
 
     if config.verbose_output:
         pywikibot.info('Python ' + sys.version)

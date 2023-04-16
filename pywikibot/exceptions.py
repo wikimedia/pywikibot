@@ -10,6 +10,8 @@ the framework::
           |    +-- UploadError
           +-- AutoblockUserError
           +-- CaptchaError
+          +-- ClientError
+          |    +-- Client414Error
           +-- InvalidTitleError
           +-- NoUsernameError
           +-- PageInUseError
@@ -24,6 +26,7 @@ the framework::
           |    +-- PageLoadRelatedError
           |    |    +-- InconsistentTitleError
           |    |    +-- InvalidPageError
+          |    |    +-- NoSiteLinkError
           |    +-- PageSaveRelatedError
           |    |    +-- EditConflictError
           |    |    |    +-- ArticleExistsConflictError
@@ -41,7 +44,6 @@ the framework::
           +-- SectionError
           +-- ServerError
           |    +-- FatalServerError
-          |    +-- Server414Error
           |    +-- Server504Error
           +-- SiteDefinitionError
           |    +-- UnknownFamilyError
@@ -68,17 +70,18 @@ the framework::
 
 Error: Base class, all exceptions should the subclass of this class.
 
-  - NoUsernameError: Username is not in user config file, or it is invalid.
-  - AutoblockUserError: requested action on a virtual autoblock user not valid
-  - TranslationError: no language translation found
-  - UserRightsError: insufficient rights for requested action
-  - InvalidTitleError: Invalid page title
   - CaptchaError: Captcha is asked and config.solve_captcha == False
-  - i18n.TranslationError: i18n/l10n message not available
+  - ClientError: A problem with the client request
+  - AutoblockUserError: requested action on a virtual autoblock user not valid
+  - InvalidTitleError: Invalid page title
+  - NoUsernameError: Username is not in user config file, or it is invalid.
   - PageInUseError: Page cannot be reserved due to a lock
-  - UnknownExtensionError: Extension is not defined for this site
-  - VersionParseError: failed to parse version information
   - SectionError: The section specified by # does not exist
+  - TranslationError: no language translation found
+  - UnknownExtensionError: Extension is not defined for this site
+  - UserRightsError: insufficient rights for requested action
+  - VersionParseError: failed to parse version information
+  - i18n.TranslationError: i18n/l10n message not available
 
 APIError: wiki API returned an error
 
@@ -104,6 +107,7 @@ PageRelatedError: any exception which is caused by an operation on a Page.
 
 PageLoadRelatedError: any exception which happens while loading a Page.
   - InconsistentTitleError: Page receives a title inconsistent with query
+  - NoSiteLinkError: ItemPage has no sitelink to given language
 
 PageSaveRelatedError: page exceptions within the save operation on a Page
 
@@ -160,9 +164,13 @@ UserWarning: warnings targeted at users
    All Pywikibot Error exceptions must be imported from
    ``pywikibot.exceptions``. Deprecated exceptions identifiers were
    removed.
+
+.. versionchanged:: 8.1
+   ``Server414Error`` class is deprecated; use :class:`Client414Error`
+   instead.
 """
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -170,7 +178,7 @@ import re
 from typing import Any, Optional, Union
 
 import pywikibot
-from pywikibot.tools import issue_deprecation_warning
+from pywikibot.tools import ModuleDeprecationWrapper, issue_deprecation_warning
 from pywikibot.tools._deprecate import _NotImplementedWarning
 
 
@@ -390,6 +398,26 @@ class InconsistentTitleError(PageLoadRelatedError):
         super().__init__(page)
 
 
+class NoSiteLinkError(PageLoadRelatedError, NoPageError):
+
+    """ItemPage has no sitelink to the given language.
+
+    .. versionadded:: 8.1
+    .. deprecated:: 8.1
+       :exc:`NoPageError` dependency.
+    """
+
+    def __init__(self, page: 'pywikibot.page.ItemPage', lang: str) -> None:
+        """Initializer.
+
+        :param page: ItemPage that caused the exception
+        :param lang: language code of the queried sitelink
+
+        """
+        self.message = f'Item {{}} has no sitelink to language {lang!r}'
+        super().__init__(page)
+
+
 class SiteDefinitionError(Error):
 
     """Site does not exist."""
@@ -576,6 +604,22 @@ class TitleblacklistError(PageSaveRelatedError):
     message = 'Page {} is title-blacklisted.'
 
 
+class ClientError(Error):
+
+    """Got unexpected server response due to client issue.
+
+    .. versionadded:: 8.1
+    """
+
+
+class Client414Error(ClientError):
+
+    """Server returned with HTTP 414 code.
+
+    .. versionadded:: 8.1
+    """
+
+
 class ServerError(Error):
 
     """Got unexpected server response."""
@@ -589,11 +633,6 @@ class FatalServerError(ServerError):
 class Server504Error(ServerError):
 
     """Server timed out with HTTP 504 code."""
-
-
-class Server414Error(ServerError):
-
-    """Server returned with HTTP 414 code."""
 
 
 class CaptchaError(Error):
@@ -681,3 +720,8 @@ class TimeoutError(Error):
 class MaxlagTimeoutError(TimeoutError):
 
     """Request failed with a maxlag timeout error."""
+
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper.add_deprecated_attr(
+    'Server414Error', Client414Error, since='8.1.0')

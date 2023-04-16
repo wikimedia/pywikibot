@@ -79,7 +79,6 @@ jobs:
         pip install requests
         pip install mwparserfromhell
         pip install mwoauth
-        pip install codecov
         pip install coverage
         python -c "import setuptools; print('setuptools:', setuptools.__version__)"
 
@@ -106,4 +105,4 @@ jobs:
         coverage run -m unittest -vv tests/oauth_tests.py
 
     - name: Upload coverage to Codecov
-      run: codecov
+      uses: codecov/codecov-action@v3

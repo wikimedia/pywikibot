@@ -33,7 +33,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     languages_by_size = [
         'en', 'fr', 'mg', 'zh', 'ru', 'de', 'es', 'sh', 'sv', 'nl', 'el', 'pl',
-        'ku', 'lt', 'ca', 'it', 'hu', 'fi', 'ta', 'tr', 'pt', 'ja', 'io', 'hy',
+        'ku', 'lt', 'ca', 'it', 'hu', 'fi', 'ta', 'pt', 'tr', 'ja', 'io', 'hy',
         'ko', 'kn', 'vi', 'sr', 'th', 'hi', 'ro', 'no', 'id', 'et', 'cs',
         'skr', 'ml', 'my', 'uz', 'li', 'or', 'eo', 'te', 'fa', 'gl', 'ar',
         'oc', 'jv', 'az', 'uk', 'eu', 'sg', 'is', 'ast', 'br', 'bn', 'da',
@@ -42,7 +42,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'zh-min-nan', 'scn', 'ms', 'tl', 'pa', 'fy', 'sw', 'ka', 'nn', 'min',
         'lv', 'sq', 'nds', 'gor', 'lb', 'co', 'mn', 'pnb', 'bs', 'nah', 'yue',
         'sa', 'kk', 'km', 'ckb', 'vec', 'be', 'diq', 'tk', 'mk', 'nia', 'sm',
-        'hsb', 'ks', 'shy', 'su', 'gd', 'bcl', 'ga', 'an', 'gom', 'mr', 'wo',
+        'hsb', 'ks', 'shy', 'su', 'bcl', 'gd', 'ga', 'an', 'gom', 'mr', 'wo',
         'mni', 'bjn', 'ia', 'ang', 'mt', 'fo', 'sd', 'tt', 'gn', 'so', 'ie',
         'mi', 'csb', 'ha', 'ug', 'si', 'guw', 'st', 'hif', 'roa-rup', 'jbo',
         'kl', 'zu', 'ay', 'yi', 'ln', 'gu', 'na', 'gv', 'kw', 'tpi', 'am',

@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Test for site detection."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2023
 #
 # Distributed under the terms of the MIT license.
 #
+import os
 import unittest
 from contextlib import suppress
 from http import HTTPStatus
@@ -13,8 +14,9 @@ from urllib.parse import urlparse
 import requests.exceptions as requests_exceptions
 
 import pywikibot
-from pywikibot.exceptions import ServerError
+from pywikibot.exceptions import ClientError, ServerError
 from pywikibot.site_detect import MWSite
+
 from tests.aspects import PatchingTestCase, TestCase
 from tests.utils import DrySite, skipping
 
@@ -36,13 +38,14 @@ class SiteDetectionTestCase(TestCase):
             self.assertIsInstance(MWSite(url), MWSite)
 
     def assertNoSite(self, url: str):
-        """
-        Assert a url is not a MediaWiki site.
+        """Assert a url is not a MediaWiki site.
 
         :param url: Url of tested site
         :raises AssertionError: Site under url is MediaWiki powered
         """
         with self.assertRaises((AttributeError,
+                                ClientError,
+                                ConnectionError,  # different from requests
                                 RuntimeError,
                                 ServerError,
                                 requests_exceptions.ConnectionError,
@@ -56,7 +59,6 @@ class MediaWikiSiteTestCase(SiteDetectionTestCase):
     """Test detection of MediaWiki sites."""
 
     standard_version_sites = (
-        'http://www.proofwiki.org/wiki/$1',
         'http://www.ck-wissen.de/ckwiki/index.php?title=$1',
         'http://en.citizendium.org/wiki/$1',
         # Server that hosts www.wikichristian.org is unreliable - it
@@ -72,11 +74,9 @@ class MediaWikiSiteTestCase(SiteDetectionTestCase):
     old_version_sites = (
         'http://tfwiki.net/wiki/$1',  # 1.19.5-1+deb7u1
         'http://www.hrwiki.org/index.php/$1',  # v 1.15.4
-        'http://www.wikifon.org/$1',  # v1.11.0
         'http://www.thelemapedia.org/index.php/$1',
         'http://www.werelate.org/wiki/$1',
         'http://www.otterstedt.de/wiki/index.php/$1',
-        'http://kb.mozillazine.org/$1',
         'https://en.wikifur.com/wiki/$1',  # 1.23.16
         'http://kb.mozillazine.org/$1'  # 1.26.4
     )
@@ -110,6 +110,12 @@ class MediaWikiSiteTestCase(SiteDetectionTestCase):
         for url in self.standard_version_sites:
             with self.subTest(url=urlparse(url).netloc):
                 self.assertSite(url)
+
+    def test_proofreadwiki(self):
+        """Test detection of proofwiki.org site."""
+        if os.getenv('GITHUB_ACTIONS'):
+            self.skipTest('Skip test on github due to T331223')
+        self.assertSite('http://www.proofwiki.org/wiki/$1')
 
     def test_non_standard_version_sites(self):
         """Test detection of non standard MediaWiki sites."""

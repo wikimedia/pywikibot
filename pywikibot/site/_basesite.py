@@ -6,6 +6,7 @@
 #
 import functools
 import re
+import sys
 import threading
 from typing import Optional
 from warnings import warn
@@ -28,6 +29,9 @@ from pywikibot.tools import (
     first_upper,
     normalize_username,
 )
+
+
+PYTHON_312A7 = sys.version.split()[0] == '3.12.0a7'  # T334378 workaround
 
 
 class BaseSite(ComparableMixin):
@@ -186,6 +190,8 @@ class BaseSite(ComparableMixin):
 
     def __getattr__(self, attr):
         """Delegate undefined methods calls to the Family object."""
+        if PYTHON_312A7:  # T334378 workaround
+            print(end='')  # noqa: T001, T201
         try:
             method = getattr(self.family, attr)
             if not callable(method):
@@ -316,27 +322,24 @@ class BaseSite(ComparableMixin):
             try:
                 name = dp.getSitelink(self)
             except NoPageError:
-                raise Error(
-                    'No disambiguation category name found in {repo} '
-                    'for {site}'.format(repo=repo_name, site=self))
+                raise Error(f'No disambiguation category name found in {repo} '
+                            f'for {self}')
 
         else:  # fallback for non WM sites
             try:
                 name = '{}:{}'.format(Namespace.CATEGORY,
                                       self.family.disambcatname[self.code])
             except KeyError:
-                raise Error(
-                    'No disambiguation category name found in '
-                    '{site.family.name}_family for {site}'.format(site=self))
+                raise Error(f'No disambiguation category name found in '
+                            f'{self.family.name}_family for {self}')
 
         return pywikibot.Category(pywikibot.Link(name, self))
 
     def isInterwikiLink(self, text):  # noqa: N802
         """Return True if text is in the form of an interwiki link.
 
-        If a link object constructed using "text" as the link text parses as
-        belonging to a different site, this method returns True.
-
+        If a link object constructed using "text" as the link text parses
+        as belonging to a different site, this method returns True.
         """
         linkfam, linkcode = pywikibot.Link(text, self).parse_site()
         return linkfam != self.family.name or linkcode != self.code

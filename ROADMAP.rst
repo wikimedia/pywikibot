@@ -1,14 +1,31 @@
 Current release
 ---------------
 
-* L10N Updates
-* Minimal needed mwparserfromhell was decreased to 0.5.2 (:phab:`T326498`, :phab:`T327600`)
-* No longer lazy load password cookies (:phab:`T271858`, :phab:`T326779`, :phab:`T329132`, :phab:`T330488`, :phab:`T331315`)
+* :mod:`generate_family_file<pywikibot.scripts.generate_family_file>` script was improved (:phab:`T334775`)
+* A ``quiet`` parameter was added to :meth:`APISite.preloadpages()
+  <pywikibot.site._generators.GeneratorsMixin.preloadpages>` which is True by default
+* Fix getting HTTPStatus enum in site_detect check_response (:phab:`T334728`)
+* Do not show a logging in message if password is entered (:phab:`T178061`)
+* Enable preleading ``Bot:`` prefix with twtranslate messages (:phab:`T161459`)
+* Disable command.log if -nolog option is given (:phab:`T334381`)
+* Guess the last needed token key if the token is not found (:phab:`T334288`)
+* Show parameters with APIError (:phab:`T333957`)
+* Raise :exc:`exceptions.NoSiteLinkError` instead of :exc:`exceptions.NoPageError` when sitelink
+  is missing in :meth:`ItemPage.getSitelink()<pywikibot.ItemPage.getSitelink>` (:phab:`T332341`)
+* :exc:`exceptions.ClientError` was added
+* Raise :exc:`exceptions.NoPageError` when deleting a missing Page (:phab:`T332924`)
+* ``text`` parameter of :class:`proofreadpage.PagesTagParser` has a default value
+* L10N updates
+* Ignore talk pages with :meth:`APISite.watched_pages()<pywikibot.site._generators.GeneratorsMixin.watched_pages>` (:phab:`T330806`)
+* Load page info when creating a page if not updated previously (:phab:`T330980`)
+* Improve flush exception logging
 
 
 Deprecations
 ------------
 
+* 8.1.0: Dependency of :exc:`exceptions.NoSiteLinkError` from :exc:`exceptions.NoPageError` will be removed
+* 8.1.0: ``exceptions.Server414Error`` is deprecated in favour of :exc:`exceptions.Client414Error`
 * 8.0.0: :meth:`Timestamp.clone()<pywikibot.time.Timestamp.clone>` method is deprecated
   in favour of ``Timestamp.replace()`` method.
 * 8.0.0: :meth:`family.Family.maximum_GET_length` method is deprecated in favour of

@@ -222,6 +222,10 @@ class PagesTagParser(collections.abc.Container):
     Parse text and extract the first ``<pages ... />`` tag.
     Individual attributes will be accessible with dot notation.
 
+    >>> tp = PagesTagParser('<pages />')
+    >>> tp
+    PagesTagParser('<pages />')
+
     >>> tp = PagesTagParser(
     ... 'Text: <pages index="Index.pdf" from="first" to="last" />')
     >>> tp
@@ -269,6 +273,8 @@ class PagesTagParser(collections.abc.Container):
     False
 
     .. versionadded:: 8.0
+    .. versionchanged:: 8.1
+       *text* parameter is defaulted to ``'<pages />'``.
     """
 
     pat_tag = re.compile(r'<pages (?P<attrs>[^/]*?)/>')
@@ -280,8 +286,8 @@ class PagesTagParser(collections.abc.Container):
         'exclude',
         'step',
         'header',
-        'tosection',
         'fromsection',
+        'tosection',
         'onlysection',
     )
     tokens = '(' + '=|'.join(tokens) + '=)'
@@ -294,11 +300,11 @@ class PagesTagParser(collections.abc.Container):
     exclude = TagAttrDesc()
     step = TagAttrDesc()
     header = TagAttrDesc()
-    tosection = TagAttrDesc()
     fromsection = TagAttrDesc()
+    tosection = TagAttrDesc()
     onlysection = TagAttrDesc()
 
-    def __init__(self, text):
+    def __init__(self, text='<pages />'):
         """Initializer."""
         m = self.pat_tag.search(text)
         if m is None:

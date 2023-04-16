@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test logentries module."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -143,8 +143,12 @@ class LogentriesTestMeta(MetaTestCaseClass):
                 """Test a single logtype entry."""
                 site = self.sites[key]['site']
                 if logtype not in site.logtypes:
-                    self.skipTest('{}: "{}" logtype not available on {}.'
-                                  .format(key, logtype, site))
+                    self.skipTest(
+                        f'{key}: {logtype!r} logtype not available on {site}.')
+                if logtype == 'upload' and key == 'old':
+                    self.skipTest(f'{key}: frequently timeouts for '
+                                  f'{logtype!r} logtype on {site} (T334729).')
+
                 self._test_logevent(logtype)
 
             return test_logevent
@@ -219,6 +223,9 @@ class TestLogentryParams(TestLogentriesBase):
     def test_move_entry(self, key):
         """Test MoveEntry methods."""
         logentry = self._get_logentry('move')
+        if 'actionhidden' in logentry:
+            self.skipTest(
+                f'move action was hidden due to {logentry.comment()}')
         self.assertIsInstance(logentry.target_ns, pywikibot.site.Namespace)
         self.assertEqual(logentry.target_page.namespace(),
                          logentry.target_ns.id)

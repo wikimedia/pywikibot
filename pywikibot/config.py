@@ -241,6 +241,14 @@ password_file = None
 #          relevant summary for bot edits
 default_edit_summary = 'Pywikibot ' + pwb_version
 
+# Edit summary prefix
+# if a str, always use this as summary prefix e.g. 'Bot:' for all sites
+# if True, always use a summary prefix from i18n
+# if False, never use a summary prefix
+# if None, the i18n summary prefix is used for botflag accounts only
+# NOTE: this feature is not yet implemented for all scripts
+bot_prefix_summary: Union[bool, str, None] = None
+
 # What permissions to use to set private files to it
 # such as password file.
 #

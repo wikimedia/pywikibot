@@ -1,7 +1,7 @@
 image: Visual Studio 2022
 clone_depth: 50
 skip_tags: true
-version: 8.0.{build}
+version: 8.1.{build}
 environment:
 
   PYWIKIBOT_DIR: "%appdata%\\Pywikibot"
@@ -87,7 +87,7 @@ test_script:
   - "%CMD_IN_ENV% coverage run -m unittest discover -vv -p \"*_tests.py\""
 
 on_finish:
-  - codecov
+  # - codecov
 
 artifacts:
   - path: dist\*  .coverage coverage.xml

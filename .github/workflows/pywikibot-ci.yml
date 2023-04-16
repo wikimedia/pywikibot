@@ -139,7 +139,7 @@ jobs:
         fi
 
     - name: Upload coverage to Codecov
-      run: codecov
+      uses: codecov/codecov-action@v3
 
     - name: Check on failure
       if: steps.ci_test.outcome == 'failure'
