@@ -414,7 +414,7 @@ class BaseSite(ComparableMixin):
 
     def interwiki_putfirst(self):
         """Return list of language codes for ordering of interwiki links."""
-        return self.family.interwiki_putfirst.get(self.code, None)
+        return self.family.interwiki_putfirst.get(self.code)
 
     def getSite(self, code):  # noqa: N802
         """Return Site object for language 'code' in this Family."""
