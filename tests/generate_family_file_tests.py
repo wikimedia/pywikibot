@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test generate_family_file script."""
 #
-# (C) Pywikibot team, 2018-2023
+# (C) Pywikibot team, 2018-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -37,7 +37,7 @@ class FamilyTestGenerator(generate_family_file.FamilyFileGenerator):
         """Pass writing."""
 
 
-class TestGenerateFamilyFile(DefaultSiteTestCase):
+class TestGenerateFamilyFiles(DefaultSiteTestCase):
 
     """Test generate_family_file functionality."""
 
@@ -80,9 +80,7 @@ class TestGenerateFamilyFile(DefaultSiteTestCase):
             with self.subTest(test='Test element counts'):
                 if self.site.lang not in gen.prefixes:
                     gen.prefixes.append(self.site.lang)
-
-                # interwiki_removals is either a frozen_set or a list
-                obsolete = set(self.site.family.interwiki_removals)
+                obsolete = self.site.family.interwiki_removals
                 self.assertCountEqual(set(gen.prefixes) - obsolete,
                                       set(gen.wikis) - obsolete)
 
