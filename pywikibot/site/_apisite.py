@@ -332,9 +332,9 @@ class APISite(
     ) -> None:
         """Log the user in if not already logged in.
 
-        .. versionchanged:: 8.0
-           lazy load cookies when logging in. This was dropped in 8.1
-        .. versionchanged:: 8.1
+        .. versionchanged:: 8.0.0
+           lazy load cookies when logging in. This was dropped in 8.0.4
+        .. versionchanged:: 8.0.4
            the *cookie_only* parameter was added and cookies are loaded
            whenever the site is initialized.
 

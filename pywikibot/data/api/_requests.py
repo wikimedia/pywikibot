@@ -940,7 +940,7 @@ The text message is:
     def submit(self) -> dict:
         """Submit a query and parse the response.
 
-        .. versionchanged:: 8.1
+        .. versionchanged:: 8.0.4
            in addition to *readapidenied* also try to login when API
            response is *notloggedin*.
 

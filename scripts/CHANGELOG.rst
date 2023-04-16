@@ -22,7 +22,7 @@ redirect
 clean_sandbox
 ~~~~~~~~~~~~~
 
-* L10N es-wikis
+* L10N for es-wikis
 
 8.0.1
 -----

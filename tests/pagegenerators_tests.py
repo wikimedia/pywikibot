@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test pagegenerators module."""
 #
-# (C) Pywikibot team, 2009-2022
+# (C) Pywikibot team, 2009-2023
 #
 # Distributed under the terms of the MIT license.
 import calendar

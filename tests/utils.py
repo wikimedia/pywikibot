@@ -1,6 +1,6 @@
 """Test utilities."""
 #
-# (C) Pywikibot team, 2013-2022
+# (C) Pywikibot team, 2013-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -403,7 +403,7 @@ class DrySite(pywikibot.site.APISite):
     def login(self, *args, cookie_only=False, **kwargs):
         """Overwrite login which is called when a site is initialized.
 
-        .. versionadded: 8.1
+        .. versionadded: 8.0.4
         """
         if cookie_only:
             return
