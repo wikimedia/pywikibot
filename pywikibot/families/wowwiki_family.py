@@ -18,7 +18,7 @@ class Family(family.FandomFamily):
     codes = (
         'ar', 'cs', 'da', 'de', 'el', 'en', 'es', 'et', 'fa', 'fi', 'fr', 'he',
         'hu', 'it', 'ja', 'ko', 'nl', 'no', 'pl', 'pt', 'pt-br', 'ru', 'uk',
-        'zh', 'zh-tw'
+        'zh', 'zh-tw',
     )
 
     removed_wikis = ['is', 'hr', 'lt', 'lv', 'ro', 'sk', 'sr', 'sv', 'tr']
@@ -64,3 +64,9 @@ class Family(family.FandomFamily):
                 'wow.gamepedia.com',  # es
                 'worldofwarcraft.fandom.com',  # et
                 'warcraft.fandom.com']  # uk
+
+    def scriptpath(self, code):
+        """Return the script path for this family."""
+        if code == 'es':
+            return ''
+        return super().scriptpath(code)
