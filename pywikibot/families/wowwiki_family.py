@@ -15,11 +15,11 @@ class Family(family.FandomFamily):
     name = 'wowwiki'
     domain = 'wowwiki.fandom.com'
 
-    codes = (
+    codes = [
         'ar', 'cs', 'da', 'de', 'el', 'en', 'es', 'et', 'fa', 'fi', 'fr', 'he',
         'hu', 'it', 'ja', 'ko', 'nl', 'no', 'pl', 'pt', 'pt-br', 'ru', 'uk',
         'zh', 'zh-tw',
-    )
+    ]
 
     removed_wikis = ['is', 'hr', 'lt', 'lv', 'ro', 'sk', 'sr', 'sv', 'tr']
 

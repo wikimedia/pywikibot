@@ -3,7 +3,7 @@
 .. versionadded:: 3.0
 """
 #
-# (C) Pywikibot team, 2020-2022
+# (C) Pywikibot team, 2020-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -21,10 +21,10 @@ class Family(family.SubdomainFamily):
     name = 'wikihow'
     domain = 'wikihow.com'
 
-    codes = (
+    codes = [
         'ar', 'cs', 'de', 'en', 'es', 'fr', 'hi', 'id', 'it', 'ja', 'ko', 'nl',
         'pt', 'ru', 'th', 'tr', 'vi', 'zh',
-    )
+    ]
 
     removed_wikis = ['ca', 'cy', 'fa', 'he', 'pl', 'ur']
 

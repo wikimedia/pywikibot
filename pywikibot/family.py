@@ -1,6 +1,6 @@
 """Objects representing MediaWiki families."""
 #
-# (C) Pywikibot team, 2004-2022
+# (C) Pywikibot team, 2004-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -18,9 +18,11 @@ from typing import Optional
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import (  # skipcq: PY-W2000
+from pywikibot.backports import (
     Dict,
+    FrozenSet,
     List,
+    Mapping,
     Set,
     Tuple,
     removesuffix,
@@ -45,6 +47,8 @@ class Family:
     .. versionchanged:: 8.0
        ``alphabetic``, ``alphabetic_revised`` and ``fyinterwiki``
        attributes where removed.
+    .. versionchanged:: 8.2
+       :attr:`obsolete` setter was removed.
     """
 
     def __new__(cls):
@@ -81,6 +85,19 @@ class Family:
         return cls()
 
     name = None
+
+    #: Not open for edits; stewards can still edit.
+    closed_wikis: List[str] = []
+
+    #: Completely removed sites
+    removed_wikis: List[str] = []
+
+    code_aliases: Dict[str, str] = {}
+    """Code mappings which are only an alias, and there is no 'old' wiki.
+
+    For all except 'nl_nds', subdomains do exist as a redirect, but that
+    should not be relied upon.
+    """
 
     langs: Dict[str, str] = {}
 
@@ -160,15 +177,6 @@ class Family:
     # These families can set this variable to the name of the target
     # family.
     interwiki_forward = None
-
-    # Which language codes no longer exist and by which language code
-    # should they be replaced. If for example the language with code xx:
-    # now should get code yy:, add {'xx':'yy'} to obsolete.
-    interwiki_replacements: Dict[str, str] = {}
-
-    # Codes that should be removed, usually because the site has been
-    # taken down.
-    interwiki_removals: List[str] = []
 
     # Language codes of the largest wikis. They should be roughly sorted
     # by size.
@@ -528,7 +536,7 @@ class Family:
         """Return the path to title using index.php with redirects disabled."""
         return f'{self.path(code)}?title={title}&redirect=no'
 
-    def interface(self, code) -> str:
+    def interface(self, code: str) -> str:
         """Return interface to use for code."""
         if code in self.interwiki_removals:
             if code in self.codes:
@@ -691,16 +699,6 @@ class Family:
         data.update(self.interwiki_replacements)
         return types.MappingProxyType(data)
 
-    @obsolete.setter
-    def obsolete(self, data) -> None:
-        """Split obsolete dict into constituent parts."""
-        self.interwiki_removals[:] = [old for (old, new) in data.items()
-                                      if new is None]
-        self.interwiki_replacements.clear()
-        self.interwiki_replacements.update((old, new)
-                                           for (old, new) in data.items()
-                                           if new is not None)
-
     @classproperty
     def domains(cls) -> Set[str]:
         """
@@ -718,6 +716,32 @@ class Family:
         :rtype: set of str
         """
         return set(cls.langs.keys())
+
+    @classproperty
+    def interwiki_replacements(cls) -> Mapping[str, str]:
+        """Return an interwiki code replacement mapping.
+
+        Which language codes no longer exist and by which language code
+        should they be replaced. If for example the language with code
+        xx: now should get code yy:, add {'xx':'yy'} to
+        :attr:`code_aliases`.
+
+        .. versionchanged:: 8.2
+           changed from dict to invariant mapping.
+        """
+        return types.MappingProxyType(cls.code_aliases)
+
+    @classproperty
+    def interwiki_removals(cls) -> FrozenSet[str]:
+        """Return a list of interwiki codes to be removed from wiki pages.
+
+        Codes that should be removed, usually because the site has been
+        taken down.
+
+        .. versionchanged:: 8.2
+           changed from list to invariant frozenset.
+        """
+        return frozenset(cls.removed_wikis + cls.closed_wikis)
 
 
 class SingleSiteFamily(Family):
@@ -761,16 +785,13 @@ class SubdomainFamily(Family):
 
         if hasattr(cls, 'test_codes'):
             codes += cls.test_codes
-        if hasattr(cls, 'closed_wikis'):
-            codes += cls.closed_wikis
+
+        codes += cls.closed_wikis
 
         # shortcut this classproperty
-        cls.langs = {code: f'{code}.{cls.domain}'
-                     for code in codes}
-
-        if hasattr(cls, 'code_aliases'):
-            cls.langs.update({alias: f'{code}.{cls.domain}'
-                              for alias, code in cls.code_aliases.items()})
+        cls.langs = {code: f'{code}.{cls.domain}' for code in codes}
+        cls.langs.update({alias: f'{code}.{cls.domain}'
+                          for alias, code in cls.code_aliases.items()})
 
         return cls.langs
 
@@ -934,11 +955,6 @@ class WikimediaFamily(Family):
         'be-x-old': 'be-tarask',
     }
 
-    # Not open for edits; stewards can still edit.
-    closed_wikis: List[str] = []
-    # Completely removed
-    removed_wikis: List[str] = []
-
     # WikimediaFamily uses Wikibase for the category name containing
     # disambiguation pages for the various languages. We need the
     # Wikibase code and item number:
@@ -959,16 +975,6 @@ class WikimediaFamily(Family):
 
         raise NotImplementedError(
             f"Family {cls.name} needs to define property 'domain'")
-
-    @classproperty
-    def interwiki_removals(cls):
-        """Return a list of interwiki codes to be removed from wiki pages."""
-        return frozenset(cls.removed_wikis + cls.closed_wikis)
-
-    @classproperty
-    def interwiki_replacements(cls):
-        """Return an interwiki code replacement mapping."""
-        return types.MappingProxyType(cls.code_aliases)
 
     def shared_image_repository(self, code):
         """Return Wikimedia Commons as the shared image repository."""
