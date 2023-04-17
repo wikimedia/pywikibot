@@ -86,11 +86,11 @@ test_script:
 
   - "%CMD_IN_ENV% coverage run -m unittest discover -vv -p \"*_tests.py\""
 
-on_finish:
+after_test:
   - ps: |
-    $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
-    Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
-    bash codecov.sh -f "coverage.xml"
+      $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
+      Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
+      bash codecov.sh -f "coverage.xml"
 
 artifacts:
   - path: dist\*  .coverage coverage.xml
