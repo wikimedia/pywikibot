@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the site module."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1109,7 +1109,7 @@ class TestSubdomainFamilySite(TestCase):
 
     def test_wow(self):
         """Test wowwiki.fandom.com."""
-        url = 'wowwiki.fandom.com'
+        url = 'wowwiki-archive.fandom.com'
         site = self.site
         self.assertEqual(site.hostname(), url)
         self.assertEqual(site.code, 'en')
