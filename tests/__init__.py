@@ -1,6 +1,6 @@
 """Package tests."""
 #
-# (C) Pywikibot team, 2007-2022
+# (C) Pywikibot team, 2007-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -113,6 +113,7 @@ library_test_modules = {
     'site_decorators',
     'site_generators',
     'site_detect',
+    'site_obsolete',
     'siteinfo',
     'sparql',
     'tests',

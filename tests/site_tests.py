@@ -12,11 +12,9 @@ import time
 import unittest
 from collections.abc import Iterable, Mapping
 from contextlib import suppress
-from http import HTTPStatus
 
 import pywikibot
 from pywikibot import config
-from pywikibot.comms import http
 from pywikibot.exceptions import (
     IsNotRedirectPageError,
     NoPageError,
@@ -24,8 +22,7 @@ from pywikibot.exceptions import (
     UnknownExtensionError,
     UnknownSiteError,
 )
-from pywikibot.tools import suppress_warnings
-from tests import WARN_SITE_CODE
+
 from tests.aspects import (
     AlteredDefaultSiteTestCase,
     DefaultDrySiteTestCase,
@@ -1034,46 +1031,6 @@ class TestLinktrails(TestCase):
             site = pywikibot.Site(code, self.family)
             with self.subTest(site=site):
                 self.assertEqual(site.linktrail(), linktrail)
-
-
-class TestObsoleteSite(DefaultSiteTestCase):
-
-    """Test 'closed' and obsolete code sites."""
-
-    def test_locked_site(self):
-        """Test Wikimedia closed/locked site."""
-        with suppress_warnings('Interwiki removal mh is in wikipedia codes'):
-            site = pywikibot.Site('mh', 'wikipedia')
-        self.assertIsInstance(site, pywikibot.site.ClosedSite)
-        self.assertEqual(site.code, 'mh')
-        self.assertIsInstance(site.obsolete, bool)
-        self.assertTrue(site.obsolete)
-        self.assertEqual(site.hostname(), 'mh.wikipedia.org')
-        r = http.fetch('http://mh.wikipedia.org/w/api.php',
-                       default_error_handling=False)
-        self.assertEqual(r.status_code, HTTPStatus.OK.value)
-        self.assertEqual(site.siteinfo['lang'], 'mh')
-
-    def test_removed_site(self):
-        """Test Wikimedia offline site."""
-        site = pywikibot.Site('ru-sib', 'wikipedia')
-        self.assertIsInstance(site, pywikibot.site.RemovedSite)
-        self.assertEqual(site.code, 'ru-sib')
-        self.assertIsInstance(site.obsolete, bool)
-        self.assertTrue(site.obsolete)
-        with self.assertRaises(KeyError):
-            site.hostname()
-        # See also http_tests, which tests that ru-sib.wikipedia.org is offline
-
-    def test_alias_code_site(self):
-        """Test Wikimedia site with an alias code."""
-        with suppress_warnings(WARN_SITE_CODE, category=UserWarning):
-            site = pywikibot.Site('jp', 'wikipedia')
-        self.assertIsInstance(site.obsolete, bool)
-        self.assertEqual(site.code, 'ja')
-        self.assertFalse(site.obsolete)
-        self.assertEqual(site.hostname(), 'ja.wikipedia.org')
-        self.assertEqual(site.ssl_hostname(), 'ja.wikipedia.org')
 
 
 class TestSingleCodeFamilySite(AlteredDefaultSiteTestCase):
