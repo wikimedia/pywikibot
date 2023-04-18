@@ -113,7 +113,7 @@ library_test_modules = {
     'site_decorators',
     'site_generators',
     'site_detect',
-    'site_obsolete',
+    'site_obsoletesites',
     'siteinfo',
     'sparql',
     'tests',

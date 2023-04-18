@@ -64,7 +64,7 @@ Tests in this project:
     site<./site_tests>
     site_decorators<./site_decorators_tests>
     site_generators<./site_generators_tests>
-    site_obsolete<./site_obsolete_tests>
+    site_obsoletesites<./site_obsoletesites_tests>
     site_detect<./site_detect_tests>
     sparql<./sparql_tests>
     tests<./tests_tests>

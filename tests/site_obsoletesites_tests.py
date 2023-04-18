@@ -34,6 +34,7 @@ class TestObsoleteSite(DefaultSiteTestCase):
                        default_error_handling=False)
         self.assertEqual(r.status_code, HTTPStatus.OK.value)
         self.assertEqual(site.siteinfo['lang'], 'mh')
+        self.assertTrue(site.is_uploaddisabled())
 
     def test_removed_site(self):
         """Test Wikimedia offline site."""
