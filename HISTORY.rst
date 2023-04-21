@@ -1,6 +1,29 @@
 Release history
 ===============
 
+8.1.0
+-----
+*16 April 2023*
+
+* :mod:`generate_family_file<pywikibot.scripts.generate_family_file>` script was improved (:phab:`T334775`)
+* A ``quiet`` parameter was added to :meth:`APISite.preloadpages()
+  <pywikibot.site._generators.GeneratorsMixin.preloadpages>` which is True by default
+* Fix getting HTTPStatus enum in site_detect check_response (:phab:`T334728`)
+* Do not show a logging in message if password is entered (:phab:`T178061`)
+* Enable preleading ``Bot:`` prefix with twtranslate messages (:phab:`T161459`)
+* Disable command.log if -nolog option is given (:phab:`T334381`)
+* Guess the last needed token key if the token is not found (:phab:`T334288`)
+* Show parameters with APIError (:phab:`T333957`)
+* Raise :exc:`exceptions.NoSiteLinkError` instead of :exc:`exceptions.NoPageError` when sitelink
+  is missing in :meth:`ItemPage.getSitelink()<pywikibot.ItemPage.getSitelink>` (:phab:`T332341`)
+* :exc:`exceptions.ClientError` was added
+* Raise :exc:`exceptions.NoPageError` when deleting a missing Page (:phab:`T332924`)
+* ``text`` parameter of :class:`proofreadpage.PagesTagParser` has a default value
+* L10N updates
+* Ignore talk pages with :meth:`APISite.watched_pages()<pywikibot.site._generators.GeneratorsMixin.watched_pages>` (:phab:`T330806`)
+* Load page info when creating a page if not updated previously (:phab:`T330980`)
+* Improve flush exception logging
+
 
 8.0.4
 -----

@@ -64,7 +64,7 @@ class TestLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase,
 
     def setUp(self):
         """Setup test."""
-        self._page = ItemPage(self.get_repo(), 'Q60')
+        self._page = ItemPage(self.get_repo(), 'Q15169668')
         super().setUp()
 
     def test_page_text(self):

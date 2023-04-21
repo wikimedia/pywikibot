@@ -133,7 +133,7 @@ class FamilyFileGenerator:
                     break
             else:
                 return w, verify
-        return None, None
+        return None, None  # pragma: no cover
 
     def run(self) -> None:
         """Main method, generate family file."""
@@ -182,7 +182,7 @@ class FamilyFileGenerator:
         code_len = len(self.langs)
         if code_len > 1:
             if self.dointerwiki is None:
-                while True:
+                while True:  # pragma: no cover
                     makeiw = input(
                         '\n'
                         f'There are {code_len} sites available.'
@@ -210,7 +210,7 @@ class FamilyFileGenerator:
                 self.langs = [wiki for wiki in self.langs
                               if domain in wiki['url']]
 
-            elif makeiw == 'e':
+            elif makeiw == 'e':  # pragma: no cover
                 for wiki in self.langs:
                     print(wiki['prefix'], wiki['url'])
                 do_langs = re.split(' *,| +',

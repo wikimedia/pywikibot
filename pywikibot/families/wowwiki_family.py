@@ -1,6 +1,6 @@
 """Family module for WOW wiki."""
 #
-# (C) Pywikibot team, 2009-2022
+# (C) Pywikibot team, 2009-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -17,11 +17,11 @@ class Family(family.FandomFamily):
 
     codes = (
         'ar', 'cs', 'da', 'de', 'el', 'en', 'es', 'et', 'fa', 'fi', 'fr', 'he',
-        'hu', 'is', 'it', 'ja', 'ko', 'lt', 'lv', 'nl', 'no', 'pl', 'pt',
-        'pt-br', 'ru', 'sk', 'sv', 'tr', 'uk', 'zh', 'zh-tw'
+        'hu', 'it', 'ja', 'ko', 'nl', 'no', 'pl', 'pt', 'pt-br', 'ru', 'uk',
+        'zh', 'zh-tw',
     )
 
-    removed_wikis = ['hr', 'ro', 'sr']
+    removed_wikis = ['is', 'hr', 'lt', 'lv', 'ro', 'sk', 'sr', 'sv', 'tr']
 
     code_aliases = {'nn': 'no'}
 
@@ -30,9 +30,8 @@ class Family(family.FandomFamily):
         """Property listing family languages."""
         cls.langs = super().langs
         # override deviations
-        for i, lang in enumerate(['es', 'et', 'sv'], start=1):
+        for i, lang in enumerate(['en', 'es', 'et', 'uk'], start=1):
             cls.langs[lang] = cls.domains[i]
-        cls.langs['uk'] = cls.domains[-1]
         return cls.langs
 
     @classproperty
@@ -61,9 +60,10 @@ class Family(family.FandomFamily):
     def domains(cls):
         """List of domains used by family wowwiki."""
         return [cls.domain,
-                'wow-es.gamepedia.com',  # es
+                'wowwiki-archive.fandom.com',  # en
+                'wow.gamepedia.com',  # es
                 'worldofwarcraft.fandom.com',  # et
-                'warcraft.fandom.com']  # sv, uk
+                'warcraft.fandom.com']  # uk
 
     def scriptpath(self, code):
         """Return the script path for this family."""

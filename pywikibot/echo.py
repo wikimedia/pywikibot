@@ -59,8 +59,8 @@ class Notification:
         except KeyError:
             notif.read = False
 
-        notif.content = data.get('*', None)
-        notif.revid = data.get('revid', None)
+        notif.content = data.get('*')
+        notif.revid = data.get('revid')
         return notif
 
     def mark_as_read(self) -> bool:

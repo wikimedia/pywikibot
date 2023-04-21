@@ -93,12 +93,11 @@ class MWSite:
                         'Unable to determine articlepath because the wiki is '
                         'private. Use the Main Page URL instead of the API.')
             else:
-                raise RuntimeError('Unable to determine articlepath: '
-                                   '{}'.format(self.fromurl))
+                raise RuntimeError(
+                    f'Unable to determine articlepath: {self.fromurl}')
 
     def __repr__(self) -> str:
-        return '{}("{}")'.format(
-            self.__class__.__name__, self.fromurl)
+        return f'{type(self).__name__}("{self.fromurl}")'
 
     @property
     def langs(self):
@@ -108,9 +107,11 @@ class MWSite:
             + '?action=query&meta=siteinfo&siprop=interwikimap'
               '&sifilteriw=local&format=json')
         iw = response.json()
-        if 'error' in iw:
-            raise RuntimeError('{} - {}'.format(iw['error']['code'],
-                                                iw['error']['info']))
+
+        error = iw.get('error')
+        if error:
+            raise RuntimeError(f"{error['code']} - {error['info']}")
+
         return [wiki for wiki in iw['query']['interwikimap']
                 if 'language' in wiki]
 
@@ -151,9 +152,8 @@ class MWSite:
                 'Private wiki detected. Login is required.\n'
                 'Please enter your username?')
             # Setup a dummy family so that we can create a site object
-            fam = pywikibot.family.AutoFamily(
-                'temporary_family',
-                self.api[:-8])
+            fam = pywikibot.family.AutoFamily('temporary_family',
+                                              self.server + self.scriptpath)
             site = pywikibot.Site(fam.code, fam, username)
             site.version = lambda: str(self.version)
             # Now the site object is able to login
@@ -259,8 +259,8 @@ class WikiHTMLPageParser(HTMLParser):
                     self._parsed_url, new_parsed_url)
 
         self._parsed_url = new_parsed_url
-        self.server = '{}://{}'.format(
-            self._parsed_url.scheme, self._parsed_url.netloc)
+        self.server = '{url.scheme}://{url.netloc}'.format(
+            url=self._parsed_url)
         self.scriptpath = self._parsed_url.path
 
     def handle_starttag(self, tag, attrs) -> None:
