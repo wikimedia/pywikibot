@@ -1,9 +1,7 @@
 Current release
 ---------------
 
-* Add support for fatwikipedia (:phab:`T335021`)
-* Add support for kcgwiktionary (:phab:`T334742`)
-* Update for wowwiki family
+* *(no changes yet)*
 
 
 Deprecations

@@ -1,6 +1,15 @@
 Release history
 ===============
 
+8.1.1
+-----
+*21 April 2023*
+
+* Add support for fatwikipedia (:phab:`T335021`)
+* Add support for kcgwiktionary (:phab:`T334742`)
+* Update for wowwiki family
+
+
 8.1.0
 -----
 *16 April 2023*
