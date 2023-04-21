@@ -45,9 +45,9 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'hsb', 'ks', 'shy', 'su', 'bcl', 'gd', 'ga', 'an', 'gom', 'mr', 'wo',
         'mni', 'bjn', 'ia', 'ang', 'mt', 'fo', 'sd', 'tt', 'gn', 'so', 'ie',
         'ha', 'mi', 'csb', 'ug', 'si', 'guw', 'st', 'hif', 'roa-rup', 'jbo',
-        'kl', 'zu', 'ay', 'yi', 'ln', 'gu', 'na', 'gv', 'kw', 'tpi', 'am',
-        'ne', 'rw', 'ts', 'ig', 'qu', 'ss', 'iu', 'chr', 'dv', 'ti', 'tn',
-        'kcg',
+        'kl', 'zu', 'ay', 'yi', 'ln', 'gu', 'na', 'gv', 'kw', 'tpi', 'kcg',
+        'am', 'ne', 'rw', 'ts', 'ig', 'qu', 'ss', 'iu', 'chr', 'dv', 'ti',
+        'tn',
     ]
 
     category_redirect_templates = {

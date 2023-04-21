@@ -39,12 +39,12 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'vo', 'yo', 'ne', 'ia', 'gu', 'kn', 'als', 'avk', 'bar', 'scn', 'bpy',
         'ha', 'crh', 'qu', 'nv', 'mn', 'xmf', 'si', 'ban', 'ps', 'frr',
         'bat-smg', 'os', 'or', 'sah', 'cdo', 'gd', 'bug', 'yi', 'sd', 'ilo',
-        'am', 'nap', 'mzn', 'li', 'ig', 'gor', 'hsb', 'fo', 'map-bms', 'mai',
+        'am', 'nap', 'mzn', 'li', 'ig', 'gor', 'fo', 'hsb', 'map-bms', 'mai',
         'bcl', 'eml', 'shn', 'ace', 'zh-classical', 'sa', 'wa', 'as', 'ie',
-        'lij', 'zu', 'mhr', 'hyw', 'hif', 'mrj', 'sn', 'tum', 'bjn', 'mni',
+        'lij', 'zu', 'mhr', 'hyw', 'hif', 'sn', 'mrj', 'tum', 'bjn', 'mni',
         'km', 'hak', 'roa-tara', 'so', 'pam', 'rue', 'nso', 'bh', 'sat', 'se',
         'myv', 'mi', 'vls', 'nds-nl', 'nah', 'sc', 'kw', 'glk', 'vep', 'kab',
-        'tk', 'ary', 'gan', 'co', 'dag', 'fiu-vro', 'bo', 'ab', 'rw', 'gv',
+        'tk', 'ary', 'gan', 'dag', 'co', 'fiu-vro', 'bo', 'ab', 'rw', 'gv',
         'skr', 'ug', 'zea', 'frp', 'udm', 'pcd', 'kv', 'csb', 'mt', 'gn',
         'smn', 'ay', 'nrm', 'lez', 'lfn', 'olo', 'stq', 'mwl', 'lo', 'ang',
         'fur', 'rm', 'lad', 'gom', 'koi', 'ext', 'tyv', 'dsb', 'av', 'ln',
@@ -57,7 +57,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'ltg', 'tn', 'ny', 'mad', 'st', 'pih', 'got', 'ee', 'rmy', 'ami', 'bm',
         'ff', 've', 'ts', 'chy', 'ss', 'kcg', 'rn', 'pcm', 'ch', 'ik', 'pnt',
         'ady', 'guc', 'iu', 'ak', 'pwn', 'sg', 'din', 'ti', 'kl', 'dz', 'gur',
-        'cr', 'fat',
+        'fat', 'cr',
     ]
 
     # Sites we want to edit but not count as real languages
