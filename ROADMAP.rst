@@ -1,7 +1,7 @@
 Current release
 ---------------
 
-* *(no changes yet)*
+* Add support for kbdwiktionary (:phab:`T333271`)
 
 
 Deprecations
