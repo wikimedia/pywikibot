@@ -100,10 +100,21 @@ def url2string(title: str,
 
     Uses the first encoding that doesn't cause an error.
 
+    **Example:**
+    >>> url2string('/El%20Ni%C3%B1o/')
+    '/El Niño/'
+    >>> url2string('/El%20Ni%C3%B1o/', 'ascii')
+    Traceback (most recent call last):
+    ...
+    UnicodeDecodeError: 'ascii' codec can't decode byte 0xc3 in position 6:...
+    >>> url2string('/El%20Ni%C3%B1o/', ['ascii', 'utf-8'])
+    '/El Niño/'
+
     :param title: URL-encoded character data to convert
     :param encodings: Encodings to attempt to use during conversion.
 
     :raise UnicodeError: Could not convert using any encoding.
+    :raise LookupError: unknown encoding
     """
     if isinstance(encodings, str):
         encodings = [encodings]
@@ -113,11 +124,12 @@ def url2string(title: str,
         try:
             t = title.encode(enc)
             t = unquote_to_bytes(t)
+            result = t.decode(enc)
         except UnicodeError as e:
             if not first_exception:
                 first_exception = e
         else:
-            return t.decode(enc)
+            return result
 
     # Couldn't convert, raise the first exception
     raise first_exception
