@@ -1,9 +1,10 @@
 """Miscellaneous helper functions (not wiki-dependent)."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
+import abc
 import bz2
 import gzip
 import hashlib
@@ -226,12 +227,21 @@ class suppress_warnings(catch_warnings):  # noqa: N801
 
 
 # From http://python3porting.com/preparing.html
-class ComparableMixin:
+class ComparableMixin(abc.ABC):
 
     """Mixin class to allow comparing to other objects which are comparable.
 
     .. versionadded:: 3.0
     """
+
+    @abc.abstractmethod
+    def _cmpkey(self) -> Any:
+        """Abstract method to return key for comparison of objects.
+
+        This ensures that ``_cmpkey`` method is defined in subclass.
+
+        .. versionadded:: 8.2
+        """
 
     def __lt__(self, other):
         """Compare if self is less than other."""
