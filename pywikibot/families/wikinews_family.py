@@ -1,6 +1,6 @@
 """Family module for Wikinews."""
 #
-# (C) Pywikibot team, 2005-2022
+# (C) Pywikibot team, 2005-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -22,7 +22,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     languages_by_size = [
         'ru', 'sr', 'pt', 'fr', 'en', 'pl', 'zh', 'de', 'es', 'it', 'ar', 'cs',
         'ca', 'nl', 'el', 'ta', 'li', 'sv', 'uk', 'fa', 'fi', 'ro', 'ja', 'eo',
-        'sq', 'no', 'ko', 'bs', 'he',
+        'sq', 'no', 'ko', 'bs', 'he', 'guw',
     ]
 
     category_redirect_templates = {
