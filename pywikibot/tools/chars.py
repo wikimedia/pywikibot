@@ -101,6 +101,7 @@ def url2string(title: str,
     Uses the first encoding that doesn't cause an error.
 
     **Example:**
+
     >>> url2string('/El%20Ni%C3%B1o/')
     '/El Niño/'
     >>> url2string('/El%20Ni%C3%B1o/', 'ascii')
