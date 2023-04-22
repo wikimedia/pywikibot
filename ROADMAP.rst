@@ -2,6 +2,7 @@ Current release
 ---------------
 
 * Add support for kbdwiktionary (:phab:`T333271`)
+* Add support for guwwikinews (:phab:`T334459`)
 
 
 Deprecations
