@@ -1,6 +1,6 @@
 """Miscellaneous helper functions (not wiki-dependent)."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -116,7 +116,7 @@ def has_module(module, version=None) -> bool:
         return False
     if version:
         if not hasattr(m, '__version__'):
-            return False
+            return False  # pragma: no cover
 
         required_version = pkg_resources.parse_version(version)
         module_version = pkg_resources.parse_version(m.__version__)
