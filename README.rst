@@ -44,7 +44,7 @@ Also included are various general function scripts that can be adapted for
 different tasks.
 
 For further information about the library excluding scripts see
-the full `code documentation <https://doc.wikimedia.org/pywikibot/>`_.
+the full `code documentation <https://doc.wikimedia.org/pywikibot/stable/>`_.
 
 Quick start
 ===========
