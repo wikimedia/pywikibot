@@ -1,9 +1,7 @@
 Current release
 ---------------
 
-* Add support for guwwikinews (:phab:`T334461`)
-* Add support for kbdwiktionary (:phab:`T333271`)
-* Fix :func:`tools.chars.url2string` parsing for multiple encodings (:phab:`T335224`)
+* *(no changes yet)*
 
 
 Deprecations

@@ -240,7 +240,7 @@ class ComparableMixin(abc.ABC):
 
         This ensures that ``_cmpkey`` method is defined in subclass.
 
-        .. versionadded:: 8.2
+        .. versionadded:: 8.1.2
         """
 
     def __lt__(self, other):
