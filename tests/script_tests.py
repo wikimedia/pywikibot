@@ -223,7 +223,7 @@ class ScriptTestMeta(MetaTestCaseClass):
 
                 # run the script
                 result = execute_pwb(cmd, data_in, timeout=timeout,
-                                     error=error, overrides=test_overrides)
+                                     overrides=test_overrides)
 
                 err_result = result['stderr']
                 out_result = result['stdout']

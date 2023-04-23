@@ -1331,12 +1331,12 @@ class PwbTestCase(TestCase):
         if self.orig_pywikibot_dir:
             os.environ['PYWIKIBOT_DIR'] = self.orig_pywikibot_dir
 
-    def _execute(self, args, data_in=None, timeout=None, error=None):
+    def _execute(self, args, data_in=None, timeout=None):
         site = self.get_site()
 
         args += ['-family:' + site.family.name, '-lang:' + site.code]
 
-        return execute_pwb(args, data_in, timeout, error)
+        return execute_pwb(args, data_in, timeout)
 
 
 class RecentChangesTestCase(WikimediaDefaultSiteTestCase):
