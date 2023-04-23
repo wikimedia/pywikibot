@@ -1,6 +1,6 @@
 """Character based helper functions (not wiki-dependent)."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -10,7 +10,7 @@ from contextlib import suppress
 from typing import Union
 from urllib.parse import unquote_to_bytes
 
-from pywikibot.backports import List, Tuple
+from pywikibot.backports import Iterable
 from pywikibot.tools._unidata import _category_cf
 
 
@@ -45,6 +45,15 @@ def replace_invisible(text):
 def string_to_ascii_html(string: str) -> str:
     """Convert unicode chars of str to HTML entities if chars are not ASCII.
 
+    **Example:**
+
+    >>> string_to_ascii_html('Python')
+    'Python'
+    >>> string_to_ascii_html("Pywikibot's API")
+    "Pywikibot's API"
+    >>> string_to_ascii_html('Eetße Joohunndot füür Kreůßtůß')
+    'Eet&#223;e Joohunndot f&#252;&#252;r Kre&#367;&#223;t&#367;&#223;'
+
     :param string: String to update
     """
     html = []
@@ -64,6 +73,17 @@ def string2html(string: str, encoding: str) -> str:
     return it unchanged. Otherwise encode the non-ASCII characters into
     HTML &#; entities.
 
+    **Example:**
+
+    >>> string2html('Referências', 'utf-8')
+    'Referências'
+    >>> string2html('Referências', 'ascii')
+    'Refer&#234;ncias'
+    >>> string2html('脚注', 'euc_jp')
+    '脚注'
+    >>> string2html('脚注', 'iso-8859-1')
+    '&#33050;&#27880;'
+
     :param string: String to update
     :param encoding: Encoding to use
     """
@@ -74,18 +94,28 @@ def string2html(string: str, encoding: str) -> str:
     return string_to_ascii_html(string)
 
 
-def url2string(
-    title: str,
-    encodings: Union[str, List[str], Tuple[str, ...]] = 'utf-8'
-) -> str:
+def url2string(title: str,
+               encodings: Union[str, Iterable[str]] = 'utf-8') -> str:
     """Convert URL-encoded text to unicode using several encoding.
 
     Uses the first encoding that doesn't cause an error.
+
+    **Example:**
+
+    >>> url2string('/El%20Ni%C3%B1o/')
+    '/El Niño/'
+    >>> url2string('/El%20Ni%C3%B1o/', 'ascii')
+    Traceback (most recent call last):
+    ...
+    UnicodeDecodeError: 'ascii' codec can't decode byte 0xc3 in position 6:...
+    >>> url2string('/El%20Ni%C3%B1o/', ['ascii', 'utf-8'])
+    '/El Niño/'
 
     :param title: URL-encoded character data to convert
     :param encodings: Encodings to attempt to use during conversion.
 
     :raise UnicodeError: Could not convert using any encoding.
+    :raise LookupError: unknown encoding
     """
     if isinstance(encodings, str):
         encodings = [encodings]
@@ -95,11 +125,12 @@ def url2string(
         try:
             t = title.encode(enc)
             t = unquote_to_bytes(t)
+            result = t.decode(enc)
         except UnicodeError as e:
             if not first_exception:
                 first_exception = e
         else:
-            return t.decode(enc)
+            return result
 
     # Couldn't convert, raise the first exception
     raise first_exception

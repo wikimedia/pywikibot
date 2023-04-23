@@ -47,7 +47,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'ha', 'mi', 'csb', 'ug', 'si', 'guw', 'st', 'hif', 'roa-rup', 'jbo',
         'kl', 'zu', 'ay', 'yi', 'ln', 'gu', 'na', 'gv', 'kw', 'tpi', 'kcg',
         'am', 'ne', 'rw', 'ts', 'ig', 'qu', 'ss', 'iu', 'chr', 'dv', 'ti',
-        'tn',
+        'tn', 'kbd',
     ]
 
     category_redirect_templates = {

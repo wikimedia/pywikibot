@@ -19,7 +19,7 @@ a deprecator without any arguments.
    deprecation decorators moved to _deprecate submodule
 """
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -157,7 +157,7 @@ def add_full_name(obj):
         return inner_wrapper
 
     if not __debug__:
-        return obj
+        return obj  # pragma: no cover
 
     return outer_wrapper
 
@@ -254,7 +254,7 @@ def deprecated(*args, **kwargs):
             else:
                 wrapper.__doc__ = deprecation_notice
 
-        if not __debug__:
+        if not __debug__:  # pragma: no cover
             return obj
 
         manage_wrapping(wrapper, obj)
@@ -290,7 +290,7 @@ def deprecated(*args, **kwargs):
     # When called as @deprecated, return a replacement function
     if without_parameters:
         if not __debug__:
-            return args[0]
+            return args[0]  # pragma: no cover
 
         return decorator(args[0])
 
@@ -396,7 +396,7 @@ def deprecated_args(**arg_pairs):
             return obj(*__args, **__kw)
 
         if not __debug__:
-            return obj
+            return obj  # pragma: no cover
 
         manage_wrapping(wrapper, obj)
 
