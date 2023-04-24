@@ -39,14 +39,14 @@ set ENDTIME=%TIME:~0,8%
 echo Start:   %STARTTIME%
 echo End:     %ENDTIME%
 
-rem calculate elapsed time, code modified from
+rem calculate elapsed time, modified code from
 rem https://stackoverflow.com/questions/4487100/how-can-i-use-a-windows-batch-file-to-measure-the-performance-of-console-applica
 
 rem convert STARTTIME and ENDTIME to seconds
-set /A STARTTIME=(1%STARTTIME:~0,2%-100)*3600 + (1%STARTTIME:~3,2%-100)*60 + (1%STARTTIME:~6,2%-100)
-set /A ENDTIME=(1%ENDTIME:~0,2%-100)*3600 + (1%ENDTIME:~3,2%-100)*60 + (1%ENDTIME:~6,2%-100)
+set /A STARTTIME=(%STARTTIME:~0,2%)*3600 + (1%STARTTIME:~3,2%-100)*60 + (1%STARTTIME:~6,2%-100)
+set /A ENDTIME=(%ENDTIME:~0,2%)*3600 + (1%ENDTIME:~3,2%-100)*60 + (1%ENDTIME:~6,2%-100)
 
-rem calculating the duratyion is easy
+rem calculating the duration is easy
 set /A DURATION=%ENDTIME%-%STARTTIME%
 
 rem we might have measured the time inbetween days
@@ -70,7 +70,7 @@ goto end
 echo.
 echo make has the following options:
 echo     make ^<target^> [^<theme^>]
-echo     make html basic
+echo     make html nature
 echo.
 %SPHINXBUILD% -M help %SOURCEDIR% %BUILDDIR%
 
