@@ -31,6 +31,10 @@ jobs:
         test_prod_only: [true]
         include:
           # ubuntu-20.04 required for Python 3.6
+          - python-version: 3.7
+            site: wikipedia:test
+            write-test: true
+            experimental: true
           - python-version: 3.6
             site: False
             family: wpbeta
@@ -43,10 +47,6 @@ jobs:
             os: ubuntu-20.04
           - python-version: 3.8
             site: wsbeta:en
-          - python-version: 3.7
-            site: wikipedia:test
-            write-test: true
-            experimental: true
           - python-version: 3.7
             site: wikidata:test
           - python-version: 3.9
