@@ -1183,27 +1183,30 @@ class TestUserContribsWithoutUser(DefaultSiteTestCase):
         """Test the site.usercontribs() method."""
         mysite = self.get_site()
         start = '2008-10-06T01:02:03Z'
-        for contrib in mysite.usercontribs(
-                userprefix='Jane',
-                start=pywikibot.Timestamp.fromISOformat(start),
-                total=5):
-            self.assertLessEqual(contrib['timestamp'], start)
+        with self.subTest(start=start):
+            for contrib in mysite.usercontribs(
+                    userprefix='Jane',
+                    start=pywikibot.Timestamp.fromISOformat(start),
+                    total=5):
+                self.assertLessEqual(contrib['timestamp'], start)
 
         end = '2008-10-07T02:03:04Z'
-        for contrib in mysite.usercontribs(
-                userprefix='Jane',
-                end=pywikibot.Timestamp.fromISOformat(end),
-                total=5):
-            self.assertGreaterEqual(contrib['timestamp'], end)
+        with self.subTest(end=end):
+            for contrib in mysite.usercontribs(
+                    userprefix='Jane',
+                    end=pywikibot.Timestamp.fromISOformat(end),
+                    total=5):
+                self.assertGreaterEqual(contrib['timestamp'], end)
 
         start = '2008-10-10T11:59:59Z'
         end = '2008-10-10T00:00:01Z'
-        for contrib in mysite.usercontribs(
-                userprefix='Timshiel',
-                start=pywikibot.Timestamp.fromISOformat(start),
-                end=pywikibot.Timestamp.fromISOformat(end),
-                total=5):
-            self.assertTrue(end <= contrib['timestamp'] <= start)
+        with self.subTest(start=start, end=end):
+            for contrib in mysite.usercontribs(
+                    userprefix='Timshiel',
+                    start=pywikibot.Timestamp.fromISOformat(start),
+                    end=pywikibot.Timestamp.fromISOformat(end),
+                    total=5):
+                self.assertTrue(end <= contrib['timestamp'] <= start)
 
     def test_user_prefix_reverse(self):
         """Test the site.usercontribs() method with range reversed."""
