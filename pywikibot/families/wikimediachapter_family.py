@@ -19,8 +19,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     closed_wikis = ['cn', 'nz', 'pa-us', ]
 
     codes = [
-        'am', 'ar', 'az', 'bd', 'be', 'br', 'ca', 'co', 'dk', 'ec', 'ee',
-        'fi', 'ge', 'gr', 'hi', 'id', 'id-internal', 'il', 'mai', 'mk', 'mx',
-        'ng', 'nl', 'no', 'nyc', 'pl', 'pt', 'punjabi', 'romd', 'rs', 'ru',
-        'se', 'tr', 'ua', 'uk', 've', 'wb',
+        'am', 'ar', 'az', 'bd', 'be', 'br', 'ca', 'co', 'dk', 'ec', 'ee', 'fi',
+        'ge', 'gr', 'hi', 'id', 'id-internal', 'il', 'mai', 'mk', 'mx', 'ng',
+        'nl', 'no', 'nyc', 'pl', 'pt', 'punjabi', 'romd', 'rs', 'ru', 'se',
+        'tr', 'ua', 'uk', 've', 'wb',
     ]
