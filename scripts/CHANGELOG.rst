@@ -1,6 +1,13 @@
 Scripts Changelog
 =================
 
+8.2.0
+-----
+
+replicate_wiki
+
+* i18n support was added (:phab:`T333759`)
+
 8.1.0
 -----
 

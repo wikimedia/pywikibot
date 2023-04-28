@@ -1,7 +1,11 @@
 Current release
 ---------------
 
-* *(no changes yet)*
+* L10N updates
+* :class:`family.Family` class was rewritten. ``obsolete.setter`` was removed,
+  :meth:`family.Family.interwiki_replacements` returns an invariant mapping,
+  :meth:`family.Family.interwiki_removals` returns a frozenset. ``closed_wikis``,
+  ``removed_wikis`` and ``code_aliases`` are :class:`family.Family` class attributes.  (:phab:`T334834`)
 
 
 Deprecations
