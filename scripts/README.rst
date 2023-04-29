@@ -195,4 +195,4 @@ parameter, e.g.::
 
 ** Outdated and deleted scripts can be recovered.**
 Refer `Outdated core scripts` and `Outdated compat scripts` in our documentation:
-https://doc.wikimedia.org/pywikibot/master/scripts/index.html#scripts-descriptions
+https://doc.wikimedia.org/pywikibot/master/scripts/index.html#script-descriptions
