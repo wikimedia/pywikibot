@@ -312,11 +312,10 @@ class TestSiteGenerators(DefaultSiteTestCase):
         for page in mysite.allpages(maxsize=200, total=5):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertTrue(page.exists())
-            if (len(page.text.encode(mysite.encoding())) > 200
-                    and mysite.data_repository() == mysite):
+            if len(page.text.encode(mysite.encoding())) > 200 \
+               and mysite.data_repository() == mysite:  # pragma: no cover
                 unittest_print(
-                    '{}.text is > 200 bytes while raw JSON is <= 200'
-                    .format(page))
+                    f'{page}.text is > 200 bytes while raw JSON is <= 200')
                 continue
             self.assertLessEqual(len(page.text.encode(mysite.encoding())), 200)
 
@@ -724,7 +723,8 @@ class TestSiteGeneratorsUsers(DefaultSiteTestCase):
             self.assertIn('editcount', user)
             self.assertIn('registration', user)
 
-    def _test_allusers_with_group(self):
+    @unittest.expectedFailure
+    def test_allusers_with_group(self):
         """Test the site.allusers(group=..) method."""
         mysite = self.get_site()
         for user in mysite.allusers(prefix='D', group='bot', total=5):
@@ -800,10 +800,10 @@ class TestImageUsage(DefaultSiteTestCase):
         imagepage = self.imagepage
         for using in mysite.imageusage(imagepage, filterredir=False, total=5):
             self.assertIsInstance(using, pywikibot.Page)
-            if using.isRedirectPage():
+            if using.isRedirectPage():  # pragma: no cover
                 unittest_print(
-                    '{} is a redirect, although just non-redirects were '
-                    'searched. See also T75120'.format(using))
+                    f'{using} is a redirect, although just non-redirects were'
+                    ' searched. See also T75120')
             self.assertFalse(using.isRedirectPage())
 
 
@@ -827,8 +827,8 @@ class TestLogEvents(DefaultSiteTestCase):
                         entry = next(gen)
                     except StopIteration:
                         break
-                    except HiddenKeyError as e:  # T216876
-                        self.skipTest(e)
+                    except HiddenKeyError as e:  # pragma: no cover
+                        self.skipTest(e)  # T216876
                     else:
                         self.assertEqual(entry.type(), logtype)
 
@@ -1094,13 +1094,12 @@ class SearchTestCase(DefaultSiteTestCase):
             for hit in mysite.search('wiki', namespaces=0, total=10):
                 self.assertIsInstance(hit, pywikibot.Page)
                 self.assertEqual(hit.namespace(), 0)
-        except APIError as e:
+        except APIError as e:  # pragma: no cover
             if e.code == 'gsrsearch-error' and 'timed out' in e.info:
-                self.skipTest('gsrsearch returned timeout on site{}:\n{!r}'
-                              .format(mysite, e))
+                self.skipTest(
+                    f'gsrsearch returned timeout on site {mysite}:\n{e!r}')
             if e.code == 'gsrsearch-text-disabled':
-                self.skipTest('gsrsearch is diabled on site {}:\n{!r}'
-                              .format(mysite, e))
+                self.skipTest(f'gsrsearch is diabled on site {mysite}:\n{e!r}')
             raise
 
     def test_search_where_title(self):

@@ -49,7 +49,7 @@ class KnownTypesTestBase(TestCaseBase):
         values = self._get_param_values(site, module, parameter)
         exp = set(expected)
         val = set(values)
-        if not exp.issuperset(val):
+        if not exp.issuperset(val):  # pragma: no cover
             diff = val - exp
             self.fail('Unexpected param{} {} in values'
                       .format('s' if len(diff) > 1 else '', diff))
