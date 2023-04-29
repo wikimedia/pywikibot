@@ -49,6 +49,7 @@ from tests.utils import (
     DrySite,
     WarningSourceSkipContextManager,
     execute_pwb,
+    skipping,
 )
 
 
@@ -1569,3 +1570,8 @@ class HttpbinTestCase(TestCase):
     def get_httpbin_hostname(self):
         """Return httpbin hostname."""
         return 'httpbin.org'
+
+    def fetch(self, *args, **kwargs):
+        """Delegate http request to http.fetch but skip on ServerError."""
+        with skipping(ServerError):
+            return http.fetch(*args, **kwargs)

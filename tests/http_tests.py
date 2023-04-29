@@ -258,21 +258,21 @@ class LiveFakeUserAgentTestCase(HttpbinTestCase):
 
     def test_existing_headers(self):
         """Test fake_user_agent with existing headers."""
-        r = http.fetch(self.get_httpbin_url('/status/200'),
+        r = self.fetch(self.get_httpbin_url('/status/200'),
                        headers={'user-agent': 'EXISTING'})
         self.assertEqual(r.request.headers['user-agent'], 'EXISTING')
 
     def test_argument_values_changes(self):
         """Test fake_user_agent with argument value changes."""
-        r = http.fetch(self.get_httpbin_url('/status/200'),
+        r = self.fetch(self.get_httpbin_url('/status/200'),
                        use_fake_user_agent=True)
         self.assertNotEqual(r.request.headers['user-agent'], http.user_agent())
 
-        r = http.fetch(self.get_httpbin_url('/status/200'),
+        r = self.fetch(self.get_httpbin_url('/status/200'),
                        use_fake_user_agent=False)
         self.assertEqual(r.request.headers['user-agent'], http.user_agent())
 
-        r = http.fetch(self.get_httpbin_url('/status/200'),
+        r = self.fetch(self.get_httpbin_url('/status/200'),
                        use_fake_user_agent='ARBITRARY')
         self.assertEqual(r.request.headers['user-agent'], 'ARBITRARY')
 
@@ -280,21 +280,21 @@ class LiveFakeUserAgentTestCase(HttpbinTestCase):
         """Test fake_user_agent with empty value."""
         with self.assertRaisesRegex(ValueError,
                                     'Invalid parameter: use_fake_user_agent'):
-            http.fetch(self.get_httpbin_url('/status/200'),
+            self.fetch(self.get_httpbin_url('/status/200'),
                        use_fake_user_agent='')
 
     def test_parameter_set_to_none(self):
         """Test fake_user_agent with parameter wrongly set to None."""
         with self.assertRaisesRegex(ValueError,
                                     'Invalid parameter: use_fake_user_agent'):
-            http.fetch(self.get_httpbin_url('/status/200'),
+            self.fetch(self.get_httpbin_url('/status/200'),
                        use_fake_user_agent=None)
 
     def test_overridden_domains(self):
         """Test fake_user_agent with manually overridden domains."""
         config.fake_user_agent_exceptions = {
             self.get_httpbin_hostname(): 'OVERRIDDEN'}
-        r = http.fetch(self.get_httpbin_url('/status/200'),
+        r = self.fetch(self.get_httpbin_url('/status/200'),
                        use_fake_user_agent=False)
         self.assertEqual(r.request.headers['user-agent'], 'OVERRIDDEN')
 
@@ -564,10 +564,10 @@ class DataBodyParameterTestCase(HttpbinTestCase):
             'X-Amzn-Trace-Id', 'X-B3-Parentspanid', 'X-B3-Spanid',
             'X-B3-Traceid', 'X-Forwarded-Client-Cert',
         )
-        r_data_request = http.fetch(self.get_httpbin_url('/post'),
+        r_data_request = self.fetch(self.get_httpbin_url('/post'),
                                     method='POST',
                                     data={'fish&chips': 'delicious'})
-        r_body_request = http.fetch(self.get_httpbin_url('/post'),
+        r_body_request = self.fetch(self.get_httpbin_url('/post'),
                                     method='POST',
                                     data={'fish&chips': 'delicious'})
 
