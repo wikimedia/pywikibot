@@ -1173,6 +1173,9 @@ class TestUserContribsWithoutUser(DefaultSiteTestCase):
     def test_user_prefix(self):
         """Test the site.usercontribs() method with userprefix."""
         mysite = self.get_site()
+        if mysite.family.name == 'wowwiki':
+            self.skipTest(f'Too many timeouts on {mysite}')
+
         for contrib in mysite.usercontribs(userprefix='John', total=5):
             self.assertIsInstance(contrib, dict)
             for key in ('user', 'title', 'ns', 'pageid', 'revid'):
