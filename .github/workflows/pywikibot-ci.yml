@@ -57,7 +57,6 @@ jobs:
             os: ubuntu-20.04
           - python-version: 3.8
             site: wowwiki:uk
-            experimental: true
           - python-version: 3
             site: wikipedia:de
             os: macOS-latest
