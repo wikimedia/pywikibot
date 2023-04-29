@@ -217,10 +217,9 @@ def collector(loader=unittest.loader.defaultTestLoader):
             'Extra test modules (run after library, before scripts):\n  {}'
             .format(', '.join(extra_test_modules)))
 
-    if disabled_tests:
-        unittest_print(
-            'Skipping tests (to run: python -m unittest ...):\n  {!r}'
-            .format(disabled_tests))
+    if disabled_tests:  # pragma: no cover
+        unittest_print(f'Skipping tests (to run: python -m unittest ...):\n'
+                       f'  {disabled_tests!r}')
 
     modules = (module
                for module in chain(library_test_modules,
