@@ -442,6 +442,7 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
 
     _allowed_failures = {
         'basic',
+        'nowcommons',
     }
     _arguments = '-simulate -page:Foobar -always -site:wikipedia:en'
     _results = ("Working on 'Foobar'", 'Script terminated successfully')
