@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the eventstreams module."""
 #
-# (C) Pywikibot team, 2017-2022
+# (C) Pywikibot team, 2017-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -280,7 +280,7 @@ class EventStreamsTestClass(EventStreams):
                 n += 1
                 try:
                     element = json.loads(event.data)
-                except ValueError as e:
+                except ValueError as e:  # pragma: no cover
                     self.source.resp.close()  # close SSLSocket
                     del self.source
                     raise ValueError(

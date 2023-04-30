@@ -982,7 +982,7 @@ class TestLagpattern(DefaultSiteTestCase):
             req.submit()
         except SystemExit:
             pass  # expected exception from DummyThrottle instance
-        except APIError as e:
+        except APIError as e:  # pragma: no cover
             pywikibot.warning(
                 'Wrong api lagpattern regex, cannot retrieve lag value')
             raise e

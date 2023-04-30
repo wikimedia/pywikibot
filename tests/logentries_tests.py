@@ -88,12 +88,12 @@ class TestLogentriesBase(TestCase):
             self.assertIsInstance(logentry.comment(), str)
             self.assertIsInstance(logentry.user(), str)
             self.assertEqual(logentry.user(), logentry['user'])
-        except HiddenKeyError as e:
+        except HiddenKeyError as e:  # pragma: no cover
             self.assertRegex(
                 str(e),
                 r"Log entry \([^)]+\) has a hidden '\w+' key and you "
                 r"don't have permission to view it")
-        except KeyError as e:
+        except KeyError as e:  # pragma: no cover
             self.assertRegex(str(e), "Log entry ([^)]+) has no 'comment' key")
         else:
             self.assertEqual(logentry.comment(), logentry['comment'])
@@ -120,7 +120,7 @@ class TestLogentriesBase(TestCase):
                 self.assertIsInstance(logentry.page(), pywikibot.FilePage)
             else:
                 self.assertIsInstance(logentry.page(), pywikibot.Page)
-        else:
+        else:  # pragma: no cover
             with self.assertRaises(KeyError):
                 logentry.page()
 
@@ -179,13 +179,13 @@ class TestSimpleLogentries(TestLogentriesBase):
                             - set(LogEntryFactory._logtypes)):
             if not simple_type:
                 # paraminfo also reports an empty string as a type
-                continue
+                continue  # pragma: no cover
             try:
                 self._test_logevent(simple_type)
-            except StopIteration:
+            except StopIteration:  # pragma: no cover
                 unittest_print(
-                    'Unable to test "{}" on "{}" because there are no log '
-                    'entries with that type.'.format(simple_type, key))
+                    f'Unable to test "{simple_type}" on "{key}" because there'
+                    ' are no log entries with that type.')
 
 
 class TestLogentryParams(TestLogentriesBase):

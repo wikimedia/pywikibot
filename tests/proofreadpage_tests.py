@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the proofreadpage module."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -392,11 +392,10 @@ class TestProofreadPageValidSite(TestCase):
                                      total=1, **rvargs)
         rvgen.set_maximum_items(-1)  # suppress use of rvlimit parameter
 
-        try:
+        loaded_text = ''
+        with suppress(LookupError, StopIteration, TypeError, ValueError):
             pagedict = next(rvgen)
             loaded_text = pagedict.get('revisions')[0].get('*')
-        except (StopIteration, TypeError, KeyError, ValueError, IndexError):
-            loaded_text = ''
 
         page_text = page._page_to_json()
         self.assertEqual(json.loads(page_text), json.loads(loaded_text))
