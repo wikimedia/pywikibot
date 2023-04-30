@@ -723,7 +723,6 @@ class TestSiteGeneratorsUsers(DefaultSiteTestCase):
             self.assertIn('editcount', user)
             self.assertIn('registration', user)
 
-    @unittest.expectedFailure
     def test_allusers_with_group(self):
         """Test the site.allusers(group=..) method."""
         mysite = self.get_site()
@@ -734,7 +733,7 @@ class TestSiteGeneratorsUsers(DefaultSiteTestCase):
             self.assertIn('editcount', user)
             self.assertIn('registration', user)
             self.assertIn('groups', user)
-            self.assertIn('sysop', user['groups'])
+            self.assertIn('bot', user['groups'])
 
 
 class TestImageUsage(DefaultSiteTestCase):
