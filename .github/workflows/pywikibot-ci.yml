@@ -33,7 +33,6 @@ jobs:
           # ubuntu-20.04 required for Python 3.6
           - python-version: 3.7
             site: wikipedia:test
-            write-test: true
             experimental: true
           - python-version: 3.6
             site: False
@@ -128,7 +127,6 @@ jobs:
         PYWIKIBOT_TEST_NO_RC:
           ${{ (matrix.site == 'wikisource:zh' || matrix.test_no_rc) && 1 || 0 }}
         PYWIKIBOT_TEST_PROD_ONLY: ${{ matrix.test_prod_only && 1 || 0 }}
-        PYWIKIBOT_TEST_WRITE: ${{ (matrix.site == 'wikipedia:test' && matrix.write-test ) && 1 || 0}}
       run: |
         python pwb.py version
         if [ ${{matrix.site || 0}} != 'wikipedia:test' ]; then
