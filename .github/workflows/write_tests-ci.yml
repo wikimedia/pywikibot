@@ -1,10 +1,8 @@
-name: Pywikibot CI
-# Run Pywikibot tests  with a variety of Python versions
+name: Write test CI
+# Run Pywikibot write tests on test wiki
 
 on:
   push:
-    branches: [ master, stable ]
-  pull_request:
     branches: [ master ]
 
 concurrency:
