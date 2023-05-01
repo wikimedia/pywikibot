@@ -104,5 +104,9 @@ jobs:
         python pwb.py version
         coverage run -m unittest -vv tests/oauth_tests.py
 
+    - name: Show coverage statistics
+      run: |
+        coverage report
+
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3

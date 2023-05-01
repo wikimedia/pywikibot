@@ -119,5 +119,9 @@ jobs:
         python pwb.py version
         coverage run -m unittest -vv tests/site_login_logout_tests.py
 
+    - name: Show coverage statistics
+      run: |
+        coverage report
+
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3

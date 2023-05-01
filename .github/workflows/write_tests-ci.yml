@@ -75,6 +75,10 @@ jobs:
         python pwb.py version
         pytest -a write --cov=.;
 
+    - name: Show coverage statistics
+      run: |
+        coverage report
+
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
 
