@@ -16,8 +16,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     closed_wikis = [
         # https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist
-        'aa', 'cho', 'ho', 'hz', 'ii', 'kj', 'kr', 'lrc', 'mh', 'mus', 'ng',
-        'ten',
+        'aa', 'cho', 'ho', 'hz', 'ii', 'kj', 'kr', 'lrc', 'mh', 'mus', 'na',
+        'ng', 'ten',
     ]
 
     removed_wikis = [
@@ -41,21 +41,21 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'bat-smg', 'os', 'or', 'sah', 'cdo', 'gd', 'bug', 'yi', 'sd', 'ilo',
         'am', 'nap', 'mzn', 'ig', 'li', 'gor', 'fo', 'hsb', 'map-bms', 'mai',
         'bcl', 'eml', 'shn', 'ace', 'zh-classical', 'sa', 'wa', 'as', 'ie',
-        'lij', 'zu', 'mhr', 'hyw', 'hif', 'sn', 'mrj', 'tum', 'bjn', 'mni',
+        'lij', 'zu', 'mhr', 'hyw', 'hif', 'sn', 'tum', 'mrj', 'bjn', 'mni',
         'km', 'hak', 'roa-tara', 'so', 'pam', 'rue', 'nso', 'bh', 'sat', 'se',
         'myv', 'mi', 'vls', 'nds-nl', 'nah', 'sc', 'kw', 'vep', 'glk', 'dag',
         'kab', 'tk', 'ary', 'gan', 'co', 'bo', 'fiu-vro', 'ab', 'rw', 'gv',
-        'zea', 'skr', 'ug', 'frp', 'udm', 'pcd', 'kv', 'csb', 'mt', 'gn',
+        'zea', 'ug', 'skr', 'frp', 'udm', 'pcd', 'kv', 'csb', 'mt', 'gn',
         'smn', 'ay', 'nrm', 'lez', 'lfn', 'olo', 'stq', 'mwl', 'lo', 'ang',
-        'fur', 'rm', 'lad', 'gom', 'koi', 'ext', 'tyv', 'dsb', 'av', 'ln',
+        'fur', 'rm', 'lad', 'gom', 'ext', 'koi', 'tyv', 'dsb', 'av', 'ln',
         'dty', 'kaa', 'pap', 'cbk-zam', 'mdf', 'dv', 'ksh', 'tw', 'ks', 'gag',
         'bxr', 'pfl', 'lg', 'za', 'pi', 'pag', 'szy', 'haw', 'awa', 'tay',
         'blk', 'inh', 'krc', 'xal', 'pdc', 'to', 'atj', 'arc', 'tcy', 'mnw',
-        'jam', 'kbp', 'na', 'wo', 'kbd', 'nia', 'anp', 'nov', 'shi', 'ki',
+        'jam', 'kbp', 'wo', 'kbd', 'anp', 'nia', 'nov', 'shi', 'ki',
         'nqo', 'bi', 'tpi', 'tet', 'jbo', 'roa-rup', 'xh', 'om', 'fj', 'kg',
         'lbe', 'ty', 'guw', 'cu', 'trv', 'srn', 'sm', 'alt', 'gcr', 'chr',
-        'tn', 'ltg', 'ny', 'mad', 'st', 'pih', 'got', 'ee', 'rmy', 'ami', 'bm',
-        'ff', 've', 'ts', 'chy', 'ss', 'kcg', 'rn', 'pcm', 'ch', 'ik', 'pnt',
+        'tn', 'ltg', 'ny', 'mad', 'st', 'pih', 'got', 'ee', 'ami', 'rmy', 'bm',
+        'ff', 've', 'ts', 'chy', 'ss', 'kcg', 'pcm', 'rn', 'ch', 'ik', 'pnt',
         'ady', 'guc', 'iu', 'ak', 'pwn', 'sg', 'din', 'gur', 'ti', 'kl', 'dz',
         'fat', 'cr',
     ]
