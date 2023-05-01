@@ -98,9 +98,12 @@ class SetupBase(abc.ABC):
     def cleanup(self) -> None:
         """Cleanup copied files."""
 
-    def run(self) -> None:  # pragma: no cover
-        """Run the installer script."""
-        if self.upgrade:
+    def run(self) -> bool:
+        """Run the installer script.
+
+        :return: True if no error occurs, else False
+        """
+        if self.upgrade:  # pragma: no cover
             check_call('python -m pip install --upgrade pip', shell=True)
             check_call(
                 'pip install --upgrade setuptools wheel twine ', shell=True)
@@ -108,20 +111,20 @@ class SetupBase(abc.ABC):
         if self.local or self.remote or self.clear:
             self.clear_old_dist()
             if self.clear:
-                return
+                return True  # pragma: no cover
 
         self.copy_files()
         try:
             setup.main()  # create a new package
-        except SystemExit as e:
+        except SystemExit as e:  # pragma: no cover
             error(e)
-            return
+            return False
         finally:
             self.cleanup()
 
         # check description
         if run('twine check dist/*', shell=True).returncode:
-            return
+            return False  # pragma: no cover
 
         if self.local:
             check_call('pip uninstall pywikibot -y', shell=True)
@@ -131,7 +134,8 @@ class SetupBase(abc.ABC):
 
         if self.remote and input_yn(
                 '<<lightblue>>Upload dist to pypi', automatic_quit=False):
-            check_call('twine upload dist/*', shell=True)
+            check_call('twine upload dist/*', shell=True)  # pragma: no cover
+        return True
 
 
 class SetupPywikibot(SetupBase):
@@ -149,7 +153,7 @@ class SetupPywikibot(SetupBase):
         self.target = target
         self.source = source
 
-    def copy_files(self) -> None:  # pragma: no cover
+    def copy_files(self) -> None:
         """Copy i18n files to pywikibot.scripts folder.
 
         Pywikibot i18n files are used for some translations. They are copied
@@ -162,7 +166,7 @@ class SetupPywikibot(SetupBase):
         shutil.copytree(self.source, self.target)
         info('done')
 
-    def cleanup(self) -> None:  # pragma: no cover
+    def cleanup(self) -> None:
         """Remove all copied files from pywikibot scripts folder."""
         info('Remove copied files... ', newline=False)
         shutil.rmtree(self.target)
@@ -182,7 +186,7 @@ def handle_args() -> Tuple[bool, bool, bool, bool, bool]:
     :return: Return whether dist is to be installed locally or to be
         uploaded
     """
-    if '-help' in sys.argv:  # pragma: no cover
+    if '-help' in sys.argv:
         info(__doc__)
         info(setup.__doc__)
         sys.exit()
@@ -192,7 +196,7 @@ def handle_args() -> Tuple[bool, bool, bool, bool, bool]:
     clear = '-clear' in sys.argv
     upgrade = '-upgrade' in sys.argv
 
-    if remote and 'dev' in __version__:
+    if remote and 'dev' in __version__:  # pragma: no cover
         warning('Distribution must not be a developmental release to upload.')
         remote = False
 
@@ -200,11 +204,12 @@ def handle_args() -> Tuple[bool, bool, bool, bool, bool]:
     return local, remote, clear, upgrade
 
 
-def main() -> None:  # pragma: no cover
+def main() -> None:
     """Script entry point."""
     args = handle_args()
-    SetupPywikibot(*args).run()
+    return SetupPywikibot(*args).run()
 
 
-if __name__ == '__main__':  # pragma: no cover
-    main()
+if __name__ == '__main__':
+    if not main():
+        sys.exit(1)  # pragma: no cover

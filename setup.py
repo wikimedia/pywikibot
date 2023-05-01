@@ -120,7 +120,7 @@ with open(os.path.join(path, name, '__metadata__.py')) as f:
 assert metadata.__name__ == name
 
 
-def get_validated_version() -> str:  # pragma: no cover
+def get_validated_version() -> str:
     """Get a validated pywikibot module version string.
 
     The version number from pywikibot.__metadata__.__version__ is used.
@@ -134,7 +134,7 @@ def get_validated_version() -> str:  # pragma: no cover
     """
     version = metadata.__version__
     if 'sdist' not in sys.argv:
-        return version
+        return version  # pragma: no cover
 
     # validate version for sdist
     from contextlib import suppress
@@ -144,33 +144,34 @@ def get_validated_version() -> str:  # pragma: no cover
     try:
         tags = run(['git', 'tag'], check=True, stdout=PIPE,
                    universal_newlines=True).stdout.splitlines()
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         print(e)
         sys.exit('Creating source distribution canceled.')
 
-    for tag in ('stable', 'python2'):
-        with suppress(ValueError):
-            tags.remove(tag)
+    last_tag = None
+    if tags:  # pragma: no cover
+        for tag in ('stable', 'python2'):
+            with suppress(ValueError):
+                tags.remove(tag)
 
-    last_tag = tags[-1]
+        last_tag = tags[-1]
 
     warnings = []
-    if parse_version(version) < parse_version('0'):
+    if parse_version(version) < parse_version('0'):  # pragma: no cover
         # any version which is not a valid PEP 440 version will be considered
         # less than any valid PEP 440 version
         warnings.append(
             version + ' is not a valid version string following PEP 440.')
-    elif safe_version(version) != version:
-        warnings.append(
-            '{} does not follow PEP 440. Use {} as version string instead.'
-            .format(version, safe_version(version)))
+    elif safe_version(version) != version:  # pragma: no cover
+        warnings.append(f'{version} does not follow PEP 440. Use '
+                        f'{safe_version(version)} as version string instead.')
 
-    if parse_version(version) <= parse_version(last_tag):
-        warnings.append(
-            'New version "{}" is not higher than last version "{}".'
-            .format(version, last_tag))
+    if last_tag and parse_version(version) <= parse_version(last_tag):
+        warnings.append(  # pragma: no cover
+            f'New version {version!r} is not higher than last version '
+            f'{last_tag!r}.')
 
-    if warnings:
+    if warnings:  # pragma: no cover
         print(__doc__)
         print('\n\n'.join(warnings))
         sys.exit('\nBuild of distribution package canceled.')
@@ -178,7 +179,7 @@ def get_validated_version() -> str:  # pragma: no cover
     return version
 
 
-def read_desc(filename) -> str:  # pragma: no cover
+def read_desc(filename) -> str:
     """Read long description.
 
     Combine included restructured text files which must be done before
@@ -193,14 +194,14 @@ def read_desc(filename) -> str:  # pragma: no cover
                 if os.path.exists(include):
                     with open(include) as g:
                         desc.append(re.sub(pattern[0], pattern[1], g.read()))
-                else:
-                    print('Cannot include {}; file not found'.format(include))
+                else:  # pragma: no cover
+                    print(f'Cannot include {include}; file not found')
             else:
                 desc.append(re.sub(pattern[0], pattern[1], line))
     return ''.join(desc)
 
 
-def get_packages(name) -> List[str]:  # pragma: no cover
+def get_packages(name) -> List[str]:
     """Find framework packages."""
     try:
         from setuptools import find_namespace_packages
@@ -211,7 +212,7 @@ def get_packages(name) -> List[str]:  # pragma: no cover
     return [str(name)] + packages
 
 
-def main() -> None:  # pragma: no cover
+def main() -> None:
     """Setup entry point."""
     version = get_validated_version()
     setup(
@@ -350,7 +351,7 @@ def main() -> None:  # pragma: no cover
 
     # Finally show distribution version before uploading
     if 'sdist' in sys.argv:
-        print('\nDistribution package created for version {}'.format(version))
+        print(f'\nDistribution package created for version {version}')
 
 
 if __name__ == '__main__':  # pragma: no cover
