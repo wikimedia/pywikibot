@@ -19,11 +19,11 @@ jobs:
   build:
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     continue-on-error: ${{ matrix.experimental || false }}
-    timeout-minutes: 120
+    timeout-minutes: 90
 
     strategy:
       fail-fast: false
-      max-parallel: 16
+      max-parallel: 17
 
       matrix:
         python-version: ["pypy3.7", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12.0-alpha - 3.12.0"]
@@ -122,7 +122,7 @@ jobs:
     - name: Test with unittest or pytest
       id: ci_test
       continue-on-error: true
-      timeout-minutes: 90
+      timeout-minutes: 70
       env:
         PYWIKIBOT_TEST_NO_RC:
           ${{ (matrix.site == 'wikisource:zh' || matrix.test_no_rc) && 1 || 0 }}

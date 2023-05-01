@@ -17,11 +17,11 @@ jobs:
   build:
     runs-on: 'ubuntu-latest'
     continue-on-error: ${{ matrix.experimental || false }}
-    timeout-minutes: 120
+    timeout-minutes: 60
 
     strategy:
       fail-fast: false
-      max-parallel: 16
+      max-parallel: 1
 
       matrix:
         python-version: ["3.7"]
@@ -65,10 +65,10 @@ jobs:
         echo "password_file = os.path.expanduser('passwordfile')" >> user-config.py
         echo "('${{ env.PYWIKIBOT_USERNAME }}', '${{ secrets.PYWIKIBOT_USERPWD }}')" > passwordfile
 
-    - name: Test with unittest or pytest
+    - name: Test with pytest
       id: ci_test
       continue-on-error: true
-      timeout-minutes: 90
+      timeout-minutes: 55
       env:
         PYWIKIBOT_TEST_WRITE: ${{ matrix.site == 'wikipedia:test' && 1 || 0}}
       run: |
