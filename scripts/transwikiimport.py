@@ -45,96 +45,95 @@ Wikipedia to the home Wikipedia, adding "Wikipedia:Import enwp/" as
 prefix:
 
     python pwb.py transwikiimport -interwikisource:en -cat:"Query service" \
-        -prefix:"Wikipedia:Import enwp/" -fullhistory -assignknownusers
+-prefix:"Wikipedia:Import enwp/" -fullhistory -assignknownusers
 
 Copy the template "Query service" from the English Wikipedia to the home
 Wiktionary:
 
     python pwb.py transferbot -interwikisource:w:en \
-        -page:"Template:Query service" -fullhistory -assignknownusers
+-page:"Template:Query service" -fullhistory -assignknownusers
 
 Copy 10 wanted templates of the home Wikipedia from English Wikipedia to
-the home Wikipedia
+the home Wikipedia:
 
-    python pwb.py transferbot -interwikisource:en \
-        -wantedtemplates:10 -target -fullhistory -assignknownusers
+    python pwb.py transferbot -interwikisource:en -wantedtemplates:10 \
+-target -fullhistory -assignknownusers
+
 
 Advices
 -------
 
-The module gives access to all parameters of the API (and specialpage)
-    and is compatible to the transferbot module.
-However for most scenarios the following parameters should be avoided:
-  -overwrite (by default set as False)
-  -target (by default set as False)
-  -includealltemplates (by default set as False)
+The module gives access to all parameters of the API (and special page)
+and is compatible to the :mod:`scripts.transferbot` script.
+However for most scenarios the parameters ``-overwrite``, ``-target`` and
+``-includealltemplates`` should be avoided; by default they are set to
+False.
 
-The correspondingnamespace is used only if the namespaces on both wikis do not
-    correspond one with another.
+The correspondingnamespace is used only if the namespaces on both wikis
+do not correspond one with another.
 
 Correspondingnamespace and rootpage are mutually exclusive.
 
-Target and rootpage are mutually exclusive.
-    (This combination does not seem to be feasible.)
+Target and rootpage are mutually exclusive. (This combination does not
+seem to be feasible.)
 
 If the target page already exists, the target page will be overwritten
-    if -overwrite is set or skipped otherwise.
+if ``-overwrite`` is set or skipped otherwise.
 
 The list of pages to be imported can be generated outside of the pywikbot:
 
-    for i in {1..10} ; do python3 pwb.py transwikiimport -interwikisource:mul \
--page:"Page:How to become famous.djvu/$i" -fullhistory \
--assignknownusers ; done
+    for i in {1..10} ; do python3 pwb.py transwikiimport \
+-interwikisource:mul -page:"Page:How to become famous.djvu/$i" \
+-fullhistory -assignknownusers ; done
 
-(The pages Page:How to become famous.djvu/1, Page:How to become famous.djvu/2 \
-.. Page:How to become famous.djvu/10 will be copied
-    from wikisource (mul) to the home-wikisource, all versions will be imported
-    and the usernames will be identified
-    (existing pages will be skipped.)
+*The pages *``Page:How to become famous.djvu/1``*,
+*``Page:How to become famous.djvu/2``* ..
+*``Page:How to become famous.djvu/10``* will be copied from wikisource
+(mul) to the home-wikisource, all versions will be imported and the
+usernames will be identified (existing pages will be skipped).*
 
 Or generated using the usual pywikibot generators:
 
     python3 pwb.py transwikiimport -interwikisource:mul \
--prefixindex:"Page:How to become famous.djvu" \
--fullhistory -assignknownusers \
--summary:"Book copied from oldwiki."
+-prefixindex:"Page:How to become famous.djvu" -fullhistory \
+-assignknownusers -summary:"Book copied from oldwiki."
 
-(All pages like Page:How to become famous.djvu... will be copied
-    from wikisource (mul) to the home-wikisource, all versions will be
-    imported and the usernames will be identified
-    (existing pages will be skipped.)
+*All pages like *``Page:How to become famous.djvu``*... will be copied
+from wikisource (mul) to the home-wikisource, all versions will be
+imported and the usernames will be identified (existing pages will be
+skipped).*
 
-The global option -simulate disables the import and the bot prints the
-names of the pages that would be imported. Since the import of pages is
-a quite exceptionell process and potentially dangerous it should be made
-carefully and tested in advance.
+The global option ``-simulate`` disables the import and the bot prints
+the names of the pages that would be imported. Since the import of pages
+is a quite exceptionell process and potentially dangerous it should be
+made carefully and tested in advance.
 
-The -simulate option can help to find out which pages would be moved
+The ``-simulate`` option can help to find out which pages would be moved
 and what would be the target of the import. However it does not print
 the titles of the transcluded pages (e.g. templates) if
--includealltemplates is set.
+``-includealltemplates`` is set.
 
 This option is quite *dangerous*. If the title of an existing page on
 home wiki clashes with the title of one of the linked pages it would be
 *overritten*. The histories would be merged. (If the imported version is
-newer.) Even if -overwrite is not set the linked page *can be
+newer.) Even if ``-overwrite`` is not set the linked page *can be
 overwritten*.
 
 
-Interwikisource
----------------
+Hints
+-----
 
-The list of wikis that can be used as a source
-    is defined in the variable $wgImportSources
-It can be viewed on the Specialpage:Import.
+The list of wikis that can be used as a interwiki source is defined in
+the variable ``$wgImportSources``. It can be viewed on the
+``Special:Import`` page.
 
 
 Rights
 ------
 
-For tranwikiimport (and even to access the Specialpage:Import)
-    the appropriate flag on the account
-    must be set (usually administrator, tranwiki importer or importer).
+For transwikiimport script and even to access the ``Special:Import``
+page the appropriate flag on the account must be set, usually
+administrator, transwiki importer or importer.
 
 .. versionadded:: 8.2
 """

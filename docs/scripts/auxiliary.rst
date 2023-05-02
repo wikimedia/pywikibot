@@ -22,3 +22,10 @@ transferbot script
 .. automodule:: scripts.transferbot
    :no-members:
    :noindex:
+
+transwikiimport script
+======================
+
+.. automodule:: scripts.transwikiimport
+   :no-members:
+   :noindex:

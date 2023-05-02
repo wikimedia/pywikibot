@@ -466,8 +466,12 @@ autodoc_typehints = 'description'
 suppress_warnings = ['autosectionlabel.*']
 toc_object_entries_show_parents = 'hide'
 
-# Allow lines like "Example:" to be followed by a code block
+# Napoleon settings
 napoleon_use_admonition_for_examples = True
+napoleon_use_admonition_for_notes = True
+napoleon_use_admonition_for_references = True
+napoleon_custom_sections = ['Advice', 'Advices', 'Hints', 'Rights', 'Tips']
+
 python_use_unqualified_type_names = True
 modindex_common_prefix = ['pywikibot.scripts.']
 
