@@ -1,10 +1,7 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-"""
-This script transfers pages from a source wiki to a target wiki
-    over the transwiki import mechanism.
+#!/usr/bin/env python3
+"""This script transfers pages from a source wiki to a target wiki.
 
-It is also able to copy the full edit history.
+It uses :api:`Import` and it is also able to copy the full edit history.
 
 The following parameters are supported:
 
@@ -24,8 +21,9 @@ The following parameters are supported:
 
 -summary:                Log entry import summary.
 
--tags:                   Change tags to apply to the entry in the import log
-                         and to the null revision on the imported pages.
+-tags:                   Change tags to apply to the entry in the import
+                         log and to the null revision on the imported
+                         pages.
 
 -test:                   No import, the names of the pages are output.
 
@@ -35,8 +33,7 @@ The following parameters are supported:
 -target                  Use page generator of the target site
                          This also affects the correspondingnamespace.
 
-
-Internal links are *not* repaired!
+.. warning:: Internal links are *not* repaired!
 
 Pages to work on can be specified using any of:
 
@@ -45,22 +42,24 @@ Pages to work on can be specified using any of:
 Examples
 --------
 
-Transfer all pages in category "Query service" from the English Wikipedia to
-the home Wikipedia, adding "Wikipedia:Import enwp/" as prefix:
+Transfer all pages in category "Query service" from the English
+Wikipedia to the home Wikipedia, adding "Wikipedia:Import enwp/" as
+prefix:
 
     python pwb.py transwikiimport -interwikisource:en -cat:"Query service" \
--prefix:"Wikipedia:Import enwp/" -fullhistory -assignknownusers
+        -prefix:"Wikipedia:Import enwp/" -fullhistory -assignknownusers
 
-Copy the template "Query service" from the English Wikipedia to the
-home Wiktionary:
+Copy the template "Query service" from the English Wikipedia to the home
+Wiktionary:
 
     python pwb.py transferbot -interwikisource:w:en \
--page:"Template:Query service" -fullhistory -assignknownusers
+        -page:"Template:Query service" -fullhistory -assignknownusers
 
-Copy 10 wanted templates of the home Wikipedia from English Wikipedia \
-to the home Wikipedia
+Copy 10 wanted templates of the home Wikipedia from English Wikipedia to
+the home Wikipedia
+
     python pwb.py transferbot -interwikisource:en \
--wantedtemplates:10 -target -fullhistory -assignknownusers
+        -wantedtemplates:10 -target -fullhistory -assignknownusers
 
 Advices
 -------
@@ -136,24 +135,25 @@ For tranwikiimport (and even to access the Specialpage:Import)
     the appropriate flag on the account
     must be set (usually administrator, tranwiki importer or importer).
 
-
+.. versionadded:: 8.2
 """
 #
-# (C) Draco flavus
+# (C) Pywikibot team, 2023
 #
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
 from pywikibot import pagegenerators
+from pywikibot.backports import Dict
 from pywikibot.bot import suggest_help
-# from pywikibot.i18n import twtranslate
 from pywikibot.data import api
 
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
-def api_query(site, params):
+def api_query(site, params: Dict[str, str]):
+    """Request data from given site."""
     query = api.Request(site, parameters=params)
     datas = query.submit()
     return datas
@@ -227,7 +227,7 @@ def main(*args: str) -> None:
         return
 
     gen_args = ' '.join(gen_args)
-    pywikibot.output("""
+    pywikibot.info("""
     Page transfer configuration
     ---------------------------
     Source: {fromsite}
@@ -240,10 +240,11 @@ def main(*args: str) -> None:
                rootpage=rootpage if rootpage else '(none)',
                target='from target site\n' if target else ''))
 
-    if correspondingnamespace != 'all' and rootpage != '':
-        pywikibot.output('Both the correspondingnamespace and the rootpage are set! Exiting.')
-    elif target and rootpage != '':
-        pywikibot.output('Both the target and the rootpage are set! Exiting.')
+    if correspondingnamespace != 'all' and rootpage:
+        pywikibot.info('Both the correspondingnamespace and the rootpage are '
+                       'set! Exiting.')
+    elif target and rootpage:
+        pywikibot.info('Both the target and the rootpage are set! Exiting.')
     else:
         params = {
             'action': 'import',
@@ -256,24 +257,32 @@ def main(*args: str) -> None:
         }
         if correspondingnamespace != 'all':
             params['namespace'] = correspondingnamespace
-        if rootpage != '':
+        if rootpage:
             params['rootpage'] = rootpage
-        if tags != '':
+        if tags:
             params['tags'] = tags
+
         for page in gen:
             if target:
                 if correspondingnamespace == 'all':
-                    fromtitle = page.namespace().canonical_prefix() + page.title(with_ns=False)
+                    fromtitle = (page.namespace().canonical_prefix()
+                                 + page.title(with_ns=False))
                 else:
-                    fromtitle = str(fromsite.namespaces[int(correspondingnamespace)]) + page.title(with_ns=False)
+                    fromtitle = str(
+                        fromsite.namespaces[int(correspondingnamespace)]) \
+                        + page.title(with_ns=False)
                 targetpage = page
             else:
                 fromtitle = page.title(with_ns=True)
                 if correspondingnamespace == 'all':
-                    totitle = page.namespace().canonical_prefix() + page.title(with_ns=False)
+                    totitle = (page.namespace().canonical_prefix()
+                               + page.title(with_ns=False))
                 else:
-                    totitle = str(tosite.namespaces[int(correspondingnamespace)]) + page.title(with_ns=False)
+                    totitle = str(
+                        tosite.namespaces[int(correspondingnamespace)]) \
+                        + page.title(with_ns=False)
                 targetpage = pywikibot.Page(tosite, totitle)
+
             if not overwrite:
                 if targetpage.exists():
                     pywikibot.warning(
@@ -291,19 +300,15 @@ def main(*args: str) -> None:
                         )
                     )
                     continue
+
             params['interwikipage'] = fromtitle
             if test:
-                pywikibot.output('Simulation:    {} →  {}'.format(
-                    fromtitle,
-                    targetpage.title(with_ns=True)
-                    )
-                )
+                pywikibot.info(f'Simulation: {fromtitle} →  '
+                               f'{targetpage.title(with_ns=True)}')
             else:
-                # Zum Testen die folgende Zeile auskommentieren.
                 api_query(tosite, params)
-                # Zum Testen bei folgenden zwei Zeilen das Kreuzzeichen entfernen.
-                # pywikibot.output(params)
-                # pywikibot.output(fromtitle + ' → ' + page.title(with_ns=True) if target else totitle)
+                pywikibot.info(fromtitle + ' → ' + page.title(with_ns=True)
+                               if target else totitle)
 
 
 if __name__ == '__main__':
