@@ -494,8 +494,7 @@ class BinaryTestCase(TestCase):
 
 class QueryStringParamsTestCase(HttpbinTestCase):
 
-    """
-    Test the query string parameter of request methods.
+    """Test the query string parameter of request methods.
 
     The /get endpoint of httpbin returns JSON that can include an
     'args' key with urldecoded query string parameters.
@@ -508,12 +507,12 @@ class QueryStringParamsTestCase(HttpbinTestCase):
 
     def test_no_params(self):
         """Test fetch method with no parameters."""
-        r = http.fetch(self.url, params={})
+        r = self.fetch(self.url, params={})
 
         fail_status = HTTPStatus.SERVICE_UNAVAILABLE
         if r.status_code == fail_status:  # T203637
-            self.skipTest('{status.value}: {status.description} for {url}'
-                          .format(status=fail_status, url=self.url))
+            self.skipTest(f'{fail_status.value}: {fail_status.description} '
+                          f'for {self.url}')
 
         self.assertEqual(r.status_code, HTTPStatus.OK)
         self.assertEqual(r.json()['args'], {})
@@ -525,12 +524,12 @@ class QueryStringParamsTestCase(HttpbinTestCase):
         HTTPBin returns the args in their urldecoded form, so what we put in
         should be the same as what we get out.
         """
-        r = http.fetch(self.url, params={'fish&chips': 'delicious'})
+        r = self.fetch(self.url, params={'fish&chips': 'delicious'})
 
         fail_status = HTTPStatus.SERVICE_UNAVAILABLE
         if r.status_code == fail_status:  # T203637
-            self.skipTest('{status.value}: {status.description} for {url}'
-                          .format(status=fail_status, url=self.url))
+            self.skipTest(f'{fail_status.value}: {fail_status.description} '
+                          f'for {self.url}')
 
         self.assertEqual(r.status_code, HTTPStatus.OK)
         self.assertEqual(r.json()['args'], {'fish&chips': 'delicious'})
@@ -542,12 +541,12 @@ class QueryStringParamsTestCase(HttpbinTestCase):
         HTTPBin returns the args in their urldecoded form, so what we put in
         should be the same as what we get out.
         """
-        r = http.fetch(self.url, params={'fish%26chips': 'delicious'})
+        r = self.fetch(self.url, params={'fish%26chips': 'delicious'})
 
         fail_status = HTTPStatus.SERVICE_UNAVAILABLE
         if r.status_code == fail_status:  # T203637
-            self.skipTest('{status.value}: {status.description} for {url}'
-                          .format(status=fail_status, url=self.url))
+            self.skipTest(f'{fail_status.value}: {fail_status.description} '
+                          f'for {self.url}')
 
         self.assertEqual(r.status_code, HTTPStatus.OK)
         self.assertEqual(r.json()['args'], {'fish%26chips': 'delicious'})
