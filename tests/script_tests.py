@@ -363,6 +363,7 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
         'catall',          # stdout user interaction
         'checkimages',
         'revertbot',
+        'transwikiimport',
     }
 
     _allowed_failures = {
@@ -433,6 +434,7 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
         'template',
         'templatecount',
         'transferbot',
+        'transwikiimport',
         'unusedfiles',
         'upload',
         'watchlist',
