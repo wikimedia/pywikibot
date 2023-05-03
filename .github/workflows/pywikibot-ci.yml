@@ -33,7 +33,6 @@ jobs:
           # ubuntu-20.04 required for Python 3.6
           - python-version: 3.7
             site: wikipedia:test
-            experimental: true
           - python-version: 3.6
             site: False
             family: wpbeta
