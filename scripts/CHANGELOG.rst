@@ -5,8 +5,15 @@ Scripts Changelog
 -----
 
 replicate_wiki
+~~~~~~~~~~~~~~
 
 * i18n support was added (:phab:`T333759`)
+
+transwikiimport
+~~~~~~~~~~~~~~~
+
+* Script was added (:phab:`T335246`)
+
 
 8.1.0
 -----
