@@ -16,8 +16,8 @@ The following options are supported:
 -clear     Clear old dist folders and leave. Does not create a
            distribution.
 
--upgrade   Upgrade distribution packages pip, setuptools, wheel and
-           twine first
+-upgrade   Upgrade pip first; upgrade or install distribution packages
+           build and twine first.
 
 Usage::
 
@@ -41,6 +41,9 @@ Usage::
    *nodist* option was removed, *clear* option does not create a
    distribution. *local* and *remote* option clears old distributions
    first.
+.. versionchanged:: 8.2
+   Build frontend was changed from setuptools to build. ``-upgrade``
+   option also installs packages if necessary.
 """
 #
 # (C) Pywikibot team, 2022-2023
@@ -51,10 +54,10 @@ import abc
 import shutil
 import sys
 from dataclasses import dataclass, field
+from importlib import import_module
 from pathlib import Path
 from subprocess import check_call, run
 
-import setup
 from pywikibot import __version__, error, info, input_yn, warning
 from pywikibot.backports import Tuple
 
@@ -84,11 +87,11 @@ class SetupBase(abc.ABC):
 
         .. versionadded:: 7.5
         """
-        info('Removing old dist folders... ', newline=False)
+        info('<<lightyellow>>Removing old dist folders... ', newline=False)
         shutil.rmtree(self.folder / 'build', ignore_errors=True)
         shutil.rmtree(self.folder / 'dist', ignore_errors=True)
         shutil.rmtree(self.folder / 'pywikibot.egg-info', ignore_errors=True)
-        info('done')
+        info('<<lightyellow>>done')
 
     @abc.abstractmethod
     def copy_files(self) -> None:
@@ -103,30 +106,46 @@ class SetupBase(abc.ABC):
 
         :return: True if no error occurs, else False
         """
-        if self.upgrade:  # pragma: no cover
-            check_call('python -m pip install --upgrade pip', shell=True)
-            check_call(
-                'pip install --upgrade setuptools wheel twine ', shell=True)
-
         if self.local or self.remote or self.clear:
             self.clear_old_dist()
             if self.clear:
                 return True  # pragma: no cover
 
+        if self.upgrade:  # pragma: no cover
+            check_call('python -m pip install --upgrade pip', shell=True)
+            for module in ('build', 'twine'):
+                info(f'<<lightyellow>>Install or upgrade {module}')
+                try:
+                    import_module(module)
+                except ModuleNotFoundError:
+                    check_call(f'pip install {module}', shell=True)
+                else:
+                    check_call(f'pip install --upgrade {module}', shell=True)
+        else:
+            for module in ('build', 'twine'):
+                try:
+                    import_module(module)
+                except ModuleNotFoundError as e:  # pragma: no cover
+                    error(f'<<lightred>>{e}')
+                    info('<<lightblue>>You may use -upgrade option to install')
+                    return False
+
         self.copy_files()
+        info('<<lightyellow>>Build package')
         try:
-            setup.main()  # create a new package
-        except SystemExit as e:  # pragma: no cover
+            check_call('python -m build')
+        except Exception as e:  # pragma: no cover
             error(e)
             return False
         finally:
             self.cleanup()
 
-        # check description
+        info('<<lightyellow>>Check package and description')
         if run('twine check dist/*', shell=True).returncode:
             return False  # pragma: no cover
 
         if self.local:
+            info('<<lightyellow>>Install locally')
             check_call('pip uninstall pywikibot -y', shell=True)
             check_call(
                 'pip install --no-index --pre --find-links=dist pywikibot',
@@ -159,6 +178,7 @@ class SetupPywikibot(SetupBase):
         Pywikibot i18n files are used for some translations. They are copied
         to the pywikibot scripts folder.
         """
+        info('<<lightyellow>>Copy files')
         info(f'directory is {self.folder}')
         info(f'clear {self.target} directory')
         shutil.rmtree(self.target, ignore_errors=True)
@@ -168,16 +188,16 @@ class SetupPywikibot(SetupBase):
 
     def cleanup(self) -> None:
         """Remove all copied files from pywikibot scripts folder."""
-        info('Remove copied files... ', newline=False)
+        info('<<lightyellow>>Remove copied files... ', newline=False)
         shutil.rmtree(self.target)
         # restore pywikibot en.json file
         filename = 'en.json'
         self.target.mkdir()
         shutil.copy(self.source / filename, self.target / filename)
-        info('done')
+        info('<<lightyellow>>done')
 
 
-def handle_args() -> Tuple[bool, bool, bool, bool, bool]:
+def handle_args() -> Tuple[bool, bool, bool, bool]:
     """Handle arguments and print documentation if requested.
 
     Read arguments from `sys.argv` and adjust it passing `sdist` to
@@ -187,6 +207,7 @@ def handle_args() -> Tuple[bool, bool, bool, bool, bool]:
         uploaded
     """
     if '-help' in sys.argv:
+        import setup
         info(__doc__)
         info(setup.__doc__)
         sys.exit()
@@ -200,7 +221,7 @@ def handle_args() -> Tuple[bool, bool, bool, bool, bool]:
         warning('Distribution must not be a developmental release to upload.')
         remote = False
 
-    sys.argv = [sys.argv[0], 'sdist', 'bdist_wheel']
+    sys.argv = [sys.argv[0]]
     return local, remote, clear, upgrade
 
 

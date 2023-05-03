@@ -1,1 +1,3 @@
 graft pywikibot/scripts/i18n/pywikibot
+include CODE_OF_CONDUCT.rst
+include ROADMAP.rst

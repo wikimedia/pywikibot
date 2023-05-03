@@ -19,17 +19,11 @@ class TestMakeDist(TestCase):
 
     net = False
 
-    def _test_argv(self):
-        """Test argv."""
-        self.assertIn('sdist', sys.argv)
-        self.assertIn('bdist_wheel', sys.argv)
-
     def test_handle_args_empty(self):
         """Test make_dist handle_args function."""
         from make_dist import handle_args
         args = handle_args()
         self.assertEqual(args, (False, ) * 4)
-        self._test_argv()
 
     def test_handle_args(self):
         """Test make_dist handle_args function."""
@@ -40,7 +34,6 @@ class TestMakeDist(TestCase):
         self.assertEqual(remote, 'dev' not in __version__)
         self.assertTrue(clear)
         self.assertTrue(upgrade)
-        self._test_argv()
 
 
 if __name__ == '__main__':  # pragma: no cover
