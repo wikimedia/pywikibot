@@ -10,7 +10,7 @@ This module requires sseclient to be installed::
 .. versionadded:: 3.0
 """
 #
-# (C) Pywikibot team, 2017-2022
+# (C) Pywikibot team, 2017-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -143,7 +143,10 @@ class EventStreams(GeneratorWrapper):
                               'install it with "pip install sseclient"\n')
         self.filter = {'all': [], 'any': [], 'none': []}
         self._total = None
-        self._site = kwargs.pop('site', Site())
+        try:
+            self._site = kwargs.pop('site')
+        except KeyError:  # T335720
+            self._site = Site()
 
         self._streams = kwargs.pop('streams', None)
         if self._streams and not isinstance(self._streams, str):

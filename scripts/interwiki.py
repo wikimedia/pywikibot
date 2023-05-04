@@ -2147,7 +2147,10 @@ class InterwikiDumps(OptionHandler):
         :keyword do_continue: If true, continue alphabetically starting at the
             last of the dumped pages.
         """
-        self.site = kwargs.pop('site', pywikibot.Site())
+        try:
+            self.site = kwargs.pop('site')
+        except KeyError:  # T335720
+            self.site = pywikibot.Site()
         super().__init__(**kwargs)
 
         self.restored_files = set()
