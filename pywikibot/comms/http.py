@@ -326,6 +326,11 @@ def error_handling_callback(response):
            and re.search(r'\[Errno (-2|8|11001)\]', msg):
             raise ConnectionError(response)
 
+    # catch requests.ReadTimeout and requests.ConnectTimeout and convert
+    # it to ServerError
+    if isinstance(response, requests.Timeout):
+        raise ServerError(response)
+
     if isinstance(response, Exception):
         with suppress(Exception):
             # request exception may contain response and request attribute
