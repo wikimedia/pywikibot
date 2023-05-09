@@ -25,8 +25,6 @@ The following parameters are supported:
                          log and to the null revision on the imported
                          pages.
 
--test:                   No import, the names of the pages are output.
-
 -overwrite:              Existing pages are skipped by default.
                          Use this option to overwrite pages.
 
@@ -106,18 +104,21 @@ Or generated using the usual pywikibot generators:
     imported and the usernames will be identified
     (existing pages will be skipped.)
 
-The parameter -test disables the import and the bot prints the names
-    of the pages that would be imported.
-Since the import of pages is a quite exceptionell process and potentially
-    dangerous it should be made carefully and tested in advance.
-The -test parameter can help to find out which pages would be moved
-    and what would be the target of the import.
-However it does not print the titles of the transcluded pages (e.g. templates)
-    if -includealltemplates is set.
-This option is quite *dangerous*. If the title of an existing page on home wiki
-    clashes with the title of one of the linked pages it would be *overritten*.
-    The histories would be merged. (If the imported version is newer.)
-    Even if -overwrite is not set the linked page *can be overwritten*.
+The global option -simulate disables the import and the bot prints the
+names of the pages that would be imported. Since the import of pages is
+a quite exceptionell process and potentially dangerous it should be made
+carefully and tested in advance.
+
+The -simulate option can help to find out which pages would be moved
+and what would be the target of the import. However it does not print
+the titles of the transcluded pages (e.g. templates) if
+-includealltemplates is set.
+
+This option is quite *dangerous*. If the title of an existing page on
+home wiki clashes with the title of one of the linked pages it would be
+*overritten*. The histories would be merged. (If the imported version is
+newer.) Even if -overwrite is not set the linked page *can be
+overwritten*.
 
 
 Interwikisource
@@ -143,10 +144,11 @@ For tranwikiimport (and even to access the Specialpage:Import)
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-from pywikibot import pagegenerators
+from pywikibot import config, pagegenerators
 from pywikibot.backports import Dict
 from pywikibot.bot import suggest_help
 from pywikibot.data import api
+from pywikibot.tools import issue_deprecation_warning
 
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
@@ -303,12 +305,15 @@ def main(*args: str) -> None:
 
             params['interwikipage'] = fromtitle
             if test:
-                pywikibot.info(f'Simulation: {fromtitle} →  '
-                               f'{targetpage.title(with_ns=True)}')
-            else:
-                api_query(tosite, params)
-                pywikibot.info(fromtitle + ' → ' + page.title(with_ns=True)
-                               if target else totitle)
+                # -simulate may be given as an int to indicate waiting seconds
+                if not config.simulate:
+                    config.simulate = True
+
+                # since 8.2.0; no deprecation period
+                issue_deprecation_warning('-test option', '-simulate')
+
+            api_query(tosite, params)
+            pywikibot.info(f'{fromtitle} →  {targetpage}')
 
 
 if __name__ == '__main__':
