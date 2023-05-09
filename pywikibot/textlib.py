@@ -18,6 +18,7 @@ from typing import NamedTuple, Optional, Union
 import pywikibot
 from pywikibot.backports import Container, Dict, Iterable, List
 from pywikibot.backports import OrderedDict as OrderedDictType
+from pywikibot.backports import Pattern
 from pywikibot.backports import Sequence as SequenceType
 from pywikibot.backports import Tuple
 from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
@@ -300,8 +301,11 @@ def _create_default_regexes() -> None:
     })
 
 
-def _get_regexes(keys, site):
-    """Fetch compiled regexes."""
+def _get_regexes(keys: Iterable, site) -> List[Pattern[str]]:
+    """Fetch compiled regexes.
+
+    :meta public:
+    """
     if not _regex_cache:
         _create_default_regexes()
 
@@ -319,8 +323,8 @@ def _get_regexes(keys, site):
             if isinstance(_regex_cache[exc], tuple):
                 if not site and exc in ('interwiki', 'property', 'invoke',
                                         'category', 'file'):
-                    raise ValueError("Site cannot be None for the '{}' regex"
-                                     .format(exc))
+                    raise ValueError(
+                        'Site cannot be None for the {exc!r} regex')
 
                 if (exc, site) not in _regex_cache:
                     re_text, re_var = _regex_cache[exc]
