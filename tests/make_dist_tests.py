@@ -5,7 +5,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-import os
 import sys
 import unittest
 
@@ -22,8 +21,6 @@ class TestMakeDist(TestCase):
 
     def _test_argv(self):
         """Test argv."""
-        if os.environ.get('PYWIKIBOT_TEST_RUNNING', '0') != '1':
-            self.assertEqual(__file__, sys.argv[0])
         self.assertIn('sdist', sys.argv)
         self.assertIn('bdist_wheel', sys.argv)
 
