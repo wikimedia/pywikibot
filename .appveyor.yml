@@ -92,4 +92,3 @@ on_finish:
       coverage report
       Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
       bash codecov.sh -U "-s" -A "-s"
-
