@@ -1,6 +1,10 @@
 Current release
 ---------------
 
+* Use ``build`` instead of ``setuptools.setup()`` to build the distribution
+* Raise ``ConnectionError`` on ``requests.ReadTimeout`` in :func:`comms.http.error_handling_callback`
+* Raise :exc:`exceptions.ServerError` on ``requests.ReadTimeout`` in :func:`comms.http.error_handling_callback`
+* Do not evaluate :func:`pywikibot.Site` with dict.pop() as default value (:phab:`T335720`)
 * L10N updates
 * :class:`family.Family` class was rewritten. ``obsolete.setter`` was removed,
   :meth:`family.Family.interwiki_replacements` returns an invariant mapping,

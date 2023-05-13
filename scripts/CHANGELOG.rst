@@ -4,6 +4,11 @@ Scripts Changelog
 8.2.0
 -----
 
+archivebot
+~~~~~~~~~~
+
+* KeyboardInterrupt was enabled for -async option
+
 replicate_wiki
 ~~~~~~~~~~~~~~
 
