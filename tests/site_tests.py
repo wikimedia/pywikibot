@@ -22,7 +22,6 @@ from pywikibot.exceptions import (
     UnknownExtensionError,
     UnknownSiteError,
 )
-
 from tests.aspects import (
     AlteredDefaultSiteTestCase,
     DefaultDrySiteTestCase,

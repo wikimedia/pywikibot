@@ -16,7 +16,6 @@ import requests.exceptions as requests_exceptions
 import pywikibot
 from pywikibot.exceptions import ClientError, ServerError
 from pywikibot.site_detect import MWSite
-
 from tests.aspects import PatchingTestCase, TestCase
 from tests.utils import DrySite, skipping
 
