@@ -28,7 +28,7 @@ instantiating the bot. It also calls ``bot.run()`` to create the dictionaries:
 >>> bot.to_json()
 """
 #
-# (C) Pywikibot team, 2013-2022
+# (C) Pywikibot team, 2013-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -140,7 +140,7 @@ class i18nBot:  # noqa: N801
             file_name = os.path.join(json_dir, f'{lang}.json')
             if os.path.isfile(file_name):
                 with codecs.open(file_name, 'r', 'utf-8') as json_file:
-                    new_dict = json.loads(json_file.read())
+                    new_dict = json.load(json_file)
             else:
                 new_dict = {}
             new_dict['@metadata'] = new_dict.get('@metadata', {'authors': []})
