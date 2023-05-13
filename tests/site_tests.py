@@ -1024,7 +1024,7 @@ class TestLinktrails(TestCase):
             'wuu': '',
             'xmf': '[a-zაბგდევზთიკლმნოპჟრსტუფქღყშჩცძწჭხჯჰ“»]*',
             'yi': '[a-zא-ת]*',
-            'zh-cn': ''
+            'zh': ''
         }
         for code, linktrail in linktrails.items():
             site = pywikibot.Site(code, self.family)
