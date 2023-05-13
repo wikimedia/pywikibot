@@ -30,10 +30,10 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'it', 'en', 'pl', 'ru', 'cs', 'et', 'pt', 'fa', 'uk', 'he', 'de', 'fr',
         'es', 'tr', 'eo', 'sk', 'bs', 'az', 'ca', 'fi', 'sr', 'zh', 'sl', 'lt',
         'ar', 'su', 'bg', 'id', 'hy', 'hr', 'el', 'nn', 'sv', 'li', 'hu', 'ko',
-        'nl', 'sah', 'ja', 'la', 'ta', 'hi', 'gl', 'gu', 'ur', 'ig', 'be',
-        'guw', 'te', 'vi', 'tl', 'cy', 'no', 'bn', 'sq', 'ml', 'as', 'kn',
-        'ro', 'eu', 'ku', 'uz', 'ka', 'da', 'sa', 'is', 'bcl', 'br', 'th',
-        'mr', 'af', 'ky',
+        'nl', 'sah', 'ja', 'la', 'ta', 'hi', 'ig', 'gl', 'gu', 'ur', 'guw',
+        'be', 'te', 'vi', 'tl', 'cy', 'no', 'bn', 'as', 'sq', 'ml', 'kn', 'ro',
+        'eu', 'ku', 'uz', 'ka', 'da', 'sa', 'is', 'bcl', 'br', 'th', 'mr',
+        'af', 'ky',
     ]
 
     category_redirect_templates = {
