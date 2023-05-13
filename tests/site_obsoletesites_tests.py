@@ -12,7 +12,6 @@ from http import HTTPStatus
 import pywikibot
 from pywikibot.comms import http
 from pywikibot.tools import suppress_warnings
-
 from tests import WARN_SITE_CODE
 from tests.aspects import DefaultSiteTestCase
 
