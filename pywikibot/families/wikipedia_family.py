@@ -16,8 +16,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     closed_wikis = [
         # https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist
-        'aa', 'cho', 'ho', 'hz', 'ii', 'kj', 'kr', 'lrc', 'mh', 'mus', 'na',
-        'ng', 'ten',
+        'aa', 'ak', 'cho', 'ho', 'hz', 'ii', 'kj', 'kr', 'lrc', 'mh', 'mus',
+        'na', 'ng', 'ten',
     ]
 
     removed_wikis = [
@@ -56,7 +56,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'ty', 'guw', 'cu', 'trv', 'srn', 'sm', 'alt', 'gcr', 'chr', 'tn',
         'ltg', 'mad', 'ny', 'st', 'pih', 'ff', 'got', 'ee', 'ami', 'rmy', 've',
         'bm', 'ts', 'chy', 'pcm', 'ss', 'kcg', 'rn', 'ch', 'ik', 'pnt', 'guc',
-        'ady', 'fat', 'iu', 'ak', 'gur', 'pwn', 'sg', 'din', 'ti', 'kl', 'dz',
+        'ady', 'fat', 'iu', 'gur', 'pwn', 'sg', 'din', 'ti', 'kl', 'dz',
         'cr',
     ]
 
@@ -115,7 +115,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # https://meta.wikimedia.org/wiki/BPI#Current_implementation
     # & https://meta.wikimedia.org/wiki/Special:WikiSets/2
     cross_allowed = [
-        'ab', 'ace', 'ady', 'af', 'ak', 'als', 'am', 'an', 'ang', 'ar', 'arc',
+        'ab', 'ace', 'ady', 'af', 'als', 'am', 'an', 'ang', 'ar', 'arc',
         'arz', 'as', 'ast', 'atj', 'av', 'ay', 'az', 'ba', 'bar', 'bat-smg',
         'bcl', 'be', 'be-tarask', 'bg', 'bh', 'bi', 'bjn', 'bm', 'bo', 'bpy',
         'bug', 'bxr', 'ca', 'cbk-zam', 'cdo', 'ce', 'ceb', 'ch', 'chr', 'chy',
