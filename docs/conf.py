@@ -500,7 +500,7 @@ extlinks = {
 
 
 def pywikibot_docstring_fixups(app, what, name, obj, options, lines):
-    """Fixup docstrings."""
+    """Remove plain 'Initializer.' docstring."""
     if what not in ('class', 'exception'):
         return
 
@@ -520,19 +520,27 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
 
     length = 0
     for index, line in enumerate(lines):
+        # highlight the first line
         if index == 0:  # highlight the first line
             lines[0] = '**{}**'.format(line.strip('.'))
+
+        # add link for pagegenerators options
         elif line == '&params;':
             lines[index] = ('This script supports use of '
                             ':py:mod:`pagegenerators` arguments.')
+
+        # add link for fixes
         elif name == 'scripts.replace' and line == '&fixes-help;':
             lines[index] = ('                  The available fixes are listed '
                             'in :py:mod:`pywikibot.fixes`.')
+
+        # replace cosmetic changes warning
         elif name == 'scripts.cosmetic_changes' and line == '&warning;':
             lines[index] = warning
+
+        # Initiate code block except pagegenerator arguments follows
         elif (line.endswith(':') and not line.lstrip().startswith(':')
                 and 'Traceback (most recent call last)' not in line):
-            # Initiate code block except pagegenerator arguments follows
             for afterline in lines[index + 1:]:
                 if not afterline:
                     continue
@@ -540,6 +548,7 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
                     lines[index] = line + ':'
                 break
 
+        # adjust options
         if line.startswith('-'):
             # Indent options
             match = re.match(r'-[^ ]+? +', line)
