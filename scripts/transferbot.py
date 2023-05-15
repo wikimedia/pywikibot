@@ -39,7 +39,8 @@ Arabic Wiktionary:
     python pwb.py transferbot -family:wikipedia -lang:en \
         -tofamily:wiktionary -tolang:ar -page:"Template:Query service"
 
-Copy 10 wanted templates of German Wikipedia from English Wikipedia to German
+Copy 10 wanted templates of German Wikipedia from English Wikipedia to German:
+
     python pwb.py transferbot -family:wikipedia -lang:en \
         -tolang:de -wantedtemplates:10 -target
 
