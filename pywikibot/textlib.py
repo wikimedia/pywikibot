@@ -16,7 +16,14 @@ from html.parser import HTMLParser
 from typing import NamedTuple, Optional, Union
 
 import pywikibot
-from pywikibot.backports import Container, Dict, Iterable, List
+from pywikibot.backports import (
+    Callable,
+    Container,
+    Dict,
+    Iterable,
+    Match,
+    List,
+)
 from pywikibot.backports import OrderedDict as OrderedDictType
 from pywikibot.backports import Pattern
 from pywikibot.backports import Sequence as SequenceType
@@ -352,30 +359,38 @@ def _get_regexes(keys: Iterable, site) -> List[Pattern[str]]:
     return result
 
 
-def replaceExcept(text: str, old, new, exceptions: list,
-                  caseInsensitive: bool = False, allowoverlap: bool = False,
-                  marker: str = '', site=None, count: int = 0) -> str:
+def replaceExcept(text: str,
+                  old: Union[str, Pattern[str]],
+                  new: Union[str, Callable[[Match[str]], str]],
+                  exceptions: List[Union[str, Pattern[str]]],
+                  caseInsensitive: bool = False,
+                  allowoverlap: bool = False,
+                  marker: str = '',
+                  site: Optional['pywikibot.site.BaseSite'] = None,
+                  count: int = 0) -> str:
     """
-    Return text with 'old' replaced by 'new', ignoring specified types of text.
+    Return text with *old* replaced by *new*, ignoring specified types of text.
 
-    Skips occurrences of 'old' within exceptions; e.g., within nowiki tags or
-    HTML comments. If caseInsensitive is true, then use case insensitive
-    regex matching. If allowoverlap is true, overlapping occurrences are all
-    replaced (watch out when using this, it might lead to infinite loops!).
+    Skip occurrences of *old* within *exceptions*; e.g. within nowiki
+    tags or HTML comments. If *caseInsensitive* is true, then use case
+    insensitive regex matching. If *allowoverlap* is true, overlapping
+    occurrences are all replaced
+
+    .. caution:: Watch out when using *allowoverlap*, it might lead to
+       infinite loops!
 
     :param text: text to be modified
     :param old: a compiled or uncompiled regular expression
-    :param new: a unicode string (which can contain regular
-        expression references), or a function which takes
-        a match object as parameter. See parameter repl of
-        re.sub().
+    :param new: a string (which can contain regular expression
+        references), or a function which takes a match object as
+        parameter. See parameter *repl* of ``re.sub()``.
     :param exceptions: a list of strings or already compiled regex
-        objects which signal what to leave out. Strings might be like
-        ['math', 'table', 'template'] for example.
+        objects which signal what to leave out. List of strings might be
+        like ``['math', 'table', 'template']`` for example.
     :param marker: a string that will be added to the last replacement;
         if nothing is changed, it is added at the end
     :param count: how many replacements to do at most. See parameter
-        count of re.sub().
+        *count* of ``re.sub()``.
     """
     # if we got a string, compile it as a regular expression
     if isinstance(old, str):
@@ -393,6 +408,7 @@ def replaceExcept(text: str, old, new, exceptions: list,
     while not count or replaced < count:
         if index > len(text):
             break
+
         match = old.search(text, index)
         if not match:
             # nothing left to replace
@@ -412,55 +428,57 @@ def replaceExcept(text: str, old, new, exceptions: list,
             # an HTML comment or text in nowiki tags stands before the next
             # valid match. Skip.
             index = nextExceptionMatch.end()
+            continue
+
+        # We found a valid match. Replace it.
+        if callable(new):
+            # the parameter new can be a function which takes the match
+            # as a parameter.
+            replacement = new(match)
         else:
-            # We found a valid match. Replace it.
-            if callable(new):
-                # the parameter new can be a function which takes the match
-                # as a parameter.
-                replacement = new(match)
-            else:
-                # it is not a function, but a string.
+            # it is not a function, but a string.
 
-                # it is a little hack to make \n work. It would be better
-                # to fix it previously, but better than nothing.
-                new = new.replace('\\n', '\n')
+            # it is a little hack to make \n work. It would be better
+            # to fix it previously, but better than nothing.
+            new = new.replace('\\n', '\n')
 
-                # We cannot just insert the new string, as it may contain regex
-                # group references such as \2 or \g<name>.
-                # On the other hand, this approach does not work because it
-                # can't handle lookahead or lookbehind (see bug T123185).
-                # So we have to process the group references manually.
-                replacement = ''
+            # We cannot just insert the new string, as it may contain regex
+            # group references such as \2 or \g<name>.
+            # On the other hand, this approach does not work because it
+            # can't handle lookahead or lookbehind (see bug T123185).
+            # So we have to process the group references manually.
+            replacement = ''
 
-                group_regex = re.compile(r'\\(\d+)|\\g<(.+?)>')
-                last = 0
-                for group_match in group_regex.finditer(new):
-                    group_id = group_match[1] or group_match[2]
-                    with suppress(ValueError):
-                        group_id = int(group_id)
+            group_regex = re.compile(r'\\(\d+)|\\g<(.+?)>')
+            last = 0
+            for group_match in group_regex.finditer(new):
+                group_id = group_match[1] or group_match[2]
+                with suppress(ValueError):
+                    group_id = int(group_id)
 
-                    try:
-                        replacement += new[last:group_match.start()]
-                        replacement += match[group_id] or ''
-                    except IndexError:
-                        raise IndexError('Invalid group reference: {}\n'
-                                         'Groups found: {}'
-                                         .format(group_id, match.groups()))
-                    last = group_match.end()
-                replacement += new[last:]
+                try:
+                    replacement += new[last:group_match.start()]
+                    replacement += match[group_id] or ''
+                except IndexError:
+                    raise IndexError(f'Invalid group reference: {group_id}\n'
+                                     f'Groups found: {match.groups()}')
+                last = group_match.end()
+            replacement += new[last:]
 
-            text = text[:match.start()] + replacement + text[match.end():]
+        text = text[:match.start()] + replacement + text[match.end():]
 
-            # continue the search on the remaining text
-            if allowoverlap:
-                index = match.start() + 1
-            else:
-                index = match.start() + len(replacement)
-            if not match.group():
-                # When the regex allows to match nothing, shift by one char
-                index += 1
-            markerpos = match.start() + len(replacement)
-            replaced += 1
+        # continue the search on the remaining text
+        if allowoverlap:
+            index = match.start() + 1
+        else:
+            index = match.start() + len(replacement)
+
+        if not match.group():
+            # When the regex allows to match nothing, shift by one char
+            index += 1
+
+        markerpos = match.start() + len(replacement)
+        replaced += 1
 
     return text[:markerpos] + marker + text[markerpos:]
 
