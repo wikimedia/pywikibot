@@ -1,8 +1,4 @@
-"""Functions for manipulating wiki-text.
-
-Unless otherwise noted, all functions take a unicode string as the
-argument and return a unicode string.
-"""
+"""Functions for manipulating wiki-text."""
 #
 # (C) Pywikibot team, 2008-2023
 #
@@ -655,8 +651,7 @@ def replace_links(text: str, replace, site: 'pywikibot.site.BaseSite') -> str:
 
     If it's a string and the replacement was a sequence it converts it into a
     Page instance. If the replacement is done via a callable it'll use it like
-    unlinking and directly replace the link with the text itself. It only
-    supports unicode when used by the callable and bytes are not allowed.
+    unlinking and directly replace the link with the text itself.
 
     If either the section or label should be used the replacement can be a
     function which returns a Link instance and copies the value which should
@@ -815,8 +810,6 @@ def replace_links(text: str, replace, site: 'pywikibot.site.BaseSite') -> str:
             new_link = new_label
 
         if isinstance(new_link, str):
-            # Nothing good can come out of the fact that bytes is returned so
-            # force unicode
             text = text[:start] + new_link + text[end:]
             # Make sure that next time around we will not find this same hit.
             curpos = start + len(new_link)
