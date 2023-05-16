@@ -319,26 +319,24 @@ def _get_regexes(keys: Iterable, site) -> List[Pattern[str]]:
 
         # assume the string is a reference to a standard regex above,
         # which may not yet have a site specific re compiled.
-        if exc in _regex_cache:
-            if isinstance(_regex_cache[exc], tuple):
-                if not site and exc in ('interwiki', 'property', 'invoke',
-                                        'category', 'file'):
-                    raise ValueError(
-                        'Site cannot be None for the {exc!r} regex')
-
-                if (exc, site) not in _regex_cache:
-                    re_text, re_var = _regex_cache[exc]
-                    _regex_cache[(exc, site)] = re.compile(
-                        re_text % re_var(site), re.VERBOSE)
-
-                result.append(_regex_cache[(exc, site)])
-            else:
-                result.append(_regex_cache[exc])
-        else:
+        if exc not in _regex_cache:
             # nowiki, noinclude, includeonly, timeline, math and other
             # extensions
             _regex_cache[exc] = _tag_regex(exc)
             result.append(_regex_cache[exc])
+        elif not isinstance(_regex_cache[exc], tuple):
+            result.append(_regex_cache[exc])
+        else:
+            if not site and exc in ('interwiki', 'property', 'invoke',
+                                    'category', 'file'):
+                raise ValueError(f'Site cannot be None for the {exc!r} regex')
+
+            if (exc, site) not in _regex_cache:
+                re_text, re_var = _regex_cache[exc]
+                _regex_cache[(exc, site)] = re.compile(
+                    re_text % re_var(site), re.VERBOSE)
+
+            result.append(_regex_cache[(exc, site)])
 
         # handle aliases
         if exc == 'source':
