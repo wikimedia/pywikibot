@@ -143,7 +143,7 @@ are also in 'Pneumatics' category.
    :mod:`pagegenerators` are supported with "move" and "remove" action.
 """
 #
-# (C) Pywikibot team, 2004-2022
+# (C) Pywikibot team, 2004-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1184,7 +1184,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
         # skip initial templates, images and comments for articles.
         if member.namespace() == member.site.namespaces.MAIN:
             excludes = ('template', 'file', 'comment')
-            regexes = textlib._get_regexes(excludes, member.site)
+            regexes = textlib.get_regexes(excludes, member.site)
             i = 0
             while i < 3:
                 i = 0

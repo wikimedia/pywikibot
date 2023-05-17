@@ -46,7 +46,7 @@ except ImportError:
 ETPType = List[Tuple[str, OrderedDictType[str, str]]]
 
 # cache for replaceExcept to avoid recompile or regexes each call
-_regex_cache = {}
+_regex_cache: Dict[str, Pattern[str]] = {}
 
 # The regex below collects nested templates, providing simpler
 # identification of templates used at the top-level of wikitext.
@@ -253,7 +253,15 @@ def _tag_regex(tag_name: str):
 
 
 def _create_default_regexes() -> None:
-    """Fill (and possibly overwrite) _regex_cache with default regexes."""
+    """Fill (and possibly overwrite) ``_regex_cache`` with default regexes.
+
+    The following keys are provided: ``category``, ``comment``, ``file``,
+    ``header``, ``hyperlink``, ``interwiki``, ``invoke``, ``link``,
+    ``pagelist``, ``property``, ``startcolon``, ``startspace``, ``table``,
+    ``template``.
+
+    :meta public:
+    """
     _regex_cache.update({
         # categories
         'category': (r'\[\[ *(?:%s)\s*:.*?\]\]',
@@ -304,16 +312,29 @@ def _create_default_regexes() -> None:
     })
 
 
-def _get_regexes(keys: Iterable, site) -> List[Pattern[str]]:
+def get_regexes(
+    keys: Union[str, Iterable[str]],
+    site: Optional['pywikibot.site.BaseSite'] = None
+) -> List[Pattern[str]]:
     """Fetch compiled regexes.
 
-    :meta public:
+    .. versionchanged:: 8.2
+       ``_get_regexes`` becomes a public function.
+       *keys* may be a single string; *site* is optional.
+
+    :param keys: a single key or an iterable of keys whose regex pattern
+        should be given
+    :param site: a BaseSite object needed for ``category``, ``file``,
+        ``interwiki``, ``invoke`` and ``property`` keys
+    :raises ValueError: site cannot be None.
     """
     if not _regex_cache:
         _create_default_regexes()
 
-    result = []
+    if isinstance(keys, str):
+        keys = [keys]
 
+    result = []
     for exc in keys:
         if not isinstance(exc, str):
             # assume it's a regular expression
@@ -332,7 +353,7 @@ def _get_regexes(keys: Iterable, site) -> List[Pattern[str]]:
         else:
             if not site and exc in ('interwiki', 'property', 'invoke',
                                     'category', 'file'):
-                raise ValueError(f'Site cannot be None for the {exc!r} regex')
+                raise ValueError(f'site cannot be None for the {exc!r} regex')
 
             if (exc, site) not in _regex_cache:
                 re_text, re_var = _regex_cache[exc]
@@ -396,7 +417,7 @@ def replaceExcept(text: str,
     if not old.search(text):
         return text + marker
 
-    dontTouchRegexes = _get_regexes(exceptions, site)
+    dontTouchRegexes = get_regexes(exceptions, site)
 
     index = 0
     replaced = 0
@@ -500,7 +521,7 @@ def removeDisabledParts(text: str,
        if provided as an ordered collection (list, tuple)
 
     :param tags: The exact set of parts which should be removed using
-        keywords from textlib._get_regexes().
+        keywords from :func:`get_regexes`.
     :param include: Or, in alternative, default parts that shall not
         be removed.
     :param site: Site to be used for site-dependent regexes. Default
@@ -518,7 +539,7 @@ def removeDisabledParts(text: str,
     # ("Note" at the end of the section)
     if include:
         tags = [tag for tag in tags if tag not in include]
-    regexes = _get_regexes(tags, site)
+    regexes = get_regexes(tags, site)
     for regex in regexes:
         text = regex.sub('', text)
     return text
@@ -917,10 +938,10 @@ _Section = namedtuple('_Section', ('title', 'content'))
 _Content = namedtuple('_Content', ('header', 'sections', 'footer'))
 
 
-def _extract_headings(text: str, site) -> list:
+def _extract_headings(text: str) -> list:
     """Return _Heading objects."""
     headings = []
-    heading_regex = _get_regexes(['header'], site)[0]
+    heading_regex = get_regexes('header')[0]
     for match in heading_regex.finditer(text):
         start, end = match.span()
         if not isDisabled(text, start) and not isDisabled(text, end):
@@ -981,11 +1002,11 @@ def extract_sections(
 
     .. versionadded:: 3.0
     """
-    headings = _extract_headings(text, site)
+    headings = _extract_headings(text)
     sections = _extract_sections(text, headings)
     # Find header and footer contents
     header = text[:headings[0].start] if headings else text
-    cat_regex, interwiki_regex = _get_regexes(('category', 'interwiki'), site)
+    cat_regex, interwiki_regex = get_regexes(['category', 'interwiki'], site)
     langlink_pattern = interwiki_regex.pattern.replace(':?', '')
     last_section_content = sections[-1].content if sections else header
     footer = re.search(
@@ -1251,7 +1272,7 @@ def replaceLanguageLinks(oldtext: str,
         above_interwiki.append(comment)
 
     if above_interwiki:
-        interwiki = _get_regexes(['interwiki'], site)[0]
+        interwiki = get_regexes('interwiki', site)[0]
         first_interwiki = interwiki.search(newtext)
         for reg in above_interwiki:
             special = reg.search(newtext)
@@ -1565,7 +1586,7 @@ def replaceCategoryLinks(oldtext: str,
         under_categories.append(stub)
 
     if under_categories:
-        category = _get_regexes(['category'], site)[0]
+        category = get_regexes('category', site)[0]
         for last_category in category.finditer(newtext):
             pass
         for reg in under_categories:

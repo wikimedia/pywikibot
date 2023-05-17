@@ -142,7 +142,7 @@ Please type "python pwb.py replace -help | more" if you can't read
 the top of the help.
 """
 #
-# (C) Pywikibot team, 2004-2022
+# (C) Pywikibot team, 2004-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -504,8 +504,8 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             regular expressions.
         inside-tags
             A list of strings. These strings must be keys from the
-            dictionary in textlib._create_default_regexes() or must be
-            accepted by textlib._get_regexes().
+            dictionary in :func:`textlib._create_default_regexes` or must be
+            accepted by :func:`textlib.get_regexes`.
 
     :keyword allowoverlap: when matches overlap, all of them are replaced.
     :type allowoverlap: bool
