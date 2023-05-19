@@ -23,15 +23,16 @@ optional arguments:
 .. seealso:: https://graphviz.org/doc/info/attrs.html
    for graphviz style definitions.
 
-Example::
+Example
+-------
 
     pwb.py -v category_graph -from
 
 Extended example with style settings::
 
     pwb.py category_graph -from Life -downsize 1.5 \
-    -style 'graph[rankdir=BT ranksep=0.5] node[shape=circle
-    style=filled fillcolor=green] edge[style=dashed penwidth=3]'
+-style 'graph[rankdir=BT ranksep=0.5] node[shape=circle style=filled \
+fillcolor=green] edge[style=dashed penwidth=3]'
 
 .. versionadded:: 8.0
 """
