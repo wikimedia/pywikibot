@@ -41,22 +41,22 @@ Examples
 1. Append 'hello world' to the bottom of the sandbox:
 
     python pwb.py add_text -page:Wikipedia:Sandbox \
-        -summary:"Bot: pywikibot practice" -text:"hello world"
+-summary:"Bot: pywikibot practice" -text:"hello world"
 
 2. Add a template to the top of the pages with 'category:catname':
 
     python pwb.py add_text -cat:catname -summary:"Bot: Adding a template" \
-        -text:"{{Something}}" -except:"\{\{([Tt]emplate:|)[Ss]omething" -up
+-text:"{{Something}}" -except:"\{\{([Tt]emplate:|)[Ss]omething" -up
 
 3. Command used on it.wikipedia to put the template in the page without any
    category:
 
     python pwb.py add_text -except:"\{\{([Tt]emplate:|)[Cc]ategorizzare" \
-        -text:"{{Categorizzare}}" -excepturl:"class='catlinks'>" -uncat \
-        -summary:"Bot: Aggiungo template Categorizzare"
+-text:"{{Categorizzare}}" -excepturl:"class='catlinks'>" -uncat \
+-summary:"Bot: Aggiungo template Categorizzare"
 """
 #
-# (C) Pywikibot team, 2007-2022
+# (C) Pywikibot team, 2007-2023
 #
 # Distributed under the terms of the MIT license.
 #

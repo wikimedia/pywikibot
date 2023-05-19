@@ -127,7 +127,7 @@ Errror -> Error, use this:
 If you want to do more than one replacement at a time, use this:
 
     python pwb.py replace -xml:foobar.xml "Errror" "Error" "Faail" "Fail" \
-        -namespace:0
+-namespace:0
 
 If you have a page called 'John Doe' and want to fix the format of ISBNs, use:
 
@@ -142,7 +142,7 @@ Please type "python pwb.py replace -help | more" if you can't read
 the top of the help.
 """
 #
-# (C) Pywikibot team, 2004-2022
+# (C) Pywikibot team, 2004-2023
 #
 # Distributed under the terms of the MIT license.
 #
