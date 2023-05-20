@@ -64,9 +64,8 @@ from typing import Any
 from urllib.parse import urlparse, urlunparse
 
 import pywikibot
-from pywikibot import textlib
+from pywikibot import exceptions, textlib
 from pywikibot.backports import Callable, Match, Pattern
-from pywikibot.exceptions import InvalidTitleError
 from pywikibot.textlib import (
     FILE_LINK_REGEX,
     MultiTemplateMatchBuilder,
@@ -532,8 +531,10 @@ class CosmeticChangesToolkit:
             oldlink = url2string(match.group(),
                                  encodings=self.site.encodings())
 
-            is_interwiki = self.site.isInterwikiLink(titleWithSection)
-            if is_interwiki:
+            is_interwiki = None
+            with suppress(exceptions.ServerError):
+                is_interwiki = self.site.isInterwikiLink(titleWithSection)
+            if is_interwiki is not False:
                 return oldlink
 
             # The link looks like this:
@@ -541,10 +542,9 @@ class CosmeticChangesToolkit:
             # We only work on namespace 0 because pipes and linktrails work
             # differently for images and categories.
             page = pywikibot.Page(pywikibot.Link(titleWithSection, self.site))
-            try:
+            in_main_namespace = None
+            with suppress(exceptions.InvalidTitleError):
                 in_main_namespace = page.namespace() == 0
-            except InvalidTitleError:
-                in_main_namespace = False
             if not in_main_namespace:
                 return oldlink
 
