@@ -9,6 +9,11 @@ archivebot
 
 * KeyboardInterrupt was enabled for -async option
 
+noreferences
+~~~~~~~~~~~~
+
+* NoReferencesBot derives from :class:`bot.AutomaticTWSummaryBot`
+
 replicate_wiki
 ~~~~~~~~~~~~~~
 

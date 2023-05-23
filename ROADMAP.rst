@@ -1,6 +1,7 @@
 Current release
 ---------------
 
+* return 'https' scheme with :meth:`family.Family.protocol` (:phab:`T326046`)
 * Use ``build`` instead of ``setuptools.setup()`` to build the distribution
 * Raise ``ConnectionError`` on ``requests.ReadTimeout`` in :func:`comms.http.error_handling_callback`
 * Raise :exc:`exceptions.ServerError` on ``requests.ReadTimeout`` in :func:`comms.http.error_handling_callback`
