@@ -29,7 +29,7 @@ bandwidth. Instead, use the -xml parameter, or use another way to generate
 a list of affected articles
 """
 #
-# (C) Pywikibot team, 2007-2022
+# (C) Pywikibot team, 2007-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -38,7 +38,7 @@ from functools import partial
 
 import pywikibot
 from pywikibot import i18n, pagegenerators, textlib
-from pywikibot.bot import ExistingPageBot, SingleSiteBot
+from pywikibot.bot import AutomaticTWSummaryBot, ExistingPageBot, SingleSiteBot
 from pywikibot.exceptions import LockedPageError
 from pywikibot.pagegenerators import XMLDumpPageGenerator
 
@@ -511,7 +511,7 @@ XmlDumpNoReferencesPageGenerator = partial(
     XMLDumpPageGenerator, text_predicate=_match_xml_page_text)
 
 
-class NoReferencesBot(SingleSiteBot, ExistingPageBot):
+class NoReferencesBot(AutomaticTWSummaryBot, SingleSiteBot, ExistingPageBot):
 
     """References section bot."""
 
@@ -579,8 +579,8 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot):
         :return: The modified pagetext
         """
         # Do we have a malformed <reference> tag which could be repaired?
-        # Set the edit summary for this case
-        self.comment = i18n.twtranslate(self.site, 'noreferences-fix-tag')
+        # Set the edit summary key for this case
+        self.summary_key = 'noreferences-fix-tag'
 
         # Repair two opening tags or an opening and an empty tag
         pattern = re.compile(r'< *references *>(.*?)'
@@ -595,8 +595,8 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot):
             return re.sub(pattern, '<references />', oldText)
 
         # Is there an existing section where we can add the references tag?
-        # Set the edit summary for this case
-        self.comment = i18n.twtranslate(self.site, 'noreferences-add-tag')
+        # Set the edit summary key for this case
+        self.summary_key = 'noreferences-add-tag'
         for section in i18n.translate(self.site, referencesSections):
             sectionR = re.compile(fr'\r?\n=+ *{section} *=+ *\r?\n')
             index = 0
@@ -725,12 +725,11 @@ class NoReferencesBot(SingleSiteBot, ExistingPageBot):
         try:
             text = page.text
         except LockedPageError:
-            pywikibot.warning('Page {} is locked?!'
-                              .format(page.title(as_link=True)))
+            pywikibot.warning(f'Page {page} is locked?!')
             return
 
         if self.lacksReferences(text):
-            self.put_current(self.addReferences(text), summary=self.comment)
+            self.put_current(self.addReferences(text))
 
 
 def main(*args: str) -> None:
