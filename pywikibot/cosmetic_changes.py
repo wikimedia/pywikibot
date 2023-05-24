@@ -51,7 +51,7 @@ or by adding a list to the given one::
                                      'your_script_name_2']
 """
 #
-# (C) Pywikibot team, 2006-2022
+# (C) Pywikibot team, 2006-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -68,7 +68,7 @@ from pywikibot.exceptions import InvalidTitleError
 from pywikibot.textlib import (
     FILE_LINK_REGEX,
     MultiTemplateMatchBuilder,
-    _get_regexes,
+    get_regexes,
 )
 from pywikibot.tools import first_lower, first_upper
 from pywikibot.tools.chars import url2string
@@ -682,7 +682,7 @@ class CosmeticChangesToolkit:
             return text
 
         skippings = ['comment', 'category']
-        skip_regexes = _get_regexes(skippings, self.site)
+        skip_regexes = get_regexes(skippings, self.site)
         # site defined templates
         skip_templates = {
             'cs': ('Pahýl[ _]část',),  # stub section
