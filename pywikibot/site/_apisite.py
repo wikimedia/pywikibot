@@ -1372,24 +1372,34 @@ class APISite(
     ) -> None:
         """Load image info from api and save in page attributes.
 
-        Parameters correspond to iiprops in:
-        [1] :api:`Imageinfo`
+        The following properties are loaded: ``timestamp``, ``user``,
+        ``comment``, ``url``, ``size``, ``sha1``, ``mime``, ``mediatype``,
+        ``metadata``, ``archivename`` and ``bitdepth``. If *url_width*,
+        *url_height* or *url_param* is given, additional properties
+        ``thumbwidth``, ``thumbheight``, ``thumburl`` and
+        ``responsiveUrls`` are given.
 
-        Parameters validation and error handling left to the API call.
+        .. note:: Parameters validation and error handling left to the
+           API call.
+        .. versionchanged:: 8.2
+           *mediatype* and *bitdepth* properties were added.
+        .. seealso:: :api:`Imageinfo`
 
         :param history: if true, return the image's version history
-        :param url_width: see iiurlwidth in [1]
-        :param url_height: see iiurlheigth in [1]
-        :param url_param: see iiurlparam in [1]
-
+        :param url_width: get info for a thumbnail with given width
+        :param url_height: get info for a thumbnail with given height
+        :param url_param:  get info for a thumbnail with given param
         """
-        args = {'titles': page.title(with_section=False),
-                'iiurlwidth': url_width,
-                'iiurlheight': url_height,
-                'iiurlparam': url_param,
-                'iiprop': ['timestamp', 'user', 'comment', 'url', 'size',
-                           'sha1', 'mime', 'metadata', 'archivename']
-                }
+        args = {
+            'titles': page.title(with_section=False),
+            'iiurlwidth': url_width,
+            'iiurlheight': url_height,
+            'iiurlparam': url_param,
+            'iiprop': [
+                'timestamp', 'user', 'comment', 'url', 'size', 'sha1', 'mime',
+                'mediatype', 'metadata', 'archivename', 'bitdepth',
+            ]
+        }
         if not history:
             args['total'] = 1
         query = self._generator(api.PropertyGenerator,
