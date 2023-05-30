@@ -6,7 +6,6 @@
 #
 import functools
 import re
-import sys
 import threading
 from typing import Optional
 from warnings import warn
@@ -29,9 +28,6 @@ from pywikibot.tools import (
     first_upper,
     normalize_username,
 )
-
-
-PYTHON_312A7 = sys.version.split()[0] == '3.12.0a7'  # T334378 workaround
 
 
 class BaseSite(ComparableMixin):
@@ -190,8 +186,6 @@ class BaseSite(ComparableMixin):
 
     def __getattr__(self, attr):
         """Delegate undefined methods calls to the Family object."""
-        if PYTHON_312A7:  # T334378 workaround
-            print(end='')  # noqa: T001, T201
         try:
             method = getattr(self.family, attr)
             if not callable(method):
