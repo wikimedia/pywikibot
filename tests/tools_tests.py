@@ -5,6 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 import decimal
+import hashlib
 import os
 import subprocess
 import tempfile
@@ -12,6 +13,7 @@ import unittest
 from collections import Counter, OrderedDict
 from collections.abc import Mapping
 from contextlib import suppress
+from functools import partial
 from unittest import mock
 
 from pywikibot import config, tools
@@ -599,35 +601,49 @@ class TestFileModeChecker(TestCase):
         self.chmod.assert_called_once_with(self.file, 0o600)
 
 
+def hash_func(digest):
+    """Function who gives a hashlib function."""
+    return hashlib.new(digest)
+
+
 class TestFileShaCalculator(TestCase):
 
     r"""Test calculator of sha of a file.
 
     There are two possible hash values for each test. The second one is for
     files with Windows line endings (\r\n).
-
     """
 
     net = False
 
     filename = join_xml_data_path('article-pear-0.10.xml')
 
+    md5_tests = {
+        'str': 'md5',
+        'hash': hashlib.md5,
+        'function': partial(hash_func, 'md5')
+    }
+
     def test_md5_complete_calculation(self):
         """Test md5 of complete file."""
-        res = tools.compute_file_hash(self.filename, sha='md5')
-        self.assertIn(res, (
-            '5d7265e290e6733e1e2020630262a6f3',
-            '2c941f2fa7e6e629d165708eb02b67f7',
-        ))
+        for test, sha in self.md5_tests.items():
+            with self.subTest(test=test):
+                res = tools.compute_file_hash(self.filename, sha=sha)
+                self.assertIn(res, (
+                    '5d7265e290e6733e1e2020630262a6f3',
+                    '2c941f2fa7e6e629d165708eb02b67f7',
+                ))
 
     def test_md5_partial_calculation(self):
         """Test md5 of partial file (1024 bytes)."""
-        res = tools.compute_file_hash(self.filename, sha='md5',
-                                      bytes_to_read=1024)
-        self.assertIn(res, (
-            'edf6e1accead082b6b831a0a600704bc',
-            'be0227b6d490baa49e6d7e131c7f596b',
-        ))
+        for test, sha in self.md5_tests.items():
+            with self.subTest(test=test):
+                res = tools.compute_file_hash(self.filename, sha=sha,
+                                              bytes_to_read=1024)
+                self.assertIn(res, (
+                    'edf6e1accead082b6b831a0a600704bc',
+                    'be0227b6d490baa49e6d7e131c7f596b',
+                ))
 
     def test_sha1_complete_calculation(self):
         """Test sha1 of complete file."""
