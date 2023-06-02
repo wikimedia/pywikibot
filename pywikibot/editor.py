@@ -5,6 +5,7 @@
 # Distributed under the terms of the MIT license.
 #
 import os
+import shlex
 import subprocess
 import tempfile
 from pathlib import Path
@@ -83,7 +84,8 @@ class TextEditor:
             command = []
 
         # See T102465 for problems relating to using self.editor unparsed.
-        command = [self.editor] + command + [file_name]
+        editor_cmd = [self.editor] if OSWIN32 else shlex.split(self.editor)
+        command = editor_cmd + command + [file_name]
         pywikibot.log(f'Running editor: {self._concat(command)}')
         return command
 
