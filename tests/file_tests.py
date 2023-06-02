@@ -280,12 +280,44 @@ class TestFilePageDownload(TestCase):
     cached = True
 
     def test_successful_download(self):
-        """Test successful_download."""
+        """Test successful download."""
         page = pywikibot.FilePage(self.site, 'File:Albert Einstein.jpg')
         filename = join_images_path('Albert Einstein.jpg')
         status_code = page.download(filename)
         self.assertTrue(status_code)
-        os.unlink(filename)
+        oldsize = os.stat(filename).st_size
+
+        status_code = page.download(filename, url_height=128)
+        self.assertTrue(status_code)
+        size = os.stat(filename).st_size
+        self.assertLess(size, oldsize)
+
+        status_code = page.download(filename, url_width=120)
+        self.assertTrue(status_code)
+        size = os.stat(filename).st_size
+        self.assertLess(size, oldsize)
+
+        status_code = page.download(filename, url_param='120px')
+        self.assertTrue(status_code)
+        self.assertEqual(size, os.stat(filename).st_size)
+
+        os.remove(filename)
+
+    def test_changed_title(self):
+        """Test changed title."""
+        page = pywikibot.FilePage(self.site, 'Pywikibot MW gear icon.svg')
+        filename = join_images_path('Pywikibot MW gear icon.svg')
+        status_code = page.download(filename)
+        self.assertTrue(status_code)
+        self.assertTrue(os.path.exists(filename))
+
+        status_code = page.download(filename, url_param='120px')
+        self.assertTrue(status_code)
+        new_filename = filename.replace('.svg', '.png')
+        self.assertTrue(os.path.exists(new_filename))
+
+        os.remove(filename)
+        os.remove(new_filename)
 
     def test_not_existing_download(self):
         """Test not existing download."""
