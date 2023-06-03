@@ -47,6 +47,9 @@ These parameters are supported to specify which pages titles to print:
 
 -get        Page content is printed.
 
+-tofile     Save Page titles to a single file. File name can be set
+            with -tofile:filename or -tofile:dir_name/filename.
+
 -save       Save Page content to a file named as page.title(as_filename=True).
             Directory can be set with -save:dir_name
             If no dir is specified, current directory will be used.
@@ -176,6 +179,7 @@ class ListPagesBot(AutomaticTWSummaryBot, SingleSiteBot):
     available_options = {
         'always': True,
         'save': None,
+        'tofile': None,
         'encode': config.textfile_encoding,
         'format': '1',
         'notitle': False,
@@ -190,7 +194,7 @@ class ListPagesBot(AutomaticTWSummaryBot, SingleSiteBot):
     def treat(self, page) -> None:
         """Process one page and add it to the `output_list`."""
         self.num += 1
-        if not self.opt.notitle:
+        if self.opt.tofile or not self.opt.notitle:
             page_fmt = Formatter(page, self.opt.outputlang)
             self.output_list += [page_fmt.output(num=self.num,
                                                  fmt=self.opt.format)]
@@ -241,11 +245,16 @@ class ListPagesBot(AutomaticTWSummaryBot, SingleSiteBot):
             self.opt.save = base_dir
 
     def teardown(self) -> None:
-        """Print the list and put it to the target page if specified."""
+        """Print list, if selected put it to wiki page or save it to a file."""
         text = '\n'.join(self.output_list)
         if self.opt.put:
             self.current_page = self.opt.put
             self.put_current(text, summary=self.opt.summary, show_diff=False)
+
+        if self.opt.tofile:
+            pywikibot.info(f'Writing page titles to {self.opt.tofile}')
+            with open(self.opt.tofile, 'w', encoding='utf-8') as f:
+                f.write(text)
 
         if self.opt.preloading is True:
             pywikibot.stdout(text)
