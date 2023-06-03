@@ -883,7 +883,7 @@ LIMIT 200""".format(where_clause, except_clause)
     return pagegenerators.MySQLPageGenerator(sql)
 
 
-def main(*args: str) -> None:
+def main(*args: str) -> None:  # noqa: C901
     """
     Process command line arguments and invoke bot.
 
@@ -1000,6 +1000,15 @@ def main(*args: str) -> None:
                 pywikibot.info(f'The user fixes file could not be found: '
                                f'{fixes.filename}')
             return
+
+        if not isinstance(fix, dict):
+            pywikibot.error(
+                f'fixes[{fix_name!r}] is a {type(fix).__name__}, not a dict')
+            if type(fix) is tuple:
+                pywikibot.info('Maybe a trailing comma in your user_fixes.py?')
+            pywikibot.debug(fix)
+            return
+
         if not fix['replacements']:
             pywikibot.warning(f'No replacements defined for fix {fix_name!r}')
             continue
