@@ -1,7 +1,12 @@
 Current release
 ---------------
 
-* return 'https' scheme with :meth:`family.Family.protocol` (:phab:`T326046`)
+* Enable :meth:`FilePage.download()<pywikibot.FilePage.download>` to download thumbnails (:phab:`T247095`)
+* Refactor :func:`tools.compute_file_hash` and use ``hashlib.file_digest`` with Python 3.11
+* Url ends with curly bracket in :func:`textlib.compileLinkR` (:phab:`T338029`)
+* Allows spaces in environment variables for :class:`editor.TextEditor` (:phab:`T102465`, :phab:`T323078`)
+* Add :func:`textlib.get_regexes` puplic function (:phab:`T336144`)
+* Return 'https' scheme with :meth:`family.Family.protocol` (:phab:`T326046`)
 * Use ``build`` instead of ``setuptools.setup()`` to build the distribution
 * Raise ``ConnectionError`` on ``requests.ReadTimeout`` in :func:`comms.http.error_handling_callback`
 * Raise :exc:`exceptions.ServerError` on ``requests.ReadTimeout`` in :func:`comms.http.error_handling_callback`
@@ -46,7 +51,7 @@ Deprecations
 * 7.2.0: RedirectPageBot and NoRedirectPageBot bot classes are deprecated in favour of
   :attr:`use_redirects<bot.BaseBot.use_redirects>` attribute
 * 7.2.0: :func:`tools.formatter.color_format<tools.formatter.color_format>` is deprecated and will be removed
-* 7.1.0: Unused `get_redirect` parameter of Page.getOldVersion() will be removed
+* 7.1.0: Unused ``get_redirect`` parameter of :meth:`Page.getOldVersion()<page.BasePage.getOldVersion>` will be removed
 * 7.1.0: APISite._simple_request() will be removed in favour of APISite.simple_request()
 * 7.0.0: User.isBlocked() method is renamed to is_blocked for consistency
 * 7.0.0: Private BaseBot counters _treat_counter, _save_counter, _skip_counter will be removed in favour of collections.Counter counter attribute

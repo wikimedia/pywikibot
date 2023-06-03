@@ -9,6 +9,11 @@ archivebot
 
 * KeyboardInterrupt was enabled for -async option
 
+listpages
+~~~~~~~~~
+
+* ``-tofile`` option was added to save list to a file
+
 noreferences
 ~~~~~~~~~~~~
 
