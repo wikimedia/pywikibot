@@ -312,6 +312,8 @@ class FilePage(Page):
            iterable of path segments.
         .. note:: filename suffix is adjusted if target url's suffix is
            different which may be the case if a thumbnail is loaded.
+        .. warning:: If a file already exists, it will be overridden
+           without further notes.
         .. seealso:: :api:`Imageinfo` for new parameters
 
         :param filename: filename where to save file. If ``None``,
