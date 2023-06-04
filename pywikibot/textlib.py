@@ -1342,7 +1342,7 @@ def interwikiSort(sites, insite=None):
                 site = insite.getSite(code=code)
                 if site in sites:
                     del sites[sites.index(site)]
-                    firstsites += [site]
+                    firstsites.append(site)
         sites = firstsites + sites
     return sites
 

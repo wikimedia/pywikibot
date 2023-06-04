@@ -196,8 +196,8 @@ class ListPagesBot(AutomaticTWSummaryBot, SingleSiteBot):
         self.num += 1
         if self.opt.tofile or not self.opt.notitle:
             page_fmt = Formatter(page, self.opt.outputlang)
-            self.output_list += [page_fmt.output(num=self.num,
-                                                 fmt=self.opt.format)]
+            self.output_list.append(
+                page_fmt.output(num=self.num, fmt=self.opt.format))
         if self.opt['get']:
             try:
                 pywikibot.stdout(page.text)

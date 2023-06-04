@@ -348,10 +348,10 @@ class PatchManager:
                 # created with one hunk
                 if (not super_hunk or hunk.pre_context <= self.context * 2):
                     # previous hunk has shared/adjacent self.context lines
-                    super_hunk += [hunk]
+                    super_hunk.append(hunk)
                 else:
                     super_hunk = [hunk]
-                    super_hunks += [super_hunk]
+                    super_hunks.append(super_hunk)
         else:
             super_hunks = [[hunk] for hunk in hunks]
         return [_SuperHunk(sh) for sh in super_hunks]
@@ -430,16 +430,16 @@ class PatchManager:
 
             answers = ['y', 'n', 'q', 'a', 'd', 'g']
             if next_pending is not None:
-                answers += ['j']
+                answers.append('j')
             if position < len(super_hunks) - 1:
-                answers += ['J']
+                answers.append('J')
             if prev_pending is not None:
-                answers += ['k']
+                answers.append('k')
             if position > 0:
-                answers += ['K']
+                answers.append('K')
             if len(super_hunk) > 1:
-                answers += ['s']
-            answers += ['?']
+                answers.append('s')
+            answers.append('?')
 
             pywikibot.info(self._generate_diff(super_hunk))
             choice = pywikibot.input('Accept this hunk [{}]?'.format(

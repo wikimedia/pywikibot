@@ -350,7 +350,7 @@ class Category(Page):
                 total -= len(cached)
                 if total <= 0:
                     break
-            cache[page.oldest_revision.timestamp] += [page]
+            cache[page.oldest_revision.timestamp].append(page)
         else:
             # clear cache
             assert total is None or total > 0, \

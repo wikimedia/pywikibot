@@ -485,7 +485,7 @@ def _extract_plural(lang: str, message: str, parameters: Mapping[str, int]
                 assert not specific_entries, (
                     'generic entries defined after specific in "{}"'
                     .format(variants))
-                plural_entries += [plural]
+                plural_entries.append(plural)
 
         if num in specific_entries:
             return specific_entries[num]

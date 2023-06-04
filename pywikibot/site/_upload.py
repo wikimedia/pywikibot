@@ -209,7 +209,7 @@ class Uploader:
                                  'using a file name.')
             props = ['size']
             if verify_stash:
-                props += ['sha1']
+                props.append('sha1')
             stash_info = self.site.stash_info(file_key, props)
             if offset is True:
                 offset = stash_info['size']

@@ -667,8 +667,8 @@ class CosmeticChangesToolkit:
             8207,   # Right-to-left mark (&rtl;)
         ]
         if self.template:
-            ignore += [32]  # Space ( )
-            ignore += [58]  # Colon (:)
+            ignore.append(32)  # Space ( )
+            ignore.append(58)  # Colon (:)
         # TODO: T254350 - what other extension tags should be avoided?
         # (graph, math, score, timeline, etc.)
         text = pywikibot.html2unicode(

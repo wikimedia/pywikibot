@@ -190,10 +190,10 @@ def main(*args: str) -> None:
         additional = ''
         missing = []
         if url is None:
-            missing += ['filename']
+            missing.append('filename')
             additional = error + ' '
         if description is None:
-            missing += ['description']
+            missing.append('description')
         if aborts is not True and ignorewarn is not True:
             additional += ('Either -ignorewarn or -abortonwarn must be '
                            'defined for all codes. ')

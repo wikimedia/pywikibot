@@ -238,7 +238,7 @@ class Siteinfo(Container):
                 pywikibot.debug(
                     "Load siteinfo properties '{}' along with 'general'"
                     .format("', '".join(props)))
-            props += ['general']
+            props.append('general')
             default_info = self._get_siteinfo(props, expiry)
             for prop in props:
                 self._cache[prop] = default_info[prop]
