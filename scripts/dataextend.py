@@ -944,7 +944,7 @@ class DataExtendBot(SingleSiteBot):
                                             min(
                                                 datetime.datetime.now(
                                                 ).strftime('%Y-%m-%d'),
-                                                datetime.datetime.utcnow()
+                                                pywikibot.Timestamp.nowutc()
                                                 .strftime('%Y-%m-%d'))))
 
                                 if not analyzer.showurl:
@@ -1062,13 +1062,10 @@ class DataExtendBot(SingleSiteBot):
                                     date = None
                                 else:
                                     date = pywikibot.Claim(self.site, 'P813')
-                                    date.setTarget(
-                                        self.createdateclaim(
-                                            min(
-                                                datetime.datetime.now(
-                                                ).strftime('%Y-%m-%d'),
-                                                datetime.datetime.utcnow()
-                                                .strftime('%Y-%m-%d'))))
+                                    date.setTarget(self.createdateclaim(
+                                        min(datetime.datetime.now().strftime(
+                                            '%Y-%m-%d'),
+                                            pywikibot.Timestamp.nowutc().strftime('%Y-%m-%d'))))
                                 if not analyzer.showurl:
                                     url = None
 

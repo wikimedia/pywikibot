@@ -16,7 +16,7 @@
    Import them from :mod:`tools.threading` instead.
 """
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -32,7 +32,6 @@ import os
 import re
 import stat
 import subprocess
-import sys
 from contextlib import suppress
 from functools import total_ordering, wraps
 from types import TracebackType
@@ -42,7 +41,12 @@ from warnings import catch_warnings, showwarning, warn
 import packaging.version
 
 import pywikibot  # T306760
-from pywikibot.backports import Callable, importlib_metadata
+from pywikibot.backports import (
+    Callable,
+    importlib_metadata,
+    PYTHON_VERSION,
+    SPHINX_RUNNING,
+)
 from pywikibot.tools._deprecate import (
     ModuleDeprecationWrapper,
     add_decorated_full_name,
@@ -75,6 +79,7 @@ __all__ = (
 
     # other tools
     'PYTHON_VERSION',
+    'SPHINX_RUNNING',
     'as_filename',
     'is_ip_address',
     'is_ip_network',
@@ -93,9 +98,6 @@ __all__ = (
     'compute_file_hash',
     'cached',
 )
-
-
-PYTHON_VERSION = sys.version_info[:3]
 
 
 def is_ip_address(value: str) -> bool:

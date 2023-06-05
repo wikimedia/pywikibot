@@ -3,7 +3,7 @@
 .. versionadded:: 7.5
 """
 #
-# (C) Pywikibot team, 2007-2023
+# (C) Pywikibot team, 2007-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -12,12 +12,18 @@ from __future__ import annotations
 import datetime
 import math
 import re
+import time as _time
 import types
 from contextlib import suppress
 from typing import overload
 
 import pywikibot
-from pywikibot.tools import classproperty, deprecated
+from pywikibot.tools import (
+    classproperty,
+    deprecated,
+    PYTHON_VERSION,
+    SPHINX_RUNNING,
+)
 
 
 __all__ = (
@@ -43,24 +49,29 @@ class Timestamp(datetime.datetime):
 
     """Class for handling MediaWiki timestamps.
 
-    This inherits from datetime.datetime, so it can use all of the methods
-    and operations of a datetime object. To ensure that the results of any
-    operation are also a Timestamp object, be sure to use only Timestamp
-    objects (and datetime.timedeltas) in any operation.
+    This inherits from :python:`datetime.datetime
+    <library/datetime.html#datetime.datetime>`, so it can use all of
+    the methods and operations of a ``datetime`` object. To ensure that
+    the results of any operation are also a Timestamp object, be sure to
+    use only Timestamp objects (and :python:`datetime.timedelta
+    <library/datetime.html#datetime.timedelta>`) in any operation.
 
-    Use Timestamp.fromISOformat() and Timestamp.fromtimestampformat() to
-    create Timestamp objects from MediaWiki string formats.
-    As these constructors are typically used to create objects using data
-    passed provided by site and page methods, some of which return a Timestamp
-    when previously they returned a MediaWiki string representation, these
-    methods also accept a Timestamp object, in which case they return a clone.
+    Use :meth:`Timestamp.fromISOformat` and
+    :meth:`Timestamp.fromtimestampformat` to create Timestamp objects
+    from MediaWiki string formats. As these constructors are typically
+    used to create objects using data passed provided by site and page
+    methods, some of which return a Timestamp when previously they
+    returned a MediaWiki string representation, these methods also
+    accept a Timestamp object, in which case they return a clone.
 
-    Alternatively, Timestamp.set_timestamp() can create Timestamp objects from
-    Timestamp, datetime.datetime object, or strings compliant with ISO8601,
-    MW, or POSIX formats.
+    Alternatively, :meth:`Timestamp.set_timestamp` can create Timestamp
+    objects from :class:`Timestamp`, ``datetime.datetime`` object, or
+    strings compliant with ISO8601, MediaWiki, or POSIX formats.
 
-    Use Site.server_time() for the current time; this is more reliable
-    than using Timestamp.utcnow().
+    Use :meth:`Site.server_time()
+    <pywikibot.site._apisite.APISite.server_time>` for the current time;
+    this is more reliable than using :meth:`Timestamp.utcnow` or
+    :meth:`Timestamp.nowutc`.
 
     .. versionchanged:: 7.5
        moved to :mod:`time` module
@@ -372,6 +383,120 @@ class Timestamp(datetime.datetime):
         if isinstance(newdt, datetime.datetime):
             return self._from_datetime(newdt)
         return newdt
+
+    @classmethod
+    def nowutc(cls, *, with_tz: bool = True) -> 'Timestamp':
+        """Return the current UTC date and time.
+
+        If *with_tz* is True it returns an aware :class:`Timestamp`
+        object with UTC timezone by calling ``now(datetime.UTC)``. As
+        such this is just a short way to get it.
+
+        Otherwise the UTC timestamp is returned as a naive Timestamp
+        object with timezone of None. This is equal to the
+        :meth:`Timestamp.utcnow`.
+
+        .. warning::
+           Because naive datetime objects are treated by many datetime
+           methods as local times, it is preferred to use aware
+           Timestamps or datetimes to represent times in UTC. As such,
+           it is not recommended to set *with_tz* to False.
+
+        .. caution::
+           You cannot compare, add or subtract offset-naive and offset-
+           aware Timestamps/datetimes (i.e. missing or having timezone).
+           A TypeError will be raised in such cases.
+
+        .. versionadded:: 9.0
+        .. seealso::
+           - :python:`datetime.now()
+             <library/datetime.html#datetime.datetime.now>`
+           - :python:`datetime.utcnow()
+             <library/datetime.html#datetime.datetime.utcnow>`
+           - :python:`datetime.UTC<library/datetime.html#datetime.UTC>`
+
+        :param with_tz: Whether to include UTC timezone or not
+        """
+        if with_tz:
+            # datetime.UTC can only be used with Python 3.11+
+            return cls.now(datetime.timezone.utc)
+
+        ts = _time.time()
+        gmt = _time.gmtime(ts)
+        us = round(ts % 1 * 1e6)
+        return cls(*gmt[:6], us)
+
+    @classmethod
+    def utcnow(cls) -> 'Timestamp':
+        """Return the current UTC date and time, with `tzinfo` ``None``.
+
+        This is like :meth:`Timestamp.now`, but returns the current UTC
+        date and time, as a naive :class:`Timestamp` object. An aware
+        current UTC datetime can be obtained by calling
+        :meth:`Timestamp.nowutc`.
+
+        .. note:: This method is deprecated since Python 3.12 but held
+           here for backward compatibility because ``utcnow`` is widely
+           used inside the framework to compare MediaWiki timestamps
+           which are UTC-based. Neither :meth:`fromisoformatformat`
+           implementations of Python < 3.11 nor :class:`Timestamp`specific
+           :meth:`fromISOformat` supports timezone.
+
+        .. warning::
+           Because naive datetime objects are treated by many datetime
+           methods as local times, it is preferred to use aware
+           Timestamps or datetimes to represent times in UTC. As such,
+           the recommended way to create an object representing the
+           current time in UTC is by calling :meth:`Timestamp.nowutc`.
+
+        .. hint::
+           This method might be deprecated later.
+
+        .. versionadded:: 9.0
+        .. seealso::
+           :python:`datetime.utcnow()
+           <library/datetime.html#datetime.datetime.utcnow>`
+        """
+        if PYTHON_VERSION < (3, 12):
+            return super().utcnow()
+        return cls.nowutc(with_tz=False)
+
+    if PYTHON_VERSION < (3, 8) or SPHINX_RUNNING:
+        # methods which does not upcast the right class if tz is given
+        # but return a datetime.datetime object
+        @classmethod
+        def fromtimestamp(cls, timestamp: int | float, tz=None) -> Timestamp:
+            """Return the local date and time corresponding to the POSIX ts.
+
+            This class method is for Python 3.7 to upcast the class if a
+            tz is given.
+
+            .. versionadded:: 9.0
+            .. seealso::
+               - :python:`datetime.fromtimestamp()
+                 <library/datetime.html#datetime.datetime.fromtimestamp>`
+            """
+            ts = super().fromtimestamp(timestamp, tz)
+            if tz:
+                ts = cls.set_timestamp(ts)
+            return ts
+
+        @classmethod
+        def now(cls, tz=None) -> Timestamp:
+            """Return the current local date and time.
+
+            This class method is for Python 3.7 to upcast the class if a
+            tz is given.
+
+            .. versionadded:: 9.0
+            .. seealso::
+               - :python:`datetime.fromtimestamp()
+                 <library/datetime.html#datetime.datetime.now>`
+            """
+            ts = super().now(tz)
+            if tz:
+                ts = cls.set_timestamp(ts)
+            return ts
 
 
 class TZoneFixedOffset(datetime.tzinfo):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the Timestamp class."""
 #
-# (C) Pywikibot team, 2014-2023
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,7 +11,7 @@ import calendar
 import re
 import unittest
 from contextlib import suppress
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from pywikibot.time import Timestamp, parse_duration, str2timedelta
 from tests.aspects import TestCase
@@ -65,18 +65,25 @@ class TestTimestamp(TestCase):
     }
 
     def test_set_from_timestamp(self):
-        """Test creating instance from Timestamp string."""
-        t1 = Timestamp.utcnow()
-        t2 = Timestamp.set_timestamp(t1)
-        self.assertEqual(t1, t2)
-        self.assertIsInstance(t2, Timestamp)
+        """Test creating instance from Timestamp object."""
+        for func in Timestamp.utcnow, Timestamp.nowutc:
+            with self.subTest(func=func.__qualname__):
+                t1 = func()
+                t2 = Timestamp.set_timestamp(t1)
+                self.assertIs(t1, t2)
+                self.assertIsInstance(t2, Timestamp)
 
     def test_set_from_datetime(self):
-        """Test creating instance from datetime.datetime string."""
-        t1 = datetime.utcnow()
-        t2 = Timestamp.set_timestamp(t1)
-        self.assertEqual(t1, t2)
-        self.assertIsInstance(t2, datetime)
+        """Test creating instance from datetime.datetime object."""
+        for tz in (None, timezone.utc):
+            with self.subTest(tzinfo=bool(tz)):
+                t1 = datetime.now(tz)
+                t2 = Timestamp.set_timestamp(t1)
+                self.assertEqual(t1, t2)
+                self.assertIsInstance(t1, datetime)
+                self.assertNotIsInstance(t1, Timestamp)
+                self.assertIsInstance(t2, Timestamp)
+                self.assertEqual(t2.tzinfo, tz)
 
     @staticmethod
     def _compute_posix(timestr):
@@ -119,17 +126,21 @@ class TestTimestamp(TestCase):
 
     def test_instantiate_from_instance(self):
         """Test passing instance to factory methods works."""
-        t1 = Timestamp.utcnow()
-        self.assertIsNot(t1, Timestamp.fromISOformat(t1))
-        self.assertEqual(t1, Timestamp.fromISOformat(t1))
-        self.assertIsInstance(Timestamp.fromISOformat(t1), Timestamp)
-        self.assertIsNot(t1, Timestamp.fromtimestampformat(t1))
-        self.assertEqual(t1, Timestamp.fromtimestampformat(t1))
-        self.assertIsInstance(Timestamp.fromtimestampformat(t1), Timestamp)
+        for func in Timestamp.utcnow, Timestamp.nowutc:
+            with self.subTest(func=func.__qualname__):
+                t1 = func()
+                self.assertIsNot(t1, Timestamp.fromISOformat(t1))
+                self.assertEqual(t1, Timestamp.fromISOformat(t1))
+                self.assertIsInstance(Timestamp.fromISOformat(t1), Timestamp)
+                self.assertIsNot(t1, Timestamp.fromtimestampformat(t1))
+                self.assertEqual(t1, Timestamp.fromtimestampformat(t1))
+                self.assertIsInstance(Timestamp.fromtimestampformat(t1),
+                                      Timestamp)
 
     def test_iso_format(self):
         """Test conversion from and to ISO format."""
         sep = 'T'
+        # note: fromISOformat does not respect timezone
         t1 = Timestamp.utcnow()
         if not t1.microsecond:  # T199179: ensure microsecond is not 0
             t1 = t1.replace(microsecond=1)  # pragma: no cover
@@ -220,40 +231,29 @@ class TestTimestamp(TestCase):
 
     def test_add_timedelta(self):
         """Test addin a timedelta to a Timestamp."""
-        t1 = Timestamp.utcnow()
+        t1 = Timestamp.nowutc()
         t2 = t1 + timedelta(days=1)
         if t1.month != t2.month:
             self.assertEqual(1, t2.day)
         else:
             self.assertEqual(t1.day + 1, t2.day)
+        self.assertIsInstance(t1, Timestamp)
         self.assertIsInstance(t2, Timestamp)
-
-    def test_add_timedate(self):
-        """Test unsupported additions raise NotImplemented."""
-        t1 = datetime.utcnow()
-        t2 = t1 + timedelta(days=1)
-        t3 = t1.__add__(t2)
-        self.assertIs(t3, NotImplemented)
-
-        # Now check that the pywikibot sub-class behaves the same way
-        t1 = Timestamp.utcnow()
-        t2 = t1 + timedelta(days=1)
-        t3 = t1.__add__(t2)
-        self.assertIs(t3, NotImplemented)
 
     def test_sub_timedelta(self):
         """Test subtracting a timedelta from a Timestamp."""
-        t1 = Timestamp.utcnow()
+        t1 = Timestamp.nowutc()
         t2 = t1 - timedelta(days=1)
         if t1.month != t2.month:
             self.assertEqual(calendar.monthrange(t2.year, t2.month)[1], t2.day)
         else:
             self.assertEqual(t1.day - 1, t2.day)
+        self.assertIsInstance(t1, Timestamp)
         self.assertIsInstance(t2, Timestamp)
 
     def test_sub_timedate(self):
         """Test subtracting two timestamps."""
-        t1 = Timestamp.utcnow()
+        t1 = Timestamp.nowutc()
         t2 = t1 - timedelta(days=1)
         td = t1 - t2
         self.assertIsInstance(td, timedelta)

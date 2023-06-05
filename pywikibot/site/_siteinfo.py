@@ -159,7 +159,7 @@ class Siteinfo(Container):
         if 'query' in data:
             # If the request is a CachedRequest, use the _cachetime attr.
             cache_time = getattr(
-                request, '_cachetime', None) or datetime.datetime.utcnow()
+                request, '_cachetime', None) or pywikibot.Timestamp.nowutc()
             for prop in props:
                 if prop in data['query']:
                     self._post_process(prop, data['query'][prop])
@@ -176,7 +176,7 @@ class Siteinfo(Container):
             return True
 
         # cached date + expiry are in the past if it's expired
-        return cache_date + expire < datetime.datetime.utcnow()
+        return cache_date + expire < pywikibot.Timestamp.nowutc()
 
     def _get_general(self, key: str, expiry):
         """

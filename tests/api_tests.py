@@ -748,11 +748,12 @@ class TestCachedRequest(DefaultSiteTestCase):
         mysite = self.get_site()
         # Run tests on a missing page unique to this test run so it can
         # not be cached the first request, but will be cached after.
-        now = datetime.datetime.utcnow()
-        params = {'action': 'query',
-                  'prop': 'info',
-                  'titles': 'TestCachedRequest_test_internals ' + str(now),
-                  }
+        now = pywikibot.time.Timestamp.nowutc()
+        params = {
+            'action': 'query',
+            'prop': 'info',
+            'titles': 'TestCachedRequest_test_internals ' + str(now),
+        }
         req = api.CachedRequest(datetime.timedelta(minutes=10),
                                 site=mysite, parameters=params)
         rv = req._load_cache()
@@ -770,6 +771,8 @@ class TestCachedRequest(DefaultSiteTestCase):
         self.assertTrue(rv)
         self.assertIsNotNone(req._data)
         self.assertIsNotNone(req._cachetime)
+        self.assertIsNotNone(req._cachetime.tzinfo)
+        self.assertEqual(req._cachetime.tzinfo, datetime.timezone.utc)
         self.assertGreater(req._cachetime, now)
         self.assertEqual(req._data, data)
 

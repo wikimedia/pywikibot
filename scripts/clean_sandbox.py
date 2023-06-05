@@ -43,7 +43,7 @@ For example:
     delay: 7
 """
 #
-# (C) Pywikibot team, 2006-2023
+# (C) Pywikibot team, 2006-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -260,7 +260,7 @@ class SandboxBot(Bot, ConfigParserBot):
                         pywikibot.info(
                             'Standard content was changed, sandbox cleaned.')
                     else:
-                        edit_delta = (datetime.datetime.utcnow()
+                        edit_delta = (pywikibot.Timestamp.utcnow()
                                       - sandbox_page.latest_revision.timestamp)
                         delta = self.delay_td - edit_delta
                         # Is the last edit more than 'delay' minutes ago?

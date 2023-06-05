@@ -15,6 +15,7 @@ import sys
 from typing import Any
 
 
+# Placed here to omit circular import in tools
 PYTHON_VERSION = sys.version_info[:3]
 SPHINX_RUNNING = 'sphinx' in sys.modules
 

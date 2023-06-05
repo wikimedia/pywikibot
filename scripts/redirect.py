@@ -349,7 +349,7 @@ class RedirectGenerator(OptionHandler):
         # this will run forever, until user interrupts it
         if self.opt.offset <= 0:
             self.opt.offset = 1
-        start = (datetime.datetime.utcnow()
+        start = (pywikibot.Timestamp.nowutc()
                  - datetime.timedelta(0, self.opt.offset * 3600))
         # self.opt.offset hours ago
         offset_time = start.strftime('%Y%m%d%H%M%S')

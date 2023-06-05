@@ -64,7 +64,7 @@ Available output commands:
     uniquedesc(entry)
 """
 #
-# (C) Pywikibot team, 2014-2023
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -230,13 +230,15 @@ def process_entries(cache_path, func, use_accesstime: bool | None = None,
     check the filesystem mount options. You may need to remount with
     'strictatime'.
 
+    .. versionchanged:: 9.0
+       default cache path to 'apicache' without Python main version.
+
     :param use_accesstime: Whether access times should be used. `None`
         for detect, `False` for don't use and `True` for always use.
     :param tests: Only process a test sample of files
     """
     if not cache_path:
-        cache_path = os.path.join(pywikibot.config.base_dir,
-                                  f'apicache-py{PYTHON_VERSION[0]:d}')
+        cache_path = os.path.join(pywikibot.config.base_dir, 'apicache')
 
     if not os.path.exists(cache_path):
         pywikibot.error(f'{cache_path}: no such file or directory')
@@ -370,15 +372,29 @@ def incorrect_hash(entry):
 
 def older_than(entry, interval):
     """Find older entries."""
-    if entry._cachetime + interval < datetime.datetime.utcnow():
+    if entry._cachetime.tzinfo is not None \
+       and entry._cachetime + interval < pywikibot.Timestamp.nowutc():
         return entry
+
+    # old apicache-py2/3 cache
+    if entry._cachetime.tzinfo is None \
+       and entry._cachetime + interval < pywikibot.Timestamp.utcnow():
+        return entry
+
     return None
 
 
 def newer_than(entry, interval):
     """Find newer entries."""
-    if entry._cachetime + interval >= datetime.datetime.utcnow():
+    if entry._cachetime.tzinfo is not None \
+       and entry._cachetime + interval >= pywikibot.Timestamp.nowutc():
         return entry
+
+    # old apicache-py2/3 cache
+    if entry._cachetime.tzinfo is None \
+       and entry._cachetime + interval >= pywikibot.Timestamp.utcnow():
+        return entry
+
     return None
 
 

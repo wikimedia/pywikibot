@@ -231,8 +231,9 @@ def get_packages(name: str) -> List[str]:
         sys.exit(
             'setuptools >= 40.1.0 is required to create a new distribution.')
     packages = find_namespace_packages(include=[name + '.*'])
-    with suppress(ValueError):
-        packages.remove(name + '.apicache-py3')
+    for cache_variant in ('', '-py3'):
+        with suppress(ValueError):
+            packages.remove(f'{name}.apicache{cache_variant}')
     return [str(name)] + packages
 
 

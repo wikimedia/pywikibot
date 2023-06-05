@@ -38,7 +38,7 @@ from pywikibot.exceptions import (
 )
 from pywikibot.login import LoginStatus
 from pywikibot.textlib import removeDisabledParts, removeHTMLParts
-from pywikibot.tools import PYTHON_VERSION, deprecated
+from pywikibot.tools import deprecated
 
 
 __all__ = ('CachedRequest', 'Request', 'encode_url')
@@ -1133,7 +1133,11 @@ but {scheme!r} is required. Please add the following code to your family file:
 
 class CachedRequest(Request):
 
-    """Cached request."""
+    """Cached request.
+
+    .. versionchanged:: 9.0
+       timestamp with timezone is used to determine expiry.
+    """
 
     def __init__(self, expiry, *args, **kwargs) -> None:
         """Initialize a CachedRequest object.
@@ -1162,10 +1166,12 @@ class CachedRequest(Request):
 
         .. versionchanged:: 8.0
            return a `pathlib.Path` object.
+        .. versionchanged:: 9.0
+           remove Python main version from directoy name
 
         :return: base directory path for cache entries
         """
-        path = Path(config.base_dir, f'apicache-py{PYTHON_VERSION[0]:d}')
+        path = Path(config.base_dir, 'apicache')
         cls._make_dir(path)
         cls._get_cache_dir = classmethod(lambda c: path)  # cache the result
         return path
@@ -1226,7 +1232,8 @@ class CachedRequest(Request):
         return CachedRequest._get_cache_dir() / self._create_file_name()
 
     def _expired(self, dt):
-        return dt + self.expiry < datetime.datetime.utcnow()
+        """Check whether the timestamp is expired."""
+        return dt + self.expiry < pywikibot.Timestamp.nowutc()
 
     def _load_cache(self) -> bool:
         """Load cache entry for request, if available.
@@ -1262,7 +1269,7 @@ class CachedRequest(Request):
 
     def _write_cache(self, data) -> None:
         """Write data to self._cachefile_path()."""
-        data = (self._uniquedescriptionstr(), data, datetime.datetime.utcnow())
+        data = self._uniquedescriptionstr(), data, pywikibot.Timestamp.nowutc()
         path = self._cachefile_path()
         with suppress(OSError), path.open('wb') as f:
             pickle.dump(data, f, protocol=config.pickle_protocol)

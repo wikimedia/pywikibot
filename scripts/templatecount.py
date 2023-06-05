@@ -33,16 +33,14 @@ Lists all the category pages that transclude {{cfd}} and {{cfdu}}:
 
 """
 #
-# (C) Pywikibot team, 2006-2022
+# (C) Pywikibot team, 2006-2024
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
-import datetime
-from typing import Generator
-
 import pywikibot
+from pywikibot.backports import Generator
 
 
 class TemplateCountRobot:
@@ -72,8 +70,8 @@ class TemplateCountRobot:
             pywikibot.stdout(formatstr.format(key, count))
             total += count
         pywikibot.stdout(formatstr.format('TOTAL', total))
-        pywikibot.stdout('Report generated on {}'
-                         .format(datetime.datetime.utcnow().isoformat()))
+        pywikibot.stdout(
+            f'Report generated on {pywikibot.Timestamp.nowutc().isoformat()}')
 
     @classmethod
     def list_templates(cls, templates, namespaces) -> None:
@@ -99,8 +97,8 @@ class TemplateCountRobot:
                 pywikibot.stdout(page.title())
                 total += 1
         pywikibot.info(f'Total page count: {total}')
-        pywikibot.stdout('Report generated on {}'
-                         .format(datetime.datetime.utcnow().isoformat()))
+        pywikibot.stdout(
+            f'Report generated on {pywikibot.Timestamp.nowutc().isoformat()}')
 
     @classmethod
     def template_dict(cls, templates, namespaces) -> dict[

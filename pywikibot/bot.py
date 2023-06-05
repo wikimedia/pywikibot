@@ -91,7 +91,6 @@ __all__ = (
 import atexit
 import codecs
 import configparser
-import datetime
 import json
 import logging
 import logging.handlers
@@ -444,10 +443,12 @@ def init_handlers() -> None:
 
 
 def writelogheader() -> None:
-    """
-    Save additional version, system and status info to the log file in use.
+    """Save additional version, system and status info to the log file in use.
 
     This may help the user to track errors or report bugs.
+
+    .. versionchanged:: 9.0
+       ignore milliseconds with timestamp.
     """
     log('')
     log(f'=== Pywikibot framework v{pywikibot.__version__} -- Logging header'
@@ -457,7 +458,7 @@ def writelogheader() -> None:
     log(f'COMMAND: {sys.argv}')
 
     # script call time stamp
-    log(f'DATE: {datetime.datetime.utcnow()} UTC')
+    log(f'DATE: {pywikibot.Timestamp.nowutc()} UTC')
 
     # new framework release/revision? (handle_args needs to be called first)
     try:

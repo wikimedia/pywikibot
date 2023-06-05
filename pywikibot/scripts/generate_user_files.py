@@ -26,9 +26,6 @@ from pywikibot.backports import Callable
 from pywikibot.scripts import _import_with_no_user_config
 
 
-PYTHON_VERSION = sys.version_info[:2]
-
-
 # DISABLED_SECTIONS cannot be copied; variables must be set manually
 DISABLED_SECTIONS = {
     'USER INTERFACE SETTINGS',  # uses sys

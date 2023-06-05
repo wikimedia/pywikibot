@@ -33,7 +33,6 @@ from pywikibot import config
 from pywikibot.backports import removesuffix
 from pywikibot.data.api import CachedRequest
 from pywikibot.data.api import Request as _original_Request
-from pywikibot.tools import PYTHON_VERSION
 
 
 _root_dir = os.path.split(os.path.split(__file__)[0])[0]
@@ -56,8 +55,7 @@ def create_path_func(base_func, subpath):
 
 join_root_path.path = 'root'
 join_tests_path = create_path_func(join_root_path, 'tests')
-join_cache_path = create_path_func(join_tests_path,
-                                   f'apicache-py{PYTHON_VERSION[0]}')
+join_cache_path = create_path_func(join_tests_path, 'apicache')
 join_data_path = create_path_func(join_tests_path, 'data')
 join_pages_path = create_path_func(join_tests_path, 'pages')
 
