@@ -1,6 +1,6 @@
 """Page filter generators provided by the pagegenerators module."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -27,12 +27,13 @@ from pywikibot.backports import (
     List,
     Sequence,
     Tuple,
+    batched,
 )
 from pywikibot.comms import http
 from pywikibot.exceptions import APIError, ServerError
 from pywikibot.tools import deprecated
 from pywikibot.tools.collections import GeneratorWrapper
-from pywikibot.tools.itertools import filter_unique, itergroup
+from pywikibot.tools.itertools import filter_unique
 
 
 OPT_SITE_TYPE = Optional['pywikibot.site.BaseSite']
@@ -1023,8 +1024,8 @@ def WikidataPageFromItemGenerator(gen: Iterable['pywikibot.page.ItemPage'],
     :param site: Site for generator results.
     """
     repo = site.data_repository()
-    for sublist in itergroup(gen, 50):
-        req = {'ids': [item.id for item in sublist],
+    for batch in batched(gen, 50):
+        req = {'ids': [item.id for item in batch],
                'sitefilter': site.dbName(),
                'action': 'wbgetentities',
                'props': 'sitelinks'}

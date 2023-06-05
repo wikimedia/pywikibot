@@ -1,6 +1,6 @@
 """This module contains backports to support older Python versions."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -164,3 +164,43 @@ if PYTHON_VERSION < (3, 10) or SPHINX_RUNNING:
         return zip(a, b)
 else:
     from itertools import pairwise
+
+
+# gh-98363
+if PYTHON_VERSION < (3, 12) or SPHINX_RUNNING:
+    def batched(iterable, n: int) -> Generator[Any, None, None]:
+        """Batch data from the *iterable* into tuples of length *n*.
+
+        .. note:: The last batch may be shorter than *n*.
+
+        Example:
+
+        >>> i = batched(range(25), 10)
+        >>> print(next(i))
+        (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+        >>> print(next(i))
+        (10, 11, 12, 13, 14, 15, 16, 17, 18, 19)
+        >>> print(next(i))
+        (20, 21, 22, 23, 24)
+        >>> print(next(i))
+        Traceback (most recent call last):
+         ...
+        StopIteration
+
+        .. seealso:: :python:`itertools.batched
+           <library/itertools.html#itertools.batched>`,
+           backported from Python 3.12.
+        .. versionadded:: 8.2
+
+        :param n: How many items of the iterable to get in one chunk
+        """
+        group = []
+        for item in iterable:
+            group.append(item)
+            if len(group) == n:
+                yield tuple(group)
+                group.clear()
+        if group:
+            yield tuple(group)
+else:
+    from itertools import batched

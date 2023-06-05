@@ -109,13 +109,10 @@ import re
 
 import pywikibot
 from pywikibot import i18n, pagegenerators, textlib
+from pywikibot.backports import batched
 from pywikibot.bot import SingleSiteBot
 from pywikibot.pagegenerators import XMLDumpPageGenerator
-from pywikibot.tools.itertools import (
-    filter_unique,
-    itergroup,
-    roundrobin_generators,
-)
+from pywikibot.tools.itertools import filter_unique, roundrobin_generators
 from scripts.replace import ReplaceRobot as ReplaceBot
 
 
@@ -268,7 +265,7 @@ def main(*args: str) -> None:
         templates = dict.fromkeys(template_names)
     else:
         try:
-            templates = dict(itergroup(template_names, 2, strict=True))
+            templates = dict(batched(template_names, 2))
         except ValueError:
             pywikibot.info('Unless using solely -subst or -remove, you must '
                            'give an even number of template names.')

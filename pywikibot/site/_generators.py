@@ -12,7 +12,7 @@ from itertools import zip_longest
 from typing import Any, Optional, Union
 
 import pywikibot
-from pywikibot.backports import Dict, Generator, Iterable, List  # skipcq
+from pywikibot.backports import Dict, Generator, Iterable, List, batched
 from pywikibot.data import api
 from pywikibot.exceptions import (
     APIError,
@@ -25,7 +25,7 @@ from pywikibot.exceptions import (
 from pywikibot.site._decorators import need_right
 from pywikibot.site._namespace import NamespaceArgType
 from pywikibot.tools import is_ip_address, issue_deprecation_warning
-from pywikibot.tools.itertools import filter_unique, itergroup
+from pywikibot.tools.itertools import filter_unique
 
 
 class GeneratorsMixin:
@@ -55,13 +55,13 @@ class GeneratorsMixin:
         # Validate pageids.
         gen = (str(int(p)) for p in pageids if int(p) > 0)
 
-        for sublist in itergroup(filter_unique(gen), self.maxlimit):
+        for batch in batched(filter_unique(gen), self.maxlimit):
             # Store the order of the input data.
-            priority_dict = dict(zip(sublist, range(len(sublist))))
+            priority_dict = dict(zip(batch, range(len(batch))))
 
             prio_queue = []
             next_prio = 0
-            params = {'pageids': sublist, }
+            params = {'pageids': batch}
             rvgen = api.PropertyGenerator('info', site=self, parameters=params)
 
             for pagedata in rvgen:
@@ -138,13 +138,13 @@ class GeneratorsMixin:
             props += '|categories'
 
         groupsize = min(groupsize or self.maxlimit, self.maxlimit)
-        for sublist in itergroup(pagelist, groupsize):
+        for batch in batched(pagelist, groupsize):
             # Do not use p.pageid property as it will force page loading.
-            pageids = [str(p._pageid) for p in sublist
+            pageids = [str(p._pageid) for p in batch
                        if hasattr(p, '_pageid') and p._pageid > 0]
             cache = {}
             # In case of duplicates, return the first entry.
-            for priority, page in enumerate(sublist):
+            for priority, page in enumerate(batch):
                 try:
                     cache.setdefault(page.title(with_section=False),
                                      (priority, page))
@@ -156,7 +156,7 @@ class GeneratorsMixin:
             rvgen = api.PropertyGenerator(props, site=self)
             rvgen.set_maximum_items(-1)  # suppress use of "rvlimit" parameter
 
-            if len(pageids) == len(sublist) \
+            if len(pageids) == len(batch) \
                and len(set(pageids)) <= self.maxlimit:
                 # only use pageids if all pages have them
                 rvgen.request['pageids'] = set(pageids)

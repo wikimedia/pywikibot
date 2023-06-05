@@ -14,9 +14,9 @@ from contextlib import suppress
 from itertools import chain, zip_longest
 from typing import Any
 
-from pywikibot.backports import Generator
+from pywikibot.backports import batched, Generator
 from pywikibot.logging import debug
-from pywikibot.tools import issue_deprecation_warning
+from pywikibot.tools import deprecated, issue_deprecation_warning
 
 
 __all__ = (
@@ -28,6 +28,7 @@ __all__ = (
 )
 
 
+@deprecated('backports.batched()', since='8.2.0')
 def itergroup(iterable,
               size: int,
               strict: bool = False) -> Generator[Any, None, None]:
@@ -47,21 +48,20 @@ def itergroup(iterable,
      ...
     StopIteration
 
+    .. versionadded:: 7.6
+       The *strict* parameter.
+    .. deprecated:: 8.2
+       Use :func:`backports.batched` instead.
+
     :param size: How many items of the iterable to get in one chunk
     :param strict: If True, raise a ValueError if length of iterable is
         not divisible by `size`.
     :raises ValueError: iterable is not divisible by size
     """
-    group = []
-    for item in iterable:
-        group.append(item)
-        if len(group) == size:
-            yield group
-            group = []
-    if group:
-        if strict:
+    for group in batched(iterable, size):
+        if strict and len(group) < size:
             raise ValueError('iterable is not divisible by size.')
-        yield group
+        yield list(group)
 
 
 def islice_with_ellipsis(iterable, *args, marker: str = '…'):
