@@ -1078,7 +1078,8 @@ class ItemPage(WikibasePage):
     def getSitelink(self, site, force: bool = False) -> str:
         """Return the title for the specific site.
 
-        If the item doesn't have that language, raise NoSiteLinkError.
+        If the item doesn't have a link to that site, raise
+        NoSiteLinkError.
 
         .. versionchanged:: 8.1
            raises NoSiteLinkError instead of NoPageError.
@@ -1095,7 +1096,9 @@ class ItemPage(WikibasePage):
             self.get(force=force)
 
         if site not in self.sitelinks:
-            raise NoSiteLinkError(self, site.lang)
+            if not isinstance(site, str):
+                site = site.dbName()
+            raise NoSiteLinkError(self, site)
 
         return self.sitelinks[site].canonical_title()
 
