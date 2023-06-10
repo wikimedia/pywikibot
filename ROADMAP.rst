@@ -52,9 +52,7 @@ Deprecations
   :attr:`use_redirects<bot.BaseBot.use_redirects>` attribute
 * 7.2.0: :func:`tools.formatter.color_format<tools.formatter.color_format>` is deprecated and will be removed
 * 7.1.0: Unused ``get_redirect`` parameter of :meth:`Page.getOldVersion()<page.BasePage.getOldVersion>` will be removed
-* 7.1.0: APISite._simple_request() will be removed in favour of APISite.simple_request()
 * 7.0.0: User.isBlocked() method is renamed to is_blocked for consistency
-* 7.0.0: Private BaseBot counters _treat_counter, _save_counter, _skip_counter will be removed in favour of collections.Counter counter attribute
 * 7.0.0: A boolean watch parameter in Page.save() is deprecated and will be desupported
 * 7.0.0: baserevid parameter of editSource(), editQualifier(), removeClaims(), removeSources(), remove_qualifiers() DataSite methods will be removed
 * 7.0.0: Values of APISite.allpages() parameter filterredir other than True, False and None are deprecated

@@ -57,7 +57,7 @@ Additionally there is the :py:obj:`AutomaticTWSummaryBot` which subclasses
 ``put_current`` is used.
 """
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -175,7 +175,6 @@ from pywikibot.logging import (
 from pywikibot.throttle import Throttle
 from pywikibot.tools import (
     PYTHON_VERSION,
-    deprecated,
     issue_deprecation_warning,
     strtobool,
 )
@@ -1362,36 +1361,6 @@ class BaseBot(OptionHandler):
 
         #: instance variable to hold the default page type
         self.treat_page_type: Any = pywikibot.page.BasePage
-
-    @property
-    @deprecated("self.counter['read']", since='7.0.0')
-    def _treat_counter(self):
-        return self.counter['read']
-
-    @_treat_counter.setter
-    @deprecated("self.counter['read']", since='7.0.0')
-    def _treat_counter(self, value) -> None:
-        self.counter['read'] = value
-
-    @property
-    @deprecated("self.counter['write']", since='7.0.0')
-    def _save_counter(self):
-        return self.counter['write']
-
-    @_save_counter.setter
-    @deprecated("self.counter['write']", since='7.0.0')
-    def _save_counter(self, value) -> None:
-        self.counter['write'] = value
-
-    @property
-    @deprecated("self.counter['skip']", since='7.0.0')
-    def _skip_counter(self):
-        return self.counter['skip']
-
-    @_skip_counter.setter
-    @deprecated("self.counter['skip']", since='7.0.0')
-    def _skip_counter(self, value) -> None:
-        self.counter['skip'] = value
 
     @property
     def current_page(self) -> 'pywikibot.page.BasePage':

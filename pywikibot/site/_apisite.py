@@ -285,15 +285,10 @@ class APISite(
 
         return self._request_class(kwargs)(site=self, **kwargs)
 
-    @deprecated('simple_request', since='7.1.0')
-    def _simple_request(self, **kwargs: Any) -> api.Request:
-        """DEPRECATED. Create a request using all kwargs as parameters."""
-        return self.simple_request(**kwargs)
-
     def simple_request(self, **kwargs: Any) -> api.Request:
         """Create a request by defining all kwargs as parameters.
 
-        .. versionchanged:: 7.1
+        .. versionadded:: 7.1
            `_simple_request` becomes a public method
         """
         return self._request_class({'parameters': kwargs}).create_simple(
