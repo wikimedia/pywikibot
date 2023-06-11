@@ -11,13 +11,13 @@ import typing
 from collections import OrderedDict, defaultdict, namedtuple
 from contextlib import suppress
 from textwrap import fill
-from typing import Any, Iterable, Optional, Type, TypeVar, Union
+from typing import Any, Optional, Type, TypeVar, Union
 
 import pywikibot
 from pywikibot import login
 from pywikibot.backports import DefaultDict, Dict, List, Match
 from pywikibot.backports import OrderedDict as OrderedDictType
-from pywikibot.backports import Pattern, Set, Tuple, removesuffix
+from pywikibot.backports import Iterable, Pattern, Set, Tuple, removesuffix
 from pywikibot.comms import http
 from pywikibot.data import api
 from pywikibot.exceptions import (
@@ -353,9 +353,8 @@ class APISite(
         #       to be increased to 'warning' level once majority
         #       of issues are resolved.
         if self._loginstatus == login.LoginStatus.IN_PROGRESS:
-            pywikibot.log(
-                '{!r}.login() called when a previous login was in progress.'
-                .format(self))
+            pywikibot.log(f'{self!r}.login() called when a previous login was '
+                          f'in progress.')
 
         # There are several ways that the site may already be
         # logged in, and we do not need to hit the server again.
@@ -389,8 +388,7 @@ class APISite(
 
         if self.is_oauth_token_available():
             if self.userinfo['name'] == self.username():
-                error_msg = ('Logging in on {} via OAuth failed'
-                             .format(self))
+                error_msg = (f'Logging in on {self} via OAuth failed')
             elif self.username() is None:
                 error_msg = ('No username has been defined in your '
                              'user config file: you have to add in this '
@@ -543,8 +541,7 @@ class APISite(
             self._userinfo = uidata['query']['userinfo']
             if self._loginstatus != login.LoginStatus.IN_PROGRESS \
                and ('anon' in self._userinfo or not self._userinfo.get('id')):
-                pywikibot.warning('No user is logged in on site {}'
-                                  .format(self))
+                pywikibot.warning(f'No user is logged in on site {self}')
         return self._userinfo
 
     @userinfo.deleter
@@ -741,9 +738,8 @@ class APISite(
         if not match:
             with suppress(KeyError):
                 return unresolved_linktrails[self.code]
-            raise KeyError(
-                '"{}": No linktrail pattern extracted from "{}"'
-                .format(self.code, linktrail))
+            raise KeyError(f'"{self.code}": No linktrail pattern extracted '
+                           f'from "{linktrail}"')
 
         pattern = match['pattern']
         letters = match['letters']
@@ -777,9 +773,7 @@ class APISite(
         """
         if not (isinstance(end, type(start)) or isinstance(start, type(end))):
             raise TypeError(
-                'start ({!r}) and end ({!r}) must be comparable'
-                .format(start, end)
-            )
+                f'start ({start!r}) and end ({end!r}) must be comparable')
         if reverse ^ is_ts:
             low, high = end, start
             order = 'follow'
@@ -860,8 +854,8 @@ class APISite(
                 try:
                     result[key] = _mw_msg_cache[amlang][key]
                 except KeyError:
-                    raise KeyError("No message '{}' found for lang '{}'"
-                                   .format(key, amlang))
+                    raise KeyError(
+                        f"No message '{key}' found for lang '{amlang}'")
 
             return result
 
@@ -1087,9 +1081,8 @@ class APISite(
             try:
                 namespace = _namespaces[ns]
             except KeyError:
-                pywikibot.warning(
-                    'Broken namespace alias "{}" (id: {}) on {}'.format(
-                        item['*'], ns, self))
+                pywikibot.warning('Broken namespace alias "{}" (id: {}) on {}'
+                                  .format(item['*'], ns, self))
             else:
                 if item['*'] not in namespace:
                     namespace.aliases.append(item['*'])
@@ -1200,8 +1193,8 @@ class APISite(
                 return pywikibot.Site(url=url, user=self.username(),
                                       interface='DataSite')
             except SiteDefinitionError as e:
-                pywikibot.warning('Site "{}" supports wikibase at "{}", but '
-                                  'creation failed: {}.'.format(self, url, e))
+                pywikibot.warning(f'Site "{self}" supports wikibase at '
+                                  f'"{url}", but creation failed: {e}.')
                 return None
         else:
             assert 'warnings' in data
@@ -1491,8 +1484,7 @@ class APISite(
         result = query.submit()
         if 'query' not in result or 'redirects' not in result['query']:
             raise RuntimeError(
-                "getredirtarget: No 'redirects' found for page {}."
-                .format(title))
+                f"getredirtarget: No 'redirects' found for page {title}.")
 
         redirmap = {item['from']: {'title': item['to'],
                                    'section': '#'
@@ -1509,9 +1501,8 @@ class APISite(
                 break
 
         if title not in redirmap:
-            raise RuntimeError(
-                "getredirtarget: 'redirects' contains no key for page {}."
-                .format(title))
+            raise RuntimeError(f"getredirtarget: 'redirects' contains no key "
+                               f'for page {title}.')
         target_title = '{title}{section}'.format_map(redirmap[title])
 
         if self.sametitle(title, target_title):
@@ -1799,8 +1790,8 @@ class APISite(
                 raise Error(
                     self._dl_errors[err.code].format_map(errdata)
                 ) from None
-            pywikibot.debug("revdelete: Unexpected error code '{}' received."
-                            .format(err.code))
+            pywikibot.debug(
+                f"revdelete: Unexpected error code '{err.code}' received.")
             raise
         else:
             if target:
@@ -1949,8 +1940,8 @@ class APISite(
         if watch in watch_items:
             params['watchlist'] = watch
         elif watch:
-            pywikibot.warning("editpage: Invalid watch value '{}' ignored."
-                              .format(watch))
+            pywikibot.warning(
+                f"editpage: Invalid watch value '{watch}' ignored.")
         req = self.simple_request(**params)
 
         self.lock_page(page)
@@ -1961,11 +1952,10 @@ class APISite(
                     pywikibot.debug(f'editpage response: {result}')
                 except APIError as err:
                     if err.code.endswith('anon') and self.logged_in():
-                        pywikibot.debug("editpage: received '{}' even though "
-                                        'bot is logged in'.format(err.code))
+                        pywikibot.debug(f"editpage: received '{err.code}' "
+                                        f'even though bot is logged in')
                     if err.code == 'abusefilter-warning':
-                        pywikibot.warning('{info}\nRetrying.'
-                                          .format(info=err.info))
+                        pywikibot.warning(f'{err.info}\nRetrying.')
                         continue
                     if err.code in self._ep_errors:
                         exception = self._ep_errors[err.code]
@@ -1985,9 +1975,8 @@ class APISite(
                             urls = ', '.join(err.other[err.code]['matches'])
                             raise exception(page, url=urls) from None
                         raise exception(page) from None
-                    pywikibot.debug(
-                        "editpage: Unexpected error code '{}' received."
-                        .format(err.code))
+                    pywikibot.debug(f'editpage: Unexpected error code '
+                                    f"'{err.code}' received.")
                     raise
 
                 assert 'edit' in result and 'result' in result['edit'], result
@@ -1995,8 +1984,8 @@ class APISite(
                 if result['edit']['result'] == 'Success':
                     if 'nochange' in result['edit']:
                         # null edit, page not changed
-                        pywikibot.log('Page [[{}]] saved without any changes.'
-                                      .format(page.title()))
+                        pywikibot.log(f'Page [[{page.title()}]] saved without '
+                                      f'any changes.')
                         return True
                     page.latest_revision_id = result['edit']['newrevid']
                     # See:
@@ -2028,10 +2017,8 @@ class APISite(
                                 'then type answer here:')
                             continue
 
-                        pywikibot.error(
-                            'editpage: unknown CAPTCHA response {}, '
-                            'page not saved'
-                            .format(captcha))
+                        pywikibot.error(f'editpage: unknown CAPTCHA response '
+                                        f'{captcha}, page not saved')
                         break
 
                     if 'spamblacklist' in result['edit']:
@@ -2045,8 +2032,8 @@ class APISite(
                                     result['edit']['info']))
                         break
 
-                    pywikibot.error('editpage: unknown failure reason {}'
-                                    .format(str(result)))
+                    pywikibot.error(
+                        f'editpage: unknown failure reason {result}')
                     break
 
                 pywikibot.error(
@@ -2152,16 +2139,14 @@ class APISite(
         self.lock_page(dest)
         try:
             result = req.submit()
-            pywikibot.debug('mergehistory response: {result}'
-                            .format(result=result))
+            pywikibot.debug(f'mergehistory response: {result}')
         except APIError as err:
             if err.code in self._mh_errors:
                 on_error = self._mh_errors[err.code]
                 raise Error(on_error.format_map(errdata)) from None
 
             pywikibot.debug(
-                "mergehistory: Unexpected error code '{code}' received"
-                .format(code=err.code))
+                f"mergehistory: Unexpected error code '{err.code}' received")
             raise
         finally:
             self.unlock_page(source)
@@ -2237,8 +2222,7 @@ class APISite(
         else:
             newtitle = newlink.title
         if oldtitle == newtitle:
-            raise Error('Cannot move page {} to its own title.'
-                        .format(oldtitle))
+            raise Error(f'Cannot move page {oldtitle} to its own title.')
         if not page.exists():
             raise NoPageError(page,
                               'Cannot move page {page} because it '
@@ -2258,9 +2242,8 @@ class APISite(
             pywikibot.debug(f'movepage response: {result}')
         except APIError as err:
             if err.code.endswith('anon') and self.logged_in():
-                pywikibot.debug(
-                    "movepage: received '{}' even though bot is logged in"
-                    .format(err.code))
+                pywikibot.debug(f"movepage: received '{err.code}' even though "
+                                f'bot is logged in')
 
             if err.code in self._mv_errors:
                 on_error = self._mv_errors[err.code]
@@ -2293,8 +2276,8 @@ class APISite(
 
                 raise Error(on_error.format_map(errdata)) from None
 
-            pywikibot.debug("movepage: Unexpected error code '{}' received."
-                            .format(err.code))
+            pywikibot.debug(
+                f"movepage: Unexpected error code '{err.code}' received.")
             raise
         finally:
             self.unlock_page(page)
@@ -2338,8 +2321,7 @@ class APISite(
         """
         if len(page._revisions) < 2:
             raise Error(
-                'Rollback of {} aborted; load revision history first.'
-                .format(page))
+                f'Rollback of {page} aborted; load revision history first.')
 
         user = kwargs.pop('user', page.latest_revision.user)
         for rev in sorted(page._revisions.values(), reverse=True,
@@ -2348,9 +2330,8 @@ class APISite(
             if rev.user != user:
                 break
         else:
-            raise Error(
-                'Rollback of {} aborted; only one user in revision history.'
-                .format(page))
+            raise Error(f'Rollback of {page} aborted; only one user in '
+                        f'revision history.')
 
         parameters = merge_unique_dicts(kwargs,
                                         action='rollback',
@@ -2371,8 +2352,8 @@ class APISite(
                 raise Error(
                     self._rb_errors[err.code].format_map(errdata)
                 ) from None
-            pywikibot.debug("rollback: Unexpected error code '{}' received."
-                            .format(err.code))
+            pywikibot.debug(
+                f"rollback: Unexpected error code '{err.code}' received.")
             raise
         finally:
             self.unlock_page(page)
@@ -2475,8 +2456,8 @@ class APISite(
                 raise Error(
                     self._dl_errors[err.code].format_map(errdata)
                 ) from None
-            pywikibot.debug('delete: Unexpected error code {!r} received.'
-                            .format(err.code))
+            pywikibot.debug(
+                f'delete: Unexpected error code {err.code!r} received.')
             raise
         else:
             if isinstance(page, pywikibot.page.BasePage):
@@ -2534,8 +2515,8 @@ class APISite(
                 raise Error(
                     self._dl_errors[err.code].format_map(errdata)
                 ) from None
-            pywikibot.debug('undelete: Unexpected error code {!r} received.'
-                            .format(err.code))
+            pywikibot.debug(
+                f'undelete: Unexpected error code {err.code!r} received.')
             raise
         finally:
             self.unlock_page(page)
@@ -2635,8 +2616,8 @@ class APISite(
                 raise Error(
                     self._protect_errors[err.code].format_map(errdata)
                 ) from None
-            pywikibot.debug("protect: Unexpected error code '{}' received."
-                            .format(err.code))
+            pywikibot.debug(
+                f"protect: Unexpected error code '{err.code}' received.")
             raise
         else:
             protection = {}
