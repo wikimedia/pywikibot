@@ -1551,18 +1551,21 @@ class TestExtractSections(DefaultDrySiteTestCase):
 
     """Test the extract_sections function."""
 
-    def _extract_sections_tests(self, result, header, sections, footer):
+    def _extract_sections_tests(self, result, header, sections, footer='',
+                                title=''):
         """Test extract_sections function."""
         self.assertIsInstance(result, tuple)
         self.assertIsInstance(result.sections, list)
-        self.assertEqual(result, (header, sections, footer))
         self.assertEqual(result.header, header)
         self.assertEqual(result.sections, sections)
         self.assertEqual(result.footer, footer)
-        if result.sections:
-            for section in sections:
-                self.assertIsInstance(section, tuple)
-                self.assertLength(section, 2)
+        self.assertEqual(result.title, title)
+        self.assertEqual(result, (header, sections, footer))
+        for section in result.sections:
+            self.assertIsInstance(section, tuple)
+            self.assertLength(section, 2)
+            self.assertIsInstance(section.level, int)
+            self.assertEqual(section.title.count('=') // 2, section.level)
 
     def test_no_sections_no_footer(self):
         """Test for text having no sections or footer."""
@@ -1583,7 +1586,7 @@ class TestExtractSections(DefaultDrySiteTestCase):
                 'content')
         result = extract_sections(text, self.site)
         self._extract_sections_tests(
-            result, 'text\n\n', [('==title==', '\ncontent')], '')
+            result, 'text\n\n', [('==title==', '\ncontent')])
 
     def test_with_section_with_footer(self):
         """Test for text having sections and footer."""
@@ -1607,8 +1610,8 @@ class TestExtractSections(DefaultDrySiteTestCase):
         self._extract_sections_tests(
             result,
             'text\n\n',
-            [('=first level=', '\nfoo\n'), ('==title==', '\nbar')],
-            '')
+            [('=first level=', '\nfoo\n'), ('==title==', '\nbar')]
+        )
 
     def test_with_h4_and_h2_sections(self):
         """Test for text having h4 and h2 sections."""
@@ -1621,7 +1624,7 @@ class TestExtractSections(DefaultDrySiteTestCase):
             result,
             'text\n\n',
             [('====title====', '\n'), ('==title 2==', '\ncontent')],
-            '')
+        )
 
     def test_long_comment(self):
         r"""Test for text having a long expanse of white space.
@@ -1636,6 +1639,30 @@ class TestExtractSections(DefaultDrySiteTestCase):
         text = '<!--                                         -->'
         result = extract_sections(text, self.site)
         self._extract_sections_tests(result, text, [], '')
+
+    def test_unbalanced_headers(self):
+        """Test unbalances section headers."""
+        text = ('text\n\n'
+                '====title===\n'
+                '==title 2===\n'
+                'content')
+        result = extract_sections(text, self.site)
+        self._extract_sections_tests(
+            result,
+            'text\n\n',
+            [('====title===', '\n'), ('==title 2===', '\ncontent')],
+        )
+
+    def test_title(self):
+        """Test title."""
+        text = "Test ''' Pywikibot ''' title."
+        result = extract_sections(text, self.site)
+        self._extract_sections_tests(
+            result,
+            "Test ''' Pywikibot ''' title.",
+            [],
+            title='Pywikibot'
+        )
 
 
 if __name__ == '__main__':  # pragma: no cover

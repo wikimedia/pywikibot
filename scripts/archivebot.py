@@ -395,11 +395,10 @@ class DiscussionPage(pywikibot.Page):
         else:
             self.header = header + footer
 
-        for thread_heading, thread_content in threads:
-            cur_thread = DiscussionThread(thread_heading.strip('= '),
-                                          self.timestripper)
+        for thread in threads:
+            cur_thread = DiscussionThread(thread.heading, self.timestripper)
             # remove heading line
-            _, *lines = thread_content.replace(marker, '').splitlines()
+            _, *lines = thread.content.replace(marker, '').splitlines()
             for line in lines:
                 cur_thread.feed_line(line)
             self.threads.append(cur_thread)
