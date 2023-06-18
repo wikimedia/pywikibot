@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the Category class."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -183,8 +183,9 @@ class TestCategoryObject(TestCase):
 
         # Invalid title case
         cat3 = pywikibot.Category(site, '2021 establishments in Orissa')
+        cat3.text = ('{{Category redirect|'
+                     '{{title year}} establishments in Odisha}}')
         cat4 = pywikibot.Category(site, '2021 establishments in Odisha')
-        self.assertIn('{{title year}}', cat3.text)
         self.assertTrue(cat3.isCategoryRedirect())
         self.assertFalse(cat4.isCategoryRedirect())
         tgt = cat3.getCategoryRedirectTarget()
