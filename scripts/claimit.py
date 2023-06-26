@@ -46,14 +46,13 @@ but 'p' must be included.
 
 """
 #
-# (C) Pywikibot team, 2013-2022
+# (C) Pywikibot team, 2013-2023
 #
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
 from pywikibot import WikidataBot, pagegenerators
-from pywikibot.backports import removeprefix
-from pywikibot.tools.itertools import itergroup
+from pywikibot.backports import batched, removeprefix
 
 
 # This is required for the text that is shown when you run this script
@@ -127,7 +126,7 @@ def main(*args: str) -> None:
 
     claims = []
     repo = pywikibot.Site().data_repository()
-    for property_id, target_str in itergroup(commandline_claims, 2):
+    for property_id, target_str in batched(commandline_claims, 2):
         claim = pywikibot.Claim(repo, property_id)
         if claim.type == 'wikibase-item':
             target = pywikibot.ItemPage(repo, target_str)

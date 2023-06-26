@@ -12,6 +12,7 @@ from typing import Any, Dict, List, Optional
 from warnings import warn
 
 import pywikibot
+from pywikibot.backports import batched
 from pywikibot.data import api
 from pywikibot.exceptions import (
     APIError,
@@ -23,7 +24,6 @@ from pywikibot.exceptions import (
 from pywikibot.site._apisite import APISite
 from pywikibot.site._decorators import need_extension, need_right, need_version
 from pywikibot.tools import merge_unique_dicts, remove_last_args
-from pywikibot.tools.itertools import itergroup
 
 
 __all__ = ('DataSite', )
@@ -204,21 +204,20 @@ class DataSite(APISite):
         return data['entities']
 
     def preload_entities(self, pagelist, groupsize: int = 50):
-        """
-        Yield subclasses of WikibaseEntity's with content prefilled.
+        """Yield subclasses of WikibaseEntity's with content prefilled.
 
-        Note that pages will be iterated in a different order
-        than in the underlying pagelist.
+        .. note:: Pages will be iterated in a different order than in
+           the underlying pagelist.
 
-        :param pagelist: an iterable that yields either WikibaseEntity objects,
-                         or Page objects linked to an ItemPage.
+        :param pagelist: an iterable that yields either WikibaseEntity
+            objects, or Page objects linked to an ItemPage.
         :param groupsize: how many pages to query at a time
         """
         if not hasattr(self, '_entity_namespaces'):
             self._cache_entity_namespaces()
-        for sublist in itergroup(pagelist, groupsize):
+        for batch in batched(pagelist, groupsize):
             req = {'ids': [], 'titles': [], 'sites': []}
-            for p in sublist:
+            for p in batch:
                 if isinstance(p, pywikibot.page.WikibaseEntity):
                     ident = p._defined_by()
                     for key in ident:

@@ -1,6 +1,6 @@
 """Object representing API parameter information."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,8 +9,7 @@ from typing import Any, Optional, Union
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Dict, removeprefix
-from pywikibot.tools.itertools import itergroup
+from pywikibot.backports import Dict, batched, removeprefix
 
 
 __all__ = ['ParamInfo']
@@ -196,12 +195,11 @@ class ParamInfo(Sized, Container):
         """
         def module_generator():
             """A generator yielding batches of modules."""
-            i = itergroup(sorted(modules), self._limit)
-            for batch in i:
+            for batch in batched(sorted(modules), self._limit):
                 for failed_module in failed_modules:
                     yield [failed_module]
-                del failed_modules[:]
-                yield batch
+                failed_modules.clear()
+                yield list(batch)
 
         modules -= set(self._paraminfo)
         if not modules:

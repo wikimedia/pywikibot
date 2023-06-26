@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Utility to show pywikibot colors."""
 #
-# (C) Pywikibot team, 2016-2022
+# (C) Pywikibot team, 2016-2023
 #
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-from pywikibot.tools.itertools import itergroup
+from pywikibot.backports import batched
 from pywikibot.userinterfaces.terminal_interface_base import colors
 
 
@@ -26,7 +26,7 @@ def main():
 
     for bg_col in bg_colors:
         # Three lines per each backgoung color.
-        for fg_col_group in itergroup(fg_colors, n_fg_colors / 4 + 1):
+        for fg_col_group in batched(fg_colors, n_fg_colors / 4 + 1):
             line = ''
             for fg_col in fg_col_group:
                 line += ' '

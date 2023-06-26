@@ -838,7 +838,8 @@ wrapper.add_deprecated_attr(
 # Deprecate objects which has to be imported from tools.itertools instead
 wrapper.add_deprecated_attr(
     'itergroup',
-    replacement_name='pywikibot.tools.itertools.itergroup',
+    # new replacement in 8.2
+    replacement_name='pywikibot.backports.batched',
     since='7.6.0')
 wrapper.add_deprecated_attr(
     'islice_with_ellipsis',
