@@ -803,7 +803,8 @@ db_port = 3306
 # DO NOT set to None to disable timeouts. Otherwise this may freeze your
 # script.
 # You may assign either a tuple of two int or float values for connection and
-# read timeout, or a single value for both in a tuple.
+# read timeout, or a single value for both.
+# See also: https://requests.readthedocs.io/en/stable/user/advanced/#timeouts
 socket_timeout = (6.05, 45)
 
 
