@@ -22,6 +22,7 @@ from pywikibot import config, date, xmlreader
 from pywikibot.backports import (
     Callable,
     Dict,
+    Generator,
     Iterable,
     Iterator,
     List,
@@ -30,6 +31,7 @@ from pywikibot.backports import (
 )
 from pywikibot.comms import http
 from pywikibot.exceptions import APIError, ServerError
+from pywikibot.site import Namespace
 from pywikibot.tools import deprecated
 from pywikibot.tools.collections import GeneratorWrapper
 from pywikibot.tools.itertools import filter_unique, itergroup
@@ -169,26 +171,49 @@ def NewpagesPageGenerator(site: OPT_SITE_TYPE = None,
                                               total=total, returndict=True))
 
 
-def RecentChangesPageGenerator(site: OPT_SITE_TYPE = None,
-                               _filter_unique: Optional[Callable[
-                                   [Iterable['pywikibot.page.Page']],
-                                   Iterable['pywikibot.page.Page']]] = None,
-                               **kwargs: Any
-                               ) -> Iterable['pywikibot.page.Page']:
+def RecentChangesPageGenerator(
+    site: OPT_SITE_TYPE = None,
+    _filter_unique: Optional[Callable[[Iterable['pywikibot.Page']],
+                                      Iterable['pywikibot.Page']]] = None,
+    **kwargs: Any
+) -> Generator['pywikibot.Page', None, None]:
     """
     Generate pages that are in the recent changes list, including duplicates.
 
-    For parameters refer pywikibot.site.recentchanges
+    For keyword parameters refer :meth:`APISite.recentchanges()
+    <pywikibot.site._generators.GeneratorsMixin.recentchanges>`.
+
+    .. versionchanged:: 8.2
+       The YieldType depends on namespace. It can be
+       :class:`pywikibot.Page`, :class:`pywikibot.User`,
+       :class:`pywikibot.FilePage` or :class:`pywikibot.Category`.
 
     :param site: Site for generator results.
     """
+    def upcast(gen):
+        """Upcast pywikibot.Page type."""
+        for rc in gen:
+            # The title in a log entry may have been suppressed
+            if rc['type'] == 'log' and 'title' not in rc:
+                continue
+
+            ns = rc['ns']
+            if ns == Namespace.USER:
+                pageclass = pywikibot.User
+            elif ns == Namespace.FILE:
+                pageclass = pywikibot.FilePage
+            elif ns == Namespace.CATEGORY:
+                pageclass = pywikibot.Category
+            else:
+                pageclass = pywikibot.Page
+            yield pageclass(site, rc['title'])
+
     if site is None:
         site = pywikibot.Site()
 
     gen = site.recentchanges(**kwargs)
     gen.request['rcprop'] = 'title'
-    gen = (pywikibot.Page(site, rc['title'])
-           for rc in gen if rc['type'] != 'log' or 'title' in rc)
+    gen = upcast(gen)
 
     if _filter_unique:
         gen = _filter_unique(gen)
