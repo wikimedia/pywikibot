@@ -143,11 +143,10 @@ administrator, transwiki importer or importer.
 # Distributed under the terms of the MIT license.
 #
 import pywikibot
-from pywikibot import config, pagegenerators
+from pywikibot import pagegenerators
 from pywikibot.backports import Dict
 from pywikibot.bot import suggest_help
 from pywikibot.data import api
-from pywikibot.tools import issue_deprecation_warning
 
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
@@ -175,7 +174,6 @@ def main(*args: str) -> None:
     rootpage = ''
     tags = ''
     summary = 'Importing page from '
-    test = False
     overwrite = False
     target = False
     fullhistory = False
@@ -195,8 +193,6 @@ def main(*args: str) -> None:
             tags = arg[len('-tags:'):]
         elif arg.startswith('-summary'):
             summary = arg[len('-summary:'):]
-        elif arg == '-test':
-            test = True
         elif arg == '-overwrite':
             overwrite = True
         elif arg == '-target':
@@ -303,14 +299,6 @@ def main(*args: str) -> None:
                     continue
 
             params['interwikipage'] = fromtitle
-            if test:
-                # -simulate may be given as an int to indicate waiting seconds
-                if not config.simulate:
-                    config.simulate = True
-
-                # since 8.2.0; no deprecation period
-                issue_deprecation_warning('-test option', '-simulate')
-
             api_query(tosite, params)
             pywikibot.info(f'{fromtitle} →  {targetpage}')
 
