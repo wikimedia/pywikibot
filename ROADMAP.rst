@@ -1,11 +1,13 @@
 Current release
 ---------------
 
+* Backport ``itertools.batched()`` from Python 3.12 in favour of :func:`tools.itertools.itergroup`
+* Upcast page types in :func:`pagegenerators.RecentChangesPageGenerator` (:phab:`T340450`)
 * Enable :meth:`FilePage.download()<pywikibot.FilePage.download>` to download thumbnails (:phab:`T247095`)
 * Refactor :func:`tools.compute_file_hash` and use ``hashlib.file_digest`` with Python 3.11
 * Url ends with curly bracket in :func:`textlib.compileLinkR` (:phab:`T338029`)
 * Allows spaces in environment variables for :class:`editor.TextEditor` (:phab:`T102465`, :phab:`T323078`)
-* Add :func:`textlib.get_regexes` puplic function (:phab:`T336144`)
+* Add :func:`textlib.get_regexes` public function (:phab:`T336144`)
 * Return 'https' scheme with :meth:`family.Family.protocol` (:phab:`T326046`)
 * Use ``build`` instead of ``setuptools.setup()`` to build the distribution
 * Raise ``ConnectionError`` on ``requests.ReadTimeout`` in :func:`comms.http.error_handling_callback`
