@@ -1,7 +1,7 @@
 Current release
 ---------------
 
-* Backport ``itertools.batched()`` from Python 3.12 in favour of :func:`tools.itertools.itergroup`
+* Backport ``itertools.batched()`` from Python 3.12 which replaces :func:`tools.itertools.itergroup`
 * Upcast page types in :func:`pagegenerators.RecentChangesPageGenerator` (:phab:`T340450`)
 * Enable :meth:`FilePage.download()<pywikibot.FilePage.download>` to download thumbnails (:phab:`T247095`)
 * Refactor :func:`tools.compute_file_hash` and use ``hashlib.file_digest`` with Python 3.11
