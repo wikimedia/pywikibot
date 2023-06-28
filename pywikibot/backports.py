@@ -168,7 +168,7 @@ else:
 
 # gh-98363
 if PYTHON_VERSION < (3, 12) or SPHINX_RUNNING:
-    def batched(iterable, n: int) -> Generator[Any, None, None]:
+    def batched(iterable, n: int) -> Generator[tuple, None, None]:
         """Batch data from the *iterable* into tuples of length *n*.
 
         .. note:: The last batch may be shorter than *n*.
