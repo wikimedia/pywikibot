@@ -14,7 +14,7 @@ from contextlib import suppress
 from itertools import chain, zip_longest
 from typing import Any
 
-from pywikibot.backports import batched, Generator
+from pywikibot.backports import batched, Generator, List
 from pywikibot.logging import debug
 from pywikibot.tools import deprecated, issue_deprecation_warning
 
@@ -31,7 +31,7 @@ __all__ = (
 @deprecated('backports.batched()', since='8.2.0')
 def itergroup(iterable,
               size: int,
-              strict: bool = False) -> Generator[Any, None, None]:
+              strict: bool = False) -> Generator[List[Any], None, None]:
     """Make an iterator that returns lists of (up to) size items from iterable.
 
     Example:
