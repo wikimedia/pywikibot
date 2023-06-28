@@ -17,7 +17,7 @@ jobs:
   build:
     runs-on: 'ubuntu-latest'
     continue-on-error: ${{ matrix.experimental || false }}
-    timeout-minutes: 60
+    timeout-minutes: 100
 
     strategy:
       fail-fast: false
@@ -68,7 +68,7 @@ jobs:
     - name: Test with pytest
       id: ci_test
       continue-on-error: true
-      timeout-minutes: 55
+      timeout-minutes: 90
       env:
         PYWIKIBOT_TEST_WRITE: ${{ matrix.site == 'wikipedia:test' && 1 || 0}}
       run: |
