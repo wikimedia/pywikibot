@@ -195,7 +195,9 @@ class ParamInfo(Sized, Container):
         """
         def module_generator():
             """A generator yielding batches of modules."""
-            for batch in batched(sorted(modules), self._limit):
+            # T340617: self._limit is not set for the first modules
+            # which is frozenset({'paraminfo', 'query', 'main'})
+            for batch in batched(sorted(modules), self._limit or 50):
                 for failed_module in failed_modules:
                     yield [failed_module]
                 failed_modules.clear()
