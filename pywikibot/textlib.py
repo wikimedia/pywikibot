@@ -933,12 +933,69 @@ def add_text(text: str, add: str, *, site=None) -> str:
 # -------------------------------
 # Functions dealing with sections
 # -------------------------------
+
+#: Head pattern
+HEAD_PATTERN = re.compile('{0}[^=]+{0}'.format('(={1,6})'))
+TITLE_PATTERN = re.compile("'{3}([^']+)'{3}")
+
 _Heading = namedtuple('_Heading', ('text', 'start', 'end'))
-_Section = namedtuple('_Section', ('title', 'content'))
-_Content = namedtuple('_Content', ('header', 'sections', 'footer'))
 
 
-def _extract_headings(text: str) -> list:
+class Section(NamedTuple):
+
+    """A namedtuple as part of :class:`Content` describing a page section.
+
+    .. versionchanged:: 8.2
+       ``_Section`` becomes a public class.
+    """
+
+    title: str  #: section title including equal signs
+    content: str  #: section content
+
+    @property
+    def level(self) -> int:
+        """Return the section level.
+
+        .. versionadded:: 8.2
+        """
+        m = HEAD_PATTERN.match(self.title)
+        return min(map(len, m.groups()))
+
+    @property
+    def heading(self) -> str:
+        """Return the section title without equal signs.
+
+        .. versionadded:: 8.2
+        """
+        level = self.level
+        return self.title[level:-level].strip()
+
+
+class Content(NamedTuple):
+
+    """A namedtuple as result of :func:`extract_sections` holding page content.
+
+    .. versionchanged:: 8.2
+       ``_Content`` becomes a public class.
+    """
+
+    header: str  #: the page header
+    sections: List[Section]  #: the page sections
+    footer: str  #: the page footer
+
+    @property
+    def title(self) -> str:
+        """Return the first main title found on the page.
+
+        The first main title is anything enclosed within triple quotes.
+
+        .. versionadded:: 8.2
+        """
+        m = TITLE_PATTERN.search(self.header)
+        return m[1].strip() if m else ''
+
+
+def _extract_headings(text: str) -> List[_Heading]:
     """Return _Heading objects."""
     headings = []
     heading_regex = get_regexes('header')[0]
@@ -949,59 +1006,90 @@ def _extract_headings(text: str) -> list:
     return headings
 
 
-def _extract_sections(text: str, headings) -> list:
-    """Return _Section objects."""
+def _extract_sections(text: str, headings) -> List[Section]:
+    """Return a list of :class:`Section` objects."""
+    sections = []
     if headings:
         # Assign them their contents
-        contents = []
         for i, heading in enumerate(headings):
             try:
                 next_heading = headings[i + 1]
             except IndexError:
-                contents.append(text[heading.end:])
+                content = text[heading.end:]
             else:
-                contents.append(text[heading.end:next_heading.start])
-        return [_Section(heading.text, content)
-                for heading, content in zip(headings, contents)]
-    return []
+                content = text[heading.end:next_heading.start]
+            sections.append(Section(heading.text, content))
+
+    return sections
 
 
 def extract_sections(
-    text: str, site=None
-) -> NamedTuple('_Content', [('header', str),  # noqa: F821
-                             ('sections', List[Tuple[str, str]]),  # noqa: F821
-                             ('footer', str)]):  # noqa: F821
-    """
-    Return section headings and contents found in text.
+    text: str,
+    site: Optional['pywikibot.site.BaseSite'] = None
+) -> Content:
+    """Return section headings and contents found in text.
 
-    :return: The returned namedtuple contains the text parsed into
-        header, contents and footer parts: The header part is a string
-        containing text part above the first heading. The footer part
-        is also a string containing text part after the last section.
-        The section part is a list of tuples, each tuple containing a
-        string with section heading and a string with section content.
-        Example article::
+    The returned namedtuple :class:`Content` contains the text parsed
+    into *header*, *sections* and *footer* parts. The main title found
+    in the header which is the first text enclosed with ''' like
+    '''page title''' can be given by the *title* property.
 
-            '''A''' is a thing.
+    The header part is a string containing text part above the first
+    heading.
 
-            == History of A ==
-            Some history...
+    The sections part is a list of :class:`Section` namedtuples, each
+    tuple containing a string with section title (including equal signs),
+    and a string with the section content. In addition the section
+    heading (the title without equal signs) can be given by the *heading*
+    property. Also the section level can be found by the *level*
+    property which is the number of the equal signs around the section
+    heading.
 
-            == Usage of A ==
-            Some usage...
+    The footer part is also a string containing text part after the last
+    section.
 
-            [[Category:Things starting with A]]
+    **Examples:**
 
-        ...is parsed into the following namedtuple::
+    >>> text = \"\"\"
+    ... '''this''' is a Python module.
+    ...
+    ... == History of this ==
+    ... This set of principles was posted in 1999...
+    ...
+    ... == Usage of this ==
+    ... Enter "import this" for usage...
+    ...
+    ... === Details ===
+    ... The Zen of Python...
+    ...
+    ... [[Category:Programming principles]]
+    ... \"\"\"
+    >>> site = pywikibot.Site('wikipedia:en')
+    >>> result = extract_sections(text, site)
+    >>> result.header.strip()
+    "'''this''' is a Python module."
+    >>> result.sections[0].title
+    '== History of this =='
+    >>> result.sections[1].content.strip()
+    'Enter "import this" for usage...'
+    >>> result.sections[2].heading
+    'Details'
+    >>> result.sections[2].level
+    3
+    >>> result.footer.strip()
+    '[[Category:Programming principles]]'
+    >>> result.title
+    'this'
 
-            result = extract_sections(text, site)
-            result.header = "'''A''' is a thing."
-            result.sections = [('== History of A ==', 'Some history...'),
-                               ('== Usage of A ==', 'Some usage...')]
-            result.footer = '[[Category:Things starting with A]]'
-
+    .. note:: sections and text from templates are not extracted but
+       embedded as plain text.
     .. versionadded:: 3.0
-    """
+    .. versionchanged:: 8.2
+       The :class:`Content` and :class:`Section` class have additional
+       properties.
+
+    :return: The parsed namedtuple.
+    """  # noqa: D300, D301
     headings = _extract_headings(text)
     sections = _extract_sections(text, headings)
     # Find header and footer contents
@@ -1013,13 +1101,15 @@ def extract_sections(
         r'({})*\Z'.format(r'|'.join((langlink_pattern,
                                      cat_regex.pattern, r'\s'))),
         last_section_content).group().lstrip()
+
     if footer:
         if sections:
-            sections[-1] = _Section(
+            sections[-1] = Section(
                 sections[-1].title, last_section_content[:-len(footer)])
         else:
             header = header[:-len(footer)]
-    return _Content(header, sections, footer)
+
+    return Content(header, sections, footer)
 
 
 # -----------------------------------------------
