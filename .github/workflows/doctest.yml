@@ -29,15 +29,13 @@ jobs:
         include:
           - python-version: "3.12.0-alpha - 3.12.0"
           # ubuntu-20.04 required for Python 3.6
+          - python-version: "3.13-dev"
           - python-version: 3.6
             os: windows-latest
           - python-version: 3.6
             os: macOS-latest
           - python-version: 3.6
             os: ubuntu-20.04
-          - python-version: "3.13-dev"
-            site: wikipedia:test
-            experimental: true
 
     steps:
     - name: Checkout Repository

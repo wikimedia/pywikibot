@@ -45,7 +45,9 @@ jobs:
             domain: test.wikipedia.org
             os: ubuntu-20.04
           - python-version: "3.13-dev"
-            site: wikipedia:test
+            family: wikipedia
+            code: test
+            domain: test.wikipedia.org
             experimental: true
 
     steps:
