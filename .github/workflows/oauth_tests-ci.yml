@@ -44,7 +44,7 @@ jobs:
             code: test
             domain: test.wikipedia.org
             os: ubuntu-20.04
-          - python-version: "3.13"
+          - python-version: "3.13-dev"
             site: wikipedia:test
             experimental: true
 
@@ -56,14 +56,14 @@ jobs:
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
-      if: ${{ matrix.python-version != '3.13' }}
+      if: ${{ matrix.python-version != '3.13-dev' }}
       with:
         python-version: ${{ matrix.python-version }}
 
     # use deadsnakes/action until actions/setup-python supports Python 3.13
     - name: Set up development Python ${{ matrix.python-version }}
-      uses: deadsnakes/action@v2.1.1
-      if: ${{ matrix.python-version == '3.13' }}
+      uses: deadsnakes/action@v3.0.1
+      if: ${{ matrix.python-version == '3.13-dev' }}
       with:
         python-version: ${{ matrix.python-version }}
 
