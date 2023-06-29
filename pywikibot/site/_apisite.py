@@ -2851,7 +2851,12 @@ class APISite(
             self._property_names = [pn['propname'] for pn in ppngen]
         return self._property_names
 
-    def compare(self, old: _CompType, diff: _CompType) -> str:
+    def compare(
+        self,
+        old: _CompType,
+        diff: _CompType,
+        difftype: str = 'table'
+    ) -> str:
         """
         Corresponding method to the 'action=compare' API action.
 
@@ -2861,6 +2866,7 @@ class APISite(
         Use pywikibot.diff's html_comparator() method to parse result.
         :param old: starting revision ID, title, Page, or Revision
         :param diff: ending revision ID, title, Page, or Revision
+        :param difftype: type of diff. One of 'table' or 'inline'.
         :return: Returns an HTML string of a diff between two revisions.
         """
         # check old and diff types
@@ -2885,7 +2891,8 @@ class APISite(
 
         params = {'action': 'compare',
                   f'from{old_t[0]}': old_t[1],
-                  f'to{diff_t[0]}': diff_t[1]}
+                  f'to{diff_t[0]}': diff_t[1],
+                  'difftype': difftype}
 
         req = self.simple_request(**params)
         data = req.submit()
