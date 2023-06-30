@@ -29,56 +29,85 @@ class ExportDotThreeTestCase(TestCase):
 
     def test_XmlDumpAllRevs(self):
         """Test loading all revisions."""
-        pages = get_entries('article-pear.xml', allrevisions=True)
+        pages = get_entries('article-pear.xml', revisions='all')
         self.assertLength(pages, 4)
         self.assertEqual('Automated conversion', pages[0].comment)
         self.assertEqual('Pear', pages[0].title)
         self.assertEqual('24278', pages[0].id)
+        self.assertEqual('185185', pages[0].revisionid)
+        self.assertEqual('188924', pages[3].revisionid)
         self.assertTrue(pages[0].text.startswith('Pears are [[tree]]s of'))
         self.assertEqual('Quercusrobur', pages[1].username)
         self.assertEqual('Pear', pages[0].title)
 
-    def test_XmlDumpFirstRev(self):
-        """Test loading the first revision."""
-        pages = get_entries('article-pear.xml', allrevisions=False)
+    def test_XmlDumpFirstFoundRev(self):
+        """Test loading the first found revision.
+
+        To be deprecated.
+        :phab: `T340804`
+        """
+        pages = get_entries('article-pear.xml', revisions='first_found')
         self.assertLength(pages, 1)
         self.assertEqual('Automated conversion', pages[0].comment)
         self.assertEqual('Pear', pages[0].title)
         self.assertEqual('24278', pages[0].id)
+        self.assertEqual('185185', pages[0].revisionid)
+        self.assertTrue(pages[0].text.startswith('Pears are [[tree]]s of'))
+        self.assertTrue(not pages[0].isredirect)
+
+    def test_XmlDumpEarliestRev(self):
+        """Test loading the earliest revision."""
+        pages = get_entries('article-pear.xml', revisions='earliest')
+        self.assertLength(pages, 1)
+        self.assertEqual('Automated conversion', pages[0].comment)
+        self.assertEqual('Pear', pages[0].title)
+        self.assertEqual('24278', pages[0].id)
+        self.assertEqual('185185', pages[0].revisionid)
+        self.assertTrue(pages[0].text.startswith('Pears are [[tree]]s of'))
+        self.assertTrue(not pages[0].isredirect)
+
+    def test_XmlDumpLatestRev(self):
+        """Test loading the latest revision."""
+        pages = get_entries('article-pear.xml', revisions='latest')
+        self.assertLength(pages, 1)
+        self.assertEqual('sp', pages[0].comment)
+        self.assertEqual('Pear', pages[0].title)
+        self.assertEqual('24278', pages[0].id)
+        self.assertEqual('188924', pages[0].revisionid)
         self.assertTrue(pages[0].text.startswith('Pears are [[tree]]s of'))
         self.assertTrue(not pages[0].isredirect)
 
     def test_XmlDumpRedirect(self):
         """Test XmlDump correctly parsing whether a page is a redirect."""
-        get_entries('article-pyrus.xml', allrevisions=True)
+        get_entries('article-pyrus.xml', revisions='all')
         pages = list(xmlreader.XmlDump(
             join_xml_data_path('article-pyrus.xml')).parse())
         self.assertTrue(pages[0].isredirect)
 
-    def _compare(self, previous, variant, all_revisions):
+    def _compare(self, previous, variant, revisions):
         """Compare the tested variant with the previous (if not None)."""
         entries = get_entries('article-pyrus' + variant,
-                              allrevisions=all_revisions)
+                              revisions=revisions)
         result = [entry.__dict__ for entry in entries]
         if previous:
             self.assertEqual(previous, result)
         return result
 
-    def _compare_variants(self, all_revisions):
+    def _compare_variants(self, revisions):
         """Compare the different XML file variants."""
         previous = None
-        previous = self._compare(previous, '.xml', all_revisions)
-        previous = self._compare(previous, '-utf16.xml', all_revisions)
-        previous = self._compare(previous, '.xml.bz2', all_revisions)
-        self._compare(previous, '-utf16.xml.bz2', all_revisions)
+        previous = self._compare(previous, '.xml', revisions)
+        previous = self._compare(previous, '-utf16.xml', revisions)
+        previous = self._compare(previous, '.xml.bz2', revisions)
+        self._compare(previous, '-utf16.xml.bz2', revisions)
 
     def test_XmlDump_compare_all(self):
         """Compare the different XML files using all revisions."""
-        self._compare_variants(True)
+        self._compare_variants('all')
 
     def test_XmlDump_compare_single(self):
         """Compare the different XML files using only a single revision."""
-        self._compare_variants(False)
+        self._compare_variants('latest')
 
 
 class ExportDotTenTestCase(TestCase):
@@ -89,7 +118,7 @@ class ExportDotTenTestCase(TestCase):
 
     def test_pair(self):
         """Test reading the main page/user talk page pair file."""
-        entries = get_entries('pair-0.10.xml', allrevisions=True)
+        entries = get_entries('pair-0.10.xml', revisions='all')
         self.assertLength(entries, 4)
         for entry in entries:
             self.assertEqual(entry.username, 'Carlossuarez46')
@@ -115,7 +144,7 @@ class ExportDotTenTestCase(TestCase):
 
     def test_edit_summary_decoding(self):
         """Test edit summaries are decoded."""
-        entries = get_entries('pair-0.10.xml', allrevisions=True)
+        entries = get_entries('pair-0.10.xml', revisions='all')
         articles = [entry for entry in entries if entry.ns == '0']
 
         # It does not decode the edit summary
