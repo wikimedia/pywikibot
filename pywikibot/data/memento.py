@@ -287,8 +287,8 @@ class MementoClient(OldMementoClient):
                                     allow_redirects=follow_redirects,
                                     timeout=timeout or 9)
         except (InvalidSchema, MissingSchema):
-            raise ValueError('Only HTTP URIs are supported, '
-                             'URI {} unrecognized.'.format(uri))
+            raise ValueError(
+                f'Only HTTP URIs are supported, URI {uri} unrecognized.')
         if session_set:
             session.close()
 

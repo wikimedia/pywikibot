@@ -58,7 +58,7 @@ class Option(ABC):
         for option in options:
             formatted_options.append(option.format(default=default))
         # remove color highlights before fill function
-        text = '{} ({})'.format(text, ', '.join(formatted_options))
+        text = f"{text} ({', '.join(formatted_options)})"
         pattern = '<<[a-z]+>>'
         highlights = re.findall(pattern, text)
         return fill(re.sub(pattern, '{}', text), width=77).format(*highlights)

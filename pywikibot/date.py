@@ -499,8 +499,7 @@ def dh(value: int, pattern: str, encf: encf_type, decf: decf_type,
                            for i, param in enumerate(params))
         return strPattern % str_params
     assert len(decoders) == 1, (
-        'A single parameter does not match {} decoders.'
-        .format(len(decoders)))
+        f'A single parameter does not match {len(decoders)} decoders.')
     # convert integer parameter into its textual representation
     assert isinstance(params, int)
     return strPattern % _make_parameter(decoders[0], params)
@@ -690,8 +689,8 @@ class MonthFormat(abc.MutableMapping):  # type: ignore[type-arg]
         self.data[key] = value
 
     def __delitem__(self, key: str) -> None:
-        raise NotImplementedError("Deleting of key '{}' is not implemented"
-                                  .format(key))
+        raise NotImplementedError(
+            f"Deleting of key '{key}' is not implemented")
 
     def __iter__(self) -> Iterator[str]:
         return iter(self.data)
@@ -1675,7 +1674,7 @@ def addFmt1(lang: str, isMnthOfYear: bool,
 
     :param lang: language code
     """
-    assert len(patterns) == 12, 'pattern %s does not have 12 elements' % lang
+    assert len(patterns) == 12, f'pattern {lang} does not have 12 elements'
 
     for i in range(12):
         if patterns[i] is not None:
@@ -1989,8 +1988,7 @@ def format_date(month: int, day: int,
     max_day = calendar.monthrange(year, month)[1]
     if not 1 <= day <= max_day:
         raise ValueError(
-            'Wrong day value {day}; must be 1-{max_day}'
-            .format(day=day, max_day=max_day))
+            f'Wrong day value {day}; must be 1-{max_day}')
     assert isinstance(lang, str)
     return formats[dayMnthFmts[month - 1]][lang](day)
 

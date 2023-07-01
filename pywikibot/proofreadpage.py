@@ -517,8 +517,8 @@ class ProofreadPage(pywikibot.Page):
             try:
                 num = int(right)
             except ValueError:
-                raise InvalidTitleError('{} contains invalid index {!r}'
-                                        .format(self, right))
+                raise InvalidTitleError(
+                    f'{self} contains invalid index {right!r}')
         else:
             base = right
 
@@ -562,24 +562,22 @@ class ProofreadPage(pywikibot.Page):
         index_page, others = self._index
         if others:
             pywikibot.warning(f'{self} linked to several Index pages.')
-            pywikibot.info('{}{!s}'.format(' ' * 9, [index_page] + others))
+            pywikibot.info(f"{' ' * 9}{[index_page] + others!s}")
 
             if index_page:
                 pywikibot.info(
-                    '{}Selected Index: {}'.format(' ' * 9, index_page))
-                pywikibot.info('{}remaining: {!s}'.format(' ' * 9, others))
+                    f"{' ' * 9}Selected Index: {index_page}")
+                pywikibot.info(f"{' ' * 9}remaining: {others!s}")
 
         if not index_page:
-            pywikibot.warning('Page {} is not linked to any Index page.'
-                              .format(self))
+            pywikibot.warning(f'Page {self} is not linked to any Index page.')
 
         return index_page
 
     @index.setter
     def index(self, value: 'IndexPage') -> None:
         if not isinstance(value, IndexPage):
-            raise TypeError('value {} must be an IndexPage object.'
-                            .format(value))
+            raise TypeError(f'value {value} must be an IndexPage object.')
         self._index = (value, [])
 
     @index.deleter
@@ -861,8 +859,7 @@ class ProofreadPage(pywikibot.Page):
             # if None raises TypeError.
             url_image = url_image['src']
         except (TypeError, AttributeError):
-            raise ValueError('No prp-page-image src found for {}.'
-                             .format(self))
+            raise ValueError(f'No prp-page-image src found for {self}.')
         else:
             url_image = 'https:' + url_image
 
@@ -890,8 +887,7 @@ class ProofreadPage(pywikibot.Page):
 
         if ocr_tool not in self._OCR_METHODS:
             raise TypeError(
-                "ocr_tool must be in {}, not '{}'."
-                .format(self._OCR_METHODS, ocr_tool))
+                f"ocr_tool must be in {self._OCR_METHODS}, not '{ocr_tool}'.")
 
         # wrong link fail with Exceptions
         for retry in range(5, 30, 5):
@@ -983,8 +979,7 @@ class ProofreadPage(pywikibot.Page):
             cmd_fmt = self._OCR_CMDS[ocr_tool]
         except KeyError:
             raise TypeError(
-                "ocr_tool must be in {}, not '{}'."
-                .format(self._OCR_METHODS, ocr_tool))
+                f"ocr_tool must be in {self._OCR_METHODS}, not '{ocr_tool}'.")
 
         params = {
             'url_image': url_image,
@@ -1016,16 +1011,15 @@ class ProofreadPage(pywikibot.Page):
 
         if ocr_tool not in self._OCR_METHODS:
             raise TypeError(
-                "ocr_tool must be in {}, not '{}'."
-                .format(self._OCR_METHODS, ocr_tool))
+                f"ocr_tool must be in {self._OCR_METHODS}, not '{ocr_tool}'.")
 
         # if _multi_page, try _do_hocr() first and fall back to _do_ocr()
         if ocr_tool == self._PHETOOLS and self._multi_page:
             error, text = self._do_hocr()
             if not error and isinstance(text, str):
                 return text
-            pywikibot.warning('{}: phetools hocr failed, falling back to ocr.'
-                              .format(self))
+            pywikibot.warning(
+                f'{self}: phetools hocr failed, falling back to ocr.')
 
         error, text = self._do_ocr(ocr_tool=ocr_tool)
 
@@ -1262,8 +1256,7 @@ class IndexPage(pywikibot.Page):
             # Sanity check if WS site use page convention name/number.
             if page._num is not None:
                 assert page_cnt == int(page._num), (
-                    'Page number {} not recognised as page {}.'
-                    .format(page_cnt, title))
+                    f'Page number {page_cnt} not recognised as page {title}.')
 
             # Mapping: numbers <-> pages.
             self._page_from_numbers[page_cnt] = page
@@ -1362,8 +1355,7 @@ class IndexPage(pywikibot.Page):
         try:
             return self._labels_from_page_number[page_number]
         except KeyError:
-            raise KeyError('Page number ".../{}" not in range.'
-                           .format(page_number))
+            raise KeyError(f'Page number ".../{page_number}" not in range.')
 
     @staticmethod
     def _get_from_label(mapping_dict: Dict[str, Any],

@@ -48,12 +48,11 @@ class BaseSite(ComparableMixin):
         if code.lower() != code:
             # Note the Site function in __init__ also emits a UserWarning
             # for this condition, showing the callers file and line no.
-            pywikibot.log('BaseSite: code "{}" converted to lowercase'
-                          .format(code))
+            pywikibot.log(f'BaseSite: code "{code}" converted to lowercase')
             code = code.lower()
         if not all(x in pywikibot.family.CODE_CHARACTERS for x in code):
-            pywikibot.log('BaseSite: code "{}" contains invalid characters'
-                          .format(code))
+            pywikibot.log(
+                f'BaseSite: code "{code}" contains invalid characters')
         self.__code = code
         if isinstance(fam, str) or fam is None:
             self.__family = pywikibot.family.Family.load(fam)
@@ -67,8 +66,8 @@ class BaseSite(ComparableMixin):
                 self.__code = self.__family.obsolete[self.__code]
                 # Note the Site function in __init__ emits a UserWarning
                 # for this condition, showing the callers file and line no.
-                pywikibot.log('Site {} instantiated using aliases code of {}'
-                              .format(self, code))
+                pywikibot.log(
+                    f'Site {self} instantiated using aliases code of {code}')
             else:
                 # no such language anymore
                 self.obsolete = True
@@ -209,8 +208,7 @@ class BaseSite(ComparableMixin):
 
     def __repr__(self) -> str:
         """Return internal representation."""
-        return '{}("{}", "{}")'.format(
-            self.__class__.__name__, self.code, self.family)
+        return f'{self.__class__.__name__}("{self.code}", "{self.family}")'
 
     def __hash__(self):
         """Return hash value of instance."""
@@ -321,8 +319,8 @@ class BaseSite(ComparableMixin):
 
         else:  # fallback for non WM sites
             try:
-                name = '{}:{}'.format(Namespace.CATEGORY,
-                                      self.family.disambcatname[self.code])
+                name = (f'{Namespace.CATEGORY}:'
+                        f'{self.family.disambcatname[self.code]}')
             except KeyError:
                 raise Error(f'No disambiguation category name found in '
                             f'{self.family.name}_family for {self}')
@@ -375,8 +373,7 @@ class BaseSite(ComparableMixin):
         # delimiters like spaces and multiple combinations of them with
         # only one delimiter
         sep = self.family.title_delimiter_and_aliases[0]
-        pattern = re.compile('[{}]+'
-                             .format(self.family.title_delimiter_and_aliases))
+        pattern = re.compile(f'[{self.family.title_delimiter_and_aliases}]+')
         title1 = pattern.sub(sep, title1)
         title2 = pattern.sub(sep, title2)
         if title1 == title2:

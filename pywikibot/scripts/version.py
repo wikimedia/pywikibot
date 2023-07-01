@@ -63,8 +63,7 @@ def main(*args: str) -> None:
             or not callable(requests.certs.where)):
         pywikibot.info('  cacerts: not defined')
     elif not os.path.isfile(requests.certs.where()):
-        pywikibot.info('  cacerts: {} (missing)'.format(
-            requests.certs.where()))
+        pywikibot.info(f'  cacerts: {requests.certs.where()} (missing)')
     else:
         pywikibot.info('  cacerts: ' + requests.certs.where())
 

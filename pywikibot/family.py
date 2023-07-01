@@ -328,12 +328,10 @@ class Family:
             raise UnknownFamilyError(f'Family {fam} does not exist')
         cls = mod.Family.instance
         if cls.name != fam:
-            warnings.warn(
-                'Family name {} does not match family module name {}'
-                .format(cls.name, fam),
-                FamilyMaintenanceWarning,
-                stacklevel=2,
-            )
+            warnings.warn(f'Family name {cls.name} does not match family '
+                          f'module name {fam}',
+                          FamilyMaintenanceWarning,
+                          stacklevel=2)
         # Family 'name' and the 'langs' codes must be ascii letters and digits,
         # and codes must be lower-case due to the Site loading algorithm;
         # codes can accept also underscore/dash.
@@ -423,8 +421,7 @@ class Family:
             return self.disambiguationTemplates[fallback]
 
         raise KeyError(
-            'ERROR: title for disambig template in language {} unknown'
-            .format(code))
+            f'ERROR: title for disambig template in language {code} unknown')
 
     # Methods
     def protocol(self, code: str) -> str:
@@ -543,8 +540,7 @@ class Family:
         """Return interface to use for code."""
         if code in self.interwiki_removals:
             if code in self.codes:
-                pywikibot.warn('Interwiki removal {} is in {} codes'
-                               .format(code, self))
+                pywikibot.warn(f'Interwiki removal {code} is in {self} codes')
             if code in self.closed_wikis:
                 return 'ClosedSite'
             if code in self.removed_wikis:
@@ -804,8 +800,7 @@ class SubdomainFamily(Family):
         if cls.languages_by_size:
             return cls.languages_by_size
         raise NotImplementedError(
-            'Family {} needs property "languages_by_size" or "codes"'
-            .format(cls.name))
+            f'Family {cls.name} needs property "languages_by_size" or "codes"')
 
     @classproperty
     def domains(cls):

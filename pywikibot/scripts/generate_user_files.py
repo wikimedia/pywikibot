@@ -8,7 +8,7 @@
    Also EXTERNAL EDITOR SETTINGS section can be copied.
 """
 #
-# (C) Pywikibot team, 2010-2022
+# (C) Pywikibot team, 2010-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -395,8 +395,8 @@ def create_user_config(
                                      botpasswordpass))
 
     if not userlist:  # Show a sample
-        usernames = "# usernames['{}']['{}'] = 'MyUsername'".format(
-            main_family, main_code)
+        usernames = (
+            f"# usernames['{main_family}']['{main_code}'] = 'MyUsername'")
     else:
         usernames = '\n'.join(
             "usernames['{user.family}']['{user.code}'] = '{user.name}'"

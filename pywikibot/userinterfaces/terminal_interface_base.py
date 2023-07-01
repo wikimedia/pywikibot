@@ -515,8 +515,7 @@ class UI(ABUIC):
         # lock stream output
         with self.lock:
             if not force:
-                line_template = '{{0: >{}}}: {{1}}\n'.format(
-                    len(str(len(answers))))
+                line_template = f'{{0: >{len(str(len(answers)))}}}: {{1}}\n'
                 for i, entry in enumerate(answers, start=1):
                     self.stream_output(line_template.format(i, entry))
 
@@ -536,8 +535,7 @@ class UI(ABUIC):
 
                 if force:
                     raise ValueError(
-                        'Invalid value "{}" for default during force.'
-                        .format(default))
+                        f'Invalid value "{default}" for default during force.')
 
                 self.stream_output('Error: Invalid response\n')
 

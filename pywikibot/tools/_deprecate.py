@@ -62,8 +62,7 @@ def add_decorated_full_name(obj, stacklevel: int = 1) -> None:
     frame = sys._getframe(stacklevel + 1)
     class_name = frame.f_code.co_name
     if class_name and class_name != '<module>':
-        obj.__full_name__ = '{}.{}.{}'.format(obj.__module__,
-                                              class_name, obj.__name__)
+        obj.__full_name__ = f'{obj.__module__}.{class_name}.{obj.__name__}'
     else:
         obj.__full_name__ = f'{obj.__module__}.{obj.__name__}'
 
@@ -462,8 +461,7 @@ def remove_last_args(arg_names):
             depth = get_wrapper_depth(wrapper) + 1
             args, varargs, kwargs, *_ = getfullargspec(wrapper.__wrapped__)
             if varargs is not None and kwargs is not None:
-                raise ValueError('{} may not have * or ** args.'
-                                 .format(name))
+                raise ValueError(f'{name} may not have * or ** args.')
             deprecated = set(__kw) & set(arg_names)
             if len(__args) > len(args):
                 deprecated.update(arg_names[:len(__args) - len(args)])
@@ -604,13 +602,12 @@ class ModuleDeprecationWrapper(types.ModuleType):
             otherwise it provides a DeprecationWarning
         """
         if '.' in name:
-            raise ValueError('Deprecated name "{}" may not contain '
-                             '".".'.format(name))
+            raise ValueError(f'Deprecated name "{name}" may not contain ".".')
         if name in self._deprecated:
             raise ValueError(f'Name "{name}" is already deprecated.')
         if replacement is not None and hasattr(self._module, name):
-            raise ValueError('Module has already an attribute named '
-                             '"{}".'.format(name))
+            raise ValueError(
+                f'Module has already an attribute named "{name}".')
 
         if replacement_name is None:
             if hasattr(replacement, '__name__'):

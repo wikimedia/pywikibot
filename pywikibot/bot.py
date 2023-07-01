@@ -420,8 +420,8 @@ def init_handlers() -> None:
             logfile = config.datafilepath('logs', config.logfilename)
         else:
             # add PID to logfle name
-            logfile = config.datafilepath('logs', '{}-{}bot.log'
-                                          .format(module_name, pid))
+            logfile = config.datafilepath('logs',
+                                          f'{module_name}-{pid}bot.log')
 
         # give up infinite rotating file handler with logfilecount of -1;
         # set it to 999 and use the standard implementation
@@ -473,8 +473,8 @@ def writelogheader() -> None:
     This may help the user to track errors or report bugs.
     """
     log('')
-    log('=== Pywikibot framework v{} -- Logging header ==='
-        .format(pywikibot.__version__))
+    log(f'=== Pywikibot framework v{pywikibot.__version__} -- Logging header'
+        ' ===')
 
     # script call
     log(f'COMMAND: {sys.argv}')
@@ -511,7 +511,7 @@ def writelogheader() -> None:
     for name in sorted(packages.keys()):
         info = packages[name]
         info.setdefault('path',
-                        '[{}]'.format(info.get('type', 'path unknown')))
+                        f"[{info.get('type', 'path unknown')}]")
         info.setdefault('ver', '??')
         if 'err' in info:
             log('  {name}: {err}'.format_map(info))
@@ -797,12 +797,11 @@ class InteractiveReplace:
             # at the beginning of the link, start red color.
             # at the end of the link, reset the color to default
             pywikibot.info(text[max(0, rng[0] - self.context): rng[0]]
-                           + '<<lightred>>{}<<default>>'.format(
-                               text[rng[0]: rng[1]])
+                           + f'<<lightred>>{text[rng[0]:rng[1]]}<<default>>'
                            + text[rng[1]: rng[1] + self.context])
         else:
-            question += '<<lightred>>{}<<default>> '.format(
-                self._old.canonical_title())
+            question += (
+                f'<<lightred>>{self._old.canonical_title()}<<default>> ')
 
         if self._new is False:
             question += 'be unlinked?'
@@ -947,8 +946,8 @@ def handle_args(args: Optional[Iterable[str]] = None,
         elif option in ('-cosmeticchanges', '-cc'):
             config.cosmetic_changes = (strtobool(value) if value
                                        else not config.cosmetic_changes)
-            output('NOTE: option cosmetic_changes is {}\n'
-                   .format(config.cosmetic_changes))
+            output(f'NOTE: option cosmetic_changes is '
+                   f'{config.cosmetic_changes}\n')
         elif option == '-simulate':
             config.simulate = value or True
         #
@@ -1158,8 +1157,7 @@ class _OptionDict(Dict[str, Any]):
         super().__init__(options)
 
     def __missing__(self, key: str) -> None:
-        raise Error("'{}' is not a valid option for {}."
-                    .format(key, self._classname))
+        raise Error(f"'{key}' is not a valid option for {self._classname}.")
 
     def __getattr__(self, name: str) -> Any:
         """Get item from dict."""
@@ -1242,8 +1240,7 @@ class OptionHandler:
         self.opt.update((opt, options[opt])
                         for opt in received_options & valid_options)
         for opt in received_options - valid_options:
-            pywikibot.warning('{} is not a valid option. It was ignored.'
-                              .format(opt))
+            pywikibot.warning(f'{opt} is not a valid option. It was ignored.')
 
 
 class BaseBot(OptionHandler):
@@ -1385,8 +1382,7 @@ class BaseBot(OptionHandler):
             msg = f'Working on {page.title()!r}'
             if config.colorized_output:
                 log(msg)
-                stdout('\n\n>>> <<lightpurple>>{}<<default>> <<<'
-                       .format(page.title()))
+                stdout(f'\n\n>>> <<lightpurple>>{page.title()}<<default>> <<<')
             else:
                 stdout(msg)
 
@@ -1445,7 +1441,7 @@ class BaseBot(OptionHandler):
             pywikibot.showDiff(oldtext, newtext)
 
         if 'summary' in kwargs:
-            pywikibot.info('Edit summary: {}'.format(kwargs['summary']))
+            pywikibot.info(f"Edit summary: {kwargs['summary']}")
 
         page.text = newtext
         return self._save_page(page, page.save, **kwargs)
@@ -1489,22 +1485,21 @@ class BaseBot(OptionHandler):
             if not ignore_save_related_errors:
                 raise
             if isinstance(e, EditConflictError):
-                pywikibot.info('Skipping {} because of edit conflict'
-                               .format(page.title()))
+                pywikibot.info(
+                    f'Skipping {page.title()} because of edit conflict')
             elif isinstance(e, SpamblacklistError):
                 pywikibot.info('Cannot change {} because of blacklist '
                                'entry {}'.format(page.title(), e.url))
             elif isinstance(e, LockedPageError):
-                pywikibot.info('Skipping {} (locked page)'
-                               .format(page.title()))
+                pywikibot.info(f'Skipping {page.title()} (locked page)')
             else:
                 pywikibot.error('Skipping {} because of a save related '
                                 'error: {}'.format(page.title(), e))
         except ServerError as e:
             if not ignore_server_errors:
                 raise
-            pywikibot.error('Server Error while processing {}: {}'
-                            .format(page.title(), e))
+            pywikibot.error(
+                f'Server Error while processing {page.title()}: {e}')
         else:
             return True
         return False
@@ -1536,8 +1531,7 @@ class BaseBot(OptionHandler):
 
         pywikibot.info()
         for op, count in self.counter.items():
-            pywikibot.info('{} {} operation{}'
-                           .format(count, op, 's' if count > 1 else ''))
+            pywikibot.info(f"{count} {op} operation{'s' if count > 1 else ''}")
 
         if hasattr(self, '_start_ts'):
             write_delta = pywikibot.Timestamp.now() - self._start_ts
@@ -1678,8 +1672,7 @@ class BaseBot(OptionHandler):
 
             self.generator_completed = True
         except QuitKeyboardInterrupt:
-            pywikibot.info('\nUser quit {} bot run...'
-                           .format(self.__class__.__name__))
+            pywikibot.info(f'\nUser quit {self.__class__.__name__} bot run...')
         except KeyboardInterrupt:
             if config.verbose_output:
                 raise
@@ -1817,8 +1810,8 @@ class SingleSiteBot(BaseBot):
             if self._site == value:
                 pywikibot.warning('Defined site without changing it.')
             else:
-                pywikibot.warning('Changed the site from "{}" to '
-                                  '"{}"'.format(self._site, value))
+                pywikibot.warning(
+                    f'Changed the site from "{self._site}" to "{value}"')
         self._site = value
 
     def init_page(self, item: Any) -> 'pywikibot.page.BasePage':
@@ -2206,7 +2199,7 @@ class WikidataBot(Bot, ExistingPageBot):
             pywikibot.info(json.dumps(diff, indent=4, sort_keys=True))
 
         if 'summary' in kwargs:
-            pywikibot.info('Change summary: {}'.format(kwargs['summary']))
+            pywikibot.info(f"Change summary: {kwargs['summary']}")
 
         # TODO PageSaveRelatedErrors should be actually raised in editEntity
         # (bug T86083)
@@ -2245,8 +2238,7 @@ class WikidataBot(Bot, ExistingPageBot):
             if sourceclaim:
                 claim.addSource(sourceclaim)
 
-        pywikibot.info('Adding {} --> {}'.format(claim.getID(),
-                                                 claim.getTarget()))
+        pywikibot.info(f'Adding {claim.getID()} --> {claim.getTarget()}')
         return self._save_page(item, item.addClaim, claim, bot=bot, **kwargs)
 
     def getSource(self, site: 'BaseSite') -> Optional['pywikibot.page.Claim']:

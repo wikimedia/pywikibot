@@ -198,8 +198,7 @@ class ThreadList(list):
         super().__init__(*args)
         for item in self:
             if not isinstance(item, threading.Thread):
-                raise TypeError("Cannot add '{}' to ThreadList"
-                                .format(type(item)))
+                raise TypeError(f"Cannot add '{type(item)}' to ThreadList")
 
     def active_count(self):
         """Return the number of alive threads and delete all non-alive ones."""
@@ -214,13 +213,11 @@ class ThreadList(list):
     def append(self, thd):
         """Add a thread to the pool and start it."""
         if not isinstance(thd, threading.Thread):
-            raise TypeError("Cannot append '{}' to ThreadList"
-                            .format(type(thd)))
+            raise TypeError(f"Cannot append '{type(thd)}' to ThreadList")
 
         while self.active_count() >= self.limit:
             time.sleep(self.wait_time)
 
         super().append(thd)
         thd.start()
-        pywikibot.logging.debug("thread {} ('{}') started"
-                                .format(len(self), type(thd)))
+        pywikibot.logging.debug(f"thread {len(self)} ('{type(thd)}') started")

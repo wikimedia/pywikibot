@@ -338,8 +338,8 @@ class EventStreams(GeneratorWrapper):
             try:
                 event = next(self.source)
             except (ProtocolError, OSError, httplib.IncompleteRead) as e:
-                warning('Connection error: {}.\n'
-                        'Try to re-establish connection.'.format(e))
+                warning(
+                    f'Connection error: {e}.\nTry to re-establish connection.')
                 del self.source
                 if event is not None:
                     self.sse_kwargs['last_id'] = event.id
@@ -349,8 +349,7 @@ class EventStreams(GeneratorWrapper):
                     try:
                         element = json.loads(event.data)
                     except ValueError as e:
-                        warning('Could not load json data from\n{}\n{}'
-                                .format(event, e))
+                        warning(f'Could not load json data from\n{event}\n{e}')
                     else:
                         if self.streamfilter(element):
                             n += 1

@@ -213,8 +213,7 @@ def _print_requirements(requirements, script, variant):  # pragma: no cover
           .format('s' if len(requirements) > 1 else ''))
 
     for requirement in requirements:
-        print('    pip install "{}"\n'
-              .format(str(requirement).partition(';')[0]))
+        print(f"    pip install \"{str(requirement).partition(';')[0]}\"\n")
 
 
 def check_modules(script=None):
@@ -476,8 +475,8 @@ def execute():
             try:
                 module = import_module(file_package)
             except ImportError as e:
-                warn('Parent module {} not found: {}'
-                     .format(file_package, e), ImportWarning)
+                warn(f'Parent module {file_package} not found: {e}',
+                     ImportWarning)
 
     help_option = any(arg.startswith('-help:') or arg == '-help'
                       for arg in script_args)

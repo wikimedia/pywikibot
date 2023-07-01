@@ -777,8 +777,8 @@ class DataSite(APISite):
             raise
 
         if 'results' not in data:
-            raise RuntimeError("Unexpected missing 'results' in query data\n{}"
-                               .format(data))
+            raise RuntimeError(
+                f"Unexpected missing 'results' in query data\n{data}")
 
         results = []
         for result_hash in data['results']:

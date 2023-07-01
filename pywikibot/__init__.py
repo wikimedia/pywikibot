@@ -148,8 +148,7 @@ class Coordinate(_WbRepresentation):
         if not self._entity:
             if self.globe not in self.site.globes():
                 raise exceptions.CoordinateGlobeUnknownError(
-                    '{} is not supported in Wikibase yet.'
-                    .format(self.globe))
+                    f'{self.globe} is not supported in Wikibase yet.')
             return self.site.globes()[self.globe]
 
         if isinstance(self._entity, ItemPage):
@@ -435,8 +434,7 @@ class WbTime(_WbRepresentation):
             if site is None:
                 site = Site().data_repository()
                 if site is None:
-                    raise ValueError('Site {} has no data repository'
-                                     .format(Site()))
+                    raise ValueError(f'Site {Site()} has no data repository')
             calendarmodel = site.calendarmodel()
         self.calendarmodel = calendarmodel
         # if precision is given it overwrites the autodetection above
@@ -1014,9 +1012,8 @@ class _WbDataPage(_WbRepresentation):
         :param label: Label describing the data type in error messages.
         """
         if not isinstance(page, Page):
-            raise ValueError(
-                'Page {} must be a pywikibot.Page object not a {}.'
-                .format(page, type(page)))
+            raise ValueError(f'Page {page} must be a pywikibot.Page object '
+                             f'not a {type(page)}.')
 
         # validate page exists
         if not page.exists():
@@ -1304,8 +1301,7 @@ def Site(code: Optional[str] = None,
         fam = fam or _config.family
 
     if not (code and fam):
-        raise ValueError('Missing Site {}'
-                         .format('code' if not code else 'family'))
+        raise ValueError(f"Missing Site {'code' if not code else 'family'}")
 
     if not isinstance(fam, Family):
         fam = Family.load(fam)
@@ -1337,8 +1333,7 @@ def Site(code: Optional[str] = None,
     key = f'{interface.__name__}:{fam}:{code}:{user}'
     if key not in _sites or not isinstance(_sites[key], interface):
         _sites[key] = interface(code=code, fam=fam, user=user)
-        debug("Instantiated {} object '{}'"
-              .format(interface.__name__, _sites[key]))
+        debug(f"Instantiated {interface.__name__} object '{_sites[key]}'")
 
         if _sites[key].code != code:
             warn('Site {} instantiated using different code "{}"'

@@ -525,8 +525,7 @@ class SubEntityCollection(MutableSequence):
             try:
                 index = self._by_key[index]
             except KeyError as e:
-                raise ValueError('No entity with id {} was found'
-                                 .format(index)) from e
+                raise ValueError(f'No entity with id {index} was found') from e
         return self._data[index]
 
     def __setitem__(self, index, value):
@@ -537,8 +536,7 @@ class SubEntityCollection(MutableSequence):
             try:
                 index = self._by_key[index]
             except KeyError as e:
-                raise ValueError('No entity with id {} was found'
-                                 .format(index)) from e
+                raise ValueError(f'No entity with id {index} was found') from e
         obj = self._data[index]
         del self._data[index]
         del self._by_key[obj.id]

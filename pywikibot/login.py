@@ -378,9 +378,8 @@ class ClientLoginManager(LoginManager):
         if hasattr(self, '_waituntil') \
            and datetime.datetime.now() < self._waituntil:
             diff = self._waituntil - datetime.datetime.now()
-            pywikibot.warning(
-                'Too many tries, waiting {} seconds before retrying.'
-                .format(diff.seconds))
+            pywikibot.warning(f'Too many tries, waiting {diff.seconds}'
+                              ' seconds before retrying.')
             pywikibot.sleep(diff.seconds)
 
         self.site._loginstatus = LoginStatus.IN_PROGRESS

@@ -6,7 +6,7 @@
    :class:`tools.collections.GeneratorWrapper`
 """
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -157,13 +157,12 @@ class APIGenerator(APIGeneratorBase, GeneratorWrapper):
         n = 0
         while True:
             self.request[self.continue_name] = offset
-            pywikibot.debug('{}: Request: {}'
-                            .format(type(self).__name__, self.request))
+            pywikibot.debug(f'{type(self).__name__}: Request: {self.request}')
             data = self.request.submit()
 
             n_items = len(data[self.data_name])
-            pywikibot.debug('{}: Retrieved {} items'
-                            .format(type(self).__name__, n_items))
+            pywikibot.debug(
+                f'{type(self).__name__}: Retrieved {n_items} items')
             if n_items > 0:
                 for item in data[self.data_name]:
                     yield item
@@ -561,9 +560,8 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
             else:
                 resultdata = [resultdata[k]
                               for k in sorted(resultdata)]
-        pywikibot.debug('{name} received {keys}; limit={limit}'
-                        .format(name=type(self).__name__, keys=keys,
-                                limit=self.limit))
+        pywikibot.debug(
+            f'{type(self).__name__} received {keys}; limit={self.limit}')
         return resultdata
 
     def _extract_results(self, resultdata):
@@ -811,9 +809,8 @@ class PropertyGenerator(QueryGenerator):
             elif isinstance(v, list):
                 old_dict.setdefault(k, []).extend(v)
             else:
-                raise ValueError(
-                    'continued API result had an unexpected type: {}'
-                    .format(type(v).__name__))
+                raise ValueError(f'continued API result had an unexpected '
+                                 f'type: {type(v).__name__}')
 
 
 class ListGenerator(QueryGenerator):
@@ -878,13 +875,11 @@ def _update_pageid(page, pagedict: dict):
         # Something is wrong.
         if page.site.sametitle(page.title(), pagedict['title']) \
            and 'invalid' in pagedict:
-            raise InvalidTitleError('{}: {}'
-                                    .format(page, pagedict['invalidreason']))
+            raise InvalidTitleError(f"{page}: {pagedict['invalidreason']}")
         if int(pagedict['ns']) < 0:
             raise UnsupportedPageError(page)
-        raise RuntimeError(
-            "Page {} has neither 'pageid' nor 'missing' attribute"
-            .format(pagedict['title']))
+        raise RuntimeError(f"Page {pagedict['title']} has neither 'pageid'"
+                           " nor 'missing' attribute")
 
 
 def _update_contentmodel(page, pagedict: dict) -> None:
@@ -1003,8 +998,7 @@ def update_page(page, pagedict: dict, props=None):
     if 'imageinfo' in pagedict:
         if not isinstance(page, pywikibot.FilePage):
             raise RuntimeError(
-                '"imageinfo" found but {} is not a FilePage object'
-                .format(page))
+                f'"imageinfo" found but {page} is not a FilePage object')
         page._load_file_revisions(pagedict['imageinfo'])
 
     if 'categoryinfo' in pagedict:

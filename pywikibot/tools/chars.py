@@ -18,7 +18,7 @@ from pywikibot.tools._unidata import _category_cf
 # At the moment we've only added the characters from the Cf category
 _invisible_chars = _category_cf
 
-INVISIBLE_REGEX = re.compile('[{}]'.format(''.join(_invisible_chars)))
+INVISIBLE_REGEX = re.compile(f"[{''.join(_invisible_chars)}]")
 
 
 def contains_invisible(text):

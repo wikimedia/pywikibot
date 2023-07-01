@@ -400,8 +400,8 @@ class ParamInfo(Sized, Container):
                 if not name and php_class:
                     name = removeprefix(php_class, 'Api').lower()
                     if name not in ('main', 'pageset'):
-                        pywikibot.warning('Unknown paraminfo module "{}"'
-                                          .format(php_class))
+                        pywikibot.warning(
+                            f'Unknown paraminfo module "{php_class}"')
                         name = '<unknown>:' + php_class
 
                     mod_data['name'] = name
@@ -421,8 +421,7 @@ class ParamInfo(Sized, Container):
                 if path in result_data:
                     # Only warn first time
                     if result_data[path] is not False:
-                        pywikibot.warning('Path "{}" is ambiguous.'
-                                          .format(path))
+                        pywikibot.warning(f'Path "{path}" is ambiguous.')
                     else:
                         pywikibot.log(f'Found another path "{path}"')
                     result_data[path] = False
@@ -499,9 +498,8 @@ class ParamInfo(Sized, Container):
             return None
 
         if len(param_data) != 1:
-            raise RuntimeError(
-                'parameter data length is eiter empty or not unique.\n{}'
-                .format(param_data))
+            raise RuntimeError(f'parameter data length is eiter empty or not '
+                               f'unique.\n{param_data}')
         return param_data[0]
 
     @property

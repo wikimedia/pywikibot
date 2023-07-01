@@ -1,6 +1,6 @@
 """Wrapper around djvulibre to access djvu files properties and content."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -75,9 +75,7 @@ class DjVuFile:
 
     def __repr__(self) -> str:
         """Return a more complete string representation."""
-        return "{}.{}('{}')".format(self.__module__,
-                                    self.__class__.__name__,
-                                    self._filename)
+        return f"{self.__module__}.{type(self).__name__}('{self._filename}')"
 
     def __str__(self) -> str:
         """Return a string representation."""
@@ -223,8 +221,7 @@ class DjVuFile:
         :param force: if True, refresh the cached data
         """
         if not self.has_text(force=force):
-            raise ValueError('Djvu file {} has no text layer.'
-                             .format(self.file))
+            raise ValueError(f'Djvu file {self.file} has no text layer.')
         res, stdoutdata = _call_cmd(['djvutxt', f'--page={n}',
                                      self.file])
         if not res:

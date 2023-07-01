@@ -46,8 +46,7 @@ class User(Page):
             self._isAutoblock = False
         super().__init__(source, title, ns=2)
         if self.namespace() != 2:
-            raise ValueError("'{}' is not in the user namespace!"
-                             .format(self.title()))
+            raise ValueError(f"'{self.title()}' is not in the user namespace!")
         if self._isAutoblock:
             # This user is probably being queried for purpose of lifting
             # an autoblock.
@@ -275,8 +274,7 @@ class User(Page):
             self.site.blockuser(self, *args, **kwargs)
         except APIError as err:
             if err.code == 'invalidrange':
-                raise ValueError('{} is not a valid IP range.'
-                                 .format(self.username))
+                raise ValueError(f'{self.username} is not a valid IP range.')
 
             raise err
 
