@@ -458,8 +458,8 @@ def UserContributionsGenerator(username: str,
 
     user = pywikibot.User(site, username)
     if not (user.isAnonymous() or user.isRegistered()):
-        pywikibot.warning('User "{}" does not exist on site "{}".'
-                          .format(user.username, site))
+        pywikibot.warning(
+            f'User "{user.username}" does not exist on site "{site}".')
 
     gen = (contrib[0] for contrib in user.contributions(
         namespaces=namespaces, total=total))
@@ -875,8 +875,7 @@ class GoogleSearchPageGenerator(GeneratorWrapper):
         """
         # restrict query to local site
         local_query = f'{self.query} site:{self.site.hostname()}'
-        base = 'http://{}{}'.format(self.site.hostname(),
-                                    self.site.articlepath)
+        base = f'http://{self.site.hostname()}{self.site.articlepath}'
         pattern = base.replace('{}', '(.+)')
         for url in self.queryGoogle(local_query):
             m = re.search(pattern, url)

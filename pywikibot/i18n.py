@@ -483,8 +483,7 @@ def _extract_plural(lang: str, message: str, parameters: Mapping[str, int]
                 specific_entries[int(number)] = plural
             else:
                 assert not specific_entries, (
-                    'generic entries defined after specific in "{}"'
-                    .format(variants))
+                    f'generic entries defined after specific in "{variants}"')
                 plural_entries.append(plural)
 
         if num in specific_entries:
@@ -625,8 +624,8 @@ def translate(code: STR_OR_SITE_TYPE,
                 break
         else:
             if fallback is not False:
-                raise KeyError('No fallback key found in lookup dict for "{}"'
-                               .format(code))
+                raise KeyError(
+                    f'No fallback key found in lookup dict for "{code}"')
             trans = None
 
     if trans is None:

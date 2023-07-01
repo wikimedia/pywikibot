@@ -59,8 +59,7 @@ if __name__ == '__main__':  # pragma: no cover
     if sys.platform == 'win32':
         import platform
         import subprocess
-        subprocess.run('title Python {} Shell'
-                       .format(platform.python_version()),
+        subprocess.run(f'title Python {platform.python_version()} Shell',
                        shell=True, check=True)
         del subprocess
         del platform

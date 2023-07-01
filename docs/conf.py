@@ -526,7 +526,7 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
     for index, line in enumerate(lines):
         # highlight the first line
         if index == 0:  # highlight the first line
-            lines[0] = '**{}**'.format(line.strip('.'))
+            lines[0] = f"**{line.strip('.')}**"
 
         # add link for pagegenerators options
         elif line == '&params;':

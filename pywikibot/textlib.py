@@ -173,9 +173,7 @@ def case_escape(case: str, string: str) -> str:
     """
     first = string[0]
     if first.isalpha() and case == 'first-letter':
-        pattern = '[{}{}]{}'.format(first.upper(),
-                                    first.lower(),
-                                    re.escape(string[1:]))
+        pattern = f'[{first.upper()}{first.lower()}]{re.escape(string[1:])}'
     else:
         pattern = re.escape(string)
     return pattern
@@ -889,8 +887,8 @@ def replace_links(text: str, replace, site: 'pywikibot.site.BaseSite') -> str:
         if must_piped:
             new_text = f'[[{new_title}|{new_label}]]'
         else:
-            new_text = '[[{}]]{}'.format(new_label[:len(new_title)],
-                                         new_label[len(new_title):])
+            new_text = (f'[[{new_label[:len(new_title)]}]]'
+                        f'{new_label[len(new_title):]}')
 
         text = text[:start] + new_text + text[end:]
         # Make sure that next time around we will not find this same hit.
@@ -1471,13 +1469,12 @@ def getCategoryLinks(text: str, site=None,
             title, sortKey = rest, None
         try:
             cat = pywikibot.Category(site,
-                                     '{}:{}'.format(match['namespace'], title),
+                                     f"{match['namespace']}:{title}",
                                      sort_key=sortKey)
         except InvalidTitleError:
             # Category title extracted contains invalid characters
             # Likely due to on-the-fly category name creation, see T154309
-            pywikibot.warning('Invalid category title extracted: {}'
-                              .format(title))
+            pywikibot.warning(f'Invalid category title extracted: {title}')
         else:
             result.append(cat)
 

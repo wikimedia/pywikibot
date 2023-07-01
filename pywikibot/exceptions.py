@@ -697,8 +697,8 @@ class NoWikibaseEntityError(WikiBaseError):
 
         :param entity: Wikibase entity
         """
-        super().__init__("Entity '{}' doesn't exist on {}"
-                         .format(entity.id, entity.repo))
+        super().__init__(
+            f"Entity '{entity.id}' doesn't exist on {entity.repo}")
         self.entity = entity
 
 

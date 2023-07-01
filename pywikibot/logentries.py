@@ -1,6 +1,6 @@
 """Objects representing Mediawiki log entries."""
 #
-# (C) Pywikibot team, 2007-2022
+# (C) Pywikibot team, 2007-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -64,13 +64,12 @@ class LogEntry(UserDict):
                     "permission to view it due to '{}'"
                     .format(self['type'], key, hidden_key))
 
-        raise KeyError('Log entry ({}) has no {!r} key'
-                       .format(self['type'], key))
+        raise KeyError(f"Log entry ({self['type']}) has no {key!r} key")
 
     def __repr__(self) -> str:
         """Return a string representation of LogEntry object."""
-        return '<{}({}, logid={})>'.format(type(self).__name__,
-                                           self.site.sitename, self.logid())
+        return (f'<{type(self).__name__}({self.site.sitename}, '
+                f'logid={self.logid()})>')
 
     def __hash__(self) -> int:
         """Combine site and logid as the hash."""

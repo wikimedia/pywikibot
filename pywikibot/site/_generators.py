@@ -1558,8 +1558,7 @@ class GeneratorsMixin:
         :param prop: Requested props to check
         :raises UserRightsError: user cannot view a requested prop
         """
-        err = '{}: User:{} not authorized to view '.format(msg_prefix,
-                                                           self.user())
+        err = f'{msg_prefix}: User:{self.user()} not authorized to view '
         if not self.has_right('deletedhistory'):
             if self.mw_version < '1.34':
                 raise UserRightsError(err + 'deleted revisions.')
@@ -1901,7 +1900,7 @@ class GeneratorsMixin:
         """
         param = self._paraminfo.parameter('query+querypage', 'page')
         assert special_page in param['type'], (
-            '{} not in {}'.format(special_page, param['type']))
+            f"{special_page} not in {param['type']}")
 
         return self._generator(api.PageGenerator,
                                type_arg='querypage', gqppage=special_page,

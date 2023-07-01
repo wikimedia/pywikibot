@@ -1,6 +1,6 @@
 """Objects representing API upload to MediaWiki site."""
 #
-# (C) Pywikibot team, 2009-2022
+# (C) Pywikibot team, 2009-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -181,8 +181,7 @@ class Uploader:
             if os.path.isfile(self.filename):
                 file_size = os.path.getsize(self.filename)
             elif offset is not False:
-                raise ValueError("File '{}' does not exist."
-                                 .format(self.filename))
+                raise ValueError(f"File '{self.filename}' does not exist.")
 
         # Verify the stash when a file key and offset is given:
         # requests the SHA1 and file size uploaded and compares it to
@@ -242,8 +241,8 @@ class Uploader:
 
         data = {}
         if file_key and offset is False or offset == file_size:
-            pywikibot.log('Reused already upload file using filekey "{}"'
-                          .format(file_key))
+            pywikibot.log(
+                f'Reused already upload file using filekey "{file_key}"')
             # TODO: Use sessionkey instead of filekey if necessary
             final_request = self.site._request(
                 parameters={
@@ -270,8 +269,7 @@ class Uploader:
                         'filename': file_page_title, 'comment': self.comment})
                 if chunked_upload:
                     if offset > 0:
-                        pywikibot.log('Continuing upload from byte {}'
-                                      .format(offset))
+                        pywikibot.log(f'Continuing upload from byte {offset}')
                     poll = False
                     while True:
 
@@ -522,5 +520,5 @@ class Uploader:
                     self.filepage._load_file_revisions([result['imageinfo']])
                 return True
 
-            raise Error('Unrecognized result: {}'
-                        .format(data_result or result['result']))
+            raise Error(
+                f"Unrecognized result: {data_result or result['result']}")

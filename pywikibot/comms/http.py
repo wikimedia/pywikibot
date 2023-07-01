@@ -348,8 +348,8 @@ def error_handling_callback(response):
         raise Client414Error(HTTPStatus(response.status_code).description)
 
     if response.status_code == HTTPStatus.GATEWAY_TIMEOUT:
-        raise Server504Error('Server {} timed out'
-                             .format(urlparse(response.url).netloc))
+        raise Server504Error(
+            f'Server {urlparse(response.url).netloc} timed out')
 
     if (not response.ok
             and response.status_code >= HTTPStatus.INTERNAL_SERVER_ERROR):
@@ -436,8 +436,7 @@ def fetch(uri: str, method: str = 'GET', headers: Optional[dict] = None,
     if auth is not None and len(auth) == 4:
         if isinstance(requests_oauthlib, ImportError):
             warn(str(requests_oauthlib), ImportWarning)
-            error('OAuth authentication not supported: {}'
-                  .format(requests_oauthlib))
+            error(f'OAuth authentication not supported: {requests_oauthlib}')
             auth = None
         else:
             auth = requests_oauthlib.OAuth1(*auth)
@@ -532,8 +531,7 @@ def _decide_encoding(response: requests.Response,
         try:
             content.decode(encoding)
         except LookupError:
-            pywikibot.warning('Unknown or invalid encoding {!r}'
-                              .format(encoding))
+            pywikibot.warning(f'Unknown or invalid encoding {encoding!r}')
         except UnicodeDecodeError as e:
             pywikibot.warning(f'{e} found in {content}')
         else:

@@ -1,6 +1,6 @@
 """Diff module."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -168,8 +168,7 @@ class Hunk:
 
         if line_ref is None:
             if color in self.colors:
-                colored_line = '<<{color}>>{}<<default>>'.format(
-                    line, color=self.colors[color])
+                colored_line = f'<<{self.colors[color]}>>{line}<<default>>'
                 return colored_line
             return line
 
@@ -185,8 +184,7 @@ class Hunk:
                         apply_color = self.colors[color]
                     else:
                         apply_color = 'default;' + self.bg_colors[color]
-                    char_tagged = '<<{color}>>{}'.format(char,
-                                                         color=apply_color)
+                    char_tagged = f'<<{apply_color}>>{char}'
                     color_closed = False
             else:
                 if char_ref == ' ':
@@ -442,8 +440,8 @@ class PatchManager:
             answers.append('?')
 
             pywikibot.info(self._generate_diff(super_hunk))
-            choice = pywikibot.input('Accept this hunk [{}]?'.format(
-                ','.join(answers)))
+            choice = pywikibot.input(
+                f"Accept this hunk [{','.join(answers)}]?")
             if choice not in answers:
                 choice = '?'
 

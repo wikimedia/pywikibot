@@ -6,7 +6,7 @@
    its contents.
 """
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -80,8 +80,7 @@ class BaseLink(ComparableMixin):
         assert all(isinstance(item, str) for item in self._items)
 
         attrs = (f'{getattr(self, attr)!r}' for attr in self._items)
-        return 'pywikibot.page.{}({})'.format(type(self).__name__,
-                                              ', '.join(attrs))
+        return f"pywikibot.page.{type(self).__name__}({', '.join(attrs)})"
 
     def lookup_namespace(self):
         """
@@ -105,9 +104,8 @@ class BaseLink(ComparableMixin):
                 ns = self.site.namespaces[default_nskey]
             return ns
 
-        raise TypeError(
-            'Invalid type "{}" for Page._nskey. Must be int or str.'
-            .format(type(self._nskey)))
+        raise TypeError(f'Invalid type "{type(self._nskey)}" for Page._nskey.'
+                        ' Must be int or str.')
 
     @property
     def site(self):
@@ -135,8 +133,7 @@ class BaseLink(ComparableMixin):
         """Return full page title, including localized namespace."""
         # Avoid that ':' will be added to the title for Main ns.
         if self.namespace != Namespace.MAIN:
-            return '{}:{}'.format(self.site.namespace(self.namespace),
-                                  self.title)
+            return f'{self.site.namespace(self.namespace)}:{self.title}'
         return self.title
 
     def ns_title(self, onsite=None):
@@ -454,8 +451,7 @@ class Link(BaseLink):
         # Reject illegal characters.
         m = Link.illegal_titles_pattern.search(t)
         if m:
-            raise InvalidTitleError('{!r} contains illegal char(s) {!r}'
-                                    .format(t, m.group(0)))
+            raise InvalidTitleError(f'{t!r} contains illegal char(s) {m[0]!r}')
 
         # Pages with "/./" or "/../" appearing in the URLs will
         # often be unreachable due to the way web browsers deal
@@ -467,13 +463,11 @@ class Link(BaseLink):
                          or '/../' in t
                          or t.endswith(('/.', '/..'))):
             raise InvalidTitleError(
-                "(contains . / combinations): '{}'"
-                .format(self._text))
+                f"(contains . / combinations): '{self._text}'")
 
         # Magic tilde sequences? Nu-uh!
         if '~~~' in t:
-            raise InvalidTitleError("(contains ~~~): '{}'"
-                                    .format(self._text))
+            raise InvalidTitleError(f"(contains ~~~): '{self._text}'")
 
         if self._namespace != -1 and len(t) > 255:
             raise InvalidTitleError(f"(over 255 bytes): '{t}'")
@@ -482,8 +476,7 @@ class Link(BaseLink):
         # with a fragment identifier.
         if not t.strip(' ') and not self._is_interwiki:  # T197642
             raise InvalidTitleError(
-                'The link [[{}]] does not contain a page title'
-                .format(self._text))
+                f'The link [[{self._text}]] does not contain a page title')
 
         # MediaWiki uses uppercase IP addresses
         if self._namespace in (2, 3) and is_ip_address(t):
@@ -550,7 +543,7 @@ class Link(BaseLink):
             onsite = self._source
         text = super().astext(onsite)
         if self.section:
-            text = '{}#{}]]'.format(text.rstrip(']'), self.section)
+            text = f"{text.rstrip(']')}#{self.section}]]"
 
         return text
 

@@ -107,8 +107,7 @@ def getversiondict() -> Dict[str, str]:
 
     # Git and SVN can silently fail, as it may be a nightly.
     if exceptions:
-        pywikibot.debug('version algorithm exceptions:\n{!r}'
-                        .format(exceptions))
+        pywikibot.debug(f'version algorithm exceptions:\n{exceptions!r}')
 
     if isinstance(date, str):
         datestring = date
@@ -252,7 +251,7 @@ def getversion_git(path=None):
         e = tag.find('\n', s)
         tag = tag[(s + 6):e]
         t = tag.strip().split('/')
-        tag = '[{}] {}'.format(t[0][:-1], '-'.join(t[3:]))
+        tag = f"[{t[0][:-1]}] {'-'.join(t[3:])}"
     dp = subprocess.Popen([cmd, '--no-pager',
                            'log', '-1',
                            '--pretty=format:"%ad|%an|%h|%H|%d"',

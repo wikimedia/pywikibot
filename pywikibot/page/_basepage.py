@@ -1324,8 +1324,8 @@ class BasePage(ComparableMixin):
             return summary
 
         old = self.text
-        pywikibot.log('Cosmetic changes for {}-{} enabled.'
-                      .format(family, self.site.lang))
+        pywikibot.log(
+            f'Cosmetic changes for {family}-{self.site.lang} enabled.')
         # cc depends on page directly and via several other imports
         cc_toolkit = CosmeticChangesToolkit(self, ignore=CANCEL.MATCH)
         self.text = cc_toolkit.change(old)
@@ -1896,8 +1896,8 @@ class BasePage(ComparableMixin):
             answer = 'y'
         else:
             answer = pywikibot.input_choice(
-                "Can't delete {}; do you want to mark it for deletion instead?"
-                .format(self),
+                f"Can't delete {self};"
+                ' do you want to mark it for deletion instead?',
                 [('Yes', 'y'), ('No', 'n'), ('All', 'a')],
                 'n', automatic_quit=False)
             if answer == 'a':
@@ -1980,8 +1980,7 @@ class BasePage(ComparableMixin):
             self.loadDeletedRevisions()
         if timestamp not in self._deletedRevs:
             raise ValueError(
-                'Timestamp {} is not a deleted revision'
-                .format(timestamp))
+                f'Timestamp {timestamp} is not a deleted revision')
         self._deletedRevs[timestamp]['marked'] = undelete
 
     def undelete(self, reason: Optional[str] = None) -> None:
@@ -2106,8 +2105,8 @@ class BasePage(ComparableMixin):
 
         if old_cat not in cats:
             if self.namespace() != 10:
-                pywikibot.error('{} is not in category {}!'
-                                .format(self, old_cat.title()))
+                pywikibot.error(
+                    f'{self} is not in category {old_cat.title()}!')
             else:
                 pywikibot.info('{} is not in category {}, skipping...'
                                .format(self, old_cat.title()))

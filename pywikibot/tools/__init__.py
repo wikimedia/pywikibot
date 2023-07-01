@@ -646,8 +646,8 @@ def open_archive(filename: str, mode: str = 'rb', use_extension: bool = True):
                                        stderr=subprocess.PIPE,
                                        bufsize=65535)
         except OSError:
-            raise ValueError('7za is not installed or cannot uncompress "{}"'
-                             .format(filename))
+            raise ValueError(
+                f'7za is not installed or cannot uncompress "{filename}"')
 
         stderr = process.stderr.read()
         process.stderr.close()

@@ -1,6 +1,6 @@
 """GeneratorFactory module wich handles pagegenerators options."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -328,8 +328,7 @@ class GeneratorFactory:
         # Part before ":" might be interpreted as an interwiki prefix
         prefix = category.split(':', 1)[0]  # whole word if ":" not present
         if prefix not in self.site.namespaces[14]:
-            category = '{}:{}'.format(
-                self.site.namespace(14), category)
+            category = f'{self.site.namespace(14)}:{category}'
         cat = pywikibot.Category(pywikibot.Link(category,
                                                 source=self.site,
                                                 default_namespace=14))
@@ -835,8 +834,8 @@ class GeneratorFactory:
                 '{}: {}'.format(*i)
                 for i in self.site.proofread_levels.items()]
             valid_ql = ', '.join(valid_ql_list)
-            pywikibot.warning('Acceptable values for -ql are:\n    {}'
-                              .format(valid_ql))
+            pywikibot.warning(
+                f'Acceptable values for -ql are:\n    {valid_ql}')
         self.qualityfilter_list = int_values
         return True
 

@@ -1,6 +1,6 @@
 """Object representing a MediaWiki category page."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -28,8 +28,8 @@ class Category(Page):
         self.sortKey = sort_key
         super().__init__(source, title, ns=14)
         if self.namespace() != 14:
-            raise ValueError("'{}' is not in the category namespace!"
-                             .format(self.title()))
+            raise ValueError(
+                f"'{self.title()}' is not in the category namespace!")
 
     def aslink(self, sort_key: Optional[str] = None) -> str:
         """Return a link to place a page in this Category.

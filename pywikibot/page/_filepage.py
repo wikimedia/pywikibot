@@ -43,16 +43,15 @@ class FilePage(Page):
         self._file_revisions = {}  # dictionary to cache File history.
         super().__init__(source, title, 6)
         if self.namespace() != 6:
-            raise ValueError("'{}' is not in the file namespace!"
-                             .format(self.title()))
+            raise ValueError(f"'{self.title()}' is not in the file namespace!")
 
     def _load_file_revisions(self, imageinfo) -> None:
         for file_rev in imageinfo:
             # filemissing in API response indicates most fields are missing
             # see https://gerrit.wikimedia.org/r/c/mediawiki/core/+/533482/
             if 'filemissing' in file_rev:
-                pywikibot.warning("File '{}' contains missing revisions"
-                                  .format(self.title()))
+                pywikibot.warning(
+                    f"File '{self.title()}' contains missing revisions")
                 continue
             file_revision = FileInfo(file_rev)
             self._file_revisions[file_revision.timestamp] = file_revision
