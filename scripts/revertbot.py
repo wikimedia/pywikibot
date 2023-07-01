@@ -35,7 +35,7 @@ and override its `callback` method. Here is a sample:
 
 """
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -82,11 +82,11 @@ class BaseRevertBot(OptionHandler):
             if callback(item):
                 result = self.revert(item)
                 if result:
-                    pywikibot.info('{}: {}'.format(item['title'], result))
+                    pywikibot.info(f"{item['title']}: {result}")
                 else:
-                    pywikibot.info('Skipped {}'.format(item['title']))
+                    pywikibot.info(f"Skipped {item['title']}")
             else:
-                pywikibot.info('Skipped {} by callback'.format(item['title']))
+                pywikibot.info(f"Skipped {item['title']} by callback")
 
     @staticmethod
     def callback(item: Container) -> bool:
@@ -141,8 +141,8 @@ class BaseRevertBot(OptionHandler):
         except Error:
             pass
         else:
-            return 'The edit(s) made in {} by {} was rollbacked'.format(
-                page.title(), self.user)
+            return (f'The edit(s) made in {page.title()} by {self.user}'
+                    ' was rollbacked')
 
         pywikibot.exception(exc_info=False)
         return False

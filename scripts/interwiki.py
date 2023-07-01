@@ -760,9 +760,8 @@ class Subject(interwiki_graph.Subject):
         # Bug-check: Isn't there any work still in progress? We can't work on
         # different sites at a time!
         if self.pending:
-            raise RuntimeError(
-                "BUG: Can't start to work on {}; still working on {}"
-                .format(site, self.pending))
+            raise RuntimeError(f"BUG: Can't start to work on {site}; still "
+                               f'working on {self.pending}')
         # Prepare a list of suitable pages
         result = []
         for page in self.todo.filter(site):
@@ -890,8 +889,7 @@ class Subject(interwiki_graph.Subject):
                             self.addIfNew(alternativePage, counter, None)
                 else:
                     pywikibot.info(
-                        'NOTE: ignoring {} and its interwiki links'
-                        .format(linkedPage))
+                        f'NOTE: ignoring {linkedPage} and its interwiki links')
                 return True
 
         # same namespaces, no problem
@@ -1014,8 +1012,7 @@ class Subject(interwiki_graph.Subject):
 
     def reportInterwikilessPage(self, page) -> None:
         """Report interwikiless page."""
-        self.conf.note('{} does not have any interwiki links'
-                       .format(self.origin))
+        self.conf.note(f'{self.origin} does not have any interwiki links')
         if config.without_interwiki:
             with codecs.open(
                     pywikibot.config.datafilepath('without_interwiki.txt'),
@@ -1077,8 +1074,7 @@ class Subject(interwiki_graph.Subject):
         else:
             return False
 
-        self.conf.note('{} is {}redirect to {}'
-                       .format(page, redir, redirect_target))
+        self.conf.note(f'{page} is {redir}redirect to {redirect_target}')
         if self.origin is None or page == self.origin:
             # the 1st existig page becomes the origin page, if none was
             # supplied
@@ -1200,8 +1196,8 @@ class Subject(interwiki_graph.Subject):
                         filename = interwiki_graph.getFilename(
                             self.origin,
                             extension=config.interwiki_graph_formats[0])
-                        f.write(' [{}{} graph]'
-                                .format(config.interwiki_graph_url, filename))
+                        f.write(
+                            f' [{config.interwiki_graph_url}{filename} graph]')
                     f.write('\n')
             # FIXME: What errors are we catching here?
             except Exception:
@@ -1236,9 +1232,8 @@ class Subject(interwiki_graph.Subject):
                         break
                 else:
                     if config.interwiki_shownew:
-                        pywikibot.info(
-                            '{}: {} gives new interwiki {}'
-                            .format(self.origin, page, linkedPage))
+                        pywikibot.info(f'{self.origin}: {page} gives new '
+                                       f'interwiki {linkedPage}')
             if self.forcedStop:
                 break
 
@@ -1622,8 +1617,7 @@ class Subject(interwiki_graph.Subject):
             self.conf.note(f'No changes needed on page {page}')
             return False
 
-        pywikibot.info('<<lightpurple>>Updating links on page {}.'
-                       .format(page))
+        pywikibot.info(f'<<lightpurple>>Updating links on page {page}.')
         pywikibot.info(f'Changes to be made: {mods}')
         oldtext = page.get()
         template = (page.namespace() == 10)
@@ -1758,8 +1752,7 @@ class Subject(interwiki_graph.Subject):
                 linkedPages = {pywikibot.Page(link)
                                for link in page.iterlanglinks()}
             except NoPageError:
-                pywikibot.warning('Page {} does no longer exist?!'
-                                  .format(page))
+                pywikibot.warning(f'Page {page} does no longer exist?!')
                 break
 
             # To speed things up, create a dictionary which maps sites
@@ -1876,8 +1869,7 @@ class InterwikiBot:
                         del tmpl
                     if loc is not None and loc in page.title():
                         pywikibot.info(
-                            'Skipping: {} is a templates subpage'
-                            .format(page.title()))
+                            f'Skipping: {page.title()} is a templates subpage')
                         continue
                 break
             else:  # generator stopped

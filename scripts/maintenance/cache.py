@@ -143,12 +143,11 @@ class CacheEntry(api.CachedRequest):
         end = self.key.index(')')
 
         if not end:
-            raise ParseError('End of Site() keyword not found: {}'
-                             .format(self.key))
+            raise ParseError(f'End of Site() keyword not found: {self.key}')
 
         if 'Site' not in self.key[0:start]:
-            raise ParseError('Site() keyword not found at start of key: {}'
-                             .format(self.key))
+            raise ParseError(
+                f'Site() keyword not found at start of key: {self.key}')
 
         site = self.key[0:end + 1]
         if site[0:5] == 'Site(':
@@ -171,20 +170,20 @@ class CacheEntry(api.CachedRequest):
 
             end = self.key.index(')', start + 5)
             if not end:
-                raise ParseError('End of User() keyword not found: {}'
-                                 .format(self.key))
+                raise ParseError(
+                    f'End of User() keyword not found: {self.key}')
             username = self.key[start:end]
         elif self.key[start:start + 12] == 'LoginStatus(':
             end = self.key.index(')', start + 12)
             if not end:
-                raise ParseError('End of LoginStatus() keyword not found: {}'
-                                 .format(self.key))
+                raise ParseError(
+                    f'End of LoginStatus() keyword not found: {self.key}')
             login_status = self.key[start:end + 1]
         # If the key does not contain User(..) or LoginStatus(..),
         # it must be the old key format which only contains Site and params
         elif self.key[start:start + 3] != "[('":
-            raise ParseError('Keyword after Site not recognised: {}...'
-                             .format(self.key))
+            raise ParseError(
+                f'Keyword after Site not recognised: {self.key}...')
 
         start = end + 1
 
@@ -292,8 +291,8 @@ def process_entries(cache_path, func, use_accesstime: Optional[bool] = None,
         try:
             entry.parse_key()
         except ParseError as e:
-            pywikibot.error('Problems parsing {} with key {}'
-                            .format(entry.filename, entry.key))
+            pywikibot.error(
+                f'Problems parsing {entry.filename} with key {entry.key}')
             pywikibot.error(e)
             continue
 
@@ -405,7 +404,7 @@ def parameters(entry):
     """Return a pretty formatted parameters list."""
     lines = ''
     for key, items in sorted(entry._params.items()):
-        lines += '{}={}\n'.format(key, ', '.join(items))
+        lines += f"{key}={', '.join(items)}\n"
     return lines
 
 

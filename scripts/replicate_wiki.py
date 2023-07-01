@@ -153,8 +153,8 @@ class SyncSites:
         for site in self.sites:
             sync_overview_page = Page(site,
                                       f'User:{site.user()}/sync.py overview')
-            output = '== {} ==\n\n'.format(
-                twtranslate(site, 'replicate_wiki-headline'))
+            output = (
+                f"== {twtranslate(site, 'replicate_wiki-headline')} ==\n\n")
             if self.differences[site]:
                 output += ''.join(f'* [[:{page_title}]]\n'
                                   for page_title in self.differences[site])
@@ -164,7 +164,7 @@ class SyncSites:
             output += '\n\n== {} ==\n\n'.format(
                 twtranslate(site, 'replicate_wiki-missing-users'))
             if self.user_diff[site]:
-                output += ''.join('* {}\n'.format(user_name.replace('_', ' '))
+                output += ''.join(f"* {user_name.replace('_', ' ')}\n"
                                   for user_name in self.user_diff[site])
             else:
                 output += twtranslate(site, 'replicate_wiki-same-users')

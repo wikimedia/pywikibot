@@ -352,8 +352,8 @@ class History:
             self.site = site
         self.semaphore = threading.Semaphore()
         self.datfilename = pywikibot.config.datafilepath(
-            'deadlinks', 'deadlinks-{}-{}.dat'.format(self.site.family.name,
-                                                      self.site.code))
+            'deadlinks',
+            f'deadlinks-{self.site.family.name}-{self.site.code}.dat')
         # Count the number of logged links, so that we can insert captions
         # from time to time
         self.log_count = 0
@@ -373,8 +373,7 @@ class History:
         for (page_title, date, error) in self.history_dict[url]:
             # ISO 8601 formulation
             iso_date = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(date))
-            error_report += '** In [[{}]] on {}, {}\n'.format(
-                page_title, iso_date, error)
+            error_report += f'** In [[{page_title}]] on {iso_date}, {error}\n'
         pywikibot.info('** Logging link for deletion.')
         txtfilename = pywikibot.config.datafilepath('deadlinks',
                                                     'results-{}-{}.txt'
@@ -385,8 +384,7 @@ class History:
             self.log_count += 1
             if self.log_count % 30 == 0:
                 # insert a caption
-                txtfile.write('=== {} ===\n'
-                              .format(containing_page.title()[:3]))
+                txtfile.write(f'=== {containing_page.title()[:3]} ===\n')
             txtfile.write(error_report)
 
         if self.report_thread and not containing_page.isTalkPage():
@@ -413,8 +411,7 @@ class History:
                         archive_url = get_archive_url(url)
                     except Exception as e:
                         pywikibot.warning(
-                            'get_closest_memento_url({}) failed: {}'.format(
-                                url, e))
+                            f'get_closest_memento_url({url}) failed: {e}')
                         archive_url = None
                     self.log(url, error, page, archive_url)
             else:
@@ -513,8 +510,8 @@ class DeadLinkReportThread(threading.Thread):
                 count = ''
                 # Check if there is already such a caption on
                 # the talk page.
-                while re.search('= *{}{} *='
-                                .format(caption, count), content) is not None:
+                while re.search(
+                        f'= *{caption}{count} *=', content) is not None:
                     i += 1
                     count = ' ' + str(i)
                 caption += count
@@ -602,8 +599,8 @@ class WeblinkCheckerRobot(SingleSiteBot, ExistingPageBot):
 
         num = self.count_link_check_threads()
         if num:
-            pywikibot.info('<<yellow>>>Remaining {} threads will be killed.'
-                           .format(num))
+            pywikibot.info(
+                f'<<yellow>>>Remaining {num} threads will be killed.')
 
         if self.history.report_thread:
             self.history.report_thread.shutdown()

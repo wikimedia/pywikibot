@@ -38,7 +38,7 @@ For example to go through all categories:
 # *Found one template. Add this template
 # *Found more templates. Ask the user <- still have to implement this
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -317,10 +317,10 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
             commonscatLink = self.find_commons_category(page)
             if commonscatLink:
                 if commonscatLink == page.title():
-                    text_to_add = '{{%s}}' % primaryCommonscat
+                    text_to_add = f'{{{{{primaryCommonscat}}}}}'
                 else:
-                    text_to_add = '{{{{{}|{}}}}}'.format(primaryCommonscat,
-                                                         commonscatLink)
+                    text_to_add = (
+                        f'{{{{{primaryCommonscat}|{commonscatLink}}}}}')
                 summary = self.opt.summary or i18n.twtranslate(
                     page.site, 'add_text-adding', {'adding': text_to_add})
                 self.put_current(add_text(page.text, text_to_add),
@@ -346,8 +346,7 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
         if linktitle and newcat != page.title(with_ns=False):
             newtext = re.sub(r'(?i)\{\{%s\|?[^{}]*(?:\{\{.*\}\})?\}\}'
                              % oldtemplate,
-                             '{{{{{}|{}|{}}}}}'.format(newtemplate, newcat,
-                                                       linktitle),
+                             f'{{{{{newtemplate}|{newcat}|{linktitle}}}}}',
                              page.get())
         elif newcat == page.title(with_ns=False):
             newtext = re.sub(r'(?i)\{\{%s\|?[^{}]*(?:\{\{.*\}\})?\}\}'

@@ -143,8 +143,7 @@ def main(*args: str) -> None:
                 coord_args[0], coord_args[1], precision=precision)
         else:
             raise NotImplementedError(
-                '{} datatype is not yet supported by claimit.py'
-                .format(claim.type))
+                f'{claim.type} datatype is not yet supported by claimit.py')
         claim.setTarget(target)
         claims.append(claim)
 

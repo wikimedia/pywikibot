@@ -22,7 +22,7 @@ it just to the first so many bytes.
 .. note:: This script currently only works for the Wikipedia project.
 """
 #
-# (C) Pywikibot team, 2007-2022
+# (C) Pywikibot team, 2007-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -331,8 +331,7 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
             self.csd_cat = self.site.page_from_repository(self.csd_cat_item)
             if self.csd_cat is None:
                 raise Error(
-                    'No category for speedy deletion found for {}'
-                    .format(self.site))
+                    f'No category for speedy deletion found for {self.site}')
         else:
             self.csd_cat = pywikibot.Category(self.site, csd_cat)
         self.saved_progress = None
@@ -373,8 +372,8 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
     def get_reason_for_deletion(self, page):
         """Get a reason for speedy deletion from operator."""
         suggested_reason = self.guess_reason_for_deletion(page)
-        pywikibot.info('The suggested reason is: <<lightred>>{}'
-                       .format(suggested_reason))
+        pywikibot.info(
+            f'The suggested reason is: <<lightred>>{suggested_reason}')
 
         # We don't use i18n.translate() here because for some languages the
         # entry is intentionally left out.
@@ -428,7 +427,7 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
         """Process one page."""
         page = self.current_page
 
-        color_line = '<<blue>>{}<<default>>'.format('_' * 80)
+        color_line = f"<<blue>>{'_' * 80}<<default>>"
         pywikibot.info(color_line)
         pywikibot.info(page.extract('wiki', lines=self.LINES))
         pywikibot.info(color_line)

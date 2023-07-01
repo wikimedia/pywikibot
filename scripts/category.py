@@ -427,8 +427,8 @@ class CategoryDatabase:
         elif not os.path.isabs(filename):
             filename = config.datafilepath(filename)
         if self.is_loaded and (self.cat_content_db or self.superclass_db):
-            pywikibot.info('Dumping to {}, please wait...'
-                           .format(config.shortpath(filename)))
+            pywikibot.info(
+                f'Dumping to {config.shortpath(filename)}, please wait...')
             databases = {
                 'cat_content_db': self.cat_content_db,
                 'superclass_db': self.superclass_db
@@ -952,8 +952,7 @@ class CategoryMoveRobot(CategoryPreprocess):
         history = self.oldcat.getVersionHistoryTable()
         title = i18n.twtranslate(self.site, 'category-section-title',
                                  {'oldcat': self.oldcat.title()})
-        self.newtalk.text = '{}\n== {} ==\n{}'.format(self.newtalk.text,
-                                                      title, history)
+        self.newtalk.text = f'{self.newtalk.text}\n== {title} ==\n{history}'
         comment = i18n.twtranslate(self.site, 'category-version-history',
                                    {'oldcat': self.oldcat.title()})
         self.newtalk.save(comment)
@@ -1007,8 +1006,8 @@ class CategoryListifyRobot:
     def run(self) -> None:
         """Start bot."""
         if self.list.exists() and not (self.append or self.overwrite):
-            pywikibot.info('Page {} already exists, aborting.\n'
-                           .format(self.list.title()))
+            pywikibot.info(
+                f'Page {self.list.title()} already exists, aborting.\n')
             pywikibot.info(fill(
                 'Use -append option to append the list to the output page or '
                 '-overwrite option to overwrite the output page.'))
@@ -1025,8 +1024,8 @@ class CategoryListifyRobot:
             list_string += '{} {}'.format(
                 self.prefix, article.title(as_link=True, textlink=textlink))
             if self.talk_pages and not article.isTalkPage():
-                list_string += ' -- [[{}|talk]]'.format(
-                    article.toggleTalkPage().title())
+                list_string += (
+                    f' -- [[{article.toggleTalkPage().title()}|talk]]')
             list_string += '\n'
 
         if self.list.text and self.append:
@@ -1160,19 +1159,16 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
                                          .format(prefix, index % i, cat,
                                                  index % i2, cat_list[i2]))
                         else:
-                            lines.append('[{}{}] {}'.format(
-                                prefix, index % i, cat))
+                            lines.append(f'[{prefix}{index % i}] {cat}')
                     else:
-                        lines.append('[{}{}] {}'.format(
-                            prefix, index % i, cat))
+                        lines.append(f'[{prefix}{index % i}] {cat}')
 
                 # output the result
                 for line in lines:
                     pywikibot.info(line)
 
         # show the title of the page where the link was found.
-        pywikibot.info('\n>>> <<lightpurple>>{}<<default>> <<<'
-                       .format(member.title()))
+        pywikibot.info(f'\n>>> <<lightpurple>>{member.title()}<<default>> <<<')
 
         # determine a reasonable amount of context.
         try:
@@ -1360,7 +1356,7 @@ class CategoryTreeRobot:
         if current_depth > 0:
             result += ' '
         result += cat.title(as_link=True, textlink=True, with_ns=False)
-        result += ' ({})'.format(int(cat.categoryinfo['pages']))
+        result += f" ({int(cat.categoryinfo['pages'])})"
         if current_depth < self.max_depth // 2:
             # noisy dots
             pywikibot.info('.', newline=False)

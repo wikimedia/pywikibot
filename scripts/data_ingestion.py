@@ -191,8 +191,7 @@ class Photo(pywikibot.FilePage):
         for key in sorted(params.keys()):
             value = params[key]
             if not key.startswith('_'):
-                description += '|{}={}\n'.format(
-                    key, self._safe_template_value(value))
+                description += f'|{key}={self._safe_template_value(value)}\n'
         description += '}}'
 
         return description

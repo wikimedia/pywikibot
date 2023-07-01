@@ -187,8 +187,7 @@ class TemplateRobot(ReplaceBot):
             else:
                 template = pywikibot.Page(self.site, new, ns=10)
                 if not template.exists():
-                    pywikibot.warning('Template "{}" does not exist.'
-                                      .format(new))
+                    pywikibot.warning(f'Template "{new}" does not exist.')
                     if not pywikibot.input_yn('Do you want to proceed anyway?',
                                               default=False,
                                               automatic_quit=False):

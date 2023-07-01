@@ -132,9 +132,8 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
             if lang != '':
                 tmp_page = pywikibot.Page(page.site, lang, ns=10)
                 if tmp_page not in self.lang_tmps:
-                    pywikibot.warning(
-                        '"{lang}" is not a valid language template on {site}'
-                        .format(lang=lang, site=page.site))
+                    pywikibot.warning(f'{lang!r} is not a valid language '
+                                      f'template on {page.site}')
                 new = mwparserfromhell.nodes.template.Template(lang, [value])
                 self.replace_value(desc, new)
                 edited = True

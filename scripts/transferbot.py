@@ -149,9 +149,7 @@ def main(*args: str) -> None:
 
         if not page.exists():
             pywikibot.warning(
-                "Page {} doesn't exist".format(
-                    page.title(as_link=True)
-                )
+                f"Page {page.title(as_link=True)} doesn't exist"
             )
             continue
 

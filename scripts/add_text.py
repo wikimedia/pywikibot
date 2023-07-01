@@ -130,8 +130,7 @@ class AddTextBot(AutomaticTWSummaryBot, ExistingPageBot):
         """Skip if -exceptUrl matches or page does not exists."""
         if page.exists():
             if self.opt.createonly:
-                pywikibot.warning('Skipping because {page} already exists'
-                                  .format(page=page))
+                pywikibot.warning(f'Skipping because {page} already exists')
                 return True
 
             if self.opt.regex_skip_url:
@@ -141,8 +140,8 @@ class AddTextBot(AutomaticTWSummaryBot, ExistingPageBot):
 
                 if result:
                     pywikibot.warning(
-                        'Skipping {page} because -excepturl matches {result}.'
-                        .format(page=page, result=result))
+                        f'Skipping {page} because -excepturl matches {result}.'
+                    )
                     return True
 
         elif page.isTalkPage():

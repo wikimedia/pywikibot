@@ -340,8 +340,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         handler = getattr(self, 'handle_'
                           + ppage.type.lower().replace('-', '_'), None)
         if not handler:
-            pywikibot.info('{} is not a supported datatype.'
-                           .format(ppage.type))
+            pywikibot.info(f'{ppage.type} is not a supported datatype.')
             return
 
         exists_arg = set(self._get_option_with_fallback(options, 'exists'))
@@ -399,9 +398,8 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
             return
 
         if not self._get_option_with_fallback(options, 'islink'):
-            pywikibot.info(
-                '{} field {} value "{}" is not a wikilink. Skipping.'
-                .format(prop, field, value))
+            pywikibot.info(f'{prop} field {field} value "{value}" is not a'
+                           'wikilink. Skipping.')
             return
 
         linked_item = self.template_link_target(item, site, value)

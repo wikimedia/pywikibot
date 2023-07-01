@@ -191,9 +191,8 @@ class RedirectGenerator(OptionHandler):
                 if target_link and target_link.title:
                     source = pywikibot.Link(entry.title, self.site)
                     if target_link.anchor:
-                        pywikibot.info(
-                            'HINT: {} is a redirect with a pipelink.'
-                            .format(entry.title))
+                        pywikibot.info(f'HINT: {entry.title} is a redirect'
+                                       ' with a pipelink.')
                     redict[space_to_underscore(source)] = (
                         space_to_underscore(target_link))
         return redict, pageTitles
@@ -406,8 +405,7 @@ class RedirectRobot(ExistingPageBot):
         elif action == 'both':
             self.treat_page = self.fix_double_or_delete_broken_redirect
         else:
-            raise NotImplementedError('No valid action "{}" found.'
-                                      .format(action))
+            raise NotImplementedError(f'No valid action "{action}" found.')
 
     def get_sd_template(self, site=None) -> Optional[str]:
         """Look for speedy deletion template and return it.

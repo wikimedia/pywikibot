@@ -659,8 +659,8 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
 
         if self.isTitleExcepted(page.title()):
             pywikibot.warning(
-                'Skipping {} because the title is on the exceptions list.'
-                .format(page))
+                f'Skipping {page} because the title is on the exceptions list.'
+            )
             return True
 
         if not page.has_permission():
@@ -738,8 +738,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                 try:
                     original_text = page.get(get_redirect=True, force=True)
                 except NoPageError:
-                    pywikibot.info('Page {} has been deleted.'
-                                   .format(page.title()))
+                    pywikibot.info(f'Page {page.title()} has been deleted.')
                     break
                 new_text = original_text
                 last_text = None
@@ -871,13 +870,13 @@ def handle_sql(sql: str,
         else:
             except_clause = ''
 
-        sql = """
+        sql = f"""
 SELECT page_namespace, page_title
 FROM page
 JOIN text ON (page_id = old_id)
-{}
-{}
-LIMIT 200""".format(where_clause, except_clause)
+{where_clause}
+{except_clause}
+LIMIT 200"""
 
     return pagegenerators.MySQLPageGenerator(sql)
 

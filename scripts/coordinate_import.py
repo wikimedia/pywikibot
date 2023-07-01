@@ -142,8 +142,8 @@ class CoordImportRobot(ConfigParserBot, WikidataBot):
         source = self.getSource(page.site)
         if source:
             newclaim.addSource(source)
-        pywikibot.info('Adding {}, {} to {}'.format(
-            coordinate.lat, coordinate.lon, item.title()))
+        pywikibot.info(
+            f'Adding {coordinate.lat}, {coordinate.lon} to {item.title()}')
         # todo: handle exceptions using self.user_add_claim
         try:
             item.addClaim(newclaim)

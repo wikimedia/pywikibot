@@ -638,9 +638,8 @@ class NoReferencesBot(AutomaticTWSummaryBot, SingleSiteBot, ExistingPageBot):
                             .format(section))
                         index = match.end()
                     else:
-                        pywikibot.info(
-                            'Adding references section before {} section...\n'
-                            .format(section))
+                        pywikibot.info(f'Adding references section before '
+                                       f'{section} section...\n')
                         index = match.start()
                         ident = match['ident']
                         return self.createReferenceSection(oldText, index,

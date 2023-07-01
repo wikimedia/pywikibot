@@ -82,8 +82,7 @@ class i18nBot:  # noqa: N801
             for msg in sorted(self.messages.values()):
                 label = f'{self.scriptname}-{msg}'
                 if label in self.dict[code]:
-                    print("        '{}': '{}',"
-                          .format(label, self.dict[code][label]))
+                    print(f"        '{label}': '{self.dict[code][label]}',")
             print('    },')
         print('};')
 
@@ -99,9 +98,8 @@ class i18nBot:  # noqa: N801
             if code == 'qqq':
                 if code not in self.dict:
                     self.dict[code] = {}
-                self.dict[code][label] = (
-                    'Edit summary for message {} of {} report'
-                    .format(newmsg, self.scriptname))
+                self.dict[code][label] = (f'Edit summary for message {newmsg} '
+                                          f'of {self.scriptname} report')
             elif code != 'commons':
                 if code not in self.dict:
                     self.dict[code] = {}

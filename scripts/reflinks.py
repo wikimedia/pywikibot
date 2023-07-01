@@ -42,7 +42,7 @@ The following generators and filters are supported:
 
 &params;
 """
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -484,8 +484,8 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
     @staticmethod
     def httpError(err_num, link, pagetitleaslink) -> None:
         """Log HTTP Error."""
-        pywikibot.stdout('HTTP error ({}) for {} on {}'
-                         .format(err_num, link, pagetitleaslink))
+        pywikibot.stdout(
+            f'HTTP error ({err_num}) for {link} on {pagetitleaslink}')
 
     @staticmethod
     def getPDFTitle(ref, response) -> None:
@@ -542,7 +542,7 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
             return True
 
         if not page.has_permission():
-            pywikibot.warning("You can't edit page {page}" .format(page=page))
+            pywikibot.warning(f"You can't edit page {page}")
             return True
 
         return False

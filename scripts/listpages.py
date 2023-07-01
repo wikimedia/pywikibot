@@ -228,8 +228,7 @@ class ListPagesBot(AutomaticTWSummaryBot, SingleSiteBot):
                                                          base_dir))
 
             if not os.path.exists(base_dir):
-                pywikibot.info('Directory "{}" does not exist.'
-                               .format(base_dir))
+                pywikibot.info(f'Directory "{base_dir}" does not exist.')
                 choice = pywikibot.input_yn('Do you want to create it ("No" '
                                             'to continue without saving)?')
                 if choice:

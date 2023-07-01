@@ -75,7 +75,7 @@ To complete a move of a page, one can use:
 
 """
 #
-# (C) Pywikibot team, 2003-2022
+# (C) Pywikibot team, 2003-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -430,8 +430,8 @@ class ReferringPageGeneratorWithIgnore:
                     elif self.primaryIgnoreManager.isIgnored(refs[i]):
                         del refs[i]
         if len(refs) < self.minimum:
-            pywikibot.info('Found only {} pages to work on; skipping.'
-                           .format(len(refs)))
+            pywikibot.info(
+                f'Found only {len(refs)} pages to work on; skipping.')
             return
         pywikibot.info(f'Will work on {len(refs)} pages.')
         yield from refs
@@ -835,8 +835,7 @@ DisambiguationRobot""".format(options=added_keys,
                     'Do you want to make redirect {} point to {}?'
                     .format(ref_page.title(), target),
                         default=False, automatic_quit=False):
-                    redir_text = '#{} [[{}]]' \
-                                 .format(self.site.redirect(), target)
+                    redir_text = f'#{self.site.redirect()} [[{target}]]'
                     try:
                         ref_page.put(redir_text, summary=self.summary,
                                      asynchronous=True)
@@ -844,8 +843,8 @@ DisambiguationRobot""".format(options=added_keys,
                         pywikibot.info(f'Page not saved: {error.args}')
             else:
                 choice = pywikibot.input_choice(
-                    'Do you want to work on pages linking to {}?'
-                    .format(ref_page.title()),
+                    f'Do you want to work on pages linking to '
+                    f'{ref_page.title()}?',
                     [('yes', 'y'), ('no', 'n'), ('change redirect', 'c')], 'n',
                     automatic_quit=False)
                 if choice == 'y':
@@ -860,9 +859,8 @@ DisambiguationRobot""".format(options=added_keys,
                     text = ref_page.get(get_redirect=True)
                     include = 'redirect'
         except NoPageError:
-            pywikibot.info(
-                'Page [[{}]] does not seem to exist?! Skipping.'
-                .format(ref_page.title()))
+            pywikibot.info(f'Page [[{ref_page.title()}]] does not seem to'
+                           ' exist?! Skipping.')
         else:
             ignore_reason = self.checkContents(text)
             if ignore_reason:
@@ -941,9 +939,9 @@ DisambiguationRobot""".format(options=added_keys,
 
                 if self.dn_template_str:
                     # '?', '/' for old choice
-                    options += [AliasOption('tag template %s' %
-                                            self.dn_template_str,
-                                            ['t', '?', '/'])]
+                    options += [AliasOption(
+                        f'tag template {self.dn_template_str}',
+                        ['t', '?', '/'])]
                 options += [context_option]
                 if not edited:
                     options += [ShowPageOption('show disambiguation page', 'd',
@@ -1052,9 +1050,7 @@ DisambiguationRobot""".format(options=added_keys,
                     new_targets.append(new_page_title)
 
                 if replaceit and trailing_chars:
-                    newlink = '[[{}{}]]{}'.format(new_page_title,
-                                                  section,
-                                                  trailing_chars)
+                    newlink = f'[[{new_page_title}{section}]]{trailing_chars}'
                 elif replaceit or (new_page_title == link_text
                                    and not section):
                     newlink = f'[[{new_page_title}]]'
@@ -1072,8 +1068,7 @@ DisambiguationRobot""".format(options=added_keys,
                         link_text[:len(new_page_title)],
                         link_text[len(new_page_title):])
                 else:
-                    newlink = '[[{}{}|{}]]'.format(new_page_title,
-                                                   section, link_text)
+                    newlink = f'[[{new_page_title}{section}|{link_text}]]'
                 text = text[:m.start()] + newlink + text[m.end():]
                 continue
 

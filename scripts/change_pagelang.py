@@ -21,7 +21,7 @@ Furthermore, the following command line parameters are supported:
    can be set within a settings file which is scripts.ini by default.
 """
 #
-# (C) Pywikibot team, 2018-2022
+# (C) Pywikibot team, 2018-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -100,8 +100,8 @@ class ChangeLangBot(ConfigParserBot, SingleSiteBot):
                 f'different content language '
                 f'<<yellow>>{currentlang}<<default>> set; skipping.')
         else:
-            pywikibot.info('\n\n>>> <<lightpurple>>{}<<default>> <<<'
-                           .format(page.title()))
+            pywikibot.info(
+                f'\n\n>>> <<lightpurple>>{page.title()}<<default>> <<<')
             choice = pywikibot.input_choice(
                 f'The content language for this page is already set to '
                 f'<<yellow>>{currentlang}<<default>>, which is different from '
