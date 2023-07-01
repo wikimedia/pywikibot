@@ -258,10 +258,12 @@ Applications:
 import os  # Operating system
 import re  # Regular expressions (very handy!)
 from itertools import islice
+from pprint import pformat
+from typing import Any
 
 import pywikibot  # API interface to Wikidata
 from pywikibot import pagegenerators as pg  # Wikidata Query interface
-from pywikibot.backports import List
+from pywikibot.backports import Dict, List
 from pywikibot.config import verbose_output as verbose
 from pywikibot.data import api
 
@@ -353,7 +355,7 @@ def get_item_list(item_name: str, instance_id):
     return item_list
 
 
-def amend_isbn_edition(isbn_number: str):  # noqa: C901
+def amend_isbn_edition(isbn_number: str) -> None:
     """Amend ISBN registration.
 
     Amend Wikidata, by registering the ISBN-13 data via P212,
@@ -367,7 +369,6 @@ def amend_isbn_edition(isbn_number: str):  # noqa: C901
 
     try:
         isbn_data = isbnlib.meta(isbn_number, service=booklib)
-        pywikibot.info(isbn_data)
         # {'ISBN-13': '9789042925564',
         #  'Title': 'De Leuvense Vaart - Van De Vaartkom Tot Wijgmaal. '
         #           'Aspecten Uit De Industriele Geschiedenis Van Leuven',
@@ -378,7 +379,6 @@ def amend_isbn_edition(isbn_number: str):  # noqa: C901
     except Exception as error:
         # When the book is unknown the function returns
         pywikibot.error(error)
-        # raise ValueError(error)
         return
 
     if len(isbn_data) < 6:
@@ -388,10 +388,13 @@ def amend_isbn_edition(isbn_number: str):  # noqa: C901
 
     # Show the raw results
     if verbose:
-        pywikibot.info()
-        for i in isbn_data:
-            pywikibot.info(f'{i}:\t{isbn_data[i]}')
+        pywikibot.info('\n' + pformat(isbn_data))
 
+    add_claims(isbn_data)
+
+
+def add_claims(isbn_data: Dict[str, Any]) -> None:  # noqa: C901
+    """Inspect isbn_data and add claims if possible."""
     # Get the book language from the ISBN book reference
     booklang = mainlang  # Default language
     if isbn_data['Language']:
@@ -527,32 +530,34 @@ SELECT ?item WHERE {{
     author_cnt = 0
     for author_name in isbn_data['Authors']:
         author_name = author_name.strip()
-        if author_name:
-            author_cnt += 1
-            author_list = list(get_item_list(author_name, propreqinst['P50']))
+        if not author_name:
+            continue
 
-            if len(author_list) == 1:
-                add_author = True
-                if 'P50' in item.claims:
-                    for seq in item.claims['P50']:
-                        if seq.getTarget().getID() in author_list:
-                            add_author = False
-                            break
+        author_cnt += 1
+        author_list = list(get_item_list(author_name, propreqinst['P50']))
 
-                if add_author:
-                    pywikibot.warning(f'Add author {author_cnt} (P50): '
-                                      f'{author_name} ({author_list[0]})')
-                    claim = pywikibot.Claim(repo, 'P50')
-                    claim.setTarget(pywikibot.ItemPage(repo, author_list[0]))
-                    item.addClaim(claim, bot=True, summary=transcmt)
+        if len(author_list) == 1:
+            add_author = True
+            if 'P50' in item.claims:
+                for seq in item.claims['P50']:
+                    if seq.getTarget().getID() in author_list:
+                        add_author = False
+                        break
 
-                    qualifier = pywikibot.Claim(repo, 'P1545')
-                    qualifier.setTarget(str(author_cnt))
-                    claim.addQualifier(qualifier, summary=transcmt)
-            elif not author_list:
-                pywikibot.warning(f'Unknown author: {author_name}')
-            else:
-                pywikibot.warning(f'Ambiguous author: {author_name}')
+            if add_author:
+                pywikibot.warning(f'Add author {author_cnt} (P50): '
+                                  f'{author_name} ({author_list[0]})')
+                claim = pywikibot.Claim(repo, 'P50')
+                claim.setTarget(pywikibot.ItemPage(repo, author_list[0]))
+                item.addClaim(claim, bot=True, summary=transcmt)
+
+                qualifier = pywikibot.Claim(repo, 'P1545')
+                qualifier.setTarget(str(author_cnt))
+                claim.addQualifier(qualifier, summary=transcmt)
+        elif not author_list:
+            pywikibot.warning(f'Unknown author: {author_name}')
+        else:
+            pywikibot.warning(f'Ambiguous author: {author_name}')
 
     # Get the publisher
     publisher_name = isbn_data['Publisher'].strip()
@@ -585,14 +590,11 @@ SELECT ?item WHERE {{
         pywikibot.info(isbn_editions)
 
     # Book cover images
-    for i in isbn_cover:
-        pywikibot.info(f'{i}:\t{isbn_cover[i]}')
+    pywikibot.info(pformat(isbn_cover))
 
     # Handle ISBN classification
     isbn_classify = isbnlib.classify(isbn_number)
-
-    for i in isbn_classify:
-        pywikibot.debug(f'{i}:\t{isbn_classify[i]}')
+    pywikibot.debug(pformat(isbn_classify))
 
     # ./create_isbn_edition.py '978-3-8376-5645-9' - de P407 Q188
     # Q113460204
@@ -748,22 +750,25 @@ SELECT ?item WHERE {{
             else:
                 pywikibot.error(
                     f'Ambiguous main subject for Fast ID {fast_id}')
+    show_final_information(isbn_number, isbn_doi)
 
+
+def show_final_information(number, doi):
+    """Print additional information."""
     # Book description
-    isbn_description = isbnlib.desc(isbn_number)
-    if isbn_description:
+    description = isbnlib.desc(number)
+    if description:
         pywikibot.info()
-        pywikibot.info(isbn_description)
-
-    # Currently does not work (service not available)
-    pywikibot.warning('BibTex unavailable')
-    return
+        pywikibot.info(description)
 
     try:
-        bibtex_metadata = isbnlib.doi2tex(isbn_doi)
-        pywikibot.info(bibtex_metadata)
+        bibtex_metadata = isbnlib.doi2tex(doi)
     except Exception as error:
+        # Currently does not work (service not available)
         pywikibot.error(error)  # Data not available
+        pywikibot.warning('BibTex unavailable')
+    else:
+        pywikibot.info(bibtex_metadata)
 
 
 def main(*args: str) -> None:
