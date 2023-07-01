@@ -362,9 +362,6 @@ def amend_isbn_edition(isbn_number: str):  # noqa: C901
 
     :param isbn_number:  ISBN number (10 or 13 digits with optional hyphens)
     """
-    global proptyx
-    global targetx
-
     isbn_number = isbn_number.strip()
     if not isbn_number:
         return  # Do nothing when the ISBN number is missing
