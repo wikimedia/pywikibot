@@ -316,9 +316,10 @@ def deprecate_arg(old_arg: str, new_arg: Union[str, None, bool]):
         def my_function(): pass
         # ignores 'foo' keyword no longer used by my_function
 
-    deprecated_args decorator should be used in favour of this
-    deprecate_arg decorator but it is held to deprecate args which become
-    a reserved word in future Python releases and to prevent syntax errors.
+    :func:`deprecated_args` decorator should be used in favour of this
+    ``deprecate_arg`` decorator but it is held to deprecate args which
+    become a reserved word in future Python releases and to prevent
+    syntax errors.
 
     :param old_arg: old keyword
     :param new_arg: new keyword
