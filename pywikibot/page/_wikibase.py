@@ -1971,7 +1971,7 @@ class Claim(Property):
         elif self.type == 'commonsMedia':
             value = self.getTarget().title(with_ns=False)
         elif self.type == 'time':
-            value = self.getTarget().toWikibase(normalize=True)
+            value = self.getTarget().toWikibase(normalize=False)
         elif self.type in ('globe-coordinate',
                            'quantity', 'monolingualtext',
                            'geo-shape', 'tabular-data'):
