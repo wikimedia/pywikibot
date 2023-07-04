@@ -48,7 +48,6 @@ jobs:
             family: wikipedia
             code: test
             domain: test.wikipedia.org
-            experimental: true
 
     steps:
     - name: Checkout Repository

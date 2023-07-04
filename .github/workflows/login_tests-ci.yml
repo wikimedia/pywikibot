@@ -63,7 +63,6 @@ jobs:
             os: ubuntu-20.04
           - python-version: "3.13-dev"
             site: wikipedia:test
-            experimental: true
 
     steps:
     - name: Checkout Repository
