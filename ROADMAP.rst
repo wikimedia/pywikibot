@@ -1,6 +1,9 @@
 Current release
 ---------------
 
+* Remove incorrect time normalization in :class:`page.Claim` (:phab:`T338748`, :phab:`T325860`, :phab:`T57755`)
+* Add support for other types of diffs in :meth:`Site.compare()<pywikibot.site._apisite.APISite.compare>`
+* Improvements for :func:`textlib.extract_sections` function (:phab:`T338748`)
 * Backport ``itertools.batched()`` from Python 3.12 which replaces :func:`tools.itertools.itergroup`
 * Upcast page types in :func:`pagegenerators.RecentChangesPageGenerator` (:phab:`T340450`)
 * Enable :meth:`FilePage.download()<pywikibot.FilePage.download>` to download thumbnails (:phab:`T247095`)

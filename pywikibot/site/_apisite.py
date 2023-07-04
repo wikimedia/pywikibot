@@ -2860,10 +2860,11 @@ class APISite(
         """
         Corresponding method to the 'action=compare' API action.
 
+        .. hint:: Use :func:`diff.html_comparator` function to parse
+           result.
+
         .. seealso: :api:`Compare`
 
-        See: https://en.wikipedia.org/w/api.php?action=help&modules=compare
-        Use pywikibot.diff's html_comparator() method to parse result.
         :param old: starting revision ID, title, Page, or Revision
         :param diff: ending revision ID, title, Page, or Revision
         :param difftype: type of diff. One of 'table' or 'inline'.
