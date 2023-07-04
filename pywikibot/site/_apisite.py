@@ -2862,8 +2862,7 @@ class APISite(
 
         .. hint:: Use :func:`diff.html_comparator` function to parse
            result.
-
-        .. seealso: :api:`Compare`
+        .. seealso:: :api:`Compare`
 
         :param old: starting revision ID, title, Page, or Revision
         :param diff: ending revision ID, title, Page, or Revision
