@@ -993,6 +993,100 @@ class WikimediaOrgFamily(SingleSiteFamily, WikimediaFamily):
         return f'{cls.name}.wikimedia.org'
 
 
+class WikibaseFamily(Family):
+
+    """A base class for a Wikibase Family.
+
+    .. versionadded:: 8.2
+    """
+
+    def interface(self, code) -> str:
+        """Return 'DataSite' for Wikibase family."""
+        return 'DataSite'
+
+    def entity_sources(self, code: str) -> Dict[str, Tuple[str, str]]:
+        """Provide reopsitory site information for entity types.
+
+        The result must be structured as follows:
+
+            {<entity type>: (<family code>, <family name>)}
+
+        for example:
+
+            {'property': ('test', 'wikidata')}
+
+        If an empty dict is returned, all entity types are found in the
+        current ``DataSite``.
+
+        The result is used by :meth:`DataSite.get_repo_for_entity_type
+        <pywikibot.site._datasite.DataSite.get_repo_for_entity_type>`
+        """
+        return {}
+
+
+class DefaultWikibaseFamily(WikibaseFamily):
+
+    """A base class for a Wikimedia Wikibase Family.
+
+    This class holds defauls for :meth:`calendarmodel`,
+    :meth:`default_globe` and :meth:`globes` to prevent code duplication.
+
+    .. warning:: Possibly you have to adjust the repository site in
+       :meth:`WikibaseFamily.entity_sources` to get the valid entity.
+
+    .. versionadded:: 8.2
+    """
+
+    def calendarmodel(self, code) -> str:
+        """Default calendar model for WbTime datatype."""
+        return 'http://www.wikidata.org/entity/Q1985727'
+
+    def default_globe(self, code) -> str:
+        """Default globe for Coordinate datatype."""
+        return 'earth'
+
+    def globes(self, code):
+        """Supported globes for Coordinate datatype."""
+        return {
+            'ariel': 'http://www.wikidata.org/entity/Q3343',
+            'bennu': 'http://www.wikidata.org/entity/Q11558',
+            'callisto': 'http://www.wikidata.org/entity/Q3134',
+            'ceres': 'http://www.wikidata.org/entity/Q596',
+            'deimos': 'http://www.wikidata.org/entity/Q7548',
+            'dione': 'http://www.wikidata.org/entity/Q15040',
+            'earth': 'http://www.wikidata.org/entity/Q2',
+            'enceladus': 'http://www.wikidata.org/entity/Q3303',
+            'eros': 'http://www.wikidata.org/entity/Q16711',
+            'europa': 'http://www.wikidata.org/entity/Q3143',
+            'ganymede': 'http://www.wikidata.org/entity/Q3169',
+            'gaspra': 'http://www.wikidata.org/entity/Q158244',
+            'hyperion': 'http://www.wikidata.org/entity/Q15037',
+            'iapetus': 'http://www.wikidata.org/entity/Q17958',
+            'io': 'http://www.wikidata.org/entity/Q3123',
+            'jupiter': 'http://www.wikidata.org/entity/Q319',
+            'lutetia': 'http://www.wikidata.org/entity/Q107556',
+            'mars': 'http://www.wikidata.org/entity/Q111',
+            'mercury': 'http://www.wikidata.org/entity/Q308',
+            'mimas': 'http://www.wikidata.org/entity/Q15034',
+            'miranda': 'http://www.wikidata.org/entity/Q3352',
+            'moon': 'http://www.wikidata.org/entity/Q405',
+            'oberon': 'http://www.wikidata.org/entity/Q3332',
+            'phobos': 'http://www.wikidata.org/entity/Q7547',
+            'phoebe': 'http://www.wikidata.org/entity/Q17975',
+            'pluto': 'http://www.wikidata.org/entity/Q339',
+            'rhea': 'http://www.wikidata.org/entity/Q15050',
+            'ryugu': 'http://www.wikidata.org/entity/Q1385178',
+            'steins': 'http://www.wikidata.org/entity/Q150249',
+            'tethys': 'http://www.wikidata.org/entity/Q15047',
+            'titan': 'http://www.wikidata.org/entity/Q2565',
+            'titania': 'http://www.wikidata.org/entity/Q3322',
+            'triton': 'http://www.wikidata.org/entity/Q3359',
+            'umbriel': 'http://www.wikidata.org/entity/Q3338',
+            'venus': 'http://www.wikidata.org/entity/Q313',
+            'vesta': 'http://www.wikidata.org/entity/Q3030',
+        }
+
+
 def AutoFamily(name: str, url: str) -> SingleSiteFamily:
     """
     Family that automatically loads the site configuration.
