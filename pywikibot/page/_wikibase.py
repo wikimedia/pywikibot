@@ -1952,9 +1952,6 @@ class Claim(Property):
     def _formatValue(self) -> dict:
         """Format the target into the proper JSON value that Wikibase wants.
 
-        .. versionchanges:: 8.0
-           normalize the result if type is ``time``.
-
         :return: JSON value
         """
         # todo: eventually unify the following two groups
@@ -1970,9 +1967,7 @@ class Claim(Property):
             value = self.getTarget()
         elif self.type == 'commonsMedia':
             value = self.getTarget().title(with_ns=False)
-        elif self.type == 'time':
-            value = self.getTarget().toWikibase(normalize=False)
-        elif self.type in ('globe-coordinate',
+        elif self.type in ('globe-coordinate', 'time',
                            'quantity', 'monolingualtext',
                            'geo-shape', 'tabular-data'):
             value = self.getTarget().toWikibase()
