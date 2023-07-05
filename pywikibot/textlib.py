@@ -4,6 +4,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
+import itertools
 import re
 from collections import OrderedDict, namedtuple
 from collections.abc import Sequence
@@ -21,6 +22,7 @@ from pywikibot.backports import (
     List,
     Pattern,
     Tuple,
+    pairwise,
 )
 from pywikibot.backports import OrderedDict as OrderedDictType
 from pywikibot.backports import Sequence as SequenceType
@@ -1014,14 +1016,11 @@ def _extract_sections(text: str, headings) -> List[Section]:
     sections = []
     if headings:
         # Assign them their contents
-        for i, heading in enumerate(headings):
-            try:
-                next_heading = headings[i + 1]
-            except IndexError:
-                content = text[heading.end:]
-            else:
-                content = text[heading.end:next_heading.start]
+        for heading, next_heading in pairwise(headings):
+            content = text[heading.end:next_heading.start]
             sections.append(Section(heading.text, content))
+        last = headings[-1]
+        sections.append(Section(last.text, text[last.end:]))
 
     return sections
 
@@ -1878,7 +1877,7 @@ def extract_templates_and_params_regex_simple(text: str):
         else:
             params = params.split('|')
 
-        numbered_param_identifiers = iter(range(1, len(params) + 1))
+        numbered_param_identifiers = itertools.count(1)
 
         params = OrderedDict(
             arg.split('=', 1)
