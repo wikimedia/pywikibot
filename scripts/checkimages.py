@@ -77,7 +77,7 @@ Todo
 
 """
 #
-# (C) Pywikibot team, 2006-2022
+# (C) Pywikibot team, 2006-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -713,11 +713,11 @@ class CheckImagesBot:
         else:
             commentox = commento2
 
+        new_text = f'{testoattuale}\n\n'
         if second_text:
-            new_text = f'{testoattuale}\n\n{self.notification2}'
+            new_text += f'{self.notification2}'
         else:
-            new_text = '{}\n\n== {} ==\n{}'.format(testoattuale, self.head,
-                                                   self.notification)
+            new_text += f'== {self.head} ==\n{self.notification}'
 
         # Check maximum number of notifications for this talk page
         if (self.num_notify is not None
@@ -934,8 +934,8 @@ class CheckImagesBot:
                     pywikibot.info(
                         f'{dup_page} is a duplicate and has to be tagged...')
                     images_to_tag_list.append(dup_page.title())
-                    string += '* {}\n'.format(dup_page.title(as_link=True,
-                                                             textlink=True))
+                    string += (
+                        f'* {dup_page.title(as_link=True, textlink=True)}\n')
                 else:
                     pywikibot.info(
                         "Already put the dupe-template in the files's page"
@@ -1364,11 +1364,10 @@ class CheckImagesBot:
             if delta.total_seconds() > wait_time:
                 yield image
             else:
-                pywikibot.warning(
-                    'Skipping {}, uploaded {} {} ago..'
-                    .format(image.title(), delta.days, 'days')
-                    if delta.days > 0
-                    else (image.title(), delta.seconds, 'seconds'))
+                pywikibot.warning('Skipping {}, uploaded {} ago.'
+                                  .format(image.title(),
+                                          f'{delta.days} days' if delta.days
+                                          else f'{delta.seconds} seconds'))
 
     def is_tagged(self) -> bool:
         """Understand if a file is already tagged or not."""
