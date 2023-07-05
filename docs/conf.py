@@ -504,11 +504,15 @@ extlinks = {
 
 
 def pywikibot_docstring_fixups(app, what, name, obj, options, lines):
-    """Remove plain 'Initializer.' docstring."""
+    """Remove plain 'Initializer.' or 'Allocator.' docstring.
+
+    .. versionchanged:: 8.2
+       remove 'Allocator.' docstring too.
+    """
     if what not in ('class', 'exception'):
         return
 
-    if lines and lines[0] == 'Initializer.':
+    if lines and lines[0] in ('Initializer.', 'Allocator.'):
         lines[:] = lines[2:]
 
 

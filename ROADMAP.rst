@@ -1,6 +1,8 @@
 Current release
 ---------------
 
+* Add support for gpewiki (:phab:`T335989`)
+* :class:`family.WikibaseFamily` and :class:`family.DefaultWikibaseFamily` were added to :mod:`family` module
 * Remove incorrect time normalization in :class:`page.Claim` (:phab:`T338748`, :phab:`T325860`, :phab:`T57755`)
 * Add support for other types of diffs in :meth:`Site.compare()<pywikibot.site._apisite.APISite.compare>`
 * Improvements for :func:`textlib.extract_sections` function (:phab:`T338748`)
@@ -26,6 +28,7 @@ Current release
 Deprecations
 ------------
 
+* 8.2.0: *normalize* parameter of :meth:`WbTime.toTimestr` and :meth:`WbTime.toWikibase` will be removed
 * 8.1.0: Dependency of :exc:`exceptions.NoSiteLinkError` from :exc:`exceptions.NoPageError` will be removed
 * 8.1.0: ``exceptions.Server414Error`` is deprecated in favour of :exc:`exceptions.Client414Error`
 * 8.0.0: :meth:`Timestamp.clone()<pywikibot.time.Timestamp.clone>` method is deprecated
