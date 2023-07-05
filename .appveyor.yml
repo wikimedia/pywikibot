@@ -89,6 +89,6 @@ test_script:
 on_finish:
   - ps: |
       $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
+      coverage report
       Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
       bash codecov.sh -U "-s" -A "-s"
-

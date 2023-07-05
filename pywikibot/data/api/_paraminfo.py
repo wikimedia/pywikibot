@@ -1,6 +1,6 @@
 """Object representing API parameter information."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,8 +9,7 @@ from typing import Any, Optional, Union
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Dict, removeprefix
-from pywikibot.tools.itertools import itergroup
+from pywikibot.backports import Dict, batched, removeprefix
 
 
 __all__ = ['ParamInfo']
@@ -196,12 +195,13 @@ class ParamInfo(Sized, Container):
         """
         def module_generator():
             """A generator yielding batches of modules."""
-            i = itergroup(sorted(modules), self._limit)
-            for batch in i:
+            # T340617: self._limit is not set for the first modules
+            # which is frozenset({'paraminfo', 'query', 'main'})
+            for batch in batched(sorted(modules), self._limit or 50):
                 for failed_module in failed_modules:
                     yield [failed_module]
-                del failed_modules[:]
-                yield batch
+                failed_modules.clear()
+                yield list(batch)
 
         modules -= set(self._paraminfo)
         if not modules:
@@ -400,8 +400,8 @@ class ParamInfo(Sized, Container):
                 if not name and php_class:
                     name = removeprefix(php_class, 'Api').lower()
                     if name not in ('main', 'pageset'):
-                        pywikibot.warning('Unknown paraminfo module "{}"'
-                                          .format(php_class))
+                        pywikibot.warning(
+                            f'Unknown paraminfo module "{php_class}"')
                         name = '<unknown>:' + php_class
 
                     mod_data['name'] = name
@@ -421,8 +421,7 @@ class ParamInfo(Sized, Container):
                 if path in result_data:
                     # Only warn first time
                     if result_data[path] is not False:
-                        pywikibot.warning('Path "{}" is ambiguous.'
-                                          .format(path))
+                        pywikibot.warning(f'Path "{path}" is ambiguous.')
                     else:
                         pywikibot.log(f'Found another path "{path}"')
                     result_data[path] = False
@@ -499,9 +498,8 @@ class ParamInfo(Sized, Container):
             return None
 
         if len(param_data) != 1:
-            raise RuntimeError(
-                'parameter data length is eiter empty or not unique.\n{}'
-                .format(param_data))
+            raise RuntimeError(f'parameter data length is eiter empty or not '
+                               f'unique.\n{param_data}')
         return param_data[0]
 
     @property

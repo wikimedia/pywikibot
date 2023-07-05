@@ -210,7 +210,7 @@ class UI(ABUIC):
             text_parts = old_parts
         else:
             text_parts = new_parts
-        text_parts += ['default']
+        text_parts.append('default')
         # match.split() includes every regex group; for each matched color
         # fg_col:b_col, fg_col and bg_col are added to the resulting list.
         len_text_parts = len(text_parts[::4])
@@ -461,7 +461,7 @@ class UI(ABUIC):
         if not options:
             raise ValueError('No options are given.')
         if automatic_quit:
-            options += [QuitKeyboardInterrupt()]
+            options.append(QuitKeyboardInterrupt())
         if default:
             default = default.lower()
         for i, option in enumerate(options):
@@ -515,8 +515,7 @@ class UI(ABUIC):
         # lock stream output
         with self.lock:
             if not force:
-                line_template = '{{0: >{}}}: {{1}}\n'.format(
-                    len(str(len(answers))))
+                line_template = f'{{0: >{len(str(len(answers)))}}}: {{1}}\n'
                 for i, entry in enumerate(answers, start=1):
                     self.stream_output(line_template.format(i, entry))
 
@@ -536,8 +535,7 @@ class UI(ABUIC):
 
                 if force:
                     raise ValueError(
-                        'Invalid value "{}" for default during force.'
-                        .format(default))
+                        f'Invalid value "{default}" for default during force.')
 
                 self.stream_output('Error: Invalid response\n')
 

@@ -10,7 +10,7 @@ This module requires sseclient to be installed::
 .. versionadded:: 3.0
 """
 #
-# (C) Pywikibot team, 2017-2022
+# (C) Pywikibot team, 2017-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -143,7 +143,10 @@ class EventStreams(GeneratorWrapper):
                               'install it with "pip install sseclient"\n')
         self.filter = {'all': [], 'any': [], 'none': []}
         self._total = None
-        self._site = kwargs.pop('site', Site())
+        try:
+            self._site = kwargs.pop('site')
+        except KeyError:  # T335720
+            self._site = Site()
 
         self._streams = kwargs.pop('streams', None)
         if self._streams and not isinstance(self._streams, str):
@@ -335,8 +338,8 @@ class EventStreams(GeneratorWrapper):
             try:
                 event = next(self.source)
             except (ProtocolError, OSError, httplib.IncompleteRead) as e:
-                warning('Connection error: {}.\n'
-                        'Try to re-establish connection.'.format(e))
+                warning(
+                    f'Connection error: {e}.\nTry to re-establish connection.')
                 del self.source
                 if event is not None:
                     self.sse_kwargs['last_id'] = event.id
@@ -346,8 +349,7 @@ class EventStreams(GeneratorWrapper):
                     try:
                         element = json.loads(event.data)
                     except ValueError as e:
-                        warning('Could not load json data from\n{}\n{}'
-                                .format(event, e))
+                        warning(f'Could not load json data from\n{event}\n{e}')
                     else:
                         if self.streamfilter(element):
                             n += 1

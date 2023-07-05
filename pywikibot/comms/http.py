@@ -249,7 +249,7 @@ def fake_user_agent() -> str:
     return UserAgent().random
 
 
-def request(site,
+def request(site: 'pywikibot.site.BaseSite',
             uri: Optional[str] = None,
             headers: Optional[dict] = None,
             **kwargs) -> requests.Response:
@@ -261,13 +261,16 @@ def request(site,
     The optional uri is a relative uri from site base uri including the
     document root '/'.
 
+    .. versionchanged:: 8.2
+       a *protocol* parameter can be given which is passed to the
+       :meth:`family.Family.base_url` method.
+
     :param site: The Site to connect to
-    :type site: pywikibot.site.BaseSite
     :param uri: the URI to retrieve
-    :keyword charset: Either a valid charset (usable for str.decode()) or None
-        to automatically chose the charset from the returned header (defaults
-        to latin-1)
-    :type charset: CodecInfo, str, None
+    :keyword Optional[CodecInfo, str] charset: Either a valid charset
+        (usable for str.decode()) or None to automatically chose the
+        charset from the returned header (defaults to latin-1)
+    :keyword Optional[str] protocol: a url scheme
     :return: The received data Response
     """
     kwargs.setdefault('verify', site.verify_SSL_certificate())
@@ -278,7 +281,7 @@ def request(site,
         format_string = headers.get('user-agent')
     headers['user-agent'] = user_agent(site, format_string)
 
-    baseuri = site.base_url(uri)
+    baseuri = site.base_url(uri, protocol=kwargs.pop('protocol', None))
     r = fetch(baseuri, headers=headers, **kwargs)
     site.throttle.retry_after = int(r.headers.get('retry-after', 0))
     return r
@@ -322,9 +325,18 @@ def error_handling_callback(response):
 
     if isinstance(response, requests.ConnectionError):
         msg = str(response)
-        if 'NewConnectionError' in msg \
+        if ('NewConnectionError' in msg or 'NameResolutionError' in msg) \
            and re.search(r'\[Errno (-2|8|11001)\]', msg):
             raise ConnectionError(response)
+
+    # catch requests.ReadTimeout and requests.ConnectTimeout and convert
+    # it to ServerError
+    if isinstance(response, requests.Timeout):
+        raise ServerError(response)
+
+    if isinstance(response, ValueError):
+        # MissingSchema, InvalidSchema, InvalidURL, InvalidHeader
+        raise FatalServerError(str(response))
 
     if isinstance(response, Exception):
         with suppress(Exception):
@@ -336,8 +348,8 @@ def error_handling_callback(response):
         raise Client414Error(HTTPStatus(response.status_code).description)
 
     if response.status_code == HTTPStatus.GATEWAY_TIMEOUT:
-        raise Server504Error('Server {} timed out'
-                             .format(urlparse(response.url).netloc))
+        raise Server504Error(
+            f'Server {urlparse(response.url).netloc} timed out')
 
     if (not response.ok
             and response.status_code >= HTTPStatus.INTERNAL_SERVER_ERROR):
@@ -424,8 +436,7 @@ def fetch(uri: str, method: str = 'GET', headers: Optional[dict] = None,
     if auth is not None and len(auth) == 4:
         if isinstance(requests_oauthlib, ImportError):
             warn(str(requests_oauthlib), ImportWarning)
-            error('OAuth authentication not supported: {}'
-                  .format(requests_oauthlib))
+            error(f'OAuth authentication not supported: {requests_oauthlib}')
             auth = None
         else:
             auth = requests_oauthlib.OAuth1(*auth)
@@ -520,8 +531,7 @@ def _decide_encoding(response: requests.Response,
         try:
             content.decode(encoding)
         except LookupError:
-            pywikibot.warning('Unknown or invalid encoding {!r}'
-                              .format(encoding))
+            pywikibot.warning(f'Unknown or invalid encoding {encoding!r}')
         except UnicodeDecodeError as e:
             pywikibot.warning(f'{e} found in {content}')
         else:

@@ -84,11 +84,9 @@ class NewItemRobot(WikidataBot):
             pywikibot.info('Doing a null edit on the page.')
             page.touch()
         except (NoCreateError, NoPageError):
-            pywikibot.error('Page {} does not exist.'.format(
-                page.title(as_link=True)))
+            pywikibot.error(f'Page {page.title(as_link=True)} does not exist.')
         except LockedPageError:
-            pywikibot.error('Page {} is locked.'.format(
-                page.title(as_link=True)))
+            pywikibot.error(f'Page {page.title(as_link=True)} is locked.')
         except PageSaveRelatedError as e:
             pywikibot.error(f'Page {page} not saved:\n{e.args}')
 

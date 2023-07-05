@@ -1,6 +1,6 @@
 """Family module for Vikidia."""
 #
-# (C) Pywikibot team, 2010-2022
+# (C) Pywikibot team, 2010-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -15,13 +15,9 @@ class Family(family.SubdomainFamily):
     domain = 'vikidia.org'
 
     codes = [
-        'ca', 'de', 'el', 'en', 'es', 'eu', 'fr', 'hy', 'it', 'oc',
-        'pt', 'ru', 'scn',
+        'ca', 'de', 'el', 'en', 'es', 'eu', 'fr', 'hy', 'it', 'oc', 'pt', 'ru',
+        'scn',
     ]
 
     # Sites we want to edit but not count as real languages
     test_codes = ['central', 'test']
-
-    def protocol(self, code) -> str:
-        """Return https as the protocol for this family."""
-        return 'https'

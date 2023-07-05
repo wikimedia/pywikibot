@@ -272,12 +272,10 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
         # validate L10N
         self.template_list = self.site.category_redirects()
         if not self.template_list:
-            pywikibot.warning('No redirect templates defined for {}'
-                              .format(self.site))
+            pywikibot.warning(f'No redirect templates defined for {self.site}')
             return
         if not self.get_cat():
-            pywikibot.warning('No redirect category found for {}'
-                              .format(self.site))
+            pywikibot.warning(f'No redirect category found for {self.site}')
             return
 
         self.user = self.site.user()  # invokes login()

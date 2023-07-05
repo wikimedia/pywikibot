@@ -143,6 +143,9 @@ Bots and scripts
 +--------------------------+---------------------------------------------------------+
 | transferbot.py           | Transfers pages from a source wiki to a target wiki.    |
 +--------------------------+---------------------------------------------------------+
+| transwikiimport.py       | Transfers pages from a source wiki to a target wiki     |
+|                          | including edit history using :api:`Import`.             |
++--------------------------+---------------------------------------------------------+
 | unusedfiles.py           | Bot appends some text to all unused images and other    |
 |                          | text to the respective uploaders.                       |
 +--------------------------+---------------------------------------------------------+
@@ -195,4 +198,4 @@ parameter, e.g.::
 
 ** Outdated and deleted scripts can be recovered.**
 Refer `Outdated core scripts` and `Outdated compat scripts` in our documentation:
-https://doc.wikimedia.org/pywikibot/master/scripts/index.html#scripts-descriptions
+https://doc.wikimedia.org/pywikibot/master/scripts/index.html#script-descriptions

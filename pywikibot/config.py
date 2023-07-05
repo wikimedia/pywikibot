@@ -34,7 +34,7 @@ utility methods to build paths relative to base_dir:
    default. Editor detection functions were moved to :mod:`editor`.
 """
 #
-# (C) Pywikibot team, 2003-2022
+# (C) Pywikibot team, 2003-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -369,8 +369,8 @@ def get_base_dir(test_directory: Optional[str] = None,
                 elif win_version in (6, 10):
                     sub_dir = ['AppData', 'Roaming']
                 else:
-                    raise OSError('Windows version {} not supported yet.'
-                                  .format(win_version))
+                    raise OSError(
+                        f'Windows version {win_version} not supported yet.')
                 base_dir_cand.extend([[home] + sub_dir + ['Pywikibot'],
                                      [home] + sub_dir + ['pywikibot']])
             else:
@@ -452,8 +452,8 @@ def register_families_folder(folder_path: str,
     if not os.path.exists(folder_path):
         if not_exists_ok:
             return
-        raise FileNotFoundError('Family folder {!r} does not exist'
-                                .format(folder_path))
+        raise FileNotFoundError(
+            f'Family folder {folder_path!r} does not exist')
 
     if os.path.isdir(folder_path):
         for file_name in os.listdir(folder_path):
@@ -803,7 +803,8 @@ db_port = 3306
 # DO NOT set to None to disable timeouts. Otherwise this may freeze your
 # script.
 # You may assign either a tuple of two int or float values for connection and
-# read timeout, or a single value for both in a tuple.
+# read timeout, or a single value for both.
+# See also: https://requests.readthedocs.io/en/stable/user/advanced/#timeouts
 socket_timeout = (6.05, 45)
 
 

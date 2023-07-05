@@ -149,7 +149,7 @@ def main(*args: str) -> None:
         elif arg == '-async':
             asyncronous = True
         else:
-            unknown_args += [arg]
+            unknown_args.append(arg)
 
     if pywikibot.bot.suggest_help(unknown_parameters=unknown_args):
         return

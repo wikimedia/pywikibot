@@ -19,18 +19,20 @@ jobs:
   build:
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     continue-on-error: ${{ matrix.experimental || false }}
-    timeout-minutes: 120
+    timeout-minutes: 100
 
     strategy:
       fail-fast: false
-      max-parallel: 16
+      max-parallel: 17
 
       matrix:
-        python-version: ["pypy3.7", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12.0-alpha - 3.12.0"]
+        python-version: ["pypy3.7", "3.7", "3.8", "3.9", "3.10", "3.11"]
         site: ['wikipedia:en', 'wikisource:zh']
         test_prod_only: [true]
         include:
           # ubuntu-20.04 required for Python 3.6
+          - python-version: 3.7
+            site: wikipedia:test
           - python-version: 3.6
             site: False
             family: wpbeta
@@ -44,10 +46,6 @@ jobs:
           - python-version: 3.8
             site: wsbeta:en
           - python-version: 3.7
-            site: wikipedia:test
-            write-test: true
-            experimental: true
-          - python-version: 3.7
             site: wikidata:test
           - python-version: 3.9
             site: wiktionary:ar
@@ -57,7 +55,6 @@ jobs:
             os: ubuntu-20.04
           - python-version: 3.8
             site: wowwiki:uk
-            experimental: true
           - python-version: 3
             site: wikipedia:de
             os: macOS-latest
@@ -69,6 +66,17 @@ jobs:
             site: wikisource:zh
             test_prod_only: true
             os: ubuntu-20.04
+          - python-version: "3.12.0-alpha - 3.12.0"  # 3.12 fails due to T337748
+            site: wikipedia:en
+            test_prod_only: true
+            experimental: true
+          - python-version: "3.12.0-alpha - 3.12.0"  # 3.12 fails due to T337748
+            site: wikisource:zh
+            test_prod_only: true
+            experimental: true
+          - python-version: "3.13-dev"
+            site: wikipedia:test
+            experimental: true
 
     steps:
     - name: Checkout Repository
@@ -78,6 +86,14 @@ jobs:
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
+      if: ${{ matrix.python-version != '3.13-dev' }}
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    # use deadsnakes/action until actions/setup-python supports Python 3.13
+    - name: Set up development Python ${{ matrix.python-version }}
+      uses: deadsnakes/action@v3.0.1
+      if: ${{ matrix.python-version == '3.13-dev' }}
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -129,7 +145,6 @@ jobs:
         PYWIKIBOT_TEST_NO_RC:
           ${{ (matrix.site == 'wikisource:zh' || matrix.test_no_rc) && 1 || 0 }}
         PYWIKIBOT_TEST_PROD_ONLY: ${{ matrix.test_prod_only && 1 || 0 }}
-        PYWIKIBOT_TEST_WRITE: ${{ (matrix.site == 'wikipedia:test' && matrix.write-test ) && 1 || 0}}
       run: |
         python pwb.py version
         if [ ${{matrix.site || 0}} != 'wikipedia:test' ]; then
@@ -137,6 +152,10 @@ jobs:
         else
           pytest --cov=.;
         fi
+
+    - name: Show coverage statistics
+      run: |
+        coverage report
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3

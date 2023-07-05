@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the page module."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -198,7 +198,7 @@ class TestPageObjectEnglish(TestCase):
         p1 = pywikibot.Page(site, 'Help:Test page#Testing')
         ns_name = 'Help'
         if site.namespaces[12][0] != ns_name:
-            ns_name = site.namespaces[12][0]
+            ns_name = site.namespaces[12][0]  # pragma: no cover
         self.assertEqual(p1.title(), ns_name + ':Test page#Testing')
         self.assertEqual(p1.title(underscore=True),
                          ns_name + ':Test_page#Testing')
@@ -232,7 +232,7 @@ class TestPageObjectEnglish(TestCase):
         p2 = pywikibot.Page(site, 'File:Jean-Léon Gérôme 003.jpg')
         ns_name = 'File'
         if site.namespaces[6][0] != ns_name:
-            ns_name = site.namespaces[6][0]
+            ns_name = site.namespaces[6][0]  # pragma: no cover
         self.assertEqual(p2.title(), 'File:Jean-Léon Gérôme 003.jpg')
         self.assertEqual(p2.title(underscore=True),
                          'File:Jean-Léon_Gérôme_003.jpg')

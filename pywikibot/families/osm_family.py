@@ -1,6 +1,6 @@
 """Family module for OpenStreetMap wiki."""
 #
-# (C) Pywikibot team, 2009-2022
+# (C) Pywikibot team, 2009-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -43,7 +43,3 @@ class Family(family.SingleSiteFamily):
     edit_restricted_templates = {
         'en': ('In Bearbeitung',),
     }
-
-    def protocol(self, code) -> str:
-        """Return https as the protocol for this family."""
-        return 'https'

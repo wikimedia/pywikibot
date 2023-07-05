@@ -1,6 +1,6 @@
 """Objects representing MediaWiki families."""
 #
-# (C) Pywikibot team, 2004-2022
+# (C) Pywikibot team, 2004-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -18,9 +18,11 @@ from typing import Optional
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import (  # skipcq: PY-W2000
+from pywikibot.backports import (
     Dict,
+    FrozenSet,
     List,
+    Mapping,
     Set,
     Tuple,
     removesuffix,
@@ -45,6 +47,8 @@ class Family:
     .. versionchanged:: 8.0
        ``alphabetic``, ``alphabetic_revised`` and ``fyinterwiki``
        attributes where removed.
+    .. versionchanged:: 8.2
+       :attr:`obsolete` setter was removed.
     """
 
     def __new__(cls):
@@ -81,6 +85,19 @@ class Family:
         return cls()
 
     name = None
+
+    #: Not open for edits; stewards can still edit.
+    closed_wikis: List[str] = []
+
+    #: Completely removed sites
+    removed_wikis: List[str] = []
+
+    code_aliases: Dict[str, str] = {}
+    """Code mappings which are only an alias, and there is no 'old' wiki.
+
+    For all except 'nl_nds', subdomains do exist as a redirect, but that
+    should not be relied upon.
+    """
 
     langs: Dict[str, str] = {}
 
@@ -160,15 +177,6 @@ class Family:
     # These families can set this variable to the name of the target
     # family.
     interwiki_forward = None
-
-    # Which language codes no longer exist and by which language code
-    # should they be replaced. If for example the language with code xx:
-    # now should get code yy:, add {'xx':'yy'} to obsolete.
-    interwiki_replacements: Dict[str, str] = {}
-
-    # Codes that should be removed, usually because the site has been
-    # taken down.
-    interwiki_removals: List[str] = []
 
     # Language codes of the largest wikis. They should be roughly sorted
     # by size.
@@ -320,12 +328,10 @@ class Family:
             raise UnknownFamilyError(f'Family {fam} does not exist')
         cls = mod.Family.instance
         if cls.name != fam:
-            warnings.warn(
-                'Family name {} does not match family module name {}'
-                .format(cls.name, fam),
-                FamilyMaintenanceWarning,
-                stacklevel=2,
-            )
+            warnings.warn(f'Family name {cls.name} does not match family '
+                          f'module name {fam}',
+                          FamilyMaintenanceWarning,
+                          stacklevel=2)
         # Family 'name' and the 'langs' codes must be ascii letters and digits,
         # and codes must be lower-case due to the Site loading algorithm;
         # codes can accept also underscore/dash.
@@ -415,20 +421,22 @@ class Family:
             return self.disambiguationTemplates[fallback]
 
         raise KeyError(
-            'ERROR: title for disambig template in language {} unknown'
-            .format(code))
+            f'ERROR: title for disambig template in language {code} unknown')
 
     # Methods
     def protocol(self, code: str) -> str:
-        """
-        The protocol to use to connect to the site.
+        """The protocol to use to connect to the site.
 
-        May be overridden to return 'https'. Other protocols are not supported.
+        May be overridden to return 'http'. Other protocols are not
+        supported.
+
+        .. versionchanged:: 8.2
+           ``https`` is returned instead of ``http``.
 
         :param code: language code
         :return: protocol that this family uses
         """
-        return 'http'
+        return 'https'
 
     def verify_SSL_certificate(self, code: str) -> bool:
         """
@@ -528,12 +536,11 @@ class Family:
         """Return the path to title using index.php with redirects disabled."""
         return f'{self.path(code)}?title={title}&redirect=no'
 
-    def interface(self, code) -> str:
+    def interface(self, code: str) -> str:
         """Return interface to use for code."""
         if code in self.interwiki_removals:
             if code in self.codes:
-                pywikibot.warn('Interwiki removal {} is in {} codes'
-                               .format(code, self))
+                pywikibot.warn(f'Interwiki removal {code} is in {self} codes')
             if code in self.closed_wikis:
                 return 'ClosedSite'
             if code in self.removed_wikis:
@@ -691,16 +698,6 @@ class Family:
         data.update(self.interwiki_replacements)
         return types.MappingProxyType(data)
 
-    @obsolete.setter
-    def obsolete(self, data) -> None:
-        """Split obsolete dict into constituent parts."""
-        self.interwiki_removals[:] = [old for (old, new) in data.items()
-                                      if new is None]
-        self.interwiki_replacements.clear()
-        self.interwiki_replacements.update((old, new)
-                                           for (old, new) in data.items()
-                                           if new is not None)
-
     @classproperty
     def domains(cls) -> Set[str]:
         """
@@ -718,6 +715,32 @@ class Family:
         :rtype: set of str
         """
         return set(cls.langs.keys())
+
+    @classproperty
+    def interwiki_replacements(cls) -> Mapping[str, str]:
+        """Return an interwiki code replacement mapping.
+
+        Which language codes no longer exist and by which language code
+        should they be replaced. If for example the language with code
+        xx: now should get code yy:, add {'xx':'yy'} to
+        :attr:`code_aliases`.
+
+        .. versionchanged:: 8.2
+           changed from dict to invariant mapping.
+        """
+        return types.MappingProxyType(cls.code_aliases)
+
+    @classproperty
+    def interwiki_removals(cls) -> FrozenSet[str]:
+        """Return a list of interwiki codes to be removed from wiki pages.
+
+        Codes that should be removed, usually because the site has been
+        taken down.
+
+        .. versionchanged:: 8.2
+           changed from list to invariant frozenset.
+        """
+        return frozenset(cls.removed_wikis + cls.closed_wikis)
 
 
 class SingleSiteFamily(Family):
@@ -761,16 +784,13 @@ class SubdomainFamily(Family):
 
         if hasattr(cls, 'test_codes'):
             codes += cls.test_codes
-        if hasattr(cls, 'closed_wikis'):
-            codes += cls.closed_wikis
+
+        codes += cls.closed_wikis
 
         # shortcut this classproperty
-        cls.langs = {code: f'{code}.{cls.domain}'
-                     for code in codes}
-
-        if hasattr(cls, 'code_aliases'):
-            cls.langs.update({alias: f'{code}.{cls.domain}'
-                              for alias, code in cls.code_aliases.items()})
+        cls.langs = {code: f'{code}.{cls.domain}' for code in codes}
+        cls.langs.update({alias: f'{code}.{cls.domain}'
+                          for alias, code in cls.code_aliases.items()})
 
         return cls.langs
 
@@ -780,8 +800,7 @@ class SubdomainFamily(Family):
         if cls.languages_by_size:
             return cls.languages_by_size
         raise NotImplementedError(
-            'Family {} needs property "languages_by_size" or "codes"'
-            .format(cls.name))
+            f'Family {cls.name} needs property "languages_by_size" or "codes"')
 
     @classproperty
     def domains(cls):
@@ -806,10 +825,6 @@ class FandomFamily(Family):
             codes += tuple(cls.code_aliases.keys())
 
         return {code: cls.domain for code in codes}
-
-    def protocol(self, code) -> str:
-        """Return 'https' as the protocol."""
-        return 'https'
 
     def scriptpath(self, code):
         """Return the script path for this family."""
@@ -934,11 +949,6 @@ class WikimediaFamily(Family):
         'be-x-old': 'be-tarask',
     }
 
-    # Not open for edits; stewards can still edit.
-    closed_wikis: List[str] = []
-    # Completely removed
-    removed_wikis: List[str] = []
-
     # WikimediaFamily uses Wikibase for the category name containing
     # disambiguation pages for the various languages. We need the
     # Wikibase code and item number:
@@ -960,23 +970,9 @@ class WikimediaFamily(Family):
         raise NotImplementedError(
             f"Family {cls.name} needs to define property 'domain'")
 
-    @classproperty
-    def interwiki_removals(cls):
-        """Return a list of interwiki codes to be removed from wiki pages."""
-        return frozenset(cls.removed_wikis + cls.closed_wikis)
-
-    @classproperty
-    def interwiki_replacements(cls):
-        """Return an interwiki code replacement mapping."""
-        return types.MappingProxyType(cls.code_aliases)
-
     def shared_image_repository(self, code):
         """Return Wikimedia Commons as the shared image repository."""
         return ('commons', 'commons')
-
-    def protocol(self, code) -> str:
-        """Return 'https' as the protocol."""
-        return 'https'
 
     def eventstreams_host(self, code) -> str:
         """Return 'https://stream.wikimedia.org' as the stream hostname."""
@@ -995,6 +991,100 @@ class WikimediaOrgFamily(SingleSiteFamily, WikimediaFamily):
     def domain(cls) -> str:
         """Return the parents domain with a subdomain prefix."""
         return f'{cls.name}.wikimedia.org'
+
+
+class WikibaseFamily(Family):
+
+    """A base class for a Wikibase Family.
+
+    .. versionadded:: 8.2
+    """
+
+    def interface(self, code) -> str:
+        """Return 'DataSite' for Wikibase family."""
+        return 'DataSite'
+
+    def entity_sources(self, code: str) -> Dict[str, Tuple[str, str]]:
+        """Provide reopsitory site information for entity types.
+
+        The result must be structured as follows:
+
+            {<entity type>: (<family code>, <family name>)}
+
+        for example:
+
+            {'property': ('test', 'wikidata')}
+
+        If an empty dict is returned, all entity types are found in the
+        current ``DataSite``.
+
+        The result is used by :meth:`DataSite.get_repo_for_entity_type
+        <pywikibot.site._datasite.DataSite.get_repo_for_entity_type>`
+        """
+        return {}
+
+
+class DefaultWikibaseFamily(WikibaseFamily):
+
+    """A base class for a Wikimedia Wikibase Family.
+
+    This class holds defauls for :meth:`calendarmodel`,
+    :meth:`default_globe` and :meth:`globes` to prevent code duplication.
+
+    .. warning:: Possibly you have to adjust the repository site in
+       :meth:`WikibaseFamily.entity_sources` to get the valid entity.
+
+    .. versionadded:: 8.2
+    """
+
+    def calendarmodel(self, code) -> str:
+        """Default calendar model for WbTime datatype."""
+        return 'http://www.wikidata.org/entity/Q1985727'
+
+    def default_globe(self, code) -> str:
+        """Default globe for Coordinate datatype."""
+        return 'earth'
+
+    def globes(self, code):
+        """Supported globes for Coordinate datatype."""
+        return {
+            'ariel': 'http://www.wikidata.org/entity/Q3343',
+            'bennu': 'http://www.wikidata.org/entity/Q11558',
+            'callisto': 'http://www.wikidata.org/entity/Q3134',
+            'ceres': 'http://www.wikidata.org/entity/Q596',
+            'deimos': 'http://www.wikidata.org/entity/Q7548',
+            'dione': 'http://www.wikidata.org/entity/Q15040',
+            'earth': 'http://www.wikidata.org/entity/Q2',
+            'enceladus': 'http://www.wikidata.org/entity/Q3303',
+            'eros': 'http://www.wikidata.org/entity/Q16711',
+            'europa': 'http://www.wikidata.org/entity/Q3143',
+            'ganymede': 'http://www.wikidata.org/entity/Q3169',
+            'gaspra': 'http://www.wikidata.org/entity/Q158244',
+            'hyperion': 'http://www.wikidata.org/entity/Q15037',
+            'iapetus': 'http://www.wikidata.org/entity/Q17958',
+            'io': 'http://www.wikidata.org/entity/Q3123',
+            'jupiter': 'http://www.wikidata.org/entity/Q319',
+            'lutetia': 'http://www.wikidata.org/entity/Q107556',
+            'mars': 'http://www.wikidata.org/entity/Q111',
+            'mercury': 'http://www.wikidata.org/entity/Q308',
+            'mimas': 'http://www.wikidata.org/entity/Q15034',
+            'miranda': 'http://www.wikidata.org/entity/Q3352',
+            'moon': 'http://www.wikidata.org/entity/Q405',
+            'oberon': 'http://www.wikidata.org/entity/Q3332',
+            'phobos': 'http://www.wikidata.org/entity/Q7547',
+            'phoebe': 'http://www.wikidata.org/entity/Q17975',
+            'pluto': 'http://www.wikidata.org/entity/Q339',
+            'rhea': 'http://www.wikidata.org/entity/Q15050',
+            'ryugu': 'http://www.wikidata.org/entity/Q1385178',
+            'steins': 'http://www.wikidata.org/entity/Q150249',
+            'tethys': 'http://www.wikidata.org/entity/Q15047',
+            'titan': 'http://www.wikidata.org/entity/Q2565',
+            'titania': 'http://www.wikidata.org/entity/Q3322',
+            'triton': 'http://www.wikidata.org/entity/Q3359',
+            'umbriel': 'http://www.wikidata.org/entity/Q3338',
+            'venus': 'http://www.wikidata.org/entity/Q313',
+            'vesta': 'http://www.wikidata.org/entity/Q3030',
+        }
 
 
 def AutoFamily(name: str, url: str) -> SingleSiteFamily:

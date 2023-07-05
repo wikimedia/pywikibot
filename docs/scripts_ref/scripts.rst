@@ -254,6 +254,11 @@ transferbot script
 
 .. automodule:: scripts.transferbot
 
+transwikiimport script
+======================
+
+.. automodule:: scripts.transwikiimport
+
 unusedfiles script
 ==================
 

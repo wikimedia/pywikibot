@@ -1,6 +1,6 @@
 """Diff module."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -168,8 +168,7 @@ class Hunk:
 
         if line_ref is None:
             if color in self.colors:
-                colored_line = '<<{color}>>{}<<default>>'.format(
-                    line, color=self.colors[color])
+                colored_line = f'<<{self.colors[color]}>>{line}<<default>>'
                 return colored_line
             return line
 
@@ -185,8 +184,7 @@ class Hunk:
                         apply_color = self.colors[color]
                     else:
                         apply_color = 'default;' + self.bg_colors[color]
-                    char_tagged = '<<{color}>>{}'.format(char,
-                                                         color=apply_color)
+                    char_tagged = f'<<{apply_color}>>{char}'
                     color_closed = False
             else:
                 if char_ref == ' ':
@@ -348,10 +346,10 @@ class PatchManager:
                 # created with one hunk
                 if (not super_hunk or hunk.pre_context <= self.context * 2):
                     # previous hunk has shared/adjacent self.context lines
-                    super_hunk += [hunk]
+                    super_hunk.append(hunk)
                 else:
                     super_hunk = [hunk]
-                    super_hunks += [super_hunk]
+                    super_hunks.append(super_hunk)
         else:
             super_hunks = [[hunk] for hunk in hunks]
         return [_SuperHunk(sh) for sh in super_hunks]
@@ -430,20 +428,20 @@ class PatchManager:
 
             answers = ['y', 'n', 'q', 'a', 'd', 'g']
             if next_pending is not None:
-                answers += ['j']
+                answers.append('j')
             if position < len(super_hunks) - 1:
-                answers += ['J']
+                answers.append('J')
             if prev_pending is not None:
-                answers += ['k']
+                answers.append('k')
             if position > 0:
-                answers += ['K']
+                answers.append('K')
             if len(super_hunk) > 1:
-                answers += ['s']
-            answers += ['?']
+                answers.append('s')
+            answers.append('?')
 
             pywikibot.info(self._generate_diff(super_hunk))
-            choice = pywikibot.input('Accept this hunk [{}]?'.format(
-                ','.join(answers)))
+            choice = pywikibot.input(
+                f"Accept this hunk [{','.join(answers)}]?")
             if choice not in answers:
                 choice = '?'
 
@@ -591,12 +589,16 @@ def cherry_pick(oldtext: str, newtext: str, n: int = 0,
 
 
 def html_comparator(compare_string: str) -> Dict[str, List[str]]:
-    """List of added and deleted contexts from 'action=compare' html string.
+    """List of added and deleted contexts from ``action=compare`` html string.
 
-    This function is useful when combineds with site.py's "compare" method.
-    Site.compare() returns HTML that is useful for displaying on a page.
-    Here we use BeautifulSoup to get the un-HTML-ify the context of changes.
+    This function is useful when combined with :meth:`Site.compare()
+    <pywikibot.site._apisite.APISite.compare>` method. ``compare()``
+    returns HTML that is useful for displaying on a page. Here we use
+    ``BeautifulSoup`` to get the un-HTML-ify the context of changes.
     Finally we present the added and deleted contexts.
+
+    .. note:: ``beautifulsoup4`` package is needed for this function.
+
     :param compare_string: HTML string from MediaWiki API
     :return: deleted and added list of contexts
     """

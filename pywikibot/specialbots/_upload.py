@@ -3,7 +3,7 @@
 Do not import classes directly from here but from specialbots.
 """
 #
-# (C) Pywikibot team, 2003-2022
+# (C) Pywikibot team, 2003-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -158,8 +158,8 @@ class UploadRobot(BaseBot):
                 # raised from connection lost during response.iter_content()
                 except requests.ConnectionError:
                     fd.flush()
-                    pywikibot.info('Connection closed at byte {}'
-                                   .format(path.stat().st_size))
+                    pywikibot.info(
+                        f'Connection closed at byte {path.stat().st_size}')
                 # raised from response.raise_for_status()
                 except requests.HTTPError as e:
                     # exit criteria if size is not available
@@ -230,9 +230,8 @@ class UploadRobot(BaseBot):
         if self.filename_prefix:
             filename = self.filename_prefix + filename
         if not self.keep_filename:
-            pywikibot.info(
-                '\nThe filename on the target wiki will default to: {}\n'
-                .format(filename))
+            pywikibot.info(f'\nThe filename on the target wiki will default '
+                           f'to: {filename}\n')
             assert not self.opt.always
             newfn = pywikibot.input(
                 'Enter a better name, or press enter to accept:')
@@ -412,9 +411,8 @@ class UploadRobot(BaseBot):
                                            comment=self.summary)
             except APIError as error:
                 if error.code == 'uploaddisabled':
-                    pywikibot.error(
-                        'Upload error: Local file uploads are disabled on {}.'
-                        .format(site))
+                    pywikibot.error(f'Upload error: Local file uploads are '
+                                    f'disabled on {site}.')
                 elif error.code == 'copyuploadbaddomain' and not download \
                         and '://' in file_url:
                     pywikibot.error(error)
@@ -464,8 +462,7 @@ class UploadRobot(BaseBot):
                 self.upload_file(file_url)
                 self.counter['read'] += 1
         except QuitKeyboardInterrupt:
-            pywikibot.info('\nUser quit {} bot run...'
-                           .format(self.__class__.__name__))
+            pywikibot.info(f'\nUser quit {self.__class__.__name__} bot run...')
         except KeyboardInterrupt:
             if config.verbose_output:
                 raise

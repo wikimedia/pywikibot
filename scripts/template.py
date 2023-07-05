@@ -75,37 +75,33 @@ on pages in the User: and User talk: namespaces, do:
 
     python pwb.py template test -subst -namespace:2 -namespace:3
 
-Note that -namespace: is a global Pywikibot parameter
-
+.. note:: -namespace: is a global Pywikibot parameter
 
 This next example substitutes the template lived with a supplied edit summary.
 It only performs substitutions in main article namespace and doesn't prompt to
 start replacing. Note that -putthrottle: is a global Pywikibot parameter:
 
     python pwb.py template -putthrottle:30 -namespace:0 lived -subst -always \
-        -summary:"BOT: Substituting {{lived}}, see [[WP:SUBST]]."
-
+-summary:"BOT: Substituting {{lived}}, see [[WP:SUBST]]."
 
 This next example removes the templates {{cfr}}, {{cfru}}, and {{cfr-speedy}}
 from five category pages as given:
 
     python pwb.py template cfr cfru cfr-speedy -remove -always \
-        -page:"Category:Mountain monuments and memorials" \
-        -page:"Category:Indian family names" \
-        -page:"Category:Tennis tournaments in Belgium" \
-        -page:"Category:Tennis tournaments in Germany" \
-        -page:"Category:Episcopal cathedrals in the United States" \
-        -summary:"Removing Cfd templates from category pages that survived."
-
+-page:"Category:Mountain monuments and memorials" \
+-page:"Category:Indian family names" \
+-page:"Category:Tennis tournaments in Belgium" \
+-page:"Category:Tennis tournaments in Germany" \
+-page:"Category:Episcopal cathedrals in the United States" \
+-summary:"Removing Cfd templates from category pages that survived."
 
 This next example substitutes templates test1, test2, and space test on all
 user talk pages (namespace #3):
 
     python pwb.py template test1 test2 "space test" -subst -ns:3 -always
-
 """
 #
-# (C) Pywikibot team, 2003-2022
+# (C) Pywikibot team, 2003-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -113,13 +109,10 @@ import re
 
 import pywikibot
 from pywikibot import i18n, pagegenerators, textlib
+from pywikibot.backports import batched
 from pywikibot.bot import SingleSiteBot
 from pywikibot.pagegenerators import XMLDumpPageGenerator
-from pywikibot.tools.itertools import (
-    filter_unique,
-    itergroup,
-    roundrobin_generators,
-)
+from pywikibot.tools.itertools import filter_unique, roundrobin_generators
 from scripts.replace import ReplaceRobot as ReplaceBot
 
 
@@ -194,8 +187,7 @@ class TemplateRobot(ReplaceBot):
             else:
                 template = pywikibot.Page(self.site, new, ns=10)
                 if not template.exists():
-                    pywikibot.warning('Template "{}" does not exist.'
-                                      .format(new))
+                    pywikibot.warning(f'Template "{new}" does not exist.')
                     if not pywikibot.input_yn('Do you want to proceed anyway?',
                                               default=False,
                                               automatic_quit=False):
@@ -272,7 +264,7 @@ def main(*args: str) -> None:
         templates = dict.fromkeys(template_names)
     else:
         try:
-            templates = dict(itergroup(template_names, 2, strict=True))
+            templates = dict(batched(template_names, 2))
         except ValueError:
             pywikibot.info('Unless using solely -subst or -remove, you must '
                            'give an even number of template names.')

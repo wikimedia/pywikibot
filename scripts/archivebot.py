@@ -105,15 +105,16 @@ Options (may be omitted):
   -keep           Preserve thread order in archive even if threads are
                   archived later
   -sort           Sort archive by timestamp; should not be used with -keep
-  -async          Run the bot in parallel tasks. This is experimental
-                  and the bot cannot be stopped with KeyboardInterrupt
+  -async          Run the bot in parallel tasks.
 
 .. versionchanged:: 7.6
    Localized variables for "archive" template parameter are supported.
    `User:MiszaBot/config` is the default template. `-keep` option was
    added.
 .. versionchanged:: 7.7
-   `-sort` and `-async` options were added.
+   ``-sort`` and ``-async`` options were added.
+.. versionchanged:: 8.2
+   KeyboardInterrupt was enabled with ``-async`` option.
 """
 #
 # (C) Pywikibot team, 2006-2023
@@ -124,13 +125,15 @@ import datetime
 import locale
 import os
 import re
+import signal
+import threading
 import time
 from collections import OrderedDict, defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from hashlib import md5
 from math import ceil
 from textwrap import fill
-from typing import Any, Optional, Pattern
+from typing import Any, Optional, Pattern, Union
 from warnings import warn
 
 import pywikibot
@@ -145,6 +148,7 @@ from pywikibot.textlib import (
     to_local_digits,
 )
 from pywikibot.time import MW_KEYS, parse_duration, str2timedelta
+from pywikibot.tools import PYTHON_VERSION
 
 
 ShouldArchive = Tuple[str, str]
@@ -391,11 +395,10 @@ class DiscussionPage(pywikibot.Page):
         else:
             self.header = header + footer
 
-        for thread_heading, thread_content in threads:
-            cur_thread = DiscussionThread(thread_heading.strip('= '),
-                                          self.timestripper)
+        for thread in threads:
+            cur_thread = DiscussionThread(thread.heading, self.timestripper)
             # remove heading line
-            _, *lines = thread_content.replace(marker, '').splitlines()
+            _, *lines = thread.content.replace(marker, '').splitlines()
             for line in lines:
                 cur_thread.feed_line(line)
             self.threads.append(cur_thread)
@@ -877,6 +880,11 @@ def main(*args: str) -> None:
 
     :param args: command line arguments
     """
+    def signal_handler(signum, frame):
+        pywikibot.info('\n<<lightyellow>>User quit bot run...')
+        exiting.set()
+
+    exiting = threading.Event()
     filename = None
     pagename = None
     namespace = None
@@ -885,7 +893,7 @@ def main(*args: str) -> None:
     calc = None
     keep = False
     sort = False
-    asyncronous = False
+    asynchronous = False
     templates = []
 
     local_args = pywikibot.handle_args(args)
@@ -920,7 +928,7 @@ def main(*args: str) -> None:
         elif option == 'sort':
             sort = True
         elif option == 'async':
-            asyncronous = True
+            asynchronous = True
 
     site = pywikibot.Site()
 
@@ -931,6 +939,12 @@ def main(*args: str) -> None:
         templates = ['User:MiszaBot/config']
         pywikibot.info('No template was specified, using default {{{{{}}}}}.'
                        .format(templates[0]))
+
+    if asynchronous:
+        signal.signal(signal.SIGINT, signal_handler)
+        context = ThreadPoolExecutor
+    else:
+        context = nullcontext
 
     for template_name in templates:
         tmpl = pywikibot.Page(site, template_name, ns=10)
@@ -949,13 +963,33 @@ def main(*args: str) -> None:
                                      content=True)
 
         botargs = tmpl, salt, force, keep, sort
-        context = ThreadPoolExecutor if asyncronous else nullcontext
+        futures = []  # needed for Python < 3.9
         with context() as executor:
             for pg in gen:
-                if asyncronous:
-                    executor.submit(process_page, pg, *botargs)
+                if asynchronous:
+                    future = executor.submit(process_page, pg, *botargs)
+
+                    if PYTHON_VERSION < (3, 9):
+                        futures.append(future)
+
+                    if not exiting.is_set():
+                        continue
+
+                    canceled: Union[str, int] = ''
+                    pywikibot.info(
+                        '<<lightyellow>>Canceling pending Futures... ',
+                        newline=False)
+
+                    if PYTHON_VERSION < (3, 9):
+                        canceled = sum(future.cancel() for future in futures)
+                    else:
+                        executor.shutdown(cancel_futures=True)
+
+                    pywikibot.info(f'{canceled} done')
+                    break
+
                 elif not process_page(pg, *botargs):
-                    return
+                    break
 
 
 if __name__ == '__main__':

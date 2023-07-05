@@ -18,7 +18,7 @@ To force preloading, change the global expiry value to 0::
    script was moved to the framework scripts folder.
 """
 #
-# (C) Pywikibot team, 2021-2022
+# (C) Pywikibot team, 2021-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -85,8 +85,8 @@ def preload_families(families: Union[List[str], Set[str]],
     # to allow adding futures in preload_family the workers must be one
     # more than families are handled
     worker = max(len(families) * 2, worker)
-    pywikibot.info('Using {} workers to process {} families'
-                   .format(worker, len(families)))
+    pywikibot.info(
+        f'Using {worker} workers to process {len(families)} families')
     with ThreadPoolExecutor(worker) as executor:
         futures = {executor.submit(preload_family, family, executor)
                    for family in families}

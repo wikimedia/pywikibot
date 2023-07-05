@@ -156,7 +156,7 @@ Some words, like "Administrator" or "Dio" (God in italian) or "Jimbo" aren't
 badwords at all but can be used for some bad-nickname.
 """
 #
-# (C) Pywikibot team, 2006-2022
+# (C) Pywikibot team, 2006-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -482,9 +482,8 @@ class WelcomeBot(SingleSiteBot):
         # Raises KeyError if site is not in netext dict.
         site_netext = i18n.translate(self.site, netext)
         if site_netext is None:
-            raise KeyError(
-                'welcome.py is not localized for site {} in netext dict.'
-                .format(self.site))
+            raise KeyError(f'welcome.py is not localized for site {self.site}'
+                           ' in netext dict.')
         self.welcome_text = site_netext
 
     def bad_name_filer(self, name, force: bool = False) -> bool:
@@ -597,9 +596,8 @@ class WelcomeBot(SingleSiteBot):
 
         if answer.lower() in ['yes', 'y'] or not globalvar.confirm:
             self.show_status()
-            pywikibot.info(
-                '{} is possibly an unwanted username. It will be reported.'
-                .format(name))
+            pywikibot.info(f'{name} is possibly an unwanted username. It will'
+                           ' be reported.')
             if hasattr(self, '_BAQueue'):
                 self._BAQueue.append(name)
             else:
@@ -734,9 +732,8 @@ class WelcomeBot(SingleSiteBot):
             sign_page_name = i18n.translate(self.site, random_sign)
             if not sign_page_name:
                 self.show_status(Msg.WARN)
-                pywikibot.info(
-                    "{} doesn't allow random signature, force disable."
-                    .format(self.site))
+                pywikibot.info(f"{self.site} doesn't allow random signature,"
+                               ' force disable.')
                 globalvar.random_sign = False
                 return []
 
@@ -857,8 +854,7 @@ class WelcomeBot(SingleSiteBot):
                 pywikibot.info('Putting the log of the latest user...')
             else:
                 pywikibot.info(
-                    'Putting the log of the latest {} users...'
-                    .format(welcomed_count))
+                    f'Putting the log of the latest {welcomed_count} users...')
             self.makelogpage()
 
         if hasattr(self, '_BAQueue'):
@@ -885,8 +881,7 @@ class WelcomeBot(SingleSiteBot):
             # Filename and Pywikibot path
             # file where is stored the random signature index
             filename = pywikibot.config.datafilepath(
-                'welcome-{}-{}.data'.format(self.site.family.name,
-                                            self.site.code))
+                f'welcome-{self.site.family.name}-{self.site.code}.data')
             with open(filename, 'wb') as f:
                 pickle.dump(self.welcomed_users, f,
                             protocol=config.pickle_protocol)

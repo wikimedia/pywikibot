@@ -385,18 +385,16 @@ _digitDecoders: Dict[str, decoder_type] = {
 
 # Allows to search for '(%%)|(%d)|(%R)|...", and allows one digit 1-9 to set
 # the size of zero-padding for numbers
-_reParameters = re.compile('|'.join(f'(%[1-9]?{s})'
-                                    for s in _digitDecoders))
+_reParameters = re.compile('|'.join(f'(%[1-9]?{s})' for s in _digitDecoders))
 
 # A map of sitecode+pattern to (re matching object and corresponding decoders)
 _escPtrnCache2 = {}
 
 
-def escapePattern2(pattern: str
-                   ) -> Tuple[Pattern[str], str,
-                              List[Union[decoder_type, decoder_type]]]:
-    """
-    Convert a string pattern into a regex expression and cache.
+def escapePattern2(
+    pattern: str
+) -> Tuple[Pattern[str], str, List[decoder_type]]:
+    """Convert a string pattern into a regex expression and cache.
 
     Allows matching of any _digitDecoders inside the string.
     Returns a compiled regex object and a list of digit decoders.
@@ -427,8 +425,8 @@ def escapePattern2(pattern: str
         # Special case for strings that are replaced instead of decoded
         # Keep the original text for strPattern
         assert len(subpattern) < 3, (
-            'Invalid pattern {}: Cannot use zero padding size '
-            'in {}!'.format(pattern, subpattern))
+            f'Invalid pattern {pattern}: Cannot use zero padding size '
+            f'in {subpattern}!')
         return newpattern + re.escape(dec), strpattern + subpattern
 
     if pattern not in _escPtrnCache2:
@@ -501,8 +499,7 @@ def dh(value: int, pattern: str, encf: encf_type, decf: decf_type,
                            for i, param in enumerate(params))
         return strPattern % str_params
     assert len(decoders) == 1, (
-        'A single parameter does not match {} decoders.'
-        .format(len(decoders)))
+        f'A single parameter does not match {len(decoders)} decoders.')
     # convert integer parameter into its textual representation
     assert isinstance(params, int)
     return strPattern % _make_parameter(decoders[0], params)
@@ -515,7 +512,8 @@ def _(value: str, pattern: str, encf: encf_type, decf: decf_type,
     m = compPattern.match(value)
     if m:
         # decode each found value using provided decoder
-        values = [decoder[2](m[i + 1]) for i, decoder in enumerate(decoders)]
+        values = [decoder[2](m[i])
+                  for i, decoder in enumerate(decoders, start=1)]
         decValue = decf(values)
 
         assert not isinstance(decValue, str), \
@@ -691,8 +689,8 @@ class MonthFormat(abc.MutableMapping):  # type: ignore[type-arg]
         self.data[key] = value
 
     def __delitem__(self, key: str) -> None:
-        raise NotImplementedError("Deleting of key '{}' is not implemented"
-                                  .format(key))
+        raise NotImplementedError(
+            f"Deleting of key '{key}' is not implemented")
 
     def __iter__(self) -> Iterator[str]:
         return iter(self.data)
@@ -1676,7 +1674,7 @@ def addFmt1(lang: str, isMnthOfYear: bool,
 
     :param lang: language code
     """
-    assert len(patterns) == 12, 'pattern %s does not have 12 elements' % lang
+    assert len(patterns) == 12, f'pattern {lang} does not have 12 elements'
 
     for i in range(12):
         if patterns[i] is not None:
@@ -1990,8 +1988,7 @@ def format_date(month: int, day: int,
     max_day = calendar.monthrange(year, month)[1]
     if not 1 <= day <= max_day:
         raise ValueError(
-            'Wrong day value {day}; must be 1-{max_day}'
-            .format(day=day, max_day=max_day))
+            f'Wrong day value {day}; must be 1-{max_day}')
     assert isinstance(lang, str)
     return formats[dayMnthFmts[month - 1]][lang](day)
 

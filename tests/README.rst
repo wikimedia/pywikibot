@@ -22,14 +22,6 @@ All tests
 
 The entire suite of tests may be run in the following ways from the root directory:
 
-**setup.py**
-
-::
-
-    pip install pytest
-    pip install pytest-runner
-    python setup.py pytest
-
 **Module unittest**
 
 ::
@@ -40,7 +32,8 @@ The entire suite of tests may be run in the following ways from the root directo
 
 ::
 
-    py.test
+    pip install pytest
+    pytest
 
 **tox**
 

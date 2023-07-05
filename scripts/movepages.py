@@ -192,8 +192,7 @@ class MovePagesBot(CurrentPageBot):
             self.create_title = create_title
 
             choice = pywikibot.input_choice(
-                'Change the page title '
-                'to {!r}?'.format(create_title(page)),
+                f'Change the page title to {create_title(page)!r}?',
                 choices)
 
             if choice == 'y':
@@ -236,8 +235,7 @@ def main(*args: str) -> None:
             for old_page, new_page in zip_longest(*page_gen, fillvalue=None):
                 if new_page is None:
                     pywikibot.warning(
-                        'file {} contains odd number '
-                        'of links'.format(filename))
+                        f'file {filename} contains odd number of links')
                 else:
                     from_to_pairs.append([old_page.title(), new_page.title()])
         elif opt in ('always', 'noredirect', 'skipredirects'):

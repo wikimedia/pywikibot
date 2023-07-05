@@ -17,7 +17,7 @@ from contextlib import suppress
 from email.mime.nonmultipart import MIMENonMultipart
 from pathlib import Path
 from typing import Any, Optional, Union
-from urllib.parse import unquote, urlencode
+from urllib.parse import unquote, urlencode, urlparse
 from warnings import warn
 
 import pywikibot
@@ -674,13 +674,23 @@ class Request(MutableMapping):
                       paramstring) -> tuple:
         """Get or post a http request with exception handling.
 
+        .. versionchanged:: 8.2
+           change the scheme if the previous request didn't have json
+           content.
+
         :return: a tuple containing requests.Response object from
             http.request and use_get value
         """
+        kwargs = {}
+        schemes = ('http', 'https')
+        if self.json_warning and self.site.protocol() in schemes:
+            # retry with other scheme
+            kwargs['protocol'] = schemes[self.site.protocol() == 'http']
+
         try:
             response = http.request(self.site, uri=uri,
                                     method='GET' if use_get else 'POST',
-                                    data=data, headers=headers)
+                                    data=data, headers=headers, **kwargs)
         except Server504Error:
             pywikibot.log('Caught HTTP 504 error; retrying')
         except Client414Error:
@@ -707,6 +717,10 @@ class Request(MutableMapping):
 
     def _json_loads(self, response) -> Optional[dict]:
         """Return a dict from requests.Response.
+
+        .. versionchanged:: 8.2
+           show a warning to add a ``protocoll()`` method to the family
+           file if suitable.
 
         :param response: a requests.Response object
         :type response: requests.Response
@@ -753,7 +767,18 @@ The text message is:
                         self[param] = [str(int(value) // 2)]
                         pywikibot.info(f'Set {param} = {self[param]}')
         else:
+            scheme = urlparse(response.url).scheme
+            if self.json_warning and scheme != self.site.protocol():
+                warn(f"""
+Your {self.site.family} family uses a wrong scheme {self.site.protocol()!r}
+but {scheme!r} is required. Please add the following code to your family file:
+
+    def protocol(self, code: str) -> str:
+        return '{scheme}'
+
+""", stacklevel=2)
             return result or {}
+
         self.wait()
         return None
 

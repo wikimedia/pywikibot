@@ -57,7 +57,7 @@ Unprotect all pages listed in text file 'unprotect.txt' without prompting:
 #
 # Created by modifying delete.py
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -139,10 +139,10 @@ def check_protection_level(operation, level, levels, default=None) -> str:
         if level == default:
             default_char = first_char[-1]
 
-    choice = pywikibot.input_choice('Choose a protection level to {}:'
-                                    .format(operation),
-                                    zip(levels, first_char),
-                                    default=default_char)
+    choice = pywikibot.input_choice(
+        f'Choose a protection level to {operation}:',
+        zip(levels, first_char),
+        default=default_char)
 
     return levels[first_char.index(choice)]
 

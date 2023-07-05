@@ -57,11 +57,9 @@ class TouchBot(MultipleSitesBot):
         try:
             page.touch(botflag=self.opt.botflag)
         except (NoCreateError, NoPageError):
-            pywikibot.error('Page {} does not exist.'
-                            .format(page.title(as_link=True)))
+            pywikibot.error(f'Page {page.title(as_link=True)} does not exist.')
         except LockedPageError:
-            pywikibot.error('Page {} is locked.'
-                            .format(page.title(as_link=True)))
+            pywikibot.error(f'Page {page.title(as_link=True)} is locked.')
         except PageSaveRelatedError as e:
             pywikibot.error(f'Page {page} not saved:\n{e.args}')
         else:
@@ -122,8 +120,8 @@ class PurgeBot(MultipleSitesBot):
                     self.counter['purge'] += length
                 self.pages[site].clear()
 
-                pywikibot.info('{} pages{} purged'
-                               .format(length, '' if done else ' not'))
+                pywikibot.info(
+                    f"{length} pages{'' if done else ' not'} purged")
                 if not flush and not config.simulate:
                     pywikibot.info('Waiting due to purge rate limit')
                     pywikibot.sleep(62)

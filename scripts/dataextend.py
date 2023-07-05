@@ -414,8 +414,7 @@ class DataExtendBot(SingleSiteBot):
         with codecs.open(self.datafile, **param) as f:
             for dtype in self.data:
                 for key in self.data[dtype]:
-                    f.write('{}:{}:{}\n'.format(dtype, key,
-                                                self.data[dtype][key]))
+                    f.write(f'{dtype}:{key}:{self.data[dtype][key]}\n')
 
         with codecs.open(self.nonamefile, **param) as f:
             for noname in self.noname:
@@ -466,8 +465,7 @@ class DataExtendBot(SingleSiteBot):
                                    .format(self.label(prop),
                                            self.showtime(claim.getTarget())))
                 elif claim.type in ['external-id', 'commonsMedia']:
-                    pywikibot.info('{}: {}'.format(self.label(prop),
-                                                   claim.getTarget()))
+                    pywikibot.info(f'{self.label(prop)}: {claim.getTarget()}')
                 elif claim.type == 'quantity':
                     pywikibot.info(
                         '{}: {} {}'
@@ -691,11 +689,9 @@ class DataExtendBot(SingleSiteBot):
         if day is None and month == 0:
             month = None
         if month and month > 12:
-            raise ValueError('Date seems to have an invalid month number {}'
-                             .format(month))
+            raise ValueError(f'Date seems to have an invalid month number {month}')
         if day and day > 31:
-            raise ValueError('Date seems to have an invalid day number {}'
-                             .format(day))
+            raise ValueError(f'Date seems to have an invalid day number {day}')
         if not year:
             raise ValueError(f"Can't interpret date {text}")
         return pywikibot.WbTime(year=year, month=month, day=day, precision=9
@@ -799,8 +795,7 @@ class DataExtendBot(SingleSiteBot):
                     for claim in newclaims:
                         try:
                             pywikibot.info(
-                                '{}: {}'.format(self.label(claim[0]),
-                                                self.label(claim[1])))
+                                f'{self.label(claim[0])}: {self.label(claim[1])}')
                         except ValueError:
                             newclaims = [nclaim
                                          for nclaim in newclaims
@@ -915,8 +910,7 @@ class DataExtendBot(SingleSiteBot):
                             except OtherPageSaveError as ex:
                                 if claim[1].startswith('!i!'):
                                     pywikibot.info(
-                                        'Unable to save image {}: {}'
-                                        .format(claim[1][3:], ex))
+                                        f'Unable to save image {claim[1][3:]}: {ex}')
                                     continue
 
                                 raise
@@ -1040,11 +1034,9 @@ class DataExtendBot(SingleSiteBot):
         if editdescriptions:
             item.editDescriptions(editdescriptions)
         for prop in unidentifiedprops:
-            pywikibot.info('Unknown external {} ({})'
-                           .format(prop, self.label(prop)))
+            pywikibot.info(f'Unknown external {prop} ({self.label(prop)})')
         for prop in failedprops:
-            pywikibot.info('External failed to load: {} ({})'
-                           .format(prop, self.label(prop)))
+            pywikibot.info(f'External failed to load: {prop} ({self.label(prop)})')
         if longtexts:
             if unidentifiedprops or failedprops:
                 pywikibot.input('Press Enter to continue')
@@ -2496,11 +2488,9 @@ class LcAuthAnalyzer(Analyzer):
     @property
     def url(self):
         if self.isperson:
-            return 'http://id.loc.gov/authorities/names/{id}.html'.format(
-                id=self.id)
+            return f'http://id.loc.gov/authorities/names/{self.id}.html'
         if self.id.startswith('s'):
-            return 'http://id.loc.gov/authorities/subjects/{id}.html'.format(
-                id=self.id)
+            return f'http://id.loc.gov/authorities/subjects/{self.id}.html'
         return None
 
     @property
@@ -2553,9 +2543,7 @@ class LcAuthAnalyzer(Analyzer):
         if result and '[' not in result:
             m = re.match(r'(\d+)[/\-](\d+)[/\-](\d+)', result)
             if m:
-                result = '{}-{}-{}'.format(
-                    m[2], m[1], m[3] if len(m[3]) > 2 else '19' + m[3]
-                )
+                result = f"{m[2]}-{m[1]}-{m[3] if len(m[3]) > 2 else '19' + m[3]}"
             return result
 
         return None
@@ -2572,9 +2560,7 @@ class LcAuthAnalyzer(Analyzer):
         if result and '[' not in result:
             m = re.match(r'(\d+)[/\-](\d+)[/\-](\d+)', result)
             if m:
-                result = '{}-{}-{}'.format(
-                    m[2], m[1], m[3] if len(m[3]) > 2 else '19' + m[3]
-                )
+                result = f"{m[2]}-{m[1]}-{m[3] if len(m[3]) > 2 else '19' + m[3]}"
             return result
 
         return None
@@ -4167,8 +4153,7 @@ class SikartAnalyzer(Analyzer):
         if section:
             result = []
             splitter = 'et' if ' et ' in section else 'und'
-            for subsection in section.split('.')[0].split(' {} '
-                                                          .format(splitter)):
+            for subsection in section.split('.')[0].split(f' {splitter} '):
                 result += self.findallbyre(r'([\w\s]+)', subsection,
                                            'occupation')
             return result
@@ -5807,8 +5792,7 @@ class TgnAnalyzer(Analyzer):
             return None
 
         if county:
-            return self.getdata('county', '{} county, {}'
-                                .format(county, state))
+            return self.getdata('county', f'{county} county, {state}')
         return self.getdata('state', state)
 
     def findcoords(self, html: str):
@@ -11822,8 +11806,7 @@ class Edit16Analyzer(Analyzer):
         self.language = 'it'
 
     def getvalue(self, field, html, dtype=None):
-        return self.findbyre('<B>{}:(?:<[^<>]*>)*([^<>]+)<'
-                             .format(field), html, dtype)
+        return self.findbyre(f'<B>{field}:(?:<[^<>]*>)*([^<>]+)<', html, dtype)
 
     def findnames(self, html) -> List[str]:
         result = []
@@ -13887,8 +13870,7 @@ class WikiAnalyzer(Analyzer):
         if self.language in ['commons', 'species']:
             site = 'wikimedia'
         self.dbname = f'{site.title()} {self.language.upper()}'
-        self.urlbase = 'https://{}.{}.org/wiki/{{id}}'.format(
-            self.language, site)
+        self.urlbase = f'https://{self.language}.{site}.org/wiki/{{id}}'
         self.urlbase3 = 'https://{}.{}.org/w/index.php?title={{id}}&veswitched=1&action=edit'.format(
             self.language, site)
         self.hrtre = '{{(.*?)}}'
@@ -13900,7 +13882,7 @@ class WikiAnalyzer(Analyzer):
     def prepare(self, html: str):
         def reworkwikilink(wikipart):
             parts = wikipart[1].split('|')
-            return '[[{}]]'.format(parts[0] if ':' in parts[0] else parts[-1])
+            return f"[[{parts[0] if ':' in parts[0] else parts[-1]}]]"
 
         if not html:
             return None

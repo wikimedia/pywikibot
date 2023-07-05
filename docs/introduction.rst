@@ -3,8 +3,8 @@ Introduction
 ************
 
 .. include:: ../README.rst
+   :start-line: 38
    :end-before: For more documentation on Pywikibot
-   :start-line: 41
 
 Settings
 ========

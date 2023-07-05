@@ -6,7 +6,7 @@ in paralled CI test tasks. Any logout could lead other parallel tests
 to fail.
 """
 #
-# (C) Pywikibot team, 2022
+# (C) Pywikibot team, 2022-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -74,7 +74,7 @@ class TestClearCookies(TestCase):
         raised = False
         try:
             site.login()
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             raised = e
         self.assertFalse(raised)
 

@@ -1,14 +1,34 @@
 Current release
 ---------------
 
-* Add support for guwwikinews (:phab:`T334461`)
-* Add support for kbdwiktionary (:phab:`T333271`)
-* Fix :func:`tools.chars.url2string` parsing for multiple encodings (:phab:`T335224`)
+* Add support for gpewiki (:phab:`T335989`)
+* :class:`family.WikibaseFamily` and :class:`family.DefaultWikibaseFamily` were added to :mod:`family` module
+* Remove incorrect time normalization in :class:`page.Claim` (:phab:`T338748`, :phab:`T325860`, :phab:`T57755`)
+* Add support for other types of diffs in :meth:`Site.compare()<pywikibot.site._apisite.APISite.compare>`
+* Improvements for :func:`textlib.extract_sections` function (:phab:`T338748`)
+* Backport ``itertools.batched()`` from Python 3.12 which replaces :func:`tools.itertools.itergroup`
+* Upcast page types in :func:`pagegenerators.RecentChangesPageGenerator` (:phab:`T340450`)
+* Enable :meth:`FilePage.download()<pywikibot.FilePage.download>` to download thumbnails (:phab:`T247095`)
+* Refactor :func:`tools.compute_file_hash` and use ``hashlib.file_digest`` with Python 3.11
+* Url ends with curly bracket in :func:`textlib.compileLinkR` (:phab:`T338029`)
+* Allows spaces in environment variables for :class:`editor.TextEditor` (:phab:`T102465`, :phab:`T323078`)
+* Add :func:`textlib.get_regexes` public function (:phab:`T336144`)
+* Return 'https' scheme with :meth:`family.Family.protocol` (:phab:`T326046`)
+* Use ``build`` instead of ``setuptools.setup()`` to build the distribution
+* Raise ``ConnectionError`` on ``requests.ReadTimeout`` in :func:`comms.http.error_handling_callback`
+* Raise :exc:`exceptions.ServerError` on ``requests.ReadTimeout`` in :func:`comms.http.error_handling_callback`
+* Do not evaluate :func:`pywikibot.Site` with dict.pop() as default value (:phab:`T335720`)
+* L10N updates
+* :class:`family.Family` class was rewritten. ``obsolete.setter`` was removed,
+  :meth:`family.Family.interwiki_replacements` returns an invariant mapping,
+  :meth:`family.Family.interwiki_removals` returns a frozenset. ``closed_wikis``,
+  ``removed_wikis`` and ``code_aliases`` are :class:`family.Family` class attributes.  (:phab:`T334834`)
 
 
 Deprecations
 ------------
 
+* 8.2.0: *normalize* parameter of :meth:`WbTime.toTimestr` and :meth:`WbTime.toWikibase` will be removed
 * 8.1.0: Dependency of :exc:`exceptions.NoSiteLinkError` from :exc:`exceptions.NoPageError` will be removed
 * 8.1.0: ``exceptions.Server414Error`` is deprecated in favour of :exc:`exceptions.Client414Error`
 * 8.0.0: :meth:`Timestamp.clone()<pywikibot.time.Timestamp.clone>` method is deprecated
@@ -39,10 +59,8 @@ Deprecations
 * 7.2.0: RedirectPageBot and NoRedirectPageBot bot classes are deprecated in favour of
   :attr:`use_redirects<bot.BaseBot.use_redirects>` attribute
 * 7.2.0: :func:`tools.formatter.color_format<tools.formatter.color_format>` is deprecated and will be removed
-* 7.1.0: Unused `get_redirect` parameter of Page.getOldVersion() will be removed
-* 7.1.0: APISite._simple_request() will be removed in favour of APISite.simple_request()
+* 7.1.0: Unused ``get_redirect`` parameter of :meth:`Page.getOldVersion()<page.BasePage.getOldVersion>` will be removed
 * 7.0.0: User.isBlocked() method is renamed to is_blocked for consistency
-* 7.0.0: Private BaseBot counters _treat_counter, _save_counter, _skip_counter will be removed in favour of collections.Counter counter attribute
 * 7.0.0: A boolean watch parameter in Page.save() is deprecated and will be desupported
 * 7.0.0: baserevid parameter of editSource(), editQualifier(), removeClaims(), removeSources(), remove_qualifiers() DataSite methods will be removed
 * 7.0.0: Values of APISite.allpages() parameter filterredir other than True, False and None are deprecated

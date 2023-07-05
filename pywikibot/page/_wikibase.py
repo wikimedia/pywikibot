@@ -105,15 +105,13 @@ class WikibaseEntity:
         self.id = id_ if id_ is not None else '-1'
         if self.id != '-1' and not self.is_valid_id(self.id):
             raise InvalidTitleError(
-                "'{}' is not a valid {} page title"
-                .format(self.id, self.entity_type))
+                f"'{self.id}' is not a valid {self.entity_type} page title")
 
     def __repr__(self) -> str:
         if self.id != '-1':
             return 'pywikibot.page.{}({!r}, {!r})'.format(
                 self.__class__.__name__, self.repo, self.id)
-        return 'pywikibot.page.{}({!r})'.format(
-            self.__class__.__name__, self.repo)
+        return f'pywikibot.page.{self.__class__.__name__}({self.repo!r})'
 
     @classmethod
     def is_valid_id(cls, entity_id: str) -> bool:
@@ -393,16 +391,14 @@ class MediaInfo(WikibaseEntity):
                 # state which needs to be raised as an exception, but also
                 # logged in case an exception handler is catching
                 # the generic Error
-                pywikibot.error('{} is in invalid state'
-                                .format(self.__class__.__name__))
-                raise Error('{} is in invalid state'
-                            .format(self.__class__.__name__))
+                msg = f'{self.__class__.__name__} is in invalid state'
+                pywikibot.error(msg)
+                raise Error(msg)
 
             page_id = self.getID(numeric=True)
             result = list(self.repo.load_pages_from_pageids([page_id]))
             if not result:
-                raise Error('There is no existing page with id "{}"'
-                            .format(page_id))
+                raise Error(f'There is no existing page with id "{page_id}"')
 
             page = result.pop()
             if page.namespace() != page.site.namespaces.FILE:
@@ -501,8 +497,8 @@ class WikibasePage(BasePage, WikibaseEntity):
                 elif site.property_namespace.id == ns:
                     self._namespace = site.property_namespace
                 else:
-                    raise ValueError('{!r}: Namespace "{}" is not valid'
-                                     .format(site, int(ns)))
+                    raise ValueError(
+                        f'{site!r}: Namespace "{int(ns)}" is not valid')
 
         if 'entity_type' in kwargs:
             entity_type = kwargs.pop('entity_type')
@@ -510,8 +506,8 @@ class WikibasePage(BasePage, WikibaseEntity):
                 entity_type_ns = site.get_namespace_for_entity_type(
                     entity_type)
             except EntityTypeUnknownError:
-                raise ValueError('Wikibase entity type "{}" unknown'
-                                 .format(entity_type))
+                raise ValueError(
+                    f'Wikibase entity type "{entity_type}" unknown')
 
             if self._namespace:
                 if self._namespace != entity_type_ns:
@@ -543,8 +539,8 @@ class WikibasePage(BasePage, WikibaseEntity):
             elif self.site.property_namespace.id == ns:
                 self._namespace = self.site.property_namespace
             else:
-                raise ValueError('{!r}: Namespace "{!r}" is not valid'
-                                 .format(self.site, ns))
+                raise ValueError(
+                    f'{self.site!r}: Namespace "{ns!r}" is not valid')
 
         WikibaseEntity.__init__(
             self,
@@ -889,10 +885,8 @@ class ItemPage(WikibasePage):
             # if none of the above applies, this item is in an invalid state
             # which needs to be raise as an exception, but also logged in case
             # an exception handler is catching the generic Error.
-            pywikibot.error('{} is in invalid state'
-                            .format(self.__class__.__name__))
-            raise Error('{} is in invalid state'
-                        .format(self.__class__.__name__))
+            pywikibot.error(f'{self.__class__.__name__} is in invalid state')
+            raise Error(f'{self.__class__.__name__} is in invalid state')
 
         return params
 
@@ -960,8 +954,7 @@ class ItemPage(WikibasePage):
         if hasattr(page, '_item'):
             return page._item
         if not page.site.has_data_repository:
-            raise WikiBaseError('{} has no data repository'
-                                .format(page.site))
+            raise WikiBaseError(f'{page.site} has no data repository')
         if not lazy_load and not page.exists():
             raise NoPageError(page)
 
@@ -1078,7 +1071,8 @@ class ItemPage(WikibasePage):
     def getSitelink(self, site, force: bool = False) -> str:
         """Return the title for the specific site.
 
-        If the item doesn't have that language, raise NoSiteLinkError.
+        If the item doesn't have a link to that site, raise
+        NoSiteLinkError.
 
         .. versionchanged:: 8.1
            raises NoSiteLinkError instead of NoPageError.
@@ -1095,7 +1089,9 @@ class ItemPage(WikibasePage):
             self.get(force=force)
 
         if site not in self.sitelinks:
-            raise NoSiteLinkError(self, site.lang)
+            if not isinstance(site, str):
+                site = site.dbName()
+            raise NoSiteLinkError(self, site)
 
         return self.sitelinks[site].canonical_title()
 
@@ -1706,8 +1702,7 @@ class Claim(Property):
         """
         value_class = self.types[self.type]
         if not isinstance(value, value_class):
-            raise ValueError('{} is not type {}.'
-                             .format(value, value_class))
+            raise ValueError(f'{value} is not type {value_class}.')
         self.target = value
 
     def changeTarget(
@@ -1957,9 +1952,6 @@ class Claim(Property):
     def _formatValue(self) -> dict:
         """Format the target into the proper JSON value that Wikibase wants.
 
-        .. versionchanges:: 8.0
-           normalize the result if type is ``time``.
-
         :return: JSON value
         """
         # todo: eventually unify the following two groups
@@ -1975,9 +1967,7 @@ class Claim(Property):
             value = self.getTarget()
         elif self.type == 'commonsMedia':
             value = self.getTarget().title(with_ns=False)
-        elif self.type == 'time':
-            value = self.getTarget().toWikibase(normalize=True)
-        elif self.type in ('globe-coordinate',
+        elif self.type in ('globe-coordinate', 'time',
                            'quantity', 'monolingualtext',
                            'geo-shape', 'tabular-data'):
             value = self.getTarget().toWikibase()

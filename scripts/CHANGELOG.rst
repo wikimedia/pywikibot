@@ -1,6 +1,35 @@
 Scripts Changelog
 =================
 
+8.2.0
+-----
+
+archivebot
+~~~~~~~~~~
+
+* KeyboardInterrupt was enabled for -async option
+
+listpages
+~~~~~~~~~
+
+* ``-tofile`` option was added to save list to a file
+
+noreferences
+~~~~~~~~~~~~
+
+* NoReferencesBot derives from :class:`bot.AutomaticTWSummaryBot`
+
+replicate_wiki
+~~~~~~~~~~~~~~
+
+* i18n support was added (:phab:`T333759`)
+
+transwikiimport
+~~~~~~~~~~~~~~~
+
+* Script was added (:phab:`T335246`)
+
+
 8.1.0
 -----
 

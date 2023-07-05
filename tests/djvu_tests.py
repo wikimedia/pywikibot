@@ -2,7 +2,7 @@
 """Unit tests for djvu.py."""
 
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -116,7 +116,7 @@ class TestDjVuFile(TestCase):
 
 
 def setUpModule():
-    """Sekip if djvulibre library not installed."""
+    """Skip if djvulibre library not installed."""
     with skipping(OSError, msg='djvulibre library not installed.'):
         dp = subprocess.Popen(['djvudump'],
                               stdout=subprocess.PIPE,

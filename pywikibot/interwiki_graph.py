@@ -162,8 +162,7 @@ class GraphDrawer:
             # https://sourceforge.net/p/pywikipediabot/bugs/401/
             elif self.graph.get_edge(sourceLabel, targetLabel):
                 pywikibot.error(
-                    'Tried to create duplicate edge from {} to {}'
-                    .format(refPage, page))
+                    f'Tried to create duplicate edge from {refPage} to {page}')
                 # duplicate edges would be bad because then get_edge() would
                 # give a list of edges, not a single edge when we handle the
                 # opposite edge.
@@ -194,8 +193,7 @@ class GraphDrawer:
 
         For more info see https://meta.wikimedia.org/wiki/Interwiki_graphs
         """
-        pywikibot.info('Preparing graph for {}'
-                       .format(self.subject.origin.title()))
+        pywikibot.info(f'Preparing graph for {self.subject.origin.title()}')
         # create empty graph
         self.graph = pydot.Dot()
 

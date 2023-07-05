@@ -445,10 +445,8 @@ def parse_duration(string: str) -> Tuple[str, int]:
     key, duration = string[-1], string[:-1]
 
     if key not in MW_KEYS:
-        raise ValueError('Time period qualifier is unrecognized: {}'
-                         .format(string))
+        raise ValueError(f'Time period qualifier is unrecognized: {string}')
     if not duration.isdigit():
-        raise ValueError("Time period's duration should be numeric: {}"
-                         .format(string))
+        raise ValueError(f"Time period's duration should be numeric: {string}")
 
     return key, int(duration)

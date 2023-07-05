@@ -15,6 +15,7 @@ import pywikibot
 from pywikibot.backports import Tuple
 from pywikibot.tools import PYTHON_VERSION
 
+
 try:
     import idlelib
 except ImportError as e:

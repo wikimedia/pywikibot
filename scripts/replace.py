@@ -127,7 +127,7 @@ Errror -> Error, use this:
 If you want to do more than one replacement at a time, use this:
 
     python pwb.py replace -xml:foobar.xml "Errror" "Error" "Faail" "Fail" \
-        -namespace:0
+-namespace:0
 
 If you have a page called 'John Doe' and want to fix the format of ISBNs, use:
 
@@ -142,7 +142,7 @@ Please type "python pwb.py replace -help | more" if you can't read
 the top of the help.
 """
 #
-# (C) Pywikibot team, 2004-2022
+# (C) Pywikibot team, 2004-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -154,11 +154,10 @@ from typing import Any, Optional
 
 import pywikibot
 from pywikibot import editor, fixes, i18n, pagegenerators, textlib
-from pywikibot.backports import Dict, Generator, List, Pattern, Tuple
+from pywikibot.backports import Dict, Generator, List, Pattern, Tuple, batched
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 from pywikibot.exceptions import InvalidPageError, NoPageError
 from pywikibot.tools import chars
-from pywikibot.tools.itertools import itergroup
 
 
 # This is required for the text that is shown when you run this script
@@ -504,8 +503,8 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             regular expressions.
         inside-tags
             A list of strings. These strings must be keys from the
-            dictionary in textlib._create_default_regexes() or must be
-            accepted by textlib._get_regexes().
+            dictionary in :func:`textlib._create_default_regexes` or must be
+            accepted by :func:`textlib.get_regexes`.
 
     :keyword allowoverlap: when matches overlap, all of them are replaced.
     :type allowoverlap: bool
@@ -660,8 +659,8 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
 
         if self.isTitleExcepted(page.title()):
             pywikibot.warning(
-                'Skipping {} because the title is on the exceptions list.'
-                .format(page))
+                f'Skipping {page} because the title is on the exceptions list.'
+            )
             return True
 
         if not page.has_permission():
@@ -739,8 +738,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                 try:
                     original_text = page.get(get_redirect=True, force=True)
                 except NoPageError:
-                    pywikibot.info('Page {} has been deleted.'
-                                   .format(page.title()))
+                    pywikibot.info(f'Page {page.title()} has been deleted.')
                     break
                 new_text = original_text
                 last_text = None
@@ -872,18 +870,18 @@ def handle_sql(sql: str,
         else:
             except_clause = ''
 
-        sql = """
+        sql = f"""
 SELECT page_namespace, page_title
 FROM page
 JOIN text ON (page_id = old_id)
-{}
-{}
-LIMIT 200""".format(where_clause, except_clause)
+{where_clause}
+{except_clause}
+LIMIT 200"""
 
     return pagegenerators.MySQLPageGenerator(sql)
 
 
-def main(*args: str) -> None:
+def main(*args: str) -> None:  # noqa: C901
     """
     Process command line arguments and invoke bot.
 
@@ -977,7 +975,7 @@ def main(*args: str) -> None:
     # The summary stored here won't be actually used but is only an example
     site = pywikibot.Site()
     single_summary = None
-    for old, new in itergroup(commandline_replacements, 2):
+    for old, new in batched(commandline_replacements, 2):
         replacement = Replacement(old, new)
         if not single_summary:
             single_summary = i18n.twtranslate(
@@ -1000,6 +998,15 @@ def main(*args: str) -> None:
                 pywikibot.info(f'The user fixes file could not be found: '
                                f'{fixes.filename}')
             return
+
+        if not isinstance(fix, dict):
+            pywikibot.error(
+                f'fixes[{fix_name!r}] is a {type(fix).__name__}, not a dict')
+            if type(fix) is tuple:
+                pywikibot.info('Maybe a trailing comma in your user_fixes.py?')
+            pywikibot.debug(fix)
+            return
+
         if not fix['replacements']:
             pywikibot.warning(f'No replacements defined for fix {fix_name!r}')
             continue

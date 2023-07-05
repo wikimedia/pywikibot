@@ -1,6 +1,15 @@
 Release history
 ===============
 
+8.1.2
+-----
+*23 April 2023*
+
+* Add support for guwwikinews (:phab:`T334461`)
+* Add support for kbdwiktionary (:phab:`T333271`)
+* Fix :func:`tools.chars.url2string` parsing for multiple encodings (:phab:`T335224`)
+
+
 8.1.1
 -----
 *21 April 2023*

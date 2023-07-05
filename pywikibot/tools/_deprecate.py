@@ -28,10 +28,11 @@ import inspect
 import re
 import sys
 import types
+
 from contextlib import suppress
 from importlib import import_module
 from inspect import getfullargspec
-from typing import Any, Optional
+from typing import Any, Optional, Union
 from warnings import warn
 
 
@@ -61,8 +62,7 @@ def add_decorated_full_name(obj, stacklevel: int = 1) -> None:
     frame = sys._getframe(stacklevel + 1)
     class_name = frame.f_code.co_name
     if class_name and class_name != '<module>':
-        obj.__full_name__ = '{}.{}.{}'.format(obj.__module__,
-                                              class_name, obj.__name__)
+        obj.__full_name__ = f'{obj.__module__}.{class_name}.{obj.__name__}'
     else:
         obj.__full_name__ = f'{obj.__module__}.{obj.__name__}'
 
@@ -162,7 +162,7 @@ def add_full_name(obj):
     return outer_wrapper
 
 
-def _build_msg_string(instead: str, since: str) -> str:
+def _build_msg_string(instead: Optional[str], since: Optional[str]) -> str:
     """Build a deprecation warning message format string.
 
     .. versionadded:: 3.0
@@ -183,19 +183,24 @@ def _build_msg_string(instead: str, since: str) -> str:
     return msg.format(since=' since release ' + since if since else '')
 
 
-def issue_deprecation_warning(name: str, instead: str = '', depth: int = 2,
-                              warning_class=None, since: str = '') -> None:
+def issue_deprecation_warning(name: str,
+                              instead: Optional[str] = None,
+                              depth: int = 2, *,
+                              warning_class: Optional[type] = None,
+                              since: Optional[str] = None):
     """Issue a deprecation warning.
 
     .. versionchanged:: 7.0
-       `since` parameter must be a release number, not a timestamp.
+       *since* parameter must be a release number, not a timestamp.
+
+    .. versionchanged:: 8.2
+       *warning_class* and *since* are keyword-only parameters.
 
     :param name: the name of the deprecated object
     :param instead: suggested replacement for the deprecated object
     :param depth: depth + 1 will be used as stacklevel for the warnings
-    :param warning_class: a warning class (category) to be used, defaults to
-        FutureWarning
-    :type warning_class: type
+    :param warning_class: a warning class (category) to be used,
+        defaults to FutureWarning
     :param since: a version string string when the method was deprecated
     """
     msg = _build_msg_string(instead, since)
@@ -298,7 +303,7 @@ def deprecated(*args, **kwargs):
     return decorator
 
 
-def deprecate_arg(old_arg: str, new_arg):
+def deprecate_arg(old_arg: str, new_arg: Union[str, None, bool]):
     """Decorator to declare old_arg deprecated and replace it with new_arg.
 
     Usage:
@@ -311,13 +316,13 @@ def deprecate_arg(old_arg: str, new_arg):
         def my_function(): pass
         # ignores 'foo' keyword no longer used by my_function
 
-    deprecated_args decorator should be used in favour of this
-    deprecate_arg decorator but it is held to deprecate args which become
-    a reserved word in future Python releases and to prevent syntax errors.
+    :func:`deprecated_args` decorator should be used in favour of this
+    ``deprecate_arg`` decorator but it is held to deprecate args which
+    become a reserved word in future Python releases and to prevent
+    syntax errors.
 
     :param old_arg: old keyword
     :param new_arg: new keyword
-    :type new_arg: str or None or bool
     """
     return deprecated_args(**{old_arg: new_arg})
 
@@ -457,8 +462,7 @@ def remove_last_args(arg_names):
             depth = get_wrapper_depth(wrapper) + 1
             args, varargs, kwargs, *_ = getfullargspec(wrapper.__wrapped__)
             if varargs is not None and kwargs is not None:
-                raise ValueError('{} may not have * or ** args.'
-                                 .format(name))
+                raise ValueError(f'{name} may not have * or ** args.')
             deprecated = set(__kw) & set(arg_names)
             if len(__args) > len(args):
                 deprecated.update(arg_names[:len(__args) - len(args)])
@@ -484,7 +488,8 @@ def remove_last_args(arg_names):
     return decorator
 
 
-def redirect_func(target, source_module: Optional[str] = None,
+def redirect_func(target, *,
+                  source_module: Optional[str] = None,
                   target_module: Optional[str] = None,
                   old_name: Optional[str] = None,
                   class_name: Optional[str] = None,
@@ -497,7 +502,10 @@ def redirect_func(target, source_module: Optional[str] = None,
     parameters.
 
     .. versionchanged:: 7.0
-       ``since`` parameter must be a release number, not a timestamp.
+       *since* parameter must be a release number, not a timestamp.
+
+    .. versionchanged:: 8.2
+       All parameters except *target* are keyword-only parameters.
 
     :param target: The targeted function which is to be executed.
     :type target: callable
@@ -522,6 +530,7 @@ def redirect_func(target, source_module: Optional[str] = None,
             old_name, new_name, since=since,
             warning_class=None if future_warning else DeprecationWarning)
         return target(*a, **kw)
+
     if target_module is None:
         target_module = target.__module__
     if target_module and target_module[-1] != '.':
@@ -594,13 +603,12 @@ class ModuleDeprecationWrapper(types.ModuleType):
             otherwise it provides a DeprecationWarning
         """
         if '.' in name:
-            raise ValueError('Deprecated name "{}" may not contain '
-                             '".".'.format(name))
+            raise ValueError(f'Deprecated name "{name}" may not contain ".".')
         if name in self._deprecated:
             raise ValueError(f'Name "{name}" is already deprecated.')
         if replacement is not None and hasattr(self._module, name):
-            raise ValueError('Module has already an attribute named '
-                             '"{}".'.format(name))
+            raise ValueError(
+                f'Module has already an attribute named "{name}".')
 
         if replacement_name is None:
             if hasattr(replacement, '__name__'):

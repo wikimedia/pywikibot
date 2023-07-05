@@ -1,8 +1,4 @@
-"""Functions for manipulating wiki-text.
-
-Unless otherwise noted, all functions take a unicode string as the
-argument and return a unicode string.
-"""
+"""Functions for manipulating wiki-text."""
 #
 # (C) Pywikibot team, 2008-2023
 #
@@ -16,8 +12,16 @@ from html.parser import HTMLParser
 from typing import NamedTuple, Optional, Union
 
 import pywikibot
-from pywikibot.backports import Container, Dict, Iterable, List
+from pywikibot.backports import (
+    Callable,
+    Container,
+    Dict,
+    Iterable,
+    Match,
+    List,
+)
 from pywikibot.backports import OrderedDict as OrderedDictType
+from pywikibot.backports import Pattern
 from pywikibot.backports import Sequence as SequenceType
 from pywikibot.backports import Tuple
 from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
@@ -42,7 +46,7 @@ except ImportError:
 ETPType = List[Tuple[str, OrderedDictType[str, str]]]
 
 # cache for replaceExcept to avoid recompile or regexes each call
-_regex_cache = {}
+_regex_cache: Dict[str, Pattern[str]] = {}
 
 # The regex below collects nested templates, providing simpler
 # identification of templates used at the top-level of wikitext.
@@ -169,9 +173,7 @@ def case_escape(case: str, string: str) -> str:
     """
     first = string[0]
     if first.isalpha() and case == 'first-letter':
-        pattern = '[{}{}]{}'.format(first.upper(),
-                                    first.lower(),
-                                    re.escape(string[1:]))
+        pattern = f'[{first.upper()}{first.lower()}]{re.escape(string[1:])}'
     else:
         pattern = re.escape(string)
     return pattern
@@ -249,7 +251,15 @@ def _tag_regex(tag_name: str):
 
 
 def _create_default_regexes() -> None:
-    """Fill (and possibly overwrite) _regex_cache with default regexes."""
+    """Fill (and possibly overwrite) ``_regex_cache`` with default regexes.
+
+    The following keys are provided: ``category``, ``comment``, ``file``,
+    ``header``, ``hyperlink``, ``interwiki``, ``invoke``, ``link``,
+    ``pagelist``, ``property``, ``startcolon``, ``startspace``, ``table``,
+    ``template``.
+
+    :meta public:
+    """
     _regex_cache.update({
         # categories
         'category': (r'\[\[ *(?:%s)\s*:.*?\]\]',
@@ -300,13 +310,29 @@ def _create_default_regexes() -> None:
     })
 
 
-def _get_regexes(keys, site):
-    """Fetch compiled regexes."""
+def get_regexes(
+    keys: Union[str, Iterable[str]],
+    site: Optional['pywikibot.site.BaseSite'] = None
+) -> List[Pattern[str]]:
+    """Fetch compiled regexes.
+
+    .. versionchanged:: 8.2
+       ``_get_regexes`` becomes a public function.
+       *keys* may be a single string; *site* is optional.
+
+    :param keys: a single key or an iterable of keys whose regex pattern
+        should be given
+    :param site: a BaseSite object needed for ``category``, ``file``,
+        ``interwiki``, ``invoke`` and ``property`` keys
+    :raises ValueError: site cannot be None.
+    """
     if not _regex_cache:
         _create_default_regexes()
 
-    result = []
+    if isinstance(keys, str):
+        keys = [keys]
 
+    result = []
     for exc in keys:
         if not isinstance(exc, str):
             # assume it's a regular expression
@@ -315,26 +341,24 @@ def _get_regexes(keys, site):
 
         # assume the string is a reference to a standard regex above,
         # which may not yet have a site specific re compiled.
-        if exc in _regex_cache:
-            if isinstance(_regex_cache[exc], tuple):
-                if not site and exc in ('interwiki', 'property', 'invoke',
-                                        'category', 'file'):
-                    raise ValueError("Site cannot be None for the '{}' regex"
-                                     .format(exc))
-
-                if (exc, site) not in _regex_cache:
-                    re_text, re_var = _regex_cache[exc]
-                    _regex_cache[(exc, site)] = re.compile(
-                        re_text % re_var(site), re.VERBOSE)
-
-                result.append(_regex_cache[(exc, site)])
-            else:
-                result.append(_regex_cache[exc])
-        else:
+        if exc not in _regex_cache:
             # nowiki, noinclude, includeonly, timeline, math and other
             # extensions
             _regex_cache[exc] = _tag_regex(exc)
             result.append(_regex_cache[exc])
+        elif not isinstance(_regex_cache[exc], tuple):
+            result.append(_regex_cache[exc])
+        else:
+            if not site and exc in ('interwiki', 'property', 'invoke',
+                                    'category', 'file'):
+                raise ValueError(f'site cannot be None for the {exc!r} regex')
+
+            if (exc, site) not in _regex_cache:
+                re_text, re_var = _regex_cache[exc]
+                _regex_cache[(exc, site)] = re.compile(
+                    re_text % re_var(site), re.VERBOSE)
+
+            result.append(_regex_cache[(exc, site)])
 
         # handle aliases
         if exc == 'source':
@@ -350,30 +374,38 @@ def _get_regexes(keys, site):
     return result
 
 
-def replaceExcept(text: str, old, new, exceptions: list,
-                  caseInsensitive: bool = False, allowoverlap: bool = False,
-                  marker: str = '', site=None, count: int = 0) -> str:
+def replaceExcept(text: str,
+                  old: Union[str, Pattern[str]],
+                  new: Union[str, Callable[[Match[str]], str]],
+                  exceptions: List[Union[str, Pattern[str]]],
+                  caseInsensitive: bool = False,
+                  allowoverlap: bool = False,
+                  marker: str = '',
+                  site: Optional['pywikibot.site.BaseSite'] = None,
+                  count: int = 0) -> str:
     """
-    Return text with 'old' replaced by 'new', ignoring specified types of text.
+    Return text with *old* replaced by *new*, ignoring specified types of text.
 
-    Skips occurrences of 'old' within exceptions; e.g., within nowiki tags or
-    HTML comments. If caseInsensitive is true, then use case insensitive
-    regex matching. If allowoverlap is true, overlapping occurrences are all
-    replaced (watch out when using this, it might lead to infinite loops!).
+    Skip occurrences of *old* within *exceptions*; e.g. within nowiki
+    tags or HTML comments. If *caseInsensitive* is true, then use case
+    insensitive regex matching. If *allowoverlap* is true, overlapping
+    occurrences are all replaced
+
+    .. caution:: Watch out when using *allowoverlap*, it might lead to
+       infinite loops!
 
     :param text: text to be modified
     :param old: a compiled or uncompiled regular expression
-    :param new: a unicode string (which can contain regular
-        expression references), or a function which takes
-        a match object as parameter. See parameter repl of
-        re.sub().
+    :param new: a string (which can contain regular expression
+        references), or a function which takes a match object as
+        parameter. See parameter *repl* of ``re.sub()``.
     :param exceptions: a list of strings or already compiled regex
-        objects which signal what to leave out. Strings might be like
-        ['math', 'table', 'template'] for example.
+        objects which signal what to leave out. List of strings might be
+        like ``['math', 'table', 'template']`` for example.
     :param marker: a string that will be added to the last replacement;
         if nothing is changed, it is added at the end
     :param count: how many replacements to do at most. See parameter
-        count of re.sub().
+        *count* of ``re.sub()``.
     """
     # if we got a string, compile it as a regular expression
     if isinstance(old, str):
@@ -383,7 +415,7 @@ def replaceExcept(text: str, old, new, exceptions: list,
     if not old.search(text):
         return text + marker
 
-    dontTouchRegexes = _get_regexes(exceptions, site)
+    dontTouchRegexes = get_regexes(exceptions, site)
 
     index = 0
     replaced = 0
@@ -391,6 +423,7 @@ def replaceExcept(text: str, old, new, exceptions: list,
     while not count or replaced < count:
         if index > len(text):
             break
+
         match = old.search(text, index)
         if not match:
             # nothing left to replace
@@ -410,55 +443,57 @@ def replaceExcept(text: str, old, new, exceptions: list,
             # an HTML comment or text in nowiki tags stands before the next
             # valid match. Skip.
             index = nextExceptionMatch.end()
+            continue
+
+        # We found a valid match. Replace it.
+        if callable(new):
+            # the parameter new can be a function which takes the match
+            # as a parameter.
+            replacement = new(match)
         else:
-            # We found a valid match. Replace it.
-            if callable(new):
-                # the parameter new can be a function which takes the match
-                # as a parameter.
-                replacement = new(match)
-            else:
-                # it is not a function, but a string.
+            # it is not a function, but a string.
 
-                # it is a little hack to make \n work. It would be better
-                # to fix it previously, but better than nothing.
-                new = new.replace('\\n', '\n')
+            # it is a little hack to make \n work. It would be better
+            # to fix it previously, but better than nothing.
+            new = new.replace('\\n', '\n')
 
-                # We cannot just insert the new string, as it may contain regex
-                # group references such as \2 or \g<name>.
-                # On the other hand, this approach does not work because it
-                # can't handle lookahead or lookbehind (see bug T123185).
-                # So we have to process the group references manually.
-                replacement = ''
+            # We cannot just insert the new string, as it may contain regex
+            # group references such as \2 or \g<name>.
+            # On the other hand, this approach does not work because it
+            # can't handle lookahead or lookbehind (see bug T123185).
+            # So we have to process the group references manually.
+            replacement = ''
 
-                group_regex = re.compile(r'\\(\d+)|\\g<(.+?)>')
-                last = 0
-                for group_match in group_regex.finditer(new):
-                    group_id = group_match[1] or group_match[2]
-                    with suppress(ValueError):
-                        group_id = int(group_id)
+            group_regex = re.compile(r'\\(\d+)|\\g<(.+?)>')
+            last = 0
+            for group_match in group_regex.finditer(new):
+                group_id = group_match[1] or group_match[2]
+                with suppress(ValueError):
+                    group_id = int(group_id)
 
-                    try:
-                        replacement += new[last:group_match.start()]
-                        replacement += match[group_id] or ''
-                    except IndexError:
-                        raise IndexError('Invalid group reference: {}\n'
-                                         'Groups found: {}'
-                                         .format(group_id, match.groups()))
-                    last = group_match.end()
-                replacement += new[last:]
+                try:
+                    replacement += new[last:group_match.start()]
+                    replacement += match[group_id] or ''
+                except IndexError:
+                    raise IndexError(f'Invalid group reference: {group_id}\n'
+                                     f'Groups found: {match.groups()}')
+                last = group_match.end()
+            replacement += new[last:]
 
-            text = text[:match.start()] + replacement + text[match.end():]
+        text = text[:match.start()] + replacement + text[match.end():]
 
-            # continue the search on the remaining text
-            if allowoverlap:
-                index = match.start() + 1
-            else:
-                index = match.start() + len(replacement)
-            if not match.group():
-                # When the regex allows to match nothing, shift by one char
-                index += 1
-            markerpos = match.start() + len(replacement)
-            replaced += 1
+        # continue the search on the remaining text
+        if allowoverlap:
+            index = match.start() + 1
+        else:
+            index = match.start() + len(replacement)
+
+        if not match.group():
+            # When the regex allows to match nothing, shift by one char
+            index += 1
+
+        markerpos = match.start() + len(replacement)
+        replaced += 1
 
     return text[:markerpos] + marker + text[markerpos:]
 
@@ -484,7 +519,7 @@ def removeDisabledParts(text: str,
        if provided as an ordered collection (list, tuple)
 
     :param tags: The exact set of parts which should be removed using
-        keywords from textlib._get_regexes().
+        keywords from :func:`get_regexes`.
     :param include: Or, in alternative, default parts that shall not
         be removed.
     :param site: Site to be used for site-dependent regexes. Default
@@ -502,7 +537,7 @@ def removeDisabledParts(text: str,
     # ("Note" at the end of the section)
     if include:
         tags = [tag for tag in tags if tag not in include]
-    regexes = _get_regexes(tags, site)
+    regexes = get_regexes(tags, site)
     for regex in regexes:
         text = regex.sub('', text)
     return text
@@ -635,8 +670,7 @@ def replace_links(text: str, replace, site: 'pywikibot.site.BaseSite') -> str:
 
     If it's a string and the replacement was a sequence it converts it into a
     Page instance. If the replacement is done via a callable it'll use it like
-    unlinking and directly replace the link with the text itself. It only
-    supports unicode when used by the callable and bytes are not allowed.
+    unlinking and directly replace the link with the text itself.
 
     If either the section or label should be used the replacement can be a
     function which returns a Link instance and copies the value which should
@@ -795,8 +829,6 @@ def replace_links(text: str, replace, site: 'pywikibot.site.BaseSite') -> str:
             new_link = new_label
 
         if isinstance(new_link, str):
-            # Nothing good can come out of the fact that bytes is returned so
-            # force unicode
             text = text[:start] + new_link + text[end:]
             # Make sure that next time around we will not find this same hit.
             curpos = start + len(new_link)
@@ -855,8 +887,8 @@ def replace_links(text: str, replace, site: 'pywikibot.site.BaseSite') -> str:
         if must_piped:
             new_text = f'[[{new_title}|{new_label}]]'
         else:
-            new_text = '[[{}]]{}'.format(new_label[:len(new_title)],
-                                         new_label[len(new_title):])
+            new_text = (f'[[{new_label[:len(new_title)]}]]'
+                        f'{new_label[len(new_title):]}')
 
         text = text[:start] + new_text + text[end:]
         # Make sure that next time around we will not find this same hit.
@@ -899,15 +931,72 @@ def add_text(text: str, add: str, *, site=None) -> str:
 # -------------------------------
 # Functions dealing with sections
 # -------------------------------
+
+#: Head pattern
+HEAD_PATTERN = re.compile('{0}[^=]+{0}'.format('(={1,6})'))
+TITLE_PATTERN = re.compile("'{3}([^']+)'{3}")
+
 _Heading = namedtuple('_Heading', ('text', 'start', 'end'))
-_Section = namedtuple('_Section', ('title', 'content'))
-_Content = namedtuple('_Content', ('header', 'sections', 'footer'))
 
 
-def _extract_headings(text: str, site) -> list:
+class Section(NamedTuple):
+
+    """A namedtuple as part of :class:`Content` describing a page section.
+
+    .. versionchanged:: 8.2
+       ``_Section`` becomes a public class.
+    """
+
+    title: str  #: section title including equal signs
+    content: str  #: section content
+
+    @property
+    def level(self) -> int:
+        """Return the section level.
+
+        .. versionadded:: 8.2
+        """
+        m = HEAD_PATTERN.match(self.title)
+        return min(map(len, m.groups()))
+
+    @property
+    def heading(self) -> str:
+        """Return the section title without equal signs.
+
+        .. versionadded:: 8.2
+        """
+        level = self.level
+        return self.title[level:-level].strip()
+
+
+class Content(NamedTuple):
+
+    """A namedtuple as result of :func:`extract_sections` holding page content.
+
+    .. versionchanged:: 8.2
+       ``_Content`` becomes a public class.
+    """
+
+    header: str  #: the page header
+    sections: List[Section]  #: the page sections
+    footer: str  #: the page footer
+
+    @property
+    def title(self) -> str:
+        """Return the first main title found on the page.
+
+        The first main title is anything enclosed within triple quotes.
+
+        .. versionadded:: 8.2
+        """
+        m = TITLE_PATTERN.search(self.header)
+        return m[1].strip() if m else ''
+
+
+def _extract_headings(text: str) -> List[_Heading]:
     """Return _Heading objects."""
     headings = []
-    heading_regex = _get_regexes(['header'], site)[0]
+    heading_regex = get_regexes('header')[0]
     for match in heading_regex.finditer(text):
         start, end = match.span()
         if not isDisabled(text, start) and not isDisabled(text, end):
@@ -915,77 +1004,110 @@ def _extract_headings(text: str, site) -> list:
     return headings
 
 
-def _extract_sections(text: str, headings) -> list:
-    """Return _Section objects."""
+def _extract_sections(text: str, headings) -> List[Section]:
+    """Return a list of :class:`Section` objects."""
+    sections = []
     if headings:
         # Assign them their contents
-        contents = []
         for i, heading in enumerate(headings):
             try:
                 next_heading = headings[i + 1]
             except IndexError:
-                contents.append(text[heading.end:])
+                content = text[heading.end:]
             else:
-                contents.append(text[heading.end:next_heading.start])
-        return [_Section(heading.text, content)
-                for heading, content in zip(headings, contents)]
-    return []
+                content = text[heading.end:next_heading.start]
+            sections.append(Section(heading.text, content))
+
+    return sections
 
 
 def extract_sections(
-    text: str, site=None
-) -> NamedTuple('_Content', [('header', str),  # noqa: F821
-                             ('sections', List[Tuple[str, str]]),  # noqa: F821
-                             ('footer', str)]):  # noqa: F821
-    """
-    Return section headings and contents found in text.
+    text: str,
+    site: Optional['pywikibot.site.BaseSite'] = None
+) -> Content:
+    """Return section headings and contents found in text.
 
-    :return: The returned namedtuple contains the text parsed into
-        header, contents and footer parts: The header part is a string
-        containing text part above the first heading. The footer part
-        is also a string containing text part after the last section.
-        The section part is a list of tuples, each tuple containing a
-        string with section heading and a string with section content.
-        Example article::
+    The returned namedtuple :class:`Content` contains the text parsed
+    into *header*, *sections* and *footer* parts. The main title found
+    in the header which is the first text enclosed with ''' like
+    '''page title''' can be given by the *title* property.
 
-            '''A''' is a thing.
+    The header part is a string containing text part above the first
+    heading.
 
-            == History of A ==
-            Some history...
+    The sections part is a list of :class:`Section` namedtuples, each
+    tuple containing a string with section title (including equal signs),
+    and a string with the section content. In addition the section
+    heading (the title without equal signs) can be given by the *heading*
+    property. Also the section level can be found by the *level*
+    property which is the number of the equal signs around the section
+    heading.
 
-            == Usage of A ==
-            Some usage...
+    The footer part is also a string containing text part after the last
+    section.
 
-            [[Category:Things starting with A]]
+    **Examples:**
 
-        ...is parsed into the following namedtuple::
+    >>> text = \"\"\"
+    ... '''this''' is a Python module.
+    ...
+    ... == History of this ==
+    ... This set of principles was posted in 1999...
+    ...
+    ... == Usage of this ==
+    ... Enter "import this" for usage...
+    ...
+    ... === Details ===
+    ... The Zen of Python...
+    ...
+    ... [[Category:Programming principles]]
+    ... \"\"\"
+    >>> site = pywikibot.Site('wikipedia:en')
+    >>> result = extract_sections(text, site)
+    >>> result.header.strip()
+    "'''this''' is a Python module."
+    >>> result.sections[0].title
+    '== History of this =='
+    >>> result.sections[1].content.strip()
+    'Enter "import this" for usage...'
+    >>> result.sections[2].heading
+    'Details'
+    >>> result.sections[2].level
+    3
+    >>> result.footer.strip()
+    '[[Category:Programming principles]]'
+    >>> result.title
+    'this'
 
-            result = extract_sections(text, site)
-            result.header = "'''A''' is a thing."
-            result.sections = [('== History of A ==', 'Some history...'),
-                               ('== Usage of A ==', 'Some usage...')]
-            result.footer = '[[Category:Things starting with A]]'
-
+    .. note:: sections and text from templates are not extracted but
+       embedded as plain text.
     .. versionadded:: 3.0
-    """
-    headings = _extract_headings(text, site)
+    .. versionchanged:: 8.2
+       The :class:`Content` and :class:`Section` class have additional
+       properties.
+
+    :return: The parsed namedtuple.
+    """  # noqa: D300, D301
+    headings = _extract_headings(text)
     sections = _extract_sections(text, headings)
     # Find header and footer contents
     header = text[:headings[0].start] if headings else text
-    cat_regex, interwiki_regex = _get_regexes(('category', 'interwiki'), site)
+    cat_regex, interwiki_regex = get_regexes(['category', 'interwiki'], site)
     langlink_pattern = interwiki_regex.pattern.replace(':?', '')
     last_section_content = sections[-1].content if sections else header
     footer = re.search(
         r'({})*\Z'.format(r'|'.join((langlink_pattern,
                                      cat_regex.pattern, r'\s'))),
         last_section_content).group().lstrip()
+
     if footer:
         if sections:
-            sections[-1] = _Section(
+            sections[-1] = Section(
                 sections[-1].title, last_section_content[:-len(footer)])
         else:
             header = header[:-len(footer)]
-    return _Content(header, sections, footer)
+
+    return Content(header, sections, footer)
 
 
 # -----------------------------------------------
@@ -1238,7 +1360,7 @@ def replaceLanguageLinks(oldtext: str,
         above_interwiki.append(comment)
 
     if above_interwiki:
-        interwiki = _get_regexes(['interwiki'], site)[0]
+        interwiki = get_regexes('interwiki', site)[0]
         first_interwiki = interwiki.search(newtext)
         for reg in above_interwiki:
             special = reg.search(newtext)
@@ -1308,7 +1430,7 @@ def interwikiSort(sites, insite=None):
                 site = insite.getSite(code=code)
                 if site in sites:
                     del sites[sites.index(site)]
-                    firstsites += [site]
+                    firstsites.append(site)
         sites = firstsites + sites
     return sites
 
@@ -1347,13 +1469,12 @@ def getCategoryLinks(text: str, site=None,
             title, sortKey = rest, None
         try:
             cat = pywikibot.Category(site,
-                                     '{}:{}'.format(match['namespace'], title),
+                                     f"{match['namespace']}:{title}",
                                      sort_key=sortKey)
         except InvalidTitleError:
             # Category title extracted contains invalid characters
             # Likely due to on-the-fly category name creation, see T154309
-            pywikibot.warning('Invalid category title extracted: {}'
-                              .format(title))
+            pywikibot.warning(f'Invalid category title extracted: {title}')
         else:
             result.append(cat)
 
@@ -1552,7 +1673,7 @@ def replaceCategoryLinks(oldtext: str,
         under_categories.append(stub)
 
     if under_categories:
-        category = _get_regexes(['category'], site)[0]
+        category = get_regexes('category', site)[0]
         for last_category in category.finditer(newtext):
             pass
         for reg in under_categories:
@@ -1619,7 +1740,7 @@ def compileLinkR(withoutBracketed: bool = False, onlyBracketed: bool = False):
     # Note: While allowing dots inside URLs, MediaWiki will regard
     # dots at the end of the URL as not part of that URL.
     # The same applies to comma, colon and some other characters.
-    notAtEnd = r'\]\s\.:;,<>"\|\)'
+    notAtEnd = r'\]\s\.:;,<>"\|\)}'
     # So characters inside the URL can be anything except whitespace,
     # closing squared brackets, quotation marks, greater than and less
     # than, and the last character also can't be parenthesis or another

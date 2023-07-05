@@ -113,8 +113,7 @@ class OptionSet(MutableMapping):
             elif value is None:
                 removed.add(name)
             else:
-                raise ValueError('Dict contains invalid value "{}"'.format(
-                    value))
+                raise ValueError(f'Dict contains invalid value "{value}"')
         invalid_names = (
             (enabled - self._valid_enable) | (disabled - self._valid_disable)
             | (removed - self._valid_enable - self._valid_disable)

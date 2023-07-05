@@ -90,8 +90,9 @@ from pywikibot.tools.collections import DequeGenerator
 
 
 __all__ = (
+    # factory
     'GeneratorFactory',
-
+    # filter
     'CategoryFilterPageGenerator',
     'EdittimeFilterPageGenerator',
     'ItemClaimFilterPageGenerator',
@@ -104,7 +105,7 @@ __all__ = (
     'SubpageFilterGenerator',
     'UserEditFilterGenerator',
     'WikibaseItemFilterPageGenerator',
-
+    # page generators
     'AllpagesPageGenerator',
     'AncientPagesPageGenerator',
     'CategorizedPageGenerator',
@@ -129,7 +130,6 @@ __all__ = (
     'PagesFromTitlesGenerator',
     'PetScanPageGenerator',
     'PrefixingPageGenerator',
-    'PreloadingGenerator',
     'RandomPageGenerator',
     'RandomRedirectPageGenerator',
     'RecentChangesPageGenerator',
@@ -154,6 +154,13 @@ __all__ = (
     'XMLDumpOldPageGenerator',
     'XMLDumpPageGenerator',
     'YearPageGenerator',
+    # other generators
+    'DequePreloadingGenerator',
+    'PageClassGenerator',
+    'PageWithTalkPageGenerator',
+    'PreloadingEntityGenerator',
+    'PreloadingGenerator',
+    'RepeatingGenerator',
 )
 
 

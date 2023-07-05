@@ -11,11 +11,11 @@ import unittest
 import warnings
 from contextlib import contextmanager
 from subprocess import PIPE, Popen, TimeoutExpired
-from typing import Optional
+from typing import Any, Optional, Union
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import List
+from pywikibot.backports import Dict, List, Sequence
 from pywikibot.data.api import CachedRequest
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.exceptions import APIError
@@ -451,9 +451,11 @@ class FakeLoginManager(pywikibot.login.ClientLoginManager):
         """Ignore password changes."""
 
 
-def execute(command: List[str], data_in=None, timeout=None, error=None):
-    """
-    Execute a command and capture outputs.
+def execute(command: List[str], data_in=None, timeout=None):
+    """Execute a command and capture outputs.
+
+    .. versionchanged:: 8.2.0
+       *error* parameter was removed.
 
     :param command: executable to run and arguments to use
     """
@@ -495,14 +497,17 @@ def execute(command: List[str], data_in=None, timeout=None, error=None):
             'stderr': stderr_data.decode(config.console_encoding)}
 
 
-def execute_pwb(args, data_in=None, timeout=None, error=None, overrides=None):
-    """
-    Execute the pwb.py script and capture outputs.
+def execute_pwb(args: List[str],
+                data_in: Optional[Sequence[str]] = None,
+                timeout: Union[int, float, None] = None,
+                overrides: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+    """Execute the pwb.py script and capture outputs.
+
+    .. versionchanged:: 8.2.0
+       the *error* parameter was removed.
 
     :param args: list of arguments for pwb.py
-    :type args: typing.Sequence[str]
     :param overrides: mapping of pywikibot symbols to test replacements
-    :type overrides: dict
     """
     command = [sys.executable]
 
@@ -511,13 +516,11 @@ def execute_pwb(args, data_in=None, timeout=None, error=None, overrides=None):
         overrides = '; '.join(
             f'{key} = {value}' for key, value in overrides.items())
         command.append(
-            'import pwb; import pywikibot; {}; pwb.main()'
-            .format(overrides))
+            f'import pwb; import pywikibot; {overrides}; pwb.main()')
     else:
         command.append(_pwb_py)
 
-    return execute(command=command + args,
-                   data_in=data_in, timeout=timeout, error=error)
+    return execute(command=command + args, data_in=data_in, timeout=timeout)
 
 
 @contextmanager

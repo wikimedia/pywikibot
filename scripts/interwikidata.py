@@ -29,7 +29,7 @@ Furthermore, the following command line parameters are supported:
    can be set within a settings file which is scripts.ini by default.
 """
 
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -98,8 +98,7 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
         self.iwlangs = pywikibot.textlib.getLanguageLinks(
             self.current_page.text, insite=self.current_page.site)
         if not self.iwlangs:
-            output('No interlanguagelinks on {page}'.format(
-                page=self.current_page.title(as_link=True)))
+            output(f'No interlanguagelinks on {self.current_page}')
             return
         try:
             item = pywikibot.ItemPage.fromPage(self.current_page)
@@ -201,8 +200,7 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
             return False
         item = list(wd_data).pop()
         if self.current_page.site.dbName() in item.sitelinks:
-            warning('Interwiki conflict in {}, skipping...'
-                    .format(item.title(as_link=True)))
+            warning(f'Interwiki conflict in {item}, skipping...')
             return False
         output('Adding link to ' + item.title())
         item.setSitelink(self.current_page, summary='Added ' + (

@@ -17,7 +17,7 @@ Can be used with:
 &params;
 """
 #
-# (C) Pywikibot team, 2004-2022
+# (C) Pywikibot team, 2004-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -118,9 +118,8 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, AutomaticTWSummaryBot):
             else:
                 section = m['section']
             if section and target_page.section():
-                pywikibot.warning(
-                    'Source section {} and target section {} found. '
-                    'Skipping.'.format(section, target_page))
+                pywikibot.warning(f'Source section {section} and target '
+                                  f'section {target_page} found. Skipping.')
                 continue
             trailing_chars = m['linktrail']
             if trailing_chars:
@@ -138,8 +137,8 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, AutomaticTWSummaryBot):
             if new_page_title[0] == ':':
                 new_page_title = new_page_title[1:]
 
-            if ((new_page_title == link_text and not section)
-                    or self.opt.overwrite):
+            if new_page_title == link_text and not section \
+               or self.opt.overwrite:
                 newlink = f'[[{new_page_title}]]'
             # check if we can create a link with trailing characters instead of
             # a pipelink
@@ -149,11 +148,10 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, AutomaticTWSummaryBot):
                   and re.sub(re.compile(linktrail), '',
                              link_text[len(new_page_title):]) == ''
                   and not section):
-                newlink = '[[{}]]{}'.format(link_text[:len(new_page_title)],
-                                            link_text[len(new_page_title):])
+                length = len(new_page_title)
+                newlink = f'[[{link_text[:length]}]]{link_text[length:]}'
             else:
-                newlink = '[[{}{}|{}]]'.format(new_page_title,
-                                               section, link_text)
+                newlink = f'[[{new_page_title}{section}|{link_text}]]'
             text = text[:m.start()] + newlink + text[m.end():]
             continue
         return text
@@ -181,9 +179,9 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, AutomaticTWSummaryBot):
                 if section and not does_text_contain_section(target.text,
                                                              section):
                     pywikibot.warning(
-                        'Section #{} not found on page {}'
-                        .format(section, target.title(as_link=True,
-                                                      with_section=False)))
+                        f'Section #{section} not found on page '
+                        f'{target.title(as_link=True, with_section=False)}'
+                    )
                     target = None
 
         if target is not None \

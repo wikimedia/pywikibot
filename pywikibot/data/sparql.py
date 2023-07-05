@@ -1,6 +1,6 @@
 """SPARQL Query interface."""
 #
-# (C) Pywikibot team, 2016-2022
+# (C) Pywikibot team, 2016-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -67,8 +67,8 @@ class SparqlQuery:
                     'Please provide the endpoint and entity_url '
                     'parameters instead of a repo.')
             if not self.endpoint:
-                raise Error('The site {} does not provide a sparql endpoint.'
-                            .format(repo))
+                raise Error(
+                    f'The site {repo} does not provide a sparql endpoint.')
         else:
             if not entity_url:
                 raise Error('If initialised with an endpoint the entity_url '
@@ -126,8 +126,7 @@ class SparqlQuery:
                     values[var] = None
                 elif full_data:
                     if row[var]['type'] not in VALUE_TYPES:
-                        raise ValueError('Unknown type: {}'
-                                         .format(row[var]['type']))
+                        raise ValueError(f"Unknown type: {row[var]['type']}")
                     valtype = VALUE_TYPES[row[var]['type']]
                     values[var] = valtype(row[var],
                                           entity_url=self.entity_url)

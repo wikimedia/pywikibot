@@ -51,7 +51,7 @@ or by adding a list to the given one::
                                      'your_script_name_2']
 """
 #
-# (C) Pywikibot team, 2006-2022
+# (C) Pywikibot team, 2006-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -68,7 +68,7 @@ from pywikibot.exceptions import InvalidTitleError
 from pywikibot.textlib import (
     FILE_LINK_REGEX,
     MultiTemplateMatchBuilder,
-    _get_regexes,
+    get_regexes,
 )
 from pywikibot.tools import first_lower, first_upper
 from pywikibot.tools.chars import url2string
@@ -667,8 +667,8 @@ class CosmeticChangesToolkit:
             8207,   # Right-to-left mark (&rtl;)
         ]
         if self.template:
-            ignore += [32]  # Space ( )
-            ignore += [58]  # Colon (:)
+            ignore.append(32)  # Space ( )
+            ignore.append(58)  # Colon (:)
         # TODO: T254350 - what other extension tags should be avoided?
         # (graph, math, score, timeline, etc.)
         text = pywikibot.html2unicode(
@@ -682,7 +682,7 @@ class CosmeticChangesToolkit:
             return text
 
         skippings = ['comment', 'category']
-        skip_regexes = _get_regexes(skippings, self.site)
+        skip_regexes = get_regexes(skippings, self.site)
         # site defined templates
         skip_templates = {
             'cs': ('Pahýl[ _]část',),  # stub section
@@ -699,7 +699,7 @@ class CosmeticChangesToolkit:
         for reg in skip_regexes:
             stripped_text = reg.sub(r'', stripped_text)
         strip_sections = textlib.extract_sections(
-            stripped_text, self.site)[1]
+            stripped_text, self.site).sections
 
         # get proper sections
         header, sections, footer = textlib.extract_sections(text, self.site)
@@ -707,15 +707,13 @@ class CosmeticChangesToolkit:
         # iterate stripped sections and create a new page body
         new_body = []
         for i, strip_section in enumerate(strip_sections):
-            current_heading = sections[i][0]
+            current_dep = sections[i].level
             try:
-                next_heading = sections[i + 1][0]
+                next_dep = sections[i + 1].level
             except IndexError:
-                next_heading = ''
-            current_dep = (len(current_heading)
-                           - len(current_heading.lstrip('=')))
-            next_dep = len(next_heading) - len(next_heading.lstrip('='))
-            if strip_section[1].strip() or current_dep < next_dep:
+                next_dep = 0
+
+            if strip_section.content.strip() or current_dep < next_dep:
                 new_body.extend(sections[i])
         return header + ''.join(new_body) + footer
 

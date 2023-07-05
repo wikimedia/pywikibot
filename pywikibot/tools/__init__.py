@@ -19,7 +19,7 @@ from contextlib import suppress
 from functools import total_ordering, wraps
 from importlib import import_module
 from types import TracebackType
-from typing import Any, Optional, Type
+from typing import Any, Optional, Type, Union
 from warnings import catch_warnings, showwarning, warn
 
 import pkg_resources
@@ -646,8 +646,8 @@ def open_archive(filename: str, mode: str = 'rb', use_extension: bool = True):
                                        stderr=subprocess.PIPE,
                                        bufsize=65535)
         except OSError:
-            raise ValueError('7za is not installed or cannot uncompress "{}"'
-                             .format(filename))
+            raise ValueError(
+                f'7za is not installed or cannot uncompress "{filename}"')
 
         stderr = process.stderr.read()
         process.stderr.close()
@@ -721,40 +721,48 @@ def file_mode_checker(
             warn(warn_str.format(filename, st_mode - stat.S_IFREG, mode))
 
 
-def compute_file_hash(filename: str, sha: str = 'sha1', bytes_to_read=None):
+def compute_file_hash(filename: Union[str, os.PathLike],
+                      sha: Union[str, Callable[[], Any]] = 'sha1',
+                      bytes_to_read: Optional[int] = None) -> str:
     """Compute file hash.
 
     Result is expressed as hexdigest().
 
     .. versionadded:: 3.0
+    .. versionchanged:: 8.2
+       *sha* may be  also a hash constructor, or a callable that returns
+       a hash object.
+
 
     :param filename: filename path
-    :param sha: hashing function among the following in hashlib:
-        md5(), sha1(), sha224(), sha256(), sha384(), and sha512()
-        function name shall be passed as string, e.g. 'sha1'.
-    :param bytes_to_read: only the first bytes_to_read will be considered;
-        if file size is smaller, the whole file will be considered.
-    :type bytes_to_read: None or int
-
+    :param sha: hash algorithm available with hashlib: ``sha1()``,
+        ``sha224()``, ``sha256()``, ``sha384()``, ``sha512()``,
+        ``blake2b()``, and ``blake2s()``. Additional algorithms like
+        ``md5()``, ``sha3_224()``, ``sha3_256()``, ``sha3_384()``,
+        ``sha3_512()``, ``shake_128()`` and ``shake_256()`` may also be
+        available. *sha* must either be a hash algorithm name as a str
+        like ``'sha1'`` (default), a hash constructor like
+        ``hashlib.sha1``, or a callable that returns a hash object like
+        ``lambda: hashlib.sha1()``.
+    :param bytes_to_read: only the first bytes_to_read will be
+        considered; if file size is smaller, the whole file will be
+        considered.
     """
-    size = os.path.getsize(filename)
-    if bytes_to_read is None:
-        bytes_to_read = size
-    else:
-        bytes_to_read = min(bytes_to_read, size)
-    step = 1 << 20
-
-    shas = ['md5', 'sha1', 'sha224', 'sha256', 'sha384', 'sha512']
-    assert sha in shas
-    sha = getattr(hashlib, sha)()  # sha instance
-
     with open(filename, 'rb') as f:
-        while bytes_to_read > 0:
-            read_bytes = f.read(min(bytes_to_read, step))
-            assert read_bytes  # make sure we actually read bytes
-            bytes_to_read -= len(read_bytes)
-            sha.update(read_bytes)
-    return sha.hexdigest()
+        if PYTHON_VERSION < (3, 11) or bytes_to_read is not None:
+            digest = sha() if callable(sha) else hashlib.new(sha)
+            size = os.path.getsize(filename)
+            bytes_to_read = min(bytes_to_read or size, size)
+            step = 1 << 20
+            while bytes_to_read > 0:
+                read_bytes = f.read(min(bytes_to_read, step))
+                assert read_bytes  # make sure we actually read bytes
+                bytes_to_read -= len(read_bytes)
+                digest.update(read_bytes)
+        else:
+            digest = hashlib.file_digest(f, sha)
+
+    return digest.hexdigest()
 
 
 def cached(*arg: Callable) -> Any:
@@ -830,7 +838,8 @@ wrapper.add_deprecated_attr(
 # Deprecate objects which has to be imported from tools.itertools instead
 wrapper.add_deprecated_attr(
     'itergroup',
-    replacement_name='pywikibot.tools.itertools.itergroup',
+    # new replacement in 8.2
+    replacement_name='pywikibot.backports.batched',
     since='7.6.0')
 wrapper.add_deprecated_attr(
     'islice_with_ellipsis',

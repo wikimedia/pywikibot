@@ -69,16 +69,16 @@ def color_format(text: str, *args, **kwargs) -> str:
     r"""
     Do ``str.format`` without having to worry about colors.
 
-    It is automatically adding \03 in front of color fields so it's
-    unnecessary to add them manually. Any other \03 in the text is
+    It is automatically adding \\03 in front of color fields so it's
+    unnecessary to add them manually. Any other \\03 in the text is
     disallowed.
 
     You may use a variant {color} by assigning a valid color to a named
     parameter color.
 
     .. deprecated:: 7.2
-       new color format pattern like <<color>>colored text<<default>>
-       may be used instead.
+       new color format pattern like
+       ``f'<<{color}>>colored text<<default>>'`` can be used instead.
 
     :param text: The format template string
     :return: The formatted string
@@ -103,8 +103,7 @@ def color_format(text: str, *args, **kwargs) -> str:
         text = text.format(*args, **kwargs)
     except KeyError as e:
         if str(e).strip("'") in colors:
-            raise ValueError(
-                'Color field "{}" in "{}" uses conversion information or '
-                'format spec'.format(e, text))
+            raise ValueError(f'Color field "{e}" in "{text}" uses conversion '
+                             f'information or format spec')
         raise
     return text

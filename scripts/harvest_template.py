@@ -4,14 +4,13 @@ Template harvesting script.
 
 Usage (see below for explanations and examples):
 
- python pwb.py harvest_template -transcludes:"..." \
-    [default optional arguments] \
-    template_parameter PID [local optional arguments] \
-    [template_parameter PID [local optional arguments]]
- python pwb.py harvest_template [generators] -template:"..." \
-    [default optional arguments] \
-    template_parameter PID [local optional arguments] \
-    [template_parameter PID [local optional arguments]]
+    python pwb.py harvest_template -transcludes:"..." \
+[default optional arguments] template_parameter PID \
+[local optional arguments] [template_parameter PID [local optional arguments]]
+
+    python pwb.py harvest_template [generators] -template:"..." \
+[default optional arguments] template_parameter PID \
+[local optional arguments] [template_parameter PID [local optional arguments]]
 
 This will work on all pages that transclude the template in the article
 namespace
@@ -53,27 +52,27 @@ parameter of "Infobox person" on English Wikipedia as Wikidata property
 "P18" (image):
 
     python pwb.py harvest_template -lang:en -family:wikipedia -namespace:0 \
-        -template:"Infobox person" image P18
+-template:"Infobox person" image P18
 
 The following command will behave the same as the previous example and also
 try to import [[links]] from "birth_place" parameter of the same template
 as Wikidata property "P19" (place of birth):
 
     python pwb.py harvest_template -lang:en -family:wikipedia -namespace:0 \
-        -template:"Infobox person" image P18 birth_place P19
+-template:"Infobox person" image P18 birth_place P19
 
 The following command will import both "birth_place" and "death_place"
 params with -islink modifier, ie. the bot will try to import values, even
 if it doesn't find a [[link]]:
 
     python pwb.py harvest_template -lang:en -family:wikipedia -namespace:0 \
-        -template:"Infobox person" -islink birth_place P19 death_place P20
+-template:"Infobox person" -islink birth_place P19 death_place P20
 
 The following command will do the same but only "birth_place" can be
 imported without a link:
 
     python pwb.py harvest_template -lang:en -family:wikipedia -namespace:0 \
-        -template:"Infobox person" birth_place P19 -islink death_place P20
+-template:"Infobox person" birth_place P19 -islink death_place P20
 
 The following command will import an occupation from "occupation" parameter
 of "Infobox person" on English Wikipedia as Wikidata property "P106"
@@ -81,7 +80,7 @@ of "Infobox person" on English Wikipedia as Wikidata property "P106"
 property but there is not the new value:
 
     python pwb.py harvest_template -lang:en -family:wikipedia -namespace:0 \
-        -template:"Infobox person" occupation P106 -exists:p
+-template:"Infobox person" occupation P106 -exists:p
 
 The following command will import band members from the "current_members"
 parameter of "Infobox musical artist" on English Wikipedia as Wikidata
@@ -89,8 +88,7 @@ property "P527" (has part). This will only extract multiple band members
 if each is linked, and will not add duplicate claims for the same member:
 
     python pwb.py harvest_template -lang:en -family:wikipedia -namespace:0 \
-        -template:"Infobox musical artist" current_members P527 -exists:p \
-        -multi
+-template:"Infobox musical artist" current_members P527 -exists:p -multi
 
 The following command will import the category's main topic from the first
 anonymous parameter of "Cat main" on English Wikipedia as Wikidata property
@@ -99,7 +97,8 @@ the inverse claim is imported to the topic item as Wikidata property "P910"
 (topic's main category) unless a claim of that property is already there:
 
     python pwb.py harvest_template -lang:en -family:wikipedia -namespace:14 \
-        -template:"Cat main" 1 P301 -inverse:P910 -islink
+-template:"Cat main" 1 P301 -inverse:P910 -islink
+
 
 .. note:: This script is a
    :py:obj:`ConfigParserBot <bot.ConfigParserBot>`. All options
@@ -108,7 +107,7 @@ the inverse claim is imported to the topic item as Wikidata property "P910"
    the -inverse option.
 """
 #
-# (C) Pywikibot team, 2013-2022
+# (C) Pywikibot team, 2013-2023
 #
 # Distributed under the terms of MIT License.
 #
@@ -341,8 +340,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         handler = getattr(self, 'handle_'
                           + ppage.type.lower().replace('-', '_'), None)
         if not handler:
-            pywikibot.info('{} is not a supported datatype.'
-                           .format(ppage.type))
+            pywikibot.info(f'{ppage.type} is not a supported datatype.')
             return
 
         exists_arg = set(self._get_option_with_fallback(options, 'exists'))
@@ -400,9 +398,8 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
             return
 
         if not self._get_option_with_fallback(options, 'islink'):
-            pywikibot.info(
-                '{} field {} value "{}" is not a wikilink. Skipping.'
-                .format(prop, field, value))
+            pywikibot.info(f'{prop} field {field} value "{value}" is not a'
+                           'wikilink. Skipping.')
             return
 
         linked_item = self.template_link_target(item, site, value)

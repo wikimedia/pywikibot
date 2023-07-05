@@ -1,6 +1,6 @@
 """Page filter generators provided by the pagegenerators module."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -22,17 +22,20 @@ from pywikibot import config, date, xmlreader
 from pywikibot.backports import (
     Callable,
     Dict,
+    Generator,
     Iterable,
     Iterator,
     List,
     Sequence,
     Tuple,
+    batched,
 )
 from pywikibot.comms import http
 from pywikibot.exceptions import APIError, ServerError
+from pywikibot.site import Namespace
 from pywikibot.tools import deprecated
 from pywikibot.tools.collections import GeneratorWrapper
-from pywikibot.tools.itertools import filter_unique, itergroup
+from pywikibot.tools.itertools import filter_unique
 
 
 OPT_SITE_TYPE = Optional['pywikibot.site.BaseSite']
@@ -169,26 +172,49 @@ def NewpagesPageGenerator(site: OPT_SITE_TYPE = None,
                                               total=total, returndict=True))
 
 
-def RecentChangesPageGenerator(site: OPT_SITE_TYPE = None,
-                               _filter_unique: Optional[Callable[
-                                   [Iterable['pywikibot.page.Page']],
-                                   Iterable['pywikibot.page.Page']]] = None,
-                               **kwargs: Any
-                               ) -> Iterable['pywikibot.page.Page']:
+def RecentChangesPageGenerator(
+    site: OPT_SITE_TYPE = None,
+    _filter_unique: Optional[Callable[[Iterable['pywikibot.Page']],
+                                      Iterable['pywikibot.Page']]] = None,
+    **kwargs: Any
+) -> Generator['pywikibot.Page', None, None]:
     """
     Generate pages that are in the recent changes list, including duplicates.
 
-    For parameters refer pywikibot.site.recentchanges
+    For keyword parameters refer :meth:`APISite.recentchanges()
+    <pywikibot.site._generators.GeneratorsMixin.recentchanges>`.
+
+    .. versionchanged:: 8.2
+       The YieldType depends on namespace. It can be
+       :class:`pywikibot.Page`, :class:`pywikibot.User`,
+       :class:`pywikibot.FilePage` or :class:`pywikibot.Category`.
 
     :param site: Site for generator results.
     """
+    def upcast(gen):
+        """Upcast pywikibot.Page type."""
+        for rc in gen:
+            # The title in a log entry may have been suppressed
+            if rc['type'] == 'log' and 'title' not in rc:
+                continue
+
+            ns = rc['ns']
+            if ns == Namespace.USER:
+                pageclass = pywikibot.User
+            elif ns == Namespace.FILE:
+                pageclass = pywikibot.FilePage
+            elif ns == Namespace.CATEGORY:
+                pageclass = pywikibot.Category
+            else:
+                pageclass = pywikibot.Page
+            yield pageclass(site, rc['title'])
+
     if site is None:
         site = pywikibot.Site()
 
     gen = site.recentchanges(**kwargs)
     gen.request['rcprop'] = 'title'
-    gen = (pywikibot.Page(site, rc['title'])
-           for rc in gen if rc['type'] != 'log' or 'title' in rc)
+    gen = upcast(gen)
 
     if _filter_unique:
         gen = _filter_unique(gen)
@@ -432,8 +458,8 @@ def UserContributionsGenerator(username: str,
 
     user = pywikibot.User(site, username)
     if not (user.isAnonymous() or user.isRegistered()):
-        pywikibot.warning('User "{}" does not exist on site "{}".'
-                          .format(user.username, site))
+        pywikibot.warning(
+            f'User "{user.username}" does not exist on site "{site}".')
 
     gen = (contrib[0] for contrib in user.contributions(
         namespaces=namespaces, total=total))
@@ -849,8 +875,7 @@ class GoogleSearchPageGenerator(GeneratorWrapper):
         """
         # restrict query to local site
         local_query = f'{self.query} site:{self.site.hostname()}'
-        base = 'http://{}{}'.format(self.site.hostname(),
-                                    self.site.articlepath)
+        base = f'http://{self.site.hostname()}{self.site.articlepath}'
         pattern = base.replace('{}', '(.+)')
         for url in self.queryGoogle(local_query):
             m = re.search(pattern, url)
@@ -1023,8 +1048,8 @@ def WikidataPageFromItemGenerator(gen: Iterable['pywikibot.page.ItemPage'],
     :param site: Site for generator results.
     """
     repo = site.data_repository()
-    for sublist in itergroup(gen, 50):
-        req = {'ids': [item.id for item in sublist],
+    for batch in batched(gen, 50):
+        req = {'ids': [item.id for item in batch],
                'sitefilter': site.dbName(),
                'action': 'wbgetentities',
                'props': 'sitelinks'}

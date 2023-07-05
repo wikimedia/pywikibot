@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-"""
-Spawns an interactive Python shell and imports the pywikibot library.
+"""Spawns an interactive Python shell and imports the pywikibot library.
+
+To exit the shell, type :kbd:`ctrl-D` (Linux) or :kbd:`ctrl-Z` (Windows)
+or use the :func:`exit` function.
 
 The following local option is supported::
 
@@ -14,7 +16,7 @@ Usage::
 .. versionchanged:: 7.0
    moved to pywikibot.scripts
 """
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -23,7 +25,11 @@ import sys
 
 
 def main(*args: str) -> None:
-    """Script entry point."""
+    """Script entry point.
+
+    .. versionchanged:: 8.2
+       *exitmsg* was added for :func:`code.interact`.
+    """
     args = list(args)
     if '-noimport' in args:
         args.remove('-noimport')
@@ -45,15 +51,15 @@ def main(*args: str) -> None:
     if hasattr(sys, '__interactivehook__'):
         sys.__interactivehook__()
 
-    code.interact("""Welcome to the Pywikibot interactive shell!""", local=env)
+    code.interact('Welcome to the Pywikibot interactive shell!', local=env,
+                  exitmsg='Thank you for using Pywikibot; exiting now...\n')
 
 
 if __name__ == '__main__':  # pragma: no cover
     if sys.platform == 'win32':
         import platform
         import subprocess
-        subprocess.run('title Python {} Shell'
-                       .format(platform.python_version()),
+        subprocess.run(f'title Python {platform.python_version()} Shell',
                        shell=True, check=True)
         del subprocess
         del platform

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the family module."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -103,6 +103,8 @@ class TestFamily(TestCase):
         family = Family.load('wikipedia')
         self.assertIsInstance(family.obsolete, Mapping)
         # redirected code (see site tests test_alias_code_site)
+        self.assertEqual(family.code_aliases['dk'], 'da')
+        self.assertEqual(family.interwiki_replacements['dk'], 'da')
         self.assertEqual(family.obsolete['dk'], 'da')
         # closed/locked site (see site tests test_locked_site)
         self.assertIsNone(family.obsolete['mh'])
@@ -110,19 +112,21 @@ class TestFamily(TestCase):
         self.assertIsNone(family.obsolete['ru-sib'])
         self.assertIn('dk', family.interwiki_replacements)
 
-    def test_set_obsolete(self):
-        """Test obsolete can be set."""
+    def test_obsolete_from_attributes(self):
+        """Test obsolete property for given class attributes."""
         # Construct a temporary family and instantiate it
         family = type('TempFamily', (Family,), {})()
 
         self.assertEqual(family.obsolete, {})
         self.assertEqual(family.interwiki_replacements, {})
-        self.assertEqual(family.interwiki_removals, [])
+        self.assertEqual(family.interwiki_removals, frozenset())
 
-        family.obsolete = {'a': 'b', 'c': None}
+        # Construct a temporary family with other attributes and instantiate it
+        family = type('TempFamily', (Family,),
+                      {'code_aliases': {'a': 'b'}, 'closed_wikis': ['c']})()
         self.assertEqual(family.obsolete, {'a': 'b', 'c': None})
         self.assertEqual(family.interwiki_replacements, {'a': 'b'})
-        self.assertEqual(family.interwiki_removals, ['c'])
+        self.assertEqual(family.interwiki_removals, frozenset('c'))
 
     def test_obsolete_readonly(self):
         """Test obsolete result not updatable."""
@@ -137,12 +141,10 @@ class TestFamily(TestCase):
                 "'mappingproxy' object does not support item assignment"):
             family.obsolete['a'] = 'b'
 
-    def test_WikimediaFamily_obsolete_readonly(self):
-        """Test WikimediaFamily obsolete is readonly."""
-        family = Family.load('wikipedia')
         with self.assertRaisesRegex(
-                TypeError,
-                "'frozenset' object does not support item assignment"):
+                AttributeError,
+                "property 'obsolete' of 'Family' object has no setter|"
+                "can't set attribute"):
             family.obsolete = {'a': 'b', 'c': None}
 
 

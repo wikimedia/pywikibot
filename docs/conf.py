@@ -1,6 +1,6 @@
 """Configuration file for Sphinx."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -43,7 +43,7 @@ import pywikibot  # noqa: E402
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #
-needs_sphinx = '5.2.3'
+needs_sphinx = '6.2.1'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -466,8 +466,12 @@ autodoc_typehints = 'description'
 suppress_warnings = ['autosectionlabel.*']
 toc_object_entries_show_parents = 'hide'
 
-# Allow lines like "Example:" to be followed by a code block
+# Napoleon settings
 napoleon_use_admonition_for_examples = True
+napoleon_use_admonition_for_notes = True
+napoleon_use_admonition_for_references = True
+napoleon_custom_sections = ['Advice', 'Advices', 'Hints', 'Rights', 'Tips']
+
 python_use_unqualified_type_names = True
 modindex_common_prefix = ['pywikibot.scripts.']
 
@@ -500,11 +504,15 @@ extlinks = {
 
 
 def pywikibot_docstring_fixups(app, what, name, obj, options, lines):
-    """Fixup docstrings."""
+    """Remove plain 'Initializer.' or 'Allocator.' docstring.
+
+    .. versionchanged:: 8.2
+       remove 'Allocator.' docstring too.
+    """
     if what not in ('class', 'exception'):
         return
 
-    if lines and lines[0] == 'Initializer.':
+    if lines and lines[0] in ('Initializer.', 'Allocator.'):
         lines[:] = lines[2:]
 
 
@@ -520,19 +528,27 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
 
     length = 0
     for index, line in enumerate(lines):
+        # highlight the first line
         if index == 0:  # highlight the first line
-            lines[0] = '**{}**'.format(line.strip('.'))
+            lines[0] = f"**{line.strip('.')}**"
+
+        # add link for pagegenerators options
         elif line == '&params;':
             lines[index] = ('This script supports use of '
                             ':py:mod:`pagegenerators` arguments.')
+
+        # add link for fixes
         elif name == 'scripts.replace' and line == '&fixes-help;':
             lines[index] = ('                  The available fixes are listed '
                             'in :py:mod:`pywikibot.fixes`.')
+
+        # replace cosmetic changes warning
         elif name == 'scripts.cosmetic_changes' and line == '&warning;':
             lines[index] = warning
+
+        # Initiate code block except pagegenerator arguments follows
         elif (line.endswith(':') and not line.lstrip().startswith(':')
                 and 'Traceback (most recent call last)' not in line):
-            # Initiate code block except pagegenerator arguments follows
             for afterline in lines[index + 1:]:
                 if not afterline:
                     continue
@@ -540,6 +556,7 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
                     lines[index] = line + ':'
                 break
 
+        # adjust options
         if line.startswith('-'):
             # Indent options
             match = re.match(r'-[^ ]+? +', line)

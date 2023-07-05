@@ -483,9 +483,8 @@ def _extract_plural(lang: str, message: str, parameters: Mapping[str, int]
                 specific_entries[int(number)] = plural
             else:
                 assert not specific_entries, (
-                    'generic entries defined after specific in "{}"'
-                    .format(variants))
-                plural_entries += [plural]
+                    f'generic entries defined after specific in "{variants}"')
+                plural_entries.append(plural)
 
         if num in specific_entries:
             return specific_entries[num]
@@ -625,8 +624,8 @@ def translate(code: STR_OR_SITE_TYPE,
                 break
         else:
             if fallback is not False:
-                raise KeyError('No fallback key found in lookup dict for "{}"'
-                               .format(code))
+                raise KeyError(
+                    f'No fallback key found in lookup dict for "{code}"')
             trans = None
 
     if trans is None:
@@ -875,7 +874,7 @@ def bundles(stem: bool = False) -> Generator[Union[Path, str], None, None]:
     >>> from pywikibot import i18n
     >>> bundles = sorted(i18n.bundles(stem=True))
     >>> len(bundles)
-    37
+    38
     >>> bundles[:4]
     ['add_text', 'archivebot', 'basic', 'blockpageschecker']
     >>> bundles[-5:]
@@ -912,7 +911,7 @@ def known_languages() -> List[str]:
     >>> i18n.known_languages()[-10:]
     ['vo', 'vro', 'wa', 'war', 'xal', 'xmf', 'yi', 'yo', 'yue', 'zh']
     >>> len(i18n.known_languages())
-    253
+    252
 
     The implementation is roughly equivalent to:
 

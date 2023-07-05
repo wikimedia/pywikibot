@@ -68,7 +68,7 @@ from pywikibot.logging import (
 )
 from pywikibot.site import APISite, BaseSite, DataSite
 from pywikibot.time import Timestamp
-from pywikibot.tools import normalize_username
+from pywikibot.tools import normalize_username, remove_last_args
 
 
 ItemPageStrNoneType = Union[str, 'ItemPage', None]
@@ -148,8 +148,7 @@ class Coordinate(_WbRepresentation):
         if not self._entity:
             if self.globe not in self.site.globes():
                 raise exceptions.CoordinateGlobeUnknownError(
-                    '{} is not supported in Wikibase yet.'
-                    .format(self.globe))
+                    f'{self.globe} is not supported in Wikibase yet.')
             return self.site.globes()[self.globe]
 
         if isinstance(self._entity, ItemPage):
@@ -435,8 +434,7 @@ class WbTime(_WbRepresentation):
             if site is None:
                 site = Site().data_repository()
                 if site is None:
-                    raise ValueError('Site {} has no data repository'
-                                     .format(Site()))
+                    raise ValueError(f'Site {Site()} has no data repository')
             calendarmodel = site.calendarmodel()
         self.calendarmodel = calendarmodel
         # if precision is given it overwrites the autodetection above
@@ -680,8 +678,8 @@ class WbTime(_WbRepresentation):
             kwargs['second'] = self.second
         return type(self)(**kwargs)
 
-    def toTimestr(self, force_iso: bool = False,
-                  normalize: bool = False) -> str:
+    @remove_last_args(['normalize'])  # since 8.2.0
+    def toTimestr(self, force_iso: bool = False) -> str:
         """Convert the data to a UTC date/time string.
 
         .. seealso:: :meth:`fromTimestr` for differences between output
@@ -689,15 +687,13 @@ class WbTime(_WbRepresentation):
 
         .. versionchanged:: 8.0
            *normalize* parameter was added.
+        .. versionchanged:: 8.2
+           *normalize* parameter was removed due to :phab:`T340495` and
+           :phab:`57755`
 
         :param force_iso: whether the output should be forced to ISO 8601
-        :param normalize: whether the output should be normalized (see
-            :meth:`normalize` for details)
         :return: Timestamp in a format resembling ISO 8601
         """
-        if normalize:
-            return self.normalize().toTimestr(force_iso=force_iso,
-                                              normalize=False)
         if force_iso:
             return Timestamp._ISO8601Format_new.format(
                 self.year, max(1, self.month), max(1, self.day),
@@ -726,17 +722,19 @@ class WbTime(_WbRepresentation):
                 datetime.timedelta(minutes=self.timezone)))
         return ts
 
-    def toWikibase(self, normalize: bool = False) -> Dict[str, Any]:
+    @remove_last_args(['normalize'])  # since 8.2.0
+    def toWikibase(self) -> Dict[str, Any]:
         """Convert the data to a JSON object for the Wikibase API.
 
         .. versionchanged:: 8.0
            *normalize* parameter was added.
+        .. versionchanged:: 8.2
+           *normalize* parameter was removed due to :phab:`T340495` and
+           :phab:`57755`
 
-        :param normalize: Whether to normalize the WbTime object before
-            converting it to a JSON object (see :func:`normalize` for details)
         :return: Wikibase JSON
         """
-        json = {'time': self.toTimestr(normalize=normalize),
+        json = {'time': self.toTimestr(),
                 'precision': self.precision,
                 'after': self.after,
                 'before': self.before,
@@ -1014,9 +1012,8 @@ class _WbDataPage(_WbRepresentation):
         :param label: Label describing the data type in error messages.
         """
         if not isinstance(page, Page):
-            raise ValueError(
-                'Page {} must be a pywikibot.Page object not a {}.'
-                .format(page, type(page)))
+            raise ValueError(f'Page {page} must be a pywikibot.Page object '
+                             f'not a {type(page)}.')
 
         # validate page exists
         if not page.exists():
@@ -1304,8 +1301,7 @@ def Site(code: Optional[str] = None,
         fam = fam or _config.family
 
     if not (code and fam):
-        raise ValueError('Missing Site {}'
-                         .format('code' if not code else 'family'))
+        raise ValueError(f"Missing Site {'code' if not code else 'family'}")
 
     if not isinstance(fam, Family):
         fam = Family.load(fam)
@@ -1337,8 +1333,7 @@ def Site(code: Optional[str] = None,
     key = f'{interface.__name__}:{fam}:{code}:{user}'
     if key not in _sites or not isinstance(_sites[key], interface):
         _sites[key] = interface(code=code, fam=fam, user=user)
-        debug("Instantiated {} object '{}'"
-              .format(interface.__name__, _sites[key]))
+        debug(f"Instantiated {interface.__name__} object '{_sites[key]}'")
 
         if _sites[key].code != code:
             warn('Site {} instantiated using different code "{}"'

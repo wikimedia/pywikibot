@@ -49,6 +49,7 @@ from tests.utils import (
     DrySite,
     WarningSourceSkipContextManager,
     execute_pwb,
+    skipping,
 )
 
 
@@ -1331,12 +1332,12 @@ class PwbTestCase(TestCase):
         if self.orig_pywikibot_dir:
             os.environ['PYWIKIBOT_DIR'] = self.orig_pywikibot_dir
 
-    def _execute(self, args, data_in=None, timeout=None, error=None):
+    def _execute(self, args, data_in=None, timeout=None):
         site = self.get_site()
 
         args += ['-family:' + site.family.name, '-lang:' + site.code]
 
-        return execute_pwb(args, data_in, timeout, error)
+        return execute_pwb(args, data_in, timeout)
 
 
 class RecentChangesTestCase(WikimediaDefaultSiteTestCase):
@@ -1569,3 +1570,8 @@ class HttpbinTestCase(TestCase):
     def get_httpbin_hostname(self):
         """Return httpbin hostname."""
         return 'httpbin.org'
+
+    def fetch(self, *args, **kwargs):
+        """Delegate http request to http.fetch but skip on ServerError."""
+        with skipping(ServerError):
+            return http.fetch(*args, **kwargs)

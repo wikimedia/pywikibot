@@ -755,7 +755,7 @@ class TextExtractsMixin:
         data = req.submit()['query']['pages']
         if '-1' in data:
             msg = data['-1'].get('invalidreason',
-                                 'Unknown exception:\n{}'.format(data['-1']))
+                                 f"Unknown exception:\n{data['-1']}")
             raise Error(msg)
 
         return data[str(page.pageid)]['extract']

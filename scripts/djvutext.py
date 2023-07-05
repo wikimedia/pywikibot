@@ -107,10 +107,7 @@ class DjVuTextBot(SingleSiteBot):
     def generator(self):
         """Generate pages from specified page interval."""
         for page_number in self.page_number_gen():
-            title = '{page_ns}:{prefix}/{number}'.format(
-                page_ns=self._page_ns,
-                prefix=self._prefix,
-                number=page_number)
+            title = f'{self._page_ns}:{self._prefix}/{page_number}'
             page = ProofreadPage(self._index.site, title)
             page.page_number = page_number  # remember page number in djvu file
             yield page
@@ -194,8 +191,7 @@ def main(*args: str) -> None:
 
     site = pywikibot.Site()
     if not site.has_extension('ProofreadPage'):
-        pywikibot.error('Site {} must have ProofreadPage extension.'
-                        .format(site))
+        pywikibot.error(f'Site {site} must have ProofreadPage extension.')
         return
 
     index_page = pywikibot.Page(site, index, ns=site.proofread_index_ns)

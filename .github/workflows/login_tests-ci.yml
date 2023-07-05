@@ -16,7 +16,7 @@ env:
 jobs:
   build:
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
-    timeout-minutes: 2
+    timeout-minutes: 30
 
     strategy:
       fail-fast: false
@@ -61,6 +61,8 @@ jobs:
           - python-version: 3.6
             site: wikisource:zh
             os: ubuntu-20.04
+          - python-version: "3.13-dev"
+            site: wikipedia:test
 
     steps:
     - name: Checkout Repository
@@ -70,6 +72,14 @@ jobs:
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
+      if: ${{ matrix.python-version != '3.13-dev' }}
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    # use deadsnakes/action until actions/setup-python supports Python 3.13
+    - name: Set up development Python ${{ matrix.python-version }}
+      uses: deadsnakes/action@v3.0.1
+      if: ${{ matrix.python-version == '3.13-dev' }}
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -114,10 +124,14 @@ jobs:
         echo "('${{ env.PYWIKIBOT_USERNAME }}', '${{ secrets.PYWIKIBOT_USERPWD }}')" > passwordfile
 
     - name: Test with unittest
-      timeout-minutes: 1
+      timeout-minutes: 2
       run: |
         python pwb.py version
         coverage run -m unittest -vv tests/site_login_logout_tests.py
+
+    - name: Show coverage statistics
+      run: |
+        coverage report
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3

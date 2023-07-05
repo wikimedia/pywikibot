@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for http module."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -153,8 +153,8 @@ class TestHttpStatus(HttpbinTestCase):
         """Test invalid scheme."""
         # A InvalidSchema is raised within requests
         with self.assertRaisesRegex(
-                requests.exceptions.InvalidSchema,
-                "No connection adapters were found for u?'invalid://url'"):
+                FatalServerError,
+                "No connection adapters were found for 'invalid://url'"):
             http.fetch('invalid://url')
 
     def test_follow_redirects(self):
@@ -239,6 +239,7 @@ class DefaultUserAgentTestCase(TestCase):
         self.assertIn('Python/' + str(PYTHON_VERSION[0]), http.user_agent())
 
 
+@require_modules('fake_useragent')
 class LiveFakeUserAgentTestCase(HttpbinTestCase):
 
     """Test the usage of fake user agent."""
@@ -255,51 +256,47 @@ class LiveFakeUserAgentTestCase(HttpbinTestCase):
             self.orig_fake_user_agent_exceptions)
         super().tearDown()
 
-    def _test_fetch_use_fake_user_agent(self):
-        """Test `use_fake_user_agent` argument of http.fetch."""
-        # Existing headers
-        r = http.fetch(
-            self.get_httpbin_url('/status/200'),
-            headers={'user-agent': 'EXISTING'})
+    def test_existing_headers(self):
+        """Test fake_user_agent with existing headers."""
+        r = self.fetch(self.get_httpbin_url('/status/200'),
+                       headers={'user-agent': 'EXISTING'})
         self.assertEqual(r.request.headers['user-agent'], 'EXISTING')
 
-        # Argument value changes
-        r = http.fetch(self.get_httpbin_url('/status/200'),
+    def test_argument_values_changes(self):
+        """Test fake_user_agent with argument value changes."""
+        r = self.fetch(self.get_httpbin_url('/status/200'),
                        use_fake_user_agent=True)
         self.assertNotEqual(r.request.headers['user-agent'], http.user_agent())
-        r = http.fetch(self.get_httpbin_url('/status/200'),
+
+        r = self.fetch(self.get_httpbin_url('/status/200'),
                        use_fake_user_agent=False)
         self.assertEqual(r.request.headers['user-agent'], http.user_agent())
-        r = http.fetch(
-            self.get_httpbin_url('/status/200'),
-            use_fake_user_agent='ARBITRARY')
+
+        r = self.fetch(self.get_httpbin_url('/status/200'),
+                       use_fake_user_agent='ARBITRARY')
         self.assertEqual(r.request.headers['user-agent'], 'ARBITRARY')
 
-        # Empty value
-        with self.assertRaisesRegex(
-                ValueError,
-                'Invalid parameter: use_fake_user_agent'):
-            http.fetch(self.get_httpbin_url('/status/200'),
+    def test_empty_valu(self):
+        """Test fake_user_agent with empty value."""
+        with self.assertRaisesRegex(ValueError,
+                                    'Invalid parameter: use_fake_user_agent'):
+            self.fetch(self.get_httpbin_url('/status/200'),
                        use_fake_user_agent='')
 
-        # Parameter wrongly set to None
-        with self.assertRaisesRegex(
-                ValueError,
-                'Invalid parameter: use_fake_user_agent'):
-            http.fetch(self.get_httpbin_url('/status/200'),
+    def test_parameter_set_to_none(self):
+        """Test fake_user_agent with parameter wrongly set to None."""
+        with self.assertRaisesRegex(ValueError,
+                                    'Invalid parameter: use_fake_user_agent'):
+            self.fetch(self.get_httpbin_url('/status/200'),
                        use_fake_user_agent=None)
 
-        # Manually overridden domains
+    def test_overridden_domains(self):
+        """Test fake_user_agent with manually overridden domains."""
         config.fake_user_agent_exceptions = {
             self.get_httpbin_hostname(): 'OVERRIDDEN'}
-        r = http.fetch(
-            self.get_httpbin_url('/status/200'), use_fake_user_agent=False)
+        r = self.fetch(self.get_httpbin_url('/status/200'),
+                       use_fake_user_agent=False)
         self.assertEqual(r.request.headers['user-agent'], 'OVERRIDDEN')
-
-    @require_modules('fake_useragent')
-    def test_fetch_with_fake_useragent(self):
-        """Test method with fake_useragent module."""
-        self._test_fetch_use_fake_user_agent()
 
 
 class CharsetTestCase(TestCase):
@@ -497,8 +494,7 @@ class BinaryTestCase(TestCase):
 
 class QueryStringParamsTestCase(HttpbinTestCase):
 
-    """
-    Test the query string parameter of request methods.
+    """Test the query string parameter of request methods.
 
     The /get endpoint of httpbin returns JSON that can include an
     'args' key with urldecoded query string parameters.
@@ -511,12 +507,12 @@ class QueryStringParamsTestCase(HttpbinTestCase):
 
     def test_no_params(self):
         """Test fetch method with no parameters."""
-        r = http.fetch(self.url, params={})
+        r = self.fetch(self.url, params={})
 
         fail_status = HTTPStatus.SERVICE_UNAVAILABLE
         if r.status_code == fail_status:  # T203637
-            self.skipTest('{status.value}: {status.description} for {url}'
-                          .format(status=fail_status, url=self.url))
+            self.skipTest(f'{fail_status.value}: {fail_status.description} '
+                          f'for {self.url}')
 
         self.assertEqual(r.status_code, HTTPStatus.OK)
         self.assertEqual(r.json()['args'], {})
@@ -528,12 +524,12 @@ class QueryStringParamsTestCase(HttpbinTestCase):
         HTTPBin returns the args in their urldecoded form, so what we put in
         should be the same as what we get out.
         """
-        r = http.fetch(self.url, params={'fish&chips': 'delicious'})
+        r = self.fetch(self.url, params={'fish&chips': 'delicious'})
 
         fail_status = HTTPStatus.SERVICE_UNAVAILABLE
         if r.status_code == fail_status:  # T203637
-            self.skipTest('{status.value}: {status.description} for {url}'
-                          .format(status=fail_status, url=self.url))
+            self.skipTest(f'{fail_status.value}: {fail_status.description} '
+                          f'for {self.url}')
 
         self.assertEqual(r.status_code, HTTPStatus.OK)
         self.assertEqual(r.json()['args'], {'fish&chips': 'delicious'})
@@ -545,12 +541,12 @@ class QueryStringParamsTestCase(HttpbinTestCase):
         HTTPBin returns the args in their urldecoded form, so what we put in
         should be the same as what we get out.
         """
-        r = http.fetch(self.url, params={'fish%26chips': 'delicious'})
+        r = self.fetch(self.url, params={'fish%26chips': 'delicious'})
 
         fail_status = HTTPStatus.SERVICE_UNAVAILABLE
         if r.status_code == fail_status:  # T203637
-            self.skipTest('{status.value}: {status.description} for {url}'
-                          .format(status=fail_status, url=self.url))
+            self.skipTest(f'{fail_status.value}: {fail_status.description} '
+                          f'for {self.url}')
 
         self.assertEqual(r.status_code, HTTPStatus.OK)
         self.assertEqual(r.json()['args'], {'fish%26chips': 'delicious'})
@@ -567,10 +563,10 @@ class DataBodyParameterTestCase(HttpbinTestCase):
             'X-Amzn-Trace-Id', 'X-B3-Parentspanid', 'X-B3-Spanid',
             'X-B3-Traceid', 'X-Forwarded-Client-Cert',
         )
-        r_data_request = http.fetch(self.get_httpbin_url('/post'),
+        r_data_request = self.fetch(self.get_httpbin_url('/post'),
                                     method='POST',
                                     data={'fish&chips': 'delicious'})
-        r_body_request = http.fetch(self.get_httpbin_url('/post'),
+        r_body_request = self.fetch(self.get_httpbin_url('/post'),
                                     method='POST',
                                     data={'fish&chips': 'delicious'})
 

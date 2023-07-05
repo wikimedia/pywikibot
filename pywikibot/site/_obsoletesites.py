@@ -21,8 +21,7 @@ class ClosedSite(APISite):
 
     def _closed_error(self, notice: str = '') -> None:
         """An error instead of pointless API call."""
-        pywikibot.error('Site {} has been closed. {}'.format(self.sitename,
-                                                             notice))
+        pywikibot.error(f'Site {self.sitename} has been closed. {notice}')
 
     def page_restrictions(
             self, page: 'pywikibot.Page') -> Dict[str, Tuple[str, str]]:

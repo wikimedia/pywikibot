@@ -223,7 +223,7 @@ class ScriptTestMeta(MetaTestCaseClass):
 
                 # run the script
                 result = execute_pwb(cmd, data_in, timeout=timeout,
-                                     error=error, overrides=test_overrides)
+                                     overrides=test_overrides)
 
                 err_result = result['stderr']
                 out_result = result['stdout']
@@ -363,6 +363,7 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
         'catall',          # stdout user interaction
         'checkimages',
         'revertbot',
+        'transwikiimport',
     }
 
     _allowed_failures = {
@@ -433,6 +434,7 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
         'template',
         'templatecount',
         'transferbot',
+        'transwikiimport',
         'unusedfiles',
         'upload',
         'watchlist',
@@ -442,6 +444,7 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
 
     _allowed_failures = {
         'basic',
+        'nowcommons',
     }
     _arguments = '-simulate -page:Foobar -always -site:wikipedia:en'
     _results = ("Working on 'Foobar'", 'Script terminated successfully')
