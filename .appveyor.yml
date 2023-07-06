@@ -60,6 +60,7 @@ install:
   # Download Python 3.6.1 which isn't pre-installed
   - ps: ./appveyor_install.ps1
   - python --version
+  - python -c "import platform, sys; print(platform.machine(), '|', sys.version)"
   - python -c "import struct; print('PYTHON_ARCH' + chr(58), struct.calcsize('P') << 3)"
   - pip --version
   - pip install -r requirements.txt
