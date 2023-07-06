@@ -42,7 +42,8 @@ pydot >= 1.4.1
 python-stdnum >= 1.18
 
 # GUI
-Pillow >= 8.1.1
+Pillow >= 8.1.2, < 10.0.0; platform_machine == 'AMD32'
+Pillow >= 8.1.2; platform_machine != 'AMD32'
 
 # core pagegenerators
 google >= 1.7
