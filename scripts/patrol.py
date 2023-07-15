@@ -407,7 +407,8 @@ def main(*args: str) -> None:
     # Parse command line arguments
     local_args = pywikibot.handle_args(args)
     site = pywikibot.Site()
-    gen_factory = pagegenerators.GeneratorFactory(site)
+    gen_factory = pagegenerators.GeneratorFactory(
+        site, enabled_options=['namespaces'])
     local_args = gen_factory.handle_args(local_args)
     for arg in local_args:
         opt, _, value = arg.partition(':')
