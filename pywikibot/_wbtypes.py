@@ -1,6 +1,6 @@
-"""The initialization file for the Pywikibot framework."""
+"""Wikibase data type classes."""
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2013-2023
 #
 # Distributed under the terms of the MIT license.
 #
