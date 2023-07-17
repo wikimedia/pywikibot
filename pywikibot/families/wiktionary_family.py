@@ -87,3 +87,13 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'ar': ('/شرح', '/doc'),
         'sr': ('/док', ),
     }
+
+    @classmethod
+    def __post_init__(cls):
+        """Add 'zh-yue' code alias due to :phab:`T341960`.
+
+        .. versionadded:: 8.3
+        """
+        aliases = cls.code_aliases.copy()
+        aliases['zh-yue'] = 'yue'
+        cls.code_aliases = aliases
