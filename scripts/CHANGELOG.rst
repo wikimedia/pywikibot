@@ -1,6 +1,15 @@
 Scripts Changelog
 =================
 
+8.3.0
+-----
+
+patrol
+~~~~~~
+
+* Only handle namespaces with :func:`pagegenerators.GeneratorFactory` (:phab:`T341768`)
+
+
 8.2.0
 -----
 
