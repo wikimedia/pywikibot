@@ -1,7 +1,9 @@
 Current release
 ---------------
 
-* *(No changes yet)*
+* All wbtypes are placed in ``pywkibot._wbtypes`` module
+* Use ``site.lang`` instead of ``site.code`` in :func:`comms.http.user_agent` (:phab:`T228322`)
+* Make header extraction in :func:`textlib.extract_sections` more robust (:phab:`T341787`)
 
 
 Deprecations
