@@ -318,6 +318,23 @@ class Topic(FlowPage):
         self.site.restore_topic(self, reason)
         self._reload()
 
+    def summary(self) -> Union[str, None]:
+        """Get this topic summary, if any.
+
+        :return: summary or None
+        """
+        if 'summary' in self.root._current_revision.keys():
+            return self.root._current_revision['summary']['revision'][
+                'content']['content']
+
+    def summarize(self, summary: str) -> None:
+        """Summarize this topic.
+
+        :param summary: The summary that will be added to the topic.
+        """
+        self.site.summarize_topic(self, summary)
+        self._reload()
+
 
 # Flow non-page-like objects
 class Post:
