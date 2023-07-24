@@ -216,6 +216,16 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'de': ('Archiv',),
     }
 
+    @classmethod
+    def __post_init__(cls):
+        """Add 'yue' code alias due to :phab:`T341960`.
+
+        .. versionadded:: 8.3
+        """
+        aliases = cls.code_aliases.copy()
+        aliases['yue'] = 'zh-yue'
+        cls.code_aliases = aliases
+
     def encodings(self, code):
         """Return a list of historical encodings for a specific site."""
         # Historic compatibility

@@ -5,6 +5,7 @@
 # Distributed under the terms of the MIT license.
 #
 import collections
+import inspect
 import logging
 import string
 import sys
@@ -13,6 +14,7 @@ import urllib.parse as urlparse
 import warnings
 from importlib import import_module
 from itertools import chain
+from textwrap import fill
 from os.path import basename, dirname, splitext
 from typing import Optional
 
@@ -55,9 +57,8 @@ class Family:
         """Allocator."""
         # any Family class defined in this file are abstract
         if cls in globals().values():
-            raise TypeError(
-                'Abstract Family class {} cannot be instantiated; '
-                'subclass it instead'.format(cls.__name__))
+            raise TypeError(f'Abstract Family class {cls.__name__} cannot be'
+                            ' instantiated;  subclass it instead')
 
         # Override classproperty
         cls.instance = super().__new__(cls)
@@ -67,13 +68,23 @@ class Family:
         if '__init__' in cls.__dict__:
             # Initializer deprecated. Families should be immutable and any
             # instance / class modification should go to allocator (__new__).
-            cls.__init__ = deprecated(cls.__init__)
+            cls.__init__ = deprecated(instead='__post_init__() classmethod',
+                                      since='3.0.20180710')(cls.__init__)
 
             # Invoke initializer immediately and make initializer no-op.
             # This is to avoid repeated initializer invocation on repeated
             # invocations of the metaclass's __call__.
             cls.instance.__init__()
             cls.__init__ = lambda self: None  # no-op
+        elif '__post_init__' not in cls.__dict__:
+            pass
+        elif inspect.ismethod(cls.__post_init__):  # classmethod check
+            cls.__post_init__()
+        else:
+            raise RuntimeError(fill(
+                f'__post_init__() method of {cls.__module__}.{cls.__name__}'
+                ' class or its superclass must be a classmethod. Please  check'
+                ' your family file.', width=66))
 
         return cls.instance
 
