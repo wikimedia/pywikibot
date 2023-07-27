@@ -244,7 +244,11 @@ class DryParamInfo(dict):
 
 class DummySiteinfo:
 
-    """Dummy class to use instead of :py:obj:`pywikibot.site.Siteinfo`."""
+    """Dummy Siteinfo class.
+
+    To be used instead of :class:`pywikibot.site.Siteinfo
+    <pywikibot.site._siteinfo.Siteinfo>`.
+    """
 
     def __init__(self, cache):
         """Initializer."""
@@ -281,6 +285,13 @@ class DummySiteinfo:
     def __contains__(self, key):
         """Return False."""
         return False
+
+    def is_cached(self, key: str) -> bool:
+        """Return whether the key is cached.
+
+        .. versionadded:: 8.3
+        """
+        return key in self._cache
 
     def is_recognised(self, key):
         """Return None."""

@@ -28,36 +28,35 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     languages_by_size = [
         'en', 'ceb', 'de', 'sv', 'fr', 'nl', 'ru', 'es', 'it', 'arz', 'pl',
         'ja', 'zh', 'vi', 'uk', 'war', 'ar', 'pt', 'fa', 'ca', 'sr', 'id',
-        'ko', 'no', 'ce', 'fi', 'cs', 'hu', 'tr', 'tt', 'sh', 'ro',
+        'ko', 'no', 'ce', 'fi', 'cs', 'tr', 'hu', 'tt', 'sh', 'ro',
         'zh-min-nan', 'eu', 'ms', 'eo', 'he', 'hy', 'da', 'bg', 'cy', 'sk',
-        'azb', 'uz', 'et', 'kk', 'simple', 'be', 'min', 'el', 'hr', 'lt', 'gl',
-        'az', 'ur', 'sl', 'ka', 'lld', 'nn', 'hi', 'th', 'ta', 'bn', 'la',
-        'mk', 'zh-yue', 'ast', 'lv', 'tg', 'af', 'my', 'mg', 'mr', 'bs', 'sq',
-        'oc', 'nds', 'te', 'ml', 'be-tarask', 'br', 'ky', 'sw', 'jv', 'new',
+        'azb', 'uz', 'et', 'simple', 'kk', 'be', 'min', 'el', 'hr', 'lt', 'gl',
+        'az', 'ur', 'sl', 'lld', 'ka', 'nn', 'hi', 'th', 'ta', 'bn', 'la',
+        'mk', 'zh-yue', 'ast', 'lv', 'tg', 'af', 'my', 'mg', 'mr', 'sq', 'bs',
+        'oc', 'te', 'nds', 'ml', 'be-tarask', 'br', 'ky', 'sw', 'jv', 'new',
         'lmo', 'pnb', 'vec', 'ht', 'pms', 'ba', 'lb', 'su', 'ku', 'ga', 'szl',
-        'is', 'fy', 'cv', 'pa', 'ckb', 'tl', 'an', 'wuu', 'diq', 'io', 'sco',
-        'vo', 'yo', 'ne', 'ia', 'gu', 'kn', 'als', 'avk', 'ha', 'bar', 'scn',
-        'crh', 'bpy', 'qu', 'nv', 'mn', 'xmf', 'ban', 'si', 'ps', 'frr',
-        'bat-smg', 'os', 'or', 'sah', 'mzn', 'cdo', 'ig', 'gd', 'bug', 'tum',
-        'yi', 'sd', 'ilo', 'am', 'nap', 'li', 'fo', 'gor', 'bcl', 'hsb',
-        'map-bms', 'mai', 'shn', 'eml', 'ace', 'zh-classical', 'sa', 'as',
-        'wa', 'ie', 'lij', 'zu', 'mhr', 'hyw', 'hif', 'sn', 'mrj', 'bjn',
-        'mni', 'km', 'hak', 'so', 'roa-tara', 'pam', 'rue', 'sat', 'nso', 'bh',
-        'se', 'mi', 'myv', 'vls', 'nds-nl', 'sc', 'dag', 'kw', 'vep', 'glk',
-        'bo', 'ary', 'co', 'tk', 'kab', 'gan', 'rw', 'fiu-vro', 'ab', 'gv',
-        'ug', 'nah', 'zea', 'skr', 'frp', 'udm', 'pcd', 'kv', 'mt', 'csb',
-        'gn', 'smn', 'ay', 'nrm', 'ks', 'lez', 'lfn', 'olo', 'mwl', 'stq',
-        'lo', 'ang', 'fur', 'rm', 'mdf', 'lad', 'gom', 'ext', 'kaa', 'tyv',
-        'koi', 'dsb', 'av', 'pap', 'ln', 'dty', 'tw', 'cbk-zam', 'dv', 'ksh',
-        'za', 'gag', 'bxr', 'pfl', 'lg', 'szy', 'pag', 'pi', 'tay', 'blk',
-        'haw', 'awa', 'inh', 'krc', 'xal', 'pdc', 'to', 'atj', 'tcy', 'arc',
-        'mnw', 'jam', 'kbp', 'wo', 'anp', 'kbd', 'nia', 'shi', 'nov', 'ki',
-        'nqo', 'bi', 'tpi', 'tet', 'xh', 'om', 'roa-rup', 'jbo', 'fj', 'lbe',
-        'kg', 'ty', 'guw', 'cu', 'trv', 'ami', 'ff', 'srn', 'sm', 'alt', 'gcr',
-        'chr', 'tn', 'mad', 'ltg', 'ny', 'st', 'pih', 'got', 'rmy', 'ee', 'bm',
-        'ss', 'pcm', 've', 'ts', 'chy', 'kcg', 'rn', 'gur', 'ch', 'ik', 'pnt',
-        'ady', 'fat', 'guc', 'iu', 'pwn', 'sg', 'din', 'ti', 'kl', 'dz', 'cr',
-        'gpe',
+        'is', 'fy', 'cv', 'ckb', 'pa', 'tl', 'an', 'wuu', 'diq', 'io', 'sco',
+        'vo', 'yo', 'ne', 'ia', 'gu', 'kn', 'als', 'ha', 'avk', 'bar', 'scn',
+        'crh', 'bpy', 'qu', 'nv', 'mn', 'xmf', 'ban', 'si', 'tum', 'ps', 'frr',
+        'os', 'bat-smg', 'or', 'sah', 'ig', 'mzn', 'cdo', 'gd', 'bug', 'yi',
+        'sd', 'ilo', 'am', 'nap', 'li', 'bcl', 'fo', 'gor', 'hsb', 'map-bms',
+        'mai', 'shn', 'eml', 'ace', 'zh-classical', 'sa', 'as', 'wa', 'ie',
+        'lij', 'hyw', 'mhr', 'zu', 'sn', 'hif', 'mrj', 'bjn', 'mni', 'km',
+        'hak', 'roa-tara', 'pam', 'rue', 'sat', 'nso', 'bh', 'so', 'se', 'mi',
+        'myv', 'vls', 'nds-nl', 'sc', 'dag', 'kw', 'bo', 'vep', 'co', 'ary',
+        'glk', 'tk', 'kab', 'gan', 'rw', 'fiu-vro', 'ab', 'gv', 'ug', 'nah',
+        'zea', 'skr', 'frp', 'udm', 'pcd', 'kv', 'mt', 'csb', 'gn', 'smn',
+        'ay', 'nrm', 'ks', 'lez', 'lfn', 'olo', 'mwl', 'stq', 'lo', 'ang',
+        'fur', 'rm', 'mdf', 'lad', 'gom', 'ext', 'kaa', 'tyv', 'koi', 'av',
+        'pap', 'dsb', 'ln', 'dty', 'tw', 'cbk-zam', 'dv', 'ksh', 'za', 'gag',
+        'bxr', 'pfl', 'lg', 'szy', 'pag', 'blk', 'pi', 'tay', 'haw', 'awa',
+        'inh', 'krc', 'xal', 'pdc', 'to', 'atj', 'tcy', 'arc', 'mnw', 'jam',
+        'kbp', 'wo', 'kbd', 'anp', 'nia', 'nov', 'shi', 'ki', 'nqo', 'bi',
+        'om', 'tpi', 'xh', 'tet', 'roa-rup', 'jbo', 'fj', 'lbe', 'kg', 'ff',
+        'ty', 'guw', 'cu', 'trv', 'ami', 'srn', 'sm', 'mad', 'alt', 'gcr',
+        'ltg', 'chr', 'tn', 'ny', 'st', 'pih', 'rmy', 'got', 'ee', 'pcm', 'bm',
+        'ss', 'gpe', 've', 'ts', 'chy', 'kcg', 'rn', 'gur', 'ch', 'ik', 'ady',
+        'fat', 'pnt', 'guc', 'iu', 'pwn', 'sg', 'din', 'ti', 'kl', 'dz', 'cr',
     ]
 
     # Sites we want to edit but not count as real languages
@@ -215,6 +214,16 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
                'Rfc-archiv-start',),
         'de': ('Archiv',),
     }
+
+    @classmethod
+    def __post_init__(cls):
+        """Add 'yue' code alias due to :phab:`T341960`.
+
+        .. versionadded:: 8.3
+        """
+        aliases = cls.code_aliases.copy()
+        aliases['yue'] = 'zh-yue'
+        cls.code_aliases = aliases
 
     def encodings(self, code):
         """Return a list of historical encodings for a specific site."""

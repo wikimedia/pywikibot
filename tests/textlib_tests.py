@@ -1626,6 +1626,24 @@ class TestExtractSections(DefaultDrySiteTestCase):
             [('====title====', '\n'), ('==title 2==', '\ncontent')],
         )
 
+    def test_with_comments(self):
+        """Test section headers surrounded by comments."""
+        text = ('text\n\n'
+                '<!--\n multiline comment\n-->== title ==\n'
+                'content\n\n'
+                '<!-- comment --> == not title ==\n'
+                'foo\n\n'
+                '== title 2 == <!-- trailing comment -->\n'
+                'content 2')
+        result = extract_sections(text, self.site)
+        self._extract_sections_tests(
+            result,
+            'text\n\n<!--\n multiline comment\n-->',
+            [('== title ==',
+              '\ncontent\n\n<!-- comment --> == not title ==\nfoo\n\n'),
+             ('== title 2 ==', ' <!-- trailing comment -->\ncontent 2')]
+        )
+
     def test_long_comment(self):
         r"""Test for text having a long expanse of white space.
 
@@ -1640,8 +1658,21 @@ class TestExtractSections(DefaultDrySiteTestCase):
         result = extract_sections(text, self.site)
         self._extract_sections_tests(result, text, [], '')
 
+    def test_empty_header(self):
+        """Test empty section headers."""
+        text = ('text\n\n'
+                '== ==\n'
+                '=====\n'
+                '=== ===\n')
+        result = extract_sections(text, self.site)
+        self._extract_sections_tests(
+            result,
+            'text\n\n',
+            [('== ==', '\n'), ('=====', '\n'), ('=== ===', '\n')]
+        )
+
     def test_unbalanced_headers(self):
-        """Test unbalances section headers."""
+        """Test unbalanced section headers."""
         text = ('text\n\n'
                 '====title===\n'
                 '==title 2===\n'

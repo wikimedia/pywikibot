@@ -270,7 +270,7 @@ def _create_default_regexes() -> None:
         # section headers
         'header': re.compile(
             r'(?:(?<=\n)|\A)(?:<!--[\s\S]*?-->)*'
-            r'=(?:[^\n]|<!--[\s\S]*?-->)+='
+            r'(=(?:[^\n]|<!--[\s\S]*?-->)+=)'
             r' *(?:<!--[\s\S]*?--> *)*(?=\n|\Z)'),
         # external links
         'hyperlink': compileLinkR(),
@@ -933,7 +933,7 @@ def add_text(text: str, add: str, *, site=None) -> str:
 # -------------------------------
 
 #: Head pattern
-HEAD_PATTERN = re.compile('{0}[^=]+{0}'.format('(={1,6})'))
+HEAD_PATTERN = re.compile(r'(={1,6}).+\1', re.DOTALL)
 TITLE_PATTERN = re.compile("'{3}([^']+)'{3}")
 
 _Heading = namedtuple('_Heading', ('text', 'start', 'end'))
@@ -957,7 +957,7 @@ class Section(NamedTuple):
         .. versionadded:: 8.2
         """
         m = HEAD_PATTERN.match(self.title)
-        return min(map(len, m.groups()))
+        return len(m[1])
 
     @property
     def heading(self) -> str:
@@ -998,9 +998,9 @@ def _extract_headings(text: str) -> List[_Heading]:
     headings = []
     heading_regex = get_regexes('header')[0]
     for match in heading_regex.finditer(text):
-        start, end = match.span()
+        start, end = match.span(1)
         if not isDisabled(text, start) and not isDisabled(text, end):
-            headings.append(_Heading(match.group(), start, end))
+            headings.append(_Heading(match[1], start, end))
     return headings
 
 

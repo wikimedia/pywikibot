@@ -38,16 +38,16 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'cs', 'ml', 'my', 'uz', 'li', 'eo', 'or', 'te', 'fa', 'gl', 'ar', 'oc',
         'sg', 'jv', 'is', 'az', 'uk', 'eu', 'ast', 'br', 'mnw', 'da', 'bn',
         'simple', 'lo', 'la', 'hr', 'shn', 'sk', 'fj', 'ky', 'wa', 'bg', 'ur',
-        'cy', 'ps', 'tg', 'lmo', 'he', 'vo', 'om', 'sl', 'af', 'kbd',
-        'zh-min-nan', 'scn', 'ms', 'tl', 'pa', 'fy', 'sw', 'ka', 'nn', 'min',
-        'lv', 'kk', 'gor', 'nds', 'sq', 'lb', 'co', 'mn', 'bs', 'pnb', 'nah',
+        'lmo', 'cy', 'ps', 'tg', 'he', 'kbd', 'vo', 'om', 'sl', 'af',
+        'zh-min-nan', 'scn', 'ms', 'tl', 'pa', 'fy', 'sw', 'ka', 'nn', 'kk',
+        'min', 'lv', 'gor', 'nds', 'sq', 'lb', 'co', 'bs', 'mn', 'pnb', 'nah',
         'yue', 'ckb', 'sa', 'km', 'be', 'vec', 'diq', 'tk', 'nia', 'mk', 'sm',
-        'hsb', 'ks', 'shy', 'su', 'ga', 'bcl', 'gd', 'an', 'gom', 'mr', 'wo',
-        'mni', 'bjn', 'ia', 'ang', 'mt', 'sd', 'fo', 'tt', 'ha', 'gn', 'so',
+        'hsb', 'ks', 'shy', 'su', 'bcl', 'ga', 'gd', 'an', 'gom', 'mr', 'wo',
+        'mni', 'ia', 'bjn', 'ang', 'mt', 'sd', 'fo', 'tt', 'ha', 'so', 'gn',
         'si', 'ie', 'mi', 'csb', 'ug', 'guw', 'st', 'hif', 'roa-rup', 'jbo',
         'kl', 'zu', 'ay', 'ln', 'yi', 'gu', 'na', 'gv', 'kw', 'tpi', 'kcg',
         'am', 'ne', 'rw', 'ts', 'ig', 'qu', 'ss', 'iu', 'chr', 'dv', 'ti',
-        'tn',
+        'tn', 'btm',
     ]
 
     category_redirect_templates = {
@@ -87,3 +87,13 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'ar': ('/شرح', '/doc'),
         'sr': ('/док', ),
     }
+
+    @classmethod
+    def __post_init__(cls):
+        """Add 'zh-yue' code alias due to :phab:`T341960`.
+
+        .. versionadded:: 8.3
+        """
+        aliases = cls.code_aliases.copy()
+        aliases['zh-yue'] = 'yue'
+        cls.code_aliases = aliases

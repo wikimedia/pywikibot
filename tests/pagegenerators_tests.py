@@ -1712,6 +1712,7 @@ class TestLinksearchPageGenerator(TestCase):
     family = 'wikipedia'
     code = 'en'
 
+    @unittest.skip('Needs to be adapted for T14810')
     def test_weblink(self):
         """Test -weblink."""
         cases = (('wikipedia.org', 'http://wikipedia.org'),
@@ -1720,19 +1721,20 @@ class TestLinksearchPageGenerator(TestCase):
                  ('ftp://*', 'ftp://'))
 
         for search, expected in cases:
-            gf = pagegenerators.GeneratorFactory(site=self.site)
-            gf.handle_arg(f'-weblink:{search}')
-            gf.handle_arg('-ns:2')
-            gf.handle_arg('-limit:1')
-            gen = gf.getCombinedGenerator()
-            genlist = list(gen)
-            self.assertLength(genlist, 1)
+            with self.subTest(search=search, expected=expected):
+                gf = pagegenerators.GeneratorFactory(site=self.site)
+                gf.handle_arg(f'-weblink:{search}')
+                gf.handle_arg('-ns:2')
+                gf.handle_arg('-limit:1')
+                gen = gf.getCombinedGenerator()
+                genlist = list(gen)
+                self.assertLength(genlist, 1)
 
-            page = genlist[0]
-            self.assertIsInstance(page, pywikibot.Page)
-            self.assertTrue(page.exists())
-            self.assertEqual(page.namespace(), 2)
-            self.assertIn(expected, page.text)
+                page = genlist[0]
+                self.assertIsInstance(page, pywikibot.Page)
+                self.assertTrue(page.exists())
+                self.assertEqual(page.namespace(), 2)
+                self.assertIn(expected, page.text)
 
     def test_double_opposite_protocols(self):
         """Test LinksearchPageGenerator with two opposite protocols."""
@@ -1741,6 +1743,7 @@ class TestLinksearchPageGenerator(TestCase):
                                                    protocol='https',
                                                    site=self.site)
 
+    @unittest.skip('Needs to be adapted for T14810')
     def test_double_same_protocols(self):
         """Test LinksearchPageGenerator with two same protocols."""
         gen = pagegenerators.LinksearchPageGenerator('https://w.wiki',

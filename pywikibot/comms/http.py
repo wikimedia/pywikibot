@@ -188,28 +188,25 @@ def user_agent_username(username=None):
     return username
 
 
-def user_agent(site=None, format_string: str = None) -> str:
-    """
-    Generate the user agent string for a given site and format.
+def user_agent(site: Optional['pywikibot.site.BaseSite'] = None,
+               format_string: str = '') -> str:
+    """Generate the user agent string for a given site and format.
 
-    :param site: The site for which this user agent is intended. May be None.
-    :type site: BaseSite
-    :param format_string: The string to which the values will be added using
-        str.format. Is using config.user_agent_format when it is None.
+    :param site: The site for which this user agent is intended. May be
+        None.
+    :param format_string: The string to which the values will be added
+        using str.format. Is using config.user_agent_format when it is
+        empty.
     :return: The formatted user agent
     """
     values = USER_AGENT_PRODUCTS.copy()
     values.update(dict.fromkeys(['script', 'script_product'],
                                 pywikibot.bot.calledModuleName()))
+    values.update(dict.fromkeys(['family', 'code', 'lang', 'site'], ''))
 
     script_comments = []
     if config.user_agent_description:
         script_comments.append(config.user_agent_description)
-
-    values['family'] = ''
-    values['code'] = ''
-    values['lang'] = ''  # TODO: use site.lang, if known
-    values['site'] = ''
 
     username = ''
     if site:
@@ -224,7 +221,8 @@ def user_agent(site=None, format_string: str = None) -> str:
         values.update({
             'family': site.family.name,
             'code': site.code,
-            'lang': site.code,  # TODO: use site.lang, if known
+            'lang': (site.lang if site.siteinfo.is_cached('lang')
+                     else f'({site.code})'),
             'site': str(site),
         })
 

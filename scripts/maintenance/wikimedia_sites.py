@@ -86,7 +86,7 @@ def update_family(families):
         filepath = Path(f'pywikibot/families/{family}_family.py')
         family_text = filepath.read_text(encoding='utf8')
         family_text = re.sub(r'(?ms)^ {4}languages_by_size.+?\]',
-                             text, family_text, 1)
+                             text, family_text, count=1)
         filepath.write_text(family_text, encoding='utf8')
 
 
