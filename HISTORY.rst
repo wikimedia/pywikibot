@@ -68,7 +68,7 @@ Release history
 * L10N updates
 * Ignore talk pages with :meth:`APISite.watched_pages()<pywikibot.site._generators.GeneratorsMixin.watched_pages>` (:phab:`T330806`)
 * Load page info when creating a page if not updated previously (:phab:`T330980`)
-* Improve flush exception logging
+* Improve flush exception logging  (:phab:`T108444`)
 
 
 8.0.4
