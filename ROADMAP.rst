@@ -1,12 +1,7 @@
 Current release
 ---------------
 
-* Add support for btmwiktionary (:phab:`T336117`)
-* Add 'yue'/'zh-yue' code_aliases to family files (:phab:`T341960`)
-* All wbtypes are placed in ``pywkibot._wbtypes`` module
-* Use ``site.lang`` instead of ``site.code`` in :func:`comms.http.user_agent` (:phab:`T228322`)
-* Make header extraction in :func:`textlib.extract_sections` more robust (:phab:`T341787`)
-
+* *(No changes yet*)
 
 Deprecations
 ------------
