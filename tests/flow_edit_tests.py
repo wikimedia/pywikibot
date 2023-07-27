@@ -39,6 +39,22 @@ class TestFlowCreateTopic(TestCase):
         self.assertIsInstance(wikitext, str)
         self.assertEqual(wikitext, content)
 
+    def test_summarize_topic(self):
+        """Test summarize topic we just created."""
+        board = Board(self.site, 'Talk:Pywikibot test')
+        topic = next(board.topics(total=1))
+        self.assertIsNone(topic.summary())
+
+        content = 'That was (and is still) a test'
+        topic.summarize(content)
+        self.assertIsInstance(topic.summary(), str)
+        self.assertEqual(topic.summary(), content)
+
+        content = 'That works'
+        topic.summarize(content)
+        self.assertIsInstance(topic.summary(), str)
+        self.assertEqual(topic.summary(), content)
+
 
 class TestFlowReply(TestCase):
 
