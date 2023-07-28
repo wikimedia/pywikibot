@@ -163,19 +163,24 @@ def to_latin_digits(phrase: str,
     return phrase
 
 
-def case_escape(case: str, string: str) -> str:
+def case_escape(case: str, string: str, *, underscore: bool = False) -> str:
     """Return an escaped regex pattern which depends on 'first-letter' case.
 
     .. versionadded:: 7.0
+    .. versionchanged:: 8.4
+       Added the optional *underscore* parameter.
 
-    :param case: if `case` is 'first-letter' the regex contains an
-        upper/lower case set for the first letter
+    :param case: if `case` is 'first-letter', the regex contains an
+        inline re.IGNORECASE flag for the first letter
+    :param underscore: if True, expand the regex to detect spaces and
+        underscores which are interchangeable and collapsible
     """
-    first = string[0]
-    if first.isalpha() and case == 'first-letter':
-        pattern = f'[{first.upper()}{first.lower()}]{re.escape(string[1:])}'
+    if case == 'first-letter':
+        pattern = f'(?i:{string[:1]}){re.escape(string[1:])}'
     else:
         pattern = re.escape(string)
+    if underscore:
+        pattern = re.sub(r'_|\\ ', '[_ ]+', pattern)
     return pattern
 
 
@@ -1557,9 +1562,7 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None,
         return oldtext
 
     # title might contain regex special characters
-    title = case_escape(site.namespaces[14].case, title)
-    # spaces and underscores in page titles are interchangeable and collapsible
-    title = title.replace(r'\ ', '[ _]+').replace(r'\_', '[ _]+')
+    title = case_escape(site.namespaces[14].case, title, underscore=True)
     categoryR = re.compile(r'\[\[\s*({})\s*:\s*{}[\s\u200e\u200f]*'
                            r'((?:\|[^]]+)?\]\])'
                            .format(catNamespace, title), re.I)
