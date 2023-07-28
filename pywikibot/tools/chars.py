@@ -8,7 +8,7 @@ import re
 import sys
 from contextlib import suppress
 from typing import Union
-from urllib.parse import unquote_to_bytes
+from urllib.parse import unquote
 
 from pywikibot.backports import Iterable
 from pywikibot.tools._unidata import _category_cf
@@ -98,10 +98,22 @@ def url2string(title: str,
                encodings: Union[str, Iterable[str]] = 'utf-8') -> str:
     """Convert URL-encoded text to unicode using several encoding.
 
-    Uses the first encoding that doesn't cause an error.
+    Uses the first encoding that doesn't cause an error. Raises the
+    first exception if all encodings fails.
+
+    For a single *encodings* string this function is equvalent to
+    :samp:`urllib.parse.unquote(title, encodings, errors='strict')`
+
+    .. versionchanged:: 8.4
+       Ignore *LookupError* and try other encodings.
+
+    .. seealso:: :python:`urllib.parse.unquote
+       <library/urllib.parse.html#urllib.parse.unquote>`
 
     **Example:**
 
+    >>> url2string('abc%20def')
+    'abc def'
     >>> url2string('/El%20Ni%C3%B1o/')
     '/El Niño/'
     >>> url2string('/El%20Ni%C3%B1o/', 'ascii')
@@ -118,19 +130,15 @@ def url2string(title: str,
     :raise LookupError: unknown encoding
     """
     if isinstance(encodings, str):
-        encodings = [encodings]
+        return unquote(title, encodings, errors='strict')
 
     first_exception = None
     for enc in encodings:
         try:
-            t = title.encode(enc)
-            t = unquote_to_bytes(t)
-            result = t.decode(enc)
-        except UnicodeError as e:
+            return unquote(title, enc, errors='strict')
+        except (UnicodeError, LookupError) as e:
             if not first_exception:
                 first_exception = e
-        else:
-            return result
 
     # Couldn't convert, raise the first exception
     raise first_exception
