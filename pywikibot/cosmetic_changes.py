@@ -501,17 +501,18 @@ class CosmeticChangesToolkit:
         """Tidy up wikilinks found in a string.
 
         This function will:
-        * Replace underscores with spaces
 
+        * Replace underscores with spaces
         * Move leading and trailing spaces out of the wikilink and into the
           surrounding text
-
         * Convert URL-encoded characters into Unicode-encoded characters
-
         * Move trailing characters out of the link and make the link without
           using a pipe, if possible
-
         * Capitalize the article title of the link, if appropriate
+
+        .. versionchanged:: 8.4
+           Convert URL-encoded characters if a link is an interwiki link
+           or different from main namespace.
 
         :param text: string to perform the clean-up on
         :return: text with tidied wikilinks
@@ -519,14 +520,19 @@ class CosmeticChangesToolkit:
         # helper function which works on one link and either returns it
         # unmodified, or returns a replacement.
         def handleOneLink(match: Match[str]) -> str:
-            titleWithSection = match['titleWithSection']
+            # Convert URL-encoded characters to str
+            titleWithSection = url2string(match['titleWithSection'],
+                                          encodings=self.site.encodings())
             label = match['label']
             trailingChars = match['linktrail']
             newline = match['newline']
+            # entire link but convert URL-encoded text
+            oldlink = url2string(match.group(),
+                                 encodings=self.site.encodings())
 
             is_interwiki = self.site.isInterwikiLink(titleWithSection)
             if is_interwiki:
-                return match.group()
+                return oldlink
 
             # The link looks like this:
             # [[page_title|link_text]]trailing_chars
@@ -538,7 +544,7 @@ class CosmeticChangesToolkit:
             except InvalidTitleError:
                 in_main_namespace = False
             if not in_main_namespace:
-                return match.group()
+                return oldlink
 
             # Replace underlines by spaces, also multiple underlines
             titleWithSection = re.sub('_+', ' ', titleWithSection)
@@ -560,13 +566,9 @@ class CosmeticChangesToolkit:
                 titleWithSection = titleWithSection.rstrip()
                 hadTrailingSpaces = len(titleWithSection) != titleLength
 
-            # Convert URL-encoded characters to str
-            titleWithSection = url2string(titleWithSection,
-                                          encodings=self.site.encodings())
-
             if not titleWithSection:
                 # just skip empty links.
-                return match.group()
+                return match.groups()
 
             # Remove unnecessary initial and final spaces from label.
             # Please note that some editors prefer spaces around pipes.
