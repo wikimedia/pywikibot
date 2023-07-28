@@ -1,7 +1,10 @@
 Current release
 ---------------
 
-* *(No changes yet*)
+* Convert URL-encoded characters also for links outside main namespace with
+  :meth:`cosmetic_changes.CosmeticChangesToolkit.cleanUpLinks` (:phab:`T342470`)
+* Implement Flow topic summaries (:phab:`T109443`)
+
 
 Deprecations
 ------------
