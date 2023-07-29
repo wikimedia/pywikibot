@@ -568,7 +568,7 @@ class CosmeticChangesToolkit:
 
             if not titleWithSection:
                 # just skip empty links.
-                return match.groups()
+                return match.group()
 
             # Remove unnecessary initial and final spaces from label.
             # Please note that some editors prefer spaces around pipes.
