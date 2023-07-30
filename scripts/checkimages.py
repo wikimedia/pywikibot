@@ -999,13 +999,12 @@ class CheckImagesBot:
                         comm_image=dup_comment_image, unver=True)
 
         if self.duplicates_report or only_report:
-            if only_report:
-                repme = ((self.list_entry + 'has the following duplicates '
-                          "('''forced mode'''):")
-                         % self.image.title(as_url=True))
-            else:
-                repme = ((self.list_entry + 'has the following duplicates:')
-                         % self.image.title(as_url=True))
+            has_duplicates = i18n.twtranslate(
+                self.site, 'checkimages-has-duplicates')
+            forced_mode = ' ' + i18n.twtranslate(
+                self.site, 'checkimages-forced-mode') if only_report else ''
+            repme = self.list_entry % self.image.title(as_url=True)
+            repme += has_duplicates % {'force': forced_mode}
 
             for dup_page in duplicates:
                 if dup_page.title(as_url=True) \
