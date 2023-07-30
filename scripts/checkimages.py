@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""
-Script to check recently uploaded files.
+"""Script to check recently uploaded files.
 
-This script checks if a file description is present and if there are other
-problems in the image's description.
+This script checks if a file description is present and if there are
+other problems in the image's description.
 
 This script will have to be configured for each language. Please submit
 translations as addition to the Pywikibot framework.
@@ -68,13 +67,14 @@ right parameter.
 * Text=     This is the template that the bot will use when it will report the
             image's problem.
 
-Todo
-----
-* Clean the code, some passages are pretty difficult to understand.
-* Add the "catch the language" function for commons.
-* Fix and reorganise the new documentation
-* Add a report for the image tagged.
+.. todo::
+   * Clean the code, some passages are pretty difficult to understand.
+   * Add the "catch the language" function for commons.
+   * Fix and reorganise the new documentation
+   * Add a report for the image tagged.
 
+.. versionchanged:: 8.4
+   Welcome messages are imported from :mod:`scripts.welcome` script.
 """
 #
 # (C) Pywikibot team, 2006-2023
@@ -107,6 +107,7 @@ from pywikibot.exceptions import (
 from pywikibot.family import Family
 from pywikibot.site import Namespace
 
+from scripts.welcome import get_welcome_text
 
 ###############################################################################
 # <--------------------------- Change only below! --------------------------->#
@@ -170,32 +171,6 @@ TXT_FIND = {
     'ta': ['{{no source', '{{nld', '{{no license'],
     'ur': ['{{ناحوالہ', '{{اجازہ نامعلوم', '{{Di-no'],
     'zh': ['{{no source', '{{unknown', '{{No license'],
-}
-
-# When the bot find that the usertalk is empty is not pretty to put only the
-# no source without the welcome, isn't it?
-EMPTY = {
-    'commons': '{{subst:welcome}}\n~~~~\n',
-    'meta': '{{subst:Welcome}}\n~~~~\n',
-    'ar': '{{subst:أهلا ومرحبا}}\n~~~~\n',
-    'arz': '{{subst:اهلا و سهلا}}\n~~~~\n',
-    'de': '{{subst:willkommen}} ~~~~',
-    'en': '{{subst:welcome}}\n~~~~\n',
-    'fa': '{{subst:خوشامدید|%s}}',
-    'fr': '{{Bienvenue nouveau\n~~~~\n',
-    'ga': '{{subst:Fáilte}} - ~~~~\n',
-    'hr': '{{subst:dd}}--~~~~\n',
-    'hu': '{{subst:Üdvözlet|~~~~}}\n',
-    'it': '<!-- inizio template di benvenuto -->\n{{subst:Benvebot}}\n~~~~\n'
-          '<!-- fine template di benvenuto -->',
-    'ja': '{{subst:Welcome/intro}}\n{{subst:welcome|--~~~~}}\n',
-    'ko': '{{환영}}--~~~~\n',
-    'ru': '{{subst:Приветствие}}\n~~~~\n',
-    'sd': '{{ڀليڪار}}\n~~~~\n',
-    'sr': '{{dd}}--~~~~\n',
-    'ta': '{{welcome}}\n~~~~\n',
-    'ur': '{{خوش آمدید}}\n~~~~\n',
-    'zh': '{{subst:welcome|sign=~~~~}}',
 }
 
 # if the file has an unknown extension it will be tagged with this template.
@@ -672,9 +647,11 @@ class CheckImagesBot:
         return True
 
     def put_mex_in_talk(self) -> None:
-        """Function to put the warning in talk page of the uploader."""
-        commento2 = i18n.twtranslate(self.site.lang,
-                                     'checkimages-source-notice-comment')
+        """Function to put the warning in talk page of the uploader.
+
+        When the bot find that the usertalk is empty it adds the welcome
+        message first. The messages are imported from welcome.py script.
+        """
         email_page_name = i18n.translate(self.site, EMAIL_PAGE_WITH_TEXT)
         email_subj = i18n.translate(self.site, EMAIL_SUBJECT)
         if self.notification2:
@@ -683,10 +660,11 @@ class CheckImagesBot:
             self.notification2 = self.notification
 
         second_text = False
+        curr_text = None
         # Getting the talk page's history, to check if there is another
         # advise...
         try:
-            testoattuale = self.talk_page.get()
+            curr_text = self.talk_page.get()
             history = list(self.talk_page.revisions(total=10))
             latest_user = history[0]['user']
             pywikibot.info(
@@ -699,21 +677,19 @@ class CheckImagesBot:
         except IsRedirectPageError:
             pywikibot.info(
                 'The user talk is a redirect, trying to get the right talk...')
-            try:
-                self.talk_page = self.talk_page.getRedirectTarget()
-                testoattuale = self.talk_page.get()
-            except NoPageError:
-                testoattuale = i18n.translate(self.site, EMPTY)
+            self.talk_page = self.talk_page.getRedirectTarget()
+            if self.talk_page.exists():
+                curr_text = self.talk_page.get()
         except NoPageError:
             pywikibot.info('The user page is blank')
-            testoattuale = i18n.translate(self.site, EMPTY)
 
-        if self.comm_talk:
-            commentox = self.comm_talk
-        else:
-            commentox = commento2
+        if curr_text is None:
+            try:
+                curr_text = get_welcome_text(self.site) % '~~~~'
+            except KeyError:
+                curr_text = ''
 
-        new_text = f'{testoattuale}\n\n'
+        new_text = f'{curr_text}\n\n'
         if second_text:
             new_text += f'{self.notification2}'
         else:
@@ -725,8 +701,10 @@ class CheckImagesBot:
             pywikibot.info('Maximum notifications reached, skip.')
             return
 
+        summary = self.comm_talk or i18n.twtranslate(
+            self.site.lang, 'checkimages-source-notice-comment')
         try:
-            self.talk_page.put(new_text, summary=commentox, minor=False)
+            self.talk_page.put(new_text, summary=summary, minor=False)
         except PageSaveRelatedError as e:
             if not self.ignore_save_related_errors:
                 raise
