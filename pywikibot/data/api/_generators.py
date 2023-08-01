@@ -237,7 +237,6 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
 
         parameters['indexpageids'] = True  # always ask for list of pageids
         self.continue_name = 'continue'
-        self.continue_update = self._continue
         # Explicitly enable the simplified continuation
         parameters['continue'] = True
         self.request = self.request_class(**kwargs)
@@ -476,24 +475,18 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
 
         return None
 
-    def _query_continue(self) -> bool:
-        if all(key not in self.data[self.continue_name]
-               for key in self.continuekey):
-            pywikibot.log(
-                "Missing '{}' key(s) in ['{}'] value."
-                .format(self.continuekey, self.continue_name))
-            return True
+    def continue_update(self) -> None:
+        """Update query with continue parameters.
 
-        for query_continue_pair in self.data['query-continue'].values():
-            self._add_continues(query_continue_pair)
-        return False  # a new request with query-continue is needed
-
-    def _continue(self) -> bool:
-        self._add_continues(self.data['continue'])
-        return False  # a new request with continue is needed
-
-    def _add_continues(self, continue_pair) -> None:
-        for key, value in continue_pair.items():
+        .. versionadded:: 3.0
+        .. versionchanged:: 4.0
+           explicit return a bool value to be used in :meth:`generator`
+        .. versionchanged:: 6.0
+           always return *False*
+        .. versionchanged:: 8.4
+           return *None* instead of *False*.
+        """
+        for key, value in self.data['continue'].items():
             # query-continue can return ints (continue too?)
             if isinstance(value, int):
                 value = str(value)
@@ -653,10 +646,8 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
             if self.continue_name not in self.data:
                 break
 
-            if self.continue_update():
-                break
-
-            del self.data  # a new request with (query-)continue is needed
+            self.continue_update()
+            del self.data  # a new request with continue is needed
 
     def result(self, data):
         """Process result data as needed for particular subclass."""
