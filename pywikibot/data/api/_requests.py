@@ -434,11 +434,11 @@ class Request(MutableMapping):
                and self.site.has_extension('ProofreadPage'):
                 prop = set(self['prop'] + ['proofread'])
                 self['prop'] = sorted(prop)
-            # When neither 'continue' nor 'rawcontinue' is present and the
-            # version number is at least 1.25wmf5 we add a dummy rawcontinue
-            # parameter. Querying siteinfo is save as it adds 'continue'
-            # except for 'tokens' (T284577)
-            if ('tokens' not in meta and 'continue' not in self._params
+            # When neither 'continue' nor 'rawcontinue' is present we add a
+            # dummy rawcontinue parameter except for 'tokens' (T284577) and
+            # 'siteinfo' (T343204)
+            if ('tokens' not in meta and 'siteinfo' not in meta
+                and 'continue' not in self._params
                     and self.site.mw_version >= '1.25wmf5'):
                 self._params.setdefault('rawcontinue', [''])
 
