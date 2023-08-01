@@ -884,9 +884,8 @@ class Subject(interwiki_graph.Subject):
                     if newHint:
                         alternativePage = pywikibot.Page(
                             linkedPage.site, newHint)
-                        if alternativePage:
-                            # add the page that was entered by the user
-                            self.addIfNew(alternativePage, counter, None)
+                        # add the page that was entered by the user
+                        self.addIfNew(alternativePage, counter, None)
                 else:
                     pywikibot.info(
                         f'NOTE: ignoring {linkedPage} and its interwiki links')
