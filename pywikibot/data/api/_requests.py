@@ -438,8 +438,7 @@ class Request(MutableMapping):
             # dummy rawcontinue parameter except for 'tokens' (T284577) and
             # 'siteinfo' (T343204)
             if ('tokens' not in meta and 'siteinfo' not in meta
-                and 'continue' not in self._params
-                    and self.site.mw_version >= '1.25wmf5'):
+                    and 'continue' not in self._params):
                 self._params.setdefault('rawcontinue', [''])
 
         elif self.action == 'help':
