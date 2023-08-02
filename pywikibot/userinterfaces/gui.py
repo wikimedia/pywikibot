@@ -2,7 +2,15 @@
 
 Useful for editing the contents of an article.
 
-.. note:: idlelib and tkinter modules are required
+.. note:: idlelib, tkinter and pillow modules are required.
+
+.. warning::
+   With Pillow 10 no wheels for 32-bit Python on Windows are supported.
+   This was made for Python 3.12 compatibility. Either you have to
+   update your Python using a 64-bit version or you have to
+   :command:`pip install "pillow < 10.0.0"`.
+
+.. seealso:: :mod:`editor`
 """
 #
 # (C) Pywikibot team, 2003-2023
@@ -46,14 +54,12 @@ class TextEditor(ScrolledText):
 
     """A text widget with some editing enhancements.
 
-    A lot of code here is copied or adapted from the idlelib/EditorWindow.py
-    file in the standard Python distribution.
-
+    A lot of code here is copied or adapted from the
+    idlelib/EditorWindow.py file in the standard Python distribution.
     """
 
     def __init__(self, master=None, **kwargs) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         Get default settings from user's IDLE configuration.
         """

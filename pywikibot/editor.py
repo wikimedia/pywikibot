@@ -1,6 +1,10 @@
-"""Text editor class for your favourite editor."""
+"""Text editor class for your favourite editor.
+
+.. note:: This module uses :mod:`userinterfaces.gui` and has depedencies
+   from other partially external modules.
+"""
 #
-# (C) Pywikibot team, 2004-2022
+# (C) Pywikibot team, 2004-2023
 #
 # Distributed under the terms of the MIT license.
 #
