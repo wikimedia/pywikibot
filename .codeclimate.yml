@@ -32,7 +32,6 @@ plugins:
       exclude_patterns:
       - "tests/link_tests.py"
 
-plugins:
   fixme:
     enabled: true
     config:
