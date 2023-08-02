@@ -7,8 +7,9 @@ Scripts package
    :noindex:
 
 .. include:: ../../scripts/README.rst
-   :start-after: included.
+   :start-line: 8
    :end-before: More precise
+
 
 *******************
 Script descriptions
@@ -32,3 +33,9 @@ Script descriptions
    maintenance
    archive
    outdated
+
+***************
+Scripts changes
+***************
+
+.. include:: ../../scripts/CHANGELOG.rst
