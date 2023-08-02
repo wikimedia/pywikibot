@@ -149,6 +149,7 @@ Improvements
   :meth:`Category.members()<page.Category.members>`,
   :meth:`Category.subcategories()<page.Category.subcategories>` (*member_type* excluded) and
   :meth:`Category.articles()<page.Category.articles>` (*member_type* excluded)
+  (:phab:`T102406`)
 * Enable site-package installation from git repository (:phab:`T320851`)
 * Enable 2FA login (:phab:`T186274`)
 * :meth:`Page.editTime()<page.BasePage.editTime>` was replaced by

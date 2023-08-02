@@ -1,6 +1,8 @@
 Current release
 ---------------
 
+* i18n updates
+* use inline re.IGNORECASE flag in :func:`textlib.case_escape` function (:phab:`T308265`)
 * Convert URL-encoded characters also for links outside main namespace with
   :meth:`cosmetic_changes.CosmeticChangesToolkit.cleanUpLinks` (:phab:`T342470`)
 * Implement Flow topic summaries (:phab:`T109443`)

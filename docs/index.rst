@@ -80,10 +80,10 @@ Contents
    :maxdepth: 1
    :caption: About
 
-   glossary
    changelog
    licenses
    credits
+   glossary
 
 
 .. _CC-BY-SA 3.0: https://creativecommons.org/licenses/by-sa/3.0/

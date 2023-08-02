@@ -1,6 +1,16 @@
 Scripts Changelog
 =================
 
+8.4.0
+-----
+
+checkimages
+~~~~~~~~~~~
+
+* Use welcome messages from :class:`scripts.welcome.WelcomeBot`
+* add more messages to :mod:`i18n` system
+
+
 8.3.0
 -----
 
