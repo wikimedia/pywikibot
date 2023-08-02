@@ -19,17 +19,30 @@ checks:
   similar-code:
     config:
       threshold: 40
-      exclude_patterns:
-      - "tests/link_tests.py"
 
 plugins:
   duplication:
     enabled: true
     config:
+      exclude_patterns:
+      - "tests/link_tests.py"
       count_threshold: 3
       languages:
         python:
             python_version: 3
+
+plugins:
+  fixme:
+    enabled: true
+    config:
+      strings:
+      - FIXME
+      - fixme
+      - hack
+      - TODO
+      - todo
+      - XXX
+      - xxx
 
 exclude_patterns:
 - "docs/"
