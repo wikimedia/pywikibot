@@ -24,12 +24,13 @@ plugins:
   duplication:
     enabled: true
     config:
-      exclude_patterns:
-      - "tests/link_tests.py"
       count_threshold: 3
+      mass_threshold: 40
       languages:
         python:
-            python_version: 3
+          python_version: 3
+      exclude_patterns:
+      - "tests/link_tests.py"
 
 plugins:
   fixme:
