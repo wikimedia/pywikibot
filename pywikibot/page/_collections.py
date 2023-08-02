@@ -573,7 +573,7 @@ class SubEntityCollection(MutableSequence):
 
         :return: the altered dict from parameter data.
         """
-        raise NotImplementedError  # todo
+        raise NotImplementedError  # TODO
 
     def toJSON(self, diffto: Optional[dict] = None) -> dict:
         """
@@ -584,4 +584,4 @@ class SubEntityCollection(MutableSequence):
 
         :param diffto: JSON containing entity data
         """
-        raise NotImplementedError  # todo
+        raise NotImplementedError  # TODO

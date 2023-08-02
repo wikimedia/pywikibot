@@ -40,9 +40,9 @@ plugins:
       - fixme
       - hack
       - TODO
-      - todo
+      - todo:
       - XXX
-      - xxx
+      - xxx:
 
 exclude_patterns:
 - "docs/"

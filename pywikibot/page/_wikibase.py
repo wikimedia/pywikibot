@@ -2050,7 +2050,7 @@ class LexemePage(WikibasePage):
 
     def get_data_for_new_entity(self):
         """Return data required for creation of a new lexeme."""
-        raise NotImplementedError  # todo
+        raise NotImplementedError  # TODO
 
     def toJSON(self, diffto: Optional[dict] = None) -> dict:
         """

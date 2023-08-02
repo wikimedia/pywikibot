@@ -428,7 +428,7 @@ class DiscussionPage(pywikibot.Page):
         if (unit == 'B' and self_size >= size
             or unit == 'T' and len(self.threads) >= size
                 or self_size > self.archiver.maxsize):
-            self.full = True  # xxx: this is one-way flag
+            self.full = True  # note: this is one-way flag
         return self.full
 
     def feed_thread(self, thread: DiscussionThread,
