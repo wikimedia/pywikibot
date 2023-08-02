@@ -37,13 +37,12 @@ from tests.utils import skipping
 
 class OpenArchiveTestCase(TestCase):
 
-    """
-    Unit test class for tools.
+    """Unit test class for tools.
 
-    The tests for open_archive requires that article-pyrus.xml* contain all
-    the same content after extraction. The content itself is not important.
-    The file article-pyrus.xml_invalid.7z is not a valid 7z file and
-    open_archive will fail extracting it using 7za.
+    The tests for open_archive requires that article-pyrus.xml* contain
+    all the same content after extraction. The content itself is not
+    important. The file article-pyrus.xml_invalid.7z is not a valid 7z
+    file and open_archive will fail extracting it using 7za.
     """
 
     net = False
@@ -610,8 +609,8 @@ class TestFileShaCalculator(TestCase):
 
     r"""Test calculator of sha of a file.
 
-    There are two possible hash values for each test. The second one is for
-    files with Windows line endings (\r\n).
+    There are two possible hash values for each test. The second one is
+    for files with Windows line endings (\r\n).
     """
 
     net = False
