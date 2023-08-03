@@ -873,7 +873,7 @@ DisambiguationRobot""".format(options=added_keys,
         if include:
             # save the original text so we can show the changes later
             original_text = text
-            n = 0
+            n_links = 0  # number of links
             curpos = 0
             dn = False
             edited = False
@@ -881,11 +881,13 @@ DisambiguationRobot""".format(options=added_keys,
             while True:
                 m = self.linkR.search(text, pos=curpos)
                 if not m:
-                    if n == 0:
-                        # No changes necessary for this disambiguation title.
+                    # No additinal link found
+                    if n_links == 0:
+                        # No remaining links to change for this disambiguation
+                        # title.
                         return 'nochange'
 
-                    # stop loop and save page
+                    # There are links to change; stop loop and save page
                     break
 
                 # Ensure that next time around we will not find this same hit.
@@ -911,7 +913,7 @@ DisambiguationRobot""".format(options=added_keys,
                                   .format(m['title'], ref_page.title()))
                     continue
 
-                n += 1
+                n_links += 1  # new link found: increase link counter
 
                 # how many bytes should be displayed around the current link
                 context = 60
@@ -964,7 +966,8 @@ DisambiguationRobot""".format(options=added_keys,
                     break
 
                 if answer == 's':
-                    n -= 1  # TODO what's this for?
+                    # skip this link and decrease link counter
+                    n_links -= 1
                     continue
 
                 if answer == 'e':
