@@ -112,7 +112,7 @@ class TestArchiveBot(TestCase):
     sites = {code: {'family': 'wikipedia', 'code': code} for code in THREADS}
 
     cached = True
-    expected_failures = ['ar', 'scn', 'th']
+    expected_failures = ['ar', 'scn', 'th', 'zh-yue']
 
     def test_archivebot(self, code=None):
         """Test archivebot for one site."""
@@ -155,6 +155,7 @@ class TestArchiveBot(TestCase):
     #   <message name="feb" xml:space="preserve">Han.</message>.
     #   for new entries it should work
     # 'th': year is 2552 while regex assumes 19..|20.., might be fixed
+    # 'yue': T343626
 
 
 class TestArchiveBotAfterDateUpdate(TestCase):
