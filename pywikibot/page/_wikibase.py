@@ -217,7 +217,7 @@ class WikibaseEntity:
         :raise NoWikibaseEntityError: if the entity doesn't exist
         """
         if not hasattr(self, '_revid'):
-            # fixme: unlike BasePage.latest_revision_id, this raises
+            # FIXME: unlike BasePage.latest_revision_id, this raises
             # exception when entity is redirect, cannot use get_redirect
             self.get()
         return self._revid
@@ -275,7 +275,7 @@ class WikibaseEntity:
             value = cls.fromJSON(self._content.get(key, {}), self.repo)
             setattr(self, key, value)
             data[key] = value
-            # xxx: need better handling for this
+            # fixme: need better handling for this
             if key in ['claims', 'statements']:
                 value.set_on_item(self)
 

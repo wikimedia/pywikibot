@@ -46,6 +46,7 @@ plugins:
 exclude_patterns:
 - "docs/"
 - "!docs/conf.py"
+- "tox.ini"
 - "*.json"
 - "*.png"
 - "*.rst"

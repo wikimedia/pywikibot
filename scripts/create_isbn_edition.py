@@ -169,33 +169,6 @@ External identifiers:
         Possible important replication delay; wait 5 minutes before retry
         -- otherwise risk for creating duplicates.
 
-**Known problems:**
-    * Unknown ISBN, e.g. 9789400012820
-    * No ISBN data available for an edition either causes no output
-      (goob = Google Books), or an error message (wiki, openl)
-      The script is taking care of both
-    * Only 6 ISBN attributes are listed by the webservice(s)
-      missing are e.g.: place of publication, number of pages
-    * Not all ISBN atttributes have data (authos, publisher, date of
-      publication, language)
-    * The script uses multiple webservice calls (script might take time,
-      but it is automated)
-    * Need to amend ISBN items that have no author, publisher, or other
-      required data (which additional services to use?)
-    * How to add still more digital libraries?
-        * Does the KBR has a public ISBN service (Koninklijke
-          Bibliotheek van België)?
-    * Filter for work properties -- need to amend Q47461344 (written
-      work) instance and P629 (edition of) + P747 (has edition)
-      statements https://www.wikidata.org/wiki/Q63413107
-      ['9781282557246', '9786612557248', '9781847196057', '9781847196040']
-      P8383: Goodreads-identificatiecode voor work 13957943 (should
-      have P2969)
-      P5331: OCLC-identificatiecode voor work 793965595 (should have P243)
-
-.. todo::
-   * Add source reference (digital library instance)
-
 **Algorithm:**
     # Get parameters
     # Validate parameters

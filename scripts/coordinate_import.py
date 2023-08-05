@@ -174,7 +174,7 @@ def main(*args: str) -> None:
         if arg == '-create':
             create_new = True
 
-    # xxx: this preloading preloads neither coordinates nor Wikibase items
+    # FIXME: this preloading preloads neither coordinates nor Wikibase items
     # but preloads wikitext which we don't need
     generator = generator_factory.getCombinedGenerator(preload=True)
 
