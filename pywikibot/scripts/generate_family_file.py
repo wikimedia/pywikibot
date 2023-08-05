@@ -28,6 +28,8 @@ base directory.
 .. versionchanged:: 8.1
    [s]trict can be given for <dointerwiki> parameter to ensure that
    sites are from the given domain.
+.. versionchanged:: 8.4
+   If the url scheme is missing, ``https```will be used.
 """
 #
 # (C) Pywikibot team, 2010-2023
@@ -41,7 +43,7 @@ import string
 import sys
 from contextlib import suppress
 from typing import Optional
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse
 
 
 # see pywikibot.family.py
@@ -99,9 +101,15 @@ class FamilyFileGenerator:
         """Ask for parameters if necessary."""
         if self.base_url is None:
             with suppress(KeyboardInterrupt):
-                self.base_url = input('Please insert URL to wiki: ')
-            if not self.base_url:
+                url = input('Please insert URL to wiki: ')
+            if not url:
                 return False
+            url = urlparse(url, 'https')
+            if not url.netloc and url.path:
+                self.base_url = urlunparse((url.scheme, url.path, url.netloc,
+                                            *url[3:]))
+            else:
+                self.base_url = urlunparse(url)
 
         if self.name is None:
             with suppress(KeyboardInterrupt):
@@ -120,12 +128,13 @@ class FamilyFileGenerator:
         """Get wiki from base_url."""
         import pywikibot
         from pywikibot.exceptions import FatalServerError
-        print('Generating family file from ' + self.base_url)
+        pywikibot.info('Generating family file from ' + self.base_url)
         for verify in (True, False):
             try:
                 w = self.Wiki(self.base_url, verify=verify)
             except FatalServerError:
                 pywikibot.exception()
+                pywikibot.info()
                 if not pywikibot.bot.input_yn(
                     'Retry with disabled ssl certificate validation',
                     default=self.verify, automatic_quit=False,
