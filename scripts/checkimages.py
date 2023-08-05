@@ -67,12 +67,6 @@ right parameter.
 * Text=     This is the template that the bot will use when it will report the
             image's problem.
 
-.. todo::
-   * Clean the code, some passages are pretty difficult to understand.
-   * Add the "catch the language" function for commons.
-   * Fix and reorganise the new documentation
-   * Add a report for the image tagged.
-
 .. versionchanged:: 8.4
    Welcome messages are imported from :mod:`scripts.welcome` script.
 """

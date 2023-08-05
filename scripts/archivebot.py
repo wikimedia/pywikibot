@@ -691,7 +691,7 @@ class PageArchiver:
                     raise MalformedConfigError(e)
 
             threads_per_archive[key].append((i, thread))
-            whys.add(why)  # xxx: we don't know if we ever archive anything
+            whys.add(why)  # FIXME: we don't know if we ever archive anything
 
         params = self.get_params(self.now, counter)
         aux_params = self.get_params(self.now, counter + 1)

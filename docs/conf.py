@@ -53,9 +53,7 @@ extensions = [
     'sphinx.ext.autosectionlabel',
     'sphinx.ext.autosummary',
     'sphinx.ext.extlinks',
-    # 'sphinx.ext.intersphinx',
     'sphinx.ext.napoleon',
-    'sphinx.ext.todo',
     'sphinx.ext.viewcode',
     'sphinxext.opengraph',
 ]
@@ -142,7 +140,7 @@ pygments_style = 'default'
 # keep_warnings = False
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
-todo_include_todos = True
+# todo_include_todos = False
 
 
 # -- Options for HTML output ----------------------------------------------
