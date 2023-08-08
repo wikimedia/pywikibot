@@ -856,8 +856,7 @@ class TestLazyLoginNotExistUsername(TestLazyLoginBase):
 
     @patch.object(pywikibot, 'info')
     @patch.object(pywikibot, 'warning')
-    @patch.object(pywikibot, 'error')
-    def test_access_denied_notexist_username(self, error, warning, output):
+    def test_access_denied_notexist_username(self, warning, info):
         """Test the query with a username which does not exist."""
         self.site._username = 'Not registered username'
         req = api.Request(site=self.site, parameters={'action': 'query'})
@@ -869,10 +868,8 @@ class TestLazyLoginNotExistUsername(TestLazyLoginBase):
         warning.assert_called_with(
             'API error readapidenied: '
             'You need read permission to use this module.')
-        error.assert_called_with(
-            'You have no API read permissions. Seems you are not logged in.')
         self.assertIn(
-            'Logging in to steward:steward as ', output.call_args[0][0])
+            'Logging in to steward:steward as ', info.call_args[0][0])
 
 
 class TestLazyLoginNoUsername(TestLazyLoginBase):
@@ -880,9 +877,8 @@ class TestLazyLoginNoUsername(TestLazyLoginBase):
     """Test no username."""
 
     @patch.object(pywikibot, 'warning')
-    @patch.object(pywikibot, 'error')
     @patch.object(pywikibot.config, 'usernames', defaultdict(dict))
-    def test_access_denied_no_username(self, error, warning):
+    def test_access_denied_no_username(self, warning):
         """Test the query without a username."""
         self.site._username = None
         req = api.Request(site=self.site, parameters={'action': 'query'})
@@ -894,8 +890,6 @@ class TestLazyLoginNoUsername(TestLazyLoginBase):
         warning.assert_called_with(
             'API error readapidenied: '
             'You need read permission to use this module.')
-        error.assert_called_with(
-            'You have no API read permissions. Seems you are not logged in.')
 
 
 class TestUrlEncoding(TestCase):
