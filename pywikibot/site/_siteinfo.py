@@ -1,6 +1,6 @@
 """Objects representing site info data contents."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -158,9 +158,7 @@ class Siteinfo(Container):
                 'action': 'query', 'meta': 'siteinfo', 'siprop': props,
             }
         )
-        # With 1.25wmf5 it'll require continue or rawcontinue. As we don't
-        # continue anyway we just always use continue.
-        request['continue'] = True
+
         # warnings are handled later
         request._warning_handler = warn_handler
         try:
