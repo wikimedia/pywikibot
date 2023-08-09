@@ -20,7 +20,7 @@ This script understands various command-line arguments:
 
 """
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -212,7 +212,8 @@ def main(*args: str) -> None:
     if not bot.site.logged_in():
         bot.site.login()
     user = pywikibot.User(bot.site, bot.site.username())
-    if bot.opt.touch == 'newly' and 'autoconfirmed' not in user.groups():
+    if bot.opt.touch == 'newly' and not (
+            'autoconfirmed' in user.groups() or 'confirmed' in user.groups()):
         pywikibot.warning(fill(
             f'You are logged in as {user.username}, an account that is not in '
             f'the autoconfirmed group on {bot.site.sitename}. Script will not '
