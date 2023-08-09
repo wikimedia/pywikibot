@@ -65,7 +65,7 @@ from pywikibot.backports import (
     removeprefix,
     removesuffix,
 )
-from pywikibot.logging import error, output, warning
+from pywikibot.logging import error, info, warning
 from pywikibot.tools import deprecated
 
 
@@ -406,7 +406,7 @@ def get_base_dir(test_directory: Optional[str] = None,
             raise RuntimeError(exc_text)
 
         if __no_user_config != '2':
-            output(exc_text)
+            info(exc_text)
 
     return base_dir
 
@@ -418,8 +418,8 @@ base_dir = get_base_dir(config_file=user_config_file)
 
 for arg in sys.argv[1:]:
     if arg.startswith('-verbose') or arg == '-v':
-        output('The base directory is ' + base_dir)
-        output('The user config file is ' + user_config_file)
+        info('The base directory is ' + base_dir)
+        info('The user config file is ' + user_config_file)
         break
 family_files = {}
 
@@ -1139,7 +1139,7 @@ if __name__ == '__main__':  # pragma: no cover
                           + '( ...xxxxxxxx... )')
             else:
                 _value = repr('xxxxxxxx')
-            output(f'{_name}={_value}')
+            info(f'{_name}={_value}')
 
 # cleanup all locally-defined variables
 for __var in list(globals()):
