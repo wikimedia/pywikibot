@@ -38,7 +38,7 @@ from typing import Union
 import pywikibot
 import pywikibot.i18n
 import pywikibot.textlib
-from pywikibot import output, pagegenerators, warning
+from pywikibot import info, pagegenerators, warning
 from pywikibot.backports import Set
 from pywikibot.bot import (
     ConfigParserBot,
@@ -82,6 +82,7 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
         if not self.site.has_data_repository:
             raise ValueError('{site} does not have a data repository, use '
                              'interwiki.py instead.'.format(site=self.site))
+
         self.repo = self.site.data_repository()
         if not self.opt.summary:
             self.opt.summary = pywikibot.i18n.twtranslate(
@@ -89,19 +90,19 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
 
     def treat_page(self) -> None:
         """Check page."""
-        if (self.current_page.namespace() not in NAMESPACES
-                and not self.opt.ignore_ns):
-            output('{page} is not in allowed namespaces, skipping'
-                   .format(page=self.current_page.title(
-                       as_link=True)))
+        page = self.current_page
+        if (page.namespace() not in NAMESPACES and not self.opt.ignore_ns):
+            info(f'{page} is not in allowed namespaces, skipping')
             return
+
         self.iwlangs = pywikibot.textlib.getLanguageLinks(
-            self.current_page.text, insite=self.current_page.site)
+            page.text, insite=page.site)
         if not self.iwlangs:
-            output(f'No interlanguagelinks on {self.current_page}')
+            info(f'No interlanguagelinks on {page}')
             return
+
         try:
-            item = pywikibot.ItemPage.fromPage(self.current_page)
+            item = pywikibot.ItemPage.fromPage(page)
         except NoPageError:
             item = None
 
@@ -119,17 +120,20 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
 
     def create_item(self) -> pywikibot.ItemPage:
         """Create item in repo for current_page."""
-        data = {'sitelinks':
-                {self.site.dbName():
-                 {'site': self.site.dbName(),
-                  'title': self.current_page.title()}
-                 },
-                'labels':
-                {self.site.lang:
-                 {'language': self.site.lang,
-                  'value': self.current_page.title()}
-                 }
+        data = {
+            'sitelinks': {
+                self.site.dbName(): {
+                    'site': self.site.dbName(),
+                    'title': self.current_page.title()
                 }
+            },
+            'labels': {
+                self.site.lang: {
+                    'language': self.site.lang,
+                    'value': self.current_page.title()
+                }
+            }
+        }
         for site, page in self.iwlangs.items():
             if not page.exists():
                 continue
@@ -142,7 +146,7 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
 
         item = pywikibot.ItemPage(self.repo)
         item.editEntity(data, new='item', summary=summary)
-        output(f'Created item {item.getID()}')
+        info(f'Created item {item.getID()}')
         return item
 
     def handle_complicated(self) -> bool:
@@ -168,7 +172,7 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                     .format(self.current_page.title(as_link=True)))
             return
 
-        output('Cleaning up the page')
+        info('Cleaning up the page')
         new_text = pywikibot.textlib.removeLanguageLinks(
             self.current_page.text, site=self.current_page.site)
         self.put_current(new_text, summary=self.opt.summary)
@@ -184,8 +188,7 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
             try:
                 wd_data.add(pywikibot.ItemPage.fromPage(iw_page))
             except NoPageError:
-                output('Interwiki {} does not have an item'
-                       .format(iw_page.title(as_link=True)))
+                info(f'Interwiki {iw_page} does not have an item')
         return wd_data
 
     def try_to_add(self) -> Union[pywikibot.ItemPage, bool, None]:
@@ -194,15 +197,18 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
         if not wd_data:
             # will create a new item with interwiki
             return None
+
         if len(wd_data) > 1:
             warning('Interwiki conflict in {}, skipping...'
                     .format(self.current_page.title(as_link=True)))
             return False
+
         item = list(wd_data).pop()
         if self.current_page.site.dbName() in item.sitelinks:
             warning(f'Interwiki conflict in {item}, skipping...')
             return False
-        output('Adding link to ' + item.title())
+
+        info('Adding link to ' + item.title())
         item.setSitelink(self.current_page, summary='Added ' + (
             self.current_page.title(as_link=True, insite=item.site)))
         return item
@@ -213,10 +219,11 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
         if not wd_data:
             # todo: add links to item
             return None
+
         if len(wd_data) > 1:
-            warning('Interwiki conflict in {}, skipping...'
-                    .format(self.current_page.title(as_link=True)))
+            warning(f'Interwiki conflict in {self.current_page}, skipping...')
             return False
+
         target_item = list(wd_data).pop()
         try:
             item.mergeInto(target_item)
