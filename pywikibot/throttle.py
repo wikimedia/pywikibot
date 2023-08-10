@@ -1,6 +1,6 @@
 """Mechanics to slow down wiki read and/or write rate."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -139,7 +139,7 @@ class Throttle:
         """Count running processes for site and set process_multiplicity.
 
         .. versionchanged:: 7.0
-           process is not written to throttle.ctrl file is site is empty
+           process is not written to throttle.ctrl file if site is empty.
         """
         global pid
         mysite = self.mysite
