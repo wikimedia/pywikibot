@@ -22,7 +22,6 @@ from tests.aspects import (
     DefaultDrySiteTestCase,
     DefaultSiteTestCase,
     TestCase,
-    require_version,
 )
 from tests.utils import FakeLoginManager
 
@@ -293,7 +292,6 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertIn('query+revisions', pi.prefix_map)
 
-    @require_version('>=1.25wmf4', 'support the new paraminfo api')
     def test_new_mode(self):
         """Test the new modules-only mode explicitly."""
         site = self.get_site()

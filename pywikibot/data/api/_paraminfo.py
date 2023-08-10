@@ -102,8 +102,7 @@ class ParamInfo(Sized, Container):
                 self.paraminfo_keys = frozenset(['modules'])
 
         # Assume that by v1.26, it will be desirable to prefetch 'query'
-        if mw_ver > '1.26':
-            self.preloaded_modules |= {'query'}
+        self.preloaded_modules |= {'query'}
 
         self._fetch(self.preloaded_modules)
 
@@ -299,40 +298,21 @@ class ParamInfo(Sized, Container):
         """Check and generate submodules for the given module."""
         parameters = self._paraminfo[module].get('parameters', [])
         submodules = set()
-        # Advanced submodule into added to MW API in df80f1ea
-        if self.site.mw_version >= '1.26wmf9':
-            # This is supplying submodules even if they aren't submodules
-            # of the given module so skip those
-            for param in parameters:
-                if module == 'main' and param['name'] == 'format' \
-                   or 'submodules' not in param:
-                    continue
 
-                for submodule in param['submodules'].values():
-                    if '+' in submodule:
-                        parent, child = submodule.rsplit('+', 1)
-                    else:
-                        parent, child = 'main', submodule
-                    if parent == module:
-                        submodules.add(child)
-        else:
-            # Boolean submodule info added to MW API in afa153ae
-            if self.site.mw_version < '1.24wmf18':
-                if module == 'main':
-                    params = {'action'}
-                elif module == 'query':
-                    params = {'prop', 'list', 'meta'}
+        # This is supplying submodules even if they aren't submodules
+        # of the given module so skip those
+        for param in parameters:
+            if module == 'main' and param['name'] == 'format' \
+               or 'submodules' not in param:
+                continue
+
+            for submodule in param['submodules'].values():
+                if '+' in submodule:
+                    parent, child = submodule.rsplit('+', 1)
                 else:
-                    params = set()
-                for param in parameters:
-                    if param['name'] in params:
-                        param['submodules'] = ''
-
-            for param in parameters:
-                # Do not add format modules
-                if 'submodules' in param \
-                   and (module != 'main' or param['name'] != 'format'):
-                    submodules |= set(param['type'])
+                    parent, child = 'main', submodule
+                if parent == module:
+                    submodules.add(child)
 
         if submodules:
             self._add_submodules(module, submodules)
