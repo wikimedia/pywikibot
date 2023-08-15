@@ -10,10 +10,11 @@ from urllib.parse import quote
 
 from requests.exceptions import Timeout
 
-from pywikibot import Site, config, sleep, warning
+from pywikibot import Site
 from pywikibot.backports import Dict, List, removeprefix
 from pywikibot.comms import http
-from pywikibot.exceptions import Error, TimeoutError
+from pywikibot.data import WaitingMixin
+from pywikibot.exceptions import Error
 
 
 try:
@@ -25,11 +26,14 @@ DEFAULT_HEADERS = {'cache-control': 'no-cache',
                    'Accept': 'application/sparql-results+json'}
 
 
-class SparqlQuery:
-    """
-    SPARQL Query class.
+class SparqlQuery(WaitingMixin):
+    """SPARQL Query class.
 
     This class allows to run SPARQL queries against any SPARQL endpoint.
+
+    .. versionchanged:: 8.4
+       inherited from :class:`data.WaitingMixin` which provides a
+       :meth:`data.WaitingMixin.wait` method.
     """
 
     def __init__(self,
@@ -78,13 +82,9 @@ class SparqlQuery:
 
         self.last_response = None
 
-        if max_retries is None:
-            self.max_retries = config.max_retries
-        else:
+        if max_retries is not None:
             self.max_retries = max_retries
-        if retry_wait is None:
-            self.retry_wait = config.retry_wait
-        else:
+        if retry_wait is not None:
             self.retry_wait = retry_wait
 
     def get_last_response(self):
@@ -157,16 +157,6 @@ class SparqlQuery:
             break
 
         return None
-
-    def wait(self):
-        """Determine how long to wait after a failed request."""
-        self.max_retries -= 1
-        if self.max_retries < 0:
-            raise TimeoutError('Maximum retries attempted without success.')
-        warning(f'Waiting {self.retry_wait} seconds before retrying.')
-        sleep(self.retry_wait)
-        # double the next wait, but do not exceed config.retry_max seconds
-        self.retry_wait = min(config.retry_max, self.retry_wait * 2)
 
     def ask(self, query: str,
             headers: Optional[Dict[str, str]] = None) -> bool:
