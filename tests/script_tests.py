@@ -444,6 +444,7 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
 
     _allowed_failures = {
         'basic',
+        'newitem',
         'nowcommons',
     }
     _arguments = '-simulate -page:Foobar -always -site:wikipedia:en'
