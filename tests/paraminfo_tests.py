@@ -22,7 +22,8 @@ class KnownTypesTestBase(TestCaseBase):
 
     """Base class for paraminfo checks."""
 
-    def _get_param_values(self, site, module, parameter):
+    @staticmethod
+    def _get_param_values(site, module, parameter):
         """Perform check that a parameter matches the expected list."""
         with skipping(
             ValueError,

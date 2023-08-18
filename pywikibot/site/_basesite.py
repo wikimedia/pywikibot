@@ -231,7 +231,8 @@ class BaseSite(ComparableMixin):
         yield base_path + '?title={}'
         yield self.articlepath
 
-    def _build_namespaces(self):
+    @staticmethod
+    def _build_namespaces():
         """Create default namespaces."""
         return Namespace.builtin_namespaces()
 

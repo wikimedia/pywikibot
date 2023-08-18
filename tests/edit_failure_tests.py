@@ -8,7 +8,7 @@ unless something has broken badly.
 These tests use special code 'write = -1' for edit failures.
 """
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -148,7 +148,8 @@ class TestWikibaseSaveTest(WikibaseTestCase):
         with self.assertRaises(PageSaveRelatedError):
             item.save()
 
-    def _make_WbMonolingualText_claim(self, repo, text, language):
+    @staticmethod
+    def _make_WbMonolingualText_claim(repo, text, language):
         """Make a WbMonolingualText and set its value."""
         claim = pywikibot.page.Claim(repo, 'P271', datatype='monolingualtext')
         target = pywikibot.WbMonolingualText(text=text, language=language)
