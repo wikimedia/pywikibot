@@ -10,6 +10,11 @@ checkimages
 * Use welcome messages from :class:`scripts.welcome.WelcomeBot`
 * add more messages to :mod:`i18n` system
 
+newitem
+~~~~~~~
+
+* Enable ``-touch`` in newitem script for confirmed user (:phab:`T343877`)
+
 
 8.3.0
 -----

@@ -1,7 +1,7 @@
 Current release
 ---------------
 
-* :mod:`families.wikifunctions_family` was added (:phab:`T343573`)
+* Add https scheme if missing in url asked by :mod:`pywikibot.scripts.generate_family_file`
 * i18n updates
 * use inline re.IGNORECASE flag in :func:`textlib.case_escape` function (:phab:`T308265`)
 * Convert URL-encoded characters also for links outside main namespace with
