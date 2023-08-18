@@ -871,9 +871,10 @@ class WikimediaFamily(Family):
     ]
 
     other_content_families = [
-        'wikidata',
-        'mediawiki',
         'lingualibre',
+        'mediawiki',
+        'wikidata',
+        'wikifunctions',
     ]
 
     content_families = set(

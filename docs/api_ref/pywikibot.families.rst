@@ -83,6 +83,12 @@
 .. automodule:: families.wikidata_family
    :synopsis: Family module for Wikidata
 
+:mod:`families.wikifunctions\_family` --- Wikifunctions
+=======================================================
+
+.. automodule:: families.wikifunctions_family
+   :synopsis: Family module for Wikifunctions
+
 :mod:`families.wikihow\_family` --- Wikihow
 ===========================================
 

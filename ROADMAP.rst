@@ -1,11 +1,9 @@
 Current release
 ---------------
 
-* Add support for btmwiktionary (:phab:`T336117`)
-* Add 'yue'/'zh-yue' code_aliases to family files (:phab:`T341960`)
-* All wbtypes are placed in ``pywkibot._wbtypes`` module
-* Use ``site.lang`` instead of ``site.code`` in :func:`comms.http.user_agent` (:phab:`T228322`)
-* Make header extraction in :func:`textlib.extract_sections` more robust (:phab:`T341787`)
+* Add support for suwikisource and blkwiktionary (:phab:`T343544`, :phab:`T343550`)
+* :mod:`families.wikifunctions_family` was added (:phab:`T343573`)
+* i18n updates
 
 
 Deprecations
