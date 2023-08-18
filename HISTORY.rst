@@ -1,6 +1,15 @@
 Release history
 ===============
 
+8.3.1
+-----
+*17. August 2023*
+
+* Add support for suwikisource and blkwiktionary (:phab:`T343544`, :phab:`T343550`)
+* :mod:`families.wikifunctions_family` was added (:phab:`T343573`)
+* i18n updates
+
+
 8.3.0
 -----
 *27 July 2023*
@@ -10,7 +19,7 @@ Release history
 * All wbtypes are placed in ``pywkibot._wbtypes`` module
 * Use ``site.lang`` instead of ``site.code`` in :func:`comms.http.user_agent` (:phab:`T228322`)
 * Make header extraction in :func:`textlib.extract_sections` more robust (:phab:`T341787`)
-*
+
 
 8.2.0
 -----
