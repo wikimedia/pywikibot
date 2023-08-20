@@ -15,6 +15,12 @@ newitem
 
 * Enable ``-touch`` in newitem script for confirmed user (:phab:`T343877`)
 
+maintenance
+~~~~~~~~~~~
+
+* new script unidata to update ``_first_upper_exception_dict`` of
+  :mod:`pywikibot.tools._unidata`.
+
 
 8.3.0
 -----

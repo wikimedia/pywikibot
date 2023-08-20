@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """Script to update :mod:`pywikibot.tools._unidata`.
 
-This script is for updating ``_first_upper_exception_dict``. Run this
-module multiple times using different python versions.
+This script is for updating ``_first_upper_exception_dict``.
 
 .. note:: I seems that running under the latest version of Python gives
    a superse of the older version and should be enough. But this is not
    tested completely.
+
+.. versionadded:: 8.4
 """
 #
 # (C) Pywikibot team, 2018-2023
