@@ -18,7 +18,7 @@ The following parameters are supported:
 -target           Use page generator of the target site
 
 
-Internal links are *not* repaired!
+.. warning:: Internal links are *not* repaired!
 
 Pages to work on can be specified using any of:
 
@@ -31,18 +31,18 @@ Transfer all pages in category "Query service" from the English Wikipedia to
 the Arabic Wiktionary, adding "Wiktionary:Import enwp/" as prefix:
 
     python pwb.py transferbot -family:wikipedia -lang:en -cat:"Query service" \
--tofamily:wiktionary -tolang:ar -prefix:"Wiktionary:Import enwp/"
+    -tofamily:wiktionary -tolang:ar -prefix:"Wiktionary:Import enwp/"
 
 Copy the template "Query service" from the English Wikipedia to the
 Arabic Wiktionary:
 
     python pwb.py transferbot -family:wikipedia -lang:en -tofamily:wiktionary \
--tolang:ar -page:"Template:Query service"
+    -tolang:ar -page:"Template:Query service"
 
 Copy 10 wanted templates of German Wikipedia from English Wikipedia to German:
 
     python pwb.py transferbot -family:wikipedia -lang:en -tolang:de \
--wantedtemplates:10 -target
+    -wantedtemplates:10 -target
 """
 #
 # (C) Pywikibot team, 2014-2023

@@ -29,7 +29,7 @@ base directory.
    [s]trict can be given for <dointerwiki> parameter to ensure that
    sites are from the given domain.
 .. versionchanged:: 8.4
-   If the url scheme is missing, ``https```will be used.
+   If the url scheme is missing, ``https`` will be used.
 """
 #
 # (C) Pywikibot team, 2010-2023
