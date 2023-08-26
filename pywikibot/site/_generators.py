@@ -1709,7 +1709,7 @@ class GeneratorsMixin:
                 'ususers': usernames, 'usprop': usprop})
         return usgen
 
-    def randompages(self, total=None, namespaces=None,
+    def randompages(self, total: Optional[int] = None, namespaces=None,
                     redirects: Optional[bool] = False, content: bool = False):
         """Iterate a number of random pages.
 
@@ -1723,11 +1723,11 @@ class GeneratorsMixin:
         :type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
-        :param redirects: if True, include only redirect pages in results,
-            False does not include redirects and None (MW 1.26+) include both
-            types. (default: False)
-        :param content: if True, load the current content of each iterated page
-            (default False)
+        :param redirects: if True, include only redirect pages in
+            results, False does not include redirects and None include
+            both types (default: False).
+        :param content: if True, load the current content of each
+            iterated page (default False).
         :raises KeyError: a namespace identifier was not resolved
         :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
