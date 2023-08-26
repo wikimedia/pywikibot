@@ -38,14 +38,14 @@ class WaitingMixin:
         if not hasattr(self, 'retry_wait'):
             self.retry_wait = pywikibot.config.retry_wait
 
-        if self.current_retries > self.max_retries:
-            raise pywikibot.exceptions.TimeoutError(
-                'Maximum retries attempted without success.')
-
         if not hasattr(self, 'current_retries'):
             self.current_retries = 1
         else:
             self.current_retries += 1
+
+        if self.current_retries > self.max_retries:
+            raise pywikibot.exceptions.TimeoutError(
+                'Maximum retries attempted without success.')
 
         # double the next wait, but do not exceed config.retry_max seconds
         delay = delay or self.retry_wait
