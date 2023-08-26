@@ -265,7 +265,7 @@ class Throttle:
 
         now = time.time()
         processes = [p for p in self._read_file()
-                     if now - p.time <= self.releasepid and p.pid != pid]
+                     if now - p.time <= self.expiry and p.pid != pid]
 
         self._write_file(processes)
 
