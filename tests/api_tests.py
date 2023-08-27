@@ -18,11 +18,7 @@ from pywikibot.data import api
 from pywikibot.exceptions import APIError, NoUsernameError
 from pywikibot.throttle import Throttle
 from pywikibot.tools import suppress_warnings
-from tests.aspects import (
-    DefaultDrySiteTestCase,
-    DefaultSiteTestCase,
-    TestCase,
-)
+from tests.aspects import DefaultDrySiteTestCase, DefaultSiteTestCase, TestCase
 from tests.utils import FakeLoginManager
 
 
@@ -89,7 +85,7 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
-        self.assertLength(pi, pi.preloaded_modules)
+        self.assertLength(pi, pi._preloaded_modules)
 
         self.assertIn('info', pi.query_modules)
         self.assertIn('login', pi._action_modules)
@@ -103,7 +99,7 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertIn('query', pi._paraminfo)
 
     def test_init_pageset(self):
-        """Test initializing with only the pageset."""
+        """Test initializing with deprecated pageset."""
         site = self.get_site()
         self.assertNotIn('query', api.ParamInfo.init_modules)
         pi = api.ParamInfo(site, {'pageset'})
@@ -113,36 +109,30 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
-        self.assertIn('pageset', pi._paraminfo)
-
-        if 'query' in pi.preloaded_modules:
-            self.assertIn('query', pi._paraminfo)
-            self.assertLength(pi, 4)
-        else:
-            self.assertNotIn('query', pi._paraminfo)
-            self.assertLength(pi, 3)
-
-        self.assertLength(pi, pi.preloaded_modules)
-
-        generators_param = pi.parameter('pageset', 'generator')
-        self.assertGreater(len(generators_param['type']), 1)
+        self.assertNotIn('pageset', pi._paraminfo)
+        self.assertIn('query', pi._paraminfo)
+        self.assertLength(pi, 3)
+        self.assertLength(pi._preloaded_modules, 4)
+        with self.assertRaisesRegex(ValueError,
+                                    "paraminfo for 'pageset' not loaded"):
+            pi.parameter('pageset', 'generator')
 
     def test_generators(self):
         """Test requesting the generator parameter."""
         site = self.get_site()
-        pi = api.ParamInfo(site, {'pageset', 'query'})
+        pi = api.ParamInfo(site, {'query'})
         self.assertIsEmpty(pi)
         pi._init()
 
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
-        self.assertIn('pageset', pi._paraminfo)
         self.assertIn('query', pi._paraminfo)
 
-        pageset_generators_param = pi.parameter('pageset', 'generator')
         query_generators_param = pi.parameter('query', 'generator')
-
-        self.assertEqual(pageset_generators_param, query_generators_param)
+        self.assertIn('submodules', query_generators_param)
+        self.assertEqual(query_generators_param['submoduleparamprefix'], 'g')
+        for submodule, query in query_generators_param['submodules'].items():
+            self.assertEqual('query+' + submodule, query)
 
     def test_with_module_info(self):
         """Test requesting the module info."""
@@ -154,7 +144,7 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
-        self.assertLength(pi, 1 + len(pi.preloaded_modules))
+        self.assertLength(pi, 1 + len(pi._preloaded_modules))
 
         self.assertEqual(pi['info']['prefix'], 'in')
 
@@ -178,7 +168,7 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
-        self.assertLength(pi, 1 + len(pi.preloaded_modules))
+        self.assertLength(pi, 1 + len(pi._preloaded_modules))
 
         self.assertEqual(pi['revisions']['prefix'], 'rv')
 
@@ -204,7 +194,7 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
 
-        self.assertLength(pi, 2 + len(pi.preloaded_modules))
+        self.assertLength(pi, 2 + len(pi._preloaded_modules))
 
     def test_with_invalid_module(self):
         """Test requesting different kind of invalid modules."""
@@ -225,7 +215,7 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
 
-        self.assertLength(pi, pi.preloaded_modules)
+        self.assertLength(pi, pi._preloaded_modules)
 
     def test_submodules(self):
         """Test another module apart from query having submodules."""
@@ -233,7 +223,7 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertFalse(pi._modules)
         pi.fetch(['query'])
         self.assertIn('query', pi._modules)
-        self.assertIsInstance(pi._modules['query'], frozenset)
+        self.assertIsInstance(pi._modules['query'], set)
         self.assertIn('revisions', pi._modules['query'])
         self.assertEqual(pi.submodules('query'), pi.query_modules)
         for mod in pi.submodules('query', True):
@@ -244,7 +234,7 @@ class TestParamInfo(DefaultSiteTestCase):
         with patch.object(pywikibot, 'warning') as w, \
              self.assertRaises(KeyError):
             pi.__getitem__('query+foobar')
-        # The warning message may be different with older MW versions.
+
         self.assertIn('API warning (paraminfo): ', w.call_args[0][0])
 
         with self.assertRaises(KeyError):
@@ -277,33 +267,6 @@ class TestParamInfo(DefaultSiteTestCase):
             self.assertEqual(mod, pi[mod]['path'])
             self.assertEqual(value, '')
 
-    @patch.object(pywikibot, 'warning')  # ignore several warnings
-    def test_old_mode(self, *args):
-        """Test the old mode explicitly."""
-        site = self.get_site()
-        pi = api.ParamInfo(site, modules_only_mode=False)
-        pi.fetch(['info'])
-        self.assertIn('query+info', pi._paraminfo)
-
-        self.assertIn('main', pi._paraminfo)
-        self.assertIn('paraminfo', pi._paraminfo)
-
-        self.assertLength(pi, 1 + len(pi.preloaded_modules))
-
-        self.assertIn('query+revisions', pi.prefix_map)
-
-    def test_new_mode(self):
-        """Test the new modules-only mode explicitly."""
-        site = self.get_site()
-        pi = api.ParamInfo(site, modules_only_mode=True)
-        pi.fetch(['info'])
-        self.assertIn('query+info', pi._paraminfo)
-        self.assertIn('main', pi._paraminfo)
-        self.assertIn('paraminfo', pi._paraminfo)
-
-        self.assertLength(pi, 1 + len(pi.preloaded_modules))
-        self.assertIn('query+revisions', pi.prefix_map)
-
 
 class TestOtherSubmodule(TestCase):
 
@@ -322,7 +285,7 @@ class TestOtherSubmodule(TestCase):
         self.assertIn('flow', pi._modules)
         other_modules = set()
         for modules in pi._modules.values():
-            self.assertIsInstance(modules, frozenset)
+            self.assertIsInstance(modules, set)
             other_modules |= modules
 
         other_modules -= pi.action_modules

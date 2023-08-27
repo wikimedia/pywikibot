@@ -312,62 +312,72 @@ class ParamInfoDictTests(DefaultDrySiteTestCase):
 
     """Test extracting data from the ParamInfo."""
 
-    prop_info_param_data = {  # data from 1.25
-        'name': 'info',
-        'classname': 'ApiQueryInfo',
-        'path': 'query+info',
-        'group': 'prop',
-        'prefix': 'in',
-        'parameters': [
-            {
-                'name': 'prop',
-                'multi': '',
-                'limit': 500,
-                'lowlimit': 50,
-                'highlimit': 500,
-                'type': [
-                    'protection',
-                    'talkid',
-                    'watched',
-                    'watchers',
-                    'notificationtimestamp',
-                    'subjectid',
-                    'url',
-                    'readable',
-                    'preload',
-                    'displaytitle'
-                ]
-            },
-            {
-                'name': 'token',
-                'deprecated': '',
-                'multi': '',
-                'limit': 500,
-                'lowlimit': 50,
-                'highlimit': 500,
-                'type': [
-                    'edit',
-                    'delete',
-                    'protect',
-                    'move',
-                    'block',
-                    'unblock',
-                    'email',
-                    'import',
-                    'watch'
-                ]
-            },
-            {
-                'name': 'continue',
-                'type': 'string'
-            }
-        ],
-        'querytype': 'prop'
-    }
-
-    edit_action_param_data = {
-        'name': 'edit',
-        'path': 'edit'
+    # https://en.wikipedia.org/w/api.php?action=paraminfo&modules=query+info|query+tokens
+    paraminfodata = {
+        'paraminfo': {
+            'modules': [
+                {
+                    'name': 'info',
+                    'classname': 'ApiQueryInfo',
+                    'path': 'query+info',
+                    'group': 'prop',
+                    'prefix': 'in',
+                    'parameters': [
+                        {
+                            'index': 1,
+                            'name': 'prop',
+                            'type': [
+                                'displaytitle'
+                                'notificationtimestamp',
+                                'protection',
+                                'subjectid',
+                                'talkid',
+                                'url',
+                                'watched',
+                                'watchers',
+                                'preload',
+                                'readable',
+                            ],
+                            'multi': '',
+                            'lowlimit': 50,
+                            'highlimit': 500,
+                            'limit': 50,
+                            'deprecatedvalues': [
+                                'preload',
+                                'readable'
+                            ]
+                        }
+                    ]
+                },
+                {
+                    'name': 'tokens',
+                    'classname': 'ApiQueryTokens',
+                    'path': 'query+tokens',
+                    'group': 'meta',
+                    'prefix': '',
+                    'parameters': [
+                        {
+                            'index': 1,
+                            'name': 'type',
+                            'type': [
+                                'csrf',
+                                'deleteglobalaccount',
+                                'login',
+                                'patrol',
+                                'rollback',
+                                'userrights',
+                                'watch'
+                            ],
+                            'default': 'csrf',
+                            'multi': '',
+                            'limit': 50,
+                            'lowlimit': 50,
+                            'highlimit': 500
+                        }
+                    ]
+                }
+            ]
+        }
     }
 
     def setUp(self):
@@ -380,86 +390,43 @@ class ParamInfoDictTests(DefaultDrySiteTestCase):
             site._paraminfo._paraminfo[mod] = {}
         site._paraminfo._action_modules = frozenset(['edit'])
         site._paraminfo._modules = {'query': frozenset(['info'])}
+        data = site._paraminfo.normalize_paraminfo(self.paraminfodata)
+        site._paraminfo._paraminfo.update(data)
 
-    def test_new_format(self):
+    def test_format(self):
         """Test using a dummy formatted in the new modules-only mode."""
         pi = self.get_site()._paraminfo
-        # Set it to the new limited set of keys.
-        pi.paraminfo_keys = frozenset(['modules'])
-
-        data = pi.normalize_paraminfo({
-            'paraminfo': {
-                'modules': [
-                    self.prop_info_param_data,
-                    self.edit_action_param_data,
-                ]
-            }
-        })
-
-        pi._paraminfo.update(data)
-        self.assertIn('edit', pi._paraminfo)
         self.assertIn('query+info', pi._paraminfo)
+        self.assertIn('query+tokens', pi._paraminfo)
         self.assertIn('edit', pi)
         self.assertIn('info', pi)
-
-    def test_old_format(self):
-        """Test using a dummy formatted in the old mode."""
-        pi = self.get_site()._paraminfo
-        # Reset it to the complete set of possible keys defined in the class
-        pi.paraminfo_keys = ParamInfo.paraminfo_keys
-
-        data = pi.normalize_paraminfo({
-            'paraminfo': {
-                'querymodules': [self.prop_info_param_data],
-                'modules': [self.edit_action_param_data],
-            }
-        })
-
-        pi._paraminfo.update(data)
-        self.assertIn('edit', pi._paraminfo)
-        self.assertIn('query+info', pi._paraminfo)
-        self.assertIn('edit', pi)
-        self.assertIn('info', pi)
+        self.assertIn('tokens', pi)
 
     def test_attribute(self):
         """Test using __getitem__."""
         pi = self.get_site()._paraminfo
-        # Reset it to the complete set of possible keys defined in the class
-        pi.paraminfo_keys = ParamInfo.paraminfo_keys
+        self.assertEqual(pi._paraminfo['query+info']['group'], 'prop')
+        self.assertEqual(pi['query+info']['prefix'], 'in')
 
-        data = pi.normalize_paraminfo({
-            'paraminfo': {
-                'querymodules': [self.prop_info_param_data],
-            }
-        })
-
-        pi._paraminfo.update(data)
-
-        self.assertEqual(pi._paraminfo['query+info']['querytype'], 'prop')
-        self.assertEqual(pi['info']['prefix'], 'in')
-
-    def test_parameter(self):
-        """Test parameter() method."""
+    def test_info_parameter(self):
+        """Test parameter() method with 'info' module."""
         pi = self.get_site()._paraminfo
-        # Reset it to the complete set of possible keys defined in the class
-        pi.paraminfo_keys = ParamInfo.paraminfo_keys
-
-        data = pi.normalize_paraminfo({
-            'paraminfo': {
-                'querymodules': [self.prop_info_param_data],
-            }
-        })
-
-        pi._paraminfo.update(data)
-
-        param = pi.parameter('info', 'token')
+        param = pi.parameter('info', 'prop')
         self.assertIsInstance(param, dict)
-
-        self.assertEqual(param['name'], 'token')
-        self.assertIn('deprecated', param)
-
+        self.assertEqual(param['name'], 'prop')
+        self.assertIn('deprecatedvalues', param)
         self.assertIsInstance(param['type'], list)
-        self.assertIn('email', param['type'])
+        self.assertIn('preload', param['type'])
+
+    def test_tokens_parameter(self):
+        """Test parameter() method with 'tokens' module."""
+        pi = self.get_site()._paraminfo
+        param = pi.parameter('tokens', 'type')
+        self.assertIsInstance(param, dict)
+        self.assertEqual(param['name'], 'type')
+        self.assertIn('default', param)
+        self.assertIsInstance(param['type'], list)
+        self.assertIn('login', param['type'])
 
 
 class QueryGenTests(DefaultDrySiteTestCase):
