@@ -196,6 +196,7 @@ locale.setlocale(locale.LC_ALL, '')
 # ATTENTION: Projects not listed won't write a log to the wiki.
 LOGBOOK = {
     'ar': 'Project:سجل الترحيب',
+    'ckb': 'Project:لۆگی بەخێرھاتن',
     'fr': ('Wikipedia:Prise de décision/'
            'Accueil automatique des nouveaux par un robot/log'),
     'ga': 'Project:Log fáilte',
@@ -223,6 +224,7 @@ WELCOME = {
         'ba': '{{Hello}} %s',
         'bn': '{{subst:স্বাগতম/বট}} %s',
         'bs': '{{Dobrodošlica}} %s',
+        'ckb': '{{subst:بەخێرھاتن}} %s',
         'da': '{{velkommen|%s}}',
         'de': '{{subst:willkommen}} %s',
         'en': '{{subst:welcome}} %s',
@@ -304,6 +306,7 @@ REPORT_PAGE = {
     'wikipedia': {
         'am': 'User:Beria/Report',
         'ar': 'Project:إخطار الإداريين/أسماء مستخدمين للفحص',
+        'ckb': 'Project:لۆگی بەخێرھاتن/پشکنینی ناوی بەکارھێنەران',
         'da': 'Bruger:Broadbot/Report',
         'en': 'Project:Administrator intervention against vandalism',
         'fa': 'Project:تابلوی اعلانات مدیران/گزارش ربات',
@@ -329,6 +332,7 @@ BAD_PAGE = {
     'wikipedia': {
         'am': 'User:Beria/Bad_names',
         'ar': 'Project:سجل الترحيب/أسماء سيئة',
+        'ckb': 'Project:لۆگی بەخێرھاتن/ناوە_خراپەکان',
         'en': 'Project:Welcome log/Bad_names',
         'fa': 'Project:سیاهه خوشامد/نام بد',
         'it': 'Project:Benvenuto_Bot/Lista_Badwords',
@@ -353,6 +357,7 @@ REPORT_TEXT = {
         'am': '\n*[[User talk:%s]]' + timeselected,
         'ar': '\n*{{user13|%s}}' + timeselected,
         'bs': '\n{{Korisnik|%s}}' + timeselected,
+        'ckb': '\n*{{بەستەرەکانی بەکارھێنەر|%s}} ' + timeselected,
         'da': '\n*[[Bruger Diskussion:%s]] ' + timeselected,
         'de': '\n*[[Benutzer Diskussion:%s]] ' + timeselected,
         'en': '\n*{{Userlinks|%s}} ' + timeselected,
@@ -375,6 +380,7 @@ RANDOM_SIGN = {
     'am': 'User:Beria/Signatures',
     'ar': 'Project:سجل الترحيب/توقيعات',
     'ba': 'Ҡатнашыусы:Salamat bot/Ярҙам',
+    'ckb': 'Project:لۆگی بەخێرھاتن/واژوو',
     'da': 'Wikipedia:Velkommen/Signaturer',
     'en': 'Project:Welcome log/Sign',
     'fa': 'Project:سیاهه خوشامد/امضاها',
