@@ -17,6 +17,7 @@ from pywikibot.exceptions import (
     NoWikibaseEntityError,
     PageRelatedError,
 )
+from pywikibot import pagegenerators
 from tests import join_images_path
 from tests.aspects import TestCase
 
@@ -370,13 +371,60 @@ class TestFilePageDataItem(TestCase):
         del item._file
         self.assertEqual(page, item.file)
 
-    def test_data_item_not_existing(self):
+    def test_data_item_when_no_file_or_data_item(self):
         """Test data item associated to file that does not exist."""
         page = pywikibot.FilePage(self.site,
                                   'File:Notexisting_Albert Einstein.jpg')
+        self.assertFalse(page.exists())
         item = page.data_item()
+        self.assertIsInstance(item, pywikibot.MediaInfo)
+
         with self.assertRaises(NoWikibaseEntityError):
             item.get()
+
+    def test_data_item_when_file_exist_but_without_item(self):
+        """Test if data item is missing from file."""
+        # Get latest uploaded files.
+        gen = pagegenerators.RecentChangesPageGenerator(
+            site=self.site,
+            namespaces=[6],  # File namespace
+            changetype='new',
+            total=100
+        )
+
+        # Seek to first page without mediainfo.
+        for page in gen:
+            if 'mediainfo' not in page.latest_revision.slots:
+                item = page.data_item()
+                self.assertIsInstance(item, pywikibot.MediaInfo)
+
+                # Get fails as there is no mediainfo.
+                with self.assertRaises(NoWikibaseEntityError):
+                    item.get()
+
+                # Create new empty mediainfo.
+                item.get_data_for_new_entity()
+                self.assertIsInstance(
+                    item.labels, pywikibot.page._collections.LanguageDict)
+                self.assertIsInstance(
+                    item.statements,
+                    pywikibot.page._collections.ClaimCollection)
+
+                # break the loop after checking first file
+                break
+
+    def test_data_list_to_dict_workaround(self):
+        """Test that T222159 workaround converts [] to {}."""
+        page = pywikibot.FilePage(self.site, 'File:Albert Einstein.jpg')
+        item = page.data_item()
+        item.get(force=True)
+        item._content['labels'] = []
+        item._content['statements'] = []
+        item.get()
+        self.assertIsInstance(
+            item.labels, pywikibot.page._collections.LanguageDict)
+        self.assertIsInstance(
+            item.statements, pywikibot.page._collections.ClaimCollection)
 
 
 if __name__ == '__main__':  # pragma: no cover

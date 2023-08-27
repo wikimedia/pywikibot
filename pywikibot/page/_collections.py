@@ -210,6 +210,8 @@ class ClaimCollection(MutableMapping):
     def fromJSON(cls, data, repo):
         """Construct a new ClaimCollection from JSON."""
         this = cls(repo)
+        if data == []:  # workaround for T222159
+            return this
         for key, claims in data.items():
             this[key] = [pywikibot.page.Claim.fromJSON(repo, claim)
                          for claim in claims]
