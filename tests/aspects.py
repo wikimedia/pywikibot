@@ -115,7 +115,7 @@ class TestCaseBase(TestTimerMixin):
 
         if first_len != second_len:
             msg = self._formatMessage(
-                msg, f'len({safe_repr(seq)}) != {second_len}')
+                msg, f'len({safe_repr(seq)}): {first_len} != {second_len}')
             self.fail(msg)
 
     def assertPageInNamespaces(self, page, namespaces):
