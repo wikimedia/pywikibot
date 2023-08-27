@@ -41,6 +41,7 @@ template_to_the_image = {
     'test': '{{Orphan file}}',
     'ar': '{{صورة يتيمة}}',
     'arz': '{{صوره يتيمه}}',
+    'ckb': '{{سخ-پ٥|ڕێکەوت={{subst:ڕێکەوت}}}}',
     'en': '{{Orphan image}}',
     'fa': '{{تصاویر بدون استفاده}}',
     'id': '{{Berkas yatim}}',
@@ -57,6 +58,7 @@ template_to_the_user = {
     'test': '{{User:Happy5214/Unused file notice (user)|%(title)s}}',
     'ar': '{{subst:تنبيه صورة يتيمة|%(title)s}}',
     'arz': '{{subst:تنبيه صوره يتيمه|%(title)s}}',
+    'ckb': '{{subst:سخ-پ٥-ئاگاداری|1=%(title)s}}',
     'fa': '{{subst:اخطار به کاربر برای تصاویر بدون استفاده|%(title)s}}',
     'ur': '{{subst:اطلاع برائے غیر مستعمل تصاویر|%(title)s}}',
 }

@@ -118,6 +118,7 @@ N_TXT = {
     'test': '{{No license}}',
     'ar': '{{subst:ملم}}',
     'arz': '{{subst:ملم}}',
+    'ckb': '{{subst:nld}}',
     'de': '{{Dateiüberprüfung}}',
     'en': '{{subst:nld}}',
     'fa': '{{subst:حق تکثیر تصویر نامعلوم}}',
@@ -149,6 +150,7 @@ TXT_FIND = {
     'test': ['{{no license'],
     'ar': ['{{لت', '{{لا ترخيص'],
     'arz': ['{{nld', '{{no license'],
+    'ckb': ['{{nld', '{{no license'],
     'de': ['{{DÜP', '{{Düp', '{{Dateiüberprüfung'],
     'en': ['{{nld', '{{no license'],
     'fa': ['{{حق تکثیر تصویر نامعلوم۲'],
@@ -175,6 +177,7 @@ DELETE_IMMEDIATELY = {
     'meta': '{{Delete|The file has .%s as extension.}}',
     'ar': '{{شطب|الملف له .%s كامتداد.}}',
     'arz': '{{مسح|الملف له .%s كامتداد.}}',
+    'ckb': '{{سخ-مێتا|پەڕگەکە پاشگری «.%s»ی ھەیە.}}',
     'en': '{{db-meta|The file has .%s as extension.}}',
     'fa': '{{حذف سریع|تصویر %s اضافی است.}}',
     'ga': '{{scrios|Tá iarmhír .%s ar an comhad seo.}}',
@@ -192,7 +195,7 @@ DELETE_IMMEDIATELY = {
 }
 
 # That's the text that the bot will add if it doesn't find the license.
-# Note: every __botnick__ will be repleaced with your bot's nickname
+# Note: every __botnick__ will be replaced with your bot's nickname
 # (feel free not to use if you don't need it)
 NOTHING_NOTIFICATION = {
     'commons': "\n{{subst:User:Filnik/untagged|File:%s}}\n\n''This message "
@@ -205,6 +208,7 @@ NOTHING_NOTIFICATION = {
     'meta': '{{subst:No license notice|File:%s}}',
     'ar': '{{subst:مصدر الملف|File:%s}} --~~~~',
     'arz': '{{subst:file source|File:%s}} --~~~~',
+    'ckb': '{{subst:سەرچاوەی پەڕگە|پەڕگە:%s}} --~~~~',
     'en': '{{subst:file source|File:%s}} --~~~~',
     'fa': '{{subst:اخطار نگاره|%s}}',
     'ga': '{{subst:Foinse na híomhá|File:%s}} --~~~~',
@@ -261,6 +265,7 @@ SECOND_MESSAGE_WITHOUT_LICENSE = {
 # Toolserver.
 PAGE_WITH_SETTINGS = {
     'commons': 'User:Filbot/Settings',
+    'ckb': 'User:AramBot/پەڕگەکان/ڕێکخستنەکان',
     'it': 'Progetto:Coordinamento/Immagini/Bot/Settings#Settings',
     'sr': 'User:KizuleBot/checkimages.py/подешавања',
     'zh': 'User:Alexbot/cisettings#Settings',
@@ -274,6 +279,7 @@ REPORT_PAGE = {
     'test': 'User:Pywikibot-test/Report',
     'ar': 'User:MenoBot/Report',
     'arz': 'User:MenoBot/Report',
+    'ckb': 'User:AramBot/پەڕگەکان/ڕاپۆڕت',
     'de': 'Benutzer:Xqbot/Report',
     'en': 'User:Filnik/Report',
     'fa': 'کاربر:Amirobot/گزارش تصویر',
@@ -306,6 +312,7 @@ HIDDEN_TEMPLATE = {
     'test': ['Template:Information'],
     'ar': ['Template:معلومات'],
     'arz': ['Template:معلومات'],
+    'ckb': ['داڕێژە:زانیاری'],
     'de': ['Template:Information'],
     'en': ['Template:Information'],
     'fa': ['الگو:اطلاعات'],
@@ -425,9 +432,10 @@ SERVICE_TEMPLATES = {
 }
 
 # Add your project (in alphabetical order) if you want that the bot starts
-PROJECT_INSERTED = ['ar', 'arz', 'commons', 'de', 'en', 'fa', 'ga', 'hu', 'it',
-                    'ja', 'ko', 'ru', 'meta', 'sd', 'sr', 'ta', 'test', 'ur',
-                    'zh']
+PROJECT_INSERTED = [
+    'ar', 'arz', 'commons', 'ckb', 'de', 'en', 'fa', 'ga', 'hu', 'it', 'ja',
+    'ko', 'ru', 'meta', 'sd', 'sr', 'ta', 'test', 'ur', 'zh',
+]
 
 # END OF CONFIGURATION.
 
