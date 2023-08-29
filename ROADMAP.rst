@@ -1,8 +1,7 @@
 Current release
 ---------------
 
-* Add support for suwikisource and blkwiktionary (:phab:`T343544`, :phab:`T343550`)
-* :mod:`families.wikifunctions_family` was added (:phab:`T343573`)
+* Add support for tlywiki (:phab:`T345172`)
 * i18n updates
 
 
