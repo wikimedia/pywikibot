@@ -184,14 +184,15 @@ class APISite(
         """
         return self._interwikimap[prefix].local
 
-    @classmethod
+    @staticmethod
     def fromDBName(  # noqa: N802
-        cls,
         dbname: str,
         site: Optional[BaseSite] = None
     ) -> BaseSite:
-        """
-        Create a site from a database name using the sitematrix.
+        """Create a site from a database name using the sitematrix.
+
+        .. versionchanged:: 8.4
+           changed from classmethod to staticmethod.
 
         :param dbname: database name
         :param site: Site to load sitematrix from. (Default meta.wikimedia.org)
@@ -200,19 +201,27 @@ class APISite(
         # TODO this only works for some WMF sites
         if not site:
             site = pywikibot.Site('meta')
+        param = {
+            'action': 'sitematrix',
+            'smlangprop': 'site',
+            'smsiteprop': ('code', 'dbname'),
+            'formatversion': 2,
+        }
         req = site._request(expiry=datetime.timedelta(days=10),
-                            parameters={'action': 'sitematrix'})
+                            parameters=param)
         data = req.submit()
         for key, val in data['sitematrix'].items():
             if key == 'count':
                 continue
-            if 'code' in val:
-                lang = val['code']
+            if 'site' in val:
                 for m_site in val['site']:
                     if m_site['dbname'] == dbname:
-                        if m_site['code'] == 'wiki':
-                            m_site['code'] = 'wikipedia'
-                        return pywikibot.Site(lang, m_site['code'])
+                        # extract site from dbname
+                        family = m_site['code']
+                        code = removesuffix(dbname, family).replace('_', '-')
+                        if family == 'wiki':
+                            family = 'wikipedia'
+                        return pywikibot.Site(code, family)
             else:  # key == 'specials'
                 for m_site in val:
                     if m_site['dbname'] == dbname:
