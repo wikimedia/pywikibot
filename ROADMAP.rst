@@ -1,6 +1,10 @@
 Current release
 ---------------
 
+* Extract code and family from dbname in :meth:`site.APISite.fromDBName()
+  <pywikibot.site._apisite.APISite.fromDBName>` (:phab:`T345036`)
+* ``dropdelay`` and ``releasepid`` attributes of :class:`throttle.Throttle` where deprecated
+  in favour of `expiry` class attribute
 * Add https scheme if missing in url asked by :mod:`pywikibot.scripts.generate_family_file`
 * i18n updates
 * use inline re.IGNORECASE flag in :func:`textlib.case_escape` function (:phab:`T308265`)
@@ -12,6 +16,9 @@ Current release
 Deprecations
 ------------
 
+* 8.4.0: *dropdelay* and *releasepid* attributes of :class:`throttle.Throttle` will be removed
+  in favour of *expiry* class attribute
+* 8.2.0: :func:`tools.itertools.itergroup` will be removed in favour of :func:`backports.batched`
 * 8.2.0: *normalize* parameter of :meth:`WbTime.toTimestr` and :meth:`WbTime.toWikibase` will be removed
 * 8.1.0: Dependency of :exc:`exceptions.NoSiteLinkError` from :exc:`exceptions.NoPageError` will be removed
 * 8.1.0: ``exceptions.Server414Error`` is deprecated in favour of :exc:`exceptions.Client414Error`
@@ -49,6 +56,10 @@ Deprecations
 * 7.0.0: baserevid parameter of editSource(), editQualifier(), removeClaims(), removeSources(), remove_qualifiers() DataSite methods will be removed
 * 7.0.0: Values of APISite.allpages() parameter filterredir other than True, False and None are deprecated
 * 7.0.0: The i18n identifier 'cosmetic_changes-append' will be removed in favour of 'pywikibot-cosmetic-changes'
+
+Will be removed in Pywikibot 9
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 * 6.5.0: OutputOption.output() method will be removed in favour of OutputOption.out property
 * 6.5.0: Infinite rotating file handler with logfilecount of -1 is deprecated
 * 6.4.0: 'allow_duplicates' parameter of :func:`tools.itertools.intersect_generators` as positional argument is deprecated, use keyword argument instead

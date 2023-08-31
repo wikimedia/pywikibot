@@ -4,6 +4,8 @@ Scripts Changelog
 8.4.0
 -----
 
+* L10N for several scripts
+
 checkimages
 ~~~~~~~~~~~
 
