@@ -1124,7 +1124,7 @@ class APISite(
     def version(self) -> str:
         """Return live project version number as a string.
 
-        Use :py:obj:`pywikibot.site.mw_version` to compare MediaWiki versions.
+        Use :attr:`mw_version` to compare MediaWiki versions.
         """
         try:
             version = self.siteinfo.get('generator', expiry=1).split(' ')[1]
@@ -1136,18 +1136,18 @@ class APISite(
             raise
 
         if MediaWikiVersion(version) < '1.27':
-            raise RuntimeError(
-                'Pywikibot "{}" does not support MediaWiki "{}".\n'
-                'Use Pywikibot prior to "8.0" branch instead.'
-                .format(pywikibot.__version__, version))
+            raise RuntimeError(f'Pywikibot "{pywikibot.__version__}" does not '
+                               f'support MediaWiki "{version}".\n'
+                               f'Use Pywikibot prior to "8.0" branch instead.')
         return version
 
     @property
     def mw_version(self) -> MediaWikiVersion:
-        """Return self.version() as a MediaWikiVersion object.
+        """Return :meth:`version()<pywikibot.site._apisite.APISite.version>`
+        as a :class:`tools.MediaWikiVersion` object.
 
         Cache the result for 24 hours.
-        """
+        """  # noqa: D205, D400
         mw_ver, cache_time = getattr(self, '_mw_version_time', (None, None))
         if (
             mw_ver is None
