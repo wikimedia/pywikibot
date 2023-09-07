@@ -44,6 +44,13 @@ class FilePage(Page):
         super().__init__(source, title, 6)
         if self.namespace() != 6:
             raise ValueError(f"'{self.title()}' is not in the file namespace!")
+        title = self.title(with_section=False)
+        extension = title.rpartition('.')[2].lower()
+        if extension not in self.site.file_extensions:
+            raise ValueError(
+                f'{title!r} does not have a valid extension '
+                f'({", ".join(self.site.file_extensions)}).'
+            )
 
     def _load_file_revisions(self, imageinfo) -> None:
         for file_rev in imageinfo:

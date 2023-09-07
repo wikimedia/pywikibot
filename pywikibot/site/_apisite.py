@@ -472,6 +472,11 @@ class APISite(
         api._invalidate_superior_cookies(self.family)
 
     @property
+    def file_extensions(self) -> List[str]:
+        """File extensions enabled on the wiki."""
+        return sorted(e['ext'] for e in self.siteinfo.get('fileextensions'))
+
+    @property
     def maxlimit(self) -> int:
         """Get the maximum limit of pages to be retrieved.
 

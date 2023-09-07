@@ -164,24 +164,24 @@ class TestFilePage(TestCase):
     def test_file_info_with_no_page(self):
         """FilePage:latest_file_info raises NoPageError for missing pages."""
         site = self.get_site()
-        image = pywikibot.FilePage(site, 'File:NoPage')
+        image = pywikibot.FilePage(site, 'File:NoPage.jpg')
         self.assertFalse(image.exists())
 
         with self.assertRaisesRegex(
                 NoPageError,
-                (r'Page \[\[(wikipedia\:|)test:File:NoPage\]\] '
+                (r'Page \[\[(wikipedia\:|)test:File:NoPage\.jpg\]\] '
                  r"doesn't exist\.")):
             image = image.latest_file_info
 
     def test_file_info_with_no_file(self):
         """FilePage:latest_file_info raises PagerelatedError if no file."""
         site = self.get_site()
-        image = pywikibot.FilePage(site, 'File:Test with no image')
+        image = pywikibot.FilePage(site, 'File:Test with no image.png')
         self.assertTrue(image.exists())
         with self.assertRaisesRegex(
                 PageRelatedError,
                 (r'loadimageinfo: Query on '
-                 r'\[\[(wikipedia\:|)test:File:Test with no image\]\]'
+                 r'\[\[(wikipedia\:|)test:File:Test with no image\.png\]\]'
                  r' returned no imageinfo')):
             image = image.latest_file_info
 
@@ -322,13 +322,13 @@ class TestFilePageDownload(TestCase):
     def test_not_existing_download(self):
         """Test not existing download."""
         page = pywikibot.FilePage(self.site,
-                                  'File:Albert Einstein.jpg_notexisting')
+                                  'File:notexisting_Albert Einstein.jpg')
         filename = join_images_path('Albert Einstein.jpg')
 
         with self.assertRaisesRegex(
                 NoPageError,
-                re.escape('Page [[commons:File:Albert Einstein.jpg '
-                          "notexisting]] doesn't exist.")):
+                re.escape('Page [[commons:File:Notexisting Albert '
+                          "Einstein.jpg]] doesn't exist.")):
             page.download(filename)
 
 
@@ -373,7 +373,7 @@ class TestFilePageDataItem(TestCase):
     def test_data_item_not_existing(self):
         """Test data item associated to file that does not exist."""
         page = pywikibot.FilePage(self.site,
-                                  'File:Albert Einstein.jpg_notexisting')
+                                  'File:Notexisting_Albert Einstein.jpg')
         item = page.data_item()
         with self.assertRaises(NoWikibaseEntityError):
             item.get()
