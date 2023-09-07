@@ -173,7 +173,10 @@ class Uploader:
 
         token = self.site.tokens['csrf']
         result = None
-        file_page_title = self.filepage.title(with_ns=False)
+        file_page_title = self.filepage.title(
+            with_ns=False,
+            with_section=False,
+        )
         file_size = None
 
         # make sure file actually exists
