@@ -46,7 +46,7 @@ from pywikibot.bot import (
     SingleSiteBot,
     calledModuleName,
 )
-from pywikibot.textlib import case_escape, ignore_case, replaceExcept
+from pywikibot.textlib import case_escape, ignore_case
 
 
 class CommonsDelinker(SingleSiteBot, ConfigParserBot, AutomaticTWSummaryBot):
@@ -119,7 +119,7 @@ class CommonsDelinker(SingleSiteBot, ConfigParserBot, AutomaticTWSummaryBot):
 
     def treat_page(self):
         """Delink a single page."""
-        new = replaceExcept(self.current_page.text, self.image_regex, '', [])
+        new = re.sub(self.image_regex, '', self.current_page.text)
         self.put_current(new)
 
     def teardown(self):
