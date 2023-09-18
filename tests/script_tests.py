@@ -414,6 +414,7 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
         'djvutext',
         'download_dump',
         'harvest_template',
+        'image',  # Foobar has no valid extension
         'imagetransfer',
         'interwiki',
         'listpages',
