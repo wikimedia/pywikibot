@@ -473,7 +473,10 @@ class APISite(
 
     @property
     def file_extensions(self) -> List[str]:
-        """File extensions enabled on the wiki."""
+        """File extensions enabled on the wiki.
+
+        .. versionadded:: 8.4
+        """
         return sorted(e['ext'] for e in self.siteinfo.get('fileextensions'))
 
     @property

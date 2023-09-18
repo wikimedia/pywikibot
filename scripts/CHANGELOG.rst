@@ -6,6 +6,11 @@ Scripts Changelog
 
 * L10N for several scripts
 
+category_graph
+~~~~~~~~~~~~~~
+
+* Wrap DOT-string in curly braces (:phab:`T346007`)
+
 checkimages
 ~~~~~~~~~~~
 

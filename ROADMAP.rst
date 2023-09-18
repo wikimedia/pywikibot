@@ -1,6 +1,11 @@
 Current release
 ---------------
 
+* *modules_only_mode* parameter of :class:`data.api.ParamInfo`, its *paraminfo_keys* class attribute
+  and its *preloaded_modules* property was deprecated, the :meth:`data.api.ParamInfo.normalize_paraminfo`
+  method became a staticmethod (:phab:`T306637`)
+* raise ValueError when :class:`pywikibot.FilePage` title doesn't have a valid file extension (:phab:`T345786`)
+* :attr:`site.APISite.file_extensions <pywikibot.site._apisite.APISite.file_extensions>` property was added (:phab:`T345786`)
 * Extract code and family from dbname in :meth:`site.APISite.fromDBName()
   <pywikibot.site._apisite.APISite.fromDBName>` (:phab:`T345036`)
 * ``dropdelay`` and ``releasepid`` attributes of :class:`throttle.Throttle` where deprecated
@@ -16,6 +21,8 @@ Current release
 Deprecations
 ------------
 
+* 8.4.0: *modules_only_mode* parameter of :class:`data.api.ParamInfo`, its *paraminfo_keys* class attribute
+  and its preloaded_modules property will be removed
 * 8.4.0: *dropdelay* and *releasepid* attributes of :class:`throttle.Throttle` will be removed
   in favour of *expiry* class attribute
 * 8.2.0: :func:`tools.itertools.itergroup` will be removed in favour of :func:`backports.batched`
