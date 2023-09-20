@@ -318,7 +318,7 @@ class Topic(FlowPage):
         self.site.restore_topic(self, reason)
         self._reload()
 
-    def summary(self) -> Union[str, None]:
+    def summary(self) -> Optional[str]:
         """Get this topic summary, if any.
 
         :return: summary or None
@@ -326,6 +326,7 @@ class Topic(FlowPage):
         if 'summary' in self.root._current_revision.keys():
             return self.root._current_revision['summary']['revision'][
                 'content']['content']
+        return None
 
     def summarize(self, summary: str) -> None:
         """Summarize this topic.
