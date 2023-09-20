@@ -408,6 +408,12 @@ class MediaInfo(WikibaseEntity):
 
         return self._file
 
+    def get_data_for_new_entity(self) -> dict:
+        """Return data required for creation of a new mediainfo."""
+        self.id = 'M' + str(self.file.pageid)
+        self._content = {}
+        return super().get()
+
     def get(self, force: bool = False) -> dict:
         """Fetch all MediaInfo entity data and cache it.
 
@@ -426,6 +432,8 @@ class MediaInfo(WikibaseEntity):
                 try:
                     data = self.file.latest_revision.slots['mediainfo']['*']
                 except NoPageError as exc:
+                    raise NoWikibaseEntityError(self) from exc
+                except KeyError as exc:
                     raise NoWikibaseEntityError(self) from exc
 
                 self._content = jsonlib.loads(data)
