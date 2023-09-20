@@ -349,7 +349,7 @@ class TestScriptHelp(PwbTestCase, metaclass=ScriptTestMeta):
 class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
                          metaclass=ScriptTestMeta):
 
-    """Test cases for running scripts with -siumlate.
+    """Test cases for running scripts with -simulate.
 
     This class sets the 'user' attribute on every test, thereby ensuring
     that the test runner has a username for the default site, and so that
