@@ -191,7 +191,7 @@ class APISite(
     ) -> BaseSite:
         """Create a site from a database name using the sitematrix.
 
-        .. versionchanged:: 8.4
+        .. versionchanged:: 8.3.3
            changed from classmethod to staticmethod.
 
         :param dbname: database name

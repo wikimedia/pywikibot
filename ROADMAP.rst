@@ -6,12 +6,10 @@ Current release
   method became a staticmethod (:phab:`T306637`)
 * raise ValueError when :class:`pywikibot.FilePage` title doesn't have a valid file extension (:phab:`T345786`)
 * :attr:`site.APISite.file_extensions <pywikibot.site._apisite.APISite.file_extensions>` property was added (:phab:`T345786`)
-* Extract code and family from dbname in :meth:`site.APISite.fromDBName()
-  <pywikibot.site._apisite.APISite.fromDBName>` (:phab:`T345036`)
 * ``dropdelay`` and ``releasepid`` attributes of :class:`throttle.Throttle` where deprecated
   in favour of `expiry` class attribute
 * Add https scheme if missing in url asked by :mod:`pywikibot.scripts.generate_family_file`
-* i18n updates
+* L10N updates and i18n updates
 * use inline re.IGNORECASE flag in :func:`textlib.case_escape` function (:phab:`T308265`)
 * Convert URL-encoded characters also for links outside main namespace with
   :meth:`cosmetic_changes.CosmeticChangesToolkit.cleanUpLinks` (:phab:`T342470`)

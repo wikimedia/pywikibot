@@ -1,12 +1,21 @@
 Release history
 ===============
 
+8.3.3
+-----
+*20. September 2023*
+
+* Extract code and family from dbname in :meth:`site.APISite.fromDBName()
+  <pywikibot.site._apisite.APISite.fromDBName>` (:phab:`T345036`)
+* L10N and i18n updates
+
+
 8.3.2
 -----
 *29. August 2023*
 
 * Add support for tlywiki (:phab:`T345172`)
-* i18n updates
+* L10N and i18n updates
 
 
 8.3.1
