@@ -78,7 +78,7 @@ jobs:
 
     - name: Write test with pytest without coverage due to T346862
       if: ${{ matrix.python-version == '3.13-dev' }}
-      id: ci_test
+      id: ci_test_no_cover
       continue-on-error: true
       timeout-minutes: 90
       env:
