@@ -89,17 +89,19 @@ class TestSiteObject(DefaultSiteTestCase):
     def test_constructors(self):
         """Test cases for site constructors."""
         test_list = [
+            ['alswiki', 'wikipedia:als'],  # see T345036
+            ['commonswiki', 'commons:commons'],
+            ['dewikinews', 'wikinews:de'],
             ['enwiki', 'wikipedia:en'],
             ['eswikisource', 'wikisource:es'],
-            ['dewikinews', 'wikinews:de'],
-            ['ukwikivoyage', 'wikivoyage:uk'],
             ['metawiki', 'meta:meta'],
-            ['commonswiki', 'commons:commons'],
-            ['wikidatawiki', 'wikidata:wikidata'],
-            ['testwikidatawiki', 'wikidata:test'],
-            ['testwiki', 'wikipedia:test'],  # see T225729, T228300
-            ['test2wiki', 'wikipedia:test2'],  # see T225729
+            ['roa_rupwiki', 'wikipedia:roa-rup'],  # see T345036
             ['sourceswiki', 'wikisource:mul'],  # see T226960
+            ['test2wiki', 'wikipedia:test2'],  # see T225729
+            ['testwiki', 'wikipedia:test'],  # see T225729, T228300
+            ['testwikidatawiki', 'wikidata:test'],
+            ['ukwikivoyage', 'wikivoyage:uk'],
+            ['wikidatawiki', 'wikidata:wikidata'],
         ]
         if isinstance(self.site.family, pywikibot.family.WikimediaFamily):
             site = self.site

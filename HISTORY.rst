@@ -1,6 +1,14 @@
 Release history
 ===============
 
+8.3.2
+-----
+*29. August 2023*
+
+* Add support for tlywiki (:phab:`T345172`)
+* L10N and i18n updates
+
+
 8.3.1
 -----
 *17. August 2023*
