@@ -306,13 +306,15 @@ class ScriptTestMeta(MetaTestCaseClass):
                            .format(script_name, arguments))
 
             if script_name in dct['_expected_failures']:
+                if name == 'TestScriptGenerator':
+                    continue  # do not test it
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
             elif script_name in dct['_allowed_failures']:
                 dct[test_name] = unittest.skip(
                     '{} is in _allowed_failures set'
                     .format(script_name))(dct[test_name])
             elif script_name in failed_dep_script_set \
-                    and arguments == '-simulate':
+                    and name == 'TestScriptSimulate':
                 dct[test_name] = unittest.skip(
                     '{} has dependencies; skipping'
                     .format(script_name))(dct[test_name])
