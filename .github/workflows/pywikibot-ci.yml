@@ -137,7 +137,8 @@ jobs:
         echo "password_file = os.path.expanduser('passwordfile')" >> user-config.py
         echo "('${{ env.PYWIKIBOT_USERNAME }}', '${{ secrets.PYWIKIBOT_USERPWD }}')" > passwordfile
 
-    - name: Test with unittest or pytest
+    - name: Test with unittest or pytest and coverage
+      if: ${{ matrix.python-version != '3.13-dev' }}
       id: ci_test
       continue-on-error: true
       timeout-minutes: 90
@@ -153,7 +154,21 @@ jobs:
           pytest --cov=.;
         fi
 
+    - name: Test with unittest without coverage due to T346862
+      if: ${{ matrix.python-version == '3.13-dev' }}
+      id: ci_test
+      continue-on-error: true
+      timeout-minutes: 90
+      env:
+        PYWIKIBOT_TEST_NO_RC:
+          ${{ (matrix.site == 'wikisource:zh' || matrix.test_no_rc) && 1 || 0 }}
+        PYWIKIBOT_TEST_PROD_ONLY: ${{ matrix.test_prod_only && 1 || 0 }}
+      run: |
+        python pwb.py version
+        unittest discover -vv -p \"*_tests.py\";
+
     - name: Show coverage statistics
+      if: ${{ matrix.python-version != '3.13-dev' }}
       run: |
         coverage report
 

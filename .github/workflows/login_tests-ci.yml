@@ -123,13 +123,22 @@ jobs:
         echo "password_file = os.path.expanduser('passwordfile')" >> user-config.py
         echo "('${{ env.PYWIKIBOT_USERNAME }}', '${{ secrets.PYWIKIBOT_USERPWD }}')" > passwordfile
 
-    - name: Test with unittest
+    - name: Test with unittest and coverage
+      if: ${{ matrix.python-version != '3.13-dev' }}
       timeout-minutes: 2
       run: |
         python pwb.py version
         coverage run -m unittest -vv tests/site_login_logout_tests.py
 
+    - name: Test with unittest without coverage due to T346862
+      if: ${{ matrix.python-version == '3.13-dev' }}
+      timeout-minutes: 2
+      run: |
+        python pwb.py version
+        unittest -vv tests/site_login_logout_tests.py
+
     - name: Show coverage statistics
+      if: ${{ matrix.python-version != '3.13-dev' }}
       run: |
         coverage report
 

@@ -108,7 +108,8 @@ jobs:
         echo "maximum_GET_length = 5000" >> user-config.py
         echo "console_encoding = 'utf8'" >> user-config.py
 
-    - name: Test with unittest
+    - name: Oauth tests with unittest and coverage
+      if: ${{ matrix.python-version != '3.13-dev' }}
       timeout-minutes: 2
       env:
         PYWIKIBOT_TEST_OAUTH: ${{ secrets[format('{0}', steps.token.outputs.uppercase)] }}
@@ -116,7 +117,17 @@ jobs:
         python pwb.py version
         coverage run -m unittest -vv tests/oauth_tests.py
 
+    - name: Oauth test with unittest without coverage due to T346862
+      if: ${{ matrix.python-version == '3.13-dev' }}
+      timeout-minutes: 2
+      env:
+        PYWIKIBOT_TEST_OAUTH: ${{ secrets[format('{0}', steps.token.outputs.uppercase)] }}
+      run: |
+        python pwb.py version
+        unittest -vv tests/oauth_tests.py
+
     - name: Show coverage statistics
+      if: ${{ matrix.python-version != '3.13-dev' }}
       run: |
         coverage report
 
