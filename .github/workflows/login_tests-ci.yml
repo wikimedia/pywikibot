@@ -135,7 +135,7 @@ jobs:
       timeout-minutes: 2
       run: |
         python pwb.py version
-        unittest -vv tests/site_login_logout_tests.py
+        python -m unittest -vv tests/site_login_logout_tests.py
 
     - name: Show coverage statistics
       if: ${{ matrix.python-version != '3.13-dev' }}

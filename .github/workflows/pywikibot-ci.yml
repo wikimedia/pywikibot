@@ -165,7 +165,7 @@ jobs:
         PYWIKIBOT_TEST_PROD_ONLY: ${{ matrix.test_prod_only && 1 || 0 }}
       run: |
         python pwb.py version
-        unittest discover -vv -p \"*_tests.py\";
+        python -m unittest discover -vv -p \"*_tests.py\";
 
     - name: Show coverage statistics
       if: ${{ matrix.python-version != '3.13-dev' }}
