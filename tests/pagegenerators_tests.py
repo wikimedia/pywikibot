@@ -1435,7 +1435,11 @@ class TestWantedFactoryGenerator(DefaultSiteTestCase):
         """Test wantedfiles generator."""
         self.gf.handle_arg('-wantedfiles:5')
         for page in self._generator_with_tests():
-            self.assertIsInstance(page, pywikibot.FilePage)
+            self.assertIsInstance(page, pywikibot.Page)
+            if not isinstance(page, pywikibot.FilePage):
+                with self.assertRaisesRegex(ValueError,
+                                            'does not have a valid extension'):
+                    pywikibot.FilePage(page)
 
     def test_wanted_templates(self):
         """Test wantedtemplates generator."""

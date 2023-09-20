@@ -11,6 +11,7 @@
 # Distributed under the terms of the MIT license.
 #
 from abc import ABC, abstractmethod
+from contextlib import suppress
 from typing import Union
 from warnings import warn
 
@@ -719,7 +720,8 @@ class PageGenerator(QueryGenerator):
         if ns == 2:
             p = pywikibot.User(p)
         elif ns == 6:
-            p = pywikibot.FilePage(p)
+            with suppress(ValueError):
+                p = pywikibot.FilePage(p)
         elif ns == 14:
             p = pywikibot.Category(p)
         update_page(p, pagedata, self.props)
