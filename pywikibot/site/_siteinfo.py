@@ -12,6 +12,7 @@ from contextlib import suppress
 from typing import Any, Optional, Union
 
 import pywikibot
+from pywikibot.backports import Dict, List
 from pywikibot.exceptions import APIError
 from pywikibot.tools.collections import EMPTY_DEFAULT
 
@@ -58,7 +59,7 @@ class Siteinfo(Container):
     def __init__(self, site) -> None:
         """Initialise it with an empty cache."""
         self._site = site
-        self._cache = {}
+        self._cache: Dict[str, Any] = {}
 
     def clear(self) -> None:
         """Remove all items from Siteinfo.
@@ -66,37 +67,6 @@ class Siteinfo(Container):
         .. versionadded:: 7.1
         """
         self._cache.clear()
-
-    @staticmethod
-    def _get_default(key: str):
-        """
-        Return the default value for different properties.
-
-        If the property is 'restrictions' it returns a dictionary with:
-         - 'cascadinglevels': 'sysop'
-         - 'semiprotectedlevels': 'autoconfirmed'
-         - 'levels': '' (everybody), 'autoconfirmed', 'sysop'
-         - 'types': 'create', 'edit', 'move', 'upload'
-        Otherwise it returns :py:obj:`tools.EMPTY_DEFAULT`.
-
-        :param key: The property name
-        :return: The default value
-        :rtype: dict or :py:obj:`tools.EmptyDefault`
-        """
-        if key == 'restrictions':
-            # implemented in b73b5883d486db0e9278ef16733551f28d9e096d
-            return {
-                'cascadinglevels': ['sysop'],
-                'semiprotectedlevels': ['autoconfirmed'],
-                'levels': ['', 'autoconfirmed', 'sysop'],
-                'types': ['create', 'edit', 'move', 'upload']
-            }
-
-        if key == 'fileextensions':
-            # the default file extensions in MediaWiki
-            return [{'ext': ext} for ext in ['png', 'gif', 'jpg', 'jpeg']]
-
-        return EMPTY_DEFAULT
 
     @staticmethod
     def _post_process(prop, data) -> None:
@@ -150,7 +120,7 @@ class Siteinfo(Container):
         if not props:
             raise ValueError('At least one property name must be provided.')
 
-        invalid_properties = []
+        invalid_properties: List[str] = []
         request = self._site._request(
             expiry=pywikibot.config.API_config_expiry
             if expiry is False else expiry,
@@ -168,7 +138,7 @@ class Siteinfo(Container):
                 if len(props) == 1:
                     pywikibot.log(
                         f"Unable to get siprop '{props[0]}'")
-                    return {props[0]: (Siteinfo._get_default(props[0]), False)}
+                    return {props[0]: (EMPTY_DEFAULT, False)}
                 pywikibot.log('Unable to get siteinfo, because at least '
                               "one property is unknown: '{}'".format(
                                   "', '".join(props)))
@@ -181,7 +151,7 @@ class Siteinfo(Container):
             result = {}
             if invalid_properties:
                 for prop in invalid_properties:
-                    result[prop] = (Siteinfo._get_default(prop), False)
+                    result[prop] = (EMPTY_DEFAULT, False)
                 pywikibot.log("Unable to get siprop(s) '{}'".format(
                     "', '".join(invalid_properties)))
             if 'query' in data:

@@ -20,6 +20,7 @@ from pywikibot.data.api import CachedRequest
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.exceptions import APIError
 from pywikibot.login import LoginStatus
+from pywikibot.tools.collections import EMPTY_DEFAULT
 from pywikibot.site import Namespace
 from pywikibot.tools import PYTHON_VERSION
 
@@ -277,7 +278,7 @@ class DummySiteinfo:
             return loaded[0]
 
         if get_default:
-            default = pywikibot.site.Siteinfo._get_default(key)
+            default = EMPTY_DEFAULT
             if cache:
                 self._cache[key] = (default, False)
             return default
@@ -342,7 +343,9 @@ class DrySite(pywikibot.site.APISite):
         super().__init__(code, fam, user)
         self._userinfo = pywikibot.tools.collections.EMPTY_DEFAULT
         self._paraminfo = DryParamInfo()
-        self._siteinfo = DummySiteinfo({})
+        # setup a default siteinfo used by dry tests
+        default_siteinfo = {'fileextensions': [{'ext': 'jpg'}]}
+        self._siteinfo = DummySiteinfo(default_siteinfo)
         self._siteinfo._cache['lang'] = (code, True)
         self._siteinfo._cache['case'] = (
             'case-sensitive' if self.family.name == 'wiktionary' else
