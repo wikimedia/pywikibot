@@ -1429,14 +1429,7 @@ class CheckImagesBot:
 
         # Don't put "}}" here, please. Useless and can give problems.
         something = ['{{']
-        # Allowed extensions
-        try:
-            allowed_formats = self.site.siteinfo.get(
-                'fileextensions', get_default=False)
-        except KeyError:
-            allowed_formats = []
-        else:
-            allowed_formats = [item['ext'].lower() for item in allowed_formats]
+        allowed_formats = self.site.file_extensions()  # Allowed extensions
         brackets = False
         delete = False
         notification = None
