@@ -14,6 +14,7 @@ import pywikibot
 import pywikibot.data.sparql as sparql
 from tests.aspects import TestCase, WikidataTestCase
 from tests.utils import skipping
+from pywikibot.exceptions import NoUsernameError
 
 
 # See: https://www.w3.org/TR/2013/REC-sparql11-results-json-20130321/
@@ -179,6 +180,33 @@ class TestSparql(WikidataTestCase):
         mock_method.return_value = Container(RESPONSE_FALSE)
         res = q.ask('ASK { ?x ?y ?z }')
         self.assertFalse(res)
+
+
+class TestCommonsQueryService(TestCase):
+    """Test Commons Query Service auth."""
+
+    family = 'commons'
+    code = 'commons'
+
+    def testLoginAndOauthPermisson(self):
+        """Commons Query Service Login and Oauth permission."""
+        # Define the SPARQL query
+        query = 'SELECT ?a ?b WHERE { ?a wdt:P9478 ?b } LIMIT 4'
+
+        # Set up the SPARQL endpoint and entity URL
+        # Note: https://commons-query.wikimedia.org
+        # requires user to be logged in
+
+        entity_url = 'https://commons.wikimedia.org/entity/'
+        endpoint = 'https://commons-query.wikimedia.org/sparql'
+
+        # Create a SparqlQuery object
+        query_object = sparql.SparqlQuery(endpoint=endpoint,
+                                          entity_url=entity_url)
+
+        # Execute the SPARQL query and retrieve the data user not logged in
+        with self.assertRaisesRegex(NoUsernameError, 'User not logged in'):
+            query_object.select(query, full_data=False)
 
 
 class Shared:
