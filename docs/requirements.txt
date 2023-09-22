@@ -3,4 +3,4 @@
 sphinx >= 7.2.3
 rstcheck >=6.1.2
 sphinxext-opengraph >= 0.8.2
-furo >= 2023.8.19
+furo >= 2023.9.10
