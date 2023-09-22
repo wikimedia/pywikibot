@@ -1464,28 +1464,20 @@ class TestMultiTemplateMatchBuilder(DefaultDrySiteTestCase):
         self.assertIsNone(re.search(builder.pattern('quick'), string))
 
     def test_match(self):
-        """Test text with one match without parameters."""
-        string = 'The {{quick}} brown fox'
+        """Test text with one match."""
+        tests = (
+            'The {{quick}} brown fox',  # without parameters
+            'The {{quick|brown}} fox',  # with parameters
+            'The {{msg:quick}} brown fox',  # with {{msg:..}}
+        )
         builder = MultiTemplateMatchBuilder(self.site)
-        self.assertIsNotNone(re.search(builder.pattern('quick'), string))
-        self.assertEqual(bool(re.search(builder.pattern('Quick'), string)),
-                         self._template_not_case_sensitive)
-
-    def test_match_with_params(self):
-        """Test text with one match with parameters."""
-        string = 'The {{quick|brown}} fox'
-        builder = MultiTemplateMatchBuilder(self.site)
-        self.assertIsNotNone(re.search(builder.pattern('quick'), string))
-        self.assertEqual(bool(re.search(builder.pattern('Quick'), string)),
-                         self._template_not_case_sensitive)
-
-    def test_match_msg(self):
-        """Test text with {{msg:..}}."""
-        string = 'The {{msg:quick}} brown fox'
-        builder = MultiTemplateMatchBuilder(self.site)
-        self.assertIsNotNone(re.search(builder.pattern('quick'), string))
-        self.assertEqual(bool(re.search(builder.pattern('Quick'), string)),
-                         self._template_not_case_sensitive)
+        for string in tests:
+            with self.subTest(string=string):
+                self.assertIsNotNone(
+                    re.search(builder.pattern('quick'), string))
+                self.assertEqual(
+                    bool(re.search(builder.pattern('Quick'), string)),
+                    self._template_not_case_sensitive)
 
     def test_match_template_prefix(self):
         """Test pages with {{template:..}}."""
