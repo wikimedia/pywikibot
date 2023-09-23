@@ -17,7 +17,7 @@ import pywikibot
 from pywikibot import login
 from pywikibot.backports import DefaultDict, Dict, List, Match
 from pywikibot.backports import OrderedDict as OrderedDictType
-from pywikibot.backports import Iterable, Pattern, Set, Tuple, removesuffix
+from pywikibot.backports import Iterable, Set, Tuple, removesuffix
 from pywikibot.comms import http
 from pywikibot.data import api
 from pywikibot.exceptions import (
@@ -1036,32 +1036,18 @@ class APISite(
             return self._magicwords[word]
         return [word]
 
-    def redirect(self) -> str:
-        """Return the localized #REDIRECT keyword."""
-        # return the magic word without the preceding '#' character
-        return self.getmagicwords('redirect')[0].lstrip('#')
+    def redirects(self) -> List[str]:
+        """Return a list of localized tags for the site without preceding '#'.
 
-    @deprecated('redirect_regex', since='5.5.0')
-    def redirectRegex(self) -> Pattern[str]:  # noqa: N802
-        """Return a compiled regular expression matching on redirect pages."""
-        return self.redirect_regex
+        .. seealso::
+           :meth:`BaseSite.redirect()
+           <pywikibot.site._basesite.BaseSite.redirect>` and
+           :meth:`BaseSite.redirects()
+           <pywikibot.site._basesite.BaseSite.redirects>`
 
-    @property
-    def redirect_regex(self) -> Pattern[str]:
-        """Return a compiled regular expression matching on redirect pages.
-
-        Group 1 in the regex match object will be the target title.
-
+        .. versionadded:: 8.4
         """
-        # NOTE: this is needed, since the API can give false positives!
-        try:
-            keywords = {s.lstrip('#') for s in self.getmagicwords('redirect')}
-            keywords.add('REDIRECT')  # just in case
-            pattern = '(?:' + '|'.join(keywords) + ')'
-        except KeyError:
-            # no localized keyword for redirects
-            pattern = None
-        return super().redirectRegex(pattern)
+        return [s.lstrip('#') for s in self.getmagicwords('redirect')]
 
     def pagenamecodes(self) -> List[str]:
         """Return list of localized PAGENAME tags for the site."""

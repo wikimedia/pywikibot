@@ -11,7 +11,7 @@ from typing import Optional
 from warnings import warn
 
 import pywikibot
-from pywikibot.backports import Pattern
+from pywikibot.backports import List, Pattern
 from pywikibot.exceptions import (
     Error,
     FamilyMaintenanceWarning,
@@ -242,26 +242,36 @@ class BaseSite(ComparableMixin):
         """Return dict of valid namespaces on this wiki."""
         return NamespacesDict(self._build_namespaces())
 
-    def ns_normalize(self, value):
-        """
-        Return canonical local form of namespace name.
+    def ns_normalize(self, value: str):
+        """Return canonical local form of namespace name.
 
         :param value: A namespace name
-        :type value: str
-
         """
         index = self.namespaces.lookup_name(value)
         return self.namespace(index)
 
-    def redirect(self):
-        """Return list of localized redirect tags for the site."""
+    def redirect(self) -> str:
+        """Return a default redirect tag for the site.
+
+        .. versionchanged:: 8.4
+           return a single generic redirect tag instead of a list of
+           tags. For the list use :meth:`redirects` instead.
+        """
+        return self.redirects()[0]
+
+    def redirects(self) -> List[str]:
+        """Return list of generic redirect tags for the site.
+
+        .. seealso:: :meth:`redirect` for the default redirect tag.
+        .. versionadded:: 8.4
+        """
         return ['REDIRECT']
 
-    def pagenamecodes(self):
+    def pagenamecodes(self) -> List[str]:
         """Return list of localized PAGENAME tags for the site."""
         return ['PAGENAME']
 
-    def pagename2codes(self):
+    def pagename2codes(self) -> List[str]:
         """Return list of localized PAGENAMEE tags for the site."""
         return ['PAGENAMEE']
 
@@ -337,22 +347,22 @@ class BaseSite(ComparableMixin):
         linkfam, linkcode = pywikibot.Link(text, self).parse_site()
         return linkfam != self.family.name or linkcode != self.code
 
-    def redirectRegex(  # noqa: N802
-        self,
-        pattern: Optional[str] = None
-    ) -> Pattern[str]:
+    @property
+    def redirect_regex(self) -> Pattern[str]:
         """Return a compiled regular expression matching on redirect pages.
 
         Group 1 in the regex match object will be the target title.
 
+        A redirect starts with hash (#), followed by a keyword, then
+        arbitrary stuff, then a wikilink. The wikilink may contain a
+        label, although this is not useful.
+
+        .. versionadded:: 8.4
+           moved from class:`APISite<pywikibot.site._apisite.APISite>`
         """
-        if pattern is None:
-            pattern = 'REDIRECT'
-        # A redirect starts with hash (#), followed by a keyword, then
-        # arbitrary stuff, then a wikilink. The wikilink may contain
-        # a label, although this is not useful.
-        return re.compile(r'\s*#{pattern}\s*:?\s*\[\[(.+?)(?:\|.*?)?\]\]'
-                          .format(pattern=pattern), re.IGNORECASE | re.DOTALL)
+        tags = '|'.join(self.redirects())
+        return re.compile(fr'\s*#(?:{tags})\s*:?\s*\[\[(.+?)(?:\|.*?)?\]\]',
+                          re.IGNORECASE | re.DOTALL)
 
     def sametitle(self, title1: str, title2: str) -> bool:
         """
