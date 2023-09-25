@@ -12,7 +12,7 @@ import threading
 from contextlib import suppress
 from queue import Queue
 from time import sleep as time_sleep
-from typing import Any, Optional, Union
+from typing import Any, Optional, Union, cast
 from urllib.parse import urlparse
 from warnings import warn
 
@@ -224,6 +224,7 @@ def Site(code: Optional[str] = None,  # noqa: 134
     if not isinstance(fam, Family):
         fam = Family.load(fam)
 
+    fam = cast(Family, fam)
     interface = interface or fam.interface(code)
 
     # config.usernames is initialised with a defaultdict for each family name
@@ -237,6 +238,7 @@ def Site(code: Optional[str] = None,  # noqa: 134
 
     if not isinstance(interface, type):
         # If it isn't a class, assume it is a string
+        interface = cast(str, interface)
         try:
             tmp = __import__('pywikibot.site', fromlist=[interface])
         except ImportError:
