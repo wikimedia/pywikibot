@@ -1429,7 +1429,7 @@ class CheckImagesBot:
 
         # Don't put "}}" here, please. Useless and can give problems.
         something = ['{{']
-        allowed_formats = self.site.file_extensions()  # Allowed extensions
+        allowed_formats = self.site.file_extensions  # Allowed extensions
         brackets = False
         delete = False
         notification = None
