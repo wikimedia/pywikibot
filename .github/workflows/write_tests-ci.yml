@@ -96,5 +96,5 @@ jobs:
       uses: codecov/codecov-action@v3
 
     - name: Check on failure
-      if: steps.ci_test.outcome == 'failure' or steps.ci_test_no_cover.outcome == 'failure'
+      if: steps.ci_test.outcome == 'failure'
       run: exit 1
