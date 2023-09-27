@@ -25,6 +25,7 @@ from pywikibot.backports import (
     FrozenSet,
     List,
     Mapping,
+    Sequence,
     Set,
     Tuple,
     removesuffix,
@@ -95,7 +96,7 @@ class Family:
         # Allocator will override this classproperty.
         return cls()
 
-    name = None
+    name: Optional[str] = None
 
     #: Not open for edits; stewards can still edit.
     closed_wikis: List[str] = []
@@ -113,7 +114,7 @@ class Family:
     langs: Dict[str, str] = {}
 
     # A list of category redirect template names in different languages
-    category_redirect_templates = {
+    category_redirect_templates: Dict[str, Sequence[str]] = {
         '_default': []
     }
 
@@ -121,7 +122,7 @@ class Family:
     use_hard_category_redirects = []
 
     # A list of disambiguation template names in different languages
-    disambiguationTemplates = {
+    disambiguationTemplates: Dict[str, Sequence[str]] = {
         '_default': []
     }
 
@@ -187,7 +188,7 @@ class Family:
     # forward interlanguage links to another family (wikipedia).
     # These families can set this variable to the name of the target
     # family.
-    interwiki_forward = None
+    interwiki_forward: Optional[str] = None
 
     # Language codes of the largest wikis. They should be roughly sorted
     # by size.
