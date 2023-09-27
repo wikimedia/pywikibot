@@ -1694,8 +1694,8 @@ class TestSiteLoadRevisions(TestCase):
             self.mysite.loadrevisions(self.mainpage,
                                       revids=130000)
 
-    def test_loadrevisions_querycontinue(self):
-        """Test the site.loadrevisions() method with query-continue."""
+    def test_loadrevisions_continue(self):
+        """Test the site.loadrevisions() method with continue."""
         self.mysite.loadrevisions(self.mainpage, step=5, total=12)
         self.assertLength(self.mainpage._revisions, 12)
 
