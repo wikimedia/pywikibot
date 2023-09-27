@@ -19,11 +19,11 @@ from pywikibot.backports import (
     Iterable,
     Match,
     List,
+    Pattern,
+    Tuple,
 )
 from pywikibot.backports import OrderedDict as OrderedDictType
-from pywikibot.backports import Pattern
 from pywikibot.backports import Sequence as SequenceType
-from pywikibot.backports import Tuple
 from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.family import Family
 from pywikibot.time import TZoneFixedOffset
@@ -382,7 +382,7 @@ def get_regexes(
 def replaceExcept(text: str,
                   old: Union[str, Pattern[str]],
                   new: Union[str, Callable[[Match[str]], str]],
-                  exceptions: List[Union[str, Pattern[str]]],
+                  exceptions: SequenceType[Union[str, Pattern[str]]],
                   caseInsensitive: bool = False,
                   allowoverlap: bool = False,
                   marker: str = '',
