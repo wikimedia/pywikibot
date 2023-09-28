@@ -32,16 +32,16 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     ]
 
     languages_by_size = [
-        'en', 'fr', 'mg', 'zh', 'ru', 'el', 'de', 'es', 'sh', 'ku', 'sv', 'nl',
+        'en', 'fr', 'mg', 'zh', 'ru', 'el', 'de', 'ku', 'es', 'sh', 'sv', 'nl',
         'pl', 'lt', 'ca', 'it', 'hu', 'fi', 'ta', 'pt', 'tr', 'ja', 'io', 'hy',
         'ko', 'kn', 'vi', 'sr', 'th', 'hi', 'ro', 'id', 'no', 'et', 'skr',
-        'cs', 'ml', 'my', 'uz', 'li', 'eo', 'or', 'te', 'fa', 'gl', 'sg', 'ar',
-        'oc', 'jv', 'is', 'az', 'uk', 'eu', 'ast', 'br', 'mnw', 'da', 'bn',
+        'cs', 'ml', 'my', 'uz', 'li', 'eo', 'or', 'te', 'fa', 'gl', 'sg', 'oc',
+        'ar', 'jv', 'is', 'az', 'uk', 'eu', 'ast', 'br', 'bn', 'mnw', 'da',
         'simple', 'lo', 'la', 'shn', 'hr', 'sk', 'fj', 'wa', 'ky', 'bg', 'lmo',
         'ur', 'cy', 'ps', 'tg', 'kbd', 'he', 'vo', 'om', 'sl', 'af',
         'zh-min-nan', 'ms', 'scn', 'tl', 'pa', 'fy', 'sw', 'kk', 'ka', 'nn',
         'min', 'lv', 'nds', 'gor', 'sq', 'lb', 'bs', 'co', 'mn', 'pnb', 'nah',
-        'yue', 'ckb', 'sa', 'km', 'diq', 'be', 'vec', 'tk', 'nia', 'mk', 'sm',
+        'yue', 'ckb', 'sa', 'km', 'diq', 'be', 'vec', 'nia', 'tk', 'mk', 'sm',
         'hsb', 'ks', 'shy', 'bcl', 'su', 'ga', 'btm', 'gd', 'an', 'gom', 'mr',
         'wo', 'mni', 'ha', 'ia', 'bjn', 'ang', 'mt', 'sd', 'tt', 'fo', 'blk',
         'so', 'si', 'gn', 'ie', 'mi', 'csb', 'ug', 'guw', 'st', 'hif', 'jbo',
