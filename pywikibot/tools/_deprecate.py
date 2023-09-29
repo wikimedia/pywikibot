@@ -19,7 +19,7 @@ a deprecator without any arguments.
    deprecation decorators moved to _deprecate submodule
 """
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -31,6 +31,7 @@ import re
 import sys
 import types
 from contextlib import suppress
+from functools import wraps
 from importlib import import_module
 from inspect import getfullargspec
 from typing import Any
@@ -428,6 +429,84 @@ def deprecated_args(**arg_pairs):
             wrapper.__signature__._parameters = params
 
         return wrapper
+    return decorator
+
+
+def deprecate_positionals(since: str = ''):
+    """Decorator for methods that issues warnings for positional arguments.
+
+    This decorator allowes positional arguments after keyword-only
+    argument syntax (:pep:`3102`) but throws a FutureWarning. The
+    decorator makes the needed argument updates before passing them to
+    the called function or method. This decorator may be used for a
+    deprecation period when require keyword-only arguments.
+
+    Example:
+
+        .. code-block:: python
+
+            @deprecate_positionals(since='9.2.0')
+            def f(posarg, *, kwarg):
+               ...
+
+            f('foo', 'bar')
+
+        This function call passes but throws a FutureWarning. Without
+        decorator a TypeError would be raised.
+
+    .. caution:: The decorated function may not use ``*args`` or
+       ``**kwargs``. The sequence of keyword-only arguments must match
+       the sequence of the old positional arguments, otherwise the
+       assignment of the arguments to the keyworded arguments will fail.
+    .. versionadded:: 9.2
+
+    :param since: a version string when some positional arguments were
+        deprecated
+    """
+    def decorator(func):
+        """Outer wrapper. Inspect the parameters of *func*.
+
+        :param func: function or method beeing wrapped.
+        """
+
+        @wraps(func)
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
+            """Throws the warning and makes the argument fixing.
+
+            :param args: args passed to the decorated functoin or method
+            :param kwargs: kwargs passed to the decorated function or
+                method
+            :return: the value returned by the decorated function or
+                method
+            """
+            if len(args) > positionals:
+                replace_args = list(zip(arg_keys[positionals:],
+                                        args[positionals:]))
+                pos_args = "', '".join(name for name, arg in replace_args)
+                keyw_args = ', '.join('{}={!r}'.format(name, arg)
+                                      for name, arg in replace_args)
+                issue_deprecation_warning(
+                    f"Passing '{pos_args}' as positional "
+                    f'argument(s) to {func.__qualname__}()',
+                    f'keyword arguments like {keyw_args}',
+                    since=since)
+
+                args = args[:positionals]
+                kwargs.update(replace_args)
+
+            return func(*args, **kwargs)
+
+        sig = inspect.signature(func)
+        arg_keys = list(sig.parameters)
+
+        # find the first KEYWORD_ONLY index
+        for positionals, key in enumerate(arg_keys):
+            if sig.parameters[key].kind in (inspect.Parameter.KEYWORD_ONLY,
+                                            inspect.Parameter.VAR_KEYWORD):
+                break
+
+        return wrapper
+
     return decorator
 
 
