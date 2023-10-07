@@ -55,8 +55,8 @@ init:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
 
 install:
-  - if [%PYTHON_VERSION%]==[3.6.6] GIT_SSL_NO_VERIFY = git submodule update --init
-  - if NOT [%PYTHON_VERSION%]==[3.6.6] git submodule update --init
+  - if [%PYTHON_VERSION%]==[3.6.6] set GIT_SSL_NO_VERIFY=true
+  - git submodule update --init
   # Download the AppVeyor Python build accessories into subdirectory .\appveyor
   - mkdir appveyor
   - python --version
