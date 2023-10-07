@@ -1,6 +1,15 @@
 Release history
 ===============
 
+8.3.3
+-----
+*20. September 2023*
+
+* Extract code and family from dbname in :meth:`site.APISite.fromDBName()
+  <pywikibot.site._apisite.APISite.fromDBName>` (:phab:`T345036`)
+* L10N and i18n updates
+
+
 8.3.2
 -----
 *29. August 2023*
@@ -166,6 +175,7 @@ Improvements
   :meth:`Category.members()<page.Category.members>`,
   :meth:`Category.subcategories()<page.Category.subcategories>` (*member_type* excluded) and
   :meth:`Category.articles()<page.Category.articles>` (*member_type* excluded)
+  (:phab:`T102406`)
 * Enable site-package installation from git repository (:phab:`T320851`)
 * Enable 2FA login (:phab:`T186274`)
 * :meth:`Page.editTime()<page.BasePage.editTime>` was replaced by

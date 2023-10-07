@@ -2363,7 +2363,6 @@ class WikidataBot(Bot, ExistingPageBot):
         :return: pywikibot.ItemPage or None
         """
         if not summary:
-            # FIXME: i18n
             summary = 'Bot: New item with sitelink from {}'.format(
                       page.title(as_link=True, insite=self.repo))
 

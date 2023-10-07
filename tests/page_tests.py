@@ -263,6 +263,14 @@ class TestPageObjectEnglish(TestCase):
             p2.title(as_link=True, textlink=True,
                      with_ns=False, insite=site),
             '[[:File:Jean-Léon Gérôme 003.jpg|Jean-Léon Gérôme 003.jpg]]')
+        for title in (
+            'Help:Example',  # wrong namespace
+            'File:Example',  # no file extension
+            'File:Example #3.jpg',  # file extension in section
+        ):
+            with self.subTest(title=title):
+                with self.assertRaises(ValueError):
+                    pywikibot.FilePage(site, title)
 
     def testImageAndDataRepository(self):
         """Test image_repository and data_repository page attributes."""

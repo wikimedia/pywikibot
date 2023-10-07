@@ -240,13 +240,7 @@ class UploadRobot(BaseBot):
         # FIXME: these 2 belong somewhere else, presumably in family
         # forbidden characters are handled by pywikibot/page.py
         forbidden = ':*/\\'  # to be extended
-        try:
-            allowed_formats = self.target_site.siteinfo.get(
-                'fileextensions', get_default=False)
-        except KeyError:
-            allowed_formats = []
-        else:
-            allowed_formats = [item['ext'] for item in allowed_formats]
+        allowed_formats = self.target_site.file_extensions
 
         # ask until it's valid
         first_check = True

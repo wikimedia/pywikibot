@@ -5,6 +5,11 @@
     max-width: 75%;
 }
 
+/** centering sidebar branding text as a workaround **/
+.sidebar-brand {
+    text-align: center;
+}
+
 /** brand text in the sidebar smaller than default **/
 .sidebar-brand-text {
     font-size: 1rem;

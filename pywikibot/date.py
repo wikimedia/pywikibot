@@ -69,17 +69,23 @@ decoder_type = Union[
 
 
 @singledispatch
-def multi(value: int, tuplst: tuplst_type) -> Any:
-    """
-    Run multiple pattern checks for the same entry.
+def multi(value, tuplst: tuplst_type) -> Any:
+    """Run multiple pattern checks for the same entry.
 
     For example: 1st century, 2nd century, etc.
 
-    The tuplst is a list of tuples. Each tuple must contain two functions:
-    first to encode/decode a single value (e.g. simpleInt), second is a
-    predicate function with an integer parameter that returns true or false.
-    When the 2nd function evaluates to true, the 1st function is used.
+    The tuplst is a list of tuples. Each tuple must contain two
+    functions: first to encode/decode a single value (e.g. simpleInt),
+    second is a predicate function with an integer parameter that
+    returns true or false. When the 2nd function evaluates to true, the
+    1st function is used.
     """
+    raise NotImplementedError(
+        f'multi funtion is not implemented for type {type(value).__name__}')
+
+
+@multi.register(int)
+def _(value: int, tuplst: tuplst_type) -> Any:
     # Find a predicate that gives true for this int value, and run a
     # function
     for func, pred in tuplst:

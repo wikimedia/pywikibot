@@ -164,8 +164,8 @@ class suppress_warnings(catch_warnings):  # noqa: N801
 
     """A decorator/context manager that temporarily suppresses warnings.
 
-    Those suppressed warnings that do not match the parameters will be raised
-    shown upon exit.
+    Those suppressed warnings that do not match the parameters will be
+    raised shown upon exit.
 
     .. versionadded:: 3.0
     """
@@ -181,13 +181,14 @@ class suppress_warnings(catch_warnings):  # noqa: N801
         The parameter semantics are similar to those of
         `warnings.filterwarnings`.
 
-        :param message: A string containing a regular expression that the start
-            of the warning message must match. (case-insensitive)
-        :param category: A class (a subclass of Warning) of which the warning
-            category must be a subclass in order to match.
+        :param message: A string containing a regular expression that
+            the start of the warning message must match.
+            (case-insensitive)
+        :param category: A class (a subclass of Warning) of which the
+            warning category must be a subclass in order to match.
         :type category: type
-        :param filename: A string containing a regular expression that the
-            start of the path to the warning module must match.
+        :param filename: A string containing a regular expression that
+            the start of the path to the warning module must match.
             (case-sensitive)
         """
         self.message_match = re.compile(message, re.I).match
@@ -424,16 +425,16 @@ class MediaWikiVersion:
     """
     Version object to allow comparing 'wmf' versions with normal ones.
 
-    The version mainly consist of digits separated by periods. After that is a
-    suffix which may only be 'wmf<number>', 'alpha', 'beta<number>' or
-    '-rc.<number>' (the - and . are optional). They are considered from old to
-    new in that order with a version number without suffix is considered the
-    newest. This secondary difference is stored in an internal _dev_version
-    attribute.
+    The version mainly consist of digits separated by periods. After
+    that is a suffix which may only be 'wmf<number>', 'alpha',
+    'beta<number>' or '-rc.<number>' (the - and . are optional). They
+    are considered from old to new in that order with a version number
+    without suffix is considered the newest. This secondary difference
+    is stored in an internal _dev_version attribute.
 
-    Two versions are equal if their normal version and dev version are equal. A
-    version is greater if the normal version or dev version is greater. For
-    example::
+    Two versions are equal if their normal version and dev version are
+    equal. A version is greater if the normal version or dev version is
+    greater. For example::
 
         1.34 < 1.34.1 < 1.35wmf1 < 1.35alpha < 1.35beta1 < 1.35beta2
         < 1.35-rc-1 < 1.35-rc.2 < 1.35
@@ -533,8 +534,8 @@ class SelfCallMixin:
     """
     Return self when called.
 
-    When '_own_desc' is defined it'll also issue a deprecation warning using
-    issue_deprecation_warning('Calling ' + _own_desc, 'it directly').
+    When '_own_desc' is defined it'll also issue a deprecation warning
+    using issue_deprecation_warning('Calling ' + _own_desc, 'it directly').
 
     .. versionadded:: 3.0
     .. deprecated:: 6.2
@@ -570,33 +571,37 @@ def open_archive(filename: str, mode: str = 'rb', use_extension: bool = True):
     """
     Open a file and uncompress it if needed.
 
-    This function supports bzip2, gzip, 7zip, lzma, and xz as compression
-    containers. It uses the packages available in the standard library for
-    bzip2, gzip, lzma, and xz so they are always available. 7zip is only
-    available when a 7za program is available and only supports reading
-    from it.
+    This function supports bzip2, gzip, 7zip, lzma, and xz as
+    compression containers. It uses the packages available in the
+    standard library for bzip2, gzip, lzma, and xz so they are always
+    available. 7zip is only available when a 7za program is available
+    and only supports reading from it.
 
-    The compression is either selected via the magic number or file ending.
+    The compression is either selected via the magic number or file
+    ending.
 
     .. versionadded:: 3.0
 
     :param filename: The filename.
-    :param use_extension: Use the file extension instead of the magic number
-        to determine the type of compression (default True). Must be True when
-        writing or appending.
-    :param mode: The mode in which the file should be opened. It may either be
-        'r', 'rb', 'a', 'ab', 'w' or 'wb'. All modes open the file in binary
-        mode. It defaults to 'rb'.
+    :param use_extension: Use the file extension instead of the magic
+        number to determine the type of compression (default True). Must
+        be True when writing or appending.
+    :param mode: The mode in which the file should be opened. It may
+        either be 'r', 'rb', 'a', 'ab', 'w' or 'wb'. All modes open the
+        file in binary mode. It defaults to 'rb'.
     :raises ValueError: When 7za is not available or the opening mode is
         unknown or it tries to write a 7z archive.
-    :raises FileNotFoundError: When the filename doesn't exist and it tries
-        to read from it or it tries to determine the compression algorithm.
-    :raises OSError: When it's not a 7z archive but the file extension is 7z.
-        It is also raised by bz2 when its content is invalid. gzip does not
-        immediately raise that error but only on reading it.
+    :raises FileNotFoundError: When the filename doesn't exist and it
+        tries to read from it or it tries to determine the compression
+        algorithm.
+    :raises OSError: When it's not a 7z archive but the file extension
+        is 7z. It is also raised by bz2 when its content is invalid.
+        gzip does not immediately raise that error but only on reading
+        it.
     :raises lzma.LZMAError: When error occurs during compression or
         decompression or when initializing the state with lzma or xz.
-    :return: A file-like object returning the uncompressed data in binary mode.
+    :return: A file-like object returning the uncompressed data in
+        binary mode.
     :rtype: file-like object
     """
     # extension_map maps magic_number to extension.
@@ -671,8 +676,9 @@ def merge_unique_dicts(*args, **kwargs):
     """
     Return a merged dict and make sure that the original dicts keys are unique.
 
-    The positional arguments are the dictionaries to be merged. It is also
-    possible to define an additional dict using the keyword arguments.
+    The positional arguments are the dictionaries to be merged. It is
+    also possible to define an additional dict using the keyword
+    arguments.
 
     .. versionadded:: 3.0
     """

@@ -25,6 +25,11 @@ scripts.maintenance.make\_i18n\_dict
 
 .. automodule:: scripts.maintenance.make_i18n_dict
 
+scripts.maintenance.unidata
+---------------------------
+
+.. automodule:: scripts.maintenance.unidata
+
 scripts.maintenance.wikimedia\_sites
 ------------------------------------
 

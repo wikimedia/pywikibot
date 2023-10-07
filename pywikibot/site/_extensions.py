@@ -546,6 +546,28 @@ class FlowMixin:
         data = req.submit()
         return data['flow']['moderate-topic']['committed']['topic']
 
+    def summarize_topic(self, page, summary):
+        """
+        Add summary to Flow topic.
+
+        :param page: A Flow topic
+        :type page: Topic
+        :param summary: The text of the summary
+        :type symmary: str
+        :return: Metadata returned by the API
+        :rtype: dict
+        """
+        token = self.tokens['csrf']
+        params = {'action': 'flow', 'page': page, 'token': token,
+                  'submodule': 'edit-topic-summary', 'etssummary': summary,
+                  'etsformat': 'wikitext'}
+        if 'summary' in page.root._current_revision.keys():
+            params['etsprev_revision'] = page.root._current_revision[
+                'summary']['revision']['revisionId']
+        req = self._request(parameters=params, use_get=False)
+        data = req.submit()
+        return data['flow']['edit-topic-summary']['committed']['topicsummary']
+
     @need_right('flow-delete')
     @need_extension('Flow')
     def delete_topic(self, page, reason):

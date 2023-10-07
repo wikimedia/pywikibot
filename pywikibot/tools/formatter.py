@@ -1,13 +1,13 @@
 """Module containing various formatting related utilities."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2023
 #
 # Distributed under the terms of the MIT license.
 #
 import math
 import re
 
-from pywikibot.logging import output
+from pywikibot.logging import info
 from pywikibot.tools import deprecated
 from pywikibot.userinterfaces import terminal_interface_base
 
@@ -60,7 +60,7 @@ class SequenceOutputter:
 
     def output(self) -> None:
         """Output the text of the current sequence."""
-        output(self.out)
+        info(self.out)
 
 
 @deprecated('New color format pattern like <<color>>colored text<<default>>',

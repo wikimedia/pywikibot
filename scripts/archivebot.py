@@ -428,7 +428,7 @@ class DiscussionPage(pywikibot.Page):
         if (unit == 'B' and self_size >= size
             or unit == 'T' and len(self.threads) >= size
                 or self_size > self.archiver.maxsize):
-            self.full = True  # xxx: this is one-way flag
+            self.full = True  # note: this is one-way flag
         return self.full
 
     def feed_thread(self, thread: DiscussionThread,
@@ -691,7 +691,7 @@ class PageArchiver:
                     raise MalformedConfigError(e)
 
             threads_per_archive[key].append((i, thread))
-            whys.add(why)  # xxx: we don't know if we ever archive anything
+            whys.add(why)  # FIXME: we don't know if we ever archive anything
 
         params = self.get_params(self.now, counter)
         aux_params = self.get_params(self.now, counter + 1)

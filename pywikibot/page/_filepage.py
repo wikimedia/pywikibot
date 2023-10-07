@@ -32,18 +32,37 @@ __all__ = (
 
 class FilePage(Page):
 
-    """
-    A subclass of Page representing a file description page.
+    """A subclass of Page representing a file description page.
 
-    Supports the same interface as Page, with some added methods.
+    Supports the same interface as Page except *ns*; some added methods.
     """
 
     def __init__(self, source, title: str = '') -> None:
-        """Initializer."""
+        """Initializer.
+
+        .. versionchanged:: 8.4
+           check for valid extensions.
+
+        :param source: the source of the page
+        :type source: pywikibot.page.BaseLink (or subclass),
+            pywikibot.page.Page (or subclass), or pywikibot.page.Site
+        :param title: normalized title of the page; required if source is a
+            Site, ignored otherwise
+        :raises ValueError: Either the title is not in the file
+            namespace or does not have a valid extension.
+        """
         self._file_revisions = {}  # dictionary to cache File history.
         super().__init__(source, title, 6)
         if self.namespace() != 6:
             raise ValueError(f"'{self.title()}' is not in the file namespace!")
+
+        title = self.title(with_ns=False, with_section=False)
+        _, sep, extension = title.rpartition('.')
+        if not sep or extension.lower() not in self.site.file_extensions:
+            raise ValueError(
+                f'{title!r} does not have a valid extension '
+                f'({", ".join(self.site.file_extensions)}).'
+            )
 
     def _load_file_revisions(self, imageinfo) -> None:
         for file_rev in imageinfo:

@@ -12,7 +12,7 @@ import threading
 from contextlib import suppress
 from queue import Queue
 from time import sleep as time_sleep
-from typing import Any, Optional, Union
+from typing import Any, Optional, Union, cast
 from urllib.parse import urlparse
 from warnings import warn
 
@@ -74,7 +74,7 @@ from pywikibot.logging import (
 )
 from pywikibot.site import APISite, BaseSite
 from pywikibot.time import Timestamp
-from pywikibot.tools import normalize_username
+from pywikibot.tools import PYTHON_VERSION, normalize_username
 
 __all__ = (
     '__copyright__', '__description__', '__download_url__', '__license__',
@@ -98,6 +98,16 @@ if not hasattr(sys.modules[__name__], 'argvu'):
 link_regex = re.compile(r'\[\[(?P<title>[^\]|[<>{}]*)(\|.*?)?\]\]')
 
 _sites: Dict[str, APISite] = {}
+
+if PYTHON_VERSION < (3, 7):
+    warn("""
+
+        Python {version} will be dropped soon with Pywikibot 9.0
+        due to vulnerability security alerts.
+        It is recommended to use Python 3.7 or above.
+        See T347026 for further information.
+""".format(version=sys.version.split(maxsplit=1)[0]),
+         FutureWarning)  # adjust this line no in utils.execute()
 
 
 @cache
@@ -224,6 +234,7 @@ def Site(code: Optional[str] = None,  # noqa: 134
     if not isinstance(fam, Family):
         fam = Family.load(fam)
 
+    fam = cast(Family, fam)
     interface = interface or fam.interface(code)
 
     # config.usernames is initialised with a defaultdict for each family name
@@ -237,6 +248,7 @@ def Site(code: Optional[str] = None,  # noqa: 134
 
     if not isinstance(interface, type):
         # If it isn't a class, assume it is a string
+        interface = cast(str, interface)
         try:
             tmp = __import__('pywikibot.site', fromlist=[interface])
         except ImportError:

@@ -217,7 +217,7 @@ class WikibaseEntity:
         :raise NoWikibaseEntityError: if the entity doesn't exist
         """
         if not hasattr(self, '_revid'):
-            # fixme: unlike BasePage.latest_revision_id, this raises
+            # FIXME: unlike BasePage.latest_revision_id, this raises
             # exception when entity is redirect, cannot use get_redirect
             self.get()
         return self._revid
@@ -275,7 +275,7 @@ class WikibaseEntity:
             value = cls.fromJSON(self._content.get(key, {}), self.repo)
             setattr(self, key, value)
             data[key] = value
-            # xxx: need better handling for this
+            # fixme: need better handling for this
             if key in ['claims', 'statements']:
                 value.set_on_item(self)
 
@@ -408,6 +408,12 @@ class MediaInfo(WikibaseEntity):
 
         return self._file
 
+    def get_data_for_new_entity(self) -> dict:
+        """Return data required for creation of a new mediainfo."""
+        self.id = 'M' + str(self.file.pageid)
+        self._content = {}
+        return super().get()
+
     def get(self, force: bool = False) -> dict:
         """Fetch all MediaInfo entity data and cache it.
 
@@ -426,6 +432,8 @@ class MediaInfo(WikibaseEntity):
                 try:
                     data = self.file.latest_revision.slots['mediainfo']['*']
                 except NoPageError as exc:
+                    raise NoWikibaseEntityError(self) from exc
+                except KeyError as exc:
                     raise NoWikibaseEntityError(self) from exc
 
                 self._content = jsonlib.loads(data)
@@ -2050,7 +2058,7 @@ class LexemePage(WikibasePage):
 
     def get_data_for_new_entity(self):
         """Return data required for creation of a new lexeme."""
-        raise NotImplementedError  # todo
+        raise NotImplementedError  # TODO
 
     def toJSON(self, diffto: Optional[dict] = None) -> dict:
         """

@@ -464,7 +464,7 @@ class ClientLoginManager(LoginManager):
 
     @deprecated("site.tokens['login']", since='8.0.0')
     def get_login_token(self) -> Optional[str]:
-        """Fetch login token for MediaWiki 1.27+.
+        """Fetch login token.
 
         .. deprecated:: 8.0
 

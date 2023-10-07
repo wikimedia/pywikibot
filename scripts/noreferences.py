@@ -73,6 +73,12 @@ placeBeforeSections = {
         'Enllaços externs',
         'Enllaços',
     ],
+    'ckb': [
+        'خوێندنەوەی زیاتر',
+        'بەستەرە دەرەکییەکان',
+        'ئەمانەش ببینە',
+        'تێبینییەکان'
+    ],
     'cs': [
         'Externí odkazy',
         'Poznámky',
@@ -261,6 +267,9 @@ referencesSections = {
         'ca': [
             'Referències',
         ],
+        'ckb': [
+            'سەرچاوەکان',
+        ],
         'cs': [
             'Reference',
             'Poznámky',
@@ -423,6 +432,8 @@ referencesTemplates = {
         'ca': ['Referències', 'Reflist', 'Listaref', 'Referència',
                'Referencies', 'Referències2',
                'Amaga', 'Amaga ref', 'Amaga Ref', 'Amaga Ref2', 'Apèndix'],
+        'ckb': ['Reflist', 'Refs', 'Reference', 'ژێدەرەکان', 'سەرچاوەکان',
+                'پەراوێز', 'پەراوێزەکان', 'پەڕاوێزەکان'],
         'da': ['Reflist'],
         'dsb': ['Referency'],
         'en': ['Reflist', 'Refs', 'FootnotesSmall', 'Reference',
@@ -472,6 +483,7 @@ referencesSubstitute = {
         'ary': '{{مراجع}}',
         'arz': '{{مصادر}}',
         'be': '{{зноскі}}',
+        'ckb': '{{سەرچاوەکان}}',
         'da': '{{reflist}}',
         'dsb': '{{referency}}',
         'fa': '{{پانویس}}',

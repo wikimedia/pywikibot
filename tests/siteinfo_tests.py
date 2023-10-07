@@ -53,20 +53,17 @@ class TestSiteInfo(DefaultSiteTestCase):
         self.assertIsInstance(mysite.namespaces[0].subpages, bool)
         self.assertIsInstance(mysite.namespaces[0].content, bool)
 
-    def test_properties_with_defaults(self):
-        """Test the siteinfo properties with defaults."""
-        # This does not test that the defaults work correct,
-        # unless the default site is a version needing these defaults
+    def test_properties(self):
+        """Test the siteinfo properties."""
         # 'fileextensions' introduced in v1.15:
-        self.assertIsInstance(self.site.siteinfo.get('fileextensions'), list)
         self.assertIn('fileextensions', self.site.siteinfo)
         fileextensions = self.site.siteinfo.get('fileextensions')
+        self.assertIsInstance(fileextensions, list)
         self.assertIn({'ext': 'png'}, fileextensions)
         # 'restrictions' introduced in v1.23:
-        mysite = self.site
-        self.assertIsInstance(mysite.siteinfo.get('restrictions'), dict)
-        self.assertIn('restrictions', mysite.siteinfo)
+        self.assertIn('restrictions', self.site.siteinfo)
         restrictions = self.site.siteinfo.get('restrictions')
+        self.assertIsInstance(restrictions, dict)
         self.assertIn('cascadinglevels', restrictions)
 
     def test_no_cache(self):

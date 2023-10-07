@@ -185,8 +185,8 @@ locale.setlocale(locale.LC_ALL, '')
 # been eliminated.
 # FIXME: Not all language/project combinations have been defined yet.
 #        Add the following strings to customise for a language:
-#        logbook, netext, report_page, bad_pag, report_text, random_sign,
-#        whitelist_pg, final_new_text_additions, logpage_header if
+#        LOGBOOK, WELCOME, REPORT_PAGE, BAD_PAGE, REPORT_TEXT, RANDOM_SIGN,
+#        WHITELIST, FINAL_NEW_TEXT_ADDITIONS, LOGPAGE_HEADER if
 #        different from Wikipedia entry
 
 ############################################################################
@@ -194,8 +194,9 @@ locale.setlocale(locale.LC_ALL, '')
 # The page where the bot will save the log (e.g. Wikipedia:Welcome log).
 #
 # ATTENTION: Projects not listed won't write a log to the wiki.
-logbook = {
+LOGBOOK = {
     'ar': 'Project:سجل الترحيب',
+    'ckb': 'Project:لۆگی بەخێرھاتن',
     'fr': ('Wikipedia:Prise de décision/'
            'Accueil automatique des nouveaux par un robot/log'),
     'ga': 'Project:Log fáilte',
@@ -211,8 +212,9 @@ logbook = {
 # The text for the welcome message (e.g. {{welcome}}) and %s at the end
 # that is your signature (the bot has a random parameter to add different
 # sign, so in this way it will change according to your parameters).
-netext = {
+WELCOME = {
     'commons': '{{subst:welcome}} %s',
+    'meta': '{{subst:Welcome}} %s',
     'wikipedia': {
         'am': '{{subst:Welcome}} %s',
         'ar': '{{subst:أهلا ومرحبا}} %s',
@@ -222,20 +224,25 @@ netext = {
         'ba': '{{Hello}} %s',
         'bn': '{{subst:স্বাগতম/বট}} %s',
         'bs': '{{Dobrodošlica}} %s',
+        'ckb': '{{subst:بەخێرھاتن}} %s',
         'da': '{{velkommen|%s}}',
+        'de': '{{subst:willkommen}} %s',
         'en': '{{subst:welcome}} %s',
-        'fa': '{{جا:خوشامد}} %s',
-        'fr': '{{subst:Discussion Projet:Aide/Bienvenue}} %s',
+        'fa': '{{subst:خوشامدید|%s}}',
+        'fr': '{{Bienvenue nouveau}} %s',
         'ga': '{{subst:fáilte}} %s',
         'gom': '{{subst:welcome}} %s',
         'gor': '{{subst:Welcome}} %s',
         'he': '{{ס:ברוך הבא}} %s',
         'hr': '{{subst:dd}} %s',
+        'hu': '{{subst:Üdvözlet|%s}}\n',
         'id': '{{subst:sdbot2}}\n%s',
-        'it': '<!-- inizio template di benvenuto -->\n{{subst:Benvebot}}\n%s',
+        'it': '<!-- inizio template di benvenuto -->\n{{subst:Benvebot}}\n%s'
+              '<!-- fine template di benvenuto -->',
         'ja': '{{subst:Welcome/intro}}\n{{subst:welcome|%s}}',
         'ka': '{{ახალი მომხმარებელი}}--%s',
         'kn': '{{subst:ಸುಸ್ವಾಗತ}} %s',
+        'ko': '{{환영}}--%s\n',
         'ml': '{{ബദൽ:സ്വാഗതം/bot}} %s',
         'my': '{{subst:welcome}} %s',
         'nap': '{{Bemmenuto}}%s',
@@ -244,11 +251,12 @@ netext = {
         'pdc': '{{subst:Wilkum}}%s',
         'pt': '{{subst:bem vindo}} %s',
         'roa-tara': '{{Bovègne}} %s',
-        'ru': '{{Hello}} %s',
-        'sd': '{{subst:ڀليڪار}} %s',
+        'ru': '{{subst:Приветствие}}\n%s\n',
+        'sd': '{{ڀليڪار}}\n%s\n',
         'shn': '{{subst:ႁပ်ႉတွၼ်ႈၽူႈၸႂ်ႉတိုဝ်း}} %s',
         'sq': '{{subst:tung}} %s',
-        'sr': '{{Добродошлица}} %s',
+        'sr': '{{dd}}--%s\n',
+        'ta': '{{welcome}}\n%s\n',
         'ur': '{{نقل:خوش آمدید}}%s',
         'vec': '{{subst:Benvegnù|%s}}',
         'vo': '{{benokömö}} %s',
@@ -292,12 +300,13 @@ netext = {
     },
 }
 # The page where the bot will report users with a possibly bad username.
-report_page = {
+REPORT_PAGE = {
     'commons': ("Project:Administrators'noticeboard/User problems/Usernames"
                 'to be checked'),
     'wikipedia': {
         'am': 'User:Beria/Report',
         'ar': 'Project:إخطار الإداريين/أسماء مستخدمين للفحص',
+        'ckb': 'Project:لۆگی بەخێرھاتن/پشکنینی ناوی بەکارھێنەران',
         'da': 'Bruger:Broadbot/Report',
         'en': 'Project:Administrator intervention against vandalism',
         'fa': 'Project:تابلوی اعلانات مدیران/گزارش ربات',
@@ -318,11 +327,12 @@ report_page = {
 }
 # The page where the bot reads the real-time bad words page
 # (this parameter is optional).
-bad_pag = {
+BAD_PAGE = {
     'commons': 'Project:Welcome log/Bad_names',
     'wikipedia': {
         'am': 'User:Beria/Bad_names',
         'ar': 'Project:سجل الترحيب/أسماء سيئة',
+        'ckb': 'Project:لۆگی بەخێرھاتن/ناوە_خراپەکان',
         'en': 'Project:Welcome log/Bad_names',
         'fa': 'Project:سیاهه خوشامد/نام بد',
         'it': 'Project:Benvenuto_Bot/Lista_Badwords',
@@ -341,12 +351,13 @@ timeselected = ' ~~~~~'  # Defining the time used after the signature
 
 # The text for reporting a possibly bad username
 # e.g. *[[Talk_page:Username|Username]]).
-report_text = {
+REPORT_TEXT = {
     'commons': '\n*{{user3|%s}}' + timeselected,
     'wikipedia': {
         'am': '\n*[[User talk:%s]]' + timeselected,
         'ar': '\n*{{user13|%s}}' + timeselected,
         'bs': '\n{{Korisnik|%s}}' + timeselected,
+        'ckb': '\n*{{بەستەرەکانی بەکارھێنەر|%s}} ' + timeselected,
         'da': '\n*[[Bruger Diskussion:%s]] ' + timeselected,
         'de': '\n*[[Benutzer Diskussion:%s]] ' + timeselected,
         'en': '\n*{{Userlinks|%s}} ' + timeselected,
@@ -365,10 +376,11 @@ report_text = {
 }
 # Set where you load your list of signatures that the bot will load if you use
 # the random argument (this parameter is optional).
-random_sign = {
+RANDOM_SIGN = {
     'am': 'User:Beria/Signatures',
     'ar': 'Project:سجل الترحيب/توقيعات',
     'ba': 'Ҡатнашыусы:Salamat bot/Ярҙам',
+    'ckb': 'Project:لۆگی بەخێرھاتن/واژوو',
     'da': 'Wikipedia:Velkommen/Signaturer',
     'en': 'Project:Welcome log/Sign',
     'fa': 'Project:سیاهه خوشامد/امضاها',
@@ -385,7 +397,7 @@ random_sign = {
 }
 # The page where the bot reads the real-time whitelist page.
 # (this parameter is optional).
-whitelist_pg = {
+WHITELIST = {
     'ar': 'Project:سجل الترحيب/قائمة بيضاء',
     'en': 'User:Filnik/whitelist',
     'ga': 'Project:Log fáilte/Bánliosta',
@@ -395,14 +407,14 @@ whitelist_pg = {
 
 # Text after the {{welcome}} template, if you want to add something
 # Default (en): nothing.
-final_new_text_additions = {
+FINAL_NEW_TEXT_ADDITIONS = {
     'it': '\n<!-- fine template di benvenuto -->',
     'zh': '<small>(via ~~~)</small>',
 }
 
 #
 #
-logpage_header = {
+LOGPAGE_HEADER = {
     '_default': '{|border="2" cellpadding="4" cellspacing="0" style="margin: '
                 '0.5em 0.5em 0.5em 1em; padding: 0.5em; background: #bfcda5; '
                 'border: 1px #b6fd2c solid; border-collapse: collapse; '
@@ -459,6 +471,20 @@ class Global:
     quiet = False            # Users without contributions aren't displayed
 
 
+def get_welcome_text(site: pywikibot.site.BaseSite) -> str:
+    """Check that site is managed by the script and return the message.
+
+    :raises KeyError: site is not in WELCOME dict
+    """
+    msg = i18n.translate(site, WELCOME)
+    if not msg:
+        script = pywikibot.calledModuleName()
+        welcome = 'welcome.' if script != 'welcome' else ''
+        raise KeyError(f'{script}.py is not localized for site {site} in '
+                       f'{welcome}WELCOME dict.')
+    return msg
+
+
 class WelcomeBot(SingleSiteBot):
 
     """Bot to add welcome messages on User pages."""
@@ -466,25 +492,16 @@ class WelcomeBot(SingleSiteBot):
     def __init__(self, **kwargs) -> None:
         """Initializer."""
         super().__init__(**kwargs)
-        self.check_managed_sites()
+        self.welcome_text = get_welcome_text(self.site)
         self.bname: Dict[str, str] = {}
 
         self.welcomed_users: List[str] = []
-        self.log_name = i18n.translate(self.site, logbook)
+        self.log_name = i18n.translate(self.site, LOGBOOK)
 
         if not self.log_name:
             globalvar.make_welcome_log = False
         if globalvar.random_sign:
             self.define_sign(True)
-
-    def check_managed_sites(self) -> None:
-        """Check that site is managed by welcome.py."""
-        # Raises KeyError if site is not in netext dict.
-        site_netext = i18n.translate(self.site, netext)
-        if site_netext is None:
-            raise KeyError(f'welcome.py is not localized for site {self.site}'
-                           ' in netext dict.')
-        self.welcome_text = site_netext
 
     def bad_name_filer(self, name, force: bool = False) -> bool:
         """Check for bad names."""
@@ -532,8 +549,7 @@ class WelcomeBot(SingleSiteBot):
 
             # blacklist from wikipage
             badword_page = pywikibot.Page(self.site,
-                                          i18n.translate(self.site,
-                                                         bad_pag))
+                                          i18n.translate(self.site, BAD_PAGE))
             list_loaded = []
             if badword_page.exists():
                 pywikibot.info(
@@ -548,7 +564,7 @@ class WelcomeBot(SingleSiteBot):
         if not hasattr(self, '_whitelist') or force:
             # initialize whitelist
             whitelist_default = ['emiliano']
-            wtlpg = i18n.translate(self.site, whitelist_pg)
+            wtlpg = i18n.translate(self.site, WHITELIST)
             list_white = []
             if wtlpg:
                 whitelist_page = pywikibot.Page(self.site, wtlpg)
@@ -612,8 +628,7 @@ class WelcomeBot(SingleSiteBot):
         # name in queue is max, put detail to report page
         pywikibot.info('Updating badname accounts to report page...')
         rep_page = pywikibot.Page(self.site,
-                                  i18n.translate(self.site,
-                                                 report_page))
+                                  i18n.translate(self.site, REPORT_PAGE))
         if rep_page.exists():
             text_get = rep_page.get()
         else:
@@ -630,8 +645,7 @@ class WelcomeBot(SingleSiteBot):
                 pywikibot.info(f'{username} is already in the report page.')
             else:
                 # Adding the log.
-                rep_text += i18n.translate(self.site,
-                                           report_text) % username
+                rep_text += i18n.translate(self.site, REPORT_TEXT) % username
                 if self.site.code == 'it':
                     rep_text = f'{rep_text}{self.bname[username]}}}}}'
 
@@ -663,7 +677,7 @@ class WelcomeBot(SingleSiteBot):
             self.show_status()
             pywikibot.info(
                 'Log page is not exist, getting information for page creation')
-            text = i18n.translate(self.site, logpage_header,
+            text = i18n.translate(self.site, LOGPAGE_HEADER,
                                   fallback=i18n.DEFAULT_FALLBACK)
             text += '\n!' + self.site.namespace(2)
             text += '\n!' + str.capitalize(
@@ -729,7 +743,7 @@ class WelcomeBot(SingleSiteBot):
         sign_text = ''
         creg = re.compile(r'^\* ?(.*?)$', re.M)
         if not globalvar.sign_file_name:
-            sign_page_name = i18n.translate(self.site, random_sign)
+            sign_page_name = i18n.translate(self.site, RANDOM_SIGN)
             if not sign_page_name:
                 self.show_status(Msg.WARN)
                 pywikibot.info(f"{self.site} doesn't allow random signature,"
@@ -817,7 +831,7 @@ class WelcomeBot(SingleSiteBot):
         elif self.site.sitename != 'wikinews:it':
             welcome_text = welcome_text % globalvar.default_sign
 
-        final_text = i18n.translate(self.site, final_new_text_additions)
+        final_text = i18n.translate(self.site, FINAL_NEW_TEXT_ADDITIONS)
         if final_text:
             welcome_text += final_text
         welcome_comment = i18n.twtranslate(self.site, 'welcome-welcome')

@@ -67,6 +67,11 @@ nowcommons = {
         'الآن كومنز',
         'الآن كومونز',
     ],
+    'ckb': [
+        'لە کۆمنز بەردەستە',
+        'NowCommons',
+        'Ncd',
+    ],
     'de': [
         'NowCommons',
         'NC',

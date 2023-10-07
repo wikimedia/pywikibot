@@ -40,14 +40,14 @@ if PYTHON_VERSION < (3, 7) or SPHINX_RUNNING:
         def __exit__(self, *excinfo: Any) -> None:
             pass
 else:
-    from contextlib import nullcontext  # type: ignore[misc]
+    from contextlib import nullcontext  # type: ignore[assignment]
 
 
 # queue
 if PYTHON_VERSION < (3, 7):
     from queue import Queue as SimpleQueue
 else:
-    from queue import SimpleQueue  # type: ignore[misc]
+    from queue import SimpleQueue  # type: ignore[assignment]
 
 
 # typing
@@ -143,8 +143,8 @@ if PYTHON_VERSION < (3, 9) or SPHINX_RUNNING:
             return string[:-len(suffix)]
         return string
 else:
-    removeprefix = str.removeprefix  # type: ignore[attr-defined]
-    removesuffix = str.removesuffix  # type: ignore[attr-defined]
+    removeprefix = str.removeprefix  # type: ignore[assignment]
+    removesuffix = str.removesuffix  # type: ignore[assignment]
 
 
 # bpo-38200
@@ -163,7 +163,7 @@ if PYTHON_VERSION < (3, 10) or SPHINX_RUNNING:
         next(b, None)
         return zip(a, b)
 else:
-    from itertools import pairwise
+    from itertools import pairwise  # type: ignore[no-redef]
 
 
 # gh-98363
@@ -203,4 +203,4 @@ if PYTHON_VERSION < (3, 12) or SPHINX_RUNNING:
         if group:
             yield tuple(group)
 else:
-    from itertools import batched
+    from itertools import batched  # type: ignore[no-redef]

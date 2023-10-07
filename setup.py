@@ -45,13 +45,14 @@ extra_deps = {
     'memento': ['memento_client==0.6.1'],
     'wikitextparser': ['wikitextparser>=0.47.0'],
     'mysql': ['PyMySQL >= 0.9.3'],  # toolforge
-    # vulnerability found in Pillow<8.1.1 but toolforge uses 5.4.1
-    'Tkinter': ['Pillow>=8.1.1'],
+    # vulnerability found in Pillow<8.1.2 but toolforge uses 5.4.1
+    'Tkinter': ['Pillow>=8.1.2, < 10.0.0; platform_machine == "AMD32"',
+                'Pillow>=8.1.2; platform_machine != "AMD32"'],
     'mwoauth': ['mwoauth!=0.3.1,>=0.2.4'],
     'html': ['beautifulsoup4>=4.7.1'],
     'http': [
-        'fake_useragent<0.1.14; python_version < "3.7"',
-        'fake_useragent>1.0.1; python_version >= "3.7"',
+        'fake-useragent<0.1.14; python_version < "3.7"',
+        'fake-useragent>1.2.1; python_version >= "3.7"',
     ],
     'flake8': [  # Due to incompatibilities between packages the order matters.
         'flake8>=5.0.4',

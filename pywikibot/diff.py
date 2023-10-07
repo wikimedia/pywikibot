@@ -396,22 +396,20 @@ class PatchManager:
                     return pending
             return None
 
-        # TODO: Missing commands (compared to git --patch): edit and search
-        help_msg = {'y': 'accept this hunk',
-                    'n': 'do not accept this hunk',
-                    'q': 'do not accept this hunk and quit reviewing',
-                    'a': 'accept this hunk and all other pending',
-                    'd': 'do not apply this hunk or any of the later hunks in '
-                         'the file',
-                    'g': 'select a hunk to go to',
-                    'j': 'leave this hunk undecided, see next undecided hunk',
-                    'J': 'leave this hunk undecided, see next hunk',
-                    'k': 'leave this hunk undecided, see previous undecided '
-                         'hunk',
-                    'K': 'leave this hunk undecided, see previous hunk',
-                    's': 'split this hunk into smaller ones',
-                    '?': 'help',
-                    }
+        help_msg = {
+            'y': 'accept this hunk',
+            'n': 'do not accept this hunk',
+            'q': 'do not accept this hunk and quit reviewing',
+            'a': 'accept this hunk and all other pending',
+            'd': 'do not apply this or any of the later hunks in the file',
+            'g': 'select a hunk to go to',
+            'j': 'leave this hunk undecided, see next undecided hunk',
+            'J': 'leave this hunk undecided, see next hunk',
+            'k': 'leave this hunk undecided, see previous undecided hunk',
+            'K': 'leave this hunk undecided, see previous hunk',
+            's': 'split this hunk into smaller ones',
+            '?': 'help',
+        }
 
         super_hunks = self._generate_super_hunks(
             h for h in self.hunks if h.reviewed == Hunk.PENDING)

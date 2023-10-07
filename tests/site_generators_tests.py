@@ -701,7 +701,7 @@ class TestSiteGeneratorsUsers(DefaultSiteTestCase):
             self.assertIn('name', user)
             self.assertIn('editcount', user)
             self.assertIn('registration', user)
-            self.assertIn('user', user['groups'])
+            self.assertIn('*', user['groups'])
 
     def test_allusers_with_start(self):
         """Test the site.allusers(start=..) method."""

@@ -86,6 +86,7 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
             'ar': 'تصنيف:تحويلات تصنيفات ويكيبيديا',
             'ary': 'تصنيف:Wikipedia soft redirected categories',
             'arz': 'تصنيف:تحويلات تصانيف ويكيبيديا',
+            'ckb': 'پۆل:پۆلە ڕەوانەکراوە نەرمەکان',
             'cs': 'Kategorie:Údržba:Zastaralé kategorie',
             'da': 'Kategori:Omdirigeringskategorier',
             'en': 'Category:Wikipedia soft redirected categories',

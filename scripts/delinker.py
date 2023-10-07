@@ -46,7 +46,7 @@ from pywikibot.bot import (
     SingleSiteBot,
     calledModuleName,
 )
-from pywikibot.textlib import case_escape, ignore_case, replaceExcept
+from pywikibot.textlib import case_escape, ignore_case
 
 
 class CommonsDelinker(SingleSiteBot, ConfigParserBot, AutomaticTWSummaryBot):
@@ -100,9 +100,9 @@ class CommonsDelinker(SingleSiteBot, ConfigParserBot, AutomaticTWSummaryBot):
         """Set page to current page and delink that page."""
         # use image_regex from image.py
         namespace = file_page.site.namespaces[6]
-        escaped = case_escape(namespace.case, file_page.title(with_ns=False))
-        # Be careful, spaces and _ have been converted to '\ ' and '\_'
-        escaped = re.sub('\\\\[_ ]', '[_ ]', escaped)
+        escaped = case_escape(namespace.case,
+                              file_page.title(with_ns=False),
+                              underscore=True)
         self.image_regex = re.compile(
             r'\[\[ *(?:{})\s*:\s*{} *(?P<parameters>\|'
             r'(?:[^\[\]]|\[\[[^\]]+\]\]|\[[^\]]+\])*|) *\]\]'
@@ -119,7 +119,7 @@ class CommonsDelinker(SingleSiteBot, ConfigParserBot, AutomaticTWSummaryBot):
 
     def treat_page(self):
         """Delink a single page."""
-        new = replaceExcept(self.current_page.text, self.image_regex, '', [])
+        new = re.sub(self.image_regex, '', self.current_page.text)
         self.put_current(new)
 
     def teardown(self):

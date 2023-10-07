@@ -170,6 +170,8 @@ Maintenance
 +------------------------+---------------------------------------------------------+
 | make_i18n_dict.py      | Generate an i18n file from a given script.              |
 +------------------------+---------------------------------------------------------+
+| unidata.py             | Updates _first_upper_exception_dict in tools.unidata    |
++------------------------+---------------------------------------------------------+
 | wikimedia_sites.py     | Updates the language lists in Wikimedia family files.   |
 +------------------------+---------------------------------------------------------+
 
