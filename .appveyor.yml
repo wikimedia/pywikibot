@@ -16,9 +16,8 @@ environment:
 
     # Test the lowest supported release of each major Python version
 
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
-      PYTHON: "C:\\Python36-x64"
-      PYTHON_VERSION: "3.6.6"
+    - PYTHON: "C:\\Python361-x64"
+      PYTHON_VERSION: "3.6.1"
       PYTHON_ARCH: "64"
 
     # AppVeyor pre-installs these versions onto build machines
@@ -55,10 +54,11 @@ init:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
 
 install:
-  - if [%PYTHON_VERSION%]==[3.6.6] set GIT_SSL_NO_VERIFY=true
   - git submodule update --init
   # Download the AppVeyor Python build accessories into subdirectory .\appveyor
   - mkdir appveyor
+  # Download Python 3.6.1 which isn't pre-installed
+  - ps: ./appveyor_install.ps1
   - python --version
   - python -c "import platform; print(platform.machine())"
   - python -c "import struct; print('PYTHON_ARCH:', struct.calcsize('P') << 3)"
