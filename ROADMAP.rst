@@ -1,25 +1,7 @@
 Current release
 ---------------
 
-* Add support for fonwiki (:phab:`T347941`)
-* :meth:`site.BaseSite.redirects()<pywikibot.site._basesite.BaseSite.redirects>` and
-  :meth:`site.APISite.redirects()<pywikibot.site._apisite.APISite.redirects>`
-  methods were added (:phab:`T347226`)
-* Upcast to :class:`pywikibot.FilePage` for a proper extension only (:phab:`T346889`)
-* Handle missing SDC mediainfo (:phab:`T345038`)
-* *modules_only_mode* parameter of :class:`data.api.ParamInfo`, its *paraminfo_keys* class attribute
-  and its *preloaded_modules* property was deprecated, the :meth:`data.api.ParamInfo.normalize_paraminfo`
-  method became a staticmethod (:phab:`T306637`)
-* raise ValueError when :class:`pywikibot.FilePage` title doesn't have a valid file extension (:phab:`T345786`)
-* :attr:`site.APISite.file_extensions <pywikibot.site._apisite.APISite.file_extensions>` property was added (:phab:`T345786`)
-* ``dropdelay`` and ``releasepid`` attributes of :class:`throttle.Throttle` where deprecated
-  in favour of `expiry` class attribute
-* Add https scheme if missing in url asked by :mod:`pywikibot.scripts.generate_family_file`
-* L10N updates and i18n updates
-* use inline re.IGNORECASE flag in :func:`textlib.case_escape` function (:phab:`T308265`)
-* Convert URL-encoded characters also for links outside main namespace with
-  :meth:`cosmetic_changes.CosmeticChangesToolkit.cleanUpLinks` (:phab:`T342470`)
-* Implement Flow topic summaries (:phab:`T109443`)
+*(No changes yet*)
 
 
 Deprecations
