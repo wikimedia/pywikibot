@@ -66,11 +66,11 @@ jobs:
             site: wikisource:zh
             test_prod_only: true
             os: ubuntu-20.04
-          - python-version: "3.12.0-alpha - 3.12.0"  # 3.12 fails due to T337748
+          - python-version: "3.12"  # 3.12 fails due to T337748
             site: wikipedia:en
             test_prod_only: true
             experimental: true
-          - python-version: "3.12.0-alpha - 3.12.0"  # 3.12 fails due to T337748
+          - python-version: "3.12"  # 3.12 fails due to T337748
             site: wikisource:zh
             test_prod_only: true
             experimental: true
