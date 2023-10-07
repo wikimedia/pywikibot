@@ -12,12 +12,14 @@
 #
 from abc import ABC, abstractmethod
 from contextlib import suppress
-from typing import Union
+from typing import Optional, Union
 from warnings import warn
 
 import pywikibot
 from pywikibot import config
+from pywikibot.backports import List
 from pywikibot.exceptions import Error, InvalidTitleError, UnsupportedPageError
+from pywikibot.tools import deprecated
 from pywikibot.tools.collections import GeneratorWrapper
 
 
@@ -102,6 +104,7 @@ class APIGenerator(APIGeneratorBase, GeneratorWrapper):
         self.limit_name = limit_name
         self.data_name = data_name
 
+        self.query_increment: Optional[int]
         if config.step > 0:
             self.query_increment = config.step
         else:
@@ -213,12 +216,10 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
     _namespaces = None
 
     def __init__(self, **kwargs) -> None:
-        """
-        Initialize a QueryGenerator object.
+        """Initialize a QueryGenerator object.
 
         kwargs are used to create a Request object; see that object's
         documentation for values. 'action'='query' is assumed.
-
         """
         if not hasattr(self, 'site'):
             kwargs = self._clean_kwargs(kwargs)  # hasn't been called yet
@@ -279,6 +280,7 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
                 else:
                     self.request[prefix + 'limit'] = int(param['max'])
 
+        self.api_limit: Optional[int]
         if config.step > 0:
             self.api_limit = config.step
         else:
@@ -300,16 +302,13 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
         else:
             self.resultkey = self.modules[0]
 
-        # usually the (query-)continue key is the same as the querymodule,
-        # but not always
-        # API can return more than one query-continue key, if multiple
-        # properties are requested by the query, e.g.
-        # "query-continue":{
-        #     "langlinks":{"llcontinue":"12188973|pt"},
-        #     "templates":{"tlcontinue":"310820|828|Namespace_detect"}}
-        # self.continuekey is a list
-        self.continuekey = self.modules
         self._add_slots()
+
+    @property
+    @deprecated(since='8.4.0')
+    def continuekey(self) -> List[str]:
+        """Return deprecated continuekey which is self.modules."""
+        return self.modules
 
     def _add_slots(self) -> None:
         """Add slots to params if the site supports multi-content revisions.
@@ -566,12 +565,14 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
                 continue
 
             yield result
-            if isinstance(item, dict) and set(self.continuekey) & set(item):
+
+            modules_item_intersection = set(self.modules) & set(item)
+            if isinstance(item, dict) and modules_item_intersection:
                 # if we need to count elements contained in items in
                 # self.data["query"]["pages"], we want to count
-                # item[self.continuekey] (e.g. 'revisions') and not
+                # item[self.modules] (e.g. 'revisions') and not
                 # self.resultkey (i.e. 'pages')
-                for key in set(self.continuekey) & set(item):
+                for key in modules_item_intersection:
                     self._count += len(item[key])
             # otherwise we proceed as usual
             else:
