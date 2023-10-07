@@ -1,7 +1,10 @@
 Current release
 ---------------
 
-* Python 3.6 support will be discontinued and probably this is the last version supporting it
+* Add support for fonwiki (:phab:`T347941`)
+* :meth:`site.BaseSite.redirects()<pywikibot.site._basesite.BaseSite.redirects>` and
+  :meth:`site.APISite.redirects()<pywikibot.site._apisite.APISite.redirects>`
+  methods were added (:phab:`T347226`)
 * Upcast to :class:`pywikibot.FilePage` for a proper extension only (:phab:`T346889`)
 * Handle missing SDC mediainfo (:phab:`T345038`)
 * *modules_only_mode* parameter of :class:`data.api.ParamInfo`, its *paraminfo_keys* class attribute
@@ -22,7 +25,7 @@ Current release
 Deprecations
 ------------
 
-* 8.4.0: Python 3.6 support is deprecated and will be dropped with Pywikibot 9
+* 8.4.0: *Python 3.6 support is deprecated* and will be dropped soon with Pywikibot 9
 * 8.4.0: *modules_only_mode* parameter of :class:`data.api.ParamInfo`, its *paraminfo_keys* class attribute
   and its preloaded_modules property will be removed
 * 8.4.0: *dropdelay* and *releasepid* attributes of :class:`throttle.Throttle` will be removed
