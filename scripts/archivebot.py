@@ -121,6 +121,8 @@ Options (may be omitted):
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import datetime
 import locale
 import os
@@ -130,6 +132,7 @@ import threading
 import time
 from collections import OrderedDict, defaultdict
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import nullcontext
 from hashlib import md5
 from math import ceil
 from textwrap import fill
@@ -138,7 +141,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import i18n
-from pywikibot.backports import List, Set, Tuple, nullcontext, pairwise
+from pywikibot.backports import List, Set, Tuple, pairwise
 from pywikibot.exceptions import Error, NoPageError
 from pywikibot.textlib import (
     TimeStripper,

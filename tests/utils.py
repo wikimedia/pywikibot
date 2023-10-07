@@ -4,6 +4,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import inspect
 import os
 import sys
@@ -21,7 +23,6 @@ from pywikibot.data.api import Request as _original_Request
 from pywikibot.exceptions import APIError
 from pywikibot.login import LoginStatus
 from pywikibot.site import Namespace
-from pywikibot.tools import PYTHON_VERSION
 from pywikibot.tools.collections import EMPTY_DEFAULT
 from tests import _pwb_py
 
@@ -474,9 +475,6 @@ def execute(command: List[str], data_in=None, timeout=None):
 
     :param command: executable to run and arguments to use
     """
-    if PYTHON_VERSION < (3, 7):
-        command.insert(1, '-W ignore::FutureWarning:pywikibot:111')
-
     env = os.environ.copy()
 
     # Prevent output by test package; e.g. 'max_retries reduced from x to y'

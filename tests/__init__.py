@@ -4,6 +4,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 __all__ = (
     'create_path_func', 'join_cache_path', 'join_data_path',
     'join_html_data_path', 'join_images_path', 'join_pages_path',

@@ -61,6 +61,8 @@ Additionally there is the :py:obj:`AutomaticTWSummaryBot` which subclasses
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 __all__ = (
     'CRITICAL', 'ERROR', 'INFO', 'WARNING', 'DEBUG', 'INPUT', 'STDOUT',
     'VERBOSE', 'critical', 'debug', 'error', 'exception', 'log', 'warning',

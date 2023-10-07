@@ -15,8 +15,10 @@ Usage:
 #
 # (C) Pywikibot team, 2013-2022
 #
-# Distributed under the terms of MIT License.
+# Distributed under the terms of MIT license.
 #
+from __future__ import annotations
+
 import pywikibot
 from pywikibot import WikidataBot, pagegenerators
 

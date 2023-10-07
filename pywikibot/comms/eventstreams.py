@@ -14,6 +14,8 @@ This module requires sseclient to be installed::
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import json
 from functools import partial
 from typing import Optional

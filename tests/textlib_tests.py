@@ -5,18 +5,19 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import codecs
 import functools
 import os
 import re
 import unittest
 from collections import OrderedDict
-from contextlib import suppress
+from contextlib import nullcontext, suppress
 from unittest import mock
 
 import pywikibot
 from pywikibot import textlib
-from pywikibot.backports import nullcontext
 from pywikibot.exceptions import UnknownSiteError
 from pywikibot.site._interwikimap import _IWEntry
 from pywikibot.textlib import MultiTemplateMatchBuilder, extract_sections

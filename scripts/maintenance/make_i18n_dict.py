@@ -32,6 +32,8 @@ instantiating the bot. It also calls ``bot.run()`` to create the dictionaries:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import codecs
 import json
 import os

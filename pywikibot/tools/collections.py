@@ -4,6 +4,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import collections
 from abc import ABC, abstractmethod
 from collections.abc import Collection, Generator, Iterator, Mapping

@@ -39,6 +39,8 @@ and override its `callback` method. Here is a sample:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from typing import Union
 
 import pywikibot

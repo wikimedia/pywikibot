@@ -10,6 +10,8 @@ class in edit_failiure_tests.py
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import time
 import unittest
 from contextlib import suppress

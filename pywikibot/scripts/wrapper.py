@@ -42,6 +42,8 @@ for tests to set the default site (see :phab:`T216825`)::
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 #
 import os
 import sys

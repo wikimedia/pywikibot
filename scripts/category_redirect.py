@@ -34,6 +34,8 @@ Usage:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import pickle
 import re
 import time

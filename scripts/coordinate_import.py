@@ -46,8 +46,10 @@ The following command line parameters are supported:
 #
 # (C) Pywikibot team, 2013-2023
 #
-# Distributed under the terms of MIT License.
+# Distributed under the terms of MIT license.
 #
+from __future__ import annotations
+
 from typing import Optional
 
 import pywikibot

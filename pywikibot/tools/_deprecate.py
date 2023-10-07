@@ -23,6 +23,8 @@ a deprecator without any arguments.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import collections
 import inspect
 import re
@@ -556,17 +558,15 @@ class ModuleDeprecationWrapper(types.ModuleType):
 
     """A wrapper for a module to deprecate classes or variables of it."""
 
-    def __init__(self, module) -> None:
-        """
-        Initialise the wrapper.
+    def __init__(self, module: Union[types.ModuleType, str]) -> None:
+        """Initialise the wrapper.
 
         It will automatically overwrite the module with this instance in
         ``sys.modules``.
 
         :param module: The module name or instance
-        :type module: str or module
         """
-        if isinstance(module, (str, bytes)):
+        if isinstance(module, str):
             module = sys.modules[module]
         super().__setattr__('_deprecated', {})
         super().__setattr__('_module', module)

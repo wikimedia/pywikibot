@@ -33,6 +33,8 @@ Furthermore, the following command line parameters are supported:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from typing import Union
 
 import pywikibot

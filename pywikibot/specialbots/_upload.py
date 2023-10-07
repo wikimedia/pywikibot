@@ -7,6 +7,8 @@ Do not import classes directly from here but from specialbots.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import os
 import tempfile
 from contextlib import suppress

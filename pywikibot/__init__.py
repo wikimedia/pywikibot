@@ -4,6 +4,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import atexit
 import datetime
 import re
@@ -74,7 +76,7 @@ from pywikibot.logging import (
 )
 from pywikibot.time import Timestamp
 from pywikibot.site import APISite, BaseSite
-from pywikibot.tools import PYTHON_VERSION, normalize_username
+from pywikibot.tools import normalize_username
 
 
 __all__ = (
@@ -99,16 +101,6 @@ if not hasattr(sys.modules[__name__], 'argvu'):
 link_regex = re.compile(r'\[\[(?P<title>[^\]|[<>{}]*)(\|.*?)?\]\]')
 
 _sites: Dict[str, APISite] = {}
-
-if PYTHON_VERSION < (3, 7):
-    warn("""
-
-        Python {version} will be dropped soon with Pywikibot 9.0
-        due to vulnerability security alerts.
-        It is recommended to use Python 3.7 or above.
-        See T347026 for further information.
-""".format(version=sys.version.split(maxsplit=1)[0]),
-         FutureWarning)  # adjust this line no in utils.execute()
 
 
 @cache

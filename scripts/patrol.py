@@ -46,6 +46,8 @@ Commandline parameters:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import time
 from collections import defaultdict
 from contextlib import suppress

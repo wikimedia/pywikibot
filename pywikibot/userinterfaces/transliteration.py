@@ -4,6 +4,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 #: Non latin digits used by the framework
 NON_LATIN_DIGITS = {
     'bn': '০১২৩৪৫৬৭৮৯',

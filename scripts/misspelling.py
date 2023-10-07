@@ -25,6 +25,8 @@ Command line options:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from itertools import chain
 from typing import Generator
 

@@ -10,6 +10,8 @@ to fail.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import os
 import unittest
 from contextlib import suppress

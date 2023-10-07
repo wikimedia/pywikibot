@@ -4,6 +4,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 # The new Wikivoyage family that is hosted at Wikimedia
 from pywikibot import family
 

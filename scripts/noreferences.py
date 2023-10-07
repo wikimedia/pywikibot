@@ -33,6 +33,8 @@ a list of affected articles
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import re
 from functools import partial
 

@@ -9,6 +9,8 @@ These tests write to the wiki.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import unittest
 from contextlib import suppress
 

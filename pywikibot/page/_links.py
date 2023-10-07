@@ -10,6 +10,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import re
 import unicodedata
 from html.entities import name2codepoint

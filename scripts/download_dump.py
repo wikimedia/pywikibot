@@ -20,6 +20,8 @@ This script supports the following command line parameters:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import binascii
 import os.path
 from http import HTTPStatus

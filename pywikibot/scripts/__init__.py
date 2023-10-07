@@ -8,8 +8,10 @@ pywikibot i18n package are copied here.
 #
 # (C) Pywikibot team, 2021-2022
 #
-# Distributed under the terms of the MIT license
+# Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from os import environ, getenv
 
 

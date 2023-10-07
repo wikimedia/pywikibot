@@ -55,6 +55,8 @@ Delete everything in the category "To delete" without prompting:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import collections
 
 import pywikibot

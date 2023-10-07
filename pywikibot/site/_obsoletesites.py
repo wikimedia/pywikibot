@@ -4,6 +4,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import pywikibot
 from pywikibot.backports import Dict, Tuple
 from pywikibot.exceptions import NoPageError

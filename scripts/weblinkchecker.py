@@ -108,6 +108,8 @@ Loads all wiki pages where dead links were found during a prior run:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import codecs
 import pickle
 import re

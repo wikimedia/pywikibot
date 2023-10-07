@@ -4,6 +4,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from collections import defaultdict
 from collections.abc import MutableMapping, MutableSequence
 from typing import Optional

@@ -27,6 +27,8 @@ Command line options:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import datetime
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed

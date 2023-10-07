@@ -48,6 +48,8 @@ Examples::
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import re
 import webbrowser
 from collections import namedtuple

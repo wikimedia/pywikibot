@@ -21,6 +21,8 @@ Can be used with:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import suppress

@@ -5,6 +5,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import unittest
 from unittest.mock import ANY, MagicMock, Mock, mock_open, patch
 

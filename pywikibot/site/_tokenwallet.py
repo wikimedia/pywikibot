@@ -4,6 +4,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from collections.abc import Container
 from typing import TYPE_CHECKING, Any, Optional
 

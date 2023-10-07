@@ -30,6 +30,8 @@ To enable access via cookies, assign cookie handling class::
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import atexit
 import codecs
 import re

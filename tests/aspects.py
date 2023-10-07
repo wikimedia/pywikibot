@@ -9,6 +9,8 @@ such as API result caching and excessive test durations.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import inspect
 import itertools
 import os

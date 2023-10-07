@@ -7,6 +7,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import sys
 from abc import ABC, abstractmethod
 from typing import Any, Union

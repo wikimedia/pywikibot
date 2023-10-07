@@ -7,6 +7,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import collections
 import re
 from typing import Optional

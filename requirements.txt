@@ -19,11 +19,9 @@
 
 # mandatory dependencies, others are optional
 mwparserfromhell>=0.5.2
-requests>=2.21.0, < 2.28.0; python_version < '3.7'
-requests>=2.21.0; python_version >= '3.7'
+requests>=2.21.0
 setuptools>=48.0.0 ; python_version >= '3.10'
-setuptools>=40.8.0 ; python_version >= '3.7' and python_version < '3.10'
-setuptools>=40.8.0, <59.7.0 ; python_version < '3.7'
+setuptools>=40.8.0 ; python_version < '3.10'
 
 # MediaWiki markup parser
 # mwparserfromhell is mandatory but wikitextparser can be used instead

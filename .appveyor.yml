@@ -14,9 +14,13 @@ environment:
 
   matrix:
 
-    # Test the lowest supported release of each major Python version
-    # TODO: Python 3.7.0
+    # Test the lowest supported release
+    # Python 3.7.0 is provided by VS 2013
 
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
+      PYTHON: "C:\\Python37"
+      PYTHON_VERSION: "3.7.0"
+      PYTHON_ARCH: "32"
 
 
     # AppVeyor pre-installs these versions onto build machines
@@ -53,11 +57,11 @@ init:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
 
 install:
+  # ignore SSL error for old image
+  - if [%PYTHON_VERSION%]==[3.7.0] set GIT_SSL_NO_VERIFY=true
   - git submodule update --init
   # Download the AppVeyor Python build accessories into subdirectory .\appveyor
   - mkdir appveyor
-  # Download Python 3.7.0 which isn't pre-installed
-  # - ps: ./appveyor_install.ps1
   - python --version
   - python -c "import platform; print(platform.machine())"
   - python -c "import struct; print('PYTHON_ARCH:', struct.calcsize('P') << 3)"

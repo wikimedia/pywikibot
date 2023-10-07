@@ -22,6 +22,8 @@ To force preloading, change the global expiry value to 0::
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from concurrent.futures import ThreadPoolExecutor, wait
 from datetime import datetime
 from typing import Optional, Union

@@ -34,8 +34,10 @@ base directory.
 #
 # (C) Pywikibot team, 2010-2023
 #
-# Distributed under the terms of the MIT license
+# Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import codecs
 import os
 import re

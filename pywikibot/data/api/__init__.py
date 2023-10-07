@@ -4,6 +4,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from email.generator import BytesGenerator
 from email.mime.multipart import MIMEMultipart as MIMEMultipartOrig
 from io import BytesIO

@@ -109,8 +109,10 @@ the inverse claim is imported to the topic item as Wikidata property "P910"
 #
 # (C) Pywikibot team, 2013-2023
 #
-# Distributed under the terms of MIT License.
+# Distributed under the terms of MIT license.
 #
+from __future__ import annotations
+
 import re
 import signal
 import sys

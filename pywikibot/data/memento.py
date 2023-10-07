@@ -13,6 +13,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from datetime import datetime
 from typing import Optional
 

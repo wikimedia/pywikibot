@@ -4,6 +4,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from typing import Callable, Union
 
 from pywikibot.backports import Dict

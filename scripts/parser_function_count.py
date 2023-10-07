@@ -48,6 +48,8 @@ functions will be listed.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 # Todo:
 # * Using xml and xmlstart
 # * Using categories

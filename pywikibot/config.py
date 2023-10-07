@@ -38,6 +38,8 @@ utility methods to build paths relative to base_dir:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import collections
 import copy
 import os

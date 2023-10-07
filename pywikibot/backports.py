@@ -1,9 +1,16 @@
-"""This module contains backports to support older Python versions."""
+"""This module contains backports to support older Python versions.
+
+.. deprecated:: 9.0
+   The *nullcontext* context manager; use ``contextlib.nullcontext``
+   instead. The *SimpleQueue* queue; use ``queue.SimpleQueue`` instead.
+"""
 #
 # (C) Pywikibot team, 2014-2023
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import sys
 from typing import Any
 
@@ -17,37 +24,6 @@ if PYTHON_VERSION >= (3, 9):
 else:
     from functools import lru_cache as _lru_cache
     cache = _lru_cache(None)
-
-
-# context
-if PYTHON_VERSION < (3, 7) or SPHINX_RUNNING:
-
-    class nullcontext:  # noqa: N801
-
-        """Context manager that does no additional processing.
-
-        .. seealso:: :python:`contextlib.nullcontext
-           <library/contextlib.html#contextlib.nullcontext>`,
-           backported from Python 3.7.
-        """
-
-        def __init__(self, enter_result: Any = None) -> None:  # noqa: D107
-            self.enter_result = enter_result
-
-        def __enter__(self) -> Any:
-            return self.enter_result
-
-        def __exit__(self, *excinfo: Any) -> None:
-            pass
-else:
-    from contextlib import nullcontext  # type: ignore[assignment]
-
-
-# queue
-if PYTHON_VERSION < (3, 7):
-    from queue import Queue as SimpleQueue
-else:
-    from queue import SimpleQueue  # type: ignore[assignment]
 
 
 # typing
@@ -206,3 +182,14 @@ if PYTHON_VERSION < (3, 12) or SPHINX_RUNNING:
             yield tuple(group)
 else:
     from itertools import batched  # type: ignore[no-redef]
+
+
+# import ModuleDeprecationWrapper here to prevent circular import
+from pywikibot.tools import ModuleDeprecationWrapper  # noqa: E402
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper.add_deprecated_attr('nullcontext',
+                            replacement_name='contextlib.nullcontext',
+                            since='9.0.0')
+wrapper.add_deprecated_attr('SimpleQueue',
+                            replacement_name='queue.SimpleQueue',
+                            since='9.0.0')

@@ -26,6 +26,8 @@ it just to the first so many bytes.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import time
 from textwrap import fill
 

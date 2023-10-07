@@ -50,10 +50,7 @@ extra_deps = {
                 'Pillow>=8.1.2; platform_machine != "AMD32"'],
     'mwoauth': ['mwoauth!=0.3.1,>=0.2.4'],
     'html': ['beautifulsoup4>=4.7.1'],
-    'http': [
-        'fake-useragent<0.1.14; python_version < "3.7"',
-        'fake-useragent>1.2.1; python_version >= "3.7"',
-    ],
+    'http': ['fake-useragent>1.2.1'],
     'flake8': [  # Due to incompatibilities between packages the order matters.
         'flake8>=5.0.4',
         'darglint',
@@ -68,10 +65,14 @@ extra_deps = {
         'flake8-string-format',
         'flake8-tuple>=0.4.1',
         'flake8-no-u-prefixed-strings>=0.2',
-        'pep8-naming>=0.12.1, <0.13.0; python_version < "3.7"',
-        'pep8-naming>=0.13.3; python_version >= "3.7"',
+        'pep8-naming>=0.13.3',
     ],
-    'hacking': ['hacking'],
+    'hacking': [
+        'hacking',
+        # importlib-metadata module is already installed with hacking 4.1.0
+        # used by Python 3.7 but importlib-metadata >= 5 fails, so adjust it
+        'importlib-metadata<5.0.0; python_version < "3.8"',
+    ],
 }
 
 
@@ -88,12 +89,10 @@ extra_deps.update({'scripts': [i for k, v in script_deps.items() for i in v]})
 # packages which are mandatory
 dependencies = [
     'mwparserfromhell>=0.5.2',
-    'requests>=2.21.0, <2.28.0; python_version < "3.7"',
-    'requests>=2.21.0; python_version>="3.7"',
+    'requests>=2.21.0',
     # PEP 440
     'setuptools>=48.0.0 ; python_version >= "3.10"',
-    'setuptools>=40.8.0 ; python_version >= "3.7" and python_version < "3.10"',
-    'setuptools>=40.8.0, <59.7.0 ; python_version < "3.7"',
+    'setuptools>=40.8.0 ; python_version < "3.10"',
 ]
 
 # ------- setup tests_require ------- #
@@ -249,7 +248,7 @@ def main() -> None:
         # zip_safe
         install_requires=dependencies,
         extras_require=extra_deps,
-        python_requires='>=3.6.1',
+        python_requires='>=3.7.0',
         # namespace_packages
         test_suite='tests.collector',
         tests_require=test_deps,
@@ -335,13 +334,13 @@ def main() -> None:
             'Programming Language :: Python',
             'Programming Language :: Python :: 3',
             'Programming Language :: Python :: 3 :: Only',
-            'Programming Language :: Python :: 3.6',
             'Programming Language :: Python :: 3.7',
             'Programming Language :: Python :: 3.8',
             'Programming Language :: Python :: 3.9',
             'Programming Language :: Python :: 3.10',
             'Programming Language :: Python :: 3.11',
             'Programming Language :: Python :: 3.12',
+            'Programming Language :: Python :: 3.13',
             'Programming Language :: Python :: Implementation :: CPython',
             'Programming Language :: Python :: Implementation :: PyPy',
             'Topic :: Internet :: WWW/HTTP :: Dynamic Content :: Wiki',

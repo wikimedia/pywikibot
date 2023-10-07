@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Script to create a new distribution. Requires Python 3.7+.
+"""Script to create a new distribution.
 
 The following options are supported:
 
@@ -50,6 +50,8 @@ Usage::
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import abc
 import shutil
 import sys

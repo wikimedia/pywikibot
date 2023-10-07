@@ -228,6 +228,8 @@ Applications:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import os  # Operating system
 import re  # Regular expressions (very handy!)
 from itertools import islice

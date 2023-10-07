@@ -70,6 +70,8 @@ Furthermore the following options are provided:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import datetime
 from contextlib import suppress
 from textwrap import fill

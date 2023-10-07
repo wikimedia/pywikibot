@@ -51,13 +51,15 @@ subdirectory.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import datetime
 from concurrent.futures import ThreadPoolExecutor
-from contextlib import suppress
+from contextlib import nullcontext, suppress
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Tuple, nullcontext
+from pywikibot.backports import Tuple
 from pywikibot.exceptions import NoUsernameError, SiteDefinitionError
 from pywikibot.login import OauthLoginManager
 

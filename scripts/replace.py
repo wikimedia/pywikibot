@@ -146,6 +146,8 @@ the top of the help.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import re
 from collections.abc import Sequence
 from contextlib import suppress

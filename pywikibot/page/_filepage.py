@@ -10,6 +10,8 @@ This module includes objects:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from http import HTTPStatus
 from os import PathLike
 from pathlib import Path

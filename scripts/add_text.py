@@ -60,6 +60,8 @@ Examples
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import codecs
 import re
 from typing import Union

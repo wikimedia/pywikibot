@@ -4,6 +4,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import re
 
 from pywikibot.userinterfaces import terminal_interface_base

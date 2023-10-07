@@ -4,6 +4,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import abc
 import datetime
 from typing import Any, Optional, Type, Union

@@ -19,6 +19,8 @@ See :py:obj:`twtranslate` for more information on the messages.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import json
 import os
 import pkgutil

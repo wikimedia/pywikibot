@@ -13,6 +13,8 @@ This module also includes objects:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import json as jsonlib
 import re
 from collections import OrderedDict, defaultdict

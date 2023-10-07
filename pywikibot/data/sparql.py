@@ -4,6 +4,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from textwrap import fill
 from typing import Optional
 from urllib.parse import quote

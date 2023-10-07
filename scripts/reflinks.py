@@ -46,6 +46,8 @@ The following generators and filters are supported:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import http.client as httplib
 import itertools
 import os

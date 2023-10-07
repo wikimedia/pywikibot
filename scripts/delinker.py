@@ -34,6 +34,8 @@ The following parameters are supported:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import configparser
 import heapq
 import re

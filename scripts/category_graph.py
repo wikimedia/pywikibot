@@ -41,6 +41,8 @@ fillcolor=green] edge[style=dashed penwidth=3]'
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import argparse
 from collections import defaultdict
 

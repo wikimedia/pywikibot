@@ -64,6 +64,8 @@ can be added between them by specifying '\n' as a value.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import codecs
 import os
 import re

@@ -4,6 +4,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 
 # A mapping of characters to their MediaWiki title-cased forms. Python,
 # depending on version, handles these characters differently, which causes

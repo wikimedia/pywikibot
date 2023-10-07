@@ -24,6 +24,8 @@ argument, which is a string indicating the debugging layer.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import logging
 import os
 import sys

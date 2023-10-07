@@ -4,6 +4,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from pywikibot.site._apisite import APISite
 from pywikibot.site._basesite import BaseSite
 from pywikibot.site._datasite import DataSite

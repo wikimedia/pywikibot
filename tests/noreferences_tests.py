@@ -5,6 +5,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import pywikibot
 from scripts.noreferences import NoReferencesBot
 from tests.aspects import TestCase, unittest

@@ -95,6 +95,8 @@ Example
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import base64
 import codecs
 import csv

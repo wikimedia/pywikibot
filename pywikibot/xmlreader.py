@@ -15,6 +15,8 @@ XmlEntry objects which can be used by other bots.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import re
 from typing import Optional
 

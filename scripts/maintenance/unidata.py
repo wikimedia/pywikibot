@@ -14,6 +14,8 @@ This script is for updating ``_first_upper_exception_dict``.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from json import dump, load
 from queue import Queue
 from re import findall

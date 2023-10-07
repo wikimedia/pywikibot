@@ -26,6 +26,8 @@ OCR support of page scans via:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import collections.abc
 import json
 import re
