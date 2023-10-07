@@ -1,13 +1,13 @@
 Current release
 ---------------
 
-*(No changes yet*)
+* **Python 3.6 support will be discontinued** and this is the last version supporting it.
 
 
 Deprecations
 ------------
 
-* 8.4.0: *Python 3.6 support is deprecated* and will be dropped soon with Pywikibot 9
+* 8.4.0: Python 3.6 support is deprecated and will be dropped soon with Pywikibot 9
 * 8.4.0: *modules_only_mode* parameter of :class:`data.api.ParamInfo`, its *paraminfo_keys* class attribute
   and its preloaded_modules property will be removed
 * 8.4.0: *dropdelay* and *releasepid* attributes of :class:`throttle.Throttle` will be removed

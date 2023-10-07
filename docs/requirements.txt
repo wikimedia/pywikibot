@@ -1,6 +1,7 @@
-# This is a PIP requirements file for building Sphinx documentation of pywikibot
-# requirements.txt is also needed
-sphinx >= 7.2.3
-rstcheck >=6.1.2
+# This is a PIP requirements file for building Sphinx documentation of Pywikibot
+# ../requirements.txt is also needed.
+# Note: Python 3.9 is required for sphinx 7.2.6
+sphinx >= 7.2.6
+rstcheck >=6.2.0
 sphinxext-opengraph >= 0.8.2
 furo >= 2023.9.10
