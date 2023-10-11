@@ -13,6 +13,7 @@ from itertools import chain
 
 import pywikibot
 from pywikibot.exceptions import (
+    Error,
     NoPageError,
     NoWikibaseEntityError,
     PageRelatedError,
@@ -351,7 +352,7 @@ class TestFilePageDataItem(TestCase):
         self.assertTrue(item.file is page)
         self.assertEqual('-1', item.id)
         item.get()
-        self.assertEqual('M14634781', item.getID())
+        self.assertEqual('M14634781', item.id)
         self.assertIsInstance(
             item.labels, pywikibot.page._collections.LanguageDict)
         self.assertIsInstance(
@@ -371,6 +372,15 @@ class TestFilePageDataItem(TestCase):
         del item._file
         self.assertEqual(page, item.file)
 
+    def test_data_item_not_file(self):
+        """Test data item with invalid pageid."""
+        item = pywikibot.MediaInfo(self.site, 'M1')  # Main Page
+        with self.assertRaises(Error):
+            item.file
+        with self.assertRaises(NoWikibaseEntityError):
+            item.get()
+        self.assertFalse(item.exists())
+
     def test_data_item_when_no_file_or_data_item(self):
         """Test data item associated to file that does not exist."""
         page = pywikibot.FilePage(self.site,
@@ -381,6 +391,8 @@ class TestFilePageDataItem(TestCase):
 
         with self.assertRaises(NoWikibaseEntityError):
             item.get()
+        with self.assertRaises(NoWikibaseEntityError):
+            item.labels
 
     def test_data_item_when_file_exist_but_without_item(self):
         """Test if data item is missing from file."""
@@ -394,24 +406,26 @@ class TestFilePageDataItem(TestCase):
 
         # Seek to first page without mediainfo.
         for page in gen:
-            if 'mediainfo' not in page.latest_revision.slots:
-                item = page.data_item()
-                self.assertIsInstance(item, pywikibot.MediaInfo)
+            if 'mediainfo' in page.latest_revision.slots:
+                continue
 
-                # Get fails as there is no mediainfo.
-                with self.assertRaises(NoWikibaseEntityError):
-                    item.get()
+            item = page.data_item()
+            self.assertIsInstance(item, pywikibot.MediaInfo)
 
-                # Create new empty mediainfo.
-                item.get_data_for_new_entity()
-                self.assertIsInstance(
-                    item.labels, pywikibot.page._collections.LanguageDict)
-                self.assertIsInstance(
-                    item.statements,
-                    pywikibot.page._collections.ClaimCollection)
+            # Get fails as there is no mediainfo.
+            with self.assertRaises(NoWikibaseEntityError):
+                item.get()
 
-                # break the loop after checking first file
-                break
+            self.assertFalse(item.exists())
+            self.assertEqual(f'M{page.pageid}', item.id)
+            self.assertIsInstance(
+                item.labels, pywikibot.page._collections.LanguageDict)
+            self.assertIsInstance(
+                item.statements,
+                pywikibot.page._collections.ClaimCollection)
+
+            # break the loop after checking first file
+            break
 
     def test_data_list_to_dict_workaround(self):
         """Test that T222159 workaround converts [] to {}."""
