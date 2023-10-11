@@ -64,10 +64,12 @@ __all__ = (
 )
 
 
-ALIASES_TYPE = Dict[Union[str, pywikibot.APISite], List[str]]
-LANGUAGE_TYPE = Dict[Union[str, pywikibot.APISite], str]
+LANGUAGE_IDENTIFIER = Union[str, pywikibot.APISite]
+ALIASES_TYPE = Dict[LANGUAGE_IDENTIFIER, List[str]]
+LANGUAGE_TYPE = Dict[LANGUAGE_IDENTIFIER, str]
 SITELINK_TYPE = Union['pywikibot.page.BasePage', 'pywikibot.page.BaseLink',
                       Dict[str, str]]
+ENTITY_DATA_TYPE = Dict[str, Union[LANGUAGE_TYPE, ALIASES_TYPE, SITELINK_TYPE]]
 
 
 class WikibaseEntity:
@@ -283,7 +285,7 @@ class WikibaseEntity:
 
     def editEntity(
         self,
-        data: Union[LANGUAGE_TYPE, ALIASES_TYPE, SITELINK_TYPE, None] = None,
+        data: Union[ENTITY_DATA_TYPE, None] = None,
         **kwargs
     ) -> None:
         """Edit an entity using Wikibase ``wbeditentity`` API.
@@ -648,7 +650,7 @@ class WikibasePage(BasePage, WikibaseEntity):
     @allow_asynchronous
     def editEntity(
         self,
-        data: Union[LANGUAGE_TYPE, ALIASES_TYPE, SITELINK_TYPE, None] = None,
+        data: Union[ENTITY_DATA_TYPE, None] = None,
         **kwargs: Any
     ) -> None:
         """Edit an entity using Wikibase ``wbeditentity`` API.
@@ -1114,7 +1116,7 @@ class ItemPage(WikibasePage):
         """
         self.setSitelinks([sitelink], **kwargs)
 
-    def removeSitelink(self, site, **kwargs) -> None:
+    def removeSitelink(self, site: LANGUAGE_IDENTIFIER, **kwargs) -> None:
         """
         Remove a sitelink.
 
@@ -1122,7 +1124,8 @@ class ItemPage(WikibasePage):
         """
         self.removeSitelinks([site], **kwargs)
 
-    def removeSitelinks(self, sites, **kwargs) -> None:
+    def removeSitelinks(self, sites: List[LANGUAGE_IDENTIFIER], **kwargs
+                        ) -> None:
         """
         Remove sitelinks.
 
