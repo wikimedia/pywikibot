@@ -266,9 +266,10 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
                     if pageTemplate.title(with_ns=False) == template:
                         return True
             else:
-                for (inPageTemplate, param) in page.templatesWithParams():
+                for inPageTemplate, params in page.templatesWithParams():
                     if inPageTemplate.title(with_ns=False) == template[0] \
-                       and template[1] in param[0].replace(' ', ''):
+                       and any(template[1] in param.replace(' ', '')
+                               for param in params):
                         return True
         return False
 
