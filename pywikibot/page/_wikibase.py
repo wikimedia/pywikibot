@@ -435,8 +435,10 @@ class MediaInfo(WikibaseEntity):
                     data = self.file.latest_revision.slots['mediainfo']['*']
                 except NoPageError as exc:
                     raise NoWikibaseEntityError(self) from exc
-                except KeyError as exc:
-                    raise NoWikibaseEntityError(self) from exc
+                except KeyError:
+                    # reuse the reserved ID for better message
+                    self.id = 'M' + str(self.file.pageid)
+                    raise NoWikibaseEntityError(self) from None
 
                 self._content = jsonlib.loads(data)
                 self.id = self._content['id']
