@@ -71,7 +71,7 @@ class CategoryGraphBot(SingleSiteBot):
             cat_title = pywikibot.input(
                 'For which category do you want to create a graph?')
 
-        pywikibot.info('Scanning {cat_title!r}')
+        pywikibot.info(f'Scanning {cat_title!r}')
         self.cat = pywikibot.Category(self.site, cat_title)
         self.to = args.to
         if self.to == '?':
