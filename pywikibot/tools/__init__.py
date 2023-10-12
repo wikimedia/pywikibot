@@ -1,4 +1,20 @@
-"""Miscellaneous helper functions (not wiki-dependent)."""
+"""Miscellaneous helper functions (not wiki-dependent).
+
+.. deprecated:: 7.6
+   The *CombinedError*, *DequeGenerator*, *EmptyDefault*, *EMPTY_DEFAULT*
+   and *SizedKeyCollection* objects. Import them from
+   :mod:`tools.collections` instead.
+.. deprecated:: 7.6
+   The *itergroup* function. Use :func:`backports.batched` or
+   ``itertools.batched`` instead.
+.. deprecated:: 7.6
+   The *filter_unique*, *intersect_generators*, *islice_with_ellipsis*
+   and *roundrobin_generators* functions. Import them from
+   :mod:`tools.itertools` instead.
+.. deprecated:: 7.7
+   The *RLock*, *ThreadedGenerator* and *ThreadList* classes.
+   Import them from :mod:`tools.threading` instead.
+"""
 #
 # (C) Pywikibot team, 2008-2023
 #
@@ -841,12 +857,14 @@ wrapper.add_deprecated_attr(
     replacement_name='pywikibot.tools.collections.EMPTY_DEFAULT',
     since='7.6.0')
 
-# Deprecate objects which has to be imported from tools.itertools instead
+# Deprecate objects which has to be imported from backports instead
 wrapper.add_deprecated_attr(
     'itergroup',
     # new replacement in 8.2
     replacement_name='pywikibot.backports.batched',
     since='7.6.0')
+
+# Deprecate objects which has to be imported from tools.itertools instead
 wrapper.add_deprecated_attr(
     'islice_with_ellipsis',
     replacement_name='pywikibot.tools.itertools.islice_with_ellipsis',
