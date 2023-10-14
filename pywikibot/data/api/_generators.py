@@ -1024,7 +1024,10 @@ def update_page(page, pagedict: dict, props=None):
     elif 'pageprops' in props:
         page._pageprops = {}
 
-    if 'preload' in pagedict:
+    # preload is deprecated in MW 1.41, try preloadcontent first
+    if 'preloadcontent' in pagedict:
+        page._preloadedtext = pagedict['preloadcontent']['*']
+    elif 'preload' in pagedict:
         page._preloadedtext = pagedict['preload']
 
     if 'flowinfo' in pagedict:

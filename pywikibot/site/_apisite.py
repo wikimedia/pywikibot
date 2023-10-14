@@ -15,9 +15,9 @@ from typing import Any, Optional, Type, TypeVar, Union
 
 import pywikibot
 from pywikibot import login
-from pywikibot.backports import DefaultDict, Dict, List, Match
+from pywikibot.backports import DefaultDict, Dict, Iterable, List, Match
 from pywikibot.backports import OrderedDict as OrderedDictType
-from pywikibot.backports import Iterable, Set, Tuple, removesuffix
+from pywikibot.backports import Set, Tuple, removesuffix
 from pywikibot.comms import http
 from pywikibot.data import api
 from pywikibot.exceptions import (
@@ -1336,7 +1336,10 @@ class APISite(
         title = page.title(with_section=False)
         inprop = 'protection'
         if preload:
-            inprop += '|preload'
+            if self.mw_version >= MediaWikiVersion('1.41'):
+                inprop += '|preloadcontent'
+            else:
+                inprop += '|preload'
 
         query = self._generator(api.PropertyGenerator,
                                 type_arg='info',
