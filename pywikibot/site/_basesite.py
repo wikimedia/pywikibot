@@ -11,7 +11,7 @@ from typing import Optional
 from warnings import warn
 
 import pywikibot
-from pywikibot.backports import List, Pattern
+from pywikibot.backports import List, Pattern, Set
 from pywikibot.exceptions import (
     Error,
     FamilyMaintenanceWarning,
@@ -95,7 +95,7 @@ class BaseSite(ComparableMixin):
 
         # following are for use with lock_page and unlock_page methods
         self._pagemutex = threading.Condition()
-        self._locked_pages = set()
+        self._locked_pages: Set[str] = set()
 
     @property
     @cached
