@@ -118,9 +118,6 @@ class Family:
         '_default': []
     }
 
-    # A list of languages that use hard (not soft) category redirects
-    use_hard_category_redirects = []
-
     # A list of disambiguation template names in different languages
     disambiguationTemplates: Dict[str, Sequence[str]] = {
         '_default': []
