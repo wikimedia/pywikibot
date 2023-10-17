@@ -582,7 +582,7 @@ class _GetDataHTML(HTMLParser):
     """
 
     textdata = ''
-    keeptags = []
+    keeptags: List[str] = []
 
     def __enter__(self) -> None:
         pass
@@ -1140,15 +1140,14 @@ def getLanguageLinks(
     text: str,
     insite=None,
     template_subpage: bool = False
-) -> Dict:
-    """
-    Return a dict of inter-language links found in text.
+) -> Dict['pywikibot.site.BaseSite', 'pywikibot.Page']:
+    """Return a dict of inter-language links found in text.
 
-    The returned dict uses the site as keys and Page objects as values. It does
-    not contain its own site.
+    The returned dict uses the site as keys and Page objects as values.
+    It does not contain its own site.
 
-    Do not call this routine directly, use Page.interwiki() method
-    instead.
+    Do not call this routine directly, use
+    :meth:`page.BasePage.interwiki` method instead.
     """
     if insite is None:
         insite = pywikibot.Site()
@@ -1157,7 +1156,7 @@ def getLanguageLinks(
     # infos there
     if fam.interwiki_forward:
         fam = Family.load(fam.interwiki_forward)
-    result = {}
+    result: Dict[pywikibot.site.BaseSite, pywikibot.Page] = {}
     # Ignore interwiki links within nowiki tags, includeonly tags, pre tags,
     # and HTML comments
     include = []
