@@ -72,6 +72,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'arz': ('تحويل تصنيف',),
         'bn': ('বিষয়শ্রেণী পুনর্নির্দেশ',),
         'bs': ('Category redirect',),
+        'ckb': ('ڕەوانەکەری پۆل', ),
         'cs': ('Zastaralá kategorie',),
         'da': ('Kategoriomdirigering',),
         'en': ('Category redirect',),
