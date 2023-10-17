@@ -707,7 +707,7 @@ class CosmeticChangesToolkit:
         header, sections, footer = textlib.extract_sections(text, self.site)
 
         # iterate stripped sections and create a new page body
-        new_body = []
+        new_body: List[textlib.Section] = []
         for i, strip_section in enumerate(strip_sections):
             current_dep = sections[i].level
             try:
