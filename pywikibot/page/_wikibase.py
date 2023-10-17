@@ -130,13 +130,16 @@ class WikibaseEntity:
     def __getattr__(self, name):
         if name in self.DATA_ATTRIBUTES:
             if self.getID() == '-1':
-                for key, cls in self.DATA_ATTRIBUTES.items():
-                    setattr(self, key, cls.new_empty(self.repo))
+                self._initialize_empty()
                 return getattr(self, name)
             return self.get()[name]
 
         raise AttributeError("'{}' object has no attribute '{}'"
                              .format(self.__class__.__name__, name))
+
+    def _initialize_empty(self):
+        for key, cls in self.DATA_ATTRIBUTES.items():
+            setattr(self, key, cls.new_empty(self.repo))
 
     def _defined_by(self, singular: bool = False) -> dict:
         """
@@ -355,7 +358,7 @@ class WikibaseEntity:
         """
         Return the full concept URI.
 
-        :raise NoWikibaseEntityError: if this entity doesn't exist
+        :raise NoWikibaseEntityError: if this entity's id is not known
         """
         entity_id = self.getID()
         if entity_id == '-1':
@@ -370,6 +373,7 @@ class MediaInfo(WikibaseEntity):
     .. versionadded:: 6.5
     """
 
+    entity_type = 'mediainfo'
     title_pattern = r'M[1-9]\d*'
     DATA_ATTRIBUTES = {
         'labels': LanguageDict,
@@ -378,11 +382,38 @@ class MediaInfo(WikibaseEntity):
 
     def __getattr__(self, name):
         if name == 'claims':  # T149410
-            name = 'statements'
-            if hasattr(self, name):
-                return getattr(self, name)
+            return self.statements
+
+        if name in self.DATA_ATTRIBUTES:
+            if not self.exists():
+                self._assert_has_id()
+                self._initialize_empty()
+            return getattr(self, name)
 
         return super().__getattr__(name)
+
+    def _assert_has_id(self):
+        if self.id != '-1':
+            return
+
+        if not self.file.exists():
+            exc = NoPageError(self.file)
+            raise NoWikibaseEntityError(self) from exc
+
+        self.id = 'M' + str(self.file.pageid)
+
+    def _defined_by(self, singular: bool = False) -> dict:
+        """
+        Internal function to provide the API parameters to identify the entity.
+
+        :param singular: Whether the parameter names should use the singular
+                         form
+        :raise NoWikibaseEntityError: if this entity is associated with
+                                      a non-existing file
+        :return: API parameters
+        """
+        self._assert_has_id()
+        return super()._defined_by(singular)
 
     @property
     def file(self) -> FilePage:
@@ -397,7 +428,8 @@ class MediaInfo(WikibaseEntity):
                 pywikibot.error(msg)
                 raise Error(msg)
 
-            page_id = self.getID(numeric=True)
+            # avoid recursion with self.getID()
+            page_id = int(self.id[1:])
             result = list(self.repo.load_pages_from_pageids([page_id]))
             if not result:
                 raise Error(f'There is no existing page with id "{page_id}"')
@@ -410,27 +442,24 @@ class MediaInfo(WikibaseEntity):
 
         return self._file
 
-    def get_data_for_new_entity(self) -> dict:
-        """Return data required for creation of a new mediainfo."""
-        self.id = 'M' + str(self.file.pageid)
-        self._content = {}
-        return super().get()
-
     def get(self, force: bool = False) -> dict:
         """Fetch all MediaInfo entity data and cache it.
+
+        .. note:: This method may raise exception even if the associated file
+           exists because the mediainfo may not have been initialized yet.
+           :attr:`labels` and :attr:`statements` can still be accessed and
+           modified. :meth:`exists` suppresses the exception.
+
+        .. note:: dicts returned by this method are references to content
+           of this entity and their modifying may indirectly cause
+           unwanted change to the live content
 
         :param force: override caching
         :raise NoWikibaseEntityError: if this entity doesn't exist
         :return: actual data which entity holds
         """
         if self.id == '-1':
-            if force:
-                if not self.file.exists():
-                    exc = NoPageError(self.file)
-                    raise NoWikibaseEntityError(self) from exc
-                # get just the id for Wikibase API call
-                self.id = 'M' + str(self.file.pageid)
-            else:
+            if not force:
                 try:
                     data = self.file.latest_revision.slots['mediainfo']['*']
                 except NoPageError as exc:
@@ -443,6 +472,8 @@ class MediaInfo(WikibaseEntity):
                 self._content = jsonlib.loads(data)
                 self.id = self._content['id']
 
+            self._assert_has_id()
+
         return super().get(force=force)
 
     def getID(self, numeric: bool = False):
@@ -450,9 +481,10 @@ class MediaInfo(WikibaseEntity):
         Get the entity identifier.
 
         :param numeric: Strip the first letter and return an int
+        :raise NoWikibaseEntityError: if this entity is associated with
+                                      a non-existing file
         """
-        if self.id == '-1':
-            self.get()
+        self._assert_has_id()
         return super().getID(numeric=numeric)
 
 
