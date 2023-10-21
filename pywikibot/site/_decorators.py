@@ -1,6 +1,6 @@
 """Decorators used by site models."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -36,9 +36,6 @@ def must_be(group: Optional[str] = None):
 
             return fn(self, *args, **kwargs)
 
-        if not __debug__:
-            return fn
-
         manage_wrapping(callee, fn)
         return callee
 
@@ -59,9 +56,6 @@ def need_extension(extension: str):
                     'Method "{}" is not implemented without the extension {}'
                     .format(fn.__name__, extension))
             return fn(self, *args, **kwargs)
-
-        if not __debug__:
-            return fn
 
         manage_wrapping(callee, fn)
         return callee
@@ -91,9 +85,6 @@ def need_right(right: Optional[str] = None):
                                       .format(self.user(), right))
             return fn(self, *args, **kwargs)
 
-        if not __debug__:
-            return fn
-
         manage_wrapping(callee, fn)
         return callee
 
@@ -115,9 +106,6 @@ def need_version(version: str):
                     "isn't implemented in MediaWiki version < {}"
                     .format(fn.__name__, version))
             return fn(self, *args, **kwargs)
-
-        if not __debug__:
-            return fn
 
         manage_wrapping(callee, fn)
 

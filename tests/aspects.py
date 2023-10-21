@@ -1362,21 +1362,7 @@ class RecentChangesTestCase(WikimediaDefaultSiteTestCase):
             cls.override_default_site(pywikibot.Site('en', 'wikipedia'))
 
 
-class DebugOnlyTestCase(TestCase):
-
-    """Test cases that only operate in debug mode."""
-
-    @classmethod
-    def setUpClass(cls):
-        """Set up test class."""
-        if not __debug__:
-            raise unittest.SkipTest(
-                '{} is disabled when __debug__ is disabled.'
-                .format(cls.__name__))
-        super().setUpClass()
-
-
-class DeprecationTestCase(DebugOnlyTestCase, TestCase):
+class DeprecationTestCase(TestCase):
 
     """Test cases for deprecation function in the tools module."""
 
@@ -1532,6 +1518,14 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
                 self.fail(
                     'expected warning filename {}; warning item: {}'
                     .format(filename, item))
+
+    @classmethod
+    def setUpClass(cls):
+        """Only operate in debug mode."""
+        if not __debug__:
+            raise unittest.SkipTest(
+                f'{cls.__name__} is disabled when __debug__ is disabled.')
+        super().setUpClass()
 
     def setUp(self):
         """Set up unit test."""
