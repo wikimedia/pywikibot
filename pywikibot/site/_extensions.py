@@ -141,6 +141,29 @@ class ProofreadPageMixin:
             self._cache_proofreadinfo()
         return self._proofread_levels
 
+    @need_extension('ProofreadPage')
+    def loadpageurls(
+        self,
+        page: 'pywikibot.page.BasePage'
+    ) -> None:
+        """Load URLs from api and store in page attributes.
+
+        Load URLs to images for a given page in the "Page:" namespace.
+        No effect for pages in other namespaces.
+
+        .. seealso:: :api:`imageforpage`
+        """
+        title = page.title(with_section=False)
+        # responsiveimages: server would try to render the other images as well
+        # let's not load the server unless needed.
+        prppifpprop = 'filename|size|fullsize'
+
+        query = self._generator(api.PropertyGenerator,
+                                type_arg='imageforpage',
+                                titles=title.encode(self.encoding()),
+                                prppifpprop=prppifpprop)
+        self._update_page(page, query)
+
 
 class GeoDataMixin:
 

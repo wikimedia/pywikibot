@@ -1038,3 +1038,8 @@ def update_page(page, pagedict: dict, props=None):
         page._lintinfo.pop('pageid')
         page._lintinfo.pop('title')
         page._lintinfo.pop('ns')
+
+    if 'imageforpage' in props and 'imagesforpage' in pagedict:
+        # proofreadpage will work always on dicts
+        # it serves also as workaround for T352482
+        page._imageforpage = pagedict['imagesforpage'] or {}

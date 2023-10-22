@@ -54,7 +54,7 @@ from pywikibot.comms import http
 from pywikibot.data.api import ListGenerator, Request
 from pywikibot.exceptions import Error, InvalidTitleError, OtherPageSaveError
 from pywikibot.page import PageSourceType
-from pywikibot.tools import cached
+from pywikibot.tools import MediaWikiVersion, cached
 
 
 try:
@@ -825,9 +825,7 @@ class ProofreadPage(pywikibot.Page):
         """
         return f'/* {self.status} */ '
 
-    @property
-    @cached
-    def url_image(self) -> str:
+    def __url_image_lt_140(self) -> str:
         """Get the file url of the scan of ProofreadPage.
 
         :return: file url of the scan ProofreadPage or None.
@@ -863,6 +861,36 @@ class ProofreadPage(pywikibot.Page):
             url_image = 'https:' + url_image
 
         return url_image
+
+    def __url_image(self) -> str:
+        """Get the file url of the scan of ProofreadPage.
+
+        :return: file url of the scan of ProofreadPage or None.
+        :raises ValueError: in case of no image found for scan
+        """
+        self.site.loadpageurls(self)
+        url = self._imageforpage.get('fullsize')
+        if url is not None:
+            return f'{self.site.family.protocol(self.site.code)}:{url}'
+        else:
+            raise ValueError(f'imagesforpage is empty for {self}.')
+
+    @property
+    @cached
+    def url_image(self) -> str:
+        """Get the file url of the scan of ProofreadPage.
+
+        :return: file url of the scan of ProofreadPage or None.
+
+        For MW version < 1.40:
+        :raises Exception: in case of http errors
+        :raises ImportError: if bs4 is not installed, _bs4_soup() will raise
+        :raises ValueError: in case of no prp_page_image src found for scan
+        """
+        if self.site.version() < MediaWikiVersion('1.40'):
+            return self.__url_image_lt_140()
+        else:
+            return self.__url_image()
 
     def _ocr_callback(self, cmd_uri: str,
                       parser_func: Optional[Callable[[str], str]] = None,
