@@ -487,6 +487,60 @@ class MediaInfo(WikibaseEntity):
         self._assert_has_id()
         return super().getID(numeric=numeric)
 
+    def editLabels(self, labels: LANGUAGE_TYPE, **kwargs) -> None:
+        """Edit MediaInfo labels (eg. captions).
+
+        *labels* should be a dict, with the key as a language or a site
+        object. The value should be the string to set it to. You can set
+        it to ``''`` to remove the label.
+
+        Usage:
+
+        >>> repo = pywikibot.Site('commons','commons')
+        >>> page = pywikibot.FilePage(repo, 'File:Sandbox-Test.svg')
+        >>> item = page.data_item()
+        >>> item.editLabels({'en': 'Test file.'}) # doctest: +SKIP
+        """
+        data = {'labels': labels}
+        self.editEntity(data, **kwargs)
+
+    def addClaim(self, claim, bot: bool = True, **kwargs):
+        """
+        Add a claim to the MediaInfo.
+
+        :param claim: The claim to add
+        :type claim: pywikibot.page.Claim
+        :param bot: Whether to flag as bot (if possible)
+        """
+        if claim.on_item is not None:
+            raise ValueError(
+                'The provided Claim instance is already used in an entity')
+
+        self._assert_has_id()
+        if not hasattr(self, '_revid'):
+            # workaround for uninitialized mediainfo's
+            self._revid = self.file.latest_revision_id
+
+        self.repo.addClaim(self, claim, bot=bot, **kwargs)
+        claim.on_item = self
+
+    def removeClaims(self, claims, **kwargs) -> None:
+        """
+        Remove the claims from the MediaInfo.
+
+        :param claims: list of claims to be removed
+        :type claims: list or pywikibot.Claim
+        """
+        # this check allows single claims to be removed by pushing them into a
+        # list of length one.
+        if isinstance(claims, pywikibot.Claim):
+            claims = [claims]
+        data = self.repo.removeClaims(claims, **kwargs)
+        for claim in claims:
+            claim.on_item.latest_revision_id = data['pageinfo']['lastrevid']
+            claim.on_item = None
+            claim.snak = None
+
 
 class WikibasePage(BasePage, WikibaseEntity):
 
