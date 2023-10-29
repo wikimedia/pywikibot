@@ -45,7 +45,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'hsb', 'ks', 'shy', 'bcl', 'su', 'ga', 'btm', 'gd', 'an', 'gom', 'mr',
         'ha', 'wo', 'mni', 'ia', 'bjn', 'ang', 'mt', 'tt', 'sd', 'fo', 'blk',
         'so', 'si', 'gn', 'ie', 'mi', 'csb', 'ug', 'guw', 'st', 'hif', 'jbo',
-        'roa-rup', 'kl', 'zu', 'ay', 'ln', 'yi', 'gu', 'na', 'gv', 'kw', 'kcg',
+        'roa-rup', 'kl', 'zu', 'ay', 'ln', 'yi', 'gu', 'na', 'gv', 'kcg', 'kw',
         'tpi', 'am', 'ne', 'rw', 'ts', 'ig', 'qu', 'ss', 'iu', 'chr', 'dv',
         'ti', 'tn',
     ]
