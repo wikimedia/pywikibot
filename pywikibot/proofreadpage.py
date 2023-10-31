@@ -290,8 +290,7 @@ class PagesTagParser(collections.abc.Container):
         'tosection',
         'onlysection',
     )
-    tokens = '(' + '=|'.join(tokens) + '=)'
-    pat_attr = re.compile(tokens)
+    pat_attr = re.compile(f"({'=|'.join(tokens)}=)")
 
     index = TagAttrDesc()
     ffrom = TagAttrDesc()

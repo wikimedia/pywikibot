@@ -32,7 +32,7 @@ import sys
 from logging import CRITICAL, DEBUG, ERROR, INFO, WARNING
 from typing import Any
 
-from pywikibot.backports import Callable, List
+from pywikibot.backports import Callable, List, Tuple
 from pywikibot.tools import deprecated_args, issue_deprecation_warning
 
 
@@ -107,6 +107,7 @@ def logoutput(msg: Any,
     if _init_routines:
         _init()
 
+    keys: Tuple[str, ...]
     # cleanup positional args
     if level == ERROR:
         keys = ('decoder', 'newline', 'exc_info')
@@ -114,6 +115,7 @@ def logoutput(msg: Any,
         keys = ('layer', 'decoder', 'newline')
     else:
         keys = ('decoder', 'newline')
+
     for i, arg in enumerate(args):
         key = keys[i]
         issue_deprecation_warning(

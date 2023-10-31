@@ -666,6 +666,7 @@ class Family:
         return hash(self.name)
 
     def __str__(self) -> str:
+        assert isinstance(self.name, str)
         return self.name
 
     def __repr__(self) -> str:
