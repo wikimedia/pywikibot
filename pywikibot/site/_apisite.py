@@ -2736,7 +2736,6 @@ class APISite(
         unwatch_s = 'unwatched' if unwatch else 'watched'
         return all(unwatch_s in r for r in results['watch'])
 
-    @need_right('purge')
     def purgepages(
         self,
         pages: List['pywikibot.page.BasePage'],
