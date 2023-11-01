@@ -335,6 +335,7 @@ class ParamInfoDictTests(DefaultDrySiteTestCase):
                                 'url',
                                 'watched',
                                 'watchers',
+                                'preloadcontent',
                                 'preload',
                                 'readable',
                             ],
@@ -417,6 +418,7 @@ class ParamInfoDictTests(DefaultDrySiteTestCase):
         self.assertIn('deprecatedvalues', param)
         self.assertIsInstance(param['type'], list)
         self.assertIn('preload', param['type'])
+        self.assertIn('preloadcontent', param['type'])
 
     def test_tokens_parameter(self):
         """Test parameter() method with 'tokens' module."""
