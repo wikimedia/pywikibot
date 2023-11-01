@@ -33,6 +33,7 @@ from pywikibot.pagegenerators._filters import (
     ItemClaimFilterPageGenerator,
     NamespaceFilterPageGenerator,
     QualityFilterPageGenerator,
+    RedirectFilterPageGenerator,
     RegexBodyFilterPageGenerator,
     RegexFilterPageGenerator,
     SubpageFilterGenerator,
@@ -54,6 +55,7 @@ from pywikibot.pagegenerators._generators import (
     WikibaseSearchItemPageGenerator,
     WikidataSPARQLPageGenerator,
 )
+from pywikibot.tools import strtobool
 from pywikibot.tools.collections import DequeGenerator
 from pywikibot.tools.itertools import (
     filter_unique,
@@ -113,6 +115,7 @@ class GeneratorFactory:
         self.catfilter_list: List['pywikibot.Category'] = []
         self.intersect = False
         self.subpage_max_depth: Optional[int] = None
+        self.redirectfilter: Optional[bool] = None
         self._site = site
         self._positional_arg_name = positional_arg_name
         self._sparql: Optional[str] = None
@@ -241,7 +244,8 @@ class GeneratorFactory:
                     self.claimfilter_list,
                     self.catfilter_list,
                     self.qualityfilter_list,
-                    self.subpage_max_depth is not None)):
+                    self.subpage_max_depth is not None,
+                    self.redirectfilter is not None)):
                 pywikibot.warning('filter(s) specified but no generators.')
             return None
 
@@ -263,6 +267,12 @@ class GeneratorFactory:
         if self.subpage_max_depth is not None:
             dupfiltergen = SubpageFilterGenerator(
                 dupfiltergen, self.subpage_max_depth)
+
+        if self.redirectfilter is not None:
+            # Generator expects second parameter true to exclude redirects, but
+            # our logic is true to assert it is a redirect, false when it isn't
+            dupfiltergen = RedirectFilterPageGenerator(
+                dupfiltergen, not self.redirectfilter)
 
         if self.claimfilter_list:
             for claim in self.claimfilter_list:
@@ -901,6 +911,14 @@ class GeneratorFactory:
             raise NotImplementedError(
                 f'Invalid -logevents parameter "{params[0]}"')
         return self._parse_log_events(*params)
+
+    def _handle_redirect(self, value: str) -> HANDLER_RETURN_TYPE:
+        """Handle `-redirect` argument."""
+        if not value:
+            # True by default
+            value = 'true'
+        self.redirectfilter = strtobool(value)
+        return True
 
     def handle_args(self, args: Iterable[str]) -> List[str]:
         """Handle command line arguments and return the rest as a list.
