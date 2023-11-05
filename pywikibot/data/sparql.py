@@ -4,6 +4,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from textwrap import fill
 from typing import Optional
 from urllib.parse import quote
 
@@ -135,10 +136,14 @@ class SparqlQuery(WaitingMixin):
         return result
 
     def query(self, query: str, headers: Optional[Dict[str, str]] = None):
-        """
-        Run SPARQL query and return parsed JSON result.
+        """Run SPARQL query and return parsed JSON result.
+
+        .. versionchanged:: 8.5
+           :exc:``exceptions.NoUsernameError` is raised if the response
+           looks like the user is not logged in.
 
         :param query: Query text
+        :raises NoUsernameError: User not logged in
         """
         if headers is None:
             headers = DEFAULT_HEADERS
@@ -165,15 +170,15 @@ class SparqlQuery(WaitingMixin):
             # not in case the response otherwise might have it in between
             strcontent = self.last_response.content.decode()
             if (strcontent.startswith('<!DOCTYPE html>')
-               and 'https://commons-query.wikimedia.org' in url):
-                if ('Special:UserLogin' in strcontent
-                   or 'Special:OAuth' in strcontent):
-                    message = ('You need to log in to Wikimedia Commons '
-                               'and give OAUTH permission. '
-                               'Open https://commons-query.wikimedia.org '
-                               'with browser to login and give permission.')
-                    raise NoUsernameError('User not logged in. ' + message)
-
+                and 'https://commons-query.wikimedia.org' in url
+                and ('Special:UserLogin' in strcontent
+                     or 'Special:OAuth' in strcontent)):
+                raise NoUsernameError(fill(
+                    'User not logged in. You need to log in to Wikimedia '
+                    'Commons and give OAUTH permission. Open '
+                    'https://commons-query.wikimedia.org with browser to '
+                    'login and give permission.'
+                ))
         return None
 
     def ask(self, query: str,
