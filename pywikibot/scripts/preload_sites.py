@@ -22,14 +22,18 @@ To force preloading, change the global expiry value to 0::
 #
 # Distributed under the terms of the MIT license.
 #
-import os
 from concurrent.futures import ThreadPoolExecutor, wait
 from datetime import datetime
 from typing import Optional, Union
 
 import pywikibot
-from pywikibot.backports import List, Set, removeprefix
+from pywikibot.backports import Dict, List, Set, removeprefix
 from pywikibot.family import Family
+
+try:  # Python 3.13
+    from os import process_cpu_count  # type: ignore[attr-defined]
+except ImportError:
+    from os import cpu_count as process_cpu_count
 
 
 #: supported families by this script
@@ -44,7 +48,9 @@ families_list = [
     'wiktionary',
 ]
 
-exceptions = {
+# Ignore sites from preloading
+# example: {'wikiversity': ['beta'], }
+exceptions: Dict[str, List[str]] = {
 }
 
 
@@ -80,8 +86,8 @@ def preload_families(families: Union[List[str], Set[str]],
     """
     start = datetime.now()
     if worker is None:
-        # Python 3.8 default
-        worker = min(32, (os.cpu_count() or 1) + 4)
+        # Python 3.13 default
+        worker = min(32, (process_cpu_count() or 1) + 4)
     # to allow adding futures in preload_family the workers must be one
     # more than families are handled
     worker = max(len(families) * 2, worker)
