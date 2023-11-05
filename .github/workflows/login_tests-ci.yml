@@ -23,7 +23,7 @@ jobs:
       max-parallel: 1
 
       matrix:
-        python-version: ["pypy3.7", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12.0-alpha - 3.12.0"]
+        python-version: ["pypy3.7", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
         site: ['wikipedia:en', 'wikisource:zh']
         include:
           # ubuntu-20.04 required for Python 3.6
@@ -50,7 +50,7 @@ jobs:
             os: ubuntu-20.04
           - python-version: 3.8
             site: wowwiki:uk
-          - python-version: "3.12.0-alpha - 3.12.0"
+          - python-version: "3.12"
             site: wikipedia:test
           - python-version: 3
             site: wikipedia:de
@@ -123,22 +123,13 @@ jobs:
         echo "password_file = os.path.expanduser('passwordfile')" >> user-config.py
         echo "('${{ env.PYWIKIBOT_USERNAME }}', '${{ secrets.PYWIKIBOT_USERPWD }}')" > passwordfile
 
-    - name: Test with unittest and coverage
-      if: ${{ matrix.python-version != '3.13-dev' }}
+    - name: Test with unittest
       timeout-minutes: 2
       run: |
         python pwb.py version
         coverage run -m unittest -vv tests/site_login_logout_tests.py
 
-    - name: Test with unittest without coverage due to T346862
-      if: ${{ matrix.python-version == '3.13-dev' }}
-      timeout-minutes: 2
-      run: |
-        python pwb.py version
-        python -m unittest -vv tests/site_login_logout_tests.py
-
     - name: Show coverage statistics
-      if: ${{ matrix.python-version != '3.13-dev' }}
       run: |
         coverage report
 

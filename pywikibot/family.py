@@ -21,6 +21,7 @@ from typing import Optional
 import pywikibot
 from pywikibot import config
 from pywikibot.backports import (
+    DefaultDict,
     Dict,
     FrozenSet,
     List,
@@ -35,6 +36,8 @@ from pywikibot.tools import classproperty, deprecated, remove_last_args
 
 
 logger = logging.getLogger('pywiki.wiki.family')
+
+CrossnamespaceType = DefaultDict[str, Dict[str, List[int]]]
 
 # Legal characters for Family.name and Family.langs keys
 NAME_CHARACTERS = string.ascii_letters + string.digits
@@ -118,9 +121,6 @@ class Family:
         '_default': []
     }
 
-    # A list of languages that use hard (not soft) category redirects
-    use_hard_category_redirects = []
-
     # A list of disambiguation template names in different languages
     disambiguationTemplates: Dict[str, Sequence[str]] = {
         '_default': []
@@ -135,8 +135,8 @@ class Family:
     # should be avoided
     archived_page_templates: Dict[str, Tuple[str, ...]] = {}
 
-    # A list of projects that share cross-project sessions.
-    cross_projects = []
+    # A set of projects that share cross-project sessions.
+    cross_projects: Set[str] = set()
 
     # A list with the name for cross-project cookies.
     # default for wikimedia centralAuth extensions.
@@ -182,7 +182,7 @@ class Family:
     # is checked first, and languages are put in the order given there.
     # All other languages are put after those, in code-alphabetical
     # order.
-    interwiki_putfirst = {}
+    interwiki_putfirst: Dict[str, str] = {}
 
     # Some families, e. g. commons and meta, are not multilingual and
     # forward interlanguage links to another family (wikipedia).
@@ -267,7 +267,7 @@ class Family:
     #   values are dicts where:
     #     keys are the languages that can be linked to from the lang+ns, or
     #     '_default'; values are a list of namespace numbers
-    crossnamespace = collections.defaultdict(dict)
+    crossnamespace: CrossnamespaceType = collections.defaultdict(dict)
     ##
     # Examples :
     #
@@ -302,7 +302,7 @@ class Family:
     .. versionadded:: 7.0
     """
 
-    _families = {}
+    _families: Dict[str, 'Family'] = {}
 
     @staticmethod
     def load(fam: Optional[str] = None):
@@ -666,6 +666,7 @@ class Family:
         return hash(self.name)
 
     def __str__(self) -> str:
+        assert isinstance(self.name, str)
         return self.name
 
     def __repr__(self) -> str:

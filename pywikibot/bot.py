@@ -173,11 +173,7 @@ from pywikibot.logging import (
     warning,
 )
 from pywikibot.throttle import Throttle
-from pywikibot.tools import (
-    PYTHON_VERSION,
-    issue_deprecation_warning,
-    strtobool,
-)
+from pywikibot.tools import issue_deprecation_warning, strtobool
 from pywikibot.tools._logging import LoggingFormatter
 
 
@@ -525,11 +521,8 @@ def writelogheader() -> None:
         if not filename:
             continue
 
-        param = {'sep': ' '}
-        if PYTHON_VERSION >= (3, 6, 0):
-            param['timespec'] = 'seconds'
-        mtime = version.get_module_mtime(module).isoformat(**param)
-
+        mtime = version.get_module_mtime(module).isoformat(sep=' ',
+                                                           timespec='seconds')
         log(f'  {mtime} {filename}')
 
     if config.log_pywiki_repo_version:

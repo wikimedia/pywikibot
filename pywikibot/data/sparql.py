@@ -4,7 +4,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from contextlib import suppress
 from typing import Optional
 from urllib.parse import quote
 
@@ -14,7 +13,7 @@ from pywikibot import Site
 from pywikibot.backports import Dict, List, removeprefix
 from pywikibot.comms import http
 from pywikibot.data import WaitingMixin
-from pywikibot.exceptions import Error
+from pywikibot.exceptions import Error, NoUsernameError
 
 
 try:
@@ -144,17 +143,36 @@ class SparqlQuery(WaitingMixin):
         if headers is None:
             headers = DEFAULT_HEADERS
 
+        # force cleared
+        self.last_response = None
+
         url = f'{self.endpoint}?query={quote(query)}'
         while True:
             try:
                 self.last_response = http.fetch(url, headers=headers)
+                break
             except Timeout:
                 self.wait()
-                continue
 
-            with suppress(JSONDecodeError):
-                return self.last_response.json()
-            break
+        try:
+            return self.last_response.json()
+        except JSONDecodeError:
+            # There is no proper error given but server returns HTML page
+            # in case login isn't valid sotry to guess what the problem is
+            # and notify user instead of silently ignoring it.
+            # This could be made more reliable by fixing the backend.
+            # Note: only raise error when response starts with HTML,
+            # not in case the response otherwise might have it in between
+            strcontent = self.last_response.content.decode()
+            if (strcontent.startswith('<!DOCTYPE html>')
+               and 'https://commons-query.wikimedia.org' in url):
+                if ('Special:UserLogin' in strcontent
+                   or 'Special:OAuth' in strcontent):
+                    message = ('You need to log in to Wikimedia Commons '
+                               'and give OAUTH permission. '
+                               'Open https://commons-query.wikimedia.org '
+                               'with browser to login and give permission.')
+                    raise NoUsernameError('User not logged in. ' + message)
 
         return None
 

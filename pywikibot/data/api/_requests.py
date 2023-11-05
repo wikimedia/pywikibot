@@ -221,7 +221,7 @@ class Request(MutableMapping, WaitingMixin):
             parameters = kwargs
         elif parameters is self._PARAM_DEFAULT:
             parameters = {}
-        self._params = {}
+        self._params: Dict[str, Any] = {}
         if 'action' not in parameters:
             raise ValueError("'action' specification missing from Request.")
         self.action = parameters['action']
@@ -432,12 +432,6 @@ class Request(MutableMapping, WaitingMixin):
                and self.site.has_extension('ProofreadPage'):
                 prop = set(self['prop'] + ['proofread'])
                 self['prop'] = sorted(prop)
-            # When neither 'continue' nor 'rawcontinue' is present we add a
-            # dummy rawcontinue parameter except for 'tokens' (T284577) and
-            # 'siteinfo' (T343204)
-            if ('tokens' not in meta and 'siteinfo' not in meta
-                    and 'continue' not in self._params):
-                self._params.setdefault('rawcontinue', [''])
 
         elif self.action == 'help':
             self['wrap'] = ''

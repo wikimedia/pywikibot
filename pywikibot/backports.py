@@ -69,6 +69,7 @@ else:
 if PYTHON_VERSION < (3, 9):
     from typing import (
         Container,
+        Counter,
         Dict,
         FrozenSet,
         Generator,
@@ -92,6 +93,7 @@ else:
         Mapping,
         Sequence,
     )
+    from collections import Counter
     from re import Match, Pattern
     Dict = dict  # type: ignore[misc]
     FrozenSet = frozenset  # type: ignore[misc]

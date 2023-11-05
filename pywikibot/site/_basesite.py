@@ -11,7 +11,7 @@ from typing import Optional
 from warnings import warn
 
 import pywikibot
-from pywikibot.backports import List, Pattern
+from pywikibot.backports import List, Pattern, Set
 from pywikibot.exceptions import (
     Error,
     FamilyMaintenanceWarning,
@@ -25,6 +25,7 @@ from pywikibot.tools import (
     ComparableMixin,
     SelfCallString,
     cached,
+    deprecated,
     first_upper,
     normalize_username,
 )
@@ -90,12 +91,22 @@ class BaseSite(ComparableMixin):
 
         self._username = normalize_username(user)
 
-        self.use_hard_category_redirects = (
-            self.code in self.family.use_hard_category_redirects)
-
         # following are for use with lock_page and unlock_page methods
         self._pagemutex = threading.Condition()
-        self._locked_pages = set()
+        self._locked_pages: Set[str] = set()
+
+    @property
+    @deprecated(since='8.5.0')
+    def use_hard_category_redirects(self):
+        """Hard redirects are used for this site.
+
+        Originally create as property for future use for a proposal to
+        replace category redirect templates with hard redirects. This
+        was never implemented and is not used inside the framework.
+
+        .. deprecated:: 8.5
+        """
+        return False
 
     @property
     @cached

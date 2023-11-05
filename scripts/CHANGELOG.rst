@@ -1,6 +1,19 @@
 Scripts Changelog
 =================
 
+8.5.0
+-----
+
+category_graph
+~~~~~~~~~~~~~~
+
+* Change category output string to format string (:phab:`T348709`)
+
+commonscat
+~~~~~~~~~~
+
+* Fix skip page template parameter check (:phab:`T106952`)
+
 8.4.0
 -----
 

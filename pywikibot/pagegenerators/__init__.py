@@ -500,6 +500,9 @@ FILTER OPTIONS
                     Valid values are in range 0-4.
                     Multiple values can be comma-separated.
 
+-redirect           Filter pages based on whether they are redirects. To return
+                    only pages that are not redirects, use -redirect:false
+
 -subpage            -subpage:n filters pages to only those that have depth n
                     i.e. a depth of 0 filters out all pages that are subpages,
                     and a depth of 1 filters out all pages that are subpages of

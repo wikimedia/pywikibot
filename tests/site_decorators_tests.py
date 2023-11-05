@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests against a fake Site object."""
 #
-# (C) Pywikibot team, 2012-2022
+# (C) Pywikibot team, 2012-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -10,10 +10,10 @@ import unittest
 from pywikibot.exceptions import UserRightsError
 from pywikibot.site._decorators import must_be, need_right, need_version
 from pywikibot.tools import deprecated
-from tests.aspects import DebugOnlyTestCase, DeprecationTestCase
+from tests.aspects import TestCase, DeprecationTestCase
 
 
-class TestMustBe(DebugOnlyTestCase):
+class TestMustBe(TestCase):
 
     """Test cases for the must_be decorator."""
 
@@ -125,7 +125,7 @@ class TestMustBe(DebugOnlyTestCase):
             self.call_this_user_req_function(args, kwargs)
 
 
-class TestNeedRight(DebugOnlyTestCase):
+class TestNeedRight(TestCase):
 
     """Test cases for the must_be decorator."""
 

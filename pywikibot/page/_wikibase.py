@@ -64,10 +64,12 @@ __all__ = (
 )
 
 
-ALIASES_TYPE = Dict[Union[str, pywikibot.APISite], List[str]]
-LANGUAGE_TYPE = Dict[Union[str, pywikibot.APISite], str]
+LANGUAGE_IDENTIFIER = Union[str, pywikibot.APISite]
+ALIASES_TYPE = Dict[LANGUAGE_IDENTIFIER, List[str]]
+LANGUAGE_TYPE = Dict[LANGUAGE_IDENTIFIER, str]
 SITELINK_TYPE = Union['pywikibot.page.BasePage', 'pywikibot.page.BaseLink',
                       Dict[str, str]]
+ENTITY_DATA_TYPE = Dict[str, Union[LANGUAGE_TYPE, ALIASES_TYPE, SITELINK_TYPE]]
 
 
 class WikibaseEntity:
@@ -128,13 +130,16 @@ class WikibaseEntity:
     def __getattr__(self, name):
         if name in self.DATA_ATTRIBUTES:
             if self.getID() == '-1':
-                for key, cls in self.DATA_ATTRIBUTES.items():
-                    setattr(self, key, cls.new_empty(self.repo))
+                self._initialize_empty()
                 return getattr(self, name)
             return self.get()[name]
 
         raise AttributeError("'{}' object has no attribute '{}'"
                              .format(self.__class__.__name__, name))
+
+    def _initialize_empty(self):
+        for key, cls in self.DATA_ATTRIBUTES.items():
+            setattr(self, key, cls.new_empty(self.repo))
 
     def _defined_by(self, singular: bool = False) -> dict:
         """
@@ -283,7 +288,7 @@ class WikibaseEntity:
 
     def editEntity(
         self,
-        data: Union[LANGUAGE_TYPE, ALIASES_TYPE, SITELINK_TYPE, None] = None,
+        data: Union[ENTITY_DATA_TYPE, None] = None,
         **kwargs
     ) -> None:
         """Edit an entity using Wikibase ``wbeditentity`` API.
@@ -353,7 +358,7 @@ class WikibaseEntity:
         """
         Return the full concept URI.
 
-        :raise NoWikibaseEntityError: if this entity doesn't exist
+        :raise NoWikibaseEntityError: if this entity's id is not known
         """
         entity_id = self.getID()
         if entity_id == '-1':
@@ -368,6 +373,7 @@ class MediaInfo(WikibaseEntity):
     .. versionadded:: 6.5
     """
 
+    entity_type = 'mediainfo'
     title_pattern = r'M[1-9]\d*'
     DATA_ATTRIBUTES = {
         'labels': LanguageDict,
@@ -376,11 +382,38 @@ class MediaInfo(WikibaseEntity):
 
     def __getattr__(self, name):
         if name == 'claims':  # T149410
-            name = 'statements'
-            if hasattr(self, name):
-                return getattr(self, name)
+            return self.statements
+
+        if name in self.DATA_ATTRIBUTES:
+            if not self.exists():
+                self._assert_has_id()
+                self._initialize_empty()
+            return getattr(self, name)
 
         return super().__getattr__(name)
+
+    def _assert_has_id(self):
+        if self.id != '-1':
+            return
+
+        if not self.file.exists():
+            exc = NoPageError(self.file)
+            raise NoWikibaseEntityError(self) from exc
+
+        self.id = 'M' + str(self.file.pageid)
+
+    def _defined_by(self, singular: bool = False) -> dict:
+        """
+        Internal function to provide the API parameters to identify the entity.
+
+        :param singular: Whether the parameter names should use the singular
+                         form
+        :raise NoWikibaseEntityError: if this entity is associated with
+                                      a non-existing file
+        :return: API parameters
+        """
+        self._assert_has_id()
+        return super()._defined_by(singular)
 
     @property
     def file(self) -> FilePage:
@@ -395,7 +428,8 @@ class MediaInfo(WikibaseEntity):
                 pywikibot.error(msg)
                 raise Error(msg)
 
-            page_id = self.getID(numeric=True)
+            # avoid recursion with self.getID()
+            page_id = int(self.id[1:])
             result = list(self.repo.load_pages_from_pageids([page_id]))
             if not result:
                 raise Error(f'There is no existing page with id "{page_id}"')
@@ -408,36 +442,37 @@ class MediaInfo(WikibaseEntity):
 
         return self._file
 
-    def get_data_for_new_entity(self) -> dict:
-        """Return data required for creation of a new mediainfo."""
-        self.id = 'M' + str(self.file.pageid)
-        self._content = {}
-        return super().get()
-
     def get(self, force: bool = False) -> dict:
         """Fetch all MediaInfo entity data and cache it.
+
+        .. note:: This method may raise exception even if the associated file
+           exists because the mediainfo may not have been initialized yet.
+           :attr:`labels` and :attr:`statements` can still be accessed and
+           modified. :meth:`exists` suppresses the exception.
+
+        .. note:: dicts returned by this method are references to content
+           of this entity and their modifying may indirectly cause
+           unwanted change to the live content
 
         :param force: override caching
         :raise NoWikibaseEntityError: if this entity doesn't exist
         :return: actual data which entity holds
         """
         if self.id == '-1':
-            if force:
-                if not self.file.exists():
-                    exc = NoPageError(self.file)
-                    raise NoWikibaseEntityError(self) from exc
-                # get just the id for Wikibase API call
-                self.id = 'M' + str(self.file.pageid)
-            else:
+            if not force:
                 try:
                     data = self.file.latest_revision.slots['mediainfo']['*']
                 except NoPageError as exc:
                     raise NoWikibaseEntityError(self) from exc
-                except KeyError as exc:
-                    raise NoWikibaseEntityError(self) from exc
+                except KeyError:
+                    # reuse the reserved ID for better message
+                    self.id = 'M' + str(self.file.pageid)
+                    raise NoWikibaseEntityError(self) from None
 
                 self._content = jsonlib.loads(data)
                 self.id = self._content['id']
+
+            self._assert_has_id()
 
         return super().get(force=force)
 
@@ -446,10 +481,65 @@ class MediaInfo(WikibaseEntity):
         Get the entity identifier.
 
         :param numeric: Strip the first letter and return an int
+        :raise NoWikibaseEntityError: if this entity is associated with
+                                      a non-existing file
         """
-        if self.id == '-1':
-            self.get()
+        self._assert_has_id()
         return super().getID(numeric=numeric)
+
+    def editLabels(self, labels: LANGUAGE_TYPE, **kwargs) -> None:
+        """Edit MediaInfo labels (eg. captions).
+
+        *labels* should be a dict, with the key as a language or a site
+        object. The value should be the string to set it to. You can set
+        it to ``''`` to remove the label.
+
+        Usage:
+
+        >>> repo = pywikibot.Site('commons','commons')
+        >>> page = pywikibot.FilePage(repo, 'File:Sandbox-Test.svg')
+        >>> item = page.data_item()
+        >>> item.editLabels({'en': 'Test file.'}) # doctest: +SKIP
+        """
+        data = {'labels': labels}
+        self.editEntity(data, **kwargs)
+
+    def addClaim(self, claim, bot: bool = True, **kwargs):
+        """
+        Add a claim to the MediaInfo.
+
+        :param claim: The claim to add
+        :type claim: pywikibot.page.Claim
+        :param bot: Whether to flag as bot (if possible)
+        """
+        if claim.on_item is not None:
+            raise ValueError(
+                'The provided Claim instance is already used in an entity')
+
+        self._assert_has_id()
+        if not hasattr(self, '_revid'):
+            # workaround for uninitialized mediainfo's
+            self._revid = self.file.latest_revision_id
+
+        self.repo.addClaim(self, claim, bot=bot, **kwargs)
+        claim.on_item = self
+
+    def removeClaims(self, claims, **kwargs) -> None:
+        """
+        Remove the claims from the MediaInfo.
+
+        :param claims: list of claims to be removed
+        :type claims: list or pywikibot.Claim
+        """
+        # this check allows single claims to be removed by pushing them into a
+        # list of length one.
+        if isinstance(claims, pywikibot.Claim):
+            claims = [claims]
+        data = self.repo.removeClaims(claims, **kwargs)
+        for claim in claims:
+            claim.on_item.latest_revision_id = data['pageinfo']['lastrevid']
+            claim.on_item = None
+            claim.snak = None
 
 
 class WikibasePage(BasePage, WikibaseEntity):
@@ -648,7 +738,7 @@ class WikibasePage(BasePage, WikibaseEntity):
     @allow_asynchronous
     def editEntity(
         self,
-        data: Union[LANGUAGE_TYPE, ALIASES_TYPE, SITELINK_TYPE, None] = None,
+        data: Union[ENTITY_DATA_TYPE, None] = None,
         **kwargs: Any
     ) -> None:
         """Edit an entity using Wikibase ``wbeditentity`` API.
@@ -1114,7 +1204,7 @@ class ItemPage(WikibasePage):
         """
         self.setSitelinks([sitelink], **kwargs)
 
-    def removeSitelink(self, site, **kwargs) -> None:
+    def removeSitelink(self, site: LANGUAGE_IDENTIFIER, **kwargs) -> None:
         """
         Remove a sitelink.
 
@@ -1122,7 +1212,8 @@ class ItemPage(WikibasePage):
         """
         self.removeSitelinks([site], **kwargs)
 
-    def removeSitelinks(self, sites, **kwargs) -> None:
+    def removeSitelinks(self, sites: List[LANGUAGE_IDENTIFIER], **kwargs
+                        ) -> None:
         """
         Remove sitelinks.
 

@@ -608,12 +608,12 @@ class TerminalHandler(logging.StreamHandler):
         self.UI.output(msg, targetStream=self.stream)
 
 
-class MaxLevelFilter(logging.Filter):
+class MaxLevelFilter():
 
     """Filter that only passes records at or below a specific level.
 
-    (setting handler level only passes records at or *above* a specified level,
-    so this provides the opposite functionality)
+    .. note:: setting handler level only passes records at or *above* a
+       specified level, so this provides the opposite functionality.
 
     """
 

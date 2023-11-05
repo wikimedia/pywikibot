@@ -15,6 +15,7 @@ from typing import Optional, Union
 
 import pywikibot
 from pywikibot import config
+from pywikibot.backports import Counter as CounterType
 from pywikibot.tools import deprecated
 
 
@@ -65,14 +66,14 @@ class Throttle:
         self.mindelay = mindelay or config.minthrottle
         self.maxdelay = maxdelay or config.maxthrottle
         self.writedelay = writedelay or config.put_throttle
-        self.last_read = 0
-        self.last_write = 0
+        self.last_read = 0.0
+        self.last_write = 0.0
         self.next_multiplicity = 1.0
 
         self.retry_after = 0  # set by http.request
         self.delay = 0
-        self.checktime = 0
-        self.modules = Counter()
+        self.checktime = 0.0
+        self.modules: CounterType[str] = Counter()
 
         self.checkMultiplicity()
         self.setDelays()
