@@ -1,19 +1,8 @@
 Current release
 ---------------
 
-* Add a pagegenerators filter option to check if a page is redirect (:phab:`T261549`)
-* Add support for ``vikidia:nl`` site
-* Replace MediaWiki API deprecated ``inprop=preload`` with ``preloadcontent`` (:phab:`T348910`)
-* Remove check for purge right from APISite.purgepages (:phab:`T349348`)
-* Add MediaInfo editLabels, AddClaim and removeClaim functions (:phab:`T348422`)
-* Drop unused ``Family.use_hard_category_redirects`` (:phab:`T348953`)
-* No longer drop site decorators for optimized codes (:phab:`T74424`)
-* Improve handling of uninitialized MediaInfo
-* Add support for ``vikidia:ar`` site
-* Make exception about missing mediainfo more friendly
-* L10N and i18n updates
-* Give visible error to user when there are no rights (:phab:`T345342`)
-* **Python 3.6 support will be discontinued** and this is the last version supporting it.
+* (no changes yet)
+* **Python 3.6 support will be discontinued soon**.
 
 
 Deprecations
