@@ -94,7 +94,7 @@ class WikibaseEntity:
 
     DATA_ATTRIBUTES: Dict[str, Any] = {}
 
-    def __init__(self, repo, id_=None) -> None:
+    def __init__(self, repo, id_: Optional[str] = None) -> None:
         """
         Initializer.
 
@@ -141,14 +141,14 @@ class WikibaseEntity:
         for key, cls in self.DATA_ATTRIBUTES.items():
             setattr(self, key, cls.new_empty(self.repo))
 
-    def _defined_by(self, singular: bool = False) -> dict:
+    def _defined_by(self, singular: bool = False) -> Dict[str, str]:
         """
         Internal function to provide the API parameters to identify the entity.
 
         An empty dict is returned if the entity has not been created yet.
 
         :param singular: Whether the parameter names should use the singular
-                         form
+            form
         :return: API parameters
         """
         params = {}
@@ -159,7 +159,7 @@ class WikibaseEntity:
                 params['ids'] = self.id
         return params
 
-    def getID(self, numeric: bool = False):
+    def getID(self, numeric: bool = False) -> Union[int, str]:
         """
         Get the identifier of this entity.
 
@@ -406,6 +406,8 @@ class MediaInfo(WikibaseEntity):
         """
         Internal function to provide the API parameters to identify the entity.
 
+        .. versionadded:: 8.5
+
         :param singular: Whether the parameter names should use the singular
                          form
         :raise NoWikibaseEntityError: if this entity is associated with
@@ -500,13 +502,16 @@ class MediaInfo(WikibaseEntity):
         >>> page = pywikibot.FilePage(repo, 'File:Sandbox-Test.svg')
         >>> item = page.data_item()
         >>> item.editLabels({'en': 'Test file.'}) # doctest: +SKIP
+
+        .. versionadded:: 8.5
         """
         data = {'labels': labels}
         self.editEntity(data, **kwargs)
 
     def addClaim(self, claim, bot: bool = True, **kwargs):
-        """
-        Add a claim to the MediaInfo.
+        """Add a claim to the MediaInfo.
+
+        .. versionadded:: 8.5
 
         :param claim: The claim to add
         :type claim: pywikibot.page.Claim
@@ -525,8 +530,9 @@ class MediaInfo(WikibaseEntity):
         claim.on_item = self
 
     def removeClaims(self, claims, **kwargs) -> None:
-        """
-        Remove the claims from the MediaInfo.
+        """Remove the claims from the MediaInfo.
+
+        .. versionadded:: 8.5
 
         :param claims: list of claims to be removed
         :type claims: list or pywikibot.Claim

@@ -913,7 +913,10 @@ class GeneratorFactory:
         return self._parse_log_events(*params)
 
     def _handle_redirect(self, value: str) -> HANDLER_RETURN_TYPE:
-        """Handle `-redirect` argument."""
+        """Handle `-redirect` argument.
+
+        .. versionadded:: 8.5
+        """
         if not value:
             # True by default
             value = 'true'
