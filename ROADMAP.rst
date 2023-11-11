@@ -1,7 +1,7 @@
 Current release
 ---------------
 
-* (no changes yet)
+* Add support for new wikis (:phab:`T350231`, :phab:`T350237`, :phab:`T350243`, :phab:`T350375`)
 * **Python 3.6 support will be discontinued soon**.
 
 
