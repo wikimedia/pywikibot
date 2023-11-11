@@ -991,15 +991,6 @@ def handle_args(args: Optional[Iterable[str]] = None,
                 # argument not global -> specific bot script will take care
                 non_global_args.append(arg)
 
-    if calledModuleName() != 'generate_user_files':  # T261771
-        try:
-            pywikibot.Site()
-        except (UnknownFamilyError, UnknownSiteError):
-            pywikibot.exception(exc_info=False)
-            sys.exit(1)
-        if calledModuleName() == 'wrapper':
-            pywikibot._sites.clear()
-
     if username:
         config.usernames[config.family][config.mylang] = username
 
@@ -1013,6 +1004,15 @@ def handle_args(args: Optional[Iterable[str]] = None,
     if do_help_val:
         show_help(show_global=do_help_val == 'global')
         sys.exit(0)
+
+    if calledModuleName() != 'generate_user_files':  # T261771
+        try:
+            pywikibot.Site()
+        except (UnknownFamilyError, UnknownSiteError):
+            pywikibot.exception(exc_info=False)
+            sys.exit(1)
+        if calledModuleName() == 'wrapper':
+            pywikibot._sites.clear()
 
     debug('handle_args() completed.')
     return non_global_args
