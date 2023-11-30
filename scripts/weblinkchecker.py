@@ -31,7 +31,7 @@ When a link is found alive, it will be removed from the .dat file.
 
 These command line parameters can be used to specify which pages to work on:
 
--repeat      Work on all pages were dead links were found before. This is
+-repeat      Work on all pages where dead links were found before. This is
              useful to confirm that the links are dead after some time (at
              least one week), which is required before the script will report
              the problem.
