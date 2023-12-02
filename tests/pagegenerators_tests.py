@@ -16,6 +16,7 @@ from unittest import mock
 import pywikibot
 from pywikibot import date, pagegenerators
 from pywikibot.exceptions import (
+    APIError,
     NoPageError,
     ServerError,
     UnknownExtensionError,
@@ -377,7 +378,8 @@ class PetScanPageGeneratorTestCase(TestCase):
         site = self.get_site()
         gen = pagegenerators.PetScanPageGenerator(['Pywikibot Protect Test'],
                                                   True, None, site)
-        with skipping(ServerError):
+        with skipping(ServerError,
+                      APIError):  # (temporary) disabled due to T352482
             self.assertPageTitlesEqual(gen, titles=(
                 'User:Sn1per/ProtectTest1', 'User:Sn1per/ProtectTest2'),
                 site=site)
