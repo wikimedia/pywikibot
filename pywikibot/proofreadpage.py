@@ -1313,7 +1313,14 @@ class IndexPage(pywikibot.Page):
             filter_ql = list(self.site.proofread_levels)
             filter_ql.remove(ProofreadPage.WITHOUT_TEXT)
 
-        gen = (self.get_page(i) for i in range(start, end + 1))
+        gen = [self.get_page(i) for i in range(start, end + 1)]
+
+        # Decorate and sort by page number because preloadpages does not
+        # guarantee order.
+        # TODO: remove if preloadpages will guarantee order.
+        gen = [(self.get_number(p), p) for p in gen]
+        gen = [p for n, p in sorted(gen)]
+
         if content:
             gen = self.site.preloadpages(gen)
         # Filter by QL.
@@ -1321,11 +1328,6 @@ class IndexPage(pywikibot.Page):
         # Yield only existing.
         if only_existing:
             gen = (p for p in gen if p.exists())
-        # Decorate and sort by page number because preloadpages does not
-        # guarantee order.
-        # TODO: remove if preloadpages will guarantee order.
-        gen = ((self.get_number(p), p) for p in gen)
-        gen = (p for n, p in sorted(gen))
 
         return gen
 
