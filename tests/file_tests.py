@@ -12,6 +12,7 @@ from contextlib import suppress
 from itertools import chain
 
 import pywikibot
+from pywikibot import pagegenerators
 from pywikibot.exceptions import (
     Error,
     NoPageError,
@@ -19,7 +20,6 @@ from pywikibot.exceptions import (
     PageRelatedError,
     UserRightsError,
 )
-from pywikibot import pagegenerators
 from tests import join_images_path
 from tests.aspects import TestCase
 

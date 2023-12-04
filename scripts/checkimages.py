@@ -100,8 +100,8 @@ from pywikibot.exceptions import (
 )
 from pywikibot.family import Family
 from pywikibot.site import Namespace
-
 from scripts.welcome import get_welcome_text
+
 
 ###############################################################################
 # <--------------------------- Change only below! --------------------------->#

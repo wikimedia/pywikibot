@@ -11,8 +11,9 @@ from contextlib import suppress
 from itertools import chain
 from typing import Any
 
-from pywikibot.backports import Dict, List
+from pywikibot.backports import Dict
 from pywikibot.backports import Generator as GeneratorType
+from pywikibot.backports import List
 
 
 __all__ = (

@@ -12,9 +12,9 @@ from unittest.mock import patch
 
 import pywikibot
 import pywikibot.data.sparql as sparql
+from pywikibot.exceptions import NoUsernameError
 from tests.aspects import TestCase, WikidataTestCase
 from tests.utils import skipping
-from pywikibot.exceptions import NoUsernameError
 
 
 # See: https://www.w3.org/TR/2013/REC-sparql11-results-json-20130321/

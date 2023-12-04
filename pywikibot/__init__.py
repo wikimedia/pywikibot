@@ -76,6 +76,7 @@ from pywikibot.site import APISite, BaseSite
 from pywikibot.time import Timestamp
 from pywikibot.tools import PYTHON_VERSION, normalize_username
 
+
 __all__ = (
     '__copyright__', '__description__', '__download_url__', '__license__',
     '__maintainer__', '__maintainer_email__', '__name__', '__url__',

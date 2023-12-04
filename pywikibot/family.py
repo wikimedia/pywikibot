@@ -14,8 +14,8 @@ import urllib.parse as urlparse
 import warnings
 from importlib import import_module
 from itertools import chain
-from textwrap import fill
 from os.path import basename, dirname, splitext
+from textwrap import fill
 from typing import Optional
 
 import pywikibot

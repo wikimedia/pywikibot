@@ -14,16 +14,16 @@ This script is for updating ``_first_upper_exception_dict``.
 #
 # Distributed under the terms of the MIT license.
 #
-from sys import maxunicode
-from re import findall
 from json import dump, load
 from queue import Queue
+from re import findall
+from sys import maxunicode
 from threading import Thread
 
-from scripts.maintenance.wikimedia_sites import families_list
-from pywikibot.family import Family
 from pywikibot import Site
 from pywikibot.comms.http import session
+from pywikibot.family import Family
+from scripts.maintenance.wikimedia_sites import families_list
 
 
 NUMBER_OF_THREADS = 26
@@ -133,7 +133,7 @@ def save_json(obj, path):
 def load_json(path):
     """Load data from file."""
     try:
-        with open(path, 'r', encoding='utf8') as f:
+        with open(path, encoding='utf8') as f:
             return load(f)
     except OSError:
         print('File not found:', path)  # noqa: T001, T201

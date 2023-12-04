@@ -19,6 +19,7 @@ from pywikibot.logging import warning
 from pywikibot.time import Timestamp
 from pywikibot.tools import remove_last_args
 
+
 if TYPE_CHECKING:
     from pywikibot.site import APISite, BaseSite, DataSite
 

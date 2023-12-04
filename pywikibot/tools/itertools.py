@@ -14,7 +14,7 @@ from contextlib import suppress
 from itertools import chain, zip_longest
 from typing import Any
 
-from pywikibot.backports import batched, Generator, List
+from pywikibot.backports import Generator, List, batched
 from pywikibot.logging import debug
 from pywikibot.tools import deprecated, issue_deprecation_warning
 
