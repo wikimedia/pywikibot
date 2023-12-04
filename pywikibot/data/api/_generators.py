@@ -701,7 +701,7 @@ class PageGenerator(QueryGenerator):
                 and 'protection' in parameters['inprop']):
             append_params(parameters, 'inprop', 'protection')
         append_params(parameters, 'iiprop',
-                      'timestamp|user|comment|url|size|sha1|metadata')
+                      'timestamp|user|comment|url|size|sha1')
         append_params(parameters, 'iilimit', 'max')  # T194233
         parameters['generator'] = generator
         super().__init__(**kwargs)

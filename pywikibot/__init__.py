@@ -72,8 +72,8 @@ from pywikibot.logging import (
     stdout,
     warning,
 )
-from pywikibot.site import APISite, BaseSite
 from pywikibot.time import Timestamp
+from pywikibot.site import APISite, BaseSite
 from pywikibot.tools import PYTHON_VERSION, normalize_username
 
 
