@@ -14,8 +14,8 @@ The following parameters are supported:
 -always           If used, the bot won't ask if it should add the specified
                   text
 
--delay:#          Set an amount of days. If the category is edited more recenty
-                  than given days, ignore it. Default is 7.
+-delay:#          Set an amount of days. If the category is edited more
+                  recently than given days, ignore it. Default is 7.
 
 -tiny             Only loops over Category:Non-empty_category_redirects and
                   moves all images, pages and categories in redirect categories
@@ -30,7 +30,7 @@ Usage:
    can be set within a settings file which is scripts.ini by default.
 """
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
