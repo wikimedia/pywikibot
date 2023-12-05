@@ -1,6 +1,19 @@
 Release history
 ===============
 
+8.6.0
+-----
+*05 December 2023*
+
+* Lazy load imageinfo metadata (:phab:`T253591`)
+* Fetch URL of page scan via :api:`imageforpage` in :mod:`proofreadpage` module
+  (:phab:`T114318`, :phab:`T181913`, :phab:`T352524`)
+* Sort page names before loading pages in :mod:`proofreadpage` module
+* L10N and i18n updates
+* check for valid family and site option after ``-help`` is processed (:phab:`T350756`)
+* Handle canary events in comms.eventstreams (:phab:`T350756`)
+
+
 8.5.1
 -----
 *11. November 2023*

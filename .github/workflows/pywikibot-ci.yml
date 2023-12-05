@@ -30,19 +30,16 @@ jobs:
         site: ['wikipedia:en', 'wikisource:zh']
         test_prod_only: [true]
         include:
-          # ubuntu-20.04 required for Python 3.6
           - python-version: 3.7
             site: wikipedia:test
-          - python-version: 3.6
+          - python-version: 3.7
             site: False
             family: wpbeta
             code: en
-            os: ubuntu-20.04
-          - python-version: 3.6
+          - python-version: 3.7
             site: False
             family: wpbeta
             code: zh
-            os: ubuntu-20.04
           - python-version: 3.8
             site: wsbeta:en
           - python-version: 3.7
@@ -50,22 +47,13 @@ jobs:
           - python-version: 3.9
             site: wiktionary:ar
             test_no_rc: true
-          - python-version: 3.6
+          - python-version: 3.7
             site: wikidata:wikidata
-            os: ubuntu-20.04
           - python-version: 3.8
             site: wowwiki:uk
           - python-version: 3
             site: wikipedia:de
             os: macOS-latest
-          - python-version: 3.6
-            site: wikipedia:en
-            test_prod_only: true
-            os: ubuntu-20.04
-          - python-version: 3.6
-            site: wikisource:zh
-            test_prod_only: true
-            os: ubuntu-20.04
           - python-version: "3.12"  # 3.12 fails due to T337748
             site: wikipedia:en
             test_prod_only: true

@@ -1,14 +1,7 @@
 Current release
 ---------------
 
-* Lazy load imageinfo metadata (:phab:`T253591`)
-* Fetch URL of page scan via :api:`imageforpage` in :mod:`proofreadpage` module
-  (:phab:`T114318`, :phab:`T181913`, :phab:`T352524`)
-* Sort page names before loading pages in :mod:`proofreadpage` module
-* L10N and i18n updates
-* check for valid family and site option after ``-help`` is processed (:phab:`T350756`)
-* Handle canary events in comms.eventstreams (:phab:`T350756`)
-* **Python 3.6 support will be discontinued** and this is the last version supporting it.
+* **Python 3.6 support is be discontinued**
 
 
 Deprecations
