@@ -10,7 +10,7 @@ import unittest
 from pywikibot.exceptions import UserRightsError
 from pywikibot.site._decorators import must_be, need_right, need_version
 from pywikibot.tools import deprecated
-from tests.aspects import TestCase, DeprecationTestCase
+from tests.aspects import DeprecationTestCase, TestCase
 
 
 class TestMustBe(TestCase):

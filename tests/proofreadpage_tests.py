@@ -26,7 +26,6 @@ from tests.basepage import (
     BasePageLoadRevisionsCachingTestBase,
     BasePageMethodsTestBase,
 )
-from tests.utils import skipping
 
 
 class TestPagesTagParser(TestCase):
@@ -250,7 +249,7 @@ class TestProofreadPageValidSite(TestCase):
         'footer': '\n{{smallrefs}}',
         'url_image': ('https://upload.wikimedia.org/wikipedia/commons/'
                       'thumb/a/ac/Popular_Science_Monthly_Volume_1.djvu/'
-                      'page12-1024px-Popular_Science_Monthly_Volume_1.djvu'
+                      'page12-2267px-Popular_Science_Monthly_Volume_1.djvu'
                       '.jpg'),
     }
 
@@ -412,8 +411,7 @@ class TestProofreadPageValidSite(TestCase):
             page.url_image
 
         page = ProofreadPage(self.site, self.valid_redlink['title'])
-        with skipping(ValueError, msg='T181913, T114318'):
-            self.assertEqual(page.url_image, self.valid_redlink['url_image'])
+        self.assertEqual(page.url_image, self.valid_redlink['url_image'])
 
 
 class TestPageQuality(TestCase):

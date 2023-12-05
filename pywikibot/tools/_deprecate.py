@@ -28,7 +28,6 @@ import inspect
 import re
 import sys
 import types
-
 from contextlib import suppress
 from importlib import import_module
 from inspect import getfullargspec

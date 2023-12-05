@@ -12,6 +12,7 @@ from contextlib import suppress
 from itertools import chain
 
 import pywikibot
+from pywikibot import pagegenerators
 from pywikibot.exceptions import (
     Error,
     NoPageError,
@@ -19,7 +20,6 @@ from pywikibot.exceptions import (
     PageRelatedError,
     UserRightsError,
 )
-from pywikibot import pagegenerators
 from tests import join_images_path
 from tests.aspects import TestCase
 
@@ -228,6 +228,14 @@ class TestFilePageLatestFileInfo(TestCase):
         """Create File page."""
         super().setUp()
         self.image = pywikibot.FilePage(self.site, self.file_name)
+
+    def test_lazyload_metadata(self):
+        """Test metadata lazy load."""
+        self.assertTrue(self.image.exists())
+
+        rev = self.image.latest_file_info
+        self.assertIsNone(rev._metadata)
+        self.assertIsNotNone(rev.metadata)
 
     def test_get_file_url(self):
         """Get File url."""

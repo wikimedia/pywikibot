@@ -30,6 +30,7 @@ import pywikibot
 from pywikibot.backports import Dict, List, Set, removeprefix
 from pywikibot.family import Family
 
+
 try:  # Python 3.13
     from os import process_cpu_count  # type: ignore[attr-defined]
 except ImportError:

@@ -73,7 +73,7 @@ class BasePage(ComparableMixin):
         '_contentmodel', '_langlinks', '_isredir', '_coords',
         '_preloadedtext', '_timestamp', '_applicable_protections',
         '_flowinfo', '_quality', '_pageprops', '_revid', '_quality_text',
-        '_pageimage', '_item', '_lintinfo',
+        '_pageimage', '_item', '_lintinfo', '_imageforpage',
     )
 
     def __init__(self, source, title: str = '', ns=0) -> None:

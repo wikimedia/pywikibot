@@ -240,6 +240,7 @@ from pywikibot.backports import Dict, List
 from pywikibot.config import verbose_output as verbose
 from pywikibot.data import api
 
+
 try:
     import isbnlib
 except ImportError as e:

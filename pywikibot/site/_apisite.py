@@ -1362,27 +1362,35 @@ class APISite(
         history: bool = False,
         url_width: Optional[int] = None,
         url_height: Optional[int] = None,
-        url_param: Optional[str] = None
+        url_param: Optional[str] = None,
+        timestamp: Optional[pywikibot.Timestamp] = None
     ) -> None:
         """Load image info from api and save in page attributes.
 
         The following properties are loaded: ``timestamp``, ``user``,
         ``comment``, ``url``, ``size``, ``sha1``, ``mime``, ``mediatype``,
-        ``metadata``, ``archivename`` and ``bitdepth``. If *url_width*,
-        *url_height* or *url_param* is given, additional properties
-        ``thumbwidth``, ``thumbheight``, ``thumburl`` and
+        ``archivename`` and ``bitdepth``.
+        ``metadata``is loaded only if history is False.
+        If *url_width*, *url_height* or *url_param* is given, additional
+        properties ``thumbwidth``, ``thumbheight``, ``thumburl`` and
         ``responsiveUrls`` are given.
 
         .. note:: Parameters validation and error handling left to the
            API call.
         .. versionchanged:: 8.2
            *mediatype* and *bitdepth* properties were added.
+        .. versionchanged:: 8.6.
+           Added *timestamp* parameter.
+           Metadata are loaded only if *history* is False.
         .. seealso:: :api:`Imageinfo`
 
         :param history: if true, return the image's version history
         :param url_width: get info for a thumbnail with given width
         :param url_height: get info for a thumbnail with given height
         :param url_param:  get info for a thumbnail with given param
+        :param timestamp: timestamp of the image's version to retrieve.
+            It has effect only if history is False.
+            If omitted, the latest version will be fetched.
         """
         args = {
             'titles': page.title(with_section=False),
@@ -1391,11 +1399,15 @@ class APISite(
             'iiurlparam': url_param,
             'iiprop': [
                 'timestamp', 'user', 'comment', 'url', 'size', 'sha1', 'mime',
-                'mediatype', 'metadata', 'archivename', 'bitdepth',
+                'mediatype', 'archivename', 'bitdepth',
             ]
         }
         if not history:
             args['total'] = 1
+            args['iiprop'].append('metadata')
+            if timestamp:
+                args['iistart'] = args['iiend'] = timestamp.isoformat()
+
         query = self._generator(api.PropertyGenerator,
                                 type_arg='imageinfo',
                                 **args)

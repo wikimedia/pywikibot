@@ -701,7 +701,7 @@ class PageGenerator(QueryGenerator):
                 and 'protection' in parameters['inprop']):
             append_params(parameters, 'inprop', 'protection')
         append_params(parameters, 'iiprop',
-                      'timestamp|user|comment|url|size|sha1|metadata')
+                      'timestamp|user|comment|url|size|sha1')
         append_params(parameters, 'iilimit', 'max')  # T194233
         parameters['generator'] = generator
         super().__init__(**kwargs)
@@ -1038,3 +1038,8 @@ def update_page(page, pagedict: dict, props=None):
         page._lintinfo.pop('pageid')
         page._lintinfo.pop('title')
         page._lintinfo.pop('ns')
+
+    if 'imageforpage' in props and 'imagesforpage' in pagedict:
+        # proofreadpage will work always on dicts
+        # it serves also as workaround for T352482
+        page._imageforpage = pagedict['imagesforpage'] or {}

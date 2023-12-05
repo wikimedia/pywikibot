@@ -1,6 +1,13 @@
 Release history
 ===============
 
+8.5.1
+-----
+*11. November 2023*
+
+* Add support for new wikis (:phab:`T350231`, :phab:`T350237`, :phab:`T350243`, :phab:`T350375`)
+
+
 8.5.0
 -----
 *05. November 2023*

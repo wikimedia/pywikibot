@@ -54,7 +54,7 @@ from pywikibot.comms import http
 from pywikibot.data.api import ListGenerator, Request
 from pywikibot.exceptions import Error, InvalidTitleError, OtherPageSaveError
 from pywikibot.page import PageSourceType
-from pywikibot.tools import cached
+from pywikibot.tools import MediaWikiVersion, cached
 
 
 try:
@@ -825,10 +825,10 @@ class ProofreadPage(pywikibot.Page):
         """
         return f'/* {self.status} */ '
 
-    @property
-    @cached
-    def url_image(self) -> str:
+    def _url_image_lt_140(self) -> str:
         """Get the file url of the scan of ProofreadPage.
+
+        .. versionadded:: 8.6
 
         :return: file url of the scan ProofreadPage or None.
 
@@ -863,6 +863,38 @@ class ProofreadPage(pywikibot.Page):
             url_image = 'https:' + url_image
 
         return url_image
+
+    def _url_image_ge_140(self) -> str:
+        """Get the file url of the scan of ProofreadPage.
+
+        .. versionadded:: 8.6
+
+        :return: file url of the scan of ProofreadPage or None.
+        :raises ValueError: in case of no image found for scan
+        """
+        self.site.loadpageurls(self)
+        url = self._imageforpage.get('fullsize')
+        if url is not None:
+            return f'{self.site.family.protocol(self.site.code)}:{url}'
+        else:
+            raise ValueError(f'imagesforpage is empty for {self}.')
+
+    @property
+    @cached
+    def url_image(self) -> str:
+        """Get the file url of the scan of ProofreadPage.
+
+        :return: file url of the scan of ProofreadPage or None.
+
+        For MW version < 1.40:
+        :raises Exception: in case of http errors
+        :raises ImportError: if bs4 is not installed, _bs4_soup() will raise
+        :raises ValueError: in case of no prp_page_image src found for scan
+        """
+        if self.site.version() < MediaWikiVersion('1.40'):
+            return self._url_image_lt_140()
+
+        return self._url_image_ge_140()
 
     def _ocr_callback(self, cmd_uri: str,
                       parser_func: Optional[Callable[[str], str]] = None,
@@ -1294,6 +1326,10 @@ class IndexPage(pywikibot.Page):
 
         Range is [start ... end], extremes included.
 
+        .. versionchanged:: 8.6
+           page names are sorted before loading pages.
+
+
         :param start: first page, defaults to 1
         :param end: num_pages if end is None
         :param filter_ql: filters quality levels
@@ -1313,7 +1349,14 @@ class IndexPage(pywikibot.Page):
             filter_ql = list(self.site.proofread_levels)
             filter_ql.remove(ProofreadPage.WITHOUT_TEXT)
 
-        gen = (self.get_page(i) for i in range(start, end + 1))
+        gen = [self.get_page(i) for i in range(start, end + 1)]
+
+        # Decorate and sort by page number because preloadpages does not
+        # guarantee order.
+        # TODO: remove if preloadpages will guarantee order.
+        gen = [(self.get_number(p), p) for p in gen]
+        gen = [p for n, p in sorted(gen)]
+
         if content:
             gen = self.site.preloadpages(gen)
         # Filter by QL.
@@ -1321,11 +1364,6 @@ class IndexPage(pywikibot.Page):
         # Yield only existing.
         if only_existing:
             gen = (p for p in gen if p.exists())
-        # Decorate and sort by page number because preloadpages does not
-        # guarantee order.
-        # TODO: remove if preloadpages will guarantee order.
-        gen = ((self.get_number(p), p) for p in gen)
-        gen = (p for n, p in sorted(gen))
 
         return gen
 

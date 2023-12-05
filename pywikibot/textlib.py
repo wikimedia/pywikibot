@@ -18,14 +18,13 @@ from pywikibot.backports import (
     Container,
     Dict,
     Iterable,
-    Match,
     List,
-    Pattern,
-    Tuple,
-    pairwise,
+    Match,
 )
 from pywikibot.backports import OrderedDict as OrderedDictType
+from pywikibot.backports import Pattern
 from pywikibot.backports import Sequence as SequenceType
+from pywikibot.backports import Tuple, pairwise
 from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.family import Family
 from pywikibot.time import TZoneFixedOffset

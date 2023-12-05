@@ -112,6 +112,8 @@ class EventStreams(GeneratorWrapper):
     def __init__(self, **kwargs) -> None:
         """Initializer.
 
+        :keyword bool canary: if True, include canary events, see
+            https://w.wiki/7$2z for more info
         :keyword APISite site: a project site object. Used if no url is
             given
         :keyword pywikibot.Timestamp or str since: a timestamp for older
@@ -143,6 +145,8 @@ class EventStreams(GeneratorWrapper):
                               'install it with "pip install sseclient"\n')
         self.filter = {'all': [], 'any': [], 'none': []}
         self._total = None
+        self._canary = kwargs.pop('canary', False)
+
         try:
             self._site = kwargs.pop('site')
         except KeyError:  # T335720
@@ -306,6 +310,9 @@ class EventStreams(GeneratorWrapper):
 
         :param data: event data dict used by filter functions
         """
+        if not self._canary and data.get('meta', {}).get('domain') == 'canary':
+            return False  # T266798
+
         if any(function(data) for function in self.filter['none']):
             return False
         if not all(function(data) for function in self.filter['all']):
