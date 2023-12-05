@@ -1379,9 +1379,9 @@ class APISite(
            API call.
         .. versionchanged:: 8.2
            *mediatype* and *bitdepth* properties were added.
-        .. versionchanged:: 8.6.0
+        .. versionchanged:: 8.6.
            Added *timestamp* parameter.
-           Metadata are loaded only if history is False.
+           Metadata are loaded only if *history* is False.
         .. seealso:: :api:`Imageinfo`
 
         :param history: if true, return the image's version history

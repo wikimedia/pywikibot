@@ -151,6 +151,8 @@ class ProofreadPageMixin:
         Load URLs to images for a given page in the "Page:" namespace.
         No effect for pages in other namespaces.
 
+        .. versionadded:: 8.6
+
         .. seealso:: :api:`imageforpage`
         """
         title = page.title(with_section=False)

@@ -825,8 +825,10 @@ class ProofreadPage(pywikibot.Page):
         """
         return f'/* {self.status} */ '
 
-    def __url_image_lt_140(self) -> str:
+    def _url_image_lt_140(self) -> str:
         """Get the file url of the scan of ProofreadPage.
+
+        .. versionadded:: 8.6
 
         :return: file url of the scan ProofreadPage or None.
 
@@ -862,8 +864,10 @@ class ProofreadPage(pywikibot.Page):
 
         return url_image
 
-    def __url_image(self) -> str:
+    def _url_image_ge_140(self) -> str:
         """Get the file url of the scan of ProofreadPage.
+
+        .. versionadded:: 8.6
 
         :return: file url of the scan of ProofreadPage or None.
         :raises ValueError: in case of no image found for scan
@@ -888,9 +892,9 @@ class ProofreadPage(pywikibot.Page):
         :raises ValueError: in case of no prp_page_image src found for scan
         """
         if self.site.version() < MediaWikiVersion('1.40'):
-            return self.__url_image_lt_140()
-        else:
-            return self.__url_image()
+            return self._url_image_lt_140()
+
+        return self._url_image_ge_140()
 
     def _ocr_callback(self, cmd_uri: str,
                       parser_func: Optional[Callable[[str], str]] = None,
@@ -1321,6 +1325,10 @@ class IndexPage(pywikibot.Page):
         """Return a page generator which yields pages contained in Index page.
 
         Range is [start ... end], extremes included.
+
+        .. versionchanged:: 8.6
+           page names are sorted before loading pages.
+
 
         :param start: first page, defaults to 1
         :param end: num_pages if end is None

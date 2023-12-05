@@ -123,6 +123,8 @@ class FilePage(Page):
         This function will load also metadata.
         It is also used as a helper in FileInfo to load metadata lazily.
 
+        .. versionadded:: 8.6
+
         :param ts: timestamp of the Image rev. to retrieve
 
         :return: instance of FileInfo()
@@ -467,7 +469,7 @@ class FileInfo:
     .. versionchanged:: 7.7
        raises KeyError instead of AttributeError if FileInfo is used as
        Mapping.
-    .. versionchanged:: 8.6.0
+    .. versionchanged:: 8.6
        Metadata are loaded lazily.
        Added *filepage* parameter.
     """
@@ -479,7 +481,10 @@ class FileInfo:
         self.update(file_revision)
 
     def update(self, file_revision):
-        """Update FileInfo with new values."""
+        """Update FileInfo with new values.
+
+        .. versionadded:: 8.6
+        """
         for k, v in file_revision.items():
             if k == 'timestamp':
                 v = pywikibot.Timestamp.fromISOformat(v)
@@ -503,12 +508,18 @@ class FileInfo:
 
     @property
     def metadata(self):
-        """Return metadata."""
+        """Return metadata.
+
+        .. versionadded:: 8.6
+        """
         if self._metadata is None:
             self.filepage.get_file_info(self.timestamp)
         return self._metadata
 
     @metadata.setter
     def metadata(self, value):
-        """Set metadata."""
+        """Set metadata.
+
+        .. versionadded:: 8.6
+        """
         self._metadata = value
