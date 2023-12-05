@@ -620,9 +620,6 @@ logfilesize = 1024
 # Number of rotating logfiles are created. The older files get the higher
 # number. If logfilecount is 0, no logfile will be archived but the current
 # logfile will be overwritten if the file size reached the logfilesize above.
-# If logfilecount is -1 there are no rotating logfiles but the files where
-# renamed if the logfile is full. The newest file gets the highest number until
-# some logfiles where deleted.
 logfilecount = 5
 # set to 1 (or higher) to generate "informative" messages to terminal
 verbose_output = 0

@@ -81,23 +81,6 @@ class Throttle:
         self.setDelays()
 
     @property
-    @deprecated(since='6.2')
-    def multiplydelay(self) -> bool:
-        """DEPRECATED attribute.
-
-        .. deprecated:: 6.2
-        """
-        return True
-
-    @multiplydelay.setter
-    @deprecated(since='6.2')
-    def multiplydelay(self) -> None:
-        """DEPRECATED attribute setter.
-
-        .. deprecated:: 6.2
-        """
-
-    @property
     @deprecated('expiry', since='8.4.0')
     def dropdelay(self):
         """Ignore processes that have not made a check in this many seconds.

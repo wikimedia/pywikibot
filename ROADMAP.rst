@@ -1,13 +1,28 @@
 Current release
 ---------------
 
-* **Python 3.6 support is be discontinued**
+Improvements
+^^^^^^^^^^^^
+
+* (no changes yet)
+
+Bugfixes
+^^^^^^^^
+
+* (no changes yet)
+
+Breaking changes and code cleanups
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Infinite rotating file handler with ``config.logfilesize`` of -1 is no longer supported
+* ``Throttle.multiplydelay`` attribute was removed
+* Python 3.6 support was dropped (:phab:`T347026`
 
 
 Deprecations
 ------------
 
-* 8.4.0: Python 3.6 support is deprecated and will be dropped soon with Pywikibot 9
+* 9.0.0: *nullcontext* context manager and *SimpleQueue* queue of :mod:`backports` are derecated
 * 8.4.0: *modules_only_mode* parameter of :class:`data.api.ParamInfo`, its *paraminfo_keys* class attribute
   and its preloaded_modules property will be removed
 * 8.4.0: *dropdelay* and *releasepid* attributes of :class:`throttle.Throttle` will be removed
@@ -55,13 +70,11 @@ Will be removed in Pywikibot 9
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * 6.5.0: OutputOption.output() method will be removed in favour of OutputOption.out property
-* 6.5.0: Infinite rotating file handler with logfilecount of -1 is deprecated
 * 6.4.0: 'allow_duplicates' parameter of :func:`tools.itertools.intersect_generators` as positional argument is deprecated, use keyword argument instead
 * 6.4.0: 'iterables' of :func:`tools.itertools.intersect_generators` given as a list or tuple is deprecated, either use consecutive iterables or use '*' to unpack
 * 6.2.0: outputter of OutputProxyOption without out property is deprecated
 * 6.2.0: ContextOption.output_range() and HighlightContextOption.output_range() are deprecated
 * 6.2.0: Error messages with '%' style is deprecated in favour for str.format() style
 * 6.2.0: page.url2unicode() function is deprecated in favour of tools.chars.url2string()
-* 6.2.0: Throttle.multiplydelay attribute is deprecated
 * 6.2.0: SequenceOutputter.format_list() is deprecated in favour of 'out' property
 * 6.0.0: config.register_family_file() is deprecated
