@@ -61,7 +61,7 @@ import collections
 
 import pywikibot
 from pywikibot import i18n, pagegenerators
-from pywikibot.backports import DefaultDict, Set
+from pywikibot.backports import DefaultDict
 from pywikibot.bot import CurrentPageBot
 from pywikibot.page import Page
 from pywikibot.site import Namespace
@@ -109,7 +109,7 @@ class PageWithRefs(Page):
             self._ref_table = self.get_ref_table()
         return self._ref_table
 
-    def namespaces_with_ref_to_page(self, namespaces=None) -> Set[Namespace]:
+    def namespaces_with_ref_to_page(self, namespaces=None) -> set[Namespace]:
         """
         Check if current page has links from pages in namepaces.
 

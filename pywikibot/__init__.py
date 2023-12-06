@@ -14,7 +14,7 @@ import threading
 from contextlib import suppress
 from queue import Queue
 from time import sleep as time_sleep
-from typing import Any, Optional, Union, cast
+from typing import Any, cast
 from urllib.parse import urlparse
 from warnings import warn
 
@@ -42,9 +42,6 @@ from pywikibot._wbtypes import (
 )
 from pywikibot.backports import (
     Callable,
-    Dict,
-    List,
-    Tuple,
     cache,
     removesuffix,
 )
@@ -74,8 +71,8 @@ from pywikibot.logging import (
     stdout,
     warning,
 )
-from pywikibot.time import Timestamp
 from pywikibot.site import APISite, BaseSite
+from pywikibot.time import Timestamp
 from pywikibot.tools import normalize_username
 
 
@@ -96,16 +93,16 @@ __all__ = (
 
 # argvu is set by pywikibot.bot when it's imported
 if not hasattr(sys.modules[__name__], 'argvu'):
-    argvu: List[str] = []
+    argvu: list[str] = []
 
 link_regex = re.compile(r'\[\[(?P<title>[^\]|[<>{}]*)(\|.*?)?\]\]')
 
-_sites: Dict[str, APISite] = {}
+_sites: dict[str, APISite] = {}
 
 
 @cache
-def _code_fam_from_url(url: str, name: Optional[str] = None
-                       ) -> Tuple[str, str]:
+def _code_fam_from_url(url: str, name: str | None = None
+                       ) -> tuple[str, str]:
     """Set url to cache and get code and family from cache.
 
     Site helper method.
@@ -134,11 +131,11 @@ def _code_fam_from_url(url: str, name: Optional[str] = None
     return matched_sites[0]
 
 
-def Site(code: Optional[str] = None,  # noqa: 134
-         fam: Union[str, 'Family', None] = None,
-         user: Optional[str] = None, *,
-         interface: Union[str, 'BaseSite', None] = None,
-         url: Optional[str] = None) -> BaseSite:
+def Site(code: str | None = None,  # noqa: 134
+         fam: str | Family | None = None,
+         user: str | None = None, *,
+         interface: str | BaseSite | None = None,
+         url: str | None = None) -> BaseSite:
     """A factory method to obtain a Site object.
 
     Site objects are cached and reused by this method.
@@ -338,7 +335,7 @@ def _flush(stop: bool = True) -> None:
     """
     debug('_flush() called')
 
-    def remaining() -> Tuple[int, datetime.timedelta]:
+    def remaining() -> tuple[int, datetime.timedelta]:
         remaining_pages = page_put_queue.qsize()
         if stop:
             # -1 because we added a None element to stop the queue

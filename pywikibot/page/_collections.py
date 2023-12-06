@@ -8,7 +8,6 @@ from __future__ import annotations
 
 from collections import defaultdict
 from collections.abc import MutableMapping, MutableSequence
-from typing import Optional
 
 import pywikibot
 from pywikibot.site import BaseSite
@@ -111,7 +110,7 @@ class LanguageDict(BaseDataDict):
                 norm_data[key] = value
         return norm_data
 
-    def toJSON(self, diffto: Optional[dict] = None) -> dict:
+    def toJSON(self, diffto: dict | None = None) -> dict:
         """Create JSON suitable for Wikibase API.
 
         When diffto is provided, JSON representing differences
@@ -175,7 +174,7 @@ class AliasesDict(BaseDataDict):
 
         return norm_data
 
-    def toJSON(self, diffto: Optional[dict] = None) -> dict:
+    def toJSON(self, diffto: dict | None = None) -> dict:
         """Create JSON suitable for Wikibase API.
 
         When diffto is provided, JSON representing differences
@@ -255,7 +254,7 @@ class ClaimCollection(MutableMapping):
         # no normalization here, should there be?
         return data
 
-    def toJSON(self, diffto: Optional[dict] = None) -> dict:
+    def toJSON(self, diffto: dict | None = None) -> dict:
         """Create JSON suitable for Wikibase API.
 
         When diffto is provided, JSON representing differences
@@ -453,7 +452,7 @@ class SiteLinkCollection(MutableMapping):
                 norm_data[db_name] = json
         return norm_data
 
-    def toJSON(self, diffto: Optional[dict] = None) -> dict:
+    def toJSON(self, diffto: dict | None = None) -> dict:
         """
         Create JSON suitable for Wikibase API.
 
@@ -579,7 +578,7 @@ class SubEntityCollection(MutableSequence):
         """
         raise NotImplementedError  # TODO
 
-    def toJSON(self, diffto: Optional[dict] = None) -> dict:
+    def toJSON(self, diffto: dict | None = None) -> dict:
         """
         Create JSON suitable for Wikibase API.
 

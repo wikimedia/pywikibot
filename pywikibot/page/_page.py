@@ -15,7 +15,6 @@ various pages for Proofread Extensions are defined in
 #
 from __future__ import annotations
 
-
 import pywikibot
 from pywikibot import textlib
 from pywikibot.exceptions import (

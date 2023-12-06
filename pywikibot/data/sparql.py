@@ -7,13 +7,12 @@
 from __future__ import annotations
 
 from textwrap import fill
-from typing import Optional
 from urllib.parse import quote
 
 from requests.exceptions import Timeout
 
 from pywikibot import Site
-from pywikibot.backports import Dict, List, removeprefix
+from pywikibot.backports import removeprefix
 from pywikibot.comms import http
 from pywikibot.data import WaitingMixin
 from pywikibot.exceptions import Error, NoUsernameError
@@ -39,10 +38,10 @@ class SparqlQuery(WaitingMixin):
     """
 
     def __init__(self,
-                 endpoint: Optional[str] = None,
-                 entity_url: Optional[str] = None, repo=None,
-                 max_retries: Optional[int] = None,
-                 retry_wait: Optional[float] = None) -> None:
+                 endpoint: str | None = None,
+                 entity_url: str | None = None, repo=None,
+                 max_retries: int | None = None,
+                 retry_wait: float | None = None) -> None:
         """
         Create endpoint.
 
@@ -100,8 +99,8 @@ class SparqlQuery(WaitingMixin):
     def select(self,
                query: str,
                full_data: bool = False,
-               headers: Optional[Dict[str, str]] = None
-               ) -> Optional[List[Dict[str, str]]]:
+               headers: dict[str, str] | None = None
+               ) -> list[dict[str, str]] | None:
         """
         Run SPARQL query and return the result.
 
@@ -137,7 +136,7 @@ class SparqlQuery(WaitingMixin):
             result.append(values)
         return result
 
-    def query(self, query: str, headers: Optional[Dict[str, str]] = None):
+    def query(self, query: str, headers: dict[str, str] | None = None):
         """Run SPARQL query and return parsed JSON result.
 
         .. versionchanged:: 8.5
@@ -184,7 +183,7 @@ class SparqlQuery(WaitingMixin):
         return None
 
     def ask(self, query: str,
-            headers: Optional[Dict[str, str]] = None) -> bool:
+            headers: dict[str, str] | None = None) -> bool:
         """
         Run SPARQL ASK query and return boolean result.
 

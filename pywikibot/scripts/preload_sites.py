@@ -26,10 +26,9 @@ from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor, wait
 from datetime import datetime
-from typing import Optional, Union
 
 import pywikibot
-from pywikibot.backports import Dict, List, Set, removeprefix
+from pywikibot.backports import removeprefix
 from pywikibot.family import Family
 
 
@@ -53,7 +52,7 @@ families_list = [
 
 # Ignore sites from preloading
 # example: {'wikiversity': ['beta'], }
-exceptions: Dict[str, List[str]] = {
+exceptions: dict[str, list[str]] = {
 }
 
 
@@ -78,8 +77,8 @@ def preload_family(family: str, executor: ThreadPoolExecutor) -> None:
     pywikibot.info(msg.format(family, ' completed.'))
 
 
-def preload_families(families: Union[List[str], Set[str]],
-                     worker: Optional[int]) -> None:
+def preload_families(families: list[str] | set[str],
+                     worker: int | None) -> None:
     """Preload all sites of all given family files.
 
     .. versionchanged:: 7.3

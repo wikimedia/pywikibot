@@ -13,13 +13,13 @@ import typing
 from collections import OrderedDict, defaultdict, namedtuple
 from contextlib import suppress
 from textwrap import fill
-from typing import Any, Optional, Type, TypeVar, Union
+from typing import TYPE_CHECKING, Any, TypeVar, Union
 
 import pywikibot
 from pywikibot import login
-from pywikibot.backports import DefaultDict, Dict, Iterable, List, Match
+from pywikibot.backports import DefaultDict, Iterable, Match
 from pywikibot.backports import OrderedDict as OrderedDictType
-from pywikibot.backports import Set, Tuple, removesuffix
+from pywikibot.backports import removesuffix
 from pywikibot.comms import http
 from pywikibot.data import api
 from pywikibot.exceptions import (
@@ -80,8 +80,12 @@ from pywikibot.tools import (
 )
 
 
+if TYPE_CHECKING:
+    from pywikibot.page import BasePage
+
+
 __all__ = ('APISite', )
-_mw_msg_cache: DefaultDict[str, Dict[str, str]] = defaultdict(dict)
+_mw_msg_cache: DefaultDict[str, dict[str, str]] = defaultdict(dict)
 
 
 _CompType = Union[int, str, 'pywikibot.page.Page', 'pywikibot.page.Revision']
@@ -113,14 +117,14 @@ class APISite(
     def __init__(
         self,
         code: str,
-        fam: Union[str, 'pywikibot.family.Family', None] = None,
-        user: Optional[str] = None
+        fam: str | pywikibot.family.Family | None = None,
+        user: str | None = None
     ) -> None:
         """Initializer."""
         super().__init__(code, fam, user)
-        self._globaluserinfo: Dict[Union[int, str], Any] = {}
+        self._globaluserinfo: dict[int | str, Any] = {}
         self._interwikimap = _InterwikiMap(self)
-        self._msgcache: Dict[str, str] = {}
+        self._msgcache: dict[str, str] = {}
         self._paraminfo = api.ParamInfo(self)
         self._siteinfo = Siteinfo(self)
         self._tokens = TokenWallet(self)
@@ -128,14 +132,14 @@ class APISite(
         with suppress(SiteDefinitionError):
             self.login(cookie_only=True)
 
-    def __getstate__(self) -> Dict[str, Any]:
+    def __getstate__(self) -> dict[str, Any]:
         """Remove TokenWallet before pickling, for security reasons."""
         state = super().__getstate__()
         del state['_tokens']
         del state['_interwikimap']
         return state
 
-    def __setstate__(self, state: Dict[str, Any]) -> None:
+    def __setstate__(self, state: dict[str, Any]) -> None:
         """Restore things removed in __getstate__."""
         super().__setstate__(state)
         self._interwikimap = _InterwikiMap(self)
@@ -151,7 +155,7 @@ class APISite(
         """
         return self._interwikimap[prefix].site
 
-    def interwiki_prefix(self, site: BaseSite) -> List[str]:
+    def interwiki_prefix(self, site: BaseSite) -> list[str]:
         """
         Return the interwiki prefixes going to that site.
 
@@ -189,7 +193,7 @@ class APISite(
     @staticmethod
     def fromDBName(  # noqa: N802
         dbname: str,
-        site: Optional[BaseSite] = None
+        site: BaseSite | None = None
     ) -> BaseSite:
         """Create a site from a database name using the sitematrix.
 
@@ -233,10 +237,10 @@ class APISite(
 
     def _generator(
         self,
-        gen_class: Type[_RequestWrapperT],
-        type_arg: Optional[str] = None,
+        gen_class: type[_RequestWrapperT],
+        type_arg: str | None = None,
         namespaces: NamespaceArgType = None,
-        total: Optional[int] = None,
+        total: int | None = None,
         **args: Any
     ) -> _RequestWrapperT:
         """Convenience method that returns an API generator.
@@ -258,7 +262,7 @@ class APISite(
         :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
         """
-        req_args: Dict[str, Any] = {'site': self}
+        req_args: dict[str, Any] = {'site': self}
         if 'g_content' in args:
             req_args['g_content'] = args.pop('g_content')
         if 'parameters' in args:
@@ -275,7 +279,7 @@ class APISite(
         return gen
 
     @staticmethod
-    def _request_class(kwargs: Dict[str, Any]) -> Type[api.Request]:
+    def _request_class(kwargs: dict[str, Any]) -> type[api.Request]:
         """
         Get the appropriate class.
 
@@ -332,7 +336,7 @@ class APISite(
     def login(
         self,
         autocreate: bool = False,
-        user: Optional[str] = None,
+        user: str | None = None,
         *,
         cookie_only: bool = False
     ) -> None:
@@ -474,7 +478,7 @@ class APISite(
         api._invalidate_superior_cookies(self.family)
 
     @property
-    def file_extensions(self) -> List[str]:
+    def file_extensions(self) -> list[str]:
         """File extensions enabled on the wiki.
 
         .. versionadded:: 8.4
@@ -495,7 +499,7 @@ class APISite(
         return int(parameter['limit'])  # T78333, T161783
 
     @property
-    def userinfo(self) -> Dict[str, Any]:
+    def userinfo(self) -> dict[str, Any]:
         """Retrieve userinfo from site and store in _userinfo attribute.
 
         To force retrieving userinfo ignoring cache, just delete this
@@ -573,8 +577,8 @@ class APISite(
             del self._userinfo
 
     def get_globaluserinfo(self,
-                           user: Union[str, int, None] = None,
-                           force: bool = False) -> Dict[str, Any]:
+                           user: str | int | None = None,
+                           force: bool = False) -> dict[str, Any]:
         """Retrieve globaluserinfo from site and cache it.
 
         .. versionadded:: 7.0
@@ -593,7 +597,7 @@ class APISite(
 
         :raises TypeError: Inappropriate argument type of 'user'
         """
-        param: Dict[str, Union[int, str]] = {}
+        param: dict[str, int | str] = {}
         if user is None:
             user = self.username()
             assert isinstance(user, str)
@@ -625,7 +629,7 @@ class APISite(
         return self._globaluserinfo[user]
 
     @property
-    def globaluserinfo(self) -> Dict[str, Any]:
+    def globaluserinfo(self) -> dict[str, Any]:
         """Retrieve globaluserinfo of the current user from site.
 
         To get globaluserinfo for a given user or user ID use
@@ -664,7 +668,7 @@ class APISite(
         return 'blockinfo' in self.userinfo
 
     def is_locked(self,
-                  user: Union[str, int, None] = None,
+                  user: str | int | None = None,
                   force: bool = False) -> bool:
         """Return True when given user is locked globally.
 
@@ -676,7 +680,7 @@ class APISite(
         """
         return 'locked' in self.get_globaluserinfo(user, force)
 
-    def get_searched_namespaces(self, force: bool = False) -> Set[Namespace]:
+    def get_searched_namespaces(self, force: bool = False) -> set[Namespace]:
         """
         Retrieve the default searched namespaces for the user.
 
@@ -700,7 +704,7 @@ class APISite(
                    "API userinfo response lacks 'query' key"
             assert 'userinfo' in uidata['query'], \
                    "API userinfo response lacks 'userinfo' key"
-            self._useroptions: Dict[str, Any] = uidata['query']['userinfo']['options']  # noqa: E501
+            self._useroptions: dict[str, Any] = uidata['query']['userinfo']['options']  # noqa: E501
             # To determine if user name has changed
             self._useroptions['_name'] = (
                 None if 'anon' in uidata['query']['userinfo'] else
@@ -774,8 +778,8 @@ class APISite(
     @staticmethod
     def assert_valid_iter_params(
         msg_prefix: str,
-        start: Union[datetime.datetime, int, str],
-        end: Union[datetime.datetime, int, str],
+        start: datetime.datetime | int | str,
+        end: datetime.datetime | int | str,
         reverse: bool,
         is_ts: bool = True
     ) -> None:
@@ -843,7 +847,7 @@ class APISite(
     def mediawiki_messages(
         self,
         keys: Iterable[str],
-        lang: Optional[str] = None
+        lang: str | None = None
     ) -> OrderedDictType[str, str]:
         """Fetch the text of a set of MediaWiki messages.
 
@@ -883,7 +887,7 @@ class APISite(
     def mediawiki_message(
         self,
         key: str,
-        lang: Optional[str] = None
+        lang: str | None = None
     ) -> str:
         """Fetch the text for a MediaWiki message.
 
@@ -895,7 +899,7 @@ class APISite(
     def has_mediawiki_message(
         self,
         key: str,
-        lang: Optional[str] = None
+        lang: str | None = None
     ) -> bool:
         """Determine if the site defines a MediaWiki message.
 
@@ -907,7 +911,7 @@ class APISite(
     def has_all_mediawiki_messages(
         self,
         keys: Iterable[str],
-        lang: Optional[str] = None
+        lang: str | None = None
     ) -> bool:
         """Confirm that the site defines a set of MediaWiki messages.
 
@@ -921,7 +925,7 @@ class APISite(
         return True
 
     @property
-    def months_names(self) -> List[Tuple[str, str]]:
+    def months_names(self) -> list[tuple[str, str]]:
         """Obtain month names from the site messages.
 
         The list is zero-indexed, ordered by month in calendar, and should
@@ -941,7 +945,7 @@ class APISite(
 
         months = self.mediawiki_messages(months_long + months_short)
 
-        self._months_names: List[Tuple[str, str]] = []
+        self._months_names: list[tuple[str, str]] = []
         for m_l, m_s in zip(months_long, months_short):
             self._months_names.append((months[m_l], months[m_s]))
 
@@ -975,8 +979,8 @@ class APISite(
     def expand_text(
         self,
         text: str,
-        title: Optional[str] = None,
-        includecomments: Optional[bool] = None
+        title: str | None = None,
+        includecomments: bool | None = None
     ) -> str:
         """Parse the given text for preprocessing and rendering.
 
@@ -1015,7 +1019,7 @@ class APISite(
         """
         return self.server_time().totimestampformat()
 
-    def server_time(self) -> 'pywikibot.Timestamp':
+    def server_time(self) -> pywikibot.Timestamp:
         """
         Return a Timestamp object representing the current server time.
 
@@ -1027,7 +1031,7 @@ class APISite(
         return pywikibot.Timestamp.fromISOformat(
             self.siteinfo.get('time', expiry=True))
 
-    def getmagicwords(self, word: str) -> List[str]:
+    def getmagicwords(self, word: str) -> list[str]:
         """Return list of localized "word" magic words for the site."""
         if not hasattr(self, '_magicwords'):
             magicwords = self.siteinfo.get('magicwords', cache=False)
@@ -1038,7 +1042,7 @@ class APISite(
             return self._magicwords[word]
         return [word]
 
-    def redirects(self) -> List[str]:
+    def redirects(self) -> list[str]:
         """Return a list of localized tags for the site without preceding '#'.
 
         .. seealso::
@@ -1051,15 +1055,15 @@ class APISite(
         """
         return [s.lstrip('#') for s in self.getmagicwords('redirect')]
 
-    def pagenamecodes(self) -> List[str]:
+    def pagenamecodes(self) -> list[str]:
         """Return list of localized PAGENAME tags for the site."""
         return self.getmagicwords('pagename')
 
-    def pagename2codes(self) -> List[str]:
+    def pagename2codes(self) -> list[str]:
         """Return list of localized PAGENAMEE tags for the site."""
         return self.getmagicwords('pagenamee')
 
-    def _build_namespaces(self) -> Dict[int, Namespace]:
+    def _build_namespaces(self) -> dict[int, Namespace]:
         _namespaces = {}
 
         for nsdata in self.siteinfo.get('namespaces', cache=False).values():
@@ -1165,7 +1169,7 @@ class APISite(
         """Return True if site has a shared data repository like Wikidata."""
         return self.data_repository() is not None
 
-    def image_repository(self) -> Optional[BaseSite]:
+    def image_repository(self) -> BaseSite | None:
         """Return Site object for image repository e.g. commons."""
         code, fam = self.shared_image_repository()
         if bool(code or fam):
@@ -1173,7 +1177,7 @@ class APISite(
 
         return None
 
-    def data_repository(self) -> Optional['pywikibot.site.DataSite']:
+    def data_repository(self) -> pywikibot.site.DataSite | None:
         """
         Return the data repository connected to this site.
 
@@ -1182,7 +1186,7 @@ class APISite(
         def handle_warning(
             mod: str,
             warning: str
-        ) -> Union[Match[str], bool, None]:
+        ) -> Match[str] | bool | None:
             return (mod == 'query' and re.match(
                 r'Unrecognized value for parameter [\'"]meta[\'"]: wikibase',
                 warning))
@@ -1217,7 +1221,7 @@ class APISite(
     def page_from_repository(
         self,
         item: str
-    ) -> Optional['pywikibot.page.Page']:
+    ) -> pywikibot.page.Page | None:
         """
         Return a Page for this site object specified by Wikibase item.
 
@@ -1282,7 +1286,7 @@ class APISite(
         # 'title' is expected to be URL-encoded already
         return self.siteinfo['articlepath'].replace('$1', title)
 
-    def namespace(self, num: int, all: bool = False) -> Union[str, Namespace]:
+    def namespace(self, num: int, all: bool = False) -> str | Namespace:
         """Return string containing local name of namespace 'num'.
 
         If optional argument 'all' is true, return all recognized
@@ -1299,7 +1303,7 @@ class APISite(
 
     def _update_page(
         self,
-        page: 'pywikibot.page.BasePage',
+        page: BasePage,
         query: api.PropertyGenerator,
         verify_imageinfo: bool = False
     ) -> None:
@@ -1328,7 +1332,7 @@ class APISite(
 
     def loadpageinfo(
         self,
-        page: 'pywikibot.page.BasePage',
+        page: BasePage,
         preload: bool = False
     ) -> None:
         """Load page info from api and store in page attributes.
@@ -1349,7 +1353,7 @@ class APISite(
                                 inprop=inprop)
         self._update_page(page, query)
 
-    def loadpageprops(self, page: 'pywikibot.page.BasePage') -> None:
+    def loadpageprops(self, page: BasePage) -> None:
         """Load page props for the given page."""
         title = page.title(with_section=False)
         query = self._generator(api.PropertyGenerator,
@@ -1360,12 +1364,12 @@ class APISite(
 
     def loadimageinfo(
         self,
-        page: 'pywikibot.page.FilePage',
+        page: pywikibot.page.FilePage,
         history: bool = False,
-        url_width: Optional[int] = None,
-        url_height: Optional[int] = None,
-        url_param: Optional[str] = None,
-        timestamp: Optional[pywikibot.Timestamp] = None
+        url_width: int | None = None,
+        url_height: int | None = None,
+        url_param: str | None = None,
+        timestamp: pywikibot.Timestamp | None = None
     ) -> None:
         """Load image info from api and save in page attributes.
 
@@ -1417,8 +1421,8 @@ class APISite(
 
     def page_restrictions(
         self,
-        page: 'pywikibot.page.BasePage'
-    ) -> Dict[str, Tuple[str, str]]:
+        page: BasePage
+    ) -> dict[str, tuple[str, str]]:
         """Return a dictionary reflecting page protections.
 
         **Example:**
@@ -1436,7 +1440,7 @@ class APISite(
 
     def page_can_be_edited(
         self,
-        page: 'pywikibot.page.BasePage',
+        page: BasePage,
         action: str = 'edit'
     ) -> bool:
         """Determine if the page can be modified.
@@ -1464,7 +1468,7 @@ class APISite(
         restriction = self.page_restrictions(page).get(action, ('', None))[0]
         return self.has_right(prot_rights.get(restriction, restriction))
 
-    def page_isredirect(self, page: 'pywikibot.page.BasePage') -> bool:
+    def page_isredirect(self, page: BasePage) -> bool:
         """Return True if and only if page is a redirect."""
         if not hasattr(page, '_isredir'):
             page._isredir = False  # bug T56684
@@ -1473,8 +1477,8 @@ class APISite(
 
     def getredirtarget(
         self,
-        page: 'pywikibot.page.BasePage'
-    ) -> 'pywikibot.page.Page':
+        page: BasePage,
+    ) -> pywikibot.page.Page:
         """
         Return page object for the redirect target of page.
 
@@ -1572,7 +1576,7 @@ class APISite(
         return page._redirtarget
 
     @deprecated(since='8.0.0')
-    def validate_tokens(self, types: List[str]) -> List[str]:
+    def validate_tokens(self, types: list[str]) -> list[str]:
         """Validate if requested tokens are acceptable.
 
         Valid tokens may depend on mw version.
@@ -1583,7 +1587,7 @@ class APISite(
         assert data is not None
         return [token for token in types if token in data['type']]
 
-    def get_tokens(self, types: List[str], *args, **kwargs) -> Dict[str, str]:
+    def get_tokens(self, types: list[str], *args, **kwargs) -> dict[str, str]:
         r"""Preload one or multiple tokens.
 
         **Usage**
@@ -1650,7 +1654,7 @@ class APISite(
         return user_tokens
 
     @property
-    def tokens(self) -> 'pywikibot.site._tokenwallet.TokenWallet':
+    def tokens(self) -> pywikibot.site._tokenwallet.TokenWallet:
         r"""Return the TokenWallet collection.
 
         :class:`TokenWallet<pywikibot.site._tokenwallet.TokenWallet>`
@@ -1693,7 +1697,7 @@ class APISite(
         self._tokens.clear()
 
     # TODO: expand support to other parameters of action=parse?
-    def get_parsed_page(self, page: 'pywikibot.page.BasePage') -> str:
+    def get_parsed_page(self, page: BasePage) -> str:
         """Retrieve parsed text of the page using action=parse.
 
         .. versionchanged:: 7.1
@@ -1711,7 +1715,7 @@ class APISite(
             raise KeyError(f'API parse response lacks {e} key')
         return parsed_text
 
-    def getcategoryinfo(self, category: 'pywikibot.page.Category') -> None:
+    def getcategoryinfo(self, category: pywikibot.page.Category) -> None:
         """Retrieve data on contents of category.
 
         .. seealso:: :api:`Categoryinfo`
@@ -1724,8 +1728,8 @@ class APISite(
 
     def categoryinfo(
         self,
-        category: 'pywikibot.page.Category'
-    ) -> Dict[str, int]:
+        category: pywikibot.page.Category
+    ) -> dict[str, int]:
         """Retrieve data on contents of category."""
         if not hasattr(category, '_catinfo'):
             self.getcategoryinfo(category)
@@ -1740,7 +1744,7 @@ class APISite(
         return username in (userdata['name'] for userdata in self.botusers())
 
     @property
-    def logtypes(self) -> Set['str']:
+    def logtypes(self) -> set[str]:
         """Return a set of log types available on current site."""
         data = self._paraminfo.parameter('query+logevents', 'type')
         assert data is not None
@@ -1750,12 +1754,12 @@ class APISite(
     def deleterevs(
         self,
         targettype: str,
-        ids: Union[int, str, List[Union[int, str]]],
+        ids: int | str | list[int | str],
         *,
-        hide: Union[str, List[str], None] = None,
-        show: Union[str, List[str], None] = None,
+        hide: str | list[str] | None = None,
+        show: str | list[str] | None = None,
         reason: str = '',
-        target: Union['pywikibot.page.Page', str, None] = None
+        target: pywikibot.page.Page | str | None = None
     ) -> None:
         """Delete or undelete specified page revisions, file versions or logs.
 
@@ -1822,7 +1826,7 @@ class APISite(
 
     # Catalog of editpage error codes, for use in generating messages.
     # The block at the bottom are page related errors.
-    _ep_errors: Dict[str, Union[str, Type[PageSaveRelatedError]]] = {
+    _ep_errors: dict[str, str | type[PageSaveRelatedError]] = {
         'noapiwrite': 'API editing not enabled on {site} wiki',
         'writeapidenied':
             'User {user} is not authorized to edit on {site} wiki',
@@ -1859,15 +1863,15 @@ class APISite(
     @need_right('edit')
     def editpage(
         self,
-        page: 'pywikibot.page.BasePage',
-        summary: Optional[str] = None,
+        page: BasePage,
+        summary: str | None = None,
         minor: bool = True,
         notminor: bool = False,
         bot: bool = True,
         recreate: bool = True,
         createonly: bool = False,
         nocreate: bool = False,
-        watch: Optional[str] = None,
+        watch: str | None = None,
         **kwargs: Any
     ) -> bool:
         """Submit an edit to be saved to the wiki.
@@ -2091,10 +2095,10 @@ class APISite(
     @need_right('mergehistory')
     def merge_history(
         self,
-        source: 'pywikibot.page.BasePage',
-        dest: 'pywikibot.page.BasePage',
-        timestamp: Optional['pywikibot.Timestamp'] = None,
-        reason: Optional[str] = None
+        source: BasePage,
+        dest: BasePage,
+        timestamp: pywikibot.Timestamp | None = None,
+        reason: str | None = None,
     ) -> None:
         """Merge revisions from one page into another.
 
@@ -2177,7 +2181,7 @@ class APISite(
             raise Error('mergehistory: unexpected response')
 
     # catalog of move errors for use in error messages
-    _mv_errors: Dict[str, Union[str, OnErrorExc]] = {
+    _mv_errors: dict[str, str | OnErrorExc] = {
         'noapiwrite': 'API editing not enabled on {site} wiki',
         'writeapidenied':
             'User {user} is not authorized to edit on {site} wiki',
@@ -2211,13 +2215,13 @@ class APISite(
     @need_right('move')
     def movepage(
         self,
-        page: 'pywikibot.page.BasePage',
+        page: BasePage,
         newtitle: str,
         summary: str,
         movetalk: bool = True,
         noredirect: bool = False,
         movesubpages: bool = True
-    ) -> 'pywikibot.page.Page':
+    ) -> pywikibot.page.Page:
         """Move a Page to a new title.
 
         .. seealso:: :api:`Move`
@@ -2322,7 +2326,7 @@ class APISite(
     @need_right('rollback')
     def rollbackpage(
         self,
-        page: 'pywikibot.page.BasePage',
+        page: BasePage,
         **kwargs: Any
     ) -> None:
         """Roll back page to version before last user's edits.
@@ -2394,11 +2398,11 @@ class APISite(
     @need_right('delete')
     def delete(
         self,
-        page: Union['pywikibot.page.BasePage', int, str],
+        page: BasePage | int | str,
         reason: str,
         *,
         deletetalk: bool = False,
-        oldimage: Optional[str] = None
+        oldimage: str | None = None
     ) -> None:
         """Delete a page or a specific old version of a file from the wiki.
 
@@ -2488,11 +2492,11 @@ class APISite(
     @need_right('undelete')
     def undelete(
         self,
-        page: 'pywikibot.page.BasePage',
+        page: BasePage,
         reason: str,
         *,
-        revisions: Optional[List[str]] = None,
-        fileids: Optional[List[Union[int, str]]] = None
+        revisions: list[str] | None = None,
+        fileids: list[int | str] | None = None
     ) -> None:
         """Undelete page from the wiki. Requires appropriate privilege level.
 
@@ -2552,7 +2556,7 @@ class APISite(
         'protect-invalidlevel': 'Invalid protection level'
     }
 
-    def protection_types(self) -> Set[str]:
+    def protection_types(self) -> set[str]:
         """
         Return the protection types available on this site.
 
@@ -2569,7 +2573,7 @@ class APISite(
         return set(self.siteinfo.get('restrictions')['types'])
 
     @need_version('1.27.3')
-    def protection_levels(self) -> Set[str]:
+    def protection_levels(self) -> set[str]:
         """
         Return the protection levels available on this site.
 
@@ -2588,10 +2592,10 @@ class APISite(
     @need_right('protect')
     def protect(
         self,
-        page: 'pywikibot.page.BasePage',
-        protections: Dict[str, Optional[str]],
+        page: BasePage,
+        protections: dict[str, str | None],
         reason: str,
-        expiry: Union[datetime.datetime, str, None] = None,
+        expiry: datetime.datetime | str | None = None,
         **kwargs: Any
     ) -> None:
         """(Un)protect a wiki page. Requires *protect* right.
@@ -2653,8 +2657,8 @@ class APISite(
     @need_right('block')
     def blockuser(
         self,
-        user: 'pywikibot.page.User',
-        expiry: Union[datetime.datetime, str, bool],
+        user: pywikibot.page.User,
+        expiry: datetime.datetime | str | bool,
         reason: str,
         anononly: bool = True,
         nocreate: bool = True,
@@ -2662,7 +2666,7 @@ class APISite(
         noemail: bool = False,
         reblock: bool = False,
         allowusertalk: bool = False
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Block a user for certain amount of time and for a certain reason.
 
@@ -2706,9 +2710,9 @@ class APISite(
     @need_right('unblock')
     def unblockuser(
         self,
-        user: 'pywikibot.page.User',
-        reason: Optional[str] = None
-    ) -> Dict[str, Any]:
+        user: pywikibot.page.User,
+        reason: str | None = None
+    ) -> dict[str, Any]:
         """
         Remove the block for the user.
 
@@ -2726,10 +2730,7 @@ class APISite(
     @need_right('editmywatchlist')
     def watch(
         self,
-        pages: Union['pywikibot.page.BasePage',
-                     str,
-                     List[Union['pywikibot.page.BasePage', str]]
-                     ],
+        pages: BasePage | str | list[BasePage | str],
         unwatch: bool = False
     ) -> bool:
         """Add or remove pages from watchlist.
@@ -2755,7 +2756,7 @@ class APISite(
 
     def purgepages(
         self,
-        pages: List['pywikibot.page.BasePage'],
+        pages: list[BasePage],
         forcelinkupdate: bool = False,
         forcerecursivelinkupdate: bool = False,
         converttitles: bool = False,
@@ -2814,8 +2815,8 @@ class APISite(
     def stash_info(
         self,
         file_key: str,
-        props: Optional[List[str]] = None
-    ) -> Dict[str, Any]:
+        props: list[str] | None = None
+    ) -> dict[str, Any]:
         """Get the stash info for a given file key.
 
         .. seealso:: :api:`Stashimageinfo`
@@ -2828,7 +2829,7 @@ class APISite(
     @need_right('upload')
     def upload(
         self,
-        filepage: 'pywikibot.page.FilePage',
+        filepage: pywikibot.page.FilePage,
         **kwargs: Any
     ) -> bool:
         """Upload a file to the wiki.
@@ -2857,7 +2858,7 @@ class APISite(
 
         return Uploader(self, filepage, **kwargs).upload()
 
-    def get_property_names(self, force: bool = False) -> List[str]:
+    def get_property_names(self, force: bool = False) -> list[str]:
         """
         Get property names for pages_with_property().
 
@@ -2889,7 +2890,7 @@ class APISite(
         :return: Returns an HTML string of a diff between two revisions.
         """
         # check old and diff types
-        def get_param(item: object) -> Optional[Tuple[str, Union[str, int]]]:
+        def get_param(item: object) -> tuple[str, str | int] | None:
             param = None
             if isinstance(item, str):
                 param = 'title', item

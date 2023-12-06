@@ -60,12 +60,12 @@ from __future__ import annotations
 import re
 from contextlib import suppress
 from enum import IntEnum
-from typing import Any, Union
+from typing import Any
 from urllib.parse import urlparse, urlunparse
 
 import pywikibot
 from pywikibot import textlib
-from pywikibot.backports import Callable, Dict, List, Match, Pattern
+from pywikibot.backports import Callable, Match, Pattern
 from pywikibot.exceptions import InvalidTitleError
 from pywikibot.textlib import (
     FILE_LINK_REGEX,
@@ -225,7 +225,7 @@ class CosmeticChangesToolkit:
        `from_page()` method was removed
     """
 
-    def __init__(self, page: 'pywikibot.page.BasePage', *,
+    def __init__(self, page: pywikibot.page.BasePage, *,
                  show_diff: bool = False,
                  ignore: IntEnum = CANCEL.ALL) -> None:
         """Initializer.
@@ -298,7 +298,7 @@ class CosmeticChangesToolkit:
             text = self.safe_execute(method, text)
         return text
 
-    def change(self, text: str) -> Union[bool, str]:
+    def change(self, text: str) -> bool | str:
         """Execute all clean up methods and catch errors if activated."""
         try:
             new_text = self._change(text)
@@ -491,7 +491,7 @@ class CosmeticChangesToolkit:
             return '{}|{}]]'.format(
                 split[0], '|'.join(cache.get(x.strip(), x) for x in split[1:]))
 
-        cache: Dict[Union[bool, str], Any] = {}
+        cache: dict[bool | str, Any] = {}
         exceptions = ['comment', 'nowiki', 'pre', 'syntaxhighlight']
         regex = re.compile(
             FILE_LINK_REGEX % '|'.join(self.site.namespaces[6]),
@@ -709,7 +709,7 @@ class CosmeticChangesToolkit:
         header, sections, footer = textlib.extract_sections(text, self.site)
 
         # iterate stripped sections and create a new page body
-        new_body: List[textlib.Section] = []
+        new_body: list[textlib.Section] = []
         for i, strip_section in enumerate(strip_sections):
             current_dep = sections[i].level
             try:
@@ -960,7 +960,7 @@ class CosmeticChangesToolkit:
 
     def fixTypo(self, text: str) -> str:
         """Fix units."""
-        exceptions: List[Union[str, Pattern[str]]] = [
+        exceptions: list[str | Pattern[str]] = [
             'comment',
             'gallery',
             'hyperlink',
@@ -994,7 +994,7 @@ class CosmeticChangesToolkit:
         if self.site.code not in ['ckb', 'fa']:
             return text
 
-        exceptions: List[Union[str, Pattern[str]]] = [
+        exceptions: list[str | Pattern[str]] = [
             'file',
             'gallery',
             'hyperlink',

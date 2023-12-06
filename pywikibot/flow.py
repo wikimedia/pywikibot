@@ -8,12 +8,12 @@ from __future__ import annotations
 
 import abc
 import datetime
-from typing import Any, Optional, Type, Union
+from typing import Any
 from urllib.parse import parse_qs, urlparse
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Dict, Iterator, List, Mapping
+from pywikibot.backports import Iterator, Mapping
 from pywikibot.exceptions import (
     LockedPageError,
     NoPageError,
@@ -46,7 +46,7 @@ class FlowPage(BasePage, abc.ABC):
             raise UnknownExtensionError('site is not Flow-enabled')
 
     @abc.abstractmethod
-    def _load(self, force: bool = False) -> Dict[str, Any]:
+    def _load(self, force: bool = False) -> dict[str, Any]:
         """Abstract method to load and cache the Flow data.
 
         Subclasses must overwrite _load() method to load and cache
@@ -64,7 +64,7 @@ class FlowPage(BasePage, abc.ABC):
         return self._load()['workflowId']
 
     def get(self, force: bool = False, get_redirect: bool = False
-            ) -> Dict[str, Any]:
+            ) -> dict[str, Any]:
         """Get the page's content."""
         if get_redirect or force:
             raise NotImplementedError(
@@ -79,7 +79,7 @@ class Board(FlowPage):
 
     """A Flow discussion board."""
 
-    def _load(self, force: bool = False) -> Dict[str, Any]:
+    def _load(self, force: bool = False) -> dict[str, Any]:
         """Load and cache the Board's data, derived from its topic list.
 
         :param force: Whether to force a reload if the data is already loaded
@@ -89,7 +89,7 @@ class Board(FlowPage):
         return self._data
 
     @staticmethod
-    def _parse_url(links: Mapping[str, Any]) -> Dict[str, Any]:
+    def _parse_url(links: Mapping[str, Any]) -> dict[str, Any]:
         """Parse a URL retrieved from the API."""
         if 'fwd' in links:
             rule = links['fwd']
@@ -99,7 +99,7 @@ class Board(FlowPage):
             raise ValueError('Illegal board data (missing required data).')
         parsed_url = urlparse(rule['url'])
         params = parse_qs(parsed_url.query)
-        new_params: Dict[str, Any] = {}
+        new_params: dict[str, Any] = {}
         for key, value in params.items():
             if key != 'title':
                 key = key.replace('topiclist_', '').replace('-', '_')
@@ -112,14 +112,14 @@ class Board(FlowPage):
     @deprecated_args(limit='total')  # since 8.0.0
     def topics(self, *,
                content_format: str = 'wikitext',
-               total: Optional[int] = None,
+               total: int | None = None,
                sort_by: str = 'newest',
-               offset: Union[str, datetime.datetime, None] = None,
+               offset: str | datetime.datetime | None = None,
                offset_uuid: str = '',
                reverse: bool = False,
                include_offset: bool = False,
                toc_only: bool = False
-               ) -> Iterator['Topic']:
+               ) -> Iterator[Topic]:
         """Load this board's topics.
 
         .. versionchanged:: 8.0
@@ -162,7 +162,7 @@ class Board(FlowPage):
             data = self.site.load_topiclist(self, **continue_args)
 
     def new_topic(self, title: str, content: str,
-                  content_format: str = 'wikitext') -> 'Topic':
+                  content_format: str = 'wikitext') -> Topic:
         """Create and return a Topic object for a new topic on this Board.
 
         :param title: The title of the new topic (must be in plaintext)
@@ -179,7 +179,7 @@ class Topic(FlowPage):
     """A Flow discussion topic."""
 
     def _load(self, force: bool = False, content_format: str = 'wikitext'
-              ) -> Dict[str, Any]:
+              ) -> dict[str, Any]:
         """Load and cache the Topic's data.
 
         :param force: Whether to force a reload if the data is already loaded
@@ -194,9 +194,9 @@ class Topic(FlowPage):
         self.root._load(load_from_topic=True)
 
     @classmethod
-    def create_topic(cls: Type['Topic'], board: 'Board', title: str,
+    def create_topic(cls, board: Board, title: str,
                      content: str, content_format: str = 'wikitext'
-                     ) -> 'Topic':
+                     ) -> Topic:
         """Create and return a Topic object for a new topic on a Board.
 
         :param board: The topic's parent board
@@ -211,9 +211,9 @@ class Topic(FlowPage):
         return cls(board.site, data['topic-page'])
 
     @classmethod
-    def from_topiclist_data(cls: Type['Topic'], board: 'Board',
+    def from_topiclist_data(cls, board: Board,
                             root_uuid: str,
-                            topiclist_data: Dict[str, Any]) -> 'Topic':
+                            topiclist_data: dict[str, Any]) -> Topic:
         """Create a Topic object from API data.
 
         :param board: The topic's parent Flow board
@@ -234,7 +234,7 @@ class Topic(FlowPage):
         return topic
 
     @property
-    def root(self) -> 'Post':
+    def root(self) -> Post:
         """The root post of this topic."""
         if not hasattr(self, '_root'):
             self._root = Post.fromJSON(self, self.uuid, self._data)
@@ -251,7 +251,7 @@ class Topic(FlowPage):
         return self.root._current_revision['isModerated']
 
     def replies(self, content_format: str = 'wikitext', force: bool = False
-                ) -> List['Post']:
+                ) -> list[Post]:
         """A list of replies to this topic's root post.
 
         :param content_format: Content format to return contents in;
@@ -261,7 +261,7 @@ class Topic(FlowPage):
         """
         return self.root.replies(content_format=content_format, force=force)
 
-    def reply(self, content: str, content_format: str = 'wikitext') -> 'Post':
+    def reply(self, content: str, content_format: str = 'wikitext') -> Post:
         """A convenience method to reply to this topic's root post.
 
         :param content: The content of the new post
@@ -320,7 +320,7 @@ class Topic(FlowPage):
         self.site.restore_topic(self, reason)
         self._reload()
 
-    def summary(self) -> Optional[str]:
+    def summary(self) -> str | None:
         """Get this topic summary, if any.
 
         :return: summary or None
@@ -344,7 +344,7 @@ class Post:
 
     """A post to a Flow discussion topic."""
 
-    def __init__(self, page: 'Topic', uuid: str) -> None:
+    def __init__(self, page: Topic, uuid: str) -> None:
         """
         Initializer.
 
@@ -363,11 +363,11 @@ class Post:
         self._page = page
         self._uuid = uuid
 
-        self._content: Dict[str, Any] = {}
+        self._content: dict[str, Any] = {}
 
     @classmethod
-    def fromJSON(cls, page: 'Topic', post_uuid: str,  # noqa: N802
-                 data: Dict[str, Any]) -> 'Post':
+    def fromJSON(cls, page: Topic, post_uuid: str,  # noqa: N802
+                 data: dict[str, Any]) -> Post:
         """
         Create a Post object using the data returned from the API call.
 
@@ -384,7 +384,7 @@ class Post:
 
         return post
 
-    def _set_data(self, data: Dict[str, Any]) -> None:
+    def _set_data(self, data: dict[str, Any]) -> None:
         """Set internal data and cache content.
 
         :param data: The data to store internally
@@ -411,7 +411,7 @@ class Post:
             self._content[content['format']] = content['content']
 
     def _load(self, force: bool = True, content_format: str = 'wikitext',
-              load_from_topic: bool = False) -> Dict[str, Any]:
+              load_from_topic: bool = False) -> dict[str, Any]:
         """Load and cache the Post's data using the given content format.
 
         :param load_from_topic: Whether to load the post from the whole topic
@@ -433,7 +433,7 @@ class Post:
         return self._uuid
 
     @property
-    def site(self) -> 'pywikibot.site.BaseSite':
+    def site(self) -> pywikibot.site.BaseSite:
         """Return the site associated with the post.
 
         :return: Site associated with the post
@@ -441,7 +441,7 @@ class Post:
         return self._page.site
 
     @property
-    def page(self) -> 'Topic':
+    def page(self) -> Topic:
         """Return the page associated with the post.
 
         :return: Page associated with the post
@@ -478,7 +478,7 @@ class Post:
         return self._content[content_format]
 
     def replies(self, content_format: str = 'wikitext', force: bool = False
-                ) -> List['Post']:
+                ) -> list[Post]:
         """Return this post's replies.
 
         :param content_format: Content format to return contents in;
@@ -502,7 +502,7 @@ class Post:
 
         return self._replies
 
-    def reply(self, content: str, content_format: str = 'wikitext') -> 'Post':
+    def reply(self, content: str, content_format: str = 'wikitext') -> Post:
         """Reply to this post.
 
         :param content: The content of the new post

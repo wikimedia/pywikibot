@@ -186,6 +186,8 @@ else:
 
 # import ModuleDeprecationWrapper here to prevent circular import
 from pywikibot.tools import ModuleDeprecationWrapper  # noqa: E402
+
+
 wrapper = ModuleDeprecationWrapper(__name__)
 wrapper.add_deprecated_attr('nullcontext',
                             replacement_name='contextlib.nullcontext',

@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import pywikibot
 from pywikibot import config, date
-from pywikibot.backports import List
 
 
 def translate(
@@ -17,7 +16,7 @@ def translate(
     auto: bool = True,
     removebrackets: bool = False,
     site=None
-) -> List['pywikibot.Link']:
+) -> list[pywikibot.Link]:
     """
     Return a list of links to pages on other sites based on hints.
 

@@ -106,7 +106,7 @@ def check_pwb_versions(package):
 # https://bitbucket.org/ned/coveragepy/src/2c5fb3a8b81c/setup.py?at=default#cl-31
 
 
-def run_python_file(filename, args, package=None):
+def run_python_file(filename: str, args: list[str], package=None):
     """Run a python file as if it were the main program on the command line.
 
     .. versionchanged:: 7.7
@@ -114,9 +114,7 @@ def run_python_file(filename, args, package=None):
 
     :param filename: The path to the file to execute, it need not be a
         .py file.
-    :type filename: str
     :param args: is the argument list to present as sys.argv, as strings.
-    :type args: List[str]
     :param package: The package of the script. Used for checks.
     :type package: Optional[module]
     """
@@ -167,14 +165,16 @@ def run_python_file(filename, args, package=None):
                 del os.environ[key]
 
 
-def handle_args(pwb_py, *args):
+def handle_args(
+    _,
+    *args: str,
+) -> tuple[str, list[str], list[str], list[str]]:
     """Handle args and get filename.
 
     .. versionchanged:: 7.7
        Catch ``PYWIKIBOT_TEST_...`` environment variables.
 
     :return: filename, script args, local pwb args, environment variables
-    :rtype: Tuple[str, List[str], List[str], [List[str]]
     """
     fname = None
     local = []

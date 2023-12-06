@@ -14,12 +14,10 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from contextlib import suppress
-from typing import Optional, Union
 from warnings import warn
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import List
 from pywikibot.exceptions import Error, InvalidTitleError, UnsupportedPageError
 from pywikibot.tools import deprecated
 from pywikibot.tools.collections import GeneratorWrapper
@@ -58,7 +56,7 @@ class APIGeneratorBase(ABC):
         return kwargs
 
     @abstractmethod
-    def set_maximum_items(self, value: Union[int, str, None]) -> None:
+    def set_maximum_items(self, value: int | str | None) -> None:
         """Set the maximum number of items to be retrieved from the wiki.
 
         .. versionadded:: 7.1
@@ -106,7 +104,7 @@ class APIGenerator(APIGeneratorBase, GeneratorWrapper):
         self.limit_name = limit_name
         self.data_name = data_name
 
-        self.query_increment: Optional[int]
+        self.query_increment: int | None
         if config.step > 0:
             self.query_increment = config.step
         else:
@@ -130,7 +128,7 @@ class APIGenerator(APIGeneratorBase, GeneratorWrapper):
         pywikibot.debug('{}: Set query_increment to {}.'
                         .format(type(self).__name__, self.query_increment))
 
-    def set_maximum_items(self, value: Union[int, str, None]) -> None:
+    def set_maximum_items(self, value: int | str | None) -> None:
         """
         Set the maximum number of items to be retrieved from the wiki.
 
@@ -282,7 +280,7 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
                 else:
                     self.request[prefix + 'limit'] = int(param['max'])
 
-        self.api_limit: Optional[int]
+        self.api_limit: int | None
         if config.step > 0:
             self.api_limit = config.step
         else:
@@ -308,7 +306,7 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
 
     @property
     @deprecated(since='8.4.0')
-    def continuekey(self) -> List[str]:
+    def continuekey(self) -> list[str]:
         """Return deprecated continuekey which is self.modules."""
         return self.modules
 
@@ -380,7 +378,7 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
         pywikibot.debug('{}: Set query_limit to {}.'
                         .format(type(self).__name__, self.query_limit))
 
-    def set_maximum_items(self, value: Union[int, str, None]) -> None:
+    def set_maximum_items(self, value: int | str | None) -> None:
         """Set the maximum number of items to be retrieved from the wiki.
 
         If not called, most queries will continue as long as there is

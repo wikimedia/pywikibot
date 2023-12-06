@@ -44,7 +44,7 @@ from datetime import timedelta
 
 import pywikibot
 from pywikibot import config, i18n, pagegenerators
-from pywikibot.backports import Tuple, removeprefix
+from pywikibot.backports import removeprefix
 from pywikibot.bot import ConfigParserBot, SingleSiteBot
 from pywikibot.exceptions import CircularRedirectError, Error, NoPageError
 
@@ -136,7 +136,7 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
         return self.cat is not None
 
     def move_contents(self, old_cat_title: str, new_cat_title: str,
-                      edit_summary: str) -> Tuple[int, int]:
+                      edit_summary: str) -> tuple[int, int]:
         """The worker function that moves pages out of oldCat into newCat."""
         old_cat = pywikibot.Category(self.site, self.catprefix + old_cat_title)
         new_cat = pywikibot.Category(self.site, self.catprefix + new_cat_title)

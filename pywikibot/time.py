@@ -14,10 +14,8 @@ import math
 import re
 import types
 from contextlib import suppress
-from typing import Type, Union
 
 import pywikibot
-from pywikibot.backports import Tuple
 from pywikibot.tools import classproperty, deprecated
 
 
@@ -71,9 +69,10 @@ class Timestamp(datetime.datetime):
     _ISO8601Format_new = '{0:+05d}-{1:02d}-{2:02d}T{3:02d}:{4:02d}:{5:02d}Z'
 
     @classmethod
-    def set_timestamp(cls: Type['Timestamp'],
-                      ts: Union[str, datetime.datetime, 'Timestamp']
-                      ) -> 'Timestamp':
+    def set_timestamp(
+        cls,
+        ts: str | datetime.datetime | Timestamp,
+    ) -> Timestamp:
         """Set Timestamp from input object.
 
         ts is converted to a datetime naive object representing UTC time.
@@ -100,7 +99,7 @@ class Timestamp(datetime.datetime):
             f'Unsupported "ts" type, got "{ts}" ({type(ts).__name__})')
 
     @staticmethod
-    def _from_datetime(dt: datetime.datetime) -> 'Timestamp':
+    def _from_datetime(dt: datetime.datetime) -> Timestamp:
         """Convert a datetime.datetime timestamp to a Timestamp object.
 
         .. versionadded:: 7.5
@@ -110,7 +109,7 @@ class Timestamp(datetime.datetime):
                          dt.tzinfo)
 
     @classmethod
-    def _from_mw(cls: Type['Timestamp'], timestr: str) -> 'Timestamp':
+    def _from_mw(cls, timestr: str) -> Timestamp:
         """Convert a string in MW format to a Timestamp object.
 
         Mediwiki timestamp format: YYYYMMDDHHMMSS
@@ -127,7 +126,7 @@ class Timestamp(datetime.datetime):
         return cls.strptime(timestr, cls.mediawikiTSFormat)
 
     @classmethod
-    def _from_iso8601(cls: Type['Timestamp'], timestr: str) -> 'Timestamp':
+    def _from_iso8601(cls, timestr: str) -> Timestamp:
         """Convert a string in ISO8601 format to a Timestamp object.
 
         ISO8601 format:
@@ -170,7 +169,7 @@ class Timestamp(datetime.datetime):
         return ts
 
     @classmethod
-    def _from_posix(cls: Type['Timestamp'], timestr: str) -> 'Timestamp':
+    def _from_posix(cls, timestr: str) -> Timestamp:
         """Convert a string in POSIX format to a Timestamp object.
 
         POSIX format: SECONDS[.ffffff]]
@@ -196,7 +195,7 @@ class Timestamp(datetime.datetime):
         return ts
 
     @classmethod
-    def _from_string(cls: Type['Timestamp'], timestr: str) -> 'Timestamp':
+    def _from_string(cls, timestr: str) -> Timestamp:
         """Convert a string to a Timestamp object.
 
         .. versionadded:: 7.5
@@ -214,7 +213,7 @@ class Timestamp(datetime.datetime):
         raise ValueError(f'time data {timestr!r} does not match any format.')
 
     @deprecated('replace method', since='8.0.0')
-    def clone(self) -> 'Timestamp':
+    def clone(self) -> Timestamp:
         """Clone this instance.
 
         .. deprecated:: 8.0
@@ -223,13 +222,12 @@ class Timestamp(datetime.datetime):
         return self.replace()
 
     @classproperty
-    def ISO8601Format(cls: Type['Timestamp']) -> str:  # noqa: N802
+    def ISO8601Format(cls) -> str:  # noqa: N802
         """ISO8601 format string class property for compatibility purpose."""
         return cls._ISO8601Format()
 
     @classmethod
-    def _ISO8601Format(cls: Type['Timestamp'],  # noqa: N802
-                       sep: str = 'T') -> str:
+    def _ISO8601Format(cls, sep: str = 'T') -> str:  # noqa: N802
         """ISO8601 format string.
 
         :param sep: one-character separator, placed between the date and time
@@ -239,9 +237,9 @@ class Timestamp(datetime.datetime):
         return f'%Y-%m-%d{sep}%H:%M:%SZ'
 
     @classmethod
-    def fromISOformat(cls: Type['Timestamp'],  # noqa: N802
-                      ts: Union[str, 'Timestamp'],
-                      sep: str = 'T') -> 'Timestamp':
+    def fromISOformat(cls,  # noqa: N802
+                      ts: str | Timestamp,
+                      sep: str = 'T') -> Timestamp:
         """Convert an ISO 8601 timestamp to a Timestamp object.
 
         :param ts: ISO 8601 timestamp or a Timestamp object already
@@ -256,9 +254,9 @@ class Timestamp(datetime.datetime):
         return cls._from_iso8601(f'{ts[:10]}{sep}{ts[11:]}')
 
     @classmethod
-    def fromtimestampformat(cls: Type['Timestamp'],
-                            ts: Union[str, 'Timestamp'],
-                            strict: bool = False) -> 'Timestamp':
+    def fromtimestampformat(cls,
+                            ts: str | Timestamp,
+                            strict: bool = False) -> Timestamp:
         """Convert a MediaWiki internal timestamp to a Timestamp object.
 
         .. versionchanged:: 3.0
@@ -339,7 +337,7 @@ class Timestamp(datetime.datetime):
         """Return a string format recognized by the API."""
         return self.isoformat()
 
-    def __add__(self, other: datetime.timedelta) -> 'Timestamp':
+    def __add__(self, other: datetime.timedelta) -> Timestamp:
         """Perform addition, returning a Timestamp instead of datetime."""
         newdt = super().__add__(other)
         if isinstance(newdt, datetime.datetime):
@@ -347,7 +345,7 @@ class Timestamp(datetime.datetime):
         return newdt
 
     def __sub__(self, other: datetime.timedelta  # type: ignore[override]
-                ) -> 'Timestamp':
+                ) -> Timestamp:
         """Perform subtraction, returning a Timestamp instead of datetime."""
         newdt = super().__sub__(other)
         if isinstance(newdt, datetime.datetime):
@@ -424,7 +422,7 @@ def str2timedelta(string: str, timestamp=None) -> datetime.timedelta:
     return datetime.timedelta(**{MW_KEYS[key]: duration})
 
 
-def parse_duration(string: str) -> Tuple[str, int]:
+def parse_duration(string: str) -> tuple[str, int]:
     """
     Return the key and duration extracted from the string.
 

@@ -61,7 +61,6 @@ from pathlib import Path
 from subprocess import check_call, run
 
 from pywikibot import __version__, error, info, input_yn, warning
-from pywikibot.backports import Tuple
 
 
 @dataclass
@@ -199,7 +198,7 @@ class SetupPywikibot(SetupBase):
         info('<<lightyellow>>done')
 
 
-def handle_args() -> Tuple[bool, bool, bool, bool]:
+def handle_args() -> tuple[bool, bool, bool, bool]:
     """Handle arguments and print documentation if requested.
 
     Read arguments from `sys.argv` and adjust it passing `sdist` to

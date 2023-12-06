@@ -12,12 +12,11 @@ import os
 import re
 import webbrowser
 from enum import IntEnum
-from typing import Any, Optional
+from typing import Any
 from warnings import warn
 
 import pywikibot
 from pywikibot import __url__, config
-from pywikibot.backports import Dict, Tuple
 from pywikibot.comms import http
 from pywikibot.exceptions import APIError, NoUsernameError
 from pywikibot.tools import deprecated, file_mode_checker, normalize_username
@@ -78,9 +77,9 @@ class LoginManager:
 
     """Site login manager."""
 
-    def __init__(self, password: Optional[str] = None,
-                 site: Optional['pywikibot.site.BaseSite'] = None,
-                 user: Optional[str] = None) -> None:
+    def __init__(self, password: str | None = None,
+                 site: pywikibot.site.BaseSite | None = None,
+                 user: str | None = None) -> None:
         """
         Initializer.
 
@@ -344,7 +343,7 @@ class ClientLoginManager(LoginManager):
         return self.mapping[key][self.action != 'login']
 
     def _login_parameters(self, *, botpassword: bool = False
-                          ) -> Dict[str, str]:
+                          ) -> dict[str, str]:
         """Return login parameters."""
         if botpassword:
             self.action = 'login'
@@ -465,7 +464,7 @@ class ClientLoginManager(LoginManager):
         raise pywikibot.exceptions.APIError(code=status, info=fail_reason)
 
     @deprecated("site.tokens['login']", since='8.0.0')
-    def get_login_token(self) -> Optional[str]:
+    def get_login_token(self) -> str | None:
         """Fetch login token.
 
         .. deprecated:: 8.0
@@ -513,9 +512,9 @@ class OauthLoginManager(LoginManager):
     # NOTE: Currently OauthLoginManager use mwoauth directly to complete OAuth
     # authentication process
 
-    def __init__(self, password: Optional[str] = None,
-                 site: Optional['pywikibot.site.BaseSite'] = None,
-                 user: Optional[str] = None) -> None:
+    def __init__(self, password: str | None = None,
+                 site: pywikibot.site.BaseSite | None = None,
+                 user: str | None = None) -> None:
         """
         Initializer.
 
@@ -539,7 +538,7 @@ class OauthLoginManager(LoginManager):
                            'should be removed if OAuth enabled.'
                            .format(login=self))
         self._consumer_token = (user, password)
-        self._access_token: Optional[Tuple[str, str]] = None
+        self._access_token: tuple[str, str] | None = None
 
     def login(self, retry: bool = False, force: bool = False) -> bool:
         """
@@ -580,7 +579,7 @@ class OauthLoginManager(LoginManager):
             return True
 
     @property
-    def consumer_token(self) -> Tuple[str, str]:
+    def consumer_token(self) -> tuple[str, str]:
         """
         Return OAuth consumer key token and secret token.
 
@@ -589,7 +588,7 @@ class OauthLoginManager(LoginManager):
         return self._consumer_token
 
     @property
-    def access_token(self) -> Optional[Tuple[str, str]]:
+    def access_token(self) -> tuple[str, str] | None:
         """
         Return OAuth access key token and secret token.
 
@@ -598,7 +597,7 @@ class OauthLoginManager(LoginManager):
         return self._access_token
 
     @property
-    def identity(self) -> Optional[Dict[str, Any]]:
+    def identity(self) -> dict[str, Any] | None:
         """Get identifying information about a user via an authorized token."""
         if self.access_token is None:
             pywikibot.error('Access token not set')

@@ -13,7 +13,6 @@ import time
 from collections import Counter, namedtuple
 from contextlib import suppress
 from hashlib import blake2b
-from typing import Optional, Union
 
 import pywikibot
 from pywikibot import config
@@ -24,7 +23,7 @@ from pywikibot.tools import deprecated
 FORMAT_LINE = '{module_id} {pid} {time} {site}\n'
 ProcEntry = namedtuple('ProcEntry', ['module_id', 'pid', 'time', 'site'])
 
-pid: Union[bool, int] = False
+pid: bool | int = False
 """global process identifier
 
 When the first Throttle is instantiated, it will set this variable to a
@@ -55,10 +54,10 @@ class Throttle:
     # The number of seconds entries of a process need to be counted
     expiry: int = 600
 
-    def __init__(self, site: Union['pywikibot.site.BaseSite', str], *,
-                 mindelay: Optional[int] = None,
-                 maxdelay: Optional[int] = None,
-                 writedelay: Union[int, float, None] = None) -> None:
+    def __init__(self, site: pywikibot.site.BaseSite | str, *,
+                 mindelay: int | None = None,
+                 maxdelay: int | None = None,
+                 writedelay: int | float | None = None) -> None:
         """Initializer."""
         self.lock = threading.RLock()
         self.lock_write = threading.RLock()
@@ -256,7 +255,7 @@ class Throttle:
         self._write_file(processes)
 
     @staticmethod
-    def wait(seconds: Union[int, float]) -> None:
+    def wait(seconds: int | float) -> None:
         """Wait for seconds seconds.
 
         Announce the delay if it exceeds a preset limit.
@@ -303,7 +302,7 @@ class Throttle:
             else:
                 self.last_read = time.time()
 
-    def lag(self, lagtime: Optional[float] = None) -> None:
+    def lag(self, lagtime: float | None = None) -> None:
         """Seize the throttle lock due to server lag.
 
         Usually the `self.retry-after` value from `response_header` of the

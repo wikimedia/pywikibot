@@ -104,12 +104,11 @@ import hashlib
 import io
 import os
 import posixpath
-from typing import Any, BinaryIO, Optional
+from typing import Any, BinaryIO
 from urllib.parse import urlparse
 
 import pywikibot
 from pywikibot import pagegenerators
-from pywikibot.backports import Dict, List
 from pywikibot.comms.http import fetch
 from pywikibot.exceptions import NoPageError
 from pywikibot.specialbots import UploadRobot
@@ -119,8 +118,8 @@ class Photo(pywikibot.FilePage):
 
     """Represents a Photo (or other file), with metadata, to be uploaded."""
 
-    def __init__(self, url: str, metadata: Dict[str, Any],
-                 site: Optional[pywikibot.site.APISite] = None) -> None:
+    def __init__(self, url: str, metadata: dict[str, Any],
+                 site: pywikibot.site.APISite | None = None) -> None:
         """
         Initializer.
 
@@ -155,7 +154,7 @@ class Photo(pywikibot.FilePage):
             self.contents = io.BytesIO(image_file)
         return self.contents
 
-    def find_duplicate_images(self) -> List[str]:
+    def find_duplicate_images(self) -> list[str]:
         """
         Find duplicates of the photo.
 
@@ -184,7 +183,7 @@ class Photo(pywikibot.FilePage):
         return fmt % self.metadata
 
     def get_description(self, template,
-                        extraparams: Optional[Dict[str, str]] = None) -> str:
+                        extraparams: dict[str, str] | None = None) -> str:
         """Generate a description for a file."""
         params = {}
         params.update(self.metadata)
@@ -252,7 +251,7 @@ class DataIngestionBot(pywikibot.Bot):
         bot.run()
 
     @classmethod
-    def parse_configuration_page(cls, configuration_page) -> Dict[str, str]:
+    def parse_configuration_page(cls, configuration_page) -> dict[str, str]:
         """
         Parse a Page which contains the configuration.
 

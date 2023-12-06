@@ -9,7 +9,6 @@ from __future__ import annotations
 import mimetypes
 import os
 from collections.abc import Iterable
-from typing import Optional
 from warnings import warn
 
 import pywikibot
@@ -86,18 +85,18 @@ class Uploader:
     }
 
     def __init__(self,
-                 site: 'pywikibot.site.APISite',
-                 filepage: 'pywikibot.FilePage',
+                 site: pywikibot.site.APISite,
+                 filepage: pywikibot.FilePage,
                  *,
-                 source_filename: Optional[str] = None,
-                 source_url: Optional[str] = None,
-                 comment: Optional[str] = None,
-                 text: Optional[str] = None,
+                 source_filename: str | None = None,
+                 source_url: str | None = None,
+                 comment: str | None = None,
+                 text: str | None = None,
                  watch: bool = False,
                  chunk_size: int = 0,
                  asynchronous: bool = False,
                  ignore_warnings=False,
-                 report_success: Optional[bool] = None) -> None:
+                 report_success: bool | None = None) -> None:
         """Initializer."""
         self.site = site
         self.filepage = filepage
@@ -439,7 +438,7 @@ class Uploader:
                            ignore_warnings, ignore_all_warnings,
                            report_success, file_key)
 
-    def submit(self, request, result, data_result: Optional[str],
+    def submit(self, request, result, data_result: str | None,
                ignore_warnings, ignore_all_warnings, report_success,
                file_key) -> bool:
         """Submit request and return whether upload was successful."""

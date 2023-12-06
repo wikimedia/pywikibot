@@ -9,11 +9,9 @@ from __future__ import annotations
 import itertools
 import threading
 from collections import Counter
-from typing import Optional
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Dict, List, Set
 
 
 try:
@@ -21,9 +19,6 @@ try:
     PYDOT_ERROR = None
 except ImportError as e:
     PYDOT_ERROR = e
-
-
-FoundInType = Dict['pywikibot.page.Page', List['pywikibot.page.Page']]
 
 
 class GraphSavingThread(threading.Thread):
@@ -39,8 +34,8 @@ class GraphSavingThread(threading.Thread):
     mechanism to kill a thread if it takes too long.
     """
 
-    def __init__(self, graph: 'pydot.Dot',
-                 origin: 'pywikibot.page.Page') -> None:
+    def __init__(self, graph: pydot.Dot,
+                 origin: pywikibot.page.Page) -> None:
         """Initializer."""
         super().__init__()
         self.graph = graph
@@ -61,7 +56,7 @@ class Subject:
 
     """Data about a page with translations on multiple wikis."""
 
-    def __init__(self, origin: Optional['pywikibot.page.Page'] = None) -> None:
+    def __init__(self, origin: pywikibot.page.Page | None = None) -> None:
         """Initializer.
 
         :param origin: the page on the 'origin' wiki
@@ -73,17 +68,17 @@ class Subject:
         # pages are values. It stores where we found each page.
         # As we haven't yet found a page that links to the origin page, we
         # start with an empty list for it.
-        self.found_in: FoundInType = {}
+        self.found_in: dict[pywikibot.Page, list[pywikibot.Page]] = {}
         if origin:
             self.found_in = {origin: []}
 
     @property
-    def origin(self) -> Optional['pywikibot.page.Page']:
+    def origin(self) -> pywikibot.page.Page | None:
         """Page on the origin wiki."""
         return self._origin
 
     @origin.setter
-    def origin(self, value: Optional['pywikibot.page.Page']) -> None:
+    def origin(self, value: pywikibot.page.Page | None) -> None:
         self._origin = value
 
 
@@ -91,7 +86,7 @@ class GraphDrawer:
 
     """Graphviz (dot) code creator."""
 
-    def __init__(self, subject: 'pywikibot.interwiki_graph.Subject') -> None:
+    def __init__(self, subject: pywikibot.interwiki_graph.Subject) -> None:
         """Initializer.
 
         :param subject: page data to graph
@@ -101,15 +96,15 @@ class GraphDrawer:
         if PYDOT_ERROR:
             msg = f'pydot is not installed: {PYDOT_ERROR}.'
             raise ImportError(msg)
-        self.graph: Optional[pydot.Dot] = None
+        self.graph: pydot.Dot | None = None
         self.subject = subject
 
     @staticmethod
-    def getLabel(page: 'pywikibot.page.Page') -> str:
+    def getLabel(page: pywikibot.page.Page) -> str:
         """Get label for page."""
         return f'"{page.site.code}:{page.title()}"'
 
-    def _octagon_site_set(self) -> Set['pywikibot.site.BaseSite']:
+    def _octagon_site_set(self) -> set[pywikibot.site.BaseSite]:
         """Build a list of sites with more than one valid page."""
         page_list = self.subject.found_in.keys()
 
@@ -121,7 +116,7 @@ class GraphDrawer:
             lambda x: x[1] > 1,
             Counter(each_site).most_common())}
 
-    def addNode(self, page: 'pywikibot.page.Page') -> None:
+    def addNode(self, page: pywikibot.page.Page) -> None:
         """Add a node for page."""
         assert self.graph is not None
         node = pydot.Node(self.getLabel(page), shape='rectangle')
@@ -145,8 +140,8 @@ class GraphDrawer:
             node.set_shape('octagon')
         self.graph.add_node(node)
 
-    def addDirectedEdge(self, page: 'pywikibot.page.Page',
-                        refPage: 'pywikibot.page.Page') -> None:
+    def addDirectedEdge(self, page: pywikibot.page.Page,
+                        refPage: pywikibot.page.Page) -> None:
         """Add a directed edge from refPage to page."""
         assert self.graph is not None
         # if page was given as a hint, referrers would be [None]
@@ -214,8 +209,8 @@ class GraphDrawer:
         self.saveGraphFile()
 
 
-def getFilename(page: 'pywikibot.page.Page',
-                extension: Optional[str] = None) -> str:
+def getFilename(page: pywikibot.page.Page,
+                extension: str | None = None) -> str:
     """
     Create a filename that is unique for the page.
 

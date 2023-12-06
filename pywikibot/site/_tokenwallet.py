@@ -7,9 +7,8 @@
 from __future__ import annotations
 
 from collections.abc import Container
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 
-from pywikibot.backports import Dict, List
 from pywikibot.tools import deprecated, issue_deprecation_warning
 
 
@@ -26,13 +25,13 @@ class TokenWallet(Container):
     instead which gives access to the site's TokenWallet instance.
     """
 
-    def __init__(self, site: 'APISite') -> None:
+    def __init__(self, site: APISite) -> None:
         """Initializer."""
         self.site: APISite = site
-        self._tokens: Dict[str, str] = {}
-        self._currentuser: Optional[str] = site.user()
+        self._tokens: dict[str, str] = {}
+        self._currentuser: str | None = site.user()
         # guess the needed token in update_tokens
-        self._last_token_key: Optional[str] = None
+        self._last_token_key: str | None = None
 
     def __getitem__(self, key: str) -> str:
         """Get token value for the given key."""
@@ -99,7 +98,7 @@ class TokenWallet(Container):
         """
         self._tokens.clear()
 
-    def update_tokens(self, tokens: List[str]) -> List[str]:
+    def update_tokens(self, tokens: list[str]) -> list[str]:
         """Return a list of new tokens for a given list of tokens.
 
         This method can be used if a token is outdated and has to be

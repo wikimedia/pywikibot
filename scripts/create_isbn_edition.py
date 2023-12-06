@@ -238,7 +238,6 @@ from typing import Any
 
 import pywikibot  # API interface to Wikidata
 from pywikibot import pagegenerators as pg  # Wikidata Query interface
-from pywikibot.backports import Dict, List
 from pywikibot.config import verbose_output as verbose
 from pywikibot.data import api
 
@@ -281,7 +280,7 @@ mainlang = os.getenv('LANG', 'en')[:2]  # Default description language
 transcmt = '#pwb Create ISBN edition'  # Wikidata transaction comment
 
 
-def is_in_list(statement_list, checklist: List[str]) -> bool:
+def is_in_list(statement_list, checklist: list[str]) -> bool:
     """Verify if statement list contains at least one item from the checklist.
 
     :param statement_list: Statement list
@@ -369,7 +368,7 @@ def amend_isbn_edition(isbn_number: str) -> None:
     add_claims(isbn_data)
 
 
-def add_claims(isbn_data: Dict[str, Any]) -> None:  # noqa: C901
+def add_claims(isbn_data: dict[str, Any]) -> None:  # noqa: C901
     """Inspect isbn_data and add claims if possible."""
     # Get the book language from the ISBN book reference
     booklang = mainlang  # Default language

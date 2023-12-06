@@ -11,10 +11,9 @@ import datetime
 import re
 from collections.abc import Container
 from contextlib import suppress
-from typing import Any, Optional, Union
+from typing import Any
 
 import pywikibot
-from pywikibot.backports import Dict, List
 from pywikibot.exceptions import APIError
 from pywikibot.tools.collections import EMPTY_DEFAULT
 
@@ -61,7 +60,7 @@ class Siteinfo(Container):
     def __init__(self, site) -> None:
         """Initialise it with an empty cache."""
         self._site = site
-        self._cache: Dict[str, Any] = {}
+        self._cache: dict[str, Any] = {}
 
     def clear(self) -> None:
         """Remove all items from Siteinfo.
@@ -122,7 +121,7 @@ class Siteinfo(Container):
         if not props:
             raise ValueError('At least one property name must be provided.')
 
-        invalid_properties: List[str] = []
+        invalid_properties: list[str] = []
         request = self._site._request(
             expiry=pywikibot.config.API_config_expiry
             if expiry is False else expiry,
@@ -227,7 +226,7 @@ class Siteinfo(Container):
         key: str,
         get_default: bool = True,
         cache: bool = True,
-        expiry: Union[datetime.datetime, float, bool] = False
+        expiry: datetime.datetime | float | bool = False
     ) -> Any:
         """
         Return a siteinfo property.
@@ -319,7 +318,7 @@ class Siteinfo(Container):
         else:
             return True
 
-    def is_recognised(self, key: str) -> Optional[bool]:
+    def is_recognised(self, key: str) -> bool | None:
         """Return if 'key' is a valid property name. 'None' if not cached."""
         time = self.get_requested_time(key)
         return None if time is None else bool(time)

@@ -86,7 +86,6 @@ from typing import Generator
 import pywikibot
 from pywikibot import config, i18n
 from pywikibot import pagegenerators as pg
-from pywikibot.backports import List, Set, Tuple
 from pywikibot.bot import suggest_help
 from pywikibot.exceptions import (
     EditConflictError,
@@ -768,7 +767,7 @@ class CheckImagesBot:
 
     @staticmethod
     def important_image(
-        list_given: List[Tuple[float, pywikibot.FilePage]]
+        list_given: list[tuple[float, pywikibot.FilePage]]
     ) -> pywikibot.FilePage:
         """
         Get tuples of image and time, return the most used or oldest image.
@@ -1105,7 +1104,7 @@ class CheckImagesBot:
         else:
             pywikibot.info('>> No additional settings found! <<')
 
-    def load_licenses(self) -> Set[pywikibot.Page]:
+    def load_licenses(self) -> set[pywikibot.Page]:
         """Load the list of the licenses.
 
         .. versionchanged:: 7.2
@@ -1184,7 +1183,7 @@ class CheckImagesBot:
                     if self.mini_template_check(template):
                         break
 
-    def smart_detection(self) -> Tuple[str, bool]:
+    def smart_detection(self) -> tuple[str, bool]:
         """
         Detect templates.
 
@@ -1285,7 +1284,7 @@ class CheckImagesBot:
         return (self.license_found, self.white_templates_found)
 
     @staticmethod
-    def load(raw) -> List[str]:
+    def load(raw) -> list[str]:
         """Load a list of objects from a string using regex."""
         list_loaded = []
         # I search with a regex how many user have not the talk page

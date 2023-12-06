@@ -341,7 +341,6 @@ import sys
 from collections import Counter, defaultdict
 from contextlib import suppress
 from textwrap import fill
-from typing import Optional
 
 import pywikibot
 from pywikibot import (
@@ -1894,7 +1893,7 @@ class InterwikiBot:
         # for loop was exited by break statement
         self.pageGenerator = None
 
-    def firstSubject(self) -> Optional[Subject]:
+    def firstSubject(self) -> Subject | None:
         """Return the first subject that is still being worked on."""
         return self.subjects[0] if self.subjects else None
 

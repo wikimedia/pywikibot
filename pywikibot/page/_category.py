@@ -7,10 +7,10 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Any, Optional, Union
+from typing import Any
 
 import pywikibot
-from pywikibot.backports import Dict, Generator, Iterable
+from pywikibot.backports import Generator, Iterable
 from pywikibot.page._page import Page
 
 
@@ -33,7 +33,7 @@ class Category(Page):
             raise ValueError(
                 f"'{self.title()}' is not in the category namespace!")
 
-    def aslink(self, sort_key: Optional[str] = None) -> str:
+    def aslink(self, sort_key: str | None = None) -> str:
         """Return a link to place a page in this Category.
 
         .. warning:: Use this only to generate a "true" category link,
@@ -61,7 +61,7 @@ class Category(Page):
         return f'[[{title_with_sort_key}]]'
 
     def subcategories(self, *,
-                      recurse: Union[int, bool] = False,
+                      recurse: int | bool = False,
                       **kwargs: Any) -> Iterable[Page]:
         """Iterate all subcategories of the current category.
 
@@ -135,8 +135,8 @@ class Category(Page):
                                 **kwargs)
 
     def articles(self, *,
-                 recurse: Union[int, bool] = False,
-                 total: Optional[int] = None,
+                 recurse: int | bool = False,
+                 total: int | None = None,
                  **kwargs: Any) -> Iterable[Page]:
         """
         Yield all articles in the current category.
@@ -203,7 +203,7 @@ class Category(Page):
 
     def members(self, *,
                 recurse: bool = False,
-                total: Optional[int] = None,
+                total: int | None = None,
                 **kwargs: Any) -> Iterable[Page]:
         """Yield all category contents (subcats, pages, and files).
 
@@ -274,7 +274,7 @@ class Category(Page):
         return 'hiddencat' in self.properties()
 
     @property
-    def categoryinfo(self) -> Dict[str, Any]:
+    def categoryinfo(self) -> dict[str, Any]:
         """Return a dict containing information about the category.
 
         The dict contains values for numbers of pages, subcategories,
@@ -287,7 +287,7 @@ class Category(Page):
 
     def newest_pages(
         self,
-        total: Optional[int] = None
+        total: int | None = None
     ) -> Generator[Page, None, None]:
         """
         Return pages in a category ordered by the creation date.

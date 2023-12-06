@@ -8,11 +8,9 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Mapping
 from enum import IntEnum
-from typing import Optional, Union
+from typing import Union
 
-from pywikibot.backports import Dict
 from pywikibot.backports import Iterable as IterableType
-from pywikibot.backports import List
 from pywikibot.tools import ComparableMixin, SelfCallMixin, classproperty
 
 
@@ -74,9 +72,9 @@ class Namespace(Iterable, ComparableMixin):
     """
 
     def __init__(self, id,
-                 canonical_name: Optional[str] = None,
-                 custom_name: Optional[str] = None,
-                 aliases: Optional[List[str]] = None,
+                 canonical_name: str | None = None,
+                 custom_name: str | None = None,
+                 aliases: list[str] | None = None,
                  **kwargs) -> None:
         """Initializer.
 
@@ -109,7 +107,7 @@ class Namespace(Iterable, ComparableMixin):
             setattr(self, key, value)
 
     @classproperty
-    def canonical_namespaces(cls) -> Dict[int, str]:
+    def canonical_namespaces(cls) -> dict[int, str]:
         """Return the canonical forms of MediaWiki built-in namespaces.
 
         .. versionchanged:: 7.1
@@ -334,7 +332,7 @@ class NamespacesDict(Mapping, SelfCallMixin):
         """Iterate over all namespaces."""
         return iter(self._namespaces)
 
-    def __getitem__(self, key: Union[Namespace, int, str]) -> Namespace:
+    def __getitem__(self, key: Namespace | int | str) -> Namespace:
         """
         Get the namespace with the given key.
 
@@ -353,7 +351,7 @@ class NamespacesDict(Mapping, SelfCallMixin):
 
         return super().__getitem__(key)
 
-    def __getattr__(self, attr: Union[Namespace, int, str]) -> Namespace:
+    def __getattr__(self, attr: Namespace | int | str) -> Namespace:
         """
         Get the namespace with the given key.
 
@@ -374,7 +372,7 @@ class NamespacesDict(Mapping, SelfCallMixin):
         """Get the number of namespaces."""
         return len(self._namespaces)
 
-    def lookup_name(self, name: str) -> Optional[Namespace]:
+    def lookup_name(self, name: str) -> Namespace | None:
         """
         Find the Namespace for a name also checking aliases.
 
@@ -385,7 +383,7 @@ class NamespacesDict(Mapping, SelfCallMixin):
             return None
         return self.lookup_normalized_name(name.lower())
 
-    def lookup_normalized_name(self, name: str) -> Optional[Namespace]:
+    def lookup_normalized_name(self, name: str) -> Namespace | None:
         """
         Find the Namespace for a name also checking aliases.
 
@@ -395,7 +393,7 @@ class NamespacesDict(Mapping, SelfCallMixin):
         """
         return self._namespace_names.get(name)
 
-    def resolve(self, identifiers) -> List[Namespace]:
+    def resolve(self, identifiers) -> list[Namespace]:
         """
         Resolve namespace identifiers to obtain Namespace objects.
 

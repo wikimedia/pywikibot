@@ -124,7 +124,7 @@ import requests
 
 import pywikibot
 from pywikibot import comms, config, i18n, pagegenerators, textlib
-from pywikibot.backports import Dict, removeprefix
+from pywikibot.backports import removeprefix
 from pywikibot.bot import ExistingPageBot, SingleSiteBot, suggest_help
 from pywikibot.exceptions import (
     IsRedirectPageError,
@@ -251,7 +251,7 @@ class LinkCheckThread(threading.Thread):
     """
 
     #: Collecting start time of a thread for any host
-    hosts: Dict[str, float] = {}
+    hosts: dict[str, float] = {}
     lock = threading.Lock()
 
     def __init__(self, page, url, history, http_ignores, day) -> None:

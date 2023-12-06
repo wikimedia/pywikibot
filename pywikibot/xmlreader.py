@@ -18,7 +18,6 @@ XmlEntry objects which can be used by other bots.
 from __future__ import annotations
 
 import re
-from typing import Optional
 
 
 try:
@@ -26,7 +25,7 @@ try:
 except ImportError:
     from xml.etree.ElementTree import iterparse, ParseError
 
-from pywikibot.backports import Callable, Type
+from pywikibot.backports import Callable
 from pywikibot.tools import open_archive
 
 
@@ -111,10 +110,13 @@ class XmlDump:
         callable. Otherwise the exception is raised.
     """
 
-    def __init__(self, filename, *,
-                 allrevisions: bool = False,
-                 on_error: Optional[
-                     Callable[[Type[BaseException]], None]] = None) -> None:
+    def __init__(
+        self,
+        filename,
+        *,
+        allrevisions: bool = False,
+        on_error: Callable[[type[BaseException]], None] | None = None,
+    ) -> None:
         """Initializer."""
         self.filename = filename
         self.on_error = on_error

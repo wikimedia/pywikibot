@@ -18,7 +18,6 @@ from __future__ import annotations
 
 import json
 from functools import partial
-from typing import Optional
 
 from pkg_resources import parse_version
 from requests import __version__ as requests_version
@@ -127,7 +126,7 @@ class EventStreams(GeneratorWrapper):
             Mandatory when no url is given. Multiple streams may be
             given as a string with comma separated stream types or an
             iterable of strings
-        :keyword int or float or Tuple[int or float, int or float] timeout:
+        :keyword int or float or tuple[int or float, int or float] timeout:
             a timeout value indication how long to wait to send data
             before giving up
         :keyword str url: an url retrieving events from. Will be set up
@@ -377,7 +376,7 @@ class EventStreams(GeneratorWrapper):
         del self.source
 
 
-def site_rc_listener(site, total: Optional[int] = None):
+def site_rc_listener(site, total: int | None = None):
     """Yield changes received from EventStream.
 
     :param site: the Pywikibot.Site object to yield live recent changes for

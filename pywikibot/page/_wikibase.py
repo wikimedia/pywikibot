@@ -20,7 +20,7 @@ import re
 from collections import OrderedDict, defaultdict
 from contextlib import suppress
 from itertools import chain
-from typing import Any, Optional, Union
+from typing import Any, Union
 
 import pywikibot
 from pywikibot.backports import Dict, List
@@ -94,9 +94,9 @@ class WikibaseEntity:
     :type title_pattern: str
     """
 
-    DATA_ATTRIBUTES: Dict[str, Any] = {}
+    DATA_ATTRIBUTES: dict[str, Any] = {}
 
-    def __init__(self, repo, id_: Optional[str] = None) -> None:
+    def __init__(self, repo, id_: str | None = None) -> None:
         """
         Initializer.
 
@@ -143,7 +143,7 @@ class WikibaseEntity:
         for key, cls in self.DATA_ATTRIBUTES.items():
             setattr(self, key, cls.new_empty(self.repo))
 
-    def _defined_by(self, singular: bool = False) -> Dict[str, str]:
+    def _defined_by(self, singular: bool = False) -> dict[str, str]:
         """
         Internal function to provide the API parameters to identify the entity.
 
@@ -161,7 +161,7 @@ class WikibaseEntity:
                 params['ids'] = self.id
         return params
 
-    def getID(self, numeric: bool = False) -> Union[int, str]:
+    def getID(self, numeric: bool = False) -> int | str:
         """
         Get the identifier of this entity.
 
@@ -179,7 +179,7 @@ class WikibaseEntity:
         """
         return {}
 
-    def toJSON(self, diffto: Optional[dict] = None) -> dict:
+    def toJSON(self, diffto: dict | None = None) -> dict:
         """
         Create JSON suitable for Wikibase API.
 
@@ -216,7 +216,7 @@ class WikibaseEntity:
         return norm_data
 
     @property
-    def latest_revision_id(self) -> Optional[int]:
+    def latest_revision_id(self) -> int | None:
         """
         Get the revision identifier for the most recent revision of the entity.
 
@@ -230,7 +230,7 @@ class WikibaseEntity:
         return self._revid
 
     @latest_revision_id.setter
-    def latest_revision_id(self, value: Optional[int]) -> None:
+    def latest_revision_id(self, value: int | None) -> None:
         self._revid = value
 
     @latest_revision_id.deleter
@@ -290,7 +290,7 @@ class WikibaseEntity:
 
     def editEntity(
         self,
-        data: Union[ENTITY_DATA_TYPE, None] = None,
+        data: ENTITY_DATA_TYPE | None = None,
         **kwargs
     ) -> None:
         """Edit an entity using Wikibase ``wbeditentity`` API.
@@ -746,7 +746,7 @@ class WikibasePage(BasePage, WikibaseEntity):
     @allow_asynchronous
     def editEntity(
         self,
-        data: Union[ENTITY_DATA_TYPE, None] = None,
+        data: ENTITY_DATA_TYPE | None = None,
         **kwargs: Any
     ) -> None:
         """Edit an entity using Wikibase ``wbeditentity`` API.
@@ -1120,7 +1120,7 @@ class ItemPage(WikibasePage):
         get_redirect: bool = False,
         *args,
         **kwargs
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Fetch all item data, and cache it.
 
@@ -1220,7 +1220,7 @@ class ItemPage(WikibasePage):
         """
         self.removeSitelinks([site], **kwargs)
 
-    def removeSitelinks(self, sites: List[LANGUAGE_IDENTIFIER], **kwargs
+    def removeSitelinks(self, sites: list[LANGUAGE_IDENTIFIER], **kwargs
                         ) -> None:
         """
         Remove sitelinks.
@@ -1234,7 +1234,7 @@ class ItemPage(WikibasePage):
             data.append({'site': site, 'title': ''})
         self.setSitelinks(data, **kwargs)
 
-    def setSitelinks(self, sitelinks: List[SITELINK_TYPE], **kwargs) -> None:
+    def setSitelinks(self, sitelinks: list[SITELINK_TYPE], **kwargs) -> None:
         """Set sitelinks.
 
         *sitelinks* should be a list. Each item in the list can either
@@ -1356,7 +1356,7 @@ class Property:
                    'musical-notation': 'string',
                    }
 
-    def __init__(self, site, id: str, datatype: Optional[str] = None) -> None:
+    def __init__(self, site, id: str, datatype: str | None = None) -> None:
         """
         Initializer.
 
@@ -1465,7 +1465,7 @@ class PropertyPage(WikibasePage, Property):
         data['datatype'] = self._type
         return data
 
-    def newClaim(self, *args, **kwargs) -> 'Claim':
+    def newClaim(self, *args, **kwargs) -> Claim:
         """Helper function to create a new claim object for this property."""
         # todo: raise when self.id is -1
         return Claim(self.site, self.getID(), *args, datatype=self.type,
@@ -1565,7 +1565,7 @@ class Claim(Property):
         self._on_item = None  # The item it's on
 
     @property
-    def on_item(self) -> Optional[WikibaseEntity]:
+    def on_item(self) -> WikibaseEntity | None:
         """Return entity this claim is attached to."""
         return self._on_item
 
@@ -2159,7 +2159,7 @@ class LexemePage(WikibasePage):
         """Return data required for creation of a new lexeme."""
         raise NotImplementedError  # TODO
 
-    def toJSON(self, diffto: Optional[dict] = None) -> dict:
+    def toJSON(self, diffto: dict | None = None) -> dict:
         """
         Create JSON suitable for Wikibase API.
 
@@ -2395,7 +2395,7 @@ class LexemeForm(LexemeSubEntity):
         'claims': ClaimCollection,
     }
 
-    def toJSON(self, diffto: Optional[dict] = None) -> dict:
+    def toJSON(self, diffto: dict | None = None) -> dict:
         """Create dict suitable for the MediaWiki API."""
         data = super().toJSON(diffto=diffto)
 

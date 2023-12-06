@@ -18,13 +18,13 @@ from collections.abc import MutableMapping
 from contextlib import suppress
 from email.mime.nonmultipart import MIMENonMultipart
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any
 from urllib.parse import unquote, urlencode, urlparse
 from warnings import warn
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Callable, Dict, Match, Tuple, removeprefix
+from pywikibot.backports import Callable, Match, removeprefix
 from pywikibot.comms import http
 from pywikibot.data import WaitingMixin
 from pywikibot.exceptions import (
@@ -137,11 +137,11 @@ class Request(MutableMapping, WaitingMixin):
     _PARAM_DEFAULT = object()
 
     def __init__(self, site=None,
-                 mime: Optional[dict] = None,
+                 mime: dict | None = None,
                  throttle: bool = True,
-                 max_retries: Optional[int] = None,
-                 retry_wait: Optional[int] = None,
-                 use_get: Optional[bool] = None,
+                 max_retries: int | None = None,
+                 retry_wait: int | None = None,
+                 use_get: bool | None = None,
                  parameters=_PARAM_DEFAULT, **kwargs) -> None:
         """
         Create a new Request instance with the given parameters.
@@ -223,12 +223,12 @@ class Request(MutableMapping, WaitingMixin):
             parameters = kwargs
         elif parameters is self._PARAM_DEFAULT:
             parameters = {}
-        self._params: Dict[str, Any] = {}
+        self._params: dict[str, Any] = {}
         if 'action' not in parameters:
             raise ValueError("'action' specification missing from Request.")
         self.action = parameters['action']
         self.update(parameters)  # also convert all parameter values to lists
-        self._warning_handler: Optional[Callable[[str, str], Union[Match[str], bool, None]]] = None  # noqa: E501
+        self._warning_handler: Callable[[str, str], Match[str] | bool | None] | None = None  # noqa: E501
         self.write = self.action in WRITE_ACTIONS
         # Client side verification that the request is being performed
         # by a logged in user, and warn if it isn't a config username.
@@ -447,7 +447,7 @@ class Request(MutableMapping, WaitingMixin):
 
         self.__defaulted = True  # skipcq: PTC-W0037
 
-    def _encoded_items(self) -> Dict[str, Union[str, bytes]]:
+    def _encoded_items(self) -> dict[str, str | bytes]:
         """
         Build a dict of params with minimal encoding needed for the site.
 
@@ -613,7 +613,7 @@ class Request(MutableMapping, WaitingMixin):
 
     @classmethod
     def _build_mime_request(cls, params: dict,
-                            mime_params: dict) -> Tuple[dict, bytes]:
+                            mime_params: dict) -> tuple[dict, bytes]:
         """
         Construct a MIME multipart form post.
 
@@ -708,7 +708,7 @@ class Request(MutableMapping, WaitingMixin):
         self.wait()
         return None, use_get
 
-    def _json_loads(self, response) -> Optional[dict]:
+    def _json_loads(self, response) -> dict | None:
         """Return a dict from requests.Response.
 
         .. versionchanged:: 8.2
@@ -795,7 +795,7 @@ but {scheme!r} is required. Please add the following code to your family file:
                 return True
         return False
 
-    def _handle_warnings(self, result: Dict[str, Any]) -> bool:
+    def _handle_warnings(self, result: dict[str, Any]) -> bool:
         """Handle warnings; return True to retry request, False to resume.
 
         .. versionchanged:: 7.2
@@ -831,7 +831,7 @@ but {scheme!r} is required. Please add the following code to your family file:
                         retry = retry or handled
         return retry
 
-    def _default_warning_handler(self, mode: str, msg: str) -> Optional[bool]:
+    def _default_warning_handler(self, mode: str, msg: str) -> bool | None:
         """A default warning handler to handle specific warnings.
 
         Return True to retry the request, False to resume and None if
@@ -1155,7 +1155,7 @@ class CachedRequest(Request):
         return path
 
     @staticmethod
-    def _make_dir(dir_name: Union[str, Path]) -> Path:
+    def _make_dir(dir_name: str | Path) -> Path:
         """Create directory if it does not exist already.
 
         .. versionchanged:: 7.0

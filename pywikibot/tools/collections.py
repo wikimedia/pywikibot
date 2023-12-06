@@ -13,9 +13,7 @@ from contextlib import suppress
 from itertools import chain
 from typing import Any
 
-from pywikibot.backports import Dict
 from pywikibot.backports import Generator as GeneratorType
-from pywikibot.backports import List
 
 
 __all__ = (
@@ -72,7 +70,7 @@ class SizedKeyCollection(Collection):
             with this collection which will be used as key.
         """
         self.keyattr = keyattr
-        self.data: Dict[Any, List[Any]] = {}
+        self.data: dict[Any, list[Any]] = {}
         self.size = 0
 
     def __contains__(self, key) -> bool:

@@ -6,13 +6,11 @@
 #
 from __future__ import annotations
 
-from typing import Optional
-
 from pywikibot.exceptions import UnknownExtensionError, UserRightsError
 from pywikibot.tools import MediaWikiVersion, manage_wrapping
 
 
-def must_be(group: Optional[str] = None):
+def must_be(group: str | None = None):
     """Decorator to require a certain user status when method is called.
 
     :param group: The group the logged in user should belong to.
@@ -65,7 +63,7 @@ def need_extension(extension: str):
     return decorator
 
 
-def need_right(right: Optional[str] = None):
+def need_right(right: str | None = None):
     """Decorator to require a certain user right when method is called.
 
     :param right: The right the logged in user should have.

@@ -15,7 +15,6 @@ from __future__ import annotations
 from http import HTTPStatus
 from os import PathLike
 from pathlib import Path
-from typing import Optional, Union
 from urllib.parse import urlparse
 
 import pywikibot
@@ -159,9 +158,9 @@ class FilePage(Page):
         return self._imagePageHtml
 
     def get_file_url(self,
-                     url_width: Optional[int] = None,
-                     url_height: Optional[int] = None,
-                     url_param: Optional[str] = None) -> str:
+                     url_width: int | None = None,
+                     url_height: int | None = None,
+                     url_param: str | None = None) -> str:
         """Return the url or the thumburl of the file described on this page.
 
         Fetch the information if not available.
@@ -325,12 +324,12 @@ class FilePage(Page):
                                 **kwargs)
 
     def download(self,
-                 filename: Union[None, str, PathLike, Iterable[str]] = None,
+                 filename: str | PathLike | Iterable[str] | None = None,
                  chunk_size: int = 100 * 1024,
-                 revision: Optional['FileInfo'] = None, *,
-                 url_width: Optional[int] = None,
-                 url_height: Optional[int] = None,
-                 url_param: Optional[str] = None) -> bool:
+                 revision: FileInfo | None = None, *,
+                 url_width: int | None = None,
+                 url_height: int | None = None,
+                 url_param: str | None = None) -> bool:
         """Download to filename file of FilePage.
 
         **Usage examples:**

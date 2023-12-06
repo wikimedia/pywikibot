@@ -11,7 +11,6 @@ import re
 from contextlib import suppress
 from html.parser import HTMLParser
 from http import HTTPStatus
-from typing import Optional
 from urllib.parse import urljoin, urlparse
 
 from requests.exceptions import RequestException
@@ -181,7 +180,7 @@ class MWSite:
         return hash(self.server + self.scriptpath)
 
     @property
-    def api(self) -> Optional[str]:
+    def api(self) -> str | None:
         """Get api URL."""
         if self.server is None or self.scriptpath is None:
             return None

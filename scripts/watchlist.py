@@ -35,13 +35,12 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import List
 from pywikibot.data.api import CachedRequest
 from pywikibot.exceptions import InvalidTitleError
 from scripts.maintenance.cache import CacheEntry
 
 
-def get(site=None) -> List[str]:
+def get(site=None) -> list[str]:
     """Load the watchlist, fetching it if necessary."""
     if site is None:
         site = pywikibot.Site()

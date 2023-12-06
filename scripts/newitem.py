@@ -31,7 +31,6 @@ from textwrap import fill
 
 import pywikibot
 from pywikibot import pagegenerators
-from pywikibot.backports import Set
 from pywikibot.bot import WikidataBot
 from pywikibot.exceptions import (
     LockedPageError,
@@ -96,7 +95,7 @@ class NewItemRobot(WikidataBot):
         if exc is None and self.opt.touch:
             self._touch_page(page)
 
-    def get_skipping_templates(self, site) -> Set[pywikibot.Page]:
+    def get_skipping_templates(self, site) -> set[pywikibot.Page]:
         """Get templates which leads the page to be skipped.
 
         If the script is used for multiple sites, hold the skipping templates

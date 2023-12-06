@@ -7,7 +7,6 @@
 from __future__ import annotations
 
 from collections.abc import MutableMapping
-from typing import Optional
 
 
 __all__ = ['OptionSet']
@@ -26,9 +25,9 @@ class OptionSet(MutableMapping):
     """
 
     def __init__(self, site=None,
-                 module: Optional[str] = None,
-                 param: Optional[str] = None,
-                 dict: Optional[dict] = None) -> None:
+                 module: str | None = None,
+                 param: str | None = None,
+                 dict: dict | None = None) -> None:
         """
         Initializer.
 
@@ -147,7 +146,7 @@ class OptionSet(MutableMapping):
         else:
             raise ValueError(f'Invalid value "{value}"')
 
-    def __getitem__(self, name) -> Optional[bool]:
+    def __getitem__(self, name) -> bool | None:
         """
         Return whether the option is enabled.
 

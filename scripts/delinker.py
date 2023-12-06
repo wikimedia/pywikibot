@@ -86,7 +86,7 @@ class CommonsDelinker(SingleSiteBot, ConfigParserBot, AutomaticTWSummaryBot):
                and self.opt.exclude not in entry.get('comment', ''):
                 yield entry
 
-    def init_page(self, item) -> 'pywikibot.page.FilePage':
+    def init_page(self, item) -> pywikibot.page.FilePage:
         """Upcast logevent to FilePage and combine edit summary."""
         self.summary_parameters = dict(item)
         return pywikibot.FilePage(self.site, item['title'])

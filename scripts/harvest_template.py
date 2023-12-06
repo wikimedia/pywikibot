@@ -116,13 +116,12 @@ from __future__ import annotations
 import re
 import signal
 import sys
-from typing import Any, Iterator, Optional
+from typing import Any, Iterator
 
 import pywikibot
 from pywikibot import WbTime
 from pywikibot import pagegenerators as pg
 from pywikibot import textlib
-from pywikibot.backports import List, Tuple
 from pywikibot.bot import ConfigParserBot, OptionHandler, WikidataBot
 from pywikibot.exceptions import (
     APIError,
@@ -216,7 +215,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         self.cacheSources()
         self.templateTitles = self.getTemplateSynonyms(self.template_title)
 
-    def getTemplateSynonyms(self, title: str) -> List[str]:
+    def getTemplateSynonyms(self, title: str) -> list[str]:
         """Fetch redirects of the title, so we can check against them."""
         temp = pywikibot.Page(self.site, title, ns=10)
         if not temp.exists():
@@ -236,7 +235,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
     @staticmethod
     def template_link_target(item: pywikibot.ItemPage,
                              site: pywikibot.site.BaseSite,
-                             link_text: str) -> Optional[pywikibot.ItemPage]:
+                             link_text: str) -> pywikibot.ItemPage | None:
         """Find the ItemPage target for a given link text.
 
         .. versionchanged:: 7.5
@@ -286,8 +285,8 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         return handler.opt[option] or self.opt[option]
 
     def treat_page_and_item(self,
-                            page: Optional[pywikibot.page.BasePage],
-                            item: Optional[pywikibot.page.ItemPage]) -> None:
+                            page: pywikibot.page.BasePage | None,
+                            item: pywikibot.page.ItemPage | None) -> None:
         """Process a single page/item."""
         if willstop:
             raise KeyboardInterrupt
@@ -318,7 +317,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
     def treat_field(self,
                     item: pywikibot.page.ItemPage,
                     site: pywikibot.site.BaseSite,
-                    field_item: Tuple[str, str]) -> None:
+                    field_item: tuple[str, str]) -> None:
         """Process a single field of template fielddict.
 
         .. versionadded:: 7.5

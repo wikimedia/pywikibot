@@ -19,12 +19,11 @@ import xml.dom.minidom
 from contextlib import closing, suppress
 from importlib import import_module
 from io import BytesIO
-from typing import Optional
 from warnings import warn
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Dict, List, Tuple, cache
+from pywikibot.backports import cache
 from pywikibot.comms.http import fetch
 from pywikibot.exceptions import VersionParseError
 
@@ -33,7 +32,7 @@ def _get_program_dir() -> str:
     return os.path.normpath(os.path.split(os.path.dirname(__file__))[0])
 
 
-def get_toolforge_hostname() -> Optional[str]:
+def get_toolforge_hostname() -> str | None:
     """Get hostname of the current Toolforge host.
 
     .. versionadded:: 3.0
@@ -75,7 +74,7 @@ def getversion(online: bool = True) -> str:
 
 
 @cache
-def getversiondict() -> Dict[str, str]:
+def getversiondict() -> dict[str, str]:
     """Get version info for the package.
 
     :return:
@@ -300,7 +299,7 @@ def getversion_nightly(path=None):  # pragma: no cover
     return (tag, rev, date, hsh)
 
 
-def getversion_package(path=None) -> Tuple[str, str, str, str]:
+def getversion_package(path=None) -> tuple[str, str, str, str]:
     """Get version info for an installed package.
 
     :param path: Unused argument
@@ -332,7 +331,7 @@ def getversion_onlinerepo(path: str = 'branches/master'):
         raise VersionParseError(f'{e!r} while parsing {buf!r}')
 
 
-def get_module_filename(module) -> Optional[str]:
+def get_module_filename(module) -> str | None:
     """
     Retrieve filename from an imported pywikibot module.
 
@@ -371,9 +370,9 @@ def get_module_mtime(module):
 
 
 def package_versions(
-    modules: Optional[List[str]] = None,
-    builtins: Optional[bool] = False,
-    standard_lib: Optional[bool] = None
+    modules: list[str] | None = None,
+    builtins: bool | None = False,
+    standard_lib: bool | None = None,
 ):
     """Retrieve package version information.
 

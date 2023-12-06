@@ -175,7 +175,7 @@ from textwrap import fill
 
 import pywikibot
 from pywikibot import config, i18n
-from pywikibot.backports import Dict, Generator, List  # skipcq: PY-W2000
+from pywikibot.backports import Generator  # skipcq: PY-W2000
 from pywikibot.bot import SingleSiteBot
 from pywikibot.exceptions import EditConflictError, Error, HiddenKeyError
 
@@ -495,9 +495,9 @@ class WelcomeBot(SingleSiteBot):
         """Initializer."""
         super().__init__(**kwargs)
         self.welcome_text = get_welcome_text(self.site)
-        self.bname: Dict[str, str] = {}
+        self.bname: dict[str, str] = {}
 
-        self.welcomed_users: List[str] = []
+        self.welcomed_users: list[str] = []
         self.log_name = i18n.translate(self.site, LOGBOOK)
 
         if not self.log_name:
@@ -737,7 +737,7 @@ class WelcomeBot(SingleSiteBot):
                            f'rerun. {strfstr}')
             pywikibot.sleep(globalvar.time_recur)
 
-    def define_sign(self, force: bool = False) -> List[str]:
+    def define_sign(self, force: bool = False) -> list[str]:
         """Setup signature."""
         if hasattr(self, '_random_signature') and not force:
             return self._random_signature
@@ -903,7 +903,7 @@ class WelcomeBot(SingleSiteBot):
                             protocol=config.pickle_protocol)
 
 
-def load_word_function(raw) -> List[str]:
+def load_word_function(raw) -> list[str]:
     """Load the badword list and the whitelist."""
     page = re.compile(r'(?:\"|\')(.*?)(?:\"|\')(?:, |\))')
     list_loaded = page.findall(raw)

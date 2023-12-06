@@ -152,11 +152,11 @@ import re
 from collections.abc import Sequence
 from contextlib import suppress
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import pywikibot
 from pywikibot import editor, fixes, i18n, pagegenerators, textlib
-from pywikibot.backports import Dict, Generator, List, Pattern, Tuple, batched
+from pywikibot.backports import Generator, Pattern, batched
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 from pywikibot.exceptions import InvalidPageError, NoPageError
 from pywikibot.tools import chars
@@ -407,8 +407,8 @@ class XmlDumpReplacePageGenerator:
     def __init__(self,
                  xmlFilename: str,
                  xmlStart: str,
-                 replacements: List[Tuple[Any, str]],
-                 exceptions: Dict[str, Any],
+                 replacements: list[tuple[Any, str]],
+                 exceptions: dict[str, Any],
                  site) -> None:
         """Initializer."""
         self.xmlFilename = xmlFilename
@@ -532,8 +532,8 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
     """
 
     def __init__(self, generator,
-                 replacements: List[Tuple[Any, str]],
-                 exceptions: Optional[Dict[str, Any]] = None,
+                 replacements: list[tuple[Any, str]],
+                 exceptions: dict[str, Any] | None = None,
                  **kwargs) -> None:
         """Initializer."""
         self.available_options.update({
@@ -791,7 +791,7 @@ EXC_KEYS = {
 """
 
 
-def handle_exceptions(*args: str) -> Tuple[List[str], Dict[str, str]]:
+def handle_exceptions(*args: str) -> tuple[list[str], dict[str, str]]:
     """Handle exceptions args to ignore pages which contain certain texts.
 
     .. versionadded:: 7.0
@@ -807,7 +807,7 @@ def handle_exceptions(*args: str) -> Tuple[List[str], Dict[str, str]]:
     return local_args, exceptions
 
 
-def handle_pairsfile(filename: str) -> Optional[List[str]]:
+def handle_pairsfile(filename: str) -> list[str] | None:
     """Handle -pairsfile argument.
 
     .. versionadded:: 7.0
@@ -835,7 +835,7 @@ def handle_pairsfile(filename: str) -> Optional[List[str]]:
     return replacements
 
 
-def handle_manual() -> List[str]:
+def handle_manual() -> list[str]:
     """Handle manual input.
 
     .. versionadded:: 7.0
@@ -852,8 +852,8 @@ def handle_manual() -> List[str]:
 
 
 def handle_sql(sql: str,
-               replacements: List[Pattern],
-               exceptions: List[Pattern]) -> Generator:
+               replacements: list[Pattern],
+               exceptions: list[Pattern]) -> Generator:
     """Handle default sql query.
 
     .. versionadded:: 7.0
@@ -912,7 +912,7 @@ def main(*args: str) -> None:  # noqa: C901
     # if -xml flag is present
     xmlFilename = None
     xmlStart = None
-    sql_query: Optional[str] = None
+    sql_query: str | None = None
     # Set the default regular expression flags
     flags = 0
     # Request manual replacements even if replacements are already defined

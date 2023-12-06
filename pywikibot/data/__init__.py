@@ -6,8 +6,6 @@
 #
 from __future__ import annotations
 
-from typing import Optional
-
 import pywikibot
 
 
@@ -27,7 +25,7 @@ class WaitingMixin:
         request. Starting with 1 if attribute is missing.
     """
 
-    def wait(self, delay: Optional[int] = None) -> None:
+    def wait(self, delay: int | None = None) -> None:
         """Determine how long to wait after a failed request.
 
         :param delay: Minimum time in seconds to wait. Overwrites

@@ -39,7 +39,6 @@ by default:
 from __future__ import annotations
 
 import os.path
-from typing import Optional
 
 import pywikibot
 from pywikibot import i18n
@@ -69,7 +68,7 @@ class DjVuTextBot(SingleSiteBot):
         self,
         djvu,
         index,
-        pages: Optional[tuple] = None,
+        pages: tuple | None = None,
         **kwargs
     ) -> None:
         """

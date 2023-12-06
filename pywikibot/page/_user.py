@@ -6,10 +6,8 @@
 #
 from __future__ import annotations
 
-from typing import Optional
-
 import pywikibot
-from pywikibot.backports import Iterable, Tuple
+from pywikibot.backports import Iterable
 from pywikibot.exceptions import (
     APIError,
     AutoblockUserError,
@@ -105,7 +103,7 @@ class User(Page):
         return self._userprops
 
     def registration(self,
-                     force: bool = False) -> Optional[pywikibot.Timestamp]:
+                     force: bool = False) -> pywikibot.Timestamp | None:
         """
         Fetch registration date for this user.
 
@@ -280,7 +278,7 @@ class User(Page):
 
             raise err
 
-    def unblock(self, reason: Optional[str] = None) -> None:
+    def unblock(self, reason: str | None = None) -> None:
         """
         Remove the block for the user.
 
@@ -326,7 +324,7 @@ class User(Page):
         self,
         total: int = 500,
         **kwargs
-    ) -> Tuple[Page, int, pywikibot.Timestamp, Optional[str]]:
+    ) -> tuple[Page, int, pywikibot.Timestamp, str | None]:
         """Yield tuples describing this user edits.
 
         Each tuple is composed of a pywikibot.Page object, the revision
@@ -377,7 +375,7 @@ class User(Page):
     @property
     def first_edit(
         self
-    ) -> Optional[Tuple[Page, int, pywikibot.Timestamp, str]]:
+    ) -> tuple[Page, int, pywikibot.Timestamp, str] | None:
         """Return first user contribution.
 
         :return: first user contribution entry
@@ -388,7 +386,7 @@ class User(Page):
     @property
     def last_edit(
         self
-    ) -> Optional[Tuple[Page, int, pywikibot.Timestamp, str]]:
+    ) -> tuple[Page, int, pywikibot.Timestamp, str] | None:
         """Return last user contribution.
 
         :return: last user contribution entry
@@ -398,7 +396,7 @@ class User(Page):
 
     def deleted_contributions(
         self, *, total: int = 500, **kwargs
-    ) -> Iterable[Tuple[Page, Revision]]:
+    ) -> Iterable[tuple[Page, Revision]]:
         """Yield tuples describing this user's deleted edits.
 
         .. versionadded:: 5.5

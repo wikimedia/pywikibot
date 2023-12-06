@@ -27,7 +27,7 @@ from unittest.util import safe_repr
 
 import pywikibot
 from pywikibot import Site, config
-from pywikibot.backports import List, removeprefix, removesuffix
+from pywikibot.backports import removeprefix, removesuffix
 from pywikibot.comms import http
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.exceptions import (
@@ -169,7 +169,7 @@ class TestCaseBase(TestTimerMixin):
 
         return gen_pages
 
-    def _get_gen_titles(self, gen, count: int, site=None) -> List[str]:
+    def _get_gen_titles(self, gen, count: int, site=None) -> list[str]:
         """Return a list of page titles of given iterable."""
         return [page.title() for page in self._get_gen_pages(gen, count, site)]
 

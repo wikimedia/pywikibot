@@ -41,8 +41,6 @@ and override its `callback` method. Here is a sample:
 #
 from __future__ import annotations
 
-from typing import Union
-
 import pywikibot
 from pywikibot import i18n
 from pywikibot.backports import Container
@@ -105,7 +103,7 @@ class BaseRevertBot(OptionHandler):
         *_, time = str(ts).strip('Z').partition('T')
         return ' '.join((date, year, time))
 
-    def revert(self, item) -> Union[str, bool]:
+    def revert(self, item) -> str | bool:
         """Revert a single item."""
         page = pywikibot.Page(self.site, item['title'])
         history = list(page.revisions(total=2))

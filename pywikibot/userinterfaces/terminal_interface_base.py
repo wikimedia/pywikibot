@@ -11,11 +11,11 @@ import logging
 import re
 import sys
 import threading
-from typing import Any, Optional, Union
+from typing import Any
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Iterable, Sequence, Tuple
+from pywikibot.backports import Iterable, Sequence
 from pywikibot.bot_choice import (
     ChoiceException,
     Option,
@@ -345,7 +345,7 @@ class UI(ABUIC):
 
     def input(self, question: str,
               password: bool = False,
-              default: Optional[str] = '',
+              default: str | None = '',
               force: bool = False) -> str:
         """
         Ask the user a question and return the answer.
@@ -415,15 +415,15 @@ class UI(ABUIC):
             return None  # wrong terminal encoding, T258143
         return text
 
-    def input_choice(self, question: str,
-                     options: Union[
-                         Iterable[Union[Tuple[str, str],
-                                        'pywikibot.bot_choice.Option']],
-                         'pywikibot.bot_choice.Option'],
-                     default: Optional[str] = None,
-                     return_shortcut: bool = True,
-                     automatic_quit: bool = True,
-                     force: bool = False) -> Any:
+    def input_choice(
+        self,
+        question: str,
+        options: Iterable[tuple[str, str] | Option] | Option,
+        default: str | None = None,
+        return_shortcut: bool = True,
+        automatic_quit: bool = True,
+        force: bool = False,
+    ) -> Any:
         """
         Ask the user and returns a value from the options.
 
@@ -503,7 +503,7 @@ class UI(ABUIC):
         return answer
 
     def input_list_choice(self, question: str, answers: Sequence[Any],
-                          default: Union[int, str, None] = None,
+                          default: int | str | None = None,
                           force: bool = False) -> Any:
         """Ask the user to select one entry from a list of entries.
 
@@ -543,8 +543,8 @@ class UI(ABUIC):
 
     @staticmethod
     def editText(text: str,
-                 jumpIndex: Optional[int] = None,
-                 highlight: Optional[str] = None) -> Optional[str]:
+                 jumpIndex: int | None = None,
+                 highlight: str | None = None) -> str | None:
         """Return the text as edited by the user.
 
         Uses a Tkinter edit box because we don't have a console editor

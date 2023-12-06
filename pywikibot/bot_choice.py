@@ -9,7 +9,7 @@ from __future__ import annotations
 import re
 from abc import ABC, abstractmethod
 from textwrap import fill
-from typing import Any, Optional
+from typing import Any
 
 import pywikibot
 from pywikibot.backports import Iterable, Sequence
@@ -41,8 +41,8 @@ class Option(ABC):
         self._stop = stop
 
     @staticmethod
-    def formatted(text: str, options: Iterable['Option'],
-                  default: Optional[str] = None) -> str:
+    def formatted(text: str, options: Iterable[Option],
+                  default: str | None = None) -> str:
         """
         Create a text with the options formatted into it.
 
@@ -70,7 +70,7 @@ class Option(ABC):
         """Return whether this option stops asking."""
         return self._stop
 
-    def handled(self, value: str) -> Optional['Option']:
+    def handled(self, value: str) -> Option | None:
         """
         Return the Option object that applies to the given value.
 
@@ -78,7 +78,7 @@ class Option(ABC):
         """
         return self if self.test(value) else None
 
-    def format(self, default: Optional[str] = None) -> str:
+    def format(self, default: str | None = None) -> str:
         """Return a formatted string for that option."""
         raise NotImplementedError()
 
@@ -162,7 +162,7 @@ class StandardOption(Option):
         self.option = option
         self.shortcut = shortcut.lower()
 
-    def format(self, default: Optional[str] = None) -> str:
+    def format(self, default: str | None = None) -> str:
         """Return a formatted string for that option."""
         index = self.option.lower().find(self.shortcut)
         shortcut = self.shortcut
@@ -222,12 +222,12 @@ class NestedOption(OutputOption, StandardOption):
         self.description = description
         self.options = options
 
-    def format(self, default: Optional[str] = None) -> str:
+    def format(self, default: str | None = None) -> str:
         """Return a formatted string for that option."""
         self._output = Option.formatted(self.description, self.options)
         return super().format(default=default)
 
-    def handled(self, value: str) -> Optional[Option]:
+    def handled(self, value: str) -> Option | None:
         """Return itself if it applies or the applying sub option."""
         for option in self.options:
             handled = option.handled(value)
@@ -282,14 +282,14 @@ class Choice(StandardOption):
         self,
         option: str,
         shortcut: str,
-        replacer: Optional['pywikibot.bot.InteractiveReplace']
+        replacer: pywikibot.bot.InteractiveReplace | None
     ) -> None:
         """Initializer."""
         super().__init__(option, shortcut)
         self._replacer = replacer
 
     @property
-    def replacer(self) -> Optional['pywikibot.bot.InteractiveReplace']:
+    def replacer(self) -> pywikibot.bot.InteractiveReplace | None:
         """The replacer."""
         return self._replacer
 
@@ -325,7 +325,7 @@ class LinkChoice(Choice):
         self,
         option: str,
         shortcut: str,
-        replacer: Optional['pywikibot.bot.InteractiveReplace'],
+        replacer: pywikibot.bot.InteractiveReplace | None,
         replace_section: bool,
         replace_label: bool
     ) -> None:
@@ -368,7 +368,7 @@ class AlwaysChoice(Choice):
 
     """Add an option to always apply the default."""
 
-    def __init__(self, replacer: Optional['pywikibot.bot.InteractiveReplace'],
+    def __init__(self, replacer: pywikibot.bot.InteractiveReplace | None,
                  option: str = 'always', shortcut: str = 'a') -> None:
         """Initializer."""
         super().__init__(option, shortcut, replacer)
@@ -396,7 +396,7 @@ class IntegerOption(Option):
 
     """An option allowing a range of integers."""
 
-    def __init__(self, minimum: int = 1, maximum: Optional[int] = None,
+    def __init__(self, minimum: int = 1, maximum: int | None = None,
                  prefix: str = '', **kwargs: Any) -> None:
         """Initializer."""
         super().__init__(**kwargs)
@@ -426,13 +426,13 @@ class IntegerOption(Option):
         return self._min
 
     @property
-    def maximum(self) -> Optional[int]:
+    def maximum(self) -> int | None:
         """Return the upper bound of the range of allowed values."""
         return self._max
 
-    def format(self, default: Optional[str] = None) -> str:
+    def format(self, default: str | None = None) -> str:
         """Return a formatted string showing the range."""
-        value: Optional[int] = None
+        value: int | None = None
 
         if default is not None and self.test(default):
             value = self.parse(default)
@@ -485,7 +485,7 @@ class ListOption(IntegerOption):
             raise ValueError('The sequence is empty.')
         del self._max
 
-    def format(self, default: Optional[str] = None) -> str:
+    def format(self, default: str | None = None) -> str:
         """Return a string showing the range."""
         if not self._list:
             raise ValueError('The sequence is empty.')
@@ -512,7 +512,7 @@ class ShowingListOption(ListOption, OutputOption):
     before_question = True
 
     def __init__(self, sequence: Sequence[str], prefix: str = '',
-                 pre: Optional[str] = None, post: Optional[str] = None,
+                 pre: str | None = None, post: str | None = None,
                  **kwargs: Any) -> None:
         """Initializer.
 

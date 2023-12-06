@@ -9,7 +9,6 @@ from __future__ import annotations
 import re
 import sys
 from contextlib import suppress
-from typing import Union
 from urllib.parse import unquote
 
 from pywikibot.backports import Iterable
@@ -97,7 +96,7 @@ def string2html(string: str, encoding: str) -> str:
 
 
 def url2string(title: str,
-               encodings: Union[str, Iterable[str]] = 'utf-8') -> str:
+               encodings: str | Iterable[str] = 'utf-8') -> str:
     """Convert URL-encoded text to unicode using several encoding.
 
     Uses the first encoding that doesn't cause an error. Raises the

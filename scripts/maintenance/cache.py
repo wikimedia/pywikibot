@@ -77,7 +77,6 @@ import pickle
 import sys
 from pathlib import Path
 from random import sample
-from typing import Optional
 
 import pywikibot
 from pywikibot.data import api
@@ -220,9 +219,9 @@ class CacheEntry(api.CachedRequest):
         self._cachefile_path().unlink()
 
 
-def process_entries(cache_path, func, use_accesstime: Optional[bool] = None,
+def process_entries(cache_path, func, use_accesstime: bool | None = None,
                     output_func=None, action_func=None, *,
-                    tests: Optional[int] = None):
+                    tests: int | None = None):
     """Check the contents of the cache.
 
     This program tries to use file access times to determine whether

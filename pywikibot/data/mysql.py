@@ -6,8 +6,6 @@
 #
 from __future__ import annotations
 
-from typing import Optional
-
 import pkg_resources
 
 import pywikibot
@@ -22,8 +20,8 @@ except ImportError:
 
 
 def mysql_query(query: str, params=None,
-                dbname: Optional[str] = None,
-                verbose: Optional[bool] = None):
+                dbname: str | None = None,
+                verbose: bool | None = None):
     """Yield rows from a MySQL query.
 
     An example query that yields all ns0 pages might look like::

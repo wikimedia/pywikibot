@@ -19,10 +19,7 @@ Useful for editing the contents of an article.
 #
 from __future__ import annotations
 
-from typing import Optional
-
 import pywikibot
-from pywikibot.backports import Tuple
 from pywikibot.tools import PYTHON_VERSION
 
 
@@ -395,8 +392,8 @@ class EditBoxWindow(Frame):
         self.parent.config(menu=menubar)
         self.pack()
 
-    def edit(self, text: str, jumpIndex: Optional[int] = None,  # noqa: N803
-             highlight: Optional[str] = None) -> Optional[str]:
+    def edit(self, text: str, jumpIndex: int | None = None,  # noqa: N803
+             highlight: str | None = None) -> str | None:
         """
         Provide user with editor to modify text.
 
@@ -556,7 +553,7 @@ class Tkdialog:
         self.skip = True
         self.root.destroy()
 
-    def show_dialog(self) -> Tuple[str, str, bool]:
+    def show_dialog(self) -> tuple[str, str, bool]:
         """Activate the dialog.
 
         :return: new description, name, and if the image is skipped

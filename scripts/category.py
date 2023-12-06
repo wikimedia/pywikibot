@@ -158,11 +158,10 @@ from contextlib import suppress
 from itertools import chain
 from operator import methodcaller
 from textwrap import fill
-from typing import Optional, Union
 
 import pywikibot
 from pywikibot import config, i18n, pagegenerators, textlib
-from pywikibot.backports import Sequence, Set  # skipcq: PY-W2000
+from pywikibot.backports import Sequence  # skipcq: PY-W2000
 from pywikibot.bot import (
     BaseBot,
     Bot,
@@ -229,7 +228,7 @@ class CategoryPreprocess(BaseBot):
     def determine_type_target(
         self,
         page: pywikibot.Page
-    ) -> Optional[pywikibot.Page]:
+    ) -> pywikibot.Page | None:
         """
         Return page to be categorized by type.
 
@@ -372,7 +371,7 @@ class CategoryDatabase:
         self.cat_content_db = {}
         self.superclass_db = {}
 
-    def get_subcats(self, supercat) -> Set[pywikibot.Category]:
+    def get_subcats(self, supercat) -> set[pywikibot.Category]:
         """Return the list of subcategories for a given supercategory.
 
         Saves this list in a temporary database so that it won't be loaded
@@ -388,7 +387,7 @@ class CategoryDatabase:
         self.cat_content_db[supercat] = (subcatset, articleset)
         return subcatset
 
-    def get_articles(self, cat) -> Set[pywikibot.Page]:
+    def get_articles(self, cat) -> set[pywikibot.Page]:
         """Return the list of pages for a given category.
 
         Saves this list in a temporary database so that it won't be loaded
@@ -404,7 +403,7 @@ class CategoryDatabase:
         self.cat_content_db[cat] = (subcatset, articleset)
         return articleset
 
-    def get_supercats(self, subcat) -> Set[pywikibot.Category]:
+    def get_supercats(self, subcat) -> set[pywikibot.Category]:
         """Return the supercategory (or a set of) for a given subcategory."""
         self._load()
         # if we already know which subcategories exist here.
@@ -586,8 +585,7 @@ class CategoryMoveRobot(CategoryPreprocess):
                  title_regex=None,
                  history: bool = False,
                  pagesonly: bool = False,
-                 deletion_comment: Union[
-                     int, str] = DELETION_COMMENT_AUTOMATIC,
+                 deletion_comment: int | str = DELETION_COMMENT_AUTOMATIC,
                  move_comment=None,
                  wikibase: bool = True,
                  allow_split: bool = False,
@@ -639,7 +637,7 @@ class CategoryMoveRobot(CategoryPreprocess):
         self.oldtalk = self.oldcat.toggleTalkPage()
 
         if newcat:
-            self.newcat: Optional[pywikibot.Category] = self._makecat(newcat)  # noqa: E501
+            self.newcat: pywikibot.Category | None = self._makecat(newcat)  # noqa: E501
             self.newtalk = self.newcat.toggleTalkPage()
         else:
             self.newcat = None
@@ -976,13 +974,13 @@ class CategoryListifyRobot:
 
     """Create a list containing all of the members in a category."""
 
-    def __init__(self, cat_title: Optional[str], list_title: Optional[str],
+    def __init__(self, cat_title: str | None, list_title: str | None,
                  edit_summary: str,
                  append: bool = False,
                  overwrite: bool = False,
                  show_images: bool = False, *,
                  talk_pages: bool = False,
-                 recurse: Union[int, bool] = False,
+                 recurse: int | bool = False,
                  namespaces=None,
                  **kwargs) -> None:
         """Initializer."""
@@ -1070,8 +1068,8 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
     :param comment: a custom summary for edits.
     """
 
-    def __init__(self, cat_title: Optional[str], cat_db, namespaces=None,
-                 comment: Optional[str] = None) -> None:
+    def __init__(self, cat_title: str | None, cat_db, namespaces=None,
+                 comment: str | None = None) -> None:
         """Initializer."""
         self.cat_title = cat_title or pywikibot.input(
             'Which category do you want to tidy up?')

@@ -34,7 +34,7 @@ import re
 import time
 from functools import partial
 from http import HTTPStatus
-from typing import Any, Optional, Union
+from typing import Any
 from urllib.parse import unquote
 from weakref import WeakKeyDictionary
 
@@ -44,12 +44,8 @@ import pywikibot
 from pywikibot import textlib
 from pywikibot.backports import (
     Callable,
-    Dict,
     Iterable,
-    List,
     Sequence,
-    Set,
-    Tuple,
     pairwise,
 )
 from pywikibot.comms import http
@@ -75,10 +71,6 @@ else:
         _bs4_soup = partial(BeautifulSoup, features='html.parser')
     else:
         _bs4_soup = partial(BeautifulSoup, features='lxml')
-
-
-PagesFromLabelType = Dict[str, Set['pywikibot.page.Page']]
-_IndexType = Tuple[Optional['IndexPage'], List['IndexPage']]
 
 
 class TagAttr:
@@ -348,7 +340,7 @@ def decompose(fn: Callable) -> Callable:  # type: ignore
 
     Decompose text if needed and recompose text.
     """
-    def wrapper(self: 'ProofreadPage', *args: Any, **kwargs: Any) -> Any:
+    def wrapper(self: ProofreadPage, *args: Any, **kwargs: Any) -> Any:
         if not hasattr(self, '_full_header'):
             self._decompose_page()
         _res = fn(self, *args, **kwargs)
@@ -360,7 +352,7 @@ def decompose(fn: Callable) -> Callable:  # type: ignore
 
 def check_if_cached(fn: Callable) -> Callable:  # type: ignore
     """Decorator for IndexPage to ensure data is cached."""
-    def wrapper(self: 'IndexPage', *args: Any, **kwargs: Any) -> Any:
+    def wrapper(self: IndexPage, *args: Any, **kwargs: Any) -> Any:
         if self._cached is False:
             self._get_page_mappings()
         return fn(self, *args, **kwargs)
@@ -382,7 +374,7 @@ class FullHeader:
     TEMPLATE_V2 = ('<pagequality level="{0.ql}" user="{0.user}" />'
                    '{0.header}')
 
-    def __init__(self, text: Optional[str] = None) -> None:
+    def __init__(self, text: str | None = None) -> None:
         """Initializer."""
         self._text = text or ''
         self._has_div = True
@@ -487,7 +479,7 @@ class ProofreadPage(pywikibot.Page):
     def _fmt(self) -> str:
         return self._FMT % ('</div>' if self._full_header._has_div else '')
 
-    def _parse_title(self) -> Tuple[str, str, Optional[int]]:
+    def _parse_title(self) -> tuple[str, str, int | None]:
         """Get ProofreadPage base title, base extension and page number.
 
         Base title is the part of title before the last '/', if any,
@@ -511,7 +503,7 @@ class ProofreadPage(pywikibot.Page):
         :return: (base, ext, num).
         """
         left, sep, right = self.title(with_ns=False).rpartition('/')
-        num: Optional[int] = None
+        num: int | None = None
 
         if sep:
             base = left
@@ -529,7 +521,7 @@ class ProofreadPage(pywikibot.Page):
         return base, ext, num
 
     @property
-    def index(self) -> Optional['IndexPage']:
+    def index(self) -> IndexPage | None:
         """Get the Index page which contains ProofreadPage.
 
         If there are many Index pages link to this ProofreadPage, and
@@ -547,7 +539,7 @@ class ProofreadPage(pywikibot.Page):
                                set(self.getReferences(namespaces=index_ns))]
 
             if not what_links_here:
-                self._index: _IndexType = (None, [])
+                self._index: tuple[IndexPage | None, list[IndexPage]] = (None, [])  # noqa: E501
             elif len(what_links_here) == 1:
                 self._index = (what_links_here.pop(), [])
             else:
@@ -576,7 +568,7 @@ class ProofreadPage(pywikibot.Page):
         return index_page
 
     @index.setter
-    def index(self, value: 'IndexPage') -> None:
+    def index(self, value: IndexPage) -> None:
         if not isinstance(value, IndexPage):
             raise TypeError(f'value {value} must be an IndexPage object.')
         self._index = (value, [])
@@ -636,7 +628,7 @@ class ProofreadPage(pywikibot.Page):
 
     @property  # type: ignore[misc]
     @decompose
-    def status(self) -> Optional[str]:
+    def status(self) -> str | None:
         """Return Proofread Page status."""
         try:
             return self.site.proofread_levels[self.ql]
@@ -899,9 +891,9 @@ class ProofreadPage(pywikibot.Page):
         return self._url_image_ge_140()
 
     def _ocr_callback(self, cmd_uri: str,
-                      parser_func: Optional[Callable[[str], str]] = None,
-                      ocr_tool: Optional[str] = None
-                      ) -> Tuple[bool, Union[str, Exception]]:
+                      parser_func: Callable[[str], str] | None = None,
+                      ocr_tool: str | None = None
+                      ) -> tuple[bool, str | Exception]:
         """OCR callback function.
 
         :return: tuple (error, text [error description in case of error]).
@@ -962,7 +954,7 @@ class ProofreadPage(pywikibot.Page):
             return error, _text
         return error, parser_func(_text)
 
-    def _do_hocr(self) -> Tuple[bool, Union[str, Exception]]:
+    def _do_hocr(self) -> tuple[bool, str | Exception]:
         """Do hocr using https://phetools.toolforge.org/hocr_cgi.py?cmd=hocr.
 
         This is the main method for 'phetools'.
@@ -994,8 +986,8 @@ class ProofreadPage(pywikibot.Page):
                                   parser_func=parse_hocr_text,
                                   ocr_tool=self._PHETOOLS)
 
-    def _do_ocr(self, ocr_tool: Optional[str] = None
-                ) -> Tuple[bool, Union[str, Exception]]:
+    def _do_ocr(self, ocr_tool: str | None = None
+                ) -> tuple[bool, str | Exception]:
         """Do ocr using specified ocr_tool method."""
         try:
             url_image = self.url_image
@@ -1023,7 +1015,7 @@ class ProofreadPage(pywikibot.Page):
 
         return self._ocr_callback(cmd_uri, ocr_tool=ocr_tool)
 
-    def ocr(self, ocr_tool: Optional[str] = None) -> str:
+    def ocr(self, ocr_tool: str | None = None) -> str:
         """Do OCR of ProofreadPage scan.
 
         The text returned by this function shall be assigned to self.body,
@@ -1155,7 +1147,7 @@ class IndexPage(pywikibot.Page):
             yield page
 
     @staticmethod
-    def _parse_redlink(href: str) -> Optional[str]:
+    def _parse_redlink(href: str) -> str | None:
         """Parse page title when link in Index is a redlink."""
         p_href = re.compile(
             r'/w/index\.php\?title=(.+?)&action=edit&redlink=1')
@@ -1221,11 +1213,11 @@ class IndexPage(pywikibot.Page):
         """Associate label and number for each page linked to the index."""
         # Clean cache, if any.
         self._page_from_numbers = {}
-        self._numbers_from_page: Dict[pywikibot.page.Page, int] = {}
-        self._page_numbers_from_label: Dict[str, Set[int]] = {}
-        self._pages_from_label: PagesFromLabelType = {}
-        self._labels_from_page_number: Dict[int, str] = {}
-        self._labels_from_page: Dict[pywikibot.page.Page, str] = {}
+        self._numbers_from_page: dict[pywikibot.page.Page, int] = {}
+        self._page_numbers_from_label: dict[str, set[int]] = {}
+        self._pages_from_label: dict[str, set[pywikibot.Page]] = {}
+        self._labels_from_page_number: dict[int, str] = {}
+        self._labels_from_page: dict[pywikibot.page.Page, str] = {}
         self._soup = _bs4_soup(self.get_parsed_page(True))  # type: ignore
         # Do not search for "new" here, to avoid to skip purging if links
         # to non-existing pages are present.
@@ -1319,11 +1311,11 @@ class IndexPage(pywikibot.Page):
         return len(self._page_from_numbers)
 
     def page_gen(self, start: int = 1,
-                 end: Optional[int] = None,
-                 filter_ql: Optional[Sequence[int]] = None,
+                 end: int | None = None,
+                 filter_ql: Sequence[int] | None = None,
                  only_existing: bool = False,
                  content: bool = True
-                 ) -> Iterable['pywikibot.page.Page']:
+                 ) -> Iterable[pywikibot.page.Page]:
         """Return a page generator which yields pages contained in Index page.
 
         Range is [start ... end], extremes included.
@@ -1370,7 +1362,7 @@ class IndexPage(pywikibot.Page):
         return gen
 
     @check_if_cached
-    def get_label_from_page(self, page: 'pywikibot.page.Page') -> str:
+    def get_label_from_page(self, page: pywikibot.page.Page) -> str:
         """Return 'page label' for page.
 
         There is a 1-to-1 correspondence (each page has a label).
@@ -1397,8 +1389,8 @@ class IndexPage(pywikibot.Page):
             raise KeyError(f'Page number ".../{page_number}" not in range.')
 
     @staticmethod
-    def _get_from_label(mapping_dict: Dict[str, Any],
-                        label: Union[int, str]) -> Any:
+    def _get_from_label(mapping_dict: dict[str, Any],
+                        label: int | str) -> Any:
         """Helper function to get info from label."""
         # Convert label to string if an integer is passed.
         if isinstance(label, int):
@@ -1432,7 +1424,7 @@ class IndexPage(pywikibot.Page):
         return self._get_from_label(self._pages_from_label, label)
 
     @check_if_cached
-    def get_page(self, page_number: int) -> 'pywikibot.page.Page':
+    def get_page(self, page_number: int) -> pywikibot.page.Page:
         """Return a page object from page number."""
         try:
             return self._page_from_numbers[page_number]
@@ -1440,7 +1432,7 @@ class IndexPage(pywikibot.Page):
             raise KeyError(f'Invalid page number: {page_number}.')
 
     @check_if_cached
-    def pages(self) -> List['pywikibot.page.Page']:
+    def pages(self) -> list[pywikibot.page.Page]:
         """Return the list of pages in Index, sorted by page number.
 
         :return: list of pages
@@ -1449,7 +1441,7 @@ class IndexPage(pywikibot.Page):
                 for i in range(1, self.num_pages + 1)]
 
     @check_if_cached
-    def get_number(self, page: 'pywikibot.page.Page') -> int:
+    def get_number(self, page: pywikibot.page.Page) -> int:
         """Return a page number from page object."""
         try:
             return self._numbers_from_page[page]

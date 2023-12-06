@@ -18,19 +18,15 @@ from importlib import import_module
 from itertools import chain
 from os.path import basename, dirname, splitext
 from textwrap import fill
-from typing import Optional
 
 import pywikibot
 from pywikibot import config
 from pywikibot.backports import (
     DefaultDict,
     Dict,
-    FrozenSet,
     List,
     Mapping,
     Sequence,
-    Set,
-    Tuple,
     removesuffix,
 )
 from pywikibot.exceptions import FamilyMaintenanceWarning, UnknownFamilyError
@@ -101,44 +97,44 @@ class Family:
         # Allocator will override this classproperty.
         return cls()
 
-    name: Optional[str] = None
+    name: str | None = None
 
     #: Not open for edits; stewards can still edit.
-    closed_wikis: List[str] = []
+    closed_wikis: list[str] = []
 
     #: Completely removed sites
-    removed_wikis: List[str] = []
+    removed_wikis: list[str] = []
 
-    code_aliases: Dict[str, str] = {}
+    code_aliases: dict[str, str] = {}
     """Code mappings which are only an alias, and there is no 'old' wiki.
 
     For all except 'nl_nds', subdomains do exist as a redirect, but that
     should not be relied upon.
     """
 
-    langs: Dict[str, str] = {}
+    langs: dict[str, str] = {}
 
     # A list of category redirect template names in different languages
-    category_redirect_templates: Dict[str, Sequence[str]] = {
+    category_redirect_templates: dict[str, Sequence[str]] = {
         '_default': []
     }
 
     # A list of disambiguation template names in different languages
-    disambiguationTemplates: Dict[str, Sequence[str]] = {
+    disambiguationTemplates: dict[str, Sequence[str]] = {
         '_default': []
     }
 
     # A dict of tuples for different sites with names of templates
     # that indicate an edit should be avoided
-    edit_restricted_templates: Dict[str, Tuple[str, ...]] = {}
+    edit_restricted_templates: dict[str, tuple[str, ...]] = {}
 
     # A dict of tuples for different sites with names of archive
     # templates that indicate an edit of non-archive bots
     # should be avoided
-    archived_page_templates: Dict[str, Tuple[str, ...]] = {}
+    archived_page_templates: dict[str, tuple[str, ...]] = {}
 
     # A set of projects that share cross-project sessions.
-    cross_projects: Set[str] = set()
+    cross_projects: set[str] = set()
 
     # A list with the name for cross-project cookies.
     # default for wikimedia centralAuth extensions.
@@ -148,34 +144,34 @@ class Family:
     cross_projects_cookie_username = 'centralauth_User'
 
     # A list with the name in the cross-language flag permissions
-    cross_allowed: List[str] = []
+    cross_allowed: list[str] = []
 
     # A dict with the name of the category containing disambiguation
     # pages for the various languages. Only one category per language,
     # and without the namespace, so add things like:
     # 'en': "Disambiguation"
-    disambcatname: Dict[str, str] = {}
+    disambcatname: dict[str, str] = {}
 
     # attop is a list of languages that prefer to have the interwiki
     # links at the top of the page.
-    interwiki_attop: List[str] = []
+    interwiki_attop: list[str] = []
     # on_one_line is a list of languages that want the interwiki links
     # one-after-another on a single line
-    interwiki_on_one_line: List[str] = []
+    interwiki_on_one_line: list[str] = []
     # String used as separator between interwiki links and the text
     interwiki_text_separator = '\n\n'
 
     # Similar for category
-    category_attop: List[str] = []
+    category_attop: list[str] = []
     # on_one_line is a list of languages that want the category links
     # one-after-another on a single line
-    category_on_one_line: List[str] = []
+    category_on_one_line: list[str] = []
     # String used as separator between category links and the text
     category_text_separator = '\n\n'
     # When both at the bottom should categories come after interwikilinks?
     # TODO: T86284 Needed on Wikia sites, as it uses the CategorySelect
     # extension which puts categories last on all sites. TO BE DEPRECATED!
-    categories_last: List[str] = []
+    categories_last: list[str] = []
 
     # Which languages have a special order for putting interlanguage
     # links, and what order is it? If a language is not in
@@ -184,17 +180,17 @@ class Family:
     # is checked first, and languages are put in the order given there.
     # All other languages are put after those, in code-alphabetical
     # order.
-    interwiki_putfirst: Dict[str, str] = {}
+    interwiki_putfirst: dict[str, str] = {}
 
     # Some families, e. g. commons and meta, are not multilingual and
     # forward interlanguage links to another family (wikipedia).
     # These families can set this variable to the name of the target
     # family.
-    interwiki_forward: Optional[str] = None
+    interwiki_forward: str | None = None
 
     # Language codes of the largest wikis. They should be roughly sorted
     # by size.
-    languages_by_size: List[str] = []
+    languages_by_size: list[str] = []
 
     # Some languages belong to a group where the possibility is high that
     # equivalent articles have identical titles among the group.
@@ -287,7 +283,7 @@ class Family:
 
     # Some wiki farms have UrlShortener extension enabled only on the main
     # site. This value can specify this last one with (lang, family) tuple.
-    shared_urlshortner_wiki: Optional[Tuple[str, str]] = None
+    shared_urlshortner_wiki: tuple[str, str] | None = None
 
     title_delimiter_and_aliases = ' _'
     """Titles usually are delimited by a space and the alias is replaced
@@ -304,10 +300,10 @@ class Family:
     .. versionadded:: 7.0
     """
 
-    _families: Dict[str, 'Family'] = {}
+    _families: dict[str, Family] = {}
 
     @staticmethod
-    def load(fam: Optional[str] = None):
+    def load(fam: str | None = None):
         """Import the named family.
 
         :param fam: family name (if omitted, uses the configured default)
@@ -562,7 +558,7 @@ class Family:
 
         return config.site_interface
 
-    def from_url(self, url: str) -> Optional[str]:
+    def from_url(self, url: str) -> str | None:
         """Return whether this family matches the given url.
 
         It is first checking if a domain of this family is in the domain of
@@ -701,7 +697,7 @@ class Family:
         return putText
 
     @property
-    def obsolete(self) -> Dict[str, Optional[str]]:
+    def obsolete(self) -> dict[str, str | None]:
         """
         Old codes that are not part of the family.
 
@@ -714,7 +710,7 @@ class Family:
         return types.MappingProxyType(data)
 
     @classproperty
-    def domains(cls) -> Set[str]:
+    def domains(cls) -> set[str]:
         """
         Get list of unique domain names included in this family.
 
@@ -746,7 +742,7 @@ class Family:
         return types.MappingProxyType(cls.code_aliases)
 
     @classproperty
-    def interwiki_removals(cls) -> FrozenSet[str]:
+    def interwiki_removals(cls) -> frozenset[str]:
         """Return a list of interwiki codes to be removed from wiki pages.
 
         Codes that should be removed, usually because the site has been
@@ -1020,7 +1016,7 @@ class WikibaseFamily(Family):
         """Return 'DataSite' for Wikibase family."""
         return 'DataSite'
 
-    def entity_sources(self, code: str) -> Dict[str, Tuple[str, str]]:
+    def entity_sources(self, code: str) -> dict[str, tuple[str, str]]:
         """Provide reopsitory site information for entity types.
 
         The result must be structured as follows:

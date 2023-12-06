@@ -12,14 +12,13 @@ import sys
 from datetime import timedelta
 from functools import partial
 from itertools import zip_longest
-from typing import Any, Optional, Union
+from typing import TYPE_CHECKING, Any, Optional, Union
 
 import pywikibot
 from pywikibot import i18n
 from pywikibot.backports import (
     Callable,
     Dict,
-    FrozenSet,
     Iterable,
     Iterator,
     List,
@@ -66,11 +65,12 @@ from pywikibot.tools.itertools import (
 )
 
 
+if TYPE_CHECKING:
+    from pywikibot.site import BaseSite, Namespace
+
+
 HANDLER_RETURN_TYPE = Union[None, bool, Iterable['pywikibot.page.BasePage']]
-GEN_FACTORY_NAMESPACE_TYPE = Union[List[str],
-                                   FrozenSet['pywikibot.site.Namespace']]
 GEN_FACTORY_CLAIM_TYPE = List[Tuple[str, str, Dict[str, str], bool]]
-OPT_SITE_TYPE = Optional['pywikibot.site.BaseSite']
 OPT_GENERATOR_TYPE = Optional[Iterable['pywikibot.page.Page']]
 
 
@@ -90,10 +90,10 @@ class GeneratorFactory:
        arguments are parsed except if site parameter is given.
     """
 
-    def __init__(self, site: OPT_SITE_TYPE = None,
-                 positional_arg_name: Optional[str] = None,
-                 enabled_options: Optional[Iterable[str]] = None,
-                 disabled_options: Optional[Iterable[str]] = None) -> None:
+    def __init__(self, site: BaseSite | None = None,
+                 positional_arg_name: str | None = None,
+                 enabled_options: Iterable[str] | None = None,
+                 disabled_options: Iterable[str] | None = None) -> None:
         """
         Initializer.
 
@@ -105,26 +105,26 @@ class GeneratorFactory:
         :param disabled_options: disable these given options and let them
             be handled by scripts options handler
         """
-        self.gens: List[Iterable['pywikibot.page.Page']] = []
-        self._namespaces: GEN_FACTORY_NAMESPACE_TYPE = []
-        self.limit: Optional[int] = None
-        self.qualityfilter_list: List[int] = []
-        self.articlefilter_list: List[str] = []
-        self.articlenotfilter_list: List[str] = []
-        self.titlefilter_list: List[str] = []
-        self.titlenotfilter_list: List[str] = []
+        self.gens: list[Iterable[pywikibot.page.Page]] = []
+        self._namespaces: list[str] | frozenset[Namespace] = []
+        self.limit: int | None = None
+        self.qualityfilter_list: list[int] = []
+        self.articlefilter_list: list[str] = []
+        self.articlenotfilter_list: list[str] = []
+        self.titlefilter_list: list[str] = []
+        self.titlenotfilter_list: list[str] = []
         self.claimfilter_list: GEN_FACTORY_CLAIM_TYPE = []
-        self.catfilter_list: List['pywikibot.Category'] = []
+        self.catfilter_list: list[pywikibot.Category] = []
         self.intersect = False
-        self.subpage_max_depth: Optional[int] = None
-        self.redirectfilter: Optional[bool] = None
+        self.subpage_max_depth: int | None = None
+        self.redirectfilter: bool | None = None
         self._site = site
         self._positional_arg_name = positional_arg_name
-        self._sparql: Optional[str] = None
+        self._sparql: str | None = None
         self.nopreload = False
         self._validate_options(enabled_options, disabled_options)
 
-        self.is_preloading: Optional[bool] = None
+        self.is_preloading: bool | None = None
         """Return whether Page objects are preloaded. You may use this
         instance variable after :meth:`getCombinedGenerator` is called
         e.g.::
@@ -140,8 +140,8 @@ class GeneratorFactory:
         """
 
     def _validate_options(self,
-                          enable: Optional[Iterable[str]],
-                          disable: Optional[Iterable[str]]) -> None:
+                          enable: Iterable[str] | None,
+                          disable: Iterable[str] | None) -> None:
         """Validate option restrictions."""
         msg = '{!r} is not a valid pagegenerators option to be '
         enable = enable or []
@@ -162,7 +162,7 @@ class GeneratorFactory:
             self.disabled_options = set()
 
     @property
-    def site(self) -> 'pywikibot.site.BaseSite':
+    def site(self) -> pywikibot.site.BaseSite:
         """
         Generator site.
 
@@ -179,7 +179,7 @@ class GeneratorFactory:
         return self._site
 
     @property
-    def namespaces(self) -> FrozenSet['pywikibot.site.Namespace']:
+    def namespaces(self) -> frozenset[pywikibot.site.Namespace]:
         """
         List of Namespace parameters.
 
@@ -319,7 +319,7 @@ class GeneratorFactory:
         return dupfiltergen
 
     def getCategory(self, category: str  # noqa: N802
-                    ) -> Tuple['pywikibot.Category', Optional[str]]:
+                    ) -> tuple[pywikibot.Category, str | None]:
         """
         Return Category and start as defined by category.
 
@@ -329,7 +329,7 @@ class GeneratorFactory:
             category = i18n.input('pywikibot-enter-category-name')
         category = category.replace('#', '|')
 
-        startfrom: Optional[str] = None
+        startfrom: str | None = None
         category, _, startfrom = category.partition('|')
 
         if not startfrom:
@@ -347,9 +347,9 @@ class GeneratorFactory:
         return cat, startfrom
 
     def getCategoryGen(self, category: str,  # noqa: N802
-                       recurse: Union[int, bool] = False,
+                       recurse: int | bool = False,
                        content: bool = False,
-                       gen_func: Optional[Callable] = None) -> Any:
+                       gen_func: Callable | None = None) -> Any:
         """
         Return generator based on Category defined by category and gen_func.
 
@@ -373,10 +373,10 @@ class GeneratorFactory:
 
     @staticmethod
     def _parse_log_events(logtype: str,
-                          user: Optional[str] = None,
-                          start: Optional[str] = None,
-                          end: Optional[str] = None
-                          ) -> Optional[Iterator['pywikibot.page.Page']]:
+                          user: str | None = None,
+                          start: str | None = None,
+                          end: str | None = None
+                          ) -> Iterator[pywikibot.page.Page] | None:
         """
         Parse the -logevent argument information.
 
@@ -392,8 +392,8 @@ class GeneratorFactory:
             convertible into a Timestamp matching '%Y%m%d%H%M%S'.
         :return: The generator or None if invalid 'start/total' or 'end' value.
         """
-        def parse_start(start: Optional[str]
-                        ) -> Tuple[Optional[str], Optional[int]]:
+        def parse_start(start: str | None
+                        ) -> tuple[str | None, int | None]:
             """Parse start and return (start, total)."""
             if start is None:
                 return None, None
@@ -452,12 +452,12 @@ class GeneratorFactory:
         valid_cats = [c for _list in cats.values() for c in _list]
 
         value = value or ''
-        lint_from: Optional[str] = None
+        lint_from: str | None = None
         cat, _, lint_from = value.partition('/')
         lint_from = lint_from or None
 
-        def show_available_categories(cats: Dict[
-                                      str, Sequence['pywikibot.Category']]
+        def show_available_categories(cats: dict[
+                                      str, Sequence[pywikibot.Category]]
                                       ) -> None:
             _i = ' ' * 4
             _2i = 2 * _i
@@ -925,7 +925,7 @@ class GeneratorFactory:
         self.redirectfilter = strtobool(value)
         return True
 
-    def handle_args(self, args: Iterable[str]) -> List[str]:
+    def handle_args(self, args: Iterable[str]) -> list[str]:
         """Handle command line arguments and return the rest as a list.
 
         .. versionadded:: 6.0
@@ -954,7 +954,7 @@ class GeneratorFactory:
         :param arg: Pywikibot argument consisting of -name:value
         :return: True if the argument supplied was recognised by the factory
         """
-        value: Optional[str] = None
+        value: str | None = None
 
         if not arg.startswith('-') and self._positional_arg_name:
             value = arg
@@ -986,6 +986,6 @@ class GeneratorFactory:
         return False
 
 
-def _int_none(v: Optional[str]) -> Optional[int]:
+def _int_none(v: str | None) -> int | None:
     """Return None if v is None or '' else return int(v)."""
     return None if not v else int(v)

@@ -6,7 +6,6 @@
 #
 from __future__ import annotations
 
-
 import pywikibot
 from pywikibot.exceptions import (
     Error,

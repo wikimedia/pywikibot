@@ -50,12 +50,6 @@ functions will be listed.
 #
 from __future__ import annotations
 
-# Todo:
-# * Using xml and xmlstart
-# * Using categories
-# * Error handling for uploading (anyway, that's the last action, it's only
-#   for the beauty of the program, does not effect anything).
-
 import codecs
 import re
 from collections import Counter
@@ -63,6 +57,13 @@ from collections import Counter
 import pywikibot
 from pywikibot import pagegenerators
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
+
+
+# Todo:
+# * Using xml and xmlstart
+# * Using categories
+# * Error handling for uploading (anyway, that's the last action, it's only
+#   for the beauty of the program, does not effect anything).
 
 
 class ParserFunctionCountBot(SingleSiteBot, ExistingPageBot):

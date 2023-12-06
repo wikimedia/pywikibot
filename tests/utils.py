@@ -13,11 +13,11 @@ import unittest
 import warnings
 from contextlib import contextmanager
 from subprocess import PIPE, Popen, TimeoutExpired
-from typing import Any, Optional, Union
+from typing import Any
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Dict, List, Sequence
+from pywikibot.backports import Sequence
 from pywikibot.data.api import CachedRequest
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.exceptions import APIError
@@ -467,7 +467,7 @@ class FakeLoginManager(pywikibot.login.ClientLoginManager):
         """Ignore password changes."""
 
 
-def execute(command: List[str], data_in=None, timeout=None):
+def execute(command: list[str], data_in=None, timeout=None):
     """Execute a command and capture outputs.
 
     .. versionchanged:: 8.2.0
@@ -513,10 +513,10 @@ def execute(command: List[str], data_in=None, timeout=None):
             'stderr': stderr_data.decode(config.console_encoding)}
 
 
-def execute_pwb(args: List[str],
-                data_in: Optional[Sequence[str]] = None,
-                timeout: Union[int, float, None] = None,
-                overrides: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+def execute_pwb(args: list[str],
+                data_in: Sequence[str] | None = None,
+                timeout: int | float | None = None,
+                overrides: dict[str, str] | None = None) -> dict[str, Any]:
     """Execute the pwb.py script and capture outputs.
 
     .. versionchanged:: 8.2.0
@@ -548,7 +548,7 @@ def empty_sites():
 
 
 @contextmanager
-def skipping(*exceptions: BaseException, msg: Optional[str] = None):
+def skipping(*exceptions: BaseException, msg: str | None = None):
     """Context manager to skip test on specified exceptions.
 
     For example Eventstreams raises ``NotImplementedError`` if no

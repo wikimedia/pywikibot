@@ -37,7 +37,7 @@ from contextlib import suppress
 from functools import total_ordering, wraps
 from importlib import import_module
 from types import TracebackType
-from typing import Any, Optional, Type, Union
+from typing import Any
 from warnings import catch_warnings, showwarning, warn
 
 import pkg_resources
@@ -220,9 +220,9 @@ class suppress_warnings(catch_warnings):  # noqa: N801
 
     def __exit__(
         self,
-        exc_type: Optional[Type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType]
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None
     ) -> None:
         """Stop logging warnings and show those that do not match to params."""
         super().__exit__(exc_type, exc_val, exc_tb)
@@ -396,7 +396,7 @@ def strtobool(val: str) -> bool:
     raise ValueError(f'invalid truth value {val!r}')
 
 
-def normalize_username(username) -> Optional[str]:
+def normalize_username(username) -> str | None:
     """Normalize the username.
 
     .. versionadded:: 3.0
@@ -512,7 +512,7 @@ class MediaWikiVersion:
         self.version = tuple(components)
 
     @staticmethod
-    def from_generator(generator: str) -> 'MediaWikiVersion':
+    def from_generator(generator: str) -> MediaWikiVersion:
         """Create instance from a site's generator attribute."""
         prefix = 'MediaWiki '
 
@@ -745,9 +745,9 @@ def file_mode_checker(
             warn(warn_str.format(filename, st_mode - stat.S_IFREG, mode))
 
 
-def compute_file_hash(filename: Union[str, os.PathLike],
-                      sha: Union[str, Callable[[], Any]] = 'sha1',
-                      bytes_to_read: Optional[int] = None) -> str:
+def compute_file_hash(filename: str | os.PathLike,
+                      sha: str | Callable[[], Any] = 'sha1',
+                      bytes_to_read: int | None = None) -> str:
     """Compute file hash.
 
     Result is expressed as hexdigest().

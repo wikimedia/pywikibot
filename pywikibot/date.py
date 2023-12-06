@@ -13,13 +13,12 @@ from collections import abc, defaultdict
 from contextlib import suppress
 from functools import singledispatch
 from string import digits as _decimalDigits  # noqa: N812
-from typing import Optional, Union
+from typing import Union
 
 from pywikibot import Site
 from pywikibot.backports import (
     Any,
     Callable,
-    Dict,
     Iterator,
     List,
     Mapping,
@@ -358,7 +357,7 @@ def romanNumToInt(v: str) -> int:
 
 # Each tuple must 3 parts: a list of all possible digits (symbols), encoder
 # (from int to a str) and decoder (from str to an int)
-_digitDecoders: Dict[str, decoder_type] = {
+_digitDecoders: dict[str, decoder_type] = {
     # %% is a %
     '%': '%',
     # %d is a decimal
@@ -401,7 +400,7 @@ _escPtrnCache2 = {}
 
 def escapePattern2(
     pattern: str
-) -> Tuple[Pattern[str], str, List[decoder_type]]:
+) -> tuple[Pattern[str], str, list[decoder_type]]:
     """Convert a string pattern into a regex expression and cache.
 
     Allows matching of any _digitDecoders inside the string.
@@ -409,7 +408,7 @@ def escapePattern2(
     """
     @singledispatch
     def decode(dec: decoder_type, subpattern: str, newpattern: str,
-               strpattern: str) -> Tuple[str, str]:
+               strpattern: str) -> tuple[str, str]:
 
         if len(subpattern) == 3:
             # enforce mandatory field size
@@ -429,7 +428,7 @@ def escapePattern2(
 
     @decode.register(str)
     def _(dec: str, subpattern: str, newpattern: str,
-          strpattern: str) -> Tuple[str, str]:
+          strpattern: str) -> tuple[str, str]:
         # Special case for strings that are replaced instead of decoded
         # Keep the original text for strPattern
         assert len(subpattern) < 3, (
@@ -440,7 +439,7 @@ def escapePattern2(
     if pattern not in _escPtrnCache2:
         newPattern = ''  # match starts at the beginning of the string
         strPattern = ''
-        decoders: List[decoder_type] = []
+        decoders: list[decoder_type] = []
         for s in _reParameters.split(pattern):
             if s is None:
                 continue
@@ -463,7 +462,7 @@ def escapePattern2(
 
 @singledispatch
 def dh(value: int, pattern: str, encf: encf_type, decf: decf_type,
-       filter: Optional[Callable[[int], bool]] = None) -> str:
+       filter: Callable[[int], bool] | None = None) -> str:
     """Function to help with year parsing.
 
     Usually it will be used as a lambda call in a map::
@@ -515,7 +514,7 @@ def dh(value: int, pattern: str, encf: encf_type, decf: decf_type,
 
 @dh.register(str)
 def _(value: str, pattern: str, encf: encf_type, decf: decf_type,
-      filter: Optional[Callable[[int], bool]] = None) -> int:
+      filter: Callable[[int], bool] | None = None) -> int:
     compPattern, _strPattern, decoders = escapePattern2(pattern)
     m = compPattern.match(value)
     if m:
@@ -668,7 +667,7 @@ class MonthFormat(abc.MutableMapping):  # type: ignore[type-arg]
         """
         self.index = index
         self.variant, _, self.month = format_key.partition('_')
-        self.data: Dict[str, Callable[[int], str]] = {}
+        self.data: dict[str, Callable[[int], str]] = {}
 
     def __getitem__(self, key: str) -> Callable[[int], str]:
         if key not in self.data:
@@ -727,7 +726,7 @@ def _period_with_pattern(period: str, pattern: str):
          alwaysTrue)])
 
 
-formats: Dict[Union[str, int], Mapping[str, Callable[[int], str]]] = {
+formats: dict[str | int, Mapping[str, Callable[[int], str]]] = {
     'MonthName': MonthNames(),
     'Number': {
         'ar': lambda v: dh_number(v, '%d (عدد)'),
@@ -1673,7 +1672,7 @@ for index, month_of_year in enumerate(yrMnthFmts, 1):
 
 
 def addFmt1(lang: str, isMnthOfYear: bool,
-            patterns: Sequence[Optional[str]]) -> None:
+            patterns: Sequence[str | None]) -> None:
     """Add 12 month formats for a specific type ('January', 'Feb.').
 
     The function must accept one parameter for the ->int or ->string
@@ -1694,13 +1693,13 @@ def addFmt1(lang: str, isMnthOfYear: bool,
                     f'lambda v: dh_dayOfMnth(v, "{patterns[i]}")')
 
 
-def makeMonthList(pattern: str) -> List[str]:
+def makeMonthList(pattern: str) -> list[str]:
     """Return a list of 12 elements based on the number of the month."""
     return [pattern % m for m in range(1, 13)]
 
 
 def makeMonthNamedList(lang: str, pattern: str = '%s',
-                       makeUpperCase: Optional[bool] = None) -> List[str]:
+                       makeUpperCase: bool | None = None) -> list[str]:
     """Create a list of 12 elements based on the name of the month.
 
     The language-dependent month name is used as a formatting argument
@@ -1931,7 +1930,7 @@ for month in yrMnthFmts:
     formatLimits[month] = _formatLimit_MonthOfYear
 
 
-def _format_limit_dom(days: int) -> Tuple[Callable[[int], bool], int, int]:
+def _format_limit_dom(days: int) -> tuple[Callable[[int], bool], int, int]:
     """Return day of month format limit."""
     assert 29 <= days <= 31
     return lambda v: 1 <= v <= days, 1, days + 1
@@ -1950,7 +1949,7 @@ for monthId in range(12):
 
 
 def getAutoFormat(lang: str, title: str, ignoreFirstLetterCase: bool = True
-                  ) -> Tuple[Optional[str], Optional[str]]:
+                  ) -> tuple[str | None, str | None]:
     """
     Return first matching formatted date value.
 
@@ -1976,7 +1975,7 @@ def getAutoFormat(lang: str, title: str, ignoreFirstLetterCase: bool = True
 
 
 def format_date(month: int, day: int,
-                lang: Union[None, str, BaseSite] = None,
+                lang: str | BaseSite | None = None,
                 year: int = 2000) -> str:
     """Format a date localized to given lang.
 

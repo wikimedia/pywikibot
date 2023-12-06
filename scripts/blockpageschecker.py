@@ -54,7 +54,6 @@ import re
 import webbrowser
 from collections import namedtuple
 from itertools import chain
-from typing import Optional
 
 import pywikibot
 from pywikibot import i18n, pagegenerators
@@ -302,7 +301,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
             # keep track of the changes for each step (edit then move)
             changes = -1
 
-            msg_type: Optional[str] = None
+            msg_type: str | None = None
             edit_restriction = restrictions.get('edit')
             if not edit_restriction:
                 # page is not edit-protected

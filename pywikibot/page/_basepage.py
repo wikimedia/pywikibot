@@ -12,20 +12,16 @@ from collections import Counter
 from contextlib import suppress
 from itertools import islice
 from textwrap import shorten, wrap
-from typing import Optional
 from urllib.parse import quote_from_bytes
 from warnings import warn
 
 import pywikibot
 from pywikibot import Timestamp, config, date, i18n, textlib, tools
 from pywikibot.backports import (
-    Dict,
     Generator,
     Iterable,
     Iterator,
     List,
-    Set,
-    Tuple,
 )
 from pywikibot.cosmetic_changes import CANCEL, CosmeticChangesToolkit
 from pywikibot.exceptions import (
@@ -292,7 +288,7 @@ class BasePage(ComparableMixin):
             title = tools.as_filename(title)
         return title
 
-    def section(self) -> Optional[str]:
+    def section(self) -> str | None:
         """
         Return the name of the section this Page refers to.
 
@@ -496,7 +492,7 @@ class BasePage(ComparableMixin):
         self._revid = value
 
     @property
-    def latest_revision(self) -> 'pywikibot.page.Revision':
+    def latest_revision(self) -> pywikibot.page.Revision:
         """Return the current revision for this page.
 
         **Example:**
@@ -535,7 +531,7 @@ class BasePage(ComparableMixin):
             return ''
 
     @text.setter
-    def text(self, value: Optional[str]):
+    def text(self, value: str | None):
         """Update the current (edited) wikitext.
 
         :param value: New value or None
@@ -591,9 +587,9 @@ class BasePage(ComparableMixin):
         return self._parsed_text
 
     def extract(self, variant: str = 'plain', *,
-                lines: Optional[int] = None,
-                chars: Optional[int] = None,
-                sentences: Optional[int] = None,
+                lines: int | None = None,
+                chars: int | None = None,
+                sentences: int | None = None,
                 intro: bool = True) -> str:
         """Retrieve an extract of this page.
 
@@ -666,7 +662,7 @@ class BasePage(ComparableMixin):
             self.site.loadpageprops(self)
         return self._pageprops
 
-    def defaultsort(self, force: bool = False) -> Optional[str]:
+    def defaultsort(self, force: bool = False) -> str | None:
         """
         Extract value of the {{DEFAULTSORT:}} magic word from the page.
 
@@ -744,7 +740,7 @@ class BasePage(ComparableMixin):
         raise InvalidPageError(self)
 
     @property
-    def oldest_revision(self) -> 'pywikibot.page.Revision':
+    def oldest_revision(self) -> pywikibot.page.Revision:
         """Return the first revision of this page.
 
         **Example:**
@@ -817,7 +813,7 @@ class BasePage(ComparableMixin):
 
         return bool(self._catredirect)
 
-    def getCategoryRedirectTarget(self) -> 'pywikibot.Category':
+    def getCategoryRedirectTarget(self) -> pywikibot.Category:
         """If this is a category redirect, return the target category title."""
         if self.isCategoryRedirect():
             return pywikibot.Category(Link(self._catredirect, self.site))
@@ -828,7 +824,7 @@ class BasePage(ComparableMixin):
         ns = self.namespace()
         return ns >= 0 and ns % 2 == 1
 
-    def toggleTalkPage(self) -> Optional['pywikibot.Page']:
+    def toggleTalkPage(self) -> pywikibot.Page | None:
         """
         Return other member of the article-talk page pair for this Page.
 
@@ -919,7 +915,7 @@ class BasePage(ComparableMixin):
                       only_template_inclusion: bool = False,
                       filter_redirects: bool = False,
                       namespaces=None,
-                      total: Optional[int] = None,
+                      total: int | None = None,
                       content: bool = False):
         """
         Return an iterator all pages that refer to or embed the page.
@@ -958,9 +954,9 @@ class BasePage(ComparableMixin):
 
     def backlinks(self,
                   follow_redirects: bool = True,
-                  filter_redirects: Optional[bool] = None,
+                  filter_redirects: bool | None = None,
                   namespaces=None,
-                  total: Optional[int] = None,
+                  total: int | None = None,
                   content: bool = False):
         """
         Return an iterator for pages that link to this page.
@@ -984,9 +980,9 @@ class BasePage(ComparableMixin):
         )
 
     def embeddedin(self,
-                   filter_redirects: Optional[bool] = None,
+                   filter_redirects: bool | None = None,
                    namespaces=None,
-                   total: Optional[int] = None,
+                   total: int | None = None,
                    content: bool = False):
         """
         Return an iterator for pages that embed this page as a template.
@@ -1009,11 +1005,11 @@ class BasePage(ComparableMixin):
     def redirects(
         self,
         *,
-        filter_fragments: Optional[bool] = None,
+        filter_fragments: bool | None = None,
         namespaces: NamespaceArgType = None,
-        total: Optional[int] = None,
+        total: int | None = None,
         content: bool = False
-    ) -> 'Iterable[pywikibot.Page]':
+    ) -> Iterable[pywikibot.Page]:
         """
         Return an iterable of redirects to this page.
 
@@ -1034,7 +1030,7 @@ class BasePage(ComparableMixin):
             content=content,
         )
 
-    def protection(self) -> Dict[str, Tuple[str, str]]:
+    def protection(self) -> dict[str, tuple[str, str]]:
         """Return a dictionary reflecting page protections.
 
         **Example:**
@@ -1052,7 +1048,7 @@ class BasePage(ComparableMixin):
         """
         return self.site.page_restrictions(self)
 
-    def applicable_protections(self) -> Set[str]:
+    def applicable_protections(self) -> set[str]:
         """Return the protection types allowed for that page.
 
         **Example:**
@@ -1115,7 +1111,7 @@ class BasePage(ComparableMixin):
             self._bot_may_edit = self._check_bot_may_edit()
         return self._bot_may_edit
 
-    def _check_bot_may_edit(self, module: Optional[str] = None) -> bool:
+    def _check_bot_may_edit(self, module: str | None = None) -> bool:
         """A botMayEdit helper method.
 
         :param module: The module name to be restricted. Defaults to
@@ -1217,14 +1213,14 @@ class BasePage(ComparableMixin):
         return True
 
     def save(self,
-             summary: Optional[str] = None,
-             watch: Optional[str] = None,
+             summary: str | None = None,
+             watch: str | None = None,
              minor: bool = True,
-             botflag: Optional[bool] = None,
+             botflag: bool | None = None,
              force: bool = False,
              asynchronous: bool = False,
              callback=None,
-             apply_cosmetic_changes: Optional[bool] = None,
+             apply_cosmetic_changes: bool | None = None,
              quiet: bool = False,
              **kwargs):
         """
@@ -1339,10 +1335,10 @@ class BasePage(ComparableMixin):
         return summary
 
     def put(self, newtext: str,
-            summary: Optional[str] = None,
-            watch: Optional[str] = None,
+            summary: str | None = None,
+            watch: str | None = None,
             minor: bool = True,
-            botflag: Optional[bool] = None,
+            botflag: bool | None = None,
             force: bool = False,
             asynchronous: bool = False,
             callback=None,
@@ -1432,7 +1428,7 @@ class BasePage(ComparableMixin):
 
     def linkedPages(
         self, *args, **kwargs
-    ) -> Generator['pywikibot.Page', None, None]:
+    ) -> Generator[pywikibot.Page, None, None]:
         """Iterate Pages that this Page links to.
 
         Only returns pages from "normal" internal links. Embedded
@@ -1529,7 +1525,7 @@ class BasePage(ComparableMixin):
         return [i for i in self._langlinks if not i.site.obsolete]
 
     def iterlanglinks(self,
-                      total: Optional[int] = None,
+                      total: int | None = None,
                       include_obsolete: bool = False):
         """Iterate all inter-language links on this page.
 
@@ -1556,7 +1552,7 @@ class BasePage(ComparableMixin):
         """
         return pywikibot.ItemPage.fromPage(self)
 
-    def templates(self, content: bool = False) -> List['pywikibot.Page']:
+    def templates(self, content: bool = False) -> list[pywikibot.Page]:
         """
         Return a list of Page objects for templates used on this Page.
 
@@ -1581,7 +1577,7 @@ class BasePage(ComparableMixin):
         return list(self._templates)
 
     def itertemplates(self,
-                      total: Optional[int] = None,
+                      total: int | None = None,
                       content: bool = False):
         """
         Iterate Page objects for templates used on this Page.
@@ -1600,7 +1596,7 @@ class BasePage(ComparableMixin):
 
         return self.site.pagetemplates(self, total=total, content=content)
 
-    def imagelinks(self, total: Optional[int] = None, content: bool = False):
+    def imagelinks(self, total: int | None = None, content: bool = False):
         """
         Iterate FilePage objects for images displayed on this Page.
 
@@ -1613,8 +1609,8 @@ class BasePage(ComparableMixin):
 
     def categories(self,
                    with_sort_key: bool = False,
-                   total: Optional[int] = None,
-                   content: bool = False) -> Iterator['pywikibot.Page']:
+                   total: int | None = None,
+                   content: bool = False) -> Iterator[pywikibot.Page]:
         """
         Iterate categories that the article is in.
 
@@ -1640,7 +1636,7 @@ class BasePage(ComparableMixin):
 
         return self.site.pagecategories(self, total=total, content=content)
 
-    def extlinks(self, total: Optional[int] = None):
+    def extlinks(self, total: int | None = None):
         """
         Iterate all external URLs (not interwiki links) from this page.
 
@@ -1717,7 +1713,7 @@ class BasePage(ComparableMixin):
 
     def revisions(self,
                   reverse: bool = False,
-                  total: Optional[int] = None,
+                  total: int | None = None,
                   content: bool = False,
                   starttime=None, endtime=None):
         """Generator which loads the version history as Revision instances."""
@@ -1746,7 +1742,7 @@ class BasePage(ComparableMixin):
 
     def getVersionHistoryTable(self,
                                reverse: bool = False,
-                               total: Optional[int] = None):
+                               total: int | None = None):
         """Return the version history as a wiki table."""
         result = '{| class="wikitable"\n'
         result += '! oldid || date/time || username || edit summary\n'
@@ -1758,7 +1754,7 @@ class BasePage(ComparableMixin):
         return result
 
     def contributors(self,
-                     total: Optional[int] = None,
+                     total: int | None = None,
                      starttime=None, endtime=None):
         """
         Compile contributors of this page with edit counts.
@@ -1798,9 +1794,9 @@ class BasePage(ComparableMixin):
                    for user in contributors)
 
     def merge_history(self,
-                      dest: 'BasePage',
-                      timestamp: Optional[pywikibot.Timestamp] = None,
-                      reason: Optional[str] = None) -> None:
+                      dest: BasePage,
+                      timestamp: pywikibot.Timestamp | None = None,
+                      reason: str | None = None) -> None:
         """Merge revisions from this page into another page.
 
         .. seealso:: :meth:`APISite.merge_history()
@@ -1816,7 +1812,7 @@ class BasePage(ComparableMixin):
 
     def move(self,
              newtitle: str,
-             reason: Optional[str] = None,
+             reason: str | None = None,
              movetalk: bool = True,
              noredirect: bool = False,
              movesubpages: bool = True) -> None:
@@ -1843,7 +1839,7 @@ class BasePage(ComparableMixin):
 
     def delete(
         self,
-        reason: Optional[str] = None,
+        reason: str | None = None,
         prompt: bool = True,
         mark: bool = False,
         automatic_quit: bool = False,
@@ -1928,7 +1924,7 @@ class BasePage(ComparableMixin):
             self._has_deleted_revisions = bool(list(gen))
         return self._has_deleted_revisions
 
-    def loadDeletedRevisions(self, total: Optional[int] = None, **kwargs):
+    def loadDeletedRevisions(self, total: int | None = None, **kwargs):
         """
         Retrieve deleted revisions for this Page.
 
@@ -1985,7 +1981,7 @@ class BasePage(ComparableMixin):
                 f'Timestamp {timestamp} is not a deleted revision')
         self._deletedRevs[timestamp]['marked'] = undelete
 
-    def undelete(self, reason: Optional[str] = None) -> None:
+    def undelete(self, reason: str | None = None) -> None:
         """
         Undelete revisions based on the markers set by previous calls.
 
@@ -2021,8 +2017,8 @@ class BasePage(ComparableMixin):
         self.site.undelete(self, reason, revision=undelete_revs)
 
     def protect(self,
-                reason: Optional[str] = None,
-                protections: Optional[Dict[str, Optional[str]]] = None,
+                reason: str | None = None,
+                protections: dict[str, str | None] | None = None,
                 **kwargs) -> None:
         """Protect or unprotect a wiki page. Requires  *protect* right.
 
@@ -2061,10 +2057,10 @@ class BasePage(ComparableMixin):
         self.site.protect(self, protections, reason, **kwargs)
 
     def change_category(self, old_cat, new_cat,
-                        summary: Optional[str] = None,
+                        summary: str | None = None,
                         sort_key=None,
                         in_place: bool = True,
-                        include: Optional[List[str]] = None,
+                        include: list[str] | None = None,
                         show_diff: bool = False) -> bool:
         """
         Remove page from oldCat and add it to newCat.

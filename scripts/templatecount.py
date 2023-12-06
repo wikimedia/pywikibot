@@ -43,7 +43,6 @@ import datetime
 from typing import Generator
 
 import pywikibot
-from pywikibot.backports import Dict, List, Tuple
 
 
 class TemplateCountRobot:
@@ -104,8 +103,8 @@ class TemplateCountRobot:
                          .format(datetime.datetime.utcnow().isoformat()))
 
     @classmethod
-    def template_dict(cls, templates, namespaces) -> Dict[
-            str, List[pywikibot.Page]]:
+    def template_dict(cls, templates, namespaces) -> dict[
+            str, list[pywikibot.Page]]:
         """
         Create a dict of templates and its transcluded pages.
 
@@ -121,7 +120,7 @@ class TemplateCountRobot:
 
     @staticmethod
     def template_dict_generator(templates, namespaces) -> Generator[
-            Tuple[str, List[pywikibot.Page]], None, None]:
+            tuple[str, list[pywikibot.Page]], None, None]:
         """
         Yield transclusions of each template in 'templates'.
 

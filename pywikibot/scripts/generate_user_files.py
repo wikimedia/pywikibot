@@ -21,9 +21,8 @@ import sys
 from collections import namedtuple
 from pathlib import Path
 from textwrap import fill
-from typing import Optional
 
-from pywikibot.backports import Callable, List, Tuple
+from pywikibot.backports import Callable
 from pywikibot.scripts import _import_with_no_user_config
 
 
@@ -112,11 +111,11 @@ def file_exists(filename) -> bool:
 
 
 def get_site_and_lang(
-    default_family: Optional[str] = 'wikipedia',
-    default_lang: Optional[str] = 'en',
-    default_username: Optional[str] = None,
+    default_family: str | None = 'wikipedia',
+    default_lang: str | None = 'en',
+    default_username: str | None = None,
     force: bool = False
-) -> Tuple[str, str, str]:
+) -> tuple[str, str, str]:
     """
     Ask the user for the family, site code and username.
 
@@ -294,8 +293,8 @@ def copy_sections(force: bool = False, default: str = 'n') -> str:
 
 
 def input_sections(variant: str,
-                   sections: List['ConfigSection'],
-                   skip: Optional[Callable] = None,
+                   sections: list[ConfigSection],
+                   skip: Callable | None = None,
                    force: bool = False,
                    default: str = 'n') -> None:
     """Ask for settings to copy.
@@ -461,7 +460,7 @@ def save_botpasswords(botpasswords, _fncpass):
             raise
 
 
-def ask_for_dir_change(force) -> Tuple[bool, bool]:
+def ask_for_dir_change(force) -> tuple[bool, bool]:
     """Ask whether the base directory is has to be changed.
 
     Only give option for directory change if user-config.py or user-password

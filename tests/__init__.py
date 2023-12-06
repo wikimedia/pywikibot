@@ -6,6 +6,7 @@
 #
 from __future__ import annotations
 
+
 __all__ = (
     'create_path_func', 'join_cache_path', 'join_data_path',
     'join_html_data_path', 'join_images_path', 'join_pages_path',
@@ -29,7 +30,7 @@ import requests  # noqa: F401
 
 import pywikibot.data.api
 from pywikibot import config
-from pywikibot.backports import Dict, List, removesuffix
+from pywikibot.backports import removesuffix
 from pywikibot.data.api import CachedRequest
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.tools import PYTHON_VERSION
@@ -173,7 +174,7 @@ disabled_test_modules = {
 }
 
 # remove "# pragma: no cover" below if this set is not empty
-disabled_tests: Dict[str, List[str]] = {}
+disabled_tests: dict[str, list[str]] = {}
 
 
 def _unknown_test_modules():

@@ -9,11 +9,10 @@ from __future__ import annotations
 import functools
 import re
 import threading
-from typing import Optional
 from warnings import warn
 
 import pywikibot
-from pywikibot.backports import List, Pattern, Set
+from pywikibot.backports import Pattern
 from pywikibot.exceptions import (
     Error,
     FamilyMaintenanceWarning,
@@ -95,7 +94,7 @@ class BaseSite(ComparableMixin):
 
         # following are for use with lock_page and unlock_page methods
         self._pagemutex = threading.Condition()
-        self._locked_pages: Set[str] = set()
+        self._locked_pages: set[str] = set()
 
     @property
     @deprecated(since='8.5.0')
@@ -186,13 +185,13 @@ class BaseSite(ComparableMixin):
         self.__dict__.update(attrs)
         self._pagemutex = threading.Condition()
 
-    def user(self) -> Optional[str]:
+    def user(self) -> str | None:
         """Return the currently-logged in bot username, or None."""
         if self.logged_in():
             return self.username()
         return None
 
-    def username(self) -> Optional[str]:
+    def username(self) -> str | None:
         """Return the username used for the site."""
         return self._username
 
@@ -272,7 +271,7 @@ class BaseSite(ComparableMixin):
         """
         return self.redirects()[0]
 
-    def redirects(self) -> List[str]:
+    def redirects(self) -> list[str]:
         """Return list of generic redirect tags for the site.
 
         .. seealso:: :meth:`redirect` for the default redirect tag.
@@ -280,11 +279,11 @@ class BaseSite(ComparableMixin):
         """
         return ['REDIRECT']
 
-    def pagenamecodes(self) -> List[str]:
+    def pagenamecodes(self) -> list[str]:
         """Return list of localized PAGENAME tags for the site."""
         return ['PAGENAME']
 
-    def pagename2codes(self) -> List[str]:
+    def pagename2codes(self) -> list[str]:
         """Return list of localized PAGENAMEE tags for the site."""
         return ['PAGENAMEE']
 

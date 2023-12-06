@@ -44,7 +44,6 @@ import re
 import string
 import sys
 from contextlib import suppress
-from typing import Optional
 from urllib.parse import urlparse, urlunparse
 
 
@@ -61,10 +60,10 @@ class FamilyFileGenerator:
     """Family file creator object."""
 
     def __init__(self,
-                 url: Optional[str] = None,
-                 name: Optional[str] = None,
-                 dointerwiki: Optional[str] = None,
-                 verify: Optional[str] = None) -> None:
+                 url: str | None = None,
+                 name: str | None = None,
+                 dointerwiki: str | None = None,
+                 verify: str | None = None) -> None:
         """
         Parameters are optional. If not given the script asks for the values.
 

@@ -7,11 +7,11 @@
 from __future__ import annotations
 
 from collections.abc import Container, Sized
-from typing import Any, Optional, Union
+from typing import Any
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Dict, FrozenSet, Iterable, Set, batched
+from pywikibot.backports import Iterable, batched
 from pywikibot.tools import classproperty, deprecated, remove_last_args
 
 
@@ -34,7 +34,7 @@ class ParamInfo(Sized, Container):
     @remove_last_args(['modules_only_mode'])
     def __init__(self,
                  site,
-                 preloaded_modules: Optional[Set[str]] = None) -> None:
+                 preloaded_modules: set[str] | None = None) -> None:
         """Initializer.
 
         .. deprecated:: 8.4
@@ -61,7 +61,7 @@ class ParamInfo(Sized, Container):
             self._preloaded_modules |= set(preloaded_modules)
 
     def _add_submodules(self, name: str,
-                        modules: Union[Set[str], Dict[str, str]]) -> None:
+                        modules: set[str] | dict[str, str]) -> None:
         """Add the modules to the internal cache."""
         assert '+' not in name
         if name == 'main':
@@ -104,13 +104,13 @@ class ParamInfo(Sized, Container):
             self._add_submodules('query', query_modules_param['submodules'])
 
     @staticmethod
-    def _modules_to_set(modules: Union[Iterable, str]) -> Set[str]:
+    def _modules_to_set(modules: Iterable | str) -> set[str]:
         """Return modules as a set."""
         if isinstance(modules, str):
             return set(modules.split('|'))
         return set(modules)
 
-    def fetch(self, modules: Union[Iterable, str]) -> None:
+    def fetch(self, modules: Iterable | str) -> None:
         """Fetch paraminfo for multiple modules.
 
         No exception is raised when paraminfo for a module does not
@@ -138,7 +138,7 @@ class ParamInfo(Sized, Container):
 
         self._fetch(modules)
 
-    def _fetch(self, modules: Union[set, frozenset]) -> None:
+    def _fetch(self, modules: set | frozenset) -> None:
         """
         Fetch paraminfo for multiple modules without initializing beforehand.
 
@@ -277,7 +277,7 @@ class ParamInfo(Sized, Container):
         return self._normalize_modules(modules)
 
     @staticmethod
-    def normalize_paraminfo(data: Dict[str, Any]) -> Dict[str, Any]:
+    def normalize_paraminfo(data: dict[str, Any]) -> dict[str, Any]:
         """Convert API JSON into a new data structure with path as key.
 
         For duplicate paths, the value will be False.
@@ -336,7 +336,7 @@ class ParamInfo(Sized, Container):
         self,
         module: str,
         param_name: str
-    ) -> Optional[Dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         """Get details about one modules parameter.
 
         Returns None if the parameter does not exist.
@@ -389,7 +389,7 @@ class ParamInfo(Sized, Container):
         """Set of all query module names without query+ path prefix."""
         return self.submodules('query')
 
-    def submodules(self, name: str, path: bool = False) -> Set[str]:
+    def submodules(self, name: str, path: bool = False) -> set[str]:
         """Set of all submodules.
 
         :param name: The name of the parent module.
@@ -405,7 +405,7 @@ class ParamInfo(Sized, Container):
         return submodules
 
     @property
-    def prefix_map(self) -> Dict[str, str]:
+    def prefix_map(self) -> dict[str, str]:
         """Mapping of module to its prefix for all modules with a prefix.
 
         This loads paraminfo for all modules.
@@ -419,7 +419,7 @@ class ParamInfo(Sized, Container):
         return self._prefix_map.copy()
 
     def attributes(self, attribute: str,
-                   modules: Optional[set] = None) -> Dict[str, Any]:
+                   modules: set | None = None) -> dict[str, Any]:
         """Mapping of modules with an attribute to the attribute value.
 
         It will include all modules which have that attribute set, also
@@ -439,7 +439,7 @@ class ParamInfo(Sized, Container):
 
     @classproperty
     @deprecated(since='8.4.0')
-    def paraminfo_keys(cls) -> FrozenSet[str]:
+    def paraminfo_keys(cls) -> frozenset[str]:
         """Return module types.
 
         .. deprecated:: 8.4.0
@@ -448,7 +448,7 @@ class ParamInfo(Sized, Container):
 
     @property
     @deprecated(since='8.4.0')
-    def preloaded_modules(self) -> Union[FrozenSet[str], Set[str]]:
+    def preloaded_modules(self) -> frozenset[str] | set[str]:
         """Return set of preloaded modules.
 
         .. deprecated:: 8.4.0

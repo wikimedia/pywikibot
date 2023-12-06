@@ -8,7 +8,6 @@ from __future__ import annotations
 
 from csv import DictReader
 from io import StringIO
-from typing import Optional
 
 import pywikibot
 from pywikibot.comms import http
@@ -107,7 +106,7 @@ class WikiStats:
         return {data['prefix']: data for data in self.get(table)}
 
     def sorted(self, table: str, key: str,
-               reverse: Optional[bool] = None) -> list:
+               reverse: bool | None = None) -> list:
         """
         Reverse numerical sort of data.
 

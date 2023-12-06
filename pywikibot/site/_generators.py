@@ -11,10 +11,10 @@ import itertools
 import typing
 from contextlib import suppress
 from itertools import zip_longest
-from typing import Any, Optional, Union
+from typing import Any
 
 import pywikibot
-from pywikibot.backports import Dict, Generator, Iterable, List, batched
+from pywikibot.backports import Generator, Iterable, batched
 from pywikibot.data import api
 from pywikibot.exceptions import (
     APIError,
@@ -91,7 +91,7 @@ class GeneratorsMixin:
         self,
         pagelist,
         *,
-        groupsize: Optional[int] = None,
+        groupsize: int | None = None,
         templates: bool = False,
         langlinks: bool = False,
         pageprops: bool = False,
@@ -308,13 +308,13 @@ class GeneratorsMixin:
 
     def page_redirects(
         self,
-        page: 'pywikibot.Page',
+        page: pywikibot.Page,
         *,
-        filter_fragments: Optional[bool] = None,
+        filter_fragments: bool | None = None,
         namespaces: NamespaceArgType = None,
-        total: Optional[int] = None,
+        total: int | None = None,
         content: bool = False
-    ) -> 'Iterable[pywikibot.Page]':
+    ) -> Iterable[pywikibot.Page]:
         """Iterale all redirects to the given page.
 
         .. seealso:: :api:`Redirects`
@@ -387,9 +387,9 @@ class GeneratorsMixin:
         self, page, *,
         namespaces=None,
         follow_redirects: bool = False,
-        total: Optional[int] = None,
+        total: int | None = None,
         content: bool = False
-    ) -> Generator['pywikibot.Page', None, None]:
+    ) -> Generator[pywikibot.Page, None, None]:
         """Iterate internal wikilinks contained (or transcluded) on page.
 
         .. seealso:: :api:`Links`
@@ -477,18 +477,18 @@ class GeneratorsMixin:
 
     def categorymembers(
         self,
-        category: 'pywikibot.Category', *,
+        category: pywikibot.Category, *,
         namespaces=None,
-        sortby: Optional[str] = None,
+        sortby: str | None = None,
         reverse: bool = False,
-        starttime: Optional[pywikibot.time.Timestamp] = None,
-        endtime: Optional[pywikibot.time.Timestamp] = None,
-        total: Optional[int] = None,
-        startprefix: Optional[str] = None,
-        endprefix: Optional[str] = None,
+        starttime: pywikibot.time.Timestamp | None = None,
+        endtime: pywikibot.time.Timestamp | None = None,
+        total: int | None = None,
+        startprefix: str | None = None,
+        endprefix: str | None = None,
         content: bool = False,
-        member_type: Union[str, Iterable[str], None] = None
-    ) -> Iterable['pywikibot.Page']:
+        member_type: str | Iterable[str] | None = None
+    ) -> Iterable[pywikibot.Page]:
         """Iterate members of specified category.
 
         You should not use this method directly; instead use one of the
@@ -638,7 +638,7 @@ class GeneratorsMixin:
         return self._generator(api.PageGenerator, namespaces=namespaces,
                                total=total, g_content=content, **cmargs)
 
-    def _rvprops(self, content: bool = False) -> List[str]:
+    def _rvprops(self, content: bool = False) -> list[str]:
         """Setup rvprop items for loadrevisions and preloadpages.
 
         :return: rvprop items
@@ -787,7 +787,7 @@ class GeneratorsMixin:
             api.update_page(page, pagedata, rvgen.props)
 
     def pagelanglinks(self, page, *,
-                      total: Optional[int] = None,
+                      total: int | None = None,
                       include_obsolete: bool = False,
                       include_empty_titles: bool = False):
         """Iterate all interlanguage links on page, yielding Link objects.
@@ -1127,8 +1127,8 @@ class GeneratorsMixin:
         return fagen
 
     def blocks(self, starttime=None, endtime=None, reverse: bool = False,
-               blockids=None, users=None, iprange: Optional[str] = None,
-               total: Optional[int] = None):
+               blockids=None, users=None, iprange: str | None = None,
+               total: int | None = None):
         """Iterate all current blocks, in order of creation.
 
         The iterator yields dicts containing keys corresponding to the
@@ -1184,9 +1184,9 @@ class GeneratorsMixin:
             bkgen.request['bkip'] = iprange
         return bkgen
 
-    def exturlusage(self, url: Optional[str] = None,
-                    protocol: Optional[str] = None, namespaces=None,
-                    total: Optional[int] = None, content: bool = False):
+    def exturlusage(self, url: str | None = None,
+                    protocol: str | None = None, namespaces=None,
+                    total: int | None = None, content: bool = False):
         """Iterate Pages that contain links to the given URL.
 
         .. seealso:: :api:`Exturlusage`
@@ -1222,10 +1222,10 @@ class GeneratorsMixin:
                                namespaces=namespaces,
                                total=total, g_content=content)
 
-    def imageusage(self, image: 'pywikibot.FilePage', *,
+    def imageusage(self, image: pywikibot.FilePage, *,
                    namespaces=None,
-                   filterredir: Optional[bool] = None,
-                   total: Optional[int] = None,
+                   filterredir: bool | None = None,
+                   total: int | None = None,
                    content: bool = False):
         """Iterate Pages that contain links to the given FilePage.
 
@@ -1256,11 +1256,11 @@ class GeneratorsMixin:
                                namespaces=namespaces,
                                total=total, g_content=content, **iuargs)
 
-    def logevents(self, logtype: Optional[str] = None,
-                  user: Optional[str] = None, page=None,
+    def logevents(self, logtype: str | None = None,
+                  user: str | None = None, page=None,
                   namespace=None, start=None, end=None,
-                  reverse: bool = False, tag: Optional[str] = None,
-                  total: Optional[int] = None):
+                  reverse: bool = False, tag: str | None = None,
+                  total: int | None = None):
         """Iterate all log entries.
 
         .. seealso:: :api:`Logevents`
@@ -1323,17 +1323,17 @@ class GeneratorsMixin:
                       end=None,
                       reverse: bool = False,
                       namespaces=None,
-                      changetype: Optional[str] = None,
-                      minor: Optional[bool] = None,
-                      bot: Optional[bool] = None,
-                      anon: Optional[bool] = None,
-                      redirect: Optional[bool] = None,
-                      patrolled: Optional[bool] = None,
+                      changetype: str | None = None,
+                      minor: bool | None = None,
+                      bot: bool | None = None,
+                      anon: bool | None = None,
+                      redirect: bool | None = None,
+                      patrolled: bool | None = None,
                       top_only: bool = False,
-                      total: Optional[int] = None,
-                      user: Union[str, List[str], None] = None,
-                      excludeuser: Union[str, List[str], None] = None,
-                      tag: Optional[str] = None):
+                      total: int | None = None,
+                      user: str | list[str] | None = None,
+                      excludeuser: str | list[str] | None = None,
+                      tag: str | None = None):
         """Iterate recent changes.
 
         .. seealso:: :api:`RecentChanges`
@@ -1407,8 +1407,8 @@ class GeneratorsMixin:
 
     def search(self, searchstring: str, *,
                namespaces=None,
-               where: Optional[str] = None,
-               total: Optional[int] = None,
+               where: str | None = None,
+               total: int | None = None,
                content: bool = False):
         """Iterate Pages that contain the searchstring.
 
@@ -1451,7 +1451,7 @@ class GeneratorsMixin:
 
     def usercontribs(self, user=None, userprefix=None, start=None, end=None,
                      reverse: bool = False, namespaces=None, minor=None,
-                     total: Optional[int] = None, top_only: bool = False):
+                     total: int | None = None, top_only: bool = False):
         """Iterate contributions by a particular user.
 
         Iterated values are in the same format as recentchanges.
@@ -1553,7 +1553,7 @@ class GeneratorsMixin:
                                                 filters)
         return wlgen
 
-    def _check_view_deleted(self, msg_prefix: str, prop: List[str]) -> None:
+    def _check_view_deleted(self, msg_prefix: str, prop: list[str]) -> None:
         """Check if the user can view deleted comments and content.
 
         :param msg_prefix: The calling method name
@@ -1646,9 +1646,9 @@ class GeneratorsMixin:
         namespaces=None,
         reverse: bool = False,
         content: bool = False,
-        total: Optional[int] = None,
+        total: int | None = None,
         **kwargs
-    ) -> typing.Iterable[Dict[str, Any]]:
+    ) -> typing.Iterable[dict[str, Any]]:
         """
         Iterate all deleted revisions.
 
@@ -1671,7 +1671,7 @@ class GeneratorsMixin:
         :keyword end: Iterate revisions ending at this Timestamp
         :keyword prop: Which properties to get. Defaults are ids, timestamp,
             flags, user, and comment (if you have the right to view).
-        :type prop: List[str]
+        :type prop: list[str]
         """
         if 'start' in kwargs and 'end' in kwargs:
             self.assert_valid_iter_params('alldeletedrevisions',
@@ -1711,8 +1711,8 @@ class GeneratorsMixin:
                 'ususers': usernames, 'usprop': usprop})
         return usgen
 
-    def randompages(self, total: Optional[int] = None, namespaces=None,
-                    redirects: Optional[bool] = False, content: bool = False):
+    def randompages(self, total: int | None = None, namespaces=None,
+                    redirects: bool | None = False, content: bool = False):
         """Iterate a number of random pages.
 
         .. seealso: :api:`Random`
@@ -2074,7 +2074,7 @@ class GeneratorsMixin:
         self,
         namespace=0,
         type: str = 'edit',
-        level: Union[str, bool] = False,
+        level: str | bool = False,
         total=None
     ):
         """
@@ -2107,7 +2107,7 @@ class GeneratorsMixin:
                              protect_type=type, total=total)
 
     def pages_with_property(self, propname: str, *,
-                            total: Optional[int] = None):
+                            total: int | None = None):
         """Yield Page objects from Special:PagesWithProp.
 
         .. seealso:: :api:`Pageswithprop`
@@ -2126,9 +2126,9 @@ class GeneratorsMixin:
     def watched_pages(
         self,
         force: bool = False,
-        total: Optional[int] = None, *,
+        total: int | None = None, *,
         with_talkpage: bool = True
-    ) -> Generator['pywikibot.Page', Any, None]:
+    ) -> Generator[pywikibot.Page, Any, None]:
         """Return watchlist.
 
         .. note:: ``watched_pages`` is a restartable generator. See

@@ -72,7 +72,7 @@ import re
 
 import pywikibot
 from pywikibot import config, i18n
-from pywikibot.backports import Iterator, Tuple
+from pywikibot.backports import Iterator
 from pywikibot.bot import CurrentPageBot, OptionHandler, SingleSiteBot
 from pywikibot.pagegenerators import PreloadingGenerator
 from pywikibot.tools.collections import GeneratorWrapper
@@ -251,7 +251,7 @@ class PageFromFileReader(OptionHandler, GeneratorWrapper):
                 yield page
                 text = text[length:]
 
-    def find_page(self, text) -> Tuple[int, str, str]:
+    def find_page(self, text) -> tuple[int, str, str]:
         """Find page to work on."""
         location = self.page_regex.search(text)
         if self.opt.include:
