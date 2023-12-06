@@ -50,6 +50,10 @@ from pywikibot.exceptions import CircularRedirectError, Error, NoPageError
 
 
 LOG_SIZE = 7  # Number of items to keep in active log
+# Category that contains all redirected category pages
+CAT_REDIRECT_CAT = 'Q4616723'
+# Category that contains non-empty redirected category pages
+TINY_CAT_REDIRECT_CAT = 'Q8099903'
 
 
 class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
@@ -77,43 +81,6 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
         self.log_page = pywikibot.Page(self.site,
                                        'User:{}/category redirect log'
                                        .format(self.site.username()))
-
-        # Localization:
-
-        # Category that contains all redirected category pages
-        self.cat_redirect_cat = {
-            'commons': 'Category:Category redirects',
-            'meta': 'Category:Maintenance of categories/Soft redirected '
-                    'categories',
-            'ar': 'تصنيف:تحويلات تصنيفات ويكيبيديا',
-            'ary': 'تصنيف:Wikipedia soft redirected categories',
-            'arz': 'تصنيف:تحويلات تصانيف ويكيبيديا',
-            'ckb': 'پۆل:پۆلە ڕەوانەکراوە نەرمەکان',
-            'cs': 'Kategorie:Údržba:Zastaralé kategorie',
-            'da': 'Kategori:Omdirigeringskategorier',
-            'en': 'Category:Wikipedia soft redirected categories',
-            'es': 'Categoría:Wikipedia:Categorías redirigidas',
-            'fa': 'رده:رده‌های منتقل‌شده',
-            'hi': 'श्रेणी:विकिपीडिया श्रेणी अनुप्रेषित',
-            'hu': 'Kategória:Kategóriaátirányítások',
-            'ja': 'Category:移行中のカテゴリ',
-            'ko': '분류:비어 있지 않은 분류 넘겨주기',
-            'no': 'Kategori:Wikipedia omdirigertekategorier',
-            'pl': 'Kategoria:Przekierowania kategorii',
-            'pt': 'Categoria:!Redirecionamentos de categorias',
-            'sco': 'Category:Wikipaedia soft redirectit categories',
-            'simple': 'Category:Category redirects',
-            'sh': 'Kategorija:Preusmjerene kategorije Wikipedije',
-            'sr': 'Категорија:Википедијине меко преусмерене категорије',
-            'ur': 'زمرہ:منتقل شدہ زمرہ جات',
-            'vi': 'Thể loại:Thể loại đổi hướng',
-            'zh': 'Category:已重定向的分类',
-            'ro': 'Categorie:Categorii de redirecționare',
-        }
-
-        # Category that contains non-empty redirected category pages
-        self.tiny_cat_redirect_cat = 'Q8099903'
-
         self.move_comment = 'category_redirect-change-category'
         self.redir_comment = 'category_redirect-add-template'
         self.dbl_redir_comment = 'category_redirect-fix-double'
@@ -125,14 +92,8 @@ class CategoryRedirectBot(ConfigParserBot, SingleSiteBot):
 
     def get_cat(self):
         """Specify the category page."""
-        if self.opt.tiny:
-            self.cat = self.site.page_from_repository(
-                self.tiny_cat_redirect_cat)
-        else:
-            cat_title = pywikibot.translate(self.site, self.cat_redirect_cat)
-            if cat_title:
-                self.cat = pywikibot.Category(pywikibot.Link(cat_title,
-                                                             self.site))
+        item = TINY_CAT_REDIRECT_CAT if self.opt.tiny else CAT_REDIRECT_CAT
+        self.cat = self.site.page_from_repository(item)
         return self.cat is not None
 
     def move_contents(self, old_cat_title: str, new_cat_title: str,
