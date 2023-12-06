@@ -161,7 +161,7 @@ class FilePage(Page):
     def get_file_url(self,
                      url_width: Optional[int] = None,
                      url_height: Optional[int] = None,
-                     url_param: Optional[int] = None) -> str:
+                     url_param: Optional[str] = None) -> str:
         """Return the url or the thumburl of the file described on this page.
 
         Fetch the information if not available.
@@ -330,7 +330,7 @@ class FilePage(Page):
                  revision: Optional['FileInfo'] = None, *,
                  url_width: Optional[int] = None,
                  url_height: Optional[int] = None,
-                 url_param: Optional[int] = None) -> bool:
+                 url_param: Optional[str] = None) -> bool:
         """Download to filename file of FilePage.
 
         **Usage examples:**
