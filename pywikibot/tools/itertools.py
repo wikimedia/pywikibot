@@ -18,7 +18,7 @@ from typing import Any
 
 from pywikibot.backports import Generator, batched
 from pywikibot.logging import debug
-from pywikibot.tools import deprecated, issue_deprecation_warning
+from pywikibot.tools import deprecated
 
 
 __all__ = (
@@ -124,31 +124,18 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
 
     .. deprecated:: 6.4
        ``allow_duplicates`` as positional argument,
-       ``iterables`` as list type
+       ``iterables`` as list or tuple type
 
     .. versionchanged:: 7.0
        Reimplemented without threads which is up to 10'000 times faster
+
+    .. versionchanged:: 9.0
+       Iterable elements may consist of lists or tuples
 
     :param iterables: page generators
     :param allow_duplicates: optional keyword argument to allow duplicates
         if present in all generators
     """
-    # 'allow_duplicates' must be given as keyword argument
-    if iterables and iterables[-1] in (True, False):
-        allow_duplicates = iterables[-1]
-        iterables = iterables[:-1]
-        issue_deprecation_warning("'allow_duplicates' as positional argument",
-                                  'keyword argument "allow_duplicates={}"'
-                                  .format(allow_duplicates),
-                                  since='6.4.0')
-
-    # iterables must not be given as tuple or list
-    if len(iterables) == 1 and isinstance(iterables[0], (list, tuple)):
-        iterables = iterables[0]
-        issue_deprecation_warning("'iterables' as list type",
-                                  "consecutive iterables or use '*' to unpack",
-                                  since='6.4.0')
-
     if not iterables:
         return
 

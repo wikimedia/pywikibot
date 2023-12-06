@@ -13,7 +13,6 @@ from typing import Any
 
 import pywikibot
 from pywikibot.backports import Iterable, Sequence
-from pywikibot.tools import deprecated, issue_deprecation_warning
 
 
 class Option(ABC):
@@ -135,17 +134,6 @@ class OutputOption(Option):
         """
         return ''
 
-    @deprecated('pywikibot.info(OutputOption.out)', since='6.5')
-    def output(self) -> None:
-        """Output string.
-
-        .. deprecated:: 6.5
-           This method was replaced by :attr:`out` property and is no
-           no longer used by the
-           :py:mod:`userinterfaces <pywikibot.userinterfaces>` system.
-        """
-        pywikibot.info(self.out)
-
 
 class StandardOption(Option):
 
@@ -197,12 +185,6 @@ class OutputProxyOption(OutputOption, StandardOption):
     @property
     def out(self) -> str:
         """Return the contents."""
-        if not hasattr(self._outputter, 'out'):  # pragma: no cover
-            issue_deprecation_warning('{} without "out" property'
-                                      .format(self.__class__.__name__),
-                                      since='6.2.0')
-            self._outputter.output()
-            return ''
         return self._outputter.out
 
 
@@ -267,11 +249,6 @@ class ContextOption(OutputOption, StandardOption):
         start = max(0, self.start - self.context)
         end = min(len(self.text), self.end + self.context)
         return self.text[start:end]
-
-    @deprecated('pywikibot.info(ContextOption.out)', since='6.2.0')
-    def output_range(self, start: int, end: int) -> None:
-        """DEPRECATED. Output a section from the text."""
-        pywikibot.info(self.text[start:end])
 
 
 class Choice(StandardOption):
@@ -597,20 +574,6 @@ class HighlightContextOption(ContextOption):
             self.text[self.start:self.end],
             self.text[self.end:end],
             color=self.color)
-
-    @deprecated('pywikibot.info(HighlightContextOption.out)', since='6.2.0')
-    def output_range(self, start: int, end: int) -> None:
-        """Show normal context with a highlighted center region.
-
-        .. deprecated:: 6.2
-           use :attr:`out` instead.
-        """
-        text = '{}<<{color}>>{}<<default>>{}'.format(
-            self.text[start:self.start],
-            self.text[self.start:self.end],
-            self.text[self.end:end],
-            color=self.color)
-        pywikibot.info(text)
 
 
 class UnhandledAnswer(Exception):  # noqa: N818

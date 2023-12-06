@@ -87,8 +87,8 @@ __all__ = (
     'LexemeSense', 'Link', 'log', 'MediaInfo', 'output', 'Page',
     'page_put_queue', 'PropertyPage', 'showDiff', 'show_help', 'Site',
     'SiteLink', 'sleep', 'stdout', 'stopme', 'Timestamp', 'translate', 'ui',
-    'url2unicode', 'User', 'warning', 'WbGeoShape', 'WbMonolingualText',
-    'WbQuantity', 'WbTabularData', 'WbTime', 'WbUnknown', 'WikidataBot',
+    'User', 'warning', 'WbGeoShape', 'WbMonolingualText', 'WbQuantity',
+    'WbTabularData', 'WbTime', 'WbUnknown', 'WikidataBot',
 )
 
 # argvu is set by pywikibot.bot when it's imported
@@ -278,7 +278,6 @@ from pywikibot.page import (  # noqa: E402
     SiteLink,
     User,
     html2unicode,
-    url2unicode,
 )
 
 

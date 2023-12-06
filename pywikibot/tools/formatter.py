@@ -42,11 +42,6 @@ class SequenceOutputter:
         super().__init__()
         self.sequence = sequence
 
-    @deprecated('out', since='6.2.0')
-    def format_list(self):
-        """DEPRECATED: Create the text with one item on each line."""
-        return self.out
-
     @property
     def out(self):
         """Create the text with one item on each line."""
