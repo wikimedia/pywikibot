@@ -14,7 +14,8 @@ Bugfixes
 Breaking changes and code cleanups
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* *output* OutputOption without *out* property is no longer supported with :class:`pywikibot.OutputProxyOption`
+* ``SequenceOutputter.format_list()`` was removed in favour of :attr:`tools.formatter.SequenceOutputter.out` property
+* *output* parameter of :class:``bot_choice.OutputProxyOption` (i.e. ``OutputOption`` instance) without *out* property is no longer supported
 * ``OutputOption.output()`` method was removed
 * ``ContextOption.output_range()`` and ``HighlightContextOption.output_range()`` methods were removed
 * ``page.url2unicode()`` function was removed in favour of :func:`tools.chars.url2string`
@@ -23,7 +24,7 @@ Breaking changes and code cleanups
 * *allow_duplicates* parameter of :func:`tools.itertools.intersect_generators` must be given as keyword argument
 * Infinite rotating file handler with ``config.logfilesize`` of -1 is no longer supported
 * ``Throttle.multiplydelay`` attribute was removed
-* Python 3.6 support was dropped (:phab:`T347026`
+* Python 3.6 support was dropped (:phab:`T347026`)
 
 
 Deprecations
@@ -77,5 +78,4 @@ Will be removed in Pywikibot 9
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * 6.2.0: Error messages with '%' style is deprecated in favour for str.format() style
-* 6.2.0: SequenceOutputter.format_list() is deprecated in favour of 'out' property
 * 6.0.0: config.register_family_file() is deprecated
