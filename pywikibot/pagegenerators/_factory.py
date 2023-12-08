@@ -48,6 +48,7 @@ from pywikibot.pagegenerators._generators import (
     MySQLPageGenerator,
     NewimagesPageGenerator,
     NewpagesPageGenerator,
+    PagePilePageGenerator,
     PrefixingPageGenerator,
     RecentChangesPageGenerator,
     SubCategoriesPageGenerator,
@@ -924,6 +925,14 @@ class GeneratorFactory:
             value = 'true'
         self.redirectfilter = strtobool(value)
         return True
+
+    def _handle_pagepile(self, value: str) -> HANDLER_RETURN_TYPE:
+        """Handle `-pagepile` argument."""
+        if not value.isnumeric():
+            raise ValueError(
+                f'PagePile id must be an int. I was given "{value}"')
+        pile = PagePilePageGenerator(int(value))
+        return pile.generator
 
     def handle_args(self, args: Iterable[str]) -> list[str]:
         """Handle command line arguments and return the rest as a list.

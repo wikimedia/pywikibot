@@ -60,6 +60,7 @@ from pywikibot.pagegenerators._generators import (
     NewpagesPageGenerator,
     PagesFromPageidGenerator,
     PagesFromTitlesGenerator,
+    PagePilePageGenerator,
     PetScanPageGenerator,
     PrefixingPageGenerator,
     RandomPageGenerator,
@@ -130,6 +131,7 @@ __all__ = (
     'page_with_property_generator',
     'PagesFromPageidGenerator',
     'PagesFromTitlesGenerator',
+    'PagePilePageGenerator',
     'PetScanPageGenerator',
     'PrefixingPageGenerator',
     'RandomPageGenerator',
@@ -396,6 +398,8 @@ GENERATOR OPTIONS
                     "-pageid:pageid1,pageid2,." or
                     "-pageid:'pageid1|pageid2|..'"
                     and supplied multiple times for multiple pages.
+
+-pagepile           Work on a PagePile. Argument is the pile id (an integer)
 
 -linter             Work on pages that contain lint errors. Extension Linter
                     must be available on the site.

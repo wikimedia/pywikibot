@@ -398,6 +398,21 @@ class PetScanPageGeneratorTestCase(TestCase):
                                    site=site)
 
 
+class PagePilePageGeneratorTestCase(TestCase):
+
+    """Test PagePilePageGenerator."""
+
+    family = 'wikipedia'
+    code = 'ro'
+
+    def test_PagePilePageGenerator(self):
+        """Test PagePilePageGenerator."""
+        gen = pagegenerators.PagePilePageGenerator(id=53158)
+        pages = list(gen.generator)
+        self.assertLength(pages, 215)
+        self.assertEqual(gen.site, pywikibot.Site('wikipedia:ro'))
+
+
 class TestRepeatingGenerator(RecentChangesTestCase):
 
     """Test RepeatingGenerator."""

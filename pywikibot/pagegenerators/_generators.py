@@ -1231,3 +1231,59 @@ class PetScanPageGenerator(GeneratorWrapper):
             page = pywikibot.Page(self.site, raw_page['title'],
                                   int(raw_page['namespace']))
             yield page
+
+
+class PagePilePageGenerator(GeneratorWrapper):
+    """Queries PagePile to generate pages.
+
+    .. seealso:: https://pagepile.toolforge.org/
+    .. versionadded:: 9.0
+       subclassed from :class:`tools.collections.GeneratorWrapper`
+    """
+
+    def __init__(self, id: int):
+        """Initializer.
+
+        :param id: The PagePile id to query
+        """
+        self.opts = self.buildQuery(id)
+
+    def buildQuery(self, id: int):
+        """Get the querystring options to query PagePile.
+
+        :param id: int
+        :return: Dictionary of querystring parameters to use in the query
+        """
+        query = {
+            'id': id,
+            'action': 'get_data',
+            'format': 'json',
+            'doit': ''
+        }
+
+        return query
+
+    def query(self) -> Iterator[dict[str, Any]]:
+        """Query PagePile.
+
+        :raises ServerError: Either ReadTimeout or server status error
+        :raises APIError: error response from petscan
+        """
+        url = 'https://pagepile.toolforge.org/api.php'
+
+        req = http.fetch(url, params=self.opts)
+
+        data = req.json()
+        if 'error' in data:
+            raise APIError('PagePile', data['error'], **self.opts)
+
+        self.site = pywikibot.site.APISite.fromDBName(data['wiki'])
+        raw_pages = data['pages']
+        yield from raw_pages
+
+    @property
+    def generator(self) -> Iterator['pywikibot.page.Page']:
+        """Yield results from :meth:`query`."""
+        for raw_page in self.query():
+            page = pywikibot.Page(self.site, raw_page)
+            yield page
