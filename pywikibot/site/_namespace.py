@@ -6,6 +6,7 @@
 #
 from __future__ import annotations
 
+from abc import ABCMeta
 from collections.abc import Iterable, Mapping
 from enum import IntEnum
 from typing import Union
@@ -51,7 +52,16 @@ class BuiltinNamespace(IntEnum):
         return name.replace('Mediawiki', 'MediaWiki')
 
 
-class Namespace(Iterable, ComparableMixin):
+class MetaNamespace(ABCMeta):
+    """Metaclass for Namespace attribute settings."""
+
+    def __new__(cls, name, bases, dic):
+        """Set Namespace.FOO to BuiltinNamespace.FOO for each builtin ns."""
+        dic.update(BuiltinNamespace.__members__)
+        return super().__new__(cls, name, bases, dic)
+
+
+class Namespace(Iterable, ComparableMixin, metaclass=MetaNamespace):
 
     """
     Namespace site data object.
@@ -303,11 +313,6 @@ class Namespace(Iterable, ComparableMixin):
             return parts[0].strip()
 
         return False
-
-
-# Set Namespace.FOO to be BuiltinNamespace.FOO for each builtin namespace
-for item in BuiltinNamespace:
-    setattr(Namespace, item.name, item)
 
 
 class NamespacesDict(Mapping, SelfCallMixin):
