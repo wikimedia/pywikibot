@@ -15,7 +15,7 @@ Breaking changes and code cleanups
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * ``SequenceOutputter.format_list()`` was removed in favour of :attr:`tools.formatter.SequenceOutputter.out` property
-* *output* parameter of :class:``bot_choice.OutputProxyOption` (i.e. ``OutputOption`` instance) without *out* property is no longer supported
+* *output* parameter of :class:`bot_choice.OutputProxyOption` (i.e. ``OutputOption`` instance) without *out* property is no longer supported
 * ``OutputOption.output()`` method was removed
 * ``ContextOption.output_range()`` and ``HighlightContextOption.output_range()`` methods were removed
 * ``page.url2unicode()`` function was removed in favour of :func:`tools.chars.url2string`
