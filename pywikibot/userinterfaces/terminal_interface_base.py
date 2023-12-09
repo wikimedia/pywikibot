@@ -1,6 +1,6 @@
 """Base for terminal user interfaces."""
 #
-# (C) Pywikibot team, 2003-2022
+# (C) Pywikibot team, 2003-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -15,7 +15,7 @@ from typing import Any
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Iterable, Sequence
+from pywikibot.backports import Iterable, Sequence, removeprefix
 from pywikibot.bot_choice import (
     ChoiceException,
     Option,
@@ -424,12 +424,17 @@ class UI(ABUIC):
         automatic_quit: bool = True,
         force: bool = False,
     ) -> Any:
-        """
-        Ask the user and returns a value from the options.
+        """Ask the user and returns a value from the options.
 
-        Depending on the options setting return_shortcut to False may not be
-        sensible when the option supports multiple values as it'll return an
-        ambiguous index.
+        Depending on the options setting *return_shortcut* to False may
+        not be sensible when the option supports multiple values as
+        it'll return an ambiguous index.
+
+        .. versionchanged:: 9.0
+           Raise ValueError if no *default* value is given with *force*;
+           raise ValueError if *force* is True and *default* value is
+           invalid; raise TypeError if *default* value is neither str
+           nor None.
 
         :param question: The question, without trailing whitespace.
         :param options: Iterable of all available options. Each entry contains
@@ -447,6 +452,9 @@ class UI(ABUIC):
         :return: If return_shortcut the shortcut of options or the value of
             default (if it's not None). Otherwise the index of the answer in
             options. If default is not a shortcut, it'll return -1.
+        :raises ValueError: invalid or no *default* value is given with
+            *force* or no or an invalid option is given.
+        :raises TypeError: *default* value is neither None nor str
         """
         def output_option(option, before_question) -> None:
             """Print an OutputOption before or after question."""
@@ -454,18 +462,25 @@ class UI(ABUIC):
                and option.before_question is before_question:
                 self.stream_output(option.out + '\n')
 
-        if force and default is None:
+        if force and not default:
             raise ValueError('With no default option it cannot be forced')
+
         if isinstance(options, Option):
             options = [options]
         else:  # make a copy
             options = list(options)
+
         if not options:
             raise ValueError('No options are given.')
         if automatic_quit:
             options.append(QuitKeyboardInterrupt())
-        if default:
+
+        if isinstance(default, str):
             default = default.lower()
+        elif default is not None:
+            raise TypeError(f'Invalid type {type(default).__name__!r} for '
+                            f"parameter 'default' ({default}); str expected")
+
         for i, option in enumerate(options):
             if not isinstance(option, Option):
                 if len(option) != 2:
@@ -495,6 +510,11 @@ class UI(ABUIC):
                             output_option(option, before_question=False)
                             handled = option.stop
                             break
+                    else:
+                        if force:
+                            raise ValueError(
+                                f'{default!r} is not a valid Option for '
+                                f'{removeprefix(output, question).lstrip()}')
 
         if isinstance(answer, ChoiceException):
             raise answer
