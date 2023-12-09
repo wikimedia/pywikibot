@@ -105,9 +105,9 @@ class Namespace(Iterable, ComparableMixin, metaclass=MetaNamespace):
 
         if aliases:
             self.aliases = aliases
-        elif id in (6, 7):
+        elif id in (BuiltinNamespace.FILE, BuiltinNamespace.FILE_TALK):
             alias = 'Image'
-            if id == 7:
+            if id == BuiltinNamespace.FILE_TALK:
                 alias += ' talk'
             self.aliases = [alias]
         else:
@@ -145,7 +145,7 @@ class Namespace(Iterable, ComparableMixin, metaclass=MetaNamespace):
 
         :param item: name to check
         """
-        if item == '' and self.id == 0:
+        if item == '' and self.id == BuiltinNamespace.MAIN:
             return True
 
         name = Namespace.normalize_name(item)
@@ -185,10 +185,10 @@ class Namespace(Iterable, ComparableMixin, metaclass=MetaNamespace):
     @staticmethod
     def _colons(id, name):
         """Return the name with required colons, depending on the ID."""
-        if id == 0:
+        if id == BuiltinNamespace.MAIN:
             return ':'
 
-        if id in (6, 14):
+        if id in (BuiltinNamespace.FILE, BuiltinNamespace.CATEGORY):
             return ':' + name + ':'
 
         return name + ':'
@@ -276,9 +276,10 @@ class Namespace(Iterable, ComparableMixin, metaclass=MetaNamespace):
     def default_case(id, default_case=None):
         """Return the default fixed case value for the namespace ID."""
         # https://www.mediawiki.org/wiki/Manual:$wgCapitalLinkOverrides#Warning
-        if id > 0 and id % 2 == 1:  # the talk ns has the non-talk ns case
-            id -= 1
-        if id in (-1, 2, 8):
+        if id in (BuiltinNamespace.SPECIAL,
+                  BuiltinNamespace.USER, BuiltinNamespace.USER_TALK,
+                  BuiltinNamespace.MEDIAWIKI, BuiltinNamespace.MEDIAWIKI_TALK,
+                  ):
             return 'first-letter'
 
         return default_case
@@ -286,8 +287,8 @@ class Namespace(Iterable, ComparableMixin, metaclass=MetaNamespace):
     @classmethod
     def builtin_namespaces(cls, case: str = 'first-letter'):
         """Return a dict of the builtin namespaces."""
-        return {i: cls(i, case=cls.default_case(i, case))
-                for i in range(-2, 16)}
+        return {e.value: cls(e.value, case=cls.default_case(e.value, case))
+                for e in BuiltinNamespace}
 
     @staticmethod
     def normalize_name(name):
