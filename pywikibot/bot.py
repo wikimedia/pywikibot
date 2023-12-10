@@ -562,8 +562,12 @@ def input_choice(question: str,
                  return_shortcut: bool = True,
                  automatic_quit: bool = True,
                  force: bool = False) -> Any:
-    """
-    Ask the user the question and return one of the valid answers.
+    """Ask the user the question and return one of the valid answers.
+
+    .. seealso::
+       * :meth:`userinterfaces._interface_base.ABUIC.input_choice`
+       * :meth:`userinterfaces.buffer_interface.UI.input_choice`
+       * :meth:`userinterfaces.terminal_interface_base.UI.input_choice`
 
     :param question: The question asked without trailing spaces.
     :param answers: The valid answers each containing a full length answer and
@@ -574,8 +578,8 @@ def input_choice(question: str,
     :param return_shortcut: Whether the shortcut or the index of the answer is
         returned.
     :param automatic_quit: Adds the option 'Quit' ('q') and throw a
-        :py:obj:`QuitKeyboardInterrupt` if selected.
-    :param force: Automatically use the default
+        :exc:`bot.QuitKeyboardInterrupt` if selected.
+    :param force: Automatically use the *default*.
     :return: The selected answer shortcut or index. Is -1 if the default is
         selected, it does not return the shortcut and the default is not a
         valid shortcut.
@@ -589,28 +593,35 @@ def input_yn(question: str,
              default: bool | str | None = None,
              automatic_quit: bool = True,
              force: bool = False) -> bool:
-    """
-    Ask the user a yes/no question and return the answer as a bool.
+    """Ask the user a yes/no question and return the answer as a bool.
+
+    **Example:**
+
+    >>> input_yn('Do you like Pywikibot?', 'y', False, force=True)
+    ... # doctest: +SKIP
+    Do you like Pywikibot? ([Y]es, [n]o)
+    True
+    >>> input_yn('More examples?', False, automatic_quit=False, force=True)
+    ... # doctest: +SKIP
+    Some more examples? ([y]es, [N]o)
+    False
+
+    .. seealso:: :func:`input_choice`
 
     :param question: The question asked without trailing spaces.
-    :param default: The result if no answer was entered. It must be a bool or
-        'y' or 'n' and can be disabled by setting it to None.
+    :param default: The result if no answer was entered. It must be a
+        bool or ``'y'``, ``'n'``, ``0`` or ``1`` and can be disabled by
+        setting it to None.
     :param automatic_quit: Adds the option 'Quit' ('q') and throw a
-        :py:obj:`QuitKeyboardInterrupt` if selected.
-    :param force: Automatically use the default
+        :exc:`bot.QuitKeyboardInterrupt` if selected.
+    :param force: Automatically use the *default*.
     :return: Return True if the user selected yes and False if the user
         selected no. If the default is not None it'll return True if default
         is True or 'y' and False if default is False or 'n'.
     """
-    if default not in ['y', 'Y', 'n', 'N']:
-        if default:
-            default = 'y'
-        elif default is not None:
-            default = 'n'
-    assert default in ['y', 'Y', 'n', 'N', None], \
-        'Default choice must be one of YyNn or default'
+    if default in (True, False):
+        default = 'ny'[default]
 
-    assert not isinstance(default, bool)
     return input_choice(question, [('Yes', 'y'), ('No', 'n')],
                         default,
                         automatic_quit=automatic_quit, force=force) == 'y'
