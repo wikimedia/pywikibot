@@ -66,6 +66,7 @@ from urllib.parse import urlparse, urlunparse
 import pywikibot
 from pywikibot import exceptions, textlib
 from pywikibot.backports import Callable, Match, Pattern
+from pywikibot.site import Namespace
 from pywikibot.textlib import (
     FILE_LINK_REGEX,
     MultiTemplateMatchBuilder,
@@ -247,7 +248,7 @@ class CosmeticChangesToolkit:
         self.namespace = page.namespace()
 
         self.show_diff = show_diff
-        self.template = (self.namespace == 10)
+        self.template = (self.namespace == Namespace.TEMPLATE)
         self.talkpage = self.namespace >= 0 and self.namespace % 2 == 1
         self.ignore = ignore
 
@@ -402,12 +403,13 @@ class CosmeticChangesToolkit:
         exceptions = ['nowiki', 'comment', 'math', 'pre']
 
         for namespace in self.site.namespaces.values():
-            if namespace == 0:
+            if namespace == Namespace.MAIN:
                 # skip main (article) namespace
                 continue
             # a clone is needed. Won't change the namespace dict
             namespaces = list(namespace)
-            if namespace == 6 and self.site.family.name == 'wikipedia':
+            if (namespace == Namespace.FILE
+                    and self.site.family.name == 'wikipedia'):
                 if self.site.code in ('en', 'fr'):
                     # do not change "Image" on en-wiki and fr-wiki
                     with suppress(ValueError):
@@ -423,9 +425,11 @@ class CosmeticChangesToolkit:
                             0, namespaces.pop(namespaces.index('Imagem')))
             # final namespace variant
             final_ns = namespaces.pop(0)
-            if namespace in (2, 3):
+            if namespace in (Namespace.USER, Namespace.USER_TALK):
                 # skip localized user namespace, maybe gender is used
-                namespaces = ['User' if namespace == 2 else 'User talk']
+                namespaces = ['User'
+                              if namespace == Namespace.USER
+                              else 'User talk']
             # lowerspaced and underscored namespaces
             for i, item in enumerate(namespaces):
                 item = item.replace(' ', '[ _]')
@@ -433,7 +437,8 @@ class CosmeticChangesToolkit:
                 namespaces[i] = item
             namespaces.append(first_lower(final_ns))
             if final_ns and namespaces:
-                if self.site.sitename == 'wikipedia:pt' and namespace == 6:
+                if (self.site.sitename == 'wikipedia:pt'
+                        and namespace == Namespace.FILE):
                     # only change on these file extensions (per T57242)
                     extensions = ('png', 'gif', 'jpg', 'jpeg', 'svg', 'tiff',
                                   'tif')
@@ -544,7 +549,7 @@ class CosmeticChangesToolkit:
             page = pywikibot.Page(pywikibot.Link(titleWithSection, self.site))
             in_main_namespace = None
             with suppress(exceptions.InvalidTitleError):
-                in_main_namespace = page.namespace() == 0
+                in_main_namespace = page.namespace() == Namespace.MAIN
             if not in_main_namespace:
                 return oldlink
 
@@ -682,7 +687,7 @@ class CosmeticChangesToolkit:
     def removeEmptySections(self, text: str) -> str:
         """Cleanup empty sections."""
         # userspace contains article stubs without nobots/in use templates
-        if self.namespace == 2:
+        if self.namespace == Namespace.USER:
             return text
 
         skippings = ['comment', 'category']
@@ -818,10 +823,11 @@ class CosmeticChangesToolkit:
         def replace_link(match: Match[str]) -> str:
             """Create a string to replace a single link."""
             replacement = '[['
-            if re.match(r'(?:{}):'
-                        .format('|'.join((*self.site.namespaces[6],
-                                          *self.site.namespaces[14]))),
-                        match['link']):
+            if re.match(
+                    r'(?:{}):'.format('|'.join(
+                        (*self.site.namespaces[Namespace.FILE],
+                         *self.site.namespaces[Namespace.CATEGORY]))),
+                    match['link']):
                 replacement += ':'
 
             replacement += match['link']
@@ -1045,7 +1051,8 @@ class CosmeticChangesToolkit:
         [1]:
         https://commons.wikimedia.org/wiki/Commons:Tools/pywiki_file_description_cleanup
         """
-        if self.site.sitename != 'commons:commons' or self.namespace == 6:
+        if (self.site.sitename != 'commons:commons'
+                or self.namespace == Namespace.FILE):
             return text
 
         # section headers to {{int:}} versions
