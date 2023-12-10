@@ -1238,7 +1238,6 @@ class PagePilePageGenerator(GeneratorWrapper):
 
     .. seealso:: https://pagepile.toolforge.org/
     .. versionadded:: 9.0
-       subclassed from :class:`tools.collections.GeneratorWrapper`
     """
 
     def __init__(self, id: int):

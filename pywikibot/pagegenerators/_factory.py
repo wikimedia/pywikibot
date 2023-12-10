@@ -927,12 +927,14 @@ class GeneratorFactory:
         return True
 
     def _handle_pagepile(self, value: str) -> HANDLER_RETURN_TYPE:
-        """Handle `-pagepile` argument."""
+        """Handle `-pagepile` argument.
+
+        .. versionadded:: 9.0
+        """
         if not value.isnumeric():
             raise ValueError(
-                f'PagePile id must be an int. I was given "{value}"')
-        pile = PagePilePageGenerator(int(value))
-        return pile.generator
+                f'PagePile id must be an int. It was given "{value}"')
+        return PagePilePageGenerator(int(value))
 
     def handle_args(self, args: Iterable[str]) -> list[str]:
         """Handle command line arguments and return the rest as a list.

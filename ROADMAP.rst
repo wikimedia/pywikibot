@@ -4,12 +4,14 @@ Current release
 Improvements
 ^^^^^^^^^^^^
 
-* (no changes yet)
+* L10N Updates
+* Add :class:`pagegenerators.PagePilePageGenerator` (:phab:`T353086`)
 
 Bugfixes
 ^^^^^^^^
 
-* (no changes yet)
+* :func:`pywikibot.input_choice` validates *default* parameter  (:phab:`T353097`)
+* Remove typing imports from user-config.py file (:phab:`T352965`)
 
 Breaking changes and code cleanups
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

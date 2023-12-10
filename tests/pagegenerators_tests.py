@@ -408,8 +408,7 @@ class PagePilePageGeneratorTestCase(TestCase):
     def test_PagePilePageGenerator(self):
         """Test PagePilePageGenerator."""
         gen = pagegenerators.PagePilePageGenerator(id=53158)
-        pages = list(gen.generator)
-        self.assertLength(pages, 215)
+        self.assertLength(list(gen), 215)
         self.assertEqual(gen.site, pywikibot.Site('wikipedia:ro'))
 
 

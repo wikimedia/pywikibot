@@ -1,6 +1,6 @@
 """Objects representing Namespaces of MediaWiki site."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -53,7 +53,11 @@ class BuiltinNamespace(IntEnum):
 
 
 class MetaNamespace(ABCMeta):
-    """Metaclass for Namespace attribute settings."""
+
+    """Metaclass for Namespace attribute settings.
+
+    .. versionadded:: 9.0
+    """
 
     def __new__(cls, name, bases, dic):
         """Set Namespace.FOO to BuiltinNamespace.FOO for each builtin ns."""
@@ -79,6 +83,9 @@ class Namespace(Iterable, ComparableMixin, metaclass=MetaNamespace):
 
     If only one of canonical_name and custom_name are available, both
     properties will have the same value.
+
+    .. versionchanged:: 9.0
+       metaclass from :class:`MetaNamespace`
     """
 
     def __init__(self, id,

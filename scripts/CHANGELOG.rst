@@ -1,6 +1,14 @@
 Scripts Changelog
 =================
 
+9.0.0
+-----
+
+category_redirect
+~~~~~~~~~~~~~~~~~
+
+* provide category_redirect categories for all WM sites (:phab:`T348914`)
+
 8.5.0
 -----
 
