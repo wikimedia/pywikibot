@@ -23,6 +23,9 @@ The following parameters are supported:
                   moves all images, pages and categories in redirect categories
                   to the target category.
 
+-category:<cat>   Category to be used with this script. If not given
+                  either wikibase entries Q4616723 or Q8099903 are used.
+
 Usage:
 
     python pwb.py category_redirect [options]
@@ -46,7 +49,6 @@ from datetime import timedelta
 
 import pywikibot
 from pywikibot import config, i18n, pagegenerators
-from pywikibot.backports import removeprefix
 from pywikibot.bot import AutomaticTWSummaryBot, ConfigParserBot, SingleSiteBot
 from pywikibot.exceptions import (
     CircularRedirectError,
@@ -88,6 +90,7 @@ class CategoryRedirectBot(
     update_options = {
         'tiny': False,  # use Non-empty category redirects only
         'delay': 7,  # cool down delay in days
+        'category': ''  # category to be used
     }
 
     def __init__(self, **kwargs) -> None:
@@ -119,6 +122,16 @@ class CategoryRedirectBot(
 
     def get_cat(self):
         """Specify the category page."""
+        if self.opt.category:
+            if self.opt.tiny:
+                raise Error('-tiny option is given together with -category')
+
+            cat = pywikibot.Category(self.site, self.opt.category)
+            if cat.exists():
+                return cat
+
+            raise Error(f'Category {cat} not found')
+
         item = TINY_CAT_REDIRECT_CAT if self.opt.tiny else CAT_REDIRECT_CAT
         return self.site.page_from_repository(item)
 
@@ -555,18 +568,29 @@ def main(*args: str) -> None:
     :param args: command line arguments
     """
     options = {}
+    unknown = []
     for arg in pywikibot.handle_args(args):
-        if arg.startswith('-delay:'):
-            options['delay'] = int(removeprefix(arg, '-delay:'))
+        opt, _, value = arg.partition(':')
+        if opt[0] != '-':
+            unknown.append(arg)
+            continue
+
+        opt = opt[1:]
+        if opt == 'delay:':
+            options[opt] = int(value)
+        elif opt == 'category':
+            options[opt] = value
         else:
             # generic handling of we have boolean options
-            options[arg[1:]] = True
-    try:
-        bot = CategoryRedirectBot(**options)
-    except Error as e:
-        pywikibot.bot.suggest_help(exception=e)
-    else:
-        bot.run()
+            options[opt] = True
+
+    if not pywikibot.bot.suggest_help(unknown_parameters=unknown):
+        try:
+            bot = CategoryRedirectBot(**options)
+        except Error as e:
+            pywikibot.bot.suggest_help(exception=e)
+        else:
+            bot.run()
 
 
 if __name__ == '__main__':
