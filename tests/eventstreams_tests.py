@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the eventstreams module."""
 #
-# (C) Pywikibot team, 2017-2024
+# (C) Pywikibot team, 2017-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -272,25 +272,18 @@ class EventStreamsTestClass(EventStreams):
         while self._total is None or n < self._total:
             if not hasattr(self, 'source'):
                 self.source = EventSource(**self.sse_kwargs)
+                self.source.connect()
+
             event = next(self.source)
-            if event.event == 'message':
-                if not event.data:
-                    continue
+            if event.type == 'message' and event.data:
                 n += 1
-                try:
-                    element = json.loads(event.data)
-                except ValueError as e:  # pragma: no cover
-                    self.source.resp.close()  # close SSLSocket
-                    del self.source
-                    raise ValueError(
-                        f'{e}\n\nEvent no {n}: '
-                        f'Could not load json data from source\n${event}$'
-                    ) from e
-                yield element
+                yield json.loads(event.data)
+
+        self.source.close()
         del self.source
 
 
-@require_modules('sseclient')
+@require_modules('requests_sse')
 class TestEventSource(TestCase):
 
     """Test sseclient.EventSource."""
@@ -298,12 +291,7 @@ class TestEventSource(TestCase):
     net = True
 
     def test_stream(self):
-        """Verify that the EventSource delivers events without problems.
-
-        As found in sseclient 0.0.24 the EventSource gives randomly a
-        ValueError 'Unterminated string' when json.load is processed
-        if the limit is high enough.
-        """
+        """Verify that the EventSource delivers events without problems."""
         with skipping(NotImplementedError):
             self.es = EventStreamsTestClass(streams='recentchange')
         limit = 50

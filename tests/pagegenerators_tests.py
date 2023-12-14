@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test pagegenerators module."""
 #
-# (C) Pywikibot team, 2009-2024
+# (C) Pywikibot team, 2009-2025
 #
 # Distributed under the terms of the MIT license.
 from __future__ import annotations
@@ -27,7 +27,6 @@ from pywikibot.pagegenerators import (
     PreloadingGenerator,
     WikibaseItemFilterPageGenerator,
 )
-from pywikibot.tools import has_module
 from tests import join_data_path, unittest_print
 from tests.aspects import (
     DefaultSiteTestCase,
@@ -35,6 +34,7 @@ from tests.aspects import (
     RecentChangesTestCase,
     TestCase,
     WikidataTestCase,
+    require_modules,
 )
 from tests.tools_tests import GeneratorIntersectTestCase
 from tests.utils import skipping
@@ -1648,17 +1648,10 @@ class EventStreamsPageGeneratorTestCase(RecentChangesTestCase):
 
     """Test case for Live Recent Changes pagegenerator."""
 
-    @classmethod
-    def setUpClass(cls):
-        """Setup test class."""
-        super().setUpClass()
-        cls.client = 'sseclient'
-        if not has_module(cls.client):
-            raise unittest.SkipTest(f'{cls.client} is not available')
-
+    @require_modules('requests_sse')
     def test_RC_pagegenerator_result(self):
         """Test RC pagegenerator."""
-        lgr = logging.getLogger(self.client)
+        lgr = logging.getLogger('requests_sse.client')
         lgr.setLevel(logging.DEBUG)
         ch = logging.StreamHandler()
         ch.setLevel(logging.DEBUG)
