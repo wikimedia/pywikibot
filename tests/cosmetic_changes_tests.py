@@ -12,7 +12,7 @@ from contextlib import suppress
 
 from pywikibot import Page
 from pywikibot.cosmetic_changes import CANCEL, CosmeticChangesToolkit
-from pywikibot.site._namespace import NamespacesDict
+from pywikibot.site import NamespacesDict
 from pywikibot.tools import has_module
 from tests.aspects import TestCase
 
