@@ -1275,7 +1275,7 @@ or press enter to quit:""")
             self.opt.pos.sort(key=lambda x: x.lower())
         else:
             self.opt.pos.sort()
-        SequenceOutputter(self.opt.pos).output()
+        pywikibot.info(SequenceOutputter(self.opt.pos).out)
 
         gen = ReferringPageGeneratorWithIgnore(
             page,
