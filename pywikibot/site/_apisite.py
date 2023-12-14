@@ -1565,14 +1565,13 @@ class APISite(
 
         # Upcast to proper Page subclass.
         ns = target.namespace()
-        if ns == 2:
+        if ns == Namespace.USER:
             target = pywikibot.User(target)
-        elif ns == 6:
+        elif ns == Namespace.FILE:
             target = pywikibot.FilePage(target)
-        elif ns == 14:
+        elif ns == Namespace.CATEGORY:
             target = pywikibot.Category(target)
         page._redirtarget = target
-
         return page._redirtarget
 
     @deprecated(since='8.0.0')

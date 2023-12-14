@@ -19,6 +19,7 @@ from warnings import warn
 import pywikibot
 from pywikibot import config
 from pywikibot.exceptions import Error, InvalidTitleError, UnsupportedPageError
+from pywikibot.site import Namespace
 from pywikibot.tools import deprecated
 from pywikibot.tools.collections import GeneratorWrapper
 
@@ -718,12 +719,12 @@ class PageGenerator(QueryGenerator):
         p = pywikibot.Page(self.site, pagedata['title'], pagedata['ns'])
         ns = pagedata['ns']
         # Upcast to proper Page subclass.
-        if ns == 2:
+        if ns == Namespace.USER:
             p = pywikibot.User(p)
-        elif ns == 6:
+        elif ns == Namespace.FILE:
             with suppress(ValueError):
                 p = pywikibot.FilePage(p)
-        elif ns == 14:
+        elif ns == Namespace.CATEGORY:
             p = pywikibot.Category(p)
         update_page(p, pagedata, self.props)
         return p

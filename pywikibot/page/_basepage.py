@@ -267,12 +267,12 @@ class BasePage(ComparableMixin):
                     title = f'{self.site.code}:{title}'
             elif textlink and (self.is_filepage() or self.is_categorypage()):
                 title = f':{title}'
-            elif self.namespace() == 0 and not section:
+            elif self.namespace() == Namespace.MAIN and not section:
                 with_ns = True
             if with_ns:
                 return f'[[{title}{section}]]'
             return f'[[{title}{section}|{label}]]'
-        if not with_ns and self.namespace() != 0:
+        if not with_ns and self.namespace() != Namespace.MAIN:
             title = label + section
         else:
             title += section
@@ -845,11 +845,11 @@ class BasePage(ComparableMixin):
 
     def is_categorypage(self):
         """Return True if the page is a Category, False otherwise."""
-        return self.namespace() == 14
+        return self.namespace() == Namespace.CATEGORY
 
     def is_filepage(self):
         """Return True if this is a file description page, False otherwise."""
-        return self.namespace() == 6
+        return self.namespace() == Namespace.FILE
 
     def isDisambig(self) -> bool:
         """
