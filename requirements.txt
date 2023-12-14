@@ -37,7 +37,7 @@ mwoauth>=0.2.4,!=0.3.1
 pydot >= 1.4.1
 
 # cosmetic_changes
-python-stdnum >= 1.18
+python-stdnum >= 1.19
 
 # GUI
 Pillow >= 8.1.2, < 10.0.0; platform_machine == 'AMD32'
