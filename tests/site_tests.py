@@ -277,6 +277,32 @@ class TestSiteObject(DefaultSiteTestCase):
         if a:
             self.assertEqual(a[0], mainpage)
 
+    def test_maxlimit(self):
+        """Test maxlimit property."""
+        limit = self.site.maxlimit
+        self.assertIsInstance(limit, int)
+        self.assertIn(limit, [10, 50, 500, 5000])
+
+    def test_ratelimit(self):
+        """Test ratelimit method."""
+        actions = ('edit', 'move', 'purge', 'invalid')
+        if self.site.logged_in():
+            groups = ['user', 'unknown', 'noratelimit']
+        else:
+            groups = ['ip', 'unknown']
+            self.assertFalse(self.site.has_right('noratelimit'))
+        for action in actions:
+            with self.subTest(action=action):
+                limit = self.site.ratelimit(action)
+                self.assertIn(limit.group, groups)
+                self.assertEqual(limit.seconds / limit.hits, limit.delay)
+                self.assertEqual(
+                    1 / limit.delay if limit.seconds else float('inf'),
+                    limit.ratio)
+                if limit.group == 'unknown':
+                    self.assertEqual(limit.hits, self.site.maxlimit)
+                    self.assertEqual(limit.seconds, config.put_throttle)
+
 
 class TestLockingPage(DefaultSiteTestCase):
     """Test cases for lock/unlock a page within threads."""

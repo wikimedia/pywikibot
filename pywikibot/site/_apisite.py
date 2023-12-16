@@ -78,6 +78,7 @@ from pywikibot.tools import (
     merge_unique_dicts,
     normalize_username,
 )
+from pywikibot.tools.collections import RateLimit
 
 
 if TYPE_CHECKING:
@@ -85,8 +86,8 @@ if TYPE_CHECKING:
 
 
 __all__ = ('APISite', )
-_mw_msg_cache: DefaultDict[str, dict[str, str]] = defaultdict(dict)
 
+_mw_msg_cache: DefaultDict[str, dict[str, str]] = defaultdict(dict)
 
 _CompType = Union[int, str, 'pywikibot.page.Page', 'pywikibot.page.Revision']
 _RequestWrapperT = TypeVar('_RequestWrapperT', bound='api._RequestWrapper')
@@ -497,6 +498,108 @@ class APISite(
             return int(parameter['highlimit'])
 
         return int(parameter['limit'])  # T78333, T161783
+
+    def ratelimit(self, action: str) -> RateLimit:
+        """Get the rate limit for a given action.
+
+        This method get the ratelimit for a given action and returns a
+        :class:`tools.collections.RateLimit` namedtuple which has the
+        following fields and properties:
+
+        - ``group`` --- The current user group  returned by the API. If
+          the user is not logged in, the group will be 'ip'.
+        - ``hits`` --- rate limit hits; API requests should not exceed
+          this limit value for the given action.
+        - ``seconds`` --- time base in seconds for the maximum hits
+        - ``delay`` --- *(property)* calculated as seconds per hits
+          which may be used for wait cycles.
+        - ``ratio`` --- *(property)* inverse of delay, calculated as
+          hits per seconds. The result may be Infinite.
+
+        If the user has 'noratelimit' rights, :meth:`maxlimit` is used
+        for ``hits`` and ``seconds`` will be 0. 'noratelimit' is
+        returned as group parameter in that case.
+
+        If no rate limit is found for the given action, :meth:`maxlimit`
+        is used for ``hits`` and ``seconds`` will be
+        :ref:`config.put_throttle<Settings to Avoid Server Overload>`.
+        As group parameter 'unknown' is returned in that case.
+
+        **Examples:**
+
+        This is an example for a bot user which is not logged in. The
+        rate limit user group is 'ip'
+
+        >>> site = pywikibot.Site()
+        >>> limit = site.ratelimit('edit')  # get rate limit for 'edit' action
+        >>> limit
+        RateLimit(group='ip', hits=8, seconds=60)
+        >>> limit.delay  # delay and ratio must be get as attributes
+        7.5
+        >>> site.ratelimit('purge').hits  # get purge hits
+        30
+        >>> group, *limit = site.ratelimit('urlshortcode')
+        >>> group  # the user is not logged in, we get 'ip' as group
+        'ip'
+        >>> limit  # starred assignment is allowed for the fields
+        [10, 120]
+
+        After login to the site and the rate limit will change. The
+        limit user group might be 'user':
+
+        >>> limit = site.ratelimit('edit')  # doctest: +SKIP
+        >>> limit  # doctest: +SKIP
+        RateLimit(group='user', hits=90, seconds=60)
+        >>> limit.ratio  # doctest: +SKIP
+        1.5
+        >>> limit = site.ratelimit('urlshortcode')  # no action limit found
+        >>> group, *limits = limit
+        >>> group  # doctest: +SKIP
+        'unknown'  # the group is 'unknown' because action was not found
+        >>> limits  # doctest: +SKIP
+        (50, 10)  # hits is maxlimit and seconds is config.put_throttle
+        >>> site.maxlimit, pywikibot.config.put_throttle
+        (50, 10)
+
+        If a user is logged in and has no rate limit, e.g bot accounts,
+        we always get a default RateLimit namedtuple like this:
+
+        >>> site.has_right['noratelimit']  # doctest: +SKIP
+        True
+        >>> limit = site.ratelimit('any_action')  # maxlimit is used
+        >>> limit # doctest: +SKIP
+        RateLimit(group='noratelimit', hits=500, seconds=0)
+        >>> limit.delay, limit.ratio  # doctest: +SKIP
+        (0.0, inf)
+
+        .. seealso:: :class:`tools.collections.RateLimit` for RateLimit
+           examples.
+        .. note:: It is not verified whether ``action`` parameter has a
+           valid value.
+        .. seealso:: :api:`Ratelimit`
+        .. versionadded:: 9.0
+
+        :param action: action which might be limited
+        :return: RateLimit tuple with ``group``, ``hits`` and ``seconds``
+            fields and properties for ``delay`` and ``ratio``.
+        """
+        ratio = 0
+        for key, value in self.userinfo['ratelimits'].get(action, {}).items():
+            h, s = value['hits'], value['seconds']
+            # find the highest ratio hits per seconds
+            if h / s > ratio:
+                limit = value
+                limit['group'] = key
+                ratio = h / s
+
+        if not ratio:  # no limits found
+            limit = {'hits': self.maxlimit}
+            if self.has_right('noratelimit'):
+                limit['group'] = 'noratelimit'
+            else:
+                limit['seconds'] = pywikibot.config.put_throttle
+
+        return RateLimit(**limit)
 
     @property
     def userinfo(self) -> dict[str, Any]:
