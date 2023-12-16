@@ -940,7 +940,7 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
                 # obsolete without a mapping to a hostname.
                 with suppress(KeyError):
                     data['hostname'] = (
-                        data['site'].base_url(data['site'].path()))
+                        data['site'].base_url(data['site'].apipath()))
 
         cm.__exit__(None, None, None)
 
