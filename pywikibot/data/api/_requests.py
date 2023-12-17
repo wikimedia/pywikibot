@@ -38,7 +38,7 @@ from pywikibot.exceptions import (
 )
 from pywikibot.login import LoginStatus
 from pywikibot.textlib import removeDisabledParts, removeHTMLParts
-from pywikibot.tools import PYTHON_VERSION
+from pywikibot.tools import PYTHON_VERSION, deprecated
 
 
 __all__ = ('CachedRequest', 'Request', 'encode_url')
@@ -130,7 +130,10 @@ class Request(MutableMapping, WaitingMixin):
     ['namespaces', 'userinfo']
 
     .. versionchanged:: 8.4
-       inherited from WaitingMixin.
+       inherited from :class:`WaitingMixin`.
+
+    .. versionchanged:: 9.0
+       *keys* and *items* methods return a view object instead a list
     """
 
     # To make sure the default value of 'parameters' can be identified.
@@ -382,10 +385,6 @@ class Request(MutableMapping, WaitingMixin):
         """Implement dict interface."""
         del self._params[key]
 
-    def keys(self):
-        """Implement dict interface."""
-        return list(self._params)
-
     def __iter__(self):
         """Implement dict interface."""
         return iter(self._params)
@@ -394,13 +393,14 @@ class Request(MutableMapping, WaitingMixin):
         """Implement dict interface."""
         return len(self._params)
 
+    @deprecated('items()', since='9.0.0')
     def iteritems(self):
-        """Implement dict interface."""
-        return iter(self._params.items())
+        """Implement dict interface.
 
-    def items(self):
-        """Return a list of tuples containing the parameters in any order."""
-        return list(self._params.items())
+        .. deprecated:: 9.0
+           Use ``items()`` instead.
+        """
+        return iter(self.items())
 
     def _add_defaults(self):
         """

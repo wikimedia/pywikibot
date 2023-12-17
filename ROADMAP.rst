@@ -32,6 +32,7 @@ Breaking changes and code cleanups
 Deprecations
 ------------
 
+* 9.0.0: ``iteritems`` method of :class:`data.api.Request` will be removed in favour of ``items``
 * 9.0.0: ``SequenceOutputter.output()`` is deprecated in favour of :attr:`tools.formatter.SequenceOutputter.out` property
 * 9.0.0: *nullcontext* context manager and *SimpleQueue* queue of :mod:`backports` are derecated
 * 8.4.0: *modules_only_mode* parameter of :class:`data.api.ParamInfo`, its *paraminfo_keys* class attribute
