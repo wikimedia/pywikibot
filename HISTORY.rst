@@ -5,7 +5,7 @@ Release history
 -----
 *05 December 2023*
 
-* Lazy load imageinfo metadata (:phab:`T253591`)
+* Lazy load imageinfo metadata (:phab:`T253591`, :phab:`T258036`)
 * Fetch URL of page scan via :api:`imageforpage` in :mod:`proofreadpage` module
   (:phab:`T114318`, :phab:`T181913`, :phab:`T352524`)
 * Sort page names before loading pages in :mod:`proofreadpage` module
