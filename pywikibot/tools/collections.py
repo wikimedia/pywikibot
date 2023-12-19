@@ -305,7 +305,8 @@ class RateLimit(NamedTuple):
     <pywikibot.site._apisite.APISite.ratelimit>`.
 
     .. note:: :meth:`delay` and :meth:`ratio` properties cannot be
-       sliced or used with tuple indices. The must be used as attributes.
+       sliced or used with tuple indices. They must be used as
+       attributes.
 
     >>> limit = RateLimit('user', 500, 10)
     >>> limit

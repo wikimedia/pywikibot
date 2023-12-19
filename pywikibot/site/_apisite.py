@@ -572,11 +572,11 @@ class APISite(
         >>> limit.delay, limit.ratio  # doctest: +SKIP
         (0.0, inf)
 
-        .. seealso:: :class:`tools.collections.RateLimit` for RateLimit
-           examples.
         .. note:: It is not verified whether ``action`` parameter has a
            valid value.
-        .. seealso:: :api:`Ratelimit`
+        .. seealso::
+           - :class:`tools.collections.RateLimit` for RateLimit examples.
+           - :api:`Ratelimit`
         .. versionadded:: 9.0
 
         :param action: action which might be limited
