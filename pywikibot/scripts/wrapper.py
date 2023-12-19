@@ -433,6 +433,11 @@ def execute():
     """
     global filename
 
+    # If -nolog options are in global args, add them to
+    # script args.
+    if '-nolog' in global_args:
+        script_args.append('-nolog')
+
     if global_args:  # don't use sys.argv
         unknown_args = pwb.handle_args(global_args)
         if unknown_args:  # pragma: no cover
