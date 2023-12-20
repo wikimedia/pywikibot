@@ -66,6 +66,7 @@ install:
   - python -c "import platform; print(platform.machine())"
   - python -c "import struct; print('PYTHON_ARCH:', struct.calcsize('P') << 3)"
   - pip --version
+  - if [%PYTHON_VERSION%]==[3.7.0] pip install "urllib3<2.0"
   - if [%PYTHON_ARCH%]==[32] pip install "Pillow >= 8.1.2, < 10.0.0"
   - pip install -r requirements.txt
   - pip install -r dev-requirements.txt
