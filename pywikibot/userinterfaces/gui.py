@@ -5,10 +5,10 @@ Useful for editing the contents of an article.
 .. note:: idlelib, tkinter and pillow modules are required.
 
 .. warning::
-   With Pillow 10 no wheels for 32-bit Python on Windows are supported.
-   This was made for Python 3.12 compatibility. Either you have to
-   update your Python using a 64-bit version or you have to
-   :command:`pip install "pillow < 10.0.0"`.
+   With Pillow 10.0, 10.1 no wheels for 32-bit Python on Windows are
+   supported. Pillow 10.2 supports it again. Either you have to update
+   your Python using a 64-bit version or you have to
+   :command:`pip install "pillow>8.1.1,!=10.0,!=10.1"`.
 
 .. seealso:: :mod:`editor`
 """
