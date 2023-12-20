@@ -18,6 +18,7 @@ XmlEntry objects which can be used by other bots.
 from __future__ import annotations
 
 import re
+from typing import Optional, Union
 
 
 try:
@@ -25,8 +26,11 @@ try:
 except ImportError:
     from xml.etree.ElementTree import iterparse, ParseError
 
-from pywikibot.backports import Callable
-from pywikibot.tools import open_archive
+from pywikibot.backports import Callable, Type
+from pywikibot.tools import (
+    issue_deprecation_warning,
+    open_archive,
+)
 
 
 def parseRestrictions(restrictions):
@@ -86,12 +90,15 @@ class XmlDump:
        the `on_error` parameter
     .. versionchanged:: 7.2
        `allrevisions` parameter must be given as keyword parameter
+    .. versionchanged:: 9.0
+        `allrevisions` parameter deprecated due to :phab:`T340804`
+        `revisions` parameter introduced as replacement
 
     Usage example:
 
     >>> from pywikibot import xmlreader
     >>> name = 'tests/data/xml/article-pear.xml'
-    >>> dump = xmlreader.XmlDump(name, allrevisions=True)
+    >>> dump = xmlreader.XmlDump(name, revisions='all')
     >>> for elem in dump.parse():
     ...     print(elem.title, elem.revisionid)
     ...
@@ -108,22 +115,50 @@ class XmlDump:
     :param on_error: a callable which is invoked within :meth:`parse`
         method when a ParseError occurs. The exception is passed to this
         callable. Otherwise the exception is raised.
+    :param revisions: which of four methods to use to parse the dump:
+        * `first_found` (whichever revision is the first element)
+        * `latest` (most recent revision, by largest `revisionid`)
+        * `earliest` (first revision, by smallest `revisionid`)
+        * `all` (all revisions for each page)
+        Default: `first_found`
     """
 
-    def __init__(
-        self,
-        filename,
-        *,
-        allrevisions: bool = False,
-        on_error: Callable[[type[BaseException]], None] | None = None,
-    ) -> None:
+    def __init__(self, filename, *,
+                 allrevisions: Union[bool, str] = None,
+                 # when allrevisions removed, revisions can default to 'latest'
+                 revisions: str = 'first_found',
+                 on_error: Optional[
+                     Callable[[Type[BaseException]], None]] = None) -> None:
         """Initializer."""
         self.filename = filename
         self.on_error = on_error
+
+        self.rev_actions = {
+            'first_found': self._parse_only_first_found,
+            'latest': self._parse_only_latest,
+            'earliest': self._parse_only_earliest,
+            'all': self._parse_all,
+        }
+
         if allrevisions:
-            self._parse = self._parse_all
-        else:
-            self._parse = self._parse_only_latest
+            issue_deprecation_warning(
+                'allrevisions=True',
+                "revisions='all'",
+                since='9.0.0')
+            revisions = 'all'
+        elif revisions == 'first_found':
+            issue_deprecation_warning(
+                'allrevisions=False returns first revision found,'
+                " usually earliest. For most recent, use revisions='latest'. "
+                "For oldest, use revisions='earliest',"
+                "'allrevisions'",
+                since='9.0.0')
+
+        if revisions not in self.rev_actions:
+            actions = str(list(self.rev_actions.keys())).strip('[]')
+            raise ValueError(f"'revisions' must be one of {actions}.")
+
+        self._parse = self.rev_actions.get(revisions)
 
     def parse(self):
         """Generator using ElementTree iterparse function.
@@ -154,44 +189,81 @@ class XmlDump:
                     continue
                 yield from self._parse(event, elem)
 
+    def _parse_only_first_found(self, event, elem):
+        """
+        Deprecated parser that yields the first revision found.
+
+        Documentation had wrongly indicated it returned the latest revision.
+        :phab: `T340804`
+        """
+        if event == 'end' and elem.tag == f'{{{self.uri}}}page':
+            self._headers(elem)
+            revision = elem.find(f'{{{self.uri}}}revision')
+            yield self._create_revision(revision)
+            elem.clear()
+            self.root.clear()
+
     def _parse_only_latest(self, event, elem):
         """Parser that yields only the latest revision."""
-        if event == 'end' and elem.tag == '{%s}page' % self.uri:
+        if event == 'end' and elem.tag == f'{{{self.uri}}}page':
             self._headers(elem)
-            revision = elem.find('{%s}revision' % self.uri)
-            yield self._create_revision(revision)
+            latest_revision = None
+            latest_revisionid = 0
+            for revision in elem.findall(f'{{{self.uri}}}revision'):
+                revisionid = int(revision.findtext(f'{{{self.uri}}}id'))
+                if latest_revision is None or revisionid > latest_revisionid:
+                    latest_revision = revision
+                    latest_revisionid = revisionid
+            if latest_revision is not None:
+                yield self._create_revision(latest_revision)
+            elem.clear()
+            self.root.clear()
+
+    def _parse_only_earliest(self, event, elem):
+        """Parser that yields only the earliest revision."""
+        if event == 'end' and elem.tag == f'{{{self.uri}}}page':
+            self._headers(elem)
+            earliest_revision = None
+            earliest_revisionid = float('inf')  # Initialize positive infinity
+            for revision in elem.findall(f'{{{self.uri}}}revision'):
+                revisionid = int(revision.findtext(f'{{{self.uri}}}id'))
+                if revisionid < earliest_revisionid:
+                    earliest_revisionid = revisionid
+                    earliest_revision = revision
+            if earliest_revision is not None:
+                yield self._create_revision(earliest_revision)
             elem.clear()
             self.root.clear()
 
     def _parse_all(self, event, elem):
         """Parser that yields all revisions."""
-        if event == 'start' and elem.tag == '{%s}page' % self.uri:
+        if event == 'start' and elem.tag == f'{{{self.uri}}}page':
             self._headers(elem)
-        if event == 'end' and elem.tag == '{%s}revision' % self.uri:
+        if event == 'end' and elem.tag == f'{{{self.uri}}}revision':
             yield self._create_revision(elem)
             elem.clear()
             self.root.clear()
 
     def _headers(self, elem) -> None:
         """Extract headers from XML chunk."""
-        self.title = elem.findtext('{%s}title' % self.uri)
-        self.ns = elem.findtext('{%s}ns' % self.uri)
-        self.pageid = elem.findtext('{%s}id' % self.uri)
-        self.restrictions = elem.findtext('{%s}restrictions' % self.uri)
-        self.isredirect = elem.findtext('{%s}redirect' % self.uri) is not None
+        self.title = elem.findtext(f'{{{self.uri}}}title')
+        self.ns = elem.findtext(f'{{{self.uri}}}ns')
+        self.pageid = elem.findtext(f'{{{self.uri}}}id')
+        self.restrictions = elem.findtext(f'{{{self.uri}}}restrictions')
+        self.isredirect = elem.findtext(f'{{{self.uri}}}redirect') is not None
         self.editRestriction, self.moveRestriction = parseRestrictions(
             self.restrictions)
 
     def _create_revision(self, revision):
-        """Create a Single revision."""
-        revisionid = revision.findtext('{%s}id' % self.uri)
-        timestamp = revision.findtext('{%s}timestamp' % self.uri)
-        comment = revision.findtext('{%s}comment' % self.uri)
-        contributor = revision.find('{%s}contributor' % self.uri)
-        ipeditor = contributor.findtext('{%s}ip' % self.uri)
-        username = ipeditor or contributor.findtext('{%s}username' % self.uri)
+        """Create a single revision."""
+        revisionid = revision.findtext(f'{{{self.uri}}}id')
+        timestamp = revision.findtext(f'{{{self.uri}}}timestamp')
+        comment = revision.findtext(f'{{{self.uri}}}comment')
+        contributor = revision.find(f'{{{self.uri}}}contributor')
+        ipeditor = contributor.findtext(f'{{{self.uri}}}ip')
+        username = ipeditor or contributor.findtext(f'{{{self.uri}}}username')
         # could get comment, minor as well
-        text = revision.findtext('{%s}text' % self.uri)
+        text = revision.findtext(f'{{{self.uri}}}text')
         return XmlEntry(title=self.title,
                         ns=self.ns,
                         id=self.pageid,
