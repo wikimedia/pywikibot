@@ -519,6 +519,19 @@ class WbTime(WbRepresentation):
             return self._getSecondsAdjusted() >= other._getSecondsAdjusted()
         return NotImplemented
 
+    def equal_instant(self, other: WbTime) -> bool:
+        """Checks if the two times represent the same instant in time.
+
+        This is different from the equality operator, which will return false
+        for two times that are the same number of UTC seconds, but with
+        different timezone information.
+
+        For example, a time with at 10:00 UTC-5 would return false if checked
+        with == with a time at 15:00 UTC, but would return true with
+        this method.
+        """
+        return self._getSecondsAdjusted() == other._getSecondsAdjusted()
+
     @classmethod
     def fromTimestr(cls,
                     datetimestr: str,
