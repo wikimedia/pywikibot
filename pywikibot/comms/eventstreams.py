@@ -19,8 +19,6 @@ from __future__ import annotations
 import json
 from functools import partial
 
-from pkg_resources import parse_version
-from requests import __version__ as requests_version
 from requests.packages.urllib3.exceptions import ProtocolError
 from requests.packages.urllib3.util.response import httplib
 
@@ -33,12 +31,6 @@ try:
     from sseclient import SSEClient as EventSource
 except ImportError as e:
     EventSource = e
-
-
-if parse_version(requests_version) < parse_version('2.20.1'):
-    raise ImportError(
-        'requests >= 2.20.1 is required for EventStreams;\n'
-        "install it with 'pip install \"requests>=2.20.1\"'\n")
 
 
 class EventStreams(GeneratorWrapper):
@@ -142,8 +134,10 @@ class EventStreams(GeneratorWrapper):
            parameter.
         """
         if isinstance(EventSource, Exception):
-            raise ImportError('sseclient is required for EventStreams;\n'
-                              'install it with "pip install sseclient"\n')
+            raise ImportError(
+                'sseclient is required for EventStreams;\n'
+                'install it with "pip install sseclient==0.0.22"\n'
+            )
         self.filter = {'all': [], 'any': [], 'none': []}
         self._total = None
         self._canary = kwargs.pop('canary', False)
