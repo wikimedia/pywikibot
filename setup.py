@@ -44,7 +44,7 @@ extra_deps = {
     'Google': ['google>=1.7'],
     'memento': ['memento_client==0.6.1'],
     'wikitextparser': ['wikitextparser>=0.47.0'],
-    'mysql': ['PyMySQL >= 0.9.3'],  # toolforge
+    'mysql': ['PyMySQL >= 1.0.0'],
     # vulnerability found in Pillow<8.1.2 but toolforge uses 5.4.1
     'Tkinter': ['Pillow>=8.1.2, != 10.0, != 10.1'],
     'mwoauth': ['mwoauth!=0.3.1,>=0.2.4'],

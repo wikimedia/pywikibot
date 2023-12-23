@@ -47,8 +47,7 @@ google >= 1.7
 sseclient >= 0.0.18,< 0.0.23
 
 # The mysql generator in pagegenerators depends on PyMySQL
-# toolforge uses 0.9.3
-PyMySQL >= 0.9.3
+PyMySQL >= 1.0.0
 
 # core HTML comparison parser in diff module
 beautifulsoup4>=4.7.1
