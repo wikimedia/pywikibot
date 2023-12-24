@@ -3,7 +3,7 @@
 .. versionadded:: 3.0
 """
 #
-# (C) Pywikibot team, 2017-2021
+# (C) Pywikibot team, 2017-2023
 #
 # Distributed under the terms of the MIT license.
 #
