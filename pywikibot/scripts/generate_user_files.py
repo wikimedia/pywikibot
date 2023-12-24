@@ -18,9 +18,9 @@ import codecs
 import os
 import re
 import sys
-from collections import namedtuple
 from pathlib import Path
 from textwrap import fill
+from typing import NamedTuple
 
 from pywikibot.backports import Callable
 from pywikibot.scripts import _import_with_no_user_config
@@ -228,7 +228,10 @@ PASSFILE_CONFIG = """\
 {botpasswords}"""
 
 
-ConfigSection = namedtuple('ConfigSection', 'head, info, section')
+class _ConfigSection(NamedTuple):
+    head: str
+    info: str
+    section: str
 
 
 def parse_sections() -> list:
@@ -237,7 +240,7 @@ def parse_sections() -> list:
     config.py will be in the pywikibot/ directory whereas
     generate_user_files script is in pywikibot/scripts.
 
-    :return: a list of ConfigSection named tuples.
+    :return: a list of _ConfigSection named tuples.
     """
     data = []
 
@@ -255,7 +258,7 @@ def parse_sections() -> list:
 
     for section, head, comment in result:
         info = ' '.join(text.strip('# ') for text in comment.splitlines())
-        data.append(ConfigSection(head, info, section))
+        data.append(_ConfigSection(head, info, section))
     return data
 
 
@@ -290,7 +293,7 @@ def copy_sections(force: bool = False, default: str = 'n') -> str:
 
 
 def input_sections(variant: str,
-                   sections: list[ConfigSection],
+                   sections: list[_ConfigSection],
                    skip: Callable | None = None,
                    force: bool = False,
                    default: str = 'n') -> None:
@@ -339,10 +342,16 @@ def input_sections(variant: str,
     return copies
 
 
+class _UserItem(NamedTuple):
+    family: str
+    code: str
+    name: str
+
+
 def create_user_config(
-    main_family,
-    main_code,
-    main_username,
+    main_family: str,
+    main_code: str,
+    main_username: str,
     force: bool = False
 ):
     """
@@ -353,14 +362,13 @@ def create_user_config(
     _fnc = os.path.join(base_dir, USER_BASENAME)
     _fncpass = os.path.join(base_dir, PASS_BASENAME)
 
-    useritem = namedtuple('useritem', 'family, code, name')
     userlist = []
     if force and not config.verbose_output:
         if main_username:
-            userlist = [useritem(main_family, main_code, main_username)]
+            userlist = [_UserItem(main_family, main_code, main_username)]
     else:
         while True:
-            userlist += [useritem(*get_site_and_lang(
+            userlist += [_UserItem(*get_site_and_lang(
                 main_family, main_code, main_username, force=force))]
             if not pywikibot.input_yn('Do you want to add any other projects?',
                                       force=force,

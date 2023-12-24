@@ -10,9 +10,10 @@ import itertools
 import math
 import threading
 import time
-from collections import Counter, namedtuple
+from collections import Counter
 from contextlib import suppress
 from hashlib import blake2b
+from typing import NamedTuple
 
 import pywikibot
 from pywikibot import config
@@ -21,7 +22,6 @@ from pywikibot.tools import deprecated
 
 
 FORMAT_LINE = '{module_id} {pid} {time} {site}\n'
-ProcEntry = namedtuple('ProcEntry', ['module_id', 'pid', 'time', 'site'])
 
 pid: bool | int = False
 """global process identifier
@@ -30,6 +30,15 @@ When the first Throttle is instantiated, it will set this variable to a
 positive integer, which will apply to all throttle objects created by
 this process.
 """
+
+
+class ProcEntry(NamedTuple):
+    """ProcEntry namedtuple."""
+
+    module_id: str
+    pid: int
+    time: int
+    site: str
 
 
 class Throttle:

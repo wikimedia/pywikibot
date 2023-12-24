@@ -52,8 +52,8 @@ from __future__ import annotations
 
 import re
 import webbrowser
-from collections import namedtuple
 from itertools import chain
+from typing import NamedTuple
 
 import pywikibot
 from pywikibot import i18n, pagegenerators
@@ -169,7 +169,12 @@ category_to_check = {
 project_inserted = ['ar', 'cs', 'fr', 'it', 'ja', 'pt', 'sr', 'ur', 'zh']
 
 # END PREFERENCES
-ParsedTemplate = namedtuple('ParsedTemplate', 'blocktype, regex, msgtype')
+
+
+class _ParsedTemplate(NamedTuple):
+    blocktype: str
+    regex: str
+    msgtype: str
 
 
 class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
@@ -260,25 +265,25 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                 for catch_regex in template:
                     result_catch = re.findall(catch_regex, text)
                     if result_catch:
-                        return ParsedTemplate(
+                        return _ParsedTemplate(
                             results[index], catch_regex, 'modifying')
 
             if tsmp and ttmp and ttp != ttmp and tsp != tsmp:
                 for catch_regex in ttmp:
                     result_catch = re.findall(catch_regex, text)
                     if result_catch:
-                        return ParsedTemplate(
+                        return _ParsedTemplate(
                             'sysop-move', catch_regex, 'modifying')
 
                 for catch_regex in tsmp:
                     result_catch = re.findall(catch_regex, text)
                     if result_catch:
-                        return ParsedTemplate(
+                        return _ParsedTemplate(
                             'autoconfirmed-move', catch_regex, 'modifying')
 
             # If editable means that we have no regex, won't change anything
             # with this regex
-            return ParsedTemplate('editable', r'\A', 'adding')
+            return _ParsedTemplate('editable', r'\A', 'adding')
 
         tsp = i18n.translate(self.site, template_semi_protection)
         ttp = i18n.translate(self.site, template_total_protection)
