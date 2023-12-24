@@ -86,9 +86,3 @@ Will be removed in Pywikibot 10
 * 7.0.0: baserevid parameter of editSource(), editQualifier(), removeClaims(), removeSources(), remove_qualifiers() DataSite methods will be removed
 * 7.0.0: Values of APISite.allpages() parameter filterredir other than True, False and None are deprecated
 * 7.0.0: The i18n identifier 'cosmetic_changes-append' will be removed in favour of 'pywikibot-cosmetic-changes'
-
-Will be removed in Pywikibot 9
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-* 6.2.0: Error messages with '%' style is deprecated in favour for str.format() style
-* 6.0.0: config.register_family_file() is deprecated

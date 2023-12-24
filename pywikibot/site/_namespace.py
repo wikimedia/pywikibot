@@ -12,7 +12,7 @@ from enum import IntEnum
 from typing import Union
 
 from pywikibot.backports import Iterable as IterableType
-from pywikibot.tools import ComparableMixin, SelfCallMixin, classproperty
+from pywikibot.tools import ComparableMixin, classproperty
 
 
 NamespaceIDType = Union[int, str, 'Namespace']
@@ -323,7 +323,7 @@ class Namespace(Iterable, ComparableMixin, metaclass=MetaNamespace):
         return False
 
 
-class NamespacesDict(Mapping, SelfCallMixin):
+class NamespacesDict(Mapping):
 
     """
     An immutable dictionary containing the Namespace instances.
