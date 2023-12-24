@@ -1,6 +1,6 @@
 """Fixes implementation which overwrites the variable."""
 #
-# (C) Pywikibot team, 2015-2020
+# (C) Pywikibot team, 2015-2023
 #
 # Distributed under the terms of the MIT license.
 #

@@ -1,6 +1,6 @@
 """Family module for Meta Wiki."""
 #
-# (C) Pywikibot team, 2005-2020
+# (C) Pywikibot team, 2005-2023
 #
 # Distributed under the terms of the MIT license.
 #
