@@ -87,7 +87,9 @@ extra_deps.update({'scripts': [i for k, v in script_deps.items() for i in v]})
 # ------- setup install_requires ------- #
 # packages which are mandatory
 dependencies = [
+    'importlib_metadata ; python_version < "3.8"',
     'mwparserfromhell>=0.5.2',
+    'packaging',
     'requests>=2.21.0',
     # PEP 440
     'setuptools>=48.0.0 ; python_version >= "3.10"',
@@ -129,7 +131,6 @@ def get_validated_version() -> str:
     and is not a developmental release.
 
     :return: pywikibot module version string
-    :rtype: str
     """
     version = metadata.__version__
     if 'sdist' not in sys.argv:
@@ -139,7 +140,8 @@ def get_validated_version() -> str:
     from contextlib import suppress
     from subprocess import PIPE, run
 
-    from pkg_resources import parse_version, safe_version
+    from packaging.version import InvalidVersion, Version
+
     try:
         tags = run(['git', 'tag'], check=True, stdout=PIPE,
                    universal_newlines=True).stdout.splitlines()
@@ -155,24 +157,21 @@ def get_validated_version() -> str:
 
         last_tag = tags[-1]
 
-    warnings = []
-    if parse_version(version) < parse_version('0'):  # pragma: no cover
-        # any version which is not a valid PEP 440 version will be considered
-        # less than any valid PEP 440 version
-        warnings.append(
-            version + ' is not a valid version string following PEP 440.')
-    elif safe_version(version) != version:  # pragma: no cover
-        warnings.append(f'{version} does not follow PEP 440. Use '
-                        f'{safe_version(version)} as version string instead.')
+    warning = ''
+    try:
+        vrsn = Version(version)
+    except InvalidVersion:  # pragma: no cover
+        warning = f'{version} is not a valid version string following PEP 440.'
+    else:
+        if last_tag and vrsn <= Version(last_tag):
+            warning = (  # pragma: no cover
+                f'New version {version!r} is not higher than last version '
+                f'{last_tag!r}.'
+            )
 
-    if last_tag and parse_version(version) <= parse_version(last_tag):
-        warnings.append(  # pragma: no cover
-            f'New version {version!r} is not higher than last version '
-            f'{last_tag!r}.')
-
-    if warnings:  # pragma: no cover
+    if warning:  # pragma: no cover
         print(__doc__)
-        print('\n\n'.join(warnings))
+        print('\n\n{warning}')
         sys.exit('\nBuild of distribution package canceled.')
 
     return version

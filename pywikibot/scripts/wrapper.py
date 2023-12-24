@@ -44,7 +44,6 @@ for tests to set the default site (see :phab:`T216825`)::
 #
 from __future__ import annotations
 
-#
 import os
 import sys
 import types
@@ -59,7 +58,7 @@ pwb = None
 site_package = False
 
 
-def check_pwb_versions(package):
+def check_pwb_versions(package: str):
     """Validate package version and scripts version.
 
     Rules:
@@ -67,7 +66,8 @@ def check_pwb_versions(package):
         - Scripts version must not be older than previous Pywikibot version
           due to deprecation policy
     """
-    from pywikibot.tools import Version
+    from packaging.version import Version
+
     scripts_version = Version(getattr(package, '__version__', pwb.__version__))
     wikibot_version = Version(pwb.__version__)
 
@@ -218,19 +218,18 @@ def _print_requirements(requirements, script, variant):  # pragma: no cover
         print(f"    pip install \"{str(requirement).partition(';')[0]}\"\n")
 
 
-def check_modules(script=None):
+def check_modules(script: str | None = None) -> bool:
     """Check whether mandatory modules are present.
 
     This also checks Python version when importing dependencies from setup.py
 
     :param script: The script name to be checked for dependencies
-    :type script: str or None
     :return: True if all dependencies are installed
-    :rtype: bool
     :raise RuntimeError: wrong Python version found in setup.py
     """
-    import pkg_resources
+    from packaging.requirements import Requirement
 
+    from pywikibot.backports import importlib_metadata
     from setup import script_deps
 
     missing_requirements = []
@@ -240,35 +239,25 @@ def check_modules(script=None):
         dependencies = script_deps.get(Path(script).name, [])
     else:
         from setup import dependencies
-        try:
-            next(pkg_resources.parse_requirements(dependencies))
-        except ValueError as e:  # pragma: no cover
-            # T286980: setuptools is too old and requirement parsing fails
-            import setuptools
-            setupversion = tuple(int(num)
-                                 for num in setuptools.__version__.split('.'))
-            if setupversion < (20, 8, 1):
-                # print the minimal requirement
-                _print_requirements(
-                    ['setuptools>=20.8.1'], None,
-                    f'outdated ({setuptools.__version__})')
-                return False
-            raise e
 
-    for requirement in pkg_resources.parse_requirements(dependencies):
-        if requirement.marker is None \
-           or pkg_resources.evaluate_marker(str(requirement.marker)):
+    for dependency in dependencies:
+        requirement = Requirement(dependency)
+        if requirement.marker is None or requirement.marker.evaluate():
             try:
-                pkg_resources.resource_exists(requirement, requirement.name)
-            except pkg_resources.DistributionNotFound as e:
+                instlld_vrsn = importlib_metadata.version(requirement.name)
+            except importlib_metadata.PackageNotFoundError as e:
                 missing_requirements.append(requirement)
                 print(e)
-            except pkg_resources.VersionConflict as e:
-                version_conflicts.append(requirement)
-                print(e)
+            else:
+                if instlld_vrsn not in requirement.specifier:
+                    version_conflicts.append(requirement)
+                    print(
+                        f'{requirement.name} version {instlld_vrsn} is '
+                        f'installed but {requirement.specifier} is required'
+                    )
 
-    del pkg_resources
-    del dependencies
+    del Requirement
+    del importlib_metadata
     del script_deps
 
     _print_requirements(missing_requirements, script, 'missing')
