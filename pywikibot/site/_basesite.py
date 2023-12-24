@@ -24,7 +24,6 @@ from pywikibot.site._namespace import Namespace, NamespacesDict
 from pywikibot.throttle import Throttle
 from pywikibot.tools import (
     ComparableMixin,
-    SelfCallString,
     cached,
     deprecated,
     first_upper,
@@ -216,7 +215,7 @@ class BaseSite(ComparableMixin):
     @property
     def sitename(self):
         """String representing this Site's name and code."""
-        return SelfCallString(self.__str__())
+        return self.__str__()
 
     def __repr__(self) -> str:
         """Return internal representation."""

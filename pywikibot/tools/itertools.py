@@ -122,15 +122,12 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
        ``genlist`` was renamed to ``iterables``; consecutive iterables
        are to be used as iterables parameters or '*' to unpack a list
 
-    .. deprecated:: 6.4
-       ``allow_duplicates`` as positional argument,
-       ``iterables`` as list or tuple type
-
     .. versionchanged:: 7.0
        Reimplemented without threads which is up to 10'000 times faster
 
     .. versionchanged:: 9.0
        Iterable elements may consist of lists or tuples
+       ``allow_duplicates`` is a keyword-only argument
 
     :param iterables: page generators
     :param allow_duplicates: optional keyword argument to allow duplicates

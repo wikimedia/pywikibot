@@ -11,7 +11,6 @@ from contextlib import suppress
 
 import pywikibot
 from pywikibot.exceptions import Error
-from pywikibot.tools import suppress_warnings
 from tests.aspects import DefaultSiteTestCase, TestCase, unittest
 
 
@@ -92,12 +91,6 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertEqual(mysite.sitename, f'{self.family}:{code}')
         self.assertIsInstance(mysite.linktrail(), str)
         self.assertIsInstance(mysite.redirect(), str)
-
-        # sitename attribute could also be referenced like a function
-
-        with suppress_warnings(WARN_SELF_CALL, category=FutureWarning):
-            self.assertEqual(mysite.sitename(), '{}:{}'
-                                                .format(self.family, code))
 
         try:
             dabcat = mysite.disambcategory()

@@ -26,7 +26,6 @@ from pywikibot.exceptions import (
 )
 from tests.aspects import (
     AlteredDefaultSiteTestCase,
-    DefaultDrySiteTestCase,
     DefaultSiteTestCase,
     DeprecationTestCase,
     TestCase,
@@ -53,20 +52,6 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase,
         for page in self.site.allpages(filterredir='', total=1):
             self.assertFalse(page.isRedirectPage())
         self.assertOneDeprecation()
-
-
-class TestSiteDryDeprecatedFunctions(DefaultDrySiteTestCase,
-                                     DeprecationTestCase):
-
-    """Test cases for Site deprecated methods without a user."""
-
-    def test_namespaces_callable(self):
-        """Test that namespaces is callable and returns itself."""
-        site = self.get_site()
-        self.assertIs(site.namespaces(), site.namespaces)
-        self.assertOneDeprecationParts(
-            'Referencing this attribute like a function',
-            'it directly')
 
 
 class TestSiteObject(DefaultSiteTestCase):

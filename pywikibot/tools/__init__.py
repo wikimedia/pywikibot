@@ -91,9 +91,6 @@ __all__ = (
     'normalize_username',
     'Version',
     'MediaWikiVersion',
-    'SelfCallMixin',
-    'SelfCallDict',
-    'SelfCallString',
     'open_archive',
     'merge_unique_dicts',
     'file_mode_checker',
@@ -545,44 +542,6 @@ class MediaWikiVersion:
         if self.version != other.version:
             return self.version < other.version
         return self._dev_version < other._dev_version
-
-
-class SelfCallMixin:
-
-    """
-    Return self when called.
-
-    When '_own_desc' is defined it'll also issue a deprecation warning
-    using issue_deprecation_warning('Calling ' + _own_desc, 'it directly').
-
-    .. versionadded:: 3.0
-    .. deprecated:: 6.2
-    """
-
-    def __call__(self):
-        """Do nothing and just return itself."""
-        issue_deprecation_warning('Referencing this attribute like a function',
-                                  'it directly', since='6.2')
-
-        return self
-
-
-class SelfCallDict(SelfCallMixin, dict):
-
-    """Dict with SelfCallMixin.
-
-    .. versionadded:: 3.0
-    .. deprecated:: 6.2
-    """
-
-
-class SelfCallString(SelfCallMixin, str):
-
-    """String with SelfCallMixin.
-
-    .. versionadded:: 3.0
-    .. deprecated:: 6.2
-    """
 
 
 def open_archive(filename: str, mode: str = 'rb', use_extension: bool = True):

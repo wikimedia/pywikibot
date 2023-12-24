@@ -65,7 +65,6 @@ from pywikibot.backports import (
     removesuffix,
 )
 from pywikibot.logging import error, info, warning
-from pywikibot.tools import deprecated
 
 
 _DabComDict = DefaultDict[str, Dict[str, str]]
@@ -421,16 +420,6 @@ for arg in sys.argv[1:]:
         info('The user config file is ' + user_config_file)
         break
 family_files = {}
-
-
-@deprecated('family_files[family_name] = file_path', since='6.0.0')
-def register_family_file(family_name: str, file_path: str) -> None:
-    """Register a single family class file.
-
-    Parameter file_path may be a path or an url.
-    family.AutoFamily function is used when the url is given.
-    """
-    family_files[family_name] = file_path
 
 
 def register_families_folder(folder_path: str,

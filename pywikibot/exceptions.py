@@ -180,7 +180,7 @@ import re
 from typing import Any
 
 import pywikibot
-from pywikibot.tools import ModuleDeprecationWrapper, issue_deprecation_warning
+from pywikibot.tools import ModuleDeprecationWrapper
 from pywikibot.tools._deprecate import _NotImplementedWarning
 
 
@@ -310,13 +310,6 @@ class PageRelatedError(Error):
 
         if re.search(r'\{\w+\}', self.message):
             msg = self.message.format_map(self.__dict__)
-        elif re.search(r'%\(\w+\)s', self.message):
-            issue_deprecation_warning("'%' style messages are deprecated, "
-                                      'please use str.format() style instead',
-                                      since='6.2.0')
-            msg = self.message % self.__dict__
-        elif '%s' in self.message:
-            msg = self.message % page
         else:
             msg = self.message.format(page)
 
