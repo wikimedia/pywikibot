@@ -36,6 +36,7 @@ Breaking changes and code cleanups
 Deprecations
 ------------
 
+* 9.0.0: ``pywikibot.version.get_toolforge_hostname()`` is deprecated without replacement
 * 9.0.0: ``iteritems`` method of :class:`data.api.Request` will be removed in favour of ``items``
 * 9.0.0: ``SequenceOutputter.output()`` is deprecated in favour of :attr:`tools.formatter.SequenceOutputter.out` property
 * 9.0.0: *nullcontext* context manager and *SimpleQueue* queue of :mod:`backports` are derecated

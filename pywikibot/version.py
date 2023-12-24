@@ -26,16 +26,19 @@ from pywikibot import config
 from pywikibot.backports import cache
 from pywikibot.comms.http import fetch
 from pywikibot.exceptions import VersionParseError
+from pywikibot.tools import deprecated
 
 
 def _get_program_dir() -> str:
     return os.path.normpath(os.path.split(os.path.dirname(__file__))[0])
 
 
+@deprecated(since='9.0.0')
 def get_toolforge_hostname() -> str | None:
     """Get hostname of the current Toolforge host.
 
     .. versionadded:: 3.0
+    .. deprecated:: 9.0
 
     :return: The hostname of the currently running host,
              if it is in Wikimedia Toolforge; otherwise return None.

@@ -16,7 +16,7 @@ import os
 import sys
 
 import pywikibot
-from pywikibot.version import get_toolforge_hostname, getversion
+from pywikibot.version import getversion
 
 
 class DummyModule:
@@ -79,10 +79,6 @@ def main(*args: str) -> None:
         pywikibot.info('  Please reinstall requests!')
 
     pywikibot.info('Python: ' + sys.version)
-
-    toolforge_env_hostname = get_toolforge_hostname()
-    if toolforge_env_hostname:
-        pywikibot.info('Toolforge hostname: ' + toolforge_env_hostname)
 
     # check environment settings
     settings = {key for key in os.environ if key.startswith('PYWIKIBOT')}
