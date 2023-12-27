@@ -44,7 +44,10 @@ fillcolor=green] edge[style=dashed penwidth=3]'
 from __future__ import annotations
 
 import argparse
+import glob
+import sys
 from collections import defaultdict
+from pathlib import Path
 
 import pywikibot
 from pywikibot import config
@@ -205,6 +208,23 @@ if __name__ == '__main__':
     local_args = pywikibot.handle_args()
     args, rest = ap.parse_known_args()
 
+    file_path = args.to
+    # If file exists, ask user if ok to overwrite. Otherwise, make
+    # the file, including directories unless it is top level.
+    if glob.glob(file_path + '.*'):
+        choice = pywikibot.input_yn(f'Files exist for {file_path}. Overwrite?',
+                                    'n', automatic_quit=False)
+        if not choice:
+            pywikibot.info('Exiting...')
+            sys.exit(1)
+    else:
+        try:
+            dir_path = Path(file_path)
+            dir_path.parent.mkdir(parents=True, exist_ok=True)
+        # Except ValueError in the event that the directory is top level
+        # and does not contain any slashes.
+        except FileNotFoundError:
+            pass
     if not suggest_help(missing_action='from' not in args):
         import pydot
         bot = CategoryGraphBot(ap, args)
