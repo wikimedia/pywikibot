@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import itertools
 import re
-from collections import OrderedDict, namedtuple
+from collections import OrderedDict
 from collections.abc import Sequence
 from contextlib import suppress
 from html.parser import HTMLParser
@@ -940,7 +940,11 @@ def add_text(text: str, add: str, *, site=None) -> str:
 HEAD_PATTERN = re.compile(r'(={1,6}).+\1', re.DOTALL)
 TITLE_PATTERN = re.compile("'{3}([^']+)'{3}")
 
-_Heading = namedtuple('_Heading', ('text', 'start', 'end'))
+
+class _Heading(NamedTuple):
+    text: str
+    start: int
+    end: int
 
 
 class Section(NamedTuple):
@@ -1947,11 +1951,20 @@ def reformat_ISBNs(text: str, match_func) -> str:
 
 TIMEGROUPS = ('time', 'tzinfo', 'year', 'month', 'day', 'hour', 'minute')
 
-#: Hold precompiled timestamp patterns for :class:`TimeStripper`.
-#: Order of TimeStripperPatterns is important to avoid mismatch when searching.
-#:
-#: .. versionadded:: 8.0
-TimeStripperPatterns = namedtuple('TimeStripperPatterns', TIMEGROUPS[:-2])
+
+class TimeStripperPatterns(NamedTuple):
+    """Hold precompiled timestamp patterns for :class:`TimeStripper`.
+
+    Attribute order is important to avoid mismatch when searching.
+
+    .. versionadded:: 8.0
+    """
+
+    time: Pattern[str]
+    tzinfo: Pattern[str]
+    year: Pattern[str]
+    month: Pattern[str]
+    day: Pattern[str]
 
 
 class TimeStripper:

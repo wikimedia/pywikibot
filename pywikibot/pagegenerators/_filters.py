@@ -8,9 +8,8 @@ from __future__ import annotations
 
 import datetime
 import re
-from collections import namedtuple
 from functools import partial
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, NamedTuple, Union
 
 import pywikibot
 from pywikibot import config
@@ -362,6 +361,12 @@ RegexFilterPageGenerator = RegexFilter.titlefilter
 RegexBodyFilterPageGenerator = RegexFilter.contentfilter
 
 
+class _Edit(NamedTuple):
+    do_edit: datetime.datetime
+    edit_start: datetime.datetime
+    edit_end: datetime.datetime
+
+
 def EdittimeFilterPageGenerator(
     generator: Iterable[pywikibot.page.Page],
     last_edit_start: datetime.datetime | None = None,
@@ -380,9 +385,7 @@ def EdittimeFilterPageGenerator(
     :param first_edit_end: Only yield pages first edited before this time
     :param show_filtered: Output a message for each page not yielded
     """
-    Edit = namedtuple('Edit', ['do_edit', 'edit_start', 'edit_end'])
-
-    def to_be_yielded(edit: Edit,
+    def to_be_yielded(edit: _Edit,
                       page: pywikibot.page.Page,
                       rev: pywikibot.page.Revision,
                       show_filtered: bool) -> bool:
@@ -407,13 +410,13 @@ def EdittimeFilterPageGenerator(
 
         return True
 
-    latest_edit = Edit(last_edit_start or last_edit_end,
-                       last_edit_start or datetime.datetime.min,
-                       last_edit_end or datetime.datetime.max)
+    latest_edit = _Edit(last_edit_start or last_edit_end,
+                        last_edit_start or datetime.datetime.min,
+                        last_edit_end or datetime.datetime.max)
 
-    first_edit = Edit(first_edit_start or first_edit_end,
-                      first_edit_start or datetime.datetime.min,
-                      first_edit_end or datetime.datetime.max)
+    first_edit = _Edit(first_edit_start or first_edit_end,
+                       first_edit_start or datetime.datetime.min,
+                       first_edit_end or datetime.datetime.max)
 
     for page in generator or []:
         yield_for_last = to_be_yielded(latest_edit, page,

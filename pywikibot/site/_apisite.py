@@ -10,10 +10,10 @@ import datetime
 import re
 import time
 import typing
-from collections import OrderedDict, defaultdict, namedtuple
+from collections import OrderedDict, defaultdict
 from contextlib import suppress
 from textwrap import fill
-from typing import TYPE_CHECKING, Any, TypeVar, Union
+from typing import TYPE_CHECKING, Any, NamedTuple, TypeVar, Union
 
 import pywikibot
 from pywikibot import login
@@ -91,6 +91,11 @@ _mw_msg_cache: DefaultDict[str, dict[str, str]] = defaultdict(dict)
 
 _CompType = Union[int, str, 'pywikibot.page.Page', 'pywikibot.page.Revision']
 _RequestWrapperT = TypeVar('_RequestWrapperT', bound='api._RequestWrapper')
+
+
+class _OnErrorExc(NamedTuple):
+    exception: Exception
+    on_new_page: bool | None
 
 
 class APISite(
@@ -2173,8 +2178,6 @@ class APISite(
 
         return False
 
-    OnErrorExc = namedtuple('OnErrorExc', 'exception on_new_page')
-
     # catalog of merge history errors for use in error messages
     _mh_errors = {
         'noapiwrite': 'API editing not enabled on {site} wiki',
@@ -2283,7 +2286,7 @@ class APISite(
             raise Error('mergehistory: unexpected response')
 
     # catalog of move errors for use in error messages
-    _mv_errors: dict[str, str | OnErrorExc] = {
+    _mv_errors: dict[str, str | _OnErrorExc] = {
         'noapiwrite': 'API editing not enabled on {site} wiki',
         'writeapidenied':
             'User {user} is not authorized to edit on {site} wiki',
@@ -2298,13 +2301,13 @@ class APISite(
         'immobilenamespace':
             'Pages in {oldnamespace} namespace cannot be moved on {site} '
             'wiki',
-        'articleexists': OnErrorExc(exception=ArticleExistsConflictError,
-                                    on_new_page=True),
-        # "protectedpage" can happen in both directions.
-        'protectedpage': OnErrorExc(exception=LockedPageError,
-                                    on_new_page=None),
-        'protectedtitle': OnErrorExc(exception=LockedNoPageError,
+        'articleexists': _OnErrorExc(exception=ArticleExistsConflictError,
                                      on_new_page=True),
+        # "protectedpage" can happen in both directions.
+        'protectedpage': _OnErrorExc(exception=LockedPageError,
+                                     on_new_page=None),
+        'protectedtitle': _OnErrorExc(exception=LockedNoPageError,
+                                      on_new_page=True),
         'nonfilenamespace':
             'Cannot move a file to {newnamespace} namespace on {site} '
             'wiki',
