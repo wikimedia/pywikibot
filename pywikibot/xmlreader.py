@@ -18,7 +18,6 @@ XmlEntry objects which can be used by other bots.
 from __future__ import annotations
 
 import re
-from typing import Optional, Union
 
 
 try:
@@ -124,11 +123,11 @@ class XmlDump:
     """
 
     def __init__(self, filename, *,
-                 allrevisions: Union[bool, str] = None,
+                 allrevisions: bool | str = None,
                  # when allrevisions removed, revisions can default to 'latest'
                  revisions: str = 'first_found',
-                 on_error: Optional[
-                     Callable[[Type[BaseException]], None]] = None) -> None:
+                 on_error: None | (
+                     Callable[[Type[BaseException]], None]) = None) -> None:
         """Initializer."""
         self.filename = filename
         self.on_error = on_error
@@ -237,10 +236,10 @@ class XmlDump:
 
     def _parse_all(self, event, elem):
         """Parser that yields all revisions."""
-        if event == 'start' and elem.tag == f'{{{self.uri}}}page':
+        if event == 'end' and elem.tag == f'{{{self.uri}}}page':
             self._headers(elem)
-        if event == 'end' and elem.tag == f'{{{self.uri}}}revision':
-            yield self._create_revision(elem)
+            for revision in elem.findall(f'{{{self.uri}}}revision'):
+                yield self._create_revision(revision)
             elem.clear()
             self.root.clear()
 
