@@ -24,7 +24,7 @@ from pywikibot.backports import Sequence
 
 
 try:
-    from pywikibot.userinterfaces import gui  # noqa
+    from pywikibot.userinterfaces import gui  # noqa: F401
     GUI_ERROR = None
 except ImportError as e:
     GUI_ERROR = e
