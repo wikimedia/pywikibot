@@ -17,12 +17,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import Timestamp, config, date, i18n, textlib, tools
-from pywikibot.backports import (
-    Generator,
-    Iterable,
-    Iterator,
-    List,
-)
+from pywikibot.backports import Generator, Iterable, Iterator
 from pywikibot.cosmetic_changes import CANCEL, CosmeticChangesToolkit
 from pywikibot.exceptions import (
     Error,
@@ -1947,7 +1942,7 @@ class BasePage(ComparableMixin):
         timestamp,
         content: bool = False,
         **kwargs
-    ) -> List:
+    ) -> list:
         """
         Return a particular deleted revision by timestamp.
 

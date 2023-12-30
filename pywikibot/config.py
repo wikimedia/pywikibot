@@ -52,14 +52,13 @@ from locale import getlocale
 from os import environ, getenv
 from pathlib import Path
 from textwrap import fill
-from typing import TypeVar
+from typing import TYPE_CHECKING, TypeVar
 from warnings import warn
 from zipfile import ZipFile, is_zipfile
 
 from pywikibot.__metadata__ import __version__ as pwb_version
 from pywikibot.backports import (
     DefaultDict,
-    Dict,
     Mapping,
     removeprefix,
     removesuffix,
@@ -67,7 +66,9 @@ from pywikibot.backports import (
 from pywikibot.logging import error, info, warning
 
 
-_DabComDict = DefaultDict[str, Dict[str, str]]
+if TYPE_CHECKING:
+    _DabComDict = DefaultDict[str, dict[str, str]]
+
 _ValueType = TypeVar('_ValueType')
 
 

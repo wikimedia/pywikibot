@@ -4,6 +4,8 @@
 # (C) Pywikibot team, 2015-2023
 #
 # Distributed under the terms of the MIT license.
+from __future__ import annotations
+
 import unicodedata
 import unittest
 from contextlib import suppress

@@ -3,6 +3,9 @@
 This file exists to help pkgutil find the i18n data. There is no actual
 python code in this package.
 """
+from __future__ import annotations
+
+
 #
 # (C) Pywikibot team, 2011-2022
 #

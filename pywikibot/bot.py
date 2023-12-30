@@ -108,19 +108,12 @@ from functools import wraps
 from importlib import import_module
 from pathlib import Path
 from textwrap import fill
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Any
 from warnings import warn
 
 import pywikibot
 from pywikibot import config, daemonize, i18n, version
-from pywikibot.backports import (
-    Callable,
-    Dict,
-    Iterable,
-    Mapping,
-    Sequence,
-    Tuple,
-)
+from pywikibot.backports import Callable, Dict, Iterable, Mapping, Sequence
 from pywikibot.bot_choice import (
     AlwaysChoice,
     Choice,
@@ -182,8 +175,7 @@ if TYPE_CHECKING:
     from pywikibot.page import Link, Page
     from pywikibot.site import BaseSite
 
-
-AnswerType = Union[Iterable[Union[Tuple[str, str], Option]], Option]
+    AnswerType = Iterable[tuple[str, str] | Option] | Option
 
 _GLOBAL_HELP = """
 GLOBAL OPTIONS
@@ -701,14 +693,13 @@ class InteractiveReplace:
         self._default = default
         self._quit = automatic_quit
 
-        current_match_type = Optional[tuple[  # skipcq: PYL-W0612
+        self._current_match: tuple[
             Link | Page,
             str,
             Mapping[str, str],
             tuple[int, int]
-        ]]
+        ] | None = None
 
-        self._current_match: current_match_type = None
         self.context = 30
         self.context_delta = 0
         self.allow_skip_link = True

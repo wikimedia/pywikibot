@@ -19,10 +19,10 @@ These parameters are supported to specify which pages titles to print:
 #
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pywikibot
-from pywikibot.backports import Callable, Dict, Iterable, Iterator, List
+from pywikibot.backports import Callable, Iterable, Iterator
 from pywikibot.pagegenerators._factory import GeneratorFactory
 from pywikibot.pagegenerators._filters import (
     CategoryFilterPageGenerator,
@@ -58,9 +58,9 @@ from pywikibot.pagegenerators._generators import (
     MySQLPageGenerator,
     NewimagesPageGenerator,
     NewpagesPageGenerator,
+    PagePilePageGenerator,
     PagesFromPageidGenerator,
     PagesFromTitlesGenerator,
-    PagePilePageGenerator,
     PetScanPageGenerator,
     PrefixingPageGenerator,
     RandomPageGenerator,
@@ -529,7 +529,9 @@ FILTER OPTIONS
 
 docuReplacements = {'&params;': parameterHelp}  # noqa: N816
 
-PRELOAD_SITE_TYPE = Dict[pywikibot.site.BaseSite, List[pywikibot.page.Page]]
+if TYPE_CHECKING:
+    PRELOAD_SITE_TYPE = dict[pywikibot.site.BaseSite,
+                             list[pywikibot.page.Page]]
 
 # if a bot uses GeneratorFactory, the module should include the line
 #   docuReplacements = {'&params;': pywikibot.pagegenerators.parameterHelp}

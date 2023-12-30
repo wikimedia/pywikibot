@@ -42,12 +42,7 @@ from requests.exceptions import ReadTimeout
 
 import pywikibot
 from pywikibot import textlib
-from pywikibot.backports import (
-    Callable,
-    Iterable,
-    Sequence,
-    pairwise,
-)
+from pywikibot.backports import Callable, Iterable, Sequence, pairwise
 from pywikibot.comms import http
 from pywikibot.data.api import ListGenerator, Request
 from pywikibot.exceptions import Error, InvalidTitleError, OtherPageSaveError

@@ -40,11 +40,7 @@ from pywikibot._wbtypes import (
     WbTime,
     WbUnknown,
 )
-from pywikibot.backports import (
-    Callable,
-    cache,
-    removesuffix,
-)
+from pywikibot.backports import Callable, cache, removesuffix
 from pywikibot.bot import (
     Bot,
     CurrentPageBot,

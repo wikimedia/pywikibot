@@ -13,7 +13,7 @@ import typing
 from collections import OrderedDict, defaultdict
 from contextlib import suppress
 from textwrap import fill
-from typing import TYPE_CHECKING, Any, NamedTuple, TypeVar, Union
+from typing import TYPE_CHECKING, Any, NamedTuple, TypeVar
 
 import pywikibot
 from pywikibot import login
@@ -84,13 +84,13 @@ from pywikibot.tools.collections import RateLimit
 if TYPE_CHECKING:
     from pywikibot.page import BasePage
 
+    _CompType = int | str | pywikibot.page.Page | pywikibot.page.Revision
+    _RequestWrapperT = TypeVar('_RequestWrapperT', bound='api._RequestWrapper')
+
 
 __all__ = ('APISite', )
 
 _mw_msg_cache: DefaultDict[str, dict[str, str]] = defaultdict(dict)
-
-_CompType = Union[int, str, 'pywikibot.page.Page', 'pywikibot.page.Revision']
-_RequestWrapperT = TypeVar('_RequestWrapperT', bound='api._RequestWrapper')
 
 
 class _OnErrorExc(NamedTuple):

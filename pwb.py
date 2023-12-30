@@ -11,6 +11,7 @@
 import runpy
 import sys
 
+
 VERSIONS_REQUIRED_MESSAGE = """
 Pywikibot is not available on:
 {version}

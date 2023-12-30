@@ -6,8 +6,9 @@
 #
 from __future__ import annotations
 
+
 # to prevent ImportError exception due to circular imports
-from pywikibot.site._namespace import Namespace, NamespacesDict
+from pywikibot.site._namespace import Namespace, NamespacesDict  # isort: split
 
 from pywikibot.site._apisite import APISite
 from pywikibot.site._basesite import BaseSite

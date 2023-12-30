@@ -4,7 +4,7 @@ Current release
 Improvements
 ^^^^^^^^^^^^
 
-* Add :meth:`site.APISite.ratelimit()<pywikibot.site._apisite.APISite.ratelimit>` method 
+* Add :meth:`site.APISite.ratelimit()<pywikibot.site._apisite.APISite.ratelimit>` method
   and :class:`tools.collections.RateLimit` NamedTuple (:phab:`T304808`)
 * L10N Updates
 * Add :class:`pagegenerators.PagePilePageGenerator` (:phab:`T353086`)

@@ -18,24 +18,19 @@ from importlib import import_module
 from itertools import chain
 from os.path import basename, dirname, splitext
 from textwrap import fill
+from typing import TYPE_CHECKING
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import (
-    DefaultDict,
-    Dict,
-    List,
-    Mapping,
-    Sequence,
-    removesuffix,
-)
+from pywikibot.backports import DefaultDict, Mapping, Sequence, removesuffix
 from pywikibot.exceptions import FamilyMaintenanceWarning, UnknownFamilyError
 from pywikibot.tools import classproperty, deprecated, remove_last_args
 
 
 logger = logging.getLogger('pywiki.wiki.family')
 
-CrossnamespaceType = DefaultDict[str, Dict[str, List[int]]]
+if TYPE_CHECKING:
+    CrossnamespaceType = DefaultDict[str, dict[str, list[int]]]
 
 # Legal characters for Family.name and Family.langs keys
 NAME_CHARACTERS = string.ascii_letters + string.digits

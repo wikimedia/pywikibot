@@ -1281,7 +1281,7 @@ class PagePilePageGenerator(GeneratorWrapper):
         yield from raw_pages
 
     @property
-    def generator(self) -> Iterator['pywikibot.page.Page']:
+    def generator(self) -> Iterator[pywikibot.page.Page]:
         """Yield results from :meth:`query`."""
         for raw_page in self.query():
             page = pywikibot.Page(self.site, raw_page)

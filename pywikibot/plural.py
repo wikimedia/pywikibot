@@ -6,10 +6,11 @@
 #
 from __future__ import annotations
 
-from typing import Dict, Callable, Union
+from typing import TYPE_CHECKING, Callable
 
 
-PluralRule = Dict[str, Union[int, Callable[[int], Union[bool, int]]]]
+if TYPE_CHECKING:
+    PluralRule = dict[str, int | Callable[[int], bool | int]]
 
 plural_rules: dict[str, PluralRule] = {
     '_default': {'nplurals': 2, 'plural': lambda n: (n != 1)},

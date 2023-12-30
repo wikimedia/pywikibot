@@ -15,12 +15,7 @@ from html.parser import HTMLParser
 from typing import NamedTuple
 
 import pywikibot
-from pywikibot.backports import (
-    Callable,
-    Container,
-    Iterable,
-    Match,
-)
+from pywikibot.backports import Callable, Container, Iterable, Match
 from pywikibot.backports import OrderedDict as OrderedDictType
 from pywikibot.backports import Pattern
 from pywikibot.backports import Sequence as SequenceType

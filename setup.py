@@ -27,7 +27,9 @@
 import os
 import re
 import sys
+
 from setuptools import setup
+
 
 if sys.version_info[:3] >= (3, 9):
     List = list

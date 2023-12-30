@@ -4,13 +4,14 @@
 # (C) Pywikibot team, 2009-2023
 #
 # Distributed under the terms of the MIT license.
+from __future__ import annotations
+
 import calendar
 import datetime
 import logging
 import sys
 import unittest
 from contextlib import suppress
-from typing import Optional
 from unittest import mock
 
 import pywikibot
@@ -816,8 +817,7 @@ class TestItemClaimFilterPageGenerator(WikidataTestCase):
 
     """Test item claim filter page generator generator."""
 
-    def _simple_claim_test(self, prop: str, claim, qualifiers: Optional[dict],
-                           valid: bool, negate: bool = False):
+    def _simple_claim_test(self, prop, claim, qualifiers, valid, negate=False):
         """
         Test given claim on sample (India) page.
 

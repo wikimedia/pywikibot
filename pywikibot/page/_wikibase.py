@@ -20,10 +20,9 @@ import re
 from collections import OrderedDict, defaultdict
 from contextlib import suppress
 from itertools import chain
-from typing import Any, Union
+from typing import TYPE_CHECKING, Any
 
 import pywikibot
-from pywikibot.backports import Dict, List
 from pywikibot.exceptions import (
     APIError,
     EntityTypeUnknownError,
@@ -65,13 +64,16 @@ __all__ = (
     'WikibasePage',
 )
 
-
-LANGUAGE_IDENTIFIER = Union[str, pywikibot.APISite]
-ALIASES_TYPE = Dict[LANGUAGE_IDENTIFIER, List[str]]
-LANGUAGE_TYPE = Dict[LANGUAGE_IDENTIFIER, str]
-SITELINK_TYPE = Union['pywikibot.page.BasePage', 'pywikibot.page.BaseLink',
-                      Dict[str, str]]
-ENTITY_DATA_TYPE = Dict[str, Union[LANGUAGE_TYPE, ALIASES_TYPE, SITELINK_TYPE]]
+if TYPE_CHECKING:
+    LANGUAGE_IDENTIFIER = str | pywikibot.APISite
+    ALIASES_TYPE = dict[LANGUAGE_IDENTIFIER, list[str]]
+    LANGUAGE_TYPE = dict[LANGUAGE_IDENTIFIER, str]
+    SITELINK_TYPE = (
+        pywikibot.page.BasePage
+        | pywikibot.page.BaseLink
+        | dict[str, str]
+    )
+    ENTITY_DATA_TYPE = dict[str, LANGUAGE_TYPE | ALIASES_TYPE | SITELINK_TYPE]
 
 
 class WikibaseEntity:

@@ -47,18 +47,13 @@ if PYTHON_VERSION < (3, 9):
         Container,
         Counter,
         Dict,
-        FrozenSet,
         Generator,
         Iterable,
         Iterator,
-        List,
         Mapping,
         Match,
         Pattern,
         Sequence,
-        Set,
-        Tuple,
-        Type,
     )
 else:
     from collections import Counter
@@ -72,11 +67,6 @@ else:
     )
     from re import Match, Pattern
     Dict = dict  # type: ignore[misc]
-    FrozenSet = frozenset  # type: ignore[misc]
-    List = list  # type: ignore[misc]
-    Set = set  # type: ignore[misc]
-    Tuple = tuple  # type: ignore[assignment]
-    Type = type
 
 
 if PYTHON_VERSION < (3, 9, 2):

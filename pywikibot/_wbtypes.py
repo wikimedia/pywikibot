@@ -12,7 +12,7 @@ import json
 import math
 import re
 from decimal import Decimal
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING, Any
 
 import pywikibot
 from pywikibot import exceptions
@@ -24,8 +24,9 @@ from pywikibot.tools import remove_last_args
 if TYPE_CHECKING:
     from pywikibot.site import APISite, BaseSite, DataSite
 
-ItemPageStrNoneType = Union[str, 'pywikibot.ItemPage', None]
-ToDecimalType = Union[int, float, str, 'Decimal', None]
+    ItemPageStrNoneType = str | pywikibot.ItemPage | None
+    ToDecimalType = int | float | str | Decimal | None
+
 
 __all__ = (
     'Coordinate',

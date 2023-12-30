@@ -25,11 +25,8 @@ try:
 except ImportError:
     from xml.etree.ElementTree import iterparse, ParseError
 
-from pywikibot.backports import Callable, Type
-from pywikibot.tools import (
-    issue_deprecation_warning,
-    open_archive,
-)
+from pywikibot.backports import Callable
+from pywikibot.tools import issue_deprecation_warning, open_archive
 
 
 def parseRestrictions(restrictions):
@@ -127,7 +124,7 @@ class XmlDump:
                  # when allrevisions removed, revisions can default to 'latest'
                  revisions: str = 'first_found',
                  on_error: None | (
-                     Callable[[Type[BaseException]], None]) = None) -> None:
+                     Callable[[type[BaseException]], None]) = None) -> None:
         """Initializer."""
         self.filename = filename
         self.on_error = on_error

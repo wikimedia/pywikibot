@@ -9,18 +9,11 @@ from __future__ import annotations
 import datetime
 import re
 from functools import partial
-from typing import TYPE_CHECKING, NamedTuple, Union
+from typing import TYPE_CHECKING, NamedTuple
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import (
-    Dict,
-    Iterable,
-    Iterator,
-    List,
-    Pattern,
-    Sequence,
-)
+from pywikibot.backports import Iterable, Iterator, Pattern, Sequence
 from pywikibot.exceptions import NoPageError
 from pywikibot.proofreadpage import ProofreadPage
 from pywikibot.tools.itertools import filter_unique
@@ -29,10 +22,14 @@ from pywikibot.tools.itertools import filter_unique
 if TYPE_CHECKING:
     from pywikibot.site import BaseSite, Namespace
 
-
-PRELOAD_SITE_TYPE = Dict[pywikibot.site.BaseSite, List[pywikibot.page.Page]]
-PATTERN_STR_OR_SEQ_TYPE = Union[str, Pattern[str],
-                                Sequence[str], Sequence[Pattern[str]]]
+    PRELOAD_SITE_TYPE = dict[pywikibot.site.BaseSite,
+                             list[pywikibot.page.Page]]
+    PATTERN_STR_OR_SEQ_TYPE = (
+        str
+        | Pattern[str]
+        | Sequence[str]
+        | Sequence[Pattern[str]]
+    )
 
 
 # This is the function that will be used to de-duplicate page iterators.

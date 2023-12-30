@@ -13,23 +13,33 @@ from collections import abc, defaultdict
 from contextlib import suppress
 from functools import singledispatch
 from string import digits as _decimalDigits  # noqa: N812
-from typing import Union
+from typing import TYPE_CHECKING
 
 from pywikibot import Site
 from pywikibot.backports import (
     Any,
     Callable,
     Iterator,
-    List,
     Mapping,
     Pattern,
     Sequence,
-    Tuple,
 )
 from pywikibot.site import BaseSite
 from pywikibot.textlib import NON_LATIN_DIGITS
 from pywikibot.tools import first_lower, first_upper
 
+
+if TYPE_CHECKING:
+    tuplst_type = list[tuple[Callable[[int | str], Any],
+                             Callable[[int | str], bool]]]
+    encf_type = Callable[[int], int | Sequence[int]]
+    decf_type = Callable[[Sequence[int]], int]
+    # decoders are three value tuples, with an optional fourth to represent a
+    # required number of digits
+    decoder_type = (
+        tuple[str, Callable[[int], str], Callable[[str], int]]
+        | tuple[str, Callable[[int], str], Callable[[str], int], int]
+    )
 
 #
 # Different collections of well known formats
@@ -55,18 +65,6 @@ centuryFormats = ['CenturyAD', 'CenturyBC']
 yearFormats = ['YearAD', 'YearBC']
 millFormats = ['MillenniumAD', 'MillenniumBC']
 snglValsFormats = ['CurrEvents']
-tuplst_type = List[Tuple[Callable[[Union[int, str]], Any],
-                         Callable[[Union[int, str]], bool]]]
-encf_type = Callable[[int], Union[int, Sequence[int]]]
-decf_type = Callable[[Sequence[int]], int]
-
-# decoders are three value tuples, with an optional fourth to represent a
-# required number of digits
-
-decoder_type = Union[
-    Tuple[str, Callable[[int], str], Callable[[str], int]],
-    Tuple[str, Callable[[int], str], Callable[[str], int], int]
-]
 
 
 @singledispatch
@@ -571,8 +569,7 @@ class MonthNames(abc.Mapping):
         'zh': lambda v: slh(v, makeMonthList('%d月')),
     }
 
-    def __getitem__(self, lang: str
-                    ) -> Callable[[int], str]:
+    def __getitem__(self, lang: str) -> Callable[[int], str]:
         if lang not in self.months:
             site = Site()
             # may_long differs

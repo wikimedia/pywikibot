@@ -29,7 +29,6 @@ from collections import abc, defaultdict
 from contextlib import suppress
 from pathlib import Path
 from textwrap import fill
-from typing import Union
 
 import pywikibot
 from pywikibot import __url__, config
@@ -45,8 +44,6 @@ from pywikibot.backports import (
 )
 from pywikibot.plural import plural_rule
 
-
-STR_OR_SITE_TYPE = Union[str, 'pywikibot.site.BaseSite']
 
 PLURAL_PATTERN = r'{{PLURAL:(?:%\()?([^\)]*?)(?:\)d)?\|(.*?)}}'
 
@@ -558,7 +555,7 @@ class _PluralMappingAlias(abc.Mapping):
 DEFAULT_FALLBACK = ('_default', )
 
 
-def translate(code: STR_OR_SITE_TYPE,
+def translate(code: str | pywikibot.site.BaseSite,
               xdict: str | Mapping[str, str],
               parameters: Mapping[str, int] | None = None,
               fallback: bool | Iterable[str] = False) -> str | None:
@@ -654,7 +651,10 @@ def translate(code: STR_OR_SITE_TYPE,
     return trans
 
 
-def get_bot_prefix(source: STR_OR_SITE_TYPE, use_prefix: bool) -> str:
+def get_bot_prefix(
+    source: str | pywikibot.site.BaseSite,
+    use_prefix: bool
+) -> str:
     """Get the bot prefix string like 'Bot: ' including space delimiter.
 
     .. note: If *source* is a str and ``config.bot_prefix`` is set to
@@ -690,7 +690,7 @@ def get_bot_prefix(source: STR_OR_SITE_TYPE, use_prefix: bool) -> str:
 
 
 def twtranslate(
-    source: STR_OR_SITE_TYPE,
+    source: str | pywikibot.site.BaseSite,
     twtitle: str,
     parameters: Sequence[str] | Mapping[str, int] | None = None,
     *,
@@ -822,7 +822,7 @@ def twtranslate(
     return prefix + trans
 
 
-def twhas_key(source: STR_OR_SITE_TYPE, twtitle: str) -> bool:
+def twhas_key(source: str | pywikibot.site.BaseSite, twtitle: str) -> bool:
     """
     Check if a message has a translation in the specified language code.
 

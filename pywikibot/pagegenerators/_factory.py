@@ -12,18 +12,15 @@ import sys
 from datetime import timedelta
 from functools import partial
 from itertools import zip_longest
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Any
 
 import pywikibot
 from pywikibot import i18n
 from pywikibot.backports import (
     Callable,
-    Dict,
     Iterable,
     Iterator,
-    List,
     Sequence,
-    Tuple,
     removeprefix,
 )
 from pywikibot.bot import ShowingListOption
@@ -69,10 +66,9 @@ from pywikibot.tools.itertools import (
 if TYPE_CHECKING:
     from pywikibot.site import BaseSite, Namespace
 
-
-HANDLER_RETURN_TYPE = Union[None, bool, Iterable['pywikibot.page.BasePage']]
-GEN_FACTORY_CLAIM_TYPE = List[Tuple[str, str, Dict[str, str], bool]]
-OPT_GENERATOR_TYPE = Optional[Iterable['pywikibot.page.Page']]
+    HANDLER_RETURN_TYPE = bool, Iterable[pywikibot.page.BasePage] | None
+    GEN_FACTORY_CLAIM_TYPE = list[tuple[str, str, dict[str, str], bool]]
+    OPT_GENERATOR_TYPE = Iterable[pywikibot.page.Page] | None
 
 
 # This is the function that will be used to de-duplicate page iterators.
