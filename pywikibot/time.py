@@ -14,6 +14,7 @@ import math
 import re
 import types
 from contextlib import suppress
+from typing import overload
 
 import pywikibot
 from pywikibot.tools import classproperty, deprecated
@@ -212,7 +213,7 @@ class Timestamp(datetime.datetime):
 
         raise ValueError(f'time data {timestr!r} does not match any format.')
 
-    @deprecated('replace method', since='8.0.0')
+    @deprecated('replace method', since='8.0.0')  # type: ignore[misc]
     def clone(self) -> Timestamp:
         """Clone this instance.
 
@@ -250,7 +251,7 @@ class Timestamp(datetime.datetime):
         # to create a clone.
         if isinstance(ts, cls):
             return ts.replace()
-
+        assert isinstance(ts, str)
         return cls._from_iso8601(f'{ts[:10]}{sep}{ts[11:]}')
 
     @classmethod
@@ -288,7 +289,7 @@ class Timestamp(datetime.datetime):
         # to create a clone.
         if isinstance(ts, cls):
             return ts.replace()
-
+        assert isinstance(ts, str)
         if len(ts) == 8 and not strict:
             # year, month and day are given only
             ts += '000000'
@@ -344,10 +345,20 @@ class Timestamp(datetime.datetime):
             return self._from_datetime(newdt)
         return newdt
 
-    def __sub__(self, other: datetime.timedelta  # type: ignore[override]
-                ) -> Timestamp:
+    @overload  # type: ignore[override]
+    def __sub__(self, other: datetime.timedelta) -> Timestamp:
+        ...
+
+    @overload
+    def __sub__(self, other: datetime.datetime) -> datetime.timedelta:
+        ...
+
+    def __sub__(
+        self,
+        other: datetime.datetime | datetime.timedelta,
+    ) -> datetime.timedelta | Timestamp:
         """Perform subtraction, returning a Timestamp instead of datetime."""
-        newdt = super().__sub__(other)
+        newdt = super().__sub__(other)  # type: ignore[operator]
         if isinstance(newdt, datetime.datetime):
             return self._from_datetime(newdt)
         return newdt
@@ -367,15 +378,15 @@ class TZoneFixedOffset(datetime.tzinfo):
         self._offset = datetime.timedelta(minutes=offset)
         self._name = name
 
-    def utcoffset(self, dt):
+    def utcoffset(self, dt: datetime.datetime | None) -> datetime.timedelta:
         """Return the offset to UTC."""
         return self._offset
 
-    def tzname(self, dt):
+    def tzname(self, dt: datetime.datetime | None) -> str:
         """Return the name of the timezone."""
         return self._name
 
-    def dst(self, dt):
+    def dst(self, dt: datetime.datetime | None) -> datetime.timedelta:
         """Return no daylight savings time."""
         return datetime.timedelta(0)
 
@@ -388,7 +399,10 @@ class TZoneFixedOffset(datetime.tzinfo):
         )
 
 
-def str2timedelta(string: str, timestamp=None) -> datetime.timedelta:
+def str2timedelta(
+    string: str,
+    timestamp: datetime.datetime | None = None,
+) -> datetime.timedelta:
     """
     Return a timedelta for a shorthand duration.
 
