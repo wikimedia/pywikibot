@@ -1,6 +1,6 @@
 """Family module for Wikiversity."""
 #
-# (C) Pywikibot team, 2007-2023
+# (C) Pywikibot team, 2007-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -19,7 +19,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     languages_by_size = [
         'de', 'en', 'fr', 'zh', 'it', 'cs', 'ru', 'pt', 'es', 'sl', 'ar', 'sv',
-        'fi', 'el', 'hi', 'ko', 'ja',
+        'fi', 'el', 'ko', 'hi', 'ja',
     ]
 
     test_codes = ['beta']

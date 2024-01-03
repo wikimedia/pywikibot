@@ -1,6 +1,6 @@
 """Family module for Wikipedia."""
 #
-# (C) Pywikibot team, 2004-2023
+# (C) Pywikibot team, 2004-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -35,29 +35,29 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'sk', 'simple', 'azb', 'et', 'be', 'kk', 'el', 'min', 'hr', 'lt', 'gl',
         'ur', 'az', 'sl', 'lld', 'ka', 'nn', 'ta', 'th', 'hi', 'bn', 'mk',
         'la', 'zh-yue', 'ast', 'lv', 'af', 'tg', 'my', 'mg', 'sq', 'mr', 'bs',
-        'te', 'oc', 'br', 'ml', 'be-tarask', 'nds', 'sw', 'ky', 'ku', 'lmo',
+        'te', 'oc', 'br', 'be-tarask', 'ml', 'nds', 'sw', 'ky', 'ku', 'lmo',
         'jv', 'new', 'pnb', 'vec', 'ht', 'pms', 'ba', 'lb', 'su', 'ga', 'is',
-        'szl', 'ckb', 'fy', 'cv', 'pa', 'tl', 'an', 'io', 'wuu', 'diq', 'vo',
-        'ha', 'sco', 'yo', 'ne', 'kn', 'gu', 'als', 'avk', 'crh', 'bar', 'ia',
-        'scn', 'bpy', 'qu', 'ig', 'mn', 'nv', 'ban', 'xmf', 'si', 'frr', 'mzn',
+        'szl', 'ckb', 'fy', 'cv', 'pa', 'tl', 'an', 'io', 'wuu', 'diq', 'ha',
+        'vo', 'sco', 'yo', 'ne', 'kn', 'gu', 'als', 'avk', 'crh', 'bar', 'ia',
+        'scn', 'bpy', 'qu', 'ig', 'mn', 'nv', 'ban', 'xmf', 'si', 'mzn', 'frr',
         'ps', 'tum', 'os', 'or', 'bat-smg', 'sah', 'cdo', 'bcl', 'gd', 'bug',
-        'sd', 'yi', 'ilo', 'am', 'li', 'nap', 'gor', 'fo', 'mai', 'hsb',
+        'sd', 'yi', 'ilo', 'am', 'li', 'nap', 'gor', 'mai', 'fo', 'hsb',
         'map-bms', 'shn', 'eml', 'ace', 'zh-classical', 'as', 'sa', 'wa', 'ie',
         'hyw', 'sn', 'mhr', 'lij', 'zu', 'hif', 'bjn', 'mrj', 'km', 'mni',
-        'hak', 'sat', 'ary', 'roa-tara', 'pam', 'rue', 'bh', 'nso', 'dag',
-        'co', 'so', 'vls', 'mi', 'nds-nl', 'myv', 'se', 'sc', 'bo', 'vep',
+        'hak', 'sat', 'ary', 'roa-tara', 'pam', 'rue', 'bh', 'dag', 'nso',
+        'co', 'vls', 'so', 'mi', 'nds-nl', 'myv', 'se', 'sc', 'bo', 'vep',
         'kw', 'glk', 'tk', 'kab', 'gan', 'rw', 'fiu-vro', 'gv', 'zea', 'ab',
-        'ug', 'nah', 'mt', 'skr', 'tly', 'frp', 'udm', 'pcd', 'gn', 'kv',
-        'smn', 'csb', 'ay', 'nrm', 'ks', 'lez', 'olo', 'mdf', 'mwl', 'lfn',
-        'kaa', 'ang', 'stq', 'lo', 'fur', 'rm', 'tw', 'ext', 'lad', 'pap',
-        'gom', 'tyv', 'koi', 'ln', 'av', 'dsb', 'dty', 'cbk-zam', 'dv', 'ksh',
+        'skr', 'ug', 'mt', 'nah', 'tly', 'frp', 'udm', 'pcd', 'gn', 'kv',
+        'smn', 'csb', 'ay', 'nrm', 'ks', 'lez', 'mdf', 'olo', 'mwl', 'kaa',
+        'lfn', 'ang', 'stq', 'lo', 'fur', 'rm', 'tw', 'lad', 'ext', 'pap',
+        'gom', 'ln', 'tyv', 'koi', 'av', 'dsb', 'dty', 'cbk-zam', 'dv', 'ksh',
         'za', 'lg', 'gag', 'bxr', 'pfl', 'szy', 'blk', 'tay', 'pag', 'pi',
-        'haw', 'awa', 'inh', 'krc', 'pdc', 'to', 'atj', 'tcy', 'arc', 'mnw',
-        'shi', 'ff', 'xal', 'jam', 'kbp', 'xh', 'wo', 'nia', 'om', 'anp',
-        'kbd', 'nov', 'ki', 'nqo', 'zgh', 'bi', 'tpi', 'tet', 'roa-rup', 'jbo',
+        'haw', 'awa', 'inh', 'krc', 'pdc', 'to', 'atj', 'tcy', 'mnw', 'arc',
+        'ff', 'shi', 'xal', 'xh', 'jam', 'kbp', 'wo', 'nia', 'om', 'anp',
+        'kbd', 'nov', 'ki', 'zgh', 'nqo', 'bi', 'tpi', 'tet', 'roa-rup', 'jbo',
         'tn', 'fj', 'kg', 'lbe', 'guw', 'ty', 'cu', 'rmy', 'mad', 'trv', 'ami',
-        'srn', 'sm', 'alt', 'ltg', 'gcr', 'chr', 'ny', 'dga', 'pcm', 'st',
-        'gpe', 'kcg', 'pih', 'ss', 'got', 'gur', 'ee', 'bm', 'ts', 've', 'bbc',
+        'srn', 'sm', 'alt', 'ltg', 'gcr', 'chr', 'dga', 'ny', 'pcm', 'st',
+        'gpe', 'kcg', 'pih', 'got', 'ss', 'gur', 'ee', 'bm', 'ts', 've', 'bbc',
         'chy', 'rn', 'fon', 'ik', 'ady', 'ch', 'guc', 'fat', 'pnt', 'iu',
         'pwn', 'sg', 'din', 'ti', 'kl', 'dz', 'cr',
     ]

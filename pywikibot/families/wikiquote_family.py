@@ -1,6 +1,6 @@
 """Family module for Wikiquote."""
 #
-# (C) Pywikibot team, 2005-2023
+# (C) Pywikibot team, 2005-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -34,7 +34,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'ar', 'id', 'su', 'bg', 'hy', 'hr', 'el', 'nn', 'sv', 'li', 'hu', 'ko',
         'sah', 'nl', 'ja', 'la', 'ta', 'ig', 'hi', 'as', 'bn', 'gl', 'gu',
         'te', 'guw', 'ur', 'bjn', 'tl', 'vi', 'be', 'cy', 'no', 'sq', 'ml',
-        'kn', 'eu', 'ro', 'ku', 'uz', 'ka', 'th', 'da', 'sa', 'is', 'bcl',
+        'kn', 'eu', 'ro', 'ku', 'uz', 'th', 'ka', 'da', 'sa', 'is', 'bcl',
         'br', 'mr', 'af', 'ky',
     ]
 
