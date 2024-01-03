@@ -1,6 +1,6 @@
 """GeneratorFactory module wich handles pagegenerators options."""
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -413,14 +413,13 @@ class GeneratorFactory:
                             'positive int.'.format(start))
             return None
 
-        try:
-            end = pywikibot.Timestamp.fromtimestampformat(end)
-        except ValueError as err:
-            pywikibot.error(
-                f'{err}. End parameter has wrong format!')
-            return None
-        except TypeError:  # end is None
-            pass
+        if end is not None:
+            try:
+                end = pywikibot.Timestamp.fromtimestampformat(end)
+            except ValueError as err:
+                pywikibot.error(
+                    f'{err}. End parameter has wrong format!')
+                return None
 
         if start or end:
             pywikibot.info('Fetching log events in range: {} - {}.'
