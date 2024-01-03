@@ -251,7 +251,12 @@ class Timestamp(datetime.datetime):
         # to create a clone.
         if isinstance(ts, cls):
             return ts.replace()
-        assert isinstance(ts, str)
+
+        if not isinstance(ts, str):
+            raise TypeError(
+                f'ts argument must be a string or a Timestamp object,'
+                f' not {type(ts).__name__}')
+
         return cls._from_iso8601(f'{ts[:10]}{sep}{ts[11:]}')
 
     @classmethod
@@ -289,7 +294,12 @@ class Timestamp(datetime.datetime):
         # to create a clone.
         if isinstance(ts, cls):
             return ts.replace()
-        assert isinstance(ts, str)
+
+        if not isinstance(ts, str):
+            raise TypeError(
+                f'ts argument must be a string or a Timestamp object,'
+                f' not {type(ts).__name__}')
+
         if len(ts) == 8 and not strict:
             # year, month and day are given only
             ts += '000000'
