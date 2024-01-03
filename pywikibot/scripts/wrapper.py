@@ -38,7 +38,7 @@ for tests to set the default site (see :phab:`T216825`)::
    renamed to wrapper.py
 """
 #
-# (C) Pywikibot team, 2012-2023
+# (C) Pywikibot team, 2012-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -241,6 +241,14 @@ def check_modules(script: str | None = None) -> bool:
         from setup import dependencies
 
     for dependency in dependencies:
+        if dependency.startswith(('importlib_metadata', 'packaging')):
+            # Ignore these dependencies because ImportError is raised in an
+            # early state when they are imported in backports. They are already
+            # used at this point. This is a workaound for toolforge where some
+            # modules are not installed as a site-package.
+            # TODO: Check imports from external source
+            continue
+
         requirement = Requirement(dependency)
         if requirement.marker is None or requirement.marker.evaluate():
             try:
@@ -304,7 +312,7 @@ except RuntimeError as e:  # pragma: no cover
         # we need to re-start the entire process. Ask the user to do so.
         print('Now, you have to re-execute the command to start your script.')
         sys.exit(1)
-except ImportError as e:  # raised in textlib
+except ImportError as e:  # raised in textlib or backports
     sys.exit(e)
 
 
