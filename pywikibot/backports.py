@@ -174,6 +174,12 @@ else:
     from itertools import batched  # type: ignore[no-redef]
 
 
+try:
+    import importlib.metadata as importlib_metadata
+except ImportError:
+    import importlib_metadata
+
+
 # import ModuleDeprecationWrapper here to prevent circular import
 from pywikibot.tools import ModuleDeprecationWrapper  # noqa: E402
 

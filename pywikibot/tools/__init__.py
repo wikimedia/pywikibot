@@ -35,15 +35,14 @@ import subprocess
 import sys
 from contextlib import suppress
 from functools import total_ordering, wraps
-from importlib import import_module
 from types import TracebackType
 from typing import Any
 from warnings import catch_warnings, showwarning, warn
 
-import pkg_resources
+import packaging.version
 
 import pywikibot  # T306760
-from pywikibot.backports import Callable
+from pywikibot.backports import Callable, importlib_metadata
 from pywikibot.tools._deprecate import (
     ModuleDeprecationWrapper,
     add_decorated_full_name,
@@ -58,9 +57,6 @@ from pywikibot.tools._deprecate import (
     remove_last_args,
 )
 from pywikibot.tools._unidata import _first_upper_exception
-
-
-pkg_Version = pkg_resources.packaging.version.Version  # noqa: N816
 
 
 __all__ = (
@@ -89,7 +85,6 @@ __all__ = (
     'first_upper',
     'strtobool',
     'normalize_username',
-    'Version',
     'MediaWikiVersion',
     'open_archive',
     'merge_unique_dicts',
@@ -117,7 +112,7 @@ def is_ip_address(value: str) -> bool:
     return False
 
 
-def has_module(module, version=None) -> bool:
+def has_module(module: str, version: str | None = None) -> bool:
     """Check if a module can be imported.
 
     .. versionadded:: 3.0
@@ -127,15 +122,13 @@ def has_module(module, version=None) -> bool:
        removed with Python 3.12.
     """
     try:
-        m = import_module(module)
-    except ImportError:
+        metadata_version = importlib_metadata.version(module)
+    except importlib_metadata.PackageNotFoundError:
         return False
     if version:
-        if not hasattr(m, '__version__'):
-            return False  # pragma: no cover
 
-        required_version = pkg_resources.parse_version(version)
-        module_version = pkg_resources.parse_version(m.__version__)
+        required_version = packaging.version.Version(version)
+        module_version = packaging.version.Version(metadata_version)
 
         if module_version < required_version:
             warn('Module version {} is lower than requested version {}'
@@ -402,36 +395,6 @@ def normalize_username(username) -> str | None:
         return None
     username = re.sub('[_ ]+', ' ', username).strip()
     return first_upper(username)
-
-
-class Version(pkg_Version):
-
-    """Version from pkg_resouce vendor package.
-
-    This Version provides propreties of vendor package 20.4 shipped with
-    setuptools 49.4.0.
-
-    .. versionadded:: 6.4
-    """
-
-    def __getattr__(self, name):
-        """Provides propreties of vendor package 20.4."""
-        if name in ('epoch', 'release', 'pre', ):
-            return getattr(self._version, name)
-        if name in ('post', 'dev'):
-            attr = getattr(self._version, name)
-            return attr[1] if attr else None
-        if name == 'is_devrelease':
-            return self.dev is not None
-
-        parts = ('major', 'minor', 'micro')
-        try:
-            index = parts.index(name)
-        except ValueError:
-            raise AttributeError('{!r} object has to attribute {!r}'
-                                 .format(type(self).__name__, name)) from None
-        release = self.release
-        return release[index] if len(release) >= index + 1 else 0
 
 
 @total_ordering
