@@ -4,6 +4,9 @@ Current release
 Improvements
 ^^^^^^^^^^^^
 
+* ``revisions`` parameter of :class:`xmlreader.XmlDump` was introduced to specify parsing method
+  (:phab:`T340804`)
+* Pass global -nolog argument into bot script from wrapper  (:phab:`T328900`)
 * Add :meth:`site.APISite.ratelimit()<pywikibot.site._apisite.APISite.ratelimit>` method
   and :class:`tools.collections.RateLimit` NamedTuple (:phab:`T304808`)
 * L10N Updates
@@ -12,6 +15,7 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
+* Use only ``end`` tags in ElementTree.iterparse in :mod:`xmlreader` module (:phab:`T354095`)
 * Suppress error in :meth:`cosmetic_changes.CosmeticChangesToolkit.cleanUpLinks` (:phab:`T337045`)
 * :func:`pywikibot.input_choice` validates *default* parameter (:phab:`T353097`)
 * Remove typing imports from user-config.py file (:phab:`T352965`)
@@ -19,6 +23,13 @@ Bugfixes
 Breaking changes and code cleanups
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+* ``tools.Version`` class was removed; use classes from ``packaging.version`` instead (:phab:`T340640`)
+* ``packaging`` package is mandatory; ``importlib_metadata`` package is required for Python 3.7 (:phab:`T340640`)
+* ``SelfCallMixin``, ``SelfCallDict`` and ``SelfCallString`` of :mod:`tools` module were removed
+* Calling :attr:`site.BaseSite.sitename<pywikibot.site._basesite.BaseSite.sitename>` as a function
+  is no longer supported
+* ``config.register_family_file()`` function was removed
+* require ``PyMySQL >= 1.0.0`` if necessary
 * ``keys()`` and ``items()`` methods of :class:`data.api.Reques` gives a view instead a list (:phab:`T310953`)
 * ``SequenceOutputter.format_list()`` was removed in favour of :attr:`tools.formatter.SequenceOutputter.out` property
 * *output* parameter of :class:`bot_choice.OutputProxyOption` (i.e. ``OutputOption`` instance) without *out* property is no longer supported
@@ -37,6 +48,7 @@ Deprecations
 ------------
 
 * 9.0.0: ``pywikibot.version.get_toolforge_hostname()`` is deprecated without replacement
+* 9.0.0: ``allrevisions`` parameter of :class:`xmlreader.XmpDump` is deprecated, use ``revisions`` instead  (:phab:`T340804`)
 * 9.0.0: ``iteritems`` method of :class:`data.api.Request` will be removed in favour of ``items``
 * 9.0.0: ``SequenceOutputter.output()`` is deprecated in favour of :attr:`tools.formatter.SequenceOutputter.out` property
 * 9.0.0: *nullcontext* context manager and *SimpleQueue* queue of :mod:`backports` are derecated

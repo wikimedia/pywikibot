@@ -4,10 +4,22 @@ Scripts Changelog
 9.0.0
 -----
 
+category_graph
+^^^^^^^^^^^^^^
+
+* Check for ``-from`` option first (:phab:`T354162`)
+* Validate file path input  (:phab:`T346417`)
+
 category_redirect
 ^^^^^^^^^^^^^^^^^
 
 * provide category_redirect categories for all WM sites (:phab:`T348914`)
+
+touch
+^^^^^
+
+* Use site.ratelimit for bulk purge in PurgeBot
+
 
 8.5.0
 -----
