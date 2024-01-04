@@ -58,9 +58,7 @@ jobs:
         pip install packaging
         pip install "PyMySQL >= 1.0.0"
         pip install pytest
-        pip install -U setuptools
         pip install "sseclient<0.0.23,>=0.0.18"
-        python -c "import setuptools; print('setuptools:', setuptools.__version__)"
 
     - name: Generate user files
       run: |

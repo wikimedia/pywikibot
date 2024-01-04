@@ -20,7 +20,7 @@
 .. warning: do not upload a development release to pypi.
 """
 #
-# (C) Pywikibot team, 2009-2023
+# (C) Pywikibot team, 2009-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -93,9 +93,6 @@ dependencies = [
     'mwparserfromhell>=0.5.2',
     'packaging',
     'requests>=2.21.0',
-    # PEP 440
-    'setuptools>=48.0.0 ; python_version >= "3.10"',
-    'setuptools>=40.8.0 ; python_version < "3.10"',
 ]
 
 # ------- setup tests_require ------- #

@@ -82,8 +82,6 @@ jobs:
         pip install mwparserfromhell
         pip install packaging
         pip install requests
-        pip install -U setuptools
-        python -c "import setuptools; print('setuptools:', setuptools.__version__)"
 
     - name: Generate family files
       run: |

@@ -5,7 +5,7 @@
    version script was moved to the framework scripts folder
 """
 #
-# (C) Pywikibot team, 2007-2022
+# (C) Pywikibot team, 2007-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -27,9 +27,9 @@ class DummyModule:
 
 
 try:
-    import setuptools
+    import packaging
 except ImportError:
-    setuptools = DummyModule()
+    packaging = DummyModule()
 
 try:
     import mwparserfromhell
@@ -54,7 +54,7 @@ def main(*args: str) -> None:
     """Print pywikibot version and important settings."""
     pywikibot.info('Pywikibot: ' + getversion())
     pywikibot.info('Release version: ' + pywikibot.__version__)
-    pywikibot.info('setuptools version: ' + setuptools.__version__)
+    pywikibot.info('packaging version: ' + packaging.__version__)
     pywikibot.info('mwparserfromhell version: ' + mwparserfromhell.__version__)
     pywikibot.info('wikitextparser version: ' + wikitextparser.__version__)
     pywikibot.info('requests version: ' + requests.__version__)
