@@ -52,6 +52,7 @@ Quick start
 .. code:: text
 
     pip install requests
+    pip install packaging
     git clone https://gerrit.wikimedia.org/r/pywikibot/core.git
     cd core
     git submodule update --init
