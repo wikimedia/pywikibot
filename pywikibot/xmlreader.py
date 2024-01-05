@@ -11,7 +11,7 @@ XmlEntry objects which can be used by other bots.
    vulnerable XML attacks. *defusedxml* 0.7.1 or higher is recommended.
 """
 #
-# (C) Pywikibot team, 2005-2023
+# (C) Pywikibot team, 2005-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -58,7 +58,10 @@ class XmlEntry:
 
 class Headers(NamedTuple):
 
-    """Represent the common info of a page."""
+    """Represent the common info of a page.
+
+    .. versionadded:: 9.0
+    """
 
     title: str
     ns: str
@@ -70,7 +73,10 @@ class Headers(NamedTuple):
 
 class RawRev(NamedTuple):
 
-    """Represent a raw revision."""
+    """Represent a raw revision.
+
+    .. versionadded:: 9.0
+    """
 
     headers: Headers
     revision: Element
@@ -89,8 +95,9 @@ class XmlDump:
     .. versionchanged:: 7.2
        `allrevisions` parameter must be given as keyword parameter
     .. versionchanged:: 9.0
-        `allrevisions` parameter deprecated due to :phab:`T340804`
-        `revisions` parameter introduced as replacement
+       `allrevisions` parameter is deprecated due to :phab:`T340804`,
+       `revisions` parameter was introduced as replacement.
+       `root` attribute was removed.
 
     Usage example:
 
@@ -202,11 +209,9 @@ class XmlDump:
                 root.clear()
 
     def _parse_only_first_found(self, elem: Element) -> Iterator[XmlEntry]:
-        """
-        Deprecated parser that yields the first revision found.
+        """Parser that yields the first revision found.
 
-        Documentation had wrongly indicated it returned the latest revision.
-        :phab: `T340804`
+        .. versionadded:: 9.0
         """
         raw_revs = self._fetch_revs(elem)
         try:
@@ -223,7 +228,10 @@ class XmlDump:
             yield self._create_revision(raw_rev.headers, raw_rev.revision)
 
     def _parse_only_earliest(self, elem: Element) -> Iterator[XmlEntry]:
-        """Parser that yields only the earliest revision."""
+        """Parser that yields only the earliest revision.
+
+        .. versionadded:: 9.0
+        """
         raw_revs = self._fetch_revs(elem, with_id=True)
         raw_rev = min(raw_revs, default=None, key=lambda rev: rev.revid)
         if raw_rev is not None:
@@ -236,7 +244,10 @@ class XmlDump:
             yield self._create_revision(raw_rev.headers, raw_rev.revision)
 
     def _fetch_revs(self, elem: Element, with_id=False) -> Iterator[RawRev]:
-        """Yield all revisions in a page."""
+        """Yield all revisions in a page.
+
+        .. versionadded:: 9.0
+        """
         uri = self.uri
         headers = self._headers(elem)
         for revision in elem.findall(f'{uri}revision'):
@@ -253,6 +264,9 @@ class XmlDump:
 
         Returns strings representing user groups allowed to edit and
         to move a page, where None means there are no restrictions.
+
+        .. versionadded:: 9.0
+           replaces deprecated ``parseRestrictions`` function.
         """
         if not restrictions:
             return None, None

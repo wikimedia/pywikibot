@@ -4,9 +4,10 @@ Current release
 Improvements
 ^^^^^^^^^^^^
 
+* :meth:`pywikibot.WbTime.equal_instant` was added (:phab:`T325248`)
 * ``revisions`` parameter of :class:`xmlreader.XmlDump` was introduced to specify parsing method
   (:phab:`T340804`)
-* Pass global -nolog argument into bot script from wrapper  (:phab:`T328900`)
+* Pass global -nolog argument into bot script from wrapper (:phab:`T328900`)
 * Add :meth:`site.APISite.ratelimit()<pywikibot.site._apisite.APISite.ratelimit>` method
   and :class:`tools.collections.RateLimit` NamedTuple (:phab:`T304808`)
 * L10N Updates
@@ -23,6 +24,7 @@ Bugfixes
 Breaking changes and code cleanups
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+* ``root`` attribute of :class:`xmlreader.XmlDump` was removed
 * ``tools.Version`` class was removed; use classes from ``packaging.version`` instead (:phab:`T340640`)
 * ``packaging`` package is mandatory; ``importlib_metadata`` package is required for Python 3.7 (:phab:`T340640`)
 * ``SelfCallMixin``, ``SelfCallDict`` and ``SelfCallString`` of :mod:`tools` module were removed
@@ -30,7 +32,7 @@ Breaking changes and code cleanups
   is no longer supported
 * ``config.register_family_file()`` function was removed
 * require ``PyMySQL >= 1.0.0`` if necessary
-* ``keys()`` and ``items()`` methods of :class:`data.api.Reques` gives a view instead a list (:phab:`T310953`)
+* ``keys()`` and ``items()`` methods of :class:`data.api.Request` gives a view instead a list (:phab:`T310953`)
 * ``SequenceOutputter.format_list()`` was removed in favour of :attr:`tools.formatter.SequenceOutputter.out` property
 * *output* parameter of :class:`bot_choice.OutputProxyOption` (i.e. ``OutputOption`` instance) without *out* property is no longer supported
 * ``OutputOption.output()`` method was removed

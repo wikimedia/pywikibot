@@ -1,6 +1,6 @@
 """Wikibase data type classes."""
 #
-# (C) Pywikibot team, 2013-2023
+# (C) Pywikibot team, 2013-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -530,6 +530,8 @@ class WbTime(WbRepresentation):
         For example, a time with at 10:00 UTC-5 would return false if checked
         with == with a time at 15:00 UTC, but would return true with
         this method.
+
+        .. versionadded:: 9.0
         """
         return self._getSecondsAdjusted() == other._getSecondsAdjusted()
 
