@@ -89,11 +89,9 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip --version
-        pip install -U setuptools
         if [ -f dev-requirements.txt ]; then pip install -r dev-requirements.txt; fi
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         pip install wikitextparser
-        python -c "import setuptools; print('setuptools:', setuptools.__version__)"
 
     - name: Generate family files
       run: |

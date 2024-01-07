@@ -22,8 +22,6 @@ importlib_metadata ; python_version < '3.8'
 mwparserfromhell>=0.5.2
 packaging
 requests>=2.21.0
-setuptools>=48.0.0 ; python_version >= '3.10'
-setuptools>=40.8.0 ; python_version < '3.10'
 
 # MediaWiki markup parser
 # mwparserfromhell is mandatory but wikitextparser can be used instead

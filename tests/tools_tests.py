@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test tools package alone which don't fit into other tests."""
 #
-# (C) Pywikibot team, 2015-2023
+# (C) Pywikibot team, 2015-2024
 #
 # Distributed under the terms of the MIT license.
 from __future__ import annotations
@@ -847,8 +847,8 @@ class TestHasModule(TestCase):
 
     def test_when_present(self):
         """Test when the module is available."""
-        self.assertTrue(has_module('setuptools'))
-        self.assertTrue(has_module('setuptools', '1.0'))
+        self.assertTrue(has_module('requests'))
+        self.assertTrue(has_module('requests', '1.0'))
 
     def test_when_missing(self):
         """Test when the module is unavailable."""
@@ -859,7 +859,7 @@ class TestHasModule(TestCase):
         ImportWarning)
     def test_when_insufficient_version(self):
         """Test when the module is older than what we need."""
-        self.assertFalse(has_module('setuptools', '99999'))
+        self.assertFalse(has_module('requests', '99999'))
 
 
 class TestStringFunctions(TestCase):

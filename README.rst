@@ -62,7 +62,6 @@ Or to install using PyPI (excluding scripts)
 
 .. code:: text
 
-    pip install -U setuptools
     pip install pywikibot
     pwb <scriptname>
 

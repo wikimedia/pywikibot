@@ -37,7 +37,6 @@ Usage::
    - *nodist* option was added
 
 .. versionchanged:: 8.1
-   Python 3.7+ required because *dataclasses* module is used.
    *nodist* option was removed, *clear* option does not create a
    distribution. *local* and *remote* option clears old distributions
    first.
@@ -46,7 +45,7 @@ Usage::
    option also installs packages if necessary.
 """
 #
-# (C) Pywikibot team, 2022-2023
+# (C) Pywikibot team, 2022-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -200,9 +199,6 @@ class SetupPywikibot(SetupBase):
 
 def handle_args() -> tuple[bool, bool, bool, bool]:
     """Handle arguments and print documentation if requested.
-
-    Read arguments from `sys.argv` and adjust it passing `sdist` to
-    `setuptools.setup`.
 
     :return: Return whether dist is to be installed locally or to be
         uploaded
