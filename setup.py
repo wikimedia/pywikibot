@@ -28,8 +28,6 @@ import os
 import re
 import sys
 
-from setuptools import setup
-
 
 if sys.version_info[:3] >= (3, 9):
     List = list
@@ -211,6 +209,8 @@ def get_packages(name) -> List[str]:
 
 def main() -> None:
     """Setup entry point."""
+    from setuptools import setup
+
     version = get_validated_version()
     setup(
         name=metadata.__name__,
