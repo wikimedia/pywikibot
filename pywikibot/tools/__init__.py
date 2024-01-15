@@ -77,6 +77,7 @@ __all__ = (
     'PYTHON_VERSION',
     'as_filename',
     'is_ip_address',
+    'is_ip_network',
     'has_module',
     'classproperty',
     'suppress_warnings',
@@ -107,6 +108,20 @@ def is_ip_address(value: str) -> bool:
     """
     with suppress(ValueError):
         ipaddress.ip_address(value)
+        return True
+
+    return False
+
+
+def is_ip_network(value: str) -> bool:
+    """Check if a value is a valid range of IPv4 or IPv6 addresses.
+
+    .. versionadded:: 9.0
+
+    :param value: value to check
+    """
+    with suppress(ValueError):
+        ipaddress.ip_network(value)
         return True
 
     return False

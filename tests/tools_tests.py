@@ -24,6 +24,7 @@ from pywikibot.tools import (
     classproperty,
     has_module,
     is_ip_address,
+    is_ip_network,
     suppress_warnings,
 )
 from pywikibot.tools.itertools import (
@@ -837,6 +838,81 @@ class TestIsIpAddress(TestCase):
         for address in invalid_addresses:
             with self.subTest(ip_address=address):
                 self.assertFalse(is_ip_address(address))
+
+
+class TestIsIpNetwork(TestCase):
+
+    """Unit test class for is_ip_network."""
+
+    net = False
+
+    def test_valid_ipv4_ranges(self):
+        """Check with valid IPv4 address ranges."""
+        valid_ranges = (
+            '0.0.0.0/32',
+            '1.2.3.4/32',
+            '1.2.3.0/24',
+            '192.168.0.0/16',
+            '192.168.0.0/15',
+            '255.0.0.0/8',
+            '0.0.0.0/1'
+        )
+
+        for ip_range in valid_ranges:
+            with self.subTest(ip_network=ip_range):
+                self.assertTrue(is_ip_network(ip_range))
+
+    def test_invalid_ipv4_ranges(self):
+        """Check with invalid IPv4 address ranges."""
+        invalid_ranges = (
+            None,
+            '',
+            '0.0.0',
+            '1.2.3.256',
+            '1.2.3.-1',
+            '0.0.0.a',
+            'a.b.c.d',
+            '1.2.3.4/24',
+            '192.168.0.0/8',
+            '192.168.1.0/15'
+        )
+
+        for ip_range in invalid_ranges:
+            with self.subTest(ip_network=ip_range):
+                self.assertFalse(is_ip_network(ip_range))
+
+    def test_valid_ipv6_ranges(self):
+        """Check with valid IPv6 address ranges."""
+        valid_ranges = (
+            'fe80:0000:0000:0000:0202:b3ff:fe1e:8329/128',
+            'fe80:0:0:0:202:b3ff:fe1e:8329/128',
+            '::ffff:5.9.158.75/128',
+            '2001:0db8:0000:0000:0000:0000:0000:0000/32',
+            '2001:0db8::/32',
+            '::/64',
+            '::/1',
+        )
+
+        for ip_range in valid_ranges:
+            with self.subTest(ip_network=ip_range):
+                self.assertTrue(is_ip_network(ip_range))
+
+    def test_invalid_ipv6_addresses(self):
+        """Check with invalid IPv6 addresses."""
+        invalid_ranges = (
+            None,
+            '/32',
+            ':/32',
+            ':::/32',
+            '2001:db8::aaaa::1/128',
+            'fe80:0000:0000:0000:0202:b3ff:fe1e: 8329/128',
+            'fe80:0000:0000:0000:0202:b3ff:fe1e:829g/128',
+            '2001:0db8::/16'
+        )
+
+        for ip_range in invalid_ranges:
+            with self.subTest(ip_network=ip_range):
+                self.assertFalse(is_ip_network(ip_range))
 
 
 class TestHasModule(TestCase):
