@@ -348,7 +348,6 @@ class ClientLoginManager(LoginManager):
         if botpassword:
             self.action = 'login'
         else:
-            token = self.site.tokens['login']
             self.action = 'clientlogin'
 
         # prepare default login parameters
@@ -356,11 +355,14 @@ class ClientLoginManager(LoginManager):
                       self.keyword('user'): self.login_name,
                       self.keyword('password'): self.password}
 
+        if self.action == 'login':
+            parameters['lgtoken'] = self.site.tokens['login']
+
         if self.action == 'clientlogin':
             # clientlogin requires non-empty loginreturnurl
             parameters['loginreturnurl'] = 'https://example.com'
             parameters['rememberMe'] = '1'
-            parameters['logintoken'] = token
+            parameters['logintoken'] = self.site.tokens['login']
 
         if self.site.family.ldapDomain:
             parameters[self.keyword('ldap')] = self.site.family.ldapDomain
