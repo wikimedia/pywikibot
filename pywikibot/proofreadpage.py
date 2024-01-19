@@ -22,7 +22,7 @@ OCR support of page scans via:
 
 """
 #
-# (C) Pywikibot team, 2015-2023
+# (C) Pywikibot team, 2015-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -543,7 +543,8 @@ class ProofreadPage(pywikibot.Page):
                 if self._num is not None:
                     for page in what_links_here:
                         if page.title(with_ns=False) == self._base:
-                            what_links_here.remove(page)
+                            # ignore B038, we break the loop after removal
+                            what_links_here.remove(page)  # noqa: B038
                             self._index = (page, what_links_here)
                             break
 

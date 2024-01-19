@@ -54,7 +54,7 @@ included.
 .. versionadded:: 7.2
 """
 #
-# (C) Pywikibot team, 2020-2023
+# (C) Pywikibot team, 2020-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -967,7 +967,9 @@ class DataExtendBot(SingleSiteBot):
                                             claim[0]])].addSources(sourcedata)
                         else:
                             if claim[0] not in propsdone:
-                                propstodo.append(claim[0])
+                                # DequeGenerator is intended to add items
+                                # during generation, therefore ignore B038
+                                propstodo.append(claim[0])  # noqa: B038
 
                             createdclaim = pywikibot.Claim(self.site, claim[0])
 
@@ -1093,7 +1095,8 @@ class DataExtendBot(SingleSiteBot):
                                                     0]])].addSources(sourcedata)
                                     except AttributeError:
                                         if prop not in propsdone:
-                                            propstodo.append(prop)
+                                            # ignore B038 due to DequeGenerator
+                                            propstodo.append(prop)  # noqa: B038
                                         pywikibot.info('Sourcing failed')
 
                 for language, description in analyzer.getdescriptions():
