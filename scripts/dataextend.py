@@ -1282,9 +1282,9 @@ class Analyzer:
     TAGRE = re.compile('<[^<>]*>')
     SCRIPTRE = re.compile('(?s)<script.*?</script>')
 
-    def __init__(self, id, data=None, item=None, bot=None):
+    def __init__(self, ident, data=None, item=None, bot=None):
         """Initializer."""
-        self.id = id
+        self.id = ident
         self.data = defaultdict(dict) if data is None else data
         self.dbname = None
         self.urlbase = None
@@ -16388,12 +16388,12 @@ class WikiAnalyzer(Analyzer):
 
 class UrlAnalyzer(Analyzer):
 
-    def __init__(self, id, data=None, item=None, bot=None):
+    def __init__(self, ident, data=None, item=None, bot=None):
         """Initializer."""
         if data is None:
             data = defaultdict(dict)
-        super().__init__(id.split('/', 3)[-1], data, item, bot)
-        self.urlbase = id
+        super().__init__(ident.split('/', 3)[-1], data, item, bot)
+        self.urlbase = ident
         self.dbproperty = None
         self.isurl = True
 

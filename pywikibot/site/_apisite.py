@@ -1,6 +1,6 @@
 """Objects representing API interface to MediaWiki site."""
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -73,6 +73,7 @@ from pywikibot.site._upload import Uploader
 from pywikibot.tools import (
     MediaWikiVersion,
     cached,
+    deprecate_arg,
     deprecated,
     issue_deprecation_warning,
     merge_unique_dicts,
@@ -1394,18 +1395,22 @@ class APISite(
         # 'title' is expected to be URL-encoded already
         return self.siteinfo['articlepath'].replace('$1', title)
 
-    def namespace(self, num: int, all: bool = False) -> str | Namespace:
+    @deprecate_arg('all', 'all_ns')  # since 9.0
+    def namespace(self, num: int, all_ns: bool = False) -> str | Namespace:
         """Return string containing local name of namespace 'num'.
 
-        If optional argument 'all' is true, return all recognized
+        If optional argument *all_ns* is true, return all recognized
         values for this namespace.
 
+        .. versionchanged:: 9.0
+           *all* parameter was renamed to *all_ns*.
+
         :param num: Namespace constant.
-        :param all: If True return a Namespace object. Otherwise
-            return the namespace name.
-        :return: local name or Namespace object
+        :param all_ns: If True return a :class:`Namespace` object.
+            Otherwise return the namespace name.
+        :return: local name or :class:`Namespace` object
         """
-        if all:
+        if all_ns:
             return self.namespaces[num]
         return self.namespaces[num][0]
 

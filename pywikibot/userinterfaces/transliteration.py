@@ -1,10 +1,12 @@
 """Module to transliterate text."""
 #
-# (C) Pywikibot team, 2006-2022
+# (C) Pywikibot team, 2006-2024
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
+
+from pywikibot.tools import deprecate_arg
 
 
 #: Non latin digits used by the framework
@@ -1119,15 +1121,18 @@ class transliterator:  # noqa: N801
             trans[char] = value
         self.trans = trans
 
+    @deprecate_arg('next', 'succ')  # since 9.0
     def transliterate(self, char: str, default: str = '?',
-                      prev: str = '-', next: str = '-') -> str:
-        """
-        Transliterate the character.
+                      prev: str = '-', succ: str = '-') -> str:
+        """Transliterate the character.
+
+        .. versionchanged:: 9.0
+           *next* parameter was renamed to *succ*.
 
         :param char: The character to transliterate.
         :param default: The character used when there is no transliteration.
         :param prev: The previous character
-        :param next: The next character
+        :param succ: The succeeding character
         :return: The transliterated character which may be an empty string
         """
         result = default
@@ -1138,7 +1143,7 @@ class transliterator:  # noqa: N801
             result = prev
         # Japanese
         elif char == 'ッ':
-            result = self.transliterate(next)[0]
+            result = self.transliterate(succ)[0]
         elif char in '々仝ヽヾゝゞ〱〲〳〵〴〵':
             result = prev
         # Lao

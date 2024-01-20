@@ -44,7 +44,7 @@ Examples::
 
 """
 #
-# (C) Pywikibot team, 2007-2023
+# (C) Pywikibot team, 2007-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -474,7 +474,7 @@ def main(*args: str) -> None:
         elif arg in ('-protectedpages', '-moveprotected'):
             protect_type = 'move' if option.startswith('move') else 'edit'
             generator = site.protectedpages(namespace=int(value or 0),
-                                            type=protect_type)
+                                            protect_type=protect_type)
 
     if not generator:
         generator = gen_factory.getCombinedGenerator()

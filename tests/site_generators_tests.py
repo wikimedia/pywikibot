@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for generators of the site module."""
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -571,14 +571,15 @@ class TestSiteGenerators(DefaultSiteTestCase):
 
     def test_protectedpages_create(self):
         """Test that protectedpages returns protected page titles."""
-        pages = list(self.get_site().protectedpages(type='create', total=10))
+        pages = list(self.get_site().protectedpages(protect_type='create',
+                                                    total=10))
         # Do not check for the existence of pages as they might exist (T205883)
         self.assertLessEqual(len(pages), 10)
 
     def test_protectedpages_edit(self):
         """Test that protectedpages returns protected pages."""
         site = self.get_site()
-        pages = list(site.protectedpages(type='edit', total=10))
+        pages = list(site.protectedpages(protect_type='edit', total=10))
         for page in pages:
             self.assertTrue(page.exists())
             self.assertIn('edit', page.protection())
@@ -590,7 +591,8 @@ class TestSiteGenerators(DefaultSiteTestCase):
         levels = set()
         all_levels = site.protection_levels().difference([''])
         for level in all_levels:
-            if list(site.protectedpages(type='edit', level=level, total=1)):
+            if list(site.protectedpages(protect_type='edit', level=level,
+                                        total=1)):
                 levels.add(level)
         if not levels:
             self.skipTest(
@@ -602,7 +604,8 @@ class TestSiteGenerators(DefaultSiteTestCase):
             # if only one level found, then use any other except that
             level = next(iter(all_levels.difference([level])))
         invalid_levels = all_levels.difference([level])
-        pages = list(site.protectedpages(type='edit', level=level, total=10))
+        pages = list(site.protectedpages(protect_type='edit', level=level,
+                                         total=10))
         for page in pages:
             self.assertTrue(page.exists())
             self.assertIn('edit', page.protection())

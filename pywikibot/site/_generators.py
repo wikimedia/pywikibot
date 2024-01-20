@@ -1,6 +1,6 @@
 """Objects representing API generators to MediaWiki site."""
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -26,7 +26,11 @@ from pywikibot.exceptions import (
 )
 from pywikibot.site._decorators import need_right
 from pywikibot.site._namespace import NamespaceArgType
-from pywikibot.tools import is_ip_address, issue_deprecation_warning
+from pywikibot.tools import (
+    deprecate_arg,
+    is_ip_address,
+    issue_deprecation_warning,
+)
 from pywikibot.tools.itertools import filter_unique
 
 
@@ -2070,41 +2074,43 @@ class GeneratorsMixin:
         """
         return self.querypage('Listredirects', total)
 
+    @deprecate_arg('type', 'protect_type')
     def protectedpages(
         self,
         namespace=0,
-        type: str = 'edit',
+        protect_type: str = 'edit',
         level: str | bool = False,
         total=None
     ):
-        """
-        Return protected pages depending on protection level and type.
+        """Return protected pages depending on protection level and type.
 
         For protection types which aren't 'create' it uses
         :py:obj:`APISite.allpages`, while it uses for 'create' the
         'query+protectedtitles' module.
 
+        .. versionchanged:: 9.0
+        *type* parameter was renamed to *protect_type*.
         .. seealso:: :api:`Protectedtitles`
 
         :param namespace: The searched namespace.
         :type namespace: int or Namespace or str
-        :param type: The protection type to search for (default 'edit').
-        :type type: str
+        :param protect_type: The protection type to search for
+            (default 'edit').
         :param level: The protection level (like 'autoconfirmed'). If False it
             shows all protection levels.
         :return: The pages which are protected.
         :rtype: typing.Iterable[pywikibot.Page]
         """
         namespaces = self.namespaces.resolve(namespace)
-        # always assert that, so we are be sure that type could be 'create'
+        # always assert, so we are be sure that protect_type could be 'create'
         assert 'create' in self.protection_types(), \
             "'create' should be a valid protection type."
-        if type == 'create':
+        if protect_type == 'create':
             return self._generator(
                 api.PageGenerator, type_arg='protectedtitles',
                 namespaces=namespaces, gptlevel=level, total=total)
         return self.allpages(namespace=namespaces[0], protect_level=level,
-                             protect_type=type, total=total)
+                             protect_type=protect_type, total=total)
 
     def pages_with_property(self, propname: str, *,
                             total: int | None = None):
