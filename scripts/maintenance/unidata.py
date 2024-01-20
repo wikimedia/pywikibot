@@ -10,7 +10,7 @@ This script is for updating ``_first_upper_exception_dict``.
 .. versionadded:: 8.4
 """
 #
-# (C) Pywikibot team, 2018-2023
+# (C) Pywikibot team, 2018-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -38,7 +38,7 @@ def chars_uppers_wikilinks():
     chars = []
     uppers = []
     wikilinks = ''
-    for i in range(0, maxunicode + 1):
+    for i in range(maxunicode + 1):
         c = chr(i)
         uc = c.upper()
         if uc != c:

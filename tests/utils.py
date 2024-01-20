@@ -390,7 +390,7 @@ class DrySite(pywikibot.site.APISite):
     def image_repository(self):
         """Return Site object for image repository e.g. commons."""
         code, fam = self.shared_image_repository()
-        if bool(code or fam):
+        if code or fam:
             return pywikibot.Site(code, fam, self.username(),
                                   interface=self.__class__)
         return None
@@ -411,7 +411,7 @@ class DrySite(pywikibot.site.APISite):
                             'wikivoyage'):
             code, fam = None, None
 
-        if bool(code or fam):
+        if code or fam:
             return pywikibot.Site(code, fam, self.username(),
                                   interface=DryDataSite)
         return None

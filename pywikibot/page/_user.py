@@ -1,6 +1,6 @@
 """Object representing a Wiki user."""
 #
-# (C) Pywikibot team, 2009-2022
+# (C) Pywikibot team, 2009-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -261,10 +261,8 @@ class User(Page):
         mailrequest = self.site.simple_request(**params)
         maildata = mailrequest.submit()
 
-        if 'emailuser' in maildata \
-           and maildata['emailuser']['result'] == 'Success':
-            return True
-        return False
+        return ('emailuser' in maildata
+                and maildata['emailuser']['result'] == 'Success')
 
     def block(self, *args, **kwargs):
         """

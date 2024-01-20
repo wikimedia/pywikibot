@@ -1,6 +1,6 @@
 """Objects representing API interface to MediaWiki site."""
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1280,7 +1280,7 @@ class APISite(
     def image_repository(self) -> BaseSite | None:
         """Return Site object for image repository e.g. commons."""
         code, fam = self.shared_image_repository()
-        if bool(code or fam):
+        if code or fam:
             return pywikibot.Site(code, fam, self.username())
 
         return None

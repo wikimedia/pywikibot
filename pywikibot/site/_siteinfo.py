@@ -1,6 +1,6 @@
 """Objects representing site info data contents."""
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -82,7 +82,7 @@ class Siteinfo(Container):
             if prop in ('namespaces', 'magicwords'):
                 for index, value in enumerate(data):
                     # namespaces uses a dict, while magicwords uses a list
-                    key = index if type(data) is list else value
+                    key = index if isinstance(data, list) else value
                     for p in Siteinfo.BOOLEAN_PROPS[prop]:
                         data[key][p] = p in data[key]
             else:
