@@ -98,7 +98,7 @@ class User(Page):
         if force and hasattr(self, '_userprops'):
             del self._userprops
         if not hasattr(self, '_userprops'):
-            self._userprops = list(self.site.users([self.username, ]))[0]
+            self._userprops = list(self.site.users([self.username]))[0]
             if self.isAnonymous() or self.is_CIDR():
                 r = list(self.site.blocks(iprange=self.username, total=1))
                 if r:

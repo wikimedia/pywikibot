@@ -1,6 +1,6 @@
 """Family module for Wikimedia chapter, thematic organisation and WUG wikis."""
 #
-# (C) Pywikibot team, 2012-2023
+# (C) Pywikibot team, 2012-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -18,7 +18,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'et': 'ee'
     }
 
-    closed_wikis = ['cn', 'nz', 'pa-us', ]
+    closed_wikis = ['cn', 'nz', 'pa-us']
 
     codes = [
         'am', 'ar', 'az', 'bd', 'be', 'br', 'ca', 'co', 'dk', 'ec', 'ee', 'fi',

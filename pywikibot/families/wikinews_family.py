@@ -1,6 +1,6 @@
 """Family module for Wikinews."""
 #
-# (C) Pywikibot team, 2005-2023
+# (C) Pywikibot team, 2005-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -52,7 +52,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # TODO: List is incomplete, to be completed for missing languages.
     doc_subpages = {
         '_default': (('/doc', ),
-                     ['en', ]
+                     ['en']
                      ),
         'ar': ('/شرح', '/doc'),
         'it': ('/man', ),

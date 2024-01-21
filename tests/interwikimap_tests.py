@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the site module."""
 #
-# (C) Pywikibot team, 2018-2023
+# (C) Pywikibot team, 2018-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -149,7 +149,7 @@ class TestInterwikiMapPrefix(TestCase):
 
     def test_invalid_prefix(self):
         """Test wrong interwiki prefix."""
-        for prefix in ('foo', 'mediawiki', 'test', ):
+        for prefix in ('foo', 'mediawiki', 'test'):
             with self.subTest(prefix=prefix), self.assertRaises(KeyError):
                 self.iw_map[prefix]
 

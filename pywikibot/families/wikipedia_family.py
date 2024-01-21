@@ -162,8 +162,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
                       'ilo', 'ja', 'ms', 'pt', 'ro', 'ru', 'simple', 'sh',
                       'vi', 'zh']
                      ),
-        'ar': ('/شرح', '/doc', ),
-        'ary': ('/توثيق', '/شرح', '/doc', ),
+        'ar': ('/شرح', '/doc'),
+        'ary': ('/توثيق', '/شرح', '/doc'),
         'bs': ('/dok', ),
         'ca': ('/ús', ),
         'de': ('Doku', '/Meta'),
@@ -194,7 +194,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'arz': ('بتتطور',),
         'bs': ('Izmjena u toku',),
         'cs': ('Pracuje se',),
-        'de': ('Inuse', 'In use', 'In bearbeitung', 'Inbearbeitung',),
+        'de': ('Inuse', 'In use', 'In bearbeitung', 'Inbearbeitung'),
         'en': ('Inuse', 'In use'),
         'fa': ('ویرایش',),
         'fr': ('En cours',),
@@ -202,7 +202,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'hr': ('Radovi',),
         'hy': ('Խմբագրում եմ',),
         'ru': ('Редактирую',),
-        'sr': ('Радови у току', 'Рут',),
+        'sr': ('Радови у току', 'Рут'),
         'test': ('In use',),
         'ur': ('زیر ترمیم',),
         'zh': ('Inuse',),
@@ -215,7 +215,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'arz': ('صفحة ارشيف',),
         'cs': ('Archiv', 'Archiv Wikipedie', 'Archiv diskuse',
                'Archivace start', 'Posloupnost archivů', 'Rfa-archiv-start',
-               'Rfc-archiv-start',),
+               'Rfc-archiv-start'),
         'de': ('Archiv',),
     }
 

@@ -15739,8 +15739,9 @@ class WikiAnalyzer(Analyzer):
 
     def findtitles(self, html: str):
         return self.getinfos(
-            [r'titre\d*', r'титул_?\d*', r'tước vị[\w\s]*', '爵位', 'titels', 'titles', 'títuloas', r'titul(?:y|as|ai)?\d*',
-             '(?:altri)?titol[oi]', ], html, 'title') + \
+            [r'titre\d*', r'титул_?\d*', r'tước vị[\w\s]*', '爵位',
+             'titels', 'titles', 'títuloas', r'titul(?:y|as|ai)?\d*',
+             '(?:altri)?titol[oi]'], html, 'title') + \
                self.findallbyre(r'Categorie:\s*((?:Heer|Vorst|Graaf) van.*?)\]', html, 'title') + self.findallbyre(
             r'Kategorie:\s*((?:Herzog|Herr|Graf|Vizegraf) \([^\[\]]*\))\s*\]', html, 'title') + \
                self.findallbyre(r'Catégorie:\s*((?:Duc|Prince|Comte) de.*?)\]', html, 'title') + \
@@ -15783,8 +15784,10 @@ class WikiAnalyzer(Analyzer):
                self.findbyre(r'\|otec\|([^|{}]*)}', html, 'person')
 
     def findmother(self, html: str):
-        return self.getinfo(['mother', 'madre', 'moeder', 'mère', 'mor', 'matka', 'мать', 'майка', '母親', 'матір', 'mẹ',
-                             'الأم', 'mer', 'маці', 'mãe', 'motina', 'мати', 'nome_mãe', ], html, 'person') or \
+        return self.getinfo(['mother', 'madre', 'moeder', 'mère', 'mor',
+                             'matka', 'мать', 'майка', '母親', 'матір', 'mẹ',
+                             'الأم', 'mer', 'маці', 'mãe', 'motina', 'мати',
+                             'nome_mãe'], html, 'person') or \
                self.getinfo(['rodzice', 'parents', 'roditelji', 'γονείς', 'والدین', 'parella', '부모', 'wazazi', 'ouers',
                              ], html, 'female-person') or \
                self.findbyre(r'\|matka\|([^|{}]*)}', html, 'person')

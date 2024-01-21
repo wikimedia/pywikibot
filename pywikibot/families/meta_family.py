@@ -1,6 +1,6 @@
 """Family module for Meta Wiki."""
 #
-# (C) Pywikibot team, 2005-2023
+# (C) Pywikibot team, 2005-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -17,7 +17,7 @@ class Family(family.WikimediaOrgFamily):
     name = 'meta'
 
     interwiki_forward = 'wikipedia'
-    cross_allowed = ['meta', ]
+    cross_allowed = ['meta']
 
     category_redirect_templates = {
         'meta': (
