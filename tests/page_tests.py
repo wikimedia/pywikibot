@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the page module."""
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -270,9 +270,9 @@ class TestPageObjectEnglish(TestCase):
             'File:Example',  # no file extension
             'File:Example #3.jpg',  # file extension in section
         ):
-            with self.subTest(title=title):
-                with self.assertRaises(ValueError):
-                    pywikibot.FilePage(site, title)
+            with self.subTest(title=title), \
+                 self.assertRaises(ValueError):
+                pywikibot.FilePage(site, title)
 
     def testImageAndDataRepository(self):
         """Test image_repository and data_repository page attributes."""

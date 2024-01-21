@@ -464,15 +464,15 @@ class WbTime(WbRepresentation):
         if self.month > 1:
             elapsed_seconds += self._month_offset[self.month] * 24 * 60 * 60
             # The greogrian calendar
-            if self.calendarmodel == 'http://www.wikidata.org/entity/Q1985727':
-                if (self.year % 400 == 0
-                        or (self.year % 4 == 0 and self.year % 100 != 0)
-                        and self.month > 2):
-                    elapsed_seconds += 24 * 60 * 60  # Leap year
+            if (self.calendarmodel == 'http://www.wikidata.org/entity/Q1985727'
+                and (self.year % 400 == 0
+                     or (self.year % 4 == 0 and self.year % 100 != 0)
+                     and self.month > 2)):
+                elapsed_seconds += 24 * 60 * 60  # Leap year
             # The julian calendar
-            if self.calendarmodel == 'http://www.wikidata.org/entity/Q1985786':
-                if self.year % 4 == 0 and self.month > 2:
-                    elapsed_seconds += 24 * 60 * 60
+            if (self.calendarmodel == 'http://www.wikidata.org/entity/Q1985786'
+                    and self.year % 4 == 0 and self.month > 2):
+                elapsed_seconds += 24 * 60 * 60
         if self.day > 1:
             # Days start at 1, not 0.
             elapsed_seconds += (self.day - 1) * 24 * 60 * 60

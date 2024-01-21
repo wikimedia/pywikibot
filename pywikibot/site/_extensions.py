@@ -1,6 +1,6 @@
 """Objects representing API interface to MediaWiki site extenstions."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -584,7 +584,7 @@ class FlowMixin:
         params = {'action': 'flow', 'page': page, 'token': token,
                   'submodule': 'edit-topic-summary', 'etssummary': summary,
                   'etsformat': 'wikitext'}
-        if 'summary' in page.root._current_revision.keys():
+        if 'summary' in page.root._current_revision:
             params['etsprev_revision'] = page.root._current_revision[
                 'summary']['revision']['revisionId']
         req = self._request(parameters=params, use_get=False)

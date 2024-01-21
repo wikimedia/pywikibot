@@ -1,6 +1,6 @@
 """Objects representing Flow entities, like boards, topics, and posts."""
 #
-# (C) Pywikibot team, 2015-2023
+# (C) Pywikibot team, 2015-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -325,7 +325,7 @@ class Topic(FlowPage):
 
         :return: summary or None
         """
-        if 'summary' in self.root._current_revision.keys():
+        if 'summary' in self.root._current_revision:
             return self.root._current_revision['summary']['revision'][
                 'content']['content']
         return None
