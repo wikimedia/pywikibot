@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the User page."""
 #
-# (C) Pywikibot team, 2016-2023
+# (C) Pywikibot team, 2016-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -203,8 +203,8 @@ class TestUserMethods(DefaultSiteTestCase):
         user = User(mysite, mysite.user())
         le = list(user.logevents(total=10))
         if not le:
-            self.skipTest('User {} has no logevents on site {}.'
-                          .format(mysite.user(), mysite))
+            self.skipTest(
+                f'User {mysite.user()} has no logevents on site {mysite}.')
         self.assertLessEqual(len(le), 10)
         last = le[0]
         self.assertEqual(last, user.last_event)

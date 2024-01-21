@@ -443,8 +443,7 @@ class BS4TestCase(TestCase):
         """Check whether bs4 module is installed already."""
         if not has_module('bs4'):
             unittest_print(
-                'all tests ({module}.{name})\n{doc}.. '
-                .format(module=__name__, doc=cls.__doc__, name=cls.__name__),
+                f'all tests ({__name__}.{cls.__name__})\n{cls.__doc__}.. ',
                 end='\n')
             cls.skipTest(cls, 'bs4 not installed')
         super().setUpClass()

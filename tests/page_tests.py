@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the page module."""
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -481,8 +481,7 @@ class TestPageObject(DefaultSiteTestCase):
         mainpage = self.get_mainpage()
         maintalk = mainpage.toggleTalkPage()
         if not maintalk.exists():
-            self.skipTest("No talk page for {}'s main page"
-                          .format(self.get_site()))
+            self.skipTest(f"No talk page for {self.get_site()}'s main page")
         self.assertIsInstance(maintalk.get(get_redirect=True), str)
         self.assertEqual(mainpage.toggleTalkPage(), maintalk)
         self.assertEqual(maintalk.toggleTalkPage(), mainpage)
@@ -685,7 +684,7 @@ class TestPageRepr(DefaultDrySiteTestCase):
     def test_unicode_value(self):
         """Test to capture actual Python result pre unicode_literals."""
         self.assertEqual(repr(self.page), "Page('Ō')")
-        self.assertEqual('%r' % self.page, "Page('Ō')")
+        self.assertEqual(f'{self.page!r}', "Page('Ō')")
         self.assertEqual(f'{self.page!r}', "Page('Ō')")
 
 
@@ -1027,8 +1026,8 @@ class TestPageUserAction(DefaultSiteTestCase):
     def test_watch(self):
         """Test Page.watch, with and without unwatch enabled."""
         if not self.site.has_right('editmywatchlist'):
-            self.skipTest('user {} cannot edit its watch list'
-                          .format(self.site.user()))
+            self.skipTest(
+                f'user {self.site.user()} cannot edit its watch list')
 
         # Note: this test uses the userpage, so that it is unwatched and
         # therefore is not listed by script_tests test_watchlist_simulate.
@@ -1249,8 +1248,8 @@ class TestShortLink(TestCase):
         if not meta.logged_in():
             meta.login()
         if not meta.user():
-            self.skipTest('{}: Not able to login to {}'
-                          .format(type(self).__name__, meta))
+            self.skipTest(
+                f'{type(self).__name__}: Not able to login to {meta}')
 
         site = self.get_site()
         p1 = pywikibot.Page(site, 'User:Framawiki/pwb_tests/shortlink')

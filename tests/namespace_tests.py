@@ -293,13 +293,11 @@ class TestNamespacesDictLookupName(TestCase):
 
                 with self.subTest(name=name, ns_id=ns_id):
                     if name.isupper():
-                        result = eval('self.namespaces.{name}.id'
-                                      .format(name=name))
+                        result = eval(f'self.namespaces.{name}.id')
                         self.assertEqual(result, ns_id)
                     else:
                         with self.assertRaises(AttributeError):
-                            exec('self.namespaces.{name}.id'
-                                 .format(name=name))
+                            exec(f'self.namespaces.{name}.id')
 
     def test_lookup_normalized_name(self):
         """Test lookup_normalized_name."""

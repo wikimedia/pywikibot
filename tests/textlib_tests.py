@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test textlib module."""
 #
-# (C) Pywikibot team, 2011-2023
+# (C) Pywikibot team, 2011-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -733,8 +733,7 @@ class TestReplaceLinks(TestCase):
                 self._count += 1
                 if link.section:
                     return pywikibot.Link(
-                        '{}#{}'
-                        .format(self._count, link.section), link.site)
+                        f'{self._count}#{link.section}', link.site)
                 return pywikibot.Link(f'{self._count}', link.site)
 
             return None
@@ -1396,8 +1395,8 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
         """Test replacing not inside interwiki links."""
         if ('es' not in self.site.family.langs
                 or 'ey' in self.site.family.langs):
-            raise unittest.SkipTest("family {} doesn't have languages"
-                                    .format(self.site))
+            raise unittest.SkipTest(
+                f"family {self.site} doesn't have languages")
 
         self.assertEqual(textlib.replaceExcept('[[es:s]]', 's', 't',
                                                ['interwiki'], site=self.site),

@@ -219,8 +219,7 @@ class TestFamilyUrlRegex(PatchingTestCase):
         for family in pywikibot.config.family_files:
             if family == 'wowwiki':
                 self.skipTest(
-                    'Family.from_url() does not work for {} (T215077)'
-                    .format(family))
+                    f'Family.from_url() does not work for {family} (T215077)')
             self.current_family = family
             family = Family.load(family)
             for code in family.codes:

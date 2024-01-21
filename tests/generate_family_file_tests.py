@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test generate_family_file script."""
 #
-# (C) Pywikibot team, 2018-2022
+# (C) Pywikibot team, 2018-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -52,8 +52,7 @@ class TestGenerateFamilyFile(DefaultSiteTestCase):
         super().setUpClass()
         # test fails on wowwiki (T297042)
         if cls.site.family.name == 'wowwiki':
-            raise unittest.SkipTest('skipping {} due to T297042'
-                                    .format(cls.site))
+            raise unittest.SkipTest(f'skipping {cls.site} due to T297042')
 
     def setUp(self):
         """Set up tests."""
@@ -99,9 +98,8 @@ class TestGenerateFamilyFile(DefaultSiteTestCase):
             with self.subTest(url=url):
                 if lang_parse.netloc != wiki_parse.netloc:
                     # skip redirected url (T241413)
-                    self.skipTest(
-                        '{} is redirected to {}'
-                        .format(lang_parse.netloc, wiki_parse.netloc))
+                    self.skipTest(f'{lang_parse.netloc} is redirected to '
+                                  f'{wiki_parse.netloc}')
 
                 site = Site(url=url)
 

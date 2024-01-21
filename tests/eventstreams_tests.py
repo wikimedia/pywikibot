@@ -46,8 +46,7 @@ class TestEventStreamsUrlTests(TestCase):
         self.assertIsNone(e._total)
         self.assertIsNone(e._streams)
         self.assertEqual(repr(e),
-                         "EventStreams(url='{}')"
-                         .format(self.sites[key]['hostname']))
+                         f"EventStreams(url='{self.sites[key]['hostname']}')")
 
     def test_url_from_site(self, key):
         """Test EventStreams with url from site."""
@@ -62,8 +61,7 @@ class TestEventStreamsUrlTests(TestCase):
         self.assertEqual(e._streams, streams)
         site_repr = f'site={repr(site)}, ' if site != Site() else ''
         self.assertEqual(repr(e),
-                         "EventStreams({}streams='{}')"
-                         .format(site_repr, streams))
+                         f"EventStreams({site_repr}streams='{streams}')")
 
 
 @mock.patch('pywikibot.comms.eventstreams.EventSource', new=mock.MagicMock())
@@ -78,8 +76,7 @@ class TestEventStreamsStreamsTests(DefaultSiteTestCase):
         fam = site.family
         if not isinstance(fam, WikimediaFamily):
             self.skipTest(
-                "Family '{}' of site '{}' is not a WikimediaFamily."
-                .format(fam, site))
+                f"Family '{fam}' of site '{site}' is not a WikimediaFamily.")
 
     def test_url_with_streams(self):
         """Test EventStreams with url from default site."""

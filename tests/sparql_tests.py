@@ -106,8 +106,7 @@ class TestSparql(WikidataTestCase):
     def testQuerySelect(self, mock_method):
         """Test SELECT query."""
         mock_method.return_value = Container(
-            SQL_RESPONSE_CONTAINER % '{}, {}'.format(
-                ITEM_Q498787, ITEM_Q677525))
+            SQL_RESPONSE_CONTAINER % f'{ITEM_Q498787}, {ITEM_Q677525}')
         with skipping(pywikibot.exceptions.TimeoutError):
             q = sparql.SparqlQuery()
         res = q.select('SELECT * WHERE { ?x ?y ?z }')
@@ -129,8 +128,7 @@ class TestSparql(WikidataTestCase):
     def testQuerySelectFull(self, mock_method):
         """Test SELECT query with full data."""
         mock_method.return_value = Container(
-            SQL_RESPONSE_CONTAINER % '{}, {}'.format(
-                ITEM_Q498787, ITEM_Q677525))
+            SQL_RESPONSE_CONTAINER % f'{ITEM_Q498787}, {ITEM_Q677525}')
         with skipping(pywikibot.exceptions.TimeoutError):
             q = sparql.SparqlQuery()
         res = q.select('SELECT * WHERE { ?x ?y ?z }', full_data=True)

@@ -73,8 +73,7 @@ class WikiStatsTestCase(TestCase):
             curr = int(data[code]['good'])
             self.assertGreaterEqual(
                 last, curr,
-                '{} ({}) is greater than {} ({}).'
-                .format(code, curr, last_code, last))
+                f'{code} ({curr}) is greater than {last_code} ({last}).')
             last = curr
             last_code = code
 
