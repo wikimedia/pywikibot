@@ -212,7 +212,7 @@ class TestChoiceOptions(TestCase):
         self.assertEqual(option.option, 'quit')
         self.assertEqual(option.shortcut, 'q')
         with self.assertRaises(QuitKeyboardInterrupt):
-            raise QuitKeyboardInterrupt()
+            raise QuitKeyboardInterrupt
 
 
 if __name__ == '__main__':  # pragma: no cover

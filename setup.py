@@ -64,6 +64,7 @@ extra_deps = {
         'flake8-mock-x2',
         'flake8-print>=5.0.0',
         'flake8-quotes>=3.3.2',
+        'flake8-raise',
         'flake8-string-format',
         'flake8-tuple>=0.4.1',
         'flake8-no-u-prefixed-strings>=0.2',

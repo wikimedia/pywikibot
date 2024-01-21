@@ -403,9 +403,9 @@ class APISite(
         # May occur if you are not logged in (no API read permissions).
         except APIError:
             pass
-        except NoUsernameError as e:
+        except NoUsernameError:
             if not autocreate:
-                raise e
+                raise
 
         if self.is_oauth_token_available():
             if self.userinfo['name'] == self.username():

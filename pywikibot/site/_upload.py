@@ -1,6 +1,6 @@
 """Objects representing API upload to MediaWiki site."""
 #
-# (C) Pywikibot team, 2009-2023
+# (C) Pywikibot team, 2009-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -347,7 +347,7 @@ class Uploader:
                                                       'offset mismatch error.')
                                     offset = new_offset
                                     continue
-                            raise error
+                            raise
                         if 'nochange' in data:  # in simulation mode
                             break
 

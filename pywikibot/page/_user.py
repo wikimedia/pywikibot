@@ -278,7 +278,7 @@ class User(Page):
             if err.code == 'invalidrange':
                 raise ValueError(f'{self.username} is not a valid IP range.')
 
-            raise err
+            raise
 
     def unblock(self, reason: str | None = None) -> None:
         """

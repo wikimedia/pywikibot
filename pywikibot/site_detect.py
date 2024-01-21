@@ -1,6 +1,6 @@
 """Classes for detecting a MediaWiki site."""
 #
-# (C) Pywikibot team, 2010-2023
+# (C) Pywikibot team, 2010-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -300,7 +300,7 @@ def check_response(response):
             except ValueError as err:
                 m = re.search(r'\d{3}', err.args[0], flags=re.ASCII)
                 if not m:
-                    raise err
+                    raise
                 msg = f'Generic {err_type} Error ({m.group()})'
             else:
                 msg = f'({status}) {status.description}'

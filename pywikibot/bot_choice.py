@@ -1,6 +1,6 @@
 """Options and Choices for :py:meth:`pywikibot.input_choice`."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -79,11 +79,11 @@ class Option(ABC):
 
     def format(self, default: str | None = None) -> str:
         """Return a formatted string for that option."""
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def test(self, value: str) -> bool:
         """Return True whether this option applies."""
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @abstractmethod
     def result(self, value: str) -> Any:
@@ -93,7 +93,7 @@ class Option(ABC):
            *result()* is an abstract method and must be defined in
            subclasses
         """
-        raise NotImplementedError()
+        raise NotImplementedError
 
 
 class OutputOption(Option):
@@ -273,7 +273,7 @@ class Choice(StandardOption):
     @abstractmethod
     def handle(self) -> Any:
         """Handle this choice. Must be implemented."""
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def handle_link(self) -> bool:
         """The current link will be handled by this choice."""

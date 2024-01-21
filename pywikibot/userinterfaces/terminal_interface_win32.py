@@ -1,6 +1,6 @@
 """User interface for Win32 terminals."""
 #
-# (C) Pywikibot team, 2003-2022
+# (C) Pywikibot team, 2003-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -67,5 +67,5 @@ class Win32UI(terminal_interface_base.UI):
     def _raw_input(self):  # pragma: no cover
         data = self.stdin.readline()
         if '\x1a' in data:
-            raise EOFError()
+            raise EOFError
         return data.strip()
