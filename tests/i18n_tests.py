@@ -307,8 +307,7 @@ class InputTestCase(TWNTestCaseBase, UserInterfaceLangTestCase, PwbTestCase):
 
         if cls.code in i18n.twget_keys(cls.message):
             raise unittest.SkipTest(
-                '{} has a translation for {}'
-                .format(cls.code, cls.message))
+                f'{cls.code} has a translation for {cls.message}')
 
     def test_pagegen_i18n_input(self):
         """Test i18n.input fallback via pwb."""

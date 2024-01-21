@@ -137,14 +137,11 @@ class TestChoiceOptions(TestCase):
                              f'? ({prefix}<number> [1-3])')
             for i, elem in enumerate(options, 1):
                 self.assertTrue(option.test(f'{prefix}{i}'))
-                self.assertIs(option.handled('{}{}'
-                                             .format(prefix, i)), option)
+                self.assertIs(option.handled(f'{prefix}{i}'), option)
                 self.assertEqual(option.result(f'{prefix}{i}'),
                                  (prefix, elem))
-            self.assertFalse(option.test('{}{}'
-                                         .format(prefix, len(options) + 1)))
-            self.assertIsNone(option.handled('{}{}'.format(
-                prefix, len(options) + 1)))
+            self.assertFalse(option.test(f'{prefix}{len(options) + 1}'))
+            self.assertIsNone(option.handled(f'{prefix}{len(options) + 1}'))
 
     def test_showing_list(self):
         """Test ShowingListOption."""

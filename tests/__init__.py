@@ -1,6 +1,6 @@
 """Package tests."""
 #
-# (C) Pywikibot team, 2007-2023
+# (C) Pywikibot team, 2007-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -57,8 +57,7 @@ def create_path_func(base_func, subpath):
 join_root_path.path = 'root'
 join_tests_path = create_path_func(join_root_path, 'tests')
 join_cache_path = create_path_func(join_tests_path,
-                                   'apicache-py{}'
-                                   .format(PYTHON_VERSION[0]))
+                                   f'apicache-py{PYTHON_VERSION[0]}')
 join_data_path = create_path_func(join_tests_path, 'data')
 join_pages_path = create_path_func(join_tests_path, 'pages')
 
@@ -273,8 +272,8 @@ CachedRequest._get_cache_dir = classmethod(
 # fail more frequently in code paths resulting from mishandled server problems.
 if config.max_retries > 3:
     if 'PYWIKIBOT_TEST_QUIET' not in os.environ:
-        unittest_print('tests: max_retries reduced from {} to 1'
-                       .format(config.max_retries))
+        unittest_print(
+            f'tests: max_retries reduced from {config.max_retries} to 1')
     config.max_retries = 1
 
 # Raise CaptchaError if a test requires solving a captcha

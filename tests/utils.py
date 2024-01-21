@@ -328,8 +328,7 @@ class DryRequest(CachedRequest):
 
     def submit(self):
         """Prevented method."""
-        raise Exception('DryRequest rejecting request: {!r}'
-                        .format(self._params))
+        raise Exception(f'DryRequest rejecting request: {self._params!r}')
 
 
 class DrySite(pywikibot.site.APISite):

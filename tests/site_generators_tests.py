@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for generators of the site module."""
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -594,8 +594,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
                 levels.add(level)
         if not levels:
             self.skipTest(
-                'The site "{}" has no protected pages in main namespace.'
-                .format(site))
+                f'The site "{site}" has no protected pages in main namespace.')
         # select one level which won't yield all pages from above
         level = next(iter(levels))
         if len(levels) == 1:
@@ -763,8 +762,8 @@ class TestImageUsage(DefaultSiteTestCase):
                 msg=f'No images on the main page of site {mysite!r}'):
             imagepage = next(page.imagelinks())  # 1st image of page
 
-        unittest_print('site_tests.TestImageUsage found {} on {}'
-                       .format(imagepage, page))
+        unittest_print(
+            f'site_tests.TestImageUsage found {imagepage} on {page}')
 
         self.__class__._image_page = imagepage
         return imagepage
@@ -1545,7 +1544,7 @@ class SiteRandomTestCase(DefaultSiteTestCase):
         site = cls.get_site()
         if site.family.name in ('wpbeta', 'wsbeta'):
             cls.skipTest(cls,
-                         'Skipping test on {} due to T282602' .format(site))
+                         f'Skipping test on {site} due to T282602')
 
     def test_unlimited_small_step(self):
         """Test site.randompages() continuation.
