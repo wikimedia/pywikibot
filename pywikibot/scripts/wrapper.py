@@ -376,6 +376,8 @@ def find_filename(filename):
 
     .. versionchanged:: 7.0
        Search users_scripts_paths in config.base_dir
+    .. versionchanged:: 9.0
+       Add config.base_dir to search path
     """
     from pywikibot import config
     path_list = []  # paths to find misspellings
@@ -391,14 +393,14 @@ def find_filename(filename):
             path_list.append(testpath.parent)
         return None
 
-    user_script_paths = []
+    user_script_paths = ['']
     if config.user_script_paths:  # pragma: no cover
         if isinstance(config.user_script_paths, list):
-            user_script_paths = config.user_script_paths
+            user_script_paths += config.user_script_paths
         else:
             warn("'user_script_paths' must be a list,\n"
-                 'found: {}. Ignoring this setting.'
-                 .format(type(config.user_script_paths)))
+                 f'found: {type(config.user_script_paths).__name__}.'
+                 ' Ignoring this setting.')
 
     found = test_paths(user_script_paths, Path(config.base_dir))
     if found:  # pragma: no cover
