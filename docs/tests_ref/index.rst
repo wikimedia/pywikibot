@@ -112,6 +112,7 @@ Tests in this project:
     protectbot<./protectbot_tests>
     pwb<./pwb_tests>
     script<./script_tests>
+    setup<./setup_tests>
     redirect_bot<./redirect_bot_tests>
     reflinks<./reflinks_tests>
     replacebot<./replacebot_tests>
