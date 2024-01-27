@@ -1,6 +1,6 @@
 """Base for terminal user interfaces."""
 #
-# (C) Pywikibot team, 2003-2023
+# (C) Pywikibot team, 2003-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -313,10 +313,10 @@ class UI(ABUIC):
                 if char == '?' and text[i] != '?':
                     try:
                         transliterated = transliterator.transliterate(
-                            text[i], default='?', prev=prev, next=text[i + 1])
+                            text[i], default='?', prev=prev, succ=text[i + 1])
                     except IndexError:
                         transliterated = transliterator.transliterate(
-                            text[i], default='?', prev=prev, next=' ')
+                            text[i], default='?', prev=prev, succ=' ')
                     # transliteration was successful. The replacement
                     # could consist of multiple letters.
                     # mark the transliterated letters in yellow.

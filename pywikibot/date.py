@@ -1,6 +1,6 @@
 """Date data and manipulation module."""
 #
-# (C) Pywikibot team, 2003-2023
+# (C) Pywikibot team, 2003-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -26,7 +26,7 @@ from pywikibot.backports import (
 )
 from pywikibot.site import BaseSite
 from pywikibot.textlib import NON_LATIN_DIGITS
-from pywikibot.tools import first_lower, first_upper
+from pywikibot.tools import deprecate_arg, first_lower, first_upper
 
 
 if TYPE_CHECKING:
@@ -459,8 +459,9 @@ def escapePattern2(
 
 
 @singledispatch
+@deprecate_arg('filter', 'filter_func')  # since 9.0
 def dh(value: int, pattern: str, encf: encf_type, decf: decf_type,
-       filter: Callable[[int], bool] | None = None) -> str:
+       filter_func: Callable[[int], bool] | None = None) -> str:
     """Function to help with year parsing.
 
     Usually it will be used as a lambda call in a map::
@@ -477,6 +478,9 @@ def dh(value: int, pattern: str, encf: encf_type, decf: decf_type,
 
         This function is a complement of decf.
 
+    .. versionchanged:: 9.0
+       *filter* parameter was renamed to *filter_func*
+
     :param decf:
         Converts a tuple/list of non-negative integers found in the original
         value string
@@ -490,7 +494,7 @@ def dh(value: int, pattern: str, encf: encf_type, decf: decf_type,
     # Encode an integer value into a textual form.
     # This will be called from outside as well as recursivelly to verify
     # parsed value
-    if filter and not filter(value):
+    if filter_func and not filter_func(value):
         raise ValueError(f'value {value} is not allowed')
 
     params = encf(value)
@@ -512,7 +516,7 @@ def dh(value: int, pattern: str, encf: encf_type, decf: decf_type,
 
 @dh.register(str)
 def _(value: str, pattern: str, encf: encf_type, decf: decf_type,
-      filter: Callable[[int], bool] | None = None) -> int:
+      filter_func: Callable[[int], bool] | None = None) -> int:
     compPattern, _strPattern, decoders = escapePattern2(pattern)
     m = compPattern.match(value)
     if m:
@@ -525,8 +529,8 @@ def _(value: str, pattern: str, encf: encf_type, decf: decf_type,
             'Decoder must not return a string!'
 
         # recursive call to re-encode and see if we get the original
-        # (may through filter exception)
-        if value == dh(decValue, pattern, encf, decf, filter):
+        # (may through filter_func exception)
+        if value == dh(decValue, pattern, encf, decf, filter_func):
             return decValue
 
     raise ValueError("reverse encoding didn't match")
