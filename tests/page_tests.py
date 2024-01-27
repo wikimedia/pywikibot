@@ -658,33 +658,25 @@ class TestPageRepr(DefaultDrySiteTestCase):
     def setUpClass(cls):
         """Initialize page instance."""
         super().setUpClass()
+        cls._old_encoding = config.console_encoding
+        config.console_encoding = 'utf8'
         cls.page = pywikibot.Page(cls.site, 'Ō')
 
-    def setUp(self):
-        """Force the console encoding to UTF-8."""
-        super().setUp()
-        self._old_encoding = config.console_encoding
-        config.console_encoding = 'utf8'
-
-    def tearDown(self):
+    @classmethod
+    def tearDownClass(cls):
         """Restore the original console encoding."""
-        config.console_encoding = self._old_encoding
-        super().tearDown()
+        config.console_encoding = cls._old_encoding
+        super().tearDownClass()
 
-    def test_mainpage_type(self):
-        """Test the return type of repr(Page(<main page>)) is str."""
+    def test_type(self):
+        """Test the return type of repr(Page(<page>)) is str."""
         mainpage = self.get_mainpage()
         self.assertIsInstance(repr(mainpage), str)
+        self.assertIsInstance(repr(self.page), str)
 
-    def test_unicode_type(self):
-        """Test the return type of repr(Page('<non-ascii>')) is str."""
-        page = pywikibot.Page(self.get_site(), 'Ō')
-        self.assertIsInstance(repr(page), str)
-
-    def test_unicode_value(self):
-        """Test to capture actual Python result pre unicode_literals."""
+    def test_value(self):
+        """Test to capture actual Python result."""
         self.assertEqual(repr(self.page), "Page('Ō')")
-        self.assertEqual(f'{self.page!r}', "Page('Ō')")
         self.assertEqual(f'{self.page!r}', "Page('Ō')")
 
 
