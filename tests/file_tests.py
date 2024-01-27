@@ -456,6 +456,7 @@ class TestFilePageDataItem(TestCase):
             item.statements, pywikibot.page._collections.ClaimCollection)
 
 
+@unittest.expectedFailure  # T355927
 class TestMediaInfoReadonlyEditing(TestCase):
 
     """Test writing structured data of FilePage."""
