@@ -350,10 +350,6 @@ def main() -> None:
         ],
     )
 
-    # Finally show distribution version before uploading
-    if 'sdist' in sys.argv:
-        print(f'\nDistribution package created for version {version}')
-
 
 if __name__ == '__main__':  # pragma: no cover
     main()
