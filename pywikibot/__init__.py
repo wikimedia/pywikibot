@@ -20,17 +20,7 @@ from warnings import warn
 
 from pywikibot import config as _config
 from pywikibot import exceptions
-from pywikibot.__metadata__ import (
-    __copyright__,
-    __description__,
-    __download_url__,
-    __license__,
-    __maintainer__,
-    __maintainer_email__,
-    __name__,
-    __url__,
-    __version__,
-)
+from pywikibot.__metadata__ import __copyright__, __url__, __version__
 from pywikibot._wbtypes import (
     Coordinate,
     WbGeoShape,
@@ -77,9 +67,7 @@ if TYPE_CHECKING:
 
 
 __all__ = (
-    '__copyright__', '__description__', '__download_url__', '__license__',
-    '__maintainer__', '__maintainer_email__', '__name__', '__url__',
-    '__version__',
+    '__copyright__', '__url__', '__version__',
     'async_manager', 'async_request', 'Bot', 'calledModuleName', 'Category',
     'Claim', 'Coordinate', 'critical', 'CurrentPageBot', 'debug', 'error',
     'exception', 'FilePage', 'handle_args', 'html2unicode', 'info', 'input',

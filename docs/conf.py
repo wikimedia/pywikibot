@@ -1,6 +1,6 @@
 """Configuration file for Sphinx."""
 #
-# (C) Pywikibot team, 2014-2023
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -24,6 +24,7 @@ from __future__ import annotations
 import os
 import re
 import sys
+import tomli
 import warnings
 from pathlib import Path
 
@@ -78,9 +79,13 @@ source_suffix = '.rst'
 root_doc = 'index'
 
 # General information about the project.
-project = pywikibot.__name__.title()
+filepath = Path().absolute().parent / 'pyproject.toml'
+with open(filepath, 'rb') as f:
+    meta_data = tomli.load(f)
+
+project = meta_data['project']['name'].title()
 project_copyright = pywikibot.__copyright__  # alias since Python 3.5
-author = 'Pywikibot Team'
+author = meta_data['project']['maintainers'][0]['name']
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

@@ -26,10 +26,12 @@
 #
 from __future__ import annotations
 
+import configparser
 import os
 import re
 import sys
 from contextlib import suppress
+from pathlib import Path
 
 
 if sys.version_info[:3] >= (3, 9):
@@ -113,16 +115,31 @@ class _DottedDict(dict):
     __getattr__ = dict.__getitem__
 
 
-# import metadata
-metadata = _DottedDict()
-name = 'pywikibot'
-path = os.path.abspath(os.path.dirname(__file__))
-with open(os.path.join(path, name, '__metadata__.py')) as f:
-    exec(f.read(), None, metadata)
-assert metadata.__name__ == name
+path = Path(__file__).parent
 
 
-def get_validated_version() -> str:
+def read_project() -> str:
+    """Read the project name from toml file.
+
+    ``tomllib`` was introduced with Python 3.11. To support earlier versions
+    ``configparser`` is used. Therefore the tomlfile must be readable as
+    config file until the first comment.
+
+    .. versionadded:: 9.0
+    """
+    toml = []
+    with open(path / 'pyproject.toml') as f:
+        for line in f:
+            if line.startswith('#'):
+                break
+            toml.append(line)
+
+    config = configparser.ConfigParser()
+    config.read_string(''.join(toml))
+    return config['project']['name'].strip('"')
+
+
+def get_validated_version(name: str) -> str:
     """Get a validated pywikibot module version string.
 
     The version number from pywikibot.__metadata__.__version__ is used.
@@ -133,7 +150,14 @@ def get_validated_version() -> str:
 
     :return: pywikibot module version string
     """
-    version = metadata.__version__
+    # import metadata
+    metadata = _DottedDict()
+    with open(path / name / '__metadata__.py') as f:
+        exec(f.read(), None, metadata)
+    assert metadata.__url__.endswith(
+        name.title())  # type: ignore[attr-defined]
+
+    version = metadata.__version__  # type: ignore[attr-defined]
     if 'sdist' not in sys.argv:
         return version
 
@@ -217,139 +241,17 @@ def main() -> None:  # pragma: no cover
     """Setup entry point."""
     from setuptools import setup
 
-    version = get_validated_version()
+    name = read_project()
     setup(
-        name=metadata.__name__,
-        version=version,
-        description=metadata.__description__,
+        version=get_validated_version(name),
         long_description=read_desc('README.rst'),
         long_description_content_type='text/x-rst',
-        # author
-        # author_email
-        maintainer=metadata.__maintainer__,
-        maintainer_email=metadata.__maintainer_email__,
-        url=metadata.__url__,
-        download_url=metadata.__download_url__,
         packages=get_packages(name),
-        # py_modules
-        # scripts
-        # ext_package
-        # ext_modules
-        # distclass
-        # script_name
-        # script_args
-        # options
-        license=metadata.__license__,
-        # license_files
-        keywords=metadata.__keywords__.split(),
-        # platforms
-        # cmdclass
-        # package_dir
         include_package_data=True,
-        # exclude_package_data
-        # package_data
-        # zip_safe
         install_requires=dependencies,
         extras_require=extra_deps,
-        python_requires='>=3.7.0',
-        # namespace_packages
         test_suite='tests.collector',
         tests_require=test_deps,
-        # test_loader
-        # eager_resources
-        project_urls={
-            'Documentation': 'https://doc.wikimedia.org/pywikibot/stable/',
-            'Source':
-                'https://gerrit.wikimedia.org/r/plugins/gitiles/pywikibot/core/',  # noqa: E501
-            'GitHub Mirror': 'https://github.com/wikimedia/pywikibot',
-            'Tracker': 'https://phabricator.wikimedia.org/tag/pywikibot/',
-        },
-        entry_points={
-            'console_scripts': [
-                'pwb = pywikibot.scripts.wrapper:run',
-            ],
-        },
-        classifiers=[
-            'Development Status :: 5 - Production/Stable',
-            'Environment :: Console',
-            'Intended Audience :: Developers',
-            'License :: OSI Approved :: MIT License',
-            'Natural Language :: Afrikaans',
-            'Natural Language :: Arabic',
-            'Natural Language :: Basque',
-            'Natural Language :: Bengali',
-            'Natural Language :: Bosnian',
-            'Natural Language :: Bulgarian',
-            'Natural Language :: Cantonese',
-            'Natural Language :: Catalan',
-            'Natural Language :: Chinese (Simplified)',
-            'Natural Language :: Chinese (Traditional)',
-            'Natural Language :: Croatian',
-            'Natural Language :: Czech',
-            'Natural Language :: Danish',
-            'Natural Language :: Dutch',
-            'Natural Language :: English',
-            'Natural Language :: Esperanto',
-            'Natural Language :: Finnish',
-            'Natural Language :: French',
-            'Natural Language :: Galician',
-            'Natural Language :: German',
-            'Natural Language :: Greek',
-            'Natural Language :: Hebrew',
-            'Natural Language :: Hindi',
-            'Natural Language :: Hungarian',
-            'Natural Language :: Icelandic',
-            'Natural Language :: Indonesian',
-            'Natural Language :: Irish',
-            'Natural Language :: Italian',
-            'Natural Language :: Japanese',
-            'Natural Language :: Javanese',
-            'Natural Language :: Korean',
-            'Natural Language :: Latin',
-            'Natural Language :: Latvian',
-            'Natural Language :: Lithuanian',
-            'Natural Language :: Macedonian',
-            'Natural Language :: Malay',
-            'Natural Language :: Marathi',
-            'Natural Language :: Nepali',
-            'Natural Language :: Norwegian',
-            'Natural Language :: Panjabi',
-            'Natural Language :: Persian',
-            'Natural Language :: Polish',
-            'Natural Language :: Portuguese',
-            'Natural Language :: Portuguese (Brazilian)',
-            'Natural Language :: Romanian',
-            'Natural Language :: Russian',
-            'Natural Language :: Serbian',
-            'Natural Language :: Slovak',
-            'Natural Language :: Slovenian',
-            'Natural Language :: Spanish',
-            'Natural Language :: Swedish',
-            'Natural Language :: Tamil',
-            'Natural Language :: Telugu',
-            'Natural Language :: Thai',
-            'Natural Language :: Tibetan',
-            'Natural Language :: Turkish',
-            'Natural Language :: Ukrainian',
-            'Natural Language :: Urdu',
-            'Natural Language :: Vietnamese',
-            'Operating System :: OS Independent',
-            'Programming Language :: Python',
-            'Programming Language :: Python :: 3',
-            'Programming Language :: Python :: 3 :: Only',
-            'Programming Language :: Python :: 3.7',
-            'Programming Language :: Python :: 3.8',
-            'Programming Language :: Python :: 3.9',
-            'Programming Language :: Python :: 3.10',
-            'Programming Language :: Python :: 3.11',
-            'Programming Language :: Python :: 3.12',
-            'Programming Language :: Python :: 3.13',
-            'Programming Language :: Python :: Implementation :: CPython',
-            'Programming Language :: Python :: Implementation :: PyPy',
-            'Topic :: Internet :: WWW/HTTP :: Dynamic Content :: Wiki',
-            'Topic :: Software Development :: Libraries :: Python Modules',
-            'Topic :: Utilities',
-        ],
     )
 
 

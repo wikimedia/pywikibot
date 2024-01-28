@@ -25,9 +25,14 @@ class TestSetup(TestCase):
     site = False
     net = False
 
+    def test_read_project(self):
+        """Test :func:`setup.read_project` function."""
+        self.assertEqual(setup.read_project(), 'pywikibot')
+
     def test_get_validated_version(self):
         """Test :func:`setup.get_validated_version` function."""
-        self.assertEqual(setup.get_validated_version(), pywikibot.__version__)
+        self.assertEqual(setup.get_validated_version('pywikibot'),
+                         pywikibot.__version__)
 
     def test_read_desc(self):
         """Test :func:`setup.read_desc` function."""
