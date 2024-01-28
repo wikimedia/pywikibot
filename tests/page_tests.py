@@ -26,7 +26,7 @@ from pywikibot.exceptions import (
     UnknownExtensionError,
 )
 from pywikibot.tools import suppress_warnings
-from tests import WARN_SITE_CODE
+from tests import WARN_SITE_CODE, unittest_print
 from tests.aspects import (
     DefaultDrySiteTestCase,
     DefaultSiteTestCase,
@@ -522,15 +522,21 @@ class TestPageObject(DefaultSiteTestCase):
         mainpage = self.get_mainpage()
         for p in mainpage.linkedPages():
             self.assertIsInstance(p, pywikibot.Page)
-        iw = list(mainpage.interwiki(expand=True))
-        for p in iw:
-            self.assertIsInstance(p, pywikibot.Link)
-        for p2 in mainpage.interwiki(expand=False):
-            self.assertIsInstance(p2, pywikibot.Link)
-            self.assertIn(p2, iw)
+
+        if mainpage.site.sitename == 'wikipedia:en':
+            unittest_print('Skipping interwiki link test due to T356009')
+        else:
+            iw = set(mainpage.interwiki(expand=True))
+            for link in iw:
+                self.assertIsInstance(link, pywikibot.Link)
+            for link in mainpage.interwiki(expand=False):
+                self.assertIsInstance(link, pywikibot.Link)
+                self.assertIn(link, iw)
+
         with suppress_warnings(WARN_SITE_CODE, category=UserWarning):
             for p in mainpage.langlinks():
                 self.assertIsInstance(p, pywikibot.Link)
+
         for p in mainpage.imagelinks():
             self.assertIsInstance(p, pywikibot.FilePage)
         for p in mainpage.templates():
