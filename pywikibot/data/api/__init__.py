@@ -1,4 +1,4 @@
-"""Interface to Mediawiki's api.php."""
+"""Interface to MediaWiki's api.php."""
 #
 # (C) Pywikibot team, 2014-2024
 #

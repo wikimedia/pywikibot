@@ -395,7 +395,7 @@ class FullHeader:
 
 class ProofreadPage(pywikibot.Page):
 
-    """ProofreadPage page used in Mediawiki ProofreadPage extension."""
+    """ProofreadPage page used in MediaWiki ProofreadPage extension."""
 
     WITHOUT_TEXT = 0
     NOT_PROOFREAD = 1
@@ -1068,7 +1068,7 @@ class PurgeRequest(Request):
 
 class IndexPage(pywikibot.Page):
 
-    """Index Page page used in Mediawiki ProofreadPage extension."""
+    """Index Page page used in MediaWiki ProofreadPage extension."""
 
     INDEX_TEMPLATE = ':MediaWiki:Proofreadpage_index_template'
 

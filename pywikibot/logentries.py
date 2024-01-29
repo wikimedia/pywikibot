@@ -1,4 +1,4 @@
-"""Objects representing Mediawiki log entries."""
+"""Objects representing MediaWiki log entries."""
 #
 # (C) Pywikibot team, 2007-2023
 #

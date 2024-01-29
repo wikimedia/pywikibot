@@ -1168,7 +1168,7 @@ class CheckImagesBot:
         """
         Check if template is in list.
 
-        The problem is the calls to the Mediawiki system because they can be
+        The problem is the calls to the MediaWiki system because they can be
         pretty slow. While searching in a list of objects is really fast, so
         first of all let's see if we can find something in the info that we
         already have, then make a deeper check.

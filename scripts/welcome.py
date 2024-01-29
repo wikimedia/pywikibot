@@ -926,7 +926,7 @@ def _handle_offset(val) -> None:
     except ValueError:
         # upon request, we could check for software version here
         raise ValueError(fill(
-            'Mediawiki has changed, -offset:# is not supported anymore, but '
+            'MediaWiki has changed, -offset:# is not supported anymore, but '
             '-offset:TIMESTAMP is, assuming TIMESTAMP is yyyymmddhhmmss or '
             'yyyymmdd. -timeoffset is now also supported. Please read this '
             'script source header for documentation.'))
