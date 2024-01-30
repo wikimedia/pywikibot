@@ -66,7 +66,7 @@ Furthermore the following options are provided:
 &params;
 """
 #
-# (C) Pywikibot team, 2004-2023
+# (C) Pywikibot team, 2004-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -408,11 +408,12 @@ class RedirectRobot(ExistingPageBot):
         else:
             raise NotImplementedError(f'No valid action "{action}" found.')
 
-    def get_sd_template(self, site=None) -> str | None:
+    def get_sd_template(
+        self, site: pywikibot.site.BaseSite | None = None
+    ) -> str | None:
         """Look for speedy deletion template and return it.
 
         :param site: site for which the template has to be given
-        :type site: pywikibot.BaseSite
         :return: A valid speedy deletion template.
         """
         title = None

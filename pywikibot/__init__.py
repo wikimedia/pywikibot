@@ -1,6 +1,6 @@
 """The initialization file for the Pywikibot framework."""
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -14,7 +14,7 @@ import threading
 from contextlib import suppress
 from queue import Queue
 from time import sleep as time_sleep
-from typing import Any, cast
+from typing import Any, TYPE_CHECKING, cast
 from urllib.parse import urlparse
 from warnings import warn
 
@@ -67,9 +67,13 @@ from pywikibot.logging import (
     stdout,
     warning,
 )
-from pywikibot.site import APISite, BaseSite
+from pywikibot.site import BaseSite as _BaseSite
 from pywikibot.time import Timestamp
 from pywikibot.tools import normalize_username
+
+
+if TYPE_CHECKING:
+    from pywikibot.site import APISite
 
 
 __all__ = (
@@ -127,11 +131,11 @@ def _code_fam_from_url(url: str, name: str | None = None
     return matched_sites[0]
 
 
-def Site(code: str | None = None,  # noqa: 134
+def Site(code: str | None = None,  # noqa: N802
          fam: str | Family | None = None,
          user: str | None = None, *,
-         interface: str | BaseSite | None = None,
-         url: str | None = None) -> BaseSite:
+         interface: str | _BaseSite | None = None,
+         url: str | None = None) -> _BaseSite:
     """A factory method to obtain a Site object.
 
     Site objects are cached and reused by this method.
@@ -242,7 +246,7 @@ def Site(code: str | None = None,  # noqa: 134
         else:
             interface = getattr(tmp, interface)
 
-    if not issubclass(interface, BaseSite):
+    if not issubclass(interface, _BaseSite):
         warning(f'Site called with interface={interface.__name__}')
 
     user = normalize_username(user)
