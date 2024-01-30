@@ -56,6 +56,6 @@ __all__ = (
 
 PageSourceType = Union[
     BaseLink,
+    BasePage,
     _BaseSite,
-    Page,
 ]

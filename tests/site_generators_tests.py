@@ -420,7 +420,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
         pages = mysite.querypage('Longpages', total=10)
         for p in pages:
             self.assertIsInstance(p, pywikibot.Page)
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             mysite.querypage('LongpageX')
 
     def test_longpages(self):

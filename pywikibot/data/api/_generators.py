@@ -14,10 +14,12 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from contextlib import suppress
+from typing import Any
 from warnings import warn
 
 import pywikibot
 from pywikibot import config
+from pywikibot.backports import Callable
 from pywikibot.exceptions import Error, InvalidTitleError, UnsupportedPageError
 from pywikibot.site import Namespace
 from pywikibot.tools import deprecated
@@ -110,7 +112,7 @@ class APIGenerator(APIGeneratorBase, GeneratorWrapper):
             self.query_increment = config.step
         else:
             self.query_increment = None
-        self.limit = None
+        self.limit: int | None = None
         self.starting_offset = kwargs['parameters'].pop(self.continue_name, 0)
         self.request = self.request_class(**kwargs)
         self.request[self.limit_name] = self.query_increment
@@ -210,11 +212,11 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
     # Used if the API module does not support multiple namespaces.
     # Override in subclasses by defining a function that returns True if
     # the result's namespace is in self._namespaces.
-    _check_result_namespace = NotImplemented
+    _check_result_namespace: Callable[[Any], bool] = NotImplemented
 
     # Set of allowed namespaces will be assigned to _namespaces during
     # set_namespace call. Only to be used by _check_result_namespace.
-    _namespaces = None
+    _namespaces: set[int] | bool | None = None
 
     def __init__(self, **kwargs) -> None:
         """Initialize a QueryGenerator object.
@@ -295,7 +297,7 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
         if self.api_limit is not None and 'generator' in parameters:
             self.prefix = 'g' + self.prefix
 
-        self.limit = None
+        self.limit: int | None = None
         self.query_limit = self.api_limit
         if 'generator' in parameters:
             # name of the "query" subelement key to look for when iterating
@@ -398,6 +400,7 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
 
     def _update_limit(self) -> None:
         """Set query limit for self.module based on api response."""
+        assert self.limited_module is not None
         param = self.site._paraminfo.parameter('query+' + self.limited_module,
                                                'limit')
         if self.site.logged_in() and self.site.has_right('apihighlimits'):
@@ -709,7 +712,7 @@ class PageGenerator(QueryGenerator):
         self.resultkey = 'pages'  # element to look for in result
         self.props = self.request['prop']
 
-    def result(self, pagedata):
+    def result(self, pagedata: dict[str, Any]) -> pywikibot.Page:
         """Convert page dict entry from api to Page object.
 
         This can be overridden in subclasses to return a different type
@@ -904,7 +907,7 @@ def _update_revisions(page, revisions) -> None:
         revid = rev['revid']
         revision = pywikibot.page.Revision(**rev)
         # do not overwrite an existing Revision if there is no content
-        if revid in page._revisions and revision.text is None:
+        if revid in page._revisions and revision.text is None:  # type: ignore[attr-defined]  # noqa: E501
             pass
         else:
             page._revisions[revid] = revision

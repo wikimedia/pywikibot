@@ -7,7 +7,7 @@
 from __future__ import annotations
 
 import pywikibot
-from pywikibot.backports import Iterable
+from pywikibot.backports import Generator
 from pywikibot.exceptions import (
     APIError,
     AutoblockUserError,
@@ -324,9 +324,13 @@ class User(Page):
 
     def contributions(
         self,
-        total: int = 500,
+        total: int | None = 500,
         **kwargs
-    ) -> tuple[Page, int, pywikibot.Timestamp, str | None]:
+    ) -> Generator[
+        tuple[Page, int, pywikibot.Timestamp, str | None],
+        None,
+        None
+    ]:
         """Yield tuples describing this user edits.
 
         Each tuple is composed of a pywikibot.Page object, the revision
@@ -377,7 +381,7 @@ class User(Page):
     @property
     def first_edit(
         self
-    ) -> tuple[Page, int, pywikibot.Timestamp, str] | None:
+    ) -> tuple[Page, int, pywikibot.Timestamp, str | None] | None:
         """Return first user contribution.
 
         :return: first user contribution entry
@@ -388,7 +392,7 @@ class User(Page):
     @property
     def last_edit(
         self
-    ) -> tuple[Page, int, pywikibot.Timestamp, str] | None:
+    ) -> tuple[Page, int, pywikibot.Timestamp, str | None] | None:
         """Return last user contribution.
 
         :return: last user contribution entry
@@ -397,8 +401,11 @@ class User(Page):
         return next(self.contributions(total=1), None)
 
     def deleted_contributions(
-        self, *, total: int = 500, **kwargs
-    ) -> Iterable[tuple[Page, Revision]]:
+        self,
+        *,
+        total: int | None = 500,
+        **kwargs,
+    ) -> Generator[tuple[Page, Revision], None, None]:
         """Yield tuples describing this user's deleted edits.
 
         .. versionadded:: 5.5
