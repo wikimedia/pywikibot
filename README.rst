@@ -51,12 +51,11 @@ Quick start
 
 .. code:: text
 
-    pip install requests
-    pip install packaging
     git clone https://gerrit.wikimedia.org/r/pywikibot/core.git
     cd core
     git submodule update --init
-    python pwb.py script_name
+    pip install -r requirements.txt
+    python pwb.py <script_name>
 
 Or to install using PyPI (excluding scripts)
 
