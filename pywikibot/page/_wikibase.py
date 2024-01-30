@@ -9,7 +9,7 @@ This module also includes objects:
 * WikibaseEntity: base interface for Wikibase entities.
 """
 #
-# (C) Pywikibot team, 2013-2023
+# (C) Pywikibot team, 2013-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -65,7 +65,7 @@ __all__ = (
 )
 
 if TYPE_CHECKING:
-    LANGUAGE_IDENTIFIER = str | pywikibot.APISite
+    LANGUAGE_IDENTIFIER = str | pywikibot.site.APISite
     ALIASES_TYPE = dict[LANGUAGE_IDENTIFIER, list[str]]
     LANGUAGE_TYPE = dict[LANGUAGE_IDENTIFIER, str]
     SITELINK_TYPE = (

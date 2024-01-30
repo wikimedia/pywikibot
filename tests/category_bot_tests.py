@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the category bot script."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -12,7 +12,7 @@ from contextlib import suppress
 from unittest.mock import Mock, patch
 
 import pywikibot
-from pywikibot import BaseSite
+from pywikibot.site import BaseSite
 from scripts.category import CategoryMoveRobot, CategoryPreprocess
 from tests.aspects import DefaultSiteTestCase, TestCase
 
