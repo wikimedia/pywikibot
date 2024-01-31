@@ -28,6 +28,8 @@ Bugfixes
 Breaking changes and code cleanups
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+* A RuntimeError will be raised if a :class:`family.Family` subclass has an ``__init__`` initializer method.
+  :meth:`family.Family.__post_init__` classmethod can be used instead.
 * :class:`InteractiveReplace<bot_choice.InteractiveReplace>` was moved from :mod:`bot` to :mod:`bot_choice` module
 * ``userinterfaces.transliteration.transliterator`` was renamed to :class:`Transliterator
   <userinterfaces.transliteration.Transliterator>`

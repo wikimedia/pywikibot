@@ -43,11 +43,22 @@ class Family:
 
     """Parent singleton class for all wiki families.
 
+    Families are immutable and initializer is unsupported. Any class
+    modification should go to :meth:`__post_init__` class method.
+
+    .. versionchanged:: 3.0
+       the family class is immutable. Having an ``__init__`` initializer
+       method a ``NotImplementedWarning`` will be given.
     .. versionchanged:: 8.0
        ``alphabetic``, ``alphabetic_revised`` and ``fyinterwiki``
        attributes where removed.
     .. versionchanged:: 8.2
        :attr:`obsolete` setter was removed.
+    .. versionchanged:: 8.3
+       Having an initializer method a ``FutureWarning`` will be given.
+    .. versionchanged:: 9.0.0
+       raises RuntimeError if an initializer method was found;
+       :meth:`__post_init__` classmethod should be used instead.
     """
 
     def __new__(cls):
@@ -63,17 +74,12 @@ class Family:
 
         # don't use hasattr() here. consider only the class itself
         if '__init__' in cls.__dict__:
-            # Initializer deprecated. Families should be immutable and any
-            # instance / class modification should go to allocator (__new__).
-            cls.__init__ = deprecated(instead='__post_init__() classmethod',
-                                      since='3.0.20180710')(cls.__init__)
+            raise RuntimeError(fill(
+                f'Family class {cls.__module__}.{cls.__name__} cannot be'
+                ' instantiated; use __post_init__() classmethod to modify'
+                ' your family class. Refer the documentation.', width=66))
 
-            # Invoke initializer immediately and make initializer no-op.
-            # This is to avoid repeated initializer invocation on repeated
-            # invocations of the metaclass's __call__.
-            cls.instance.__init__()
-            cls.__init__ = lambda self: None  # no-op
-        elif '__post_init__' not in cls.__dict__:
+        if '__post_init__' not in cls.__dict__:
             pass
         elif inspect.ismethod(cls.__post_init__):  # classmethod check
             cls.__post_init__()
@@ -87,11 +93,14 @@ class Family:
 
     @classproperty
     def instance(cls):
-        """Get the singleton instance."""
-        # This is a placeholder to invoke allocator before it's allocated.
-        # Allocator will override this classproperty.
+        """Get the singleton instance.
+
+        This is a placeholder to invoke allocator before it's allocated.
+        Allocator will override this classproperty.
+        """
         return cls()
 
+    #: The family name
     name: str | None = None
 
     #: Not open for edits; stewards can still edit.
