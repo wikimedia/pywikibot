@@ -4,6 +4,7 @@ Current release
 Improvements
 ^^^^^^^^^^^^
 
+* Add :func:`config.base_dir<config.get_base_dir>` to scripts search path with :mod:`pwb` wrapper (:phab:`T324287`)
 * :meth:`pywikibot.WbTime.equal_instant` was added (:phab:`T325248`)
 * ``revisions`` parameter of :class:`xmlreader.XmlDump` was introduced to specify parsing method
   (:phab:`T340804`)
@@ -16,6 +17,9 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
+* Add ``hy`` to special languages in :class:`textlib.TimeStripper` (:phab:`T356175`)
+* Pass login token when using ``action=login`` (:phab:`T309898`)
+* Detect range blocks with :meth:`pywikibot.User.is_blocked` (:phab:`T301282`)
 * Use only ``end`` tags in ElementTree.iterparse in :mod:`xmlreader` module (:phab:`T354095`)
 * Suppress error in :meth:`cosmetic_changes.CosmeticChangesToolkit.cleanUpLinks` (:phab:`T337045`)
 * :func:`pywikibot.input_choice` validates *default* parameter (:phab:`T353097`)
@@ -24,6 +28,17 @@ Bugfixes
 Breaking changes and code cleanups
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+* ``pywikibot.BaseSite`` and ``pywikibotAPISite`` were dropped. :func:`pywikibot.Site` has to be used to create a
+  :mod:`site` object.
+* ``next`` parameter of :meth:`userinterfaces.transliteration.transliterator.transliterate` was renamed to ``succ``
+* ``type`` parameter of :meth:`site.APISite.protectedpages()<pywikibot.site._generators.GeneratorsMixin.protectedpages>`
+  was renamed to ``protect_type``
+* ``all`` parameter of :meth:`site.APISite.namespace()<pywikibot.site._apisite.APISite.namespace>` was renamed to
+  ``all_ns``
+* ``filter`` parameter of :func:`date.dh` was renamed to ``filter_func``
+* ``dict`` parameter of :class:`data.api.OptionSet` was renamed to ``data``
+* ``setuptools`` package is no longer mandatory but required for tests
+  (:phab:`T340640`, :phab:`T347052`, :phab:`T354515`)
 * ``root`` attribute of :class:`xmlreader.XmlDump` was removed
 * ``tools.Version`` class was removed; use classes from ``packaging.version`` instead (:phab:`T340640`)
 * ``packaging`` package is mandatory; ``importlib_metadata`` package is required for Python 3.7 (:phab:`T340640`)
@@ -34,7 +49,8 @@ Breaking changes and code cleanups
 * require ``PyMySQL >= 1.0.0`` if necessary
 * ``keys()`` and ``items()`` methods of :class:`data.api.Request` gives a view instead a list (:phab:`T310953`)
 * ``SequenceOutputter.format_list()`` was removed in favour of :attr:`tools.formatter.SequenceOutputter.out` property
-* *output* parameter of :class:`bot_choice.OutputProxyOption` (i.e. ``OutputOption`` instance) without *out* property is no longer supported
+* *output* parameter of :class:`bot_choice.OutputProxyOption` (i.e. ``OutputOption`` instance) without *out* property is
+  no longer supported
 * ``OutputOption.output()`` method was removed
 * ``ContextOption.output_range()`` and ``HighlightContextOption.output_range()`` methods were removed
 * ``page.url2unicode()`` function was removed in favour of :func:`tools.chars.url2string`
@@ -49,10 +65,20 @@ Breaking changes and code cleanups
 Deprecations
 ------------
 
+* 9.0.0: ``next`` parameter of :meth:`userinterfaces.transliteration.transliterator.transliterate` was renamed to
+  ``succ``
+* 9.0.0: ``type`` parameter of :meth:`site.APISite.protectedpages()
+  <pywikibot.site._generators.GeneratorsMixin.protectedpages>` was renamed to ``protect_type``
+* 9.0.0: ``all`` parameter of :meth:`site.APISite.namespace()<pywikibot.site._apisite.APISite.namespace>` was renamed to
+  ``all_ns``
+* 9.0.0: ``filter`` parameter of :func:`date.dh` was renamed to ``filter_func``
+* 9.0.0: ``dict`` parameter of :class:`data.api.OptionSet` was renamed to ``data``
 * 9.0.0: ``pywikibot.version.get_toolforge_hostname()`` is deprecated without replacement
-* 9.0.0: ``allrevisions`` parameter of :class:`xmlreader.XmpDump` is deprecated, use ``revisions`` instead  (:phab:`T340804`)
+* 9.0.0: ``allrevisions`` parameter of :class:`xmlreader.XmpDump` is deprecated, use ``revisions`` instead 
+  (:phab:`T340804`)
 * 9.0.0: ``iteritems`` method of :class:`data.api.Request` will be removed in favour of ``items``
-* 9.0.0: ``SequenceOutputter.output()`` is deprecated in favour of :attr:`tools.formatter.SequenceOutputter.out` property
+* 9.0.0: ``SequenceOutputter.output()`` is deprecated in favour of :attr:`tools.formatter.SequenceOutputter.out`
+  property
 * 9.0.0: *nullcontext* context manager and *SimpleQueue* queue of :mod:`backports` are derecated
 * 8.4.0: *modules_only_mode* parameter of :class:`data.api.ParamInfo`, its *paraminfo_keys* class attribute
   and its preloaded_modules property will be removed
@@ -98,6 +124,7 @@ Will be removed in Pywikibot 10
 * 7.1.0: Unused ``get_redirect`` parameter of :meth:`Page.getOldVersion()<page.BasePage.getOldVersion>` will be removed
 * 7.0.0: User.isBlocked() method is renamed to is_blocked for consistency
 * 7.0.0: A boolean watch parameter in Page.save() is deprecated and will be desupported
-* 7.0.0: baserevid parameter of editSource(), editQualifier(), removeClaims(), removeSources(), remove_qualifiers() DataSite methods will be removed
+* 7.0.0: baserevid parameter of editSource(), editQualifier(), removeClaims(), removeSources(), remove_qualifiers()
+  DataSite methods will be removed
 * 7.0.0: Values of APISite.allpages() parameter filterredir other than True, False and None are deprecated
 * 7.0.0: The i18n identifier 'cosmetic_changes-append' will be removed in favour of 'pywikibot-cosmetic-changes'
