@@ -1,6 +1,6 @@
 """Objects representing MediaWiki families."""
 #
-# (C) Pywikibot team, 2004-2023
+# (C) Pywikibot team, 2004-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -97,98 +97,117 @@ class Family:
     #: Not open for edits; stewards can still edit.
     closed_wikis: list[str] = []
 
-    #: Completely removed sites
+    #: Completely removed sites.
     removed_wikis: list[str] = []
 
     code_aliases: dict[str, str] = {}
     """Code mappings which are only an alias, and there is no 'old' wiki.
-
     For all except 'nl_nds', subdomains do exist as a redirect, but that
     should not be relied upon.
     """
 
     langs: dict[str, str] = {}
 
-    # A list of category redirect template names in different languages
+    #: A list of category redirect template names in different languages.
     category_redirect_templates: dict[str, Sequence[str]] = {
         '_default': []
     }
 
-    # A list of disambiguation template names in different languages
+    #: A list of disambiguation template names in different languages.
     disambiguationTemplates: dict[str, Sequence[str]] = {
         '_default': []
     }
 
-    # A dict of tuples for different sites with names of templates
-    # that indicate an edit should be avoided
     edit_restricted_templates: dict[str, tuple[str, ...]] = {}
+    """A dict of tuples for different sites with names of templates that
+    indicate an edit should be avoided.
+    """
 
-    # A dict of tuples for different sites with names of archive
-    # templates that indicate an edit of non-archive bots
-    # should be avoided
     archived_page_templates: dict[str, tuple[str, ...]] = {}
+    """A dict of tuples for different sites with names of archive
+    templates that indicate an edit of non-archive bots should be
+    avoided.
+    """
 
-    # A set of projects that share cross-project sessions.
+    #: A set of projects that share cross-project sessions.
     cross_projects: set[str] = set()
 
-    # A list with the name for cross-project cookies.
-    # default for wikimedia centralAuth extensions.
+    #: A list with the name for cross-project cookies, default for
+    #: wikimedia centralAuth extensions.
     cross_projects_cookies = ['centralauth_Session',
                               'centralauth_Token',
                               'centralauth_User']
     cross_projects_cookie_username = 'centralauth_User'
 
-    # A list with the name in the cross-language flag permissions
+    #: A list with the name in the cross-language flag permissions.
     cross_allowed: list[str] = []
 
-    # A dict with the name of the category containing disambiguation
-    # pages for the various languages. Only one category per language,
-    # and without the namespace, so add things like:
-    # 'en': "Disambiguation"
     disambcatname: dict[str, str] = {}
+    """A dict with the name of the category containing disambiguation
+    pages for the various languages. Only one category per language, and
+    without the namespace, so add things like:
 
-    # attop is a list of languages that prefer to have the interwiki
-    # links at the top of the page.
+        'en': "Disambiguation"
+    """
+
     interwiki_attop: list[str] = []
-    # on_one_line is a list of languages that want the interwiki links
-    # one-after-another on a single line
+    """attop is a list of languages that prefer to have the interwiki
+    links at the top of the page.
+    """
+
     interwiki_on_one_line: list[str] = []
-    # String used as separator between interwiki links and the text
+    """on_one_line is a list of languages that want the interwiki links
+    one-after-another on a single line
+    """
+
+    #: String used as separator between interwiki links and the text.
     interwiki_text_separator = '\n\n'
 
     # Similar for category
     category_attop: list[str] = []
-    # on_one_line is a list of languages that want the category links
-    # one-after-another on a single line
+    """attop is a list of categories that prefer to have the category
+    links at the top of the page.
+    """
+
     category_on_one_line: list[str] = []
-    # String used as separator between category links and the text
+    """on_one_line is a list of languages that want the category links
+    one-after-another on a single line.
+    """
+
+    #: String used as separator between category links and the text
     category_text_separator = '\n\n'
-    # When both at the bottom should categories come after interwikilinks?
-    # TODO: T86284 Needed on Wikia sites, as it uses the CategorySelect
-    # extension which puts categories last on all sites. TO BE DEPRECATED!
+
     categories_last: list[str] = []
+    """When both at the bottom should categories come after
+    interwikilinks?
 
-    # Which languages have a special order for putting interlanguage
-    # links, and what order is it? If a language is not in
-    # interwiki_putfirst, alphabetical order on language code is used.
-    # For languages that are in interwiki_putfirst, interwiki_putfirst
-    # is checked first, and languages are put in the order given there.
-    # All other languages are put after those, in code-alphabetical
-    # order.
+    TODO: :phab:`T86284` Needed on Wikia sites, as it uses the
+    CategorySelect extension which puts categories last on all sites.
+    TO BE DEPRECATED!
+    """
+
     interwiki_putfirst: dict[str, str] = {}
+    """Which languages have a special order for putting interlanguage
+    links, and what order is it? If a language is not in
+    interwiki_putfirst, alphabetical order on language code is used. For
+    languages that are in interwiki_putfirst, interwiki_putfirst is
+    checked first, and languages are put in the order given there. All
+    other languages are put after those, in code-alphabetical order.
+    """
 
-    # Some families, e. g. commons and meta, are not multilingual and
-    # forward interlanguage links to another family (wikipedia).
-    # These families can set this variable to the name of the target
-    # family.
     interwiki_forward: str | None = None
+    """Some families, e. g. commons and meta, are not multilingual and
+    forward interlanguage links to another family (wikipedia). These
+    families can set this variable to the name of the target family.
+    """
 
-    # Language codes of the largest wikis. They should be roughly sorted
-    # by size.
     languages_by_size: list[str] = []
+    """Language codes of the largest wikis. They should be roughly
+    sorted by size.
+    """
 
-    # Some languages belong to a group where the possibility is high that
-    # equivalent articles have identical titles among the group.
+    #: Some languages belong to a group where the possibility is high
+    #: that equivalent articles have identical titles among the group.
     language_groups = {
         # languages using the Arabic script
         'arab': [
@@ -248,37 +267,48 @@ class Family:
         ],
     }
 
-    # LDAP domain if your wiki uses LDAP authentication,
-    # https://www.mediawiki.org/wiki/Extension:LDAPAuthentication2
     ldapDomain = ()
+    """LDAP domain if your wiki uses LDAP authentication.
 
-    # Allows crossnamespace interwiki linking.
-    # Lists the possible crossnamespaces combinations
-    # keys are originating NS
-    # values are dicts where:
-    #   keys are the originating langcode, or _default
-    #   values are dicts where:
-    #     keys are the languages that can be linked to from the lang+ns, or
-    #     '_default'; values are a list of namespace numbers
+    .. seealso:: https://www.mediawiki.org/wiki/Extension:LDAPAuthentication2
+    """
+
     crossnamespace: CrossnamespaceType = collections.defaultdict(dict)
-    ##
-    # Examples :
-    #
-    # Allowing linking to pt' 102 NS from any other lang' 0 NS is
-    #
-    #   crossnamespace[0] = {
-    #       '_default': { 'pt': [102]}
-    #   }
-    #
-    # While allowing linking from pt' 102 NS to any other lang' = NS is
-    #
-    #   crossnamespace[102] = {
-    #       'pt': { '_default': [0]}
-    #   }
+    """Allows crossnamespace interwiki linking.
 
-    # Some wiki farms have UrlShortener extension enabled only on the main
-    # site. This value can specify this last one with (lang, family) tuple.
+    Lists the possible crossnamespaces combinations; keys are
+    originating namespace; values are dicts where keys are the
+    originating langcode, or ``_default`` and  values are dicts where
+    keys are the languages that can be linked to from the lang+ns, or
+    ``_default``; values are a list of namespace numbers.
+
+    **Examples:**
+
+    Allowing linking *to* ``pt`` 102 namespace from any other lang 0
+    namepace is:
+
+    .. code-block:: Python
+
+       crossnamespace[0] = {
+           '_default': { 'pt': [102]}
+       }
+
+    While allowing linking *from* ``pt`` 102 namespace to any other
+    lang 0 namespace is
+
+    .. code-block:: Python
+
+       crossnamespace[102] = {
+           'pt': { '_default': [0]}
+       }
+
+    """
+
     shared_urlshortner_wiki: tuple[str, str] | None = None
+    """Some wiki farms have UrlShortener extension enabled only on
+    the main site. This value can specify this last one with
+    ``(lang, family)`` tuple.
+    """
 
     title_delimiter_and_aliases = ' _'
     """Titles usually are delimited by a space and the alias is replaced
