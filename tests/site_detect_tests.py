@@ -91,6 +91,9 @@ class MediaWikiSiteTestCase(SiteDetectionTestCase):
         'http://www.merriam-webster.com/'
         'cgi-bin/dictionary?book=Dictionary&va=$1',
         'http://arxiv.org/abs/$1',
+        # looks like a MW site but isn't, api is redirected to
+        # https://foundation.wikimedia.org
+        'https://wikimediafoundation.org/$1',
     )
 
     failing_sites = [
