@@ -30,7 +30,7 @@ from pywikibot.userinterfaces import transliteration
 from pywikibot.userinterfaces._interface_base import ABUIC
 
 
-transliterator = transliteration.transliterator(config.console_encoding)
+transliterator = transliteration.Transliterator(config.console_encoding)
 
 #: Colors supported by Pywikibot
 colors = [

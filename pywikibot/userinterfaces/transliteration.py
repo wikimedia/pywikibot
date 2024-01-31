@@ -6,7 +6,7 @@
 #
 from __future__ import annotations
 
-from pywikibot.tools import deprecate_arg
+from pywikibot.tools import ModuleDeprecationWrapper, deprecate_arg
 
 
 #: Non latin digits used by the framework
@@ -1100,7 +1100,7 @@ for digits in NON_LATIN_DIGITS.values():
     _trans.update({char: str(i) for i, char in enumerate(digits)})
 
 
-class transliterator:  # noqa: N801
+class Transliterator:
 
     """Class to transliterating text."""
 
@@ -1150,3 +1150,7 @@ class transliterator:  # noqa: N801
         elif char == 'ຫ':
             result = '' if next in 'ງຍນຣລຼຼວ' else 'h'
         return result
+
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper.add_deprecated_attr('transliterator', Transliterator, since='9.0.0')

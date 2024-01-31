@@ -28,9 +28,11 @@ Bugfixes
 Breaking changes and code cleanups
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+* ``userinterfaces.transliteration.transliterator`` was renamed to :class:`Transliterator
+  <userinterfaces.transliteration.Transliterator>`
 * ``pywikibot.BaseSite`` and ``pywikibotAPISite`` were dropped. :func:`pywikibot.Site` has to be used to create a
   :mod:`site` object.
-* ``next`` parameter of :meth:`userinterfaces.transliteration.transliterator.transliterate` was renamed to ``succ``
+* ``next`` parameter of :meth:`userinterfaces.transliteration.Transliterator.transliterate` was renamed to ``succ``
 * ``type`` parameter of :meth:`site.APISite.protectedpages()<pywikibot.site._generators.GeneratorsMixin.protectedpages>`
   was renamed to ``protect_type``
 * ``all`` parameter of :meth:`site.APISite.namespace()<pywikibot.site._apisite.APISite.namespace>` was renamed to
@@ -65,6 +67,8 @@ Breaking changes and code cleanups
 Deprecations
 ------------
 
+* 9.0.0: ``userinterfaces.transliteration.transliterator`` was renamed to :class:`Transliterator
+  <userinterfaces.transliteration.Transliterator>`
 * 9.0.0: ``next`` parameter of :meth:`userinterfaces.transliteration.transliterator.transliterate` was renamed to
   ``succ``
 * 9.0.0: ``type`` parameter of :meth:`site.APISite.protectedpages()
