@@ -25,11 +25,22 @@ from threading import Thread
 from pywikibot import Site
 from pywikibot.comms.http import session
 from pywikibot.family import Family
-from scripts.maintenance.wikimedia_sites import families_list
 
 
 NUMBER_OF_THREADS = 26
 FILEPATH = '/data/firstup_excepts.json'
+
+# supported families by this script
+families_list = [
+    'wikibooks',
+    'wikinews',
+    'wikipedia',
+    'wikiquote',
+    'wikisource',
+    'wikiversity',
+    'wikivoyage',
+    'wiktionary',
+]
 
 
 def chars_uppers_wikilinks():
@@ -109,7 +120,7 @@ def main():
     for fam_name in families_list:
         family = Family.load(fam_name)
         families_excepts.setdefault(fam_name, {})
-        for site_code in family.languages_by_size:
+        for site_code in family.codes:
             site = Site(site_code, family)
             if site.namespaces[8].case != 'first-letter':
                 raise ValueError('MW namespace case is not first-letter')

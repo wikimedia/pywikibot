@@ -8,7 +8,7 @@
    Also EXTERNAL EDITOR SETTINGS section can be copied.
 """
 #
-# (C) Pywikibot team, 2010-2023
+# (C) Pywikibot team, 2010-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -48,6 +48,7 @@ pywikibot = _import_with_no_user_config('pywikibot')
 config, __url__ = pywikibot.config, pywikibot.__url__
 base_dir = pywikibot.config.base_dir
 
+console_encoding: str | None
 try:
     console_encoding = sys.stdout.encoding
 # unittests fails with "StringIO instance has no attribute 'encoding'"
@@ -136,13 +137,8 @@ def get_site_and_lang(
         default=default_family)
     fam = pywikibot.family.Family.load(fam)
     if hasattr(fam, 'langs'):
-        if hasattr(fam, 'languages_by_size'):
-            by_size = [code for code in fam.languages_by_size
-                       if code in fam.langs]
-        else:
-            by_size = []
-        known_langs = by_size + sorted(
-            set(fam.langs.keys()).difference(by_size))
+        codes = [code for code in fam.codes if code in fam.langs]
+        known_langs = codes + sorted(set(fam.langs.keys()).difference(codes))
     else:
         known_langs = []
 
@@ -153,14 +149,20 @@ def get_site_and_lang(
         pywikibot.info(f'The only known site code: {known_langs[0]}')
         default_lang = known_langs[0]
     else:
-        if not force:
-            pywikibot.info('This is the list of known site codes:')
-            pywikibot.info(', '.join(known_langs))
         if default_lang not in known_langs:
             if default_lang != 'en' and 'en' in known_langs:
                 default_lang = 'en'
             else:
                 default_lang = None
+        if not force:
+            pywikibot.info('This is the list of known site codes:')
+            text = fill(', '.join(known_langs), width=79)
+            if default_lang:
+                text = text.replace(
+                    f' {default_lang},',
+                    f' <<lightblue>>{default_lang}<<default>>,',
+                )
+            pywikibot.info(text)
 
     message = "The site code of the site we're working on"
     mycode = None
@@ -262,7 +264,7 @@ def parse_sections() -> list:
     return data
 
 
-def copy_sections(force: bool = False, default: str = 'n') -> str:
+def copy_sections(force: bool = False, default: str = 'n') -> str | None:
     """Take config sections and copy them to user-config.py.
 
     .. versionchanged:: 8.0
@@ -296,7 +298,7 @@ def input_sections(variant: str,
                    sections: list[_ConfigSection],
                    skip: Callable | None = None,
                    force: bool = False,
-                   default: str = 'n') -> None:
+                   default: str = 'n') -> list[str]:
     """Ask for settings to copy.
 
     .. versionadded:: 8.0
@@ -377,10 +379,11 @@ def create_user_config(
 
     # For each different username entered, ask if user wants to save a
     # BotPassword (username, BotPassword name, BotPassword pass)
-    msg = fill('See {}/BotPasswords to know how to get codes.'
-               'Please note that plain text in {} and anyone with read '
-               'access to that directory will be able read the file.'
-               .format(__url__, _fncpass))
+    msg: str | None = fill(
+        f'See {__url__}/BotPasswords to know how to get codes. '
+        f'Please note that plain text in {_fncpass} and anyone with read'
+        ' access to that directory will be able read the file.'
+    )
     botpasswords = []
     userset = {user.name for user in userlist}
     for username in userset:

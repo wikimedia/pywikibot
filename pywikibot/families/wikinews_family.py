@@ -21,11 +21,11 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'bg', 'hu', 'sd', 'th', 'tr',
     ]
 
-    languages_by_size = [
-        'ru', 'sr', 'pt', 'fr', 'en', 'pl', 'zh', 'de', 'es', 'it', 'ar', 'cs',
-        'ca', 'nl', 'el', 'ta', 'li', 'sv', 'uk', 'fa', 'fi', 'ja', 'ro', 'eo',
-        'guw', 'sq', 'no', 'ko', 'bs', 'he',
-    ]
+    codes = {
+        'ar', 'bs', 'ca', 'cs', 'de', 'el', 'en', 'eo', 'es', 'fa', 'fi', 'fr',
+        'guw', 'he', 'it', 'ja', 'ko', 'li', 'nl', 'no', 'pl', 'pt', 'ro',
+        'ru', 'sq', 'sr', 'sv', 'ta', 'uk', 'zh',
+    }
 
     category_redirect_templates = {
         '_default': (),

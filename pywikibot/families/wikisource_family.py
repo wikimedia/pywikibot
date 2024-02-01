@@ -26,15 +26,15 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'tokipona',
     ]
 
-    languages_by_size = [
-        'pl', 'en', 'ru', 'de', 'fr', 'zh', 'he', 'uk', 'it', 'ar', 'es',
-        'mul', 'gu', 'cs', 'sr', 'pt', 'bn', 'sv', 'fa', 'ko', 'ta', 'hu',
-        'ml', 'be', 'sa', 'te', 'tr', 'sl', 'la', 'vi', 'hy', 'nl', 'ja', 'ro',
-        'fi', 'nap', 'el', 'az', 'ca', 'br', 'hr', 'id', 'th', 'no', 'kn',
-        'hi', 'cy', 'eo', 'vec', 'is', 'ban', 'mr', 'pms', 'lij', 'da', 'et',
-        'as', 'mk', 'yi', 'bg', 'jv', 'wa', 'li', 'lt', 'pa', 'eu', 'or', 'gl',
-        'bs', 'sah', 'sk', 'su', 'zh-min-nan', 'fo',
-    ]
+    codes = {
+        'ar', 'as', 'az', 'ban', 'be', 'bg', 'bn', 'br', 'bs', 'ca', 'cs',
+        'cy', 'da', 'de', 'el', 'en', 'eo', 'es', 'et', 'eu', 'fa', 'fi', 'fo',
+        'fr', 'gl', 'gu', 'he', 'hi', 'hr', 'hu', 'hy', 'id', 'is', 'it', 'ja',
+        'jv', 'kn', 'ko', 'la', 'li', 'lij', 'lt', 'mk', 'ml', 'mr', 'mul',
+        'nap', 'nl', 'no', 'or', 'pa', 'pl', 'pms', 'pt', 'ro', 'ru', 'sa',
+        'sah', 'sk', 'sl', 'sr', 'su', 'sv', 'ta', 'te', 'th', 'tr', 'uk',
+        'vec', 'vi', 'wa', 'yi', 'zh', 'zh-min-nan',
+    }
 
     # Sites we want to edit but not count as real languages
     test_codes = ['beta']
@@ -72,7 +72,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         cls.code_aliases = super().code_aliases.copy()
         aliases = cls.known_codes + ['-', 'www']
         for code in aliases:
-            if (code not in cls.languages_by_size
+            if (code not in cls.codes
                     and code not in cls.closed_wikis
                     and code not in cls.code_aliases):
                 cls.code_aliases[code] = 'mul'

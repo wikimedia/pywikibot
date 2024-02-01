@@ -1463,7 +1463,7 @@ class Subject(interwiki_graph.Subject):
         lclSiteDone = False
         frgnSiteDone = False
 
-        for code in lclSite.family.languages_by_size:
+        for code in lclSite.family.codes:
             site = pywikibot.Site(code, lclSite.family)
             if not lclSiteDone and site == lclSite \
                or (not frgnSiteDone and site != lclSite and site in new):

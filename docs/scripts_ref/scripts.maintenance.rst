@@ -29,8 +29,3 @@ scripts.maintenance.unidata
 ---------------------------
 
 .. automodule:: scripts.maintenance.unidata
-
-scripts.maintenance.wikimedia\_sites
-------------------------------------
-
-.. automodule:: scripts.maintenance.wikimedia_sites

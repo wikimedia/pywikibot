@@ -28,15 +28,15 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'als', 'tokipona',
     ]
 
-    languages_by_size = [
-        'en', 'it', 'pl', 'ru', 'cs', 'et', 'pt', 'uk', 'fa', 'he', 'fr', 'de',
-        'es', 'tr', 'eo', 'sk', 'az', 'bs', 'zh', 'ca', 'sr', 'fi', 'ar', 'lt',
-        'sl', 'id', 'su', 'bg', 'hy', 'hr', 'el', 'nn', 'sv', 'li', 'hu', 'ko',
-        'nl', 'sah', 'ja', 'la', 'ta', 'ig', 'hi', 'as', 'te', 'bn', 'gl',
-        'gu', 'guw', 'ur', 'bjn', 'tl', 'vi', 'be', 'cy', 'no', 'sq', 'ml',
-        'kn', 'eu', 'ro', 'th', 'ku', 'uz', 'ka', 'da', 'sa', 'is', 'bcl',
-        'br', 'mr', 'af', 'ky',
-    ]
+    codes = {
+        'af', 'ar', 'as', 'az', 'bcl', 'be', 'bg', 'bjn', 'bn', 'br', 'bs',
+        'ca', 'cs', 'cy', 'da', 'de', 'el', 'en', 'eo', 'es', 'et', 'eu', 'fa',
+        'fi', 'fr', 'gl', 'gu', 'guw', 'he', 'hi', 'hr', 'hu', 'hy', 'id',
+        'ig', 'is', 'it', 'ja', 'ka', 'kn', 'ko', 'ku', 'ky', 'la', 'li', 'lt',
+        'ml', 'mr', 'nl', 'nn', 'no', 'pl', 'pt', 'ro', 'ru', 'sa', 'sah',
+        'sk', 'sl', 'sq', 'sr', 'su', 'sv', 'ta', 'te', 'th', 'tl', 'tr', 'uk',
+        'ur', 'uz', 'vi', 'zh',
+    }
 
     category_redirect_templates = {
         '_default': (),
