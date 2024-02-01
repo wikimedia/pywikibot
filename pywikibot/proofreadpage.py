@@ -319,7 +319,7 @@ class PagesTagParser(collections.abc.Container):
         return f"{self.__class__.__name__}('{self}')"
 
 
-def decompose(fn: Callable) -> Callable:  # type: ignore
+def decompose(fn: Callable) -> Callable:
     """Decorator for ProofreadPage.
 
     Decompose text if needed and recompose text.
@@ -335,7 +335,7 @@ def decompose(fn: Callable) -> Callable:  # type: ignore
     return wrapper
 
 
-def check_if_cached(fn: Callable) -> Callable:  # type: ignore
+def check_if_cached(fn: Callable) -> Callable:
     """Decorator for IndexPage to ensure data is cached."""
 
     def wrapper(self: IndexPage, *args: Any, **kwargs: Any) -> Any:
@@ -818,7 +818,7 @@ class ProofreadPage(pywikibot.Page):
             pywikibot.error(f'Error fetching HTML for {self}.')
             raise
 
-        soup = _bs4_soup(response.text)  # type: ignore
+        soup = _bs4_soup(response.text)
 
         try:
             url_image = soup.find(class_='prp-page-image')
@@ -1149,7 +1149,7 @@ class IndexPage(pywikibot.Page):
         self._pages_from_label: dict[str, set[pywikibot.Page]] = {}
         self._labels_from_page_number: dict[int, str] = {}
         self._labels_from_page: dict[pywikibot.page.Page, str] = {}
-        self._soup = _bs4_soup(self.get_parsed_page(True))  # type: ignore
+        self._soup = _bs4_soup(self.get_parsed_page(True))
         # Do not search for "new" here, to avoid to skip purging if links
         # to non-existing pages are present.
         attrs = {'class': re.compile('prp-pagequality-[0-4]')}
@@ -1175,7 +1175,7 @@ class IndexPage(pywikibot.Page):
                  }
         if not found:
             self.purge()
-            self._soup = _bs4_soup(self.get_parsed_page(True))  # type: ignore
+            self._soup = _bs4_soup(self.get_parsed_page(True))
             if not self._soup.find_all('a', attrs=attrs):
                 raise ValueError(
                     'Missing class="qualityN prp-pagequality-N" or '
