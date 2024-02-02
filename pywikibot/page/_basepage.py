@@ -1,6 +1,6 @@
 """Objects representing a base object for a MediaWiki page."""
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
