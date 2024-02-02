@@ -9,10 +9,39 @@ from __future__ import annotations
 import re
 from abc import ABC, abstractmethod
 from textwrap import fill
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pywikibot
-from pywikibot.backports import Iterable, Sequence
+from pywikibot.backports import Iterable, Mapping, Sequence
+
+
+__all__ = (
+    'AlwaysChoice',
+    'Choice',
+    'ChoiceException',
+    'ContextOption',
+    'HighlightContextOption',
+    'IntegerOption',
+    'InteractiveReplace',
+    'LinkChoice',
+    'ListOption',
+    'MultipleChoiceList',
+    'NestedOption',
+    'Option',
+    'OutputProxyOption',
+    'QuitKeyboardInterrupt',
+    'ShowingListOption',
+    'ShowingMultipleChoiceList',
+    'StandardOption',
+    'StaticChoice',
+    'UnhandledAnswer',
+)
+
+
+if TYPE_CHECKING:
+    from typing_extensions import Literal
+
+    from pywikibot.page import BaseLink, Link, Page
 
 
 class Option(ABC):
@@ -259,14 +288,14 @@ class Choice(StandardOption):
         self,
         option: str,
         shortcut: str,
-        replacer: pywikibot.bot.InteractiveReplace | None
+        replacer: InteractiveReplace | None
     ) -> None:
         """Initializer."""
         super().__init__(option, shortcut)
         self._replacer = replacer
 
     @property
-    def replacer(self) -> pywikibot.bot.InteractiveReplace | None:
+    def replacer(self) -> InteractiveReplace | None:
         """The replacer."""
         return self._replacer
 
@@ -302,7 +331,7 @@ class LinkChoice(Choice):
         self,
         option: str,
         shortcut: str,
-        replacer: pywikibot.bot.InteractiveReplace | None,
+        replacer: InteractiveReplace | None,
         replace_section: bool,
         replace_label: bool
     ) -> None:
@@ -345,7 +374,7 @@ class AlwaysChoice(Choice):
 
     """Add an option to always apply the default."""
 
-    def __init__(self, replacer: pywikibot.bot.InteractiveReplace | None,
+    def __init__(self, replacer: InteractiveReplace | None,
                  option: str = 'always', shortcut: str = 'a') -> None:
         """Initializer."""
         super().__init__(option, shortcut, replacer)
@@ -601,3 +630,191 @@ class QuitKeyboardInterrupt(ChoiceException, KeyboardInterrupt):  # noqa: N818
     def __init__(self) -> None:
         """Constructor using the 'quit' ('q') in input_choice."""
         super().__init__('quit', 'q')
+
+
+class InteractiveReplace:
+
+    """A callback class for textlib's replace_links.
+
+    It shows various options which can be switched on and off:
+    * allow_skip_link = True (skip the current link)
+    * allow_unlink = True (unlink)
+    * allow_replace = False (just replace target, keep section and label)
+    * allow_replace_section = False (replace target and section, keep label)
+    * allow_replace_label = False (replace target and label, keep section)
+    * allow_replace_all = False (replace target, section and label)
+    (The boolean values are the default values)
+
+    It has also a ``context`` attribute which must be a non-negative
+    integer. If it is greater 0 it shows that many characters before and
+    after the link in question. The ``context_delta`` attribute can be
+    defined too and adds an option to increase ``context`` by the given
+    amount each time the option is selected.
+
+    Additional choices can be defined using the 'additional_choices' and will
+    be amended to the choices defined by this class. This list is mutable and
+    the Choice instance returned and created by this class are too.
+    """
+
+    def __init__(self,
+                 old_link: Link | Page,
+                 new_link: Link | Page | Literal[False],
+                 default: str | None = None,
+                 automatic_quit: bool = True) -> None:
+        """Initializer.
+
+        :param old_link: The old link which is searched. The label and section
+            are ignored.
+        :param new_link: The new link with which it should be replaced.
+            Depending on the replacement mode it'll use this link's label and
+            section. If False it'll unlink all and the attributes beginning
+            with allow_replace are ignored.
+        :param default: The default answer as the shortcut
+        :param automatic_quit: Add an option to quit and raise a
+            QuitKeyboardException.
+        """
+        if isinstance(old_link, pywikibot.Page):
+            self._old = old_link._link
+        else:
+            self._old = old_link
+        if isinstance(new_link, pywikibot.Page):
+            self._new: BaseLink | Literal[False] = new_link._link
+        else:
+            self._new = new_link
+        self._default = default
+        self._quit = automatic_quit
+
+        self._current_match: tuple[
+            Link | Page,
+            str,
+            Mapping[str, str],
+            tuple[int, int]
+        ] | None = None
+
+        self.context = 30
+        self.context_delta = 0
+        self.allow_skip_link = True
+        self.allow_unlink = True
+        self.allow_replace = False
+        self.allow_replace_section = False
+        self.allow_replace_label = False
+        self.allow_replace_all = False
+        # Use list to preserve order
+        self._own_choices: list[tuple[str, StandardOption]] = [
+            ('skip_link', StaticChoice('Do not change', 'n', None)),
+            ('unlink', StaticChoice('Unlink', 'u', False)),
+        ]
+        if self._new:
+            self._own_choices += [
+                ('replace', LinkChoice('Change link target', 't', self,
+                                       False, False)),
+                ('replace_section', LinkChoice(
+                    'Change link target and section', 's', self, True, False)),
+                ('replace_label', LinkChoice('Change link target and label',
+                                             'l', self, False, True)),
+                ('replace_all', LinkChoice('Change complete link', 'c', self,
+                                           True, True)),
+            ]
+
+        self.additional_choices: list[StandardOption] = []
+
+    def handle_answer(self, choice: str) -> Any:
+        """Return the result for replace_links."""
+        for c in self.choices:
+            if isinstance(c, Choice) and c.shortcut == choice:
+                return c.handle()
+
+        raise ValueError(f'Invalid choice "{choice}"')
+
+    def __call__(self, link: Link | Page,
+                 text: str, groups: Mapping[str, str],
+                 rng: tuple[int, int]) -> Any:
+        """Ask user how the selected link should be replaced."""
+        if self._old == link:
+            self._current_match = (link, text, groups, rng)
+            while True:
+                try:
+                    answer = self.handle_link()
+                except UnhandledAnswer as e:
+                    if e.stop:
+                        raise
+                else:
+                    break
+            self._current_match = None  # don't reset in case of an exception
+            return answer
+        return None
+
+    @property
+    def choices(self) -> tuple[StandardOption, ...]:
+        """Return the tuple of choices."""
+        choices = []
+        for name, choice in self._own_choices:
+            if getattr(self, 'allow_' + name):
+                choices += [choice]
+        if self.context_delta > 0:
+            choices += [HighlightContextOption(
+                'more context', 'm', self.current_text, self.context,
+                self.context_delta, *self.current_range)]
+        choices += self.additional_choices
+        return tuple(choices)
+
+    def handle_link(self) -> Any:
+        """Handle the currently given replacement."""
+        choices = self.choices
+        for c in choices:
+            if isinstance(c, AlwaysChoice) and c.handle_link():
+                return c.answer
+
+        question = 'Should the link '
+        if self.context > 0:
+            rng = self.current_range
+            text = self.current_text
+            # at the beginning of the link, start red color.
+            # at the end of the link, reset the color to default
+            pywikibot.info(text[max(0, rng[0] - self.context): rng[0]]
+                           + f'<<lightred>>{text[rng[0]:rng[1]]}<<default>>'
+                           + text[rng[1]: rng[1] + self.context])
+        else:
+            question += (
+                f'<<lightred>>{self._old.canonical_title()}<<default>> ')
+
+        if self._new is False:
+            question += 'be unlinked?'
+        else:
+            question += 'target to <<lightpurple>>{}<<default>>?'.format(
+                self._new.canonical_title())
+
+        choice = pywikibot.input_choice(question, choices,
+                                        default=self._default,
+                                        automatic_quit=self._quit)
+
+        assert isinstance(choice, str)
+        return self.handle_answer(choice)
+
+    @property
+    def current_link(self) -> Link | Page:
+        """Get the current link when it's handling one currently."""
+        if self._current_match is None:
+            raise ValueError('No current link')
+        return self._current_match[0]
+
+    @property
+    def current_text(self) -> str:
+        """Get the current text when it's handling one currently."""
+        if self._current_match is None:
+            raise ValueError('No current text')
+        return self._current_match[1]
+
+    @property
+    def current_groups(self) -> Mapping[str, str]:
+        """Get the current groups when it's handling one currently."""
+        if self._current_match is None:
+            raise ValueError('No current groups')
+        return self._current_match[2]
+
+    @property
+    def current_range(self) -> tuple[int, int]:
+        """Get the current range when it's handling one currently."""
+        if self._current_match is None:
+            raise ValueError('No current range')
+        return self._current_match[3]
