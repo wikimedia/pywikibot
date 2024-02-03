@@ -52,7 +52,7 @@ extra_deps = {
     'Tkinter': ['Pillow>=8.1.2, != 10.0, != 10.1'],
     'mwoauth': ['mwoauth!=0.3.1,>=0.2.4'],
     'html': ['beautifulsoup4>=4.7.1'],
-    'http': ['fake-useragent>1.4.0'],
+    'http': ['fake-useragent>=1.4.0'],
     'flake8': [  # Due to incompatibilities between packages the order matters.
         'flake8>=5.0.4',
         'darglint2',
