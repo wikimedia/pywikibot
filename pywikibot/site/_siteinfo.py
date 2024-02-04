@@ -137,33 +137,34 @@ class Siteinfo(Container):
         except APIError as e:
             if e.code == 'siunknown_siprop':
                 if len(props) == 1:
-                    pywikibot.log(
-                        f"Unable to get siprop '{props[0]}'")
+                    pywikibot.log(f"Unable to get siprop '{props[0]}'")
                     return {props[0]: (EMPTY_DEFAULT, False)}
+
                 pywikibot.log('Unable to get siteinfo, because at least '
-                              "one property is unknown: '{}'".format(
-                                  "', '".join(props)))
+                              "one property is unknown: '{}'"
+                              .format("', '".join(props)))
                 results = {}
                 for prop in props:
                     results.update(self._get_siteinfo(prop, expiry))
                 return results
             raise
-        else:
-            result = {}
-            if invalid_properties:
-                for prop in invalid_properties:
-                    result[prop] = (EMPTY_DEFAULT, False)
-                pywikibot.log("Unable to get siprop(s) '{}'".format(
-                    "', '".join(invalid_properties)))
-            if 'query' in data:
-                # If the request is a CachedRequest, use the _cachetime attr.
-                cache_time = getattr(
-                    request, '_cachetime', None) or datetime.datetime.utcnow()
-                for prop in props:
-                    if prop in data['query']:
-                        self._post_process(prop, data['query'][prop])
-                        result[prop] = (data['query'][prop], cache_time)
-            return result
+
+        result = {}
+        if invalid_properties:
+            for prop in invalid_properties:
+                result[prop] = (EMPTY_DEFAULT, False)
+            pywikibot.log("Unable to get siprop(s) '{}'"
+                          .format("', '".join(invalid_properties)))
+
+        if 'query' in data:
+            # If the request is a CachedRequest, use the _cachetime attr.
+            cache_time = getattr(
+                request, '_cachetime', None) or datetime.datetime.utcnow()
+            for prop in props:
+                if prop in data['query']:
+                    self._post_process(prop, data['query'][prop])
+                    result[prop] = (data['query'][prop], cache_time)
+        return result
 
     @staticmethod
     def _is_expired(cache_date, expire):
