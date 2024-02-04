@@ -1828,7 +1828,7 @@ class InterwikiBot:
         self.generateUntil = until
 
     @property
-    def dump_titles(self):
+    def dump_titles(self) -> Iterable[str]:
         """Return generator of titles for dump file."""
         return (s.origin.title(as_link=True) for s in self.subjects)
 

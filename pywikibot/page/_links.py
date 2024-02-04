@@ -132,7 +132,7 @@ class BaseLink(ComparableMixin):
             self._namespace = self.lookup_namespace()
         return self._namespace
 
-    def canonical_title(self):
+    def canonical_title(self) -> str:
         """Return full page title, including localized namespace."""
         # Avoid that ':' will be added to the title for Main ns.
         if self.namespace != Namespace.MAIN:

@@ -12,12 +12,13 @@ from collections import Counter
 from contextlib import suppress
 from itertools import islice
 from textwrap import shorten, wrap
+from typing import TYPE_CHECKING
 from urllib.parse import quote_from_bytes
 from warnings import warn
 
 import pywikibot
 from pywikibot import Timestamp, config, date, i18n, textlib, tools
-from pywikibot.backports import Generator, Iterable, Iterator
+from pywikibot.backports import Generator, Iterable
 from pywikibot.cosmetic_changes import CANCEL, CosmeticChangesToolkit
 from pywikibot.exceptions import (
     Error,
@@ -42,6 +43,12 @@ from pywikibot.tools import (
     issue_deprecation_warning,
     remove_last_args,
 )
+
+
+if TYPE_CHECKING:
+    from typing_extensions import Literal
+
+    from pywikibot.page import Revision
 
 
 PROTOCOL_REGEX = r'\Ahttps?://'
@@ -104,6 +111,7 @@ class BasePage(ComparableMixin):
         if title is None:
             raise ValueError('Title cannot be None.')
 
+        self._link: BaseLink
         if isinstance(source, pywikibot.site.BaseSite):
             self._link = Link(title, source=source, default_namespace=ns)
             self._revisions = {}
@@ -374,7 +382,7 @@ class BasePage(ComparableMixin):
             if not get_redirect:
                 raise
 
-        return self.latest_revision.text
+        return self.latest_revision.text  # type: ignore[attr-defined]
 
     def has_content(self) -> bool:
         """
@@ -516,7 +524,7 @@ class BasePage(ComparableMixin):
 
         :return: text of the page
         """
-        if getattr(self, '_text', None) is not None:
+        if hasattr(self, '_text') and self._text is not None:
             return self._text
 
         try:
@@ -690,14 +698,14 @@ class BasePage(ComparableMixin):
 
     def userName(self) -> str:
         """Return name or IP address of last user to edit page."""
-        return self.latest_revision.user
+        return self.latest_revision.user  # type: ignore[attr-defined]
 
     def isIpEdit(self) -> bool:
         """Return True if last editor was unregistered."""
-        return self.latest_revision.anon
+        return self.latest_revision.anon  # type: ignore[attr-defined]
 
     @cached
-    def lastNonBotUser(self) -> str:
+    def lastNonBotUser(self) -> str | None:
         """
         Return name or IP address of last human/non-bot user to edit page.
 
@@ -722,7 +730,7 @@ class BasePage(ComparableMixin):
            Use :attr:`latest_revision.timestamp<latest_revision>`
            instead.
         """
-        return self.latest_revision.timestamp
+        return self.latest_revision.timestamp  # type: ignore[attr-defined]
 
     def exists(self) -> bool:
         """Return True if page exists on the wiki, even if it's a redirect.
@@ -775,7 +783,7 @@ class BasePage(ComparableMixin):
             return False
 
         if not hasattr(self, '_catredirect'):
-            self._catredirect = False
+            self._catredirect: str | Literal[False] = False
             catredirs = self.site.category_redirects()
             for template, args in self.templatesWithParams():
                 if template.title(with_ns=False) not in catredirs:
@@ -911,7 +919,7 @@ class BasePage(ComparableMixin):
                       filter_redirects: bool = False,
                       namespaces=None,
                       total: int | None = None,
-                      content: bool = False):
+                      content: bool = False) -> Iterable[pywikibot.Page]:
         """
         Return an iterator all pages that refer to or embed the page.
 
@@ -929,7 +937,6 @@ class BasePage(ComparableMixin):
         :param total: iterate no more than this number of pages in total
         :param content: if True, retrieve the content of the current version
             of each referring page (default False)
-        :rtype: typing.Iterable[pywikibot.Page]
         """
         # N.B.: this method intentionally overlaps with backlinks() and
         # embeddedin(). Depending on the interface, it may be more efficient
@@ -952,7 +959,7 @@ class BasePage(ComparableMixin):
                   filter_redirects: bool | None = None,
                   namespaces=None,
                   total: int | None = None,
-                  content: bool = False):
+                  content: bool = False) -> Iterable[pywikibot.Page]:
         """
         Return an iterator for pages that link to this page.
 
@@ -978,7 +985,7 @@ class BasePage(ComparableMixin):
                    filter_redirects: bool | None = None,
                    namespaces=None,
                    total: int | None = None,
-                   content: bool = False):
+                   content: bool = False) -> Iterable[pywikibot.Page]:
         """
         Return an iterator for pages that embed this page as a template.
 
@@ -1423,7 +1430,7 @@ class BasePage(ComparableMixin):
 
     def linkedPages(
         self, *args, **kwargs
-    ) -> Generator[pywikibot.Page, None, None]:
+    ) -> Generator[pywikibot.page.BasePage, None, None]:
         """Iterate Pages that this Page links to.
 
         Only returns pages from "normal" internal links. Embedded
@@ -1467,15 +1474,17 @@ class BasePage(ComparableMixin):
 
         return self.site.pagelinks(self, **kwargs)
 
-    def interwiki(self, expand: bool = True):
+    def interwiki(
+        self,
+        expand: bool = True,
+    ) -> Generator[pywikibot.page.Link, None, None]:
         """
-        Iterate interwiki links in the page text, excluding language links.
+        Yield interwiki links in the page text, excluding language links.
 
         :param expand: if True (default), include interwiki links found in
             templates transcluded onto this page; if False, only iterate
             interwiki links found in this page's own wikitext
         :return: a generator that yields Link objects
-        :rtype: generator
         """
         # This function does not exist in the API, so it has to be
         # implemented by screen-scraping
@@ -1500,7 +1509,10 @@ class BasePage(ComparableMixin):
                 # ignore any links with invalid contents
                 continue
 
-    def langlinks(self, include_obsolete: bool = False) -> list:
+    def langlinks(
+        self,
+        include_obsolete: bool = False,
+    ) -> list[pywikibot.Link]:
         """
         Return a list of all inter-language Links on this page.
 
@@ -1519,16 +1531,17 @@ class BasePage(ComparableMixin):
             return list(self._langlinks)
         return [i for i in self._langlinks if not i.site.obsolete]
 
-    def iterlanglinks(self,
-                      total: int | None = None,
-                      include_obsolete: bool = False):
+    def iterlanglinks(
+        self,
+        total: int | None = None,
+        include_obsolete: bool = False,
+    ) -> Iterable[pywikibot.Link]:
         """Iterate all inter-language links on this page.
 
         :param total: iterate no more than this number of pages in total
         :param include_obsolete: if true, yield even Link object whose site
                                  is obsolete
         :return: a generator that yields Link objects.
-        :rtype: generator
         """
         if hasattr(self, '_langlinks'):
             return iter(self.langlinks(include_obsolete=include_obsolete))
@@ -1539,12 +1552,8 @@ class BasePage(ComparableMixin):
         return self.site.pagelanglinks(self, total=total,
                                        include_obsolete=include_obsolete)
 
-    def data_item(self):
-        """
-        Convenience function to get the Wikibase item of a page.
-
-        :rtype: pywikibot.page.ItemPage
-        """
+    def data_item(self) -> pywikibot.page.ItemPage:
+        """Convenience function to get the Wikibase item of a page."""
         return pywikibot.ItemPage.fromPage(self)
 
     def templates(self, content: bool = False) -> list[pywikibot.Page]:
@@ -1571,9 +1580,11 @@ class BasePage(ComparableMixin):
 
         return list(self._templates)
 
-    def itertemplates(self,
-                      total: int | None = None,
-                      content: bool = False):
+    def itertemplates(
+        self,
+        total: int | None = None,
+        content: bool = False,
+    ) -> Iterable[pywikibot.Page]:
         """
         Iterate Page objects for templates used on this Page.
 
@@ -1591,7 +1602,11 @@ class BasePage(ComparableMixin):
 
         return self.site.pagetemplates(self, total=total, content=content)
 
-    def imagelinks(self, total: int | None = None, content: bool = False):
+    def imagelinks(
+        self,
+        total: int | None = None,
+        content: bool = False,
+    ) -> Iterable[pywikibot.FilePage]:
         """
         Iterate FilePage objects for images displayed on this Page.
 
@@ -1602,10 +1617,12 @@ class BasePage(ComparableMixin):
         """
         return self.site.pageimages(self, total=total, content=content)
 
-    def categories(self,
-                   with_sort_key: bool = False,
-                   total: int | None = None,
-                   content: bool = False) -> Iterator[pywikibot.Page]:
+    def categories(
+        self,
+        with_sort_key: bool = False,
+        total: int | None = None,
+        content: bool = False,
+    ) -> Iterable[pywikibot.Page]:
         """
         Iterate categories that the article is in.
 
@@ -1631,13 +1648,12 @@ class BasePage(ComparableMixin):
 
         return self.site.pagecategories(self, total=total, content=content)
 
-    def extlinks(self, total: int | None = None):
+    def extlinks(self, total: int | None = None) -> Iterable[str]:
         """
         Iterate all external URLs (not interwiki links) from this page.
 
         :param total: iterate no more than this number of pages in total
         :return: a generator that yields str objects containing URLs.
-        :rtype: generator
         """
         return self.site.page_extlinks(self, total=total)
 
@@ -1717,7 +1733,7 @@ class BasePage(ComparableMixin):
                                 starttime=starttime, endtime=endtime,
                                 total=total)
 
-        revs = self._revisions.values()
+        revs: Iterable[Revision] = self._revisions.values()
 
         if starttime or endtime:
             t_min, t_max = Timestamp.min, Timestamp.max
@@ -1729,9 +1745,9 @@ class BasePage(ComparableMixin):
                 t0 = Timestamp.set_timestamp(endtime) if endtime else t_min
                 t1 = Timestamp.set_timestamp(starttime) if starttime else t_max
 
-            revs = [rev for rev in revs if t0 <= rev.timestamp <= t1]
+            revs = [rev for rev in revs if t0 <= rev.timestamp <= t1]  # type: ignore[attr-defined]  # noqa: E501
 
-        revs = sorted(revs, reverse=not reverse, key=lambda rev: rev.timestamp)
+        revs = sorted(revs, reverse=not reverse, key=lambda rev: rev.timestamp)  # type: ignore[attr-defined]  # noqa: E501
 
         return islice(revs, total)
 
@@ -1810,7 +1826,7 @@ class BasePage(ComparableMixin):
              reason: str | None = None,
              movetalk: bool = True,
              noredirect: bool = False,
-             movesubpages: bool = True) -> None:
+             movesubpages: bool = True) -> pywikibot.page.Page:
         """
         Move this page to a new title.
 
@@ -1901,7 +1917,9 @@ class BasePage(ComparableMixin):
             # We can't add templates in a wikidata item, so let's use its
             # talk page
             if isinstance(self, pywikibot.ItemPage):
-                target = self.toggleTalkPage()
+                trgt = self.toggleTalkPage()
+                assert trgt is not None
+                target: BasePage = trgt
             else:
                 target = self
             target.text = template + target.text

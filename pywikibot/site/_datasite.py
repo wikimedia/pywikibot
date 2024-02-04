@@ -14,7 +14,7 @@ from typing import Any
 from warnings import warn
 
 import pywikibot
-from pywikibot.backports import batched
+from pywikibot.backports import Generator, Iterable, batched
 from pywikibot.data import api
 from pywikibot.exceptions import (
     APIError,
@@ -205,7 +205,12 @@ class DataSite(APISite):
             raise APIError(data['errors'], '')
         return data['entities']
 
-    def preload_entities(self, pagelist, groupsize: int = 50):
+    def preload_entities(
+        self,
+        pagelist: Iterable[pywikibot.page.WikibaseEntity
+                           | pywikibot.page.Page],
+        groupsize: int = 50
+    ) -> Generator[pywikibot.page.WikibaseEntity, None, None]:
         """Yield subclasses of WikibaseEntity's with content prefilled.
 
         .. note:: Pages will be iterated in a different order than in

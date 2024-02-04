@@ -15,8 +15,12 @@ from pywikibot.backports import Iterable as IterableType
 from pywikibot.tools import ComparableMixin, classproperty
 
 
-NamespaceIDType = Union[int, str, 'Namespace']
-NamespaceArgType = Union[NamespaceIDType, IterableType[NamespaceIDType], None]
+SingleNamespaceType = Union[int, str, 'Namespace']
+NamespaceArgType = Union[
+    SingleNamespaceType,
+    IterableType[SingleNamespaceType],
+    None,
+]
 
 
 class BuiltinNamespace(IntEnum):

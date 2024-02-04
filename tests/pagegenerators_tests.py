@@ -1338,7 +1338,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_querypage_generator_with_invalid_page(self):
         """Test generator of pages with lint errors."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             gf.handle_arg('-querypage:dummy')
 
     def test_querypage_generator_with_no_page(self):

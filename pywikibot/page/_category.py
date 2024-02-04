@@ -10,7 +10,7 @@ from collections import defaultdict
 from typing import Any
 
 import pywikibot
-from pywikibot.backports import Generator, Iterable
+from pywikibot.backports import Generator
 from pywikibot.page._page import Page
 
 
@@ -62,8 +62,8 @@ class Category(Page):
 
     def subcategories(self, *,
                       recurse: int | bool = False,
-                      **kwargs: Any) -> Iterable[Page]:
-        """Iterate all subcategories of the current category.
+                      **kwargs: Any) -> Generator[Page, None, None]:
+        """Yield all subcategories of the current category.
 
         **Usage:**
 
@@ -137,7 +137,7 @@ class Category(Page):
     def articles(self, *,
                  recurse: int | bool = False,
                  total: int | None = None,
-                 **kwargs: Any) -> Iterable[Page]:
+                 **kwargs: Any) -> Generator[Page, None, None]:
         """
         Yield all articles in the current category.
 
@@ -204,7 +204,7 @@ class Category(Page):
     def members(self, *,
                 recurse: bool = False,
                 total: int | None = None,
-                **kwargs: Any) -> Iterable[Page]:
+                **kwargs: Any) -> Generator[Page, None, None]:
         """Yield all category contents (subcats, pages, and files).
 
         **Usage:**

@@ -172,7 +172,9 @@ from pywikibot.tools._logging import LoggingFormatter
 
 
 if TYPE_CHECKING:
-    from pywikibot.page import Link, Page
+    from typing_extensions import Literal
+
+    from pywikibot.page import BaseLink, Link, Page
     from pywikibot.site import BaseSite
 
     AnswerType = Iterable[tuple[str, str] | Option] | Option
@@ -611,7 +613,7 @@ def input_yn(question: str,
         selected no. If the default is not None it'll return True if default
         is True or 'y' and False if default is False or 'n'.
     """
-    if default in (True, False):
+    if isinstance(default, bool):
         default = 'ny'[default]
 
     return input_choice(question, [('Yes', 'y'), ('No', 'n')],
@@ -666,7 +668,7 @@ class InteractiveReplace:
 
     def __init__(self,
                  old_link: Link | Page,
-                 new_link: Link | Page | bool,
+                 new_link: Link | Page | Literal[False],
                  default: str | None = None,
                  automatic_quit: bool = True) -> None:
         """
@@ -687,7 +689,7 @@ class InteractiveReplace:
         else:
             self._old = old_link
         if isinstance(new_link, pywikibot.Page):
-            self._new = new_link._link
+            self._new: BaseLink | Literal[False] = new_link._link
         else:
             self._new = new_link
         self._default = default
@@ -1035,6 +1037,7 @@ def show_help(module_name: str | None = None,
             pywikibot.stdout('Sorry, no help available for ' + module_name)
         pywikibot.log('show_help:', exc_info=True)
     else:
+        assert module.__doc__ is not None
         help_text = re.sub(r'^\.\. version(added|changed)::.+', '',
                            module.__doc__, flags=re.MULTILINE | re.DOTALL)
         if hasattr(module, 'docuReplacements'):
