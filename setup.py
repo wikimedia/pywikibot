@@ -162,7 +162,6 @@ def get_validated_version(name: str) -> str:  # pragma: no cover
         return version
 
     # validate version for sdist
-    from contextlib import suppress
     from subprocess import PIPE, run
 
     from packaging.version import InvalidVersion, Version
