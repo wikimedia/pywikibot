@@ -807,6 +807,6 @@ class DeprecatorTestCase(DeprecationTestCase):
             + '.DeprecatedMethodClass.deprecated_instance_method_and_arg2')
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

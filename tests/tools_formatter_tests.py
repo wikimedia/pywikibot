@@ -106,6 +106,6 @@ class TestColorFormat(DeprecationTestCase):
         self.assert_format('{color}', '42', color=42)
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

@@ -87,6 +87,6 @@ def setUpModule():
         raise unittest.SkipTest('login/logout tests are disabled')
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

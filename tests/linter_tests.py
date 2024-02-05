@@ -36,6 +36,6 @@ class TestLinterPages(DefaultSiteTestCase):
                           ['obsolete-tag', 'missing-end-tag'])
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

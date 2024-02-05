@@ -333,6 +333,6 @@ def unpatch_request():
     pywikibot.data.api.CachedRequest._expired = original_expired
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

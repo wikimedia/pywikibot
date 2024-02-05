@@ -212,6 +212,6 @@ class TestUserMethods(DefaultSiteTestCase):
             self.assertEqual(event.user(), user.username)
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

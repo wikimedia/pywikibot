@@ -40,5 +40,5 @@ class RequestCacheTests(TestCase):
                               tests=25)
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     unittest.main()

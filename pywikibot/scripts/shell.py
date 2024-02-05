@@ -16,7 +16,7 @@ Usage::
 .. versionchanged:: 7.0
    moved to pywikibot.scripts
 """
-# (C) Pywikibot team, 2014-2023
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -57,7 +57,7 @@ def main(*args: str) -> None:
                   exitmsg='Thank you for using Pywikibot; exiting now...\n')
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     if sys.platform == 'win32':
         import platform
         import subprocess

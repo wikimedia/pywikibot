@@ -282,6 +282,6 @@ class CategoryNewestPages(TestCase):
         self.assertEqual(count, cat.categoryinfo['size'])
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

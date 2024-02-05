@@ -447,5 +447,5 @@ class QueryGenTests(DefaultDrySiteTestCase):
             q_gen1.request._params.items(), q_gen2.request._params.items())
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     unittest.main()

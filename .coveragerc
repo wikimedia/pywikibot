@@ -14,6 +14,7 @@ exclude_lines =
     raise NotImplementedError
     raise unittest\.SkipTest
     self\.skipTest
+    if __name__ == '__main__':
     if .+PYWIKIBOT_TEST_\w+.+:
     if self\.mw_version < .+:
     if TYPE_CHECKING:

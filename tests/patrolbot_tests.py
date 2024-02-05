@@ -70,6 +70,6 @@ class TestPatrolBot(DefaultDrySiteTestCase):
         self.assertTrue(self.bot.in_list({'', 'Foo'}, 'Foo'))
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

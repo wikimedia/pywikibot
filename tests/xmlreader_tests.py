@@ -153,6 +153,6 @@ class ExportDotTenTestCase(TestCase):
             'moved [[Çullu, Agdam]] to [[Çullu, Quzanlı]]:&#32;dab')
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

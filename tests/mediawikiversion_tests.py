@@ -110,6 +110,6 @@ class TestMediaWikiVersion(TestCase):
             MediaWikiVersion.from_generator('Invalid 1.2.3')
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

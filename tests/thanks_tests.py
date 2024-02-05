@@ -113,6 +113,6 @@ class TestThankRevisionErrors(TestCase):
                                     source='pywikibot test')
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

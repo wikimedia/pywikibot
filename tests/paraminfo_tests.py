@@ -245,5 +245,5 @@ class WikibaseKnownTypesTests(KnownTypesTestBase,
         self._check_param_values(self.repo, 'wbgetclaims', 'rank', known)
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     unittest.main()

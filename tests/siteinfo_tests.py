@@ -127,6 +127,6 @@ class TestSiteinfoAsync(DefaultSiteTestCase):
         self.assertTrue(self.site.siteinfo.is_cached('statistics'))
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

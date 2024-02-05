@@ -152,6 +152,6 @@ class TestUpload(TestCase):
         self._verify_stash()
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

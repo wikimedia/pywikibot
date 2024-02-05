@@ -68,6 +68,6 @@ class TestGetSDTemplateNoSysop(DefaultSiteTestCase):
         w.assert_called_with('No speedy deletion template "n" available.')
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

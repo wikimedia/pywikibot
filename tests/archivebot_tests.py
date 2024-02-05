@@ -347,6 +347,6 @@ class TestPageArchiverObject(TestCase):
             archivebot.PageArchiver(page, tmpl_without_ns, '')
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

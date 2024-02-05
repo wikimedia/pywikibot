@@ -75,6 +75,6 @@ class TestMementoDefault(MementoTestCase):
             self._get_archive_url('invalid')
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

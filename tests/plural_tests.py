@@ -63,6 +63,6 @@ class TestPluralRules(TestCase, metaclass=MetaPluralRulesTest):
     max_num = 1000
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

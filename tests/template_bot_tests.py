@@ -101,5 +101,5 @@ class TestXMLPageGenerator(TestCase):
             site=self.site)
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     unittest.main()

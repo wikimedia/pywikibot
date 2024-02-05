@@ -80,6 +80,6 @@ class TestWiktionaryGraph(SiteAttributeTestCase):
                     nodes[node][0]['attributes']['shape'], shape)
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

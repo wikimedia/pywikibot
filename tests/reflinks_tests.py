@@ -174,5 +174,5 @@ def dummy_constructor(self, *args, **kwargs):
     TestReferencesBotConstructor.constructor_kwargs = kwargs
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     unittest.main()

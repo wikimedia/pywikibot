@@ -179,5 +179,5 @@ class TestPasswordFile(DefaultDrySiteTestCase):
         self.assertEqual(obj.login_name, '~FakeUsername@~FakeSuffix')
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     unittest.main()

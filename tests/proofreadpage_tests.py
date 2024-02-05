@@ -1000,6 +1000,6 @@ class TestIndexPageHasValidContent(BS4TestCase):
         self.assertFalse(self.index.has_valid_content())
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

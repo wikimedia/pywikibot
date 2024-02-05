@@ -961,6 +961,6 @@ class TestLagpattern(DefaultSiteTestCase):
             self.assertEqual(float(lag['lag']), time)
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

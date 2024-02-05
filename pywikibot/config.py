@@ -34,7 +34,7 @@ utility methods to build paths relative to base_dir:
    default. Editor detection functions were moved to :mod:`editor`.
 """
 #
-# (C) Pywikibot team, 2003-2023
+# (C) Pywikibot team, 2003-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1099,7 +1099,7 @@ for file_path in user_families_paths:
 #
 # When called as main program, list all configuration variables
 #
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     from pprint import PrettyPrinter as _PrettyPrinter
     _pp = _PrettyPrinter()
     _all = True

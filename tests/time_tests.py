@@ -292,6 +292,6 @@ class TestTimeFunctions(TestCase):
                 parse_duration(invalid_value)
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

@@ -29,5 +29,5 @@ class TestFixingRedirects(TestCase):
         self.assertEqual(text, new_text)
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     unittest.main()
