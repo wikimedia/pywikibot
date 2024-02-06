@@ -1315,6 +1315,8 @@ class BaseBot(OptionHandler):
 
         .. versionchanged:: 7.3
            Statistics are printed for all entries in :attr:`counter`
+        .. versionchanged:: 9.0
+           Print execution time with days, hours, minutes and seconds.
         """
         self.teardown()
         if hasattr(self, '_start_ts'):
@@ -1331,13 +1333,12 @@ class BaseBot(OptionHandler):
         if hasattr(self, '_start_ts'):
             write_delta = pywikibot.Timestamp.now() - self._start_ts
             write_seconds = int(write_delta.total_seconds())
-            if write_delta.days:
-                pywikibot.info(
-                    'Execution time: {d.days} days, {d.seconds} seconds'
-                    .format(d=write_delta))
-            else:
-                pywikibot.info(
-                    f'Execution time: {write_delta.seconds} seconds')
+            hours, remainder = divmod(write_delta.seconds, 3600)
+            parts = write_delta.days, hours, *divmod(remainder, 60)
+            units = ('days', 'hours', 'minutes', 'seconds')
+            used = ', '.join(f'{value} {unit}'
+                             for value, unit in zip(parts, units) if value)
+            pywikibot.info('Execution time: ' + used)
 
             if self.counter['read']:
                 pywikibot.info('Read operation time: {:.1f} seconds'
