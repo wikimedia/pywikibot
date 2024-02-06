@@ -28,6 +28,7 @@ Bugfixes
 Breaking changes and code cleanups
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+* :class:`InteractiveReplace<bot_choice.InteractiveReplace>` was moved from :mod:`bot` to :mod:`bot_choice` module
 * ``userinterfaces.transliteration.transliterator`` was renamed to :class:`Transliterator
   <userinterfaces.transliteration.Transliterator>`
 * ``pywikibot.BaseSite`` and ``pywikibotAPISite`` were dropped. :func:`pywikibot.Site` has to be used to create a
