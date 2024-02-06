@@ -198,7 +198,7 @@ if 'PYWIKIBOT_TEST_MODULES' in os.environ:
 
 def unittest_print(*args, **kwargs):
     """Print information in test log."""
-    print(*args, **kwargs)  # noqa: T001, T201
+    print(*args, **kwargs)  # noqa: T201
 
 
 def collector(loader=unittest.loader.defaultTestLoader):

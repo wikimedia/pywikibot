@@ -138,7 +138,7 @@ def load_json(path):
         with open(path, encoding='utf8') as f:
             return load(f)
     except OSError:
-        print('File not found:', path)  # noqa: T001, T201
+        print('File not found:', path)  # noqa: T201
         return {}
 
 
@@ -151,4 +151,4 @@ if __name__ == '__main__':
     # families_excepts = load_json(FILEPATH)
     # main()
     # save_json(families_excepts, FILEPATH)
-    print(process_site('wiktionary', 'fr'))  # noqa: T001, T201
+    print(process_site('wiktionary', 'fr'))  # noqa: T201
