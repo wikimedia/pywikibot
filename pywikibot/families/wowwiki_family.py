@@ -1,6 +1,6 @@
 """Family module for WOW wiki."""
 #
-# (C) Pywikibot team, 2009-2023
+# (C) Pywikibot team, 2009-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -17,11 +17,11 @@ class Family(family.FandomFamily):
     name = 'wowwiki'
     domain = 'wowwiki.fandom.com'
 
-    codes = [
+    codes = {
         'ar', 'cs', 'da', 'de', 'el', 'en', 'es', 'et', 'fa', 'fi', 'fr', 'he',
         'hu', 'it', 'ja', 'ko', 'nl', 'no', 'pl', 'pt', 'pt-br', 'ru', 'uk',
         'zh', 'zh-tw',
-    ]
+    }
 
     removed_wikis = ['is', 'hr', 'lt', 'lv', 'ro', 'sk', 'sr', 'sv', 'tr']
 

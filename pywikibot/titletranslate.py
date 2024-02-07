@@ -1,6 +1,6 @@
 """Title translate module."""
 #
-# (C) Pywikibot team, 2003-2022
+# (C) Pywikibot team, 2003-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -47,7 +47,7 @@ def translate(
         if codes.isdigit():
             codes = site.family.languages_by_size[:int(codes)]
         elif codes == 'all':
-            codes = site.family.languages_by_size
+            codes = list(site.family.codes)
         else:
             codes = site.family.language_groups.get(codes, codes.split(','))
 

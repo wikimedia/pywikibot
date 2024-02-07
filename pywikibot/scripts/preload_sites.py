@@ -18,7 +18,7 @@ To force preloading, change the global expiry value to 0::
    script was moved to the framework scripts folder.
 """
 #
-# (C) Pywikibot team, 2021-2023
+# (C) Pywikibot team, 2021-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -61,7 +61,7 @@ def preload_family(family: str, executor: ThreadPoolExecutor) -> None:
     msg = 'Preloading sites of {} family{}'
     pywikibot.info(msg.format(family, '...'))
 
-    codes = Family.load(family).languages_by_size
+    codes = Family.load(family).codes
     for code in exceptions.get(family, []):
         if code in codes:
             codes.remove(code)

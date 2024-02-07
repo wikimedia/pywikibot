@@ -174,8 +174,6 @@ Maintenance
 +------------------------+---------------------------------------------------------+
 | unidata.py             | Updates _first_upper_exception_dict in tools.unidata    |
 +------------------------+---------------------------------------------------------+
-| wikimedia_sites.py     | Updates the language lists in Wikimedia family files.   |
-+------------------------+---------------------------------------------------------+
 
 Others
 ======

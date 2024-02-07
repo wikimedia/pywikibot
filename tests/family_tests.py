@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the family module."""
 #
-# (C) Pywikibot team, 2014-2023
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -13,7 +13,6 @@ from contextlib import suppress
 import pywikibot
 from pywikibot.exceptions import UnknownFamilyError
 from pywikibot.family import Family, SingleSiteFamily
-from pywikibot.tools import suppress_warnings
 from tests.aspects import PatchingTestCase, TestCase, unittest
 from tests.utils import DrySite
 
@@ -42,13 +41,8 @@ class TestFamily(TestCase):
                         self.assertIn('.', domain)
 
                 self.assertEqual(f.name, name)
-
-                with suppress_warnings(
-                        'wowwiki_family.Family.languages_by_size '
-                        'is deprecated'):
-                    self.assertIsInstance(f.languages_by_size, list)
-                    self.assertGreaterEqual(set(f.langs),
-                                            set(f.languages_by_size))
+                self.assertIsInstance(f.codes, set)
+                self.assertGreaterEqual(set(f.langs), set(f.codes))
 
                 if isinstance(f, SingleSiteFamily):
                     self.assertIsNotNone(f.code)

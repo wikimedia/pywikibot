@@ -70,7 +70,7 @@ class TestValidTemplateMeta(MetaTestCaseClass):
 
         # create test methods for package messages processed by unittest
         site = pywikibot.Site(dct['code'], dct['family'])
-        codes = site.family.languages_by_size
+        codes = site.family.codes
         del site
         for package in PACKAGES:
             keys = i18n.twget_keys(package)

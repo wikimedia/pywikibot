@@ -23,6 +23,7 @@ from typing import TYPE_CHECKING
 import pywikibot
 from pywikibot import config
 from pywikibot.backports import DefaultDict, Mapping, Sequence, removesuffix
+from pywikibot.data import wikistats
 from pywikibot.exceptions import FamilyMaintenanceWarning, UnknownFamilyError
 from pywikibot.tools import classproperty, deprecated, remove_last_args
 
@@ -208,11 +209,6 @@ class Family:
     """Some families, e. g. commons and meta, are not multilingual and
     forward interlanguage links to another family (wikipedia). These
     families can set this variable to the name of the target family.
-    """
-
-    languages_by_size: list[str] = []
-    """Language codes of the largest wikis. They should be roughly
-    sorted by size.
     """
 
     #: Some languages belong to a group where the possibility is high
@@ -731,7 +727,7 @@ class Family:
         return putText
 
     @property
-    def obsolete(self) -> dict[str, str | None]:
+    def obsolete(self) -> types.MappingProxyType[str, str | None]:
         """
         Old codes that are not part of the family.
 
@@ -753,12 +749,8 @@ class Family:
         return set(cls.langs.values())
 
     @classproperty
-    def codes(cls):
-        """
-        Get list of codes used by this family.
-
-        :rtype: set of str
-        """
+    def codes(cls) -> set[str]:
+        """Get list of codes used by this family."""
         return set(cls.langs.keys())
 
     @classproperty
@@ -823,9 +815,9 @@ class SubdomainFamily(Family):
         return super().__new__(cls)
 
     @classproperty
-    def langs(cls):
+    def langs(cls) -> dict[str, str]:
         """Property listing family languages."""
-        codes = cls.codes[:]
+        codes = sorted(cls.codes)
 
         if hasattr(cls, 'test_codes'):
             codes += cls.test_codes
@@ -838,14 +830,6 @@ class SubdomainFamily(Family):
                           for alias, code in cls.code_aliases.items()})
 
         return cls.langs
-
-    @classproperty
-    def codes(cls):
-        """Property listing family codes."""
-        if cls.languages_by_size:
-            return cls.languages_by_size
-        raise NotImplementedError(
-            f'Family {cls.name} needs property "languages_by_size" or "codes"')
 
     @classproperty
     def domains(cls):
@@ -864,10 +848,10 @@ class FandomFamily(Family):
     @classproperty
     def langs(cls):
         """Property listing family languages."""
-        codes = cls.codes
+        codes = sorted(cls.codes)
 
         if hasattr(cls, 'code_aliases'):
-            codes += tuple(cls.code_aliases.keys())
+            codes += cls.code_aliases
 
         return {code: cls.domain for code in codes}
 
@@ -885,10 +869,14 @@ class WikimediaFamily(Family):
     """
 
     multi_language_content_families = [
-        'wikipedia', 'wiktionary',
-        'wikisource', 'wikibooks',
-        'wikinews', 'wikiquote',
-        'wikiversity', 'wikivoyage',
+        'wikibooks',
+        'wikinews',
+        'wikipedia',
+        'wikiquote',
+        'wikisource',
+        'wikiversity',
+        'wikivoyage',
+        'wiktionary',
     ]
 
     wikimedia_org_content_families = [
@@ -896,8 +884,11 @@ class WikimediaFamily(Family):
     ]
 
     wikimedia_org_meta_families = [
-        'meta', 'outreach', 'strategy',
-        'wikimediachapter', 'wikimania',
+        'meta',
+        'outreach',
+        'strategy',
+        'wikimediachapter',
+        'wikimania',
     ]
 
     wikimedia_org_other_families = [
@@ -1027,6 +1018,43 @@ class WikimediaFamily(Family):
     def eventstreams_path(self, code) -> str:
         """Return path for EventStreams."""
         return '/v2/stream'
+
+    @property
+    def languages_by_size(self) -> list[str]:
+        """Language codes of the largest wikis.
+
+        They should be roughly sorted by size.
+
+        .. versionchanged:: 9.0
+           Sorting order is retrieved via :mod:`wikistats` for each call.
+
+        :raises NotImplementedError: Family is not member of
+            :attr:`multi_language_content_families`
+        """
+        if self.name not in self.multi_language_content_families:
+            raise NotImplementedError(
+                f'languages_by_size is not implemented for {self.name} family')
+
+        exceptions = {
+            'wikiversity': ['beta']
+        }
+
+        ws = wikistats.WikiStats()
+        table = ws.languages_by_size(self.name)
+        assert type(self.obsolete).__name__ == 'mappingproxy', (
+            f'obsolete attribute is of type {type(self.obsolete).__name__} but'
+            ' mappingproxy was expected'
+        )
+
+        lbs = [
+            code for code in table
+            if not (code in self.obsolete
+                    or code in exceptions.get(self.name, []))
+        ]
+
+        # add codes missing by wikistats
+        missing = set(self.codes) - set(lbs)
+        return lbs + list(missing)
 
 
 class WikimediaOrgFamily(SingleSiteFamily, WikimediaFamily):
