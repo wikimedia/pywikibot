@@ -967,9 +967,7 @@ class DataExtendBot(SingleSiteBot):
                                             claim[0]])].addSources(sourcedata)
                         else:
                             if claim[0] not in propsdone:
-                                # DequeGenerator is intended to add items
-                                # during generation, therefore ignore B038
-                                propstodo.append(claim[0])  # noqa: B038
+                                propstodo.append(claim[0])
 
                             createdclaim = pywikibot.Claim(self.site, claim[0])
 
@@ -1095,8 +1093,7 @@ class DataExtendBot(SingleSiteBot):
                                                     0]])].addSources(sourcedata)
                                     except AttributeError:
                                         if prop not in propsdone:
-                                            # ignore B038 due to DequeGenerator
-                                            propstodo.append(prop)  # noqa: B038
+                                            propstodo.append(prop)
                                         pywikibot.info('Sourcing failed')
 
                 for language, description in analyzer.getdescriptions():
