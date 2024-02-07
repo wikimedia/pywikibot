@@ -57,10 +57,7 @@ def _invalidate_superior_cookies(family) -> None:
     if isinstance(family, SubdomainFamily):
         for cookie in http.cookie_jar:
             if family.domain == cookie.domain:
-                # ignore B038: iterating over cookies already uses a list,
-                # created in cookiejar.deepvalues()
-                http.cookie_jar.clear(  # noqa: B038
-                    cookie.domain, cookie.path, cookie.name)
+                http.cookie_jar.clear(cookie.domain, cookie.path, cookie.name)
 
 
 # Bug: T113120, T228841

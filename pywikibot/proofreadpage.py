@@ -543,8 +543,7 @@ class ProofreadPage(pywikibot.Page):
                 if self._num is not None:
                     for page in what_links_here:
                         if page.title(with_ns=False) == self._base:
-                            # ignore B038, we break the loop after removal
-                            what_links_here.remove(page)  # noqa: B038
+                            what_links_here.remove(page)
                             self._index = (page, what_links_here)
                             break
 
