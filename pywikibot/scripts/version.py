@@ -93,7 +93,7 @@ def main(*args: str) -> None:
     for family, usernames in pywikibot.config.usernames.items():
         if not usernames:
             continue
-        pywikibot.info(f'Usernames for family {family!r}:')
+        pywikibot.info(f"Usernames for family '{family}':")
         for lang, username in usernames.items():
             pywikibot.info(f'\t{lang}: {username}')
 

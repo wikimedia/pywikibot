@@ -415,7 +415,7 @@ class APISite(
                 error_msg = ('No username has been defined in your '
                              'user config file: you have to add in this '
                              'file the following line:\n'
-                             'usernames[{family!r}][{lang!r}]= {username!r}'
+                             "usernames['{family}'][{lang!r}]= {username!r}"
                              .format(family=self.family,
                                      lang=self.lang,
                                      username=self.userinfo['name']))
