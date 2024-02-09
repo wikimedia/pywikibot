@@ -51,9 +51,10 @@ jobs:
             site: wikidata:wikidata
           - python-version: 3.8
             site: wowwiki:uk
-          - python-version: 3
+          - python-version: "3"  # fails due to T337748
             site: wikipedia:de
             os: macOS-latest
+            experimental: true
           - python-version: "3.12"  # 3.12 fails due to T337748
             site: wikipedia:en
             test_prod_only: true
