@@ -1522,7 +1522,7 @@ class TestUserList(DefaultSiteTestCase):
 
     def test_users(self):
         """Test the site.users() method with preset usernames."""
-        user_list = ['Jimbo Wales', 'Brion VIBBER', 'Tim Starling']
+        user_list = ['Jimbo Wales', 'Brooke Vibber', 'Tim Starling']
         missing = ['A username that should not exist 1A53F6E375B5']
         all_users = user_list + missing
         for cnt, user in enumerate(self.site.users(all_users), start=1):
