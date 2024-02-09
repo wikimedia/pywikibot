@@ -57,7 +57,7 @@ class Family:
        :attr:`obsolete` setter was removed.
     .. versionchanged:: 8.3
        Having an initializer method a ``FutureWarning`` will be given.
-    .. versionchanged:: 9.0.0
+    .. versionchanged:: 9.0
        raises RuntimeError if an initializer method was found;
        :meth:`__post_init__` classmethod should be used instead.
     """

@@ -1,6 +1,6 @@
 """Test utilities."""
 #
-# (C) Pywikibot team, 2013-2023
+# (C) Pywikibot team, 2013-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -469,7 +469,7 @@ class FakeLoginManager(pywikibot.login.ClientLoginManager):
 def execute(command: list[str], data_in=None, timeout=None):
     """Execute a command and capture outputs.
 
-    .. versionchanged:: 8.2.0
+    .. versionchanged:: 8.2
        *error* parameter was removed.
 
     :param command: executable to run and arguments to use
@@ -518,7 +518,7 @@ def execute_pwb(args: list[str],
                 overrides: dict[str, str] | None = None) -> dict[str, Any]:
     """Execute the pwb.py script and capture outputs.
 
-    .. versionchanged:: 8.2.0
+    .. versionchanged:: 8.2
        the *error* parameter was removed.
 
     :param args: list of arguments for pwb.py

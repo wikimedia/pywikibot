@@ -312,7 +312,7 @@ def require_version(version_needed: str, reason: str = ''):
     for other than the current site e.g. for the related data or image
     repositoy of the current site is ot possible.
 
-    .. versionadded:: 8.0.0
+    .. versionadded:: 8.0
 
     :param version_needed: The version needed
     :param reason: A reason for skipping the test.

@@ -526,9 +526,9 @@ class GeneratorsMixin:
         - :meth:`pywikibot.Category.members`
         - :meth:`pywikibot.Category.subcategories`
 
-        .. versionchanged:: 4.0.0
+        .. versionchanged:: 4.0
            parameters except *category* are keyword arguments only.
-        .. versionchanged:: 8.0.0
+        .. versionchanged:: 8.0
            raises TypeError instead of Error if no Category is specified
         .. seealso:: :api:`Categorymembers`
 

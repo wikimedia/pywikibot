@@ -726,7 +726,7 @@ class BasePage(ComparableMixin):
     def editTime(self) -> pywikibot.Timestamp:
         """Return timestamp of last revision to page.
 
-        .. deprecated:: 8.0.0
+        .. deprecated:: 8.0
            Use :attr:`latest_revision.timestamp<latest_revision>`
            instead.
         """

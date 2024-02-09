@@ -6,7 +6,7 @@ This module includes objects:
 * FileInfo: a structure holding imageinfo of latest revision of FilePage
 """
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -263,7 +263,7 @@ class FilePage(Page):
     def usingPages(self, **kwargs):  # noqa: N802
         """Yield Pages on which the file is displayed.
 
-        .. deprecated:: 7.4.0
+        .. deprecated:: 7.4
            Use :meth:`using_pages` instead.
         """
         return self.using_pages(**kwargs)

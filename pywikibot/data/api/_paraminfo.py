@@ -1,6 +1,6 @@
 """Object representing API parameter information."""
 #
-# (C) Pywikibot team, 2014-2023
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -442,7 +442,7 @@ class ParamInfo(Sized, Container):
     def paraminfo_keys(cls) -> frozenset[str]:
         """Return module types.
 
-        .. deprecated:: 8.4.0
+        .. deprecated:: 8.4
         """
         return frozenset(['modules'])
 
@@ -451,6 +451,6 @@ class ParamInfo(Sized, Container):
     def preloaded_modules(self) -> frozenset[str] | set[str]:
         """Return set of preloaded modules.
 
-        .. deprecated:: 8.4.0
+        .. deprecated:: 8.4
         """
         return self._preloaded_modules
