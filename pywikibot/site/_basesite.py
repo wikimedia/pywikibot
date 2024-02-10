@@ -1,12 +1,13 @@
 """Objects with site methods independent of the communication interface."""
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
 import functools
+import inspect
 import re
 import threading
 from warnings import warn
@@ -194,19 +195,27 @@ class BaseSite(ComparableMixin):
         """Return the username used for the site."""
         return self._username
 
-    def __getattr__(self, attr):
-        """Delegate undefined methods calls to the Family object."""
-        try:
-            method = getattr(self.family, attr)
-            if not callable(method):
-                raise AttributeError
-            f = functools.partial(method, self.code)
-            if hasattr(method, '__doc__'):
-                f.__doc__ = method.__doc__
-            return f
-        except AttributeError:
-            raise AttributeError(f'{type(self).__name__} instance has no '
-                                 f'attribute {attr!r}') from None
+    def __getattr__(self, name: str):
+        """Delegate undefined methods calls to the Family object.
+
+        .. versionchanged:: 9.0
+           Only delegate to public Family methods which have ``code`` as
+           first parameter.
+        """
+        if not name.startswith('_'):
+            obj = getattr(self.family, name, None)
+            if inspect.ismethod(obj):
+                params = inspect.signature(obj).parameters
+                if params:
+                    parameter = next(iter(params))
+                    if parameter == 'code':
+                        method = functools.partial(obj, self.code)
+                        if hasattr(obj, '__doc__'):
+                            method.__doc__ = obj.__doc__
+                        return method
+
+        raise AttributeError(f'{type(self).__name__} instance has no '
+                             f'attribute {name!r}') from None
 
     def __str__(self) -> str:
         """Return string representing this Site's name and code."""
