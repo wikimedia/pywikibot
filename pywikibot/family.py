@@ -399,7 +399,8 @@ class Family:
     def linktrail(self, code: str) -> str:
         """Return regex for trailing chars displayed as part of a link.
 
-        Returns a string, not a compiled regular expression object.
+        .. note:: Returns a string, not a compiled regular expression
+           object.
 
         .. deprecated:: 7.3
         """
@@ -463,7 +464,6 @@ class Family:
         raise KeyError(
             f'ERROR: title for disambig template in language {code} unknown')
 
-    # Methods
     def protocol(self, code: str) -> str:
         """The protocol to use to connect to the site.
 

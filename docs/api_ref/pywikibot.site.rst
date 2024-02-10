@@ -17,6 +17,72 @@
 
 .. automodule:: pywikibot.site._basesite
 
+   .. autoclass:: BaseSite
+
+      .. method:: linktrail()
+
+         Return regex for trailing chars displayed as part of a link.
+
+         .. note: Returns a string, not a compiled regular expression object.
+         .. seealso:: :meth:`family.Family.linktrail`
+         .. deprecated:: 7.3
+            Only supported as :class:`APISite<pywikibot.site._apisite.APISite>`
+            method. Use :meth:`APISite.linktrail
+            <pywikibot.site._apisite.APISite.linktrail>`
+
+         :rtype: str
+
+      .. method:: category_redirects(fallback: str = '_default')
+
+         Return list of category redirect templates.
+
+         .. seealso:: :meth:`family.Family.category_redirects`
+
+         :rtype: list[str]
+
+
+      .. method:: get_edit_restricted_templates()
+
+         Return tuple of edit restricted templates.
+
+         .. versionadded:: 3.0
+         .. seealso:: :meth:`family.Family.get_edit_restricted_templates`
+
+         :rtype: tuple[str, ...]
+
+
+      .. method:: get_archived_page_templates()
+
+         Return tuple of edit restricted templates.
+
+         .. versionadded:: 3.0
+         .. seealso:: :meth:`family.Family.get_archived_page_templates`
+
+         :rtype: tuple[str, ...]
+
+
+      .. method:: disambig(fallback: str = '_default')
+
+         Return list of disambiguation templates.
+
+         .. seealso:: :meth:`family.Family.disambig`
+
+
+      .. method:: protocol()
+
+         The protocol to use to connect to the site.
+
+         May be overridden to return 'http'. Other protocols are not
+         supported.
+
+         .. versionchanged:: 8.2
+            ``https`` is returned instead of ``http``.
+         .. seealso:: :meth:`family.Family.protocol`
+
+         :param code: language code
+         :return: protocol that this family uses
+
+
 .. py:module:: site._apisite
    :synopsis: Objects representing API interface to MediaWiki site
 
