@@ -240,7 +240,7 @@ def slh(value: int, lst: Sequence[str]) -> str:
     return lst[value - 1]
 
 
-@slh.register(str)
+@slh.register
 def _(value: str, lst: Sequence[str]) -> int:
     return lst.index(value) + 1
 
@@ -251,7 +251,7 @@ def dh_singVal(value: int, match: str) -> str:
     return dh_constVal(value, 0, match)
 
 
-@dh_singVal.register(str)
+@dh_singVal.register
 def _(value: str, match: str) -> int:
     return dh_constVal(value, 0, match)  # type: ignore[return-value]
 
@@ -268,7 +268,7 @@ def dh_constVal(value: int, ind: int, match: str) -> str:
     raise ValueError(f'unknown value {value}')
 
 
-@dh_constVal.register(str)
+@dh_constVal.register
 def _(value: str, ind: int, match: str) -> int:
     if value == match:
         return ind
