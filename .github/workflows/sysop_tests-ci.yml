@@ -84,7 +84,7 @@ jobs:
         PYWIKIBOT_TEST_OAUTH: ${{ secrets[format('{0}', steps.token.outputs.uppercase)] }}
       run: |
         python pwb.py version
-        pytest -v -a rights --cov=.;
+        pytest -s -a rights --cov=.;
 
     - name: Show coverage statistics
       run: |
