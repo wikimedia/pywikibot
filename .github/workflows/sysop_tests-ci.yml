@@ -25,8 +25,7 @@ jobs:
 
       matrix:
         python-version: ["pypy3.7", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12.0-alpha - 3.12.0"]
-        family: ['wikipedia']
-        code: ['test']
+        site: ['wikipedia:test']
         domain:  ['test.wikipedia.org']
 
     steps:
@@ -59,7 +58,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip --version
-        pip install coverage
+        if [ -f dev-requirements.txt ]; then pip install -r dev-requirements.txt; fi
         pip install "importlib_metadata ; python_version < '3.8'"
         pip install mwparserfromhell
         pip install mwoauth
@@ -69,7 +68,7 @@ jobs:
 
     - name: Generate user files
       run: |
-        python -Werror::UserWarning -m pwb generate_user_files -family:${{matrix.family}} -lang:${{matrix.code}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
+        python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
         echo "authenticate['${{ matrix.domain }}'] = ('${{ steps.split.outputs._0 }}', '${{ steps.split.outputs._1 }}', '${{ steps.split.outputs._2 }}', '${{ steps.split.outputs._3 }}')" >> user-config.py
         echo "max_retries = 3" >> user-config.py
         echo "noisysleep = float('inf')" >> user-config.py
