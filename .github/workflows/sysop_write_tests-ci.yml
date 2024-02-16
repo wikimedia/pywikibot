@@ -1,5 +1,5 @@
-name: Write test CI
-# Run Pywikibot write tests on test wiki
+name: Sysop write test CI
+# Run Pywikibot write tests on test wiki using sysop rights
 
 on:
   push:
@@ -11,11 +11,11 @@ concurrency:
 
 env:
   PYWIKIBOT_TEST_RUNNING: 1
-  PYWIKIBOT_USERNAME: Pywikibot-test
+  PYWIKIBOT_USERNAME: Pywikibot-oauth
 
 jobs:
   build:
-    runs-on: 'ubuntu-latest'
+    runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     continue-on-error: ${{ matrix.experimental || false }}
     timeout-minutes: 100
 
@@ -25,7 +25,9 @@ jobs:
 
       matrix:
         python-version: ["3.7"]
-        site: ['wikipedia:test']
+        family: ['wikipedia']
+        code: ['test']
+        domain:  ['test.wikipedia.org']
         experimental: [true]
 
     steps:
@@ -39,6 +41,21 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
+    - name: Get token name
+      env:
+        _oauth_token: OAUTH_TOKEN_${{ matrix.family }}_${{ matrix.code }}
+      uses: ASzc/change-string-case-action@v5
+      id: token
+      with:
+        string: ${{ env._oauth_token }}
+
+    - name: Split OAuth Token
+      uses: jungwinter/split@v2
+      id: split
+      with:
+        msg: ${{ secrets[format('{0}', steps.token.outputs.uppercase)] }}
+        separator: ":"
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -48,30 +65,24 @@ jobs:
 
     - name: Generate user files
       run: |
-        python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
-        echo "usernames['wikipedia']['en'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
-        echo "usernames['wikisource']['zh'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
+        python -Werror::UserWarning -m pwb generate_user_files -family:${{matrix.family}} -lang:${{matrix.code}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
+        echo "authenticate['${{ matrix.domain }}'] = ('${{ steps.split.outputs._0 }}', '${{ steps.split.outputs._1 }}', '${{ steps.split.outputs._2 }}', '${{ steps.split.outputs._3 }}')" >> user-config.py
         echo "usernames['wikipedia']['test'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
-        echo "usernames['wikidata']['test'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
-        echo "usernames['commons']['commons'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
-        echo "usernames['meta']['meta'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
         echo "max_retries = 3" >> user-config.py
         echo "noisysleep = float('inf')" >> user-config.py
         echo "maximum_GET_length = 5000" >> user-config.py
         echo "console_encoding = 'utf8'" >> user-config.py
-        echo "import os" >> user-config.py
-        echo "password_file = os.path.expanduser('passwordfile')" >> user-config.py
-        echo "('${{ env.PYWIKIBOT_USERNAME }}', '${{ secrets.PYWIKIBOT_USERPWD }}')" > passwordfile
 
-    - name: Write tests with pytest
+    - name: Sysop and write tests with pytest
       id: ci_test
       continue-on-error: true
       timeout-minutes: 90
       env:
+        PYWIKIBOT_TEST_OAUTH: ${{ secrets[format('{0}', steps.token.outputs.uppercase)] }}
         PYWIKIBOT_TEST_WRITE: ${{ matrix.site == 'wikipedia:test' && 1 || 0}}
       run: |
         python pwb.py version
-        pytest -a write --cov=.;
+        pytest -s -r A -a "rights or write" --cov=.;
 
     - name: Show coverage statistics
       run: |
