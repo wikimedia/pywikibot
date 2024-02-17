@@ -27,6 +27,9 @@ class Family(family.WikimediaFamily, family.DefaultWikibaseFamily):
         'beta': 'commons.wikimedia.beta.wmflabs.org'
     }
 
+    # Sites we want to edit but not count as real languages
+    test_codes = ['test', 'beta']
+
     interwiki_forward = 'wikipedia'
 
     # Templates that indicate a category redirect
