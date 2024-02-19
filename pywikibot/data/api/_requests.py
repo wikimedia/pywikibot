@@ -1,6 +1,6 @@
 """Objects representing API requests."""
 #
-# (C) Pywikibot team, 2007-2023
+# (C) Pywikibot team, 2007-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -945,18 +945,36 @@ but {scheme!r} is required. Please add the following code to your family file:
         self._params['token'] = tokens
         return True
 
+    def wait(self, delay: int | None = None) -> None:
+        """Determine how long to wait after a failed request.
+
+        Also reset last API error with wait cycles.
+
+        .. versionadded: 9.0
+
+        :param delay: Minimum time in seconds to wait. Overwrites
+            ``retry_wait`` variable if given. The delay doubles each
+            retry until ``retry_max`` seconds is reached.
+        """
+        self.last_error = dict.fromkeys(['code', 'info'])
+        super().wait(delay)
+
     def submit(self) -> dict:
         """Submit a query and parse the response.
 
         .. versionchanged:: 8.0.4
            in addition to *readapidenied* also try to login when API
            response is *notloggedin*.
+        .. versionchanged:: 9.0
+           Raise :exc:`pywikibot.exceptions.APIError` if the same error
+           comes twice in a row within the loop.
 
         :return: a dict containing data retrieved from api.php
         """
         self._add_defaults()
         use_get = self._use_get()
         retries = 0
+        self.last_error = dict.fromkeys(['code', 'info'])
         while True:
             paramstring = self._http_param_string()
 
@@ -1003,6 +1021,11 @@ but {scheme!r} is required. Please add the following code to your family file:
             code = error.setdefault('code', 'Unknown')
             info = error.setdefault('info', None)
 
+            if (code == self.last_error['code']
+                    and info == self.last_error['info']):
+                raise pywikibot.exceptions.APIError(**self.last_error)
+            self.last_error = error
+
             if not self._logged_in(code):
                 continue
 
@@ -1019,6 +1042,8 @@ but {scheme!r} is required. Please add the following code to your family file:
                     lag = float(lag['lag']) if lag else 0.0
 
                 self.site.throttle.lag(lag * retries)
+                # reset last error
+                self.last_error = dict.fromkeys(['code', 'info'])
                 continue
 
             if code == 'help' and self.action == 'help':
@@ -1060,6 +1085,7 @@ but {scheme!r} is required. Please add the following code to your family file:
                     pywikibot.error(f'Retrying failed {msg}')
                     continue
                 raise NoUsernameError(f'Failed {msg}')
+
             if code == 'cirrussearch-too-busy-error':  # T170647
                 self.wait()
                 continue
