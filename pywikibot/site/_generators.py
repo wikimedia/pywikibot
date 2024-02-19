@@ -13,7 +13,7 @@ from itertools import zip_longest
 from typing import TYPE_CHECKING, Any
 
 import pywikibot
-from pywikibot.backports import Generator, Iterable, batched
+from pywikibot.backports import Callable, Generator, Iterable, batched
 from pywikibot.data import api
 from pywikibot.exceptions import (
     APIError,
@@ -34,12 +34,32 @@ from pywikibot.tools.itertools import filter_unique
 
 
 if TYPE_CHECKING:
-    from pywikibot.site._namespace import SingleNamespaceType
+    from data.api import ParamInfo, Request
+    from pywikibot.site._apisite import _RequestWrapperT
+    from pywikibot.site._namespace import NamespacesDict, SingleNamespaceType
+    from pywikibot.site._tokenwallet import TokenWallet
+    from pywikibot.tools import MediaWikiVersion
 
 
 class GeneratorsMixin:
 
     """API generators mixin to MediaWiki site."""
+
+    if TYPE_CHECKING:
+        _generator: Callable[..., _RequestWrapperT]
+        _paraminfo: ParamInfo
+        _request: Callable[..., Request]
+        assert_valid_iter_params: Callable[..., None]
+        encoding: Callable[[], str]
+        get_property_names: Callable[..., list[str]]
+        has_right: Callable[[str], bool]
+        maxlimit: int
+        mw_version: MediaWikiVersion
+        namespaces: NamespacesDict
+        protection_types: Callable[[], set[str]]
+        sametitle: Callable[[str, str], bool]
+        tokens: TokenWallet
+        user: Callable[[], str | None]
 
     def load_pages_from_pageids(
         self,
@@ -1787,10 +1807,13 @@ class GeneratorsMixin:
     ) -> Iterable[pywikibot.Page]:
         """Iterate a number of random pages.
 
-        .. seealso: :api:`Random`
-
         Pages are listed in a fixed sequence, only the starting point is
         random.
+
+        .. seealso: :api:`Random`
+        .. versionchanged:: 9.0
+           Raises ``TypeError`` instead of ``AssertionError`` if
+           *redirects* is invalid.
 
         :param total: the maximum number of pages to iterate
         :param namespaces: only iterate pages in these namespaces.
@@ -1802,10 +1825,12 @@ class GeneratorsMixin:
         :raises KeyError: a namespace identifier was not resolved
         :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
-        :raises AssertError: unsupported redirects parameter
+        :raises TypeError: unsupported redirects parameter
         """
         mapping = {False: None, True: 'redirects', None: 'all'}
-        assert redirects in mapping
+        if redirects not in mapping:
+            raise TypeError(f"Invalid type for 'redirects' parameter: "
+                            f'{type(redirects).__name__}({redirects})')
         redirects_ = mapping[redirects]
         params = {}
         if redirects_ is not None:
@@ -1970,9 +1995,13 @@ class GeneratorsMixin:
     ) -> Iterable[pywikibot.Page]:
         """Iterate Page objects retrieved from Special:{special_page}.
 
-        .. seealso:: :api:`Querypage`
+        Generic function for all special pages supported by the site MW
+        API.
 
-        Generic function for all special pages supported by the site MW API.
+        .. seealso:: :api:`Querypage`
+        .. versionchanged:: 9.0
+           Raises ``ValueError`` instead of ``AssertionError`` if
+           *special_page* is invalid.
 
         :param special_page: Special page to query
         :param total: number of pages to return
