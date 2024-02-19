@@ -116,14 +116,27 @@ Environment variables
 
   .. note:: test names must be given without subsequent ``_tests``.
 
+**PYWIKIBOT_TEST_NO_RC**
+  This environment variable disables recent changes tests and can be used to
+  speed up tests. GitHub actions enables this setting for that purpose::
+
+    PYWIKIBOT_TEST_NO_RC=1
+
 **PYWIKIBOT_TEST_OAUTH**
   This environment variable holds the Oauth token. It is set by
   ``oauth_tests-ci.yml`` CI config file and is solely used by
   :mod:`tests.oauth_tests`. You can use it for your private tests. The
-  environment variabke must contain consumer key and secret and access
+  environment variable must contain consumer key and secret and access
   key and secret delimited by ``:`` as::
 
     PYWIKIBOT_TEST_OAUTH=consumer_key:consumer_secret:access_key:access:secret
+
+**PYWIKIBOT_TEST_QUIET**
+  This environment variable can be set for quit mode. It prevents output by
+  test package, i.e. 'max_retries reduced from x to y'. It is used be the
+  :func:`tests.utils.execute` test runner. To enable it for other tests use::
+
+        PYWIKIBOT_TEST_QUIET=1
 
 **PYWIKIBOT_TEST_RUNNING**
   This environment variable skips tests instead of raising
