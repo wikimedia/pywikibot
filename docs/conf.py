@@ -52,6 +52,7 @@ needs_sphinx = '7.2.6'
 # ones.
 extensions = [
     'notfound.extension',
+    'sphinx_copybutton',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosectionlabel',
     'sphinx.ext.autosummary',
