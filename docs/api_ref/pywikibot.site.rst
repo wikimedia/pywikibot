@@ -79,7 +79,6 @@
             ``https`` is returned instead of ``http``.
          .. seealso:: :meth:`family.Family.protocol`
 
-         :param code: language code
          :return: protocol that this family uses
 
 
