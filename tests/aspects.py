@@ -675,9 +675,9 @@ class NeedRightsMixin(TestCaseBase):
 
             for right in cls.rights.split(','):
                 if not site.has_right(right):
-                    raise unittest.SkipTest('User "{}" does not have required '
-                                            'user right "{}"'
-                                            .format(site.user(), right))
+                    raise unittest.SkipTest(
+                        f'User "{site.user()}" does not have required user '
+                        f'right "{right}" on site "{site}"')
 
 
 class MetaTestCaseClass(type):
