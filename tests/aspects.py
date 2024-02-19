@@ -945,7 +945,7 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
     def _uncached(cls):
         if not hasattr(cls, 'cached') or not cls.cached:
             orig_sites = pywikibot._sites
-            pywikibot._sites = {}
+            pywikibot._sites.clear()
         yield
         if not hasattr(cls, 'cached') or not cls.cached:
             pywikibot._sites = orig_sites
