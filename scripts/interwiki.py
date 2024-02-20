@@ -328,7 +328,7 @@ that you have to break it off, use "-continue" next time.
 
 """
 #
-# (C) Pywikibot team, 2003-2023
+# (C) Pywikibot team, 2003-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -357,6 +357,7 @@ from pywikibot.cosmetic_changes import moved_links
 from pywikibot.exceptions import (
     EditConflictError,
     Error,
+    InvalidPageError,
     InvalidTitleError,
     LockedPageError,
     NoCreateError,
@@ -1107,9 +1108,16 @@ class Subject(interwiki_graph.Subject):
 
     def check_page(self, page, counter) -> None:
         """Check whether any iw links should be added to the todo list."""
-        if not page.exists():
+        try:
+            ok = page.exists()
+        except InvalidPageError as e:  # T357953
+            msg = str(e)
+            ok = False
+        else:
+            msg = f'{page} does not exist.'
+        if not ok:
             self.conf.remove.append(str(page))
-            self.conf.note(f'{page} does not exist. Skipping.')
+            self.conf.note(f'{msg} Skipping.')
             if page == self.origin:
                 # The page we are working on is the page that does not
                 # exist. No use in doing any work on it in that case.
@@ -1311,7 +1319,12 @@ class Subject(interwiki_graph.Subject):
         # Each value will be a list of pages.
         new = defaultdict(list)
         for page in self.done:
-            if page.exists() and not page.isRedirectPage() \
+            try:
+                ok = page.exists()
+            except InvalidPageError:  # T357953
+                continue
+
+            if ok and not page.isRedirectPage() \
                and not page.isCategoryRedirect():
                 site = page.site
                 if site.family.interwiki_forward:
@@ -1985,10 +1998,15 @@ class InterwikiBot:
         # Get the content of the assembled list in one blow
         gen = site.preloadpages(pageGroup, templates=True, langlinks=True,
                                 pageprops=True, quiet=False)
-        for _ in gen:
-            # we don't want to do anything with them now. The
-            # page contents will be read via the Subject class.
-            pass
+        while True:
+            # we don't want to do anything with them now.
+            # The page contents will be read via the Subject class.
+            try:
+                next(gen)
+            except StopIteration:
+                break
+            except InvalidTitleError:  # T357953
+                pass
 
         # Tell all of the subjects that the promised work is done
         for subject in subjectGroup:
