@@ -4,6 +4,10 @@ Current release
 Improvements
 ^^^^^^^^^^^^
 
+* A copy button was added to the sphinx documentation.
+* Make :attr:`languages_by_size<family.WikimediaFamily.languages_by_size>` dynamic (:phab:`T78396`). The property is
+  only available for :class:`family.WikimediaFamily` families. The ``wikimedia_sites.py`` maintenance script was
+  removed.
 * Add :func:`config.base_dir<config.get_base_dir>` to scripts search path with :mod:`pwb` wrapper (:phab:`T324287`)
 * :meth:`pywikibot.WbTime.equal_instant` was added (:phab:`T325248`)
 * ``revisions`` parameter of :class:`xmlreader.XmlDump` was introduced to specify parsing method
@@ -11,12 +15,14 @@ Improvements
 * Pass global -nolog argument into bot script from wrapper (:phab:`T328900`)
 * Add :meth:`site.APISite.ratelimit()<pywikibot.site._apisite.APISite.ratelimit>` method
   and :class:`tools.collections.RateLimit` NamedTuple (:phab:`T304808`)
-* L10N Updates
+* L10N and i18n updates
 * Add :class:`pagegenerators.PagePilePageGenerator` (:phab:`T353086`)
 
 Bugfixes
 ^^^^^^^^
 
+* Only delegate :mod:`site` methods to public :class:`family.Family` methods which have *code* as first parameter.
+* Use ``str`` instead of ``repr`` for several messages with :class:`family.Family` objects (:phab:`T356782`)
 * Add ``hy`` to special languages in :class:`textlib.TimeStripper` (:phab:`T356175`)
 * Pass login token when using ``action=login`` (:phab:`T309898`)
 * Detect range blocks with :meth:`pywikibot.User.is_blocked` (:phab:`T301282`)
@@ -28,6 +34,8 @@ Bugfixes
 Breaking changes and code cleanups
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+* Raise ``TypeError`` instead of ``AttributeError`` in :meth:`Site.randompages()
+  <pywikibot.site._generators.GeneratorsMixin.randompages>` if *redirects* parameter is invalid.
 * A RuntimeError will be raised if a :class:`family.Family` subclass has an ``__init__`` initializer method.
   :meth:`family.Family.__post_init__` classmethod can be used instead.
 * :class:`InteractiveReplace<bot_choice.InteractiveReplace>` was moved from :mod:`bot` to :mod:`bot_choice` module

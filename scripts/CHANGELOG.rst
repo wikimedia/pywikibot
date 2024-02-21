@@ -15,6 +15,11 @@ category_redirect
 
 * provide category_redirect categories for all WM sites (:phab:`T348914`)
 
+interwiki
+^^^^^^^^^
+
+* Ignore :exc:`exceptions.InvalidTitleError` and :exc:`InvalidPageError` (:phab:`T357953`)
+
 touch
 ^^^^^
 
