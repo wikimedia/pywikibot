@@ -62,7 +62,7 @@ class Subject:
         :param origin: the page on the 'origin' wiki
         """
         # Remember the "origin page"
-        self._origin = origin
+        self.origin = origin
 
         # found_in is a dictionary where pages are keys and lists of
         # pages are values. It stores where we found each page.
@@ -71,15 +71,6 @@ class Subject:
         self.found_in: dict[pywikibot.Page, list[pywikibot.Page]] = {}
         if origin:
             self.found_in = {origin: []}
-
-    @property
-    def origin(self) -> pywikibot.page.Page | None:
-        """Page on the origin wiki."""
-        return self._origin
-
-    @origin.setter
-    def origin(self, value: pywikibot.page.Page | None) -> None:
-        self._origin = value
 
 
 class GraphDrawer:
