@@ -475,10 +475,10 @@ class TestDryPageGenerator(TestCase):
 
     def test_namespace(self):
         """Test PageGenerator set_namespace."""
-        with self.assertRaises(AssertionError):
-            self.gen.set_namespace(0)
-            self.gen.set_namespace(1)
-            self.gen.set_namespace(None)
+        for namespace in (0, 1, None):
+            with self.subTest(namespace=namespace), \
+                 self.assertRaises(AssertionError):
+                self.gen.set_namespace(namespace)
 
 
 class TestPropertyGenerator(TestCase):
@@ -637,10 +637,10 @@ class TestDryQueryGeneratorNamespaceParam(TestCase):
         self.gen = api.PageGenerator(site=self.site,
                                      generator='links',
                                      parameters={'titles': 'test'})
-        with self.assertRaises(AssertionError):
-            self.gen.set_namespace(0)
-            self.gen.set_namespace(1)
-            self.gen.set_namespace(None)
+        for namespace in (0, 1, None):
+            with self.subTest(namespace=namespace), \
+                 self.assertRaises(AssertionError):
+                self.gen.set_namespace(namespace)
 
     @suppress_warnings(
         r'^set_namespace\(\) will be modified to raise TypeError*',
