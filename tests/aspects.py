@@ -290,7 +290,7 @@ def require_modules(*required_modules):
         for required_module in required_modules:
             try:
                 __import__(required_module, globals(), locals(), [], 0)
-            except ImportError:
+            except ModuleNotFoundError:
                 missing += [required_module]
         if not missing:
             return obj
