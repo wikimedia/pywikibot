@@ -451,11 +451,6 @@ class MediaInfo(WikibaseEntity):
     def get(self, force: bool = False) -> dict:
         """Fetch all MediaInfo entity data and cache it.
 
-        .. note:: This method may raise exception even if the associated file
-           exists because the mediainfo may not have been initialized yet.
-           :attr:`labels` and :attr:`statements` can still be accessed and
-           modified. :meth:`exists` suppresses the exception.
-
         .. note:: dicts returned by this method are references to content
            of this entity and their modifying may indirectly cause
            unwanted change to the live content
@@ -464,23 +459,51 @@ class MediaInfo(WikibaseEntity):
         :raise NoWikibaseEntityError: if this entity doesn't exist
         :return: actual data which entity holds
         """
-        if self.id == '-1':
-            if not force:
-                try:
-                    data = self.file.latest_revision.slots['mediainfo']['*']
-                except NoPageError as exc:
+        if force or not hasattr(self, '_content'):
+            if force:
+                self.file.clear_cache()
+
+            # accessing latest_revision loads the file data
+            try:
+                latest_revision = self.file.latest_revision
+            except NoPageError as exc:
+                raise NoWikibaseEntityError(self) from exc
+            except Error as exc:
+                error_message = str(exc)
+                if 'is not a file' in error_message:
                     raise NoWikibaseEntityError(self) from exc
-                except KeyError:
-                    # reuse the reserved ID for better message
-                    self.id = 'M' + str(self.file.pageid)
-                    raise NoWikibaseEntityError(self) from None
+                else:
+                    raise Error(self) from exc
 
-                self._content = jsonlib.loads(data)
-                self.id = self._content['id']
+            # Create _content. Format is same as with wbgetentities
+            # https://commons.wikimedia.org/w/api.php?action=wbgetentities&ids=M20985340
+            data = {
+                'title': self.file.title,
+                'lastrevid': latest_revision['revid'],
+                'modified': str(latest_revision['timestamp']),
+                'type': 'mediainfo',
+                'pageid': self.file.pageid,
+                'ns': self.file.namespace,
+                'id': 'M' + str(self.file.pageid),
+                'labels': {},
+                'statements': {}
+            }
 
-            self._assert_has_id()
+            # Update 'id', 'labels' and 'statements' if mediainfo is available.
+            # MediaInfo is returned only when it has values.
+            if 'mediainfo' in latest_revision.slots:
+                mediainfo_json = latest_revision.slots['mediainfo']['*']
+                mediainfo_data = jsonlib.loads(mediainfo_json)
+                data.update(mediainfo_data)
 
-        return super().get(force=force)
+            self._content = data
+            self.id = self._content['id']
+
+        self._assert_has_id()
+
+        # Do not pass the force parameter to the upper level because
+        # reloading files without MediaInfo will fail.
+        return super().get()
 
     def getID(self, numeric: bool = False):
         """
@@ -526,10 +549,6 @@ class MediaInfo(WikibaseEntity):
                 'The provided Claim instance is already used in an entity')
 
         self._assert_has_id()
-        if not hasattr(self, '_revid'):
-            # workaround for uninitialized mediainfo's
-            self._revid = self.file.latest_revision_id
-
         self.repo.addClaim(self, claim, bot=bot, **kwargs)
         claim.on_item = self
 
