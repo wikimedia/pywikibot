@@ -1316,8 +1316,6 @@ class IndexPage(pywikibot.Page):
 
         Range is [start ... end], extremes included.
 
-        .. versionchanged:: 8.6
-           page names are sorted before loading pages.
         .. versionchanged:: 9.0
            The *content* parameter was removed
 
@@ -1339,13 +1337,7 @@ class IndexPage(pywikibot.Page):
             filter_ql = list(self.site.proofread_levels)
             filter_ql.remove(ProofreadPage.WITHOUT_TEXT)
 
-        gen = [self.get_page(i) for i in range(start, end + 1)]
-
-        # Decorate and sort by page number because preloadpages does not
-        # guarantee order.
-        # TODO: remove if preloadpages will guarantee order.
-        gen = [(self.get_number(p), p) for p in gen]
-        gen = [p for n, p in sorted(gen)]
+        gen = (self.get_page(i) for i in range(start, end + 1))
 
         gen = self.site.preloadpages(gen)
         # Filter by QL.
