@@ -60,9 +60,7 @@ def itergroup(iterable,
         not divisible by `size`.
     :raises ValueError: iterable is not divisible by size
     """
-    for group in batched(iterable, size):
-        if strict and len(group) < size:
-            raise ValueError('iterable is not divisible by size.')
+    for group in batched(iterable, size, strict=strict):
         yield list(group)
 
 

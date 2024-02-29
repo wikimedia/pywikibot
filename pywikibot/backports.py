@@ -5,7 +5,7 @@
    instead. The *SimpleQueue* queue; use ``queue.SimpleQueue`` instead.
 """
 #
-# (C) Pywikibot team, 2014-2023
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -135,11 +135,13 @@ else:
 
 
 # gh-98363
-if PYTHON_VERSION < (3, 12) or SPHINX_RUNNING:
-    def batched(iterable, n: int) -> Generator[tuple, None, None]:
+if PYTHON_VERSION < (3, 13) or SPHINX_RUNNING:
+    def batched(iterable, n: int, *,
+                strict: bool = False) -> Generator[tuple, None, None]:
         """Batch data from the *iterable* into tuples of length *n*.
 
-        .. note:: The last batch may be shorter than *n*.
+        .. note:: The last batch may be shorter than *n* if *strict* is
+           True or raise a ValueError otherwise.
 
         Example:
 
@@ -159,17 +161,32 @@ if PYTHON_VERSION < (3, 12) or SPHINX_RUNNING:
            <library/itertools.html#itertools.batched>`,
            backported from Python 3.12.
         .. versionadded:: 8.2
+        .. versionchanged:: 9.0
+           Added *strict* option, backported from Python 3.13
 
         :param n: How many items of the iterable to get in one chunk
+        :param strict: raise a ValueError if the final batch is shorter
+            than *n*.
+        :raise ValueError: the final batch is shorter than *n*.
         """
-        group = []
-        for item in iterable:
-            group.append(item)
-            if len(group) == n:
+        msg = f'The final batch is shorter than n={n}'
+        if PYTHON_VERSION < (3, 12):
+            group = []
+            for item in iterable:
+                group.append(item)
+                if len(group) == n:
+                    yield tuple(group)
+                    group.clear()
+            if group:
+                if strict:
+                    raise ValueError(msg)
                 yield tuple(group)
-                group.clear()
-        if group:
-            yield tuple(group)
+        else:  # PYTHON_VERSION == (3, 12)
+            from itertools import batched as _batched
+            for group in _batched(iterable, n):
+                if strict and len(group) < n:
+                    raise ValueError(msg)
+                yield group
 else:
     from itertools import batched  # type: ignore[no-redef]
 
