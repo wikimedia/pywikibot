@@ -156,6 +156,14 @@ if PYTHON_VERSION < (3, 13) or SPHINX_RUNNING:
         Traceback (most recent call last):
          ...
         StopIteration
+        >>> list(batched('ABCD', 2))
+        [('A', 'B'), ('C', 'D')]
+        >>> list(batched('ABCD', 3, strict=False))
+        [('A', 'B', 'C'), ('D',)]
+        >>> list(batched('ABCD', 3, strict=True))
+        Traceback (most recent call last):
+         ...
+        ValueError: batched(): incomplete batch
 
         .. seealso:: :python:`itertools.batched
            <library/itertools.html#itertools.batched>`,
@@ -167,9 +175,9 @@ if PYTHON_VERSION < (3, 13) or SPHINX_RUNNING:
         :param n: How many items of the iterable to get in one chunk
         :param strict: raise a ValueError if the final batch is shorter
             than *n*.
-        :raise ValueError: the final batch is shorter than *n*.
+        :raise ValueError: batched(): incomplete batch
         """
-        msg = f'The final batch is shorter than n={n}'
+        msg = 'batched(): incomplete batch'
         if PYTHON_VERSION < (3, 12):
             group = []
             for item in iterable:
