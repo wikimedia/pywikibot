@@ -13,11 +13,14 @@ category_graph
 category_redirect
 ^^^^^^^^^^^^^^^^^
 
+* A ``-category`` option was added (:phab:`T353282`)
+* Several improvements (:phab:`T276345`, :phab:`T351951`, :phab:`T352970`)
 * provide category_redirect categories for all WM sites (:phab:`T348914`)
 
 interwiki
 ^^^^^^^^^
 
+* Use ``site.code`` instead of ``site.lang``
 * Ignore :exc:`exceptions.InvalidTitleError` and :exc:`InvalidPageError` (:phab:`T357953`)
 
 touch

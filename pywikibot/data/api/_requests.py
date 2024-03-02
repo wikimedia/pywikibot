@@ -966,8 +966,8 @@ but {scheme!r} is required. Please add the following code to your family file:
            in addition to *readapidenied* also try to login when API
            response is *notloggedin*.
         .. versionchanged:: 9.0
-           Raise :exc:`pywikibot.exceptions.APIError` if the same error
-           comes twice in a row within the loop.
+           Raise :exc:`exceptions.APIError` if the same error comes
+           twice in a row within the loop.
 
         :return: a dict containing data retrieved from api.php
         """

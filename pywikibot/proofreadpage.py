@@ -1318,7 +1318,8 @@ class IndexPage(pywikibot.Page):
 
         .. versionchanged:: 8.6
            page names are sorted before loading pages.
-
+        .. versionchanged:: 9.0
+           The *content* parameter was removed
 
         :param start: first page, defaults to 1
         :param end: num_pages if end is None

@@ -4,6 +4,8 @@ Current release
 Improvements
 ^^^^^^^^^^^^
 
+* Remove content parameter of :meth:`proofreadpage.IndexPage.page_gen` method. (:phab:`T358635`)
+* Backport ``itertools.batched`` from Python 3.13 to :func:`backports.batched`
 * A copy button was added to the sphinx documentation.
 * Make :attr:`languages_by_size<family.WikimediaFamily.languages_by_size>` dynamic (:phab:`T78396`). The property is
   only available for :class:`family.WikimediaFamily` families. The ``wikimedia_sites.py`` maintenance script was
@@ -21,6 +23,9 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
+* Populate :class:`pywikibot.MediaInfo`._content with expected attributes when loaded (:phab:`T357608`)
+* Raise :exc:`exceptions.APIError` if the same error comes twice within :meth:`data.api.Request.submit` loop
+  (:phab:`T357870`)
 * Only delegate :mod:`site` methods to public :class:`family.Family` methods which have *code* as first parameter.
 * Use ``str`` instead of ``repr`` for several messages with :class:`family.Family` objects (:phab:`T356782`)
 * Add ``hy`` to special languages in :class:`textlib.TimeStripper` (:phab:`T356175`)
@@ -78,6 +83,8 @@ Breaking changes and code cleanups
 Deprecations
 ------------
 
+* 9.0.0: The *content* parameter of :meth:`proofreadpage.IndexPage.page_gen` is deprecated and will be ignored
+  (:phab:`T358635`)
 * 9.0.0: ``userinterfaces.transliteration.transliterator`` was renamed to :class:`Transliterator
   <userinterfaces.transliteration.Transliterator>`
 * 9.0.0: ``next`` parameter of :meth:`userinterfaces.transliteration.transliterator.transliterate` was renamed to

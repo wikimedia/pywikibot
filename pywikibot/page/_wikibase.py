@@ -455,6 +455,10 @@ class MediaInfo(WikibaseEntity):
            of this entity and their modifying may indirectly cause
            unwanted change to the live content
 
+        .. versionchanged:: 9.0
+           Added *pageid*, *ns*, *title*, *lastrevid*, *modified*, *id*
+           values to ``_content`` attribute when it is loaded.
+
         :param force: override caching
         :raise NoWikibaseEntityError: if this entity doesn't exist
         :return: actual data which entity holds
