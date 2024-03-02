@@ -47,7 +47,7 @@ from pywikibot.comms import http
 from pywikibot.data.api import ListGenerator, Request
 from pywikibot.exceptions import Error, InvalidTitleError, OtherPageSaveError
 from pywikibot.page import PageSourceType
-from pywikibot.tools import MediaWikiVersion, cached
+from pywikibot.tools import MediaWikiVersion, cached, remove_last_args
 
 
 try:
@@ -1305,12 +1305,13 @@ class IndexPage(pywikibot.Page):
         """
         return len(self._page_from_numbers)
 
-    def page_gen(self, start: int = 1,
-                 end: int | None = None,
-                 filter_ql: Sequence[int] | None = None,
-                 only_existing: bool = False,
-                 content: bool = True
-                 ) -> Iterable[pywikibot.page.Page]:
+    @remove_last_args(['content'])  # since 9.0.0
+    def page_gen(
+        self, start: int = 1,
+        end: int | None = None,
+        filter_ql: Sequence[int] | None = None,
+        only_existing: bool = False
+    ) -> Iterable[pywikibot.page.Page]:
         """Return a page generator which yields pages contained in Index page.
 
         Range is [start ... end], extremes included.
@@ -1324,7 +1325,6 @@ class IndexPage(pywikibot.Page):
         :param filter_ql: filters quality levels
                           if None: all but 'Without Text'.
         :param only_existing: yields only existing pages.
-        :param content: preload content.
         """
         if end is None:
             end = self.num_pages
@@ -1346,8 +1346,7 @@ class IndexPage(pywikibot.Page):
         gen = [(self.get_number(p), p) for p in gen]
         gen = [p for n, p in sorted(gen)]
 
-        if content:
-            gen = self.site.preloadpages(gen)
+        gen = self.site.preloadpages(gen)
         # Filter by QL.
         gen = (p for p in gen if p.ql in filter_ql)
         # Yield only existing.
