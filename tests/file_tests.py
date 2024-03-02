@@ -20,7 +20,6 @@ from pywikibot.exceptions import (
     NoPageError,
     NoWikibaseEntityError,
     PageRelatedError,
-    UserRightsError,
 )
 from tests import join_images_path
 from tests.aspects import TestCase
@@ -452,111 +451,143 @@ class TestFilePageDataItem(TestCase):
             item.statements, pywikibot.page._collections.ClaimCollection)
 
 
-@unittest.expectedFailure  # T355927
-class TestMediaInfoReadonlyEditing(TestCase):
+class TestMediaInfoEditing(TestCase):
 
     """Test writing structured data of FilePage."""
 
-    # Create valid API requests which will fail to missing permission.
+    login = True
+    write = True
 
     # commons.wikimedia.beta.wmflabs.org
     family = 'commons'
     code = 'beta'
 
     def test_edit_label(self):
-        """Test label editing without writing rights."""
-        page = pywikibot.FilePage(self.site, 'File:123_4.jpg')
-        item = page.data_item()
-        error_message = 'User "None" does not have required user right "edit"'
-
-        data = {}
-        lang = 'fi'
-        label = 'Edit label with editEntity and dict()'
-        data.update({'labels': {lang: label}})
-        with self.assertRaisesRegex(UserRightsError, error_message):
-            item.editEntity(data, summary=label)
-
-        data = item.get()
-        label = 'Edit label with editEntity and item.get()'
-        data.update({'labels': {lang: label}})
-        with self.assertRaisesRegex(UserRightsError, error_message):
-            item.editEntity(data, summary=label)
-
-        data = item.get(force=True)
-        label = 'Edit label with editEntity and item.get(force=True)'
-        data.update({'labels': {lang: label}})
-        with self.assertRaisesRegex(UserRightsError, error_message):
-            item.editEntity(data, summary=label)
-
-        lang = 'fi'
-        label = 'Edit label with editLabels and dict()'
-        data = {lang: label}
-        with self.assertRaisesRegex(UserRightsError, error_message):
-            item.editLabels(data, summary=label)
-
+        """Test label editing."""
         # Test label editing when file doesn't exists
         page = pywikibot.FilePage(self.site, 'File:123_4_DOESNT_EXISTS.jpg')
         item = page.data_item()
+        error_message = "Entity '-1' doesn't exist on commons:beta"
+        lang = 'fi'
 
         data = {}
-        lang = 'fi'
         label = 'Edit label of missing file with editEntity and dict()'
         data.update({'labels': {lang: label}})
-        with self.assertRaises(UserRightsError):
+        with self.assertRaisesRegex(NoWikibaseEntityError, error_message):
             item.editEntity(data, summary=label)
 
-        lang = 'fi'
         label = 'Edit label of missing file with editLabels and dict()'
         data = {lang: label}
-        with self.assertRaisesRegex(UserRightsError, error_message):
+        with self.assertRaisesRegex(NoWikibaseEntityError, error_message):
             item.editLabels(data, summary=label)
 
-    def test_edit_claims(self):
-        """Test claim editing without writing rights."""
-        error_message = 'User "None" does not have required user right "edit"'
-        wikidata_site = pywikibot.Site('wikidata', 'wikidata')
-
-        # Test adding claim existing file
+        # Test label editing when file exists
         page = pywikibot.FilePage(self.site, 'File:123_4.jpg')
         item = page.data_item()
+        lang = 'fi'
+
+        label = 'Edit label with editEntity and dict()'
+        data = {}
+        data.update({'labels': {lang: label}})
+        item.editEntity(data, summary=label)
+        item.get(force=True)
+        self.assertEqual(item.labels['fi'], label)
+
+        label = 'Edit label with editEntity and item'
+        item.labels['fi'] = label
+        item.editEntity(item.toJSON(), summary=label)
+        item.get(force=True)
+        self.assertEqual(item.labels['fi'], label)
+
+        label = 'Edit label with editLabels and dict()'
+        data = {lang: label}
+        item.editLabels(data, summary=label)
+        item.get(force=True)
+        self.assertEqual(item.labels['fi'], label)
+
+    def test_edit_claims(self):
+        """Test addClaim and removeClaim editing."""
+        wikidata_site = pywikibot.Site('beta', 'wikidata')
 
         # Create claim
-        finna_id = 'test123'
-        new_claim = pywikibot.Claim(wikidata_site, 'P9478')
-        new_claim.setTarget(finna_id)
 
-        # Do actual edit
-        with self.assertRaisesRegex(UserRightsError, error_message):
-            item.addClaim(new_claim)
-
-        # Test removing first claim using item.statements
-        for property_id in item.statements:
-            for statement in item.statements[property_id]:
-                with self.assertRaisesRegex(UserRightsError, error_message):
-                    summary = f'Removing {property_id}'
-                    item.removeClaims(statement, summary=summary)
-                break
-
-        # Test removing first claim using item.claims
-        for property_id in item.claims:
-            for claim in item.claims[property_id]:
-                with self.assertRaisesRegex(UserRightsError, error_message):
-                    summary = f'Removing {property_id}'
-                    item.removeClaims(claim, summary=summary)
-                break
+        property_id = 'P766'  # date of publication
+        new_claim = pywikibot.Claim(wikidata_site, 'P766')
+        new_claim_value = pywikibot.WbTime(2024, 1, 1)
+        new_claim.setTarget(new_claim_value)
 
         # Test adding claim to non-existing file
         page = pywikibot.FilePage(self.site, 'File:123_4_DOESNT_EXISTS.jpg')
         item = page.data_item()
 
-        # Create claim
-        finna_id = 'test123'
-        new_claim = pywikibot.Claim(wikidata_site, 'P9478')
-        new_claim.setTarget(finna_id)
-
-        # Do actual edit
+        # Insert claim to non-existing file
         with self.assertRaises(NoWikibaseEntityError):
             item.addClaim(new_claim)
+
+        # Insert claim using site object to non-existing file
+        with self.assertRaises(NoWikibaseEntityError):
+            self.site.addClaim(item, new_claim)
+
+        # Test adding claim existing file
+        page = pywikibot.FilePage(self.site, 'File:123_4.jpg')
+        item = page.data_item()
+
+        # Test adding claim using MediaInfo.addClaim()
+        item.addClaim(new_claim)
+
+        # Test that claim can be found
+        claim_found = False
+        item.get(force=True)
+        for statement in item.statements.get(property_id):
+            value = statement.getTarget()
+            if value == new_claim_value:
+                claim_found = True
+                summary = f'Removing {property_id} with {value}'
+                item.removeClaims(statement, summary=summary)
+
+        self.assertTrue(claim_found)
+
+        # Test that the claim was removed
+
+        claim_found = False
+        item.get(force=True)
+        for statement in item.statements.get(property_id, []):
+            value = statement.getTarget()
+            if value == new_claim_value:
+                claim_found = True
+
+        self.assertFalse(claim_found)
+
+        # Add claim using site object
+        self.site.addClaim(item, new_claim)
+
+        # Test that the claim can be found and remove it using site object
+
+        claim_found = False
+        item.get(force=True)
+        for statement in item.statements.get(property_id):
+            value = statement.getTarget()
+            remove_statements = []
+            if value == new_claim_value:
+                remove_statements.append(statement)
+                claim_found = True
+
+        self.assertTrue(claim_found)
+
+        # Note removeClaims() parameter needs to be array
+        summary = f'Removing {property_id} with {value} using site object'
+        self.site.removeClaims(remove_statements, summary=summary)
+
+        # Test that the claims were actually removed
+
+        claim_found = False
+        item.get(force=True)
+        for statement in item.statements.get(property_id, []):
+            value = statement.getTarget()
+            if value == new_claim_value:
+                claim_found = True
+
+        self.assertFalse(claim_found)
 
 
 if __name__ == '__main__':
