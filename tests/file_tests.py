@@ -430,11 +430,7 @@ class TestFilePageDataItem(TestCase):
         item = page.data_item()
         self.assertIsInstance(item, pywikibot.MediaInfo)
 
-        # Get fails as there is no mediainfo.
-        with self.assertRaises(NoWikibaseEntityError):
-            item.get()
-
-        self.assertFalse(item.exists())
+        self.assertTrue(item.exists())
         self.assertEqual(f'M{page.pageid}', item.id)
         self.assertIsInstance(
             item.labels, pywikibot.page._collections.LanguageDict)
