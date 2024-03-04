@@ -360,31 +360,6 @@ class Timestamp(datetime.datetime):
         """Return a string format recognized by the API."""
         return self.isoformat()
 
-    def __add__(self, other: datetime.timedelta) -> Timestamp:
-        """Perform addition, returning a Timestamp instead of datetime."""
-        newdt = super().__add__(other)
-        if isinstance(newdt, datetime.datetime):
-            return self._from_datetime(newdt)
-        return newdt
-
-    @overload  # type: ignore[override]
-    def __sub__(self, other: datetime.timedelta) -> Timestamp:
-        ...
-
-    @overload
-    def __sub__(self, other: datetime.datetime) -> datetime.timedelta:
-        ...
-
-    def __sub__(
-        self,
-        other: datetime.datetime | datetime.timedelta,
-    ) -> datetime.timedelta | Timestamp:
-        """Perform subtraction, returning a Timestamp instead of datetime."""
-        newdt = super().__sub__(other)  # type: ignore[operator]
-        if isinstance(newdt, datetime.datetime):
-            return self._from_datetime(newdt)
-        return newdt
-
     @classmethod
     def nowutc(cls, *, with_tz: bool = True) -> 'Timestamp':
         """Return the current UTC date and time.
@@ -464,8 +439,34 @@ class Timestamp(datetime.datetime):
         return cls.nowutc(with_tz=False)
 
     if PYTHON_VERSION < (3, 8) or SPHINX_RUNNING:
-        # methods which does not upcast the right class if tz is given
-        # but return a datetime.datetime object
+        # methods which does not upcast the right class but return a
+        # datetime.datetime object in Python 3.7
+
+        def __add__(self, other: datetime.timedelta) -> Timestamp:
+            """Perform addition, returning a Timestamp instead of datetime."""
+            newdt = super().__add__(other)
+            if isinstance(newdt, datetime.datetime):
+                return self._from_datetime(newdt)
+            return newdt
+
+        @overload  # type: ignore[override]
+        def __sub__(self, other: datetime.timedelta) -> Timestamp:
+            ...
+
+        @overload
+        def __sub__(self, other: datetime.datetime) -> datetime.timedelta:
+            ...
+
+        def __sub__(
+            self,
+            other: datetime.datetime | datetime.timedelta,
+        ) -> datetime.timedelta | Timestamp:
+            """Perform subtraction, returning Timestamp instead of datetime."""
+            newdt = super().__sub__(other)  # type: ignore[operator]
+            if isinstance(newdt, datetime.datetime):
+                return self._from_datetime(newdt)
+            return newdt
+
         @classmethod
         def fromtimestamp(cls, timestamp: int | float, tz=None) -> Timestamp:
             """Return the local date and time corresponding to the POSIX ts.
