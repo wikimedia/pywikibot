@@ -64,6 +64,7 @@ script_list = framework_scripts + list_scripts(scripts_path)
 
 script_input = {
     'create_isbn_edition': '\n',
+    'category_redirect': 'q\nn\n',
     'interwiki': 'Test page that should not exist\n',
     'misspelling': 'q\n',
     'pagefromfile': 'q\n',
