@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for deprecation tools."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,6 +11,7 @@ import unittest
 from contextlib import suppress
 
 from pywikibot.tools import (
+    PYTHON_VERSION,
     add_full_name,
     deprecate_arg,
     deprecated,
@@ -18,6 +19,7 @@ from pywikibot.tools import (
     remove_last_args,
 )
 from tests.aspects import DeprecationTestCase
+from tests.utils import expected_failure_if
 
 
 @add_full_name
@@ -297,6 +299,8 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertOneDeprecationParts(__name__ + '.deprecated_func_instead',
                                        'baz')
 
+    # deprecated_func_docstring_arg2 fails with Python 3.13
+    @expected_failure_if(PYTHON_VERSION >= (3, 13))
     def test_deprecated_function_docstring(self):
         """Test @deprecated docstring modification."""
         testcases = [
