@@ -157,9 +157,9 @@ class CategoryRedirectBot(
                 moved += 1
             else:
                 self.edit_requests.append({
-                    'title': article.title(asLink=True, textlink=True),
-                    'oldcat': old_cat.title(asLink=True, textlink=True),
-                    'newcat': new_cat.title(asLink=True, textlink=True)}
+                    'title': article.title(as_link=True, textlink=True),
+                    'oldcat': old_cat.title(as_link=True, textlink=True),
+                    'newcat': new_cat.title(as_link=True, textlink=True)}
                 )
 
             if article.namespace() != 10:
@@ -178,9 +178,9 @@ class CategoryRedirectBot(
                     moved += 1
                 else:
                     self.edit_requests.append({
-                        'title': doc.title(asLink=True, textlink=True),
-                        'oldcat': old_cat.title(asLink=True, textlink=True),
-                        'newcat': new_cat.title(asLink=True, textlink=True)}
+                        'title': doc.title(as_link=True, textlink=True),
+                        'oldcat': old_cat.title(as_link=True, textlink=True),
+                        'newcat': new_cat.title(as_link=True, textlink=True)}
                     )
 
         if found:
