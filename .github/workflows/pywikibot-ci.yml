@@ -132,7 +132,7 @@ jobs:
         if [ ${{matrix.site || 0}} != 'wikipedia:test' ]; then
           coverage run -m unittest discover -vv -p \"*_tests.py\";
         else
-          pytest -s -r A -a --cov=.;
+          pytest --cov=.;
         fi
 
     - name: Show coverage statistics
