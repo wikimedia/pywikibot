@@ -86,7 +86,7 @@ jobs:
         pip install wikitextparser
 
     - name: Install setuptools
-      if: ${{ matrix.python-version >= '3.12' }}
+      if: ${{ (matrix.python-version >= '3.12') || (matrix.os == 'macOS-latest') }}
       run: pip install setuptools
 
     - name: Generate family files
