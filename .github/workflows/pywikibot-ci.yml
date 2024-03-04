@@ -85,6 +85,10 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         pip install wikitextparser
 
+    - name: Install setuptools
+      if: ${{ matrix.python-version >= '3.12' }}
+      run: pip install setuptools
+
     - name: Generate family files
       run: |
           if  [ ${{matrix.family || 0}} == wpbeta ]; then
