@@ -564,7 +564,7 @@ class TestPropertyGenerator(TestCase):
         for count, pagedata in enumerate(gen, start=1):
             self.assertIsInstance(pagedata, dict)
             if 'missing' in pagedata:
-                self.assertNotIn('pageid', pagedata)
+                self.assertNotIn('pageid', pagedata)  # pragma: no cover
             else:
                 self.assertIn('pageid', pagedata)
         self.assertLength(links, count)
@@ -587,7 +587,7 @@ class TestPropertyGenerator(TestCase):
         for count, pagedata in enumerate(gen, start=1):
             self.assertIsInstance(pagedata, dict)
             if 'missing' in pagedata:
-                self.assertNotIn('pageid', pagedata)
+                self.assertNotIn('pageid', pagedata)  # pragma: no cover
             else:
                 self.assertIn('pageid', pagedata)
         self.assertLength(links, count)

@@ -302,7 +302,7 @@ class TestRequest(CachedRequest):
         if not super()._load_cache():
             return False
 
-        if 'lgpassword' in self._uniquedescriptionstr():
+        if 'lgpassword' in self._uniquedescriptionstr():  # pragma: no cover
             self._data = None
             return False
 

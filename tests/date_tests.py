@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the date module."""
 #
-# (C) Pywikibot team, 2012-2022
+# (C) Pywikibot team, 2012-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -30,7 +30,7 @@ class DateTestMeta(MetaTestCaseClass):
                     step = 10
                 try:
                     predicate, start, stop = date.formatLimits[formatname]
-                except KeyError:
+                except KeyError:  # pragma: no cover
                     return
 
                 for code, convert in date.formats[formatname].items():
