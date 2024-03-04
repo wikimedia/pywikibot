@@ -89,9 +89,10 @@ class Timestamp(datetime.datetime):
 
         ts is converted to a datetime naive object representing UTC time.
         String shall be compliant with:
-        - Mediwiki timestamp format: YYYYMMDDHHMMSS
-        - ISO8601 format: YYYY-MM-DD[T ]HH:MM:SS[Z|±HH[MM[SS[.ffffff]]]]
-        - POSIX format: seconds from Unix epoch S{1,13}[.ffffff]]
+
+        - Mediwiki timestamp format: ``YYYYMMDDHHMMSS``
+        - ISO8601 format: ``YYYY-MM-DD[T ]HH:MM:SS[Z|±HH[MM[SS[.ffffff]]]]``
+        - POSIX format: seconds from Unix epoch ``S{1,13}[.ffffff]]``
 
         .. versionadded:: 7.5
         .. versionchanged:: 8.0
@@ -142,7 +143,7 @@ class Timestamp(datetime.datetime):
         """Convert a string in ISO8601 format to a Timestamp object.
 
         ISO8601 format:
-        - YYYY-MM-DD[T ]HH:MM:SS[[.,]ffffff][Z|±HH[MM[SS[.ffffff]]]]
+        ``YYYY-MM-DD[T ]HH:MM:SS[[.,]ffffff][Z|±HH[MM[SS[.ffffff]]]]``
 
         .. versionadded:: 7.5
         """
@@ -184,7 +185,7 @@ class Timestamp(datetime.datetime):
     def _from_posix(cls, timestr: str) -> Timestamp:
         """Convert a string in POSIX format to a Timestamp object.
 
-        POSIX format: SECONDS[.ffffff]]
+        POSIX format: ``SECONDS[.ffffff]]``
 
         .. versionadded:: 7.5
         """
@@ -438,9 +439,10 @@ class Timestamp(datetime.datetime):
         .. note:: This method is deprecated since Python 3.12 but held
            here for backward compatibility because ``utcnow`` is widely
            used inside the framework to compare MediaWiki timestamps
-           which are UTC-based. Neither :meth:`fromisoformatformat`
-           implementations of Python < 3.11 nor :class:`Timestamp`specific
-           :meth:`fromISOformat` supports timezone.
+           which are UTC-based. Neither :python:`datetime.fromisoformat()
+           <library/datetime.html#datetime.datetime.fromisoformat>`
+           implementations of Python < 3.11 nor :class:`Timestamp`
+           specific :meth:`fromISOformat` supports timezone.
 
         .. warning::
            Because naive datetime objects are treated by many datetime
@@ -486,11 +488,11 @@ class Timestamp(datetime.datetime):
             """Return the current local date and time.
 
             This class method is for Python 3.7 to upcast the class if a
-            tz is given.
+            *tz* is given.
 
             .. versionadded:: 9.0
             .. seealso::
-               - :python:`datetime.fromtimestamp()
+               - :python:`datetime.now()
                  <library/datetime.html#datetime.datetime.now>`
             """
             ts = super().now(tz)

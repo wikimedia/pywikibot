@@ -4,6 +4,8 @@ Current release
 Improvements
 ^^^^^^^^^^^^
 
+* :meth:`Timestamp.nowutc()<pywikibot.time.Timestamp.nowutc>` and
+  :meth:`Timestamp.utcnow()<pywikibot.time.Timestamp.utcnow>` were added (:phab:`T337748`)
 * Remove content parameter of :meth:`proofreadpage.IndexPage.page_gen` method. (:phab:`T358635`)
 * Backport ``itertools.batched`` from Python 3.13 to :func:`backports.batched`
 * A copy button was added to the sphinx documentation.
@@ -23,6 +25,9 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
+* :meth:`Timestamp.now()<pywikibot.time.Timestamp.now>` and
+  :meth:`Timestamp.fromtimestamp()<pywikibot.time.Timestamp.fromtimestamp>` also returns a
+  :class:`Timestamp<pywikibot.time.Timestamp>` object with Python 3.7
 * Populate :class:`pywikibot.MediaInfo`._content with expected attributes when loaded (:phab:`T357608`)
 * Raise :exc:`exceptions.APIError` if the same error comes twice within :meth:`data.api.Request.submit` loop
   (:phab:`T357870`)
