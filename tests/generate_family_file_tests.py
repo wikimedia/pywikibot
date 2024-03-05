@@ -26,13 +26,25 @@ class FamilyTestGenerator(generate_family_file.FamilyFileGenerator):
     def getapis(self):
         """Only load up to additional ten different wikis randomly."""
         save = self.langs
-        self.langs = sample(save, min(len(save), 10))
-        for wiki in save:  # add closed wiki due to T334714
-            if wiki['prefix'] == 'ii' and 'ii' not in self.langs:
+
+        prefixes = {lang['prefix'] for lang in self.langs}
+        tests = set(sample(list(prefixes), min(len(prefixes), 10)))
+        # add closed wiki due to T334714
+        if 'ii' in prefixes and 'ii' not in tests:
+            tests.add('ii')
+
+        # collect wikis
+        self.langs = []
+        for wiki in save:
+            code = wiki['prefix']
+            if code in tests:
                 self.langs.append(wiki)
-                break
+                tests.remove(code)
+                if not tests:
+                    break
 
         super().getapis()
+        # super().getapis() might change self.langs
         self.prefixes = [item['prefix'] for item in self.langs]
         self.langs = save
 
