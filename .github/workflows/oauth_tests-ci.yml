@@ -24,10 +24,10 @@ jobs:
       max-parallel: 7
 
       matrix:
-        python-version: ["pypy3.7", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["pypy3.7", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13-dev"]
         family: ['wikipedia']
         code: ['test']
-        domain:  ['test.wikipedia.org']
+        domain: ['test.wikipedia.org']
         include:
           - python-version: 3.7
             family: wpbeta
@@ -37,14 +37,6 @@ jobs:
             family: wpbeta
             code: zh
             domain: zh.wikipedia.beta.wmflabs.org
-          - python-version: 3.7
-            family: wikipedia
-            code: test
-            domain: test.wikipedia.org
-          - python-version: "3.13-dev"
-            family: wikipedia
-            code: test
-            domain: test.wikipedia.org
 
     steps:
     - name: Checkout Repository
