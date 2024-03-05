@@ -492,8 +492,6 @@ extlinks = {
     # MediaWiki API
     'api': ('https://www.mediawiki.org/wiki/API:%s', 'API:%s'),
     # Python bug tracker
-    'bug': ('https://bugs.python.org/issue%s', 'Python issue %s'),
-    # Python bug tracker
     'issue': ('https://github.com/python/cpython/issues/%s',
               'Python issue %s'),
     # Phabricator tasks

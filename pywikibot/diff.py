@@ -1,6 +1,6 @@
 """Diff module."""
 #
-# (C) Pywikibot team, 2014-2023
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -89,7 +89,7 @@ class Hunk:
         """Generator of diff text for this hunk, without formatting.
 
         Check each line ends with line feed to prevent behaviour like
-        :bug:`2142`
+        :issue:`46395`
         """
         def check_line(line: str) -> str:
             r"""Make sure each line ends with '\n'."""
