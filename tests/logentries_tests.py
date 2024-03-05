@@ -13,7 +13,7 @@ from contextlib import suppress
 
 import pywikibot
 from pywikibot.exceptions import HiddenKeyError, NoMoveTargetError
-# from pywikibot.family import AutoFamily  (T358986)
+from pywikibot.family import AutoFamily
 from pywikibot.logentries import (
     LogEntryFactory,
     OtherLogEntry,
@@ -52,13 +52,12 @@ class TestLogentriesBase(TestCase):
             'code': 'en',
             'target': None,
         },
-        # Deactivated due to T358986
-        # 'old': {
-        #     'family': AutoFamily('infogalactic',
-        #                          'https://infogalactic.com/info/Main_Page'),
-        #     'code': 'en',
-        #     'target': None,
-        # }
+        'old': {
+            'family': AutoFamily('infogalactic',
+                                 'https://infogalactic.com/info/Main_Page'),
+            'code': 'en',
+            'target': None,
+        }
     }
 
     def _get_logentry(self, logtype):
@@ -256,7 +255,6 @@ class TestLogentryParams(TestLogentriesBase):
         # main page was moved back again, we test it.
         self.assertEqual(mainpage, target.moved_target())
 
-    @unittest.expectedFailure  # T358986
     def test_moved_target_fail_old(self):
         """Test moved_target method failing on older wiki."""
         site = self.get_site('old')
