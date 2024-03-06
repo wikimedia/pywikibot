@@ -45,6 +45,7 @@ Breaking changes and code cleanups
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * Cache directory was renamed from ``apicache-py3`` to ``apicache`` due to timestamp changes. (:phab:`T337748`)
+  **Warning:** Do not use Pywikibot 9+ together with Pywikibot 3.0.20181203 and below.
 * Raise ``TypeError`` instead of ``AttributeError`` in :meth:`Site.randompages()
   <pywikibot.site._generators.GeneratorsMixin.randompages>` if *redirects* parameter is invalid.
 * A RuntimeError will be raised if a :class:`family.Family` subclass has an ``__init__`` initializer method.
