@@ -337,6 +337,8 @@ class TestSiteGenerators(DefaultSiteTestCase):
     def test_all_links(self):
         """Test the site.alllinks() method."""
         mysite = self.get_site()
+        if mysite.sitename == 'wikipedia:de':
+            self.skipTest(f'skipping test on {mysite} due to T359427')
         fwd = list(mysite.alllinks(total=10))
         uniq = list(mysite.alllinks(total=10, unique=True))
 
