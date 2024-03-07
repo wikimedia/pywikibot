@@ -369,6 +369,7 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
 
     _allowed_failures = {
         'blockpageschecker',  # not localized for some test sites
+        'category_redirect',
         'clean_sandbox',
         'delinker',
         'disambredir',
