@@ -262,17 +262,16 @@ CachedRequest._get_cache_dir = classmethod(
     lambda cls, *args: cls._make_dir(join_cache_path()))
 
 
-# AppVeyor and GitHub action builds are set to retry twice or thrice, which
-# aims to reduce the number of 'red' builds caused by intermittent server
-# problems, while also avoiding the builds taking a long time due to retries.
 # The following allows builds to retry up to three times, but higher default
-# values are overridden here to restrict retries to only 1, so developer builds
+# values are overridden here to restrict retries to only 3, so developer builds
 # fail more frequently in code paths resulting from mishandled server problems.
+# This aims to reduce the number of 'red' builds caused by intermittent server
+# problems, while also avoiding the builds taking a long time due to retries.
 if config.max_retries > 3:
     if 'PYWIKIBOT_TEST_QUIET' not in os.environ:
         unittest_print(
-            f'tests: max_retries reduced from {config.max_retries} to 1')
-    config.max_retries = 1
+            f'tests: max_retries reduced from {config.max_retries} to 3')
+    config.max_retries = 3
 
 # Raise CaptchaError if a test requires solving a captcha
 config.solve_captcha = False
