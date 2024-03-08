@@ -28,8 +28,8 @@ from __future__ import annotations
 
 
 #
-# (C) Pywikibot team, 2021-2023
+# (C) Pywikibot team, 2021-2024
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '9.0.0'
+__version__ = '9.1.0'
