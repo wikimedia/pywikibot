@@ -1286,8 +1286,7 @@ class DefaultWikidataClientTestCase(DefaultWikibaseClientTestCase):
 
 class PwbTestCase(TestCase):
 
-    """
-    Test cases use pwb.py to invoke scripts.
+    """Test cases use :mod:`pwb` to invoke scripts.
 
     Test cases which use pwb typically also access a site, and use the network.
     Even during initialisation, scripts may call pywikibot.handle_args, which
@@ -1320,12 +1319,19 @@ class PwbTestCase(TestCase):
         if self.orig_pywikibot_dir:
             os.environ['PYWIKIBOT_DIR'] = self.orig_pywikibot_dir
 
-    def _execute(self, args, data_in=None, timeout=None):
+    def execute(self, args: list[str], **kwargs):
+        """Run :func:`tests.utils.execute_pwb` with default site.
+
+        .. versionchanged:: 9.1
+           pass all arguments to :func:`tests.utils.execute_pwb`; make
+           this method public.
+
+        :param args: :mod:`pwb` warapper script arguments
+        :param kwargs: keyword arguments of :func:`tests.utils.execute_pwb`
+        """
         site = self.get_site()
-
-        args += ['-family:' + site.family.name, '-lang:' + site.code]
-
-        return execute_pwb(args, data_in, timeout)
+        args.append(f'-site:{site.sitename}')
+        return execute_pwb(args, **kwargs)
 
 
 class RecentChangesTestCase(WikimediaDefaultSiteTestCase):

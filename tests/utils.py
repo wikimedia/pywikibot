@@ -466,11 +466,13 @@ class FakeLoginManager(pywikibot.login.ClientLoginManager):
         """Ignore password changes."""
 
 
-def execute(command: list[str], data_in=None, timeout=None):
+def execute(command: list[str], *, data_in=None, timeout=None):
     """Execute a command and capture outputs.
 
     .. versionchanged:: 8.2
        *error* parameter was removed.
+    .. versionchanged:: 9.1
+       parameters except *command* are keyword only.
 
     :param command: executable to run and arguments to use
     """
@@ -512,7 +514,7 @@ def execute(command: list[str], data_in=None, timeout=None):
             'stderr': stderr_data.decode(config.console_encoding)}
 
 
-def execute_pwb(args: list[str],
+def execute_pwb(args: list[str], *,
                 data_in: Sequence[str] | None = None,
                 timeout: int | float | None = None,
                 overrides: dict[str, str] | None = None) -> dict[str, Any]:
@@ -520,6 +522,8 @@ def execute_pwb(args: list[str],
 
     .. versionchanged:: 8.2
        the *error* parameter was removed.
+    .. versionchanged:: 9.1
+       parameters except *args* are keyword only.
 
     :param args: list of arguments for pwb.py
     :param overrides: mapping of pywikibot symbols to test replacements
