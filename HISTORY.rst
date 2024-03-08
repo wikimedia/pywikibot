@@ -1578,7 +1578,7 @@ Release History
 * Do not strip all whitespaces from Link.title (:phab:`T197642`)
 * Introduce a common BaseDataDict as parent for LanguageDict and AliasesDict
 * Replaced PageNotSaved by PageSaveRelatedError (:phab:`T267821`)
-* Add -site option as -family -lang shortcut
+* Add -site option as -family -code shortcut
 * Enable APISite.exturlusage() with default parameters (:phab:`T266989`)
 * Update tools._unidata._category_cf from Unicode version 13.0.0
 * Move TokenWallet to site/_tokenwallet.py file
@@ -1694,7 +1694,7 @@ Release History
 
 * Add support for ja.wikivoyage (:phab:`T261450`)
 * Only run cosmetic changes on wikitext pages (:phab:`T260489`)
-* Leave a script gracefully for wrong -lang and -family option (:phab:`T259756`)
+* Leave a script gracefully for wrong -code and -family option (:phab:`T259756`)
 * Change meaning of BasePage.text (:phab:`T260472`)
 * site/family methods code2encodings() and code2encoding() has been removed in favour of encoding()/encodings() methods
 * Site.getExpandedString() method was removed in favour of expand_text
@@ -2549,7 +2549,7 @@ Release History
    - added ISBN support
    - added redirect support
 * Optionally uses external library for improved isbn validation
-* Automatically generating user files when -user, -family and -lang are
+* Automatically generating user files when -user, -family and -code are
   provided to a script
 * Page.content_model added
 * Page.contributors() and Page.revision_count() added

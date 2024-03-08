@@ -29,7 +29,7 @@ will fix up search paths so the package does not need to be installed, etc.
 Currently, `<pwb options>` are :ref:`global options`. This can be used
 for tests to set the default site (see :phab:`T216825`)::
 
-    python pwb.py -lang:de bot_tests -v
+    python pwb.py -code:de bot_tests -v
 
 .. seealso:: :mod:`pwb` entry point
 .. versionchanged:: 7.0

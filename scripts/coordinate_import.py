@@ -16,7 +16,7 @@ is used so that extension has to be setup properly. You can look at the
 
 You can use any typical pagegenerator to provide with a list of pages:
 
-    python pwb.py coordinate_import -lang:it -family:wikipedia -namespace:0 \
+    python pwb.py coordinate_import -site:wikipedia:it -namespace:0 \
     -transcludes:Infobox_stazione_ferroviaria
 
 You can also run over a set of items on the repo without coordinates and
@@ -42,7 +42,7 @@ The following command line parameters are supported:
 &params;
 """
 #
-# (C) Pywikibot team, 2013-2024
+# (C) Pywikibot team, 2013-2026
 #
 # Distributed under the terms of MIT license.
 #

@@ -211,7 +211,7 @@ class BasePage(ComparableMixin):
     ) -> str:
         """Return the title of this Page, as a string.
 
-        :param underscore: Not used with as_link, If true, replace all
+        :param underscore: Not used with *as_link*, If true, replace all
             spaces with underscores.
         :param with_ns: If false, omit the namespace prefix. If this
             option is False and used together with *as_link* return a
@@ -229,9 +229,9 @@ class BasePage(ComparableMixin):
             a ':' before ``Category:`` and ``Image:`` links.
         :param as_filename: Not used with *as_link*, If true, replace
             any characters that are unsafe in filenames.
-        :param insite: Only used if *as_link* is true, A site object
+        :param insite: Only used if *as_link* is true, a site object
             where the title is to be shown. Default is the current
-            family/lang given by ``-family`` and ``-lang`` or ``-site``
+            family/code given by ``-family`` and ``-code`` or ``-site``
             option i.e. config.family and config.mylang.
         :param without_brackets: Cannot be used with *as_link*, If true,
             remove the last pair of brackets (usually removes

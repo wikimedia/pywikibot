@@ -205,9 +205,8 @@ GLOBAL OPTIONS
 
 -config:xyn       The user config filename. Default is user-config.py.
 
--lang:xx          Set the language of the wiki you want to work on,
+-code:xx          Set the site code of the wiki you want to work on,
                   overriding the configuration in user config file.
-                  xx should be the site code.
 
 -family:xyz       Set the family of the wiki you want to work on, e.g.
                   wikipedia, wiktionary, wikivoyage, ... This will
@@ -689,7 +688,7 @@ def handle_args(args: Iterable[str] | None = None,
     """Handle global command line arguments and return the rest as a list.
 
     Takes the command line arguments as strings, processes all
-    :ref:`global parameters<global options>` such as ``-lang`` or
+    :ref:`global parameters<global options>` such as ``-code`` or
     ``-log``, initialises the logging layer, which emits startup
     information into log at level 'verbose'. This function makes sure
     that global arguments are applied first, regardless of the order in
@@ -725,17 +724,20 @@ def handle_args(args: Iterable[str] | None = None,
           script.
 
     .. versionchanged:: 5.2
-       *-site* global option was added
+       ``-site`` global option was added
     .. versionchanged:: 7.1
-       *-cosmetic_changes* and *-cc* may be set directly instead of
+       ``-cosmetic_changes`` and ``-cc`` may be set directly instead of
        toggling the value. Refer :func:`tools.strtobool` for valid values.
     .. versionchanged:: 7.7
-       *-config* global option was added.
+       ``-config`` global option was added.
     .. versionchanged:: 8.0
        Short site value can be given if site code is equal to family
        like ``-site:meta``.
     .. versionchanged:: 8.1
        ``-nolog`` option also discards command.log.
+    .. versionchanged:: 11.0
+       ``-lang`` option was replaced by ``-code`` but kept for backward
+       compatibility.
 
     :param args: Command line arguments. If None,
         :meth:`pywikibot.argvu<userinterfaces._interface_base.ABUIC.argvu>`
@@ -779,7 +781,7 @@ def handle_args(args: Iterable[str] | None = None,
                 config.family = config.mylang = value
         elif option == '-family':
             config.family = value
-        elif option == '-lang':
+        elif option in ('-code', '-lang'):  # -lang might be deprecated later
             config.mylang = value
         elif option == '-user':
             username = value

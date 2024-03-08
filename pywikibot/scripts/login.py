@@ -13,7 +13,7 @@ The following parameters are supported:
 
 -logout      Log out of the current site. Combine with ``-all`` to log
              out of all sites, or with :ref:`global options` ``-family``,
-             ``-lang`` or ``-site`` to log out of a specific site.
+             ``-code`` or ``-site`` to log out of a specific site.
 
 -oauth       Generate OAuth authentication information.
 

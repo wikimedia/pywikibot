@@ -45,7 +45,7 @@ Run specific tests
 ------------------
 
 Individual test components can be run using unittest, pytest or pwb.
-With -lang and -family or -site options pwb can be used to specify a site.
+With -code and -family or -site options pwb can be used to specify a site.
 
 
 **unittest**
@@ -69,7 +69,7 @@ With -lang and -family or -site options pwb can be used to specify a site.
     python pwb.py tests/api_tests -v
     python pwb.py tests/site_tests -v
     python pwb.py tests/api_tests -v TestParamInfo.test_init
-    python pwb.py -lang:de -family:wikipedia tests/page_tests -v TestPageObject
+    python pwb.py -site:wikipedia:de tests/page_tests -v TestPageObject
 
 **env**
 

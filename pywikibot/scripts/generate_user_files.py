@@ -508,7 +508,7 @@ def main(*args: str) -> None:
     :param args: Command line arguments
     """
     # set the config family and mylang values to an invalid state so that
-    # the script can detect that the command line arguments -family & -lang
+    # the script can detect that the command line arguments -family & -code
     # or -site were used and handle_args has updated these config values,
     # and 'force' mode can be activated below.
     config.family, config.mylang = 'wikipedia', None
