@@ -5,6 +5,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import os
 from contextlib import suppress
 
@@ -72,6 +74,6 @@ class TestOauthLoginManger(DefaultSiteTestCase, OAuthSiteTestCase):
                          self.site.username())
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

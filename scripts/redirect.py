@@ -66,19 +66,20 @@ Furthermore the following options are provided:
 &params;
 """
 #
-# (C) Pywikibot team, 2004-2023
+# (C) Pywikibot team, 2004-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import datetime
 from contextlib import suppress
 from textwrap import fill
-from typing import Any, Generator, Optional, Union
+from typing import Any, Generator
 
 import pywikibot
 import pywikibot.data
 from pywikibot import i18n, pagegenerators, xmlreader
-from pywikibot.backports import Dict, List, Set, Tuple
 from pywikibot.bot import ExistingPageBot, OptionHandler, suggest_help
 from pywikibot.exceptions import (
     CircularRedirectError,
@@ -137,7 +138,7 @@ class RedirectGenerator(OptionHandler):
     def get_redirects_from_dump(
         self,
         alsoGetPageTitles: bool = False
-    ) -> Tuple[Dict[str, str], Set[str]]:
+    ) -> tuple[dict[str, str], set[str]]:
         """
         Extract redirects from dump.
 
@@ -213,7 +214,7 @@ class RedirectGenerator(OptionHandler):
                     return
                 yield p
 
-    def _next_redirect_group(self) -> Generator[List[pywikibot.Page], None,
+    def _next_redirect_group(self) -> Generator[list[pywikibot.Page], None,
                                                 None]:
         """Generator that yields batches of redirects as a list."""
         chunk = []
@@ -229,7 +230,7 @@ class RedirectGenerator(OptionHandler):
     def get_redirects_via_api(
         self,
         maxlen: int = 8
-    ) -> Generator[Tuple[str, Optional[int], str, Optional[str]], None, None]:
+    ) -> Generator[tuple[str, int | None, str, str | None], None, None]:
         r"""
         Return a generator that yields tuples of data about redirect Pages.
 
@@ -293,7 +294,7 @@ class RedirectGenerator(OptionHandler):
                     yield redirect, result, target, final
 
     def retrieve_broken_redirects(self) -> Generator[
-            Union[str, pywikibot.Page], None, None]:
+            str | pywikibot.Page, None, None]:
         """Retrieve broken redirects."""
         if self.opt.fullscan:
             count = 0
@@ -317,7 +318,7 @@ class RedirectGenerator(OptionHandler):
             yield from self.site.preloadpages(self.site.broken_redirects())
 
     def retrieve_double_redirects(self) -> Generator[
-            Union[str, pywikibot.Page], None, None]:
+            str | pywikibot.Page, None, None]:
         """Retrieve double redirects."""
         if self.opt.moves:
             yield from self.get_moved_pages_redirects()
@@ -348,7 +349,7 @@ class RedirectGenerator(OptionHandler):
         # this will run forever, until user interrupts it
         if self.opt.offset <= 0:
             self.opt.offset = 1
-        start = (datetime.datetime.utcnow()
+        start = (pywikibot.Timestamp.nowutc()
                  - datetime.timedelta(0, self.opt.offset * 3600))
         # self.opt.offset hours ago
         offset_time = start.strftime('%Y%m%d%H%M%S')
@@ -407,11 +408,12 @@ class RedirectRobot(ExistingPageBot):
         else:
             raise NotImplementedError(f'No valid action "{action}" found.')
 
-    def get_sd_template(self, site=None) -> Optional[str]:
+    def get_sd_template(
+        self, site: pywikibot.site.BaseSite | None = None
+    ) -> str | None:
         """Look for speedy deletion template and return it.
 
         :param site: site for which the template has to be given
-        :type site: pywikibot.BaseSite
         :return: A valid speedy deletion template.
         """
         title = None
@@ -698,8 +700,8 @@ def main(*args: str) -> None:
 
     :param args: command line arguments
     """
-    options: Dict[str, Any] = {}
-    gen_options: Dict[str, Any] = {}
+    options: dict[str, Any] = {}
+    gen_options: dict[str, Any] = {}
     # what the bot should do (either resolve double redirs, or process broken
     # redirs)
     action = None

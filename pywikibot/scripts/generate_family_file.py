@@ -34,15 +34,16 @@ base directory.
 #
 # (C) Pywikibot team, 2010-2023
 #
-# Distributed under the terms of the MIT license
+# Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import codecs
 import os
 import re
 import string
 import sys
 from contextlib import suppress
-from typing import Optional
 from urllib.parse import urlparse, urlunparse
 
 
@@ -59,10 +60,10 @@ class FamilyFileGenerator:
     """Family file creator object."""
 
     def __init__(self,
-                 url: Optional[str] = None,
-                 name: Optional[str] = None,
-                 dointerwiki: Optional[str] = None,
-                 verify: Optional[str] = None) -> None:
+                 url: str | None = None,
+                 name: str | None = None,
+                 dointerwiki: str | None = None,
+                 verify: str | None = None) -> None:
         """
         Parameters are optional. If not given the script asks for the values.
 

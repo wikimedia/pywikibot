@@ -5,10 +5,12 @@ Several parts of the test infrastructure are implemented as mixins,
 such as API result caching and excessive test durations.
 """
 #
-# (C) Pywikibot team, 2014-2023
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import inspect
 import itertools
 import os
@@ -25,7 +27,7 @@ from unittest.util import safe_repr
 
 import pywikibot
 from pywikibot import Site, config
-from pywikibot.backports import List, removeprefix, removesuffix
+from pywikibot.backports import removeprefix, removesuffix
 from pywikibot.comms import http
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.exceptions import (
@@ -89,8 +91,7 @@ class TestCaseBase(TestTimerMixin):
         self.assertIsInstance(
             seq, Sized, 'seq argument is not a Sized class containing __len__')
         if seq:
-            msg = self._formatMessage(msg, '{} is not empty'
-                                           .format(safe_repr(seq)))
+            msg = self._formatMessage(msg, f'{safe_repr(seq)} is not empty')
             self.fail(msg)
 
     def assertIsNotEmpty(self, seq, msg=None):
@@ -98,8 +99,7 @@ class TestCaseBase(TestTimerMixin):
         self.assertIsInstance(
             seq, Sized, 'seq argument is not a Sized class containing __len__')
         if not seq:
-            msg = self._formatMessage(msg, '{} is empty'
-                                           .format(safe_repr(seq)))
+            msg = self._formatMessage(msg, f'{safe_repr(seq)} is empty')
             self.fail(msg)
 
     def assertLength(self, seq, other, msg=None):
@@ -167,7 +167,7 @@ class TestCaseBase(TestTimerMixin):
 
         return gen_pages
 
-    def _get_gen_titles(self, gen, count: int, site=None) -> List[str]:
+    def _get_gen_titles(self, gen, count: int, site=None) -> list[str]:
         """Return a list of page titles of given iterable."""
         return [page.title() for page in self._get_gen_pages(gen, count, site)]
 
@@ -215,8 +215,8 @@ class TestCaseBase(TestTimerMixin):
 
         if skip and page_namespaces < namespaces:
             raise unittest.SkipTest(
-                'No pages in namespaces {} found.'
-                .format(list(namespaces - page_namespaces)))
+                f'No pages in namespaces {list(namespaces - page_namespaces)}'
+                ' found.')
 
         self.assertEqual(page_namespaces, namespaces)
 
@@ -290,12 +290,11 @@ def require_modules(*required_modules):
         for required_module in required_modules:
             try:
                 __import__(required_module, globals(), locals(), [], 0)
-            except ImportError:
+            except ModuleNotFoundError:
                 missing += [required_module]
         if not missing:
             return obj
-        skip_decorator = unittest.skip('{} not installed'.format(
-            ', '.join(missing)))
+        skip_decorator = unittest.skip(f"{', '.join(missing)} not installed")
         return skip_decorator(obj)
 
     return test_requirement
@@ -313,7 +312,7 @@ def require_version(version_needed: str, reason: str = ''):
     for other than the current site e.g. for the related data or image
     repositoy of the current site is ot possible.
 
-    .. versionadded:: 8.0.0
+    .. versionadded:: 8.0
 
     :param version_needed: The version needed
     :param reason: A reason for skipping the test.
@@ -406,8 +405,7 @@ class SiteNotPermitted(pywikibot.site.BaseSite):
     def __init__(self, code, fam=None, user=None):
         """Initializer."""
         raise SiteDefinitionError(
-            'Loading site {}:{} during dry test not permitted'
-            .format(fam, code))
+            f'Loading site {fam}:{code} during dry test not permitted')
 
 
 class DisconnectedSiteMixin(TestCaseBase):
@@ -466,8 +464,8 @@ class CheckHostnameMixin(TestCaseBase):
 
         for key, data in cls.sites.items():
             if 'hostname' not in data:
-                raise Exception('{}: hostname not defined for {}'
-                                .format(cls.__name__, key))
+                raise Exception(
+                    f'{cls.__name__}: hostname not defined for {key}')
             hostname = data['hostname']
 
             if hostname in cls._checked_hostnames:
@@ -502,8 +500,7 @@ class CheckHostnameMixin(TestCaseBase):
 
                 cls._checked_hostnames[hostname] = e
                 raise unittest.SkipTest(
-                    '{}: hostname {} failed: {}'
-                    .format(cls.__name__, hostname, e))
+                    f'{cls.__name__}: hostname {hostname} failed: {e}')
 
             cls._checked_hostnames[hostname] = True
 
@@ -549,9 +546,8 @@ class SiteWriteMixin(TestCaseBase):
 
         if os.environ.get(env_var, '0') != '1':
             raise unittest.SkipTest(
-                '{!r} write tests disabled. '
-                'Set {}=1 to enable.'
-                .format(cls.__name__, env_var))
+                f'{cls.__name__!r} write tests disabled. '
+                f'Set {env_var}=1 to enable.')
 
         if (not hasattr(site.family, 'test_codes')
                 or site.code not in site.family.test_codes):
@@ -572,8 +568,8 @@ class RequireLoginMixin(TestCaseBase):
     def require_site_user(cls, family, code):
         """Check the user config has a valid login to the site."""
         if not cls.has_site_user(family, code):
-            raise unittest.SkipTest('{}: No username for {}:{}'
-                                    .format(cls.__name__, family, code))
+            raise unittest.SkipTest(
+                f'{cls.__name__}: No username for {family}:{code}')
 
     @classmethod
     def setUpClass(cls):
@@ -602,8 +598,7 @@ class RequireLoginMixin(TestCaseBase):
 
             if not site.user():
                 raise unittest.SkipTest(
-                    '{}: Not able to login to {}'
-                    .format(cls.__name__, site))
+                    f'{cls.__name__}: Not able to login to {site}')
 
     def setUp(self):
         """
@@ -641,8 +636,8 @@ class RequireLoginMixin(TestCaseBase):
                 site.login()
 
             if skip_if_login_fails and not site.user():  # during setUp() only
-                self.skipTest('{}: Not able to re-login to {}'
-                              .format(type(self).__name__, site))
+                self.skipTest(
+                    f'{type(self).__name__}: Not able to re-login to {site}')
 
     def get_userpage(self, site=None):
         """Create a User object for the user's userpage."""
@@ -680,9 +675,9 @@ class NeedRightsMixin(TestCaseBase):
 
             for right in cls.rights.split(','):
                 if not site.has_right(right):
-                    raise unittest.SkipTest('User "{}" does not have required '
-                                            'user right "{}"'
-                                            .format(site.user(), right))
+                    raise unittest.SkipTest(
+                        f'User "{site.user()}" does not have required user '
+                        f'right "{right}" on site "{site}"')
 
 
 class MetaTestCaseClass(type):
@@ -796,9 +791,8 @@ class MetaTestCaseClass(type):
 
             # If there isn't a site, require declaration of net activity.
             if 'net' not in dct:
-                raise Exception(
-                    '{}: Test classes without a site configured must set "net"'
-                    .format(name))
+                raise Exception(f'{name}: Test classes without a site'
+                                ' configured must set "net"')
 
             # If the 'net' attribute is a false value,
             # remove it so it matches 'not net' in pytest.
@@ -925,9 +919,8 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
         for data in cls.sites.values():
             if (data.get('code') in ('test', 'mediawiki')
                     and prod_only and not dry):
-                raise unittest.SkipTest(
-                    'Site code {!r} and PYWIKIBOT_TEST_PROD_ONLY is set.'
-                    .format(data['code']))
+                raise unittest.SkipTest(f"Site code {data['code']!r} and"
+                                        ' PYWIKIBOT_TEST_PROD_ONLY is set.')
 
             if 'site' not in data and 'code' in data and 'family' in data:
                 with suppress_warnings(WARN_SITE_CODE, category=UserWarning):
@@ -938,7 +931,7 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
                 # obsolete without a mapping to a hostname.
                 with suppress(KeyError):
                     data['hostname'] = (
-                        data['site'].base_url(data['site'].path()))
+                        data['site'].base_url(data['site'].apipath()))
 
         cm.__exit__(None, None, None)
 
@@ -952,7 +945,7 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
     def _uncached(cls):
         if not hasattr(cls, 'cached') or not cls.cached:
             orig_sites = pywikibot._sites
-            pywikibot._sites = {}
+            pywikibot._sites.clear()
         yield
         if not hasattr(cls, 'cached') or not cls.cached:
             pywikibot._sites = orig_sites
@@ -964,13 +957,11 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
             if len(cls.sites) == 1:
                 name = next(iter(cls.sites.keys()))
             else:
-                raise Exception(
-                    '"{}.get_site(name=None)" called with multiple sites'
-                    .format(cls.__name__))
+                raise Exception(f'"{cls.__name__}.get_site(name=None)"'
+                                ' called with multiple sites')
 
         if name and name not in cls.sites:
-            raise Exception('"{}" not declared in {}'
-                            .format(name, cls.__name__))
+            raise Exception(f'"{name}" not declared in {cls.__name__}')
 
         if isinstance(cls.site, BaseSite):
             assert cls.sites[name]['site'] == cls.site
@@ -1212,9 +1203,8 @@ class WikibaseTestCase(TestCase):
 
                 site = data['site']
                 if not site.has_data_repository:
-                    raise unittest.SkipTest(
-                        '{}: {!r} does not have data repository'
-                        .format(cls.__name__, site))
+                    raise unittest.SkipTest(f'{cls.__name__}: {site!r} does'
+                                            ' not have data repository')
 
                 if (hasattr(cls, 'repo')
                         and cls.repo != site.data_repository()):
@@ -1256,9 +1246,8 @@ class WikibaseClientTestCase(WikibaseTestCase):
 
         for site in cls.sites.values():
             if not site['site'].has_data_repository:
-                raise unittest.SkipTest(
-                    '{}: {!r} does not have data repository'
-                    .format(cls.__name__, site['site']))
+                raise unittest.SkipTest(f"{cls.__name__}: {site['site']!r}"
+                                        ' does not have data repository')
 
 
 class DefaultWikibaseClientTestCase(WikibaseClientTestCase,
@@ -1291,9 +1280,8 @@ class DefaultWikidataClientTestCase(DefaultWikibaseClientTestCase):
         super().setUpClass()
 
         if str(cls.get_repo()) != 'wikidata:wikidata':
-            raise unittest.SkipTest(
-                '{}: {} is not connected to Wikidata.'
-                .format(cls.__name__, cls.get_site()))
+            raise unittest.SkipTest(f'{cls.__name__}: {cls.get_site()} is not'
+                                    'connected to Wikidata.')
 
 
 class PwbTestCase(TestCase):
@@ -1515,9 +1503,8 @@ class DeprecationTestCase(TestCase):
                 continue
 
             if item.filename != filename:
-                self.fail(
-                    'expected warning filename {}; warning item: {}'
-                    .format(filename, item))
+                self.fail(f'expected warning filename {filename}; warning '
+                          f'item: {item}')
 
     @classmethod
     def setUpClass(cls):

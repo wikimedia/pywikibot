@@ -11,17 +11,18 @@
 import runpy
 import sys
 
+
 VERSIONS_REQUIRED_MESSAGE = """
 Pywikibot is not available on:
 {version}
 
-This version of Pywikibot only supports Python 3.6.1+.
+This version of Pywikibot only supports Python 3.7+.
 """
 
 
 def python_is_supported():
     """Check that Python is supported."""
-    return sys.version_info[:3] >= (3, 6, 1)
+    return sys.version_info[:3] >= (3, 7)
 
 
 if not python_is_supported():  # pragma: no cover

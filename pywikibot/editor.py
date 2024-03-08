@@ -8,6 +8,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import os
 import shlex
 import subprocess
@@ -15,15 +17,14 @@ import tempfile
 from pathlib import Path
 from sys import platform
 from textwrap import fill
-from typing import Optional
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import List, Sequence
+from pywikibot.backports import Sequence
 
 
 try:
-    from pywikibot.userinterfaces import gui  # noqa
+    from pywikibot.userinterfaces import gui  # noqa: F401
     GUI_ERROR = None
 except ImportError as e:
     GUI_ERROR = e
@@ -57,7 +58,7 @@ class TextEditor:
             self.editor = config.editor
 
     def _command(self, file_name: str, text: str,
-                 jump_index: Optional[int] = None) -> List[str]:
+                 jump_index: int | None = None) -> list[str]:
         """Return command of editor selected in user config file."""
         if jump_index:
             # Some editors make it possible to mark occurrences of substrings,
@@ -98,8 +99,8 @@ class TextEditor:
         return ' '.join(f'{part!r}' if ' ' in part else part
                         for part in command)
 
-    def edit(self, text: str, jumpIndex: Optional[int] = None,
-             highlight: Optional[str] = None) -> Optional[str]:
+    def edit(self, text: str, jumpIndex: int | None = None,
+             highlight: str | None = None) -> str | None:
         """
         Call the editor and thus allows the user to change the text.
 
@@ -147,7 +148,7 @@ class TextEditor:
                                      highlight=highlight)
 
     @staticmethod
-    def _win32_extension_command(extension: str) -> Optional[str]:
+    def _win32_extension_command(extension: str) -> str | None:
         """Get the command from the Win32 registry for an extension."""
         fileexts_key = \
             r'Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts'

@@ -4,6 +4,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from pywikibot.page import BasePage
 from tests.aspects import TestCase
 

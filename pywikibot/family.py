@@ -1,9 +1,11 @@
 """Objects representing MediaWiki families."""
 #
-# (C) Pywikibot team, 2004-2023
+# (C) Pywikibot team, 2004-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import collections
 import inspect
 import logging
@@ -16,28 +18,20 @@ from importlib import import_module
 from itertools import chain
 from os.path import basename, dirname, splitext
 from textwrap import fill
-from typing import Optional
+from typing import TYPE_CHECKING
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import (
-    DefaultDict,
-    Dict,
-    FrozenSet,
-    List,
-    Mapping,
-    Sequence,
-    Set,
-    Tuple,
-    removesuffix,
-)
+from pywikibot.backports import DefaultDict, Mapping, Sequence, removesuffix
+from pywikibot.data import wikistats
 from pywikibot.exceptions import FamilyMaintenanceWarning, UnknownFamilyError
 from pywikibot.tools import classproperty, deprecated, remove_last_args
 
 
 logger = logging.getLogger('pywiki.wiki.family')
 
-CrossnamespaceType = DefaultDict[str, Dict[str, List[int]]]
+if TYPE_CHECKING:
+    CrossnamespaceType = DefaultDict[str, dict[str, list[int]]]
 
 # Legal characters for Family.name and Family.langs keys
 NAME_CHARACTERS = string.ascii_letters + string.digits
@@ -50,11 +44,22 @@ class Family:
 
     """Parent singleton class for all wiki families.
 
+    Families are immutable and initializer is unsupported. Any class
+    modification should go to :meth:`__post_init__` class method.
+
+    .. versionchanged:: 3.0
+       the family class is immutable. Having an ``__init__`` initializer
+       method a ``NotImplementedWarning`` will be given.
     .. versionchanged:: 8.0
        ``alphabetic``, ``alphabetic_revised`` and ``fyinterwiki``
        attributes where removed.
     .. versionchanged:: 8.2
        :attr:`obsolete` setter was removed.
+    .. versionchanged:: 8.3
+       Having an initializer method a ``FutureWarning`` will be given.
+    .. versionchanged:: 9.0
+       raises RuntimeError if an initializer method was found;
+       :meth:`__post_init__` classmethod should be used instead.
     """
 
     def __new__(cls):
@@ -70,17 +75,12 @@ class Family:
 
         # don't use hasattr() here. consider only the class itself
         if '__init__' in cls.__dict__:
-            # Initializer deprecated. Families should be immutable and any
-            # instance / class modification should go to allocator (__new__).
-            cls.__init__ = deprecated(instead='__post_init__() classmethod',
-                                      since='3.0.20180710')(cls.__init__)
+            raise RuntimeError(fill(
+                f'Family class {cls.__module__}.{cls.__name__} cannot be'
+                ' instantiated; use __post_init__() classmethod to modify'
+                ' your family class. Refer the documentation.', width=66))
 
-            # Invoke initializer immediately and make initializer no-op.
-            # This is to avoid repeated initializer invocation on repeated
-            # invocations of the metaclass's __call__.
-            cls.instance.__init__()
-            cls.__init__ = lambda self: None  # no-op
-        elif '__post_init__' not in cls.__dict__:
+        if '__post_init__' not in cls.__dict__:
             pass
         elif inspect.ismethod(cls.__post_init__):  # classmethod check
             cls.__post_init__()
@@ -94,108 +94,125 @@ class Family:
 
     @classproperty
     def instance(cls):
-        """Get the singleton instance."""
-        # This is a placeholder to invoke allocator before it's allocated.
-        # Allocator will override this classproperty.
+        """Get the singleton instance.
+
+        This is a placeholder to invoke allocator before it's allocated.
+        Allocator will override this classproperty.
+        """
         return cls()
 
-    name: Optional[str] = None
+    #: The family name
+    name: str | None = None
 
     #: Not open for edits; stewards can still edit.
-    closed_wikis: List[str] = []
+    closed_wikis: list[str] = []
 
-    #: Completely removed sites
-    removed_wikis: List[str] = []
+    #: Completely removed sites.
+    removed_wikis: list[str] = []
 
-    code_aliases: Dict[str, str] = {}
+    code_aliases: dict[str, str] = {}
     """Code mappings which are only an alias, and there is no 'old' wiki.
-
     For all except 'nl_nds', subdomains do exist as a redirect, but that
     should not be relied upon.
     """
 
-    langs: Dict[str, str] = {}
+    langs: dict[str, str] = {}
 
-    # A list of category redirect template names in different languages
-    category_redirect_templates: Dict[str, Sequence[str]] = {
+    #: A list of category redirect template names in different languages.
+    category_redirect_templates: dict[str, Sequence[str]] = {
         '_default': []
     }
 
-    # A list of disambiguation template names in different languages
-    disambiguationTemplates: Dict[str, Sequence[str]] = {
+    #: A list of disambiguation template names in different languages.
+    disambiguationTemplates: dict[str, Sequence[str]] = {
         '_default': []
     }
 
-    # A dict of tuples for different sites with names of templates
-    # that indicate an edit should be avoided
-    edit_restricted_templates: Dict[str, Tuple[str, ...]] = {}
+    edit_restricted_templates: dict[str, tuple[str, ...]] = {}
+    """A dict of tuples for different sites with names of templates that
+    indicate an edit should be avoided.
+    """
 
-    # A dict of tuples for different sites with names of archive
-    # templates that indicate an edit of non-archive bots
-    # should be avoided
-    archived_page_templates: Dict[str, Tuple[str, ...]] = {}
+    archived_page_templates: dict[str, tuple[str, ...]] = {}
+    """A dict of tuples for different sites with names of archive
+    templates that indicate an edit of non-archive bots should be
+    avoided.
+    """
 
-    # A set of projects that share cross-project sessions.
-    cross_projects: Set[str] = set()
+    #: A set of projects that share cross-project sessions.
+    cross_projects: set[str] = set()
 
-    # A list with the name for cross-project cookies.
-    # default for wikimedia centralAuth extensions.
+    #: A list with the name for cross-project cookies, default for
+    #: wikimedia centralAuth extensions.
     cross_projects_cookies = ['centralauth_Session',
                               'centralauth_Token',
                               'centralauth_User']
     cross_projects_cookie_username = 'centralauth_User'
 
-    # A list with the name in the cross-language flag permissions
-    cross_allowed: List[str] = []
+    #: A list with the name in the cross-language flag permissions.
+    cross_allowed: list[str] = []
 
-    # A dict with the name of the category containing disambiguation
-    # pages for the various languages. Only one category per language,
-    # and without the namespace, so add things like:
-    # 'en': "Disambiguation"
-    disambcatname: Dict[str, str] = {}
+    disambcatname: dict[str, str] = {}
+    """A dict with the name of the category containing disambiguation
+    pages for the various languages. Only one category per language, and
+    without the namespace, so add things like:
 
-    # attop is a list of languages that prefer to have the interwiki
-    # links at the top of the page.
-    interwiki_attop: List[str] = []
-    # on_one_line is a list of languages that want the interwiki links
-    # one-after-another on a single line
-    interwiki_on_one_line: List[str] = []
-    # String used as separator between interwiki links and the text
+        'en': "Disambiguation"
+    """
+
+    interwiki_attop: list[str] = []
+    """attop is a list of languages that prefer to have the interwiki
+    links at the top of the page.
+    """
+
+    interwiki_on_one_line: list[str] = []
+    """on_one_line is a list of languages that want the interwiki links
+    one-after-another on a single line
+    """
+
+    #: String used as separator between interwiki links and the text.
     interwiki_text_separator = '\n\n'
 
     # Similar for category
-    category_attop: List[str] = []
-    # on_one_line is a list of languages that want the category links
-    # one-after-another on a single line
-    category_on_one_line: List[str] = []
-    # String used as separator between category links and the text
+    category_attop: list[str] = []
+    """attop is a list of categories that prefer to have the category
+    links at the top of the page.
+    """
+
+    category_on_one_line: list[str] = []
+    """on_one_line is a list of languages that want the category links
+    one-after-another on a single line.
+    """
+
+    #: String used as separator between category links and the text
     category_text_separator = '\n\n'
-    # When both at the bottom should categories come after interwikilinks?
-    # TODO: T86284 Needed on Wikia sites, as it uses the CategorySelect
-    # extension which puts categories last on all sites. TO BE DEPRECATED!
-    categories_last: List[str] = []
 
-    # Which languages have a special order for putting interlanguage
-    # links, and what order is it? If a language is not in
-    # interwiki_putfirst, alphabetical order on language code is used.
-    # For languages that are in interwiki_putfirst, interwiki_putfirst
-    # is checked first, and languages are put in the order given there.
-    # All other languages are put after those, in code-alphabetical
-    # order.
-    interwiki_putfirst: Dict[str, str] = {}
+    categories_last: list[str] = []
+    """When both at the bottom should categories come after
+    interwikilinks?
 
-    # Some families, e. g. commons and meta, are not multilingual and
-    # forward interlanguage links to another family (wikipedia).
-    # These families can set this variable to the name of the target
-    # family.
-    interwiki_forward: Optional[str] = None
+    TODO: :phab:`T86284` Needed on Wikia sites, as it uses the
+    CategorySelect extension which puts categories last on all sites.
+    TO BE DEPRECATED!
+    """
 
-    # Language codes of the largest wikis. They should be roughly sorted
-    # by size.
-    languages_by_size: List[str] = []
+    interwiki_putfirst: dict[str, str] = {}
+    """Which languages have a special order for putting interlanguage
+    links, and what order is it? If a language is not in
+    interwiki_putfirst, alphabetical order on language code is used. For
+    languages that are in interwiki_putfirst, interwiki_putfirst is
+    checked first, and languages are put in the order given there. All
+    other languages are put after those, in code-alphabetical order.
+    """
 
-    # Some languages belong to a group where the possibility is high that
-    # equivalent articles have identical titles among the group.
+    interwiki_forward: str | None = None
+    """Some families, e. g. commons and meta, are not multilingual and
+    forward interlanguage links to another family (wikipedia). These
+    families can set this variable to the name of the target family.
+    """
+
+    #: Some languages belong to a group where the possibility is high
+    #: that equivalent articles have identical titles among the group.
     language_groups = {
         # languages using the Arabic script
         'arab': [
@@ -255,37 +272,48 @@ class Family:
         ],
     }
 
-    # LDAP domain if your wiki uses LDAP authentication,
-    # https://www.mediawiki.org/wiki/Extension:LDAPAuthentication2
     ldapDomain = ()
+    """LDAP domain if your wiki uses LDAP authentication.
 
-    # Allows crossnamespace interwiki linking.
-    # Lists the possible crossnamespaces combinations
-    # keys are originating NS
-    # values are dicts where:
-    #   keys are the originating langcode, or _default
-    #   values are dicts where:
-    #     keys are the languages that can be linked to from the lang+ns, or
-    #     '_default'; values are a list of namespace numbers
+    .. seealso:: https://www.mediawiki.org/wiki/Extension:LDAPAuthentication2
+    """
+
     crossnamespace: CrossnamespaceType = collections.defaultdict(dict)
-    ##
-    # Examples :
-    #
-    # Allowing linking to pt' 102 NS from any other lang' 0 NS is
-    #
-    #   crossnamespace[0] = {
-    #       '_default': { 'pt': [102]}
-    #   }
-    #
-    # While allowing linking from pt' 102 NS to any other lang' = NS is
-    #
-    #   crossnamespace[102] = {
-    #       'pt': { '_default': [0]}
-    #   }
+    """Allows crossnamespace interwiki linking.
 
-    # Some wiki farms have UrlShortener extension enabled only on the main
-    # site. This value can specify this last one with (lang, family) tuple.
-    shared_urlshortner_wiki: Optional[Tuple[str, str]] = None
+    Lists the possible crossnamespaces combinations; keys are
+    originating namespace; values are dicts where keys are the
+    originating langcode, or ``_default`` and  values are dicts where
+    keys are the languages that can be linked to from the lang+ns, or
+    ``_default``; values are a list of namespace numbers.
+
+    **Examples:**
+
+    Allowing linking *to* ``pt`` 102 namespace from any other lang 0
+    namepace is:
+
+    .. code-block:: Python
+
+       crossnamespace[0] = {
+           '_default': { 'pt': [102]}
+       }
+
+    While allowing linking *from* ``pt`` 102 namespace to any other
+    lang 0 namespace is
+
+    .. code-block:: Python
+
+       crossnamespace[102] = {
+           'pt': { '_default': [0]}
+       }
+
+    """
+
+    shared_urlshortner_wiki: tuple[str, str] | None = None
+    """Some wiki farms have UrlShortener extension enabled only on
+    the main site. This value can specify this last one with
+    ``(lang, family)`` tuple.
+    """
 
     title_delimiter_and_aliases = ' _'
     """Titles usually are delimited by a space and the alias is replaced
@@ -302,10 +330,10 @@ class Family:
     .. versionadded:: 7.0
     """
 
-    _families: Dict[str, 'Family'] = {}
+    _families: dict[str, Family] = {}
 
     @staticmethod
-    def load(fam: Optional[str] = None):
+    def load(fam: str | None = None):
         """Import the named family.
 
         :param fam: family name (if omitted, uses the configured default)
@@ -371,7 +399,8 @@ class Family:
     def linktrail(self, code: str) -> str:
         """Return regex for trailing chars displayed as part of a link.
 
-        Returns a string, not a compiled regular expression object.
+        .. note:: Returns a string, not a compiled regular expression
+           object.
 
         .. deprecated:: 7.3
         """
@@ -435,7 +464,6 @@ class Family:
         raise KeyError(
             f'ERROR: title for disambig template in language {code} unknown')
 
-    # Methods
     def protocol(self, code: str) -> str:
         """The protocol to use to connect to the site.
 
@@ -560,7 +588,7 @@ class Family:
 
         return config.site_interface
 
-    def from_url(self, url: str) -> Optional[str]:
+    def from_url(self, url: str) -> str | None:
         """Return whether this family matches the given url.
 
         It is first checking if a domain of this family is in the domain of
@@ -699,7 +727,7 @@ class Family:
         return putText
 
     @property
-    def obsolete(self) -> Dict[str, Optional[str]]:
+    def obsolete(self) -> types.MappingProxyType[str, str | None]:
         """
         Old codes that are not part of the family.
 
@@ -712,7 +740,7 @@ class Family:
         return types.MappingProxyType(data)
 
     @classproperty
-    def domains(cls) -> Set[str]:
+    def domains(cls) -> set[str]:
         """
         Get list of unique domain names included in this family.
 
@@ -721,12 +749,8 @@ class Family:
         return set(cls.langs.values())
 
     @classproperty
-    def codes(cls):
-        """
-        Get list of codes used by this family.
-
-        :rtype: set of str
-        """
+    def codes(cls) -> set[str]:
+        """Get list of codes used by this family."""
         return set(cls.langs.keys())
 
     @classproperty
@@ -744,7 +768,7 @@ class Family:
         return types.MappingProxyType(cls.code_aliases)
 
     @classproperty
-    def interwiki_removals(cls) -> FrozenSet[str]:
+    def interwiki_removals(cls) -> frozenset[str]:
         """Return a list of interwiki codes to be removed from wiki pages.
 
         Codes that should be removed, usually because the site has been
@@ -791,9 +815,9 @@ class SubdomainFamily(Family):
         return super().__new__(cls)
 
     @classproperty
-    def langs(cls):
+    def langs(cls) -> dict[str, str]:
         """Property listing family languages."""
-        codes = cls.codes[:]
+        codes = sorted(cls.codes)
 
         if hasattr(cls, 'test_codes'):
             codes += cls.test_codes
@@ -806,14 +830,6 @@ class SubdomainFamily(Family):
                           for alias, code in cls.code_aliases.items()})
 
         return cls.langs
-
-    @classproperty
-    def codes(cls):
-        """Property listing family codes."""
-        if cls.languages_by_size:
-            return cls.languages_by_size
-        raise NotImplementedError(
-            f'Family {cls.name} needs property "languages_by_size" or "codes"')
 
     @classproperty
     def domains(cls):
@@ -832,10 +848,10 @@ class FandomFamily(Family):
     @classproperty
     def langs(cls):
         """Property listing family languages."""
-        codes = cls.codes
+        codes = sorted(cls.codes)
 
         if hasattr(cls, 'code_aliases'):
-            codes += tuple(cls.code_aliases.keys())
+            codes += cls.code_aliases
 
         return {code: cls.domain for code in codes}
 
@@ -853,10 +869,14 @@ class WikimediaFamily(Family):
     """
 
     multi_language_content_families = [
-        'wikipedia', 'wiktionary',
-        'wikisource', 'wikibooks',
-        'wikinews', 'wikiquote',
-        'wikiversity', 'wikivoyage',
+        'wikibooks',
+        'wikinews',
+        'wikipedia',
+        'wikiquote',
+        'wikisource',
+        'wikiversity',
+        'wikivoyage',
+        'wiktionary',
     ]
 
     wikimedia_org_content_families = [
@@ -864,8 +884,11 @@ class WikimediaFamily(Family):
     ]
 
     wikimedia_org_meta_families = [
-        'meta', 'outreach', 'strategy',
-        'wikimediachapter', 'wikimania',
+        'meta',
+        'outreach',
+        'strategy',
+        'wikimediachapter',
+        'wikimania',
     ]
 
     wikimedia_org_other_families = [
@@ -996,6 +1019,43 @@ class WikimediaFamily(Family):
         """Return path for EventStreams."""
         return '/v2/stream'
 
+    @property
+    def languages_by_size(self) -> list[str]:
+        """Language codes of the largest wikis.
+
+        They should be roughly sorted by size.
+
+        .. versionchanged:: 9.0
+           Sorting order is retrieved via :mod:`wikistats` for each call.
+
+        :raises NotImplementedError: Family is not member of
+            :attr:`multi_language_content_families`
+        """
+        if self.name not in self.multi_language_content_families:
+            raise NotImplementedError(
+                f'languages_by_size is not implemented for {self.name} family')
+
+        exceptions = {
+            'wikiversity': ['beta']
+        }
+
+        ws = wikistats.WikiStats()
+        table = ws.languages_by_size(self.name)
+        assert type(self.obsolete).__name__ == 'mappingproxy', (
+            f'obsolete attribute is of type {type(self.obsolete).__name__} but'
+            ' mappingproxy was expected'
+        )
+
+        lbs = [
+            code for code in table
+            if not (code in self.obsolete
+                    or code in exceptions.get(self.name, []))
+        ]
+
+        # add codes missing by wikistats
+        missing = set(self.codes) - set(lbs)
+        return lbs + list(missing)
+
 
 class WikimediaOrgFamily(SingleSiteFamily, WikimediaFamily):
 
@@ -1018,7 +1078,7 @@ class WikibaseFamily(Family):
         """Return 'DataSite' for Wikibase family."""
         return 'DataSite'
 
-    def entity_sources(self, code: str) -> Dict[str, Tuple[str, str]]:
+    def entity_sources(self, code: str) -> dict[str, tuple[str, str]]:
         """Provide reopsitory site information for entity types.
 
         The result must be structured as follows:

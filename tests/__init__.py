@@ -1,9 +1,12 @@
 """Package tests."""
 #
-# (C) Pywikibot team, 2007-2023
+# (C) Pywikibot team, 2007-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
+
 __all__ = (
     'create_path_func', 'join_cache_path', 'join_data_path',
     'join_html_data_path', 'join_images_path', 'join_pages_path',
@@ -27,10 +30,9 @@ import requests  # noqa: F401
 
 import pywikibot.data.api
 from pywikibot import config
-from pywikibot.backports import Dict, List, removesuffix
+from pywikibot.backports import removesuffix
 from pywikibot.data.api import CachedRequest
 from pywikibot.data.api import Request as _original_Request
-from pywikibot.tools import PYTHON_VERSION
 
 
 _root_dir = os.path.split(os.path.split(__file__)[0])[0]
@@ -53,9 +55,7 @@ def create_path_func(base_func, subpath):
 
 join_root_path.path = 'root'
 join_tests_path = create_path_func(join_root_path, 'tests')
-join_cache_path = create_path_func(join_tests_path,
-                                   'apicache-py{}'
-                                   .format(PYTHON_VERSION[0]))
+join_cache_path = create_path_func(join_tests_path, 'apicache')
 join_data_path = create_path_func(join_tests_path, 'data')
 join_pages_path = create_path_func(join_tests_path, 'pages')
 
@@ -171,7 +171,7 @@ disabled_test_modules = {
 }
 
 # remove "# pragma: no cover" below if this set is not empty
-disabled_tests: Dict[str, List[str]] = {}
+disabled_tests: dict[str, list[str]] = {}
 
 
 def _unknown_test_modules():
@@ -196,7 +196,7 @@ if 'PYWIKIBOT_TEST_MODULES' in os.environ:
 
 def unittest_print(*args, **kwargs):
     """Print information in test log."""
-    print(*args, **kwargs)  # noqa: T001, T201
+    print(*args, **kwargs)  # noqa: T201
 
 
 def collector(loader=unittest.loader.defaultTestLoader):
@@ -262,17 +262,16 @@ CachedRequest._get_cache_dir = classmethod(
     lambda cls, *args: cls._make_dir(join_cache_path()))
 
 
-# AppVeyor and GitHub action builds are set to retry twice or thrice, which
-# aims to reduce the number of 'red' builds caused by intermittent server
-# problems, while also avoiding the builds taking a long time due to retries.
 # The following allows builds to retry up to three times, but higher default
-# values are overridden here to restrict retries to only 1, so developer builds
+# values are overridden here to restrict retries to only 3, so developer builds
 # fail more frequently in code paths resulting from mishandled server problems.
+# This aims to reduce the number of 'red' builds caused by intermittent server
+# problems, while also avoiding the builds taking a long time due to retries.
 if config.max_retries > 3:
     if 'PYWIKIBOT_TEST_QUIET' not in os.environ:
-        unittest_print('tests: max_retries reduced from {} to 1'
-                       .format(config.max_retries))
-    config.max_retries = 1
+        unittest_print(
+            f'tests: max_retries reduced from {config.max_retries} to 3')
+    config.max_retries = 3
 
 # Raise CaptchaError if a test requires solving a captcha
 config.solve_captcha = False
@@ -302,7 +301,7 @@ class TestRequest(CachedRequest):
         if not super()._load_cache():
             return False
 
-        if 'lgpassword' in self._uniquedescriptionstr():
+        if 'lgpassword' in self._uniquedescriptionstr():  # pragma: no cover
             self._data = None
             return False
 
@@ -331,6 +330,6 @@ def unpatch_request():
     pywikibot.data.api.CachedRequest._expired = original_expired
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

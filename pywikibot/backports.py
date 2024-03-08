@@ -1,13 +1,21 @@
-"""This module contains backports to support older Python versions."""
+"""This module contains backports to support older Python versions.
+
+.. deprecated:: 9.0
+   The *nullcontext* context manager; use ``contextlib.nullcontext``
+   instead. The *SimpleQueue* queue; use ``queue.SimpleQueue`` instead.
+"""
 #
-# (C) Pywikibot team, 2014-2023
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import sys
 from typing import Any
 
 
+# Placed here to omit circular import in tools
 PYTHON_VERSION = sys.version_info[:3]
 SPHINX_RUNNING = 'sphinx' in sys.modules
 
@@ -17,37 +25,6 @@ if PYTHON_VERSION >= (3, 9):
 else:
     from functools import lru_cache as _lru_cache
     cache = _lru_cache(None)
-
-
-# context
-if PYTHON_VERSION < (3, 7) or SPHINX_RUNNING:
-
-    class nullcontext:  # noqa: N801
-
-        """Context manager that does no additional processing.
-
-        .. seealso:: :python:`contextlib.nullcontext
-           <library/contextlib.html#contextlib.nullcontext>`,
-           backported from Python 3.7.
-        """
-
-        def __init__(self, enter_result: Any = None) -> None:  # noqa: D107
-            self.enter_result = enter_result
-
-        def __enter__(self) -> Any:
-            return self.enter_result
-
-        def __exit__(self, *excinfo: Any) -> None:
-            pass
-else:
-    from contextlib import nullcontext  # type: ignore[assignment]
-
-
-# queue
-if PYTHON_VERSION < (3, 7):
-    from queue import Queue as SimpleQueue
-else:
-    from queue import SimpleQueue  # type: ignore[assignment]
 
 
 # typing
@@ -71,18 +48,13 @@ if PYTHON_VERSION < (3, 9):
         Container,
         Counter,
         Dict,
-        FrozenSet,
         Generator,
         Iterable,
         Iterator,
-        List,
         Mapping,
         Match,
         Pattern,
         Sequence,
-        Set,
-        Tuple,
-        Type,
     )
 else:
     from collections import Counter
@@ -96,11 +68,6 @@ else:
     )
     from re import Match, Pattern
     Dict = dict  # type: ignore[misc]
-    FrozenSet = frozenset  # type: ignore[misc]
-    List = list  # type: ignore[misc]
-    Set = set  # type: ignore[misc]
-    Tuple = tuple  # type: ignore[assignment]
-    Type = type
 
 
 if PYTHON_VERSION < (3, 9, 2):
@@ -169,11 +136,13 @@ else:
 
 
 # gh-98363
-if PYTHON_VERSION < (3, 12) or SPHINX_RUNNING:
-    def batched(iterable, n: int) -> Generator[tuple, None, None]:
+if PYTHON_VERSION < (3, 13) or SPHINX_RUNNING:
+    def batched(iterable, n: int, *,
+                strict: bool = False) -> Generator[tuple, None, None]:
         """Batch data from the *iterable* into tuples of length *n*.
 
-        .. note:: The last batch may be shorter than *n*.
+        .. note:: The last batch may be shorter than *n* if *strict* is
+           True or raise a ValueError otherwise.
 
         Example:
 
@@ -188,21 +157,63 @@ if PYTHON_VERSION < (3, 12) or SPHINX_RUNNING:
         Traceback (most recent call last):
          ...
         StopIteration
+        >>> list(batched('ABCD', 2))
+        [('A', 'B'), ('C', 'D')]
+        >>> list(batched('ABCD', 3, strict=False))
+        [('A', 'B', 'C'), ('D',)]
+        >>> list(batched('ABCD', 3, strict=True))
+        Traceback (most recent call last):
+         ...
+        ValueError: batched(): incomplete batch
 
         .. seealso:: :python:`itertools.batched
            <library/itertools.html#itertools.batched>`,
            backported from Python 3.12.
         .. versionadded:: 8.2
+        .. versionchanged:: 9.0
+           Added *strict* option, backported from Python 3.13
 
         :param n: How many items of the iterable to get in one chunk
+        :param strict: raise a ValueError if the final batch is shorter
+            than *n*.
+        :raise ValueError: batched(): incomplete batch
         """
-        group = []
-        for item in iterable:
-            group.append(item)
-            if len(group) == n:
+        msg = 'batched(): incomplete batch'
+        if PYTHON_VERSION < (3, 12):
+            group = []
+            for item in iterable:
+                group.append(item)
+                if len(group) == n:
+                    yield tuple(group)
+                    group.clear()
+            if group:
+                if strict:
+                    raise ValueError(msg)
                 yield tuple(group)
-                group.clear()
-        if group:
-            yield tuple(group)
+        else:  # PYTHON_VERSION == (3, 12)
+            from itertools import batched as _batched
+            for group in _batched(iterable, n):
+                if strict and len(group) < n:
+                    raise ValueError(msg)
+                yield group
 else:
     from itertools import batched  # type: ignore[no-redef]
+
+
+try:
+    import importlib.metadata as importlib_metadata
+except ImportError:
+    import importlib_metadata
+
+
+# import ModuleDeprecationWrapper here to prevent circular import
+from pywikibot.tools import ModuleDeprecationWrapper  # noqa: E402
+
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper.add_deprecated_attr('nullcontext',
+                            replacement_name='contextlib.nullcontext',
+                            since='9.0.0')
+wrapper.add_deprecated_attr('SimpleQueue',
+                            replacement_name='queue.SimpleQueue',
+                            since='9.0.0')

@@ -5,6 +5,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import unittest
 from contextlib import contextmanager, suppress
 
@@ -298,6 +300,6 @@ class TestFlowSysop(FlowTests):
                 self.assertTrue(flow.is_moderated)
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

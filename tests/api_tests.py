@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """API test module."""
 #
-# (C) Pywikibot team, 2007-2023
+# (C) Pywikibot team, 2007-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import datetime
 import types
 import unittest
@@ -473,10 +475,10 @@ class TestDryPageGenerator(TestCase):
 
     def test_namespace(self):
         """Test PageGenerator set_namespace."""
-        with self.assertRaises(AssertionError):
-            self.gen.set_namespace(0)
-            self.gen.set_namespace(1)
-            self.gen.set_namespace(None)
+        for namespace in (0, 1, None):
+            with self.subTest(namespace=namespace), \
+                 self.assertRaises(AssertionError):
+                self.gen.set_namespace(namespace)
 
 
 class TestPropertyGenerator(TestCase):
@@ -562,7 +564,7 @@ class TestPropertyGenerator(TestCase):
         for count, pagedata in enumerate(gen, start=1):
             self.assertIsInstance(pagedata, dict)
             if 'missing' in pagedata:
-                self.assertNotIn('pageid', pagedata)
+                self.assertNotIn('pageid', pagedata)  # pragma: no cover
             else:
                 self.assertIn('pageid', pagedata)
         self.assertLength(links, count)
@@ -585,7 +587,7 @@ class TestPropertyGenerator(TestCase):
         for count, pagedata in enumerate(gen, start=1):
             self.assertIsInstance(pagedata, dict)
             if 'missing' in pagedata:
-                self.assertNotIn('pageid', pagedata)
+                self.assertNotIn('pageid', pagedata)  # pragma: no cover
             else:
                 self.assertIn('pageid', pagedata)
         self.assertLength(links, count)
@@ -635,10 +637,10 @@ class TestDryQueryGeneratorNamespaceParam(TestCase):
         self.gen = api.PageGenerator(site=self.site,
                                      generator='links',
                                      parameters={'titles': 'test'})
-        with self.assertRaises(AssertionError):
-            self.gen.set_namespace(0)
-            self.gen.set_namespace(1)
-            self.gen.set_namespace(None)
+        for namespace in (0, 1, None):
+            with self.subTest(namespace=namespace), \
+                 self.assertRaises(AssertionError):
+                self.gen.set_namespace(namespace)
 
     @suppress_warnings(
         r'^set_namespace\(\) will be modified to raise TypeError*',
@@ -746,11 +748,12 @@ class TestCachedRequest(DefaultSiteTestCase):
         mysite = self.get_site()
         # Run tests on a missing page unique to this test run so it can
         # not be cached the first request, but will be cached after.
-        now = datetime.datetime.utcnow()
-        params = {'action': 'query',
-                  'prop': 'info',
-                  'titles': 'TestCachedRequest_test_internals ' + str(now),
-                  }
+        now = pywikibot.time.Timestamp.nowutc()
+        params = {
+            'action': 'query',
+            'prop': 'info',
+            'titles': 'TestCachedRequest_test_internals ' + str(now),
+        }
         req = api.CachedRequest(datetime.timedelta(minutes=10),
                                 site=mysite, parameters=params)
         rv = req._load_cache()
@@ -768,6 +771,8 @@ class TestCachedRequest(DefaultSiteTestCase):
         self.assertTrue(rv)
         self.assertIsNotNone(req._data)
         self.assertIsNotNone(req._cachetime)
+        self.assertIsNotNone(req._cachetime.tzinfo)
+        self.assertEqual(req._cachetime.tzinfo, datetime.timezone.utc)
         self.assertGreater(req._cachetime, now)
         self.assertEqual(req._data, data)
 
@@ -924,8 +929,7 @@ class TestLagpattern(DefaultSiteTestCase):
         if ('dbrepllag' not in mysite.siteinfo
                 or mysite.siteinfo['dbrepllag'][0]['lag'] == -1):
             self.skipTest(
-                '{} is not running on a replicated database cluster.'
-                .format(mysite)
+                f'{mysite} is not running on a replicated database cluster.'
             )
         mythrottle = DummyThrottle(mysite)
         mysite._throttle = mythrottle
@@ -937,10 +941,10 @@ class TestLagpattern(DefaultSiteTestCase):
             req.submit()
         except SystemExit:
             pass  # expected exception from DummyThrottle instance
-        except APIError as e:  # pragma: no cover
+        except APIError:  # pragma: no cover
             pywikibot.warning(
                 'Wrong api lagpattern regex, cannot retrieve lag value')
-            raise e
+            raise
         self.assertIsInstance(mythrottle._lagvalue, (int, float))
         self.assertGreaterEqual(mythrottle._lagvalue, 0)
         self.assertIsInstance(mythrottle.retry_after, int)
@@ -960,6 +964,6 @@ class TestLagpattern(DefaultSiteTestCase):
             self.assertEqual(float(lag['lag']), time)
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

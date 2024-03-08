@@ -51,17 +51,16 @@ Quick start
 
 .. code:: text
 
-    pip install requests
     git clone https://gerrit.wikimedia.org/r/pywikibot/core.git
     cd core
     git submodule update --init
-    python pwb.py script_name
+    pip install -r requirements.txt
+    python pwb.py <script_name>
 
 Or to install using PyPI (excluding scripts)
 
 .. code:: text
 
-    pip install -U setuptools
     pip install pywikibot
     pwb <scriptname>
 

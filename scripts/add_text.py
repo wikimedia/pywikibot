@@ -60,18 +60,18 @@ Examples
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import codecs
 import re
-from typing import Union
 
 import pywikibot
 from pywikibot import config, pagegenerators, textlib
-from pywikibot.backports import Dict, Sequence
+from pywikibot.backports import Sequence
 from pywikibot.bot import AutomaticTWSummaryBot, ExistingPageBot
 
 
-ARGS_TYPE = Dict[str, Union[bool, str]]
-DEFAULT_ARGS: ARGS_TYPE = {
+DEFAULT_ARGS: dict[str, bool | str] = {
     'text': '',
     'textfile': '',
     'summary': '',
@@ -194,7 +194,7 @@ def main(*argv: str) -> None:
 
 def parse(argv: Sequence[str],
           generator_factory: pagegenerators.GeneratorFactory
-          ) -> ARGS_TYPE:
+          ) -> dict[str, bool | str]:
     """
     Parses our arguments and provide a dictionary with their values.
 

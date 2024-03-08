@@ -1,9 +1,11 @@
 """Family module for Vikidia."""
 #
-# (C) Pywikibot team, 2010-2023
+# (C) Pywikibot team, 2010-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from pywikibot import family
 from pywikibot.tools import classproperty
 
@@ -15,10 +17,10 @@ class Family(family.SubdomainFamily):
     name = 'vikidia'
     domain = 'vikidia.org'
 
-    codes = [
+    codes = {
         'ar', 'ca', 'de', 'el', 'en', 'es', 'eu', 'fr', 'hy', 'it', 'nl', 'oc',
         'pt', 'ru', 'scn',
-    ]
+    }
 
     # Sites we want to edit but not count as real languages
     test_codes = ['central', 'test']

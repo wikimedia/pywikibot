@@ -5,6 +5,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import unittest
 
 from pywikibot.titletranslate import translate
@@ -38,5 +40,5 @@ class TestTitleTranslate(TestCase):
         self.assertLength(result, 6)
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     unittest.main()

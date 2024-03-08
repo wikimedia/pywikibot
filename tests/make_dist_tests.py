@@ -5,14 +5,15 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import sys
 import unittest
 
 from pywikibot import __version__
-from tests.aspects import TestCase, require_modules
+from tests.aspects import TestCase
 
 
-@require_modules('dataclasses')  # Python 3.7+
 class TestMakeDist(TestCase):
 
     """Test the make_dist script."""
@@ -36,5 +37,5 @@ class TestMakeDist(TestCase):
         self.assertTrue(upgrade)
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     unittest.main()

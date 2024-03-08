@@ -23,62 +23,47 @@ jobs:
       max-parallel: 1
 
       matrix:
-        python-version: ["pypy3.7", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
-        site: ['wikipedia:en', 'wikisource:zh']
+        python-version: ["pypy3.7", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13-dev"]
+        site: ['wikipedia:en', 'wikisource:zh', 'wikipedia:test']
         include:
-          # ubuntu-20.04 required for Python 3.6
-          - python-version: 3.6
+          - python-version: 3.7
             site: False
             family: wpbeta
             code: en
-            os: ubuntu-20.04
-          - python-version: 3.6
+          - python-version: 3.7
             site: False
             family: wpbeta
             code: zh
-            os: ubuntu-20.04
           - python-version: 3.8
             site: wsbeta:en
-          - python-version: 3.7
-            site: wikipedia:test
           - python-version: 3.7
             site: wikidata:test
           - python-version: 3.9
             site: wiktionary:ar
-          - python-version: 3.6
+          - python-version: 3.7
             site: wikidata:wikidata
-            os: ubuntu-20.04
           - python-version: 3.8
             site: wowwiki:uk
-          - python-version: "3.12"
-            site: wikipedia:test
           - python-version: 3
             site: wikipedia:de
             os: macOS-latest
-          - python-version: 3.6
-            site: wikipedia:en
-            os: ubuntu-20.04
-          - python-version: 3.6
-            site: wikisource:zh
-            os: ubuntu-20.04
-          - python-version: "3.13-dev"
-            site: wikipedia:test
+
 
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         submodules: true
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       if: ${{ matrix.python-version != '3.13-dev' }}
       with:
         python-version: ${{ matrix.python-version }}
 
     # use deadsnakes/action until actions/setup-python supports Python 3.13
     - name: Set up development Python ${{ matrix.python-version }}
-      uses: deadsnakes/action@v3.0.1
+      uses: deadsnakes/action@v3.1.0
       if: ${{ matrix.python-version == '3.13-dev' }}
       with:
         python-version: ${{ matrix.python-version }}
@@ -87,11 +72,11 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip --version
-        pip install -U setuptools
-        pip install requests
-        pip install mwparserfromhell
         pip install coverage
-        python -c "import setuptools; print('setuptools:', setuptools.__version__)"
+        pip install "importlib_metadata ; python_version < '3.8'"
+        pip install mwparserfromhell
+        pip install packaging
+        pip install requests
 
     - name: Generate family files
       run: |
@@ -115,7 +100,6 @@ jobs:
         echo "usernames['wikidata']['test'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
         echo "usernames['commons']['commons'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
         echo "usernames['meta']['meta'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
-        echo "max_retries = 3" >> user-config.py
         echo "noisysleep = float('inf')" >> user-config.py
         echo "maximum_GET_length = 5000" >> user-config.py
         echo "console_encoding = 'utf8'" >> user-config.py
@@ -134,4 +118,6 @@ jobs:
         coverage report
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

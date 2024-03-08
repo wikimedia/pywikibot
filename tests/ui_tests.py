@@ -5,6 +5,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import io
 import logging
 import os
@@ -185,8 +187,7 @@ class TestTerminalOutput(UITestCase):
 
         end_str = ': Testing Exception'
         self.assertTrue(stderrlines[-1].endswith(end_str),
-                        '\n{!r} does not end with {!r}'
-                        .format(stderrlines[-1], end_str))
+                        f'\n{stderrlines[-1]!r} does not end with {end_str!r}')
 
 
 class TestTerminalInput(UITestCase):
@@ -363,8 +364,7 @@ class TestTransliterationTable(TestCase):
             with self.subTest(lang=lang):
                 for char in digits:
                     self.assertIn(char, _trans,
-                                  '{!r} not in transliteration table'
-                                  .format(char))
+                                  f'{char!r} not in transliteration table')
 
     def test_transliteration_table(self):
         """Test transliteration table consistency."""
@@ -519,6 +519,6 @@ class FakeWin32UncolorizedTest(FakeWin32Test):
     expect_color = False
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

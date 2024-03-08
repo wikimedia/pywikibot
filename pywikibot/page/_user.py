@@ -1,13 +1,13 @@
 """Object representing a Wiki user."""
 #
-# (C) Pywikibot team, 2009-2022
+# (C) Pywikibot team, 2009-2024
 #
 # Distributed under the terms of the MIT license.
 #
-from typing import Optional
+from __future__ import annotations
 
 import pywikibot
-from pywikibot.backports import Iterable, Tuple
+from pywikibot.backports import Generator
 from pywikibot.exceptions import (
     APIError,
     AutoblockUserError,
@@ -17,7 +17,7 @@ from pywikibot.exceptions import (
 from pywikibot.page._links import Link
 from pywikibot.page._page import Page
 from pywikibot.page._revision import Revision
-from pywikibot.tools import deprecated, is_ip_address
+from pywikibot.tools import deprecated, is_ip_address, is_ip_network
 
 
 __all__ = ('User', )
@@ -85,6 +85,10 @@ class User(Page):
         """Determine if the user is editing as an IP address."""
         return is_ip_address(self.username)
 
+    def is_CIDR(self) -> bool:  # noqa: N802
+        """Determine if the input refers to a range of IP addresses."""
+        return is_ip_network(self.username)
+
     def getprops(self, force: bool = False) -> dict:
         """
         Return a properties about the user.
@@ -94,8 +98,8 @@ class User(Page):
         if force and hasattr(self, '_userprops'):
             del self._userprops
         if not hasattr(self, '_userprops'):
-            self._userprops = list(self.site.users([self.username, ]))[0]
-            if self.isAnonymous():
+            self._userprops = list(self.site.users([self.username]))[0]
+            if self.isAnonymous() or self.is_CIDR():
                 r = list(self.site.blocks(iprange=self.username, total=1))
                 if r:
                     self._userprops['blockedby'] = r[0]['by']
@@ -103,7 +107,7 @@ class User(Page):
         return self._userprops
 
     def registration(self,
-                     force: bool = False) -> Optional[pywikibot.Timestamp]:
+                     force: bool = False) -> pywikibot.Timestamp | None:
         """
         Fetch registration date for this user.
 
@@ -257,10 +261,8 @@ class User(Page):
         mailrequest = self.site.simple_request(**params)
         maildata = mailrequest.submit()
 
-        if 'emailuser' in maildata \
-           and maildata['emailuser']['result'] == 'Success':
-            return True
-        return False
+        return ('emailuser' in maildata
+                and maildata['emailuser']['result'] == 'Success')
 
     def block(self, *args, **kwargs):
         """
@@ -276,9 +278,9 @@ class User(Page):
             if err.code == 'invalidrange':
                 raise ValueError(f'{self.username} is not a valid IP range.')
 
-            raise err
+            raise
 
-    def unblock(self, reason: Optional[str] = None) -> None:
+    def unblock(self, reason: str | None = None) -> None:
         """
         Remove the block for the user.
 
@@ -322,9 +324,13 @@ class User(Page):
 
     def contributions(
         self,
-        total: int = 500,
+        total: int | None = 500,
         **kwargs
-    ) -> Tuple[Page, int, pywikibot.Timestamp, Optional[str]]:
+    ) -> Generator[
+        tuple[Page, int, pywikibot.Timestamp, str | None],
+        None,
+        None
+    ]:
         """Yield tuples describing this user edits.
 
         Each tuple is composed of a pywikibot.Page object, the revision
@@ -375,7 +381,7 @@ class User(Page):
     @property
     def first_edit(
         self
-    ) -> Optional[Tuple[Page, int, pywikibot.Timestamp, str]]:
+    ) -> tuple[Page, int, pywikibot.Timestamp, str | None] | None:
         """Return first user contribution.
 
         :return: first user contribution entry
@@ -386,7 +392,7 @@ class User(Page):
     @property
     def last_edit(
         self
-    ) -> Optional[Tuple[Page, int, pywikibot.Timestamp, str]]:
+    ) -> tuple[Page, int, pywikibot.Timestamp, str | None] | None:
         """Return last user contribution.
 
         :return: last user contribution entry
@@ -395,8 +401,11 @@ class User(Page):
         return next(self.contributions(total=1), None)
 
     def deleted_contributions(
-        self, *, total: int = 500, **kwargs
-    ) -> Iterable[Tuple[Page, Revision]]:
+        self,
+        *,
+        total: int | None = 500,
+        **kwargs,
+    ) -> Generator[tuple[Page, Revision], None, None]:
         """Yield tuples describing this user's deleted edits.
 
         .. versionadded:: 5.5

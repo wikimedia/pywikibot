@@ -4,16 +4,16 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import collections
 from abc import ABC, abstractmethod
 from collections.abc import Collection, Generator, Iterator, Mapping
 from contextlib import suppress
 from itertools import chain
-from typing import Any
+from typing import Any, NamedTuple
 
-from pywikibot.backports import Dict
 from pywikibot.backports import Generator as GeneratorType
-from pywikibot.backports import List
 
 
 __all__ = (
@@ -21,6 +21,7 @@ __all__ = (
     'DequeGenerator',
     'EmptyDefault',
     'GeneratorWrapper',
+    'RateLimit',
     'SizedKeyCollection',
     'EMPTY_DEFAULT',
 )
@@ -70,7 +71,7 @@ class SizedKeyCollection(Collection):
             with this collection which will be used as key.
         """
         self.keyattr = keyattr
-        self.data: Dict[Any, List[Any]] = {}
+        self.data: dict[Any, list[Any]] = {}
         self.size = 0
 
     def __contains__(self, key) -> bool:
@@ -294,3 +295,56 @@ class GeneratorWrapper(ABC, Generator):
         """Restart the generator."""
         with suppress(AttributeError):
             del self._started_gen
+
+
+class RateLimit(NamedTuple):
+
+    """A namedtuple which can hold rate limit content.
+
+    This class is used by :meth:`APISite.ratelimit()
+    <pywikibot.site._apisite.APISite.ratelimit>`.
+
+    .. note:: :meth:`delay` and :meth:`ratio` properties cannot be
+       sliced or used with tuple indices. They must be used as
+       attributes.
+
+    >>> limit = RateLimit('user', 500, 10)
+    >>> limit
+    RateLimit(group='user', hits=500, seconds=10)
+    >>> limit.delay
+    0.02
+    >>> limit.ratio
+    50.0
+    >>> limit._fields
+    ('group', 'hits', 'seconds')
+    >>> limit._asdict()  # doctest: +SKIP
+    {'group': 'user', 'hits': 500, 'seconds': 10}
+    >>> limit[0]
+    'user'
+    >>> limit[-1]
+    10
+    >>> user, hits, seconds = limit
+    >>> hits, seconds
+    (500, 10)
+    >>> newlimit = limit._replace(seconds=0)
+    >>> newlimit.delay
+    0.0
+    >>> newlimit.ratio
+    inf
+
+    .. versionadded:: 9.0
+    """
+
+    group: str = 'unknown'
+    hits: int = 50
+    seconds: int = 0
+
+    @property
+    def delay(self) -> float:
+        """Calculate a delay value which is the inverse of :meth:`ratio`."""
+        return self.seconds / self.hits
+
+    @property
+    def ratio(self) -> float:
+        """Calculate a ratio how many hits can be done within one second."""
+        return self.hits / self.seconds if self.seconds != 0 else float('inf')

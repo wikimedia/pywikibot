@@ -7,12 +7,13 @@ Do not import classes directly from here but from specialbots.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import os
 import tempfile
 from contextlib import suppress
 from http import HTTPStatus
 from pathlib import Path
-from typing import Optional, Union
 from urllib.parse import urlparse
 
 import requests
@@ -20,7 +21,6 @@ import requests
 import pywikibot
 import pywikibot.comms.http as http
 from pywikibot import config
-from pywikibot.backports import List
 from pywikibot.bot import BaseBot, QuitKeyboardInterrupt
 from pywikibot.exceptions import APIError, FatalServerError, NoPageError
 
@@ -29,19 +29,19 @@ class UploadRobot(BaseBot):
 
     """Upload bot."""
 
-    def __init__(self, url: Union[List[str], str], *,
+    def __init__(self, url: list[str] | str, *,
                  url_encoding=None,
                  description: str = '',
                  use_filename=None,
                  keep_filename: bool = False,
                  verify_description: bool = True,
-                 ignore_warning: Union[bool, list] = False,
+                 ignore_warning: bool | list = False,
                  target_site=None,
-                 aborts: Union[bool, list, None] = None,
+                 aborts: bool | list | None = None,
                  chunk_size: int = 0,
                  asynchronous: bool = False,
-                 summary: Optional[str] = None,
-                 filename_prefix: Optional[str] = None,
+                 summary: str | None = None,
+                 filename_prefix: str | None = None,
                  force_if_shared: bool = False,
                  **kwargs) -> None:
         """Initializer.
@@ -182,7 +182,7 @@ class UploadRobot(BaseBot):
         pywikibot.info(f'Downloaded {path.stat().st_size} bytes')
         return tempname
 
-    def _handle_warning(self, warning: str) -> Optional[bool]:
+    def _handle_warning(self, warning: str) -> bool | None:
         """Return whether the warning cause an abort or be ignored.
 
         :param warning: The warning name

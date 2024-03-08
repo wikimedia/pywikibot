@@ -142,9 +142,10 @@ administrator, transwiki importer or importer.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import pywikibot
 from pywikibot import pagegenerators
-from pywikibot.backports import Dict
 from pywikibot.bot import suggest_help
 from pywikibot.data import api
 
@@ -152,7 +153,7 @@ from pywikibot.data import api
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
-def api_query(site, params: Dict[str, str]):
+def api_query(site, params: dict[str, str]):
     """Request data from given site."""
     query = api.Request(site, parameters=params)
     datas = query.submit()

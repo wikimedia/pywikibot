@@ -75,6 +75,8 @@ right parameter.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import collections
 import re
 import time
@@ -84,7 +86,6 @@ from typing import Generator
 import pywikibot
 from pywikibot import config, i18n
 from pywikibot import pagegenerators as pg
-from pywikibot.backports import List, Set, Tuple
 from pywikibot.bot import suggest_help
 from pywikibot.exceptions import (
     EditConflictError,
@@ -766,7 +767,7 @@ class CheckImagesBot:
 
     @staticmethod
     def important_image(
-        list_given: List[Tuple[float, pywikibot.FilePage]]
+        list_given: list[tuple[float, pywikibot.FilePage]]
     ) -> pywikibot.FilePage:
         """
         Get tuples of image and time, return the most used or oldest image.
@@ -1103,7 +1104,7 @@ class CheckImagesBot:
         else:
             pywikibot.info('>> No additional settings found! <<')
 
-    def load_licenses(self) -> Set[pywikibot.Page]:
+    def load_licenses(self) -> set[pywikibot.Page]:
         """Load the list of the licenses.
 
         .. versionchanged:: 7.2
@@ -1167,7 +1168,7 @@ class CheckImagesBot:
         """
         Check if template is in list.
 
-        The problem is the calls to the Mediawiki system because they can be
+        The problem is the calls to the MediaWiki system because they can be
         pretty slow. While searching in a list of objects is really fast, so
         first of all let's see if we can find something in the info that we
         already have, then make a deeper check.
@@ -1182,7 +1183,7 @@ class CheckImagesBot:
                     if self.mini_template_check(template):
                         break
 
-    def smart_detection(self) -> Tuple[str, bool]:
+    def smart_detection(self) -> tuple[str, bool]:
         """
         Detect templates.
 
@@ -1283,7 +1284,7 @@ class CheckImagesBot:
         return (self.license_found, self.white_templates_found)
 
     @staticmethod
-    def load(raw) -> List[str]:
+    def load(raw) -> list[str]:
         """Load a list of objects from a string using regex."""
         list_loaded = []
         # I search with a regex how many user have not the talk page

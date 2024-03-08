@@ -1,7 +1,7 @@
 image: Visual Studio 2022
 clone_depth: 50
 skip_tags: true
-version: 8.6.{build}
+version: 9.0.{build}
 environment:
 
   PYWIKIBOT_DIR: "%appdata%\\Pywikibot"
@@ -14,17 +14,16 @@ environment:
 
   matrix:
 
-    # Test the lowest supported release of each major Python version
+    # Test the lowest supported release
+    # Python 3.7.0 is provided by VS 2013
 
-    - PYTHON: "C:\\Python361-x64"
-      PYTHON_VERSION: "3.6.1"
-      PYTHON_ARCH: "64"
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
+      PYTHON: "C:\\Python37"
+      PYTHON_VERSION: "3.7.0"
+      PYTHON_ARCH: "32"
+
 
     # AppVeyor pre-installs these versions onto build machines
-
-    - PYTHON: "C:\\Python36"
-      PYTHON_VERSION: "3.6.x"
-      PYTHON_ARCH: "32"
 
     - PYTHON: "C:\\Python37-x64"
       PYTHON_VERSION: "3.7.x"
@@ -58,16 +57,18 @@ init:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
 
 install:
+  # ignore SSL error for old image
+  - if [%PYTHON_VERSION%]==[3.7.0] set GIT_SSL_NO_VERIFY=true
   - git submodule update --init
   # Download the AppVeyor Python build accessories into subdirectory .\appveyor
   - mkdir appveyor
-  # Download Python 3.6.1 which isn't pre-installed
-  - ps: ./appveyor_install.ps1
   - python --version
-  - python -c "import platform; print(platform.machine())"
   - python -c "import struct; print('PYTHON_ARCH:', struct.calcsize('P') << 3)"
   - pip --version
-  - if [%PYTHON_ARCH%]==[32] pip install "Pillow >= 8.1.2, < 10.0.0"
+  - if [%PYTHON_VERSION%]==[3.7.0] pip install "urllib3<2.0"
+  - if [%PYTHON_VERSION%]==[3.7.0] pip install -U setuptools
+  - if [%PYTHON_VERSION%]==[3.12.x] pip install -U setuptools
+  - if [%PYTHON_ARCH%]==[32] pip install "Pillow >= 8.1.2, != 10.0, != 10.1"
   - pip install -r requirements.txt
   - pip install -r dev-requirements.txt
   - pip install wikitextparser
@@ -80,7 +81,7 @@ test_script:
 
   - "mkdir %PYWIKIBOT_DIR%"
   - "python -Werror::UserWarning -m pwb generate_user_files -dir:%PYWIKIBOT_DIR% -family:wikipedia -lang:en -v -debug -user:%PYWIKIBOT_USERNAME%"
-  - ps: "[IO.File]::AppendAllText($env:PYWIKIBOT_USER_CONFIG, 'max_retries = 2; maximum_GET_length = 5000; transliteration_target = None;')"
+  - ps: "[IO.File]::AppendAllText($env:PYWIKIBOT_USER_CONFIG, 'maximum_GET_length = 5000; transliteration_target = None;')"
   - ps: "[IO.File]::AppendAllText($env:PYWIKIBOT_USER_CONFIG, 'noisysleep = float(''inf'');')"
   - ps: "[IO.File]::AppendAllText($env:PYWIKIBOT_USER_CONFIG, 'usernames[''wikipedia''][''test''] = ''{0}'';' -f $env:PYWIKIBOT_USERNAME)"
   - ps: "[IO.File]::AppendAllText($env:PYWIKIBOT_USER_CONFIG, 'usernames[''wikidata''][''test''] = ''{0}'';' -f $env:PYWIKIBOT_USERNAME)"

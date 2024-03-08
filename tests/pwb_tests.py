@@ -5,6 +5,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import io
 import sys
 import unittest
@@ -139,5 +141,5 @@ class TestPwb(PwbTestCase):
         self.assertLength(remaining, 3)  # always 3 lines remaining after list
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     unittest.main(verbosity=10)

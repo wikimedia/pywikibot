@@ -5,6 +5,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import os
 import unittest
 from contextlib import suppress
@@ -71,6 +73,6 @@ def setUpModule():
     from pywikibot.userinterfaces.gui import EditBoxWindow, Tkdialog
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

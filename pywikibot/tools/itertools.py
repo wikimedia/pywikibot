@@ -8,15 +8,17 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import collections
 import itertools
 from contextlib import suppress
 from itertools import chain, zip_longest
 from typing import Any
 
-from pywikibot.backports import Generator, List, batched
+from pywikibot.backports import Generator, batched
 from pywikibot.logging import debug
-from pywikibot.tools import deprecated, issue_deprecation_warning
+from pywikibot.tools import deprecated
 
 
 __all__ = (
@@ -31,7 +33,7 @@ __all__ = (
 @deprecated('backports.batched()', since='8.2.0')
 def itergroup(iterable,
               size: int,
-              strict: bool = False) -> Generator[List[Any], None, None]:
+              strict: bool = False) -> Generator[list[Any], None, None]:
     """Make an iterator that returns lists of (up to) size items from iterable.
 
     Example:
@@ -58,9 +60,7 @@ def itergroup(iterable,
         not divisible by `size`.
     :raises ValueError: iterable is not divisible by size
     """
-    for group in batched(iterable, size):
-        if strict and len(group) < size:
-            raise ValueError('iterable is not divisible by size.')
+    for group in batched(iterable, size, strict=strict):
         yield list(group)
 
 
@@ -120,33 +120,17 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
        ``genlist`` was renamed to ``iterables``; consecutive iterables
        are to be used as iterables parameters or '*' to unpack a list
 
-    .. deprecated:: 6.4
-       ``allow_duplicates`` as positional argument,
-       ``iterables`` as list type
-
     .. versionchanged:: 7.0
        Reimplemented without threads which is up to 10'000 times faster
+
+    .. versionchanged:: 9.0
+       Iterable elements may consist of lists or tuples
+       ``allow_duplicates`` is a keyword-only argument
 
     :param iterables: page generators
     :param allow_duplicates: optional keyword argument to allow duplicates
         if present in all generators
     """
-    # 'allow_duplicates' must be given as keyword argument
-    if iterables and iterables[-1] in (True, False):
-        allow_duplicates = iterables[-1]
-        iterables = iterables[:-1]
-        issue_deprecation_warning("'allow_duplicates' as positional argument",
-                                  'keyword argument "allow_duplicates={}"'
-                                  .format(allow_duplicates),
-                                  since='6.4.0')
-
-    # iterables must not be given as tuple or list
-    if len(iterables) == 1 and isinstance(iterables[0], (list, tuple)):
-        iterables = iterables[0]
-        issue_deprecation_warning("'iterables' as list type",
-                                  "consecutive iterables or use '*' to unpack",
-                                  since='6.4.0')
-
     if not iterables:
         return
 

@@ -1,13 +1,14 @@
 """Objects representing API interface to MediaWiki site extenstions."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
-from typing import Any, Optional, Union
+from __future__ import annotations
+
+from typing import Any
 
 import pywikibot
-from pywikibot.backports import Dict
 from pywikibot.data import api
 from pywikibot.echo import Notification
 from pywikibot.exceptions import (
@@ -142,10 +143,7 @@ class ProofreadPageMixin:
         return self._proofread_levels
 
     @need_extension('ProofreadPage')
-    def loadpageurls(
-        self,
-        page: 'pywikibot.page.BasePage'
-    ) -> None:
+    def loadpageurls(self, page: pywikibot.page.BasePage) -> None:
         """Load URLs from api and store in page attributes.
 
         Load URLs to images for a given page in the "Page:" namespace.
@@ -397,16 +395,16 @@ class FlowMixin:
 
     @need_extension('Flow')
     def load_topiclist(self,
-                       page: 'pywikibot.flow.Board',
+                       page: pywikibot.flow.Board,
                        *,
                        content_format: str = 'wikitext',
                        limit: int = 100,
                        sortby: str = 'newest',
                        toconly: bool = False,
-                       offset: Union['pywikibot.Timestamp', str, None] = None,
-                       offset_id: Optional[str] = None,
+                       offset: pywikibot.Timestamp | str | None = None,
+                       offset_id: str | None = None,
                        reverse: bool = False,
-                       include_offset: bool = False) -> Dict[str, Any]:
+                       include_offset: bool = False) -> dict[str, Any]:
         """
         Retrieve the topiclist of a Flow board.
 
@@ -586,7 +584,7 @@ class FlowMixin:
         params = {'action': 'flow', 'page': page, 'token': token,
                   'submodule': 'edit-topic-summary', 'etssummary': summary,
                   'etsformat': 'wikitext'}
-        if 'summary' in page.root._current_revision.keys():
+        if 'summary' in page.root._current_revision:
             params['etsprev_revision'] = page.root._current_revision[
                 'summary']['revision']['revisionId']
         req = self._request(parameters=params, use_get=False)
@@ -769,9 +767,9 @@ class TextExtractsMixin:
     """
 
     @need_extension('TextExtracts')
-    def extract(self, page: 'pywikibot.Page', *,
-                chars: Optional[int] = None,
-                sentences: Optional[int] = None,
+    def extract(self, page: pywikibot.Page, *,
+                chars: int | None = None,
+                sentences: int | None = None,
                 intro: bool = True,
                 plaintext: bool = True) -> str:
         """Retrieve an extract of a page.

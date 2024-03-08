@@ -10,6 +10,8 @@ to fail.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import os
 import unittest
 from contextlib import suppress
@@ -85,6 +87,6 @@ def setUpModule():
         raise unittest.SkipTest('login/logout tests are disabled')
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

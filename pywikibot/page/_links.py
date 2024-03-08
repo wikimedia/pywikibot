@@ -10,9 +10,12 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import re
 import unicodedata
 from html.entities import name2codepoint
+from typing import Any
 
 import pywikibot
 from pywikibot import textlib
@@ -129,7 +132,7 @@ class BaseLink(ComparableMixin):
             self._namespace = self.lookup_namespace()
         return self._namespace
 
-    def canonical_title(self):
+    def canonical_title(self) -> str:
         """Return full page title, including localized namespace."""
         # Avoid that ':' will be added to the title for Main ns.
         if self.namespace != Namespace.MAIN:
@@ -732,15 +735,17 @@ class SiteLink(BaseLink):
         return list(self._badges)
 
     @classmethod
-    def fromJSON(cls, data: dict, site=None):  # noqa: N802
+    def fromJSON(  # noqa: N802
+        cls,
+        data: dict[str, Any],
+        site: pywikibot.site.DataSite | None = None,
+    ) -> SiteLink:
         """
         Create a SiteLink object from JSON returned in the API call.
 
         :param data: JSON containing SiteLink data
         :param site: The Wikibase site
         :type site: pywikibot.site.DataSite
-
-        :rtype: pywikibot.page.SiteLink
         """
         sl = cls(data['title'], data['site'])
         repo = site or sl.site.data_repository()
@@ -748,7 +753,7 @@ class SiteLink(BaseLink):
             sl._badges.add(pywikibot.ItemPage(repo, badge))
         return sl
 
-    def toJSON(self) -> dict:  # noqa: N802
+    def toJSON(self) -> dict[str, str | list[str]]:  # noqa: N802
         """
         Convert the SiteLink to a JSON object for the Wikibase API.
 

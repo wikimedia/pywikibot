@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Tests for the date module."""
 #
-# (C) Pywikibot team, 2012-2022
+# (C) Pywikibot team, 2012-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import unittest
 from contextlib import suppress
 from datetime import datetime
@@ -28,7 +30,7 @@ class DateTestMeta(MetaTestCaseClass):
                     step = 10
                 try:
                     predicate, start, stop = date.formatLimits[formatname]
-                except KeyError:
+                except KeyError:  # pragma: no cover
                     return
 
                 for code, convert in date.formats[formatname].items():
@@ -135,6 +137,6 @@ class TestMonthDelta(TestCase):
                          datetime(2013, 3, 31)), -12)
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

@@ -4,15 +4,17 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import datetime
 import json
 import uuid
 from contextlib import suppress
-from typing import Any, Dict, List, Optional
+from typing import Any
 from warnings import warn
 
 import pywikibot
-from pywikibot.backports import batched
+from pywikibot.backports import Generator, Iterable, batched
 from pywikibot.data import api
 from pywikibot.exceptions import (
     APIError,
@@ -47,7 +49,7 @@ class DataSite(APISite):
             'sense': pywikibot.LexemeSense,
         }
 
-    def get_repo_for_entity_type(self, entity_type: str) -> 'DataSite':
+    def get_repo_for_entity_type(self, entity_type: str) -> DataSite:
         """
         Get the data repository for the entity type.
 
@@ -203,7 +205,12 @@ class DataSite(APISite):
             raise APIError(data['errors'], '')
         return data['entities']
 
-    def preload_entities(self, pagelist, groupsize: int = 50):
+    def preload_entities(
+        self,
+        pagelist: Iterable[pywikibot.page.WikibaseEntity
+                           | pywikibot.page.Page],
+        groupsize: int = 50
+    ) -> Generator[pywikibot.page.WikibaseEntity, None, None]:
         """Yield subclasses of WikibaseEntity's with content prefilled.
 
         .. note:: Pages will be iterated in a different order than in
@@ -322,10 +329,10 @@ class DataSite(APISite):
 
     @need_right('edit')
     def addClaim(self,
-                 entity: 'pywikibot.page.WikibaseEntity',
-                 claim: 'pywikibot.page.Claim',
+                 entity: pywikibot.page.WikibaseEntity,
+                 claim: pywikibot.page.Claim,
                  bot: bool = True,
-                 summary: Optional[str] = None) -> None:
+                 summary: str | None = None) -> None:
         """
         Add a claim.
 
@@ -382,8 +389,8 @@ class DataSite(APISite):
         return req.submit()
 
     @need_right('edit')
-    def save_claim(self, claim: 'pywikibot.page.Claim',
-                   summary: Optional[str] = None,
+    def save_claim(self, claim: pywikibot.page.Claim,
+                   summary: str | None = None,
                    bot: bool = True):
         """
         Save the whole claim to the wikibase site.
@@ -415,7 +422,7 @@ class DataSite(APISite):
     def editSource(self, claim, source,
                    new: bool = False,
                    bot: bool = True,
-                   summary: Optional[str] = None):
+                   summary: str | None = None):
         """Create/Edit a source.
 
         .. versionchanged:: 7.0
@@ -466,7 +473,7 @@ class DataSite(APISite):
     def editQualifier(self, claim, qualifier,
                       new: bool = False,
                       bot: bool = True,
-                      summary: Optional[str] = None):
+                      summary: str | None = None):
         """Create/Edit a qualifier.
 
         .. versionchanged:: 7.0
@@ -504,14 +511,14 @@ class DataSite(APISite):
     @remove_last_args(['baserevid'])  # since 7.0.0
     def removeClaims(self, claims,
                      bot: bool = True,
-                     summary: Optional[str] = None):
+                     summary: str | None = None):
         """Remove claims.
 
         .. versionchanged:: 7.0
            deprecated `baserevid` parameter was removed
 
         :param claims: Claims to be removed
-        :type claims: List[pywikibot.Claim]
+        :type claims: list[pywikibot.Claim]
         :param bot: Whether to mark the edit as a bot edit
         :type bot: bool
         :param summary: Edit summary
@@ -537,7 +544,7 @@ class DataSite(APISite):
     @remove_last_args(['baserevid'])  # since 7.0.0
     def removeSources(self, claim, sources,
                       bot: bool = True,
-                      summary: Optional[str] = None):
+                      summary: str | None = None):
         """Remove sources.
 
         .. versionchanged:: 7.0
@@ -566,7 +573,7 @@ class DataSite(APISite):
     @remove_last_args(['baserevid'])  # since 7.0.0
     def remove_qualifiers(self, claim, qualifiers,
                           bot: bool = True,
-                          summary: Optional[str] = None):
+                          summary: str | None = None):
         """Remove qualifiers.
 
         .. versionchanged:: 7.0
@@ -575,7 +582,7 @@ class DataSite(APISite):
         :param claim: A Claim object to remove the qualifier from
         :type claim: pywikibot.Claim
         :param qualifiers: Claim objects currently used as a qualifiers
-        :type qualifiers: List[pywikibot.Claim]
+        :type qualifiers: list[pywikibot.Claim]
         :param bot: Whether to mark the edit as a bot edit
         :param summary: Edit summary
         """
@@ -701,7 +708,7 @@ class DataSite(APISite):
         return req.submit()
 
     def search_entities(self, search: str, language: str,
-                        total: Optional[int] = None, **kwargs):
+                        total: int | None = None, **kwargs):
         """
         Search for pages or properties that contain the given text.
 
@@ -733,10 +740,10 @@ class DataSite(APISite):
                               total=total, parameters=parameters)
         return gen
 
-    def parsevalue(self, datatype: str, values: List[str],
-                   options: Optional[Dict[str, Any]] = None,
-                   language: Optional[str] = None,
-                   validate: bool = False) -> List[Any]:
+    def parsevalue(self, datatype: str, values: list[str],
+                   options: dict[str, Any] | None = None,
+                   language: str | None = None,
+                   validate: bool = False) -> list[Any]:
         """
         Send data values to the wikibase parser for interpretation.
 

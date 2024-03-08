@@ -5,6 +5,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import pickle
 import random
 import threading
@@ -24,7 +26,6 @@ from pywikibot.exceptions import (
 )
 from tests.aspects import (
     AlteredDefaultSiteTestCase,
-    DefaultDrySiteTestCase,
     DefaultSiteTestCase,
     DeprecationTestCase,
     TestCase,
@@ -51,20 +52,6 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase,
         for page in self.site.allpages(filterredir='', total=1):
             self.assertFalse(page.isRedirectPage())
         self.assertOneDeprecation()
-
-
-class TestSiteDryDeprecatedFunctions(DefaultDrySiteTestCase,
-                                     DeprecationTestCase):
-
-    """Test cases for Site deprecated methods without a user."""
-
-    def test_namespaces_callable(self):
-        """Test that namespaces is callable and returns itself."""
-        site = self.get_site()
-        self.assertIs(site.namespaces(), site.namespaces)
-        self.assertOneDeprecationParts(
-            'Referencing this attribute like a function',
-            'it directly')
 
 
 class TestSiteObject(DefaultSiteTestCase):
@@ -274,6 +261,32 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertLength(a, int(mainpage.exists()))
         if a:
             self.assertEqual(a[0], mainpage)
+
+    def test_maxlimit(self):
+        """Test maxlimit property."""
+        limit = self.site.maxlimit
+        self.assertIsInstance(limit, int)
+        self.assertIn(limit, [10, 50, 500, 5000])
+
+    def test_ratelimit(self):
+        """Test ratelimit method."""
+        actions = ('edit', 'move', 'purge', 'invalid')
+        if self.site.logged_in():
+            groups = ['user', 'unknown', 'noratelimit']
+        else:
+            groups = ['ip', 'unknown']
+            self.assertFalse(self.site.has_right('noratelimit'))
+        for action in actions:
+            with self.subTest(action=action):
+                limit = self.site.ratelimit(action)
+                self.assertIn(limit.group, groups)
+                self.assertEqual(limit.seconds / limit.hits, limit.delay)
+                self.assertEqual(
+                    1 / limit.delay if limit.seconds else float('inf'),
+                    limit.ratio)
+                if limit.group == 'unknown':
+                    self.assertEqual(limit.hits, self.site.maxlimit)
+                    self.assertEqual(limit.seconds, config.put_throttle)
 
 
 class TestLockingPage(DefaultSiteTestCase):
@@ -1307,6 +1320,6 @@ class TestCategoryFromWikibase(DefaultSiteTestCase):
         self.assertIsNone(page)
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

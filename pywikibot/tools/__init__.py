@@ -16,10 +16,12 @@
    Import them from :mod:`tools.threading` instead.
 """
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import abc
 import bz2
 import gzip
@@ -30,18 +32,21 @@ import os
 import re
 import stat
 import subprocess
-import sys
 from contextlib import suppress
 from functools import total_ordering, wraps
-from importlib import import_module
 from types import TracebackType
-from typing import Any, Optional, Type, Union
+from typing import Any
 from warnings import catch_warnings, showwarning, warn
 
-import pkg_resources
+import packaging.version
 
 import pywikibot  # T306760
-from pywikibot.backports import Callable
+from pywikibot.backports import (
+    PYTHON_VERSION,
+    SPHINX_RUNNING,
+    Callable,
+    importlib_metadata,
+)
 from pywikibot.tools._deprecate import (
     ModuleDeprecationWrapper,
     add_decorated_full_name,
@@ -56,9 +61,6 @@ from pywikibot.tools._deprecate import (
     remove_last_args,
 )
 from pywikibot.tools._unidata import _first_upper_exception
-
-
-pkg_Version = pkg_resources.packaging.version.Version  # noqa: N816
 
 
 __all__ = (
@@ -77,8 +79,10 @@ __all__ = (
 
     # other tools
     'PYTHON_VERSION',
+    'SPHINX_RUNNING',
     'as_filename',
     'is_ip_address',
+    'is_ip_network',
     'has_module',
     'classproperty',
     'suppress_warnings',
@@ -87,20 +91,13 @@ __all__ = (
     'first_upper',
     'strtobool',
     'normalize_username',
-    'Version',
     'MediaWikiVersion',
-    'SelfCallMixin',
-    'SelfCallDict',
-    'SelfCallString',
     'open_archive',
     'merge_unique_dicts',
     'file_mode_checker',
     'compute_file_hash',
     'cached',
 )
-
-
-PYTHON_VERSION = sys.version_info[:3]
 
 
 def is_ip_address(value: str) -> bool:
@@ -118,7 +115,21 @@ def is_ip_address(value: str) -> bool:
     return False
 
 
-def has_module(module, version=None) -> bool:
+def is_ip_network(value: str) -> bool:
+    """Check if a value is a valid range of IPv4 or IPv6 addresses.
+
+    .. versionadded:: 9.0
+
+    :param value: value to check
+    """
+    with suppress(ValueError):
+        ipaddress.ip_network(value)
+        return True
+
+    return False
+
+
+def has_module(module: str, version: str | None = None) -> bool:
     """Check if a module can be imported.
 
     .. versionadded:: 3.0
@@ -128,15 +139,13 @@ def has_module(module, version=None) -> bool:
        removed with Python 3.12.
     """
     try:
-        m = import_module(module)
-    except ImportError:
+        metadata_version = importlib_metadata.version(module)
+    except importlib_metadata.PackageNotFoundError:
         return False
     if version:
-        if not hasattr(m, '__version__'):
-            return False  # pragma: no cover
 
-        required_version = pkg_resources.parse_version(version)
-        module_version = pkg_resources.parse_version(m.__version__)
+        required_version = packaging.version.Version(version)
+        module_version = packaging.version.Version(metadata_version)
 
         if module_version < required_version:
             warn('Module version {} is lower than requested version {}'
@@ -218,9 +227,9 @@ class suppress_warnings(catch_warnings):  # noqa: N801
 
     def __exit__(
         self,
-        exc_type: Optional[Type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType]
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None
     ) -> None:
         """Stop logging warnings and show those that do not match to params."""
         super().__exit__(exc_type, exc_val, exc_tb)
@@ -394,7 +403,7 @@ def strtobool(val: str) -> bool:
     raise ValueError(f'invalid truth value {val!r}')
 
 
-def normalize_username(username) -> Optional[str]:
+def normalize_username(username) -> str | None:
     """Normalize the username.
 
     .. versionadded:: 3.0
@@ -403,36 +412,6 @@ def normalize_username(username) -> Optional[str]:
         return None
     username = re.sub('[_ ]+', ' ', username).strip()
     return first_upper(username)
-
-
-class Version(pkg_Version):
-
-    """Version from pkg_resouce vendor package.
-
-    This Version provides propreties of vendor package 20.4 shipped with
-    setuptools 49.4.0.
-
-    .. versionadded:: 6.4
-    """
-
-    def __getattr__(self, name):
-        """Provides propreties of vendor package 20.4."""
-        if name in ('epoch', 'release', 'pre', ):
-            return getattr(self._version, name)
-        if name in ('post', 'dev'):
-            attr = getattr(self._version, name)
-            return attr[1] if attr else None
-        if name == 'is_devrelease':
-            return self.dev is not None
-
-        parts = ('major', 'minor', 'micro')
-        try:
-            index = parts.index(name)
-        except ValueError:
-            raise AttributeError('{!r} object has to attribute {!r}'
-                                 .format(type(self).__name__, name)) from None
-        release = self.release
-        return release[index] if len(release) >= index + 1 else 0
 
 
 @total_ordering
@@ -510,7 +489,7 @@ class MediaWikiVersion:
         self.version = tuple(components)
 
     @staticmethod
-    def from_generator(generator: str) -> 'MediaWikiVersion':
+    def from_generator(generator: str) -> MediaWikiVersion:
         """Create instance from a site's generator attribute."""
         prefix = 'MediaWiki '
 
@@ -543,44 +522,6 @@ class MediaWikiVersion:
         if self.version != other.version:
             return self.version < other.version
         return self._dev_version < other._dev_version
-
-
-class SelfCallMixin:
-
-    """
-    Return self when called.
-
-    When '_own_desc' is defined it'll also issue a deprecation warning
-    using issue_deprecation_warning('Calling ' + _own_desc, 'it directly').
-
-    .. versionadded:: 3.0
-    .. deprecated:: 6.2
-    """
-
-    def __call__(self):
-        """Do nothing and just return itself."""
-        issue_deprecation_warning('Referencing this attribute like a function',
-                                  'it directly', since='6.2')
-
-        return self
-
-
-class SelfCallDict(SelfCallMixin, dict):
-
-    """Dict with SelfCallMixin.
-
-    .. versionadded:: 3.0
-    .. deprecated:: 6.2
-    """
-
-
-class SelfCallString(SelfCallMixin, str):
-
-    """String with SelfCallMixin.
-
-    .. versionadded:: 3.0
-    .. deprecated:: 6.2
-    """
 
 
 def open_archive(filename: str, mode: str = 'rb', use_extension: bool = True):
@@ -743,9 +684,9 @@ def file_mode_checker(
             warn(warn_str.format(filename, st_mode - stat.S_IFREG, mode))
 
 
-def compute_file_hash(filename: Union[str, os.PathLike],
-                      sha: Union[str, Callable[[], Any]] = 'sha1',
-                      bytes_to_read: Optional[int] = None) -> str:
+def compute_file_hash(filename: str | os.PathLike,
+                      sha: str | Callable[[], Any] = 'sha1',
+                      bytes_to_read: int | None = None) -> str:
     """Compute file hash.
 
     Result is expressed as hexdigest().

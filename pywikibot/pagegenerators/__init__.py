@@ -17,10 +17,12 @@ These parameters are supported to specify which pages titles to print:
 #
 # Distributed under the terms of the MIT license.
 #
-from typing import Any, Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 import pywikibot
-from pywikibot.backports import Callable, Dict, Iterable, Iterator, List, Set
+from pywikibot.backports import Callable, Generator, Iterable
 from pywikibot.pagegenerators._factory import GeneratorFactory
 from pywikibot.pagegenerators._filters import (
     CategoryFilterPageGenerator,
@@ -56,6 +58,7 @@ from pywikibot.pagegenerators._generators import (
     MySQLPageGenerator,
     NewimagesPageGenerator,
     NewpagesPageGenerator,
+    PagePilePageGenerator,
     PagesFromPageidGenerator,
     PagesFromTitlesGenerator,
     PetScanPageGenerator,
@@ -128,6 +131,7 @@ __all__ = (
     'page_with_property_generator',
     'PagesFromPageidGenerator',
     'PagesFromTitlesGenerator',
+    'PagePilePageGenerator',
     'PetScanPageGenerator',
     'PrefixingPageGenerator',
     'RandomPageGenerator',
@@ -395,6 +399,8 @@ GENERATOR OPTIONS
                     "-pageid:'pageid1|pageid2|..'"
                     and supplied multiple times for multiple pages.
 
+-pagepile           Work on a PagePile. Argument is the pile id (an integer)
+
 -linter             Work on pages that contain lint errors. Extension Linter
                     must be available on the site.
                     -linter select all categories.
@@ -523,7 +529,9 @@ FILTER OPTIONS
 
 docuReplacements = {'&params;': parameterHelp}  # noqa: N816
 
-PRELOAD_SITE_TYPE = Dict[pywikibot.site.BaseSite, List[pywikibot.page.Page]]
+if TYPE_CHECKING:
+    PRELOAD_SITE_TYPE = dict[pywikibot.site.BaseSite,
+                             list[pywikibot.page.Page]]
 
 # if a bot uses GeneratorFactory, the module should include the line
 #   docuReplacements = {'&params;': pywikibot.pagegenerators.parameterHelp}
@@ -535,8 +543,8 @@ PRELOAD_SITE_TYPE = Dict[pywikibot.site.BaseSite, List[pywikibot.page.Page]]
 __doc__ = __doc__.replace('&params;', parameterHelp)
 
 
-def PageClassGenerator(generator: Iterable['pywikibot.page.Page']
-                       ) -> Iterator['pywikibot.page.Page']:
+def PageClassGenerator(generator: Iterable[pywikibot.page.Page]
+                       ) -> Generator[pywikibot.page.Page, None, None]:
     """
     Yield pages from another generator as Page subclass objects.
 
@@ -554,9 +562,10 @@ def PageClassGenerator(generator: Iterable['pywikibot.page.Page']
             yield page
 
 
-def PageWithTalkPageGenerator(generator: Iterable['pywikibot.page.Page'],
-                              return_talk_only: bool = False
-                              ) -> Iterator['pywikibot.page.Page']:
+def PageWithTalkPageGenerator(
+    generator: Iterable[pywikibot.page.BasePage],
+    return_talk_only: bool = False,
+) -> Generator[pywikibot.page.BasePage, None, None]:
     """Yield pages and associated talk pages from another generator.
 
     Only yields talk pages if the original generator yields a non-talk page,
@@ -570,11 +579,13 @@ def PageWithTalkPageGenerator(generator: Iterable['pywikibot.page.Page'],
             yield page.toggleTalkPage()
 
 
-def RepeatingGenerator(generator: Callable,  # type: ignore[type-arg]
-                       key_func: Callable[[Any], Any] = lambda x: x,
-                       sleep_duration: int = 60,
-                       total: Optional[int] = None,
-                       **kwargs: Any) -> Iterator['pywikibot.page.Page']:
+def RepeatingGenerator(
+    generator: Callable[..., Iterable[pywikibot.page.BasePage]],
+    key_func: Callable[[pywikibot.page.BasePage], Any] = lambda x: x,
+    sleep_duration: int = 60,
+    total: int | None = None,
+    **kwargs: Any,
+) -> Generator[pywikibot.page.Page, None, None]:
     """Yield items in live time.
 
     The provided generator must support parameter 'start', 'end',
@@ -605,9 +616,10 @@ def RepeatingGenerator(generator: Callable,  # type: ignore[type-arg]
     kwargs.pop('start', None)  # don't set start time
     kwargs.pop('end', None)  # don't set stop time
 
-    seen: Set[Any] = set()
+    seen: set[Any] = set()
     while total is None or len(seen) < total:
-        def filtered_generator() -> Iterable['pywikibot.page.Page']:
+        def filtered_generator() -> Generator[pywikibot.page.BasePage,
+                                              None, None]:
             for item in generator(total=None if seen else 1, **kwargs):
                 key = key_func(item)
                 if key not in seen:
@@ -622,10 +634,10 @@ def RepeatingGenerator(generator: Callable,  # type: ignore[type-arg]
         yield from reversed(list(filtered_generator()))
 
 
-def PreloadingGenerator(generator: Iterable['pywikibot.page.Page'],
+def PreloadingGenerator(generator: Iterable[pywikibot.page.Page],
                         groupsize: int = 50,
                         quiet: bool = False
-                        ) -> Iterator['pywikibot.page.Page']:
+                        ) -> Generator[pywikibot.page.Page, None, None]:
     """Yield preloaded pages taken from another generator.
 
     :param generator: pages to iterate over
@@ -653,10 +665,11 @@ def PreloadingGenerator(generator: Iterable['pywikibot.page.Page'],
         yield from site.preloadpages(pages, groupsize=groupsize, quiet=quiet)
 
 
-def DequePreloadingGenerator(generator: Iterable['pywikibot.page.Page'],
-                             groupsize: int = 50,
-                             quiet: bool = False
-                             ) -> Iterator['pywikibot.page.Page']:
+def DequePreloadingGenerator(
+    generator: DequeGenerator,
+    groupsize: int = 50,
+    quiet: bool = False,
+) -> Generator[pywikibot.page.Page, None, None]:
     """Preload generator of type DequeGenerator.
 
     :param generator: pages to iterate over
@@ -675,9 +688,10 @@ def DequePreloadingGenerator(generator: Iterable['pywikibot.page.Page'],
         yield from PreloadingGenerator(generator, page_count, quiet)
 
 
-def PreloadingEntityGenerator(generator: Iterable['pywikibot.page.Page'],
-                              groupsize: int = 50
-                              ) -> Iterator['pywikibot.page.Page']:
+def PreloadingEntityGenerator(
+    generator: Iterable[pywikibot.page.WikibaseEntity],
+    groupsize: int = 50,
+) -> Generator[pywikibot.page.WikibaseEntity, None, None]:
     """
     Yield preloaded pages taken from another generator.
 
@@ -686,7 +700,8 @@ def PreloadingEntityGenerator(generator: Iterable['pywikibot.page.Page'],
     :param generator: pages to iterate over
     :param groupsize: how many pages to preload at once
     """
-    sites: PRELOAD_SITE_TYPE = {}
+    sites: dict[pywikibot.site.BaseSite,
+                list[pywikibot.page.WikibaseEntity]] = {}
     for page in generator:
         site = page.site
         sites.setdefault(site, []).append(page)

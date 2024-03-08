@@ -4,13 +4,10 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from typing import Optional
-
-import pkg_resources
+from __future__ import annotations
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import removesuffix
 
 
 try:
@@ -20,8 +17,8 @@ except ImportError:
 
 
 def mysql_query(query: str, params=None,
-                dbname: Optional[str] = None,
-                verbose: Optional[bool] = None):
+                dbname: str | None = None,
+                verbose: bool | None = None):
     """Yield rows from a MySQL query.
 
     An example query that yields all ns0 pages might look like::
@@ -55,8 +52,6 @@ def mysql_query(query: str, params=None,
     else:
         credentials = {'read_default_file': config.db_connect_file}
 
-    pymysql_version = pkg_resources.parse_version(
-        removesuffix(pymysql.__version__, '.None'))
     args = {
         'host': config.db_hostname_format.format(dbname),
         'database': config.db_name_format.format(dbname),
@@ -66,9 +61,6 @@ def mysql_query(query: str, params=None,
     }
 
     connection = pymysql.connect(**args, **credentials)
-    if pymysql_version < pkg_resources.parse_version('1.0.0'):
-        from contextlib import closing
-        connection = closing(connection)
 
     with connection as conn, conn.cursor() as cursor:
         if verbose:

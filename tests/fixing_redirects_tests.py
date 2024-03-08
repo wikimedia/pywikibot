@@ -5,6 +5,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import pywikibot
 from scripts.fixing_redirects import FixingRedirectBot
 from tests.aspects import TestCase, unittest
@@ -27,5 +29,5 @@ class TestFixingRedirects(TestCase):
         self.assertEqual(text, new_text)
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     unittest.main()

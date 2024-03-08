@@ -1,9 +1,11 @@
 """Family module for Wikinews."""
 #
-# (C) Pywikibot team, 2005-2023
+# (C) Pywikibot team, 2005-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from pywikibot import family
 
 
@@ -19,11 +21,11 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'bg', 'hu', 'sd', 'th', 'tr',
     ]
 
-    languages_by_size = [
-        'ru', 'sr', 'pt', 'fr', 'en', 'pl', 'zh', 'de', 'es', 'it', 'ar', 'cs',
-        'ca', 'nl', 'el', 'ta', 'li', 'sv', 'uk', 'fa', 'fi', 'ja', 'ro', 'eo',
-        'guw', 'sq', 'no', 'ko', 'bs', 'he',
-    ]
+    codes = {
+        'ar', 'bs', 'ca', 'cs', 'de', 'el', 'en', 'eo', 'es', 'fa', 'fi', 'fr',
+        'guw', 'he', 'it', 'ja', 'ko', 'li', 'nl', 'no', 'pl', 'pt', 'ro',
+        'ru', 'sq', 'sr', 'sv', 'ta', 'uk', 'zh',
+    }
 
     category_redirect_templates = {
         '_default': (),
@@ -50,7 +52,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # TODO: List is incomplete, to be completed for missing languages.
     doc_subpages = {
         '_default': (('/doc', ),
-                     ['en', ]
+                     ['en']
                      ),
         'ar': ('/شرح', '/doc'),
         'it': ('/man', ),

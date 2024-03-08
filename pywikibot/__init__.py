@@ -1,9 +1,11 @@
 """The initialization file for the Pywikibot framework."""
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import atexit
 import datetime
 import re
@@ -12,23 +14,13 @@ import threading
 from contextlib import suppress
 from queue import Queue
 from time import sleep as time_sleep
-from typing import Any, Optional, Union, cast
+from typing import TYPE_CHECKING, Any, cast
 from urllib.parse import urlparse
 from warnings import warn
 
 from pywikibot import config as _config
 from pywikibot import exceptions
-from pywikibot.__metadata__ import (
-    __copyright__,
-    __description__,
-    __download_url__,
-    __license__,
-    __maintainer__,
-    __maintainer_email__,
-    __name__,
-    __url__,
-    __version__,
-)
+from pywikibot.__metadata__ import __copyright__, __url__, __version__
 from pywikibot._wbtypes import (
     Coordinate,
     WbGeoShape,
@@ -38,14 +30,7 @@ from pywikibot._wbtypes import (
     WbTime,
     WbUnknown,
 )
-from pywikibot.backports import (
-    Callable,
-    Dict,
-    List,
-    Tuple,
-    cache,
-    removesuffix,
-)
+from pywikibot.backports import Callable, cache, removesuffix
 from pywikibot.bot import (
     Bot,
     CurrentPageBot,
@@ -72,15 +57,17 @@ from pywikibot.logging import (
     stdout,
     warning,
 )
+from pywikibot.site import BaseSite as _BaseSite
 from pywikibot.time import Timestamp
-from pywikibot.site import APISite, BaseSite
-from pywikibot.tools import PYTHON_VERSION, normalize_username
+from pywikibot.tools import normalize_username
+
+
+if TYPE_CHECKING:
+    from pywikibot.site import APISite
 
 
 __all__ = (
-    '__copyright__', '__description__', '__download_url__', '__license__',
-    '__maintainer__', '__maintainer_email__', '__name__', '__url__',
-    '__version__',
+    '__copyright__', '__url__', '__version__',
     'async_manager', 'async_request', 'Bot', 'calledModuleName', 'Category',
     'Claim', 'Coordinate', 'critical', 'CurrentPageBot', 'debug', 'error',
     'exception', 'FilePage', 'handle_args', 'html2unicode', 'info', 'input',
@@ -88,32 +75,22 @@ __all__ = (
     'LexemeSense', 'Link', 'log', 'MediaInfo', 'output', 'Page',
     'page_put_queue', 'PropertyPage', 'showDiff', 'show_help', 'Site',
     'SiteLink', 'sleep', 'stdout', 'stopme', 'Timestamp', 'translate', 'ui',
-    'url2unicode', 'User', 'warning', 'WbGeoShape', 'WbMonolingualText',
-    'WbQuantity', 'WbTabularData', 'WbTime', 'WbUnknown', 'WikidataBot',
+    'User', 'warning', 'WbGeoShape', 'WbMonolingualText', 'WbQuantity',
+    'WbTabularData', 'WbTime', 'WbUnknown', 'WikidataBot',
 )
 
 # argvu is set by pywikibot.bot when it's imported
 if not hasattr(sys.modules[__name__], 'argvu'):
-    argvu: List[str] = []
+    argvu: list[str] = []
 
 link_regex = re.compile(r'\[\[(?P<title>[^\]|[<>{}]*)(\|.*?)?\]\]')
 
-_sites: Dict[str, APISite] = {}
-
-if PYTHON_VERSION < (3, 7):
-    warn("""
-
-        Python {version} will be dropped soon with Pywikibot 9.0
-        due to vulnerability security alerts.
-        It is recommended to use Python 3.7 or above.
-        See T347026 for further information.
-""".format(version=sys.version.split(maxsplit=1)[0]),
-         FutureWarning)  # adjust this line no in utils.execute()
+_sites: dict[str, APISite] = {}
 
 
 @cache
-def _code_fam_from_url(url: str, name: Optional[str] = None
-                       ) -> Tuple[str, str]:
+def _code_fam_from_url(url: str, name: str | None = None
+                       ) -> tuple[str, str]:
     """Set url to cache and get code and family from cache.
 
     Site helper method.
@@ -142,11 +119,11 @@ def _code_fam_from_url(url: str, name: Optional[str] = None
     return matched_sites[0]
 
 
-def Site(code: Optional[str] = None,  # noqa: 134
-         fam: Union[str, 'Family', None] = None,
-         user: Optional[str] = None, *,
-         interface: Union[str, 'BaseSite', None] = None,
-         url: Optional[str] = None) -> BaseSite:
+def Site(code: str | None = None,  # noqa: N802
+         fam: str | Family | None = None,
+         user: str | None = None, *,
+         interface: str | _BaseSite | None = None,
+         url: str | None = None) -> _BaseSite:
     """A factory method to obtain a Site object.
 
     Site objects are cached and reused by this method.
@@ -257,7 +234,7 @@ def Site(code: Optional[str] = None,  # noqa: 134
         else:
             interface = getattr(tmp, interface)
 
-    if not issubclass(interface, BaseSite):
+    if not issubclass(interface, _BaseSite):
         warning(f'Site called with interface={interface.__name__}')
 
     user = normalize_username(user)
@@ -289,7 +266,6 @@ from pywikibot.page import (  # noqa: E402
     SiteLink,
     User,
     html2unicode,
-    url2unicode,
 )
 
 
@@ -346,7 +322,7 @@ def _flush(stop: bool = True) -> None:
     """
     debug('_flush() called')
 
-    def remaining() -> Tuple[int, datetime.timedelta]:
+    def remaining() -> tuple[int, datetime.timedelta]:
         remaining_pages = page_put_queue.qsize()
         if stop:
             # -1 because we added a None element to stop the queue

@@ -4,11 +4,12 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import os
 import stat
 import sys
 from pathlib import Path
-from typing import Optional
 
 
 is_daemon = False
@@ -16,7 +17,7 @@ is_daemon = False
 
 def daemonize(close_fd: bool = True,
               chdir: bool = True,
-              redirect_std: Optional[str] = None) -> None:
+              redirect_std: str | None = None) -> None:
     """Daemonize the current process.
 
     Only works on POSIX compatible operating systems.

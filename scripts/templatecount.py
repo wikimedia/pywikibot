@@ -33,15 +33,14 @@ Lists all the category pages that transclude {{cfd}} and {{cfdu}}:
 
 """
 #
-# (C) Pywikibot team, 2006-2022
+# (C) Pywikibot team, 2006-2024
 #
 # Distributed under the terms of the MIT license.
 #
-import datetime
-from typing import Generator
+from __future__ import annotations
 
 import pywikibot
-from pywikibot.backports import Dict, List, Tuple
+from pywikibot.backports import Generator
 
 
 class TemplateCountRobot:
@@ -71,8 +70,8 @@ class TemplateCountRobot:
             pywikibot.stdout(formatstr.format(key, count))
             total += count
         pywikibot.stdout(formatstr.format('TOTAL', total))
-        pywikibot.stdout('Report generated on {}'
-                         .format(datetime.datetime.utcnow().isoformat()))
+        pywikibot.stdout(
+            f'Report generated on {pywikibot.Timestamp.nowutc().isoformat()}')
 
     @classmethod
     def list_templates(cls, templates, namespaces) -> None:
@@ -98,12 +97,12 @@ class TemplateCountRobot:
                 pywikibot.stdout(page.title())
                 total += 1
         pywikibot.info(f'Total page count: {total}')
-        pywikibot.stdout('Report generated on {}'
-                         .format(datetime.datetime.utcnow().isoformat()))
+        pywikibot.stdout(
+            f'Report generated on {pywikibot.Timestamp.nowutc().isoformat()}')
 
     @classmethod
-    def template_dict(cls, templates, namespaces) -> Dict[
-            str, List[pywikibot.Page]]:
+    def template_dict(cls, templates, namespaces) -> dict[
+            str, list[pywikibot.Page]]:
         """
         Create a dict of templates and its transcluded pages.
 
@@ -119,7 +118,7 @@ class TemplateCountRobot:
 
     @staticmethod
     def template_dict_generator(templates, namespaces) -> Generator[
-            Tuple[str, List[pywikibot.Page]], None, None]:
+            tuple[str, list[pywikibot.Page]], None, None]:
         """
         Yield transclusions of each template in 'templates'.
 

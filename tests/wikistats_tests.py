@@ -5,6 +5,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import sys
 import unittest
 from contextlib import suppress
@@ -71,8 +73,7 @@ class WikiStatsTestCase(TestCase):
             curr = int(data[code]['good'])
             self.assertGreaterEqual(
                 last, curr,
-                '{} ({}) is greater than {} ({}).'
-                .format(code, curr, last_code, last))
+                f'{code} ({curr}) is greater than {last_code} ({last}).')
             last = curr
             last_code = code
 
@@ -107,6 +108,6 @@ class WikiStatsTestCase(TestCase):
         self.assertIn('total', data)
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

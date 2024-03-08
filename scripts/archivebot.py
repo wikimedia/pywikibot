@@ -121,6 +121,8 @@ Options (may be omitted):
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import datetime
 import locale
 import os
@@ -130,15 +132,16 @@ import threading
 import time
 from collections import OrderedDict, defaultdict
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import nullcontext
 from hashlib import md5
 from math import ceil
 from textwrap import fill
-from typing import Any, Optional, Pattern, Union
+from typing import Any, Pattern
 from warnings import warn
 
 import pywikibot
 from pywikibot import i18n
-from pywikibot.backports import List, Set, Tuple, nullcontext, pairwise
+from pywikibot.backports import pairwise
 from pywikibot.exceptions import Error, NoPageError
 from pywikibot.textlib import (
     TimeStripper,
@@ -149,10 +152,6 @@ from pywikibot.textlib import (
 )
 from pywikibot.time import MW_KEYS, parse_duration, str2timedelta
 from pywikibot.tools import PYTHON_VERSION
-
-
-ShouldArchive = Tuple[str, str]
-Size = Tuple[int, str]
 
 
 class ArchiveBotSiteConfigError(Error):
@@ -200,7 +199,7 @@ def str2localized_duration(site, string: str) -> str:
     return to_local_digits(string, site.code)
 
 
-def str2size(string: str) -> Size:
+def str2size(string: str) -> tuple[int, str]:
     """Return a size for a shorthand size.
 
     Accepts a string defining a size::
@@ -346,9 +345,9 @@ class DiscussionPage(pywikibot.Page):
 
     @staticmethod
     def max(
-        ts1: Optional[pywikibot.Timestamp],
-        ts2: Optional[pywikibot.Timestamp]
-    ) -> Optional[pywikibot.Timestamp]:
+        ts1: pywikibot.Timestamp | None,
+        ts2: pywikibot.Timestamp | None
+    ) -> pywikibot.Timestamp | None:
         """Calculate the maximum of two timestamps but allow None as value.
 
         .. versionadded:: 7.6
@@ -418,7 +417,7 @@ class DiscussionPage(pywikibot.Page):
         if pywikibot.calledModuleName() not in ['archivebot_tests', 'setup']:
             pywikibot.info(f'{len(self.threads)} thread(s) found on {self}')
 
-    def is_full(self, max_archive_size: Size) -> bool:
+    def is_full(self, max_archive_size: tuple[int, str]) -> bool:
         """Check whether archive size exceeded."""
         if self.full:
             return True
@@ -432,7 +431,7 @@ class DiscussionPage(pywikibot.Page):
         return self.full
 
     def feed_thread(self, thread: DiscussionThread,
-                    max_archive_size: Size) -> bool:
+                    max_archive_size: tuple[int, str]) -> bool:
         """Append a new thread to the archive."""
         self.threads.append(thread)
         self.archived_threads += 1
@@ -536,7 +535,7 @@ class PageArchiver:
                      ResourceWarning, stacklevel=2)
         self.attributes[attr] = [value, out]
 
-    def saveables(self) -> List[str]:
+    def saveables(self) -> list[str]:
         """Return a list of saveable attributes."""
         return [a for a in self.attributes if self.attributes[a][1]
                 and a != 'maxage']
@@ -578,7 +577,7 @@ class PageArchiver:
                     f'Missing argument {field!r} in template')
 
     def should_archive_thread(self, thread: DiscussionThread
-                              ) -> Optional[ShouldArchive]:
+                              ) -> tuple[str, str] | None:
         """Check whether a thread has to be archived.
 
         :return: the archivation reason as a tuple of localization args
@@ -648,7 +647,7 @@ class PageArchiver:
             self.get_archive_page(pattern % params, params)
         list(self.site.preloadpages(self.archives.values()))
 
-    def analyze_page(self) -> Set[ShouldArchive]:
+    def analyze_page(self) -> set[tuple[str, str]]:
         """Analyze DiscussionPage."""
         max_size = self.get_attr('maxarchivesize')
         max_arch_size = str2size(max_size)
@@ -975,7 +974,7 @@ def main(*args: str) -> None:
                     if not exiting.is_set():
                         continue
 
-                    canceled: Union[str, int] = ''
+                    canceled: str | int = ''
                     pywikibot.info(
                         '<<lightyellow>>Canceling pending Futures... ',
                         newline=False)

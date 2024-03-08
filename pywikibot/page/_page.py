@@ -13,6 +13,7 @@ various pages for Proofread Extensions are defined in
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
 
 import pywikibot
 from pywikibot import textlib

@@ -8,13 +8,13 @@ exclude_lines =
     except ImportError
     except KeyboardInterrupt
     except OSError
-    except pkg_resources
     except \w*ServerError
     except SyntaxError
     raise ImportError
     raise NotImplementedError
     raise unittest\.SkipTest
     self\.skipTest
+    if __name__ == '__main__':
     if .+PYWIKIBOT_TEST_\w+.+:
     if self\.mw_version < .+:
     if TYPE_CHECKING:

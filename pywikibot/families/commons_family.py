@@ -4,6 +4,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from pywikibot import family
 
 
@@ -24,6 +26,9 @@ class Family(family.WikimediaFamily, family.DefaultWikibaseFamily):
         'test': 'test-commons.wikimedia.org',
         'beta': 'commons.wikimedia.beta.wmflabs.org'
     }
+
+    # Sites we want to edit but not count as real languages
+    test_codes = ['test', 'beta']
 
     interwiki_forward = 'wikipedia'
 

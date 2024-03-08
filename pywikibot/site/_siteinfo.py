@@ -1,18 +1,19 @@
 """Objects representing site info data contents."""
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import copy
 import datetime
 import re
 from collections.abc import Container
 from contextlib import suppress
-from typing import Any, Optional, Union
+from typing import Any
 
 import pywikibot
-from pywikibot.backports import Dict, List
 from pywikibot.exceptions import APIError
 from pywikibot.tools.collections import EMPTY_DEFAULT
 
@@ -59,7 +60,7 @@ class Siteinfo(Container):
     def __init__(self, site) -> None:
         """Initialise it with an empty cache."""
         self._site = site
-        self._cache: Dict[str, Any] = {}
+        self._cache: dict[str, Any] = {}
 
     def clear(self) -> None:
         """Remove all items from Siteinfo.
@@ -81,7 +82,7 @@ class Siteinfo(Container):
             if prop in ('namespaces', 'magicwords'):
                 for index, value in enumerate(data):
                     # namespaces uses a dict, while magicwords uses a list
-                    key = index if type(data) is list else value
+                    key = index if isinstance(data, list) else value
                     for p in Siteinfo.BOOLEAN_PROPS[prop]:
                         data[key][p] = p in data[key]
             else:
@@ -120,7 +121,7 @@ class Siteinfo(Container):
         if not props:
             raise ValueError('At least one property name must be provided.')
 
-        invalid_properties: List[str] = []
+        invalid_properties: list[str] = []
         request = self._site._request(
             expiry=pywikibot.config.API_config_expiry
             if expiry is False else expiry,
@@ -136,33 +137,34 @@ class Siteinfo(Container):
         except APIError as e:
             if e.code == 'siunknown_siprop':
                 if len(props) == 1:
-                    pywikibot.log(
-                        f"Unable to get siprop '{props[0]}'")
+                    pywikibot.log(f"Unable to get siprop '{props[0]}'")
                     return {props[0]: (EMPTY_DEFAULT, False)}
+
                 pywikibot.log('Unable to get siteinfo, because at least '
-                              "one property is unknown: '{}'".format(
-                                  "', '".join(props)))
+                              "one property is unknown: '{}'"
+                              .format("', '".join(props)))
                 results = {}
                 for prop in props:
                     results.update(self._get_siteinfo(prop, expiry))
                 return results
             raise
-        else:
-            result = {}
-            if invalid_properties:
-                for prop in invalid_properties:
-                    result[prop] = (EMPTY_DEFAULT, False)
-                pywikibot.log("Unable to get siprop(s) '{}'".format(
-                    "', '".join(invalid_properties)))
-            if 'query' in data:
-                # If the request is a CachedRequest, use the _cachetime attr.
-                cache_time = getattr(
-                    request, '_cachetime', None) or datetime.datetime.utcnow()
-                for prop in props:
-                    if prop in data['query']:
-                        self._post_process(prop, data['query'][prop])
-                        result[prop] = (data['query'][prop], cache_time)
-            return result
+
+        result = {}
+        if invalid_properties:
+            for prop in invalid_properties:
+                result[prop] = (EMPTY_DEFAULT, False)
+            pywikibot.log("Unable to get siprop(s) '{}'"
+                          .format("', '".join(invalid_properties)))
+
+        if 'query' in data:
+            # If the request is a CachedRequest, use the _cachetime attr.
+            cache_time = getattr(
+                request, '_cachetime', None) or pywikibot.Timestamp.nowutc()
+            for prop in props:
+                if prop in data['query']:
+                    self._post_process(prop, data['query'][prop])
+                    result[prop] = (data['query'][prop], cache_time)
+        return result
 
     @staticmethod
     def _is_expired(cache_date, expire):
@@ -174,7 +176,7 @@ class Siteinfo(Container):
             return True
 
         # cached date + expiry are in the past if it's expired
-        return cache_date + expire < datetime.datetime.utcnow()
+        return cache_date + expire < pywikibot.Timestamp.nowutc()
 
     def _get_general(self, key: str, expiry):
         """
@@ -225,7 +227,7 @@ class Siteinfo(Container):
         key: str,
         get_default: bool = True,
         cache: bool = True,
-        expiry: Union[datetime.datetime, float, bool] = False
+        expiry: datetime.datetime | float | bool = False
     ) -> Any:
         """
         Return a siteinfo property.
@@ -317,7 +319,7 @@ class Siteinfo(Container):
         else:
             return True
 
-    def is_recognised(self, key: str) -> Optional[bool]:
+    def is_recognised(self, key: str) -> bool | None:
         """Return if 'key' is a valid property name. 'None' if not cached."""
         time = self.get_requested_time(key)
         return None if time is None else bool(time)

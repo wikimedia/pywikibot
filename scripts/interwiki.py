@@ -328,10 +328,12 @@ that you have to break it off, use "-continue" next time.
 
 """
 #
-# (C) Pywikibot team, 2003-2023
+# (C) Pywikibot team, 2003-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import codecs
 import os
 import re
@@ -339,7 +341,6 @@ import sys
 from collections import Counter, defaultdict
 from contextlib import suppress
 from textwrap import fill
-from typing import Optional
 
 import pywikibot
 from pywikibot import (
@@ -356,6 +357,7 @@ from pywikibot.cosmetic_changes import moved_links
 from pywikibot.exceptions import (
     EditConflictError,
     Error,
+    InvalidPageError,
     InvalidTitleError,
     LockedPageError,
     NoCreateError,
@@ -819,6 +821,21 @@ class Subject(interwiki_graph.Subject):
             or self.namespaceMismatch(page, target, counter) \
             or self.wiktionaryMismatch(target)
 
+    def get_alternative(
+        self,
+        site: pywikibot.site.BaseSite
+    ) -> pywikibot.Page | None:
+        """Ask for an alternative Page for a given site.
+
+        :param site: a BaseSite
+        """
+        title = pywikibot.input(f'Give the alternative page for code '
+                                f'{site.code!r} (without site code)')
+        if title:
+            return pywikibot.Page(site, title)
+
+        return None
+
     def namespaceMismatch(self, linkingPage, linkedPage, counter) -> bool:
         """
         Check whether or not the given page has a different namespace.
@@ -834,9 +851,9 @@ class Subject(interwiki_graph.Subject):
             # Allow for a mapping between different namespaces
             crossFrom = self.origin.site.family.crossnamespace.get(
                 self.origin.namespace(), {})
-            crossTo = crossFrom.get(self.origin.site.lang,
+            crossTo = crossFrom.get(self.origin.site.code,
                                     crossFrom.get('_default', {}))
-            nsmatch = crossTo.get(linkedPage.site.lang,
+            nsmatch = crossTo.get(linkedPage.site.code,
                                   crossTo.get('_default', []))
             if linkedPage.namespace() in nsmatch:
                 return False
@@ -877,15 +894,10 @@ class Subject(interwiki_graph.Subject):
                 if choice == 'g':
                     self.makeForcedStop(counter)
                 elif choice == 'a':
-                    newHint = pywikibot.input(
-                        'Give the alternative for language {}, not '
-                        'using a language code:'
-                        .format(linkedPage.site.lang))
-                    if newHint:
-                        alternativePage = pywikibot.Page(
-                            linkedPage.site, newHint)
+                    alternative_page = self.get_alternative(linkedPage.site)
+                    if alternative_page:
                         # add the page that was entered by the user
-                        self.addIfNew(alternativePage, counter, None)
+                        self.addIfNew(alternative_page, counter, None)
                 else:
                     pywikibot.info(
                         f'NOTE: ignoring {linkedPage} and its interwiki links')
@@ -984,11 +996,8 @@ class Subject(interwiki_graph.Subject):
                 return (True, None)
 
             if choice == 'a':
-                newHint = pywikibot.input(
-                    f'Give the alternative for language {page.site.lang}, '
-                    f'not using a language code:')
-                alternativePage = pywikibot.Page(page.site, newHint)
-                return (True, alternativePage)
+                alternative_page = self.get_alternative(page.site)
+                return (True, alternative_page)
 
             if choice == 'g':
                 self.makeForcedStop(counter)
@@ -999,7 +1008,7 @@ class Subject(interwiki_graph.Subject):
 
     def isIgnored(self, page) -> bool:
         """Return True if pages is to be ignored."""
-        if page.site.lang in self.conf.neverlink:
+        if page.site.code in self.conf.neverlink:
             pywikibot.info(f'Skipping link {page} to an ignored language')
             return True
 
@@ -1106,9 +1115,16 @@ class Subject(interwiki_graph.Subject):
 
     def check_page(self, page, counter) -> None:
         """Check whether any iw links should be added to the todo list."""
-        if not page.exists():
+        try:
+            ok = page.exists()
+        except InvalidPageError as e:  # T357953
+            msg = str(e)
+            ok = False
+        else:
+            msg = f'{page} does not exist.'
+        if not ok:
             self.conf.remove.append(str(page))
-            self.conf.note(f'{page} does not exist. Skipping.')
+            self.conf.note(f'{msg} Skipping.')
             if page == self.origin:
                 # The page we are working on is the page that does not
                 # exist. No use in doing any work on it in that case.
@@ -1174,7 +1190,7 @@ class Subject(interwiki_graph.Subject):
                 # Ignore the interwiki links.
                 iw = ()
             if self.conf.lacklanguage \
-               and self.conf.lacklanguage in (link.site.lang for link in iw):
+               and self.conf.lacklanguage in (link.site.code for link in iw):
                 iw = ()
                 self.workonme = False
             if len(iw) < self.conf.minlinks:
@@ -1260,10 +1276,9 @@ class Subject(interwiki_graph.Subject):
                 if dictName is not None:
                     if self.origin:
                         pywikibot.warning(
-                            '{}:{} relates to {}:{}, which is an '
-                            'auto entry {}({})'
-                            .format(self.origin.site.lang, self.origin,
-                                    page.site.lang, page, dictName, year))
+                            f'{self.origin.site.code}:{self.origin} relates '
+                            f'to {page.site.code}:{page}, which is an auto '
+                            f'entry {dictName}({year})')
 
                     # Abort processing if the bot is running in autonomous mode
                     if self.conf.autonomous:
@@ -1310,7 +1325,12 @@ class Subject(interwiki_graph.Subject):
         # Each value will be a list of pages.
         new = defaultdict(list)
         for page in self.done:
-            if page.exists() and not page.isRedirectPage() \
+            try:
+                ok = page.exists()
+            except InvalidPageError:  # T357953
+                continue
+
+            if ok and not page.isRedirectPage() \
                and not page.isCategoryRedirect():
                 site = page.site
                 if site.family.interwiki_forward:
@@ -1462,7 +1482,7 @@ class Subject(interwiki_graph.Subject):
         lclSiteDone = False
         frgnSiteDone = False
 
-        for code in lclSite.family.languages_by_size:
+        for code in lclSite.family.codes:
             site = pywikibot.Site(code, lclSite.family)
             if not lclSiteDone and site == lclSite \
                or (not frgnSiteDone and site != lclSite and site in new):
@@ -1827,7 +1847,7 @@ class InterwikiBot:
         self.generateUntil = until
 
     @property
-    def dump_titles(self):
+    def dump_titles(self) -> Iterable[str]:
         """Return generator of titles for dump file."""
         return (s.origin.title(as_link=True) for s in self.subjects)
 
@@ -1892,7 +1912,7 @@ class InterwikiBot:
         # for loop was exited by break statement
         self.pageGenerator = None
 
-    def firstSubject(self) -> Optional[Subject]:
+    def firstSubject(self) -> Subject | None:
         """Return the first subject that is still being worked on."""
         return self.subjects[0] if self.subjects else None
 
@@ -1984,10 +2004,15 @@ class InterwikiBot:
         # Get the content of the assembled list in one blow
         gen = site.preloadpages(pageGroup, templates=True, langlinks=True,
                                 pageprops=True, quiet=False)
-        for _ in gen:
-            # we don't want to do anything with them now. The
-            # page contents will be read via the Subject class.
-            pass
+        while True:
+            # we don't want to do anything with them now.
+            # The page contents will be read via the Subject class.
+            try:
+                next(gen)
+            except StopIteration:
+                break
+            except InvalidTitleError:  # T357953
+                pass
 
         # Tell all of the subjects that the promised work is done
         for subject in subjectGroup:

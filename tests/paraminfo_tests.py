@@ -5,6 +5,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from pywikibot.family import WikimediaFamily
 from pywikibot.page import Claim, Property
 from pywikibot.site import DataSite
@@ -243,5 +245,5 @@ class WikibaseKnownTypesTests(KnownTypesTestBase,
         self._check_param_values(self.repo, 'wbgetclaims', 'rank', known)
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     unittest.main()

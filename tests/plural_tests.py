@@ -5,6 +5,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import unittest
 from contextlib import suppress
 
@@ -45,7 +47,7 @@ class MetaPluralRulesTest(MetaTestCaseClass):
             return test_static_rule
 
         for lang, rule in plural.plural_rules.items():
-            cls.add_method(dct, 'test_{}'.format(lang.replace('-', '_')),
+            cls.add_method(dct, f"test_{lang.replace('-', '_')}",
                            create_test(rule),
                            doc_suffix=f'for "{lang}"')
         return super().__new__(cls, name, bases, dct)
@@ -61,6 +63,6 @@ class TestPluralRules(TestCase, metaclass=MetaPluralRulesTest):
     max_num = 1000
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

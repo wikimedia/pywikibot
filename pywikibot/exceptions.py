@@ -174,11 +174,13 @@ UserWarning: warnings targeted at users
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import re
-from typing import Any, Optional, Union
+from typing import Any
 
 import pywikibot
-from pywikibot.tools import ModuleDeprecationWrapper, issue_deprecation_warning
+from pywikibot.tools import ModuleDeprecationWrapper
 from pywikibot.tools._deprecate import _NotImplementedWarning
 
 
@@ -201,7 +203,7 @@ class Error(Exception):
 
     """Pywikibot error."""
 
-    def __init__(self, arg: Union[Exception, str]) -> None:
+    def __init__(self, arg: Exception | str) -> None:
         """Initializer."""
         self.unicode = str(arg)
 
@@ -256,8 +258,8 @@ class UploadError(APIError):
     """Upload failed with a warning message (passed as the argument)."""
 
     def __init__(self, code: str, message: str,
-                 file_key: Optional[str] = None,
-                 offset: Union[int, bool] = 0) -> None:
+                 file_key: str | None = None,
+                 offset: int | bool = 0) -> None:
         """
         Create a new UploadError instance.
 
@@ -289,8 +291,8 @@ class PageRelatedError(Error):
     # Override this in subclasses.
     message = ''
 
-    def __init__(self, page: 'pywikibot.page.BasePage',
-                 message: Optional[str] = None) -> None:
+    def __init__(self, page: pywikibot.page.BasePage,
+                 message: str | None = None) -> None:
         """
         Initializer.
 
@@ -308,13 +310,6 @@ class PageRelatedError(Error):
 
         if re.search(r'\{\w+\}', self.message):
             msg = self.message.format_map(self.__dict__)
-        elif re.search(r'%\(\w+\)s', self.message):
-            issue_deprecation_warning("'%' style messages are deprecated, "
-                                      'please use str.format() style instead',
-                                      since='6.2.0')
-            msg = self.message % self.__dict__
-        elif '%s' in self.message:
-            msg = self.message % page
         else:
             msg = self.message.format(page)
 
@@ -334,8 +329,8 @@ class OtherPageSaveError(PageSaveRelatedError):
 
     message = 'Edit to page {title} failed:\n{reason}'
 
-    def __init__(self, page: 'pywikibot.page.BasePage',
-                 reason: Union[str, Exception]) -> None:
+    def __init__(self, page: pywikibot.page.BasePage,
+                 reason: str | Exception) -> None:
         """Initializer.
 
         :param reason: Details of the problem
@@ -387,7 +382,7 @@ class InconsistentTitleError(PageLoadRelatedError):
 
     """Page receives a title inconsistent with query."""
 
-    def __init__(self, page: 'pywikibot.page.BasePage', actual: str) -> None:
+    def __init__(self, page: pywikibot.page.BasePage, actual: str) -> None:
         """Initializer.
 
         :param page: Page that caused the exception
@@ -407,7 +402,7 @@ class NoSiteLinkError(PageLoadRelatedError, NoPageError):
        :exc:`NoPageError` dependency.
     """
 
-    def __init__(self, page: 'pywikibot.page.ItemPage', dbname: str) -> None:
+    def __init__(self, page: pywikibot.page.ItemPage, dbname: str) -> None:
         """Initializer.
 
         :param page: ItemPage that caused the exception
@@ -483,8 +478,8 @@ class InterwikiRedirectPageError(PageRelatedError):
                'Page: {page}\n'
                'Target page: {target_page} on {target_site}.')
 
-    def __init__(self, page: 'pywikibot.page.BasePage',
-                 target_page: 'pywikibot.page.BasePage') -> None:
+    def __init__(self, page: pywikibot.page.BasePage,
+                 target_page: pywikibot.page.BasePage) -> None:
         """Initializer.
 
         :param target_page: Target page of the redirect.
@@ -578,7 +573,7 @@ class AbuseFilterDisallowedError(PageSaveRelatedError):
     message = ('Edit to page {title} disallowed by the AbuseFilter.\n'
                '{info}')
 
-    def __init__(self, page: 'pywikibot.page.BasePage', info: str) -> None:
+    def __init__(self, page: pywikibot.page.BasePage, info: str) -> None:
         """Initializer."""
         self.info = info
         super().__init__(page)
@@ -591,7 +586,7 @@ class SpamblacklistError(PageSaveRelatedError):
     message = ('Edit to page {title} rejected by spam filter due to '
                'content:\n{url}')
 
-    def __init__(self, page: 'pywikibot.page.BasePage', url: str) -> None:
+    def __init__(self, page: pywikibot.page.BasePage, url: str) -> None:
         """Initializer."""
         self.url = url
         super().__init__(page)
@@ -691,7 +686,7 @@ class NoWikibaseEntityError(WikiBaseError):
 
     """This entity doesn't exist."""
 
-    def __init__(self, entity: 'pywikibot.page.WikibaseEntity') -> None:
+    def __init__(self, entity: pywikibot.page.WikibaseEntity) -> None:
         """
         Initializer.
 

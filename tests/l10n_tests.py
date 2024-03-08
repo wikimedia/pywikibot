@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Test valid templates."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import unittest
 from contextlib import suppress
 from itertools import chain
@@ -68,18 +70,16 @@ class TestValidTemplateMeta(MetaTestCaseClass):
 
         # create test methods for package messages processed by unittest
         site = pywikibot.Site(dct['code'], dct['family'])
-        codes = site.family.languages_by_size
+        codes = site.family.codes
         del site
         for package in PACKAGES:
             keys = i18n.twget_keys(package)
             for code in codes:
                 current_site = pywikibot.Site(code, dct['family'])
-                test_name = ('test_{}_{}'
-                             .format(package, code)).replace('-', '_')
+                test_name = f'test_{package}_{code}'.replace('-', '_')
                 cls.add_method(
                     dct, test_name, test_method(current_site, package),
-                    doc_suffix='{} and language {}'.format(
-                        package, code))
+                    doc_suffix=f'{package} and language {code}')
 
         return super().__new__(cls, name, bases, dct)
 
@@ -129,11 +129,12 @@ class TestPackages(TestCase):
                     for key in bundle.keys():
                         if key == '@metadata':
                             continue
-                        self.assertTrue(key.startswith(dirname),
-                                        '{!r} does not start with {!r}'
-                                        .format(key, dirname))
+                        self.assertTrue(
+                            key.startswith(dirname),
+                            f'{key!r} does not start with {dirname!r}'
+                        )
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

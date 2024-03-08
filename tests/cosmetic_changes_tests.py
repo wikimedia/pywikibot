@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 """Test cosmetic_changes module."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import unittest
 from contextlib import suppress
 
 from pywikibot import Page
 from pywikibot.cosmetic_changes import CANCEL, CosmeticChangesToolkit
-from pywikibot.site._namespace import NamespacesDict
-from pywikibot.tools import has_module
-from tests.aspects import TestCase
+from pywikibot.site import NamespacesDict
+from tests.aspects import TestCase, require_modules
 
 
 class TestCosmeticChanges(TestCase):
@@ -546,6 +547,7 @@ class TestCosmeticChangesPersian(TestCosmeticChanges):
         # Once numbering fixes are enabled we can add tests.
 
 
+@require_modules('stdnum')
 class TestCosmeticChangesISBN(TestCosmeticChanges):
 
     """Test CosmeticChanges ISBN fix."""
@@ -558,13 +560,6 @@ class TestCosmeticChangesISBN(TestCosmeticChanges):
     ISBN_INVALIDCHECKERROR_RE = 'checksum or check digit is invalid'
     ISBN_INVALIDCHARERROR_RE = 'ISBN [0-9a-zA-Z]+ contains invalid characters'
     ISBN_INVALIDLENGTHERROR_RE = 'The number has an invalid length'
-
-    @classmethod
-    def setUpClass(cls):
-        """Skip tests if isbn libraries are missing."""
-        if not has_module('stdnum', version='1.18'):
-            raise unittest.SkipTest('python-stdnum is not available.')
-        super().setUpClass()
 
     def test_valid_isbn(self):
         """Test ISBN."""
@@ -623,6 +618,6 @@ class TestCosmeticChangesISBN(TestCosmeticChanges):
         self.cct.ignore = safe_ignore
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

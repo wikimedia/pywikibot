@@ -46,6 +46,8 @@ Commandline parameters:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import time
 from collections import defaultdict
 from contextlib import suppress
@@ -56,6 +58,7 @@ import pywikibot
 from pywikibot import pagegenerators
 from pywikibot.backports import Container, removeprefix
 from pywikibot.bot import BaseBot, suggest_help
+from pywikibot.site import Namespace
 
 
 def verbose_output(string) -> None:
@@ -214,7 +217,7 @@ class PatrolBot(BaseBot):
                 continue
 
             obj = pywikibot.Link(node.title, self.site)
-            if obj.namespace == -1:
+            if obj.namespace == Namespace.SPECIAL:
                 # the parser accepts 'special:prefixindex/' as a wildcard
                 # this allows a prefix that doesn't match an existing page
                 # to be a blue link, and can be clicked to see what pages
@@ -229,7 +232,7 @@ class PatrolBot(BaseBot):
                         verbose_output('Whitelist prefixindex hack for: '
                                        + page)
 
-            elif obj.namespace == 2 and not current_user:
+            elif obj.namespace == Namespace.USER and not current_user:
                 # if a target user hasn't been found yet, and the link is
                 # 'user:'
                 # the user will be the target of subsequent rules

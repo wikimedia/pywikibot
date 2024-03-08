@@ -24,6 +24,8 @@ argument, which is a string indicating the debugging layer.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import logging
 import os
 import sys
@@ -32,7 +34,7 @@ import sys
 from logging import CRITICAL, DEBUG, ERROR, INFO, WARNING
 from typing import Any
 
-from pywikibot.backports import Callable, List, Tuple
+from pywikibot.backports import Callable
 from pywikibot.tools import deprecated_args, issue_deprecation_warning
 
 
@@ -46,7 +48,7 @@ INPUT = 25  #:
 .. seealso:: :python:`Python Logging Levels<logging.html#logging-levels>`
 """
 
-_init_routines: List[Callable[[], Any]] = []
+_init_routines: list[Callable[[], Any]] = []
 _inited_routines = set()
 
 
@@ -107,7 +109,7 @@ def logoutput(msg: Any,
     if _init_routines:
         _init()
 
-    keys: Tuple[str, ...]
+    keys: tuple[str, ...]
     # cleanup positional args
     if level == ERROR:
         keys = ('decoder', 'newline', 'exc_info')

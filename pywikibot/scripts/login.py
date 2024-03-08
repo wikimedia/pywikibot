@@ -51,18 +51,19 @@ subdirectory.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import datetime
 from concurrent.futures import ThreadPoolExecutor
-from contextlib import suppress
+from contextlib import nullcontext, suppress
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Tuple, nullcontext
 from pywikibot.exceptions import NoUsernameError, SiteDefinitionError
 from pywikibot.login import OauthLoginManager
 
 
-def _get_consumer_token(site) -> Tuple[str, str]:
+def _get_consumer_token(site) -> tuple[str, str]:
     key_msg = f'OAuth consumer key on {site.code}:{site.family}'
     key = pywikibot.input(key_msg)
     secret_msg = f'OAuth consumer secret for consumer {key}'

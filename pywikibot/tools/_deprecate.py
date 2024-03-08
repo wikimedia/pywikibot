@@ -23,6 +23,8 @@ a deprecator without any arguments.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import collections
 import inspect
 import re
@@ -31,7 +33,7 @@ import types
 from contextlib import suppress
 from importlib import import_module
 from inspect import getfullargspec
-from typing import Any, Optional, Union
+from typing import Any
 from warnings import warn
 
 
@@ -161,7 +163,7 @@ def add_full_name(obj):
     return outer_wrapper
 
 
-def _build_msg_string(instead: Optional[str], since: Optional[str]) -> str:
+def _build_msg_string(instead: str | None, since: str | None) -> str:
     """Build a deprecation warning message format string.
 
     .. versionadded:: 3.0
@@ -183,10 +185,10 @@ def _build_msg_string(instead: Optional[str], since: Optional[str]) -> str:
 
 
 def issue_deprecation_warning(name: str,
-                              instead: Optional[str] = None,
+                              instead: str | None = None,
                               depth: int = 2, *,
-                              warning_class: Optional[type] = None,
-                              since: Optional[str] = None):
+                              warning_class: type | None = None,
+                              since: str | None = None):
     """Issue a deprecation warning.
 
     .. versionchanged:: 7.0
@@ -302,7 +304,7 @@ def deprecated(*args, **kwargs):
     return decorator
 
 
-def deprecate_arg(old_arg: str, new_arg: Union[str, None, bool]):
+def deprecate_arg(old_arg: str, new_arg: str | bool | None):
     """Decorator to declare old_arg deprecated and replace it with new_arg.
 
     Usage:
@@ -488,10 +490,10 @@ def remove_last_args(arg_names):
 
 
 def redirect_func(target, *,
-                  source_module: Optional[str] = None,
-                  target_module: Optional[str] = None,
-                  old_name: Optional[str] = None,
-                  class_name: Optional[str] = None,
+                  source_module: str | None = None,
+                  target_module: str | None = None,
+                  old_name: str | None = None,
+                  class_name: str | None = None,
                   since: str = '',
                   future_warning: bool = True):
     """
@@ -556,17 +558,15 @@ class ModuleDeprecationWrapper(types.ModuleType):
 
     """A wrapper for a module to deprecate classes or variables of it."""
 
-    def __init__(self, module) -> None:
-        """
-        Initialise the wrapper.
+    def __init__(self, module: types.ModuleType | str) -> None:
+        """Initialise the wrapper.
 
         It will automatically overwrite the module with this instance in
         ``sys.modules``.
 
         :param module: The module name or instance
-        :type module: str or module
         """
-        if isinstance(module, (str, bytes)):
+        if isinstance(module, str):
             module = sys.modules[module]
         super().__setattr__('_deprecated', {})
         super().__setattr__('_module', module)
@@ -576,8 +576,8 @@ class ModuleDeprecationWrapper(types.ModuleType):
             sys.modules[module.__name__] = self
 
     def add_deprecated_attr(self, name: str, replacement: Any = None, *,
-                            replacement_name: Optional[str] = None,
-                            warning_message: Optional[str] = None,
+                            replacement_name: str | None = None,
+                            warning_message: str | None = None,
                             since: str = '',
                             future_warning: bool = True):
         """

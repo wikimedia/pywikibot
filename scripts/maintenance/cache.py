@@ -64,10 +64,12 @@ Available output commands:
     uniquedesc(entry)
 """
 #
-# (C) Pywikibot team, 2014-2023
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import datetime
 import hashlib
 import os
@@ -75,7 +77,6 @@ import pickle
 import sys
 from pathlib import Path
 from random import sample
-from typing import Optional
 
 import pywikibot
 from pywikibot.data import api
@@ -218,9 +219,9 @@ class CacheEntry(api.CachedRequest):
         self._cachefile_path().unlink()
 
 
-def process_entries(cache_path, func, use_accesstime: Optional[bool] = None,
+def process_entries(cache_path, func, use_accesstime: bool | None = None,
                     output_func=None, action_func=None, *,
-                    tests: Optional[int] = None):
+                    tests: int | None = None):
     """Check the contents of the cache.
 
     This program tries to use file access times to determine whether
@@ -229,13 +230,15 @@ def process_entries(cache_path, func, use_accesstime: Optional[bool] = None,
     check the filesystem mount options. You may need to remount with
     'strictatime'.
 
+    .. versionchanged:: 9.0
+       default cache path to 'apicache' without Python main version.
+
     :param use_accesstime: Whether access times should be used. `None`
         for detect, `False` for don't use and `True` for always use.
     :param tests: Only process a test sample of files
     """
     if not cache_path:
-        cache_path = os.path.join(pywikibot.config.base_dir,
-                                  f'apicache-py{PYTHON_VERSION[0]:d}')
+        cache_path = os.path.join(pywikibot.config.base_dir, 'apicache')
 
     if not os.path.exists(cache_path):
         pywikibot.error(f'{cache_path}: no such file or directory')
@@ -369,15 +372,29 @@ def incorrect_hash(entry):
 
 def older_than(entry, interval):
     """Find older entries."""
-    if entry._cachetime + interval < datetime.datetime.utcnow():
+    if entry._cachetime.tzinfo is not None \
+       and entry._cachetime + interval < pywikibot.Timestamp.nowutc():
         return entry
+
+    # old apicache-py2/3 cache
+    if entry._cachetime.tzinfo is None \
+       and entry._cachetime + interval < pywikibot.Timestamp.utcnow():
+        return entry
+
     return None
 
 
 def newer_than(entry, interval):
     """Find newer entries."""
-    if entry._cachetime + interval >= datetime.datetime.utcnow():
+    if entry._cachetime.tzinfo is not None \
+       and entry._cachetime + interval >= pywikibot.Timestamp.nowutc():
         return entry
+
+    # old apicache-py2/3 cache
+    if entry._cachetime.tzinfo is None \
+       and entry._cachetime + interval >= pywikibot.Timestamp.utcnow():
+        return entry
+
     return None
 
 

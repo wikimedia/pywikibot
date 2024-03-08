@@ -10,10 +10,12 @@ This script is for updating ``_first_upper_exception_dict``.
 .. versionadded:: 8.4
 """
 #
-# (C) Pywikibot team, 2018-2023
+# (C) Pywikibot team, 2018-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from json import dump, load
 from queue import Queue
 from re import findall
@@ -23,11 +25,22 @@ from threading import Thread
 from pywikibot import Site
 from pywikibot.comms.http import session
 from pywikibot.family import Family
-from scripts.maintenance.wikimedia_sites import families_list
 
 
 NUMBER_OF_THREADS = 26
 FILEPATH = '/data/firstup_excepts.json'
+
+# supported families by this script
+families_list = [
+    'wikibooks',
+    'wikinews',
+    'wikipedia',
+    'wikiquote',
+    'wikisource',
+    'wikiversity',
+    'wikivoyage',
+    'wiktionary',
+]
 
 
 def chars_uppers_wikilinks():
@@ -36,7 +49,7 @@ def chars_uppers_wikilinks():
     chars = []
     uppers = []
     wikilinks = ''
-    for i in range(0, maxunicode + 1):
+    for i in range(maxunicode + 1):
         c = chr(i)
         uc = c.upper()
         if uc != c:
@@ -107,7 +120,7 @@ def main():
     for fam_name in families_list:
         family = Family.load(fam_name)
         families_excepts.setdefault(fam_name, {})
-        for site_code in family.languages_by_size:
+        for site_code in family.codes:
             site = Site(site_code, family)
             if site.namespaces[8].case != 'first-letter':
                 raise ValueError('MW namespace case is not first-letter')
@@ -136,7 +149,7 @@ def load_json(path):
         with open(path, encoding='utf8') as f:
             return load(f)
     except OSError:
-        print('File not found:', path)  # noqa: T001, T201
+        print('File not found:', path)  # noqa: T201
         return {}
 
 
@@ -149,4 +162,4 @@ if __name__ == '__main__':
     # families_excepts = load_json(FILEPATH)
     # main()
     # save_json(families_excepts, FILEPATH)
-    print(process_site('wiktionary', 'fr'))  # noqa: T001, T201
+    print(process_site('wiktionary', 'fr'))  # noqa: T201

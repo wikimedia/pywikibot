@@ -33,6 +33,10 @@ See the table below for a cross reference between MediaWiki's API and Pywikibot'
      - :meth:`delete()<pywikibot.site._apisite.APISite.delete>`
      - :meth:`BasePage.delete()<page.BasePage.delete>`
      -
+   * - :api:`Deletedrevisions<Deletedrevisions>`
+     - :meth:`delete()<pywikibot.site._apisite.APISite.delete>`
+     - :meth:`BasePage.delete()<page.BasePage.delete>`
+     -
    * - :api:`echomarkread<echomarkread>`
      - :meth:`notifications_mark_read()<pywikibot.site._extensions.EchoMixin.notifications_mark_read>`
      -

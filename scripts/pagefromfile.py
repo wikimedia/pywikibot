@@ -64,13 +64,15 @@ can be added between them by specifying '\n' as a value.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import codecs
 import os
 import re
 
 import pywikibot
 from pywikibot import config, i18n
-from pywikibot.backports import Iterator, Tuple
+from pywikibot.backports import Generator
 from pywikibot.bot import CurrentPageBot, OptionHandler, SingleSiteBot
 from pywikibot.pagegenerators import PreloadingGenerator
 from pywikibot.tools.collections import GeneratorWrapper
@@ -211,7 +213,7 @@ class PageFromFileReader(OptionHandler, GeneratorWrapper):
         return page_regex, title_regex
 
     @property
-    def generator(self) -> Iterator[pywikibot.Page]:
+    def generator(self) -> Generator[pywikibot.Page, None, None]:
         """Read file and yield a page with content from file.
 
         content is stored as a page attribute defined by CTX_ATTR.
@@ -249,7 +251,7 @@ class PageFromFileReader(OptionHandler, GeneratorWrapper):
                 yield page
                 text = text[length:]
 
-    def find_page(self, text) -> Tuple[int, str, str]:
+    def find_page(self, text) -> tuple[int, str, str]:
         """Find page to work on."""
         location = self.page_regex.search(text)
         if self.opt.include:

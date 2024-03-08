@@ -61,6 +61,8 @@ Unprotect all pages listed in text file 'unprotect.txt' without prompting:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import ConfigParserBot, CurrentPageBot, SingleSiteBot

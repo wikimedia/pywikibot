@@ -1,22 +1,23 @@
 #!/usr/bin/env python3
 """Test textlib module."""
 #
-# (C) Pywikibot team, 2011-2023
+# (C) Pywikibot team, 2011-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import codecs
 import functools
 import os
 import re
 import unittest
 from collections import OrderedDict
-from contextlib import suppress
+from contextlib import nullcontext, suppress
 from unittest import mock
 
 import pywikibot
 from pywikibot import textlib
-from pywikibot.backports import nullcontext
 from pywikibot.exceptions import UnknownSiteError
 from pywikibot.site._interwikimap import _IWEntry
 from pywikibot.textlib import MultiTemplateMatchBuilder, extract_sections
@@ -732,8 +733,7 @@ class TestReplaceLinks(TestCase):
                 self._count += 1
                 if link.section:
                     return pywikibot.Link(
-                        '{}#{}'
-                        .format(self._count, link.section), link.site)
+                        f'{self._count}#{link.section}', link.site)
                 return pywikibot.Link(f'{self._count}', link.site)
 
             return None
@@ -1395,8 +1395,8 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
         """Test replacing not inside interwiki links."""
         if ('es' not in self.site.family.langs
                 or 'ey' in self.site.family.langs):
-            raise unittest.SkipTest("family {} doesn't have languages"
-                                    .format(self.site))
+            raise unittest.SkipTest(
+                f"family {self.site} doesn't have languages")
 
         self.assertEqual(textlib.replaceExcept('[[es:s]]', 's', 't',
                                                ['interwiki'], site=self.site),
@@ -1688,6 +1688,6 @@ class TestExtractSections(DefaultDrySiteTestCase):
         )
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

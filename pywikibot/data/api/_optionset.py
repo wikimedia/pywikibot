@@ -1,11 +1,15 @@
 """Object representing boolean API option."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from collections.abc import MutableMapping
-from typing import Optional
+
+import pywikibot
+from pywikibot.tools import deprecate_arg
 
 
 __all__ = ['OptionSet']
@@ -23,30 +27,33 @@ class OptionSet(MutableMapping):
     None and after setting it, any site (even None) will fail.
     """
 
-    def __init__(self, site=None,
-                 module: Optional[str] = None,
-                 param: Optional[str] = None,
-                 dict: Optional[dict] = None) -> None:
-        """
-        Initializer.
+    @deprecate_arg('dict', 'data')  # since 9.0
+    def __init__(self,
+                 site: pywikibot.site.APISite | None = None,
+                 module: str | None = None,
+                 param: str | None = None,
+                 data: dict | None = None) -> None:
+        """Initializer.
 
         If a site is given, the module and param must be given too.
 
+        .. versionchanged:: 9.0
+           *dict* parameter was renamed to *data*.
+
         :param site: The associated site
-        :type site: pywikibot.site.APISite or None
         :param module: The module name which is used by paraminfo. (Ignored
             when site is None)
         :param param: The parameter name inside the module. That parameter must
             have a 'type' entry. (Ignored when site is None)
-        :param dict: The initializing dict which is used for
-            :py:obj:`from_dict`
+        :param data: The initializing data dict which is used for
+            :meth:`from_dict`
         """
         self._site_set = False
         self._enabled = set()
         self._disabled = set()
         self._set_site(site, module, param)
-        if dict:
-            self.from_dict(dict)
+        if data:
+            self.from_dict(data)
 
     def _set_site(self, site, module: str, param: str,
                   clear_invalid: bool = False):
@@ -145,7 +152,7 @@ class OptionSet(MutableMapping):
         else:
             raise ValueError(f'Invalid value "{value}"')
 
-    def __getitem__(self, name) -> Optional[bool]:
+    def __getitem__(self, name) -> bool | None:
         """
         Return whether the option is enabled.
 

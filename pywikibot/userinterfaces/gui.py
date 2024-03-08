@@ -5,10 +5,10 @@ Useful for editing the contents of an article.
 .. note:: idlelib, tkinter and pillow modules are required.
 
 .. warning::
-   With Pillow 10 no wheels for 32-bit Python on Windows are supported.
-   This was made for Python 3.12 compatibility. Either you have to
-   update your Python using a 64-bit version or you have to
-   :command:`pip install "pillow < 10.0.0"`.
+   With Pillow 10.0, 10.1 no wheels for 32-bit Python on Windows are
+   supported. Pillow 10.2 supports it again. Either you have to update
+   your Python using a 64-bit version or you have to
+   :command:`pip install "pillow>8.1.1,!=10.0,!=10.1"`.
 
 .. seealso:: :mod:`editor`
 """
@@ -17,10 +17,9 @@ Useful for editing the contents of an article.
 #
 # Distributed under the terms of the MIT license.
 #
-from typing import Optional
+from __future__ import annotations
 
 import pywikibot
-from pywikibot.backports import Tuple
 from pywikibot.tools import PYTHON_VERSION
 
 
@@ -393,8 +392,8 @@ class EditBoxWindow(Frame):
         self.parent.config(menu=menubar)
         self.pack()
 
-    def edit(self, text: str, jumpIndex: Optional[int] = None,  # noqa: N803
-             highlight: Optional[str] = None) -> Optional[str]:
+    def edit(self, text: str, jumpIndex: int | None = None,  # noqa: N803
+             highlight: str | None = None) -> str | None:
         """
         Provide user with editor to modify text.
 
@@ -554,7 +553,7 @@ class Tkdialog:
         self.skip = True
         self.root.destroy()
 
-    def show_dialog(self) -> Tuple[str, str, bool]:
+    def show_dialog(self) -> tuple[str, str, bool]:
         """Activate the dialog.
 
         :return: new description, name, and if the image is skipped

@@ -5,6 +5,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import unittest
 
 import pywikibot
@@ -106,5 +108,5 @@ class TestDrySite(DefaultDrySiteTestCase):
                                     format_string='Foo ({script_comments})'))
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     unittest.main()

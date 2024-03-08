@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Test that each script can be compiled and executed."""
 #
-# (C) Pywikibot team, 2014-2023
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import os
 import sys
 import unittest
@@ -36,9 +38,8 @@ def check_script_deps(script_name):
     if script_name in script_deps:
         for package_name in script_deps[script_name]:
             if not has_module(package_name):
-                unittest_print(
-                    "{} depends on {}, which isn't available"
-                    .format(script_name, package_name))
+                unittest_print(f'{script_name} depends on {package_name},'
+                               " which isn't available")
                 return False
     return True
 
@@ -63,6 +64,7 @@ script_list = framework_scripts + list_scripts(scripts_path)
 
 script_input = {
     'create_isbn_edition': '\n',
+    'category_redirect': 'q\nn\n',
     'interwiki': 'Test page that should not exist\n',
     'misspelling': 'q\n',
     'pagefromfile': 'q\n',
@@ -263,8 +265,8 @@ class ScriptTestMeta(MetaTestCaseClass):
                         unittest_print(
                             ' auto-run script stderr within {} seconds: {!r}'
                             .format(timeout, err_result), end='  ')
-                    unittest_print(' exit code: {}'
-                                   .format(result['exit_code']), end=' ')
+                    unittest_print(f" exit code: {result['exit_code']}",
+                                   end=' ')
 
                 self.assertNotIn('Traceback (most recent call last)',
                                  err_result)
@@ -302,20 +304,19 @@ class ScriptTestMeta(MetaTestCaseClass):
 
             cls.add_method(dct, test_name,
                            test_execution(script_name, arguments.split()),
-                           'Test running {} {}.'
-                           .format(script_name, arguments))
+                           f'Test running {script_name} {arguments}.')
 
             if script_name in dct['_expected_failures']:
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
             elif script_name in dct['_allowed_failures']:
                 dct[test_name] = unittest.skip(
-                    '{} is in _allowed_failures set'
-                    .format(script_name))(dct[test_name])
+                    f'{script_name} is in _allowed_failures set'
+                )(dct[test_name])
             elif script_name in failed_dep_script_set \
                     and arguments == '-simulate':
                 dct[test_name] = unittest.skip(
-                    '{} has dependencies; skipping'
-                    .format(script_name))(dct[test_name])
+                    f'{script_name} has dependencies; skipping'
+                )(dct[test_name])
 
             # Disable test by default in pytest
             if script_name in unrunnable_script_set:
@@ -368,6 +369,7 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
 
     _allowed_failures = {
         'blockpageschecker',  # not localized for some test sites
+        'category_redirect',
         'clean_sandbox',
         'delinker',
         'disambredir',
@@ -454,6 +456,6 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
     _timeout = True
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

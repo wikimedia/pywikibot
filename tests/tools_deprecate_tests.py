@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 """Tests for deprecation tools."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import unittest
 from contextlib import suppress
 
 from pywikibot.tools import (
+    PYTHON_VERSION,
     add_full_name,
     deprecate_arg,
     deprecated,
@@ -309,12 +312,23 @@ class DeprecatorTestCase(DeprecationTestCase):
              'this. Deprecated function.'),
             (deprecated_func_docstring_arg, 'Deprecated.\n\n'
              ':param foo: Foo. DEPRECATED.'),
-            (deprecated_func_docstring_arg2, '\n    DEPRECATED.\n\n'
-             '    :param foo: Foo. DEPRECATED.\n    '),
         ]
         for rv, doc in testcases:
             with self.subTest(function=rv.__name__):
                 self.assertEqual(rv.__doc__, doc)
+
+    def test_deprecated_function_multiline_docstring(self):
+        """Test @deprecated docstring modification on multiline docstring.
+
+        Python 3.13 strips the doc string, see
+        https://docs.python.org/3.13/whatsnew/3.13.html#other-language-changes
+        """
+        doc = '\n    DEPRECATED.\n\n    :param foo: Foo. DEPRECATED.\n    '
+        if PYTHON_VERSION < (3, 13):
+            self.assertEqual(deprecated_func_docstring_arg2.__doc__, doc)
+        else:
+            self.assertEqual(deprecated_func_docstring_arg2.__doc__,
+                             doc.replace(' ' * 4, ''))
 
     def test_deprecated_function_bad_args(self):
         """Test @deprecated function with bad arguments."""
@@ -805,6 +819,6 @@ class DeprecatorTestCase(DeprecationTestCase):
             + '.DeprecatedMethodClass.deprecated_instance_method_and_arg2')
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

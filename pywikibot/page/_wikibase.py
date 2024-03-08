@@ -9,19 +9,20 @@ This module also includes objects:
 * WikibaseEntity: base interface for Wikibase entities.
 """
 #
-# (C) Pywikibot team, 2013-2023
+# (C) Pywikibot team, 2013-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import json as jsonlib
 import re
 from collections import OrderedDict, defaultdict
 from contextlib import suppress
 from itertools import chain
-from typing import Any, Optional, Union
+from typing import TYPE_CHECKING, Any
 
 import pywikibot
-from pywikibot.backports import Dict, List
 from pywikibot.exceptions import (
     APIError,
     EntityTypeUnknownError,
@@ -63,13 +64,16 @@ __all__ = (
     'WikibasePage',
 )
 
-
-LANGUAGE_IDENTIFIER = Union[str, pywikibot.APISite]
-ALIASES_TYPE = Dict[LANGUAGE_IDENTIFIER, List[str]]
-LANGUAGE_TYPE = Dict[LANGUAGE_IDENTIFIER, str]
-SITELINK_TYPE = Union['pywikibot.page.BasePage', 'pywikibot.page.BaseLink',
-                      Dict[str, str]]
-ENTITY_DATA_TYPE = Dict[str, Union[LANGUAGE_TYPE, ALIASES_TYPE, SITELINK_TYPE]]
+if TYPE_CHECKING:
+    LANGUAGE_IDENTIFIER = str | pywikibot.site.APISite
+    ALIASES_TYPE = dict[LANGUAGE_IDENTIFIER, list[str]]
+    LANGUAGE_TYPE = dict[LANGUAGE_IDENTIFIER, str]
+    SITELINK_TYPE = (
+        pywikibot.page.BasePage
+        | pywikibot.page.BaseLink
+        | dict[str, str]
+    )
+    ENTITY_DATA_TYPE = dict[str, LANGUAGE_TYPE | ALIASES_TYPE | SITELINK_TYPE]
 
 
 class WikibaseEntity:
@@ -92,9 +96,9 @@ class WikibaseEntity:
     :type title_pattern: str
     """
 
-    DATA_ATTRIBUTES: Dict[str, Any] = {}
+    DATA_ATTRIBUTES: dict[str, Any] = {}
 
-    def __init__(self, repo, id_: Optional[str] = None) -> None:
+    def __init__(self, repo, id_: str | None = None) -> None:
         """
         Initializer.
 
@@ -141,7 +145,7 @@ class WikibaseEntity:
         for key, cls in self.DATA_ATTRIBUTES.items():
             setattr(self, key, cls.new_empty(self.repo))
 
-    def _defined_by(self, singular: bool = False) -> Dict[str, str]:
+    def _defined_by(self, singular: bool = False) -> dict[str, str]:
         """
         Internal function to provide the API parameters to identify the entity.
 
@@ -159,7 +163,7 @@ class WikibaseEntity:
                 params['ids'] = self.id
         return params
 
-    def getID(self, numeric: bool = False) -> Union[int, str]:
+    def getID(self, numeric: bool = False) -> int | str:
         """
         Get the identifier of this entity.
 
@@ -177,7 +181,7 @@ class WikibaseEntity:
         """
         return {}
 
-    def toJSON(self, diffto: Optional[dict] = None) -> dict:
+    def toJSON(self, diffto: dict | None = None) -> dict:
         """
         Create JSON suitable for Wikibase API.
 
@@ -214,7 +218,7 @@ class WikibaseEntity:
         return norm_data
 
     @property
-    def latest_revision_id(self) -> Optional[int]:
+    def latest_revision_id(self) -> int | None:
         """
         Get the revision identifier for the most recent revision of the entity.
 
@@ -228,7 +232,7 @@ class WikibaseEntity:
         return self._revid
 
     @latest_revision_id.setter
-    def latest_revision_id(self, value: Optional[int]) -> None:
+    def latest_revision_id(self, value: int | None) -> None:
         self._revid = value
 
     @latest_revision_id.deleter
@@ -288,7 +292,7 @@ class WikibaseEntity:
 
     def editEntity(
         self,
-        data: Union[ENTITY_DATA_TYPE, None] = None,
+        data: ENTITY_DATA_TYPE | None = None,
         **kwargs
     ) -> None:
         """Edit an entity using Wikibase ``wbeditentity`` API.
@@ -447,36 +451,63 @@ class MediaInfo(WikibaseEntity):
     def get(self, force: bool = False) -> dict:
         """Fetch all MediaInfo entity data and cache it.
 
-        .. note:: This method may raise exception even if the associated file
-           exists because the mediainfo may not have been initialized yet.
-           :attr:`labels` and :attr:`statements` can still be accessed and
-           modified. :meth:`exists` suppresses the exception.
-
         .. note:: dicts returned by this method are references to content
            of this entity and their modifying may indirectly cause
            unwanted change to the live content
+
+        .. versionchanged:: 9.0
+           Added *pageid*, *ns*, *title*, *lastrevid*, *modified*, *id*
+           values to ``_content`` attribute when it is loaded.
 
         :param force: override caching
         :raise NoWikibaseEntityError: if this entity doesn't exist
         :return: actual data which entity holds
         """
-        if self.id == '-1':
-            if not force:
-                try:
-                    data = self.file.latest_revision.slots['mediainfo']['*']
-                except NoPageError as exc:
+        if force or not hasattr(self, '_content'):
+            if force:
+                self.file.clear_cache()
+
+            # accessing latest_revision loads the file data
+            try:
+                latest_revision = self.file.latest_revision
+            except NoPageError as exc:
+                raise NoWikibaseEntityError(self) from exc
+            except Error as exc:
+                error_message = str(exc)
+                if 'is not a file' in error_message:
                     raise NoWikibaseEntityError(self) from exc
-                except KeyError:
-                    # reuse the reserved ID for better message
-                    self.id = 'M' + str(self.file.pageid)
-                    raise NoWikibaseEntityError(self) from None
+                else:
+                    raise Error(self) from exc
 
-                self._content = jsonlib.loads(data)
-                self.id = self._content['id']
+            # Create _content. Format is same as with wbgetentities
+            # https://commons.wikimedia.org/w/api.php?action=wbgetentities&ids=M20985340
+            data = {
+                'title': self.file.title,
+                'lastrevid': latest_revision['revid'],
+                'modified': str(latest_revision['timestamp']),
+                'type': 'mediainfo',
+                'pageid': self.file.pageid,
+                'ns': self.file.namespace,
+                'id': 'M' + str(self.file.pageid),
+                'labels': {},
+                'statements': {}
+            }
 
-            self._assert_has_id()
+            # Update 'id', 'labels' and 'statements' if mediainfo is available.
+            # MediaInfo is returned only when it has values.
+            if 'mediainfo' in latest_revision.slots:
+                mediainfo_json = latest_revision.slots['mediainfo']['*']
+                mediainfo_data = jsonlib.loads(mediainfo_json)
+                data.update(mediainfo_data)
 
-        return super().get(force=force)
+            self._content = data
+            self.id = self._content['id']
+
+        self._assert_has_id()
+
+        # Do not pass the force parameter to the upper level because
+        # reloading files without MediaInfo will fail.
+        return super().get()
 
     def getID(self, numeric: bool = False):
         """
@@ -522,10 +553,6 @@ class MediaInfo(WikibaseEntity):
                 'The provided Claim instance is already used in an entity')
 
         self._assert_has_id()
-        if not hasattr(self, '_revid'):
-            # workaround for uninitialized mediainfo's
-            self._revid = self.file.latest_revision_id
-
         self.repo.addClaim(self, claim, bot=bot, **kwargs)
         claim.on_item = self
 
@@ -744,7 +771,7 @@ class WikibasePage(BasePage, WikibaseEntity):
     @allow_asynchronous
     def editEntity(
         self,
-        data: Union[ENTITY_DATA_TYPE, None] = None,
+        data: ENTITY_DATA_TYPE | None = None,
         **kwargs: Any
     ) -> None:
         """Edit an entity using Wikibase ``wbeditentity`` API.
@@ -1118,7 +1145,7 @@ class ItemPage(WikibasePage):
         get_redirect: bool = False,
         *args,
         **kwargs
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Fetch all item data, and cache it.
 
@@ -1218,7 +1245,7 @@ class ItemPage(WikibasePage):
         """
         self.removeSitelinks([site], **kwargs)
 
-    def removeSitelinks(self, sites: List[LANGUAGE_IDENTIFIER], **kwargs
+    def removeSitelinks(self, sites: list[LANGUAGE_IDENTIFIER], **kwargs
                         ) -> None:
         """
         Remove sitelinks.
@@ -1232,7 +1259,7 @@ class ItemPage(WikibasePage):
             data.append({'site': site, 'title': ''})
         self.setSitelinks(data, **kwargs)
 
-    def setSitelinks(self, sitelinks: List[SITELINK_TYPE], **kwargs) -> None:
+    def setSitelinks(self, sitelinks: list[SITELINK_TYPE], **kwargs) -> None:
         """Set sitelinks.
 
         *sitelinks* should be a list. Each item in the list can either
@@ -1354,7 +1381,7 @@ class Property:
                    'musical-notation': 'string',
                    }
 
-    def __init__(self, site, id: str, datatype: Optional[str] = None) -> None:
+    def __init__(self, site, id: str, datatype: str | None = None) -> None:
         """
         Initializer.
 
@@ -1463,7 +1490,7 @@ class PropertyPage(WikibasePage, Property):
         data['datatype'] = self._type
         return data
 
-    def newClaim(self, *args, **kwargs) -> 'Claim':
+    def newClaim(self, *args, **kwargs) -> Claim:
         """Helper function to create a new claim object for this property."""
         # todo: raise when self.id is -1
         return Claim(self.site, self.getID(), *args, datatype=self.type,
@@ -1563,7 +1590,7 @@ class Claim(Property):
         self._on_item = None  # The item it's on
 
     @property
-    def on_item(self) -> Optional[WikibaseEntity]:
+    def on_item(self) -> WikibaseEntity | None:
         """Return entity this claim is attached to."""
         return self._on_item
 
@@ -2157,7 +2184,7 @@ class LexemePage(WikibasePage):
         """Return data required for creation of a new lexeme."""
         raise NotImplementedError  # TODO
 
-    def toJSON(self, diffto: Optional[dict] = None) -> dict:
+    def toJSON(self, diffto: dict | None = None) -> dict:
         """
         Create JSON suitable for Wikibase API.
 
@@ -2393,7 +2420,7 @@ class LexemeForm(LexemeSubEntity):
         'claims': ClaimCollection,
     }
 
-    def toJSON(self, diffto: Optional[dict] = None) -> dict:
+    def toJSON(self, diffto: dict | None = None) -> dict:
         """Create dict suitable for the MediaWiki API."""
         data = super().toJSON(diffto=diffto)
 

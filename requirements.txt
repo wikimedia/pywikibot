@@ -18,12 +18,10 @@
 # $ awk -F '[#>=]' '{print $1}' requirements.txt | xargs apt-cache search
 
 # mandatory dependencies, others are optional
+importlib_metadata ; python_version < '3.8'
 mwparserfromhell>=0.5.2
-requests>=2.21.0, < 2.28.0; python_version < '3.7'
-requests>=2.21.0; python_version >= '3.7'
-setuptools>=48.0.0 ; python_version >= '3.10'
-setuptools>=40.8.0 ; python_version >= '3.7' and python_version < '3.10'
-setuptools>=40.8.0, <59.7.0 ; python_version < '3.7'
+packaging
+requests>=2.21.0
 
 # MediaWiki markup parser
 # mwparserfromhell is mandatory but wikitextparser can be used instead
@@ -39,19 +37,17 @@ mwoauth>=0.2.4,!=0.3.1
 pydot >= 1.4.1
 
 # cosmetic_changes
-python-stdnum >= 1.18
+python-stdnum >= 1.19
 
 # GUI
-Pillow >= 8.1.2, < 10.0.0; platform_machine == 'AMD32'
-Pillow >= 8.1.2; platform_machine != 'AMD32'
+Pillow >= 8.1.2, != 10.0, != 10.1
 
 # core pagegenerators
 google >= 1.7
 sseclient >= 0.0.18,< 0.0.23
 
 # The mysql generator in pagegenerators depends on PyMySQL
-# toolforge uses 0.9.3
-PyMySQL >= 0.9.3
+PyMySQL >= 1.0.0
 
 # core HTML comparison parser in diff module
 beautifulsoup4>=4.7.1

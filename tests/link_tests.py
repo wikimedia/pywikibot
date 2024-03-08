@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Test Link functionality."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import re
 from contextlib import suppress
 
@@ -864,21 +866,37 @@ class TestForeignInterwikiLinks(WikimediaDefaultSiteTestCase):
     code = 'en'
 
     def test_non_wiki_prefix(self):
-        """Test that Link fails if the interwiki prefix is not a wiki."""
+        """Test that Link fails if the interwiki prefix is not a wiki.
+
+        *bugzilla* does not return a json content but redirects to phab.
+        api.Request._json_loads cannot detect this problem and raises a
+        :exc:`exceptions.SiteDefinitionError`. The site is created
+        anyway but the title cannot be parsed:
+        """
         link = Link('bugzilla:1337', source=self.site)
-        # bugzilla does not return a json content but redirects to phab.
-        # api.Request._json_loads cannot detect this problem and raises
-        # a SiteDefinitionError. The site is created anyway but the title
-        # cannot be parsed
         with self.assertRaises(SiteDefinitionError):
             link.site
         self.assertEqual(link.site.sitename, 'wikimedia:wikimedia')
         self.assertTrue(link._is_interwiki)
 
     def test_other_wiki_prefix(self):
-        """Test that Link fails if the interwiki prefix is a unknown family."""
+        """Test that Link fails if the interwiki prefix is a unknown family.
+
+        Sometimes *bulba* does not return a json content but a security
+        script. api.Request._json_loads raises a
+        :exc:`exceptions.SiteDefinitionError` for an invalid
+        :class:`Autofamily('bulbapedia.bulbagarden.net')
+        <family.AutoFamily>`. The site is created anyway but the title
+        cannot be parsed in such case.
+        """
         link = Link('bulba:title on auto-generated Site', source=self.site)
-        self.assertEqual(link.title, 'Title on auto-generated Site')
+        try:
+            link.site
+        except SiteDefinitionError as e:
+            self.assertEqual(
+                str(e), "Invalid AutoFamily('bulbapedia.bulbagarden.net')")
+        else:
+            self.assertEqual(link.title, 'Title on auto-generated Site')
         self.assertEqual(link.site.sitename, 'bulba:bulba')
         self.assertTrue(link._is_interwiki)
 
@@ -915,6 +933,6 @@ class TestSiteLink(WikimediaDefaultSiteTestCase):
                         'en', 'wikipedia')
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

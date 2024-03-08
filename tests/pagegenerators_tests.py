@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
 """Test pagegenerators module."""
 #
-# (C) Pywikibot team, 2009-2023
+# (C) Pywikibot team, 2009-2024
 #
 # Distributed under the terms of the MIT license.
+from __future__ import annotations
+
 import calendar
 import datetime
 import logging
 import sys
 import unittest
 from contextlib import suppress
-from typing import Optional
 from unittest import mock
 
 import pywikibot
 from pywikibot import date, pagegenerators
 from pywikibot.exceptions import (
-    APIError,
     NoPageError,
     ServerError,
     UnknownExtensionError,
@@ -378,8 +378,7 @@ class PetScanPageGeneratorTestCase(TestCase):
         site = self.get_site()
         gen = pagegenerators.PetScanPageGenerator(['Pywikibot Protect Test'],
                                                   True, None, site)
-        with skipping(ServerError,
-                      APIError):  # (temporary) disabled due to T352482
+        with skipping(ServerError):
             self.assertPageTitlesEqual(gen, titles=(
                 'User:Sn1per/ProtectTest1', 'User:Sn1per/ProtectTest2'),
                 site=site)
@@ -396,6 +395,20 @@ class PetScanPageGeneratorTestCase(TestCase):
              'Test'], True, None, site)
         self.assertPageTitlesEqual(gen, titles=('User:Sn1per/PetScanTest1', ),
                                    site=site)
+
+
+class PagePilePageGeneratorTestCase(TestCase):
+
+    """Test PagePilePageGenerator."""
+
+    family = 'wikipedia'
+    code = 'ro'
+
+    def test_PagePilePageGenerator(self):
+        """Test PagePilePageGenerator."""
+        gen = pagegenerators.PagePilePageGenerator(id=53158)
+        self.assertLength(list(gen), 215)
+        self.assertEqual(gen.site, pywikibot.Site('wikipedia:ro'))
 
 
 class TestRepeatingGenerator(RecentChangesTestCase):
@@ -491,9 +504,8 @@ class TestYearPageGenerator(DefaultSiteTestCase):
         site = self.get_site()
         # Some languages are missing (T85681)
         if site.lang not in date.formats['YearBC']:
-            self.skipTest(
-                'Date formats for {!r} language are missing from date.py'
-                .format(site.lang))
+            self.skipTest(f'Date formats for {site.lang!r} language are'
+                          ' missing from date.py')
         start = -20
         end = 2026
 
@@ -802,8 +814,7 @@ class TestItemClaimFilterPageGenerator(WikidataTestCase):
 
     """Test item claim filter page generator generator."""
 
-    def _simple_claim_test(self, prop: str, claim, qualifiers: Optional[dict],
-                           valid: bool, negate: bool = False):
+    def _simple_claim_test(self, prop, claim, qualifiers, valid, negate=False):
         """
         Test given claim on sample (India) page.
 
@@ -1104,8 +1115,8 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_recentchanges_default(self):
         """Test recentchanges generator with default namespace setting."""
         if self.site.family.name in ('wpbeta', 'wsbeta'):
-            self.skipTest('Skipping {} due to too many autoblocked users'
-                          .format(self.site))
+            self.skipTest(
+                f'Skipping {self.site} due to too many autoblocked users')
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handle_arg('-ns:0,1,2')
         gf.handle_arg('-recentchanges:50')
@@ -1277,8 +1288,8 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_linter_generator_ns_valid_cat(self):
         """Test generator of pages with lint errors."""
         if not self.site.has_extension('Linter'):
-            self.skipTest('The site {} does not use Linter extension'
-                          .format(self.site))
+            self.skipTest(
+                f'The site {self.site} does not use Linter extension')
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handle_arg('-ns:1')
         gf.handle_arg('-limit:3')
@@ -1295,8 +1306,8 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_linter_generator_invalid_cat(self):
         """Test generator of pages with lint errors."""
         if not self.site.has_extension('Linter'):
-            self.skipTest('The site {} does not use Linter extension'
-                          .format(self.site))
+            self.skipTest(
+                f'The site {self.site} does not use Linter extension')
         gf = pagegenerators.GeneratorFactory(site=self.site)
         with self.assertRaises(AssertionError):
             gf.handle_arg('-linter:dummy')
@@ -1327,7 +1338,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_querypage_generator_with_invalid_page(self):
         """Test generator of pages with lint errors."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             gf.handle_arg('-querypage:dummy')
 
     def test_querypage_generator_with_no_page(self):
@@ -1760,6 +1771,6 @@ class TestLinksearchPageGenerator(TestCase):
         self.assertLength(list(gen), 1)
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

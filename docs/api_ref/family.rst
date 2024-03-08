@@ -7,17 +7,6 @@
 
    .. autoclass:: Family
 
-      .. method:: __init__()
-
-         Initializer
-
-         .. deprecated:: 3.0.20180710
-            Use :meth:`__post_init__` instead.
-         .. versionchanged:: 8.3
-            A FutureWarning is printed instead of a ``NotImplementedWarning``.
-            The deprecation may be removed in a future release and a
-            ``RuntimeError`` will be thrown instead.
-
       .. method:: __post_init__()
          :classmethod:
 

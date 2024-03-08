@@ -55,16 +55,18 @@ or by adding a list to the given one::
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import re
 from contextlib import suppress
 from enum import IntEnum
-from typing import Any, Union
+from typing import Any
 from urllib.parse import urlparse, urlunparse
 
 import pywikibot
-from pywikibot import textlib
-from pywikibot.backports import Callable, Dict, List, Match, Pattern
-from pywikibot.exceptions import InvalidTitleError
+from pywikibot import exceptions, textlib
+from pywikibot.backports import Callable, Match, Pattern
+from pywikibot.site import Namespace
 from pywikibot.textlib import (
     FILE_LINK_REGEX,
     MultiTemplateMatchBuilder,
@@ -223,7 +225,7 @@ class CosmeticChangesToolkit:
        `from_page()` method was removed
     """
 
-    def __init__(self, page: 'pywikibot.page.BasePage', *,
+    def __init__(self, page: pywikibot.page.BasePage, *,
                  show_diff: bool = False,
                  ignore: IntEnum = CANCEL.ALL) -> None:
         """Initializer.
@@ -246,7 +248,7 @@ class CosmeticChangesToolkit:
         self.namespace = page.namespace()
 
         self.show_diff = show_diff
-        self.template = (self.namespace == 10)
+        self.template = (self.namespace == Namespace.TEMPLATE)
         self.talkpage = self.namespace >= 0 and self.namespace % 2 == 1
         self.ignore = ignore
 
@@ -296,7 +298,7 @@ class CosmeticChangesToolkit:
             text = self.safe_execute(method, text)
         return text
 
-    def change(self, text: str) -> Union[bool, str]:
+    def change(self, text: str) -> bool | str:
         """Execute all clean up methods and catch errors if activated."""
         try:
             new_text = self._change(text)
@@ -401,12 +403,13 @@ class CosmeticChangesToolkit:
         exceptions = ['nowiki', 'comment', 'math', 'pre']
 
         for namespace in self.site.namespaces.values():
-            if namespace == 0:
+            if namespace == Namespace.MAIN:
                 # skip main (article) namespace
                 continue
             # a clone is needed. Won't change the namespace dict
             namespaces = list(namespace)
-            if namespace == 6 and self.site.family.name == 'wikipedia':
+            if (namespace == Namespace.FILE
+                    and self.site.family.name == 'wikipedia'):
                 if self.site.code in ('en', 'fr'):
                     # do not change "Image" on en-wiki and fr-wiki
                     with suppress(ValueError):
@@ -422,9 +425,11 @@ class CosmeticChangesToolkit:
                             0, namespaces.pop(namespaces.index('Imagem')))
             # final namespace variant
             final_ns = namespaces.pop(0)
-            if namespace in (2, 3):
+            if namespace in (Namespace.USER, Namespace.USER_TALK):
                 # skip localized user namespace, maybe gender is used
-                namespaces = ['User' if namespace == 2 else 'User talk']
+                namespaces = ['User'
+                              if namespace == Namespace.USER
+                              else 'User talk']
             # lowerspaced and underscored namespaces
             for i, item in enumerate(namespaces):
                 item = item.replace(' ', '[ _]')
@@ -432,7 +437,8 @@ class CosmeticChangesToolkit:
                 namespaces[i] = item
             namespaces.append(first_lower(final_ns))
             if final_ns and namespaces:
-                if self.site.sitename == 'wikipedia:pt' and namespace == 6:
+                if (self.site.sitename == 'wikipedia:pt'
+                        and namespace == Namespace.FILE):
                     # only change on these file extensions (per T57242)
                     extensions = ('png', 'gif', 'jpg', 'jpeg', 'svg', 'tiff',
                                   'tif')
@@ -489,7 +495,7 @@ class CosmeticChangesToolkit:
             return '{}|{}]]'.format(
                 split[0], '|'.join(cache.get(x.strip(), x) for x in split[1:]))
 
-        cache: Dict[Union[bool, str], Any] = {}
+        cache: dict[bool | str, Any] = {}
         exceptions = ['comment', 'nowiki', 'pre', 'syntaxhighlight']
         regex = re.compile(
             FILE_LINK_REGEX % '|'.join(self.site.namespaces[6]),
@@ -530,8 +536,10 @@ class CosmeticChangesToolkit:
             oldlink = url2string(match.group(),
                                  encodings=self.site.encodings())
 
-            is_interwiki = self.site.isInterwikiLink(titleWithSection)
-            if is_interwiki:
+            is_interwiki = None
+            with suppress(exceptions.ServerError):
+                is_interwiki = self.site.isInterwikiLink(titleWithSection)
+            if is_interwiki is not False:
                 return oldlink
 
             # The link looks like this:
@@ -539,10 +547,9 @@ class CosmeticChangesToolkit:
             # We only work on namespace 0 because pipes and linktrails work
             # differently for images and categories.
             page = pywikibot.Page(pywikibot.Link(titleWithSection, self.site))
-            try:
-                in_main_namespace = page.namespace() == 0
-            except InvalidTitleError:
-                in_main_namespace = False
+            in_main_namespace = None
+            with suppress(exceptions.InvalidTitleError):
+                in_main_namespace = page.namespace() == Namespace.MAIN
             if not in_main_namespace:
                 return oldlink
 
@@ -680,7 +687,7 @@ class CosmeticChangesToolkit:
     def removeEmptySections(self, text: str) -> str:
         """Cleanup empty sections."""
         # userspace contains article stubs without nobots/in use templates
-        if self.namespace == 2:
+        if self.namespace == Namespace.USER:
             return text
 
         skippings = ['comment', 'category']
@@ -707,7 +714,7 @@ class CosmeticChangesToolkit:
         header, sections, footer = textlib.extract_sections(text, self.site)
 
         # iterate stripped sections and create a new page body
-        new_body: List[textlib.Section] = []
+        new_body: list[textlib.Section] = []
         for i, strip_section in enumerate(strip_sections):
             current_dep = sections[i].level
             try:
@@ -816,10 +823,11 @@ class CosmeticChangesToolkit:
         def replace_link(match: Match[str]) -> str:
             """Create a string to replace a single link."""
             replacement = '[['
-            if re.match(r'(?:{}):'
-                        .format('|'.join((*self.site.namespaces[6],
-                                          *self.site.namespaces[14]))),
-                        match['link']):
+            if re.match(
+                    r'(?:{}):'.format('|'.join(
+                        (*self.site.namespaces[Namespace.FILE],
+                         *self.site.namespaces[Namespace.CATEGORY]))),
+                    match['link']):
                 replacement += ':'
 
             replacement += match['link']
@@ -958,7 +966,7 @@ class CosmeticChangesToolkit:
 
     def fixTypo(self, text: str) -> str:
         """Fix units."""
-        exceptions: List[Union[str, Pattern[str]]] = [
+        exceptions: list[str | Pattern[str]] = [
             'comment',
             'gallery',
             'hyperlink',
@@ -992,7 +1000,7 @@ class CosmeticChangesToolkit:
         if self.site.code not in ['ckb', 'fa']:
             return text
 
-        exceptions: List[Union[str, Pattern[str]]] = [
+        exceptions: list[str | Pattern[str]] = [
             'file',
             'gallery',
             'hyperlink',
@@ -1043,7 +1051,8 @@ class CosmeticChangesToolkit:
         [1]:
         https://commons.wikimedia.org/wiki/Commons:Tools/pywiki_file_description_cleanup
         """
-        if self.site.sitename != 'commons:commons' or self.namespace == 6:
+        if (self.site.sitename != 'commons:commons'
+                or self.namespace == Namespace.FILE):
             return text
 
         # section headers to {{int:}} versions

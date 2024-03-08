@@ -1,9 +1,11 @@
 """Family module for Wikiquote."""
 #
-# (C) Pywikibot team, 2005-2023
+# (C) Pywikibot team, 2005-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from pywikibot import family
 
 
@@ -26,15 +28,15 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'als', 'tokipona',
     ]
 
-    languages_by_size = [
-        'it', 'en', 'pl', 'ru', 'cs', 'et', 'pt', 'uk', 'fa', 'he', 'fr', 'de',
-        'es', 'tr', 'eo', 'sk', 'az', 'bs', 'ca', 'zh', 'sr', 'fi', 'lt', 'sl',
-        'ar', 'id', 'su', 'bg', 'hy', 'hr', 'el', 'nn', 'sv', 'li', 'hu', 'ko',
-        'nl', 'sah', 'ja', 'la', 'ta', 'ig', 'hi', 'as', 'gl', 'gu', 'bn',
-        'ur', 'te', 'bjn', 'tl', 'guw', 'vi', 'be', 'cy', 'no', 'sq', 'ml',
-        'kn', 'eu', 'ro', 'ku', 'uz', 'ka', 'da', 'th', 'sa', 'is', 'bcl',
-        'br', 'mr', 'af', 'ky',
-    ]
+    codes = {
+        'af', 'ar', 'as', 'az', 'bcl', 'be', 'bg', 'bjn', 'bn', 'br', 'bs',
+        'ca', 'cs', 'cy', 'da', 'de', 'el', 'en', 'eo', 'es', 'et', 'eu', 'fa',
+        'fi', 'fr', 'gl', 'gu', 'guw', 'he', 'hi', 'hr', 'hu', 'hy', 'id',
+        'ig', 'is', 'it', 'ja', 'ka', 'kn', 'ko', 'ku', 'ky', 'la', 'li', 'lt',
+        'ml', 'mr', 'nl', 'nn', 'no', 'pl', 'pt', 'ro', 'ru', 'sa', 'sah',
+        'sk', 'sl', 'sq', 'sr', 'su', 'sv', 'ta', 'te', 'th', 'tl', 'tr', 'uk',
+        'ur', 'uz', 'vi', 'zh',
+    }
 
     category_redirect_templates = {
         '_default': (),

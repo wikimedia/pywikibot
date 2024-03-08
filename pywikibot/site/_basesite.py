@@ -1,17 +1,19 @@
 """Objects with site methods independent of the communication interface."""
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import functools
+import inspect
 import re
 import threading
-from typing import Optional
 from warnings import warn
 
 import pywikibot
-from pywikibot.backports import List, Pattern, Set
+from pywikibot.backports import Pattern
 from pywikibot.exceptions import (
     Error,
     FamilyMaintenanceWarning,
@@ -23,7 +25,6 @@ from pywikibot.site._namespace import Namespace, NamespacesDict
 from pywikibot.throttle import Throttle
 from pywikibot.tools import (
     ComparableMixin,
-    SelfCallString,
     cached,
     deprecated,
     first_upper,
@@ -93,7 +94,7 @@ class BaseSite(ComparableMixin):
 
         # following are for use with lock_page and unlock_page methods
         self._pagemutex = threading.Condition()
-        self._locked_pages: Set[str] = set()
+        self._locked_pages: set[str] = set()
 
     @property
     @deprecated(since='8.5.0')
@@ -184,29 +185,37 @@ class BaseSite(ComparableMixin):
         self.__dict__.update(attrs)
         self._pagemutex = threading.Condition()
 
-    def user(self) -> Optional[str]:
+    def user(self) -> str | None:
         """Return the currently-logged in bot username, or None."""
         if self.logged_in():
             return self.username()
         return None
 
-    def username(self) -> Optional[str]:
+    def username(self) -> str | None:
         """Return the username used for the site."""
         return self._username
 
-    def __getattr__(self, attr):
-        """Delegate undefined methods calls to the Family object."""
-        try:
-            method = getattr(self.family, attr)
-            if not callable(method):
-                raise AttributeError
-            f = functools.partial(method, self.code)
-            if hasattr(method, '__doc__'):
-                f.__doc__ = method.__doc__
-            return f
-        except AttributeError:
-            raise AttributeError(f'{type(self).__name__} instance has no '
-                                 f'attribute {attr!r}') from None
+    def __getattr__(self, name: str):
+        """Delegate undefined methods calls to the Family object.
+
+        .. versionchanged:: 9.0
+           Only delegate to public Family methods which have ``code`` as
+           first parameter.
+        """
+        if not name.startswith('_'):
+            obj = getattr(self.family, name, None)
+            if inspect.ismethod(obj):
+                params = inspect.signature(obj).parameters
+                if params:
+                    parameter = next(iter(params))
+                    if parameter == 'code':
+                        method = functools.partial(obj, self.code)
+                        if hasattr(obj, '__doc__'):
+                            method.__doc__ = obj.__doc__
+                        return method
+
+        raise AttributeError(f'{type(self).__name__} instance has no '
+                             f'attribute {name!r}') from None
 
     def __str__(self) -> str:
         """Return string representing this Site's name and code."""
@@ -215,7 +224,7 @@ class BaseSite(ComparableMixin):
     @property
     def sitename(self):
         """String representing this Site's name and code."""
-        return SelfCallString(self.__str__())
+        return self.__str__()
 
     def __repr__(self) -> str:
         """Return internal representation."""
@@ -270,7 +279,7 @@ class BaseSite(ComparableMixin):
         """
         return self.redirects()[0]
 
-    def redirects(self) -> List[str]:
+    def redirects(self) -> list[str]:
         """Return list of generic redirect tags for the site.
 
         .. seealso:: :meth:`redirect` for the default redirect tag.
@@ -278,11 +287,11 @@ class BaseSite(ComparableMixin):
         """
         return ['REDIRECT']
 
-    def pagenamecodes(self) -> List[str]:
+    def pagenamecodes(self) -> list[str]:
         """Return list of localized PAGENAME tags for the site."""
         return ['PAGENAME']
 
-    def pagename2codes(self) -> List[str]:
+    def pagename2codes(self) -> list[str]:
         """Return list of localized PAGENAMEE tags for the site."""
         return ['PAGENAMEE']
 

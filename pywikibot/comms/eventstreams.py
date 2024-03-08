@@ -14,12 +14,11 @@ This module requires sseclient to be installed::
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import json
 from functools import partial
-from typing import Optional
 
-from pkg_resources import parse_version
-from requests import __version__ as requests_version
 from requests.packages.urllib3.exceptions import ProtocolError
 from requests.packages.urllib3.util.response import httplib
 
@@ -32,12 +31,6 @@ try:
     from sseclient import SSEClient as EventSource
 except ImportError as e:
     EventSource = e
-
-
-if parse_version(requests_version) < parse_version('2.20.1'):
-    raise ImportError(
-        'requests >= 2.20.1 is required for EventStreams;\n'
-        "install it with 'pip install \"requests>=2.20.1\"'\n")
 
 
 class EventStreams(GeneratorWrapper):
@@ -125,7 +118,7 @@ class EventStreams(GeneratorWrapper):
             Mandatory when no url is given. Multiple streams may be
             given as a string with comma separated stream types or an
             iterable of strings
-        :keyword int or float or Tuple[int or float, int or float] timeout:
+        :keyword int or float or tuple[int or float, int or float] timeout:
             a timeout value indication how long to wait to send data
             before giving up
         :keyword str url: an url retrieving events from. Will be set up
@@ -141,8 +134,10 @@ class EventStreams(GeneratorWrapper):
            parameter.
         """
         if isinstance(EventSource, Exception):
-            raise ImportError('sseclient is required for EventStreams;\n'
-                              'install it with "pip install sseclient"\n')
+            raise ImportError(
+                'sseclient is required for EventStreams;\n'
+                'install it with "pip install sseclient==0.0.22"\n'
+            )
         self.filter = {'all': [], 'any': [], 'none': []}
         self._total = None
         self._canary = kwargs.pop('canary', False)
@@ -375,7 +370,7 @@ class EventStreams(GeneratorWrapper):
         del self.source
 
 
-def site_rc_listener(site, total: Optional[int] = None):
+def site_rc_listener(site, total: int | None = None):
     """Yield changes received from EventStream.
 
     :param site: the Pywikibot.Site object to yield live recent changes for

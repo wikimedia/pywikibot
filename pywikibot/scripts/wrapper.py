@@ -38,11 +38,12 @@ for tests to set the default site (see :phab:`T216825`)::
    renamed to wrapper.py
 """
 #
-# (C) Pywikibot team, 2012-2023
+# (C) Pywikibot team, 2012-2024
 #
 # Distributed under the terms of the MIT license.
 #
-#
+from __future__ import annotations
+
 import os
 import sys
 import types
@@ -57,7 +58,7 @@ pwb = None
 site_package = False
 
 
-def check_pwb_versions(package):
+def check_pwb_versions(package: str):
     """Validate package version and scripts version.
 
     Rules:
@@ -65,7 +66,8 @@ def check_pwb_versions(package):
         - Scripts version must not be older than previous Pywikibot version
           due to deprecation policy
     """
-    from pywikibot.tools import Version
+    from packaging.version import Version
+
     scripts_version = Version(getattr(package, '__version__', pwb.__version__))
     wikibot_version = Version(pwb.__version__)
 
@@ -104,7 +106,7 @@ def check_pwb_versions(package):
 # https://bitbucket.org/ned/coveragepy/src/2c5fb3a8b81c/setup.py?at=default#cl-31
 
 
-def run_python_file(filename, args, package=None):
+def run_python_file(filename: str, args: list[str], package=None):
     """Run a python file as if it were the main program on the command line.
 
     .. versionchanged:: 7.7
@@ -112,9 +114,7 @@ def run_python_file(filename, args, package=None):
 
     :param filename: The path to the file to execute, it need not be a
         .py file.
-    :type filename: str
     :param args: is the argument list to present as sys.argv, as strings.
-    :type args: List[str]
     :param package: The package of the script. Used for checks.
     :type package: Optional[module]
     """
@@ -165,14 +165,16 @@ def run_python_file(filename, args, package=None):
                 del os.environ[key]
 
 
-def handle_args(pwb_py, *args):
+def handle_args(
+    _,
+    *args: str,
+) -> tuple[str, list[str], list[str], list[str]]:
     """Handle args and get filename.
 
     .. versionchanged:: 7.7
        Catch ``PYWIKIBOT_TEST_...`` environment variables.
 
     :return: filename, script args, local pwb args, environment variables
-    :rtype: Tuple[str, List[str], List[str], [List[str]]
     """
     fname = None
     local = []
@@ -216,19 +218,18 @@ def _print_requirements(requirements, script, variant):  # pragma: no cover
         print(f"    pip install \"{str(requirement).partition(';')[0]}\"\n")
 
 
-def check_modules(script=None):
+def check_modules(script: str | None = None) -> bool:
     """Check whether mandatory modules are present.
 
     This also checks Python version when importing dependencies from setup.py
 
     :param script: The script name to be checked for dependencies
-    :type script: str or None
     :return: True if all dependencies are installed
-    :rtype: bool
     :raise RuntimeError: wrong Python version found in setup.py
     """
-    import pkg_resources
+    from packaging.requirements import Requirement
 
+    from pywikibot.backports import importlib_metadata
     from setup import script_deps
 
     missing_requirements = []
@@ -238,35 +239,33 @@ def check_modules(script=None):
         dependencies = script_deps.get(Path(script).name, [])
     else:
         from setup import dependencies
-        try:
-            next(pkg_resources.parse_requirements(dependencies))
-        except ValueError as e:  # pragma: no cover
-            # T286980: setuptools is too old and requirement parsing fails
-            import setuptools
-            setupversion = tuple(int(num)
-                                 for num in setuptools.__version__.split('.'))
-            if setupversion < (20, 8, 1):
-                # print the minimal requirement
-                _print_requirements(
-                    ['setuptools>=20.8.1'], None,
-                    f'outdated ({setuptools.__version__})')
-                return False
-            raise e
 
-    for requirement in pkg_resources.parse_requirements(dependencies):
-        if requirement.marker is None \
-           or pkg_resources.evaluate_marker(str(requirement.marker)):
+    for dependency in dependencies:
+        if dependency.startswith(('importlib_metadata', 'packaging')):
+            # Ignore these dependencies because ImportError is raised in an
+            # early state when they are imported in backports. They are already
+            # used at this point. This is a workaound for toolforge where some
+            # modules are not installed as a site-package.
+            # TODO: Check imports from external source
+            continue
+
+        requirement = Requirement(dependency)
+        if requirement.marker is None or requirement.marker.evaluate():
             try:
-                pkg_resources.resource_exists(requirement, requirement.name)
-            except pkg_resources.DistributionNotFound as e:
+                instlld_vrsn = importlib_metadata.version(requirement.name)
+            except importlib_metadata.PackageNotFoundError as e:
                 missing_requirements.append(requirement)
                 print(e)
-            except pkg_resources.VersionConflict as e:
-                version_conflicts.append(requirement)
-                print(e)
+            else:
+                if instlld_vrsn not in requirement.specifier:
+                    version_conflicts.append(requirement)
+                    print(
+                        f'{requirement.name} version {instlld_vrsn} is '
+                        f'installed but {requirement.specifier} is required'
+                    )
 
-    del pkg_resources
-    del dependencies
+    del Requirement
+    del importlib_metadata
     del script_deps
 
     _print_requirements(missing_requirements, script, 'missing')
@@ -313,7 +312,7 @@ except RuntimeError as e:  # pragma: no cover
         # we need to re-start the entire process. Ask the user to do so.
         print('Now, you have to re-execute the command to start your script.')
         sys.exit(1)
-except ImportError as e:  # raised in textlib
+except ImportError as e:  # raised in textlib or backports
     sys.exit(e)
 
 
@@ -377,6 +376,8 @@ def find_filename(filename):
 
     .. versionchanged:: 7.0
        Search users_scripts_paths in config.base_dir
+    .. versionchanged:: 9.0
+       Add config.base_dir to search path
     """
     from pywikibot import config
     path_list = []  # paths to find misspellings
@@ -392,14 +393,14 @@ def find_filename(filename):
             path_list.append(testpath.parent)
         return None
 
-    user_script_paths = []
+    user_script_paths = ['']
     if config.user_script_paths:  # pragma: no cover
         if isinstance(config.user_script_paths, list):
-            user_script_paths = config.user_script_paths
+            user_script_paths += config.user_script_paths
         else:
             warn("'user_script_paths' must be a list,\n"
-                 'found: {}. Ignoring this setting.'
-                 .format(type(config.user_script_paths)))
+                 f'found: {type(config.user_script_paths).__name__}.'
+                 ' Ignoring this setting.')
 
     found = test_paths(user_script_paths, Path(config.base_dir))
     if found:  # pragma: no cover
@@ -430,6 +431,11 @@ def execute():
        renamed from :func:`main`
     """
     global filename
+
+    # If -nolog options are in global args, add them to
+    # script args.
+    if '-nolog' in global_args:
+        script_args.append('-nolog')
 
     if global_args:  # don't use sys.argv
         unknown_args = pwb.handle_args(global_args)

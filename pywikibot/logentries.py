@@ -1,15 +1,16 @@
-"""Objects representing Mediawiki log entries."""
+"""Objects representing MediaWiki log entries."""
 #
 # (C) Pywikibot team, 2007-2023
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import datetime
 from collections import UserDict
-from typing import Any, Optional, Type, Union
+from typing import Any
 
 import pywikibot
-from pywikibot.backports import Dict, List
 from pywikibot.exceptions import Error, HiddenKeyError
 from pywikibot.tools import cached
 
@@ -29,10 +30,10 @@ class LogEntry(UserDict):
     # Log type expected. None for every type, or one of the (letype) str :
     # block/patrol/etc...
     # Overridden in subclasses.
-    _expected_type: Optional[str] = None
+    _expected_type: str | None = None
 
-    def __init__(self, apidata: Dict[str, Any],
-                 site: 'pywikibot.site.BaseSite') -> None:
+    def __init__(self, apidata: dict[str, Any],
+                 site: pywikibot.site.BaseSite) -> None:
         """Initialize object from a logevent dict returned by MW API."""
         super().__init__(apidata)
         self.site = site
@@ -93,12 +94,12 @@ class LogEntry(UserDict):
         return super().__getattribute__(item)
 
     @property
-    def _params(self) -> Dict[str, Any]:
+    def _params(self) -> dict[str, Any]:
         """Additional data for some log entry types."""
         return self.get('params', {})
 
     @cached
-    def page(self) -> Union[int, 'pywikibot.page.Page']:
+    def page(self) -> int | pywikibot.page.Page:
         """
         Page on which action was performed.
 
@@ -107,7 +108,7 @@ class LogEntry(UserDict):
         return pywikibot.Page(self.site, self['title'])
 
     @cached
-    def timestamp(self) -> 'pywikibot.Timestamp':
+    def timestamp(self) -> pywikibot.Timestamp:
         """Timestamp object corresponding to event timestamp."""
         return pywikibot.Timestamp.fromISOformat(self['timestamp'])
 
@@ -122,7 +123,7 @@ class UserTargetLogEntry(LogEntry):
     """A log entry whose target is a user page."""
 
     @cached
-    def page(self) -> 'pywikibot.page.User':
+    def page(self) -> pywikibot.page.User:
         """Return the target user.
 
         This returns a User object instead of the Page object returned by the
@@ -144,8 +145,8 @@ class BlockEntry(LogEntry):
 
     _expected_type = 'block'
 
-    def __init__(self, apidata: Dict[str, Any],
-                 site: 'pywikibot.site.BaseSite') -> None:
+    def __init__(self, apidata: dict[str, Any],
+                 site: pywikibot.site.BaseSite) -> None:
         """Initializer."""
         super().__init__(apidata, site)
         # When an autoblock is removed, the "title" field is not a page title
@@ -155,7 +156,7 @@ class BlockEntry(LogEntry):
         if self.isAutoblockRemoval:
             self._blockid = int(self['title'][pos + 1:])
 
-    def page(self) -> Union[int, 'pywikibot.page.Page']:
+    def page(self) -> int | pywikibot.page.Page:
         """
         Return the blocked account or IP.
 
@@ -170,7 +171,7 @@ class BlockEntry(LogEntry):
         return super().page()
 
     @cached
-    def flags(self) -> List[str]:
+    def flags(self) -> list[str]:
         """
         Return a list of (str) flags associated with the block entry.
 
@@ -184,7 +185,7 @@ class BlockEntry(LogEntry):
         return self._params.get('flags', [])
 
     @cached
-    def duration(self) -> Optional[datetime.timedelta]:
+    def duration(self) -> datetime.timedelta | None:
         """
         Return a datetime.timedelta representing the block duration.
 
@@ -195,7 +196,7 @@ class BlockEntry(LogEntry):
                 if self.expiry() is not None else None)
 
     @cached
-    def expiry(self) -> Optional['pywikibot.Timestamp']:
+    def expiry(self) -> pywikibot.Timestamp | None:
         """Return a Timestamp representing the block expiry date."""
         details = self._params.get('expiry')
         return pywikibot.Timestamp.fromISOformat(details) if details else None
@@ -208,7 +209,7 @@ class RightsEntry(LogEntry):
     _expected_type = 'rights'
 
     @property
-    def oldgroups(self) -> List[str]:
+    def oldgroups(self) -> list[str]:
         """Return old rights groups.
 
         .. versionchanged:: 7.5
@@ -219,7 +220,7 @@ class RightsEntry(LogEntry):
         return self._params.get('oldgroups', [])
 
     @property
-    def newgroups(self) -> List[str]:
+    def newgroups(self) -> list[str]:
         """Return new rights groups.
 
         .. versionchanged:: 7.5
@@ -237,7 +238,7 @@ class UploadEntry(LogEntry):
     _expected_type = 'upload'
 
     @cached
-    def page(self) -> 'pywikibot.page.FilePage':
+    def page(self) -> pywikibot.page.FilePage:
         """Return FilePage on which action was performed."""
         return pywikibot.FilePage(self.site, self['title'])
 
@@ -249,7 +250,7 @@ class MoveEntry(LogEntry):
     _expected_type = 'move'
 
     @property
-    def target_ns(self) -> 'pywikibot.site._namespace.Namespace':
+    def target_ns(self) -> pywikibot.site._namespace.Namespace:
         """Return namespace object of target page."""
         return self.site.namespaces[self._params['target_ns']]
 
@@ -260,7 +261,7 @@ class MoveEntry(LogEntry):
 
     @property
     @cached
-    def target_page(self) -> 'pywikibot.page.Page':
+    def target_page(self) -> pywikibot.page.Page:
         """Return target page object."""
         return pywikibot.Page(self.site, self.target_title)
 
@@ -308,8 +309,8 @@ class LogEntryFactory:
         'patrol': PatrolEntry,
     }
 
-    def __init__(self, site: 'pywikibot.site.BaseSite',
-                 logtype: Optional[str] = None) -> None:
+    def __init__(self, site: pywikibot.site.BaseSite,
+                 logtype: str | None = None) -> None:
         """
         Initializer.
 
@@ -327,7 +328,7 @@ class LogEntryFactory:
             logclass = self.get_valid_entry_class(logtype)
             self._creator = lambda data: logclass(data, self._site)
 
-    def create(self, logdata: Dict[str, Any]) -> LogEntry:
+    def create(self, logdata: dict[str, Any]) -> LogEntry:
         """
         Instantiate the LogEntry object representing logdata.
 
@@ -337,7 +338,7 @@ class LogEntryFactory:
         """
         return self._creator(logdata)
 
-    def get_valid_entry_class(self, logtype: str) -> 'LogEntry':
+    def get_valid_entry_class(self, logtype: str) -> LogEntry:
         """
         Return the class corresponding to the @logtype string parameter.
 
@@ -350,8 +351,7 @@ class LogEntryFactory:
         return LogEntryFactory.get_entry_class(logtype)
 
     @classmethod
-    def get_entry_class(cls: Type['LogEntryFactory'],
-                        logtype: str) -> 'LogEntry':
+    def get_entry_class(cls, logtype: str) -> LogEntry:
         """
         Return the class corresponding to the @logtype string parameter.
 
@@ -379,7 +379,7 @@ class LogEntryFactory:
                 )
         return cls._logtypes[logtype]
 
-    def _create_from_data(self, logdata: Dict[str, Any]) -> LogEntry:
+    def _create_from_data(self, logdata: dict[str, Any]) -> LogEntry:
         """
         Check for logtype from data, and creates the correct LogEntry.
 

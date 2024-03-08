@@ -5,6 +5,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import sys
 from contextlib import suppress
 
@@ -317,6 +319,6 @@ class TestOptionHandler(TestCase):
         self.assertNotIn('baz', oh.opt.__dict__)
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

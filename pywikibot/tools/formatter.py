@@ -4,6 +4,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import math
 import re
 
@@ -40,11 +42,6 @@ class SequenceOutputter:
         super().__init__()
         self.sequence = sequence
 
-    @deprecated('out', since='6.2.0')
-    def format_list(self):
-        """DEPRECATED: Create the text with one item on each line."""
-        return self.out
-
     @property
     def out(self):
         """Create the text with one item on each line."""
@@ -58,8 +55,13 @@ class SequenceOutputter:
             content = ''
         return self.prefix + content + self.suffix
 
+    @deprecated('pywikibot.info(SequenceOutputter.out)', since='9.0.0')
     def output(self) -> None:
-        """Output the text of the current sequence."""
+        """Output the text of the current sequence.
+
+        .. deprecated:: 9.0
+           Use :func:`pywikibot.info` with *out* property
+        """
         info(self.out)
 
 

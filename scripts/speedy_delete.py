@@ -22,10 +22,12 @@ it just to the first so many bytes.
 .. note:: This script currently only works for the Wikipedia project.
 """
 #
-# (C) Pywikibot team, 2007-2023
+# (C) Pywikibot team, 2007-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import time
 from textwrap import fill
 
@@ -323,7 +325,7 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
     def __init__(self, **kwargs) -> None:
         """Initializer.
 
-        :keyword pywikibot.APISite site: the site to work on
+        :keyword pywikibot.site.APISite site: the site to work on
         """
         super().__init__(**kwargs)
         csd_cat = i18n.translate(self.site, self.csd_cat_title)

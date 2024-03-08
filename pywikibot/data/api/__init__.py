@@ -1,9 +1,11 @@
-"""Interface to Mediawiki's api.php."""
+"""Interface to MediaWiki's api.php."""
 #
-# (C) Pywikibot team, 2014-2023
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from email.generator import BytesGenerator
 from email.mime.multipart import MIMEMultipart as MIMEMultipartOrig
 from io import BytesIO

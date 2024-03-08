@@ -1,9 +1,11 @@
 """Family module for Wikivoyage."""
 #
-# (C) Pywikibot team, 2012-2023
+# (C) Pywikibot team, 2012-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 # The new Wikivoyage family that is hosted at Wikimedia
 from pywikibot import family
 
@@ -14,11 +16,11 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     name = 'wikivoyage'
 
-    languages_by_size = [
-        'en', 'de', 'pl', 'it', 'fa', 'fr', 'ru', 'zh', 'nl', 'pt', 'es', 'he',
-        'vi', 'fi', 'sv', 'el', 'ja', 'eo', 'uk', 'bn', 'ro', 'tr', 'ps',
-        'shn', 'hi',
-    ]
+    codes = {
+        'bn', 'de', 'el', 'en', 'eo', 'es', 'fa', 'fi', 'fr', 'he', 'hi', 'it',
+        'ja', 'nl', 'pl', 'ps', 'pt', 'ro', 'ru', 'shn', 'sv', 'tr', 'uk',
+        'vi', 'zh',
+    }
 
     category_redirect_templates = {
         '_default': (),

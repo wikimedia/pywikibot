@@ -4,14 +4,15 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from typing import Callable, Union
+from __future__ import annotations
 
-from pywikibot.backports import Dict
+from typing import TYPE_CHECKING, Callable
 
 
-PluralRule = Dict[str, Union[int, Callable[[int], Union[bool, int]]]]
+if TYPE_CHECKING:
+    PluralRule = dict[str, int | Callable[[int], bool | int]]
 
-plural_rules: Dict[str, PluralRule] = {
+plural_rules: dict[str, PluralRule] = {
     '_default': {'nplurals': 2, 'plural': lambda n: (n != 1)},
     'ar': {'nplurals': 6, 'plural': lambda n:
            0 if (n == 0) else

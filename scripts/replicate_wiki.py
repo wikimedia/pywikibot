@@ -42,6 +42,8 @@ The following parameters are supported:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import sys
 from argparse import ArgumentParser
 from collections import defaultdict

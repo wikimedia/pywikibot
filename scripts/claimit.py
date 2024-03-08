@@ -50,6 +50,8 @@ but 'p' must be included.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import pywikibot
 from pywikibot import WikidataBot, pagegenerators
 from pywikibot.backports import batched, removeprefix

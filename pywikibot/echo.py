@@ -4,37 +4,35 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from typing import Any, Optional, Type
+from __future__ import annotations
+
+from typing import Any
 
 import pywikibot
-from pywikibot.backports import Dict
-
-
-NOTIFICATION_CLASS_TYPE = Type['Notification']
 
 
 class Notification:
 
     """A notification issued by the Echo extension."""
 
-    def __init__(self, site: 'pywikibot.site.BaseSite') -> None:
+    def __init__(self, site: pywikibot.site.BaseSite) -> None:
         """Initialize an empty Notification object."""
         self.site = site
 
-        self.event_id: Optional[int] = None
+        self.event_id: int | None = None
         self.type = None
         self.category = None
         self.timestamp = None
         self.page = None
         self.agent = None
-        self.read: Optional[bool] = None
+        self.read: bool | None = None
         self.content = None
         self.revid = None
 
     @classmethod
-    def fromJSON(cls: NOTIFICATION_CLASS_TYPE,  # noqa: N802
-                 site: 'pywikibot.site.BaseSite',
-                 data: Dict[str, Any]) -> 'Notification':
+    def fromJSON(cls,  # noqa: N802
+                 site: pywikibot.site.BaseSite,
+                 data: dict[str, Any]) -> Notification:
         """Construct a Notification object from our API's JSON data."""
         notif = cls(site)
 

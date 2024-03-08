@@ -1,15 +1,16 @@
 """Classes for detecting a MediaWiki site."""
 #
-# (C) Pywikibot team, 2010-2023
+# (C) Pywikibot team, 2010-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import json
 import re
 from contextlib import suppress
 from html.parser import HTMLParser
 from http import HTTPStatus
-from typing import Optional
 from urllib.parse import urljoin, urlparse
 
 from requests.exceptions import RequestException
@@ -179,7 +180,7 @@ class MWSite:
         return hash(self.server + self.scriptpath)
 
     @property
-    def api(self) -> Optional[str]:
+    def api(self) -> str | None:
         """Get api URL."""
         if self.server is None or self.scriptpath is None:
             return None
@@ -299,7 +300,7 @@ def check_response(response):
             except ValueError as err:
                 m = re.search(r'\d{3}', err.args[0], flags=re.ASCII)
                 if not m:
-                    raise err
+                    raise
                 msg = f'Generic {err_type} Error ({m.group()})'
             else:
                 msg = f'({status}) {status.description}'

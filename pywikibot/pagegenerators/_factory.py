@@ -1,30 +1,22 @@
 """GeneratorFactory module wich handles pagegenerators options."""
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import itertools
 import re
 import sys
 from datetime import timedelta
 from functools import partial
 from itertools import zip_longest
-from typing import Any, Optional, Union
+from typing import TYPE_CHECKING, Any
 
 import pywikibot
 from pywikibot import i18n
-from pywikibot.backports import (
-    Callable,
-    Dict,
-    FrozenSet,
-    Iterable,
-    Iterator,
-    List,
-    Sequence,
-    Tuple,
-    removeprefix,
-)
+from pywikibot.backports import Callable, Iterable, Sequence, removeprefix
 from pywikibot.bot import ShowingListOption
 from pywikibot.data import api
 from pywikibot.exceptions import UnknownExtensionError
@@ -47,6 +39,7 @@ from pywikibot.pagegenerators._generators import (
     MySQLPageGenerator,
     NewimagesPageGenerator,
     NewpagesPageGenerator,
+    PagePilePageGenerator,
     PrefixingPageGenerator,
     RecentChangesPageGenerator,
     SubCategoriesPageGenerator,
@@ -64,12 +57,14 @@ from pywikibot.tools.itertools import (
 )
 
 
-HANDLER_RETURN_TYPE = Union[None, bool, Iterable['pywikibot.page.BasePage']]
-GEN_FACTORY_NAMESPACE_TYPE = Union[List[str],
-                                   FrozenSet['pywikibot.site.Namespace']]
-GEN_FACTORY_CLAIM_TYPE = List[Tuple[str, str, Dict[str, str], bool]]
-OPT_SITE_TYPE = Optional['pywikibot.site.BaseSite']
-OPT_GENERATOR_TYPE = Optional[Iterable['pywikibot.page.Page']]
+if TYPE_CHECKING:
+    from typing_extensions import Literal
+
+    from pywikibot.site import BaseSite, Namespace
+
+    HANDLER_GEN_TYPE = Iterable[pywikibot.page.BasePage]
+    GEN_FACTORY_CLAIM_TYPE = list[tuple[str, str, dict[str, str], bool]]
+    OPT_GENERATOR_TYPE = HANDLER_GEN_TYPE | None
 
 
 # This is the function that will be used to de-duplicate page iterators.
@@ -88,10 +83,10 @@ class GeneratorFactory:
        arguments are parsed except if site parameter is given.
     """
 
-    def __init__(self, site: OPT_SITE_TYPE = None,
-                 positional_arg_name: Optional[str] = None,
-                 enabled_options: Optional[Iterable[str]] = None,
-                 disabled_options: Optional[Iterable[str]] = None) -> None:
+    def __init__(self, site: BaseSite | None = None,
+                 positional_arg_name: str | None = None,
+                 enabled_options: Iterable[str] | None = None,
+                 disabled_options: Iterable[str] | None = None) -> None:
         """
         Initializer.
 
@@ -103,26 +98,26 @@ class GeneratorFactory:
         :param disabled_options: disable these given options and let them
             be handled by scripts options handler
         """
-        self.gens: List[Iterable['pywikibot.page.Page']] = []
-        self._namespaces: GEN_FACTORY_NAMESPACE_TYPE = []
-        self.limit: Optional[int] = None
-        self.qualityfilter_list: List[int] = []
-        self.articlefilter_list: List[str] = []
-        self.articlenotfilter_list: List[str] = []
-        self.titlefilter_list: List[str] = []
-        self.titlenotfilter_list: List[str] = []
+        self.gens: list[Iterable[pywikibot.page.BasePage]] = []
+        self._namespaces: list[str] | frozenset[Namespace] = []
+        self.limit: int | None = None
+        self.qualityfilter_list: list[int] = []
+        self.articlefilter_list: list[str] = []
+        self.articlenotfilter_list: list[str] = []
+        self.titlefilter_list: list[str] = []
+        self.titlenotfilter_list: list[str] = []
         self.claimfilter_list: GEN_FACTORY_CLAIM_TYPE = []
-        self.catfilter_list: List['pywikibot.Category'] = []
+        self.catfilter_list: list[pywikibot.Category] = []
         self.intersect = False
-        self.subpage_max_depth: Optional[int] = None
-        self.redirectfilter: Optional[bool] = None
+        self.subpage_max_depth: int | None = None
+        self.redirectfilter: bool | None = None
         self._site = site
         self._positional_arg_name = positional_arg_name
-        self._sparql: Optional[str] = None
+        self._sparql: str | None = None
         self.nopreload = False
         self._validate_options(enabled_options, disabled_options)
 
-        self.is_preloading: Optional[bool] = None
+        self.is_preloading: bool | None = None
         """Return whether Page objects are preloaded. You may use this
         instance variable after :meth:`getCombinedGenerator` is called
         e.g.::
@@ -138,8 +133,8 @@ class GeneratorFactory:
         """
 
     def _validate_options(self,
-                          enable: Optional[Iterable[str]],
-                          disable: Optional[Iterable[str]]) -> None:
+                          enable: Iterable[str] | None,
+                          disable: Iterable[str] | None) -> None:
         """Validate option restrictions."""
         msg = '{!r} is not a valid pagegenerators option to be '
         enable = enable or []
@@ -160,7 +155,7 @@ class GeneratorFactory:
             self.disabled_options = set()
 
     @property
-    def site(self) -> 'pywikibot.site.BaseSite':
+    def site(self) -> pywikibot.site.BaseSite:
         """
         Generator site.
 
@@ -177,7 +172,7 @@ class GeneratorFactory:
         return self._site
 
     @property
-    def namespaces(self) -> FrozenSet['pywikibot.site.Namespace']:
+    def namespaces(self) -> frozenset[pywikibot.site.Namespace]:
         """
         List of Namespace parameters.
 
@@ -317,7 +312,7 @@ class GeneratorFactory:
         return dupfiltergen
 
     def getCategory(self, category: str  # noqa: N802
-                    ) -> Tuple['pywikibot.Category', Optional[str]]:
+                    ) -> tuple[pywikibot.Category, str | None]:
         """
         Return Category and start as defined by category.
 
@@ -327,7 +322,7 @@ class GeneratorFactory:
             category = i18n.input('pywikibot-enter-category-name')
         category = category.replace('#', '|')
 
-        startfrom: Optional[str] = None
+        startfrom: str | None = None
         category, _, startfrom = category.partition('|')
 
         if not startfrom:
@@ -345,9 +340,9 @@ class GeneratorFactory:
         return cat, startfrom
 
     def getCategoryGen(self, category: str,  # noqa: N802
-                       recurse: Union[int, bool] = False,
+                       recurse: int | bool = False,
                        content: bool = False,
-                       gen_func: Optional[Callable] = None) -> Any:
+                       gen_func: Callable | None = None) -> Any:
         """
         Return generator based on Category defined by category and gen_func.
 
@@ -370,11 +365,12 @@ class GeneratorFactory:
                         content=content)
 
     @staticmethod
-    def _parse_log_events(logtype: str,
-                          user: Optional[str] = None,
-                          start: Optional[str] = None,
-                          end: Optional[str] = None
-                          ) -> Optional[Iterator['pywikibot.page.Page']]:
+    def _parse_log_events(
+        logtype: str,
+        user: str | None = None,
+        start: str | None = None,
+        end: str | None = None,
+    ) -> Iterable[pywikibot.page.BasePage] | None:
         """
         Parse the -logevent argument information.
 
@@ -390,8 +386,8 @@ class GeneratorFactory:
             convertible into a Timestamp matching '%Y%m%d%H%M%S'.
         :return: The generator or None if invalid 'start/total' or 'end' value.
         """
-        def parse_start(start: Optional[str]
-                        ) -> Tuple[Optional[str], Optional[int]]:
+        def parse_start(start: str | None
+                        ) -> tuple[pywikibot.Timestamp | None, int | None]:
             """Parse start and return (start, total)."""
             if start is None:
                 return None, None
@@ -403,7 +399,7 @@ class GeneratorFactory:
 
         start = start or None  # because start might be an empty string
         try:
-            start, total = parse_start(start)
+            start_, total = parse_start(start)
             assert total is None or total > 0
         except ValueError as err:
             pywikibot.error(
@@ -414,25 +410,27 @@ class GeneratorFactory:
                             'positive int.'.format(start))
             return None
 
-        try:
-            end = pywikibot.Timestamp.fromtimestampformat(end)
-        except ValueError as err:
-            pywikibot.error(
-                f'{err}. End parameter has wrong format!')
-            return None
-        except TypeError:  # end is None
-            pass
+        if end is None:
+            end_ = None
+        else:
+            try:
+                end_ = pywikibot.Timestamp.fromtimestampformat(end)
+            except ValueError as err:
+                pywikibot.error(
+                    f'{err}. End parameter has wrong format!')
+                return None
 
-        if start or end:
-            pywikibot.info('Fetching log events in range: {} - {}.'
-                           .format(end or 'beginning of time', start or 'now'))
+        if start_ or end_:
+            pywikibot.info(
+                'Fetching log events in range: {} - {}.'
+                .format(end or 'beginning of time', start or 'now'))
 
         # 'user or None', because user might be an empty string when
         # 'foo,,bar' was used.
         return LogeventsPageGenerator(logtype, user or None, total=total,
-                                      start=start, end=end)
+                                      start=start_, end=end_)
 
-    def _handle_filelinks(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_filelinks(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-filelinks` argument."""
         if not value:
             value = i18n.input('pywikibot-enter-file-links-processing')
@@ -441,7 +439,7 @@ class GeneratorFactory:
         file_page = pywikibot.FilePage(self.site, value)
         return file_page.using_pages()
 
-    def _handle_linter(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_linter(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-linter` argument."""
         if not self.site.has_extension('Linter'):
             raise UnknownExtensionError(
@@ -450,12 +448,12 @@ class GeneratorFactory:
         valid_cats = [c for _list in cats.values() for c in _list]
 
         value = value or ''
-        lint_from: Optional[str] = None
+        lint_from: str | None = None
         cat, _, lint_from = value.partition('/')
         lint_from = lint_from or None
 
-        def show_available_categories(cats: Dict[
-                                      str, Sequence['pywikibot.Category']]
+        def show_available_categories(cats: dict[
+                                      str, Sequence[pywikibot.Category]]
                                       ) -> None:
             _i = ' ' * 4
             _2i = 2 * _i
@@ -483,7 +481,7 @@ class GeneratorFactory:
             lint_categories='|'.join(lint_cats), namespaces=self.namespaces,
             lint_from=lint_from)
 
-    def _handle_querypage(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_querypage(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-querypage` argument."""
         if value is None:  # Display special pages.
             pages = self.site._paraminfo.parameter('query+querypage',
@@ -503,41 +501,41 @@ class GeneratorFactory:
 
         return self.site.querypage(value)
 
-    def _handle_url(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_url(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-url` argument."""
         if not value:
             value = pywikibot.input('Please enter the URL:')
         return TextIOPageGenerator(value, site=self.site)
 
-    def _handle_unusedfiles(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_unusedfiles(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-unusedfiles` argument."""
         return self.site.unusedfiles(total=_int_none(value))
 
-    def _handle_lonelypages(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_lonelypages(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-lonelypages` argument."""
         return self.site.lonelypages(total=_int_none(value))
 
-    def _handle_unwatched(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_unwatched(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-unwatched` argument."""
         return self.site.unwatchedpage(total=_int_none(value))
 
-    def _handle_wantedpages(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_wantedpages(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-wantedpages` argument."""
         return self.site.wantedpages(total=_int_none(value))
 
-    def _handle_wantedfiles(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_wantedfiles(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-wantedfiles` argument."""
         return self.site.wantedfiles(total=_int_none(value))
 
-    def _handle_wantedtemplates(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_wantedtemplates(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-wantedtemplates` argument."""
         return self.site.wantedtemplates(total=_int_none(value))
 
-    def _handle_wantedcategories(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_wantedcategories(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-wantedcategories` argument."""
         return self.site.wantedcategories(total=_int_none(value))
 
-    def _handle_property(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_property(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-property` argument."""
         if not value:
             question = 'Which property name to be used?'
@@ -549,24 +547,24 @@ class GeneratorFactory:
                                                   ShowingListOption(pnames))
         return self.site.pages_with_property(value)
 
-    def _handle_usercontribs(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_usercontribs(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-usercontribs` argument."""
         self._single_gen_filter_unique = True
         return UserContributionsGenerator(
             value, site=self.site, _filter_unique=None)
 
-    def _handle_withoutinterwiki(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_withoutinterwiki(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-withoutinterwiki` argument."""
         return self.site.withoutinterwiki(total=_int_none(value))
 
-    def _handle_interwiki(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_interwiki(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-interwiki` argument."""
         if not value:
             value = i18n.input('pywikibot-enter-page-processing')
         page = pywikibot.Page(pywikibot.Link(value, self.site))
         return LanguageLinksPageGenerator(page)
 
-    def _handle_randomredirect(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_randomredirect(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-randomredirect` argument."""
         # partial workaround for bug T119940
         # to use -namespace/ns with -randomredirect, -ns must be given
@@ -576,7 +574,7 @@ class GeneratorFactory:
         return self.site.randompages(total=_int_none(value),
                                      namespaces=namespaces, redirects=True)
 
-    def _handle_random(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_random(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-random` argument."""
         # partial workaround for bug T119940
         # to use -namespace/ns with -random, -ns must be given
@@ -586,7 +584,7 @@ class GeneratorFactory:
         return self.site.randompages(total=_int_none(value),
                                      namespaces=namespaces)
 
-    def _handle_recentchanges(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_recentchanges(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-recentchanges` argument."""
         rcstart = None
         rcend = None
@@ -612,18 +610,18 @@ class GeneratorFactory:
             namespaces=self.namespaces, total=total, start=rcstart, end=rcend,
             site=self.site, tag=rctag)
 
-    def _handle_liverecentchanges(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_liverecentchanges(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-liverecentchanges` argument."""
         self.nopreload = True
         return LiveRCPageGenerator(site=self.site, total=_int_none(value))
 
-    def _handle_file(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_file(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-file` argument."""
         if not value:
             value = pywikibot.input('Please enter the local file name:')
         return TextIOPageGenerator(value, site=self.site)
 
-    def _handle_namespaces(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_namespaces(self, value: str) -> Literal[True]:
         """Handle `-namespaces` argument."""
         if isinstance(self._namespaces, frozenset):
             raise RuntimeError('-namespace/ns option must be provided before '
@@ -648,66 +646,66 @@ class GeneratorFactory:
     _handle_ns = _handle_namespaces
     _handle_namespace = _handle_namespaces
 
-    def _handle_limit(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_limit(self, value: str) -> Literal[True]:
         """Handle `-limit` argument."""
         if not value:
             value = pywikibot.input('What is the limit value?')
         self.limit = _int_none(value)
         return True
 
-    def _handle_category(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_category(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-category` argument."""
         return self.getCategoryGen(
             value, recurse=False, gen_func=CategorizedPageGenerator)
 
     _handle_cat = _handle_category
 
-    def _handle_catr(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_catr(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-catr` argument."""
         return self.getCategoryGen(
             value, recurse=True, gen_func=CategorizedPageGenerator)
 
-    def _handle_subcats(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_subcats(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-subcats` argument."""
         return self.getCategoryGen(
             value, recurse=False, gen_func=SubCategoriesPageGenerator)
 
-    def _handle_subcatsr(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_subcatsr(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-subcatsr` argument."""
         return self.getCategoryGen(
             value, recurse=True, gen_func=SubCategoriesPageGenerator)
 
-    def _handle_catfilter(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_catfilter(self, value: str) -> Literal[True]:
         """Handle `-catfilter` argument."""
         cat, _ = self.getCategory(value)
         self.catfilter_list.append(cat)
         return True
 
-    def _handle_page(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_page(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-page` argument."""
         if not value:
             value = pywikibot.input('What page do you want to use?')
         return [pywikibot.Page(pywikibot.Link(value, self.site))]
 
-    def _handle_pageid(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_pageid(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-pageid` argument."""
         if not value:
             value = pywikibot.input('What pageid do you want to use?')
         return self.site.load_pages_from_pageids(value)
 
-    def _handle_uncatfiles(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_uncatfiles(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-uncatfiles` argument."""
         return self.site.uncategorizedimages()
 
-    def _handle_uncatcat(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_uncatcat(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-uncatcat` argument."""
         return self.site.uncategorizedcategories()
 
-    def _handle_uncat(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_uncat(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-uncat` argument."""
         return self.site.uncategorizedpages()
 
-    def _handle_ref(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_ref(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-ref` argument."""
         if not value:
             value = pywikibot.input(
@@ -715,7 +713,7 @@ class GeneratorFactory:
         page = pywikibot.Page(pywikibot.Link(value, self.site))
         return page.getReferences()
 
-    def _handle_links(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_links(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-links` argument."""
         if not value:
             value = pywikibot.input(
@@ -723,14 +721,14 @@ class GeneratorFactory:
         page = pywikibot.Page(pywikibot.Link(value, self.site))
         return page.linkedPages()
 
-    def _handle_weblink(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_weblink(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-weblink` argument."""
         if not value:
             value = pywikibot.input(
                 'Pages with which weblink should be processed?')
         return self.site.exturlusage(value)
 
-    def _handle_transcludes(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_transcludes(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-transcludes` argument."""
         if not value:
             value = pywikibot.input(
@@ -740,7 +738,7 @@ class GeneratorFactory:
                                              source=self.site))
         return page.getReferences(only_template_inclusion=True)
 
-    def _handle_start(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_start(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-start` argument."""
         if not value:
             value = '!'
@@ -749,17 +747,17 @@ class GeneratorFactory:
             start=firstpagelink.title, namespace=firstpagelink.namespace,
             filterredir=False)
 
-    def _handle_prefixindex(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_prefixindex(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-prefixindex` argument."""
         if not value:
             value = pywikibot.input('What page names are you looking for?')
         return PrefixingPageGenerator(prefix=value, site=self.site)
 
-    def _handle_newimages(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_newimages(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-newimages` argument."""
         return NewimagesPageGenerator(total=_int_none(value), site=self.site)
 
-    def _handle_newpages(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_newpages(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-newpages` argument."""
         # partial workaround for bug T69249
         # to use -namespace/ns with -newpages, -ns must be given
@@ -769,11 +767,14 @@ class GeneratorFactory:
         return NewpagesPageGenerator(
             namespaces=namespaces, total=_int_none(value), site=self.site)
 
-    def _handle_unconnectedpages(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_unconnectedpages(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-unconnectedpages` argument."""
         return self.site.unconnected_pages(total=_int_none(value))
 
-    def _handle_imagesused(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_imagesused(
+        self,
+        value: str,
+    ) -> Iterable[pywikibot.FilePage]:
         """Handle `-imagesused` argument."""
         if not value:
             value = pywikibot.input(
@@ -781,7 +782,7 @@ class GeneratorFactory:
         page = pywikibot.Page(pywikibot.Link(value, self.site))
         return page.imagelinks()
 
-    def _handle_searchitem(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_searchitem(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-searchitem` argument."""
         if not value:
             value = pywikibot.input('Text to look for:')
@@ -791,7 +792,7 @@ class GeneratorFactory:
         return WikibaseSearchItemPageGenerator(
             value, language=lang, site=self.site)
 
-    def _handle_search(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_search(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-search` argument."""
         if not value:
             value = pywikibot.input('What do you want to search for?')
@@ -799,11 +800,11 @@ class GeneratorFactory:
         return self.site.search(value, namespaces=[])
 
     @staticmethod
-    def _handle_google(value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_google(value: str) -> HANDLER_GEN_TYPE:
         """Handle `-google` argument."""
         return GoogleSearchPageGenerator(value)
 
-    def _handle_titleregex(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_titleregex(self, value: str) -> Literal[True]:
         """Handle `-titleregex` argument."""
         if not value:
             value = pywikibot.input(
@@ -811,7 +812,7 @@ class GeneratorFactory:
         self.titlefilter_list.append(value)
         return True
 
-    def _handle_titleregexnot(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_titleregexnot(self, value: str) -> Literal[True]:
         """Handle `-titleregexnot` argument."""
         if not value:
             value = pywikibot.input(
@@ -819,21 +820,21 @@ class GeneratorFactory:
         self.titlenotfilter_list.append(value)
         return True
 
-    def _handle_grep(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_grep(self, value: str) -> Literal[True]:
         """Handle `-grep` argument."""
         if not value:
             value = pywikibot.input('Which pattern do you want to grep?')
         self.articlefilter_list.append(value)
         return True
 
-    def _handle_grepnot(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_grepnot(self, value: str) -> Literal[True]:
         """Handle `-grepnot` argument."""
         if not value:
             value = pywikibot.input('Which pattern do you want to skip?')
         self.articlenotfilter_list.append(value)
         return True
 
-    def _handle_ql(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_ql(self, value: str) -> Literal[True]:
         """Handle `-ql` argument."""
         if not self.site.has_extension('ProofreadPage'):
             raise UnknownExtensionError(
@@ -849,16 +850,16 @@ class GeneratorFactory:
         self.qualityfilter_list = int_values
         return True
 
-    def _handle_onlyif(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_onlyif(self, value: str) -> Literal[True]:
         """Handle `-onlyif` argument."""
         return self._onlyif_onlyifnot_handler(value, False)
 
-    def _handle_onlyifnot(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_onlyifnot(self, value: str) -> Literal[True]:
         """Handle `-onlyifnot` argument."""
         return self._onlyif_onlyifnot_handler(value, True)
 
     def _onlyif_onlyifnot_handler(self, value: str, ifnot: bool
-                                  ) -> HANDLER_RETURN_TYPE:
+                                  ) -> Literal[True]:
         """Handle `-onlyif` and `-onlyifnot` arguments."""
         if not value:
             value = pywikibot.input('Which claim do you want to filter?')
@@ -871,32 +872,32 @@ class GeneratorFactory:
             (temp[0][0], temp[0][1], dict(temp[1:]), ifnot))
         return True
 
-    def _handle_sparqlendpoint(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_sparqlendpoint(self, value: str) -> Literal[True]:
         """Handle `-sparqlendpoint` argument."""
         if not value:
             value = pywikibot.input('SPARQL endpoint:')
         self._sparql = value
         return True
 
-    def _handle_sparql(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_sparql(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-sparql` argument."""
         if not value:
             value = pywikibot.input('SPARQL query:')
         return WikidataSPARQLPageGenerator(
             value, site=self.site, endpoint=self._sparql)
 
-    def _handle_mysqlquery(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_mysqlquery(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-mysqlquery` argument."""
         if not value:
             value = pywikibot.input('Mysql query string:')
         return MySQLPageGenerator(value, site=self.site)
 
-    def _handle_intersect(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_intersect(self, value: str) -> Literal[True]:
         """Handle `-intersect` argument."""
         self.intersect = True
         return True
 
-    def _handle_subpage(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_subpage(self, value: str) -> Literal[True]:
         """Handle `-subpage` argument."""
         if not value:
             value = pywikibot.input(
@@ -904,7 +905,7 @@ class GeneratorFactory:
         self.subpage_max_depth = int(value)
         return True
 
-    def _handle_logevents(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_logevents(self, value: str) -> HANDLER_GEN_TYPE | None:
         """Handle `-logevents` argument."""
         params = value.split(',')
         if params[0] not in self.site.logtypes:
@@ -912,7 +913,7 @@ class GeneratorFactory:
                 f'Invalid -logevents parameter "{params[0]}"')
         return self._parse_log_events(*params)
 
-    def _handle_redirect(self, value: str) -> HANDLER_RETURN_TYPE:
+    def _handle_redirect(self, value: str) -> Literal[True]:
         """Handle `-redirect` argument.
 
         .. versionadded:: 8.5
@@ -923,7 +924,17 @@ class GeneratorFactory:
         self.redirectfilter = strtobool(value)
         return True
 
-    def handle_args(self, args: Iterable[str]) -> List[str]:
+    def _handle_pagepile(self, value: str) -> HANDLER_GEN_TYPE:
+        """Handle `-pagepile` argument.
+
+        .. versionadded:: 9.0
+        """
+        if not value.isnumeric():
+            raise ValueError(
+                f'PagePile id must be an int. It was given "{value}"')
+        return PagePilePageGenerator(int(value))
+
+    def handle_args(self, args: Iterable[str]) -> list[str]:
         """Handle command line arguments and return the rest as a list.
 
         .. versionadded:: 6.0
@@ -952,7 +963,7 @@ class GeneratorFactory:
         :param arg: Pywikibot argument consisting of -name:value
         :return: True if the argument supplied was recognised by the factory
         """
-        value: Optional[str] = None
+        value: str | None = None
 
         if not arg.startswith('-') and self._positional_arg_name:
             value = arg
@@ -984,6 +995,6 @@ class GeneratorFactory:
         return False
 
 
-def _int_none(v: Optional[str]) -> Optional[int]:
+def _int_none(v: str | None) -> int | None:
     """Return None if v is None or '' else return int(v)."""
     return None if not v else int(v)

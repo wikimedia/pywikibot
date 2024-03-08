@@ -4,6 +4,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 
 # A mapping of characters to their MediaWiki title-cased forms. Python,
 # depending on version, handles these characters differently, which causes
@@ -271,7 +273,7 @@ _first_upper_exception = _first_upper_exception_dict.get
 # codepoint it takes longer especially when working with UCS2. The lists also
 # differ between Python versions which can be avoided by this static list.
 #
-# This frozenset was created using Python 3.12 (Unicode version 15.0.0):
+# This frozenset was created using Python 3.13 (Unicode version 15.1.0):
 # list(c for c in (chr(i) for i in range(sys.maxunicode))
 #      if unicodedata.category(c) == 'Cf')
 _category_cf = frozenset([

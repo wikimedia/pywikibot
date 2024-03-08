@@ -39,7 +39,7 @@ and override its `callback` method. Here is a sample:
 #
 # Distributed under the terms of the MIT license.
 #
-from typing import Union
+from __future__ import annotations
 
 import pywikibot
 from pywikibot import i18n
@@ -103,7 +103,7 @@ class BaseRevertBot(OptionHandler):
         *_, time = str(ts).strip('Z').partition('T')
         return ' '.join((date, year, time))
 
-    def revert(self, item) -> Union[str, bool]:
+    def revert(self, item) -> str | bool:
         """Revert a single item."""
         page = pywikibot.Page(self.site, item['title'])
         history = list(page.revisions(total=2))

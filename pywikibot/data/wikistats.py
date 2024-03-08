@@ -1,15 +1,21 @@
 """Objects representing WikiStats API."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from csv import DictReader
 from io import StringIO
-from typing import Optional
+from typing import Any
 
 import pywikibot
 from pywikibot.comms import http
+
+
+# cache the data
+_data: dict[str, list[Any]] = {}
 
 
 class WikiStats:
@@ -19,6 +25,9 @@ class WikiStats:
 
     The methods accept a Pywikibot family name as the WikiStats table name,
     mapping the names before calling the WikiStats API.
+
+    .. versionchanged:: 9.0
+       tables are cached globally instead by instances.
     """
 
     FAMILY_MAPPING = {
@@ -74,15 +83,14 @@ class WikiStats:
     def __init__(self, url: str = 'https://wikistats.wmcloud.org/') -> None:
         """Initializer."""
         self.url = url
-        self._data = {}
 
     def get(self, table: str) -> list:
         """Get a list of a table of data.
 
         :param table: table of data to fetch
         """
-        if table in self._data:
-            return self._data[table]
+        if table in _data:
+            return _data[table]
 
         if table not in self.ALL_KEYS:
             pywikibot.warning('WikiStats unknown table ' + table)
@@ -94,7 +102,7 @@ class WikiStats:
         f = StringIO(r.text)
         reader = DictReader(f)
         data = list(reader)
-        self._data[table] = data
+        _data[table] = data
         return data
 
     def get_dict(self, table: str) -> dict:
@@ -105,7 +113,7 @@ class WikiStats:
         return {data['prefix']: data for data in self.get(table)}
 
     def sorted(self, table: str, key: str,
-               reverse: Optional[bool] = None) -> list:
+               reverse: bool | None = None) -> list:
         """
         Reverse numerical sort of data.
 

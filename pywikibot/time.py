@@ -3,20 +3,27 @@
 .. versionadded:: 7.5
 """
 #
-# (C) Pywikibot team, 2007-2023
+# (C) Pywikibot team, 2007-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import datetime
 import math
 import re
+import time as _time
 import types
 from contextlib import suppress
-from typing import Type, Union
+from typing import overload
 
 import pywikibot
-from pywikibot.backports import Tuple
-from pywikibot.tools import classproperty, deprecated
+from pywikibot.tools import (
+    PYTHON_VERSION,
+    SPHINX_RUNNING,
+    classproperty,
+    deprecated,
+)
 
 
 __all__ = (
@@ -42,24 +49,29 @@ class Timestamp(datetime.datetime):
 
     """Class for handling MediaWiki timestamps.
 
-    This inherits from datetime.datetime, so it can use all of the methods
-    and operations of a datetime object. To ensure that the results of any
-    operation are also a Timestamp object, be sure to use only Timestamp
-    objects (and datetime.timedeltas) in any operation.
+    This inherits from :python:`datetime.datetime
+    <library/datetime.html#datetime.datetime>`, so it can use all of
+    the methods and operations of a ``datetime`` object. To ensure that
+    the results of any operation are also a Timestamp object, be sure to
+    use only Timestamp objects (and :python:`datetime.timedelta
+    <library/datetime.html#datetime.timedelta>`) in any operation.
 
-    Use Timestamp.fromISOformat() and Timestamp.fromtimestampformat() to
-    create Timestamp objects from MediaWiki string formats.
-    As these constructors are typically used to create objects using data
-    passed provided by site and page methods, some of which return a Timestamp
-    when previously they returned a MediaWiki string representation, these
-    methods also accept a Timestamp object, in which case they return a clone.
+    Use :meth:`Timestamp.fromISOformat` and
+    :meth:`Timestamp.fromtimestampformat` to create Timestamp objects
+    from MediaWiki string formats. As these constructors are typically
+    used to create objects using data passed provided by site and page
+    methods, some of which return a Timestamp when previously they
+    returned a MediaWiki string representation, these methods also
+    accept a Timestamp object, in which case they return a clone.
 
-    Alternatively, Timestamp.set_timestamp() can create Timestamp objects from
-    Timestamp, datetime.datetime object, or strings compliant with ISO8601,
-    MW, or POSIX formats.
+    Alternatively, :meth:`Timestamp.set_timestamp` can create Timestamp
+    objects from :class:`Timestamp`, ``datetime.datetime`` object, or
+    strings compliant with ISO8601, MediaWiki, or POSIX formats.
 
-    Use Site.server_time() for the current time; this is more reliable
-    than using Timestamp.utcnow().
+    Use :meth:`Site.server_time()
+    <pywikibot.site._apisite.APISite.server_time>` for the current time;
+    this is more reliable than using :meth:`Timestamp.utcnow` or
+    :meth:`Timestamp.nowutc`.
 
     .. versionchanged:: 7.5
        moved to :mod:`time` module
@@ -69,16 +81,18 @@ class Timestamp(datetime.datetime):
     _ISO8601Format_new = '{0:+05d}-{1:02d}-{2:02d}T{3:02d}:{4:02d}:{5:02d}Z'
 
     @classmethod
-    def set_timestamp(cls: Type['Timestamp'],
-                      ts: Union[str, datetime.datetime, 'Timestamp']
-                      ) -> 'Timestamp':
+    def set_timestamp(
+        cls,
+        ts: str | datetime.datetime | Timestamp,
+    ) -> Timestamp:
         """Set Timestamp from input object.
 
         ts is converted to a datetime naive object representing UTC time.
         String shall be compliant with:
-        - Mediwiki timestamp format: YYYYMMDDHHMMSS
-        - ISO8601 format: YYYY-MM-DD[T ]HH:MM:SS[Z|±HH[MM[SS[.ffffff]]]]
-        - POSIX format: seconds from Unix epoch S{1,13}[.ffffff]]
+
+        - Mediwiki timestamp format: ``YYYYMMDDHHMMSS``
+        - ISO8601 format: ``YYYY-MM-DD[T ]HH:MM:SS[Z|±HH[MM[SS[.ffffff]]]]``
+        - POSIX format: seconds from Unix epoch ``S{1,13}[.ffffff]]``
 
         .. versionadded:: 7.5
         .. versionchanged:: 8.0
@@ -98,7 +112,7 @@ class Timestamp(datetime.datetime):
             f'Unsupported "ts" type, got "{ts}" ({type(ts).__name__})')
 
     @staticmethod
-    def _from_datetime(dt: datetime.datetime) -> 'Timestamp':
+    def _from_datetime(dt: datetime.datetime) -> Timestamp:
         """Convert a datetime.datetime timestamp to a Timestamp object.
 
         .. versionadded:: 7.5
@@ -108,7 +122,7 @@ class Timestamp(datetime.datetime):
                          dt.tzinfo)
 
     @classmethod
-    def _from_mw(cls: Type['Timestamp'], timestr: str) -> 'Timestamp':
+    def _from_mw(cls, timestr: str) -> Timestamp:
         """Convert a string in MW format to a Timestamp object.
 
         Mediwiki timestamp format: YYYYMMDDHHMMSS
@@ -125,11 +139,11 @@ class Timestamp(datetime.datetime):
         return cls.strptime(timestr, cls.mediawikiTSFormat)
 
     @classmethod
-    def _from_iso8601(cls: Type['Timestamp'], timestr: str) -> 'Timestamp':
+    def _from_iso8601(cls, timestr: str) -> Timestamp:
         """Convert a string in ISO8601 format to a Timestamp object.
 
         ISO8601 format:
-        - YYYY-MM-DD[T ]HH:MM:SS[[.,]ffffff][Z|±HH[MM[SS[.ffffff]]]]
+        ``YYYY-MM-DD[T ]HH:MM:SS[[.,]ffffff][Z|±HH[MM[SS[.ffffff]]]]``
 
         .. versionadded:: 7.5
         """
@@ -168,10 +182,10 @@ class Timestamp(datetime.datetime):
         return ts
 
     @classmethod
-    def _from_posix(cls: Type['Timestamp'], timestr: str) -> 'Timestamp':
+    def _from_posix(cls, timestr: str) -> Timestamp:
         """Convert a string in POSIX format to a Timestamp object.
 
-        POSIX format: SECONDS[.ffffff]]
+        POSIX format: ``SECONDS[.ffffff]]``
 
         .. versionadded:: 7.5
         """
@@ -194,7 +208,7 @@ class Timestamp(datetime.datetime):
         return ts
 
     @classmethod
-    def _from_string(cls: Type['Timestamp'], timestr: str) -> 'Timestamp':
+    def _from_string(cls, timestr: str) -> Timestamp:
         """Convert a string to a Timestamp object.
 
         .. versionadded:: 7.5
@@ -211,8 +225,8 @@ class Timestamp(datetime.datetime):
 
         raise ValueError(f'time data {timestr!r} does not match any format.')
 
-    @deprecated('replace method', since='8.0.0')
-    def clone(self) -> 'Timestamp':
+    @deprecated('replace method', since='8.0.0')  # type: ignore[misc]
+    def clone(self) -> Timestamp:
         """Clone this instance.
 
         .. deprecated:: 8.0
@@ -221,13 +235,12 @@ class Timestamp(datetime.datetime):
         return self.replace()
 
     @classproperty
-    def ISO8601Format(cls: Type['Timestamp']) -> str:  # noqa: N802
+    def ISO8601Format(cls) -> str:  # noqa: N802
         """ISO8601 format string class property for compatibility purpose."""
         return cls._ISO8601Format()
 
     @classmethod
-    def _ISO8601Format(cls: Type['Timestamp'],  # noqa: N802
-                       sep: str = 'T') -> str:
+    def _ISO8601Format(cls, sep: str = 'T') -> str:  # noqa: N802
         """ISO8601 format string.
 
         :param sep: one-character separator, placed between the date and time
@@ -237,9 +250,9 @@ class Timestamp(datetime.datetime):
         return f'%Y-%m-%d{sep}%H:%M:%SZ'
 
     @classmethod
-    def fromISOformat(cls: Type['Timestamp'],  # noqa: N802
-                      ts: Union[str, 'Timestamp'],
-                      sep: str = 'T') -> 'Timestamp':
+    def fromISOformat(cls,  # noqa: N802
+                      ts: str | Timestamp,
+                      sep: str = 'T') -> Timestamp:
         """Convert an ISO 8601 timestamp to a Timestamp object.
 
         :param ts: ISO 8601 timestamp or a Timestamp object already
@@ -251,12 +264,17 @@ class Timestamp(datetime.datetime):
         if isinstance(ts, cls):
             return ts.replace()
 
+        if not isinstance(ts, str):
+            raise TypeError(
+                f'ts argument must be a string or a Timestamp object,'
+                f' not {type(ts).__name__}')
+
         return cls._from_iso8601(f'{ts[:10]}{sep}{ts[11:]}')
 
     @classmethod
-    def fromtimestampformat(cls: Type['Timestamp'],
-                            ts: Union[str, 'Timestamp'],
-                            strict: bool = False) -> 'Timestamp':
+    def fromtimestampformat(cls,
+                            ts: str | Timestamp,
+                            strict: bool = False) -> Timestamp:
         """Convert a MediaWiki internal timestamp to a Timestamp object.
 
         .. versionchanged:: 3.0
@@ -288,6 +306,11 @@ class Timestamp(datetime.datetime):
         # to create a clone.
         if isinstance(ts, cls):
             return ts.replace()
+
+        if not isinstance(ts, str):
+            raise TypeError(
+                f'ts argument must be a string or a Timestamp object,'
+                f' not {type(ts).__name__}')
 
         if len(ts) == 8 and not strict:
             # year, month and day are given only
@@ -337,20 +360,146 @@ class Timestamp(datetime.datetime):
         """Return a string format recognized by the API."""
         return self.isoformat()
 
-    def __add__(self, other: datetime.timedelta) -> 'Timestamp':
-        """Perform addition, returning a Timestamp instead of datetime."""
-        newdt = super().__add__(other)
-        if isinstance(newdt, datetime.datetime):
-            return self._from_datetime(newdt)
-        return newdt
+    @classmethod
+    def nowutc(cls, *, with_tz: bool = True) -> Timestamp:
+        """Return the current UTC date and time.
 
-    def __sub__(self, other: datetime.timedelta  # type: ignore[override]
-                ) -> 'Timestamp':
-        """Perform subtraction, returning a Timestamp instead of datetime."""
-        newdt = super().__sub__(other)
-        if isinstance(newdt, datetime.datetime):
-            return self._from_datetime(newdt)
-        return newdt
+        If *with_tz* is True it returns an aware :class:`Timestamp`
+        object with UTC timezone by calling ``now(datetime.UTC)``. As
+        such this is just a short way to get it.
+
+        Otherwise the UTC timestamp is returned as a naive Timestamp
+        object with timezone of None. This is equal to the
+        :meth:`Timestamp.utcnow`.
+
+        .. warning::
+           Because naive datetime objects are treated by many datetime
+           methods as local times, it is preferred to use aware
+           Timestamps or datetimes to represent times in UTC. As such,
+           it is not recommended to set *with_tz* to False.
+
+        .. caution::
+           You cannot compare, add or subtract offset-naive and offset-
+           aware Timestamps/datetimes (i.e. missing or having timezone).
+           A TypeError will be raised in such cases.
+
+        .. versionadded:: 9.0
+        .. seealso::
+           - :python:`datetime.now()
+             <library/datetime.html#datetime.datetime.now>`
+           - :python:`datetime.utcnow()
+             <library/datetime.html#datetime.datetime.utcnow>`
+           - :python:`datetime.UTC<library/datetime.html#datetime.UTC>`
+
+        :param with_tz: Whether to include UTC timezone or not
+        """
+        if with_tz:
+            # datetime.UTC can only be used with Python 3.11+
+            return cls.now(datetime.timezone.utc)
+
+        ts = _time.time()
+        gmt = _time.gmtime(ts)
+        us = round(ts % 1 * 1e6)
+        return cls(*gmt[:6], us)
+
+    @classmethod
+    def utcnow(cls) -> Timestamp:
+        """Return the current UTC date and time, with `tzinfo` ``None``.
+
+        This is like :meth:`Timestamp.now`, but returns the current UTC
+        date and time, as a naive :class:`Timestamp` object. An aware
+        current UTC datetime can be obtained by calling
+        :meth:`Timestamp.nowutc`.
+
+        .. note:: This method is deprecated since Python 3.12 but held
+           here for backward compatibility because ``utcnow`` is widely
+           used inside the framework to compare MediaWiki timestamps
+           which are UTC-based. Neither :python:`datetime.fromisoformat()
+           <library/datetime.html#datetime.datetime.fromisoformat>`
+           implementations of Python < 3.11 nor :class:`Timestamp`
+           specific :meth:`fromISOformat` supports timezone.
+
+        .. warning::
+           Because naive datetime objects are treated by many datetime
+           methods as local times, it is preferred to use aware
+           Timestamps or datetimes to represent times in UTC. As such,
+           the recommended way to create an object representing the
+           current time in UTC is by calling :meth:`Timestamp.nowutc`.
+
+        .. hint::
+           This method might be deprecated later.
+
+        .. versionadded:: 9.0
+        .. seealso::
+           :python:`datetime.utcnow()
+           <library/datetime.html#datetime.datetime.utcnow>`
+        """
+        if PYTHON_VERSION < (3, 12):
+            return super().utcnow()
+        return cls.nowutc(with_tz=False)
+
+    if PYTHON_VERSION < (3, 8) or SPHINX_RUNNING:
+        # methods which does not upcast the right class but return a
+        # datetime.datetime object in Python 3.7
+
+        def __add__(self, other: datetime.timedelta) -> Timestamp:
+            """Perform addition, returning a Timestamp instead of datetime."""
+            newdt = super().__add__(other)
+            if isinstance(newdt, datetime.datetime):
+                return self._from_datetime(newdt)
+            return newdt
+
+        @overload  # type: ignore[override]
+        def __sub__(self, other: datetime.timedelta) -> Timestamp:
+            ...
+
+        @overload
+        def __sub__(self, other: datetime.datetime) -> datetime.timedelta:
+            ...
+
+        def __sub__(
+            self,
+            other: datetime.datetime | datetime.timedelta,
+        ) -> datetime.timedelta | Timestamp:
+            """Perform subtraction, returning Timestamp instead of datetime."""
+            newdt = super().__sub__(other)  # type: ignore[operator]
+            if isinstance(newdt, datetime.datetime):
+                return self._from_datetime(newdt)
+            return newdt
+
+        @classmethod
+        def fromtimestamp(cls, timestamp: int | float, tz=None) -> Timestamp:
+            """Return the local date and time corresponding to the POSIX ts.
+
+            This class method is for Python 3.7 to upcast the class if a
+            tz is given.
+
+            .. versionadded:: 9.0
+            .. seealso::
+               - :python:`datetime.fromtimestamp()
+                 <library/datetime.html#datetime.datetime.fromtimestamp>`
+            """
+            ts = super().fromtimestamp(timestamp, tz)
+            if tz:
+                ts = cls.set_timestamp(ts)
+            return ts
+
+        @classmethod
+        def now(cls, tz=None) -> Timestamp:
+            """Return the current local date and time.
+
+            This class method is for Python 3.7 to upcast the class if a
+            *tz* is given.
+
+            .. versionadded:: 9.0
+            .. seealso::
+               - :python:`datetime.now()
+                 <library/datetime.html#datetime.datetime.now>`
+            """
+            ts = super().now(tz)
+            if tz:
+                ts = cls.set_timestamp(ts)
+            return ts
 
 
 class TZoneFixedOffset(datetime.tzinfo):
@@ -367,15 +516,15 @@ class TZoneFixedOffset(datetime.tzinfo):
         self._offset = datetime.timedelta(minutes=offset)
         self._name = name
 
-    def utcoffset(self, dt):
+    def utcoffset(self, dt: datetime.datetime | None) -> datetime.timedelta:
         """Return the offset to UTC."""
         return self._offset
 
-    def tzname(self, dt):
+    def tzname(self, dt: datetime.datetime | None) -> str:
         """Return the name of the timezone."""
         return self._name
 
-    def dst(self, dt):
+    def dst(self, dt: datetime.datetime | None) -> datetime.timedelta:
         """Return no daylight savings time."""
         return datetime.timedelta(0)
 
@@ -388,7 +537,10 @@ class TZoneFixedOffset(datetime.tzinfo):
         )
 
 
-def str2timedelta(string: str, timestamp=None) -> datetime.timedelta:
+def str2timedelta(
+    string: str,
+    timestamp: datetime.datetime | None = None,
+) -> datetime.timedelta:
     """
     Return a timedelta for a shorthand duration.
 
@@ -422,7 +574,7 @@ def str2timedelta(string: str, timestamp=None) -> datetime.timedelta:
     return datetime.timedelta(**{MW_KEYS[key]: duration})
 
 
-def parse_duration(string: str) -> Tuple[str, int]:
+def parse_duration(string: str) -> tuple[str, int]:
     """
     Return the key and duration extracted from the string.
 

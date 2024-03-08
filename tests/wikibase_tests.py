@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Tests for the Wikidata parts of the page module."""
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import copy
 import datetime
 import json
@@ -40,7 +42,7 @@ from tests.basepage import (
 def _get_test_unconnected_page(site):
     """Get unconnected page from site for tests."""
     gen = pagegenerators.NewpagesPageGenerator(site=site, total=10,
-                                               namespaces=[1, ])
+                                               namespaces=[1])
     for page in gen:
         if not page.properties().get('wikibase_item'):
             return page
@@ -587,6 +589,65 @@ class TestWbTime(WbRepresentationTestCase):
         t2 = pywikibot.WbTime.fromTimestamp(ts2, timezone=0, site=repo)
         self.assertGreater(t1, t2)
 
+    def test_comparison_timezones_equal(self):
+        """Test when two WbTime's have equal instants but not the same tz."""
+        repo = self.get_repo()
+        ts1 = pywikibot.Timestamp(
+            year=2023, month=12, day=21, hour=13,
+            tzinfo=datetime.timezone(datetime.timedelta(hours=-5)))
+        ts2 = pywikibot.Timestamp(
+            year=2023, month=12, day=21, hour=18,
+            tzinfo=datetime.timezone.utc)
+        self.assertEqual(ts1.timestamp(), ts2.timestamp())
+
+        t1 = pywikibot.WbTime.fromTimestamp(ts1, timezone=-300, site=repo)
+        t2 = pywikibot.WbTime.fromTimestamp(ts2, timezone=0, site=repo)
+        self.assertGreaterEqual(t1, t2)
+        self.assertGreaterEqual(t2, t1)
+        self.assertNotEqual(t1, t2)
+        self.assertNotEqual(t2, t1)
+        # Ignore H205: We specifically want to test the operator
+        self.assertFalse(t1 > t2)  # noqa: H205
+        self.assertFalse(t2 > t1)  # noqa: H205
+        self.assertFalse(t1 < t2)  # noqa: H205
+        self.assertFalse(t2 < t1)  # noqa: H205
+
+    def test_comparison_equal_instant(self):
+        """Test the equal_instant method."""
+        repo = self.get_repo()
+
+        ts1 = pywikibot.Timestamp(
+            year=2023, month=12, day=21, hour=13,
+            tzinfo=datetime.timezone(datetime.timedelta(hours=-5)))
+        ts2 = pywikibot.Timestamp(
+            year=2023, month=12, day=21, hour=18,
+            tzinfo=datetime.timezone.utc)
+        ts3 = pywikibot.Timestamp(
+            year=2023, month=12, day=21, hour=19,
+            tzinfo=datetime.timezone(datetime.timedelta(hours=1)))
+        ts4 = pywikibot.Timestamp(
+            year=2023, month=12, day=21, hour=13,
+            tzinfo=datetime.timezone(datetime.timedelta(hours=-6)))
+
+        self.assertEqual(ts1.timestamp(), ts2.timestamp())
+        self.assertEqual(ts1.timestamp(), ts3.timestamp())
+        self.assertEqual(ts2.timestamp(), ts3.timestamp())
+        self.assertNotEqual(ts1.timestamp(), ts4.timestamp())
+        self.assertNotEqual(ts2.timestamp(), ts4.timestamp())
+        self.assertNotEqual(ts3.timestamp(), ts4.timestamp())
+
+        t1 = pywikibot.WbTime.fromTimestamp(ts1, timezone=-300, site=repo)
+        t2 = pywikibot.WbTime.fromTimestamp(ts2, timezone=0, site=repo)
+        t3 = pywikibot.WbTime.fromTimestamp(ts3, timezone=60, site=repo)
+        t4 = pywikibot.WbTime.fromTimestamp(ts4, timezone=-360, site=repo)
+
+        self.assertTrue(t1.equal_instant(t2))
+        self.assertTrue(t1.equal_instant(t3))
+        self.assertTrue(t2.equal_instant(t3))
+        self.assertFalse(t1.equal_instant(t4))
+        self.assertFalse(t2.equal_instant(t4))
+        self.assertFalse(t3.equal_instant(t4))
+
 
 class TestWbQuantity(WbRepresentationTestCase):
 
@@ -606,26 +667,26 @@ class TestWbQuantity(WbRepresentationTestCase):
         q = pywikibot.WbQuantity(amount=1234, error=1, site=repo)
         self.assertEqual(q.toWikibase(),
                          {'amount': '+1234', 'lowerBound': '+1233',
-                          'upperBound': '+1235', 'unit': '1', })
+                          'upperBound': '+1235', 'unit': '1'})
         q = pywikibot.WbQuantity(amount=5, error=(2, 3), site=repo)
         self.assertEqual(q.toWikibase(),
                          {'amount': '+5', 'lowerBound': '+2',
-                          'upperBound': '+7', 'unit': '1', })
+                          'upperBound': '+7', 'unit': '1'})
         q = pywikibot.WbQuantity(amount=0, error=(0, 0), site=repo)
         self.assertEqual(q.toWikibase(),
                          {'amount': '+0', 'lowerBound': '+0',
-                          'upperBound': '+0', 'unit': '1', })
+                          'upperBound': '+0', 'unit': '1'})
         q = pywikibot.WbQuantity(amount=-5, error=(2, 3), site=repo)
         self.assertEqual(q.toWikibase(),
                          {'amount': '-5', 'lowerBound': '-8',
-                          'upperBound': '-3', 'unit': '1', })
+                          'upperBound': '-3', 'unit': '1'})
 
     def test_WbQuantity_float_27(self):
         """Test WbQuantity for float value."""
         repo = self.get_repo()
         q = pywikibot.WbQuantity(amount=0.044405586, error=0.0, site=repo)
         q_dict = {'amount': '+0.044405586', 'lowerBound': '+0.044405586',
-                  'upperBound': '+0.044405586', 'unit': '1', }
+                  'upperBound': '+0.044405586', 'unit': '1'}
         self.assertEqual(q.toWikibase(), q_dict)
 
     def test_WbQuantity_scientific(self):
@@ -633,7 +694,7 @@ class TestWbQuantity(WbRepresentationTestCase):
         repo = self.get_repo()
         q = pywikibot.WbQuantity(amount='1.3e-13', error='1e-14', site=repo)
         q_dict = {'amount': '+1.3e-13', 'lowerBound': '+1.2e-13',
-                  'upperBound': '+1.4e-13', 'unit': '1', }
+                  'upperBound': '+1.4e-13', 'unit': '1'}
         self.assertEqual(q.toWikibase(), q_dict)
 
     def test_WbQuantity_decimal(self):
@@ -642,7 +703,7 @@ class TestWbQuantity(WbRepresentationTestCase):
         q = pywikibot.WbQuantity(amount=Decimal('0.044405586'),
                                  error=Decimal('0.0'), site=repo)
         q_dict = {'amount': '+0.044405586', 'lowerBound': '+0.044405586',
-                  'upperBound': '+0.044405586', 'unit': '1', }
+                  'upperBound': '+0.044405586', 'unit': '1'}
         self.assertEqual(q.toWikibase(), q_dict)
 
     def test_WbQuantity_string(self):
@@ -650,7 +711,7 @@ class TestWbQuantity(WbRepresentationTestCase):
         repo = self.get_repo()
         q = pywikibot.WbQuantity(amount='0.044405586', error='0', site=repo)
         q_dict = {'amount': '+0.044405586', 'lowerBound': '+0.044405586',
-                  'upperBound': '+0.044405586', 'unit': '1', }
+                  'upperBound': '+0.044405586', 'unit': '1'}
         self.assertEqual(q.toWikibase(), q_dict)
 
     def test_WbQuantity_formatting_bound(self):
@@ -686,7 +747,7 @@ class TestWbQuantity(WbRepresentationTestCase):
         # note that the bounds are inputted as INT but are returned as FLOAT
         self.assertEqual(q.toWikibase(),
                          {'amount': '+0.0229', 'lowerBound': '+0.0000',
-                          'upperBound': '+1.0000', 'unit': '1', })
+                          'upperBound': '+1.0000', 'unit': '1'})
 
     def test_WbQuantity_errors(self):
         """Test WbQuantity error handling."""
@@ -702,19 +763,19 @@ class TestWbQuantity(WbRepresentationTestCase):
         self.assertEqual(q.toWikibase(),
                          {'amount': '+1234', 'lowerBound': '+1233',
                           'upperBound': '+1235',
-                          'unit': 'http://www.wikidata.org/entity/Q712226', })
+                          'unit': 'http://www.wikidata.org/entity/Q712226'})
 
     def test_WbQuantity_unit_fromWikibase(self):
         """Test WbQuantity recognising unit from Wikibase output."""
         repo = self.get_repo()
         q = pywikibot.WbQuantity.fromWikibase({
             'amount': '+1234', 'lowerBound': '+1233', 'upperBound': '+1235',
-            'unit': 'http://www.wikidata.org/entity/Q712226', },
+            'unit': 'http://www.wikidata.org/entity/Q712226'},
             site=repo)
         self.assertEqual(q.toWikibase(),
                          {'amount': '+1234', 'lowerBound': '+1233',
                           'upperBound': '+1235',
-                          'unit': 'http://www.wikidata.org/entity/Q712226', })
+                          'unit': 'http://www.wikidata.org/entity/Q712226'})
 
 
 class TestWbQuantityNonDry(WbRepresentationTestCase):
@@ -770,7 +831,7 @@ class TestWbQuantityNonDry(WbRepresentationTestCase):
                                               site=self.repo)
         self.assertEqual(q.toWikibase(),
                          {'amount': '+0.0229', 'lowerBound': None,
-                          'upperBound': None, 'unit': '1', })
+                          'upperBound': None, 'unit': '1'})
 
     def test_WbQuantity_ItemPage_unit(self):
         """Test WbQuantity with ItemPage unit."""
@@ -783,7 +844,7 @@ class TestWbQuantityNonDry(WbRepresentationTestCase):
         self.assertEqual(q.toWikibase(),
                          {'amount': '+1234', 'lowerBound': '+1233',
                           'upperBound': '+1235',
-                          'unit': 'http://www.wikidata.org/entity/Q712226', })
+                          'unit': 'http://www.wikidata.org/entity/Q712226'})
 
     def test_WbQuantity_equality(self):
         """Test WbQuantity equality with different unit representations."""
@@ -2467,6 +2528,6 @@ class TestJSON(WikidataTestCase):
         self.assertEqual(diff, expected)
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

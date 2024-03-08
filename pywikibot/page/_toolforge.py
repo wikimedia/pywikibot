@@ -7,9 +7,10 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import collections
 import re
-from typing import Optional
 
 import pywikibot
 from pywikibot import config
@@ -44,7 +45,7 @@ class WikiBlameMixin:
             raise pywikibot.exceptions.NoPageError(self)
 
     def main_authors(self, *,
-                     onlynew: Optional[bool] = None) -> collections.Counter:
+                     onlynew: bool | None = None) -> collections.Counter:
         """Retrieve the 5 topmost main authors of an article.
 
         This method uses WikiHistory to retrieve the text based main

@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Test tools package alone which don't fit into other tests."""
 #
-# (C) Pywikibot team, 2015-2023
+# (C) Pywikibot team, 2015-2024
 #
 # Distributed under the terms of the MIT license.
+from __future__ import annotations
+
 import decimal
 import hashlib
 import os
@@ -22,6 +24,7 @@ from pywikibot.tools import (
     classproperty,
     has_module,
     is_ip_address,
+    is_ip_network,
     suppress_warnings,
 )
 from pywikibot.tools.itertools import (
@@ -837,6 +840,81 @@ class TestIsIpAddress(TestCase):
                 self.assertFalse(is_ip_address(address))
 
 
+class TestIsIpNetwork(TestCase):
+
+    """Unit test class for is_ip_network."""
+
+    net = False
+
+    def test_valid_ipv4_ranges(self):
+        """Check with valid IPv4 address ranges."""
+        valid_ranges = (
+            '0.0.0.0/32',
+            '1.2.3.4/32',
+            '1.2.3.0/24',
+            '192.168.0.0/16',
+            '192.168.0.0/15',
+            '255.0.0.0/8',
+            '0.0.0.0/1'
+        )
+
+        for ip_range in valid_ranges:
+            with self.subTest(ip_network=ip_range):
+                self.assertTrue(is_ip_network(ip_range))
+
+    def test_invalid_ipv4_ranges(self):
+        """Check with invalid IPv4 address ranges."""
+        invalid_ranges = (
+            None,
+            '',
+            '0.0.0',
+            '1.2.3.256',
+            '1.2.3.-1',
+            '0.0.0.a',
+            'a.b.c.d',
+            '1.2.3.4/24',
+            '192.168.0.0/8',
+            '192.168.1.0/15'
+        )
+
+        for ip_range in invalid_ranges:
+            with self.subTest(ip_network=ip_range):
+                self.assertFalse(is_ip_network(ip_range))
+
+    def test_valid_ipv6_ranges(self):
+        """Check with valid IPv6 address ranges."""
+        valid_ranges = (
+            'fe80:0000:0000:0000:0202:b3ff:fe1e:8329/128',
+            'fe80:0:0:0:202:b3ff:fe1e:8329/128',
+            '::ffff:5.9.158.75/128',
+            '2001:0db8:0000:0000:0000:0000:0000:0000/32',
+            '2001:0db8::/32',
+            '::/64',
+            '::/1',
+        )
+
+        for ip_range in valid_ranges:
+            with self.subTest(ip_network=ip_range):
+                self.assertTrue(is_ip_network(ip_range))
+
+    def test_invalid_ipv6_addresses(self):
+        """Check with invalid IPv6 addresses."""
+        invalid_ranges = (
+            None,
+            '/32',
+            ':/32',
+            ':::/32',
+            '2001:db8::aaaa::1/128',
+            'fe80:0000:0000:0000:0202:b3ff:fe1e: 8329/128',
+            'fe80:0000:0000:0000:0202:b3ff:fe1e:829g/128',
+            '2001:0db8::/16'
+        )
+
+        for ip_range in invalid_ranges:
+            with self.subTest(ip_network=ip_range):
+                self.assertFalse(is_ip_network(ip_range))
+
+
 class TestHasModule(TestCase):
 
     """Unit test class for has_module."""
@@ -845,8 +923,8 @@ class TestHasModule(TestCase):
 
     def test_when_present(self):
         """Test when the module is available."""
-        self.assertTrue(has_module('setuptools'))
-        self.assertTrue(has_module('setuptools', '1.0'))
+        self.assertTrue(has_module('requests'))
+        self.assertTrue(has_module('requests', '1.0'))
 
     def test_when_missing(self):
         """Test when the module is unavailable."""
@@ -857,7 +935,7 @@ class TestHasModule(TestCase):
         ImportWarning)
     def test_when_insufficient_version(self):
         """Test when the module is older than what we need."""
-        self.assertFalse(has_module('setuptools', '99999'))
+        self.assertFalse(has_module('requests', '99999'))
 
 
 class TestStringFunctions(TestCase):
@@ -998,6 +1076,6 @@ class TestTinyCache(TestCase):
         self.assertEqual(self.foo.read, 2)
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

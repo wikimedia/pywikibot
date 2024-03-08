@@ -79,18 +79,19 @@ To complete a move of a page, one can use:
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import codecs
 import os
 import re
 from contextlib import suppress
 from itertools import chain
-from typing import Generator, Optional
+from typing import Generator
 
 import pywikibot
 from pywikibot import config
 from pywikibot import editor as editarticle
 from pywikibot import i18n, pagegenerators
-from pywikibot.backports import List
 from pywikibot.bot import (
     HighlightContextOption,
     ListOption,
@@ -697,7 +698,7 @@ bot class or use available_options.update() to use default settings from
 DisambiguationRobot""".format(options=added_keys,
                               classname=self.__class__.__name__))
 
-    def checkContents(self, text: str) -> Optional[str]:  # noqa: N802
+    def checkContents(self, text: str) -> str | None:  # noqa: N802
         """
         Check if the text matches any of the ignore regexes.
 
@@ -764,7 +765,7 @@ DisambiguationRobot""".format(options=added_keys,
             if found:
                 yield found[1]
 
-    def firstize(self, page, links) -> List[pywikibot.Page]:
+    def firstize(self, page, links) -> list[pywikibot.Page]:
         """Call firstlinks and remove extra links.
 
         This will remove a lot of silly redundant links from overdecorated
@@ -1274,7 +1275,7 @@ or press enter to quit:""")
             self.opt.pos.sort(key=lambda x: x.lower())
         else:
             self.opt.pos.sort()
-        SequenceOutputter(self.opt.pos).output()
+        pywikibot.info(SequenceOutputter(self.opt.pos).out)
 
         gen = ReferringPageGeneratorWithIgnore(
             page,

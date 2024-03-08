@@ -29,10 +29,3 @@ unidata script
 .. automodule:: scripts.maintenance.unidata
    :no-members:
    :noindex:
-
-wikimedia\_sites script
-=======================
-
-.. automodule:: scripts.maintenance.wikimedia_sites
-   :no-members:
-   :noindex:

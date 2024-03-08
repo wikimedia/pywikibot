@@ -46,9 +46,9 @@ The following command line parameters are supported:
 #
 # (C) Pywikibot team, 2013-2023
 #
-# Distributed under the terms of MIT License.
+# Distributed under the terms of MIT license.
 #
-from typing import Optional
+from __future__ import annotations
 
 import pywikibot
 from pywikibot import pagegenerators
@@ -77,7 +77,7 @@ class CoordImportRobot(ConfigParserBot, WikidataBot):
         self.prop = 'P625'
         self.create_missing_item = self.opt.create
 
-    def has_coord_qualifier(self, claims) -> Optional[str]:
+    def has_coord_qualifier(self, claims) -> str | None:
         """
         Check if self.prop is used as property for a qualifier.
 

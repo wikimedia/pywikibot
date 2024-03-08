@@ -1,6 +1,6 @@
 """Configuration file for Sphinx."""
 #
-# (C) Pywikibot team, 2014-2023
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -15,6 +15,7 @@
 #
 # All configuration values have a default; values that are commented out
 # serve to show the default.
+from __future__ import annotations
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -25,6 +26,8 @@ import re
 import sys
 import warnings
 from pathlib import Path
+
+import tomli
 
 
 # Deprecated classes will generate warnings as Sphinx processes them.
@@ -43,12 +46,14 @@ import pywikibot  # noqa: E402
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #
-needs_sphinx = '7.2.3'
+needs_sphinx = '7.2.6'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'notfound.extension',
+    'sphinx_copybutton',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosectionlabel',
     'sphinx.ext.autosummary',
@@ -76,9 +81,13 @@ source_suffix = '.rst'
 root_doc = 'index'
 
 # General information about the project.
-project = pywikibot.__name__.title()
+filepath = Path().absolute().parent / 'pyproject.toml'
+with open(filepath, 'rb') as f:
+    meta_data = tomli.load(f)
+
+project = meta_data['project']['name'].title()
 project_copyright = pywikibot.__copyright__  # alias since Python 3.5
-author = 'Pywikibot Team'
+author = meta_data['project']['maintainers'][0]['name']
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -483,8 +492,6 @@ html_css_files = [
 extlinks = {
     # MediaWiki API
     'api': ('https://www.mediawiki.org/wiki/API:%s', 'API:%s'),
-    # Python bug tracker
-    'bug': ('https://bugs.python.org/issue%s', 'Python issue %s'),
     # Python bug tracker
     'issue': ('https://github.com/python/cpython/issues/%s',
               'Python issue %s'),

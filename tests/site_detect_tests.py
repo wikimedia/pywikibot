@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Test for site detection."""
 #
-# (C) Pywikibot team, 2014-2023
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import os
 import unittest
 from contextlib import suppress
@@ -63,6 +65,7 @@ class MediaWikiSiteTestCase(SiteDetectionTestCase):
         # Server that hosts www.wikichristian.org is unreliable - it
         # occasionally responding with 500 error (see: T151368).
         'http://www.wikichristian.org/index.php?title=$1',
+        'http://kb.mozillazine.org/$1'  # 1.40.1
     )
 
     non_standard_version_sites = (
@@ -77,7 +80,6 @@ class MediaWikiSiteTestCase(SiteDetectionTestCase):
         'http://www.werelate.org/wiki/$1',
         'http://www.otterstedt.de/wiki/index.php/$1',
         'https://en.wikifur.com/wiki/$1',  # 1.23.16
-        'http://kb.mozillazine.org/$1'  # 1.26.4
     )
 
     no_sites = (
@@ -89,6 +91,9 @@ class MediaWikiSiteTestCase(SiteDetectionTestCase):
         'http://www.merriam-webster.com/'
         'cgi-bin/dictionary?book=Dictionary&va=$1',
         'http://arxiv.org/abs/$1',
+        # looks like a MW site but isn't, api is redirected to
+        # https://foundation.wikimedia.org
+        'https://wikimediafoundation.org/$1',
     )
 
     failing_sites = [
@@ -234,6 +239,6 @@ class PrivateWikiTestCase(PatchingTestCase):
         self.assertEqual(site.lang, self.LANG)
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

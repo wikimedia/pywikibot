@@ -5,16 +5,18 @@
    version script was moved to the framework scripts folder
 """
 #
-# (C) Pywikibot team, 2007-2022
+# (C) Pywikibot team, 2007-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import codecs
 import os
 import sys
 
 import pywikibot
-from pywikibot.version import get_toolforge_hostname, getversion
+from pywikibot.version import getversion
 
 
 class DummyModule:
@@ -25,9 +27,9 @@ class DummyModule:
 
 
 try:
-    import setuptools
+    import packaging
 except ImportError:
-    setuptools = DummyModule()
+    packaging = DummyModule()
 
 try:
     import mwparserfromhell
@@ -52,7 +54,7 @@ def main(*args: str) -> None:
     """Print pywikibot version and important settings."""
     pywikibot.info('Pywikibot: ' + getversion())
     pywikibot.info('Release version: ' + pywikibot.__version__)
-    pywikibot.info('setuptools version: ' + setuptools.__version__)
+    pywikibot.info('packaging version: ' + packaging.__version__)
     pywikibot.info('mwparserfromhell version: ' + mwparserfromhell.__version__)
     pywikibot.info('wikitextparser version: ' + wikitextparser.__version__)
     pywikibot.info('requests version: ' + requests.__version__)
@@ -78,10 +80,6 @@ def main(*args: str) -> None:
 
     pywikibot.info('Python: ' + sys.version)
 
-    toolforge_env_hostname = get_toolforge_hostname()
-    if toolforge_env_hostname:
-        pywikibot.info('Toolforge hostname: ' + toolforge_env_hostname)
-
     # check environment settings
     settings = {key for key in os.environ if key.startswith('PYWIKIBOT')}
     settings.update(['PYWIKIBOT_DIR', 'PYWIKIBOT_DIR_PWB',
@@ -95,7 +93,7 @@ def main(*args: str) -> None:
     for family, usernames in pywikibot.config.usernames.items():
         if not usernames:
             continue
-        pywikibot.info(f'Usernames for family {family!r}:')
+        pywikibot.info(f"Usernames for family '{family}':")
         for lang, username in usernames.items():
             pywikibot.info(f'\t{lang}: {username}')
 

@@ -1,21 +1,26 @@
 """Objects representing Namespaces of MediaWiki site."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2023
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
+from abc import ABCMeta
 from collections.abc import Iterable, Mapping
 from enum import IntEnum
-from typing import Optional, Union
+from typing import Union
 
-from pywikibot.backports import Dict
 from pywikibot.backports import Iterable as IterableType
-from pywikibot.backports import List
-from pywikibot.tools import ComparableMixin, SelfCallMixin, classproperty
+from pywikibot.tools import ComparableMixin, classproperty
 
 
-NamespaceIDType = Union[int, str, 'Namespace']
-NamespaceArgType = Union[NamespaceIDType, IterableType[NamespaceIDType], None]
+SingleNamespaceType = Union[int, str, 'Namespace']
+NamespaceArgType = Union[
+    SingleNamespaceType,
+    IterableType[SingleNamespaceType],
+    None,
+]
 
 
 class BuiltinNamespace(IntEnum):
@@ -51,7 +56,20 @@ class BuiltinNamespace(IntEnum):
         return name.replace('Mediawiki', 'MediaWiki')
 
 
-class Namespace(Iterable, ComparableMixin):
+class MetaNamespace(ABCMeta):
+
+    """Metaclass for Namespace attribute settings.
+
+    .. versionadded:: 9.0
+    """
+
+    def __new__(cls, name, bases, dic):
+        """Set Namespace.FOO to BuiltinNamespace.FOO for each builtin ns."""
+        dic.update(BuiltinNamespace.__members__)
+        return super().__new__(cls, name, bases, dic)
+
+
+class Namespace(Iterable, ComparableMixin, metaclass=MetaNamespace):
 
     """
     Namespace site data object.
@@ -69,12 +87,15 @@ class Namespace(Iterable, ComparableMixin):
 
     If only one of canonical_name and custom_name are available, both
     properties will have the same value.
+
+    .. versionchanged:: 9.0
+       metaclass from :class:`MetaNamespace`
     """
 
     def __init__(self, id,
-                 canonical_name: Optional[str] = None,
-                 custom_name: Optional[str] = None,
-                 aliases: Optional[List[str]] = None,
+                 canonical_name: str | None = None,
+                 custom_name: str | None = None,
+                 aliases: list[str] | None = None,
                  **kwargs) -> None:
         """Initializer.
 
@@ -95,9 +116,9 @@ class Namespace(Iterable, ComparableMixin):
 
         if aliases:
             self.aliases = aliases
-        elif id in (6, 7):
+        elif id in (BuiltinNamespace.FILE, BuiltinNamespace.FILE_TALK):
             alias = 'Image'
-            if id == 7:
+            if id == BuiltinNamespace.FILE_TALK:
                 alias += ' talk'
             self.aliases = [alias]
         else:
@@ -107,7 +128,7 @@ class Namespace(Iterable, ComparableMixin):
             setattr(self, key, value)
 
     @classproperty
-    def canonical_namespaces(cls) -> Dict[int, str]:
+    def canonical_namespaces(cls) -> dict[int, str]:
         """Return the canonical forms of MediaWiki built-in namespaces.
 
         .. versionchanged:: 7.1
@@ -135,7 +156,7 @@ class Namespace(Iterable, ComparableMixin):
 
         :param item: name to check
         """
-        if item == '' and self.id == 0:
+        if item == '' and self.id == BuiltinNamespace.MAIN:
             return True
 
         name = Namespace.normalize_name(item)
@@ -175,10 +196,10 @@ class Namespace(Iterable, ComparableMixin):
     @staticmethod
     def _colons(id, name):
         """Return the name with required colons, depending on the ID."""
-        if id == 0:
+        if id == BuiltinNamespace.MAIN:
             return ':'
 
-        if id in (6, 14):
+        if id in (BuiltinNamespace.FILE, BuiltinNamespace.CATEGORY):
             return ':' + name + ':'
 
         return name + ':'
@@ -266,9 +287,10 @@ class Namespace(Iterable, ComparableMixin):
     def default_case(id, default_case=None):
         """Return the default fixed case value for the namespace ID."""
         # https://www.mediawiki.org/wiki/Manual:$wgCapitalLinkOverrides#Warning
-        if id > 0 and id % 2 == 1:  # the talk ns has the non-talk ns case
-            id -= 1
-        if id in (-1, 2, 8):
+        if id in (BuiltinNamespace.SPECIAL,
+                  BuiltinNamespace.USER, BuiltinNamespace.USER_TALK,
+                  BuiltinNamespace.MEDIAWIKI, BuiltinNamespace.MEDIAWIKI_TALK,
+                  ):
             return 'first-letter'
 
         return default_case
@@ -276,8 +298,8 @@ class Namespace(Iterable, ComparableMixin):
     @classmethod
     def builtin_namespaces(cls, case: str = 'first-letter'):
         """Return a dict of the builtin namespaces."""
-        return {i: cls(i, case=cls.default_case(i, case))
-                for i in range(-2, 16)}
+        return {e.value: cls(e.value, case=cls.default_case(e.value, case))
+                for e in BuiltinNamespace}
 
     @staticmethod
     def normalize_name(name):
@@ -305,12 +327,7 @@ class Namespace(Iterable, ComparableMixin):
         return False
 
 
-# Set Namespace.FOO to be BuiltinNamespace.FOO for each builtin namespace
-for item in BuiltinNamespace:
-    setattr(Namespace, item.name, item)
-
-
-class NamespacesDict(Mapping, SelfCallMixin):
+class NamespacesDict(Mapping):
 
     """
     An immutable dictionary containing the Namespace instances.
@@ -332,7 +349,7 @@ class NamespacesDict(Mapping, SelfCallMixin):
         """Iterate over all namespaces."""
         return iter(self._namespaces)
 
-    def __getitem__(self, key: Union[Namespace, int, str]) -> Namespace:
+    def __getitem__(self, key: Namespace | int | str) -> Namespace:
         """
         Get the namespace with the given key.
 
@@ -351,7 +368,7 @@ class NamespacesDict(Mapping, SelfCallMixin):
 
         return super().__getitem__(key)
 
-    def __getattr__(self, attr: Union[Namespace, int, str]) -> Namespace:
+    def __getattr__(self, attr: Namespace | int | str) -> Namespace:
         """
         Get the namespace with the given key.
 
@@ -372,7 +389,7 @@ class NamespacesDict(Mapping, SelfCallMixin):
         """Get the number of namespaces."""
         return len(self._namespaces)
 
-    def lookup_name(self, name: str) -> Optional[Namespace]:
+    def lookup_name(self, name: str) -> Namespace | None:
         """
         Find the Namespace for a name also checking aliases.
 
@@ -383,7 +400,7 @@ class NamespacesDict(Mapping, SelfCallMixin):
             return None
         return self.lookup_normalized_name(name.lower())
 
-    def lookup_normalized_name(self, name: str) -> Optional[Namespace]:
+    def lookup_normalized_name(self, name: str) -> Namespace | None:
         """
         Find the Namespace for a name also checking aliases.
 
@@ -393,7 +410,7 @@ class NamespacesDict(Mapping, SelfCallMixin):
         """
         return self._namespace_names.get(name)
 
-    def resolve(self, identifiers) -> List[Namespace]:
+    def resolve(self, identifiers) -> list[Namespace]:
         """
         Resolve namespace identifiers to obtain Namespace objects.
 

@@ -4,38 +4,32 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import datetime
 import re
-from collections import namedtuple
 from functools import partial
-from typing import Optional, Union
+from typing import TYPE_CHECKING, NamedTuple
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import (
-    Dict,
-    FrozenSet,
-    Iterable,
-    Iterator,
-    List,
-    Pattern,
-    Sequence,
-    Type,
-)
+from pywikibot.backports import Generator, Iterable, Pattern, Sequence
 from pywikibot.exceptions import NoPageError
 from pywikibot.proofreadpage import ProofreadPage
 from pywikibot.tools.itertools import filter_unique
 
 
-PRELOAD_SITE_TYPE = Dict[pywikibot.site.BaseSite, List[pywikibot.page.Page]]
-OPT_SITE_TYPE = Optional['pywikibot.site.BaseSite']
-OPT_TIMESTAMP_TYPE = Optional['pywikibot.Timestamp']
-NAMESPACE_OR_INT_TYPE = Union[int, 'pywikibot.site.Namespace']
-NAMESPACE_OR_STR_TYPE = Union[str, 'pywikibot.site.Namespace']
-ITEM_CLAIM_FILTER_CLASS = Type['ItemClaimFilter']
-REGEX_FILTER_CLASS = Type['RegexFilter']
-PATTERN_STR_OR_SEQ_TYPE = Union[str, Pattern[str],
-                                Sequence[str], Sequence[Pattern[str]]]
+if TYPE_CHECKING:
+    from pywikibot.site import BaseSite, Namespace
+
+    PRELOAD_SITE_TYPE = dict[pywikibot.site.BaseSite,
+                             list[pywikibot.page.BasePage]]
+    PATTERN_STR_OR_SEQ_TYPE = (
+        str
+        | Pattern[str]
+        | Sequence[str]
+        | Sequence[Pattern[str]]
+    )
 
 
 # This is the function that will be used to de-duplicate page iterators.
@@ -49,12 +43,13 @@ def _output_if(predicate: bool, msg: str) -> None:
 
 
 def NamespaceFilterPageGenerator(
-    generator: Iterable['pywikibot.page.Page'],
-    namespaces: Union[FrozenSet['pywikibot.site.Namespace'],
-                      NAMESPACE_OR_STR_TYPE,
-                      Sequence[NAMESPACE_OR_STR_TYPE]],
-    site: OPT_SITE_TYPE = None
-) -> Iterator['pywikibot.page.Page']:
+    generator: Iterable[pywikibot.page.BasePage],
+    namespaces: frozenset[Namespace]
+    | str
+    | Namespace
+    | Sequence[str | Namespace],
+    site: BaseSite | None = None,
+) -> Generator[pywikibot.page.BasePage, None, None]:
     """
     A generator yielding pages from another generator in given namespaces.
 
@@ -88,9 +83,10 @@ def NamespaceFilterPageGenerator(
     return (page for page in generator if page.namespace() in namespaces)
 
 
-def PageTitleFilterPageGenerator(generator: Iterable['pywikibot.page.Page'],
-                                 ignore_list: Dict[str, Dict[str, str]]
-                                 ) -> Iterator['pywikibot.page.Page']:
+def PageTitleFilterPageGenerator(
+    generator: Iterable[pywikibot.page.BasePage],
+    ignore_list: dict[str, dict[str, str]],
+) -> Generator[pywikibot.page.BasePage, None, None]:
     """
     Yield only those pages are not listed in the ignore list.
 
@@ -98,7 +94,7 @@ def PageTitleFilterPageGenerator(generator: Iterable['pywikibot.page.Page'],
         language codes are mapped to lists of page titles. Each title must
         be a valid regex as they are compared using :py:obj:`re.search`.
     """
-    def is_ignored(page: 'pywikibot.page.Page') -> bool:
+    def is_ignored(page: pywikibot.page.BasePage) -> bool:
         try:
             site_ig_list = ignore_list[page.site.family.name][page.site.code]
         except KeyError:
@@ -114,10 +110,11 @@ def PageTitleFilterPageGenerator(generator: Iterable['pywikibot.page.Page'],
             pywikibot.info(f'Ignoring page {page.title()}')
 
 
-def RedirectFilterPageGenerator(generator: Iterable['pywikibot.page.Page'],
-                                no_redirects: bool = True,
-                                show_filtered: bool = False
-                                ) -> Iterator['pywikibot.page.Page']:
+def RedirectFilterPageGenerator(
+    generator: Iterable[pywikibot.page.BasePage],
+    no_redirects: bool = True,
+    show_filtered: bool = False,
+) -> Generator[pywikibot.page.BasePage, None, None]:
     """
     Yield pages from another generator that are redirects or not.
 
@@ -148,11 +145,11 @@ class ItemClaimFilter:
     }
 
     @classmethod
-    def __filter_match(cls: ITEM_CLAIM_FILTER_CLASS,
-                       page: 'pywikibot.page.BasePage',
+    def __filter_match(cls,
+                       page: pywikibot.page.WikibasePage,
                        prop: str,
                        claim: str,
-                       qualifiers: Dict[str, str]) -> bool:
+                       qualifiers: dict[str, str]) -> bool:
         """
         Return true if the page contains the claim given.
 
@@ -172,8 +169,8 @@ class ItemClaimFilter:
                 except NoPageError:
                     return False
 
-        def match_qualifiers(page_claim: 'pywikibot.page.Claim',
-                             qualifiers: Dict[str, str]) -> bool:
+        def match_qualifiers(page_claim: pywikibot.page.Claim,
+                             qualifiers: dict[str, str]) -> bool:
             return all(page_claim.has_qualifier(prop, val)
                        for prop, val in qualifiers.items())
 
@@ -183,12 +180,14 @@ class ItemClaimFilter:
             for p_cl in page_claims)
 
     @classmethod
-    def filter(cls: ITEM_CLAIM_FILTER_CLASS,
-               generator: Iterable['pywikibot.page.Page'],
-               prop: str,
-               claim: str,
-               qualifiers: Optional[Dict[str, str]] = None,
-               negate: bool = False) -> Iterator['pywikibot.page.Page']:
+    def filter(
+        cls,
+        generator: Iterable[pywikibot.page.WikibasePage],
+        prop: str,
+        claim: str,
+        qualifiers: dict[str, str] | None = None,
+        negate: bool = False,
+    ) -> Generator[pywikibot.page.WikibasePage, None, None]:
         """
         Yield all ItemPages which contain certain claim in a property.
 
@@ -210,10 +209,10 @@ class ItemClaimFilter:
 ItemClaimFilterPageGenerator = ItemClaimFilter.filter
 
 
-def SubpageFilterGenerator(generator: Iterable['pywikibot.page.Page'],
+def SubpageFilterGenerator(generator: Iterable[pywikibot.page.BasePage],
                            max_depth: int = 0,
                            show_filtered: bool = False
-                           ) -> Iterable['pywikibot.page.Page']:
+                           ) -> Generator[pywikibot.page.BasePage, None, None]:
     """
     Generator which filters out subpages based on depth.
 
@@ -240,7 +239,7 @@ class RegexFilter:
     """Regex filter."""
 
     @classmethod
-    def __filter_match(cls: REGEX_FILTER_CLASS, regex: Sequence[Pattern[str]],
+    def __filter_match(cls, regex: Sequence[Pattern[str]],
                        string: str, quantifier: str) -> bool:
         """Return True if string matches precompiled regex list.
 
@@ -253,8 +252,8 @@ class RegexFilter:
         return (quantifier == 'none') ^ match
 
     @classmethod
-    def __precompile(cls: REGEX_FILTER_CLASS, regex: PATTERN_STR_OR_SEQ_TYPE,
-                     flag: int) -> List[Pattern[str]]:
+    def __precompile(cls, regex: PATTERN_STR_OR_SEQ_TYPE,
+                     flag: int) -> list[Pattern[str]]:
         """Precompile the regex list if needed."""
         if isinstance(regex, list):
             regex_list = regex
@@ -270,12 +269,12 @@ class RegexFilter:
         return regex_list
 
     @classmethod
-    def titlefilter(cls: REGEX_FILTER_CLASS,
-                    generator: Iterable['pywikibot.page.Page'],
+    def titlefilter(cls,
+                    generator: Iterable[pywikibot.page.BasePage],
                     regex: PATTERN_STR_OR_SEQ_TYPE,
                     quantifier: str = 'any',
                     ignore_namespace: bool = True
-                    ) -> Iterator['pywikibot.page.Page']:
+                    ) -> Generator[pywikibot.page.BasePage, None, None]:
         """Yield pages from another generator whose title matches regex.
 
         Uses regex option re.IGNORECASE depending on the quantifier parameter.
@@ -306,11 +305,11 @@ class RegexFilter:
                 yield page
 
     @classmethod
-    def contentfilter(cls: REGEX_FILTER_CLASS,
-                      generator: Iterable['pywikibot.page.Page'],
+    def contentfilter(cls,
+                      generator: Iterable[pywikibot.page.BasePage],
                       regex: PATTERN_STR_OR_SEQ_TYPE,
                       quantifier: str = 'any'
-                      ) -> Iterator['pywikibot.page.Page']:
+                      ) -> Generator[pywikibot.page.BasePage, None, None]:
         """Yield pages from another generator whose body matches regex.
 
         Uses regex option re.IGNORECASE depending on the quantifier parameter.
@@ -322,9 +321,10 @@ class RegexFilter:
                 if cls.__filter_match(reg, page.text, quantifier))
 
 
-def QualityFilterPageGenerator(generator: Iterable['pywikibot.page.Page'],
-                               quality: List[int]
-                               ) -> Iterator['pywikibot.page.Page']:
+def QualityFilterPageGenerator(
+    generator: Iterable[pywikibot.page.BasePage],
+    quality: list[int],
+) -> Generator[pywikibot.page.BasePage, None, None]:
     """
     Wrap a generator to filter pages according to quality levels.
 
@@ -343,10 +343,10 @@ def QualityFilterPageGenerator(generator: Iterable['pywikibot.page.Page'],
             yield page
 
 
-def CategoryFilterPageGenerator(generator: Iterable['pywikibot.page.Page'],
-                                category_list:
-                                    Sequence['pywikibot.page.Category']
-                                ) -> Iterator['pywikibot.page.Page']:
+def CategoryFilterPageGenerator(
+    generator: Iterable[pywikibot.page.BasePage],
+    category_list: Sequence[pywikibot.page.Category],
+) -> Generator[pywikibot.page.BasePage, None, None]:
     """
     Wrap a generator to filter pages by categories specified.
 
@@ -363,14 +363,20 @@ RegexFilterPageGenerator = RegexFilter.titlefilter
 RegexBodyFilterPageGenerator = RegexFilter.contentfilter
 
 
+class _Edit(NamedTuple):
+    do_edit: datetime.datetime | None
+    edit_start: datetime.datetime | None
+    edit_end: datetime.datetime | None
+
+
 def EdittimeFilterPageGenerator(
-    generator: Iterable['pywikibot.page.Page'],
-    last_edit_start: Optional[datetime.datetime] = None,
-    last_edit_end: Optional[datetime.datetime] = None,
-    first_edit_start: Optional[datetime.datetime] = None,
-    first_edit_end: Optional[datetime.datetime] = None,
-    show_filtered: bool = False
-) -> Iterator['pywikibot.page.Page']:
+    generator: Iterable[pywikibot.page.BasePage],
+    last_edit_start: datetime.datetime | None = None,
+    last_edit_end: datetime.datetime | None = None,
+    first_edit_start: datetime.datetime | None = None,
+    first_edit_end: datetime.datetime | None = None,
+    show_filtered: bool = False,
+) -> Generator[pywikibot.page.BasePage, None, None]:
     """
     Wrap a generator to filter pages outside last or first edit range.
 
@@ -381,11 +387,9 @@ def EdittimeFilterPageGenerator(
     :param first_edit_end: Only yield pages first edited before this time
     :param show_filtered: Output a message for each page not yielded
     """
-    Edit = namedtuple('Edit', ['do_edit', 'edit_start', 'edit_end'])
-
-    def to_be_yielded(edit: Edit,
-                      page: 'pywikibot.page.Page',
-                      rev: 'pywikibot.page.Revision',
+    def to_be_yielded(edit: _Edit,
+                      page: pywikibot.page.BasePage,
+                      rev: pywikibot.page.Revision,
                       show_filtered: bool) -> bool:
         if not edit.do_edit:
             return True
@@ -408,13 +412,13 @@ def EdittimeFilterPageGenerator(
 
         return True
 
-    latest_edit = Edit(last_edit_start or last_edit_end,
-                       last_edit_start or datetime.datetime.min,
-                       last_edit_end or datetime.datetime.max)
+    latest_edit = _Edit(last_edit_start or last_edit_end,
+                        last_edit_start or datetime.datetime.min,
+                        last_edit_end or datetime.datetime.max)
 
-    first_edit = Edit(first_edit_start or first_edit_end,
-                      first_edit_start or datetime.datetime.min,
-                      first_edit_end or datetime.datetime.max)
+    first_edit = _Edit(first_edit_start or first_edit_end,
+                       first_edit_start or datetime.datetime.min,
+                       first_edit_end or datetime.datetime.max)
 
     for page in generator or []:
         yield_for_last = to_be_yielded(latest_edit, page,
@@ -426,14 +430,14 @@ def EdittimeFilterPageGenerator(
             yield page
 
 
-def UserEditFilterGenerator(generator: Iterable['pywikibot.page.Page'],
-                            username: str,
-                            timestamp: Union[None, str,
-                                             datetime.datetime] = None,
-                            skip: bool = False,
-                            max_revision_depth: Optional[int] = None,
-                            show_filtered: bool = False
-                            ) -> Iterator['pywikibot.page.Page']:
+def UserEditFilterGenerator(
+    generator: Iterable[pywikibot.page.BasePage],
+    username: str,
+    timestamp: str | datetime.datetime | None = None,
+    skip: bool = False,
+    max_revision_depth: int | None = None,
+    show_filtered: bool = False
+) -> Generator[pywikibot.page.BasePage, None, None]:
     """
     Generator which will yield Pages modified by username.
 
@@ -451,10 +455,10 @@ def UserEditFilterGenerator(generator: Iterable['pywikibot.page.Page'],
         max_revision_depth
     :param show_filtered: Output a message for each page not yielded
     """
-    if isinstance(timestamp, str):
-        ts = pywikibot.Timestamp.fromtimestampformat(timestamp)
+    if timestamp is None:
+        ts = None
     else:
-        ts = timestamp
+        ts = pywikibot.Timestamp.set_timestamp(timestamp)
 
     for page in generator:
         contribs = page.contributors(total=max_revision_depth, endtime=ts)
@@ -464,10 +468,11 @@ def UserEditFilterGenerator(generator: Iterable['pywikibot.page.Page'],
             pywikibot.info(f'Skipping {page.title(as_link=True)}')
 
 
-def WikibaseItemFilterPageGenerator(generator: Iterable['pywikibot.page.Page'],
-                                    has_item: bool = True,
-                                    show_filtered: bool = False
-                                    ) -> Iterator['pywikibot.page.Page']:
+def WikibaseItemFilterPageGenerator(
+    generator: Iterable[pywikibot.page.BasePage],
+    has_item: bool = True,
+    show_filtered: bool = False,
+) -> Generator[pywikibot.page.BasePage, None, None]:
     """
     A wrapper generator used to exclude if page has a Wikibase item or not.
 

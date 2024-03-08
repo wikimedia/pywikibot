@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Tests for the page module."""
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import pickle
 import re
 from contextlib import suppress
@@ -24,7 +26,7 @@ from pywikibot.exceptions import (
     UnknownExtensionError,
 )
 from pywikibot.tools import suppress_warnings
-from tests import WARN_SITE_CODE
+from tests import WARN_SITE_CODE, unittest_print
 from tests.aspects import (
     DefaultDrySiteTestCase,
     DefaultSiteTestCase,
@@ -268,9 +270,9 @@ class TestPageObjectEnglish(TestCase):
             'File:Example',  # no file extension
             'File:Example #3.jpg',  # file extension in section
         ):
-            with self.subTest(title=title):
-                with self.assertRaises(ValueError):
-                    pywikibot.FilePage(site, title)
+            with self.subTest(title=title), \
+                 self.assertRaises(ValueError):
+                pywikibot.FilePage(site, title)
 
     def testImageAndDataRepository(self):
         """Test image_repository and data_repository page attributes."""
@@ -479,8 +481,7 @@ class TestPageObject(DefaultSiteTestCase):
         mainpage = self.get_mainpage()
         maintalk = mainpage.toggleTalkPage()
         if not maintalk.exists():
-            self.skipTest("No talk page for {}'s main page"
-                          .format(self.get_site()))
+            self.skipTest(f"No talk page for {self.get_site()}'s main page")
         self.assertIsInstance(maintalk.get(get_redirect=True), str)
         self.assertEqual(mainpage.toggleTalkPage(), maintalk)
         self.assertEqual(maintalk.toggleTalkPage(), mainpage)
@@ -521,15 +522,21 @@ class TestPageObject(DefaultSiteTestCase):
         mainpage = self.get_mainpage()
         for p in mainpage.linkedPages():
             self.assertIsInstance(p, pywikibot.Page)
-        iw = list(mainpage.interwiki(expand=True))
-        for p in iw:
-            self.assertIsInstance(p, pywikibot.Link)
-        for p2 in mainpage.interwiki(expand=False):
-            self.assertIsInstance(p2, pywikibot.Link)
-            self.assertIn(p2, iw)
+
+        if mainpage.site.sitename == 'wikipedia:en':
+            unittest_print('Skipping interwiki link test due to T356009')
+        else:
+            iw = set(mainpage.interwiki(expand=True))
+            for link in iw:
+                self.assertIsInstance(link, pywikibot.Link)
+            for link in mainpage.interwiki(expand=False):
+                self.assertIsInstance(link, pywikibot.Link)
+                self.assertIn(link, iw)
+
         with suppress_warnings(WARN_SITE_CODE, category=UserWarning):
             for p in mainpage.langlinks():
                 self.assertIsInstance(p, pywikibot.Link)
+
         for p in mainpage.imagelinks():
             self.assertIsInstance(p, pywikibot.FilePage)
         for p in mainpage.templates():
@@ -657,33 +664,25 @@ class TestPageRepr(DefaultDrySiteTestCase):
     def setUpClass(cls):
         """Initialize page instance."""
         super().setUpClass()
+        cls._old_encoding = config.console_encoding
+        config.console_encoding = 'utf8'
         cls.page = pywikibot.Page(cls.site, 'Ō')
 
-    def setUp(self):
-        """Force the console encoding to UTF-8."""
-        super().setUp()
-        self._old_encoding = config.console_encoding
-        config.console_encoding = 'utf8'
-
-    def tearDown(self):
+    @classmethod
+    def tearDownClass(cls):
         """Restore the original console encoding."""
-        config.console_encoding = self._old_encoding
-        super().tearDown()
+        config.console_encoding = cls._old_encoding
+        super().tearDownClass()
 
-    def test_mainpage_type(self):
-        """Test the return type of repr(Page(<main page>)) is str."""
+    def test_type(self):
+        """Test the return type of repr(Page(<page>)) is str."""
         mainpage = self.get_mainpage()
         self.assertIsInstance(repr(mainpage), str)
+        self.assertIsInstance(repr(self.page), str)
 
-    def test_unicode_type(self):
-        """Test the return type of repr(Page('<non-ascii>')) is str."""
-        page = pywikibot.Page(self.get_site(), 'Ō')
-        self.assertIsInstance(repr(page), str)
-
-    def test_unicode_value(self):
-        """Test to capture actual Python result pre unicode_literals."""
+    def test_value(self):
+        """Test to capture actual Python result."""
         self.assertEqual(repr(self.page), "Page('Ō')")
-        self.assertEqual('%r' % self.page, "Page('Ō')")
         self.assertEqual(f'{self.page!r}', "Page('Ō')")
 
 
@@ -1025,8 +1024,8 @@ class TestPageUserAction(DefaultSiteTestCase):
     def test_watch(self):
         """Test Page.watch, with and without unwatch enabled."""
         if not self.site.has_right('editmywatchlist'):
-            self.skipTest('user {} cannot edit its watch list'
-                          .format(self.site.user()))
+            self.skipTest(
+                f'user {self.site.user()} cannot edit its watch list')
 
         # Note: this test uses the userpage, so that it is unwatched and
         # therefore is not listed by script_tests test_watchlist_simulate.
@@ -1247,8 +1246,8 @@ class TestShortLink(TestCase):
         if not meta.logged_in():
             meta.login()
         if not meta.user():
-            self.skipTest('{}: Not able to login to {}'
-                          .format(type(self).__name__, meta))
+            self.skipTest(
+                f'{type(self).__name__}: Not able to login to {meta}')
 
         site = self.get_site()
         p1 = pywikibot.Page(site, 'User:Framawiki/pwb_tests/shortlink')
@@ -1263,6 +1262,6 @@ class TestShortLink(TestCase):
                              'w.wiki/3Cz')
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

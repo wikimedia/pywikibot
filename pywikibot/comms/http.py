@@ -30,6 +30,8 @@ To enable access via cookies, assign cookie handling class::
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import atexit
 import codecs
 import re
@@ -38,7 +40,6 @@ import traceback
 from contextlib import suppress
 from http import HTTPStatus, cookiejar
 from string import Formatter
-from typing import Optional, Union
 from urllib.parse import quote, urlparse
 from warnings import warn
 
@@ -46,7 +47,6 @@ import requests
 
 import pywikibot
 from pywikibot import config, tools
-from pywikibot.backports import Tuple
 from pywikibot.exceptions import (
     Client414Error,
     FatalServerError,
@@ -188,7 +188,7 @@ def user_agent_username(username=None):
     return username
 
 
-def user_agent(site: Optional['pywikibot.site.BaseSite'] = None,
+def user_agent(site: pywikibot.site.BaseSite | None = None,
                format_string: str = '') -> str:
     """Generate the user agent string for a given site and format.
 
@@ -247,9 +247,9 @@ def fake_user_agent() -> str:
     return UserAgent().random
 
 
-def request(site: 'pywikibot.site.BaseSite',
-            uri: Optional[str] = None,
-            headers: Optional[dict] = None,
+def request(site: pywikibot.site.BaseSite,
+            uri: str | None = None,
+            headers: dict | None = None,
             **kwargs) -> requests.Response:
     """
     Request to Site with default error handling and response decoding.
@@ -285,7 +285,7 @@ def request(site: 'pywikibot.site.BaseSite',
     return r
 
 
-def get_authentication(uri: str) -> Optional[Tuple[str, str]]:
+def get_authentication(uri: str) -> tuple[str, str] | None:
     """
     Retrieve authentication token.
 
@@ -363,9 +363,9 @@ def error_handling_callback(response):
         warning(f'Http response status {response.status_code}')
 
 
-def fetch(uri: str, method: str = 'GET', headers: Optional[dict] = None,
+def fetch(uri: str, method: str = 'GET', headers: dict | None = None,
           default_error_handling: bool = True,
-          use_fake_user_agent: Union[bool, str] = False, **kwargs):
+          use_fake_user_agent: bool | str = False, **kwargs):
     """
     HTTP request.
 
@@ -466,7 +466,7 @@ CHARSET_RE = re.compile(
 )
 
 
-def get_charset_from_content_type(content_type: str) -> Optional[str]:
+def get_charset_from_content_type(content_type: str) -> str | None:
     """Get charset from the content-type header.
 
     .. versionadded:: 7.3
@@ -491,7 +491,7 @@ def get_charset_from_content_type(content_type: str) -> Optional[str]:
 
 def _get_encoding_from_response_headers(
     response: requests.Response
-) -> Optional[str]:
+) -> str | None:
     """Return charset given by the response header."""
     content_type = response.headers.get('content-type')
 
@@ -519,9 +519,9 @@ def _get_encoding_from_response_headers(
 
 
 def _decide_encoding(response: requests.Response,
-                     charset: Optional[str] = None) -> Optional[str]:
+                     charset: str | None = None) -> str | None:
     """Detect the response encoding."""
-    def _try_decode(content: bytes, encoding: Optional[str]) -> Optional[str]:
+    def _try_decode(content: bytes, encoding: str | None) -> str | None:
         """Helper function to try decoding."""
         if encoding is None:
             return None

@@ -109,18 +109,20 @@ the inverse claim is imported to the topic item as Wikidata property "P910"
 #
 # (C) Pywikibot team, 2013-2023
 #
-# Distributed under the terms of MIT License.
+# Distributed under the terms of MIT license.
 #
+from __future__ import annotations
+
 import re
 import signal
 import sys
-from typing import Any, Iterator, Optional
+from typing import Any
 
 import pywikibot
 from pywikibot import WbTime
 from pywikibot import pagegenerators as pg
 from pywikibot import textlib
-from pywikibot.backports import List, Tuple
+from pywikibot.backports import Generator
 from pywikibot.bot import ConfigParserBot, OptionHandler, WikidataBot
 from pywikibot.exceptions import (
     APIError,
@@ -214,7 +216,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         self.cacheSources()
         self.templateTitles = self.getTemplateSynonyms(self.template_title)
 
-    def getTemplateSynonyms(self, title: str) -> List[str]:
+    def getTemplateSynonyms(self, title: str) -> list[str]:
         """Fetch redirects of the title, so we can check against them."""
         temp = pywikibot.Page(self.site, title, ns=10)
         if not temp.exists():
@@ -234,7 +236,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
     @staticmethod
     def template_link_target(item: pywikibot.ItemPage,
                              site: pywikibot.site.BaseSite,
-                             link_text: str) -> Optional[pywikibot.ItemPage]:
+                             link_text: str) -> pywikibot.ItemPage | None:
         """Find the ItemPage target for a given link text.
 
         .. versionchanged:: 7.5
@@ -284,8 +286,8 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         return handler.opt[option] or self.opt[option]
 
     def treat_page_and_item(self,
-                            page: Optional[pywikibot.page.BasePage],
-                            item: Optional[pywikibot.page.ItemPage]) -> None:
+                            page: pywikibot.page.BasePage | None,
+                            item: pywikibot.page.ItemPage | None) -> None:
         """Process a single page/item."""
         if willstop:
             raise KeyboardInterrupt
@@ -316,7 +318,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
     def treat_field(self,
                     item: pywikibot.page.ItemPage,
                     site: pywikibot.site.BaseSite,
-                    field_item: Tuple[str, str]) -> None:
+                    field_item: tuple[str, str]) -> None:
         """Process a single field of template fielddict.
 
         .. versionadded:: 7.5
@@ -374,10 +376,13 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
             if added:
                 exists_arg.add('p')
 
-    def handle_wikibase_item(self, value: str,
-                             site: pywikibot.site.BaseSite,
-                             item: pywikibot.page.ItemPage,
-                             field: str) -> Iterator[pywikibot.ItemPage]:
+    def handle_wikibase_item(
+        self,
+        value: str,
+        site: pywikibot.site.BaseSite,
+        item: pywikibot.page.ItemPage,
+        field: str,
+    ) -> Generator[pywikibot.ItemPage, None, None]:
         """Handle 'wikibase-item' claim type.
 
         .. versionadded:: 7.5
@@ -408,7 +413,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
 
     def handle_time(self, value: str,
                     site: pywikibot.site.BaseSite,
-                    *args) -> Iterator[WbTime]:
+                    *args) -> Generator[WbTime, None, None]:
         """Handle 'time' claim type.
 
         .. versionadded:: 7.5
@@ -462,7 +467,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         yield WbTime.fromWikibase(out, self.repo)
 
     @staticmethod
-    def handle_string(value, *args) -> Iterator[str]:
+    def handle_string(value: str, *args) -> Generator[str, None, None]:
         """Handle 'string' and 'external-id' claim type.
 
         .. versionadded:: 7.5
@@ -471,7 +476,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
 
     handle_external_id = handle_string
 
-    def handle_url(self, value, *args) -> Iterator[str]:
+    def handle_url(self, value, *args) -> Generator[str, None, None]:
         """Handle 'url' claim type.
 
         .. versionadded:: 7.5
@@ -480,8 +485,11 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
             yield match['url']
 
     @staticmethod
-    def handle_commonsmedia(value, site,
-                            *args) -> Iterator[pywikibot.FilePage]:
+    def handle_commonsmedia(
+        value,
+        site,
+        *args,
+    ) -> Generator[pywikibot.FilePage, None, None]:
         """Handle 'commonsMedia' claim type.
 
         .. versionadded:: 7.5

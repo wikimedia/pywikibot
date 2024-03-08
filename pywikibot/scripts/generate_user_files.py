@@ -8,24 +8,22 @@
    Also EXTERNAL EDITOR SETTINGS section can be copied.
 """
 #
-# (C) Pywikibot team, 2010-2023
+# (C) Pywikibot team, 2010-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import codecs
 import os
 import re
 import sys
-from collections import namedtuple
 from pathlib import Path
 from textwrap import fill
-from typing import Optional
+from typing import NamedTuple
 
-from pywikibot.backports import Callable, List, Tuple
+from pywikibot.backports import Callable
 from pywikibot.scripts import _import_with_no_user_config
-
-
-PYTHON_VERSION = sys.version_info[:2]
 
 
 # DISABLED_SECTIONS cannot be copied; variables must be set manually
@@ -47,6 +45,7 @@ pywikibot = _import_with_no_user_config('pywikibot')
 config, __url__ = pywikibot.config, pywikibot.__url__
 base_dir = pywikibot.config.base_dir
 
+console_encoding: str | None
 try:
     console_encoding = sys.stdout.encoding
 # unittests fails with "StringIO instance has no attribute 'encoding'"
@@ -110,11 +109,11 @@ def file_exists(filename) -> bool:
 
 
 def get_site_and_lang(
-    default_family: Optional[str] = 'wikipedia',
-    default_lang: Optional[str] = 'en',
-    default_username: Optional[str] = None,
+    default_family: str | None = 'wikipedia',
+    default_lang: str | None = 'en',
+    default_username: str | None = None,
     force: bool = False
-) -> Tuple[str, str, str]:
+) -> tuple[str, str, str]:
     """
     Ask the user for the family, site code and username.
 
@@ -135,13 +134,8 @@ def get_site_and_lang(
         default=default_family)
     fam = pywikibot.family.Family.load(fam)
     if hasattr(fam, 'langs'):
-        if hasattr(fam, 'languages_by_size'):
-            by_size = [code for code in fam.languages_by_size
-                       if code in fam.langs]
-        else:
-            by_size = []
-        known_langs = by_size + sorted(
-            set(fam.langs.keys()).difference(by_size))
+        codes = [code for code in fam.codes if code in fam.langs]
+        known_langs = codes + sorted(set(fam.langs.keys()).difference(codes))
     else:
         known_langs = []
 
@@ -152,14 +146,20 @@ def get_site_and_lang(
         pywikibot.info(f'The only known site code: {known_langs[0]}')
         default_lang = known_langs[0]
     else:
-        if not force:
-            pywikibot.info('This is the list of known site codes:')
-            pywikibot.info(', '.join(known_langs))
         if default_lang not in known_langs:
             if default_lang != 'en' and 'en' in known_langs:
                 default_lang = 'en'
             else:
                 default_lang = None
+        if not force:
+            pywikibot.info('This is the list of known site codes:')
+            text = fill(', '.join(known_langs), width=79)
+            if default_lang:
+                text = text.replace(
+                    f' {default_lang},',
+                    f' <<lightblue>>{default_lang}<<default>>,',
+                )
+            pywikibot.info(text)
 
     message = "The site code of the site we're working on"
     mycode = None
@@ -184,9 +184,6 @@ EXTENDED_CONFIG = """\
 # This is an automatically generated file. You can find more
 # configuration parameters in 'config.py' file or refer
 # https://doc.wikimedia.org/pywikibot/master/api_ref/pywikibot.config.html
-from typing import Optional, Union
-
-from pywikibot.backports import Dict, List, Tuple
 
 # The family of sites to be working on.
 # Pywikibot will import families/xxx_family.py so if you want to change
@@ -230,7 +227,10 @@ PASSFILE_CONFIG = """\
 {botpasswords}"""
 
 
-ConfigSection = namedtuple('ConfigSection', 'head, info, section')
+class _ConfigSection(NamedTuple):
+    head: str
+    info: str
+    section: str
 
 
 def parse_sections() -> list:
@@ -239,7 +239,7 @@ def parse_sections() -> list:
     config.py will be in the pywikibot/ directory whereas
     generate_user_files script is in pywikibot/scripts.
 
-    :return: a list of ConfigSection named tuples.
+    :return: a list of _ConfigSection named tuples.
     """
     data = []
 
@@ -257,11 +257,11 @@ def parse_sections() -> list:
 
     for section, head, comment in result:
         info = ' '.join(text.strip('# ') for text in comment.splitlines())
-        data.append(ConfigSection(head, info, section))
+        data.append(_ConfigSection(head, info, section))
     return data
 
 
-def copy_sections(force: bool = False, default: str = 'n') -> str:
+def copy_sections(force: bool = False, default: str = 'n') -> str | None:
     """Take config sections and copy them to user-config.py.
 
     .. versionchanged:: 8.0
@@ -292,10 +292,10 @@ def copy_sections(force: bool = False, default: str = 'n') -> str:
 
 
 def input_sections(variant: str,
-                   sections: List['ConfigSection'],
-                   skip: Optional[Callable] = None,
+                   sections: list[_ConfigSection],
+                   skip: Callable | None = None,
                    force: bool = False,
-                   default: str = 'n') -> None:
+                   default: str = 'n') -> list[str]:
     """Ask for settings to copy.
 
     .. versionadded:: 8.0
@@ -341,10 +341,16 @@ def input_sections(variant: str,
     return copies
 
 
+class _UserItem(NamedTuple):
+    family: str
+    code: str
+    name: str
+
+
 def create_user_config(
-    main_family,
-    main_code,
-    main_username,
+    main_family: str,
+    main_code: str,
+    main_username: str,
     force: bool = False
 ):
     """
@@ -355,14 +361,13 @@ def create_user_config(
     _fnc = os.path.join(base_dir, USER_BASENAME)
     _fncpass = os.path.join(base_dir, PASS_BASENAME)
 
-    useritem = namedtuple('useritem', 'family, code, name')
     userlist = []
     if force and not config.verbose_output:
         if main_username:
-            userlist = [useritem(main_family, main_code, main_username)]
+            userlist = [_UserItem(main_family, main_code, main_username)]
     else:
         while True:
-            userlist += [useritem(*get_site_and_lang(
+            userlist += [_UserItem(*get_site_and_lang(
                 main_family, main_code, main_username, force=force))]
             if not pywikibot.input_yn('Do you want to add any other projects?',
                                       force=force,
@@ -371,10 +376,11 @@ def create_user_config(
 
     # For each different username entered, ask if user wants to save a
     # BotPassword (username, BotPassword name, BotPassword pass)
-    msg = fill('See {}/BotPasswords to know how to get codes.'
-               'Please note that plain text in {} and anyone with read '
-               'access to that directory will be able read the file.'
-               .format(__url__, _fncpass))
+    msg: str | None = fill(
+        f'See {__url__}/BotPasswords to know how to get codes. '
+        f'Please note that plain text in {_fncpass} and anyone with read'
+        ' access to that directory will be able read the file.'
+    )
     botpasswords = []
     userset = {user.name for user in userlist}
     for username in userset:
@@ -459,7 +465,7 @@ def save_botpasswords(botpasswords, _fncpass):
             raise
 
 
-def ask_for_dir_change(force) -> Tuple[bool, bool]:
+def ask_for_dir_change(force) -> tuple[bool, bool]:
     """Ask whether the base directory is has to be changed.
 
     Only give option for directory change if user-config.py or user-password

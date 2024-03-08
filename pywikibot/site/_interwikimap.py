@@ -4,8 +4,9 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import pywikibot
-from pywikibot.backports import Set
 
 
 class _IWEntry:
@@ -79,7 +80,7 @@ class _InterwikiMap:
         raise TypeError('_iw_sites[{}] is wrong type: {}'
                         .format(prefix, type(self._iw_sites[prefix].site)))
 
-    def get_by_url(self, url: str) -> Set[str]:
+    def get_by_url(self, url: str) -> set[str]:
         """
         Return a set of prefixes applying to the URL.
 

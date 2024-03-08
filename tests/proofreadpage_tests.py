@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Tests for the proofreadpage module."""
 #
-# (C) Pywikibot team, 2015-2023
+# (C) Pywikibot team, 2015-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import difflib
 import json
 import unittest
@@ -19,8 +21,6 @@ from pywikibot.proofreadpage import (
     ProofreadPage,
     TagAttr,
 )
-from pywikibot.tools import has_module
-from tests import unittest_print
 from tests.aspects import TestCase, require_modules
 from tests.basepage import (
     BasePageLoadRevisionsCachingTestBase,
@@ -437,14 +437,9 @@ class BS4TestCase(TestCase):
     """Run tests which needs bs4 beeing installed."""
 
     @classmethod
+    @require_modules('bs4')
     def setUpClass(cls):
         """Check whether bs4 module is installed already."""
-        if not has_module('bs4'):
-            unittest_print(
-                'all tests ({module}.{name})\n{doc}.. '
-                .format(module=__name__, doc=cls.__doc__, name=cls.__name__),
-                end='\n')
-            cls.skipTest(cls, 'bs4 not installed')
         super().setUpClass()
 
 
@@ -999,6 +994,6 @@ class TestIndexPageHasValidContent(BS4TestCase):
         self.assertFalse(self.index.has_valid_content())
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

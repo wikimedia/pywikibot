@@ -1,9 +1,11 @@
 """Test utilities."""
 #
-# (C) Pywikibot team, 2013-2023
+# (C) Pywikibot team, 2013-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import inspect
 import os
 import sys
@@ -11,17 +13,16 @@ import unittest
 import warnings
 from contextlib import contextmanager
 from subprocess import PIPE, Popen, TimeoutExpired
-from typing import Any, Optional, Union
+from typing import Any
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Dict, List, Sequence
+from pywikibot.backports import Sequence
 from pywikibot.data.api import CachedRequest
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.exceptions import APIError
 from pywikibot.login import LoginStatus
 from pywikibot.site import Namespace
-from pywikibot.tools import PYTHON_VERSION
 from pywikibot.tools.collections import EMPTY_DEFAULT
 from tests import _pwb_py
 
@@ -327,8 +328,7 @@ class DryRequest(CachedRequest):
 
     def submit(self):
         """Prevented method."""
-        raise Exception('DryRequest rejecting request: {!r}'
-                        .format(self._params))
+        raise Exception(f'DryRequest rejecting request: {self._params!r}')
 
 
 class DrySite(pywikibot.site.APISite):
@@ -389,7 +389,7 @@ class DrySite(pywikibot.site.APISite):
     def image_repository(self):
         """Return Site object for image repository e.g. commons."""
         code, fam = self.shared_image_repository()
-        if bool(code or fam):
+        if code or fam:
             return pywikibot.Site(code, fam, self.username(),
                                   interface=self.__class__)
         return None
@@ -410,7 +410,7 @@ class DrySite(pywikibot.site.APISite):
                             'wikivoyage'):
             code, fam = None, None
 
-        if bool(code or fam):
+        if code or fam:
             return pywikibot.Site(code, fam, self.username(),
                                   interface=DryDataSite)
         return None
@@ -466,17 +466,14 @@ class FakeLoginManager(pywikibot.login.ClientLoginManager):
         """Ignore password changes."""
 
 
-def execute(command: List[str], data_in=None, timeout=None):
+def execute(command: list[str], data_in=None, timeout=None):
     """Execute a command and capture outputs.
 
-    .. versionchanged:: 8.2.0
+    .. versionchanged:: 8.2
        *error* parameter was removed.
 
     :param command: executable to run and arguments to use
     """
-    if PYTHON_VERSION < (3, 7):
-        command.insert(1, '-W ignore::FutureWarning:pywikibot:111')
-
     env = os.environ.copy()
 
     # Prevent output by test package; e.g. 'max_retries reduced from x to y'
@@ -515,13 +512,13 @@ def execute(command: List[str], data_in=None, timeout=None):
             'stderr': stderr_data.decode(config.console_encoding)}
 
 
-def execute_pwb(args: List[str],
-                data_in: Optional[Sequence[str]] = None,
-                timeout: Union[int, float, None] = None,
-                overrides: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+def execute_pwb(args: list[str],
+                data_in: Sequence[str] | None = None,
+                timeout: int | float | None = None,
+                overrides: dict[str, str] | None = None) -> dict[str, Any]:
     """Execute the pwb.py script and capture outputs.
 
-    .. versionchanged:: 8.2.0
+    .. versionchanged:: 8.2
        the *error* parameter was removed.
 
     :param args: list of arguments for pwb.py
@@ -550,7 +547,7 @@ def empty_sites():
 
 
 @contextmanager
-def skipping(*exceptions: BaseException, msg: Optional[str] = None):
+def skipping(*exceptions: BaseException, msg: str | None = None):
     """Context manager to skip test on specified exceptions.
 
     For example Eventstreams raises ``NotImplementedError`` if no

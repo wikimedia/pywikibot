@@ -7,11 +7,11 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import sys
 from abc import ABC, abstractmethod
-from typing import Any, Union
-
-from pywikibot.backports import List
+from typing import Any
 
 
 class ABUIC(ABC):
@@ -24,7 +24,7 @@ class ABUIC(ABC):
     .. versionadded:: 6.2
     """
 
-    def argvu(self) -> List[str]:
+    def argvu(self) -> list[str]:
         """Return copy of sys.argv.
 
         Assigned to pywikibot.argvu in bot module
@@ -56,7 +56,7 @@ class ABUIC(ABC):
         return input()
 
     @abstractmethod
-    def input_choice(self, *args, **kwargs) -> Union[int, str]:
+    def input_choice(self, *args, **kwargs) -> int | str:
         """Ask the user and returns a value from the options.
 
         Called by bot.input_choice().
@@ -74,4 +74,4 @@ class ABUIC(ABC):
     @abstractmethod
     def output(self, *args, **kwargs) -> None:
         """Output text to a stream."""
-        print(*args, **kwargs)  # noqa: T001, T201
+        print(*args, **kwargs)  # noqa: T201

@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Test generate_family_file script."""
 #
-# (C) Pywikibot team, 2018-2022
+# (C) Pywikibot team, 2018-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import unittest
 from contextlib import suppress
 from random import sample
@@ -24,13 +26,25 @@ class FamilyTestGenerator(generate_family_file.FamilyFileGenerator):
     def getapis(self):
         """Only load up to additional ten different wikis randomly."""
         save = self.langs
-        self.langs = sample(save, min(len(save), 10))
-        for wiki in save:  # add closed wiki due to T334714
-            if wiki['prefix'] == 'ii' and 'ii' not in self.langs:
+
+        prefixes = {lang['prefix'] for lang in self.langs}
+        tests = set(sample(list(prefixes), min(len(prefixes), 10)))
+        # add closed wiki due to T334714
+        if 'ii' in prefixes and 'ii' not in tests:
+            tests.add('ii')
+
+        # collect wikis
+        self.langs = []
+        for wiki in save:
+            code = wiki['prefix']
+            if code in tests:
                 self.langs.append(wiki)
-                break
+                tests.remove(code)
+                if not tests:
+                    break
 
         super().getapis()
+        # super().getapis() might change self.langs
         self.prefixes = [item['prefix'] for item in self.langs]
         self.langs = save
 
@@ -50,8 +64,7 @@ class TestGenerateFamilyFile(DefaultSiteTestCase):
         super().setUpClass()
         # test fails on wowwiki (T297042)
         if cls.site.family.name == 'wowwiki':
-            raise unittest.SkipTest('skipping {} due to T297042'
-                                    .format(cls.site))
+            raise unittest.SkipTest(f'skipping {cls.site} due to T297042')
 
     def setUp(self):
         """Set up tests."""
@@ -97,9 +110,8 @@ class TestGenerateFamilyFile(DefaultSiteTestCase):
             with self.subTest(url=url):
                 if lang_parse.netloc != wiki_parse.netloc:
                     # skip redirected url (T241413)
-                    self.skipTest(
-                        '{} is redirected to {}'
-                        .format(lang_parse.netloc, wiki_parse.netloc))
+                    self.skipTest(f'{lang_parse.netloc} is redirected to '
+                                  f'{wiki_parse.netloc}')
 
                 site = Site(url=url)
 
@@ -113,6 +125,6 @@ class TestGenerateFamilyFile(DefaultSiteTestCase):
                                      .format(site=site, lang=lang))
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

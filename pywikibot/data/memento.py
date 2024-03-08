@@ -13,8 +13,9 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from datetime import datetime
-from typing import Optional
 
 import requests
 from memento_client.memento_client import MementoClient as OldMementoClient
@@ -95,8 +96,8 @@ class MementoClient(OldMementoClient):
         super().__init__(*args, **kwargs)
 
     def get_memento_info(self, request_uri: str,
-                         accept_datetime: Optional[datetime] = None,
-                         timeout: Optional[int] = None,
+                         accept_datetime: datetime | None = None,
+                         timeout: int | None = None,
                          **kwargs) -> dict:
         """Query the preferred timegate and return the closest memento uri.
 
@@ -151,9 +152,9 @@ class MementoClient(OldMementoClient):
 
     def get_native_timegate_uri(self,
                                 original_uri: str,
-                                accept_datetime: Optional[datetime],
-                                timeout: Optional[int] = None,
-                                **kwargs) -> Optional[str]:
+                                accept_datetime: datetime | None,
+                                timeout: int | None = None,
+                                **kwargs) -> str | None:
         """Check the original uri whether the timegate uri is provided.
 
         Given an original URL and an accept datetime, check the original uri
@@ -190,10 +191,10 @@ class MementoClient(OldMementoClient):
 
     @staticmethod
     def is_timegate(uri: str,
-                    accept_datetime: Optional[str] = None,
-                    response: Optional[requests.Response] = None,
-                    session: Optional[requests.Session] = None,
-                    timeout: Optional[int] = None) -> bool:
+                    accept_datetime: str | None = None,
+                    response: requests.Response | None = None,
+                    session: requests.Session | None = None,
+                    timeout: int | None = None) -> bool:
         """Checks if the given uri is a valid timegate according to the RFC.
 
         :param uri: the http uri to check.
@@ -220,9 +221,9 @@ class MementoClient(OldMementoClient):
 
     @staticmethod
     def is_memento(uri: str,
-                   response: Optional[requests.Response] = None,
-                   session: Optional[requests.Session] = None,
-                   timeout: Optional[int] = None) -> bool:
+                   response: requests.Response | None = None,
+                   session: requests.Session | None = None,
+                   timeout: int | None = None) -> bool:
         """
         Determines if the URI given is indeed a Memento.
 
@@ -243,7 +244,7 @@ class MementoClient(OldMementoClient):
         return old_is_memento(uri, response=response)
 
     @staticmethod
-    def convert_to_http_datetime(dt: Optional[datetime]) -> str:
+    def convert_to_http_datetime(dt: datetime | None) -> str:
         """Converts a datetime object to a date string in HTTP format.
 
         :param dt: A datetime object.
@@ -257,10 +258,10 @@ class MementoClient(OldMementoClient):
 
     @staticmethod
     def request_head(uri: str,
-                     accept_datetime: Optional[str] = None,
+                     accept_datetime: str | None = None,
                      follow_redirects: bool = False,
-                     session: Optional[requests.Session] = None,
-                     timeout: Optional[int] = None) -> requests.Response:
+                     session: requests.Session | None = None,
+                     timeout: int | None = None) -> requests.Response:
         """Makes HEAD requests.
 
         :param uri: the uri for the request.
@@ -307,8 +308,8 @@ OldMementoClient.request_head = MementoClient.request_head
 
 
 def get_closest_memento_url(url: str,
-                            when: Optional[datetime] = None,
-                            timegate_uri: Optional[str] = None):
+                            when: datetime | None = None,
+                            timegate_uri: str | None = None):
     """Get most recent memento for url."""
     if not when:
         when = datetime.now()

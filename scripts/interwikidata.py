@@ -33,13 +33,12 @@ Furthermore, the following command line parameters are supported:
 #
 # Distributed under the terms of the MIT license.
 #
-from typing import Union
+from __future__ import annotations
 
 import pywikibot
 import pywikibot.i18n
 import pywikibot.textlib
 from pywikibot import info, pagegenerators, warning
-from pywikibot.backports import Set
 from pywikibot.bot import (
     ConfigParserBot,
     ExistingPageBot,
@@ -177,7 +176,7 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
             self.current_page.text, site=self.current_page.site)
         self.put_current(new_text, summary=self.opt.summary)
 
-    def get_items(self) -> Set[pywikibot.ItemPage]:
+    def get_items(self) -> set[pywikibot.ItemPage]:
         """Return all items of pages linked through the interwiki."""
         wd_data = set()
         for iw_page in self.iwlangs.values():
@@ -191,7 +190,7 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                 info(f'Interwiki {iw_page} does not have an item')
         return wd_data
 
-    def try_to_add(self) -> Union[pywikibot.ItemPage, bool, None]:
+    def try_to_add(self) -> pywikibot.ItemPage | bool | None:
         """Add current page in repo."""
         wd_data = self.get_items()
         if not wd_data:
@@ -213,7 +212,7 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
             self.current_page.title(as_link=True, insite=item.site)))
         return item
 
-    def try_to_merge(self, item) -> Union[pywikibot.ItemPage, bool, None]:
+    def try_to_merge(self, item) -> pywikibot.ItemPage | bool | None:
         """Merge two items."""
         wd_data = self.get_items()
         if not wd_data:

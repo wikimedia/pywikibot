@@ -3,10 +3,12 @@
 .. versionadded:: 3.0
 """
 #
-# (C) Pywikibot team, 2017-2021
+# (C) Pywikibot team, 2017-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from pywikibot import family
 from pywikibot.tools import classproperty
 
@@ -26,7 +28,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         '2014', '2015', '2016', '2017', '2018'
     ]
 
-    codes = ['wikimania', 'team']
+    codes = {'wikimania', 'team'}
 
     code_aliases = {'2019': 'wikimania'}
 

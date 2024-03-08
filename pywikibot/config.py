@@ -34,10 +34,12 @@ utility methods to build paths relative to base_dir:
    default. Editor detection functions were moved to :mod:`editor`.
 """
 #
-# (C) Pywikibot team, 2003-2023
+# (C) Pywikibot team, 2003-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import collections
 import copy
 import os
@@ -50,26 +52,23 @@ from locale import getlocale
 from os import environ, getenv
 from pathlib import Path
 from textwrap import fill
-from typing import Optional, TypeVar, Union
+from typing import TYPE_CHECKING, TypeVar
 from warnings import warn
 from zipfile import ZipFile, is_zipfile
 
 from pywikibot.__metadata__ import __version__ as pwb_version
 from pywikibot.backports import (
     DefaultDict,
-    Dict,
-    FrozenSet,
-    List,
     Mapping,
-    Tuple,
     removeprefix,
     removesuffix,
 )
 from pywikibot.logging import error, info, warning
-from pywikibot.tools import deprecated
 
 
-_DabComDict = DefaultDict[str, Dict[str, str]]
+if TYPE_CHECKING:
+    _DabComDict = DefaultDict[str, dict[str, str]]
+
 _ValueType = TypeVar('_ValueType')
 
 
@@ -143,7 +142,7 @@ mylang = 'language'
 # usernames['wikibooks']['*'] = 'mySingleUsername'
 # You may use '*' for family name in a similar manner.
 #
-usernames: Dict[str, Dict[str, str]] = collections.defaultdict(dict)
+usernames: dict[str, dict[str, str]] = collections.defaultdict(dict)
 disambiguation_comment: _DabComDict = collections.defaultdict(dict)
 
 # User agent format.
@@ -169,7 +168,7 @@ fake_user_agent_default = {'reflinks': False, 'weblinkchecker': False}
 # True for enabling, False for disabling, str to hardcode a UA.
 # Example: {'problematic.site.example': True,
 #           'prefers.specific.ua.example': 'snakeoil/4.2'}
-fake_user_agent_exceptions: Dict[str, Union[bool, str]] = {}
+fake_user_agent_exceptions: dict[str, bool | str] = {}
 
 # The default interface for communicating with the site
 # currently the only defined interface is 'APISite', so don't change this!
@@ -217,7 +216,7 @@ solve_captcha = True
 #                                    'access_key', 'access_secret')
 #
 # Note: the target wiki site must install OAuth extension
-authenticate: Dict[str, Tuple[str, ...]] = {}
+authenticate: dict[str, tuple[str, ...]] = {}
 
 # By default you are asked for a password on the terminal.
 # A password file may be used, e.g. password_file = '.passwd'
@@ -247,7 +246,7 @@ default_edit_summary = 'Pywikibot ' + pwb_version
 # if False, never use a summary prefix
 # if None, the i18n summary prefix is used for botflag accounts only
 # NOTE: this feature is not yet implemented for all scripts
-bot_prefix_summary: Union[bool, str, None] = None
+bot_prefix_summary: bool | str | None = None
 
 # What permissions to use to set private files to it
 # such as password file.
@@ -306,7 +305,7 @@ def get_user_config_file() -> str:
     return 'user-config.py'
 
 
-def get_base_dir(test_directory: Optional[str] = None,
+def get_base_dir(test_directory: str | None = None,
                  config_file: str = 'user-config.py') -> str:
     r"""Return the directory in which user-specific information is stored.
 
@@ -424,16 +423,6 @@ for arg in sys.argv[1:]:
 family_files = {}
 
 
-@deprecated('family_files[family_name] = file_path', since='6.0.0')
-def register_family_file(family_name: str, file_path: str) -> None:
-    """Register a single family class file.
-
-    Parameter file_path may be a path or an url.
-    family.AutoFamily function is used when the url is given.
-    """
-    family_files[family_name] = file_path
-
-
 def register_families_folder(folder_path: str,
                              not_exists_ok: bool = False) -> None:
     """Register all family class files contained in a directory.
@@ -530,7 +519,7 @@ userinterface = 'terminal'
 # this can be used to pass variables to the UI init function
 # useful for e.g.
 # userinterface_init_kwargs = {'default_stream': 'stdout'}
-userinterface_init_kwargs: Dict[str, str] = {}
+userinterface_init_kwargs: dict[str, str] = {}
 
 # i18n setting for user interface language
 # default is obtained from locale.getlocale
@@ -585,7 +574,7 @@ tkvertsize = 800
 # command. If EDITOR is not set, on windows plattforms it tries to
 # determine the default text editor from registry. Finally, Tkinter is
 # used as fallback.
-editor: Union[bool, str, None] = None
+editor: bool | str | None = None
 
 # Warning: DO NOT use an editor which doesn't support Unicode to edit pages!
 # You will BREAK non-ASCII symbols!
@@ -608,9 +597,9 @@ editor_filename_extension = 'wiki'
 #     log = []
 # Per default, no logging is enabled.
 # This setting can be overridden by the -log or -nolog command-line arguments.
-log: List[str] = []
+log: list[str] = []
 # filename defaults to modulename-bot.log
-logfilename: Optional[str] = None
+logfilename: str | None = None
 # maximal size of a logfile in kilobytes. If the size reached that limit the
 # logfile will be renamed (if logfilecount is not 0) and the old file is filled
 # again. logfilesize must be an integer value
@@ -618,9 +607,6 @@ logfilesize = 1024
 # Number of rotating logfiles are created. The older files get the higher
 # number. If logfilecount is 0, no logfile will be archived but the current
 # logfile will be overwritten if the file size reached the logfilesize above.
-# If logfilecount is -1 there are no rotating logfiles but the files where
-# renamed if the logfile is full. The newest file gets the highest number until
-# some logfiles where deleted.
 logfilecount = 5
 # set to 1 (or higher) to generate "informative" messages to terminal
 verbose_output = 0
@@ -628,7 +614,7 @@ verbose_output = 0
 log_pywiki_repo_version = False
 # if True, include a lot of debugging info in logfile
 # (overrides log setting above)
-debug_log: List[str] = []
+debug_log: list[str] = []
 
 # ############# EXTERNAL SCRIPT PATH SETTINGS ##############
 # Set your own script path to lookup for your script files.
@@ -648,7 +634,7 @@ debug_log: List[str] = []
 #
 # sample:
 # user_script_paths = ['scripts.myscripts']
-user_script_paths: List[str] = []
+user_script_paths: list[str] = []
 
 # ############# EXTERNAL FAMILIES SETTINGS ##############
 # Set your own family path to lookup for your family files.
@@ -663,7 +649,7 @@ user_script_paths: List[str] = []
 # samples:
 # family_files['mywiki'] = 'https://de.wikipedia.org'
 # user_families_paths = ['data/families']
-user_families_paths: List[str] = []
+user_families_paths: list[str] = []
 
 # ############# INTERWIKI SETTINGS ##############
 
@@ -741,7 +727,7 @@ maxthrottle = 60
 
 # Slow down the robot such that it never makes a second page edit within
 # 'put_throttle' seconds.
-put_throttle: Union[int, float] = 10
+put_throttle: int | float = 10
 
 # Sometimes you want to know when a delay is inserted. If a delay is larger
 # than 'noisysleep' seconds, it is logged on the screen.
@@ -829,7 +815,7 @@ cosmetic_changes_mylang_only = True
 # (if cosmetic_changes_mylang_only is set)
 # Please set your dictionary by adding such lines to your user config file:
 # cosmetic_changes_enable['wikipedia'] = ('de', 'en', 'fr')
-cosmetic_changes_enable: Dict[str, Tuple[str, ...]] = {}
+cosmetic_changes_enable: dict[str, tuple[str, ...]] = {}
 
 # The dictionary cosmetic_changes_disable should contain a tuple of languages
 # for each site where you wish to disable cosmetic changes. You may use it with
@@ -837,7 +823,7 @@ cosmetic_changes_enable: Dict[str, Tuple[str, ...]] = {}
 # language. This also overrides the settings in the cosmetic_changes_enable
 # dictionary. Please set your dict by adding such lines to your user config:
 # cosmetic_changes_disable['wikipedia'] = ('de', 'en', 'fr')
-cosmetic_changes_disable: Dict[str, Tuple[str, ...]] = {}
+cosmetic_changes_disable: dict[str, tuple[str, ...]] = {}
 
 # cosmetic_changes_deny_script is a list of scripts for which cosmetic changes
 # are disabled. You may add additional scripts by appending script names in
@@ -859,7 +845,7 @@ cosmetic_changes_deny_script = ['category_redirect', 'cosmetic_changes',
 #
 # to replace all occurrences of 'Hoofdpagina' with 'Veurblaad' when writing to
 # liwiki. Note that this does not take the origin wiki into account.
-replicate_replace: Dict[str, Dict[str, str]] = {}
+replicate_replace: dict[str, dict[str, str]] = {}
 
 # ############# FURTHER SETTINGS ##############
 
@@ -869,11 +855,11 @@ replicate_replace: Dict[str, Dict[str, str]] = {}
 # on the wiki server. Allows simulation runs of bots to be carried out without
 # changing any page on the server side. Use this setting to add more actions
 # into user config file for wikis with extra write actions.
-actions_to_block: List[str] = []
+actions_to_block: list[str] = []
 
 # Set simulate to True or use -simulate option to block all actions given
 # above.
-simulate: Union[bool, str] = False
+simulate: bool | str = False
 
 # How many pages should be put to a queue in asynchronous mode.
 # If maxsize is <= 0, the queue size is infinite.
@@ -977,7 +963,7 @@ class _DifferentTypeError(UserWarning, TypeError):
         self,
         name: str,
         actual_type: type,
-        allowed_types: Tuple[type, ...],
+        allowed_types: tuple[type, ...],
     ) -> None:
         super().__init__(
             'Configuration variable "{}" is defined as "{}" in '
@@ -990,7 +976,7 @@ def _assert_default_type(
     name: str,
     value: _ValueType,
     default_value: object,
-) -> Union[_ValueType, float, None]:
+) -> _ValueType | float | None:
     """Return the value if the old or new is None or both same type."""
     if (value is None or default_value is None
             or isinstance(value, type(default_value))):
@@ -1003,7 +989,7 @@ def _assert_default_type(
 def _assert_types(
     name: str,
     value: _ValueType,
-    types: Tuple[type, ...],
+    types: tuple[type, ...],
 ) -> _ValueType:
     """Return the value if it's one of the types."""
     if isinstance(value, types):
@@ -1018,9 +1004,9 @@ DEPRECATED_VARIABLE = (
 
 
 def _check_user_config_types(
-    user_config: Dict[str, object],
-    default_values: Dict[str, object],
-    skipped: FrozenSet[str],
+    user_config: dict[str, object],
+    default_values: dict[str, object],
+    skipped: frozenset[str],
 ) -> None:
     """Check the types compared to the default values."""
     for name, value in user_config.items():
@@ -1113,7 +1099,7 @@ for file_path in user_families_paths:
 #
 # When called as main program, list all configuration variables
 #
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     from pprint import PrettyPrinter as _PrettyPrinter
     _pp = _PrettyPrinter()
     _all = True

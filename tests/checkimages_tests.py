@@ -5,6 +5,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import unittest
 
 from pywikibot import FilePage
@@ -42,5 +44,5 @@ class TestMethods(DefaultSiteTestCase):
                          FilePage(self.site, 'Example.jpg'))
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     unittest.main()

@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """API tests which do not interact with a site."""
 #
-# (C) Pywikibot team, 2012-2023
+# (C) Pywikibot team, 2012-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import datetime
 from pathlib import Path
 from unittest.mock import patch
@@ -19,7 +21,7 @@ from pywikibot.data.api import (
 from pywikibot.exceptions import Error
 from pywikibot.family import Family
 from pywikibot.login import LoginStatus
-from pywikibot.tools import PYTHON_VERSION, suppress_warnings
+from pywikibot.tools import suppress_warnings
 from tests import join_images_path
 from tests.aspects import (
     DefaultDrySiteTestCase,
@@ -78,7 +80,7 @@ class DryCachedRequestTests(SiteAttributeTestCase):
 
     def test_expired(self):
         """Test if the request is expired."""
-        now = datetime.datetime.utcnow()
+        now = pywikibot.Timestamp.nowutc()
         self.assertFalse(self.req._expired(now))
         self.assertTrue(
             self.req._expired(now - datetime.timedelta(days=2)),
@@ -105,7 +107,7 @@ class DryCachedRequestTests(SiteAttributeTestCase):
         """Test that 'apicache' is in the cache dir."""
         retval = self.req._get_cache_dir()
         self.assertIsInstance(retval, Path)
-        self.assertIn(f'apicache-py{PYTHON_VERSION[0]:d}', retval.parts)
+        self.assertIn('apicache', retval.parts)
 
     def test_create_file_name(self):
         """Test the file names for the cache."""
@@ -445,5 +447,5 @@ class QueryGenTests(DefaultDrySiteTestCase):
             q_gen1.request._params.items(), q_gen2.request._params.items())
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     unittest.main()

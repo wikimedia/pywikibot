@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Tests for generators of the site module."""
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import unittest
 from contextlib import suppress
 from unittest.mock import patch
@@ -335,6 +337,8 @@ class TestSiteGenerators(DefaultSiteTestCase):
     def test_all_links(self):
         """Test the site.alllinks() method."""
         mysite = self.get_site()
+        if mysite.sitename == 'wikipedia:de':
+            self.skipTest(f'skipping test on {mysite} due to T359427')
         fwd = list(mysite.alllinks(total=10))
         uniq = list(mysite.alllinks(total=10, unique=True))
 
@@ -418,7 +422,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
         pages = mysite.querypage('Longpages', total=10)
         for p in pages:
             self.assertIsInstance(p, pywikibot.Page)
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             mysite.querypage('LongpageX')
 
     def test_longpages(self):
@@ -569,14 +573,15 @@ class TestSiteGenerators(DefaultSiteTestCase):
 
     def test_protectedpages_create(self):
         """Test that protectedpages returns protected page titles."""
-        pages = list(self.get_site().protectedpages(type='create', total=10))
+        pages = list(self.get_site().protectedpages(protect_type='create',
+                                                    total=10))
         # Do not check for the existence of pages as they might exist (T205883)
         self.assertLessEqual(len(pages), 10)
 
     def test_protectedpages_edit(self):
         """Test that protectedpages returns protected pages."""
         site = self.get_site()
-        pages = list(site.protectedpages(type='edit', total=10))
+        pages = list(site.protectedpages(protect_type='edit', total=10))
         for page in pages:
             self.assertTrue(page.exists())
             self.assertIn('edit', page.protection())
@@ -588,19 +593,20 @@ class TestSiteGenerators(DefaultSiteTestCase):
         levels = set()
         all_levels = site.protection_levels().difference([''])
         for level in all_levels:
-            if list(site.protectedpages(type='edit', level=level, total=1)):
+            if list(site.protectedpages(protect_type='edit', level=level,
+                                        total=1)):
                 levels.add(level)
         if not levels:
             self.skipTest(
-                'The site "{}" has no protected pages in main namespace.'
-                .format(site))
+                f'The site "{site}" has no protected pages in main namespace.')
         # select one level which won't yield all pages from above
         level = next(iter(levels))
         if len(levels) == 1:
             # if only one level found, then use any other except that
             level = next(iter(all_levels.difference([level])))
         invalid_levels = all_levels.difference([level])
-        pages = list(site.protectedpages(type='edit', level=level, total=10))
+        pages = list(site.protectedpages(protect_type='edit', level=level,
+                                         total=10))
         for page in pages:
             self.assertTrue(page.exists())
             self.assertIn('edit', page.protection())
@@ -761,8 +767,8 @@ class TestImageUsage(DefaultSiteTestCase):
                 msg=f'No images on the main page of site {mysite!r}'):
             imagepage = next(page.imagelinks())  # 1st image of page
 
-        unittest_print('site_tests.TestImageUsage found {} on {}'
-                       .format(imagepage, page))
+        unittest_print(
+            f'site_tests.TestImageUsage found {imagepage} on {page}')
 
         self.__class__._image_page = imagepage
         return imagepage
@@ -1518,7 +1524,7 @@ class TestUserList(DefaultSiteTestCase):
 
     def test_users(self):
         """Test the site.users() method with preset usernames."""
-        user_list = ['Jimbo Wales', 'Brion VIBBER', 'Tim Starling']
+        user_list = ['Jimbo Wales', 'Brooke Vibber', 'Tim Starling']
         missing = ['A username that should not exist 1A53F6E375B5']
         all_users = user_list + missing
         for cnt, user in enumerate(self.site.users(all_users), start=1):
@@ -1543,7 +1549,7 @@ class SiteRandomTestCase(DefaultSiteTestCase):
         site = cls.get_site()
         if site.family.name in ('wpbeta', 'wsbeta'):
             cls.skipTest(cls,
-                         'Skipping test on {} due to T282602' .format(site))
+                         f'Skipping test on {site} due to T282602')
 
     def test_unlimited_small_step(self):
         """Test site.randompages() continuation.
@@ -2283,6 +2289,6 @@ class TestPagePreloading(DefaultSiteTestCase):
         self.assertTrue(page.has_content())
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

@@ -6,14 +6,15 @@ This module includes objects:
 * FileInfo: a structure holding imageinfo of latest revision of FilePage
 """
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from http import HTTPStatus
 from os import PathLike
 from pathlib import Path
-from typing import Optional, Union
 from urllib.parse import urlparse
 
 import pywikibot
@@ -157,9 +158,9 @@ class FilePage(Page):
         return self._imagePageHtml
 
     def get_file_url(self,
-                     url_width: Optional[int] = None,
-                     url_height: Optional[int] = None,
-                     url_param: Optional[int] = None) -> str:
+                     url_width: int | None = None,
+                     url_height: int | None = None,
+                     url_param: str | None = None) -> str:
         """Return the url or the thumburl of the file described on this page.
 
         Fetch the information if not available.
@@ -262,7 +263,7 @@ class FilePage(Page):
     def usingPages(self, **kwargs):  # noqa: N802
         """Yield Pages on which the file is displayed.
 
-        .. deprecated:: 7.4.0
+        .. deprecated:: 7.4
            Use :meth:`using_pages` instead.
         """
         return self.using_pages(**kwargs)
@@ -323,12 +324,12 @@ class FilePage(Page):
                                 **kwargs)
 
     def download(self,
-                 filename: Union[None, str, PathLike, Iterable[str]] = None,
+                 filename: str | PathLike | Iterable[str] | None = None,
                  chunk_size: int = 100 * 1024,
-                 revision: Optional['FileInfo'] = None, *,
-                 url_width: Optional[int] = None,
-                 url_height: Optional[int] = None,
-                 url_param: Optional[int] = None) -> bool:
+                 revision: FileInfo | None = None, *,
+                 url_width: int | None = None,
+                 url_height: int | None = None,
+                 url_param: str | None = None) -> bool:
         """Download to filename file of FilePage.
 
         **Usage examples:**

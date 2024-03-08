@@ -1,12 +1,13 @@
 """Title translate module."""
 #
-# (C) Pywikibot team, 2003-2022
+# (C) Pywikibot team, 2003-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import pywikibot
 from pywikibot import config, date
-from pywikibot.backports import List
 
 
 def translate(
@@ -15,7 +16,7 @@ def translate(
     auto: bool = True,
     removebrackets: bool = False,
     site=None
-) -> List['pywikibot.Link']:
+) -> list[pywikibot.Link]:
     """
     Return a list of links to pages on other sites based on hints.
 
@@ -46,7 +47,7 @@ def translate(
         if codes.isdigit():
             codes = site.family.languages_by_size[:int(codes)]
         elif codes == 'all':
-            codes = site.family.languages_by_size
+            codes = list(site.family.codes)
         else:
             codes = site.family.language_groups.get(codes, codes.split(','))
 

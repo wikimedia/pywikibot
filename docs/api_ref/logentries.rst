@@ -3,4 +3,4 @@
 ************************
 
 .. automodule:: logentries
-   :synopsis: Objects representing Mediawiki log entries
+   :synopsis: Objects representing MediaWiki log entries

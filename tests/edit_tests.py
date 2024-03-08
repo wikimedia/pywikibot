@@ -5,6 +5,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import time
 import unittest
 from contextlib import suppress
@@ -210,6 +212,6 @@ class OAuthEditTest(OAuthSiteTestCase):
         self.assertTrue(p.text.endswith(ts))
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

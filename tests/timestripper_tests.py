@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Tests for archivebot.py/Timestripper."""
 #
-# (C) Pywikibot team, 2014-2023
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import datetime
 import re
 from contextlib import suppress
@@ -334,8 +336,8 @@ class TestTimeStripperTreatSpecialText(TestTimeStripperCase):
         txt_match = '[http://' + self.fake_date + ']' + self.date
         self.assertEqual(ts(txt_match), self.expected_date)
 
-        txt_match = ('{} [http://www.org | link with date {}]'
-                     .format(self.date, self.fake_date))
+        txt_match = (f'{self.date} [http://www.org | link with date '
+                     f'{self.fake_date}]')
         self.assertEqual(ts(txt_match), self.expected_date)
 
         txt_match = '[http://' + self.fake_date + ']' + self.date
@@ -345,8 +347,10 @@ class TestTimeStripperTreatSpecialText(TestTimeStripperCase):
         """Test that skipping hyperlinks will not make gaps shorter."""
         ts = self.ts.timestripper
 
-        txt_match = ('{}[http://example.com Here is long enough text]{}'
-                     .format(self.date[:9], self.date[9:]))
+        txt_match = (
+            f'{self.date[:9]}[http://example.com Here is long enough text]'
+            f'{self.date[9:]}'
+        )
         self.assertIsNone(ts(txt_match))
 
     def test_timestripper_match_wikilink_with_date(self):
@@ -369,8 +373,8 @@ class TestTimeStripperTreatSpecialText(TestTimeStripperCase):
         """Test that skipping wikilinks will not make gaps shorter."""
         ts = self.ts.timestripper
 
-        txt_match = ('{}[[Here is long enough text]]{}'
-                     .format(self.date[:9], self.date[9:]))
+        txt_match = (f'{self.date[:9]}[[Here is long enough text]]'
+                     f'{self.date[9:]}')
         self.assertIsNone(ts(txt_match))
 
         txt_match = self.date[:9] + '[[foo]]' + self.date[9:]
@@ -434,6 +438,6 @@ class TestTimeStripperDoNotArchiveUntil(TestTimeStripperCase):
         self.assertEqual(ts.timestripper(txt_match), res)
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

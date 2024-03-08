@@ -5,6 +5,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import unittest
 
 from scripts import data_ingestion
@@ -128,5 +130,5 @@ class TestDataIngestionBot(ScriptMainTestCase):
                 '-page:User:John_Vandenberg/data_ingestion_test_template')
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     unittest.main()

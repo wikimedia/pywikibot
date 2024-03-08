@@ -6,7 +6,7 @@ of category hierarchy.
 
 Usage:
 
-    pwb.py graph [-style STYLE] [-depth DEPTH] [-from FROM] [-to TO]
+    pwb.py category_graph [-style STYLE] [-depth DEPTH] [-from FROM] [-to TO]
 
 actions:
 
@@ -37,22 +37,34 @@ fillcolor=green] edge[style=dashed penwidth=3]'
 .. versionadded:: 8.0
 """
 #
-# (C) Pywikibot team, 2022-2023
+# (C) Pywikibot team, 2022-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import argparse
+import glob
 from collections import defaultdict
+from contextlib import suppress
+from pathlib import Path
 
 import pywikibot
 from pywikibot import config
 from pywikibot.bot import SingleSiteBot, suggest_help
 
 
+try:
+    import pydot
+except ImportError as e:
+    pydot = e
+
+
 class CategoryGraphBot(SingleSiteBot):
     """Bot to create graph of the category structure."""
 
-    def args(self, ap):
+    @staticmethod
+    def setup_args(ap):
         """Declares arguments."""
         ap.add_argument('-from', nargs='?', default=argparse.SUPPRESS)
         ap.add_argument('-to', nargs='?', default='')
@@ -60,11 +72,11 @@ class CategoryGraphBot(SingleSiteBot):
         ap.add_argument('-depth', nargs='?', default=2)
         ap.add_argument('-downsize', nargs='?', default=4)
 
-    def __init__(self, ap, args: argparse.Namespace) -> None:
+    def __init__(self, args: argparse.Namespace) -> None:
         """Initializer."""
         super().__init__()
         self.args = args
-        cat_title = args.__dict__.get('from')
+        cat_title = vars(args)['from']
         if not cat_title:
             cat_title = 'Main topic classifications'
         if cat_title == '?':
@@ -101,7 +113,7 @@ class CategoryGraphBot(SingleSiteBot):
             the tree (for recursion), opposite of depth.
         """
         title = cat.title(with_ns=False)
-        size = float(args.downsize) ** level
+        size = float(self.args.downsize) ** level
         subcats = sorted(cat.subcategories())
 
         def node():
@@ -197,13 +209,44 @@ class CategoryGraphBot(SingleSiteBot):
             o.write(self.dot.create('dot', 'svg', encoding='utf-8'))
 
 
-if __name__ == '__main__':
-    ap = argparse.ArgumentParser(add_help=False)
-    CategoryGraphBot.args(None, ap)
-    local_args = pywikibot.handle_args()
-    args, rest = ap.parse_known_args()
+def main(*args: str) -> None:
+    """
+    Process command line arguments and invoke bot.
 
-    if not suggest_help(missing_action='from' not in args):
-        import pydot
-        bot = CategoryGraphBot(ap, args)
-        bot.run()
+    If args is an empty list, sys.argv is used.
+
+    :param args: command line arguments
+    """
+    ap = argparse.ArgumentParser(add_help=False)
+    CategoryGraphBot.setup_args(ap)
+    local_args = pywikibot.handle_args()
+    args, rest = ap.parse_known_args(local_args)
+
+    if suggest_help(
+        missing_action='from' not in args,
+        unknown_parameters=rest,
+        missing_dependencies=(['pydot'] if isinstance(pydot, ImportError)
+                              else [])
+    ):
+        return
+
+    file_path = args.to
+    # If file exists, ask user if ok to overwrite. Otherwise, make
+    # the file, including directories unless it is top level.
+    if glob.glob(file_path + '.*'):
+        choice = pywikibot.input_yn(f'Files exist for {file_path}. Overwrite?',
+                                    'n', automatic_quit=False)
+        if not choice:
+            pywikibot.info('Exiting...')
+            return
+    else:
+        dir_path = Path(file_path)
+        with suppress(FileNotFoundError):
+            dir_path.parent.mkdir(parents=True, exist_ok=True)
+
+    bot = CategoryGraphBot(args)
+    bot.run()
+
+
+if __name__ == '__main__':
+    main()

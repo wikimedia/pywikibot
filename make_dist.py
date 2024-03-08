@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Script to create a new distribution. Requires Python 3.7+.
+"""Script to create a new distribution.
 
 The following options are supported:
 
@@ -37,7 +37,6 @@ Usage::
    - *nodist* option was added
 
 .. versionchanged:: 8.1
-   Python 3.7+ required because *dataclasses* module is used.
    *nodist* option was removed, *clear* option does not create a
    distribution. *local* and *remote* option clears old distributions
    first.
@@ -46,10 +45,12 @@ Usage::
    option also installs packages if necessary.
 """
 #
-# (C) Pywikibot team, 2022-2023
+# (C) Pywikibot team, 2022-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import abc
 import shutil
 import sys
@@ -59,7 +60,6 @@ from pathlib import Path
 from subprocess import check_call, run
 
 from pywikibot import __version__, error, info, input_yn, warning
-from pywikibot.backports import Tuple
 
 
 @dataclass
@@ -197,11 +197,8 @@ class SetupPywikibot(SetupBase):
         info('<<lightyellow>>done')
 
 
-def handle_args() -> Tuple[bool, bool, bool, bool]:
+def handle_args() -> tuple[bool, bool, bool, bool]:
     """Handle arguments and print documentation if requested.
-
-    Read arguments from `sys.argv` and adjust it passing `sdist` to
-    `setuptools.setup`.
 
     :return: Return whether dist is to be installed locally or to be
         uploaded

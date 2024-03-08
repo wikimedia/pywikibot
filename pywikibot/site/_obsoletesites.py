@@ -4,8 +4,9 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import pywikibot
-from pywikibot.backports import Dict, Tuple
 from pywikibot.exceptions import NoPageError
 from pywikibot.site._apisite import APISite
 from pywikibot.site._basesite import BaseSite
@@ -24,7 +25,7 @@ class ClosedSite(APISite):
         pywikibot.error(f'Site {self.sitename} has been closed. {notice}')
 
     def page_restrictions(
-            self, page: 'pywikibot.Page') -> Dict[str, Tuple[str, str]]:
+            self, page: pywikibot.Page) -> dict[str, tuple[str, str]]:
         """Return a dictionary reflecting page protections."""
         if not page.exists():
             raise NoPageError(page)

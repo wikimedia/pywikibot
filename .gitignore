@@ -4,6 +4,7 @@ user-*.py
 *.lwp
 *.pyc
 *.pyo
+*.swp
 *.*~
 /.tox
 /*.egg

@@ -20,58 +20,58 @@
 .. warning: do not upload a development release to pypi.
 """
 #
-# (C) Pywikibot team, 2009-2023
+# (C) Pywikibot team, 2009-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
+import configparser
 import os
 import re
 import sys
-from setuptools import setup
-
-if sys.version_info[:3] >= (3, 9):
-    List = list
-else:
-    from typing import List
+from contextlib import suppress
+from pathlib import Path
 
 
 # ------- setup extra_requires ------- #
 extra_deps = {
     # Core library dependencies
     'eventstreams': ['sseclient<0.0.23,>=0.0.18'],  # T222885
-    'isbn': ['python-stdnum>=1.18'],
+    'isbn': ['python-stdnum>=1.19'],
     'Graphviz': ['pydot>=1.4.1'],
     'Google': ['google>=1.7'],
     'memento': ['memento_client==0.6.1'],
     'wikitextparser': ['wikitextparser>=0.47.0'],
-    'mysql': ['PyMySQL >= 0.9.3'],  # toolforge
+    'mysql': ['PyMySQL >= 1.0.0'],
     # vulnerability found in Pillow<8.1.2 but toolforge uses 5.4.1
-    'Tkinter': ['Pillow>=8.1.2, < 10.0.0; platform_machine == "AMD32"',
-                'Pillow>=8.1.2; platform_machine != "AMD32"'],
+    'Tkinter': ['Pillow>=8.1.2, != 10.0, != 10.1'],
     'mwoauth': ['mwoauth!=0.3.1,>=0.2.4'],
     'html': ['beautifulsoup4>=4.7.1'],
-    'http': [
-        'fake-useragent<0.1.14; python_version < "3.7"',
-        'fake-useragent>1.2.1; python_version >= "3.7"',
-    ],
+    'http': ['fake-useragent>=1.4.0'],
     'flake8': [  # Due to incompatibilities between packages the order matters.
         'flake8>=5.0.4',
-        'darglint',
-        'pydocstyle>=6.2.3',
-        'flake8-bugbear!=23.1.14',
-        'flake8-coding',
-        'flake8-comprehensions',
+        'darglint2',
+        'pydocstyle>=6.3.0',
+        'flake8-bugbear!=24.1.17',
+        'flake8-comprehensions>=3.13.0',
         'flake8-docstrings>=1.4.0',
+        'flake8-future-annotations',
         'flake8-mock-x2',
-        'flake8-print>=4.0.1',
+        'flake8-print>=5.0.0',
         'flake8-quotes>=3.3.2',
+        'flake8-raise',
         'flake8-string-format',
         'flake8-tuple>=0.4.1',
         'flake8-no-u-prefixed-strings>=0.2',
-        'pep8-naming>=0.12.1, <0.13.0; python_version < "3.7"',
-        'pep8-naming>=0.13.3; python_version >= "3.7"',
+        'pep8-naming>=0.13.3',
     ],
-    'hacking': ['hacking'],
+    'hacking': [
+        'hacking',
+        # importlib-metadata module is already installed with hacking 4.1.0
+        # used by Python 3.7 but importlib-metadata >= 5 fails, so adjust it
+        'importlib-metadata<5.0.0; python_version < "3.8"',
+    ],
 }
 
 
@@ -87,13 +87,10 @@ extra_deps.update({'scripts': [i for k, v in script_deps.items() for i in v]})
 # ------- setup install_requires ------- #
 # packages which are mandatory
 dependencies = [
+    'importlib_metadata ; python_version < "3.8"',
     'mwparserfromhell>=0.5.2',
-    'requests>=2.21.0, <2.28.0; python_version < "3.7"',
-    'requests>=2.21.0; python_version>="3.7"',
-    # PEP 440
-    'setuptools>=48.0.0 ; python_version >= "3.10"',
-    'setuptools>=40.8.0 ; python_version >= "3.7" and python_version < "3.10"',
-    'setuptools>=40.8.0, <59.7.0 ; python_version < "3.7"',
+    'packaging',
+    'requests>=2.21.0',
 ]
 
 # ------- setup tests_require ------- #
@@ -112,16 +109,31 @@ class _DottedDict(dict):
     __getattr__ = dict.__getitem__
 
 
-# import metadata
-metadata = _DottedDict()
-name = 'pywikibot'
-path = os.path.abspath(os.path.dirname(__file__))
-with open(os.path.join(path, name, '__metadata__.py')) as f:
-    exec(f.read(), None, metadata)
-assert metadata.__name__ == name
+path = Path(__file__).parent
 
 
-def get_validated_version() -> str:
+def read_project() -> str:
+    """Read the project name from toml file.
+
+    ``tomllib`` was introduced with Python 3.11. To support earlier versions
+    ``configparser`` is used. Therefore the tomlfile must be readable as
+    config file until the first comment.
+
+    .. versionadded:: 9.0
+    """
+    toml = []
+    with open(path / 'pyproject.toml') as f:
+        for line in f:
+            if line.startswith('#'):
+                break
+            toml.append(line)
+
+    config = configparser.ConfigParser()
+    config.read_string(''.join(toml))
+    return config['project']['name'].strip('"')
+
+
+def get_validated_version(name: str) -> str:  # pragma: no cover
     """Get a validated pywikibot module version string.
 
     The version number from pywikibot.__metadata__.__version__ is used.
@@ -131,50 +143,53 @@ def get_validated_version() -> str:
     and is not a developmental release.
 
     :return: pywikibot module version string
-    :rtype: str
     """
-    version = metadata.__version__
+    # import metadata
+    metadata = _DottedDict()
+    with open(path / name / '__metadata__.py') as f:
+        exec(f.read(), None, metadata)
+    assert metadata.__url__.endswith(
+        name.title())  # type: ignore[attr-defined]
+
+    version = metadata.__version__  # type: ignore[attr-defined]
     if 'sdist' not in sys.argv:
-        return version  # pragma: no cover
+        return version
 
     # validate version for sdist
-    from contextlib import suppress
     from subprocess import PIPE, run
 
-    from pkg_resources import parse_version, safe_version
+    from packaging.version import InvalidVersion, Version
+
     try:
         tags = run(['git', 'tag'], check=True, stdout=PIPE,
-                   universal_newlines=True).stdout.splitlines()
-    except Exception as e:  # pragma: no cover
+                   text=True).stdout.splitlines()
+    except Exception as e:
         print(e)
         sys.exit('Creating source distribution canceled.')
 
     last_tag = None
-    if tags:  # pragma: no cover
+    if tags:
         for tag in ('stable', 'python2'):
             with suppress(ValueError):
                 tags.remove(tag)
 
         last_tag = tags[-1]
 
-    warnings = []
-    if parse_version(version) < parse_version('0'):  # pragma: no cover
-        # any version which is not a valid PEP 440 version will be considered
-        # less than any valid PEP 440 version
-        warnings.append(
-            version + ' is not a valid version string following PEP 440.')
-    elif safe_version(version) != version:  # pragma: no cover
-        warnings.append(f'{version} does not follow PEP 440. Use '
-                        f'{safe_version(version)} as version string instead.')
+    warning = ''
+    try:
+        vrsn = Version(version)
+    except InvalidVersion:
+        warning = f'{version} is not a valid version string following PEP 440.'
+    else:
+        if last_tag and vrsn <= Version(last_tag):
+            warning = (
+                f'New version {version!r} is not higher than last version '
+                f'{last_tag!r}.'
+            )
 
-    if last_tag and parse_version(version) <= parse_version(last_tag):
-        warnings.append(  # pragma: no cover
-            f'New version {version!r} is not higher than last version '
-            f'{last_tag!r}.')
-
-    if warnings:  # pragma: no cover
+    if warning:
         print(__doc__)
-        print('\n\n'.join(warnings))
+        print('\n\n{warning}')
         sys.exit('\nBuild of distribution package canceled.')
 
     return version
@@ -202,7 +217,7 @@ def read_desc(filename) -> str:
     return ''.join(desc)
 
 
-def get_packages(name) -> List[str]:
+def get_packages(name: str) -> list[str]:
     """Find framework packages."""
     try:
         from setuptools import find_namespace_packages
@@ -210,150 +225,29 @@ def get_packages(name) -> List[str]:
         sys.exit(
             'setuptools >= 40.1.0 is required to create a new distribution.')
     packages = find_namespace_packages(include=[name + '.*'])
+    for cache_variant in ('', '-py3'):
+        with suppress(ValueError):
+            packages.remove(f'{name}.apicache{cache_variant}')
     return [str(name)] + packages
 
 
-def main() -> None:
+def main() -> None:  # pragma: no cover
     """Setup entry point."""
-    version = get_validated_version()
+    from setuptools import setup
+
+    name = read_project()
     setup(
-        name=metadata.__name__,
-        version=version,
-        description=metadata.__description__,
+        version=get_validated_version(name),
         long_description=read_desc('README.rst'),
         long_description_content_type='text/x-rst',
-        # author
-        # author_email
-        maintainer=metadata.__maintainer__,
-        maintainer_email=metadata.__maintainer_email__,
-        url=metadata.__url__,
-        download_url=metadata.__download_url__,
         packages=get_packages(name),
-        # py_modules
-        # scripts
-        # ext_package
-        # ext_modules
-        # distclass
-        # script_name
-        # script_args
-        # options
-        license=metadata.__license__,
-        # license_files
-        keywords=metadata.__keywords__.split(),
-        # platforms
-        # cmdclass
-        # package_dir
         include_package_data=True,
-        # exclude_package_data
-        # package_data
-        # zip_safe
         install_requires=dependencies,
         extras_require=extra_deps,
-        python_requires='>=3.6.1',
-        # namespace_packages
         test_suite='tests.collector',
         tests_require=test_deps,
-        # test_loader
-        # eager_resources
-        project_urls={
-            'Documentation': 'https://doc.wikimedia.org/pywikibot/stable/',
-            'Source':
-                'https://gerrit.wikimedia.org/r/plugins/gitiles/pywikibot/core/',  # noqa: E501
-            'GitHub Mirror': 'https://github.com/wikimedia/pywikibot',
-            'Tracker': 'https://phabricator.wikimedia.org/tag/pywikibot/',
-        },
-        entry_points={
-            'console_scripts': [
-                'pwb = pywikibot.scripts.wrapper:run',
-            ],
-        },
-        classifiers=[
-            'Development Status :: 5 - Production/Stable',
-            'Environment :: Console',
-            'Intended Audience :: Developers',
-            'License :: OSI Approved :: MIT License',
-            'Natural Language :: Afrikaans',
-            'Natural Language :: Arabic',
-            'Natural Language :: Basque',
-            'Natural Language :: Bengali',
-            'Natural Language :: Bosnian',
-            'Natural Language :: Bulgarian',
-            'Natural Language :: Cantonese',
-            'Natural Language :: Catalan',
-            'Natural Language :: Chinese (Simplified)',
-            'Natural Language :: Chinese (Traditional)',
-            'Natural Language :: Croatian',
-            'Natural Language :: Czech',
-            'Natural Language :: Danish',
-            'Natural Language :: Dutch',
-            'Natural Language :: English',
-            'Natural Language :: Esperanto',
-            'Natural Language :: Finnish',
-            'Natural Language :: French',
-            'Natural Language :: Galician',
-            'Natural Language :: German',
-            'Natural Language :: Greek',
-            'Natural Language :: Hebrew',
-            'Natural Language :: Hindi',
-            'Natural Language :: Hungarian',
-            'Natural Language :: Icelandic',
-            'Natural Language :: Indonesian',
-            'Natural Language :: Irish',
-            'Natural Language :: Italian',
-            'Natural Language :: Japanese',
-            'Natural Language :: Javanese',
-            'Natural Language :: Korean',
-            'Natural Language :: Latin',
-            'Natural Language :: Latvian',
-            'Natural Language :: Lithuanian',
-            'Natural Language :: Macedonian',
-            'Natural Language :: Malay',
-            'Natural Language :: Marathi',
-            'Natural Language :: Nepali',
-            'Natural Language :: Norwegian',
-            'Natural Language :: Panjabi',
-            'Natural Language :: Persian',
-            'Natural Language :: Polish',
-            'Natural Language :: Portuguese',
-            'Natural Language :: Portuguese (Brazilian)',
-            'Natural Language :: Romanian',
-            'Natural Language :: Russian',
-            'Natural Language :: Serbian',
-            'Natural Language :: Slovak',
-            'Natural Language :: Slovenian',
-            'Natural Language :: Spanish',
-            'Natural Language :: Swedish',
-            'Natural Language :: Tamil',
-            'Natural Language :: Telugu',
-            'Natural Language :: Thai',
-            'Natural Language :: Tibetan',
-            'Natural Language :: Turkish',
-            'Natural Language :: Ukrainian',
-            'Natural Language :: Urdu',
-            'Natural Language :: Vietnamese',
-            'Operating System :: OS Independent',
-            'Programming Language :: Python',
-            'Programming Language :: Python :: 3',
-            'Programming Language :: Python :: 3 :: Only',
-            'Programming Language :: Python :: 3.6',
-            'Programming Language :: Python :: 3.7',
-            'Programming Language :: Python :: 3.8',
-            'Programming Language :: Python :: 3.9',
-            'Programming Language :: Python :: 3.10',
-            'Programming Language :: Python :: 3.11',
-            'Programming Language :: Python :: 3.12',
-            'Programming Language :: Python :: Implementation :: CPython',
-            'Programming Language :: Python :: Implementation :: PyPy',
-            'Topic :: Internet :: WWW/HTTP :: Dynamic Content :: Wiki',
-            'Topic :: Software Development :: Libraries :: Python Modules',
-            'Topic :: Utilities',
-        ],
     )
 
-    # Finally show distribution version before uploading
-    if 'sdist' in sys.argv:
-        print(f'\nDistribution package created for version {version}')
 
-
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     main()

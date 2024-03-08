@@ -5,6 +5,8 @@
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import pywikibot
 from scripts.noreferences import NoReferencesBot
 from tests.aspects import TestCase, unittest
@@ -38,5 +40,5 @@ class TestAddingReferences(TestCase):
         self.assertEqual(new_text, expected)
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     unittest.main()

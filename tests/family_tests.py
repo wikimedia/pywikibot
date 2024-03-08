@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 """Tests for the family module."""
 #
-# (C) Pywikibot team, 2014-2023
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from collections.abc import Mapping
 from contextlib import suppress
 
 import pywikibot
 from pywikibot.exceptions import UnknownFamilyError
 from pywikibot.family import Family, SingleSiteFamily
-from pywikibot.tools import suppress_warnings
 from tests.aspects import PatchingTestCase, TestCase, unittest
 from tests.utils import DrySite
 
@@ -40,13 +41,8 @@ class TestFamily(TestCase):
                         self.assertIn('.', domain)
 
                 self.assertEqual(f.name, name)
-
-                with suppress_warnings(
-                        'wowwiki_family.Family.languages_by_size '
-                        'is deprecated'):
-                    self.assertIsInstance(f.languages_by_size, list)
-                    self.assertGreaterEqual(set(f.langs),
-                                            set(f.languages_by_size))
+                self.assertIsInstance(f.codes, set)
+                self.assertGreaterEqual(set(f.langs), set(f.codes))
 
                 if isinstance(f, SingleSiteFamily):
                     self.assertIsNotNone(f.code)
@@ -217,8 +213,7 @@ class TestFamilyUrlRegex(PatchingTestCase):
         for family in pywikibot.config.family_files:
             if family == 'wowwiki':
                 self.skipTest(
-                    'Family.from_url() does not work for {} (T215077)'
-                    .format(family))
+                    f'Family.from_url() does not work for {family} (T215077)')
             self.current_family = family
             family = Family.load(family)
             for code in family.codes:
@@ -232,6 +227,6 @@ class TestFamilyUrlRegex(PatchingTestCase):
                     self.assertEqual(family.from_url(url), code)
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

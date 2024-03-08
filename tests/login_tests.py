@@ -9,6 +9,8 @@ e.g. used to test password-file based login.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from collections import defaultdict
 from io import StringIO
 from unittest import mock
@@ -177,5 +179,5 @@ class TestPasswordFile(DefaultDrySiteTestCase):
         self.assertEqual(obj.login_name, '~FakeUsername@~FakeSuffix')
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == '__main__':
     unittest.main()

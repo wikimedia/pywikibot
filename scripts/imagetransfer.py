@@ -41,6 +41,8 @@ used on a page reachable via interwiki links.
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 import re
 import sys
 
