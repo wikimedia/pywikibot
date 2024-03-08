@@ -35,6 +35,7 @@ from pywikibot.tools.itertools import filter_unique
 
 if TYPE_CHECKING:
     from data.api import ParamInfo, Request
+
     from pywikibot.site._apisite import _RequestWrapperT
     from pywikibot.site._namespace import NamespacesDict, SingleNamespaceType
     from pywikibot.site._tokenwallet import TokenWallet

@@ -42,10 +42,10 @@ import packaging.version
 
 import pywikibot  # T306760
 from pywikibot.backports import (
-    Callable,
-    importlib_metadata,
     PYTHON_VERSION,
     SPHINX_RUNNING,
+    Callable,
+    importlib_metadata,
 )
 from pywikibot.tools._deprecate import (
     ModuleDeprecationWrapper,

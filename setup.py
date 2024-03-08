@@ -34,12 +34,6 @@ from contextlib import suppress
 from pathlib import Path
 
 
-if sys.version_info[:3] >= (3, 9):
-    List = list
-else:
-    from typing import List
-
-
 # ------- setup extra_requires ------- #
 extra_deps = {
     # Core library dependencies
@@ -168,7 +162,7 @@ def get_validated_version(name: str) -> str:  # pragma: no cover
 
     try:
         tags = run(['git', 'tag'], check=True, stdout=PIPE,
-                   universal_newlines=True).stdout.splitlines()
+                   text=True).stdout.splitlines()
     except Exception as e:
         print(e)
         sys.exit('Creating source distribution canceled.')
@@ -223,7 +217,7 @@ def read_desc(filename) -> str:
     return ''.join(desc)
 
 
-def get_packages(name: str) -> List[str]:
+def get_packages(name: str) -> list[str]:
     """Find framework packages."""
     try:
         from setuptools import find_namespace_packages

@@ -14,7 +14,6 @@ import unittest
 
 import pywikibot
 import setup
-
 from tests.aspects import TestCase
 
 

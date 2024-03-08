@@ -19,10 +19,10 @@ from typing import overload
 
 import pywikibot
 from pywikibot.tools import (
-    classproperty,
-    deprecated,
     PYTHON_VERSION,
     SPHINX_RUNNING,
+    classproperty,
+    deprecated,
 )
 
 
@@ -361,7 +361,7 @@ class Timestamp(datetime.datetime):
         return self.isoformat()
 
     @classmethod
-    def nowutc(cls, *, with_tz: bool = True) -> 'Timestamp':
+    def nowutc(cls, *, with_tz: bool = True) -> Timestamp:
         """Return the current UTC date and time.
 
         If *with_tz* is True it returns an aware :class:`Timestamp`
@@ -403,7 +403,7 @@ class Timestamp(datetime.datetime):
         return cls(*gmt[:6], us)
 
     @classmethod
-    def utcnow(cls) -> 'Timestamp':
+    def utcnow(cls) -> Timestamp:
         """Return the current UTC date and time, with `tzinfo` ``None``.
 
         This is like :meth:`Timestamp.now`, but returns the current UTC

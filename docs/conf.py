@@ -24,9 +24,10 @@ from __future__ import annotations
 import os
 import re
 import sys
-import tomli
 import warnings
 from pathlib import Path
+
+import tomli
 
 
 # Deprecated classes will generate warnings as Sphinx processes them.
