@@ -892,7 +892,7 @@ class TestForeignInterwikiLinks(WikimediaDefaultSiteTestCase):
         link = Link('bulba:title on auto-generated Site', source=self.site)
         try:
             link.site
-        except SiteDefinitionError as e:
+        except SiteDefinitionError as e:  # pragma: no cover
             self.assertEqual(
                 str(e), "Invalid AutoFamily('bulbapedia.bulbagarden.net')")
         else:
