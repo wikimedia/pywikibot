@@ -4,6 +4,8 @@ Current release
 Improvements
 ^^^^^^^^^^^^
 
+* Python 3.13 is supported
+* Update :mod:`tools`._unidata._category_cf from Unicodedata version 15.1.0
 * :meth:`Timestamp.nowutc()<pywikibot.time.Timestamp.nowutc>` and
   :meth:`Timestamp.utcnow()<pywikibot.time.Timestamp.utcnow>` were added (:phab:`T337748`)
 * Remove content parameter of :meth:`proofreadpage.IndexPage.page_gen` method. (:phab:`T358635`)
