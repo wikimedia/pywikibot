@@ -1453,6 +1453,8 @@ class TestWantedFactoryGenerator(DefaultSiteTestCase):
                 with self.assertRaisesRegex(ValueError,
                                             'does not have a valid extension'):
                     pywikibot.FilePage(page)
+            else:
+                self.assertIsInstance(page.latest_file_info.mime, str)
 
     def test_wanted_templates(self):
         """Test wantedtemplates generator."""

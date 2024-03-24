@@ -1488,11 +1488,10 @@ class APISite(
 
         The following properties are loaded: ``timestamp``, ``user``,
         ``comment``, ``url``, ``size``, ``sha1``, ``mime``, ``mediatype``,
-        ``archivename`` and ``bitdepth``.
-        ``metadata``is loaded only if history is False.
-        If *url_width*, *url_height* or *url_param* is given, additional
-        properties ``thumbwidth``, ``thumbheight``, ``thumburl`` and
-        ``responsiveUrls`` are given.
+        ``archivename`` and ``bitdepth``. ``metadata`` is loaded only if
+        *history* is False. If *url_width*, *url_height* or *url_param*
+        is given, additional properties ``thumbwidth``, ``thumbheight``,
+        ``thumburl`` and ``responsiveUrls`` are given.
 
         .. note:: Parameters validation and error handling left to the
            API call.
@@ -1508,7 +1507,7 @@ class APISite(
         :param url_height: get info for a thumbnail with given height
         :param url_param:  get info for a thumbnail with given param
         :param timestamp: timestamp of the image's version to retrieve.
-            It has effect only if history is False.
+            It has effect only if *history* is False.
             If omitted, the latest version will be fetched.
         """
         args = {
@@ -1516,14 +1515,11 @@ class APISite(
             'iiurlwidth': url_width,
             'iiurlheight': url_height,
             'iiurlparam': url_param,
-            'iiprop': [
-                'timestamp', 'user', 'comment', 'url', 'size', 'sha1', 'mime',
-                'mediatype', 'archivename', 'bitdepth',
-            ]
+            'iiprop': pywikibot.site._IIPROP
         }
         if not history:
             args['total'] = 1
-            args['iiprop'].append('metadata')
+            args['iiprop'] += ('metadata', )
             if timestamp:
                 args['iistart'] = args['iiend'] = timestamp.isoformat()
 

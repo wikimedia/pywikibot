@@ -6,7 +6,7 @@
    :class:`tools.collections.GeneratorWrapper`
 """
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -675,23 +675,28 @@ class PageGenerator(QueryGenerator):
         g_content: bool = False,
         **kwargs
     ) -> None:
-        """
-        Initializer.
+        """Initializer.
 
-        Required and optional parameters are as for ``Request``, except that
-        action=query is assumed and generator is required.
+        Required and optional parameters are as for ``Request``, except
+        that ``action=query`` is assumed and generator is required.
+
+        .. versionchanged:: 9.1
+           retrieve the same imageinfo properties as in
+           :meth:`APISite.loadimageinfo()
+           <pywikibot.site._apisite.APISite.loadimageinfo>` with default
+           parameters.
 
         :param generator: the "generator=" type from api.php
         :param g_content: if True, retrieve the contents of the current
             version of each Page (default False)
-
         """
-        # If possible, use self.request after __init__ instead of appendParams
+        # If possible, use self.request after __init__ instead of append_params
         def append_params(params, key, value) -> None:
             if key in params:
                 params[key] += '|' + value
             else:
                 params[key] = value
+
         kwargs = self._clean_kwargs(kwargs)
         parameters = kwargs['parameters']
         # get some basic information about every page generated
@@ -704,8 +709,7 @@ class PageGenerator(QueryGenerator):
         if not ('inprop' in parameters
                 and 'protection' in parameters['inprop']):
             append_params(parameters, 'inprop', 'protection')
-        append_params(parameters, 'iiprop',
-                      'timestamp|user|comment|url|size|sha1')
+        append_params(parameters, 'iiprop', pywikibot.site._IIPROP)
         append_params(parameters, 'iilimit', 'max')  # T194233
         parameters['generator'] = generator
         super().__init__(**kwargs)

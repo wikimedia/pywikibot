@@ -1,6 +1,6 @@
 """Library module representing MediaWiki sites (wikis)."""
 #
-# (C) Pywikibot team, 2021-2022
+# (C) Pywikibot team, 2021-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -21,3 +21,9 @@ from pywikibot.site._tokenwallet import TokenWallet
 
 __all__ = ('APISite', 'BaseSite', 'ClosedSite', 'DataSite', 'RemovedSite',
            'Namespace', 'NamespacesDict', 'Siteinfo', 'TokenWallet')
+
+# iiprop file information to get, used in several places
+_IIPROP = (
+    'timestamp', 'user', 'comment', 'url', 'size', 'sha1', 'mime', 'mediatype',
+    'archivename', 'bitdepth',
+)

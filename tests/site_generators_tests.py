@@ -26,6 +26,17 @@ from tests.aspects import DefaultSiteTestCase, DeprecationTestCase, TestCase
 from tests.utils import skipping
 
 
+global_expected_params = {
+    'action': ['query'],
+    'continue': [True],
+    'iilimit': ['max'],
+    'iiprop': list(pywikibot.site._IIPROP),
+    'indexpageids': [True],
+    'inprop': ['protection'],
+    'prop': ['info', 'imageinfo', 'categoryinfo'],
+}
+
+
 class TestSiteGenerators(DefaultSiteTestCase):
     """Test cases for Site methods."""
 
@@ -179,16 +190,11 @@ class TestSiteGenerators(DefaultSiteTestCase):
     def test_pagetemplates(self):
         """Test Site.pagetemplates."""
         tl_gen = self.site.pagetemplates(self.mainpage)
-        expected_params = {
-            'continue': [True],
-            'inprop': ['protection'],
-            'iilimit': ['max'],
-            'iiprop': ['timestamp', 'user', 'comment', 'url', 'size', 'sha1'],
-            'indexpageids': [True],
-            'generator': ['templates'], 'action': ['query'],
-            'prop': ['info', 'imageinfo', 'categoryinfo'],
-            'titles': [self.mainpage.title()],
-        }
+        expected_params = dict(
+            global_expected_params,
+            generator=['templates'],
+            titles=[self.mainpage.title()],
+        )
 
         self.assertEqual(tl_gen.request._params, expected_params)
 
@@ -213,16 +219,11 @@ class TestSiteGenerators(DefaultSiteTestCase):
         """Test Site.pagelinks."""
         links_gen = self.site.pagelinks(self.mainpage)
         gen_params = links_gen.request._params.copy()
-        expected_params = {
-            'action': ['query'], 'indexpageids': [True],
-            'continue': [True],
-            'inprop': ['protection'],
-            'iilimit': ['max'],
-            'iiprop': ['timestamp', 'user', 'comment', 'url', 'size',
-                       'sha1'], 'generator': ['links'],
-            'prop': ['info', 'imageinfo', 'categoryinfo'],
-            'redirects': [False],
-        }
+        expected_params = dict(
+            global_expected_params,
+            generator=['links'],
+            redirects=[False],
+        )
         if 'pageids' in gen_params:
             expected_params['pageids'] = [str(self.mainpage.pageid)]
         else:
@@ -1110,13 +1111,13 @@ class SearchTestCase(DefaultSiteTestCase):
         """Test site.search() method with 'where' parameter set to title."""
         search_gen = self.site.search(
             'wiki', namespaces=0, total=10, where='title')
-        expected_params = {
-            'prop': ['info', 'imageinfo', 'categoryinfo'],
-            'inprop': ['protection'],
-            'iiprop': ['timestamp', 'user', 'comment', 'url', 'size', 'sha1'],
-            'iilimit': ['max'], 'generator': ['search'], 'action': ['query'],
-            'indexpageids': [True], 'continue': [True],
-            'gsrnamespace': [0], 'gsrsearch': ['wiki'], 'gsrwhat': ['title']}
+        expected_params = dict(
+            global_expected_params,
+            generator=['search'],
+            gsrnamespace=[0],
+            gsrsearch=['wiki'],
+            gsrwhat=['title'],
+        )
         self.assertEqual(search_gen.request._params, expected_params)
         for hit in search_gen:
             self.assertIsInstance(hit, pywikibot.Page)
