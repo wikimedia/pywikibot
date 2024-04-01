@@ -3,7 +3,7 @@
 Do not import classes directly from here but from specialbots.
 """
 #
-# (C) Pywikibot team, 2003-2023
+# (C) Pywikibot team, 2003-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -270,13 +270,13 @@ class UploadRobot(BaseBot):
                 if self.opt.always:
                     pywikibot.info('File format is not one of [{}]'
                                    .format(' '.join(allowed_formats)))
-                    continue
 
-                if not pywikibot.input_yn(
-                        'File format is not one of [{}], but {!r}. Continue?'
-                        .format(' '.join(allowed_formats), ext),
-                        default=False):
-                    continue
+                elif pywikibot.input_yn(
+                        'File format is not one of [{}], but {!r}. Skip?'
+                        .format(' '.join(allowed_formats), ext)):
+                    return None
+
+                continue
 
             potential_file_page = pywikibot.FilePage(self.target_site,
                                                      filename)
