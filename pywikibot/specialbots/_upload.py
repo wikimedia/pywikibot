@@ -216,11 +216,13 @@ class UploadRobot(BaseBot):
                                         default=False, automatic_quit=False)
         return answer
 
-    def process_filename(self, file_url):
-        """Return base filename portion of file_url."""
+    def process_filename(self, file_url: str) -> str | None:
+        """Return base filename portion of *file_url*.
+
+        :param file_url: either a URL or a local file path
+        """
         # Isolate the pure name
         filename = file_url
-        # Filename may be either a URL or a local file path
         if '://' in filename:
             # extract the path portion of the URL
             filename = urlparse(filename).path
@@ -288,10 +290,10 @@ class UploadRobot(BaseBot):
                 if potential_file_page.has_permission():
                     if overwrite is None:
                         overwrite = not pywikibot.input_yn(
-                            'File with name {} already exists. '
-                            'Would you like to change the name? '
-                            '(Otherwise file will be overwritten.)'
-                            .format(filename), default=True,
+                            f'File with name {filename} already exists.'
+                            ' Would you like to change the name?'
+                            ' (Otherwise file will be overwritten.)',
+                            default=True,
                             automatic_quit=False)
                     if not overwrite:
                         continue
@@ -361,7 +363,7 @@ class UploadRobot(BaseBot):
         """
         return self.ignore_warning is True or warn_code in self.ignore_warning
 
-    def upload_file(self, file_url):
+    def upload_file(self, file_url: str) -> str | None:
         """
         Upload the image at file_url to the target wiki.
 
@@ -374,6 +376,8 @@ class UploadRobot(BaseBot):
         .. versionchanged:: 7.0
            If 'copyuploadbaddomain' API error occurred in first step,
            download the file and upload it afterwards
+
+        :param file_url: either a URL or a local file path
         """
         filename = self.process_filename(file_url)
         if not filename:
@@ -432,36 +436,41 @@ class UploadRobot(BaseBot):
         """Check whether processing is to be skipped."""
         # early check that upload is enabled
         if self.target_site.is_uploaddisabled():
-            pywikibot.error(
-                'Upload error: Local file uploads are disabled on {}.'
-                .format(self.target_site))
+            pywikibot.error(f'Upload error: Local file uploads are disabled '
+                            f'on {self.target_site}.')
             return True
 
         # early check that user has proper rights to upload
         self.target_site.login()
         if not self.target_site.has_right('upload'):
-            pywikibot.error(
-                "User '{}' does not have upload rights on site {}."
-                .format(self.target_site.user(), self.target_site))
+            pywikibot.error(f"User '{self.target_site.user()}' does not have "
+                            f'upload rights on site {self.target_site}.')
             return True
 
         return False
 
     def run(self):
-        """Run bot."""
+        """Run bot.
+
+        .. versionchanged: 9.1
+           count uploads.
+        """
         if self.skip_run():
             return
+
         try:
             for file_url in self.url:
-                self.upload_file(file_url)
+                filename = self.upload_file(file_url)
                 self.counter['read'] += 1
+                if filename:
+                    self.counter['upload'] += 1
         except QuitKeyboardInterrupt:
-            pywikibot.info(f'\nUser quit {self.__class__.__name__} bot run...')
+            pywikibot.info(f'\nUser quit {type(self).__name__} bot run...')
         except KeyboardInterrupt:
             if config.verbose_output:
                 raise
 
-            pywikibot.info('\nKeyboardInterrupt during {} bot run...'
-                           .format(self.__class__.__name__))
+            pywikibot.info(
+                f'\nKeyboardInterrupt during {type(self).__name__} bot run...')
         finally:
             self.exit()
