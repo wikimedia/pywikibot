@@ -358,19 +358,31 @@ class BasePage(ComparableMixin):
         """Return the wiki-text of the page.
 
         This will retrieve the page from the server if it has not been
-        retrieved yet, or if force is True. This can raise the following
-        exceptions that should be caught by the calling code:
+        retrieved yet, or if force is True. Exceptions should be caught
+        by the calling code.
 
-        :exception pywikibot.exceptions.NoPageError: The page does not exist
-        :exception pywikibot.exceptions.IsRedirectPageError: The page is a
-            redirect. The argument of the exception is the title of the page
-            it redirects to.
-        :exception pywikibot.exceptions.SectionError: The section does not
-            exist on a page with a # link
+        **Example:**
 
-        :param force:           reload all page attributes, including errors.
-        :param get_redirect:    return the redirect text, do not follow the
-                                redirect, do not raise an exception.
+        >>> import pywikibot
+        >>> site = pywikibot.Site('mediawiki')
+        >>> page = pywikibot.Page(site, 'Pywikibot')
+        >>> page.get(get_redirect=True)
+        '#REDIRECT[[Manual:Pywikibot]]'
+        >>> page.get()
+        Traceback (most recent call last):
+         ...
+        pywikibot.exceptions.IsRedirectPageError: ... is a redirect page.
+
+        .. seealso:: :attr:`text` property
+
+        :param force: reload all page attributes, including errors.
+        :param get_redirect: return the redirect text, do not follow the
+            redirect, do not raise an exception.
+
+        :raises NoPageError: The page does not exist.
+        :raises IsRedirectPageError: The page is a redirect.
+        :raises SectionError: The section does not exist on a page with
+            a # link.
         """
         if force:
             del self.latest_revision_id
@@ -519,8 +531,29 @@ class BasePage(ComparableMixin):
 
     @property
     def text(self) -> str:
-        """
-        Return the current (edited) wikitext, loading it if necessary.
+        """Return the current (edited) wikitext, loading it if necessary.
+
+        This property should be prefered over :meth:`get`. If the page
+        does not exist, an empty string will be returned. For a redirect
+        it returns the redirect page content and does not raise an
+        :exc:`exceptions.IsRedirectPageError` exception.
+
+        **Example:**
+
+        >>> import pywikibot
+        >>> site = pywikibot.Site('mediawiki')
+        >>> page = pywikibot.Page(site, 'Pywikibot')
+        >>> page.text
+        '#REDIRECT[[Manual:Pywikibot]]'
+        >>> page.text = 'PWB Framework'
+        >>> page.text
+        'PWB Framework'
+        >>> page.text = None  # reload from wiki
+        >>> page.text
+        '#REDIRECT[[Manual:Pywikibot]]'
+        >>> del page.text  # other way to reload from wiki
+
+        To save the modified text :meth:`save` is one possible method.
 
         :return: text of the page
         """
@@ -534,7 +567,7 @@ class BasePage(ComparableMixin):
             return ''
 
     @text.setter
-    def text(self, value: str | None):
+    def text(self, value: str | None) -> None:
         """Update the current (edited) wikitext.
 
         :param value: New value or None
