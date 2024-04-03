@@ -30,12 +30,14 @@ for tests to set the default site (see :phab:`T216825`)::
 
     python pwb.py -lang:de bot_tests -v
 
+.. seealso:: :mod:`pwb` entry point
 .. versionchanged:: 7.0
-   pwb wrapper was added to the Python site package lib
+   pwb wrapper was added to the Python site package lib.
 .. versionchanged:: 7.7
-   pwb wrapper is able to set ``PYWIKIBOT_TEST_...`` environment variables
+   pwb wrapper is able to set ``PYWIKIBOT_TEST_...`` environment variables,
+   see :ref:`Environment variables`.
 .. versionchanged:: 8.0
-   renamed to wrapper.py
+   renamed to wrapper.py.
 """
 #
 # (C) Pywikibot team, 2012-2024
