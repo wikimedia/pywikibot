@@ -474,7 +474,7 @@ class UploadRobot(BaseBot):
     def run(self):
         """Run bot.
 
-        .. versionchanged: 9.1
+        .. versionchanged:: 9.1
            count uploads.
         """
         if self.skip_run():
