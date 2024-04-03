@@ -3,7 +3,7 @@
 Do not import classes directly from here but from specialbots.
 """
 #
-# (C) Pywikibot team, 2003-2023
+# (C) Pywikibot team, 2003-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -21,6 +21,7 @@ import requests
 import pywikibot
 import pywikibot.comms.http as http
 from pywikibot import config
+from pywikibot.backports import Callable
 from pywikibot.bot import BaseBot, QuitKeyboardInterrupt
 from pywikibot.exceptions import APIError, FatalServerError, NoPageError
 
@@ -28,6 +29,27 @@ from pywikibot.exceptions import APIError, FatalServerError, NoPageError
 class UploadRobot(BaseBot):
 
     """Upload bot."""
+
+    post_processor: Callable[[str, str | None], None] | None = None
+    """If this attribute is set to a callable, the :meth:`run` method calls it
+    after upload. The parameter passed to the callable is the origin *file_url*
+    passed to the :meth:`upload` method and the filename returned from that
+    method. It can be used like this:
+
+    .. code:: python
+
+       def summarize(old: str, new: str | None) -> None:
+           if new is None:
+               print(f'{old} was ignored')
+           else:
+               print(f'{old} was uploaded as {new}')
+
+       bot = UploadRobot('Myfile.bmp')
+       bot.post_processor = summarize
+       bot.run()
+
+    .. versionadded:: 9.1
+    """
 
     def __init__(self, url: list[str] | str, *,
                  url_encoding=None,
@@ -464,6 +486,8 @@ class UploadRobot(BaseBot):
                 self.counter['read'] += 1
                 if filename:
                     self.counter['upload'] += 1
+                if callable(self.post_processor):
+                    self.post_processor(file_url, filename)
         except QuitKeyboardInterrupt:
             pywikibot.info(f'\nUser quit {type(self).__name__} bot run...')
         except KeyboardInterrupt:

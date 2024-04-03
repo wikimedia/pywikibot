@@ -5,7 +5,7 @@ UploadRobot test.
 These tests write to the wiki.
 """
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -83,6 +83,7 @@ class TestDryUploadbot(DefaultSiteTestCase):
         self.assertTrue(bot._handle_warning('any warning'))  # ignore_warning
         self.assertTrue(bot.ignore_on_warn('any warning'))  # ignore_warning
         self.assertFalse(bot.abort_on_warn('any warning'))  # aborts
+        self.assertIsNone(bot.post_processor)
 
 
 if __name__ == '__main__':
