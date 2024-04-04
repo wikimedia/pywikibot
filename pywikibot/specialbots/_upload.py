@@ -31,10 +31,10 @@ class UploadRobot(BaseBot):
     """Upload bot."""
 
     post_processor: Callable[[str, str | None], None] | None = None
-    """If this attribute is set to a callable, the :meth:`run` method calls it
-    after upload. The parameter passed to the callable is the origin *file_url*
-    passed to the :meth:`upload` method and the filename returned from that
-    method. It can be used like this:
+    """If this attribute is set to a callable, the :meth:`run` method
+    calls it after upload. The parameters passed to the callable is the
+    origin *file_url* passed to the :meth:`upload` method and the
+    *filename* returned from that method. It can be used like this:
 
     .. code:: python
 
@@ -70,7 +70,6 @@ class UploadRobot(BaseBot):
 
         .. versionchanged:: 6.2
            asynchronous upload is used if *asynchronous* parameter is set
-
         .. versionchanged:: 6.4
            *force_if_shared* parameter was added
 
@@ -78,7 +77,6 @@ class UploadRobot(BaseBot):
             to local files.
         :param description: Description of file for its page. If multiple files
             are uploading the same description is used for every file.
-        :type description: str
         :param use_filename: Specify title of the file's page. If multiple
             files are uploading it asks to change the name for second, third,
             etc. files, otherwise the last file will overwrite the other.
@@ -104,11 +102,10 @@ class UploadRobot(BaseBot):
         :param force_if_shared: Upload the file even if it's currently
             shared to the target site (e.g. when moving from Commons to another
             wiki)
-        :keyword always: Disables any input, requires that either
+        :keyword bool always: Disables any input, requires that either
             ignore_warning or aborts are set to True and that the
             description is also set. It overwrites verify_description to
             False and keep_filename to True.
-        :type always: bool
         """
         super().__init__(**kwargs)
         if self.opt.always:
