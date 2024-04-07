@@ -1,7 +1,14 @@
 Current release
 ---------------
 
-* (no changes yet)
+* File title of :class:`specialbots.UploadRobot` must have a valid file extension (:phab:`T345786`)
+* Add a :attr:`post_processor<specialbots.UploadRobot.post_processor>` attribute to :class:`specialbots.UploadRobot`
+  which can be called after each upload (:phab:`T359766`)
+* Avoid using :meth:`pywikibot.handle_args` in private scripts;
+  use :mod:`pwb<pywikibot.scripts.wrapper>` wrapper instead (:phab:`T359766`)
+* Show upload count with :class:`specialbots.UploadRobot`
+* Use the same ``iiprop`` properties in :class:`data.api.PageGenerator` as in
+  :meth:`APISite.loadimageinfo<pywikibot.site._apisite.APISite.loadimageinfo>` (:phab:`T360093`)
 
 Deprecations
 ------------
