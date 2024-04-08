@@ -177,9 +177,13 @@ if PYTHON_VERSION < (3, 13) or SPHINX_RUNNING:
         :param strict: raise a ValueError if the final batch is shorter
             than *n*.
         :raise ValueError: batched(): incomplete batch
+        :raise TypeError: *n* cannot be interpreted as an integer
         """
         msg = 'batched(): incomplete batch'
         if PYTHON_VERSION < (3, 12):
+            if not isinstance(n, int):
+                raise TypeError(f'{type(n),__name__!r} object cannot be'
+                                ' interpreted as an integer')
             group = []
             for item in iterable:
                 group.append(item)

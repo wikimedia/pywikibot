@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Utility to show pywikibot colors."""
 #
-# (C) Pywikibot team, 2016-2023
+# (C) Pywikibot team, 2016-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -17,10 +17,8 @@ def main():
     fg_colors = [col for col in colors if col != 'default']
     bg_colors = fg_colors[:]
     n_fg_colors = len(fg_colors)
-    fg_colors.insert(3 * int(n_fg_colors / 4), 'default')
-    fg_colors.insert(2 * int(n_fg_colors / 4), 'default')
-    fg_colors.insert(int(n_fg_colors / 4), 'default')
-    fg_colors.insert(0, 'default')
+    for i in range(4):
+        fg_colors.insert((3 - i) * (n_fg_colors // 4), 'default')
 
     # Max len of color names for padding.
     max_len_fg_colors = len(max(fg_colors, key=len))
@@ -28,7 +26,7 @@ def main():
 
     for bg_col in bg_colors:
         # Three lines per each backgoung color.
-        for fg_col_group in batched(fg_colors, n_fg_colors / 4 + 1):
+        for fg_col_group in batched(fg_colors, n_fg_colors // 4 + 1):
             line = ''
             for fg_col in fg_col_group:
                 line += ' '
