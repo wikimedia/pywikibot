@@ -1095,13 +1095,11 @@ class CheckImagesBot:
             self.settings_data = None
             self.some_problem = False
 
-        if not self.settings_data:
-            self.settings_data = None
-
         # Real-Time page loaded
         if self.settings_data:
             pywikibot.info('>> Loaded the real-time page... <<')
         else:
+            self.settings_data = None
             pywikibot.info('>> No additional settings found! <<')
 
     def load_licenses(self) -> set[pywikibot.Page]:
