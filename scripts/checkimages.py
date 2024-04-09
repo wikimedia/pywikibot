@@ -71,7 +71,7 @@ right parameter.
    Welcome messages are imported from :mod:`scripts.welcome` script.
 """
 #
-# (C) Pywikibot team, 2006-2023
+# (C) Pywikibot team, 2006-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1058,42 +1058,37 @@ class CheckImagesBot:
     def takesettings(self) -> None:
         """Function to take the settings from the wiki."""
         settings_page = i18n.translate(self.site, PAGE_WITH_SETTINGS)
-        try:
-            if not settings_page:
-                self.settings_data = None
-            else:
-                page = pywikibot.Page(self.site, settings_page)
-                self.settings_data = []
-                try:
-                    testo = page.get()
 
-                    for number, m in enumerate(SETTINGS_REGEX.finditer(testo),
-                                               start=1):
-                        name = str(m[1])
-                        find_tipe = str(m[2])
-                        find = str(m[3])
-                        imagechanges = str(m[4])
-                        summary = str(m[5])
-                        head = str(m[6])
-                        text = str(m[7])
-                        mexcatched = str(m[8])
-                        tupla = [number, name, find_tipe, find, imagechanges,
-                                 summary, head, text, mexcatched]
-                        self.settings_data += [tupla]
-
-                    if not self.settings_data:
-                        pywikibot.info(
-                            "You've set wrongly your settings, please take a "
-                            'look to the relative page. (run without them)')
-                        self.settings_data = None
-                except NoPageError:
-                    pywikibot.info("The settings' page doesn't exist!")
-                    self.settings_data = None
-        except Error:
-            pywikibot.info(
-                'Problems with loading the settigs, run without them.')
+        if not settings_page:
             self.settings_data = None
-            self.some_problem = False
+        else:
+            page = pywikibot.Page(self.site, settings_page)
+            self.settings_data = []
+            try:
+                testo = page.get()
+
+                for number, m in enumerate(SETTINGS_REGEX.finditer(testo),
+                                           start=1):
+                    name = str(m[1])
+                    find_tipe = str(m[2])
+                    find = str(m[3])
+                    imagechanges = str(m[4])
+                    summary = str(m[5])
+                    head = str(m[6])
+                    text = str(m[7])
+                    mexcatched = str(m[8])
+                    tupla = [number, name, find_tipe, find, imagechanges,
+                             summary, head, text, mexcatched]
+                    self.settings_data += [tupla]
+
+                if not self.settings_data:
+                    pywikibot.info(
+                        "You've set wrongly your settings, please take a "
+                        'look to the relative page. (run without them)')
+                    self.settings_data = None
+            except NoPageError:
+                pywikibot.info("The settings' page doesn't exist!")
+                self.settings_data = None
 
         # Real-Time page loaded
         if self.settings_data:
