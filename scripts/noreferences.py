@@ -29,7 +29,7 @@ bandwidth. Instead, use the -xml parameter, or use another way to generate
 a list of affected articles
 """
 #
-# (C) Pywikibot team, 2007-2023
+# (C) Pywikibot team, 2007-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -37,11 +37,12 @@ from __future__ import annotations
 
 import re
 from functools import partial
+from pathlib import Path
 
 import pywikibot
 from pywikibot import i18n, pagegenerators, textlib
 from pywikibot.bot import AutomaticTWSummaryBot, ExistingPageBot, SingleSiteBot
-from pywikibot.exceptions import LockedPageError
+from pywikibot.exceptions import LockedPageError, TranslationError
 from pywikibot.pagegenerators import XMLDumpPageGenerator
 
 
@@ -611,7 +612,7 @@ class NoReferencesBot(AutomaticTWSummaryBot, SingleSiteBot, ExistingPageBot):
         # Is there an existing section where we can add the references tag?
         # Set the edit summary key for this case
         self.summary_key = 'noreferences-add-tag'
-        for section in i18n.translate(self.site, referencesSections):
+        for section in i18n.translate(self.site, referencesSections) or []:
             sectionR = re.compile(fr'\r?\n=+ *{section} *=+ *\r?\n')
             index = 0
             while index < len(oldText):
@@ -637,7 +638,7 @@ class NoReferencesBot(AutomaticTWSummaryBot, SingleSiteBot, ExistingPageBot):
                     break
 
         # Create a new section for the references tag
-        for section in i18n.translate(self.site, placeBeforeSections):
+        for section in i18n.translate(self.site, placeBeforeSections) or []:
             # Find out where to place the new section
             sectionR = re.compile(r'\r?\n(?P<ident>=+) *{} *(?P=ident) *\r?\n'
                                   .format(section))
@@ -699,24 +700,34 @@ class NoReferencesBot(AutomaticTWSummaryBot, SingleSiteBot, ExistingPageBot):
         index = len(tmpText)
         return self.createReferenceSection(oldText, index)
 
-    def createReferenceSection(self, oldText, index, ident: str = '==') -> str:
+    def createReferenceSection(self,
+                               oldText: str,
+                               index: int,
+                               ident: str = '==') -> str:
         """Create a reference section and insert it into the given text.
 
+        .. versionchanged:: 9.1
+           raise :exc:`exceptions.TranslationError` if script is not
+           localized for the current site.
+
         :param oldText: page text that is going to be be amended
-        :type oldText: str
-        :param index: the index of oldText where the reference section should
-            be inserted at
-        :type index: int
-        :param ident: symbols to be inserted before and after reference section
-            title
+        :param index: the index of oldText where the reference section
+            should be inserted at
+        :param ident: symbols to be inserted before and after reference
+            section title
         :return: the amended page text with reference section added
+        :raises TranslationError: script is not localized for the
+            current site
         """
+        title = i18n.translate(self.site, referencesSections)
         if self.site.code in noTitleRequired:
             ref_section = f'\n\n{self.referencesText}\n'
+        elif title:
+            ref_section = (f'\n\n{ident} {title[0]} {ident}\n'
+                           f'{self.referencesText}\n')
         else:
-            ref_section = '\n\n{ident} {title} {ident}\n{text}\n'.format(
-                title=i18n.translate(self.site, referencesSections)[0],
-                ident=ident, text=self.referencesText)
+            raise TranslationError(f'{Path(__file__).name} script is not '
+                                   f'localized for {self.site}')
         return oldText[:index].rstrip() + ref_section + oldText[index:]
 
     def skip_page(self, page):
@@ -726,14 +737,18 @@ class NoReferencesBot(AutomaticTWSummaryBot, SingleSiteBot, ExistingPageBot):
 
         if self.site.sitename == 'wikipedia:en' and page.isIpEdit():
             pywikibot.warning(
-                'Page {} is edited by IP. Possible vandalized'
-                .format(page.title(as_link=True)))
+                f'Page {page} is edited by IP. Possible vandalized')
             return True
 
         return False
 
     def treat_page(self) -> None:
-        """Run the bot."""
+        """Run the bot.
+
+        .. versionchanged:: 9.1
+           print error message and close :attr:`bot.BaseBot.generator`
+           if :exc:`exceptions.TranslationError` was raised.
+        """
         page = self.current_page
         try:
             text = page.text
@@ -742,7 +757,13 @@ class NoReferencesBot(AutomaticTWSummaryBot, SingleSiteBot, ExistingPageBot):
             return
 
         if self.lacksReferences(text):
-            self.put_current(self.addReferences(text))
+            try:
+                newtext = self.addReferences(text)
+            except TranslationError as e:
+                pywikibot.error(e)
+                self.generator.close()
+            else:
+                self.put_current(newtext)
 
 
 def main(*args: str) -> None:
