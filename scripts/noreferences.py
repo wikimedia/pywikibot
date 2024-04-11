@@ -52,12 +52,15 @@ docuReplacements = {
     '&params;': pagegenerators.parameterHelp,
 }
 
-# References sections are usually placed before further reading / external
-# link sections. This dictionary defines these sections, sorted by priority.
-# For example, on an English wiki, the script would place the "References"
-# section in front of the "Further reading" section, if that existed.
-# Otherwise, it would try to put it in front of the "External links" section,
-# or if that fails, the "See also" section, etc.
+placeBeforeSections: dict[str, list[str]]
+"""References sections are usually placed before further reading /
+external link sections. This dictionary defines these sections, sorted
+by priority. For example, on an English wiki, the script would place the
+"References" section in front of the "Further reading" section, if that
+existed. Otherwise, it would try to put it in front of the
+"External links" section, or if that fails, the "See also" section, etc.
+"""
+
 placeBeforeSections = {
     'ar': [              # no explicit policy on where to put the references
         'وصلات خارجية',
@@ -208,6 +211,10 @@ placeBeforeSections = {
         'حوالا',
         'خارجي ڳنڌڻا',
     ],
+    'simple': [
+        'Other websites',
+        'Sources',
+    ],
     'sk': [
         'Pozri aj',
     ],
@@ -241,10 +248,30 @@ placeBeforeSections = {
     ],
 }
 
-# Titles of sections where a reference tag would fit into.
-# The first title should be the preferred one: It's the one that will be
-# used when a new section has to be created. Section titles can be regex
-# patterns except of the first.
+PLACE_AFTER_SECTIONS: dict[str, list[str]]
+"""References sections can also be placed after a given section. This
+dictionary defines these sections, sorted by priority. For example, on
+Simple wiki, the script would place the "References" section after the
+"Notes" section, if that existed. The PLACE_AFTER_SECTIONS is priorized
+over the placing of the "placeBeforeSections" sections.
+
+.. attention:: not implemented yet.
+"""
+
+# TODO: not implemented yet.
+PLACE_AFTER_SECTIONS = {
+    'simple': [
+        'Notes',
+    ],
+}
+
+referencesSections: dict[str, dict[str, list[str]]]
+"""Titles of sections where a reference tag would fit into. The first
+title should be the preferred one: It's the one that will be used when
+a new section has to be created. Section titles can be regex patterns
+except of the first.
+"""
+
 referencesSections = {
     'wikipedia': {
         'ar': [             # not sure about which ones are preferred.
@@ -385,6 +412,9 @@ referencesSections = {
         'sd': [
             'حوالا',
         ],
+        'simple': [
+            'References',
+        ],
         'sk': [
             'Referencie',
         ],
@@ -419,8 +449,11 @@ referencesSections = {
 referencesSections['wiktionary'] = dict(referencesSections['wikipedia'])
 referencesSections['wiktionary'].update(cs=['poznámky', 'reference'])
 
-# Templates which include a <references /> tag. If there is no such template
-# on your wiki, you don't have to enter anything here.
+referencesTemplates: dict[str, dict[str, list[str]]]
+"""Templates which include a <references /> tag. If there is no such
+template on your wiki, you don't have to enter anything here.
+"""
+
 referencesTemplates = {
     'wikipedia': {
         'ar': ['مراجع', 'المراجع', 'ثبت المراجع',
@@ -469,6 +502,7 @@ referencesTemplates = {
                'Сноска', 'Сноски'],
         'sd': ['Reflist', 'Refs', 'Reference',
                'حوالا'],
+        'simple': ['Reflist'],
         'sr': ['Reflist', 'Референце', 'Извори', 'Рефлист'],
         'szl': ['Przipisy', 'Připisy'],
         'th': ['รายการอ้างอิง'],
@@ -478,8 +512,11 @@ referencesTemplates = {
     },
 }
 
-# Text to be added instead of the <references /> tag.
-# Define this only if required by your wiki.
+referencesSubstitute: dict[str, dict[str, list[str]]]
+"""Text to be added instead of the <references /> tag. Define this only
+if required by your wiki.
+"""
+
 referencesSubstitute = {
     'wikipedia': {
         'ar': '{{مراجع}}',
@@ -498,6 +535,7 @@ referencesSubstitute = {
         'pl': '{{Przypisy}}',
         'ru': '{{примечания}}',
         'sd': '{{حوالا}}',
+        'simple': '{{reflist}}',
         'sr': '{{reflist}}',
         'szl': '{{Przipisy}}',
         'th': '{{รายการอ้างอิง}}',
@@ -506,11 +544,13 @@ referencesSubstitute = {
     },
 }
 
-# Sites where no title is required for references template
-# as it is already included there
-noTitleRequired = ['be', 'szl']
+noTitleRequired: list[str] = ['be', 'szl']
+"""Sites where no title is required for references template as it is
+already included there
+"""
 
-maintenance_category = 'Q6483427'
+#: The maintenance category to retrieve pages for processing
+maintenance_category: str = 'Q6483427'
 
 _ref_regex = re.compile('</ref>', re.IGNORECASE)
 _references_regex = re.compile('<references.*?/>', re.IGNORECASE)
