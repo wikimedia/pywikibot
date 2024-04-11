@@ -1,6 +1,20 @@
 Scripts Changelog
 =================
 
+9.1.0
+-----
+
+colors
+^^^^^^
+
+* Fix TypeError with :func:`backports.batched` (:phab:`T362035`)
+
+noreferences
+^^^^^^^^^^^^
+
+* Show an error message and leave if script is not localized (:phab:`T362103`)
+
+
 9.0.0
 -----
 
