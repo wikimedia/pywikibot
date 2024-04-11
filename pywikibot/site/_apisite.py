@@ -471,10 +471,12 @@ class APISite(
         if self.is_oauth_token_available():
             pywikibot.warning('Using OAuth suppresses logout function')
 
-        req_params = {'action': 'logout', 'token': self.tokens['csrf']}
-        uirequest = self.simple_request(**req_params)
-        uirequest.submit()
-        self._loginstatus = login.LoginStatus.NOT_LOGGED_IN
+        # check if already logged out to avoid requiring logging in
+        if not self._loginstatus == login.LoginStatus.NOT_LOGGED_IN:
+            req_params = {'action': 'logout', 'token': self.tokens['csrf']}
+            uirequest = self.simple_request(**req_params)
+            uirequest.submit()
+            self._loginstatus = login.LoginStatus.NOT_LOGGED_IN
 
         # Reset tokens and user properties
         del self.userinfo
