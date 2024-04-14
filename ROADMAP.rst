@@ -1,6 +1,9 @@
 Current release
 ---------------
 
+* Detect nighly version file with :func:`version.getversion_nightly` (:phab:`T362492`)
+* :mod:`version`.github_svn_rev2hash() was removed; it was no longer functional (:phab:`T362484`)
+* SVN support has been dropped; ``.svnprops`` property settings was removed (:phab:`T362484`)
 * Skip process that requires login to logout (:phab:`T326614`)
 * File title of :class:`specialbots.UploadRobot` must have a valid file extension (:phab:`T345786`)
 * Add a :attr:`post_processor<specialbots.UploadRobot.post_processor>` attribute to :class:`specialbots.UploadRobot`
@@ -64,6 +67,8 @@ Deprecations
 Will be removed in Pywikibot 10
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+* 9.1.0: :func:`version.svn_rev_info` and :func:`version.getversion_svn` will be removed. SVN is no longer supported.
+  (:phab:`T362484`)
 * 7.7.0: :mod:`tools.threading` classes should no longer imported from :mod:`tools`
 * 7.6.0: :mod:`tools.itertools` datatypes should no longer imported from :mod:`tools`
 * 7.6.0: :mod:`tools.collections` datatypes should no longer imported from :mod:`tools`
