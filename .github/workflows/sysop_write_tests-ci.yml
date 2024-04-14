@@ -80,7 +80,7 @@ jobs:
         PYWIKIBOT_TEST_OAUTH: ${{ secrets[format('{0}', steps.token.outputs.uppercase)] }}
         PYWIKIBOT_TEST_WRITE: ${{ matrix.domain == 'test.wikipedia.org' && 1 || 0}}
       run: |
-        python pwb.py version
+        python pwb.py version -usernames
         pytest -s -r A -a "rights or write" --cov=.;
 
     - name: Show coverage statistics
