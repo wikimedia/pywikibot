@@ -418,7 +418,7 @@ class DrySite(pywikibot.site.APISite):
     def login(self, *args, cookie_only=False, **kwargs):
         """Overwrite login which is called when a site is initialized.
 
-        .. versionadded: 8.0.4
+        .. versionadded:: 8.0.4
         """
         if cookie_only:
             return
