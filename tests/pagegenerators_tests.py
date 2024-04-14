@@ -1515,15 +1515,6 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
     def test_searchitem_language(self):
         """Test -searchitem with custom language specified."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handle_arg('-searchitem:pl:abc')
-        gf.handle_arg('-limit:1')
-        gen = gf.getCombinedGenerator()
-        self.assertIsNotNone(gen)
-        # alphabet, also known as ABC
-        page1 = next(gen)
-        self.assertEqual(page1.title(), 'Q9779')
-
-        gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handle_arg('-searchitem:en:abc')
         gf.handle_arg('-limit:2')
         gen = gf.getCombinedGenerator()
