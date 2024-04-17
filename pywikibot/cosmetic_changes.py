@@ -28,7 +28,7 @@ all of them, but be careful if you do.
 
 You may disable cosmetic changes by adding the all unwanted languages to
 the `dictionary cosmetic_changes_disable` in your user config file
-(`user_config.py`). It should contain a tuple of languages for each site
+(`user-config.py`). It should contain a tuple of languages for each site
 where you wish to disable cosmetic changes. You may use it with
 `cosmetic_changes_mylang_only` is False, but you can also disable your
 own language. This also overrides the settings in the dictionary
@@ -51,7 +51,7 @@ or by adding a list to the given one::
                                      'your_script_name_2']
 """
 #
-# (C) Pywikibot team, 2006-2023
+# (C) Pywikibot team, 2006-2024
 #
 # Distributed under the terms of the MIT license.
 #
