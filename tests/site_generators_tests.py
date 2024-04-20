@@ -341,30 +341,42 @@ class TestSiteGenerators(DefaultSiteTestCase):
         fwd = list(mysite.alllinks(total=10))
         uniq = list(mysite.alllinks(total=10, unique=True))
 
-        self.assertLessEqual(len(fwd), 10)
+        with self.subTest(msg='Test that unique links are in all links'):
+            self.assertLessEqual(len(fwd), 10)
+            self.assertLessEqual(len(uniq), len(fwd))
+            for link in fwd:
+                self.assertIsInstance(link, pywikibot.Page)
+                self.assertIn(link, uniq)
 
-        for link in fwd:
-            self.assertIsInstance(link, pywikibot.Page)
-            self.assertIn(link, uniq)
-        for page in mysite.alllinks(start='Link', total=5):
-            self.assertIsInstance(page, pywikibot.Page)
-            self.assertEqual(page.namespace(), 0)
-            self.assertGreaterEqual(page.title(), 'Link')
-        for page in mysite.alllinks(prefix='Fix', total=5):
-            self.assertIsInstance(page, pywikibot.Page)
-            self.assertEqual(page.namespace(), 0)
-            self.assertTrue(page.title().startswith('Fix'))
-        for page in mysite.alllinks(namespace=1, total=5):
-            self.assertIsInstance(page, pywikibot.Page)
-            self.assertEqual(page.namespace(), 1)
-        for page in mysite.alllinks(start='From', namespace=4, fromids=True,
-                                    total=5):
-            self.assertIsInstance(page, pywikibot.Page)
-            self.assertGreaterEqual(page.title(with_ns=False), 'From')
-            self.assertTrue(hasattr(page, '_fromid'))
-        errgen = mysite.alllinks(unique=True, fromids=True)
-        with self.assertRaises(Error):
-            next(errgen)
+        with self.subTest(msg='Test with start parameter'):
+            for page in mysite.alllinks(start='Link', total=5):
+                self.assertIsInstance(page, pywikibot.Page)
+                self.assertEqual(page.namespace(), 0)
+                self.assertGreaterEqual(page.title(), 'Link')
+
+        with self.subTest(msg='Test with prefix parameter'):
+            for page in mysite.alllinks(prefix='Fix', total=5):
+                self.assertIsInstance(page, pywikibot.Page)
+                self.assertEqual(page.namespace(), 0)
+                self.assertTrue(page.title().startswith('Fix'))
+
+        with self.subTest(msg='Test namespace parameter'):
+            for page in mysite.alllinks(namespace=1, total=5):
+                self.assertIsInstance(page, pywikibot.Page)
+                self.assertEqual(page.namespace(), 1)
+
+        with self.subTest(msg='Test with fromids parameter'):
+            for page in mysite.alllinks(start='From', namespace=4,
+                                        fromids=True, total=5):
+                self.assertIsInstance(page, pywikibot.Page)
+                self.assertGreaterEqual(page.title(with_ns=False), 'From')
+                self.assertTrue(hasattr(page, '_fromid'))
+
+        with self.subTest(
+                msg='Test that Error is raised with unique and fromids'):
+            errgen = mysite.alllinks(unique=True, fromids=True)
+            with self.assertRaises(Error):
+                next(errgen)
 
     def test_all_categories(self):
         """Test the site.allcategories() method."""
