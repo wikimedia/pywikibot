@@ -358,7 +358,10 @@ class TestSiteGenerators(DefaultSiteTestCase):
             for page in mysite.alllinks(prefix='Fix', total=5):
                 self.assertIsInstance(page, pywikibot.Page)
                 self.assertEqual(page.namespace(), 0)
-                self.assertTrue(page.title().startswith('Fix'))
+                self.assertTrue(
+                    page.title().startswith('Fix'),
+                    msg=f"{page.title()} does not start with 'Fix'"
+                )
 
         with self.subTest(msg='Test namespace parameter'):
             for page in mysite.alllinks(namespace=1, total=5):

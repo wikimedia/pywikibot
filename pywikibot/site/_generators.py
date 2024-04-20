@@ -975,7 +975,7 @@ class GeneratorsMixin:
 
     def alllinks(
         self,
-        start: str = '!',
+        start: str = '',
         prefix: str = '',
         namespace: SingleNamespaceType = 0,
         unique: bool = False,
@@ -1013,20 +1013,30 @@ class GeneratorsMixin:
         algen = self._generator(api.ListGenerator, type_arg='alllinks',
                                 namespaces=namespace, alfrom=start,
                                 total=total)
-        if prefix:
-            algen.request['alprefix'] = prefix
         if fromids:
             algen.request['alprop'] = 'title|ids'
-        if not unique:
-            pass
-        elif self.mw_version < '1.43':
-            algen.request['alunique'] = True
+
+        # circumvent problems with unique and prefix due to T359425 and T359427
+        if self.mw_version < '1.43':
+            if prefix:
+                algen.request['alprefix'] = prefix
+                prefix = ''  # don't break the loop later
+            if start:
+                algen.request['alstart'] = start
+            algen.request['alunique'] = unique
         else:
-            # unique filter for mw >= 1.43, use (title, ns) as key
-            # See: T359425, T359427
-            algen = filter_unique(algen, key=lambda x: (x['title'], x['ns']))
+            if prefix:
+                algen.request['alstart'] = prefix
+            elif start:
+                algen.request['alstart'] = start
+            if unique:
+                algen = filter_unique(
+                    algen, key=lambda link: (link['title'], link['ns']))
+
         for link in algen:
             p = pywikibot.Page(self, link['title'], link['ns'])
+            if prefix and p.title() > prefix:  # T359425, T359427
+                break
             if fromids:
                 p._fromid = link['fromid']  # type: ignore[attr-defined]
             yield p
