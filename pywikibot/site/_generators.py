@@ -1011,8 +1011,7 @@ class GeneratorsMixin:
         if unique and fromids:
             raise Error('alllinks: unique and fromids cannot both be True.')
         algen = self._generator(api.ListGenerator, type_arg='alllinks',
-                                namespaces=namespace, alfrom=start,
-                                total=total)
+                                namespaces=namespace, total=total)
         if fromids:
             algen.request['alprop'] = 'title|ids'
 
@@ -1022,13 +1021,13 @@ class GeneratorsMixin:
                 algen.request['alprefix'] = prefix
                 prefix = ''  # don't break the loop later
             if start:
-                algen.request['alstart'] = start
+                algen.request['alfrom'] = start
             algen.request['alunique'] = unique
         else:
             if prefix:
-                algen.request['alstart'] = prefix
+                algen.request['alfrom'] = prefix
             elif start:
-                algen.request['alstart'] = start
+                algen.request['alfrom'] = start
             if unique:
                 algen = filter_unique(
                     algen, key=lambda link: (link['title'], link['ns']))
