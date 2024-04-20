@@ -686,36 +686,37 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
         except InvalidPageError as e:
             pywikibot.error(e)
             return
+
+        if self.isTextExcepted(original_text):
+            pywikibot.info(f'Skipping {page} because it contains text '
+                           f'that is on the exceptions list.')
+            return
+
         applied = set()
         new_text = original_text
         last_text = None
+        while new_text != last_text:
+            last_text = new_text
+            new_text = self.apply_replacements(last_text, applied, page)
+            if not self.opt.recursive:
+                break
+
+        if new_text == original_text:
+            if not self.opt.quiet:
+                pywikibot.info(f'No changes were necessary in {page}')
+            return
+
+        if self.opt.addcat:
+            # Fetch only categories in wikitext, otherwise the others
+            # will be explicitly added.
+            cats = textlib.getCategoryLinks(new_text, site=page.site)
+            if self.opt.addcat not in cats:
+                cats.append(self.opt.addcat)
+                new_text = textlib.replaceCategoryLinks(new_text, cats,
+                                                        site=page.site)
+
         context = 0
         while True:
-            if self.isTextExcepted(new_text):
-                pywikibot.info(f'Skipping {page} because it contains text '
-                               f'that is on the exceptions list.')
-                return
-
-            while new_text != last_text:
-                last_text = new_text
-                new_text = self.apply_replacements(last_text, applied, page)
-                if not self.opt.recursive:
-                    break
-
-            if new_text == original_text:
-                if not self.opt.quiet:
-                    pywikibot.info(f'No changes were necessary in {page}')
-                return
-
-            if self.opt.addcat:
-                # Fetch only categories in wikitext, otherwise the others
-                # will be explicitly added.
-                cats = textlib.getCategoryLinks(new_text, site=page.site)
-                if self.opt.addcat not in cats:
-                    cats.append(self.opt.addcat)
-                    new_text = textlib.replaceCategoryLinks(new_text,
-                                                            cats,
-                                                            site=page.site)
             # Show the title of the page we're working on.
             # Highlight the title in purple.
             self.current_page = page
@@ -729,9 +730,11 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                  ('edit Latest', 'l'), ('open in Browser', 'b'),
                  ('More context', 'm'), ('All', 'a')],
                 default='N')
+
             if choice == 'm':
                 context = context * 3 if context else 3
                 continue
+
             if choice in ('e', 'l'):
                 text_editor = editor.TextEditor()
                 edit_text = original_text if choice == 'e' else new_text
@@ -739,32 +742,28 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                 # if user didn't press Cancel
                 if as_edited and as_edited != new_text:
                     new_text = as_edited
-                    if choice == 'l':
-                        # prevent changes from being applied again
-                        last_text = new_text
                 continue
+
             if choice == 'b':
+                # open in browser and leave
                 pywikibot.bot.open_webbrowser(page)
                 try:
-                    original_text = page.get(get_redirect=True, force=True)
+                    page.get(get_redirect=True, force=True)
                 except NoPageError:
                     pywikibot.info(f'Page {page.title()} has been deleted.')
-                    break
-                new_text = original_text
-                last_text = None
-                continue
+                return
+
+            if choice == 'n':
+                return
+
             if choice == 'a':
                 self.opt.always = True
-            if choice == 'y':
-                self.save(page, original_text, new_text, applied,
-                          show_diff=False, asynchronous=True)
 
-            # choice must be 'N'
+            # break if choice is 'y' or 'a' to save
             break
 
-        if self.opt.always and new_text != original_text:
-            self.save(page, original_text, new_text, applied,
-                      show_diff=False, asynchronous=False)
+        self.save(page, original_text, new_text, applied, show_diff=False,
+                  asynchronous=not self.opt.always)
 
     def save(self, page, oldtext, newtext, applied, **kwargs) -> None:
         """Save the given page."""
