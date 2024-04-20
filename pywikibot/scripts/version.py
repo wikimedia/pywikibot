@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
 """Script to determine the Pywikibot version (tag, revision and date).
 
+The following option is supported:
+
+-usernames  print usernames for each registered family
+
 .. versionchanged:: 7.0
    version script was moved to the framework scripts folder
+.. versionadded:: 9.1
+   the *-usernames* option.
 """
 #
 # (C) Pywikibot team, 2007-2024
@@ -51,7 +57,11 @@ WMF_CACERT = 'MIIDxTCCAq2gAwIBAgIQAqxcJmoLQJuPC3nyrkYldzANBgkqhkiG9w0BAQUFADBs'
 
 
 def main(*args: str) -> None:
-    """Print pywikibot version and important settings."""
+    """Print pywikibot version and important settings.
+
+    .. versionchanged:: 9.1
+       usernames are printed with ``-usernames`` option only.
+    """
     pywikibot.info('Pywikibot: ' + getversion())
     pywikibot.info('Release version: ' + pywikibot.__version__)
     pywikibot.info('packaging version: ' + packaging.__version__)
@@ -90,7 +100,12 @@ def main(*args: str) -> None:
                             os.environ.get(environ_name, 'Not set') or "''"))
 
     pywikibot.info('Config base dir: ' + pywikibot.config.base_dir)
-    for family, usernames in pywikibot.config.usernames.items():
+
+    if '-usernames' in sys.argv:
+        usernames_items = pywikibot.config.usernames.items()
+    else:
+        usernames_items = {}
+    for family, usernames in usernames_items:
         if not usernames:
             continue
         pywikibot.info(f"Usernames for family '{family}':")
