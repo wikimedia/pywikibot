@@ -12,6 +12,7 @@ colors
 noreferences
 ^^^^^^^^^^^^
 
+* L10N updates
 * Show an error message and leave if script is not localized (:phab:`T362103`)
 
 

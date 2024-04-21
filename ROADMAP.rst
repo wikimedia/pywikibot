@@ -1,6 +1,9 @@
 Current release
 ---------------
 
+* ``-usernames`` option was added to :mod:`version<pywikibot.scripts.version>` script
+* Circumvent problems with *unique* and *prefix* parameters in :meth:`Site.alllinks()
+  <pywikibot.site._generators.GeneratorsMixin.alllinks>` (:phab:`T359427`)
 * Detect nighly version file with :func:`version.getversion_nightly` (:phab:`T362492`)
 * :mod:`version`.github_svn_rev2hash() was removed; it was no longer functional (:phab:`T362484`)
 * SVN support has been dropped; ``.svnprops`` property settings was removed (:phab:`T362484`)
