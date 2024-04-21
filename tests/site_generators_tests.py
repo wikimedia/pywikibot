@@ -363,10 +363,15 @@ class TestSiteGenerators(DefaultSiteTestCase):
                     msg=f"{page.title()} does not start with 'Fix'"
                 )
 
+        # increase timeout due to T359427/T359425
+        # ~ 47s are required on wikidata
+        config_timeout = pywikibot.config.socket_timeout
+        pywikibot.config.socket_timeout = (config_timeout[0], 60)
         with self.subTest(msg='Test namespace parameter'):
             for page in mysite.alllinks(namespace=1, total=5):
                 self.assertIsInstance(page, pywikibot.Page)
                 self.assertEqual(page.namespace(), 1)
+        pywikibot.config.socket_timeout = config_timeout
 
         with self.subTest(msg='Test with fromids parameter'):
             for page in mysite.alllinks(start='From', namespace=4,

@@ -428,7 +428,9 @@ class GeneratorsMixin:
     ) -> Generator[pywikibot.Page, None, None]:
         """Yield internal wikilinks contained (or transcluded) on page.
 
-        .. seealso:: :api:`Links`
+        .. seealso::
+           - :api:`Links`
+           - :meth:`page.BasePage.linkedPages`
 
         :param namespaces: Only iterate pages in these namespaces
             (default: all)
@@ -993,7 +995,27 @@ class GeneratorsMixin:
            :func:`tools.itertools.filter_unique` in that case which
            might be memory intensive. Use it with care.
 
-        .. seealso:: :api:`Alllinks`
+        .. important:: Using *namespace* option different from ``0``
+           needs a lot of time on Wikidata site. You have to increase
+           the **read** timeout part of ``socket_timeout`` in
+           :ref:`Http Settings` in your ``user-config.py`` file. Or
+           increase it patially within your code like:
+
+           .. code:: pytkon
+
+              from pywikibot import config
+              save_timeout = config.socket_timeout  # save the timeout config
+              config.socket_timeout = save_timeout[0], 60
+              ... # your code here
+              config.socket_timeout = save_timeout  # restore timeout config
+
+           The minimum read timeout value should be 60 seconds in that
+           case.
+
+        .. seealso::
+           - :api:`Alllinks`
+           - :meth:`pagebacklinks`
+           - :meth:`pagelinks`
 
         :param start: Start at this title (page need not exist).
         :param prefix: Only yield pages starting with this string.
