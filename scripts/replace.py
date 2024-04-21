@@ -178,6 +178,8 @@ def precompile_exceptions(exceptions, use_regex, flags) -> None:
             'title', 'require-title', 'text-contains', 'inside']:
         if exceptionCategory in exceptions:
             patterns = exceptions[exceptionCategory]
+            if isinstance(patterns, str):
+                patterns = [patterns]
             if not use_regex:
                 patterns = [re.escape(pattern) for pattern in patterns]
             patterns = [re.compile(pattern, flags) for pattern in patterns]
@@ -1029,9 +1031,9 @@ def main(*args: str) -> None:  # noqa: C901
         if not generators_given and 'generator' in fix:
             gen_args = fix['generator']
             if isinstance(gen_args, str):
-                gen_args = [gen_args]
-            for gen_arg in gen_args:
-                genFactory.handle_arg(gen_arg)
+                genFactory.handle_arg(gen_args)
+            else:
+                genFactory.handle_args(gen_args)
         replacement_set = ReplacementList(fix.get('regex'),
                                           fix.get('exceptions'),
                                           fix.get('nocase'),
