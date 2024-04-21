@@ -988,9 +988,9 @@ def main(*args: str) -> None:  # noqa: C901
         replacement = Replacement(old, new)
         if not single_summary:
             single_summary = i18n.twtranslate(
-                site, 'replace-replacing',
-                {'description':
-                 f' (-{replacement.old} +{replacement.new})'}
+                site,
+                'replace-replacing',
+                {'description': f' (-{replacement.old} +{replacement.new})'}
             )
         replacements.append(replacement)
 
@@ -1012,7 +1012,7 @@ def main(*args: str) -> None:  # noqa: C901
             pywikibot.error(
                 f'fixes[{fix_name!r}] is a {type(fix).__name__}, not a dict')
             if type(fix) is tuple:
-                pywikibot.info('Maybe a trailing comma in your user_fixes.py?')
+                pywikibot.info('Maybe a trailing comma in your user-fixes.py?')
             pywikibot.debug(fix)
             return
 

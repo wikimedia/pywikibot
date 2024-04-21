@@ -433,9 +433,9 @@ class FilePage(Page):
         """
         Convenience function to get the associated Wikibase item of the file.
 
-        If WikibaseMediaInfo extension is available (e.g. on Commons),
+        If WikibaseMediaInfo extension is available (e.g., on Commons),
         the method returns the associated mediainfo entity. Otherwise,
-        it falls back to behavior of BasePage.data_item.
+        it falls back to the behavior of :meth:`BasePage.data_item`.
 
         .. versionadded:: 6.5
 
