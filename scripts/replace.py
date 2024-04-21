@@ -575,11 +575,14 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                     return True
         return False
 
-    def isTextExcepted(self, original_text) -> bool:
+    def isTextExcepted(self, text, exceptions=None) -> bool:
         """Return True iff one of the exceptions applies for the given text."""
-        if 'text-contains' in self.exceptions:
-            return any(exc.search(original_text)
-                       for exc in self.exceptions['text-contains'])
+        if exceptions is None:
+            exceptions = self.exceptions
+
+        if 'text-contains' in exceptions:
+            return any(exc.search(text) for exc in exceptions['text-contains'])
+
         return False
 
     def apply_replacements(self, original_text, applied, page=None):
@@ -601,6 +604,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             if (replacement.container
                     and replacement.container.name in skipped_containers):
                 continue
+
             if page is not None and self.isTitleExcepted(
                     page.title(), replacement.exceptions):
                 if replacement.container:
@@ -616,6 +620,10 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                         'the title is on the exceptions list.'.format(
                             replacement.description, page.title(as_link=True)))
                 continue
+
+            if self.isTextExcepted(original_text, replacement.exceptions):
+                continue
+
             old_text = new_text
             new_text = textlib.replaceExcept(
                 new_text, replacement.old_regex, replacement.new,
