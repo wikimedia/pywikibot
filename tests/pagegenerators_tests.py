@@ -1446,6 +1446,8 @@ class TestWantedFactoryGenerator(DefaultSiteTestCase):
 
     def test_wanted_files(self):
         """Test wantedfiles generator."""
+        if self.site.sitename == 'wowwiki:uk':
+            self.skipTest(f'skipping {self.site} due to T362384)')
         self.gf.handle_arg('-wantedfiles:5')
         for page in self._generator_with_tests():
             self.assertIsInstance(page, pywikibot.Page)

@@ -15,6 +15,13 @@ noreferences
 * L10N updates
 * Show an error message and leave if script is not localized (:phab:`T362103`)
 
+replace
+^^^^^^^
+
+* Permit strings as exceptions for fixes
+* Do not apply replacements multiple times  (:phab:`T363047`)
+* Respect 'text-contains' from fixes dictionaries (:phab:`T142324`)
+
 
 9.0.0
 -----
