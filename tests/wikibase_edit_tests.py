@@ -421,7 +421,7 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         # set new claim
         claim = pywikibot.page.Claim(
             testsite, 'P88936', datatype='musical-notation')
-        target = "\relative c' { c d e f | g2 g | a4 a a a | g1 |})"
+        target = "\\relative c' { c d e f | g2 g | a4 a a a | g1 |}"
         claim.setTarget(target)
         item.addClaim(claim)
 

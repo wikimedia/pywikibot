@@ -2014,7 +2014,7 @@ class TestClaimSetValue(WikidataTestCase):
         wikidata = self.get_repo()
         claim = pywikibot.Claim(wikidata, 'P6604')
         self.assertEqual(claim.type, 'musical-notation')
-        target = "\relative c' { c d e f | g2 g | a4 a a a | g1 |})"
+        target = "\\relative c' { c d e f | g2 g | a4 a a a | g1 |}"
         claim.setTarget(target)
         self.assertEqual(claim.target, target)
 
