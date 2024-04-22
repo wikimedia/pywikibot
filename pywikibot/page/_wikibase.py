@@ -84,9 +84,10 @@ class WikibaseEntity:
     Each entity is identified by a data repository it belongs to
     and an identifier.
 
-    :cvar DATA_ATTRIBUTES: dictionary which maps data attributes (eg. 'labels',
-        'claims') to appropriate collection classes (eg. LanguageDict,
-        ClaimsCollection)
+    :cvar DATA_ATTRIBUTES: dictionary which maps data attributes
+        (e.g., 'labels', 'claims') to appropriate collection classes
+        (e.g., :class:`LanguageDict<pywikibot.page._collections.LanguageDict>`,
+        :class:`ClaimCollection<pywikibot.page._collections.ClaimCollection>`)
 
     :cvar entity_type: entity type identifier
     :type entity_type: str

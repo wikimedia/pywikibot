@@ -672,6 +672,26 @@ def handle_args(args: Iterable[str] | None = None,
     ['-myoption']
     >>> for arg in local_args: pass  # do whatever is wanted with local_args
 
+    .. caution::
+       Global options might be introduced without warning period. It is
+       up to developers to verify that global options do not interfere
+       with local script options of private scripts.
+
+    .. tip::
+       Avoid using this method in your private scripts and use the
+       :mod:`pwb<pywikibot.scripts.wrapper>` wrapper instead. In
+       directory mode::
+
+           python pwb.py <global options> <name_of_script> <local options>
+
+       With installed site package::
+
+           pwb <global options> <name_of_script> <local options>
+
+       .. note:: the :mod:`pwb<pywikibot.scripts.wrapper>` wrapper can
+          be used even if the `handle_args` method is used within the
+          script.
+
     .. versionchanged:: 5.2
        *-site* global option was added
     .. versionchanged:: 7.1

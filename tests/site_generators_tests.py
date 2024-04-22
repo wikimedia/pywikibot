@@ -26,6 +26,17 @@ from tests.aspects import DefaultSiteTestCase, DeprecationTestCase, TestCase
 from tests.utils import skipping
 
 
+global_expected_params = {
+    'action': ['query'],
+    'continue': [True],
+    'iilimit': ['max'],
+    'iiprop': list(pywikibot.site._IIPROP),
+    'indexpageids': [True],
+    'inprop': ['protection'],
+    'prop': ['info', 'imageinfo', 'categoryinfo'],
+}
+
+
 class TestSiteGenerators(DefaultSiteTestCase):
     """Test cases for Site methods."""
 
@@ -179,16 +190,11 @@ class TestSiteGenerators(DefaultSiteTestCase):
     def test_pagetemplates(self):
         """Test Site.pagetemplates."""
         tl_gen = self.site.pagetemplates(self.mainpage)
-        expected_params = {
-            'continue': [True],
-            'inprop': ['protection'],
-            'iilimit': ['max'],
-            'iiprop': ['timestamp', 'user', 'comment', 'url', 'size', 'sha1'],
-            'indexpageids': [True],
-            'generator': ['templates'], 'action': ['query'],
-            'prop': ['info', 'imageinfo', 'categoryinfo'],
-            'titles': [self.mainpage.title()],
-        }
+        expected_params = dict(
+            global_expected_params,
+            generator=['templates'],
+            titles=[self.mainpage.title()],
+        )
 
         self.assertEqual(tl_gen.request._params, expected_params)
 
@@ -213,16 +219,11 @@ class TestSiteGenerators(DefaultSiteTestCase):
         """Test Site.pagelinks."""
         links_gen = self.site.pagelinks(self.mainpage)
         gen_params = links_gen.request._params.copy()
-        expected_params = {
-            'action': ['query'], 'indexpageids': [True],
-            'continue': [True],
-            'inprop': ['protection'],
-            'iilimit': ['max'],
-            'iiprop': ['timestamp', 'user', 'comment', 'url', 'size',
-                       'sha1'], 'generator': ['links'],
-            'prop': ['info', 'imageinfo', 'categoryinfo'],
-            'redirects': [False],
-        }
+        expected_params = dict(
+            global_expected_params,
+            generator=['links'],
+            redirects=[False],
+        )
         if 'pageids' in gen_params:
             expected_params['pageids'] = [str(self.mainpage.pageid)]
         else:
@@ -337,35 +338,53 @@ class TestSiteGenerators(DefaultSiteTestCase):
     def test_all_links(self):
         """Test the site.alllinks() method."""
         mysite = self.get_site()
-        if mysite.sitename == 'wikipedia:de':
-            self.skipTest(f'skipping test on {mysite} due to T359427')
         fwd = list(mysite.alllinks(total=10))
         uniq = list(mysite.alllinks(total=10, unique=True))
 
-        self.assertLessEqual(len(fwd), 10)
+        with self.subTest(msg='Test that unique links are in all links'):
+            self.assertLessEqual(len(fwd), 10)
+            self.assertLessEqual(len(uniq), len(fwd))
+            for link in fwd:
+                self.assertIsInstance(link, pywikibot.Page)
+                self.assertIn(link, uniq)
 
-        for link in fwd:
-            self.assertIsInstance(link, pywikibot.Page)
-            self.assertIn(link, uniq)
-        for page in mysite.alllinks(start='Link', total=5):
-            self.assertIsInstance(page, pywikibot.Page)
-            self.assertEqual(page.namespace(), 0)
-            self.assertGreaterEqual(page.title(), 'Link')
-        for page in mysite.alllinks(prefix='Fix', total=5):
-            self.assertIsInstance(page, pywikibot.Page)
-            self.assertEqual(page.namespace(), 0)
-            self.assertTrue(page.title().startswith('Fix'))
-        for page in mysite.alllinks(namespace=1, total=5):
-            self.assertIsInstance(page, pywikibot.Page)
-            self.assertEqual(page.namespace(), 1)
-        for page in mysite.alllinks(start='From', namespace=4, fromids=True,
-                                    total=5):
-            self.assertIsInstance(page, pywikibot.Page)
-            self.assertGreaterEqual(page.title(with_ns=False), 'From')
-            self.assertTrue(hasattr(page, '_fromid'))
-        errgen = mysite.alllinks(unique=True, fromids=True)
-        with self.assertRaises(Error):
-            next(errgen)
+        with self.subTest(msg='Test with start parameter'):
+            for page in mysite.alllinks(start='Link', total=5):
+                self.assertIsInstance(page, pywikibot.Page)
+                self.assertEqual(page.namespace(), 0)
+                self.assertGreaterEqual(page.title(), 'Link')
+
+        with self.subTest(msg='Test with prefix parameter'):
+            for page in mysite.alllinks(prefix='Fix', total=5):
+                self.assertIsInstance(page, pywikibot.Page)
+                self.assertEqual(page.namespace(), 0)
+                self.assertTrue(
+                    page.title().startswith('Fix'),
+                    msg=f"{page.title()} does not start with 'Fix'"
+                )
+
+        # increase timeout due to T359427/T359425
+        # ~ 47s are required on wikidata
+        config_timeout = pywikibot.config.socket_timeout
+        pywikibot.config.socket_timeout = (config_timeout[0], 60)
+        with self.subTest(msg='Test namespace parameter'):
+            for page in mysite.alllinks(namespace=1, total=5):
+                self.assertIsInstance(page, pywikibot.Page)
+                self.assertEqual(page.namespace(), 1)
+        pywikibot.config.socket_timeout = config_timeout
+
+        with self.subTest(msg='Test with fromids parameter'):
+            for page in mysite.alllinks(start='From', namespace=4,
+                                        fromids=True, total=5):
+                self.assertIsInstance(page, pywikibot.Page)
+                self.assertGreaterEqual(page.title(with_ns=False), 'From')
+                self.assertTrue(hasattr(page, '_fromid'))
+
+        with self.subTest(
+                msg='Test that Error is raised with unique and fromids'):
+            errgen = mysite.alllinks(unique=True, fromids=True)
+            with self.assertRaises(Error):
+                next(errgen)
 
     def test_all_categories(self):
         """Test the site.allcategories() method."""
@@ -1110,13 +1129,13 @@ class SearchTestCase(DefaultSiteTestCase):
         """Test site.search() method with 'where' parameter set to title."""
         search_gen = self.site.search(
             'wiki', namespaces=0, total=10, where='title')
-        expected_params = {
-            'prop': ['info', 'imageinfo', 'categoryinfo'],
-            'inprop': ['protection'],
-            'iiprop': ['timestamp', 'user', 'comment', 'url', 'size', 'sha1'],
-            'iilimit': ['max'], 'generator': ['search'], 'action': ['query'],
-            'indexpageids': [True], 'continue': [True],
-            'gsrnamespace': [0], 'gsrsearch': ['wiki'], 'gsrwhat': ['title']}
+        expected_params = dict(
+            global_expected_params,
+            generator=['search'],
+            gsrnamespace=[0],
+            gsrsearch=['wiki'],
+            gsrwhat=['title'],
+        )
         self.assertEqual(search_gen.request._params, expected_params)
         for hit in search_gen:
             self.assertIsInstance(hit, pywikibot.Page)

@@ -1,6 +1,6 @@
 """Library to log the bot in to a wiki account."""
 #
-# (C) Pywikibot team, 2003-2023
+# (C) Pywikibot team, 2003-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -105,7 +105,7 @@ class LoginManager:
                     'ERROR: '
                     'username for {site.family.name}:{site.code} is undefined.'
                     '\nIf you have a username for that site, please add a '
-                    'line to user config file (user_config.py) as follows:\n'
+                    'line to user config file (user-config.py) as follows:\n'
                     "usernames['{site.family.name}']['{site.code}'] = "
                     "'myUsername'".format(site=site))
         self.password = password

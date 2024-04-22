@@ -20,3 +20,4 @@ exclude_lines =
     if TYPE_CHECKING:
     @(abc\.)?abstractmethod
     @deprecated\([^\)]+\)
+    @unittest\.skip

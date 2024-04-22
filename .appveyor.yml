@@ -1,7 +1,7 @@
 image: Visual Studio 2022
 clone_depth: 50
 skip_tags: true
-version: 9.0.{build}
+version: 9.1.{build}
 environment:
 
   PYWIKIBOT_DIR: "%appdata%\\Pywikibot"
@@ -64,6 +64,7 @@ install:
   - mkdir appveyor
   - python --version
   - python -c "import struct; print('PYTHON_ARCH:', struct.calcsize('P') << 3)"
+  - python -m pip install --upgrade pip
   - pip --version
   - if [%PYTHON_VERSION%]==[3.7.0] pip install "urllib3<2.0"
   - if [%PYTHON_VERSION%]==[3.7.0] pip install -U setuptools
@@ -97,5 +98,5 @@ on_finish:
   - ps: |
       $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
       coverage report
-      Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
-      bash codecov.sh -U "-s" -A "-s"
+  - pip install codecov-cli
+  - codecovcli do-upload

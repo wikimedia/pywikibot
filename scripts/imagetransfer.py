@@ -37,7 +37,7 @@ used on a page reachable via interwiki links.
 &params;
 """
 #
-# (C) Pywikibot team, 2004-2022
+# (C) Pywikibot team, 2004-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -201,6 +201,34 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
 
         :return: the filename which was used to upload the image
         """
+        def delete_source(old_filename, target_filename):
+            """Delete source image or tag nowCommons template to it.
+
+            This function is called when upload to Commons was
+            successful.
+            """
+            if not target_filename \
+               or self.opt.target.sitename != 'commons:commons':
+                return
+
+            reason = i18n.twtranslate(sourceSite,
+                                      'imagetransfer-nowcommons_notice')
+            # try to delete the original image if we have a sysop account
+            if sourceSite.has_right('delete') \
+               and sourceImagePage.delete(reason):
+                return
+
+            if sourceSite.lang in nowCommonsTemplate \
+               and sourceSite.family.name in config.usernames \
+               and sourceSite.lang in config.usernames[sourceSite.family.name]:
+                # add the nowCommons template.
+                pywikibot.info('Adding nowCommons template to '
+                               + sourceImagePage.title())
+                sourceImagePage.put(sourceImagePage.get() + '\n\n'
+                                    + nowCommonsTemplate[sourceSite.code]
+                                    % target_filename,
+                                    summary=reason)
+
         sourceSite = sourceImagePage.site
         pywikibot.info(
             '\n>>> Transfer {source} from {source.site} to {target}\n'
@@ -246,32 +274,8 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
                               force_if_shared=self.opt.force_if_shared,
                               asynchronous=self.opt.asynchronous,
                               chunk_size=self.opt.chunk_size)
-
-            # try to upload
-            if bot.skip_run():
-                return
-            target_filename = bot.upload_file(url)
-
-            if target_filename \
-               and self.opt.target.sitename == 'commons:commons':
-                # upload to Commons was successful
-                reason = i18n.twtranslate(sourceSite,
-                                          'imagetransfer-nowcommons_notice')
-                # try to delete the original image if we have a sysop account
-                if sourceSite.has_right('delete') \
-                   and sourceImagePage.delete(reason):
-                    return
-                if sourceSite.lang in nowCommonsTemplate \
-                   and sourceSite.family.name in config.usernames \
-                   and sourceSite.lang in \
-                   config.usernames[sourceSite.family.name]:
-                    # add the nowCommons template.
-                    pywikibot.info('Adding nowCommons template to '
-                                   + sourceImagePage.title())
-                    sourceImagePage.put(sourceImagePage.get() + '\n\n'
-                                        + nowCommonsTemplate[sourceSite.lang]
-                                        % target_filename,
-                                        summary=reason)
+            bot.post_processor = delete_source
+            bot.run()
 
     def show_image_list(self, imagelist) -> None:
         """Print image list."""

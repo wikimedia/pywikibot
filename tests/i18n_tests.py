@@ -312,8 +312,8 @@ class InputTestCase(TWNTestCaseBase, UserInterfaceLangTestCase, PwbTestCase):
     def test_pagegen_i18n_input(self):
         """Test i18n.input fallback via pwb."""
         expect = i18n.twtranslate(self.alt_code, self.message, fallback=False)
-        result = self._execute(args=['listpages', '-cat'],
-                               data_in='non-existant-category\r\n')
+        result = self.execute(args=['listpages', '-cat'],
+                              data_in='non-existant-category\r\n')
         self.assertIn(expect, result['stderr'])
 
 

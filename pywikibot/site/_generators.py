@@ -428,7 +428,9 @@ class GeneratorsMixin:
     ) -> Generator[pywikibot.Page, None, None]:
         """Yield internal wikilinks contained (or transcluded) on page.
 
-        .. seealso:: :api:`Links`
+        .. seealso::
+           - :api:`Links`
+           - :meth:`page.BasePage.linkedPages`
 
         :param namespaces: Only iterate pages in these namespaces
             (default: all)
@@ -975,7 +977,7 @@ class GeneratorsMixin:
 
     def alllinks(
         self,
-        start: str = '!',
+        start: str = '',
         prefix: str = '',
         namespace: SingleNamespaceType = 0,
         unique: bool = False,
@@ -984,35 +986,78 @@ class GeneratorsMixin:
     ) -> Generator[pywikibot.Page, None, None]:
         """Iterate all links to pages (which need not exist) in one namespace.
 
-        Note that, in practice, links that were found on pages that have
-        been deleted may not have been removed from the links table, so this
-        method can return false positives.
+        .. note:: In practice, links that were found on pages that have
+           been deleted may not have been removed from the links table,
+           so this method can return false positives.
 
-        .. seealso:: :api:`Alllinks`
+        .. caution:: *unique* parameter is no longer supported by
+           MediaWiki 1.43 or higher. Pywikibot uses
+           :func:`tools.itertools.filter_unique` in that case which
+           might be memory intensive. Use it with care.
+
+        .. important:: Using *namespace* option different from ``0``
+           needs a lot of time on Wikidata site. You have to increase
+           the **read** timeout part of ``socket_timeout`` in
+           :ref:`Http Settings` in your ``user-config.py`` file. Or
+           increase it patially within your code like:
+
+           .. code:: python
+
+              from pywikibot import config
+              save_timeout = config.socket_timeout  # save the timeout config
+              config.socket_timeout = save_timeout[0], 60
+              ... # your code here
+              config.socket_timeout = save_timeout  # restore timeout config
+
+           The minimum read timeout value should be 60 seconds in that
+           case.
+
+        .. seealso::
+           - :api:`Alllinks`
+           - :meth:`pagebacklinks`
+           - :meth:`pagelinks`
 
         :param start: Start at this title (page need not exist).
         :param prefix: Only yield pages starting with this string.
         :param namespace: Iterate pages from this (single) namespace
-        :param unique: If True, only iterate each link title once (default:
-            iterate once for each linking page)
-        :param fromids: if True, include the pageid of the page containing
-            each link (default: False) as the '_fromid' attribute of the Page;
-            cannot be combined with unique
-        :raises KeyError: the namespace identifier was not resolved
-        :raises TypeError: the namespace identifier has an inappropriate
-            type such as bool, or an iterable with more than one namespace
+        :param unique: If True, only iterate each link title once
+            (default: False)
+        :param fromids: if True, include the pageid of the page
+            containing each link (default: False) as the '_fromid'
+            attribute of the Page; cannot be combined with *unique*
+        :raises KeyError: the *namespace* identifier was not resolved
+        :raises TypeError: the *namespace* identifier has an
+            inappropriate type such as bool, or an iterable with more
+            than one namespace
         """
         if unique and fromids:
             raise Error('alllinks: unique and fromids cannot both be True.')
         algen = self._generator(api.ListGenerator, type_arg='alllinks',
-                                namespaces=namespace, alfrom=start,
-                                total=total, alunique=unique)
-        if prefix:
-            algen.request['alprefix'] = prefix
+                                namespaces=namespace, total=total)
         if fromids:
             algen.request['alprop'] = 'title|ids'
+
+        # circumvent problems with unique and prefix due to T359425 and T359427
+        if self.mw_version < '1.43':
+            if prefix:
+                algen.request['alprefix'] = prefix
+                prefix = ''  # don't break the loop later
+            if start:
+                algen.request['alfrom'] = start
+            algen.request['alunique'] = unique
+        else:
+            if prefix:
+                algen.request['alfrom'] = prefix
+            elif start:
+                algen.request['alfrom'] = start
+            if unique:
+                algen = filter_unique(
+                    algen, key=lambda link: (link['title'], link['ns']))
+
         for link in algen:
             p = pywikibot.Page(self, link['title'], link['ns'])
+            if prefix and p.title() > prefix:  # T359425, T359427
+                break
             if fromids:
                 p._fromid = link['fromid']  # type: ignore[attr-defined]
             yield p

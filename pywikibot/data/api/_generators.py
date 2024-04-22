@@ -6,7 +6,7 @@
    :class:`tools.collections.GeneratorWrapper`
 """
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -19,7 +19,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Callable
+from pywikibot.backports import Callable, Iterable
 from pywikibot.exceptions import Error, InvalidTitleError, UnsupportedPageError
 from pywikibot.site import Namespace
 from pywikibot.tools import deprecated
@@ -675,23 +675,28 @@ class PageGenerator(QueryGenerator):
         g_content: bool = False,
         **kwargs
     ) -> None:
-        """
-        Initializer.
+        """Initializer.
 
-        Required and optional parameters are as for ``Request``, except that
-        action=query is assumed and generator is required.
+        Required and optional parameters are as for ``Request``, except
+        that ``action=query`` is assumed and generator is required.
+
+        .. versionchanged:: 9.1
+           retrieve the same imageinfo properties as in
+           :meth:`APISite.loadimageinfo()
+           <pywikibot.site._apisite.APISite.loadimageinfo>` with default
+           parameters.
 
         :param generator: the "generator=" type from api.php
         :param g_content: if True, retrieve the contents of the current
             version of each Page (default False)
-
         """
-        # If possible, use self.request after __init__ instead of appendParams
+        # If possible, use self.request after __init__ instead of append_params
         def append_params(params, key, value) -> None:
             if key in params:
                 params[key] += '|' + value
             else:
                 params[key] = value
+
         kwargs = self._clean_kwargs(kwargs)
         parameters = kwargs['parameters']
         # get some basic information about every page generated
@@ -704,8 +709,7 @@ class PageGenerator(QueryGenerator):
         if not ('inprop' in parameters
                 and 'protection' in parameters['inprop']):
             append_params(parameters, 'inprop', 'protection')
-        append_params(parameters, 'iiprop',
-                      'timestamp|user|comment|url|size|sha1')
+        append_params(parameters, 'iiprop', pywikibot.site._IIPROP)
         append_params(parameters, 'iilimit', 'max')  # T194233
         parameters['generator'] = generator
         super().__init__(**kwargs)
@@ -959,25 +963,42 @@ def _update_coordinates(page, coordinates) -> None:
     page._coords = coords
 
 
-def update_page(page, pagedict: dict, props=None):
-    """Update attributes of Page object page, based on query data in pagedict.
+def update_page(page: pywikibot.Page,
+                pagedict: dict[str, Any],
+                props: Iterable[str] | None = None) -> None:
+    """
+    Update attributes of Page object *page*, based on query data in *pagedict*.
 
     :param page: object to be updated
-    :type page: pywikibot.page.Page
-    :param pagedict: the contents of a "page" element of a query response
-    :param props: the property names which resulted in pagedict. If a missing
-        value in pagedict can indicate both 'false' and 'not present' the
-        property which would make the value present must be in the props
-        parameter.
-    :type props: iterable of string
-    :raises pywikibot.exceptions.InvalidTitleError: Page title is invalid
-    :raises pywikibot.exceptions.UnsupportedPageError: Page with namespace < 0
-        is not supported yet
+    :param pagedict: the contents of a *page* element of a query
+        response
+    :param props: the property names which resulted in *pagedict*. If a
+        missing value in *pagedict* can indicate both 'false' and
+        'not present' the property which would make the value present
+        must be in the *props* parameter.
+    :raises InvalidTitleError: Page title is invalid
+    :raises UnsupportedPageError: Page with namespace < 0 is not
+        supported yet
     """
     _update_pageid(page, pagedict)
     _update_contentmodel(page, pagedict)
 
     props = props or []
+
+    # test for pagedict content only and call updater function
+    for element in ('coordinates', 'revisions'):
+        if element in pagedict:
+            updater = globals()['_update_' + element]
+            updater(page, pagedict[element])
+
+    # test for pagedict and props contents, call updater or set attribute
+    for element in ('categories', 'langlinks', 'templates'):
+        if element in pagedict:
+            updater = globals()['_update_' + element]
+            updater(page, pagedict[element])
+        elif element in props:
+            setattr(page, '_' + element, set())
+
     if 'info' in props:
         page._isredir = 'redirect' in pagedict
 
@@ -986,9 +1007,6 @@ def update_page(page, pagedict: dict, props=None):
 
     if 'protection' in pagedict:
         _update_protection(page, pagedict)
-
-    if 'revisions' in pagedict:
-        _update_revisions(page, pagedict['revisions'])
 
     if 'lastrevid' in pagedict:
         page.latest_revision_id = pagedict['lastrevid']
@@ -1001,24 +1019,6 @@ def update_page(page, pagedict: dict, props=None):
 
     if 'categoryinfo' in pagedict:
         page._catinfo = pagedict['categoryinfo']
-
-    if 'templates' in pagedict:
-        _update_templates(page, pagedict['templates'])
-    elif 'templates' in props:
-        page._templates = set()
-
-    if 'categories' in pagedict:
-        _update_categories(page, pagedict['categories'])
-    elif 'categories' in props:
-        page._categories = set()
-
-    if 'langlinks' in pagedict:
-        _update_langlinks(page, pagedict['langlinks'])
-    elif 'langlinks' in props:
-        page._langlinks = set()
-
-    if 'coordinates' in pagedict:
-        _update_coordinates(page, pagedict['coordinates'])
 
     if 'pageimage' in pagedict:
         page._pageimage = pywikibot.FilePage(page.site, pagedict['pageimage'])

@@ -124,7 +124,7 @@ jobs:
           ${{ (matrix.site == 'wikisource:zh' || matrix.test_no_rc) && 1 || 0 }}
         PYWIKIBOT_TEST_PROD_ONLY: ${{ matrix.test_prod_only && 1 || 0 }}
       run: |
-        python pwb.py version
+        python pwb.py version -usernames
         if [ ${{matrix.site || 0}} != 'wikipedia:test' ]; then
           coverage run -m unittest discover -vv -p \"*_tests.py\";
         else

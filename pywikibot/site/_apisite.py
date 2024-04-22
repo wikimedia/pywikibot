@@ -471,10 +471,12 @@ class APISite(
         if self.is_oauth_token_available():
             pywikibot.warning('Using OAuth suppresses logout function')
 
-        req_params = {'action': 'logout', 'token': self.tokens['csrf']}
-        uirequest = self.simple_request(**req_params)
-        uirequest.submit()
-        self._loginstatus = login.LoginStatus.NOT_LOGGED_IN
+        # check if already logged out to avoid requiring logging in
+        if not self._loginstatus == login.LoginStatus.NOT_LOGGED_IN:
+            req_params = {'action': 'logout', 'token': self.tokens['csrf']}
+            uirequest = self.simple_request(**req_params)
+            uirequest.submit()
+            self._loginstatus = login.LoginStatus.NOT_LOGGED_IN
 
         # Reset tokens and user properties
         del self.userinfo
@@ -1488,11 +1490,10 @@ class APISite(
 
         The following properties are loaded: ``timestamp``, ``user``,
         ``comment``, ``url``, ``size``, ``sha1``, ``mime``, ``mediatype``,
-        ``archivename`` and ``bitdepth``.
-        ``metadata``is loaded only if history is False.
-        If *url_width*, *url_height* or *url_param* is given, additional
-        properties ``thumbwidth``, ``thumbheight``, ``thumburl`` and
-        ``responsiveUrls`` are given.
+        ``archivename`` and ``bitdepth``. ``metadata`` is loaded only if
+        *history* is False. If *url_width*, *url_height* or *url_param*
+        is given, additional properties ``thumbwidth``, ``thumbheight``,
+        ``thumburl`` and ``responsiveUrls`` are given.
 
         .. note:: Parameters validation and error handling left to the
            API call.
@@ -1508,7 +1509,7 @@ class APISite(
         :param url_height: get info for a thumbnail with given height
         :param url_param:  get info for a thumbnail with given param
         :param timestamp: timestamp of the image's version to retrieve.
-            It has effect only if history is False.
+            It has effect only if *history* is False.
             If omitted, the latest version will be fetched.
         """
         args = {
@@ -1516,14 +1517,11 @@ class APISite(
             'iiurlwidth': url_width,
             'iiurlheight': url_height,
             'iiurlparam': url_param,
-            'iiprop': [
-                'timestamp', 'user', 'comment', 'url', 'size', 'sha1', 'mime',
-                'mediatype', 'archivename', 'bitdepth',
-            ]
+            'iiprop': pywikibot.site._IIPROP
         }
         if not history:
             args['total'] = 1
-            args['iiprop'].append('metadata')
+            args['iiprop'] += ('metadata', )
             if timestamp:
                 args['iistart'] = args['iiend'] = timestamp.isoformat()
 

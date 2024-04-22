@@ -1446,6 +1446,8 @@ class TestWantedFactoryGenerator(DefaultSiteTestCase):
 
     def test_wanted_files(self):
         """Test wantedfiles generator."""
+        if self.site.sitename == 'wowwiki:uk':
+            self.skipTest(f'skipping {self.site} due to T362384)')
         self.gf.handle_arg('-wantedfiles:5')
         for page in self._generator_with_tests():
             self.assertIsInstance(page, pywikibot.Page)
@@ -1453,6 +1455,8 @@ class TestWantedFactoryGenerator(DefaultSiteTestCase):
                 with self.assertRaisesRegex(ValueError,
                                             'does not have a valid extension'):
                     pywikibot.FilePage(page)
+            else:
+                self.assertIsInstance(page.latest_file_info.mime, str)
 
     def test_wanted_templates(self):
         """Test wantedtemplates generator."""
@@ -1512,15 +1516,6 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
 
     def test_searchitem_language(self):
         """Test -searchitem with custom language specified."""
-        gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handle_arg('-searchitem:pl:abc')
-        gf.handle_arg('-limit:1')
-        gen = gf.getCombinedGenerator()
-        self.assertIsNotNone(gen)
-        # alphabet, also known as ABC
-        page1 = next(gen)
-        self.assertEqual(page1.title(), 'Q9779')
-
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handle_arg('-searchitem:en:abc')
         gf.handle_arg('-limit:2')

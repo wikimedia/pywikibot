@@ -698,7 +698,7 @@ class WbTime(WbRepresentation):
            *normalize* parameter was added.
         .. versionchanged:: 8.2
            *normalize* parameter was removed due to :phab:`T340495` and
-           :phab:`57755`
+           :phab:`T57755`
 
         :param force_iso: whether the output should be forced to ISO 8601
         :return: Timestamp in a format resembling ISO 8601
@@ -739,7 +739,7 @@ class WbTime(WbRepresentation):
            *normalize* parameter was added.
         .. versionchanged:: 8.2
            *normalize* parameter was removed due to :phab:`T340495` and
-           :phab:`57755`
+           :phab:`T57755`
 
         :return: Wikibase JSON
         """

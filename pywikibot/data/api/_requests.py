@@ -950,7 +950,7 @@ but {scheme!r} is required. Please add the following code to your family file:
 
         Also reset last API error with wait cycles.
 
-        .. versionadded: 9.0
+        .. versionadded:: 9.0
 
         :param delay: Minimum time in seconds to wait. Overwrites
             ``retry_wait`` variable if given. The delay doubles each

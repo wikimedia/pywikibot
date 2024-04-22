@@ -178,6 +178,8 @@ def precompile_exceptions(exceptions, use_regex, flags) -> None:
             'title', 'require-title', 'text-contains', 'inside']:
         if exceptionCategory in exceptions:
             patterns = exceptions[exceptionCategory]
+            if isinstance(patterns, str):
+                patterns = [patterns]
             if not use_regex:
                 patterns = [re.escape(pattern) for pattern in patterns]
             patterns = [re.compile(pattern, flags) for pattern in patterns]
@@ -575,11 +577,14 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                     return True
         return False
 
-    def isTextExcepted(self, original_text) -> bool:
+    def isTextExcepted(self, text, exceptions=None) -> bool:
         """Return True iff one of the exceptions applies for the given text."""
-        if 'text-contains' in self.exceptions:
-            return any(exc.search(original_text)
-                       for exc in self.exceptions['text-contains'])
+        if exceptions is None:
+            exceptions = self.exceptions
+
+        if 'text-contains' in exceptions:
+            return any(exc.search(text) for exc in exceptions['text-contains'])
+
         return False
 
     def apply_replacements(self, original_text, applied, page=None):
@@ -601,6 +606,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
             if (replacement.container
                     and replacement.container.name in skipped_containers):
                 continue
+
             if page is not None and self.isTitleExcepted(
                     page.title(), replacement.exceptions):
                 if replacement.container:
@@ -616,6 +622,10 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                         'the title is on the exceptions list.'.format(
                             replacement.description, page.title(as_link=True)))
                 continue
+
+            if self.isTextExcepted(original_text, replacement.exceptions):
+                continue
+
             old_text = new_text
             new_text = textlib.replaceExcept(
                 new_text, replacement.old_regex, replacement.new,
@@ -678,36 +688,37 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
         except InvalidPageError as e:
             pywikibot.error(e)
             return
+
+        if self.isTextExcepted(original_text):
+            pywikibot.info(f'Skipping {page} because it contains text '
+                           f'that is on the exceptions list.')
+            return
+
         applied = set()
         new_text = original_text
         last_text = None
+        while new_text != last_text:
+            last_text = new_text
+            new_text = self.apply_replacements(last_text, applied, page)
+            if not self.opt.recursive:
+                break
+
+        if new_text == original_text:
+            if not self.opt.quiet:
+                pywikibot.info(f'No changes were necessary in {page}')
+            return
+
+        if self.opt.addcat:
+            # Fetch only categories in wikitext, otherwise the others
+            # will be explicitly added.
+            cats = textlib.getCategoryLinks(new_text, site=page.site)
+            if self.opt.addcat not in cats:
+                cats.append(self.opt.addcat)
+                new_text = textlib.replaceCategoryLinks(new_text, cats,
+                                                        site=page.site)
+
         context = 0
         while True:
-            if self.isTextExcepted(new_text):
-                pywikibot.info(f'Skipping {page} because it contains text '
-                               f'that is on the exceptions list.')
-                return
-
-            while new_text != last_text:
-                last_text = new_text
-                new_text = self.apply_replacements(last_text, applied, page)
-                if not self.opt.recursive:
-                    break
-
-            if new_text == original_text:
-                if not self.opt.quiet:
-                    pywikibot.info(f'No changes were necessary in {page}')
-                return
-
-            if self.opt.addcat:
-                # Fetch only categories in wikitext, otherwise the others
-                # will be explicitly added.
-                cats = textlib.getCategoryLinks(new_text, site=page.site)
-                if self.opt.addcat not in cats:
-                    cats.append(self.opt.addcat)
-                    new_text = textlib.replaceCategoryLinks(new_text,
-                                                            cats,
-                                                            site=page.site)
             # Show the title of the page we're working on.
             # Highlight the title in purple.
             self.current_page = page
@@ -721,9 +732,11 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                  ('edit Latest', 'l'), ('open in Browser', 'b'),
                  ('More context', 'm'), ('All', 'a')],
                 default='N')
+
             if choice == 'm':
                 context = context * 3 if context else 3
                 continue
+
             if choice in ('e', 'l'):
                 text_editor = editor.TextEditor()
                 edit_text = original_text if choice == 'e' else new_text
@@ -731,32 +744,28 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                 # if user didn't press Cancel
                 if as_edited and as_edited != new_text:
                     new_text = as_edited
-                    if choice == 'l':
-                        # prevent changes from being applied again
-                        last_text = new_text
                 continue
+
             if choice == 'b':
+                # open in browser and leave
                 pywikibot.bot.open_webbrowser(page)
                 try:
-                    original_text = page.get(get_redirect=True, force=True)
+                    page.get(get_redirect=True, force=True)
                 except NoPageError:
                     pywikibot.info(f'Page {page.title()} has been deleted.')
-                    break
-                new_text = original_text
-                last_text = None
-                continue
+                return
+
+            if choice == 'n':
+                return
+
             if choice == 'a':
                 self.opt.always = True
-            if choice == 'y':
-                self.save(page, original_text, new_text, applied,
-                          show_diff=False, asynchronous=True)
 
-            # choice must be 'N'
+            # break if choice is 'y' or 'a' to save
             break
 
-        if self.opt.always and new_text != original_text:
-            self.save(page, original_text, new_text, applied,
-                      show_diff=False, asynchronous=False)
+        self.save(page, original_text, new_text, applied, show_diff=False,
+                  asynchronous=not self.opt.always)
 
     def save(self, page, oldtext, newtext, applied, **kwargs) -> None:
         """Save the given page."""
@@ -981,9 +990,9 @@ def main(*args: str) -> None:  # noqa: C901
         replacement = Replacement(old, new)
         if not single_summary:
             single_summary = i18n.twtranslate(
-                site, 'replace-replacing',
-                {'description':
-                 f' (-{replacement.old} +{replacement.new})'}
+                site,
+                'replace-replacing',
+                {'description': f' (-{replacement.old} +{replacement.new})'}
             )
         replacements.append(replacement)
 
@@ -1005,7 +1014,7 @@ def main(*args: str) -> None:  # noqa: C901
             pywikibot.error(
                 f'fixes[{fix_name!r}] is a {type(fix).__name__}, not a dict')
             if type(fix) is tuple:
-                pywikibot.info('Maybe a trailing comma in your user_fixes.py?')
+                pywikibot.info('Maybe a trailing comma in your user-fixes.py?')
             pywikibot.debug(fix)
             return
 
@@ -1022,9 +1031,9 @@ def main(*args: str) -> None:  # noqa: C901
         if not generators_given and 'generator' in fix:
             gen_args = fix['generator']
             if isinstance(gen_args, str):
-                gen_args = [gen_args]
-            for gen_arg in gen_args:
-                genFactory.handle_arg(gen_arg)
+                genFactory.handle_arg(gen_args)
+            else:
+                genFactory.handle_args(gen_args)
         replacement_set = ReplacementList(fix.get('regex'),
                                           fix.get('exceptions'),
                                           fix.get('nocase'),

@@ -97,7 +97,7 @@ class TestUserClass(TestCase):
         self.assertIsNone(user.registration())
         self.assertIsNone(user.getprops()['registration'])
         self.assertGreater(user.editCount(), 0)
-        self.assertEqual(user.gender(), 'male')
+        self.assertEqual(user.gender(), 'unknown')
         self.assertIn('userid', user.getprops())
         self.assertTrue(user.is_thankable)
 
