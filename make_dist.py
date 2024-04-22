@@ -204,8 +204,11 @@ def handle_args() -> tuple[bool, bool, bool, bool]:
         uploaded
     """
     if '-help' in sys.argv:
+        import re
         import setup
-        info(__doc__)
+        help_text = re.sub(r'^\.\. version(added|changed)::.+', '',
+                           __doc__, flags=re.MULTILINE | re.DOTALL)
+        info(help_text)
         info(setup.__doc__)
         sys.exit()
 
