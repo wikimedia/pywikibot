@@ -60,7 +60,7 @@ jobs:
     - name: Get token name
       env:
         _oauth_token: OAUTH_TOKEN_${{ matrix.family }}_${{ matrix.code }}
-      uses: ASzc/change-string-case-action@v5
+      uses: ASzc/change-string-case-action@v6
       id: token
       with:
         string: ${{ env._oauth_token }}
