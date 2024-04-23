@@ -6,7 +6,7 @@ Tests which should fail should instead be in the TestWikibaseSaveTest
 class in edit_failiure_tests.py
 """
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -428,6 +428,41 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         # confirm new claim
         item.get(force=True)
         claim = item.claims['P88936'][0]
+        self.assertEqual(claim.getTarget(), target)
+
+    def test_WbTime_edit_simple(self):
+        """Attempt adding a WbTime claim with valid input."""
+        testsite = self.get_repo()
+        item = self._clean_item(testsite, 'P66')
+
+        # set new claim
+        claim = pywikibot.page.Claim(
+            testsite, 'P66', datatype='time')
+        target = pywikibot.WbTime(year=2012)
+        claim.setTarget(target)
+        item.addClaim(claim)
+
+        # confirm new claim
+        item.get(force=True)
+        claim = item.claims['P66'][0]
+        self.assertEqual(claim.getTarget(), target)
+
+    @unittest.expectedFailure  # T325860
+    def test_WbTime_edit_fromTimestr(self):
+        """Attempt adding a WbTime claim with valid input."""
+        testsite = self.get_repo()
+        item = self._clean_item(testsite, 'P66')
+
+        # set new claim
+        claim = pywikibot.page.Claim(
+            testsite, 'P66', datatype='time')
+        target = pywikibot.WbTime.fromTimestr('+00000002010-01-01T12:43:01Z')
+        claim.setTarget(target)
+        item.addClaim(claim)
+
+        # confirm new claim
+        item.get(force=True)
+        claim = item.claims['P66'][0]
         self.assertEqual(claim.getTarget(), target)
 
 
