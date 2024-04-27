@@ -1,7 +1,9 @@
 Current release
 ---------------
 
-* (no changes yet)
+* Add support for new wikis
+  (:phab:`T363272`, :phab:`T363265`:phab:`T363258`:phab:`T363251`:phab:`T363245`:phab:`T360312`:phab:`T360305`)
+* i18n updates
 
 Deprecations
 ------------
