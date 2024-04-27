@@ -1,6 +1,15 @@
 Release history
 ===============
 
+9.1.1
+-----
+*27 April 2024*
+
+* Add support for new wikis
+  (:phab:`T363272`, :phab:`T363265`:phab:`T363258`:phab:`T363251`:phab:`T363245`:phab:`T360312`:phab:`T360305`)
+* i18n updates
+
+
 9.1.0
 -----
 *22 April 2024*
