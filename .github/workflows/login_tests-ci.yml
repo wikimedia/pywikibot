@@ -110,7 +110,7 @@ jobs:
     - name: Test with unittest
       timeout-minutes: 2
       run: |
-        python pwb.py version -usernames
+        python pwb.py version
         coverage run -m unittest -vv tests/site_login_logout_tests.py
 
     - name: Show coverage statistics

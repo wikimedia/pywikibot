@@ -101,7 +101,7 @@ jobs:
       env:
         PYWIKIBOT_TEST_OAUTH: ${{ secrets[format('{0}', steps.token.outputs.uppercase)] }}
       run: |
-        python pwb.py version -usernames
+        python pwb.py version
         coverage run -m unittest -vv tests/oauth_tests.py
 
     - name: Show coverage statistics
