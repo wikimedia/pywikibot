@@ -67,7 +67,7 @@ jobs:
     - name: doctest with pytest
       timeout-minutes: 5
       run: |
-        python pwb.py version -usernames
+        python pwb.py version
         pytest --version
         coverage run -m pytest pywikibot --doctest-modules --ignore-glob="*gui.py" --ignore-glob="*memento.py"
 

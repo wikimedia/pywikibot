@@ -60,7 +60,7 @@ jobs:
     - name: Get token name
       env:
         _oauth_token: OAUTH_TOKEN_${{ matrix.family }}_${{ matrix.code }}
-      uses: ASzc/change-string-case-action@v5
+      uses: ASzc/change-string-case-action@v6
       id: token
       with:
         string: ${{ env._oauth_token }}
@@ -101,7 +101,7 @@ jobs:
       env:
         PYWIKIBOT_TEST_OAUTH: ${{ secrets[format('{0}', steps.token.outputs.uppercase)] }}
       run: |
-        python pwb.py version -usernames
+        python pwb.py version
         coverage run -m unittest -vv tests/oauth_tests.py
 
     - name: Show coverage statistics

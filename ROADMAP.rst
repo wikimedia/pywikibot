@@ -1,21 +1,8 @@
 Current release
 ---------------
 
-* ``-usernames`` option was added to :mod:`version<pywikibot.scripts.version>` script
-* Circumvent problems with *unique* and *prefix* parameters in :meth:`Site.alllinks()
-  <pywikibot.site._generators.GeneratorsMixin.alllinks>` (:phab:`T359427`)
-* Detect nighly version file with :func:`version.getversion_nightly` (:phab:`T362492`)
-* :mod:`version`.github_svn_rev2hash() was removed; it was no longer functional (:phab:`T362484`)
-* SVN support has been dropped; ``.svnprops`` property settings was removed (:phab:`T362484`)
-* Skip process that requires login to logout (:phab:`T326614`)
-* File title of :class:`specialbots.UploadRobot` must have a valid file extension (:phab:`T345786`)
-* Add a :attr:`post_processor<specialbots.UploadRobot.post_processor>` attribute to :class:`specialbots.UploadRobot`
-  which can be called after each upload (:phab:`T359766`)
-* Avoid using :meth:`pywikibot.handle_args` in private scripts;
-  use :mod:`pwb<pywikibot.scripts.wrapper>` wrapper instead (:phab:`T359766`)
-* Show upload count with :class:`specialbots.UploadRobot`
-* Use the same ``iiprop`` properties in :class:`data.api.PageGenerator` as in
-  :meth:`APISite.loadimageinfo<pywikibot.site._apisite.APISite.loadimageinfo>` (:phab:`T360093`)
+* Add support for new wikis
+  (:phab:`T363272`, :phab:`T363265`:phab:`T363258`:phab:`T363251`:phab:`T363245`:phab:`T360312`:phab:`T360305`)
 * i18n updates
 
 Deprecations
