@@ -16,6 +16,7 @@ A
     Alex Shih-Han Lin
     Alexander Jones
     Alexander Shtyrov
+    Alexander Vorwerk
     Alfio
     Allen Guo
     Amir Sarabadani
