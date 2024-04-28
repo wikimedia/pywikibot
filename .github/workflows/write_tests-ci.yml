@@ -50,9 +50,13 @@ jobs:
       run: |
         python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
         echo "usernames['wikipedia']['test'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
+        echo "usernames['wikidata']['test'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
         echo "noisysleep = float('inf')" >> user-config.py
         echo "maximum_GET_length = 5000" >> user-config.py
         echo "console_encoding = 'utf8'" >> user-config.py
+        echo "import os" >> user-config.py
+        echo "password_file = os.path.expanduser('passwordfile')" >> user-config.py
+        echo "('${{ env.PYWIKIBOT_USERNAME }}', '${{ secrets.PYWIKIBOT_USERPWD }}')" > passwordfile
 
     - name: Write tests with pytest
       id: ci_test
