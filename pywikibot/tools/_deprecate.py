@@ -313,7 +313,7 @@ def deprecate_arg(old_arg: str, new_arg: str | bool | None):
         def my_function(bar='baz'): pass
         # replaces 'foo' keyword by 'bar' used by my_function
 
-        @deprecare_arg('foo', None)
+        @deprecate_arg('foo', None)
         def my_function(): pass
         # ignores 'foo' keyword no longer used by my_function
 
