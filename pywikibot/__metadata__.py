@@ -14,4 +14,4 @@ from time import strftime
 
 __version__ = '9.2.0.dev1'
 __url__ = 'https://www.mediawiki.org/wiki/Manual:Pywikibot'
-__copyright__ = '(C) Pywikibot team, 2003-' + strftime('%Y')
+__copyright__ = f'2003-{strftime("%Y")}, Pywikibot team'
