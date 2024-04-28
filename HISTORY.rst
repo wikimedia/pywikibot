@@ -5,8 +5,8 @@ Release history
 -----
 *27 April 2024*
 
-* Add support for new wikis
-  (:phab:`T363272`, :phab:`T363265`, :phab:`T363258`, :phab:`T363251`, :phab:`T363245`, :phab:`T360312`, :phab:`T360305`)
+* Add support for new wikis (:phab:`T363272`, :phab:`T363265`, :phab:`T363258`,
+  :phab:`T363251`, :phab:`T363245`, :phab:`T360312`, :phab:`T360305`)
 * i18n updates
 
 
@@ -1094,7 +1094,7 @@ Other changes
 * Property.getType() method has been removed
 * Family.server_time() method was removed; it is still available from Site object (:phab:`T89451`)
 * All HttpRequest parameters except of charset has been dropped (:phab:`T265206`)
-* A lot of methods and properties of HttpRequest are deprecared in favour of requests.Resonse attributes
+* A lot of methods and properties of HttpRequest are deprecated in favour of requests.Resonse attributes
   (:phab:`T265206`)
 * Method and properties of HttpRequest are delegated to requests.Response object (:phab:`T265206`)
 * comms.threadedhttp.HttpRequest.raw was replaced by HttpRequest.content property (:phab:`T265206`)
