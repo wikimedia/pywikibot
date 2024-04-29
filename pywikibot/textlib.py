@@ -1671,8 +1671,7 @@ def replaceCategoryLinks(oldtext: str,
 
     if under_categories:
         category = get_regexes('category', site)[0]
-        for last_category in category.finditer(newtext):
-            pass
+        last_category = list(category.finditer(newtext))[-1]
         for reg in under_categories:
             special = reg.search(newtext)
             if special and not isDisabled(newtext, special.start()):
@@ -2112,28 +2111,30 @@ class TimeStripper:
         """
         return to_latin_digits(line)
 
-    def _last_match_and_replace(self, txt: str, pat):
+    def _last_match_and_replace(self,
+                                txt: str,
+                                pat) -> tuple[str, Match[str] | None]:
         """Take the rightmost match and replace with marker.
 
         It does so to prevent spurious earlier matches.
         """
-        m = None
-        cnt = 0
-        for cnt, m in enumerate(pat.finditer(txt), start=1):
-            pass
+        all_matches = list(pat.finditer(txt))
+        cnt = len(all_matches)
 
-        def marker(m):
+        if not cnt:
+            return (txt, None)
+
+        m = all_matches[-1]
+
+        def marker(m: Match[str]):
             """
             Replace exactly the same number of matched characters.
 
-            Same number of chars shall be replaced, in order to be able to
-            compare pos for matches reliably (absolute pos of a match
+            Same number of chars shall be replaced, in order to be able
+            to compare pos for matches reliably (absolute pos of a match
             is not altered by replacement).
             """
             return '@' * (m.end() - m.start())
-
-        if not m:
-            return (txt, None)
 
         # month and day format might be identical (e.g. see bug T71315),
         # avoid to wipe out day, after month is matched. Replace all matches
