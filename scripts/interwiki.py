@@ -750,19 +750,19 @@ class Subject(interwiki_graph.Subject):
         """
         return self.todo.iter_values_len()
 
-    def whatsNextPageBatch(self, site):
-        """
-        Return the next page batch.
+    def whatsNextPageBatch(self, site) -> list[pywikibot.Page]:
+        """Return the next page batch.
 
-        By calling this method, you 'promise' this instance that you will
-        preload all the 'site' Pages that are in the todo list.
+        By calling this method, you 'promise' this instance that you
+        will preload all the *site* Pages that are in the todo list.
 
-        This routine will return a list of pages that can be treated.
+        :return: This routine will return a list of pages that can be
+            treated.
         """
         # Bug-check: Isn't there any work still in progress? We can't work on
         # different sites at a time!
         if self.pending:
-            raise RuntimeError(f"BUG: Can't start to work on {site}; still "
+            raise RuntimeError(f"Can't start to work on {site}; still "
                                f'working on {self.pending}')
         # Prepare a list of suitable pages
         result = []
@@ -1402,8 +1402,7 @@ class Subject(interwiki_graph.Subject):
                 pywikibot.info(f'Found link to {page2} in:')
                 self.whereReport(page2, indent=4)
 
-            # TODO: allow answer to repeat previous or go back
-            # after a mistake
+            # TODO: allow answer to repeat previous or go back after a mistake
             answer = 'a' if acceptall else pywikibot.input_choice(
                 'What should be done?',
                 [('accept', 'a'), ('reject', 'r'), ('give up', 'g'),
@@ -1921,7 +1920,7 @@ class InterwikiBot:
         Return the site that has the most open queries plus the number.
 
         If there is nothing left, return None.
-        Only languages that are TODO for the first Subject are returned.
+        Only sites that are todo for the first Subject are returned.
         """
         if not self.firstSubject():
             return None
