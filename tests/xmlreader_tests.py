@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for xmlreader module."""
 #
-# (C) Pywikibot team, 2009-2022
+# (C) Pywikibot team, 2009-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,6 +11,7 @@ import unittest
 from contextlib import suppress
 
 from pywikibot import xmlreader
+from pywikibot.tools import suppress_warnings
 from tests import join_xml_data_path
 from tests.aspects import TestCase
 
@@ -40,42 +41,26 @@ class ExportDotThreeTestCase(TestCase):
         self.assertEqual('Quercusrobur', pages[1].username)
         self.assertEqual('Pear', pages[0].title)
 
-    def test_XmlDumpFirstFoundRev(self):
-        """Test loading the first found revision.
-
-        To be deprecated.
-        :phab: `T340804`
-        """
-        pages = get_entries('article-pear.xml', revisions='first_found')
-        self.assertLength(pages, 1)
-        self.assertEqual('Automated conversion', pages[0].comment)
-        self.assertEqual('Pear', pages[0].title)
-        self.assertEqual('24278', pages[0].id)
-        self.assertEqual('185185', pages[0].revisionid)
-        self.assertTrue(pages[0].text.startswith('Pears are [[tree]]s of'))
-        self.assertTrue(not pages[0].isredirect)
-
-    def test_XmlDumpEarliestRev(self):
-        """Test loading the earliest revision."""
-        pages = get_entries('article-pear.xml', revisions='earliest')
-        self.assertLength(pages, 1)
-        self.assertEqual('Automated conversion', pages[0].comment)
-        self.assertEqual('Pear', pages[0].title)
-        self.assertEqual('24278', pages[0].id)
-        self.assertEqual('185185', pages[0].revisionid)
-        self.assertTrue(pages[0].text.startswith('Pears are [[tree]]s of'))
-        self.assertTrue(not pages[0].isredirect)
-
-    def test_XmlDumpLatestRev(self):
-        """Test loading the latest revision."""
-        pages = get_entries('article-pear.xml', revisions='latest')
-        self.assertLength(pages, 1)
-        self.assertEqual('sp', pages[0].comment)
-        self.assertEqual('Pear', pages[0].title)
-        self.assertEqual('24278', pages[0].id)
-        self.assertEqual('188924', pages[0].revisionid)
-        self.assertTrue(pages[0].text.startswith('Pears are [[tree]]s of'))
-        self.assertTrue(not pages[0].isredirect)
+    def test_XmlDumpFoundRev(self):
+        """Test loading the first, earliest and latest revision."""
+        tests = {
+            'first_found': ('Automated conversion', '185185'),
+            'earliest': ('Automated conversion', '185185'),
+            'latest': ('sp', '188924'),
+        }
+        for revisions, (comment, revid) in tests.items():
+            with suppress_warnings(
+                    r".+'allrevisions' is deprecated since release 9\.0\.0"):
+                pages = get_entries('article-pear.xml', revisions=revisions)
+            with self.subTest(revisions=revisions):
+                self.assertLength(pages, 1)
+                page = pages[0]
+                self.assertEqual(comment, page.comment)
+                self.assertEqual('Pear', page.title)
+                self.assertEqual('24278', page.id)
+                self.assertEqual(revid, page.revisionid)
+                self.assertTrue(page.text.startswith('Pears are [[tree]]s of'))
+                self.assertTrue(not page.isredirect)
 
     def test_XmlDumpRedirect(self):
         """Test XmlDump correctly parsing whether a page is a redirect."""
