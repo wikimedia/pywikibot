@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for editing pages."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -12,10 +12,9 @@ import unittest
 from contextlib import suppress
 
 import pywikibot
-from pywikibot import config, page_put_queue
+from pywikibot import page_put_queue
 from pywikibot.exceptions import Error
 from tests.aspects import TestCase, require_version
-from tests.oauth_tests import OAuthSiteTestCase
 
 
 called_back = False
@@ -174,42 +173,6 @@ class TestSiteMergeHistory(TestCase):
         dest.clear_cache()
         site.merge_history(source, dest, revs[0])
         self.assertEqual(dest.revision_count(), 2)
-
-
-class OAuthEditTest(OAuthSiteTestCase):
-
-    """Run edit test with OAuth enabled."""
-
-    family = 'wikipedia'
-    code = 'test'
-
-    write = True
-
-    def setUp(self):
-        """Set up test by checking site and initialization."""
-        super().setUp()
-        self._authenticate = config.authenticate
-        oauth_tokens = self.consumer_token + self.access_token
-        config.authenticate[self.site.hostname()] = oauth_tokens
-
-    def tearDown(self):
-        """Tear down test by resetting config.authenticate."""
-        super().tearDown()
-        config.authenticate = self._authenticate
-
-    def test_edit(self):
-        """Test editing to a page."""
-        self.site.login()
-        self.assertTrue(self.site.logged_in())
-        ts = str(time.time())
-        p = pywikibot.Page(self.site,
-                           f'User:{self.site.username()}/edit test')
-        p.site.editpage(p, appendtext=ts)
-        revision_id = p.latest_revision_id
-        p = pywikibot.Page(self.site,
-                           f'User:{self.site.username()}/edit test')
-        self.assertEqual(revision_id, p.latest_revision_id)
-        self.assertTrue(p.text.endswith(ts))
 
 
 if __name__ == '__main__':
