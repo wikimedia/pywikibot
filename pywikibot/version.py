@@ -241,7 +241,7 @@ def getversion_git(path=None):
     return (tag, rev, date, hsh)
 
 
-def getversion_nightly(path: str | Path | None = None):  # pragma: no cover
+def getversion_nightly(path: str | Path | None = None):
     """Get version info for a nightly release.
 
     .. hint::
@@ -256,7 +256,10 @@ def getversion_nightly(path: str | Path | None = None):  # pragma: no cover
         - hash (git hash for the current revision)
     :rtype: ``tuple`` of three ``str`` and a ``time.struct_time``
     """
-    file = Path(path or _get_program_dir()) / 'pywikibot' / 'version'
+    file = Path(path or _get_program_dir())
+    if not path:
+        file /= 'pywikibot'
+    file /= 'version'
 
     with file.open() as data:
         (tag, rev, date, hsh) = data.readlines()
@@ -287,7 +290,7 @@ def getversion_package(path=None) -> tuple[str, str, str, str]:
     return (tag, rev, date, hsh)
 
 
-def getversion_onlinerepo(path: str = 'branches/master'):
+def getversion_onlinerepo(path: str = 'branches/master') -> str:
     """Retrieve current framework git hash from Gerrit."""
     # Gerrit API responses include )]}' at the beginning,
     # make sure to strip it out
