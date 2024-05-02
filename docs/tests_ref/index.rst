@@ -79,6 +79,7 @@ Tests in this project:
     tools<./tools_tests>
     ui_options<./ui_options_tests>
     ui<./ui_tests>
+    upload<./upload_tests>
     user<./user_tests>
     utils
     wikibase_edit<./wikibase_edit_tests>
@@ -117,5 +118,4 @@ Tests in this project:
     reflinks<./reflinks_tests>
     replacebot<./replacebot_tests>
     template_bot<./template_bot_tests>
-    upload<./upload_tests>
     uploadbot<./uploadbot_tests>
