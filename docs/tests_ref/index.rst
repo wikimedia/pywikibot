@@ -81,6 +81,7 @@ Tests in this project:
     ui<./ui_tests>
     user<./user_tests>
     utils
+    version<./version_tests>
     wikibase_edit<./wikibase_edit_tests>
     wikibase<./wikibase_tests>
     wikistats<./wikistats_tests>
