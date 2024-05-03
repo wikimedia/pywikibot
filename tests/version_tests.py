@@ -25,15 +25,14 @@ class LocalVersionTestCase(TestCase):
 
     net = False
 
-    @unittest.expectedFailure  # T363943
     def test_nightly_version(self):
         """Test version file of nightly dump."""
         path = Path(__file__).parent / 'data'
         tag, rev, date, hsh, *dummy = version.getversion_nightly(path)
-        self.assertEqual(tag, 'nightly/core')
+        self.assertEqual(tag, 'nightly/core_stable')
         self.assertEqual(rev, '1')
         self.assertIsInstance(date, time.struct_time)
-        self.assertEqual(hsh, '567a31d')
+        self.assertEqual(hsh, 'e8f64f2')
         self.assertEqual(dummy, [])
 
     def test_package_version(self):
