@@ -32,4 +32,4 @@ from __future__ import annotations
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '9.2.0'
+__version__ = '9.1.2'

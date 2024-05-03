@@ -7,7 +7,7 @@ The following option is supported:
 
 .. versionchanged:: 7.0
    version script was moved to the framework scripts folder
-.. versionadded:: 9.2
+.. versionadded:: 9.1.2
    the *-nouser* option.
 """
 #
@@ -59,7 +59,7 @@ WMF_CACERT = 'MIIDxTCCAq2gAwIBAgIQAqxcJmoLQJuPC3nyrkYldzANBgkqhkiG9w0BAQUFADBs'
 def main(*args: str) -> None:
     """Print pywikibot version and important settings.
 
-    .. versionchanged:: 9.2
+    .. versionchanged:: 9.1.2
        usernames are not printed with ``-nouser`` option.
     """
     pywikibot.info('Pywikibot: ' + getversion())
