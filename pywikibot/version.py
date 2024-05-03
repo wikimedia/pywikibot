@@ -262,7 +262,7 @@ def getversion_nightly(path: str | Path | None = None):
     file /= 'version'
 
     with file.open() as data:
-        (tag, rev, date, hsh) = data.readlines()
+        (tag, rev, date, hsh) = data.read().splitlines()
 
     date = time.strptime(date[:19], '%Y-%m-%dT%H:%M:%S')
 
