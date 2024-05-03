@@ -89,7 +89,7 @@ def need_right(right: str | None = None):
                     rights = '.'
                 raise UserRightsError(
                     f'User "{self.user()}" does not have required user right '
-                    f'"{right}"{rights}')
+                    f'"{right}" on site {self}{rights}')
             return fn(self, *args, **kwargs)
 
         manage_wrapping(callee, fn)

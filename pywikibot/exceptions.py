@@ -77,11 +77,11 @@ Error: Base class, all exceptions should the subclass of this class.
   - NoUsernameError: Username is not in user config file, or it is invalid.
   - PageInUseError: Page cannot be reserved due to a lock
   - SectionError: The section specified by # does not exist
-  - TranslationError: no language translation found
+  - TranslationError: no language translation found, i18n/l10n message
+    not available
   - UnknownExtensionError: Extension is not defined for this site
   - UserRightsError: insufficient rights for requested action
   - VersionParseError: failed to parse version information
-  - i18n.TranslationError: i18n/l10n message not available
 
 APIError: wiki API returned an error
 

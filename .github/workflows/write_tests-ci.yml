@@ -1,5 +1,5 @@
-name: Sysop write test CI
-# Run Pywikibot write tests on test wiki using sysop rights
+name: Write test CI
+# Run Pywikibot write tests on test wiki
 
 on:
   push:
@@ -11,11 +11,11 @@ concurrency:
 
 env:
   PYWIKIBOT_TEST_RUNNING: 1
-  PYWIKIBOT_USERNAME: Pywikibot-oauth
+  PYWIKIBOT_USERNAME: Pywikibot-test
 
 jobs:
   build:
-    runs-on: ${{ matrix.os || 'ubuntu-latest' }}
+    runs-on: 'ubuntu-latest'
     continue-on-error: ${{ matrix.experimental || false }}
     timeout-minutes: 100
 
@@ -25,9 +25,7 @@ jobs:
 
       matrix:
         python-version: ["3.7"]
-        family: ['wikipedia']
-        code: ['test']
-        domain:  ['test.wikipedia.org']
+        site: ['wikipedia:test']
         experimental: [true]
 
     steps:
@@ -41,21 +39,6 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Get token name
-      env:
-        _oauth_token: OAUTH_TOKEN_${{ matrix.family }}_${{ matrix.code }}
-      uses: ASzc/change-string-case-action@v6
-      id: token
-      with:
-        string: ${{ env._oauth_token }}
-
-    - name: Split OAuth Token
-      uses: jungwinter/split@v2
-      id: split
-      with:
-        msg: ${{ secrets[format('{0}', steps.token.outputs.uppercase)] }}
-        separator: ":"
-
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -65,20 +48,22 @@ jobs:
 
     - name: Generate user files
       run: |
-        python -Werror::UserWarning -m pwb generate_user_files -family:${{matrix.family}} -lang:${{matrix.code}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
-        echo "authenticate['${{ matrix.domain }}'] = ('${{ steps.split.outputs._0 }}', '${{ steps.split.outputs._1 }}', '${{ steps.split.outputs._2 }}', '${{ steps.split.outputs._3 }}')" >> user-config.py
+        python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
         echo "usernames['wikipedia']['test'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
+        echo "usernames['wikidata']['test'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
         echo "noisysleep = float('inf')" >> user-config.py
         echo "maximum_GET_length = 5000" >> user-config.py
         echo "console_encoding = 'utf8'" >> user-config.py
+        echo "import os" >> user-config.py
+        echo "password_file = os.path.expanduser('passwordfile')" >> user-config.py
+        echo "('${{ env.PYWIKIBOT_USERNAME }}', '${{ secrets.PYWIKIBOT_USERPWD }}')" > passwordfile
 
-    - name: Sysop and write tests with pytest
+    - name: Write tests with pytest
       id: ci_test
       continue-on-error: true
       timeout-minutes: 90
       env:
-        PYWIKIBOT_TEST_OAUTH: ${{ secrets[format('{0}', steps.token.outputs.uppercase)] }}
-        PYWIKIBOT_TEST_WRITE: ${{ matrix.domain == 'test.wikipedia.org' && 1 || 0}}
+        PYWIKIBOT_TEST_WRITE: ${{ matrix.site == 'wikipedia:test' && 1 || 0}}
       run: |
         python pwb.py version
         pytest -s -r A -a "rights or write" --cov=.;

@@ -81,3 +81,48 @@ table.align-default {
     padding: 0.2rem 0;
     border: 1px solid #fff5;
 }
+
+/** Version change directives **/
+:root {
+    --versionadded: #246342;
+    --versionchanged: #AC6600;
+    --deprecated: #970302;
+
+    --versionadded-border: #339966;
+    --versionchanged-border: #F0BC00;
+    --deprecated-border: #990000;
+}
+
+div.versionadded,
+div.versionchanged,
+div.deprecated,
+div.versionremoved {
+    border-left: 4px solid;
+    padding: 0 1rem;
+}
+
+div.versionadded {
+    border-left-color: var(--versionadded-border);
+}
+
+div.versionchanged {
+    border-left-color: var(--versionchanged-border);
+}
+
+div.deprecated,
+div.versionremoved {
+    border-left-color: var(--deprecated-border);
+}
+
+div.versionadded .versionmodified {
+    color: var(--versionadded);
+}
+
+div.versionchanged .versionmodified {
+    color: var(--versionchanged);
+}
+
+div.deprecated .versionmodified,
+div.versionremoved .versionmodified {
+    color: var(--deprecated);
+}
