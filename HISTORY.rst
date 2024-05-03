@@ -1,6 +1,15 @@
 Release history
 ===============
 
+9.1.2
+-----
+*03 May 2024*
+
+* Remove line endings in :func:`version.getversion_nightly` (:phab:`T363943`)
+* Provide ``-nouser`` option with :mod:`pywikibot.scripts.version`
+* i18n updates
+
+
 9.1.1
 -----
 *27 April 2024*
