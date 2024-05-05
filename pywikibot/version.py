@@ -103,7 +103,7 @@ def getversiondict() -> dict[str, str]:
             exceptions[vcs_func] = vcs_func.__name__, e
         else:
             break
-    else:
+    else:  # pragma: no cover
         # nothing worked; version unknown (but suppress exceptions)
         # the value is most likely '$Id' + '$', it means that
         # pywikibot was imported without using version control at all.
@@ -114,14 +114,14 @@ def getversiondict() -> dict[str, str]:
         exceptions = None
 
     # Git and SVN can silently fail, as it may be a nightly.
-    if exceptions:
+    if exceptions:  # pragma: no cover
         pywikibot.debug(f'version algorithm exceptions:\n{exceptions!r}')
 
     if isinstance(date, str):
         datestring = date
     elif isinstance(date, time.struct_time):
         datestring = time.strftime('%Y/%m/%d, %H:%M:%S', date)
-    else:
+    else:  # pragma: no cover
         warn('Unable to detect package date', UserWarning)
         datestring = '-2 (unknown)'
 
@@ -258,7 +258,7 @@ def getversion_nightly(path: str | Path | None = None):
     """
     file = Path(path or _get_program_dir())
     if not path:
-        file /= 'pywikibot'
+        file /= 'pywikibot'  # pragma: no cover
     file /= 'version'
 
     with file.open() as data:
@@ -267,7 +267,7 @@ def getversion_nightly(path: str | Path | None = None):
     date = time.strptime(date[:19], '%Y-%m-%dT%H:%M:%S')
 
     if not date or not tag or not rev:
-        raise VersionParseError
+        raise VersionParseError  # pragma: no cover
     return (tag, rev, date, hsh)
 
 
@@ -299,7 +299,7 @@ def getversion_onlinerepo(path: str = 'branches/master') -> str:
         headers={'user-agent': '{pwb}'}).text[4:]
     try:
         return json.loads(buf)['revision']
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         raise VersionParseError(f'{e!r} while parsing {buf!r}')
 
 

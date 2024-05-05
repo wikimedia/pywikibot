@@ -58,7 +58,7 @@ class RemoteVersionTestCase(TestCase):
                 hsh = version.getversion_onlinerepo('branches/' + branch)
                 try:
                     int(hsh, 16)
-                except ValueError:
+                except ValueError:  # pragma: no cover
                     self.fail(
                         f'{hsh!r} is not a valid hash of {branch} branch')
 
