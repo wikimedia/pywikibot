@@ -498,11 +498,9 @@ extlinks = {
     # Phabricator tasks
     'phab': ('https://phabricator.wikimedia.org/%s', '%s'),
     # Python howto link
-    'pyhow': ('https://docs.python.org/3/howto/%s.html',
-              'Python Howto %s'),
+    'pyhow': ('https://docs.python.org/3/howto/%s', 'Python Howto %s'),
     # Python library link
-    'pylib': ('https://docs.python.org/3/library/%s.html',
-              'Python Library %s'),
+    'pylib': ('https://docs.python.org/3/library/%s', 'Python Library %s'),
     # Generic Python link; should be used with explicit title
     'python': ('https://docs.python.org/3/%s', None),
 }
