@@ -1,5 +1,4 @@
-"""
-This module offers a wide variety of page generators.
+"""This module offers a wide variety of page generators.
 
 A page generator is an object that is iterable (see :pep:`255`) and
 that yields page objects on which other scripts can then work.
@@ -8,12 +7,12 @@ Most of these functions just wrap a Site or Page method that returns a
 generator. For testing purposes listpages.py can be used, to print page
 titles to standard output.
 
-These parameters are supported to specify which pages titles to print:
+These parameters are supported to specify which pages titles to be used:
 
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -214,44 +213,47 @@ GENERATOR OPTIONS
 
                         logevent,username,start,end
 
-                    or for backward compatibility::
+                    .. deprecated:: 9.2
+                       backward compatible *total* argument like
+                       ``logevent,username,total``; use ``-limit`` filter
+                       option instead (see below).
 
-                        logevent,username,total
+                    To use the default value, use an empty string.
 
                     .. note:: 'start' is the most recent date and log
                        events are iterated from present to past. If
                        'start' is not provided, it means 'now'; if 'end'
                        is not provided, it means 'since the beginning'.
 
-                    To use the default value, use an empty string.
-                    You have options for every type of logs given by the
-                    log event parameter which could be one of the following::
+                    .. seealso::
+                       *letype* of :api:`Logevents` for the supported
+                       types of log events.
 
-                        spamblacklist, titleblacklist, gblblock, renameuser,
-                        globalauth, gblrights, gblrename, abusefilter,
-                        massmessage, thanks, usermerge, block, protect, rights,
-                        delete, upload, move, import, patrol, merge, suppress,
-                        tag, managetags, contentmodel, review, stable,
-                        timedmediahandler, newusers
+                    **Examples:**
 
-                    It uses the default number of pages 10.
-
-                    Examples:
-
-                    -logevents:move gives pages from move log (usually
+                    ``-logevents:move`` gives pages from move log (usually
                     redirects)
-                    -logevents:delete,,20 gives 20 pages from deletion log
-                    -logevents:protect,Usr gives pages from protect log by user
-                    Usr
-                    -logevents:patrol,Usr,20 gives 20 patrolled pages by Usr
-                    -logevents:upload,,20121231,20100101 gives upload pages
-                    in the 2010s, 2011s, and 2012s
-                    -logevents:review,,20121231 gives review pages since the
-                    beginning till the 31 Dec 2012
-                    -logevents:review,Usr,20121231 gives review pages by user
-                    Usr since the beginning till the 31 Dec 2012
 
-                    In some cases it must be given as -logevents:"move,Usr,20"
+                    ``-logevents:delete -limit20`` gives 20 pages from deletion
+                    log
+
+                    ``-logevents:protect,Usr`` gives pages from protect log by
+                    user Usr
+
+                    ``-logevents:patrol,Usr -limit:20`` gives 20 patrolled
+                    pages by Usr
+
+                    ``-logevents:upload,,20121231,20100101`` gives upload pages
+                    in the 2010s, 2011s, and 2012s
+
+                    ``-logevents:review,,20121231`` gives review pages since
+                    the beginning till the 31 Dec 2012
+
+                    ``-logevents:review,Usr,20121231`` gives review pages by
+                    user Usr since the beginning till the 31 Dec 2012
+
+                    In some cases it must be given as
+                    ``-logevents:"move,Usr,20"``
 
 -interwiki          Work on the given page and all equivalent pages in other
                     languages. This can, for example, be used to fight
@@ -282,14 +284,18 @@ GENERATOR OPTIONS
                     'duration' minutes of timespan. rctags are supported too.
                     The rctag must be the very first parameter part.
 
-                    Examples:
+                    **Examples:**
 
-                    -recentchanges:20 gives the 20 most recently changed pages
-                    -recentchanges:120,70 will give pages with 120 offset
+                    ``-recentchanges:20`` gives the 20 most recently changed
+                    pages
+
+                    ``-recentchanges:120,70`` will give pages with 120 offset
                     minutes and 70 minutes of timespan
-                    -recentchanges:visualeditor,10 gives the 10 most recently
-                    changed pages marked with 'visualeditor'
-                    -recentchanges:"mobile edit,60,35" will retrieve pages
+
+                    ``-recentchanges:visualeditor,10`` gives the 10 most
+                    recently changed pages marked with 'visualeditor'
+
+                    ``-recentchanges:"mobile edit,60,35"`` will retrieve pages
                     marked with 'mobile edit' for the given offset and timespan
 
 -unconnectedpages   Work on the most recent unconnected pages to the Wikibase
@@ -328,8 +334,10 @@ GENERATOR OPTIONS
                     Argument can be given as "-unwatched:n" where
                     n is the maximum number of articles to work on.
 
--property:name      Work on all pages with a given property name from
-                    Special:PagesWithProp.
+-property           Work on all pages with a given property name from
+                    Special:PagesWithProp. Usage:
+
+                        -property:name
 
 -usercontribs       Work on all articles that were edited by a certain user.
                     (Example : -usercontribs:DumZiBoT)
@@ -414,17 +422,23 @@ GENERATOR OPTIONS
 
                     -linter:show just shows available categories.
 
--querypage:name     Work on pages provided by a QueryPage-based special page,
-                    see :api:`Querypage`.
-                    (tip: use -limit:n to fetch only n pages).
+-querypage          Work on pages provided by a QueryPage-based special
+                    page. Usage:
 
-                    -querypage shows special pages available.
+                        -querypage:name
+
+                    ``-querypage`` without argument shows special pages
+                    available.
+
+                    .. seealso:: :api:`Querypage`
 
 -url                Read a list of pages to treat from the provided URL.
                     The URL must return text in the same format as expected for
                     the -file argument, e.g. page titles separated by newlines
                     or enclosed in brackets.
 
+.. tip::
+   use ``-limit:n`` filter option to fetch only n pages.
 
 FILTER OPTIONS
 ==============
