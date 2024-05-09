@@ -999,7 +999,7 @@ class GeneratorsMixin:
            needs a lot of time on Wikidata site. You have to increase
            the **read** timeout part of ``socket_timeout`` in
            :ref:`Http Settings` in your ``user-config.py`` file. Or
-           increase it patially within your code like:
+           increase it partially within your code like:
 
            .. code:: python
 
