@@ -30,10 +30,10 @@ from pywikibot.data import WaitingMixin
 from pywikibot.exceptions import (
     Client414Error,
     Error,
+    FatalServerError,
     MaxlagTimeoutError,
     NoUsernameError,
     Server504Error,
-    ServerError,
     SiteDefinitionError,
 )
 from pywikibot.login import LoginStatus
@@ -694,7 +694,7 @@ class Request(MutableMapping, WaitingMixin):
                 pywikibot.warning(
                     'Caught HTTP 414 error, although not using GET.')
                 raise
-        except (ConnectionError, ServerError):
+        except (ConnectionError, FatalServerError):
             # This error is not going to be fixed by just waiting
             pywikibot.error(traceback.format_exc())
             raise
