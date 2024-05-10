@@ -1,6 +1,6 @@
 """SPARQL Query interface."""
 #
-# (C) Pywikibot team, 2016-2023
+# (C) Pywikibot team, 2016-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -140,7 +140,7 @@ class SparqlQuery(WaitingMixin):
         """Run SPARQL query and return parsed JSON result.
 
         .. versionchanged:: 8.5
-           :exc:``exceptions.NoUsernameError` is raised if the response
+           :exc:`exceptions.NoUsernameError` is raised if the response
            looks like the user is not logged in.
 
         :param query: Query text
