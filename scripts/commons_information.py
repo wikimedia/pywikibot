@@ -17,6 +17,9 @@ Example for going through all files:
 
     python pwb.py commons_information -start:File:!
 
+.. versionadded:: 6.0
+.. versionchanged:: 9.2
+   accelerated script with preloading pages.
 """
 #
 # (C) Pywikibot team, 2015-2024
@@ -181,7 +184,7 @@ def main(*args: str) -> None:
     for arg in local_args:
         gen_factory.handle_arg(arg)
 
-    gen = gen_factory.getCombinedGenerator()
+    gen = gen_factory.getCombinedGenerator(preload=True)
     if gen:
         bot = InformationBot(generator=gen)
         bot.run()
