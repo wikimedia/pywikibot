@@ -821,8 +821,8 @@ class Subject(interwiki_graph.Subject):
             or self.namespaceMismatch(page, target, counter) \
             or self.wiktionaryMismatch(target)
 
+    @staticmethod
     def get_alternative(
-        self,
         site: pywikibot.site.BaseSite
     ) -> pywikibot.Page | None:
         """Ask for an alternative Page for a given site.
@@ -831,10 +831,7 @@ class Subject(interwiki_graph.Subject):
         """
         title = pywikibot.input(f'Give the alternative page for code '
                                 f'{site.code!r} (without site code)')
-        if title:
-            return pywikibot.Page(site, title)
-
-        return None
+        return pywikibot.Page(site, title) if title else None
 
     def namespaceMismatch(self, linkingPage, linkedPage, counter) -> bool:
         """
