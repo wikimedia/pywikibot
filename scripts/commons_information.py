@@ -1,7 +1,25 @@
 #!/usr/bin/env python3
-"""Insert a language template into the description field."""
+"""
+This bot adds a language template to the file's description field.
+
+This script understands the following command-line arguments:
+
+&params;
+
+Usage:
+
+    python pwb.py commons_information [pagegenerators]
+
+You can use any typical pagegenerator (like categories) to provide with a
+list of pages.
+
+Example for going through all files:
+
+    python pwb.py commons_information -start:File:!
+
+"""
 #
-# (C) Pywikibot team, 2015-2023
+# (C) Pywikibot team, 2015-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -15,6 +33,9 @@ import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 
+# This is required for the text that is shown when you run this script
+# with the parameter -help or without parameters.
+docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 try:
     import langdetect
@@ -52,7 +73,7 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
 
     @staticmethod
     def detect_langs(text):
-        """Detect language from griven text."""
+        """Detect language from given text."""
         if langdetect is not None:
             return langdetect.detect_langs(text)
         return None
