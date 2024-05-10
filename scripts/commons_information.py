@@ -62,7 +62,7 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
         """Initialzer."""
         super().__init__(**kwargs)
         lang_tmp_cat = pywikibot.Category(self.site, self.lang_tmp_cat)
-        self.lang_tmps = lang_tmp_cat.articles(namespaces=[10])
+        self.lang_tmps = set(lang_tmp_cat.articles(namespaces=[10]))
 
     def get_description(self, template):
         """Get description parameter."""
@@ -129,23 +129,29 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
         page = self.current_page
         code = mwparserfromhell.parse(page.text)
         edited = False  # to prevent unwanted changes
+
         for template in code.ifilter_templates():
             if not page.site.sametitle(template.name.strip(), 'Information'):
                 continue
+
             desc = self.get_description(template)
             if desc is None:
                 continue
+
             for tmp in desc.value.filter_templates(recursive=False):
                 if self.process_desc_template(tmp):
                     edited = True
+
             desc_clean = copy.deepcopy(desc.value)
             for tmp in desc_clean.filter_templates(recursive=False):
                 # TODO: emit a debug item?
                 desc_clean.remove(tmp)
+
             value = desc_clean.strip()
             if value == '':
                 pywikibot.info('Empty description')
                 continue
+
             pywikibot.info(value)
             langs = self.detect_langs(value)
             if langs:
@@ -153,6 +159,7 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
                 for language in langs:
                     pywikibot.info(
                         f'<<lightblue>>{language.lang}: {language.prob}')
+
             lang = pywikibot.input(
                 'Enter the language of the displayed text:').strip()
             if lang != '':
@@ -163,6 +170,7 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
                 new = mwparserfromhell.nodes.template.Template(lang, [value])
                 self.replace_value(desc, new)
                 edited = True
+
         if edited:
             text = str(code)
             summary = i18n.translate(page.site.lang, self.comment,
