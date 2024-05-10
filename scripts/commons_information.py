@@ -28,7 +28,7 @@ Example for going through all files:
 #
 from __future__ import annotations
 
-import copy
+from textwrap import fill
 
 import mwparserfromhell
 
@@ -62,7 +62,8 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
         """Initialzer."""
         super().__init__(**kwargs)
         lang_tmp_cat = pywikibot.Category(self.site, self.lang_tmp_cat)
-        self.lang_tmps = set(lang_tmp_cat.articles(namespaces=[10]))
+        self.lang_tmps = {t.title(with_ns=False).lower()
+                          for t in lang_tmp_cat.articles(namespaces=[10])}
 
     def get_description(self, template):
         """Get description parameter."""
@@ -75,50 +76,134 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
         return None
 
     @staticmethod
-    def detect_langs(text):
+    def detect_langs(text: str):
         """Detect language from given text."""
         if langdetect is not None:
             return langdetect.detect_langs(text)
         return None
 
-    def process_desc_template(self, template) -> bool:
-        """Process description template."""
-        tmp_page = pywikibot.Page(self.site, template.name.strip(), ns=10)
-        if tmp_page in self.lang_tmps and len(template.params) == 1 \
+    def process_desc_template(
+        self,
+        template: mwparserfromhell.nodes.template.Template
+    ) -> bool:
+        """Process description template.
+
+        :param template: a mwparserfromhell Template found in the
+            description parameter of ``Information`` template.
+        :return: whether the *template* node was changed.
+        """
+        tmpl_lang = template.name.strip().lower()
+        if tmpl_lang in self.lang_tmps and len(template.params) == 1 \
            and template.has('1'):
             lang_tmp_val = template.get('1').value.strip()
             langs = self.detect_langs(lang_tmp_val)
-            if langs and langs[0].prob > 0.9:
-                tmp_page2 = pywikibot.Page(self.site, langs[0].lang, ns=10)
-                if tmp_page2 != tmp_page:
-                    pywikibot.info(
-                        '<<lightblue>>The language template {before!r} '
-                        'was found, but langdetect thinks {after!r} is the '
-                        'most appropriate with a probability of {prob}:'
-                        '<<default>>\n{text}'
-                        .format(before=tmp_page.title(with_ns=False),
-                                after=tmp_page2.title(with_ns=False),
-                                prob=langs[0].prob,
-                                text=lang_tmp_val))
+            if not langs:
+                return False
+
+            lang, prob = langs[0].lang, langs[0].prob
+            if lang != tmpl_lang and prob > 0.9 and lang in self.lang_tmps:
+                pywikibot.info(
+                    f'<<lightblue>>The language template {tmpl_lang!r} '
+                    f'was found, but language detection thinks {lang!r}\n'
+                    f'is the most appropriate with a probability of {prob}:'
+                )
+                pywikibot.info(fill(lang_tmp_val, width=78))
+                while True:
                     choice = pywikibot.input_choice(
                         'What to do?',
-                        [('Replace it', 'r'), ('Do not replace it', 'n'),
-                         ('Choose another', 'c')])
+                        [
+                            ('Replace it', 'r'),
+                            ('Do not replace it', 'n'),
+                            ('Choose another', 'c'),
+                        ],
+                        default='n',
+                    )
+                    if choice == 'n':
+                        break
+
                     if choice == 'r':
-                        template.name = langs[0].lang
+                        template.name = lang
                         return True
 
-                    if choice == 'c':
-                        newlang = pywikibot.input(
-                            'Enter the language of the displayed text:')
-                        if newlang and newlang != template.name:
-                            template.name = newlang
-                            return True
+                    # choice == 'c':
+                    newlang = pywikibot.input(
+                        'Enter the language of the displayed text:').strip()
+                    if not newlang or newlang == tmpl_lang:
+                        break
+
+                    if newlang in self.lang_tmps:
+                        template.name = newlang
+                        return True
+
+                    pywikibot.warning(f'<<lightred>>{newlang!r} is not a valid'
+                                      f' language template on {self.site}')
         return False
 
+    def process_desc_other(self,
+                           wikicode: mwparserfromhell.wikicode.Wikicode,
+                           nodes: list[mwparserfromhell.nodes.Node]) -> bool:
+        """Process other description text.
+
+        The description text may consist of different Node types except
+        of Template which is handled by :meth:`process_desc_template`.
+        Combine all nodes and replace the last with new created
+        Template while removing the remaining from *wikicode*.
+
+        .. versionadded:: 9.2
+
+        :param wikicode: The Wikicode of the parsed page text.
+        :param nodes: wikitext nodes to be processed
+        :return: whether the description nodes were changed
+        """
+        if type(nodes[0]).__name__ == 'Text' and nodes[0].value.isspace():
+            # ignore the first node with spaces only
+            nodes = nodes[1:]
+
+        value = ''.join(str(node) for node in nodes).strip()
+        if not value:
+            return False
+
+        pywikibot.info(fill(value, 78))
+        langs = self.detect_langs(value)
+
+        if langs:
+            pywikibot.info('<<lightblue>>Hints from langdetect:')
+            for language in langs:
+                pywikibot.info(
+                    f'<<lightblue>>{language.lang}: {language.prob}')
+
+        while True:
+            lang = pywikibot.input(
+                'Enter the language of the displayed text:').strip()
+
+            if not lang:
+                return False
+
+            if lang in self.lang_tmps:
+                break
+
+            pywikibot.warning(f'<<lightred>>{lang!r} is not a valid language '
+                              f'template on {self.site}')
+
+        # replace the last node
+        new = mwparserfromhell.nodes.template.Template(lang, [value.rstrip()])
+        try:
+            self.replace_value(nodes[-1], new)
+        except AttributeError:
+            # Node is has no value attribute, add the template directly
+            wikicode.insert_after(nodes[-1], str(new))
+            wikicode.remove(nodes[-1])
+
+        # remove the other nodes
+        for node in nodes[:-1]:
+            node = wikicode.remove(node)
+
+        return True
+
     @staticmethod
-    def replace_value(param, value) -> None:
-        """Replace param with given value."""
+    def replace_value(param: mwparserfromhell.nodes.Node,
+                      value: mwparserfromhell.nodes.template.Template) -> None:
+        """Replace *param* node with given value."""
         lstrip = param.value.lstrip()
         lspaces = param.value[:len(param.value) - len(lstrip)]
         rspaces = lstrip[len(lstrip.rstrip()):]
@@ -138,37 +223,27 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
             if desc is None:
                 continue
 
-            for tmp in desc.value.filter_templates(recursive=False):
-                if self.process_desc_template(tmp):
-                    edited = True
+            unhandled = []
+            for node in desc.value.nodes:
+                node_type = type(node).__name__
 
-            desc_clean = copy.deepcopy(desc.value)
-            for tmp in desc_clean.filter_templates(recursive=False):
-                # TODO: emit a debug item?
-                desc_clean.remove(tmp)
+                if node_type == 'Comment':
+                    pass
+                elif node_type == 'Template':
 
-            value = desc_clean.strip()
-            if value == '':
-                pywikibot.info('Empty description')
-                continue
+                    # first handle unhandled nodes
+                    if unhandled:
+                        if self.process_desc_other(code, unhandled):
+                            edited = True
+                        unhandled = []
 
-            pywikibot.info(value)
-            langs = self.detect_langs(value)
-            if langs:
-                pywikibot.info('<<lightblue>>Hints from langdetect:')
-                for language in langs:
-                    pywikibot.info(
-                        f'<<lightblue>>{language.lang}: {language.prob}')
+                    # now process hte template
+                    if self.process_desc_template(node):
+                        edited = True
+                else:
+                    unhandled.append(node)
 
-            lang = pywikibot.input(
-                'Enter the language of the displayed text:').strip()
-            if lang != '':
-                tmp_page = pywikibot.Page(page.site, lang, ns=10)
-                if tmp_page not in self.lang_tmps:
-                    pywikibot.warning(f'{lang!r} is not a valid language '
-                                      f'template on {page.site}')
-                new = mwparserfromhell.nodes.template.Template(lang, [value])
-                self.replace_value(desc, new)
+            if unhandled and self.process_desc_other(code, unhandled):
                 edited = True
 
         if edited:
