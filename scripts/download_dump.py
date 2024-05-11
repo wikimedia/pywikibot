@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-This bot downloads dump from dumps.wikimedia.org.
+"""This bot downloads dump from dumps.wikimedia.org.
 
 This script supports the following command line parameters:
 
@@ -12,11 +11,12 @@ This script supports the following command line parameters:
                     formatted as YYYYMMDD.
 
 .. note:: This script is a
-   :py:obj:`ConfigParserBot <bot.ConfigParserBot>`. All options
-   can be set within a settings file which is scripts.ini by default.
+   :class:`ConfigParserBot<bot.ConfigParserBot>`. All options can be set
+   within a settings file which is scripts.ini by default.
+.. versionadded:: 3.0.20180108
 """
 #
-# (C) Pywikibot team, 2017-2022
+# (C) Pywikibot team, 2017-2024
 #
 # Distributed under the terms of the MIT license.
 #
