@@ -1001,7 +1001,7 @@ class GeneratorsMixin:
            :ref:`Http Settings` in your ``user-config.py`` file. Or
            increase it partially within your code like:
 
-           .. code:: python
+           .. code-block:: python
 
               from pywikibot import config
               save_timeout = config.socket_timeout  # save the timeout config

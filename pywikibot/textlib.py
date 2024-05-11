@@ -574,7 +574,7 @@ class _GetDataHTML(HTMLParser):
 
     The parser is used by :func:`removeHTMLParts` similar to this:
 
-    .. code:: python
+    .. code-block:: python
 
        from contextlib import closing
        from pywikibot.textlib import _GetDataHTML
@@ -586,7 +586,7 @@ class _GetDataHTML(HTMLParser):
 
     The result is:
 
-    .. code:: text
+    .. code-block:: html
 
        <html>Test me!</html>
 
