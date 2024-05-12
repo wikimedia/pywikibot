@@ -1,6 +1,19 @@
 Scripts Changelog
 =================
 
+9.2.0
+-----
+
+commons_information
+^^^^^^^^^^^^^^^^^^^
+
+* Preload pages to make the script upto 10 times faster
+
+noreferences
+^^^^^^^^^^^^
+
+* L10N updates
+
 9.1.0
 -----
 

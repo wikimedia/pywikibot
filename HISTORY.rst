@@ -23,7 +23,6 @@ Release history
 -----
 *22 April 2024*
 
-* ``-usernames`` option was added to :mod:`version<pywikibot.scripts.version>` script
 * Circumvent problems with *unique* and *prefix* parameters in :meth:`Site.alllinks()
   <pywikibot.site._generators.GeneratorsMixin.alllinks>` (:phab:`T359427`)
 * Detect nighly version file with :func:`version.getversion_nightly` (:phab:`T362492`)

@@ -1,7 +1,7 @@
 Current release
 ---------------
 
-* (no changes yet)
+* Retry api request on ServerError (:phab:`T364275`, :phab:`T364393`)
 
 Deprecations
 ------------
