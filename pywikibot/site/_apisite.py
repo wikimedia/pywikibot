@@ -2516,7 +2516,7 @@ class APISite(
 
         Requires appropriate privileges.
 
-        .. seealso: :api:`Delete`
+        .. seealso:: :api:`Delete`
 
         Page to be deleted can be given either as Page object or as pageid.
         To delete a specific version of an image the oldimage identifier

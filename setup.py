@@ -17,7 +17,7 @@
   ``pywikibot.__metadata__.py`` and adding developmental identifier
 - upload this patchset to Gerrit and merge it.
 
-.. warning: do not upload a development release to pypi.
+.. warning:: do not upload a development release to pypi.
 """
 #
 # (C) Pywikibot team, 2009-2024

@@ -1856,7 +1856,7 @@ class GeneratorsMixin:
         Pages are listed in a fixed sequence, only the starting point is
         random.
 
-        .. seealso: :api:`Random`
+        .. seealso:: :api:`Random`
         .. versionchanged:: 9.0
            Raises ``TypeError`` instead of ``AssertionError`` if
            *redirects* is invalid.
