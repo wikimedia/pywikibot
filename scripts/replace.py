@@ -142,7 +142,7 @@ Please type "python pwb.py replace -help | more" if you can't read
 the top of the help.
 """
 #
-# (C) Pywikibot team, 2004-2023
+# (C) Pywikibot team, 2004-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -820,6 +820,8 @@ def handle_pairsfile(filename: str) -> list[str] | None:
     """Handle -pairsfile argument.
 
     .. versionadded:: 7.0
+    .. versionchanged:: 9.2
+       replacement patterns are printed it they are incomplete.
     """
     if not filename:
         filename = pywikibot.input(
@@ -835,8 +837,8 @@ def handle_pairsfile(filename: str) -> list[str] | None:
         return None
 
     if len(replacements) % 2:
-        pywikibot.error(
-            f'{filename} contains an incomplete pattern replacement pair.')
+        pywikibot.error(f'{filename} contains an incomplete pattern '
+                        f'replacement pair:\n{replacements}')
         return None
 
     # Strip BOM from first line
@@ -893,10 +895,12 @@ LIMIT 200"""
 
 
 def main(*args: str) -> None:  # noqa: C901
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
+
+    .. versionchanged:: 9.2
+       replacement patterns are printed it they are incomplete.
 
     :param args: command line arguments
     """
@@ -976,7 +980,8 @@ def main(*args: str) -> None:  # noqa: C901
         return
 
     if len(commandline_replacements) % 2:
-        pywikibot.error('Incomplete command line pattern replacement pair.')
+        pywikibot.error('Incomplete command line pattern replacement pair:\n'
+                        f'{commandline_replacements}')
         return
 
     commandline_replacements += file_replacements
