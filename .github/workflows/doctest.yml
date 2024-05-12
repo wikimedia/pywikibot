@@ -25,7 +25,7 @@ jobs:
 
       matrix:
         os: [ "windows-latest", "macOS", "ubuntu-latest" ]
-        python-version: ["graalpy-21.1", "graalpy-24.0", "pypy3.7", "pypy3.10", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["pypy3.7", "pypy3.10", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
         include:
           - python-version: "3.13-dev"
 
