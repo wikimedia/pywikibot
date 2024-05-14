@@ -17,7 +17,7 @@ env:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os || 'ubuntu-latest' }}
+    runs-on: ${{ matrix.os || "ubuntu-latest" }}
     continue-on-error: ${{ matrix.experimental || false }}
     timeout-minutes: 100
 
@@ -27,7 +27,7 @@ jobs:
 
       matrix:
         python-version: [ "pypy3.7", "pypy3.10", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13-dev", "3.14-dev" ]
-        site: [ wikipedia:en, wikisource:zh ]
+        site: [ "wikipedia:en", "wikisource:zh" ]
         test_prod_only: [ true ]
         include:
           - python-version: "3.7"

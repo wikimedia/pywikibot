@@ -15,7 +15,7 @@ env:
 
 jobs:
   build:
-    runs-on: 'ubuntu-latest'
+    runs-on: "ubuntu-latest"
     continue-on-error: ${{ matrix.experimental || false }}
     timeout-minutes: 100
 
@@ -24,7 +24,7 @@ jobs:
 
       matrix:
         python-version: [ "3.7" ]
-        site: [ wikipedia:test ]
+        site: [ "wikipedia:test" ]
         experimental: [ true ]
 
     steps:
