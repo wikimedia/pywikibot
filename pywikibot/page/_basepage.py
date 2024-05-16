@@ -292,11 +292,10 @@ class BasePage(ComparableMixin):
         return title
 
     def section(self) -> str | None:
-        """
-        Return the name of the section this Page refers to.
+        """Return the name of the section this Page refers to.
 
-        The section is the part of the title following a '#' character, if
-        any. If no section is present, return None.
+        The section is the part of the title following a ``#`` character,
+        if any. If no section is present, return None.
         """
         try:
             section = self._link.section
@@ -373,12 +372,14 @@ class BasePage(ComparableMixin):
          ...
         pywikibot.exceptions.IsRedirectPageError: ... is a redirect page.
 
+        .. versionchanged:: 9.2
+           :exc:`exceptions.SectionError` is raised if the
+           :meth:`section` does not exists
         .. seealso:: :attr:`text` property
 
         :param force: reload all page attributes, including errors.
         :param get_redirect: return the redirect text, do not follow the
             redirect, do not raise an exception.
-
         :raises NoPageError: The page does not exist.
         :raises IsRedirectPageError: The page is a redirect.
         :raises SectionError: The section does not exist on a page with
@@ -394,7 +395,18 @@ class BasePage(ComparableMixin):
             if not get_redirect:
                 raise
 
-        return self.latest_revision.text  # type: ignore[attr-defined]
+        text = self.latest_revision.text
+
+        # check for valid section in title
+        page_section = self.section()
+        if page_section:
+            content = textlib.extract_sections(text, self.site)
+            headings = {section.heading for section in content.sections}
+            if page_section not in headings:
+                raise SectionError(f'{page_section!r} is not a valid section '
+                                   f'of {self.title(with_section=False)}')
+
+        return text
 
     def has_content(self) -> bool:
         """

@@ -22,6 +22,7 @@ from pywikibot.exceptions import (
     IsNotRedirectPageError,
     IsRedirectPageError,
     NoPageError,
+    SectionError,
     TimeoutError,
     UnknownExtensionError,
 )
@@ -974,6 +975,7 @@ class TestPageRedirects(TestCase):
 
     def testPageGet(self):
         """Test ``Page.get()`` on different types of pages."""
+        fail_msg = '{page!r}.get() raised {error!r} unexpectedly!'
         site = self.get_site('en')
         p1 = pywikibot.Page(site, 'User:Legoktm/R2')
         p2 = pywikibot.Page(site, 'User:Legoktm/R1')
@@ -986,8 +988,26 @@ class TestPageRedirects(TestCase):
                                     r'{} is a redirect page\.'
                                     .format(re.escape(str(p2)))):
             p2.get()
+
+        try:
+            p2.get(get_redirect=True)
+        except (IsRedirectPageError, NoPageError, SectionError) as e:
+            self.fail(fail_msg.format(page=p2, error=e))
+
         with self.assertRaisesRegex(NoPageError, NO_PAGE_RE):
             p3.get()
+
+        page = pywikibot.Page(site, 'User:Legoktm/R2#Section')
+        with self.assertRaisesRegex(SectionError,
+                                    "'Section' is not a valid section"):
+            page.get()
+
+        site = pywikibot.Site('mediawiki')
+        page = pywikibot.Page(site, 'Manual:Pywikibot/2.0 #See_also')
+        try:
+            page.get()
+        except (IsRedirectPageError, NoPageError, SectionError) as e:
+            self.fail(fail_msg.format(page=page, error=e))
 
     def test_set_redirect_target(self):
         """Test set_redirect_target method."""
