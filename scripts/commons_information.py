@@ -1,6 +1,38 @@
 #!/usr/bin/env python3
-"""
-This bot adds a language template to the file's description field.
+"""This bot adds a language template to the file's description field.
+
+The ``Information`` template is commonly used to provide formatting to
+the basic information for files (description, source, author, etc.). The
+``description`` field should provide brief but complete information
+about the image. The description format should use Language templates
+like ``{{En}}`` or ``{{De}}`` to specify the language of the description.
+This script adds these langage templates if missing. For example the
+description of
+
+.. code-block:: wikitext
+
+   {{Information
+    | Description = A simplified icon for [[Pywikibot]]
+    | Date = 2003-06-14
+    | Other fields =
+   }}
+
+will be analyzed as ``en`` language by ~100 % accurancy and the bot
+replaces its content by
+
+.. code-block:: wikitext
+   :emphasize-lines: 2
+
+   {{Information
+    | Description = {{en|A simplified icon for [[Pywikibot]]}}
+    | Date = 2003-06-14
+    | Other fields =
+   }}
+
+.. note:: ``langdetect`` package is needed for fully support of language
+   detection. Install it with::
+
+       pip install langdetect
 
 This script understands the following command-line arguments:
 
@@ -10,8 +42,12 @@ Usage:
 
     python pwb.py commons_information [pagegenerators]
 
-You can use any typical pagegenerator (like categories) to provide with a
-list of pages.
+You can use any typical pagegenerator (like categories) to provide with
+a list of pages. If no pagegenerator is given, transcluded pages from
+``Information`` template are used.
+
+.. hint:: This script uses ``commons`` site as default. For other sites
+   use the global ``-site`` option.
 
 Example for going through all files:
 
@@ -19,7 +55,8 @@ Example for going through all files:
 
 .. versionadded:: 6.0
 .. versionchanged:: 9.2
-   accelerated script with preloading pages.
+   accelerate script with preloading pages; use ``commons`` as default
+   site; use transcluded pages of ``Information`` template.
 """
 #
 # (C) Pywikibot team, 2015-2024
@@ -33,7 +70,7 @@ import copy
 import mwparserfromhell
 
 import pywikibot
-from pywikibot import i18n, pagegenerators
+from pywikibot import config, i18n, pagegenerators
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 
 # This is required for the text that is shown when you run this script
@@ -46,6 +83,9 @@ except ImportError:
     langdetect = None
 
 
+INFORMATION_TMPL = 'Information'
+
+
 class InformationBot(SingleSiteBot, ExistingPageBot):
 
     """Bot for the Information template."""
@@ -54,8 +94,8 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
     desc_params = ('Description', 'description')
 
     comment = {
-        'en': ('Bot: wrap the description parameter of Information in the '
-               'appropriate language template')
+        'en': (f'Bot: wrap the description parameter of {INFORMATION_TMPL} in'
+               ' the appropriate language template')
     }
 
     def __init__(self, **kwargs) -> None:
@@ -131,7 +171,8 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
         edited = False  # to prevent unwanted changes
 
         for template in code.ifilter_templates():
-            if not page.site.sametitle(template.name.strip(), 'Information'):
+            if not page.site.sametitle(template.name.strip(),
+                                       INFORMATION_TMPL):
                 continue
 
             desc = self.get_description(template)
@@ -186,18 +227,25 @@ def main(*args: str) -> None:
 
     :param args: command line arguments
     """
+    # set default family to commons
+    config.mylang = config.family = 'commons'
+
     local_args = pywikibot.handle_args(args)
     gen_factory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:
         gen_factory.handle_arg(arg)
 
+    site = pywikibot.Site()
     gen = gen_factory.getCombinedGenerator(preload=True)
-    if gen:
-        bot = InformationBot(generator=gen)
-        bot.run()
-    else:
-        pywikibot.bot.suggest_help(missing_generator=True)
+    if not gen:
+        tmpl = pywikibot.Page(site, INFORMATION_TMPL,
+                              ns=site.namespaces.TEMPLATE)
+        gen = tmpl.getReferences(only_template_inclusion=True,
+                                 namespaces=site.namespaces.FILE,
+                                 content=True)
+    bot = InformationBot(site=site, generator=gen)
+    bot.run()
 
 
 if __name__ == '__main__':
