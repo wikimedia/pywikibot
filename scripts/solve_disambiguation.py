@@ -107,6 +107,7 @@ from pywikibot.exceptions import (
     NoPageError,
     PageSaveRelatedError,
 )
+from pywikibot.site import Namespace
 from pywikibot.tools import first_lower, first_upper
 from pywikibot.tools.formatter import SequenceOutputter
 
@@ -1037,7 +1038,8 @@ class DisambiguationRobot(SingleSiteBot):
             if primary:
                 primary_page = pywikibot.Page(page.site,
                                               'Template:' + primary)
-            if primary and primary_page in page.templates():
+            if primary and primary_page in page.itertemplates(
+                    namespaces=Namespace.TEMPLATE):
                 baseTerm = page.title()
                 for template, params in page.templatesWithParams():
                     if params and template == primary_page:

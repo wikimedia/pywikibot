@@ -9,7 +9,7 @@ various pages for Proofread Extensions are defined in
    itself, including its contents.
 """
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -27,6 +27,7 @@ from pywikibot.exceptions import (
 )
 from pywikibot.page._basepage import BasePage
 from pywikibot.page._toolforge import WikiBlameMixin
+from pywikibot.site import Namespace
 from pywikibot.tools import cached
 
 
@@ -58,7 +59,9 @@ class Page(BasePage, WikiBlameMixin):
         """
         return textlib.extract_templates_and_params(self.text, True, True)
 
-    def templatesWithParams(self):  # noqa: N802
+    def templatesWithParams(  # noqa: N802
+        self,
+    ) -> list[tuple[pywikibot.Page, list[str]]]:
         """Return templates used on this Page.
 
         The templates are extracted by :meth:`raw_extracted_templates`,
@@ -68,14 +71,14 @@ class Page(BasePage, WikiBlameMixin):
         All parameter keys and values for each template are stripped of
         whitespace.
 
-        :return: a list of tuples with one tuple for each template invocation
-            in the page, with the template Page as the first entry and a list
-            of parameters as the second entry.
-        :rtype: list of (pywikibot.page.Page, list)
+        :return: a list of tuples with one tuple for each template
+            invocation in the page, with the template Page as the first
+            entry and a list of parameters as the second entry.
         """
         # WARNING: may not return all templates used in particularly
         # intricate cases such as template substitution
-        titles = {t.title() for t in self.templates()}
+        titles = {t.title()
+                  for t in self.itertemplates(namespaces=Namespace.TEMPLATE)}
         templates = self.raw_extracted_templates
         # backwards-compatibility: convert the dict returned as the second
         # element into a list in the format used by old scripts
@@ -83,7 +86,7 @@ class Page(BasePage, WikiBlameMixin):
         for template in templates:
             try:
                 link = pywikibot.Link(template[0], self.site,
-                                      default_namespace=10)
+                                      default_namespace=Namespace.TEMPLATE)
                 if link.canonical_title() not in titles:
                     continue
             except Error:

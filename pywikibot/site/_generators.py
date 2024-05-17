@@ -504,21 +504,29 @@ class GeneratorsMixin:
         self,
         page: pywikibot.Page,
         *,
+        content: bool = False,
         namespaces: NamespaceArgType = None,
         total: int | None = None,
-        content: bool = False,
     ) -> Iterable[pywikibot.Page]:
-        """Iterate templates transcluded (not just linked) on the page.
+        """Iterate pages transcluded (not just linked) on the page.
 
-        .. seealso:: :api:`Templates`
+        .. note: You should not use this method directly; use
+           :meth:`pywikibot.Page.itertemplates` instead.
 
+        .. seealso::
+           - :api:`Templates`
+           - :meth:`page.BasePage.itertemplates`
+
+        :param content: if True, load the current content of each
+            iterated page (default False)
         :param namespaces: Only iterate pages in these namespaces
-        :param content: if True, load the current content of each iterated page
-            (default False)
+        :param total: maximum number of pages to retrieve in total
 
         :raises KeyError: a namespace identifier was not resolved
         :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
+        :raises UnsupportedPageError: a Page object is not supported due
+            to namespace restriction
         """
         tltitle = page.title(with_section=False).encode(self.encoding())
         return self._generator(api.PageGenerator, type_arg='templates',

@@ -38,7 +38,7 @@ For example to go through all categories:
 # *Found one template. Add this template
 # *Found more templates. Ask the user <- still have to implement this
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -50,6 +50,7 @@ import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import ConfigParserBot, ExistingPageBot
 from pywikibot.exceptions import InvalidTitleError
+from pywikibot.site import Namespace
 from pywikibot.textlib import add_text
 
 
@@ -264,8 +265,9 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
 
         for template in templates_to_ignore:
             if not isinstance(template, tuple):
-                for pageTemplate in page.templates():
-                    if pageTemplate.title(with_ns=False) == template:
+                for page_template in page.itertemplates(
+                        namespaces=Namespace.TEMPLATE):
+                    if page_template.title(with_ns=False) == template:
                         return True
             else:
                 for inPageTemplate, params in page.templatesWithParams():
@@ -512,7 +514,7 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
                 commonsPage.getRedirectTarget().title(with_ns=False))
 
         if (pywikibot.Page(commonsPage.site, 'Template:Category redirect')
-                in commonsPage.templates()):
+                in commonsPage.itertemplates(namespaces=Namespace.TEMPLATE)):
             pywikibot.log(
                 'getCommonscat: The category is a category redirect')
             for template, param in commonsPage.templatesWithParams():
