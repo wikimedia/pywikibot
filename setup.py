@@ -64,7 +64,8 @@ extra_deps = {
         'flake8-string-format',
         'flake8-tuple>=0.4.1',
         'flake8-no-u-prefixed-strings>=0.2',
-        'pep8-naming>=0.13.3',
+        'pep8-naming==0.13.3; python_version < "3.8"',
+        'pep8-naming>=0.14.0; python_version >= "3.8"',
     ],
     'hacking': [
         'hacking',
