@@ -31,16 +31,6 @@ def noop(foo=None):
     return decorator
 
 
-@add_full_name
-def noop2():
-    """Dummy decorator."""
-    def decorator(obj):
-        def wrapper(*args, **kwargs):
-            raise Exception(obj.__full_name__)
-        return wrapper
-    return decorator
-
-
 @noop()
 def decorated_func():
     """Test dummy decorator."""
