@@ -1288,17 +1288,19 @@ class PwbTestCase(TestCase):
 
     """Test cases use :mod:`pwb` to invoke scripts.
 
-    Test cases which use pwb typically also access a site, and use the network.
-    Even during initialisation, scripts may call pywikibot.handle_args, which
-    initialises loggers and uses the network to determine if the code is stale.
+    Test cases which use pwb typically also access a site, and use the
+    network. Even during initialisation, scripts may call
+    :func:`pywikibot.handle_args`, which initialises loggers and uses
+    the network to determine if the code is stale.
 
-    The flag 'pwb' is used by the TestCase metaclass to check that a test site
-    is set declared in the class properties, or that 'site = False' is added
-    to the class properties in the unlikely scenario that the test case
-    uses pwb in a way that doesn't use a site.
+    The flag 'pwb' is used by the TestCase metaclass to check that a
+    test site is set declared in the class properties, or that
+    :code:`site = False` is added to the class properties in the
+    unlikely scenario that the test case uses pwb in a way that doesn't
+    use a site.
 
-    If a test class is marked as 'site = False', the metaclass will also check
-    that the 'net' flag is explicitly set.
+    If a test class is marked as :code:`site = False , the metaclass
+    will also check that the ``net`` flag is explicitly set.
     """
 
     pwb = True

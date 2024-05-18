@@ -30,9 +30,8 @@ class TestThankRevision(TestCase):
     def test_thank_revision(self):
         """Test thanks for normal revisions.
 
-        .. note:: This test relies on activity in recentchanges, and
-           there must make edits made before reruns of this test.
-        .. seealso:: :phab:`T137836`.
+        This test relies on activity in recentchanges, and there must
+        make edits made before reruns of this test; see :phab:`T137836`.
         """
         site = self.get_site()
         data = site.recentchanges(total=20)

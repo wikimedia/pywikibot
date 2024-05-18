@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-"""Test cases for the :mod:`version` module.
-
-.. versionadded:: 9.2
-"""
+"""Test cases for the :mod:`version` module."""
 #
 # (C) Pywikibot team, 2024
 #
