@@ -1,11 +1,14 @@
 Current release
 ---------------
 
+* Raise :exc:`exceptions.SectionError` if a section does not exists on a page (:phab:`T107141`)
 * Retry api request on ServerError (:phab:`T364275`, :phab:`T364393`)
 
 Deprecations
 ------------
 
+* 9.2.0: *total* argument in ``-logevents`` pagegenrators option is deprecated;
+  use ``-limit`` instead (:phab:`T128981`)
 * 9.0.0: The *content* parameter of :meth:`proofreadpage.IndexPage.page_gen` is deprecated and will be ignored
   (:phab:`T358635`)
 * 9.0.0: ``userinterfaces.transliteration.transliterator`` was renamed to :class:`Transliterator

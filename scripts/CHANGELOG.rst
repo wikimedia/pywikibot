@@ -7,6 +7,8 @@ Scripts Changelog
 commons_information
 ^^^^^^^^^^^^^^^^^^^
 
+* Do not remove valid description parts of Information template (:phab:`T364640`)
+* Use transclusions of Information template as default generator
 * Preload pages to make the script upto 10 times faster
 
 noreferences
