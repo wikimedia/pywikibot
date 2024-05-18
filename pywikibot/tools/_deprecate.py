@@ -19,7 +19,7 @@ a deprecator without any arguments.
    deprecation decorators moved to _deprecate submodule
 """
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -36,6 +36,7 @@ from inspect import getfullargspec
 from typing import Any
 from warnings import warn
 
+from pywikibot.backports import NoneType
 from pywikibot.tools import SPHINX_RUNNING
 
 
@@ -309,10 +310,12 @@ if not SPHINX_RUNNING:
     deprecated = add_full_name(deprecated)
 
 
-def deprecate_arg(old_arg: str, new_arg: str | bool | None):
+def deprecate_arg(old_arg: str, new_arg: str | None = None):
     """Decorator to declare old_arg deprecated and replace it with new_arg.
 
-    Usage:
+    **Usage:**
+
+    .. code-block:: python
 
         @deprecate_arg('foo', 'bar')
         def my_function(bar='baz'): pass
@@ -323,9 +326,12 @@ def deprecate_arg(old_arg: str, new_arg: str | bool | None):
         # ignores 'foo' keyword no longer used by my_function
 
     :func:`deprecated_args` decorator should be used in favour of this
-    ``deprecate_arg`` decorator but it is held to deprecate args which
-    become a reserved word in future Python releases and to prevent
-    syntax errors.
+    ``deprecate_arg`` decorator but it is held to deprecate args of
+    reserved words even for future Python releases and to prevent syntax
+    errors.
+
+    .. versionchanged:: 9.2
+       bool type of *new_arg* is no longer supported.
 
     :param old_arg: old keyword
     :param new_arg: new keyword
@@ -333,21 +339,29 @@ def deprecate_arg(old_arg: str, new_arg: str | bool | None):
     return deprecated_args(**{old_arg: new_arg})
 
 
-def deprecated_args(**arg_pairs):
+def deprecated_args(**arg_pairs: str | None):
     """Decorator to declare multiple args deprecated.
 
-    Usage:
+    **Usage:**
+
+    .. code-block:: python
 
         @deprecated_args(foo='bar', baz=None)
         def my_function(bar='baz'): pass
         # replaces 'foo' keyword by 'bar' and ignores 'baz' keyword
 
+    .. versionchanged:: 3.0.20200703
+       show a FutureWarning if the *arg_pairs* value is True; don't show
+       a warning if the value is an empty string.
+    .. versionchanged:: 6.4
+       show a FutureWarning for renamed arguments
+    .. versionchanged:: 9.2
+       bool type argument is no longer supported.
+
     :param arg_pairs: Each entry points to the new argument name. If an
-        argument is to be removed, the value may be one of the following:
-        - None: shows a DeprecationWarning
-        - False: shows a PendingDeprecationWarning
-        - True: shows a FutureWarning (only once)
-        - empty string: no warning is printed
+        argument is to be removed, the value may be either an empty str
+        or ``None``; the later also shows a `FutureWarning` once.
+    :raises TypeError: *arg_pairs* value is neither str nor None or
     """
     def decorator(obj):
         """Outer wrapper.
@@ -376,15 +390,18 @@ def deprecated_args(**arg_pairs):
                 if old_arg not in __kw:
                     continue
 
-                if new_arg not in [True, False, None, '']:
+                if not isinstance(new_arg, (str, NoneType)):
+                    raise TypeError(
+                        f'deprecated_arg value for {old_arg} of {name} must '
+                        f'be either str or None, not {type(new_arg).__name__}')
+
+                if new_arg:
                     if new_arg in __kw:
                         warn('{new_arg} argument of {name} '
                              'replaces {old_arg}; cannot use both.'
                              .format_map(output_args),
                              RuntimeWarning, depth)
                     else:
-                        # If the value is positionally given this will
-                        # cause a TypeError, which is intentional
                         warn('{old_arg} argument of {name} '
                              'is deprecated; use {new_arg} instead.'
                              .format_map(output_args),
@@ -393,15 +410,9 @@ def deprecated_args(**arg_pairs):
                 elif new_arg == '':
                     pass
                 else:
-                    if new_arg is False:
-                        cls = PendingDeprecationWarning
-                    elif new_arg is True:
-                        cls = FutureWarning
-                    else:  # new_arg is None
-                        cls = DeprecationWarning
                     warn('{old_arg} argument of {name} is deprecated.'
                          .format_map(output_args),
-                         cls, depth)
+                         FutureWarning, depth)
                 del __kw[old_arg]
 
             return obj(*__args, **__kw)

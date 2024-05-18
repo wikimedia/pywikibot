@@ -116,10 +116,12 @@ else:
     removesuffix = str.removesuffix  # type: ignore[assignment]
 
 
-# bpo-38200
 if PYTHON_VERSION < (3, 10) or SPHINX_RUNNING:
     from itertools import tee
 
+    NoneType = type(None)
+
+    # bpo-38200
     def pairwise(iterable):
         """Return successive overlapping pairs taken from the input iterable.
 
@@ -132,6 +134,7 @@ if PYTHON_VERSION < (3, 10) or SPHINX_RUNNING:
         next(b, None)
         return zip(a, b)
 else:
+    from types import NoneType
     from itertools import pairwise  # type: ignore[no-redef]
 
 
