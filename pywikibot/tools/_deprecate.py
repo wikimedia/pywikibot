@@ -36,6 +36,8 @@ from inspect import getfullargspec
 from typing import Any
 from warnings import warn
 
+from pywikibot.tools import SPHINX_RUNNING
+
 
 class _NotImplementedWarning(RuntimeWarning):
 
@@ -211,20 +213,18 @@ def issue_deprecation_warning(name: str,
     warn(msg.format(name, instead), warning_class, depth + 1)
 
 
-@add_full_name
 def deprecated(*args, **kwargs):
     """Decorator to output a deprecation warning.
 
     .. versionchanged:: 7.0
        `since` keyword must be a release number, not a timestamp.
 
-    :keyword instead: if provided, will be used to specify the replacement
-    :type instead: str
-    :keyword since: a version string string when the method was deprecated
-    :type since: str
-    :keyword future_warning: if True a FutureWarning will be thrown,
+    :keyword str instead: if provided, will be used to specify the
+        replacement
+    :keyword str since: a version string string when the method was
+        deprecated
+    :keyword bool future_warning: if True a FutureWarning will be thrown,
         otherwise it provides a DeprecationWarning
-    :type future_warning: bool
     """
     def decorator(obj):
         """Outer wrapper.
@@ -302,6 +302,11 @@ def deprecated(*args, **kwargs):
 
     # Otherwise return a decorator, which returns a replacement function
     return decorator
+
+
+if not SPHINX_RUNNING:
+    # T365286: decorate deprecated function with add_full_name
+    deprecated = add_full_name(deprecated)
 
 
 def deprecate_arg(old_arg: str, new_arg: str | bool | None):
