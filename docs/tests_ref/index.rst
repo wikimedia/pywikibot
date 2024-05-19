@@ -10,7 +10,6 @@ Subpackages
 
 .. toctree::
 
-    i18n
     pwb
 
 **************
