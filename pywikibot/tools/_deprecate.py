@@ -174,7 +174,7 @@ def _build_msg_string(instead: str | None, since: str | None) -> str:
        `since`parameter must be a release number, not a timestamp.
 
     :param instead: suggested replacement for the deprecated object
-    :param since: a version string string when the method was deprecated
+    :param since: a version string when the method or function was deprecated
     """
     if since and '.' not in since:
         raise ValueError(f'{since} is not a valid release number')
@@ -204,7 +204,7 @@ def issue_deprecation_warning(name: str,
     :param depth: depth + 1 will be used as stacklevel for the warnings
     :param warning_class: a warning class (category) to be used,
         defaults to FutureWarning
-    :param since: a version string string when the method was deprecated
+    :param since: a version string when the method or function was deprecated
     """
     msg = _build_msg_string(instead, since)
     if warning_class is None:
@@ -221,7 +221,7 @@ def deprecated(*args, **kwargs):
 
     :keyword str instead: if provided, will be used to specify the
         replacement
-    :keyword str since: a version string string when the method was
+    :keyword str since: a version string when the method or function was
         deprecated
     :keyword bool future_warning: if True a FutureWarning will be thrown,
         otherwise it provides a DeprecationWarning
@@ -525,7 +525,7 @@ def redirect_func(target, *,
         new function.
     :param class_name: The name of the class. It's added to the target and
         source module (separated by a '.').
-    :param since: a version string string when the method was deprecated
+    :param since: a version string when the method or function was deprecated
     :param future_warning: if True a FutureWarning will be thrown,
         otherwise it provides a DeprecationWarning
     :return: A new function which adds a warning prior to each execution.
@@ -602,7 +602,8 @@ class ModuleDeprecationWrapper(types.ModuleType):
             object name, and evaluated when the deprecated object is needed.
         :param warning_message: The warning to display, with positional
             variables: {0} = module, {1} = attribute name, {2} = replacement.
-        :param since: a version string string when the method was deprecated
+        :param since: a version string when the method or function was
+            deprecated
         :param future_warning: if True a FutureWarning will be thrown,
             otherwise it provides a DeprecationWarning
         """
