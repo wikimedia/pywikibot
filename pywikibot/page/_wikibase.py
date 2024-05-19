@@ -477,8 +477,8 @@ class MediaInfo(WikibaseEntity):
                 error_message = str(exc)
                 if 'is not a file' in error_message:
                     raise NoWikibaseEntityError(self) from exc
-                else:
-                    raise Error(self) from exc
+
+                raise Error(self) from exc
 
             # Create _content. Format is same as with wbgetentities
             # https://commons.wikimedia.org/w/api.php?action=wbgetentities&ids=M20985340

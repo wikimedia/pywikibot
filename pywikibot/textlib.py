@@ -2276,8 +2276,8 @@ class TimeStripper:
                     f"incorrect month name {dateDict['month']['value']!r} "
                     f'in page in site {self.site}'
                 )
-            else:
-                dateDict['month']['value'] = value
+
+            dateDict['month']['value'] = value
 
             # convert to integers and remove the inner dict
             for k, v in dateDict.items():

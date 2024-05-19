@@ -44,7 +44,7 @@ The following command line parameters are supported:
 &params;
 """
 #
-# (C) Pywikibot team, 2013-2023
+# (C) Pywikibot team, 2013-2024
 #
 # Distributed under the terms of MIT license.
 #
@@ -144,14 +144,15 @@ class CoordImportRobot(ConfigParserBot, WikidataBot):
             newclaim.addSource(source)
         pywikibot.info(
             f'Adding {coordinate.lat}, {coordinate.lon} to {item.title()}')
+
         # todo: handle exceptions using self.user_add_claim
         try:
             item.addClaim(newclaim)
         except CoordinateGlobeUnknownError as e:
             pywikibot.info(f'Skipping unsupported globe: {e.args}')
             return False
-        else:
-            return True
+
+        return True
 
 
 def main(*args: str) -> None:

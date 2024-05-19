@@ -1764,8 +1764,8 @@ class BasePage(ComparableMixin):
             lastmove = next(gen)
         except StopIteration:
             raise NoMoveTargetError(self)
-        else:
-            return lastmove.target_page
+
+        return lastmove.target_page
 
     def revisions(self,
                   reverse: bool = False,

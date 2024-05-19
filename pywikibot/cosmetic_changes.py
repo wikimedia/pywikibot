@@ -309,10 +309,10 @@ class CosmeticChangesToolkit:
                 pywikibot.error(e)
                 return False
             raise
-        else:
-            if self.show_diff:
-                pywikibot.showDiff(text, new_text)
-            return new_text
+
+        if self.show_diff:
+            pywikibot.showDiff(text, new_text)
+        return new_text
 
     def fixSelfInterwiki(self, text: str) -> str:
         """

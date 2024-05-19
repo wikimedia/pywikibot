@@ -29,7 +29,7 @@ Furthermore, the following command line parameters are supported:
    can be set within a settings file which is scripts.ini by default.
 """
 
-# (C) Pywikibot team, 2015-2023
+# (C) Pywikibot team, 2015-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -229,9 +229,9 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
         except APIError:
             # warning already printed by the API
             return False
-        else:
-            target_item.get(force=True)
-            return target_item
+
+        target_item.get(force=True)
+        return target_item
 
 
 def main(*args: str) -> None:

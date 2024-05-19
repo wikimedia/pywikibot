@@ -848,10 +848,8 @@ class ProofreadPage(pywikibot.Page):
             url_image = url_image['src']
         except (TypeError, AttributeError):
             raise ValueError(f'No prp-page-image src found for {self}.')
-        else:
-            url_image = 'https:' + url_image
 
-        return url_image
+        return 'https:' + url_image
 
     def _url_image_ge_140(self) -> str:
         """Get the file url of the scan of ProofreadPage.
@@ -865,8 +863,8 @@ class ProofreadPage(pywikibot.Page):
         url = self._imageforpage.get('fullsize')
         if url is not None:
             return f'{self.site.family.protocol(self.site.code)}:{url}'
-        else:
-            raise ValueError(f'imagesforpage is empty for {self}.')
+
+        raise ValueError(f'imagesforpage is empty for {self}.')
 
     @property
     @cached
