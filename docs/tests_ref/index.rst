@@ -4,13 +4,6 @@ Tests reference
 
 .. include:: ../../tests/README.rst
 
-***********
-Subpackages
-***********
-
-.. toctree::
-
-    pwb
 
 **************
 Test utilities
