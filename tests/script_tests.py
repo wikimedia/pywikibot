@@ -85,6 +85,7 @@ auto_run_script_set = {
     'category_redirect',
     'checkimages',
     'clean_sandbox',
+    'commons_information',
     'create_isbn_edition',
     'delinker',
     'login',
