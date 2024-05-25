@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test confirming paraminfo contains expected values."""
 #
-# (C) Pywikibot team, 2015-2023
+# (C) Pywikibot team, 2015-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -216,7 +216,7 @@ class WikibaseKnownTypesTests(KnownTypesTestBase,
 
     def test_entities(self):
         """Test known entities."""
-        unsupported = {'form', 'lexeme', 'sense'}  # T195435
+        unsupported = {'entity-schema', 'form', 'lexeme', 'sense'}  # T195435
         supported = {'item', 'property'}
         known = supported | unsupported
         self._check_param_superset(
