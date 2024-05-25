@@ -364,6 +364,7 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
     _expected_failures = {
         'catall',          # stdout user interaction
         'checkimages',
+        'commons_information',  # no empty out_result
         'revertbot',
         'transwikiimport',
     }
