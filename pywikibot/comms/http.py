@@ -433,9 +433,8 @@ def fetch(uri: str, method: str = 'GET', headers: dict | None = None,
     auth = get_authentication(uri)
     if auth is not None and len(auth) == 4:
         if isinstance(requests_oauthlib, ImportError):
-            warn(str(requests_oauthlib), ImportWarning)
-            error(f'OAuth authentication not supported: {requests_oauthlib}')
-            auth = None
+            pywikibot.error(requests_oauthlib)
+            sys.exit(1)
         else:
             auth = requests_oauthlib.OAuth1(*auth)
 
