@@ -175,6 +175,8 @@ fake_user_agent_exceptions: dict[str, bool | str] = {}
 site_interface = 'APISite'
 # number of days to cache namespaces, api configuration, etc.
 API_config_expiry = 30
+# userinfo expiry
+API_uinfo_expiry = 1
 
 # The maximum number of bytes which uses a GET request, if not positive
 # it'll always use POST requests
