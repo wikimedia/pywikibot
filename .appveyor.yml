@@ -69,7 +69,6 @@ install:
   - if [%PYTHON_VERSION%]==[3.7.0] pip install "urllib3<2.0"
   - if [%PYTHON_VERSION%]==[3.7.0] pip install -U setuptools
   - if [%PYTHON_VERSION%]==[3.12.x] pip install -U setuptools
-  - if [%PYTHON_ARCH%]==[32] pip install "Pillow >= 8.1.2, != 10.0, != 10.1"
   - pip install -r requirements.txt
   - pip install -r dev-requirements.txt
   - pip install wikitextparser
