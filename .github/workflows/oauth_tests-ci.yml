@@ -12,7 +12,6 @@ concurrency:
 env:
   PYWIKIBOT_TEST_RUNNING: 1
   PYWIKIBOT_USERNAME: Pywikibot-oauth
-  PYWIKIBOT_LOGIN_LOGOUT: 1
 
 jobs:
   build:
@@ -98,6 +97,7 @@ jobs:
     - name: Oauth tests with unittest
       timeout-minutes: 2
       env:
+        PYWIKIBOT_TEST_WRITE: ${{ matrix.domain == 'test.wikipedia.org' && 1 || 0}}
         PYWIKIBOT_TEST_OAUTH: ${{ secrets[format('{0}', steps.token.outputs.uppercase)] }}
       run: |
         python pwb.py version
