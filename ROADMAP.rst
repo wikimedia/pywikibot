@@ -1,7 +1,6 @@
 Current release
 ---------------
 
-* Use :class:`data.api.CachedRequest` for userinfo requests (:phab:`T348925`)
 * Raise :exc:`exceptions.SectionError` if a section does not exists on a page (:phab:`T107141`)
 * Retry api request on ServerError (:phab:`T364275`, :phab:`T364393`)
 

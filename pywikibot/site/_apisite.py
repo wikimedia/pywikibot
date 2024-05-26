@@ -648,10 +648,6 @@ class APISite(
         .. seealso:: :api:`Userinfo`
         .. versionchanged:: 8.0
            Use API formatversion 2.
-        .. versionchanged:: 9.2
-           API call is made through :class:`data.api.CachedRequest` with
-           expiry is set in ``API_uinfo_expiry`` within
-           :ref:`Account settings`.
 
         :return: A dict with the following keys and values:
 
@@ -665,14 +661,11 @@ class APISite(
 
         """
         if not hasattr(self, '_userinfo'):
-            uirequest = self._request(
-                expiry=pywikibot.config.API_uinfo_expiry,
-                parameters={
-                    'action': 'query',
-                    'meta': 'userinfo',
-                    'uiprop': 'blockinfo|hasmsg|groups|rights|ratelimits',
-                    'formatversion': 2,
-                }
+            uirequest = self.simple_request(
+                action='query',
+                meta='userinfo',
+                uiprop='blockinfo|hasmsg|groups|rights|ratelimits',
+                formatversion=2,
             )
             uidata = uirequest.submit()
             assert 'query' in uidata, \
