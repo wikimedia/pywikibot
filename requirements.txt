@@ -41,7 +41,6 @@ python-stdnum >= 1.19
 
 # GUI
 Pillow >= 8.1.2, != 10.0, != 10.1 ; python_version < '3.13'
-Pillow >= 10.4 ; python_version >= '3.13'
 
 # core pagegenerators
 google >= 1.7
