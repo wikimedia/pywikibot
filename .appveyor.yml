@@ -97,5 +97,7 @@ on_finish:
   - ps: |
       $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
       coverage report
-  - pip install codecov-cli
-  - codecovcli do-upload
+
+  # ignore codecov-cli for Python 3.11 due to T365943
+  - if [%PYTHON_VERSION%]!=[3.11.x] pip install codecov-cli
+  - if [%PYTHON_VERSION%]!=[3.11.x] codecovcli do-upload
