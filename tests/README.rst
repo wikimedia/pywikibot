@@ -105,6 +105,16 @@ Environment variables
 
     PYWIKIBOT_TEST_GUI=1
 
+**PYWIKIBOT_TEST_LOGOUT**
+  Used when a test is logging out the test user. This environment variable
+  enables :mod:`tests.site_login_logout_tests`. The environment setting is
+  needed to ensure that these tests run in their own test action and does not
+  interfere with other tests. Otherwise they could fail if the test user is
+  logged out by the test. Only one instance must run this test script. Set this
+  environment variable to run this test locally::
+
+    PYWIKIBOT_TEST_LOGOUT=1
+
 **PYWIKIBOT_TEST_MODULES**
   Only run tests given with this environment variable. Multiple tests must be
   separated by a ``,`` without any white space. Available library tests are

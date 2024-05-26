@@ -10,8 +10,8 @@ on:
 
 env:
   PYWIKIBOT_TEST_RUNNING: 1
+  PYWIKIBOT_TEST_LOGOUT: 1
   PYWIKIBOT_USERNAME: Pywikibot-test
-  PYWIKIBOT_LOGIN_LOGOUT: 1
 
 jobs:
   build:
