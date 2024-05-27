@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """FilePage tests."""
 #
-# (C) Pywikibot team, 2014-2023
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -259,7 +259,7 @@ class TestFilePageLatestFileInfo(TestCase):
         self.assertEqual(self.image.latest_file_info.thumbwidth, 100)
         self.assertEqual(self.image.latest_file_info.thumbheight, 133)
 
-    def test_get_file_url_thumburl_from_heigth(self):
+    def test_get_file_url_thumburl_from_height(self):
         """Get File thumburl from height."""
         self.assertTrue(self.image.exists())
         # url_param has no precedence over height/width.
