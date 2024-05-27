@@ -673,7 +673,7 @@ class BasePage(ComparableMixin):
             if sentences:
                 raise NotImplementedError(
                     "'wiki' variant of extract method does not support "
-                    "'sencence' parameter")
+                    "'sentences' parameter")
 
             extract = self.text[:]
             if intro:
