@@ -1,24 +1,13 @@
-"""
-Objects used with ProofreadPage Extension.
-
-This module includes objects:
-
-* ProofreadPage(Page)
-* FullHeader
-* IndexPage(Page)
-
+"""Objects used with ProofreadPage Extension.
 
 OCR support of page scans via:
-- https://phetools.toolforge.org/hocr_cgi.py
-- https://phetools.toolforge.org/ocr.php
-- inspired by https://en.wikisource.org/wiki/MediaWiki:Gadget-ocr.js
 
-- Wikimedia OCR
-- see: https://www.mediawiki.org/wiki/Help:Extension:Wikisource/Wikimedia_OCR
+- Wikimedia OCR, see:
+  https://www.mediawiki.org/wiki/Help:Extension:Wikisource/Wikimedia_OCR
+- https://ocr.wmcloud.org/, inspired by
+  https://wikisource.org/wiki/MediaWiki:GoogleOCR.js
 
-- https://ocr.wmcloud.org/
-- inspired by https://wikisource.org/wiki/MediaWiki:GoogleOCR.js
-- see also: https://wikisource.org/wiki/Wikisource:Google_OCR
+.. seealso:: https://wikisource.org/wiki/Wikisource:Google_OCR
 
 """
 #
@@ -421,13 +410,6 @@ class ProofreadPage(pywikibot.Page):
     p_close = re.compile(r'(</div>|\n\n\n)?</noinclude>')
     p_close_no_div = re.compile('</noinclude>')  # V2 page format.
 
-    # phetools ocr utility
-    _HOCR_CMD = ('https://phetools.toolforge.org/hocr_cgi.py?'
-                 'cmd=hocr&book={book}&lang={lang}&user={user}')
-
-    _OCR_CMD = ('https://phetools.toolforge.org/ocr.php?'
-                'cmd=ocr&url={url_image}&lang={lang}&user={user}')
-
     # Wikimedia OCR utility
     _WMFOCR_CMD = ('https://ocr.wmcloud.org/api.php?engine=tesseract&'
                    'langs[]={lang}&image={url_image}&uselang={lang}')
@@ -438,14 +420,10 @@ class ProofreadPage(pywikibot.Page):
 
     _MULTI_PAGE_EXT = ['djvu', 'pdf']
 
-    _PHETOOLS = 'phetools'
     _WMFOCR = 'wmfOCR'
     _GOOGLE_OCR = 'googleOCR'
-    _OCR_CMDS = {_PHETOOLS: _OCR_CMD,
-                 _WMFOCR: _WMFOCR_CMD,
-                 _GOOGLE_OCR: _GOCR_CMD,
-                 }
-    _OCR_METHODS = list(_OCR_CMDS.keys())
+    _OCR_CMDS = {_WMFOCR: _WMFOCR_CMD, _GOOGLE_OCR: _GOCR_CMD}
+    _OCR_METHODS = list(_OCR_CMDS)
 
     def __init__(self, source: PageSourceType, title: str = '') -> None:
         """Instantiate a ProofreadPage object.
@@ -883,10 +861,12 @@ class ProofreadPage(pywikibot.Page):
 
         return self._url_image_ge_140()
 
-    def _ocr_callback(self, cmd_uri: str,
-                      parser_func: Callable[[str], str] | None = None,
-                      ocr_tool: str | None = None
-                      ) -> tuple[bool, str | Exception]:
+    def _ocr_callback(
+        self,
+        cmd_uri: str,
+        parser_func: Callable[[str], str] | None = None,
+        ocr_tool: str | None = None,
+    ) -> tuple[bool, str | Exception]:
         """OCR callback function.
 
         :return: tuple (error, text [error description in case of error]).
@@ -903,7 +883,7 @@ class ProofreadPage(pywikibot.Page):
         if not callable(parser_func):
             raise TypeError('Keyword parser_func must be callable.')
 
-        if ocr_tool not in self._OCR_METHODS:
+        if ocr_tool not in self._OCR_CMDS:
             raise TypeError(
                 f"ocr_tool must be in {self._OCR_METHODS}, not '{ocr_tool}'.")
 
@@ -931,53 +911,16 @@ class ProofreadPage(pywikibot.Page):
 
         data = response.json()
 
-        if ocr_tool == self._PHETOOLS:  # phetools
-            assert 'error' in data, f'Error from phetools: {data}'
-            assert data['error'] in [0, 1, 2, 3], \
-                f'Error from phetools: {data}'
-            error, _text = bool(data['error']), data['text']
-        else:  # googleOCR
-            if 'error' in data:
-                error, _text = True, data['error']
-            else:
-                error, _text = False, data['text']
+        if 'error' in data:
+            error, _text = True, data['error']
+        else:
+            error, _text = False, data['text']
 
         if error:
             pywikibot.error(f'OCR query {cmd_uri}: {_text}')
             return error, _text
+
         return error, parser_func(_text)
-
-    def _do_hocr(self) -> tuple[bool, str | Exception]:
-        """Do hocr using https://phetools.toolforge.org/hocr_cgi.py?cmd=hocr.
-
-        This is the main method for 'phetools'.
-        Fallback method is ocr.
-
-        :raise ImportError: if bs4 is not installed, _bs4_soup() will raise
-        """
-        def parse_hocr_text(txt: str) -> str:
-            """Parse hocr text."""
-            soup = _bs4_soup(txt)  # type: ignore
-
-            res = []
-            for _ocr_page in soup.find_all(class_='ocr_page'):
-                for area in soup.find_all(class_='ocr_carea'):
-                    for par in area.find_all(class_='ocr_par'):
-                        for line in par.find_all(class_='ocr_line'):
-                            res.append(line.get_text())
-                        res.append('\n')
-            return ''.join(res)
-
-        params = {
-            'book': self.title(as_url=True, with_ns=False),
-            'lang': self.site.lang,
-            'user': self.site.user(),
-        }
-        cmd_uri = self._HOCR_CMD.format_map(params)
-
-        return self._ocr_callback(cmd_uri,
-                                  parser_func=parse_hocr_text,
-                                  ocr_tool=self._PHETOOLS)
 
     def _do_ocr(self, ocr_tool: str | None = None
                 ) -> tuple[bool, str | Exception]:
@@ -990,8 +933,8 @@ class ProofreadPage(pywikibot.Page):
             return True, error_text
 
         if ocr_tool is None:
-            msg = 'ocr_tool required, must be among {}'
-            raise TypeError(msg.format(self._OCR_METHODS))
+            raise TypeError(
+                f'ocr_tool required, must be among {self._OCR_METHODS}')
 
         try:
             cmd_fmt = self._OCR_CMDS[ocr_tool]
@@ -1011,38 +954,34 @@ class ProofreadPage(pywikibot.Page):
     def ocr(self, ocr_tool: str | None = None) -> str:
         """Do OCR of ProofreadPage scan.
 
-        The text returned by this function shall be assigned to self.body,
-        otherwise the ProofreadPage format will not be maintained.
+        The text returned by this function shall be assigned to
+        :attr:`body`, otherwise the ProofreadPage format will not be
+        maintained.
 
-        It is the user's responsibility to reset quality level accordingly.
+        .. warning:: It is the user's responsibility to reset quality
+           level accordingly.
 
-        :param ocr_tool: 'phetools', 'wmfOCR' or 'googleOCR';
-            default is 'phetools'
+        .. versionchanged:: 9.2
+           default for *ocr_tool* is `wmfOCR`.
+        .. versionremoved:: 9.2
+           `phetools` support is not available anymore.
 
+        :param ocr_tool: 'wmfOCR' or 'googleOCR'; default is 'wmfOCR'
         :return: OCR text for the page.
-
         :raise TypeError: wrong ocr_tool keyword arg.
         :raise ValueError: something went wrong with OCR process.
         """
         if ocr_tool is None:  # default value
-            ocr_tool = self._PHETOOLS
+            ocr_tool = self._WMFOCR
 
-        if ocr_tool not in self._OCR_METHODS:
+        if ocr_tool not in self._OCR_CMDS:
             raise TypeError(
-                f"ocr_tool must be in {self._OCR_METHODS}, not '{ocr_tool}'.")
-
-        # if _multi_page, try _do_hocr() first and fall back to _do_ocr()
-        if ocr_tool == self._PHETOOLS and self._multi_page:
-            error, text = self._do_hocr()
-            if not error and isinstance(text, str):
-                return text
-            pywikibot.warning(
-                f'{self}: phetools hocr failed, falling back to ocr.')
+                f'ocr_tool must be in {self._OCR_METHODS}, not {ocr_tool!r}.')
 
         error, text = self._do_ocr(ocr_tool=ocr_tool)
-
         if not error and isinstance(text, str):
             return text
+
         raise ValueError(
             f'{self}: not possible to perform OCR. {text}')
 
