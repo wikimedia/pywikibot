@@ -12,6 +12,6 @@ from __future__ import annotations
 from time import strftime
 
 
-__version__ = '9.1.2'
+__version__ = '9.1.3'
 __url__ = 'https://www.mediawiki.org/wiki/Manual:Pywikibot'
 __copyright__ = f'2003-{strftime("%Y")}, Pywikibot team'

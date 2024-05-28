@@ -17,7 +17,7 @@
   ``pywikibot.__metadata__.py`` and adding developmental identifier
 - upload this patchset to Gerrit and merge it.
 
-.. warning: do not upload a development release to pypi.
+.. warning:: do not upload a development release to pypi.
 """
 #
 # (C) Pywikibot team, 2009-2024
@@ -45,7 +45,7 @@ extra_deps = {
     'wikitextparser': ['wikitextparser>=0.47.0'],
     'mysql': ['PyMySQL >= 1.0.0'],
     # vulnerability found in Pillow<8.1.2 but toolforge uses 5.4.1
-    'Tkinter': ['Pillow>=8.1.2, != 10.0, != 10.1'],
+    'Tkinter': ['Pillow>=8.1.2, != 10.0, != 10.1; python_version < "3.13"'],
     'mwoauth': ['mwoauth!=0.3.1,>=0.2.4'],
     'html': ['beautifulsoup4>=4.7.1'],
     'http': ['fake-useragent>=1.4.0'],
@@ -64,7 +64,8 @@ extra_deps = {
         'flake8-string-format',
         'flake8-tuple>=0.4.1',
         'flake8-no-u-prefixed-strings>=0.2',
-        'pep8-naming>=0.13.3',
+        'pep8-naming==0.13.3; python_version < "3.8"',
+        'pep8-naming>=0.14.0; python_version >= "3.8"',
     ],
     'hacking': [
         'hacking',

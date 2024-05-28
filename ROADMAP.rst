@@ -1,8 +1,7 @@
 Current release
 ---------------
 
-* Remove line endings in :func:`version.getversion_nightly` (:phab:`T363943`)
-* Provide ``-nouser`` option with :mod:`pywikibot.scripts.version`
+* Add support for dtpwiki (:phab:`T365232`)
 * i18n updates
 
 Deprecations
