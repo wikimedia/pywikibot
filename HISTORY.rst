@@ -1,6 +1,13 @@
 Release history
 ===============
 
+9.1.3
+-----
+*28.05.2024*
+
+* Add support for dtpwiki (:phab:`T365232`)
+* i18n updates
+
 9.1.2
 -----
 *03 May 2024*
