@@ -524,7 +524,6 @@ class TestFullyQualifiedNoLangFamilyExplicitLinkParser(LinkTestCase):
 
     def test_fully_qualified_NS0_family(self):
         """Test ':wikidata:testwiki:Q6' on enwp is namespace 0."""
-        config.family = 'wikipedia'
         link = Link(':wikidata:testwiki:Q6')
         link.parse()
         self.assertEqual(link.site, self.get_site('test'))
