@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for scripts/interwikidata.py."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -55,9 +55,9 @@ class TestInterwikidataBot(SiteAttributeTestCase):
 
     def test_main(self):
         """Test main function interwikidata.py."""
-        # The main function should return False when no generator is defined.
+        # The main function return None.
         with empty_sites():
-            self.assertFalse(interwikidata.main())
+            self.assertIsNone(interwikidata.main())
 
     def test_iw_bot(self):
         """Test IWBot class."""

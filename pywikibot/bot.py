@@ -1069,17 +1069,15 @@ class BaseBot(OptionHandler):
     This class provides a :meth:`run` method for basic processing of a
     generator one page at a time.
 
-    If the subclass places a page generator in
-    :attr:`self.generator<generator>`, Bot will process each page in the
-    generator, invoking the method :meth:`treat` which must then be
-    implemented by subclasses.
+    If the subclass places a page generator in :attr:`generator`, Bot
+    will process each page in the generator, invoking the method
+    :meth:`treat` which must then be implemented by subclasses.
 
-    Each item processed by :meth:`treat` must be a
-    :class:`page.BasePage` type. Use :meth:`init_page` to
-    upcast the type. To enable other types, set
-    :attr:`BaseBot.treat_page_type` to an appropriate type; your bot
-    should derive from :class:`BaseBot` in that case and handle site
-    properties.
+    Each item processed by :meth:`treat` must be a :class:`page.BasePage`
+    type. Use :meth:`init_page` to upcast the type. To enable other
+    types, set :attr:`BaseBot.treat_page_type` to an appropriate type;
+    your bot should derive from :class:`BaseBot` in that case and handle
+    site properties.
 
     If the subclass does not set a generator, or does not override
     :meth:`treat` or :meth:`run`, `NotImplementedError` is raised.
@@ -1133,15 +1131,14 @@ class BaseBot(OptionHandler):
         """Initializer.
 
         :param kwargs: bot options
-        :keyword generator: a :attr:`generator` processed by :meth:`run` method
+        :keyword generator: a :attr:`generator` processed by :meth:`run`
+            method
         """
         if 'generator' in kwargs:
             if hasattr(self, 'generator'):
-                pywikibot.warn('{} has a generator already. Ignoring argument.'
-                               .format(self.__class__.__name__))
+                pywikibot.warn(f'{type(self).__name__} has a generator'
+                               ' already. Ignoring argument.')
             else:
-                #: instance variable to hold the generator processed by
-                #: :meth:`run` method
                 self.generator: Iterable = kwargs.pop('generator')
 
         self.available_options.update(self.update_options)
@@ -1149,7 +1146,8 @@ class BaseBot(OptionHandler):
 
         self.counter: Counter = Counter()
         """Instance variable which holds counters. The default counters
-        are 'read', 'write' and 'skip'. You can use your own counters like::
+        are 'read', 'write' and 'skip'. All of them are printed within
+        :meth:`exit`. You can use your own counters like::
 
             self.counter['delete'] += 1
 
@@ -1159,21 +1157,30 @@ class BaseBot(OptionHandler):
         """
 
         self.generator_completed: bool = False
-        """Instance attribute which is True if the generator is completed.
+        """
+        Instance attribute which is True if the :attr:`generator` is completed.
+
+        It gives False if the the generator processing in :meth:`run` is
+        either interrupted by ``KeyboardInterrupt`` or exited by
+        :exc:`QuitKeyboardInterrupt` while closing the generator i.e.
+        :code:`self.generator.close()` keeps the value True.
 
         To check for an empty generator you may use::
 
             if self.generator_completed and not self.counter['read']:
                 print('generator was emtpty')
 
-        .. note:: An empty generator remains False.
+        .. note:: An empty generator returns True.
         .. versionadded:: 3.0
         .. versionchanged:: 7.4
            renamed to `generator_completed` to become a public attribute.
         """
 
-        #: instance variable to hold the default page type
         self.treat_page_type: Any = pywikibot.page.BasePage
+        """Instance variable to hold the default page type used by :meth:`run`.
+
+        .. versionadded:: 6.1
+        """
 
     @property
     def current_page(self) -> pywikibot.page.BasePage:
@@ -1455,19 +1462,86 @@ class BaseBot(OptionHandler):
     def run(self) -> None:
         """Process all pages in generator.
 
-        :raise AssertionError: "page" is not a pywikibot.page.BasePage object
+        Call :meth:`setup`, check for a valid ``Iterable`` type in
+        :attr:`generator`, upcast it to a ``Generator`` type if
+        necessary, process every generator`s item as follows:
+
+        For each item call :meth:`init_page`, check whether the result
+        is a :attr:`treat_page_type` type, call :meth:`skip_page` to
+        determine whether to skip the current page. Otherwise call
+        :meth:`treat` for each item.
+
+        This method also adjust ``read`` and ``skip`` :attr:`counter`,
+        and finally it calls :meth:`exit` when leaving the method. In
+        short this method is implemented similar to this:
+
+        .. code-block:: python
+
+           def run(self) -> None:
+               '''Process all pages in generator.'''
+               self.setup()
+
+               if not hasattr(self, 'generator'):
+                   raise NotImplementedError('"generator" not set.')
+
+               if self.generator is None;
+                   print('No generator was defined')
+
+               try:
+                   for item in self.generator:
+                       page = self.init_page(item)
+
+                   if self.skip_page(page):
+                       continue
+
+                   self.treat(page)
+
+               except(QuitKeyboardInterrupt, KeyboardInterrupt):
+                   print('User canceled bot run.')
+
+               finally:
+                   self.exit()
+
+        .. versionchanged:: 3.0
+           ``skip`` counter was added.; call :meth:`setup` first.
+        .. versionchanged:: 6.0
+           upcast :attr:`generator` to a ``Generator`` type to enable
+           ``generator.close()`` method.
+        .. versionchanged:: 6.1
+           Objects from :attr:`generator` may be different from
+           :class:`pywikibot.Page` but the type must be registered in
+           :attr:`treat_page_type`.
+        .. versionchanged:: 9.2
+           leave method gracefully if :attr:`generator` is None using
+           :func:`suggest_help` function.
+
+        :raise AssertionError: "page" is not a pywikibot.page.BasePage
+            object
+        :raise KeyboardInterrupt: KeyboardInterrupt occurred while
+            :attr:`config.verbose_output` was set
+        :raise NotImplementedError: :attr:`generator` is not set
+        :raise TypeError: invalid generator type or page is not a
+            :attr:`treat_page_type`
         """
         self._start_ts = pywikibot.Timestamp.now()
         self.setup()
 
         if not hasattr(self, 'generator'):
-            raise NotImplementedError('Variable {}.generator not set.'
-                                      .format(self.__class__.__name__))
+            raise NotImplementedError(
+                f'Variable {type(self).__name__}.generator not set.')
+
+        if suggest_help(missing_generator=self.generator is None):
+            return
+
         if not isinstance(self.generator, Generator):
-            # to provide close() method
-            pywikibot.debug('wrapping {} type to a Generator type'
-                            .format(type(self.generator).__name__))
-            self.generator = (item for item in self.generator)
+            gen_type = type(self.generator).__name__
+            pywikibot.debug(f'wrapping {gen_type} type to a Generator type')
+            try:
+                # to provide generator.close() method
+                self.generator = (item for item in self.generator)
+            except TypeError:
+                raise TypeError(f'Invalid type {gen_type} for generator')
+
         try:
             for item in self.generator:
                 # preprocessing of the page
@@ -1475,9 +1549,8 @@ class BaseBot(OptionHandler):
 
                 # validate page type
                 if not isinstance(page, self.treat_page_type):
-                    raise TypeError('"page" is not a {!r} object but {}.'
-                                    .format(self.treat_page_type,
-                                            page.__class__.__name__))
+                    raise TypeError(f'"page" is not a {self.treat_page_type!r}'
+                                    f' object but {type(page).__name__}.')
 
                 if self.skip_page(page):
                     self.counter['skip'] += 1
@@ -1489,13 +1562,13 @@ class BaseBot(OptionHandler):
 
             self.generator_completed = True
         except QuitKeyboardInterrupt:
-            pywikibot.info(f'\nUser quit {self.__class__.__name__} bot run...')
+            pywikibot.info(f'\nUser quit {type(self).__name__} bot run...')
         except KeyboardInterrupt:
             if config.verbose_output:
                 raise
 
-            pywikibot.info('\nKeyboardInterrupt during {} bot run...'
-                           .format(self.__class__.__name__))
+            pywikibot.info(
+                f'\nKeyboardInterrupt during {type(self).__name__} bot run...')
         finally:
             self.exit()
 

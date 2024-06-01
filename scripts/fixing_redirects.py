@@ -17,7 +17,7 @@ Can be used with:
 &params;
 """
 #
-# (C) Pywikibot team, 2004-2023
+# (C) Pywikibot team, 2004-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -256,11 +256,9 @@ def main(*args: str) -> None:
             return
     else:
         gen = gen_factory.getCombinedGenerator(preload=True)
-    if gen:
-        bot = FixingRedirectBot(generator=gen, **options)
-        bot.run()
-    else:
-        suggest_help(missing_generator=True)
+
+    bot = FixingRedirectBot(generator=gen, **options)
+    bot.run()
 
 
 if __name__ == '__main__':

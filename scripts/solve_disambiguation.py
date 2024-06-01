@@ -1283,10 +1283,6 @@ def main(*args: str) -> None:
             generator_factory.handle_arg(argument)
 
     generator = generator_factory.getCombinedGenerator(generator)
-    if not generator:
-        pywikibot.bot.suggest_help(missing_generator=True)
-        return
-
     bot = DisambiguationRobot(generator=generator, pos=alternatives, **options)
     bot.run()
 

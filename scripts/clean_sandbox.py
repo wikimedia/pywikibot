@@ -214,15 +214,17 @@ class SandboxBot(Bot, ConfigParserBot):
         if not self.translated_content:
             raise RuntimeError(
                 'No content is given for sandbox pages, exiting.')
+
         if not self.generator:
             pages = []
             for item in sandbox_titles:
                 p = self.site.page_from_repository(item)
                 if p is not None:
                     pages.append(p)
-            if not pages:
-                pywikibot.bot.suggest_help(missing_generator=True)
+
+            if pywikibot.bot.suggest_help(missing_generator=not pages):
                 sys.exit()
+
             self.generator = pages
 
     def run(self) -> None:

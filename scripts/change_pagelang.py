@@ -182,11 +182,8 @@ def main(*args: str) -> None:
         return
 
     gen = gen_factory.getCombinedGenerator(preload=True)
-    if gen:
-        bot = ChangeLangBot(generator=gen, **options)
-        bot.run()
-    else:
-        pywikibot.bot.suggest_help(missing_generator=True)
+    bot = ChangeLangBot(generator=gen, **options)
+    bot.run()
 
 
 if __name__ == '__main__':
