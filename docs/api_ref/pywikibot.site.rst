@@ -61,11 +61,14 @@
          :rtype: tuple[str, ...]
 
 
-      .. method:: disambig(fallback: str = '_default')
+      .. method:: disambig(fallback = '_default')
 
          Return list of disambiguation templates.
 
          .. seealso:: :meth:`family.Family.disambig`
+
+         :param str | None fallback:
+         :rtype: list[str]
 
 
       .. method:: protocol()

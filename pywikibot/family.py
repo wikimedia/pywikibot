@@ -453,8 +453,11 @@ class Family:
         """
         return self.archived_page_templates.get(code, ())
 
-    def disambig(self, code, fallback: str = '_default'):
-        """Return list of disambiguation templates."""
+    def disambig(self, code, fallback: str | None = '_default') -> list[str]:
+        """Return list of disambiguation templates.
+
+        :raises KeyError: unknown title for disambig template
+        """
         if code in self.disambiguationTemplates:
             return self.disambiguationTemplates[code]
 
