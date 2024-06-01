@@ -506,37 +506,25 @@ class TestFullyQualifiedNoLangFamilyExplicitLinkParser(LinkTestCase):
         config.mylang = 'en'
         config.family = 'wikipedia'
 
-    def test_fully_qualified_NS0_code(self):
-        """Test ':testwiki:wikidata:Q6' on enwp is namespace 0."""
-        link = Link(':testwiki:wikidata:Q6')
-        link.parse()
-        self.assertEqual(link.site, self.get_site('wikidata'))
-        self.assertEqual(link.title, 'Q6')
-        self.assertEqual(link.namespace, 0)
+    def test_fully_qualified_NS_code(self):
+        """Test ':testwiki:wikidata:Q6' on enwp."""
+        for ns, title in enumerate(['Q6', 'Talk:Q6']):
+            with self.subTest(title=title):
+                link = Link(f':testwiki:wikidata:{title}')
+                link.parse()
+                self.assertEqual(link.site, self.get_site('wikidata'))
+                self.assertEqual(link.title, 'Q6')
+                self.assertEqual(link.namespace, ns)
 
-    def test_fully_qualified_NS1_code(self):
-        """Test ':testwiki:wikidata:Talk:Q6' on enwp is namespace 1."""
-        link = Link(':testwiki:wikidata:Talk:Q6')
-        link.parse()
-        self.assertEqual(link.site, self.get_site('wikidata'))
-        self.assertEqual(link.title, 'Q6')
-        self.assertEqual(link.namespace, 1)
-
-    def test_fully_qualified_NS0_family(self):
-        """Test ':wikidata:testwiki:Q6' on enwp is namespace 0."""
-        link = Link(':wikidata:testwiki:Q6')
-        link.parse()
-        self.assertEqual(link.site, self.get_site('test'))
-        self.assertEqual(link.title, 'Q6')
-        self.assertEqual(link.namespace, 0)
-
-    def test_fully_qualified_NS1_family(self):
-        """Test ':wikidata:testwiki:Talk:Q6' on enwp is namespace 1."""
-        link = Link(':wikidata:testwiki:Talk:Q6')
-        link.parse()
-        self.assertEqual(link.site, self.get_site('test'))
-        self.assertEqual(link.title, 'Q6')
-        self.assertEqual(link.namespace, 1)
+    def test_fully_qualified_NS_family(self):
+        """Test ':wikidata:testwiki:Q6' on enwp."""
+        for ns, title in enumerate(['Q6', 'Talk:Q6']):
+            with self.subTest(title=title):
+                link = Link(f':wikidata:testwiki:{title}')
+                link.parse()
+                self.assertEqual(link.site, self.get_site('test'))
+                self.assertEqual(link.title, 'Q6')
+                self.assertEqual(link.namespace, ns)
 
 
 class TestFullyQualifiedOneSiteFamilyExplicitLinkParser(LinkTestCase):
