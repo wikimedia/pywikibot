@@ -249,7 +249,11 @@ def main(*args: str) -> None:
     options = {}
     for arg in local_args:
         option, _, value = arg.partition(':')
-        option = option[1:] if option.startswith('-') else None
+        if option.startswith('-'):
+            option = option[1:]
+        else:
+            continue
+
         if option == 'summary':
             options[option] = value
         else:
