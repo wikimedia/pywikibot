@@ -11,9 +11,21 @@ from __future__ import annotations
 
 import collections
 import re
+from typing import TYPE_CHECKING
 
 import pywikibot
-from pywikibot import config
+from pywikibot import textlib
+from pywikibot.tools import deprecated, deprecated_args
+
+try:
+    import wikitextparser
+except ImportError as e:
+    wikitextparser = e
+
+if TYPE_CHECKING:
+    import datetime
+    from pywikibot import Timestamp
+    DATETYPE = str | Timestamp | datetime.datetime | datetime.date | None
 
 
 class WikiBlameMixin:
@@ -24,7 +36,10 @@ class WikiBlameMixin:
     """
 
     #: Supported wikipedia site codes
-    WIKIBLAME_CODES = 'als', 'bar', 'de', 'en', 'it', 'nds', 'sco'
+    WIKIBLAME_CODES = (
+        'ar', 'de', 'en', 'es', 'eu', 'fr', 'hu', 'id', 'it', 'ja', 'nl', 'pl',
+        'pt', 'tr',
+    )
 
     def _check_wh_supported(self):
         """Check if WikiHistory is supported."""
@@ -44,68 +59,161 @@ class WikiBlameMixin:
         if not self.exists():
             raise pywikibot.exceptions.NoPageError(self)
 
-    def main_authors(self, *,
-                     onlynew: bool | None = None) -> collections.Counter:
-        """Retrieve the 5 topmost main authors of an article.
+        if isinstance(wikitextparser, ImportError):
+            raise wikitextparser
 
-        This method uses WikiHistory to retrieve the text based main
-        authorship.
+    @deprecated('authorsship', since='9.3.0')
+    @deprecated_args(onlynew=None)  # since 9.2.0
+    def main_authors(self) -> collections.Counter[str, int]:
+        """Retrieve the 5 topmost main authors of an article.
 
         Sample:
 
         >>> import pywikibot
-        >>> site = pywikibot.Site('wikipedia:nds')
-        >>> page = pywikibot.Page(site, 'Python (Programmeerspraak)')
-        >>> auth = page.main_authors(onlynew=False)
-        >>> auth
-        Counter({'RebeccaBreu': 99, 'Slomox': 1})
+        >>> site = pywikibot.Site('wikipedia:eu')
+        >>> page = pywikibot.Page(site, 'Python (informatika)')
+        >>> auth = page.main_authors()
+        >>> auth.most_common(1)
+        [('Ksarasola', 80)]
 
-        .. note:: Only implemented for main namespace pages.
-        .. note:: Only wikipedias of :attr:`WIKIBLAME_CODES` are supported.
-        .. attention:: This method does not return new results due to
-           :phab:`366100`.
+        .. important:: Only implemented for main namespace pages and
+           only wikipedias of :attr:`WIKIBLAME_CODES` are supported.
         .. seealso::
            - https://wikihistory.toolforge.org
            - https://de.wikipedia.org/wiki/Wikipedia:Technik/Cloud/wikihistory
+           - https://xtools.wmcloud.org/authorship/
 
         .. versionchanged:: 9.2
            do not use any wait cycles due to :phab:`366100`.
+        .. versionchanged:: 9.3
+           https://xtools.wmcloud.org/authorship/ is used to retrieve
+           authors
+        .. deprecated:: 9.3
+           use :meth:`authorship` instead.
 
-        :param onlynew: Currently meaningless
-        :return: Number of edits for each username
-        :raise NotImplementedError: unsupported site or unsupported namespace
-        :raise pywikibot.exceptions.NoPageError: The page does not exist
-        :raise pywikibot.exceptions.TimeoutError: No cached results found
+        :return: Percentage of edits for each username
+
+        :raise ImportError: missing ``wikitextparser`` module.
+        :raise NotImplementedError: unsupported site or unsupported
+            namespace.
+        :raise Error: Error response from xtools.
+        :raise NoPageError: The page does not exist.
+        :raise requests.exceptions.HTTPError: 429 Client Error: Too Many
+            Requests for url; login to meta family first.
         """
-        baseurl = 'https://wikihistory.toolforge.org'
-        pattern = (r'><bdi>(?P<author>.+?)</bdi></a>\s'
-                   r'\((?P<percent>\d{1,3})&')
+        return collections.Counter(
+            {user: int(cnt) for user, (_, cnt) in self.authorship(5).items()})
+
+    def authorship(
+        self,
+        n: int | None = None,
+        *,
+        min_chars: int = 0,
+        min_pct: float = 0.0,
+        max_pct_sum: float | None = None,
+        revid: int | None = None,
+        date: DATETYPE = None,
+    ) -> dict[str, tuple[int, float]]:
+        """Retrieve authorship attributon of an article.
+
+        This method uses XTools/Authorship to retrieve the authors
+        measured by character count.
+
+        Sample:
+
+        >>> import pywikibot
+        >>> site = pywikibot.Site('wikipedia:en')
+        >>> page = pywikibot.Page(site, 'Pywikibot')
+        >>> auth = page.authorship()
+        >>> auth
+        {'1234qwer1234qwer4': (68, 100.0)}
+
+        .. important:: Only implemented for main namespace pages and
+           only wikipedias of :attr:`WIKIBLAME_CODES` are supported.
+        .. seealso::
+           - https://xtools.wmcloud.org/authorship/
+           - https://www.mediawiki.org/wiki/XTools/Authorship
+           - https://www.mediawiki.org/wiki/WikiWho
+
+        .. versionadded:: 9.3
+           this method replaces :meth:`main_authors`.
+
+        :param n: Only return the first *n* or fewer authors.
+        :param min_chars: Only return authors with more than *min_chars*
+            chars changes.
+        :param min_pct: Only return authors with more than *min_pct*
+            percentage edits.
+        :param max_pct_sum: Only return authors until the prcentage sum
+            reached *max_pct_sum*.
+        :param revid: The revision id for the authors should be found.
+            If ``None`` or ``0``, the latest revision is be used. Cannot
+            be used together with *date*.
+        :param date: The revision date for the authors should be found.
+            If ``None``, it will be ignored. Cannot be used together
+            with *revid*. If the parameter is a string it must be given
+            in the form ``YYYY-MM-DD``
+        :return: Character count and percentage of edits for each
+            username.
+
+        :raise ImportError: missing ``wikitextparser`` module
+        :raise NotImplementedError: unsupported site or unsupported
+            namespace.
+        :raise Error: Error response from xtools.
+        :raiseNoPageError: The page does not exist.
+        :raise requests.exceptions.HTTPError: 429 Client Error: Too Many
+            Requests for url; login to meta family first.
+        """
+        baseurl = 'https://xtools.wmcloud.org/authorship/{url}&format=wikitext'
+        pattern = r'\[\[.+[|/](?P<user>.+)\]\]'
 
         self._check_wh_supported()
 
-        url = baseurl + '/wiki/getauthors.php?wiki={}wiki&page_id={}'.format(
-            self.site.code, self.pageid)
-        if onlynew:
-            url += '&onlynew=1'
+        if revid and date:
+            raise ValueError(
+                'You cannot specify revid together with date argument')
 
-        for current_retries in range(config.max_retries):
-            r = pywikibot.comms.http.fetch(url)
-            if r.status_code != 200:
-                r.raise_for_status()
+        if date is None:
+            show = revid or 0
+        else:
+            show = str(date)[:10]
 
-            if 'Timeout' not in r.text:  # window.setTimeout in result
-                return collections.Counter(
-                    {user: int(cnt)
-                     for user, cnt in re.findall(pattern, r.text)})
+        url = '{}.wikipedia.org/{}/{}?uselang={}'.format(
+            self.site.code,
+            self.title(as_url=True, with_ns=False, with_section=False),
+            show,
+            'en',
+        )
+        url = baseurl.format(url=url)
 
-            break  # T366100
+        r = pywikibot.comms.http.fetch(url)
+        if r.status_code != 200:
+            r.raise_for_status()
 
-            delay = pywikibot.config.retry_wait * 2 ** current_retries
-            pywikibot.warning('WikiHistory timeout.\n'
-                              f'Waiting {delay:.1f} seconds before retrying.')
-            pywikibot.sleep(delay)
-            if onlynew is None and current_retries >= config.max_retries - 2:
-                url += '&onlynew=1'
+        result: list[list[str]] = []
+        try:
+            table = wikitextparser.parse(r.text).tables[0]
+        except IndexError:
+            pattern = textlib.get_regexes('code')[0]
+            msg = pattern.search(r.text)[0]
+            raise pywikibot.exceptions.Error(textlib.removeHTMLParts(msg))
 
-        raise pywikibot.exceptions.TimeoutError(
-            'Maximum retries attempted without success.')
+        pct_sum = 0.0
+        for row in table.data():
+            if row[0] == 'Rank':
+                continue  # skip headline
+
+            rank = int(row[0])
+            user = re.match(pattern, row[1])['user']
+            chars = int(row[3].replace(',', '_'))
+            percent = float(row[4].rstrip('%'))
+
+            # take into account tht data() is ordered
+            if n and rank > n or chars < min_chars or percent < min_pct:
+                break
+
+            result.append((user, chars, percent))
+            pct_sum += percent
+            if max_pct_sum and pct_sum >= max_pct_sum:
+                break
+
+        return {user: (chars, percent) for user, chars, percent in result}
