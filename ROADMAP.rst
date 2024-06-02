@@ -1,11 +1,11 @@
-Current release
----------------
+Current Release Changes
+=======================
 
 * Raise :exc:`exceptions.SectionError` if a section does not exists on a page (:phab:`T107141`)
 * Retry api request on ServerError (:phab:`T364275`, :phab:`T364393`)
 
-Deprecations
-------------
+New Deprecations
+================
 
 * 9.2.0: *total* argument in ``-logevents`` pagegenerators option is deprecated;
   use ``-limit`` instead (:phab:`T128981`)
@@ -55,8 +55,8 @@ Deprecations
   :attr:`Page.latest_revision.timestamp<page.BasePage.latest_revision>`
 
 
-Will be removed in Pywikibot 10
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Pending removal in Pywikibot 10
+-------------------------------
 
 * 9.1.0: :func:`version.svn_rev_info` and :func:`version.getversion_svn` will be removed. SVN is no longer supported.
   (:phab:`T362484`)

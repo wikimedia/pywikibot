@@ -503,6 +503,10 @@ extlinks = {
     'pylib': ('https://docs.python.org/3/library/%s', 'Python Library %s'),
     # Generic Python link; should be used with explicit title
     'python': ('https://docs.python.org/3/%s', None),
+    # Pywikibot source (on Phabricator)
+    'source': (
+        'https://phabricator.wikimedia.org/diffusion/PWBC/browse/master/%s.py',
+        '%s'),
 }
 
 

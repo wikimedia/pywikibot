@@ -17,8 +17,8 @@ A function collector also exists in the 'tests' package.
 Running tests
 =============
 
-All tests
----------
+Run all tests
+-------------
 
 The entire suite of tests may be run in the following ways from the root directory:
 
@@ -41,8 +41,8 @@ The entire suite of tests may be run in the following ways from the root directo
 
     tox
 
-Specific tests
---------------
+Run specific tests
+------------------
 
 Individual test components can be run using unittest, pytest or pwb.
 With -lang and -family or -site options pwb can be used to specify a site.
@@ -99,7 +99,7 @@ Environment variables
 =====================
 
 **PYWIKIBOT_TEST_GUI**
-  Enable :mod:`tests.gui_tests`. Used for AppVeyor tests. GitHub actions would
+  Enable :source:`tests/gui_tests`. Used for AppVeyor tests. GitHub actions would
   fail due to ``couldn't connect to display ":1.0"`` error. Set this environment
   variable to run this test locally::
 
@@ -107,7 +107,7 @@ Environment variables
 
 **PYWIKIBOT_TEST_LOGOUT**
   Used when a test is logging out the test user. This environment variable
-  enables :mod:`tests.site_login_logout_tests`. The environment setting is
+  enables :source:`tests/site_login_logout_tests`. The environment setting is
   needed to ensure that these tests run in their own test action and does not
   interfere with other tests. Otherwise they could fail if the test user is
   logged out by the test. Only one instance must run this test script. Set this
@@ -117,10 +117,9 @@ Environment variables
 
 **PYWIKIBOT_TEST_MODULES**
   Only run tests given with this environment variable. Multiple tests must be
-  separated by a ``,`` without any white space. Available library tests are
-  listed in :ref:`Library tests` and script tests can be found in
-  :ref:`Script tests`. To enable only :mod:`tests.site_tests` and
-  :mod:`tests.wikibase_tests` set the environment variable as::
+  separated by a ``,`` without any white space. For example to enable only
+  :source:`tests/site_tests` and :source:`tests/wikibase_tests` set the
+  environment variable as::
 
     PYWIKIBOT_TEST_MODULES=site,wikibase
 
@@ -135,7 +134,7 @@ Environment variables
 **PYWIKIBOT_TEST_OAUTH**
   This environment variable holds the Oauth token. It is set by
   ``oauth_tests-ci.yml`` CI config file and is solely used by
-  :mod:`tests.oauth_tests`. You can use it for your private tests. The
+  :source:`tests/oauth_tests`. You can use it for your private tests. The
   environment variable must contain consumer key and secret and access
   key and secret delimited by ``:`` as::
 
@@ -151,7 +150,7 @@ Environment variables
 **PYWIKIBOT_TEST_RUNNING**
   This environment variable skips tests instead of raising
   :exc:`exceptions.MaxlagTimeoutError` when maximum retries attempted due to
-  maxlag without success. It is also used by :mod:`tests.script_tests` for code
+  maxlag without success. It is also used by :source:`tests/script_tests` for code
   coverage. GitHub actions and AppVeyor tests activate this variable::
 
     PYWIKIBOT_TEST_RUNNING=1

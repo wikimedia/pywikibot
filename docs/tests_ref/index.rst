@@ -9,11 +9,9 @@ Tests reference
 Test utilities
 **************
 
-Tests in this project:
-
 .. toctree::
-    :maxdepth: 1
+   :titlesonly:
 
-    aspects
-    basepage
-    utils
+   aspects
+   basepage
+   utils
