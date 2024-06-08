@@ -42,7 +42,7 @@ class TestDjVuFile(TestCase):
                                   stderr=subprocess.PIPE)
             dp.communicate()
 
-    def setUp(self):
+    def setUp(self):  # pragma: no cover
         """Set up test."""
         super().setUp()
         self.djvu = DjVuFile(file_djvu)
