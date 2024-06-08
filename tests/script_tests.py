@@ -319,12 +319,6 @@ class ScriptTestMeta(MetaTestCaseClass):
                     f'{script_name} has dependencies; skipping'
                 )(dct[test_name])
 
-            # Disable test by default in pytest
-            if script_name in unrunnable_script_set:
-                # flag them as an expectedFailure due to py.test (T135594)
-                dct[test_name] = unittest.expectedFailure(dct[test_name])
-                dct[test_name].__test__ = False
-
         return super().__new__(cls, name, bases, dct)
 
 
