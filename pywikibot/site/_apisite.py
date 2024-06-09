@@ -10,6 +10,7 @@ import datetime
 import re
 import time
 import typing
+import webbrowser
 from collections import OrderedDict, defaultdict
 from contextlib import suppress
 from textwrap import fill
@@ -1968,7 +1969,6 @@ class APISite(
         'spamblacklist': SpamblacklistError,
         'abusefilter-disallowed': AbuseFilterDisallowedError,
     }
-    _ep_text_overrides = {'appendtext', 'prependtext', 'undo'}
 
     @need_right('edit')
     def editpage(
@@ -1986,47 +1986,80 @@ class APISite(
     ) -> bool:
         """Submit an edit to be saved to the wiki.
 
-        .. seealso:: :api:`Edit`
+        .. seealso::
+           - :api:`Edit`
+           - :meth:`BasePage.save()<page.BasePage.save>`
+             (should be preferred)
 
         :param page: The Page to be saved.
             By default its .text property will be used
             as the new text to be saved to the wiki
-        :param summary: the edit summary
+        :param summary: The edit summary for the modification (optional,
+            but most wikis strongly encourage its use)
         :param minor: if True (default), mark edit as minor
-        :param notminor: if True, override account preferences to mark edit
-            as non-minor
+        :param notminor: if True, override account preferences to mark
+            edit as non-minor
         :param recreate: if True (default), create new page even if this
             title has previously been deleted
         :param createonly: if True, raise an error if this title already
             exists on the wiki
-        :param nocreate: if True, raise an error if the page does not exist
-        :param watch: Specify how the watchlist is affected by this edit, set
-            to one of "watch", "unwatch", "preferences", "nochange":
-            * watch: add the page to the watchlist
-            * unwatch: remove the page from the watchlist
-            * preferences: use the preference settings (default)
-            * nochange: don't change the watchlist
+        :param nocreate: if True, raise a :exc:`exceptions.NoCreateError`
+            exception if the page does not exist
+        :param watch: Specify how the watchlist is affected by this edit,
+            set to one of ``watch``, ``unwatch``, ``preferences``,
+            ``nochange``:
+
+            * watch --- add the page to the watchlist
+            * unwatch --- remove the page from the watchlist
+            * preferences --- use the preference settings (default)
+            * nochange --- don't change the watchlist
+            If None (default), follow bot account's default settings
         :param bot: if True, mark edit with bot flag
-        :keyword text: Overrides Page.text
-        :type text: str
-        :keyword section: Edit an existing numbered section or
+
+        :keyword str text: Overrides Page.text
+        :keyword int | str section: Edit an existing numbered section or
             a new section ('new')
-        :type section: int or str
-        :keyword prependtext: Prepend text. Overrides Page.text
-        :type text: str
-        :keyword appendtext: Append text. Overrides Page.text.
-        :type text: str
-        :keyword undo: Revision id to undo. Overrides Page.text
-        :type undo: int
+        :keyword str prependtext: Prepend text. Overrides Page.text
+        :keyword str appendtext: Append text. Overrides Page.text.
+        :keyword int undo: Revision id to undo. Overrides Page.text
+
         :return: True if edit succeeded, False if it failed
-        :raises pywikibot.exceptions.Error: No text to be saved
-        :raises pywikibot.exceptions.NoPageError: recreate is disabled and page
-            does not exist
-        :raises pywikibot.exceptions.CaptchaError: config.solve_captcha is
-            False and saving the page requires solving a captcha
+
+        :raises AbuseFilterDisallowedError: This action has been
+            automatically identified as harmful, and therefore disallowed
+        :raises CaptchaError: :ref:`config.solve_captcha
+            <pywikibot.config#account-settings>` is False and saving the
+            page requires solving a captcha
+        :raises CascadeLockedPageError: The page is protected with
+            protection cascade
+        :raises EditConflictError: an edit confict occurred
+        :raises Error: No text to be saved or API editing not enabled on
+            site or user is not authorized to edit, create pages or
+            create image redirects on site or bot is not logged in and
+            anon users are not authorized to edit, create pages or to
+            create image redirects or the edit was filtered or the
+            content is too big
+        :raises KeyError: No 'result' found in API response
+        :raises LockedNoPageError: The page title is protected
+        :raises LockedPageError: The page has been protected to prevent
+            editing or other actions
+        :raises NoCreateError: The page you specified doesn't exist and
+            *nocreate* is set
+        :raises NoPageError: *recreate* is disabled and page does not
+            exist
+        :raises PageCreatedConflictError: The page you tried to create
+            has been created already
+        :raises PageDeletedConflictError: The page has been deleted in
+            meantime
+        :raises SpamblacklistError: The title is blacklisted as spam
+        :raises TitleblacklistError: The title is blacklisted
+        :raises ValueError: *text* keyword is used with one of the
+            override keywords *appendtext*, *prependtext* or *undo* or
+            more than one of the override keywords are used or no *text*
+            keyword is used together with *section* keyword.
         """
         basetimestamp = True
-        text_overrides = self._ep_text_overrides.intersection(kwargs.keys())
+        text_overrides = {'appendtext', 'prependtext', 'undo'} & kwargs.keys()
 
         if text_overrides:
             if 'text' in kwargs:
@@ -2060,12 +2093,21 @@ class APISite(
         token = self.tokens['csrf']
         if bot is None:
             bot = self.has_right('bot')
-        params = dict(action='edit', title=page,
-                      text=text, token=token, summary=summary, bot=bot,
-                      recreate=recreate, createonly=createonly,
-                      nocreate=nocreate, minor=minor,
-                      notminor=not minor and notminor,
-                      **kwargs)
+
+        params = dict(
+            action='edit',
+            title=page,
+            text=text,
+            token=token,
+            summary=summary,
+            bot=bot,
+            recreate=recreate,
+            createonly=createonly,
+            nocreate=nocreate,
+            minor=minor,
+            notminor=not minor and notminor,
+            **kwargs
+        )
 
         if basetimestamp and 'basetimestamp' not in kwargs:
             params['basetimestamp'] = basetimestamp
@@ -2082,15 +2124,17 @@ class APISite(
         try:
             while True:
                 try:
-                    result = req.submit()
-                    pywikibot.debug(f'editpage response: {result}')
+                    response = req.submit()
+                    pywikibot.debug(f'editpage response: {response}')
                 except APIError as err:
                     if err.code.endswith('anon') and self.logged_in():
                         pywikibot.debug(f"editpage: received '{err.code}' "
                                         f'even though bot is logged in')
+
                     if err.code == 'abusefilter-warning':
                         pywikibot.warning(f'{err.info}\nRetrying.')
                         continue
+
                     if err.code in self._ep_errors:
                         exception = self._ep_errors[err.code]
                         if isinstance(exception, str):
@@ -2103,37 +2147,47 @@ class APISite(
                             raise Error(
                                 exception.format_map(errdata)
                             ) from None
+
                         if issubclass(exception, AbuseFilterDisallowedError):
                             raise exception(page, info=err.info) from None
+
                         if issubclass(exception, SpamblacklistError):
                             urls = ', '.join(err.other[err.code]['matches'])
                             raise exception(page, url=urls) from None
+
                         raise exception(page) from None
+
                     pywikibot.debug(f'editpage: Unexpected error code '
-                                    f"'{err.code}' received.")
+                                    f'{err.code!r} received.')
                     raise
 
-                assert 'edit' in result and 'result' in result['edit'], result
+                try:
+                    result = response['edit']['result']
+                except KeyError:
+                    raise KeyError(
+                        f"No 'result' key found in response\n{response}")
 
-                if result['edit']['result'] == 'Success':
-                    if 'nochange' in result['edit']:
+                if result == 'Success':
+                    if 'nochange' in response['edit']:
                         # null edit, page not changed
-                        pywikibot.log(f'Page [[{page.title()}]] saved without '
-                                      f'any changes.')
+                        pywikibot.log(
+                            f'Page {page} saved without any changes.')
                         return True
-                    page.latest_revision_id = result['edit']['newrevid']
+
+                    page.latest_revision_id = response['edit']['newrevid']
                     # See:
                     # https://www.mediawiki.org/wiki/API:Wikimania_2006_API_discussion#Notes
                     # not safe to assume that saved text is the same as sent
                     del page.text
                     return True
 
-                if result['edit']['result'] == 'Failure':
-                    if 'captcha' in result['edit']:
+                if result == 'Failure':
+                    captcha = response['edit'].get('captcha')
+                    if captcha is not None:
                         if not pywikibot.config.solve_captcha:
                             raise CaptchaError('captcha encountered while '
                                                'config.solve_captcha is False')
-                        captcha = result['edit']['captcha']
+
                         req['captchaid'] = captcha['id']
 
                         if captcha['type'] in ['math', 'simple']:
@@ -2141,39 +2195,36 @@ class APISite(
                             continue
 
                         if 'url' in captcha:
-                            import webbrowser
-                            webbrowser.open('{}://{}{}'
-                                            .format(self.protocol(),
-                                                    self.hostname(),
-                                                    captcha['url']))
+                            webbrowser.open(
+                                f'{self.protocol()}://{self.hostname()}'
+                                f"{captcha['url']}"
+                            )
                             req['captchaword'] = pywikibot.input(
                                 'Please view CAPTCHA in your browser, '
-                                'then type answer here:')
+                                'then type answer here:'
+                            )
                             continue
 
                         pywikibot.error(f'editpage: unknown CAPTCHA response '
                                         f'{captcha}, page not saved')
                         break
 
-                    if 'spamblacklist' in result['edit']:
+                    if 'spamblacklist' in response['edit']:
                         raise SpamblacklistError(
-                            page, result['edit']['spamblacklist']) from None
-
-                    if 'code' in result['edit'] and 'info' in result['edit']:
-                        pywikibot.error(
-                            'editpage: {}\n{}, '
-                            .format(result['edit']['code'],
-                                    result['edit']['info']))
+                            page, response['edit']['spamblacklist']) from None
+                    code = response['edit'].get('code')
+                    info = response['edit'].get('info')
+                    if code is not None and info is not None:
+                        pywikibot.error(f'editpage: {code}\n{info}')
                         break
 
                     pywikibot.error(
-                        f'editpage: unknown failure reason {result}')
+                        f'editpage: unknown failure reason {response}')
                     break
 
-                pywikibot.error(
-                    "editpage: Unknown result code '{}' received; "
-                    'page not saved'.format(result['edit']['result']))
-                pywikibot.log(str(result))
+                pywikibot.error(f'editpage: Unknown result code {result!r}'
+                                ' received; page not saved')
+                pywikibot.log(str(response))
                 break
 
         finally:
