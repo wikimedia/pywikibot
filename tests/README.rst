@@ -228,7 +228,7 @@ Require that the given list of modules can be imported.
 
   from tests.aspects import require_modules
   [......]
-  @require_modules(['important1', 'musthave2'])
+  @require_modules('important1', 'musthave2')
   def test_require_modules(self):
 
 @tests.aspects.require_version
