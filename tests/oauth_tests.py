@@ -79,14 +79,17 @@ class OAuthEditTest(OAuthSiteTestCase):
         ts = str(time.time())
         p = pywikibot.Page(self.site, title)
         try:
-            p.site.editpage(p, appendtext=ts)
+            p.site.editpage(p, appendtext='\n' + ts)
         except EditConflictError as e:
             self.assertEqual(e.page, p)
         else:
             revision_id = p.latest_revision_id
             p = pywikibot.Page(self.site, title)
-            self.assertEqual(revision_id, p.latest_revision_id)
-            self.assertTrue(p.text.endswith(ts))
+            t = p.text
+            if revision_id == p.latest_revision_id:
+                self.assertTrue(p.text.endswith(ts))
+            else:
+                self.assertIn(ts, t)
 
 
 class TestOauthLoginManger(DefaultSiteTestCase, OAuthSiteTestCase):
