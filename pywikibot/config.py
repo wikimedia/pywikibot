@@ -128,7 +128,7 @@ family = 'wikipedia'
 # The language code of the site we're working on.
 mylang = 'language'
 # If family and mylang are not modified from the above, the default is changed
-# to test:test, which is test.wikipedia.org, at the end of this module.
+# to wikipedia:test, which is test.wikipedia.org, at the end of this module.
 
 # The dictionary usernames should contain a username for each site where you
 # have a bot account. Please set your usernames by adding such lines to your
