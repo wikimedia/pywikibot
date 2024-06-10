@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for scripts/protect.py."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -28,12 +28,12 @@ class TestProtectionBot(ScriptMainTestCase):
     def test_protect(self):
         """Test ProtectionBot protect/unprotect on the test wiki."""
         site = self.get_site()
-        protect.main('-page:User:Sn1per/ProtectTest1', '-always',
-                     '-unprotect', '-summary=Pywikibot protect.py unit tests')
+        protect.main('-page:User:Sn1per/ProtectTest1', '-always', '-unprotect',
+                     '-summary:Pywikibot protect.py unit tests')
         page = pywikibot.Page(site, 'User:Sn1per/ProtectTest1')
         self.assertIsEmpty(list(page.protection()))
-        protect.main('-page:User:Sn1per/ProtectTest1', '-always',
-                     '-default', '-summary=Pywikibot protect.py unit tests')
+        protect.main('-page:User:Sn1per/ProtectTest1', '-always', '-default',
+                     '-summary:Pywikibot protect.py unit tests')
         page = pywikibot.Page(site, 'User:Sn1per/ProtectTest1')
         self.assertLength(list(page.protection()), 2)
 
