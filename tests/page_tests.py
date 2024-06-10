@@ -1139,8 +1139,8 @@ class TestPageProtect(TestCase):
         p1.protect(protections={'edit': 'sysop', 'move': 'autoconfirmed'},
                    reason='Pywikibot unit test')
         self.assertEqual(p1.protection(),
-                         {'edit': ('sysop', 'infinity'),
-                          'move': ('autoconfirmed', 'infinity')})
+                         {'edit': ('sysop', 'infinite'),
+                          'move': ('autoconfirmed', 'infinite')})
 
         p1.protect(protections={'edit': '', 'move': ''},
                    reason='Pywikibot unit test')
@@ -1154,8 +1154,8 @@ class TestPageProtect(TestCase):
         p1.protect(protections={'edit': 'sysop', 'move': 'autoconfirmed'},
                    reason='Pywikibot unit test')
         self.assertEqual(p1.protection(),
-                         {'edit': ('sysop', 'infinity'),
-                          'move': ('autoconfirmed', 'infinity')})
+                         {'edit': ('sysop', 'infinite'),
+                          'move': ('autoconfirmed', 'infinite')})
 
         p1.protect(reason='Pywikibot unit test')
         self.assertEqual(p1.protection(), {})
@@ -1168,8 +1168,8 @@ class TestPageProtect(TestCase):
         p1.protect(protections={'edit': 'sysop', 'move': 'autoconfirmed'},
                    reason='Pywikibot unit test')
         self.assertEqual(p1.protection(),
-                         {'edit': ('sysop', 'infinity'),
-                          'move': ('autoconfirmed', 'infinity')})
+                         {'edit': ('sysop', 'infinite'),
+                          'move': ('autoconfirmed', 'infinite')})
         # workaround
         p1 = pywikibot.Page(site, 'User:Unicodesnowman/ProtectTest')
         p1.protect(protections={'edit': '', 'move': ''},
