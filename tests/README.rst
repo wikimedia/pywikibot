@@ -158,11 +158,8 @@ Environment variables
 **PYWIKIBOT_TEST_WRITE**
   There are also several other 'write' tests which also attempt to perform
   write operations successfully.  These **will** write to the wikis, and they
-  should always only write to 'test' wikis.
-
-  These 'write' tests are disabled by default, and currently cannot be
-  run on Travis or AppVeyor as they require interaction using a terminal. Also
-  enabling them won't enable 'edit failure' tests.
+  should always only write to 'test' wikis. Enabling them won't enable 'edit
+  failure' tests.
 
   To enable 'write' tests, set::
 
@@ -173,15 +170,12 @@ Environment variables
   and **should** fail. If there is a bug in pywikibot or MediaWiki, these
   tests **may** actually perform a write operation.
 
-  These 'edit failure' tests are disabled by default. On Travis they are enabled
-  by default on builds by any other GitHub account except 'wikimedia'.
+  To enable 'edit failure' tests, set::
 
-  To disable 'edit failure' tests, set::
+    PYWIKIBOT_TEST_WRITE_FAIL=1
 
-    PYWIKIBOT_TEST_WRITE_FAIL=0
-
-.. note:: Enabling only 'edit failure' tests or 'write' tests won't enable the other tests
-   automatically.
+.. note:: Enabling only 'edit failure' tests or 'write' tests won't enable the
+   other tests automatically.
 
 Instead of setting the environment by the os (or `os.environ` as well) you can use the :mod:`pwb`
 wrapper script to set it::
