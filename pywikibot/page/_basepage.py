@@ -2028,8 +2028,7 @@ class BasePage(ComparableMixin):
         return self._has_deleted_revisions
 
     def loadDeletedRevisions(self, total: int | None = None, **kwargs):
-        """
-        Retrieve deleted revisions for this Page.
+        """Retrieve deleted revisions for this Page.
 
         Stores all revisions' timestamps, dates, editors and comments in
         self._deletedRevs attribute.
@@ -2074,8 +2073,11 @@ class BasePage(ComparableMixin):
         return []
 
     def markDeletedRevision(self, timestamp, undelete: bool = True):
-        """
-        Mark the revision identified by timestamp for undeletion.
+        """Mark the revision identified by timestamp for undeletion.
+
+        .. seealso::
+           - :meth:`undelete`
+           - :meth:`loadDeletedRevisions`
 
         :param undelete: if False, mark the revision to remain deleted.
         """
@@ -2087,24 +2089,33 @@ class BasePage(ComparableMixin):
         self._deletedRevs[timestamp]['marked'] = undelete
 
     def undelete(self, reason: str | None = None) -> None:
-        """
-        Undelete revisions based on the markers set by previous calls.
+        """Undelete revisions based on the markers set by previous calls.
 
-        If no calls have been made since loadDeletedRevisions(), everything
-        will be restored.
+        If no calls have been made since :meth:`loadDeletedRevisions`,
+        everything will be restored.
 
-        Simplest case::
+        Simplest case:
+
+        .. code-block:: python
 
             Page(...).undelete('This will restore all revisions')
 
-        More complex::
+        More complex:
 
-            pg = Page(...)
-            revs = pg.loadDeletedRevisions()
+        .. code-block:: Python
+
+            page = Page(...)
+            revs = page.loadDeletedRevisions()
             for rev in revs:
-                if ... #decide whether to undelete a revision
-                    pg.markDeletedRevision(rev) #mark for undeletion
-            pg.undelete('This will restore only selected revisions.')
+                if ...  # decide whether to undelete a revision
+                    page.markDeletedRevision(rev)  # mark for undeletion
+            page.undelete('This will restore only selected revisions.')
+
+        .. seealso::
+           - :meth:`loadDeletedRevisions`
+           - :meth:`markDeletedRevision`
+           - :meth:`site.APISite.undelete
+             <pywikibot.site._apisite.APISite.undelete>`
 
         :param reason: Reason for the action.
         """
@@ -2119,7 +2130,7 @@ class BasePage(ComparableMixin):
             pywikibot.info(f'Undeleting {self.title(as_link=True)}.')
             reason = pywikibot.input(
                 'Please enter a reason for the undeletion:')
-        self.site.undelete(self, reason, revision=undelete_revs)
+        self.site.undelete(self, reason, revisions=undelete_revs)
 
     def protect(self,
                 reason: str | None = None,
