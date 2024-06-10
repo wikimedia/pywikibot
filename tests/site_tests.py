@@ -506,6 +506,7 @@ class SiteSysopTestCase(DefaultSiteTestCase):
                           prop=prop):
             for item in mysite.alldeletedrevisions(
                 start='2008-10-11T01:02:03Z',
+                user=myuser,
                 total=5
             ):
                 for drev in item['revisions']:
@@ -517,6 +518,7 @@ class SiteSysopTestCase(DefaultSiteTestCase):
                           prop=prop):
             for item in mysite.alldeletedrevisions(
                 start='2008-10-11T01:02:03Z',
+                user=myuser,
                 total=5
             ):
                 for drev in item['revisions']:
