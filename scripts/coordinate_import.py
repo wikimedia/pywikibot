@@ -178,12 +178,8 @@ def main(*args: str) -> None:
     # FIXME: this preloading preloads neither coordinates nor Wikibase items
     # but preloads wikitext which we don't need
     generator = generator_factory.getCombinedGenerator(preload=True)
-
-    if generator:
-        coordbot = CoordImportRobot(generator=generator, create=create_new)
-        coordbot.run()
-    else:
-        pywikibot.bot.suggest_help(missing_generator=True)
+    coordbot = CoordImportRobot(generator=generator, create=create_new)
+    coordbot.run()
 
 
 if __name__ == '__main__':

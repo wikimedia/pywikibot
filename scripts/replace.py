@@ -1137,9 +1137,6 @@ def main(*args: str) -> None:  # noqa: C901
         gen = handle_sql(sql_query, replacements, exceptions['text-contains'])
 
     gen = genFactory.getCombinedGenerator(gen, preload=preload)
-    if pywikibot.bot.suggest_help(missing_generator=not gen):
-        return
-
     bot = ReplaceRobot(gen, replacements, exceptions, site=site,
                        summary=edit_summary, **options)
     site.login()

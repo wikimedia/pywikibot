@@ -185,9 +185,6 @@ def main(*argv: str) -> None:
         return
 
     generator = generator_factory.getCombinedGenerator()
-    if pywikibot.bot.suggest_help(missing_generator=not generator):
-        return
-
     bot = AddTextBot(generator=generator, **options)
     bot.run()
 

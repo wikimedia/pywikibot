@@ -13,7 +13,7 @@ Usage:
 &params;
 """
 #
-# (C) Pywikibot team, 2013-2022
+# (C) Pywikibot team, 2013-2024
 #
 # Distributed under the terms of MIT license.
 #
@@ -100,10 +100,6 @@ def main(*args: str) -> None:
             generator_factory.handle_arg(arg)
 
     generator = generator_factory.getCombinedGenerator(preload=True)
-    if not generator:
-        pywikibot.bot.suggest_help(missing_generator=True)
-        return
-
     bot = IllustrateRobot(wdproperty, generator=generator)
     bot.run()
 

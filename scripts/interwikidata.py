@@ -39,12 +39,7 @@ import pywikibot
 import pywikibot.i18n
 import pywikibot.textlib
 from pywikibot import info, pagegenerators, warning
-from pywikibot.bot import (
-    ConfigParserBot,
-    ExistingPageBot,
-    SingleSiteBot,
-    suggest_help,
-)
+from pywikibot.bot import ConfigParserBot, ExistingPageBot, SingleSiteBot
 from pywikibot.exceptions import APIError, NoPageError
 
 
@@ -262,11 +257,8 @@ def main(*args: str) -> None:
     site = pywikibot.Site()
 
     generator = gen_factory.getCombinedGenerator(preload=True)
-    if generator:
-        bot = IWBot(generator=generator, site=site, **options)
-        bot.run()
-    else:
-        suggest_help(missing_generator=True)
+    bot = IWBot(generator=generator, site=site, **options)
+    bot.run()
 
 
 if __name__ == '__main__':
