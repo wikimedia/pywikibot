@@ -1,11 +1,16 @@
 Current Release Changes
 =======================
 
+* Check whether :attr:`BaseBot.generator<bot.BaseBot.generator>` is None in :meth:`run()<bot.BaseBot.run>` method
+* Add *namespaces* parameter to :meth:`Page.templates()<page.BasePage.templates>` and
+  :meth:`Page.itertemplates()<page.BasePage.itertemplates>` and require keyword arguments;
+  only use TEMPLATE namespace for meth:`Page.isDisambig()<page.BasePage.isDisambig>` (:phab:`T365199`)
+* Drop pheetools support for :mod:`proofreadpage` which is no longer available upstreams (:phab:`T366036`)
 * Raise :exc:`exceptions.SectionError` if a section does not exists on a page (:phab:`T107141`)
 * Retry api request on ServerError (:phab:`T364275`, :phab:`T364393`)
 
-New Deprecations
-================
+Current Deprecations
+====================
 
 * 9.2.0: *total* argument in ``-logevents`` pagegenerators option is deprecated;
   use ``-limit`` instead (:phab:`T128981`)

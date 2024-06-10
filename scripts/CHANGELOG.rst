@@ -11,6 +11,11 @@ commons_information
 * Use transclusions of Information template as default generator
 * Preload pages to make the script upto 10 times faster
 
+interwikidata
+^^^^^^^^^^^^^
+
+* Do not create an option named None (:phab:`T366409`)
+
 noreferences
 ^^^^^^^^^^^^
 
