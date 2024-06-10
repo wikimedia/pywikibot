@@ -345,13 +345,13 @@ class User(Page):
         >>> len(contrib)
         4
         >>> contrib[0].title()
-        'User:Unicodesnowman/DeleteMark'
+        'User:John Vandenberg/appendtext test'
         >>> contrib[1]
-        504586
+        504588
         >>> str(contrib[2])
-        '2022-03-04T17:35:41Z'
+        '2022-03-04T17:36:02Z'
         >>> contrib[3]
-        'pywikibot unit test. Do NOT actually delete.'
+        ''
 
         .. seealso:: :meth:`Site.usercontribs()
            <pywikibot.site._generators.GeneratorsMixin.usercontribs>`
