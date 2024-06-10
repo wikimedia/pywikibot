@@ -1795,22 +1795,26 @@ class GeneratorsMixin:
         Yield all deleted revisions.
 
         .. seealso:: :api:`Alldeletedrevisions`
+        .. warning:: *user* keyword argument must be given together with
+           *start* or *end*.
 
         :param namespaces: Only iterate pages in these namespaces
         :param reverse: Iterate oldest revisions first (default: newest)
         :param content: If True, retrieve the content of each revision
         :param total: Number of revisions to retrieve
-        :keyword from: Start listing at this title
-        :keyword to: Stop listing at this title
-        :keyword prefix: Search for all page titles that begin with this value
-        :keyword excludeuser: Exclude revisions by this user
-        :keyword tag: Only list revisions tagged with this tag
-        :keyword user: List revisions by this user
+
+        :keyword str from: Start listing at this title
+        :keyword str to: Stop listing at this title
+        :keyword str prefix: Search for all page titles that begin with this
+            value
+        :keyword str excludeuser: Exclude revisions by this user
+        :keyword str tag: Only list revisions tagged with this tag
+        :keyword str user: List revisions by this user
         :keyword start: Iterate revisions starting at this Timestamp
         :keyword end: Iterate revisions ending at this Timestamp
-        :keyword prop: Which properties to get. Defaults are ids, timestamp,
-            flags, user, and comment (if you have the right to view).
-        :type prop: list[str]
+        :keyword list[str] prop: Which properties to get. Defaults are
+            ``ids``, ``timestamp``, ``flags``, ``user``, and ``comment``
+            (if the bot has the right to view).
         """
         if 'start' in kwargs and 'end' in kwargs:
             self.assert_valid_iter_params('alldeletedrevisions',
