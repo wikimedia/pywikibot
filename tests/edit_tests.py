@@ -129,7 +129,7 @@ class TestSiteMergeHistory(TestCase):
                 },
                 'Cannot merge revisions from source '
                 '[[test:User:Sn1per/Nonexistent]] because it does not exist '
-                'on test:test'
+                'on wikipedia:test'
             ),
             (
                 {  # nonexistent dest
@@ -138,7 +138,7 @@ class TestSiteMergeHistory(TestCase):
                 },
                 'Cannot merge revisions to destination '
                 '[[test:User:Sn1per/Nonexistent]] because it does not exist '
-                'on test:test'
+                'on wikipedia:test'
             ),
         ]
 
