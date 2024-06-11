@@ -2760,9 +2760,10 @@ class APISite(
         """(Un)protect a wiki page. Requires *protect* right.
 
         .. seealso::
-           - :api:`Protect`
+           - :meth:`page.BasePage.protect`
            - :meth:`protection_types`
            - :meth:`protection_levels`
+           - :api:`Protect`
 
         :param protections: A dict mapping type of protection to
             protection level of that type. Refer :meth:`protection_types`
@@ -2781,11 +2782,15 @@ class APISite(
         protections_list = [ptype + '=' + level
                             for ptype, level in protections.items()
                             if level is not None]
-        parameters = merge_unique_dicts(kwargs, action='protect', title=page,
-                                        token=token,
-                                        protections=protections_list,
-                                        reason=reason,
-                                        expiry=expiry)
+        parameters = merge_unique_dicts(
+            kwargs,
+            action='protect',
+            title=page,
+            token=token,
+            protections=protections_list,
+            reason=reason,
+            expiry=expiry or None,  # pass None instead of empty str
+        )
 
         req = self.simple_request(**parameters)
         try:

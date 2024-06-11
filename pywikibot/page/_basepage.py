@@ -2148,8 +2148,9 @@ class BasePage(ComparableMixin):
         protections dictionary.
 
         Expiry of protections can be set via *kwargs*, see
-        :meth:`Site.protect()<pywikibot.site._apisite.APISite.protect>` for
-        details. By default there is no expiry for the protection types.
+        :meth:`Site.protect()<pywikibot.site._apisite.APISite.protect>`
+        for details. By default there is no expiry for the protection
+        types.
 
         .. seealso::
            - :meth:`Site.protect()
@@ -2162,10 +2163,10 @@ class BasePage(ComparableMixin):
             Defaults to protections is None, which means unprotect all
             protection types.
 
-            Example: ``{'move': 'sysop', 'edit': 'autoconfirmed'}``
+            Example: :code:`{'move': 'sysop', 'edit': 'autoconfirmed'}`
 
-        :param reason: Reason for the action, default is None and will set an
-            empty string.
+        :param reason: Reason for the action, default is None and will
+            set an empty string.
         """
         protections = protections or {}  # protections is converted to {}
         reason = reason or ''  # None is converted to ''
