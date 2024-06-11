@@ -59,6 +59,10 @@ class TestSaveFailure(TestCase):
 
     def test_titleblacklist(self):
         """Test that title blacklist raise the appropriate exception."""
+        user = pywikibot.User(self.site, self.site.user())
+        if 'sysop' in user.groups():
+            self.skipTest(f'{user} is member of the sysop group')
+
         page = pywikibot.Page(self.site, 'User:UpsandDowns1234/Blacklisttest')
         with self.assertRaises(TitleblacklistError):
             page.save()
