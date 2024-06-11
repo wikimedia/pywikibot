@@ -18,6 +18,7 @@ from contextlib import suppress
 import pywikibot
 from pywikibot import config
 from pywikibot.exceptions import (
+    APIError,
     IsNotRedirectPageError,
     NoPageError,
     PageInUseError,
@@ -620,13 +621,18 @@ class TestSiteSysopWrite(TestCase):
     def test_protect_exception(self):
         """Test that site.protect() throws an exception for invalid args."""
         site = self.get_site()
-        p1 = pywikibot.Page(site, 'User:Unicodesnowman/ProtectTest')
-        with self.assertRaises(AssertionError):
-            site.protect(protections={'anInvalidValue': 'sysop'},
-                         page=p1, reason='Pywikibot unit test')
-        with self.assertRaises(AssertionError):
-            site.protect(protections={'edit': 'anInvalidValue'},
-                         page=p1, reason='Pywikibot unit test')
+        page = pywikibot.Page(site, 'User:Unicodesnowman/ProtectTest')
+
+        with self.subTest(test='anInvalidType'), \
+             self.assertRaisesRegex(APIError,
+                                    'Invalid protection type "anInvalidType"'):
+            site.protect(protections={'anInvalidType': 'sysop'},
+                         page=page, reason='Pywikibot unit test')
+
+        with self.subTest(test='anInvalidLevel'), \
+             self.assertRaises(AssertionError):
+            site.protect(protections={'edit': 'anInvalidLevel'},
+                         page=page, reason='Pywikibot unit test')
 
     def test_delete(self):
         """Test the site.delete() and site.undelete() methods."""
