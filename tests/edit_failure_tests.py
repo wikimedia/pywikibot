@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
-"""
-Tests for edit failures.
+"""Tests for edit failures.
 
-These tests should never write to the wiki,
-unless something has broken badly.
-
-These tests use special code 'write = -1' for edit failures.
+These tests should never write to the wiki, unless something has broken
+badly.
 """
 #
-# (C) Pywikibot team, 2014-2023
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -39,9 +36,7 @@ class TestSaveFailure(TestCase):
 
     """Test cases for edits which should fail to save."""
 
-    login = True
-    write = -1
-
+    write = True
     family = 'wikipedia'
     code = 'test'
 
@@ -109,9 +104,7 @@ class TestActionFailure(TestCase):
 
     """Test cases for actions which should fail to save."""
 
-    login = True
-    write = -1
-
+    write = True
     family = 'wikipedia'
     code = 'test'
 
@@ -139,9 +132,7 @@ class TestWikibaseSaveTest(WikibaseTestCase):
 
     family = 'wikidata'
     code = 'test'
-
-    login = True
-    write = -1
+    write = True
 
     def test_itempage_save(self):
         """Test ItemPage save method inherited from superclass Page."""

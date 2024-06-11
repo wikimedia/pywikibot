@@ -23,8 +23,6 @@ class TestThankRevision(TestCase):
 
     family = 'wikipedia'
     code = 'test'
-
-    login = True
     write = True
 
     def test_thank_revision(self):
@@ -77,8 +75,7 @@ class TestThankRevisionErrors(TestCase):
 
     family = 'wikipedia'
     code = 'test'
-
-    write = -1
+    write = True
 
     def test_bad_recipient(self):
         """Test that thanking a bad recipient causes an error."""

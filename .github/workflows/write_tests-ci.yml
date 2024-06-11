@@ -63,7 +63,6 @@ jobs:
       timeout-minutes: 90
       env:
         PYWIKIBOT_TEST_WRITE: ${{ matrix.site == 'wikipedia:test' && 1 || 0}}
-        PYWIKIBOT_TEST_WRITE_FAIL: ${{ matrix.site == 'wikipedia:test' && 1 || 0}}
       run: |
         python pwb.py version
         pytest -s -r A -a "rights or write" --cov=.;

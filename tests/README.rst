@@ -158,8 +158,12 @@ Environment variables
 **PYWIKIBOT_TEST_WRITE**
   There are also several other 'write' tests which also attempt to perform
   write operations successfully.  These **will** write to the wikis, and they
-  should always only write to 'test' wikis. Enabling them won't enable 'edit
-  failure' tests.
+  should always only write to 'test' wikis.
+
+  .. versionchanged:: 9.2
+     Enabling them will also enable 'edit failure' tests which attempt to write
+     to the wikis and **should** fail. If there is a bug in pywikibot or
+     MediaWiki, these tests **may** actually perform a write operation.
 
   To enable 'write' tests, set::
 
@@ -174,8 +178,9 @@ Environment variables
 
     PYWIKIBOT_TEST_WRITE_FAIL=1
 
-.. note:: Enabling only 'edit failure' tests or 'write' tests won't enable the
-   other tests automatically.
+  .. deprecated:: 9.2
+     this environment variable no longer has any effect; use
+     :envvar:`PYWIKIBOT_TEST_WRITE` instead.
 
 Instead of setting the environment by the os (or `os.environ` as well) you can use the :mod:`pwb`
 wrapper script to set it::

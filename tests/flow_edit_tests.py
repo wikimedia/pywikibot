@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Edit tests for the flow module."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -25,8 +25,6 @@ class TestFlowCreateTopic(TestCase):
 
     family = 'wikipedia'
     code = 'test'
-
-    login = True
     write = True
 
     def test_create_topic(self):
@@ -64,8 +62,6 @@ class TestFlowReply(TestCase):
 
     family = 'wikipedia'
     code = 'test'
-
-    login = True
     write = True
 
     @classmethod
@@ -185,8 +181,6 @@ class TestFlowLockTopic(TestCase):
 
     family = 'wikipedia'
     code = 'test'
-
-    login = True
     write = True
 
     def test_lock_unlock_topic(self):
@@ -210,9 +204,7 @@ class TestFlowEditFailure(TestCase):
 
     family = 'wikipedia'
     code = 'test'
-
-    login = True
-    write = -1
+    write = True
 
     def test_reply_to_locked_topic(self):
         """Test replying to locked topic (should raise exception)."""
@@ -236,8 +228,6 @@ class FlowTests(TestCase):
 
     family = 'wikipedia'
     code = 'test'
-
-    login = True
     write = True
 
     def setUp(self):
