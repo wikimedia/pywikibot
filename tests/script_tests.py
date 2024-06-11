@@ -369,11 +369,13 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
         'clean_sandbox',
         'delinker',
         'disambredir',
+        'interwiki_data',
         'misspelling',  # T94681
         'noreferences',
         'nowcommons',
         'patrol',
         'shell',
+        'speedy_delete',
         'unusedfiles',  # not localized for default sites
         'upload',  # raises custom ValueError
         'watchlist',  # not logged in
