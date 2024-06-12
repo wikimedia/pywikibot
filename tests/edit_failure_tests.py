@@ -116,10 +116,6 @@ class TestActionFailure(TestCase):
         """Test that site.movepage raises the appropriate exceptions."""
         mysite = self.get_site()
         mainpage = self.get_mainpage()
-        if 'move' not in mysite.tokens:
-            self.skipTest(
-                "movepage test requires 'move' token not given to user on {}"
-                .format(self.site))
 
         with self.assertRaises(Error):
             mysite.movepage(mainpage, mainpage.title(), 'test')
