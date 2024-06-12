@@ -21,7 +21,6 @@ class TestProtectionBot(ScriptMainTestCase):
 
     family = 'wikipedia'
     code = 'test'
-
     rights = 'protect'
     write = True
 
@@ -57,9 +56,9 @@ class TestProtectionBot(ScriptMainTestCase):
         self.assertEqual(
             rev[0].comment,
             'Protected "[[User:Sn1per/ProtectTest2]]": Bot: '
-            'Protecting all pages from category Pywikibot Protect Test '
-            '([Edit=Allow only administrators] (indefinite) [Move=Allow only '
-            'administrators] (indefinite))')
+            'Protecting all pages from category Pywikibot Protect Test ('
+            '[Move=Allow only administrators] (indefinite) '
+            '[Edit=Allow only administrators] (indefinite))')
 
 
 if __name__ == '__main__':
