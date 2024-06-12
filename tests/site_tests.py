@@ -19,6 +19,7 @@ import pywikibot
 from pywikibot import config
 from pywikibot.exceptions import (
     APIError,
+    Error,
     IsNotRedirectPageError,
     NoPageError,
     PageInUseError,
@@ -630,7 +631,7 @@ class TestSiteSysopWrite(TestCase):
                          page=page, reason='Pywikibot unit test')
 
         with self.subTest(test='anInvalidLevel'), \
-             self.assertRaises(AssertionError):
+             self.assertRaisesRegex(Error, 'Invalid protection level'):
             site.protect(protections={'edit': 'anInvalidLevel'},
                          page=page, reason='Pywikibot unit test')
 
