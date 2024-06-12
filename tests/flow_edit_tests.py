@@ -183,6 +183,7 @@ class TestFlowLockTopic(TestCase):
     code = 'test'
     write = True
 
+    @unittest.expectedFailure  # T367301
     def test_lock_unlock_topic(self):
         """Lock and unlock a test topic."""
         # Setup

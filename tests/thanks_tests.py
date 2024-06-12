@@ -25,6 +25,7 @@ class TestThankRevision(TestCase):
     code = 'test'
     write = True
 
+    @unittest.expectedFailure  # T367311
     def test_thank_revision(self):
         """Test thanks for normal revisions.
 

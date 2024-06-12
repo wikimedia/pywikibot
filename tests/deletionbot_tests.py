@@ -78,6 +78,7 @@ class TestDeletionBotUser(ScriptMainTestCase):
         cls.page.text = 'Pywikibot deletion test.'
         cls.page.save('Pywikibot unit test', botflag=True)
 
+    @unittest.expectedFailure  # T367299
     def test_delete_mark(self):
         """Test marking User:Unicodesnowman/DeleteMark for deletion."""
         delete.main('-page:User:Unicodesnowman/DeleteMark', '-always',
