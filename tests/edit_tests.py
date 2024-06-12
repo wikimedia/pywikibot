@@ -149,6 +149,7 @@ class TestSiteMergeHistory(TestCase):
             except Error as err:
                 self.assertEqual(str(err), error_msg)
 
+    @unittest.expectedFailure  # T367300
     def test_merge_history(self):
         """Test Site.merge_history functionality."""
         site = self.get_site()

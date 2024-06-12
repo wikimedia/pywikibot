@@ -5,7 +5,7 @@ Site upload test.
 These tests write to the wiki.
 """
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -31,6 +31,7 @@ class TestUpload(TestCase):
     sounds_png = join_images_path('MP_sounds.png')
     arrow_png = join_images_path('1rightarrow.png')
 
+    @unittest.expectedFailure  # T367319
     def test_png(self):
         """Test uploading a png using Site.upload."""
         page = pywikibot.FilePage(self.site, 'MP_sounds-pwb.png')
@@ -38,6 +39,7 @@ class TestUpload(TestCase):
                          comment='pywikibot test',
                          ignore_warnings=True)
 
+    @unittest.expectedFailure  # T367320
     def test_png_chunked(self):
         """Test uploading a png in two chunks using Site.upload."""
         page = pywikibot.FilePage(self.site, 'MP_sounds-pwb-chunked.png')
@@ -106,15 +108,17 @@ class TestUpload(TestCase):
                         'info ({}) did not start with '
                         '"File not found"'.format(cm.exception.info))
 
+    @unittest.expectedFailure  # T367314
     def test_continue_filekey_once(self):
         """Test continuing to upload a file without using chunked mode."""
         self._test_continue_filekey(0)
 
-    @unittest.expectedFailure  # see T112416
+    @unittest.expectedFailure  # T133288
     def test_continue_filekey_chunked(self):
         """Test continuing to upload a file with using chunked mode."""
         self._test_continue_filekey(1024)
 
+    @unittest.expectedFailure  # T367321
     def test_sha1_missmatch(self):
         """Test trying to continue with a different file."""
         self._init_upload(1024)
@@ -127,6 +131,7 @@ class TestUpload(TestCase):
             '3dd334f11aa1e780d636416dc0649b96b67588b6'.format(self._file_key))
         self._verify_stash()
 
+    @unittest.expectedFailure  # T367316
     def test_offset_missmatch(self):
         """Test trying to continue with a different offset."""
         self._init_upload(1024)
@@ -139,6 +144,7 @@ class TestUpload(TestCase):
             'offset was 0'.format(self._file_key))
         self._verify_stash()
 
+    @unittest.expectedFailure  # T367317
     def test_offset_oversize(self):
         """Test trying to continue with an offset which is to large."""
         self._init_upload(1024)

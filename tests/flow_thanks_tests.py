@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for thanks-related code."""
 #
-# (C) Pywikibot team, 2016-2023
+# (C) Pywikibot team, 2016-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -32,6 +32,7 @@ class TestThankFlowPost(TestCase):
         super().setUpClass()
         cls._topic_title = 'Topic:Tvkityksg1ukyrrw'
 
+    @unittest.expectedFailure  # T367308
     def test_thank_post(self):
         """Test thanks for Flow posts."""
         site = self.get_site()

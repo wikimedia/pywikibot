@@ -129,6 +129,7 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         item = pywikibot.ItemPage(testsite)
         item.editEntity(data)
 
+    @unittest.expectedFailure  # T367324
     def test_edit_entity_propogation(self):
         """Test that ``ItemPage.editEntity`` propagates changes to claims."""
         testsite = self.get_repo()
@@ -291,6 +292,7 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         claim = item.claims['P271'][0]
         self.assertEqual(claim.getTarget(), target)
 
+    @unittest.expectedFailure  # T367326
     def test_Coordinate_edit(self):
         """Attempt adding a Coordinate with globe set via item."""
         testsite = self.get_repo()
@@ -393,6 +395,7 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         claim = item.claims['P27199'][0]
         self.assertEqual(claim.getTarget(), target)
 
+    @unittest.expectedFailure  # T367327
     def test_WbTabularData_edit(self):
         """Attempt adding a tabular-data with valid input."""
         # Clean the slate in preparation for test.

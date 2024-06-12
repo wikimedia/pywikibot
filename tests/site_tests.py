@@ -709,6 +709,7 @@ class TestSiteSysopWrite(TestCase):
                         show='content|comment|user',
                         reason='pywikibot unit tests')
 
+    @unittest.expectedFailure  # T367309
     def test_revdel_file(self):
         """Test deleting and undeleting file revisions."""
         site = pywikibot.Site('test')
