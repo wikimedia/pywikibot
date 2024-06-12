@@ -52,6 +52,8 @@ class TestProtectionBot(ScriptMainTestCase):
             rev[1].comment,
             'Removed protection from "[[User:Sn1per/ProtectTest2]]": Bot: '
             'Unprotecting all pages from category Pywikibot Protect Test')
+
+        self.maxDiff = None
         self.assertEqual(
             rev[0].comment,
             'Protected "[[User:Sn1per/ProtectTest2]]": Bot: '
