@@ -1064,7 +1064,6 @@ class TestPageDelete(TestCase):
 
     family = 'wikipedia'
     code = 'test'
-
     write = True
     rights = 'delete'
 
@@ -1078,7 +1077,7 @@ class TestPageDelete(TestCase):
 
         # Test deletion
         res = p.delete(reason='Pywikibot unit test', prompt=False, mark=False)
-        self.assertEqual(p._pageid, 0)
+        self.assertEqual(p.pageid, 0)
         self.assertEqual(res, 1)
         with self.assertRaisesRegex(NoPageError, NO_PAGE_RE):
             p.get(force=True)
