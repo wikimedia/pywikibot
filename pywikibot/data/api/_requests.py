@@ -901,6 +901,7 @@ but {scheme!r} is required. Please add the following code to your family file:
         retry = class_name in ['DBConnectionError',  # T64974
                                'DBQueryError',  # T60158
                                'DBQueryTimeoutError',  # T297708
+                               'DBUnexpectedError',  # T360930
                                'ReadOnlyError',  # T61227
                                'readonly',  # T154011
                                ]

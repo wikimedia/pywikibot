@@ -205,6 +205,7 @@ def handle_args() -> tuple[bool, bool, bool, bool]:
     """
     if '-help' in sys.argv:
         import re
+
         import setup
         help_text = re.sub(r'^\.\. version(added|changed)::.+', '',
                            __doc__, flags=re.MULTILINE | re.DOTALL)
