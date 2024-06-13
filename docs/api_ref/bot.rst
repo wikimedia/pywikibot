@@ -7,6 +7,7 @@
    :member-order: bysource
 
    .. admonition:: Imports in :mod:`pywikibot` module
+      :class: note
 
       The following classes and functions are inported in :mod:`pywikibot`
       module and can also be used as :mod:`pywikibot` members:

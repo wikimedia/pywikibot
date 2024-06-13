@@ -4,3 +4,11 @@
 
 .. automodule:: i18n
    :synopsis: Various i18n functions
+
+   .. admonition:: Imports in :mod:`pywikibot` module
+      :class: note
+
+      The following function is inported in :mod:`pywikibot` module but can also
+      be used as :mod:`pywikibot` members:
+
+      - :class:`pywikibot.translate()<i18n.translate>`
