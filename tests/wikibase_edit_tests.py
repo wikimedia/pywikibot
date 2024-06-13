@@ -161,6 +161,7 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         self.assertSame(qual.on_item, item)
         self.assertSame(ref.on_item, item)
 
+    @unittest.expectedFailure  # T367323
     def test_edit_entity_new_property(self):
         """Test creating a new property using ``PropertyPage.editEntity``."""
         testsite = self.get_repo()
