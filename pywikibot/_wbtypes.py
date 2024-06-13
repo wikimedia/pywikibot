@@ -188,32 +188,34 @@ class Coordinate(WbRepresentation):
 
     @property
     def precision(self) -> float | None:
-        """
-        Return the precision of the geo coordinate.
+        """Return the precision of the geo coordinate.
 
         The precision is calculated if the Coordinate does not have a
         precision, and self._dim is set.
 
         When no precision and no self._dim exists, None is returned.
 
-        The biggest error (in degrees) will be given by the longitudinal error;
-        the same error in meters becomes larger (in degrees) further up north.
-        We can thus ignore the latitudinal error.
+        The biggest error (in degrees) will be given by the longitudinal
+        error; the same error in meters becomes larger (in degrees)
+        further up north. We can thus ignore the latitudinal error.
 
         The longitudinal can be derived as follows:
 
         In small angle approximation (and thus in radians):
 
-        M{Δλ ≈ Δpos / r_φ}, where r_φ is the radius of earth at the given
-        latitude.
-        Δλ is the error in longitude.
+        :math:`M{Δλ ≈ Δpos / r_φ}`, where :math:`r_φ` is the radius of
+        earth at the given latitude. :math:`Δλ` is the error in
+        longitude.
 
-        M{r_φ = r cos φ}, where r is the radius of earth, φ the latitude
+        :math:`M{r_φ = r cos(φ)}`, where :math:`r` is the radius of
+        earth, :math:`φ` the latitude
 
-        Therefore::
+        Therefore:
 
-            precision = math.degrees(
-                self._dim/(radius*math.cos(math.radians(self.lat))))
+        .. code-block:: python
+
+           precision = math.degrees(
+               self._dim / (radius * math.cos(math.radians(self.lat))))
         """
         if self._dim is None and self._precision is None:
             return None
@@ -236,11 +238,18 @@ class Coordinate(WbRepresentation):
         is thrown.
 
         Carrying on from the earlier derivation of precision, since
-        precision = math.degrees(dim/(radius*math.cos(math.radians(self.lat))))
-        we get::
 
-            dim = math.radians(
-                precision)*radius*math.cos(math.radians(self.lat))
+        .. code-block::
+
+           precision = math.degrees(
+               dim / (radius * math.cos(math.radians(self.lat))))
+
+        we get:
+
+        .. code-block:: python
+
+           dim = math.radians(
+               precision) * radius * math.cos(math.radians(self.lat))
 
         But this is not valid, since it returns a float value for dim which is
         an integer. We must round it off to the nearest integer.
