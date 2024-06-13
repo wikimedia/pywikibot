@@ -6,6 +6,21 @@
    :synopsis: User-interface related functions for building bots
    :member-order: bysource
 
+   .. admonition:: Imports in :mod:`pywikibot` module
+
+      The following classes and functions are inported in :mod:`pywikibot`
+      module and can also be used as :mod:`pywikibot` members:
+
+      - :class:`pywikibot.Bot<bot.Bot>`
+      - :class:`pywikibot.CurrentPageBot<bot.CurrentPageBot>`
+      - :class:`pywikibot.WikidataBot<bot.WikidataBot>`
+      - :func:`pywikibot.calledModuleName<bot.calledModuleName>`
+      - :func:`pywikibot.handle_args<bot.handle_args>`
+      - :func:`pywikibot.input<bot.input>`
+      - :func:`pywikibot.input_choice<bot.input_choice>`
+      - :func:`pywikibot.input_yn<bot.input_yn>`
+      - :func:`pywikibot.show_help<bot.show_help>`
+
    .. autoclass:: BaseBot
 
       .. attribute:: generator
