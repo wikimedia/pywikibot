@@ -20,11 +20,19 @@ displayed on the user console. :func:`debug()` takes a required second
 argument, which is a string indicating the debugging layer.
 """
 #
-# (C) Pywikibot team, 2010-2023
+# (C) Pywikibot team, 2010-2024
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
+
+__all__ = (
+    'CRITICAL', 'DEBUG', 'ERROR', 'INFO', 'WARNING', 'STDOUT', 'VERBOSE',
+    'INPUT',
+    'add_init_routine',
+    'logoutput', 'info', 'output', 'stdout', 'warning', 'error', 'log',
+    'critical', 'debug', 'exception',
+)
 
 import logging
 import os
