@@ -366,8 +366,8 @@ def init_handlers() -> None:
         * :python:`Python Logging Levels<library/logging.html#logging-levels>`
 
     Accordingly, do **not** use print statements in bot code; instead,
-    use :func:`pywikibot.output` function and other functions from
-    :mod:`pywikibot.logging` module.
+    use :func:`pywikibot.info()<pywikibot.logging.info>` function and
+    other functions from :mod:`pywikibot.logging` module.
 
     .. versionchanged:: 6.2
        Different logfiles are used if multiple processes of the same

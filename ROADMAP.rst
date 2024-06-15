@@ -75,7 +75,7 @@ Pending removal in Pywikibot 10
   <pywikibot.site._apisite.APISite.linktrail>` instead
 * 7.2.0: Positional arguments *decoder*, *layer* and *newline* for :mod:`logging` functions where dropped; keyword 
   arguments must be used instead.
-* 7.2.0: ``tb`` parameter of :func:`exception()<pywikibot.exception>` function was renamed to ``exc_info``
+* 7.2.0: ``tb`` parameter of :func:`exception()<pywikibot.logging.exception>` function was renamed to ``exc_info``
 * 7.2.0: XMLDumpOldPageGenerator is deprecated in favour of a ``content`` parameter of
   :func:`XMLDumpPageGenerator<pagegenerators.XMLDumpPageGenerator>` (:phab:`T306134`)
 * 7.2.0: RedirectPageBot and NoRedirectPageBot bot classes are deprecated in favour of

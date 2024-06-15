@@ -583,7 +583,7 @@ Release History
 * L10N updates
 * Circumvent circular import in tools module (:phab:`T306760`)
 * Don't fix html inside syntaxhighlight parts in fixes.py (:phab:`T306723`)
-* Make layer parameter optional in `pywikibot.debug()` (:phab:`T85620`)
+* Make layer parameter optional in :func:`pywikibot.debug()<pywikibot.logging.debug>` (:phab:`T85620`)
 * Retry for internal_api_error_DBQueryTimeoutError errors due to :phab:`T297708`
 * Handle ParserError within xmlreader.XmlDump.parse() instead of raising an exception (:phab:`T306134`)
 * XMLDumpOldPageGenerator is deprecated in favour of a `content` parameter (:phab:`T306134`)
