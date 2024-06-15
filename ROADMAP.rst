@@ -73,6 +73,8 @@ Pending removal in Pywikibot 10
 * 7.3.0: Old color escape sequences like ``\03{color}`` is deprecated in favour of new color format like <<color>>
 * 7.3.0: ``linktrail`` method of :class:`family.Family` is deprecated; use :meth:`APISite.linktrail()
   <pywikibot.site._apisite.APISite.linktrail>` instead
+* 7.2.0: Positional arguments *decoder*, *layer* and *newline* for :mod:`logging` functions where dropped; keyword 
+  arguments must be used instead.
 * 7.2.0: ``tb`` parameter of :func:`exception()<pywikibot.exception>` function was renamed to ``exc_info``
 * 7.2.0: XMLDumpOldPageGenerator is deprecated in favour of a ``content`` parameter of
   :func:`XMLDumpPageGenerator<pagegenerators.XMLDumpPageGenerator>` (:phab:`T306134`)
