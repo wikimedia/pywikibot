@@ -21,7 +21,7 @@ Table of contents
 
 .. toctree::
    :glob:
-   :maxdepth: 2
+   :titlesonly:
 
    pywikibot
    pywikibot.config
@@ -44,3 +44,4 @@ Table of contents
    pywikibot.userinterfaces
    logging
    *
+   tools/*
