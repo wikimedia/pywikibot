@@ -2310,7 +2310,8 @@ class GeneratorsMixin:
         'query+protectedtitles' module.
 
         .. versionchanged:: 9.0
-        *type* parameter was renamed to *protect_type*.
+           *type* parameter was renamed to *protect_type*.
+
         .. seealso:: :api:`Protectedtitles`
 
         :param namespace: The searched namespace.

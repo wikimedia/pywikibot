@@ -2013,6 +2013,7 @@ class APISite(
             * unwatch --- remove the page from the watchlist
             * preferences --- use the preference settings (default)
             * nochange --- don't change the watchlist
+
             If None (default), follow bot account's default settings
         :param bot: if True, mark edit with bot flag
 
@@ -2028,7 +2029,7 @@ class APISite(
         :raises AbuseFilterDisallowedError: This action has been
             automatically identified as harmful, and therefore disallowed
         :raises CaptchaError: :ref:`config.solve_captcha
-            <pywikibot.config#account-settings>` is False and saving the
+            <Account Settings>` is False and saving the
             page requires solving a captcha
         :raises CascadeLockedPageError: The page is protected with
             protection cascade
