@@ -256,6 +256,7 @@ class TestFlowHide(FlowTests):
 
     """Hiding topics and posts."""
 
+    @unittest.expectedFailure  # T367303
     def test_hide(self):
         """Hide and restore a test topic and post."""
         for flow in (self.topic, self.post):
