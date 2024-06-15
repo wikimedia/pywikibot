@@ -53,12 +53,15 @@ class TestProtectionBot(ScriptMainTestCase):
             'Unprotecting all pages from category Pywikibot Protect Test')
 
         self.maxDiff = None
-        self.assertEqual(
-            rev[0].comment,
+        comment = rev[0].comment
+        self.assertTrue(comment.startswith(
             'Protected "[[User:Sn1per/ProtectTest2]]": Bot: '
-            'Protecting all pages from category Pywikibot Protect Test ('
-            '[Move=Allow only administrators] (indefinite) '
-            '[Edit=Allow only administrators] (indefinite))')
+            'Protecting all pages from category Pywikibot Protect Test'
+        ))
+        # the order may change, see T367259
+        for ptype in ('Edit', 'Move'):
+            self.assertIn(f'[{ptype}=Allow only administrators] (indefinite)',
+                          comment)
 
 
 if __name__ == '__main__':
