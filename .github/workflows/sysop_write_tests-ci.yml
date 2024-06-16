@@ -25,7 +25,7 @@ jobs:
       matrix:
         python-version: [ "3.7" ]
         site: [ "wikipedia:test" ]
-        attr: [ "write", "rights and not write" ]
+        attr: [ "write and not rights", "write and rights", "rights and not write" ]
         experimental: [ true ]
 
     steps:
