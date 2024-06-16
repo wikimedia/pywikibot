@@ -13,6 +13,7 @@ import os
 import pickle
 import pprint
 import re
+import sys
 import traceback
 from collections.abc import MutableMapping
 from contextlib import suppress
@@ -670,9 +671,12 @@ class Request(MutableMapping, WaitingMixin):
         .. versionchanged:: 8.2
            change the scheme if the previous request didn't have json
            content.
+        .. versionchanged:: 9.2
+           no wait cycles for :exc:`ImportError` and :exc:`NameError`.
 
         :return: a tuple containing requests.Response object from
             http.request and use_get value
+        :meta public:
         """
         kwargs = {}
         schemes = ('http', 'https')
@@ -686,6 +690,7 @@ class Request(MutableMapping, WaitingMixin):
                                     data=data, headers=headers, **kwargs)
         except Server504Error:
             pywikibot.log('Caught HTTP 504 error; retrying')
+
         except Client414Error:
             if use_get:
                 pywikibot.log('Caught HTTP 414 error; retrying')
@@ -694,17 +699,25 @@ class Request(MutableMapping, WaitingMixin):
                 pywikibot.warning(
                     'Caught HTTP 414 error, although not using GET.')
                 raise
-        except (ConnectionError, FatalServerError):
-            # This error is not going to be fixed by just waiting
-            pywikibot.error(traceback.format_exc())
+
+        except (ConnectionError, FatalServerError, NameError):
+            # These errors are not going to be fixed by just waiting
             raise
+
+        except ImportError as e:
+            # Leave the script gracefully
+            pywikibot.error(e)
+            sys.exit(1)
+
         # TODO: what other exceptions can occur here?
         except Exception:
             # for any other error on the http request, wait and retry
             pywikibot.error(traceback.format_exc())
             pywikibot.log(f'{uri}, {paramstring}')
+
         else:
             return response, use_get
+
         self.wait()
         return None, use_get
 

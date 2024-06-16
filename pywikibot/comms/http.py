@@ -432,8 +432,10 @@ def fetch(uri: str, method: str = 'GET', headers: dict | None = None,
     auth = get_authentication(uri)
     if auth is not None and len(auth) == 4:
         if isinstance(requests_oauthlib, ImportError):
-            pywikibot.error(requests_oauthlib)
-            sys.exit(1)
+            raise ModuleNotFoundError(f"""{requests_oauthlib}. Install it with
+
+    pip install requests_oauthlib
+""")
         else:
             auth = requests_oauthlib.OAuth1(*auth)
 
