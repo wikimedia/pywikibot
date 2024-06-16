@@ -26,7 +26,7 @@ To enable access via cookies, assign cookie handling class::
    Cookies are lazy loaded when logging to site.
 """
 #
-# (C) Pywikibot team, 2007-2023
+# (C) Pywikibot team, 2007-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -286,26 +286,25 @@ def request(site: pywikibot.site.BaseSite,
 
 
 def get_authentication(uri: str) -> tuple[str, str] | None:
-    """
-    Retrieve authentication token.
+    """Retrieve authentication token.
 
     :param uri: the URI to access
     :return: authentication token
     """
-    parsed_uri = requests.utils.urlparse(uri)
+    parsed_uri = urlparse(uri)
     netloc_parts = parsed_uri.netloc.split('.')
     netlocs = [parsed_uri.netloc] + ['.'.join(['*'] + netloc_parts[i + 1:])
                                      for i in range(len(netloc_parts))]
     for path in netlocs:
         if path in config.authenticate:
-            if len(config.authenticate[path]) in [2, 4]:
+            length = len(config.authenticate[path])
+            if length in (2, 4):
                 return config.authenticate[path]
-            warn('config.authenticate["{path}"] has invalid value.\n'
-                 'It should contain 2 or 4 items, not {length}.\n'
-                 'See {url}/OAuth for more info.'
-                 .format(path=path,
-                         length=len(config.authenticate[path]),
-                         url=pywikibot.__url__))
+
+            warn(f'config.authenticate[{path!r}] has invalid value.\n'
+                 f'It should contain 2 or 4 items, not {length}.\n'
+                 f'See {pywikibot.__url__}/OAuth for more info.')
+
     return None
 
 
