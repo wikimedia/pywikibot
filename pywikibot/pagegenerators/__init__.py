@@ -68,6 +68,7 @@ from pywikibot.pagegenerators._generators import (
     SearchPageGenerator,
     ShortPagesPageGenerator,
     SubCategoriesPageGenerator,
+    SupersetPageGenerator,
     TextIOPageGenerator,
     UnCategorizedCategoryGenerator,
     UnCategorizedImageGenerator,
@@ -139,6 +140,7 @@ __all__ = (
     'SearchPageGenerator',
     'ShortPagesPageGenerator',
     'SubCategoriesPageGenerator',
+    'SupersetPageGenerator',
     'TextIOPageGenerator',
     'UnCategorizedCategoryGenerator',
     'UnCategorizedImageGenerator',
@@ -354,6 +356,12 @@ GENERATOR OPTIONS
                     WHERE page_namespace = 0"
                     and treats the resulting pages. See :manpage:`MySQL`
                     for more details.
+
+-supersetquery      Takes a SQL query string like
+                    "SELECT page_namespace, page_title FROM page
+                    WHERE page_namespace = 0" and run it in
+                    https://superset.wmcloud.org/ and treats
+                    the resulting pages.
 
 -sparql             Takes a SPARQL SELECT query string including ?item
                     and works on the resulting pages.

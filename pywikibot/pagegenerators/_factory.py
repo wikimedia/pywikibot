@@ -46,6 +46,7 @@ from pywikibot.pagegenerators._generators import (
     PrefixingPageGenerator,
     RecentChangesPageGenerator,
     SubCategoriesPageGenerator,
+    SupersetPageGenerator,
     TextIOPageGenerator,
     UserContributionsGenerator,
     WikibaseSearchItemPageGenerator,
@@ -900,6 +901,12 @@ class GeneratorFactory:
         if not value:
             value = pywikibot.input('Mysql query string:')
         return MySQLPageGenerator(value, site=self.site)
+
+    def _handle_supersetquery(self, value: str) -> HANDLER_GEN_TYPE:
+        """Handle `-supersetquery` argument."""
+        if not value:
+            value = pywikibot.input('Superset SQL query string:')
+        return SupersetPageGenerator(value, site=self.site)
 
     def _handle_intersect(self, value: str) -> Literal[True]:
         """Handle `-intersect` argument."""
