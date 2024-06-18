@@ -155,8 +155,7 @@ def NewpagesPageGenerator(site: BaseSite | None = None,
                           namespaces: NamespaceArgType = (0, ),
                           total: int | None = None
                           ) -> Generator[pywikibot.page.Page, None, None]:
-    """
-    Iterate Page objects for all new titles in a single namespace.
+    """Iterate Page objects for all new titles in a single namespace.
 
     :param site: Site for generator results.
     :param namespace: namespace to retrieve pages from
@@ -185,8 +184,14 @@ def RecentChangesPageGenerator(
 
     .. versionchanged:: 8.2
        The YieldType depends on namespace. It can be
-       :class:`pywikibot.Page`, :class:`pywikibot.User`,
-       :class:`pywikibot.FilePage` or :class:`pywikibot.Category`.
+       :class:`pywikibot.Page<pywikibot.page.Page>`,
+       :class:`pywikibot.User<pywikibot.page.User>`,
+       :class:`pywikibot.FilePage<pywikibot.page.FilePage>` or
+       :class:`pywikibot.Category<pywikibot.page.Category>`.
+    .. versionchanged:: 9.2
+       Ignore :class:`pywikibot.FilePage<pywikibot.page.FilePage>` if it
+       raises a :exc:`ValueError` during upcast e.g. due to an invaild
+       file extension.
 
     :param site: Site for generator results.
     """
@@ -206,7 +211,12 @@ def RecentChangesPageGenerator(
                 pageclass = pywikibot.Category
             else:
                 pageclass = pywikibot.Page
-            yield pageclass(site, rc['title'])
+            try:
+                yield pageclass(site, rc['title'])
+            except ValueError:
+                if pageclass == pywikibot.FilePage:
+                    pywikibot.exception()
+                raise
 
     if site is None:
         site = pywikibot.Site()

@@ -415,16 +415,12 @@ class TestFilePageDataItem(TestCase):
         )
 
         # Seek to first page without mediainfo.
-        # Retry loop is for excepting incorrect files
-        for retry in range(5):
-            try:
-                for page in gen:
-                    slots = page.latest_revision.slots
-                    if 'mediainfo' not in slots:
-                        break
+        for page in gen:
+            slots = page.latest_revision.slots
+            if 'mediainfo' not in slots:
                 break
-            except ValueError:
-                pass
+        else:
+            self.skipTest('No page found without mediainfo')
 
         item = page.data_item()
         self.assertIsInstance(item, pywikibot.MediaInfo)
