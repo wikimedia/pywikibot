@@ -492,8 +492,13 @@ class APISite(
         """File extensions enabled on the wiki.
 
         .. versionadded:: 8.4
+        .. versionchanged:: 9.2
+           also include extensions from the image repository
         """
-        return sorted(e['ext'] for e in self.siteinfo.get('fileextensions'))
+        ext = self.siteinfo.get('fileextensions')
+        if self.has_image_repository:
+            ext.extend(self.image_repository().siteinfo.get('fileextensions'))
+        return sorted({e['ext'] for e in ext})
 
     @property
     def maxlimit(self) -> int:
@@ -1273,8 +1278,7 @@ class APISite(
     @property
     def has_image_repository(self) -> bool:
         """Return True if site has a shared image repository like Commons."""
-        code, fam = self.shared_image_repository()
-        return bool(code or fam)
+        return self.image_repository() is not None
 
     @property
     def has_data_repository(self) -> bool:
