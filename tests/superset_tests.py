@@ -9,11 +9,12 @@ from __future__ import annotations
 
 import unittest
 from contextlib import suppress
+
 import pywikibot
 from pywikibot.data.superset import SupersetQuery
 from pywikibot.exceptions import NoUsernameError
-from tests.aspects import TestCase
 from pywikibot.pagegenerators import SupersetPageGenerator
+from tests.aspects import TestCase
 
 
 class TestSupersetWithoutAuth(TestCase):
@@ -52,17 +53,17 @@ class TestSupersetWithAuth(TestCase):
         """Superset login and queries."""
         sql = 'SELECT page_id, page_title FROM page LIMIT 2;'
         site = self.get_site()
-        site.login()
-        self.assertTrue(site.logged_in())
 
         # Test login and initial site parameters
+        superset = SupersetQuery(site=site)
         try:
-            superset = SupersetQuery(site=site)
             superset.login()
         except NoUsernameError:
-            pywikibot.warning('Oauth permission is missing. SKIPPING TESTS.')
-            return
+            self.skipTest('Oauth permission is missing.')
+        except ConnectionError as e:
+            self.skipTest(e)
 
+        self.assertTrue(site.logged_in())
         self.assertTrue(superset.connected)
         rows = superset.query(sql)
         self.assertLength(rows, 2)
