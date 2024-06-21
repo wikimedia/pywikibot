@@ -166,6 +166,8 @@ Maintenance
 +------------------------+---------------------------------------------------------+
 | maintenance            | Framework helper scripts                                |
 +========================+=========================================================+
+| addwikis.py            | Script to add wikis to a family file.                   |
++------------------------+---------------------------------------------------------+
 | cache.py               | Script for showing and deleting API cache.              |
 +------------------------+---------------------------------------------------------+
 | colors.py              | Utility to show pywikibot colors.                       |
