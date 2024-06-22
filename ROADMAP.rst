@@ -1,30 +1,7 @@
 Current Release Changes
 =======================
 
-* Add support for ``btmwiki`` to Pywikibot (:phab:`T368069`)
-* Include image repository extensions in :attr:`site.APISite.file_extensions
-  <pywikibot.site._apisite.APISite.file_extensions>`
-* Ignore :exc:`ValueError` durig upcast of :class:`FilePage<pywikibot.page.FilePage>` due to invalid file extension 
-  (:phab:`T367777`)
-* Add :func:`pagegenerators.SupersetPageGenerator` pagegenerator (:phab:`T367684`)
-* No longer wait in :meth:`data.api.Request._http_request` for ``ImportError`` and ``NameError``
-* Replace ``requests.utils.urlparse`` with ``urllib.parse.urlparse`` in
-  :func:`comms.http.get_authentication` (:phab:`T367649`)
-* Show an appropiate message if ``requests_oauthlib`` package is required but missing (:phab:`T353387`)
-* Retry ``DBUnexpectedError`` in :meth:`data.api.Request._internal_api_error` (:phab:`T367383`)
-* Duplicated entries found in :mod:`pywikibot` were removed
-* Pass ``None`` instead of an empty string as *expiry* argument in 
-  :meth:`site.APISite.protect()<pywikibot.site._apisite.APISite.protect>` (:phab:`T367176`)
-* Fix keyword argument in :meth:`Page.undelete()<page.BasePage.undelete>` when 
-  calling :meth:`site.APISite.undelete()<pywikibot.site._apisite.APISite.undelete>` (:phab:`T367037`)
-* Check whether :attr:`BaseBot.generator<bot.BaseBot.generator>` is None in :meth:`run()<bot.BaseBot.run>` method
-* Add *namespaces* parameter to :meth:`Page.templates()<page.BasePage.templates>` and
-  :meth:`Page.itertemplates()<page.BasePage.itertemplates>` and require keyword arguments;
-  only use TEMPLATE namespace for meth:`Page.isDisambig()<page.BasePage.isDisambig>` (:phab:`T365199`)
-* Drop pheetools support for :mod:`proofreadpage` which is no longer available upstreams (:phab:`T366036`)
-* Raise :exc:`exceptions.SectionError` if a section does not exists on a page (:phab:`T107141`)
-* Retry api request on ServerError (:phab:`T364275`, :phab:`T364393`)
-* i18n updates
+* (no changes yet)
 
 Current Deprecations
 ====================
