@@ -39,6 +39,7 @@ from pywikibot.tools import (
     ComparableMixin,
     cached,
     deprecated,
+    deprecate_positionals,
     first_upper,
     issue_deprecation_warning,
     remove_last_args,
@@ -292,11 +293,10 @@ class BasePage(ComparableMixin):
         return title
 
     def section(self) -> str | None:
-        """
-        Return the name of the section this Page refers to.
+        """Return the name of the section this Page refers to.
 
-        The section is the part of the title following a '#' character, if
-        any. If no section is present, return None.
+        The section is the part of the title following a ``#`` character,
+        if any. If no section is present, return None.
         """
         try:
             section = self._link.section
@@ -373,12 +373,14 @@ class BasePage(ComparableMixin):
          ...
         pywikibot.exceptions.IsRedirectPageError: ... is a redirect page.
 
+        .. versionchanged:: 9.2
+           :exc:`exceptions.SectionError` is raised if the
+           :meth:`section` does not exists
         .. seealso:: :attr:`text` property
 
         :param force: reload all page attributes, including errors.
         :param get_redirect: return the redirect text, do not follow the
             redirect, do not raise an exception.
-
         :raises NoPageError: The page does not exist.
         :raises IsRedirectPageError: The page is a redirect.
         :raises SectionError: The section does not exist on a page with
@@ -394,7 +396,18 @@ class BasePage(ComparableMixin):
             if not get_redirect:
                 raise
 
-        return self.latest_revision.text  # type: ignore[attr-defined]
+        text = self.latest_revision.text
+
+        # check for valid section in title
+        page_section = self.section()
+        if page_section:
+            content = textlib.extract_sections(text, self.site)
+            headings = {section.heading for section in content.sections}
+            if page_section not in headings:
+                raise SectionError(f'{page_section!r} is not a valid section '
+                                   f'of {self.title(with_section=False)}')
+
+        return text
 
     def has_content(self) -> bool:
         """
@@ -661,7 +674,7 @@ class BasePage(ComparableMixin):
             if sentences:
                 raise NotImplementedError(
                     "'wiki' variant of extract method does not support "
-                    "'sencence' parameter")
+                    "'sentences' parameter")
 
             extract = self.text[:]
             if intro:
@@ -888,18 +901,19 @@ class BasePage(ComparableMixin):
         return self.namespace() == Namespace.FILE
 
     def isDisambig(self) -> bool:
-        """
-        Return True if this is a disambiguation page, False otherwise.
+        """Return True if this is a disambiguation page, False otherwise.
 
         By default, it uses the Disambiguator extension's result. The
-        identification relies on the presence of the __DISAMBIG__ magic word
-        which may also be transcluded.
+        identification relies on the presence of the ``__DISAMBIG__``
+        magic word which may also be transcluded.
 
-        If the Disambiguator extension isn't activated for the given site,
-        the identification relies on the presence of specific templates.
-        First load a list of template names from the Family file;
-        if the value in the Family file is None or no entry was made, look for
-        the list on [[MediaWiki:Disambiguationspage]]. If this page does not
+        If the Disambiguator extension isn't activated for the given
+        site, the identification relies on the presence of specific
+        templates. First load a list of template names from the
+        :class:`Family<family.Family>` file via :meth:`BaseSite.disambig()
+        <pywikibot.site._basesite.BaseSite.disambig>`; if the value in
+        the Family file not found, look for the list on
+        ``[[MediaWiki:Disambiguationspage]]``. If this page does not
         exist, take the MediaWiki message. 'Template:Disambig' is always
         assumed to be default, and will be appended regardless of its
         existence.
@@ -913,19 +927,25 @@ class BasePage(ComparableMixin):
                 default = set(self.site.family.disambig('_default'))
             except KeyError:
                 default = {'Disambig'}
+
             try:
-                distl = self.site.family.disambig(self.site.code,
-                                                  fallback=False)
+                distl = self.site.disambig(fallback=False)
             except KeyError:
                 distl = None
-            if distl is None:
+
+            if distl:
+                # Normalize template capitalization
+                self.site._disambigtemplates = {first_upper(t) for t in distl}
+            else:
+                # look for the list on [[MediaWiki:Disambiguationspage]]
                 disambigpages = pywikibot.Page(self.site,
                                                'MediaWiki:Disambiguationspage')
                 if disambigpages.exists():
                     disambigs = {link.title(with_ns=False)
                                  for link in disambigpages.linkedPages()
-                                 if link.namespace() == 10}
+                                 if link.namespace() == Namespace.TEMPLATE}
                 elif self.site.has_mediawiki_message('disambiguationspage'):
+                    # take the MediaWiki message
                     message = self.site.mediawiki_message(
                         'disambiguationspage').split(':', 1)[1]
                     # add the default template(s) for default mw message
@@ -934,16 +954,16 @@ class BasePage(ComparableMixin):
                 else:
                     disambigs = default
                 self.site._disambigtemplates = disambigs
-            else:
-                # Normalize template capitalization
-                self.site._disambigtemplates = {first_upper(t) for t in distl}
-        templates = {tl.title(with_ns=False) for tl in self.templates()}
+
+        templates = {tl.title(with_ns=False)
+                     for tl in self.templates(namespaces=Namespace.TEMPLATE)}
         disambigs = set()
         # always use cached disambig templates
         disambigs.update(self.site._disambigtemplates)
         # see if any template on this page is in the set of disambigs
         disambig_in_page = disambigs.intersection(templates)
-        return self.namespace() != 10 and bool(disambig_in_page)
+        return (self.namespace() != Namespace.TEMPLATE
+                and bool(disambig_in_page))
 
     def getReferences(self,
                       follow_redirects: bool = True,
@@ -1589,17 +1609,33 @@ class BasePage(ComparableMixin):
         """Convenience function to get the Wikibase item of a page."""
         return pywikibot.ItemPage.fromPage(self)
 
-    def templates(self, content: bool = False) -> list[pywikibot.Page]:
-        """
-        Return a list of Page objects for templates used on this Page.
+    @deprecate_positionals(since='9.2')
+    def templates(self,
+                  *,
+                  content: bool = False,
+                  namespaces: NamespaceArgType = None) -> list[pywikibot.Page]:
+        """Return a list of Page objects for templates used on this Page.
 
-        Template parameters are ignored. This method only returns embedded
-        templates, not template pages that happen to be referenced through
-        a normal link.
+        This method returns a list of pages which are embedded as
+        templates even they are not in the TEMPLATE: namespace. This
+        method caches the result. If *namespaces* is used, all pages are
+        retrieved and cached but the result is filtered.
+
+        .. versionchanged:: 2.0
+           a list of :class:`pywikibot.Page` is returned instead of a
+           list of template titles. The given pages may have namespaces
+           different from TEMPLATE namespace. *get_redirect* parameter
+           was removed.
+        .. versionchanged:: 9.2
+           *namespaces* parameter was added; all parameters must be given
+           as keyword arguments.
+
+        .. seealso::
+           - :meth:`itertemplates`
 
         :param content: if True, retrieve the content of the current version
             of each template (default False)
-        :param content: bool
+        :param namespaces: Only iterate pages in these namespaces
         """
         # Data might have been preloaded
         # Delete cache if content is needed and elements have no content
@@ -1608,32 +1644,53 @@ class BasePage(ComparableMixin):
                 and not all(t.has_content() for t in self._templates)):
             del self._templates
 
+        # retrieve all pages in _templates and filter namespaces later
         if not hasattr(self, '_templates'):
             self._templates = set(self.itertemplates(content=content))
 
+        if namespaces is not None:
+            ns = self.site.namespaces.resolve(namespaces)
+            return [t for t in self._templates if t.namespace() in ns]
+
         return list(self._templates)
 
+    @deprecate_positionals(since='9.2')
     def itertemplates(
         self,
         total: int | None = None,
+        *,
         content: bool = False,
+        namespaces: NamespaceArgType = None
     ) -> Iterable[pywikibot.Page]:
-        """
-        Iterate Page objects for templates used on this Page.
+        """Iterate Page objects for templates used on this Page.
 
-        Template parameters are ignored. This method only returns embedded
-        templates, not template pages that happen to be referenced through
-        a normal link.
+        This method yield pages embedded as templates even they are not
+        in the TEMPLATE: namespace. The retrieved pages are not cached
+        but they can be yielded from the cache of a previous
+        :meth:`templates` call.
+
+        .. versionadded:: 2.0
+        .. versionchanged:: 9.2
+           *namespaces* parameter was added; all parameters except
+           *total* must be given as keyword arguments.
+
+        .. seealso::
+           - :meth:`site.APISite.pagetemplates()
+             <pywikibot.site._generators.GeneratorsMixin.pagetemplates>`
+           - :meth:`templates`
+           - :meth:`getReferences`
 
         :param total: iterate no more than this number of pages in total
         :param content: if True, retrieve the content of the current version
             of each template (default False)
-        :param content: bool
+        :param namespaces: Only iterate pages in these namespaces
         """
         if hasattr(self, '_templates'):
-            return itertools.islice(self.templates(content=content), total)
+            return itertools.islice(self.templates(
+                content=content, namespaces=namespaces), total)
 
-        return self.site.pagetemplates(self, total=total, content=content)
+        return self.site.pagetemplates(
+            self, content=content, namespaces=namespaces, total=total)
 
     def imagelinks(
         self,
@@ -1752,8 +1809,8 @@ class BasePage(ComparableMixin):
             lastmove = next(gen)
         except StopIteration:
             raise NoMoveTargetError(self)
-        else:
-            return lastmove.target_page
+
+        return lastmove.target_page
 
     def revisions(self,
                   reverse: bool = False,
@@ -1971,8 +2028,7 @@ class BasePage(ComparableMixin):
         return self._has_deleted_revisions
 
     def loadDeletedRevisions(self, total: int | None = None, **kwargs):
-        """
-        Retrieve deleted revisions for this Page.
+        """Retrieve deleted revisions for this Page.
 
         Stores all revisions' timestamps, dates, editors and comments in
         self._deletedRevs attribute.
@@ -2017,8 +2073,11 @@ class BasePage(ComparableMixin):
         return []
 
     def markDeletedRevision(self, timestamp, undelete: bool = True):
-        """
-        Mark the revision identified by timestamp for undeletion.
+        """Mark the revision identified by timestamp for undeletion.
+
+        .. seealso::
+           - :meth:`undelete`
+           - :meth:`loadDeletedRevisions`
 
         :param undelete: if False, mark the revision to remain deleted.
         """
@@ -2030,24 +2089,33 @@ class BasePage(ComparableMixin):
         self._deletedRevs[timestamp]['marked'] = undelete
 
     def undelete(self, reason: str | None = None) -> None:
-        """
-        Undelete revisions based on the markers set by previous calls.
+        """Undelete revisions based on the markers set by previous calls.
 
-        If no calls have been made since loadDeletedRevisions(), everything
-        will be restored.
+        If no calls have been made since :meth:`loadDeletedRevisions`,
+        everything will be restored.
 
-        Simplest case::
+        Simplest case:
+
+        .. code-block:: python
 
             Page(...).undelete('This will restore all revisions')
 
-        More complex::
+        More complex:
 
-            pg = Page(...)
-            revs = pg.loadDeletedRevisions()
+        .. code-block:: Python
+
+            page = Page(...)
+            revs = page.loadDeletedRevisions()
             for rev in revs:
-                if ... #decide whether to undelete a revision
-                    pg.markDeletedRevision(rev) #mark for undeletion
-            pg.undelete('This will restore only selected revisions.')
+                if ...  # decide whether to undelete a revision
+                    page.markDeletedRevision(rev)  # mark for undeletion
+            page.undelete('This will restore only selected revisions.')
+
+        .. seealso::
+           - :meth:`loadDeletedRevisions`
+           - :meth:`markDeletedRevision`
+           - :meth:`site.APISite.undelete
+             <pywikibot.site._apisite.APISite.undelete>`
 
         :param reason: Reason for the action.
         """
@@ -2062,7 +2130,7 @@ class BasePage(ComparableMixin):
             pywikibot.info(f'Undeleting {self.title(as_link=True)}.')
             reason = pywikibot.input(
                 'Please enter a reason for the undeletion:')
-        self.site.undelete(self, reason, revision=undelete_revs)
+        self.site.undelete(self, reason, revisions=undelete_revs)
 
     def protect(self,
                 reason: str | None = None,
@@ -2080,8 +2148,9 @@ class BasePage(ComparableMixin):
         protections dictionary.
 
         Expiry of protections can be set via *kwargs*, see
-        :meth:`Site.protect()<pywikibot.site._apisite.APISite.protect>` for
-        details. By default there is no expiry for the protection types.
+        :meth:`Site.protect()<pywikibot.site._apisite.APISite.protect>`
+        for details. By default there is no expiry for the protection
+        types.
 
         .. seealso::
            - :meth:`Site.protect()
@@ -2094,10 +2163,10 @@ class BasePage(ComparableMixin):
             Defaults to protections is None, which means unprotect all
             protection types.
 
-            Example: ``{'move': 'sysop', 'edit': 'autoconfirmed'}``
+            Example: :code:`{'move': 'sysop', 'edit': 'autoconfirmed'}`
 
-        :param reason: Reason for the action, default is None and will set an
-            empty string.
+        :param reason: Reason for the action, default is None and will
+            set an empty string.
         """
         protections = protections or {}  # protections is converted to {}
         reason = reason or ''  # None is converted to ''

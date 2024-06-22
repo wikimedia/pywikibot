@@ -231,8 +231,8 @@ def Site(code: str | None = None,  # noqa: N802
             tmp = __import__('pywikibot.site', fromlist=[interface])
         except ImportError:
             raise ValueError(f'Invalid interface name: {interface}')
-        else:
-            interface = getattr(tmp, interface)
+
+        interface = getattr(tmp, interface)
 
     if not issubclass(interface, _BaseSite):
         warning(f'Site called with interface={interface.__name__}')

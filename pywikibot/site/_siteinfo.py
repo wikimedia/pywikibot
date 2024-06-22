@@ -303,8 +303,8 @@ class Siteinfo(Container):
             self._get_cached(key)
         except KeyError:
             return False
-        else:
-            return True
+
+        return True
 
     def __contains__(self, key: str) -> bool:
         """Return whether the value is in Siteinfo container.
@@ -316,8 +316,8 @@ class Siteinfo(Container):
             self[key]
         except KeyError:
             return False
-        else:
-            return True
+
+        return True
 
     def is_recognised(self, key: str) -> bool | None:
         """Return if 'key' is a valid property name. 'None' if not cached."""

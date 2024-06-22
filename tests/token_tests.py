@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for tokens."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,7 +11,6 @@ import unittest
 from contextlib import suppress
 
 from pywikibot.exceptions import APIError, Error
-from pywikibot.site import TokenWallet
 from tests.aspects import (
     DefaultSiteTestCase,
     DeprecationTestCase,
@@ -71,11 +70,11 @@ class TokenTestBase(TestCaseBase):
 
         self.token = token
         self._orig_wallet = self.site.tokens
-        self.site.tokens = TokenWallet(self.site)
+        self.site.tokens.clear()
 
     def tearDown(self):
         """Restore site tokens."""
-        self.site.tokens = self._orig_wallet
+        self.site._tokens = self._orig_wallet
         super().tearDown()
 
 
@@ -85,11 +84,9 @@ class PatrolTestCase(TokenTestBase, TestCase):
 
     family = 'wikipedia'
     code = 'test'
-    token_type = 'patrol'
-
-    login = True
     write = True
     rights = 'patrol'
+    token_type = 'patrol'
 
     def test_patrol(self):
         """Test the site.patrol() method."""

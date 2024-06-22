@@ -55,8 +55,7 @@ class TestTkinter(DefaultSiteTestCase):
         self.assertIn('Main Page', text)
 
 
-@require_modules('tkinter')
-@require_modules('PIL')
+@require_modules('tkinter', 'PIL')
 def setUpModule():
     """Skip tests if tkinter or PIL is not installed.
 

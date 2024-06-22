@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""
-This script changes the content language of pages.
+"""This script changes the content language of pages.
 
-These command line parameters can be used to specify which pages to work on:
+These command line parameters can be used to specify which pages to work
+on:
 
 &params;
 
@@ -10,18 +10,20 @@ Furthermore, the following command line parameters are supported:
 
 -setlang          What language the pages should be set to
 
--always           If a language is already set for a page, always change it
-                  to the one set in -setlang.
+-always           If a language is already set for a page, always change
+                  it to the one set in -setlang.
 
--never            If a language is already set for a page, never change it to
-                  the one set in -setlang (keep the current language).
+-never            If a language is already set for a page, never change
+                  it to the one set in -setlang (keep the current
+                  language).
 
 .. note:: This script is a
-   :py:obj:`ConfigParserBot <bot.ConfigParserBot>`. All options
-   can be set within a settings file which is scripts.ini by default.
+   :class:`ConfigParserBot<bot.ConfigParserBot>`. All options can be set
+   within a settings file which is scripts.ini by default.
+.. versionadded:: 5.1
 """
 #
-# (C) Pywikibot team, 2018-2023
+# (C) Pywikibot team, 2018-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -180,11 +182,8 @@ def main(*args: str) -> None:
         return
 
     gen = gen_factory.getCombinedGenerator(preload=True)
-    if gen:
-        bot = ChangeLangBot(generator=gen, **options)
-        bot.run()
-    else:
-        pywikibot.bot.suggest_help(missing_generator=True)
+    bot = ChangeLangBot(generator=gen, **options)
+    bot.run()
 
 
 if __name__ == '__main__':

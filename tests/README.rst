@@ -17,8 +17,8 @@ A function collector also exists in the 'tests' package.
 Running tests
 =============
 
-All tests
----------
+Run all tests
+-------------
 
 The entire suite of tests may be run in the following ways from the root directory:
 
@@ -41,8 +41,8 @@ The entire suite of tests may be run in the following ways from the root directo
 
     tox
 
-Specific tests
---------------
+Run specific tests
+------------------
 
 Individual test components can be run using unittest, pytest or pwb.
 With -lang and -family or -site options pwb can be used to specify a site.
@@ -99,18 +99,27 @@ Environment variables
 =====================
 
 **PYWIKIBOT_TEST_GUI**
-  Enable :mod:`tests.gui_tests`. Used for AppVeyor tests. GitHub actions would
+  Enable :source:`tests/gui_tests`. Used for AppVeyor tests. GitHub actions would
   fail due to ``couldn't connect to display ":1.0"`` error. Set this environment
   variable to run this test locally::
 
     PYWIKIBOT_TEST_GUI=1
 
+**PYWIKIBOT_TEST_LOGOUT**
+  Used when a test is logging out the test user. This environment variable
+  enables :source:`tests/site_login_logout_tests`. The environment setting is
+  needed to ensure that these tests run in their own test action and does not
+  interfere with other tests. Otherwise they could fail if the test user is
+  logged out by the test. Only one instance must run this test script. Set this
+  environment variable to run this test locally::
+
+    PYWIKIBOT_TEST_LOGOUT=1
+
 **PYWIKIBOT_TEST_MODULES**
   Only run tests given with this environment variable. Multiple tests must be
-  separated by a ``,`` without any white space. Available library tests are
-  listed in :ref:`Library tests` and script tests can be found in
-  :ref:`Script tests`. To enable only :mod:`tests.site_tests` and
-  :mod:`tests.wikibase_tests` set the environment variable as::
+  separated by a ``,`` without any white space. For example to enable only
+  :source:`tests/site_tests` and :source:`tests/wikibase_tests` set the
+  environment variable as::
 
     PYWIKIBOT_TEST_MODULES=site,wikibase
 
@@ -125,7 +134,7 @@ Environment variables
 **PYWIKIBOT_TEST_OAUTH**
   This environment variable holds the Oauth token. It is set by
   ``oauth_tests-ci.yml`` CI config file and is solely used by
-  :mod:`tests.oauth_tests`. You can use it for your private tests. The
+  :source:`tests/oauth_tests`. You can use it for your private tests. The
   environment variable must contain consumer key and secret and access
   key and secret delimited by ``:`` as::
 
@@ -141,7 +150,7 @@ Environment variables
 **PYWIKIBOT_TEST_RUNNING**
   This environment variable skips tests instead of raising
   :exc:`exceptions.MaxlagTimeoutError` when maximum retries attempted due to
-  maxlag without success. It is also used by :mod:`tests.script_tests` for code
+  maxlag without success. It is also used by :source:`tests/script_tests` for code
   coverage. GitHub actions and AppVeyor tests activate this variable::
 
     PYWIKIBOT_TEST_RUNNING=1
@@ -151,9 +160,10 @@ Environment variables
   write operations successfully.  These **will** write to the wikis, and they
   should always only write to 'test' wikis.
 
-  These 'write' tests are disabled by default, and currently cannot be
-  run on Travis or AppVeyor as they require interaction using a terminal. Also
-  enabling them won't enable 'edit failure' tests.
+  .. versionchanged:: 9.2
+     Enabling them will also enable 'edit failure' tests which attempt to write
+     to the wikis and **should** fail. If there is a bug in pywikibot or
+     MediaWiki, these tests **may** actually perform a write operation.
 
   To enable 'write' tests, set::
 
@@ -164,15 +174,13 @@ Environment variables
   and **should** fail. If there is a bug in pywikibot or MediaWiki, these
   tests **may** actually perform a write operation.
 
-  These 'edit failure' tests are disabled by default. On Travis they are enabled
-  by default on builds by any other GitHub account except 'wikimedia'.
+  To enable 'edit failure' tests, set::
 
-  To disable 'edit failure' tests, set::
+    PYWIKIBOT_TEST_WRITE_FAIL=1
 
-    PYWIKIBOT_TEST_WRITE_FAIL=0
-
-.. note:: Enabling only 'edit failure' tests or 'write' tests won't enable the other tests
-   automatically.
+  .. deprecated:: 9.2
+     this environment variable no longer has any effect; use
+     :envvar:`PYWIKIBOT_TEST_WRITE` instead.
 
 Instead of setting the environment by the os (or `os.environ` as well) you can use the :mod:`pwb`
 wrapper script to set it::
@@ -219,7 +227,7 @@ Require that the given list of modules can be imported.
 
   from tests.aspects import require_modules
   [......]
-  @require_modules(['important1', 'musthave2'])
+  @require_modules('important1', 'musthave2')
   def test_require_modules(self):
 
 @tests.aspects.require_version

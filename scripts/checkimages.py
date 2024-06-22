@@ -1150,7 +1150,7 @@ class CheckImagesBot:
             try:
                 self.all_licenses.remove(template)
             except ValueError:
-                return False
+                pass
             else:
                 self.white_templates_found = True
         return False

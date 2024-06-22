@@ -2,6 +2,13 @@
 Utility scripts
 ***************
 
+addwikis script
+===============
+
+.. automodule:: scripts.maintenance.addwikis
+   :no-members:
+   :noindex:
+
 cache script
 ============
 

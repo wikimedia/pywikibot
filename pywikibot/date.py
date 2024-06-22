@@ -708,7 +708,7 @@ class MonthFormat(abc.MutableMapping):  # type: ignore[type-arg]
 
 
 def _en_period(period: str):
-    """Create century and millenium format function for ``en`` language."""
+    """Create century and millennium format function for ``en`` language."""
     return lambda m: multi(m, [
         (lambda v: dh_centuryAD(v, '%dst ' + period),
          lambda p: p == 1 or (p > 20 and p % 10 == 1)),
@@ -720,7 +720,7 @@ def _en_period(period: str):
 
 
 def _period_with_pattern(period: str, pattern: str):
-    """Create century and millenium format function with pattern."""
+    """Create century and millennium format function with pattern."""
     return lambda m: multi(m, [
         (lambda v: dh_constVal(v, 1, period), lambda p: p == 1),
         (lambda v: dh(v, pattern, lambda i: i - 1, lambda ii: ii[0] + 1),

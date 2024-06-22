@@ -19,7 +19,7 @@ a deprecator without any arguments.
    deprecation decorators moved to _deprecate submodule
 """
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -31,10 +31,14 @@ import re
 import sys
 import types
 from contextlib import suppress
+from functools import wraps
 from importlib import import_module
 from inspect import getfullargspec
 from typing import Any
 from warnings import warn
+
+from pywikibot.backports import NoneType
+from pywikibot.tools import SPHINX_RUNNING
 
 
 class _NotImplementedWarning(RuntimeWarning):
@@ -172,7 +176,7 @@ def _build_msg_string(instead: str | None, since: str | None) -> str:
        `since`parameter must be a release number, not a timestamp.
 
     :param instead: suggested replacement for the deprecated object
-    :param since: a version string string when the method was deprecated
+    :param since: a version string when the method or function was deprecated
     """
     if since and '.' not in since:
         raise ValueError(f'{since} is not a valid release number')
@@ -202,7 +206,7 @@ def issue_deprecation_warning(name: str,
     :param depth: depth + 1 will be used as stacklevel for the warnings
     :param warning_class: a warning class (category) to be used,
         defaults to FutureWarning
-    :param since: a version string string when the method was deprecated
+    :param since: a version string when the method or function was deprecated
     """
     msg = _build_msg_string(instead, since)
     if warning_class is None:
@@ -211,20 +215,18 @@ def issue_deprecation_warning(name: str,
     warn(msg.format(name, instead), warning_class, depth + 1)
 
 
-@add_full_name
 def deprecated(*args, **kwargs):
     """Decorator to output a deprecation warning.
 
     .. versionchanged:: 7.0
        `since` keyword must be a release number, not a timestamp.
 
-    :keyword instead: if provided, will be used to specify the replacement
-    :type instead: str
-    :keyword since: a version string string when the method was deprecated
-    :type since: str
-    :keyword future_warning: if True a FutureWarning will be thrown,
+    :keyword str instead: if provided, will be used to specify the
+        replacement
+    :keyword str since: a version string when the method or function was
+        deprecated
+    :keyword bool future_warning: if True a FutureWarning will be thrown,
         otherwise it provides a DeprecationWarning
-    :type future_warning: bool
     """
     def decorator(obj):
         """Outer wrapper.
@@ -304,10 +306,17 @@ def deprecated(*args, **kwargs):
     return decorator
 
 
-def deprecate_arg(old_arg: str, new_arg: str | bool | None):
+if not SPHINX_RUNNING:
+    # T365286: decorate deprecated function with add_full_name
+    deprecated = add_full_name(deprecated)
+
+
+def deprecate_arg(old_arg: str, new_arg: str | None = None):
     """Decorator to declare old_arg deprecated and replace it with new_arg.
 
-    Usage:
+    **Usage:**
+
+    .. code-block:: python
 
         @deprecate_arg('foo', 'bar')
         def my_function(bar='baz'): pass
@@ -318,9 +327,12 @@ def deprecate_arg(old_arg: str, new_arg: str | bool | None):
         # ignores 'foo' keyword no longer used by my_function
 
     :func:`deprecated_args` decorator should be used in favour of this
-    ``deprecate_arg`` decorator but it is held to deprecate args which
-    become a reserved word in future Python releases and to prevent
-    syntax errors.
+    ``deprecate_arg`` decorator but it is held to deprecate args of
+    reserved words even for future Python releases and to prevent syntax
+    errors.
+
+    .. versionchanged:: 9.2
+       bool type of *new_arg* is no longer supported.
 
     :param old_arg: old keyword
     :param new_arg: new keyword
@@ -328,21 +340,29 @@ def deprecate_arg(old_arg: str, new_arg: str | bool | None):
     return deprecated_args(**{old_arg: new_arg})
 
 
-def deprecated_args(**arg_pairs):
+def deprecated_args(**arg_pairs: str | None):
     """Decorator to declare multiple args deprecated.
 
-    Usage:
+    **Usage:**
+
+    .. code-block:: python
 
         @deprecated_args(foo='bar', baz=None)
         def my_function(bar='baz'): pass
         # replaces 'foo' keyword by 'bar' and ignores 'baz' keyword
 
+    .. versionchanged:: 3.0.20200703
+       show a FutureWarning if the *arg_pairs* value is True; don't show
+       a warning if the value is an empty string.
+    .. versionchanged:: 6.4
+       show a FutureWarning for renamed arguments
+    .. versionchanged:: 9.2
+       bool type argument is no longer supported.
+
     :param arg_pairs: Each entry points to the new argument name. If an
-        argument is to be removed, the value may be one of the following:
-        - None: shows a DeprecationWarning
-        - False: shows a PendingDeprecationWarning
-        - True: shows a FutureWarning (only once)
-        - empty string: no warning is printed
+        argument is to be removed, the value may be either an empty str
+        or ``None``; the later also shows a `FutureWarning` once.
+    :raises TypeError: *arg_pairs* value is neither str nor None or
     """
     def decorator(obj):
         """Outer wrapper.
@@ -371,15 +391,18 @@ def deprecated_args(**arg_pairs):
                 if old_arg not in __kw:
                     continue
 
-                if new_arg not in [True, False, None, '']:
+                if not isinstance(new_arg, (str, NoneType)):
+                    raise TypeError(
+                        f'deprecated_arg value for {old_arg} of {name} must '
+                        f'be either str or None, not {type(new_arg).__name__}')
+
+                if new_arg:
                     if new_arg in __kw:
                         warn('{new_arg} argument of {name} '
                              'replaces {old_arg}; cannot use both.'
                              .format_map(output_args),
                              RuntimeWarning, depth)
                     else:
-                        # If the value is positionally given this will
-                        # cause a TypeError, which is intentional
                         warn('{old_arg} argument of {name} '
                              'is deprecated; use {new_arg} instead.'
                              .format_map(output_args),
@@ -388,15 +411,9 @@ def deprecated_args(**arg_pairs):
                 elif new_arg == '':
                     pass
                 else:
-                    if new_arg is False:
-                        cls = PendingDeprecationWarning
-                    elif new_arg is True:
-                        cls = FutureWarning
-                    else:  # new_arg is None
-                        cls = DeprecationWarning
                     warn('{old_arg} argument of {name} is deprecated.'
                          .format_map(output_args),
-                         cls, depth)
+                         FutureWarning, depth)
                 del __kw[old_arg]
 
             return obj(*__args, **__kw)
@@ -423,6 +440,84 @@ def deprecated_args(**arg_pairs):
             wrapper.__signature__._parameters = params
 
         return wrapper
+    return decorator
+
+
+def deprecate_positionals(since: str = ''):
+    """Decorator for methods that issues warnings for positional arguments.
+
+    This decorator allowes positional arguments after keyword-only
+    argument syntax (:pep:`3102`) but throws a FutureWarning. The
+    decorator makes the needed argument updates before passing them to
+    the called function or method. This decorator may be used for a
+    deprecation period when require keyword-only arguments.
+
+    Example:
+
+        .. code-block:: python
+
+            @deprecate_positionals(since='9.2.0')
+            def f(posarg, *, kwarg):
+               ...
+
+            f('foo', 'bar')
+
+        This function call passes but throws a FutureWarning. Without
+        decorator a TypeError would be raised.
+
+    .. caution:: The decorated function may not use ``*args`` or
+       ``**kwargs``. The sequence of keyword-only arguments must match
+       the sequence of the old positional arguments, otherwise the
+       assignment of the arguments to the keyworded arguments will fail.
+    .. versionadded:: 9.2
+
+    :param since: a version string when some positional arguments were
+        deprecated
+    """
+    def decorator(func):
+        """Outer wrapper. Inspect the parameters of *func*.
+
+        :param func: function or method beeing wrapped.
+        """
+
+        @wraps(func)
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
+            """Throws the warning and makes the argument fixing.
+
+            :param args: args passed to the decorated functoin or method
+            :param kwargs: kwargs passed to the decorated function or
+                method
+            :return: the value returned by the decorated function or
+                method
+            """
+            if len(args) > positionals:
+                replace_args = list(zip(arg_keys[positionals:],
+                                        args[positionals:]))
+                pos_args = "', '".join(name for name, arg in replace_args)
+                keyw_args = ', '.join('{}={!r}'.format(name, arg)
+                                      for name, arg in replace_args)
+                issue_deprecation_warning(
+                    f"Passing '{pos_args}' as positional "
+                    f'argument(s) to {func.__qualname__}()',
+                    f'keyword arguments like {keyw_args}',
+                    since=since)
+
+                args = args[:positionals]
+                kwargs.update(replace_args)
+
+            return func(*args, **kwargs)
+
+        sig = inspect.signature(func)
+        arg_keys = list(sig.parameters)
+
+        # find the first KEYWORD_ONLY index
+        for positionals, key in enumerate(arg_keys):
+            if sig.parameters[key].kind in (inspect.Parameter.KEYWORD_ONLY,
+                                            inspect.Parameter.VAR_KEYWORD):
+                break
+
+        return wrapper
+
     return decorator
 
 
@@ -520,7 +615,7 @@ def redirect_func(target, *,
         new function.
     :param class_name: The name of the class. It's added to the target and
         source module (separated by a '.').
-    :param since: a version string string when the method was deprecated
+    :param since: a version string when the method or function was deprecated
     :param future_warning: if True a FutureWarning will be thrown,
         otherwise it provides a DeprecationWarning
     :return: A new function which adds a warning prior to each execution.
@@ -597,7 +692,8 @@ class ModuleDeprecationWrapper(types.ModuleType):
             object name, and evaluated when the deprecated object is needed.
         :param warning_message: The warning to display, with positional
             variables: {0} = module, {1} = attribute name, {2} = replacement.
-        :param since: a version string string when the method was deprecated
+        :param since: a version string when the method or function was
+            deprecated
         :param future_warning: if True a FutureWarning will be thrown,
             otherwise it provides a DeprecationWarning
         """

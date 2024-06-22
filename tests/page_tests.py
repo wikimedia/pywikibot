@@ -22,6 +22,7 @@ from pywikibot.exceptions import (
     IsNotRedirectPageError,
     IsRedirectPageError,
     NoPageError,
+    SectionError,
     TimeoutError,
     UnknownExtensionError,
 )
@@ -974,6 +975,7 @@ class TestPageRedirects(TestCase):
 
     def testPageGet(self):
         """Test ``Page.get()`` on different types of pages."""
+        fail_msg = '{page!r}.get() raised {error!r} unexpectedly!'
         site = self.get_site('en')
         p1 = pywikibot.Page(site, 'User:Legoktm/R2')
         p2 = pywikibot.Page(site, 'User:Legoktm/R1')
@@ -986,8 +988,26 @@ class TestPageRedirects(TestCase):
                                     r'{} is a redirect page\.'
                                     .format(re.escape(str(p2)))):
             p2.get()
+
+        try:
+            p2.get(get_redirect=True)
+        except (IsRedirectPageError, NoPageError, SectionError) as e:
+            self.fail(fail_msg.format(page=p2, error=e))
+
         with self.assertRaisesRegex(NoPageError, NO_PAGE_RE):
             p3.get()
+
+        page = pywikibot.Page(site, 'User:Legoktm/R2#Section')
+        with self.assertRaisesRegex(SectionError,
+                                    "'Section' is not a valid section"):
+            page.get()
+
+        site = pywikibot.Site('mediawiki')
+        page = pywikibot.Page(site, 'Manual:Pywikibot/2.0 #See_also')
+        try:
+            page.get()
+        except (IsRedirectPageError, NoPageError, SectionError) as e:
+            self.fail(fail_msg.format(page=page, error=e))
 
     def test_set_redirect_target(self):
         """Test set_redirect_target method."""
@@ -1044,7 +1064,6 @@ class TestPageDelete(TestCase):
 
     family = 'wikipedia'
     code = 'test'
-
     write = True
     rights = 'delete'
 
@@ -1058,7 +1077,7 @@ class TestPageDelete(TestCase):
 
         # Test deletion
         res = p.delete(reason='Pywikibot unit test', prompt=False, mark=False)
-        self.assertEqual(p._pageid, 0)
+        self.assertEqual(p.pageid, 0)
         self.assertEqual(res, 1)
         with self.assertRaisesRegex(NoPageError, NO_PAGE_RE):
             p.get(force=True)
@@ -1119,8 +1138,8 @@ class TestPageProtect(TestCase):
         p1.protect(protections={'edit': 'sysop', 'move': 'autoconfirmed'},
                    reason='Pywikibot unit test')
         self.assertEqual(p1.protection(),
-                         {'edit': ('sysop', 'infinity'),
-                          'move': ('autoconfirmed', 'infinity')})
+                         {'edit': ('sysop', 'infinite'),
+                          'move': ('autoconfirmed', 'infinite')})
 
         p1.protect(protections={'edit': '', 'move': ''},
                    reason='Pywikibot unit test')
@@ -1134,8 +1153,8 @@ class TestPageProtect(TestCase):
         p1.protect(protections={'edit': 'sysop', 'move': 'autoconfirmed'},
                    reason='Pywikibot unit test')
         self.assertEqual(p1.protection(),
-                         {'edit': ('sysop', 'infinity'),
-                          'move': ('autoconfirmed', 'infinity')})
+                         {'edit': ('sysop', 'infinite'),
+                          'move': ('autoconfirmed', 'infinite')})
 
         p1.protect(reason='Pywikibot unit test')
         self.assertEqual(p1.protection(), {})
@@ -1148,8 +1167,8 @@ class TestPageProtect(TestCase):
         p1.protect(protections={'edit': 'sysop', 'move': 'autoconfirmed'},
                    reason='Pywikibot unit test')
         self.assertEqual(p1.protection(),
-                         {'edit': ('sysop', 'infinity'),
-                          'move': ('autoconfirmed', 'infinity')})
+                         {'edit': ('sysop', 'infinite'),
+                          'move': ('autoconfirmed', 'infinite')})
         # workaround
         p1 = pywikibot.Page(site, 'User:Unicodesnowman/ProtectTest')
         p1.protect(protections={'edit': '', 'move': ''},

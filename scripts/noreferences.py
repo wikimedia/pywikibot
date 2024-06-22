@@ -497,9 +497,7 @@ referencesTemplates = {
                'Noot', 'FootnotesSmall'],
         'pl': ['Przypisy', 'Przypisy-lista', 'Uwagi'],
         'pt': ['Notas', 'ref-section', 'Referências', 'Reflist'],
-        'ru': ['Reflist', 'Ref-list', 'Refs', 'Sources',
-               'Примечания', 'Список примечаний',
-               'Сноска', 'Сноски'],
+        'ru': ['Reflist', 'Примечания', 'Список примечаний', 'Сноски'],
         'sd': ['Reflist', 'Refs', 'Reference',
                'حوالا'],
         'simple': ['Reflist'],
@@ -840,11 +838,8 @@ def main(*args: str) -> None:
         if cat:
             gen = cat.articles(namespaces=genFactory.namespaces or [0])
 
-    if gen:
-        bot = NoReferencesBot(generator=gen, **options)
-        bot.run()
-    else:
-        pywikibot.bot.suggest_help(missing_generator=True)
+    bot = NoReferencesBot(generator=gen, **options)
+    bot.run()
 
 
 if __name__ == '__main__':

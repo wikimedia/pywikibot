@@ -1,6 +1,6 @@
 """Page filter generators provided by the pagegenerators module."""
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -155,8 +155,7 @@ def NewpagesPageGenerator(site: BaseSite | None = None,
                           namespaces: NamespaceArgType = (0, ),
                           total: int | None = None
                           ) -> Generator[pywikibot.page.Page, None, None]:
-    """
-    Iterate Page objects for all new titles in a single namespace.
+    """Iterate Page objects for all new titles in a single namespace.
 
     :param site: Site for generator results.
     :param namespace: namespace to retrieve pages from
@@ -185,8 +184,14 @@ def RecentChangesPageGenerator(
 
     .. versionchanged:: 8.2
        The YieldType depends on namespace. It can be
-       :class:`pywikibot.Page`, :class:`pywikibot.User`,
-       :class:`pywikibot.FilePage` or :class:`pywikibot.Category`.
+       :class:`pywikibot.Page<pywikibot.page.Page>`,
+       :class:`pywikibot.User<pywikibot.page.User>`,
+       :class:`pywikibot.FilePage<pywikibot.page.FilePage>` or
+       :class:`pywikibot.Category<pywikibot.page.Category>`.
+    .. versionchanged:: 9.2
+       Ignore :class:`pywikibot.FilePage<pywikibot.page.FilePage>` if it
+       raises a :exc:`ValueError` during upcast e.g. due to an invaild
+       file extension.
 
     :param site: Site for generator results.
     """
@@ -206,7 +211,12 @@ def RecentChangesPageGenerator(
                 pageclass = pywikibot.Category
             else:
                 pageclass = pywikibot.Page
-            yield pageclass(site, rc['title'])
+            try:
+                yield pageclass(site, rc['title'])
+            except ValueError:
+                if pageclass == pywikibot.FilePage:
+                    pywikibot.exception()
+                raise
 
     if site is None:
         site = pywikibot.Site()
@@ -920,6 +930,127 @@ def MySQLPageGenerator(query: str, site: BaseSite | None = None,
         page_name = page_name.decode(site.encoding())
         page = pywikibot.Page(site, page_name, ns=int(namespace_number))
         yield page
+
+
+def SupersetPageGenerator(query: str,
+                          site: BaseSite | None = None,
+                          schema_name: str | None = None,
+                          database_id: int | None = None
+                          ) -> Iterator[pywikibot.page.Page]:
+    """Generate pages that result from the given SPARQL query.
+
+    Pages are generated using site in following order:
+
+    1. site retrieved using page_wikidb column in SQL result
+    2. site as parameter
+    3. site retrieved using schema_name
+
+    SQL columns used are
+
+    - page_id
+    - page_namespace + page_title
+    - page_wikidb
+
+    Example SQL queries
+
+    .. code-block:: sql
+
+        SELECT
+            gil_wiki AS page_wikidb,
+            gil_page AS page_id
+        FROM globalimagelinks
+        GROUP BY gil_wiki
+        LIMIT 10
+
+    OR
+
+    .. code-block:: sql
+
+        SELECT
+            page_id
+        FROM page
+        LIMIT 10
+
+    OR
+
+    .. code-block:: sql
+
+        SELECT
+            page_namespace,
+            page_title
+        FROM page
+        LIMIT 10
+
+    .. versionadded:: 9.2
+
+    :param query: the SQL query string.
+    :param site: Site for generator results.
+    :param schema_name: target superset schema name
+    :param database_id: target superset database id
+    """
+    from pywikibot.data.superset import SupersetQuery
+
+    # Do not pass site to superset if schema_name is defined.
+    # The user may use schema_name to point to different
+    # wikimedia db on purpose and use site for
+    # generating result pages.
+
+    superset_site = None if schema_name else site
+
+    superset = SupersetQuery(site=superset_site,
+                             schema_name=schema_name,
+                             database_id=database_id)
+
+    try:
+        rows = superset.query(query)
+    except Exception as e:
+        pywikibot.error(f'Error executing query: {query}\n{e}')
+        return
+
+    sites = {}
+
+    # If there is no site then retrieve it using schema_name
+    if not site:
+        if not schema_name:
+            raise TypeError('Schema name or site must be provided.')
+
+        wikidb = re.sub('_p$', '', schema_name)
+        site = pywikibot.site.APISite.fromDBName(wikidb)
+
+    for row in rows:
+        # If page_wikidb column in SQL result then use it to retrieve site
+        if 'page_wikidb' in row:
+            # remove "_p" suffix
+            wikidb = re.sub('_p$', '', row['page_wikidb'])
+
+            # Caching sites
+            if wikidb not in sites:
+                try:
+                    sites[wikidb] = pywikibot.site.APISite.fromDBName(wikidb)
+                except ValueError:
+                    msg = f'Cannot parse a site from {wikidb} for {row}.'
+                    pywikibot.warning(msg)
+                    continue
+            site = sites[wikidb]
+
+        # Generate page objects
+
+        # Create page object from page_id
+        if 'page_id' in row:
+            page_ids = [row['page_id']]
+            pages = site.load_pages_from_pageids(page_ids)
+            for page in pages:
+                yield page
+
+        # Create page object from page_namespace + page_title
+        elif 'page_title' in rows[0] and 'page_namespace' in rows[0]:
+            page_namespace = int(row['page_namespace'])
+            page_title = row['page_title']
+            page = pywikibot.Page(site, page_title, ns=page_namespace)
+            yield page
+
+        else:
+            raise ValueError('The SQL result is in wrong format.')
 
 
 class XMLDumpPageGenerator(abc.Iterator):  # type: ignore[type-arg]

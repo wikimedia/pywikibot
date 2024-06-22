@@ -103,33 +103,51 @@ Furthermore, the following command line parameters are supported:
 
 -fullsummary      Use one large summary for all command line replacements.
 
-other:            First argument is the old text, second argument is the new
-                  text. If the -regex argument is given, the first argument
-                  will be regarded as a regular expression, and the second
-                  argument might contain expressions like \1 or \g<name>.
-                  It is possible to introduce more than one pair of old text
-                  and replacement.
+
+*Replacement parameters*
+    Replacement parameters are pairs of arguments given to the script.
+    The First argument is the old text to be replaced, the second
+    argument is the new text. If the ``-regex`` argument is given, the
+    first argument will be regarded as a regular expression, and the
+    second argument might contain expressions like ``\1`` or ``\g<name>``.
+    The second parameter can also be specified as empty string, usually
+    ``""``. It is possible to introduce more than one pair of
+    replacement parameters.
+
+.. admonition:: **Empty string arguments with PowerShell**
+   :class: attention
+
+   Using PowerShell as command shell removes empty strings during
+   PowerShell's command line parsing. To enable empty strings with
+   PowerShell you have either to escape quotation marks with gravis
+   symbols in front of them like ```"`"`` or to disable command line
+   parsing with ``--%`` symbol for all following command parts like
+   :samp:`python pwb replace --% -start:! foo ""` which disables parsing
+   for all replace options and arguments following this delimiter and
+   enables empty strings.
 
 Examples
 --------
 
-If you want to change templates from the old syntax, e.g. {{msg:Stub}}, to the
-new syntax, e.g. {{Stub}}, download an XML dump file (pages-articles) from
-https://dumps.wikimedia.org, then use this command:
+If you want to change templates from the old syntax, e.g.
+``{{msg:Stub}}``, to the new syntax, e.g. ``{{Stub}}``, download an XML
+dump file (pages-articles) from https://dumps.wikimedia.org, then use
+this command:
 
     python pwb.py replace -xml -regex "{{msg:(.*?)}}" "{{\1}}"
 
-If you have a dump called foobar.xml and want to fix typos in articles, e.g.
-Errror -> Error, use this:
+If you have a dump called ``foobar.xml`` and want to fix typos in
+articles, e.g. Errror -> Error, use this:
 
     python pwb.py replace -xml:foobar.xml "Errror" "Error" -namespace:0
 
 If you want to do more than one replacement at a time, use this:
 
     python pwb.py replace -xml:foobar.xml "Errror" "Error" "Faail" "Fail" \
--namespace:0
+    -namespace:0
 
-If you have a page called 'John Doe' and want to fix the format of ISBNs, use:
+If you have a page called 'John Doe' and want to fix the format of ISBNs,
+use:
 
     python pwb.py replace -page:John_Doe -fix:isbn
 
@@ -138,11 +156,13 @@ talk about HTTP, where the typo has become part of the standard:
 
     python pwb.py replace referer referrer -file:typos.txt -excepttext:HTTP
 
-Please type "python pwb.py replace -help | more" if you can't read
-the top of the help.
+
+.. seealso:: :mod:`scripts.template` to modify or remove templates.
+.. Please type "python pwb.py replace -help | more" if you can't read
+   the top of the help.
 """
 #
-# (C) Pywikibot team, 2004-2023
+# (C) Pywikibot team, 2004-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -820,6 +840,8 @@ def handle_pairsfile(filename: str) -> list[str] | None:
     """Handle -pairsfile argument.
 
     .. versionadded:: 7.0
+    .. versionchanged:: 9.2
+       replacement patterns are printed it they are incomplete.
     """
     if not filename:
         filename = pywikibot.input(
@@ -835,8 +857,8 @@ def handle_pairsfile(filename: str) -> list[str] | None:
         return None
 
     if len(replacements) % 2:
-        pywikibot.error(
-            f'{filename} contains an incomplete pattern replacement pair.')
+        pywikibot.error(f'{filename} contains an incomplete pattern '
+                        f'replacement pair:\n{replacements}')
         return None
 
     # Strip BOM from first line
@@ -893,10 +915,12 @@ LIMIT 200"""
 
 
 def main(*args: str) -> None:  # noqa: C901
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
+
+    .. versionchanged:: 9.2
+       replacement patterns are printed it they are incomplete.
 
     :param args: command line arguments
     """
@@ -976,7 +1000,8 @@ def main(*args: str) -> None:  # noqa: C901
         return
 
     if len(commandline_replacements) % 2:
-        pywikibot.error('Incomplete command line pattern replacement pair.')
+        pywikibot.error('Incomplete command line pattern replacement pair:\n'
+                        f'{commandline_replacements}')
         return
 
     commandline_replacements += file_replacements
@@ -1112,9 +1137,6 @@ def main(*args: str) -> None:  # noqa: C901
         gen = handle_sql(sql_query, replacements, exceptions['text-contains'])
 
     gen = genFactory.getCombinedGenerator(gen, preload=preload)
-    if pywikibot.bot.suggest_help(missing_generator=not gen):
-        return
-
     bot = ReplaceRobot(gen, replacements, exceptions, site=site,
                        summary=edit_summary, **options)
     site.login()

@@ -11,7 +11,7 @@ import os
 import sys
 import unittest
 import warnings
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from subprocess import PIPE, Popen, TimeoutExpired
 from typing import Any
 
@@ -239,10 +239,15 @@ class DryParamInfo(dict):
 
     def __getitem__(self, name):
         """Return dry data or a dummy parameter block."""
-        try:
+        with suppress(KeyError):
             return super().__getitem__(name)
-        except KeyError:
-            return {'name': name, 'limit': None}
+
+        result = {'name': name, 'prefix': '', 'limit': {}}
+
+        if name == 'query+templates':
+            result['limit'] = {'max': 1}
+
+        return result
 
 
 class DummySiteinfo:
@@ -322,9 +327,8 @@ class DryRequest(CachedRequest):
         """Never invalidate cached data."""
         return False
 
-    def _write_cache(self, data):
-        """Never write data."""
-        return
+    def _write_cache(self, data) -> None:
+        """Never write data but just do nothing."""
 
     def submit(self):
         """Prevented method."""

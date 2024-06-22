@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-"""Test setup.py.
-
-.. versionadded:: 9.0
-"""
+"""Test setup.py."""
 #
 # (C) Pywikibot team, 2024
 #

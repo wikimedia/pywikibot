@@ -3,7 +3,7 @@
 .. versionadded:: 7.7
 """
 #
-# (C) Pywikibot team, 2022-2023
+# (C) Pywikibot team, 2022-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -62,19 +62,20 @@ class WikiBlameMixin:
 
         .. note:: Only implemented for main namespace pages.
         .. note:: Only wikipedias of :attr:`WIKIBLAME_CODES` are supported.
+        .. attention:: This method does not return new results due to
+           :phab:`366100`.
         .. seealso::
            - https://wikihistory.toolforge.org
            - https://de.wikipedia.org/wiki/Wikipedia:Technik/Cloud/wikihistory
 
-        :param onlynew: If False, use the cached values. If True,
-            calculate the Counter data which can take some time; it may
-            fail with TimeoutError after ``config.max_retries``. If None
-            it calculates new data like for True but uses data from
-            cache if new data cannot be calculated in meantime.
+        .. versionchanged:: 9.2
+           do not use any wait cycles due to :phab:`366100`.
+
+        :param onlynew: Currently meaningless
         :return: Number of edits for each username
         :raise NotImplementedError: unsupported site or unsupported namespace
         :raise pywikibot.exceptions.NoPageError: The page does not exist
-        :raise pywikibot.exceptions.TimeoutError: Maximum retries exceeded
+        :raise pywikibot.exceptions.TimeoutError: No cached results found
         """
         baseurl = 'https://wikihistory.toolforge.org'
         pattern = (r'><bdi>(?P<author>.+?)</bdi></a>\s'
@@ -97,10 +98,11 @@ class WikiBlameMixin:
                     {user: int(cnt)
                      for user, cnt in re.findall(pattern, r.text)})
 
+            break  # T366100
+
             delay = pywikibot.config.retry_wait * 2 ** current_retries
             pywikibot.warning('WikiHistory timeout.\n'
-                              'Waiting {:.1f} seconds before retrying.'
-                              .format(delay))
+                              f'Waiting {delay:.1f} seconds before retrying.')
             pywikibot.sleep(delay)
             if onlynew is None and current_retries >= config.max_retries - 2:
                 url += '&onlynew=1'

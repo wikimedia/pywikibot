@@ -6,13 +6,18 @@ The following parameters are supported:
 -worker:<num>     The number of parallel tasks to be run. Default is the
                   number of processors on the machine
 
-Usage::
+**Usage:**
 
     python pwb.py preload_sites [{<family>}] [-worker:{<num>}]
 
-To force preloading, change the global expiry value to 0::
+To force preloading, change the global expiry values to 0:
 
-    python pwb.py -API_config_expiry:0 preload_sites [{<family>}]
+    python pwb.py -API_config_expiry:0 -API_uinfo_expiry:0 \
+    preload_sites [{<family>}]
+
+or run the :mod:`cache<scripts.maintenance.cache>` script previeously:
+
+    python pwb.py cache -delete
 
 .. versionchanged:: 7.4
    script was moved to the framework scripts folder.
@@ -57,7 +62,17 @@ exceptions: dict[str, list[str]] = {
 
 
 def preload_family(family: str, executor: ThreadPoolExecutor) -> None:
-    """Preload all sites of a single family file."""
+    """Preload all sites of a single family file.
+
+    .. versionchanged:: 9.2
+       use a separate worker thread for each site.
+    """
+
+    def create_page(code, family):
+        """Preload siteinfo and userinfo."""
+        site = pywikibot.Site(code, family)
+        pywikibot.Page(site, 'Main Page')
+
     msg = 'Preloading sites of {} family{}'
     pywikibot.info(msg.format(family, '...'))
 
@@ -65,14 +80,13 @@ def preload_family(family: str, executor: ThreadPoolExecutor) -> None:
     for code in exceptions.get(family, []):
         if code in codes:
             codes.remove(code)
+
     obsolete = Family.load(family).obsolete
 
     futures = set()
     for code in codes:
         if code not in obsolete:
-            site = pywikibot.Site(code, family)
-            # page title does not care
-            futures.add(executor.submit(pywikibot.Page, site, 'Main page'))
+            futures.add(executor.submit(create_page, code, family))
     wait(futures)
     pywikibot.info(msg.format(family, ' completed.'))
 

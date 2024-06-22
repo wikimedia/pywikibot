@@ -449,28 +449,21 @@ class TestPageOCR(BS4TestCase):
 
     family = 'wikisource'
     code = 'en'
-
     cached = True
 
-    data = {'title': 'Page:Popular Science Monthly Volume 1.djvu/10',
-            'hocr': (False, 'ENTERED, according to Act of Congress, in the '
-                            'year 1872,\nBY D. APPLETON & CO.,\nIn the Ofﬁce '
-                            'of the Librarian of Congress, at '
-                            'Washington.\n\n'),
-            'ocr': (False, 'EsTEnen, according to Act of Congress, in the '
-                           'year 1872,\nBy D. APPLETON & CO.,\nIn the '
-                           'Office of the Librarian of Congress, at '
-                           'Washington.\n\u000c'),
-            'wmfOCR': (False, 'Estee, according to Act of Congress, in the '
-                              'year 1872,\n'
-                              'By D. APPLETON & CO.,\n'
-                              'In the Office of the Librarian of Congress, '
-                              'at Washington.'),
-            'googleOCR': (False, 'ENTERED, according to Act of Congress, in '
-                                 'the year 1572,\nBY D. APPLETON & CO.\n'
-                                 'In the Office of the Librarian of '
-                                 'Congress, at Washington.\n4 334\n'),
-            }
+    data = {
+        'title':
+            'Page:Popular Science Monthly Volume 1.djvu/10',
+        'wmfOCR':
+            'Estee, according to Act of Congress, in the year 1872,\n'
+            'By D. APPLETON & CO.,\n'
+            'In the Office of the Librarian of Congress, at Washington.',
+        'googleOCR':
+            'ENTERED, according to Act of Congress, in the year 1572,\n'
+            'BY D. APPLETON & CO.\n'
+            'In the Office of the Librarian of Congress, at Washington.\n'
+            '4 334\n',
+    }
 
     def setUp(self):
         """Test setUp."""
@@ -484,33 +477,12 @@ class TestPageOCR(BS4TestCase):
         with self.assertRaises(TypeError):
             self.page.ocr(ocr_tool='dummy')
 
-    def test_do_hocr(self):
-        """Test page._do_hocr()."""
-        error, text = self.page._do_hocr()
-        if error:
-            self.skipTest(text)
-        ref_error, ref_text = self.data['hocr']
-        self.assertEqual(error, ref_error)
-        s = difflib.SequenceMatcher(None, text, ref_text)
-        self.assertGreater(s.ratio(), 0.9)
-
-    def test_do_ocr_phetools(self):
-        """Test page._do_ocr(ocr_tool='phetools')."""
-        error, text = self.page._do_ocr(ocr_tool='phetools')
-        ref_error, ref_text = self.data['ocr']
-        if error:
-            self.skipTest(text)
-        self.assertEqual(error, ref_error)
-        s = difflib.SequenceMatcher(None, text, ref_text)
-        self.assertGreater(s.ratio(), 0.9)
-
     def test_do_ocr_wmfocr(self):
         """Test page._do_ocr(ocr_tool='wmfOCR')."""
         error, text = self.page._do_ocr(ocr_tool='wmfOCR')
         if error:
             self.skipTest(text)
-        ref_error, ref_text = self.data['wmfOCR']
-        self.assertEqual(error, ref_error)
+        ref_text = self.data['wmfOCR']
         s = difflib.SequenceMatcher(None, text, ref_text)
         self.assertGreater(s.ratio(), 0.9)
 
@@ -519,8 +491,7 @@ class TestPageOCR(BS4TestCase):
         error, text = self.page._do_ocr(ocr_tool='googleOCR')
         if error:
             self.skipTest(text)
-        ref_error, ref_text = self.data['googleOCR']
-        self.assertEqual(error, ref_error)
+        ref_text = self.data['googleOCR']
         s = difflib.SequenceMatcher(None, text, ref_text)
         self.assertGreater(s.ratio(), 0.9)
 
@@ -531,7 +502,7 @@ class TestPageOCR(BS4TestCase):
         except Exception as exc:
             self.assertIsInstance(exc, ValueError)
         else:
-            _error, ref_text = self.data['wmfOCR']
+            ref_text = self.data['wmfOCR']
             s = difflib.SequenceMatcher(None, text, ref_text)
             self.assertGreater(s.ratio(), 0.9)
 

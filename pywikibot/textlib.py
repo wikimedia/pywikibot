@@ -10,7 +10,7 @@ import itertools
 import re
 from collections import OrderedDict
 from collections.abc import Sequence
-from contextlib import suppress
+from contextlib import closing, suppress
 from html.parser import HTMLParser
 from typing import NamedTuple
 
@@ -543,22 +543,26 @@ def removeDisabledParts(text: str,
 
 
 def removeHTMLParts(text: str, keeptags: list[str] | None = None) -> str:
-    """
-    Return text without portions where HTML markup is disabled.
+    """Return text without portions where HTML markup is disabled.
 
-    Parts that can/will be removed are --
-    * HTML and all wiki tags
+    Parts that can/will be removed are HTML tags and all wiki tags. The
+    exact set of parts which should NOT be removed can be passed as the
+    *keeptags* parameter, which defaults to
+    ``['tt', 'nowiki', 'small', 'sup']``.
 
-    The exact set of parts which should NOT be removed can be passed as the
-    'keeptags' parameter, which defaults to ['tt', 'nowiki', 'small', 'sup'].
+    **Example:**
+
+    >>> removeHTMLParts('<div><b><ref><tt>Hi all!</tt></ref></b></div>')
+    '<tt>Hi all!</tt>'
+
+    .. seealso:: :class:`_GetDataHTML`
     """
-    # try to merge with 'removeDisabledParts()' above into one generic function
-    # thanks to:
-    # https://www.hellboundhackers.org/articles/read-article.php?article_id=841
+    # TODO: try to merge with 'removeDisabledParts()' above into one generic
+    # function
     parser = _GetDataHTML()
     if keeptags is None:
         keeptags = ['tt', 'nowiki', 'small', 'sup']
-    with parser:
+    with closing(parser):
         parser.keeptags = keeptags
         parser.feed(text)
     return parser.textdata
@@ -568,19 +572,38 @@ class _GetDataHTML(HTMLParser):
 
     """HTML parser which removes html tags except they are listed in keeptags.
 
-    This class is also a context manager which closes itself at exit time.
+    The parser is used by :func:`removeHTMLParts` similar to this:
 
-    .. seealso:: :pylib:`html.parser`
+    .. code-block:: python
+
+       from contextlib import closing
+       from pywikibot.textlib import _GetDataHTML
+       with closing(_GetDataHTML()) as parser:
+           parser.keeptags = ['html']
+           parser.feed('<html><head><title>Test</title></head>'
+                       '<body><h1><!-- Parse --> me!</h1></body></html>')
+           print(parser.textdata)
+
+    The result is:
+
+    .. code-block:: html
+
+       <html>Test me!</html>
+
+    .. versionchanged:: 9.2
+       This class is no longer a context manager;
+       :pylib:`contextlib.closing()<contextlib#contextlib.closing>`
+       should be used instead.
+
+    .. seealso::
+       - :pylib:`html.parser`
+       - :pylib:`contextlib#contextlib.closing`
+
+    :meta public:
     """
 
     textdata = ''
     keeptags: list[str] = []
-
-    def __enter__(self) -> None:
-        pass
-
-    def __exit__(self, *exc_info) -> None:
-        self.close()
 
     def handle_data(self, data) -> None:
         """Add data to text."""
@@ -1671,8 +1694,7 @@ def replaceCategoryLinks(oldtext: str,
 
     if under_categories:
         category = get_regexes('category', site)[0]
-        for last_category in category.finditer(newtext):
-            pass
+        last_category = list(category.finditer(newtext))[-1]
         for reg in under_categories:
             special = reg.search(newtext)
             if special and not isDisabled(newtext, special.start()):
@@ -2112,28 +2134,30 @@ class TimeStripper:
         """
         return to_latin_digits(line)
 
-    def _last_match_and_replace(self, txt: str, pat):
+    def _last_match_and_replace(self,
+                                txt: str,
+                                pat) -> tuple[str, Match[str] | None]:
         """Take the rightmost match and replace with marker.
 
         It does so to prevent spurious earlier matches.
         """
-        m = None
-        cnt = 0
-        for cnt, m in enumerate(pat.finditer(txt), start=1):
-            pass
+        all_matches = list(pat.finditer(txt))
+        cnt = len(all_matches)
 
-        def marker(m):
+        if not cnt:
+            return (txt, None)
+
+        m = all_matches[-1]
+
+        def marker(m: Match[str]):
             """
             Replace exactly the same number of matched characters.
 
-            Same number of chars shall be replaced, in order to be able to
-            compare pos for matches reliably (absolute pos of a match
+            Same number of chars shall be replaced, in order to be able
+            to compare pos for matches reliably (absolute pos of a match
             is not altered by replacement).
             """
             return '@' * (m.end() - m.start())
-
-        if not m:
-            return (txt, None)
 
         # month and day format might be identical (e.g. see bug T71315),
         # avoid to wipe out day, after month is matched. Replace all matches
@@ -2252,8 +2276,8 @@ class TimeStripper:
                     f"incorrect month name {dateDict['month']['value']!r} "
                     f'in page in site {self.site}'
                 )
-            else:
-                dateDict['month']['value'] = value
+
+            dateDict['month']['value'] = value
 
             # convert to integers and remove the inner dict
             for k, v in dateDict.items():

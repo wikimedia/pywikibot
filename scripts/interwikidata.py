@@ -29,7 +29,7 @@ Furthermore, the following command line parameters are supported:
    can be set within a settings file which is scripts.ini by default.
 """
 
-# (C) Pywikibot team, 2015-2023
+# (C) Pywikibot team, 2015-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -39,12 +39,7 @@ import pywikibot
 import pywikibot.i18n
 import pywikibot.textlib
 from pywikibot import info, pagegenerators, warning
-from pywikibot.bot import (
-    ConfigParserBot,
-    ExistingPageBot,
-    SingleSiteBot,
-    suggest_help,
-)
+from pywikibot.bot import ConfigParserBot, ExistingPageBot, SingleSiteBot
 from pywikibot.exceptions import APIError, NoPageError
 
 
@@ -229,9 +224,9 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
         except APIError:
             # warning already printed by the API
             return False
-        else:
-            target_item.get(force=True)
-            return target_item
+
+        target_item.get(force=True)
+        return target_item
 
 
 def main(*args: str) -> None:
@@ -249,7 +244,11 @@ def main(*args: str) -> None:
     options = {}
     for arg in local_args:
         option, _, value = arg.partition(':')
-        option = option[1:] if option.startswith('-') else None
+        if option.startswith('-'):
+            option = option[1:]
+        else:
+            continue
+
         if option == 'summary':
             options[option] = value
         else:
@@ -258,11 +257,8 @@ def main(*args: str) -> None:
     site = pywikibot.Site()
 
     generator = gen_factory.getCombinedGenerator(preload=True)
-    if generator:
-        bot = IWBot(generator=generator, site=site, **options)
-        bot.run()
-    else:
-        suggest_help(missing_generator=True)
+    bot = IWBot(generator=generator, site=site, **options)
+    bot.run()
 
 
 if __name__ == '__main__':

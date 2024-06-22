@@ -3,7 +3,8 @@
 
 The following option is supported:
 
--usernames  print usernames for each registered family
+-nouser  do not print usernames; otherwise they are printed for each
+         registered family
 
 .. versionchanged:: 7.0
    version script was moved to the framework scripts folder

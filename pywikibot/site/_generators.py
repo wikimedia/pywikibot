@@ -504,21 +504,29 @@ class GeneratorsMixin:
         self,
         page: pywikibot.Page,
         *,
+        content: bool = False,
         namespaces: NamespaceArgType = None,
         total: int | None = None,
-        content: bool = False,
     ) -> Iterable[pywikibot.Page]:
-        """Iterate templates transcluded (not just linked) on the page.
+        """Iterate pages transcluded (not just linked) on the page.
 
-        .. seealso:: :api:`Templates`
+        .. note: You should not use this method directly; use
+           :meth:`pywikibot.Page.itertemplates` instead.
 
+        .. seealso::
+           - :api:`Templates`
+           - :meth:`page.BasePage.itertemplates`
+
+        :param content: if True, load the current content of each
+            iterated page (default False)
         :param namespaces: Only iterate pages in these namespaces
-        :param content: if True, load the current content of each iterated page
-            (default False)
+        :param total: maximum number of pages to retrieve in total
 
         :raises KeyError: a namespace identifier was not resolved
         :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
+        :raises UnsupportedPageError: a Page object is not supported due
+            to namespace restriction
         """
         tltitle = page.title(with_section=False).encode(self.encoding())
         return self._generator(api.PageGenerator, type_arg='templates',
@@ -999,9 +1007,9 @@ class GeneratorsMixin:
            needs a lot of time on Wikidata site. You have to increase
            the **read** timeout part of ``socket_timeout`` in
            :ref:`Http Settings` in your ``user-config.py`` file. Or
-           increase it patially within your code like:
+           increase it partially within your code like:
 
-           .. code:: python
+           .. code-block:: python
 
               from pywikibot import config
               save_timeout = config.socket_timeout  # save the timeout config
@@ -1787,22 +1795,26 @@ class GeneratorsMixin:
         Yield all deleted revisions.
 
         .. seealso:: :api:`Alldeletedrevisions`
+        .. warning:: *user* keyword argument must be given together with
+           *start* or *end*.
 
         :param namespaces: Only iterate pages in these namespaces
         :param reverse: Iterate oldest revisions first (default: newest)
         :param content: If True, retrieve the content of each revision
         :param total: Number of revisions to retrieve
-        :keyword from: Start listing at this title
-        :keyword to: Stop listing at this title
-        :keyword prefix: Search for all page titles that begin with this value
-        :keyword excludeuser: Exclude revisions by this user
-        :keyword tag: Only list revisions tagged with this tag
-        :keyword user: List revisions by this user
+
+        :keyword str from: Start listing at this title
+        :keyword str to: Stop listing at this title
+        :keyword str prefix: Search for all page titles that begin with this
+            value
+        :keyword str excludeuser: Exclude revisions by this user
+        :keyword str tag: Only list revisions tagged with this tag
+        :keyword str user: List revisions by this user
         :keyword start: Iterate revisions starting at this Timestamp
         :keyword end: Iterate revisions ending at this Timestamp
-        :keyword prop: Which properties to get. Defaults are ids, timestamp,
-            flags, user, and comment (if you have the right to view).
-        :type prop: list[str]
+        :keyword list[str] prop: Which properties to get. Defaults are
+            ``ids``, ``timestamp``, ``flags``, ``user``, and ``comment``
+            (if the bot has the right to view).
         """
         if 'start' in kwargs and 'end' in kwargs:
             self.assert_valid_iter_params('alldeletedrevisions',
@@ -1856,7 +1868,7 @@ class GeneratorsMixin:
         Pages are listed in a fixed sequence, only the starting point is
         random.
 
-        .. seealso: :api:`Random`
+        .. seealso:: :api:`Random`
         .. versionchanged:: 9.0
            Raises ``TypeError`` instead of ``AssertionError`` if
            *redirects* is invalid.
@@ -2298,7 +2310,8 @@ class GeneratorsMixin:
         'query+protectedtitles' module.
 
         .. versionchanged:: 9.0
-        *type* parameter was renamed to *protect_type*.
+           *type* parameter was renamed to *protect_type*.
+
         .. seealso:: :api:`Protectedtitles`
 
         :param namespace: The searched namespace.

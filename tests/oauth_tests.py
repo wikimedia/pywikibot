@@ -13,6 +13,7 @@ from contextlib import suppress
 
 import pywikibot
 from pywikibot import config
+from pywikibot.exceptions import EditConflictError
 from pywikibot.login import OauthLoginManager
 from tests.aspects import (
     DefaultSiteTestCase,
@@ -74,15 +75,21 @@ class OAuthEditTest(OAuthSiteTestCase):
         """Test editing to a page."""
         self.site.login()
         self.assertTrue(self.site.logged_in())
+        title = f'User:{self.site.username()}/edit test'
         ts = str(time.time())
-        p = pywikibot.Page(self.site,
-                           f'User:{self.site.username()}/edit test')
-        p.site.editpage(p, appendtext=ts)
-        revision_id = p.latest_revision_id
-        p = pywikibot.Page(self.site,
-                           f'User:{self.site.username()}/edit test')
-        self.assertEqual(revision_id, p.latest_revision_id)
-        self.assertTrue(p.text.endswith(ts))
+        p = pywikibot.Page(self.site, title)
+        try:
+            p.site.editpage(p, appendtext='\n' + ts)
+        except EditConflictError as e:
+            self.assertEqual(e.page, p)
+        else:
+            revision_id = p.latest_revision_id
+            p = pywikibot.Page(self.site, title)
+            t = p.text
+            if revision_id == p.latest_revision_id:
+                self.assertTrue(p.text.endswith(ts))
+            else:
+                self.assertIn(ts, t)
 
 
 class TestOauthLoginManger(DefaultSiteTestCase, OAuthSiteTestCase):

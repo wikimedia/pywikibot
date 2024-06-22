@@ -13,6 +13,7 @@ import os
 import pickle
 import pprint
 import re
+import sys
 import traceback
 from collections.abc import MutableMapping
 from contextlib import suppress
@@ -30,10 +31,10 @@ from pywikibot.data import WaitingMixin
 from pywikibot.exceptions import (
     Client414Error,
     Error,
+    FatalServerError,
     MaxlagTimeoutError,
     NoUsernameError,
     Server504Error,
-    ServerError,
     SiteDefinitionError,
 )
 from pywikibot.login import LoginStatus
@@ -670,9 +671,13 @@ class Request(MutableMapping, WaitingMixin):
         .. versionchanged:: 8.2
            change the scheme if the previous request didn't have json
            content.
+        .. versionchanged:: 9.2
+           no wait cycles for :exc:`ImportError` and :exc:`NameError`.
 
         :return: a tuple containing requests.Response object from
-            http.request and use_get value
+            :func:`comms.http.request` and *use_get* value
+
+        :meta public:
         """
         kwargs = {}
         schemes = ('http', 'https')
@@ -686,6 +691,7 @@ class Request(MutableMapping, WaitingMixin):
                                     data=data, headers=headers, **kwargs)
         except Server504Error:
             pywikibot.log('Caught HTTP 504 error; retrying')
+
         except Client414Error:
             if use_get:
                 pywikibot.log('Caught HTTP 414 error; retrying')
@@ -694,17 +700,25 @@ class Request(MutableMapping, WaitingMixin):
                 pywikibot.warning(
                     'Caught HTTP 414 error, although not using GET.')
                 raise
-        except (ConnectionError, ServerError):
-            # This error is not going to be fixed by just waiting
-            pywikibot.error(traceback.format_exc())
+
+        except (ConnectionError, FatalServerError, NameError):
+            # These errors are not going to be fixed by just waiting
             raise
+
+        except ImportError as e:
+            # Leave the script gracefully
+            pywikibot.error(e)
+            sys.exit(1)
+
         # TODO: what other exceptions can occur here?
         except Exception:
             # for any other error on the http request, wait and retry
             pywikibot.error(traceback.format_exc())
             pywikibot.log(f'{uri}, {paramstring}')
+
         else:
             return response, use_get
+
         self.wait()
         return None, use_get
 
@@ -720,6 +734,8 @@ class Request(MutableMapping, WaitingMixin):
         :return: a data dict
         :raises pywikibot.exceptions.APIError: unknown action found
         :raises pywikibot.exceptions.APIError: unknown query result type
+
+        :meta public:
         """
         try:
             result = response.json()
@@ -800,6 +816,8 @@ but {scheme!r} is required. Please add the following code to your family file:
 
         .. versionchanged:: 7.2
            Return True to retry the current request and Falso to resume.
+
+        :meta public:
         """
         retry = False
         if 'warnings' not in result:
@@ -838,6 +856,8 @@ but {scheme!r} is required. Please add the following code to your family file:
         the warning is not handled.
 
         .. versionadded:: 7.2
+
+        :meta public:
         """
         warnings = {
             'purge': ("You've exceeded your rate limit. "
@@ -883,7 +903,9 @@ but {scheme!r} is required. Please add the following code to your family file:
     def _internal_api_error(self, code, error, result) -> bool:
         """Check for ``internal_api_error_`` or readonly and retry.
 
-        :raises pywikibot.exceptions.APIMWError: internal_api_error or readonly
+        :raises pywikibot.exceptions.APIMWError: internal_api_error or
+            readonly
+        :meta public:
         """
         iae = 'internal_api_error_'
         if not (code.startswith(iae) or code == 'readonly'):
@@ -898,12 +920,14 @@ but {scheme!r} is required. Please add the following code to your family file:
         # If the error key is in this table, it is probably a temporary
         # problem, so we will retry the edit.
         # TODO: T154011: 'ReadOnlyError' seems replaced by 'readonly'
-        retry = class_name in ['DBConnectionError',  # T64974
-                               'DBQueryError',  # T60158
-                               'DBQueryTimeoutError',  # T297708
-                               'ReadOnlyError',  # T61227
-                               'readonly',  # T154011
-                               ]
+        retry = class_name in [
+            'DBConnectionError',  # T64974
+            'DBQueryError',  # T60158
+            'DBQueryTimeoutError',  # T297708
+            'DBUnexpectedError',  # T360930
+            'ReadOnlyError',  # T61227
+            'readonly',  # T154011
+        ]
 
         pywikibot.error('Detected MediaWiki API exception {}{}'
                         .format(e, '; retrying' if retry else '; raising'))
@@ -1170,6 +1194,8 @@ class CachedRequest(Request):
            remove Python main version from directoy name
 
         :return: base directory path for cache entries
+
+        :meta public:
         """
         path = Path(config.base_dir, 'apicache')
         cls._make_dir(path)
@@ -1189,6 +1215,8 @@ class CachedRequest(Request):
 
         :param dir_name: directory path
         :return: directory path as `pathlib.Path` object for test purpose
+
+        :meta public:
         """
         if isinstance(dir_name, str):
             dir_name = Path(dir_name)
@@ -1228,6 +1256,8 @@ class CachedRequest(Request):
 
         .. versionchanged:: 8.0
            return a `pathlib.Path` object.
+
+        :meta public:
         """
         return CachedRequest._get_cache_dir() / self._create_file_name()
 

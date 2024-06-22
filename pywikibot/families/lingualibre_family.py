@@ -1,9 +1,9 @@
 """Family module for Lingua Libre.
 
-.. versionaddded: 6.5
+.. versionadded:: 6.5
 """
 #
-# (C) Pywikibot team, 2021-2023
+# (C) Pywikibot team, 2021-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -16,7 +16,7 @@ class Family(family.WikimediaFamily, family.WikibaseFamily):
 
     """Family class for Lingua Libre.
 
-    .. versionaddded: 6.5
+    .. versionadded:: 6.5
     """
 
     name = 'lingualibre'

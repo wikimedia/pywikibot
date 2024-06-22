@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the site module."""
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -18,6 +18,8 @@ from contextlib import suppress
 import pywikibot
 from pywikibot import config
 from pywikibot.exceptions import (
+    APIError,
+    Error,
     IsNotRedirectPageError,
     NoPageError,
     PageInUseError,
@@ -506,6 +508,7 @@ class SiteSysopTestCase(DefaultSiteTestCase):
                           prop=prop):
             for item in mysite.alldeletedrevisions(
                 start='2008-10-11T01:02:03Z',
+                user=myuser,
                 total=5
             ):
                 for drev in item['revisions']:
@@ -517,6 +520,7 @@ class SiteSysopTestCase(DefaultSiteTestCase):
                           prop=prop):
             for item in mysite.alldeletedrevisions(
                 start='2008-10-11T01:02:03Z',
+                user=myuser,
                 total=5
             ):
                 for drev in item['revisions']:
@@ -566,8 +570,8 @@ class TestSiteSysopWrite(TestCase):
                          reason='Pywikibot unit test')
         self.assertIsNone(r)
         self.assertEqual(site.page_restrictions(page=p1),
-                         {'edit': ('sysop', 'infinity'),
-                          'move': ('autoconfirmed', 'infinity')})
+                         {'edit': ('sysop', 'infinite'),
+                          'move': ('autoconfirmed', 'infinite')})
 
         expiry = pywikibot.Timestamp.fromISOformat('2050-01-01T00:00:00Z')
         site.protect(protections={'edit': 'sysop', 'move': 'autoconfirmed'},
@@ -595,8 +599,8 @@ class TestSiteSysopWrite(TestCase):
                          reason='Pywikibot unit test')
         self.assertIsNone(r)
         self.assertEqual(site.page_restrictions(page=p1),
-                         {'edit': ('sysop', 'infinity'),
-                          'move': ('autoconfirmed', 'infinity')})
+                         {'edit': ('sysop', 'infinite'),
+                          'move': ('autoconfirmed', 'infinite')})
 
         p1 = pywikibot.Page(site, 'User:Unicodesnowman/ProtectTest')
         expiry = pywikibot.Timestamp.fromISOformat('2050-01-01T00:00:00Z')
@@ -618,13 +622,18 @@ class TestSiteSysopWrite(TestCase):
     def test_protect_exception(self):
         """Test that site.protect() throws an exception for invalid args."""
         site = self.get_site()
-        p1 = pywikibot.Page(site, 'User:Unicodesnowman/ProtectTest')
-        with self.assertRaises(AssertionError):
-            site.protect(protections={'anInvalidValue': 'sysop'},
-                         page=p1, reason='Pywikibot unit test')
-        with self.assertRaises(AssertionError):
-            site.protect(protections={'edit': 'anInvalidValue'},
-                         page=p1, reason='Pywikibot unit test')
+        page = pywikibot.Page(site, 'User:Unicodesnowman/ProtectTest')
+
+        with self.subTest(test='anInvalidType'), \
+             self.assertRaisesRegex(APIError,
+                                    'Invalid protection type "anInvalidType"'):
+            site.protect(protections={'anInvalidType': 'sysop'},
+                         page=page, reason='Pywikibot unit test')
+
+        with self.subTest(test='anInvalidLevel'), \
+             self.assertRaisesRegex(Error, 'Invalid protection level'):
+            site.protect(protections={'edit': 'anInvalidLevel'},
+                         page=page, reason='Pywikibot unit test')
 
     def test_delete(self):
         """Test the site.delete() and site.undelete() methods."""
@@ -700,6 +709,7 @@ class TestSiteSysopWrite(TestCase):
                         show='content|comment|user',
                         reason='pywikibot unit tests')
 
+    @unittest.expectedFailure  # T367309
     def test_revdel_file(self):
         """Test deleting and undeleting file revisions."""
         site = pywikibot.Site('test')

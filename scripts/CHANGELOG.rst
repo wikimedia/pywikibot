@@ -1,6 +1,36 @@
 Scripts Changelog
 =================
 
+9.2.0
+-----
+
+addwikis
+^^^^^^^^
+
+* This maintenance script was added to add wikis to the Family.codes set
+
+commons_information
+^^^^^^^^^^^^^^^^^^^
+
+* Do not remove valid description parts of Information template (:phab:`T364640`)
+* Use transclusions of Information template as default generator
+* Preload pages to make the script upto 10 times faster
+
+illustrate_wikidata
+^^^^^^^^^^^^^^^^^^^
+
+* ``-always`` option is supported
+
+interwikidata
+^^^^^^^^^^^^^
+
+* Do not create an option named None (:phab:`T366409`)
+
+noreferences
+^^^^^^^^^^^^
+
+* L10N updates
+
 9.1.0
 -----
 

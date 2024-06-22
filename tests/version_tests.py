@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-"""Test cases for the :mod:`version` module.
-
-.. versionadded:: 9.2
-"""
+"""Test cases for the :mod:`version` module."""
 #
 # (C) Pywikibot team, 2024
 #
@@ -58,7 +55,7 @@ class RemoteVersionTestCase(TestCase):
                 hsh = version.getversion_onlinerepo('branches/' + branch)
                 try:
                     int(hsh, 16)
-                except ValueError:
+                except ValueError:  # pragma: no cover
                     self.fail(
                         f'{hsh!r} is not a valid hash of {branch} branch')
 

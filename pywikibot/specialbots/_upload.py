@@ -36,7 +36,7 @@ class UploadRobot(BaseBot):
     origin *file_url* passed to the :meth:`upload` method and the
     *filename* returned from that method. It can be used like this:
 
-    .. code:: python
+    .. code-block:: python
 
        def summarize(old: str, new: str | None) -> None:
            if new is None:

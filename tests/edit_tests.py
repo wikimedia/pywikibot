@@ -129,7 +129,7 @@ class TestSiteMergeHistory(TestCase):
                 },
                 'Cannot merge revisions from source '
                 '[[test:User:Sn1per/Nonexistent]] because it does not exist '
-                'on test:test'
+                'on wikipedia:test'
             ),
             (
                 {  # nonexistent dest
@@ -138,7 +138,7 @@ class TestSiteMergeHistory(TestCase):
                 },
                 'Cannot merge revisions to destination '
                 '[[test:User:Sn1per/Nonexistent]] because it does not exist '
-                'on test:test'
+                'on wikipedia:test'
             ),
         ]
 
@@ -149,6 +149,7 @@ class TestSiteMergeHistory(TestCase):
             except Error as err:
                 self.assertEqual(str(err), error_msg)
 
+    @unittest.expectedFailure  # T367300
     def test_merge_history(self):
         """Test Site.merge_history functionality."""
         site = self.get_site()

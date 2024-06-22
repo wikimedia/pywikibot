@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
-"""
-Bot to add images to Wikidata items.
+"""Bot to add images to Wikidata items.
 
 The image is extracted from the page_props. For this to be available the
-PageImages extension (https://www.mediawiki.org/wiki/Extension:PageImages)
-needs to be installed
+PageImages extension
+(https://www.mediawiki.org/wiki/Extension:PageImages) needs to be
+installed.
+
+The following options are provided:
+
+-always    Don't prompt to make changes, just do them.
+-property  The property to add. Should be of type commonsMedia.
 
 Usage:
 
@@ -13,7 +18,7 @@ Usage:
 &params;
 """
 #
-# (C) Pywikibot team, 2013-2022
+# (C) Pywikibot team, 2013-2024
 #
 # Distributed under the terms of MIT license.
 #
@@ -30,19 +35,19 @@ class IllustrateRobot(WikidataBot):
 
     """A bot to add Wikidata image claims."""
 
-    def __init__(self, wdproperty: str = 'P18', **kwargs) -> None:
-        """Initializer.
+    update_options = {
+        'property': 'P18',
+    }
 
-        :param wdproperty: The property to add. Should be of type commonsMedia
-        """
+    def __init__(self, **kwargs) -> None:
+        """Initializer."""
         super().__init__(**kwargs)
-        self.wdproperty = wdproperty
         self.cacheSources()
 
-        claim = pywikibot.Claim(self.repo, self.wdproperty)
+        claim = pywikibot.Claim(self.repo, self.opt.property)
         if claim.type != 'commonsMedia':
-            raise ValueError('{} is of type {}, should be commonsMedia'
-                             .format(self.wdproperty, claim.type))
+            raise ValueError(f'{self.opt.property} is of type {claim.type},'
+                             ' should be commonsMedia')
 
     def treat_page_and_item(self, page, item) -> None:
         """Treat a page / item."""
@@ -53,12 +58,12 @@ class IllustrateRobot(WikidataBot):
             return
 
         claims = item.get().get('claims')
-        if self.wdproperty in claims:
-            pywikibot.info('Item {} already contains image ({})'
-                           .format(item.title(), self.wdproperty))
+        if self.opt.property in claims:
+            pywikibot.info(f'Item {item.title()} already contains image '
+                           f'({self.opt.property})')
             return
 
-        newclaim = pywikibot.Claim(self.repo, self.wdproperty)
+        newclaim = pywikibot.Claim(self.repo, self.opt.property)
         commonssite = pywikibot.Site('commons')
         imagelink = pywikibot.Link(imagename, source=commonssite,
                                    default_namespace=6)
@@ -87,24 +92,20 @@ def main(*args: str) -> None:
     local_args = pywikibot.handle_args(args)
     generator_factory = pagegenerators.GeneratorFactory()
 
-    wdproperty = 'P18'
+    options = {}
 
     for arg in local_args:
-        if arg.startswith('-property'):
-            if len(arg) == 9:
-                wdproperty = pywikibot.input(
-                    'Please enter the property you want to add:')
-            else:
-                wdproperty = arg[10:]
+        opt, _, value = arg.partition(':')
+        if opt == '-property':
+            options['property'] = value or pywikibot.input(
+                'Please enter the property you want to add:')
+        elif opt == '-always':
+            options[opt[1:]] = True
         else:
             generator_factory.handle_arg(arg)
 
-    generator = generator_factory.getCombinedGenerator(preload=True)
-    if not generator:
-        pywikibot.bot.suggest_help(missing_generator=True)
-        return
-
-    bot = IllustrateRobot(wdproperty, generator=generator)
+    options['generator'] = generator_factory.getCombinedGenerator(preload=True)
+    bot = IllustrateRobot(**options)
     bot.run()
 
 

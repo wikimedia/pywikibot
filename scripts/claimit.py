@@ -46,7 +46,7 @@ but 'p' must be included.
 
 """
 #
-# (C) Pywikibot team, 2013-2023
+# (C) Pywikibot team, 2013-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -150,10 +150,6 @@ def main(*args: str) -> None:
         claims.append(claim)
 
     generator = gen.getCombinedGenerator()
-    if not generator:
-        pywikibot.bot.suggest_help(missing_generator=True)
-        return
-
     bot = ClaimRobot(claims, exists_arg, generator=generator)
     bot.run()
 

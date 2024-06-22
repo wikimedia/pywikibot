@@ -85,6 +85,7 @@ auto_run_script_set = {
     'category_redirect',
     'checkimages',
     'clean_sandbox',
+    'commons_information',
     'create_isbn_edition',
     'delinker',
     'login',
@@ -318,12 +319,6 @@ class ScriptTestMeta(MetaTestCaseClass):
                     f'{script_name} has dependencies; skipping'
                 )(dct[test_name])
 
-            # Disable test by default in pytest
-            if script_name in unrunnable_script_set:
-                # flag them as an expectedFailure due to py.test (T135594)
-                dct[test_name] = unittest.expectedFailure(dct[test_name])
-                dct[test_name].__test__ = False
-
         return super().__new__(cls, name, bases, dct)
 
 
@@ -363,6 +358,7 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
     _expected_failures = {
         'catall',          # stdout user interaction
         'checkimages',
+        'commons_information',  # no empty out_result
         'revertbot',
         'transwikiimport',
     }
@@ -370,14 +366,18 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
     _allowed_failures = {
         'blockpageschecker',  # not localized for some test sites
         'category_redirect',
+        'claimit',
         'clean_sandbox',
+        'coordinate_import',
         'delinker',
         'disambredir',
+        'illustrate_wikidata',
         'misspelling',  # T94681
         'noreferences',
         'nowcommons',
         'patrol',
         'shell',
+        'speedy_delete',
         'unusedfiles',  # not localized for default sites
         'upload',  # raises custom ValueError
         'watchlist',  # not logged in

@@ -60,7 +60,8 @@ class SequenceOutputter:
         """Output the text of the current sequence.
 
         .. deprecated:: 9.0
-           Use :func:`pywikibot.info` with *out* property
+           Use :func:`pywikibot.info()<pywikibot.logging.info>` with
+           :attr:`out` property.
         """
         info(self.out)
 

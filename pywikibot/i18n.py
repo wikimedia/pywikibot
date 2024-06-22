@@ -15,7 +15,7 @@ __init__.py, and a message bundle called 'pywikibot' containing messages.
 See :py:obj:`twtranslate` for more information on the messages.
 """
 #
-# (C) Pywikibot team, 2004-2023
+# (C) Pywikibot team, 2004-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -657,7 +657,7 @@ def get_bot_prefix(
 ) -> str:
     """Get the bot prefix string like 'Bot: ' including space delimiter.
 
-    .. note: If *source* is a str and ``config.bot_prefix`` is set to
+    .. note:: If *source* is a str and ``config.bot_prefix`` is set to
        None, it cannot be determined whether the current user is a bot
        account. In this cas the prefix will be returned.
     .. versionadded:: 8.1

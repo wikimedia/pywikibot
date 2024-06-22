@@ -507,55 +507,48 @@ class CheckHostnameMixin(TestCaseBase):
 
 class SiteWriteMixin(TestCaseBase):
 
-    """
-    Test cases involving writing to the server.
+    """Test cases involving writing to the server.
 
-    When editing, the API should not be patched to use
-    CachedRequest. This class prevents that.
+    When editing, the API should not be patched to use CachedRequest.
+    This class prevents that.
     """
 
     @classmethod
-    def setUpClass(cls):
-        """
-        Set up the test class.
+    def setUpClass(cls) -> None:
+        """Set up the test class.
 
-        Reject write test classes configured with non-test wikis, or caching.
+        Reject write test classes configured with non-test wikis, or
+        caching. Prevent test classes from writing to the site by
+        default.
 
-        Prevent test classes from writing to the site by default.
+        The test class is skipped unless environment variable
+        :envvar:`PYWIKIBOT_TEST_WRITE` is set to 1.
 
-        If class attribute 'write' is -1, the test class is skipped unless
-        environment variable PYWIKIBOT_TEST_WRITE_FAIL is set to 1.
+        .. versionchanged:: 9.2
+           :envvar:`PYWIKIBOT_TEST_WRITE_FAIL` environment variable was
+           discarded, see :ref:`Environment variables`.
 
-        Otherwise the test class is skipped unless environment variable
-        PYWIKIBOT_TEST_WRITE is set to 1.
+        :raises Exception: test class cannot use *write* attribute
+            together with *cached* and must be run on test sites only.
         """
         if issubclass(cls, ForceCacheMixin):
-            raise Exception(
-                '{} cannot be a subclass of both '
-                'SiteWriteMixin and ForceCacheMixin'
-                .format(cls.__name__))
+            raise Exception(f'{cls.__name__} cannot be a subclass of both'
+                            ' SiteWriteMixin and ForceCacheMixin')
 
         super().setUpClass()
-
         site = cls.get_site()
 
-        if cls.write == -1:
-            env_var = 'PYWIKIBOT_TEST_WRITE_FAIL'
-        else:
-            env_var = 'PYWIKIBOT_TEST_WRITE'
-
-        if os.environ.get(env_var, '0') != '1':
-            raise unittest.SkipTest(
-                f'{cls.__name__!r} write tests disabled. '
-                f'Set {env_var}=1 to enable.')
+        if os.environ.get('PYWIKIBOT_TEST_WRITE', '0') != '1':
+            raise unittest.SkipTest(f'{cls.__name__!r} write tests disabled.'
+                                    ' Set PYWIKIBOT_TEST_WRITE=1 to enable.')
 
         if (not hasattr(site.family, 'test_codes')
                 or site.code not in site.family.test_codes):
             raise Exception(
-                '{} should only be run on test sites. '
-                "To run this test, add '{}' to the {} family "
-                "attribute 'test_codes'."
-                .format(cls.__name__, site.code, site.family.name))
+                f'{cls.__name__} should only be run on test sites. To run '
+                f'this test, add {site.code!r} to the {site.family.name}'
+                " family attribute 'test_codes'."
+            )
 
 
 class RequireLoginMixin(TestCaseBase):
@@ -1288,17 +1281,19 @@ class PwbTestCase(TestCase):
 
     """Test cases use :mod:`pwb` to invoke scripts.
 
-    Test cases which use pwb typically also access a site, and use the network.
-    Even during initialisation, scripts may call pywikibot.handle_args, which
-    initialises loggers and uses the network to determine if the code is stale.
+    Test cases which use pwb typically also access a site, and use the
+    network. Even during initialisation, scripts may call
+    :func:`pywikibot.handle_args`, which initialises loggers and uses
+    the network to determine if the code is stale.
 
-    The flag 'pwb' is used by the TestCase metaclass to check that a test site
-    is set declared in the class properties, or that 'site = False' is added
-    to the class properties in the unlikely scenario that the test case
-    uses pwb in a way that doesn't use a site.
+    The flag 'pwb' is used by the TestCase metaclass to check that a
+    test site is set declared in the class properties, or that
+    :code:`site = False` is added to the class properties in the
+    unlikely scenario that the test case uses pwb in a way that doesn't
+    use a site.
 
-    If a test class is marked as 'site = False', the metaclass will also check
-    that the 'net' flag is explicitly set.
+    If a test class is marked as :code:`site = False , the metaclass
+    will also check that the ``net`` flag is explicitly set.
     """
 
     pwb = True
