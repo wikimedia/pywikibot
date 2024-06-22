@@ -4,6 +4,11 @@ Scripts Changelog
 9.2.0
 -----
 
+addwikis
+^^^^^^^^
+
+* This maintenance script was added to add wikis to the Family.codes set
+
 commons_information
 ^^^^^^^^^^^^^^^^^^^
 

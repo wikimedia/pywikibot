@@ -1,15 +1,25 @@
-"""Superset Query interface."""
+"""Superset Query interface.
+
+.. versionadded:: 9.2
+"""
 #
 # (C) Pywikibot team, 2024
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import annotations
+
 from textwrap import fill
+from typing import TYPE_CHECKING, Any
 
 import pywikibot
 from pywikibot.comms import http
 from pywikibot.data import WaitingMixin
 from pywikibot.exceptions import NoUsernameError, ServerError
+
+
+if TYPE_CHECKING:
+    from pywikibot.site import BaseSite
 
 
 class SupersetQuery(WaitingMixin):
@@ -19,27 +29,21 @@ class SupersetQuery(WaitingMixin):
     service.
     """
 
-    def __init__(self, schema_name=None,
-                 site=None, database_id=None):
-        """
-        Create superset endpoint with initial defaults.
+    def __init__(self,
+                 schema_name: str | None = None,
+                 site: BaseSite | None = None,
+                 database_id: int | None = None) -> None:
+        """Create superset endpoint with initial defaults.
 
         Either site OR schema_name is required. Site and schema_name are
         mutually exclusive. Database id will be retrieved automatically
         if needed.
 
         :param site: The mediawiki site to be queried
-        :type site: pywikibot.Site, optional
-
-        :param schema_name: superset database schema name.
-                            Example value "enwiki_p"
-        :type schema_name: str, optional
-
+        :param schema_name: superset database schema name. Example value
+            "enwiki_p"
         :param database_id: superset database id.
-        :type database_id: int, optional
-
         :raises TypeError: if site and schema_name are both defined'
-
         """
         if site and schema_name:
             msg = 'Only one of schema_name and site parameters can be defined'
@@ -59,20 +63,16 @@ class SupersetQuery(WaitingMixin):
         self.last_response = None
         self.superset_url = 'https://superset.wmcloud.org'
 
-    def login(self):
-        """
-        Login to superset.
+    def login(self) -> bool:
+        """Login to superset.
 
-        Function logins first to meta.wikimedia.org
-        and then OAUTH login to superset.wmcloud.org.
-        Working login expects that the user has manually
-        permitted the username to login to the superset.
+        Function logins first to meta.wikimedia.org and then OAUTH login
+        to superset.wmcloud.org. Working login expects that the user has
+        manually permitted the username to login to the superset.
 
         :raises NoUsernameError: if not not logged in.
         :raises ServerError: For other errors
-
         :return: True if user has been logged to superset
-        :rtype bool
         """
         # superset uses meta for OAUTH authentication
         loginsite = pywikibot.Site('meta')
@@ -108,16 +108,14 @@ class SupersetQuery(WaitingMixin):
 
         return self.connected
 
-    def get_csrf_token(self):
-        """
-        Get superset CSRF token.
+    def get_csrf_token(self) -> str:
+        """Get superset CSRF token.
 
-        Method retrieves a CSRF token from the Superset service.
-        If the instance is not connected, it attempts to log in first.
+        Method retrieves a CSRF token from the Superset service. If the
+        instance is not connected, it attempts to log in first.
 
         :raises ServerError: For any http errors
         :return CSRF token string
-        :rtype str
         """
         if not self.connected:
             self.login()
@@ -132,19 +130,14 @@ class SupersetQuery(WaitingMixin):
             status_code = self.last_response.status_code
             raise ServerError(f'CSRF token error:  {status_code}')
 
-    def get_database_id_by_schema_name(self, schema_name):
-        """
-        Get superset database_id using superset schema name.
+    def get_database_id_by_schema_name(self, schema_name: str) -> int:
+        """Get superset database_id using superset schema name.
 
-        :param schema_name: superset database schema name.
-                            Example value "enwiki_p"
-        :type schema_name: str
-
+        :param schema_name: superset database schema name. Example value
+            "enwiki_p"
         :raises KeyError: If the database ID could found.
         :raises ServerError: For any other http errors
-
         :return: database id
-        :rtype: int
         """
         if not self.connected:
             self.login()
@@ -169,27 +162,18 @@ class SupersetQuery(WaitingMixin):
         raise KeyError(f'Schema "{schema_name}" not found in {url}.')
 
     def merge_query_arguments(self,
-                              database_id=None,
-                              schema_name=None,
-                              site=None):
-        """
-        Determine and validate the database_id and schema_name.
+                              database_id: int | None = None,
+                              schema_name: str | None = None,
+                              site: BaseSite = None) -> tuple(int, str):
+        """Determine and validate the database_id and schema_name.
 
         :param database_id: The superset database ID.
-        :type database_id: int, optional
-
         :param schema_name: The superset schema name.
-        :type schema_name: str, optional
-
         :param site: The target site
-        :type site: pywikibot.Site, optional
-
         :raises TypeError: if site and schema_name are both defined'
         :raises TypeError: If determined database_id is not an integer.
         :raises TypeError: If neither site nor schema_name is determined.
-
         :return A tuple containing database_id and schema_name.
-        :rtype: tuple
         """
         if site and schema_name:
             msg = 'Only one of schema_name and site parameters can be defined'
@@ -222,21 +206,17 @@ class SupersetQuery(WaitingMixin):
 
         return database_id, schema_name
 
-    def query(self, sql, database_id=None, schema_name=None, site=None):
-        """
-        Execute SQL queries on Superset.
+    def query(self, sql: str,
+              database_id: int | None = None,
+              schema_name: str | None = None,
+              site: BaseSite = None) -> list[Any]:
+        """Execute SQL queries on Superset.
 
         :param sql: The SQL query to execute.
-        :type sql: str
         :param database_id: The database ID.
-        :type database_id: int, optional
         :param schema_name: The schema name.
-        :type schema_name: str, optional
-
         :raises RuntimeError: If the query execution fails.
-
         :return: The data returned from the query execution.
-        :rtype: list
         """
         if not self.connected:
             self.login()

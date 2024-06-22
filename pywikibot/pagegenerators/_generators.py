@@ -1,6 +1,6 @@
 """Page filter generators provided by the pagegenerators module."""
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -980,6 +980,8 @@ def SupersetPageGenerator(query: str,
             page_title
         FROM page
         LIMIT 10
+
+    .. versionadded:: 9.2
 
     :param query: the SQL query string.
     :param site: Site for generator results.

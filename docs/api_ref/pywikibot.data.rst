@@ -29,6 +29,12 @@
 .. automodule:: data.sparql
    :synopsis: SPARQL Query interface
 
+:mod:`data.superset` --- Superset requests
+==========================================
+
+.. automodule:: data.superset
+   :synopsis: Superset Query interface
+
 :mod:`data.wikistats` --- WikiStats requests
 ============================================
 
