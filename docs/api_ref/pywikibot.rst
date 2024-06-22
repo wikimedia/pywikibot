@@ -3,14 +3,6 @@
 ***********************************************
 
 .. automodule:: pywikibot
-   :exclude-members:
-       Bot, CurrentPageBot, WikidataBot, calledModuleName, handle_args, input,
-       input_choice, input_yn, show_help,
-       translate,
-       critical, debug, error, exception, info, log, output, stdout, warning,
-       Category, Claim, FilePage, ItemPage, LexemeForm, LexemePage, LexemeSense,
-       Link, MediaInfo, Page, PropertyPage, SiteLink, User, html2unicode,
-       Timestamp
 
    .. admonition:: Imports from :mod:`bot` module
       :class: tip
