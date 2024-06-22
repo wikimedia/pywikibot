@@ -92,10 +92,3 @@ test_script:
   - ps: "[IO.File]::AppendAllText($env:PYWIKIBOT_USER_CONFIG, 'password_file = ''{0}'';' -f $env:PYWIKIBOT_PASSWD_FILE.replace('\\', '\\\\'))"
 
   - "%CMD_IN_ENV% coverage run -m unittest discover -vv -p \"*_tests.py\""
-
-on_finish:
-  - ps: |
-      $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
-      coverage report
-  - pip install codecov-cli
-  - codecovcli do-upload
