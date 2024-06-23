@@ -114,7 +114,7 @@ class WikiBlameMixin:
         revid: int | None = None,
         date: DATETYPE = None,
     ) -> dict[str, tuple[int, float]]:
-        """Retrieve authorship attributon of an article.
+        """Retrieve authorship attribution of an article.
 
         This method uses XTools/Authorship to retrieve the authors
         measured by character count.
