@@ -63,6 +63,7 @@ jobs:
         pip install "PyMySQL >= 1.0.0"
         pip install pytest
         pip install "sseclient<0.0.23,>=0.0.18"
+        pip install wikitextparser
 
     - name: Generate user files
       run: |
