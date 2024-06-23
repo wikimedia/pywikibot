@@ -78,7 +78,7 @@ class Page(BasePage, WikiBlameMixin):
         # WARNING: may not return all templates used in particularly
         # intricate cases such as template substitution
         titles = {t.title()
-                  for t in self.itertemplates(namespaces=Namespace.TEMPLATE)}
+                  for t in self.templates(namespaces=Namespace.TEMPLATE)}
         templates = self.raw_extracted_templates
         # backwards-compatibility: convert the dict returned as the second
         # element into a list in the format used by old scripts
