@@ -109,7 +109,7 @@ class SetupBase(abc.ABC):
         if self.local or self.remote or self.clear:
             self.clear_old_dist()
             if self.clear:
-                return True  # pragma: no cover
+                return True
 
         if self.upgrade:  # pragma: no cover
             check_call('python -m pip install --upgrade pip', shell=True)
@@ -125,16 +125,22 @@ class SetupBase(abc.ABC):
             for module in ('build', 'twine'):
                 try:
                     import_module(module)
-                except ModuleNotFoundError as e:  # pragma: no cover
+                except ModuleNotFoundError as e:
                     error(f'<<lightred>>{e}')
                     info('<<lightblue>>You may use -upgrade option to install')
                     return False
+        return self.build()  # pragma: no cover
 
+    def build(self) -> bool:  # pragma: no cover
+        """Build the packages.
+
+        .. versionadded:: 9.3
+        """
         self.copy_files()
         info('<<lightyellow>>Build package')
         try:
             check_call('python -m build')
-        except Exception as e:  # pragma: no cover
+        except Exception as e:
             error(e)
             return False
         finally:
@@ -142,7 +148,7 @@ class SetupBase(abc.ABC):
 
         info('<<lightyellow>>Check package and description')
         if run('twine check dist/*', shell=True).returncode:
-            return False  # pragma: no cover
+            return False
 
         if self.local:
             info('<<lightyellow>>Install locally')
@@ -153,7 +159,7 @@ class SetupBase(abc.ABC):
 
         if self.remote and input_yn(
                 '<<lightblue>>Upload dist to pypi', automatic_quit=False):
-            check_call('twine upload dist/*', shell=True)  # pragma: no cover
+            check_call('twine upload dist/*', shell=True)
         return True
 
 
@@ -172,7 +178,7 @@ class SetupPywikibot(SetupBase):
         self.target = target
         self.source = source
 
-    def copy_files(self) -> None:
+    def copy_files(self) -> None:  # pragma: no cover
         """Copy i18n files to pywikibot.scripts folder.
 
         Pywikibot i18n files are used for some translations. They are copied
@@ -186,7 +192,7 @@ class SetupPywikibot(SetupBase):
         shutil.copytree(self.source, self.target)
         info('done')
 
-    def cleanup(self) -> None:
+    def cleanup(self) -> None:  # pragma: no cover
         """Remove all copied files from pywikibot scripts folder."""
         info('<<lightyellow>>Remove copied files... ', newline=False)
         shutil.rmtree(self.target)
