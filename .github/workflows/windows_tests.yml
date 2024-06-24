@@ -1,5 +1,5 @@
-name: Pywikibot CI
-# Run Pywikibot tests with a variety of Python versions
+name: Windows Tests
+# Successor for Appveyor Tests
 
 on:
   push:
@@ -23,37 +23,14 @@ jobs:
 
     strategy:
       fail-fast: false
-      max-parallel: 18
+      max-parallel: 10
 
       matrix:
-        python-version: [ "pypy3.7", "pypy3.10", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13.0-alpha - 3.13.0", "3.14-dev" ]
-        site: [ "wikipedia:en", "wikisource:zh" ]
-        test_prod_only: [ true ]
-        include:
-          - python-version: "3.7"
-            site: wikipedia:test
-          - python-version: "3.7"
-            site: False
-            family: wpbeta
-            code: en
-          - python-version: "3.7"
-            site: False
-            family: wpbeta
-            code: zh
-          - python-version: "3.8"
-            site: wsbeta:en
-          - python-version: "3.7"
-            site: wikidata:test
-          - python-version: "3.9"
-            site: wiktionary:ar
-            test_no_rc: true
-          - python-version: "3.7"
-            site: wikidata:wikidata
-          - python-version: "3.8"
-            site: wowwiki:uk
-          - python-version: "3"
-            site: wikipedia:de
-            os: macOS-latest
+        python-version: [ "3.7.0", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13.0-alpha - 3.13.0" ]
+        python-arch: [ x64, x86 ]
+        site: [ "wikipedia:en" ]
+        test_prod_only: [ false ]
+        experimental: [ true ]
 
     steps:
     - name: Checkout Repository
@@ -66,6 +43,7 @@ jobs:
       if: "!endsWith(matrix.python-version, '-dev')"
       with:
         python-version: ${{ matrix.python-version }}
+        architecture: ${{ matrix.python-arch }}
 
     # use deadsnakes/action for development releases
     - name: Set up development Python ${{ matrix.python-version }}
@@ -73,18 +51,21 @@ jobs:
       if: "endsWith(matrix.python-version, '-dev')"
       with:
         python-version: ${{ matrix.python-version }}
+        architecture: ${{ matrix.python-arch }}
 
     - name: Install dependencies
       run: |
+        git submodule update --init
+        python --version
+        python -c "import struct; print('PYTHON_ARCH:', struct.calcsize('P') << 3)"
         python -m pip install --upgrade pip
         pip --version
+        if [ ${{matrix.python-version}} == '3.7.0'; then pip install "urllib3<2.0"; fi
+        if [ ${{matrix.python-version}} == '3.7.0'; then pip install -U setuptools; fi
+        if [ ${{matrix.python-version}} >= '3.12'; then pip install -U setuptools; fi
         if [ -f dev-requirements.txt ]; then pip install -r dev-requirements.txt; fi
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         pip install wikitextparser
-
-    - name: Install setuptools
-      if: ${{ (matrix.python-version >= '3.12') || (matrix.os == 'macOS-latest') }}
-      run: pip install setuptools
 
     - name: Generate family files
       run: |
