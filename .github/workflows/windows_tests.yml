@@ -60,9 +60,9 @@ jobs:
         python -c "import struct; print('PYTHON_ARCH:', struct.calcsize('P') << 3)"
         python -m pip install --upgrade pip
         pip --version
-        if [ ${{matrix.python-version}} == '3.7.0'; then pip install "urllib3<2.0"; fi
-        if [ ${{matrix.python-version}} == '3.7.0'; then pip install -U setuptools; fi
-        if [ ${{matrix.python-version}} >= '3.12'; then pip install -U setuptools; fi
+        if [ ${{matrix.python-version}} == '3.7.0' ]; then pip install "urllib3<2.0"; fi
+        if [ ${{matrix.python-version}} == '3.7.0' ]; then pip install -U setuptools; fi
+        if [ ${{matrix.python-version}} >= '3.12' ]; then pip install -U setuptools; fi
         if [ -f dev-requirements.txt ]; then pip install -r dev-requirements.txt; fi
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         pip install wikitextparser
