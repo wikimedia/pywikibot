@@ -12,7 +12,6 @@ such as API result caching and excessive test durations.
 from __future__ import annotations
 
 import inspect
-import itertools
 import os
 import re
 import sys
@@ -27,7 +26,7 @@ from unittest.util import safe_repr
 
 import pywikibot
 from pywikibot import Site, config
-from pywikibot.backports import removeprefix, removesuffix
+from pywikibot.backports import Iterable, Iterator, removeprefix, removesuffix
 from pywikibot.comms import http
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.exceptions import (
@@ -133,32 +132,20 @@ class TestCaseBase(TestTimerMixin):
         self.assertIn(page.namespace(), namespaces,
                       f'{page} not in namespace {namespaces!r}')
 
-    def _get_gen_pages(self, gen, count: int = None, site=None):
-        """
-        Get pages from gen, asserting they are Page from site.
+    def _get_gen_pages(self,
+                       gen: Iterable[pywikibot.Page],
+                       site: pywikibot.site.APISite = None) -> None:
+        """Get pages from gen, asserting they are Page from site.
 
-        Iterates at most two greater than count, including the
-        Page after count if it exists, and then a Page with title '...'
-        if additional items are in the iterator.
+        .. versionchanged:: 9.3
+           the *count* parameter was dropped; all pages from *gen* are
+           tested.
 
         :param gen: Page generator
-        :type gen: typing.Iterable[pywikibot.Page]
-        :param count: number of pages to get
         :param site: Site of expected pages
-        :type site: pywikibot.site.APISite
+        :meta public:
         """
-        original_iter = iter(gen)
-
-        gen = itertools.islice(original_iter, 0, count)
-
         gen_pages = list(gen)
-
-        with suppress(StopIteration):
-            gen_pages.append(next(original_iter))
-            next(original_iter)
-            if not site:
-                site = gen_pages[0].site
-            gen_pages.append(pywikibot.Page(site, '...'))
 
         for page in gen_pages:
             self.assertIsInstance(page, pywikibot.Page)
@@ -167,9 +154,9 @@ class TestCaseBase(TestTimerMixin):
 
         return gen_pages
 
-    def _get_gen_titles(self, gen, count: int, site=None) -> list[str]:
+    def _get_gen_titles(self, gen, site=None) -> list[str]:
         """Return a list of page titles of given iterable."""
-        return [page.title() for page in self._get_gen_pages(gen, count, site)]
+        return [page.title() for page in self._get_gen_pages(gen, site)]
 
     @staticmethod
     def _get_canonical_titles(titles, site=None):
@@ -220,38 +207,36 @@ class TestCaseBase(TestTimerMixin):
 
         self.assertEqual(page_namespaces, namespaces)
 
-    def assertPageTitlesEqual(self, gen, titles, site=None):
-        """
-        Test that pages in gen match expected titles.
-
-        Only iterates to the length of titles plus two.
+    def assertPageTitlesEqual(
+        self,
+        gen: Iterable[pywikibot.Page],
+        titles: Iterator[str],
+        site: pywikibot.site.APISite | None = None
+    ) -> None:
+        """Test that pages in gen match expected titles.
 
         :param gen: Page generator
-        :type gen: typing.Iterable[pywikibot.Page]
         :param titles: Expected titles
-        :type titles: iterator
         :param site: Site of expected pages
-        :type site: pywikibot.site.APISite
         """
         titles = self._get_canonical_titles(titles, site)
-        gen_titles = self._get_gen_titles(gen, len(titles), site)
+        gen_titles = self._get_gen_titles(gen, site)
         self.assertEqual(gen_titles, titles)
 
-    def assertPageTitlesCountEqual(self, gen, titles, site=None):
-        """
-        Test that pages in gen match expected titles, regardless of order.
-
-        Only iterates to the length of titles plus two.
+    def assertPageTitlesCountEqual(
+        self,
+        gen: Iterable[pywikibot.Page],
+        titles: Iterator[str],
+        site: pywikibot.site.APISite | None = None
+    ) -> None:
+        """Test that pages in gen match expected titles, regardless of order.
 
         :param gen: Page generator
-        :type gen: typing.Iterable[pywikibot.Page]
         :param titles: Expected titles
-        :type titles: iterator
         :param site: Site of expected pages
-        :type site: pywikibot.site.APISite
         """
         titles = self._get_canonical_titles(titles, site)
-        gen_titles = self._get_gen_titles(gen, len(titles), site)
+        gen_titles = self._get_gen_titles(gen, site)
         self.assertCountEqual(gen_titles, titles)
 
     def assertAPIError(self, code, info=None, callable_obj=None, *args,
