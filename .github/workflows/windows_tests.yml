@@ -66,22 +66,9 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         pip install wikitextparser
 
-    - name: Generate family files
-      run: |
-          if  [ ${{matrix.family || 0}} == wpbeta ]; then
-            python pwb.py generate_family_file http://${{matrix.code}}.wikipedia.beta.wmflabs.org/ wpbeta y
-          fi
-          if [ ${{matrix.site || 0}} == 'wsbeta:en' ]; then
-            python pwb.py generate_family_file http://en.wikisource.beta.wmflabs.org/ wsbeta y
-          fi
-
     - name: Generate user files
       run: |
-        if [ ${{matrix.site}} != false ]; then
-          python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
-        else
-          python -Werror::UserWarning -m pwb generate_user_files -family:${{matrix.family}} -lang:${{matrix.code}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
-        fi
+        python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
         echo "usernames['wikipedia']['en'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
         echo "usernames['wikisource']['zh'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
         echo "usernames['wikipedia']['test'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
@@ -99,16 +86,9 @@ jobs:
       id: ci_test
       continue-on-error: true
       timeout-minutes: 90
-      env:
-        PYWIKIBOT_TEST_NO_RC:
-          ${{ (matrix.site == 'wikisource:zh' || matrix.test_no_rc) && 1 || 0 }}
       run: |
         python pwb.py version
-        if [ ${{matrix.site || 0}} != 'wikipedia:test' ]; then
-          coverage run -m unittest discover -vv -p \"*_tests.py\";
-        else
-          pytest --cov=.;
-        fi
+        coverage run -m unittest discover -vv -p \"*_tests.py\";
 
     - name: Show coverage statistics
       run: |
