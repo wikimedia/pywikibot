@@ -29,7 +29,6 @@ jobs:
         python-version: [ "3.7.0", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13.0-alpha - 3.13.0" ]
         python-arch: [ x64, x86 ]
         site: [ "wikipedia:en" ]
-        test_prod_only: [ false ]
         experimental: [ true ]
 
     steps:
@@ -103,7 +102,6 @@ jobs:
       env:
         PYWIKIBOT_TEST_NO_RC:
           ${{ (matrix.site == 'wikisource:zh' || matrix.test_no_rc) && 1 || 0 }}
-        PYWIKIBOT_TEST_PROD_ONLY: ${{ matrix.test_prod_only && 1 || 0 }}
       run: |
         python pwb.py version
         if [ ${{matrix.site || 0}} != 'wikipedia:test' ]; then

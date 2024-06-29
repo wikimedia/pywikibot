@@ -893,13 +893,7 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
         if dry:
             interface = DrySite
 
-        prod_only = os.environ.get('PYWIKIBOT_TEST_PROD_ONLY', '0') == '1'
         for data in cls.sites.values():
-            if (data.get('code') in ('test', 'mediawiki')
-                    and prod_only and not dry):
-                raise unittest.SkipTest(f"Site code {data['code']!r} and"
-                                        ' PYWIKIBOT_TEST_PROD_ONLY is set.')
-
             if 'site' not in data and 'code' in data and 'family' in data:
                 with suppress_warnings(WARN_SITE_CODE, category=UserWarning):
                     data['site'] = Site(data['code'], data['family'],
