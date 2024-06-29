@@ -22,32 +22,12 @@ environment:
       PYTHON_VERSION: "3.7.0"
       PYTHON_ARCH: "32"
 
-
-    # AppVeyor pre-installs these versions onto build machines
-
-    - PYTHON: "C:\\Python37-x64"
-      PYTHON_VERSION: "3.7.x"
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
+      PYTHON: "C:\\Python37"
+      PYTHON_VERSION: "3.7.0"
       PYTHON_ARCH: "64"
 
-    - PYTHON: "C:\\Python38"
-      PYTHON_VERSION: "3.8.x"
-      PYTHON_ARCH: "32"
-
-    - PYTHON: "C:\\Python39-x64"
-      PYTHON_VERSION: "3.9.x"
-      PYTHON_ARCH: "64"
-
-    - PYTHON: "C:\\Python310"
-      PYTHON_VERSION: "3.10.x"
-      PYTHON_ARCH: "32"
-
-    - PYTHON: "C:\\Python311-x64"
-      PYTHON_VERSION: "3.11.x"
-      PYTHON_ARCH: "64"
-
-    - PYTHON: "C:\\Python312"
-      PYTHON_VERSION: "3.12.x"
-      PYTHON_ARCH: "32"
+    # Other versions are tested with GutHub actions
 
 matrix:
   fast_finish: false
@@ -66,9 +46,10 @@ install:
   - python -c "import struct; print('PYTHON_ARCH:', struct.calcsize('P') << 3)"
   - python -m pip install --upgrade pip
   - pip --version
+  # required for Python 3.7.0
   - if [%PYTHON_VERSION%]==[3.7.0] pip install "urllib3<2.0"
   - if [%PYTHON_VERSION%]==[3.7.0] pip install -U setuptools
-  - if [%PYTHON_VERSION%]==[3.12.x] pip install -U setuptools
+  # other requirements
   - pip install -r requirements.txt
   - pip install -r dev-requirements.txt
   - pip install wikitextparser
@@ -76,9 +57,6 @@ install:
 build: off
 
 test_script:
-  - chcp 65001
-  - set PYTHONIOENCODING=utf8
-
   - "mkdir %PYWIKIBOT_DIR%"
   - "python -Werror::UserWarning -m pwb generate_user_files -dir:%PYWIKIBOT_DIR% -family:wikipedia -lang:en -v -debug -user:%PYWIKIBOT_USERNAME%"
   - ps: "[IO.File]::AppendAllText($env:PYWIKIBOT_USER_CONFIG, 'maximum_GET_length = 5000; transliteration_target = None;')"
