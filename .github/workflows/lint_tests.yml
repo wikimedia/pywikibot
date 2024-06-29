@@ -11,7 +11,7 @@ concurrency:
 
 env:
   PYWIKIBOT_TEST_RUNNING: 1
-  PYWIKIBOT_NO_USER_CONFIG=2
+  PYWIKIBOT_NO_USER_CONFIG: 2
 
 jobs:
   build:
