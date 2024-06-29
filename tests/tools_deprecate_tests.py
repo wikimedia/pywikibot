@@ -473,7 +473,7 @@ class DeprecatorTestCase(DeprecationTestCase):
 
     def test_deprecate_and_remove_function_args(self):
         """Test @deprecated and removed function argument."""
-        deprecation_msg = f' argument of {__name__ }.deprecated_func_arg3'
+        deprecation_msg = f' argument of {__name__}.deprecated_func_arg3'
         rv = deprecated_func_arg3()
         self.assertIsNone(rv)
         self.assertNoDeprecation()
