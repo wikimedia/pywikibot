@@ -1,7 +1,12 @@
 Current Release Changes
 =======================
 
-* (no changes yet)
+* use :meth:`page.BasePage.templates` in :meth:`Page.templatesWithParams<page.Page.templatesWithParams>` to cache
+  templates
+* Re-implement :meth:`Page.main_authors()<page._toolforge.WikiBlameMixin.main_authors>` as 
+  :meth:`Page.authorship()<page._toolforge.WikiBlameMixin.authorship>` using ``xtools`` (:phab:`T366100`);
+  ``wikitextparser`` packages is required for it.
+
 
 Current Deprecations
 ====================
