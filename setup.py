@@ -61,7 +61,7 @@ extra_deps = {
         'flake8-print>=5.0.0',
         'flake8-quotes>=3.3.2',
         'flake8-raise',
-        'flake8-string-format',
+        'flake8-string-format; python_version < "3.14"',
         'flake8-tuple>=0.4.1',
         'flake8-no-u-prefixed-strings>=0.2',
         'pep8-naming==0.13.3; python_version < "3.8"',
