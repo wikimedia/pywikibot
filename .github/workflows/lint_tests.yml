@@ -1,0 +1,61 @@
+name: Lint test
+# Run Pywikibot lint tests with a variety of Python versions
+
+on:
+  push:
+    branches: [ master, stable ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYWIKIBOT_TEST_RUNNING: 1
+  PYWIKIBOT_NO_USER_CONFIG=2
+
+jobs:
+  build:
+    runs-on: "ubuntu-latest"
+    continue-on-error: ${{ matrix.experimental || false }}
+    timeout-minutes: 100
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        python-version: [ "pypy3.7", "pypy3.10", "3.10", "3.11", "3.12", "3.13.0-alpha - 3.13.0", "3.14-dev" ]
+        experimental: [ true ]
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        submodules: true
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      if: "!endsWith(matrix.python-version, '-dev')"
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    # use deadsnakes/action for development releases
+    - name: Set up development Python ${{ matrix.python-version }}
+      uses: deadsnakes/action@v3.1.0
+      if: "endsWith(matrix.python-version, '-dev')"
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip --version
+        pip install .[flake8]
+
+    - name: Flake8 tests
+      id: ci_test
+      continue-on-error: true
+      timeout-minutes: 10
+      run: |
+        python --version
+        flake8 --version
+        flake8 --color always --doctests
