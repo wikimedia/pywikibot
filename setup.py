@@ -68,7 +68,7 @@ extra_deps = {
         'pep8-naming>=0.14.0; python_version >= "3.8"',
     ],
     'hacking': [
-        'hacking; python_version < "3.14"',  # T368851
+        'hacking',
         # importlib-metadata module is already installed with hacking 4.1.0
         # used by Python 3.7 but importlib-metadata >= 5 fails, so adjust it
         'importlib-metadata<5.0.0; python_version < "3.8"',
