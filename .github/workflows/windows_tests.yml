@@ -48,7 +48,10 @@ jobs:
         python -c "import struct; print('PYTHON_ARCH:', struct.calcsize('P') << 3)"
         python -m pip install --upgrade pip
         pip --version
-        if ('${{ matrix.python-version }}' -eq '3.7.1') {pip install "urllib3<2.0"}
+        if ('${{ matrix.python-version }}' -eq '3.7.1') {
+          pip install .U setuptools;
+          pip install "urllib3<2.0";
+        }
         pip install -r dev-requirements.txt
         pip install -r requirements.txt
         pip install wikitextparser
