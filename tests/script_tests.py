@@ -411,13 +411,11 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
         'create_isbn_edition',
         'dataextend',
         'data_ingestion',
-        'delete',
         'delinker',
         'djvutext',
         'download_dump',
         'harvest_template',
         'image',  # Foobar has no valid extension
-        'imagetransfer',
         'interwiki',
         'listpages',
         'login',
@@ -447,6 +445,8 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
 
     _allowed_failures = {
         'basic',
+        'delete',  # T368859
+        'imagetransfer',  # T368859
         'newitem',
         'nowcommons',
     }
