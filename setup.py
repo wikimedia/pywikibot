@@ -61,14 +61,14 @@ extra_deps = {
         'flake8-print>=5.0.0',
         'flake8-quotes>=3.3.2',
         'flake8-raise',
-        'flake8-string-format; python_version < "3.14"',
+        'flake8-string-format; python_version < "3.14"',  # T368838
         'flake8-tuple>=0.4.1',
         'flake8-no-u-prefixed-strings>=0.2',
         'pep8-naming==0.13.3; python_version < "3.8"',
         'pep8-naming>=0.14.0; python_version >= "3.8"',
     ],
     'hacking': [
-        'hacking',
+        'hacking; python_version < "3.14"',  # T368851
         # importlib-metadata module is already installed with hacking 4.1.0
         # used by Python 3.7 but importlib-metadata >= 5 fails, so adjust it
         'importlib-metadata<5.0.0; python_version < "3.8"',
