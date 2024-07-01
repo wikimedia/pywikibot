@@ -72,8 +72,10 @@ class TestSiteObject(DefaultSiteTestCase):
     def test_repr(self):
         """Test __repr__."""
         code = self.site.family.obsolete.get(self.code) or self.code
-        expect = f'Site("{code}", "{self.family}")'
-        self.assertTrue(repr(self.site).endswith(expect))
+        expect = f"Site('{code}', '{self.family}')"
+        reprs = repr(self.site)
+        self.assertTrue(reprs.endswith(expect),
+                        f'\n{reprs} does not end with {expect}')
 
     def test_constructors(self):
         """Test cases for site constructors."""
