@@ -1,6 +1,6 @@
 """Objects representing API interface to Wikibase site."""
 #
-# (C) Pywikibot team, 2012-2023
+# (C) Pywikibot team, 2012-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -253,11 +253,12 @@ class DataSite(APISite):
                 yield page
 
     def getPropertyType(self, prop):
-        """
-        Obtain the type of a property.
+        """Obtain the type of a property.
 
-        This is used specifically because we can cache
-        the value for a much longer time (near infinite).
+        This is used specifically because we can cache the value for a
+        much longer time (near infinite).
+
+        :raises KeyError: *prop* does not exist
         """
         params = {'action': 'wbgetentities', 'ids': prop.getID(),
                   'props': 'datatype'}
@@ -269,11 +270,14 @@ class DataSite(APISite):
         # the IDs returned from the API can be upper or lowercase, depending
         # on the version. See bug T55894 for more information.
         try:
-            dtype = data['entities'][prop.getID()]['datatype']
+            entity = data['entities'][prop.getID()]
         except KeyError:
-            dtype = data['entities'][prop.getID().lower()]['datatype']
+            entity = data['entities'][prop.getID().lower()]
 
-        return dtype
+        if 'missing' in entity:
+            raise KeyError(f'{prop} does not exist')
+
+        return entity['datatype']
 
     @need_right('edit')
     def editEntity(self, entity, data, bot: bool = True, **kwargs):
