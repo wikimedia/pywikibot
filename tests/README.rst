@@ -78,23 +78,6 @@ With -lang and -family or -site options pwb can be used to specify a site.
     PYWIKIBOT_TEST_MODULES=api,site python -m unittest -v
 
 
-AppVeyor CI
-===========
-
-After changes are published into a GitHub repository, tests may be run on
-a Microsoft Windows box provided by ci.appveyor.com according to the
-configuration in .appveyor.yml file. To do this:
-
-1. create a GitHub and AppVeyor account
-2. fork the main GitHub repository
-3. create a project in ci.appveyor.com
-4. go to https://ci.appveyor.com/project/<username>/pywikibot/settings
-   and enter the custom configuration .yml filename: .appveyor.yml
-5. push changes into the forked git repository
-6. watch the build at https://ci.appveyor.com/<username>/pywikibot/history
-
-The 'user' tests are not yet enabled on AppVeyor builds.
-
 Environment variables
 =====================
 
