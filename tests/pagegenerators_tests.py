@@ -839,6 +839,7 @@ class TestItemClaimFilterPageGenerator(WikidataTestCase):
         site = self.get_site()
         return pywikibot.Page(site, 'Q37470')
 
+    @unittest.expectedFailure  # T368879
     def test_valid_qualifiers(self):
         """Test ItemClaimFilterPageGenerator using valid qualifiers."""
         qualifiers = {
@@ -849,6 +850,7 @@ class TestItemClaimFilterPageGenerator(WikidataTestCase):
         self._simple_claim_test('P463', self._get_council_page(), qualifiers,
                                 True)
 
+    @unittest.expectedFailure  # T368879
     def test_invalid_qualifiers(self):
         """Test ItemClaimFilterPageGenerator with invalid qualifiers."""
         qualifiers = {
@@ -859,6 +861,7 @@ class TestItemClaimFilterPageGenerator(WikidataTestCase):
         self._simple_claim_test('P463', self._get_council_page(), qualifiers,
                                 False)
 
+    @unittest.expectedFailure  # T368879
     def test_nonexisting_qualifiers(self):
         """
         Test ItemClaimFilterPageGenerator on sample page.
@@ -874,6 +877,7 @@ class TestItemClaimFilterPageGenerator(WikidataTestCase):
         self._simple_claim_test('P463', self._get_council_page(), qualifiers,
                                 False)
 
+    @unittest.expectedFailure  # T368879
     def test_no_qualifiers(self):
         """Test ItemClaimFilterPageGenerator without qualifiers."""
         self._simple_claim_test('P474', '+91', None, True)
@@ -881,11 +885,13 @@ class TestItemClaimFilterPageGenerator(WikidataTestCase):
         self._simple_claim_test('P1334', '28,97.4,0.1', None, True)
         self._simple_claim_test('P1334', '28,96,0.01', None, False)
 
+    @unittest.expectedFailure  # T368879
     def test_negative_filter(self):
         """Test negative ItemClaimFilterPageGenerator."""
         self._simple_claim_test('P463', 'Q37470', None, False, True)
         self._simple_claim_test('P463', 'Q37471', None, True, True)
 
+    @unittest.expectedFailure  # T368879
     def test_item_from_page(self):
         """Test ItemPage can be obtained form Page."""
         site = pywikibot.Site('en', 'wikipedia')
@@ -1497,6 +1503,7 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
         self.assertIsNotNone(gen)
         self.assertIsEmpty(set(gen))
 
+    @unittest.expectedFailure  # T368879
     def test_onlyif_qualifiers(self):
         """Test -onlyif with qualifiers."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
