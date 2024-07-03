@@ -125,26 +125,3 @@ Repository = "https://gerrit.wikimedia.org/r/plugins/gitiles/pywikibot/core/"
 Download = "https://www.pywikibot.org"
 Changelog = "https://doc.wikimedia.org/pywikibot/master/changelog.html"
 Tracker = "https://phabricator.wikimedia.org/tag/pywikibot/"
-
-[tool.ruff]
-line-length = 80
-
-[tool.ruff.format]
-quote-style = "single"
-docstring-code-format = true
-
-[tool.ruff.lint]
-select = [
-    # pycodestyle
-    "E",
-    # Pyflakes
-    "F",
-    # pyupgrade
-    "UP",
-    # flake8-bugbear
-    "B",
-    # flake8-simplify
-    "SIM",
-    # isort
-    "I",
-]
