@@ -25,7 +25,6 @@ from tests import WARN_SITE_CODE, unittest_print
 from tests.aspects import DefaultSiteTestCase, DeprecationTestCase, TestCase
 from tests.utils import skipping
 
-
 global_expected_params = {
     'action': ['query'],
     'continue': [True],
@@ -660,8 +659,8 @@ class TestSiteGenerators(DefaultSiteTestCase):
 
         site = self.site.data_repository()
         pattern = (r'Page '
-                   r'\[\[({site.sitename}:|{site.code}:)-1\]\]'
-                   r" doesn't exist\.".format(site=site))
+                   rf'\[\[({site.sitename}:|{site.code}:)-1\]\]'
+                   r" doesn't exist\.")
         for page in pages:
             with self.assertRaisesRegex(NoPageError, pattern):
                 page.data_item()

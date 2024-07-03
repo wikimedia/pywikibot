@@ -36,8 +36,10 @@ from pywikibot.exceptions import (
 )
 from pywikibot.family import WikimediaFamily
 from pywikibot.site import BaseSite
-from pywikibot.tools import MediaWikiVersion  # noqa: F401 (used by f-string)
-from pywikibot.tools import suppress_warnings
+from pywikibot.tools import (  # noqa: F401 (used by eval())
+    MediaWikiVersion,
+    suppress_warnings,
+)
 from tests import (
     WARN_SITE_CODE,
     patch_request,
@@ -52,7 +54,6 @@ from tests.utils import (
     execute_pwb,
     skipping,
 )
-
 
 OSWIN32 = (sys.platform == 'win32')
 pywikibot.bot.set_interface('buffer')
@@ -456,12 +457,12 @@ class CheckHostnameMixin(TestCaseBase):
             if hostname in cls._checked_hostnames:
                 if isinstance(cls._checked_hostnames[hostname], Exception):
                     raise unittest.SkipTest(
-                        '{}: hostname {} failed (cached): {}'
-                        .format(cls.__name__, hostname,
-                                cls._checked_hostnames[hostname]))
+                        f'{cls.__name__}: hostname {hostname} failed '
+                        f'(cached): {cls._checked_hostnames[hostname]}'
+                    )
                 if cls._checked_hostnames[hostname] is False:
-                    raise unittest.SkipTest('{}: hostname {} failed (cached)'
-                                            .format(cls.__name__, hostname))
+                    raise unittest.SkipTest(
+                        f'{cls.__name__}: hostname {hostname} failed (cached)')
                 continue
 
             try:
@@ -476,16 +477,15 @@ class CheckHostnameMixin(TestCaseBase):
                                          HTTPStatus.SEE_OTHER,
                                          HTTPStatus.TEMPORARY_REDIRECT,
                                          HTTPStatus.PERMANENT_REDIRECT}:
-                    raise ServerError(
-                        'HTTP status: {} - {}'.format(
-                            r.status_code, HTTPStatus(r.status_code).phrase))
+                    raise ServerError(f'HTTP status: {r.status_code} - '
+                                      f'{HTTPStatus(r.status_code).phrase}')
             except Exception as e:
-                pywikibot.exception('{}: accessing {} caused exception:'
-                                    .format(cls.__name__, hostname))
+                pywikibot.exception(
+                    f'{cls.__name__}: accessing {hostname} caused exception:')
 
                 cls._checked_hostnames[hostname] = e
-                raise unittest.SkipTest(
-                    f'{cls.__name__}: hostname {hostname} failed: {e}')
+                raise unittest.SkipTest(f'{cls.__name__}: hostname {hostname}'
+                                        ' failed: {e}') from None
 
             cls._checked_hostnames[hostname] = True
 
@@ -758,9 +758,9 @@ class MetaTestCaseClass(type):
             # check that the script invoked by pwb will not load a site.
             if dct.get('pwb') and 'site' not in dct:
                 raise Exception(
-                    '{}: Test classes using pwb must set "site"; add '
-                    'site=False if the test script will not use a site'
-                    .format(name))
+                    f'{name}: Test classes using pwb must set "site";'
+                    ' add site=False if the test script will not use a site'
+                )
 
             # If the 'site' attribute is a false value,
             # remove it so it matches 'not site' in pytest.
@@ -822,9 +822,9 @@ class MetaTestCaseClass(type):
             # A multi-site test method only accepts 'self' and the site-key
             if test_func.__code__.co_argcount != 2:
                 raise Exception(
-                    '{}: Test method {} must accept either 1 or 2 arguments; '
-                    ' {} found'
-                    .format(name, test, test_func.__code__.co_argcount))
+                    f'{name}: Test method {test} must accept either 1 or 2 '
+                    f'arguments;  {test_func.__code__.co_argcount} found'
+                )
 
             # create test methods processed by unittest
             for (key, sitedata) in dct['sites'].items():
@@ -1077,8 +1077,7 @@ class DefaultSiteTestCase(TestCase):
         :type site: BaseSite
         """
         unittest_print(
-            '{cls.__name__} using {site} instead of {cls.family}:{cls.code}.'
-            .format(cls=cls, site=site))
+            f'{cls.__name__} using {site} instead of {cls.family}:{cls.code}.')
         cls.site = site
         cls.family = site.family.name
         cls.code = site.code
@@ -1180,9 +1179,8 @@ class WikibaseTestCase(TestCase):
 
                 if (hasattr(cls, 'repo')
                         and cls.repo != site.data_repository()):
-                    raise Exception(
-                        '{}: sites do not all have the same data repository'
-                        .format(cls.__name__))
+                    raise Exception(f'{cls.__name__}: sites do not all have'
+                                    ' the same data repository')
 
                 cls.repo = site.data_repository()
 
@@ -1429,8 +1427,8 @@ class DeprecationTestCase(TestCase):
                         or msg is None):
                     break
             else:
-                self.fail('No generic deprecation message match found in {}'
-                          .format(deprecation_messages))
+                self.fail('No generic deprecation message match found in '
+                          f'{deprecation_messages}')
         else:
             head, _, tail = msg.partition('; ')
             for message in self.deprecation_messages:
@@ -1438,8 +1436,8 @@ class DeprecationTestCase(TestCase):
                    and message.endswith(tail):
                     break
             else:
-                self.fail("'{}' not found in {} (ignoring since)"
-                          .format(msg, self.deprecation_messages))
+                self.fail(f"'{msg}' not found in {self.deprecation_messages}"
+                          '(ignoring since)')
         if self._do_test_warning_filename:
             self.assertDeprecationFile(self.expect_warning_filename)
 

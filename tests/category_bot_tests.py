@@ -16,7 +16,6 @@ from pywikibot.site import BaseSite
 from scripts.category import CategoryMoveRobot, CategoryPreprocess
 from tests.aspects import DefaultSiteTestCase, TestCase
 
-
 MOCKED_USERNAME = Mock(return_value='FakeUsername')
 
 

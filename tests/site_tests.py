@@ -391,7 +391,7 @@ class SiteSysopTestCase(DefaultSiteTestCase):
         if not mysite.has_right('deletedhistory'):
             self.skipTest(
                 "You don't have permission to view the deleted revisions "
-                'on {}.'.format(mysite))
+                f'on {mysite}.')
         mainpage = self.get_mainpage()
         gen = mysite.deletedrevs(total=10, titles=mainpage)
 
@@ -491,7 +491,7 @@ class SiteSysopTestCase(DefaultSiteTestCase):
         if not mysite.has_right('deletedhistory'):
             self.skipTest(
                 "You don't have permission to view the deleted revisions "
-                'on {}.'.format(mysite))
+                f'on {mysite}.')
         prop = ['ids', 'timestamp', 'flags', 'user', 'comment']
         gen = mysite.alldeletedrevisions(total=10, prop=prop)
 

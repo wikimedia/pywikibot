@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for archivebot scripts."""
 #
-# (C) Pywikibot team, 2014-2023
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -16,7 +16,6 @@ from pywikibot.exceptions import Error
 from pywikibot.textlib import TimeStripper
 from scripts import archivebot
 from tests.aspects import TestCase
-
 
 THREADS = {
     'als': 4, 'ar': 1, 'bar': 0, 'bg': 0, 'bjn': 1, 'bs': 0, 'ca': 5, 'ckb': 2,
@@ -130,8 +129,9 @@ class TestArchiveBot(TestCase):
         self.assertIsInstance(talk.threads, list)
         self.assertGreaterEqual(
             len(talk.threads), THREADS[code],
-            '{} Threads found on {},\n{} or more expected'
-            .format(len(talk.threads), talk, THREADS[code]))
+            f'{len(talk.threads)} Threads found on {talk},\n{THREADS[code]} or'
+            ' more expected'
+        )
 
         for thread in talk.threads:
             with self.subTest(thread=thread.title,
@@ -188,9 +188,9 @@ class TestArchiveBotAfterDateUpdate(TestCase):
         self.assertIsInstance(talk.threads, list)
         self.assertGreaterEqual(
             len(talk.threads), THREADS_WITH_UPDATED_FORMAT[code],
-            '{} Threads found on {},\n{} or more expected'
-            .format(len(talk.threads), talk,
-                    THREADS_WITH_UPDATED_FORMAT[code]))
+            f'{len(talk.threads)} Threads found on {talk},\n'
+            f'{THREADS_WITH_UPDATED_FORMAT[code]} or more expected'
+        )
 
         for thread in talk.threads:
             with self.subTest(thread=thread.title,

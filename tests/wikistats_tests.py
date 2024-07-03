@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test cases for the WikiStats dataset."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -87,7 +87,7 @@ class WikiStatsTestCase(TestCase):
         self.assertGreater(int(data['en']['total']), int(data['en']['good']))
         data = data['en']
         self.assertTrue(all(isinstance(key, str)
-                            for key in data.keys() if key is not None))
+                            for key in data if key is not None))
         self.assertIsInstance(data['total'], str)
         self.assertIn('prefix', data)
         self.assertIn('total', data)
@@ -102,7 +102,7 @@ class WikiStatsTestCase(TestCase):
         self.assertGreater(int(data['fr']['total']), int(data['fr']['good']))
         data = data['fr']
         self.assertTrue(all(isinstance(key, str)
-                            for key in data.keys() if key is not None))
+                            for key in data if key is not None))
         self.assertIsInstance(data['total'], str)
         self.assertIn('prefix', data)
         self.assertIn('total', data)

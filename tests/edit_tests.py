@@ -16,7 +16,6 @@ from pywikibot import page_put_queue
 from pywikibot.exceptions import Error
 from tests.aspects import TestCase, require_version
 
-
 called_back = False
 
 

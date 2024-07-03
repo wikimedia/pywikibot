@@ -13,7 +13,6 @@ from contextlib import suppress
 from pywikibot.flow import Topic
 from tests.aspects import TestCase
 
-
 NO_THANKABLE_POSTS = 'There is no recent post which can be test thanked.'
 
 

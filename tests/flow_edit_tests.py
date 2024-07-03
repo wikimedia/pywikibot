@@ -15,7 +15,6 @@ from pywikibot.flow import Board, Post, Topic
 from tests.aspects import TestCase
 from tests.utils import skipping
 
-
 MODERATION_REASON = 'Pywikibot test'
 
 

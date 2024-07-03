@@ -37,7 +37,6 @@ from tests.aspects import (
 )
 from tests.utils import skipping
 
-
 EMPTY_TITLE_RE = r'Title must be specified and not empty if source is a Site\.'
 INVALID_TITLE_RE = r'The link \[\[.*\]\] does not contain a page title'
 NO_PAGE_RE = r"doesn't exist\."
@@ -190,9 +189,8 @@ class TestPageObjectEnglish(TestCase):
         family_name = (site.family.name + ':'
                        if pywikibot.config.family != site.family.name
                        else '')
-        self.assertEqual(str(mainpage), '[[{}{}:{}]]'
-                                        .format(family_name, site.code,
-                                                mainpage.title()))
+        self.assertEqual(str(mainpage),
+                         f'[[{family_name}{site.code}:{mainpage.title()}]]')
         self.assertLess(mainpage, maintalk)
 
     def testHelpTitle(self):
@@ -702,9 +700,8 @@ class TestPageBotMayEdit(TestCase):
         self.page = pywikibot.Page(self.site,
                                    'not_existent_page_for_pywikibot_tests')
         if self.page.exists():
-            self.skipTest(
-                'Page {} exists! Change page name in tests/page_tests.py'
-                .format(self.page.title()))
+            self.skipTest(f'Page {self.page.title()} exists! Change page name'
+                          ' in tests/page_tests.py')
 
     def tearDown(self):
         """Cleanup cache."""
@@ -985,8 +982,8 @@ class TestPageRedirects(TestCase):
                 'testing suite.')
         self.assertEqual(p1.get(), text)
         with self.assertRaisesRegex(IsRedirectPageError,
-                                    r'{} is a redirect page\.'
-                                    .format(re.escape(str(p2)))):
+                                    rf'{re.escape(str(p2))} is a redirect '
+                                    rf'page\.'):
             p2.get()
 
         try:
@@ -1019,8 +1016,8 @@ class TestPageRedirects(TestCase):
 
         text = p2.get(get_redirect=True)
         with self.assertRaisesRegex(IsNotRedirectPageError,
-                                    r'{} is not a redirect page\.'
-                                    .format(re.escape(str(p1)))):
+                                    rf'{re.escape(str(p1))} is not a redirect '
+                                    rf'page\.'):
             p1.set_redirect_target(p2)
         with self.assertRaisesRegex(NoPageError, NO_PAGE_RE):
             p3.set_redirect_target(p2)

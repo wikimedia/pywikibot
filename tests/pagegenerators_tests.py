@@ -39,7 +39,6 @@ from tests.aspects import (
 from tests.tools_tests import GeneratorIntersectTestCase
 from tests.utils import skipping
 
-
 en_wp_page_titles = (
     # just a bunch of randomly selected titles for English Wikipedia tests
     'Eastern Sayan',
@@ -1394,10 +1393,10 @@ class TestFactoryGeneratorNewpages(TestCase):
 
         newpages_url = self.site.base_url(
             self.site.path() + '?title=Special:NewPages&uselang=en')
-        failure_message = 'No new pages returned by -newpages. ' \
-            'If this is the only failure, check whether {url} contains any ' \
+        failure_message = 'No new pages returned by -newpages. If this is ' \
+            f'the only failure, check whether {newpages_url} contains any ' \
             'pages. If not, create a new page on the site to make the test ' \
-            'pass again.'.format(url=newpages_url)
+            'pass again.'
 
         self.assertIsNotEmpty(pages, msg=failure_message)
 

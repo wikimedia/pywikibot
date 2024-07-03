@@ -12,7 +12,6 @@ from contextlib import suppress
 from scripts.patrol import PatrolBot
 from tests.aspects import DefaultDrySiteTestCase, unittest
 
-
 DUMMY_PAGE_TUPLES = """
 This is some text above the entries:
 

@@ -29,7 +29,6 @@ from tests.aspects import (
     require_modules,
 )
 
-
 files = {}
 dirname = os.path.join(os.path.dirname(__file__), 'pages')
 

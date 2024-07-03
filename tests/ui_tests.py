@@ -33,7 +33,6 @@ from pywikibot.userinterfaces import (
 from pywikibot.userinterfaces.transliteration import NON_LATIN_DIGITS, _trans
 from tests.aspects import TestCase, TestCaseBase
 
-
 logger = logging.getLogger('pywiki')
 loggingcontext = {'caller_name': 'ui_tests',
                   'caller_file': 'ui_tests',

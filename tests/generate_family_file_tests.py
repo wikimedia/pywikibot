@@ -114,15 +114,11 @@ class TestGenerateFamilyFile(DefaultSiteTestCase):
                                   f'{wiki_parse.netloc}')
 
                 site = Site(url=url)
-
+                msg = (f'url has lang "{lang}" but Site {site} has lang '
+                       f'"{site.lang}"')
                 with skipping(AssertionError,
-                              msg='KNOWN BUG (T194138): url has lang "{lang}" '
-                                  'but Site {site} has lang "{site.lang}"'
-                                  .format(site=site, lang=lang)):
-                    self.assertEqual(site.lang, lang,
-                                     'url has lang "{lang}" '
-                                     'but Site {site} has lang "{site.lang}"'
-                                     .format(site=site, lang=lang))
+                              msg='KNOWN BUG (T194138): ' + msg):
+                    self.assertEqual(site.lang, lang, msg)
 
 
 if __name__ == '__main__':

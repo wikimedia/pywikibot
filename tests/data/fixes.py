@@ -6,7 +6,6 @@
 #
 from __future__ import annotations
 
-
 # flake8 cannot detect that fixes is defined via pywikibot.fixes
 if 'fixes' not in globals():
     fixes = {}
