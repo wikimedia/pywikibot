@@ -678,17 +678,17 @@ class NoReferencesBot(AutomaticTWSummaryBot, SingleSiteBot, ExistingPageBot):
         # Create a new section for the references tag
         for section in i18n.translate(self.site, placeBeforeSections) or []:
             # Find out where to place the new section
-            sectionR = re.compile(r'\r?\n(?P<ident>=+) *{} *(?P=ident) *\r?\n'
-                                  .format(section))
+            sectionR = re.compile(
+                rf'\r?\n(?P<ident>=+) *{section} *(?P=ident) *\r?\n')
             index = 0
             while index < len(oldText):
                 match = sectionR.search(oldText, index)
                 if match:
                     if textlib.isDisabled(oldText, match.start()):
                         pywikibot.info(
-                            'Existing {} section is commented out, '
+                            f'Existing {section} section is commented out, '
                             "won't add the references in front of it."
-                            .format(section))
+                        )
                         index = match.end()
                     else:
                         pywikibot.info(f'Adding references section before '
@@ -720,10 +720,12 @@ class NoReferencesBot(AutomaticTWSummaryBot, SingleSiteBot, ExistingPageBot):
         # so templatePattern must be fixed
         templatePattern = r'\r?\n{{((?!}}).)+?}}\s*'
         commentPattern = r'<!--((?!-->).)*?-->\s*'
-        metadataR = re.compile(r'(\r?\n)?({}|{}|{}|{})$'
-                               .format(categoryPattern, interwikiPattern,
-                                       templatePattern, commentPattern),
-                               re.DOTALL)
+        metadataR = re.compile(
+            r'(\r?\n)?'
+            f'({categoryPattern}|{interwikiPattern}|{templatePattern}|'
+            f'{commentPattern})$',
+            re.DOTALL
+        )
         tmpText = oldText
         while True:
             match = metadataR.search(tmpText)

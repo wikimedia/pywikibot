@@ -224,7 +224,7 @@ Applications:
 .. versionadded:: 7.7
 """  # noqa: E501, W505, W605
 #
-# (C) Pywikibot team, 2022-2023
+# (C) Pywikibot team, 2022-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -459,9 +459,11 @@ SELECT ?item WHERE {{
             targetx[propty] = pywikibot.ItemPage(repo, target[propty])
 
             try:
-                pywikibot.warning('Add {} ({}): {} ({})'.format(
-                    proptyx[propty].labels[booklang], propty,
-                    targetx[propty].labels[booklang], target[propty]))
+                pywikibot.warning(
+                    f'Add {proptyx[propty].labels[booklang]} '
+                    f'({propty}): {targetx[propty].labels[booklang]} '
+                    f'({target[propty]})'
+                )
             except:  # noqa: B001, E722, H201
                 pywikibot.warning(f'Add {propty}:{target[propty]}')
 
@@ -797,8 +799,8 @@ def main(*args: str) -> None:
         if propty in propreqinst and (
                 'P31' not in targetx[propty].claims or not is_in_list(
                     targetx[propty].claims['P31'], propreqinst[propty])):
-            pywikibot.critical('{} ({}) is not a language'.format(
-                targetx[propty].labels[mainlang], target[propty]))
+            pywikibot.critical(f'{targetx[propty].labels[mainlang]} '
+                               f'({target[propty]}) is not a language')
             return
 
     # check dependencies

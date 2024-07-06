@@ -108,9 +108,8 @@ class DownloadDumpBot(Bot, ConfigParserBot):
                         remove(file_final_storepath)
                     symlink(toolforge_dump_filepath, file_current_storepath)
                 else:
-                    url = 'https://dumps.wikimedia.org/{}/{}/{}'.format(
-                        self.opt.wikiname, self.opt.dumpdate,
-                        download_filename)
+                    url = (f'https://dumps.wikimedia.org/{self.opt.wikiname}/'
+                           f'{self.opt.dumpdate}/{download_filename}')
                     pywikibot.info('Downloading file from ' + url)
                     response = fetch(url, stream=True)
 

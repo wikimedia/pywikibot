@@ -43,7 +43,7 @@ Example
    can be set within a settings file which is scripts.ini by default.
 """
 #
-# (C) Pywikibot team, 2006-2022
+# (C) Pywikibot team, 2006-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -291,16 +291,18 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
 
             if using_pages and using_pages != [local_file_page]:
                 pywikibot.info(
-                    '"<<lightred>>{}<<default>>" is still used in {} pages.'
-                    .format(local_file_page.title(with_ns=False),
-                            len(using_pages)))
+                    f'"<<lightred>>{local_file_page.title(with_ns=False)}'
+                    f'<<default>>" is still used in {len(using_pages)} pages.'
+                )
 
                 if self.opt.replace:
                     pywikibot.info(
-                        'Replacing "<<lightred>>{}<<default>>" by '
-                        '"<<lightgreen>>{}<<default>>".'
-                        .format(local_file_page.title(with_ns=False),
-                                commons_file_page.title(with_ns=False)))
+                        'Replacing "<<lightred>>'
+                        f'{local_file_page.title(with_ns=False)}'
+                        '<<default>>" by "<<lightgreen>>'
+                        f'{commons_file_page.title(with_ns=False)}'
+                        '<<default>>".'
+                    )
 
                     bot = ImageBot(local_file_page.using_pages(),
                                    local_file_page.title(with_ns=False),
@@ -325,8 +327,9 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
                 return
 
             pywikibot.info(
-                'No page is using "<<lightgreen>>{}<<default>>" anymore.'
-                .format(local_file_page.title(with_ns=False)))
+                'No page is using "<<lightgreen>>'
+                f'{local_file_page.title(with_ns=False)}<<default>>" anymore.'
+            )
 
         try:
             commons_text = commons_file_page.get()
@@ -373,8 +376,8 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
     def teardown(self):
         """Show a message if no files were found."""
         if self.generator_completed and not self.counter['read']:
-            pywikibot.info('No transcluded files found for {}.'
-                           .format(self.nc_templates_list()[0]))
+            pywikibot.info('No transcluded files found for '
+                           f'{self.nc_templates_list()[0]}.')
 
 
 def main(*args: str) -> None:

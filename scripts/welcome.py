@@ -156,7 +156,7 @@ Some words, like "Administrator" or "Dio" (God in italian) or "Jimbo" aren't
 badwords at all but can be used for some bad-nickname.
 """
 #
-# (C) Pywikibot team, 2006-2023
+# (C) Pywikibot team, 2006-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -602,9 +602,8 @@ class WelcomeBot(SingleSiteBot):
         """Add bad account to queue."""
         if globalvar.confirm:
             answer = pywikibot.input_choice(
-                '{} may have an unwanted username, do you want to report '
-                'this user?'
-                .format(name), [('Yes', 'y'), ('No', 'n'), ('All', 'a')],
+                f'{name} may have an unwanted username, do you want to report '
+                'this user?', [('Yes', 'y'), ('No', 'n'), ('All', 'a')],
                 'n', automatic_quit=False)
             if answer in ['a', 'all']:
                 answer = 'y'
@@ -800,8 +799,8 @@ class WelcomeBot(SingleSiteBot):
         elif user.editCount() < globalvar.attach_edit_count:
             if user.editCount() != 0:
                 self.show_status(Msg.IGNORE)
-                pywikibot.info('{} has only {} contributions.'
-                               .format(user.username, user.editCount()))
+                pywikibot.info(f'{user.username} has only {user.editCount()}'
+                               ' contributions.')
             elif not globalvar.quiet:
                 self.show_status(Msg.IGNORE)
                 pywikibot.info(f'{user.username} has no contributions.')

@@ -231,8 +231,9 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
 
         sourceSite = sourceImagePage.site
         pywikibot.info(
-            '\n>>> Transfer {source} from {source.site} to {target}\n'
-            .format(source=sourceImagePage, target=self.opt.target))
+            f'\n>>> Transfer {sourceImagePage} from {sourceImagePage.site} '
+            f'to {self.opt.target}\n'
+        )
         url = sourceImagePage.get_file_url()
         pywikibot.info('URL should be: ' + url)
         # localize the text that should be printed on image description page
@@ -398,9 +399,9 @@ def main(*args: str) -> None:
 
     if target_code or target_family:
         site = pywikibot.Site()
-        options.setdefault('target',
-                           '{}:{}'.format(target_family or site.family,
-                                          target_code or site.lang))
+        options.setdefault(
+            'target',
+            f'{target_family or site.family}:{target_code or site.lang}')
 
     bot = ImageTransferBot(generator=gen, **options)
     bot.run()

@@ -42,7 +42,7 @@ Commandline parameters:
 
 """
 #
-# (C) Pywikibot team, 2011-2023
+# (C) Pywikibot team, 2011-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -100,9 +100,10 @@ class PatrolBot(BaseBot):
         else:
             local_whitelist_subpage_name = pywikibot.translate(
                 self.site, self.whitelist_subpage_name, fallback=True)
-            self.whitelist_pagename = '{}:{}/{}'.format(
-                self.site.namespace(2), self.site.username(),
-                local_whitelist_subpage_name)
+            self.whitelist_pagename = (
+                f'{self.site.namespace(2)}:{self.site.username()}/'
+                f'{local_whitelist_subpage_name}'
+            )
         self.whitelist = None
         self.whitelist_ts = 0
         self.whitelist_load_ts = 0

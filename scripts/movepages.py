@@ -94,8 +94,8 @@ class MovePagesBot(CurrentPageBot):
         """Treat only non-redirect pages if 'skipredirects' is set."""
         if self.opt.skipredirects and page.isRedirectPage():
             pywikibot.warning(
-                'Page {page} on {page.site} is a redirect; skipping'
-                .format(page=page))
+                f'Page {page} on {page.site} is a redirect; skipping'
+            )
             return True
         return super().skip_page(page)
 
@@ -129,7 +129,7 @@ class MovePagesBot(CurrentPageBot):
             """Manage interactive choices for namespace prefix."""
             namespace = page.site.namespace(page.namespace())
             q = pywikibot.input_yn('Do you want to remove the '
-                                   'namespace prefix "{}:"?'.format(namespace),
+                                   f'namespace prefix "{namespace}:"?',
                                    automatic_quit=False)
             return None if q else namespace
 

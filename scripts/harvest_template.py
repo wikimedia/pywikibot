@@ -306,8 +306,8 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
                 template = pywikibot.Page(page.site, template, ns=10)
             except InvalidTitleError:
                 pywikibot.error(
-                    'Failed parsing template; {!r} should be '
-                    'the template name.'.format(template))
+                    f'Failed parsing template; {template!r} should be '
+                    'the template name.')
                 continue
 
             if template.title(with_ns=False) not in self.templateTitles:
@@ -362,8 +362,8 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
                     and isinstance(target, pywikibot.ItemPage)):
                 inverse_ppage = pywikibot.PropertyPage(self.repo, inverse_prop)
                 if inverse_ppage.type != 'wikibase-item':
-                    raise ValueError("{} does not have 'wikibase-item' type"
-                                     .format(inverse_ppage))
+                    raise ValueError(
+                        f"{inverse_ppage} does not have 'wikibase-item' type")
                 inverse_claim = inverse_ppage.newClaim()
                 inverse_claim.setTarget(item)
                 self.user_add_claim_unless_exists(
@@ -502,8 +502,8 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
             image = pywikibot.FilePage(image.getRedirectTarget())
 
         if not image.exists():
-            pywikibot.info("{} doesn't exist so it cannot be linked"
-                           .format(image.title(as_link=True)))
+            pywikibot.info(f"{image.title(as_link=True)} doesn't exist so it"
+                           ' cannot be linked')
             return
 
         yield image
