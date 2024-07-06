@@ -126,9 +126,9 @@ class SupersetQuery(WaitingMixin):
 
         if self.last_response.status_code == 200:
             return self.last_response.json()['result']
-        else:
-            status_code = self.last_response.status_code
-            raise ServerError(f'CSRF token error:  {status_code}')
+
+        status_code = self.last_response.status_code
+        raise ServerError(f'CSRF token error:  {status_code}')
 
     def get_database_id_by_schema_name(self, schema_name: str) -> int:
         """Get superset database_id using superset schema name.
