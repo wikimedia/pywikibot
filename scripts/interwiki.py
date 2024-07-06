@@ -1635,7 +1635,7 @@ class Subject(interwiki_graph.Subject):
         pywikibot.info(f'<<lightpurple>>Updating links on page {page}.')
         pywikibot.info(f'Changes to be made: {mods}')
         oldtext = page.get()
-        template = (page.namespace() == 10)
+        template = page.namespace() == 10
         newtext = textlib.replaceLanguageLinks(oldtext, new,
                                                site=page.site,
                                                template=template)

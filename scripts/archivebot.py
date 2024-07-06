@@ -543,7 +543,7 @@ class PageArchiver:
     def attr2text(self) -> str:
         """Return a template with archiver saveable attributes."""
         return '{{%s\n%s\n}}' \
-               % (self.tpl.title(with_ns=(self.tpl.namespace() != 10)),
+               % (self.tpl.title(with_ns=self.tpl.namespace() != 10),
                   '\n'.join(f'|{a} = {self.get_attr(a)}'
                             for a in self.saveables()))
 

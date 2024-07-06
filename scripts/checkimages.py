@@ -888,7 +888,7 @@ class CheckImagesBot:
                 if dup_page.title(as_url=True) != self.image.title(
                         as_url=True) or self.timestamp is None:
                     try:
-                        self.timestamp = (dup_page.latest_file_info.timestamp)
+                        self.timestamp = dup_page.latest_file_info.timestamp
                     except PageRelatedError:
                         continue
                 data = self.timestamp.timetuple()

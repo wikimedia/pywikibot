@@ -104,7 +104,7 @@ class Board(FlowPage):
             if key != 'title':
                 key = key.replace('topiclist_', '').replace('-', '_')
                 if key == 'offset_dir':
-                    new_params['reverse'] = (value == 'rev')
+                    new_params['reverse'] = value == 'rev'
                 else:
                     new_params[key] = value
         return new_params

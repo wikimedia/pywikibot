@@ -248,7 +248,7 @@ class CosmeticChangesToolkit:
         self.namespace = page.namespace()
 
         self.show_diff = show_diff
-        self.template = (self.namespace == Namespace.TEMPLATE)
+        self.template = self.namespace == Namespace.TEMPLATE
         self.talkpage = self.namespace >= 0 and self.namespace % 2 == 1
         self.ignore = ignore
 

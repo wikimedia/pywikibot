@@ -411,7 +411,7 @@ class APISite(
 
         if self.is_oauth_token_available():
             if self.userinfo['name'] == self.username():
-                error_msg = (f'Logging in on {self} via OAuth failed')
+                error_msg = f'Logging in on {self} via OAuth failed'
             elif self.username() is None:
                 error_msg = ('No username has been defined in your '
                              'user config file: you have to add in this '

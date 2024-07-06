@@ -128,7 +128,7 @@ def main(*args: str) -> None:
             target_title = prefix + page.title()
             page = pywikibot.Page(fromsite, title)
         else:
-            target_title = (prefix + title)
+            target_title = prefix + title
         targetpage = pywikibot.Page(tosite, target_title)
         edithistpage = pywikibot.Page(tosite, target_title + '/edithistory')
 
