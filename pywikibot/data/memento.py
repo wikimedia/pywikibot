@@ -87,7 +87,7 @@ class MementoClient(OldMementoClient):
     :param int max_redirects: the maximum number of redirects allowed
         for all HTTP requests to be made.
     :return: A :class:`MementoClient` obj.
-    """  # noqa: E501
+    """  # noqa: E501, W505
 
     def __init__(self, *args, **kwargs):
         """Initializer."""

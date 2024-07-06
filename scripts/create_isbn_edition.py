@@ -222,7 +222,7 @@ Applications:
     * https://www.titelbank.nl/pls/ttb/f?p=103:4012:::NO::P4012_TTEL_ID:3496019&cs=19BB8084860E3314502A1F777F875FE61
 
 .. versionadded:: 7.7
-"""  # noqa: E501, W605
+"""  # noqa: E501, W505, W605
 #
 # (C) Pywikibot team, 2022-2023
 #

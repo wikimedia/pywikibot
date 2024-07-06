@@ -89,7 +89,7 @@ Example
 
 .. warning:: Put it in one line, otherwise it won't work correctly.
 
-"""  # noqa: E501
+"""  # noqa: E501 ,W505
 #
 # (C) Pywikibot team, 2012-2022
 #
