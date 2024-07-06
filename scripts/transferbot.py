@@ -45,7 +45,7 @@ Copy 10 wanted templates of German Wikipedia from English Wikipedia to German:
     -wantedtemplates:10 -target
 """
 #
-# (C) Pywikibot team, 2014-2023
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -135,17 +135,14 @@ def main(*args: str) -> None:
         if targetpage.exists():
             if not overwrite:
                 pywikibot.warning(
-                    'Skipped {} (target page {} exists)'.format(
-                        page.title(as_link=True, force_interwiki=True),
-                        targetpage.title(as_link=True)
-                    )
+                    f'Skipped {page.title(as_link=True, force_interwiki=True)}'
+                    f' (target page {targetpage.title(as_link=True)} exists)'
                 )
                 continue
             if not targetpage.botMayEdit():
                 pywikibot.warning(
-                    'Target page {} is not editable by bots'.format(
-                        targetpage.title(as_link=True)
-                    )
+                    f'Target page {targetpage.title(as_link=True)} is not'
+                    ' editable by bots'
                 )
                 continue
 

@@ -20,7 +20,7 @@ This script understands various command-line arguments:
 
 """
 #
-# (C) Pywikibot team, 2014-2023
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -70,14 +70,13 @@ class NewItemRobot(WikidataBot):
             days=self.opt.pageage)
         self.lastEditBefore = self.repo.server_time() - timedelta(
             days=self.opt.lastedit)
-        pywikibot.info('Page age is set to {} days so only pages created'
-                       '\nbefore {} will be considered.\n'
-                       .format(self.opt.pageage,
-                               self.pageAgeBefore.isoformat()))
         pywikibot.info(
-            'Last edit is set to {} days so only pages last edited'
-            '\nbefore {} will be considered.\n'
-            .format(self.opt.lastedit, self.lastEditBefore.isoformat()))
+            f'Page age is set to {self.opt.pageage} days so only pages created'
+            f'\nbefore {self.pageAgeBefore.isoformat()} will be considered.\n'
+            f'\nLast edit is set to {self.opt.lastedit} days so only pages '
+            f'last edited\nbefore {self.lastEditBefore.isoformat()} will be'
+            ' considered.\n'
+        )
 
     @staticmethod
     def _touch_page(page) -> None:

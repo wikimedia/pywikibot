@@ -250,8 +250,8 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
         """Skip category redirects."""
         if page.isCategoryRedirect():
             pywikibot.warning(
-                'Page {page} on {page.site} is a category redirect. '
-                'Skipping.'.format(page=page))
+                f'Page {page} on {page.site} is a category redirect. '
+                'Skipping.')
             return True
         return super().skip_page(page)
 
@@ -301,8 +301,8 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
 
             if currentCommonscatTarget == checkedCommonscatTarget:
                 # The current commonscat link is good
-                pywikibot.info('Commonscat link at {} to Category:{} is ok'
-                               .format(page.title(), currentCommonscatTarget))
+                pywikibot.info(f'Commonscat link at {page.title()} to '
+                               f'Category:{currentCommonscatTarget} is ok')
                 return
 
             if checkedCommonscatTarget:
@@ -403,10 +403,9 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
 
             checkedCommonscat = self.checkCommonscatLink(commonscatLink[1])
             if checkedCommonscat:
-                pywikibot.info(
-                    'Found link for {} at [[{}:{}]] to {}.'
-                    .format(page.title(), ipage.site.code, ipage.title(),
-                            checkedCommonscat))
+                pywikibot.info(f'Found link for {page.title()} at '
+                               f'[[{ipage.site.code}:{ipage.title()}]] to '
+                               f'{checkedCommonscat}.')
                 return checkedCommonscat
         return ''
 
@@ -496,9 +495,9 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
 
                 if not m:
                     pywikibot.info(
-                        "getCommonscat: {} deleted by {}. Couldn't find "
-                        'move target in "{}"'
-                        .format(commonsPage, loguser, logcomment))
+                        f'getCommonscat: {commonsPage} deleted by {loguser}. '
+                        f'Couldn\'t find move target in "{logcomment}"'
+                    )
                     break
 
                 if m['newcat1']:

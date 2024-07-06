@@ -123,9 +123,9 @@ class DjVuTextBot(SingleSiteBot):
 
         if page.exists() and not self.opt.force:
             pywikibot.info(
-                'Page {} already exists, not adding!\n'
+                f'Page {page} already exists, not adding!\n'
                 'Use -force option to overwrite the output page.'
-                .format(page))
+            )
         else:
             self.userPut(page, old_text, new_text, summary=self.opt.summary)
 

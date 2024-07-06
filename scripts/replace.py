@@ -477,9 +477,8 @@ class XmlDumpReplacePageGenerator:
         except KeyboardInterrupt:
             with suppress(NameError):
                 if not self.skipping:
-                    pywikibot.info(
-                        'To resume, use "-xmlstart:{}" on the command line.'
-                        .format(entry.title))
+                    pywikibot.info(f'To resume, use "-xmlstart:{entry.title}"'
+                                   ' on the command line.')
 
     def isTitleExcepted(self, title) -> bool:
         """Return True if one of the exceptions applies for the given title."""
@@ -571,9 +570,8 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
         for i, replacement in enumerate(replacements):
             if isinstance(replacement, Sequence):
                 if len(replacement) != 2:
-                    raise ValueError('Replacement number {} does not have '
-                                     'exactly two elements: {}'.format(
-                                         i, replacement))
+                    raise ValueError(f'Replacement number {i} does not have '
+                                     f'exactly two elements: {replacement}')
                 # Replacement assumes it gets strings but it's already compiled
                 replacements[i] = Replacement.from_compiled(replacement[0],
                                                             replacement[1])
@@ -631,16 +629,18 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                     page.title(), replacement.exceptions):
                 if replacement.container:
                     pywikibot.info(
-                        'Skipping fix "{}" on {} because the title is on '
-                        'the exceptions list.'.format(
-                            replacement.container.name,
-                            page.title(as_link=True)))
+                        f'Skipping fix "{replacement.container.name}" on '
+                        f'{page.title(as_link=True)} because the title is on '
+                        'the exceptions list.'
+                    )
                     skipped_containers.add(replacement.container.name)
                 else:
                     pywikibot.info(
-                        'Skipping unnamed replacement ({}) on {} because '
-                        'the title is on the exceptions list.'.format(
-                            replacement.description, page.title(as_link=True)))
+                        'Skipping unnamed replacement '
+                        f'({replacement.description}) on '
+                        f'{page.title(as_link=True)} because the title is on'
+                        ' the exceptions list.'
+                    )
                 continue
 
             if self.isTextExcepted(original_text, replacement.exceptions):
@@ -891,14 +891,14 @@ def handle_sql(sql: str,
     """
     if not sql:
         where_clause = 'WHERE ({})'.format(' OR '.join(
-            "old_text RLIKE '{}'"
-            .format(prepareRegexForMySQL(repl.old_regex.pattern))
+            f"old_text RLIKE '{prepareRegexForMySQL(repl.old_regex.pattern)}'"
+
             for repl in replacements))
 
         if exceptions:
             except_clause = 'AND NOT ({})'.format(' OR '.join(
-                "old_text RLIKE '{}'"
-                .format(prepareRegexForMySQL(exc.pattern))
+                f"old_text RLIKE '{prepareRegexForMySQL(exc.pattern)}'"
+
                 for exc in exceptions))
         else:
             except_clause = ''
@@ -1073,14 +1073,17 @@ def main(*args: str) -> None:  # noqa: C901
                 missing_fix_summaries.append(
                     f'"{fix_name}" (replacement #{index})')
             if chars.contains_invisible(replacement[0]):
-                pywikibot.warning('The old string "{}" contains formatting '
-                                  'characters like U+200E'.format(
-                                      chars.replace_invisible(replacement[0])))
+                pywikibot.warning(
+                    'The old string '
+                    f'"{chars.replace_invisible(replacement[0])}"'
+                    ' contains formatting characters like U+200E'
+                )
             if (not callable(replacement[1])
                     and chars.contains_invisible(replacement[1])):
-                pywikibot.warning('The new string "{}" contains formatting '
-                                  'characters like U+200E'.format(
-                                      chars.replace_invisible(replacement[1])))
+                pywikibot.warning(
+                    'The new string '
+                    f'"{chars.replace_invisible(replacement[1])}"'
+                    ' contains formatting characters like U+200E')
             replacement_set.append(ReplacementListEntry(
                 old=replacement[0],
                 new=replacement[1],

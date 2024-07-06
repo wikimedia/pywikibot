@@ -291,6 +291,8 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
         ttmp = i18n.translate(self.site, template_total_move_protection)
         tnr = i18n.translate(self.site, template_no_regex)
         tu = i18n.translate(self.site, template_unique)
+        missing_l10n = ('This script is not localized to use it on '
+                        f'{self.site.sitename}.\nMissing ')
 
         while True:
             text, restrictions = yield
@@ -312,11 +314,9 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                 # page is not edit-protected
                 # Deleting the template because the page doesn't need it.
                 if not (ttp or tsp):
-                    raise Error(
-                        'This script is not localized to use it on {}.\n'
-                        'Missing "template_semi_protection" or'
-                        '"template_total_protection"'
-                        .format(self.site.sitename))
+                    raise Error(missing_l10n
+                                + ('"template_semi_protection" '
+                                   'or "template_total_protection"'))
 
                 replacement = '|'.join(ttp + tsp + (tu or []))
                 text, changes = re.subn(
@@ -341,10 +341,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                     pywikibot.info(msg)
                 else:
                     if not tnr or tu and not tnr[4] or not (tu or tnr[1]):
-                        raise Error(
-                            'This script is not localized to use it on \n{}. '
-                            'Missing "template_no_regex"'
-                            .format(self.site.sitename))
+                        raise Error(missing_l10n + '"template_no_regex"')
 
                     pywikibot.info(
                         'The page is protected to the sysop, but the template '
@@ -364,10 +361,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                     pywikibot.info(msg)
                 else:
                     if not tnr or tu and not tnr[4] or not (tu or tnr[1]):
-                        raise Error(
-                            'This script is not localized to use it on \n'
-                            '{}. Missing "template_no_regex"'
-                            .format(self.site.sitename))
+                        raise Error(missing_l10n + '"template_no_regex"')
                     pywikibot.info(
                         'The page is editable only for the autoconfirmed '
                         'users, but the template seems not correct. Fixing...')

@@ -238,8 +238,9 @@ class SandboxBot(Bot, ConfigParserBot):
                                + sandbox_page.title(as_link=True))
                 if sandbox_page.isRedirectPage():
                     pywikibot.warning(
-                        '{} is a redirect page, cleaning it anyway'
-                        .format(sandbox_page.title(as_link=True)))
+                        f'{sandbox_page.title(as_link=True)} is a redirect'
+                        ' page, cleaning it anyway'
+                    )
                 try:
                     text = sandbox_page.text
                     if self.opt.summary:
@@ -274,8 +275,10 @@ class SandboxBot(Bot, ConfigParserBot):
                                            'sandbox cleaned.')
                         else:  # wait for the rest
                             pywikibot.info(
-                                'Sandbox edited {:.1f} minutes ago...'
-                                .format(edit_delta.seconds / 60.0))
+                                'Sandbox edited '
+                                f'{edit_delta.seconds / 60.0:.1f} minutes'
+                                ' ago...'
+                            )
                             pywikibot.info(
                                 f'Sleeping for {delta.seconds // 60} minutes.')
                             pywikibot.sleep(delta.seconds)

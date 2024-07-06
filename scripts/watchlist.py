@@ -23,7 +23,7 @@ Command line options:
    watchlist is retrieved in parallel tasks.
 """
 #
-# (C) Pywikibot team, 2005-2022
+# (C) Pywikibot team, 2005-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -67,8 +67,8 @@ def count_watchlist_all(quiet=False) -> None:
         wl_count_all = sum(len(future.result())
                            for future in as_completed(futures))
     if not quiet:
-        pywikibot.info('There are a total of {} page(s) in the watchlists for '
-                       'all wikis.'.format(wl_count_all))
+        pywikibot.info(f'There are a total of {wl_count_all} page(s) in the'
+                       ' watchlists for all wikis.')
 
 
 def isWatched(pageName, site=None):  # noqa: N802, N803
@@ -157,5 +157,5 @@ def main(*args: str) -> None:
 if __name__ == '__main__':
     start = datetime.datetime.now()
     main()
-    pywikibot.info('\nExecution time: {} seconds'
-                   .format((datetime.datetime.now() - start).seconds))
+    pywikibot.info('\nExecution time: '
+                   f'{(datetime.datetime.now() - start).seconds} seconds')

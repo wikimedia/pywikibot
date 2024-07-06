@@ -37,7 +37,7 @@ The image "Flag.svg" has been uploaded, making the old "Flag.jpg" obsolete:
 
 """
 #
-# (C) Pywikibot team, 2013-2022
+# (C) Pywikibot team, 2013-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -99,11 +99,11 @@ class ImageRobot(ReplaceBot):
 
         replacements = []
         if not self.opt.loose and self.new_image:
-            replacements.append((image_regex,
-                                 '[[{}:{}\\g<parameters>]]'
-                                 .format(
-                                     self.site.namespaces.FILE.custom_name,
-                                     self.new_image)))
+            replacements.append(
+                (image_regex,
+                 f'[[{self.site.namespaces.FILE.custom_name}:{self.new_image}'
+                 '\\g<parameters>]]')
+            )
         else:
             replacements.append((image_regex, self.new_image))
 

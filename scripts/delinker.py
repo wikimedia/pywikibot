@@ -30,7 +30,7 @@ The following parameters are supported:
    This script is completely rewriten from compat branch.
 """
 #
-# (C) Pywikibot team, 2006-2023
+# (C) Pywikibot team, 2006-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -113,9 +113,8 @@ class CommonsDelinker(SingleSiteBot, ConfigParserBot, AutomaticTWSummaryBot):
         shown = False
         for page in file_page.using_pages(content=True, namespaces=0):
             if not shown:
-                pywikibot.info(
-                    '\n>>> <<lightgreen>>Delinking {}<<default>> <<<'
-                    .format(file_page.title()))
+                pywikibot.info('\n>>> <<lightgreen>>Delinking '
+                               f'{file_page.title()}<<default>> <<<')
                 shown = True
             super().treat(page)
 

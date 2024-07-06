@@ -74,8 +74,9 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
         """Initialize the bot."""
         super().__init__(**kwargs)
         if not self.site.has_data_repository:
-            raise ValueError('{site} does not have a data repository, use '
-                             'interwiki.py instead.'.format(site=self.site))
+            raise ValueError(
+                f'{self.site} does not have a data repository, use '
+                'interwiki.py instead.')
 
         self.repo = self.site.data_repository()
         if not self.opt.summary:
@@ -162,8 +163,8 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
         dbnames = [iw_site.dbName() for iw_site in self.iwlangs]
         if set(dbnames) - set(self.current_item.sitelinks.keys()) \
            and not self.handle_complicated():
-            warning('Interwiki conflict in {}, skipping...'
-                    .format(self.current_page.title(as_link=True)))
+            warning('Interwiki conflict in '
+                    f'{self.current_page.title(as_link=True)}, skipping...')
             return
 
         info('Cleaning up the page')
@@ -176,8 +177,8 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
         wd_data = set()
         for iw_page in self.iwlangs.values():
             if not iw_page.exists():
-                warning('Interwiki {} does not exist, skipping...'
-                        .format(iw_page.title(as_link=True)))
+                warning(f'Interwiki {iw_page.title(as_link=True)} does not'
+                        ' exist, skipping...')
                 continue
             try:
                 wd_data.add(pywikibot.ItemPage.fromPage(iw_page))
@@ -193,8 +194,8 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
             return None
 
         if len(wd_data) > 1:
-            warning('Interwiki conflict in {}, skipping...'
-                    .format(self.current_page.title(as_link=True)))
+            warning('Interwiki conflict in '
+                    f'{self.current_page.title(as_link=True)}, skipping...')
             return False
 
         item = list(wd_data).pop()

@@ -105,8 +105,8 @@ class UnusedFilesBot(SingleSiteBot,
                 and (self.opt.usertemplate or self.opt.nouserwarning)):
             # if no templates are given
             raise TranslationError(
-                'This script is not localized for {} site;\n'
-                'try using -filetemplate:<template name>.'.format(self.site))
+                f'This script is not localized for {self.site} site;\n'
+                'try using -filetemplate:<template name>.')
 
     def treat(self, image) -> None:
         """Process one image page."""
