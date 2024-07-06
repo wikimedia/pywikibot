@@ -129,10 +129,10 @@ class WikiStats:
         # take the first entry to determine the sorting key
         first_entry = table[0]
         if first_entry[key].isdigit():
-            sort_key = lambda d: int(d[key])  # noqa: E731
+            def sort_key(d): return int(d[key])
             reverse = reverse if reverse is not None else True
         else:
-            sort_key = lambda d: d[key]  # noqa: E731
+            def sort_key(d): return d[key]
             reverse = reverse if reverse is not None else False
 
         return sorted(table, key=sort_key, reverse=reverse)
