@@ -270,7 +270,7 @@ class TestPageObjectEnglish(TestCase):
             'File:Example #3.jpg',  # file extension in section
         ):
             with self.subTest(title=title), \
-                 self.assertRaises(ValueError):
+                    self.assertRaises(ValueError):
                 pywikibot.FilePage(site, title)
 
     def testImageAndDataRepository(self):

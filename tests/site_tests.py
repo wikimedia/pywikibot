@@ -625,13 +625,13 @@ class TestSiteSysopWrite(TestCase):
         page = pywikibot.Page(site, 'User:Unicodesnowman/ProtectTest')
 
         with self.subTest(test='anInvalidType'), \
-             self.assertRaisesRegex(APIError,
-                                    'Invalid protection type "anInvalidType"'):
+            self.assertRaisesRegex(APIError,
+                                   'Invalid protection type "anInvalidType"'):
             site.protect(protections={'anInvalidType': 'sysop'},
                          page=page, reason='Pywikibot unit test')
 
         with self.subTest(test='anInvalidLevel'), \
-             self.assertRaisesRegex(Error, 'Invalid protection level'):
+                self.assertRaisesRegex(Error, 'Invalid protection level'):
             site.protect(protections={'edit': 'anInvalidLevel'},
                          page=page, reason='Pywikibot unit test')
 

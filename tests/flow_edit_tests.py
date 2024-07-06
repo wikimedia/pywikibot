@@ -260,7 +260,7 @@ class TestFlowHide(FlowTests):
         """Hide and restore a test topic and post."""
         for flow in (self.topic, self.post):
             with self.subTest(flow=flow.__class__.__name__), \
-                 self.restored(flow):
+                    self.restored(flow):
                 # Hide
                 flow.hide(MODERATION_REASON)
                 self.assertTrue(flow.is_moderated)
@@ -276,7 +276,7 @@ class TestFlowSysop(FlowTests):
         """Delete and restore a test topic and post."""
         for flow in (self.topic, self.post):
             with self.subTest(flow=flow.__class__.__name__), \
-                 self.restored(flow):
+                    self.restored(flow):
                 # Delete
                 flow.delete_mod(MODERATION_REASON)
                 self.assertTrue(flow.is_moderated)
@@ -285,7 +285,7 @@ class TestFlowSysop(FlowTests):
         """Suppress and restore a test topic and post."""
         for flow in (self.topic, self.post):
             with self.subTest(flow=flow.__class__.__name__), \
-                 self.restored(flow):
+                    self.restored(flow):
                 # Suppress
                 flow.suppress(MODERATION_REASON)
                 self.assertTrue(flow.is_moderated)

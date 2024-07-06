@@ -234,7 +234,7 @@ class TestParamInfo(DefaultSiteTestCase):
             self.assertEqual(mod, pi[mod]['path'])
 
         with patch.object(pywikibot, 'warning') as w, \
-             self.assertRaises(KeyError):
+                self.assertRaises(KeyError):
             pi.__getitem__('query+foobar')
 
         self.assertIn('API warning (paraminfo): ', w.call_args[0][0])
@@ -477,7 +477,7 @@ class TestDryPageGenerator(TestCase):
         """Test PageGenerator set_namespace."""
         for namespace in (0, 1, None):
             with self.subTest(namespace=namespace), \
-                 self.assertRaises(AssertionError):
+                    self.assertRaises(AssertionError):
                 self.gen.set_namespace(namespace)
 
 
@@ -639,7 +639,7 @@ class TestDryQueryGeneratorNamespaceParam(TestCase):
                                      parameters={'titles': 'test'})
         for namespace in (0, 1, None):
             with self.subTest(namespace=namespace), \
-                 self.assertRaises(AssertionError):
+                    self.assertRaises(AssertionError):
                 self.gen.set_namespace(namespace)
 
     @suppress_warnings(

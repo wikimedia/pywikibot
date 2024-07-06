@@ -568,12 +568,12 @@ class TestSiteGenerators(DefaultSiteTestCase):
 
         # starttime earlier than endtime
         with self.subTest(starttime=low, endtime=high, reverse=False), \
-             self.assertRaises(AssertionError):
+                self.assertRaises(AssertionError):
             mysite.blocks(total=5, starttime=low, endtime=high)
 
         # reverse: endtime earlier than starttime
         with self.subTest(starttime=high, endtime=low, reverse=True), \
-             self.assertRaises(AssertionError):
+                self.assertRaises(AssertionError):
             mysite.blocks(total=5, starttime=high, endtime=low, reverse=True)
 
     def test_exturl_usage(self):
