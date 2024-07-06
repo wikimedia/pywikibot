@@ -3453,7 +3453,8 @@ class ImdbAnalyzer(Analyzer):
     def findcast(self, html: str):
         section = self.findbyre(r'(?s)>Credited cast:(<.*?</table>)', html)
         if section:
-            return self.findallbyre(r'"name">([^<>]*)</span>', section, 'actor')
+            return self.findallbyre(
+                r'"name">([^<>]*)</span>', section, 'actor')
 
     def findprodcoms(self, html: str):
         section = self.findbyre(r'(?s)>Production Co:(<.*?</div>)', html)
@@ -3734,10 +3735,12 @@ class MusicBrainzAnalyzer(Analyzer):
         return self.findbyre(r'class="gender">(.*?)</', html, 'gender')
 
     def findbirthdate(self, html: str):
-        return self.findbyre(r'(?s)<dt>Born:</dt>.*?<dd[^<>]*>(.*?)[<\(]', html)
+        return self.findbyre(
+            r'(?s)<dt>Born:</dt>.*?<dd[^<>]*>(.*?)[<\(]', html)
 
     def finddeathdate(self, html: str):
-        return self.findbyre(r'(?s)<dt>Died:</dt>.*?<dd[^<>]*>(.*?)[<\(]', html)
+        return self.findbyre(
+            r'(?s)<dt>Died:</dt>.*?<dd[^<>]*>(.*?)[<\(]', html)
 
     def findbirthplace(self, html: str):
         section = self.findbyre(r'(?s)<dt>Born in:</dt>\s*(<dd.*?</dd>)', html)
@@ -4345,7 +4348,8 @@ class RkdArtistsAnalyzer(Analyzer):
         section = self.findbyre(r'(?s)Kwalificaties\s*</dt>.*?<dd>(.*?)</dd>',
                                 html)
         if section:
-            return self.findallbyre(r'">([^<>]+)</span>', section, 'occupation')
+            return self.findallbyre(
+                r'">([^<>]+)</span>', section, 'occupation')
 
     def findbirthplace(self, html: str):
         return self.findbyre(r'itemprop="birthPlace">([^<>]*),', html, 'city') or \
@@ -4474,7 +4478,8 @@ class BiografischPortaalAnalyzer(Analyzer):
         return self.finddefaultmixedrefs(html)
 
     def findgender(self, html: str):
-        return self.findbyre(r'(?s)<th>sekse</th>.*?<li>(.*?)<', html, 'gender')
+        return self.findbyre(
+            r'(?s)<th>sekse</th>.*?<li>(.*?)<', html, 'gender')
 
     def findsources(self, html: str):
         return self.findallbyre(
@@ -4789,7 +4794,8 @@ class HdsAnalyzer(Analyzer):
         self.escapeunicode = True
 
     def finddescription(self, html: str):
-        return self.findbyre(r'property="og:description" content="(.*?)"', html)
+        return self.findbyre(
+            r'property="og:description" content="(.*?)"', html)
 
     def findlongtext(self, html: str):
         return self.findbyre(r'(?s)(<h1.*?<!-- noindex -->)', html)
@@ -5041,7 +5047,8 @@ class IaafAnalyzer(Analyzer):
         return ['Q542']
 
     def findnationality(self, html: str):
-        return self.findbyre(r'(?s)COUNTRY.*?>([^<>]*)</span>', html, 'country')
+        return self.findbyre(
+            r'(?s)COUNTRY.*?>([^<>]*)</span>', html, 'country')
 
     def findbirthdate(self, html: str):
         return self.findbyre(r'(?s)DATE OF BIRTH\s*<br\s*/>(.*?)<', html)
@@ -6485,7 +6492,8 @@ class WelshBioAnalyzer(Analyzer):
         return self.findbyre(r'<b>Gender:</b>(.*?)<', html, 'gender')
 
     def findoccupations(self, html: str):
-        return self.findallbyre(r'<b>Occupation:</b>(.*?)<', html, 'occupation')
+        return self.findallbyre(
+            r'<b>Occupation:</b>(.*?)<', html, 'occupation')
 
     def findfather(self, html: str):
         for person in self.findallbyre(r'<b>Parent:</b>(.*?)<', html,
@@ -6692,7 +6700,8 @@ class BritishMuseumAnalyzer(Analyzer):
         return self.findallbyre('(?s)name:</span>(.*?)<', html)
 
     def findlongtext(self, html: str):
-        return self.findbyre(r'(?s)Biography</dt>\s*<dd[^<>]*>(.*?)</dd>', html)
+        return self.findbyre(
+            r'(?s)Biography</dt>\s*<dd[^<>]*>(.*?)</dd>', html)
 
     def findinstanceof(self, html: str):
         return self.findbyre('([^;]+)', self.finddetails(html), 'instanceof')
@@ -7354,7 +7363,8 @@ class DiscogsAnalyzer(Analyzer):
                 r'Born\s*:?\s*(\w+ \d+, \d+)', html))
 
     def findbirthplace(self, html: str):
-        return self.findbyre(r'[bB]orn (?:on|:) .*? in ([\w\s]+)', html, 'city')
+        return self.findbyre(
+            r'[bB]orn (?:on|:) .*? in ([\w\s]+)', html, 'city')
 
     def finddeathdate(self, html: str):
         return self.findbyre(r'died on (\w+ \w+ \w+)', html) or \
@@ -7362,7 +7372,8 @@ class DiscogsAnalyzer(Analyzer):
             self.findbyre(r'Died\s*:?\s*(\w+ \d+, \d+)', html)
 
     def finddeathplace(self, html: str):
-        return self.findbyre(r'[dD]ied (?:on|:) .*? in ([\w\s]+)', html, 'city')
+        return self.findbyre(
+            r'[dD]ied (?:on|:) .*? in ([\w\s]+)', html, 'city')
 
     def findschools(self, html: str):
         return [
@@ -7401,7 +7412,8 @@ class ArchivesDuSpectacleAnalyzer(Analyzer):
         return self.findallbyre(r'(?s)itemprop="\w*[nN]ame">(.*?)<', html)
 
     def finddescription(self, html: str):
-        return self.findbyre(r"(?s)<div class='fiche__infos'>(.*?)</div>", html)
+        return self.findbyre(
+            r"(?s)<div class='fiche__infos'>(.*?)</div>", html)
 
     def findgender(self, html: str):
         return self.findbyre(r"meta itemprop='gender' content='(.*?)'", html,
@@ -7951,7 +7963,8 @@ class NgaAnalyzer(Analyzer):
                              'country')
 
     def findbirthdate(self, html: str):
-        return self.findbyre(r'(?s)<dd class="lifespan">[^<>]+,([^<>]+)-', html)
+        return self.findbyre(
+            r'(?s)<dd class="lifespan">[^<>]+,([^<>]+)-', html)
 
     def finddeathdate(self, html: str):
         return self.findbyre(r'(?s)<dd class="lifespan">[^<>]+-([^<>\-]+)',
@@ -7976,7 +7989,8 @@ class OrsayAnalyzer(Analyzer):
         return self.findbyre(r'(?s)<h6>Documentation</h6>(.*?)</div>', html)
 
     def findlongtext(self, html: str):
-        return self.findbyre(r'(?s)<h6>Commentaire</h6>(.*?)<(?:h\d|div)', html)
+        return self.findbyre(
+            r'(?s)<h6>Commentaire</h6>(.*?)<(?:h\d|div)', html)
 
     def findnames(self, html) -> list[str]:
         section = self.findbyre(r'(?s)(<h2>.*?)</div>', html)
@@ -7991,7 +8005,8 @@ class OrsayAnalyzer(Analyzer):
         return self.findbyre(r'Sexe\s*:\s*(.*?)<', html, 'gender')
 
     def findbirthdate(self, html: str):
-        return self.findbyre(r'Naissance</h6>([^<>,]*?\d{4}[^<>,]*?)[,<]', html)
+        return self.findbyre(
+            r'Naissance</h6>([^<>,]*?\d{4}[^<>,]*?)[,<]', html)
 
     def findbirthplace(self, html: str):
         return self.findbyre(r'Naissance</h6>[^,<>]*?,([^<>]*)', html, 'city')
@@ -8572,7 +8587,8 @@ class KnawAnalyzer(Analyzer):
         return 'Q5'
 
     def findgender(self, html: str):
-        return self.findbyre(r'<strong>Gender</strong>:?(.*?)<', html, 'gender')
+        return self.findbyre(
+            r'<strong>Gender</strong>:?(.*?)<', html, 'gender')
 
     def findbirthplace(self, html: str):
         return self.findbyre(r'Born:([^<>]*),', html, 'city')
@@ -8891,7 +8907,8 @@ class CageMatchAnalyzer(Analyzer):
         section = self.getvalue('Nicknames', html)
         if section:
             result += self.findallbyre(r'"([^,]+)"', section)
-        return [('en', res) for res in result] + [('de', res) for res in result]
+        return [('en', res) for res in result] + [('de', res)
+                                                  for res in result]
 
     def findlongtext(self, html: str):
         return self.findbyre(r'(?s)<div id="hiddenText1"[^<>]*>(.*?)</div>',
@@ -8983,10 +9000,12 @@ class PhotographersAnalyzer(Analyzer):
         return [self.findbyre(r'<h1[^<>]*>(.*?)<', html)]
 
     def findoccupations(self, html: str):
-        return self.findallbyre(r'role\.TermID=\d*">(.*?)<', html, 'occupation')
+        return self.findallbyre(
+            r'role\.TermID=\d*">(.*?)<', html, 'occupation')
 
     def findnationality(self, html: str):
-        return self.findbyre(r'<h2 class="subtitle">(.*?)[<,]', html, 'country')
+        return self.findbyre(
+            r'<h2 class="subtitle">(.*?)[<,]', html, 'country')
 
     def findmixedrefs(self, html: str):
         return self.finddefaultmixedrefs(html)
@@ -9163,7 +9182,8 @@ class BenezitAnalyzer(Analyzer):
         return result
 
     def findlastname(self, html: str):
-        return self.findbyre(r'"pf:contentName" : "([^"]+?),', html, 'lastname')
+        return self.findbyre(
+            r'"pf:contentName" : "([^"]+?),', html, 'lastname')
 
     def findfirstname(self, html: str):
         return self.findbyre(r'"pf:contentName" : "[^",]+,\s*(\w+)', html,
@@ -10974,7 +10994,8 @@ class AthenaeumAnalyzer(Analyzer):
         return self.findallbyre(r'<strong>Name:</strong></td><td>(.*?)<', html)
 
     def findbirthdate(self, html: str):
-        return self.findbyre(r'<strong>Dates:</strong></td><td>(.*?)[-<]', html)
+        return self.findbyre(
+            r'<strong>Dates:</strong></td><td>(.*?)[-<]', html)
 
     def finddeathdate(self, html: str):
         return self.findbyre(r'<strong>Dates:</strong></td><td>[^<>]*-(.*?)<',
@@ -11459,7 +11480,8 @@ class OnlineBooksAnalyzer(Analyzer):
                              'firstname')
 
     def findlastname(self, html: str):
-        return self.findbyre(r'<h3[^<>]*>[^<>]*\(([^<>,]*?),', html, 'lastname')
+        return self.findbyre(
+            r'<h3[^<>]*>[^<>]*\(([^<>,]*?),', html, 'lastname')
 
     def findbirthdate(self, html: str):
         return self.findbyre(r'<h3[^<>]*>[^<>]*\([^<>]*,([^<>]*)-', html)
@@ -12434,7 +12456,8 @@ class NelsonAtkinsAnalyzer(Analyzer):
         return 'Q5'
 
     def findnationality(self, html: str):
-        return self.findbyre(r'filter=nationality.3A([^<>]*)"', html, 'country')
+        return self.findbyre(
+            r'filter=nationality.3A([^<>]*)"', html, 'country')
 
     def findbirthdate(self, html: str):
         return self.findbyre(r'born ([^<>]*)</', html) or self.findbyre(
@@ -12500,7 +12523,8 @@ class ArmbAnalyzer(Analyzer):
             for part in parts:
                 result += self.findallbyre(r'([^,;\-\.]*\w)', part, 'subject')
             return result
-        return self.findallbyre(r'Spécialité\s*:\s*([^<>]*\w)', html, 'subject')
+        return self.findallbyre(
+            r'Spécialité\s*:\s*([^<>]*\w)', html, 'subject')
 
     def findmemberships(self, html: str):
         return ['Q2124852']
@@ -13673,7 +13697,8 @@ class IgdbAnalyzer(Analyzer):
     def getvalues(self, field, html, dtype=None, alt=None) -> list[str]:
         section = self.getvalue(field, html)
         if section:
-            return self.findallbyre('>([^<>]+)<', section, dtype=dtype, alt=alt)
+            return self.findallbyre(
+                '>([^<>]+)<', section, dtype=dtype, alt=alt)
         return []
 
     def findinstanceof(self, html: str):
@@ -13759,7 +13784,8 @@ class MuziekwebAnalyzer(Analyzer):
                                               html)
 
     def findlongtext(self, html: str):
-        return self.findbyre(r'(?s)(<p class="cat-article-text">.*?</p>)', html)
+        return self.findbyre(
+            r'(?s)(<p class="cat-article-text">.*?</p>)', html)
 
     def finddescription(self, html: str):
         return self.findbyre(r'(?s)<p class="cat-article-text">(.*?)[\.<]',
@@ -13938,7 +13964,8 @@ class BritishExecutionsAnalyzer(Analyzer):
         return self.findbyre(r'<strong>Sex:</strong>(.*?)<', html, 'gender')
 
     def finddeathdate(self, html: str):
-        return self.findbyre(r'<strong>Date Of Execution:</strong>(.*?)<', html)
+        return self.findbyre(
+            r'<strong>Date Of Execution:</strong>(.*?)<', html)
 
     def findcrimes(self, html: str):
         return [self.findbyre(r'<strong>Crime:</strong>(.*?)<', html, 'crime')]
@@ -13977,7 +14004,8 @@ class BdfaAnalyzer(Analyzer):
                              'footballposition')
 
     def findweight(self, html: str):
-        return self.findbyre(r'(?s)<strong>Peso:</strong>\s*(\d+\s*kg)\.', html)
+        return self.findbyre(
+            r'(?s)<strong>Peso:</strong>\s*(\d+\s*kg)\.', html)
 
     def findheight(self, html: str):
         return self.findbyre(r'(?s)<strong>Altura:</strong>\s*(\d+\s*m)ts',
@@ -15572,7 +15600,8 @@ class WikiAnalyzer(Analyzer):
                                                    section, dtype)
         return result
 
-    def getinfo(self, names, html, dtype=None, splitters=None, alt=None) -> str:
+    def getinfo(self, names, html, dtype=None,
+                splitters=None, alt=None) -> str:
         if not alt:
             alt = []
         for name in names:
@@ -16075,7 +16104,8 @@ class WikiAnalyzer(Analyzer):
             + self.findallbyre(r'Category:([^\[\]]+) faculty', html, 'university')
 
     def findteachers(self, html: str):
-        return self.getinfos(['maîtres?', 'leraren', 'ohjaaja'], html, 'artist')
+        return self.getinfos(
+            ['maîtres?', 'leraren', 'ohjaaja'], html, 'artist')
 
     def findwebsite(self, html: str):
         result = self.getinfo([
@@ -16770,7 +16800,8 @@ class FotomuseumAnalyzer(UrlAnalyzer):
     def findmemberships(self, html: str):
         section = self.getvalue('Affiliated entity', html)
         if section:
-            return self.findallbyre('<a [^<>]*>(.*?)<', section, 'organization')
+            return self.findallbyre(
+                '<a [^<>]*>(.*?)<', section, 'organization')
         return None
 
 
@@ -16872,7 +16903,8 @@ class BenezitUrlAnalyzer(UrlAnalyzer):
         return result
 
     def findlastname(self, html: str):
-        return self.findbyre(r'"pf:contentName" : "([^"]+?),', html, 'lastname')
+        return self.findbyre(
+            r'"pf:contentName" : "([^"]+?),', html, 'lastname')
 
     def findfirstname(self, html: str):
         return self.findbyre(r'"pf:contentName" : "[^",]+,\s*([\w\-]+)', html,
