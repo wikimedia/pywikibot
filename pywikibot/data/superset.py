@@ -50,10 +50,9 @@ class SupersetQuery(WaitingMixin):
             raise TypeError(msg)
 
         # Validate database_id
-        if database_id:
-            if not isinstance(database_id, int):
-                msg = f'database_id should be integer, but got "{database_id}"'
-                raise TypeError(msg)
+        if database_id and not isinstance(database_id, int):
+            msg = f'database_id should be integer, but got "{database_id}"'
+            raise TypeError(msg)
 
         self.site = site
         self.schema_name = schema_name

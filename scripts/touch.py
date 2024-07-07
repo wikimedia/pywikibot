@@ -154,7 +154,7 @@ def main(*args: str) -> None:
 
     bot_class = TouchBot
     for arg in local_args:
-        option, _, value = arg[1:].partition(':')
+        option = arg[1:]
         if arg == '-purge':
             bot_class = PurgeBot
         elif arg.startswith('-'):

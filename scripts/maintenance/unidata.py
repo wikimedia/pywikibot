@@ -97,7 +97,7 @@ def spawn_threads(q):
     """Prepare several threads."""
     # TODO: use ThreadList instead
     threads = []
-    for i in range(NUMBER_OF_THREADS):
+    for _ in range(NUMBER_OF_THREADS):
         t = Thread(target=threads_target, args=(q,))
         t.start()
         threads.append(t)
@@ -106,7 +106,7 @@ def spawn_threads(q):
 
 def stop_threads(q, threads):
     """Stop threads."""
-    for i in range(NUMBER_OF_THREADS):
+    for _ in range(NUMBER_OF_THREADS):
         q.put(None)
     for t in threads:
         t.join()
