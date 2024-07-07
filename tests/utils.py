@@ -357,11 +357,10 @@ class DrySite(pywikibot.site.APISite):
         if self.family.name == 'wikisource':
             extensions.append({'name': 'ProofreadPage'})
         self._siteinfo._cache['extensions'] = (extensions, True)
-        aliases = []
-        for alias in ('PrefixIndex', ):
-            # TODO: Not all follow that scheme (e.g. "BrokenRedirects")
-            aliases.append(
-                {'realname': alias.capitalize(), 'aliases': [alias]})
+
+        # TODO: Not all follow that scheme (e.g. "BrokenRedirects")
+        aliases = [{'realname': alias.capitalize(), 'aliases': [alias]}
+                   for alias in ('PrefixIndex', )]
         self._siteinfo._cache['specialpagealiases'] = (aliases, True)
         self._msgcache = {'*': 'dummy entry', 'hello': 'world'}
 

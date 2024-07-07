@@ -354,9 +354,8 @@ class LinkedPagesRule:
         if not self.linkedpages:
             verbose_output('loading page links on ' + self.page_title)
             p = pywikibot.Page(self.site, self.page_title)
-            linkedpages = []
-            for linkedpage in p.linkedPages():
-                linkedpages.append(linkedpage.title())
+            linkedpages = [linkedpage.title()
+                           for linkedpage in p.linkedPages()]
 
             self.linkedpages = linkedpages
             verbose_output(f'Loaded {len(linkedpages)} page links')

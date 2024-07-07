@@ -741,7 +741,7 @@ class TestSiteSysopWrite(TestCase):
 
         fp2 = pywikibot.FilePage(site, 'File:T276726.png')
         site.loadimageinfo(fp2, history=True)
-        for idx, v in fp2._file_revisions.items():
+        for v in fp2._file_revisions.values():
             if v['timestamp'] in (ts1, ts2):
                 self.assertTrue(hasattr(v, 'commenthidden'))
 
@@ -753,7 +753,7 @@ class TestSiteSysopWrite(TestCase):
 
         fp3 = pywikibot.FilePage(site, 'File:T276726.png')
         site.loadimageinfo(fp3, history=True)
-        for idx, v in fp3._file_revisions.items():
+        for v in fp3._file_revisions.values():
             if v['timestamp'] in (ts1, ts2):
                 self.assertFalse(hasattr(v, 'commenthidden'))
                 self.assertFalse(hasattr(v, 'userhidden'))

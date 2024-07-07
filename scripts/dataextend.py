@@ -3190,12 +3190,11 @@ class BnfAnalyzer(Analyzer):
         section = self.findbyre(
             r'(?s)"description">\s*<span[^<>]*>(.*?)</span>', html)
         if section:
-            result = []
             texts = []
             for subsection in section.split(' et '):
                 texts += self.findallbyre(r'(\w[\-\s\w&\']+)', subsection)
-            for text in texts[:8]:
-                result.append(self.findbyre(r'(.+)', text, 'occupation'))
+            result = [self.findbyre(r'(.+)', text, 'occupation')
+                      for text in texts[:8]]
             return result
         return None
 
@@ -5261,24 +5260,20 @@ class IbdbAnalyzer(Analyzer):
         if section:
             parts = self.findallbyre(r'(?s)(<tr><th.*?</tr>\s*<tr>.*?</tr>)',
                                      section)
-            result = []
-            for part in parts:
-                if '[nominee]' not in part:
-                    result.append(
-                        self.findbyre(r'<th[^<>]*>(.*?)<', section, 'award'))
+            result = [self.findbyre(r'<th[^<>]*>(.*?)<', section, 'award')
+                      for part in parts if '[nominee]' not in part]
             return result
+        return None
 
     def findnominations(self, html: str):
         section = self.findbyre(r'(?s)<div id="awards".*?>(.*?)</table>', html)
         if section:
             parts = self.findallbyre(r'(?s)(<tr><th.*?</tr>\s*<tr>.*?</tr>)',
                                      section)
-            result = []
-            for part in parts:
-                if '[nominee]' in part:
-                    result.append(
-                        self.findbyre(r'<th[^<>]*>(.*?)<', section, 'award'))
+            result = [self.findbyre(r'<th[^<>]*>(.*?)<', section, 'award')
+                      for part in parts if '[nominee]' in part]
             return result
+        return None
 
     def findspouses(self, html: str):
         return self.findallbyre(
@@ -6305,14 +6300,15 @@ class ZbmathAnalyzer(Analyzer):
         if section:
             preresults = self.findallbyre(r'(?s)<tr>(.*?)</tr>',
                                           section.replace('&nbsp;', ' '))[:5]
-            results = []
-            for preresult in preresults:
-                if int(self.findbyre(r'">(\d+)</a>', preresult) or 0) > 5:
-                    results.append(
-                        self.findbyre(
-                            r'(?s)"Mathematics Subject Classification">(.*?)<',
-                            preresult, 'subject'))
-            return results
+            result = [
+                self.findbyre(
+                    r'(?s)"Mathematics Subject Classification">(.*?)<',
+                    preresult, 'subject')
+                for preresult in preresults
+                if int(self.findbyre(r'">(\d+)</a>', preresult) or 0) > 5
+            ]
+            return result
+        return None
 
     def findwebsite(self, html: str):
         return self.findbyre(r'(?s)<td>Homepage:</td>\s*<td><a[^<>]*>(.*?)<',
@@ -8340,15 +8336,16 @@ class OdisAnalyzer(Analyzer):
             r'(?s)<b>Woon- en verblijfplaatsen</b>\s*</td>\s*</tr>\s*<tr>(.*?)</tbody>',
             html)
         if section:
-            result = []
             subsections = self.findallbyre(r'(?s)(<tr.*?</tr>)', section)
-            for subsection in subsections:
-                result.append(
-                    self.findbyre(
-                        r'<td width="auto">([^<>]*)</td>', subsection, 'city')
-                    or self.findbyre(
-                        r'<span[^<>]*>(.*?)<', subsection, 'city'))
+            result = [
+                self.findbyre(
+                    r'<td width="auto">([^<>]*)</td>', subsection, 'city')
+                or self.findbyre(
+                    r'<span[^<>]*>(.*?)<', subsection, 'city')
+                for subsection in subsections
+            ]
             return result
+        return None
 
     def findoccupations(self, html: str):
         section = self.findbyre(
@@ -14882,10 +14879,9 @@ class PlwabnAnalyzer(Analyzer):
 
     def findsources(self, html: str):
         sources = self.getvalues('670', 'a', html)
-        result = []
-        for source in sources:
-            if source and ' by ' not in source and ' / ' not in source:
-                result.append(self.findbyre('(.*)', source, 'source'))
+        result = [self.findbyre('(.*)', source, 'source')
+                  for source in sources
+                  if source and ' by ' not in source and ' / ' not in source]
         return result
 
 

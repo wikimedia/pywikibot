@@ -1651,7 +1651,7 @@ class APISite(
         if 'pages' not in result['query']:
             # No "pages" element might indicate a circular redirect
             # Check that a "to" link is also a "from" link in redirmap
-            for _from, _to in redirmap.items():
+            for _to in redirmap.values():
                 if _to['title'] in redirmap:
                     raise CircularRedirectError(page)
 
