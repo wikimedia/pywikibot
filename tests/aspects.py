@@ -22,6 +22,7 @@ from collections.abc import Sized
 from contextlib import contextmanager, suppress
 from functools import wraps
 from http import HTTPStatus
+from typing import Any
 from unittest.util import safe_repr
 
 import pywikibot
@@ -183,21 +184,25 @@ class TestCaseBase(TestTimerMixin):
         for page in gen:
             self.assertPageInNamespaces(page, namespaces)
 
-    def assertPagesInNamespacesAll(self, gen, namespaces, skip=False):
-        """
-        Try to confirm that generator returns Pages for all namespaces.
+    def assertPagesInNamespacesAll(self, gen,
+                                   namespaces: int | set[int],
+                                   skip: bool = False) -> None:
+        """Try to confirm that generator returns Pages for all namespaces.
+
+        .. versionchanged:: 9.3
+           raises TypeError instead of AssertionError
 
         :param gen: generator to iterate
         :type gen: generator
         :param namespaces: expected namespaces
-        :type namespaces: int or set of int
         :param skip: skip test if not all namespaces found
-        :param skip: bool
+        :raises TypeError: Invalid *namespaces* type
         """
         if isinstance(namespaces, int):
             namespaces = {namespaces}
-        else:
-            assert isinstance(namespaces, set)
+        elif not isinstance(namespaces, set):
+            raise TypeError('namespaces argument must be an int or a set, not '
+                            f'{type(namespaces).__name__}')
 
         page_namespaces = {page.namespace() for page in gen}
 
@@ -663,7 +668,21 @@ class MetaTestCaseClass(type):
     """Test meta class."""
 
     def __new__(cls, name, bases, dct):
-        """Create the new class."""
+        """Create the new class.
+
+        .. versionchanged:: 9.3
+           raises AttributeError instead of AssertionError for
+           duplicated hostname, raises Exception instead of
+           AssertionError for missing or wrong "net" attribute with
+           hostnames.
+
+        :raises AttributeError: hostname already found
+        :raises Exception: Test classes using "pwb" must set "site" or
+            test classes without a "site" configured must set "net" or
+            test method must accept either 1 or 2 arguments or
+            "net" must be True with hostnames defined.
+        :meta public:
+        """
         def wrap_method(key, sitedata, func):
 
             def wrapped_method(self):
@@ -741,7 +760,9 @@ class MetaTestCaseClass(type):
         if hostnames:
             dct.setdefault('sites', {})
             for hostname in hostnames:
-                assert hostname not in dct['sites']
+                if hostname in dct['sites']:
+                    raise AttributeError(f'hostname {hostname!r} already found'
+                                         f"in dict['sites']:\n{dict['sites']}")
                 dct['sites'][hostname] = {'hostname': hostname}
 
         if dct.get('dry') is True:
@@ -792,8 +813,8 @@ class MetaTestCaseClass(type):
 
         if dct.get('net'):
             bases = cls.add_base(bases, CheckHostnameMixin)
-        else:
-            assert not hostnames, 'net must be True with hostnames defined'
+        elif hostnames:
+            raise Exception('"net" must be True with hostnames defined')
 
         if dct.get('write'):
             dct.setdefault('login', True)
@@ -849,14 +870,21 @@ class MetaTestCaseClass(type):
 
     @staticmethod
     def add_method(dct, test_name, method, doc=None, doc_suffix=None):
-        """Set method's __name__ and __doc__ and add it to dct."""
+        """Set method's __name__ and __doc__ and add it to dct.
+
+        .. versionchanged:: 9.3
+           raises ValueError instead of AssertionError
+
+        :raises ValueError: doc string must end with a period.
+        """
         dct[test_name] = method
         # it's explicitly using str() because __name__ must be str
         dct[test_name].__name__ = str(test_name)
         if doc_suffix:
             if not doc:
                 doc = method.__doc__
-            assert doc[-1] == '.'
+            if doc[-1] != '.':
+                raise ValueError('doc string must end with a period.')
             doc = doc[:-1] + ' ' + doc_suffix + '.'
 
         if doc:
@@ -924,7 +952,16 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
 
     @classmethod
     def get_site(cls, name=None):
-        """Return the prefetched Site object."""
+        """Return the prefetched Site object.
+
+        .. versionchanged:: 9.3
+           raises Exception instead of AssertionError for site mismatch
+
+        :raises Exception: method called for multiple sites without
+            *name* argument given or *name* not found in sites attribute
+            or cls.site is not equal to cls.sites content for the given
+            *name*.
+        """
         if not name and hasattr(cls, 'sites'):
             if len(cls.sites) == 1:
                 name = next(iter(cls.sites.keys()))
@@ -936,7 +973,10 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
             raise Exception(f'"{name}" not declared in {cls.__name__}')
 
         if isinstance(cls.site, BaseSite):
-            assert cls.sites[name]['site'] == cls.site
+            if cls.sites[name]['site'] != cls.site:
+                raise Exception(f'{cls.__name__}.site is different from '
+                                f"{cls.__name__}.sites[{name!r}]['site']:\n"
+                                f"{cls.site} != {cls.sites[name]['site']}")
             return cls.site
 
         return cls.sites[name]['site']
@@ -1134,16 +1174,23 @@ class WikimediaDefaultSiteTestCase(DefaultSiteTestCase):
 
     @classmethod
     def setUpClass(cls):
-        """
-        Set up the test class.
+        """Set up the test class.
 
         Check that the default site is a Wikimedia site.
         Use en.wikipedia.org as a fallback.
+
+        .. versionchanged:: 9.3
+           raises Exception instead of AssertionError
+
+        :raises Exception: "site" or "sites" attribute is missing or
+            "sites" entries count is different from 1.
         """
         super().setUpClass()
 
-        assert hasattr(cls, 'site') and hasattr(cls, 'sites')
-        assert len(cls.sites) == 1
+        if not (hasattr(cls, 'site') and hasattr(cls, 'sites')) \
+           or len(cls.sites) != 1:
+            raise Exception('"site" or "sites" attribute is missing or "sites"'
+                            'entries count is different from 1')
 
         site = cls.get_site()
         if not isinstance(site.family, WikimediaFamily):
@@ -1377,7 +1424,16 @@ class DeprecationTestCase(TestCase):
         return [str(item.message) for item in self.warning_log]
 
     @classmethod
-    def _build_message(cls, deprecated, instead):
+    def _build_message(cls,
+                       deprecated: str | None,
+                       instead: str | bool | None) -> Any:
+        """Build a deprecation warning result.
+
+        .. versionchanged:: 9.3
+           raises TypeError instead of AssertionError
+
+        :raises TypeError: invalid *instead* type
+        """
         if deprecated is not None:
             msg = f'{deprecated} is deprecated'
             if instead:
@@ -1386,9 +1442,11 @@ class DeprecationTestCase(TestCase):
             msg = None
         elif instead is True:
             msg = cls.INSTEAD
-        else:
-            assert instead is False
+        elif instead is False:
             msg = cls.NO_INSTEAD
+        else:
+            raise TypeError(
+                f'instead argument must not be a {type(instead).__name__!r}')
         return msg
 
     def assertDeprecationParts(self, deprecated=None, instead=None):
