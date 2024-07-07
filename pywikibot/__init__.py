@@ -269,7 +269,7 @@ from pywikibot.page import (  # noqa: E402
 )
 
 
-def showDiff(oldtext: str,  # noqa: 134
+def showDiff(oldtext: str,  # noqa: N802
              newtext: str,
              context: int = 0) -> None:
     """
