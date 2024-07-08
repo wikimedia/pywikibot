@@ -599,7 +599,7 @@ class RedirectRobot(ExistingPageBot):
             # all uncatched exceptions
             # Note: elif statements are necessary above because all Errors
             # above derive from Exception class
-            raise
+            raise error
 
         return True
 
