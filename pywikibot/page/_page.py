@@ -28,7 +28,7 @@ from pywikibot.exceptions import (
 from pywikibot.page._basepage import BasePage
 from pywikibot.page._toolforge import WikiBlameMixin
 from pywikibot.site import Namespace
-from pywikibot.tools import cached
+from pywikibot.tools import cached, deprecated_args
 
 
 __all__ = ['Page']
@@ -122,6 +122,7 @@ class Page(BasePage, WikiBlameMixin):
             result.append((pywikibot.Page(link, self.site), positional))
         return result
 
+    @deprecated_args(botflag='bot')  # since 9.3.0
     def set_redirect_target(
         self,
         target_page,
@@ -133,6 +134,9 @@ class Page(BasePage, WikiBlameMixin):
     ):
         """
         Change the page's text to point to the redirect page.
+
+        .. versionchanged:: 9.3
+           *botflag* keyword parameter was renamed to *bot*.
 
         :param target_page: target of the redirect, this argument is required.
         :type target_page: pywikibot.Page or string
@@ -150,15 +154,19 @@ class Page(BasePage, WikiBlameMixin):
             target_page = pywikibot.Page(self.site, target_page)
         elif self.site != target_page.site:
             raise InterwikiRedirectPageError(self, target_page)
+
         if not self.exists() and not (create or force):
             raise NoPageError(self)
+
         if self.exists() and not self.isRedirectPage() and not force:
             raise IsNotRedirectPageError(self)
+
         redirect_regex = self.site.redirect_regex
         if self.exists():
             old_text = self.get(get_redirect=True)
         else:
             old_text = ''
+
         result = redirect_regex.search(old_text)
         if result:
             oldlink = result[1]
@@ -172,8 +180,7 @@ class Page(BasePage, WikiBlameMixin):
             prefix = self.text[:result.start()]
             suffix = self.text[result.end():]
         else:
-            prefix = ''
-            suffix = ''
+            prefix = suffix = ''
 
         target_link = target_page.title(as_link=True, textlink=True,
                                         allow_interwiki=False)
