@@ -77,7 +77,7 @@ class TestGetAuthenticationConfig(TestCase):
             'https://www.wikiquote.org/': None,
         }
         with suppress_warnings(
-            r'config.authenticate\["\*.wmflabs.org"] has invalid value.',
+            r"config.authenticate\['\*.wmflabs.org'] has invalid value.",
             UserWarning,
         ):
             for url, auth in pairs.items():
