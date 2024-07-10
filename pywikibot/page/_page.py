@@ -125,21 +125,20 @@ class Page(BasePage, WikiBlameMixin):
     @deprecated_args(botflag='bot')  # since 9.3.0
     def set_redirect_target(
         self,
-        target_page,
+        target_page: pywikibot.Page | str,
         create: bool = False,
         force: bool = False,
         keep_section: bool = False,
         save: bool = True,
         **kwargs
     ):
-        """
-        Change the page's text to point to the redirect page.
+        """Change the page's text to point to the redirect page.
 
         .. versionchanged:: 9.3
            *botflag* keyword parameter was renamed to *bot*.
 
-        :param target_page: target of the redirect, this argument is required.
-        :type target_page: pywikibot.Page or string
+        :param target_page: target of the redirect, this argument is
+            required.
         :param create: if true, it creates the redirect even if the page
             doesn't exist.
         :param force: if true, it set the redirect target even the page
@@ -147,8 +146,8 @@ class Page(BasePage, WikiBlameMixin):
         :param keep_section: if the old redirect links to a section
             and the new one doesn't it uses the old redirect's section.
         :param save: if true, it saves the page immediately.
-        :param kwargs: Arguments which are used for saving the page directly
-            afterwards, like 'summary' for edit summary.
+        :param kwargs: Arguments which are used for saving the page
+            directly afterwards, like *summary* for edit summary.
         """
         if isinstance(target_page, str):
             target_page = pywikibot.Page(self.site, target_page)
@@ -161,13 +160,8 @@ class Page(BasePage, WikiBlameMixin):
         if self.exists() and not self.isRedirectPage() and not force:
             raise IsNotRedirectPageError(self)
 
-        redirect_regex = self.site.redirect_regex
-        if self.exists():
-            old_text = self.get(get_redirect=True)
-        else:
-            old_text = ''
-
-        result = redirect_regex.search(old_text)
+        old_text = self.text
+        result = self.site.redirect_regex.search(old_text)
         if result:
             oldlink = result[1]
             if (keep_section and '#' in oldlink
