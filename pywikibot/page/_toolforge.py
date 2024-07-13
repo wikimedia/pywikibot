@@ -194,8 +194,8 @@ class WikiBlameMixin:
             table = wikitextparser.parse(r.text).tables[0]
         except IndexError:
             pattern = textlib.get_regexes('code')[0]
-            msg = pattern.search(r.text)[0]
-            raise pywikibot.exceptions.Error(textlib.removeHTMLParts(msg))
+            msg = textlib.removeHTMLParts(pattern.search(r.text)[0])
+            raise pywikibot.exceptions.Error(msg) from None
 
         pct_sum = 0.0
         for row in table.data():
