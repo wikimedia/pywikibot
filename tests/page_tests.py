@@ -464,15 +464,20 @@ class TestPageObject(DefaultSiteTestCase):
         # we only check that the returned objects are of correct type.
         self.assertIsInstance(mainpage.get(), str)
         self.assertIsInstance(mainpage.latest_revision_id, int)
-        self.assertIsInstance(mainpage.userName(), str)
-        self.assertIsInstance(mainpage.isIpEdit(), bool)
+
+        with suppress_warnings(
+            r'pywikibot\.page\._basepage.BasePage\.\w+ is deprecated since '
+            r'release [89]\.[03]\.0; use latest_revision\..+ instead\.',
+                FutureWarning):
+            self.assertIsInstance(mainpage.userName(), str)
+            self.assertIsInstance(mainpage.isIpEdit(), bool)
+            self.assertIsInstance(mainpage.editTime(), pywikibot.Timestamp)
+
         self.assertIsInstance(mainpage.exists(), bool)
         self.assertIsInstance(mainpage.isRedirectPage(), bool)
         self.assertIsInstance(mainpage.isDisambig(), bool)
         self.assertIsInstance(mainpage.has_permission(), bool)
         self.assertIsInstance(mainpage.botMayEdit(), bool)
-        self.assertIsInstance(mainpage.latest_revision.timestamp,
-                              pywikibot.Timestamp)
         self.assertIsInstance(mainpage.permalink(), str)
 
     def test_talk_page(self):
