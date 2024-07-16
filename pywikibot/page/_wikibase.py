@@ -2138,17 +2138,17 @@ class LexemePage(WikibasePage):
     >>> import pywikibot
     >>> repo = pywikibot.Site('wikidata')
     >>> L2 = pywikibot.LexemePage(repo, 'L2')  # create a Lexeme page
-    >>> list(L2.claims.keys())  # access the claims
-    ['P5402', 'P5831']
+    >>> list(L2.claims)  # access the claims
+    ['P5402', 'P5831', 'P12690']
     >>> len(L2.forms)  # access the forms
     2
     >>> F1 = L2.forms[0]  # access the first form
-    >>> list(F1.claims.keys())  # access its claims
+    >>> list(F1.claims)  # access its claims
     ['P898']
     >>> len(L2.senses)  # access the senses
     1
     >>> S1 = L2.senses[0]  # access the first sense
-    >>> list(S1.claims.keys())  # and its claims
+    >>> list(S1.claims)  # and its claims
     ['P5137', 'P5972', 'P2888']
     """
 
