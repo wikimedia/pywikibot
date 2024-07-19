@@ -1798,16 +1798,28 @@ class BasePage(ComparableMixin):
 
         return self._pageimage
 
-    def getRedirectTarget(self):
-        """
-        Return a Page object for the target this Page redirects to.
+    def getRedirectTarget(self, *,
+                          ignore_section: bool = True) -> pywikibot.Page:
+        """Return a Page object for the target this Page redirects to.
 
-        If this page is not a redirect page, will raise an
-        IsNotRedirectPageError. This method also can raise a NoPageError.
+        .. versionadded:: 9.3
+           *ignore_section* parameter
 
-        :rtype: pywikibot.Page
+        .. seealso:: :meth:`Site.getredirtarget()
+           <pywikibot.site._apisite.APISite.getredirtarget>`
+
+        :param ignore_section: do not include section to the target even
+            the link has one
+
+        :raises CircularRedirectError: page is a circular redirect
+        :raises InterwikiRedirectPageError: the redirect target is on
+            another site
+        :raises IsNotRedirectPageError: page is not a redirect
+        :raises RuntimeError: no redirects found
+        :raises SectionError: the section is not found on target page
+            and *ignore_section* is not set
         """
-        return self.site.getredirtarget(self)
+        return self.site.getredirtarget(self, ignore_section=ignore_section)
 
     def moved_target(self):
         """
