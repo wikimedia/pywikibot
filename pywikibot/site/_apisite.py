@@ -1594,20 +1594,28 @@ class APISite(
     def getredirtarget(
         self,
         page: BasePage,
+        *,
+        ignore_section: bool = True
     ) -> pywikibot.page.Page:
-        """
-        Return page object for the redirect target of page.
+        """Return page object for the redirect target of page.
+
+        .. versionadded:: 9.3
+           *ignore_section* parameter
+
+        .. seealso:: :meth:`page.BasePage.getRedirectTarget`
 
         :param page: page to search redirects for
+        :param ignore_section: do not include section to the target even
+            the link has one
         :return: redirect target of page
 
-        :raises pywikibot.exceptions.IsNotRedirectPageError: page is not a
-            redirect
+        :raises CircularRedirectError: page is a circular redirect
+        :raises InterwikiRedirectPageError: the redirect target is on
+            another site
+        :raises IsNotRedirectPageError: page is not a redirect
         :raises RuntimeError: no redirects found
-        :raises pywikibot.exceptions.CircularRedirectError: page is a circular
-            redirect
-        :raises pywikibot.exceptions.InterwikiRedirectPageError: the redirect
-            target is on another site
+        :raises SectionError: the section is not found on target page
+            and *ignore_section* is not set
         """
         if not self.page_isredirect(page):
             raise IsNotRedirectPageError(page)
@@ -1626,13 +1634,14 @@ class APISite(
             raise RuntimeError(
                 f"getredirtarget: No 'redirects' found for page {title}.")
 
-        redirmap = {item['from']: {'title': item['to'],
-                                   'section': '#'
-                                   + item['tofragment']
-                                   if 'tofragment' in item
-                                   and item['tofragment']
-                                   else ''}
-                    for item in result['query']['redirects']}
+        redirmap = {
+            item['from']: {
+                'title': item['to'],
+                'section': '#' + item['tofragment']
+                if 'tofragment' in item and item['tofragment'] else ''
+            }
+            for item in result['query']['redirects']
+        }
 
         # Normalize title
         for item in result['query'].get('normalized', []):
@@ -1687,6 +1696,11 @@ class APISite(
             target = pywikibot.FilePage(target)
         elif ns == Namespace.CATEGORY:
             target = pywikibot.Category(target)
+
+        if not ignore_section:
+            # get the content; this raises SectionError if section is not found
+            target.text
+
         page._redirtarget = target
         return page._redirtarget
 

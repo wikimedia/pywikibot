@@ -1170,14 +1170,31 @@ class ItemPage(WikibasePage):
 
         return data
 
-    def getRedirectTarget(self):
-        """Return the redirect target for this page."""
-        target = super().getRedirectTarget()
+    def getRedirectTarget(self, *, ignore_section: bool = True):
+        """Return the redirect target for this page.
+
+        .. versionadded:: 9.3
+           *ignore_section* parameter
+
+        .. seealso:: :meth:`page.BasePage.getRedirectTarget`
+
+        :param ignore_section: do not include section to the target even
+            the link has one
+
+        :raises CircularRedirectError: page is a circular redirect
+        :raises InterwikiRedirectPageError: the redirect target is on
+            another site
+        :raises Error: target page has wrong content model
+        :raises IsNotRedirectPageError: page is not a redirect
+        :raises RuntimeError: no redirects found
+        :raises SectionError: the section is not found on target page
+            and *ignore_section* is not set
+        """
+        target = super().getRedirectTarget(ignore_section=ignore_section)
         cmodel = target.content_model
         if cmodel != 'wikibase-item':
-            raise Error('{} has redirect target {} with content model {} '
-                        'instead of wikibase-item'
-                        .format(self, target, cmodel))
+            raise Error(f'{self} has redirect target {target} with content '
+                        f'model {cmodel} instead of wikibase-item')
         return self.__class__(target.site, target.title(), target.namespace())
 
     def iterlinks(self, family=None):
