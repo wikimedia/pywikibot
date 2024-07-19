@@ -23,11 +23,11 @@ THREADS = {
     'hi': 0, 'hr': 2, 'hu': 5, 'id': 3, 'it': 25, 'ja': 4, 'la': 0, 'lt': 1,
     'nl': 9, 'nn': 0, 'no': 0, 'pdc': 25, 'pfl': 3, 'pl': 8, 'pt': 0, 'ro': 1,
     'ru': 20, 'scn': 2, 'simple': 1, 'sr': 0, 'sv': 5, 'th': 1, 'tr': 7,
-    'ug': 0, 'uk': 1, 'uz': 1, 'vi': 1, 'zh': 4, 'zh-yue': 2,
+    'ug': 0, 'uk': 1, 'vi': 1, 'zh': 4, 'zh-yue': 2,
 }
 
 THREADS_WITH_UPDATED_FORMAT = {
-    'eo': 1, 'pdc': 1,
+    'eo': 1, 'pdc': 1, 'uz': 0,
 }
 
 
@@ -157,6 +157,7 @@ class TestArchiveBot(TestCase):
     #   <message name="feb" xml:space="preserve">Han.</message>.
     #   for new entries it should work
     # 'th': year is 2552 while regex assumes 19..|20.., might be fixed
+    # 'uz': changed month name for October (T370501)
 
 
 class TestArchiveBotAfterDateUpdate(TestCase):
