@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Script to check language links for general pages.
+"""Script to check language links for general pages.
 
 Uses existing translations of a page, plus hints from the command line, to
 download the equivalent pages from other languages. All of such pages are
@@ -110,9 +109,8 @@ These arguments control miscellaneous bot behaviour:
                    hints, the bot does nothing.
                    Hitting return without input on the "Which page to check:"
                    prompt has the same effect as using -hintsonly.
-                   Options like -back, -same or -wiktionary are in effect only
-                   after a page has been found to work on.
-                   (note: without ending colon)
+                   Options like -back or -same are in effect only after a page
+                   has been found to work on. (note: without ending colon)
 
 These arguments are useful to provide hints to the bot:
 
@@ -162,11 +160,6 @@ These arguments are useful to provide hints to the bot:
     -same          looks over all 'serious' languages for the same title.
                    -same is equivalent to -hint:all:
                    (note: without ending colon)
-
-    -wiktionary:   similar to -same, but will ONLY accept names that are
-                   identical to the original. Also, if the title is not
-                   capitalized, it will only go through other wikis without
-                   automatic capitalization.
 
     -untranslated: works normally on pages with at least one interlanguage
                    link; asks for hints for pages that have none.
@@ -352,7 +345,12 @@ from pywikibot import (
     titletranslate,
 )
 from pywikibot.backports import Iterable
-from pywikibot.bot import ListOption, OptionHandler, StandardOption
+from pywikibot.bot import (
+    ListOption,
+    OptionHandler,
+    StandardOption,
+    suggest_help,
+)
 from pywikibot.cosmetic_changes import moved_links
 from pywikibot.exceptions import (
     EditConflictError,
@@ -489,11 +487,6 @@ class InterwikiBotConfig:
             R = re.compile(r'\[\[(.+?)(?:\]\]|\|)')
             with codecs.open(hintfilename, 'r', config.textfile_encoding) as f:
                 self.hints += R.findall(f.read())
-        elif arg == 'wiktionary':
-            self.same = 'wiktionary'
-            # Don't use auto-translation in -wiktionary mode
-            # where page titles must be the same
-            self.auto = False
         elif arg == 'untranslatedonly':
             self.untranslated = True
             self.untranslatedonly = True
@@ -818,8 +811,7 @@ class Subject(interwiki_graph.Subject):
     def skipPage(self, page, target, counter):
         """Return whether page has to be skipped."""
         return self.isIgnored(target) \
-            or self.namespaceMismatch(page, target, counter) \
-            or self.wiktionaryMismatch(target)
+            or self.namespaceMismatch(page, target, counter)
 
     @staticmethod
     def get_alternative(
@@ -901,24 +893,6 @@ class Subject(interwiki_graph.Subject):
 
         # same namespaces, no problem
         # or no origin page yet, also no problem
-        return False
-
-    def wiktionaryMismatch(self, page) -> bool:
-        """Check for ignoring pages."""
-        if self.origin and self.conf.same == 'wiktionary':
-            if page.title().lower() != self.origin.title().lower():
-                pywikibot.info(f'NOTE: Ignoring {page} for {self.origin} in '
-                               f'wiktionary mode')
-                return True
-
-            if (page.title() != self.origin.title()
-                and self.origin.namespace().case == 'case-sensitive'
-                    and page.namespace().case == 'case-sensitive'):
-                pywikibot.info(
-                    f'NOTE: Ignoring {page} for {self.origin} in wiktionary'
-                    ' mode because both languages are uncapitalized.')
-                return True
-
         return False
 
     def disambigMismatch(self, page, counter):
@@ -2287,6 +2261,7 @@ def main(*args: str) -> None:
     optRestore = False
     append = True
     newPages = None
+    unknown = []
 
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)
@@ -2338,9 +2313,14 @@ def main(*args: str) -> None:
             number = int(arg[8:])
         elif arg.startswith('-until:'):
             until = arg[7:]
-        else:
-            if not genFactory.handle_arg(arg) and not singlePageTitle:
+        elif not genFactory.handle_arg(arg):
+            if not (arg.startswith('-') or singlePageTitle):
                 singlePageTitle = arg
+            else:
+                unknown.append(arg)
+
+    if suggest_help(unknown_parameters=unknown):
+        return
 
     # Do not use additional summary with autonomous mode
     if iwconf.autonomous:
