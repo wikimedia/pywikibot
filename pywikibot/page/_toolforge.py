@@ -74,7 +74,7 @@ class WikiBlameMixin:
         >>> page = pywikibot.Page(site, 'Python (informatika)')
         >>> auth = page.main_authors()
         >>> auth.most_common(1)
-        [('Ksarasola', 80)]
+        [('Ksarasola', 81)]
 
         .. important:: Only implemented for main namespace pages and
            only wikipedias of :attr:`WIKIBLAME_CODES` are supported.
