@@ -2303,18 +2303,18 @@ class BasePage(ComparableMixin):
     def create_short_link(self,
                           permalink: bool = False,
                           with_protocol: bool = True) -> str:
-        """
-        Return a shortened link that points to that page.
+        """Return a shortened link that points to that page.
 
-        If shared_urlshortner_wiki is defined in family config, it'll use
-        that site to create the link instead of the current wiki.
+        If shared_urlshortner_wiki is defined in family config, it'll
+        use that site to create the link instead of the current wiki.
 
-        :param permalink: If true, the link will point to the actual revision
-            of the page.
+        :param permalink: If true, the link will point to the actual
+            revision of the page.
         :param with_protocol: If true, and if it's not already included,
-            the link will have http(s) protocol prepended. On Wikimedia wikis
-            the protocol is already present.
+            the link will have http(s) protocol prepended. On Wikimedia
+            wikis the protocol is already present.
         :return: The reduced link.
+        :raises APIError: urlshortener-ratelimit exceeded
         """
         wiki = self.site
         if self.site.family.shared_urlshortner_wiki:

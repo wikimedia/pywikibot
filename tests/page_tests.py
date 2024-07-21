@@ -17,6 +17,7 @@ import pywikibot
 import pywikibot.page
 from pywikibot import config
 from pywikibot.exceptions import (
+    APIError,
     Error,
     InvalidTitleError,
     IsNotRedirectPageError,
@@ -1267,12 +1268,16 @@ class TestShortLink(TestCase):
 
         site = self.get_site()
         p1 = pywikibot.Page(site, 'User:Framawiki/pwb_tests/shortlink')
-        with self.subTest(parameters='defaulted'):
+
+        with self.subTest(parameters='defaulted'), \
+             skipping(APIError, code='urlshortener-ratelimit'):
             self.assertEqual(p1.create_short_link(), 'https://w.wiki/3Cy')
-        with self.subTest(with_protocol=True):
+        with self.subTest(with_protocol=True), \
+             skipping(APIError, code='urlshortener-ratelimit'):
             self.assertEqual(p1.create_short_link(with_protocol=True),
                              'https://w.wiki/3Cy')
-        with self.subTest(permalink=True):
+        with self.subTest(permalink=True), \
+             skipping(APIError, code='urlshortener-ratelimit'):
             self.assertEqual(p1.create_short_link(permalink=True,
                                                   with_protocol=False),
                              'w.wiki/3Cz')
