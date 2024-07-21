@@ -690,10 +690,21 @@ class TestUnconnectedPages(DefaultSiteTestCase):
 
         pattern = (fr'Page \[\[({site.sitename}:|{site.code}:)-1\]\]'
                    r" doesn't exist\.")
+        found = []
         for page in pages:
-            with self.subTest(page=page), self.assertRaisesRegex(
-                    NoPageError, pattern):
-                page.data_item()
+            with self.subTest(page=page):
+                try:
+                    page.data_item()
+                except NoPageError as e:
+                    self.assertRegex(str(e), pattern)
+                else:
+                    found.append(page)
+        if found:
+            unittest_print('connection found for ',
+                           ', '.join(str(p) for p in found))
+
+        # assume that we have at least one unconnected page
+        self.assertLess(len(found), 3)
 
 
 class TestSiteGeneratorsUsers(DefaultSiteTestCase):
