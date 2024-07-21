@@ -529,7 +529,8 @@ class RedirectRobot(ExistingPageBot):
                         f'{redir_page} has been moved to {movedTarget}')
                     reason = i18n.twtranslate(
                         redir_page.site, 'redirect-fix-broken-moved',
-                        {'to': movedTarget.title(as_link=True,
+                        {'from': targetPage.title(allow_interwiki=False),
+                         'to': movedTarget.title(as_link=True,
                                                  allow_interwiki=False)},
                         bot_prefix=True)
                     content = redir_page.get(get_redirect=True)
@@ -607,6 +608,7 @@ class RedirectRobot(ExistingPageBot):
         """Treat one double redirect."""
         newRedir = redir = self.current_page
         redirList = []  # bookkeeping to detect loops
+        first_target = None
         while True:
             redirList.append(
                 f'{newRedir.site.lang}:{newRedir.title(with_section=False)}')
@@ -619,6 +621,7 @@ class RedirectRobot(ExistingPageBot):
                 if not targetPage:
                     break
 
+                first_target = first_target or targetPage
                 pywikibot.info(f'   Links to: {targetPage}.')
                 mw_msg = None
                 with suppress(KeyError):
@@ -663,7 +666,9 @@ class RedirectRobot(ExistingPageBot):
                                       save=False)
             summary = i18n.twtranslate(
                 redir.site, 'redirect-fix-double',
-                {'to': targetPage.title(as_link=True, allow_interwiki=False)},
+                {'from': first_target.title(as_link=True,
+                                            allow_interwiki=False),
+                 'to': targetPage.title(as_link=True, allow_interwiki=False)},
                 bot_prefix=True)
             self.userPut(redir, oldText, redir.text, summary=summary,
                          ignore_save_related_errors=True,
