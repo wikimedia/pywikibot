@@ -1688,16 +1688,15 @@ class TestUnconnectedPageGenerator(DefaultSiteTestCase):
 
     """Test UnconnectedPageGenerator."""
 
-    cached = True
-
     def test_unconnected_with_repo(self):
         """Test UnconnectedPageGenerator."""
-        if not self.site.data_repository():
+        site = self.site.data_repository()
+        if not site:
             self.skipTest('Site is not using a Wikibase repository')
+
         pages = list(pagegenerators.UnconnectedPageGenerator(self.site, 3))
         self.assertLessEqual(len(pages), 3)
 
-        site = self.site.data_repository()
         pattern = (fr'Page \[\[({site.sitename}:|{site.code}:)-1\]\]'
                    r" doesn't exist\.")
         for page in pages:

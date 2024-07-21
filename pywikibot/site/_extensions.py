@@ -262,6 +262,8 @@ class WikibaseClientMixin:
     def unconnected_pages(self, total=None):
         """Yield Page objects from Special:UnconnectedPages.
 
+        .. warning:: The retrieved pages may be connected in meantime.
+
         :param total: number of pages to return
         """
         return self.querypage('UnconnectedPages', total)

@@ -650,21 +650,6 @@ class TestSiteGenerators(DefaultSiteTestCase):
                     self.fail(
                         f'NotImplementedError not raised for {item}')
 
-    def test_unconnected(self):
-        """Test site.unconnected_pages method."""
-        if not self.site.data_repository():
-            self.skipTest('Site is not using a Wikibase repository')
-        pages = list(self.site.unconnected_pages(total=3))
-        self.assertLessEqual(len(pages), 3)
-
-        site = self.site.data_repository()
-        pattern = (r'Page '
-                   rf'\[\[({site.sitename}:|{site.code}:)-1\]\]'
-                   r" doesn't exist\.")
-        for page in pages:
-            with self.assertRaisesRegex(NoPageError, pattern):
-                page.data_item()
-
     def test_assert_valid_iter_params(self):
         """Test site.assert_valid_iter_params method."""
         func = self.site.assert_valid_iter_params
@@ -688,6 +673,27 @@ class TestSiteGenerators(DefaultSiteTestCase):
         self.assertIsNone(func('m', 1, 2, True, True))
         with self.assertRaises(AssertionError):
             func('m', 2, 1, True, True)
+
+
+class TestUnconnectedPages(DefaultSiteTestCase):
+
+    """Test unconnected_pages method without cache enabled."""
+
+    def test_unconnected(self):
+        """Test site.unconnected_pages method."""
+        site = self.site.data_repository()
+        if not site:
+            self.skipTest('Site is not using a Wikibase repository')
+
+        pages = list(self.site.unconnected_pages(total=3))
+        self.assertLessEqual(len(pages), 3)
+
+        pattern = (fr'Page \[\[({site.sitename}:|{site.code}:)-1\]\]'
+                   r" doesn't exist\.")
+        for page in pages:
+            with self.subTest(page=page), self.assertRaisesRegex(
+                    NoPageError, pattern):
+                page.data_item()
 
 
 class TestSiteGeneratorsUsers(DefaultSiteTestCase):
