@@ -248,12 +248,14 @@ class SandboxBot(Bot, ConfigParserBot):
                     else:
                         translated_msg = i18n.twtranslate(
                             self.site, 'clean_sandbox-cleaned')
+
                     subst = 'subst:' in self.translated_content
                     pos = text.find(self.translated_content.strip())
+                    latest_user = sandbox_page.latest_revision.user
                     if text.strip() == self.translated_content.strip():
                         pywikibot.info(
                             'The sandbox is still clean, no change necessary.')
-                    elif subst and sandbox_page.userName() == self.site.user():
+                    elif subst and latest_user == self.site.user():
                         pywikibot.info(
                             'The sandbox might be clean, no change necessary.')
                     elif pos != 0 and not subst:

@@ -775,7 +775,7 @@ class NoReferencesBot(AutomaticTWSummaryBot, SingleSiteBot, ExistingPageBot):
         if super().skip_page(page):
             return True
 
-        if self.site.sitename == 'wikipedia:en' and page.isIpEdit():
+        if self.site.sitename == 'wikipedia:en' and page.latest_revision.anon:
             pywikibot.warning(
                 f'Page {page} is edited by IP. Possible vandalized')
             return True
