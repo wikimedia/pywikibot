@@ -3,7 +3,7 @@
 
 Usage:
 
-    python pwb.py addwiki [-family:<family>] {<wiki>}
+    python pwb.py addwikis [-family:<family>] {<wiki>}
 
 
 .. versionadded:: 9.2
