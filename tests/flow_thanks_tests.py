@@ -16,6 +16,7 @@ from tests.aspects import TestCase
 NO_THANKABLE_POSTS = 'There is no recent post which can be test thanked.'
 
 
+@unittest.skip('T371112: Structured Discussion was disabled on test-wiki')
 class TestThankFlowPost(TestCase):
 
     """Test thanks for Flow posts."""
