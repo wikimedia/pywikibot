@@ -1,6 +1,14 @@
 Current Release Changes
 =======================
 
+* Only add lang links from API response to a given page if present in family file (:phab:`T371107`)
+* Add support for ``cswikivoyage`` to Pywikibot (:phab:`T370915`)
+* :class:`pywikibot.FilePage` has a parameter *ignore_extension* to ignore file extension check :phab:`T352237`)
+* Provide :attr:`cosmetic_changes.main_sortkey` to localize sort key in
+  :meth:`CosmeticChangesToolkit.standardizePageFooter<cosmetic_changes.CosmeticChangesToolkit.standardizePageFooter>`
+* Add *ignore_section parameter* to :meth:`site.APISite.getredirtarget` and :meth:`page.BasePage.getRedirectTarget` to
+  ignore :exc:`exceptions.SectionError` (:phab:`T370295`)
+* Avoid backslash in repr string of :class:`page.WikibaseEntity`
 * *botflag* parameter of :meth:`page.BasePage.save`, :meth:`page.BasePage.put`, :meth:`page.BasePage.touch`,
   :meth:`pywikibot.Page.set_redirect_target` and :meth:`pywikibot.ItemPage.set_redirect_target` was renamed to *bot* to
   be in sync with :meth:`APISite.editpage<pywikibot.site._apisite.APISite.editpage>` and :api:`edit`.
@@ -14,6 +22,8 @@ Current Release Changes
 Current Deprecations
 ====================
 
+* 9.3.0: :meth:`page.BasePage.userName` and :meth:`page.BasePage.isIpEdit` are deprecated in favour of
+  ``user`` or ``anon`` attributes of :attr:`page.BasePage.latest_revision` property
 * 9.2.0: Imports of :mod:`logging` functions from :mod:`bot` module is deprecated and will be desupported
 * 9.2.0: *total* argument in ``-logevents`` pagegenerators option is deprecated;
   use ``-limit`` instead (:phab:`T128981`)
