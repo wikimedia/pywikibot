@@ -23,7 +23,7 @@ Purge mode:
 &params;
 """
 #
-# (C) Pywikibot team, 2009-2023
+# (C) Pywikibot team, 2009-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -57,7 +57,7 @@ class TouchBot(MultipleSitesBot):
     def treat(self, page) -> None:
         """Touch the given page."""
         try:
-            page.touch(botflag=self.opt.botflag)
+            page.touch(bot=self.opt.botflag)
         except (NoCreateError, NoPageError):
             pywikibot.error(f'Page {page.title(as_link=True)} does not exist.')
         except LockedPageError:
@@ -154,7 +154,7 @@ def main(*args: str) -> None:
 
     bot_class = TouchBot
     for arg in local_args:
-        option, _, value = arg[1:].partition(':')
+        option = arg[1:]
         if arg == '-purge':
             bot_class = PurgeBot
         elif arg.startswith('-'):

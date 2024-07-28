@@ -71,10 +71,9 @@ class Option(ABC):
     @staticmethod
     def formatted(text: str, options: Iterable[Option],
                   default: str | None = None) -> str:
-        """
-        Create a text with the options formatted into it.
+        """Create a text with the options formatted into it.
 
-        This static method is used by :py:meth:`pywikibot.input_choice`.
+        This static method is used by :meth:`pywikibot.input_choice`.
         It calls :py:obj:`format` for all *options* to combine the
         question for :py:meth:`pywikibot.input`.
 
@@ -84,9 +83,8 @@ class Option(ABC):
 
         :return: Text with the options formatted into it
         """
-        formatted_options = []
-        for option in options:
-            formatted_options.append(option.format(default=default))
+        formatted_options = [option.format(default=default)
+                             for option in options]
         # remove color highlights before fill function
         text = f"{text} ({', '.join(formatted_options)})"
         pattern = '<<[a-z]+>>'

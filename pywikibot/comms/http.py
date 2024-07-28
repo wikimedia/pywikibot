@@ -436,8 +436,8 @@ def fetch(uri: str, method: str = 'GET', headers: dict | None = None,
 
     pip install requests_oauthlib
 """)
-        else:
-            auth = requests_oauthlib.OAuth1(*auth)
+
+        auth = requests_oauthlib.OAuth1(*auth)
 
     timeout = config.socket_timeout
 

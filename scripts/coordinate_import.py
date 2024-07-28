@@ -100,15 +100,14 @@ class CoordImportRobot(ConfigParserBot, WikidataBot):
         """
         claims = item.get().get('claims')
         if self.prop in claims:
-            pywikibot.info('Item {} already contains coordinates ({})'
-                           .format(item.title(), self.prop))
+            pywikibot.info(f'Item {item.title()} already contains coordinates '
+                           f'({self.prop})')
             return True
 
         prop = self.has_coord_qualifier(claims)
         if prop:
-            pywikibot.info(
-                'Item {} already contains coordinates ({}) as qualifier for {}'
-                .format(item.title(), self.prop, prop))
+            pywikibot.info(f'Item {item.title()} already contains coordinates '
+                           f'({self.prop}) as qualifier for {prop}')
             return True
         return False
 

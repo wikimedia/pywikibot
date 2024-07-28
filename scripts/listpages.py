@@ -240,8 +240,8 @@ class ListPagesBot(AutomaticTWSummaryBot, SingleSiteBot):
                     base_dir = None
             elif not os.path.isdir(base_dir):
                 # base_dir is a file.
-                pywikibot.warning('Not a directory: "{}"\nSkipping saving ...'
-                                  .format(base_dir))
+                pywikibot.warning(
+                    f'Not a directory: "{base_dir}"\nSkipping saving ...')
                 base_dir = None
             self.opt.save = base_dir
 
@@ -309,10 +309,10 @@ def main(*args: str) -> None:
     if page_target:
         page_target = pywikibot.Page(site, page_target)
         if not options.get('overwrite') and page_target.exists():
-            additional_text = ('Page {} already exists.\n'
+            additional_text = (f'Page {page_target} already exists.\n'
                                'You can use the -overwrite argument to '
                                'replace the content of this page.'
-                               .format(page_target))
+                               )
 
     gen = gen_factory.getCombinedGenerator()
     options['preloading'] = gen_factory.is_preloading

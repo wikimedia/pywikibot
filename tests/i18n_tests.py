@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test i18n module."""
 #
-# (C) Pywikibot team, 2007-2023
+# (C) Pywikibot team, 2007-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -236,8 +236,8 @@ class TWNTestCaseBase(TWNSetMessagePackageBase):
     def setUpClass(cls):
         """Verify that the test translations are not empty."""
         if not isinstance(cls.message_package, str):
-            raise TypeError('{}.message_package must be a package name'
-                            .format(cls.__name__))  # pragma: no cover
+            raise TypeError(  # pragma: no cover
+                f'{cls.__name__}.message_package must be a package name')
         # The call to set_messages_package below exists only to confirm
         # that the package exists and messages are available, so
         # that tests can be skipped if the i18n data doesn't exist.
@@ -246,8 +246,8 @@ class TWNTestCaseBase(TWNSetMessagePackageBase):
         has_messages = i18n.messages_available()
         i18n._messages_package_name = cls.orig_messages_package_name
         if not has_messages:
-            raise unittest.SkipTest("i18n messages package '{}' not available."
-                                    .format(cls.message_package))
+            raise unittest.SkipTest('i18n messages package '
+                                    f"'{cls.message_package}' not available.")
         super().setUpClass()
 
 
@@ -380,8 +380,8 @@ class PywikibotPackageTestCase(TestCase):
         self.assertFalse(config.cosmetic_changes_mylang_only)
 
         if page.content_model != 'wikitext':
-            self.skipTest('Wrong content model {!r} for cosmetic_changes'
-                          .format(page.content_model))
+            self.skipTest(f'Wrong content model {page.content_model!r}'
+                          ' for cosmetic_changes')
 
         summary = f'Working on Test page at site {self.site}'
         msg = page._cosmetic_changes_hook(summary)

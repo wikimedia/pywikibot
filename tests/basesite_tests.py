@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the site module."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -12,7 +12,6 @@ from contextlib import suppress
 import pywikibot
 from pywikibot.exceptions import Error
 from tests.aspects import DefaultSiteTestCase, TestCase, unittest
-
 
 WARN_SELF_CALL = (r'Referencing this attribute like a function '
                   r'is deprecated .+; use it directly instead')
@@ -99,11 +98,11 @@ class TestSiteObject(DefaultSiteTestCase):
                 self.assertIn('No disambiguation category name found', str(e))
             except AssertionError:
                 self.assertIn(
-                    'No {repo} qualifier found for disambiguation category '
-                    'name in {fam}_family file'.format(
-                        repo=mysite.data_repository().family.name,
-                        fam=mysite.family.name),
-                    str(e))
+                    f'No {mysite.data_repository().family.name} qualifier'
+                    ' found for disambiguation category name in '
+                    f'{mysite.family.name}_family file',
+                    str(e)
+                )
         else:
             self.assertIsInstance(dabcat, pywikibot.Category)
 

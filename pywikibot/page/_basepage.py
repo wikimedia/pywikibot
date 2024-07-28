@@ -39,6 +39,7 @@ from pywikibot.tools import (
     ComparableMixin,
     cached,
     deprecated,
+    deprecated_args,
     deprecate_positionals,
     first_upper,
     issue_deprecation_warning,
@@ -742,12 +743,24 @@ class BasePage(ComparableMixin):
                 includecomments=includecomments)
         return self._expanded_text
 
+    @deprecated('latest_revision.user', since='9.3.0')
     def userName(self) -> str:
-        """Return name or IP address of last user to edit page."""
+        """Return name or IP address of last user to edit page.
+
+        .. deprecated:: 9.3
+           Use :attr:`latest_revision.user<latest_revision>`
+           instead.
+        """
         return self.latest_revision.user  # type: ignore[attr-defined]
 
+    @deprecated('latest_revision.anon', since='9.3.0')
     def isIpEdit(self) -> bool:
-        """Return True if last editor was unregistered."""
+        """Return True if last editor was unregistered.
+
+        .. deprecated:: 9.3
+           Use :attr:`latest_revision.anon<latest_revision>`
+           instead.
+        """
         return self.latest_revision.anon  # type: ignore[attr-defined]
 
     @cached
@@ -1267,11 +1280,12 @@ class BasePage(ComparableMixin):
         # no restricting template found
         return True
 
+    @deprecated_args(botflag='bot')  # since 9.3.0
     def save(self,
              summary: str | None = None,
              watch: str | None = None,
              minor: bool = True,
-             botflag: bool | None = None,
+             bot: bool | None = None,
              force: bool = False,
              asynchronous: bool = False,
              callback=None,
@@ -1282,35 +1296,41 @@ class BasePage(ComparableMixin):
         Save the current contents of page's text to the wiki.
 
         .. versionchanged:: 7.0
-           boolean watch parameter is deprecated
+           boolean *watch* parameter is deprecated
+        .. versionchanged:: 9.3
+           *botflag* parameter was renamed to *bot*.
 
-        :param summary: The edit summary for the modification (optional, but
-            most wikis strongly encourage its use)
-        :param watch: Specify how the watchlist is affected by this edit, set
-            to one of "watch", "unwatch", "preferences", "nochange":
-            * watch: add the page to the watchlist
-            * unwatch: remove the page from the watchlist
-            * preferences: use the preference settings (Default)
-            * nochange: don't change the watchlist
+        .. seealso:: :meth:`APISite.editpage
+           <pywikibot.site._apisite.APISite.editpage>`
+
+        :param summary: The edit summary for the modification (optional,
+            but most wikis strongly encourage its use)
+        :param watch: Specify how the watchlist is affected by this edit,
+            set to one of ``watch``, ``unwatch``, ``preferences``,
+            ``nochange``:
+
+            * watch --- add the page to the watchlist
+            * unwatch --- remove the page from the watchlist
+            * preferences --- use the preference settings (Default)
+            * nochange --- don't change the watchlist
             If None (default), follow bot account's default settings
         :param minor: if True, mark this edit as minor
-        :param botflag: if True, mark this edit as made by a bot (default:
+        :param bot: if True, mark this edit as made by a bot (default:
             True if user has bot status, False if not)
         :param force: if True, ignore botMayEdit() setting
         :param asynchronous: if True, launch a separate thread to save
             asynchronously
         :param callback: a callable object that will be called after the
-            page put operation. This object must take two arguments: (1) a
-            Page object, and (2) an exception instance, which will be None
-            if the page was saved successfully. The callback is intended for
-            use by bots that need to keep track of which saves were
-            successful.
+            page put operation. This object must take two arguments: (1)
+            a Page object, and (2) an exception instance, which will be
+            None if the page was saved successfully. The callback is
+            intended for use by bots that need to keep track of which
+            saves were successful.
         :param apply_cosmetic_changes: Overwrites the cosmetic_changes
             configuration value to this value unless it's None.
         :param quiet: enable/disable successful save operation message;
-            defaults to False.
-            In asynchronous mode, if True, it is up to the calling bot to
-            manage the output e.g. via callback.
+            defaults to False. In asynchronous mode, if True, it is up
+            to the calling bot to manage the output e.g. via callback.
         """
         if not summary:
             summary = config.default_edit_summary
@@ -1326,12 +1346,12 @@ class BasePage(ComparableMixin):
             raise OtherPageSaveError(
                 self, 'Editing restricted by {{bots}}, {{nobots}} '
                 "or site's equivalent of {{in use}} template")
-        self._save(summary=summary, watch=watch, minor=minor, botflag=botflag,
+        self._save(summary=summary, watch=watch, minor=minor, bot=bot,
                    asynchronous=asynchronous, callback=callback,
                    cc=apply_cosmetic_changes, quiet=quiet, **kwargs)
 
     @allow_asynchronous
-    def _save(self, summary=None, watch=None, minor: bool = True, botflag=None,
+    def _save(self, summary=None, watch=None, minor: bool = True, bot=None,
               cc=None, quiet: bool = False, **kwargs):
         """Helper function for save()."""
         link = self.title(as_link=True)
@@ -1339,7 +1359,7 @@ class BasePage(ComparableMixin):
             summary = self._cosmetic_changes_hook(summary)
 
         done = self.site.editpage(self, summary=summary, minor=minor,
-                                  watch=watch, bot=botflag, **kwargs)
+                                  watch=watch, bot=bot, **kwargs)
         if not done:
             if not quiet:
                 pywikibot.warning(f'Page {link} not saved')
@@ -1389,11 +1409,12 @@ class BasePage(ComparableMixin):
                                         'pywikibot-cosmetic-changes')
         return summary
 
+    @deprecated_args(botflag='bot')  # since 9.3.0
     def put(self, newtext: str,
             summary: str | None = None,
             watch: str | None = None,
             minor: bool = True,
-            botflag: bool | None = None,
+            bot: bool | None = None,
             force: bool = False,
             asynchronous: bool = False,
             callback=None,
@@ -1403,11 +1424,15 @@ class BasePage(ComparableMixin):
         Save the page with the contents of the first argument as the text.
 
         This method is maintained primarily for backwards-compatibility.
-        For new code, using Page.save() is preferred. See save() method
-        docs for all parameters not listed here.
+        For new code, using :meth:`save` is preferred; also ee that
+        method docs for all parameters not listed here.
 
         .. versionadded:: 7.0
            The `show_diff` parameter
+        .. versionchanged:: 9.3
+           *botflag* parameter was renamed to *bot*.
+
+        .. seealso:: :meth:`save`
 
         :param newtext: The complete text of the revised page.
         :param show_diff: show changes between oldtext and newtext
@@ -1416,7 +1441,7 @@ class BasePage(ComparableMixin):
         if show_diff:
             pywikibot.showDiff(self.text, newtext)
         self.text = newtext
-        self.save(summary=summary, watch=watch, minor=minor, botflag=botflag,
+        self.save(summary=summary, watch=watch, minor=minor, bot=bot,
                   force=force, asynchronous=asynchronous, callback=callback,
                   **kwargs)
 
@@ -1455,31 +1480,33 @@ class BasePage(ComparableMixin):
         self.clear_cache()
         return self.site.purgepages([self], **kwargs)
 
-    def touch(self, callback=None, botflag: bool = False, **kwargs):
-        """
-        Make a touch edit for this page.
+    @deprecated_args(botflag='bot')  # since 9.3.0
+    def touch(self, callback=None, bot: bool = False, **kwargs):
+        """Make a touch edit for this page.
 
-        See save() method docs for all parameters.
-        The following parameters will be overridden by this method:
-        - summary, watch, minor, force, asynchronous
+        See Meth:`save` method docs for all parameters. The following
+        parameters will be overridden by this method: *summary*, *watch*,
+        *minor*, *force*, *asynchronous*
 
-        Parameter botflag is False by default.
+        Parameter *bot* is False by default.
 
-        minor and botflag parameters are set to False which prevents hiding
-        the edit when it becomes a real edit due to a bug.
+        *minor* and *bot* parameters are set to ``False`` which prevents
+        hiding the edit when it becomes a real edit due to a bug.
 
         .. note:: This discards content saved to self.text.
+
+        .. versionchanged:: 9.2
+           *botflag* parameter was renamed to *bot*.
         """
-        if self.exists():
-            # ensure always get the page text and not to change it.
-            del self.text
-            summary = i18n.twtranslate(self.site, 'pywikibot-touch')
-            self.save(summary=summary, watch='nochange',
-                      minor=False, botflag=botflag, force=True,
-                      asynchronous=False, callback=callback,
-                      apply_cosmetic_changes=False, nocreate=True, **kwargs)
-        else:
+        if not self.exists():
             raise NoPageError(self)
+
+        # ensure always get the page text and not to change it.
+        del self.text
+        summary = i18n.twtranslate(self.site, 'pywikibot-touch')
+        self.save(summary=summary, watch='nochange', minor=False, bot=bot,
+                  force=True, asynchronous=False, callback=callback,
+                  apply_cosmetic_changes=False, nocreate=True, **kwargs)
 
     def linkedPages(
         self, *args, **kwargs
@@ -1783,16 +1810,28 @@ class BasePage(ComparableMixin):
 
         return self._pageimage
 
-    def getRedirectTarget(self):
-        """
-        Return a Page object for the target this Page redirects to.
+    def getRedirectTarget(self, *,
+                          ignore_section: bool = True) -> pywikibot.Page:
+        """Return a Page object for the target this Page redirects to.
 
-        If this page is not a redirect page, will raise an
-        IsNotRedirectPageError. This method also can raise a NoPageError.
+        .. versionadded:: 9.3
+           *ignore_section* parameter
 
-        :rtype: pywikibot.Page
+        .. seealso:: :meth:`Site.getredirtarget()
+           <pywikibot.site._apisite.APISite.getredirtarget>`
+
+        :param ignore_section: do not include section to the target even
+            the link has one
+
+        :raises CircularRedirectError: page is a circular redirect
+        :raises InterwikiRedirectPageError: the redirect target is on
+            another site
+        :raises IsNotRedirectPageError: page is not a redirect
+        :raises RuntimeError: no redirects found
+        :raises SectionError: the section is not found on target page
+            and *ignore_section* is not set
         """
-        return self.site.getredirtarget(self)
+        return self.site.getredirtarget(self, ignore_section=ignore_section)
 
     def moved_target(self):
         """
@@ -2276,18 +2315,18 @@ class BasePage(ComparableMixin):
     def create_short_link(self,
                           permalink: bool = False,
                           with_protocol: bool = True) -> str:
-        """
-        Return a shortened link that points to that page.
+        """Return a shortened link that points to that page.
 
-        If shared_urlshortner_wiki is defined in family config, it'll use
-        that site to create the link instead of the current wiki.
+        If shared_urlshortner_wiki is defined in family config, it'll
+        use that site to create the link instead of the current wiki.
 
-        :param permalink: If true, the link will point to the actual revision
-            of the page.
+        :param permalink: If true, the link will point to the actual
+            revision of the page.
         :param with_protocol: If true, and if it's not already included,
-            the link will have http(s) protocol prepended. On Wikimedia wikis
-            the protocol is already present.
+            the link will have http(s) protocol prepended. On Wikimedia
+            wikis the protocol is already present.
         :return: The reduced link.
+        :raises APIError: urlshortener-ratelimit exceeded
         """
         wiki = self.site
         if self.site.family.shared_urlshortner_wiki:

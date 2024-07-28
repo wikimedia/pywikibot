@@ -1,12 +1,29 @@
 Current Release Changes
 =======================
 
-* Add support for ``aewikimedia`` to Pywikibot (:phab:`T362529`)
-* i18n updates
+* Only add lang links from API response to a given page if present in family file (:phab:`T371107`)
+* Add support for ``cswikivoyage`` to Pywikibot (:phab:`T370915`)
+* :class:`pywikibot.FilePage` has a parameter *ignore_extension* to ignore file extension check :phab:`T352237`)
+* Provide :attr:`cosmetic_changes.main_sortkey` to localize sort key in
+  :meth:`CosmeticChangesToolkit.standardizePageFooter<cosmetic_changes.CosmeticChangesToolkit.standardizePageFooter>`
+* Add *ignore_section parameter* to :meth:`site.APISite.getredirtarget` and :meth:`page.BasePage.getRedirectTarget` to
+  ignore :exc:`exceptions.SectionError` (:phab:`T370295`)
+* Avoid backslash in repr string of :class:`page.WikibaseEntity`
+* *botflag* parameter of :meth:`page.BasePage.save`, :meth:`page.BasePage.put`, :meth:`page.BasePage.touch`,
+  :meth:`pywikibot.Page.set_redirect_target` and :meth:`pywikibot.ItemPage.set_redirect_target` was renamed to *bot* to
+  be in sync with :meth:`APISite.editpage<pywikibot.site._apisite.APISite.editpage>` and :api:`edit`.
+* use :meth:`page.BasePage.templates` in :meth:`Page.templatesWithParams<page.Page.templatesWithParams>` to cache
+  templates
+* Re-implement :meth:`Page.main_authors()<page._toolforge.WikiBlameMixin.main_authors>` as
+  :meth:`Page.authorship()<page._toolforge.WikiBlameMixin.authorship>` using ``xtools`` (:phab:`T366100`);
+  ``wikitextparser`` packages is required for it.
+
 
 Current Deprecations
 ====================
 
+* 9.3.0: :meth:`page.BasePage.userName` and :meth:`page.BasePage.isIpEdit` are deprecated in favour of
+  ``user`` or ``anon`` attributes of :attr:`page.BasePage.latest_revision` property
 * 9.2.0: Imports of :mod:`logging` functions from :mod:`bot` module is deprecated and will be desupported
 * 9.2.0: *total* argument in ``-logevents`` pagegenerators option is deprecated;
   use ``-limit`` instead (:phab:`T128981`)
@@ -69,7 +86,7 @@ Pending removal in Pywikibot 10
 * 7.3.0: Old color escape sequences like ``\03{color}`` is deprecated in favour of new color format like <<color>>
 * 7.3.0: ``linktrail`` method of :class:`family.Family` is deprecated; use :meth:`APISite.linktrail()
   <pywikibot.site._apisite.APISite.linktrail>` instead
-* 7.2.0: Positional arguments *decoder*, *layer* and *newline* for :mod:`logging` functions where dropped; keyword 
+* 7.2.0: Positional arguments *decoder*, *layer* and *newline* for :mod:`logging` functions where dropped; keyword
   arguments must be used instead.
 * 7.2.0: ``tb`` parameter of :func:`exception()<pywikibot.logging.exception>` function was renamed to ``exc_info``
 * 7.2.0: XMLDumpOldPageGenerator is deprecated in favour of a ``content`` parameter of

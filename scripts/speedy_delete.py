@@ -479,8 +479,8 @@ def main(*args: str) -> None:
         bot = SpeedyBot(site=site)
         bot.run()
     elif site.logged_in():
-        pywikibot.info("{} does not have 'delete' right for site {}"
-                       .format(site.username(), site))
+        pywikibot.info(
+            f"{site.username()} does not have 'delete' right for site {site}")
     else:
         pywikibot.info('Login first.')
 

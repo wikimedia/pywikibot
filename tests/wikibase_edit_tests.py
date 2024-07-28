@@ -91,9 +91,8 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         item = pywikibot.PropertyPage(testsite, 'P115')
         item.get()
         if 'P115' in item.claims:
-            to_remove = []
-            for claim in item.claims['P115']:
-                to_remove.append({'id': claim.toJSON()['id'], 'remove': ''})
+            to_remove = [{'id': claim.toJSON()['id'], 'remove': ''}
+                         for claim in item.claims['P115']]
             item.editEntity({'claims': to_remove})
 
         claim = pywikibot.page.Claim(

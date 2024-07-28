@@ -123,33 +123,29 @@ class TestLink(DefaultDrySiteTestCase):
         """Test that invalid titles raise InvalidTitleError."""
         # Bad characters forbidden regardless of wgLegalTitleChars
         def generate_contains_illegal_chars_exc_regex(text):
-            exc_regex = (
-                r'^(u|)\'{}\' contains illegal char\(s\) (u|)\'{}\'$'
-                .format(re.escape(text), re.escape(text[2])))
+            exc_regex = (rf'^(u|)\'{re.escape(text)}\' contains illegal char'
+                         rf'\(s\) (u|)\'{re.escape(text[2])}\'$')
             return exc_regex
 
         # Directory navigation
         def generate_contains_dot_combinations_exc_regex(text):
-            exc_regex = (r'^\(contains \. / combinations\): (u|)\'{}\'$'
-                         .format(re.escape(text)))
+            exc_regex = (rf'^\(contains \. / combinations\): (u|)'
+                         rf'\'{re.escape(text)}\'$')
             return exc_regex
 
         # Tilde
         def generate_contains_tilde_exc_regex(text):
-            exc_regex = r'^\(contains ~~~\): (u|)\'{}\'$' \
-                        .format(re.escape(text))
+            exc_regex = rf'^\(contains ~~~\): (u|)\'{re.escape(text)}\'$'
             return exc_regex
 
         # Overlength
         def generate_overlength_exc_regex(text):
-            exc_regex = r'^\(over 255 bytes\): (u|)\'{}\'$' \
-                        .format(re.escape(text))
+            exc_regex = rf'^\(over 255 bytes\): (u|)\'{re.escape(text)}\'$'
             return exc_regex
 
         # Namespace prefix without actual title
         def generate_has_no_title_exc_regex(text):
-            exc_regex = r'^(u|)\'{}\' has no title\.$'.format(
-                re.escape(text.strip()))
+            exc_regex = rf'^(u|)\'{re.escape(text.strip())}\' has no title\.$'
             return exc_regex
 
         title_tests = [

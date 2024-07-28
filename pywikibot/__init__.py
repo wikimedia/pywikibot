@@ -160,7 +160,7 @@ def Site(code: str | None = None,  # noqa: N802
     >>> site_1 is site_2
     True
     >>> site_1
-    APISite("fr", "wikisource")
+    APISite('fr', 'wikisource')
 
     :class:`APISite<pywikibot.site._apisite.APISite>` is the default
     interface. Refer :py:obj:`pywikibot.site` for other interface types.
@@ -269,7 +269,7 @@ from pywikibot.page import (  # noqa: E402
 )
 
 
-def showDiff(oldtext: str,  # noqa: 134
+def showDiff(oldtext: str,  # noqa: N802
              newtext: str,
              context: int = 0) -> None:
     """

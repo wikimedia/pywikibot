@@ -50,10 +50,9 @@ class SupersetQuery(WaitingMixin):
             raise TypeError(msg)
 
         # Validate database_id
-        if database_id:
-            if not isinstance(database_id, int):
-                msg = f'database_id should be integer, but got "{database_id}"'
-                raise TypeError(msg)
+        if database_id and not isinstance(database_id, int):
+            msg = f'database_id should be integer, but got "{database_id}"'
+            raise TypeError(msg)
 
         self.site = site
         self.schema_name = schema_name
@@ -126,9 +125,9 @@ class SupersetQuery(WaitingMixin):
 
         if self.last_response.status_code == 200:
             return self.last_response.json()['result']
-        else:
-            status_code = self.last_response.status_code
-            raise ServerError(f'CSRF token error:  {status_code}')
+
+        status_code = self.last_response.status_code
+        raise ServerError(f'CSRF token error:  {status_code}')
 
     def get_database_id_by_schema_name(self, schema_name: str) -> int:
         """Get superset database_id using superset schema name.

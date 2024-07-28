@@ -51,7 +51,7 @@ Delete everything in the category "To delete" without prompting:
     python pwb.py delete -cat:"To delete" -always
 """
 #
-# (C) Pywikibot team, 2013-2023
+# (C) Pywikibot team, 2013-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -159,8 +159,8 @@ class DeletionRobot(CurrentPageBot):
 
         total = sum(len(v) for v in refs.values())
         if total > 1:
-            pywikibot.warning('There are {} pages that link to {}.'
-                              .format(total, self.current_page))
+            pywikibot.warning(
+                f'There are {total} pages that link to {self.current_page}.')
         else:
             pywikibot.warning(
                 f'There is a page that links to {self.current_page}.')
@@ -206,9 +206,8 @@ class DeletionRobot(CurrentPageBot):
                 ns_with_ref = sorted(ns_with_ref)
                 if ns_with_ref:
                     ns_names = ', '.join(str(ns.id) for ns in ns_with_ref)
-                    pywikibot.info(
-                        'Skipping: {} is not orphan in ns: {}.'.format(
-                            self.current_page, ns_names))
+                    pywikibot.info(f'Skipping: {self.current_page} is not '
+                                   f'orphan in ns: {ns_names}.')
                     return  # Not an orphan, do not delete.
 
             if self.current_page.site.user() is None:

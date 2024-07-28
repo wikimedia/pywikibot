@@ -1,5 +1,5 @@
-name: Sysop write test CI
-# Run Pywikibot write tests on test wiki using sysop rights
+name: Windows Tests
+# Successor for Appveyor Tests
 
 on:
   push:
@@ -15,18 +15,17 @@ env:
 
 jobs:
   build:
-    runs-on: "ubuntu-latest"
+    runs-on: "windows-latest"
     continue-on-error: ${{ matrix.experimental || false }}
     timeout-minutes: 100
 
     strategy:
       fail-fast: false
-      max-parallel: 2
 
       matrix:
-        python-version: [ "3.7" ]
-        site: [ "wikipedia:test" ]
-        attr: [ "write and not rights", "write and rights", "rights and not write" ]
+        python-version: [ "3.7.1", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13.0-alpha - 3.13.0" ]
+        python-arch: [ x64, x86 ]
+        site: [ "wikipedia:en" ]
 
     steps:
     - name: Checkout Repository
@@ -38,35 +37,54 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+        architecture: ${{ matrix.python-arch }}
 
     - name: Install dependencies
+      shell: powershell
       run: |
+        git submodule update --init
+        python --version
+        python -c "import struct; print('PYTHON_ARCH:', struct.calcsize('P') << 3)"
         python -m pip install --upgrade pip
         pip --version
-        if [ -f dev-requirements.txt ]; then pip install -r dev-requirements.txt; fi
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        if ('${{ matrix.python-version }}' -eq '3.7.1') {
+          pip install -U setuptools;
+          pip install "urllib3<2.0";
+        }
+        if ('${{ matrix.python-version }}' -ge '3.12') {
+          pip install -U setuptools;
+        }
+        pip install -r dev-requirements.txt
+        pip install -r requirements.txt
+        pip install wikitextparser
 
     - name: Generate user files
       run: |
         python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
+        echo "usernames['wikisource']['zh'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
         echo "usernames['wikipedia']['test'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
         echo "usernames['wikidata']['test'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
+        echo "usernames['commons']['commons'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
+        echo "usernames['meta']['meta'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
         echo "noisysleep = float('inf')" >> user-config.py
         echo "maximum_GET_length = 5000" >> user-config.py
+        echo "transliteration_target = None"  >> user-config.py
         echo "console_encoding = 'utf8'" >> user-config.py
         echo "import os" >> user-config.py
         echo "password_file = os.path.expanduser('passwordfile')" >> user-config.py
         echo "('${{ env.PYWIKIBOT_USERNAME }}', '${{ secrets.PYWIKIBOT_USERPWD }}')" > passwordfile
 
-    - name: Sysop and write tests with pytest
+    - name: Test with unittest
       id: ci_test
       continue-on-error: true
       timeout-minutes: 90
-      env:
-        PYWIKIBOT_TEST_WRITE: ${{ matrix.site == 'wikipedia:test' && 1 || 0 }}
       run: |
         python pwb.py version
-        pytest -s -r A -a "${{ matrix.attr }}" --cov=.;
+        coverage run -m unittest discover -vv -p \"*_tests.py\";
+
+    - name: Show coverage statistics
+      run: |
+        coverage report
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4

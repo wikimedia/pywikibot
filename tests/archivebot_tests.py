@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for archivebot scripts."""
 #
-# (C) Pywikibot team, 2014-2023
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -17,18 +17,17 @@ from pywikibot.textlib import TimeStripper
 from scripts import archivebot
 from tests.aspects import TestCase
 
-
 THREADS = {
     'als': 4, 'ar': 1, 'bar': 0, 'bg': 0, 'bjn': 1, 'bs': 0, 'ca': 5, 'ckb': 2,
     'cs': 0, 'de': 1, 'en': 25, 'eo': 2, 'es': 13, 'fa': 2, 'fr': 25, 'frr': 2,
     'hi': 0, 'hr': 2, 'hu': 5, 'id': 3, 'it': 25, 'ja': 4, 'la': 0, 'lt': 1,
     'nl': 9, 'nn': 0, 'no': 0, 'pdc': 25, 'pfl': 3, 'pl': 8, 'pt': 0, 'ro': 1,
     'ru': 20, 'scn': 2, 'simple': 1, 'sr': 0, 'sv': 5, 'th': 1, 'tr': 7,
-    'ug': 0, 'uk': 1, 'uz': 1, 'vi': 1, 'zh': 4, 'zh-yue': 2,
+    'ug': 0, 'uk': 1, 'vi': 1, 'zh': 4, 'zh-yue': 2,
 }
 
 THREADS_WITH_UPDATED_FORMAT = {
-    'eo': 1, 'pdc': 1,
+    'eo': 1, 'pdc': 1, 'uz': 0,
 }
 
 
@@ -130,8 +129,9 @@ class TestArchiveBot(TestCase):
         self.assertIsInstance(talk.threads, list)
         self.assertGreaterEqual(
             len(talk.threads), THREADS[code],
-            '{} Threads found on {},\n{} or more expected'
-            .format(len(talk.threads), talk, THREADS[code]))
+            f'{len(talk.threads)} Threads found on {talk},\n{THREADS[code]} or'
+            ' more expected'
+        )
 
         for thread in talk.threads:
             with self.subTest(thread=thread.title,
@@ -157,6 +157,7 @@ class TestArchiveBot(TestCase):
     #   <message name="feb" xml:space="preserve">Han.</message>.
     #   for new entries it should work
     # 'th': year is 2552 while regex assumes 19..|20.., might be fixed
+    # 'uz': changed month name for October (T370501)
 
 
 class TestArchiveBotAfterDateUpdate(TestCase):
@@ -188,9 +189,9 @@ class TestArchiveBotAfterDateUpdate(TestCase):
         self.assertIsInstance(talk.threads, list)
         self.assertGreaterEqual(
             len(talk.threads), THREADS_WITH_UPDATED_FORMAT[code],
-            '{} Threads found on {},\n{} or more expected'
-            .format(len(talk.threads), talk,
-                    THREADS_WITH_UPDATED_FORMAT[code]))
+            f'{len(talk.threads)} Threads found on {talk},\n'
+            f'{THREADS_WITH_UPDATED_FORMAT[code]} or more expected'
+        )
 
         for thread in talk.threads:
             with self.subTest(thread=thread.title,

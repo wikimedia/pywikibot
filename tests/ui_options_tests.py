@@ -14,7 +14,6 @@ from pywikibot import bot, bot_choice
 from pywikibot.bot_choice import ChoiceException, QuitKeyboardInterrupt
 from tests.aspects import TestCase
 
-
 message = bot.Option.formatted
 
 

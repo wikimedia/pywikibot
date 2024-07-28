@@ -13,7 +13,6 @@ from contextlib import suppress
 from pywikibot.page import Page, User
 from tests.aspects import TestCase
 
-
 NO_THANKABLE_REVS = 'There is no recent change which can be test thanked.'
 
 

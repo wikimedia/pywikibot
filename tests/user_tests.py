@@ -181,8 +181,8 @@ class TestUserMethods(DefaultSiteTestCase):
         user = User(mysite, mysite.user())
         uc = list(user.contributions(total=total))
         if not uc:
-            self.skipTest('User {} has no contributions on site {}.'
-                          .format(mysite.user(), mysite))
+            self.skipTest(
+                f'User {mysite.user()} has no contributions on site {mysite}.')
         self.assertLessEqual(len(uc), total)
         self.assertEqual(uc[0], user.last_edit)
         first_edit = uc[-1] if len(uc) < total else list(

@@ -18,7 +18,6 @@ from tests import join_root_path, unittest_print
 from tests.aspects import DefaultSiteTestCase, MetaTestCaseClass, PwbTestCase
 from tests.utils import execute_pwb
 
-
 ci_test_run = os.environ.get('PYWIKIBOT_TEST_RUNNING', '0') == '1'
 scripts_path = join_root_path('scripts')
 
@@ -147,8 +146,8 @@ def collector(loader=unittest.loader.defaultTestLoader):
        to fallback to its own discover() ordering of unit tests.
     """
     if unrunnable_script_set:  # pragma: no cover
-        unittest_print('Skipping execution of unrunnable scripts:\n  {!r}'
-                       .format(unrunnable_script_set))
+        unittest_print('Skipping execution of unrunnable scripts:\n'
+                       f'{unrunnable_script_set!r}')
 
     test_pattern = 'tests.script_tests.TestScript{}.test_{}'
 
@@ -258,14 +257,14 @@ class ScriptTestMeta(MetaTestCaseClass):
                     exit_codes = [0, 1, -9]
                     if not out_result and not err_result:
                         unittest_print(' auto-run script unresponsive after '
-                                       '{} seconds'.format(timeout), end=' ')
+                                       f'{timeout} seconds', end=' ')
                     elif 'SIMULATION: edit action blocked' in err_result:
                         unittest_print(' auto-run script simulated edit '
                                        'blocked', end=' ')
                     else:
-                        unittest_print(
-                            ' auto-run script stderr within {} seconds: {!r}'
-                            .format(timeout, err_result), end='  ')
+                        unittest_print(' auto-run script stderr within '
+                                       f'{timeout} seconds: {err_result!r}',
+                                       end='  ')
                     unittest_print(f" exit code: {result['exit_code']}",
                                    end=' ')
 
@@ -411,13 +410,11 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
         'create_isbn_edition',
         'dataextend',
         'data_ingestion',
-        'delete',
         'delinker',
         'djvutext',
         'download_dump',
         'harvest_template',
         'image',  # Foobar has no valid extension
-        'imagetransfer',
         'interwiki',
         'listpages',
         'login',
@@ -447,6 +444,8 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
 
     _allowed_failures = {
         'basic',
+        'delete',  # T368859
+        'imagetransfer',  # T368859
         'newitem',
         'nowcommons',
     }

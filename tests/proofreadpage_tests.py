@@ -249,7 +249,7 @@ class TestProofreadPageValidSite(TestCase):
         'footer': '\n{{smallrefs}}',
         'url_image': ('https://upload.wikimedia.org/wikipedia/commons/'
                       'thumb/a/ac/Popular_Science_Monthly_Volume_1.djvu/'
-                      'page12-2267px-Popular_Science_Monthly_Volume_1.djvu'
+                      'page12-2012px-Popular_Science_Monthly_Volume_1.djvu'
                       '.jpg'),
     }
 

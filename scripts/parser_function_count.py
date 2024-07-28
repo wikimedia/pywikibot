@@ -156,8 +156,8 @@ class ParserFunctionCountBot(SingleSiteBot, ExistingPageBot):
     def teardown(self) -> None:
         """Final processing."""
         resultlist = '\n'.join(
-            '# [[{result[0]}]] ({result[1]})'
-            .format(result=result)
+            f'# [[{result[0]}]] ({result[1]})'
+
             for result in self.results.most_common(self.opt.first))
         pywikibot.info(resultlist)
         pywikibot.info(f'{len(self.results)} templates were found.')

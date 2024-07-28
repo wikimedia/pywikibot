@@ -26,7 +26,8 @@ requests>=2.21.0
 # MediaWiki markup parser
 # mwparserfromhell is mandatory but wikitextparser can be used instead
 # mwparserfromhell is still required for commons_information.py and patrol.py
-# wikitextparser>=0.47.5
+# wikitextparser is required for Page.authorship()
+wikitextparser>=0.47.5
 
 # OAuth support
 # mwoauth 0.2.4 is needed because it supports getting identity information
@@ -41,6 +42,7 @@ python-stdnum >= 1.19
 
 # GUI
 Pillow >= 8.1.2, != 10.0, != 10.1 ; python_version < '3.13'
+Pillow >= 10.4 ; python_version >= '3.13'
 
 # core pagegenerators
 google >= 1.7

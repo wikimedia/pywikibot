@@ -228,7 +228,7 @@ class BaseSite(ComparableMixin):
 
     def __repr__(self) -> str:
         """Return internal representation."""
-        return f'{self.__class__.__name__}("{self.code}", "{self.family}")'
+        return f'{type(self).__name__}({self.code!r}, {self.family.name!r})'
 
     def __hash__(self):
         """Return hash value of instance."""

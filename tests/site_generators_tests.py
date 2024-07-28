@@ -25,7 +25,6 @@ from tests import WARN_SITE_CODE, unittest_print
 from tests.aspects import DefaultSiteTestCase, DeprecationTestCase, TestCase
 from tests.utils import skipping
 
-
 global_expected_params = {
     'action': ['query'],
     'continue': [True],
@@ -569,12 +568,12 @@ class TestSiteGenerators(DefaultSiteTestCase):
 
         # starttime earlier than endtime
         with self.subTest(starttime=low, endtime=high, reverse=False), \
-             self.assertRaises(AssertionError):
+                self.assertRaises(AssertionError):
             mysite.blocks(total=5, starttime=low, endtime=high)
 
         # reverse: endtime earlier than starttime
         with self.subTest(starttime=high, endtime=low, reverse=True), \
-             self.assertRaises(AssertionError):
+                self.assertRaises(AssertionError):
             mysite.blocks(total=5, starttime=high, endtime=low, reverse=True)
 
     def test_exturl_usage(self):
@@ -651,21 +650,6 @@ class TestSiteGenerators(DefaultSiteTestCase):
                     self.fail(
                         f'NotImplementedError not raised for {item}')
 
-    def test_unconnected(self):
-        """Test site.unconnected_pages method."""
-        if not self.site.data_repository():
-            self.skipTest('Site is not using a Wikibase repository')
-        pages = list(self.site.unconnected_pages(total=3))
-        self.assertLessEqual(len(pages), 3)
-
-        site = self.site.data_repository()
-        pattern = (r'Page '
-                   r'\[\[({site.sitename}:|{site.code}:)-1\]\]'
-                   r" doesn't exist\.".format(site=site))
-        for page in pages:
-            with self.assertRaisesRegex(NoPageError, pattern):
-                page.data_item()
-
     def test_assert_valid_iter_params(self):
         """Test site.assert_valid_iter_params method."""
         func = self.site.assert_valid_iter_params
@@ -689,6 +673,38 @@ class TestSiteGenerators(DefaultSiteTestCase):
         self.assertIsNone(func('m', 1, 2, True, True))
         with self.assertRaises(AssertionError):
             func('m', 2, 1, True, True)
+
+
+class TestUnconnectedPages(DefaultSiteTestCase):
+
+    """Test unconnected_pages method without cache enabled."""
+
+    def test_unconnected(self):
+        """Test site.unconnected_pages method."""
+        site = self.site.data_repository()
+        if not site:
+            self.skipTest('Site is not using a Wikibase repository')
+
+        pages = list(self.site.unconnected_pages(total=3))
+        self.assertLessEqual(len(pages), 3)
+
+        pattern = (fr'Page \[\[({site.sitename}:|{site.code}:)-1\]\]'
+                   r" doesn't exist\.")
+        found = []
+        for page in pages:
+            with self.subTest(page=page):
+                try:
+                    page.data_item()
+                except NoPageError as e:
+                    self.assertRegex(str(e), pattern)
+                else:
+                    found.append(page)
+        if found:
+            unittest_print('connection found for ',
+                           ', '.join(str(p) for p in found))
+
+        # assume that we have at least one unconnected page
+        self.assertLess(len(found), 3)
 
 
 class TestSiteGeneratorsUsers(DefaultSiteTestCase):

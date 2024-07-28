@@ -72,7 +72,7 @@ if TYPE_CHECKING:
 _ValueType = TypeVar('_ValueType')
 
 
-OSWIN32 = (sys.platform == 'win32')
+OSWIN32 = sys.platform == 'win32'
 
 
 # This frozen set should contain all imported modules/variables, so it must

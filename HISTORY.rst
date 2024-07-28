@@ -1,6 +1,14 @@
 Release History
 ===============
 
+9.2.1
+-----
+*13 July 2024*
+
+* Add support for ``aewikimedia`` to Pywikibot (:phab:`T362529`)
+* i18n updates
+
+
 9.2.0
 -----
 *22 June 2024*

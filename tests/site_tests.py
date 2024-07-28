@@ -72,8 +72,10 @@ class TestSiteObject(DefaultSiteTestCase):
     def test_repr(self):
         """Test __repr__."""
         code = self.site.family.obsolete.get(self.code) or self.code
-        expect = f'Site("{code}", "{self.family}")'
-        self.assertTrue(repr(self.site).endswith(expect))
+        expect = f"Site('{code}', '{self.family}')"
+        reprs = repr(self.site)
+        self.assertTrue(reprs.endswith(expect),
+                        f'\n{reprs} does not end with {expect}')
 
     def test_constructors(self):
         """Test cases for site constructors."""
@@ -391,7 +393,7 @@ class SiteSysopTestCase(DefaultSiteTestCase):
         if not mysite.has_right('deletedhistory'):
             self.skipTest(
                 "You don't have permission to view the deleted revisions "
-                'on {}.'.format(mysite))
+                f'on {mysite}.')
         mainpage = self.get_mainpage()
         gen = mysite.deletedrevs(total=10, titles=mainpage)
 
@@ -491,7 +493,7 @@ class SiteSysopTestCase(DefaultSiteTestCase):
         if not mysite.has_right('deletedhistory'):
             self.skipTest(
                 "You don't have permission to view the deleted revisions "
-                'on {}.'.format(mysite))
+                f'on {mysite}.')
         prop = ['ids', 'timestamp', 'flags', 'user', 'comment']
         gen = mysite.alldeletedrevisions(total=10, prop=prop)
 
@@ -625,13 +627,13 @@ class TestSiteSysopWrite(TestCase):
         page = pywikibot.Page(site, 'User:Unicodesnowman/ProtectTest')
 
         with self.subTest(test='anInvalidType'), \
-             self.assertRaisesRegex(APIError,
-                                    'Invalid protection type "anInvalidType"'):
+            self.assertRaisesRegex(APIError,
+                                   'Invalid protection type "anInvalidType"'):
             site.protect(protections={'anInvalidType': 'sysop'},
                          page=page, reason='Pywikibot unit test')
 
         with self.subTest(test='anInvalidLevel'), \
-             self.assertRaisesRegex(Error, 'Invalid protection level'):
+                self.assertRaisesRegex(Error, 'Invalid protection level'):
             site.protect(protections={'edit': 'anInvalidLevel'},
                          page=page, reason='Pywikibot unit test')
 
@@ -741,7 +743,7 @@ class TestSiteSysopWrite(TestCase):
 
         fp2 = pywikibot.FilePage(site, 'File:T276726.png')
         site.loadimageinfo(fp2, history=True)
-        for idx, v in fp2._file_revisions.items():
+        for v in fp2._file_revisions.values():
             if v['timestamp'] in (ts1, ts2):
                 self.assertTrue(hasattr(v, 'commenthidden'))
 
@@ -753,7 +755,7 @@ class TestSiteSysopWrite(TestCase):
 
         fp3 = pywikibot.FilePage(site, 'File:T276726.png')
         site.loadimageinfo(fp3, history=True)
-        for idx, v in fp3._file_revisions.items():
+        for v in fp3._file_revisions.values():
             if v['timestamp'] in (ts1, ts2):
                 self.assertFalse(hasattr(v, 'commenthidden'))
                 self.assertFalse(hasattr(v, 'userhidden'))

@@ -20,7 +20,12 @@ from warnings import warn
 import pywikibot
 from pywikibot import config
 from pywikibot.backports import Callable, Iterable
-from pywikibot.exceptions import Error, InvalidTitleError, UnsupportedPageError
+from pywikibot.exceptions import (
+    Error,
+    InvalidTitleError,
+    UnknownSiteError,
+    UnsupportedPageError,
+)
 from pywikibot.site import Namespace
 from pywikibot.tools import deprecated
 from pywikibot.tools.collections import GeneratorWrapper
@@ -936,10 +941,20 @@ def _update_categories(page, categories):
 
 
 def _update_langlinks(page, langlinks) -> None:
-    """Update page langlinks."""
-    links = {pywikibot.Link.langlinkUnsafe(link['lang'], link['*'],
-                                           source=page.site)
-             for link in langlinks}
+    """Update page langlinks.
+
+    .. versionadded:: 9.3
+       only add a language link if it is found in the family file.
+
+    :meta public:
+    """
+    links = set()
+    for langlink in langlinks:
+        with suppress(UnknownSiteError):
+            link = pywikibot.Link.langlinkUnsafe(langlink['lang'],
+                                                 langlink['*'],
+                                                 source=page.site)
+            links.add(link)
 
     if hasattr(page, '_langlinks'):
         page._langlinks |= links

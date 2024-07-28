@@ -1,6 +1,6 @@
 """Wrapper around djvulibre to access djvu files properties and content."""
 #
-# (C) Pywikibot team, 2015-2023
+# (C) Pywikibot team, 2015-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -255,7 +255,7 @@ class DjVuFile:
             return False
 
         # Convert white_page to djvu.
-        res, data = _call_cmd(['c44', white_ppm, '-dpi', str(dpi)])
+        res, _ = _call_cmd(['c44', white_ppm, '-dpi', str(dpi)])
         os.unlink(white_ppm)  # rm white_page.ppm before returning.
         if not res:
             return False
@@ -263,12 +263,12 @@ class DjVuFile:
         # Delete page n.
         # Get ref page info for later checks.
         info_ref_page = self.page_info(ref_page)
-        res, data = _call_cmd(['djvm', '-d', self.file, str(n)])
+        res, _ = _call_cmd(['djvm', '-d', self.file, str(n)])
         if not res:
             return False
 
         # Insert new page
-        res, data = _call_cmd(['djvm', '-i', self.file, white_djvu, str(n)])
+        res, _ = _call_cmd(['djvm', '-i', self.file, white_djvu, str(n)])
         os.unlink(white_djvu)  # rm white_page.djvu before returning.
         if not res:
             return False

@@ -117,7 +117,7 @@ Options (may be omitted):
    KeyboardInterrupt was enabled with ``-async`` option.
 """
 #
-# (C) Pywikibot team, 2006-2023
+# (C) Pywikibot team, 2006-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -543,7 +543,7 @@ class PageArchiver:
     def attr2text(self) -> str:
         """Return a template with archiver saveable attributes."""
         return '{{%s\n%s\n}}' \
-               % (self.tpl.title(with_ns=(self.tpl.namespace() != 10)),
+               % (self.tpl.title(with_ns=self.tpl.namespace() != 10),
                   '\n'.join(f'|{a} = {self.get_attr(a)}'
                             for a in self.saveables()))
 
@@ -611,8 +611,9 @@ class PageArchiver:
             if not (title.startswith(page_title + '/') or self.force
                     or self.key_ok()):
                 raise ArchiveSecurityError(
-                    'Archive page {} does not start with page title ({})!'
-                    .format(archive_link, page_title))
+                    f'Archive page {archive_link} does not start with page '
+                    f'title ({page_title})!'
+                )
             self.archives[title] = DiscussionPage(archive_link, self, params)
 
         return self.archives[title]
@@ -936,8 +937,8 @@ def main(*args: str) -> None:
 
     if not templates:
         templates = ['User:MiszaBot/config']
-        pywikibot.info('No template was specified, using default {{{{{}}}}}.'
-                       .format(templates[0]))
+        pywikibot.info('No template was specified, using default '
+                       f'{{{{{templates[0]}}}}}.')
 
     if asynchronous:
         signal.signal(signal.SIGINT, signal_handler)
@@ -994,5 +995,5 @@ def main(*args: str) -> None:
 if __name__ == '__main__':
     start = datetime.datetime.now()
     main()
-    pywikibot.info('\nExecution time: {} seconds'
-                   .format((datetime.datetime.now() - start).seconds))
+    pywikibot.info('\nExecution time: '
+                   f'{(datetime.datetime.now() - start).seconds} seconds')

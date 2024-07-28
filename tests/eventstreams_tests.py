@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the eventstreams module."""
 #
-# (C) Pywikibot team, 2017-2023
+# (C) Pywikibot team, 2017-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -245,12 +245,12 @@ class TestEventStreamsFilter(TestCase):
         self.es.register_filter(lambda x: all_type, ftype='all')
         if any_type is not None:
             self.es.register_filter(lambda x: any_type, ftype='any')
-        self.assertEqual(self.es.streamfilter(self.data), result,
-                         'Test EventStreams filter mixed function failed for\n'
-                         "'none': {}, 'all': {}, 'any': {}\n"
-                         '(expected {}, given {})'
-                         .format(none_type, all_type, any_type,
-                                 result, not result))
+        self.assertEqual(
+            self.es.streamfilter(self.data), result,
+            'Test EventStreams filter mixed function failed for\n'
+            f"'none': {none_type}, 'all': {all_type}, 'any': {any_type}\n"
+            f'(expected {result}, given {not result})'
+        )
 
     def test_filter_mixed_function(self):
         """Test EventStreams filter mixed function."""
@@ -283,9 +283,9 @@ class EventStreamsTestClass(EventStreams):
                     self.source.resp.close()  # close SSLSocket
                     del self.source
                     raise ValueError(
-                        '{error}\n\nEvent no {number}: '
-                        'Could not load json data from source\n${event}$'
-                        .format(number=n, event=event, error=e))
+                        f'{e}\n\nEvent no {n}: '
+                        f'Could not load json data from source\n${event}$'
+                    ) from e
                 yield element
         del self.source
 

@@ -121,7 +121,7 @@ class TestTimestamp(TestCase):
         for timestr, _posix in self.test_results['INVALID']:
             regex = "time data \'[^\']*?\' does not match"
             with self.subTest(timestr), \
-                 self.assertRaisesRegex(ValueError, regex):
+                    self.assertRaisesRegex(ValueError, regex):
                 Timestamp.set_timestamp(timestr)
 
     def test_instantiate_from_instance(self):
@@ -288,7 +288,7 @@ class TestTimeFunctions(TestCase):
 
         for invalid_value in ('', '3000', '4000@'):
             with self.subTest(value=invalid_value), \
-                 self.assertRaises(ValueError):
+                    self.assertRaises(ValueError):
                 parse_duration(invalid_value)
 
 

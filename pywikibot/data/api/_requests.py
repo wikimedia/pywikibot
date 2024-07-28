@@ -995,6 +995,8 @@ but {scheme!r} is required. Please add the following code to your family file:
 
         :return: a dict containing data retrieved from api.php
         """
+        test_running = os.environ.get('PYWIKIBOT_TEST_RUNNING', '0') == '1'
+
         self._add_defaults()
         use_get = self._use_get()
         retries = 0
@@ -1137,18 +1139,20 @@ but {scheme!r} is required. Please add the following code to your family file:
             # raise error
             try:
                 param_repr = str(self._params)
-                pywikibot.log(
-                    f'API Error: query=\n{pprint.pformat(param_repr)}')
-                pywikibot.log(f'           response=\n{result}')
+                msg = (f'API Error: query=\n{pprint.pformat(param_repr)}\n'
+                       f'           response=\n{result}')
+                if test_running:
+                    from tests import unittest_print
+                    unittest_print(msg)
+                else:
+                    pywikibot.log(msg)
 
-                args = {'param': body} if body else {}
-                args.update(error)
-                raise pywikibot.exceptions.APIError(**args)
+                raise pywikibot.exceptions.APIError(**error)
             except TypeError:
                 raise RuntimeError(result)
 
         msg = 'Maximum retries attempted due to maxlag without success.'
-        if os.environ.get('PYWIKIBOT_TEST_RUNNING', '0') == '1':
+        if test_running:
             import unittest
             raise unittest.SkipTest(msg)
 

@@ -55,9 +55,17 @@ class TestInterwikidataBot(SiteAttributeTestCase):
 
     def test_main(self):
         """Test main function interwikidata.py."""
-        # The main function return None.
-        with empty_sites():
-            self.assertIsNone(interwikidata.main())
+        # The default site is used here
+        if pywikibot.Site().has_data_repository:
+            with empty_sites():
+                # The main function return None.
+                self.assertIsNone(interwikidata.main())
+        else:
+            with empty_sites(), self.assertRaisesRegex(
+                ValueError,
+                    r'[a-z}+:[a-z_-]+ does not have a data repository, use '
+                    r'interwiki\.py instead\.'):
+                interwikidata.main()
 
     def test_iw_bot(self):
         """Test IWBot class."""

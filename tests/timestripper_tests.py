@@ -15,7 +15,6 @@ from pywikibot.textlib import TimeStripper
 from pywikibot.time import TZoneFixedOffset
 from tests.aspects import TestCase, unittest
 
-
 MatchObject = type(re.search('', ''))
 
 

@@ -781,8 +781,8 @@ def handle_args(args: Iterable[str] | None = None,
         elif option in ('-cosmeticchanges', '-cc'):
             config.cosmetic_changes = (strtobool(value) if value
                                        else not config.cosmetic_changes)
-            output(f'NOTE: option cosmetic_changes is '
-                   f'{config.cosmetic_changes}\n')
+            pywikibot.info(f'NOTE: option cosmetic_changes is '
+                           f'{config.cosmetic_changes}\n')
         elif option == '-simulate':
             config.simulate = value or True
         #

@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       fail-fast: false
-      max-parallel: 14
+      max-parallel: 17
 
       matrix:
         python-version: [ "pypy3.7", "pypy3.10", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13.0-alpha - 3.13.0" ]
@@ -63,6 +63,7 @@ jobs:
         pip install "PyMySQL >= 1.0.0"
         pip install pytest
         pip install "sseclient<0.0.23,>=0.0.18"
+        pip install wikitextparser
 
     - name: Generate user files
       run: |

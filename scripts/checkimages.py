@@ -888,7 +888,7 @@ class CheckImagesBot:
                 if dup_page.title(as_url=True) != self.image.title(
                         as_url=True) or self.timestamp is None:
                     try:
-                        self.timestamp = (dup_page.latest_file_info.timestamp)
+                        self.timestamp = dup_page.latest_file_info.timestamp
                     except PageRelatedError:
                         continue
                 data = self.timestamp.timetuple()
@@ -961,8 +961,8 @@ class CheckImagesBot:
                 fp = pywikibot.FilePage(self.site, images_to_tag_list[-1])
                 already_reported_in_past = fp.revision_count(self.bots)
                 image_title = re.escape(self.image.title(as_url=True))
-                from_regex = (r'\n\*\[\[:{}{}\]\]'
-                              .format(self.image_namespace, image_title))
+                from_regex = (
+                    rf'\n\*\[\[:{self.image_namespace}{image_title}\]\]')
                 # Delete the image in the list where we're write on
                 text_for_the_report = re.sub(from_regex, '',
                                              text_for_the_report)
@@ -992,8 +992,8 @@ class CheckImagesBot:
                    == self.image.title(as_url=True):
                     # the image itself, not report also this as duplicate
                     continue
-                repme += '\n** [[:{}{}]]'.format(self.image_namespace,
-                                                 dup_page.title(as_url=True))
+                repme += (f'\n** [[:{self.image_namespace}'
+                          f'{dup_page.title(as_url=True)}]]')
 
             result = self.report_image(self.image_name, self.rep_page,
                                        self.com, repme, addings=False)
@@ -1037,14 +1037,12 @@ class CheckImagesBot:
             pywikibot.info(f'{image_to_report} is already in the report page.')
             reported = False
         elif len(text_get) >= self.log_full_number:
+            msg = (f'The log page ({another_page.title()}) is full! Please'
+                   ' delete the old files reported.')
             if self.log_full_error:
-                raise LogIsFull(
-                    'The log page ({}) is full! Please delete the old files '
-                    'reported.'.format(another_page.title()))
+                raise LogIsFull(msg)
 
-            pywikibot.info(
-                'The log page ({}) is full! Please delete the old files '
-                ' reported. Skip!'.format(another_page.title()))
+            pywikibot.info(msg + ' Skip!')
             # Don't report, but continue with the check
             # (we don't know if this is the first time we check this file
             # or not)

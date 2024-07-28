@@ -38,24 +38,32 @@ class FilePage(Page):
     Supports the same interface as Page except *ns*; some added methods.
     """
 
-    def __init__(self, source, title: str = '') -> None:
+    def __init__(self, source, title: str = '', *,
+                 ignore_extension: bool = False) -> None:
         """Initializer.
 
         .. versionchanged:: 8.4
            check for valid extensions.
+        .. versionchanged:: 9.3
+           *ignore_extension* parameter was added
 
         :param source: the source of the page
         :type source: pywikibot.page.BaseLink (or subclass),
             pywikibot.page.Page (or subclass), or pywikibot.page.Site
         :param title: normalized title of the page; required if source is a
             Site, ignored otherwise
+        :param ignore_extension: prevent extension check
         :raises ValueError: Either the title is not in the file
-            namespace or does not have a valid extension.
+            namespace or does not have a valid extension and
+            *ignore_extension* was not set.
         """
         self._file_revisions = {}  # dictionary to cache File history.
         super().__init__(source, title, 6)
         if self.namespace() != 6:
             raise ValueError(f"'{self.title()}' is not in the file namespace!")
+
+        if ignore_extension:
+            return
 
         title = self.title(with_ns=False, with_section=False)
         _, sep, extension = title.rpartition('.')

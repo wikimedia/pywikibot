@@ -15,10 +15,10 @@ from pywikibot.flow import Board, Post, Topic
 from tests.aspects import TestCase
 from tests.utils import skipping
 
-
 MODERATION_REASON = 'Pywikibot test'
 
 
+@unittest.skip('T371112: Structured Discussion was disabled on test-wiki')
 class TestFlowCreateTopic(TestCase):
 
     """Test the creation of Flow topics."""
@@ -56,6 +56,7 @@ class TestFlowCreateTopic(TestCase):
         self.assertEqual(topic.summary(), content)
 
 
+@unittest.skip('T371112: Structured Discussion was disabled on test-wiki')
 class TestFlowReply(TestCase):
 
     """Test replying to existing posts."""
@@ -175,6 +176,7 @@ class TestFlowReply(TestCase):
         self.assertLength(more_root_replies, len(new_root_replies) + 1)
 
 
+@unittest.skip('T371112: Structured Discussion was disabled on test-wiki')
 class TestFlowLockTopic(TestCase):
 
     """Locking and unlocking topics."""
@@ -183,7 +185,6 @@ class TestFlowLockTopic(TestCase):
     code = 'test'
     write = True
 
-    @unittest.expectedFailure  # T367301
     def test_lock_unlock_topic(self):
         """Lock and unlock a test topic."""
         # Setup
@@ -252,16 +253,16 @@ class FlowTests(TestCase):
             self.assertFalse(flow.is_moderated)
 
 
+@unittest.skip('T371112: Structured Discussion was disabled on test-wiki')
 class TestFlowHide(FlowTests):
 
     """Hiding topics and posts."""
 
-    @unittest.expectedFailure  # T367303
     def test_hide(self):
         """Hide and restore a test topic and post."""
         for flow in (self.topic, self.post):
             with self.subTest(flow=flow.__class__.__name__), \
-                 self.restored(flow):
+                    self.restored(flow):
                 # Hide
                 flow.hide(MODERATION_REASON)
                 self.assertTrue(flow.is_moderated)
@@ -277,7 +278,7 @@ class TestFlowSysop(FlowTests):
         """Delete and restore a test topic and post."""
         for flow in (self.topic, self.post):
             with self.subTest(flow=flow.__class__.__name__), \
-                 self.restored(flow):
+                    self.restored(flow):
                 # Delete
                 flow.delete_mod(MODERATION_REASON)
                 self.assertTrue(flow.is_moderated)
@@ -286,7 +287,7 @@ class TestFlowSysop(FlowTests):
         """Suppress and restore a test topic and post."""
         for flow in (self.topic, self.post):
             with self.subTest(flow=flow.__class__.__name__), \
-                 self.restored(flow):
+                    self.restored(flow):
                 # Suppress
                 flow.suppress(MODERATION_REASON)
                 self.assertTrue(flow.is_moderated)

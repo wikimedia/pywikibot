@@ -138,7 +138,7 @@ administrator, transwiki importer or importer.
 .. versionadded:: 8.2
 """
 #
-# (C) Pywikibot team, 2023
+# (C) Pywikibot team, 2023-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -284,18 +284,17 @@ def main(*args: str) -> None:
             if not overwrite:
                 if targetpage.exists():
                     pywikibot.warning(
-                        'Skipped {} (target page {} exists)'.format(
-                            page.title(as_link=True, force_interwiki=True),
-                            targetpage.title(as_link=True)
-                        )
+                        'Skipped '
+                        f'{page.title(as_link=True, force_interwiki=True)} '
+                        f'(target page {targetpage.title(as_link=True)}'
+                        ' exists)'
                     )
                     continue
             else:
                 if not targetpage.botMayEdit():
                     pywikibot.warning(
-                        'Target page {} is not editable by bots'.format(
-                            targetpage.title(as_link=True)
-                        )
+                        f'Target page {targetpage.title(as_link=True)} is not'
+                        ' editable by bots'
                     )
                     continue
 

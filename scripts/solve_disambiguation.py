@@ -673,11 +673,11 @@ class DisambiguationRobot(SingleSiteBot):
         # group linktrail is the link trail, that's letters after ]] which
         # are part of the word.
         # note: the definition of 'letter' varies from language to language.
-        self.linkR = re.compile(r"""
+        self.linkR = re.compile(rf"""
             \[\[  (?P<title>     [^\[\]\|#]*)
                   (?P<section> \#[^\]\|]*)?
                (\|(?P<label>     [^\]]*))?  \]\]
-            (?P<linktrail>{})""".format(linktrail), flags=re.X)
+            (?P<linktrail>{linktrail})""", flags=re.X)
 
     @staticmethod
     def firstlinks(page) -> Generator[str, None, None]:
@@ -759,13 +759,13 @@ class DisambiguationRobot(SingleSiteBot):
         try:
             text = ref_page.get()
         except IsRedirectPageError:
-            pywikibot.info('{} is a redirect to {}'
-                           .format(ref_page.title(), disamb_page.title()))
+            pywikibot.info(
+                f'{ref_page.title()} is a redirect to {disamb_page.title()}')
             if disamb_page.isRedirectPage():
                 target = self.opt.pos[0]
                 if pywikibot.input_yn(
-                    'Do you want to make redirect {} point to {}?'
-                    .format(ref_page.title(), target),
+                    f'Do you want to make redirect {ref_page.title()} point '
+                    f'to {target}?',
                         default=False, automatic_quit=False):
                     redir_text = f'#{self.site.redirect()} [[{target}]]'
                     try:
@@ -796,9 +796,8 @@ class DisambiguationRobot(SingleSiteBot):
         else:
             ignore_reason = self.checkContents(text)
             if ignore_reason:
-                pywikibot.info(
-                    '\n\nSkipping {} because it contains {}.\n\n'
-                    .format(ref_page.title(), ignore_reason))
+                pywikibot.info(f'\n\nSkipping {ref_page.title()} because it '
+                               f'contains {ignore_reason}.\n\n')
             else:
                 include = True
 
@@ -999,9 +998,8 @@ class DisambiguationRobot(SingleSiteBot):
                         '', link_text[len(new_page_title):]) == '')
                     and (not section)
                 ):
-                    newlink = '[[{}]]{}'.format(
-                        link_text[:len(new_page_title)],
-                        link_text[len(new_page_title):])
+                    newlink = (f'[[{link_text[:len(new_page_title)]}]]'
+                               f'{link_text[len(new_page_title):]}')
                 else:
                     newlink = f'[[{new_page_title}{section}|{link_text}]]'
                 text = text[:m.start()] + newlink + text[m.end():]
@@ -1097,7 +1095,7 @@ or press enter to quit:""")
                     except NoPageError:
                         pywikibot.info(
                             'Page does not exist; using first '
-                            'link in page {}.'.format(page.title()))
+                            f'link in page {page.title()}.')
                         links = page.linkedPages()[:1]
                         links = [correctcap(link, page.get())
                                  for link in links]
@@ -1260,9 +1258,9 @@ def main(*args: str) -> None:
             else:
                 page = pywikibot.Page(pywikibot.Link(value, site))
                 if page.exists() or pywikibot.input_yn(
-                    'Possibility {} does not actually exist. Use it anyway?'
-                    .format(page.title()), default=False,
-                        automatic_quit=False):
+                    f'Possibility {page.title()} does not actually exist.'
+                    ' Use it anyway?',
+                        default=False, automatic_quit=False):
                     alternatives.append(page.title())
         elif arg == '-just':
             options['just'] = False

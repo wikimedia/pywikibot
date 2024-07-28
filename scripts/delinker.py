@@ -19,18 +19,17 @@ The following parameters are supported:
             stops, the last timestamp is written to the settings file and
             the next script call starts there if no `-since` is given.
 
-.. note:: This sample script is a
-   :class:`ConfigParserBot <bot.ConfigParserBot>`. All
-   settings can be made either by giving option with the command line or
-   with a settings file which is scripts.ini by default. If you don't
-   want the default values you can add any option you want to change to
-   that settings file below the [delinker] section like.
+.. note:: This script is a :class:`ConfigParserBot <bot.ConfigParserBot>`.
+   All settings can be made either by giving option with the command
+   line or with a settings file which is scripts.ini by default. If you
+   don't want the default values you can add any option you want to
+   change to that settings file below the [delinker] section like.
 
 .. versionadded:: 7.2
    This script is completely rewriten from compat branch.
 """
 #
-# (C) Pywikibot team, 2006-2023
+# (C) Pywikibot team, 2006-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -89,7 +88,7 @@ class CommonsDelinker(SingleSiteBot, ConfigParserBot, AutomaticTWSummaryBot):
     def init_page(self, item) -> pywikibot.page.FilePage:
         """Upcast logevent to FilePage and combine edit summary."""
         self.summary_parameters = dict(item)
-        return pywikibot.FilePage(self.site, item['title'])
+        return pywikibot.FilePage(item.page(), ignore_extension=True)
 
     def skip_page(self, page) -> bool:
         """Skip pages which neither exists locally nor on shared repository."""
@@ -113,9 +112,8 @@ class CommonsDelinker(SingleSiteBot, ConfigParserBot, AutomaticTWSummaryBot):
         shown = False
         for page in file_page.using_pages(content=True, namespaces=0):
             if not shown:
-                pywikibot.info(
-                    '\n>>> <<lightgreen>>Delinking {}<<default>> <<<'
-                    .format(file_page.title()))
+                pywikibot.info('\n>>> <<lightgreen>>Delinking '
+                               f'{file_page.title()}<<default>> <<<')
                 shown = True
             super().treat(page)
 

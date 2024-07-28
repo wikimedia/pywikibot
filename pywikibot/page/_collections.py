@@ -1,6 +1,6 @@
 """Structures holding data for Wikibase entities."""
 #
-# (C) Pywikibot team, 2019-2022
+# (C) Pywikibot team, 2019-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -471,14 +471,13 @@ class SiteLinkCollection(MutableMapping):
             for dbname, sitelink in data.items():
                 if dbname not in diffto:
                     continue
+
                 diffto_link = diffto[dbname]
                 if diffto_link.get('title') == sitelink.get('title'):
                     # compare badges
-                    tmp_badges = []
                     diffto_badges = diffto_link.get('badges', [])
                     badges = sitelink.get('badges', [])
-                    for badge in set(diffto_badges) - set(badges):
-                        tmp_badges.append('')
+                    tmp_badges = [''] * len(set(diffto_badges) - set(badges))
                     for badge in set(badges) - set(diffto_badges):
                         tmp_badges.append(badge)
                     if tmp_badges:

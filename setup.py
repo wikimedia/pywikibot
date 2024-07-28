@@ -45,7 +45,10 @@ extra_deps = {
     'wikitextparser': ['wikitextparser>=0.47.0'],
     'mysql': ['PyMySQL >= 1.0.0'],
     # vulnerability found in Pillow<8.1.2 but toolforge uses 5.4.1
-    'Tkinter': ['Pillow>=8.1.2, != 10.0, != 10.1; python_version < "3.13"'],
+    'Tkinter': [
+        'Pillow>=8.1.2, != 10.0, != 10.1; python_version < "3.13"',
+        'Pillow>=10.4; python_version >= "3.13"',
+    ],
     'mwoauth': ['mwoauth!=0.3.1,>=0.2.4'],
     'html': ['beautifulsoup4>=4.7.1'],
     'http': ['fake-useragent>=1.4.0'],
@@ -61,7 +64,6 @@ extra_deps = {
         'flake8-print>=5.0.0',
         'flake8-quotes>=3.3.2',
         'flake8-raise',
-        'flake8-string-format',
         'flake8-tuple>=0.4.1',
         'flake8-no-u-prefixed-strings>=0.2',
         'pep8-naming==0.13.3; python_version < "3.8"',

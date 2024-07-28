@@ -143,7 +143,7 @@ are also in 'Pneumatics' category.
    :mod:`pagegenerators` are supported with "move" and "remove" action.
 """
 #
-# (C) Pywikibot team, 2004-2023
+# (C) Pywikibot team, 2004-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -436,13 +436,13 @@ class CategoryDatabase:
             }
             # store dump to disk in binary format
             with open_archive(filename, 'wb') as f, \
-                 suppress(pickle.PicklingError):
+                    suppress(pickle.PicklingError):
                 pickle.dump(databases, f, protocol=config.pickle_protocol)
         else:
             with suppress(EnvironmentError):
                 os.remove(filename)
-                pywikibot.info('Database is empty. {} removed'
-                               .format(config.shortpath(filename)))
+                pywikibot.info(
+                    f'Database is empty. {config.shortpath(filename)} removed')
 
 
 class CategoryAddBot(CategoryPreprocess):
@@ -512,8 +512,8 @@ class CategoryAddBot(CategoryPreprocess):
             pywikibot.info('* ' + cat.title())
         catpl = pywikibot.Category(self.current_page.site, self.newcat)
         if catpl in cats:
-            pywikibot.info('{} is already in {}.'
-                           .format(self.current_page.title(), catpl.title()))
+            pywikibot.info(
+                f'{self.current_page.title()} is already in {catpl.title()}.')
         else:
             if self.sort:
                 catpl = self.sorted_by_last_name(catpl, self.current_page)
@@ -539,8 +539,7 @@ class CategoryAddBot(CategoryPreprocess):
                 else:
                     if self.includeonly == ['includeonly']:
                         text += '\n\n'
-                    text += '<{0}>\n{1}\n</{0}>'.format(
-                            tagname, categorytitle)
+                    text += f'<{tagname}>\n{categorytitle}\n</{tagname}>'
             else:
                 cats.append(catpl)
                 text = textlib.replaceCategoryLinks(
@@ -663,8 +662,8 @@ class CategoryMoveRobot(CategoryPreprocess):
             if self.wikibase and repo.username() is None:
                 # The bot can't move categories nor update the Wikibase repo
                 raise NoUsernameError(
-                    "The 'wikibase' option is turned on and {} has no "
-                    'registered username.'.format(repo))
+                    f"The 'wikibase' option is turned on and {repo} has no "
+                    'registered username.')
 
         template_vars = {'oldcat': self.oldcat.title(with_ns=False)}
         if self.newcat:
@@ -860,15 +859,15 @@ class CategoryMoveRobot(CategoryPreprocess):
         """
         move_possible = True
         if new_page and new_page.exists():
-            pywikibot.warning("The {} target '{}' already exists."
-                              .format(name, new_page.title()))
+            pywikibot.warning(
+                f"The {name} target '{new_page.title()}' already exists.")
             move_possible = False
         if not old_page.exists():
             # only warn if not a talk page
             log = (pywikibot.log if old_page.namespace() % 2 else
                    pywikibot.warning)
-            log("Moving {} '{}' requested, but the page doesn't exist."
-                .format(name, old_page.title()))
+            log(f"Moving {name} '{old_page.title()}' requested, but the page"
+                " doesn't exist.")
             move_possible = False
         return move_possible
 
@@ -883,8 +882,8 @@ class CategoryMoveRobot(CategoryPreprocess):
         Do not use this function from outside the class.
         """
         # Some preparing
-        pywikibot.info('Moving text from {} to {}.'.format(
-            self.oldcat.title(), self.newcat.title()))
+        pywikibot.info(f'Moving text from {self.oldcat.title()} to '
+                       f'{self.newcat.title()}.')
         comma = self.site.mediawiki_message('comma-separator')
         authors = comma.join(self.oldcat.contributors().keys())
         template_vars = {'oldcat': self.oldcat.title(), 'authors': authors}
@@ -1021,8 +1020,10 @@ class CategoryListifyRobot:
         list_string = ''
         for article in sorted(set_of_articles):
             textlink = not (article.is_filepage() and self.show_images)
-            list_string += '{} {}'.format(
-                self.prefix, article.title(as_link=True, textlink=textlink))
+            list_string += (
+                f'{self.prefix} '
+                f'{article.title(as_link=True, textlink=textlink)}'
+            )
             if self.talk_pages and not article.isTalkPage():
                 list_string += (
                     f' -- [[{article.toggleTalkPage().title()}|talk]]')
@@ -1117,8 +1118,11 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
                         if cat != original_cat:
                             text += cat.title(as_link=True)
                         else:
-                            text += '<<lightpurple>>{}<<default>>'.format(
-                                current_cat.title(as_link=True))
+                            text += (
+                                '<<lightpurple>>'
+                                f'{current_cat.title(as_link=True)}'
+                                '<<default>>'
+                            )
                         text += '\n'
                 return text
 
@@ -1155,9 +1159,11 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
                         # columnify
                         i2 = i + new_column
                         if i2 < count:
-                            lines.append('[{0}{1}] {2:35}[{0}{3}] {4}'
-                                         .format(prefix, index % i, cat,
-                                                 index % i2, cat_list[i2]))
+                            lines.append(
+                                f'[{prefix}{index % i}] '
+                                f'{cat:35}[{prefix}{index % i2}] '
+                                f'{cat_list[i2]}'
+                            )
                         else:
                             lines.append(f'[{prefix}{index % i}] {cat}')
                     else:
@@ -1223,18 +1229,22 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
 
         # show possible options for the user
         pywikibot.info()
-        options = (supercat_option,
-                   subcat_option,
-                   StandardOption(
-                       'save page to category <<lightpurple>>{}<<default>>'
-                       .format(current_cat.title(with_ns=False)), 'c'),
-                   StandardOption('remove the category from page', 'r'),
-                   StandardOption('skip page', 's'),
-                   context_option,
-                   StandardOption('jump to custom category', 'j'))
+        options = (
+            supercat_option,
+            subcat_option,
+            StandardOption('save page to category <<lightpurple>>'
+                           f'{current_cat.title(with_ns=False)}<<default>>',
+                           'c'),
+            StandardOption('remove the category from page', 'r'),
+            StandardOption('skip page', 's'),
+            context_option,
+            StandardOption('jump to custom category', 'j')
+        )
         choice = pywikibot.input_choice(
-            'Choice for page <<lightpurple>>{}<<default>>:'
-            .format(member.title()), options, default='c')
+            f'Choice for page <<lightpurple>>{member.title()}<<default>>:',
+            options,
+            default='c'
+        )
 
         if choice == 'c':
             pywikibot.info(f'Saving page to {current_cat.title()}')
@@ -1457,18 +1467,17 @@ class CleanBot(Bot):
             return
 
         if config.verbose_output:
-            pywikibot.info('Subcategory "{}" is parent for:'
-                           .format(child.title(with_ns=False)))
+            pywikibot.info(
+                f'Subcategory "{child.title(with_ns=False)}" is parent for:')
 
             for grandchild in overcategorized:
                 pywikibot.info(f'\t{grandchild.title()}')
 
         for grandchild in overcategorized:
-            msg = ('Remove "<<lightpurple>>{}<<default>>" from "{}" because '
-                   'it is already under subcategory "<<green>>{}<<default>>"?'
-                   .format(grandchild.title(with_ns=False),
-                           self.cat.title(with_ns=False),
-                           child.title(with_ns=False)))
+            msg = (f'Remove "<<lightpurple>>{grandchild.title(with_ns=False)}'
+                   f'<<default>>" from "{self.cat.title(with_ns=False)}"'
+                   ' because it is already under subcategory '
+                   f'"<<green>>{child.title(with_ns=False)}<<default>>"?')
 
             if not self.user_confirm(msg):
                 continue

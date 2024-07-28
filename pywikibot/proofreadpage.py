@@ -324,6 +324,7 @@ def decompose(fn: Callable) -> Callable:  # type: ignore
 
     Decompose text if needed and recompose text.
     """
+
     def wrapper(self: ProofreadPage, *args: Any, **kwargs: Any) -> Any:
         if not hasattr(self, '_full_header'):
             self._decompose_page()
@@ -336,6 +337,7 @@ def decompose(fn: Callable) -> Callable:  # type: ignore
 
 def check_if_cached(fn: Callable) -> Callable:  # type: ignore
     """Decorator for IndexPage to ensure data is cached."""
+
     def wrapper(self: IndexPage, *args: Any, **kwargs: Any) -> Any:
         if self._cached is False:
             self._get_page_mappings()

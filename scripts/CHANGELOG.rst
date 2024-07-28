@@ -1,6 +1,30 @@
 Scripts Changelog
 =================
 
+9.3.0
+-----
+
+delinker
+^^^^^^^^
+
+* Ignore file extension check :phab:`T352237`)
+
+fixing_redirects
+^^^^^^^^^^^^^^^^
+
+* Ignore :exc:`SectionError` in fixing_redirects.py script (:phab:`T370295`)
+
+interwiki
+^^^^^^^^^
+
+* ``-wiktionary`` option was removed
+
+redirect
+^^^^^^^^
+
+* Show the current redirect target with redirect summary (:phab:`T254839`)
+
+
 9.2.0
 -----
 

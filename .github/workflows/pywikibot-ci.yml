@@ -1,5 +1,5 @@
 name: Pywikibot CI
-# Run Pywikibot tests  with a variety of Python versions
+# Run Pywikibot tests with a variety of Python versions
 
 on:
   push:
@@ -23,12 +23,11 @@ jobs:
 
     strategy:
       fail-fast: false
-      max-parallel: 17
+      max-parallel: 18
 
       matrix:
         python-version: [ "pypy3.7", "pypy3.10", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13.0-alpha - 3.13.0", "3.14-dev" ]
         site: [ "wikipedia:en", "wikisource:zh" ]
-        test_prod_only: [ true ]
         include:
           - python-version: "3.7"
             site: wikipedia:test
@@ -122,7 +121,6 @@ jobs:
       env:
         PYWIKIBOT_TEST_NO_RC:
           ${{ (matrix.site == 'wikisource:zh' || matrix.test_no_rc) && 1 || 0 }}
-        PYWIKIBOT_TEST_PROD_ONLY: ${{ matrix.test_prod_only && 1 || 0 }}
       run: |
         python pwb.py version
         if [ ${{matrix.site || 0}} != 'wikipedia:test' ]; then

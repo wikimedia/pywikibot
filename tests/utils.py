@@ -26,7 +26,6 @@ from pywikibot.site import Namespace
 from pywikibot.tools.collections import EMPTY_DEFAULT
 from tests import _pwb_py
 
-
 OSWIN32 = (sys.platform == 'win32')
 
 
@@ -358,11 +357,10 @@ class DrySite(pywikibot.site.APISite):
         if self.family.name == 'wikisource':
             extensions.append({'name': 'ProofreadPage'})
         self._siteinfo._cache['extensions'] = (extensions, True)
-        aliases = []
-        for alias in ('PrefixIndex', ):
-            # TODO: Not all follow that scheme (e.g. "BrokenRedirects")
-            aliases.append(
-                {'realname': alias.capitalize(), 'aliases': [alias]})
+
+        # TODO: Not all follow that scheme (e.g. "BrokenRedirects")
+        aliases = [{'realname': alias.capitalize(), 'aliases': [alias]}
+                   for alias in ('PrefixIndex', )]
         self._siteinfo._cache['specialpagealiases'] = (aliases, True)
         self._msgcache = {'*': 'dummy entry', 'hello': 'world'}
 
@@ -555,7 +553,9 @@ def empty_sites():
 
 
 @contextmanager
-def skipping(*exceptions: BaseException, msg: str | None = None):
+def skipping(*exceptions: BaseException,
+             msg: str | None = None,
+             code: str | None = None):
     """Context manager to skip test on specified exceptions.
 
     For example Eventstreams raises ``NotImplementedError`` if no
@@ -583,13 +583,25 @@ def skipping(*exceptions: BaseException, msg: str | None = None):
     .. note:: The last sample uses Python 3.10 syntax.
 
     .. versionadded:: 6.2
+    .. versionchanged:: 9.3
+       *code* parameter was added
 
-    :param msg: Optional skipping reason
     :param exceptions: Exceptions to let test skip
+    :param msg: Optional skipping reason
+    :param code: if *exceptions* is a single :exc:`APIError` you can
+        specify the :attr:`APIError.code` for the right match to be
+        skipped.
     """
     try:
         yield
     except exceptions as e:
+        if code:
+            if len(exceptions) != 1 \
+               or not hasattr(e, 'code') \
+               or e.code != code:
+                raise
+            msg = e.info
+
         if msg is None:
             msg = e
         raise unittest.SkipTest(msg)

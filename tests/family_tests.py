@@ -218,9 +218,8 @@ class TestFamilyUrlRegex(PatchingTestCase):
             family = Family.load(family)
             for code in family.codes:
                 self.current_code = code
-                url = '{}://{}{}/$1'.format(family.protocol(code),
-                                            family.hostname(code),
-                                            family.path(code))
+                url = (f'{family.protocol(code)}://{family.hostname(code)}'
+                       f'{family.path(code)}/$1')
                 with self.subTest(url=url):
                     self.assertEqual(family.from_url(url), code)
 

@@ -738,7 +738,7 @@ class Family:
 
         :return: mapping of old codes to new codes (or None)
         """
-        data = {code: None for code in self.interwiki_removals}
+        data = dict.fromkeys(self.interwiki_removals)
         data.update(self.interwiki_replacements)
         return types.MappingProxyType(data)
 

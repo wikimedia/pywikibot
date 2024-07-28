@@ -41,8 +41,9 @@ from pywikibot.exceptions import (
     InvalidPageError,
     InvalidTitleError,
     NoMoveTargetError,
+    SectionError,
 )
-from pywikibot.textlib import does_text_contain_section, isDisabled
+from pywikibot.textlib import isDisabled
 from pywikibot.tools import first_lower
 from pywikibot.tools import first_upper as firstcap
 
@@ -169,22 +170,13 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, AutomaticTWSummaryBot):
                     target = page.moved_target()
         elif page.isRedirectPage():
             try:
-                target = page.getRedirectTarget()
+                target = page.getRedirectTarget(ignore_section=False)
             except (CircularRedirectError,
                     InvalidTitleError,
                     InterwikiRedirectPageError):
                 pass
-            except RuntimeError as e:
+            except (RuntimeError, SectionError) as e:
                 pywikibot.error(e)
-            else:
-                section = target.section()
-                if section and not does_text_contain_section(target.text,
-                                                             section):
-                    pywikibot.warning(
-                        f'Section #{section} not found on page '
-                        f'{target.title(as_link=True, with_section=False)}'
-                    )
-                    target = None
 
         if target is not None \
            and target.namespace() in [2, 3] and page.namespace() not in [2, 3]:
