@@ -3,7 +3,6 @@
 Structured Discussions was formerly known as Flow. Flow was renamed in
 2017 as the focus was scoped to user-to-user discussions.
 
-.. versionadded:: 3.0.20170403
 .. caution:: Structured Discussions support previously known as Flow is
    no longer tested because the test environment was disabled. Please
    use this module with care.
@@ -37,6 +36,14 @@ from pywikibot.exceptions import (
 )
 from pywikibot.page import BasePage, PageSourceType, User
 from pywikibot.tools import cached, deprecated_args
+
+
+__all__ = (
+    'Board',
+    'FlowPage',
+    'Post',
+    'Topic',
+)
 
 
 class FlowPage(BasePage, abc.ABC):
