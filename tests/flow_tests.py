@@ -12,12 +12,18 @@ from contextlib import suppress
 
 from pywikibot import config
 from pywikibot.exceptions import LockedPageError, NoPageError
-from pywikibot.flow import Board, Post, Topic
 from tests.aspects import TestCase
 from tests.basepage import (
     BasePageLoadRevisionsCachingTestBase,
     BasePageMethodsTestBase,
 )
+from pywikibot.tools import suppress_warnings
+
+
+with suppress_warnings(r'pywikibot\.flow\.(Board|Post|Topic) is deprecated '
+                       r'since release 9\.4\.0\.',
+                       DeprecationWarning):
+    from pywikibot.flow import Board, Post, Topic
 
 
 class TestMediaWikiFlowSandbox(TestCase):
