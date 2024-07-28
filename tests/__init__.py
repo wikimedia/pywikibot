@@ -85,8 +85,6 @@ library_test_modules = {
     'file',
     'fixes',
     'flow',
-    'flow_edit',
-    'flow_thanks',
     'gui',
     'http',
     'i18n',

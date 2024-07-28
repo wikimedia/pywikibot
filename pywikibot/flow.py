@@ -1,4 +1,20 @@
-"""Objects representing Flow entities, like boards, topics, and posts."""
+"""Objects representing Structured Discussions entities.
+
+Structured Discussions was formerly known as Flow. Flow was renamed in
+2017 as the focus was scoped to user-to-user discussions.
+
+.. versionadded:: 3.0.20170403
+.. caution:: Structured Discussions support previously known as Flow is
+   no longer tested because the test environment was disabled. Please
+   use this module with care.
+.. deprecated:: 9.4
+   Structured Discussions extension is not maintained and will be
+   removed. Users are encouraged to stop using it. (:phab:`T371180`)
+.. seealso::
+   - https://www.mediawiki.org/wiki/Structured_Discussions
+   - https://www.mediawiki.org/wiki/Structured_Discussions/Wikis
+   - https://www.mediawiki.org/wiki/Extension:StructuredDiscussions
+"""
 #
 # (C) Pywikibot team, 2015-2024
 #
@@ -339,14 +355,12 @@ class Topic(FlowPage):
         self._reload()
 
 
-# Flow non-page-like objects
 class Post:
 
-    """A post to a Flow discussion topic."""
+    """A post to a Flow discussion topic. This is a non-page-like object."""
 
     def __init__(self, page: Topic, uuid: str) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param page: Flow topic
         :param uuid: UUID of a Flow post
