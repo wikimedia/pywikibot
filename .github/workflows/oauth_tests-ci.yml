@@ -99,7 +99,7 @@ jobs:
     - name: Oauth tests with unittest
       timeout-minutes: 2
       env:
-        PYWIKIBOT_TEST_WRITE: ${{ matrix.domain == 'test.wikipedia.org' && 1 || 0}}
+        PYWIKIBOT_TEST_WRITE: 1
         PYWIKIBOT_TEST_OAUTH: ${{ secrets[format('{0}', steps.token.outputs.uppercase)] }}
         PYWIKIBOT_TEST_MODULES: file,oauth
       run: |
