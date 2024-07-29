@@ -35,3 +35,17 @@ coverage:
       default:
         server: libera.chat
         channel: pywikibot
+
+component_management:
+
+  individual_components:
+    - component_id: Framework
+      paths:
+        - pywikibot/**
+        - *.py
+    - component_id: Tests
+      paths:
+        - tests/**
+    - component_id: Scripts
+      paths:
+        - scripts/**
