@@ -139,8 +139,8 @@ def run_python_file(filename: str, args: list[str], package=None):
     for key, value in environ:  # pragma: no cover
         os.environ[key] = value
 
-    sys.argv = [filename] + args
-    pwb.argvu = [Path(filename).stem] + args
+    sys.argv = [filename, *args]
+    pwb.argvu = [Path(filename).stem, *args]
     sys.path.insert(0, os.path.dirname(filename))
 
     try:
@@ -388,7 +388,7 @@ def find_filename(filename):
         """Search for filename in given paths within 'root' base directory."""
         for file_package in paths:
             package = file_package.split('.')
-            path = package + [filename]
+            path = [*package, filename]
             testpath = root.joinpath(*path)
             if testpath.exists():
                 return str(testpath)

@@ -85,10 +85,7 @@ class BaseUnlinkBot(ExistingPageBot, AutomaticTWSummaryBot):
                     unlink_callback.current_text,
                     jumpIndex=unlink_callback.current_range[0])
                 # if user didn't press Cancel
-                if new_text:
-                    text = new_text
-                else:
-                    text = unlink_callback.current_text
+                text = new_text or unlink_callback.current_text
             else:
                 break
 

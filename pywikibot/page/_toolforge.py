@@ -172,11 +172,7 @@ class WikiBlameMixin:
             raise ValueError(
                 'You cannot specify revid together with date argument')
 
-        if date is None:
-            show = revid or 0
-        else:
-            show = str(date)[:10]
-
+        show = revid or 0 if date is None else str(date)[:10]
         url = '{}.wikipedia.org/{}/{}?uselang={}'.format(
             self.site.code,
             self.title(as_url=True, with_ns=False, with_section=False),

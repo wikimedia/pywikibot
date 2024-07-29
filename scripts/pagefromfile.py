@@ -60,7 +60,7 @@ a parameter -appendtop:foo would add 'foo' between them. A new line
 can be added between them by specifying '\n' as a value.
 """
 #
-# (C) Pywikibot team, 2004-2022
+# (C) Pywikibot team, 2004-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -254,10 +254,7 @@ class PageFromFileReader(OptionHandler, GeneratorWrapper):
     def find_page(self, text) -> tuple[int, str, str]:
         """Find page to work on."""
         location = self.page_regex.search(text)
-        if self.opt.include:
-            contents = location[0]
-        else:
-            contents = location[1]
+        contents = location[0] if self.opt.include else location[1]
 
         title = self.opt.title
         if not title:

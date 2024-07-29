@@ -751,7 +751,7 @@ class CheckImagesBot:
         """Function to load the white templates."""
         # A template as {{en is not a license! Adding also them in the
         # whitelist template...
-        for key in Family.load('wikipedia').langs.keys():
+        for key in Family.load('wikipedia').langs:
             self.hiddentemplates.add(pywikibot.Page(
                 self.site, f'Template:{key}'))
         # Hidden template loading
@@ -1000,11 +1000,10 @@ class CheckImagesBot:
             if not result:
                 return True  # If Errors, exit (but continue the check)
 
-        if older_image_page.title() != self.image_name:
-            # The image is a duplicate, it will be deleted. So skip the
-            # check-part, useless
-            return False
-        return True  # Ok - No problem. Let's continue the checking phase
+        # If different, the image is a duplicate; it will be deleted.
+        # So skip the check-part as useless.
+        # Otherwise ok - No problem. Let's continue the checking phase
+        return older_image_page.title() == self.image_name
 
     def report_image(self, image_to_report, rep_page=None, com=None,
                      rep_text=None, addings: bool = True) -> bool:

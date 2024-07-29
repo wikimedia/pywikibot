@@ -202,7 +202,7 @@ class ScriptTestMeta(MetaTestCaseClass):
                     'For global options use -help:global or run pwb'
                 global_args = ['-pwb_close_matches:1']
 
-                cmd = global_args + [script_name] + args
+                cmd = [*global_args, script_name, *args]
                 data_in = script_input.get(script_name)
                 if isinstance(self._timeout, bool):
                     do_timeout = self._timeout

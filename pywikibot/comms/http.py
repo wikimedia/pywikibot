@@ -508,10 +508,7 @@ def _get_encoding_from_response_headers(
         header = response.content[:100].splitlines()[0]  # bytes
         m = re.search(
             br'encoding=(["\'])(?P<encoding>.+?)\1', header)
-        if m:
-            header_encoding = m['encoding'].decode('utf-8')
-        else:
-            header_encoding = 'utf-8'
+        header_encoding = m['encoding'].decode('utf-8') if m else 'utf-8'
     else:
         header_encoding = None
 

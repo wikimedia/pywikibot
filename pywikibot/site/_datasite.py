@@ -316,8 +316,10 @@ class DataSite(APISite):
         params['action'] = 'wbeditentity'
         if bot:
             params['bot'] = 1
-        if 'baserevid' in kwargs and kwargs['baserevid']:
+
+        if kwargs.get('baserevid'):
             params['baserevid'] = kwargs['baserevid']
+
         params['token'] = self.tokens['csrf']
 
         for arg in kwargs:
@@ -447,10 +449,7 @@ class DataSite(APISite):
                   'summary': summary, 'bot': bot, 'token': self.tokens['csrf']}
 
         # build up the snak
-        if isinstance(source, list):
-            sources = source
-        else:
-            sources = [source]
+        sources = source if isinstance(source, list) else [source]
 
         snak = {}
         for sourceclaim in sources:

@@ -135,12 +135,9 @@ def main(*args: str) -> None:
         elif claim.type == 'string':
             target = target_str
         elif claim.type == 'globe-coordinate':
-            coord_args = [
-                float(c) for c in target_str.split(',')]
-            if len(coord_args) >= 3:
-                precision = coord_args[2]
-            else:
-                precision = 0.0001  # Default value (~10 m at equator)
+            coord_args = [float(c) for c in target_str.split(',')]
+            # Default value 0.0001 ~10 m at equator
+            precision = coord_args[2] if len(coord_args) >= 3 else 0.0001
             target = pywikibot.Coordinate(
                 coord_args[0], coord_args[1], precision=precision)
         else:

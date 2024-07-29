@@ -138,8 +138,8 @@ class Namespace(Iterable, ComparableMixin, metaclass=MetaNamespace):
 
     def _distinct(self):
         if self.custom_name == self.canonical_name:
-            return [self.canonical_name] + self.aliases
-        return [self.custom_name, self.canonical_name] + self.aliases
+            return [self.canonical_name, *self.aliases]
+        return [self.custom_name, self.canonical_name, *self.aliases]
 
     def _contains_lowercase_name(self, name):
         """Determine a lowercase normalised name is a name of this namespace.
@@ -442,8 +442,7 @@ class NamespacesDict(Mapping):
         result = [NotImplemented if isinstance(ns, bool)
                   else self._lookup_name(ns)
                   if isinstance(ns, str) and not ns.lstrip('-').isdigit()
-                  else namespaces[int(ns)] if int(ns) in namespaces
-                  else None
+                  else namespaces.get(int(ns))
                   for ns in identifiers]
 
         if NotImplemented in result:

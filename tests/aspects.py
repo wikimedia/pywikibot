@@ -865,7 +865,7 @@ class MetaTestCaseClass(type):
     def add_base(bases, subclass):
         """Return a tuple of bases with the subclasses added if not already."""
         if not any(issubclass(base, subclass) for base in bases):
-            bases = (subclass, ) + bases
+            bases = (subclass, *bases)
         return bases
 
     @staticmethod

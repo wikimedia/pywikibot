@@ -132,7 +132,7 @@ class XmlDump:
         self,
         filename,
         *,
-        allrevisions: bool | str = None,
+        allrevisions: bool | str | None = None,
         # when allrevisions removed, revisions can default to 'latest'
         revisions: str = 'first_found',
         on_error: Callable[[ParseError], None] | None = None,
@@ -251,10 +251,7 @@ class XmlDump:
         uri = self.uri
         headers = self._headers(elem)
         for revision in elem.findall(f'{uri}revision'):
-            if with_id:
-                revid = int(revision.findtext(f'{uri}id'))
-            else:
-                revid = 0
+            revid = int(revision.findtext(f'{uri}id')) if with_id else 0
             yield RawRev(headers, revision, revid)
 
     @staticmethod

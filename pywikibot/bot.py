@@ -2189,10 +2189,7 @@ class WikidataBot(Bot, ExistingPageBot):
         """
         # This code is somewhat duplicate to user_add_claim but
         # unfortunately we need the source claim here, too.
-        if source:
-            sourceclaim = self.getSource(source)
-        else:
-            sourceclaim = None
+        sourceclaim = self.getSource(source) if source else None
 
         # Existing claims on page of same property
         claims = item.get().get('claims')

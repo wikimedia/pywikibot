@@ -53,7 +53,7 @@ colors = [
     'white',
 ]
 
-_color_pat = '((:?{0});?(:?{0})?)'.format('|'.join(colors + ['previous']))
+_color_pat = '((:?{0});?(:?{0})?)'.format('|'.join([*colors, 'previous']))
 old_colorTagR = re.compile(f'\03{{{_color_pat}}}')
 new_colorTagR = re.compile(f'<<{_color_pat}>>')
 
@@ -465,10 +465,8 @@ class UI(ABUIC):
         if force and not default:
             raise ValueError('With no default option it cannot be forced')
 
-        if isinstance(options, Option):
-            options = [options]
-        else:  # make a copy
-            options = list(options)
+        # make a copy
+        options = [options] if isinstance(options, Option) else list(options)
 
         if not options:
             raise ValueError('No options are given.')

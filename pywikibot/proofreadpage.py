@@ -160,7 +160,7 @@ class TagAttr:
 
     def __repr__(self):
         attr = 'from' if self.attr == 'ffrom' else self.attr
-        return f"{self.__class__.__name__}('{attr}', {repr(self._orig_value)})"
+        return f"{type(self).__name__}('{attr}', {self._orig_value!r})"
 
 
 class TagAttrDesc:
@@ -530,7 +530,7 @@ class ProofreadPage(pywikibot.Page):
         index_page, others = self._index
         if others:
             pywikibot.warning(f'{self} linked to several Index pages.')
-            pywikibot.info(f"{' ' * 9}{[index_page] + others!s}")
+            pywikibot.info(f"{' ' * 9}{[index_page, *others]!s}")
 
             if index_page:
                 pywikibot.info(
@@ -1122,11 +1122,8 @@ class IndexPage(pywikibot.Page):
 
         # Discard all inner templates as only top-level ones matter
         templates = textlib.extract_templates_and_params_regex_simple(text)
-        if len(templates) != 1 or templates[0][0] != self.INDEX_TEMPLATE:
-            # Only a single call to the INDEX_TEMPLATE is allowed
-            return False
-
-        return True
+        # Only a single call to the INDEX_TEMPLATE is allowed
+        return len(templates) == 1 and templates[0][0] == self.INDEX_TEMPLATE
 
     def purge(self) -> None:  # type: ignore[override]
         """Overwrite purge method.

@@ -641,7 +641,7 @@ def merge_unique_dicts(*args, **kwargs):
 
     .. versionadded:: 3.0
     """
-    args = list(args) + [dict(kwargs)]
+    args = [*list(args), dict(kwargs)]
     conflicts = set()
     result = {}
     for arg in args:

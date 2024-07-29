@@ -834,10 +834,7 @@ class CosmeticChangesToolkit:
             for template in deprecatedTemplates[
                     self.site.family.name][self.site.code]:
                 old, new = template
-                if new is None:
-                    new = ''
-                else:
-                    new = '{{%s}}' % new
+                new = '{{%s}}' % new if new else ''
 
                 text = textlib.replaceExcept(
                     text,

@@ -860,7 +860,7 @@ class DataExtendBot(SingleSiteBot):
             aliases = item.aliases
 
             # This can happen after reloading
-            if prop not in claims.keys():
+            if prop not in claims:
                 continue
 
             if self.opt.restrict:
@@ -1127,7 +1127,7 @@ class DataExtendBot(SingleSiteBot):
             claims['Data'] = [Quasiclaim(item.title())]
 
         editdescriptions = {}
-        for language in newdescriptions.keys():
+        for language in newdescriptions:
             newdescription = self.definedescription(
                 language, descriptions.get(language),
                 newdescriptions.get(language))
@@ -1150,7 +1150,7 @@ class DataExtendBot(SingleSiteBot):
 
     @staticmethod
     def definedescription(language, existingdescription, suggestions):
-        possibilities = [existingdescription] + list(suggestions)
+        possibilities = [existingdescription, *list(suggestions)]
 
         pywikibot.info(f'\nSelect a description for language {language}:')
         pywikibot.info('Default is to keep the old value (0)')
@@ -1184,13 +1184,13 @@ class DataExtendBot(SingleSiteBot):
 
         if anythingfound:
             pywikibot.info('\nNew names found:')
-            for language in realnewnames.keys():
+            for language in realnewnames:
                 for name in realnewnames[language]:
                     pywikibot.info(f'{language}: {name}')
             result = pywikibot.input('Add these names? (y/n/[S]elect/x) ')
             if not result or result[0].upper() not in 'YNX':
                 chosennewnames = defaultdict(list)
-                for language in realnewnames.keys():
+                for language in realnewnames:
                     for name in realnewnames[language]:
                         result = pywikibot.input(f'{language}: {name} - ')
                         if (not result) or result[0].upper() == 'Y':
@@ -1200,7 +1200,7 @@ class DataExtendBot(SingleSiteBot):
                 realnewnames = chosennewnames
                 result = 'Y'
             if result[0].upper() == 'X':
-                for language in realnewnames.keys():
+                for language in realnewnames:
                     for name in realnewnames[language]:
                         self.noname.add(name)
             elif result[0].upper() != 'N':
@@ -2228,7 +2228,7 @@ class Analyzer:
         if not m:
             return None
         if dtype:
-            alt = [dtype] + alt
+            alt = [dtype, *alt]
         for alttype in alt:
             if self.getdata(alttype, m[1], ask=False) \
                and self.getdata(alttype, m[1], ask=False) != 'XXX':
@@ -2248,7 +2248,7 @@ class Analyzer:
         if not alt:
             alt = []
         if dtype:
-            alt = [dtype] + alt
+            alt = [dtype, *alt]
         matches = re.findall(regex, html)
         result = set()
         for match in matches:
@@ -7541,10 +7541,7 @@ class DelargeAnalyzer(Analyzer):
     def findlongtext(self, html: str):
         result = self.findbyre(
             r'(?s)Présentation[^<>]*</span>\s*<span[^<>]*>(.*?)</span>', html)
-        if result:
-            result = [result]
-        else:
-            result = []
+        result = [result] if result else []
         result += self.findallbyre(r'<p align="justify">(.*?)</p>', html)
         return '\n'.join(result)
 
@@ -11325,10 +11322,7 @@ class ItauAnalyzer(Analyzer):
 
     def findnames(self, html) -> list[str]:
         section = self.findbyre(r'(?s)Outros nomes.*?<ul>(.*?)</ul>', html)
-        if section:
-            result = self.findallbyre(r'(?s)>(.*?)<', section)
-        else:
-            result = []
+        result = self.findallbyre(r'(?s)>(.*?)<', section) if section else []
         return (result + self.findallbyre(r'title" content="(.*?)[\|"]', html)
                 + self.findallbyre(r'(?s)<title>(.*?)[\|"]', html))
 

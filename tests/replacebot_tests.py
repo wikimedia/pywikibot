@@ -95,7 +95,7 @@ class TestReplacementsMain(TWNBotTestCase):
             -page to not have an empty generator
             -site as it will use Site() otherwise
         """
-        return replace.main(*(args + ('-site:wikipedia:test', '-page:TEST')))
+        return replace.main(*args, '-site:wikipedia:test', '-page:TEST')
 
     def test_invalid_replacements(self):
         """Test invalid command line replacement configurations."""

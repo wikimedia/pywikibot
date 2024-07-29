@@ -382,7 +382,7 @@ class Family:
                 FamilyMaintenanceWarning,
                 stacklevel=2,
             )
-        for code in cls.langs.keys():
+        for code in cls.langs:
             if not all(x in CODE_CHARACTERS for x in code):
                 warnings.warn(
                     'Family {} code {} must be ASCII lowercase letters and '

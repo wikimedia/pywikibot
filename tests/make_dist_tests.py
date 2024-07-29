@@ -38,12 +38,12 @@ class TestMakeDist(TestCase):
     def test_main(self):
         """Test main result."""
         saved_argv = sys.argv
-        sys.argv = saved_argv + ['-clear']
+        sys.argv = [*saved_argv, '-clear']
         self.assertTrue(make_dist.main())
 
         # no build or twine modules
         self.assertFalse(make_dist.main())
-        sys.argv = saved_argv + ['-local']
+        sys.argv = [*saved_argv, '-local']
         self.assertFalse(make_dist.main())
         sys.argv = saved_argv
 

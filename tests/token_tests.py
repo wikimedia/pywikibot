@@ -35,7 +35,7 @@ class TestSiteTokens(DeprecationTestCase, DefaultSiteTestCase):
     def test_tokens(self):
         """Test tokens."""
         redirected_tokens = ['edit', 'move', 'delete']
-        for ttype in redirected_tokens + ['patrol', 'deleteglobalaccount']:
+        for ttype in [*redirected_tokens, 'patrol', 'deleteglobalaccount']:
             self.assertIsInstance(self.site.tokens[ttype], str)
             self.assertIn(ttype, self.site.tokens)  # test __contains__
             if ttype in redirected_tokens:

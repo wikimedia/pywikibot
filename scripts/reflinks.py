@@ -436,7 +436,7 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
         # Check
         manual = 'mw:Manual:Pywikibot/refLinks'
         code = None
-        for alt in [self.site.code] + i18n._altlang(self.site.code):
+        for alt in [self.site.code, *i18n._altlang(self.site.code)]:
             if alt in localized_msg:
                 code = alt
                 break
@@ -449,10 +449,7 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
             self.msg = i18n.twtranslate(self.site, 'reflinks-msg', locals())
 
         local = i18n.translate(self.site, badtitles)
-        if local:
-            bad = f'({globalbadtitles}|{local})'
-        else:
-            bad = globalbadtitles
+        bad = f'({globalbadtitles}|{local})' if local else globalbadtitles
 
         self.titleBlackList = re.compile(bad, re.I | re.S | re.X)
         self.norefbot = noreferences.NoReferencesBot(verbose=False)

@@ -233,7 +233,7 @@ class LiveBotTestCase(TestBotTreatExit, DefaultSiteTestCase):
     def _missing_generator(self):
         """Yield pages and the last one does not exist."""
         self._count = 0  # skip_page skips one page
-        self._current_page = list(self.site.allpages(total=1))[0]
+        self._current_page = next(self.site.allpages(total=1))
         yield self._current_page
         while self._current_page.exists():
             self._count += 1
