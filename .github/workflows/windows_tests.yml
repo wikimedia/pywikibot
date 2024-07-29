@@ -78,6 +78,8 @@ jobs:
       id: ci_test
       continue-on-error: true
       timeout-minutes: 90
+      env:
+        PYTHONIOENCODING: utf-8
       run: |
         python pwb.py version
         coverage run -m unittest discover -vv -p \"*_tests.py\";
