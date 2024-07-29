@@ -13,6 +13,7 @@ import pywikibot
 from pywikibot.exceptions import Error
 from tests.aspects import DefaultSiteTestCase, TestCase, unittest
 
+
 WARN_SELF_CALL = (r'Referencing this attribute like a function '
                   r'is deprecated .+; use it directly instead')
 

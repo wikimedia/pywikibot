@@ -17,6 +17,7 @@ import pywikibot
 from pywikibot import textlib
 from pywikibot.tools import deprecated, deprecated_args
 
+
 try:
     import wikitextparser
 except ImportError as e:
@@ -24,6 +25,7 @@ except ImportError as e:
 
 if TYPE_CHECKING:
     import datetime
+
     from pywikibot import Timestamp
     DATETYPE = str | Timestamp | datetime.datetime | datetime.date | None
 

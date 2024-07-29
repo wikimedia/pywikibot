@@ -169,6 +169,7 @@ from pywikibot.exceptions import (
     VersionParseError,
     WikiBaseError,
 )
+
 # the constants are
 from pywikibot.logging import (  # noqa: F401
     CRITICAL,

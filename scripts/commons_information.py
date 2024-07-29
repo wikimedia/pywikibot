@@ -73,6 +73,7 @@ import pywikibot
 from pywikibot import config, i18n, pagegenerators
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 
+
 # This is required for the text that is shown when you run this script
 # with the parameter -help or without parameters.
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816

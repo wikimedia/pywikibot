@@ -38,9 +38,9 @@ from pywikibot.site import Namespace, NamespaceArgType
 from pywikibot.tools import (
     ComparableMixin,
     cached,
+    deprecate_positionals,
     deprecated,
     deprecated_args,
-    deprecate_positionals,
     first_upper,
     issue_deprecation_warning,
     remove_last_args,

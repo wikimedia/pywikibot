@@ -18,6 +18,7 @@ from pywikibot.exceptions import NoUsernameError
 from tests.aspects import TestCase, WikidataTestCase
 from tests.utils import skipping
 
+
 # See: https://www.w3.org/TR/2013/REC-sparql11-results-json-20130321/
 
 SQL_RESPONSE_CONTAINER = """

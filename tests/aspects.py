@@ -56,6 +56,7 @@ from tests.utils import (
     skipping,
 )
 
+
 OSWIN32 = (sys.platform == 'win32')
 pywikibot.bot.set_interface('buffer')
 

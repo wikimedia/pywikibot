@@ -17,6 +17,7 @@ from tests import join_data_path
 from tests.bot_tests import TWNBotTestCase
 from tests.utils import empty_sites
 
+
 # Load only the custom fixes
 fixes.fixes.clear()
 fixes._load_file(join_data_path('fixes.py'))

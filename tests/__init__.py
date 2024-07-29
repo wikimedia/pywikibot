@@ -6,6 +6,7 @@
 #
 from __future__ import annotations
 
+
 __all__ = (
     'create_path_func', 'join_cache_path', 'join_data_path',
     'join_html_data_path', 'join_images_path', 'join_pages_path',
@@ -32,6 +33,7 @@ from pywikibot import config
 from pywikibot.backports import removesuffix
 from pywikibot.data.api import CachedRequest
 from pywikibot.data.api import Request as _original_Request
+
 
 _root_dir = os.path.split(os.path.split(__file__)[0])[0]
 
