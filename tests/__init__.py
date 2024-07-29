@@ -183,11 +183,11 @@ def _unknown_test_modules():
 extra_test_modules = _unknown_test_modules()
 
 if 'PYWIKIBOT_TEST_MODULES' in os.environ:
-    _enabled_test_modules = os.environ['PYWIKIBOT_TEST_MODULES'].split(',')
-    disabled_test_modules = (library_test_modules
-                             | extra_test_modules
-                             | script_test_modules
-                             - set(_enabled_test_modules))
+    enabled_test_modules = os.environ['PYWIKIBOT_TEST_MODULES'].split(',')
+else:
+    enabled_test_modules = chain(library_test_modules,
+                                 extra_test_modules,
+                                 script_test_modules)
 
 
 def unittest_print(*args, **kwargs):
@@ -218,9 +218,7 @@ def collector(loader=unittest.loader.defaultTestLoader):
                        f'  {disabled_tests!r}')
 
     modules = (module
-               for module in chain(library_test_modules,
-                                   extra_test_modules,
-                                   script_test_modules)
+               for module in enabled_test_modules
                if module not in disabled_test_modules)
 
     test_list = []
