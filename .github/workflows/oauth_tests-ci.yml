@@ -100,7 +100,7 @@ jobs:
       env:
         PYWIKIBOT_TEST_WRITE: ${{ matrix.domain == 'test.wikipedia.org' && 1 || 0}}
         PYWIKIBOT_TEST_OAUTH: ${{ secrets[format('{0}', steps.token.outputs.uppercase)] }}
-        PYWIKIBOT_TEST_MODULES=file,oauth
+        PYWIKIBOT_TEST_MODULES: file,oauth
       run: |
         python pwb.py version
         coverage run -m unittest -vv
