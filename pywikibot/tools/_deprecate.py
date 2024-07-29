@@ -494,7 +494,7 @@ def deprecate_positionals(since: str = ''):
                 replace_args = list(zip(arg_keys[positionals:],
                                         args[positionals:]))
                 pos_args = "', '".join(name for name, arg in replace_args)
-                keyw_args = ', '.join('{}={!r}'.format(name, arg)
+                keyw_args = ', '.join(f'{name}={arg!r}'
                                       for name, arg in replace_args)
                 issue_deprecation_warning(
                     f"Passing '{pos_args}' as positional "

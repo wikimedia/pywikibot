@@ -1307,7 +1307,7 @@ class ItemPage(WikibasePage):
     @deprecated_args(botflag='bot')  # since 9.3.0
     def set_redirect_target(
         self,
-        target_page: 'ItemPage' | str,
+        target_page: ItemPage | str,
         create: bool = False,
         force: bool = False,
         keep_section: bool = False,

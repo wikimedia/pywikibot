@@ -199,8 +199,7 @@ class RedirectGenerator(OptionHandler):
                         space_to_underscore(target_link))
         return redict, pageTitles
 
-    def get_redirect_pages_via_api(self) -> Generator[pywikibot.Page, None,
-                                                      None]:
+    def get_redirect_pages_via_api(self) -> Generator[pywikibot.Page]:
         """Yield Pages that are redirects."""
         for ns in self.opt.namespaces:
             gen = self.site.allpages(start=self.opt.start,
@@ -215,8 +214,7 @@ class RedirectGenerator(OptionHandler):
                     return
                 yield p
 
-    def _next_redirect_group(self) -> Generator[list[pywikibot.Page], None,
-                                                None]:
+    def _next_redirect_group(self) -> Generator[list[pywikibot.Page]]:
         """Generator that yields batches of redirects as a list."""
         chunk = []
         for page in self.get_redirect_pages_via_api():
@@ -231,7 +229,7 @@ class RedirectGenerator(OptionHandler):
     def get_redirects_via_api(
         self,
         maxlen: int = 8
-    ) -> Generator[tuple[str, int | None, str, str | None], None, None]:
+    ) -> Generator[tuple[str, int | None, str, str | None]]:
         r"""
         Return a generator that yields tuples of data about redirect Pages.
 
@@ -295,7 +293,7 @@ class RedirectGenerator(OptionHandler):
                     yield redirect, result, target, final
 
     def retrieve_broken_redirects(self) -> Generator[
-            str | pywikibot.Page, None, None]:
+            str | pywikibot.Page]:
         """Retrieve broken redirects."""
         if self.opt.fullscan:
             count = 0
@@ -319,7 +317,7 @@ class RedirectGenerator(OptionHandler):
             yield from self.site.preloadpages(self.site.broken_redirects())
 
     def retrieve_double_redirects(self) -> Generator[
-            str | pywikibot.Page, None, None]:
+            str | pywikibot.Page]:
         """Retrieve double redirects."""
         if self.opt.moves:
             yield from self.get_moved_pages_redirects()
@@ -344,8 +342,7 @@ class RedirectGenerator(OptionHandler):
             pywikibot.info('Retrieving double redirect special page...')
             yield from self.site.preloadpages(self.site.double_redirects())
 
-    def get_moved_pages_redirects(self) -> Generator[pywikibot.Page, None,
-                                                     None]:
+    def get_moved_pages_redirects(self) -> Generator[pywikibot.Page]:
         """Generate redirects to recently-moved pages."""
         # this will run forever, until user interrupts it
         if self.opt.offset <= 0:

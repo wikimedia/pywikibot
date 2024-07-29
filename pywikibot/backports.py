@@ -134,14 +134,14 @@ if PYTHON_VERSION < (3, 10) or SPHINX_RUNNING:
         next(b, None)
         return zip(a, b)
 else:
-    from types import NoneType
     from itertools import pairwise  # type: ignore[no-redef]
+    from types import NoneType
 
 
 # gh-98363
 if PYTHON_VERSION < (3, 13) or SPHINX_RUNNING:
     def batched(iterable, n: int, *,
-                strict: bool = False) -> Generator[tuple, None, None]:
+                strict: bool = False) -> Generator[tuple]:
         """Batch data from the *iterable* into tuples of length *n*.
 
         .. note:: The last batch may be shorter than *n* if *strict* is

@@ -58,7 +58,7 @@ class MisspellingRobot(BaseDisambigBot):
     update_options = {'start': None}
 
     @property
-    def generator(self) -> Generator[pywikibot.Page, None, None]:
+    def generator(self) -> Generator[pywikibot.Page]:
         """Generator to retrieve misspelling pages or misspelling redirects."""
         templates = self.misspelling_templates.get(self.site.sitename)
         categories = [cat for cat in (self.site.page_from_repository(item)
