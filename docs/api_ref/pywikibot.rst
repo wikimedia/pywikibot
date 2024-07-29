@@ -47,7 +47,7 @@
    .. admonition:: Imports from :mod:`page` module
       :class: tip
 
-      The following classes and function are inported from :mod:`page` module 
+      The following classes and function are inported from :mod:`page` module
       but can also be used as :mod:`pywikibot` members:
 
       - :class:`pywikibot.Category<page.Category>`
