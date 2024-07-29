@@ -739,8 +739,11 @@ class CheckImagesBot:
                 except NotEmailableError:
                     pywikibot.info('User is not mailable, aborted')
 
-    def regex_generator(self, regexp, textrun) -> Generator[pywikibot.FilePage,
-                                                            None, None]:
+    def regex_generator(
+        self,
+        regexp,
+        textrun,
+    ) -> Generator[pywikibot.FilePage]:
         """Find page to yield using regex to parse text."""
         regex = re.compile(fr'{regexp}', re.DOTALL)
         results = regex.findall(textrun)
@@ -1312,8 +1315,7 @@ class CheckImagesBot:
         return False
 
     @staticmethod
-    def wait(generator, wait_time) -> Generator[pywikibot.FilePage, None,
-                                                None]:
+    def wait(generator, wait_time) -> Generator[pywikibot.FilePage]:
         """
         Skip the images uploaded before x seconds.
 
