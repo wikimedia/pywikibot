@@ -553,7 +553,6 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
         raw_text = textlib.removeDisabledParts(new_text)
         # for each link to change
         for match in linksInRef.finditer(raw_text):
-
             link = match['url']
             if 'jstor.org' in link:
                 # TODO: Clean URL blacklist
@@ -647,10 +646,12 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
 
             if meta_content:
                 tag = None
-                encodings = [encoding] if encoding else []
-                encodings += list(page.site.encodings())
+                # use a dict to keep the order
+                encodings = {encoding: None} if encoding else {}
+                encodings.update(dict.fromkeys(page.site.encodings()))
+
                 for enc in encodings:
-                    with suppress(UnicodeDecodeError):
+                    with suppress(UnicodeDecodeError, LookupError):
                         tag = meta_content.group().decode(enc)
                         break
 
