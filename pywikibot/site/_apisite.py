@@ -325,16 +325,14 @@ class APISite(
         """
         if not hasattr(self, '_userinfo'):
             return False
+
         if 'anon' in self.userinfo or not self.userinfo.get('id'):
             return False
 
         if not self.userinfo.get('name'):
             return False
 
-        if self.userinfo['name'] != self.username():
-            return False
-
-        return True
+        return self.userinfo['name'] == self.username()
 
     def is_oauth_token_available(self) -> bool:
         """Check whether OAuth token is set for this site."""
@@ -473,7 +471,7 @@ class APISite(
             pywikibot.warning('Using OAuth suppresses logout function')
 
         # check if already logged out to avoid requiring logging in
-        if not self._loginstatus == login.LoginStatus.NOT_LOGGED_IN:
+        if self._loginstatus != login.LoginStatus.NOT_LOGGED_IN:
             req_params = {'action': 'logout', 'token': self.tokens['csrf']}
             uirequest = self.simple_request(**req_params)
             uirequest.submit()
@@ -1638,7 +1636,7 @@ class APISite(
             item['from']: {
                 'title': item['to'],
                 'section': '#' + item['tofragment']
-                if 'tofragment' in item and item['tofragment'] else ''
+                if item.get('tofragment') else ''
             }
             for item in result['query']['redirects']
         }
@@ -1775,7 +1773,7 @@ class APISite(
         data = data.get('query', data)
 
         user_tokens = {}
-        if 'tokens' in data and data['tokens']:
+        if data.get('tokens'):
             user_tokens = {removesuffix(key, 'token'): val
                            for key, val in data['tokens'].items()
                            if val != '+\\'}

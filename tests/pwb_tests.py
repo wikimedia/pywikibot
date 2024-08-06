@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test pwb.py."""
 #
-# (C) Pywikibot team, 2007-2023
+# (C) Pywikibot team, 2007-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -14,6 +14,7 @@ import unittest
 from tests import create_path_func, join_tests_path
 from tests.aspects import PwbTestCase
 from tests.utils import execute, execute_pwb
+
 
 join_pwb_tests_path = create_path_func(join_tests_path, 'pwb')
 
@@ -82,13 +83,13 @@ class TestPwb(PwbTestCase):
         script_name = 'print_argv'
         script_path = join_pwb_tests_path(script_name + '.py')
         script_opts = ['-help']
-        command = [script_path] + script_opts
+        command = [script_path, *script_opts]
         without_global_args = execute_pwb(command)
-        with_no_global_args = execute_pwb(['-maxlag:5'] + command)
+        with_no_global_args = execute_pwb(['-maxlag:5', *command])
         self.assertEqual(without_global_args['stdout'],
                          with_no_global_args['stdout'])
         self.assertEqual(without_global_args['stdout'].rstrip(),
-                         str([script_name] + script_opts))
+                         str([script_name, *script_opts]))
 
     def test_script_found(self):
         """Test pwb.py script call which is found."""

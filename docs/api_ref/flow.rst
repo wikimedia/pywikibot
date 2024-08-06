@@ -1,6 +1,6 @@
-*****************************
-:mod:`flow` --- Flow Entities
-*****************************
+***********************************************
+:mod:`flow` --- Structured Discussions Entities
+***********************************************
 
 .. automodule:: flow
-   :synopsis: Objects representing Flow entities, like boards, topics, and posts
+   :synopsis: Objects representing Structured Discussions entities, like boards, topics, and posts

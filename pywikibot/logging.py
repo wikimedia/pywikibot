@@ -30,6 +30,7 @@ argument, which is a string indicating the debugging layer.
 #
 from __future__ import annotations
 
+
 __all__ = (
     'CRITICAL', 'DEBUG', 'ERROR', 'INFO', 'WARNING', 'STDOUT', 'VERBOSE',
     'INPUT',

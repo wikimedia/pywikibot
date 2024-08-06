@@ -26,6 +26,7 @@ from pywikibot.site import Namespace
 from pywikibot.tools.collections import EMPTY_DEFAULT
 from tests import _pwb_py
 
+
 OSWIN32 = (sys.platform == 'win32')
 
 

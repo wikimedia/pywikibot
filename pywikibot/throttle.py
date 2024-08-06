@@ -1,6 +1,6 @@
 """Mechanics to slow down wiki read and/or write rate."""
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -222,12 +222,8 @@ class Throttle:
 
         This value is the maximum wait between reads/writes, not taking
         into account of how much time has elapsed since the last access.
-
         """
-        if write:
-            thisdelay = self.writedelay
-        else:
-            thisdelay = self.delay
+        thisdelay = self.writedelay if write else self.delay
 
         # We're checking for multiple processes
         if time.time() > self.checktime + self.checkdelay:

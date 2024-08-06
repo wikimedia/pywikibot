@@ -116,10 +116,7 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, AutomaticTWSummaryBot):
             if not link_text:
                 # or like this: [[page_title]]trailing_chars
                 link_text = page_title
-            if m['section'] is None:
-                section = ''
-            else:
-                section = m['section']
+            section = m['section'] or ''
             if section and target_page.section():
                 pywikibot.warning(f'Source section {section} and target '
                                   f'section {target_page} found. Skipping.')

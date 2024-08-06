@@ -426,10 +426,10 @@ class Request(MutableMapping, WaitingMixin):
             typep = self._params.get('type', [])
             if not ('tokens' in meta and 'login' in typep):
                 if 'userinfo' not in meta:
-                    meta = set(meta + ['userinfo'])
+                    meta = {*meta, 'userinfo'}
                     self['meta'] = sorted(meta)
                 uiprop = self._params.get('uiprop', [])
-                uiprop = set(uiprop + ['blockinfo', 'hasmsg'])
+                uiprop = {*uiprop, 'blockinfo', 'hasmsg'}
                 self['uiprop'] = sorted(uiprop)
             if 'prop' in self._params \
                and self.site.has_extension('ProofreadPage'):

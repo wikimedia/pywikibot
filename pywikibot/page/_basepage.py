@@ -38,9 +38,9 @@ from pywikibot.site import Namespace, NamespaceArgType
 from pywikibot.tools import (
     ComparableMixin,
     cached,
+    deprecate_positionals,
     deprecated,
     deprecated_args,
-    deprecate_positionals,
     first_upper,
     issue_deprecation_warning,
     remove_last_args,
@@ -1568,10 +1568,7 @@ class BasePage(ComparableMixin):
         """
         # This function does not exist in the API, so it has to be
         # implemented by screen-scraping
-        if expand:
-            text = self.expand_text()
-        else:
-            text = self.text
+        text = self.expand_text() if expand else self.text
         for linkmatch in pywikibot.link_regex.finditer(
                 textlib.removeDisabledParts(text)):
             linktitle = linkmatch['title']
@@ -2160,7 +2157,7 @@ class BasePage(ComparableMixin):
         """
         if hasattr(self, '_deletedRevs'):
             undelete_revs = [ts for ts, rev in self._deletedRevs.items()
-                             if 'marked' in rev and rev['marked']]
+                             if rev.get('marked')]
         else:
             undelete_revs = []
         if reason is None:

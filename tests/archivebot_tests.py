@@ -17,6 +17,7 @@ from pywikibot.textlib import TimeStripper
 from scripts import archivebot
 from tests.aspects import TestCase
 
+
 THREADS = {
     'als': 4, 'ar': 1, 'bar': 0, 'bg': 0, 'bjn': 1, 'bs': 0, 'ca': 5, 'ckb': 2,
     'cs': 0, 'de': 1, 'en': 25, 'eo': 2, 'es': 13, 'fa': 2, 'fr': 25, 'frr': 2,

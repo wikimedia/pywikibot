@@ -160,7 +160,7 @@ class TagAttr:
 
     def __repr__(self):
         attr = 'from' if self.attr == 'ffrom' else self.attr
-        return f"{self.__class__.__name__}('{attr}', {repr(self._orig_value)})"
+        return f"{type(self).__name__}('{attr}', {self._orig_value!r})"
 
 
 class TagAttrDesc:
@@ -319,7 +319,7 @@ class PagesTagParser(collections.abc.Container):
         return f"{self.__class__.__name__}('{self}')"
 
 
-def decompose(fn: Callable) -> Callable:  # type: ignore
+def decompose(fn: Callable) -> Callable:
     """Decorator for ProofreadPage.
 
     Decompose text if needed and recompose text.
@@ -335,7 +335,7 @@ def decompose(fn: Callable) -> Callable:  # type: ignore
     return wrapper
 
 
-def check_if_cached(fn: Callable) -> Callable:  # type: ignore
+def check_if_cached(fn: Callable) -> Callable:
     """Decorator for IndexPage to ensure data is cached."""
 
     def wrapper(self: IndexPage, *args: Any, **kwargs: Any) -> Any:
@@ -530,7 +530,7 @@ class ProofreadPage(pywikibot.Page):
         index_page, others = self._index
         if others:
             pywikibot.warning(f'{self} linked to several Index pages.')
-            pywikibot.info(f"{' ' * 9}{[index_page] + others!s}")
+            pywikibot.info(f"{' ' * 9}{[index_page, *others]!s}")
 
             if index_page:
                 pywikibot.info(
@@ -818,7 +818,7 @@ class ProofreadPage(pywikibot.Page):
             pywikibot.error(f'Error fetching HTML for {self}.')
             raise
 
-        soup = _bs4_soup(response.text)  # type: ignore
+        soup = _bs4_soup(response.text)
 
         try:
             url_image = soup.find(class_='prp-page-image')
@@ -1122,11 +1122,8 @@ class IndexPage(pywikibot.Page):
 
         # Discard all inner templates as only top-level ones matter
         templates = textlib.extract_templates_and_params_regex_simple(text)
-        if len(templates) != 1 or templates[0][0] != self.INDEX_TEMPLATE:
-            # Only a single call to the INDEX_TEMPLATE is allowed
-            return False
-
-        return True
+        # Only a single call to the INDEX_TEMPLATE is allowed
+        return len(templates) == 1 and templates[0][0] == self.INDEX_TEMPLATE
 
     def purge(self) -> None:  # type: ignore[override]
         """Overwrite purge method.
@@ -1152,7 +1149,7 @@ class IndexPage(pywikibot.Page):
         self._pages_from_label: dict[str, set[pywikibot.Page]] = {}
         self._labels_from_page_number: dict[int, str] = {}
         self._labels_from_page: dict[pywikibot.page.Page, str] = {}
-        self._soup = _bs4_soup(self.get_parsed_page(True))  # type: ignore
+        self._soup = _bs4_soup(self.get_parsed_page(True))
         # Do not search for "new" here, to avoid to skip purging if links
         # to non-existing pages are present.
         attrs = {'class': re.compile('prp-pagequality-[0-4]')}
@@ -1178,7 +1175,7 @@ class IndexPage(pywikibot.Page):
                  }
         if not found:
             self.purge()
-            self._soup = _bs4_soup(self.get_parsed_page(True))  # type: ignore
+            self._soup = _bs4_soup(self.get_parsed_page(True))
             if not self._soup.find_all('a', attrs=attrs):
                 raise ValueError(
                     'Missing class="qualityN prp-pagequality-N" or '

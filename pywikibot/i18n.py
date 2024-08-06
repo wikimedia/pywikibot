@@ -613,7 +613,7 @@ def translate(code: str | pywikibot.site.BaseSite,
     else:
         codes = [code]
         if fallback is True:
-            codes += _altlang(code) + ['_default', 'en']
+            codes += [*_altlang(code), '_default', 'en']
         elif fallback is not False:
             assert not isinstance(fallback, bool)
             codes.extend(fallback)
@@ -793,7 +793,7 @@ def twtranslate(
     # modes are caught with the KeyError.
     langs = [lang]
     if fallback:
-        langs += _altlang(lang) + ['en']
+        langs += [*_altlang(lang), 'en']
     for alt in langs:
         trans = _get_translation(alt, twtitle)
         if trans:

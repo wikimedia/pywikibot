@@ -413,7 +413,7 @@ def escapePattern2(
             newpattern += f'([{dec[0]}]{{{subpattern[1]}}})'
             # add the number of required digits as the last (4th)
             # part of the tuple
-            decoders.append(dec + (int(s[1]),))
+            decoders.append((*dec, int(s[1])))
         else:
             newpattern += f'([{dec[0]}]+)'
             decoders.append(dec)

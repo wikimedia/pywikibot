@@ -38,6 +38,7 @@ from tests.aspects import (
 )
 from tests.utils import skipping
 
+
 EMPTY_TITLE_RE = r'Title must be specified and not empty if source is a Site\.'
 INVALID_TITLE_RE = r'The link \[\[.*\]\] does not contain a page title'
 NO_PAGE_RE = r"doesn't exist\."

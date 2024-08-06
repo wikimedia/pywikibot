@@ -413,7 +413,7 @@ class ReferringPageGeneratorWithIgnore:
         self.minimum = minimum
         self.main_only = main_only
 
-    def __iter__(self) -> Generator[pywikibot.Page, None, None]:
+    def __iter__(self) -> Generator[pywikibot.Page]:
         """Yield pages."""
         # TODO: start yielding before all referring pages have been found
         refs = list(self.page.getReferences(with_template_inclusion=False,
@@ -680,7 +680,7 @@ class DisambiguationRobot(SingleSiteBot):
             (?P<linktrail>{linktrail})""", flags=re.X)
 
     @staticmethod
-    def firstlinks(page) -> Generator[str, None, None]:
+    def firstlinks(page) -> Generator[str]:
         """Return a list of first links of every line beginning with `*`.
 
         When a disambpage is full of unnecessary links, this may be useful
@@ -927,10 +927,7 @@ class DisambiguationRobot(SingleSiteBot):
                     # or like this: [[page_title]]trailing_chars
                     link_text = page_title
 
-                if m['section'] is None:
-                    section = ''
-                else:
-                    section = m['section']
+                section = m['section'] or ''
 
                 trailing_chars = m['linktrail']
                 if trailing_chars:

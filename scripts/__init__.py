@@ -24,12 +24,12 @@ The advantages of pwb.py wrapper script are:
 - find a script even if given script name does not match a filename e.g.
   due to spelling mistake
 """
-from __future__ import annotations
-
-
 #
 # (C) Pywikibot team, 2021-2024
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '9.3.0'
+from __future__ import annotations
+
+
+__version__ = '9.3.1'

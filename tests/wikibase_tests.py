@@ -2111,7 +2111,7 @@ class TestLinks(WikidataTestCase):
 
     def test_iterlinks_page_object(self):
         """Test iterlinks for page objects."""
-        page = [pg for pg in self.wdp.iterlinks() if pg.site.code == 'af'][0]
+        page = next(pg for pg in self.wdp.iterlinks() if pg.site.code == 'af')
         self.assertEqual(page, pywikibot.Page(self.get_site('afwiki'),
                          'New York Stad'))
 

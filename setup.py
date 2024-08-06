@@ -102,7 +102,7 @@ test_deps = ['mock']
 # Add all dependencies as test dependencies,
 # so all scripts can be compiled for script_tests, etc.
 if 'PYSETUP_TEST_EXTRAS' in os.environ:  # pragma: no cover
-    test_deps += [i for k, v in extra_deps.items() if k != 'flake8' for i in v]
+    test_deps += [i for v in extra_deps.values() for i in v]
 
 # These extra dependencies are needed other unittest fails to load tests.
 test_deps += extra_deps['eventstreams']

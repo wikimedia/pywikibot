@@ -371,7 +371,7 @@ def get_base_dir(test_directory: str | None = None,
                     raise OSError(
                         f'Windows version {win_version} not supported yet.')
                 base_dir_cand.extend([[home] + sub_dir + ['Pywikibot'],
-                                     [home] + sub_dir + ['pywikibot']])
+                                      [home] + sub_dir + ['pywikibot']])
             else:
                 base_dir_cand.append([home, '.pywikibot'])
 
@@ -475,9 +475,9 @@ def register_families_folder(folder_path: str,
 
 
 # Get the names of all known families, and initialize with empty dictionaries.
-# ‘families/’ is a subdirectory of the directory in which config.py is found.
+# 'families/' is a subdirectory of the directory in which config.py is found.
 register_families_folder(os.path.join(os.path.dirname(__file__), 'families'))
-# ‘families/’ can also be stored in the base directory
+# 'families/' can also be stored in the base directory
 register_families_folder(os.path.join(base_dir, 'families'),
                          not_exists_ok=True)
 

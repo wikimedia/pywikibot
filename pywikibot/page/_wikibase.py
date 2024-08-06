@@ -584,7 +584,7 @@ class WikibasePage(BasePage, WikibaseEntity):
     There should be no need to instantiate this directly.
     """
 
-    _cache_attrs = BasePage._cache_attrs + ('_content', )
+    _cache_attrs = (*BasePage._cache_attrs, '_content')
 
     def __init__(self, site, title: str = '', **kwargs) -> None:
         """
@@ -925,8 +925,7 @@ class WikibasePage(BasePage, WikibaseEntity):
 
 class ItemPage(WikibasePage):
 
-    """
-    Wikibase entity of type 'item'.
+    """Wikibase entity of type 'item'.
 
     A Wikibase item may be defined by either a 'Q' id (qid),
     or by a site & title.
@@ -935,8 +934,8 @@ class ItemPage(WikibasePage):
     been looked up, the item is then defined by the qid.
     """
 
-    _cache_attrs = WikibasePage._cache_attrs + (
-        'labels', 'descriptions', 'aliases', 'claims', 'sitelinks')
+    _cache_attrs = (*WikibasePage._cache_attrs, 'labels', 'descriptions',
+                    'aliases', 'claims', 'sitelinks')
     entity_type = 'item'
     title_pattern = r'Q[1-9]\d*'
     DATA_ATTRIBUTES = {
@@ -1308,7 +1307,7 @@ class ItemPage(WikibasePage):
     @deprecated_args(botflag='bot')  # since 9.3.0
     def set_redirect_target(
         self,
-        target_page: 'ItemPage' | str,
+        target_page: ItemPage | str,
         create: bool = False,
         force: bool = False,
         keep_section: bool = False,
@@ -1440,8 +1439,7 @@ class Property:
 
 class PropertyPage(WikibasePage, Property):
 
-    """
-    A Wikibase entity in the property namespace.
+    """A Wikibase entity in the property namespace.
 
     Should be created as::
 
@@ -1452,8 +1450,8 @@ class PropertyPage(WikibasePage, Property):
         PropertyPage(DataSite, datatype='url')
     """
 
-    _cache_attrs = WikibasePage._cache_attrs + (
-        '_type', 'labels', 'descriptions', 'aliases', 'claims')
+    _cache_attrs = (*WikibasePage._cache_attrs, '_type', 'labels',
+                    'descriptions', 'aliases', 'claims')
     entity_type = 'property'
     title_pattern = r'P[1-9]\d*'
     DATA_ATTRIBUTES = {
@@ -2077,10 +2075,8 @@ class Claim(Property):
         if (isinstance(self.target, pywikibot.Coordinate)
                 and isinstance(value, str)):
             coord_args = [float(x) for x in value.split(',')]
-            if len(coord_args) >= 3:
-                precision = coord_args[2]
-            else:
-                precision = 0.0001  # Default value (~10 m at equator)
+            # Default value 0.0001 ~10 m at equator
+            precision = coord_args[2] if len(coord_args) >= 3 else 0.0001
             with suppress(TypeError):
                 if self.target.precision is not None:
                     precision = max(precision, self.target.precision)
@@ -2169,9 +2165,8 @@ class LexemePage(WikibasePage):
     ['P5137', 'P5972', 'P2888']
     """
 
-    _cache_attrs = WikibasePage._cache_attrs + (
-        'lemmas', 'language', 'lexicalCategory', 'forms', 'senses',
-    )
+    _cache_attrs = (*WikibasePage._cache_attrs, 'lemmas', 'language',
+                    'lexicalCategory', 'forms', 'senses')
     entity_type = 'lexeme'
     title_pattern = r'L[1-9]\d*'
     DATA_ATTRIBUTES = {

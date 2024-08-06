@@ -1426,10 +1426,7 @@ def interwikiFormat(links: dict, insite=None) -> str:
             s.append(link)
         else:
             raise ValueError('links dict must contain Page or Link objects')
-    if insite.code in insite.family.interwiki_on_one_line:
-        sep = ' '
-    else:
-        sep = '\n'
+    sep = ' ' if insite.code in insite.family.interwiki_on_one_line else '\n'
     return sep.join(s) + '\n'
 
 
@@ -1891,10 +1888,7 @@ def extract_templates_and_params_regex_simple(text: str):
         name, params = match[1], match[2]
 
         # Special case for {{a}}
-        if params is None:
-            params = []
-        else:
-            params = params.split('|')
+        params = [] if params is None else params.split('|')
 
         numbered_param_identifiers = itertools.count(1)
 
@@ -2190,9 +2184,7 @@ class TimeStripper:
             return False
         if min_pos < tzinfo_pos < max_pos:
             return False
-        if min_pos < time_pos < max_pos:
-            return False
-        return True
+        return not min_pos < time_pos < max_pos
 
     def timestripper(self, line: str) -> pywikibot.Timestamp | None:
         """

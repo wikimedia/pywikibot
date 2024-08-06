@@ -25,6 +25,7 @@ from tests import WARN_SITE_CODE, unittest_print
 from tests.aspects import DefaultSiteTestCase, DeprecationTestCase, TestCase
 from tests.utils import skipping
 
+
 global_expected_params = {
     'action': ['query'],
     'continue': [True],

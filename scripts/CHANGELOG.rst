@@ -1,13 +1,22 @@
 Scripts Changelog
 =================
 
+9.3.1
+-----
+
+reflinks
+^^^^^^^^
+
+*  Ignore LookupError when decoding meta content (:phab:`T371687`)
+
+
 9.3.0
 -----
 
 delinker
 ^^^^^^^^
 
-* Ignore file extension check :phab:`T352237`)
+* Ignore file extension check (:phab:`T352237`)
 
 fixing_redirects
 ^^^^^^^^^^^^^^^^

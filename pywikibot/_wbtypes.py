@@ -929,10 +929,7 @@ class WbQuantity(WbRepresentation):
         error = None
         if bounds_provided or cls._require_errors(site):
             error = (upper_bound - amount, amount - lower_bound)
-        if data['unit'] == '1':
-            unit = None
-        else:
-            unit = data['unit']
+        unit = None if data['unit'] == '1' else data['unit']
         return cls(amount, unit, error, site)
 
 

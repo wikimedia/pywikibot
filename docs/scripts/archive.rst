@@ -274,4 +274,3 @@ As alternative, if '-ocr' option is selected,
 OCR tool will be used to get text.
 In this case, also already existing pages with quality value 'Not Proofread'
 can be treated. '-force' will override existing page in this case.
-

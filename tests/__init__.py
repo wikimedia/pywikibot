@@ -6,6 +6,7 @@
 #
 from __future__ import annotations
 
+
 __all__ = (
     'create_path_func', 'join_cache_path', 'join_data_path',
     'join_html_data_path', 'join_images_path', 'join_pages_path',
@@ -32,6 +33,7 @@ from pywikibot import config
 from pywikibot.backports import removesuffix
 from pywikibot.data.api import CachedRequest
 from pywikibot.data.api import Request as _original_Request
+
 
 _root_dir = os.path.split(os.path.split(__file__)[0])[0]
 
@@ -85,8 +87,6 @@ library_test_modules = {
     'file',
     'fixes',
     'flow',
-    'flow_edit',
-    'flow_thanks',
     'gui',
     'http',
     'i18n',
@@ -102,23 +102,28 @@ library_test_modules = {
     'memento',
     'mysql',
     'namespace',
+    'oauth',
     'page',
     'pagegenerators',
     'paraminfo',
     'plural',
     'proofreadpage',
+    'setup',
     'site',
     'site_decorators',
     'site_generators',
     'site_detect',
+    'site_login_logout',
     'site_obsoletesites',
     'siteinfo',
+    'superset',
     'sparql',
     'tests',
     'textlib',
     'thanks',
     'time',
     'timestripper',
+    'titletranslate',
     'token',
     'tools',
     'tools_chars',
@@ -130,6 +135,7 @@ library_test_modules = {
     'upload',
     'uploadbot',
     'user',
+    'version',
     'wikibase',
     'wikibase_edit',
     'wikiblame',
@@ -152,6 +158,7 @@ script_test_modules = {
     'interwikidata',
     'l10n',
     'make_dist',
+    'noreferences',
     'patrolbot',
     'protectbot',
     'pwb',
@@ -185,11 +192,11 @@ def _unknown_test_modules():
 extra_test_modules = _unknown_test_modules()
 
 if 'PYWIKIBOT_TEST_MODULES' in os.environ:
-    _enabled_test_modules = os.environ['PYWIKIBOT_TEST_MODULES'].split(',')
-    disabled_test_modules = (library_test_modules
-                             | extra_test_modules
-                             | script_test_modules
-                             - set(_enabled_test_modules))
+    enabled_test_modules = os.environ['PYWIKIBOT_TEST_MODULES'].split(',')
+else:
+    enabled_test_modules = chain(library_test_modules,
+                                 extra_test_modules,
+                                 script_test_modules)
 
 
 def unittest_print(*args, **kwargs):
@@ -220,9 +227,7 @@ def collector(loader=unittest.loader.defaultTestLoader):
                        f'  {disabled_tests!r}')
 
     modules = (module
-               for module in chain(library_test_modules,
-                                   extra_test_modules,
-                                   script_test_modules)
+               for module in enabled_test_modules
                if module not in disabled_test_modules)
 
     test_list = []

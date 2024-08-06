@@ -663,10 +663,7 @@ class WelcomeBot(SingleSiteBot):
         if not globalvar.make_welcome_log or not self.welcomed_users:
             return
 
-        if self.site.code == 'it':
-            pattern = '%d/%m/%Y'
-        else:
-            pattern = '%Y/%m/%d'
+        pattern = '%d/%m/%Y' if self.site.code == 'it' else '%Y/%m/%d'
         target = self.log_name + '/' + time.strftime(
             pattern, time.localtime(time.time()))
 

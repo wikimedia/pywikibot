@@ -47,7 +47,7 @@ class UI(ABUIC):
         """Ask the user a question and return the answer."""
         return default
 
-    def input_choice(self, question: str, options, default: str = None,
+    def input_choice(self, question: str, options, default: str | None = None,
                      return_shortcut: bool = True,
                      automatic_quit: bool = True, force: bool = False):
         """Ask the user and returns a value from the options."""

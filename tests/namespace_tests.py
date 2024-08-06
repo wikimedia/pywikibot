@@ -14,6 +14,7 @@ from pywikibot.site import Namespace, NamespacesDict
 from pywikibot.site._namespace import BuiltinNamespace
 from tests.aspects import TestCase, unittest
 
+
 # Default namespaces which should work in any MW wiki
 _base_builtin_ns = {
     'Media': -2,

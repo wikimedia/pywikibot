@@ -16,6 +16,7 @@ from pywikibot import page_put_queue
 from pywikibot.exceptions import Error
 from tests.aspects import TestCase, require_version
 
+
 called_back = False
 
 
@@ -87,9 +88,9 @@ class TestSiteMergeHistory(TestCase):
         dest = pywikibot.Page(site, 'User:Sn1per/MergeTest2')
 
         if source.exists():
-            source.delete('Pywikibot merge history unit test')
+            source.delete('Pywikibot merge history unit test', prompt=False)
         if dest.exists():
-            dest.delete('Pywikibot merge history unit test')
+            dest.delete('Pywikibot merge history unit test', prompt=False)
 
         source.text = 'Lorem ipsum dolor sit amet'
         source.save()
@@ -148,7 +149,6 @@ class TestSiteMergeHistory(TestCase):
             except Error as err:
                 self.assertEqual(str(err), error_msg)
 
-    @unittest.expectedFailure  # T367300
     def test_merge_history(self):
         """Test Site.merge_history functionality."""
         site = self.get_site()

@@ -39,6 +39,7 @@ from tests.aspects import (
 from tests.tools_tests import GeneratorIntersectTestCase
 from tests.utils import skipping
 
+
 en_wp_page_titles = (
     # just a bunch of randomly selected titles for English Wikipedia tests
     'Eastern Sayan',

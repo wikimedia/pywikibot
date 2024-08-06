@@ -18,6 +18,7 @@ from tests import create_path_func, join_data_path
 from tests.aspects import TestCase
 from tests.utils import skipping
 
+
 join_djvu_data_path = create_path_func(join_data_path, 'djvu')
 file_djvu = join_djvu_data_path('myfilé.djvu')  # test non-ASCII name
 

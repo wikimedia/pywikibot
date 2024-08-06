@@ -1,6 +1,6 @@
 """Module with the Graphviz drawing calls."""
 #
-# (C) Pywikibot team, 2006-2022
+# (C) Pywikibot team, 2006-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -187,7 +187,7 @@ class GraphDrawer:
 
         self.octagon_sites = self._octagon_site_set()
 
-        for page in self.subject.found_in.keys():
+        for page in self.subject.found_in:
             # a node for each found page
             self.addNode(page)
         # mark start node by pointing there from a black dot.

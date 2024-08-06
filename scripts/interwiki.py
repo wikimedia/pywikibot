@@ -1574,7 +1574,7 @@ class Subject(interwiki_graph.Subject):
         del new[page.site]
         # Do not add interwiki links to foreign families that page.site() does
         # not forward to
-        for stmp in new.keys():
+        for stmp in new:
             if stmp.family != page.site.family \
                and stmp.family.name != page.site.family.interwiki_forward:
                 del new[stmp]

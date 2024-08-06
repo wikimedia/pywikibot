@@ -37,4 +37,3 @@
                 cls.code_aliases = aliases
 
          .. versionadded:: 8.3
-

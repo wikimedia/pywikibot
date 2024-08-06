@@ -90,6 +90,7 @@ jobs:
     - name: Generate user files
       run: |
         python -Werror::UserWarning -m pwb generate_user_files -family:${{matrix.family}} -lang:${{matrix.code}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
+        echo "usernames['commons']['beta'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
         echo "authenticate['${{ matrix.domain }}'] = ('${{ steps.split.outputs._0 }}', '${{ steps.split.outputs._1 }}', '${{ steps.split.outputs._2 }}', '${{ steps.split.outputs._3 }}')" >> user-config.py
         echo "noisysleep = float('inf')" >> user-config.py
         echo "maximum_GET_length = 5000" >> user-config.py
@@ -98,11 +99,12 @@ jobs:
     - name: Oauth tests with unittest
       timeout-minutes: 2
       env:
-        PYWIKIBOT_TEST_WRITE: ${{ matrix.domain == 'test.wikipedia.org' && 1 || 0}}
+        PYWIKIBOT_TEST_WRITE: 1
         PYWIKIBOT_TEST_OAUTH: ${{ secrets[format('{0}', steps.token.outputs.uppercase)] }}
+        PYWIKIBOT_TEST_MODULES: file,oauth
       run: |
         python pwb.py version
-        coverage run -m unittest -vv tests/oauth_tests.py
+        coverage run -m unittest -vv
 
     - name: Show coverage statistics
       run: |

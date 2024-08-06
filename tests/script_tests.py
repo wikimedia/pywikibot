@@ -18,6 +18,7 @@ from tests import join_root_path, unittest_print
 from tests.aspects import DefaultSiteTestCase, MetaTestCaseClass, PwbTestCase
 from tests.utils import execute_pwb
 
+
 ci_test_run = os.environ.get('PYWIKIBOT_TEST_RUNNING', '0') == '1'
 scripts_path = join_root_path('scripts')
 
@@ -202,7 +203,7 @@ class ScriptTestMeta(MetaTestCaseClass):
                     'For global options use -help:global or run pwb'
                 global_args = ['-pwb_close_matches:1']
 
-                cmd = global_args + [script_name] + args
+                cmd = [*global_args, script_name, *args]
                 data_in = script_input.get(script_name)
                 if isinstance(self._timeout, bool):
                     do_timeout = self._timeout

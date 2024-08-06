@@ -24,12 +24,8 @@ def _call_cmd(args, lib: str = 'djvulibre') -> tuple:
     :return: returns a tuple (res, stdoutdata), where
         res is True if dp.returncode != 0 else False
     """
-    if not isinstance(args, str):
-        # upcast any param in sequence args to str
-        cmd = ' '.join(str(a) for a in args)
-    else:
-        cmd = args
-
+    # upcast any param in sequence args to str
+    cmd = ' '.join(str(a) for a in args) if not isinstance(args, str) else args
     dp = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdoutdata, stderrdata = dp.communicate()
 

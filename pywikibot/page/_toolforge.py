@@ -17,6 +17,7 @@ import pywikibot
 from pywikibot import textlib
 from pywikibot.tools import deprecated, deprecated_args
 
+
 try:
     import wikitextparser
 except ImportError as e:
@@ -24,6 +25,7 @@ except ImportError as e:
 
 if TYPE_CHECKING:
     import datetime
+
     from pywikibot import Timestamp
     DATETYPE = str | Timestamp | datetime.datetime | datetime.date | None
 
@@ -172,11 +174,7 @@ class WikiBlameMixin:
             raise ValueError(
                 'You cannot specify revid together with date argument')
 
-        if date is None:
-            show = revid or 0
-        else:
-            show = str(date)[:10]
-
+        show = revid or 0 if date is None else str(date)[:10]
         url = '{}.wikipedia.org/{}/{}?uselang={}'.format(
             self.site.code,
             self.title(as_url=True, with_ns=False, with_section=False),

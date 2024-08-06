@@ -56,6 +56,7 @@ from tests.utils import (
     skipping,
 )
 
+
 OSWIN32 = (sys.platform == 'win32')
 pywikibot.bot.set_interface('buffer')
 
@@ -865,7 +866,7 @@ class MetaTestCaseClass(type):
     def add_base(bases, subclass):
         """Return a tuple of bases with the subclasses added if not already."""
         if not any(issubclass(base, subclass) for base in bases):
-            bases = (subclass, ) + bases
+            bases = (subclass, *bases)
         return bases
 
     @staticmethod

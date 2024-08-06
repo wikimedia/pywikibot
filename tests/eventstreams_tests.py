@@ -59,7 +59,7 @@ class TestEventStreamsUrlTests(TestCase):
         self.assertEqual(e._url, e.sse_kwargs.get('url'))
         self.assertIsNone(e._total)
         self.assertEqual(e._streams, streams)
-        site_repr = f'site={repr(site)}, ' if site != Site() else ''
+        site_repr = f'site={site!r}, ' if site != Site() else ''
         self.assertEqual(repr(e),
                          f"EventStreams({site_repr}streams='{streams}')")
 

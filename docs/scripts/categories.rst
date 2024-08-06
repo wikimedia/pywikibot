@@ -22,4 +22,3 @@ commonscat script
 .. automodule:: scripts.commonscat
    :no-members:
    :noindex:
-
