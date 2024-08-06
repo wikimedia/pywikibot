@@ -1,6 +1,14 @@
 Release History
 ===============
 
+9.3.1
+-----
+*06 August 2024*
+
+* Add support for bdrwiki (:phab:`T371762`)
+* i18n updates
+
+
 9.3.0
 -----
 *28 July 2024*
