@@ -1,7 +1,8 @@
 Current Release Changes
 =======================
 
-* (no changes yet)
+* Add support for bdrwiki (:phab:`T371762`)
+* i18n updates
 
 Current Deprecations
 ====================

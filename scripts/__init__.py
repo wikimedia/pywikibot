@@ -32,4 +32,4 @@ The advantages of pwb.py wrapper script are:
 from __future__ import annotations
 
 
-__version__ = '9.4.0'
+__version__ = '9.3.1'
