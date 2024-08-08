@@ -55,7 +55,7 @@ class TestTkinter(DefaultSiteTestCase):
         self.assertIn('Main Page', text)
 
 
-@require_modules('tkinter', 'PIL')
+@require_modules('PIL')
 def setUpModule():
     """Skip tests if tkinter or PIL is not installed.
 
@@ -67,7 +67,13 @@ def setUpModule():
                                 '(set PYWIKIBOT_TEST_GUI=1 to enable)')
 
     global EditBoxWindow, Tkdialog, tkinter
-    import tkinter
+
+    # pypy3 has a tkinter module which just raises importError if _tkinter
+    # is not installed; thus require_modules does not work for it.
+    try:
+        import tkinter
+    except ImportError as e:
+        raise unittest.SkipTest(e)
 
     from pywikibot.userinterfaces.gui import EditBoxWindow, Tkdialog
 
