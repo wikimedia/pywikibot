@@ -93,7 +93,7 @@ class CommonsDelinker(SingleSiteBot, ConfigParserBot, AutomaticTWSummaryBot):
     def skip_page(self, page) -> bool:
         """Skip pages which neither exists locally nor on shared repository."""
         pywikibot.info('.', newline=False)
-        if page.file_is_shared() or page.exists():
+        if page.exists() or page.file_is_shared():
             return True
         return super().skip_page(page)
 
