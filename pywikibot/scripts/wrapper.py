@@ -314,8 +314,10 @@ except RuntimeError as e:  # pragma: no cover
         # we need to re-start the entire process. Ask the user to do so.
         print('Now, you have to re-execute the command to start your script.')
         sys.exit(1)
-except ImportError as e:  # raised in textlib or backports
-    sys.exit(e)
+except ModuleNotFoundError as module:  # raised in textlib or backports
+    print(f'\n{module.msg}\nPlease install it with\n\n'
+          f'    pip install {module.name}')
+    sys.exit()
 
 
 def find_alternates(filename, script_paths):
