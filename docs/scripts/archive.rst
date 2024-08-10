@@ -254,12 +254,6 @@ table2wiki script
 **Nifty script to convert HTML-tables to MediaWiki's own syntax**
 
 
-unlink script
-=============
-
-**This bot unlinks a page on every page that links to it**
-
-
 wikisourcetext script
 =====================
 

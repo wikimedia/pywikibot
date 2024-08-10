@@ -151,6 +151,8 @@ Bots and scripts
 | unusedfiles.py           | Bot appends some text to all unused images and other    |
 |                          | text to the respective uploaders.                       |
 +--------------------------+---------------------------------------------------------+
+| unlink.py                | This bot unlinks a page on every page that links to it. |
++--------------------------+---------------------------------------------------------+
 | upload.py                | Upload an image to a wiki.                              |
 +--------------------------+---------------------------------------------------------+
 | watchlists.py            | Allows access to the account's watchlist.               |

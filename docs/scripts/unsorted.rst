@@ -84,6 +84,13 @@ replicate\_wiki script
    :no-members:
    :noindex:
 
+unlink script
+=============
+
+.. automodule:: scripts.unlink
+   :no-members:
+   :noindex:
+
 watchlist script
 ================
 

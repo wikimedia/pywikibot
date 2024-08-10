@@ -1,6 +1,15 @@
 Scripts Changelog
 =================
 
+9.4.0
+-----
+
+unlink
+^^^^^^
+
+* unlink script was recovered
+
+
 9.3.1
 -----
 
