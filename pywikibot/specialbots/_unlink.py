@@ -26,8 +26,7 @@ class EditReplacementError(ChoiceException, UnhandledAnswer):
 
     def __init__(self) -> None:
         """Initializer."""
-        super().__init__('edit', 'e')
-        self.stop = True
+        super().__init__('edit', 'e', stop=True)
 
 
 class InteractiveUnlink(InteractiveReplace):
