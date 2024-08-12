@@ -137,7 +137,6 @@ class DelinkerFromCategory(CommonsDelinker):
 
         params = {
             'logtype': 'delete',
-            'reverse': True,
             'page': 'File:' + page.title(underscore=True, with_ns=False),
         }
         try:
