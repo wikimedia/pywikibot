@@ -24,9 +24,14 @@ from __future__ import annotations
 import os
 import re
 import sys
-import tomllib
 import warnings
 from pathlib import Path
+
+
+try:
+    import tomllib
+except ImportError:
+    import tomli as tomllib
 
 
 # Deprecated classes will generate warnings as Sphinx processes them.
