@@ -715,8 +715,8 @@ class Family:
         """
         Do a conversion on the retrieved text from the Wiki.
 
-        For example a X-conversion in Esperanto
-        https://en.wikipedia.org/wiki/Esperanto_orthography#X-system.
+        For example a :wiki:`X-conversion in Esperanto
+        <Esperanto_orthography#X-system>`.
         """
         return getText
 
@@ -724,8 +724,8 @@ class Family:
         """
         Do a conversion on the text to insert on the Wiki.
 
-        For example a X-conversion in Esperanto
-        https://en.wikipedia.org/wiki/Esperanto_orthography#X-system.
+        For example a :wiki:`X-conversion in Esperanto
+        <Esperanto_orthography#X-system>`.
         """
         return putText
 

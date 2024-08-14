@@ -119,8 +119,8 @@ External identifiers:
    GNU General Public License v3.0, User:Geertivp
 
 **Documentation:**
-    * https://en.wikipedia.org/wiki/ISBN
-    * https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
+    * :wiki:`ISBN`
+    * :wiki:`List_of_ISO_639-1_codes`
     * https://www.geeksforgeeks.org/searching-books-with-python/
     * https://www.freecodecamp.org/news/python-json-how-to-convert-a-string-to-json/
     * https://pypi.org/project/isbnlib/
@@ -213,12 +213,12 @@ Applications:
     * :phab:`T208134`
     * :phab:`T138911`
     * :phab:`T20814`
-    * https://en.wikipedia.org/wiki/User:Citation_bot
+    * :wiki:`User:Citation_bot`
     * https://meta.wikimedia.org/wiki/Community_Wishlist_Survey_2021/Wikidata/Bibliographical_references/sources_for_wikidataitems
     * https://zenodo.org/record/55004#.YvwO4hTP1D8
 
 **Other systems:**
-    * https://en.wikipedia.org/wiki/bibliographic_database
+    * `wiki:`bibliographic_database`
     * https://www.titelbank.nl/pls/ttb/f?p=103:4012:::NO::P4012_TTEL_ID:3496019&cs=19BB8084860E3314502A1F777F875FE61
 
 .. versionadded:: 7.7

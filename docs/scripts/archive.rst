@@ -119,7 +119,7 @@ imagecopy\_self script
 **Script to copy self published files from English Wikipedia to Commons**
 
 This bot is based on imagecopy.py and intended to be used to empty out
-https://en.wikipedia.org/wiki/Category:Self-published_work
+:wiki:`Category:Self-published_work`
 
 This bot uses a graphical interface and may not work from commandline
 only environment.

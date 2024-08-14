@@ -16,8 +16,7 @@ Glossary
    compat
       The first Pywikibot package formerly known as *Pywikipediabot*
       also called :term:`trunk` was started in 2003. MediaWiki didn't
-      have an API so a `screen scrapping
-      <https://en.wikipedia.org/wiki/Screen_scraper>`_ was used.
+      have an API so a :wiki:`screen scrapping<Screen_scraper>` was used.
 
    core
       In 2007 a new branch of Pywikibot formerly known as
