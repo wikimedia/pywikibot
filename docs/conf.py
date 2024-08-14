@@ -511,6 +511,7 @@ extlinks = {
     'source': (
         'https://phabricator.wikimedia.org/diffusion/PWBC/browse/master/%s.py',
         '%s'),
+    'wiki': ('https://en.wikipedia.org/wiki/%s', '%s')
 }
 
 
