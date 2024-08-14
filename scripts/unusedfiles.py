@@ -18,7 +18,7 @@ by default::
 -usertemplate:  Use a custom template to warn the uploader.
 """
 #
-# (C) Pywikibot team, 2007-2022
+# (C) Pywikibot team, 2007-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -35,7 +35,6 @@ from pywikibot.bot import (
     SingleSiteBot,
 )
 from pywikibot.exceptions import Error, NoPageError, TranslationError
-from pywikibot.flow import Board
 
 
 template_to_the_image = {
@@ -108,30 +107,39 @@ class UnusedFilesBot(SingleSiteBot,
                 f'This script is not localized for {self.site} site;\n'
                 'try using -filetemplate:<template name>.')
 
+    def skip_page(self, image: pywikibot.page.FilePage) -> bool:
+        """Skip processing on repository images or if image is already tagged.
+
+        Use get_file_url() and file_is_shared() to confirm it is local
+        media rather than a local page with the same name as shared
+        media.
+        """
+        if not image.get_file_url() or image.file_is_shared() \
+           or 'http://' in image.text:
+            return True
+
+        if self.opt.filetemplate in image.text:
+            pywikibot.info(f'{image} done already')
+            return True
+
+        return super().skip_page(image)
+
     def treat(self, image) -> None:
         """Process one image page."""
-        # Use get_file_url() and file_is_shared() to confirm it is local media
-        # rather than a local page with the same name as shared media.
-        if (image.get_file_url() and not image.file_is_shared()
-                and 'http://' not in image.text):
-            if self.opt.filetemplate in image.text:
-                pywikibot.info(f'{image} done already')
-                return
+        self.append_text(image, '\n\n' + self.opt.filetemplate)
 
-            self.append_text(image, '\n\n' + self.opt.filetemplate)
-            if self.opt.nouserwarning:
-                return
+        if self.opt.nouserwarning:
+            return
 
-            uploader = image.oldest_file_info.user
-            user = pywikibot.User(image.site, uploader)
-            usertalkpage = user.getUserTalkPage()
-            template2uploader = self.opt.usertemplate \
-                % {'title': image.title()}
-            msg2uploader = self.site.expand_text(template2uploader)
-            if usertalkpage.is_flow_page():
-                self.post_to_flow_board(usertalkpage, msg2uploader)
-            else:
-                self.append_text(usertalkpage, '\n\n' + msg2uploader + ' ~~~~')
+        uploader = image.oldest_file_info.user
+        user = pywikibot.User(image.site, uploader)
+        usertalkpage = user.getUserTalkPage()
+        msg2uploader = self.opt.usertemplate % {'title': image.title()}
+        if usertalkpage.is_flow_page():
+            pywikibot.warning(f'Unsupported Flow talkpage {usertalkpage};'
+                              '\n         uploader cannot be informed.')
+        else:
+            self.append_text(usertalkpage, '\n\n' + msg2uploader + ' ~~~~')
 
     def append_text(self, page, apptext):
         """Append apptext to the page."""
@@ -148,15 +156,6 @@ class UnusedFilesBot(SingleSiteBot,
         text += apptext
         self.current_page = page
         self.put_current(text)
-
-    @staticmethod
-    def post_to_flow_board(page, post) -> None:
-        """Post message as a Flow topic."""
-        board = Board(page)
-        header, rest = post.split('\n', 1)
-        title = header.strip('=')
-        content = rest.lstrip()
-        board.new_topic(title, content)
 
 
 def main(*args: str) -> None:
