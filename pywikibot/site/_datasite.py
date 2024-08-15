@@ -323,7 +323,7 @@ class DataSite(APISite):
         params['token'] = self.tokens['csrf']
 
         for arg in kwargs:
-            if arg in ['clear', 'summary']:
+            if arg in ['clear', 'summary', 'tags']:
                 params[arg] = kwargs[arg]
             elif arg != 'baserevid':
                 warn(f'Unknown wbeditentity parameter {arg} ignored',
@@ -338,7 +338,8 @@ class DataSite(APISite):
                  entity: pywikibot.page.WikibaseEntity,
                  claim: pywikibot.page.Claim,
                  bot: bool = True,
-                 summary: str | None = None) -> None:
+                 summary: str | None = None,
+                 tags: str | None = None) -> None:
         """
         Add a claim.
 
@@ -346,14 +347,16 @@ class DataSite(APISite):
         :param claim: Claim to be added
         :param bot: Whether to mark the edit as a bot edit
         :param summary: Edit summary
+        :param tags: Change tags to apply to the revision
         """
         claim.snak = entity.getID() + '$' + str(uuid.uuid4())
         params = {'action': 'wbsetclaim',
                   'claim': json.dumps(claim.toJSON()),
                   'baserevid': entity.latest_revision_id,
                   'summary': summary,
-                  'token': self.tokens['csrf'],
+                  'tags': tags,
                   'bot': bot,
+                  'token': self.tokens['csrf'],
                   }
         req = self.simple_request(**params)
         data = req.submit()
@@ -365,8 +368,12 @@ class DataSite(APISite):
         entity.latest_revision_id = data['pageinfo']['lastrevid']
 
     @need_right('edit')
-    def changeClaimTarget(self, claim, snaktype: str = 'value',
-                          bot: bool = True, summary=None):
+    def changeClaimTarget(self,
+                          claim,
+                          snaktype: str = 'value',
+                          bot: bool = True,
+                          summary: str | None = None,
+                          tags: str | None = None):
         """
         Set the claim target to the value of the provided claim target.
 
@@ -376,16 +383,21 @@ class DataSite(APISite):
             'somevalue'). Default: 'value'
         :param bot: Whether to mark the edit as a bot edit
         :param summary: Edit summary
-        :type summary: str
+        :param tags: Change tags to apply to the revision
         """
         if claim.isReference or claim.isQualifier:
             raise NotImplementedError
         if not claim.snak:
             # We need to already have the snak value
             raise NoPageError(claim)
-        params = {'action': 'wbsetclaimvalue', 'claim': claim.snak,
-                  'snaktype': snaktype, 'summary': summary, 'bot': bot,
-                  'token': self.tokens['csrf']}
+        params = {'action': 'wbsetclaimvalue',
+                  'claim': claim.snak,
+                  'snaktype': snaktype,
+                  'summary': summary,
+                  'tags': tags,
+                  'bot': bot,
+                  'token': self.tokens['csrf'],
+                  }
 
         if snaktype == 'value':
             params['value'] = json.dumps(claim._formatValue())
@@ -397,13 +409,15 @@ class DataSite(APISite):
     @need_right('edit')
     def save_claim(self, claim: pywikibot.page.Claim,
                    summary: str | None = None,
-                   bot: bool = True):
+                   bot: bool = True,
+                   tags: str | None = None):
         """
         Save the whole claim to the wikibase site.
 
         :param claim: The claim to save
         :param bot: Whether to mark the edit as a bot edit
         :param summary: Edit summary
+        :param tags: Change tags to apply to the revision
         """
         if claim.isReference or claim.isQualifier:
             raise NotImplementedError
@@ -412,10 +426,11 @@ class DataSite(APISite):
             raise NoPageError(claim)
         params = {'action': 'wbsetclaim',
                   'claim': json.dumps(claim.toJSON()),
-                  'token': self.tokens['csrf'],
                   'baserevid': claim.on_item.latest_revision_id,
                   'summary': summary,
+                  'tags': tags,
                   'bot': bot,
+                  'token': self.tokens['csrf'],
                   }
 
         req = self.simple_request(**params)
@@ -428,7 +443,8 @@ class DataSite(APISite):
     def editSource(self, claim, source,
                    new: bool = False,
                    bot: bool = True,
-                   summary: str | None = None):
+                   summary: str | None = None,
+                   tags: str | None = None):
         """Create/Edit a source.
 
         .. versionchanged:: 7.0
@@ -441,12 +457,18 @@ class DataSite(APISite):
         :param new: Whether to create a new one if the "source" already exists
         :param bot: Whether to mark the edit as a bot edit
         :param summary: Edit summary
+        :param tags: Change tags to apply to the revision
         """
         if claim.isReference or claim.isQualifier:
             raise ValueError('The claim cannot have a source.')
-        params = {'action': 'wbsetreference', 'statement': claim.snak,
+        params = {'action': 'wbsetreference',
+                  'statement': claim.snak,
                   'baserevid': claim.on_item.latest_revision_id,
-                  'summary': summary, 'bot': bot, 'token': self.tokens['csrf']}
+                  'summary': summary,
+                  'tags': tags,
+                  'bot': bot,
+                  'token': self.tokens['csrf'],
+                  }
 
         # build up the snak
         sources = source if isinstance(source, list) else [source]
@@ -476,7 +498,8 @@ class DataSite(APISite):
     def editQualifier(self, claim, qualifier,
                       new: bool = False,
                       bot: bool = True,
-                      summary: str | None = None):
+                      summary: str | None = None,
+                      tags: str | None = None):
         """Create/Edit a qualifier.
 
         .. versionchanged:: 7.0
@@ -490,17 +513,22 @@ class DataSite(APISite):
             already exists
         :param bot: Whether to mark the edit as a bot edit
         :param summary: Edit summary
+        :param tags: Change tags to apply to the revision
         """
         if claim.isReference or claim.isQualifier:
             raise ValueError('The claim cannot have a qualifier.')
-        params = {'action': 'wbsetqualifier', 'claim': claim.snak,
+        params = {'action': 'wbsetqualifier',
+                  'claim': claim.snak,
                   'baserevid': claim.on_item.latest_revision_id,
-                  'summary': summary, 'bot': bot}
+                  'summary': summary,
+                  'tags': tags,
+                  'bot': bot,
+                  'token': self.tokens['csrf'],
+                  }
 
         if (not new and hasattr(qualifier, 'hash')
                 and qualifier.hash is not None):
             params['snakhash'] = qualifier.hash
-        params['token'] = self.tokens['csrf']
         # build up the snak
         if qualifier.getSnakType() == 'value':
             params['value'] = json.dumps(qualifier._formatValue())
@@ -514,7 +542,8 @@ class DataSite(APISite):
     @remove_last_args(['baserevid'])  # since 7.0.0
     def removeClaims(self, claims,
                      bot: bool = True,
-                     summary: str | None = None):
+                     summary: str | None = None,
+                     tags: str | None = None):
         """Remove claims.
 
         .. versionchanged:: 7.0
@@ -523,9 +552,8 @@ class DataSite(APISite):
         :param claims: Claims to be removed
         :type claims: list[pywikibot.Claim]
         :param bot: Whether to mark the edit as a bot edit
-        :type bot: bool
         :param summary: Edit summary
-        :type summary: str
+        :param tags: Change tags to apply to the revision
         """
         # Check on_item for all additional claims
         items = {claim.on_item for claim in claims if claim.on_item}
@@ -533,10 +561,12 @@ class DataSite(APISite):
         baserevid = items.pop().latest_revision_id
 
         params = {
-            'action': 'wbremoveclaims', 'baserevid': baserevid,
-            'summary': summary,
-            'bot': bot,
+            'action': 'wbremoveclaims',
             'claim': '|'.join(claim.snak for claim in claims),
+            'baserevid': baserevid,
+            'summary': summary,
+            'tags': tags,
+            'bot': bot,
             'token': self.tokens['csrf'],
         }
 
@@ -547,7 +577,8 @@ class DataSite(APISite):
     @remove_last_args(['baserevid'])  # since 7.0.0
     def removeSources(self, claim, sources,
                       bot: bool = True,
-                      summary: str | None = None):
+                      summary: str | None = None,
+                      tags: str | None = None):
         """Remove sources.
 
         .. versionchanged:: 7.0
@@ -559,13 +590,16 @@ class DataSite(APISite):
         :type sources: list
         :param bot: Whether to mark the edit as a bot edit
         :param summary: Edit summary
+        :param tags: Change tags to apply to the revision
         """
         params = {
             'action': 'wbremovereferences',
-            'baserevid': claim.on_item.latest_revision_id,
-            'summary': summary, 'bot': bot,
             'statement': claim.snak,
             'references': '|'.join(source.hash for source in sources),
+            'baserevid': claim.on_item.latest_revision_id,
+            'summary': summary,
+            'tags': tags,
+            'bot': bot,
             'token': self.tokens['csrf'],
         }
 
@@ -576,7 +610,8 @@ class DataSite(APISite):
     @remove_last_args(['baserevid'])  # since 7.0.0
     def remove_qualifiers(self, claim, qualifiers,
                           bot: bool = True,
-                          summary: str | None = None):
+                          summary: str | None = None,
+                          tags: str | None = None):
         """Remove qualifiers.
 
         .. versionchanged:: 7.0
@@ -588,15 +623,17 @@ class DataSite(APISite):
         :type qualifiers: list[pywikibot.Claim]
         :param bot: Whether to mark the edit as a bot edit
         :param summary: Edit summary
+        :param tags: Change tags to apply to the revision
         """
         params = {
             'action': 'wbremovequalifiers',
             'claim': claim.snak,
+            'qualifiers': [qualifier.hash for qualifier in qualifiers],
             'baserevid': claim.on_item.latest_revision_id,
             'summary': summary,
+            'tags': tags,
             'bot': bot,
-            'qualifiers': [qualifier.hash for qualifier in qualifiers],
-            'token': self.tokens['csrf']
+            'token': self.tokens['csrf'],
         }
 
         req = self.simple_request(**params)
@@ -621,16 +658,21 @@ class DataSite(APISite):
             'totitle': page1.title(),
             'fromsite': page2.site.dbName(),
             'fromtitle': page2.title(),
+            'bot': bot,
             'token': self.tokens['csrf']
         }
-        if bot:
-            params['bot'] = 1
+
         req = self.simple_request(**params)
         return req.submit()
 
     @need_right('item-merge')
-    def mergeItems(self, from_item, to_item, ignore_conflicts=None,
-                   summary=None, bot: bool = True):
+    def mergeItems(self,
+                   from_item,
+                   to_item,
+                   ignore_conflicts=None,
+                   summary: str | None = None,
+                   bot: bool = True,
+                   tags: str | None = None):
         """
         Merge two items together.
 
@@ -643,8 +685,8 @@ class DataSite(APISite):
             should be ignored
         :type ignore_conflicts: list of str
         :param summary: Edit summary
-        :type summary: str
         :param bot: Whether to mark the edit as a bot edit
+        :param tags: Change tags to apply to the revision
         :return: dict API output
         :rtype: dict
         """
@@ -653,11 +695,12 @@ class DataSite(APISite):
             'fromid': from_item.getID(),
             'toid': to_item.getID(),
             'ignoreconflicts': ignore_conflicts,
-            'token': self.tokens['csrf'],
             'summary': summary,
+            'tags': tags,
+            'bot': bot,
+            'token': self.tokens['csrf'],
         }
-        if bot:
-            params['bot'] = 1
+
         req = self.simple_request(**params)
         return req.submit()
 
@@ -683,9 +726,9 @@ class DataSite(APISite):
             'target': to_lexeme.getID(),
             'token': self.tokens['csrf'],
             'summary': summary,
+            'bot': bot,
         }
-        if bot:
-            params['bot'] = 1
+
         req = self.simple_request(**params)
         return req.submit()
 
