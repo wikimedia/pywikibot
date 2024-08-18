@@ -40,10 +40,11 @@ from pywikibot.exceptions import Error, NoPageError, TranslationError
 template_to_the_image = {
     'meta': '{{Orphan file}}',
     'test': '{{Orphan file}}',
-    'ar': '{{صورة يتيمة}}',
-    'arz': '{{صوره يتيمه}}',
+    'ar': '{{ملف يتيم}}',
+    'ary': '{{Orphan file}}',
+    'arz': '{{فايل يتيم}}',
     'ckb': '{{سخ-پ٥|ڕێکەوت={{subst:ڕێکەوت}}}}',
-    'en': '{{Orphan image}}',
+    'en': '{{Orphan file}}',
     'fa': '{{تصاویر بدون استفاده}}',
     'id': '{{Berkas yatim}}',
     'it': '{{immagine orfana}}',
@@ -58,6 +59,7 @@ template_to_the_image = {
 template_to_the_user = {
     'test': '{{User:Happy5214/Unused file notice (user)|%(title)s}}',
     'ar': '{{subst:تنبيه صورة يتيمة|%(title)s}}',
+    'ary': '{{subst:تنبيه صورة يتيمة|%(title)s}}',
     'arz': '{{subst:تنبيه صوره يتيمه|%(title)s}}',
     'ckb': '{{subst:سخ-پ٥-ئاگاداری|1=%(title)s}}',
     'fa': '{{subst:اخطار به کاربر برای تصاویر بدون استفاده|%(title)s}}',
