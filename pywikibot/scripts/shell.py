@@ -4,9 +4,9 @@
 To exit the shell, type :kbd:`ctrl-D` (Linux) or :kbd:`ctrl-Z` (Windows)
 or use the :func:`exit` function.
 
-The following local option is supported::
+The following local option is supported:
 
- -noimport Do not import the pywikibot library. All other arguments are
+-noimport  Do not import the pywikibot library. All other arguments are
            ignored in this case.
 
 Usage::

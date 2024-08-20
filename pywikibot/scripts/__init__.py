@@ -1,8 +1,5 @@
 """Folder which holds framework scripts.
 
-When uploading pywikibot to pypi the pwb.py (wrapper script) and
-pywikibot i18n package are copied here.
-
 .. versionadded:: 7.0
 """
 #

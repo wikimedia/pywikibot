@@ -3,7 +3,7 @@
 
 The following parameters are supported:
 
--worker:<num>     The number of parallel tasks to be run. Default is the
+ -worker:<num>    The number of parallel tasks to be run. Default is the
                   number of processors on the machine
 
 **Usage:**
