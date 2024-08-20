@@ -90,9 +90,10 @@ class ProofreadPageMixin:
             values: category name corresponding to the 'key' quality level
             e.g. on en.wikisource:
 
-            .. code-block::
-                {0: 'Without text', 1: 'Not proofread', 2: 'Problematic',
-                 3: 'Proofread', 4: 'Validated'}
+            .. code-block:: python
+
+               {0: 'Without text', 1: 'Not proofread', 2: 'Problematic',
+                3: 'Proofread', 4: 'Validated'}
 
         :param expiry: either a number of days or a datetime.timedelta object
         :type expiry: int (days), :py:obj:`datetime.timedelta`, False (config)

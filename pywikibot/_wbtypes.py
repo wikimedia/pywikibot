@@ -239,7 +239,7 @@ class Coordinate(WbRepresentation):
 
         Carrying on from the earlier derivation of precision, since
 
-        .. code-block::
+        .. code-block:: python
 
            precision = math.degrees(
                dim / (radius * math.cos(math.radians(self.lat))))

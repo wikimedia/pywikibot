@@ -811,14 +811,14 @@ class DataSite(APISite):
         wbsetaliases:
             dict shall have the following structure:
 
-            .. code-block::
+            .. code-block:: python
 
                {
                    'language': value (str),
                    'add': list of language codes (str),
                    'remove': list of language codes (str),
-                   'set' list of language codes (str)
-                }
+                   'set' list of language codes (str),
+               }
 
             'add' and 'remove' are alternative to 'set'
 
