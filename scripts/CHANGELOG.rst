@@ -4,10 +4,25 @@ Scripts Changelog
 9.4.0
 -----
 
+delinker
+^^^^^^^^
+
+* Use :pylib:`difflib.get_close_matches()<difflib#difflib.get_close_matches>`
+  to find the closest image match
+* Add ``-category`` option to work from given category and look for the
+  lastest file deletion first(:phab:`T372206`)
+* Check whether image exists first (:phab:`T372106`)
+
 unlink
 ^^^^^^
 
 * unlink script was recovered
+
+unusedfiles
+^^^^^^^^^^^
+
+* L10N updates
+* :mod:`flow` support was dropped, it never worked (:phab:`T372477`)
 
 
 9.3.1

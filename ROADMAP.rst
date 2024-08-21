@@ -1,11 +1,15 @@
 Current Release Changes
 =======================
 
-* (no changes yet)
+* :func:`diff.get_close_matches_ratio()` function was added
+* Initialize super classes of :exc:`EditReplacementError` (:phab:`T212740`)
+* Add a hint to import missing module in :mod:`wrapper<pywikibot.scripts.wrapper>` script
+* i18n updates
 
 Current Deprecations
 ====================
 
+* 9.4.0: :mod:`flow` support is deprecated and will be removed (:phab:`T371180`)
 * 9.3.0: :meth:`page.BasePage.userName` and :meth:`page.BasePage.isIpEdit` are deprecated in favour of
   ``user`` or ``anon`` attributes of :attr:`page.BasePage.latest_revision` property
 * 9.2.0: Imports of :mod:`logging` functions from :mod:`bot` module is deprecated and will be desupported
