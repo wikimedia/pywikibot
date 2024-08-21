@@ -45,6 +45,7 @@ from __future__ import annotations
 import configparser
 import heapq
 import re
+from difflib import get_close_matches
 
 import pywikibot
 from pywikibot.backports import removeprefix
@@ -64,7 +65,7 @@ class CommonsDelinker(SingleSiteBot, ConfigParserBot, AutomaticTWSummaryBot):
     summary_key = 'delinker-delink'
 
     def skip_page(self, page) -> bool:
-        """Skip pages which neither exists locally nor on shared repository."""
+        """Skip pages which either exists locally or on shared repository."""
         pywikibot.info('.', newline=False)
         if page.exists() or page.file_is_shared():
             return True
@@ -135,31 +136,33 @@ class DelinkerFromCategory(CommonsDelinker):
         if super().skip_page(page):
             return True
 
+        title = page.title(with_ns=False)
         params = {
             'logtype': 'delete',
-            'page': 'File:' + page.title(underscore=True, with_ns=False),
+            'page': 'File:' + title,
+            'total': 1,
         }
-        try:
-            entry = next(self.site.logevents(**params))
-        except StopIteration:
-            try:
-                entry = next(self.site.image_repository().logevents(**params))
-            except StopIteration:
-                pywikibot.info()
-                pywikibot.warning(
-                    f'unable to delink missing {page.title(as_link=True)}')
-                found = list(self.site.search(
-                    page.title(),
-                    namespaces=self.site.namespaces.MAIN,
-                    total=1
-                ))
-                if found:
-                    pywikibot.info('probably <<lightblue>>'
-                                   f'{found[0].title(as_link=True)}'
-                                   '<<default>> is meant')
-                return True
+        entries = list(self.site.logevents(**params))
+        if not entries:
+            entries = list(self.site.image_repository().logevents(**params))
 
-        self.summary_parameters = dict(entry)
+        if not entries:
+            pywikibot.info()
+            pywikibot.warning(
+                f'unable to delink missing {page.title(as_link=True)}')
+            possibilities = [
+                p.title(with_ns=False)
+                for p in self.site.search(page.title(),
+                                          namespaces=self.site.namespaces.MAIN,
+                                          total=5)
+            ]
+            found = get_close_matches(title, possibilities, n=1)
+            if found:
+                pywikibot.info(
+                    f'probably <<lightblue>>{found[0]}<<default>> is meant')
+            return True
+
+        self.summary_parameters = dict(entries[0])
         return False
 
 
