@@ -91,7 +91,8 @@ extra_deps.update({'scripts': [i for k, v in script_deps.items() for i in v]})
 # packages which are mandatory
 dependencies = [
     'importlib_metadata ; python_version < "3.8"',
-    'mwparserfromhell>=0.5.2',
+    'mwparserfromhell>=0.5.2; python_version != "3.13"',
+    'wikitextparser; python_version == "3.13"',
     'packaging',
     'requests>=2.21.0',
 ]
