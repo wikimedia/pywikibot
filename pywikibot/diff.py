@@ -632,7 +632,7 @@ def get_close_matches_ratio(word: Sequence,
                             ignorecase: bool = False) -> list[float, Sequence]:
     """Return a list of the best “good enough” matches and its ratio.
 
-    This method is Similar to Python's :pylib:`difflib.get_close_matches()
+    This method is similar to Python's :pylib:`difflib.get_close_matches()
     <difflib#difflib.get_close_matches>` but also gives ratio back and
     has a *ignorecase* parameter to compare case-insensitive.
 
