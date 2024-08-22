@@ -19,7 +19,7 @@ from pywikibot.exceptions import (
     SiteDefinitionError,
 )
 from pywikibot.site._decorators import need_extension, need_right
-from pywikibot.tools import merge_unique_dicts
+from pywikibot.tools import deprecated, merge_unique_dicts
 
 
 class EchoMixin:
@@ -355,10 +355,18 @@ class ThanksMixin:
 
 class ThanksFlowMixin:
 
-    """APISite mixin for Thanks and Flow extension."""
+    """APISite mixin for Thanks and Structured Discussions extension.
+
+    .. deprecated:: 9.4.0
+       Structured Discussions extension formerly known as Flow
+       extenstion is not maintained and will be removed. Users are
+       encouraged to stop using it. (:phab:`T371180`)
+    .. seealso:: :mod:`flow`
+    """
 
     @need_extension('Flow')
     @need_extension('Thanks')
+    @deprecated(since='9.4.0')
     def thank_post(self, post):
         """Corresponding method to the 'action=flowthank' API action.
 
@@ -379,9 +387,17 @@ class ThanksFlowMixin:
 
 class FlowMixin:
 
-    """APISite mixin for Flow extension."""
+    """APISite mixin for Structured Discussions extension.
+
+    .. deprecated:: 9.4.0
+       Structured Discussions extension formerly known as Flow
+       extenstion is not maintained and will be removed. Users are
+       encouraged to stop using it. (:phab:`T371180`)
+    .. seealso:: :mod:`flow`
+    """
 
     @need_extension('Flow')
+    @deprecated(since='9.4.0')
     def load_board(self, page):
         """
         Retrieve the data for a Flow board.
@@ -397,6 +413,7 @@ class FlowMixin:
         return data['flow']['view-topiclist']['result']['topiclist']
 
     @need_extension('Flow')
+    @deprecated(since='9.4.0')
     def load_topiclist(self,
                        page: pywikibot.flow.Board,
                        *,
@@ -441,6 +458,7 @@ class FlowMixin:
         return data['flow']['view-topiclist']['result']['topiclist']
 
     @need_extension('Flow')
+    @deprecated(since='9.4.0')
     def load_topic(self, page, content_format: str):
         """
         Retrieve the data for a Flow topic.
@@ -459,6 +477,7 @@ class FlowMixin:
         return data['flow']['view-topic']['result']['topic']
 
     @need_extension('Flow')
+    @deprecated(since='9.4.0')
     def load_post_current_revision(self, page, post_id, content_format: str):
         """
         Retrieve the data for a post to a Flow topic.
@@ -480,6 +499,7 @@ class FlowMixin:
 
     @need_right('edit')
     @need_extension('Flow')
+    @deprecated(since='9.4.0')
     def create_new_topic(self, page, title, content, content_format):
         """
         Create a new topic on a Flow board.
@@ -505,6 +525,7 @@ class FlowMixin:
 
     @need_right('edit')
     @need_extension('Flow')
+    @deprecated(since='9.4.0')
     def reply_to_post(self, page, reply_to_uuid: str, content: str,
                       content_format: str) -> dict:
         """Reply to a post on a Flow topic.
@@ -527,6 +548,7 @@ class FlowMixin:
 
     @need_right('flow-lock')
     @need_extension('Flow')
+    @deprecated(since='9.4.0')
     def lock_topic(self, page, lock, reason):
         """
         Lock or unlock a Flow topic.
@@ -551,6 +573,7 @@ class FlowMixin:
 
     @need_right('edit')
     @need_extension('Flow')
+    @deprecated(since='9.4.0')
     def moderate_topic(self, page, state, reason):
         """
         Moderate a Flow topic.
@@ -572,6 +595,8 @@ class FlowMixin:
         data = req.submit()
         return data['flow']['moderate-topic']['committed']['topic']
 
+    @need_extension('Flow')
+    @deprecated(since='9.4.0')
     def summarize_topic(self, page, summary):
         """
         Add summary to Flow topic.
@@ -596,6 +621,7 @@ class FlowMixin:
 
     @need_right('flow-delete')
     @need_extension('Flow')
+    @deprecated(since='9.4.0')
     def delete_topic(self, page, reason):
         """
         Delete a Flow topic.
@@ -611,6 +637,7 @@ class FlowMixin:
 
     @need_right('flow-hide')
     @need_extension('Flow')
+    @deprecated(since='9.4.0')
     def hide_topic(self, page, reason):
         """
         Hide a Flow topic.
@@ -626,6 +653,7 @@ class FlowMixin:
 
     @need_right('flow-suppress')
     @need_extension('Flow')
+    @deprecated(since='9.4.0')
     def suppress_topic(self, page, reason):
         """
         Suppress a Flow topic.
@@ -641,6 +669,7 @@ class FlowMixin:
 
     @need_right('edit')
     @need_extension('Flow')
+    @deprecated(since='9.4.0')
     def restore_topic(self, page, reason):
         """
         Restore a Flow topic.
@@ -656,6 +685,7 @@ class FlowMixin:
 
     @need_right('edit')
     @need_extension('Flow')
+    @deprecated(since='9.4.0')
     def moderate_post(self, post, state, reason):
         """
         Moderate a Flow post.
@@ -681,6 +711,7 @@ class FlowMixin:
 
     @need_right('flow-delete')
     @need_extension('Flow')
+    @deprecated(since='9.4.0')
     def delete_post(self, post, reason):
         """
         Delete a Flow post.
@@ -696,6 +727,7 @@ class FlowMixin:
 
     @need_right('flow-hide')
     @need_extension('Flow')
+    @deprecated(since='9.4.0')
     def hide_post(self, post, reason):
         """
         Hide a Flow post.
@@ -711,6 +743,7 @@ class FlowMixin:
 
     @need_right('flow-suppress')
     @need_extension('Flow')
+    @deprecated(since='9.4.0')
     def suppress_post(self, post, reason):
         """
         Suppress a Flow post.
@@ -726,6 +759,7 @@ class FlowMixin:
 
     @need_right('edit')
     @need_extension('Flow')
+    @deprecated(since='9.4.0')
     def restore_post(self, post, reason):
         """
         Restore a Flow post.

@@ -35,7 +35,24 @@ from pywikibot.exceptions import (
     UnknownExtensionError,
 )
 from pywikibot.page import BasePage, PageSourceType, User
-from pywikibot.tools import cached, deprecated_args
+from pywikibot.tools import (
+    ModuleDeprecationWrapper,
+    cached,
+    deprecated_args,
+    suppress_warnings,
+)
+from pywikibot.tools._deprecate import _NotImplementedWarning
+
+
+__all__ = (
+    'Board',
+    'FlowPage',
+    'Post',
+    'Topic',
+)
+
+FLOW_WARNING = (r'pywikibot\.site\._extensions\.(Thanks)?FlowMixin\.[a-z_]+ '
+                r'is deprecated since release 9\.4\.0\.')
 
 
 __all__ = (
@@ -108,7 +125,8 @@ class Board(FlowPage):
         :param force: Whether to force a reload if the data is already loaded
         """
         if not hasattr(self, '_data') or force:
-            self._data = self.site.load_board(self)
+            with suppress_warnings(FLOW_WARNING, _NotImplementedWarning):
+                self._data = self.site.load_board(self)
         return self._data
 
     @staticmethod
@@ -166,11 +184,18 @@ class Board(FlowPage):
         """
         maxlimit = min(config.step, 100) if config.step > 0 else 100
         request_limit = min(total, maxlimit)
-        data = self.site.load_topiclist(self, content_format=content_format,
-                                        limit=request_limit, sortby=sort_by,
-                                        toconly=toc_only, offset=offset,
-                                        offset_id=offset_uuid, reverse=reverse,
-                                        include_offset=include_offset)
+        with suppress_warnings(FLOW_WARNING, _NotImplementedWarning):
+            data = self.site.load_topiclist(
+                self,
+                content_format=content_format,
+                limit=request_limit,
+                sortby=sort_by,
+                toconly=toc_only,
+                offset=offset,
+                offset_id=offset_uuid,
+                reverse=reverse,
+                include_offset=include_offset
+            )
         count = 0
         while data['roots']:
             for root in data['roots']:
@@ -182,7 +207,8 @@ class Board(FlowPage):
                     return
 
             continue_args = self._parse_url(data['links']['pagination'])
-            data = self.site.load_topiclist(self, **continue_args)
+            with suppress_warnings(FLOW_WARNING, _NotImplementedWarning):
+                data = self.site.load_topiclist(self, **continue_args)
 
     def new_topic(self, title: str, content: str,
                   content_format: str = 'wikitext') -> Topic:
@@ -209,7 +235,8 @@ class Topic(FlowPage):
         :param content_format: The post format in which to load
         """
         if not hasattr(self, '_data') or force:
-            self._data = self.site.load_topic(self, content_format)
+            with suppress_warnings(FLOW_WARNING, _NotImplementedWarning):
+                self._data = self.site.load_topic(self, content_format)
         return self._data
 
     def _reload(self) -> None:
@@ -300,7 +327,8 @@ class Topic(FlowPage):
 
         :param reason: The reason for locking this topic
         """
-        self.site.lock_topic(self, True, reason)
+        with suppress_warnings(FLOW_WARNING, _NotImplementedWarning):
+            self.site.lock_topic(self, True, reason)
         self._reload()
 
     def unlock(self, reason: str) -> None:
@@ -308,7 +336,8 @@ class Topic(FlowPage):
 
         :param reason: The reason for unlocking this topic
         """
-        self.site.lock_topic(self, False, reason)
+        with suppress_warnings(FLOW_WARNING, _NotImplementedWarning):
+            self.site.lock_topic(self, False, reason)
         self._reload()
 
     def delete_mod(self, reason: str) -> None:
@@ -316,7 +345,8 @@ class Topic(FlowPage):
 
         :param reason: The reason for deleting this topic.
         """
-        self.site.delete_topic(self, reason)
+        with suppress_warnings(FLOW_WARNING, _NotImplementedWarning):
+            self.site.delete_topic(self, reason)
         self._reload()
 
     def hide(self, reason: str) -> None:
@@ -324,7 +354,8 @@ class Topic(FlowPage):
 
         :param reason: The reason for hiding this topic.
         """
-        self.site.hide_topic(self, reason)
+        with suppress_warnings(FLOW_WARNING, _NotImplementedWarning):
+            self.site.hide_topic(self, reason)
         self._reload()
 
     def suppress(self, reason: str) -> None:
@@ -332,7 +363,8 @@ class Topic(FlowPage):
 
         :param reason: The reason for suppressing this topic.
         """
-        self.site.suppress_topic(self, reason)
+        with suppress_warnings(FLOW_WARNING, _NotImplementedWarning):
+            self.site.suppress_topic(self, reason)
         self._reload()
 
     def restore(self, reason: str) -> None:
@@ -340,7 +372,8 @@ class Topic(FlowPage):
 
         :param reason: The reason for restoring this topic.
         """
-        self.site.restore_topic(self, reason)
+        with suppress_warnings(FLOW_WARNING, _NotImplementedWarning):
+            self.site.restore_topic(self, reason)
         self._reload()
 
     def summary(self) -> str | None:
@@ -358,7 +391,8 @@ class Topic(FlowPage):
 
         :param summary: The summary that will be added to the topic.
         """
-        self.site.summarize_topic(self, summary)
+        with suppress_warnings(FLOW_WARNING, _NotImplementedWarning):
+            self.site.summarize_topic(self, summary)
         self._reload()
 
 
@@ -440,8 +474,9 @@ class Post:
         if load_from_topic:
             data = self.page._load(force=force, content_format=content_format)
         else:
-            data = self.site.load_post_current_revision(self.page, self.uuid,
-                                                        content_format)
+            with suppress_warnings(FLOW_WARNING, _NotImplementedWarning):
+                data = self.site.load_post_current_revision(
+                    self.page, self.uuid, content_format)
         self._set_data(data)
         return self._current_revision
 
@@ -542,8 +577,9 @@ class Post:
         if self.uuid == reply_to:
             del self._current_revision
             del self._replies
-        data = self.site.reply_to_post(self.page, reply_to, content,
-                                       content_format)
+        with suppress_warnings(FLOW_WARNING, _NotImplementedWarning):
+            data = self.site.reply_to_post(self.page, reply_to, content,
+                                           content_format)
         return Post(self.page, data['post-id'])
 
     # Moderation
@@ -552,7 +588,8 @@ class Post:
 
         :param reason: The reason for deleting this post.
         """
-        self.site.delete_post(self, reason)
+        with suppress_warnings(FLOW_WARNING, _NotImplementedWarning):
+            self.site.delete_post(self, reason)
         self._load()
 
     def hide(self, reason: str) -> None:
@@ -560,7 +597,8 @@ class Post:
 
         :param reason: The reason for hiding this post.
         """
-        self.site.hide_post(self, reason)
+        with suppress_warnings(FLOW_WARNING, _NotImplementedWarning):
+            self.site.hide_post(self, reason)
         self._load()
 
     def suppress(self, reason: str) -> None:
@@ -568,7 +606,8 @@ class Post:
 
         :param reason: The reason for suppressing this post.
         """
-        self.site.suppress_post(self, reason)
+        with suppress_warnings(FLOW_WARNING, _NotImplementedWarning):
+            self.site.suppress_post(self, reason)
         self._load()
 
     def restore(self, reason: str) -> None:
@@ -576,9 +615,20 @@ class Post:
 
         :param reason: The reason for restoring this post.
         """
-        self.site.restore_post(self, reason)
+        with suppress_warnings(FLOW_WARNING, _NotImplementedWarning):
+            self.site.restore_post(self, reason)
         self._load()
 
     def thank(self) -> None:
         """Thank the user who made this post."""
-        self.site.thank_post(self)
+        with suppress_warnings(FLOW_WARNING, _NotImplementedWarning):
+            self.site.thank_post(self)
+
+
+wrapper = ModuleDeprecationWrapper(__name__)
+for cls in __all__:
+    wrapper.add_deprecated_attr(
+        cls,
+        replacement_name='',
+        since='9.4.0',
+        future_warning=False)
