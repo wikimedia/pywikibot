@@ -58,7 +58,7 @@ jobs:
         pip --version
         pip install coverage
         pip install "importlib_metadata ; python_version < '3.8'"
-        pip install mwparserfromhell
+        pip install "mwparserfromhell ; python_version != '3.13'"
         pip install packaging
         pip install "PyMySQL >= 1.0.0"
         pip install pytest

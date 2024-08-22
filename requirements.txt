@@ -18,8 +18,9 @@
 # $ awk -F '[#>=]' '{print $1}' requirements.txt | xargs apt-cache search
 
 # mandatory dependencies, others are optional
+# mwparserfromhell fails with Python 3.13 (T372162)
 importlib_metadata ; python_version < '3.8'
-mwparserfromhell>=0.5.2
+mwparserfromhell>=0.5.2; python_version != '3.13'
 packaging
 requests>=2.21.0
 
