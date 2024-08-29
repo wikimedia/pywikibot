@@ -44,7 +44,7 @@ class TestDeletionBotWrite(ScriptMainTestCase):
         p1 = pywikibot.Page(site, 'User:Unicodesnowman/ExistingPage')
         if not p1.exists():
             p1.text = 'pywikibot unit test page'
-            p1.save('unit test', bot=True)
+            p1.save('unit test')
         delete.main('-page:User:Unicodesnowman/ExistingPage', '-always',
                     '-undelete', '-summary:pywikibot unit tests')
 
@@ -76,7 +76,7 @@ class TestDeletionBotUser(ScriptMainTestCase):
     def save_page(cls):
         """Reset the test page content."""
         cls.page.text = 'Pywikibot deletion test.'
-        cls.page.save('Pywikibot unit test', bot=True)
+        cls.page.save('Pywikibot unit test')
 
     @unittest.expectedFailure  # T367299
     def test_delete_mark(self):
