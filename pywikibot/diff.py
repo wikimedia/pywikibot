@@ -9,7 +9,7 @@ from __future__ import annotations
 import difflib
 import math
 from collections import abc
-from difflib import _format_range_unified, SequenceMatcher
+from difflib import SequenceMatcher, _format_range_unified
 from heapq import nlargest
 from itertools import zip_longest
 

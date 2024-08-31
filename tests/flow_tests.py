@@ -12,12 +12,12 @@ from contextlib import suppress
 
 from pywikibot import config
 from pywikibot.exceptions import LockedPageError, NoPageError
+from pywikibot.tools import suppress_warnings
 from tests.aspects import TestCase
 from tests.basepage import (
     BasePageLoadRevisionsCachingTestBase,
     BasePageMethodsTestBase,
 )
-from pywikibot.tools import suppress_warnings
 
 
 with suppress_warnings(r'pywikibot\.flow\.(Board|Post|Topic) is deprecated '

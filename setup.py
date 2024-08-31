@@ -52,29 +52,6 @@ extra_deps = {
     'mwoauth': ['mwoauth!=0.3.1,>=0.2.4'],
     'html': ['beautifulsoup4>=4.7.1'],
     'http': ['fake-useragent>=1.4.0'],
-    'flake8': [  # Due to incompatibilities between packages the order matters.
-        'flake8>=5.0.4',
-        'darglint2',
-        'pydocstyle>=6.3.0',
-        'flake8-bugbear!=24.1.17',
-        'flake8-comprehensions>=3.13.0',
-        'flake8-docstrings>=1.4.0',
-        'flake8-future-annotations',
-        'flake8-mock-x2',
-        'flake8-print>=5.0.0',
-        'flake8-quotes>=3.3.2',
-        'flake8-raise',
-        'flake8-tuple>=0.4.1',
-        'flake8-no-u-prefixed-strings>=0.2',
-        'pep8-naming==0.13.3; python_version < "3.8"',
-        'pep8-naming>=0.14.0; python_version >= "3.8"',
-    ],
-    'hacking': [
-        'hacking',
-        # importlib-metadata module is already installed with hacking 4.1.0
-        # used by Python 3.7 but importlib-metadata >= 5 fails, so adjust it
-        'importlib-metadata<5.0.0; python_version < "3.8"',
-    ],
 }
 
 
