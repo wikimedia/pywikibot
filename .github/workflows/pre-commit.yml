@@ -12,11 +12,13 @@ env:
   PYWIKIBOT_NO_USER_CONFIG: 2
 jobs:
   pre-commit:
-    matrix:
-      python-version:
-        - "3.13.0-alpha - 3.13.0"
-        - "3.14-dev"
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - "3.13.0-alpha - 3.13.0"
+          - "3.14-dev"
     steps:
       - name: set up python ${{ matrix.python-version }}
         if: "!endsWith(matrix.python-version, '-dev')"
@@ -35,6 +37,4 @@ jobs:
       - name: run pre-commit
         uses: pre-commit/action@v3.0.1
         timeout-minutes: 5
-    strategy:
-      fail-fast: false
     timeout-minutes: 100
