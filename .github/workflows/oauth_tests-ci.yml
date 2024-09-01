@@ -16,6 +16,7 @@ env:
 jobs:
   build:
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
+    continue-on-error: ${{ matrix.experimental || false }}
     timeout-minutes: 5
 
     strategy:
@@ -36,6 +37,7 @@ jobs:
             family: wpbeta
             code: zh
             domain: zh.wikipedia.beta.wmflabs.org
+            experimental: true
 
     steps:
     - name: Checkout Repository
