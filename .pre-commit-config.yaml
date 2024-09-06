@@ -1,8 +1,15 @@
+default_install_hook_types:
+  - commit-msg
+  - pre-commit
 repos:
   - repo: meta
     hooks:
       - id: check-hooks-apply
       - id: check-useless-excludes
+  - repo: https://gitlab.wikimedia.org/repos/ci-tools/commit-message-validator
+    rev: v2.1.0
+    hooks:
+      - id: commit-message-validator
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
