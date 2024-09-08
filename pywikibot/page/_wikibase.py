@@ -521,6 +521,14 @@ class MediaInfo(WikibaseEntity):
         self._assert_has_id()
         return super().getID(numeric=numeric)
 
+    def title(self):
+        """
+        Return ID as title of the MediaInfo.
+
+        :return: str: the entity identifier
+        """
+        return self.getID()
+
     def editLabels(self, labels: LANGUAGE_TYPE, **kwargs) -> None:
         """Edit MediaInfo labels (eg. captions).
 
