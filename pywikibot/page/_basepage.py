@@ -1826,8 +1826,10 @@ class BasePage(ComparableMixin):
         .. versionadded:: 9.3
            *ignore_section* parameter
 
-        .. seealso:: :meth:`Site.getredirtarget()
-           <pywikibot.site._apisite.APISite.getredirtarget>`
+        .. seealso::
+           * :meth:`Site.getredirtarget()
+             <pywikibot.site._apisite.APISite.getredirtarget>`
+           * :meth:`moved_target`
 
         :param ignore_section: do not include section to the target even
             the link has one
@@ -1842,15 +1844,15 @@ class BasePage(ComparableMixin):
         """
         return self.site.getredirtarget(self, ignore_section=ignore_section)
 
-    def moved_target(self):
-        """
-        Return a Page object for the target this Page was moved to.
+    def moved_target(self) -> pywikibot.page.Page:
+        """Return a Page object for the target this Page was moved to.
 
         If this page was not moved, it will raise a NoMoveTargetError.
         This method also works if the source was already deleted.
 
-        :rtype: pywikibot.page.Page
-        :raises pywikibot.exceptions.NoMoveTargetError: page was not moved
+        .. seealso:: :meth:`getRedirectTarget`
+
+        :raises NoMoveTargetError: page was not moved
         """
         gen = iter(self.site.logevents(logtype='move', page=self, total=1))
         try:
