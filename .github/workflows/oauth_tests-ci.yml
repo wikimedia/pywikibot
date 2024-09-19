@@ -37,7 +37,6 @@ jobs:
             family: wpbeta
             code: zh
             domain: zh.wikipedia.beta.wmflabs.org
-            experimental: true
 
     steps:
     - name: Checkout Repository
