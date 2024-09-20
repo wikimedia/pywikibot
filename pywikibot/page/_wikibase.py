@@ -1777,19 +1777,19 @@ class Claim(Property):
             except NoWikibaseEntityError:
                 claim_type = None
 
-            claim.target = None
+            msg = None
             if not claim_type:
-                pywikibot.warning(f'{claim.id} does not exist.')
+                msg = '{claim.id} does not exist.'
             elif claim.type in cls.types:
                 # The default covers string, url types
                 claim.target = cls.TARGET_CONVERTER.get(
                     claim.type, lambda value, site: value)(value, site)
             else:
-                pywikibot.warning(
-                    f'{claim.type} datatype is not supported yet.')
+                msg = f'{claim.type} datatype is not supported yet.'
 
-            if claim.target is None:
+            if msg is not None:
                 claim.target = pywikibot.WbUnknown.fromWikibase(value)
+                claim.target.warning = msg
 
         if 'rank' in data:  # References/Qualifiers don't have ranks
             claim.rank = data['rank']

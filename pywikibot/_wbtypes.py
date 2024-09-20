@@ -1151,8 +1151,7 @@ class WbTabularData(WbDataPage):
 
 
 class WbUnknown(WbRepresentation):
-    """
-    A Wikibase representation for unknown data type.
+    """A Wikibase representation for unknown data type.
 
     This will prevent the bot from breaking completely when a new type
     is introduced.
@@ -1160,24 +1159,34 @@ class WbUnknown(WbRepresentation):
     This data type is just a json container
 
     .. versionadded:: 3.0
+    .. versionchanged:: 9.4
+       *warning* parameter was added
     """
 
     _items = ('json',)
 
-    def __init__(self, json: dict[str, Any]) -> None:
+    def __init__(self, json: dict[str, Any], warning: str = '') -> None:
         """
         Create a new WbUnknown object.
 
         :param json: Wikibase JSON
+        :param warning: a warning message which is shown once if
+            :meth:`toWikibase` is called
         """
         self.json = json
+        self.warning = warning
 
     def toWikibase(self) -> dict[str, Any]:
-        """
-        Return the JSON object for the Wikibase API.
+        """Return the JSON object for the Wikibase API.
+
+        .. versionchanged:: 9.4
+           a waning message given by the warning attribute is shown once.
 
         :return: Wikibase JSON
         """
+        if self.warning:
+            pywikibot.warning(self.warning)
+            self.warning = ''
         return self.json
 
     @classmethod
