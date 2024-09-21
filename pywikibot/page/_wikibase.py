@@ -510,22 +510,27 @@ class MediaInfo(WikibaseEntity):
         # reloading files without MediaInfo will fail.
         return super().get()
 
-    def getID(self, numeric: bool = False):
-        """
-        Get the entity identifier.
+    def getID(self, numeric: bool = False) -> str | int:
+        """Get the entity identifier.
+
+        .. seealso:: :meth:`title`
 
         :param numeric: Strip the first letter and return an int
-        :raise NoWikibaseEntityError: if this entity is associated with
-                                      a non-existing file
+        :raises NoWikibaseEntityError: if this entity is associated with
+            a non-existing file
         """
         self._assert_has_id()
         return super().getID(numeric=numeric)
 
-    def title(self):
-        """
-        Return ID as title of the MediaInfo.
+    def title(self) -> str:
+        """Return ID as title of the MediaInfo.
 
-        :return: str: the entity identifier
+        .. versionadded:: 9.4
+        .. seealso:: :meth:`getID`
+
+        :raises NoWikibaseEntityError: if this entity is associated with
+            a non-existing file
+        :return: the entity identifier
         """
         return self.getID()
 

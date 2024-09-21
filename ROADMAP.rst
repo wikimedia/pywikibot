@@ -1,6 +1,7 @@
 Current Release Changes
 =======================
 
+* Add :meth:`title()<pywikibot.MediaInfo.title>` method to :class:`pywikibot.MediaInfo` (:phab:`T366424`)
 * Add tags to the wikibase functions (:phab:`T372513`)
 * :func:`diff.get_close_matches_ratio()` function was added
 * Initialize super classes of :exc:`EditReplacementError` (:phab:`T212740`)
