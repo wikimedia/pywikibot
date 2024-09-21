@@ -1,6 +1,8 @@
 """Folder which holds framework scripts.
 
 .. versionadded:: 7.0
+.. versionremoved:: 9.4
+   ``preload_sites`` script was removed (:phab:`T348925`).
 """
 #
 # (C) Pywikibot team, 2021-2022
