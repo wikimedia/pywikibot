@@ -14,7 +14,6 @@ import operator
 import unittest
 from contextlib import suppress
 from decimal import Decimal
-from unittest import mock
 
 import pywikibot
 from pywikibot import pagegenerators
@@ -1192,12 +1191,11 @@ class TestLoadUnknownType(WikidataTestCase):
 
     def test_load_unknown(self):
         """Ensure unknown value is loaded but raises a warning."""
-        with mock.patch.object(pywikibot, 'warning', autospec=True) as warn:
-            self.wdp.get()
-            unknown_value = self.wdp.claims['P99999'][0].getTarget()
-            self.assertIsInstance(unknown_value, pywikibot.WbUnknown)
-            warn.assert_called_once_with(
-                'foo-unknown-bar datatype is not supported yet.')
+        self.wdp.get()
+        unknown_value = self.wdp.claims['P99999'][0].getTarget()
+        self.assertIsInstance(unknown_value, pywikibot.WbUnknown)
+        self.assertEqual(unknown_value.warning,
+                         'foo-unknown-bar datatype is not supported yet.')
 
 
 class TestItemPageExtensibility(TestCase):
