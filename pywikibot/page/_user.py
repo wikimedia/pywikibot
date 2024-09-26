@@ -11,6 +11,7 @@ from pywikibot.backports import Generator
 from pywikibot.exceptions import (
     APIError,
     AutoblockUserError,
+    NoRenameTargetError,
     NotEmailableError,
     UserRightsError,
 )
@@ -451,3 +452,42 @@ class User(Page):
            :phab:`T57401#2216861` and :phab:`T120753#1863894`.
         """
         return self.isRegistered() and 'bot' not in self.groups()
+
+    def renamed_target(self) -> User:
+        """Return a User object for the target this user was renamed to.
+
+        If this user was not renamed, it will raise a
+        :exc:`NoRenameTargetError`.
+
+        **Usage:**
+
+        >>> site = pywikibot.Site('wikipedia:de')
+        >>> user = pywikibot.User(site, 'Foo')
+        >>> user.isRegistered()
+        False
+        >>> target = user.renamed_target()
+        >>> target.isRegistered()
+        True
+        >>> target.title(with_ns=False)
+        'Foo~dewiki'
+        >>> target.renamed_target()
+        Traceback (most recent call last):
+        ...
+        pywikibot.exceptions.NoRenameTargetError: Rename target user ...
+
+        .. seealso::
+           * :meth:`BasePage.moved_target`
+           * :meth:`BasePage.getRedirectTarget`
+
+        .. versionadded:: 9.4
+
+        :raises NoRenameTargetError: user was not renamed
+        """
+        gen = iter(self.site.logevents(logtype='renameuser',
+                                       page=self, total=1))
+        try:
+            renamed = next(gen)
+        except StopIteration:
+            raise NoRenameTargetError(self)
+
+        return User(self.site, renamed.params['newuser'])
