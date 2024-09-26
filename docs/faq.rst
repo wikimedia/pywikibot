@@ -4,24 +4,21 @@ Frequently asked questions
 
 
 **How to speed up Pywikibot?**
-  1. The first time you are using Pywikibot for multiple Wikimedia sites you
-     can run :py:mod:`preload_sites <pywikibot.scripts.preload_sites>` script
-     to preload site info quickly.
-  2. If you need the content, use :py:mod:`PreloadingGenerator
-     <pagegenerators.PreloadingGenerator>` with page generators,
-     :py:mod:`EntityGenerator <pagegenerators.EntityGenerator>`
-     for wikibase entities and :py:mod:`DequePreloadingGenerator
-     <pagegenerators.DequePreloadingGenerator>` for a
-     :py:mod:`DequeGenerator <tools.collections.DequeGenerator>`.
-  3. If you use :py:mod:`GeneratorFactory
-     <pagegenerators.GeneratorFactory>` with your bot and use its
-     :py:mod:`getCombinedGenerator
-     <pagegenerators.GeneratorFactory.getCombinedGenerator>` method
-     you can set ``preload=True`` to preload page content. This is an alternate
-     to the ``PreloadingGenerator`` function mentioned above.
-  4. Use :py:mod:`MySQLPageGenerator
-     <pagegenerators.MySQLPageGenerator >` if direct DB access is
-     available and appropriate. See also: :manpage:`MySQL`
+  * If you need the content, use :py:mod:`PreloadingGenerator
+    <pagegenerators.PreloadingGenerator>` with page generators,
+    :func:`PreloadingEntityGenerator <pagegenerators.PreloadingEntityGenerator>`
+    for wikibase entities and :py:mod:`DequePreloadingGenerator
+    <pagegenerators.DequePreloadingGenerator>` for a
+    :py:mod:`DequeGenerator <tools.collections.DequeGenerator>`.
+  * If you use :py:mod:`GeneratorFactory
+    <pagegenerators.GeneratorFactory>` with your bot and use its
+    :py:mod:`getCombinedGenerator
+    <pagegenerators.GeneratorFactory.getCombinedGenerator>` method
+    you can set ``preload=True`` to preload page content. This is an alternate
+    to the ``PreloadingGenerator`` function mentioned above.
+  * Use :func:`MySQLPageGenerator
+    <pagegenerators.MySQLPageGenerator>` if direct DB access is
+    available and appropriate. See also: :manpage:`MySQL`
 
 **The bot cannot delete pages**
   Your account needs delete rights on your wiki. If you have setup another
