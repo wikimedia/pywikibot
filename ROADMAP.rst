@@ -1,6 +1,12 @@
 Current Release Changes
 =======================
 
+* Show a warning message for a deleted or unknown :class:`Claim<pywikibot.Claim>` type (:phab:`T374676`)
+* ``preload_sites`` maintenance script was removed (:phab:`T348925`)
+* Add :meth:`User.renamed_target()<pywikibot.User.renamed_target>` method
+* Check whether Claim exists within :meth:`Claim.fromJSON()<pywikibot.Claim.fromJSON>` method (:phab:`T374681`)
+* Add :attr:`logentries.LogEntry.params` as a public property
+* Add support for several wikis (:phab:`T375435`, :phab:`T375097`, :phab:`T374646`, :phab:`T374817`, :phab:`T375026`)
 * Add :meth:`title()<pywikibot.MediaInfo.title>` method to :class:`pywikibot.MediaInfo` (:phab:`T366424`)
 * Add tags to the wikibase functions (:phab:`T372513`)
 * :func:`diff.get_close_matches_ratio()` function was added
