@@ -1208,7 +1208,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gf.handle_arg('-randomredirect:1')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
-        pages = set(gen)
+        pages = list(gen)
         self.assertLength(pages, 1)
 
     def test_randomredirect_generator_ns(self):
