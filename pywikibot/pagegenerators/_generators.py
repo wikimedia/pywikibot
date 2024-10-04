@@ -214,10 +214,10 @@ def RecentChangesPageGenerator(
             try:
                 yield pageclass(site, rc['title'])
             except ValueError:
-                if pageclass == pywikibot.FilePage:
-                    pywikibot.exception()
-                else:
+                if pageclass != pywikibot.FilePage:
                     raise
+
+                pywikibot.exception()
 
     if site is None:
         site = pywikibot.Site()

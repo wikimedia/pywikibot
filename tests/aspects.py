@@ -964,11 +964,11 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
             *name*.
         """
         if not name and hasattr(cls, 'sites'):
-            if len(cls.sites) == 1:
-                name = next(iter(cls.sites.keys()))
-            else:
+            if len(cls.sites) != 1:
                 raise Exception(f'"{cls.__name__}.get_site(name=None)"'
                                 ' called with multiple sites')
+
+            name = next(iter(cls.sites.keys()))
 
         if name and name not in cls.sites:
             raise Exception(f'"{name}" not declared in {cls.__name__}')

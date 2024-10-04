@@ -1029,8 +1029,9 @@ class ItemPage(WikibasePage):
             # if none of the above applies, this item is in an invalid state
             # which needs to be raise as an exception, but also logged in case
             # an exception handler is catching the generic Error.
-            pywikibot.error(f'{self.__class__.__name__} is in invalid state')
-            raise Error(f'{self.__class__.__name__} is in invalid state')
+            msg = f'{self.__class__.__name__} is in invalid state'
+            pywikibot.error(msg)
+            raise Error(msg)
 
         return params
 

@@ -160,18 +160,18 @@ class AliasesDict(BaseDataDict):
         """
         norm_data = {}
         for key, values in data.items():
-            if isinstance(values, list):
-                strings = []
-                for value in values:
-                    if isinstance(value, str):
-                        strings.append({'language': key, 'value': value})
-                    else:
-                        strings.append(value)
-                norm_data[key] = strings
-            else:
+            if not isinstance(values, list):
                 raise TypeError(
-                    "Unsupported value type {!r} for '{}'; list expected."
-                    .format(type(values).__name__, values))
+                    f'Unsupported value type {type(values).__name__!r}'
+                    f"for '{values}'; list expected.")
+
+            strings = []
+            for value in values:
+                if isinstance(value, str):
+                    strings.append({'language': key, 'value': value})
+                else:
+                    strings.append(value)
+            norm_data[key] = strings
 
         return norm_data
 

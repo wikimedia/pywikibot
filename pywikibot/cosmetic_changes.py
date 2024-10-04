@@ -298,12 +298,13 @@ class CosmeticChangesToolkit:
         try:
             result = method(text)
         except Exception as e:
-            if self.ignore == CANCEL.METHOD:
-                pywikibot.warning('Unable to perform "{}" on "{}"!'
-                                  .format(method.__name__, self.title))
-                pywikibot.error(e)
-            else:
+            if self.ignore != CANCEL.METHOD:
                 raise
+
+            pywikibot.warning(
+                f'Unable to perform "{method.__name__}" on "{self.title}"!')
+            pywikibot.error(e)
+
         return text if result is None else result
 
     def _change(self, text: str) -> str:

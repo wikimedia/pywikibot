@@ -150,10 +150,9 @@ class UnusedFilesBot(SingleSiteBot,
         if page.exists():
             text = page.text
         else:
-            if page.isTalkPage():
-                text = ''
-            else:
+            if not page.isTalkPage():
                 raise NoPageError(page)
+            text = ''
 
         text += apptext
         self.current_page = page
