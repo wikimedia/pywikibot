@@ -3,6 +3,7 @@ Current Release Changes
 
 * Ignore :exc:`ValueError` durig upcast of :class:`FilePage<pywikibot.page.FilePage>` due to invalid file extension
   (:phab:`T367777`, :phab:`T376452`)
+* Provide an entry point to connect foreign scripts with pwb wapper (:phab:`T139143`, :phab:`T139144`)
 * Show a warning message for a deleted or unknown :class:`Claim<pywikibot.Claim>` type (:phab:`T374676`)
 * ``preload_sites`` maintenance script was removed (:phab:`T348925`)
 * Add :meth:`User.renamed_target()<pywikibot.User.renamed_target>` method
