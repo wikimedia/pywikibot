@@ -188,9 +188,9 @@ def RecentChangesPageGenerator(
        :class:`pywikibot.User<pywikibot.page.User>`,
        :class:`pywikibot.FilePage<pywikibot.page.FilePage>` or
        :class:`pywikibot.Category<pywikibot.page.Category>`.
-    .. versionchanged:: 9.2
+    .. versionchanged:: 9.4
        Ignore :class:`pywikibot.FilePage<pywikibot.page.FilePage>` if it
-       raises a :exc:`ValueError` during upcast e.g. due to an invaild
+       raises a :exc:`ValueError` during upcast e.g. due to an invalid
        file extension.
 
     :param site: Site for generator results.
@@ -214,9 +214,10 @@ def RecentChangesPageGenerator(
             try:
                 yield pageclass(site, rc['title'])
             except ValueError:
-                if pageclass == pywikibot.FilePage:
-                    pywikibot.exception()
-                raise
+                if pageclass != pywikibot.FilePage:
+                    raise
+
+                pywikibot.exception()
 
     if site is None:
         site = pywikibot.Site()

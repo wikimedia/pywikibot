@@ -706,16 +706,16 @@ class ModuleDeprecationWrapper(types.ModuleType):
                 f'Module has already an attribute named "{name}".')
 
         if replacement_name is None:
-            if hasattr(replacement, '__name__'):
-                replacement_name = replacement.__module__
-                if hasattr(replacement, '__self__'):
-                    replacement_name += '.'
-                    replacement_name += replacement.__self__.__class__.__name__
-                replacement_name += '.' + replacement.__name__
-            else:
+            if not hasattr(replacement, '__name__'):
                 raise TypeError('Replacement must have a __name__ attribute '
                                 'or a replacement name must be set '
                                 'specifically.')
+
+            replacement_name = replacement.__module__
+            if hasattr(replacement, '__self__'):
+                replacement_name += '.'
+                replacement_name += replacement.__self__.__class__.__name__
+            replacement_name += '.' + replacement.__name__
 
         if not warning_message:
             warning_message = _build_msg_string(

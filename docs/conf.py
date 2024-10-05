@@ -27,7 +27,11 @@ import sys
 import warnings
 from pathlib import Path
 
-import tomli
+
+try:
+    import tomllib
+except ImportError:
+    import tomli as tomllib
 
 
 # Deprecated classes will generate warnings as Sphinx processes them.
@@ -46,7 +50,7 @@ import pywikibot  # noqa: E402
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #
-needs_sphinx = '7.3.7'
+needs_sphinx = '8.0.2'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -54,6 +58,7 @@ needs_sphinx = '7.3.7'
 extensions = [
     'notfound.extension',
     'sphinx_copybutton',
+    'sphinx_tabs.tabs',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosectionlabel',
     'sphinx.ext.autosummary',
@@ -68,10 +73,9 @@ extensions = [
 templates_path = ['_templates']
 
 # The suffix(es) of source filenames.
-# You can specify multiple suffix as a list of string:
+# You can specify multiple suffix as a dict:
 #
-# source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+# source_suffix = {'.rst': 'restructuredtext'}
 
 # The encoding of source files.
 #
@@ -83,7 +87,7 @@ root_doc = 'index'
 # General information about the project.
 filepath = Path().absolute().parent / 'pyproject.toml'
 with open(filepath, 'rb') as f:
-    meta_data = tomli.load(f)
+    meta_data = tomllib.load(f)
 
 project = meta_data['project']['name'].title()
 project_copyright = pywikibot.__copyright__  # alias since Python 3.5
@@ -507,6 +511,7 @@ extlinks = {
     'source': (
         'https://phabricator.wikimedia.org/diffusion/PWBC/browse/master/%s.py',
         '%s'),
+    'wiki': ('https://en.wikipedia.org/wiki/%s', '%s')
 }
 
 

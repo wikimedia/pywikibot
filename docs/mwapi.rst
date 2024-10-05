@@ -62,41 +62,9 @@ See the table below for a cross reference between MediaWiki's API and Pywikibot'
      - :meth:`BasePage.expand_text()<page.BasePage.expand_text>`
      - :meth:`textlib.getCategoryLinks`
    * - :api:`flow<flow>`
-     - :meth:`load_board()<pywikibot.site._extensions.FlowMixin.load_board>`
-       :meth:`load_topiclist()<pywikibot.site._extensions.FlowMixin.load_topiclist>`
-       :meth:`load_topic()<pywikibot.site._extensions.FlowMixin.load_topic>`
-       :meth:`load_post_current_revision()<pywikibot.site._extensions.FlowMixin.load_post_current_revision>`
-       :meth:`create_new_topic()<pywikibot.site._extensions.FlowMixin.create_new_topic>`
-       :meth:`reply_to_post()<pywikibot.site._extensions.FlowMixin.reply_to_post>` |br|
-       :meth:`lock_topic()<pywikibot.site._extensions.FlowMixin.lock_topic>`
-       :meth:`moderate_topic()<pywikibot.site._extensions.FlowMixin.moderate_topic>`
-       :meth:`delete_topic()<pywikibot.site._extensions.FlowMixin.delete_topic>` |br|
-       :meth:`hide_topic()<pywikibot.site._extensions.FlowMixin.hide_topic>`
-       :meth:`suppress_topic()<pywikibot.site._extensions.FlowMixin.suppress_topic>`
-       :meth:`restore_topic()<pywikibot.site._extensions.FlowMixin.restore_topic>`
-       :meth:`moderate_post()<pywikibot.site._extensions.FlowMixin.moderate_post>`
-       :meth:`delete_post()<pywikibot.site._extensions.FlowMixin.delete_post>` |br|
-       :meth:`hide_post()<pywikibot.site._extensions.FlowMixin.hide_post>` |br|
-       :meth:`suppress_post()<pywikibot.site._extensions.FlowMixin.suppress_post>`
-       :meth:`restore_post()<pywikibot.site._extensions.FlowMixin.restore_post>`
+     - *deprecated, see below*
      -
-     - :meth:`flow.Board.topics`
-       :meth:`flow.Topic.create_topic`
-       :meth:`flow.Topic.lock`
-       :meth:`flow.Topic.unlock`
-       :meth:`flow.Topic.delete_mod`
-       :meth:`flow.Topic.hide`
-       :meth:`flow.Topic.suppress`
-       :meth:`flow.Topic.retore`
-       :meth:`flow.Post.reply`
-       :meth:`flow.Post.delete`
-       :meth:`flow.Post.hide`
-       :meth:`flow.Post.suppress`
-       :meth:`flow.Post.restore`
-   * - :api:`flowthank<flowthank>`
-     - :meth:`thank_post()<pywikibot.site._extensions.ThanksFlowMixin.thank_post>`
      -
-     - :meth:`flow.Post.thank`
    * - :api:`login<login>`
      - :meth:`login()<pywikibot.site._apisite.APISite.login>`
      -
@@ -170,3 +138,51 @@ See the table below for a cross reference between MediaWiki's API and Pywikibot'
      - :meth:`watch()<pywikibot.site._apisite.APISite.watch>`
      - :meth:`BasePage.watch()<page.BasePage.watch>`
      -
+
+Flow support
+============
+
+.. deprecated:: 9.4
+   will be removed with Pywikibot 12 or earlier (:phab:`T371180`).
+
+.. list-table::
+   :header-rows: 1
+   :align: left
+
+   * - action
+     - APISite method
+     - flow module method
+   * - :api:`flow<flow>`
+     - :meth:`load_board()<pywikibot.site._extensions.FlowMixin.load_board>` |br|
+       :meth:`load_topiclist()<pywikibot.site._extensions.FlowMixin.load_topiclist>` |br|
+       :meth:`load_topic()<pywikibot.site._extensions.FlowMixin.load_topic>` |br|
+       :meth:`load_post_current_revision()<pywikibot.site._extensions.FlowMixin.load_post_current_revision>` |br|
+       :meth:`create_new_topic()<pywikibot.site._extensions.FlowMixin.create_new_topic>` |br|
+       :meth:`reply_to_post()<pywikibot.site._extensions.FlowMixin.reply_to_post>` |br|
+       :meth:`lock_topic()<pywikibot.site._extensions.FlowMixin.lock_topic>` |br|
+       :meth:`moderate_topic()<pywikibot.site._extensions.FlowMixin.moderate_topic>` |br|
+       :meth:`delete_topic()<pywikibot.site._extensions.FlowMixin.delete_topic>` |br|
+       :meth:`hide_topic()<pywikibot.site._extensions.FlowMixin.hide_topic>` |br|
+       :meth:`suppress_topic()<pywikibot.site._extensions.FlowMixin.suppress_topic>` |br|
+       :meth:`restore_topic()<pywikibot.site._extensions.FlowMixin.restore_topic>` |br|
+       :meth:`moderate_post()<pywikibot.site._extensions.FlowMixin.moderate_post>` |br|
+       :meth:`delete_post()<pywikibot.site._extensions.FlowMixin.delete_post>` |br|
+       :meth:`hide_post()<pywikibot.site._extensions.FlowMixin.hide_post>` |br|
+       :meth:`suppress_post()<pywikibot.site._extensions.FlowMixin.suppress_post>` |br|
+       :meth:`restore_post()<pywikibot.site._extensions.FlowMixin.restore_post>` |br|
+     - :meth:`flow.Board.topics` |br|
+       :meth:`flow.Topic.create_topic` |br|
+       :meth:`flow.Topic.lock` |br|
+       :meth:`flow.Topic.unlock` |br|
+       :meth:`flow.Topic.delete_mod` |br|
+       :meth:`flow.Topic.hide` |br|
+       :meth:`flow.Topic.suppress` |br|
+       :meth:`flow.Topic.restore` |br|
+       :meth:`flow.Post.reply` |br|
+       :meth:`flow.Post.delete` |br|
+       :meth:`flow.Post.hide` |br|
+       :meth:`flow.Post.suppress` |br|
+       :meth:`flow.Post.restore` |br|
+   * - :api:`flowthank<flowthank>`
+     - :meth:`thank_post()<pywikibot.site._extensions.ThanksFlowMixin.thank_post>`
+     - :meth:`flow.Post.thank`

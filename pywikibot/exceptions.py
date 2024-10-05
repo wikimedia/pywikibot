@@ -22,6 +22,7 @@ the framework::
           |    +-- IsRedirectPageError
           |    +-- NoMoveTargetError
           |    +-- NoPageError
+          |    +-- NoRenameTargetError
           |    +-- NotEmailableError
           |    +-- PageLoadRelatedError
           |    |    +-- InconsistentTitleError
@@ -104,6 +105,7 @@ PageRelatedError: any exception which is caused by an operation on a Page.
   - InvalidPageError: Page is invalid e.g. without history
   - NotEmailableError: The target user has disabled email
   - NoMoveTargetError: An expected move target page does not exist
+  - NoRenameTargetError: An expected rename target user does not exist
 
 PageLoadRelatedError: any exception which happens while loading a Page.
   - InconsistentTitleError: Page receives a title inconsistent with query
@@ -369,6 +371,16 @@ class NoMoveTargetError(PageRelatedError):
     """Expected move target page not found."""
 
     message = 'Move target page of {} not found.'
+
+
+class NoRenameTargetError(PageRelatedError):
+
+    """Expected rename target user not found.
+
+    .. versionadded:: 9.4
+    """
+
+    message = 'Rename target user of {} not found.'
 
 
 class PageLoadRelatedError(PageRelatedError):

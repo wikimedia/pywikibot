@@ -1,5 +1,5 @@
 name: Oauth CI
-# Run login tests using OAuth
+# Run login tests using OAuth and non-sysop tests on test wiki
 
 on:
   push:
@@ -16,11 +16,11 @@ env:
 jobs:
   build:
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
+    continue-on-error: ${{ matrix.experimental || false }}
     timeout-minutes: 5
 
     strategy:
       fail-fast: false
-      max-parallel: 8
 
       matrix:
         python-version: [ "pypy3.7", "pypy3.10", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13.0-alpha - 3.13.0", "3.14-dev" ]
@@ -101,7 +101,7 @@ jobs:
       env:
         PYWIKIBOT_TEST_WRITE: 1
         PYWIKIBOT_TEST_OAUTH: ${{ secrets[format('{0}', steps.token.outputs.uppercase)] }}
-        PYWIKIBOT_TEST_MODULES: file,oauth
+        PYWIKIBOT_TEST_MODULES: edit_failure,file,oauth
       run: |
         python pwb.py version
         coverage run -m unittest -vv

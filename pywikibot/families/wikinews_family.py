@@ -24,7 +24,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     codes = {
         'ar', 'bs', 'ca', 'cs', 'de', 'el', 'en', 'eo', 'es', 'fa', 'fi', 'fr',
         'guw', 'he', 'it', 'ja', 'ko', 'li', 'nl', 'no', 'pl', 'pt', 'ro',
-        'ru', 'sq', 'sr', 'sv', 'ta', 'uk', 'zh',
+        'ru', 'shn', 'sq', 'sr', 'sv', 'ta', 'uk', 'zh',
     }
 
     category_redirect_templates = {

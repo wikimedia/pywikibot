@@ -1,0 +1,2 @@
+graft scripts/i18n/
+include CODE_OF_CONDUCT.rst

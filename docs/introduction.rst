@@ -41,4 +41,4 @@ language to be used can be set as follows:
    * :manpage:`i18n` Manual
    * `MediaWiki Language Codes <https://www.mediawiki.org/wiki/Manual:Language#Language_code>`_
    * :ref:`User Interface Settings`
-   * :py:mod:`pywikibot.i18n`
+   * :mod:`i18n`

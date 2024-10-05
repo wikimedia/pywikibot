@@ -1,12 +1,26 @@
 Current Release Changes
 =======================
 
-* Add support for bdrwiki (:phab:`T371762`)
+* Ignore :exc:`ValueError` durig upcast of :class:`FilePage<pywikibot.page.FilePage>` due to invalid file extension
+  (:phab:`T367777`, :phab:`T376452`)
+* Provide an entry point to connect foreign scripts with pwb wapper (:phab:`T139143`, :phab:`T139144`)
+* Show a warning message for a deleted or unknown :class:`Claim<pywikibot.Claim>` type (:phab:`T374676`)
+* ``preload_sites`` maintenance script was removed (:phab:`T348925`)
+* Add :meth:`User.renamed_target()<pywikibot.User.renamed_target>` method
+* Check whether Claim exists within :meth:`Claim.fromJSON()<pywikibot.Claim.fromJSON>` method (:phab:`T374681`)
+* Add :attr:`logentries.LogEntry.params` as a public property
+* Add support for several wikis (:phab:`T375435`, :phab:`T375097`, :phab:`T374646`, :phab:`T374817`, :phab:`T375026`)
+* Add :meth:`title()<pywikibot.MediaInfo.title>` method to :class:`pywikibot.MediaInfo` (:phab:`T366424`)
+* Add tags to the wikibase functions (:phab:`T372513`)
+* :func:`diff.get_close_matches_ratio()` function was added
+* Initialize super classes of :exc:`EditReplacementError` (:phab:`T212740`)
+* Add a hint to import missing module in :mod:`wrapper<pywikibot.scripts.wrapper>` script
 * i18n updates
 
 Current Deprecations
 ====================
 
+* 9.4.0: :mod:`flow` support is deprecated and will be removed (:phab:`T371180`)
 * 9.3.0: :meth:`page.BasePage.userName` and :meth:`page.BasePage.isIpEdit` are deprecated in favour of
   ``user`` or ``anon`` attributes of :attr:`page.BasePage.latest_revision` property
 * 9.2.0: Imports of :mod:`logging` functions from :mod:`bot` module is deprecated and will be desupported

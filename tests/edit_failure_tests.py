@@ -40,33 +40,6 @@ class TestSaveFailure(TestCase):
     family = 'wikipedia'
     code = 'test'
 
-    def test_protected(self):
-        """Test that protected titles raise the appropriate exception."""
-        if self.site.has_group('sysop'):
-            self.skipTest(
-                'Testing failure of edit protected with a sysop account')
-        page = pywikibot.Page(self.site, 'Wikipedia:Create a new page')
-        with self.assertRaises(LockedPageError):
-            page.save()
-
-    def test_spam(self):
-        """Test that spam in content raise the appropriate exception."""
-        page = pywikibot.Page(self.site, 'Wikipedia:Sandbox')
-        page.text = 'http://badsite.com'
-        with skipping(OtherPageSaveError), self.assertRaisesRegex(
-                SpamblacklistError, 'badsite.com'):
-            page.save()
-
-    def test_titleblacklist(self):
-        """Test that title blacklist raise the appropriate exception."""
-        user = pywikibot.User(self.site, self.site.user())
-        if 'sysop' in user.groups():
-            self.skipTest(f'{user} is member of the sysop group')
-
-        page = pywikibot.Page(self.site, 'User:UpsandDowns1234/Blacklisttest')
-        with self.assertRaises(TitleblacklistError):
-            page.save()
-
     def test_nobots(self):
         """Test that {{nobots}} raise the appropriate exception."""
         page = pywikibot.Page(self.site, 'User:John Vandenberg/nobots')
@@ -102,6 +75,42 @@ class TestSaveFailure(TestCase):
                 OtherPageSaveError,
                 "Page .* doesn't exist"):
             page.save(recreate=False)
+
+
+class TestNonSysopSaveFailure(TestCase):
+
+    """Tests for edits which should fail to save for non-sysop accounts."""
+
+    write = True
+    family = 'wikipedia'
+    code = 'test'
+
+    @classmethod
+    def setUpClass(cls):
+        """Skip tests for sysop accounts."""
+        super().setUpClass()
+        if cls.site.has_group('sysop'):
+            raise unittest.SkipTest('Testing failure with a sysop account')
+
+    def test_protected(self):
+        """Test that protected titles raise the appropriate exception."""
+        page = pywikibot.Page(self.site, 'Wikipedia:Create a new page')
+        with self.assertRaises(LockedPageError):
+            page.save()
+
+    def test_spam(self):
+        """Test that spam in content raise the appropriate exception."""
+        page = pywikibot.Page(self.site, 'Wikipedia:Sandbox')
+        page.text = 'http://badsite.com'
+        with skipping(OtherPageSaveError), self.assertRaisesRegex(
+                SpamblacklistError, 'badsite.com'):
+            page.save()
+
+    def test_titleblacklist(self):
+        """Test that title blacklist raise the appropriate exception."""
+        page = pywikibot.Page(self.site, 'User:UpsandDowns1234/Blacklisttest')
+        with self.assertRaises(TitleblacklistError):
+            page.save()
 
 
 class TestActionFailure(TestCase):

@@ -65,6 +65,7 @@ Contents
    recipes
    api_ref/index
    mwapi
+   entrypoint
 
 .. toctree::
    :maxdepth: 1

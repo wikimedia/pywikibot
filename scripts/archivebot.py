@@ -678,17 +678,17 @@ class PageArchiver:
             try:
                 key = pattern % params
             except TypeError as e:
-                if 'a real number is required' in str(e):
-                    pywikibot.error(e)
-                    pywikibot.info(
-                        fill('<<lightblue>>Use string format field like '
-                             '%(localfield)s instead of %(localfield)d. '
-                             'Trying to solve it...'))
-                    pywikibot.info()
-                    pattern = stringpattern
-                    key = pattern % params
-                else:
+                if 'a real number is required' not in str(e):
                     raise MalformedConfigError(e)
+
+                pywikibot.error(e)
+                pywikibot.info(
+                    fill('<<lightblue>>Use string format field like '
+                         '%(localfield)s instead of %(localfield)d. '
+                         'Trying to solve it...'))
+                pywikibot.info()
+                pattern = stringpattern
+                key = pattern % params
 
             threads_per_archive[key].append((i, thread))
             whys.add(why)  # FIXME: we don't know if we ever archive anything

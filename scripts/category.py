@@ -1426,9 +1426,8 @@ class CleanBot(Bot):
 
     .. note:: For details please read:
 
-       - https://en.wikipedia.org/wiki/WP:SUBCAT
-
-       - https://en.wikipedia.org/wiki/WP:DIFFUSE
+       - :wiki:`WP:SUBCAT`
+       - :wiki:`WP:DIFFUSE`
 
     .. versionadded:: 7.0
     """

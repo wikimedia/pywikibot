@@ -1285,20 +1285,30 @@ class BasePage(ComparableMixin):
              summary: str | None = None,
              watch: str | None = None,
              minor: bool = True,
-             bot: bool | None = None,
+             bot: bool = True,
              force: bool = False,
              asynchronous: bool = False,
              callback=None,
              apply_cosmetic_changes: bool | None = None,
              quiet: bool = False,
              **kwargs):
-        """
-        Save the current contents of page's text to the wiki.
+        """Save the current contents of page's text to the wiki.
 
         .. versionchanged:: 7.0
            boolean *watch* parameter is deprecated
         .. versionchanged:: 9.3
            *botflag* parameter was renamed to *bot*.
+        .. versionchanged:: 9.4
+           edits cannot be marked as bot edits if the bot account has no
+           ``bot`` right. Therefore a ``None`` argument for *bot*
+           parameter was dropped.
+
+        .. hint:: Setting up :manpage:`OAuth` or :manpage:`BotPassword
+           <BotPasswords>` login, you have to grant
+           ``High-volume (bot) access`` to get ``bot`` right even if the
+           account is member of the bots group granted by bureaucrats.
+           Otherwise edits cannot be marked with both flag and *bot*
+           argument will be ignored.
 
         .. seealso:: :meth:`APISite.editpage
            <pywikibot.site._apisite.APISite.editpage>`
@@ -1313,10 +1323,11 @@ class BasePage(ComparableMixin):
             * unwatch --- remove the page from the watchlist
             * preferences --- use the preference settings (Default)
             * nochange --- don't change the watchlist
+
             If None (default), follow bot account's default settings
         :param minor: if True, mark this edit as minor
-        :param bot: if True, mark this edit as made by a bot (default:
-            True if user has bot status, False if not)
+        :param bot: if True, mark this edit as made by a bot if user has
+            ``bot`` right (default), if False do not mark it as bot edit.
         :param force: if True, ignore botMayEdit() setting
         :param asynchronous: if True, launch a separate thread to save
             asynchronously
@@ -1351,15 +1362,13 @@ class BasePage(ComparableMixin):
                    cc=apply_cosmetic_changes, quiet=quiet, **kwargs)
 
     @allow_asynchronous
-    def _save(self, summary=None, watch=None, minor: bool = True, bot=None,
-              cc=None, quiet: bool = False, **kwargs):
+    def _save(self, summary=None, cc=None, quiet: bool = False, **kwargs):
         """Helper function for save()."""
         link = self.title(as_link=True)
         if cc or (cc is None and config.cosmetic_changes):
             summary = self._cosmetic_changes_hook(summary)
 
-        done = self.site.editpage(self, summary=summary, minor=minor,
-                                  watch=watch, bot=bot, **kwargs)
+        done = self.site.editpage(self, summary=summary, **kwargs)
         if not done:
             if not quiet:
                 pywikibot.warning(f'Page {link} not saved')
@@ -1414,14 +1423,13 @@ class BasePage(ComparableMixin):
             summary: str | None = None,
             watch: str | None = None,
             minor: bool = True,
-            bot: bool | None = None,
+            bot: bool = True,
             force: bool = False,
             asynchronous: bool = False,
             callback=None,
             show_diff: bool = False,
             **kwargs) -> None:
-        """
-        Save the page with the contents of the first argument as the text.
+        """Save the page with the contents of the first argument as the text.
 
         This method is maintained primarily for backwards-compatibility.
         For new code, using :meth:`save` is preferred; also ee that
@@ -1431,6 +1439,10 @@ class BasePage(ComparableMixin):
            The `show_diff` parameter
         .. versionchanged:: 9.3
            *botflag* parameter was renamed to *bot*.
+        .. versionchanged:: 9.4
+           edits cannot be marked as bot edits if the bot account has no
+           ``bot`` right. Therefore a ``None`` argument for *bot*
+           parameter was dropped.
 
         .. seealso:: :meth:`save`
 
@@ -1814,8 +1826,10 @@ class BasePage(ComparableMixin):
         .. versionadded:: 9.3
            *ignore_section* parameter
 
-        .. seealso:: :meth:`Site.getredirtarget()
-           <pywikibot.site._apisite.APISite.getredirtarget>`
+        .. seealso::
+           * :meth:`Site.getredirtarget()
+             <pywikibot.site._apisite.APISite.getredirtarget>`
+           * :meth:`moved_target`
 
         :param ignore_section: do not include section to the target even
             the link has one
@@ -1830,15 +1844,15 @@ class BasePage(ComparableMixin):
         """
         return self.site.getredirtarget(self, ignore_section=ignore_section)
 
-    def moved_target(self):
-        """
-        Return a Page object for the target this Page was moved to.
+    def moved_target(self) -> pywikibot.page.Page:
+        """Return a Page object for the target this Page was moved to.
 
         If this page was not moved, it will raise a NoMoveTargetError.
         This method also works if the source was already deleted.
 
-        :rtype: pywikibot.page.Page
-        :raises pywikibot.exceptions.NoMoveTargetError: page was not moved
+        .. seealso:: :meth:`getRedirectTarget`
+
+        :raises NoMoveTargetError: page was not moved
         """
         gen = iter(self.site.logevents(logtype='move', page=self, total=1))
         try:

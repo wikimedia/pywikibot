@@ -31,11 +31,11 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     codes = {
         'af', 'ar', 'as', 'az', 'bcl', 'be', 'bg', 'bjn', 'bn', 'br', 'bs',
         'ca', 'cs', 'cy', 'da', 'de', 'el', 'en', 'eo', 'es', 'et', 'eu', 'fa',
-        'fi', 'fr', 'gl', 'gu', 'guw', 'he', 'hi', 'hr', 'hu', 'hy', 'id',
-        'ig', 'is', 'it', 'ja', 'ka', 'kn', 'ko', 'ku', 'ky', 'la', 'li', 'lt',
-        'ml', 'mr', 'nl', 'nn', 'no', 'pl', 'pt', 'ro', 'ru', 'sa', 'sah',
-        'sk', 'sl', 'sq', 'sr', 'su', 'sv', 'ta', 'te', 'th', 'tl', 'tr', 'uk',
-        'ur', 'uz', 'vi', 'zh',
+        'fi', 'fr', 'gl', 'gor', 'gu', 'guw', 'he', 'hi', 'hr', 'hu', 'hy',
+        'id', 'ig', 'is', 'it', 'ja', 'ka', 'kn', 'ko', 'ku', 'ky', 'la', 'li',
+        'lt', 'ml', 'mr', 'nl', 'nn', 'no', 'pl', 'pt', 'ro', 'ru', 'sa',
+        'sah', 'sk', 'sl', 'sq', 'sr', 'su', 'sv', 'ta', 'te', 'th', 'tl',
+        'tr', 'uk', 'ur', 'uz', 'vi', 'zh',
     }
 
     category_redirect_templates = {

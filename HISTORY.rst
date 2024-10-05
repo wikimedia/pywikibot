@@ -1,6 +1,14 @@
 Release History
 ===============
 
+9.3.1
+-----
+*06 August 2024*
+
+* Add support for bdrwiki (:phab:`T371762`)
+* i18n updates
+
+
 9.3.0
 -----
 *28 July 2024*
@@ -38,8 +46,6 @@ Release History
 * Add support for ``btmwiki`` to Pywikibot (:phab:`T368069`)
 * Include image repository extensions in :attr:`site.APISite.file_extensions
   <pywikibot.site._apisite.APISite.file_extensions>`
-* Ignore :exc:`ValueError` durig upcast of :class:`FilePage<pywikibot.page.FilePage>` due to invalid file extension
-  (:phab:`T367777`)
 * Add :func:`pagegenerators.SupersetPageGenerator` pagegenerator (:phab:`T367684`)
 * No longer wait in :meth:`data.api.Request._http_request` for ``ImportError`` and ``NameError``
 * Replace ``requests.utils.urlparse`` with ``urllib.parse.urlparse`` in

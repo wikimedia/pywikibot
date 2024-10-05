@@ -362,6 +362,7 @@ class TestFilePageDataItem(TestCase):
         self.assertEqual('-1', item.id)
         item.get()
         self.assertEqual('M14634781', item.id)
+        self.assertEqual('M14634781', item.title())
         self.assertIsInstance(
             item.labels, pywikibot.page._collections.LanguageDict)
         self.assertIsInstance(
@@ -400,6 +401,8 @@ class TestFilePageDataItem(TestCase):
 
         with self.assertRaises(NoWikibaseEntityError):
             item.get()
+        with self.assertRaises(NoWikibaseEntityError):
+            item.title()
         with self.assertRaises(NoWikibaseEntityError):
             item.labels
 

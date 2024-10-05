@@ -510,16 +510,29 @@ class MediaInfo(WikibaseEntity):
         # reloading files without MediaInfo will fail.
         return super().get()
 
-    def getID(self, numeric: bool = False):
-        """
-        Get the entity identifier.
+    def getID(self, numeric: bool = False) -> str | int:
+        """Get the entity identifier.
+
+        .. seealso:: :meth:`title`
 
         :param numeric: Strip the first letter and return an int
-        :raise NoWikibaseEntityError: if this entity is associated with
-                                      a non-existing file
+        :raises NoWikibaseEntityError: if this entity is associated with
+            a non-existing file
         """
         self._assert_has_id()
         return super().getID(numeric=numeric)
+
+    def title(self) -> str:
+        """Return ID as title of the MediaInfo.
+
+        .. versionadded:: 9.4
+        .. seealso:: :meth:`getID`
+
+        :raises NoWikibaseEntityError: if this entity is associated with
+            a non-existing file
+        :return: the entity identifier
+        """
+        return self.getID()
 
     def editLabels(self, labels: LANGUAGE_TYPE, **kwargs) -> None:
         """Edit MediaInfo labels (eg. captions).
@@ -1016,8 +1029,9 @@ class ItemPage(WikibasePage):
             # if none of the above applies, this item is in an invalid state
             # which needs to be raise as an exception, but also logged in case
             # an exception handler is catching the generic Error.
-            pywikibot.error(f'{self.__class__.__name__} is in invalid state')
-            raise Error(f'{self.__class__.__name__} is in invalid state')
+            msg = f'{self.__class__.__name__} is in invalid state'
+            pywikibot.error(msg)
+            raise Error(msg)
 
         return params
 
@@ -1420,11 +1434,34 @@ class Property:
         if datatype:
             self._type = datatype
 
+    def exists(self):
+        """Determine if the property exists in the data repository.
+
+        .. versionadded:: 9.4
+        """
+        try:
+            self._type = self.repo.getPropertyType(self)
+        except KeyError:
+            return False
+        return True
+
     @property
     @cached
     def type(self) -> str:
-        """Return the type of this property."""
-        return self.repo.getPropertyType(self)
+        """Return the type of this property.
+
+        .. versionchanged:: 9.4
+           raises :exc:`NoWikibaseEntityError` if property does not
+           exist.
+
+        :raises NoWikibaseEntityError: property does not exist
+        """
+        try:
+            prop_type = self.repo.getPropertyType(self)
+        except KeyError as e:
+            raise NoWikibaseEntityError(e)
+
+        return prop_type
 
     def getID(self, numeric: bool = False):
         """
@@ -1719,14 +1756,14 @@ class Claim(Property):
         return copy
 
     @classmethod
-    def fromJSON(cls, site, data):
-        """
-        Create a claim object from JSON returned in the API call.
+    def fromJSON(cls, site, data: dict[str, Any]) -> Claim:
+        """Create a claim object from JSON returned in the API call.
+
+        .. versionchanged:: 9.4
+           print a warning if the Claim.type is not given and missing in
+           the wikibase.
 
         :param data: JSON containing claim data
-        :type data: dict
-
-        :rtype: pywikibot.page.Claim
         """
         claim_repo = site.get_repo_for_entity_type('property')
         claim = cls(claim_repo, data['mainsnak']['property'],
@@ -1735,17 +1772,31 @@ class Claim(Property):
             claim.snak = data['id']
         elif 'hash' in data:
             claim.hash = data['hash']
+
         claim.snaktype = data['mainsnak']['snaktype']
         if claim.getSnakType() == 'value':
             value = data['mainsnak']['datavalue']['value']
-            # The default covers string, url types
-            if claim.type in cls.types:
+
+            # note: claim.type could be set during claim initialization
+            try:
+                claim_type = claim.type
+            except NoWikibaseEntityError:
+                claim_type = None
+
+            msg = None
+            if not claim_type:
+                msg = '{claim.id} does not exist.'
+            elif claim.type in cls.types:
+                # The default covers string, url types
                 claim.target = cls.TARGET_CONVERTER.get(
                     claim.type, lambda value, site: value)(value, site)
             else:
-                pywikibot.warning(
-                    f'{claim.type} datatype is not supported yet.')
+                msg = f'{claim.type} datatype is not supported yet.'
+
+            if msg is not None:
                 claim.target = pywikibot.WbUnknown.fromWikibase(value)
+                claim.target.warning = msg
+
         if 'rank' in data:  # References/Qualifiers don't have ranks
             claim.rank = data['rank']
         if 'references' in data:

@@ -1,0 +1,94 @@
+default_install_hook_types:
+  - commit-msg
+  - pre-commit
+repos:
+  - repo: meta
+    hooks:
+      - id: check-hooks-apply
+      - id: check-useless-excludes
+  - repo: https://gitlab.wikimedia.org/repos/ci-tools/commit-message-validator
+    rev: v2.1.0
+    hooks:
+      - id: commit-message-validator
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-ast
+      - id: check-builtin-literals
+      - id: check-case-conflict
+      - id: check-executables-have-shebangs
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-shebang-scripts-are-executable
+      - id: check-toml
+      - id: check-vcs-permalinks
+      - id: check-xml
+      - id: check-yaml
+      - id: debug-statements
+      - id: destroyed-symlinks
+      - id: end-of-file-fixer
+      - id: fix-byte-order-marker
+      - id: fix-encoding-pragma
+        args:
+          - --remove
+      - id: forbid-new-submodules
+      - id: mixed-line-ending
+      - id: pretty-format-json
+        args:
+          - --autofix
+          - --indent=4
+          - --no-ensure-ascii
+      - id: trailing-whitespace
+        args:
+          - --markdown-linebreak-ext=rst
+        exclude: '^tests/data/'
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.10.0
+    hooks:
+      - id: python-check-blanket-noqa
+      - id: python-check-blanket-type-ignore
+      - id: python-check-mock-methods
+      - id: python-use-type-annotations
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.17.0
+    hooks:
+      - id: pyupgrade
+        args:
+          - --py37-plus
+  - repo: https://github.com/PyCQA/autoflake
+    rev: v2.3.1
+    hooks:
+      - id: autoflake
+        args:
+          - --expand-star-imports
+          - --in-place
+          - --remove-all-unused-imports
+          - --remove-duplicate-keys
+          - --remove-unused-variables
+        exclude: '^pywikibot/backports\.py$'
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        exclude: '^pwb\.py$'
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.1.1
+    hooks:
+      - id: flake8
+        args:
+          - --doctests
+        additional_dependencies:
+          # Due to incompatibilities between packages the order matters.
+          - darglint2
+          - pydocstyle==6.3.0  # deprecated and no longer maintained
+          - flake8-bugbear!=24.1.17
+          - flake8-comprehensions>=3.13.0
+          - flake8-docstrings>=1.4.0
+          - flake8-mock-x2
+          - flake8-print>=5.0.0
+          - flake8-quotes>=3.3.2
+          - flake8-raise
+          - flake8-tuple>=0.4.1
+          - flake8-no-u-prefixed-strings>=0.2
+          - pep8-naming>=0.13.3

@@ -220,7 +220,7 @@ def stdout(msg: Any = '', *args: Any, **kwargs: Any) -> None:
        parameter *layer* was added.
     .. seealso::
        - :python:`Logger.log()<library/logging.html#logging.Logger.log>`
-       - https://en.wikipedia.org/wiki/Pipeline_%28Unix%29
+       - :wiki:`Pipeline (Unix)`
     """
     logoutput(msg, *args, level=STDOUT, **kwargs)
 

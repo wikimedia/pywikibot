@@ -2,13 +2,12 @@
 requires = ["packaging", "setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools]
+package-dir = {"pywikibot_scripts" = "scripts"}
 
 [project]
-name = "pywikibot"
-
-##############################################################
-# Keep this file readable for all entries above this comment #
-##############################################################
+name = "pywikibot-scripts"
+version = "9.4.0"
 
 authors = [
     {name = "xqt", email = "info@gno.de"},
@@ -16,11 +15,24 @@ authors = [
 maintainers = [
     {name = "The Pywikibot team", email = "pywikibot@lists.wikimedia.org"},
 ]
-description = "Python MediaWiki Bot Framework"
+description = "Pywikibot Scripts Collection"
+readme = "scripts/README.rst"
 requires-python = ">=3.7.0"
+dependencies = [
+    "pywikibot >= 9.4.0.dev0",
+    "isbnlib",
+    "langdetect",
+    "mwparserfromhell",
+    "pydot",
+    "requests",
+    "unidecode",
+]
+
 keywords = [
-    "API", "bot", "client", "framework", "mediawiki", "pwb", "pybot", "python",
+    "add text", "archivebot", "basic", "bot", "client", "framework", "mediawiki",
+    "pwb", "pybot", "python",
     "pywiki", "pywikibase", "pywikibot", "pywikipedia", "pywikipediabot",
+    "replace", "redirect", "script", "scripts", "upload",
     "wiki", "wikibase", "wikidata", "wikimedia", "wikipedia",
 ]
 license = {text = "MIT License"}
@@ -106,16 +118,9 @@ classifiers=[
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Utilities",
 ]
-dynamic = [
-    "dependencies",
-    "optional-dependencies",
-    "readme",
-    "version",
-]
 
-
-[project.scripts]
-pwb = "pywikibot.scripts.wrapper:run"
+[project.entry-points."pywikibot"]
+scriptspath = "pywikibot_scripts:base_dir"
 
 [project.urls]
 Homepage = "https://www.mediawiki.org/wiki/Manual:Pywikibot"
@@ -125,23 +130,3 @@ Repository = "https://gerrit.wikimedia.org/r/plugins/gitiles/pywikibot/core/"
 Download = "https://www.pywikibot.org"
 Changelog = "https://doc.wikimedia.org/pywikibot/master/changelog.html"
 Tracker = "https://phabricator.wikimedia.org/tag/pywikibot/"
-
-
-[tool.isort]
-py_version = 37
-add_imports = ["from __future__ import annotations"]
-atomic = true
-ensure_newline_before_comments = true
-force_grid_wrap = 0
-include_trailing_comma = true
-lines_after_imports = 2
-multi_line_output = 3
-use_parentheses = true
-
-
-[tool.mypy]
-python_version = 3.7
-enable_error_code = [
-    "ignore-without-code",
-]
-ignore_missing_imports = true

@@ -1,6 +1,15 @@
+.. image:: https://img.shields.io/github/languages/top/wikimedia/pywikibot
+   :alt: Top language
+   :target: https://www.python.org/downloads/
+.. image:: https://img.shields.io/github/last-commit/wikimedia/pywikibot
+   :alt: Last commit
+   :target: https://gerrit.wikimedia.org/r/plugins/gitiles/pywikibot/core/
+
 ###########################################################################
 **This is a package to include robots for MediaWiki wikis like Wikipedia.**
 ###########################################################################
+
+.. role:: api
 
 *********************************
 Some example robots are included.
@@ -151,6 +160,8 @@ Bots and scripts
 | unusedfiles.py           | Bot appends some text to all unused images and other    |
 |                          | text to the respective uploaders.                       |
 +--------------------------+---------------------------------------------------------+
+| unlink.py                | This bot unlinks a page on every page that links to it. |
++--------------------------+---------------------------------------------------------+
 | upload.py                | Upload an image to a wiki.                              |
 +--------------------------+---------------------------------------------------------+
 | watchlists.py            | Allows access to the account's watchlist.               |
@@ -177,18 +188,6 @@ Maintenance
 | unidata.py             | Updates _first_upper_exception_dict in tools.unidata    |
 +------------------------+---------------------------------------------------------+
 
-Others
-======
-
-+------------------------+---------------------------------------------------------+
-| Others                 |                                                         |
-+========================+=========================================================+
-| i18n (folder)          | Contains i18n translations for bot edit summaries.      |
-+------------------------+---------------------------------------------------------+
-| userscripts (folder)   | Empty folder for user scripts.                          |
-+------------------------+---------------------------------------------------------+
-| README.rst             | This file (Short info of all scripts).                  |
-+------------------------+---------------------------------------------------------+
 
 **External packages could be required with Pywikibot:**
 

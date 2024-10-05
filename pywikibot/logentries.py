@@ -1,6 +1,6 @@
 """Objects representing MediaWiki log entries."""
 #
-# (C) Pywikibot team, 2007-2023
+# (C) Pywikibot team, 2007-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -94,8 +94,12 @@ class LogEntry(UserDict):
         return super().__getattribute__(item)
 
     @property
-    def _params(self) -> dict[str, Any]:
-        """Additional data for some log entry types."""
+    def params(self) -> dict[str, Any]:
+        """Additional data for some log entry types.
+
+        .. versionadded:: 9.4
+           private *_param* attribute became a public property
+        """
         return self.get('params', {})
 
     @cached
@@ -182,7 +186,7 @@ class BlockEntry(LogEntry):
         if self.action() == 'unblock':
             return []
 
-        return self._params.get('flags', [])
+        return self.params.get('flags', [])
 
     @cached
     def duration(self) -> datetime.timedelta | None:
@@ -198,7 +202,7 @@ class BlockEntry(LogEntry):
     @cached
     def expiry(self) -> pywikibot.Timestamp | None:
         """Return a Timestamp representing the block expiry date."""
-        details = self._params.get('expiry')
+        details = self.params.get('expiry')
         return pywikibot.Timestamp.fromISOformat(details) if details else None
 
 
@@ -217,7 +221,7 @@ class RightsEntry(LogEntry):
            LogEntry has no additional data e.g. due to hidden data and
            insufficient rights.
         """
-        return self._params.get('oldgroups', [])
+        return self.params.get('oldgroups', [])
 
     @property
     def newgroups(self) -> list[str]:
@@ -228,7 +232,7 @@ class RightsEntry(LogEntry):
            LogEntry has no additional data e.g. due to hidden data and
            insufficient rights.
         """
-        return self._params.get('newgroups', [])
+        return self.params.get('newgroups', [])
 
 
 class UploadEntry(LogEntry):
@@ -252,12 +256,12 @@ class MoveEntry(LogEntry):
     @property
     def target_ns(self) -> pywikibot.site._namespace.Namespace:
         """Return namespace object of target page."""
-        return self.site.namespaces[self._params['target_ns']]
+        return self.site.namespaces[self.params['target_ns']]
 
     @property
     def target_title(self) -> str:
         """Return the target title."""
-        return self._params['target_title']
+        return self.params['target_title']
 
     @property
     @cached
@@ -268,7 +272,7 @@ class MoveEntry(LogEntry):
     def suppressedredirect(self) -> bool:
         """Return True if no redirect was created during the move."""
         # Introduced in MW r47901
-        return 'suppressedredirect' in self._params
+        return 'suppressedredirect' in self.params
 
 
 class PatrolEntry(LogEntry):
@@ -280,17 +284,17 @@ class PatrolEntry(LogEntry):
     @property
     def current_id(self) -> int:
         """Return the current id."""
-        return int(self._params['curid'])
+        return int(self.params['curid'])
 
     @property
     def previous_id(self) -> int:
         """Return the previous id."""
-        return int(self._params['previd'])
+        return int(self.params['previd'])
 
     @property
     def auto(self) -> bool:
         """Return auto patrolled."""
-        return 'auto' in self._params and self._params['auto'] != 0
+        return 'auto' in self.params and self.params['auto'] != 0
 
 
 class LogEntryFactory:

@@ -346,15 +346,15 @@ class Family:
         if fam in Family._families:
             return Family._families[fam]
 
-        if fam in config.family_files:
-            family_file = config.family_files[fam]
-
-            if family_file.startswith(('http://', 'https://')):
-                myfamily = AutoFamily(fam, family_file)
-                Family._families[fam] = myfamily
-                return Family._families[fam]
-        else:
+        if fam not in config.family_files:
             raise UnknownFamilyError(f'Family {fam} does not exist')
+
+        family_file = config.family_files[fam]
+
+        if family_file.startswith(('http://', 'https://')):
+            myfamily = AutoFamily(fam, family_file)
+            Family._families[fam] = myfamily
+            return Family._families[fam]
 
         try:
             # Ignore warnings due to dots in family names.
@@ -715,8 +715,8 @@ class Family:
         """
         Do a conversion on the retrieved text from the Wiki.
 
-        For example a X-conversion in Esperanto
-        https://en.wikipedia.org/wiki/Esperanto_orthography#X-system.
+        For example a :wiki:`X-conversion in Esperanto
+        <Esperanto_orthography#X-system>`.
         """
         return getText
 
@@ -724,8 +724,8 @@ class Family:
         """
         Do a conversion on the text to insert on the Wiki.
 
-        For example a X-conversion in Esperanto
-        https://en.wikipedia.org/wiki/Esperanto_orthography#X-system.
+        For example a :wiki:`X-conversion in Esperanto
+        <Esperanto_orthography#X-system>`.
         """
         return putText
 

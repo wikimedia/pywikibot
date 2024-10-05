@@ -1,5 +1,4 @@
-"""
-Server-Sent Events client.
+"""Server-Sent Events client.
 
 This file is part of the Pywikibot framework.
 
@@ -10,7 +9,7 @@ This module requires sseclient to be installed::
 .. versionadded:: 3.0
 """
 #
-# (C) Pywikibot team, 2017-2023
+# (C) Pywikibot team, 2017-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -281,10 +280,10 @@ class EventStreams(GeneratorWrapper):
 
         # register an external filter function
         for func in args:
-            if callable(func):
-                self.filter[ftype].append(func)
-            else:
+            if not callable(func):
                 raise TypeError(f'{func} is not a callable')
+
+            self.filter[ftype].append(func)
 
         # register pairs of keys and items as a filter function
         for key, value in kwargs.items():

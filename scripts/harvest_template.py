@@ -139,12 +139,12 @@ willstop = False
 
 def _signal_handler(signum, frame) -> None:
     global willstop
-    if not willstop:
-        willstop = True
-        pywikibot.info('Received ctrl-c. Finishing current item; '
-                       'press ctrl-c again to abort.')
-    else:
+    if willstop:
         raise KeyboardInterrupt
+
+    willstop = True
+    pywikibot.info('Received ctrl-c. Finishing current item; '
+                   'press ctrl-c again to abort.')
 
 
 signal.signal(signal.SIGINT, _signal_handler)

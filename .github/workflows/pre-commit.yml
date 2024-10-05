@@ -1,0 +1,40 @@
+name: pre-commit
+on:
+  push:
+    branches:
+      - master
+      - stable
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  PYWIKIBOT_TEST_RUNNING: 1
+  PYWIKIBOT_NO_USER_CONFIG: 2
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - "3.13.0-alpha - 3.13.0"
+          - "3.14-dev"
+    steps:
+      - name: set up python ${{ matrix.python-version }}
+        if: "!endsWith(matrix.python-version, '-dev')"
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: set up development python ${{ matrix.python-version }}
+        if: "endsWith(matrix.python-version, '-dev')"
+        uses: deadsnakes/action@v3.1.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: run pre-commit
+        uses: pre-commit/action@v3.0.1
+        timeout-minutes: 5
+    timeout-minutes: 100

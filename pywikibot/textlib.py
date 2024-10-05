@@ -193,16 +193,14 @@ class MultiTemplateMatchBuilder:
         # TODO: merge regex with NESTED_TEMPLATE_REGEX
         namespace = self.site.namespaces[10]
         if isinstance(template, pywikibot.Page):
-            if template.namespace() == 10:
-                old = template.title(with_ns=False)
-            else:
-                raise ValueError(
-                    f'{template} is not a template Page object')
+            if template.namespace() != 10:
+                raise ValueError(f'{template} is not a template Page object')
+
+            old = template.title(with_ns=False)
         elif isinstance(template, str):
             old = template
         else:
-            raise ValueError(
-                f'{template!r} is not a valid template')
+            raise ValueError(f'{template!r} is not a valid template')
 
         pattern = case_escape(namespace.case, old)
         # namespaces may be any mixed case
@@ -1419,13 +1417,14 @@ def interwikiFormat(links: dict, insite=None) -> str:
     for site in ar:
         if isinstance(links[site], pywikibot.Link):
             links[site] = pywikibot.Page(links[site])
-        if isinstance(links[site], pywikibot.Page):
-            title = links[site].title(as_link=True, force_interwiki=True,
-                                      insite=insite)
-            link = title.replace('[[:', '[[')
-            s.append(link)
-        else:
+        if not isinstance(links[site], pywikibot.Page):
             raise ValueError('links dict must contain Page or Link objects')
+
+        title = links[site].title(as_link=True, force_interwiki=True,
+                                  insite=insite)
+        link = title.replace('[[:', '[[')
+        s.append(link)
+
     sep = ' ' if insite.code in insite.family.interwiki_on_one_line else '\n'
     return sep.join(s) + '\n'
 

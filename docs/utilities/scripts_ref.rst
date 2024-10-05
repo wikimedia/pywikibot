@@ -30,12 +30,6 @@ login script
 .. automodule:: pywikibot.scripts.login
    :synopsis: Script to log the bot in to a wiki account
 
-preload_sites script
-====================
-
-.. automodule:: pywikibot.scripts.preload_sites
-   :synopsis: Script that preloads site and user info for all sites of given family
-
 shell script
 ============
 

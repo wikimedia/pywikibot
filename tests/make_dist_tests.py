@@ -24,16 +24,27 @@ class TestMakeDist(TestCase):
     def test_handle_args_empty(self):
         """Test make_dist handle_args function."""
         args = make_dist.handle_args()
-        self.assertEqual(args, (False, ) * 4)
+        self.assertEqual(args, (False, ) * 5)
+
+    def test_handle_args_scripts(self):
+        """Test make_dist handle_args function."""
+        sys.argv += ['-local', 'scripts', '-remote']
+        local, remote, clear, upgrade, scripts = make_dist.handle_args()
+        self.assertTrue(local)
+        self.assertEqual(remote, 'dev' not in __version__)
+        self.assertFalse(clear)
+        self.assertFalse(upgrade)
+        self.assertTrue(scripts)
 
     def test_handle_args(self):
         """Test make_dist handle_args function."""
         sys.argv += ['-clear', '-local', '-remote', '-upgrade']
-        local, remote, clear, upgrade = make_dist.handle_args()
+        local, remote, clear, upgrade, scripts = make_dist.handle_args()
         self.assertTrue(local)
         self.assertEqual(remote, 'dev' not in __version__)
         self.assertTrue(clear)
         self.assertTrue(upgrade)
+        self.assertFalse(scripts)
 
     def test_main(self):
         """Test main result."""

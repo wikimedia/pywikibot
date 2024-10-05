@@ -1208,7 +1208,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gf.handle_arg('-randomredirect:1')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
-        pages = set(gen)
+        pages = list(gen)
         self.assertLength(pages, 1)
 
     def test_randomredirect_generator_ns(self):
@@ -1518,15 +1518,13 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
         """Test -searchitem with custom language specified."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handle_arg('-searchitem:en:abc')
-        gf.handle_arg('-limit:2')
+        gf.handle_arg('-limit:5')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
-        # American Broadcasting Company
-        page1 = next(gen)
-        self.assertEqual(page1.title(), 'Q169889')
-        # alphabet, also known as ABC
-        page2 = next(gen)
-        self.assertEqual(page2.title(), 'Q9779')
+        result = {page.title() for page in gen}
+        self.assertIn('Q169889', result)  # American Broadcasting Company
+        self.assertIn('Q9779', result)  # alphabet, also known as ABC
+        self.assertIn('Q1057802', result)  # ABC programming language
 
     def test_get_category_site(self):
         """Test the getCategory method."""

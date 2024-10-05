@@ -34,13 +34,6 @@ login script
    :no-members:
    :noindex:
 
-preload_sites script
-====================
-
-.. automodule:: pywikibot.scripts.preload_sites
-   :no-members:
-   :noindex:
-
 shell script
 ============
 

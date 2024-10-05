@@ -15,6 +15,7 @@ from collections import OrderedDict, defaultdict
 from contextlib import suppress
 from textwrap import fill
 from typing import TYPE_CHECKING, Any, NamedTuple, TypeVar
+from warnings import warn
 
 import pywikibot
 from pywikibot import login
@@ -2031,7 +2032,8 @@ class APISite(
             * nochange --- don't change the watchlist
 
             If None (default), follow bot account's default settings
-        :param bot: if True, mark edit with bot flag
+        :param bot: if True and bot right is given, mark edit with bot
+            flag
 
         :keyword str text: Overrides Page.text
         :keyword int | str section: Edit an existing numbered section or
@@ -2109,7 +2111,19 @@ class APISite(
 
         token = self.tokens['csrf']
         if bot is None:
+            issue_deprecation_warning("'None' argument for 'bot' parameter",
+                                      "'True' value", since='9.4.0')
+            bot = True
+
+        if bot:
             bot = self.has_right('bot')
+            # show a warning if user is a bot member but hasn't bot right
+            if not bot and 'bot' in self.userinfo['groups']:
+                msg = '\n' + fill(
+                    f"{self.user()} is within 'bot' group but 'bot' right"
+                    " wasn't activated with OAuth or BotPassword settings"
+                )
+                warn(msg)
 
         params = dict(
             action='edit',

@@ -1,9 +1,8 @@
 """Folder which holds framework scripts.
 
-When uploading pywikibot to pypi the pwb.py (wrapper script) and
-pywikibot i18n package are copied here.
-
 .. versionadded:: 7.0
+.. versionremoved:: 9.4
+   ``preload_sites`` script was removed (:phab:`T348925`).
 """
 #
 # (C) Pywikibot team, 2021-2022

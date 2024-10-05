@@ -9,12 +9,21 @@ from __future__ import annotations
 import difflib
 import math
 from collections import abc
-from difflib import _format_range_unified  # type: ignore[attr-defined]
+from difflib import SequenceMatcher, _format_range_unified
+from heapq import nlargest
 from itertools import zip_longest
 
 import pywikibot
 from pywikibot.backports import Iterable, Sequence
 from pywikibot.tools import chars
+
+
+__all__ = [
+    'Hunk',
+    'PatchManager', 'cherry_pick',
+    'get_close_matches_ratio',
+    'html_comparator',
+]
 
 
 class Hunk:
@@ -613,3 +622,67 @@ def html_comparator(compare_string: str) -> dict[str, list[str]]:
             cruton_string = ''.join(cruton.strings)
             comparands[change_type].append(cruton_string)
     return comparands
+
+
+def get_close_matches_ratio(word: Sequence,
+                            possibilities: list[Sequence],
+                            *,
+                            n: int = 3,
+                            cutoff: float = 0.6,
+                            ignorecase: bool = False) -> list[float, Sequence]:
+    """Return a list of the best “good enough” matches and its ratio.
+
+    This method is similar to Python's :pylib:`difflib.get_close_matches()
+    <difflib#difflib.get_close_matches>` but also gives ratio back and
+    has a *ignorecase* parameter to compare case-insensitive.
+
+    SequenceMatcher is used to return a list of the best "good enough"
+    matches together with their ratio. The ratio is computed by the
+    :wiki:`Gestalt pattern matching` algorithm. The best (no more than
+    *n*) matches among the *possibilities* with their ratio are returned
+    in a list, sorted by similarity score, most similar first.
+
+    >>> get_close_matches_ratio('appel', ['ape', 'apple', 'peach', 'puppy'])
+    [(0.8, 'apple'), (0.75, 'ape')]
+    >>> p = possibilities = ['Python', 'Wikipedia', 'Robot', 'Framework']
+    >>> get_close_matches_ratio('Pywikibot', possibilities, n=2, cutoff=0)
+    [(0.42857142857142855, 'Robot'), (0.4, 'Python')]
+    >>> get_close_matches_ratio('Pywikibot', p, n=2, cutoff=0, ignorecase=True)
+    [(0.4444444444444444, 'Wikipedia'), (0.42857142857142855, 'Robot')]
+
+    .. versionadded:: 9.4
+    .. note:: Most code is incorporated from Python software under the
+       `PSF`_ license.
+
+    :param word: a sequence for which close matches are desired
+        (typically a string)
+    :param possibilities: a list of sequences against which to match
+        *word* (typically a list of strings)
+    :param n: optional arg (default 3) which is the maximum number of
+        close matches to return. *n* must be :code:`> 0`.
+    :param cutoff: optional arg (default 0.6) is a float in :code:`[0, 1]`.
+        *possibilities* that don't score at least that similar to *word*
+        are ignored.
+    :param ignorecase: if false, compare case sensitive
+    :raises ValueError: invalid value for *n* or *catoff*
+
+    .. _PSF:
+       https://docs.python.org/3/license.html#psf-license-agreement-for-python-release
+    """
+    if n < 0:
+        raise ValueError(f'n must be > 0: {n!r}')
+    if not 0.0 <= cutoff <= 1.0:
+        raise ValueError(f'cutoff must be in [0.0, 1.0]: {cutoff!r}')
+
+    result = []
+    s = SequenceMatcher()
+    s.set_seq2(word.lower() if ignorecase else word)
+    for x in possibilities:
+        s.set_seq1(x.lower() if ignorecase else x)
+        if s.real_quick_ratio() >= cutoff and \
+           s.quick_ratio() >= cutoff and \
+           s.ratio() >= cutoff:
+            result.append((s.ratio(), x))
+
+    # Move the best scorers to head of list
+    return nlargest(n, result)

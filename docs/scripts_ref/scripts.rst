@@ -259,6 +259,11 @@ transwikiimport script
 
 .. automodule:: scripts.transwikiimport
 
+unlink script
+=============
+
+.. automodule:: scripts.unlink
+
 unusedfiles script
 ==================
 
