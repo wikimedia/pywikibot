@@ -101,7 +101,7 @@ class SetupBase(abc.ABC):
         shutil.rmtree(self.folder / 'build', ignore_errors=True)
         shutil.rmtree(self.folder / 'dist', ignore_errors=True)
         shutil.rmtree(self.folder / 'pywikibot.egg-info', ignore_errors=True)
-        shutil.rmtree(self.folder / 'scripts' / 'pywikibot_scripts.egg-info',
+        shutil.rmtree(self.folder / 'pywikibot_scripts.egg-info',
                       ignore_errors=True)
         info('<<lightyellow>>done')
 
