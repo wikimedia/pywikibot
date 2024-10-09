@@ -192,7 +192,16 @@ class WikiBlameMixin:
             table = wikitextparser.parse(r.text).tables[0]
         except IndexError:
             pattern = textlib.get_regexes('code')[0]
-            msg = textlib.removeHTMLParts(pattern.search(r.text)[0])
+            match = pattern.search(r.text)
+            if match:
+                msg = textlib.removeHTMLParts(match[0])
+            else:
+                pattern = textlib.get_regexes('strong')[0]
+                strongs = pattern.findall(r.text)
+                if strongs:
+                    msg = textlib.removeHTMLParts('\n'.join(strongs))
+                else:
+                    msg = 'Unknown exception from xtools'
             raise pywikibot.exceptions.Error(msg) from None
 
         pct_sum = 0.0
