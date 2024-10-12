@@ -72,7 +72,12 @@ from pywikibot.pagegenerators import (
 )
 from pywikibot.textlib import replaceExcept
 from pywikibot.tools.chars import string2html
-from scripts import noreferences
+
+
+try:
+    from scripts import noreferences
+except ModuleNotFoundError:
+    from pywikibot_scripts import noreferences
 
 
 docuReplacements = {

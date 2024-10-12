@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
-"""
-Generate an i18n file from a given script.
+"""Generate an i18n file from a given script.
 
-run IDLE at topmost level:
+Run IDLE at topmost level:
 
 >>> import pwb
 >>> from scripts.maintenance.make_i18n_dict import i18nBot
 >>> bot = i18nBot('<scriptname>', '<msg dict>')
 >>> bot.run()
+
+.. hint:: Import from ``pywikibot-scripts`` if scripts are installed as
+   a site-package.
 
 If you have more than one message dictionary, give all these names to the bot:
 
@@ -28,7 +30,7 @@ instantiating the bot. It also calls ``bot.run()`` to create the dictionaries:
 >>> bot.to_json()
 """
 #
-# (C) Pywikibot team, 2013-2023
+# (C) Pywikibot team, 2013-2024
 #
 # Distributed under the terms of the MIT license.
 #

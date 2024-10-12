@@ -101,7 +101,12 @@ from pywikibot.exceptions import (
 )
 from pywikibot.family import Family
 from pywikibot.site import Namespace
-from scripts.welcome import get_welcome_text
+
+
+try:
+    from scripts.welcome import get_welcome_text
+except ModuleNotFoundError:
+    from pywikibot_scripts.welcome import get_welcome_text
 
 
 ###############################################################################

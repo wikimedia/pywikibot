@@ -21,7 +21,7 @@ Command line options:
                given, it starts at the beginning.
 """
 #
-# (C) Pywikibot team, 2007-2022
+# (C) Pywikibot team, 2007-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -32,8 +32,16 @@ from typing import Generator
 
 import pywikibot
 from pywikibot import i18n, pagegenerators
-from scripts.solve_disambiguation import DisambiguationRobot as BaseDisambigBot
 
+
+try:
+    from scripts.solve_disambiguation import (
+        DisambiguationRobot as BaseDisambigBot,
+    )
+except ModuleNotFoundError:
+    from pywikibot_scripts.solve_disambiguation import (
+        DisambiguationRobot as BaseDisambigBot,
+    )
 
 HELP_MSG = """\n
 misspelling.py does not support site {site}.
