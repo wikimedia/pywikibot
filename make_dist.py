@@ -269,7 +269,7 @@ def handle_args() -> tuple[bool, bool, bool, bool]:
     upgrade = '-upgrade' in sys.argv
     scripts = 'scripts' in sys.argv
 
-    if remote and 'dev' in __version__:  # pragma: no cover
+    if not scripts and remote and 'dev' in __version__:  # pragma: no cover
         warning('Distribution must not be a developmental release to upload.')
         remote = False
 
