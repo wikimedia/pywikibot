@@ -13,7 +13,7 @@ import unittest
 from contextlib import suppress
 
 import pywikibot
-from tests.aspects import DefaultSiteTestCase, TestCase, require_modules
+from tests.aspects import TestCase, require_modules
 
 
 class TestTkdialog(TestCase):
@@ -36,11 +36,12 @@ class TestTkdialog(TestCase):
         self.assertTrue(skip)
 
 
-class TestTkinter(DefaultSiteTestCase):
+class TestTkinter(TestCase):
 
     """Test Tkinter."""
 
-    net = True
+    family = 'wikipedia'
+    code = 'en'
 
     def test_tkinter(self):
         """Test Tkinter window."""
