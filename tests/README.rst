@@ -145,18 +145,11 @@ Environment variables
 
     PYWIKIBOT_TEST_WRITE=1
 
-**PYWIKIBOT_TEST_WRITE_FAIL**
-  There are a set of 'edit failure' tests, which attempt to write to the wikis
-  and **should** fail. If there is a bug in pywikibot or MediaWiki, these
-  tests **may** actually perform a write operation.
-
-  To enable 'edit failure' tests, set::
-
-    PYWIKIBOT_TEST_WRITE_FAIL=1
-
-  .. deprecated:: 9.2
-     this environment variable no longer has any effect; use
-     :envvar:`PYWIKIBOT_TEST_WRITE` instead.
+.. versionremoved:: 9.2
+   The :envvar:`PYWIKIBOT_TEST_WRITE_FAIL` environment variable; use
+   :envvar:`PYWIKIBOT_TEST_WRITE` instead.
+.. versionremoved:: 9.5
+   The :envvar:`PYWIKIBOT_TEST_GUI` environment variable.
 
 Instead of setting the environment by the os (or `os.environ` as well) you can use the :mod:`pwb`
 wrapper script to set it::
@@ -166,9 +159,6 @@ wrapper script to set it::
 The assignment can be omitted and defaults to 1. The following is equal to the line above::
 
     pwb PYWIKIBOT_TEST_WRITE script_tests -v TestScriptSimulate.test_archivebot
-
-.. versionremoved:: 9.5
-   The :envvar:`PYWIKIBOT_TEST_GUI` environment variable.
 
 Decorators
 ==========
