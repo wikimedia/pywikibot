@@ -37,7 +37,12 @@ import pywikibot
 from pywikibot import config
 from pywikibot.data.api import CachedRequest
 from pywikibot.exceptions import InvalidTitleError
-from scripts.maintenance.cache import CacheEntry
+
+
+try:
+    from scripts.maintenance.cache import CacheEntry
+except ModuleNotFoundError:
+    from pywikibot_scripts.maintenance.cache import CacheEntry
 
 
 def get(site=None) -> list[str]:

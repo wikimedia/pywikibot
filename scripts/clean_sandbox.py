@@ -56,7 +56,7 @@ import time
 import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import Bot, ConfigParserBot
-from pywikibot.exceptions import EditConflictError, NoPageError
+from pywikibot.exceptions import EditConflictError
 
 
 content = {
@@ -227,77 +227,75 @@ class SandboxBot(Bot, ConfigParserBot):
 
             self.generator = pages
 
+    def treat(self, page):
+        """Treat a single page."""
+        if not page.exists():
+            pywikibot.info('*** The sandbox is not existent, skipping.')
+            return
+
+        pywikibot.info(f'Preparing to process sandbox page {page}')
+        if page.isRedirectPage():
+            pywikibot.warning(f'{page.title(as_link=True)} is a redirect'
+                              ' page, cleaning it anyway')
+        text = page.text
+        if self.opt.summary:
+            translated_msg = self.opt.summary
+        else:
+            translated_msg = i18n.twtranslate(
+                self.site, 'clean_sandbox-cleaned')
+
+        subst = 'subst:' in self.translated_content
+        pos = text.find(self.translated_content.strip())
+        latest_user = page.latest_revision.user
+
+        try:
+            if text.strip() == self.translated_content.strip():
+                pywikibot.info(
+                    'The sandbox is still clean, no change necessary.')
+            elif subst and latest_user == self.site.user():
+                pywikibot.info(
+                    'The sandbox might be clean, no change necessary.')
+            elif pos != 0 and not subst:
+                page.put(self.translated_content, translated_msg)
+                pywikibot.showDiff(text, self.translated_content)
+                pywikibot.info(
+                    'Standard content was changed, sandbox cleaned.')
+            else:
+                edit_delta = (pywikibot.Timestamp.utcnow()
+                              - page.latest_revision.timestamp)
+                delta = self.delay_td - edit_delta
+                # Is the last edit more than 'delay' minutes ago?
+                if delta <= datetime.timedelta(0):
+                    page.put(self.translated_content, translated_msg)
+                    pywikibot.showDiff(text, self.translated_content)
+                    pywikibot.info('Standard content was changed, '
+                                   'sandbox cleaned.')
+                else:  # wait for the rest
+                    pywikibot.info(
+                        'Sandbox edited '
+                        f'{edit_delta.seconds / 60.0:.1f} minutes ago...'
+                    )
+                    pywikibot.info(
+                        f'Sleeping for {delta.seconds // 60} minutes.')
+                    pywikibot.sleep(delta.seconds)
+                    self.wait = True
+        except EditConflictError:
+            pywikibot.info('*** Skipping because of an edit conflict.\n')
+
     def run(self) -> None:
         """Run bot."""
         self.site.login()
         while True:
-            wait = False
+            self.wait = False
             now = time.strftime('%d %b %Y %H:%M:%S (UTC)', time.gmtime())
             for sandbox_page in self.generator:
-                pywikibot.info('Preparing to process sandbox page '
-                               + sandbox_page.title(as_link=True))
-                if sandbox_page.isRedirectPage():
-                    pywikibot.warning(
-                        f'{sandbox_page.title(as_link=True)} is a redirect'
-                        ' page, cleaning it anyway'
-                    )
-                try:
-                    text = sandbox_page.text
-                    if self.opt.summary:
-                        translated_msg = self.opt.summary
-                    else:
-                        translated_msg = i18n.twtranslate(
-                            self.site, 'clean_sandbox-cleaned')
-
-                    subst = 'subst:' in self.translated_content
-                    pos = text.find(self.translated_content.strip())
-                    latest_user = sandbox_page.latest_revision.user
-                    if text.strip() == self.translated_content.strip():
-                        pywikibot.info(
-                            'The sandbox is still clean, no change necessary.')
-                    elif subst and latest_user == self.site.user():
-                        pywikibot.info(
-                            'The sandbox might be clean, no change necessary.')
-                    elif pos != 0 and not subst:
-                        sandbox_page.put(self.translated_content,
-                                         translated_msg)
-                        pywikibot.showDiff(text, self.translated_content)
-                        pywikibot.info(
-                            'Standard content was changed, sandbox cleaned.')
-                    else:
-                        edit_delta = (pywikibot.Timestamp.utcnow()
-                                      - sandbox_page.latest_revision.timestamp)
-                        delta = self.delay_td - edit_delta
-                        # Is the last edit more than 'delay' minutes ago?
-                        if delta <= datetime.timedelta(0):
-                            sandbox_page.put(
-                                self.translated_content, translated_msg)
-                            pywikibot.showDiff(text, self.translated_content)
-                            pywikibot.info('Standard content was changed, '
-                                           'sandbox cleaned.')
-                        else:  # wait for the rest
-                            pywikibot.info(
-                                'Sandbox edited '
-                                f'{edit_delta.seconds / 60.0:.1f} minutes'
-                                ' ago...'
-                            )
-                            pywikibot.info(
-                                f'Sleeping for {delta.seconds // 60} minutes.')
-                            pywikibot.sleep(delta.seconds)
-                            wait = True
-                except EditConflictError:
-                    pywikibot.info(
-                        '*** Loading again because of edit conflict.\n')
-                except NoPageError:
-                    pywikibot.info(
-                        '*** The sandbox is not existent, skipping.')
-                    continue
+                self.treat(sandbox_page)
 
             if self.opt.hours < 0:
                 pywikibot.info('\nDone.')
                 return
 
-            if not wait:
+            if not self.wait:
                 if self.opt.hours < 1.0:
                     pywikibot.info(
                         f'\nSleeping {self.opt.hours * 60} minutes, now {now}')
@@ -308,8 +306,7 @@ class SandboxBot(Bot, ConfigParserBot):
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
@@ -321,10 +318,10 @@ def main(*args: str) -> None:
     gen_factory = pagegenerators.GeneratorFactory()
     for arg in local_args:
         opt, _, value = arg.partition(':')
-        if opt.startswith('-'):
-            opt = opt[1:]
-        else:
+        if not opt.startswith('-'):
             continue
+
+        opt = opt[1:]
         if opt == 'hours':
             opts[opt] = float(value)
         elif opt == 'delay':

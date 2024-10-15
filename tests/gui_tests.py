@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 """Tests for the Tk UI."""
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
 import os
+import sys
 import unittest
 from contextlib import suppress
 
 import pywikibot
-from tests.aspects import DefaultSiteTestCase, TestCase, require_modules
+from tests.aspects import TestCase, require_modules
 
 
 class TestTkdialog(TestCase):
@@ -35,11 +36,12 @@ class TestTkdialog(TestCase):
         self.assertTrue(skip)
 
 
-class TestTkinter(DefaultSiteTestCase):
+class TestTkinter(TestCase):
 
     """Test Tkinter."""
 
-    net = True
+    family = 'wikipedia'
+    code = 'en'
 
     def test_tkinter(self):
         """Test Tkinter window."""
@@ -59,12 +61,24 @@ class TestTkinter(DefaultSiteTestCase):
 def setUpModule():
     """Skip tests if tkinter or PIL is not installed.
 
-    Also skip test if ``PYWIKIBOT_TEST_GUI`` environment variable is not
-    set. Otherwise import modules and run tests.
+    .. versionchanged:: 7.7
+       skip test if ``PYWIKIBOT_TEST_GUI`` environment variable is not
+       set.
+    .. versionchanged:: 9.5
+       :envvar:`PYWIKIBOT_TEST_GUI` environment variable was removed.
+       ``pytest`` with ``pytest-xvfb `` extension is required for this
+       tests on github actions.
     """
-    if os.environ.get('PYWIKIBOT_TEST_GUI', '0') != '1':
-        raise unittest.SkipTest('Tkinter tests are not enabled. '
-                                '(set PYWIKIBOT_TEST_GUI=1 to enable)')
+    if os.environ.get('GITHUB_ACTIONS'):
+        skip = True
+        if 'pytest' in sys.modules:
+            with suppress(ModuleNotFoundError):
+                import pytest_xvfb  # noqa: F401
+                skip = False
+
+        if skip:
+            raise unittest.SkipTest('Tkinter tests must run with pytest and '
+                                    'needs pytest-xvfb extension')
 
     global EditBoxWindow, Tkdialog, tkinter
 

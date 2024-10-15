@@ -101,7 +101,7 @@ user talk pages (namespace #3):
     python pwb.py template test1 test2 "space test" -subst -ns:3 -always
 """
 #
-# (C) Pywikibot team, 2003-2023
+# (C) Pywikibot team, 2003-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -115,7 +115,12 @@ from pywikibot.backports import batched
 from pywikibot.bot import SingleSiteBot
 from pywikibot.pagegenerators import XMLDumpPageGenerator
 from pywikibot.tools.itertools import filter_unique, roundrobin_generators
-from scripts.replace import ReplaceRobot as ReplaceBot
+
+
+try:
+    from scripts.replace import ReplaceRobot as ReplaceBot
+except ModuleNotFoundError:
+    from pywikibot_scripts.replace import ReplaceRobot as ReplaceBot
 
 
 class TemplateRobot(ReplaceBot):

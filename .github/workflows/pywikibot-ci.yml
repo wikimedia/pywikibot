@@ -26,7 +26,7 @@ jobs:
       max-parallel: 18
 
       matrix:
-        python-version: [ "pypy3.7", "pypy3.10", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13.0-alpha - 3.13.0", "3.14-dev" ]
+        python-version: [ "pypy3.7", "pypy3.10", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14-dev" ]
         site: [ "wikipedia:en", "wikisource:zh" ]
         include:
           - python-version: "3.7"
@@ -123,7 +123,7 @@ jobs:
           ${{ (matrix.site == 'wikisource:zh' || matrix.test_no_rc) && 1 || 0 }}
       run: |
         python pwb.py version
-        if [ ${{matrix.site || 0}} != 'wikipedia:test' ]; then
+        if [ ${{matrix.site || 0}} != 'wikisource:zh' ]; then
           coverage run -m unittest discover -vv -p \"*_tests.py\";
         else
           pytest --cov=.;

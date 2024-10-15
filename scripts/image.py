@@ -49,7 +49,12 @@ import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import SingleSiteBot
 from pywikibot.textlib import case_escape, ignore_case
-from scripts.replace import ReplaceRobot as ReplaceBot
+
+
+try:
+    from scripts.replace import ReplaceRobot as ReplaceBot
+except ModuleNotFoundError:
+    from pywikibot_scripts.replace import ReplaceRobot as ReplaceBot
 
 
 class ImageRobot(ReplaceBot):

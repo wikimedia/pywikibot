@@ -1,6 +1,12 @@
 Scripts Changelog
 =================
 
+9.4.1
+-----
+
+* import scripts from pywikibot-scripts if site-package is installed (:phab:`T377056`)
+* i18n updates
+
 9.4.0
 -----
 

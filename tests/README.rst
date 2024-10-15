@@ -81,13 +81,6 @@ With -lang and -family or -site options pwb can be used to specify a site.
 Environment variables
 =====================
 
-**PYWIKIBOT_TEST_GUI**
-  Enable :source:`tests/gui_tests`. Used for AppVeyor tests. GitHub actions would
-  fail due to ``couldn't connect to display ":1.0"`` error. Set this environment
-  variable to run this test locally::
-
-    PYWIKIBOT_TEST_GUI=1
-
 **PYWIKIBOT_TEST_LOGOUT**
   Used when a test is logging out the test user. This environment variable
   enables :source:`tests/site_login_logout_tests`. The environment setting is
@@ -152,18 +145,11 @@ Environment variables
 
     PYWIKIBOT_TEST_WRITE=1
 
-**PYWIKIBOT_TEST_WRITE_FAIL**
-  There are a set of 'edit failure' tests, which attempt to write to the wikis
-  and **should** fail. If there is a bug in pywikibot or MediaWiki, these
-  tests **may** actually perform a write operation.
-
-  To enable 'edit failure' tests, set::
-
-    PYWIKIBOT_TEST_WRITE_FAIL=1
-
-  .. deprecated:: 9.2
-     this environment variable no longer has any effect; use
-     :envvar:`PYWIKIBOT_TEST_WRITE` instead.
+.. versionremoved:: 9.2
+   The :envvar:`PYWIKIBOT_TEST_WRITE_FAIL` environment variable; use
+   :envvar:`PYWIKIBOT_TEST_WRITE` instead.
+.. versionremoved:: 9.5
+   The :envvar:`PYWIKIBOT_TEST_GUI` environment variable.
 
 Instead of setting the environment by the os (or `os.environ` as well) you can use the :mod:`pwb`
 wrapper script to set it::

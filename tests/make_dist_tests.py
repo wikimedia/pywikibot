@@ -31,7 +31,7 @@ class TestMakeDist(TestCase):
         sys.argv += ['-local', 'scripts', '-remote']
         local, remote, clear, upgrade, scripts = make_dist.handle_args()
         self.assertTrue(local)
-        self.assertEqual(remote, 'dev' not in __version__)
+        self.assertTrue(remote)
         self.assertFalse(clear)
         self.assertFalse(upgrade)
         self.assertTrue(scripts)
