@@ -1,6 +1,14 @@
 Release History
 ===============
 
+9.4.1
+-----
+*15 October 2024*
+
+* Add support for new wikis (:phab:`T375019`, :phab:`T375104`, :phab:`T375426`,
+  :phab:`T376332`, :phab:`T376574`, :phab:`T377090`)
+
+
 9.4.0
 -----
 *05 October 2024*
