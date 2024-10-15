@@ -1,7 +1,8 @@
 Current Release Changes
 =======================
 
-* (no changes yet)
+* Add support for new wikis (:phab:`T375019`, :phab:`T375104`, :phab:`T375426`,
+  :phab:`T376332`, :phab:`T376574`, :phab:`T377090`)
 
 Current Deprecations
 ====================
