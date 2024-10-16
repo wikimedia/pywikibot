@@ -80,7 +80,7 @@ def multi(value, tuplst: tuplst_type) -> Any:
     1st function is used.
     """
     raise NotImplementedError(
-        f'multi funtion is not implemented for type {type(value).__name__}')
+        f'multi function is not implemented for type {type(value).__name__}')
 
 
 @multi.register(int)
