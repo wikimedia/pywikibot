@@ -120,14 +120,12 @@ class TestCaseBase(TestTimerMixin):
                 msg, f'len({safe_repr(seq)}): {first_len} != {second_len}')
             self.fail(msg)
 
-    def assertPageInNamespaces(self, page, namespaces):
-        """
-        Assert that Pages is in namespaces.
+    def assertPageInNamespaces(self, page, namespaces: int | set[int]) -> None:
+        """Assert that Pages is in namespaces.
 
         :param page: Page
         :type page: pywikibot.BasePage
         :param namespaces: expected namespaces
-        :type namespaces: int or set of int
         """
         if isinstance(namespaces, int):
             namespaces = {namespaces}
@@ -170,18 +168,13 @@ class TestCaseBase(TestTimerMixin):
             titles = list(titles)
         return titles
 
-    def assertPagesInNamespaces(self, gen, namespaces):
-        """
-        Assert that generator returns Pages all in namespaces.
+    def assertPagesInNamespaces(self, gen, namespaces: int | set[int]) -> None:
+        """Assert that generator returns Pages all in namespaces.
 
         :param gen: generator to iterate
         :type gen: generator
         :param namespaces: expected namespaces
-        :type namespaces: int or set of int
         """
-        if isinstance(namespaces, int):
-            namespaces = {namespaces}
-
         for page in gen:
             self.assertPageInNamespaces(page, namespaces)
 
@@ -200,8 +193,8 @@ class TestCaseBase(TestTimerMixin):
         :raises TypeError: Invalid *namespaces* type
         """
         if isinstance(namespaces, int):
-            namespaces = {namespaces}
-        elif not isinstance(namespaces, set):
+            namespaces = {namespaces}  # pragma: no cover
+        elif not isinstance(namespaces, set):  # pragma: no cover
             raise TypeError('namespaces argument must be an int or a set, not '
                             f'{type(namespaces).__name__}')
 
@@ -282,12 +275,13 @@ def require_modules(*required_modules):
         for required_module in required_modules:
             try:
                 __import__(required_module, globals(), locals(), [], 0)
-            except ModuleNotFoundError:
+            except ModuleNotFoundError:  # pragma: no cover
                 missing += [required_module]
         if not missing:
             return obj
-        skip_decorator = unittest.skip(f"{', '.join(missing)} not installed")
-        return skip_decorator(obj)
+        skip_decorator = unittest.skip(  # pragma: no cover
+            f"{', '.join(missing)} not installed")
+        return skip_decorator(obj)  # pragma: no cover
 
     return test_requirement
 
@@ -317,17 +311,17 @@ def require_version(version_needed: str, reason: str = ''):
             """Validate environment."""
             if not isinstance(self.site, BaseSite) \
                or isinstance(self.site, DrySite):
-                raise Exception(
+                raise Exception(  # pragma: no cover
                     f'{type(self).__name__}.site must be a BaseSite not '
                     f'{type(self.site).__name__}.')
 
             if args or kwargs:
-                raise Exception(
+                raise Exception(  # pragma: no cover
                     f'Test method {method.__name__!r} has parameters which is '
                     f'not supported with require_version decorator.')
 
             _, op, version = re.split('([<>]=?)', version_needed)
-            if not op:
+            if not op:  # pragma: no cover
                 raise Exception(f'There is no valid operator given with '
                                 f'version {version_needed!r}')
 
@@ -336,7 +330,7 @@ def require_version(version_needed: str, reason: str = ''):
             if not skip:
                 return method(self, *args, **kwargs)
 
-            myreason = ' to ' + reason if reason else ''
+            myreason = ' to ' + reason if reason else ''  # pragma: no cover
             raise unittest.SkipTest(
                 f'MediaWiki {op} v{version} required{myreason}.')
 
@@ -396,7 +390,7 @@ class SiteNotPermitted(pywikibot.site.BaseSite):
 
     def __init__(self, code, fam=None, user=None):
         """Initializer."""
-        raise SiteDefinitionError(
+        raise SiteDefinitionError(  # pragma: no cover
             f'Loading site {fam}:{code} during dry test not permitted')
 
 
@@ -452,11 +446,11 @@ class CheckHostnameMixin(TestCaseBase):
         super().setUpClass()
 
         if not hasattr(cls, 'sites'):
-            return
+            return  # pragma: no cover
 
         for key, data in cls.sites.items():
             if 'hostname' not in data:
-                raise Exception(
+                raise Exception(  # pragma: no cover
                     f'{cls.__name__}: hostname not defined for {key}')
             hostname = data['hostname']
 
@@ -522,7 +516,7 @@ class SiteWriteMixin(TestCaseBase):
         :raises Exception: test class cannot use *write* attribute
             together with *cached* and must be run on test sites only.
         """
-        if issubclass(cls, ForceCacheMixin):
+        if issubclass(cls, ForceCacheMixin):  # pragma: no cover
             raise Exception(f'{cls.__name__} cannot be a subclass of both'
                             ' SiteWriteMixin and ForceCacheMixin')
 
@@ -535,7 +529,7 @@ class SiteWriteMixin(TestCaseBase):
 
         if (not hasattr(site.family, 'test_codes')
                 or site.code not in site.family.test_codes):
-            raise Exception(
+            raise Exception(  # pragma: no cover
                 f'{cls.__name__} should only be run on test sites. To run '
                 f'this test, add {site.code!r} to the {site.family.name}'
                 " family attribute 'test_codes'."
@@ -631,7 +625,7 @@ class RequireLoginMixin(TestCaseBase):
         # For multi-site test classes, or site is specified as a param,
         # the cached userpage object may not be the desired site.
         if hasattr(self, '_userpage') and self._userpage.site == site:
-            return self._userpage
+            return self._userpage  # pragma: no cover
 
         userpage = pywikibot.User(site, site.username())
         self._userpage = userpage
@@ -761,7 +755,7 @@ class MetaTestCaseClass(type):
         if hostnames:
             dct.setdefault('sites', {})
             for hostname in hostnames:
-                if hostname in dct['sites']:
+                if hostname in dct['sites']:  # pragma: no cover
                     raise AttributeError(f'hostname {hostname!r} already found'
                                          f"in dict['sites']:\n{dict['sites']}")
                 dct['sites'][hostname] = {'hostname': hostname}
@@ -779,7 +773,7 @@ class MetaTestCaseClass(type):
             # test writer explicitly sets 'site=False' so code reviewers
             # check that the script invoked by pwb will not load a site.
             if dct.get('pwb') and 'site' not in dct:
-                raise Exception(
+                raise Exception(  # pragma: no cover
                     f'{name}: Test classes using pwb must set "site";'
                     ' add site=False if the test script will not use a site'
                 )
@@ -790,7 +784,7 @@ class MetaTestCaseClass(type):
                 del dct['site']
 
             # If there isn't a site, require declaration of net activity.
-            if 'net' not in dct:
+            if 'net' not in dct:  # pragma: no cover
                 raise Exception(f'{name}: Test classes without a site'
                                 ' configured must set "net"')
 
@@ -814,7 +808,7 @@ class MetaTestCaseClass(type):
 
         if dct.get('net'):
             bases = cls.add_base(bases, CheckHostnameMixin)
-        elif hostnames:
+        elif hostnames:  # pragma: no cover
             raise Exception('"net" must be True with hostnames defined')
 
         if dct.get('write'):
@@ -843,7 +837,7 @@ class MetaTestCaseClass(type):
 
             # A multi-site test method only accepts 'self' and the site-key
             if test_func.__code__.co_argcount != 2:
-                raise Exception(
+                raise Exception(  # pragma: no cover
                     f'{name}: Test method {test} must accept either 1 or 2 '
                     f'arguments;  {test_func.__code__.co_argcount} found'
                 )
@@ -884,7 +878,7 @@ class MetaTestCaseClass(type):
         if doc_suffix:
             if not doc:
                 doc = method.__doc__
-            if doc[-1] != '.':
+            if doc[-1] != '.':  # pragma: no cover
                 raise ValueError('doc string must end with a period.')
             doc = doc[:-1] + ' ' + doc_suffix + '.'
 
@@ -911,7 +905,7 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
 
         # This stores the site under the site name.
         if not cls.sites:
-            cls.sites = {}
+            cls.sites = {}  # pragma: no cover
 
         # If the test is not cached, create new Site objects for this class
         cm = cls._uncached()
@@ -964,17 +958,17 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
             *name*.
         """
         if not name and hasattr(cls, 'sites'):
-            if len(cls.sites) != 1:
+            if len(cls.sites) != 1:  # pragma: no cover
                 raise Exception(f'"{cls.__name__}.get_site(name=None)"'
                                 ' called with multiple sites')
 
             name = next(iter(cls.sites.keys()))
 
-        if name and name not in cls.sites:
+        if name and name not in cls.sites:  # pragma: no cover
             raise Exception(f'"{name}" not declared in {cls.__name__}')
 
         if isinstance(cls.site, BaseSite):
-            if cls.sites[name]['site'] != cls.site:
+            if cls.sites[name]['site'] != cls.site:  # pragma: no cover
                 raise Exception(f'{cls.__name__}.site is different from '
                                 f"{cls.__name__}.sites[{name!r}]['site']:\n"
                                 f"{cls.site} != {cls.sites[name]['site']}")
@@ -985,9 +979,9 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
     @classmethod
     def has_site_user(cls, family, code):
         """Check the user config has a user for the site."""
-        if not family:
+        if not family:  # pragma: no cover
             raise Exception(f'no family defined for {cls.__name__}')
-        if not code:
+        if not code:  # pragma: no cover
             raise Exception(f'no site code defined for {cls.__name__}')
 
         usernames = config.usernames
@@ -1027,7 +1021,7 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
         maintitle = removeprefix(maintitle, 'Special:MyLanguage/')  # T278702
         mainpage = pywikibot.Page(site, maintitle)
         if not isinstance(site, DrySite) and mainpage.isRedirectPage():
-            mainpage = mainpage.getRedirectTarget()
+            mainpage = mainpage.getRedirectTarget()  # pragma: no cover
 
         if force:
             mainpage = pywikibot.Page(self.site, mainpage.title())
@@ -1189,7 +1183,7 @@ class WikimediaDefaultSiteTestCase(DefaultSiteTestCase):
         super().setUpClass()
 
         if not (hasattr(cls, 'site') and hasattr(cls, 'sites')) \
-           or len(cls.sites) != 1:
+           or len(cls.sites) != 1:  # pragma: no cover
             raise Exception('"site" or "sites" attribute is missing or "sites"'
                             'entries count is different from 1')
 
@@ -1218,7 +1212,7 @@ class WikibaseTestCase(TestCase):
         with cls._uncached():
             for data in cls.sites.values():
                 if 'site' not in data:
-                    continue
+                    continue  # pragma: no cover
 
                 site = data['site']
                 if not site.has_data_repository:
@@ -1227,8 +1221,9 @@ class WikibaseTestCase(TestCase):
 
                 if (hasattr(cls, 'repo')
                         and cls.repo != site.data_repository()):
-                    raise Exception(f'{cls.__name__}: sites do not all have'
-                                    ' the same data repository')
+                    raise Exception(  # pragma: no cover
+                        f'{cls.__name__}: sites do not all have the same data'
+                        ' repository')
 
                 cls.repo = site.data_repository()
 
@@ -1327,7 +1322,7 @@ class PwbTestCase(TestCase):
         """Prepare the environment for running the pwb.py script."""
         super().setUp()
         self.orig_pywikibot_dir = None
-        if 'PYWIKIBOT_DIR' in os.environ:
+        if 'PYWIKIBOT_DIR' in os.environ:  # pragma: no cover
             self.orig_pywikibot_dir = os.environ['PYWIKIBOT_DIR']
         base_dir = pywikibot.config.base_dir
         os.environ['PYWIKIBOT_DIR'] = base_dir
@@ -1336,7 +1331,7 @@ class PwbTestCase(TestCase):
         """Restore the environment after running the pwb.py script."""
         super().tearDown()
         del os.environ['PYWIKIBOT_DIR']
-        if self.orig_pywikibot_dir:
+        if self.orig_pywikibot_dir:  # pragma: no cover
             os.environ['PYWIKIBOT_DIR'] = self.orig_pywikibot_dir
 
     def execute(self, args: list[str], **kwargs):
@@ -1405,7 +1400,7 @@ class DeprecationTestCase(TestCase):
         self.warning_log = []
 
         self.expect_warning_filename = inspect.getfile(self.__class__)
-        if self.expect_warning_filename.endswith('.pyc'):
+        if self.expect_warning_filename.endswith('.pyc'):  # pragma: no cover
             self.expect_warning_filename = self.expect_warning_filename[:-1]
 
         self._do_test_warning_filename = True
@@ -1439,14 +1434,14 @@ class DeprecationTestCase(TestCase):
             msg = f'{deprecated} is deprecated'
             if instead:
                 msg += f'; use {instead} instead.'
-        elif instead is None:
+        elif instead is None:  # pragma: no cover
             msg = None
-        elif instead is True:
+        elif instead is True:  # pragma: no cover
             msg = cls.INSTEAD
-        elif instead is False:
+        elif instead is False:  # pragma: no cover
             msg = cls.NO_INSTEAD
         else:
-            raise TypeError(
+            raise TypeError(  # pragma: no cover
                 f'instead argument must not be a {type(instead).__name__!r}')
         return msg
 
@@ -1485,7 +1480,7 @@ class DeprecationTestCase(TestCase):
                 if (match and bool(match[1]) == (msg is self.INSTEAD)
                         or msg is None):
                     break
-            else:
+            else:  # pragma: no cover
                 self.fail('No generic deprecation message match found in '
                           f'{deprecation_messages}')
         else:
@@ -1494,7 +1489,7 @@ class DeprecationTestCase(TestCase):
                 if message.startswith(head) \
                    and message.endswith(tail):
                     break
-            else:
+            else:  # pragma: no cover
                 self.fail(f"'{msg}' not found in {self.deprecation_messages}"
                           '(ignoring since)')
         if self._do_test_warning_filename:
@@ -1522,7 +1517,7 @@ class DeprecationTestCase(TestCase):
 
     def assertNoDeprecation(self, msg=None):
         """Assert that no deprecation warning happened."""
-        if msg:
+        if msg:  # pragma: no cover
             self.assertNotIn(msg, self.deprecation_messages)
         else:
             self.assertIsEmpty(self.deprecation_messages)
@@ -1537,7 +1532,7 @@ class DeprecationTestCase(TestCase):
         for item in self.warning_log:
             if (self._ignore_unknown_warning_packages
                     and 'pywikibot' not in item.filename):
-                continue
+                continue  # pragma: no cover
 
             if item.filename != filename:
                 self.fail(f'expected warning filename {filename}; warning '
