@@ -114,7 +114,7 @@ class SupersetQuery(WaitingMixin):
         instance is not connected, it attempts to log in first.
 
         :raises ServerError: For any http errors
-        :return CSRF token string
+        :return: CSRF token string
         """
         if not self.connected:
             self.login()
@@ -172,7 +172,7 @@ class SupersetQuery(WaitingMixin):
         :raises TypeError: if site and schema_name are both defined'
         :raises TypeError: If determined database_id is not an integer.
         :raises TypeError: If neither site nor schema_name is determined.
-        :return A tuple containing database_id and schema_name.
+        :return: A tuple containing database_id and schema_name.
         """
         if site and schema_name:
             msg = 'Only one of schema_name and site parameters can be defined'
