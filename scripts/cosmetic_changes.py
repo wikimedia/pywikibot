@@ -17,7 +17,7 @@ The following parameters are supported:
 
 -ignore:          Ignores if an error occurred and either skips the page or
                   only that method. It can be set to:
-                  all - dos not ignore errors
+                  all - does not ignore errors
                   match - ignores ISBN related errors (default)
                   method - ignores fixing method errors
                   page - ignores page related errors
