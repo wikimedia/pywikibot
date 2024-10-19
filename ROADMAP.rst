@@ -1,7 +1,7 @@
 Current Release Changes
 =======================
 
-* *no changes yet*
+* No longer raise :exc:`exceptions.UnsupportedPageError` within :meth:`data.api.PageGenerator.result` (:phab:`T377651`)
 
 Current Deprecations
 ====================
