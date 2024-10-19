@@ -44,6 +44,7 @@ sys.path = [str(repo_dir), str(repo_dir / 'pywikibot')] + sys.path
 
 os.environ['PYWIKIBOT_NO_USER_CONFIG'] = '1'
 import pywikibot  # noqa: E402
+from pywikibot.backports import removeprefix  # noqa: E402
 
 
 # -- General configuration ------------------------------------------------
@@ -532,6 +533,9 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
     """Pywikibot specific conversions."""
     from scripts.cosmetic_changes import warning
 
+    # these scripts are skipped for fixing options lists
+    skipscripts = {'add_text'}
+
     if what != 'module':
         return
 
@@ -539,6 +543,7 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
         return
 
     length = 0
+    shortname = removeprefix(name, 'scripts.')
     for index, line in enumerate(lines):
         # highlight the first line
         if index == 0:  # highlight the first line
@@ -559,8 +564,10 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
             lines[index] = warning
 
         # Initiate code block except pagegenerator arguments follows
-        elif (line.endswith(':') and not line.lstrip().startswith(':')
-                and 'Traceback (most recent call last)' not in line):
+        elif (shortname not in skipscripts
+              and line.endswith(':')
+              and not line.lstrip().startswith(':')
+              and 'Traceback (most recent call last)' not in line):
             for afterline in lines[index + 1:]:
                 if not afterline:
                     continue
@@ -569,7 +576,7 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
                 break
 
         # adjust options
-        if line.startswith('-'):
+        if shortname not in skipscripts and line.startswith('-'):
             # Indent options
             match = re.match(r'-[^ ]+? +', line)
             if match:

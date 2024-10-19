@@ -1,35 +1,36 @@
 #!/usr/bin/env python3
-r"""
-Append text to the top or bottom of a page.
+r"""Append text to the top or bottom of a page.
 
-By default this adds the text to the bottom above the categories and interwiki.
+By default this adds the text to the bottom above the categories and
+interwiki.
 
 Use the following command line parameters to specify what to add:
 
--text             Text to append. "\n" are interpreted as newlines.
+-text        Text to append. "\n" are interpreted as newlines.
 
--textfile         Path to a file with text to append
+-textfile    Path to a file with text to append
 
--summary          Change summary to use
+-summary     Change summary to use
 
--up               Append text to the top of the page rather than the bottom
+-up          Append text to the top of the page rather than the bottom
 
--create           Create the page if necessary. Note that talk pages are
-                  created already without of this option.
+-create      Create the page if necessary. Note that talk pages are
+             created already without of this option.
 
--createonly       Only create the page but do not edit existing ones
+-createonly  Only create the page but do not edit existing ones
 
--always           If used, the bot won't ask if it should add the specified
-                  text
+-always      If used, the bot won't ask if it should add the specified
+             text
 
--major            If used, the edit will be saved without the "minor edit" flag
+-major       If used, the edit will be saved without the "minor edit"
+             flag
 
--talkpage         Put the text onto the talk page instead
--talk
+-talk, -talkpage
+             Put the text onto the talk page instead
 
--excepturl        Skip pages with a url that matches this regular expression
+-excepturl   Skip pages with a url that matches this regular expression
 
--noreorder        Place the text beneath the categories and interwiki
+-noreorder   Place the text beneath the categories and interwiki
 
 Furthermore, the following can be used to specify which pages to process...
 
@@ -40,20 +41,26 @@ Examples
 
 Append 'hello world' to the bottom of the sandbox:
 
-    python pwb.py add_text -page:Wikipedia:Sandbox \
-    -summary:"Bot: pywikibot practice" -text:"hello world"
+.. code-block:: batch
+
+   python pwb.py add_text -page:Wikipedia:Sandbox
+   -summary:"Bot: pywikibot practice" -text:"hello world"
 
 Add a template to the top of the pages with 'category:catname':
 
-    python pwb.py add_text -cat:catname -summary:"Bot: Adding a template" \
-    -text:"{{Something}}" -except:"\{\{([Tt]emplate:|)[Ss]omething" -up
+.. code-block:: batch
+
+   python pwb.py add_text -cat:catname -summary:"Bot: Adding a template"
+   -text:"{{Something}}" -except:"\{\{([Tt]emplate:|)[Ss]omething" -up
 
 Command used on it.wikipedia to put the template in the page without any
 category:
 
-    python pwb.py add_text -except:"\{\{([Tt]emplate:|)[Cc]ategorizzare" \
-    -text:"{{Categorizzare}}" -excepturl:"class='catlinks'>" -uncat \
-    -summary:"Bot: Aggiungo template Categorizzare"
+.. code-block:: batch
+
+   python pwb.py add_text -except:"\{\{([Tt]emplate:|)[Cc]ategorizzare"
+   -text:"{{Categorizzare}}" -excepturl:"class='catlinks'>" -uncat
+   -summary:"Bot: Aggiungo template Categorizzare"
 """
 #
 # (C) Pywikibot team, 2007-2024
