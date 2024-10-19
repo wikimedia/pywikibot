@@ -853,6 +853,12 @@ class TestPageBotMayEdit(TestCase):
                 self.assertFalse(page.botMayEdit())
                 del page
 
+    def test_real_page(self):
+        """Test botMayEdit for real example due to T377651."""
+        site = pywikibot.Site('wikipedia:en')
+        page = pywikibot.Page(site, 'Talk:Alan Turing')
+        self.assertTrue(page.botMayEdit())
+
 
 class TestPageHistory(DefaultSiteTestCase):
 
