@@ -335,10 +335,12 @@ def localDigitsStrToInt(value: str, digitsToLocalDict: Mapping[int, str],
 
 
 # Helper for roman numerals number representation
-_romanNumbers = ['-', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX',
-                 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI', 'XVII', 'XVIII',
-                 'XIX', 'XX', 'XXI', 'XXII', 'XXIII', 'XXIV', 'XXV', 'XXVI',
-                 'XXVII', 'XXVIII', 'XXIX', 'XXX']
+_romanNumbers = [
+    '-', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI',
+    'XII', 'XIII', 'XIV', 'XV', 'XVI', 'XVII', 'XVIII', 'XIX', 'XX', 'XXI',
+    'XXII', 'XXIII', 'XXIV', 'XXV', 'XXVI', 'XXVII', 'XXVIII', 'XXIX', 'XXX',
+    'XXXI',
+]
 
 
 def intToRomanNum(i: int) -> str:
