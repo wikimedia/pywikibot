@@ -1,44 +1,41 @@
 #!/usr/bin/env python3
-"""
-Script to log the bot in to a wiki account.
+"""Script to log the bot in to a wiki account.
 
 Suggestion is to make a special account to use for bot use only. Make
 sure this bot account is well known on your home wiki before using.
 
-The following parameters are supported::
+The following parameters are supported:
 
- -family:FF   Log in to the LL language of the FF family.
- -lang:LL     Example: -family:wiktionary -lang:fr will log you in at
-              fr.wiktionary.org.
+-all         Try to log in on all sites where a username is defined in
+             user config file (user-config.py).
 
- -site:FF:LL  Log in to the LL language of the FF family
+-logout      Log out of the current site. Combine with ``-all`` to log
+             out of all sites, or with :ref:`global options` ``-family``,
+             ``-lang`` or ``-site`` to log out of a specific site.
 
- -all         Try to log in on all sites where a username is defined in
-              user config file (user-config.py).
+-oauth       Generate OAuth authentication information.
 
- -logout      Log out of the current site. Combine with -all to log out of
-              all sites, or with -family and -lang to log out of a specific
-              site.
+             .. note:: Need to copy OAuth tokens to your user config
+                file manually. -logout is not compatible with -oauth.
 
- -oauth       Generate OAuth authentication information.
+-autocreate  Auto-create an account using unified login when necessary.
 
-              .. note:: Need to copy OAuth tokens to your user config
-                 file manually. -logout is not compatible with -oauth.
+             .. note:: the global account must exist already before
+                using this.
 
- -autocreate  Auto-create an account using unified login when necessary.
+-async       Run the bot in parallel tasks, only usefull together with
+             ``-all`` option
 
-              .. note:: the global account must exist already before
-                 using this.
-
- -async       Run the bot in parallel tasks
+.. hint:: Use :ref:`global options` ``-code``, ``-family`` or ``-site``
+   to determine the site to login/logout.
 
 If not given as parameter, the script will ask for your username and
 password (password entry will be hidden), log in to your home wiki using
-this combination, and store the resulting cookies (containing your password
-hash, so keep it secured!) in a file in the data subdirectory.
+this combination, and store the resulting cookies (containing your
+password hash, so keep it secured!) in a file in the data subdirectory.
 
-All scripts in this library will be looking for this cookie file and will
-use the login information if it is present.
+All scripts in this library will be looking for this cookie file and
+will use the login information if it is present.
 
 To log out, throw away the ``*.lwp`` file that is created in the data
 subdirectory.
