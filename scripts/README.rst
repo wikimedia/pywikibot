@@ -1,6 +1,21 @@
+.. image:: https://img.shields.io/pypi/pyversions/pywikibot-scripts.svg
+   :alt: Python
+   :target: https://www.python.org/downloads/
 .. image:: https://img.shields.io/github/languages/top/wikimedia/pywikibot
    :alt: Top language
    :target: https://www.python.org/downloads/
+.. image:: https://img.shields.io/pypi/v/pywikibot-scripts.svg
+   :alt: Pywikibot-scripts release
+   :target: https://pypi.org/project/pywikibot-scripts/
+.. image:: https://img.shields.io/pypi/wheel/pywikibot-scripts
+   :alt: wheel
+   :target: https://pypi.org/project/pywikibot-scripts/
+.. image:: https://static.pepy.tech/badge/pywikibot-scripts
+   :alt: Total downloads
+   :target: https://pepy.tech/project/pywikibot-scripts
+.. image:: https://static.pepy.tech/personalized-badge/pywikibot-scripts?period=month&units=international_system&left_color=black&right_color=blue&left_text=monthly
+   :alt: Monthly downloads
+   :target: https://pepy.tech/project/pywikibot-scripts
 .. image:: https://img.shields.io/github/last-commit/wikimedia/pywikibot
    :alt: Last commit
    :target: https://gerrit.wikimedia.org/r/plugins/gitiles/pywikibot/core/
