@@ -1,38 +1,44 @@
 #!/usr/bin/env python3
-"""
-This bot uploads text from djvu files onto pages in the "Page" namespace.
+"""This bot uploads text from djvu files onto pages in the "Page" namespace.
 
-It is intended to be used for Wikisource.
+.. note:: It is intended to be used for Wikisource.
 
 The following parameters are supported:
 
-    -index:...     name of the index page (without the Index: prefix)
-    -djvu:...      path to the djvu file, it shall be:
-                   - path to a file name
-                   - dir where a djvu file name as index is located
-                   optional, by default is current dir '.'
-    -pages:<start>-<end>,...<start>-<end>,<start>-<end>
-                   Page range to upload;
-                   optional, start=1, end=djvu file number of images.
-                   Page ranges can be specified as:
-                     A-B -> pages A until B
-                     A-  -> pages A until number of images
-                     A   -> just page A
-                     -B  -> pages 1 until B
+-index:    name of the index page (without the Index: prefix)
 
-This script is a :py:obj:`ConfigParserBot <bot.ConfigParserBot>`.
-The following options can be set within a settings file which is scripts.ini
+-djvu:     path to the djvu file, it shall be:
+
+           .. hlist::
+
+              * path to a file name
+              * dir where a djvu file name as index is located optional,
+                by default is current dir '.'
+
+-pages:<start>-<end>,...<start>-<end>,<start>-<end>  Page range to
+           upload; optional, :samp:`start=1`,
+           :samp:`end={djvu file number of images}`. Page ranges can be
+           specified as::
+
+               A-B -> pages A until B
+               A-  -> pages A until number of images
+               A   -> just page A
+               -B  -> pages 1 until B
+
+This script is a :class:`ConfigParserBot <bot.ConfigParserBot>`. The
+following options can be set within a settings file which is scripts.ini
 by default:
 
-    -summary:      custom edit summary.
-                   Use quotes if edit summary contains spaces.
-    -force         overwrites existing text
-                   optional, default False
-    -always        do not bother asking to confirm any of the changes.
+-summary:  [str] Custom edit summary. Use quotes if edit summary
+           contains spaces.
+
+-force     Overwrites existing text optional, default False.
+
+-always    Do not bother asking to confirm any of the changes.
 
 """
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #

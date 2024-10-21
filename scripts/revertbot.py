@@ -1,20 +1,22 @@
 #!/usr/bin/env python3
-r"""
-This script can be used for reverting certain edits.
+r"""This script can be used for reverting certain edits.
 
 The following command line parameters are supported:
 
--username         Edits of which user need to be reverted.
-                  Default is bot's username (site.username())
+-username   Edits of which user need to be reverted. Default is bot's
+            username (:code:`site.username()`).
 
--rollback         Rollback edits instead of reverting them.
-                  Note that in rollback, no diff would be shown.
+-rollback   Rollback edits instead of reverting them.
 
--limit:num        Use the last num contributions to be checked for revert.
-                  Default is 500.
+            .. note:: No diff would be shown in this mode.
+
+-limit:num  [int] Use the last num contributions to be checked for
+            revert. Default is 500.
 
 Users who want to customize the behaviour should subclass the `BaseRevertBot`
 and override its `callback` method. Here is a sample:
+
+.. code:: python
 
     class myRevertBot(BaseRevertBot):
 
@@ -35,7 +37,7 @@ and override its `callback` method. Here is a sample:
 
 """
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #

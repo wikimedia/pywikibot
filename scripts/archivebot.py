@@ -17,76 +17,100 @@ incremented when the archive reaches a certain size.
 
 Transcluded template may contain the following parameters:
 
- {{TEMPLATE_PAGE
- |archive =
- |algo =
- |counter =
- |maxarchivesize =
- |minthreadsleft =
- |minthreadstoarchive =
- |archiveheader =
- |key =
- }}
+.. code:: wikitext
+
+   {{TEMPLATE_PAGE
+   |archive =
+   |algo =
+   |counter =
+   |maxarchivesize =
+   |minthreadsleft =
+   |minthreadstoarchive =
+   |archiveheader =
+   |key =
+   }}
 
 Meanings of parameters are:
 
- archive              Name of the page to which archived threads will be put.
-                      Must be a subpage of the current page. Variables are
-                      supported.
- algo                 Specifies the maximum age of a thread. Must be
-                      in the form old(<delay>) where <delay> specifies
-                      the age in seconds (s), hours (h), days (d),
-                      weeks (w), or years (y) like 24h or 5d. Default is
-                      old(24h).
- counter              The current value of a counter which could be assigned as
-                      variable. Will be updated by bot. Initial value is 1.
- maxarchivesize       The maximum archive size before incrementing the counter.
-                      Value can be given with appending letter like K or M
-                      which indicates KByte or MByte. Default value is 200K.
- minthreadsleft       Minimum number of threads that should be left on a page.
-                      Default value is 5.
- minthreadstoarchive  The minimum number of threads to archive at once. Default
-                      value is 2.
- archiveheader        Content that will be put on new archive pages as the
-                      header. This parameter supports the use of variables.
-                      Default value is {{talkarchive}}
- key                  A secret key that (if valid) allows archives not to be
-                      subpages of the page being archived.
+archive
+    Name of the page to which archived threads will be put. Must be a
+    subpage of the current page. Variables are supported.
+algo
+    Specifies the maximum age of a thread. Must be in the form
+    :code:`old(<delay>)` where ``<delay>`` specifies the age in
+    seconds (s), hours (h), days (d), weeks (w), or years (y) like ``24h``
+    or ``5d``. Default is :code:`old(24h)`.
+counter
+    The current value of a counter which could be assigned as variable.
+    Will be updated by bot. Initial value is 1.
+maxarchivesize
+    The maximum archive size before incrementing the counter. Value can
+    be given with appending letter like ``K`` or ``M`` which indicates
+    KByte or MByte. Default value is ``200K``.
+minthreadsleft
+    Minimum number of threads that should be left on a page. Default
+    value is 5.
+minthreadstoarchive
+    The minimum number of threads to archive at once. Default value is 2.
+archiveheader
+    Content that will be put on new archive pages as the header. This
+    parameter supports the use of variables. Default value is
+    ``{{talkarchive}}``.
+key
+    A secret key that (if valid) allows archives not to be subpages of
+    the page being archived.
 
 Variables below can be used in the value for "archive" in the template
-above; numbers are latin digits:
+above; numbers are **latin** digits. Alternatively you may use
+**localized** digits. This is only available for a few site languages.
+Refer :attr:`NON_LATIN_DIGITS
+<userinterfaces.transliteration.NON_LATIN_DIGITS>` whether there is a
+localized one.
 
-%(counter)d          the current value of the counter
-%(year)d             year of the thread being archived
-%(isoyear)d          ISO year of the thread being archived
-%(isoweek)d          ISO week number of the thread being archived
-%(semester)d         semester term of the year of the thread being archived
-%(quarter)d          quarter of the year of the thread being archived
-%(month)d            month (as a number 1-12) of the thread being archived
-%(monthname)s        localized name of the month above
-%(monthnameshort)s   first three letters of the name above
-%(week)d             week number of the thread being archived
+.. list-table::
+   :header-rows: 1
 
-Alternatively you may use localized digits. This is only available for a
-few site languages. Refer :attr:`NON_LATIN_DIGITS
-<userinterfaces.transliteration.NON_LATIN_DIGITS>` whether
-there is a localized one:
+   * - latin
+     - localized
+     - Description
+   * - %(counter)d
+     - %(localcounter)s
+     - the current value of the counter
+   * - %(year)d
+     - %(localyear)s
+     - year of the thread being archived
+   * - %(isoyear)d
+     - %(localisoyear)s
+     - ISO year of the thread being archived
+   * - %(isoweek)d
+     - %(localisoweek)s
+     - ISO week number of the thread being archived
+   * - %(semester)d
+     - %(localsemester)s
+     - semester term of the year of the thread being archived
+   * - %(quarter)d
+     - %(localquarter)s
+     - quarter of the year of the thread being archived
+   * - %(month)d
+     - %(localmonth)s
+     - month (as a number 1-12) of the thread being archived
+   * - %(monthname)s
+     -
+     - localized name of the month above
+   * - %(monthnameshort)s
+     -
+     - first three letters of the name above
+   * - %(week)d
+     - %(localweek)s
+     - week number of the thread being archived
 
-%(localcounter)s     the current value of the counter
-%(localyear)s        year of the thread being archived
-%(localisoyear)s     ISO year of the thread being archived
-%(localisoweek)s     ISO week number of the thread being archived
-%(localsemester)s    semester term of the year of the thread being archived
-%(localquarter)s     quarter of the year of the thread being archived
-%(localmonth)s       month (as a number 1-12) of the thread being archived
-%(localweek)s        week number of the thread being archived
-
-The ISO calendar starts with the Monday of the week which has at least four
-days in the new Gregorian calendar. If January 1st is between Monday and
-Thursday (including), the first week of that year started the Monday of that
-week, which is in the year before if January 1st is not a Monday. If it's
-between Friday or Sunday (including) the following week is then the first week
-of the year. So up to three days are still counted as the year before.
+The ISO calendar starts with the Monday of the week which has at least
+four days in the new Gregorian calendar. If January 1st is between
+Monday and Thursday (including), the first week of that year started the
+Monday of that week, which is in the year before if January 1st is not a
+Monday. If it's between Friday or Sunday (including) the following week
+is then the first week of the year. So up to three days are still
+counted as the year before.
 
 .. seealso:: Python :python:`datetime.date.isocalendar
    <library/datetime.html#datetime.date.isocalendar>`,
@@ -94,18 +118,27 @@ of the year. So up to three days are still counted as the year before.
 
 Options (may be omitted):
 
-  -help           show this help message and exit
-  -calc:PAGE      calculate key for PAGE and exit
-  -file:FILE      load list of pages from FILE
-  -force          override security options
-  -locale:LOCALE  switch to locale LOCALE
-  -namespace:NS   only archive pages from a given namespace
-  -page:PAGE      archive a single PAGE, default ns is a user talk page
-  -salt:SALT      specify salt
-  -keep           Preserve thread order in archive even if threads are
-                  archived later
-  -sort           Sort archive by timestamp; should not be used with -keep
-  -async          Run the bot in parallel tasks.
+-help           show this help message and exit
+
+-calc:PAGE      calculate key for PAGE and exit
+
+-file:FILE      load list of pages from FILE
+
+-force          override security options
+
+-locale:LOCALE  switch to locale LOCALE
+
+-namespace:NS   only archive pages from a given namespace
+
+-page:PAGE      archive a single PAGE, default ns is a user talk page
+
+-salt:SALT      specify salt
+
+-keep           Preserve thread order in archive even if threads are
+                archived later
+-sort           Sort archive by timestamp; should not be used with `keep`
+
+-async          Run the bot in parallel tasks.
 
 .. versionchanged:: 7.6
    Localized variables for "archive" template parameter are supported.

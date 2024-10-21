@@ -1,29 +1,31 @@
 #!/usr/bin/env python3
-"""
-With this tool you can add the template {{commonscat}} to categories.
+"""With this tool you can add the template {{commonscat}} to categories.
 
-The tool works by following the interwiki links. If the template is present on
-another language page, the bot will use it.
+The tool works by following the interwiki links. If the template is
+present on another language page, the bot will use it.
 
-You could probably use it at articles as well, but this isn't tested.
+.. warning::
+   You could probably use it at articles as well, but this isn't tested.
 
 The following parameters are supported:
 
--checkcurrent     Work on all category pages that use the primary commonscat
-                  template.
+-checkcurrent  Work on all category pages that use the primary commonscat
+               template.
 
-This script is a :py:obj:`ConfigParserBot <bot.ConfigParserBot>`.
-The following options can be set within a settings file which is scripts.ini
-by default::
+This script is a :class:`ConfigParserBot <bot.ConfigParserBot>`. The
+following options can be set within a settings file which is scripts.ini
+by default:
 
--always           Don't prompt you for each replacement. Warning message
-                  has not to be confirmed. ATTENTION: Use this with care!
+-always        Don't prompt you for each replacement. Warning message
+               has not to be confirmed.
 
--summary:XYZ      Set the action summary message for the edit to XYZ,
-                  otherwise it uses messages from add_text.py as default.
+               .. attention:: Use this with care!
 
-This bot uses pagegenerators to get a list of pages. The following options are
-supported:
+-summary:XYZ   Set the action summary message for the edit to XYZ,
+               otherwise it uses messages from add_text.py as default.
+
+This bot uses pagegenerators to get a list of pages. The following
+options are supported:
 
 &params;
 

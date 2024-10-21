@@ -10,11 +10,13 @@ where action can be one of these
 *add*
     mass-add a category to a list of pages.
 *remove*
-    remove category tag from all pages in a category. If a pagegenerators
-    option is given, the intersection with category pages is processed.
+    remove category tag from all pages in a category. If a
+    pagegenerators option is given, the intersection with category pages
+    is processed.
 *move*
-    move all pages in a category to another category. If a pagegenerators
-    option is given, the intersection with category pages is processed.
+    move all pages in a category to another category. If a
+    pagegenerators option is given, the intersection with category pages
+    is processed.
 *tidy*
     tidy up a category by moving its pages into subcategories.
 *tree*
@@ -28,97 +30,105 @@ where action can be one of these
 
 and option can be one of these
 
-Options for "add" action:
+Options for *add* action:
 
- -person      - Sort persons by their last name.
- -create      - If a page doesn't exist, do not skip it, create it instead.
- -redirect    - Follow redirects.
+-person       Sort persons by their last name.
+-create       If a page doesn't exist, do not skip it, create it instead.
+-redirect     Follow redirects.
 
 
-Options for "listify" action:
+Options for *listify* action:
 
- -append      - This appends the list to the current page that is already
-                existing (appending to the bottom by default).
- -overwrite   - This overwrites the current page with the list even if
-                something is already there.
- -showimages  - This displays images rather than linking them in the list.
- -talkpages   - This outputs the links to talk pages of the pages to be
-                listified in addition to the pages themselves.
- -prefix:#    - You may specify a list prefix like "#" for a numbered list or
-                any other prefix. Default is a bullet list with prefix "*".
+-append       This appends the list to the current page that is already
+              existing (appending to the bottom by default).
+-overwrite    This overwrites the current page with the list even if
+              something is already there.
+-showimages   This displays images rather than linking them in the list.
+-talkpages    This outputs the links to talk pages of the pages to be
+              listified in addition to the pages themselves.
+-prefix:#     You may specify a list prefix like "#" for a numbered list
+              or any other prefix. Default is a bullet list with prefix
+              "*".
 
-Options for "remove" action:
+Options for *remove* action:
 
- -nodelsum    - This specifies not to use the custom edit summary as the
-                deletion reason. Instead, it uses the default deletion reason
-                for the language, which is "Category was disbanded" in
-                English.
+-nodelsum     This specifies not to use the custom edit summary as the
+              deletion reason. Instead, it uses the default deletion
+              reason for the language, which is "Category was disbanded"
+              in English.
 
-Options for "move" action:
+Options for *move* action:
 
- -hist        - Creates a nice wikitable on the talk page of target category
-                that contains detailed page history of the source category.
- -nodelete    - Don't delete the old category after move.
- -nowb        - Don't update the Wikibase repository.
- -allowsplit  - If that option is not set, it only moves the talk and main
-                page together.
- -mvtogether  - Only move the pages/subcategories of a category, if the
-                target page (and talk page, if -allowsplit is not set)
-                doesn't exist.
- -keepsortkey - Use sortKey of the old category also for the new category.
-                If not specified, sortKey is removed.
-                An alternative method to keep sortKey is to use -inplace
-                option.
+-hist         Creates a nice wikitable on the talk page of target
+              category that contains detailed page history of the source
+              category.
+-nodelete     Don't delete the old category after move.
+-nowb         Don't update the Wikibase repository.
+-allowsplit   If that option is not set, it only moves the talk and main
+              page together.
+-mvtogether   Only move the pages/subcategories of a category, if the
+              target page (and talk page, if ``-allowsplit`` is not set)
+              doesn't exist.
+-keepsortkey  Use sortKey of the old category also for the new category.
+              If not specified, sortKey is removed. An alternative
+              method to keep sortKey is to use ``-inplace`` option.
 
-Options for "listify" and "tidy" actions:
+Options for *listify* and *tidy* actions:
 
- -namespaces    Filter the arcitles in the specified namespaces. Separate
- -namespace     multiple namespace numbers or names with commas. Examples:
- -ns            -ns:0,2,4
-                -ns:Help,MediaWiki
+-namespaces, -namespace, -ns
+              Filter the arcitles in the specified namespaces. Separate
+              multiple namespace numbers or names with commas. Examples:
+              :samp:`-ns:0,2,4`, :samp:`-ns:Help,MediaWiki`
 
-Options for "clean" action:
+Options for *clean* action:
 
- -always
+-always       The bot won't ask for confirmation when putting a page.
 
 Options for several actions:
 
- -rebuild     - Reset the database.
- -from:       - The category to move from (for the move option)
-                Also, the category to remove from in the remove option
-                Also, the category to make a list of in the listify option.
- -to:         - The category to move to (for the move option).
-              - Also, the name of the list to make in the listify option.
+-rebuild      Reset the database.
 
- -batch       - Don't prompt to delete emptied categories (do it
-                automatically).
- -summary:    - Pick a custom edit summary for the bot.
- -inplace     - Use this flag to change categories in place rather than
-                rearranging them.
- -recurse[:<depth>]
-              - Recurse through subcategories of the category to
-                optional depth.
- -pagesonly   - While removing pages from a category, keep the subpage links
-                and do not remove them.
- -match       - Only work on pages whose titles match the given regex (for
-                move and remove actions).
- -depth:      - The max depth limit beyond which no subcategories will be
-                listed.
+-from:        The category to move from (for the move option). Also, the
+              category to remove from in the remove option. Also, the
+              category to make a list of in the listify option.
+
+-to:          The category to move to (for the move option). Also, the
+              name of the list to make in the listify option.
+
+-batch        Don't prompt to delete emptied categories (do it
+              automatically).
+
+-summary:     Pick a custom edit summary for the bot.
+
+-inplace      Use this flag to change categories in place rather than
+              rearranging them.
+
+-recurse[:<depth>]  Recurse through subcategories of the category to
+                    optional depth.
+
+-pagesonly    While removing pages from a category, keep the subpage
+              links and do not remove them.
+
+-match        Only work on pages whose titles match the given regex (for
+              move and remove actions).
+
+-depth:       The max depth limit beyond which no subcategories will be
+               isted.
 
 .. note:: If the category names have spaces in them you may need to use
    a special syntax in your shell so that the names aren't treated as
    separate parameters. For instance, in BASH, use single quotes, e.g.
    ``-from:'Polar bears'``.
 
-If action is "add", "move" or "remove, the following additional options are
-supported:
+If action is "add", "move" or "remove, the following additional options
+are supported:
 
 &params;
 
 For the actions tidy and tree, the bot will store the category structure
-locally in category.dump. This saves time and server load, but if it uses
-these data later, they may be outdated; use the -rebuild parameter in this
-case.
+locally in category.dump. This saves time and server load, but if it
+uses these data later, they may be outdated; use the -rebuild parameter
+in this case.
 
 For example, to create a new category from a list of persons, type:
 
@@ -132,7 +142,7 @@ Or to do it all from the command-line, use the following syntax:
 
 This will move all pages in the category US to the category United States.
 
-A pagegenerators option can be given with ``move`` and ``remove`` action:
+A pagegenerators option can be given with *move* and *remove* action:
 
     pwb category -site:wikipedia:en remove -from:Hydraulics -cat:Pneumatics
 

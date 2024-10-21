@@ -9,9 +9,10 @@ These parameters are supported to specify which pages titles to print:
 
 -format     Defines the output format.
 
-            Can be a custom string according to python string.format() notation
-            or can be selected by a number from following list
+            Can be a custom string according to python string.format()
+            notation or can be selected by a number from following list
             (1 is default format):
+
             1 - '{num:4d} {page.title}'
                 --> 10 PageTitle
 
@@ -38,10 +39,11 @@ These parameters are supported to specify which pages titles to print:
 
             num is the sequential number of the listed page.
 
-            An empty format is equal to -notitle and just shows the total
-            amount of pages.
+            An empty format is equal to ``-notitle`` and just shows the
+            total amount of pages.
 
--outputlang Language for translation of namespaces.
+-outputlang
+            Language for translation of namespaces.
 
 -notitle    Page title is not printed.
 
@@ -50,47 +52,55 @@ These parameters are supported to specify which pages titles to print:
 -tofile     Save Page titles to a single file. File name can be set
             with -tofile:filename or -tofile:dir_name/filename.
 
--save       Save Page content to a file named as page.title(as_filename=True).
-            Directory can be set with -save:dir_name
-            If no dir is specified, current directory will be used.
+-save       Save Page content to a file named as
+            :code:`page.title(as_filename=True)`. Directory can be set
+            with ``-save:dir_name``. If no dir is specified, current
+            directory will be used.
 
--encode     File encoding can be specified with '-encode:name' (name must be
-            a valid python encoding: utf-8, etc.).
-            If not specified, it defaults to config.textfile_encoding.
+-encode     File encoding can be specified with '-encode:name' (name
+            must be a valid python encoding: utf-8, etc.). If not
+            specified, it defaults to :code:`config.textfile_encoding`.
 
--put:       Save the list to the defined page of the wiki. By default it does
-            not overwrite an existing page.
+-put:       [str] Save the list to the defined page of the wiki. By
+            default it does not overwrite an existing page.
 
--overwrite  Overwrite the page if it exists. Can only by applied with -put.
+-overwrite  Overwrite the page if it exists. Can only by applied with
+            -put.
 
--summary:   The summary text when the page is written. If it's one word just
-            containing letters, dashes and underscores it uses that as a
-            translation key.
+-summary:   [str] The summary text when the page is written. If it's one
+            word just containing letters, dashes and underscores it uses
+            that as a translation key.
 
 Custom format can be applied to the following items extrapolated from a
 page object:
 
-    site: obtained from page._link._site.
+*site*
+    Obtained from :code:`page._link._site`.
 
-    title: obtained from page._link._title.
+*title*
+    Obtained from :code:`page._link._title`.
 
-    loc_title: obtained from page._link.canonical_title().
+*loc_title*
+    Obtained from :code:`page._link.canonical_title()`.
 
-    can_title: obtained from page._link.ns_title().
-        based either the canonical namespace name or on the namespace name
-        in the language specified by the -trans param;
-        a default value '******' will be used if no ns is found.
+*can_title*
+    Obtained from :code:`page._link.ns_title()`. Based either the
+    canonical namespace name or on the namespace name in the language
+    specified by the ``-trans`` param; a default value ``******`` will
+    be used if no *ns* is found.
 
-    onsite: obtained from pywikibot.Site(outputlang, self.site.family).
+*onsite*
+    Obtained from :code:`pywikibot.Site(outputlang, self.site.family)`.
 
-    trs_title: obtained from page._link.ns_title(onsite=onsite).
-        If selected format requires trs_title, outputlang must be set.
+*trs_title*
+    Obtained from :code:`page._link.ns_title(onsite=onsite)`. If
+    selected, format requires *trs_title*, ``-outputlang`` must be set.
 
 
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #

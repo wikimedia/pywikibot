@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-This script can be used to delete and undelete pages en masse.
+"""This script can be used to delete and undelete pages en masse.
 
 Of course, you will need an admin account on the relevant wiki.
 
@@ -10,31 +9,33 @@ These command line parameters can be used to specify which pages to work on:
 
 Furthermore, the following command line parameters are supported:
 
--always           Don't prompt to delete pages, just do it.
+-always        Don't prompt to delete pages, just do it.
 
--summary:XYZ      Set the summary message text for the edit to XYZ.
+-summary:XYZ   Set the summary message text for the edit to XYZ.
 
--undelete         Actually undelete pages instead of deleting.
-                  Obviously makes sense only with -page and -file.
+-undelete      Actually undelete pages instead of deleting. Obviously
+               makes sense only with -page and -file.
 
--isorphan         Alert if there are pages that link to page to be
-                  deleted (check 'What links here').
-                  By default it is active and only the summary per namespace
-                  is be given.
-                  If given as -isorphan:n, n pages per namespace will be shown,
-                  If given as -isorphan:0, only the summary per namespace will
-                  be shown,
-                  If given as -isorphan:n, with n < 0, the option is disabled.
-                  This option is disregarded if -always is set.
+-isorphan      Alert if there are pages that link to page to be deleted
+               (check 'What links here'). By default it is active and
+               only the summary per namespace is be given. If given as
+               ``-isorphan:n``, n pages per namespace will be shown. If
+               given as ``-isorphan:0``, only the summary per namespace
+               will be shown. If given as ``-isorphan:n``, with n < 0,
+               the option is disabled. This option is disregarded if
+               ``-always`` is set.
 
--orphansonly:     Specified namespaces. Separate multiple namespace
-                  numbers or names with commas.
-                  Examples:
+-orphansonly:  Specified namespaces. Separate multiple namespace numbers
+               or names with commas. Examples:
+
+               .. code:: shell
 
                   -orphansonly:0,2,4
                   -orphansonly:Help,MediaWiki
 
-                  Note that Main ns can be indicated either with a 0 or a ',':
+               Note that Main ns can be indicated either with a 0 or a ',':
+
+               .. code:: shell
 
                   -orphansonly:0,1
                   -orphansonly:,Talk

@@ -44,7 +44,6 @@ sys.path = [str(repo_dir), str(repo_dir / 'pywikibot')] + sys.path
 
 os.environ['PYWIKIBOT_NO_USER_CONFIG'] = '1'
 import pywikibot  # noqa: E402
-from pywikibot.backports import removeprefix  # noqa: E402
 
 
 # -- General configuration ------------------------------------------------
@@ -533,17 +532,11 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
     """Pywikibot specific conversions."""
     from scripts.cosmetic_changes import warning
 
-    # these scripts are skipped for fixing options lists
-    skipscripts = {'add_text', 'clean_sandbox'}
-
-    if what != 'module':
-        return
-
-    if not name.startswith('scripts.'):
+    if what != 'module' or 'scripts.' not in name:
         return
 
     length = 0
-    shortname = removeprefix(name, 'scripts.')
+    desc = ''
     for index, line in enumerate(lines):
         # highlight the first line
         if index == 0:  # highlight the first line
@@ -563,44 +556,28 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
         elif name == 'scripts.cosmetic_changes' and line == '&warning;':
             lines[index] = warning
 
-        # Initiate code block except pagegenerator arguments follows
-        elif (shortname not in skipscripts
-              and line.endswith(':')
-              and not line.lstrip().startswith(':')
-              and 'Traceback (most recent call last)' not in line):
-            for afterline in lines[index + 1:]:
-                if not afterline:
-                    continue
-                if afterline != '&params;':
-                    lines[index] = line + ':'
-                break
-
-        # adjust options
-        if shortname not in skipscripts and line.startswith('-'):
-            # Indent options
-            match = re.match(r'-[^ ]+? +', line)
+        # adjust options: if the option contains a colon, convert it to a
+        # definition list and mark the option with a :kbd: role. Also convert
+        # option types enclosed in square brackets to italic style.
+        if line.startswith('-'):
+            # extract term and wrap it with :kbd: role
+            match = re.fullmatch(r'(-\w.+?[^ ])( {2,})(.+)', line)
             if match:
-                length = len(match[0])
-            lines[index] = ' ' + line
-        elif length and line.startswith(' ' * length):
-            # Indent descriptions of options (as options are indented)
-            lines[index] = ' ' + line
+                opt, sp, desc = match.groups()
+                desc = re.sub(r'\[(float|int|str)\]', r'*(\1)*', desc)
+                if ':' in opt or ' ' in opt:
+                    length = len(opt + sp)
+                    lines[index] = f':kbd:`{opt}`'
+                else:
+                    lines[index] = f'{opt}{sp}{desc}'
+
+        elif length and (not line or line.startswith(' ' * length)):
+            # Add descriptions to the next line
+            lines[index] = ' ' * length + f'{desc} {line.strip()}'
+            length = 0
         elif line:
             # Reset length
             length = 0
-
-
-TYPE_PATTERN = re.compile(r'(  +)\[(float|int|str)\]')
-
-
-def pywikibot_option_types_fixups(app, what, name, obj, options, lines):
-    """Convert option types enclosed in square brackets to italic style."""
-    if what != 'module' or 'scripts.' not in name:
-        return
-
-    for index, line in enumerate(lines):
-        if line.startswith('-'):
-            lines[index] = TYPE_PATTERN.sub(r'\1*(\2)*', line)
 
 
 def pywikibot_family_classproperty_getattr(obj, name, *defargs):
@@ -631,7 +608,6 @@ def setup(app):
     """Implicit Sphinx extension hook."""
     app.connect('autodoc-process-docstring', pywikibot_docstring_fixups)
     app.connect('autodoc-process-docstring', pywikibot_script_docstring_fixups)
-    app.connect('autodoc-process-docstring', pywikibot_option_types_fixups)
     app.add_autodoc_attrgetter(type, pywikibot_family_classproperty_getattr)
 
 
