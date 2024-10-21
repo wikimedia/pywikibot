@@ -6,11 +6,11 @@ interwiki.
 
 Use the following command line parameters to specify what to add:
 
--text        Text to append. "\n" are interpreted as newlines.
+-text        [str] Text to append. "\n" are interpreted as newlines.
 
--textfile    Path to a file with text to append
+-textfile    [str] Path to a file with text to append
 
--summary     Change summary to use
+-summary     [str] Change summary to use
 
 -up          Append text to the top of the page rather than the bottom
 
@@ -28,7 +28,7 @@ Use the following command line parameters to specify what to add:
 -talk, -talkpage
              Put the text onto the talk page instead
 
--excepturl   Skip pages with a url that matches this regular expression
+-excepturl   [str] Skip pages with a url that matches this regular expression
 
 -noreorder   Place the text beneath the categories and interwiki
 

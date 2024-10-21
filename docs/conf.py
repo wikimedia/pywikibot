@@ -534,7 +534,7 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
     from scripts.cosmetic_changes import warning
 
     # these scripts are skipped for fixing options lists
-    skipscripts = {'add_text'}
+    skipscripts = {'add_text', 'clean_sandbox'}
 
     if what != 'module':
         return
@@ -590,6 +590,19 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
             length = 0
 
 
+TYPE_PATTERN = re.compile(r'(  +)\[(float|int|str)\]')
+
+
+def pywikibot_option_types_fixups(app, what, name, obj, options, lines):
+    """Convert option types enclosed in square brackets to italic style."""
+    if what != 'module' or 'scripts.' not in name:
+        return
+
+    for index, line in enumerate(lines):
+        if line.startswith('-'):
+            lines[index] = TYPE_PATTERN.sub(r'\1*(\2)*', line)
+
+
 def pywikibot_family_classproperty_getattr(obj, name, *defargs):
     """Custom getattr() to get classproperty instances."""
     from sphinx.util.inspect import safe_getattr
@@ -618,6 +631,7 @@ def setup(app):
     """Implicit Sphinx extension hook."""
     app.connect('autodoc-process-docstring', pywikibot_docstring_fixups)
     app.connect('autodoc-process-docstring', pywikibot_script_docstring_fixups)
+    app.connect('autodoc-process-docstring', pywikibot_option_types_fixups)
     app.add_autodoc_attrgetter(type, pywikibot_family_classproperty_getattr)
 
 

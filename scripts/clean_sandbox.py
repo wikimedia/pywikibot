@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-This bot resets a (user) sandbox with predefined text.
+"""This bot resets a (user) sandbox with predefined text.
 
 This script understands the following command-line arguments:
 
@@ -8,39 +7,42 @@ This script understands the following command-line arguments:
 
 Furthermore, the following command line parameters are supported:
 
-    -hours:#       Use this parameter if to make the script repeat itself
-                   after # hours. Hours can be defined as a decimal. 0.01
-                   hours are 36 seconds; 0.1 are 6 minutes.
+-hours     [float] Use this parameter if to make the script repeat
+           itself after the given hours. Hours can be defined as a
+           decimal. 0.01 hours are 36 seconds; 0.1 are 6 minutes.
 
-    -delay:#       Use this parameter for a wait time after the last edit
-                   was made. If no parameter is given it takes it from
-                   hours and limits it between 5 and 15 minutes.
-                   The minimum delay time is 5 minutes.
+-delay     [int] Use this parameter for a wait time after the last edit
+           was made. If no parameter is given it takes it from hours and
+           limits it between 5 and 15 minutes. The minimum delay time is
+           5 minutes.
 
-    -text          The text that substitutes in the sandbox, you can use this
-                   when you haven't configured clean_sandbox for your wiki.
+-text      [str] The text that substitutes in the sandbox, you can use
+           this when you haven't configured clean_sandbox for your wiki.
 
-    -textfile      As an alternative to -text, you can use this to provide
-                   a file containing the text to be used.
+-textfile  [str] As an alternative to -text, you can use this to provide
+           a file containing the text to be used.
 
-    -summary       Summary of the edit made by the bot. Overrides the default
-                   from i18n.
+-summary   [str] Summary of the edit made by the bot. Overrides the
+           default from i18n.
 
 This script is a :py:obj:`ConfigParserBot <bot.ConfigParserBot>`.
 All local parameters can be given inside a scripts.ini file. Options
 passed to the script are priorized over options read from ini file.
 
+For example:
+
+.. code:: ini
+
+   [clean_sandbox]
+   # the parameter section for clean_sandbox script
+   summary = Bot: Cleaning sandbox
+   text = {{subst:Clean Sandbox}}
+   hours: 0.5
+   delay: 7
+
 .. seealso:: :python:`Supported .ini File Structure
    <library/configparser.html#supported-ini-file-structure>`
 
-For example:
-
-    [clean_sandbox]
-    # the parameter section for clean_sandbox script
-    summary = Bot: Cleaning sandbox
-    text = {{subst:Clean Sandbox}}
-    hours: 0.5
-    delay: 7
 """
 #
 # (C) Pywikibot team, 2006-2024
