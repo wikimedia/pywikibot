@@ -1458,8 +1458,11 @@ class Property:
         """
         try:
             prop_type = self.repo.getPropertyType(self)
-        except KeyError as e:
-            raise NoWikibaseEntityError(e)
+        except KeyError:
+            raise NoWikibaseEntityError(
+                self if isinstance(self, WikibaseEntity)
+                else WikibaseEntity(self.repo, self.id)
+            ) from None
 
         return prop_type
 
