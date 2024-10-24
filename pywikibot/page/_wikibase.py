@@ -1440,8 +1440,8 @@ class Property:
         .. versionadded:: 9.4
         """
         try:
-            self._type = self.repo.getPropertyType(self)
-        except KeyError:
+            self._type = self.repo.get_property_type(self)
+        except NoWikibaseEntityError:
             return False
         return True
 
@@ -1456,15 +1456,7 @@ class Property:
 
         :raises NoWikibaseEntityError: property does not exist
         """
-        try:
-            prop_type = self.repo.getPropertyType(self)
-        except KeyError:
-            raise NoWikibaseEntityError(
-                self if isinstance(self, WikibaseEntity)
-                else WikibaseEntity(self.repo, self.id)
-            ) from None
-
-        return prop_type
+        return self.repo.get_property_type(self)
 
     def getID(self, numeric: bool = False):
         """
