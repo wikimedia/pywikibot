@@ -1,63 +1,74 @@
 #!/usr/bin/env python3
-r"""
-Bot to upload pages from a text file.
+r"""Bot to upload pages from a text file.
 
-This bot takes its input from the UTF-8 text file that contains
-a number of pages to be put on the wiki. The pages should all have
-the same beginning and ending text (which may not overlap).
-The beginning and ending text is not uploaded with the page content
-by default.
+This bot takes its input from the UTF-8 text file that contains a number
+of pages to be put on the wiki. The pages should all have the same
+beginning and ending text (which may not overlap). The beginning and
+ending text is not uploaded with the page content by default.
 
-As a pagename is by default taken the first text block
-from the page content marked in bold (wrapped between ''' and ''').
-If you expect the page title not to be present in the text
-or marked by different markers, use -titlestart, -titleend,
-and -notitle parameters.
+As a pagename is by default taken the first text block from the page
+content marked in bold (wrapped between ''' and '''). If you expect the
+page title not to be present in the text or marked by different markers,
+use -titlestart, -titleend, and -notitle parameters.
 
 Specific arguments:
 
--file:xxx       The filename we are getting our material from,
-                the default value is "dict.txt"
--begin:xxx      The text that marks the beginning of a page,
-                the default value is "{{-start-}}"
--end:xxx        The text that marks the end of the page,
-                the default value is "{{-stop-}}"
--include        Include the beginning and end markers to the page
--textonly       Text is given without markers. Only one page text is given.
-                -begin and -end options are ignored.
--titlestart:xxx The text used in place of ''' for identifying
-                the beginning of a page title
--titleend:xxx   The text used in place of ''' for identifying
-                the end of the page title
--notitle        Do not include the page title, including titlestart
-                and titleend, to the page. Can be used to specify unique
-                page title above the page content
--title:xxx      The page title is given directly. Ignores -titlestart,
-                -titleend and -notitle options
--nocontent:xxx  If the existing page contains specified statement,
-                the page is skipped from editing
--noredirect     Do not upload on redirect pages
--summary:xxx    The text used as an edit summary for the upload.
-                If the page exists, standard messages for prepending,
-                appending, or replacement are appended after it
--autosummary    Use MediaWiki's autosummary when creating a new page,
-                overrides -summary
--minor          Set the minor edit flag on page edits
--showdiff       Show difference between current page and page to upload,
-                also forces the bot to ask for confirmation
-                on every edit
+-file:xxx        The filename we are getting our material from,
+                 the default value is "dict.txt"
 
-If the page to be uploaded already exists, it is skipped by default.
-But you can override this behavior if you want to:
+-begin:xxx       The text that marks the beginning of a page,
+                 the default value is "{{-start-}}"
 
--appendtop      Add the text to the top of the existing page
--appendbottom   Add the text to the bottom of the existing page
--force          Overwrite the existing page
+-end:xxx         The text that marks the end of the page,
+                 the default value is "{{-stop-}}"
 
-It is possible to define a separator after the 'append' modes which
-is added between the existing and the new text. For example
-a parameter -appendtop:foo would add 'foo' between them. A new line
-can be added between them by specifying '\n' as a value.
+-include         Include the beginning and end markers to the page
+
+-textonly        Text is given without markers. Only one page text is
+                 given. ``-begin`` and ``-end`` options are ignored.
+
+-titlestart:xxx  The text used in place of ''' for identifying
+                 the beginning of a page title
+
+-titleend:xxx    The text used in place of ''' for identifying
+                 the end of the page title
+
+-notitle         Do not include the page title, including titlestart
+                 and titleend, to the page. Can be used to specify
+                 unique page title above the page content
+
+-title:xxx       The page title is given directly. Ignores ``-titlestart``,
+                 -titleend and -notitle options
+
+-nocontent:xxx   If the existing page contains specified statement,
+                 the page is skipped from editing
+
+-noredirect      Do not upload on redirect pages
+
+-summary:xxx     The text used as an edit summary for the upload.
+                 If the page exists, standard messages for prepending,
+                 appending, or replacement are appended after it.
+
+-autosummary     Use MediaWiki's autosummary when creating a new page,
+                 overrides ``-summary``-
+
+-minor           Set the minor edit flag on page edits
+
+-showdiff        Show difference between current page and page to upload,
+                 also forces the bot to ask for confirmation
+                 on every edit.
+
+If the page to be uploaded already exists, it is skipped by default. But
+you can override this behavior if you want to:
+
+-appendtop       Add the text to the top of the existing page
+-appendbottom    Add the text to the bottom of the existing page
+-force           Overwrite the existing page
+
+It is possible to define a separator after the 'append' modes which is
+added between the existing and the new text. For example a parameter
+``-appendtop:foo`` would add 'foo' between them. A new line can be added
+between them by specifying '\n' as a value.
 """
 #
 # (C) Pywikibot team, 2004-2024

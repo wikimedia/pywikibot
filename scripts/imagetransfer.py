@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Script to copy images to Wikimedia Commons, or to another wiki.
+"""Script to copy images to Wikimedia Commons, or to another wiki.
 
 Syntax:
 
@@ -8,31 +7,38 @@ Syntax:
 
 The following parameters are supported:
 
-  -interwiki        Look for images in pages found through interwiki links.
+-interwiki        Look for images in pages found through interwiki
+                  links.
 
-  -keepname         Keep the filename and do not verify description while
-                    replacing
+-keepname         Keep the filename and do not verify description while
+                  replacing.
 
-  -tolang:x         Copy the image to the wiki in code x
+-tolang:x         [str] Copy the image to the wiki in code x.
 
-  -tofamily:y       Copy the image to a wiki in the family y
+-tofamily:y       [str] Copy the image to a wiki in the family y.
 
-  -tosite:s         Copy the image to the given site like wikipedia:test
+-tosite:s         [str] Copy the image to the given site like
+                  wikipedia:test.
 
-  -force_if_shared  Upload the file to the target, even if it exists on that
-                    wiki's shared repo
+-force_if_shared  Upload the file to the target, even if it exists on
+                  that wiki's shared repo
 
-  -asynchronous     Upload to stash.
+-asynchronous     Upload to stash.
 
-  -chunk_size:n     Upload in chunks of n bytes.
+-chunk_size:n     [int] Upload in chunks of n bytes.
 
-  -file:z           Upload many files from textfile: [[Image:x]]
-                                                     [[Image:y]]
+-file:z           [str] Upload many files from textfile z
+                  like:
 
-If pagename is an image description page, offers to copy the image to the
-target site. If it is a normal page, it will offer to copy any of the images
-used on that page, or if the -interwiki argument is used, any of the images
-used on a page reachable via interwiki links.
+                  .. code:: wikitext
+
+                     [[Image:x]]
+                     [[Image:y]]
+
+If pagename is an image description page, offers to copy the image to
+the target site. If it is a normal page, it will offer to copy any of
+the images used on that page, or if the -interwiki argument is used, any
+of the images used on a page reachable via interwiki links.
 
 &params;
 """

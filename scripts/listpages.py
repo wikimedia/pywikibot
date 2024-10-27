@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-r"""
-Print a list of pages, as defined by page generator parameters.
+r"""Print a list of pages, as defined by page generator parameters.
 
 Optionally, it also prints page content to STDOUT or save it to a file
 in the current directory.

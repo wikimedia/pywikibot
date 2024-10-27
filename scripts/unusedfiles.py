@@ -6,6 +6,7 @@ Parameters:
 -limit:n        [int] Specify number of pages to work on where *n* is
                 the maximum number of articles to work on. If not used,
                 all pages are processe.
+
 -always         Don't be asked every time.
 
 This script is a :class:`ConfigParserBot <bot.ConfigParserBot>`. The

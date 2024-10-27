@@ -1,324 +1,348 @@
 #!/usr/bin/env python3
 """Script to check language links for general pages.
 
-Uses existing translations of a page, plus hints from the command line, to
-download the equivalent pages from other languages. All of such pages are
-downloaded as well and checked for interwiki links recursively until there are
-no more links that are encountered. A rationalization process then selects the
-right interwiki links, and if this is unambiguous, the interwiki links in the
-original page will be automatically updated and the modified page uploaded.
+Uses existing translations of a page, plus hints from the command line,
+to download the equivalent pages from other languages. All of such pages
+are downloaded as well and checked for interwiki links recursively until
+there are no more links that are encountered. A rationalization process
+then selects the right interwiki links, and if this is unambiguous, the
+interwiki links in the original page will be automatically updated and
+the modified page uploaded.
 
-These command-line arguments can be used to specify which pages to work on:
+.. hint:: This script should not be used for wiki farms having a data
+   repository like Wikidata for Wikimedia cluster. Possibly use the
+   :mod:``scripts.interwikidata`` script for similar purpose in such
+   environments.
 
-    -days:         Like -years, but runs through all date pages. Stops at
-                   Dec 31. If the argument is given in the form -days:X,
-                   it will start at month no. X through Dec 31. If the
-                   argument is simply given as -days, it will run from
-                   Jan 1 through Dec 31. E.g. for -days:9 it will run
-                   from Sep 1 through Dec 31.
+These command-line arguments can be used to specify which pages to work
+on:
 
-    -years:        run on all year pages in numerical order. Stop at year 2050.
-                   If the argument is given in the form -years:XYZ, it
-                   will run from [[XYZ]] through [[2050]]. If XYZ is a
-                   negative value, it is interpreted as a year BC. If the
-                   argument is simply given as -years, it will run from 1
-                   through 2050.
+-days:          Like -years, but runs through all date pages. Stops at
+                Dec 31. If the argument is given in the form -days:X, it
+                will start at month no. X through Dec 31. If the
+                argument is simply given as -days, it will run from Jan
+                1 through Dec 31. E.g. for -days:9 it will run from Sep
+                1 through Dec 31.
 
-                   This implies -noredirect.
+-years:         Run on all year pages in numerical order. Stop at year
+                2050. If the argument is given in the form -years:XYZ,
+                it will run from [[XYZ]] through [[2050]]. If XYZ is a
+                negative value, it is interpreted as a year BC. If the
+                argument is simply given as -years, it will run from 1
+                through 2050.
 
-    -new:          Work on the 100 newest pages. If given as -new:x, will work
-                   on the x newest pages.
-                   When multiple -namespace parameters are given, x pages are
-                   inspected, and only the ones in the selected name spaces are
-                   processed. Use -namespace:all for all namespaces. Without
-                   -namespace, only article pages are processed.
+                This option implies ``-noredirect``.
 
-                   This implies -noredirect.
+-new:           Work on the 100 newest pages. If given as -new:x, will
+                work on the x newest pages. When multiple -namespace
+                parameters are given, x pages are inspected, and only
+                the ones in the selected name spaces are processed. Use
+                ``-namespace:all`` for all namespaces. Without
+                ``-namespace``, only article pages are processed.
 
-    -restore:      restore a set of "dumped" pages the bot was working on
-                   when it terminated. The dump file will be subsequently
-                   removed.
+                This option implies ``-noredirect``.
 
-    -restore:all   restore a set of "dumped" pages of all dumpfiles to a given
-                   family remaining in the "interwiki-dumps" directory. All
-                   these dump files will be subsequently removed. If restoring
-                   process interrupts again, it saves all unprocessed pages in
-                   one new dump file of the given site.
+-restore:       Restore a set of "dumped" pages the bot was working on
+                when it terminated. The dump file will be subsequently
+                removed.
 
-    -continue:     like restore, but after having gone through the dumped
-                   pages, continue alphabetically starting at the last of the
-                   dumped pages. The dump file will be subsequently removed.
+-restore:all    Restore a set of "dumped" pages of all dumpfiles to a
+                given family remaining in the "interwiki-dumps"
+                directory. All these dump files will be subsequently
+                removed. If restoring process interrupts again, it saves
+                all unprocessed pages in one new dump file of the given
+                site.
+
+-continue:      Like restore, but after having gone through the dumped
+                pages, continue alphabetically starting at the last of
+                the dumped pages. The dump file will be subsequently
+                removed.
 
 &params;
 
-Additionally, these arguments can be used to restrict the bot to certain pages:
+Additionally, these arguments can be used to restrict the bot to certain
+pages:
 
-    -namespace:n   Number or name of namespace to process. The parameter can be
-                   used multiple times. It works in combination with all other
-                   parameters, except for the -start parameter. If you e.g.
-                   want to iterate over all categories starting at M, use
-                   -start:Category:M.
+-namespace:n    [int] Number or name of namespace to process. The
+                parameter can be used multiple times. It works in
+                combination with all other parameters, except for the
+                ``-start`` parameter. If you e.g. want to iterate over
+                all categories starting at M, use  ``-start:Category:M``.
 
-    -number:       used as -number:#, specifies that the bot should process
-                   that amount of pages and then stop. This is only useful in
-                   combination with -start. The default is not to stop.
+-number:        [int] Used as -number:#, specifies that the bot should
+                process that amount of pages and then stop. This is only
+                useful in combination with ``-start``. The default is
+                not to stop.
 
-    -until:        used as -until:title, specifies that the bot should
-                   process pages in wiki default sort order up to, and
-                   including, "title" and then stop. This is only useful in
-                   combination with -start. The default is not to stop.
-                   Note: do not specify a namespace, even if -start has one.
+-until:         [str] Used as -until:title, specifies that the bot
+                should process pages in wiki default sort order up to,
+                and including, "title" and then stop. This is only
+                useful in combination with ``-start``. The default is
+                not to stop.
 
-    -bracket       only work on pages that have (in the home language)
-                   parenthesis in their title. All other pages are skipped.
-                   (note: without ending colon)
+                .. note:: Do not specify a namespace, even if ``-start``
+                   has one.
 
-    -skipfile:     used as -skipfile:filename, skip all links mentioned in
-                   the given file. This does not work with -number!
+-bracket        Only work on pages that have (in the home language)
+                parenthesis in their title. All other pages are skipped.
 
-    -skipauto      use to skip all pages that can be translated automatically,
-                   like dates, centuries, months, etc.
-                   (note: without ending colon)
+-skipfile:      Used as -skipfile:filename, skip all links mentioned in
+                the given file. This does not work with ``-number``!
 
-    -lack:         used as -lack:xx with xx a language code: only work on pages
-                   without links to language xx. You can also add a number nn
-                   like -lack:xx:nn, so that the bot only works on pages with
-                   at least nn interwiki links (the default value for nn is 1).
+-skipauto       Use to skip all pages that can be translated
+                automatically, like dates, centuries, months, etc.
+
+-lack:          Used as -lack:xx with xx a language code: only work on
+                pages without links to language xx. You can also add a
+                number nn like ``-lack:xx:nn``, so that the bot only
+                works on pages with at least nn interwiki links (the
+                default value for nn is 1).
 
 These arguments control miscellaneous bot behaviour:
 
-    -quiet         Use this option to get less output
-                   (note: without ending colon)
+-quiet          Use this option to get less output
 
-    -async         Put page on queue to be saved to wiki asynchronously. This
-                   enables loading pages during saving throttling and gives a
-                   better performance.
-                   NOTE: For post-processing it always assumes that saving the
-                   the pages was successful.
-                   (note: without ending colon)
+-async          Put page on queue to be saved to wiki asynchronously.
+                This enables loading pages during saving throttling and
+                gives a better performance.
 
-    -summary:      Set an additional action summary message for the edit. This
-                   could be used for further explainings of the bot action.
-                   This will only be used in non-autonomous mode.
+                .. note:: For post-processing it always assumes that
+                   saving the pages was successful.
 
-    -hintsonly     The bot does not ask for a page to work on, even if none of
-                   the above page sources was specified. This will make the
-                   first existing page of -hint or -hinfile slip in as start
-                   page, determining properties like namespace, disambiguation
-                   state, and so on. When no existing page is found in the
-                   hints, the bot does nothing.
-                   Hitting return without input on the "Which page to check:"
-                   prompt has the same effect as using -hintsonly.
-                   Options like -back or -same are in effect only after a page
-                   has been found to work on. (note: without ending colon)
+-summary:       [str] Set an additional action summary message for the
+                edit. This could be used for further explainings of the
+                bot action. This will only be used in non-autonomous
+                mode.
+
+-hintsonly      The bot does not ask for a page to work on, even if none
+                of the above page sources was specified. This will make
+                the first existing page of -hint or -hinfile slip in as
+                start page, determining properties like namespace,
+                disambiguation state, and so on. When no existing page
+                is found in the hints, the bot does nothing. Hitting
+                return without input on the "Which page to check:"
+                prompt has the same effect as using ``-hintsonly``.
+                Options like ``-back`` or ``-same`` are in effect only
+                after a page has been found to work on.
 
 These arguments are useful to provide hints to the bot:
 
-    -hint:         used as -hint:de:Anweisung to give the bot a hint
-                   where to start looking for translations. If no text
-                   is given after the second ':', the name of the page
-                   itself is used as the title for the hint, unless the
-                   -hintnobracket command line option (see there) is also
-                   selected.
+-hint:          Used as -hint:de:Anweisung to give the bot a hint where
+                to start looking for translations. If no text is given
+                after the second ':', the name of the page itself is
+                used as the title for the hint, unless the
+                ``-hintnobracket`` command line option (see there) is
+                also selected.
 
-                   There are some special hints, trying a number of languages
-                   at once:
+                There are some special hints, trying a number of
+                languages at once:
 
-                      * all:       All languages with at least ca. 100 articles
-                      * 10:        The 10 largest languages (sites with most
-                                   articles). Analogous for any other natural
-                                   number
-                      * arab:      All languages using the Arabic alphabet
-                      * cyril:     All languages that use the Cyrillic alphabet
-                      * chinese:   All Chinese dialects
-                      * latin:     All languages using the Latin script
-                      * scand:     All Scandinavian languages
+                * *all:*     All languages with at least ca. 100
+                  articles
+                * *10:*      The 10 largest languages (sites with most
+                  articles). Analogous for any other natural number
+                * *arab:*    All languages using the Arabic alphabet
+                * *cyril:*   All languages that use the Cyrillic alphabet
+                * *chinese:* All Chinese dialects
+                * *latin:*   All languages using the Latin script
+                * *scand:*   All Scandinavian languages
 
-                   Names of families that forward their interlanguage links
-                   to the wiki family being worked upon can be used, they are:
+                Names of families that forward their interlanguage links
+                to the wiki family being worked upon can be used, they
+                are:
 
-                      * commons:   Interlanguage links of Wikimedia Commons
-                      * incubator: Links in pages on the Wikimedia Incubator
-                      * meta:      Interlanguage links of named pages on Meta
-                      * species:   Interlanguage links of the Wikispecies wiki
-                      * strategy:  Links in pages on Wikimedia Strategy wiki
-                      * test:      Take interwiki links from Test Wikipedia
-                      * wikimania: Interwiki links of Wikimania
+                * *commons:*   Interlanguage links of Wikimedia Commons
+                * *incubator:* Links in pages on the Wikimedia Incubator
+                * *meta:*      Interlanguage links of named pages on Meta
+                * *species:*   Interlanguage links of the Wikispecies wiki
+                * *strategy:*  Links in pages on Wikimedia Strategy wiki
+                * *test:*      Take interwiki links from Test Wikipedia
+                * *wikimania:* Interwiki links of Wikimania
 
-                   Languages, groups and families having the same page title
-                   can be combined, as -hint:5,scand,sr,pt,commons:New_York
+                Languages, groups and families having the same page
+                title can be combined, as
+                ``-hint:5,scand,sr,pt,commons:New_York``
 
-    -hintfile:     similar to -hint, except that hints are taken from the given
-                   file, enclosed in [[]] each, instead of the command line.
+-hintfile:      Similar to -hint, except that hints are taken from the
+                given file, enclosed in [[]] each, instead of the
+                command line.
 
-    -askhints:     for each page one or more hints are asked. See hint: above
-                   for the format, one can for example give "en:something" or
-                   "20:" as hint.
+-askhints:      For each page one or more hints are asked. See ``-hint:``
+                above for the format, one can for example give
+                "en:something" or "20:" as hint.
 
-    -repository    Include data repository
+-repository     Include data repository
 
-    -same          looks over all 'serious' languages for the same title.
-                   -same is equivalent to -hint:all:
-                   (note: without ending colon)
+-same           Looks over all 'serious' languages for the same title.
+                ``-same`` is equivalent to ``-hint:all``.
 
-    -untranslated: works normally on pages with at least one interlanguage
-                   link; asks for hints for pages that have none.
+-untranslated:  Works normally on pages with at least one interlanguage
+                link; asks for hints for pages that have none.
 
-    -untranslatedonly: same as -untranslated, but pages which already have a
-                   translation are skipped. Hint: do NOT use this in
-                   combination with -start without a -number limit, because
-                   you will go through the whole alphabet before any queries
-                   are performed!
+-untranslatedonly:  Same as ``-untranslated``,
+                but pages which already have a translation are skipped.
 
-    -showpage      when asking for hints, show the first bit of the text
-                   of the page always, rather than doing so only when being
-                   asked for (by typing '?'). Only useful in combination
-                   with a hint-asking option like -untranslated, -askhints
-                   or -untranslatedonly.
-                   (note: without ending colon)
+                .. hint:: do NOT use this in combination with ``-start``
+                   without a ``-number`` limit, because you will go
+                   through the whole alphabet before any queries are
+                   performed!
 
-    -noauto        Do not use the automatic translation feature for years and
-                   dates, only use found links and hints.
-                   (note: without ending colon)
+-showpage       When asking for hints, show the first bit of the text of
+                the page always, rather than doing so only when being
+                asked for (by typing '?'). Only useful in combination
+                with a hint-asking option like ``-untranslated``,
+                ``-askhints`` or ``-untranslatedonly``.
 
-    -hintnobracket used to make the bot strip everything in last brackets,
-                   and surrounding spaces from the page name, before it is
-                   used in a -hint:xy: where the page name has been left out,
-                   or -hint:all:, -hint:10:, etc. without a name, or
-                   an -askhint reply, where only a language is given.
+-noauto         Do not use the automatic translation feature for years
+                and dates, only use found links and hints.
+
+-hintnobracket  Used to make the bot strip everything in last brackets,
+                and surrounding spaces from the page name, before it is
+                used in a ``-hint:xy:`` where the page name has been
+                left out, or ``-hint:all:``, ``-hint:10:``, etc. without
+                a name, or an ``-askhint`` reply, where only a language
+                is given.
 
 These arguments define how much user confirmation is required:
 
-    -autonomous    run automatically, do not ask any questions. If a question
-    -auto          to an operator is needed, write the name of the page
-                   to autonomous_problems.dat and continue on the next page.
-                   (note: without ending colon)
+-autonomous, -auto
+                Run automatically, do not ask any questions. If a
+                question to an operator is needed, write the name of the
+                page to autonomous_problems.dat and continue on the next
+                page.
 
-    -confirm       ask for confirmation before any page is changed on the
-                   live wiki. Without this argument, additions and
-                   unambiguous modifications are made without confirmation.
-                   (note: without ending colon)
+-confirm        Ask for confirmation before any page is changed on the
+                live wiki. Without this argument, additions and
+                unambiguous modifications are made without confirmation.
 
-    -force         do not ask permission to make "controversial" changes,
-                   like removing a language because none of the found
-                   alternatives actually exists.
-                   (note: without ending colon)
+-force          Do not ask permission to make "controversial" changes,
+                like removing a language because none of the found
+                alternatives actually exists.
 
-    -cleanup       like -force but only removes interwiki links to non-existent
-                   or empty pages.
+-cleanup        Like ``-force`` but only removes interwiki links to
+                non-existent or empty pages.
 
-    -select        ask for each link whether it should be included before
-                   changing any page. This is useful if you want to remove
-                   invalid interwiki links and if you do multiple hints of
-                   which some might be correct and others incorrect. Combining
-                   -select and -confirm is possible, but seems like overkill.
-                   (note: without ending colon)
+-select         Ask for each link whether it should be included before
+                changing any page. This is useful if you want to remove
+                invalid interwiki links and if you do multiple hints of
+                which some might be correct and others incorrect.
+                Combining ``-select`` and ``-confirm`` is possible, but
+                seems like overkill.
 
-These arguments specify in which way the bot should follow interwiki links:
+These arguments specify in which way the bot should follow interwiki
+links:
 
-    -noredirect    do not follow redirects nor category redirects.
-                   (note: without ending colon)
+-noredirect     Do not follow redirects nor category redirects.
 
-    -initialredirect  work on its target if a redirect or category redirect is
-                   entered on the command line or by a generator (note: without
-                   ending colon). It is recommended to use this option with the
-                   -movelog pagegenerator.
+-initialredirect
+                Work on its target if a redirect or category redirect is
+                entered on the command line or by a generator.
 
-    -neverlink:    used as -neverlink:xx where xx is a language code:
-                   Disregard any links found to language xx. You can also
-                   specify a list of languages to disregard, separated by
-                   commas.
+                .. tip:: It is recommended to use this option with the
+                   ``-movelog`` pagegenerator.
 
-    -ignore:       used as -ignore:xx:aaa where xx is a language code, and
-                   aaa is a page title to be ignored.
+-neverlink:     Used as ``-neverlink:xx`` where xx is a language code,
+                disregard any links found to language xx. You can also
+                specify a list of languages to disregard, separated by
+                commas.
 
-    -ignorefile:   similar to -ignore, except that the pages are taken from
-                   the given file instead of the command line.
+-ignore:        Used as -ignore:xx:aaa where xx is a language code, and
+                aaa is a page title to be ignored.
 
-    -localright    do not follow interwiki links from other pages than the
-                   starting page. (Warning! Should be used very sparingly,
-                   only when you are sure you have first gotten the interwiki
-                   links on the starting page exactly right).
-                   (note: without ending colon)
+-ignorefile:    Similar to ``-ignore``, except that the pages are taken
+                from the given file instead of the command line.
 
-    -hintsareright do not follow interwiki links to sites for which hints
-                   on existing pages are given. Note that, hints given
-                   interactively, via the -askhint command line option,
-                   are only effective once they have been entered, thus
-                   interwiki links on the starting page are followed
-                   regardess of hints given when prompted.
-                   (Warning! Should be used with caution!)
-                   (note: without ending colon)
+-localright     Do not follow interwiki links from other pages than the
+                starting page.
 
-    -back          only work on pages that have no backlink from any other
-                   language; if a backlink is found, all work on the page
-                   will be halted.  (note: without ending colon)
+                .. warning:: Should be used very sparingly, only when
+                   you are sure you have first gotten the interwiki
+                   links on the starting page exactly right.
 
-The following arguments are only important for users who have accounts for
-multiple languages, and specify on which sites the bot should modify pages:
+-hintsareright  Do not follow interwiki links to sites for which hints
+                on existing pages are given. Note that, hints given
+                interactively, via the -askhint command line option, are
+                only effective once they have been entered, thus
+                interwiki links on the starting page are followed
+                regardess of hints given when prompted.
 
-    -localonly     only work on the local wiki, not on other wikis in the
-                   family I have a login at. (note: without ending colon)
+                .. caution:: Should be used with care!
 
-    -limittwo      only update two pages - one in the local wiki (if logged-in)
-                   and one in the top available one.
-                   For example, if the local page has links to de and fr,
-                   this option will make sure that only the local site and
-                   the de: (larger) sites are updated. This option is useful
-                   to quickly set two way links without updating all of the
-                   wiki families sites.
-                   (note: without ending colon)
+-back           Only work on pages that have no backlink from any other
+                language; if a backlink is found, all work on the page
+                will be halted.
 
-    -whenneeded    works like limittwo, but other languages are changed in the
-                   following cases:
+The following arguments are only important for users who have accounts
+for multiple languages, and specify on which sites the bot should modify
+pages:
 
-                   * If there are no interwiki links at all on the page
-                   * If an interwiki link must be removed
-                   * If an interwiki link must be changed and there has been
-                     a conflict for this page
+-localonly      Only work on the local wiki, not on other wikis in the
+                family I have a login at.
 
-                   Optionally, -whenneeded can be given an additional number
-                   (for example -whenneeded:3), in which case other languages
-                   will be changed if there are that number or more links to
-                   change or add. (note: without ending colon)
+-limittwo       Only update two pages - one in the local wiki (if
+                logged-in) and one in the top available one. For example,
+                if the local page has links to de and fr, this option
+                will make sure that only the local site and the de:
+                (larger) sites are updated. This option is useful to
+                quickly set two way links without updating all of the
+                wiki families sites.
 
-The following arguments influence how many pages the bot works on at once:
+-whenneeded     Works like ``-limittwo``, but other languages are
+                changed in the following cases:
 
-    -array:        The number of pages the bot tries to be working on at once.
-                   If the number of pages loaded is lower than this number,
-                   a new set of pages is loaded from the starting wiki. The
-                   default is 100, but can be changed in the config variable
-                   interwiki_min_subjects
+                * If there are no interwiki links at all on the page
+                * If an interwiki link must be removed
+                * If an interwiki link must be changed and there has
+                  been a conflict for this page
 
-    -query:        The maximum number of pages that the bot will load at once.
-                   Default value is 50.
+                Optionally, ``-whenneeded`` can be given an additional
+                number (for example ``-whenneeded:3``), in which case
+                other languages will be changed if there are that number
+                or more links to change or add.
+
+The following arguments influence how many pages the bot works on at
+once:
+
+-array:         The number of pages the bot tries to be working on at
+                once. If the number of pages loaded is lower than this
+                number, a new set of pages is loaded from the starting
+                wiki. The default is 100, but can be changed in the
+                config variable ``interwiki_min_subjects``.
+
+-query:         The maximum number of pages that the bot will load at
+                once. Default value is 50.
 
 Some configuration option can be used to change the working of this bot:
 
- interwiki_min_subjects: the minimum amount of subjects that should be
-                     processed at the same time.
+*interwiki_min_subjects*
+    the minimum amount of subjects that should be processed at the same
+    time.
 
- interwiki_backlink: if set to True, all problems in foreign wikis will
-                     be reported
+*interwiki_backlink*
+    if set to True, all problems in foreign wikis will be reported
 
- interwiki_shownew:  should interwiki.py display every new link it discovers?
+*interwiki_shownew*
+    should interwiki.py display every new link it discovers?
 
- interwiki_graph:    output a graph PNG file on conflicts? You need pydot for
-                     this: https://pypi.org/project/pydot/
+*interwiki_graph*
+    output a graph PNG file on conflicts? You need pydot for this:
+    https://pypi.org/project/pydot/
 
- interwiki_graph_format: the file format for interwiki graphs
+*interwiki_graph_format*
+    the file format for interwiki graphs
 
- without_interwiki:  save file with local articles without interwikis
+*without_interwiki*
+    save file with local articles without interwikis
 
 All these options can be changed through the user configuration file.
 
-If interwiki.py is terminated before it is finished, it will write a dump file
-to the interwiki-dumps subdirectory. The program will read it if invoked with
-the "-restore" or "-continue" option, and finish all the subjects in that list.
-After finishing the dump file will be deleted. To run the interwiki-bot on all
-pages on a language, run it with option "-start:!", and if it takes so long
-that you have to break it off, use "-continue" next time.
-
+If this script is terminated before it is finished, it will write a dump
+file to the interwiki-dumps subdirectory. The program will read it if
+invoked with the ``-restore`` or ``-continue`` option, and finish all
+the subjects in that list. After finishing the dump file will be deleted.
+To run the script on all pages on a language, run it with option
+``-start:!``, and if it takes so long that you have to break it off, use
+``-continue`` next time.
 """
 #
 # (C) Pywikibot team, 2003-2024

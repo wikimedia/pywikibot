@@ -565,7 +565,7 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
             if match:
                 opt, sp, desc = match.groups()
                 desc = re.sub(r'\[(float|int|str)\]', r'*(\1)*', desc)
-                if ':' in opt or ' ' in opt:
+                if ':' in opt or ' ' in opt and ', ' not in opt:
                     length = len(opt + sp)
                     lines[index] = f':kbd:`{opt}`'
                 else:

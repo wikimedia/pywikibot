@@ -5,9 +5,9 @@ The following parameters are supported:
 
 -keep          Keep the filename as is
 
--filename:     Target filename without the namespace prefix
+-filename:     [str] Target filename without the namespace prefix
 
--prefix:       Add specified prefix to every filename.
+-prefix:       [str] Add specified prefix to every filename.
 
 -noverify      Do not ask for verification of the upload description if
                one is given
@@ -43,9 +43,10 @@ The following parameters are supported:
 -recursive     When the filename is a directory it also uploads the
                files from the subdirectories.
 
--summary:      Pick a custom edit summary for the bot.
+-summary:      [str] Pick a custom edit summary for the bot.
 
--descfile:     Specify a filename where the description is stored
+-descfile:     [str] Specify a filename where the description is stored
+
 
 It is possible to combine ``-abortonwarn`` and ``-ignorewarn`` so that
 if the specific warning is given it won't apply the general one but more

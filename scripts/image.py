@@ -1,37 +1,39 @@
 #!/usr/bin/env python3
-"""
-This script can be used to change one image to another or remove an image.
+"""This script can be used to change one image to another or remove an image.
 
 Syntax:
 
     python pwb.py image image_name [new_image_name]
 
-If only one command-line parameter is provided then that image will be removed;
-if two are provided, then the first image will be replaced by the second one on
-all pages.
+If only one command-line parameter is provided then that image will be
+removed; if two are provided, then the first image will be replaced by
+the second one on all pages.
 
 Command line options:
 
 -summary:  Provide a custom edit summary. If the summary includes spaces,
            surround it with single quotes, such as:
-           -summary:'My edit summary'
+           ``-summary:'My edit summary'``
+
 -always    Don't prompt to make changes, just do them.
--loose     Do loose replacements. This will replace all occurrences of the name
-           of the image (and not just explicit image syntax). This should work
-           to catch all instances of the image, including where it is used as a
-           template parameter or in image galleries. However, it can also make
-           more mistakes. This only works with image replacement, not image
-           removal.
+
+-loose     Do loose replacements. This will replace all occurrences of
+           the name of the image (and not just explicit image syntax).
+           This should work to catch all instances of the image,
+           including where it is used as a template parameter or in
+           image galleries. However, it can also make more mistakes.
+           This only works with image replacement, not image removal.
 
 Examples
 --------
 
-The image "FlagrantCopyvio.jpg" is about to be deleted, so let's first remove
-it from everything that displays it:
+The image "FlagrantCopyvio.jpg" is about to be deleted, so let's first
+remove it from everything that displays it:
 
     python pwb.py image FlagrantCopyvio.jpg
 
-The image "Flag.svg" has been uploaded, making the old "Flag.jpg" obsolete:
+The image "Flag.svg" has been uploaded, making the old "Flag.jpg"
+obsolete:
 
     python pwb.py image Flag.jpg Flag.svg
 

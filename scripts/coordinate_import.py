@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
-r"""
-Coordinate importing script.
+r"""Coordinate importing script.
 
 Usage:
 
     python pwb.py coordinate_import -site:wikipedia:en \
--cat:Category:Coordinates_not_on_Wikidata
+    -cat:Category:Coordinates_not_on_Wikidata
 
-This will work on all pages in the category "coordinates not on Wikidata" and
-will import the coordinates on these pages to Wikidata.
+This will work on all pages in the category "coordinates not on Wikidata"
+and will import the coordinates on these pages to Wikidata.
 
 The data from the "GeoData" extension
 (https://www.mediawiki.org/wiki/Extension:GeoData)
@@ -18,7 +17,7 @@ is used so that extension has to be setup properly. You can look at the
 You can use any typical pagegenerator to provide with a list of pages:
 
     python pwb.py coordinate_import -lang:it -family:wikipedia -namespace:0 \
--transcludes:Infobox_stazione_ferroviaria
+    -transcludes:Infobox_stazione_ferroviaria
 
 You can also run over a set of items on the repo without coordinates and
 try to import them from any connected page. To do this, you have to
@@ -27,19 +26,18 @@ explicitly provide the repo as the site using -site argument.
 Example:
 
     python pwb.py coordinate_import -site:wikidata:wikidata -namespace:0 \
--querypage:Deadendpages
+    -querypage:Deadendpages
 
 
 The following command line parameters are supported:
 
--always           If used, the bot won't ask if it should add the specified
-                  text
+-always  If used, the bot won't ask if it should add the specified text.
 
--create           Create items for pages without one.
+-create  Create items for pages without one.
 
-.. note:: This script is a
-   :py:obj:`ConfigParserBot <bot.ConfigParserBot>`. All options
-   can be set within a settings file which is scripts.ini by default.
+.. note:: This script is a :class:`ConfigParserBot <bot.ConfigParserBot>`.
+   All options can be set within a settings file which is scripts.ini by
+   default.
 
 &params;
 """

@@ -1,39 +1,42 @@
 #!/usr/bin/env python3
-"""
-This script can move pages.
+"""This script can move pages.
 
-These command line parameters can be used to specify which pages to work on:
+These command line parameters can be used to specify which pages to work
+on:
 
 &params;
 
 Furthermore, the following command line parameters are supported:
 
--from and -to     The page to move from and the page to move to.
+-from           The page to move from.
 
--noredirect       Leave no redirect behind.
+-to             The page to move to.
 
--notalkpage       Do not move this page's talk page (if it exists)
+-noredirect     Leave no redirect behind.
 
--nosubpages       Do not move subpages
+-notalkpage     Do not move this page's talk page (if it exists)
 
--prefix           Move pages by adding a namespace prefix to the names of the
-                  pages. (Will remove the old namespace prefix if any)
-                  Argument can also be given as "-prefix:namespace:".
+-nosubpages     Do not move subpages
 
--always           Don't prompt to make changes, just do them.
+-prefix         Move pages by adding a namespace prefix to the names of
+                the pages. (Will remove the old namespace prefix if any)
+                Argument can also be given as ``-prefix:namespace:``.
 
--skipredirects    Skip redirect pages (Warning: increases server load)
+-always         Don't prompt to make changes, just do them.
 
--summary          Prompt for a custom summary, bypassing the predefined message
-                  texts. Argument can also be given as "-summary:XYZ".
+-skipredirects  Skip redirect pages (Warning: increases server load)
 
--pairsfile        Read pairs of file names from a file. The file must be in a
-                  format [[frompage]] [[topage]] [[frompage]] [[topage]] ...
-                  Argument can also be given as "-pairsfile:filename"
+-summary        [str] Prompt for a custom summary, bypassing the
+                predefined message texts. Argument can also be given as
+                ``-summary:XYZ``.
 
+-pairsfile      Read pairs of file names from a file. The file must be
+                in a format [[frompage]] [[topage]] [[frompage]]
+                [[topage]] ... Argument can also be given as
+                ``-pairsfile:filename``
 """
 #
-# (C) Pywikibot team, 2006-2022
+# (C) Pywikibot team, 2006-2024
 #
 # Distributed under the terms of the MIT license.
 #

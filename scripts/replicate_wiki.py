@@ -1,28 +1,32 @@
 #!/usr/bin/env python3
-"""
-This bot replicates pages in a wiki to a second wiki within one family.
+"""This bot replicates pages in a wiki to a second wiki within one family.
 
 Example:
 
+::
+
     python pwb.py replicate_wiki [-r] -ns 10 -family:wikipedia -o nl li fy
 
-or:
+or::
 
     python pwb.py replicate_wiki [-r] -ns 10 -family:wikipedia -lang:nl li fy
 
-to copy all templates from nlwiki to liwiki and fywiki. It will show which
-pages have to be changed if -r is not present, and will only actually write
-pages if -r /is/ present.
+to copy all templates from nlwiki to liwiki and fywiki. It will show
+which pages have to be changed if -r is not present, and will only
+actually write pages if -r is present.
 
 You can add replicate_replace to your user config file (user-config.py),
 which has the following format:
 
- replicate_replace = {
-     'wikipedia:li': {'Hoofdpagina': 'Veurblaad'}
- }
+.. code-block:: python
 
-to replace all occurrences of 'Hoofdpagina' with 'Veurblaad' when writing to
-liwiki. Note that this does not take the origin wiki into account.
+   replicate_replace = {
+       'wikipedia:li': {'Hoofdpagina': 'Veurblaad'}
+   }
+
+to replace all occurrences of 'Hoofdpagina' with 'Veurblaad' when
+writing to liwiki. Note that this does not take the origin wiki into
+account.
 
 The following parameters are supported:
 
@@ -35,10 +39,10 @@ The following parameters are supported:
 
 -dns, --dest-namespace  destination namespace (if different)
 
- destination_wiki       destination wiki(s)
+destination_wiki        destination wiki(s)
 """
 #
-# (C) Pywikibot team, 2012-2023
+# (C) Pywikibot team, 2012-2024
 #
 # Distributed under the terms of the MIT license.
 #

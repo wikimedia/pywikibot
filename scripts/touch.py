@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
-"""
-This bot goes over multiple pages of a wiki, and edits them without changes.
+"""This bot goes over multiple pages of a wiki, and edits them without changes.
 
 This is for example used to get category links in templates working.
 
 Command-line arguments:
 
--purge                    Purge the page instead of touching it
+-purge            Purge the page instead of touching it
 
-Touch mode (default):
+*Touch* mode (default):
 
--botflag                  Force botflag in case of edits with changes.
+-botflag          Force botflag in case of edits with changes.
 
-Purge mode:
+*Purge* mode:
 
--converttitles            Convert titles to other variants if necessary
--forcelinkupdate          Update the links tables
--forcerecursivelinkupdate Update the links table, and update the links tables
-                          for any page that uses this page as a template
--redirects                Automatically resolve redirects
+-converttitles    Convert titles to other variants if necessary
+-forcelinkupdate  Update the links tables
+-forcerecursivelinkupdate
+                  Update the links table, and update the links tables
+                  for any page that uses this page as a template
+-redirects        Automatically resolve redirects
 
 &params;
 """
