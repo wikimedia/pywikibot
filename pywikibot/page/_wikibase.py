@@ -2200,12 +2200,12 @@ class LexemePage(WikibasePage):
     >>> list(L2.claims)  # access the claims
     ['P5402', 'P5831', 'P12690']
     >>> len(L2.forms)  # access the forms
-    2
+    3
     >>> F1 = L2.forms[0]  # access the first form
     >>> list(F1.claims)  # access its claims
     ['P898']
     >>> len(L2.senses)  # access the senses
-    1
+    2
     >>> S1 = L2.senses[0]  # access the first sense
     >>> list(S1.claims)  # and its claims
     ['P5137', 'P5972', 'P2888']
