@@ -171,8 +171,6 @@ These arguments are useful to provide hints to the bot:
                 above for the format, one can for example give
                 "en:something" or "20:" as hint.
 
--repository     Include data repository
-
 -same           Looks over all 'serious' languages for the same title.
                 ``-same`` is equivalent to ``-hint:all``.
 
@@ -566,10 +564,11 @@ class InterwikiBotConfig:
         elif arg == 'lack':
             self.lacklanguage, _, minlinks = value.partition(':')
             self.minlinks = int(minlinks or 1)
-        elif arg in ('cleanup', 'confirm', 'force', 'hintnobracket',
-                     'hintsareright', 'initialredirect', 'localonly', 'quiet',
-                     'repository', 'same', 'select', 'skipauto',
-                     'untranslated'):
+        elif arg in (
+            'cleanup', 'confirm', 'force', 'hintnobracket', 'hintsareright',
+            'initialredirect', 'localonly', 'quiet', 'same', 'select',
+            'skipauto', 'untranslated',
+        ):
             assert hasattr(self, arg)
             assert value == ''
             setattr(self, arg, True)
@@ -643,8 +642,7 @@ class Subject(interwiki_graph.Subject):
     """
 
     def __init__(self, origin=None, hints=None, conf=None) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         Takes as arguments the Page on the home wiki
         plus optionally a list of hints for translation
@@ -653,7 +651,6 @@ class Subject(interwiki_graph.Subject):
 
         super().__init__(origin)
 
-        self.repoPage = None
         # todo is a list of all pages that still need to be analyzed.
         # Mark the origin page as todo.
         self.todo = SizedKeyCollection('site')
