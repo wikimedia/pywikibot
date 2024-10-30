@@ -258,6 +258,8 @@ class DataSite(APISite):
         This is used specifically because we can cache the value for a
         much longer time (near infinite).
 
+        .. versionadded:: 9.5
+
         :raises NoWikibaseEntityError: *prop* does not exist
         """
         params = {'action': 'wbgetentities', 'ids': prop.getID(),

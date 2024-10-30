@@ -344,14 +344,24 @@ _romanNumbers = [
 
 
 def intToRomanNum(i: int) -> str:
-    """Convert integer to roman numeral."""
-    if i >= len(_romanNumbers):
+    """Convert integer to roman numeral.
+
+    .. versionchanged:: 9.5
+       negative *i* is no longer accepted but 31 is a valid value.
+
+    :raises IndexError: Roman value *i* is nont in range 0..31
+    """
+    if not 0 <= i < len(_romanNumbers):
         raise IndexError(f'Roman value {i} is not defined')
     return _romanNumbers[i]
 
 
 def romanNumToInt(v: str) -> int:
-    """Convert roman numeral to integer."""
+    """Convert roman numeral to integer.
+
+    .. versionchanged:: 9.5
+       ``XXXI`` can be converted.
+    """
     return _romanNumbers.index(v)
 
 

@@ -1,6 +1,16 @@
 Scripts Changelog
 =================
 
+9.5.0
+-----
+
+* i18n updates
+
+interwiki
+^^^^^^^^^
+
+* Remove ``-repository`` option which was never implemented in core
+
 9.4.1
 -----
 
