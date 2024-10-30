@@ -1,15 +1,8 @@
 Current Release Changes
 =======================
 
-* Add support for tcywikisource and tcywiktionary (:phab:`T378473`, :phab:`T378465`)
-* i18n-updates
-* Update invisible chars in :mod:`tools.chars` from unicode 16.0.0
-* Rename :meth:`DataSite.getPropertyType()<pywikibot.site._datasite.DataSite.getPropertyType>`
-  to :meth:`DataSite.get_property_type()<pywikibot.site._datasite.DataSite.get_property_type>`
-* provide XXXI with :func:`date.romanNumToInt` and :func:`date.intToRomanNum` functions
-* No longer raise :exc:`exceptions.UnsupportedPageError` within :meth:`data.api.PageGenerator.result` (:phab:`T377651`)
-* Extract messages with strong tag from xtools as error message in
-  :meth:`Page.authorship()<page._toolforge.WikiBlameMixin.authorship>` (:phab:`T376815`)
+* (no changes yet)
+
 
 Current Deprecations
 ====================
