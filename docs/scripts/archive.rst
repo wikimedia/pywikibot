@@ -3,7 +3,7 @@ Outdated core scripts
 *********************
 
 This list contains outdated scripts from :term:`core` banch which
-aren't supported any longer. They aredeleted from repository.
+aren't supported any longer. They are deleted from repository.
 
 .. hint::
    Feel free to reactivate any script at any time by creating a
@@ -60,6 +60,52 @@ create_categories script
 The program expects a generator of category titles to be used
 as suffix for creating new categories with a different base.
 
+
+dataextend script
+=================
+
+**Script to add properties, identifiers and sources to WikiBase items**
+
+In the basic usage, where no property is specified, item is the Q-number
+of the item to work on.from html import unescape
+
+If a property (P-number, or the special value 'Wiki' or 'Data') is
+specified, only the data from that identifier are added. With a '+'
+after it, work starts on that identifier, then goes on to identifiers
+after that (including new identifiers added while working on those
+identifiers). With a '*' after it, the identifier itself is skipped, but
+those coming after it (not those coming before it) are included.
+
+The bot will load the corresponding pages for these identifiers, and try
+to the meaning of that string for the specified type of thing (for
+example 'city' or 'gender'). If you want to use it, but not save it
+(which can happen if the string specifies a certain value now, but might
+show another value elsewhere, or if it is so specific that you're pretty
+sure it won't occur a second time), you can provide the Q-number with X
+rather than Q. If you do not want to use the string, you can just hit
+enter, or give the special value 'XXX' which means that it will be
+skipped in each subsequent run as well.
+
+After an identifier has been worked on, there might be a list of names
+that has been found, in lc:name format, where lc is a language code. You
+can accept all suggested names (answer Y), none (answer N) or ask to get
+asked for each name separately (answer S), the latter being the default
+if you do not fill in anything.
+
+After all identifiers have been worked on, possible descriptions in
+various languages are presented, and you get to choose one. The default
+is here 0, which always is the current description for that language.
+Finally, for a number of identifiers text is shown that usually gives
+parts of the description that are hard to parse automatically, so you
+can see if there any additional pieces of data that can be added.
+
+It is advisable to (re)load the item page that the bot has been working
+on in the browser afterward, to correct any mistakes it has made, or
+cases where a more precise and less precise value have both been
+included.
+
+.. versionadded:: 7.2
+.. versionremoved:: 10.0
 
 disambredirs script
 ===================

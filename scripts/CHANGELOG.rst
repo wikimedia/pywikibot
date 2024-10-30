@@ -1,6 +1,14 @@
 Scripts Changelog
 =================
 
+10.0.0
+------
+
+dataextend
+^^^^^^^^^^
+
+* Script was removed from repository
+
 9.6.0
 -----
 

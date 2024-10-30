@@ -84,11 +84,6 @@ create\_isbn\_edition script
 
 .. automodule:: scripts.create_isbn_edition
 
-dataextend script
-=================
-
-.. automodule:: scripts.dataextend
-
 data\_ingestion script
 ======================
 

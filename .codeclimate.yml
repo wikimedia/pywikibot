@@ -53,4 +53,3 @@ exclude_patterns:
 - "*.txt"
 - "*.xml"
 - "*.yml"
-- "scripts/dataextend.py"
