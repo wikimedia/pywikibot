@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Allows access to the bot account's watchlist.
+"""Allows access to the bot account's watchlist.
 
 The watchlist can be updated manually by running this script.
 
@@ -10,14 +9,17 @@ Syntax:
 
 Command line options:
 
--all         Reloads watchlists for all wikis where a watchlist is already
-             present
--count       Count only the total number of pages on the watchlist of the
-             account the bot has access to
--count:all   Count only the total number of pages on all wikis watchlists
-             that the bot is connected to.
--new         Load watchlists for all wikis where accounts is set in user
-             config file
+-all        Reloads watchlists for all wikis where a watchlist is
+            already present.
+
+-count      Count only the total number of pages on the watchlist of the
+            account the bot has access to.
+
+-count:all  Count only the total number of pages on all wikis watchlists
+            that the bot is connected to.
+
+-new        Load watchlists for all wikis where accounts is set in user
+            config file
 
 .. versionchanged:: 7.7
    watchlist is retrieved in parallel tasks.

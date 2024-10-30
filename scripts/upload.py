@@ -1,58 +1,72 @@
 #!/usr/bin/env python3
-"""
-Script to upload images to Wikipedia.
+"""Script to upload images to Wikipedia.
 
 The following parameters are supported:
 
-  -keep         Keep the filename as is
-  -filename:    Target filename without the namespace prefix
-  -prefix:      Add specified prefix to every filename.
-  -noverify     Do not ask for verification of the upload description if one
-                is given
-  -abortonwarn: Abort upload on the specified warning type. If no warning type
-                is specified, aborts on any warning.
-  -ignorewarn:  Ignores specified upload warnings. If no warning type is
-                specified, ignores all warnings. Use with caution
-  -chunked:     Upload the file in chunks (more overhead, but restartable). If
-                no value is specified the chunk size is 1 MiB. The value must
-                be a number which can be preceded by a suffix. The units are:
+-keep          Keep the filename as is
 
-                    No suffix: Bytes
-                    'k': Kilobytes (1000 B)
-                    'M': Megabytes (1000000 B)
-                    'Ki': Kibibytes (1024 B)
-                    'Mi': Mebibytes (1024x1024 B)
+-filename:     [str] Target filename without the namespace prefix
 
-                The suffixes are case insensitive.
-  -async        Make potentially large file operations asynchronous on the
-                server side when possible.
-  -always       Don't ask the user anything. This will imply -keep and
-                -noverify and require that either -abortonwarn or -ignorewarn
-                is defined for all. It will also require a valid file name and
-                description. It'll only overwrite files if -ignorewarn includes
-                the 'exists' warning.
-  -recursive    When the filename is a directory it also uploads the files from
-                the subdirectories.
-  -summary:     Pick a custom edit summary for the bot.
-  -descfile:    Specify a filename where the description is stored
+-prefix:       [str] Add specified prefix to every filename.
 
-It is possible to combine -abortonwarn and -ignorewarn so that if the specific
-warning is given it won't apply the general one but more specific one. So if it
-should ignore specific warnings and abort on the rest it's possible by defining
-no warning for -abortonwarn and the specific warnings for -ignorewarn. The
-order does not matter. If both are unspecific or a warning is specified by
-both, it'll prefer aborting.
+-noverify      Do not ask for verification of the upload description if
+               one is given
+
+-abortonwarn:  Abort upload on the specified warning type. If no warning
+               type is specified, aborts on any warning.
+
+-ignorewarn:   Ignores specified upload warnings. If no warning type is
+               specified, ignores all warnings. Use with caution
+
+-chunked:      Upload the file in chunks (more overhead, but restartable).
+               If no value is specified the chunk size is 1 MiB. The
+               value must be a number which can be preceded by a suffix.
+               The units are::
+
+                   No suffix: Bytes
+                   'k': Kilobytes (1000 B)
+                   'M': Megabytes (1000000 B)
+                   'Ki': Kibibytes (1024 B)
+                   'Mi': Mebibytes (1024x1024 B)
+
+               The suffixes are case insensitive.
+
+-async         Make potentially large file operations asynchronous on
+               the server side when possible.
+
+-always        Don't ask the user anything. This will imply -keep and
+               ``-noverify`` and require that either ``-abortonwarn`` or
+               ``-ignorewarn`` is defined for all. It will also require
+               a valid file name and description. It'll only overwrite
+               files if ``-ignorewarn`` includes the 'exists' warning.
+
+-recursive     When the filename is a directory it also uploads the
+               files from the subdirectories.
+
+-summary:      [str] Pick a custom edit summary for the bot.
+
+-descfile:     [str] Specify a filename where the description is stored
+
+
+It is possible to combine ``-abortonwarn`` and ``-ignorewarn`` so that
+if the specific warning is given it won't apply the general one but more
+specific one. So if it should ignore specific warnings and abort on the
+rest it's possible by defining no warning for -abortonwarn and the
+specific warnings for ``-ignorewarn``. The order does not matter. If
+both are unspecific or a warning is specified by both, it'll prefer
+aborting.
 
 If any other arguments are given, the first is either URL, filename or
-directory to upload, and the rest is a proposed description to go with the
-upload. If none of these are given, the user is asked for the directory, file
-or URL to upload. The bot will then upload the image to the wiki.
+directory to upload, and the rest is a proposed description to go with
+the upload. If none of these are given, the user is asked for the
+directory, file or URL to upload. The bot will then upload the image to
+the wiki.
 
 The script will ask for the location of an image(s), if not given as a
 parameter, and for a description.
 """
 #
-# (C) Pywikibot team, 2003-2022
+# (C) Pywikibot team, 2003-2024
 #
 # Distributed under the terms of the MIT license.
 #

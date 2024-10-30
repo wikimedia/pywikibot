@@ -25,7 +25,7 @@ from pywikibot.exceptions import (
 )
 from pywikibot.site._apisite import APISite
 from pywikibot.site._decorators import need_extension, need_right, need_version
-from pywikibot.tools import merge_unique_dicts, remove_last_args
+from pywikibot.tools import deprecated, merge_unique_dicts, remove_last_args
 
 
 __all__ = ('DataSite', )
@@ -252,13 +252,15 @@ class DataSite(APISite):
                     page.get()  # cannot provide get_redirect=True (T145971)
                 yield page
 
-    def getPropertyType(self, prop):
+    def get_property_type(self, prop: pywikibot.page.Property) -> str:
         """Obtain the type of a property.
 
         This is used specifically because we can cache the value for a
         much longer time (near infinite).
 
-        :raises KeyError: *prop* does not exist
+        .. versionadded:: 9.5
+
+        :raises NoWikibaseEntityError: *prop* does not exist
         """
         params = {'action': 'wbgetentities', 'ids': prop.getID(),
                   'props': 'datatype'}
@@ -275,9 +277,24 @@ class DataSite(APISite):
             entity = data['entities'][prop.getID().lower()]
 
         if 'missing' in entity:
-            raise KeyError(f'{prop} does not exist')
+            raise NoWikibaseEntityError(
+                prop if isinstance(prop, pywikibot.page.WikibaseEntity)
+                else pywikibot.page.WikibaseEntity(self, prop.getID())
+            )
 
         return entity['datatype']
+
+    @deprecated('get_property_type', since='9.5.0')
+    def getPropertyType(self, prop):
+        """Obtain the type of a property.
+
+        .. deprecated:: 9.5
+           Use :meth:`get_property_type` instead.
+        """
+        try:
+            return self.get_property_type(prop)
+        except NoWikibaseEntityError as exc:
+            raise KeyError(f'{exc.entity.id} does not exist') from None
 
     @need_right('edit')
     def editEntity(self,

@@ -7,7 +7,7 @@ Scripts package
    :noindex:
 
 .. include:: ../../scripts/README.rst
-   :start-line: 8
+   :start-line: 33
    :end-before: More precise
 
 

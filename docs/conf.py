@@ -56,7 +56,6 @@ needs_sphinx = '8.1.1'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'notfound.extension',
     'sphinx_copybutton',
     'sphinx_tabs.tabs',
     'sphinx.ext.autodoc',
@@ -532,13 +531,11 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
     """Pywikibot specific conversions."""
     from scripts.cosmetic_changes import warning
 
-    if what != 'module':
-        return
-
-    if not name.startswith('scripts.'):
+    if what != 'module' or 'scripts.' not in name:
         return
 
     length = 0
+    desc = ''
     for index, line in enumerate(lines):
         # highlight the first line
         if index == 0:  # highlight the first line
@@ -558,26 +555,25 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
         elif name == 'scripts.cosmetic_changes' and line == '&warning;':
             lines[index] = warning
 
-        # Initiate code block except pagegenerator arguments follows
-        elif (line.endswith(':') and not line.lstrip().startswith(':')
-                and 'Traceback (most recent call last)' not in line):
-            for afterline in lines[index + 1:]:
-                if not afterline:
-                    continue
-                if afterline != '&params;':
-                    lines[index] = line + ':'
-                break
-
-        # adjust options
+        # adjust options: if the option contains a colon, convert it to a
+        # definition list and mark the option with a :kbd: role. Also convert
+        # option types enclosed in square brackets to italic style.
         if line.startswith('-'):
-            # Indent options
-            match = re.match(r'-[^ ]+? +', line)
+            # extract term and wrap it with :kbd: role
+            match = re.fullmatch(r'(-\w.+?[^ ])( {2,})(.+)', line)
             if match:
-                length = len(match[0])
-            lines[index] = ' ' + line
-        elif length and line.startswith(' ' * length):
-            # Indent descriptions of options (as options are indented)
-            lines[index] = ' ' + line
+                opt, sp, desc = match.groups()
+                desc = re.sub(r'\[(float|int|str)\]', r'*(\1)*', desc)
+                if ':' in opt or ' ' in opt and ', ' not in opt:
+                    length = len(opt + sp)
+                    lines[index] = f':kbd:`{opt}`'
+                else:
+                    lines[index] = f'{opt}{sp}{desc}'
+
+        elif length and (not line or line.startswith(' ' * length)):
+            # Add descriptions to the next line
+            lines[index] = ' ' * length + f'{desc} {line.strip()}'
+            length = 0
         elif line:
             # Reset length
             length = 0

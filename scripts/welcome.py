@@ -1,159 +1,174 @@
 #!/usr/bin/env python3
-"""
-Script to welcome new users.
+"""Script to welcome new users.
 
-This script works out of the box for Wikis that have been
-defined in the script.
+This script works out of the box for Wikis that have been defined in the
+script.
 
-Ensure you have community support before running this bot!
+.. important::
+   Ensure you have community support before running this bot!
 
 Everything that needs customisation to support additional projects is
 indicated by comments.
 
-Description of basic functionality
+**Description of basic functionality**
 
- * Request a list of new users every period (default: 3600 seconds)
-   You can choose to break the script after the first check (see arguments)
- * Check if new user has passed a threshold for a number of edits
-   (default: 1 edit)
- * Optional: check username for bad words in the username or if the username
-   consists solely of numbers; log this somewhere on the wiki (default: False)
-   Update: Added a whitelist (explanation below).
- * If user has made enough edits (it can be also 0), check if user has an empty
-   talk page
- * If user has an empty talk page, add a welcome message.
- * Optional: Once the set number of users have been welcomed, add this to the
-   configured log page, one for each day (default: True)
- * If no log page exists, create a header for the log page first.
+* Request a list of new users every period (default: 3600 seconds). You
+  can choose to break the script after the first check (see arguments)
+* Check if new user has passed a threshold for a number of edits
+  (default: 1 edit)
+* Optional: check username for bad words in the username or if the
+  username consists solely of numbers; log this somewhere on the wiki
+  (default: False). A whitelist is also implemented (explanation below).
+* If user has made enough edits (it can be also 0), check if user has an
+  empty talk page
+* If user has an empty talk page, add a welcome message.
+* Optional: Once the set number of users have been welcomed, add this to
+  the configured log page, one for each day (default: True)
+* If no log page exists, create a header for the log page first.
 
-This script (by default not yet implemented) uses two templates that need to
-be on the local wiki
+This script uses two templates that need to be on the local wiki:
 
-* {{WLE}}: contains mark up code for log entries (just copy it from Commons)
-* {{welcome}}: contains the information for new users
+.. role:: tmpl(code)
+   :language: wikitext
+
+* :tmpl:`{{WLE}}`: contains mark up code for log entries (just copy it
+  from Commons)
+* :tmpl:`{{welcome}}`: contains the information for new users
 
 This script understands the following command-line arguments:
 
-   -edit[:#]       Define how many edits a new user needs to be welcomed
-                   (default: 1, max: 50)
+-edit[:#]        [int] Define how many edits a new user needs to be
+                 welcomed (default: 1, max: 50)
 
-   -time[:#]       Define how many seconds the bot sleeps before restart
-                   (default: 3600)
+-time[:#]        Define how many seconds the bot sleeps before restart
+                 (default: 3600)
 
-   -break          Use it if you don't want that the Bot restart at the end
-                   (it will break) (default: False)
+-break           Use it if you don't want that the Bot restart at the
+                 end (it will break) (default: False)
 
-   -nlog           Use this parameter if you do not want the bot to log all
-                   welcomed users (default: False)
+-nlog            Use this parameter if you do not want the bot to log
+                 all welcomed users (default: False)
 
-   -limit[:#]      Use this parameter to define how may users should be
-                   checked (default:50)
+-limit[:#]       [int] Use this parameter to define how may users should
+                 be checked (default:50)
 
-   -offset[:TIME]  Skip the latest new users (those newer than TIME)
-                   to give interactive users a chance to welcome the
-                   new users (default: now)
-                   Timezone is the server timezone, GMT for Wikimedia
-                   TIME format : yyyymmddhhmmss or yyyymmdd
+-offset[:TIME]   Skip the latest new users (those newer than TIME) to
+                 give interactive users a chance to welcome the new
+                 users (default: now) Timezone is the server timezone,
+                 GMT for Wikimedia TIME format : yyyymmddhhmmss or yyyymmdd
 
-   -timeoffset[:#] Skip the latest new users, accounts newer than
-                   # minutes
+-timeoffset[:#]  Skip the latest new users, accounts newer than #
+                 minutes
 
-   -numberlog[:#]  The number of users to welcome before refreshing the
-                   welcome log (default: 4)
+-numberlog[:#]   The number of users to welcome before refreshing the
+                 welcome log (default: 4)
 
-   -filter         Enable the username checks for bad names (default: False)
+-filter          Enable the username checks for bad names (default:
+                 False)
 
-   -ask            Use this parameter if you want to confirm each possible
-                   bad username (default: False)
+-ask             Use this parameter if you want to confirm each possible
+                 bad username (default: False)
 
-   -random         Use a random signature, taking the signatures from a wiki
-                   page (for instruction, see below).
+-random          Use a random signature, taking the signatures from a
+                 wiki page (for instruction, see below).
 
-   -file[:#]       Use a file instead of a wikipage to take the random sign.
-                   If you use this parameter, you don't need to use -random.
+-file[:#]        Use a file instead of a wikipage to take the random
+                 sign. If you use this parameter, you don't need to use
+                 ``-random``.
 
-   -sign           Use one signature from command line instead of the default
+-sign            Use one signature from command line instead of the
+                 default
 
-   -savedata       This feature saves the random signature index to allow to
-                   continue to welcome with the last signature used.
+-savedata        This feature saves the random signature index to allow
+                 to continue to welcome with the last signature used.
 
-   -sul            Welcome the auto-created users (default: False)
+-sul             Welcome the auto-created users (default: False)
 
-   -quiet          Prevents users without contributions are displayed
+-quiet           Prevents users without contributions are displayed
 
-********************************* GUIDE ***********************************
+GUIDE
+-----
 
-*** Report, Bad and white list guide: ***
+**Report, Bad and white list guide**
 
-1)  Set in the code which page it will use to load the badword, the
-    whitelist and the report
-2)  In these page you have to add a "tuple" with the names that you want to
-    add in the two list. For example: ('cat', 'mouse', 'dog')
-    You can write also other text in the page, it will work without problem.
-3)  What will do the two pages? Well, the Bot will check if a badword is in
-    the username and set the "warning" as True. Then the Bot check if a word
-    of the whitelist is in the username. If yes it remove the word and
-    recheck in the bad word list to see if there are other badword in the
-    username.
-    Example
+1) Set in the code which page it will use to load the badword, the
+   whitelist and the report.
 
-        * dio is a badword
-        * Claudio is a normal name
-        * The username is "Claudio90 fuck!"
-        * The Bot finds dio and sets "warning"
-        * The Bot finds Claudio and sets "ok"
-        * The Bot finds fuck at the end and sets "warning"
-        * Result: The username is reported.
-4)  When a user is reported you have to check him and do
+2) In these page you have to add a "tuple" with the names that you want
+   to add in the two list. For example: ('cat', 'mouse', 'dog') You can
+   write also other text in the page, it will work without problem.
 
-        * If he's ok, put the {{welcome}}
-        * If he's not, block him
-        * You can decide to put a "you are blocked, change another username"
-          template or not.
-        * Delete the username from the page.
+3) What will do the two pages? Well, the Bot will check if a badword is
+   in the username and set the "warning" as True. Then the Bot check if
+   a word of the whitelist is in the username. If yes it remove the word
+   and recheck in the bad word list to see if there are other badword in
+   the username.
 
-        IMPORTANT : The Bot check the user in this order
+   Example:
 
-            * Search if he has a talkpage (if yes, skip)
-            * Search if he's blocked, if yes he will be skipped
-            * Search if he's in the report page, if yes he will be skipped
-            * If no, he will be reported.
+   * dio is a badword
+   * Claudio is a normal name
+   * The username is "Claudio90 fuck!"
+   * The Bot finds dio and sets "warning"
+   * The Bot finds Claudio and sets "ok"
+   * The Bot finds fuck at the end and sets "warning"
+   * Result: The username is reported.
 
-*** Random signature guide: ***
+4) When a user is reported you have to check him and do
 
-Some welcomed users will answer to the one who has signed the welcome message.
-When you welcome many new users, you might be overwhelmed with such answers.
-Therefore you can define usernames of other users who are willing to receive
-some of these messages from newbies.
+   * If he's ok, put the :tmpl:`{{welcome}}`
+   * If he's not, block him
+   * You can decide to put a "you are blocked, change another username"
+     template or not.
+   * Delete the username from the page.
+
+   .. important::
+
+      The Bot check the user in this order
+
+      * Search if he has a talkpage (if yes, skip)
+      * Search if he's blocked, if yes he will be skipped
+      * Search if he's in the report page, if yes he will be skipped
+      * If no, he will be reported.
+
+**Random signature guide**
+
+Some welcomed users will answer to the one who has signed the welcome
+message. When you welcome many new users, you might be overwhelmed with
+such answers. Therefore you can define usernames of other users who are
+willing to receive some of these messages from newbies.
 
 1) Set the page that the bot will load
-2) Add the signatures in this way:
+2) Add the signature lines in this way:
 
-    *<SPACE>SIGNATURE
-    <NEW LINE>
+    * SIGNATURE
 
-Example of signatures:
+   Example of signatures:
 
- <pre>
- * [[User:Filnik|Filnik]]
- * [[User:Rock|Rock]]
- </pre>
+   .. code:: wikitext
 
-.. note:: The white space and <pre></pre> aren't required but I suggest
-   you to use them.
+      <pre>
+      * [[User:Filnik|Filnik]]
+      * [[User:Rock|Rock]]
+      </pre>
 
-******************************** Badwords **********************************
+   .. note:: The white space after asterisk and ``<pre></pre>`` aren't
+      required but it is recommended you to use them.
+
+Badwords
+--------
 
 The list of Badwords of the code is opened. If you think that a word is
-international and it must be blocked in all the projects feel free to add it.
-If also you think that a word isn't so international, feel free to delete it.
+international and it must be blocked in all the projects feel free to
+add it. If also you think that a word isn't so international, feel free
+to delete it.
 
-However, there is a dinamic-wikipage to load that badwords of your project or
-you can add them directly in the source code that you are using without adding
-or deleting.
+However, there is a dinamic-wikipage to load that badwords of your
+project or you can add them directly in the source code that you are
+using without adding or deleting.
 
-Some words, like "Administrator" or "Dio" (God in italian) or "Jimbo" aren't
-badwords at all but can be used for some bad-nickname.
+Some words, like "Administrator" or "Dio" (God in italian) or "Jimbo"
+aren't badwords at all but can be used for some bad-nickname.
 """
 #
 # (C) Pywikibot team, 2006-2024

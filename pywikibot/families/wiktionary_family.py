@@ -47,9 +47,9 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'oc', 'om', 'or', 'pa', 'pl', 'pnb', 'ps', 'pt', 'qu', 'ro', 'roa-rup',
         'ru', 'rw', 'sa', 'scn', 'sd', 'sg', 'sh', 'shn', 'shy', 'si',
         'simple', 'sk', 'skr', 'sl', 'sm', 'so', 'sq', 'sr', 'ss', 'st', 'su',
-        'sv', 'sw', 'ta', 'te', 'tg', 'th', 'ti', 'tk', 'tl', 'tn', 'tpi',
-        'tr', 'ts', 'tt', 'ug', 'uk', 'ur', 'uz', 'vec', 'vi', 'vo', 'wa',
-        'wo', 'yi', 'yue', 'zh', 'zh-min-nan', 'zu',
+        'sv', 'sw', 'ta', 'tcy', 'te', 'tg', 'th', 'ti', 'tk', 'tl', 'tn',
+        'tpi', 'tr', 'ts', 'tt', 'ug', 'uk', 'ur', 'uz', 'vec', 'vi', 'vo',
+        'wa', 'wo', 'yi', 'yue', 'zh', 'zh-min-nan', 'zu',
     }
 
     category_redirect_templates = {

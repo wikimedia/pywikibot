@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-r"""
-Very simple script to replace a template with another one.
+r"""Very simple script to replace a template with another one.
 
 It also converts the old MediaWiki boilerplate format to the new format.
 
@@ -9,94 +8,94 @@ Syntax:
     python pwb.py template [-remove] [xml[:filename]] oldTemplate \
         [newTemplate]
 
-Specify the template on the command line. The program will pick up the template
-page, and look for all pages using it. It will then automatically loop over
-them, and replace the template.
+Specify the template on the command line. The program will pick up the
+template page, and look for all pages using it. It will then
+automatically loop over them, and replace the template.
 
 Command line options:
 
 -remove      Remove every occurrence of the template from every article
 
 -subst       Resolves the template by putting its text directly into the
-             article. This is done by changing {{...}} or {{msg:...}} into
-             {{subst:...}}. If you want to use safesubst, you
-             can do -subst:safe. Substitution is not available inside
+             article. This is done by changing {{...}} or {{msg:...}}
+             into {{subst:...}}. If you want to use safesubst, you can
+             do -subst:safe. Substitution is not available inside
              <ref>...</ref>, <gallery>...</gallery>, <poem>...</poem>
              and <pagelist ... /> tags.
 
 -assubst     Replaces the first argument as old template with the second
-             argument as new template but substitutes it like -subst does.
-             Using both options -remove and -subst in the same command line has
-             the same effect.
+             argument as new template but substitutes it like ``-subst``
+             does. Using both options -remove and -subst in the same
+             command line has the same effect.
 
 -xml         retrieve information from a local dump
              (https://dumps.wikimedia.org). If this argument isn't given,
-             info will be loaded from the maintenance page of the live wiki.
-             argument can also be given as "-xml:filename.xml".
+             info will be loaded from the maintenance page of the live
+             wiki. argument can also be given as "-xml:filename.xml".
 
 -onlyuser:   Only process pages edited by a given user
 
 -skipuser:   Only process pages not edited by a given user
 
--timestamp:  (With -onlyuser or -skipuser). Only check for a user where his
-             edit is not older than the given timestamp. Timestamp must be
-             written in MediaWiki timestamp format which is "%Y%m%d%H%M%S".
-             If this parameter is missed, all edits are checked but this is
-             restricted to the last 100 edits.
+-timestamp:  (With -onlyuser or -skipuser). Only check for a user where
+             his edit is not older than the given timestamp. Timestamp
+             must be written in MediaWiki timestamp format which is
+             "%Y%m%d%H%M%S". If this parameter is missed, all edits are
+             checked but this is restricted to the last 100 edits.
 
--summary:    Lets you pick a custom edit summary. Use quotes if edit summary
-             contains spaces.
+-summary:    [str] Lets you pick a custom edit summary. Use quotes if
+             edit summary contains spaces.
 
 -always      Don't bother asking to confirm any of the changes, Just Do It.
 
--addcat:     Appends the given category to every page that is edited. This is
-             useful when a category is being broken out from a template
-             parameter or when templates are being upmerged but more
-             information must be preserved.
+-addcat:     Appends the given category to every page that is edited.
+             This is useful when a category is being broken out from a
+             template parameter or when templates are being upmerged but
+             more information must be preserved.
 
-other:       First argument is the old template name, second one is the new
-             name.
-             If you want to address a template which has spaces, put quotation
-             marks around it, or use underscores.
+other:       First argument is the old template name, second one is the
+             new name. If you want to address a template which has
+             spaces, put quotation marks around it, or use underscores.
 
 Examples
 --------
 
-If you have a template called [[Template:Cities in Washington]] and want to
-change it to [[Template:Cities in Washington state]], start:
+If you have a template called [[Template:Cities in Washington]] and want
+to change it to [[Template:Cities in Washington state]], start:
 
     python pwb.py template "Cities in Washington" "Cities in Washington state"
 
 Move the page [[Template:Cities in Washington]] manually afterwards.
 
 
-If you have a template called [[Template:test]] and want to substitute it only
-on pages in the User: and User talk: namespaces, do:
+If you have a template called [[Template:test]] and want to substitute
+it only on pages in the User: and User talk: namespaces, do:
 
     python pwb.py template test -subst -namespace:2 -namespace:3
 
 .. note:: -namespace: is a global Pywikibot parameter
 
-This next example substitutes the template lived with a supplied edit summary.
-It only performs substitutions in main article namespace and doesn't prompt to
-start replacing. Note that -putthrottle: is a global Pywikibot parameter:
+This next example substitutes the template lived with a supplied edit
+summary. It only performs substitutions in main article namespace and
+doesn't prompt to start replacing. Note that -putthrottle: is a global
+Pywikibot parameter:
 
     python pwb.py template -putthrottle:30 -namespace:0 lived -subst -always \
--summary:"BOT: Substituting {{lived}}, see [[WP:SUBST]]."
+    -summary:"BOT: Substituting {{lived}}, see [[WP:SUBST]]."
 
-This next example removes the templates {{cfr}}, {{cfru}}, and {{cfr-speedy}}
-from five category pages as given:
+This next example removes the templates {{cfr}}, {{cfru}}, and
+{{cfr-speedy}} from five category pages as given:
 
     python pwb.py template cfr cfru cfr-speedy -remove -always \
--page:"Category:Mountain monuments and memorials" \
--page:"Category:Indian family names" \
--page:"Category:Tennis tournaments in Belgium" \
--page:"Category:Tennis tournaments in Germany" \
--page:"Category:Episcopal cathedrals in the United States" \
--summary:"Removing Cfd templates from category pages that survived."
+    -page:"Category:Mountain monuments and memorials" \
+    -page:"Category:Indian family names" \
+    -page:"Category:Tennis tournaments in Belgium" \
+    -page:"Category:Tennis tournaments in Germany" \
+    -page:"Category:Episcopal cathedrals in the United States" \
+    -summary:"Removing Cfd templates from category pages that survived."
 
-This next example substitutes templates test1, test2, and space test on all
-user talk pages (namespace #3):
+This next example substitutes templates test1, test2, and space test on
+all user talk pages (namespace #3):
 
     python pwb.py template test1 test2 "space test" -subst -ns:3 -always
 """

@@ -1,21 +1,23 @@
 #!/usr/bin/env python3
-"""
-This bot appends some text to all unused images and notifies uploaders.
+"""This bot appends some text to all unused images and notifies uploaders.
 
 Parameters:
 
--limit          Specify number of pages to work on with "-limit:n" where
-                n is the maximum number of articles to work on.
-                If not used, all pages are used.
+-limit:n        [int] Specify number of pages to work on where *n* is
+                the maximum number of articles to work on. If not used,
+                all pages are processe.
+
 -always         Don't be asked every time.
 
-This script is a :py:obj:`ConfigParserBot <bot.ConfigParserBot>`.
-The following options can be set within a settings file which is scripts.ini
-by default::
+This script is a :class:`ConfigParserBot <bot.ConfigParserBot>`. The
+following options can be set within a settings file which is scripts.ini
+by default:
 
 -nouserwarning  Do not warn uploader about orphaned file.
--filetemplate:  Use a custom template on unused file pages.
--usertemplate:  Use a custom template to warn the uploader.
+
+-filetemplate:  [str] Use a custom template on unused file pages.
+
+-usertemplate:  [str] Use a custom template to warn the uploader.
 """
 #
 # (C) Pywikibot team, 2007-2024

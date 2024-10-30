@@ -95,6 +95,16 @@ class UtilsTests(TestCase):
         self.assertTrue(utils.entered_loop(self.pattern))
         self.assertFalse(utils.entered_loop(''))
 
+    @utils.expected_failure_if(True)
+    def test_expected_failure_true(self):
+        """Test expected_failure_if decorator if condition is True."""
+        self.assertTrue(False)
+
+    @utils.expected_failure_if(False)
+    def test_expected_failure_false(self):
+        """Test expected_failure_if decorator if condition is False."""
+        self.assertTrue(True)
+
 
 if __name__ == '__main__':
     with suppress(SystemExit):

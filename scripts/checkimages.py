@@ -4,68 +4,72 @@
 This script checks if a file description is present and if there are
 other problems in the image's description.
 
-This script will have to be configured for each language. Please submit
-translations as addition to the Pywikibot framework.
+This script will have to be configured for each site. Please submit
+localisations as addition to the Pywikibot framework.
 
 Everything that needs customisation is indicated by comments.
 
 This script understands the following command-line arguments:
 
--limit              The number of images to check (default: 80)
+-limit             [int] The number of images to check (default: 80)
 
--commons            The bot will check if an image on Commons has the same name
-                    and if true it reports the image.
+-commons           The bot will check if an image on Commons has the
+                   same name and if true it reports the image.
 
--duplicates[:#]     Checking if the image has duplicates (if arg, set how many
-                    rollback wait before reporting the image in the report
-                    instead of tag the image) default: 1 rollback.
+-duplicates[:#]    Checking if the image has duplicates (if arg, set how
+                   many rollback wait before reporting the image in the
+                   report instead of tag the image) default: 1 rollback.
 
--duplicatesreport   Report the duplicates in a log *AND* put the template in
-                    the images.
+-duplicatesreport  Report the duplicates in a log *AND* put the template
+                   in the images.
 
--maxusernotify      Maximum notifications added to a user talk page in a single
-                    check, to avoid email spamming.
+-maxusernotify     Maximum notifications added to a user talk page in a
+                   single check, to avoid email spamming.
 
--sendemail          Send an email after tagging.
+-sendemail         Send an email after tagging.
 
--break              To break the bot after the first check (default: recursive)
+-break             To break the bot after the first check (default:
+                   recursive)
 
--sleep[:#]          Time in seconds between repeat runs (default: 30)
+-sleep[:#]         Time in seconds between repeat runs (default: 30)
 
--wait[:#]           Wait x second before check the images (default: 0)
+-wait[:#]          Wait x second before check the images (default: 0)
 
--skip[:#]           The bot skip the first [:#] images (default: 0)
+-skip[:#]          The bot skip the first [:#] images (default: 0)
 
--start[:#]          Use allimages() as generator
-                    (it starts already from File:[:#])
+-start[:#]         Use allimages() as generator (it starts already from
+                   File:[:#])
 
--cat[:#]            Use a category as generator
+-cat[:#]           Use a category as generator
 
--regex[:#]          Use regex, must be used with -url or -page
+-regex[:#]         Use regex, must be used with ``-url`` or ``-page``
 
--page[:#]           Define the name of the wikipage where are the images
+-page[:#]          Define the name of the wikipage where are the images
 
--url[:#]            Define the url where are the images
+-url[:#]           Define the url where are the images
 
--nologerror         If given, this option will disable the error that is risen
-                    when the log is full.
+-nologerror        If given, this option will disable the error that is
+                   risen when the log is full.
 
-Instructions for the real-time settings.
-For every new block you have to add:
+**Instructions for the real-time settings**
 
- <------- ------->
+For every new block you have to add::
 
-In this way the bot can understand where the block starts in order to take the
-right parameter.
+    <------- ------->
 
-* Name=     Set the name of the block
-* Find=     search this text in the image's description
-* Findonly= search for exactly this text in the image's description
-* Summary=  That's the summary that the bot will use when it will notify the
-            problem.
-* Head=     That's the incipit that the bot will use for the message.
-* Text=     This is the template that the bot will use when it will report the
-            image's problem.
+In this way the bot can understand where the block starts in order to
+take the right parameter:
+
+.. code:: text
+
+    Name=     Set the name of the block
+    Find=     search this text in the image's description
+    Findonly= search for exactly this text in the image's description
+    Summary=  That's the summary that the bot will use when it will
+              notify the problem.
+    Head=     That's the incipit that the bot will use for the message.
+    Text=     This is the template that the bot will use when it will
+              report the image's problem.
 
 .. versionchanged:: 8.4
    Welcome messages are imported from :mod:`scripts.welcome` script.

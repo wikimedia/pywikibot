@@ -1,42 +1,45 @@
 #!/usr/bin/env python3
-"""
-Fetch and add titles for bare links in references.
+"""Fetch and add titles for bare links in references.
 
 This bot will search for references which are only made of a link
-without title (i.e. <ref>[https://www.google.fr/]</ref> or
-<ref>https://www.google.fr/</ref>) and will fetch the html title from
-the link to use it as the title of the wiki link in the reference, i.e.
-<ref>[https://www.google.fr/search?q=test test - Google Search]</ref>
+without title (i.e. ``<ref>[https://www.google.fr/]</ref>`` or
+``<ref>https://www.google.fr/</ref>``) and will fetch the html title
+from the link to use it as the title of the wiki link in the reference,
+i.e.
+
+.. code:: wikitext
+
+   <ref>[https://www.google.fr/search?q=test test - Google Search]</ref>
 
 The bot checks every 20 edits a special stop page. If the page has been
 edited, it stops.
 
-As it uses it, you need to configure noreferences.py for your wiki, or it
+As it uses it, you need to configure reflinks.py for your wiki, or it
 will not work.
 
 pdfinfo is needed for parsing pdf titles.
 
 The following parameters are supported:
 
--xml:dump.xml     Should be used instead of a simple page fetching method
-                  from pagegenerators.py for performance and load issues
+-xml:dump.xml  Should be used instead of a simple page fetching method
+               from pagegenerators.py for performance and load issues
 
--xmlstart         Page to start with when using an XML dump
+-xmlstart      Page to start with when using an XML dump
 
-This script is a :py:obj:`ConfigParserBot <bot.ConfigParserBot>`.
-The following options can be set within a settings file which is scripts.ini
-by default::
+This script is a :class:`ConfigParserBot <bot.ConfigParserBot>`. The
+following options can be set within a settings file which is scripts.ini
+by default:
 
--always          Doesn't ask every time whether the bot should make the change.
-                 Do it always.
+-always        Doesn't ask every time whether the bot should make the
+               change. Do it always.
 
--limit:n          Stops after n edits
+-limit:n       [int] Stops after n edits
 
--ignorepdf        Do not handle PDF files (handy if you use Windows and
-                  can't get pdfinfo)
+-ignorepdf     Do not handle PDF files (handy if you use Windows and
+               can't get pdfinfo)
 
--summary          Use a custom edit summary. Otherwise it uses the
-                  default one from translatewiki
+-summary       [str] Use a custom edit summary. Otherwise it uses the
+               default one from translatewiki
 
 The following generators and filters are supported:
 

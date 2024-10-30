@@ -1,32 +1,33 @@
 #!/usr/bin/env python3
-"""
-Script to handle interwiki links based on Wikibase.
+"""Script to handle interwiki links based on Wikibase.
 
-This script connects pages to Wikibase items using language links on the page.
-If multiple language links are present, and they are connected to different
-items, the bot skips. After connecting the page to an item, language links
-can be removed from the page.
+This script connects pages to Wikibase items using language links on the
+page. If multiple language links are present, and they are connected to
+different items, the bot skips. After connecting the page to an item,
+language links can be removed from the page.
 
-These command line parameters can be used to specify which pages to work on:
+These command line parameters can be used to specify which pages to work
+on:
 
 &params;
 
 Furthermore, the following command line parameters are supported:
 
--always           If used, the bot won't ask if it should add the specified
-                  text
+-always    If used, the bot won't ask if it should add the specified
+           text.
 
--clean            Clean pages.
+-clean     Clean pages.
 
--create           Create items.
+-create    Create items.
 
--merge            Merge items.
+-merge     Merge items.
 
--summary:         Use your own edit summary for cleaning the page.
+-summary:  [str] Use your own edit summary for cleaning the page.
 
-.. note:: This script is a
-   :py:obj:`ConfigParserBot <bot.ConfigParserBot>`. All options
-   can be set within a settings file which is scripts.ini by default.
+
+.. note:: This script is a :class:`ConfigParserBot <bot.ConfigParserBot>`.
+   All options can be set within a settings file which is scripts.ini by
+   default.
 """
 
 # (C) Pywikibot team, 2015-2024

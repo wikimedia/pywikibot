@@ -10,15 +10,18 @@ Usage:
 
 actions:
 
--from [FROM]   Category name to scan, default is main category, "?" to ask.
+-from [FROM]  Category name to scan, default is main category, "?" to ask.
 
 optional arguments:
 
--to TO         base file name to save, "?" to ask
--style STYLE   graphviz style definitions in dot format (see below)
--depth DEPTH   maximal hierarchy depth. 2 by default
--downsize K    font size divider for subcategories. 4 by default
-               Use 1 for the same font size
+-to TO        base file name to save, "?" to ask
+
+-style STYLE  graphviz style definitions in dot format (see below)
+
+-depth DEPTH  maximal hierarchy depth. 2 by default
+
+-downsize K   font size divider for subcategories. 4 by default Use 1
+              for the same font size
 
 .. seealso:: https://graphviz.org/doc/info/attrs.html
    for graphviz style definitions.

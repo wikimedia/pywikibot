@@ -1,12 +1,21 @@
 Current Release Changes
 =======================
 
-* Add support for new wikis (:phab:`T375019`, :phab:`T375104`, :phab:`T375426`,
-  :phab:`T376332`, :phab:`T376574`, :phab:`T377090`)
+* Add support for tcywikisource and tcywiktionary (:phab:`T378473`, :phab:`T378465`)
+* i18n-updates
+* Update invisible chars in :mod:`tools.chars` from unicode 16.0.0
+* Rename :meth:`DataSite.getPropertyType()<pywikibot.site._datasite.DataSite.getPropertyType>`
+  to :meth:`DataSite.get_property_type()<pywikibot.site._datasite.DataSite.get_property_type>`
+* provide XXXI with :func:`date.romanNumToInt` and :func:`date.intToRomanNum` functions
+* No longer raise :exc:`exceptions.UnsupportedPageError` within :meth:`data.api.PageGenerator.result` (:phab:`T377651`)
+* Extract messages with strong tag from xtools as error message in
+  :meth:`Page.authorship()<page._toolforge.WikiBlameMixin.authorship>` (:phab:`T376815`)
 
 Current Deprecations
 ====================
 
+* 9.5.0: :meth:`DataSite.getPropertyType()<pywikibot.site._datasite.DataSite.getPropertyType>` will be removed
+  in favour of :meth:`DataSite.get_property_type()<pywikibot.site._datasite.DataSite.get_property_type>`
 * 9.4.0: :mod:`flow` support is deprecated and will be removed (:phab:`T371180`)
 * 9.3.0: :meth:`page.BasePage.userName` and :meth:`page.BasePage.isIpEdit` are deprecated in favour of
   ``user`` or ``anon`` attributes of :attr:`page.BasePage.latest_revision` property

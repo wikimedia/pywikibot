@@ -11,8 +11,8 @@
 .. automodule:: pagegenerators._factory
    :synopsis: GeneratorFactory module wich handles pagegenerators options
 
-:mod:`pagegenerators.\_filters` --- Filter Funtions
-===================================================
+:mod:`pagegenerators.\_filters` --- Filter Functions
+====================================================
 
 .. automodule:: pagegenerators._filters
    :synopsis: Page filter generators provided by the pagegenerators module

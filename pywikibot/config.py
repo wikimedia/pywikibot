@@ -571,7 +571,7 @@ tkvertsize = 800
 # editor will be used. If set to False, no editor will be used. In
 # script tests to be a noop (like /bin/true) so the script continues.
 # If set to None, the EDITOR environment variable will be used as
-# command. If EDITOR is not set, on windows plattforms it tries to
+# command. If EDITOR is not set, on Windows platforms it tries to
 # determine the default text editor from registry. Finally, Tkinter is
 # used as fallback.
 editor: bool | str | None = None

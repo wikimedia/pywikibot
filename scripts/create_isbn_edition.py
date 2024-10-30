@@ -1,46 +1,47 @@
 #!/usr/bin/env python3
 r"""Pywikibot script to load ISBN related data into Wikidata.
 
-Pywikibot script to get ISBN data from a digital library,
-and create or amend the related Wikidata item for edition
-(with the P212=ISBN number as unique external ID).
+Pywikibot script to get ISBN data from a digital library, and create or
+amend the related Wikidata item for edition (with the
+:samp:`P212={ISBN number}` as unique external ID).
 
 Use digital libraries to get ISBN data in JSON format, and integrate the
 results into Wikidata.
 
 Then the resulting item number can be used e.g. to generate Wikipedia
-references using template Cite_Q.
+references using template ``Cite_Q``.
 
-Parameters:
-
+**Parameters**:
     All parameters are optional:
 
-        P1:         digital library (default goob "-")
+    .. code:: text
 
-            bnf     Catalogue General (France)
-            bol     Bol.com
-            dnb     Deutsche National Library
-            goob    Google Books
-            kb      National Library of the Netherlands
-            loc     Library of Congress US
-            mcues   Ministerio de Cultura (Spain)
-            openl   OpenLibrary.org
-            porbase urn.porbase.org Portugal
-            sbn     Servizio Bibliotecario Nazionale
-            wiki    wikipedia.org
-            worldcat    WorldCat
+        *P1:*        digital library (default goob "-")
 
-        P2:         ISO 639-1 language code
-                    Default LANG; e.g. en, nl, fr, de, es, it, etc.
+            bnf      Catalogue General (France)
+            bol      Bol.com
+            dnb      Deutsche National Library
+            goob     Google Books
+            kb       National Library of the Netherlands
+            loc      Library of Congress US
+            mcues    Ministerio de Cultura (Spain)
+            openl    OpenLibrary.org
+            porbase  urn.porbase.org Portugal
+            sbn      Servizio Bibliotecario Nazionale
+            wiki     wikipedia.org
+            worldcat WorldCat
 
-        P3 P4...:   P/Q pairs to add additional claims (repeated)
-                    e.g. P921 Q107643461 (main subject: database
-                    management linked to P2163 Fast ID)
+        *P2:*        ISO 639-1 language code. Default LANG; e.g. en, nl,
+                     fr, de, es, it, etc.
 
-    stdin: ISBN numbers (International standard book number)
+        *P3 P4...:*  P/Q pairs to add additional claims (repeated) e.g.
+                     P921 Q107643461 (main subject: database management
+                     linked to P2163 Fast ID)
 
-        Free text (e.g. Wikipedia references list, or publication list)
-        is accepted. Identification is done via an ISBN regex expression.
+        *stdin:*     ISBN numbers (International standard book number)
+
+    Free text (e.g. Wikipedia references list, or publication list)
+    is accepted. Identification is done via an ISBN regex expression.
 
 **Functionality:**
     * The ISBN number is used as a primary key (P212 where no duplicates
@@ -52,21 +53,20 @@ Parameters:
       (ambiguous items are skipped)
     * Book title and subtitle are separated with '.', ':', or '-'
     * This script can be run incrementally with the same parameters
-      Caveat: Take into account the Wikidata Query database
-      replication delay. Wait for minimum 5 minutes to avoid creating
-      duplicate objects.
+      Caveat: Take into account the Wikidata Query database replication
+      delay. Wait for minimum 5 minutes to avoid creating duplicate
+      objects.
 
 **Data quality:**
     * Use https://query.wikidata.org/querybuilder/ to identify P212
-      duplicates. Merge duplicate items before running the script
-      again.
+      duplicates. Merge duplicate items before running the script again.
     * The following properties should only be used for written works
-      P5331:  OCLC work ID (editions should only have P243)
-      P8383:  Goodreads-identificatiecode for work (editions should
-      only have P2969)
 
-Examples:
+      * P5331: OCLC work ID (editions should only have P243)
+      * P8383: Goodreads-identificatiecode for work (editions should
+        only have P2969)
 
+**Examples:**
     Default library (Google Books), language (LANG), no additional
     statements:
 
@@ -76,47 +76,54 @@ Examples:
 
         pwb create_isbn_edition.py wiki en P921 Q107643461 978-0-596-10089-6
 
-Standard ISBN properties:
+**Standard ISBN properties:**
+    ::
 
-    P31:Q3331189:   instance of edition
-    P50:    author
-    P123:   publisher
-    P212:   canonical ISBN number (lookup via Wikidata Query)
-    P407:   language of work (Qnumber linked to ISO 639-1 language code)
-    P577:   date of publication (year)
-    P1476:  book title
-    P1680:  subtitle
+        P31:Q3331189:  instance of edition
+        P50:           author
+        P123:          publisher
+        P212:          canonical ISBN number (lookup via Wikidata Query)
+        P407:          language of work
+                       (Qnumber linked to ISO 639-1 language code)
+        P577:          date of publication (year)
+        P1476:         book title
+        P1680:         subtitle
 
-Other ISBN properties:
+**Other ISBN properties:**
+    ::
 
-    P291:   place of publication
-    P921:   main subject (inverse lookup from external Fast ID P2163)
-    P629:   work for edition
-    P747:   edition of work
-    P1104:  number of pages
+        P291:   place of publication
+        P921:   main subject (inverse lookup from external Fast ID P2163)
+        P629:   work for edition
+        P747:   edition of work
+        P1104:  number of pages
 
-Qualifiers:
+**Qualifiers:**
+    ::
 
-    P1545:  (author) sequence number
+        P1545:  (author) sequence number
 
-External identifiers:
+**External identifiers:**
+    ::
 
-    P213:   ISNI ID
-    P243:   OCLC ID
-    P496:   ORCID iD
-    P675:   Google Books-identificatiecode
-    P1036:  Dewey Decimal Classification
-    P2163:  Fast ID (inverse lookup via Wikidata Query) -> P921: main subject
-    P2969:  Goodreads-identificatiecode
+        P213:   ISNI ID
+        P243:   OCLC ID
+        P496:   ORCID iD
+        P675:   Google Books-identificatiecode
+        P1036:  Dewey Decimal Classification
+        P2163:  Fast ID (inverse lookup via Wikidata Query)
+                -> P921: main subject
+        P2969:  Goodreads-identificatiecode
 
-    (only for written works)
-    P5331:  OCLC work ID (editions should only have P243)
-    P8383:  Goodreads-identificatiecode for work (editions should only
-            have P2969)
+        (only for written works)
+        P5331:  OCLC work ID (editions should only have P243)
+        P8383:  Goodreads-identificatiecode for work
+                (editions should only have P2969)
 
 **Author:**
-   Geert Van Pamel, 2022-08-04,
-   GNU General Public License v3.0, User:Geertivp
+   Geert Van Pamel (User:Geertivp), 2022-08-04,
+
+   Licensed under MIT amd GNU General Public License v3.0
 
 **Documentation:**
     * :wiki:`ISBN`
@@ -146,61 +153,68 @@ External identifiers:
     * https://www.wikidata.org/wiki/Wikidata:Pywikibot\_-_Python_3_Tutorial/Setting_statements
 
 **Prerequisites:**
-    pywikibot
+    In addition to Pywikibot the following ISBN lib package is mandatory;
+    install it with:
 
-    Install the following ISBN lib packages:
-    https://pypi.org/search/?q=isbnlib_
+    .. code:: shell
 
-        pip install isbnlib (mandatory)
+       pip install isbnlib
 
-        (optional)
+    The following ISBN lib package are optional; install them with:
+
+    .. code:: shell
+
         pip install isbnlib-bol
         pip install isbnlib-bnf
         pip install isbnlib-dnb
         pip install isbnlib-kb
         pip install isbnlib-loc
         pip install isbnlib-worldcat2
-        etc.
 
 **Restrictions:**
-    * Better use the ISO 639-1 language code parameter as a default
-        The language code is not always available from the digital library.
-    * SPARQL queries run on a replicated database
-        Possible important replication delay; wait 5 minutes before retry
-        -- otherwise risk for creating duplicates.
+    * Better use the ISO 639-1 language code parameter as a default. The
+      language code is not always available from the digital library.
+    * SPARQL queries run on a replicated database.
+
+      .. important::
+         Replication delay: wait 5 minutes before retry, otherwise there
+         is a risk for creating duplicates.
 
 **Algorithm:**
-    # Get parameters
-    # Validate parameters
-    # Get ISBN data
-    # Convert ISBN data
-    # Get additional data
-    # Register ISBN data into Wikidata (create or amend items or claims)
+    #. Get parameters
+    #. Validate parameters
+    #. Get ISBN data
+    #. Convert ISBN data
+    #. Get additional data
+    #. Register ISBN data into Wikidata (create or amend items or claims)
 
-Environment:
-
+**Environment:**
     The python script can run on the following platforms:
 
-        Linux client
-        Google Chromebook (Linux container)
-        Toolforge Portal
-        PAWS
+    * Linux client
+    * Google Chromebook (Linux container)
+    * Toolforge Portal
+    * PAWS
 
     LANG: ISO 639-1 language code
 
 
-Applications:
+**Applications:**
+    Generate a book reference. Example for (wp.en):
 
-    Generate a book reference
-        Example: {{Cite Q|Q63413107}} (wp.en)
-        See also:
-            https://meta.wikimedia.org/wiki/WikiCite
-            https://www.wikidata.org/wiki/Q21831105 (WikiCite)
-            https://www.wikidata.org/wiki/Q22321052 (Cite_Q)
-            https://www.mediawiki.org/wiki/Global_templates
-            https://www.wikidata.org/wiki/Wikidata:WikiProject_Source_MetaData
-            https://phabricator.wikimedia.org/tag/wikicite/
-            https://meta.wikimedia.org/wiki/WikiCite/Shared_Citations
+    .. code:: wikitext
+
+       {{Cite Q|Q63413107}}
+
+    .. seealso::
+
+       - https://meta.wikimedia.org/wiki/WikiCite
+       - https://www.wikidata.org/wiki/Q21831105 (WikiCite)
+       - https://www.wikidata.org/wiki/Q22321052 (Cite_Q)
+       - https://www.mediawiki.org/wiki/Global_templates
+       - https://www.wikidata.org/wiki/Wikidata:WikiProject_Source_MetaData
+       - https://phabricator.wikimedia.org/tag/wikicite/
+       - https://meta.wikimedia.org/wiki/WikiCite/Shared_Citations
 
 **Wikidata Query:**
     * List of editions about musicians: https://w.wiki/5aaz
@@ -218,7 +232,7 @@ Applications:
     * https://zenodo.org/record/55004#.YvwO4hTP1D8
 
 **Other systems:**
-    * `wiki:`bibliographic_database`
+    * wiki:`bibliographic_database`
     * https://www.titelbank.nl/pls/ttb/f?p=103:4012:::NO::P4012_TTEL_ID:3496019&cs=19BB8084860E3314502A1F777F875FE61
 
 .. versionadded:: 7.7
