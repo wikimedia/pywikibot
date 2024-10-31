@@ -848,20 +848,20 @@ def handle_pairsfile(filename: str) -> list[str] | None:
             'Please enter the filename to read replacements from:')
 
     try:
-        replacements = Path(filename).read_text(encoding='utf-8').splitlines()
-        if not replacements:
+        # use utf-8-sig to ignore BOM
+        content = Path(filename).read_text(encoding='utf-8-sig')
+        if not content:
             raise OSError(f'{filename} is empty.')
     except OSError as e:
         pywikibot.error(f'Error loading {filename}: {e}')
         return None
 
+    replacements = content.splitlines()
     if len(replacements) % 2:
         pywikibot.error(f'{filename} contains an incomplete pattern '
                         f'replacement pair:\n{replacements}')
         return None
 
-    # Strip BOM from first line
-    replacements[0].lstrip('\uFEFF')
     return replacements
 
 

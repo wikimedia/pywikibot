@@ -303,6 +303,31 @@ class TestReplacementsMain(TWNBotTestCase):
             '"no-msg-callable" (all replacements)',
         ], pywikibot.bot.ui.pop_output())
 
+    def test_pairs_file(self):
+        """Test handle_pairsfile."""
+        result = replace.handle_pairsfile('non existing file')
+        self.assertIsNone(result)
+        self.assertIn("No such file or directory: 'non existing file'",
+                      pywikibot.bot.ui.pop_output()[0])
+
+        result = replace.handle_pairsfile('tests/data/pagelist-lines.txt')
+        self.assertIsNone(result)
+        self.assertIn('pagelist-lines.txt contains an incomplete pattern '
+                      "replacement pair:\n['file', 'bracket', ",
+                      pywikibot.bot.ui.pop_output()[0])
+
+        # check file with and without BOM
+        for variant in ('', ' BOM'):
+            result = replace.handle_pairsfile(
+                f'tests/data/pairsfile{variant}.txt')
+            self.assertIsEmpty(pywikibot.bot.ui.pop_output())
+            self.assertEqual(result, [
+                'Category:Notice Board Quests',
+                'Категория:Задания с Доски объявлений',
+                'Windbluff Tower Key',
+                'Ключ от Крепости Ветров'
+            ])
+
 
 if __name__ == '__main__':
     with suppress(SystemExit):
