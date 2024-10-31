@@ -848,8 +848,7 @@ def handle_pairsfile(filename: str) -> list[str] | None:
             'Please enter the filename to read replacements from:')
 
     try:
-        with Path(filename).open(encoding='utf-8') as f:
-            replacements = f.readlines()
+        replacements = Path(filename).read_text(encoding='utf-8').splitlines()
         if not replacements:
             raise OSError(f'{filename} is empty.')
     except OSError as e:
