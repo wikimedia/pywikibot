@@ -155,7 +155,7 @@ def NewpagesPageGenerator(site: BaseSite | None = None,
     """Iterate Page objects for all new titles in a single namespace.
 
     :param site: Site for generator results.
-    :param namespace: namespace to retrieve pages from
+    :param namespaces: namespace to retrieve pages from
     :param total: Maxmium number of pages to retrieve in total
     """
     # API does not (yet) have a newpages function, so this tries to duplicate

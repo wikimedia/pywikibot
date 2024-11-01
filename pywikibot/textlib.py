@@ -1394,7 +1394,7 @@ def interwikiFormat(links: dict, insite=None) -> str:
 
     :param links: interwiki links to be formatted
     :type links: dict with the Site objects as keys, and Page
-        or Link objects as values.  # noqa: DAR103
+        or Link objects as values.
     :param insite: site the interwiki links will be formatted for
         (defaulting to the current site).
     :type insite: BaseSite

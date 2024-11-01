@@ -573,17 +573,15 @@ class Link(BaseLink):
         return link
 
     @classmethod
-    def langlinkUnsafe(cls, lang, title, source):  # noqa: N802
+    def langlinkUnsafe(cls, lang: str, title: str, source):  # noqa: N802
         """Create a "lang:title" Link linked from source.
 
         Assumes that the lang & title come clean, no checks are made.
 
         :param lang: target site code (language)
-        :type lang: str
         :param title: target Page
-        :type title: str
         :param source: Link from site source
-        :param source: Site
+        :type source: Site
 
         :rtype: pywikibot.page.Link
         """
@@ -785,11 +783,12 @@ _ILLEGAL_HTML_ENTITIES_MAPPING = {
 }
 
 
-def html2unicode(text: str, ignore=None, exceptions=None) -> str:
+def html2unicode(text: str,
+                 ignore: list[int] | None = None,
+                 exceptions=None) -> str:
     """Replace HTML entities with equivalent unicode.
 
     :param ignore: HTML entities to ignore
-    :param ignore: list of int
     """
     if ignore is None:
         ignore = []

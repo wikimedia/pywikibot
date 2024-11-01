@@ -613,7 +613,7 @@ class Request(MutableMapping, WaitingMixin):
 
         :param params: HTTP request params
         :param mime_params: HTTP request parts which must be sent in the body
-        :type mime_params: dict of (content, keytype, headers)  # noqa: DAR103
+        :type mime_params: dict of (content, keytype, headers)
         :return: HTTP request headers and body
         """
         # construct a MIME message containing all API key/values

@@ -1214,8 +1214,6 @@ class ItemPage(WikibasePage):
         :param site: Site to find the linked page of.
         :type site: pywikibot.Site or database name
         :param force: override caching
-        :param get_redirect: return the item content, do not follow the
-                             redirect, do not raise an exception.
         :raise IsRedirectPageError: instance is a redirect page
         :raise NoSiteLinkError: site is not in :attr:`sitelinks`
         """

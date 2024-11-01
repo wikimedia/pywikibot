@@ -497,7 +497,7 @@ class BotPassword:
     def login_name(self, username: str) -> str:
         """Construct the login name from the username and suffix.
 
-        :param user: username (without suffix)
+        :param username: username (without suffix)
         """
         return f'{username}@{self.suffix}'
 

@@ -77,6 +77,13 @@ repos:
     hooks:
       - id: isort
         exclude: '^pwb\.py$'
+  - repo: https://github.com/jshwi/docsig
+    rev: v0.64.0
+    hooks:
+      - id: docsig
+        args:
+          - "-dSIG101,SIG202,SIG203,SIG301,SIG302,SIG401,SIG402,SIG404,SIG501,SIG502,SIG503,SIG505"
+        exclude: ^(tests|scripts)
   - repo: https://github.com/PyCQA/flake8
     rev: 7.1.1
     hooks:
@@ -85,7 +92,6 @@ repos:
           - --doctests
         additional_dependencies:
           # Due to incompatibilities between packages the order matters.
-          - darglint2
           - flake8-bugbear!=24.1.17
           - flake8-comprehensions>=3.13.0
           - flake8-mock-x2
