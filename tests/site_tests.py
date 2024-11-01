@@ -1015,7 +1015,8 @@ class TestLinktrails(TestCase):
         small_wikis = self.site.family.languages_by_size[-size:]
         great_wikis = self.site.family.languages_by_size[:-size]
         great_wikis = random.sample(great_wikis, size)
-        for code in sorted(small_wikis + great_wikis):
+        # Also test for 'hr' which failed due to T378787
+        for code in {'hr', *small_wikis, *great_wikis}:
             site = pywikibot.Site(code, self.family)
             with self.subTest(site=site):
                 self.assertIsInstance(site.linktrail(), str)

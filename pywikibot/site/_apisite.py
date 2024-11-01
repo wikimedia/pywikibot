@@ -872,6 +872,9 @@ class APISite(
         if linktrail == '/^()(.*)$/sD':  # empty linktrail
             return ''
 
+        # T378787
+        linktrail = linktrail.replace(r'\p{L}', r'[^\W\d_]')
+
         match = re.search(r'\((?:\:\?|\?\:)?\[(?P<pattern>.+?)\]'
                           r'(?P<letters>(\|.)*)\)?\+\)', linktrail)
         if not match:
