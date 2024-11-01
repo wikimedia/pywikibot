@@ -101,8 +101,7 @@ class Coordinate(WbRepresentation):
                  site: DataSite | None = None,
                  globe_item: ItemPageStrNoneType = None,
                  primary: bool = False) -> None:
-        """
-        Represent a geo coordinate.
+        """Represent a geo coordinate.
 
         :param lat: Latitude
         :param lon: Longitude
@@ -150,8 +149,7 @@ class Coordinate(WbRepresentation):
         return self._entity
 
     def toWikibase(self) -> dict[str, Any]:
-        """
-        Export the data to a JSON object for the Wikibase API.
+        """Export the data to a JSON object for the Wikibase API.
 
         FIXME: Should this be in the DataSite object?
 
@@ -167,8 +165,7 @@ class Coordinate(WbRepresentation):
     @classmethod
     def fromWikibase(cls, data: dict[str, Any],
                      site: DataSite | None = None) -> Coordinate:
-        """
-        Constructor to create an object from Wikibase's JSON output.
+        """Constructor to create an object from Wikibase's JSON output.
 
         :param data: Wikibase JSON
         :param site: The Wikibase site
@@ -230,8 +227,7 @@ class Coordinate(WbRepresentation):
         self._precision = value
 
     def precisionToDim(self) -> int | None:
-        """
-        Convert precision from Wikibase to GeoData's dim and return the latter.
+        """Convert precision from Wikibase to GeoData's dim.
 
         dim is calculated if the Coordinate doesn't have a dimension, and
         precision is set. When neither dim nor precision are set, ValueError
@@ -273,8 +269,7 @@ class Coordinate(WbRepresentation):
 
     def get_globe_item(self, repo: DataSite | None = None,
                        lazy_load: bool = False) -> pywikibot.ItemPage:
-        """
-        Return the ItemPage corresponding to the globe.
+        """Return the ItemPage corresponding to the globe.
 
         Note that the globe need not be in the same data repository as the
         Coordinate itself.
@@ -720,8 +715,7 @@ class WbTime(WbRepresentation):
                                      self.hour, self.minute, self.second)
 
     def toTimestamp(self, timezone_aware: bool = False) -> Timestamp:
-        """
-        Convert the data to a pywikibot.Timestamp.
+        """Convert the data to a pywikibot.Timestamp.
 
         .. versionchanged:: 8.0.1
            *timezone_aware* parameter was added.
@@ -764,8 +758,7 @@ class WbTime(WbRepresentation):
     @classmethod
     def fromWikibase(cls, data: dict[str, Any],
                      site: DataSite | None = None) -> WbTime:
-        """
-        Create a WbTime from the JSON data given by the Wikibase API.
+        """Create a WbTime from the JSON data given by the Wikibase API.
 
         :param data: Wikibase JSON
         :param site: The Wikibase site. If not provided, retrieves the data
@@ -784,8 +777,7 @@ class WbQuantity(WbRepresentation):
 
     @staticmethod
     def _require_errors(site: DataSite | None) -> bool:
-        """
-        Check if Wikibase site is so old it requires error bounds to be given.
+        """Check if Wikibase site is old and requires error bounds to be given.
 
         If no site item is supplied it raises a warning and returns True.
 
@@ -800,8 +792,7 @@ class WbQuantity(WbRepresentation):
 
     @staticmethod
     def _todecimal(value: ToDecimalType) -> Decimal | None:
-        """
-        Convert a string to a Decimal for use in WbQuantity.
+        """Convert a string to a Decimal for use in WbQuantity.
 
         None value is returned as is.
 
@@ -815,8 +806,7 @@ class WbQuantity(WbRepresentation):
 
     @staticmethod
     def _fromdecimal(value: Decimal | None) -> str | None:
-        """
-        Convert a Decimal to a string representation suitable for WikiBase.
+        """Convert a Decimal to a string representation suitable for WikiBase.
 
         None value is returned as is.
 
@@ -830,8 +820,7 @@ class WbQuantity(WbRepresentation):
         error: ToDecimalType | tuple[ToDecimalType, ToDecimalType] = None,
         site: DataSite | None = None,
     ) -> None:
-        """
-        Create a new WbQuantity object.
+        """Create a new WbQuantity object.
 
         :param amount: number representing this quantity
         :param unit: the Wikibase item for the unit or the entity URI of this
@@ -878,8 +867,7 @@ class WbQuantity(WbRepresentation):
 
     def get_unit_item(self, repo: DataSite | None = None,
                       lazy_load: bool = False) -> pywikibot.ItemPage:
-        """
-        Return the ItemPage corresponding to the unit.
+        """Return the ItemPage corresponding to the unit.
 
         Note that the unit need not be in the same data repository as the
         WbQuantity itself.
@@ -901,8 +889,7 @@ class WbQuantity(WbRepresentation):
         return self._unit
 
     def toWikibase(self) -> dict[str, Any]:
-        """
-        Convert the data to a JSON object for the Wikibase API.
+        """Convert the data to a JSON object for the Wikibase API.
 
         :return: Wikibase JSON
         """
@@ -916,8 +903,7 @@ class WbQuantity(WbRepresentation):
     @classmethod
     def fromWikibase(cls, data: dict[str, Any],
                      site: DataSite | None = None) -> WbQuantity:
-        """
-        Create a WbQuantity from the JSON data given by the Wikibase API.
+        """Create a WbQuantity from the JSON data given by the Wikibase API.
 
         :param data: Wikibase JSON
         :param site: The Wikibase site
@@ -934,13 +920,13 @@ class WbQuantity(WbRepresentation):
 
 
 class WbMonolingualText(WbRepresentation):
+
     """A Wikibase monolingual text representation."""
 
     _items = ('text', 'language')
 
     def __init__(self, text: str, language: str) -> None:
-        """
-        Create a new WbMonolingualText object.
+        """Create a new WbMonolingualText object.
 
         :param text: text string
         :param language: language code of the string
@@ -951,8 +937,7 @@ class WbMonolingualText(WbRepresentation):
         self.language = language
 
     def toWikibase(self) -> dict[str, Any]:
-        """
-        Convert the data to a JSON object for the Wikibase API.
+        """Convert the data to a JSON object for the Wikibase API.
 
         :return: Wikibase JSON
         """
@@ -964,8 +949,7 @@ class WbMonolingualText(WbRepresentation):
     @classmethod
     def fromWikibase(cls, data: dict[str, Any],
                      site: DataSite | None = None) -> WbMonolingualText:
-        """
-        Create a WbMonolingualText from the JSON data given by Wikibase API.
+        """Create a WbMonolingualText from the JSON data given by Wikibase API.
 
         :param data: Wikibase JSON
         :param site: The Wikibase site
@@ -974,6 +958,7 @@ class WbMonolingualText(WbRepresentation):
 
 
 class WbDataPage(WbRepresentation):
+
     """An abstract Wikibase representation for data pages.
 
     .. warning:: Perhaps a temporary implementation until :phab:`T162336`
@@ -986,8 +971,7 @@ class WbDataPage(WbRepresentation):
     @classmethod
     @abc.abstractmethod
     def _get_data_site(cls, repo_site: DataSite) -> APISite:
-        """
-        Return the site serving as a repository for a given data type.
+        """Return the site serving as a repository for a given data type.
 
         .. note:: implemented in the extended class.
 
@@ -998,8 +982,7 @@ class WbDataPage(WbRepresentation):
     @classmethod
     @abc.abstractmethod
     def _get_type_specifics(cls, site: DataSite) -> dict[str, Any]:
-        """
-        Return the specifics for a given data type.
+        """Return the specifics for a given data type.
 
         .. note:: Must be implemented in the extended class.
 
@@ -1017,8 +1000,7 @@ class WbDataPage(WbRepresentation):
     @staticmethod
     def _validate(page: pywikibot.Page, data_site: BaseSite, ending: str,
                   label: str) -> None:
-        """
-        Validate the provided page against general and type specific rules.
+        """Validate the provided page against general and type specific rules.
 
         :param page: Page containing the data.
         :param data_site: The site serving as a repository for the given
@@ -1073,8 +1055,7 @@ class WbDataPage(WbRepresentation):
         return hash(self.toWikibase())
 
     def toWikibase(self) -> str:
-        """
-        Convert the data to the value required by the Wikibase API.
+        """Convert the data to the value required by the Wikibase API.
 
         :return: title of the data page incl. namespace
         """
@@ -1097,12 +1078,12 @@ class WbDataPage(WbRepresentation):
 
 
 class WbGeoShape(WbDataPage):
+
     """A Wikibase geo-shape representation."""
 
     @classmethod
     def _get_data_site(cls, site: DataSite) -> APISite:
-        """
-        Return the site serving as a geo-shape repository.
+        """Return the site serving as a geo-shape repository.
 
         :param site: The Wikibase site
         """
@@ -1110,8 +1091,7 @@ class WbGeoShape(WbDataPage):
 
     @classmethod
     def _get_type_specifics(cls, site: DataSite) -> dict[str, Any]:
-        """
-        Return the specifics for WbGeoShape.
+        """Return the specifics for WbGeoShape.
 
         :param site: The Wikibase site
         """
@@ -1124,12 +1104,12 @@ class WbGeoShape(WbDataPage):
 
 
 class WbTabularData(WbDataPage):
+
     """A Wikibase tabular-data representation."""
 
     @classmethod
     def _get_data_site(cls, site: DataSite) -> APISite:
-        """
-        Return the site serving as a tabular-data repository.
+        """Return the site serving as a tabular-data repository.
 
         :param site: The Wikibase site
         """
@@ -1137,8 +1117,7 @@ class WbTabularData(WbDataPage):
 
     @classmethod
     def _get_type_specifics(cls, site: DataSite) -> dict[str, Any]:
-        """
-        Return the specifics for WbTabularData.
+        """Return the specifics for WbTabularData.
 
         :param site: The Wikibase site
         """
@@ -1151,6 +1130,7 @@ class WbTabularData(WbDataPage):
 
 
 class WbUnknown(WbRepresentation):
+
     """A Wikibase representation for unknown data type.
 
     This will prevent the bot from breaking completely when a new type
@@ -1166,8 +1146,7 @@ class WbUnknown(WbRepresentation):
     _items = ('json',)
 
     def __init__(self, json: dict[str, Any], warning: str = '') -> None:
-        """
-        Create a new WbUnknown object.
+        """Create a new WbUnknown object.
 
         :param json: Wikibase JSON
         :param warning: a warning message which is shown once if
@@ -1192,8 +1171,7 @@ class WbUnknown(WbRepresentation):
     @classmethod
     def fromWikibase(cls, data: dict[str, Any],
                      site: DataSite | None = None) -> WbUnknown:
-        """
-        Create a WbUnknown from the JSON data given by the Wikibase API.
+        """Create a WbUnknown from the JSON data given by the Wikibase API.
 
         :param data: Wikibase JSON
         :param site: The Wikibase site

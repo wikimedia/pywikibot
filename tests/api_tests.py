@@ -779,8 +779,7 @@ class TestCachedRequest(DefaultSiteTestCase):
 
 class TestLazyLoginBase(TestCase):
 
-    """
-    Test that it tries to login when read API access is denied.
+    """Test that it tries to login when read API access is denied.
 
     Because there is no such family configured it creates an AutoFamily and
     BaseSite on it's own. It's testing against steward.wikimedia.org.

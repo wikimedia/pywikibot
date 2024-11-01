@@ -95,8 +95,7 @@ class APIGenerator(APIGeneratorBase, GeneratorWrapper):
         data_name: str = 'data',
         **kwargs
     ) -> None:
-        """
-        Initialize an APIGenerator object.
+        """Initialize an APIGenerator object.
 
         kwargs are used to create a Request object; see that object's
         documentation for values.
@@ -123,8 +122,7 @@ class APIGenerator(APIGeneratorBase, GeneratorWrapper):
         self.request[self.limit_name] = self.query_increment
 
     def set_query_increment(self, value: int) -> None:
-        """
-        Set the maximum number of items to be retrieved per API query.
+        """Set the maximum number of items to be retrieved per API query.
 
         If not called, the default is config.step.
 
@@ -137,8 +135,7 @@ class APIGenerator(APIGeneratorBase, GeneratorWrapper):
                         .format(type(self).__name__, self.query_increment))
 
     def set_maximum_items(self, value: int | str | None) -> None:
-        """
-        Set the maximum number of items to be retrieved from the wiki.
+        """Set the maximum number of items to be retrieved from the wiki.
 
         If not called, most queries will continue as long as there is
         more data to be retrieved from the API.
@@ -157,8 +154,7 @@ class APIGenerator(APIGeneratorBase, GeneratorWrapper):
 
     @property
     def generator(self):
-        """
-        Submit request and iterate the response.
+        """Submit request and iterate the response.
 
         Continues response as needed until limit (if defined) is reached.
 
@@ -764,8 +760,7 @@ class PropertyGenerator(QueryGenerator):
     """
 
     def __init__(self, prop: str, **kwargs) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         Required and optional parameters are as for ``Request``, except that
         action=query is assumed and prop is required.
@@ -844,8 +839,7 @@ class ListGenerator(QueryGenerator):
     """
 
     def __init__(self, listaction: str, **kwargs) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         Required and optional parameters are as for ``Request``, except that
         action=query is assumed and listaction is required.
@@ -988,8 +982,7 @@ def _update_coordinates(page, coordinates) -> None:
 def update_page(page: pywikibot.Page,
                 pagedict: dict[str, Any],
                 props: Iterable[str] | None = None) -> None:
-    """
-    Update attributes of Page object *page*, based on query data in *pagedict*.
+    """Update attributes of *page*, based on query data in *pagedict*.
 
     :param page: object to be updated
     :param pagedict: the contents of a *page* element of a query

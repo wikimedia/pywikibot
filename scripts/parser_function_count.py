@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Used to find expensive templates that are subject to be converted to Lua.
+"""Used to find expensive templates that are subject to be converted to Lua.
 
 It counts parser functions and then orders templates by number of these
 and uploads the first n titles or alternatively templates having count()>n.

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Display the list of pages transcluding a given list of templates.
+"""Display the list of pages transcluding a given list of templates.
 
 It can also be used to simply count the number of pages (rather than
 listing each individually).
@@ -49,8 +48,7 @@ class TemplateCountRobot:
 
     @classmethod
     def count_templates(cls, templates, namespaces) -> None:
-        """
-        Display number of transclusions for a list of templates.
+        """Display number of transclusions for a list of templates.
 
         Displays the number of transcluded page in the given 'namespaces' for
         each template given by 'templates' list.
@@ -75,8 +73,7 @@ class TemplateCountRobot:
 
     @classmethod
     def list_templates(cls, templates, namespaces) -> None:
-        """
-        Display transcluded pages for a list of templates.
+        """Display transcluded pages for a list of templates.
 
         Displays each transcluded page in the given 'namespaces' for
         each template given by 'templates' list.
@@ -103,8 +100,7 @@ class TemplateCountRobot:
     @classmethod
     def template_dict(cls, templates, namespaces) -> dict[
             str, list[pywikibot.Page]]:
-        """
-        Create a dict of templates and its transcluded pages.
+        """Create a dict of templates and its transcluded pages.
 
         The names of the templates are the keys, and lists of pages
         transcluding templates in the given namespaces are the values.
@@ -119,8 +115,7 @@ class TemplateCountRobot:
     @staticmethod
     def template_dict_generator(templates, namespaces) -> Generator[
             tuple[str, list[pywikibot.Page]], None, None]:
-        """
-        Yield transclusions of each template in 'templates'.
+        """Yield transclusions of each template in 'templates'.
 
         For each template in 'templates', yield a tuple
         (template, transclusions), where 'transclusions' is a list of all pages
@@ -140,8 +135,7 @@ class TemplateCountRobot:
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

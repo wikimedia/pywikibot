@@ -184,8 +184,7 @@ class Page(BasePage, WikiBlameMixin):
             self.save(**kwargs)
 
     def get_best_claim(self, prop: str):
-        """
-        Return the first best Claim for this page.
+        """Return the first best Claim for this page.
 
         Return the first 'preferred' ranked Claim specified by Wikibase
         property or the first 'normal' one otherwise.

@@ -58,6 +58,7 @@ class TestLoginLogout(DefaultSiteTestCase):
 
 
 class TestClearCookies(TestCase):
+
     """Test cookies are cleared after logout."""
 
     login = True

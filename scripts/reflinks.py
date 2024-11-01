@@ -265,8 +265,7 @@ class RefLink:
         # TODO : remove HTML when both opening and closing tags are included
 
     def avoid_uppercase(self) -> None:
-        """
-        Convert to title()-case if title is 70% uppercase characters.
+        """Convert to title()-case if title is 70% uppercase characters.
 
         Skip title that has less than 6 characters.
         """
@@ -744,8 +743,7 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

@@ -15,8 +15,7 @@ import pywikibot
 
 
 def _call_cmd(args, lib: str = 'djvulibre') -> tuple:
-    """
-    Tiny wrapper around subprocess.Popen().
+    """Tiny wrapper around subprocess.Popen().
 
     :param args: same as Popen()
     :type args: str or typing.Sequence[string]
@@ -52,8 +51,7 @@ class DjVuFile:
     """
 
     def __init__(self, file: str) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param file: filename (including path) to djvu file
         """
@@ -108,8 +106,7 @@ class DjVuFile:
 
     @check_cache
     def number_of_images(self, force: bool = False):
-        """
-        Return the number of images in the djvu file.
+        """Return the number of images in the djvu file.
 
         :param force: if True, refresh the cached data
         """
@@ -122,8 +119,7 @@ class DjVuFile:
 
     @check_page_number
     def page_info(self, n: int, force: bool = False):
-        """
-        Return a tuple (id, (size, dpi)) for page n of djvu file.
+        """Return a tuple (id, (size, dpi)) for page n of djvu file.
 
         :param n: page n of djvu file
         :param force: if True, refresh the cached data
@@ -134,9 +130,9 @@ class DjVuFile:
 
     @check_cache
     def _get_page_info(self, force: bool = False):
-        """
-        Return a dict of tuples (id, (size, dpi)) for all pages of djvu file.
+        """Return a dict of tuples for all pages of djvu file.
 
+        The tuples consist of (id, (size, dpi)).
         :param force: if True, refresh the cached data
         """
         if not hasattr(self, '_page_info'):
@@ -181,8 +177,7 @@ class DjVuFile:
 
     @check_cache
     def has_text(self, force: bool = False):
-        """
-        Test if the djvu file has a text-layer.
+        """Test if the djvu file has a text-layer.
 
         :param force: if True, refresh the cached data
         """
@@ -212,8 +207,7 @@ class DjVuFile:
     @check_page_number
     @check_cache
     def get_page(self, n: int, force: bool = False):
-        """
-        Get page n for djvu file.
+        """Get page n for djvu file.
 
         :param n: page n of djvu file
         :param force: if True, refresh the cached data

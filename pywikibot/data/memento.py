@@ -224,8 +224,7 @@ class MementoClient(OldMementoClient):
                    response: requests.Response | None = None,
                    session: requests.Session | None = None,
                    timeout: int | None = None) -> bool:
-        """
-        Determines if the URI given is indeed a Memento.
+        """Determines if the URI given is indeed a Memento.
 
         The simple case is to look for a Memento-Datetime header in the
         request, but not all archives are Memento-compliant yet.

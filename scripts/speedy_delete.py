@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Help sysops to quickly check and/or delete pages listed for speedy deletion.
+"""Help sysops to quickly check and/or delete pages listed for speedy deletion.
 
 This bot trawls through candidates for speedy deletion in a fast
 and semi-automated fashion. It displays the contents of each page
@@ -38,6 +37,7 @@ from pywikibot.exceptions import Error
 
 
 class SpeedyBot(SingleSiteBot, ExistingPageBot):
+
     """Bot to delete pages which are tagged as speedy deletion.
 
     This bot will load a list of pages from the category of candidates for

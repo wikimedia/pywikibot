@@ -159,8 +159,7 @@ def has_module(module: str, version: str | None = None) -> bool:
 
 class classproperty:  # noqa: N801
 
-    """
-    Descriptor class to access a class method as a property.
+    """Descriptor class to access a class method as a property.
 
     This class may be used as a decorator::
 
@@ -297,8 +296,7 @@ class ComparableMixin(abc.ABC):
 
 
 def first_lower(string: str) -> str:
-    """
-    Return a string with the first character uncapitalized.
+    """Return a string with the first character uncapitalized.
 
     Empty strings are supported. The original string is not changed.
 
@@ -313,8 +311,7 @@ def first_lower(string: str) -> str:
 
 
 def first_upper(string: str) -> str:
-    """
-    Return a string with the first character capitalized.
+    """Return a string with the first character capitalized.
 
     Empty strings are supported. The original string is not changed.
 
@@ -419,8 +416,7 @@ def normalize_username(username) -> str | None:
 @total_ordering
 class MediaWikiVersion:
 
-    """
-    Version object to allow comparing 'wmf' versions with normal ones.
+    """Version object to allow comparing 'wmf' versions with normal ones.
 
     The version mainly consist of digits separated by periods. After
     that is a suffix which may only be 'wmf<number>', 'alpha',
@@ -449,8 +445,7 @@ class MediaWikiVersion:
         r'(\d+(?:\.\d+)+)(-?wmf\.?(\d+)|alpha|beta(\d+)|-?rc\.?(\d+)|.*)?')
 
     def __init__(self, version_str: str) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param version_str: version to parse
         """
@@ -527,8 +522,7 @@ class MediaWikiVersion:
 
 
 def open_archive(filename: str, mode: str = 'rb', use_extension: bool = True):
-    """
-    Open a file and uncompress it if needed.
+    """Open a file and uncompress it if needed.
 
     This function supports bzip2, gzip, 7zip, lzma, and xz as
     compression containers. It uses the packages available in the
@@ -632,8 +626,7 @@ def open_archive(filename: str, mode: str = 'rb', use_extension: bool = True):
 
 
 def merge_unique_dicts(*args, **kwargs):
-    """
-    Return a merged dict and make sure that the original dicts keys are unique.
+    """Return a merged dict and make sure that the original keys are unique.
 
     The positional arguments are the dictionaries to be merged. It is
     also possible to define an additional dict using the keyword

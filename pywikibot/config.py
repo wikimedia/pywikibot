@@ -1,5 +1,4 @@
-"""
-Module to define and load pywikibot configuration default and user preferences.
+"""Module to define pywikibot configuration default and user preferences.
 
 User preferences are loaded from a python file called `user-config.py`,
 which may be located in directory specified by the environment variable

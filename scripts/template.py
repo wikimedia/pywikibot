@@ -134,8 +134,7 @@ class TemplateRobot(ReplaceBot):
     }
 
     def __init__(self, generator, templates: dict, **kwargs) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param generator: the pages to work on
         :type generator: iterable
@@ -209,8 +208,7 @@ class TemplateRobot(ReplaceBot):
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

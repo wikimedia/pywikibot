@@ -146,8 +146,7 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
         return item
 
     def handle_complicated(self) -> bool:
-        """
-        Handle pages when they have interwiki conflict.
+        """Handle pages when they have interwiki conflict.
 
         When this method returns True it means conflict has resolved
         and it's okay to clean old interwiki links.
@@ -232,8 +231,7 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

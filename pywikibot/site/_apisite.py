@@ -155,8 +155,7 @@ class APISite(
         self._tokens = TokenWallet(self)
 
     def interwiki(self, prefix: str) -> BaseSite:
-        """
-        Return the site for a corresponding interwiki prefix.
+        """Return the site for a corresponding interwiki prefix.
 
         :raises pywikibot.exceptions.SiteDefinitionError: if the url given in
             the interwiki table doesn't match any of the existing families.
@@ -165,8 +164,7 @@ class APISite(
         return self._interwikimap[prefix].site
 
     def interwiki_prefix(self, site: BaseSite) -> list[str]:
-        """
-        Return the interwiki prefixes going to that site.
+        """Return the interwiki prefixes going to that site.
 
         The interwiki prefixes are ordered first by length (shortest first)
         and then alphabetically. :py:obj:`interwiki(prefix)` is not
@@ -186,8 +184,7 @@ class APISite(
         return sorted(prefixes, key=lambda p: (len(p), p))
 
     def local_interwiki(self, prefix: str) -> bool:
-        """
-        Return whether the interwiki prefix is local.
+        """Return whether the interwiki prefix is local.
 
         A local interwiki prefix is handled by the target site like a normal
         link. So if that link also contains an interwiki link it does follow
@@ -289,8 +286,7 @@ class APISite(
 
     @staticmethod
     def _request_class(kwargs: dict[str, Any]) -> type[api.Request]:
-        """
-        Get the appropriate class.
+        """Get the appropriate class.
 
         Inside this class kwargs use the parameters mode but QueryGenerator may
         use the old kwargs mode.
@@ -459,8 +455,7 @@ class APISite(
         self.login()
 
     def logout(self) -> None:
-        """
-        Logout of the site and load details for the logged out user.
+        """Logout of the site and load details for the logged out user.
 
         Also logs out of the global account if linked to the user.
 
@@ -797,8 +792,7 @@ class APISite(
         return 'locked' in self.get_globaluserinfo(user, force)
 
     def get_searched_namespaces(self, force: bool = False) -> set[Namespace]:
-        """
-        Retrieve the default searched namespaces for the user.
+        """Retrieve the default searched namespaces for the user.
 
         If no user is logged in, it returns the namespaces used by default.
         Otherwise it returns the user preferences. It caches the last result
@@ -1125,8 +1119,7 @@ class APISite(
         return req.submit()['expandtemplates']['wikitext']
 
     def getcurrenttimestamp(self) -> str:
-        """
-        Return the server time as a MediaWiki timestamp string.
+        """Return the server time as a MediaWiki timestamp string.
 
         It calls :py:obj:`server_time` first so it queries the server to
         get the current server time.
@@ -1136,8 +1129,7 @@ class APISite(
         return self.server_time().totimestampformat()
 
     def server_time(self) -> pywikibot.Timestamp:
-        """
-        Return a Timestamp object representing the current server time.
+        """Return a Timestamp object representing the current server time.
 
         It uses the 'time' property of the siteinfo 'general'. It'll force a
         reload before returning the time.
@@ -1293,8 +1285,7 @@ class APISite(
         return None
 
     def data_repository(self) -> pywikibot.site.DataSite | None:
-        """
-        Return the data repository connected to this site.
+        """Return the data repository connected to this site.
 
         :return: The data repository if one is connected or None otherwise.
         """
@@ -1337,8 +1328,7 @@ class APISite(
         self,
         item: str
     ) -> pywikibot.page.Page | None:
-        """
-        Return a Page for this site object specified by Wikibase item.
+        """Return a Page for this site object specified by Wikibase item.
 
         Usage:
 
@@ -2747,8 +2737,7 @@ class APISite(
     }
 
     def protection_types(self) -> set[str]:
-        """
-        Return the protection types available on this site.
+        """Return the protection types available on this site.
 
         **Example:**
 
@@ -2764,8 +2753,7 @@ class APISite(
 
     @need_version('1.27.3')
     def protection_levels(self) -> set[str]:
-        """
-        Return the protection levels available on this site.
+        """Return the protection levels available on this site.
 
         **Example:**
 
@@ -2862,8 +2850,7 @@ class APISite(
         reblock: bool = False,
         allowusertalk: bool = False
     ) -> dict[str, Any]:
-        """
-        Block a user for certain amount of time and for a certain reason.
+        """Block a user for certain amount of time and for a certain reason.
 
         .. seealso:: :api:`Block`
 
@@ -2908,8 +2895,7 @@ class APISite(
         user: pywikibot.page.User,
         reason: str | None = None
     ) -> dict[str, Any]:
-        """
-        Remove the block for the user.
+        """Remove the block for the user.
 
         .. seealso:: :api:`Block`
 
@@ -2957,8 +2943,7 @@ class APISite(
         converttitles: bool = False,
         redirects: bool = False
     ) -> bool:
-        """
-        Purge the server's cache for one or multiple pages.
+        """Purge the server's cache for one or multiple pages.
 
         :param pages: list of Page objects
         :param redirects: Automatically resolve redirects.
@@ -3054,8 +3039,7 @@ class APISite(
         return Uploader(self, filepage, **kwargs).upload()
 
     def get_property_names(self, force: bool = False) -> list[str]:
-        """
-        Get property names for pages_with_property().
+        """Get property names for pages_with_property().
 
         .. seealso:: :api:`Pagepropnames`
 
@@ -3072,8 +3056,7 @@ class APISite(
         diff: _CompType,
         difftype: str = 'table'
     ) -> str:
-        """
-        Corresponding method to the 'action=compare' API action.
+        """Corresponding method to the 'action=compare' API action.
 
         .. hint:: Use :func:`diff.html_comparator` function to parse
            result.

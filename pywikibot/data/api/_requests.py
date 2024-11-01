@@ -147,8 +147,7 @@ class Request(MutableMapping, WaitingMixin):
                  retry_wait: int | None = None,
                  use_get: bool | None = None,
                  parameters=_PARAM_DEFAULT, **kwargs) -> None:
-        """
-        Create a new Request instance with the given parameters.
+        """Create a new Request instance with the given parameters.
 
         The parameters for the request can be defined via either the
         'parameters' parameter or the keyword arguments. The keyword arguments
@@ -284,8 +283,7 @@ class Request(MutableMapping, WaitingMixin):
 
     @classmethod
     def clean_kwargs(cls, kwargs: dict) -> dict:
-        """
-        Convert keyword arguments into new parameters mode.
+        """Convert keyword arguments into new parameters mode.
 
         If there are no other arguments in kwargs apart from the used arguments
         by the class' initializer it'll just return kwargs and otherwise remove
@@ -331,8 +329,7 @@ class Request(MutableMapping, WaitingMixin):
         return kwargs
 
     def _format_value(self, value):
-        """
-        Format the MediaWiki API request parameter.
+        """Format the MediaWiki API request parameter.
 
         Converts from Python datatypes to MediaWiki API parameter values.
 
@@ -404,8 +401,7 @@ class Request(MutableMapping, WaitingMixin):
         return iter(self.items())
 
     def _add_defaults(self):
-        """
-        Add default parameters to the API request.
+        """Add default parameters to the API request.
 
         This method will only add them once.
         """
@@ -449,8 +445,7 @@ class Request(MutableMapping, WaitingMixin):
         self.__defaulted = True  # skipcq: PTC-W0037
 
     def _encoded_items(self) -> dict[str, str | bytes]:
-        """
-        Build a dict of params with minimal encoding needed for the site.
+        """Build a dict of params with minimal encoding needed for the site.
 
         This helper method only prepares params for serialisation or
         transmission, so it only encodes values which are not ASCII,
@@ -496,8 +491,7 @@ class Request(MutableMapping, WaitingMixin):
         return params
 
     def _http_param_string(self):
-        """
-        Return the parameters as a HTTP URL query fragment.
+        """Return the parameters as a HTTP URL query fragment.
 
         URL encodes the parameters provided by _encoded_items()
 
@@ -615,8 +609,7 @@ class Request(MutableMapping, WaitingMixin):
     @classmethod
     def _build_mime_request(cls, params: dict,
                             mime_params: dict) -> tuple[dict, bytes]:
-        """
-        Construct a MIME multipart form post.
+        """Construct a MIME multipart form post.
 
         :param params: HTTP request params
         :param mime_params: HTTP request parts which must be sent in the body
@@ -1187,8 +1180,7 @@ class CachedRequest(Request):
 
     @classmethod
     def _get_cache_dir(cls) -> Path:
-        """
-        Return the base directory path for cache entries.
+        """Return the base directory path for cache entries.
 
         The directory will be created if it does not already exist.
 

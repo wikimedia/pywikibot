@@ -423,8 +423,7 @@ class Post:
     @classmethod
     def fromJSON(cls, page: Topic, post_uuid: str,  # noqa: N802
                  data: dict[str, Any]) -> Post:
-        """
-        Create a Post object using the data returned from the API call.
+        """Create a Post object using the data returned from the API call.
 
         :param page: A Flow topic
         :param post_uuid: The UUID of the post

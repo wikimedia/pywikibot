@@ -239,6 +239,7 @@ class TestFlowFactoryErrors(TestCase):
 
 
 class TestFlowTopic(TestCase):
+
     """Test Topic functions."""
 
     family = 'wikipedia'

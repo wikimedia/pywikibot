@@ -46,8 +46,7 @@ __all__ = (
 
 
 def _invalidate_superior_cookies(family) -> None:
-    """
-    Clear cookies for site's second level domain.
+    """Clear cookies for site's second level domain.
 
     The http module takes care of all the cookie stuff.
     This is a workaround for requests bug, see :phab:`T224712`

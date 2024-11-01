@@ -219,8 +219,7 @@ class TextEditor(ScrolledText):
         return 'break'
 
     def find_all(self, s):
-        """
-        Highlight all occurrences of string s, and select the first one.
+        """Highlight all occurrences of string s, and select the first one.
 
         If the string has already been highlighted, jump to the next occurrence
         after the current selection. (You cannot go backwards using the
@@ -394,8 +393,7 @@ class EditBoxWindow(Frame):
 
     def edit(self, text: str, jumpIndex: int | None = None,  # noqa: N803
              highlight: str | None = None) -> str | None:
-        """
-        Provide user with editor to modify text.
+        """Provide user with editor to modify text.
 
         :param text: the text to be edited
         :param jumpIndex: position at which to put the caret
@@ -441,8 +439,7 @@ class EditBoxWindow(Frame):
         ConfigDialog(self, 'Settings')
 
     def pressedOK(self) -> None:  # noqa: N802
-        """
-        Perform OK operation.
+        """Perform OK operation.
 
         Called when user pushes the OK button.
         Saves the buffer into a variable, and closes the window.

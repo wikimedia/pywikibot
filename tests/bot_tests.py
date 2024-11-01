@@ -40,8 +40,7 @@ class TestBotTreatExit:
     """Mixin to provide handling for treat and exit."""
 
     def _treat(self, pages, post_treat=None):
-        """
-        Get tests which are executed on each treat.
+        """Get tests which are executed on each treat.
 
         It uses pages as an iterator and compares the page given to the page
         returned by pages iterator. It checks that the bot's _site and site
@@ -71,8 +70,7 @@ class TestBotTreatExit:
         return treat
 
     def _treat_page(self, pages=True, post_treat=None):
-        """
-        Adjust to CurrentPageBot signature.
+        """Adjust to CurrentPageBot signature.
 
         It uses almost the same logic as _treat but returns a wrapper function
         which itself calls the function returned by _treat.

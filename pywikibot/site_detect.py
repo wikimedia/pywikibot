@@ -39,8 +39,7 @@ class MWSite:
     """Minimal wiki site class."""
 
     def __init__(self, fromurl, **kwargs) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :raises pywikibot.exceptions.ServerError: a server error occurred
             while loading the site

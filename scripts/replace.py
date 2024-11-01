@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-r"""
-This bot will make direct text replacements.
+r"""This bot will make direct text replacements.
 
 It will retrieve information on which pages might need changes either from
 an XML dump or a text file, or only change a single page.
@@ -325,8 +324,7 @@ class Replacement(ReplacementBase):
 
 class ReplacementList(list):
 
-    """
-    A list of replacements which all share some properties.
+    """A list of replacements which all share some properties.
 
     The shared properties are:
     * use_regex
@@ -412,8 +410,7 @@ class ReplacementListEntry(ReplacementBase):
 
 class XmlDumpReplacePageGenerator:
 
-    """
-    Iterator that will yield Pages that might contain text to replace.
+    """Iterator that will yield Pages that might contain text to replace.
 
     These pages will be retrieved from a local XML dump file.
 
@@ -606,8 +603,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
         return False
 
     def apply_replacements(self, original_text, applied, page=None):
-        """
-        Apply all replacements to the given text.
+        """Apply all replacements to the given text.
 
         :rtype: str, set
         """

@@ -28,6 +28,7 @@ DEFAULT_HEADERS = {'cache-control': 'no-cache',
 
 
 class SparqlQuery(WaitingMixin):
+
     """SPARQL Query class.
 
     This class allows to run SPARQL queries against any SPARQL endpoint.
@@ -42,8 +43,7 @@ class SparqlQuery(WaitingMixin):
                  entity_url: str | None = None, repo=None,
                  max_retries: int | None = None,
                  retry_wait: float | None = None) -> None:
-        """
-        Create endpoint.
+        """Create endpoint.
 
         :param endpoint: SPARQL endpoint URL
         :param entity_url: URL prefix for any entities returned in a query.
@@ -89,8 +89,7 @@ class SparqlQuery(WaitingMixin):
             self.retry_wait = retry_wait
 
     def get_last_response(self):
-        """
-        Return last received response.
+        """Return last received response.
 
         :return: Response object from last request or None
         """
@@ -101,8 +100,7 @@ class SparqlQuery(WaitingMixin):
                full_data: bool = False,
                headers: dict[str, str] | None = None
                ) -> list[dict[str, str]] | None:
-        """
-        Run SPARQL query and return the result.
+        """Run SPARQL query and return the result.
 
         The response is assumed to be in format defined by:
         https://www.w3.org/TR/2013/REC-sparql11-results-json-20130321/
@@ -184,8 +182,7 @@ class SparqlQuery(WaitingMixin):
 
     def ask(self, query: str,
             headers: dict[str, str] | None = None) -> bool:
-        """
-        Run SPARQL ASK query and return boolean result.
+        """Run SPARQL ASK query and return boolean result.
 
         :param query: Query text
         """
@@ -195,8 +192,7 @@ class SparqlQuery(WaitingMixin):
         return data['boolean']
 
     def get_items(self, query, item_name: str = 'item', result_type=set):
-        """
-        Retrieve items which satisfy given query.
+        """Retrieve items which satisfy given query.
 
         Items are returned as Wikibase IDs.
 
@@ -216,6 +212,7 @@ class SparqlQuery(WaitingMixin):
 
 
 class SparqlNode:
+
     """Base class for SPARQL nodes."""
 
     def __init__(self, value) -> None:
@@ -227,6 +224,7 @@ class SparqlNode:
 
 
 class URI(SparqlNode):
+
     """Representation of URI result type."""
 
     def __init__(self, data: dict, entity_url, **kwargs) -> None:
@@ -235,8 +233,7 @@ class URI(SparqlNode):
         self.entity_url = entity_url
 
     def getID(self):  # noqa: N802
-        """
-        Get ID of Wikibase object identified by the URI.
+        """Get ID of Wikibase object identified by the URI.
 
         :return: ID of Wikibase object, e.g. Q1234
         """
@@ -249,6 +246,7 @@ class URI(SparqlNode):
 
 
 class Literal(SparqlNode):
+
     """Representation of RDF literal result type."""
 
     def __init__(self, data: dict, **kwargs) -> None:
@@ -266,6 +264,7 @@ class Literal(SparqlNode):
 
 
 class Bnode(SparqlNode):
+
     """Representation of blank node."""
 
     def __init__(self, data: dict, **kwargs) -> None:

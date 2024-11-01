@@ -1,5 +1,4 @@
-"""
-Test aspects to allow fine grained control over what tests are executed.
+"""Test aspects to allow fine grained control over what tests are executed.
 
 Several parts of the test infrastructure are implemented as mixins,
 such as API result caching and excessive test durations.
@@ -241,8 +240,7 @@ class TestCaseBase(TestTimerMixin):
 
     def assertAPIError(self, code, info=None, callable_obj=None, *args,
                        regex=None, **kwargs):
-        """
-        Assert that a specific APIError wrapped around :py:obj:`assertRaises`.
+        """Assert that a specific APIError wrapped around :exc:`assertRaises`.
 
         If no callable object is defined and it returns a context manager, that
         context manager will return the underlying context manager used by
@@ -438,8 +436,7 @@ class CheckHostnameMixin(TestCaseBase):
 
     @classmethod
     def setUpClass(cls):
-        """
-        Set up the test class.
+        """Set up the test class.
 
         Prevent tests running if the host is down.
         """
@@ -579,8 +576,7 @@ class RequireLoginMixin(TestCaseBase):
                     f'{cls.__name__}: Not able to login to {site}')
 
     def setUp(self):
-        """
-        Set up the test case.
+        """Set up the test case.
 
         Login to the site if it is not logged in.
         """
@@ -892,8 +888,7 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
 
     @classmethod
     def setUpClass(cls):
-        """
-        Set up the test class.
+        """Set up the test class.
 
         Prefetch the Site object for each of the sites the test
         class has declared are needed.
@@ -1058,8 +1053,7 @@ class PatchingTestCase(TestCase):
         return add_patch
 
     def patch(self, obj, attr_name, replacement):
-        """
-        Patch the obj's attribute with the replacement.
+        """Patch the obj's attribute with the replacement.
 
         It will be reset after each ``tearDown``.
         """
@@ -1105,8 +1099,7 @@ class DefaultSiteTestCase(TestCase):
 
     @classmethod
     def override_default_site(cls, site):
-        """
-        Override the default site.
+        """Override the default site.
 
         :param site: site tests should use
         :type site: BaseSite
@@ -1200,8 +1193,7 @@ class WikibaseTestCase(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        """
-        Set up the test class.
+        """Set up the test class.
 
         Checks that all sites are configured with a Wikibase repository,
         with Site.has_data_repository() returning True, and all sites
@@ -1249,8 +1241,7 @@ class WikibaseClientTestCase(WikibaseTestCase):
 
     @classmethod
     def setUpClass(cls):
-        """
-        Set up the test class.
+        """Set up the test class.
 
         Checks that all sites are configured as a Wikibase client,
         with Site.has_data_repository returning True.
@@ -1285,8 +1276,7 @@ class DefaultWikidataClientTestCase(DefaultWikibaseClientTestCase):
 
     @classmethod
     def setUpClass(cls):
-        """
-        Set up the test class.
+        """Set up the test class.
 
         Require the data repository is wikidata.org.
         """
@@ -1446,8 +1436,7 @@ class DeprecationTestCase(TestCase):
         return msg
 
     def assertDeprecationParts(self, deprecated=None, instead=None):
-        """
-        Assert that a deprecation warning happened.
+        """Assert that a deprecation warning happened.
 
         To simplify deprecation tests it just requires the to separated parts
         and forwards the result to :py:obj:`assertDeprecation`.
@@ -1465,8 +1454,7 @@ class DeprecationTestCase(TestCase):
         self.assertDeprecation(self._build_message(deprecated, instead))
 
     def assertDeprecation(self, msg=None):
-        """
-        Assert that a deprecation warning happened.
+        """Assert that a deprecation warning happened.
 
         :param msg: Either the specific message or None to allow any generic
             message. When set to ``INSTEAD`` it only counts those supplying an
@@ -1497,8 +1485,7 @@ class DeprecationTestCase(TestCase):
 
     def assertOneDeprecationParts(self, deprecated=None, instead=None,
                                   count=1):
-        """
-        Assert that exactly one deprecation message happened and reset.
+        """Assert that exactly one deprecation message happened and reset.
 
         It uses the same arguments as :py:obj:`assertDeprecationParts`.
         """
@@ -1564,8 +1551,7 @@ class DeprecationTestCase(TestCase):
 
 class HttpbinTestCase(TestCase):
 
-    """
-    Custom test case class, which allows dry httpbin tests with pytest-httpbin.
+    """Custom test case class, which allows dry httpbin tests.
 
     Test cases, which use httpbin, need to inherit this class.
     """

@@ -22,6 +22,7 @@ __all__ = (
 
 
 class RLock:
+
     """Context manager which implements extended reentrant lock objects.
 
     This RLock is implicit derived from threading.RLock but provides a

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Correct all redirect links in featured pages or only one page of each wiki.
+"""Correct all redirect links in featured pages or only one page of each wiki.
 
 Can be used with:
 
@@ -200,8 +199,7 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, AutomaticTWSummaryBot):
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

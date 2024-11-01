@@ -175,8 +175,7 @@ class TestWikibaseCoordinate(WbRepresentationTestCase):
 
 class TestWikibaseCoordinateNonDry(WbRepresentationTestCase):
 
-    """
-    Test Wikibase Coordinate data type (non-dry).
+    """Test Wikibase Coordinate data type (non-dry).
 
     These can be moved to TestWikibaseCoordinate once DrySite has been bumped
     to the appropriate version.
@@ -779,8 +778,7 @@ class TestWbQuantity(WbRepresentationTestCase):
 
 class TestWbQuantityNonDry(WbRepresentationTestCase):
 
-    """
-    Test Wikibase WbQuantity data type (non-dry).
+    """Test Wikibase WbQuantity data type (non-dry).
 
     These can be moved to TestWbQuantity once DrySite has been bumped to
     the appropriate version.
@@ -944,6 +942,7 @@ class TestWbMonolingualText(WbRepresentationTestCase):
 
 
 class TestWikibaseParser(WikidataTestCase):
+
     """Test passing various datatypes to wikibase parser."""
 
     def test_wbparse_strings(self):
@@ -992,8 +991,7 @@ class TestWikibaseParser(WikidataTestCase):
 
 class TestWbGeoShapeNonDry(WbRepresentationTestCase):
 
-    """
-    Test Wikibase WbGeoShape data type (non-dry).
+    """Test Wikibase WbGeoShape data type (non-dry).
 
     These require non dry tests due to the page.exists() call.
     """
@@ -1068,8 +1066,7 @@ class TestWbGeoShapeNonDry(WbRepresentationTestCase):
 
 class TestWbTabularDataNonDry(WbRepresentationTestCase):
 
-    """
-    Test Wikibase WbTabularData data type (non-dry).
+    """Test Wikibase WbTabularData data type (non-dry).
 
     These require non dry tests due to the page.exists() call.
     """
@@ -1220,8 +1217,7 @@ class TestItemPageExtensibility(TestCase):
 
 class TestItemLoad(WikidataTestCase):
 
-    """
-    Test item creation.
+    """Test item creation.
 
     Tests for item creation include:
     1. by Q id
@@ -1307,8 +1303,7 @@ class TestItemLoad(WikidataTestCase):
         self.assertEqual(item.title(), 'Q60')
 
     def test_reuse_item_set_id(self):
-        """
-        Test modifying item.id attribute.
+        """Test modifying item.id attribute.
 
         Some scripts are using item.id = 'Q60' semantics, which does work
         but modifying item.id does not currently work, and this test
@@ -1334,8 +1329,7 @@ class TestItemLoad(WikidataTestCase):
         # self.assertTrue(item.labels['en'].lower().endswith('main page'))
 
     def test_empty_item(self):
-        """
-        Test empty wikibase item.
+        """Test empty wikibase item.
 
         should not raise an error as the constructor only requires
         the site parameter, with the title parameter defaulted to None.
@@ -1365,8 +1359,7 @@ class TestItemLoad(WikidataTestCase):
             ItemPage(wikidata, '')
 
     def test_item_untrimmed_title(self):
-        """
-        Test intrimmed titles of wikibase items.
+        """Test intrimmed titles of wikibase items.
 
         Spaces in the title should not cause an error.
         """
@@ -1540,8 +1533,7 @@ class TestItemLoad(WikidataTestCase):
                     ItemPage.fromPage(page)
 
     def test_fromPage_redirect(self):
-        """
-        Test item from redirect page.
+        """Test item from redirect page.
 
         A redirect should not have a wikidata item.
         """
@@ -1549,8 +1541,7 @@ class TestItemLoad(WikidataTestCase):
         self._test_fromPage_noitem(link)
 
     def test_fromPage_missing(self):
-        """
-        Test item from deleted page.
+        """Test item from deleted page.
 
         A deleted page should not have a wikidata item.
         """
@@ -1558,8 +1549,7 @@ class TestItemLoad(WikidataTestCase):
         self._test_fromPage_noitem(link)
 
     def test_fromPage_noitem(self):
-        """
-        Test item from new page.
+        """Test item from new page.
 
         A new created page should not have a wikidata item yet.
         """
@@ -1754,8 +1744,7 @@ class TestClaim(WikidataTestCase):
     """Test Claim object functionality."""
 
     def test_claim_eq_simple(self):
-        """
-        Test comparing two claims.
+        """Test comparing two claims.
 
         If they have the same property and value, they are equal.
         """
@@ -1768,8 +1757,7 @@ class TestClaim(WikidataTestCase):
         self.assertEqual(claim2, claim1)
 
     def test_claim_eq_simple_different_value(self):
-        """
-        Test comparing two claims.
+        """Test comparing two claims.
 
         If they have the same property and different values,
         they are not equal.
@@ -1783,8 +1771,7 @@ class TestClaim(WikidataTestCase):
         self.assertNotEqual(claim2, claim1)
 
     def test_claim_eq_simple_different_rank(self):
-        """
-        Test comparing two claims.
+        """Test comparing two claims.
 
         If they have the same property and value and different ranks,
         they are equal.
@@ -1799,8 +1786,7 @@ class TestClaim(WikidataTestCase):
         self.assertEqual(claim2, claim1)
 
     def test_claim_eq_simple_different_snaktype(self):
-        """
-        Test comparing two claims.
+        """Test comparing two claims.
 
         If they have the same property and different snaktypes,
         they are not equal.
@@ -1814,8 +1800,7 @@ class TestClaim(WikidataTestCase):
         self.assertNotEqual(claim2, claim1)
 
     def test_claim_eq_simple_different_property(self):
-        """
-        Test comparing two claims.
+        """Test comparing two claims.
 
         If they have the same value and different properties,
         they are not equal.
@@ -1829,8 +1814,7 @@ class TestClaim(WikidataTestCase):
         self.assertNotEqual(claim2, claim1)
 
     def test_claim_eq_with_qualifiers(self):
-        """
-        Test comparing two claims.
+        """Test comparing two claims.
 
         If they have the same property, value and qualifiers, they are equal.
         """
@@ -1849,8 +1833,7 @@ class TestClaim(WikidataTestCase):
         self.assertEqual(claim2, claim1)
 
     def test_claim_eq_with_different_qualifiers(self):
-        """
-        Test comparing two claims.
+        """Test comparing two claims.
 
         If they have the same property and value and different qualifiers,
         they are not equal.
@@ -1870,8 +1853,7 @@ class TestClaim(WikidataTestCase):
         self.assertNotEqual(claim2, claim1)
 
     def test_claim_eq_one_without_qualifiers(self):
-        """
-        Test comparing two claims.
+        """Test comparing two claims.
 
         If they have the same property and value and one of them has
         no qualifiers while the other one does, they are not equal.
@@ -1888,8 +1870,7 @@ class TestClaim(WikidataTestCase):
         self.assertNotEqual(claim2, claim1)
 
     def test_claim_eq_with_different_sources(self):
-        """
-        Test comparing two claims.
+        """Test comparing two claims.
 
         If they have the same property and value and different sources,
         they are equal.
@@ -1909,8 +1890,7 @@ class TestClaim(WikidataTestCase):
         self.assertEqual(claim2, claim1)
 
     def test_claim_copy_is_equal(self):
-        """
-        Test making a copy of a claim.
+        """Test making a copy of a claim.
 
         The copy of a claim should be always equal to the claim.
         """
@@ -1927,8 +1907,7 @@ class TestClaim(WikidataTestCase):
         self.assertEqual(claim, copy)
 
     def test_claim_copy_is_equal_qualifier(self):
-        """
-        Test making a copy of a claim.
+        """Test making a copy of a claim.
 
         The copy of a qualifier should be always equal to the qualifier.
         """
@@ -1941,8 +1920,7 @@ class TestClaim(WikidataTestCase):
         self.assertTrue(copy.isQualifier)
 
     def test_claim_copy_is_equal_source(self):
-        """
-        Test making a copy of a claim.
+        """Test making a copy of a claim.
 
         The copy of a source should be always equal to the source.
         """
@@ -2204,8 +2182,7 @@ class TestNamespaces(WikidataTestCase):
     """Test cases to test namespaces of Wikibase entities."""
 
     def test_empty_wikibase_page(self):
-        """
-        Test empty wikibase page.
+        """Test empty wikibase page.
 
         As a base class it should be able to instantiate
         it with minimal arguments

@@ -1,5 +1,4 @@
-"""
-Objects representing various types of Wikibase pages and structures.
+"""Objects representing various types of Wikibase pages and structures.
 
 This module also includes objects:
 
@@ -78,8 +77,7 @@ if TYPE_CHECKING:
 
 class WikibaseEntity:
 
-    """
-    The base interface for Wikibase entities.
+    """The base interface for Wikibase entities.
 
     Each entity is identified by a data repository it belongs to
     and an identifier.
@@ -100,8 +98,7 @@ class WikibaseEntity:
     DATA_ATTRIBUTES: dict[str, Any] = {}
 
     def __init__(self, repo, id_: str | None = None) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param repo: Entity repository.
         :type repo: DataSite
@@ -122,8 +119,7 @@ class WikibaseEntity:
 
     @classmethod
     def is_valid_id(cls, entity_id: str) -> bool:
-        """
-        Whether the string can be a valid id of the entity type.
+        """Whether the string can be a valid id of the entity type.
 
         :param entity_id: The ID to test.
         """
@@ -147,8 +143,7 @@ class WikibaseEntity:
             setattr(self, key, cls.new_empty(self.repo))
 
     def _defined_by(self, singular: bool = False) -> dict[str, str]:
-        """
-        Internal function to provide the API parameters to identify the entity.
+        """Function to provide the API parameters to identify the entity.
 
         An empty dict is returned if the entity has not been created yet.
 
@@ -165,8 +160,7 @@ class WikibaseEntity:
         return params
 
     def getID(self, numeric: bool = False) -> int | str:
-        """
-        Get the identifier of this entity.
+        """Get the identifier of this entity.
 
         :param numeric: Strip the first letter and return an int
         """
@@ -175,16 +169,14 @@ class WikibaseEntity:
         return self.id
 
     def get_data_for_new_entity(self) -> dict:
-        """
-        Return data required for creation of a new entity.
+        """Return data required for creation of a new entity.
 
         Override it if you need.
         """
         return {}
 
     def toJSON(self, diffto: dict | None = None) -> dict:
-        """
-        Create JSON suitable for Wikibase API.
+        """Create JSON suitable for Wikibase API.
 
         When diffto is provided, JSON representing differences
         to the provided data is created.
@@ -206,8 +198,7 @@ class WikibaseEntity:
 
     @classmethod
     def _normalizeData(cls, data: dict) -> dict:
-        """
-        Helper function to expand data into the Wikibase API structure.
+        """Helper function to expand data into the Wikibase API structure.
 
         :param data: The dict to normalize
         :return: The dict with normalized data
@@ -220,8 +211,7 @@ class WikibaseEntity:
 
     @property
     def latest_revision_id(self) -> int | None:
-        """
-        Get the revision identifier for the most recent revision of the entity.
+        """Get the revision id for the most recent revision of the entity.
 
         :rtype: int or None if it cannot be determined
         :raise NoWikibaseEntityError: if the entity doesn't exist
@@ -252,8 +242,7 @@ class WikibaseEntity:
         return 'missing' not in self._content
 
     def get(self, force: bool = False) -> dict:
-        """
-        Fetch all entity data and cache it.
+        """Fetch all entity data and cache it.
 
         :param force: override caching
         :raise NoWikibaseEntityError: if this entity doesn't exist
@@ -360,8 +349,7 @@ class WikibaseEntity:
                                 target_ref.hash = ref_stat['hash']
 
     def concept_uri(self) -> str:
-        """
-        Return the full concept URI.
+        """Return the full concept URI.
 
         :raise NoWikibaseEntityError: if this entity's id is not known
         """
@@ -408,8 +396,7 @@ class MediaInfo(WikibaseEntity):
         self.id = 'M' + str(self.file.pageid)
 
     def _defined_by(self, singular: bool = False) -> dict:
-        """
-        Internal function to provide the API parameters to identify the entity.
+        """Function to provide the API parameters to identify the entity.
 
         .. versionadded:: 8.5
 
@@ -591,8 +578,7 @@ class MediaInfo(WikibaseEntity):
 
 class WikibasePage(BasePage, WikibaseEntity):
 
-    """
-    Mixin base class for Wikibase entities which are also pages (eg. items).
+    """Mixin base class for Wikibase entities which are also pages (eg. items).
 
     There should be no need to instantiate this directly.
     """
@@ -600,8 +586,7 @@ class WikibasePage(BasePage, WikibaseEntity):
     _cache_attrs = (*BasePage._cache_attrs, '_content')
 
     def __init__(self, site, title: str = '', **kwargs) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         If title is provided, either ns or entity_type must also be provided,
         and will be checked against the title parsed using the Page
@@ -697,8 +682,7 @@ class WikibasePage(BasePage, WikibaseEntity):
             self._link.title)
 
     def namespace(self) -> int:
-        """
-        Return the number of the namespace of the entity.
+        """Return the number of the namespace of the entity.
 
         :return: Namespace id
         """
@@ -715,8 +699,7 @@ class WikibasePage(BasePage, WikibaseEntity):
         return 'missing' not in self._content
 
     def botMayEdit(self) -> bool:
-        """
-        Return whether bots may edit this page.
+        """Return whether bots may edit this page.
 
         Because there is currently no system to mark a page that it shouldn't
         be edited by bots on Wikibase pages it always returns True. The content
@@ -728,8 +711,7 @@ class WikibasePage(BasePage, WikibaseEntity):
         return True
 
     def get(self, force: bool = False, *args, **kwargs) -> dict:
-        """
-        Fetch all page data, and cache it.
+        """Fetch all page data, and cache it.
 
         :param force: override caching
         :raise NotImplementedError: a value in args or kwargs
@@ -763,8 +745,7 @@ class WikibasePage(BasePage, WikibaseEntity):
 
     @property
     def latest_revision_id(self) -> int:
-        """
-        Get the revision identifier for the most recent revision of the entity.
+        """Get the revision id for the most recent revision of the entity.
 
         :rtype: int
         :raise pywikibot.exceptions.NoPageError: if the entity doesn't exist
@@ -886,8 +867,7 @@ class WikibasePage(BasePage, WikibaseEntity):
         save: bool = True,
         **kwargs
     ):
-        """
-        Set target of a redirect for a Wikibase page.
+        """Set target of a redirect for a Wikibase page.
 
         Has not been implemented in the Wikibase API yet, except for ItemPage.
         """
@@ -895,8 +875,7 @@ class WikibasePage(BasePage, WikibaseEntity):
 
     @allow_asynchronous
     def addClaim(self, claim, bot: bool = True, **kwargs):
-        """
-        Add a claim to the entity.
+        """Add a claim to the entity.
 
         :param claim: The claim to add
         :type claim: pywikibot.page.Claim
@@ -919,8 +898,7 @@ class WikibasePage(BasePage, WikibaseEntity):
         claim.on_item = self
 
     def removeClaims(self, claims, **kwargs) -> None:
-        """
-        Remove the claims from the entity.
+        """Remove the claims from the entity.
 
         :param claims: list of claims to be removed
         :type claims: list or pywikibot.Claim
@@ -960,8 +938,7 @@ class ItemPage(WikibasePage):
     }
 
     def __init__(self, site, title=None, ns=None) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param site: data repository
         :type site: pywikibot.site.DataSite
@@ -989,8 +966,7 @@ class ItemPage(WikibasePage):
         assert self.id == self._link.title
 
     def _defined_by(self, singular: bool = False) -> dict:
-        """
-        Internal function to provide the API parameters to identify the item.
+        """Function to provide the API parameters to identify the item.
 
         The API parameters may be 'id' if the ItemPage has one,
         or 'site'&'title' if instantiated via ItemPage.fromPage with
@@ -1036,8 +1012,7 @@ class ItemPage(WikibasePage):
         return params
 
     def title(self, **kwargs):
-        """
-        Return ID as title of the ItemPage.
+        """Return ID as title of the ItemPage.
 
         If the ItemPage was lazy-loaded via ItemPage.fromPage, this method
         will fetch the Wikibase item ID for the page, potentially raising
@@ -1070,8 +1045,7 @@ class ItemPage(WikibasePage):
         return super().title(**kwargs)
 
     def getID(self, numeric: bool = False, force: bool = False):
-        """
-        Get the entity identifier.
+        """Get the entity identifier.
 
         :param numeric: Strip the first letter and return an int
         :param force: Force an update of new data
@@ -1082,8 +1056,7 @@ class ItemPage(WikibasePage):
 
     @classmethod
     def fromPage(cls, page, lazy_load: bool = False):
-        """
-        Get the ItemPage for a Page that links to it.
+        """Get the ItemPage for a Page that links to it.
 
         :param page: Page to look for corresponding data item
         :type page: pywikibot.page.Page
@@ -1122,8 +1095,7 @@ class ItemPage(WikibasePage):
 
     @classmethod
     def from_entity_uri(cls, site, uri: str, lazy_load: bool = False):
-        """
-        Get the ItemPage from its entity uri.
+        """Get the ItemPage from its entity uri.
 
         :param site: The Wikibase site for the item.
         :type site: pywikibot.site.DataSite
@@ -1160,8 +1132,7 @@ class ItemPage(WikibasePage):
         *args,
         **kwargs
     ) -> dict[str, Any]:
-        """
-        Fetch all item data, and cache it.
+        """Fetch all item data, and cache it.
 
         :param force: override caching
         :param get_redirect: return the item content, do not follow the
@@ -1211,8 +1182,7 @@ class ItemPage(WikibasePage):
         return self.__class__(target.site, target.title(), target.namespace())
 
     def iterlinks(self, family=None):
-        """
-        Iterate through all the sitelinks.
+        """Iterate through all the sitelinks.
 
         :param family: string/Family object which represents what family of
                        links to iterate
@@ -1269,8 +1239,7 @@ class ItemPage(WikibasePage):
         self.setSitelinks([sitelink], **kwargs)
 
     def removeSitelink(self, site: LANGUAGE_IDENTIFIER, **kwargs) -> None:
-        """
-        Remove a sitelink.
+        """Remove a sitelink.
 
         A site can either be a Site object, or it can be a dbName.
         """
@@ -1278,8 +1247,7 @@ class ItemPage(WikibasePage):
 
     def removeSitelinks(self, sites: list[LANGUAGE_IDENTIFIER], **kwargs
                         ) -> None:
-        """
-        Remove sitelinks.
+        """Remove sitelinks.
 
         Sites should be a list, with values either
         being Site objects, or dbNames.
@@ -1303,8 +1271,7 @@ class ItemPage(WikibasePage):
         self.editEntity(data, **kwargs)
 
     def mergeInto(self, item, **kwargs) -> None:
-        """
-        Merge the item into another item.
+        """Merge the item into another item.
 
         :param item: The item to merge into
         :type item: pywikibot.page.ItemPage
@@ -1370,8 +1337,7 @@ class ItemPage(WikibasePage):
 
 class Property:
 
-    """
-    A Wikibase property.
+    """A Wikibase property.
 
     While every Wikibase property has a Page on the data repository,
     this object is for when the property is used as part of another concept
@@ -1420,8 +1386,7 @@ class Property:
                    }
 
     def __init__(self, site, id: str, datatype: str | None = None) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param site: data repository
         :type site: pywikibot.site.DataSite
@@ -1459,8 +1424,7 @@ class Property:
         return self.repo.get_property_type(self)
 
     def getID(self, numeric: bool = False):
-        """
-        Get the identifier of this property.
+        """Get the identifier of this property.
 
         :param numeric: Strip the first letter and return an int
         """
@@ -1494,8 +1458,7 @@ class PropertyPage(WikibasePage, Property):
     }
 
     def __init__(self, source, title=None, datatype=None) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param source: data repository property is on
         :type source: pywikibot.site.DataSite
@@ -1523,8 +1486,7 @@ class PropertyPage(WikibasePage, Property):
             Property.__init__(self, source, self.id)
 
     def get(self, force: bool = False, *args, **kwargs) -> dict:
-        """
-        Fetch the property entity, and cache it.
+        """Fetch the property entity, and cache it.
 
         :param force: override caching
         :raise NotImplementedError: a value in args or kwargs
@@ -1552,8 +1514,7 @@ class PropertyPage(WikibasePage, Property):
                      **kwargs)
 
     def getID(self, numeric: bool = False):
-        """
-        Get the identifier of this property.
+        """Get the identifier of this property.
 
         :param numeric: Strip the first letter and return an int
         """
@@ -1571,8 +1532,7 @@ Property.types['wikibase-property'] = PropertyPage
 
 class Claim(Property):
 
-    """
-    A Claim on a Wikibase entity.
+    """A Claim on a Wikibase entity.
 
     Claims are standard claims as well as references and qualifiers.
     """
@@ -1614,8 +1574,7 @@ class Claim(Property):
         rank: str = 'normal',
         **kwargs
     ) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         Defined by the "snak" value, supplemented by site + pid
 
@@ -1733,8 +1692,7 @@ class Claim(Property):
         return True
 
     def copy(self):
-        """
-        Create an independent copy of this object.
+        """Create an independent copy of this object.
 
         :rtype: pywikibot.page.Claim
         """
@@ -1806,8 +1764,7 @@ class Claim(Property):
 
     @classmethod
     def referenceFromJSON(cls, site, data) -> dict:
-        """
-        Create a dict of claims from reference JSON returned in the API call.
+        """Create a dict of claims from reference JSON fetched in the API call.
 
         Reference objects are represented a bit differently, and require
         some more handling.
@@ -1830,8 +1787,7 @@ class Claim(Property):
 
     @classmethod
     def qualifierFromJSON(cls, site, data):
-        """
-        Create a Claim for a qualifier from JSON.
+        """Create a Claim for a qualifier from JSON.
 
         Qualifier objects are represented a bit
         differently like references, but I'm not
@@ -1892,8 +1848,7 @@ class Claim(Property):
         return data
 
     def setTarget(self, value):
-        """
-        Set the target value in the local object.
+        """Set the target value in the local object.
 
         :param value: The new target value.
         :type value: object
@@ -1912,8 +1867,7 @@ class Claim(Property):
         snaktype: str = 'value',
         **kwargs
     ) -> None:
-        """
-        Set the target value in the data repository.
+        """Set the target value in the data repository.
 
         :param value: The new target value.
         :type value: object
@@ -1931,8 +1885,7 @@ class Claim(Property):
         self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
 
     def getTarget(self):
-        """
-        Return the target value of this Claim.
+        """Return the target value of this Claim.
 
         None is returned if no target is set
 
@@ -1941,16 +1894,14 @@ class Claim(Property):
         return self.target
 
     def getSnakType(self) -> str:
-        """
-        Return the type of snak.
+        """Return the type of snak.
 
         :return: str ('value', 'somevalue' or 'novalue')
         """
         return self.snaktype
 
     def setSnakType(self, value):
-        """
-        Set the type of snak.
+        """Set the type of snak.
 
         :param value: Type of snak
         :type value: str ('value', 'somevalue', or 'novalue')
@@ -1978,8 +1929,7 @@ class Claim(Property):
         return self.on_item.repo.save_claim(self, **kwargs)
 
     def changeSnakType(self, value=None, **kwargs) -> None:
-        """
-        Save the new snak value.
+        """Save the new snak value.
 
         TODO: Is this function really needed?
         """
@@ -1992,8 +1942,7 @@ class Claim(Property):
         return self.sources
 
     def addSource(self, claim, **kwargs) -> None:
-        """
-        Add the claim as a source.
+        """Add the claim as a source.
 
         :param claim: the claim to add
         :type claim: pywikibot.Claim
@@ -2001,8 +1950,7 @@ class Claim(Property):
         self.addSources([claim], **kwargs)
 
     def addSources(self, claims, **kwargs):
-        """
-        Add the claims as one source.
+        """Add the claims as one source.
 
         :param claims: the claims to add
         :type claims: list of pywikibot.Claim
@@ -2026,8 +1974,7 @@ class Claim(Property):
         self.sources.append(source)
 
     def removeSource(self, source, **kwargs) -> None:
-        """
-        Remove the source. Call removeSources().
+        """Remove the source. Call removeSources().
 
         :param source: the source to remove
         :type source: pywikibot.Claim
@@ -2035,8 +1982,7 @@ class Claim(Property):
         self.removeSources([source], **kwargs)
 
     def removeSources(self, sources, **kwargs) -> None:
-        """
-        Remove the sources.
+        """Remove the sources.
 
         :param sources: the sources to remove
         :type sources: list of pywikibot.Claim
@@ -2071,8 +2017,7 @@ class Claim(Property):
             self.qualifiers[qualifier.getID()] = [qualifier]
 
     def removeQualifier(self, qualifier, **kwargs) -> None:
-        """
-        Remove the qualifier. Call removeQualifiers().
+        """Remove the qualifier. Call removeQualifiers().
 
         :param qualifier: the qualifier to remove
         :type qualifier: pywikibot.page.Claim
@@ -2080,8 +2025,7 @@ class Claim(Property):
         self.removeQualifiers([qualifier], **kwargs)
 
     def removeQualifiers(self, qualifiers, **kwargs) -> None:
-        """
-        Remove the qualifiers.
+        """Remove the qualifiers.
 
         :param qualifiers: the qualifiers to remove
         :type qualifiers: list of pywikibot.Claim
@@ -2095,8 +2039,7 @@ class Claim(Property):
             qualifier.on_item = None
 
     def target_equals(self, value) -> bool:
-        """
-        Check whether the Claim's target is equal to specified value.
+        """Check whether the Claim's target is equal to specified value.
 
         The function checks for:
 
@@ -2137,8 +2080,7 @@ class Claim(Property):
         return self.target == value
 
     def has_qualifier(self, qualifier_id: str, target) -> bool:
-        """
-        Check whether Claim contains specified qualifier.
+        """Check whether Claim contains specified qualifier.
 
         :param qualifier_id: id of the qualifier
         :param target: qualifier target to check presence of
@@ -2177,8 +2119,7 @@ class Claim(Property):
         return value
 
     def _formatDataValue(self) -> dict:
-        """
-        Format the target into the proper JSON datavalue that Wikibase wants.
+        """Format the target into the proper JSON datavalue for Wikibase.
 
         :return: Wikibase API representation with type and value.
         """
@@ -2224,8 +2165,7 @@ class LexemePage(WikibasePage):
     }
 
     def __init__(self, site, title=None) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param site: data repository
         :type site: pywikibot.site.DataSite
@@ -2251,8 +2191,7 @@ class LexemePage(WikibasePage):
         raise NotImplementedError  # TODO
 
     def toJSON(self, diffto: dict | None = None) -> dict:
-        """
-        Create JSON suitable for Wikibase API.
+        """Create JSON suitable for Wikibase API.
 
         When diffto is provided, JSON representing differences
         to the provided data is created.
@@ -2271,8 +2210,7 @@ class LexemePage(WikibasePage):
         return data
 
     def get(self, force=False, get_redirect=False, *args, **kwargs):
-        """
-        Fetch all lexeme data, and cache it.
+        """Fetch all lexeme data, and cache it.
 
         :param force: override caching
         :type force: bool
@@ -2308,8 +2246,7 @@ class LexemePage(WikibasePage):
 
     @classmethod
     def _normalizeData(cls, data: dict) -> dict:
-        """
-        Helper function to expand data into the Wikibase API structure.
+        """Helper function to expand data into the Wikibase API structure.
 
         :param data: The dict to normalize
         :return: the altered dict from parameter data.
@@ -2326,8 +2263,7 @@ class LexemePage(WikibasePage):
 
     @allow_asynchronous
     def add_form(self, form, **kwargs):
-        """
-        Add a form to the lexeme.
+        """Add a form to the lexeme.
 
         :param form: The form to add
         :type form: Form
@@ -2356,8 +2292,7 @@ class LexemePage(WikibasePage):
         self.latest_revision_id = data['lastrevid']
 
     def remove_form(self, form, **kwargs) -> None:
-        """
-        Remove a form from the lexeme.
+        """Remove a form from the lexeme.
 
         :param form: The form to remove
         :type form: pywikibot.LexemeForm
@@ -2371,8 +2306,7 @@ class LexemePage(WikibasePage):
     # todo: senses
 
     def mergeInto(self, lexeme, **kwargs):
-        """
-        Merge the lexeme into another lexeme.
+        """Merge the lexeme into another lexeme.
 
         :param lexeme: The lexeme to merge into
         :type lexeme: LexemePage
@@ -2437,8 +2371,7 @@ class LexemeSubEntity(WikibaseEntity):
 
     @allow_asynchronous
     def addClaim(self, claim, **kwargs):
-        """
-        Add a claim to the form.
+        """Add a claim to the form.
 
         :param claim: The claim to add
         :type claim: Claim
@@ -2458,8 +2391,7 @@ class LexemeSubEntity(WikibaseEntity):
         claim.on_item = self
 
     def removeClaims(self, claims, **kwargs) -> None:
-        """
-        Remove the claims from the form.
+        """Remove the claims from the form.
 
         :param claims: list of claims to be removed
         :type claims: list or pywikibot.Claim
@@ -2511,8 +2443,7 @@ class LexemeForm(LexemeSubEntity):
         return new_data
 
     def get(self, force: bool = False) -> dict:
-        """
-        Fetch all form data, and cache it.
+        """Fetch all form data, and cache it.
 
         :param force: override caching
 
@@ -2532,8 +2463,7 @@ class LexemeForm(LexemeSubEntity):
         return data
 
     def edit_elements(self, data: dict, **kwargs) -> None:
-        """
-        Update form elements.
+        """Update form elements.
 
         :param data: Data to be saved
         """

@@ -280,8 +280,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         return linked_item
 
     def _get_option_with_fallback(self, handler, option) -> Any:
-        """
-        Compare bot's (global) and provided (local) options.
+        """Compare bot's (global) and provided (local) options.
 
         .. seealso:: :class:`OptionHandler`
         """
@@ -510,8 +509,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

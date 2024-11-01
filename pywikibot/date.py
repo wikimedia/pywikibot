@@ -116,8 +116,7 @@ def dh_noConv(value: int, pattern: str, limit: Callable[[int], bool]) -> str:
 
 
 def dh_dayOfMnth(value: int, pattern: str) -> str:
-    """
-    Helper for decoding a single integer value.
+    """Helper for decoding a single integer value.
 
     The single integer should be <=31, no conversion,
     no rounding (used in days of month).
@@ -127,8 +126,7 @@ def dh_dayOfMnth(value: int, pattern: str) -> str:
 
 
 def dh_mnthOfYear(value: int, pattern: str) -> str:
-    """
-    Helper for decoding a single integer value.
+    """Helper for decoding a single integer value.
 
     The value should be >=1000, no conversion,
     no rounding (used in month of the year)
@@ -137,8 +135,7 @@ def dh_mnthOfYear(value: int, pattern: str) -> str:
 
 
 def dh_decAD(value: int, pattern: str) -> str:
-    """
-    Helper for decoding a single integer value.
+    """Helper for decoding a single integer value.
 
     It should be no conversion, round to decimals (used in decades)
     """
@@ -147,8 +144,7 @@ def dh_decAD(value: int, pattern: str) -> str:
 
 
 def dh_decBC(value: int, pattern: str) -> str:
-    """
-    Helper for decoding a single integer value.
+    """Helper for decoding a single integer value.
 
     It should be no conversion, round to decimals (used in decades)
     """
@@ -276,8 +272,7 @@ def _(value: str, ind: int, match: str) -> int:
 
 
 def alwaysTrue(x: Any) -> bool:
-    """
-    Return True, always.
+    """Return True, always.
 
     Used for multiple value selection function to accept all other values.
 
@@ -1963,8 +1958,7 @@ for monthId in range(12):
 
 def getAutoFormat(lang: str, title: str, ignoreFirstLetterCase: bool = True
                   ) -> tuple[str | None, str | None]:
-    """
-    Return first matching formatted date value.
+    """Return first matching formatted date value.
 
     :param lang: language code
     :param title: value to format
@@ -2022,8 +2016,7 @@ def formatYear(lang: str, year: int) -> str:
 
 def apply_month_delta(date: datetime.date, month_delta: int = 1,
                       add_overlap: bool = False) -> datetime.date:
-    """
-    Add or subtract months from the date.
+    """Add or subtract months from the date.
 
     By default if the new month has less days then the day of the date it
     chooses the last day in the new month. For example a date in the March 31st
@@ -2055,8 +2048,7 @@ def apply_month_delta(date: datetime.date, month_delta: int = 1,
 
 
 def get_month_delta(date1: datetime.date, date2: datetime.date) -> int:
-    """
-    Return the difference between two dates in months.
+    """Return the difference between two dates in months.
 
     It does only work on calendars with 12 months per year, and where the
     months are consecutive and non-negative numbers.

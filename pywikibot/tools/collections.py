@@ -148,8 +148,7 @@ class CombinedError(KeyError, IndexError):
 
 class EmptyDefault(str, Mapping):
 
-    """
-    A default for a not existing siteinfo property.
+    """A default for a not existing siteinfo property.
 
     It should be chosen if there is no better default known. It acts like an
     empty collections, so it can be iterated through it safely if treated as a

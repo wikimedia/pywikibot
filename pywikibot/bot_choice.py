@@ -46,8 +46,7 @@ if TYPE_CHECKING:
 
 class Option(ABC):
 
-    """
-    A basic option for input_choice.
+    """A basic option for input_choice.
 
     The following methods need to be implemented:
 
@@ -97,8 +96,7 @@ class Option(ABC):
         return self._stop
 
     def handled(self, value: str) -> Option | None:
-        """
-        Return the Option object that applies to the given value.
+        """Return the Option object that applies to the given value.
 
         If this Option object doesn't know which applies it returns None.
         """
@@ -167,8 +165,7 @@ class StandardOption(Option):
     """An option with a description and shortcut and returning the shortcut."""
 
     def __init__(self, option: str, shortcut: str, **kwargs: Any) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param option: option string
         :param shortcut: Shortcut of the option
@@ -217,8 +214,7 @@ class OutputProxyOption(OutputOption, StandardOption):
 
 class NestedOption(OutputOption, StandardOption):
 
-    """
-    An option containing other options.
+    """An option containing other options.
 
     It will return True in test if this option applies but False if a sub
     option applies while handle returns the sub option.

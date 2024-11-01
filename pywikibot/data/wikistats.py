@@ -20,8 +20,7 @@ _data: dict[str, list[Any]] = {}
 
 class WikiStats:
 
-    """
-    Light wrapper around WikiStats data, caching responses and data.
+    """Light wrapper around WikiStats data, caching responses and data.
 
     The methods accept a Pywikibot family name as the WikiStats table name,
     mapping the names before calling the WikiStats API.
@@ -114,8 +113,7 @@ class WikiStats:
 
     def sorted(self, table: str, key: str,
                reverse: bool | None = None) -> list:
-        """
-        Reverse numerical sort of data.
+        """Reverse numerical sort of data.
 
         :param table: name of table of data
         :param key: data table key

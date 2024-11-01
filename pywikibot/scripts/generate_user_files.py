@@ -114,8 +114,7 @@ def get_site_and_lang(
     default_username: str | None = None,
     force: bool = False
 ) -> tuple[str, str, str]:
-    """
-    Ask the user for the family, site code and username.
+    """Ask the user for the family, site code and username.
 
     :param default_family: The default family which should be chosen.
     :param default_lang: The default site code which should be chosen,
@@ -353,8 +352,7 @@ def create_user_config(
     main_username: str,
     force: bool = False
 ):
-    """
-    Create a user-config.py in base_dir.
+    """Create a user-config.py in base_dir.
 
     Create a user-password.py if necessary.
     """
@@ -497,8 +495,7 @@ def ask_for_dir_change(force) -> tuple[bool, bool]:
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and generate user-config.
+    """Process command line arguments and generate user-config.
 
     If args is an empty list, sys.argv is used.
 

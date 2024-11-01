@@ -84,8 +84,7 @@ def PrefixingPageGenerator(prefix: str,
                            total: int | None = None,
                            content: bool = False
                            ) -> Iterable[pywikibot.page.Page]:
-    """
-    Prefixed Page generator.
+    """Prefixed Page generator.
 
     :param prefix: The prefix of the pages.
     :param namespace: Namespace to retrieve pages from
@@ -125,8 +124,7 @@ def LogeventsPageGenerator(logtype: str | None = None,
                            end: Timestamp | None = None,
                            reverse: bool = False
                            ) -> Generator[pywikibot.page.Page, None, None]:
-    """
-    Generate Pages for specified modes of logevents.
+    """Generate Pages for specified modes of logevents.
 
     :param logtype: Mode of logs to retrieve
     :param user: User of logs retrieved
@@ -176,8 +174,7 @@ def RecentChangesPageGenerator(
                             Iterable[pywikibot.Page]]) = None,
     **kwargs: Any
 ) -> Generator[pywikibot.Page, None, None]:
-    """
-    Generate pages that are in the recent changes list, including duplicates.
+    """Generate recent changes pages, including duplicates.
 
     For keyword parameters refer :meth:`APISite.recentchanges()
     <pywikibot.site._generators.GeneratorsMixin.recentchanges>`.
@@ -414,8 +411,7 @@ def TextIOPageGenerator(source: str | None = None,
 def PagesFromTitlesGenerator(iterable: Iterable[str],
                              site: BaseSite | None = None
                              ) -> Generator[pywikibot.page.Page, None, None]:
-    """
-    Generate pages from the titles (strings) yielded by iterable.
+    """Generate pages from the titles (strings) yielded by iterable.
 
     :param site: Site for generator results.
     """
@@ -480,8 +476,7 @@ def UserContributionsGenerator(username: str,
 def NewimagesPageGenerator(total: int | None = None,
                            site: BaseSite | None = None
                            ) -> Generator[pywikibot.page.Page, None, None]:
-    """
-    New file generator.
+    """New file generator.
 
     :param total: Maximum number of pages to retrieve in total
     :param site: Site for generator results.
@@ -494,8 +489,7 @@ def NewimagesPageGenerator(total: int | None = None,
 
 def WikibaseItemGenerator(gen: Iterable[pywikibot.page.Page]
                           ) -> Generator[pywikibot.page.ItemPage, None, None]:
-    """
-    A wrapper generator used to yield Wikibase items of another generator.
+    """A wrapper generator used to yield Wikibase items of another generator.
 
     :param gen: Generator to wrap.
     :return: Wrapped generator
@@ -516,8 +510,7 @@ def AncientPagesPageGenerator(
     total: int = 100,
     site: BaseSite | None = None
 ) -> Generator[pywikibot.page.Page, None, None]:
-    """
-    Ancient page generator.
+    """Ancient page generator.
 
     :param total: Maximum number of pages to retrieve in total
     :param site: Site for generator results.
@@ -686,8 +679,7 @@ def DeadendPagesPageGenerator(
 def LongPagesPageGenerator(total: int = 100,
                            site: BaseSite | None = None
                            ) -> Generator[pywikibot.page.Page, None, None]:
-    """
-    Long page generator.
+    """Long page generator.
 
     :param total: Maximum number of pages to retrieve in total
     :param site: Site for generator results.
@@ -700,8 +692,7 @@ def LongPagesPageGenerator(total: int = 100,
 def ShortPagesPageGenerator(total: int = 100,
                             site: BaseSite | None = None
                             ) -> Generator[pywikibot.page.Page, None, None]:
-    """
-    Short page generator.
+    """Short page generator.
 
     :param total: Maximum number of pages to retrieve in total
     :param site: Site for generator results.
@@ -785,8 +776,7 @@ def SearchPageGenerator(
 def LiveRCPageGenerator(site: BaseSite | None = None,
                         total: int | None = None
                         ) -> Generator[pywikibot.page.Page, None, None]:
-    """
-    Yield pages from a socket.io RC stream.
+    """Yield pages from a socket.io RC stream.
 
     Generates pages based on the EventStreams Server-Sent-Event (SSE) recent
     changes stream.
@@ -816,6 +806,7 @@ def LiveRCPageGenerator(site: BaseSite | None = None,
 
 
 class GoogleSearchPageGenerator(GeneratorWrapper):
+
     """Page generator using Google search results.
 
     To use this generator, you need to install the package 'google':
@@ -834,8 +825,7 @@ class GoogleSearchPageGenerator(GeneratorWrapper):
 
     def __init__(self, query: str | None = None,
                  site: BaseSite | None = None) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param site: Site for generator results.
         """
@@ -896,8 +886,7 @@ class GoogleSearchPageGenerator(GeneratorWrapper):
 def MySQLPageGenerator(query: str, site: BaseSite | None = None,
                        verbose: bool | None = None
                        ) -> Generator[pywikibot.page.Page, None, None]:
-    """
-    Yield a list of pages based on a MySQL query.
+    """Yield a list of pages based on a MySQL query.
 
     The query should return two columns, page namespace and page title pairs
     from some table. An example query that yields all ns0 pages might look
@@ -1055,6 +1044,7 @@ def SupersetPageGenerator(query: str,
 
 
 class XMLDumpPageGenerator(abc.Iterator):  # type: ignore[type-arg]
+
     """Xml iterator that yields Page objects.
 
     .. versionadded:: 7.2
@@ -1133,8 +1123,7 @@ class XMLDumpOldPageGenerator(XMLDumpPageGenerator):
 def YearPageGenerator(start: int = 1, end: int = 2050,
                       site: BaseSite | None = None
                       ) -> Generator[pywikibot.page.Page, None, None]:
-    """
-    Year page generator.
+    """Year page generator.
 
     :param site: Site for generator results.
     """
@@ -1153,8 +1142,7 @@ def YearPageGenerator(start: int = 1, end: int = 2050,
 def DayPageGenerator(start_month: int = 1, end_month: int = 12,
                      site: BaseSite | None = None, year: int = 2000
                      ) -> Generator[pywikibot.page.Page, None, None]:
-    """
-    Day page generator.
+    """Day page generator.
 
     :param site: Site for generator results.
     :param year: considering leap year.
@@ -1238,8 +1226,7 @@ def WikibaseSearchItemPageGenerator(
     total: int | None = None,
     site: BaseSite | None = None,
 ) -> Generator[pywikibot.page.ItemPage, None, None]:
-    """
-    Generate pages that contain the provided text.
+    """Generate pages that contain the provided text.
 
     :param text: Text to look for.
     :param language: Code of the language to search in. If not specified,
@@ -1259,6 +1246,7 @@ def WikibaseSearchItemPageGenerator(
 
 
 class PetScanPageGenerator(GeneratorWrapper):
+
     """Queries PetScan to generate pages.
 
     .. seealso:: https://petscan.wmflabs.org/
@@ -1275,8 +1263,7 @@ class PetScanPageGenerator(GeneratorWrapper):
         site: BaseSite | None = None,
         extra_options: dict[Any, Any] | None = None
     ) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param categories: List of category names to retrieve pages from
         :param subset_combination: Combination mode.
@@ -1298,8 +1285,7 @@ class PetScanPageGenerator(GeneratorWrapper):
     def buildQuery(self, categories: Sequence[str], subset_combination: bool,
                    namespaces: Iterable[int | pywikibot.site.Namespace] | None,
                    extra_options: dict[Any, Any] | None) -> dict[str, Any]:
-        """
-        Get the querystring options to query PetScan.
+        """Get the querystring options to query PetScan.
 
         :param categories: List of categories (as strings)
         :param subset_combination: Combination mode.
@@ -1370,6 +1356,7 @@ class PetScanPageGenerator(GeneratorWrapper):
 
 
 class PagePilePageGenerator(GeneratorWrapper):
+
     """Queries PagePile to generate pages.
 
     .. seealso:: https://pagepile.toolforge.org/

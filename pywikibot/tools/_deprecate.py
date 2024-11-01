@@ -109,8 +109,7 @@ def get_wrapper_depth(wrapper):
 
 
 def add_full_name(obj):
-    """
-    A decorator to add __full_name__ to the function being decorated.
+    """A decorator to add __full_name__ to the function being decorated.
 
     This should be done for all decorators used in pywikibot, as any
     decorator that does not add __full_name__ will prevent other
@@ -522,8 +521,7 @@ def deprecate_positionals(since: str = ''):
 
 
 def remove_last_args(arg_names):
-    """
-    Decorator to declare all args additionally provided deprecated.
+    """Decorator to declare all args additionally provided deprecated.
 
     All positional arguments appearing after the normal arguments are marked
     deprecated. It marks also all keyword arguments present in arg_names as
@@ -591,8 +589,7 @@ def redirect_func(target, *,
                   class_name: str | None = None,
                   since: str = '',
                   future_warning: bool = True):
-    """
-    Return a function which can be used to redirect to 'target'.
+    """Return a function which can be used to redirect to 'target'.
 
     It also acts like marking that function deprecated and copies all
     parameters.
@@ -675,8 +672,7 @@ class ModuleDeprecationWrapper(types.ModuleType):
                             warning_message: str | None = None,
                             since: str = '',
                             future_warning: bool = True):
-        """
-        Add the name to the local deprecated names dict.
+        """Add the name to the local deprecated names dict.
 
         .. versionchanged:: 7.0
            ``since`` parameter must be a release number, not a timestamp.

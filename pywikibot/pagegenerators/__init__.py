@@ -567,8 +567,7 @@ __doc__ = __doc__.replace('&params;', parameterHelp)
 
 def PageClassGenerator(generator: Iterable[pywikibot.page.Page]
                        ) -> Generator[pywikibot.page.Page, None, None]:
-    """
-    Yield pages from another generator as Page subclass objects.
+    """Yield pages from another generator as Page subclass objects.
 
     The page class type depends on the page namespace.
     Objects may be Category, FilePage, Userpage or Page.
@@ -714,8 +713,7 @@ def PreloadingEntityGenerator(
     generator: Iterable[pywikibot.page.WikibaseEntity],
     groupsize: int = 50,
 ) -> Generator[pywikibot.page.WikibaseEntity, None, None]:
-    """
-    Yield preloaded pages taken from another generator.
+    """Yield preloaded pages taken from another generator.
 
     Function basically is copied from above, but for Wikibase entities.
 

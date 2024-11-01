@@ -1,5 +1,4 @@
-"""
-Platform independent terminal interface module.
+"""Platform independent terminal interface module.
 
 It imports the appropriate operating system specific implementation.
 """

@@ -74,8 +74,7 @@ class FilePage(Page):
             )
 
     def _load_file_revisions(self, imageinfo) -> None:
-        """
-        Store an Image revision of FilePage (a FileInfo object) in local cache.
+        """Save a file revision of FilePage (a FileInfo object) in local cache.
 
         Metadata shall be added lazily to the revision already present
         in cache.
@@ -97,8 +96,7 @@ class FilePage(Page):
 
     @property
     def latest_file_info(self):
-        """
-        Retrieve and store information of latest Image rev. of FilePage.
+        """Retrieve and store information of latest Image rev. of FilePage.
 
         At the same time, the whole history of Image is fetched and cached in
         self._file_revisions
@@ -112,8 +110,7 @@ class FilePage(Page):
 
     @property
     def oldest_file_info(self):
-        """
-        Retrieve and store information of oldest Image rev. of FilePage.
+        """Retrieve and store information of oldest Image rev. of FilePage.
 
         At the same time, the whole history of Image is fetched and cached in
         self._file_revisions
@@ -126,8 +123,7 @@ class FilePage(Page):
         return self._file_revisions[oldest_ts]
 
     def get_file_info(self, ts) -> dict:
-        """
-        Retrieve and store information of a specific Image rev. of FilePage.
+        """Retrieve and store information of a specific Image rev. of FilePage.
 
         This function will load also metadata.
         It is also used as a helper in FileInfo to load metadata lazily.
@@ -142,8 +138,7 @@ class FilePage(Page):
         return self._file_revisions[ts]
 
     def get_file_history(self) -> dict:
-        """
-        Return the file's version history.
+        """Return the file's version history.
 
         :return: dictionary with:
             key: timestamp of the entry
@@ -285,8 +280,7 @@ class FilePage(Page):
         return bool(list(self.using_pages(total=1)))
 
     def upload(self, source: str, **kwargs) -> bool:
-        """
-        Upload this file to the wiki.
+        """Upload this file to the wiki.
 
         keyword arguments are from site.upload() method.
 
@@ -425,8 +419,7 @@ class FilePage(Page):
         return False
 
     def globalusage(self, total=None):
-        """
-        Iterate all global usage for this page.
+        """Iterate all global usage for this page.
 
         .. seealso:: :meth:`using_pages`
 
@@ -438,8 +431,7 @@ class FilePage(Page):
         return self.site.globalusage(self, total=total)
 
     def data_item(self):
-        """
-        Convenience function to get the associated Wikibase item of the file.
+        """Function to get the associated Wikibase item of the file.
 
         If WikibaseMediaInfo extension is available (e.g., on Commons),
         the method returns the associated mediainfo entity. Otherwise,
@@ -460,8 +452,7 @@ class FilePage(Page):
 
 class FileInfo:
 
-    """
-    A structure holding imageinfo of latest rev. of FilePage.
+    """A structure holding imageinfo of latest rev. of FilePage.
 
     All keys of API imageinfo dictionary are mapped to FileInfo attributes.
     Attributes can be retrieved both as self['key'] or self.key.

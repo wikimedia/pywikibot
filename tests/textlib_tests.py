@@ -189,8 +189,7 @@ class TestAddText(DefaultDrySiteTestCase):
 
 class TestCategoryRearrangement(DefaultDrySiteTestCase):
 
-    """
-    Ensure that sorting keys are not being lost.
+    """Ensure that sorting keys are not being lost.
 
     Tests .getCategoryLinks() and .replaceCategoryLinks(),
     with both a newline and an empty string as separators.
@@ -966,6 +965,7 @@ class TestReplaceLinks(TestCase):
 
 
 class TestReplaceLinksNonDry(TestCase):
+
     """Test the replace_links function in textlib non-dry."""
 
     family = 'wikipedia'

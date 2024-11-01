@@ -18,6 +18,7 @@ class RemovedSite(BaseSite):
 
 
 class ClosedSite(APISite):
+
     """Site closed to read-only mode."""
 
     def _closed_error(self, notice: str = '') -> None:

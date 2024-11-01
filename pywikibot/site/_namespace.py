@@ -71,8 +71,7 @@ class MetaNamespace(ABCMeta):
 
 class Namespace(Iterable, ComparableMixin, metaclass=MetaNamespace):
 
-    """
-    Namespace site data object.
+    """Namespace site data object.
 
     This is backwards compatible with the structure of entries
     in site._namespaces which were a list of::
@@ -303,8 +302,7 @@ class Namespace(Iterable, ComparableMixin, metaclass=MetaNamespace):
 
     @staticmethod
     def normalize_name(name):
-        """
-        Remove an optional colon before and after name.
+        """Remove an optional colon before and after name.
 
         TODO: reject illegal characters.
         """
@@ -329,8 +327,7 @@ class Namespace(Iterable, ComparableMixin, metaclass=MetaNamespace):
 
 class NamespacesDict(Mapping):
 
-    """
-    An immutable dictionary containing the Namespace instances.
+    """An immutable dictionary containing the Namespace instances.
 
     It adds a deprecation message when called as the 'namespaces' property of
     APISite was callable.
@@ -350,8 +347,7 @@ class NamespacesDict(Mapping):
         return iter(self._namespaces)
 
     def __getitem__(self, key: Namespace | int | str) -> Namespace:
-        """
-        Get the namespace with the given key.
+        """Get the namespace with the given key.
 
         :param key: namespace key
         """
@@ -369,8 +365,7 @@ class NamespacesDict(Mapping):
         return super().__getitem__(key)
 
     def __getattr__(self, attr: Namespace | int | str) -> Namespace:
-        """
-        Get the namespace with the given key.
+        """Get the namespace with the given key.
 
         :param attr: namespace key
         """
@@ -390,8 +385,7 @@ class NamespacesDict(Mapping):
         return len(self._namespaces)
 
     def lookup_name(self, name: str) -> Namespace | None:
-        """
-        Find the Namespace for a name also checking aliases.
+        """Find the Namespace for a name also checking aliases.
 
         :param name: Name of the namespace.
         """
@@ -401,8 +395,7 @@ class NamespacesDict(Mapping):
         return self.lookup_normalized_name(name.lower())
 
     def lookup_normalized_name(self, name: str) -> Namespace | None:
-        """
-        Find the Namespace for a name also checking aliases.
+        """Find the Namespace for a name also checking aliases.
 
         The name has to be normalized and must be lower case.
 
@@ -411,8 +404,7 @@ class NamespacesDict(Mapping):
         return self._namespace_names.get(name)
 
     def resolve(self, identifiers) -> list[Namespace]:
-        """
-        Resolve namespace identifiers to obtain Namespace objects.
+        """Resolve namespace identifiers to obtain Namespace objects.
 
         Identifiers may be any value for which int() produces a valid
         namespace id, except bool, or any string which Namespace.lookup_name

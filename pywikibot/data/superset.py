@@ -23,6 +23,7 @@ if TYPE_CHECKING:
 
 
 class SupersetQuery(WaitingMixin):
+
     """Superset Query class.
 
     This class allows to run SQL queries against wikimedia superset

@@ -23,8 +23,7 @@ except ImportError as e:
 
 class GraphSavingThread(threading.Thread):
 
-    """
-    Threaded graph renderer.
+    """Threaded graph renderer.
 
     Rendering a graph can take extremely long. We use
     multithreading because of that.
@@ -176,8 +175,7 @@ class GraphDrawer:
         thread.start()
 
     def createGraph(self) -> None:
-        """
-        Create graph of the interwiki links.
+        """Create graph of the interwiki links.
 
         For more info see https://meta.wikimedia.org/wiki/Interwiki_graphs
         """
@@ -202,8 +200,7 @@ class GraphDrawer:
 
 def getFilename(page: pywikibot.page.Page,
                 extension: str | None = None) -> str:
-    """
-    Create a filename that is unique for the page.
+    """Create a filename that is unique for the page.
 
     :param page: page used to create the new filename
     :param extension: file extension

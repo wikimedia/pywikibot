@@ -112,8 +112,7 @@ TIMESTAMP_GAP_LIMIT = 10
 
 
 def to_local_digits(phrase: str | int, lang: str) -> str:
-    """
-    Change Latin digits based on language to localized version.
+    """Change Latin digits based on language to localized version.
 
     Be aware that this function only works for several languages, and that it
     returns an unchanged string if an unsupported language is given.
@@ -380,8 +379,7 @@ def replaceExcept(text: str,
                   marker: str = '',
                   site: pywikibot.site.BaseSite | None = None,
                   count: int = 0) -> str:
-    """
-    Return text with *old* replaced by *new*, ignoring specified types of text.
+    """Return text with *old* replaced by *new*, ignoring specified text types.
 
     Skip occurrences of *old* within *exceptions*; e.g. within nowiki
     tags or HTML comments. If *caseInsensitive* is true, then use case
@@ -500,8 +498,7 @@ def removeDisabledParts(text: str,
                         include: Container | None = None,
                         site: pywikibot.site.BaseSite | None = None
                         ) -> str:
-    """
-    Return text without portions where wiki markup is disabled.
+    """Return text without portions where wiki markup is disabled.
 
     Parts that will be removed by default are:
 
@@ -619,8 +616,7 @@ class _GetDataHTML(HTMLParser):
 
 
 def isDisabled(text: str, index: int, tags=None) -> bool:
-    """
-    Return True if text[index] is disabled, e.g. by a comment or nowiki tags.
+    """Return True if text[index] is disabled, e.g. by a comment or nowiki tag.
 
     For the tags parameter, see :py:obj:`removeDisabledParts`.
     """
@@ -643,8 +639,7 @@ def findmarker(text: str, startwith: str = '@@',
 
 
 def expandmarker(text: str, marker: str = '', separator: str = '') -> str:
-    """
-    Return a marker expanded whitespace and the separator.
+    """Return a marker expanded whitespace and the separator.
 
     It searches for the first occurrence of the marker and gets the combination
     of the separator and whitespace directly before it.
@@ -1251,8 +1246,7 @@ def removeLanguageLinks(text: str, site=None, marker: str = '') -> str:
 
 def removeLanguageLinksAndSeparator(text: str, site=None, marker: str = '',
                                     separator: str = '') -> str:
-    """
-    Return text with inter-language links and preceding separators removed.
+    """Return text with inter-language links and preceding separators removed.
 
     If a link to an unknown language is encountered, a warning
     is printed.
@@ -1532,8 +1526,7 @@ def removeCategoryLinks(text: str, site=None, marker: str = '') -> str:
 
 def removeCategoryLinksAndSeparator(text: str, site=None, marker: str = '',
                                     separator: str = '') -> str:
-    """
-    Return text with category links and preceding separators removed.
+    """Return text with category links and preceding separators removed.
 
     :param text: The text that needs to be modified.
     :param site: The site that the text is coming from.
@@ -1556,8 +1549,7 @@ def removeCategoryLinksAndSeparator(text: str, site=None, marker: str = '',
 
 def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None,
                            add_only: bool = False) -> str:
-    """
-    Replace old category with new one and return the modified text.
+    """Replace old category with new one and return the modified text.
 
     :param oldtext: Content of the old category
     :param oldcat: pywikibot.Category object of the old category
@@ -1613,8 +1605,7 @@ def replaceCategoryLinks(oldtext: str,
                          new: Iterable,
                          site: pywikibot.site.BaseSite | None = None,
                          add_only: bool = False) -> str:
-    """
-    Replace all existing category links with new category links.
+    """Replace all existing category links with new category links.
 
     :param oldtext: The text that needs to be replaced.
     :param new: Should be a list of Category objects or strings
@@ -1866,8 +1857,7 @@ def extract_templates_and_params(
 
 
 def extract_templates_and_params_regex_simple(text: str):
-    """
-    Extract top-level templates with params using only a simple regex.
+    """Extract top-level templates with params using only a simple regex.
 
     This function uses only a single regex, and returns
     an entry for each template called at the top-level of the wikitext.
@@ -1922,8 +1912,7 @@ def glue_template_and_params(template_and_params) -> str:
 # --------------------------
 
 def does_text_contain_section(pagetext: str, section: str) -> bool:
-    """
-    Determine whether the page text contains the given section title.
+    """Determine whether the page text contains the given section title.
 
     It does not care whether a section string may contain spaces or
     underlines. Both will match.
@@ -1963,6 +1952,7 @@ TIMEGROUPS = ('time', 'tzinfo', 'year', 'month', 'day', 'hour', 'minute')
 
 
 class TimeStripperPatterns(NamedTuple):
+
     """Hold precompiled timestamp patterns for :class:`TimeStripper`.
 
     Attribute order is important to avoid mismatch when searching.
@@ -2143,8 +2133,7 @@ class TimeStripper:
         m = all_matches[-1]
 
         def marker(m: Match[str]):
-            """
-            Replace exactly the same number of matched characters.
+            """Replace exactly the same number of matched characters.
 
             Same number of chars shall be replaced, in order to be able
             to compare pos for matches reliably (absolute pos of a match
@@ -2186,8 +2175,7 @@ class TimeStripper:
         return not min_pos < time_pos < max_pos
 
     def timestripper(self, line: str) -> pywikibot.Timestamp | None:
-        """
-        Find timestamp in line and convert it to time zone aware datetime.
+        """Find timestamp in line and convert it to time zone aware datetime.
 
         All the following items must be matched, otherwise None is
         returned: -. year, month, hour, time, day, minute, tzinfo

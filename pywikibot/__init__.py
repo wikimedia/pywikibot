@@ -272,8 +272,7 @@ from pywikibot.page import (  # noqa: E402
 def showDiff(oldtext: str,  # noqa: N802
              newtext: str,
              context: int = 0) -> None:
-    """
-    Output a string showing the differences between oldtext and newtext.
+    """Output a string showing the differences between oldtext and newtext.
 
     The differences are highlighted (only on compatible systems) to show which
     changes were made.

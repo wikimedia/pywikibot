@@ -58,6 +58,7 @@ else:
 
 
 class TagAttr:
+
     """Tag attribute of <pages />.
 
     Represent a single attribute. It is used internally in
@@ -164,6 +165,7 @@ class TagAttr:
 
 
 class TagAttrDesc:
+
     """A descriptor tag.
 
     .. versionadded:: 8.0
@@ -192,6 +194,7 @@ class TagAttrDesc:
 
 
 class PagesTagParser(collections.abc.Container):
+
     """Parser for tag ``<pages />``.
 
     .. seealso::
@@ -1091,8 +1094,7 @@ class IndexPage(pywikibot.Page):
         return None
 
     def save(self, *args: Any, **kwargs: Any) -> None:  # See Page.save().
-        """
-        Save page after validating the content.
+        """Save page after validating the content.
 
         Trying to save any other content fails silently with a parameterless
         INDEX_TEMPLATE being saved.

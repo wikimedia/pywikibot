@@ -368,8 +368,7 @@ def set_messages_package(package_name: str) -> None:
 
 
 def messages_available() -> bool:
-    """
-    Return False if there are no i18n messages available.
+    """Return False if there are no i18n messages available.
 
     To determine if messages are available, it looks for the package name
     set using :py:obj:`set_messages_package` for a message bundle called
@@ -438,8 +437,7 @@ def _get_bundle(lang: str, dirname: str) -> dict[str, str]:
 
 
 def _get_translation(lang: str, twtitle: str) -> str | None:
-    """
-    Return message of certain twtitle if exists.
+    """Return message of certain twtitle if exists.
 
     For internal use, don't use it directly.
     """
@@ -515,8 +513,7 @@ def _extract_plural(lang: str, message: str, parameters: Mapping[str, int]
 
 class _PluralMappingAlias(abc.Mapping):
 
-    """
-    Aliasing class to allow non mappings in _extract_plural.
+    """Aliasing class to allow non mappings in _extract_plural.
 
     That function only uses __getitem__ so this is only implemented here.
     """
@@ -699,8 +696,7 @@ def twtranslate(
     only_plural: bool = False,
     bot_prefix: bool = False
 ) -> str | None:
-    r"""
-    Translate a message using JSON files in messages_package_name.
+    r"""Translate a message using JSON files in messages_package_name.
 
     fallback parameter must be True for i18n and False for L10N or testing
     purposes.
@@ -823,8 +819,7 @@ def twtranslate(
 
 
 def twhas_key(source: str | pywikibot.site.BaseSite, twtitle: str) -> bool:
-    """
-    Check if a message has a translation in the specified language code.
+    """Check if a message has a translation in the specified language code.
 
     The translations are retrieved from i18n.<package>, based on the callers
     import table.
@@ -842,8 +837,7 @@ def twhas_key(source: str | pywikibot.site.BaseSite, twtitle: str) -> bool:
 
 
 def twget_keys(twtitle: str) -> list[str]:
-    """
-    Return all language codes for a special message.
+    """Return all language codes for a special message.
 
     :param twtitle: The TranslateWiki string title, in <package>-<key> format
 
@@ -938,8 +932,7 @@ def input(twtitle: str,
           parameters: Mapping[str, int] | None = None,
           password: bool = False,
           fallback_prompt: str | None = None) -> str:
-    """
-    Ask the user a question, return the user's answer.
+    """Ask the user a question, return the user's answer.
 
     The prompt message is retrieved via :py:obj:`twtranslate` and uses the
     config variable 'userinterface_lang'.

@@ -88,6 +88,7 @@ RESPONSE_FALSE = """
 
 
 class Container:
+
     """Simple test container for return values."""
 
     def __init__(self, value):
@@ -100,6 +101,7 @@ class Container:
 
 
 class TestSparql(WikidataTestCase):
+
     """Test SPARQL queries."""
 
     @patch.object(sparql.http, 'fetch')
@@ -184,6 +186,7 @@ class TestSparql(WikidataTestCase):
 
 
 class TestCommonsQueryService(TestCase):
+
     """Test Commons Query Service auth."""
 
     family = 'commons'
@@ -211,9 +214,11 @@ class TestCommonsQueryService(TestCase):
 
 
 class Shared:
+
     """Shared test placeholder."""
 
     class SparqlNodeTests(TestCase):
+
         """Tests encoding issues."""
 
         net = False
@@ -233,6 +238,7 @@ class Shared:
 
 
 class LiteralTests(Shared.SparqlNodeTests):
+
     """Tests for sparql.Literal."""
 
     net = False
@@ -241,6 +247,7 @@ class LiteralTests(Shared.SparqlNodeTests):
 
 
 class BnodeTests(Shared.SparqlNodeTests):
+
     """Tests for sparql.Bnode."""
 
     net = False
@@ -248,6 +255,7 @@ class BnodeTests(Shared.SparqlNodeTests):
 
 
 class URITests(Shared.SparqlNodeTests):
+
     """Tests for sparql.URI."""
 
     net = False

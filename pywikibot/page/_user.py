@@ -26,15 +26,13 @@ __all__ = ('User', )
 
 class User(Page):
 
-    """
-    A class that represents a Wiki user.
+    """A class that represents a Wiki user.
 
     This class also represents the Wiki page User:<username>
     """
 
     def __init__(self, source, title: str = '') -> None:
-        """
-        Initializer for a User object.
+        """Initializer for a User object.
 
         All parameters are the same as for Page() Initializer.
         """
@@ -56,8 +54,7 @@ class User(Page):
 
     @property
     def username(self) -> str:
-        """
-        The username.
+        """The username.
 
         Convenience method that returns the title of the page with
         namespace prefix omitted, which is the username.
@@ -67,8 +64,7 @@ class User(Page):
         return self.title(with_ns=False)
 
     def isRegistered(self, force: bool = False) -> bool:  # noqa: N802
-        """
-        Determine if the user is registered on the site.
+        """Determine if the user is registered on the site.
 
         It is possible to have a page named User:xyz and not have
         a corresponding user with username xyz.
@@ -91,8 +87,7 @@ class User(Page):
         return is_ip_network(self.username)
 
     def getprops(self, force: bool = False) -> dict:
-        """
-        Return a properties about the user.
+        """Return a properties about the user.
 
         :param force: if True, forces reloading the data from API
         """
@@ -109,8 +104,7 @@ class User(Page):
 
     def registration(self,
                      force: bool = False) -> pywikibot.Timestamp | None:
-        """
-        Fetch registration date for this user.
+        """Fetch registration date for this user.
 
         :param force: if True, forces reloading the data from API
         """
@@ -121,8 +115,7 @@ class User(Page):
         return None
 
     def editCount(self, force: bool = False) -> int:  # noqa: N802
-        """
-        Return edit count for a registered user.
+        """Return edit count for a registered user.
 
         Always returns 0 for 'anonymous' users.
 
@@ -162,16 +155,14 @@ class User(Page):
         return self.site.is_locked(self.username, force)
 
     def isEmailable(self, force: bool = False) -> bool:  # noqa: N802
-        """
-        Determine whether emails may be send to this user through MediaWiki.
+        """Determine whether emails may be send to this user through MediaWiki.
 
         :param force: if True, forces reloading the data from API
         """
         return not self.isAnonymous() and 'emailable' in self.getprops(force)
 
     def groups(self, force: bool = False) -> list:
-        """
-        Return a list of groups to which this user belongs.
+        """Return a list of groups to which this user belongs.
 
         The list of groups may be empty.
 
@@ -199,8 +190,7 @@ class User(Page):
         return self.getprops(force).get('rights', [])
 
     def getUserPage(self, subpage: str = '') -> Page:  # noqa: N802
-        """
-        Return a Page object relative to this user's main page.
+        """Return a Page object relative to this user's main page.
 
         :param subpage: subpage part to be appended to the main
                             page title (optional)
@@ -216,8 +206,7 @@ class User(Page):
         return Page(Link(self.title() + subpage, self.site))
 
     def getUserTalkPage(self, subpage: str = '') -> Page:  # noqa: N802
-        """
-        Return a Page object relative to this user's main talk page.
+        """Return a Page object relative to this user's main talk page.
 
         :param subpage: subpage part to be appended to the main
                             talk page title (optional)
@@ -234,8 +223,7 @@ class User(Page):
                          self.site, default_namespace=3))
 
     def send_email(self, subject: str, text: str, ccme: bool = False) -> bool:
-        """
-        Send an email to this user via MediaWiki's email interface.
+        """Send an email to this user via MediaWiki's email interface.
 
         :param subject: the subject header of the mail
         :param text: mail body
@@ -266,8 +254,7 @@ class User(Page):
                 and maildata['emailuser']['result'] == 'Success')
 
     def block(self, *args, **kwargs):
-        """
-        Block user.
+        """Block user.
 
         Refer :py:obj:`APISite.blockuser` method for parameters.
 
@@ -282,8 +269,7 @@ class User(Page):
             raise
 
     def unblock(self, reason: str | None = None) -> None:
-        """
-        Remove the block for the user.
+        """Remove the block for the user.
 
         :param reason: Reason for the unblock.
         """
@@ -424,8 +410,7 @@ class User(Page):
                 yield page, Revision(**contrib)
 
     def uploadedImages(self, total: int = 10):  # noqa: N802
-        """
-        Yield tuples describing files uploaded by this user.
+        """Yield tuples describing files uploaded by this user.
 
         Each tuple is composed of a pywikibot.Page, the timestamp (str in
         ISO8601 format), comment (str) and a bool for pageid > 0.
@@ -443,8 +428,7 @@ class User(Page):
 
     @property
     def is_thankable(self) -> bool:
-        """
-        Determine if the user has thanks notifications enabled.
+        """Determine if the user has thanks notifications enabled.
 
         .. note::
            This doesn't accurately determine if thanks is enabled for user.

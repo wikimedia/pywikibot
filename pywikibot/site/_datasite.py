@@ -50,8 +50,7 @@ class DataSite(APISite):
         }
 
     def get_repo_for_entity_type(self, entity_type: str) -> DataSite:
-        """
-        Get the data repository for the entity type.
+        """Get the data repository for the entity type.
 
         When no foreign repository is defined for the entity type,
         the method returns this repository itself even if it does not
@@ -86,8 +85,7 @@ class DataSite(APISite):
                     break
 
     def get_namespace_for_entity_type(self, entity_type):
-        """
-        Return namespace for given entity type.
+        """Return namespace for given entity type.
 
         :return: corresponding namespace
         :rtype: Namespace
@@ -103,8 +101,7 @@ class DataSite(APISite):
 
     @property
     def item_namespace(self):
-        """
-        Return namespace for items.
+        """Return namespace for items.
 
         :return: item namespace
         :rtype: Namespace
@@ -115,8 +112,7 @@ class DataSite(APISite):
 
     @property
     def property_namespace(self):
-        """
-        Return namespace for properties.
+        """Return namespace for properties.
 
         :return: property namespace
         :rtype: Namespace
@@ -127,8 +123,7 @@ class DataSite(APISite):
         return self._property_namespace
 
     def get_entity_for_entity_id(self, entity_id):
-        """
-        Return a new instance for given entity id.
+        """Return a new instance for given entity id.
 
         :raises pywikibot.exceptions.NoWikibaseEntityError: there is no entity
             with the id
@@ -145,8 +140,7 @@ class DataSite(APISite):
     @property
     @need_version('1.28-wmf.3')
     def sparql_endpoint(self):
-        """
-        Return the sparql endpoint url, if any has been set.
+        """Return the sparql endpoint url, if any has been set.
 
         :return: sparql endpoint url
         :rtype: str|None
@@ -156,8 +150,7 @@ class DataSite(APISite):
     @property
     @need_version('1.28-wmf.23')
     def concept_base_uri(self):
-        """
-        Return the base uri for concepts/entities.
+        """Return the base uri for concepts/entities.
 
         :return: concept base uri
         :rtype: str
@@ -182,8 +175,7 @@ class DataSite(APISite):
         return None
 
     def loadcontent(self, identification, *props):
-        """
-        Fetch the current content of a Wikibase item.
+        """Fetch the current content of a Wikibase item.
 
         This is called loadcontent since
         wbgetentities does not support fetching old
@@ -451,8 +443,7 @@ class DataSite(APISite):
                    summary: str | None = None,
                    bot: bool = True,
                    tags: str | None = None):
-        """
-        Save the whole claim to the wikibase site.
+        """Save the whole claim to the wikibase site.
 
         .. versionchanged:: 9.4
            *tags* parameter was added
@@ -776,8 +767,7 @@ class DataSite(APISite):
     @need_extension('WikibaseLexeme')
     def mergeLexemes(self, from_lexeme, to_lexeme, summary=None, *,
                      bot: bool = True) -> dict:
-        """
-        Merge two lexemes together.
+        """Merge two lexemes together.
 
         :param from_lexeme: Lexeme to merge from
         :type from_lexeme: pywikibot.LexemePage
@@ -802,8 +792,7 @@ class DataSite(APISite):
 
     @need_right('item-redirect')
     def set_redirect_target(self, from_item, to_item, bot: bool = True):
-        """
-        Make a redirect to another item.
+        """Make a redirect to another item.
 
         :param to_item: title of target item.
         :type to_item: pywikibot.ItemPage
@@ -823,8 +812,7 @@ class DataSite(APISite):
 
     def search_entities(self, search: str, language: str,
                         total: int | None = None, **kwargs):
-        """
-        Search for pages or properties that contain the given text.
+        """Search for pages or properties that contain the given text.
 
         :param search: Text to find.
         :param language: Language to search in.
@@ -858,8 +846,7 @@ class DataSite(APISite):
                    options: dict[str, Any] | None = None,
                    language: str | None = None,
                    validate: bool = False) -> list[Any]:
-        """
-        Send data values to the wikibase parser for interpretation.
+        """Send data values to the wikibase parser for interpretation.
 
         .. versionadded:: 7.5
         .. seealso:: `wbparsevalue API
@@ -913,8 +900,7 @@ class DataSite(APISite):
     @need_right('edit')
     def _wbset_action(self, itemdef, action: str, action_data,
                       **kwargs) -> dict:
-        """
-        Execute wbset{action} on a Wikibase entity.
+        """Execute wbset{action} on a Wikibase entity.
 
         Supported actions are:
             wbsetaliases, wbsetdescription, wbsetlabel and wbsetsitelink
@@ -1028,16 +1014,14 @@ class DataSite(APISite):
         return req.submit()
 
     def wbsetaliases(self, itemdef, aliases, **kwargs):
-        """
-        Set aliases for a single Wikibase entity.
+        """Set aliases for a single Wikibase entity.
 
         See self._wbset_action() for parameters
         """
         return self._wbset_action(itemdef, 'wbsetaliases', aliases, **kwargs)
 
     def wbsetdescription(self, itemdef, description, **kwargs):
-        """
-        Set description for a single Wikibase entity.
+        """Set description for a single Wikibase entity.
 
         See self._wbset_action()
         """
@@ -1045,16 +1029,14 @@ class DataSite(APISite):
                                   **kwargs)
 
     def wbsetlabel(self, itemdef, label, **kwargs):
-        """
-        Set label for a single Wikibase entity.
+        """Set label for a single Wikibase entity.
 
         See self._wbset_action() for parameters
         """
         return self._wbset_action(itemdef, 'wbsetlabel', label, **kwargs)
 
     def wbsetsitelink(self, itemdef, sitelink, **kwargs):
-        """
-        Set, remove or modify a sitelink on a Wikibase item.
+        """Set, remove or modify a sitelink on a Wikibase item.
 
         See self._wbset_action() for parameters
         """
@@ -1064,8 +1046,7 @@ class DataSite(APISite):
     @need_extension('WikibaseLexeme')
     def add_form(self, lexeme, form, *, bot: bool = True,
                  baserevid=None) -> dict:
-        """
-        Add a form.
+        """Add a form.
 
         :param lexeme: Lexeme to modify
         :type lexeme: pywikibot.LexemePage
@@ -1091,8 +1072,7 @@ class DataSite(APISite):
     @need_right('edit')
     @need_extension('WikibaseLexeme')
     def remove_form(self, form, *, bot: bool = True, baserevid=None) -> dict:
-        """
-        Remove a form.
+        """Remove a form.
 
         :param form: Form to be removed
         :type form: pywikibot.LexemeForm
@@ -1116,8 +1096,7 @@ class DataSite(APISite):
     @need_extension('WikibaseLexeme')
     def edit_form_elements(self, form, data, *, bot: bool = True,
                            baserevid=None) -> dict:
-        """
-        Edit lexeme form elements.
+        """Edit lexeme form elements.
 
         :param form: Form
         :type form: pywikibot.LexemeForm

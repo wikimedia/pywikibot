@@ -29,8 +29,7 @@ class SiteDetectionTestCase(TestCase):
     net = True
 
     def assertSite(self, url: str):
-        """
-        Assert a MediaWiki site can be loaded from the url.
+        """Assert a MediaWiki site can be loaded from the url.
 
         :param url: Url of tested site
         :raises AssertionError: Site under url is not MediaWiki powered

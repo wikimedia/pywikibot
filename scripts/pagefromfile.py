@@ -103,8 +103,7 @@ class NoTitleError(Exception):
 
 class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
 
-    """
-    Responsible for writing pages to the wiki.
+    """Responsible for writing pages to the wiki.
 
     Titles and contents are given by a PageFromFileReader.
 
@@ -281,8 +280,7 @@ class PageFromFileReader(OptionHandler, GeneratorWrapper):
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

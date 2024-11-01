@@ -65,8 +65,7 @@ def itergroup(iterable,
 
 
 def islice_with_ellipsis(iterable, *args, marker: str = '…'):
-    """
-    Generator which yields the first n elements of the iterable.
+    """Generator which yields the first n elements of the iterable.
 
     If more elements are available and marker is True, it returns an extra
     string marker as continuation mark.
@@ -216,8 +215,7 @@ def roundrobin_generators(*iterables) -> Generator[Any, None, None]:
 
 
 def filter_unique(iterable, container=None, key=None, add=None):
-    """
-    Yield unique items from an iterable, omitting duplicates.
+    """Yield unique items from an iterable, omitting duplicates.
 
     By default, to provide uniqueness, it puts the generated items into a
     set created as a local variable. It only yields items which are not

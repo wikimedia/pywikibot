@@ -43,8 +43,7 @@ class Hunk:
                  b: str | Sequence[str],
                  grouped_opcode: Sequence[tuple[str, int, int, int, int]]
                  ) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param a: sequence of lines
         :param b: sequence of lines

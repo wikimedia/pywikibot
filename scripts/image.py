@@ -65,8 +65,7 @@ class ImageRobot(ReplaceBot):
 
     def __init__(self, generator, old_image: str,
                  new_image: str = '', **kwargs) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param generator: the pages to work on
         :type generator: iterable
@@ -121,8 +120,7 @@ class ImageRobot(ReplaceBot):
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

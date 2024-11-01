@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-The bot is meant to mark the edits based on info obtained by whitelist.
+"""The bot is meant to mark the edits based on info obtained by whitelist.
 
 This bot obtains a list of recent changes and newpages and marks the
 edits as patrolled based on a whitelist.
@@ -83,8 +82,7 @@ class PatrolBot(BaseBot):
     }
 
     def __init__(self, site=None, **kwargs) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :keyword ask: If True, confirm each patrol action
         :keyword whitelist: page title for whitelist (optional)

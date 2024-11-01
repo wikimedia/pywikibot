@@ -101,8 +101,7 @@ class TextEditor:
 
     def edit(self, text: str, jumpIndex: int | None = None,
              highlight: str | None = None) -> str | None:
-        """
-        Call the editor and thus allows the user to change the text.
+        """Call the editor and thus allows the user to change the text.
 
         Halts the thread's operation until the editor is closed.
 

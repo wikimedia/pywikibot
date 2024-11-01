@@ -17,8 +17,7 @@ def translate(
     removebrackets: bool = False,
     site=None
 ) -> list[pywikibot.Link]:
-    """
-    Return a list of links to pages on other sites based on hints.
+    """Return a list of links to pages on other sites based on hints.
 
     Entries for single page titles list those pages. Page titles for entries
     such as "all:" or "xyz:" or "20:" are first built from the page title of

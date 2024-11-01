@@ -20,8 +20,7 @@ from pywikibot.tools.collections import EMPTY_DEFAULT
 
 class Siteinfo(Container):
 
-    """
-    A 'dictionary' like container for siteinfo.
+    """A 'dictionary' like container for siteinfo.
 
     This class queries the server to get the requested siteinfo property.
     Optionally it can cache this directly in the instance so that later
@@ -90,8 +89,7 @@ class Siteinfo(Container):
                     data[p] = p in data
 
     def _get_siteinfo(self, prop, expiry) -> dict:
-        """
-        Retrieve a siteinfo property.
+        """Retrieve a siteinfo property.
 
         All properties which the site doesn't
         support contain the default value. Because pre-1.12 no data was
@@ -179,8 +177,7 @@ class Siteinfo(Container):
         return cache_date + expire < pywikibot.Timestamp.nowutc()
 
     def _get_general(self, key: str, expiry):
-        """
-        Return a siteinfo property which is loaded by default.
+        """Return a siteinfo property which is loaded by default.
 
         The property 'general' will be queried if it wasn't yet or it's forced.
         Additionally all uncached default properties are queried. This way
@@ -229,8 +226,7 @@ class Siteinfo(Container):
         cache: bool = True,
         expiry: datetime.datetime | float | bool = False
     ) -> Any:
-        """
-        Return a siteinfo property.
+        """Return a siteinfo property.
 
         It will never throw an APIError if it only stated, that the siteinfo
         property doesn't exist. Instead it will use the default value.
@@ -325,8 +321,7 @@ class Siteinfo(Container):
         return None if time is None else bool(time)
 
     def get_requested_time(self, key: str):
-        """
-        Return when 'key' was successfully requested from the server.
+        """Return when 'key' was successfully requested from the server.
 
         If the property is actually in the siprop 'general' it returns the
         last request from the 'general' siprop.

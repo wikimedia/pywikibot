@@ -148,7 +148,7 @@ ignore_missing_imports = true
 
 [tool.ruff.lint]
 select = ["D"]
-ignore = ["D105", "D203", "D211", "D212", "D213", "D214", "D401", "D404", "D406", "D407", "D412", "D413", "D416", "D417"]
+ignore = ["D105", "D211", "D213", "D214", "D401", "D404", "D406", "D407", "D412", "D413", "D416", "D417"]
 
 [tool.ruff.lint.per-file-ignores]
 "pywikibot/families/*" = ["D102"]

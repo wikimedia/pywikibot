@@ -781,8 +781,7 @@ class CheckImagesBot:
     def important_image(
         list_given: list[tuple[float, pywikibot.FilePage]]
     ) -> pywikibot.FilePage:
-        """
-        Get tuples of image and time, return the most used or oldest image.
+        """Get tuples of image and time, return the most used or oldest image.
 
         .. versionchanged:: 7.2
            itertools.zip_longest is used to stop `using_pages` as soon as
@@ -1165,8 +1164,7 @@ class CheckImagesBot:
         return False
 
     def template_in_list(self) -> None:
-        """
-        Check if template is in list.
+        """Check if template is in list.
 
         The problem is the calls to the MediaWiki system because they can be
         pretty slow. While searching in a list of objects is really fast, so
@@ -1184,8 +1182,7 @@ class CheckImagesBot:
                         break
 
     def smart_detection(self) -> tuple[str, bool]:
-        """
-        Detect templates.
+        """Detect templates.
 
         The bot instead of checking if there's a simple template in the
         image's description, checks also if that template is a license or
@@ -1325,8 +1322,7 @@ class CheckImagesBot:
 
     @staticmethod
     def wait(generator, wait_time) -> Generator[pywikibot.FilePage]:
-        """
-        Skip the images uploaded before x seconds.
+        """Skip the images uploaded before x seconds.
 
         Let the users to fix the image's problem alone in the first x seconds.
         """
@@ -1538,8 +1534,7 @@ class CheckImagesBot:
 
 
 def main(*args: str) -> bool:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

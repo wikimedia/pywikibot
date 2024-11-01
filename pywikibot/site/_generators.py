@@ -66,8 +66,7 @@ class GeneratorsMixin:
         self,
         pageids: str | Iterable[int | str],
     ) -> Generator[pywikibot.Page, None, None]:
-        """
-        Return a page generator from pageids.
+        """Return a page generator from pageids.
 
         Pages are iterated in the same order than in the underlying pageids.
 
@@ -387,8 +386,7 @@ class GeneratorsMixin:
         total: int | None = None,
         content: bool = False,
     ) -> Iterable[pywikibot.Page]:
-        """
-        Convenience method combining pagebacklinks and page_embeddedin.
+        """Convenience method combining pagebacklinks and page_embeddedin.
 
         :param namespaces: If present, only return links from the namespaces
             in this list.
@@ -1791,8 +1789,7 @@ class GeneratorsMixin:
         total: int | None = None,
         **kwargs,
     ) -> Generator[dict[str, Any], None, None]:
-        """
-        Yield all deleted revisions.
+        """Yield all deleted revisions.
 
         .. seealso:: :api:`Alldeletedrevisions`
         .. warning:: *user* keyword argument must be given together with

@@ -68,6 +68,7 @@ class CfdActions(DefaultSiteTestCase):
 
 
 class TestPreprocessingCategory(TestCase):
+
     """Test determining template or type categorization target."""
 
     family = 'wikipedia'

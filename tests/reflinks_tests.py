@@ -83,8 +83,7 @@ class TestXMLPageGenerator(TestCase):
 
 class TestReferencesBotConstructor(ScriptMainTestCase):
 
-    """
-    Test reflinks with run() removed.
+    """Test reflinks with run() removed.
 
     These tests can't verify the order of the pages in the XML
     as the constructor is given a preloading generator.

@@ -59,8 +59,7 @@ class TestCreateSeparated(DefaultDrySiteTestCase):
 
 class TestLink(DefaultDrySiteTestCase):
 
-    """
-    Test parsing links with DrySite.
+    """Test parsing links with DrySite.
 
     The DrySite is using the builtin namespaces which behaviour is controlled
     in this repository so namespace aware tests do work, even when the actual

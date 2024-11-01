@@ -139,8 +139,7 @@ class ParamInfo(Sized, Container):
         self._fetch(modules)
 
     def _fetch(self, modules: set | frozenset) -> None:
-        """
-        Fetch paraminfo for multiple modules without initializing beforehand.
+        """Get paraminfo for multiple modules without initializing beforehand.
 
         :param modules: API modules to load and which haven't been loaded yet.
         """

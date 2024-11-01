@@ -1,5 +1,4 @@
-"""
-Basic HTTP access interface.
+"""Basic HTTP access interface.
 
 This module handles communication between the bot and the HTTP threads.
 
@@ -162,8 +161,7 @@ _USER_AGENT_FORMATTER = _UserAgentFormatter()
 
 
 def user_agent_username(username=None):
-    """
-    Reduce username to a representation permitted in HTTP headers.
+    """Reduce username to a representation permitted in HTTP headers.
 
     To achieve that, this function:
     1) replaces spaces (' ') with '_'
@@ -251,8 +249,7 @@ def request(site: pywikibot.site.BaseSite,
             uri: str | None = None,
             headers: dict | None = None,
             **kwargs) -> requests.Response:
-    """
-    Request to Site with default error handling and response decoding.
+    """Request to Site with default error handling and response decoding.
 
     See :py:obj:`requests.Session.request` for additional parameters.
 
@@ -309,8 +306,7 @@ def get_authentication(uri: str) -> tuple[str, str] | None:
 
 
 def error_handling_callback(response):
-    """
-    Raise exceptions and log alerts.
+    """Raise exceptions and log alerts.
 
     :param response: Response returned by Session.request().
     :type response: :py:obj:`requests.Response`
@@ -365,8 +361,7 @@ def error_handling_callback(response):
 def fetch(uri: str, method: str = 'GET', headers: dict | None = None,
           default_error_handling: bool = True,
           use_fake_user_agent: bool | str = False, **kwargs):
-    """
-    HTTP request.
+    """HTTP request.
 
     See :py:obj:`requests.Session.request` for parameters.
 

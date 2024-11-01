@@ -195,8 +195,7 @@ class EventStreams(GeneratorWrapper):
             since=f'?since={self._since}' if self._since else '')
 
     def set_maximum_items(self, value: int) -> None:
-        """
-        Set the maximum number of items to be retrieved from the stream.
+        """Set the maximum number of items to be retrieved from the stream.
 
         If not called, most queries will continue as long as there is
         more data to be retrieved from the stream.

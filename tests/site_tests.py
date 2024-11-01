@@ -294,6 +294,7 @@ class TestSiteObject(DefaultSiteTestCase):
 
 
 class TestLockingPage(DefaultSiteTestCase):
+
     """Test cases for lock/unlock a page within threads."""
 
     cached = True

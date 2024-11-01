@@ -815,8 +815,7 @@ class TestItemClaimFilterPageGenerator(WikidataTestCase):
     """Test item claim filter page generator generator."""
 
     def _simple_claim_test(self, prop, claim, qualifiers, valid, negate=False):
-        """
-        Test given claim on sample (India) page.
+        """Test given claim on sample (India) page.
 
         :param prop: the property to check
         :param claim: the claim the property should contain
@@ -860,8 +859,7 @@ class TestItemClaimFilterPageGenerator(WikidataTestCase):
                                 False)
 
     def test_nonexisting_qualifiers(self):
-        """
-        Test ItemClaimFilterPageGenerator on sample page.
+        """Test ItemClaimFilterPageGenerator on sample page.
 
         The item does not have the searched qualifiers.
         """

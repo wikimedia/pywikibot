@@ -122,8 +122,7 @@ def deprecated_func_docstring_arg(foo=None):
 
 @deprecated
 def deprecated_func_docstring_arg2(foo=None):
-    """
-    DEPRECATED.
+    """DEPRECATED.
 
     :param foo: Foo. DEPRECATED.
     """
@@ -327,7 +326,7 @@ class DeprecatorTestCase(DeprecationTestCase):
         Python 3.13 strips the doc string, see
         https://docs.python.org/3.13/whatsnew/3.13.html#other-language-changes
         """
-        doc = '\n    DEPRECATED.\n\n    :param foo: Foo. DEPRECATED.\n    '
+        doc = 'DEPRECATED.\n\n    :param foo: Foo. DEPRECATED.\n    '
         if PYTHON_VERSION < (3, 13):
             self.assertEqual(deprecated_func_docstring_arg2.__doc__, doc)
         else:

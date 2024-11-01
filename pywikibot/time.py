@@ -318,8 +318,7 @@ class Timestamp(datetime.datetime):
         return cls._from_mw(ts)
 
     def isoformat(self, sep: str = 'T') -> str:  # type: ignore[override]
-        """
-        Convert object to an ISO 8601 timestamp accepted by MediaWiki.
+        """Convert object to an ISO 8601 timestamp accepted by MediaWiki.
 
         datetime.datetime.isoformat does not postfix the ISO formatted date
         with a 'Z' unless a timezone is included, which causes MediaWiki
@@ -332,8 +331,7 @@ class Timestamp(datetime.datetime):
         return self.strftime(self.mediawikiTSFormat)
 
     def posix_timestamp(self) -> float:
-        """
-        Convert object to a POSIX timestamp.
+        """Convert object to a POSIX timestamp.
 
         See Note in datetime.timestamp().
 
@@ -504,8 +502,7 @@ class Timestamp(datetime.datetime):
 
 class TZoneFixedOffset(datetime.tzinfo):
 
-    """
-    Class building tzinfo objects for fixed-offset time zones.
+    """Class building tzinfo objects for fixed-offset time zones.
 
     :param offset: a number indicating fixed offset in minutes east from UTC
     :param name: a string with name of the timezone
@@ -541,8 +538,7 @@ def str2timedelta(
     string: str,
     timestamp: datetime.datetime | None = None,
 ) -> datetime.timedelta:
-    """
-    Return a timedelta for a shorthand duration.
+    """Return a timedelta for a shorthand duration.
 
     :param string: a string defining a time period:
 
@@ -575,8 +571,7 @@ def str2timedelta(
 
 
 def parse_duration(string: str) -> tuple[str, int]:
-    """
-    Return the key and duration extracted from the string.
+    """Return the key and duration extracted from the string.
 
     :param string: a string defining a time period
 

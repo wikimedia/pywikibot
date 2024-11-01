@@ -75,8 +75,7 @@ class BasicBot(
     AutomaticTWSummaryBot,  # Automatically defines summary; needs summary_key
 ):
 
-    """
-    An incomplete sample bot.
+    """An incomplete sample bot.
 
     :ivar summary_key: Edit summary message key. The message that should be
         used is placed on /i18n subdirectory. The file containing these
@@ -129,8 +128,7 @@ class BasicBot(
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

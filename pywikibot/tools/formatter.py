@@ -69,8 +69,7 @@ class SequenceOutputter:
 @deprecated('New color format pattern like <<color>>colored text<<default>>',
             since='7.2.0')
 def color_format(text: str, *args, **kwargs) -> str:
-    r"""
-    Do ``str.format`` without having to worry about colors.
+    r"""Do ``str.format`` without having to worry about colors.
 
     It is automatically adding \\03 in front of color fields so it's
     unnecessary to add them manually. Any other \\03 in the text is

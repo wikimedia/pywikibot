@@ -33,6 +33,7 @@ this process.
 
 
 class ProcEntry(NamedTuple):
+
     """ProcEntry namedtuple."""
 
     module_id: str

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-This script can be used to protect and unprotect pages en masse.
+"""This script can be used to protect and unprotect pages en masse.
 
 Of course, you will need an admin account on the relevant wiki.
 These command line parameters can be used to specify which pages to work on:
@@ -87,8 +86,7 @@ class ProtectionRobot(SingleSiteBot, ConfigParserBot, CurrentPageBot):
     }
 
     def __init__(self, protections, **kwargs) -> None:
-        """
-        Create a new ProtectionRobot.
+        """Create a new ProtectionRobot.
 
         :param protections: protections as a dict with "type": "level"
         :type protections: dict
@@ -150,8 +148,7 @@ def check_protection_level(operation, level, levels, default=None) -> str:
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

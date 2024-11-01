@@ -1,5 +1,4 @@
-"""
-This module can do slight modifications to tidy a wiki page's source code.
+"""This module can do slight modifications to tidy a wiki page's source code.
 
 The changes are not supposed to change the look of the rendered wiki page.
 
@@ -330,8 +329,7 @@ class CosmeticChangesToolkit:
         return new_text
 
     def fixSelfInterwiki(self, text: str) -> str:
-        """
-        Interwiki links to the site itself are displayed like local links.
+        """Interwiki links to the site itself are displayed like local links.
 
         Remove their language code prefix.
         """
@@ -767,8 +765,7 @@ class CosmeticChangesToolkit:
         return text
 
     def removeNonBreakingSpaceBeforePercent(self, text: str) -> str:
-        """
-        Remove a non-breaking space between number and percent sign.
+        """Remove a non-breaking space between number and percent sign.
 
         Newer MediaWiki versions automatically place a non-breaking space in
         front of a percent sign, so it is no longer required to place it
@@ -779,8 +776,7 @@ class CosmeticChangesToolkit:
         return text
 
     def cleanUpSectionHeaders(self, text: str) -> str:
-        """
-        Add a space between the equal signs and the section title.
+        """Add a space between the equal signs and the section title.
 
         Example::
 
@@ -805,8 +801,7 @@ class CosmeticChangesToolkit:
             ['comment', 'math', 'nowiki', 'pre'])
 
     def putSpacesInLists(self, text: str) -> str:
-        """
-        Add a space between the * or # and the text.
+        """Add a space between the * or # and the text.
 
         .. note:: This space is recommended in the syntax help on the
            English, German and French Wikipedias. It might be that it
@@ -1069,8 +1064,7 @@ class CosmeticChangesToolkit:
         return text
 
     def commonsfiledesc(self, text: str) -> str:
-        """
-        Clean up file descriptions on Wikimedia Commons.
+        """Clean up file descriptions on Wikimedia Commons.
 
         It works according to [1] and works only on pages in the file
         namespace on Wikimedia Commons.

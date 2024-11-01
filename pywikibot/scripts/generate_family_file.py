@@ -32,7 +32,7 @@ base directory.
    If the url scheme is missing, ``https`` will be used.
 """
 #
-# (C) Pywikibot team, 2010-2023
+# (C) Pywikibot team, 2010-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -64,8 +64,7 @@ class FamilyFileGenerator:
                  name: str | None = None,
                  dointerwiki: str | None = None,
                  verify: str | None = None) -> None:
-        """
-        Parameters are optional. If not given the script asks for the values.
+        """Parameters are optional. If missing the script asks for the values.
 
         :param url: an url from where the family settings are loaded
         :param name: the family name without "_family.py" tail.

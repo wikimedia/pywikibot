@@ -434,8 +434,7 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
 
     @unittest.expectedFailure
     def test_translateMagicWords_fail(self):
-        """
-        Test translateMagicWords method.
+        """Test translateMagicWords method.
 
         The current implementation doesn't check whether the magic word is
         inside a template.

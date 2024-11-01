@@ -37,8 +37,7 @@ class BaseSite(ComparableMixin):
     """Site methods that are independent of the communication interface."""
 
     def __init__(self, code: str, fam=None, user=None) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param code: the site's language code
         :type code: str
@@ -122,8 +121,7 @@ class BaseSite(ComparableMixin):
 
     @property
     def code(self):
-        """
-        The identifying code for this Site equal to the wiki prefix.
+        """The identifying code for this Site equal to the wiki prefix.
 
         By convention, this is usually an ISO language code, but it does
         not have to be.
@@ -296,8 +294,7 @@ class BaseSite(ComparableMixin):
         return ['PAGENAMEE']
 
     def lock_page(self, page, block: bool = True):
-        """
-        Lock page for writing. Must be called before writing any page.
+        """Lock page for writing. Must be called before writing any page.
 
         We don't want different threads trying to write to the same page
         at the same time, even to different sections.
@@ -317,8 +314,7 @@ class BaseSite(ComparableMixin):
             self._locked_pages.add(title)
 
     def unlock_page(self, page) -> None:
-        """
-        Unlock page. Call as soon as a write operation has completed.
+        """Unlock page. Call as soon as a write operation has completed.
 
         :param page: the page to be locked
         :type page: pywikibot.Page
@@ -385,8 +381,7 @@ class BaseSite(ComparableMixin):
                           re.IGNORECASE | re.DOTALL)
 
     def sametitle(self, title1: str, title2: str) -> bool:
-        """
-        Return True if title1 and title2 identify the same wiki page.
+        """Return True if title1 and title2 identify the same wiki page.
 
         title1 and title2 may be unequal but still identify the same page,
         if they use different aliases for the same namespace.

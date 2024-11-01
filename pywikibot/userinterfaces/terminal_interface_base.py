@@ -70,8 +70,7 @@ class UI(ABUIC):
     split_col_pat = re.compile(r'(\w+);?(\w+)?')
 
     def __init__(self) -> None:
-        """
-        Initialize the UI.
+        """Initialize the UI.
 
         This caches the std-streams locally so any attempts to
         monkey-patch the streams later will not work.
@@ -145,8 +144,7 @@ class UI(ABUIC):
 
     @classmethod
     def divide_color(cls, color):
-        """
-        Split color label in a tuple.
+        """Split color label in a tuple.
 
         Received color is a string like 'fg_color;bg_color' or 'fg_color'.
         Returned values are (fg_color, bg_color) or (fg_color, None).
@@ -347,8 +345,7 @@ class UI(ABUIC):
               password: bool = False,
               default: str | None = '',
               force: bool = False) -> str:
-        """
-        Ask the user a question and return the answer.
+        """Ask the user a question and return the answer.
 
         Works like raw_input(), but returns a unicode string instead of ASCII.
 

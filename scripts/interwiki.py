@@ -579,8 +579,7 @@ class InterwikiBotConfig:
 
 class Subject(interwiki_graph.Subject):
 
-    """
-    Class to follow the progress of a single 'subject'.
+    """Class to follow the progress of a single 'subject'.
 
     (i.e. a page with all its translations)
 
@@ -675,8 +674,7 @@ class Subject(interwiki_graph.Subject):
         self.workonme = True
 
     def getFoundDisambig(self, site):
-        """
-        Return the first disambiguation found.
+        """Return the first disambiguation found.
 
         If we found a disambiguation on the given site while working on the
         subject, this method returns it. If several ones have been found, the
@@ -690,8 +688,7 @@ class Subject(interwiki_graph.Subject):
         return None
 
     def getFoundNonDisambig(self, site):
-        """
-        Return the first non-disambiguation found.
+        """Return the first non-disambiguation found.
 
         If we found a non-disambiguation on the given site while working on the
         subject, this method returns it. If several ones have been found, the
@@ -708,8 +705,7 @@ class Subject(interwiki_graph.Subject):
         return None
 
     def getFoundInCorrectNamespace(self, site):
-        """
-        Return the first page in the extended namespace.
+        """Return the first page in the extended namespace.
 
         If we found a page that has the expected namespace on the given site
         while working on the subject, this method returns it. If several ones
@@ -755,8 +751,7 @@ class Subject(interwiki_graph.Subject):
                 self.hintedsites.add(page.site)
 
     def openSites(self):
-        """
-        Iterator.
+        """Iterator.
 
         Yields (site, count) pairs:
         * site is a site where we still have work to do on
@@ -797,8 +792,7 @@ class Subject(interwiki_graph.Subject):
         self.forcedStop = True
 
     def addIfNew(self, page, counter, linkingPage) -> bool:
-        """
-        Add the pagelink given to the todo list, if it hasn't been seen yet.
+        """Add the pagelink given to the todo list, if it hasn't been seen yet.
 
         If it is added, update the counter accordingly.
 
@@ -847,8 +841,7 @@ class Subject(interwiki_graph.Subject):
         return pywikibot.Page(site, title) if title else None
 
     def namespaceMismatch(self, linkingPage, linkedPage, counter) -> bool:
-        """
-        Check whether or not the given page has a different namespace.
+        """Check whether or not the given page has a different namespace.
 
         Returns True if the namespaces are different and the user
         has selected not to follow the linked page.
@@ -917,8 +910,7 @@ class Subject(interwiki_graph.Subject):
         return False
 
     def disambigMismatch(self, page, counter):
-        """
-        Check whether the given page has a different disambiguation status.
+        """Check whether the given page has a different disambiguation status.
 
         Returns a tuple (skip, alternativePage).
 
@@ -1248,8 +1240,7 @@ class Subject(interwiki_graph.Subject):
                 break
 
     def batchLoaded(self, counter) -> None:
-        """
-        Notify that the promised batch of pages was loaded.
+        """Notify that the promised batch of pages was loaded.
 
         This is called by a worker to tell us that the promised batch of
         pages was loaded.
@@ -1416,8 +1407,7 @@ class Subject(interwiki_graph.Subject):
         return result
 
     def finish(self):
-        """
-        Round up the subject, making any necessary changes.
+        """Round up the subject, making any necessary changes.
 
         This should be called exactly once after the todo list has gone empty.
 
@@ -1745,12 +1735,11 @@ class Subject(interwiki_graph.Subject):
 
     @staticmethod
     def reportBacklinks(new, updatedSites) -> None:
-        """
-        Report missing back links. This will be called from finish() if needed.
+        """Report missing back links.
 
-        updatedSites is a list that contains all sites we changed, to avoid
-        reporting of missing backlinks for pages we already fixed
-
+        This will be called from :meth:`finish` if needed. *updatedSites*
+        is a list that contains all sites that are changed, to avoid
+        reporting of missing backlinks for already fixed pages.
         """
         # use sets because searching an element is faster than in lists
         expectedPages = set(new.values())
@@ -1801,8 +1790,7 @@ class Subject(interwiki_graph.Subject):
 
 class InterwikiBot:
 
-    """
-    A class keeping track of a list of subjects.
+    """A class keeping track of a list of subjects.
 
     It controls which pages are queried from which languages when.
     """
@@ -1830,8 +1818,7 @@ class InterwikiBot:
             self.plus(site, count)
 
     def setPageGenerator(self, pageGenerator, number=None, until=None) -> None:
-        """
-        Add a generator of subjects.
+        """Add a generator of subjects.
 
         Once the list of subjects gets too small,
         this generator is called to produce more Pages.
@@ -1910,8 +1897,7 @@ class InterwikiBot:
         return self.subjects[0] if self.subjects else None
 
     def maxOpenSite(self):
-        """
-        Return the site that has the most open queries plus the number.
+        """Return the site that has the most open queries plus the number.
 
         If there is nothing left, return None.
         Only sites that are todo for the first Subject are returned.
@@ -1965,8 +1951,7 @@ class InterwikiBot:
         return self.maxOpenSite()
 
     def oneQuery(self) -> bool:
-        """
-        Perform one step in the solution process.
+        """Perform one step in the solution process.
 
         Returns True if pages could be preloaded, or false
         otherwise.
@@ -2117,8 +2102,7 @@ def botMayEdit(page) -> bool:
 
 
 def page_empty_check(page) -> bool:
-    """
-    Return True if page should be skipped as it is almost empty.
+    """Return True if page should be skipped as it is almost empty.
 
     Pages in content namespaces are considered empty if they contain less than
     50 characters, and other pages are considered empty if they are not

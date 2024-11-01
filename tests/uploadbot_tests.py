@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-UploadRobot test.
+"""UploadRobot test.
 
 These tests write to the wiki.
 """

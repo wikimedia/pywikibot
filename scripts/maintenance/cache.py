@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-r"""
-This script runs commands on each entry in the API caches.
+r"""This script runs commands on each entry in the API caches.
 
 Syntax:
 

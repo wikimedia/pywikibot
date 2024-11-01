@@ -46,8 +46,7 @@ botList = {
 
 class LoginStatus(IntEnum):
 
-    """
-    Enum for Login statuses.
+    """Enum for Login statuses.
 
     >>> LoginStatus.NOT_ATTEMPTED
     LoginStatus(-3)
@@ -80,8 +79,7 @@ class LoginManager:
     def __init__(self, password: str | None = None,
                  site: pywikibot.site.BaseSite | None = None,
                  user: str | None = None) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         All parameters default to defaults in user-config.
 
@@ -114,8 +112,7 @@ class LoginManager:
             self.readPassword()
 
     def check_user_exists(self) -> None:
-        """
-        Check that the username exists on the site.
+        """Check that the username exists on the site.
 
         .. seealso:: :api:`Users`
 
@@ -148,8 +145,7 @@ class LoginManager:
                                   .format(main_username, self.site))
 
     def botAllowed(self) -> bool:
-        """
-        Check whether the bot is listed on a specific page.
+        """Check whether the bot is listed on a specific page.
 
         This allows bots to comply with the policy on the respective wiki.
         """
@@ -264,8 +260,7 @@ class LoginManager:
     }
 
     def login(self, retry: bool = False, autocreate: bool = False) -> bool:
-        """
-        Attempt to log into the server.
+        """Attempt to log into the server.
 
         .. seealso:: :api:`Login`
 
@@ -481,8 +476,7 @@ class BotPassword:
     """BotPassword object for storage in password file."""
 
     def __init__(self, suffix: str, password: str) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         BotPassword function by using a separate password paired with a
         suffixed username of the form <username>@<suffix>.
@@ -499,8 +493,7 @@ class BotPassword:
         self.password = password
 
     def login_name(self, username: str) -> str:
-        """
-        Construct the login name from the username and suffix.
+        """Construct the login name from the username and suffix.
 
         :param user: username (without suffix)
         """
@@ -517,8 +510,7 @@ class OauthLoginManager(LoginManager):
     def __init__(self, password: str | None = None,
                  site: pywikibot.site.BaseSite | None = None,
                  user: str | None = None) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         All parameters default to defaults in user-config.
 
@@ -543,8 +535,7 @@ class OauthLoginManager(LoginManager):
         self._access_token: tuple[str, str] | None = None
 
     def login(self, retry: bool = False, force: bool = False) -> bool:
-        """
-        Attempt to log into the server.
+        """Attempt to log into the server.
 
         .. seealso:: :api:`Login`
 
@@ -582,8 +573,7 @@ class OauthLoginManager(LoginManager):
 
     @property
     def consumer_token(self) -> tuple[str, str]:
-        """
-        Return OAuth consumer key token and secret token.
+        """Return OAuth consumer key token and secret token.
 
         .. seealso:: :api:`Tokens`
         """
@@ -591,8 +581,7 @@ class OauthLoginManager(LoginManager):
 
     @property
     def access_token(self) -> tuple[str, str] | None:
-        """
-        Return OAuth access key token and secret token.
+        """Return OAuth access key token and secret token.
 
         .. seealso:: :api:`Tokens`
         """
