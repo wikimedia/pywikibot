@@ -297,7 +297,7 @@ class DummySiteinfo:
 
     def is_recognised(self, key):
         """Return None."""
-        return None
+        return
 
     def get_requested_time(self, key):
         """Return False."""
