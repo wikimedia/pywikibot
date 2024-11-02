@@ -413,17 +413,16 @@ class Uploader:
                             raise Error('Unrecognized result: {result}'
                                         .format_map(data))
 
-                else:  # not chunked upload
-                    if file_key:
-                        final_request['filekey'] = file_key
-                    else:
-                        file_contents = f.read()
-                        filetype = (mimetypes.guess_type(self.filename)[0]
-                                    or 'application/octet-stream')
-                        final_request.mime = {
-                            'file': (file_contents, filetype.split('/'),
-                                     {'filename': mime_filename})
-                        }
+                elif file_key:
+                    final_request['filekey'] = file_key
+                else:
+                    file_contents = f.read()
+                    filetype = (mimetypes.guess_type(self.filename)[0]
+                                or 'application/octet-stream')
+                    final_request.mime = {
+                        'file': (file_contents, filetype.split('/'),
+                                 {'filename': mime_filename})
+                    }
         else:
             # upload by URL
             if not self.site.has_right('upload_by_url'):

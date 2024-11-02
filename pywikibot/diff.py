@@ -189,10 +189,9 @@ class Hunk:
                         apply_color = 'default;' + self.bg_colors[color]
                     char_tagged = f'<<{apply_color}>>{char}'
                     color_closed = False
-            else:
-                if char_ref == ' ':
-                    char_tagged = f'<<default>>{char}'
-                    color_closed = True
+            elif char_ref == ' ':
+                char_tagged = f'<<default>>{char}'
+                color_closed = True
             colored_line += char_tagged
 
         if not color_closed:

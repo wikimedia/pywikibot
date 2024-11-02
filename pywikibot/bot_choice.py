@@ -350,14 +350,13 @@ class LinkChoice(Choice):
                     kwargs['label'] += '#' + self.replacer._new.section
             else:
                 kwargs['label'] = self.replacer._new.anchor
+        elif self.replacer.current_link.anchor is None:
+            kwargs['label'] = self.replacer.current_groups['title']
+            if self.replacer.current_groups['section']:
+                kwargs['label'] += '#' \
+                    + self.replacer.current_groups['section']
         else:
-            if self.replacer.current_link.anchor is None:
-                kwargs['label'] = self.replacer.current_groups['title']
-                if self.replacer.current_groups['section']:
-                    kwargs['label'] += '#' \
-                        + self.replacer.current_groups['section']
-            else:
-                kwargs['label'] = self.replacer.current_link.anchor
+            kwargs['label'] = self.replacer.current_link.anchor
         return pywikibot.Link.create_separated(
             self.replacer._new.canonical_title(), self.replacer._new.site,
             **kwargs)

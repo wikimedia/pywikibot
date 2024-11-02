@@ -2284,32 +2284,31 @@ class WikidataBot(Bot, ExistingPageBot):
                 item = pywikibot.ItemPage.fromPage(page)
             except NoPageError:
                 item = None
+        elif isinstance(page, pywikibot.ItemPage):
+            item = page
+            page = None
         else:
-            if isinstance(page, pywikibot.ItemPage):
-                item = page
+            # FIXME: Hack because 'is_data_repository' doesn't work if
+            #        site is the APISite. See T85483
+            assert page is not None
+            data_site = page.site.data_repository()
+            if (data_site.family == page.site.family
+                    and data_site.code == page.site.code):
+                is_item = page.namespace() == data_site.item_namespace.id
+            else:
+                is_item = False
+            if is_item:
+                item = pywikibot.ItemPage(data_site, page.title())
                 page = None
             else:
-                # FIXME: Hack because 'is_data_repository' doesn't work if
-                #        site is the APISite. See T85483
-                assert page is not None
-                data_site = page.site.data_repository()
-                if (data_site.family == page.site.family
-                        and data_site.code == page.site.code):
-                    is_item = page.namespace() == data_site.item_namespace.id
-                else:
-                    is_item = False
-                if is_item:
-                    item = pywikibot.ItemPage(data_site, page.title())
-                    page = None
-                else:
-                    try:
-                        item = pywikibot.ItemPage.fromPage(page)
-                    except NoPageError:
-                        item = None
-                    if self.use_from_page is False:
-                        _error(f'{page} is not in the item namespace but must'
-                               ' be an item.')
-                        return
+                try:
+                    item = pywikibot.ItemPage.fromPage(page)
+                except NoPageError:
+                    item = None
+                if self.use_from_page is False:
+                    _error(f'{page} is not in the item namespace but must'
+                           ' be an item.')
+                    return
 
         assert not (page is None and item is None)
 

@@ -289,13 +289,12 @@ def main(*args: str) -> None:
                         ' exists)'
                     )
                     continue
-            else:
-                if not targetpage.botMayEdit():
-                    pywikibot.warning(
-                        f'Target page {targetpage.title(as_link=True)} is not'
-                        ' editable by bots'
-                    )
-                    continue
+            elif not targetpage.botMayEdit():
+                pywikibot.warning(
+                    f'Target page {targetpage.title(as_link=True)} is not'
+                    ' editable by bots'
+                )
+                continue
 
             params['interwikipage'] = fromtitle
             api_query(tosite, params)

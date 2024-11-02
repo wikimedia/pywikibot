@@ -700,17 +700,16 @@ class CategoryMoveRobot(CategoryPreprocess):
         elif deletion_comment == self.DELETION_COMMENT_SAME_AS_EDIT_COMMENT:
             # Use the edit comment as the deletion comment.
             self.deletion_comment = self.comment
+        # Deletion comment is set to internationalized default.
+        elif self.newcat:
+            # Category is moved.
+            self.deletion_comment = i18n.twtranslate(self.site,
+                                                     'category-was-moved',
+                                                     template_vars)
         else:
-            # Deletion comment is set to internationalized default.
-            if self.newcat:
-                # Category is moved.
-                self.deletion_comment = i18n.twtranslate(self.site,
-                                                         'category-was-moved',
-                                                         template_vars)
-            else:
-                # Category is deleted.
-                self.deletion_comment = i18n.twtranslate(
-                    self.site, 'category-was-disbanded')
+            # Category is deleted.
+            self.deletion_comment = i18n.twtranslate(
+                self.site, 'category-was-disbanded')
         self.move_comment = move_comment if move_comment else self.comment
 
     def run(self) -> None:

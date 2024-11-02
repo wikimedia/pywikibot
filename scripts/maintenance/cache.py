@@ -444,11 +444,10 @@ def main():
             if output:
                 sys.exit('Only one output may be defined.')
             output = ''
+        elif not cache_paths:
+            cache_paths = [arg]
         else:
-            if not cache_paths:
-                cache_paths = [arg]
-            else:
-                cache_paths.append(arg)
+            cache_paths.append(arg)
 
     if not cache_paths:
         folders = ('apicache', 'apicache-py2', 'apicache-py3')

@@ -169,9 +169,8 @@ class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
             else:
                 pywikibot.info(f'Page {title} already exists, not adding!')
                 return
-        else:
-            if self.opt.autosummary:
-                comment = config.default_edit_summary = ''
+        elif self.opt.autosummary:
+            comment = config.default_edit_summary = ''
 
         self.put_current(contents, summary=comment,
                          minor=self.opt.minor,

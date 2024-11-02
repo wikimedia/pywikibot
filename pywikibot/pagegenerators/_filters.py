@@ -222,10 +222,9 @@ def SubpageFilterGenerator(generator: Iterable[pywikibot.page.BasePage],
     for page in generator:
         if page.depth <= max_depth:
             yield page
-        else:
-            if show_filtered:
-                pywikibot.info(
-                    f'Page {page} is a subpage that is too deep. Skipping.')
+        elif show_filtered:
+            pywikibot.info(
+                f'Page {page} is a subpage that is too deep. Skipping.')
 
 
 class RegexFilter:

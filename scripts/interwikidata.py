@@ -106,9 +106,8 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
             item = self.try_to_add()
             if self.opt.create and item is None:
                 item = self.create_item()
-        else:
-            if self.opt.merge:
-                item = self.try_to_merge(item)
+        elif self.opt.merge:
+            item = self.try_to_merge(item)
 
         if item and self.opt.clean:
             self.current_item = item

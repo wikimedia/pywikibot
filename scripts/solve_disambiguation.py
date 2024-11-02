@@ -1163,22 +1163,21 @@ or press enter to quit:""")
                     {'from': page.title(),
                      'to': targets,
                      'count': len(new_targets)})
+        elif unlink_counter and not new_targets:
+            self.summary = i18n.twtranslate(
+                self.site, 'solve_disambiguation-links-removed',
+                {'from': page.title(),
+                 'count': unlink_counter})
+        elif dn and not new_targets:
+            self.summary = i18n.twtranslate(
+                self.site, 'solve_disambiguation-adding-dn-template',
+                {'from': page.title()})
         else:
-            if unlink_counter and not new_targets:
-                self.summary = i18n.twtranslate(
-                    self.site, 'solve_disambiguation-links-removed',
-                    {'from': page.title(),
-                     'count': unlink_counter})
-            elif dn and not new_targets:
-                self.summary = i18n.twtranslate(
-                    self.site, 'solve_disambiguation-adding-dn-template',
-                    {'from': page.title()})
-            else:
-                self.summary = i18n.twtranslate(
-                    self.site, 'solve_disambiguation-links-resolved',
-                    {'from': page.title(),
-                     'to': targets,
-                     'count': len(new_targets)})
+            self.summary = i18n.twtranslate(
+                self.site, 'solve_disambiguation-links-resolved',
+                {'from': page.title(),
+                 'to': targets,
+                 'count': len(new_targets)})
 
     def teardown(self) -> None:
         """Write ignoring pages to a file."""

@@ -323,8 +323,7 @@ class PatrolBot(BaseBot):
         else:
             verbose_output('Skipped')
 
-        if rcid > self.highest_rcid:
-            self.highest_rcid = rcid
+        self.highest_rcid = max(rcid, self.highest_rcid)
         self.last_rcid = rcid
 
 

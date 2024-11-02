@@ -243,20 +243,19 @@ class WikiHTMLPageParser(HTMLParser):
                 f'{new_parsed_url.netloc or self.url.netloc}'
                 f'{new_parsed_url.path}'
             )
-        else:
-            if self._parsed_url:
-                # allow upgrades to https, but not downgrades
-                if self._parsed_url.scheme == 'https' \
-                   and new_parsed_url.scheme != self._parsed_url.scheme:
-                    return
+        elif self._parsed_url:
+            # allow upgrades to https, but not downgrades
+            if self._parsed_url.scheme == 'https' \
+               and new_parsed_url.scheme != self._parsed_url.scheme:
+                return
 
-                # allow http://www.brickwiki.info/ vs http://brickwiki.info/
-                if (new_parsed_url.netloc in self._parsed_url.netloc
-                        or self._parsed_url.netloc in new_parsed_url.netloc):
-                    return
+            # allow http://www.brickwiki.info/ vs http://brickwiki.info/
+            if (new_parsed_url.netloc in self._parsed_url.netloc
+                    or self._parsed_url.netloc in new_parsed_url.netloc):
+                return
 
-                assert new_parsed_url == self._parsed_url, \
-                       f'{self._parsed_url} != {new_parsed_url}'
+            assert new_parsed_url == self._parsed_url, \
+                   f'{self._parsed_url} != {new_parsed_url}'
 
         self._parsed_url = new_parsed_url
         self.server = f'{self._parsed_url.scheme}://{self._parsed_url.netloc}'

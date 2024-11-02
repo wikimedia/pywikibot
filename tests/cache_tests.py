@@ -9,9 +9,9 @@ from __future__ import annotations
 
 import unittest
 
-import scripts.maintenance.cache as cache
 from pywikibot.login import LoginStatus
 from pywikibot.site import BaseSite
+from scripts.maintenance import cache
 from tests import join_cache_path
 from tests.aspects import TestCase
 

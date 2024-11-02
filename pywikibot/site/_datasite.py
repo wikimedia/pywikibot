@@ -221,15 +221,14 @@ class DataSite(APISite):
                     ident = p._defined_by()
                     for key in ident:
                         req[key].append(ident[key])
+                elif (p.site == self
+                      and p.namespace() in self._entity_namespaces.values()):
+                    req['ids'].append(p.title(with_ns=False))
                 else:
-                    if p.site == self and p.namespace() in (
-                            self._entity_namespaces.values()):
-                        req['ids'].append(p.title(with_ns=False))
-                    else:
-                        assert p.site.has_data_repository, \
-                            'Site must have a data repository'
-                        req['sites'].append(p.site.dbName())
-                        req['titles'].append(p._link._text)
+                    assert p.site.has_data_repository, \
+                        'Site must have a data repository'
+                    req['sites'].append(p.site.dbName())
+                    req['titles'].append(p._link._text)
 
             req = self.simple_request(action='wbgetentities', **req)
             data = req.submit()

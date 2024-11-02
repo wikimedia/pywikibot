@@ -1262,22 +1262,21 @@ class CheckImagesBot:
                 else:
                     pywikibot.info('Skipping the file...')
                 self.some_problem = False
-        else:
-            if not self.seems_ok and self.license_found:
-                rep_text_license_fake = ((self.list_entry
-                                          + "seems to have a ''fake license'',"
-                                          ' license detected:'
-                                          ' <nowiki>%s</nowiki>') %
-                                         (self.image_name, self.license_found))
-                print_with_time_zone(
-                    f'{self.image_name} seems to have a fake license: '
-                    f'{self.license_found}, reporting...')
-                self.report_image(self.image_name,
-                                  rep_text=rep_text_license_fake,
-                                  addings=False)
-            elif self.license_found:
-                pywikibot.info(f'[[{self.image_name}]] seems ok, license '
-                               f'found: {{{{{self.license_found}}}}}...')
+        elif not self.seems_ok and self.license_found:
+            rep_text_license_fake = ((self.list_entry
+                                      + "seems to have a ''fake license'',"
+                                      ' license detected:'
+                                      ' <nowiki>%s</nowiki>') %
+                                     (self.image_name, self.license_found))
+            print_with_time_zone(
+                f'{self.image_name} seems to have a fake license: '
+                f'{self.license_found}, reporting...')
+            self.report_image(self.image_name,
+                              rep_text=rep_text_license_fake,
+                              addings=False)
+        elif self.license_found:
+            pywikibot.info(f'[[{self.image_name}]] seems ok, license '
+                           f'found: {{{{{self.license_found}}}}}...')
         return (self.license_found, self.white_templates_found)
 
     @staticmethod
