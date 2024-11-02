@@ -407,7 +407,7 @@ class UI(ABUIC):
             else:
                 text = self._raw_input()
         except KeyboardInterrupt:
-            raise QuitKeyboardInterrupt()
+            raise QuitKeyboardInterrupt
         except UnicodeDecodeError:
             return None  # wrong terminal encoding, T258143
         return text
