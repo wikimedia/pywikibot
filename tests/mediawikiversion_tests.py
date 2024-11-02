@@ -97,7 +97,7 @@ class TestMediaWikiVersion(TestCase):
             MediaWikiVersion('1.missing')
         with self.assertRaisesRegex(
                 AssertionError,
-                'Found \"wmf\" in \"wmf-1\"'):
+                'Found "wmf" in "wmf-1"'):
             MediaWikiVersion('1.33wmf-1')
 
     def test_generator(self):
