@@ -726,7 +726,7 @@ class WikibasePage(BasePage, WikibaseEntity):
                 '{}.get does not implement var args: {!r} and {!r}'.format(
                     self.__class__.__name__, args, kwargs))
 
-        # todo: this variable is specific to ItemPage
+        # TODO: this variable is specific to ItemPage
         lazy_loading_id = not hasattr(self, 'id') and hasattr(self, '_site')
         try:
             data = WikibaseEntity.get(self, force=force)
@@ -735,7 +735,7 @@ class WikibasePage(BasePage, WikibaseEntity):
                 p = pywikibot.Page(self._site, self._title)
                 if not p.exists():
                     raise NoPageError(p)
-                # todo: raise a nicer exception here (T87345)
+                # TODO: raise a nicer exception here (T87345)
             raise NoPageError(self)
 
         if 'pageid' in self._content:
@@ -1509,7 +1509,7 @@ class PropertyPage(WikibasePage, Property):
 
     def newClaim(self, *args, **kwargs) -> Claim:
         """Helper function to create a new claim object for this property."""
-        # todo: raise when self.id is -1
+        # TODO: raise when self.id is -1
         return Claim(self.site, self.getID(), *args, datatype=self.type,
                      **kwargs)
 
@@ -2095,7 +2095,7 @@ class Claim(Property):
 
         :return: JSON value
         """
-        # todo: eventually unify the following two groups
+        # TODO: eventually unify the following two groups
         if self.type in ('wikibase-item', 'wikibase-property'):
             value = {'entity-type': self.getTarget().entity_type,
                      'numeric-id': self.getTarget().getID(numeric=True)}
@@ -2303,7 +2303,7 @@ class LexemePage(WikibasePage):
         form.on_lexeme = None
         form.id = '-1'
 
-    # todo: senses
+    # TODO: senses
 
     def mergeInto(self, lexeme, **kwargs):
         """Merge the lexeme into another lexeme.

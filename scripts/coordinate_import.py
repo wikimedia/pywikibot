@@ -139,7 +139,7 @@ class CoordImportRobot(ConfigParserBot, WikidataBot):
         pywikibot.info(
             f'Adding {coordinate.lat}, {coordinate.lon} to {item.title()}')
 
-        # todo: handle exceptions using self.user_add_claim
+        # TODO: handle exceptions using self.user_add_claim
         try:
             item.addClaim(newclaim)
         except CoordinateGlobeUnknownError as e:

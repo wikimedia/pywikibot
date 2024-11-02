@@ -650,7 +650,7 @@ class Subject(interwiki_graph.Subject):
 
         super().__init__(origin)
 
-        # todo is a list of all pages that still need to be analyzed.
+        # TODO is a list of all pages that still need to be analyzed.
         # Mark the origin page as todo.
         self.todo = SizedKeyCollection('site')
         if origin:
@@ -1274,7 +1274,7 @@ class Subject(interwiki_graph.Subject):
             counter.minus(page.site)
 
             # Now check whether any interwiki links should be added to the
-            # todo list.
+            # TODO list.
             self.check_page(page, counter)
 
         # These pages are no longer 'in progress'
