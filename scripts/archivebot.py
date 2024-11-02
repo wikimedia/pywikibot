@@ -1019,7 +1019,7 @@ def main(*args: str) -> None:
                     pywikibot.info(f'{canceled} done')
                     break
 
-                elif not process_page(pg, *botargs):
+                if not process_page(pg, *botargs):
                     break
 
 

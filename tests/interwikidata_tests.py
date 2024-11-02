@@ -31,7 +31,7 @@ class DummyBot(interwikidata.IWBot):
 
     def try_to_add(self):
         """Prevent adding sitelinks to items."""
-        return None
+        return
 
 
 class TestInterwikidataBot(SiteAttributeTestCase):

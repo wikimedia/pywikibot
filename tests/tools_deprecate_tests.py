@@ -144,7 +144,7 @@ def deprecated_func_arg3(foo=None):
 @remove_last_args(['foo', 'bar'])
 def deprecated_all():
     """Test remove_last_args with all args removed."""
-    return None
+    return
 
 
 @remove_last_args(['bar'])
@@ -232,7 +232,7 @@ class DeprecatedMethodClass:
     @remove_last_args(['foo', 'bar'])
     def deprecated_all(self):
         """Deprecating positional parameters."""
-        return None
+        return
 
     @remove_last_args(['bar'])
     def deprecated_all2(self, foo):
