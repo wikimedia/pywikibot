@@ -329,9 +329,9 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         if not field or field not in self.fields:
             return
 
-        # todo: extend the list of tags to ignore
+        # TODO: extend the list of tags to ignore
         value = textlib.removeDisabledParts(
-            # todo: eventually we may want to import the references
+            # TODO: eventually we may want to import the references
             value, tags=['ref'], site=site).strip()
 
         if not value:

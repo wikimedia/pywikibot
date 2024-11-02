@@ -58,7 +58,7 @@ from pywikibot import pagegenerators
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 
 
-# Todo:
+# TODO:
 # * Using xml and xmlstart
 # * Using categories
 # * Error handling for uploading (anyway, that's the last action, it's only

@@ -212,7 +212,7 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
         """Merge two items."""
         wd_data = self.get_items()
         if not wd_data:
-            # todo: add links to item
+            # TODO: add links to item
             return None
 
         if len(wd_data) > 1:
