@@ -457,7 +457,7 @@ def fetch(uri: str, method: str = 'GET', headers: dict | None = None,
 # Extract charset (from content-type header)
 CHARSET_RE = re.compile(
     r'charset\s*=\s*(?P<q>[\'"]?)(?P<charset>[^\'",;>/]+)(?P=q)',
-    flags=re.I,
+    flags=re.IGNORECASE,
 )
 
 

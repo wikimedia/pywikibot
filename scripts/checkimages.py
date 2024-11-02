@@ -1358,7 +1358,7 @@ class CheckImagesBot:
             if '{{' in i:
                 regex_pattern = re.compile(
                     r'\{\{(?:template)?%s ?(?:\||\r?\n|\}|<|/) ?'
-                    % i.split('{{')[1].replace(' ', '[ _]'), re.I)
+                    % i.split('{{')[1].replace(' ', '[ _]'), re.IGNORECASE)
                 result = regex_pattern.findall(self.image_check_text)
                 if result:
                     return True

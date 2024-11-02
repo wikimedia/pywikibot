@@ -492,7 +492,7 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
                     r'(?P<newcat1>[^\|\}]+)(\|[^\}]+)?\]\]|'
                     r'Robot: Changing Category:(.+) '
                     r'to Category:(?P<newcat2>.+)')
-                m = re.search(regex, logcomment, flags=re.I)
+                m = re.search(regex, logcomment, flags=re.IGNORECASE)
 
                 if not m:
                     pywikibot.info(

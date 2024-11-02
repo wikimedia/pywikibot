@@ -217,7 +217,7 @@ class suppress_warnings(catch_warnings):  # noqa: N801
             the start of the path to the warning module must match.
             (case-sensitive)
         """
-        self.message_match = re.compile(message, re.I).match
+        self.message_match = re.compile(message, re.IGNORECASE).match
         self.category = category
         self.filename_match = re.compile(filename).match
         super().__init__(record=True)

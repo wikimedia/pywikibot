@@ -1571,10 +1571,10 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None,
     title = case_escape(site.namespaces[14].case, title, underscore=True)
     categoryR = re.compile(
         rf'\[\[\s*({catNamespace})\s*:\s*{title}[\s\u200e\u200f]*'
-        r'((?:\|[^]]+)?\]\])', re.I)
+        r'((?:\|[^]]+)?\]\])', re.IGNORECASE)
     categoryRN = re.compile(
         rf'^[^\S\n]*\[\[\s*({catNamespace})\s*:\s*{title}[\s\u200e\u200f]*'
-        r'((?:\|[^]]+)?\]\])[^\S\n]*\n', re.I | re.M)
+        r'((?:\|[^]]+)?\]\])[^\S\n]*\n', re.IGNORECASE | re.MULTILINE)
     exceptions = ['comment', 'math', 'nowiki', 'pre', 'syntaxhighlight']
     if newcat is None:
         # First go through and try the more restrictive regex that removes
@@ -1621,7 +1621,7 @@ def replaceCategoryLinks(oldtext: str,
     if site is None:
         site = pywikibot.Site()
     if re.search(r'\{\{ *(' + r'|'.join(site.getmagicwords('defaultsort'))
-                 + r')', oldtext, flags=re.I):
+                 + r')', oldtext, flags=re.IGNORECASE):
         separator = '\n'
     else:
         separator = site.family.category_text_separator
@@ -1668,15 +1668,15 @@ def replaceCategoryLinks(oldtext: str,
 
     if site.sitename == 'wikipedia:de':
         personendaten = re.compile(r'\{\{ *Personendaten.*?\}\}',
-                                   re.I | re.DOTALL)
+                                   re.IGNORECASE | re.DOTALL)
         under_categories.append(personendaten)
 
     if site.sitename == 'wikipedia:yi':
-        stub = re.compile(r'\{\{.*?שטומף *\}\}', re.I)
+        stub = re.compile(r'\{\{.*?שטומף *\}\}', re.IGNORECASE)
         under_categories.append(stub)
 
     if site.family.name == 'wikipedia' and site.code in ('simple', 'en'):
-        stub = re.compile(r'\{\{.*?stub *\}\}', re.I)
+        stub = re.compile(r'\{\{.*?stub *\}\}', re.IGNORECASE)
         under_categories.append(stub)
 
     if under_categories:

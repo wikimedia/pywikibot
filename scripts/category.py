@@ -197,7 +197,7 @@ docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 CFD_TEMPLATE_REGEX = re.compile(r'<!--\s*BEGIN CFD TEMPLATE\s*-->.*?'
                                 r'<!--\s*END CFD TEMPLATE\s*-->\n?',
-                                flags=re.I | re.M | re.S)
+                                flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
 
 cfd_templates = {
     'wikipedia': {
@@ -531,7 +531,7 @@ class CategoryAddBot(CategoryPreprocess):
                 if self.includeonly == ['includeonly']:
                     tagname = 'includeonly'
                 tagnameregexp = re.compile(fr'(.*)(<\/{tagname}>)',
-                                           re.I | re.DOTALL)
+                                           re.IGNORECASE | re.DOTALL)
                 categorytitle = catpl.title(
                     as_link=True, allow_interwiki=False)
                 if tagnameregexp.search(text):

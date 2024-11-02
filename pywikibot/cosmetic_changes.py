@@ -529,7 +529,7 @@ class CosmeticChangesToolkit:
         exceptions = ['comment', 'nowiki', 'pre', 'syntaxhighlight']
         regex = re.compile(
             FILE_LINK_REGEX % '|'.join(self.site.namespaces[6]),
-            flags=re.X)
+            flags=re.VERBOSE)
         return textlib.replaceExcept(
             text, regex, replace_magicword, exceptions)
 
@@ -729,7 +729,7 @@ class CosmeticChangesToolkit:
         if self.site.code in skip_templates:
             for template in skip_templates[self.site.code]:
                 skip_regexes.append(
-                    re.compile(r'\{\{\s*%s\s*\}\}' % template, re.I))
+                    re.compile(r'\{\{\s*%s\s*\}\}' % template, re.IGNORECASE))
         # empty lists
         skip_regexes.append(re.compile(r'(?m)^[\*#] *$'))
 

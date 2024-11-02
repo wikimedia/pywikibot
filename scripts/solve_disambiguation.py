@@ -674,7 +674,7 @@ class DisambiguationRobot(SingleSiteBot):
             \[\[  (?P<title>     [^\[\]\|#]*)
                   (?P<section> \#[^\]\|]*)?
                (\|(?P<label>     [^\]]*))?  \]\]
-            (?P<linktrail>{linktrail})""", flags=re.X)
+            (?P<linktrail>{linktrail})""", flags=re.VERBOSE)
 
     @staticmethod
     def firstlinks(page) -> Generator[str]:

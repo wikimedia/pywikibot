@@ -291,7 +291,7 @@ class RegexFilter:
             quantifier = 'any'
         elif quantifier is True:
             quantifier = 'none'
-        reg = cls.__precompile(regex, re.I)
+        reg = cls.__precompile(regex, re.IGNORECASE)
         for page in generator:
             title = page.title(with_ns=not ignore_namespace)
             if cls.__filter_match(reg, title, quantifier):

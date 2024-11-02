@@ -339,7 +339,7 @@ class CategoryRedirectBot(
                         template='|'.join(item.replace(' ', '[ _]+')
                                           for item in self.template_list),
                         catns=self.site.namespace(14)),
-            re.I | re.X)
+            re.IGNORECASE | re.VERBOSE)
 
         nonemptypages = []
         catpages = set()

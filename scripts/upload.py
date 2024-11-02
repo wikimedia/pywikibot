@@ -83,7 +83,7 @@ from pywikibot.specialbots import UploadRobot
 
 
 CHUNK_SIZE_REGEX = re.compile(
-    r'-chunked(?::(\d+(?:\.\d+)?)[ \t]*(k|ki|m|mi)?b?)?', re.I)
+    r'-chunked(?::(\d+(?:\.\d+)?)[ \t]*(k|ki|m|mi)?b?)?', re.IGNORECASE)
 
 
 def get_chunk_size(match) -> int:
