@@ -113,8 +113,8 @@ class WikibaseEntity:
 
     def __repr__(self) -> str:
         if self.id != '-1':
-            return 'pywikibot.page.{}({!r}, {!r})'.format(
-                self.__class__.__name__, self.repo, self.id)
+            return (f'pywikibot.page.{type(self).__name__}'
+                    f'({self.repo!r}, {self.id!r})')
         return f'pywikibot.page.{self.__class__.__name__}({self.repo!r})'
 
     @classmethod
@@ -135,8 +135,9 @@ class WikibaseEntity:
                 return getattr(self, name)
             return self.get()[name]
 
-        raise AttributeError("'{}' object has no attribute '{}'"
-                             .format(self.__class__.__name__, name))
+        raise AttributeError(
+            f"'{type(self).__name__}' object has no attribute '{name}'"
+        )
 
     def _initialize_empty(self):
         for key, cls in self.DATA_ATTRIBUTES.items():
@@ -609,9 +610,8 @@ class WikibasePage(BasePage, WikibaseEntity):
         if not isinstance(site, pywikibot.site.DataSite):
             raise TypeError('site must be a pywikibot.site.DataSite object')
         if title and ('ns' not in kwargs and 'entity_type' not in kwargs):
-            pywikibot.debug('{}.__init__: {} title {!r} specified without '
-                            'ns or entity_type'
-                            .format(type(self).__name__, site, title))
+            pywikibot.debug(f'{type(self).__name__}.__init__: {site} title '
+                            f'{title!r} specified without ns or entity_type')
 
         self._namespace = None
 
@@ -658,8 +658,9 @@ class WikibasePage(BasePage, WikibaseEntity):
 
         if self._namespace:
             if self._link.namespace != self._namespace.id:
-                raise ValueError("'{}' is not in the namespace {}"
-                                 .format(title, self._namespace.id))
+                raise ValueError(
+                    f"'{title}' is not in the namespace {self._namespace.id}"
+                )
         else:
             # Neither ns or entity_type was provided.
             # Use the _link to determine entity type.
@@ -723,8 +724,9 @@ class WikibasePage(BasePage, WikibaseEntity):
         """
         if args or kwargs:
             raise NotImplementedError(
-                '{}.get does not implement var args: {!r} and {!r}'.format(
-                    self.__class__.__name__, args, kwargs))
+                f'{type(self).__name__}.get does not implement var args: '
+                f'{args!r} and {kwargs!r}'
+            )
 
         # todo: this variable is specific to ItemPage
         lazy_loading_id = not hasattr(self, 'id') and hasattr(self, '_site')

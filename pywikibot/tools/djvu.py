@@ -98,9 +98,8 @@ class DjVuFile:
             n = args[0]
             force = kwargs.get('force', False)
             if not 1 <= n <= obj.number_of_images(force=force):
-                raise ValueError('Page {} not in file {} [{}-{}]'
-                                 .format(int(n), obj.file, int(n),
-                                         int(obj.number_of_images())))
+                raise ValueError(f'Page {int(n)} not in file {obj.file} '
+                                 f'[{int(n)}-{int(obj.number_of_images())}]')
             return fn(obj, *args, **kwargs)
         return wrapper
 

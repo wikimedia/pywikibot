@@ -4,7 +4,7 @@
    in :mod:`backports`
 """
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -140,8 +140,8 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
     # If any iterable is empty, no pages are going to be returned
     for source in iterables:
         if not source:
-            debug('At least one iterable ({!r}) is empty and execution was '
-                  'skipped immediately.'.format(source))
+            debug(f'At least one iterable ({source!r}) is empty and execution'
+                  ' was skipped immediately.')
             return
 
     # Item is cached to check that it is found n_gen times

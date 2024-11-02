@@ -508,8 +508,9 @@ def dh(value: int, pattern: str, encf: encf_type, decf: decf_type,
 
     if isinstance(params, (tuple, list)):
         assert len(params) == len(decoders), (
-            'parameter count ({}) does not match decoder count ({})'
-            .format(len(params), len(decoders)))
+            f'parameter count ({len(params)}) does not match decoder count '
+            f'({len(decoders)})'
+        )
         # convert integer parameters into their textual representation
         str_params = tuple(_make_parameter(decoders[i], param)
                            for i, param in enumerate(params))
@@ -1859,9 +1860,10 @@ for i in range(12):
     # for all other days
     formats[dayMnthFmts[i]]['br'] = eval(
         'lambda m: multi(m, ['
-        '(lambda v: dh_dayOfMnth(v, "%dañ {mname}"), lambda p: p == 1), '
-        '(lambda v: dh_dayOfMnth(v, "%d {mname}"), alwaysTrue)])'
-        .format(mname=brMonthNames[i]))
+        f'(lambda v: dh_dayOfMnth(v, "%dañ {brMonthNames[i]}"),'
+        ' lambda p: p == 1), '
+        f'(lambda v: dh_dayOfMnth(v, "%d {brMonthNames[i]}"), alwaysTrue)])'
+    )
 
 #
 # Month of the Year: "en:May 1976"

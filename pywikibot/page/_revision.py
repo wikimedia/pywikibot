@@ -1,6 +1,6 @@
 """Object representing page revision."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -95,5 +95,6 @@ class Revision(Mapping):
     def __missing__(self, key):
         """Provide backward compatibility for exceptions."""
         # raise AttributeError instead of KeyError for backward compatibility
-        raise AttributeError("'{}' object has no attribute '{}'"
-                             .format(self.__class__.__name__, key))
+        raise AttributeError(
+            f"'{type(self).__name__}' object has no attribute '{key}'"
+        )

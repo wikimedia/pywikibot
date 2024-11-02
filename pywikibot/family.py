@@ -377,17 +377,16 @@ class Family:
         # codes can accept also underscore/dash.
         if not all(x in NAME_CHARACTERS for x in cls.name):
             warnings.warn(
-                'Name of family {} must be ASCII letters and digits '
-                '[a-zA-Z0-9]'.format(cls.name),
+                f'Name of family {cls.name} must be ASCII letters and digits'
+                ' [a-zA-Z0-9]',
                 FamilyMaintenanceWarning,
                 stacklevel=2,
             )
         for code in cls.langs:
             if not all(x in CODE_CHARACTERS for x in code):
                 warnings.warn(
-                    'Family {} code {} must be ASCII lowercase letters and '
-                    'digits [a-z0-9] or underscore/dash [_-]'
-                    .format(cls.name, code),
+                    f'Family {cls.name} code {code} must be ASCII lowercase'
+                    ' letters and digits [a-z0-9] or underscore/dash [_-]',
                     FamilyMaintenanceWarning,
                     stacklevel=2,
                 )

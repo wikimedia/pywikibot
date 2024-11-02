@@ -66,7 +66,8 @@ class RLock:
         """Representation of tools.RLock instance."""
         return repr(self._lock).replace(
             '_thread.RLock',
-            '{cls.__module__}.{cls.__class__.__name__}'.format(cls=self))
+            f'{self.__module__}.{type(self).__name__}'
+        )
 
     @property
     def count(self):

@@ -6,7 +6,7 @@
    its contents.
 """
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -155,8 +155,9 @@ class BaseLink(ComparableMixin):
                     break
             else:
                 raise InvalidTitleError(
-                    'No corresponding title found for namespace {} on {}.'
-                    .format(self.namespace, onsite))
+                    'No corresponding title found for namespace '
+                    f'{self.namespace} on {onsite}.'
+                )
 
         if self.namespace != Namespace.MAIN:
             return f'{name}:{self.title}'
@@ -308,9 +309,10 @@ class Link(BaseLink):
         # Cleanup whitespace
         sep = self._source.family.title_delimiter_and_aliases[0]
         t = re.sub(
-            '[{}\xa0\u1680\u180E\u2000-\u200A\u2028\u2029\u202F\u205F\u3000]+'
-            .format(self._source.family.title_delimiter_and_aliases),
-            sep, t)
+            f'[{self._source.family.title_delimiter_and_aliases}'
+            '\xa0\u1680\u180E\u2000-\u200A\u2028\u2029\u202F\u205F\u3000]+',
+            sep, t
+        )
         # Strip spaces at both ends
         t = t.strip()
         # Remove left-to-right and right-to-left markers.
@@ -395,16 +397,18 @@ class Link(BaseLink):
                 break  # text before : doesn't match any known prefix
             except SiteDefinitionError as e:
                 raise SiteDefinitionError(
-                    '{} is not a local page on {}, and the interwiki '
-                    'prefix {} is not supported by Pywikibot!\n{}'
-                    .format(self._text, self._site, prefix, e))
+                    f'{self._text} is not a local page on {self._site}, and '
+                    f'the interwiki prefix {prefix} is not supported by '
+                    f'Pywikibot!\n{e}'
+                )
             else:
                 if first_other_site:
                     if not self._site.local_interwiki(prefix):
                         raise InvalidTitleError(
-                            '{} links to a non local site {} via an '
-                            'interwiki link to {}.'.format(
-                                self._text, newsite, first_other_site))
+                            f'{self._text} links to a non local site '
+                            f'{newsite} via an interwiki link to '
+                            f'{first_other_site}.'
+                        )
                 elif newsite != self._source:
                     first_other_site = newsite
                 self._site = newsite
@@ -435,8 +439,9 @@ class Link(BaseLink):
                     next_ns = t[:t.index(':')]
                     if self._site.namespaces.lookup_name(next_ns):
                         raise InvalidTitleError(
-                            "The (non-)talk page of '{}' is a valid title "
-                            'in another namespace.'.format(self._text))
+                            f"The (non-)talk page of '{self._text}' is a valid"
+                            ' title in another namespace.'
+                        )
 
         # Reject illegal characters.
         m = Link.illegal_titles_pattern.search(t)

@@ -527,11 +527,9 @@ class TZoneFixedOffset(datetime.tzinfo):
 
     def __repr__(self) -> str:
         """Return the internal representation of the timezone."""
-        return '{}({}, {})'.format(
-            self.__class__.__name__,
-            self._offset.days * 86400 + self._offset.seconds,
-            self._name
-        )
+        return (f'{type(self).__name__}'
+                f'({self._offset.days * 86400 + self._offset.seconds}, '
+                f'{self._name})')
 
 
 def str2timedelta(

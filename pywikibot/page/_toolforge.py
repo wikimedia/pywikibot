@@ -50,9 +50,8 @@ class WikiBlameMixin:
                 'main_authors method is implemented for wikipedia family only')
 
         if self.site.code not in self.WIKIBLAME_CODES:
-            raise NotImplementedError(
-                'main_authors method is not implemented for wikipedia:{}'
-                .format(self.site.code))
+            raise NotImplementedError('main_authors method is not implemented '
+                                      f'for wikipedia:{self.site.code}')
 
         if self.namespace() != pywikibot.site.Namespace.MAIN:
             raise NotImplementedError(

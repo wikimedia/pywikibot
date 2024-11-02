@@ -1032,9 +1032,8 @@ class WbDataPage(WbRepresentation):
         # check should be enough.
         if not page.title().startswith('Data:') \
            or not page.title().endswith(ending):
-            raise ValueError(
-                "Page must be in 'Data:' namespace and end in '{}' "
-                'for {}.'.format(ending, label))
+            raise ValueError(f"Page must be in 'Data:' namespace and end in "
+                             f"'{ending}' for {label}.")
 
     def __init__(self,
                  page: pywikibot.Page,

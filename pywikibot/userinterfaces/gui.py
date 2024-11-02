@@ -13,7 +13,7 @@ Useful for editing the contents of an article.
 .. seealso:: :mod:`editor`
 """
 #
-# (C) Pywikibot team, 2003-2023
+# (C) Pywikibot team, 2003-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -465,9 +465,8 @@ class Tkdialog:
 
         self.root = tkinter.Tk()
         # "%dx%d%+d%+d" % (width, height, xoffset, yoffset)
-        self.root.geometry('{}x{}+10-10'
-                           .format(int(pywikibot.config.tkhorsize),
-                                   int(pywikibot.config.tkvertsize)))
+        self.root.geometry(f'{int(pywikibot.config.tkhorsize)}x'
+                           f'{int(pywikibot.config.tkvertsize)}+10-10')
 
         self.root.title(filename)
         self.photo_description = photo_description

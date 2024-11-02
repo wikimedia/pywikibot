@@ -1,6 +1,6 @@
 """Objects representing Namespaces of MediaWiki site."""
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -273,14 +273,10 @@ class Namespace(Iterable, ComparableMixin, metaclass=MetaNamespace):
         else:
             kwargs = ''
 
-        return '{}(id={}, custom_name={!r}, canonical_name={!r}, ' \
-               'aliases={!r}{})' \
-               .format(self.__class__.__name__,
-                       self.id,
-                       self.custom_name,
-                       self.canonical_name,
-                       self.aliases,
-                       kwargs)
+        return (f'{self.__class__.__name__}(id={self.id}, '
+                f'custom_name={self.custom_name!r}, '
+                f'canonical_name={self.canonical_name!r}, '
+                f'aliases={self.aliases!r}{kwargs})')
 
     @staticmethod
     def default_case(id, default_case=None):
@@ -355,8 +351,8 @@ class NamespacesDict(Mapping):
             try:
                 return self._namespaces[key]
             except KeyError:
-                raise KeyError('{} is not a known namespace. Maybe you should '
-                               'clear the api cache.'.format(key))
+                raise KeyError(f'{key} is not a known namespace. Maybe you'
+                               ' should clear the api cache.')
 
         namespace = self.lookup_name(key)
         if namespace:
@@ -438,8 +434,9 @@ class NamespacesDict(Mapping):
                   for ns in identifiers]
 
         if NotImplemented in result:
-            raise TypeError('identifiers contains inappropriate types: {!r}'
-                            .format(identifiers))
+            raise TypeError(
+                f'identifiers contains inappropriate types: {identifiers!r}'
+            )
 
         # Namespace.lookup_name returns None if the name is not recognised
         if None in result:

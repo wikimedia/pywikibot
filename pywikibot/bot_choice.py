@@ -181,9 +181,8 @@ class StandardOption(Option):
         if self.shortcut == default:
             shortcut = self.shortcut.upper()
         if index >= 0:
-            return '{}[{}]{}'.format(
-                self.option[:index], shortcut,
-                self.option[index + len(self.shortcut):])
+            return (f'{self.option[:index]}[{shortcut}]'
+                    f'{self.option[index + len(self.shortcut):]}')
         return f'{self.option} [{shortcut}]'
 
     def result(self, value: str) -> Any:
@@ -592,11 +591,9 @@ class HighlightContextOption(ContextOption):
         """Highlighted output section of the text."""
         start = max(0, self.start - self.context)
         end = min(len(self.text), self.end + self.context)
-        return '{}<<{color}>>{}<<default>>{}'.format(
-            self.text[start:self.start],
-            self.text[self.start:self.end],
-            self.text[self.end:end],
-            color=self.color)
+        return (f'{self.text[start:self.start]}<<{self.color}>>'
+                f'{self.text[self.start:self.end]}<<default>>'
+                f'{self.text[self.end:end]}')
 
 
 class UnhandledAnswer(Exception):  # noqa: N818
@@ -775,8 +772,8 @@ class InteractiveReplace:
         if self._new is False:
             question += 'be unlinked?'
         else:
-            question += 'target to <<lightpurple>>{}<<default>>?'.format(
-                self._new.canonical_title())
+            question += (f'target to <<lightpurple>>'
+                         f'{self._new.canonical_title()}<<default>>?')
 
         choice = pywikibot.input_choice(question, choices,
                                         default=self._default,

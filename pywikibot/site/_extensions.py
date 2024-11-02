@@ -246,9 +246,8 @@ class GlobalUsageMixin:
                 try:
                     gu_site = pywikibot.Site(url=entry['url'])
                 except SiteDefinitionError:
-                    pywikibot.warning(
-                        'Site could not be defined for global'
-                        ' usage for {}: {}.'.format(page, entry))
+                    pywikibot.warning('Site could not be defined for global '
+                                      f'usage for {page}: {entry}.')
                     continue
                 gu_page = pywikibot.Page(gu_site, entry['title'])
                 yield gu_page

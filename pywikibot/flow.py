@@ -109,7 +109,8 @@ class FlowPage(BasePage, abc.ABC):
         if get_redirect or force:
             raise NotImplementedError(
                 "Neither 'force' nor 'get_redirect' parameter is implemented "
-                'in {}.get()'.format(self.__class__.__name__))
+                f'in {self.__class__.__name__}.get()'
+            )
 
         # TODO: Return more useful data
         return getattr(self, '_data', {})

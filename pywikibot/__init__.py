@@ -244,8 +244,8 @@ def Site(code: str | None = None,  # noqa: N802
         debug(f"Instantiated {interface.__name__} object '{_sites[key]}'")
 
         if _sites[key].code != code:
-            warn('Site {} instantiated using different code "{}"'
-                 .format(_sites[key], code), UserWarning, 2)
+            warn(f'Site {_sites[key]} instantiated using different code '
+                 f'"{code}"', UserWarning, 2)
 
     return _sites[key]
 
@@ -337,9 +337,8 @@ def _flush(stop: bool = True) -> None:
 
     num, sec = remaining()
     if num > 0 and sec.total_seconds() > _config.noisysleep:
-        output('<<lightblue>>Waiting for {num} pages to be put. '
-               'Estimated time remaining: {sec}<<default>>'
-               .format(num=num, sec=sec))
+        output(f'<<lightblue>>Waiting for {num} pages to be put. '
+               f'Estimated time remaining: {sec}<<default>>')
 
     exit_queue = None
     if _putthread is not threading.current_thread():

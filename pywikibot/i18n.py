@@ -464,8 +464,8 @@ def _extract_plural(lang: str, message: str, parameters: Mapping[str, int]
         variants = match[2]
         num = parameters[selector]
         if not isinstance(num, int):
-            raise ValueError("'{}' must be a number, not a {} ({})"
-                             .format(selector, num, type(num).__name__))
+            raise ValueError(f"'{selector}' must be a number, not a {num} "
+                             f'({type(num).__name__})')
 
         plural_entries = []
         specific_entries = {}
@@ -635,8 +635,9 @@ def translate(code: str | pywikibot.site.BaseSite,
         return trans
 
     if not isinstance(parameters, Mapping):
-        raise ValueError('parameters should be a mapping, not {}'
-                         .format(type(parameters).__name__))
+        raise ValueError(
+            f'parameters should be a mapping, not {type(parameters).__name__}'
+        )
 
     # else we check for PLURAL variants
     trans = _extract_plural(code, trans, parameters)
@@ -776,10 +777,10 @@ def twtranslate(
             return fallback_prompt
 
         raise pywikibot.exceptions.TranslationError(
-            'Unable to load messages package {} for bundle {}'
-            '\nIt can happen due to lack of i18n submodule or files. '
-            'See {}/i18n'
-            .format(_messages_package_name, twtitle, __url__))
+            f'Unable to load messages package {_messages_package_name} for '
+            f' bundle {twtitle}\nIt can happen due to lack of i18n submodule '
+            f'or files. See {__url__}/i18n'
+        )
 
     # if source is a site then use its lang attribute, otherwise it's a str
     lang = getattr(source, 'lang', source)
@@ -810,8 +811,9 @@ def twtranslate(
         trans = _extract_plural(alt, trans, parameters)
 
     if parameters is not None and not isinstance(parameters, Mapping):
-        raise ValueError('parameters should be a mapping, not {}'
-                         .format(type(parameters).__name__))
+        raise ValueError(
+            f'parameters should be a mapping, not {type(parameters).__name__}'
+        )
 
     if not only_plural and parameters:
         trans = trans % parameters
@@ -949,8 +951,9 @@ def input(twtitle: str,
         prompt = fallback_prompt
     else:
         raise pywikibot.exceptions.TranslationError(
-            'Unable to load messages package {} for bundle {}'
-            .format(_messages_package_name, twtitle))
+            f'Unable to load messages package {_messages_package_name} for '
+            f'bundle {twtitle}'
+        )
     return pywikibot.input(prompt, password)
 
 

@@ -186,8 +186,8 @@ class EventStreams(GeneratorWrapper):
         :raises NotImplementedError: no stream types specified
         """
         if self._streams is None:
-            raise NotImplementedError('No streams specified for class {}'
-                                      .format(self.__class__.__name__))
+            raise NotImplementedError(
+                f'No streams specified for class {type(self).__name__}')
         return '{host}{path}/{streams}{since}'.format(
             host=self._site.eventstreams_host(),
             path=self._site.eventstreams_path(),
@@ -205,8 +205,8 @@ class EventStreams(GeneratorWrapper):
         """
         if value is not None:
             self._total = int(value)
-            debug('{}: Set limit (maximum_items) to {}.'
-                  .format(self.__class__.__name__, self._total))
+            debug(f'{type(self).__name__}: Set limit (maximum_items) to '
+                  f'{self._total}.')
 
     def register_filter(self, *args, **kwargs):
         """Register a filter.
@@ -363,8 +363,8 @@ class EventStreams(GeneratorWrapper):
             else:
                 warning(f'Unknown event {event.event} occurred.')
 
-        debug('{}: Stopped iterating due to exceeding item limit.'
-              .format(self.__class__.__name__))
+        debug(f'{type(self).__name__}: Stopped iterating due to exceeding item'
+              ' limit.')
         del self.source
 
 

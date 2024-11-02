@@ -39,8 +39,8 @@ class LogEntry(UserDict):
         self.site = site
         expected_type = self._expected_type
         if expected_type is not None and expected_type != self.type():
-            raise Error('Wrong log type! Expecting {}, received {} instead.'
-                        .format(expected_type, self.type()))
+            raise Error(f'Wrong log type! Expecting {expected_type}, received '
+                        f'{self.type()} instead.')
 
     def __missing__(self, key: str) -> None:
         """Debug when the key is missing.
@@ -79,8 +79,8 @@ class LogEntry(UserDict):
     def __eq__(self, other: Any) -> bool:
         """Compare if self is equal to other."""
         if not isinstance(other, LogEntry):
-            pywikibot.debug("'{}' cannot be compared with '{}'"
-                            .format(type(self).__name__, type(other).__name__))
+            pywikibot.debug(f"'{type(self).__name__}' cannot be compared with "
+                            f"'{type(other).__name__}'")
             return False
 
         return self.logid() == other.logid() and self.site == other.site

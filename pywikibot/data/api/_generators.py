@@ -131,8 +131,8 @@ class APIGenerator(APIGeneratorBase, GeneratorWrapper):
         """
         self.query_increment = int(value)
         self.request[self.limit_name] = self.query_increment
-        pywikibot.debug('{}: Set query_increment to {}.'
-                        .format(type(self).__name__, self.query_increment))
+        pywikibot.debug(f'{type(self).__name__}: Set query_increment to '
+                        f'{self.query_increment}.')
 
     def set_maximum_items(self, value: int | str | None) -> None:
         """Set the maximum number of items to be retrieved from the wiki.
@@ -147,10 +147,10 @@ class APIGenerator(APIGeneratorBase, GeneratorWrapper):
             self.limit = int(value)
             if self.query_increment and self.limit < self.query_increment:
                 self.request[self.limit_name] = self.limit
-                pywikibot.debug('{}: Set request item limit to {}'
-                                .format(type(self).__name__, self.limit))
-            pywikibot.debug('{}: Set limit (maximum_items) to {}.'
-                            .format(type(self).__name__, self.limit))
+                pywikibot.debug(f'{type(self).__name__}: Set request item '
+                                f'limit to {self.limit}')
+            pywikibot.debug(f'{type(self).__name__}: Set limit '
+                            f'(maximum_items) to {self.limit}.')
 
     @property
     def generator(self):
@@ -176,14 +176,15 @@ class APIGenerator(APIGeneratorBase, GeneratorWrapper):
                     yield item
                     n += 1
                     if self.limit is not None and n >= self.limit:
-                        pywikibot.debug('{}: Stopped iterating due to '
-                                        'exceeding item limit.'
-                                        .format(type(self).__name__))
+                        pywikibot.debug(
+                            f'{type(self).__name__}: Stopped iterating due to'
+                            ' exceeding item limit.'
+                        )
                         return
                 offset += n_items
             else:
-                pywikibot.debug('{}: Stopped iterating due to empty list in '
-                                'response.'.format(type(self).__name__))
+                pywikibot.debug(f'{type(self).__name__}: Stopped iterating'
+                                ' due to empty list in response.')
                 break
 
 
@@ -238,8 +239,8 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
                 self.modules = parameters[modtype].split('|')
                 break
         else:
-            raise Error('{}: No query module name found in arguments.'
-                        .format(self.__class__.__name__))
+            raise Error(f'{type(self).__name__}: No query module name found'
+                        ' in arguments.')
 
         parameters['indexpageids'] = True  # always ask for list of pageids
         self.continue_name = 'continue'
@@ -266,10 +267,11 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
                     self.limited_module = module
                     limited_modules.remove(module)
                     break
-            pywikibot.log('{}: multiple requested query modules support limits'
-                          "; using the first such module '{}' of {!r}"
-                          .format(self.__class__.__name__, self.limited_module,
-                                  self.modules))
+            pywikibot.log(
+                f'{type(self).__name__}: multiple requested query modules'
+                ' support limits; using the first such module '
+                f"{self.limited_module}' of {self.modules!r}"
+            )
 
             # Set limits for all remaining limited modules to max value.
             # Default values will only cause more requests and make the query
@@ -379,8 +381,9 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
             self.query_limit = limit
         else:
             self.query_limit = min(self.api_limit, limit)
-        pywikibot.debug('{}: Set query_limit to {}.'
-                        .format(type(self).__name__, self.query_limit))
+        pywikibot.debug(
+            f'{type(self).__name__}: Set query_limit to {self.query_limit}.'
+        )
 
     def set_maximum_items(self, value: int | str | None) -> None:
         """Set the maximum number of items to be retrieved from the wiki.
@@ -410,8 +413,9 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
             limit = int(param['max'])
         if self.api_limit is None or limit < self.api_limit:
             self.api_limit = limit
-            pywikibot.debug('{}: Set query_limit to {}.'
-                            .format(type(self).__name__, self.api_limit))
+            pywikibot.debug(
+                f'{type(self).__name__}: Set query_limit to {self.api_limit}.'
+            )
 
     def support_namespace(self) -> bool:
         """Check if namespace is a supported parameter on this query.
@@ -446,8 +450,8 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
         param = self.site._paraminfo.parameter('query+' + self.limited_module,
                                                'namespace')
         if not param:
-            pywikibot.warning('{} module does not support a namespace '
-                              'parameter'.format(self.limited_module))
+            pywikibot.warning(f'{self.limited_module} module does not support'
+                              ' a namespace parameter')
             warn('set_namespace() will be modified to raise TypeError '
                  'when namespace parameter is not supported. '
                  'It will be a Breaking Change, please update your code '
@@ -468,8 +472,8 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
 
         if 'multi' not in param and len(namespaces) != 1:
             if self._check_result_namespace is NotImplemented:
-                raise TypeError('{} module does not support multiple '
-                                'namespaces'.format(self.limited_module))
+                raise TypeError(f'{self.limited_module} module does not'
+                                ' support multiple namespaces')
             self._namespaces = set(namespaces)
             namespaces = None
 
@@ -608,9 +612,8 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
                 self.data = self.request.submit()
 
             if not self.data or not isinstance(self.data, dict):
-                pywikibot.debug(
-                    '{}: stopped iteration because no dict retrieved from api.'
-                    .format(type(self).__name__))
+                pywikibot.debug(f'{type(self).__name__}: stopped iteration'
+                                ' because no dict retrieved from api.')
                 break
 
             if 'query' in self.data and self.resultkey in self.data['query']:

@@ -1984,8 +1984,9 @@ class GeneratorsMixin:
                 if err.code in self._patrol_errors:
                     raise Error(self._patrol_errors[err.code]
                                 .format_map(errdata))
-                pywikibot.debug("protect: Unexpected error code '{}' received."
-                                .format(err.code))
+                pywikibot.debug(
+                    f"protect: Unexpected error code '{err.code}' received."
+                )
                 raise
 
             yield result['patrol']

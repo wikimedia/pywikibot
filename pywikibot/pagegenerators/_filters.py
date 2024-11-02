@@ -1,6 +1,6 @@
 """Page filter generators provided by the pagegenerators module."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -387,11 +387,8 @@ def EdittimeFilterPageGenerator(
 
         edit_time = rev.timestamp  # type: ignore[attr-defined]
 
-        msg = '{prefix} edit on {page} was on {time}.\n' \
-              'Too {{when}}. Skipping.' \
-              .format(prefix=type(edit).__name__,
-                      page=page,
-                      time=edit_time.isoformat())
+        msg = (f'{type(edit).__name__} edit on {page} was on '
+               f'{edit_time.isoformat()}.\nToo {{when}}. Skipping.')
 
         if edit_time < edit.edit_start:
             _output_if(show_filtered, msg.format(when='old'))

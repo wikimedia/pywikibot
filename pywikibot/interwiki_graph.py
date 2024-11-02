@@ -110,9 +110,8 @@ class GraphDrawer:
         """Add a node for page."""
         assert self.graph is not None
         node = pydot.Node(self.getLabel(page), shape='rectangle')
-        node.set_URL('"http://{}{}"'
-                     .format(page.site.hostname(),
-                             page.site.get_address(page.title(as_url=True))))
+        node.set_URL(f'"http://{page.site.hostname()}'
+                     f'{page.site.get_address(page.title(as_url=True))}"')
         node.set_style('filled')
         node.set_fillcolor('white')
         node.set_fontsize('11')

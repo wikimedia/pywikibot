@@ -163,7 +163,7 @@ class TestLink(DefaultDrySiteTestCase):
             # A link is invalid if their (non-)talk page would be in another
             # namespace than the link's "other" namespace
             (['Talk:File:Example.svg'],
-             r'The \(non-\)talk page of (u|)\'Talk:File:Example.svg\''
+             r"The \(non-\)talk page of 'Talk:File:Example.svg'"
              r' is a valid title in another namespace.'),
 
             (['.', '..', './Sandbox', '../Sandbox', 'Foo/./Sandbox',

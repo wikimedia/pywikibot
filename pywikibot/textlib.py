@@ -235,10 +235,10 @@ def ignore_case(string: str) -> str:
 def _tag_pattern(tag_name: str) -> str:
     """Return a tag pattern for the given tag name."""
     return (
-        r'<{0}(?:>|\s+[^>]*(?<!/)>)'  # start tag
+        rf'<{ignore_case(tag_name)}(?:>|\s+[^>]*(?<!/)>)'  # start tag
         r'[\s\S]*?'  # contents
-        r'</{0}\s*>'  # end tag
-        .format(ignore_case(tag_name)))
+        rf'</{ignore_case(tag_name)}\s*>'  # end tag
+    )
 
 
 def _tag_regex(tag_name: str):
@@ -732,9 +732,9 @@ def replace_links(text: str, replace, site: pywikibot.site.BaseSite) -> str:
     def check_classes(replacement):
         """Normalize the replacement into a list."""
         if not isinstance(replacement, (pywikibot.Page, pywikibot.Link)):
-            raise ValueError('The replacement must be None, False, '
-                             'a sequence, a Link or a str but '
-                             'is "{}"'.format(type(replacement)))
+            raise ValueError('The replacement must be None, False, a'
+                             ' sequence, a Link or a str but is '
+                             f'"{type(replacement)}"')
 
     def title_section(link) -> str:
         title = link.title
@@ -743,8 +743,8 @@ def replace_links(text: str, replace, site: pywikibot.site.BaseSite) -> str:
         return title
 
     if not isinstance(site, pywikibot.site.BaseSite):
-        raise ValueError('The "site" argument must be a BaseSite not {}.'
-                         .format(type(site).__name__))
+        raise ValueError('The "site" argument must be a BaseSite not '
+                         f'{type(site).__name__}.')
 
     if isinstance(replace, Sequence):
         if len(replace) != 2:
@@ -753,8 +753,8 @@ def replace_links(text: str, replace, site: pywikibot.site.BaseSite) -> str:
         replace_list = [to_link(replace[0]), replace[1]]
         if not isinstance(replace_list[0], pywikibot.Link):
             raise ValueError(
-                'The original value must be either str, Link or Page '
-                'but is "{}"'.format(type(replace_list[0])))
+                'The original value must be either str, Link or Page but is '
+                f'"{type(replace_list[0])}"')
         if replace_list[1] is not False and replace_list[1] is not None:
             if isinstance(replace_list[1], str):
                 replace_list[1] = pywikibot.Page(site, replace_list[1])
@@ -764,7 +764,8 @@ def replace_links(text: str, replace, site: pywikibot.site.BaseSite) -> str:
     linktrail = site.linktrail()
     link_pattern = re.compile(
         r'\[\[(?P<title>.*?)(#(?P<section>.*?))?(\|(?P<label>.*?))?\]\]'
-        r'(?P<linktrail>{})'.format(linktrail))
+        rf'(?P<linktrail>{linktrail})'
+    )
     extended_label_pattern = re.compile(fr'(.*?\]\])({linktrail})')
     linktrail = re.compile(linktrail)
     curpos = 0
@@ -1234,8 +1235,8 @@ def removeLanguageLinks(text: str, site=None, marker: str = '') -> str:
                          + list(site.family.obsolete.keys()))
     if not languages:
         return text
-    interwikiR = re.compile(r'\[\[({})\s?:[^\[\]\n]*\]\][\s]*'
-                            .format(languages), re.IGNORECASE)
+    interwikiR = re.compile(rf'\[\[({languages})\s?:[^\[\]\n]*\]\][\s]*',
+                            re.IGNORECASE)
     text = replaceExcept(text, interwikiR, '',
                          ['comment', 'math', 'nowiki', 'pre',
                           'syntaxhighlight'],
@@ -1467,8 +1468,9 @@ def getCategoryLinks(text: str, site=None,
     # and HTML comments
     text = removeDisabledParts(text, include=include or [])
     catNamespace = '|'.join(site.namespaces.CATEGORY)
-    R = re.compile(r'\[\[\s*(?P<namespace>{})\s*:\s*(?P<rest>.+?)\]\]'
-                   .format(catNamespace), re.I)
+    R = re.compile(
+        rf'\[\[\s*(?P<namespace>{catNamespace})\s*:\s*(?P<rest>.+?)\]\]', re.I
+    )
     for match in R.finditer(text):
         match_rest = match['rest']
         if expand_text and '{{' in match_rest:
@@ -1510,8 +1512,7 @@ def removeCategoryLinks(text: str, site=None, marker: str = '') -> str:
     if site is None:
         site = pywikibot.Site()
     catNamespace = '|'.join(site.namespaces.CATEGORY)
-    categoryR = re.compile(r'\[\[\s*({})\s*:.*?\]\]\s*'
-                           .format(catNamespace), re.I)
+    categoryR = re.compile(rf'\[\[\s*({catNamespace})\s*:.*?\]\]\s*', re.I)
     text = replaceExcept(text, categoryR, '',
                          ['comment', 'includeonly', 'math', 'nowiki', 'pre',
                           'syntaxhighlight'],
@@ -1568,13 +1569,12 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None,
 
     # title might contain regex special characters
     title = case_escape(site.namespaces[14].case, title, underscore=True)
-    categoryR = re.compile(r'\[\[\s*({})\s*:\s*{}[\s\u200e\u200f]*'
-                           r'((?:\|[^]]+)?\]\])'
-                           .format(catNamespace, title), re.I)
+    categoryR = re.compile(
+        rf'\[\[\s*({catNamespace})\s*:\s*{title}[\s\u200e\u200f]*'
+        r'((?:\|[^]]+)?\]\])', re.I)
     categoryRN = re.compile(
-        r'^[^\S\n]*\[\[\s*({})\s*:\s*{}[\s\u200e\u200f]*'
-        r'((?:\|[^]]+)?\]\])[^\S\n]*\n'
-        .format(catNamespace, title), re.I | re.M)
+        rf'^[^\S\n]*\[\[\s*({catNamespace})\s*:\s*{title}[\s\u200e\u200f]*'
+        r'((?:\|[^]]+)?\]\])[^\S\n]*\n', re.I | re.M)
     exceptions = ['comment', 'math', 'nowiki', 'pre', 'syntaxhighlight']
     if newcat is None:
         # First go through and try the more restrictive regex that removes
@@ -1587,16 +1587,16 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None,
     elif add_only:
         text = replaceExcept(
             oldtext, categoryR,
-            '{}\n{}'.format(
-                oldcat.title(as_link=True, allow_interwiki=False),
-                newcat.title(as_link=True, allow_interwiki=False)),
-            exceptions, site=site)
+            f'{oldcat.title(as_link=True, allow_interwiki=False)}\n'
+            f'{newcat.title(as_link=True, allow_interwiki=False)}',
+            exceptions, site=site
+        )
     else:
-        text = replaceExcept(oldtext, categoryR,
-                             '[[{}:{}\\2'
-                             .format(site.namespace(14),
-                                     newcat.title(with_ns=False)),
-                             exceptions, site=site)
+        text = replaceExcept(
+            oldtext, categoryR,
+            f'[[{site.namespace(14)}:{newcat.title(with_ns=False)}\\2',
+            exceptions, site=site
+        )
     return text
 
 
@@ -1756,10 +1756,9 @@ def compileLinkR(withoutBracketed: bool = False, onlyBracketed: bool = False):
     # not allowed inside links. For example, in this wiki text:
     #       ''Please see https://www.example.org.''
     # .'' shouldn't be considered as part of the link.
-    regex = r'(?P<url>http[s]?://[^{notInside}]*?[^{notAtEnd}]' \
-            r'(?=[{notAtEnd}]*\'\')|http[s]?://[^{notInside}]*' \
-            r'[^{notAtEnd}])'.format(notInside=notInside,
-                                     notAtEnd=notAtEnd)
+    regex = rf'(?P<url>http[s]?://[^{notInside}]*?[^{notAtEnd}]' \
+            rf'(?=[{notAtEnd}]*\'\')|http[s]?://[^{notInside}]*' \
+            rf'[^{notAtEnd}])'
 
     if withoutBracketed:
         regex = r'(?<!\[)' + regex

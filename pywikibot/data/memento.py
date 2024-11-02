@@ -9,7 +9,7 @@
 # Parts of MementoClient class codes are
 # licensed under the BSD open source software license.
 #
-# (C) Pywikibot team, 2015-2023
+# (C) Pywikibot team, 2015-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -179,8 +179,8 @@ class MementoClient(OldMementoClient):
                 )
             except (requests.exceptions.ConnectTimeout,
                     requests.exceptions.ConnectionError):  # pragma: no cover
-                warning('Could not connect to URI {}, returning no native '
-                        'URI-G'.format(original_uri))
+                warning(f'Could not connect to URI {original_uri}, returning'
+                        'no native URI-G')
                 return None
 
             debug('Request headers sent to search for URI-G:  '

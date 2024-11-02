@@ -400,7 +400,7 @@ def fetch(uri: str, method: str = 'GET', headers: dict | None = None,
         if use_fake_user_agent and isinstance(use_fake_user_agent, str):
             return use_fake_user_agent  # Custom UA.
         raise ValueError('Invalid parameter: '
-                         'use_fake_user_agent={}'.format(use_fake_user_agent))
+                         f'use_fake_user_agent={use_fake_user_agent}')
 
     def assign_user_agent(user_agent_format_string):
         if not user_agent_format_string or '{' in user_agent_format_string:
@@ -554,8 +554,9 @@ def _decide_encoding(response: requests.Response,
 
     if header_codecs and charset_codecs and header_codecs != charset_codecs:
         pywikibot.warning(
-            'Encoding "{}" requested but "{}" received in the '
-            'response header.'.format(charset, header_encoding))
+            f'Encoding "{charset}" requested but "{header_encoding}" received'
+            ' in the response header.'
+        )
 
     _encoding = _try_decode(response.content, header_encoding) \
         or _try_decode(response.content, charset)

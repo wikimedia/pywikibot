@@ -72,8 +72,8 @@ class BaseSite(ComparableMixin):
             else:
                 # no such language anymore
                 self.obsolete = True
-                pywikibot.log('Site {} instantiated and marked "obsolete" '
-                              'to prevent access'.format(self))
+                pywikibot.log(f'Site {self} instantiated and marked "obsolete"'
+                              ' to prevent access')
         elif self.__code not in self.languages():
             if self.__family.name in self.__family.langs \
                and len(self.__family.langs) == 1:
@@ -82,11 +82,11 @@ class BaseSite(ComparableMixin):
                    and code == pywikibot.config.mylang:
                     pywikibot.config.mylang = self.__code
                     warn('Global configuration variable "mylang" changed to '
-                         '"{}" while instantiating site {}'
-                         .format(self.__code, self), UserWarning)
+                         f'"{self.__code}" while instantiating site {self}',
+                         UserWarning)
             else:
-                error_msg = ("Language '{}' does not exist in family {}"
-                             .format(self.__code, self.__family.name))
+                error_msg = (f"Language '{self.__code}' does not exist in "
+                             f'family {self.__family.name}')
                 raise UnknownSiteError(error_msg)
 
         self._username = normalize_username(user)
@@ -150,15 +150,14 @@ class BaseSite(ComparableMixin):
                 # should it just raise an Exception and fail?
                 # this will help to check the dictionary ...
                 except KeyError:
-                    warn('Site {} has no language defined in '
-                         'doc_subpages dict in {}_family.py file'
-                         .format(self, self.family.name),
-                         FamilyMaintenanceWarning, 2)
+                    warn(f'Site {self} has no language defined in '
+                         f'doc_subpages dict in {self.family.name}_family.py '
+                         'file', FamilyMaintenanceWarning, 2)
         # doc_subpages not defined in x_family.py file
         except AttributeError:
             doc = ()  # default
-            warn('Site {} has no doc_subpages dict in {}_family.py file'
-                 .format(self, self.family.name),
+            warn(f'Site {self} has no doc_subpages dict in '
+                 f'{self.family.name}_family.py file',
                  FamilyMaintenanceWarning, 2)
 
         return doc
@@ -332,10 +331,9 @@ class BaseSite(ComparableMixin):
             try:
                 item = self.family.disambcatname[repo.code]
             except KeyError:
-                raise Error(
-                    'No {repo} qualifier found for disambiguation category '
-                    'name in {fam}_family file'.format(repo=repo_name,
-                                                       fam=self.family.name))
+                raise Error(f'No {repo_name} qualifier found for'
+                            ' disambiguation category name in '
+                            f'{self.family.name}_family file')
 
             dp = pywikibot.ItemPage(repo, item)
             try:

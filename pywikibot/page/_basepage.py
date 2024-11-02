@@ -129,9 +129,8 @@ class BasePage(ComparableMixin):
             self._link = source
             self._revisions = {}
         else:
-            raise Error(
-                "Invalid argument type '{}' in Page initializer: {}"
-                .format(type(source), source))
+            raise Error(f"Invalid argument type '{type(source)}' in Page "
+                        f'initializer: {source}')
 
     @property
     def site(self):
@@ -257,8 +256,7 @@ class BasePage(ComparableMixin):
                         or self.site.code != target_code)):
                 if self.site.family.name not in (
                         target_family, self.site.code):
-                    title = '{site.family.name}:{site.code}:{title}'.format(
-                        site=self.site, title=title)
+                    title = f'{self.site.family.name}:{self.site.code}:{title}'
                 else:
                     # use this form for sites like commons, where the
                     # code is the same as the family name
@@ -672,9 +670,8 @@ class BasePage(ComparableMixin):
                 extract = shorten(extract, chars, break_long_words=False,
                                   placeholder='…')
         else:
-            raise ValueError(
-                'variant parameter must be "plain", "html" or "wiki", not "{}"'
-                .format(variant))
+            raise ValueError('variant parameter must be "plain", "html" or '
+                             f'"wiki", not "{variant}"')
 
         if not lines:
             return extract
@@ -847,9 +844,9 @@ class BasePage(ComparableMixin):
                         self._catredirect = p.title()
                     else:
                         pywikibot.warning(
-                            'Category redirect target {} on {} is not a '
-                            'category'.format(p.title(as_link=True),
-                                              self.title(as_link=True)))
+                            f'Category redirect target {p.title(as_link=True)}'
+                            f' on {self.title(as_link=True)} is not a category'
+                        )
                 else:
                     pywikibot.warning(
                         'No target found for category redirect on '
@@ -1533,9 +1530,8 @@ class BasePage(ComparableMixin):
                 f'keyword argument "{key}={arg}"',
                 since='7.0.0')
             if key in kwargs:
-                pywikibot.warning('{!r} is given as keyword argument {!r} '
-                                  'already; ignoring {!r}'
-                                  .format(key, arg, kwargs[key]))
+                pywikibot.warning(f'{key!r} is given as keyword argument '
+                                  f'{arg!r} already; ignoring {kwargs[key]!r}')
             else:
                 kwargs[key] = arg
 
@@ -1867,8 +1863,8 @@ class BasePage(ComparableMixin):
         result += '! oldid || date/time || username || edit summary\n'
         for entry in self.revisions(reverse=reverse, total=total):
             result += '|----\n'
-            result += ('| {r.revid} || {r.timestamp} || {r.user} || '
-                       '<nowiki>{r.comment}</nowiki>\n'.format(r=entry))
+            result += (f'| {entry.revid} || {entry.timestamp} || {entry.user} '
+                       f'|| <nowiki>{entry.comment}</nowiki>\n')
         result += '|}\n'
         return result
 
@@ -2233,12 +2229,9 @@ class BasePage(ComparableMixin):
             return False
 
         if old_cat not in cats:
-            if self.namespace() != 10:
-                pywikibot.error(
-                    f'{self} is not in category {old_cat.title()}!')
-            else:
-                pywikibot.info('{} is not in category {}, skipping...'
-                               .format(self, old_cat.title()))
+            pywikibot.info(
+                f'{self} is not in category {old_cat.title()}, skipping...'
+            )
             return False
 
         # This prevents the bot from adding new_cat if it is already present.

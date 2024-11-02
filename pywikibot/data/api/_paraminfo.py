@@ -193,10 +193,11 @@ class ParamInfo(Sized, Container):
             if len(missing_modules) == 1 and len(normalized_result) == 1:
                 # Okay it's possible to recover
                 normalized_result = next(iter(normalized_result.values()))
-                pywikibot.warning('The module "{0[name]}" ("{0[path]}") '
-                                  'was returned as path even though "{1}" '
-                                  'was requested'.format(normalized_result,
-                                                         missing_modules[0]))
+                pywikibot.warning(
+                    f'The module "{normalized_result["name"]}" '
+                    f'("{normalized_result["path"]}") was returned as path '
+                    f'even though "{missing_modules[0]}" was requested'
+                )
                 normalized_result['path'] = missing_modules[0]
                 normalized_result['name'] = missing_modules[0].rsplit('+')[0]
                 normalized_result = {missing_modules[0]: normalized_result}

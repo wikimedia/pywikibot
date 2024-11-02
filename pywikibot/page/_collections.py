@@ -444,7 +444,7 @@ class SiteLinkCollection(MutableMapping):
                 if not isinstance(json, dict):
                     raise ValueError(
                         "Couldn't determine the site and title of the value: "
-                        '{!r}'.format(json))
+                        f'{json!r}')
                 db_name = json['site']
                 norm_data[db_name] = json
         return norm_data
@@ -511,11 +511,10 @@ class SubEntityCollection(MutableSequence):
     def _validate_isinstance(self, obj):
         if not isinstance(obj, self.type_class):
             raise TypeError(
-                '{} should only hold instances of {}, '
-                'instance of {} was provided'
-                .format(self.__class__.__name__,
-                        self.type_class.__name__,
-                        obj.__class__.__name__))
+                f'{type(self).__name__} should only hold instances of '
+                f'{self.type_class.__name__}, instance of '
+                f'{type(obj).__name__} was provided'
+            )
 
     def __getitem__(self, index):
         if isinstance(index, str):

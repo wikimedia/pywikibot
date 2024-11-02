@@ -296,8 +296,8 @@ def set_interface(module_name: str) -> None:
     """
     global ui
 
-    ui_module = __import__('pywikibot.userinterfaces.{}_interface'
-                           .format(module_name), fromlist=['UI'])
+    ui_module = __import__(f'pywikibot.userinterfaces.{module_name}_interface',
+                           fromlist=['UI'])
     ui = ui_module.UI()
     assert ui is not None
     atexit.register(ui.flush)
@@ -1327,8 +1327,8 @@ class BaseBot(OptionHandler):
                 pywikibot.info(
                     f'Skipping {page.title()} because of edit conflict')
             elif isinstance(e, SpamblacklistError):
-                pywikibot.info('Cannot change {} because of blacklist '
-                               'entry {}'.format(page.title(), e.url))
+                pywikibot.info(f'Cannot change {page.title()} because of '
+                               f'blacklist entry {e.url}')
             elif isinstance(e, LockedPageError):
                 pywikibot.info(f'Skipping {page.title()} (locked page)')
             else:
@@ -1390,8 +1390,8 @@ class BaseBot(OptionHandler):
             for op, count in self.counter.items():
                 if not count or op == 'read':
                     continue
-                pywikibot.info('{} operation time: {:.1f} seconds'
-                               .format(op.capitalize(), write_seconds / count))
+                pywikibot.info(f'{op.capitalize()} operation time: '
+                               f'{write_seconds / count:.1f} seconds')
 
         # exc_info contains exception from self.run() while terminating
         exc_info = sys.exc_info()
@@ -1454,8 +1454,8 @@ class BaseBot(OptionHandler):
             :class:`page.BasePage`. For other page types the
             :attr:`treat_page_type` must be set.
         """
-        raise NotImplementedError('Method {}.treat() not implemented.'
-                                  .format(self.__class__.__name__))
+        raise NotImplementedError(
+            f'Method {type(self).__name__}.treat() not implemented.')
 
     def setup(self) -> None:
         """Some initial setup before :meth:`run` operation starts.
@@ -1814,8 +1814,8 @@ class CurrentPageBot(BaseBot):
 
     def treat_page(self) -> None:
         """Process one page (Abstract method)."""
-        raise NotImplementedError('Method {}.treat_page() not implemented.'
-                                  .format(self.__class__.__name__))
+        raise NotImplementedError(
+            f'Method {type(self).__name__}.treat_page() not implemented.')
 
     def treat(self, page: pywikibot.page.BasePage) -> None:
         """Set page to current page and treat that page."""
@@ -1874,8 +1874,9 @@ class AutomaticTWSummaryBot(CurrentPageBot):
     def summary_parameters(self, value: dict[str, str]) -> None:
         """Set the i18n dictionary."""
         if not isinstance(value, dict):
-            raise TypeError('"value" must be a dict but {} was found.'
-                            .format(type(value).__name__))
+            raise TypeError(
+                f'"value" must be a dict but {type(value).__name__} was found.'
+            )
         self._summary_parameters = value
 
     @summary_parameters.deleter
@@ -2250,8 +2251,8 @@ class WikidataBot(Bot, ExistingPageBot):
         :return: pywikibot.ItemPage or None
         """
         if not summary:
-            summary = 'Bot: New item with sitelink from {}'.format(
-                      page.title(as_link=True, insite=self.repo))
+            summary = ('Bot: New item with sitelink from '
+                       f'{page.title(as_link=True, insite=self.repo)}')
 
         if data is None:
             data = {}
@@ -2327,9 +2328,8 @@ class WikidataBot(Bot, ExistingPageBot):
 
         Must be implemented in subclasses.
         """
-        raise NotImplementedError('Method {}.treat_page_and_item() not '
-                                  'implemented.'
-                                  .format(self.__class__.__name__))
+        raise NotImplementedError(f'Method {type(self).__name__}.'
+                                  'treat_page_and_item() not implemented.')
 
 
 set_interface(config.userinterface)

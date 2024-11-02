@@ -139,8 +139,8 @@ class UI(ABUIC):
 
     def encounter_color(self, color, target_stream):
         """Abstract method to handle the next color encountered."""
-        raise NotImplementedError('The {} class does not support '
-                                  'colors.'.format(self.__class__.__name__))
+        raise NotImplementedError(f'The {type(self).__name__} class does not'
+                                  ' support colors.')
 
     @classmethod
     def divide_color(cls, color):
@@ -180,9 +180,8 @@ class UI(ABUIC):
                 out, err = self.stdout.name, self.stderr.name
             except AttributeError:
                 out, err = self.stdout, self.stderr
-            raise OSError(
-                'Target stream {} is neither stdin ({}) nor stderr ({})'
-                .format(target_stream.name, out, err))
+            raise OSError(f'Target stream {target_stream.name} is neither '
+                          f'stdin ({out}) nor stderr ({err})')
 
     def support_color(self, target_stream) -> bool:
         """Return whether the target stream does support colors."""
@@ -479,8 +478,8 @@ class UI(ABUIC):
         for i, option in enumerate(options):
             if not isinstance(option, Option):
                 if len(option) != 2:
-                    raise ValueError('Option #{} does not consist of an '
-                                     'option and shortcut.'.format(i))
+                    raise ValueError(f'Option #{i} does not consist of an '
+                                     'option and shortcut.')
                 options[i] = StandardOption(*option)
             # TODO: Test for uniquity
 
@@ -625,7 +624,7 @@ class TerminalHandler(logging.StreamHandler):
         self.UI.output(msg, targetStream=self.stream)
 
 
-class MaxLevelFilter():
+class MaxLevelFilter:
 
     """Filter that only passes records at or below a specific level.
 

@@ -216,7 +216,7 @@ class UploadRobot(BaseBot):
         return None if self.aborts is not True else False
 
     def _handle_warnings(self, warnings):
-        messages = '\n'.join('{0.code}: {0.info}'.format(warning)
+        messages = '\n'.join(f'{warning.code}: {warning.info}'
                              for warning in sorted(warnings,
                                                    key=lambda w: w.code))
         if len(warnings) > 1:

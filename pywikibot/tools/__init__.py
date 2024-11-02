@@ -150,8 +150,8 @@ def has_module(module: str, version: str | None = None) -> bool:
         module_version = packaging.version.Version(metadata_version)
 
         if module_version < required_version:
-            warn('Module version {} is lower than requested version {}'
-                 .format(module_version, required_version), ImportWarning)
+            warn(f'Module version {module_version} is lower than requested '
+                 f'version {required_version}', ImportWarning)
             return False
 
     return True
@@ -491,8 +491,8 @@ class MediaWikiVersion:
         prefix = 'MediaWiki '
 
         if not generator.startswith(prefix):
-            raise ValueError('Generator string ({!r}) must start with '
-                             '"{}"'.format(generator, prefix))
+            raise ValueError(f'Generator string ({generator!r}) must start '
+                             f'with "{prefix}"')
 
         return MediaWikiVersion(generator[len(prefix):])
 
@@ -513,8 +513,8 @@ class MediaWikiVersion:
         if isinstance(other, str):
             other = MediaWikiVersion(other)
         elif not isinstance(other, MediaWikiVersion):
-            raise TypeError("Comparison between 'MediaWikiVersion' and '{}' "
-                            'unsupported'.format(type(other).__name__))
+            raise TypeError(f"Comparison between 'MediaWikiVersion' and "
+                            f"'{type(other).__name__}' unsupported")
 
         if self.version != other.version:
             return self.version < other.version

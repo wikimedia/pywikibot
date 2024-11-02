@@ -717,8 +717,8 @@ class APISite(
         elif isinstance(user, int):
             param = {'guiid': user}
         else:
-            raise TypeError("Inappropriate argument type of 'user' ({})"
-                            .format(type(user).__name__))
+            raise TypeError("Inappropriate argument type of 'user' "
+                            f'({type(user).__name__})')
 
         if force or user not in self._globaluserinfo:
             param.update(
@@ -1564,9 +1564,10 @@ class APISite(
         :raises ValueError: invalid action parameter
         """
         if action not in self.siteinfo.get('restrictions')['types']:
-            raise ValueError('{}.page_can_be_edited(): Invalid value "{}" for '
-                             '"action" parameter'
-                             .format(self.__class__.__name__, action))
+            raise ValueError(
+                f'{type(self).__name__}.page_can_be_edited(): '
+                f'Invalid value "{action}" for "action" parameter'
+            )
         prot_rights = {
             '': action,
             'autoconfirmed': 'editsemiprotected',
@@ -2494,8 +2495,9 @@ class APISite(
         # TODO: Check for talkmove-error messages
         if 'talkmove-error-code' in result['move']:
             pywikibot.warning(
-                'movepage: Talk page {} not moved'
-                .format(page.toggleTalkPage().title(as_link=True)))
+                'movepage: Talk page '
+                f'{page.toggleTalkPage().title(as_link=True)} not moved'
+            )
         return pywikibot.Page(page, newtitle)
 
     # catalog of rollback errors for use in error messages
@@ -2619,8 +2621,9 @@ class APISite(
         """
         if oldimage and isinstance(page, pywikibot.page.BasePage) \
            and not isinstance(page, pywikibot.FilePage):
-            raise TypeError("'page' must be a FilePage not a '{}'"
-                            .format(page.__class__.__name__))
+            raise TypeError(
+                f"'page' must be a FilePage not a '{page.__class__.__name__}'"
+            )
 
         token = self.tokens['csrf']
         params = {

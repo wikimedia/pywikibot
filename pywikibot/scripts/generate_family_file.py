@@ -118,8 +118,8 @@ class FamilyFileGenerator:
                 return False
 
         if any(x not in NAME_CHARACTERS for x in self.name):
-            print('ERROR: Name of family "{}" must be ASCII letters and '
-                  'digits [a-zA-Z0-9]'.format(self.name))
+            print(f'ERROR: Name of family "{self.name}" must be ASCII letters'
+                  ' and digits [a-zA-Z0-9]')
             return False
 
         return True
@@ -155,9 +155,9 @@ class FamilyFileGenerator:
 
         self.wikis[w.lang] = w
         print('\n=================================='
-              '\nAPI url: {w.api}'
-              '\nMediaWiki version: {w.version}'
-              '\n==================================\n'.format(w=w))
+              f'\nAPI url: {w.api}'
+              f'\nMediaWiki version: {w.version}'
+              '\n==================================\n')
 
         self.getlangs(w)
         self.getapis()

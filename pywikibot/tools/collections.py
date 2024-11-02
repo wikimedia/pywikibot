@@ -1,6 +1,6 @@
 """Collections datatypes."""
 #
-# (C) Pywikibot team, 2014-2023
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -270,8 +270,8 @@ class GeneratorWrapper(ABC, Generator):
         :raises TypeError: generator property is not a generator
         """
         if not isinstance(self.generator, GeneratorType):
-            raise TypeError('generator property is not a generator but {}'
-                            .format(type(self.generator).__name__))
+            raise TypeError('generator property is not a generator but '
+                            f'{type(self.generator).__name__}')
         if not hasattr(self, '_started_gen'):
             # start the generator
             self._started_gen = self.generator

@@ -143,9 +143,8 @@ def LogeventsPageGenerator(logtype: str | None = None,
         try:
             yield entry.page()
         except KeyError as e:
-            pywikibot.warning('LogeventsPageGenerator: '
-                              'failed to load page for {!r}; skipping'
-                              .format(entry.data))
+            pywikibot.warning('LogeventsPageGenerator: failed to load page '
+                              f'for {entry.data!r}; skipping')
             pywikibot.error(e)
 
 

@@ -239,10 +239,10 @@ class WikiHTMLPageParser(HTMLParser):
 
         if not new_parsed_url.scheme or not new_parsed_url.netloc:
             new_parsed_url = urlparse(
-                '{}://{}{}'.format(
-                    new_parsed_url.scheme or self.url.scheme,
-                    new_parsed_url.netloc or self.url.netloc,
-                    new_parsed_url.path))
+                f'{new_parsed_url.scheme or self.url.scheme}://'
+                f'{new_parsed_url.netloc or self.url.netloc}'
+                f'{new_parsed_url.path}'
+            )
         else:
             if self._parsed_url:
                 # allow upgrades to https, but not downgrades
@@ -255,12 +255,11 @@ class WikiHTMLPageParser(HTMLParser):
                         or self._parsed_url.netloc in new_parsed_url.netloc):
                     return
 
-                assert new_parsed_url == self._parsed_url, '{} != {}'.format(
-                    self._parsed_url, new_parsed_url)
+                assert new_parsed_url == self._parsed_url, \
+                       f'{self._parsed_url} != {new_parsed_url}'
 
         self._parsed_url = new_parsed_url
-        self.server = '{url.scheme}://{url.netloc}'.format(
-            url=self._parsed_url)
+        self.server = f'{self._parsed_url.scheme}://{self._parsed_url.netloc}'
         self.scriptpath = self._parsed_url.path
 
     def handle_starttag(self, tag, attrs) -> None:

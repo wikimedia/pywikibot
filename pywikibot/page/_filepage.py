@@ -155,8 +155,8 @@ class FilePage(Page):
         same FilePage object, the page will only be downloaded once.
         """
         if not hasattr(self, '_imagePageHtml'):
-            path = '{}/index.php?title={}'.format(self.site.scriptpath(),
-                                                  self.title(as_url=True))
+            path = (f'{self.site.scriptpath()}/index.php?'
+                    f'title={self.title(as_url=True)}')
             self._imagePageHtml = http.request(self.site, path).text
         return self._imagePageHtml
 
