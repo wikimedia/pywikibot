@@ -23,27 +23,28 @@ import pywikibot
 from pywikibot.tools import PYTHON_VERSION
 
 
+# Some Python distributions have tkinter but the underlying _tkinter
+# implementation is missing. Thus just import tkinter does not raise
+# the exception. Therefore try to import _tkinter.
+# Note: idlelib also needs tkinter.
 try:
-    import idlelib
+    import _tkinter  # noqa: F401
 except ImportError as e:
-    idlelib = e
-    ConfigDialog = ReplaceDialog = SearchDialog = object()
-    idleConf = MultiCallCreator = object()  # noqa:  N816
+    idlelib = tkinter = e
+    Frame = simpledialog = ScrolledText = object
+    ConfigDialog = ReplaceDialog = SearchDialog = object
+    idleConf = MultiCallCreator = object  # noqa:  N816
 else:
+    import tkinter
+    from tkinter import Frame, simpledialog
+    from tkinter.scrolledtext import ScrolledText
+
+    import idlelib
     from idlelib import replace as ReplaceDialog  # noqa: N812
     from idlelib import search as SearchDialog  # noqa: N812
     from idlelib.config import idleConf
     from idlelib.configdialog import ConfigDialog
     from idlelib.multicall import MultiCallCreator
-
-try:
-    import tkinter
-except ImportError as e:
-    tkinter = e
-    Frame = simpledialog = ScrolledText = object
-else:
-    from tkinter import Frame, simpledialog
-    from tkinter.scrolledtext import ScrolledText
 
 
 __all__ = ('EditBoxWindow', 'TextEditor', 'Tkdialog')
