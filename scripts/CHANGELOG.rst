@@ -1,6 +1,14 @@
 Scripts Changelog
 =================
 
+9.6.0
+-----
+
+replace
+^^^^^^^
+
+* Strip newlines from pairsfile lines (:phab:`T378647`)
+
 9.5.0
 -----
 

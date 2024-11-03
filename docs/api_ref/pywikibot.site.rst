@@ -27,7 +27,7 @@
          .. seealso:: :meth:`family.Family.linktrail`
          .. deprecated:: 7.3
             Only supported as :class:`APISite<pywikibot.site._apisite.APISite>`
-            method. Use :meth:`APISite.linktrail
+            method. Use :meth:`APISite.linktrail()
             <pywikibot.site._apisite.APISite.linktrail>`
 
          :rtype: str

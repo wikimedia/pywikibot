@@ -666,7 +666,7 @@ Release History
 * Raise InvalidTitleError instead of unspecific ValueError in ProofreadPage (:phab:`T308016`)
 * Preload pages if GeneratorFactory.articlenotfilter_list is not empty; also set attribute ``is_preloading``.
 * ClaimCollection.toJSON() should not ignore new claim (:phab:`T308245`)
-* use linktrail via siteinfo and remove `update_linkrtrails` maintenance script
+* use linktrail via siteinfo and remove `update_linktrails` maintenance script
 * Print counter statistic for all counters (:phab:`T307834`)
 * Use proofreadpagesinindex query module
 * Prioritize -namespaces options in `pagegenerators.handle_args` (:phab:`T222519`)

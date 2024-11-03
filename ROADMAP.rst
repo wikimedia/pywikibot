@@ -1,7 +1,8 @@
 Current Release Changes
 =======================
 
-* (no changes yet)
+* Extract :meth:`APISite.linktrail()<pywikibot.site._apisite.APISite.linktrail>`
+  for hr-wiki (:phab:`T378787`)
 
 
 Current Deprecations
