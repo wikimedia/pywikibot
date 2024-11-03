@@ -4,6 +4,11 @@ Scripts Changelog
 9.6.0
 -----
 
+dataextend
+^^^^^^^^^^
+
+* The script is deprecated and will be removed from script package with Pywikibot 10.
+
 replace
 ^^^^^^^
 
