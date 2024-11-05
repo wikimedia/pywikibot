@@ -15,7 +15,7 @@ from pywikibot import Site
 from pywikibot.backports import removeprefix
 from pywikibot.comms import http
 from pywikibot.data import WaitingMixin
-from pywikibot.exceptions import Error, NoUsernameError
+from pywikibot.exceptions import Error, NoUsernameError, ServerError
 
 
 try:
@@ -140,6 +140,8 @@ class SparqlQuery(WaitingMixin):
         .. versionchanged:: 8.5
            :exc:`exceptions.NoUsernameError` is raised if the response
            looks like the user is not logged in.
+        .. versionchanged:: 9.6
+           retry on internal server error (500).
 
         :param query: Query text
         :raises NoUsernameError: User not logged in
@@ -154,9 +156,14 @@ class SparqlQuery(WaitingMixin):
         while True:
             try:
                 self.last_response = http.fetch(url, headers=headers)
-                break
             except Timeout:
-                self.wait()
+                pass
+            except ServerError as e:
+                if not e.unicode.startswith('500'):
+                    raise
+            else:
+                break
+            self.wait()
 
         try:
             return self.last_response.json()
