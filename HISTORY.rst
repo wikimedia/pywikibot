@@ -3,6 +3,7 @@ Release History
 
 9.5.0
 -----
+*30 October 2024*
 
 * Add support for tcywikisource and tcywiktionary (:phab:`T378473`, :phab:`T378465`)
 * i18n-updates
