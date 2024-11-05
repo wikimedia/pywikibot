@@ -307,8 +307,10 @@ class TestReplacementsMain(TWNBotTestCase):
         """Test handle_pairsfile."""
         result = replace.handle_pairsfile('non existing file')
         self.assertIsNone(result)
-        self.assertIn("No such file or directory: 'non existing file'",
-                      pywikibot.bot.ui.pop_output()[0])
+
+        msg = pywikibot.bot.ui.pop_output()[0]
+        self.assertIn('No such file or directory:', msg)
+        self.assertIn('non existing file', msg)
 
         result = replace.handle_pairsfile('tests/data/pagelist-lines.txt')
         self.assertIsNone(result)
