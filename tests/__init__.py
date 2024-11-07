@@ -136,6 +136,7 @@ library_test_modules = {
     'uploadbot',
     'user',
     'version',
+    'wbtypes',
     'wikibase',
     'wikibase_edit',
     'wikiblame',
