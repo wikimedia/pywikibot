@@ -650,8 +650,8 @@ class Subject(interwiki_graph.Subject):
 
         super().__init__(origin)
 
-        # TODO is a list of all pages that still need to be analyzed.
-        # Mark the origin page as todo.
+        # self.todo is a collection of all pages that still need to be
+        # analyzed. Mark the origin page as todo.
         self.todo = SizedKeyCollection('site')
         if origin:
             self.todo.append(origin)
@@ -725,7 +725,7 @@ class Subject(interwiki_graph.Subject):
         return None
 
     def translate(self, hints=None, keephintedsites: bool = False) -> None:
-        """Add the given translation hints to the todo list."""
+        """Add the given translation hints to the todo collection."""
         if self.conf.same and self.origin:
             if hints:
                 hints += ['all:']
@@ -763,7 +763,8 @@ class Subject(interwiki_graph.Subject):
         """Return the next page batch.
 
         By calling this method, you 'promise' this instance that you
-        will preload all the *site* Pages that are in the todo list.
+        will preload all the *site* Pages that are in the todo
+        collection.
 
         :return: This routine will return a list of pages that can be
             treated.
@@ -792,7 +793,7 @@ class Subject(interwiki_graph.Subject):
         self.forcedStop = True
 
     def addIfNew(self, page, counter, linkingPage) -> bool:
-        """Add the pagelink given to the todo list, if it hasn't been seen yet.
+        """Add the *page* to the todo collection, if it hasn't been seen yet.
 
         If it is added, update the counter accordingly.
 
@@ -1100,7 +1101,7 @@ class Subject(interwiki_graph.Subject):
         return True
 
     def check_page(self, page, counter) -> None:
-        """Check whether any iw links should be added to the todo list."""
+        """Check whether iw links should be added to the todo collection."""
         try:
             ok = page.exists()
         except InvalidPageError as e:  # T357953
@@ -1274,7 +1275,7 @@ class Subject(interwiki_graph.Subject):
             counter.minus(page.site)
 
             # Now check whether any interwiki links should be added to the
-            # TODO list.
+            # self.todo collection.
             self.check_page(page, counter)
 
         # These pages are no longer 'in progress'
@@ -1409,8 +1410,8 @@ class Subject(interwiki_graph.Subject):
     def finish(self):
         """Round up the subject, making any necessary changes.
 
-        This should be called exactly once after the todo list has gone empty.
-
+        This should be called exactly once after the todo collection has
+        gone empty.
         """
         if not self.isDone():
             raise Exception('Bugcheck: finish called before done')
@@ -1579,7 +1580,7 @@ class Subject(interwiki_graph.Subject):
         if pltmp != page:
             pywikibot.error(
                 f'{page} is not in the list of new links! Found {pltmp}.')
-            raise SaveError('BUG: sanity check failed')
+            raise SaveError('sanity check failed')
 
         # Avoid adding an iw link back to itself
         del new[page.site]
