@@ -1,6 +1,7 @@
 Current Release Changes
 =======================
 
+* Python 3.7 support will be discontinued and probably this is the last version supporting it
 * Retry :meth:`data.sparql.SparqlQuery.query` on internal server error (500) (:phab:`T378788`)
 * Extract :meth:`APISite.linktrail()<pywikibot.site._apisite.APISite.linktrail>`
   for hr-wiki (:phab:`T378787`)
@@ -66,6 +67,7 @@ Current Deprecations
 Pending removal in Pywikibot 10
 -------------------------------
 
+* 9.6.0: Python 3.7 support is deprecated and will be dropped with Pywikibot 10
 * 9.1.0: :func:`version.svn_rev_info` and :func:`version.getversion_svn` will be removed. SVN is no longer supported.
   (:phab:`T362484`)
 * 7.7.0: :mod:`tools.threading` classes should no longer imported from :mod:`tools`
