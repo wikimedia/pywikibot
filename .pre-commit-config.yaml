@@ -37,6 +37,7 @@ repos:
           - --autofix
           - --indent=4
           - --no-ensure-ascii
+        exclude: pywikibot/scripts/i18n/pywikibot/
       - id: trailing-whitespace
         args:
           - --markdown-linebreak-ext=rst
