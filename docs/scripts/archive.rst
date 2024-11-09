@@ -3,12 +3,13 @@ Outdated core scripts
 *********************
 
 This list contains outdated scripts from :term:`core` banch which
-aren't supported any longer. They are either archived or deleted.
+aren't supported any longer. They aredeleted from repository.
 
-Feel free to reactivate any script at any time by creating a Phabricator
-task: :phab:`Recovery request
-<maniphest/task/edit/form/1/?projects=pywikibot,pywikibot-scripts&title=Recover
-Pywikibot%20script:%20>`
+.. hint::
+   Feel free to reactivate any script at any time by creating a
+   Phabricator task: :phab:`Recovery request
+   <maniphest/task/edit/form/1/?projects=pywikibot,pywikibot-scripts&title=Recover
+   Pywikibot%20script:%20>`
 
 .. seealso:: :ref:`Outdated compat scripts`
 

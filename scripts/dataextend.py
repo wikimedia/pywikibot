@@ -52,6 +52,8 @@ cases where a more precise and less precise value have both been
 included.
 
 .. versionadded:: 7.2
+.. deprecated:: 9.6
+   will be removed with Pywikibot 10.
 """
 #
 # (C) Pywikibot team, 2020-2024
