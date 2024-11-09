@@ -83,7 +83,7 @@ class TestPwb(PwbTestCase):
         script_opts = ['-help']
         command = [script_path, *script_opts]
         without_global_args = execute_pwb(command)
-        with_no_global_args = execute_pwb(['-maxlag:5', *command], timeout=10)
+        with_no_global_args = execute_pwb(['-maxlag:5', *command])
         self.assertEqual(without_global_args['stdout'],
                          with_no_global_args['stdout'])
         self.assertEqual(without_global_args['stdout'].rstrip(),
