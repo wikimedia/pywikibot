@@ -93,7 +93,7 @@ class EventStreams(GeneratorWrapper):
      'server_url': 'https://www.wikidata.org',
      ...
      'type': 'edit',
-     'user': '...',
+     'user': ...,
      'wiki': 'wikidatawiki'}
     >>> del stream
 
