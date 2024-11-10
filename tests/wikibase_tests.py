@@ -285,7 +285,8 @@ class TestItemLoad(WikidataTestCase):
         item.get()
         self.assertTrue(hasattr(item, '_content'))
         self.assertIn('en', item.labels)
-        self.assertEqual(item.labels['en'], 'New York City')
+        # label could change
+        self.assertIn(item.labels['en'], ['New York', 'New York City'])
         self.assertEqual(item.title(), 'Q60')
 
     def test_reuse_item_set_id(self):
@@ -295,10 +296,12 @@ class TestItemLoad(WikidataTestCase):
         but modifying item.id does not currently work, and this test
         highlights that it breaks silently.
         """
+        # label could change
+        label = ['New York', 'New York City']
         wikidata = self.get_repo()
         item = ItemPage(wikidata, 'Q60')
         item.get()
-        self.assertEqual(item.labels['en'], 'New York City')
+        self.assertIn(item.labels['en'], label)
 
         # When the id attribute is modified, the ItemPage goes into
         # an inconsistent state.
@@ -310,9 +313,7 @@ class TestItemLoad(WikidataTestCase):
         # it doesn't help to clear this piece of saved state.
         del item._content
         # The labels are not updated; assertion showing undesirable behaviour:
-        self.assertEqual(item.labels['en'], 'New York City')
-        # TODO: This is the assertion that this test should be using:
-        # self.assertTrue(item.labels['en'].lower().endswith('main page'))
+        self.assertIn(item.labels['en'], label)
 
     def test_empty_item(self):
         """Test empty wikibase item.
