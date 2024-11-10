@@ -78,11 +78,9 @@ repos:
       - id: isort
         exclude: '^pwb\.py$'
   - repo: https://github.com/jshwi/docsig
-    rev: v0.64.0
+    rev: v0.64.1
     hooks:
       - id: docsig
-        args:
-          - "-dSIG101,SIG202,SIG203,SIG301,SIG302,SIG401,SIG402,SIG404,SIG501,SIG502,SIG503,SIG505"
         exclude: ^(tests|scripts)
   - repo: https://github.com/PyCQA/flake8
     rev: 7.1.1
