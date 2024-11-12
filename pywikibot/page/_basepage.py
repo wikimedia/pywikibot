@@ -1737,10 +1737,6 @@ class BasePage(ComparableMixin):
         :return: a generator that yields Category objects.
         :rtype: generator
         """
-        # FIXME: bug T75561: with_sort_key is ignored by Site.pagecategories
-        if with_sort_key:
-            raise NotImplementedError('with_sort_key is not implemented')
-
         # Data might have been preloaded
         # Delete cache if content is needed and elements have no content
         if hasattr(self, '_categories'):
@@ -1750,7 +1746,8 @@ class BasePage(ComparableMixin):
             else:
                 return itertools.islice(self._categories, total)
 
-        return self.site.pagecategories(self, total=total, content=content)
+        return self.site.pagecategories(self, with_sort_key=with_sort_key,
+                                        total=total, content=content)
 
     def extlinks(self, total: int | None = None) -> Iterable[str]:
         """Iterate all external URLs (not interwiki links) from this page.

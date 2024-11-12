@@ -451,11 +451,11 @@ class GeneratorsMixin:
                                g_content=content, redirects=follow_redirects,
                                **plargs)
 
-    # Sortkey doesn't work with generator
     def pagecategories(
         self,
         page: pywikibot.Page,
         *,
+        with_sort_key: bool = False,
         total: int | None = None,
         content: bool = False,
     ) -> Iterable[pywikibot.Page]:
@@ -463,6 +463,7 @@ class GeneratorsMixin:
 
         .. seealso:: :api:`Categories`
 
+        :param with_sort_key: if True, include the sort key in each Category
         :param content: if True, load the current content of each iterated page
             (default False); note that this means the contents of the
             category description page, not the pages contained in the category
@@ -473,9 +474,26 @@ class GeneratorsMixin:
         else:
             clargs['titles'] = page.title(
                 with_section=False).encode(self.encoding())
-        return self._generator(api.PageGenerator,
-                               type_arg='categories', total=total,
-                               g_content=content, **clargs)
+        if with_sort_key:
+            page_dict = next(iter(self._generator(
+                api.PropertyGenerator,
+                type_arg='categories',
+                total=total,
+                clprop='sortkey|timestamp|hidden',
+                **clargs)))
+            cats = (
+                pywikibot.Category(self,
+                                   cat_dict['title'],
+                                   sort_key=cat_dict['sortkeyprefix'] or None)
+                for cat_dict in page_dict.get('categories', [])
+            )
+            return self.preloadpages(cats) if content else cats
+        else:
+            return self._generator(api.PageGenerator,
+                                   type_arg='categories',
+                                   total=total,
+                                   g_content=content,
+                                   **clargs)
 
     def pageimages(
         self,
