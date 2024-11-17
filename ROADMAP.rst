@@ -1,7 +1,9 @@
 Current Release Changes
 =======================
 
+* Implement param *with_sort_key* in :meth:`page.BasePage.categories` (:phab:`T75561`)
 * Python 3.7 support will be discontinued and probably this is the last version supporting it
+* Add :meth:`page.BasePage.get_revision` method
 * Retry :meth:`data.sparql.SparqlQuery.query` on internal server error (500) (:phab:`T378788`)
 * Extract :meth:`APISite.linktrail()<pywikibot.site._apisite.APISite.linktrail>`
   for hr-wiki (:phab:`T378787`)
