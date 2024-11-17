@@ -443,6 +443,10 @@ class BasePage(ComparableMixin):
     ) -> pywikibot.page.Revision:
         """Return an old revision of this page.
 
+        .. versionadded:: 9.6
+        .. seealso:: :meth:`getOldVersion`
+
+
         :param oldid: The revid of the revision desired.
         :param content: if True, retrieve the content of the revision
             (default False)
@@ -455,6 +459,8 @@ class BasePage(ComparableMixin):
     @remove_last_args(['get_redirect'])
     def getOldVersion(self, oldid, force: bool = False) -> str:
         """Return text of an old revision of this page.
+
+        .. seealso:: :meth:`get_revision`
 
         :param oldid: The revid of the revision desired.
         """
@@ -1730,12 +1736,20 @@ class BasePage(ComparableMixin):
     ) -> Iterable[pywikibot.Page]:
         """Iterate categories that the article is in.
 
-        :param with_sort_key: if True, include the sort key in each Category.
+        .. versionchanged:: 2.0
+           *with_sort_key* parameter is not supported and a
+           NotImplementedError is raised if set.
+        .. versionchanged:: 9.6
+           *with_sort_key* parameter is supported.
+        .. seealso:: :meth:`Site.pagecategories()
+           <pywikibot.site._generators.GeneratorsMixin.pagecategories>`
+
+        :param with_sort_key: if True, include the sort key in
+            each Category.
         :param total: iterate no more than this number of pages in total
-        :param content: if True, retrieve the content of the current version
-            of each category description page (default False)
+        :param content: if True, retrieve the content of the current
+            version of each category description page (default False)
         :return: a generator that yields Category objects.
-        :rtype: generator
         """
         # Data might have been preloaded
         # Delete cache if content is needed and elements have no content
