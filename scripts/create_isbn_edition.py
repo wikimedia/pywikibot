@@ -1572,13 +1572,13 @@ def main(*args: str) -> None:
     global targetx
     global wdbotflag
 
+    # Get optional parameters
+    local_args = pywikibot.handle_args(*args)
+
     # check dependencies
     for module in (isbnlib, unidecode):
         if isinstance(module, ImportError):
             raise module
-
-    # Get optional parameters
-    local_args = pywikibot.handle_args(*args)
 
     # Connect to databases
     # Login to Wikibase instance
