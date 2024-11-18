@@ -619,6 +619,31 @@ class TestPageObject(DefaultSiteTestCase):
                 mainpage.page_image()
 
 
+class TestPageCategories(TestCase):
+
+    """Categories tests class."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    def testCategories(self):
+        """Test BasePage.categories() with sort keys."""
+        mainhelp = pywikibot.Page(self.site, 'Help:Contents')
+        cat_help = pywikibot.Category(self.site, 'Category:Help')
+
+        for with_sort_key in (False, True):
+            with self.subTest(with_sort_key=with_sort_key):
+                cats = list(mainhelp.categories(with_sort_key=with_sort_key))
+                self.assertLength(cats, 4)
+                self.assertIn(cat_help, cats)
+                for p in cats:
+                    self.assertIsInstance(p, pywikibot.Category)
+                    if with_sort_key:
+                        self.assertEqual(p.sortKey, 'Contents')
+                    else:
+                        self.assertIsNone(p.sortKey)
+
+
 class TestPageCoordinates(TestCase):
 
     """Test Page Object using German Wikipedia."""
