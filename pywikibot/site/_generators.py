@@ -468,6 +468,9 @@ class GeneratorsMixin:
            - :meth:`page.BasePage.categories`
            - :api:`Categories`
 
+        .. note:: This method also yields categories which are
+           transcluded.
+
         :param with_sort_key: if True, include the sort key in each
             Category
         :param content: if True, load the current content of each
@@ -487,7 +490,7 @@ class GeneratorsMixin:
                 api.PropertyGenerator,
                 type_arg='categories',
                 total=total,
-                clprop='sortkey|timestamp|hidden',
+                clprop='sortkey',
                 **clargs)))
             cats = (
                 pywikibot.Category(self,

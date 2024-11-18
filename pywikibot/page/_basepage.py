@@ -1743,6 +1743,8 @@ class BasePage(ComparableMixin):
            *with_sort_key* parameter is supported.
         .. seealso:: :meth:`Site.pagecategories()
            <pywikibot.site._generators.GeneratorsMixin.pagecategories>`
+        .. note:: This method also yields categories which are
+           transcluded.
 
         :param with_sort_key: if True, include the sort key in
             each Category.
