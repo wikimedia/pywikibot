@@ -782,8 +782,7 @@ def get_item_list(item_name: str,
     :return: Set of items
     """
     pywikibot.debug(f'Search label: {item_name.encode("utf-8")}')
-    item_list = set()  # Empty set
-    # TODO: try to us search_entities instead?
+    # TODO: try to use search_entities instead?
     params = {
         'action': 'wbsearchentities',
         'format': 'json',
@@ -799,31 +798,33 @@ def get_item_list(item_name: str,
     result = request.submit()
     pywikibot.debug(result)
 
-    if 'search' in result:
-        # Ignore accents and case
-        item_name_canon = unidecode(item_name).casefold()
+    if 'search' not in result:
+        return set()
 
-        # Loop though items
-        for res in result['search']:
-            item = get_item_page(res['id'])
+    # Ignore accents and case
+    item_name_canon = unidecode(item_name).casefold()
 
-            # Matching instance
-            if INSTANCEPROP not in item.claims \
-               or not item_is_in_list(item.claims[INSTANCEPROP], instance_id):
-                continue
+    item_list = set()
+    # Loop though items
+    for res in result['search']:
+        item = get_item_page(res['id'])
 
-            # Search all languages, ignore label case and accents
-            for lang in item.labels:
-                if (item_name_canon
-                        == unidecode(item.labels[lang].casefold())):
-                    item_list.add(item.getID())  # Label math
+        # Matching instance
+        if INSTANCEPROP not in item.claims \
+           or not item_is_in_list(item.claims[INSTANCEPROP], instance_id):
+            continue
+
+        # Search all languages, ignore label case and accents
+        for lang in item.labels:
+            if item_name_canon == unidecode(item.labels[lang].casefold()):
+                item_list.add(item.getID())  # Label math
+                break
+
+        for lang in item.aliases:
+            for seq in item.aliases[lang]:
+                if item_name_canon == unidecode(seq).casefold():
+                    item_list.add(item)  # Alias match
                     break
-
-            for lang in item.aliases:
-                for seq in item.aliases[lang]:
-                    if item_name_canon == unidecode(seq).casefold():
-                        item_list.add(item)  # Alias match
-                        break
 
     pywikibot.log(item_list)
     return item_list
