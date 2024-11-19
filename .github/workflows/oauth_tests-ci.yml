@@ -87,7 +87,7 @@ jobs:
         pip install "importlib_metadata ; python_version < '3.8'"
         pip install mwparserfromhell
         # PyJWT added due to T380270
-        pip install "PyJWT != 2.10.0"
+        pip install "PyJWT != 2.10.0 ; python_version > '3.8'"
         pip install mwoauth
         pip install packaging
         pip install requests

@@ -32,6 +32,8 @@ wikitextparser>=0.47.5
 # OAuth support
 # mwoauth 0.2.4 is needed because it supports getting identity information
 # about the user
+# Due to T380270 PyJWT must be set
+PyJWT != 2.10.0; python_version > '3.8'
 mwoauth>=0.2.4,!=0.3.1
 
 # interwiki_graph.py module and category_graph.py script:
