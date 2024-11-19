@@ -727,9 +727,12 @@ class PageGenerator(QueryGenerator):
         of object.
 
         .. versionchanged:: 9.5
-           no longer raise :exc:`exceptions.UnsupportedPageError` but
+           No longer raise :exc:`exceptions.UnsupportedPageError` but
            return a generic :class:`pywikibot.Page` obect. The exception
            is raised when getting the content for example.
+        .. versionchanged:: 9.6
+           Upcast to :class:`page.FilePage` if *pagedata* has
+           ``imageinfo`` contents even if the file extension is invalid.
         """
         p = pywikibot.Page(self.site, pagedata['title'], pagedata['ns'])
         ns = pagedata['ns']
@@ -738,7 +741,8 @@ class PageGenerator(QueryGenerator):
             p = pywikibot.User(p)
         elif ns == Namespace.FILE:
             with suppress(ValueError):
-                p = pywikibot.FilePage(p)
+                p = pywikibot.FilePage(
+                    p, ignore_extension='imageinfo' in pagedata)
         elif ns == Namespace.CATEGORY:
             p = pywikibot.Category(p)
 
