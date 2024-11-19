@@ -43,9 +43,15 @@ class FilePage(Page):
         """Initializer.
 
         .. versionchanged:: 8.4
-           check for valid extensions.
+           Check for valid extensions.
         .. versionchanged:: 9.3
-           *ignore_extension* parameter was added
+           Added the optional *ignore_extension* parameter.
+        .. versionchanged:: 9.6
+           Show a warning if *ignore_extension* was set and the
+           extension is invalid.
+        .. seealso::
+           :meth:`Site.file_extensions
+           <pywikibot.site._apisite.APISite.file_extensions>`
 
         :param source: the source of the page
         :type source: pywikibot.page.BaseLink (or subclass),
@@ -62,16 +68,15 @@ class FilePage(Page):
         if self.namespace() != 6:
             raise ValueError(f"'{self.title()}' is not in the file namespace!")
 
-        if ignore_extension:
-            return
-
         title = self.title(with_ns=False, with_section=False)
         _, sep, extension = title.rpartition('.')
         if not sep or extension.lower() not in self.site.file_extensions:
-            raise ValueError(
-                f'{title!r} does not have a valid extension '
-                f'({", ".join(self.site.file_extensions)}).'
-            )
+            msg = (f'{title!r} does not have a valid extension\n'
+                   f'({", ".join(self.site.file_extensions)}).')
+            if not ignore_extension:
+                raise ValueError(msg)
+
+            pywikibot.warning(msg)
 
     def _load_file_revisions(self, imageinfo) -> None:
         """Save a file revision of FilePage (a FileInfo object) in local cache.
