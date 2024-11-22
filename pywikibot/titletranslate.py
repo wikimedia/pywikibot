@@ -51,7 +51,7 @@ def translate(
             codes = site.family.language_groups.get(codes, codes.split(','))
 
         for newcode in codes:
-            if newcode in site.languages():
+            if newcode in site.codes:
                 if newcode != site.code:
                     ns = page.namespace() if page else 0
                     x = pywikibot.Link(newname,
@@ -71,7 +71,7 @@ def translate(
             pywikibot.info(f'TitleTranslate: {page.title()} was recognized as '
                            f'{dict_name} with value {value}')
             for entry_lang, entry in date.formats[dict_name].items():
-                if entry_lang not in site.languages():
+                if entry_lang not in site.codes:
                     continue
                 if entry_lang != sitelang:
                     newname = entry(value)
