@@ -546,8 +546,10 @@ class TestDayPageGenerator(DefaultSiteTestCase):
 
         expected = []
         for month in range(start_month, end_month + 1):
-            for day in range(1, calendar.monthrange(year, month)[1] + 1):
-                expected.append(date.format_date(month, day, self.site))
+            expected += [
+                date.format_date(month, day, self.site)
+                for day in range(1, calendar.monthrange(year, month)[1] + 1)
+            ]
 
         self.assertPageTitlesEqual(gen2, expected)
 
