@@ -103,7 +103,7 @@ class BaseRevertBot(OptionHandler):
         year = formatYear(self.site.lang, ts.year)
         date = format_date(ts.month, ts.day, self.site)
         *_, time = str(ts).strip('Z').partition('T')
-        return ' '.join((date, year, time))
+        return f'{date} {year} {time}'
 
     def revert(self, item) -> str | bool:
         """Revert a single item."""

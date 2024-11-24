@@ -170,10 +170,9 @@ class PrivateWikiTestCase(PatchingTestCase):
         # the user-supplied URL. We need to return enough data for
         # site_detect.WikiHTMLPageParser to determine the server
         # version and the API URL.
-        WEBPATH: ''.join((
-            '<meta name="generator" content="', _generator,
-            '"/>\n<link rel="EditURI" type="application/rsd+xml" '
-            'href="', _apiurl, '?action=rsd"/>')),
+        WEBPATH: f'<meta name="generator" content="{_generator}"/>\n'
+                 f'<link rel="EditURI" type="application/rsd+xml" '
+                 f'href="{_apiurl}?action=rsd"/>',
         APIPATH: '{"error":{"code":"readapidenied"}}',
     }
 

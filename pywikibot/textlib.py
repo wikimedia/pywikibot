@@ -1112,10 +1112,8 @@ def extract_sections(
     cat_regex, interwiki_regex = get_regexes(['category', 'interwiki'], site)
     langlink_pattern = interwiki_regex.pattern.replace(':?', '')
     last_section_content = sections[-1].content if sections else header
-    footer = re.search(
-        r'({})*\Z'.format(r'|'.join((langlink_pattern,
-                                     cat_regex.pattern, r'\s'))),
-        last_section_content).group().lstrip()
+    footer = re.search(fr'({langlink_pattern}|{cat_regex.pattern}|\s)*\Z',
+                       last_section_content).group().lstrip()
 
     if footer:
         if sections:
