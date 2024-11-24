@@ -935,7 +935,6 @@ def amend_isbn_edition(isbn_number: str) -> int:
 
 def add_claims(isbn_data: dict[str, Any]) -> int:  # noqa: C901
     """Inspect isbn_data and add claims if possible."""
-    global proptyx
     # targetx is not global (to allow for language specific editions)
 
     # Set default language from book library
@@ -1096,13 +1095,13 @@ def add_claims(isbn_data: dict[str, Any]) -> int:  # noqa: C901
 
     # Register missing statements
     pywikibot.debug(target)
-    for propty in target:
+    for propty, title in target.items():
         if propty not in item.claims:
             if propty not in proptyx:
                 proptyx[propty] = pywikibot.PropertyPage(repo, propty)
 
             # Target could get overwritten locally
-            targetx[propty] = pywikibot.ItemPage(repo, target[propty])
+            targetx[propty] = pywikibot.ItemPage(repo, title)
 
             claim = pywikibot.Claim(repo, propty)
             claim.setTarget(targetx[propty])
@@ -1110,7 +1109,7 @@ def add_claims(isbn_data: dict[str, Any]) -> int:  # noqa: C901
             pywikibot.warning(
                 f'Add {get_item_header_lang(proptyx[propty].labels, booklang)}'
                 f':{get_item_header_lang(targetx[propty].labels, booklang)} '
-                f'({propty}:{target[propty]})'
+                f'({propty}:{title})'
             )
 
             # Set source reference
@@ -1675,14 +1674,14 @@ def main(*args: str) -> None:
     targetx = {}
 
     # Validate and encode the propery/instance pair
-    for propty in target:
+    for propty, title in target.items():
         if propty not in proptyx:
             proptyx[propty] = pywikibot.PropertyPage(repo, propty)
-        if target[propty] != '-':
-            targetx[propty] = get_item_page(target[propty])
+        if title != '-':
+            targetx[propty] = get_item_page(title)
         pywikibot.info(f'Add {get_item_header(proptyx[propty].labels)}:'
                        f'{get_item_header(targetx[propty].labels)} '
-                       f'({propty}:{target[propty]})')
+                       f'({propty}:{title})')
 
         # Check the instance type for P/Q pairs (critical)
         if (propty in propreqinst
@@ -1690,7 +1689,7 @@ def main(*args: str) -> None:
                  or not item_is_in_list(targetx[propty].claims[INSTANCEPROP],
                                         propreqinst[propty]))):
             pywikibot.critical(
-                f'{get_item_header(targetx[propty].labels)} ({target[propty]})'
+                f'{get_item_header(targetx[propty].labels)} ({title})'
                 f' is not one of instance type {propreqinst[propty]} for '
                 f'statement {get_item_header(proptyx[propty].labels)} '
                 f'({propty})'
@@ -1703,7 +1702,7 @@ def main(*args: str) -> None:
             and not item_is_in_list(targetx[propty].claims,
                                     propreqobjectprop[propty])):
             pywikibot.error(
-                f'{get_item_header(targetx[propty].labels)} ({target[propty]})'
+                f'{get_item_header(targetx[propty].labels)} ({title})'
                 f' does not have property {propreqobjectprop[propty]} for '
                 f'statement {get_item_header(proptyx[propty].labels)} '
                 f'({propty})'
