@@ -462,9 +462,8 @@ class CosmeticChangesToolkit:
                               else 'User talk']
             # lowerspaced and underscored namespaces
             for i, item in enumerate(namespaces):
-                item = item.replace(' ', '[ _]')
-                item = f'[{item[0]}{item[0].lower()}]' + item[1:]
-                namespaces[i] = item
+                ns = item.replace(' ', '[ _]')
+                namespaces[i] = f'[{ns[0]}{ns[0].lower()}]{ns[1:]}'
             namespaces.append(first_lower(final_ns))
             if final_ns and namespaces:
                 if (self.site.sitename == 'wikipedia:pt'

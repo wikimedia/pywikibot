@@ -209,9 +209,9 @@ class GeneratorsMixin:
                         # This checks to see if there is a normalized title in
                         # the response that corresponds to the canonical form
                         # used in the query.
-                        for key in cache:
+                        for key, value in cache.items():
                             if self.sametitle(key, pagedata['title']):
-                                cache[pagedata['title']] = cache[key]
+                                cache[pagedata['title']] = value
                                 break
                         else:
                             pywikibot.warning(

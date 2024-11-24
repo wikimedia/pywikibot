@@ -112,9 +112,9 @@ class Page(BasePage, WikiBlameMixin):
                     positional.append(intkeys[i])
                     continue
 
-                for k in intkeys:
+                for k, v in intkeys.items():
                     if k < 1 or k >= i:
-                        named[str(k)] = intkeys[k]
+                        named[str(k)] = v
                 break
 
             for item in named.items():

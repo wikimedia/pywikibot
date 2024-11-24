@@ -581,9 +581,9 @@ def open_archive(filename: str, mode: str = 'rb', use_extension: bool = True):
         with open(filename, 'rb') as f:
             magic_number = f.read(8)
 
-        for pattern in extension_map:
+        for pattern, ext in extension_map.items():
             if magic_number.startswith(pattern):
-                extension = extension_map[pattern]
+                extension = ext
                 break
         else:
             extension = ''

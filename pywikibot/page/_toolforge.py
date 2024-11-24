@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import collections
 import re
+from http import HTTPStatus
 from typing import TYPE_CHECKING
 
 import pywikibot
@@ -183,7 +184,7 @@ class WikiBlameMixin:
         url = baseurl.format(url=url)
 
         r = pywikibot.comms.http.fetch(url)
-        if r.status_code != 200:
+        if r.status_code != HTTPStatus.OK:
             r.raise_for_status()
 
         result: list[list[str]] = []

@@ -1616,8 +1616,8 @@ class Claim(Property):
                 qualifier.on_item = item
         for source in self.sources:
             for values in source.values():
-                for source in values:
-                    source.on_item = item
+                for val in values:
+                    val.on_item = item
 
     def _assert_attached(self) -> None:
         if self.on_item is None:

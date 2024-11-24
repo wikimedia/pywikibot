@@ -345,9 +345,9 @@ class DataSite(APISite):
 
         params['token'] = self.tokens['csrf']
 
-        for arg in kwargs:
+        for arg, param in kwargs.items():
             if arg in ['clear', 'summary', 'tags']:
-                params[arg] = kwargs[arg]
+                params[arg] = param
             elif arg != 'baserevid':
                 warn(f'Unknown wbeditentity parameter {arg} ignored',
                      UserWarning, 2)
@@ -1002,9 +1002,9 @@ class DataSite(APISite):
              })
         params.update(prepare_data(action, action_data))
 
-        for arg in kwargs:
+        for arg, param in kwargs.items():
             if arg in ['summary', 'tags']:
-                params[arg] = kwargs[arg]
+                params[arg] = param
             else:
                 warn(f'Unknown parameter {arg} for action {action}, ignored',
                      UserWarning, 2)

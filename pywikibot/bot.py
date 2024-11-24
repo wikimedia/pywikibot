@@ -2042,17 +2042,18 @@ class WikidataBot(Bot, ExistingPageBot):
     def get_property_by_name(self, property_name: str) -> str:
         """Find given property and return its ID.
 
-        Method first uses site.search() and if the property isn't found, then
-        asks user to provide the property ID.
+        Method first uses site.search() and if the property isn't found,
+        then asks user to provide the property ID.
 
         :param property_name: property to find
         """
         ns = self.repo.property_namespace
         for page in self.repo.search(property_name, total=1, namespaces=ns):
-            page = pywikibot.PropertyPage(self.repo, page.title())
+            prop = pywikibot.PropertyPage(self.repo, page.title())
             pywikibot.info(
-                f'Assuming that {property_name} property is {page.id}.')
-            return page.id
+                f'Assuming that {property_name} property is {prop.id}.')
+            return prop.id
+
         return pywikibot.input(
             f'Property {property_name} was not found. Please enter the '
             f'property ID (e.g. P123) of it:').upper()
