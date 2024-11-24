@@ -1236,7 +1236,7 @@ def add_claims(isbn_data: dict[str, Any]) -> int:  # noqa: C901
                         add_author = False
                         break
 
-                    elif item_has_label(book_author, author_name):
+                    if item_has_label(book_author, author_name):
                         pywikibot.warning(
                             f'Edition has conflicting author ({prop}) '
                             f'{author_name} ({book_author.getID()})'
