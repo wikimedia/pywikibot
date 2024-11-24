@@ -117,8 +117,7 @@ class Page(BasePage, WikiBlameMixin):
                         named[str(k)] = v
                 break
 
-            for item in named.items():
-                positional.append('{}={}'.format(*item))
+            positional += [f'{key}={value}' for key, value in named.items()]
             result.append((pywikibot.Page(link, self.site), positional))
         return result
 

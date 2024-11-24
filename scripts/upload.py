@@ -222,8 +222,9 @@ def main(*args: str) -> None:
             if not recursive:
                 # Do not visit any subdirectories
                 directory_info[1][:] = []
-            for dir_file in directory_info[2]:
-                file_list.append(os.path.join(directory_info[0], dir_file))
+
+            file_list += [os.path.join(directory_info[0], dir_file)
+                          for dir_file in directory_info[2]]
         url = file_list
     else:
         url = [url]

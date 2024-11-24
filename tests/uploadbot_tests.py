@@ -39,8 +39,9 @@ class TestUploadbot(TestCase):
         """Test uploading a list of pngs using upload.py."""
         image_list = []
         for directory_info in os.walk(join_images_path()):
-            for dir_file in directory_info[2]:
-                image_list.append(os.path.join(directory_info[0], dir_file))
+            image_list += [os.path.join(directory_info[0], dir_file)
+                           for dir_file in directory_info[2]]
+
         bot = UploadRobot(url=image_list, target_site=self.get_site(),
                           **self.params)
         bot.run()
