@@ -91,6 +91,7 @@ jobs:
         pip install mwoauth
         pip install packaging
         pip install requests
+        pip install "tomli >= 2.02; python_version < '3.11"
 
     - name: Generate family files
       if:  ${{ matrix.family == 'wpbeta' }}
