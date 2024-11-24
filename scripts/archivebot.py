@@ -422,7 +422,7 @@ class DiscussionPage(pywikibot.Page):
         header, threads, footer = extract_sections(text, self.site)
         header = header.replace(marker, '')
         if header and footer:
-            self.header = '\n\n'.join((header.rstrip(), footer, ''))
+            self.header = f'{header.rstrip()}\n\n{footer}\n\n'
         else:
             self.header = header + footer
 

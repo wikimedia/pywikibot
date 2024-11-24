@@ -317,10 +317,10 @@ class UI(ABUIC):
                     # transliteration was successful. The replacement
                     # could consist of multiple letters.
                     # mark the transliterated letters in yellow.
-                    transliteratedText = ''.join((transliteratedText,
-                                                  '<<lightyellow>>',
-                                                  transliterated,
-                                                  '<<previous>>'))
+                    transliteratedText = (
+                        f'{transliteratedText}'
+                        f'<<lightyellow>>{transliterated}<<previous>>'
+                    )
                     # memorize if we replaced a single letter by multiple
                     # letters.
                     if transliterated:
