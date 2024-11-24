@@ -142,15 +142,15 @@ class Siteinfo(Container):
                               "one property is unknown: '{}'"
                               .format("', '".join(props)))
                 results = {}
-                for prop in props:
-                    results.update(self._get_siteinfo(prop, expiry))
+                for p in props:
+                    results.update(self._get_siteinfo(p, expiry))
                 return results
             raise
 
         result = {}
         if invalid_properties:
-            for prop in invalid_properties:
-                result[prop] = (EMPTY_DEFAULT, False)
+            for invalid_prop in invalid_properties:
+                result[invalid_prop] = (EMPTY_DEFAULT, False)
             pywikibot.log("Unable to get siprop(s) '{}'"
                           .format("', '".join(invalid_properties)))
 

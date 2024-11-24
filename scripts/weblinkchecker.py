@@ -369,10 +369,10 @@ class History:
             error_report = f'* {url} ([{archive_url} archive])\n'
         else:
             error_report = f'* {url}\n'
-        for (page_title, date, error) in self.history_dict[url]:
+        for (page_title, date, err) in self.history_dict[url]:
             # ISO 8601 formulation
             iso_date = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(date))
-            error_report += f'** In [[{page_title}]] on {iso_date}, {error}\n'
+            error_report += f'** In [[{page_title}]] on {iso_date}, {err}\n'
         pywikibot.info('** Logging link for deletion.')
         txtfilename = pywikibot.config.datafilepath(
             'deadlinks',

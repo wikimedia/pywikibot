@@ -213,8 +213,8 @@ class UI(ABUIC):
         # match.split() includes every regex group; for each matched color
         # fg_col:b_col, fg_col and bg_col are added to the resulting list.
         len_text_parts = len(text_parts[::4])
-        for index, (text, next_color) in enumerate(zip(text_parts[::4],
-                                                       text_parts[1::4])):
+        for index, (txt, next_color) in enumerate(zip(text_parts[::4],
+                                                      text_parts[1::4])):
             current_color = color_stack[-1]
             if next_color == 'previous':
                 if len(color_stack) > 1:  # keep the last element in the stack
@@ -226,15 +226,15 @@ class UI(ABUIC):
             if current_color != next_color:
                 colored_line = True
             if colored_line and not colorized:
-                if '\n' in text:  # Normal end of line
-                    text = text.replace('\n', ' ***\n', 1)
+                if '\n' in txt:  # Normal end of line
+                    txt = txt.replace('\n', ' ***\n', 1)
                     colored_line = False
                 elif index == len_text_parts - 1:  # Or end of text
-                    text += ' ***'
+                    txt += ' ***'
                     colored_line = False
 
             # print the text up to the tag.
-            self._write(text, target_stream)
+            self._write(txt, target_stream)
 
             if current_color != next_color and colorized:
                 # set the new color, but only if they change

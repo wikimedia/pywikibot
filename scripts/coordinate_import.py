@@ -113,9 +113,9 @@ class CoordImportRobot(ConfigParserBot, WikidataBot):
             return
         if page is None:
             # running over items, search in linked pages
-            for page in item.iterlinks():
-                if page.site.has_extension('GeoData') \
-                   and self.try_import_coordinates_from_page(page, item):
+            for p in item.iterlinks():
+                if p.site.has_extension('GeoData') \
+                   and self.try_import_coordinates_from_page(p, item):
                     break
             return
 
