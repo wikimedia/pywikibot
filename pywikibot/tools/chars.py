@@ -1,13 +1,12 @@
 """Character based helper functions (not wiki-dependent)."""
 #
-# (C) Pywikibot team, 2015-2023
+# (C) Pywikibot team, 2015-2024
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
 import re
-import sys
 from contextlib import suppress
 from urllib.parse import unquote
 
@@ -30,14 +29,7 @@ def contains_invisible(text):
 def replace_invisible(text):
     """Replace invisible characters by '<codepoint>'."""
     def replace(match) -> str:
-        match = match.group()
-        if sys.maxunicode < 0x10ffff and len(match) == 2:
-            mask = (1 << 10) - 1
-            assert ord(match[0]) & ~mask == 0xd800
-            assert ord(match[1]) & ~mask == 0xdc00
-            codepoint = (ord(match[0]) & mask) << 10 | (ord(match[1]) & mask)
-        else:
-            codepoint = ord(match)
+        codepoint = ord(match.group())
         return f'<{codepoint:x}>'
 
     return INVISIBLE_REGEX.sub(replace, text)
