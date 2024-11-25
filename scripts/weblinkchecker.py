@@ -363,7 +363,7 @@ class History:
             # no saved history exists yet, or history dump broken
             self.history_dict = {}
 
-    def log(self, url, error, containing_page, archive_url) -> None:
+    def log(self, url, containing_page, archive_url) -> None:
         """Log an error report to a text file in the deadlinks subdirectory."""
         if archive_url:
             error_report = f'* {url} ([{archive_url} archive])\n'
@@ -411,7 +411,7 @@ class History:
                         pywikibot.warning(
                             f'get_closest_memento_url({url}) failed: {e}')
                         archive_url = None
-                    self.log(url, error, page, archive_url)
+                    self.log(url, page, archive_url)
             else:
                 self.history_dict[url] = [(page.title(), now, error)]
 
