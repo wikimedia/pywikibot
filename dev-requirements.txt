@@ -10,6 +10,9 @@ pytest-xvfb>=3.0.0
 
 pre-commit
 coverage>=5.2.1
+# required for coverage (T380697)
+tomli>=2.0.1; python_version < "3.11"
+
 
 # optional but needed for tests
 fake-useragent
