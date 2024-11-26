@@ -91,9 +91,11 @@ def setUpModule():
         raise unittest.SkipTest(e)
 
     try:
-        tkinter.Tk()
+        dialog = tkinter.Tk()
     except RuntimeError as e:
         raise unittest.SkipTest(f'Skipping due to T380732 - {e}')
+    else:
+        dialog.destroy()
 
     from pywikibot.userinterfaces.gui import EditBoxWindow, Tkdialog
 
