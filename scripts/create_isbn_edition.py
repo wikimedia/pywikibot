@@ -696,39 +696,39 @@ def get_language_preferences() -> list[str]:
     return main_languages
 
 
-def item_is_in_list(statement_list: list, itemlist: list[str]) -> str:
+def item_is_in_list(statement_list: list, itemlist: list[str]) -> bool:
     """Verify if statement list contains at least one item from the itemlist.
 
     param statement_list: Statement list
     param itemlist: List of values (string)
-    return: Matching or empty string
+    return: Whether the item matches
     """
     for seq in statement_list:
         with suppress(AttributeError):  # Ignore NoneType error
             isinlist = seq.getTarget().getID()
             if isinlist in itemlist:
-                return isinlist
-    return ''
+                return True
+    return False
 
 
-def item_has_label(item, label: str) -> str:
+def item_has_label(item, label: str) -> bool:
     """Verify if the item has a label.
 
     :param item: Item
     :param label: Item label
-    :return: Matching string
+    :return: Whether the item has a label
     """
     label = unidecode(label).casefold()
     for lang in item.labels:
         if unidecode(item.labels[lang]).casefold() == label:
-            return item.labels[lang]
+            return True
 
     for lang in item.aliases:
         for seq in item.aliases[lang]:
             if unidecode(seq).casefold() == label:
-                return seq
+                return True
 
-    return ''   # Must return "False" when no label
+    return False
 
 
 def is_in_value_list(statement_list: list, valuelist: list[str]) -> bool:
