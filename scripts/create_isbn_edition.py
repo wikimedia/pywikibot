@@ -781,32 +781,12 @@ def get_item_list(item_name: str,
     :param instance_id: Instance ID
     :return: Set of items
     """
-    pywikibot.debug(f'Search label: {item_name.encode("utf-8")}')
-    # TODO: try to use search_entities instead?
-    params = {
-        'action': 'wbsearchentities',
-        'format': 'json',
-        'type': 'item',
-        # All languages are searched, but labels are in native language
-        'strictlanguage': False,
-        'language': mainlang,
-        'uselang': mainlang,  # (primary) Search language
-        'search': item_name,  # Get item list from label
-        'limit': 20,  # Should be reasonable value
-    }
-    request = api.Request(site=repo, parameters=params)
-    result = request.submit()
-    pywikibot.debug(result)
-
-    if 'search' not in result:
-        return set()
-
     # Ignore accents and case
     item_name_canon = unidecode(item_name).casefold()
 
     item_list = set()
-    # Loop though items
-    for res in result['search']:
+    # Loop though items, total should be reasonable value
+    for res in repo.search_entities(item_name, mainlang, total=20):
         item = get_item_page(res['id'])
 
         # Matching instance
