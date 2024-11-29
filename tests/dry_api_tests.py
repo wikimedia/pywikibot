@@ -169,8 +169,9 @@ class MockCachedRequestKeyTests(TestCase):
             def protocol(self):
                 return 'http'
 
-            def languages(self):
-                return ['mock']
+            @property
+            def codes(self):
+                return {'mock'}
 
             def user(self):
                 return self._user

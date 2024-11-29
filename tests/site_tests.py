@@ -104,12 +104,12 @@ class TestSiteObject(DefaultSiteTestCase):
                     pywikibot.site.APISite.fromDBName(dbname, site),
                     pywikibot.Site(sitename))
 
-    def test_language_methods(self):
-        """Test cases for languages() and related methods."""
+    def test_codes_property(self):
+        """Test cases for codes property and related methods."""
         mysite = self.get_site()
-        langs = mysite.languages()
-        self.assertIsInstance(langs, list)
-        self.assertIn(mysite.code, langs)
+        codes = mysite.codes
+        self.assertIsInstance(codes, set)
+        self.assertIn(mysite.code, codes)
         self.assertIsInstance(mysite.obsolete, bool)
         ipf = mysite.interwiki_putfirst()
         if ipf:  # no languages use this anymore, keep it for foreign families
@@ -118,7 +118,7 @@ class TestSiteObject(DefaultSiteTestCase):
             self.assertIsNone(ipf)
 
         for item in mysite.validLanguageLinks():
-            self.assertIn(item, langs)
+            self.assertIn(item, codes)
             self.assertIsNone(self.site.namespaces.lookup_name(item))
 
     def test_namespace_methods(self):

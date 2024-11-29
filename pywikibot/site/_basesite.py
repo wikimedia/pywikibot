@@ -74,7 +74,7 @@ class BaseSite(ComparableMixin):
                 self.obsolete = True
                 pywikibot.log(f'Site {self} instantiated and marked "obsolete"'
                               ' to prevent access')
-        elif self.__code not in self.languages():
+        elif self.__code not in self.codes:
             if self.__family.name in self.__family.langs \
                and len(self.__family.langs) == 1:
                 self.__code = self.__family.name
@@ -231,13 +231,27 @@ class BaseSite(ComparableMixin):
         """Return hash value of instance."""
         return hash(repr(self))
 
-    def languages(self):
-        """Return list of all valid language codes for this site's Family."""
-        return list(self.family.langs.keys())
+    @deprecated('codes', since='9.6')
+    def languages(self) -> list[str]:
+        """Return list of all valid site codes for this site's Family.
+
+        .. deprecated:: 9.6
+           Use :meth:`codes` instead.
+        """
+        return sorted(self.codes)
+
+    @property
+    def codes(self) -> set[str]:
+        """Return set of all valid site codes for this site's Family.
+
+        .. versionadded:: 9.6
+        .. seealso:: :attr:`family.Family.codes`
+        """
+        return set(self.family.langs.keys())
 
     def validLanguageLinks(self):  # noqa: N802
         """Return list of language codes to be used in interwiki links."""
-        return [lang for lang in self.languages()
+        return [lang for lang in sorted(self.codes)
                 if self.namespaces.lookup_normalized_name(lang) is None]
 
     def _interwiki_urls(self, only_article_suffixes: bool = False):
