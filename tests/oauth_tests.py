@@ -92,7 +92,7 @@ class OAuthEditTest(OAuthSiteTestCase):
                 self.assertIn(ts, t)
 
 
-class TestOauthLoginManger(DefaultSiteTestCase, OAuthSiteTestCase):
+class TestOauthLoginManager(DefaultSiteTestCase, OAuthSiteTestCase):
 
     """Test OAuth login manager."""
 
