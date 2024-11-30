@@ -112,6 +112,13 @@ class LoginManager:
         if getattr(config, 'password_file', ''):
             self.readPassword()
 
+    def __repr__(self):
+        """Return representation string for LoginManager.
+
+        ..versionadded:: 10.0
+        """
+        return f'{type(self).__name__}(user={self.username!r})'
+
     def check_user_exists(self) -> None:
         """Check that the username exists on the site.
 
@@ -584,11 +591,23 @@ class OauthLoginManager(LoginManager):
 
     @property
     def access_token(self) -> tuple[str, str] | None:
-        """Return OAuth access key token and secret token.
+        """OAuth access key token and secret token.
 
         .. seealso:: :api:`Tokens`
+
+        :getter: Return OAuth access key token and secret token.
+        :setter: Add OAuth access key token and secret token.
+            Implemented to discard user interaction token fetching,
+            usually for tests.
+
+            .. versionadded:: 10.0
         """
         return self._access_token
+
+    @access_token.setter
+    def access_token(self, token: tuple[str, str]) -> None:
+        """Add OAuth access key token and secret token."""
+        self._access_token = token
 
     @property
     def identity(self) -> dict[str, Any] | None:
