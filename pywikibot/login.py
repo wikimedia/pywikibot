@@ -592,7 +592,12 @@ class OauthLoginManager(LoginManager):
 
     @property
     def identity(self) -> dict[str, Any] | None:
-        """Get identifying information about a user via an authorized token."""
+        """Get identifying information about a user via an authorized token.
+
+        .. versionchanged:: 9.6
+           *leeway* parameter for ``mwoauth.identify`` function was
+           increased to 30.0 seconds.
+        """
         if self.access_token is None:
             pywikibot.error('Access token not set')
             return None
@@ -601,8 +606,12 @@ class OauthLoginManager(LoginManager):
         access_token = mwoauth.AccessToken(*self.access_token)
         try:
             identity = mwoauth.identify(self.site.base_url(self.site.path()),
-                                        consumer_token, access_token)
-            return identity
+                                        consumer_token,
+                                        access_token,
+                                        leeway=30.0)
         except Exception as e:
             pywikibot.error(e)
-            return None
+        else:
+            return identity
+
+        return None

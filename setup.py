@@ -50,7 +50,7 @@ extra_deps = {
         'Pillow>=10.4; python_version >= "3.13"',
     ],
     'mwoauth': [
-        'PyJWT != 2.10.0; python_version > "3.8"',  # T380270
+        'PyJWT != 2.10.0, != 2.10.1; python_version > "3.8"',  # T380270
         'mwoauth!=0.3.1,>=0.2.4',
     ],
     'html': ['beautifulsoup4>=4.7.1'],
