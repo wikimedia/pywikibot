@@ -177,12 +177,20 @@ class classproperty:  # noqa: N801
     """
 
     def __init__(self, cls_method) -> None:
-        """Hold the class method."""
+        """Initializer: hold the class method and documentation."""
         self.method = cls_method
-        self.__doc__ = self.method.__doc__
+        self.__annotations__ = self.method.__annotations__
+        self.__doc__ = (':class:`classproperty<tools.classproperty>` '
+                        f'{self.method.__doc__}')
+        rtype = self.__annotations__.get('return')
+        if rtype:
+            self.__doc__ += f'\n\n:rtype: {rtype}'
 
     def __get__(self, instance, owner):
         """Get the attribute of the owner class by its method."""
+        if SPHINX_RUNNING:
+            return self
+
         return self.method(owner)
 
 
