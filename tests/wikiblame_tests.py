@@ -36,7 +36,6 @@ class TestWikiBlameMixin(TestCase):
             page.authorship()
 
     @require_modules('wikitextparser')
-    @unittest.expectedFailure  # T381262
     def test_main_authors(self):
         """Test main_authors() method."""
         page = pywikibot.Page(self.site, 'Python (programmeertaal)')
@@ -49,7 +48,6 @@ class TestWikiBlameMixin(TestCase):
         self.assertIsInstance(values[1], float)
 
     @require_modules('wikitextparser')
-    @unittest.expectedFailure  # T381262
     def test_restrictions(self):
         """Test main_authors() method with restrictions."""
         page = pywikibot.Page(pywikibot.Site('wikipedia:en'), 'Python')
