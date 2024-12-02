@@ -180,11 +180,19 @@ class classproperty:  # noqa: N801
         """Initializer: hold the class method and documentation."""
         self.method = cls_method
         self.__annotations__ = self.method.__annotations__
-        self.__doc__ = (':class:`classproperty<tools.classproperty>` '
-                        f'{self.method.__doc__}')
+        doc = self.method.__doc__
+        self.__doc__ = f':class:`classproperty<tools.classproperty>` {doc}'
+
         rtype = self.__annotations__.get('return')
         if rtype:
-            self.__doc__ += f'\n\n:rtype: {rtype}'
+            lines = doc.splitlines()
+
+            if len(lines) > 2 and PYTHON_VERSION < (3, 13):
+                spaces = ' ' * re.search('[^ ]', lines[2]).start()
+            else:
+                spaces = ''
+
+            self.__doc__ += f'\n{spaces}:rtype: {rtype}'
 
     def __get__(self, instance, owner):
         """Get the attribute of the owner class by its method."""
