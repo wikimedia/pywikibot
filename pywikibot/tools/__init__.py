@@ -192,7 +192,7 @@ class classproperty:  # noqa: N801
             else:
                 spaces = ''
 
-            self.__doc__ += f'\n{spaces}:rtype: {rtype}'
+            self.__doc__ += f'\n\n{spaces}:rtype: {rtype}'
 
     def __get__(self, instance, owner):
         """Get the attribute of the owner class by its method."""
