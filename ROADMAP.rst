@@ -11,6 +11,8 @@ Current Release Changes
 
 **Breaking changes and code cleanups**
 
+* 7.2.0: RedirectPageBot and NoRedirectPageBot bot classes were removed in favour of
+  :attr:`use_redirects<bot.BaseBot.use_redirects>` attribute
 * Python 3.7 support was dropped (:phab:`T378893`)
 
 
@@ -95,8 +97,6 @@ Pending removal in Pywikibot 10
 * 7.2.0: ``tb`` parameter of :func:`exception()<pywikibot.logging.exception>` function was renamed to ``exc_info``
 * 7.2.0: XMLDumpOldPageGenerator is deprecated in favour of a ``content`` parameter of
   :func:`XMLDumpPageGenerator<pagegenerators.XMLDumpPageGenerator>` (:phab:`T306134`)
-* 7.2.0: RedirectPageBot and NoRedirectPageBot bot classes are deprecated in favour of
-  :attr:`use_redirects<bot.BaseBot.use_redirects>` attribute
 * 7.2.0: :func:`tools.formatter.color_format<tools.formatter.color_format>` is deprecated and will be removed
 * 7.1.0: Unused ``get_redirect`` parameter of :meth:`Page.getOldVersion()<page.BasePage.getOldVersion>` will be removed
 * 7.0.0: User.isBlocked() method is renamed to is_blocked for consistency

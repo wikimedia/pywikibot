@@ -55,11 +55,6 @@ Additionally there is the :class:`AutomaticTWSummaryBot` which
 subclasses :class:`CurrentPageBot` and automatically defines the summary
 when :meth:`put_current` is used.
 
-.. deprecated:: 7.2
-   The bot classes :class:`RedirectPageBot` and
-   :class:`NoRedirectPageBot` are deprecated. Use
-   :attr:`use_redirects<BaseBot.use_redirects>` attribute instead.
-
 .. deprecated:: 9.2
    The functions
    :func:`critical()<pywikibot.logging.critical>`
@@ -78,6 +73,11 @@ when :meth:`put_current` is used.
    and ``WARNING`` imported from :mod:`logging` module are deprecated
    within this module. Import them directly. These functions can also be
    used as :mod:`pywikibot` members.
+
+.. versionremoved:: 10.0
+   The bot classes :class:`RedirectPageBot` and
+   :class:`NoRedirectPageBot` are deprecated. Use
+   :attr:`use_redirects<BaseBot.use_redirects>` attribute instead.
 """
 #
 # (C) Pywikibot team, 2008-2024
@@ -105,7 +105,6 @@ __all__ = (
     'BaseBot', 'Bot', 'ConfigParserBot', 'SingleSiteBot', 'MultipleSitesBot',
     'CurrentPageBot', 'AutomaticTWSummaryBot',
     'ExistingPageBot', 'FollowRedirectPageBot', 'CreatingPageBot',
-    'RedirectPageBot', 'NoRedirectPageBot',
     'WikidataBot',
 )
 
@@ -189,7 +188,7 @@ from pywikibot.logging import log as _log
 from pywikibot.logging import stdout as _stdout
 from pywikibot.logging import warning as _warning
 from pywikibot.throttle import Throttle
-from pywikibot.tools import issue_deprecation_warning, redirect_func, strtobool
+from pywikibot.tools import redirect_func, strtobool
 from pywikibot.tools._logging import LoggingFormatter
 
 
@@ -1933,56 +1932,6 @@ class CreatingPageBot(CurrentPageBot):
         """Treat page if doesn't exist."""
         if page.exists():
             _warning(f'Page {page} does already exist on {page.site}.')
-            return True
-        return super().skip_page(page)
-
-
-class RedirectPageBot(CurrentPageBot):  # pragma: no cover
-
-    """A RedirectPageBot class which only treats redirects.
-
-    .. deprecated:: 7.2
-       use BaseBot attribute
-       :attr:`use_redirects  = True<BaseBot.use_redirects>` instead
-    """
-
-    def __init__(self, *args, **kwargs):
-        """Deprecate RedirectPageBot."""
-        issue_deprecation_warning('RedirectPageBot',
-                                  "BaseBot attribute 'use_redirects = True'",
-                                  since='7.2.0')
-        super().__init__(*args, **kwargs)
-
-    def skip_page(self, page: pywikibot.page.BasePage) -> bool:
-        """Treat only redirect pages and handle IsNotRedirectPageError."""
-        if not page.isRedirectPage():
-            _warning(f'Page {page} on {page.site} is skipped because it is'
-                     ' not a redirect')
-            return True
-        return super().skip_page(page)
-
-
-class NoRedirectPageBot(CurrentPageBot):  # pragma: no cover
-
-    """A NoRedirectPageBot class which only treats non-redirects.
-
-    .. deprecated:: 7.2
-       use BaseBot attribute
-       :attr:`use_redirects  = False<BaseBot.use_redirects>` instead
-    """
-
-    def __init__(self, *args, **kwargs):
-        """Deprecate NoRedirectPageBot."""
-        issue_deprecation_warning('NoRedirectPageBot',
-                                  "BaseBot attribute 'use_redirects = False'",
-                                  since='7.2.0')
-        super().__init__(*args, **kwargs)
-
-    def skip_page(self, page: pywikibot.page.BasePage) -> bool:
-        """Treat only non-redirect pages and handle IsRedirectPageError."""
-        if page.isRedirectPage():
-            _warning(f'Page {page} on {page.site} is skipped because it is'
-                     ' a redirect')
             return True
         return super().skip_page(page)
 
