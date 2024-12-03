@@ -77,25 +77,26 @@ def check_pwb_versions(package: str):
     wikibot_version = Version(pwb.__version__)
 
     if scripts_version.release > wikibot_version.release:  # pragma: no cover
-        print('WARNING: Pywikibot version {} is behind scripts package '
-              'version {}.\nYour Pywikibot may need an update or be '
-              'misconfigured.\n'.format(wikibot_version, scripts_version))
+        print(f'WARNING: Pywikibot version {wikibot_version} is behind '
+              f'scripts package version {scripts_version}.\n'
+              'Your Pywikibot may need an update or be misconfigured.\n')
 
     # calculate previous minor release
     if wikibot_version.minor > 0:  # pragma: no cover
-        prev_wikibot = Version('{v.major}.{}.{v.micro}'
-                               .format(wikibot_version.minor - 1,
-                                       v=wikibot_version))
+        prev_wikibot = Version(
+            f'{wikibot_version.major}.{wikibot_version.minor - 1}.'
+            f'{wikibot_version.micro}'
+        )
 
         if scripts_version.release < prev_wikibot.release:
-            print('WARNING: Scripts package version {} is behind legacy '
-                  'Pywikibot version {} and current version {}\nYour scripts '
-                  'may need an update or be misconfigured.\n'
-                  .format(scripts_version, prev_wikibot, wikibot_version))
+            print(f'WARNING: Scripts package version {scripts_version} is '
+                  f'behind legacy Pywikibot version {prev_wikibot} and '
+                  f'current version {wikibot_version}\n'
+                  'Your scripts may need an update or be misconfigured.\n')
     elif scripts_version.release < wikibot_version.release:  # pragma: no cover
-        print('WARNING: Scripts package version {} is behind current version '
-              '{}\nYour scripts may need an update or be misconfigured.\n'
-              .format(scripts_version, wikibot_version))
+        print(f'WARNING: Scripts package version {scripts_version} is behind '
+              f'current version {wikibot_version}\n'
+              'Your scripts may need an update or be misconfigured.\n')
 
     del Version
 
@@ -359,9 +360,8 @@ def find_alternates(filename, script_paths):
         script = similar_scripts[0]
         wait_time = config.pwb_autostart_waittime
         info('NOTE: Starting the most similar script '
-             '<<lightyellow>>{}.py<<default>>\n'
-             '      in {} seconds; type CTRL-C to stop.'
-             .format(script, wait_time))
+             f'<<lightyellow>>{script}.py<<default>>\n'
+             f'      in {wait_time} seconds; type CTRL-C to stop.')
         try:
             sleep(wait_time)  # Wait a bit to let it be cancelled
         except KeyboardInterrupt:

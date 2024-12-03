@@ -597,8 +597,7 @@ class TestPageObject(DefaultSiteTestCase):
         self.assertEqual(page_d3.depth, 3)
 
     def test_page_image(self):
-        """
-        Test ``Page.page_image`` function.
+        """Test ``Page.page_image`` function.
 
         Since we are not sure what the wiki will return, we mainly test types
         """
@@ -618,6 +617,31 @@ class TestPageObject(DefaultSiteTestCase):
                     'Method "loadpageimage" is not implemented '
                     'without the extension PageImages'):
                 mainpage.page_image()
+
+
+class TestPageCategories(TestCase):
+
+    """Categories tests class."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    def testCategories(self):
+        """Test BasePage.categories() with sort keys."""
+        mainhelp = pywikibot.Page(self.site, 'Help:Contents')
+        cat_help = pywikibot.Category(self.site, 'Category:Help')
+
+        for with_sort_key in (False, True):
+            with self.subTest(with_sort_key=with_sort_key):
+                cats = list(mainhelp.categories(with_sort_key=with_sort_key))
+                self.assertLength(cats, 4)
+                self.assertIn(cat_help, cats)
+                for p in cats:
+                    self.assertIsInstance(p, pywikibot.Category)
+                    if with_sort_key:
+                        self.assertEqual(p.sortKey, 'Contents')
+                    else:
+                        self.assertIsNone(p.sortKey)
 
 
 class TestPageCoordinates(TestCase):
@@ -943,8 +967,7 @@ class TestPageHistory(DefaultSiteTestCase):
 
 class TestPageRedirects(TestCase):
 
-    """
-    Test redirects.
+    """Test redirects.
 
     This is using the pages 'User:Legoktm/R1', 'User:Legoktm/R2' and
     'User:Legoktm/R3' on the English Wikipedia. 'R1' is redirecting to 'R2',
@@ -1237,6 +1260,7 @@ class HtmlEntity(TestCase):
 
 
 class TestPermalink(TestCase):
+
     """Test that permalink links are correct."""
 
     family = 'wikipedia'
@@ -1261,6 +1285,7 @@ class TestPermalink(TestCase):
 
 
 class TestShortLink(TestCase):
+
     """Test that short link management is correct."""
 
     login = True

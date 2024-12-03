@@ -103,8 +103,7 @@ class NoTitleError(Exception):
 
 class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
 
-    """
-    Responsible for writing pages to the wiki.
+    """Responsible for writing pages to the wiki.
 
     Titles and contents are given by a PageFromFileReader.
 
@@ -170,9 +169,8 @@ class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
             else:
                 pywikibot.info(f'Page {title} already exists, not adding!')
                 return
-        else:
-            if self.opt.autosummary:
-                comment = config.default_edit_summary = ''
+        elif self.opt.autosummary:
+            comment = config.default_edit_summary = ''
 
         self.put_current(contents, summary=comment,
                          minor=self.opt.minor,
@@ -281,8 +279,7 @@ class PageFromFileReader(OptionHandler, GeneratorWrapper):
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

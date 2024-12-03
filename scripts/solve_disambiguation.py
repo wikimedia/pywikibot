@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Script to help a human solve disambiguations by presenting a set of options.
+"""Script to help a human solve disambiguations by presenting a set of options.
 
 Specify the disambiguation page on the command line.
 
@@ -441,8 +440,7 @@ class ReferringPageGeneratorWithIgnore:
 
 class PrimaryIgnoreManager:
 
-    """
-    Primary ignore manager.
+    """Primary ignore manager.
 
     If run with the -primary argument, reads from a file which pages should
     not be worked on; these are the ones where the user pressed n last time.
@@ -630,8 +628,7 @@ class DisambiguationRobot(SingleSiteBot):
         self.dn_template_str = i18n.translate(self.site, dn_template)
 
     def checkContents(self, text: str) -> str | None:  # noqa: N802
-        """
-        Check if the text matches any of the ignore regexes.
+        """Check if the text matches any of the ignore regexes.
 
         :param text: wikitext of a page
         :return: None if none of the regular expressions
@@ -677,7 +674,7 @@ class DisambiguationRobot(SingleSiteBot):
             \[\[  (?P<title>     [^\[\]\|#]*)
                   (?P<section> \#[^\]\|]*)?
                (\|(?P<label>     [^\]]*))?  \]\]
-            (?P<linktrail>{linktrail})""", flags=re.X)
+            (?P<linktrail>{linktrail})""", flags=re.VERBOSE)
 
     @staticmethod
     def firstlinks(page) -> Generator[str]:
@@ -1166,22 +1163,21 @@ or press enter to quit:""")
                     {'from': page.title(),
                      'to': targets,
                      'count': len(new_targets)})
+        elif unlink_counter and not new_targets:
+            self.summary = i18n.twtranslate(
+                self.site, 'solve_disambiguation-links-removed',
+                {'from': page.title(),
+                 'count': unlink_counter})
+        elif dn and not new_targets:
+            self.summary = i18n.twtranslate(
+                self.site, 'solve_disambiguation-adding-dn-template',
+                {'from': page.title()})
         else:
-            if unlink_counter and not new_targets:
-                self.summary = i18n.twtranslate(
-                    self.site, 'solve_disambiguation-links-removed',
-                    {'from': page.title(),
-                     'count': unlink_counter})
-            elif dn and not new_targets:
-                self.summary = i18n.twtranslate(
-                    self.site, 'solve_disambiguation-adding-dn-template',
-                    {'from': page.title()})
-            else:
-                self.summary = i18n.twtranslate(
-                    self.site, 'solve_disambiguation-links-resolved',
-                    {'from': page.title(),
-                     'to': targets,
-                     'count': len(new_targets)})
+            self.summary = i18n.twtranslate(
+                self.site, 'solve_disambiguation-links-resolved',
+                {'from': page.title(),
+                 'to': targets,
+                 'count': len(new_targets)})
 
     def teardown(self) -> None:
         """Write ignoring pages to a file."""
@@ -1221,8 +1217,7 @@ or press enter to quit:""")
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

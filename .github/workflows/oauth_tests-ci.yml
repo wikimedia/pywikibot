@@ -84,8 +84,12 @@ jobs:
         python -m pip install --upgrade pip
         pip --version
         pip install coverage
+        # tomli required for coverage due to T380697
+        pip install "tomli; python_version < '3.11'"
         pip install "importlib_metadata ; python_version < '3.8'"
         pip install mwparserfromhell
+        # PyJWT added due to T380270
+        pip install "PyJWT != 2.10.0, != 2.10.1 ; python_version > '3.8'"
         pip install mwoauth
         pip install packaging
         pip install requests

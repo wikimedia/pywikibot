@@ -23,6 +23,7 @@ from pywikibot.data.api import Request as _original_Request
 from pywikibot.exceptions import APIError
 from pywikibot.login import LoginStatus
 from pywikibot.site import Namespace
+from pywikibot.tools import PYTHON_VERSION
 from pywikibot.tools.collections import EMPTY_DEFAULT
 from tests import _pwb_py
 
@@ -31,8 +32,7 @@ OSWIN32 = (sys.platform == 'win32')
 
 
 def expected_failure_if(expect):
-    """
-    Unit test decorator to expect failure under conditions.
+    """Unit test decorator to expect failure under conditions.
 
     :param expect: Flag to check if failure is expected
     :type expect: bool
@@ -75,8 +75,7 @@ def entered_loop(iterable):
 
 class WarningSourceSkipContextManager(warnings.catch_warnings):
 
-    """
-    Warning context manager that adjusts source of warning.
+    """Warning context manager that adjusts source of warning.
 
     The source of the warning will be moved further down the
     stack to skip a list of objects that have been monkey
@@ -84,8 +83,7 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
     """
 
     def __init__(self, skip_list):
-        """
-        Initializer.
+        """Initializer.
 
         :param skip_list: List of objects to be skipped. The source of any
             warning that matches the skip_list won't be adjusted.
@@ -96,8 +94,7 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
 
     @property
     def skip_list(self):
-        """
-        Return list of filename and line ranges to skip.
+        """Return list of filename and line ranges to skip.
 
         :rtype: list of (obj, str, int, int)
         """
@@ -105,8 +102,7 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
 
     @skip_list.setter
     def skip_list(self, value):
-        """
-        Set list of objects to be skipped.
+        """Set list of objects to be skipped.
 
         :param value: List of objects to be skipped
         :type value: list of object or (obj, str, int, int)
@@ -173,8 +169,7 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
 
 class AssertAPIErrorContextManager:
 
-    """
-    Context manager to assert certain APIError exceptions.
+    """Context manager to assert certain APIError exceptions.
 
     This is build similar to the :py:obj:`unittest.TestCase.assertError`
     implementation which creates a context manager. It then calls
@@ -303,7 +298,7 @@ class DummySiteinfo:
 
     def is_recognised(self, key):
         """Return None."""
-        return None
+        return
 
     def get_requested_time(self, key):
         """Return False."""
@@ -479,6 +474,9 @@ def execute(command: list[str], *, data_in=None, timeout=None):
 
     :param command: executable to run and arguments to use
     """
+    if PYTHON_VERSION < (3, 8):
+        command.insert(1, '-W ignore::FutureWarning:pywikibot:97')
+
     env = os.environ.copy()
 
     # Prevent output by test package; e.g. 'max_retries reduced from x to y'

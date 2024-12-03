@@ -70,8 +70,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     }
 
     def encodings(self, code):
-        """
-        Return a list of historical encodings for a specific language.
+        """Return a list of historical encodings for a specific language.
 
         :param code: site code
         """

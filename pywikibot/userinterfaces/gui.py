@@ -13,7 +13,7 @@ Useful for editing the contents of an article.
 .. seealso:: :mod:`editor`
 """
 #
-# (C) Pywikibot team, 2003-2023
+# (C) Pywikibot team, 2003-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -23,27 +23,28 @@ import pywikibot
 from pywikibot.tools import PYTHON_VERSION
 
 
+# Some Python distributions have tkinter but the underlying _tkinter
+# implementation is missing. Thus just import tkinter does not raise
+# the exception. Therefore try to import _tkinter.
+# Note: idlelib also needs tkinter.
 try:
-    import idlelib
+    import _tkinter  # noqa: F401
 except ImportError as e:
-    idlelib = e
-    ConfigDialog = ReplaceDialog = SearchDialog = object()
-    idleConf = MultiCallCreator = object()  # noqa:  N816
+    idlelib = tkinter = e
+    Frame = simpledialog = ScrolledText = object
+    ConfigDialog = ReplaceDialog = SearchDialog = object
+    idleConf = MultiCallCreator = object  # noqa:  N816
 else:
+    import tkinter
+    from tkinter import Frame, simpledialog
+    from tkinter.scrolledtext import ScrolledText
+
+    import idlelib
     from idlelib import replace as ReplaceDialog  # noqa: N812
     from idlelib import search as SearchDialog  # noqa: N812
     from idlelib.config import idleConf
     from idlelib.configdialog import ConfigDialog
     from idlelib.multicall import MultiCallCreator
-
-try:
-    import tkinter
-except ImportError as e:
-    tkinter = e
-    Frame = simpledialog = ScrolledText = object
-else:
-    from tkinter import Frame, simpledialog
-    from tkinter.scrolledtext import ScrolledText
 
 
 __all__ = ('EditBoxWindow', 'TextEditor', 'Tkdialog')
@@ -219,8 +220,7 @@ class TextEditor(ScrolledText):
         return 'break'
 
     def find_all(self, s):
-        """
-        Highlight all occurrences of string s, and select the first one.
+        """Highlight all occurrences of string s, and select the first one.
 
         If the string has already been highlighted, jump to the next occurrence
         after the current selection. (You cannot go backwards using the
@@ -394,8 +394,7 @@ class EditBoxWindow(Frame):
 
     def edit(self, text: str, jumpIndex: int | None = None,  # noqa: N803
              highlight: str | None = None) -> str | None:
-        """
-        Provide user with editor to modify text.
+        """Provide user with editor to modify text.
 
         :param text: the text to be edited
         :param jumpIndex: position at which to put the caret
@@ -441,8 +440,7 @@ class EditBoxWindow(Frame):
         ConfigDialog(self, 'Settings')
 
     def pressedOK(self) -> None:  # noqa: N802
-        """
-        Perform OK operation.
+        """Perform OK operation.
 
         Called when user pushes the OK button.
         Saves the buffer into a variable, and closes the window.
@@ -468,9 +466,8 @@ class Tkdialog:
 
         self.root = tkinter.Tk()
         # "%dx%d%+d%+d" % (width, height, xoffset, yoffset)
-        self.root.geometry('{}x{}+10-10'
-                           .format(int(pywikibot.config.tkhorsize),
-                                   int(pywikibot.config.tkvertsize)))
+        self.root.geometry(f'{int(pywikibot.config.tkhorsize)}x'
+                           f'{int(pywikibot.config.tkvertsize)}+10-10')
 
         self.root.title(filename)
         self.photo_description = photo_description

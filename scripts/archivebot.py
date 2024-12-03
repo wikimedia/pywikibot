@@ -287,8 +287,7 @@ def calc_md5_hexdigest(txt, salt) -> str:
 
 class DiscussionThread:
 
-    """
-    An object representing a discussion thread on a page.
+    """An object representing a discussion thread on a page.
 
     It represents something that is of the form::
 
@@ -423,7 +422,7 @@ class DiscussionPage(pywikibot.Page):
         header, threads, footer = extract_sections(text, self.site)
         header = header.replace(marker, '')
         if header and footer:
-            self.header = '\n\n'.join((header.rstrip(), footer, ''))
+            self.header = f'{header.rstrip()}\n\n{footer}\n\n'
         else:
             self.header = header + footer
 
@@ -906,8 +905,7 @@ def show_md5_key(calc, salt, site) -> bool:
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
@@ -1021,7 +1019,7 @@ def main(*args: str) -> None:
                     pywikibot.info(f'{canceled} done')
                     break
 
-                elif not process_page(pg, *botargs):
+                if not process_page(pg, *botargs):
                     break
 
 

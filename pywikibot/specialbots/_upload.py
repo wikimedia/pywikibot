@@ -19,10 +19,10 @@ from urllib.parse import urlparse
 import requests
 
 import pywikibot
-import pywikibot.comms.http as http
 from pywikibot import config
 from pywikibot.backports import Callable
 from pywikibot.bot import BaseBot, QuitKeyboardInterrupt
+from pywikibot.comms import http
 from pywikibot.exceptions import APIError, FatalServerError, NoPageError
 
 
@@ -216,7 +216,7 @@ class UploadRobot(BaseBot):
         return None if self.aborts is not True else False
 
     def _handle_warnings(self, warnings):
-        messages = '\n'.join('{0.code}: {0.info}'.format(warning)
+        messages = '\n'.join(f'{warning.code}: {warning.info}'
                              for warning in sorted(warnings,
                                                    key=lambda w: w.code))
         if len(warnings) > 1:
@@ -375,16 +375,14 @@ class UploadRobot(BaseBot):
         return self.aborts is True or warn_code in self.aborts
 
     def ignore_on_warn(self, warn_code: str):
-        """
-        Determine if the warning message should be ignored.
+        """Determine if the warning message should be ignored.
 
         :param warn_code: The warning message
         """
         return self.ignore_warning is True or warn_code in self.ignore_warning
 
     def upload_file(self, file_url: str) -> str | None:
-        """
-        Upload the image at file_url to the target wiki.
+        """Upload the image at file_url to the target wiki.
 
         .. seealso:: :api:`Upload`
 

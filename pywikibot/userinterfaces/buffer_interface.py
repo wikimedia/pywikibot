@@ -3,7 +3,7 @@
 .. versionadded:: 6.4
 """
 #
-# (C) Pywikibot team, 2021-2022
+# (C) Pywikibot team, 2021-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -75,9 +75,8 @@ class UI(ABUIC):
             elif isinstance(record, logging.LogRecord):
                 output.append(record.getMessage())
             else:
-                raise ValueError(
-                    'BUG: buffer can only contain logs and strings, had {}'
-                    .format(type(record).__name__))
+                raise ValueError('Buffer can only contain logs and strings, '
+                                 f'had {type(record).__name__}')
 
         return output
 

@@ -256,8 +256,7 @@ class XmlDump:
 
     @staticmethod
     def parse_restrictions(restrictions: str) -> tuple[str | None, str | None]:
-        """
-        Parse the characters within a restrictions tag.
+        """Parse the characters within a restrictions tag.
 
         Returns strings representing user groups allowed to edit and
         to move a page, where None means there are no restrictions.

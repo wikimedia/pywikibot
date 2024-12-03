@@ -161,8 +161,7 @@ def api_query(site, params: dict[str, str]):
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
@@ -290,13 +289,12 @@ def main(*args: str) -> None:
                         ' exists)'
                     )
                     continue
-            else:
-                if not targetpage.botMayEdit():
-                    pywikibot.warning(
-                        f'Target page {targetpage.title(as_link=True)} is not'
-                        ' editable by bots'
-                    )
-                    continue
+            elif not targetpage.botMayEdit():
+                pywikibot.warning(
+                    f'Target page {targetpage.title(as_link=True)} is not'
+                    ' editable by bots'
+                )
+                continue
 
             params['interwikipage'] = fromtitle
             api_query(tosite, params)

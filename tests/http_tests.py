@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for http module."""
 #
-# (C) Pywikibot team, 2014-2023
+# (C) Pywikibot team, 2014-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -520,8 +520,7 @@ class QueryStringParamsTestCase(HttpbinTestCase):
         self.assertEqual(r.json()['args'], {})
 
     def test_unencoded_params(self):
-        """
-        Test fetch method with unencoded parameters to be encoded internally.
+        """Test fetch method with unencoded parameters to be encoded inside.
 
         HTTPBin returns the args in their urldecoded form, so what we put in
         should be the same as what we get out.
@@ -537,8 +536,7 @@ class QueryStringParamsTestCase(HttpbinTestCase):
         self.assertEqual(r.json()['args'], {'fish&chips': 'delicious'})
 
     def test_encoded_params(self):
-        """
-        Test fetch method with encoded parameters to be re-encoded internally.
+        """Test fetch method with encoded parameters to be re-encoded inside.
 
         HTTPBin returns the args in their urldecoded form, so what we put in
         should be the same as what we get out.
@@ -555,6 +553,7 @@ class QueryStringParamsTestCase(HttpbinTestCase):
 
 
 class DataBodyParameterTestCase(HttpbinTestCase):
+
     """Test data and body params of fetch/request methods are equivalent."""
 
     maxDiff = None

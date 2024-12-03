@@ -56,8 +56,7 @@ from pywikibot.tools.djvu import DjVuFile
 
 class DjVuTextBot(SingleSiteBot):
 
-    """
-    A bot that uploads text-layer from djvu files to Page:namespace.
+    """A bot that uploads text-layer from djvu files to Page:namespace.
 
     Works only on sites with Proofread Page extension installed.
 
@@ -77,8 +76,7 @@ class DjVuTextBot(SingleSiteBot):
         pages: tuple | None = None,
         **kwargs
     ) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param djvu: djvu from where to fetch the text layer
         :type djvu: DjVuFile object
@@ -137,8 +135,7 @@ class DjVuTextBot(SingleSiteBot):
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

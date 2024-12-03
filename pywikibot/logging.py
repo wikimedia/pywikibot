@@ -138,8 +138,8 @@ def logoutput(msg: Any,
             f'keyword argument "{key}={arg}"',
             since='7.2.0')
         if key in kwargs:
-            warning('{!r} is given as keyword argument {!r} already; ignoring '
-                    '{!r}'.format(key, arg, kwargs[key]))
+            warning(f'{key!r} is given as keyword argument {arg!r} already; '
+                    f'ignoring {kwargs[key]!r}')
         else:
             kwargs[key] = arg
 

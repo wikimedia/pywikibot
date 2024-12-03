@@ -29,6 +29,7 @@ from tests.basepage import (
 
 
 class TestPagesTagParser(TestCase):
+
     """Test TagAttr class."""
 
     net = False

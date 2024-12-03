@@ -29,8 +29,7 @@ class SiteDetectionTestCase(TestCase):
     net = True
 
     def assertSite(self, url: str):
-        """
-        Assert a MediaWiki site can be loaded from the url.
+        """Assert a MediaWiki site can be loaded from the url.
 
         :param url: Url of tested site
         :raises AssertionError: Site under url is not MediaWiki powered
@@ -171,10 +170,9 @@ class PrivateWikiTestCase(PatchingTestCase):
         # the user-supplied URL. We need to return enough data for
         # site_detect.WikiHTMLPageParser to determine the server
         # version and the API URL.
-        WEBPATH: ''.join((
-            '<meta name="generator" content="', _generator,
-            '"/>\n<link rel="EditURI" type="application/rsd+xml" '
-            'href="', _apiurl, '?action=rsd"/>')),
+        WEBPATH: f'<meta name="generator" content="{_generator}"/>\n'
+                 f'<link rel="EditURI" type="application/rsd+xml" '
+                 f'href="{_apiurl}?action=rsd"/>',
         APIPATH: '{"error":{"code":"readapidenied"}}',
     }
 

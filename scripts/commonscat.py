@@ -280,8 +280,7 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
         return False
 
     def treat_page(self) -> None:
-        """
-        Add CommonsCat template to page.
+        """Add CommonsCat template to page.
 
         Take a page. Go to all the interwiki page looking for a commonscat
         template. When all the interwiki's links are checked and a proper
@@ -493,7 +492,7 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
                     r'(?P<newcat1>[^\|\}]+)(\|[^\}]+)?\]\]|'
                     r'Robot: Changing Category:(.+) '
                     r'to Category:(?P<newcat2>.+)')
-                m = re.search(regex, logcomment, flags=re.I)
+                m = re.search(regex, logcomment, flags=re.IGNORECASE)
 
                 if not m:
                     pywikibot.info(
@@ -531,8 +530,7 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

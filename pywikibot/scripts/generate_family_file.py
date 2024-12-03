@@ -32,7 +32,7 @@ base directory.
    If the url scheme is missing, ``https`` will be used.
 """
 #
-# (C) Pywikibot team, 2010-2023
+# (C) Pywikibot team, 2010-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -64,8 +64,7 @@ class FamilyFileGenerator:
                  name: str | None = None,
                  dointerwiki: str | None = None,
                  verify: str | None = None) -> None:
-        """
-        Parameters are optional. If not given the script asks for the values.
+        """Parameters are optional. If missing the script asks for the values.
 
         :param url: an url from where the family settings are loaded
         :param name: the family name without "_family.py" tail.
@@ -119,8 +118,8 @@ class FamilyFileGenerator:
                 return False
 
         if any(x not in NAME_CHARACTERS for x in self.name):
-            print('ERROR: Name of family "{}" must be ASCII letters and '
-                  'digits [a-zA-Z0-9]'.format(self.name))
+            print(f'ERROR: Name of family "{self.name}" must be ASCII letters'
+                  ' and digits [a-zA-Z0-9]')
             return False
 
         return True
@@ -156,9 +155,9 @@ class FamilyFileGenerator:
 
         self.wikis[w.lang] = w
         print('\n=================================='
-              '\nAPI url: {w.api}'
-              '\nMediaWiki version: {w.version}'
-              '\n==================================\n'.format(w=w))
+              f'\nAPI url: {w.api}'
+              f'\nMediaWiki version: {w.version}'
+              '\n==================================\n')
 
         self.getlangs(w)
         self.getapis()

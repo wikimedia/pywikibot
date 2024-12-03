@@ -48,8 +48,7 @@ class TestPwb(PwbTestCase):
         return (direct, vpwb)
 
     def test_env(self):
-        """
-        Test external environment of pywikibot.
+        """Test external environment of pywikibot.
 
         Make sure the environment is not contaminated, and is the same as
         the environment we get when directly running a script.
@@ -57,8 +56,7 @@ class TestPwb(PwbTestCase):
         self._do_check('print_env')
 
     def test_locals(self):
-        """
-        Test internal environment of pywikibot.
+        """Test internal environment of pywikibot.
 
         Make sure the environment is not contaminated, and is the same as
         the environment we get when directly running a script.

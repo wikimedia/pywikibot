@@ -83,7 +83,7 @@ from pywikibot.specialbots import UploadRobot
 
 
 CHUNK_SIZE_REGEX = re.compile(
-    r'-chunked(?::(\d+(?:\.\d+)?)[ \t]*(k|ki|m|mi)?b?)?', re.I)
+    r'-chunked(?::(\d+(?:\.\d+)?)[ \t]*(k|ki|m|mi)?b?)?', re.IGNORECASE)
 
 
 def get_chunk_size(match) -> int:
@@ -112,8 +112,7 @@ def get_chunk_size(match) -> int:
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
@@ -223,8 +222,9 @@ def main(*args: str) -> None:
             if not recursive:
                 # Do not visit any subdirectories
                 directory_info[1][:] = []
-            for dir_file in directory_info[2]:
-                file_list.append(os.path.join(directory_info[0], dir_file))
+
+            file_list += [os.path.join(directory_info[0], dir_file)
+                          for dir_file in directory_info[2]]
         url = file_list
     else:
         url = [url]

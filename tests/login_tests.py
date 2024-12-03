@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Tests for LoginManager classes.
+"""Tests for LoginManager classes.
 
 e.g. used to test password-file based login.
 """
@@ -21,12 +20,14 @@ from tests.aspects import DefaultDrySiteTestCase, unittest
 
 
 class FakeFamily:
+
     """Mock."""
 
     name = '~FakeFamily'
 
 
 class FakeSite:
+
     """Mock."""
 
     code = '~FakeCode'
@@ -37,6 +38,7 @@ FakeUsername = '~FakeUsername'
 
 
 class FakeConfig:
+
     """Mock."""
 
     usernames = defaultdict(dict)
@@ -46,6 +48,7 @@ class FakeConfig:
 @mock.patch('pywikibot.Site', FakeSite)
 @mock.patch('pywikibot.login.config', FakeConfig)
 class TestOfflineLoginManager(DefaultDrySiteTestCase):
+
     """Test offline operation of login.LoginManager."""
 
     dry = True
@@ -82,6 +85,7 @@ class TestOfflineLoginManager(DefaultDrySiteTestCase):
 
 @mock.patch('pywikibot.Site', FakeSite)
 class TestPasswordFile(DefaultDrySiteTestCase):
+
     """Test parsing password files."""
 
     def patch(self, name):

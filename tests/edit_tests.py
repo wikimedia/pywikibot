@@ -72,6 +72,7 @@ class TestGeneralWrite(TestCase):
 
 
 class TestSiteMergeHistory(TestCase):
+
     """Test history merge action."""
 
     family = 'wikipedia'

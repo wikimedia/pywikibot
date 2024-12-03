@@ -199,9 +199,9 @@ class Uploader:
             if (offset is not False and offset is not True
                     and offset > file_size):
                 raise ValueError(
-                    'For the file key "{}" the offset was set to {} '
-                    'while the file is only {} bytes large.'
-                    .format(file_key, offset, file_size))
+                    f'For the file key "{file_key}" the offset was set to '
+                    f'{offset} while the file is only {file_size} bytes large.'
+                )
 
         if verify_stash or offset is True:
             if not file_key:
@@ -338,10 +338,10 @@ class Uploader:
                                 # every time ApiError.
                                 if offset != new_offset:
                                     pywikibot.log(
-                                        'Old offset: {}; Returned '
-                                        'offset: {}; Chunk size: {}'
-                                        .format(offset, new_offset,
-                                                len(chunk)))
+                                        f'Old offset: {offset}; Returned '
+                                        f'offset: {new_offset}; Chunk size: '
+                                        f'{len(chunk)}'
+                                    )
                                     pywikibot.warning('Attempting to correct '
                                                       'automatically from '
                                                       'offset mismatch error.')
@@ -390,11 +390,11 @@ class Uploader:
                             if 'offset' in data:
                                 new_offset = int(data['offset'])
                                 if offset + len(chunk) != new_offset:
-                                    pywikibot.log('Old offset: {}; Returned '
-                                                  'offset: {}; Chunk size: {}'
-                                                  .format(offset,
-                                                          new_offset,
-                                                          len(chunk)))
+                                    pywikibot.log(
+                                        f'Old offset: {offset}; Returned '
+                                        f'offset: {new_offset}; Chunk size: '
+                                        f'{len(chunk)}'
+                                    )
                                     pywikibot.warning('Unexpected offset.')
                                 offset = new_offset
                             else:
@@ -413,23 +413,21 @@ class Uploader:
                             raise Error('Unrecognized result: {result}'
                                         .format_map(data))
 
-                else:  # not chunked upload
-                    if file_key:
-                        final_request['filekey'] = file_key
-                    else:
-                        file_contents = f.read()
-                        filetype = (mimetypes.guess_type(self.filename)[0]
-                                    or 'application/octet-stream')
-                        final_request.mime = {
-                            'file': (file_contents, filetype.split('/'),
-                                     {'filename': mime_filename})
-                        }
+                elif file_key:
+                    final_request['filekey'] = file_key
+                else:
+                    file_contents = f.read()
+                    filetype = (mimetypes.guess_type(self.filename)[0]
+                                or 'application/octet-stream')
+                    final_request.mime = {
+                        'file': (file_contents, filetype.split('/'),
+                                 {'filename': mime_filename})
+                    }
         else:
             # upload by URL
             if not self.site.has_right('upload_by_url'):
-                raise Error(
-                    "User '{}' is not authorized to upload by URL on site {}."
-                    .format(self.site.user(), self))
+                raise Error(f"User '{self.site.user()}' is not authorized to "
+                            f'upload by URL on site {self}.')
             final_request = self.site.simple_request(
                 action='upload', filename=file_page_title, url=self.url,
                 comment=self.comment, text=self.text, token=token)

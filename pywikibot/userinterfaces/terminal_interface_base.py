@@ -70,8 +70,7 @@ class UI(ABUIC):
     split_col_pat = re.compile(r'(\w+);?(\w+)?')
 
     def __init__(self) -> None:
-        """
-        Initialize the UI.
+        """Initialize the UI.
 
         This caches the std-streams locally so any attempts to
         monkey-patch the streams later will not work.
@@ -140,13 +139,12 @@ class UI(ABUIC):
 
     def encounter_color(self, color, target_stream):
         """Abstract method to handle the next color encountered."""
-        raise NotImplementedError('The {} class does not support '
-                                  'colors.'.format(self.__class__.__name__))
+        raise NotImplementedError(f'The {type(self).__name__} class does not'
+                                  ' support colors.')
 
     @classmethod
     def divide_color(cls, color):
-        """
-        Split color label in a tuple.
+        """Split color label in a tuple.
 
         Received color is a string like 'fg_color;bg_color' or 'fg_color'.
         Returned values are (fg_color, bg_color) or (fg_color, None).
@@ -182,9 +180,8 @@ class UI(ABUIC):
                 out, err = self.stdout.name, self.stderr.name
             except AttributeError:
                 out, err = self.stdout, self.stderr
-            raise OSError(
-                'Target stream {} is neither stdin ({}) nor stderr ({})'
-                .format(target_stream.name, out, err))
+            raise OSError(f'Target stream {target_stream.name} is neither '
+                          f'stdin ({out}) nor stderr ({err})')
 
     def support_color(self, target_stream) -> bool:
         """Return whether the target stream does support colors."""
@@ -216,8 +213,8 @@ class UI(ABUIC):
         # match.split() includes every regex group; for each matched color
         # fg_col:b_col, fg_col and bg_col are added to the resulting list.
         len_text_parts = len(text_parts[::4])
-        for index, (text, next_color) in enumerate(zip(text_parts[::4],
-                                                       text_parts[1::4])):
+        for index, (txt, next_color) in enumerate(zip(text_parts[::4],
+                                                      text_parts[1::4])):
             current_color = color_stack[-1]
             if next_color == 'previous':
                 if len(color_stack) > 1:  # keep the last element in the stack
@@ -229,15 +226,15 @@ class UI(ABUIC):
             if current_color != next_color:
                 colored_line = True
             if colored_line and not colorized:
-                if '\n' in text:  # Normal end of line
-                    text = text.replace('\n', ' ***\n', 1)
+                if '\n' in txt:  # Normal end of line
+                    txt = txt.replace('\n', ' ***\n', 1)
                     colored_line = False
                 elif index == len_text_parts - 1:  # Or end of text
-                    text += ' ***'
+                    txt += ' ***'
                     colored_line = False
 
             # print the text up to the tag.
-            self._write(text, target_stream)
+            self._write(txt, target_stream)
 
             if current_color != next_color and colorized:
                 # set the new color, but only if they change
@@ -320,10 +317,10 @@ class UI(ABUIC):
                     # transliteration was successful. The replacement
                     # could consist of multiple letters.
                     # mark the transliterated letters in yellow.
-                    transliteratedText = ''.join((transliteratedText,
-                                                  '<<lightyellow>>',
-                                                  transliterated,
-                                                  '<<previous>>'))
+                    transliteratedText = (
+                        f'{transliteratedText}'
+                        f'<<lightyellow>>{transliterated}<<previous>>'
+                    )
                     # memorize if we replaced a single letter by multiple
                     # letters.
                     if transliterated:
@@ -347,8 +344,7 @@ class UI(ABUIC):
               password: bool = False,
               default: str | None = '',
               force: bool = False) -> str:
-        """
-        Ask the user a question and return the answer.
+        """Ask the user a question and return the answer.
 
         Works like raw_input(), but returns a unicode string instead of ASCII.
 
@@ -410,7 +406,7 @@ class UI(ABUIC):
             else:
                 text = self._raw_input()
         except KeyboardInterrupt:
-            raise QuitKeyboardInterrupt()
+            raise QuitKeyboardInterrupt
         except UnicodeDecodeError:
             return None  # wrong terminal encoding, T258143
         return text
@@ -482,8 +478,8 @@ class UI(ABUIC):
         for i, option in enumerate(options):
             if not isinstance(option, Option):
                 if len(option) != 2:
-                    raise ValueError('Option #{} does not consist of an '
-                                     'option and shortcut.'.format(i))
+                    raise ValueError(f'Option #{i} does not consist of an '
+                                     'option and shortcut.')
                 options[i] = StandardOption(*option)
             # TODO: Test for uniquity
 
@@ -628,7 +624,7 @@ class TerminalHandler(logging.StreamHandler):
         self.UI.output(msg, targetStream=self.stream)
 
 
-class MaxLevelFilter():
+class MaxLevelFilter:
 
     """Filter that only passes records at or below a specific level.
 

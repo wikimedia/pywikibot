@@ -163,8 +163,7 @@ class TestArchiveBot(TestCase):
 
 class TestArchiveBotAfterDateUpdate(TestCase):
 
-    """
-    Test archivebot script on failures on Wikipedia sites.
+    """Test archivebot script on failures on Wikipedia sites.
 
     If failure is due to updated date format on wiki, test pages with
     new format only.

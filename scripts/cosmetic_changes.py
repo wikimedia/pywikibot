@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-This module can do slight modifications to tidy a wiki page's source code.
+"""This module can do slight modifications to tidy a wiki page's source code.
 
 The changes are not supposed to change the look of the rendered wiki page.
 
@@ -91,8 +90,7 @@ class CosmeticChangesBot(AutomaticTWSummaryBot, ExistingPageBot):
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

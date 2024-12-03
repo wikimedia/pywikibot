@@ -13,6 +13,7 @@ from tests.aspects import TestCase, unittest
 
 
 class TestFixingRedirects(TestCase):
+
     """Test fixing redirects."""
 
     family = 'wikipedia'

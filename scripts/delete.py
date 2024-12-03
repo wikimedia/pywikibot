@@ -78,8 +78,7 @@ RefTable = DefaultDict[Namespace, Page]
 
 class PageWithRefs(Page):
 
-    """
-    A subclass of Page with convenience methods for reference checking.
+    """A subclass of Page with convenience methods for reference checking.
 
     Supports the same interface as Page, with some added methods.
     """
@@ -99,8 +98,7 @@ class PageWithRefs(Page):
 
     @property
     def ref_table(self) -> RefTable:
-        """
-        Build link reference table lazily.
+        """Build link reference table lazily.
 
         This property gives a default table without any parameter set for
         getReferences(), whereas self.get_ref_table() is able to accept
@@ -111,8 +109,7 @@ class PageWithRefs(Page):
         return self._ref_table
 
     def namespaces_with_ref_to_page(self, namespaces=None) -> set[Namespace]:
-        """
-        Check if current page has links from pages in namepaces.
+        """Check if current page has links from pages in namepaces.
 
         If namespaces is None, all namespaces are checked.
         Returns a set with namespaces where a ref to page is present.
@@ -148,8 +145,7 @@ class DeletionRobot(CurrentPageBot):
         self.generator = (PageWithRefs(p) for p in self.generator)
 
     def display_references(self) -> None:
-        """
-        Display pages that link to the current page, sorted per namespace.
+        """Display pages that link to the current page, sorted per namespace.
 
         Number of pages to display per namespace is provided by:
         - self.opt.isorphan

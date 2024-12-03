@@ -136,8 +136,7 @@ class Formatter:
     fmt_need_lang = [k for k, v in fmt_options.items() if 'trs_title' in v]
 
     def __init__(self, page, outputlang=None, default: str = '******') -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param page: the page to be formatted.
         :type page: Page object.
@@ -271,8 +270,7 @@ class ListPagesBot(AutomaticTWSummaryBot, SingleSiteBot):
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

@@ -25,8 +25,7 @@ class BasePageTestBase(TestCase):
 
 class BasePageLoadRevisionsCachingTestBase(BasePageTestBase):
 
-    """
-    Test site.loadrevisions() caching.
+    """Test site.loadrevisions() caching.
 
     This test class monkey patches site.loadrevisions, which will cause
     the pickling tests in site_tests and page_tests to fail, if it

@@ -47,27 +47,19 @@ class CfdActions(DefaultSiteTestCase):
     def _runtest_strip_cfd_templates(self, template_start, template_end):
         """Run a CFD template stripping test, given CFD start/end templates."""
         bot = CategoryMoveRobot(oldcat='Old', newcat='New')
-        bot.newcat.text = '\n'.join((
-            'Preamble',
-            template_start,
-            'Random text inside template',
-            'Even another template: {{cfr-speedy}}',
-            template_end,
-            'Footer stuff afterwards',
-            '',
-            '[[Category:Should remain]]'
-        ))
-        expected = '\n'.join((
-            'Preamble',
-            'Footer stuff afterwards',
-            '',
-            '[[Category:Should remain]]'
-        ))
+        bot.newcat.text = (
+            f'Preamble\n{template_start}\nRandom text inside template\n'
+            f'Even another template: {{{{cfr-speedy}}}}\n{template_end}\n'
+            f'Footer stuff afterwards\n\n[[Category:Should remain]]'
+        )
+        expected = ('Preamble\nFooter stuff afterwards\n\n'
+                    '[[Category:Should remain]]')
         bot._strip_cfd_templates(commit=False)
         self.assertEqual(bot.newcat.text, expected)
 
 
 class TestPreprocessingCategory(TestCase):
+
     """Test determining template or type categorization target."""
 
     family = 'wikipedia'

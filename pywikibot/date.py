@@ -116,8 +116,7 @@ def dh_noConv(value: int, pattern: str, limit: Callable[[int], bool]) -> str:
 
 
 def dh_dayOfMnth(value: int, pattern: str) -> str:
-    """
-    Helper for decoding a single integer value.
+    """Helper for decoding a single integer value.
 
     The single integer should be <=31, no conversion,
     no rounding (used in days of month).
@@ -127,8 +126,7 @@ def dh_dayOfMnth(value: int, pattern: str) -> str:
 
 
 def dh_mnthOfYear(value: int, pattern: str) -> str:
-    """
-    Helper for decoding a single integer value.
+    """Helper for decoding a single integer value.
 
     The value should be >=1000, no conversion,
     no rounding (used in month of the year)
@@ -137,8 +135,7 @@ def dh_mnthOfYear(value: int, pattern: str) -> str:
 
 
 def dh_decAD(value: int, pattern: str) -> str:
-    """
-    Helper for decoding a single integer value.
+    """Helper for decoding a single integer value.
 
     It should be no conversion, round to decimals (used in decades)
     """
@@ -147,8 +144,7 @@ def dh_decAD(value: int, pattern: str) -> str:
 
 
 def dh_decBC(value: int, pattern: str) -> str:
-    """
-    Helper for decoding a single integer value.
+    """Helper for decoding a single integer value.
 
     It should be no conversion, round to decimals (used in decades)
     """
@@ -276,8 +272,7 @@ def _(value: str, ind: int, match: str) -> int:
 
 
 def alwaysTrue(x: Any) -> bool:
-    """
-    Return True, always.
+    """Return True, always.
 
     Used for multiple value selection function to accept all other values.
 
@@ -513,8 +508,9 @@ def dh(value: int, pattern: str, encf: encf_type, decf: decf_type,
 
     if isinstance(params, (tuple, list)):
         assert len(params) == len(decoders), (
-            'parameter count ({}) does not match decoder count ({})'
-            .format(len(params), len(decoders)))
+            f'parameter count ({len(params)}) does not match decoder count '
+            f'({len(decoders)})'
+        )
         # convert integer parameters into their textual representation
         str_params = tuple(_make_parameter(decoders[i], param)
                            for i, param in enumerate(params))
@@ -779,26 +775,26 @@ formats: dict[str | int, Mapping[str, Callable[[int], str]]] = {
         'zh': lambda v: dh_number(v, '%d'),
     },
 
-    'YearAD': defaultdict(lambda: dh_simpleYearAD, **{
-        'bn': lambda v: dh_yearAD(v, '%B'),
-        'fa': lambda v: dh_yearAD(v, '%F (میلادی)'),
-        'gan': lambda v: dh_yearAD(v, '%d年'),
-        'gu': lambda v: dh_yearAD(v, '%G'),
-        'hi': lambda v: dh_yearAD(v, '%H'),
-        'hr': lambda v: dh_yearAD(v, '%d.'),
-        'ja': lambda v: dh_yearAD(v, '%d年'),
-        'jbo': lambda v: dh_yearAD(v, '%dmoi nanca'),
-        'kn': lambda v: dh_yearAD(v, '%K'),
-        'ko': lambda v: dh_yearAD(v, '%d년'),
-        'ksh': lambda v: dh_yearAD(v, 'Joohr %d'),
-        'mr': lambda v: dh_yearAD(v, 'ई.स. %H'),
-        'nan': lambda v: dh_yearAD(v, '%d nî'),
-        'ru': lambda v: dh_yearAD(v, '%d год'),
-        # 2005 => 'พ.ศ. 2548'
-        'th': lambda v: dh_yearAD(v, 'พ.ศ. %T'),
-        'ur': lambda v: dh_yearAD(v, '%dء'),
-        'zh': lambda v: dh_yearAD(v, '%d年'),
-    }),
+    'YearAD': defaultdict(
+        lambda: dh_simpleYearAD,
+        bn=lambda v: dh_yearAD(v, '%B'),
+        fa=lambda v: dh_yearAD(v, '%F (میلادی)'),
+        gan=lambda v: dh_yearAD(v, '%d年'),
+        gu=lambda v: dh_yearAD(v, '%G'),
+        hi=lambda v: dh_yearAD(v, '%H'),
+        hr=lambda v: dh_yearAD(v, '%d.'),
+        ja=lambda v: dh_yearAD(v, '%d年'),
+        jbo=lambda v: dh_yearAD(v, '%dmoi nanca'),
+        kn=lambda v: dh_yearAD(v, '%K'),
+        ko=lambda v: dh_yearAD(v, '%d년'),
+        ksh=lambda v: dh_yearAD(v, 'Joohr %d'),
+        mr=lambda v: dh_yearAD(v, 'ई.स. %H'),
+        nan=lambda v: dh_yearAD(v, '%d nî'),
+        ru=lambda v: dh_yearAD(v, '%d год'),
+        th=lambda v: dh_yearAD(v, 'พ.ศ. %T'),
+        ur=lambda v: dh_yearAD(v, '%dء'),
+        zh=lambda v: dh_yearAD(v, '%d年'),
+    ),
 
     'YearBC': {
         'af': lambda v: dh_yearBC(v, '%d v.C.'),
@@ -1864,9 +1860,10 @@ for i in range(12):
     # for all other days
     formats[dayMnthFmts[i]]['br'] = eval(
         'lambda m: multi(m, ['
-        '(lambda v: dh_dayOfMnth(v, "%dañ {mname}"), lambda p: p == 1), '
-        '(lambda v: dh_dayOfMnth(v, "%d {mname}"), alwaysTrue)])'
-        .format(mname=brMonthNames[i]))
+        f'(lambda v: dh_dayOfMnth(v, "%dañ {brMonthNames[i]}"),'
+        ' lambda p: p == 1), '
+        f'(lambda v: dh_dayOfMnth(v, "%d {brMonthNames[i]}"), alwaysTrue)])'
+    )
 
 #
 # Month of the Year: "en:May 1976"
@@ -1963,8 +1960,7 @@ for monthId in range(12):
 
 def getAutoFormat(lang: str, title: str, ignoreFirstLetterCase: bool = True
                   ) -> tuple[str | None, str | None]:
-    """
-    Return first matching formatted date value.
+    """Return first matching formatted date value.
 
     :param lang: language code
     :param title: value to format
@@ -2022,8 +2018,7 @@ def formatYear(lang: str, year: int) -> str:
 
 def apply_month_delta(date: datetime.date, month_delta: int = 1,
                       add_overlap: bool = False) -> datetime.date:
-    """
-    Add or subtract months from the date.
+    """Add or subtract months from the date.
 
     By default if the new month has less days then the day of the date it
     chooses the last day in the new month. For example a date in the March 31st
@@ -2055,8 +2050,7 @@ def apply_month_delta(date: datetime.date, month_delta: int = 1,
 
 
 def get_month_delta(date1: datetime.date, date2: datetime.date) -> int:
-    """
-    Return the difference between two dates in months.
+    """Return the difference between two dates in months.
 
     It does only work on calendars with 12 months per year, and where the
     months are consecutive and non-negative numbers.

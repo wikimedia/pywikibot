@@ -39,8 +39,7 @@ class MWSite:
     """Minimal wiki site class."""
 
     def __init__(self, fromurl, **kwargs) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :raises pywikibot.exceptions.ServerError: a server error occurred
             while loading the site
@@ -240,28 +239,26 @@ class WikiHTMLPageParser(HTMLParser):
 
         if not new_parsed_url.scheme or not new_parsed_url.netloc:
             new_parsed_url = urlparse(
-                '{}://{}{}'.format(
-                    new_parsed_url.scheme or self.url.scheme,
-                    new_parsed_url.netloc or self.url.netloc,
-                    new_parsed_url.path))
-        else:
-            if self._parsed_url:
-                # allow upgrades to https, but not downgrades
-                if self._parsed_url.scheme == 'https' \
-                   and new_parsed_url.scheme != self._parsed_url.scheme:
-                    return
+                f'{new_parsed_url.scheme or self.url.scheme}://'
+                f'{new_parsed_url.netloc or self.url.netloc}'
+                f'{new_parsed_url.path}'
+            )
+        elif self._parsed_url:
+            # allow upgrades to https, but not downgrades
+            if self._parsed_url.scheme == 'https' \
+               and new_parsed_url.scheme != self._parsed_url.scheme:
+                return
 
-                # allow http://www.brickwiki.info/ vs http://brickwiki.info/
-                if (new_parsed_url.netloc in self._parsed_url.netloc
-                        or self._parsed_url.netloc in new_parsed_url.netloc):
-                    return
+            # allow http://www.brickwiki.info/ vs http://brickwiki.info/
+            if (new_parsed_url.netloc in self._parsed_url.netloc
+                    or self._parsed_url.netloc in new_parsed_url.netloc):
+                return
 
-                assert new_parsed_url == self._parsed_url, '{} != {}'.format(
-                    self._parsed_url, new_parsed_url)
+            assert new_parsed_url == self._parsed_url, \
+                   f'{self._parsed_url} != {new_parsed_url}'
 
         self._parsed_url = new_parsed_url
-        self.server = '{url.scheme}://{url.netloc}'.format(
-            url=self._parsed_url)
+        self.server = f'{self._parsed_url.scheme}://{self._parsed_url.netloc}'
         self.scriptpath = self._parsed_url.path
 
     def handle_starttag(self, tag, attrs) -> None:

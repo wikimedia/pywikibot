@@ -9,6 +9,7 @@
 #
 from __future__ import annotations
 
+from http import HTTPStatus
 from textwrap import fill
 from typing import TYPE_CHECKING, Any
 
@@ -23,6 +24,7 @@ if TYPE_CHECKING:
 
 
 class SupersetQuery(WaitingMixin):
+
     """Superset Query class.
 
     This class allows to run SQL queries against wikimedia superset
@@ -90,9 +92,9 @@ class SupersetQuery(WaitingMixin):
         self.last_response = http.fetch(url)
 
         # Handle error cases
-        if self.last_response.status_code == 200:
+        if self.last_response.status_code == HTTPStatus.OK:
             self.connected = True
-        elif self.last_response.status_code == 401:
+        elif self.last_response.status_code == HTTPStatus.UNAUTHORIZED:
             self.connected = False
             raise NoUsernameError(fill(
                 'User not logged in. You need to log in to '
@@ -123,7 +125,7 @@ class SupersetQuery(WaitingMixin):
         url = f'{self.superset_url}/api/v1/security/csrf_token/'
         self.last_response = http.fetch(url)
 
-        if self.last_response.status_code == 200:
+        if self.last_response.status_code == HTTPStatus.OK:
             return self.last_response.json()['result']
 
         status_code = self.last_response.status_code
@@ -146,12 +148,12 @@ class SupersetQuery(WaitingMixin):
             url += f'/api/v1/database/{database_id}/schemas/?q=(force:!f)'
             self.last_response = http.fetch(url)
 
-            if self.last_response.status_code == 200:
+            if self.last_response.status_code == HTTPStatus.OK:
                 schemas = self.last_response.json()['result']
                 if schema_name in schemas:
                     return database_id
 
-            elif self.last_response.status_code == 404:
+            elif self.last_response.status_code == HTTPStatus.NOT_FOUND:
                 break
             else:
                 status_code = self.last_response.status_code

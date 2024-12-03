@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Script to resolve double redirects, and to delete broken redirects.
+"""Script to resolve double redirects, and to delete broken redirects.
 
 Requires access to MediaWiki's maintenance pages or to a XML dump file.
 Delete function requires adminship.
@@ -139,8 +138,7 @@ class RedirectGenerator(OptionHandler):
         self,
         alsoGetPageTitles: bool = False
     ) -> tuple[dict[str, str], set[str]]:
-        """
-        Extract redirects from dump.
+        """Extract redirects from dump.
 
         Load a local XML dump file, look at all pages which have the
         redirect flag set, and find out where they're pointing at. Return
@@ -230,8 +228,7 @@ class RedirectGenerator(OptionHandler):
         self,
         maxlen: int = 8
     ) -> Generator[tuple[str, int | None, str, str | None]]:
-        r"""
-        Return a generator that yields tuples of data about redirect Pages.
+        r"""Return a generator that yields tuples of data about redirect Pages.
 
         .. versionchanged:: 7.0
            only yield tuple if type of redirect is not 1 (normal redirect)
@@ -693,8 +690,7 @@ class RedirectRobot(ExistingPageBot):
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

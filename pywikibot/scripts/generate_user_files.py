@@ -86,12 +86,12 @@ def change_base_dir():
         # config would find that file
         return new_base
 
-    msg = fill("""WARNING: Your user files will be created in the directory
+    msg = fill(f"""WARNING: Your user files will be created in the directory
 '{new_base}' you have chosen. To access these files, you will either have
 to use the argument "-dir:{new_base}" every time you run the bot, or set
 the environment variable "PYWIKIBOT_DIR" equal to this directory name in
 your operating system. See your operating system documentation for how to
-set environment variables.""".format(new_base=new_base), width=76)
+set environment variables.""", width=76)
     pywikibot.info(msg)
     if pywikibot.input_yn('Is this OK?', default=False, automatic_quit=False):
         return new_base
@@ -114,8 +114,7 @@ def get_site_and_lang(
     default_username: str | None = None,
     force: bool = False
 ) -> tuple[str, str, str]:
-    """
-    Ask the user for the family, site code and username.
+    """Ask the user for the family, site code and username.
 
     :param default_family: The default family which should be chosen.
     :param default_lang: The default site code which should be chosen,
@@ -167,8 +166,8 @@ def get_site_and_lang(
         mycode = pywikibot.input(message, default=default_lang, force=force)
         if known_langs and mycode and mycode not in known_langs \
            and not pywikibot.input_yn(
-               fill('The site code {!r} is not in the list of known sites. '
-                    'Do you want to continue?'.format(mycode)),
+               fill(f'The site code {mycode!r} is not in the list of known'
+                    ' sites. Do you want to continue?'),
                default=False, automatic_quit=False):
             mycode = None
 
@@ -353,8 +352,7 @@ def create_user_config(
     main_username: str,
     force: bool = False
 ):
-    """
-    Create a user-config.py in base_dir.
+    """Create a user-config.py in base_dir.
 
     Create a user-password.py if necessary.
     """
@@ -384,16 +382,16 @@ def create_user_config(
     botpasswords = []
     userset = {user.name for user in userlist}
     for username in userset:
-        if pywikibot.input_yn('Do you want to add a BotPassword for {}?'
-                              .format(username), force=force, default=False):
+        if pywikibot.input_yn('Do you want to add a BotPassword for '
+                              f'{username}?', force=force, default=False):
             if msg:
                 pywikibot.info(msg)
             msg = None
             message = f'BotPassword\'s "bot name" for {username}'
             botpasswordname = pywikibot.input(message, force=force)
-            message = 'BotPassword\'s "password" for "{}" ' \
+            message = f'BotPassword\'s "password" for "{botpasswordname}" ' \
                       '(no characters will be shown)' \
-                      .format(botpasswordname)
+
             botpasswordpass = pywikibot.input(message, force=force,
                                               password=True)
             if botpasswordname and botpasswordpass:
@@ -405,8 +403,9 @@ def create_user_config(
             f"# usernames['{main_family}']['{main_code}'] = 'MyUsername'")
     else:
         usernames = '\n'.join(
-            "usernames['{user.family}']['{user.code}'] = '{user.name}'"
-            .format(user=user) for user in userlist)
+            f"usernames['{user.family}']['{user.code}'] = '{user.name}'"
+            for user in userlist
+        )
         # Arbitrarily use the first key as default settings
         main_family, main_code = userlist[0].family, userlist[0].code
     botpasswords = '\n'.join(
@@ -497,8 +496,7 @@ def ask_for_dir_change(force) -> tuple[bool, bool]:
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and generate user-config.
+    """Process command line arguments and generate user-config.
 
     If args is an empty list, sys.argv is used.
 

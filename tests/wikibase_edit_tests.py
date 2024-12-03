@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Tests for editing Wikibase items.
+"""Tests for editing Wikibase items.
 
 Tests which should fail should instead be in the TestWikibaseSaveTest
 class in edit_failiure_tests.py
@@ -242,8 +241,7 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
 
     @staticmethod
     def _clean_item(repo, prop: str):
-        """
-        Return an item without any existing claims of the given property.
+        """Return an item without any existing claims of the given property.
 
         :param repo: repository to fetch item from
         :type repo: pywikibot.site.DataSite
@@ -617,8 +615,7 @@ class TestWikibaseAddClaimToExisting(WikibaseTestCase):
 
     @staticmethod
     def _clean_item_temp(repo, prop: str):
-        """
-        Return an item without any existing claims of the given property.
+        """Return an item without any existing claims of the given property.
 
         :param repo: repository to fetch item from
         :type repo: pywikibot.site.DataSite

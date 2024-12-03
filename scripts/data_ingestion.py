@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-r"""
-A generic bot to do data ingestion (batch uploading) of photos or other files.
+r"""A generic bot to do data ingestion (batch uploading) of photos or other files.
 
 In addition it installs related metadata. The uploading is primarily from a url
 to a wiki-site.
@@ -120,8 +119,7 @@ class Photo(pywikibot.FilePage):
 
     def __init__(self, url: str, metadata: dict[str, Any],
                  site: pywikibot.site.APISite | None = None) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param url: URL of photo
         :param metadata: metadata about the photo that can be referred to
@@ -144,8 +142,7 @@ class Photo(pywikibot.FilePage):
         super().__init__(site, self.get_title('%(_filename)s.%(_ext)s'))
 
     def download_photo(self) -> BinaryIO:
-        """
-        Download the photo and store it in an io.BytesIO object.
+        """Download the photo and store it in an io.BytesIO object.
 
         TODO: Add exception handling
         """
@@ -155,8 +152,7 @@ class Photo(pywikibot.FilePage):
         return self.contents
 
     def find_duplicate_images(self) -> list[str]:
-        """
-        Find duplicates of the photo.
+        """Find duplicates of the photo.
 
         Calculates the SHA1 hash and asks the MediaWiki API
         for a list of duplicates.
@@ -170,8 +166,7 @@ class Photo(pywikibot.FilePage):
                     sha1=base64.b16encode(hash_object.digest()))]
 
     def get_title(self, fmt: str) -> str:
-        """
-        Populate format string with %(name)s entries using metadata.
+        """Populate format string with %(name)s entries using metadata.
 
         .. note:: this does not clean the title, so it may be unusable as
            a MediaWiki page title, and cause an API exception when used.
@@ -215,8 +210,7 @@ class DataIngestionBot(pywikibot.Bot):
     """Data ingestion bot."""
 
     def __init__(self, titlefmt: str, pagefmt: str, **kwargs) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param titlefmt: Title format
         :param pagefmt: Page format
@@ -252,8 +246,7 @@ class DataIngestionBot(pywikibot.Bot):
 
     @classmethod
     def parse_configuration_page(cls, configuration_page) -> dict[str, str]:
-        """
-        Parse a Page which contains the configuration.
+        """Parse a Page which contains the configuration.
 
         :param configuration_page: page with configuration
         :type configuration_page: :py:obj:`pywikibot.Page`
@@ -282,8 +275,7 @@ class DataIngestionBot(pywikibot.Bot):
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

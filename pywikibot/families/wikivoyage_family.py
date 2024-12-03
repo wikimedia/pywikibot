@@ -18,8 +18,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     codes = {
         'bn', 'cs', 'de', 'el', 'en', 'eo', 'es', 'fa', 'fi', 'fr', 'he', 'hi',
-        'it', 'ja', 'nl', 'pl', 'ps', 'pt', 'ro', 'ru', 'shn', 'sv', 'tr',
-        'uk', 'vi', 'zh',
+        'id', 'it', 'ja', 'nl', 'pl', 'ps', 'pt', 'ro', 'ru', 'shn', 'sv',
+        'tr', 'uk', 'vi', 'zh',
     }
 
     category_redirect_templates = {

@@ -1,5 +1,4 @@
-"""
-Basic HTTP access interface.
+"""Basic HTTP access interface.
 
 This module handles communication between the bot and the HTTP threads.
 
@@ -162,8 +161,7 @@ _USER_AGENT_FORMATTER = _UserAgentFormatter()
 
 
 def user_agent_username(username=None):
-    """
-    Reduce username to a representation permitted in HTTP headers.
+    """Reduce username to a representation permitted in HTTP headers.
 
     To achieve that, this function:
     1) replaces spaces (' ') with '_'
@@ -251,8 +249,7 @@ def request(site: pywikibot.site.BaseSite,
             uri: str | None = None,
             headers: dict | None = None,
             **kwargs) -> requests.Response:
-    """
-    Request to Site with default error handling and response decoding.
+    """Request to Site with default error handling and response decoding.
 
     See :py:obj:`requests.Session.request` for additional parameters.
 
@@ -309,8 +306,7 @@ def get_authentication(uri: str) -> tuple[str, str] | None:
 
 
 def error_handling_callback(response):
-    """
-    Raise exceptions and log alerts.
+    """Raise exceptions and log alerts.
 
     :param response: Response returned by Session.request().
     :type response: :py:obj:`requests.Response`
@@ -365,8 +361,7 @@ def error_handling_callback(response):
 def fetch(uri: str, method: str = 'GET', headers: dict | None = None,
           default_error_handling: bool = True,
           use_fake_user_agent: bool | str = False, **kwargs):
-    """
-    HTTP request.
+    """HTTP request.
 
     See :py:obj:`requests.Session.request` for parameters.
 
@@ -405,7 +400,7 @@ def fetch(uri: str, method: str = 'GET', headers: dict | None = None,
         if use_fake_user_agent and isinstance(use_fake_user_agent, str):
             return use_fake_user_agent  # Custom UA.
         raise ValueError('Invalid parameter: '
-                         'use_fake_user_agent={}'.format(use_fake_user_agent))
+                         f'use_fake_user_agent={use_fake_user_agent}')
 
     def assign_user_agent(user_agent_format_string):
         if not user_agent_format_string or '{' in user_agent_format_string:
@@ -462,7 +457,7 @@ def fetch(uri: str, method: str = 'GET', headers: dict | None = None,
 # Extract charset (from content-type header)
 CHARSET_RE = re.compile(
     r'charset\s*=\s*(?P<q>[\'"]?)(?P<charset>[^\'",;>/]+)(?P=q)',
-    flags=re.I,
+    flags=re.IGNORECASE,
 )
 
 
@@ -559,8 +554,9 @@ def _decide_encoding(response: requests.Response,
 
     if header_codecs and charset_codecs and header_codecs != charset_codecs:
         pywikibot.warning(
-            'Encoding "{}" requested but "{}" received in the '
-            'response header.'.format(charset, header_encoding))
+            f'Encoding "{charset}" requested but "{header_encoding}" received'
+            ' in the response header.'
+        )
 
     _encoding = _try_decode(response.content, header_encoding) \
         or _try_decode(response.content, charset)

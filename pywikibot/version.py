@@ -304,8 +304,7 @@ def getversion_onlinerepo(path: str = 'branches/master') -> str:
 
 
 def get_module_filename(module) -> str | None:
-    """
-    Retrieve filename from an imported pywikibot module.
+    """Retrieve filename from an imported pywikibot module.
 
     It uses the __file__ attribute of the module. If it's file extension ends
     with py and another character the last character is discarded when the py
@@ -327,8 +326,7 @@ def get_module_filename(module) -> str | None:
 
 
 def get_module_mtime(module):
-    """
-    Retrieve the modification time from an imported module.
+    """Retrieve the modification time from an imported module.
 
     :param module: The module instance.
     :type module: module
@@ -411,9 +409,11 @@ def package_versions(
                 path = _file
 
             info['path'] = path
-            assert path not in paths, \
-                'Path {} of the package {} is in defined paths as {}' \
-                .format(path, name, paths[path])
+            assert path not in paths, (
+                f'Path {path} of the package {name} is in defined paths as '
+                f'{paths[path]}'
+            )
+
             paths[path] = name
 
         if '__version__' in package.__dict__:

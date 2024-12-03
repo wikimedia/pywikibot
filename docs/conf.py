@@ -579,35 +579,10 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
             length = 0
 
 
-def pywikibot_family_classproperty_getattr(obj, name, *defargs):
-    """Custom getattr() to get classproperty instances."""
-    from sphinx.util.inspect import safe_getattr
-
-    from pywikibot.family import Family
-    from pywikibot.tools import classproperty
-
-    if not isinstance(obj, type) or not issubclass(obj, Family):
-        return safe_getattr(obj, name, *defargs)
-
-    for base_class in obj.__mro__:
-        try:
-            prop = base_class.__dict__[name]
-        except KeyError:
-            continue
-
-        if not isinstance(prop, classproperty):
-            return safe_getattr(obj, name, *defargs)
-
-        return prop
-
-    return safe_getattr(obj, name, *defargs)
-
-
 def setup(app):
     """Implicit Sphinx extension hook."""
     app.connect('autodoc-process-docstring', pywikibot_docstring_fixups)
     app.connect('autodoc-process-docstring', pywikibot_script_docstring_fixups)
-    app.add_autodoc_attrgetter(type, pywikibot_family_classproperty_getattr)
 
 
 autoclass_content = 'both'

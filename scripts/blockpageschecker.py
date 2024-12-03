@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-A bot to remove stale protection templates from pages that are not protected.
+"""A bot to remove stale protection templates from unprotected pages.
 
 Very often sysops block the pages for a set time but then they forget to
 remove the warning! This script is useful if you want to remove those
@@ -438,8 +437,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and perform task.
+    """Process command line arguments and perform task.
 
     If args is an empty list, sys.argv is used.
 

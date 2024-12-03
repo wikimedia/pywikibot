@@ -7,7 +7,7 @@ package-dir = {"pywikibot_scripts" = "scripts"}
 
 [project]
 name = "pywikibot-scripts"
-version = "9.5.0"
+version = "9.6.0"
 
 authors = [
     {name = "xqt", email = "info@gno.de"},

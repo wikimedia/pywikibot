@@ -781,8 +781,7 @@ class CheckImagesBot:
     def important_image(
         list_given: list[tuple[float, pywikibot.FilePage]]
     ) -> pywikibot.FilePage:
-        """
-        Get tuples of image and time, return the most used or oldest image.
+        """Get tuples of image and time, return the most used or oldest image.
 
         .. versionchanged:: 7.2
            itertools.zip_longest is used to stop `using_pages` as soon as
@@ -1165,8 +1164,7 @@ class CheckImagesBot:
         return False
 
     def template_in_list(self) -> None:
-        """
-        Check if template is in list.
+        """Check if template is in list.
 
         The problem is the calls to the MediaWiki system because they can be
         pretty slow. While searching in a list of objects is really fast, so
@@ -1184,8 +1182,7 @@ class CheckImagesBot:
                         break
 
     def smart_detection(self) -> tuple[str, bool]:
-        """
-        Detect templates.
+        """Detect templates.
 
         The bot instead of checking if there's a simple template in the
         image's description, checks also if that template is a license or
@@ -1265,22 +1262,21 @@ class CheckImagesBot:
                 else:
                     pywikibot.info('Skipping the file...')
                 self.some_problem = False
-        else:
-            if not self.seems_ok and self.license_found:
-                rep_text_license_fake = ((self.list_entry
-                                          + "seems to have a ''fake license'',"
-                                          ' license detected:'
-                                          ' <nowiki>%s</nowiki>') %
-                                         (self.image_name, self.license_found))
-                print_with_time_zone(
-                    f'{self.image_name} seems to have a fake license: '
-                    f'{self.license_found}, reporting...')
-                self.report_image(self.image_name,
-                                  rep_text=rep_text_license_fake,
-                                  addings=False)
-            elif self.license_found:
-                pywikibot.info(f'[[{self.image_name}]] seems ok, license '
-                               f'found: {{{{{self.license_found}}}}}...')
+        elif not self.seems_ok and self.license_found:
+            rep_text_license_fake = ((self.list_entry
+                                      + "seems to have a ''fake license'',"
+                                      ' license detected:'
+                                      ' <nowiki>%s</nowiki>') %
+                                     (self.image_name, self.license_found))
+            print_with_time_zone(
+                f'{self.image_name} seems to have a fake license: '
+                f'{self.license_found}, reporting...')
+            self.report_image(self.image_name,
+                              rep_text=rep_text_license_fake,
+                              addings=False)
+        elif self.license_found:
+            pywikibot.info(f'[[{self.image_name}]] seems ok, license '
+                           f'found: {{{{{self.license_found}}}}}...')
         return (self.license_found, self.white_templates_found)
 
     @staticmethod
@@ -1325,8 +1321,7 @@ class CheckImagesBot:
 
     @staticmethod
     def wait(generator, wait_time) -> Generator[pywikibot.FilePage]:
-        """
-        Skip the images uploaded before x seconds.
+        """Skip the images uploaded before x seconds.
 
         Let the users to fix the image's problem alone in the first x seconds.
         """
@@ -1363,7 +1358,7 @@ class CheckImagesBot:
             if '{{' in i:
                 regex_pattern = re.compile(
                     r'\{\{(?:template)?%s ?(?:\||\r?\n|\}|<|/) ?'
-                    % i.split('{{')[1].replace(' ', '[ _]'), re.I)
+                    % i.split('{{')[1].replace(' ', '[ _]'), re.IGNORECASE)
                 result = regex_pattern.findall(self.image_check_text)
                 if result:
                     return True
@@ -1538,8 +1533,7 @@ class CheckImagesBot:
 
 
 def main(*args: str) -> bool:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

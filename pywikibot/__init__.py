@@ -59,7 +59,7 @@ from pywikibot.logging import (
 )
 from pywikibot.site import BaseSite as _BaseSite
 from pywikibot.time import Timestamp
-from pywikibot.tools import normalize_username
+from pywikibot.tools import PYTHON_VERSION, normalize_username
 
 
 if TYPE_CHECKING:
@@ -86,6 +86,15 @@ if not hasattr(sys.modules[__name__], 'argvu'):
 link_regex = re.compile(r'\[\[(?P<title>[^\]|[<>{}]*)(\|.*?)?\]\]')
 
 _sites: dict[str, APISite] = {}
+
+if PYTHON_VERSION < (3, 8):
+    __version = sys.version.split(maxsplit=1)[0]
+    warn(f"""
+
+    Python {__version} will be dropped soon with Pywikibot 10.
+    It is recommended to use Python 3.8 or above.
+    See phab: T379227 for further information.
+""", FutureWarning)  # adjust this line no in utils.execute()
 
 
 @cache
@@ -244,8 +253,8 @@ def Site(code: str | None = None,  # noqa: N802
         debug(f"Instantiated {interface.__name__} object '{_sites[key]}'")
 
         if _sites[key].code != code:
-            warn('Site {} instantiated using different code "{}"'
-                 .format(_sites[key], code), UserWarning, 2)
+            warn(f'Site {_sites[key]} instantiated using different code '
+                 f'"{code}"', UserWarning, 2)
 
     return _sites[key]
 
@@ -272,8 +281,7 @@ from pywikibot.page import (  # noqa: E402
 def showDiff(oldtext: str,  # noqa: N802
              newtext: str,
              context: int = 0) -> None:
-    """
-    Output a string showing the differences between oldtext and newtext.
+    """Output a string showing the differences between oldtext and newtext.
 
     The differences are highlighted (only on compatible systems) to show which
     changes were made.
@@ -338,9 +346,8 @@ def _flush(stop: bool = True) -> None:
 
     num, sec = remaining()
     if num > 0 and sec.total_seconds() > _config.noisysleep:
-        output('<<lightblue>>Waiting for {num} pages to be put. '
-               'Estimated time remaining: {sec}<<default>>'
-               .format(num=num, sec=sec))
+        output(f'<<lightblue>>Waiting for {num} pages to be put. '
+               f'Estimated time remaining: {sec}<<default>>')
 
     exit_queue = None
     if _putthread is not threading.current_thread():

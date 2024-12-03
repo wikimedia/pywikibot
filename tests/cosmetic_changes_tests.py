@@ -434,8 +434,7 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
 
     @unittest.expectedFailure
     def test_translateMagicWords_fail(self):
-        """
-        Test translateMagicWords method.
+        """Test translateMagicWords method.
 
         The current implementation doesn't check whether the magic word is
         inside a template.
@@ -582,31 +581,31 @@ class TestCosmeticChangesISBN(TestCosmeticChanges):
         # Invalid characters
         with self.assertRaisesRegex(
                 ValidationError,
-                '|'.join((self.ISBN_DIGITERROR_RE,
-                          self.ISBN_INVALIDERROR_RE,
-                          self.ISBN_INVALIDLENGTHERROR_RE))):
+                f'{self.ISBN_DIGITERROR_RE}|{self.ISBN_INVALIDERROR_RE}|'
+                f'{self.ISBN_INVALIDLENGTHERROR_RE}'
+        ):
             self.cct.fix_ISBN('ISBN 0975229LOL')
         # Invalid checksum
         with self.assertRaisesRegex(
                 ValidationError,
-                '|'.join((self.ISBN_CHECKSUMERROR_RE,
-                          self.ISBN_INVALIDERROR_RE,
-                          self.ISBN_INVALIDLENGTHERROR_RE,
-                          self.ISBN_INVALIDCHECKERROR_RE))):
+                f'{self.ISBN_CHECKSUMERROR_RE}|{self.ISBN_INVALIDERROR_RE}|'
+                f'{self.ISBN_INVALIDLENGTHERROR_RE}|'
+                f'{self.ISBN_INVALIDCHECKERROR_RE}'
+        ):
             self.cct.fix_ISBN('ISBN 0975229801')
         # Invalid length
         with self.assertRaisesRegex(
                 ValidationError,
-                '|'.join((self.ISBN_DIGITERROR_RE,
-                          self.ISBN_INVALIDERROR_RE,
-                          self.ISBN_INVALIDLENGTHERROR_RE))):
+                f'{self.ISBN_DIGITERROR_RE}|{self.ISBN_INVALIDERROR_RE}|'
+                f'{self.ISBN_INVALIDLENGTHERROR_RE}'
+        ):
             self.cct.fix_ISBN('ISBN 09752298')
         # X in the middle
         with self.assertRaisesRegex(
             ValidationError,
-            '|'.join((self.ISBN_INVALIDCHARERROR_RE,
-                      self.ISBN_INVALIDERROR_RE,
-                      self.ISBN_INVALIDLENGTHERROR_RE))):
+            f'{self.ISBN_INVALIDCHARERROR_RE}|{self.ISBN_INVALIDERROR_RE}|'
+            f'{self.ISBN_INVALIDLENGTHERROR_RE}'
+        ):
             self.cct.fix_ISBN('ISBN 09752X9801')
 
     def test_ignore_invalid_isbn(self):

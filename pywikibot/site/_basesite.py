@@ -37,8 +37,7 @@ class BaseSite(ComparableMixin):
     """Site methods that are independent of the communication interface."""
 
     def __init__(self, code: str, fam=None, user=None) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param code: the site's language code
         :type code: str
@@ -73,9 +72,9 @@ class BaseSite(ComparableMixin):
             else:
                 # no such language anymore
                 self.obsolete = True
-                pywikibot.log('Site {} instantiated and marked "obsolete" '
-                              'to prevent access'.format(self))
-        elif self.__code not in self.languages():
+                pywikibot.log(f'Site {self} instantiated and marked "obsolete"'
+                              ' to prevent access')
+        elif self.__code not in self.codes:
             if self.__family.name in self.__family.langs \
                and len(self.__family.langs) == 1:
                 self.__code = self.__family.name
@@ -83,11 +82,11 @@ class BaseSite(ComparableMixin):
                    and code == pywikibot.config.mylang:
                     pywikibot.config.mylang = self.__code
                     warn('Global configuration variable "mylang" changed to '
-                         '"{}" while instantiating site {}'
-                         .format(self.__code, self), UserWarning)
+                         f'"{self.__code}" while instantiating site {self}',
+                         UserWarning)
             else:
-                error_msg = ("Language '{}' does not exist in family {}"
-                             .format(self.__code, self.__family.name))
+                error_msg = (f"Language '{self.__code}' does not exist in "
+                             f'family {self.__family.name}')
                 raise UnknownSiteError(error_msg)
 
         self._username = normalize_username(user)
@@ -122,8 +121,7 @@ class BaseSite(ComparableMixin):
 
     @property
     def code(self):
-        """
-        The identifying code for this Site equal to the wiki prefix.
+        """The identifying code for this Site equal to the wiki prefix.
 
         By convention, this is usually an ISO language code, but it does
         not have to be.
@@ -152,15 +150,14 @@ class BaseSite(ComparableMixin):
                 # should it just raise an Exception and fail?
                 # this will help to check the dictionary ...
                 except KeyError:
-                    warn('Site {} has no language defined in '
-                         'doc_subpages dict in {}_family.py file'
-                         .format(self, self.family.name),
-                         FamilyMaintenanceWarning, 2)
+                    warn(f'Site {self} has no language defined in '
+                         f'doc_subpages dict in {self.family.name}_family.py '
+                         'file', FamilyMaintenanceWarning, 2)
         # doc_subpages not defined in x_family.py file
         except AttributeError:
             doc = ()  # default
-            warn('Site {} has no doc_subpages dict in {}_family.py file'
-                 .format(self, self.family.name),
+            warn(f'Site {self} has no doc_subpages dict in '
+                 f'{self.family.name}_family.py file',
                  FamilyMaintenanceWarning, 2)
 
         return doc
@@ -234,13 +231,27 @@ class BaseSite(ComparableMixin):
         """Return hash value of instance."""
         return hash(repr(self))
 
-    def languages(self):
-        """Return list of all valid language codes for this site's Family."""
-        return list(self.family.langs.keys())
+    @deprecated('codes', since='9.6')
+    def languages(self) -> list[str]:
+        """Return list of all valid site codes for this site's Family.
+
+        .. deprecated:: 9.6
+           Use :meth:`codes` instead.
+        """
+        return sorted(self.codes)
+
+    @property
+    def codes(self) -> set[str]:
+        """Return set of all valid site codes for this site's Family.
+
+        .. versionadded:: 9.6
+        .. seealso:: :attr:`family.Family.codes`
+        """
+        return set(self.family.langs.keys())
 
     def validLanguageLinks(self):  # noqa: N802
         """Return list of language codes to be used in interwiki links."""
-        return [lang for lang in self.languages()
+        return [lang for lang in sorted(self.codes)
                 if self.namespaces.lookup_normalized_name(lang) is None]
 
     def _interwiki_urls(self, only_article_suffixes: bool = False):
@@ -296,8 +307,7 @@ class BaseSite(ComparableMixin):
         return ['PAGENAMEE']
 
     def lock_page(self, page, block: bool = True):
-        """
-        Lock page for writing. Must be called before writing any page.
+        """Lock page for writing. Must be called before writing any page.
 
         We don't want different threads trying to write to the same page
         at the same time, even to different sections.
@@ -317,8 +327,7 @@ class BaseSite(ComparableMixin):
             self._locked_pages.add(title)
 
     def unlock_page(self, page) -> None:
-        """
-        Unlock page. Call as soon as a write operation has completed.
+        """Unlock page. Call as soon as a write operation has completed.
 
         :param page: the page to be locked
         :type page: pywikibot.Page
@@ -336,10 +345,9 @@ class BaseSite(ComparableMixin):
             try:
                 item = self.family.disambcatname[repo.code]
             except KeyError:
-                raise Error(
-                    'No {repo} qualifier found for disambiguation category '
-                    'name in {fam}_family file'.format(repo=repo_name,
-                                                       fam=self.family.name))
+                raise Error(f'No {repo_name} qualifier found for'
+                            ' disambiguation category name in '
+                            f'{self.family.name}_family file')
 
             dp = pywikibot.ItemPage(repo, item)
             try:
@@ -385,8 +393,7 @@ class BaseSite(ComparableMixin):
                           re.IGNORECASE | re.DOTALL)
 
     def sametitle(self, title1: str, title2: str) -> bool:
-        """
-        Return True if title1 and title2 identify the same wiki page.
+        """Return True if title1 and title2 identify the same wiki page.
 
         title1 and title2 may be unequal but still identify the same page,
         if they use different aliases for the same namespace.

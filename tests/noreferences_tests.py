@@ -13,6 +13,7 @@ from tests.aspects import TestCase, unittest
 
 
 class TestAddingReferences(TestCase):
+
     """Test adding references to section."""
 
     family = 'wikipedia'

@@ -119,7 +119,7 @@ class TestTimestamp(TestCase):
     def test_set_from_string_invalid(self):
         """Test failure creating instance from invalid string."""
         for timestr, _posix in self.test_results['INVALID']:
-            regex = "time data \'[^\']*?\' does not match"
+            regex = "time data '[^']*?' does not match"
             with self.subTest(timestr), \
                     self.assertRaisesRegex(ValueError, regex):
                 Timestamp.set_timestamp(timestr)

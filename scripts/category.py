@@ -197,7 +197,7 @@ docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 CFD_TEMPLATE_REGEX = re.compile(r'<!--\s*BEGIN CFD TEMPLATE\s*-->.*?'
                                 r'<!--\s*END CFD TEMPLATE\s*-->\n?',
-                                flags=re.I | re.M | re.S)
+                                flags=re.IGNORECASE | re.MULTILINE | re.DOTALL)
 
 cfd_templates = {
     'wikipedia': {
@@ -239,8 +239,7 @@ class CategoryPreprocess(BaseBot):
         self,
         page: pywikibot.Page
     ) -> pywikibot.Page | None:
-        """
-        Return page to be categorized by type.
+        """Return page to be categorized by type.
 
         :param page: Existing, missing or redirect page to be processed.
         :return: Page to be categorized.
@@ -284,8 +283,7 @@ class CategoryPreprocess(BaseBot):
         return None
 
     def determine_template_target(self, page) -> pywikibot.Page:
-        """
-        Return template page to be categorized.
+        """Return template page to be categorized.
 
         Categories for templates can be included
         in <includeonly> section of template doc page.
@@ -533,7 +531,7 @@ class CategoryAddBot(CategoryPreprocess):
                 if self.includeonly == ['includeonly']:
                     tagname = 'includeonly'
                 tagnameregexp = re.compile(fr'(.*)(<\/{tagname}>)',
-                                           re.I | re.DOTALL)
+                                           re.IGNORECASE | re.DOTALL)
                 categorytitle = catpl.title(
                     as_link=True, allow_interwiki=False)
                 if tagnameregexp.search(text):
@@ -702,22 +700,20 @@ class CategoryMoveRobot(CategoryPreprocess):
         elif deletion_comment == self.DELETION_COMMENT_SAME_AS_EDIT_COMMENT:
             # Use the edit comment as the deletion comment.
             self.deletion_comment = self.comment
+        # Deletion comment is set to internationalized default.
+        elif self.newcat:
+            # Category is moved.
+            self.deletion_comment = i18n.twtranslate(self.site,
+                                                     'category-was-moved',
+                                                     template_vars)
         else:
-            # Deletion comment is set to internationalized default.
-            if self.newcat:
-                # Category is moved.
-                self.deletion_comment = i18n.twtranslate(self.site,
-                                                         'category-was-moved',
-                                                         template_vars)
-            else:
-                # Category is deleted.
-                self.deletion_comment = i18n.twtranslate(
-                    self.site, 'category-was-disbanded')
+            # Category is deleted.
+            self.deletion_comment = i18n.twtranslate(
+                self.site, 'category-was-disbanded')
         self.move_comment = move_comment if move_comment else self.comment
 
     def run(self) -> None:
-        """
-        The main bot function that does all the work.
+        """The main bot function that does all the work.
 
         For readability it is split into several helper functions:
         - _movecat()
@@ -824,8 +820,7 @@ class CategoryMoveRobot(CategoryPreprocess):
         self.counter['delete talk'] += 1
 
     def _change(self, gen) -> None:
-        """
-        Private function to move category contents.
+        """Private function to move category contents.
 
         Do not use this function from outside the class.
 
@@ -1052,8 +1047,8 @@ class CategoryListifyRobot:
 
 
 class CategoryTidyRobot(Bot, CategoryPreprocess):
-    """
-    Robot to move members of a category into sub- or super-categories.
+
+    """Robot to move members of a category into sub- or super-categories.
 
     Specify the category title on the command line. The robot will
     pick up the page, look for all sub- and super-categories, and show
@@ -1098,8 +1093,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
                          member: pywikibot.Page,
                          original_cat: pywikibot.Category,
                          current_cat: pywikibot.Category) -> None:
-        """
-        Ask whether to move it to one of the sub- or super-categories.
+        """Ask whether to move it to one of the sub- or super-categories.
 
         Given a page in the original_cat category, ask the user whether
         to move it to one of original_cat's sub- or super-categories.
@@ -1113,6 +1107,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
         :param current_cat: a category which is questioned.
         """
         class CatContextOption(ContextOption):
+
             """An option to show more and more context and categories."""
 
             @property
@@ -1137,6 +1132,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
                 return text
 
         class CatIntegerOption(IntegerOption):
+
             """An option allowing a range of integers."""
 
             @staticmethod
@@ -1499,8 +1495,7 @@ class CleanBot(Bot):
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

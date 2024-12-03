@@ -60,8 +60,7 @@ __all__ = ['BasePage']
 
 class BasePage(ComparableMixin):
 
-    """
-    BasePage: Base object for a MediaWiki page.
+    """BasePage: Base object for a MediaWiki page.
 
     This object only implements internally methods that do not require
     reading from or writing to the wiki. All other methods are delegated
@@ -79,8 +78,7 @@ class BasePage(ComparableMixin):
     )
 
     def __init__(self, source, title: str = '', ns=0) -> None:
-        """
-        Instantiate a Page object.
+        """Instantiate a Page object.
 
         Three calling formats are supported:
 
@@ -131,9 +129,8 @@ class BasePage(ComparableMixin):
             self._link = source
             self._revisions = {}
         else:
-            raise Error(
-                "Invalid argument type '{}' in Page initializer: {}"
-                .format(type(source), source))
+            raise Error(f"Invalid argument type '{type(source)}' in Page "
+                        f'initializer: {source}')
 
     @property
     def site(self):
@@ -144,8 +141,7 @@ class BasePage(ComparableMixin):
         return self._link.site
 
     def version(self):
-        """
-        Return MediaWiki version number of the page site.
+        """Return MediaWiki version number of the page site.
 
         This is needed to use @need_version() decorator for methods of
         Page objects.
@@ -163,8 +159,7 @@ class BasePage(ComparableMixin):
         return self.site.data_repository()
 
     def namespace(self) -> Namespace:
-        """
-        Return the namespace of the page.
+        """Return the namespace of the page.
 
         :return: namespace of the page
         """
@@ -172,8 +167,7 @@ class BasePage(ComparableMixin):
 
     @property
     def content_model(self):
-        """
-        Return the content model for this page.
+        """Return the content model for this page.
 
         If it cannot be reliably determined via the API,
         None is returned.
@@ -194,8 +188,7 @@ class BasePage(ComparableMixin):
 
     @property
     def pageid(self) -> int:
-        """
-        Return pageid of the page.
+        """Return pageid of the page.
 
         :return: pageid or 0 if page does not exist
         """
@@ -218,8 +211,7 @@ class BasePage(ComparableMixin):
         insite=None,
         without_brackets: bool = False
     ) -> str:
-        """
-        Return the title of this Page, as a string.
+        """Return the title of this Page, as a string.
 
         :param underscore: (not used with as_link) if true, replace all ' '
             characters with '_'
@@ -264,8 +256,7 @@ class BasePage(ComparableMixin):
                         or self.site.code != target_code)):
                 if self.site.family.name not in (
                         target_family, self.site.code):
-                    title = '{site.family.name}:{site.code}:{title}'.format(
-                        site=self.site, title=title)
+                    title = f'{self.site.family.name}:{self.site.code}:{title}'
                 else:
                     # use this form for sites like commons, where the
                     # code is the same as the family name
@@ -314,8 +305,7 @@ class BasePage(ComparableMixin):
         return f'{self.__class__.__name__}({self.title()!r})'
 
     def _cmpkey(self):
-        """
-        Key for comparison of Page objects.
+        """Key for comparison of Page objects.
 
         Page objects are "equal" if and only if they are on the same site
         and have the same normalized title, including section if any.
@@ -325,8 +315,7 @@ class BasePage(ComparableMixin):
         return (self.site, self.namespace(), self.title())
 
     def __hash__(self):
-        """
-        A stable identifier to be used as a key in hash-tables.
+        """A stable identifier to be used as a key in hash-tables.
 
         This relies on the fact that the string
         representation of an instance cannot change after the construction.
@@ -340,8 +329,7 @@ class BasePage(ComparableMixin):
 
     @cached
     def autoFormat(self):
-        """
-        Return :py:obj:`date.getAutoFormat` dictName and value, if any.
+        """Return :py:obj:`date.getAutoFormat` dictName and value, if any.
 
         Value can be a year, date, etc., and dictName is 'YearBC',
         'Year_December', or another dictionary name. Please note that two
@@ -411,8 +399,7 @@ class BasePage(ComparableMixin):
         return text
 
     def has_content(self) -> bool:
-        """
-        Page has been loaded.
+        """Page has been loaded.
 
         Not existing pages are considered loaded.
 
@@ -428,8 +415,7 @@ class BasePage(ComparableMixin):
         return None
 
     def _getInternals(self):
-        """
-        Helper function for get().
+        """Helper function for get().
 
         Stores latest revision in self if it doesn't contain it, doesn't think.
         * Raises exceptions from previous runs.
@@ -452,16 +438,33 @@ class BasePage(ComparableMixin):
             self._getexception = IsRedirectPageError(self)
             raise self._getexception
 
+    def get_revision(
+        self, oldid: int, *, force: bool = False, content: bool = False
+    ) -> pywikibot.page.Revision:
+        """Return an old revision of this page.
+
+        .. versionadded:: 9.6
+        .. seealso:: :meth:`getOldVersion`
+
+
+        :param oldid: The revid of the revision desired.
+        :param content: if True, retrieve the content of the revision
+            (default False)
+        """
+        if force or oldid not in self._revisions \
+           or (content and self._revisions[oldid].text is None):
+            self.site.loadrevisions(self, content=content, revids=oldid)
+        return self._revisions[oldid]
+
     @remove_last_args(['get_redirect'])
     def getOldVersion(self, oldid, force: bool = False) -> str:
         """Return text of an old revision of this page.
 
+        .. seealso:: :meth:`get_revision`
+
         :param oldid: The revid of the revision desired.
         """
-        if force or oldid not in self._revisions \
-                or self._revisions[oldid].text is None:
-            self.site.loadrevisions(self, content=True, revids=oldid)
-        return self._revisions[oldid].text
+        return self.get_revision(oldid, content=True, force=force).text
 
     def permalink(self, oldid=None, percent_encoded: bool = True,
                   with_protocol: bool = False) -> str:
@@ -493,8 +496,7 @@ class BasePage(ComparableMixin):
 
     @latest_revision_id.deleter
     def latest_revision_id(self) -> None:
-        """
-        Remove the latest revision id set for this Page.
+        """Remove the latest revision id set for this Page.
 
         All internal cached values specifically for the latest revision
         of this page are cleared.
@@ -608,8 +610,7 @@ class BasePage(ComparableMixin):
             del self._raw_extracted_templates
 
     def preloadText(self) -> str:
-        """
-        The text returned by EditFormPreloadText.
+        """The text returned by EditFormPreloadText.
 
         See API module "info".
 
@@ -686,9 +687,8 @@ class BasePage(ComparableMixin):
                 extract = shorten(extract, chars, break_long_words=False,
                                   placeholder='…')
         else:
-            raise ValueError(
-                'variant parameter must be "plain", "html" or "wiki", not "{}"'
-                .format(variant))
+            raise ValueError('variant parameter must be "plain", "html" or '
+                             f'"wiki", not "{variant}"')
 
         if not lines:
             return extract
@@ -702,8 +702,7 @@ class BasePage(ComparableMixin):
         return '\n'.join(text_lines[:min(lines, len(text_lines))])
 
     def properties(self, force: bool = False) -> dict:
-        """
-        Return the properties of the page.
+        """Return the properties of the page.
 
         :param force: force updating from the live site
         """
@@ -713,8 +712,7 @@ class BasePage(ComparableMixin):
         return self._pageprops
 
     def defaultsort(self, force: bool = False) -> str | None:
-        """
-        Extract value of the {{DEFAULTSORT:}} magic word from the page.
+        """Extract value of the {{DEFAULTSORT:}} magic word from the page.
 
         :param force: force updating from the live site
         """
@@ -765,8 +763,7 @@ class BasePage(ComparableMixin):
 
     @cached
     def lastNonBotUser(self) -> str | None:
-        """
-        Return name or IP address of last human/non-bot user to edit page.
+        """Return name or IP address of last human/non-bot user to edit page.
 
         Determine the most recent human editor out of the last revisions.
         If it was not able to retrieve a human user, returns None.
@@ -864,9 +861,9 @@ class BasePage(ComparableMixin):
                         self._catredirect = p.title()
                     else:
                         pywikibot.warning(
-                            'Category redirect target {} on {} is not a '
-                            'category'.format(p.title(as_link=True),
-                                              self.title(as_link=True)))
+                            f'Category redirect target {p.title(as_link=True)}'
+                            f' on {self.title(as_link=True)} is not a category'
+                        )
                 else:
                     pywikibot.warning(
                         'No target found for category redirect on '
@@ -887,8 +884,7 @@ class BasePage(ComparableMixin):
         return ns >= 0 and ns % 2 == 1
 
     def toggleTalkPage(self) -> pywikibot.Page | None:
-        """
-        Return other member of the article-talk page pair for this Page.
+        """Return other member of the article-talk page pair for this Page.
 
         If self is a talk page, returns the associated content page;
         otherwise, returns the associated talk page. The returned page need
@@ -986,8 +982,7 @@ class BasePage(ComparableMixin):
                       namespaces=None,
                       total: int | None = None,
                       content: bool = False) -> Iterable[pywikibot.Page]:
-        """
-        Return an iterator all pages that refer to or embed the page.
+        """Return an iterator all pages that refer to or embed the page.
 
         If you need a full list of referring pages, use
         ``pages = list(s.getReferences())``
@@ -1026,8 +1021,7 @@ class BasePage(ComparableMixin):
                   namespaces=None,
                   total: int | None = None,
                   content: bool = False) -> Iterable[pywikibot.Page]:
-        """
-        Return an iterator for pages that link to this page.
+        """Return an iterator for pages that link to this page.
 
         :param follow_redirects: if True, also iterate pages that link to a
             redirect pointing to the page.
@@ -1052,8 +1046,7 @@ class BasePage(ComparableMixin):
                    namespaces=None,
                    total: int | None = None,
                    content: bool = False) -> Iterable[pywikibot.Page]:
-        """
-        Return an iterator for pages that embed this page as a template.
+        """Return an iterator for pages that embed this page as a template.
 
         :param filter_redirects: if True, only iterate redirects; if False,
             omit redirects; if None, do not filter
@@ -1078,8 +1071,7 @@ class BasePage(ComparableMixin):
         total: int | None = None,
         content: bool = False
     ) -> Iterable[pywikibot.Page]:
-        """
-        Return an iterable of redirects to this page.
+        """Return an iterable of redirects to this page.
 
         :param filter_fragments: If True, only return redirects with fragments.
             If False, only return redirects without fragments. If None, return
@@ -1161,8 +1153,7 @@ class BasePage(ComparableMixin):
         return self.site.page_can_be_edited(self, action)
 
     def botMayEdit(self) -> bool:
-        """
-        Determine whether the active bot is allowed to edit the page.
+        """Determine whether the active bot is allowed to edit the page.
 
         This will be True if the page doesn't contain {{bots}} or {{nobots}}
         or any other template from edit_restricted_templates list
@@ -1458,8 +1449,7 @@ class BasePage(ComparableMixin):
                   **kwargs)
 
     def watch(self, unwatch: bool = False) -> bool:
-        """
-        Add or remove this page to/from bot account's watchlist.
+        """Add or remove this page to/from bot account's watchlist.
 
         :param unwatch: True to unwatch, False (default) to watch.
         :return: True if successful, False otherwise.
@@ -1474,8 +1464,7 @@ class BasePage(ComparableMixin):
                 delattr(self, attr)
 
     def purge(self, **kwargs) -> bool:
-        """
-        Purge the server's cache for this page.
+        """Purge the server's cache for this page.
 
         :keyword redirects: Automatically resolve redirects.
         :type redirects: bool
@@ -1558,9 +1547,8 @@ class BasePage(ComparableMixin):
                 f'keyword argument "{key}={arg}"',
                 since='7.0.0')
             if key in kwargs:
-                pywikibot.warning('{!r} is given as keyword argument {!r} '
-                                  'already; ignoring {!r}'
-                                  .format(key, arg, kwargs[key]))
+                pywikibot.warning(f'{key!r} is given as keyword argument '
+                                  f'{arg!r} already; ignoring {kwargs[key]!r}')
             else:
                 kwargs[key] = arg
 
@@ -1570,8 +1558,7 @@ class BasePage(ComparableMixin):
         self,
         expand: bool = True,
     ) -> Generator[pywikibot.page.Link, None, None]:
-        """
-        Yield interwiki links in the page text, excluding language links.
+        """Yield interwiki links in the page text, excluding language links.
 
         :param expand: if True (default), include interwiki links found in
             templates transcluded onto this page; if False, only iterate
@@ -1602,8 +1589,7 @@ class BasePage(ComparableMixin):
         self,
         include_obsolete: bool = False,
     ) -> list[pywikibot.Link]:
-        """
-        Return a list of all inter-language Links on this page.
+        """Return a list of all inter-language Links on this page.
 
         :param include_obsolete: if true, return even Link objects whose site
                                  is obsolete
@@ -1733,8 +1719,7 @@ class BasePage(ComparableMixin):
         total: int | None = None,
         content: bool = False,
     ) -> Iterable[pywikibot.FilePage]:
-        """
-        Iterate FilePage objects for images displayed on this Page.
+        """Iterate FilePage objects for images displayed on this Page.
 
         :param total: iterate no more than this number of pages in total
         :param content: if True, retrieve the content of the current version
@@ -1749,20 +1734,25 @@ class BasePage(ComparableMixin):
         total: int | None = None,
         content: bool = False,
     ) -> Iterable[pywikibot.Page]:
-        """
-        Iterate categories that the article is in.
+        """Iterate categories that the article is in.
 
-        :param with_sort_key: if True, include the sort key in each Category.
+        .. versionchanged:: 2.0
+           *with_sort_key* parameter is not supported and a
+           NotImplementedError is raised if set.
+        .. versionchanged:: 9.6
+           *with_sort_key* parameter is supported.
+        .. seealso:: :meth:`Site.pagecategories()
+           <pywikibot.site._generators.GeneratorsMixin.pagecategories>`
+        .. note:: This method also yields categories which are
+           transcluded.
+
+        :param with_sort_key: if True, include the sort key in
+            each Category.
         :param total: iterate no more than this number of pages in total
-        :param content: if True, retrieve the content of the current version
-            of each category description page (default False)
+        :param content: if True, retrieve the content of the current
+            version of each category description page (default False)
         :return: a generator that yields Category objects.
-        :rtype: generator
         """
-        # FIXME: bug T75561: with_sort_key is ignored by Site.pagecategories
-        if with_sort_key:
-            raise NotImplementedError('with_sort_key is not implemented')
-
         # Data might have been preloaded
         # Delete cache if content is needed and elements have no content
         if hasattr(self, '_categories'):
@@ -1772,11 +1762,11 @@ class BasePage(ComparableMixin):
             else:
                 return itertools.islice(self._categories, total)
 
-        return self.site.pagecategories(self, total=total, content=content)
+        return self.site.pagecategories(self, with_sort_key=with_sort_key,
+                                        total=total, content=content)
 
     def extlinks(self, total: int | None = None) -> Iterable[str]:
-        """
-        Iterate all external URLs (not interwiki links) from this page.
+        """Iterate all external URLs (not interwiki links) from this page.
 
         :param total: iterate no more than this number of pages in total
         :return: a generator that yields str objects containing URLs.
@@ -1784,8 +1774,7 @@ class BasePage(ComparableMixin):
         return self.site.page_extlinks(self, total=total)
 
     def coordinates(self, primary_only: bool = False):
-        """
-        Return a list of Coordinate objects for points on the page.
+        """Return a list of Coordinate objects for points on the page.
 
         Uses the MediaWiki extension GeoData.
 
@@ -1805,8 +1794,7 @@ class BasePage(ComparableMixin):
         return list(self._coords)
 
     def page_image(self):
-        """
-        Return the most appropriate image on the page.
+        """Return the most appropriate image on the page.
 
         Uses the MediaWiki extension PageImages.
 
@@ -1899,16 +1887,15 @@ class BasePage(ComparableMixin):
         result += '! oldid || date/time || username || edit summary\n'
         for entry in self.revisions(reverse=reverse, total=total):
             result += '|----\n'
-            result += ('| {r.revid} || {r.timestamp} || {r.user} || '
-                       '<nowiki>{r.comment}</nowiki>\n'.format(r=entry))
+            result += (f'| {entry.revid} || {entry.timestamp} || {entry.user} '
+                       f'|| <nowiki>{entry.comment}</nowiki>\n')
         result += '|}\n'
         return result
 
     def contributors(self,
                      total: int | None = None,
                      starttime=None, endtime=None):
-        """
-        Compile contributors of this page with edit counts.
+        """Compile contributors of this page with edit counts.
 
         :param total: iterate no more than this number of revisions in total
         :param starttime: retrieve revisions starting at this Timestamp
@@ -1967,8 +1954,7 @@ class BasePage(ComparableMixin):
              movetalk: bool = True,
              noredirect: bool = False,
              movesubpages: bool = True) -> pywikibot.page.Page:
-        """
-        Move this page to a new title.
+        """Move this page to a new title.
 
         .. versionchanged:: 7.2
            The *movesubpages* parameter was added
@@ -1997,8 +1983,7 @@ class BasePage(ComparableMixin):
         *,
         deletetalk: bool = False
     ) -> int:
-        """
-        Delete the page from the wiki. Requires administrator status.
+        """Delete the page from the wiki. Requires administrator status.
 
         .. versionchanged:: 7.1
            keyword only parameter *deletetalk* was added.
@@ -2229,8 +2214,7 @@ class BasePage(ComparableMixin):
                         in_place: bool = True,
                         include: list[str] | None = None,
                         show_diff: bool = False) -> bool:
-        """
-        Remove page from oldCat and add it to newCat.
+        """Remove page from oldCat and add it to newCat.
 
         .. versionadded:: 7.0
            The `show_diff` parameter
@@ -2269,12 +2253,9 @@ class BasePage(ComparableMixin):
             return False
 
         if old_cat not in cats:
-            if self.namespace() != 10:
-                pywikibot.error(
-                    f'{self} is not in category {old_cat.title()}!')
-            else:
-                pywikibot.info('{} is not in category {}, skipping...'
-                               .format(self, old_cat.title()))
+            pywikibot.info(
+                f'{self} is not in category {old_cat.title()}, skipping...'
+            )
             return False
 
         # This prevents the bot from adding new_cat if it is already present.

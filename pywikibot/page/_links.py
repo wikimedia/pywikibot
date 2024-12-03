@@ -6,7 +6,7 @@
    its contents.
 """
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -34,8 +34,7 @@ __all__ = (
 
 class BaseLink(ComparableMixin):
 
-    """
-    A MediaWiki link (local or interwiki).
+    """A MediaWiki link (local or interwiki).
 
     Has the following attributes:
 
@@ -49,8 +48,7 @@ class BaseLink(ComparableMixin):
     _items = ('title', 'namespace', '_sitekey')
 
     def __init__(self, title: str, namespace=None, site=None) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param title: the title of the page linked to (str); does not
             include namespace or section
@@ -86,8 +84,7 @@ class BaseLink(ComparableMixin):
         return f"pywikibot.page.{type(self).__name__}({', '.join(attrs)})"
 
     def lookup_namespace(self):
-        """
-        Look up the namespace given the provided namespace id or name.
+        """Look up the namespace given the provided namespace id or name.
 
         :rtype: pywikibot.Namespace
         """
@@ -112,8 +109,7 @@ class BaseLink(ComparableMixin):
 
     @property
     def site(self):
-        """
-        Return the site of the link.
+        """Return the site of the link.
 
         :rtype: pywikibot.Site
         """
@@ -123,8 +119,7 @@ class BaseLink(ComparableMixin):
 
     @property
     def namespace(self):
-        """
-        Return the namespace of the link.
+        """Return the namespace of the link.
 
         :rtype: pywikibot.Namespace
         """
@@ -140,8 +135,7 @@ class BaseLink(ComparableMixin):
         return self.title
 
     def ns_title(self, onsite=None):
-        """
-        Return full page title, including namespace.
+        """Return full page title, including namespace.
 
         :param onsite: site object
             if specified, present title using onsite local namespace,
@@ -161,16 +155,16 @@ class BaseLink(ComparableMixin):
                     break
             else:
                 raise InvalidTitleError(
-                    'No corresponding title found for namespace {} on {}.'
-                    .format(self.namespace, onsite))
+                    'No corresponding title found for namespace '
+                    f'{self.namespace} on {onsite}.'
+                )
 
         if self.namespace != Namespace.MAIN:
             return f'{name}:{self.title}'
         return self.title
 
     def astext(self, onsite=None) -> str:
-        """
-        Return a text representation of the link.
+        """Return a text representation of the link.
 
         :param onsite: if specified, present as a (possibly interwiki) link
             from the given site; otherwise, present as an internal link on
@@ -192,8 +186,7 @@ class BaseLink(ComparableMixin):
         return f'[[{self.site.sitename}:{title}]]'
 
     def _cmpkey(self):
-        """
-        Key for comparison of BaseLink objects.
+        """Key for comparison of BaseLink objects.
 
         BaseLink objects are "equal" if and only if they are on the same site
         and have the same normalized title.
@@ -212,8 +205,7 @@ class BaseLink(ComparableMixin):
 
     @classmethod
     def fromPage(cls, page):  # noqa: N802
-        """
-        Create a BaseLink to a Page.
+        """Create a BaseLink to a Page.
 
         :param page: target pywikibot.page.Page
         :type page: pywikibot.page.Page
@@ -229,8 +221,7 @@ class BaseLink(ComparableMixin):
 
 class Link(BaseLink):
 
-    """
-    A MediaWiki wikitext link (local or interwiki).
+    """A MediaWiki wikitext link (local or interwiki).
 
     Constructs a Link object based on a wikitext link and a source site.
 
@@ -258,8 +249,7 @@ class Link(BaseLink):
     )
 
     def __init__(self, text, source=None, default_namespace=0) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param text: the link text (everything appearing between [[ and ]]
             on a wiki page)
@@ -319,9 +309,10 @@ class Link(BaseLink):
         # Cleanup whitespace
         sep = self._source.family.title_delimiter_and_aliases[0]
         t = re.sub(
-            '[{}\xa0\u1680\u180E\u2000-\u200A\u2028\u2029\u202F\u205F\u3000]+'
-            .format(self._source.family.title_delimiter_and_aliases),
-            sep, t)
+            f'[{self._source.family.title_delimiter_and_aliases}'
+            '\xa0\u1680\u180E\u2000-\u200A\u2028\u2029\u202F\u205F\u3000]+',
+            sep, t
+        )
         # Strip spaces at both ends
         t = t.strip()
         # Remove left-to-right and right-to-left markers.
@@ -332,8 +323,7 @@ class Link(BaseLink):
             self._text = source.title(with_section=False) + self._text
 
     def parse_site(self) -> tuple:
-        """
-        Parse only enough text to determine which site the link points to.
+        """Parse only enough text to determine which site the link points to.
 
         This method does not parse anything after the first ":"; links
         with multiple interwiki prefixes (such as "wikt:fr:Parlais") need
@@ -372,8 +362,7 @@ class Link(BaseLink):
         return (fam.name, code)  # text before : doesn't match any known prefix
 
     def parse(self):
-        """
-        Parse wikitext of the link.
+        """Parse wikitext of the link.
 
         Called internally when accessing attributes.
         """
@@ -408,16 +397,18 @@ class Link(BaseLink):
                 break  # text before : doesn't match any known prefix
             except SiteDefinitionError as e:
                 raise SiteDefinitionError(
-                    '{} is not a local page on {}, and the interwiki '
-                    'prefix {} is not supported by Pywikibot!\n{}'
-                    .format(self._text, self._site, prefix, e))
+                    f'{self._text} is not a local page on {self._site}, and '
+                    f'the interwiki prefix {prefix} is not supported by '
+                    f'Pywikibot!\n{e}'
+                )
             else:
                 if first_other_site:
                     if not self._site.local_interwiki(prefix):
                         raise InvalidTitleError(
-                            '{} links to a non local site {} via an '
-                            'interwiki link to {}.'.format(
-                                self._text, newsite, first_other_site))
+                            f'{self._text} links to a non local site '
+                            f'{newsite} via an interwiki link to '
+                            f'{first_other_site}.'
+                        )
                 elif newsite != self._source:
                     first_other_site = newsite
                 self._site = newsite
@@ -448,8 +439,9 @@ class Link(BaseLink):
                     next_ns = t[:t.index(':')]
                     if self._site.namespaces.lookup_name(next_ns):
                         raise InvalidTitleError(
-                            "The (non-)talk page of '{}' is a valid title "
-                            'in another namespace.'.format(self._text))
+                            f"The (non-)talk page of '{self._text}' is a valid"
+                            ' title in another namespace.'
+                        )
 
         # Reject illegal characters.
         m = Link.illegal_titles_pattern.search(t)
@@ -493,8 +485,7 @@ class Link(BaseLink):
 
     @property
     def site(self):
-        """
-        Return the site of the link.
+        """Return the site of the link.
 
         :rtype: pywikibot.Site
         """
@@ -504,8 +495,7 @@ class Link(BaseLink):
 
     @property
     def namespace(self):
-        """
-        Return the namespace of the link.
+        """Return the namespace of the link.
 
         :rtype: pywikibot.Namespace
         """
@@ -535,8 +525,7 @@ class Link(BaseLink):
         return self._anchor
 
     def astext(self, onsite=None):
-        """
-        Return a text representation of the link.
+        """Return a text representation of the link.
 
         :param onsite: if specified, present as a (possibly interwiki) link
             from the given site; otherwise, present as an internal link on
@@ -551,8 +540,7 @@ class Link(BaseLink):
         return text
 
     def _cmpkey(self):
-        """
-        Key for comparison of Link objects.
+        """Key for comparison of Link objects.
 
         Link objects are "equal" if and only if they are on the same site
         and have the same normalized title, including section if any.
@@ -563,8 +551,7 @@ class Link(BaseLink):
 
     @classmethod
     def fromPage(cls, page, source=None):  # noqa: N802
-        """
-        Create a Link to a Page.
+        """Create a Link to a Page.
 
         :param page: target Page
         :type page: pywikibot.page.Page
@@ -586,18 +573,15 @@ class Link(BaseLink):
         return link
 
     @classmethod
-    def langlinkUnsafe(cls, lang, title, source):  # noqa: N802
-        """
-        Create a "lang:title" Link linked from source.
+    def langlinkUnsafe(cls, lang: str, title: str, source):  # noqa: N802
+        """Create a "lang:title" Link linked from source.
 
         Assumes that the lang & title come clean, no checks are made.
 
         :param lang: target site code (language)
-        :type lang: str
         :param title: target Page
-        :type title: str
         :param source: Link from site source
-        :param source: Site
+        :type source: Site
 
         :rtype: pywikibot.page.Link
         """
@@ -628,8 +612,7 @@ class Link(BaseLink):
     @classmethod
     def create_separated(cls, link, source, default_namespace=0, section=None,
                          label=None):
-        """
-        Create a new instance but overwrite section or label.
+        """Create a new instance but overwrite section or label.
 
         The returned Link instance is already parsed.
 
@@ -661,8 +644,7 @@ class Link(BaseLink):
 
 class SiteLink(BaseLink):
 
-    """
-    A single sitelink in a Wikibase item.
+    """A single sitelink in a Wikibase item.
 
     Extends BaseLink by the following attribute:
 
@@ -675,8 +657,7 @@ class SiteLink(BaseLink):
     _items = ('_sitekey', '_rawtitle', 'badges')
 
     def __init__(self, title, site=None, badges=None) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param title: the title of the linked page including namespace
         :type title: str
@@ -699,8 +680,7 @@ class SiteLink(BaseLink):
 
     @staticmethod
     def _parse_namespace(title, site=None):
-        """
-        Parse enough of a title with a ':' to determine the namespace.
+        """Parse enough of a title with a ':' to determine the namespace.
 
         :param site: the Site object for the wiki linked to. Can be provided as
             either a Site instance or a db key, defaults to pywikibot.Site().
@@ -727,8 +707,7 @@ class SiteLink(BaseLink):
 
     @property
     def badges(self):
-        """
-        Return a list of all badges associated with the link.
+        """Return a list of all badges associated with the link.
 
         :rtype: [pywikibot.ItemPage]
         """
@@ -740,8 +719,7 @@ class SiteLink(BaseLink):
         data: dict[str, Any],
         site: pywikibot.site.DataSite | None = None,
     ) -> SiteLink:
-        """
-        Create a SiteLink object from JSON returned in the API call.
+        """Create a SiteLink object from JSON returned in the API call.
 
         :param data: JSON containing SiteLink data
         :param site: The Wikibase site
@@ -754,8 +732,7 @@ class SiteLink(BaseLink):
         return sl
 
     def toJSON(self) -> dict[str, str | list[str]]:  # noqa: N802
-        """
-        Convert the SiteLink to a JSON object for the Wikibase API.
+        """Convert the SiteLink to a JSON object for the Wikibase API.
 
         :return: Wikibase JSON
         """
@@ -806,12 +783,12 @@ _ILLEGAL_HTML_ENTITIES_MAPPING = {
 }
 
 
-def html2unicode(text: str, ignore=None, exceptions=None) -> str:
-    """
-    Replace HTML entities with equivalent unicode.
+def html2unicode(text: str,
+                 ignore: list[int] | None = None,
+                 exceptions=None) -> str:
+    """Replace HTML entities with equivalent unicode.
 
     :param ignore: HTML entities to ignore
-    :param ignore: list of int
     """
     if ignore is None:
         ignore = []

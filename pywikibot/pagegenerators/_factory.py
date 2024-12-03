@@ -91,8 +91,7 @@ class GeneratorFactory:
                  positional_arg_name: str | None = None,
                  enabled_options: Iterable[str] | None = None,
                  disabled_options: Iterable[str] | None = None) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param site: Site for generator results
         :param positional_arg_name: generator to use for positional args,
@@ -160,8 +159,7 @@ class GeneratorFactory:
 
     @property
     def site(self) -> pywikibot.site.BaseSite:
-        """
-        Generator site.
+        """Generator site.
 
         The generator site should not be accessed until after the global
         arguments have been handled, otherwise the default Site may be changed
@@ -177,8 +175,7 @@ class GeneratorFactory:
 
     @property
     def namespaces(self) -> frozenset[pywikibot.site.Namespace]:
-        """
-        List of Namespace parameters.
+        """List of Namespace parameters.
 
         Converts int or string namespaces to Namespace objects and
         change the storage to immutable once it has been accessed.
@@ -317,8 +314,7 @@ class GeneratorFactory:
 
     def getCategory(self, category: str  # noqa: N802
                     ) -> tuple[pywikibot.Category, str | None]:
-        """
-        Return Category and start as defined by category.
+        """Return Category and start as defined by category.
 
         :param category: category name with start parameter
         """
@@ -347,8 +343,7 @@ class GeneratorFactory:
                        recurse: int | bool = False,
                        content: bool = False,
                        gen_func: Callable | None = None) -> Any:
-        """
-        Return generator based on Category defined by category and gen_func.
+        """Return generator based on Category defined by category and gen_func.
 
         :param category: category name with start parameter
         :param recurse: if not False or 0, also iterate articles in

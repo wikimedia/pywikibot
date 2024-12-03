@@ -176,8 +176,7 @@ class AddTextBot(AutomaticTWSummaryBot, ExistingPageBot):
 
 
 def main(*argv: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
@@ -199,8 +198,7 @@ def main(*argv: str) -> None:
 def parse(argv: Sequence[str],
           generator_factory: pagegenerators.GeneratorFactory
           ) -> dict[str, bool | str]:
-    """
-    Parses our arguments and provide a dictionary with their values.
+    """Parses our arguments and provide a dictionary with their values.
 
     :param argv: input arguments to be parsed
     :param generator_factory: factory that will determine what pages to

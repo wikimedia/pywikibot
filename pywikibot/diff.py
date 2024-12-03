@@ -43,8 +43,7 @@ class Hunk:
                  b: str | Sequence[str],
                  grouped_opcode: Sequence[tuple[str, int, int, int, int]]
                  ) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param a: sequence of lines
         :param b: sequence of lines
@@ -63,22 +62,16 @@ class Hunk:
             '+': 'lightgreen',
             '-': 'lightred',
         }
-
         self.diff = list(self.create_diff())
         self.diff_plain_text = ''.join(self.diff)
         self.diff_text = ''.join(self.format_diff())
-
         first, last = self.group[0], self.group[-1]
         self.a_rng = (first[1], last[2])
         self.b_rng = (first[3], last[4])
-
         self.header = self.get_header()
-        self.diff_plain_text = '{hunk.header}\n{hunk.diff_plain_text}' \
-                               .format(hunk=self)
+        self.diff_plain_text = f'{self.header}\n{self.diff_plain_text}'
         self.diff_text = str(self.diff_text)
-
         self.reviewed = self.PENDING
-
         self.pre_context = 0
         self.post_context = 0
 
@@ -92,7 +85,7 @@ class Hunk:
         """Provide header for any ranges."""
         a_rng = _format_range_unified(*a_rng)
         b_rng = _format_range_unified(*b_rng)
-        return '{0} -{1} +{2} {0}'.format(affix, a_rng, b_rng)
+        return f'{affix} -{a_rng} +{b_rng} {affix}'
 
     def create_diff(self) -> Iterable[str]:
         """Generator of diff text for this hunk, without formatting.
@@ -196,10 +189,9 @@ class Hunk:
                         apply_color = 'default;' + self.bg_colors[color]
                     char_tagged = f'<<{apply_color}>>{char}'
                     color_closed = False
-            else:
-                if char_ref == ' ':
-                    char_tagged = f'<<default>>{char}'
-                    color_closed = True
+            elif char_ref == ' ':
+                char_tagged = f'<<default>>{char}'
+                color_closed = True
             colored_line += char_tagged
 
         if not color_closed:
@@ -383,9 +375,10 @@ class PatchManager:
 
         context_range = self._get_context_range(hunks)
 
-        output = '<<aqua>>{}<<default>>\n{}'.format(
-            Hunk.get_header_text(*context_range),
-            extend_context(context_range[0][0], hunks[0].a_rng[0]))
+        output = (
+            f'<<aqua>>{Hunk.get_header_text(*context_range)}<<default>>\n'
+            f'{extend_context(context_range[0][0], hunks[0].a_rng[0])}'
+        )
         previous_hunk = None
         for hunk in hunks:
             if previous_hunk:

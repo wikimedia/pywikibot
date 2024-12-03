@@ -4,7 +4,7 @@
    in :mod:`backports`
 """
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -65,8 +65,7 @@ def itergroup(iterable,
 
 
 def islice_with_ellipsis(iterable, *args, marker: str = '…'):
-    """
-    Generator which yields the first n elements of the iterable.
+    """Generator which yields the first n elements of the iterable.
 
     If more elements are available and marker is True, it returns an extra
     string marker as continuation mark.
@@ -141,8 +140,8 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
     # If any iterable is empty, no pages are going to be returned
     for source in iterables:
         if not source:
-            debug('At least one iterable ({!r}) is empty and execution was '
-                  'skipped immediately.'.format(source))
+            debug(f'At least one iterable ({source!r}) is empty and execution'
+                  ' was skipped immediately.')
             return
 
     # Item is cached to check that it is found n_gen times
@@ -216,8 +215,7 @@ def roundrobin_generators(*iterables) -> Generator[Any, None, None]:
 
 
 def filter_unique(iterable, container=None, key=None, add=None):
-    """
-    Yield unique items from an iterable, omitting duplicates.
+    """Yield unique items from an iterable, omitting duplicates.
 
     By default, to provide uniqueness, it puts the generated items into a
     set created as a local variable. It only yields items which are not

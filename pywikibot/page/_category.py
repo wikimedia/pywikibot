@@ -22,8 +22,7 @@ class Category(Page):
     """A page in the Category: namespace."""
 
     def __init__(self, source, title: str = '', sort_key=None) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         All parameters are the same as for Page() Initializer.
         """
@@ -138,8 +137,7 @@ class Category(Page):
                  recurse: int | bool = False,
                  total: int | None = None,
                  **kwargs: Any) -> Generator[Page, None, None]:
-        """
-        Yield all articles in the current category.
+        """Yield all articles in the current category.
 
         Yields all pages in the category that are not subcategories.
         Duplicates are filtered. To enable duplicates use :meth:`members`
@@ -289,8 +287,7 @@ class Category(Page):
         self,
         total: int | None = None
     ) -> Generator[Page, None, None]:
-        """
-        Return pages in a category ordered by the creation date.
+        """Return pages in a category ordered by the creation date.
 
         If two or more pages are created at the same time, the pages are
         returned in the order they were added to the category. The most

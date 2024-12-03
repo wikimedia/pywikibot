@@ -26,8 +26,7 @@ from tests.utils import skipping
 
 class TestLogentriesBase(TestCase):
 
-    """
-    Base class for log entry tests.
+    """Base class for log entry tests.
 
     It uses the German Wikipedia for a current representation of the
     log entries and the test Wikipedia for the future representation.

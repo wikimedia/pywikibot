@@ -76,8 +76,7 @@ class CoordImportRobot(ConfigParserBot, WikidataBot):
         self.create_missing_item = self.opt.create
 
     def has_coord_qualifier(self, claims) -> str | None:
-        """
-        Check if self.prop is used as property for a qualifier.
+        """Check if self.prop is used as property for a qualifier.
 
         :param claims: the Wikibase claims to check in
         :type claims: dict
@@ -91,8 +90,7 @@ class CoordImportRobot(ConfigParserBot, WikidataBot):
         return None
 
     def item_has_coordinates(self, item) -> bool:
-        """
-        Check if the item has coordinates.
+        """Check if the item has coordinates.
 
         :return: whether the item has coordinates
         """
@@ -115,17 +113,16 @@ class CoordImportRobot(ConfigParserBot, WikidataBot):
             return
         if page is None:
             # running over items, search in linked pages
-            for page in item.iterlinks():
-                if page.site.has_extension('GeoData') \
-                   and self.try_import_coordinates_from_page(page, item):
+            for p in item.iterlinks():
+                if p.site.has_extension('GeoData') \
+                   and self.try_import_coordinates_from_page(p, item):
                     break
             return
 
         self.try_import_coordinates_from_page(page, item)
 
     def try_import_coordinates_from_page(self, page, item) -> bool:
-        """
-        Try import coordinate from the given page to the given item.
+        """Try import coordinate from the given page to the given item.
 
         :return: whether any coordinates were found and the import
             was successful
@@ -142,7 +139,7 @@ class CoordImportRobot(ConfigParserBot, WikidataBot):
         pywikibot.info(
             f'Adding {coordinate.lat}, {coordinate.lon} to {item.title()}')
 
-        # todo: handle exceptions using self.user_add_claim
+        # TODO: handle exceptions using self.user_add_claim
         try:
             item.addClaim(newclaim)
         except CoordinateGlobeUnknownError as e:
@@ -153,8 +150,7 @@ class CoordImportRobot(ConfigParserBot, WikidataBot):
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

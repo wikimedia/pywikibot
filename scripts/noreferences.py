@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-This script adds a missing references section to pages.
+"""This script adds a missing references section to pages.
 
 It goes over multiple pages, searches for pages where <references />
 is missing although a <ref> tag is present, and in that case adds a new
@@ -620,8 +619,7 @@ class NoReferencesBot(AutomaticTWSummaryBot, SingleSiteBot, ExistingPageBot):
         return True
 
     def addReferences(self, oldText) -> str:
-        """
-        Add a references tag into an existing section where it fits into.
+        """Add a references tag into an existing section where it fits into.
 
         If there is no such section, creates a new section containing
         the references tag. Also repair malformed references tags.
@@ -807,8 +805,7 @@ class NoReferencesBot(AutomaticTWSummaryBot, SingleSiteBot, ExistingPageBot):
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

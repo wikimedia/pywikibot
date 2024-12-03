@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-r"""
-This script transfers pages from a source wiki to a target wiki.
+r"""This script transfers pages from a source wiki to a target wiki.
 
 It also copies edit history to a subpage.
 
@@ -61,8 +60,7 @@ docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

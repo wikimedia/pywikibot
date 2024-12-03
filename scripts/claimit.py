@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-A script that adds claims to Wikidata items based on a list of pages.
+"""A script that adds claims to Wikidata items based on a list of pages.
 
 These command line parameters can be used to specify which pages to work on:
 
@@ -99,8 +98,7 @@ class ClaimRobot(WikidataBot):
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

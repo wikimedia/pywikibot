@@ -39,8 +39,8 @@ class LogEntry(UserDict):
         self.site = site
         expected_type = self._expected_type
         if expected_type is not None and expected_type != self.type():
-            raise Error('Wrong log type! Expecting {}, received {} instead.'
-                        .format(expected_type, self.type()))
+            raise Error(f'Wrong log type! Expecting {expected_type}, received '
+                        f'{self.type()} instead.')
 
     def __missing__(self, key: str) -> None:
         """Debug when the key is missing.
@@ -79,8 +79,8 @@ class LogEntry(UserDict):
     def __eq__(self, other: Any) -> bool:
         """Compare if self is equal to other."""
         if not isinstance(other, LogEntry):
-            pywikibot.debug("'{}' cannot be compared with '{}'"
-                            .format(type(self).__name__, type(other).__name__))
+            pywikibot.debug(f"'{type(self).__name__}' cannot be compared with "
+                            f"'{type(other).__name__}'")
             return False
 
         return self.logid() == other.logid() and self.site == other.site
@@ -104,8 +104,7 @@ class LogEntry(UserDict):
 
     @cached
     def page(self) -> int | pywikibot.page.Page:
-        """
-        Page on which action was performed.
+        """Page on which action was performed.
 
         :return: page on action was performed
         """
@@ -140,8 +139,7 @@ class UserTargetLogEntry(LogEntry):
 
 class BlockEntry(LogEntry):
 
-    """
-    Block or unblock log entry.
+    """Block or unblock log entry.
 
     It might contain a block or unblock depending on the action. The duration,
     expiry and flags are not available on unblock log entries.
@@ -161,8 +159,7 @@ class BlockEntry(LogEntry):
             self._blockid = int(self['title'][pos + 1:])
 
     def page(self) -> int | pywikibot.page.Page:
-        """
-        Return the blocked account or IP.
+        """Return the blocked account or IP.
 
         :return: the Page object of username or IP if this block action
             targets a username or IP, or the blockid if this log reflects
@@ -176,8 +173,7 @@ class BlockEntry(LogEntry):
 
     @cached
     def flags(self) -> list[str]:
-        """
-        Return a list of (str) flags associated with the block entry.
+        """Return a list of (str) flags associated with the block entry.
 
         It raises an Error if the entry is an unblocking log entry.
 
@@ -190,8 +186,7 @@ class BlockEntry(LogEntry):
 
     @cached
     def duration(self) -> datetime.timedelta | None:
-        """
-        Return a datetime.timedelta representing the block duration.
+        """Return a datetime.timedelta representing the block duration.
 
         :return: datetime.timedelta, or None if block is indefinite.
         """
@@ -299,8 +294,7 @@ class PatrolEntry(LogEntry):
 
 class LogEntryFactory:
 
-    """
-    LogEntry Factory.
+    """LogEntry Factory.
 
     Only available method is create()
     """
@@ -315,8 +309,7 @@ class LogEntryFactory:
 
     def __init__(self, site: pywikibot.site.BaseSite,
                  logtype: str | None = None) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param site: The site on which the log entries are created.
         :param logtype: The log type of the log entries, if known in advance.
@@ -333,8 +326,7 @@ class LogEntryFactory:
             self._creator = lambda data: logclass(data, self._site)
 
     def create(self, logdata: dict[str, Any]) -> LogEntry:
-        """
-        Instantiate the LogEntry object representing logdata.
+        """Instantiate the LogEntry object representing logdata.
 
         :param logdata: <item> returned by the api
 
@@ -343,8 +335,7 @@ class LogEntryFactory:
         return self._creator(logdata)
 
     def get_valid_entry_class(self, logtype: str) -> LogEntry:
-        """
-        Return the class corresponding to the @logtype string parameter.
+        """Return the class corresponding to the @logtype string parameter.
 
         :return: specified subclass of LogEntry
         :raise KeyError: logtype is not valid
@@ -356,8 +347,7 @@ class LogEntryFactory:
 
     @classmethod
     def get_entry_class(cls, logtype: str) -> LogEntry:
-        """
-        Return the class corresponding to the @logtype string parameter.
+        """Return the class corresponding to the @logtype string parameter.
 
         :return: specified subclass of LogEntry
 
@@ -384,8 +374,7 @@ class LogEntryFactory:
         return cls._logtypes[logtype]
 
     def _create_from_data(self, logdata: dict[str, Any]) -> LogEntry:
-        """
-        Check for logtype from data, and creates the correct LogEntry.
+        """Check for logtype from data, and creates the correct LogEntry.
 
         :param logdata: log entry data
         """

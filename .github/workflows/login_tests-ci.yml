@@ -86,6 +86,7 @@ jobs:
         python -m pip install --upgrade pip
         pip --version
         pip install coverage
+        pip install "tomli; python_version < '3.11'"
         pip install "importlib_metadata ; python_version < '3.8'"
         pip install mwparserfromhell
         pip install packaging

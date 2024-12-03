@@ -368,8 +368,7 @@ def set_messages_package(package_name: str) -> None:
 
 
 def messages_available() -> bool:
-    """
-    Return False if there are no i18n messages available.
+    """Return False if there are no i18n messages available.
 
     To determine if messages are available, it looks for the package name
     set using :py:obj:`set_messages_package` for a message bundle called
@@ -438,8 +437,7 @@ def _get_bundle(lang: str, dirname: str) -> dict[str, str]:
 
 
 def _get_translation(lang: str, twtitle: str) -> str | None:
-    """
-    Return message of certain twtitle if exists.
+    """Return message of certain twtitle if exists.
 
     For internal use, don't use it directly.
     """
@@ -466,8 +464,8 @@ def _extract_plural(lang: str, message: str, parameters: Mapping[str, int]
         variants = match[2]
         num = parameters[selector]
         if not isinstance(num, int):
-            raise ValueError("'{}' must be a number, not a {} ({})"
-                             .format(selector, num, type(num).__name__))
+            raise ValueError(f"'{selector}' must be a number, not a {num} "
+                             f'({type(num).__name__})')
 
         plural_entries = []
         specific_entries = {}
@@ -515,8 +513,7 @@ def _extract_plural(lang: str, message: str, parameters: Mapping[str, int]
 
 class _PluralMappingAlias(abc.Mapping):
 
-    """
-    Aliasing class to allow non mappings in _extract_plural.
+    """Aliasing class to allow non mappings in _extract_plural.
 
     That function only uses __getitem__ so this is only implemented here.
     """
@@ -638,8 +635,9 @@ def translate(code: str | pywikibot.site.BaseSite,
         return trans
 
     if not isinstance(parameters, Mapping):
-        raise ValueError('parameters should be a mapping, not {}'
-                         .format(type(parameters).__name__))
+        raise ValueError(
+            f'parameters should be a mapping, not {type(parameters).__name__}'
+        )
 
     # else we check for PLURAL variants
     trans = _extract_plural(code, trans, parameters)
@@ -699,8 +697,7 @@ def twtranslate(
     only_plural: bool = False,
     bot_prefix: bool = False
 ) -> str | None:
-    r"""
-    Translate a message using JSON files in messages_package_name.
+    r"""Translate a message using JSON files in messages_package_name.
 
     fallback parameter must be True for i18n and False for L10N or testing
     purposes.
@@ -780,10 +777,10 @@ def twtranslate(
             return fallback_prompt
 
         raise pywikibot.exceptions.TranslationError(
-            'Unable to load messages package {} for bundle {}'
-            '\nIt can happen due to lack of i18n submodule or files. '
-            'See {}/i18n'
-            .format(_messages_package_name, twtitle, __url__))
+            f'Unable to load messages package {_messages_package_name} for '
+            f' bundle {twtitle}\nIt can happen due to lack of i18n submodule '
+            f'or files. See {__url__}/i18n'
+        )
 
     # if source is a site then use its lang attribute, otherwise it's a str
     lang = getattr(source, 'lang', source)
@@ -814,8 +811,9 @@ def twtranslate(
         trans = _extract_plural(alt, trans, parameters)
 
     if parameters is not None and not isinstance(parameters, Mapping):
-        raise ValueError('parameters should be a mapping, not {}'
-                         .format(type(parameters).__name__))
+        raise ValueError(
+            f'parameters should be a mapping, not {type(parameters).__name__}'
+        )
 
     if not only_plural and parameters:
         trans = trans % parameters
@@ -823,8 +821,7 @@ def twtranslate(
 
 
 def twhas_key(source: str | pywikibot.site.BaseSite, twtitle: str) -> bool:
-    """
-    Check if a message has a translation in the specified language code.
+    """Check if a message has a translation in the specified language code.
 
     The translations are retrieved from i18n.<package>, based on the callers
     import table.
@@ -842,8 +839,7 @@ def twhas_key(source: str | pywikibot.site.BaseSite, twtitle: str) -> bool:
 
 
 def twget_keys(twtitle: str) -> list[str]:
-    """
-    Return all language codes for a special message.
+    """Return all language codes for a special message.
 
     :param twtitle: The TranslateWiki string title, in <package>-<key> format
 
@@ -938,8 +934,7 @@ def input(twtitle: str,
           parameters: Mapping[str, int] | None = None,
           password: bool = False,
           fallback_prompt: str | None = None) -> str:
-    """
-    Ask the user a question, return the user's answer.
+    """Ask the user a question, return the user's answer.
 
     The prompt message is retrieved via :py:obj:`twtranslate` and uses the
     config variable 'userinterface_lang'.
@@ -956,8 +951,9 @@ def input(twtitle: str,
         prompt = fallback_prompt
     else:
         raise pywikibot.exceptions.TranslationError(
-            'Unable to load messages package {} for bundle {}'
-            .format(_messages_package_name, twtitle))
+            f'Unable to load messages package {_messages_package_name} for '
+            f'bundle {twtitle}'
+        )
     return pywikibot.input(prompt, password)
 
 

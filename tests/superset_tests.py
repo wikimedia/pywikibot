@@ -21,6 +21,7 @@ from tests.aspects import TestCase
 
 
 class TestSupersetWithoutAuth(TestCase):
+
     """Test Superset without auth."""
 
     family = 'meta'
@@ -46,6 +47,7 @@ class TestSupersetWithoutAuth(TestCase):
 
 
 class TestSupersetWithAuth(TestCase):
+
     """Test Superset with auth."""
 
     login = True

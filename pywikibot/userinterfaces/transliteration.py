@@ -1105,8 +1105,7 @@ class Transliterator:
     """Class to transliterating text."""
 
     def __init__(self, encoding: str) -> None:
-        """
-        Initialize the transliteration mapping.
+        """Initialize the transliteration mapping.
 
         :param encoding: the encoding available. Any transliterated character
             which can't be mapped, will be removed from the mapping.

@@ -10,8 +10,6 @@ The contents of the package
     +---------------------------+-----------------------------------------------------------+
     | CONTENT.rst               | This Content description file                             |
     +---------------------------+-----------------------------------------------------------+
-    | dev-requirements.txt      | PIP requirements file for development dependencies        |
-    +---------------------------+-----------------------------------------------------------+
     | Dockerfile                | Assemble a Docker image, install all dependencies via pip |
     +---------------------------+-----------------------------------------------------------+
     | Dockerfile-dev            | Docker image including development dependencies           |
@@ -20,17 +18,21 @@ The contents of the package
     +---------------------------+-----------------------------------------------------------+
     | LICENSE                   | Reference to the MIT license                              |
     +---------------------------+-----------------------------------------------------------+
-    | make_dist.py              | Script to create a Pywikibot distribution                 |
-    +---------------------------+-----------------------------------------------------------+
     | MANIFEST.in               | Setup file for package data                               |
-    +---------------------------+-----------------------------------------------------------+
-    | pwb.py                    | Caller script for pwb wrapper script                      |
     +---------------------------+-----------------------------------------------------------+
     | README.rst                | Short info string used by Pywikibot Nightlies             |
     +---------------------------+-----------------------------------------------------------+
-    | requirements.txt          | General PIP requirements file                             |
-    +---------------------------+-----------------------------------------------------------+
     | ROADMAP.rst               | PyPI version roadmap file                                 |
+    +---------------------------+-----------------------------------------------------------+
+    | dev-requirements.txt      | PIP requirements file for development dependencies        |
+    +---------------------------+-----------------------------------------------------------+
+    | make_dist.py              | Script to create a Pywikibot distribution                 |
+    +---------------------------+-----------------------------------------------------------+
+    | pwb.py                    | Caller script for pwb wrapper script                      |
+    +---------------------------+-----------------------------------------------------------+
+    | pyproject.toml            | Configuration file used by packaging tools and tests      |
+    +---------------------------+-----------------------------------------------------------+
+    | requirements.txt          | General PIP requirements file                             |
     +---------------------------+-----------------------------------------------------------+
     | setup.py                  | Installer script for Pywikibot framework                  |
     +---------------------------+-----------------------------------------------------------+
@@ -44,6 +46,8 @@ The contents of the package
     +---------------------------+-----------------------------------------------------------+
     | Directories                                                                           |
     +===========================+===========================================================+
+    | docs                      | Documentation files                                       |
+    +---------------------------+-----------------------------------------------------------+
     | pywikibot                 | Contains some libraries and control files                 |
     +---------------------------+-----------------------------------------------------------+
     | scripts                   | Contains all bots and utility scripts                     |

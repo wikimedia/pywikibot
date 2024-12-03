@@ -339,7 +339,7 @@ class CategoryRedirectBot(
                         template='|'.join(item.replace(' ', '[ _]+')
                                           for item in self.template_list),
                         catns=self.site.namespace(14)),
-            re.I | re.X)
+            re.IGNORECASE | re.VERBOSE)
 
         nonemptypages = []
         catpages = set()
@@ -560,8 +560,7 @@ class CategoryRedirectBot(
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

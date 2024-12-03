@@ -368,6 +368,7 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
         'category_redirect',
         'claimit',
         'clean_sandbox',
+        'commons_information',  # T379455
         'coordinate_import',
         'delinker',
         'disambredir',
@@ -446,6 +447,8 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
     _allowed_failures = {
         'basic',
         'delete',  # T368859
+        'fixing_redirects',  # T379455
+        'illustrate_wikidata',  # T379455
         'imagetransfer',  # T368859
         'newitem',
         'nowcommons',

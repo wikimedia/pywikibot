@@ -112,8 +112,7 @@ class i18nBot:  # noqa: N801
             print('WARNING: "en" key missing for message ' + newmsg)
 
     def run(self, quiet=False):
-        """
-        Run the bot, read the messages from source and print the dict.
+        """Run the bot, read the messages from source and print the dict.
 
         :param quiet: print the result if False
         :type quiet: bool
@@ -124,8 +123,7 @@ class i18nBot:  # noqa: N801
             self.print_all()
 
     def to_json(self, quiet=True):
-        """
-        Run the bot and create json files.
+        """Run the bot and create json files.
 
         :param quiet: Print the result if False
         :type quiet: bool

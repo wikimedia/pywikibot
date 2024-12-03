@@ -104,12 +104,12 @@ class TestSiteObject(DefaultSiteTestCase):
                     pywikibot.site.APISite.fromDBName(dbname, site),
                     pywikibot.Site(sitename))
 
-    def test_language_methods(self):
-        """Test cases for languages() and related methods."""
+    def test_codes_property(self):
+        """Test cases for codes property and related methods."""
         mysite = self.get_site()
-        langs = mysite.languages()
-        self.assertIsInstance(langs, list)
-        self.assertIn(mysite.code, langs)
+        codes = mysite.codes
+        self.assertIsInstance(codes, set)
+        self.assertIn(mysite.code, codes)
         self.assertIsInstance(mysite.obsolete, bool)
         ipf = mysite.interwiki_putfirst()
         if ipf:  # no languages use this anymore, keep it for foreign families
@@ -118,7 +118,7 @@ class TestSiteObject(DefaultSiteTestCase):
             self.assertIsNone(ipf)
 
         for item in mysite.validLanguageLinks():
-            self.assertIn(item, langs)
+            self.assertIn(item, codes)
             self.assertIsNone(self.site.namespaces.lookup_name(item))
 
     def test_namespace_methods(self):
@@ -196,7 +196,7 @@ class TestSiteObject(DefaultSiteTestCase):
             self.assertLength(mysite.mediawiki_messages(months, lang1), 12)
             self.assertLength(mysite.mediawiki_messages(months, lang2), 12)
             familyname = mysite.family.name
-            if lang1 != lang2 and lang1 != familyname and lang2 != familyname:
+            if lang1 not in (lang2, familyname) and lang2 != familyname:
                 self.assertNotEqual(mysite.mediawiki_messages(months, lang1),
                                     mysite.mediawiki_messages(months, lang2))
 
@@ -294,6 +294,7 @@ class TestSiteObject(DefaultSiteTestCase):
 
 
 class TestLockingPage(DefaultSiteTestCase):
+
     """Test cases for lock/unlock a page within threads."""
 
     cached = True
@@ -1015,7 +1016,8 @@ class TestLinktrails(TestCase):
         small_wikis = self.site.family.languages_by_size[-size:]
         great_wikis = self.site.family.languages_by_size[:-size]
         great_wikis = random.sample(great_wikis, size)
-        for code in sorted(small_wikis + great_wikis):
+        # Also test for 'hr' which failed due to T378787
+        for code in {'hr', *small_wikis, *great_wikis}:
             site = pywikibot.Site(code, self.family)
             with self.subTest(site=site):
                 self.assertIsInstance(site.linktrail(), str)

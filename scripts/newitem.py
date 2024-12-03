@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-This script creates new items on Wikidata based on certain criteria.
+"""This script creates new items on Wikidata based on certain criteria.
 
 * When was the (Wikipedia) page created?
 * When was the last edit on the page?
@@ -182,8 +181,7 @@ class NewItemRobot(WikidataBot):
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

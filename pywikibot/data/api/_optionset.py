@@ -17,8 +17,7 @@ __all__ = ['OptionSet']
 
 class OptionSet(MutableMapping):
 
-    """
-    A class to store a set of options which can be either enabled or not.
+    """A class to store a set of options which can be either enabled or not.
 
     If it is instantiated with the associated site, module and parameter it
     will only allow valid names as options. If instantiated 'lazy loaded' it
@@ -95,8 +94,7 @@ class OptionSet(MutableMapping):
         self._site_set = True
 
     def from_dict(self, dictionary):
-        """
-        Load options from the dict.
+        """Load options from the dict.
 
         The options are not cleared before. If changes have been made
         previously, but only the dict values should be applied it needs to be
@@ -153,8 +151,7 @@ class OptionSet(MutableMapping):
             raise ValueError(f'Invalid value "{value}"')
 
     def __getitem__(self, name) -> bool | None:
-        """
-        Return whether the option is enabled.
+        """Return whether the option is enabled.
 
         :return: If the name has been set it returns whether it is enabled.
             Otherwise it returns None. If the site has been set it raises a

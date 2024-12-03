@@ -136,6 +136,7 @@ library_test_modules = {
     'uploadbot',
     'user',
     'version',
+    'wbtypes',
     'wikibase',
     'wikibase_edit',
     'wikiblame',
@@ -238,12 +239,12 @@ def collector(loader=unittest.loader.defaultTestLoader):
             discovered = loader.loadTestsFromName(module_class_name)
             enabled_tests = []
             for cls in discovered:
-                for test_func in cls:
-                    if test_func._testMethodName not in disabled_tests[module]:
-                        enabled_tests.append(
-                            module_class_name + '.'
-                            + test_func.__class__.__name__ + '.'
-                            + test_func._testMethodName)
+                enabled_tests += [
+                    f'{module_class_name}.{type(test_func).__name__}.'
+                    f'{test_func._testMethodName}'
+                    for test_func in cls
+                    if test_func._testMethodName not in disabled_tests[module]
+                ]
 
             test_list.extend(enabled_tests)
         else:

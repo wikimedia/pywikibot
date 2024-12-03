@@ -44,7 +44,7 @@ subdirectory.
    moved to :mod:`pywikibot.scripts` folder
 """
 #
-# (C) Pywikibot team, 2003-2023
+# (C) Pywikibot team, 2003-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -83,11 +83,11 @@ def _oauth_login(site) -> None:
     else:
         oauth_token = login_manager.consumer_token + login_manager.access_token
         pywikibot.info(
-            'Logged in on {site} as {username} via OAuth consumer {consumer}\n'
-            'NOTE: To use OAuth, you need to copy the  following line to your '
-            'user config file:\n authenticate[{hostname!r}] = {oauth_token}'
-            .format(site=site, username=site.username(), consumer=consumer_key,
-                    hostname=site.hostname(), oauth_token=oauth_token))
+            f'Logged in on {site} as {site.username()} via OAuth consumer '
+            f'{consumer_key}\nNOTE: To use OAuth, you need to copy the'
+            ' following line to your user config file:\n'
+            f'authenticate[{site.hostname()!r}] = {oauth_token}'
+        )
 
 
 def login_one_site(code, family, oauth, logout, autocreate):
@@ -95,9 +95,8 @@ def login_one_site(code, family, oauth, logout, autocreate):
     try:
         site = pywikibot.Site(code, family)
     except SiteDefinitionError:
-        pywikibot.error('{}:{} is not a valid site, '
-                        'please remove it from your user-config'
-                        .format(family, code))
+        pywikibot.error(f'{family}:{code} is not a valid site, '
+                        'please remove it from your user-config')
         return
 
     if oauth:
@@ -122,8 +121,7 @@ def login_one_site(code, family, oauth, logout, autocreate):
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
@@ -173,5 +171,5 @@ if __name__ == '__main__':
     start = datetime.datetime.now()
     with suppress(KeyboardInterrupt):
         main()
-    pywikibot.info('\nExecution time: {} seconds'
-                   .format((datetime.datetime.now() - start).seconds))
+    pywikibot.info('\nExecution time: '
+                   f'{(datetime.datetime.now() - start).seconds} seconds')

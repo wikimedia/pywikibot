@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-This bot is used for checking external links found at the wiki.
+"""This bot is used for checking external links found at the wiki.
 
 It checks several pages at once, with a limit set by the config variable
 max_external_links, which defaults to 50.
@@ -190,8 +189,7 @@ def weblinks_from_text(
     without_bracketed: bool = False,
     only_bracketed: bool = False
 ):
-    """
-    Yield web links from text.
+    """Yield web links from text.
 
     Only used as text predicate for XmlDumpPageGenerator to speed up
     generator.
@@ -323,8 +321,7 @@ class LinkCheckThread(threading.Thread):
 
 class History:
 
-    """
-    Store previously found dead links.
+    """Store previously found dead links.
 
     The URLs are dictionary keys, and
     values are lists of tuples where each tuple represents one time the URL was
@@ -366,16 +363,16 @@ class History:
             # no saved history exists yet, or history dump broken
             self.history_dict = {}
 
-    def log(self, url, error, containing_page, archive_url) -> None:
+    def log(self, url, containing_page, archive_url) -> None:
         """Log an error report to a text file in the deadlinks subdirectory."""
         if archive_url:
             error_report = f'* {url} ([{archive_url} archive])\n'
         else:
             error_report = f'* {url}\n'
-        for (page_title, date, error) in self.history_dict[url]:
+        for (page_title, date, err) in self.history_dict[url]:
             # ISO 8601 formulation
             iso_date = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(date))
-            error_report += f'** In [[{page_title}]] on {iso_date}, {error}\n'
+            error_report += f'** In [[{page_title}]] on {iso_date}, {err}\n'
         pywikibot.info('** Logging link for deletion.')
         txtfilename = pywikibot.config.datafilepath(
             'deadlinks',
@@ -414,13 +411,12 @@ class History:
                         pywikibot.warning(
                             f'get_closest_memento_url({url}) failed: {e}')
                         archive_url = None
-                    self.log(url, error, page, archive_url)
+                    self.log(url, page, archive_url)
             else:
                 self.history_dict[url] = [(page.title(), now, error)]
 
     def set_link_alive(self, url) -> bool:
-        """
-        Record that the link is now alive.
+        """Record that the link is now alive.
 
         If link was previously found dead, remove it from the .dat file.
 
@@ -441,8 +437,7 @@ class History:
 
 class DeadLinkReportThread(threading.Thread):
 
-    """
-    A Thread that is responsible for posting error reports on talk pages.
+    """A Thread that is responsible for posting error reports on talk pages.
 
     There is only one DeadLinkReportThread, and it is using a semaphore to make
     sure that two LinkCheckerThreads cannot access the queue at the same time.
@@ -536,8 +531,7 @@ class DeadLinkReportThread(threading.Thread):
 
 class WeblinkCheckerRobot(SingleSiteBot, ExistingPageBot):
 
-    """
-    Bot which will search for dead weblinks.
+    """Bot which will search for dead weblinks.
 
     It uses several LinkCheckThreads at once to process pages from generator.
     """
@@ -640,8 +634,7 @@ def RepeatPageGenerator():  # noqa: N802
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

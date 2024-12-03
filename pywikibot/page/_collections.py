@@ -25,8 +25,7 @@ __all__ = (
 
 class BaseDataDict(MutableMapping):
 
-    """
-    Base structure holding data for a Wikibase entity.
+    """Base structure holding data for a Wikibase entity.
 
     Data are mappings from a language to a value. It will be
     specialised in subclasses.
@@ -82,8 +81,7 @@ class BaseDataDict(MutableMapping):
 
 class LanguageDict(BaseDataDict):
 
-    """
-    A structure holding language data for a Wikibase entity.
+    """A structure holding language data for a Wikibase entity.
 
     Language data are mappings from a language to a string. It can be
     labels, descriptions and others.
@@ -133,8 +131,7 @@ class LanguageDict(BaseDataDict):
 
 class AliasesDict(BaseDataDict):
 
-    """
-    A structure holding aliases for a Wikibase entity.
+    """A structure holding aliases for a Wikibase entity.
 
     It is a mapping from a language to a list of strings.
     """
@@ -200,6 +197,7 @@ class AliasesDict(BaseDataDict):
 
 
 class ClaimCollection(MutableMapping):
+
     """A structure holding claims for a Wikibase entity."""
 
     def __init__(self, repo) -> None:
@@ -319,11 +317,11 @@ class ClaimCollection(MutableMapping):
 
 
 class SiteLinkCollection(MutableMapping):
+
     """A structure holding SiteLinks for a Wikibase item."""
 
     def __init__(self, repo, data=None) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param repo: the Wikibase site on which badges are defined
         :type repo: pywikibot.site.DataSite
@@ -346,8 +344,7 @@ class SiteLinkCollection(MutableMapping):
 
     @staticmethod
     def getdbName(site):
-        """
-        Helper function to obtain a dbName for a Site.
+        """Helper function to obtain a dbName for a Site.
 
         :param site: The site to look up.
         :type site: pywikibot.site.BaseSite or str
@@ -357,8 +354,7 @@ class SiteLinkCollection(MutableMapping):
         return site
 
     def __getitem__(self, key):
-        """
-        Get the SiteLink with the given key.
+        """Get the SiteLink with the given key.
 
         :param key: site key as Site instance or db key
         :type key: pywikibot.Site or str
@@ -380,8 +376,7 @@ class SiteLinkCollection(MutableMapping):
         key: str | pywikibot.site.APISite,
         val: str | dict[str, Any] | pywikibot.page.SiteLink,
     ) -> None:
-        """
-        Set the SiteLink for a given key.
+        """Set the SiteLink for a given key.
 
         This only sets the value given as str, dict or SiteLink. If a
         str or dict is given the SiteLink object is created later in
@@ -424,8 +419,7 @@ class SiteLinkCollection(MutableMapping):
 
     @classmethod
     def normalizeData(cls, data) -> dict:
-        """
-        Helper function to expand data into the Wikibase API structure.
+        """Helper function to expand data into the Wikibase API structure.
 
         :param data: Data to normalize
         :type data: list or dict
@@ -450,14 +444,13 @@ class SiteLinkCollection(MutableMapping):
                 if not isinstance(json, dict):
                     raise ValueError(
                         "Couldn't determine the site and title of the value: "
-                        '{!r}'.format(json))
+                        f'{json!r}')
                 db_name = json['site']
                 norm_data[db_name] = json
         return norm_data
 
     def toJSON(self, diffto: dict | None = None) -> dict:
-        """
-        Create JSON suitable for Wikibase API.
+        """Create JSON suitable for Wikibase API.
 
         When diffto is provided, JSON representing differences
         to the provided data is created.
@@ -501,8 +494,7 @@ class SubEntityCollection(MutableSequence):
     """Ordered collection of sub-entities indexed by their ids."""
 
     def __init__(self, repo, data=None):
-        """
-        Initializer.
+        """Initializer.
 
         :param repo: Wikibase site
         :type repo: pywikibot.site.DataSite
@@ -519,11 +511,10 @@ class SubEntityCollection(MutableSequence):
     def _validate_isinstance(self, obj):
         if not isinstance(obj, self.type_class):
             raise TypeError(
-                '{} should only hold instances of {}, '
-                'instance of {} was provided'
-                .format(self.__class__.__name__,
-                        self.type_class.__name__,
-                        obj.__class__.__name__))
+                f'{type(self).__name__} should only hold instances of '
+                f'{self.type_class.__name__}, instance of '
+                f'{type(obj).__name__} was provided'
+            )
 
     def __getitem__(self, index):
         if isinstance(index, str):
@@ -570,8 +561,7 @@ class SubEntityCollection(MutableSequence):
 
     @classmethod
     def normalizeData(cls, data: list) -> dict:
-        """
-        Helper function to expand data into the Wikibase API structure.
+        """Helper function to expand data into the Wikibase API structure.
 
         :param data: Data to normalize
         :type data: list
@@ -581,8 +571,7 @@ class SubEntityCollection(MutableSequence):
         raise NotImplementedError  # TODO
 
     def toJSON(self, diffto: dict | None = None) -> dict:
-        """
-        Create JSON suitable for Wikibase API.
+        """Create JSON suitable for Wikibase API.
 
         When diffto is provided, JSON representing differences
         to the provided data is created.

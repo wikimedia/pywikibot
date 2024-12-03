@@ -262,8 +262,7 @@ class UploadError(APIError):
     def __init__(self, code: str, message: str,
                  file_key: str | None = None,
                  offset: int | bool = 0) -> None:
-        """
-        Create a new UploadError instance.
+        """Create a new UploadError instance.
 
         :param file_key: The file_key of the uploaded file to reuse it later.
             If no key is known or it is an incomplete file it may be None.
@@ -282,8 +281,7 @@ class UploadError(APIError):
 
 class PageRelatedError(Error):
 
-    """
-    Abstract Exception, used when the exception concerns a particular Page.
+    """Abstract Exception, used when the exception concerns a particular Page.
 
     This class should be used when the Exception concerns a particular
     Page, and when a generic message can be written once for all.
@@ -295,8 +293,7 @@ class PageRelatedError(Error):
 
     def __init__(self, page: pywikibot.page.BasePage,
                  message: str | None = None) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param page: Page that caused the exception
         """
@@ -479,8 +476,7 @@ class CircularRedirectError(PageRelatedError):
 
 class InterwikiRedirectPageError(PageRelatedError):
 
-    """
-    Page is a redirect to another site.
+    """Page is a redirect to another site.
 
     This is considered invalid in Pywikibot. See bug :phab:`T75184`.
 
@@ -699,8 +695,7 @@ class NoWikibaseEntityError(WikiBaseError):
     """This entity doesn't exist."""
 
     def __init__(self, entity: pywikibot.page.WikibaseEntity) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param entity: Wikibase entity
         """

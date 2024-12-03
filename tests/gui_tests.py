@@ -84,10 +84,18 @@ def setUpModule():
 
     # pypy3 has a tkinter module which just raises importError if _tkinter
     # is not installed; thus require_modules does not work for it.
+    # pypy3.10 has a version mismatch, see T380732.
     try:
         import tkinter
     except ImportError as e:
         raise unittest.SkipTest(e)
+
+    try:
+        dialog = tkinter.Tk()
+    except RuntimeError as e:
+        raise unittest.SkipTest(f'Skipping due to T380732 - {e}')
+    else:
+        dialog.destroy()
 
     from pywikibot.userinterfaces.gui import EditBoxWindow, Tkdialog
 

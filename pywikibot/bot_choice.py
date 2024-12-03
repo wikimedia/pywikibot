@@ -46,8 +46,7 @@ if TYPE_CHECKING:
 
 class Option(ABC):
 
-    """
-    A basic option for input_choice.
+    """A basic option for input_choice.
 
     The following methods need to be implemented:
 
@@ -97,8 +96,7 @@ class Option(ABC):
         return self._stop
 
     def handled(self, value: str) -> Option | None:
-        """
-        Return the Option object that applies to the given value.
+        """Return the Option object that applies to the given value.
 
         If this Option object doesn't know which applies it returns None.
         """
@@ -167,8 +165,7 @@ class StandardOption(Option):
     """An option with a description and shortcut and returning the shortcut."""
 
     def __init__(self, option: str, shortcut: str, **kwargs: Any) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param option: option string
         :param shortcut: Shortcut of the option
@@ -184,9 +181,8 @@ class StandardOption(Option):
         if self.shortcut == default:
             shortcut = self.shortcut.upper()
         if index >= 0:
-            return '{}[{}]{}'.format(
-                self.option[:index], shortcut,
-                self.option[index + len(self.shortcut):])
+            return (f'{self.option[:index]}[{shortcut}]'
+                    f'{self.option[index + len(self.shortcut):]}')
         return f'{self.option} [{shortcut}]'
 
     def result(self, value: str) -> Any:
@@ -217,8 +213,7 @@ class OutputProxyOption(OutputOption, StandardOption):
 
 class NestedOption(OutputOption, StandardOption):
 
-    """
-    An option containing other options.
+    """An option containing other options.
 
     It will return True in test if this option applies but False if a sub
     option applies while handle returns the sub option.
@@ -355,14 +350,13 @@ class LinkChoice(Choice):
                     kwargs['label'] += '#' + self.replacer._new.section
             else:
                 kwargs['label'] = self.replacer._new.anchor
+        elif self.replacer.current_link.anchor is None:
+            kwargs['label'] = self.replacer.current_groups['title']
+            if self.replacer.current_groups['section']:
+                kwargs['label'] += '#' \
+                    + self.replacer.current_groups['section']
         else:
-            if self.replacer.current_link.anchor is None:
-                kwargs['label'] = self.replacer.current_groups['title']
-                if self.replacer.current_groups['section']:
-                    kwargs['label'] += '#' \
-                        + self.replacer.current_groups['section']
-            else:
-                kwargs['label'] = self.replacer.current_link.anchor
+            kwargs['label'] = self.replacer.current_link.anchor
         return pywikibot.Link.create_separated(
             self.replacer._new.canonical_title(), self.replacer._new.site,
             **kwargs)
@@ -596,11 +590,9 @@ class HighlightContextOption(ContextOption):
         """Highlighted output section of the text."""
         start = max(0, self.start - self.context)
         end = min(len(self.text), self.end + self.context)
-        return '{}<<{color}>>{}<<default>>{}'.format(
-            self.text[start:self.start],
-            self.text[self.start:self.end],
-            self.text[self.end:end],
-            color=self.color)
+        return (f'{self.text[start:self.start]}<<{self.color}>>'
+                f'{self.text[self.start:self.end]}<<default>>'
+                f'{self.text[self.end:end]}')
 
 
 class UnhandledAnswer(Exception):  # noqa: N818
@@ -779,8 +771,8 @@ class InteractiveReplace:
         if self._new is False:
             question += 'be unlinked?'
         else:
-            question += 'target to <<lightpurple>>{}<<default>>?'.format(
-                self._new.canonical_title())
+            question += (f'target to <<lightpurple>>'
+                         f'{self._new.canonical_title()}<<default>>?')
 
         choice = pywikibot.input_choice(question, choices,
                                         default=self._default,

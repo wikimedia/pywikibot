@@ -429,8 +429,6 @@ FINAL_NEW_TEXT_ADDITIONS = {
     'zh': '<small>(via ~~~)</small>',
 }
 
-#
-#
 LOGPAGE_HEADER = {
     '_default': '{|border="2" cellpadding="4" cellspacing="0" style="margin: '
                 '0.5em 0.5em 0.5em 1em; padding: 0.5em; background: #bfcda5; '
@@ -754,7 +752,7 @@ class WelcomeBot(SingleSiteBot):
             return self._random_signature
 
         sign_text = ''
-        creg = re.compile(r'^\* ?(.*?)$', re.M)
+        creg = re.compile(r'^\* ?(.*?)$', re.MULTILINE)
         if not globalvar.sign_file_name:
             sign_page_name = i18n.translate(self.site, RANDOM_SIGN)
             if not sign_page_name:

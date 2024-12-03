@@ -1,6 +1,21 @@
 Release History
 ===============
 
+9.5.0
+-----
+*30 October 2024*
+
+* Add support for tcywikisource and tcywiktionary (:phab:`T378473`, :phab:`T378465`)
+* i18n-updates
+* Update invisible chars in :mod:`tools.chars` from unicode 16.0.0
+* Rename :meth:`DataSite.getPropertyType()<pywikibot.site._datasite.DataSite.getPropertyType>`
+  to :meth:`DataSite.get_property_type()<pywikibot.site._datasite.DataSite.get_property_type>`
+* provide XXXI with :func:`date.romanNumToInt` and :func:`date.intToRomanNum` functions
+* No longer raise :exc:`exceptions.UnsupportedPageError` within :meth:`data.api.PageGenerator.result` (:phab:`T377651`)
+* Extract messages with strong tag from xtools as error message in
+  :meth:`Page.authorship()<page._toolforge.WikiBlameMixin.authorship>` (:phab:`T376815`)
+
+
 9.4.1
 -----
 *15 October 2024*
@@ -652,7 +667,7 @@ Release History
 * Raise InvalidTitleError instead of unspecific ValueError in ProofreadPage (:phab:`T308016`)
 * Preload pages if GeneratorFactory.articlenotfilter_list is not empty; also set attribute ``is_preloading``.
 * ClaimCollection.toJSON() should not ignore new claim (:phab:`T308245`)
-* use linktrail via siteinfo and remove `update_linkrtrails` maintenance script
+* use linktrail via siteinfo and remove `update_linktrails` maintenance script
 * Print counter statistic for all counters (:phab:`T307834`)
 * Use proofreadpagesinindex query module
 * Prioritize -namespaces options in `pagegenerators.handle_args` (:phab:`T222519`)

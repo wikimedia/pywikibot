@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Used to find expensive templates that are subject to be converted to Lua.
+"""Used to find expensive templates that are subject to be converted to Lua.
 
 It counts parser functions and then orders templates by number of these
 and uploads the first n titles or alternatively templates having count()>n.
@@ -59,7 +58,7 @@ from pywikibot import pagegenerators
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 
 
-# Todo:
+# TODO:
 # * Using xml and xmlstart
 # * Using categories
 # * Error handling for uploading (anyway, that's the last action, it's only

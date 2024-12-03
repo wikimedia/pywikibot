@@ -66,8 +66,7 @@ class GeneratorsMixin:
         self,
         pageids: str | Iterable[int | str],
     ) -> Generator[pywikibot.Page, None, None]:
-        """
-        Return a page generator from pageids.
+        """Return a page generator from pageids.
 
         Pages are iterated in the same order than in the underlying pageids.
 
@@ -210,9 +209,9 @@ class GeneratorsMixin:
                         # This checks to see if there is a normalized title in
                         # the response that corresponds to the canonical form
                         # used in the query.
-                        for key in cache:
+                        for key, value in cache.items():
                             if self.sametitle(key, pagedata['title']):
-                                cache[pagedata['title']] = cache[key]
+                                cache[pagedata['title']] = value
                                 break
                         else:
                             pywikibot.warning(
@@ -387,8 +386,7 @@ class GeneratorsMixin:
         total: int | None = None,
         content: bool = False,
     ) -> Iterable[pywikibot.Page]:
-        """
-        Convenience method combining pagebacklinks and page_embeddedin.
+        """Convenience method combining pagebacklinks and page_embeddedin.
 
         :param namespaces: If present, only return links from the namespaces
             in this list.
@@ -453,21 +451,32 @@ class GeneratorsMixin:
                                g_content=content, redirects=follow_redirects,
                                **plargs)
 
-    # Sortkey doesn't work with generator
     def pagecategories(
         self,
         page: pywikibot.Page,
         *,
+        with_sort_key: bool = False,
         total: int | None = None,
         content: bool = False,
     ) -> Iterable[pywikibot.Page]:
         """Iterate categories to which page belongs.
 
-        .. seealso:: :api:`Categories`
+        .. versionadded:: 9.6
+           the *with_sort_key* parameter.
 
-        :param content: if True, load the current content of each iterated page
-            (default False); note that this means the contents of the
-            category description page, not the pages contained in the category
+        .. seealso::
+           - :meth:`page.BasePage.categories`
+           - :api:`Categories`
+
+        .. note:: This method also yields categories which are
+           transcluded.
+
+        :param with_sort_key: if True, include the sort key in each
+            Category
+        :param content: if True, load the current content of each
+            iterated page default False); note that this means the
+            contents of the category description page, not the pages
+            contained in the category
         """
         clargs: dict[str, Any] = {}
         if hasattr(page, '_pageid'):
@@ -475,9 +484,27 @@ class GeneratorsMixin:
         else:
             clargs['titles'] = page.title(
                 with_section=False).encode(self.encoding())
+
+        if with_sort_key:
+            page_dict = next(iter(self._generator(
+                api.PropertyGenerator,
+                type_arg='categories',
+                total=total,
+                clprop='sortkey',
+                **clargs)))
+            cats = (
+                pywikibot.Category(self,
+                                   cat_dict['title'],
+                                   sort_key=cat_dict['sortkeyprefix'] or None)
+                for cat_dict in page_dict.get('categories', [])
+            )
+            return self.preloadpages(cats) if content else cats
+
         return self._generator(api.PageGenerator,
-                               type_arg='categories', total=total,
-                               g_content=content, **clargs)
+                               type_arg='categories',
+                               total=total,
+                               g_content=content,
+                               **clargs)
 
     def pageimages(
         self,
@@ -1791,8 +1818,7 @@ class GeneratorsMixin:
         total: int | None = None,
         **kwargs,
     ) -> Generator[dict[str, Any], None, None]:
-        """
-        Yield all deleted revisions.
+        """Yield all deleted revisions.
 
         .. seealso:: :api:`Alldeletedrevisions`
         .. warning:: *user* keyword argument must be given together with
@@ -1987,8 +2013,9 @@ class GeneratorsMixin:
                 if err.code in self._patrol_errors:
                     raise Error(self._patrol_errors[err.code]
                                 .format_map(errdata))
-                pywikibot.debug("protect: Unexpected error code '{}' received."
-                                .format(err.code))
+                pywikibot.debug(
+                    f"protect: Unexpected error code '{err.code}' received."
+                )
                 raise
 
             yield result['patrol']

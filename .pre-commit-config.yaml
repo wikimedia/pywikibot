@@ -29,9 +29,7 @@ repos:
       - id: destroyed-symlinks
       - id: end-of-file-fixer
       - id: fix-byte-order-marker
-      - id: fix-encoding-pragma
-        args:
-          - --remove
+        exclude: '^tests/data/'
       - id: forbid-new-submodules
       - id: mixed-line-ending
       - id: pretty-format-json
@@ -39,6 +37,7 @@ repos:
           - --autofix
           - --indent=4
           - --no-ensure-ascii
+        exclude: pywikibot/scripts/i18n/pywikibot/
       - id: trailing-whitespace
         args:
           - --markdown-linebreak-ext=rst
@@ -50,6 +49,12 @@ repos:
       - id: python-check-blanket-type-ignore
       - id: python-check-mock-methods
       - id: python-use-type-annotations
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.0
+    hooks:
+      - id: ruff
+        args:
+        - --fix
   - repo: https://github.com/asottile/pyupgrade
     rev: v3.19.0
     hooks:
@@ -72,6 +77,11 @@ repos:
     hooks:
       - id: isort
         exclude: '^pwb\.py$'
+  - repo: https://github.com/jshwi/docsig
+    rev: v0.65.0
+    hooks:
+      - id: docsig
+        exclude: ^(tests|scripts)
   - repo: https://github.com/PyCQA/flake8
     rev: 7.1.1
     hooks:
@@ -80,15 +90,11 @@ repos:
           - --doctests
         additional_dependencies:
           # Due to incompatibilities between packages the order matters.
-          - darglint2
-          - pydocstyle==6.3.0  # deprecated and no longer maintained
           - flake8-bugbear!=24.1.17
           - flake8-comprehensions>=3.13.0
-          - flake8-docstrings>=1.4.0
           - flake8-mock-x2
           - flake8-print>=5.0.0
           - flake8-quotes>=3.3.2
           - flake8-raise
           - flake8-tuple>=0.4.1
-          - flake8-no-u-prefixed-strings>=0.2
           - pep8-naming>=0.13.3

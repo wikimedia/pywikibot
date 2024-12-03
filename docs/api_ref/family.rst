@@ -4,6 +4,7 @@
 
 .. automodule:: family
    :synopsis: Objects representing MediaWiki families
+   :exclude-members: Family
 
    .. autoclass:: Family
 

@@ -377,17 +377,16 @@ class Family:
         # codes can accept also underscore/dash.
         if not all(x in NAME_CHARACTERS for x in cls.name):
             warnings.warn(
-                'Name of family {} must be ASCII letters and digits '
-                '[a-zA-Z0-9]'.format(cls.name),
+                f'Name of family {cls.name} must be ASCII letters and digits'
+                ' [a-zA-Z0-9]',
                 FamilyMaintenanceWarning,
                 stacklevel=2,
             )
         for code in cls.langs:
             if not all(x in CODE_CHARACTERS for x in code):
                 warnings.warn(
-                    'Family {} code {} must be ASCII lowercase letters and '
-                    'digits [a-z0-9] or underscore/dash [_-]'
-                    .format(cls.name, code),
+                    f'Family {cls.name} code {code} must be ASCII lowercase'
+                    ' letters and digits [a-z0-9] or underscore/dash [_-]',
                     FamilyMaintenanceWarning,
                     stacklevel=2,
                 )
@@ -482,8 +481,7 @@ class Family:
         return 'https'
 
     def verify_SSL_certificate(self, code: str) -> bool:
-        """
-        Return whether a HTTPS certificate should be verified.
+        """Return whether a HTTPS certificate should be verified.
 
         .. versionadded:: 5.3
            renamed from ignore_certificate_error
@@ -535,8 +533,7 @@ class Family:
         return protocol, host
 
     def base_url(self, code: str, uri: str, protocol=None) -> str:
-        """
-        Prefix uri with port and hostname.
+        """Prefix uri with port and hostname.
 
         :param code: The site code
         :param uri: The absolute path after the hostname
@@ -712,8 +709,7 @@ class Family:
         return True
 
     def post_get_convert(self, site, getText):
-        """
-        Do a conversion on the retrieved text from the Wiki.
+        """Do a conversion on the retrieved text from the Wiki.
 
         For example a :wiki:`X-conversion in Esperanto
         <Esperanto_orthography#X-system>`.
@@ -721,8 +717,7 @@ class Family:
         return getText
 
     def pre_put_convert(self, site, putText):
-        """
-        Do a conversion on the text to insert on the Wiki.
+        """Do a conversion on the text to insert on the Wiki.
 
         For example a :wiki:`X-conversion in Esperanto
         <Esperanto_orthography#X-system>`.
@@ -731,8 +726,7 @@ class Family:
 
     @property
     def obsolete(self) -> types.MappingProxyType[str, str | None]:
-        """
-        Old codes that are not part of the family.
+        """Old codes that are not part of the family.
 
         Interwiki replacements override removals for the same code.
 
@@ -744,8 +738,7 @@ class Family:
 
     @classproperty
     def domains(cls) -> set[str]:
-        """
-        Get list of unique domain names included in this family.
+        """Get list of unique domain names included in this family.
 
         These domains may also exist in another family.
         """
@@ -1165,8 +1158,7 @@ class DefaultWikibaseFamily(WikibaseFamily):
 
 
 def AutoFamily(name: str, url: str) -> SingleSiteFamily:
-    """
-    Family that automatically loads the site configuration.
+    """Family that automatically loads the site configuration.
 
     :param name: Name for the family
     :param url: API endpoint URL of the wiki

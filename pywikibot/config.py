@@ -1,5 +1,4 @@
-"""
-Module to define and load pywikibot configuration default and user preferences.
+"""Module to define pywikibot configuration default and user preferences.
 
 User preferences are loaded from a python file called `user-config.py`,
 which may be located in directory specified by the environment variable
@@ -398,9 +397,10 @@ def get_base_dir(test_directory: str | None = None,
         if __no_user_config is None:
             assert get_base_dir.__doc__ is not None
             exc_text += (
-                '\nPlease check that {0} is stored in the correct location.'
-                '\nDirectory where {0} is searched is determined as follows:'
-                '\n\n    '.format(config_file)
+                f'\nPlease check that {config_file} is stored in the correct'
+                ' location.'
+                f'\nDirectory where {config_file} is searched is determined as'
+                ' follows:\n\n    '
             ) + get_base_dir.__doc__
             raise RuntimeError(exc_text)
 
@@ -998,9 +998,10 @@ def _assert_types(
 
 
 DEPRECATED_VARIABLE = (
-    '"{{}}" present in our {} is no longer a supported configuration variable '
-    'and should be removed. Please inform the maintainers if you depend on it.'
-    .format(user_config_file))
+    f'"{{}}" present in our {user_config_file} is no longer a supported'
+    ' configuration variable and should be removed. Please inform the'
+    ' maintainers if you depend on it.'
+)
 
 
 def _check_user_config_types(
@@ -1026,10 +1027,10 @@ def _check_user_config_types(
                 warn('\n' + fill(DEPRECATED_VARIABLE.format(name)),
                      _ConfigurationDeprecationWarning)
             elif name not in _future_variables:
-                warn('\n' + fill('Configuration variable "{}" is defined in '
-                                 'your {} but unknown. It can be a misspelled '
-                                 'one or a variable that is no longer '
-                                 'supported.'.format(name, user_config_file)),
+                warn('\n' + fill(f'Configuration variable "{name}" is defined '
+                                 f'in your {user_config_file} but unknown. It'
+                                 ' can be a misspelled one or a variable that'
+                                 ' is no longer supported.'),
                      UserWarning)
 
 

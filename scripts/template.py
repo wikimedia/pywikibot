@@ -134,8 +134,7 @@ class TemplateRobot(ReplaceBot):
     }
 
     def __init__(self, generator, templates: dict, **kwargs) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param generator: the pages to work on
         :type generator: iterable
@@ -209,8 +208,7 @@ class TemplateRobot(ReplaceBot):
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 
@@ -257,10 +255,9 @@ def main(*args: str) -> None:
             skip = True
         elif arg.startswith('-timestamp:'):
             timestamp = arg[len('-timestamp:'):]
-        else:
-            if not gen_factory.handle_arg(arg):
-                template_name = pywikibot.Page(site, arg, ns=10)
-                template_names.append(template_name.title(with_ns=False))
+        elif not gen_factory.handle_arg(arg):
+            template_name = pywikibot.Page(site, arg, ns=10)
+            template_names.append(template_name.title(with_ns=False))
 
     if not template_names:
         pywikibot.bot.suggest_help(missing_parameters=['templates'])

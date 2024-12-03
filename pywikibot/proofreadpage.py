@@ -58,6 +58,7 @@ else:
 
 
 class TagAttr:
+
     """Tag attribute of <pages />.
 
     Represent a single attribute. It is used internally in
@@ -164,6 +165,7 @@ class TagAttr:
 
 
 class TagAttrDesc:
+
     """A descriptor tag.
 
     .. versionadded:: 8.0
@@ -192,6 +194,7 @@ class TagAttrDesc:
 
 
 class PagesTagParser(collections.abc.Container):
+
     """Parser for tag ``<pages />``.
 
     .. seealso::
@@ -439,13 +442,13 @@ class ProofreadPage(pywikibot.Page):
             site = source
         super().__init__(source, title)
         if self.namespace() != site.proofread_page_ns:
-            raise ValueError('Page {} must belong to {} namespace'
-                             .format(self.title(), site.proofread_page_ns))
+            raise ValueError(f'Page {self.title()} must belong to '
+                             f'{site.proofread_page_ns} namespace')
         # Ensure that constants are in line with Extension values.
         level_list = list(self.site.proofread_levels)
         if level_list != self.PROOFREAD_LEVELS:
-            raise ValueError('QLs do not match site values: {} != {}'
-                             .format(level_list, self.PROOFREAD_LEVELS))
+            raise ValueError(f'QLs do not match site values: {level_list} != '
+                             f'{self.PROOFREAD_LEVELS}')
 
         self._base, self._base_ext, self._num = self._parse_title()
         self._multi_page = self._base_ext in self._MULTI_PAGE_EXT
@@ -584,8 +587,8 @@ class ProofreadPage(pywikibot.Page):
     @decompose
     def ql(self, value: int) -> None:
         if value not in self.site.proofread_levels:
-            raise ValueError('Not valid QL value: {} (legal values: {})'
-                             .format(value, list(self.site.proofread_levels)))
+            raise ValueError(f'Not valid QL value: {value} (legal values: '
+                             f'{list(self.site.proofread_levels)})')
         # TODO: add logic to validate ql value change, considering
         # site.proofread_levels.
         self._full_header.ql = value
@@ -608,8 +611,10 @@ class ProofreadPage(pywikibot.Page):
         try:
             return self.site.proofread_levels[self.ql]
         except KeyError:
-            pywikibot.warning('Not valid status set for {}: quality level = {}'
-                              .format(self.title(as_link=True), self.ql))
+            pywikibot.warning(
+                f'Not valid status set for {self.title(as_link=True)}: '
+                f'quality level = {self.ql}'
+            )
         return None
 
     def without_text(self) -> None:
@@ -1044,8 +1049,8 @@ class IndexPage(pywikibot.Page):
             site = source
         super().__init__(source, title)
         if self.namespace() != site.proofread_index_ns:
-            raise ValueError('Page {} must belong to {} namespace'
-                             .format(self.title(), site.proofread_index_ns))
+            raise ValueError(f'Page {self.title()} must belong to '
+                             f'{site.proofread_index_ns} namespace')
 
         self._all_page_links = {}
 
@@ -1091,8 +1096,7 @@ class IndexPage(pywikibot.Page):
         return None
 
     def save(self, *args: Any, **kwargs: Any) -> None:  # See Page.save().
-        """
-        Save page after validating the content.
+        """Save page after validating the content.
 
         Trying to save any other content fails silently with a parameterless
         INDEX_TEMPLATE being saved.
@@ -1179,7 +1183,8 @@ class IndexPage(pywikibot.Page):
             if not self._soup.find_all('a', attrs=attrs):
                 raise ValueError(
                     'Missing class="qualityN prp-pagequality-N" or '
-                    'class="new" in: {}.'.format(self))
+                    f'class="new" in: {self}.'
+                )
 
         page_cnt = 0
         for a_tag in self._soup.find_all('a', attrs=attrs):
@@ -1265,8 +1270,8 @@ class IndexPage(pywikibot.Page):
             end = self.num_pages
 
         if not 1 <= start <= end <= self.num_pages:
-            raise ValueError('start={}, end={} are not in valid range (1, {})'
-                             .format(start, end, self.num_pages))
+            raise ValueError(f'start={start}, end={end} are not in valid '
+                             f'range (1, {self.num_pages})')
 
         # All but 'Without Text'
         if filter_ql is None:

@@ -1,5 +1,4 @@
-"""
-This module can do slight modifications to tidy a wiki page's source code.
+"""This module can do slight modifications to tidy a wiki page's source code.
 
 The changes are not supposed to change the look of the rendered wiki page.
 
@@ -319,8 +318,9 @@ class CosmeticChangesToolkit:
             new_text = self._change(text)
         except Exception as e:
             if self.ignore == CANCEL.PAGE:
-                pywikibot.warning('Skipped "{}", because an error occurred.'
-                                  .format(self.title))
+                pywikibot.warning(
+                    f'Skipped "{self.title}", because an error occurred.'
+                )
                 pywikibot.error(e)
                 return False
             raise
@@ -330,14 +330,14 @@ class CosmeticChangesToolkit:
         return new_text
 
     def fixSelfInterwiki(self, text: str) -> str:
-        """
-        Interwiki links to the site itself are displayed like local links.
+        """Interwiki links to the site itself are displayed like local links.
 
         Remove their language code prefix.
         """
         if not self.talkpage and pywikibot.calledModuleName() != 'interwiki':
-            interwikiR = re.compile(r'\[\[(?: *:)? *{} *: *([^\[\]\n]*)\]\]'
-                                    .format(self.site.code))
+            interwikiR = re.compile(
+                rf'\[\[(?: *:)? *{self.site.code} *: *([^\[\]\n]*)\]\]'
+            )
             text = interwikiR.sub(r'[[\1]]', text)
         return text
 
@@ -462,9 +462,8 @@ class CosmeticChangesToolkit:
                               else 'User talk']
             # lowerspaced and underscored namespaces
             for i, item in enumerate(namespaces):
-                item = item.replace(' ', '[ _]')
-                item = f'[{item[0]}{item[0].lower()}]' + item[1:]
-                namespaces[i] = item
+                ns = item.replace(' ', '[ _]')
+                namespaces[i] = f'[{ns[0]}{ns[0].lower()}]{ns[1:]}'
             namespaces.append(first_lower(final_ns))
             if final_ns and namespaces:
                 if (self.site.sitename == 'wikipedia:pt'
@@ -529,7 +528,7 @@ class CosmeticChangesToolkit:
         exceptions = ['comment', 'nowiki', 'pre', 'syntaxhighlight']
         regex = re.compile(
             FILE_LINK_REGEX % '|'.join(self.site.namespaces[6]),
-            flags=re.X)
+            flags=re.VERBOSE)
         return textlib.replaceExcept(
             text, regex, replace_magicword, exceptions)
 
@@ -642,8 +641,8 @@ class CosmeticChangesToolkit:
             # instead of a pipelink
             elif (firstcase_label.startswith(firstcase_title)
                   and trailR.sub('', label[len(titleWithSection):]) == ''):
-                newLink = '[[{}]]{}'.format(label[:len(titleWithSection)],
-                                            label[len(titleWithSection):])
+                newLink = (f'[[{label[:len(titleWithSection)]}]]'
+                           f'{label[len(titleWithSection):]}')
 
             else:
                 # Try to capitalize the first letter of the title.
@@ -729,7 +728,7 @@ class CosmeticChangesToolkit:
         if self.site.code in skip_templates:
             for template in skip_templates[self.site.code]:
                 skip_regexes.append(
-                    re.compile(r'\{\{\s*%s\s*\}\}' % template, re.I))
+                    re.compile(r'\{\{\s*%s\s*\}\}' % template, re.IGNORECASE))
         # empty lists
         skip_regexes.append(re.compile(r'(?m)^[\*#] *$'))
 
@@ -767,8 +766,7 @@ class CosmeticChangesToolkit:
         return text
 
     def removeNonBreakingSpaceBeforePercent(self, text: str) -> str:
-        """
-        Remove a non-breaking space between number and percent sign.
+        """Remove a non-breaking space between number and percent sign.
 
         Newer MediaWiki versions automatically place a non-breaking space in
         front of a percent sign, so it is no longer required to place it
@@ -779,8 +777,7 @@ class CosmeticChangesToolkit:
         return text
 
     def cleanUpSectionHeaders(self, text: str) -> str:
-        """
-        Add a space between the equal signs and the section title.
+        """Add a space between the equal signs and the section title.
 
         Example::
 
@@ -805,8 +802,7 @@ class CosmeticChangesToolkit:
             ['comment', 'math', 'nowiki', 'pre'])
 
     def putSpacesInLists(self, text: str) -> str:
-        """
-        Add a space between the * or # and the text.
+        """Add a space between the * or # and the text.
 
         .. note:: This space is recommended in the syntax help on the
            English, German and French Wikipedias. It might be that it
@@ -896,9 +892,8 @@ class CosmeticChangesToolkit:
 
                 # Match first a non space in the title to prevent that multiple
                 # spaces at the end without title will be matched by it
-                title_regex = (r'(?P<link>[^{sep}]+?)'
-                               r'(\s+(?P<title>[^\s].*?))'
-                               .format(sep=separator))
+                title_regex = (rf'(?P<link>[^{separator}]+?)'
+                               r'(\s+(?P<title>[^\s].*?))')
                 url_regex = fr'\[\[?{url}?\s*\]\]?'
                 text = textlib.replaceExcept(
                     text,
@@ -1048,8 +1043,7 @@ class CosmeticChangesToolkit:
         faChrs = 'ءاآأإئؤبپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیةيك' + digits['fa']
 
         # not to let bot edits in latin content
-        exceptions.append(re.compile('[^{fa}] *?"*? *?, *?[^{fa}]'
-                                     .format(fa=faChrs)))
+        exceptions.append(re.compile(f'[^{faChrs}] *?"*? *?, *?[^{faChrs}]'))
         text = textlib.replaceExcept(text, ',', '،', exceptions,
                                      site=self.site)
         if self.site.code == 'ckb':
@@ -1069,8 +1063,7 @@ class CosmeticChangesToolkit:
         return text
 
     def commonsfiledesc(self, text: str) -> str:
-        """
-        Clean up file descriptions on Wikimedia Commons.
+        """Clean up file descriptions on Wikimedia Commons.
 
         It works according to [1] and works only on pages in the file
         namespace on Wikimedia Commons.

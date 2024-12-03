@@ -13,7 +13,7 @@ from contextlib import suppress
 import pywikibot
 from pywikibot import Link
 from scripts import interwikidata
-from tests.aspects import SiteAttributeTestCase
+from tests.aspects import AlteredDefaultSiteTestCase, SiteAttributeTestCase
 from tests.utils import empty_sites
 
 
@@ -31,10 +31,10 @@ class DummyBot(interwikidata.IWBot):
 
     def try_to_add(self):
         """Prevent adding sitelinks to items."""
-        return None
+        return
 
 
-class TestInterwikidataBot(SiteAttributeTestCase):
+class TestInterwikidataBot(AlteredDefaultSiteTestCase, SiteAttributeTestCase):
 
     """Test Interwikidata."""
 
@@ -53,10 +53,13 @@ class TestInterwikidataBot(SiteAttributeTestCase):
         },
     }
 
-    def test_main(self):
+    def test_main(self, key):
         """Test main function interwikidata.py."""
-        # The default site is used here
-        if pywikibot.Site().has_data_repository:
+        site = self.get_site(key)
+        pywikibot.config.family = site.family
+        pywikibot.config.mylang = site.code
+
+        if site.has_data_repository:
             with empty_sites():
                 # The main function return None.
                 self.assertIsNone(interwikidata.main())

@@ -38,6 +38,7 @@ global_expected_params = {
 
 
 class TestSiteGenerators(DefaultSiteTestCase):
+
     """Test cases for Site methods."""
 
     cached = True
@@ -709,6 +710,7 @@ class TestUnconnectedPages(DefaultSiteTestCase):
 
 
 class TestSiteGeneratorsUsers(DefaultSiteTestCase):
+
     """Test cases for Site methods with users."""
 
     cached = True

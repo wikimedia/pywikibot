@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Site upload test.
+"""Site upload test.
 
 These tests write to the wiki.
 """

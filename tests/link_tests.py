@@ -59,8 +59,7 @@ class TestCreateSeparated(DefaultDrySiteTestCase):
 
 class TestLink(DefaultDrySiteTestCase):
 
-    """
-    Test parsing links with DrySite.
+    """Test parsing links with DrySite.
 
     The DrySite is using the builtin namespaces which behaviour is controlled
     in this repository so namespace aware tests do work, even when the actual
@@ -164,7 +163,7 @@ class TestLink(DefaultDrySiteTestCase):
             # A link is invalid if their (non-)talk page would be in another
             # namespace than the link's "other" namespace
             (['Talk:File:Example.svg'],
-             r'The \(non-\)talk page of (u|)\'Talk:File:Example.svg\''
+             r"The \(non-\)talk page of 'Talk:File:Example.svg'"
              r' is a valid title in another namespace.'),
 
             (['.', '..', './Sandbox', '../Sandbox', 'Foo/./Sandbox',

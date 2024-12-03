@@ -495,8 +495,7 @@ class FakeUnixTest(FakeUIColorizedTestBase, FakeUITest):
 
 class FakeWin32Test(FakeUIColorizedTestBase, FakeUITest):
 
-    """
-    Test case to allow doing colorized Win32 tests in any environment.
+    """Test case to allow doing colorized Win32 tests in any environment.
 
     This only patches the ctypes import in the terminal_interface_win32
     module. As the Win32CtypesUI is using the std-streams from another

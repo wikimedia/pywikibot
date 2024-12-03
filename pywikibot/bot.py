@@ -296,8 +296,8 @@ def set_interface(module_name: str) -> None:
     """
     global ui
 
-    ui_module = __import__('pywikibot.userinterfaces.{}_interface'
-                           .format(module_name), fromlist=['UI'])
+    ui_module = __import__(f'pywikibot.userinterfaces.{module_name}_interface',
+                           fromlist=['UI'])
     ui = ui_module.UI()
     assert ui is not None
     atexit.register(ui.flush)
@@ -646,8 +646,7 @@ def input_list_choice(question: str,
                       answers: AnswerType,
                       default: int | str | None = None,
                       force: bool = False) -> str:
-    """
-    Ask the user the question and return one of the valid answers.
+    """Ask the user the question and return one of the valid answers.
 
     :param question: The question asked without trailing spaces.
     :param answers: The valid answers each containing a full length answer.
@@ -674,8 +673,7 @@ def calledModuleName() -> str:
 
 def handle_args(args: Iterable[str] | None = None,
                 do_help: bool = True) -> list[str]:
-    """
-    Handle global command line arguments and return the rest as a list.
+    """Handle global command line arguments and return the rest as a list.
 
     Takes the command line arguments as strings, processes all
     :ref:`global parameters<global options>` such as ``-lang`` or
@@ -908,8 +906,7 @@ def suggest_help(missing_parameters: Sequence[str] | None = None,
                  missing_action: bool = False,
                  additional_text: str = '',
                  missing_dependencies: Sequence[str] | None = None) -> bool:
-    """
-    Output error message to use -help with additional text before it.
+    """Output error message to use -help with additional text before it.
 
     :param missing_parameters: A list of parameters which are missing.
     :param missing_generator: Whether a generator is missing.
@@ -952,8 +949,7 @@ def suggest_help(missing_parameters: Sequence[str] | None = None,
 
 
 def writeToCommandLogFile() -> None:
-    """
-    Save name of the called module along with all params to logs/commands.log.
+    """Save name of the called module along with all params to logfile.
 
     This can be used by user later to track errors or report bugs.
     """
@@ -1258,8 +1254,7 @@ class BaseBot(OptionHandler):
 
     def userPut(self, page: pywikibot.page.BasePage, oldtext: str,
                 newtext: str, **kwargs: Any) -> bool:
-        """
-        Save a new revision of a page, with user confirmation as required.
+        """Save a new revision of a page, with user confirmation as required.
 
         Print differences, ask user for confirmation, and puts the page
         if needed.
@@ -1294,8 +1289,7 @@ class BaseBot(OptionHandler):
     def _save_page(self, page: pywikibot.page.BasePage,
                    func: Callable[..., Any], *args: Any,
                    **kwargs: Any) -> bool:
-        """
-        Helper function to handle page save-related option error handling.
+        """Helper function to handle page save-related option error handling.
 
         .. note:: Do no use it directly. Use :meth:`userPut` instead.
 
@@ -1333,8 +1327,8 @@ class BaseBot(OptionHandler):
                 pywikibot.info(
                     f'Skipping {page.title()} because of edit conflict')
             elif isinstance(e, SpamblacklistError):
-                pywikibot.info('Cannot change {} because of blacklist '
-                               'entry {}'.format(page.title(), e.url))
+                pywikibot.info(f'Cannot change {page.title()} because of '
+                               f'blacklist entry {e.url}')
             elif isinstance(e, LockedPageError):
                 pywikibot.info(f'Skipping {page.title()} (locked page)')
             else:
@@ -1396,8 +1390,8 @@ class BaseBot(OptionHandler):
             for op, count in self.counter.items():
                 if not count or op == 'read':
                     continue
-                pywikibot.info('{} operation time: {:.1f} seconds'
-                               .format(op.capitalize(), write_seconds / count))
+                pywikibot.info(f'{op.capitalize()} operation time: '
+                               f'{write_seconds / count:.1f} seconds')
 
         # exc_info contains exception from self.run() while terminating
         exc_info = sys.exc_info()
@@ -1460,8 +1454,8 @@ class BaseBot(OptionHandler):
             :class:`page.BasePage`. For other page types the
             :attr:`treat_page_type` must be set.
         """
-        raise NotImplementedError('Method {}.treat() not implemented.'
-                                  .format(self.__class__.__name__))
+        raise NotImplementedError(
+            f'Method {type(self).__name__}.treat() not implemented.')
 
     def setup(self) -> None:
         """Some initial setup before :meth:`run` operation starts.
@@ -1598,8 +1592,7 @@ class BaseBot(OptionHandler):
 # a site previously defined
 class Bot(BaseBot):
 
-    """
-    Generic bot subclass for multiple sites.
+    """Generic bot subclass for multiple sites.
 
     If possible the MultipleSitesBot or SingleSiteBot classes should be used
     instead which specifically handle multiple or single sites.
@@ -1627,8 +1620,7 @@ class Bot(BaseBot):
 
     @site.setter
     def site(self, site: BaseSite | None) -> None:
-        """
-        Set the Site that the bot is using.
+        """Set the Site that the bot is using.
 
         When Bot.run() is managing the generator and site property, this is
         set each time a page is on a site different from the previous page.
@@ -1682,8 +1674,7 @@ class Bot(BaseBot):
 
 class SingleSiteBot(BaseBot):
 
-    """
-    A bot only working on one site and ignoring the others.
+    """A bot only working on one site and ignoring the others.
 
     If no site is given from the start it'll use the first page's site. Any
     page after the site has been defined and is not on the defined site will be
@@ -1693,8 +1684,7 @@ class SingleSiteBot(BaseBot):
     def __init__(self,
                  site: BaseSite | bool | None = True,
                  **kwargs: Any) -> None:
-        """
-        Create a SingleSiteBot instance.
+        """Create a SingleSiteBot instance.
 
         :param site: If True it'll be set to the configured site using
             pywikibot.Site.
@@ -1746,8 +1736,7 @@ class SingleSiteBot(BaseBot):
 
 class MultipleSitesBot(BaseBot):
 
-    """
-    A bot class working on multiple sites.
+    """A bot class working on multiple sites.
 
     The bot should accommodate for that case and not store site specific
     information on only one site.
@@ -1814,8 +1803,7 @@ class ConfigParserBot(BaseBot):
 
 class CurrentPageBot(BaseBot):
 
-    """
-    A bot which automatically sets 'current_page' on each treat().
+    """A bot which automatically sets 'current_page' on each treat().
 
     This class should be always used together with either the MultipleSitesBot
     or SingleSiteBot class as there is no site management in this class.
@@ -1826,8 +1814,8 @@ class CurrentPageBot(BaseBot):
 
     def treat_page(self) -> None:
         """Process one page (Abstract method)."""
-        raise NotImplementedError('Method {}.treat_page() not implemented.'
-                                  .format(self.__class__.__name__))
+        raise NotImplementedError(
+            f'Method {type(self).__name__}.treat_page() not implemented.')
 
     def treat(self, page: pywikibot.page.BasePage) -> None:
         """Set page to current page and treat that page."""
@@ -1838,8 +1826,7 @@ class CurrentPageBot(BaseBot):
                     ignore_save_related_errors: bool | None = None,
                     ignore_server_errors: bool | None = None,
                     **kwargs: Any) -> bool:
-        """
-        Call :py:obj:`Bot.userPut` but use the current page.
+        """Call :py:obj:`Bot.userPut` but use the current page.
 
         It compares the new_text to the current page text.
 
@@ -1865,8 +1852,7 @@ class CurrentPageBot(BaseBot):
 
 class AutomaticTWSummaryBot(CurrentPageBot):
 
-    """
-    A class which automatically defines ``summary`` for ``put_current``.
+    """A class which automatically defines ``summary`` for ``put_current``.
 
     The class must defined a ``summary_key`` string which contains the
     i18n key for :py:obj:`i18n.twtranslate`. It can also
@@ -1888,8 +1874,9 @@ class AutomaticTWSummaryBot(CurrentPageBot):
     def summary_parameters(self, value: dict[str, str]) -> None:
         """Set the i18n dictionary."""
         if not isinstance(value, dict):
-            raise TypeError('"value" must be a dict but {} was found.'
-                            .format(type(value).__name__))
+            raise TypeError(
+                f'"value" must be a dict but {type(value).__name__} was found.'
+            )
         self._summary_parameters = value
 
     @summary_parameters.deleter
@@ -2002,8 +1989,7 @@ class NoRedirectPageBot(CurrentPageBot):  # pragma: no cover
 
 class WikidataBot(Bot, ExistingPageBot):
 
-    """
-    Generic Wikidata Bot to be subclassed.
+    """Generic Wikidata Bot to be subclassed.
 
     Source claims (P143) can be created for specific sites
 
@@ -2041,8 +2027,7 @@ class WikidataBot(Bot, ExistingPageBot):
                 f'{self.site} is not connected to a data repository')
 
     def cacheSources(self) -> None:
-        """
-        Fetch the sources from the list on Wikidata.
+        """Fetch the sources from the list on Wikidata.
 
         It is stored internally and reused by getSource()
         """
@@ -2055,20 +2040,20 @@ class WikidataBot(Bot, ExistingPageBot):
                         self.repo, family[source_lang])
 
     def get_property_by_name(self, property_name: str) -> str:
-        """
-        Find given property and return its ID.
+        """Find given property and return its ID.
 
-        Method first uses site.search() and if the property isn't found, then
-        asks user to provide the property ID.
+        Method first uses site.search() and if the property isn't found,
+        then asks user to provide the property ID.
 
         :param property_name: property to find
         """
         ns = self.repo.property_namespace
         for page in self.repo.search(property_name, total=1, namespaces=ns):
-            page = pywikibot.PropertyPage(self.repo, page.title())
+            prop = pywikibot.PropertyPage(self.repo, page.title())
             pywikibot.info(
-                f'Assuming that {property_name} property is {page.id}.')
-            return page.id
+                f'Assuming that {property_name} property is {prop.id}.')
+            return prop.id
+
         return pywikibot.input(
             f'Property {property_name} was not found. Please enter the '
             f'property ID (e.g. P123) of it:').upper()
@@ -2078,8 +2063,7 @@ class WikidataBot(Bot, ExistingPageBot):
                          ignore_save_related_errors: bool | None = None,
                          ignore_server_errors: bool | None = None,
                          **kwargs: Any) -> bool:
-        """
-        Edit entity with data provided, with user confirmation as required.
+        """Edit entity with data provided, with user confirmation as required.
 
         :param entity: page to be edited
         :param data: data to be saved, or None if the diff should be created
@@ -2119,8 +2103,7 @@ class WikidataBot(Bot, ExistingPageBot):
                        claim: pywikibot.page.Claim,
                        source: BaseSite | None = None,
                        bot: bool = True, **kwargs: Any) -> bool:
-        """
-        Add a claim to an item, with user confirmation as required.
+        """Add a claim to an item, with user confirmation as required.
 
         :param item: page to be edited
         :param claim: claim to be saved
@@ -2149,8 +2132,7 @@ class WikidataBot(Bot, ExistingPageBot):
         return self._save_page(item, item.addClaim, claim, bot=bot, **kwargs)
 
     def getSource(self, site: BaseSite) -> pywikibot.page.Claim | None:
-        """
-        Create a Claim usable as a source for Wikibase statements.
+        """Create a Claim usable as a source for Wikibase statements.
 
         :param site: site that is the source of assertions.
 
@@ -2170,8 +2152,7 @@ class WikidataBot(Bot, ExistingPageBot):
             source: BaseSite | None = None,
             logger_callback: Callable[[str], Any] = pwb_logging.log,
             **kwargs: Any) -> bool:
-        """
-        Decorator of :py:obj:`user_add_claim`.
+        """Decorator of :py:obj:`user_add_claim`.
 
         Before adding a new claim, it checks if we can add it, using provided
         filters.
@@ -2261,8 +2242,7 @@ class WikidataBot(Bot, ExistingPageBot):
                              summary: str | None = None,
                              **kwargs: Any
                              ) -> pywikibot.page.ItemPage | None:
-        """
-        Create an ItemPage with the provided page as the sitelink.
+        """Create an ItemPage with the provided page as the sitelink.
 
         :param page: the page for which the item will be created
         :param data: additional data to be included in the new item (optional).
@@ -2272,8 +2252,8 @@ class WikidataBot(Bot, ExistingPageBot):
         :return: pywikibot.ItemPage or None
         """
         if not summary:
-            summary = 'Bot: New item with sitelink from {}'.format(
-                      page.title(as_link=True, insite=self.repo))
+            summary = ('Bot: New item with sitelink from '
+                       f'{page.title(as_link=True, insite=self.repo)}')
 
         if data is None:
             data = {}
@@ -2305,32 +2285,31 @@ class WikidataBot(Bot, ExistingPageBot):
                 item = pywikibot.ItemPage.fromPage(page)
             except NoPageError:
                 item = None
+        elif isinstance(page, pywikibot.ItemPage):
+            item = page
+            page = None
         else:
-            if isinstance(page, pywikibot.ItemPage):
-                item = page
+            # FIXME: Hack because 'is_data_repository' doesn't work if
+            #        site is the APISite. See T85483
+            assert page is not None
+            data_site = page.site.data_repository()
+            if (data_site.family == page.site.family
+                    and data_site.code == page.site.code):
+                is_item = page.namespace() == data_site.item_namespace.id
+            else:
+                is_item = False
+            if is_item:
+                item = pywikibot.ItemPage(data_site, page.title())
                 page = None
             else:
-                # FIXME: Hack because 'is_data_repository' doesn't work if
-                #        site is the APISite. See T85483
-                assert page is not None
-                data_site = page.site.data_repository()
-                if (data_site.family == page.site.family
-                        and data_site.code == page.site.code):
-                    is_item = page.namespace() == data_site.item_namespace.id
-                else:
-                    is_item = False
-                if is_item:
-                    item = pywikibot.ItemPage(data_site, page.title())
-                    page = None
-                else:
-                    try:
-                        item = pywikibot.ItemPage.fromPage(page)
-                    except NoPageError:
-                        item = None
-                    if self.use_from_page is False:
-                        _error(f'{page} is not in the item namespace but must'
-                               ' be an item.')
-                        return
+                try:
+                    item = pywikibot.ItemPage.fromPage(page)
+                except NoPageError:
+                    item = None
+                if self.use_from_page is False:
+                    _error(f'{page} is not in the item namespace but must'
+                           ' be an item.')
+                    return
 
         assert not (page is None and item is None)
 
@@ -2345,14 +2324,12 @@ class WikidataBot(Bot, ExistingPageBot):
 
     def treat_page_and_item(self, page: pywikibot.page.BasePage,
                             item: pywikibot.page.ItemPage) -> None:
-        """
-        Treat page together with its item (if it exists).
+        """Treat page together with its item (if it exists).
 
         Must be implemented in subclasses.
         """
-        raise NotImplementedError('Method {}.treat_page_and_item() not '
-                                  'implemented.'
-                                  .format(self.__class__.__name__))
+        raise NotImplementedError(f'Method {type(self).__name__}.'
+                                  'treat_page_and_item() not implemented.')
 
 
 set_interface(config.userinterface)

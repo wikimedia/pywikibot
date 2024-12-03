@@ -202,8 +202,7 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
             self.opt.target = pywikibot.Site(self.opt.target)
 
     def transfer_image(self, sourceImagePage) -> None:
-        """
-        Download image and its description, and upload it to another site.
+        """Download image and its description, and upload it to another site.
 
         :return: the filename which was used to upload the image
         """
@@ -365,8 +364,7 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-This script fixes links that contain common spelling mistakes.
+"""This script fixes links that contain common spelling mistakes.
 
 This is only possible on wikis that have a template for these misspellings.
 
@@ -105,8 +104,7 @@ class MisspellingRobot(BaseDisambigBot):
         yield from pagegenerators.PreloadingGenerator(chain(*generators))
 
     def findAlternatives(self, page) -> bool:
-        """
-        Append link target to a list of alternative links.
+        """Append link target to a list of alternative links.
 
         Overrides the BaseDisambigBot method.
 
@@ -142,8 +140,7 @@ class MisspellingRobot(BaseDisambigBot):
         return False
 
     def setSummaryMessage(self, page, *args, **kwargs) -> None:
-        """
-        Setup the summary message.
+        """Setup the summary message.
 
         Overrides the BaseDisambigBot method.
         """
@@ -154,8 +151,7 @@ class MisspellingRobot(BaseDisambigBot):
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

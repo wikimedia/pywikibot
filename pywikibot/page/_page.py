@@ -112,13 +112,12 @@ class Page(BasePage, WikiBlameMixin):
                     positional.append(intkeys[i])
                     continue
 
-                for k in intkeys:
+                for k, v in intkeys.items():
                     if k < 1 or k >= i:
-                        named[str(k)] = intkeys[k]
+                        named[str(k)] = v
                 break
 
-            for item in named.items():
-                positional.append('{}={}'.format(*item))
+            positional += [f'{key}={value}' for key, value in named.items()]
             result.append((pywikibot.Page(link, self.site), positional))
         return result
 
@@ -184,8 +183,7 @@ class Page(BasePage, WikiBlameMixin):
             self.save(**kwargs)
 
     def get_best_claim(self, prop: str):
-        """
-        Return the first best Claim for this page.
+        """Return the first best Claim for this page.
 
         Return the first 'preferred' ranked Claim specified by Wikibase
         property or the first 'normal' one otherwise.

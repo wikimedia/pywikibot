@@ -1,6 +1,6 @@
 """Objects representing interwiki map of MediaWiki site."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -35,8 +35,7 @@ class _InterwikiMap:
     """A representation of the interwiki map of a site."""
 
     def __init__(self, site) -> None:
-        """
-        Create an empty uninitialized interwiki map for the given site.
+        """Create an empty uninitialized interwiki map for the given site.
 
         :param site: Given site for which interwiki map is to be created
         :type site: pywikibot.site.APISite
@@ -62,8 +61,7 @@ class _InterwikiMap:
         return self._map
 
     def __getitem__(self, prefix):
-        """
-        Return the site, locality and url for the requested prefix.
+        """Return the site, locality and url for the requested prefix.
 
         :param prefix: Interwiki prefix
         :type prefix: Dictionary key
@@ -77,12 +75,11 @@ class _InterwikiMap:
             return self._iw_sites[prefix]
         if isinstance(self._iw_sites[prefix].site, Exception):
             raise self._iw_sites[prefix].site
-        raise TypeError('_iw_sites[{}] is wrong type: {}'
-                        .format(prefix, type(self._iw_sites[prefix].site)))
+        raise TypeError(f'_iw_sites[{prefix}] is wrong type: '
+                        f'{type(self._iw_sites[prefix].site)}')
 
     def get_by_url(self, url: str) -> set[str]:
-        """
-        Return a set of prefixes applying to the URL.
+        """Return a set of prefixes applying to the URL.
 
         :param url: URL for the interwiki
         """

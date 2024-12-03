@@ -150,8 +150,8 @@ def has_module(module: str, version: str | None = None) -> bool:
         module_version = packaging.version.Version(metadata_version)
 
         if module_version < required_version:
-            warn('Module version {} is lower than requested version {}'
-                 .format(module_version, required_version), ImportWarning)
+            warn(f'Module version {module_version} is lower than requested '
+                 f'version {required_version}', ImportWarning)
             return False
 
     return True
@@ -159,8 +159,7 @@ def has_module(module: str, version: str | None = None) -> bool:
 
 class classproperty:  # noqa: N801
 
-    """
-    Descriptor class to access a class method as a property.
+    """Descriptor class to access a class method as a property.
 
     This class may be used as a decorator::
 
@@ -178,12 +177,28 @@ class classproperty:  # noqa: N801
     """
 
     def __init__(self, cls_method) -> None:
-        """Hold the class method."""
+        """Initializer: hold the class method and documentation."""
         self.method = cls_method
-        self.__doc__ = self.method.__doc__
+        self.__annotations__ = self.method.__annotations__
+        doc = self.method.__doc__
+        self.__doc__ = f':class:`classproperty<tools.classproperty>` {doc}'
+
+        rtype = self.__annotations__.get('return')
+        if rtype:
+            lines = doc.splitlines()
+
+            if len(lines) > 2 and PYTHON_VERSION < (3, 13):
+                spaces = ' ' * re.search('[^ ]', lines[2]).start()
+            else:
+                spaces = ''
+
+            self.__doc__ += f'\n\n{spaces}:rtype: {rtype}'
 
     def __get__(self, instance, owner):
         """Get the attribute of the owner class by its method."""
+        if SPHINX_RUNNING:
+            return self
+
         return self.method(owner)
 
 
@@ -218,7 +233,7 @@ class suppress_warnings(catch_warnings):  # noqa: N801
             the start of the path to the warning module must match.
             (case-sensitive)
         """
-        self.message_match = re.compile(message, re.I).match
+        self.message_match = re.compile(message, re.IGNORECASE).match
         self.category = category
         self.filename_match = re.compile(filename).match
         super().__init__(record=True)
@@ -297,8 +312,7 @@ class ComparableMixin(abc.ABC):
 
 
 def first_lower(string: str) -> str:
-    """
-    Return a string with the first character uncapitalized.
+    """Return a string with the first character uncapitalized.
 
     Empty strings are supported. The original string is not changed.
 
@@ -313,8 +327,7 @@ def first_lower(string: str) -> str:
 
 
 def first_upper(string: str) -> str:
-    """
-    Return a string with the first character capitalized.
+    """Return a string with the first character capitalized.
 
     Empty strings are supported. The original string is not changed.
 
@@ -419,8 +432,7 @@ def normalize_username(username) -> str | None:
 @total_ordering
 class MediaWikiVersion:
 
-    """
-    Version object to allow comparing 'wmf' versions with normal ones.
+    """Version object to allow comparing 'wmf' versions with normal ones.
 
     The version mainly consist of digits separated by periods. After
     that is a suffix which may only be 'wmf<number>', 'alpha',
@@ -449,8 +461,7 @@ class MediaWikiVersion:
         r'(\d+(?:\.\d+)+)(-?wmf\.?(\d+)|alpha|beta(\d+)|-?rc\.?(\d+)|.*)?')
 
     def __init__(self, version_str: str) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         :param version_str: version to parse
         """
@@ -496,8 +507,8 @@ class MediaWikiVersion:
         prefix = 'MediaWiki '
 
         if not generator.startswith(prefix):
-            raise ValueError('Generator string ({!r}) must start with '
-                             '"{}"'.format(generator, prefix))
+            raise ValueError(f'Generator string ({generator!r}) must start '
+                             f'with "{prefix}"')
 
         return MediaWikiVersion(generator[len(prefix):])
 
@@ -518,8 +529,8 @@ class MediaWikiVersion:
         if isinstance(other, str):
             other = MediaWikiVersion(other)
         elif not isinstance(other, MediaWikiVersion):
-            raise TypeError("Comparison between 'MediaWikiVersion' and '{}' "
-                            'unsupported'.format(type(other).__name__))
+            raise TypeError(f"Comparison between 'MediaWikiVersion' and "
+                            f"'{type(other).__name__}' unsupported")
 
         if self.version != other.version:
             return self.version < other.version
@@ -527,8 +538,7 @@ class MediaWikiVersion:
 
 
 def open_archive(filename: str, mode: str = 'rb', use_extension: bool = True):
-    """
-    Open a file and uncompress it if needed.
+    """Open a file and uncompress it if needed.
 
     This function supports bzip2, gzip, 7zip, lzma, and xz as
     compression containers. It uses the packages available in the
@@ -587,9 +597,9 @@ def open_archive(filename: str, mode: str = 'rb', use_extension: bool = True):
         with open(filename, 'rb') as f:
             magic_number = f.read(8)
 
-        for pattern in extension_map:
+        for pattern, ext in extension_map.items():
             if magic_number.startswith(pattern):
-                extension = extension_map[pattern]
+                extension = ext
                 break
         else:
             extension = ''
@@ -632,8 +642,7 @@ def open_archive(filename: str, mode: str = 'rb', use_extension: bool = True):
 
 
 def merge_unique_dicts(*args, **kwargs):
-    """
-    Return a merged dict and make sure that the original dicts keys are unique.
+    """Return a merged dict and make sure that the original keys are unique.
 
     The positional arguments are the dictionaries to be merged. It is
     also possible to define an additional dict using the keyword

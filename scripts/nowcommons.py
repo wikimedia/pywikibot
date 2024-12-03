@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-r"""
-Script to delete files that are also present on Wikimedia Commons.
+r"""Script to delete files that are also present on Wikimedia Commons.
 
 Do not run this script on Wikimedia Commons itself. It works based on
 a given array of templates defined below.
@@ -386,8 +385,7 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
 
 
 def main(*args: str) -> None:
-    """
-    Process command line arguments and invoke bot.
+    """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
 

@@ -46,8 +46,7 @@ botList = {
 
 class LoginStatus(IntEnum):
 
-    """
-    Enum for Login statuses.
+    """Enum for Login statuses.
 
     >>> LoginStatus.NOT_ATTEMPTED
     LoginStatus(-3)
@@ -80,8 +79,7 @@ class LoginManager:
     def __init__(self, password: str | None = None,
                  site: pywikibot.site.BaseSite | None = None,
                  user: str | None = None) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         All parameters default to defaults in user-config.
 
@@ -102,20 +100,20 @@ class LoginManager:
                 user = code_to_usr.get(site.code) or code_to_usr['*']
             except KeyError:
                 raise NoUsernameError(
-                    'ERROR: '
-                    'username for {site.family.name}:{site.code} is undefined.'
-                    '\nIf you have a username for that site, please add a '
-                    'line to user config file (user-config.py) as follows:\n'
-                    "usernames['{site.family.name}']['{site.code}'] = "
-                    "'myUsername'".format(site=site))
+                    f'ERROR: username for {site.family.name}:{site.code} is'
+                    ' undefined.\nIf you have a username for that site,'
+                    ' please add a line to user config file (user-config.py)'
+                    ' as follows:\n'
+                    f"usernames['{site.family.name}']['{site.code}'] ="
+                    " 'myUsername'"
+                )
         self.password = password
         self.login_name = self.username = user
         if getattr(config, 'password_file', ''):
             self.readPassword()
 
     def check_user_exists(self) -> None:
-        """
-        Check that the username exists on the site.
+        """Check that the username exists on the site.
 
         .. seealso:: :api:`Users`
 
@@ -125,11 +123,10 @@ class LoginManager:
         # convert any Special:BotPassword usernames to main account equivalent
         main_username = self.username
         if '@' in self.username:
-            warn(
-                'When using BotPasswords it is recommended that you store '
-                'your login credentials in a password_file instead. See '
-                '{}/BotPasswords for instructions and more information.'
-                .format(__url__))
+            warn('When using BotPasswords it is recommended that you store'
+                 ' your login credentials in a password_file instead. See '
+                 f'{__url__}/BotPasswords for instructions and more'
+                 ' information.')
             main_username = self.username.partition('@')[0]
 
         try:
@@ -137,19 +134,19 @@ class LoginManager:
             user = next(data, {'name': None})
         except APIError as e:
             if e.code == 'readapidenied':
-                pywikibot.warning("Could not check user '{}' exists on {}"
-                                  .format(main_username, self.site))
+                pywikibot.warning(f"Could not check user '{main_username}' "
+                                  f'exists on {self.site}')
                 return
             raise
 
         if user['name'] != main_username:
             # Report the same error as server error code NotExists
-            raise NoUsernameError("Username '{}' does not exist on {}"
-                                  .format(main_username, self.site))
+            raise NoUsernameError(
+                f"Username '{main_username}' does not exist on {self.site}"
+            )
 
     def botAllowed(self) -> bool:
-        """
-        Check whether the bot is listed on a specific page.
+        """Check whether the bot is listed on a specific page.
 
         This allows bots to comply with the policy on the respective wiki.
         """
@@ -264,8 +261,7 @@ class LoginManager:
     }
 
     def login(self, retry: bool = False, autocreate: bool = False) -> bool:
-        """
-        Attempt to log into the server.
+        """Attempt to log into the server.
 
         .. seealso:: :api:`Login`
 
@@ -285,9 +281,10 @@ class LoginManager:
             # As we don't want the password to appear on the screen, we set
             # password = True
             self.password = pywikibot.input(
-                'Password for user {name} on {site} (no characters will be '
-                'shown):'.format(name=self.login_name, site=self.site),
-                password=True)
+                f'Password for user {self.login_name} on {self.site}'
+                ' (no characters will be shown):',
+                password=True
+            )
         else:
             pywikibot.info(f'Logging in to {self.site} as {self.login_name}')
 
@@ -298,8 +295,8 @@ class LoginManager:
 
             # TODO: investigate other unhandled API codes
             if error_code in self._api_error:
-                error_msg = 'Username {!r} {} on {}'.format(
-                    self.login_name, self._api_error[error_code], self.site)
+                error_msg = (f'Username {self.login_name!r} '
+                             f'{self._api_error[error_code]} on {self.site}')
                 if error_code in ('Failed', 'FAIL'):
                     error_msg += f'.\n{e.info}'
                 raise NoUsernameError(error_msg)
@@ -481,8 +478,7 @@ class BotPassword:
     """BotPassword object for storage in password file."""
 
     def __init__(self, suffix: str, password: str) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         BotPassword function by using a separate password paired with a
         suffixed username of the form <username>@<suffix>.
@@ -499,10 +495,9 @@ class BotPassword:
         self.password = password
 
     def login_name(self, username: str) -> str:
-        """
-        Construct the login name from the username and suffix.
+        """Construct the login name from the username and suffix.
 
-        :param user: username (without suffix)
+        :param username: username (without suffix)
         """
         return f'{username}@{self.suffix}'
 
@@ -517,8 +512,7 @@ class OauthLoginManager(LoginManager):
     def __init__(self, password: str | None = None,
                  site: pywikibot.site.BaseSite | None = None,
                  user: str | None = None) -> None:
-        """
-        Initializer.
+        """Initializer.
 
         All parameters default to defaults in user-config.
 
@@ -535,16 +529,16 @@ class OauthLoginManager(LoginManager):
         assert password is not None and user is not None
         super().__init__(password=None, site=site, user=None)
         if self.password:
-            pywikibot.warn('Password exists in password file for {login.site}:'
-                           '{login.username}. Password is unnecessary and '
-                           'should be removed if OAuth enabled.'
-                           .format(login=self))
+            pywikibot.warn(
+                f'Password exists in password file for {self.site}: '
+                f'{self.username}. Password is unnecessary and should be'
+                ' removed if OAuth enabled.'
+            )
         self._consumer_token = (user, password)
         self._access_token: tuple[str, str] | None = None
 
     def login(self, retry: bool = False, force: bool = False) -> bool:
-        """
-        Attempt to log into the server.
+        """Attempt to log into the server.
 
         .. seealso:: :api:`Login`
 
@@ -553,9 +547,8 @@ class OauthLoginManager(LoginManager):
         :param force: force to re-authenticate
         """
         if self.access_token is None or force:
-            pywikibot.info(
-                'Logging in to {site} via OAuth consumer {key}'
-                .format(key=self.consumer_token[0], site=self.site))
+            pywikibot.info(f'Logging in to {self.site} via OAuth consumer '
+                           f'{self.consumer_token[0]}')
             consumer_token = mwoauth.ConsumerToken(*self.consumer_token)
             handshaker = mwoauth.Handshaker(
                 self.site.base_url(self.site.path()), consumer_token)
@@ -563,9 +556,10 @@ class OauthLoginManager(LoginManager):
                 redirect, request_token = handshaker.initiate()
                 pywikibot.stdout('Authenticate via web browser..')
                 webbrowser.open(redirect)
-                pywikibot.stdout('If your web browser does not open '
-                                 'automatically, please point it to: {}'
-                                 .format(redirect))
+                pywikibot.stdout(
+                    'If your web browser does not open automatically, please '
+                    f'point it to: {redirect}'
+                )
                 request_qs = pywikibot.input('Response query string: ')
                 access_token = handshaker.complete(request_token, request_qs)
                 self._access_token = (access_token.key, access_token.secret)
@@ -576,14 +570,13 @@ class OauthLoginManager(LoginManager):
                     return self.login(retry=True, force=force)
                 return False
         else:
-            pywikibot.info('Logged in to {site} via consumer {key}'
-                           .format(key=self.consumer_token[0], site=self.site))
+            pywikibot.info(f'Logged in to {self.site} via consumer '
+                           f'{self.consumer_token[0]}')
             return True
 
     @property
     def consumer_token(self) -> tuple[str, str]:
-        """
-        Return OAuth consumer key token and secret token.
+        """Return OAuth consumer key token and secret token.
 
         .. seealso:: :api:`Tokens`
         """
@@ -591,8 +584,7 @@ class OauthLoginManager(LoginManager):
 
     @property
     def access_token(self) -> tuple[str, str] | None:
-        """
-        Return OAuth access key token and secret token.
+        """Return OAuth access key token and secret token.
 
         .. seealso:: :api:`Tokens`
         """
@@ -600,7 +592,12 @@ class OauthLoginManager(LoginManager):
 
     @property
     def identity(self) -> dict[str, Any] | None:
-        """Get identifying information about a user via an authorized token."""
+        """Get identifying information about a user via an authorized token.
+
+        .. versionchanged:: 9.6
+           *leeway* parameter for ``mwoauth.identify`` function was
+           increased to 30.0 seconds.
+        """
         if self.access_token is None:
             pywikibot.error('Access token not set')
             return None
@@ -609,8 +606,12 @@ class OauthLoginManager(LoginManager):
         access_token = mwoauth.AccessToken(*self.access_token)
         try:
             identity = mwoauth.identify(self.site.base_url(self.site.path()),
-                                        consumer_token, access_token)
-            return identity
+                                        consumer_token,
+                                        access_token,
+                                        leeway=30.0)
         except Exception as e:
             pywikibot.error(e)
-            return None
+        else:
+            return identity
+
+        return None

@@ -1,19 +1,31 @@
 Current Release Changes
 =======================
 
-* Add support for tcywikisource and tcywiktionary (:phab:`T378473`, :phab:`T378465`)
+* Add support for idwikivoyage (:phab:`T381082`)
+* Add docstrings of :class:`tools.classproperty` methods (:phab:`T380628`)
+* Site property :attr:`BaseSite.codes<pywikibot.site._basesite.BaseSite.codes>` was added (:phab:`T380606`)
+* Increase *leeway* parameter of :meth:`login.OauthLoginManager.identity` (:phab:`T380270`)
+* Show a warning if *ignore_extension* parameter of :class:`pywikibot.FilePage` was set and the extension is invalid
+* Remove old code of Python 3.2 or older in :func:`tools.chars.replace_invisible` due to :pep:`393`
+* use :meth:`BasePage.autoFormat()<page.BasePage.autoFormat>` instead of :func:`date.getAutoFormat` in
+  :mod:`titletranslate`
+* Upcast :class:`pywikibot.Page` to :class:`pywikibot.FilePage` in :meth:`PageGenerator.result()
+  <data.api.PageGenerator.result>` if ``imageinfo`` is given (:phab:`T379513`)
+* Update oauth requirements
 * i18n-updates
-* Update invisible chars in :mod:`tools.chars` from unicode 16.0.0
-* Rename :meth:`DataSite.getPropertyType()<pywikibot.site._datasite.DataSite.getPropertyType>`
-  to :meth:`DataSite.get_property_type()<pywikibot.site._datasite.DataSite.get_property_type>`
-* provide XXXI with :func:`date.romanNumToInt` and :func:`date.intToRomanNum` functions
-* No longer raise :exc:`exceptions.UnsupportedPageError` within :meth:`data.api.PageGenerator.result` (:phab:`T377651`)
-* Extract messages with strong tag from xtools as error message in
-  :meth:`Page.authorship()<page._toolforge.WikiBlameMixin.authorship>` (:phab:`T376815`)
+* Implement param *with_sort_key* in :meth:`page.BasePage.categories` (:phab:`T75561`)
+* Python 3.7 support will be discontinued and probably this is the last version supporting it
+* Add :meth:`page.BasePage.get_revision` method
+* Retry :meth:`data.sparql.SparqlQuery.query` on internal server error (500) (:phab:`T378788`)
+* Extract :meth:`APISite.linktrail()<pywikibot.site._apisite.APISite.linktrail>`
+  for hr-wiki (:phab:`T378787`)
+
 
 Current Deprecations
 ====================
 
+* 9.6.0: :meth:`BaseSite.languages()<pywikibot.site._basesite.BaseSite.languages>` will be removed in favour of
+  :attr:`BaseSite.codes<pywikibot.site._basesite.BaseSite.codes>`
 * 9.5.0: :meth:`DataSite.getPropertyType()<pywikibot.site._datasite.DataSite.getPropertyType>` will be removed
   in favour of :meth:`DataSite.get_property_type()<pywikibot.site._datasite.DataSite.get_property_type>`
 * 9.4.0: :mod:`flow` support is deprecated and will be removed (:phab:`T371180`)
@@ -71,6 +83,7 @@ Current Deprecations
 Pending removal in Pywikibot 10
 -------------------------------
 
+* 9.6.0: Python 3.7 support is deprecated and will be dropped with Pywikibot 10
 * 9.1.0: :func:`version.svn_rev_info` and :func:`version.getversion_svn` will be removed. SVN is no longer supported.
   (:phab:`T362484`)
 * 7.7.0: :mod:`tools.threading` classes should no longer imported from :mod:`tools`
@@ -81,7 +94,7 @@ Pending removal in Pywikibot 10
 * 7.3.0: Old color escape sequences like ``\03{color}`` is deprecated in favour of new color format like <<color>>
 * 7.3.0: ``linktrail`` method of :class:`family.Family` is deprecated; use :meth:`APISite.linktrail()
   <pywikibot.site._apisite.APISite.linktrail>` instead
-* 7.2.0: Positional arguments *decoder*, *layer* and *newline* for :mod:`logging` functions where dropped; keyword
+* 7.2.0: Positional arguments *decoder*, *layer* and *newline* for :mod:`logging` functions were dropped; keyword
   arguments must be used instead.
 * 7.2.0: ``tb`` parameter of :func:`exception()<pywikibot.logging.exception>` function was renamed to ``exc_info``
 * 7.2.0: XMLDumpOldPageGenerator is deprecated in favour of a ``content`` parameter of

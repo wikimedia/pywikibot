@@ -190,8 +190,7 @@ class PageImagesMixin:
 
     @need_extension('PageImages')
     def loadpageimage(self, page) -> None:
-        """
-        Load [[mw:Extension:PageImages]] info.
+        """Load [[mw:Extension:PageImages]] info.
 
         :param page: The page for which to obtain the image
         :type page: pywikibot.Page
@@ -247,9 +246,8 @@ class GlobalUsageMixin:
                 try:
                     gu_site = pywikibot.Site(url=entry['url'])
                 except SiteDefinitionError:
-                    pywikibot.warning(
-                        'Site could not be defined for global'
-                        ' usage for {}: {}.'.format(page, entry))
+                    pywikibot.warning('Site could not be defined for global '
+                                      f'usage for {page}: {entry}.')
                     continue
                 gu_page = pywikibot.Page(gu_site, entry['title'])
                 yield gu_page
@@ -399,8 +397,7 @@ class FlowMixin:
     @need_extension('Flow')
     @deprecated(since='9.4.0')
     def load_board(self, page):
-        """
-        Retrieve the data for a Flow board.
+        """Retrieve the data for a Flow board.
 
         :param page: A Flow board
         :type page: Board
@@ -425,8 +422,7 @@ class FlowMixin:
                        offset_id: str | None = None,
                        reverse: bool = False,
                        include_offset: bool = False) -> dict[str, Any]:
-        """
-        Retrieve the topiclist of a Flow board.
+        """Retrieve the topiclist of a Flow board.
 
         .. versionchanged:: 8.0
            All parameters except *page* are keyword only parameters.
@@ -460,8 +456,7 @@ class FlowMixin:
     @need_extension('Flow')
     @deprecated(since='9.4.0')
     def load_topic(self, page, content_format: str):
-        """
-        Retrieve the data for a Flow topic.
+        """Retrieve the data for a Flow topic.
 
         :param page: A Flow topic
         :type page: Topic
@@ -479,8 +474,7 @@ class FlowMixin:
     @need_extension('Flow')
     @deprecated(since='9.4.0')
     def load_post_current_revision(self, page, post_id, content_format: str):
-        """
-        Retrieve the data for a post to a Flow topic.
+        """Retrieve the data for a post to a Flow topic.
 
         :param page: A Flow topic
         :type page: Topic
@@ -501,8 +495,7 @@ class FlowMixin:
     @need_extension('Flow')
     @deprecated(since='9.4.0')
     def create_new_topic(self, page, title, content, content_format):
-        """
-        Create a new topic on a Flow board.
+        """Create a new topic on a Flow board.
 
         :param page: A Flow board
         :type page: Board
@@ -550,8 +543,7 @@ class FlowMixin:
     @need_extension('Flow')
     @deprecated(since='9.4.0')
     def lock_topic(self, page, lock, reason):
-        """
-        Lock or unlock a Flow topic.
+        """Lock or unlock a Flow topic.
 
         :param page: A Flow topic
         :type page: Topic
@@ -575,8 +567,7 @@ class FlowMixin:
     @need_extension('Flow')
     @deprecated(since='9.4.0')
     def moderate_topic(self, page, state, reason):
-        """
-        Moderate a Flow topic.
+        """Moderate a Flow topic.
 
         :param page: A Flow topic
         :type page: Topic
@@ -598,8 +589,7 @@ class FlowMixin:
     @need_extension('Flow')
     @deprecated(since='9.4.0')
     def summarize_topic(self, page, summary):
-        """
-        Add summary to Flow topic.
+        """Add summary to Flow topic.
 
         :param page: A Flow topic
         :type page: Topic
@@ -623,8 +613,7 @@ class FlowMixin:
     @need_extension('Flow')
     @deprecated(since='9.4.0')
     def delete_topic(self, page, reason):
-        """
-        Delete a Flow topic.
+        """Delete a Flow topic.
 
         :param page: A Flow topic
         :type page: Topic
@@ -639,8 +628,7 @@ class FlowMixin:
     @need_extension('Flow')
     @deprecated(since='9.4.0')
     def hide_topic(self, page, reason):
-        """
-        Hide a Flow topic.
+        """Hide a Flow topic.
 
         :param page: A Flow topic
         :type page: Topic
@@ -655,8 +643,7 @@ class FlowMixin:
     @need_extension('Flow')
     @deprecated(since='9.4.0')
     def suppress_topic(self, page, reason):
-        """
-        Suppress a Flow topic.
+        """Suppress a Flow topic.
 
         :param page: A Flow topic
         :type page: Topic
@@ -671,8 +658,7 @@ class FlowMixin:
     @need_extension('Flow')
     @deprecated(since='9.4.0')
     def restore_topic(self, page, reason):
-        """
-        Restore a Flow topic.
+        """Restore a Flow topic.
 
         :param page: A Flow topic
         :type page: Topic
@@ -687,8 +673,7 @@ class FlowMixin:
     @need_extension('Flow')
     @deprecated(since='9.4.0')
     def moderate_post(self, post, state, reason):
-        """
-        Moderate a Flow post.
+        """Moderate a Flow post.
 
         :param post: A Flow post
         :type post: Post
@@ -713,8 +698,7 @@ class FlowMixin:
     @need_extension('Flow')
     @deprecated(since='9.4.0')
     def delete_post(self, post, reason):
-        """
-        Delete a Flow post.
+        """Delete a Flow post.
 
         :param post: A Flow post
         :type post: Post
@@ -729,8 +713,7 @@ class FlowMixin:
     @need_extension('Flow')
     @deprecated(since='9.4.0')
     def hide_post(self, post, reason):
-        """
-        Hide a Flow post.
+        """Hide a Flow post.
 
         :param post: A Flow post
         :type post: Post
@@ -745,8 +728,7 @@ class FlowMixin:
     @need_extension('Flow')
     @deprecated(since='9.4.0')
     def suppress_post(self, post, reason):
-        """
-        Suppress a Flow post.
+        """Suppress a Flow post.
 
         :param post: A Flow post
         :type post: Post
@@ -761,8 +743,7 @@ class FlowMixin:
     @need_extension('Flow')
     @deprecated(since='9.4.0')
     def restore_post(self, post, reason):
-        """
-        Restore a Flow post.
+        """Restore a Flow post.
 
         :param post: A Flow post
         :type post: Post
@@ -780,8 +761,7 @@ class UrlShortenerMixin:
 
     @need_extension('UrlShortener')
     def create_short_link(self, url):
-        """
-        Return a shortened link.
+        """Return a shortened link.
 
         Note that on Wikimedia wikis only metawiki supports this action,
         and this wiki can process links to all WM domains.
