@@ -20,7 +20,6 @@ Useful for editing the contents of an article.
 from __future__ import annotations
 
 import pywikibot
-from pywikibot.tools import PYTHON_VERSION
 
 
 # Some Python distributions have tkinter but the underlying _tkinter
@@ -93,28 +92,17 @@ class TextEditor(ScrolledText):
             'width': idleConf.GetOption('main', 'EditorWindow', 'width'),
             'height': idleConf.GetOption('main', 'EditorWindow', 'height'),
         }
-        if PYTHON_VERSION >= (3, 7, 4):  # T241216
-            config['foreground'] = idleConf.GetHighlight(
-                theme, 'normal')['foreground']
-            config['background'] = idleConf.GetHighlight(
-                theme, 'normal')['background']
-            config['highlightcolor'] = idleConf.GetHighlight(
-                theme, 'hilite')['foreground']
-            config['highlightbackground'] = idleConf.GetHighlight(
-                theme, 'hilite')['background']
-            config['insertbackground'] = idleConf.GetHighlight(
-                theme, 'cursor')['foreground']
-        else:
-            config['foreground'] = idleConf.GetHighlight(
-                theme, 'normal', fgBg='fg')
-            config['background'] = idleConf.GetHighlight(
-                theme, 'normal', fgBg='bg')
-            config['highlightcolor'] = idleConf.GetHighlight(
-                theme, 'hilite', fgBg='fg')
-            config['highlightbackground'] = idleConf.GetHighlight(
-                theme, 'hilite', fgBg='bg')
-            config['insertbackground'] = idleConf.GetHighlight(
-                theme, 'cursor', fgBg='fg')
+
+        config['foreground'] = idleConf.GetHighlight(
+            theme, 'normal')['foreground']
+        config['background'] = idleConf.GetHighlight(
+            theme, 'normal')['background']
+        config['highlightcolor'] = idleConf.GetHighlight(
+            theme, 'hilite')['foreground']
+        config['highlightbackground'] = idleConf.GetHighlight(
+            theme, 'hilite')['background']
+        config['insertbackground'] = idleConf.GetHighlight(
+            theme, 'cursor')['foreground']
         return config
 
     def add_bindings(self) -> None:

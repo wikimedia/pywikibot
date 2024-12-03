@@ -4,7 +4,7 @@
 .. versionadded:: 8.0
 """
 #
-# (C) Pywikibot team, 2022
+# (C) Pywikibot team, 2022-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -16,13 +16,13 @@ VERSIONS_REQUIRED_MESSAGE = """
 Pywikibot is not available on:
 {version}
 
-This version of Pywikibot only supports Python 3.7+.
+This version of Pywikibot only supports Python 3.8+.
 """
 
 
 def python_is_supported():
     """Check that Python is supported."""
-    return sys.version_info[:3] >= (3, 7)
+    return sys.version_info[:3] >= (3, 8)
 
 
 if not python_is_supported():  # pragma: no cover

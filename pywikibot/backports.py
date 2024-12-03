@@ -36,9 +36,7 @@ else:
     )
 
 
-if PYTHON_VERSION < (3, 7, 2):
-    from typing import Dict as OrderedDict
-elif PYTHON_VERSION < (3, 9):
+if PYTHON_VERSION < (3, 9):
     from typing import OrderedDict
 else:
     from collections import OrderedDict

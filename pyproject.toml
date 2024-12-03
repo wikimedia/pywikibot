@@ -17,7 +17,7 @@ maintainers = [
     {name = "The Pywikibot team", email = "pywikibot@lists.wikimedia.org"},
 ]
 description = "Python MediaWiki Bot Framework"
-requires-python = ">=3.7.0"
+requires-python = ">=3.8.0"
 keywords = [
     "API", "bot", "client", "framework", "mediawiki", "pwb", "pybot", "python",
     "pywiki", "pywikibase", "pywikibot", "pywikipedia", "pywikipediabot",
@@ -92,7 +92,6 @@ classifiers=[
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -171,7 +170,7 @@ disable = [
 
 
 [tool.isort]
-py_version = 37
+py_version = 38
 add_imports = ["from __future__ import annotations"]
 atomic = true
 ensure_newline_before_comments = true
@@ -183,7 +182,7 @@ use_parentheses = true
 
 
 [tool.mypy]
-python_version = 3.7
+python_version = 3.8
 enable_error_code = [
     "ignore-without-code",
 ]
