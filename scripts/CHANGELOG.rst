@@ -4,6 +4,17 @@ Scripts Changelog
 9.6.0
 -----
 
+* i18n updates
+
+create_isbn_edition
+^^^^^^^^^^^^^^^^^^^
+
+* Use :meth:`DataSite.search()<pywikibot.site._generators.GeneratorsMixin.search>` in ``get_item_with_prop_value``
+* Use :meth:`DataSite.search_entities()<pywikibot.site._datasite.DataSite.search_entities>` method in
+  ``get_item_list`` function
+* Call :func:`pywikibot.handle_args` first to provide help message
+* Enhance searching the item number from the ISBN number, code improvements  (:phab:`T314942`)
+
 dataextend
 ^^^^^^^^^^
 
@@ -13,6 +24,11 @@ replace
 ^^^^^^^
 
 * Strip newlines from pairsfile lines (:phab:`T378647`)
+
+weblinkchecker
+^^^^^^^^^^^^^^
+
+* Remove unused *error* parameter from ``History.log()`` method (:phab:`T380693`)
 
 9.5.0
 -----
