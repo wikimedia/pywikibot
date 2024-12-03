@@ -1,6 +1,29 @@
 Release History
 ===============
 
+9.6.0
+-----
+
+* Add support for idwikivoyage (:phab:`T381082`)
+* Add docstrings of :class:`tools.classproperty` methods (:phab:`T380628`)
+* Site property :attr:`BaseSite.codes<pywikibot.site._basesite.BaseSite.codes>` was added (:phab:`T380606`)
+* Increase *leeway* parameter of :meth:`login.OauthLoginManager.identity` (:phab:`T380270`)
+* Show a warning if *ignore_extension* parameter of :class:`pywikibot.FilePage` was set and the extension is invalid
+* Remove old code of Python 3.2 or older in :func:`tools.chars.replace_invisible` due to :pep:`393`
+* use :meth:`BasePage.autoFormat()<page.BasePage.autoFormat>` instead of :func:`date.getAutoFormat` in
+  :mod:`titletranslate`
+* Upcast :class:`pywikibot.Page` to :class:`pywikibot.FilePage` in :meth:`PageGenerator.result()
+  <data.api.PageGenerator.result>` if ``imageinfo`` is given (:phab:`T379513`)
+* Update oauth requirements
+* i18n-updates
+* Implement param *with_sort_key* in :meth:`page.BasePage.categories` (:phab:`T75561`)
+* Python 3.7 support will be discontinued and probably this is the last version supporting it
+* Add :meth:`page.BasePage.get_revision` method
+* Retry :meth:`data.sparql.SparqlQuery.query` on internal server error (500) (:phab:`T378788`)
+* Extract :meth:`APISite.linktrail()<pywikibot.site._apisite.APISite.linktrail>`
+  for hr-wiki (:phab:`T378787`)
+
+
 9.5.0
 -----
 *30 October 2024*

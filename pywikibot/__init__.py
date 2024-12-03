@@ -59,7 +59,7 @@ from pywikibot.logging import (
 )
 from pywikibot.site import BaseSite as _BaseSite
 from pywikibot.time import Timestamp
-from pywikibot.tools import PYTHON_VERSION, normalize_username
+from pywikibot.tools import normalize_username
 
 
 if TYPE_CHECKING:
@@ -86,15 +86,6 @@ if not hasattr(sys.modules[__name__], 'argvu'):
 link_regex = re.compile(r'\[\[(?P<title>[^\]|[<>{}]*)(\|.*?)?\]\]')
 
 _sites: dict[str, APISite] = {}
-
-if PYTHON_VERSION < (3, 8):
-    __version = sys.version.split(maxsplit=1)[0]
-    warn(f"""
-
-    Python {__version} will be dropped soon with Pywikibot 10.
-    It is recommended to use Python 3.8 or above.
-    See phab: T379227 for further information.
-""", FutureWarning)  # adjust this line no in utils.execute()
 
 
 @cache
