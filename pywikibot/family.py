@@ -574,7 +574,7 @@ class Family:
 
     def get_address(self, code, title) -> str:
         """Return the path to title using index.php with redirects disabled."""
-        return f'{self.path(code)}?title={title}&redirect=no'
+        return f'{self.path(code)}?{title=!s}&redirect=no'
 
     def interface(self, code: str) -> str:
         """Return interface to use for code."""

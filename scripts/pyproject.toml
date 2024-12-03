@@ -17,7 +17,7 @@ maintainers = [
 ]
 description = "Pywikibot Scripts Collection"
 readme = "scripts/README.rst"
-requires-python = ">=3.7.0"
+requires-python = ">=3.8.0"
 dependencies = [
     "pywikibot >= 9.4.0",
     "isbnlib",

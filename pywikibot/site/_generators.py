@@ -221,7 +221,7 @@ class GeneratorsMixin:
 
                 except KeyError:
                     pywikibot.debug(f"No 'title' in {pagedata}")
-                    pywikibot.debug(f'pageids={pageids}')
+                    pywikibot.debug(f'{pageids=!s}')
                     pywikibot.debug(f'titles={list(cache.keys())}')
                     continue
 
