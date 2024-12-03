@@ -3,6 +3,7 @@ Release History
 
 9.6.0
 -----
+*03 December 2024*
 
 * Add support for idwikivoyage (:phab:`T381082`)
 * Add docstrings of :class:`tools.classproperty` methods (:phab:`T380628`)

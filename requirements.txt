@@ -18,7 +18,6 @@
 # $ awk -F '[#>=]' '{print $1}' requirements.txt | xargs apt-cache search
 
 # mandatory dependencies, others are optional
-importlib_metadata ; python_version < '3.8'
 mwparserfromhell>=0.5.2
 packaging
 requests>=2.21.0
