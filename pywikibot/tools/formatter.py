@@ -1,17 +1,15 @@
 """Module containing various formatting related utilities."""
 #
-# (C) Pywikibot team, 2015-2023
+# (C) Pywikibot team, 2015-2024
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
 import math
-import re
 
 from pywikibot.logging import info
 from pywikibot.tools import deprecated
-from pywikibot.userinterfaces import terminal_interface_base
 
 
 class SequenceOutputter:
@@ -64,48 +62,3 @@ class SequenceOutputter:
            :attr:`out` property.
         """
         info(self.out)
-
-
-@deprecated('New color format pattern like <<color>>colored text<<default>>',
-            since='7.2.0')
-def color_format(text: str, *args, **kwargs) -> str:
-    r"""Do ``str.format`` without having to worry about colors.
-
-    It is automatically adding \\03 in front of color fields so it's
-    unnecessary to add them manually. Any other \\03 in the text is
-    disallowed.
-
-    You may use a variant {color} by assigning a valid color to a named
-    parameter color.
-
-    .. deprecated:: 7.2
-       new color format pattern like
-       ``f'<<{color}>>colored text<<default>>'`` can be used instead.
-
-    :param text: The format template string
-    :return: The formatted string
-    :raises ValueError: Wrong format string or wrong keywords
-    """
-    colors = set(terminal_interface_base.colors)
-    # Dot.product of colors to create all possible combinations of foreground
-    # and background colors.
-    colors |= {f'{c1};{c2}' for c1 in colors for c2 in colors}
-    col_pat = '|'.join(colors)
-    text = re.sub(f'(?:\03)?{{({col_pat})}}', r'<<\1>>', text)
-    replace_color = kwargs.get('color')
-    if replace_color in colors:
-        text = text.replace('{color}', f'<<{replace_color}>>')
-    if '\03' in text:
-        raise ValueError('\\03 pattern found in color format')
-    intersect = colors.intersection(kwargs)  # kwargs use colors
-    if intersect:
-        raise ValueError('Keyword argument(s) use valid color(s): '
-                         + '", "'.join(intersect))
-    try:
-        text = text.format(*args, **kwargs)
-    except KeyError as e:
-        if str(e).strip("'") in colors:
-            raise ValueError(f'Color field "{e}" in "{text}" uses conversion '
-                             f'information or format spec')
-        raise
-    return text

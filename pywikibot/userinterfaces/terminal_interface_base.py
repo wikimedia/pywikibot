@@ -24,7 +24,6 @@ from pywikibot.bot_choice import (
     StandardOption,
 )
 from pywikibot.logging import INFO, INPUT, STDOUT, VERBOSE, WARNING
-from pywikibot.tools import issue_deprecation_warning
 from pywikibot.tools.threading import RLock
 from pywikibot.userinterfaces import transliteration
 from pywikibot.userinterfaces._interface_base import ABUIC
@@ -53,9 +52,8 @@ colors = [
     'white',
 ]
 
-_color_pat = '((:?{0});?(:?{0})?)'.format('|'.join([*colors, 'previous']))
-old_colorTagR = re.compile(f'\03{{{_color_pat}}}')
-new_colorTagR = re.compile(f'<<{_color_pat}>>')
+colorTagR = re.compile(
+    '<<((:?{0});?(:?{0})?)>>'.format('|'.join([*colors, 'previous'])))
 
 
 class UI(ABUIC):
@@ -195,20 +193,7 @@ class UI(ABUIC):
         # Color tags might be cascaded, e.g. because of transliteration.
         # Therefore we need this stack.
         color_stack = ['default']
-        old_parts = old_colorTagR.split(text)
-        new_parts = new_colorTagR.split(text)
-        if min(len(old_parts), len(new_parts)) > 1:
-            raise ValueError('Old color format must not be mixed with new '
-                             'color format. Found:\n'
-                             + text.replace('\03', '\\03'))
-        if len(old_parts) > 1:
-            issue_deprecation_warning(
-                'old color format variant like \03{color}',
-                'new color format like <<color>>',
-                since='7.3.0')
-            text_parts = old_parts
-        else:
-            text_parts = new_parts
+        text_parts = colorTagR.split(text)
         text_parts.append('default')
         # match.split() includes every regex group; for each matched color
         # fg_col:b_col, fg_col and bg_col are added to the resulting list.

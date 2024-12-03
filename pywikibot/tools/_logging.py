@@ -1,6 +1,6 @@
 """Logging tools."""
 #
-# (C) Pywikibot team, 2009-2022
+# (C) Pywikibot team, 2009-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import logging
 
-from pywikibot.userinterfaces.terminal_interface_base import new_colorTagR
+from pywikibot.userinterfaces.terminal_interface_base import colorTagR
 
 
 class LoggingFormatter(logging.Formatter):
@@ -33,6 +33,6 @@ class LoggingFormatter(logging.Formatter):
 
         # remove color tags
         if record.msg and isinstance(record.msg, str):
-            record.msg = new_colorTagR.sub('', record.msg)
+            record.msg = colorTagR.sub('', record.msg)
 
         return super().format(record).rstrip()
