@@ -23,7 +23,7 @@ jobs:
       fail-fast: false
 
       matrix:
-        python-version: [ "3.7.1", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13" ]
+        python-version: [ "3.8.0", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13" ]
         python-arch: [ x64, x86 ]
         site: [ "wikipedia:en" ]
 
@@ -47,10 +47,6 @@ jobs:
         python -c "import struct; print('PYTHON_ARCH:', struct.calcsize('P') << 3)"
         python -m pip install --upgrade pip
         pip --version
-        if ('${{ matrix.python-version }}' -eq '3.7.1') {
-          pip install -U setuptools;
-          pip install "urllib3<2.0";
-        }
         if ('${{ matrix.python-version }}' -ge '3.12') {
           pip install -U setuptools;
         }
