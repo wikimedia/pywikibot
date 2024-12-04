@@ -205,12 +205,6 @@ else:
     from itertools import batched  # type: ignore[no-redef]
 
 
-try:
-    import importlib.metadata as importlib_metadata
-except ImportError:
-    import importlib_metadata
-
-
 # import ModuleDeprecationWrapper here to prevent circular import
 from pywikibot.tools import ModuleDeprecationWrapper  # noqa: E402
 
@@ -222,3 +216,6 @@ wrapper.add_deprecated_attr('nullcontext',
 wrapper.add_deprecated_attr('SimpleQueue',
                             replacement_name='queue.SimpleQueue',
                             since='9.0.0')
+wrapper.add_deprecated_attr('importlib_metadata',
+                            replacement_name='importlib.metadata',
+                            since='10.0.0')

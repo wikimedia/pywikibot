@@ -21,6 +21,7 @@ Current Release Changes
 Current Deprecations
 ====================
 
+* 10.0.0: *importlib_metadata* of :mod:`backports` is deprecated
 * 9.6.0: :meth:`BaseSite.languages()<pywikibot.site._basesite.BaseSite.languages>` will be removed in favour of
   :attr:`BaseSite.codes<pywikibot.site._basesite.BaseSite.codes>`
 * 9.5.0: :meth:`DataSite.getPropertyType()<pywikibot.site._datasite.DataSite.getPropertyType>` will be removed
@@ -49,7 +50,7 @@ Current Deprecations
 * 9.0.0: ``iteritems`` method of :class:`data.api.Request` will be removed in favour of ``items``
 * 9.0.0: ``SequenceOutputter.output()`` is deprecated in favour of :attr:`tools.formatter.SequenceOutputter.out`
   property
-* 9.0.0: *nullcontext* context manager and *SimpleQueue* queue of :mod:`backports` are derecated
+* 9.0.0: *nullcontext* context manager and *SimpleQueue* queue of :mod:`backports` are deprecated
 
 Pending removal in Pywikibot 11
 -------------------------------
