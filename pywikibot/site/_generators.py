@@ -25,11 +25,7 @@ from pywikibot.exceptions import (
 )
 from pywikibot.site._decorators import need_right
 from pywikibot.site._namespace import NamespaceArgType
-from pywikibot.tools import (
-    deprecate_arg,
-    is_ip_address,
-    issue_deprecation_warning,
-)
+from pywikibot.tools import deprecate_arg, is_ip_address
 from pywikibot.tools.itertools import filter_unique
 
 
@@ -950,40 +946,32 @@ class GeneratorsMixin:
 
         :param start: Start at this title (page need not exist).
         :param prefix: Only yield pages starting with this string.
-        :param namespace: Iterate pages from this (single) namespace
-        :param filterredir: if True, only yield redirects; if False (and not
-            None), only yield non-redirects (default: yield both)
-        :param filterlanglinks: if True, only yield pages with language links;
-            if False (and not None), only yield pages without language links
-            (default: yield both)
+        :param namespace: Iterate pages from this (single) namespace.
+        :param filterredir: if True, only yield redirects; if False (and
+            not None), only yield non-redirects (default: yield both).
+        :param filterlanglinks: if True, only yield pages with language
+            links; if False (and not None), only yield pages without
+            language links (default: yield both).
         :param minsize: if present, only yield pages at least this many
-            bytes in size
-        :param maxsize: if present, only yield pages at most this many bytes
-            in size
-        :param protect_type: only yield pages that have a protection of the
-            specified type
-        :param protect_level: only yield pages that have protection at this
-            level; can only be used if protect_type is specified
+            bytes in size.
+        :param maxsize: if present, only yield pages at most this many
+            bytes in size.
+        :param protect_type: only yield pages that have a protection of
+            the specified type.
+        :param protect_level: only yield pages that have protection at
+            this level; can only be used if protect_type is specified.
         :param reverse: if True, iterate in reverse Unicode lexigraphic
-            order (default: iterate in forward order)
-        :param content: if True, load the current content of each iterated page
-            (default False)
+            order (default: iterate in forward order).
+        :param content: if True, load the current content of each
+            iterated page (default False).
         :raises KeyError: the namespace identifier was not resolved
         :raises TypeError: the namespace identifier has an inappropriate
-            type such as bool, or an iterable with more than one namespace
+            type such as bool, or an iterable with more than one
+            namespace or *filterredir* parameter has an invalid type.
         """
-        # backward compatibility test
         if filterredir not in (True, False, None):
-            old = filterredir
-            if not filterredir:
-                filterredir = False
-            elif filterredir == 'only':
-                filterredir = True
-            else:
-                filterredir = None
-            issue_deprecation_warning(
-                f'The value "{old}" for "filterredir"',
-                f'"{filterredir}"', since='7.0.0')
+            raise TypeError('filterredir parameter must be True, False or '
+                            f'None, not {type(filterredir)}')
 
         apgen = self._generator(api.PageGenerator, type_arg='allpages',
                                 namespaces=namespace,
