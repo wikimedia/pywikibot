@@ -10,7 +10,7 @@ import abc
 import bz2
 import gzip
 import hashlib
-import importlib.metadata as importlib_metadata
+import importlib.metadata
 import ipaddress
 import lzma
 import os
@@ -121,8 +121,8 @@ def has_module(module: str, version: str | None = None) -> bool:
        removed with Python 3.12.
     """
     try:
-        metadata_version = importlib_metadata.version(module)
-    except importlib_metadata.PackageNotFoundError:
+        metadata_version = importlib.metadata.version(module)
+    except importlib.metadata.PackageNotFoundError:
         return False
     if version:
 

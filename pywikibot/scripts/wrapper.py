@@ -49,6 +49,7 @@ for tests to set the default site (see :phab:`T216825`)::
 #
 from __future__ import annotations
 
+import importlib.metadata
 import os
 import sys
 import types
@@ -233,8 +234,6 @@ def check_modules(script: str | None = None) -> bool:
     :return: True if all dependencies are installed
     :raise RuntimeError: wrong Python version found in setup.py
     """
-    import importlib.metadata as importlib_metadata
-
     from packaging.requirements import Requirement
 
     from setup import script_deps
@@ -259,8 +258,8 @@ def check_modules(script: str | None = None) -> bool:
         requirement = Requirement(dependency)
         if requirement.marker is None or requirement.marker.evaluate():
             try:
-                instlld_vrsn = importlib_metadata.version(requirement.name)
-            except importlib_metadata.PackageNotFoundError as e:
+                instlld_vrsn = importlib.metadata.version(requirement.name)
+            except importlib.metadata.PackageNotFoundError as e:
                 missing_requirements.append(requirement)
                 print(e)
             else:
@@ -272,7 +271,6 @@ def check_modules(script: str | None = None) -> bool:
                     )
 
     del Requirement
-    del importlib_metadata
     del script_deps
 
     _print_requirements(missing_requirements, script, 'missing')
