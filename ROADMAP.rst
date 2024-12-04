@@ -11,6 +11,8 @@ Current Release Changes
 
 **Breaking changes and code cleanups**
 
+* ``svn_rev_info`` and ``getversion_svn`` of :mod:`version` module were be removed.
+  SVN repository is no longer supported. (:phab:`T362484`)
 * Old color escape sequences like ``\03{color}`` were dropped in favour of new color format like ``<<color>>``
 * ``tools.formatter.color_format()`` was removed; the new color literals can be used instead
 * RedirectPageBot and NoRedirectPageBot bot classes were removed in favour of
@@ -85,8 +87,6 @@ Pending removal in Pywikibot 11
 Pending removal in Pywikibot 10
 -------------------------------
 
-* 9.1.0: :func:`version.svn_rev_info` and :func:`version.getversion_svn` will be removed. SVN is no longer supported.
-  (:phab:`T362484`)
 * 7.7.0: :mod:`tools.threading` classes should no longer imported from :mod:`tools`
 * 7.6.0: :mod:`tools.itertools` datatypes should no longer imported from :mod:`tools`
 * 7.6.0: :mod:`tools.collections` datatypes should no longer imported from :mod:`tools`

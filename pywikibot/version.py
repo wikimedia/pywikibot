@@ -11,12 +11,11 @@ import json
 import os
 import pathlib
 import socket
-import sqlite3
 import subprocess
 import sys
 import sysconfig
 import time
-from contextlib import closing, suppress
+from contextlib import suppress
 from importlib import import_module
 from pathlib import Path
 from warnings import warn
@@ -26,8 +25,7 @@ from pywikibot import config
 from pywikibot.backports import cache
 from pywikibot.comms.http import fetch
 from pywikibot.exceptions import VersionParseError
-from pywikibot.tools import deprecated, suppress_warnings
-from pywikibot.tools._deprecate import _NotImplementedWarning
+from pywikibot.tools import deprecated
 
 
 def _get_program_dir() -> str:
@@ -91,14 +89,10 @@ def getversiondict() -> dict[str, str]:
     exceptions = {}
 
     for vcs_func in (getversion_git,
-                     getversion_svn,
                      getversion_nightly,
                      getversion_package):
         try:
-            with suppress_warnings(
-                f'.*({vcs_func.__name__}|svn_rev_info) is deprecated since '
-                    'release 9.1.', _NotImplementedWarning):
-                tag, rev, date, hsh = vcs_func(_program_dir)
+            tag, rev, date, hsh = vcs_func(_program_dir)
         except Exception as e:
             exceptions[vcs_func] = vcs_func.__name__, e
         else:
@@ -126,64 +120,6 @@ def getversiondict() -> dict[str, str]:
         datestring = '-2 (unknown)'
 
     return {'tag': tag, 'rev': rev, 'date': datestring, 'hsh': hsh}
-
-
-@deprecated(since='9.1')
-def svn_rev_info(path):
-    """Fetch information about the current revision of a Subversion checkout.
-
-    .. deprecated:: 9.1
-       update to git repository.
-    .. versionchanged:: 9.1
-       drop support for svn 1.6 and older.
-
-    :param path: directory of the Subversion checkout
-    :return:
-        - tag (name for the repository),
-        - rev (current Subversion revision identifier),
-        - date (date of current revision),
-    :rtype: ``tuple`` of two ``str`` and a ``time.struct_time``
-    """
-    if not os.path.isdir(os.path.join(path, '.svn')):
-        path = os.path.join(path, '..')
-
-    with closing(
-            sqlite3.connect(os.path.join(path, '.svn/wc.db'))) as con:
-        cur = con.cursor()
-        cur.execute("""select
-local_relpath, repos_path, revision, changed_date, checksum from nodes
-order by revision desc, changed_date desc""")
-        _name, tag, rev, date, _checksum = cur.fetchone()
-        cur.execute('select root from repository')
-        tag, = cur.fetchone()
-
-    tag = os.path.split(tag)[1]
-    date = time.gmtime(date / 1_000_000)
-    return tag, rev, date
-
-
-@deprecated(since='9.1')
-def getversion_svn(path=None):
-    """Get version info for a Subversion checkout.
-
-    .. deprecated:: 9.1
-       update to git repository.
-
-    :param path: directory of the Subversion checkout
-    :return:
-        - tag (name for the repository),
-        - rev (current Subversion revision identifier),
-        - date (date of current revision),
-        - hash '(unknown)'
-    :rtype: ``tuple`` of three ``str`` and a ``time.struct_time``
-    """
-    _program_dir = path or _get_program_dir()
-    tag, rev, date = svn_rev_info(_program_dir)
-    rev = f's{rev}'
-
-    if (not date or not tag or not rev) and not path:
-        raise VersionParseError
-    return (tag, rev, date, '(unknown)')
 
 
 def getversion_git(path=None):
