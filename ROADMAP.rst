@@ -26,7 +26,8 @@ Current Release Changes
 * ``tools.formatter.color_format()`` was removed; the new color literals can be used instead
 * RedirectPageBot and NoRedirectPageBot bot classes were removed in favour of
   :attr:`use_redirects<bot.BaseBot.use_redirects>` attribute
-* Python 3.7 support was dropped (:phab:`T378893`)
+* Python 3.7 support was dropped (:phab:`T378893`), including *importlib_metadata* of
+  :mod:`backports`
 
 
 Current Deprecations
@@ -34,7 +35,6 @@ Current Deprecations
 
 * 10.0.0: *includeredirects* parameter of :func:`pagegenerators.AllpagesPageGenerator` and
   :func:`pagegenerators.PrefixingPageGenerator` is deprecated and should be replaced by *filterredir*
-* 10.0.0: *importlib_metadata* of :mod:`backports` is deprecated
 * 9.6.0: :meth:`BaseSite.languages()<pywikibot.site._basesite.BaseSite.languages>` will be removed in favour of
   :attr:`BaseSite.codes<pywikibot.site._basesite.BaseSite.codes>`
 * 9.5.0: :meth:`DataSite.getPropertyType()<pywikibot.site._datasite.DataSite.getPropertyType>` will be removed

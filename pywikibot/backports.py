@@ -3,8 +3,6 @@
 .. deprecated:: 9.0
    The *nullcontext* context manager; use ``contextlib.nullcontext``
    instead. The *SimpleQueue* queue; use ``queue.SimpleQueue`` instead.
-.. deprecated:: 10.0
-   The *importlib_metadata* lib. Import ``importlib.metadata`` instead.
 """
 #
 # (C) Pywikibot team, 2014-2024
@@ -218,6 +216,3 @@ wrapper.add_deprecated_attr('nullcontext',
 wrapper.add_deprecated_attr('SimpleQueue',
                             replacement_name='queue.SimpleQueue',
                             since='9.0.0')
-wrapper.add_deprecated_attr('importlib_metadata',
-                            replacement_name='importlib.metadata',
-                            since='10.0.0')
