@@ -1,20 +1,4 @@
-"""Miscellaneous helper functions (not wiki-dependent).
-
-.. deprecated:: 7.6
-   The *CombinedError*, *DequeGenerator*, *EmptyDefault*, *EMPTY_DEFAULT*
-   and *SizedKeyCollection* objects. Import them from
-   :mod:`tools.collections` instead.
-.. deprecated:: 7.6
-   The *itergroup* function. Use :func:`backports.batched` or
-   ``itertools.batched`` instead.
-.. deprecated:: 7.6
-   The *filter_unique*, *intersect_generators*, *islice_with_ellipsis*
-   and *roundrobin_generators* functions. Import them from
-   :mod:`tools.itertools` instead.
-.. deprecated:: 7.7
-   The *RLock*, *ThreadedGenerator* and *ThreadList* classes.
-   Import them from :mod:`tools.threading` instead.
-"""
+"""Miscellaneous helper functions (not wiki-dependent)."""
 #
 # (C) Pywikibot team, 2008-2024
 #
@@ -780,66 +764,3 @@ def cached(*arg: Callable) -> Any:
             return val
 
     return wrapper
-
-
-# Deprecate objects which has to be imported from tools.collections instead
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper.add_deprecated_attr(
-    'CombinedError',
-    replacement_name='pywikibot.tools.collections.CombinedError',
-    since='7.6.0')
-wrapper.add_deprecated_attr(
-    'DequeGenerator',
-    replacement_name='pywikibot.tools.collections.DequeGenerator',
-    since='7.6.0')
-wrapper.add_deprecated_attr(
-    'EmptyDefault',
-    replacement_name='pywikibot.tools.collections.EmptyDefault',
-    since='7.6.0')
-wrapper.add_deprecated_attr(
-    'SizedKeyCollection',
-    replacement_name='pywikibot.tools.collections.SizedKeyCollection',
-    since='7.6.0')
-wrapper.add_deprecated_attr(
-    'EMPTY_DEFAULT',
-    replacement_name='pywikibot.tools.collections.EMPTY_DEFAULT',
-    since='7.6.0')
-
-# Deprecate objects which has to be imported from backports instead
-wrapper.add_deprecated_attr(
-    'itergroup',
-    # new replacement in 8.2
-    replacement_name='pywikibot.backports.batched',
-    since='7.6.0')
-
-# Deprecate objects which has to be imported from tools.itertools instead
-wrapper.add_deprecated_attr(
-    'islice_with_ellipsis',
-    replacement_name='pywikibot.tools.itertools.islice_with_ellipsis',
-    since='7.6.0')
-wrapper.add_deprecated_attr(
-    'intersect_generators',
-    replacement_name='pywikibot.tools.itertools.intersect_generators',
-    since='7.6.0')
-wrapper.add_deprecated_attr(
-    'roundrobin_generators',
-    replacement_name='pywikibot.tools.itertools.roundrobin_generators',
-    since='7.6.0')
-wrapper.add_deprecated_attr(
-    'filter_unique',
-    replacement_name='pywikibot.tools.itertools.filter_unique',
-    since='7.6.0')
-
-# Deprecate objects which has to be imported from tools.threading instead
-wrapper.add_deprecated_attr(
-    'RLock',
-    replacement_name='pywikibot.tools.threading.RLock',
-    since='7.7.0')
-wrapper.add_deprecated_attr(
-    'ThreadedGenerator',
-    replacement_name='pywikibot.tools.threading.ThreadedGenerator',
-    since='7.7.0')
-wrapper.add_deprecated_attr(
-    'ThreadList',
-    replacement_name='pywikibot.tools.threading.ThreadList',
-    since='7.7.0')
