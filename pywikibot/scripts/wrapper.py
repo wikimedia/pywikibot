@@ -233,9 +233,10 @@ def check_modules(script: str | None = None) -> bool:
     :return: True if all dependencies are installed
     :raise RuntimeError: wrong Python version found in setup.py
     """
+    import importlib.metadata as importlib_metadata
+
     from packaging.requirements import Requirement
 
-    from pywikibot.backports import importlib_metadata
     from setup import script_deps
 
     missing_requirements = []
@@ -247,7 +248,7 @@ def check_modules(script: str | None = None) -> bool:
         from setup import dependencies
 
     for dependency in dependencies:
-        if dependency.startswith(('importlib_metadata', 'packaging')):
+        if dependency.startswith('packaging'):
             # Ignore these dependencies because ImportError is raised in an
             # early state when they are imported in backports. They are already
             # used at this point. This is a workaound for toolforge where some

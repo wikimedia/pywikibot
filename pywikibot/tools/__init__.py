@@ -26,6 +26,7 @@ import abc
 import bz2
 import gzip
 import hashlib
+import importlib.metadata as importlib_metadata
 import ipaddress
 import lzma
 import os
@@ -41,12 +42,7 @@ from warnings import catch_warnings, showwarning, warn
 import packaging.version
 
 import pywikibot  # T306760
-from pywikibot.backports import (
-    PYTHON_VERSION,
-    SPHINX_RUNNING,
-    Callable,
-    importlib_metadata,
-)
+from pywikibot.backports import PYTHON_VERSION, SPHINX_RUNNING, Callable
 from pywikibot.tools._deprecate import (
     ModuleDeprecationWrapper,
     add_decorated_full_name,
