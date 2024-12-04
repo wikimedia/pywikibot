@@ -11,6 +11,9 @@ Current Release Changes
 
 **Breaking changes and code cleanups**
 
+* :mod:`tools.threading` classes no longer can be imported from :mod:`tools`
+* :mod:`tools.itertools` datatypes no longer can be imported from :mod:`tools`
+* :mod:`tools.collections` datatypes no longer can be imported from :mod:`tools`
 * ``svn_rev_info`` and ``getversion_svn`` of :mod:`version` module were be removed.
   SVN repository is no longer supported. (:phab:`T362484`)
 * Old color escape sequences like ``\03{color}`` were dropped in favour of new color format like ``<<color>>``
@@ -87,9 +90,6 @@ Pending removal in Pywikibot 11
 Pending removal in Pywikibot 10
 -------------------------------
 
-* 7.7.0: :mod:`tools.threading` classes should no longer imported from :mod:`tools`
-* 7.6.0: :mod:`tools.itertools` datatypes should no longer imported from :mod:`tools`
-* 7.6.0: :mod:`tools.collections` datatypes should no longer imported from :mod:`tools`
 * 7.5.0: :mod:`textlib`.tzoneFixedOffset class will be removed in favour of :class:`time.TZoneFixedOffset`
 * 7.4.0: ``FilePage.usingPages()`` was renamed to :meth:`using_pages()<pywikibot.FilePage.using_pages>`
 * 7.3.0: ``linktrail`` method of :class:`family.Family` is deprecated; use :meth:`APISite.linktrail()
