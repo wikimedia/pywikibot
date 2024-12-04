@@ -46,31 +46,27 @@ class SparqlQuery(WaitingMixin):
         """Create endpoint.
 
         :param endpoint: SPARQL endpoint URL
-        :param entity_url: URL prefix for any entities returned in a query.
-        :param repo: The Wikibase site which we want to run queries on. If
-            provided this overrides any value in endpoint and entity_url.
-            Defaults to Wikidata.
+        :param entity_url: URL prefix for any entities returned in a
+            query.
+        :param repo: The Wikibase site which we want to run queries on.
+            If provided this overrides any value in endpoint and
+            entity_url. Defaults to Wikidata.
         :type repo: pywikibot.site.DataSite
-        :param max_retries: (optional) Maximum number of times to retry after
-               errors, defaults to config.max_retries.
-        :param retry_wait: (optional) Minimum time in seconds to wait after an
-               error, defaults to config.retry_wait seconds (doubles each retry
-               until config.retry_max is reached).
+        :param max_retries: (optional) Maximum number of times to retry
+            after errors, defaults to config.max_retries.
+        :param retry_wait: (optional) Minimum time in seconds to wait
+            after an error, defaults to config.retry_wait seconds
+            (doubles each retry until config.retry_max is reached).
+        :raises Error: The site does not provide a sparql endpoint or if
+            initialised with an endpoint the entity_url must be provided.
         """
         # default to Wikidata
         if not repo and not endpoint:
             repo = Site('wikidata')
 
         if repo:
-            try:
-                self.endpoint = repo.sparql_endpoint
-                self.entity_url = repo.concept_base_uri
-            except NotImplementedError:
-                raise NotImplementedError(
-                    'Wiki version must be 1.28-wmf.23 or newer to '
-                    'automatically extract the sparql endpoint. '
-                    'Please provide the endpoint and entity_url '
-                    'parameters instead of a repo.')
+            self.endpoint = repo.sparql_endpoint
+            self.entity_url = repo.concept_base_uri
             if not self.endpoint:
                 raise Error(
                     f'The site {repo} does not provide a sparql endpoint.')

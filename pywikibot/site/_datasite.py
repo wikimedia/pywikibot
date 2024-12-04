@@ -24,7 +24,7 @@ from pywikibot.exceptions import (
     NoWikibaseEntityError,
 )
 from pywikibot.site._apisite import APISite
-from pywikibot.site._decorators import need_extension, need_right, need_version
+from pywikibot.site._decorators import need_extension, need_right
 from pywikibot.tools import deprecated, merge_unique_dicts, remove_last_args
 
 
@@ -138,7 +138,6 @@ class DataSite(APISite):
         raise NoWikibaseEntityError(entity)
 
     @property
-    @need_version('1.28-wmf.3')
     def sparql_endpoint(self):
         """Return the sparql endpoint url, if any has been set.
 
@@ -148,7 +147,6 @@ class DataSite(APISite):
         return self.siteinfo['general'].get('wikibase-sparql')
 
     @property
-    @need_version('1.28-wmf.23')
     def concept_base_uri(self):
         """Return the base uri for concepts/entities.
 
