@@ -3,6 +3,8 @@
 .. deprecated:: 9.0
    The *nullcontext* context manager; use ``contextlib.nullcontext``
    instead. The *SimpleQueue* queue; use ``queue.SimpleQueue`` instead.
+.. deprecated:: 10.0
+   The *importlib_metadata* lib. Import ``importlib.metadata`` instead.
 """
 #
 # (C) Pywikibot team, 2014-2024
