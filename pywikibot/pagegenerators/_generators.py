@@ -11,6 +11,7 @@ import codecs
 import io
 import re
 import sys
+import typing
 from collections import abc
 from functools import partial
 from http import HTTPStatus
@@ -32,7 +33,7 @@ from pywikibot.backports import (
 from pywikibot.comms import http
 from pywikibot.exceptions import APIError, ServerError
 from pywikibot.site import Namespace
-from pywikibot.tools import deprecated
+from pywikibot.tools import deprecated, issue_deprecation_warning
 from pywikibot.tools.collections import GeneratorWrapper
 from pywikibot.tools.itertools import filter_unique
 
@@ -42,7 +43,6 @@ if TYPE_CHECKING:
     from pywikibot.site._namespace import SingleNamespaceType
     from pywikibot.time import Timestamp
 
-
 # This is the function that will be used to de-duplicate page iterators.
 _filter_unique_pages = partial(
     filter_unique, key=lambda page: '{}:{}:{}'.format(*page._cmpkey()))
@@ -51,51 +51,93 @@ _filter_unique_pages = partial(
 def AllpagesPageGenerator(
     start: str = '!',
     namespace: SingleNamespaceType = 0,
-    includeredirects: str | bool = True,
+    includeredirects: typing.Literal['only'] | bool = True,
     site: BaseSite | None = None,
-    total: int | None = None, content: bool = False
+    total: int | None = None,
+    content: bool = False,
+    *,
+    filterredir: bool | None = None,
 ) -> Iterable[pywikibot.page.Page]:
     """Iterate Page objects for all titles in a single namespace.
 
-    If includeredirects is False, redirects are not included. If
-    includeredirects equals the string 'only', only redirects are added.
+    .. deprecated:: 10.0
+       The *includeredirects* parameter; use *filterredir* instead.
+    .. seealso:: :meth:`APISite.allpages()
+       <pywikibot.site._generators.GeneratorsMixin.allpages>`
 
-    :param total: Maximum number of pages to retrieve in total
-    :param content: If True, load current version of each page (default False)
+    :param start: if provided, only generate pages >= this title
+        lexically
+    :param namespace: Namespace to retrieve pages from
+    :param includeredirects: If False, redirects are not included. If
+        equals the string 'only', only redirects are added. Otherwise
+        redirects will be included. This parameter is deprecated; use
+        *filterredir* instead.
     :param site: Site for generator results.
+    :param total: Maximum number of pages to retrieve in total
+    :param content: If True, load current version of each page (default
+        False)
+    :param filterredir: if True, only yield redirects; if False (and
+        not None), only yield non-redirects (default: yield both).
+    :return: a generator that yields Page objects
+    :raises ValueError: *filterredir* as well as *includeredirects*
+        parameters were given. Use *filterredir* only.
     """
     if site is None:
         site = pywikibot.Site()
 
-    filterredir: bool | None = None
-    if not includeredirects:
-        filterredir = False
-    elif includeredirects == 'only':
-        filterredir = True
+    if filterredir is not None and includeredirects is not True:
+        raise ValueError(
+            f'filterredir parameter ({filterredir}) is used together with '
+            f'outdated includeredirects parameter ({includeredirects}).'
+        )
+
+    # backward compatibility
+    if includeredirects is not True:
+        if not includeredirects:
+            filterredir = False
+        elif includeredirects == 'only':
+            filterredir = True
+
+        issue_deprecation_warning(
+            'includeredirects parameter ({includeredirects})',
+            f'filterredir={filterredir}',
+            since='10.0.0'
+        )
 
     return site.allpages(start=start, namespace=namespace,
                          filterredir=filterredir, total=total, content=content)
 
 
-def PrefixingPageGenerator(prefix: str,
-                           namespace: SingleNamespaceType | None = None,
-                           includeredirects: bool | str | None = True,
-                           site: BaseSite | None = None,
-                           total: int | None = None,
-                           content: bool = False
-                           ) -> Iterable[pywikibot.page.Page]:
+def PrefixingPageGenerator(
+    prefix: str,
+    namespace: SingleNamespaceType | None = None,
+    includeredirects: typing.Literal['only'] | bool = True,
+    site: BaseSite | None = None,
+    total: int | None = None,
+    content: bool = False,
+    *,
+    filterredir: bool | None = None,
+) -> Iterable[pywikibot.page.Page]:
     """Prefixed Page generator.
+
+    .. deprecated:: 10.0
+       The *includeredirects* parameter; use *filterredir* instead.
 
     :param prefix: The prefix of the pages.
     :param namespace: Namespace to retrieve pages from
-    :param includeredirects: If includeredirects is None, False or an empty
-        string, redirects will not be found. If includeredirects equals the
-        string 'only', only redirects will be found. Otherwise redirects will
-        be included.
+    :param includeredirects: If False, redirects are not included. If
+        equals the string 'only', only redirects are added. Otherwise
+        redirects will be included. This parameter is deprecated; use
+        *filterredir* instead.
     :param site: Site for generator results.
     :param total: Maximum number of pages to retrieve in total
-    :param content: If True, load current version of each page (default False)
+    :param content: If True, load current version of each page (default
+        False)
+    :param filterredir: if True, only yield redirects; if False (and
+        not None), only yield non-redirects (default: yield both).
     :return: a generator that yields Page objects
+    :raises ValueError: *filterredir* as well as *includeredirects*
+        parameters were given. Use *filterredir* only.
     """
     if site is None:
         site = pywikibot.Site()
@@ -105,11 +147,24 @@ def PrefixingPageGenerator(prefix: str,
         namespace = prefixlink.namespace
     title = prefixlink.title
 
-    filterredir: bool | None = None
-    if not includeredirects:
-        filterredir = False
-    elif includeredirects == 'only':
-        filterredir = True
+    if filterredir is not None and includeredirects is not True:
+        raise ValueError(
+            f'filterredir parameter ({filterredir}) is used together with '
+            f'outdated includeredirects parameter ({includeredirects}).'
+        )
+
+    # backward compatibility
+    if includeredirects is not True:
+        if not includeredirects:
+            filterredir = False
+        elif includeredirects == 'only':
+            filterredir = True
+
+        issue_deprecation_warning(
+            'includeredirects parameter ({includeredirects})',
+            f'filterredir={filterredir}',
+            since='10.0.0'
+        )
 
     return site.allpages(prefix=title, namespace=namespace,
                          filterredir=filterredir, total=total, content=content)

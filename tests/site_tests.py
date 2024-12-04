@@ -36,26 +36,6 @@ from tests.aspects import (
 from tests.basepage import BasePageLoadRevisionsCachingTestBase
 
 
-class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase,
-                                        DeprecationTestCase):
-
-    """Test cases for Site deprecated methods on a live wiki."""
-
-    cached = True
-
-    def test_allpages_filterredir_true(self):
-        """Test that filterredir set to 'only' is deprecated to True."""
-        for page in self.site.allpages(filterredir='only', total=1):
-            self.assertTrue(page.isRedirectPage())
-        self.assertOneDeprecation()
-
-    def test_allpages_filterredir_talse(self):
-        """Test if filterredir's bool is False it's deprecated to False."""
-        for page in self.site.allpages(filterredir='', total=1):
-            self.assertFalse(page.isRedirectPage())
-        self.assertOneDeprecation()
-
-
 class TestSiteObject(DefaultSiteTestCase):
 
     """Test cases for Site methods."""

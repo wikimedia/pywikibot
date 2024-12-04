@@ -11,6 +11,8 @@ Current Release Changes
 
 **Breaking changes and code cleanups**
 
+* Values of :meth:`APISite.allpages()<pywikibot.site._generators.GeneratorsMixin.allpages>`
+  parameter filterredir must be True, False or None
 * :mod:`tools.threading` classes no longer can be imported from :mod:`tools`
 * :mod:`tools.itertools` datatypes no longer can be imported from :mod:`tools`
 * :mod:`tools.collections` datatypes no longer can be imported from :mod:`tools`
@@ -26,6 +28,8 @@ Current Release Changes
 Current Deprecations
 ====================
 
+* 10.0.0: *includeredirects* parameter of :func:`pagegenerators.AllpagesPageGenerator` and
+  :func:`pagegenerators.PrefixingPageGenerator` is deprecated and should be replaced by *filterredir*
 * 10.0.0: *importlib_metadata* of :mod:`backports` is deprecated
 * 9.6.0: :meth:`BaseSite.languages()<pywikibot.site._basesite.BaseSite.languages>` will be removed in favour of
   :attr:`BaseSite.codes<pywikibot.site._basesite.BaseSite.codes>`
@@ -104,4 +108,3 @@ Pending removal in Pywikibot 10
 * 7.0.0: A boolean watch parameter in Page.save() is deprecated and will be desupported
 * 7.0.0: baserevid parameter of editSource(), editQualifier(), removeClaims(), removeSources(), remove_qualifiers()
   DataSite methods will be removed
-* 7.0.0: Values of APISite.allpages() parameter filterredir other than True, False and None are deprecated
