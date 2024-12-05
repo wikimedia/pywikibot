@@ -18,7 +18,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import Timestamp, config, date, i18n, textlib, tools
-from pywikibot.backports import Generator, Iterable
+from pywikibot.backports import Generator, Iterable, NoneType
 from pywikibot.cosmetic_changes import CANCEL, CosmeticChangesToolkit
 from pywikibot.exceptions import (
     Error,
@@ -1293,6 +1293,8 @@ class BasePage(ComparableMixin):
            edits cannot be marked as bot edits if the bot account has no
            ``bot`` right. Therefore a ``None`` argument for *bot*
            parameter was dropped.
+        .. versionchanged:: 10.0
+           boolean *watch* parameter is desupported
 
         .. hint:: Setting up :manpage:`OAuth` or :manpage:`BotPassword
            <BotPasswords>` login, you have to grant
@@ -1333,21 +1335,22 @@ class BasePage(ComparableMixin):
         :param quiet: enable/disable successful save operation message;
             defaults to False. In asynchronous mode, if True, it is up
             to the calling bot to manage the output e.g. via callback.
+        :raises TypeError: watch parameter must be a string literal or
+            None
+        :raises OtherPageSaveError: Editing restricted by a template.
         """
         if not summary:
             summary = config.default_edit_summary
 
-        if isinstance(watch, bool):  # pragma: no cover
-            issue_deprecation_warning(
-                'boolean watch parameter',
-                '"watch", "unwatch", "preferences" or "nochange" value',
-                since='7.0.0')
-            watch = ('unwatch', 'watch')[watch]
-
+        if not isinstance(watch, (str, NoneType)):
+            raise TypeError(
+                f'watch parameter must be a string literal, not {watch}')
         if not force and not self.botMayEdit():
             raise OtherPageSaveError(
                 self, 'Editing restricted by {{bots}}, {{nobots}} '
-                "or site's equivalent of {{in use}} template")
+                "or site's equivalent of {{in use}} template"
+            )
+
         self._save(summary=summary, watch=watch, minor=minor, bot=bot,
                    asynchronous=asynchronous, callback=callback,
                    cc=apply_cosmetic_changes, quiet=quiet, **kwargs)
