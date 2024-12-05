@@ -9,10 +9,13 @@ Structured Discussions was formerly known as Flow. Flow was renamed in
 .. deprecated:: 9.4
    Structured Discussions extension is not maintained and will be
    removed. Users are encouraged to stop using it. (:phab:`T371180`)
+.. versionremoved:: 10.0
+   (:phab:`T381551`)
 .. seealso::
+   - https://www.mediawiki.org/wiki/Extension:StructuredDiscussions
    - https://www.mediawiki.org/wiki/Structured_Discussions
    - https://www.mediawiki.org/wiki/Structured_Discussions/Wikis
-   - https://www.mediawiki.org/wiki/Extension:StructuredDiscussions
+   - https://www.mediawiki.org/wiki/Structured_Discussions/Deprecation
 """
 #
 # (C) Pywikibot team, 2015-2024
@@ -36,6 +39,7 @@ from pywikibot.exceptions import (
 )
 from pywikibot.page import BasePage, PageSourceType, User
 from pywikibot.tools import (
+    SPHINX_RUNNING,
     ModuleDeprecationWrapper,
     cached,
     deprecated_args,
@@ -53,14 +57,6 @@ __all__ = (
 
 FLOW_WARNING = (r'pywikibot\.site\._extensions\.(Thanks)?FlowMixin\.[a-z_]+ '
                 r'is deprecated since release 9\.4\.0\.')
-
-
-__all__ = (
-    'Board',
-    'FlowPage',
-    'Post',
-    'Topic',
-)
 
 
 class FlowPage(BasePage, abc.ABC):
@@ -625,10 +621,11 @@ class Post:
             self.site.thank_post(self)
 
 
-wrapper = ModuleDeprecationWrapper(__name__)
-for cls in __all__:
-    wrapper.add_deprecated_attr(
-        cls,
-        replacement_name='',
-        since='9.4.0',
-        future_warning=False)
+if not SPHINX_RUNNING:
+    wrapper = ModuleDeprecationWrapper(__name__)
+    for cls in __all__:
+        wrapper.add_deprecated_attr(
+            cls,
+            replacement_name='',
+            since='9.4.0'
+        )
