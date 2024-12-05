@@ -33,7 +33,7 @@ from pywikibot.backports import (
 from pywikibot.comms import http
 from pywikibot.exceptions import APIError, ServerError
 from pywikibot.site import Namespace
-from pywikibot.tools import deprecated, issue_deprecation_warning
+from pywikibot.tools import issue_deprecation_warning
 from pywikibot.tools.collections import GeneratorWrapper
 from pywikibot.tools.itertools import filter_unique
 
@@ -1157,21 +1157,6 @@ class XMLDumpPageGenerator(abc.Iterator):  # type: ignore[type-arg]
                 if self.content:
                     page.text = entry.text
                 return page
-
-
-@deprecated('XMLDumpPageGenerator with content=True parameter', since='7.2.0')
-class XMLDumpOldPageGenerator(XMLDumpPageGenerator):
-
-    """Xml iterator that yields Page objects with old text loaded.
-
-    .. deprecated:: 7.2
-       :class:`XMLDumpPageGenerator` with `content` parameter should be
-       used instead
-    """
-
-    def __init__(self, *args, **kwargs):
-        """Initializer."""
-        super().__init__(*args, **kwargs, content=True)
 
 
 def YearPageGenerator(start: int = 1, end: int = 2050,

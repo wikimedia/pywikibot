@@ -11,6 +11,8 @@ Current Release Changes
 
 **Breaking changes and code cleanups**
 
+* ``XMLDumpOldPageGenerator`` was removed in favour of a ``content`` parameter of
+  :func:`pagegenerators.XMLDumpPageGenerator` (:phab:`T306134`)
 * :meth:`pywikibot.User.is_blocked` method was renamed from ``isBlocked`` for consistency
 * Values of :meth:`APISite.allpages()<pywikibot.site._generators.GeneratorsMixin.allpages>`
   parameter filterredir must be True, False or None
@@ -102,8 +104,6 @@ Pending removal in Pywikibot 10
 * 7.2.0: Positional arguments *decoder*, *layer* and *newline* for :mod:`logging` functions were dropped; keyword
   arguments must be used instead.
 * 7.2.0: ``tb`` parameter of :func:`exception()<pywikibot.logging.exception>` function was renamed to ``exc_info``
-* 7.2.0: XMLDumpOldPageGenerator is deprecated in favour of a ``content`` parameter of
-  :func:`XMLDumpPageGenerator<pagegenerators.XMLDumpPageGenerator>` (:phab:`T306134`)
 * 7.1.0: Unused ``get_redirect`` parameter of :meth:`Page.getOldVersion()<page.BasePage.getOldVersion>` will be removed
 * 7.0.0: A boolean watch parameter in Page.save() is deprecated and will be desupported
 * 7.0.0: baserevid parameter of editSource(), editQualifier(), removeClaims(), removeSources(), remove_qualifiers()
