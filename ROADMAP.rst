@@ -11,6 +11,7 @@ Current Release Changes
 
 **Breaking changes and code cleanups**
 
+* :meth:`pywikibot.User.is_blocked` method was renamed from ``isBlocked`` for consistency
 * Values of :meth:`APISite.allpages()<pywikibot.site._generators.GeneratorsMixin.allpages>`
   parameter filterredir must be True, False or None
 * :mod:`tools.threading` classes no longer can be imported from :mod:`tools`
@@ -104,7 +105,6 @@ Pending removal in Pywikibot 10
 * 7.2.0: XMLDumpOldPageGenerator is deprecated in favour of a ``content`` parameter of
   :func:`XMLDumpPageGenerator<pagegenerators.XMLDumpPageGenerator>` (:phab:`T306134`)
 * 7.1.0: Unused ``get_redirect`` parameter of :meth:`Page.getOldVersion()<page.BasePage.getOldVersion>` will be removed
-* 7.0.0: User.isBlocked() method is renamed to is_blocked for consistency
 * 7.0.0: A boolean watch parameter in Page.save() is deprecated and will be desupported
 * 7.0.0: baserevid parameter of editSource(), editQualifier(), removeClaims(), removeSources(), remove_qualifiers()
   DataSite methods will be removed
