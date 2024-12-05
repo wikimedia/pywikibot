@@ -10,6 +10,7 @@ from __future__ import annotations
 from contextlib import suppress
 
 import pywikibot
+from pywikibot.backports import NoneType
 from pywikibot.exceptions import Error
 from tests.aspects import DefaultSiteTestCase, TestCase, unittest
 
@@ -87,7 +88,7 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertEqual(mysite.code, code)
         self.assertIsInstance(mysite.lang, str)
         self.assertEqual(mysite, pywikibot.Site(self.code, self.family))
-        self.assertIsInstance(mysite.user(), (str, type(None)))
+        self.assertIsInstance(mysite.user(), (str, NoneType))
         self.assertEqual(mysite.sitename, f'{self.family}:{code}')
         self.assertIsInstance(mysite.linktrail(), str)
         self.assertIsInstance(mysite.redirect(), str)

@@ -22,6 +22,7 @@ from requests.packages.urllib3.exceptions import ProtocolError
 from requests.packages.urllib3.util.response import httplib
 
 from pywikibot import Site, Timestamp, config, debug, warning
+from pywikibot.backports import NoneType
 from pywikibot.tools import cached
 from pywikibot.tools.collections import GeneratorWrapper
 
@@ -287,7 +288,7 @@ class EventStreams(GeneratorWrapper):
         # register pairs of keys and items as a filter function
         for key, value in kwargs.items():
             # append function for singletons
-            if isinstance(value, (bool, type(None))):
+            if isinstance(value, (bool, NoneType)):
                 self.filter[ftype].append(partial(_is, key=key, value=value))
             # append function for a single value
             elif isinstance(value, (str, int)):
