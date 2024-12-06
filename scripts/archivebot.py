@@ -532,11 +532,8 @@ class PageArchiver:
         self.timestripper = TimeStripper(site=self.site)
 
         # read maxarticlesize
-        try:
-            # keep a gap of 1 KB not to block later changes
-            self.maxsize = self.site.siteinfo['maxarticlesize'] - 1024
-        except KeyError:  # mw < 1.28
-            self.maxsize = 2_096_128  # 2 MB - 1 KB gap
+        # keep a gap of 1 KB not to block later changes
+        self.maxsize = self.site.siteinfo['maxarticlesize'] - 1024
 
         self.page = DiscussionPage(page, self, keep=keep)
         self.comment_params = {
