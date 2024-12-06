@@ -296,11 +296,6 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         testsite = self.get_repo()
         item = self._clean_item(testsite, 'P20480')
 
-        # Make sure the wiki supports wikibase-conceptbaseuri
-        if testsite.mw_version < '1.29.0-wmf.2':
-            self.skipTest('Wiki version must be 1.29.0-wmf.2 or newer to '
-                          'support unbound uncertainties.')
-
         # set new claim
         claim = pywikibot.page.Claim(testsite, 'P20480',
                                      datatype='globe-coordinate')
@@ -320,11 +315,6 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         testsite = self.get_repo()
         item = self._clean_item(testsite, 'P69')
 
-        # Make sure the wiki supports unbound uncertainties
-        if testsite.mw_version < '1.29.0-wmf.2':
-            self.skipTest('Wiki version must be 1.29.0-wmf.2 or newer to '
-                          'support unbound uncertainties.')
-
         # set new claim
         claim = pywikibot.page.Claim(testsite, 'P69', datatype='quantity')
         target = pywikibot.WbQuantity(amount=1234)
@@ -341,11 +331,6 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         # Clean the slate in preparation for test.
         testsite = self.get_repo()
         item = self._clean_item(testsite, 'P69')
-
-        # Make sure the wiki supports wikibase-conceptbaseuri
-        if testsite.mw_version < '1.28-wmf.23':
-            self.skipTest('Wiki version must be 1.28-wmf.23 or newer to '
-                          'expose wikibase-conceptbaseuri.')
 
         # set new claim
         claim = pywikibot.page.Claim(testsite, 'P69', datatype='quantity')
