@@ -50,7 +50,7 @@ repos:
       - id: python-check-mock-methods
       - id: python-use-type-annotations
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.8.1
+    rev: v0.8.2
     hooks:
       - id: ruff
         args:
