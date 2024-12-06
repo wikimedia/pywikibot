@@ -909,7 +909,7 @@ def known_languages() -> list[str]:
     >>> i18n.known_languages()[-10:]
     ['vo', 'vro', 'wa', 'war', 'xal', 'xmf', 'yi', 'yo', 'yue', 'zh']
     >>> len(i18n.known_languages())
-    255
+    254
 
     The implementation is roughly equivalent to:
 
