@@ -41,10 +41,11 @@ class MWSite:
     def __init__(self, fromurl, **kwargs) -> None:
         """Initializer.
 
-        :raises pywikibot.exceptions.ServerError: a server error occurred
-            while loading the site
+        :raises pywikibot.exceptions.ServerError: a server error
+            occurred while loading the site
         :raises Timeout: a timeout occurred while loading the site
-        :raises RuntimeError: Version not found or version less than 1.27
+        :raises RuntimeError: Version not found or version less than
+            1.27
         """
         fromurl = removesuffix(fromurl, '$1')
 
@@ -85,16 +86,16 @@ class MWSite:
             raise RuntimeError(f'Unsupported version: {self.version}')
 
         if not self.articlepath:
-            if self.private_wiki:
-                if self.api != self.fromurl and self.private_wiki:
-                    self.articlepath = self.fromurl.rsplit('/', 1)[0] + '/$1'
-                else:
-                    raise RuntimeError(
-                        'Unable to determine articlepath because the wiki is '
-                        'private. Use the Main Page URL instead of the API.')
-            else:
+            if not self.private_wiki:
                 raise RuntimeError(
                     f'Unable to determine articlepath: {self.fromurl}')
+
+            if self.api == self.fromurl:
+                raise RuntimeError(
+                    'Unable to determine articlepath because the wiki is '
+                    'private. Use the Main Page URL instead of the API.')
+
+            self.articlepath = self.fromurl.rsplit('/', 1)[0] + '/$1'
 
     def __repr__(self) -> str:
         return f'{type(self).__name__}("{self.fromurl}")'
