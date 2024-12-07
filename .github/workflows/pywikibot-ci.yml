@@ -82,6 +82,7 @@ jobs:
         if [ -f dev-requirements.txt ]; then pip install -r dev-requirements.txt; fi
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         pip install wikitextparser
+        pip install "fake_useragent != 2.0; python_version=='3.8'"
 
     - name: Install setuptools
       if: ${{ (matrix.python-version >= '3.12') || (matrix.os == 'macOS-latest') }}
