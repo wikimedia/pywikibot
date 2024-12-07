@@ -18,7 +18,7 @@ from tests.aspects import TestCase
 
 class LocalVersionTestCase(TestCase):
 
-    """Test local version infomation."""
+    """Test local version information."""
 
     net = False
 
@@ -44,7 +44,7 @@ class LocalVersionTestCase(TestCase):
 
 class RemoteVersionTestCase(TestCase):
 
-    """Test remote version infomation."""
+    """Test remote version information."""
 
     net = True
 

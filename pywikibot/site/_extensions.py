@@ -1,4 +1,4 @@
-"""Objects representing API interface to MediaWiki site extenstions."""
+"""Objects representing API interface to MediaWiki site extensions."""
 #
 # (C) Pywikibot team, 2008-2024
 #
@@ -357,7 +357,7 @@ class ThanksFlowMixin:
 
     .. deprecated:: 9.4.0
        Structured Discussions extension formerly known as Flow
-       extenstion is not maintained and will be removed. Users are
+       extension is not maintained and will be removed. Users are
        encouraged to stop using it. (:phab:`T371180`)
     .. seealso:: :mod:`flow`
     """
@@ -389,7 +389,7 @@ class FlowMixin:
 
     .. deprecated:: 9.4.0
        Structured Discussions extension formerly known as Flow
-       extenstion is not maintained and will be removed. Users are
+       extension is not maintained and will be removed. Users are
        encouraged to stop using it. (:phab:`T371180`)
     .. seealso:: :mod:`flow`
     """

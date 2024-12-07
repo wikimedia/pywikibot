@@ -686,7 +686,7 @@ def handle_args(args: Iterable[str] | None = None,
     >>> local_args  # doctest: +SKIP
     []
     >>> local_args = pywikibot.handle_args(['-simulate', '-myoption'])
-    >>> local_args  # global optons are handled, show the remaining
+    >>> local_args  # global options are handled, show the remaining
     ['-myoption']
     >>> for arg in local_args: pass  # do whatever is wanted with local_args
 

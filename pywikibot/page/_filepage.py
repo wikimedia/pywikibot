@@ -350,7 +350,7 @@ class FilePage(Page):
 
         Pywikibot_MW_gear_icon.svg was downloaded.
 
-        Download a thumnail:
+        Download a thumbnail:
 
         >>> file.download(url_param='120px')
         True

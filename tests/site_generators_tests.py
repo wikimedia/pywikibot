@@ -1141,7 +1141,8 @@ class SearchTestCase(DefaultSiteTestCase):
                 self.skipTest(
                     f'gsrsearch returned timeout on site {mysite}:\n{e!r}')
             if e.code == 'gsrsearch-text-disabled':
-                self.skipTest(f'gsrsearch is diabled on site {mysite}:\n{e!r}')
+                self.skipTest(
+                    'gsrsearch is disabled on site {mysite}:\n{e!r}')
             raise
 
     def test_search_where_title(self):

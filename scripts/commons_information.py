@@ -6,7 +6,7 @@ the basic information for files (description, source, author, etc.). The
 ``description`` field should provide brief but complete information
 about the image. The description format should use Language templates
 like ``{{En}}`` or ``{{De}}`` to specify the language of the description.
-This script adds these langage templates if missing. For example the
+This script adds these language templates if missing. For example the
 description of
 
 .. code-block:: wikitext
@@ -17,7 +17,7 @@ description of
     | Other fields =
    }}
 
-will be analyzed as ``en`` language by ~100 % accurancy and the bot
+will be analyzed as ``en`` language by ~100 % accuracy and the bot
 replaces its content by
 
 .. code-block:: wikitext
@@ -100,7 +100,7 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
     }
 
     def __init__(self, **kwargs) -> None:
-        """Initialzer."""
+        """Initializer."""
         super().__init__(**kwargs)
         lang_tmp_cat = pywikibot.Category(self.site, self.lang_tmp_cat)
         self.lang_tmps = {t.title(with_ns=False).lower()
@@ -279,7 +279,7 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
                             edited = True
                         unhandled = []
 
-                    # now process hte template
+                    # now process the template
                     if self.process_desc_template(node):
                         edited = True
                 else:

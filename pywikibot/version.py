@@ -181,7 +181,7 @@ def getversion_nightly(path: str | Path | None = None):
     """Get version info for a nightly release.
 
     .. hint::
-       the version informations of the nightly dump is stored in the
+       the version information of the nightly dump is stored in the
        ``version`` file within the ``pywikibot`` folder.
 
     :param path: directory of the uncompressed nightly.

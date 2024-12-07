@@ -109,7 +109,7 @@ class PageWithRefs(Page):
         return self._ref_table
 
     def namespaces_with_ref_to_page(self, namespaces=None) -> set[Namespace]:
-        """Check if current page has links from pages in namepaces.
+        """Check if current page has links from pages in namespaces.
 
         If namespaces is None, all namespaces are checked.
         Returns a set with namespaces where a ref to page is present.

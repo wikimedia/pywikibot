@@ -94,7 +94,7 @@ def url2string(title: str,
     Uses the first encoding that doesn't cause an error. Raises the
     first exception if all encodings fails.
 
-    For a single *encodings* string this function is equvalent to
+    For a single *encodings* string this function is equivalent to
     :samp:`urllib.parse.unquote(title, encodings, errors='strict')`
 
     .. versionchanged:: 8.4

@@ -165,7 +165,7 @@ class Namespace(Iterable, ComparableMixin, metaclass=MetaNamespace):
         return self._contains_lowercase_name(name.lower())
 
     def __bool__(self) -> bool:
-        """Obtain boolean method for Namepace class.
+        """Obtain boolean method for Namespace class.
 
         This method is implemented to be independent from __len__ method.
 

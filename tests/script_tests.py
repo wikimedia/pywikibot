@@ -22,7 +22,7 @@ from tests.utils import execute_pwb
 ci_test_run = os.environ.get('PYWIKIBOT_TEST_RUNNING', '0') == '1'
 scripts_path = join_root_path('scripts')
 
-# login scritpt should be the first to test
+# login script should be the first to test
 framework_scripts = ['login', 'shell']
 
 # These dependencies are not always the package name which is in setup.py.

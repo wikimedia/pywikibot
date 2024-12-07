@@ -960,7 +960,7 @@ class GeneratorsMixin:
             the specified type.
         :param protect_level: only yield pages that have protection at
             this level; can only be used if protect_type is specified.
-        :param reverse: if True, iterate in reverse Unicode lexigraphic
+        :param reverse: if True, iterate in reverse Unicode lexicographic
             order (default: iterate in forward order).
         :param content: if True, load the current content of each
             iterated page (default False).
@@ -1103,7 +1103,7 @@ class GeneratorsMixin:
 
         :param start: Start at this category title (category need not exist).
         :param prefix: Only yield categories starting with this string.
-        :param reverse: if True, iterate in reverse Unicode lexigraphic
+        :param reverse: if True, iterate in reverse Unicode lexicographic
             order (default: iterate in forward order)
         :param content: if True, load the current content of each iterated page
             (default False); note that this means the contents of the category
@@ -1191,7 +1191,7 @@ class GeneratorsMixin:
         :param prefix: only iterate titles starting with this substring
         :param minsize: only iterate images of at least this many bytes
         :param maxsize: only iterate images of no more than this many bytes
-        :param reverse: if True, iterate in reverse lexigraphic order
+        :param reverse: if True, iterate in reverse lexicographic order
         :param sha1: only iterate image (it is theoretically possible there
             could be more than one) with this sha1 hash
         :param sha1base36: same as sha1 but in base 36
@@ -1226,13 +1226,13 @@ class GeneratorsMixin:
     ) -> Iterable[dict[str, Any]]:
         """Iterate archived files.
 
-        Yields dict of file archive informations.
+        Yields dict of file archive information.
 
         .. seealso:: :api:`filearchive`
 
         :param start: start at this title (name need not exist)
         :param end: end at this title (name need not exist)
-        :param reverse: if True, iterate in reverse lexigraphic order
+        :param reverse: if True, iterate in reverse lexicographic order
         :param total: maximum number of pages to retrieve in total
         :keyword prefix: only iterate titles starting with this substring
         :keyword sha1: only iterate image with this sha1 hash

@@ -549,7 +549,7 @@ class BasePage(ComparableMixin):
     def text(self) -> str:
         """Return the current (edited) wikitext, loading it if necessary.
 
-        This property should be prefered over :meth:`get`. If the page
+        This property should be preferred over :meth:`get`. If the page
         does not exist, an empty string will be returned. For a redirect
         it returns the redirect page content and does not raise an
         :exc:`exceptions.IsRedirectPageError` exception.

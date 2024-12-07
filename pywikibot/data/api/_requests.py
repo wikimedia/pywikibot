@@ -719,7 +719,7 @@ class Request(MutableMapping, WaitingMixin):
         """Return a dict from requests.Response.
 
         .. versionchanged:: 8.2
-           show a warning to add a ``protocoll()`` method to the family
+           show a warning to add a ``protocol()`` method to the family
            file if suitable.
 
         :param response: a requests.Response object
@@ -808,7 +808,7 @@ but {scheme!r} is required. Please add the following code to your family file:
         """Handle warnings; return True to retry request, False to resume.
 
         .. versionchanged:: 7.2
-           Return True to retry the current request and Falso to resume.
+           Return True to retry the current request and False to resume.
 
         :meta public:
         """
@@ -1121,7 +1121,7 @@ but {scheme!r} is required. Please add the following code to your family file:
                 continue
 
             if code == 'urlshortener-blocked':  # T244062
-                # add additional informations to error dict
+                # add additional information to error dict
                 error['current site'] = self.site
                 if self.site.user():
                     error['current user'] = self.site.user()
@@ -1187,7 +1187,7 @@ class CachedRequest(Request):
         .. versionchanged:: 8.0
            return a `pathlib.Path` object.
         .. versionchanged:: 9.0
-           remove Python main version from directoy name
+           remove Python main version from directory name
 
         :return: base directory path for cache entries
 

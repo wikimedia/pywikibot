@@ -92,7 +92,7 @@ class PurgeBot(MultipleSitesBot):
            Enable batch purge using :meth:`APISite.purgepages()
            <pywikibot.site._apisite.APISite.purgepages>`
         """
-        # We can have mutiple sites, save pages and cache rate limit
+        # We can have multiple sites, save pages and cache rate limit
         self.pages[page.site].append(page)
         self.limit.setdefault(page.site, page.site.ratelimit('purge'))
         self.purgepages()

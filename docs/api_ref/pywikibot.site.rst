@@ -94,7 +94,7 @@
 .. automodule:: pywikibot.site._apisite
 
 .. automodule:: pywikibot.site._extensions
-   :synopsis: Objects representing API interface to MediaWiki site extenstions
+   :synopsis: Objects representing API interface to MediaWiki site extensions
 
 .. automodule:: pywikibot.site._generators
    :synopsis: Objects representing API generators to MediaWiki site
