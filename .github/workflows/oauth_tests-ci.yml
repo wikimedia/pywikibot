@@ -100,7 +100,7 @@ jobs:
         echo "console_encoding = 'utf8'" >> user-config.py
 
     - name: Oauth tests with unittest
-      timeout-minutes: 5
+      timeout-minutes: 2
       env:
         PYWIKIBOT_TEST_WRITE: 1
         PYWIKIBOT_TEST_OAUTH: ${{ secrets[format('{0}', steps.token.outputs.uppercase)] }}
