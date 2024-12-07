@@ -11,14 +11,16 @@ import datetime
 import json
 import math
 import re
+from collections.abc import Mapping
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
 import pywikibot
 from pywikibot import exceptions
+from pywikibot.backports import Iterator
 from pywikibot.logging import warning
 from pywikibot.time import Timestamp
-from pywikibot.tools import remove_last_args
+from pywikibot.tools import issue_deprecation_warning, remove_last_args
 
 
 if TYPE_CHECKING:
@@ -289,6 +291,43 @@ class Coordinate(WbRepresentation):
         return pywikibot.ItemPage.from_entity_uri(repo, self.entity, lazy_load)
 
 
+class _Precision(Mapping):
+
+    """Wrapper for WbTime.PRECISION to deprecate 'millenia' key."""
+
+    PRECISION = {
+        '1000000000': 0,
+        '100000000': 1,
+        '10000000': 2,
+        '1000000': 3,
+        '100000': 4,
+        '10000': 5,
+        'millennium': 6,
+        'century': 7,
+        'decade': 8,
+        'year': 9,
+        'month': 10,
+        'day': 11,
+        'hour': 12,
+        'minute': 13,
+        'second': 14,
+    }
+
+    def __getitem__(self, key) -> int:
+        if key == 'millenia':
+            issue_deprecation_warning(
+                f'{key!r} key for precision', "'millennium'", since='10.0.0')
+            return self.PRECISION['millennium']
+
+        return self.PRECISION[key]
+
+    def __iter__(self) -> Iterator[int]:
+        return iter(self.PRECISION)
+
+    def __len__(self) -> int:
+        return len(self.PRECISION)
+
+
 class WbTime(WbRepresentation):
 
     """A Wikibase time representation.
@@ -304,22 +343,7 @@ class WbTime(WbRepresentation):
     :class:`pywikibot.Timestamp` and :meth:`fromTimestamp`.
     """
 
-    PRECISION = {'1000000000': 0,
-                 '100000000': 1,
-                 '10000000': 2,
-                 '1000000': 3,
-                 '100000': 4,
-                 '10000': 5,
-                 'millenia': 6,
-                 'century': 7,
-                 'decade': 8,
-                 'year': 9,
-                 'month': 10,
-                 'day': 11,
-                 'hour': 12,
-                 'minute': 13,
-                 'second': 14
-                 }
+    PRECISION = _Precision()
 
     FORMATSTR = '{0:+012d}-{1:02d}-{2:02d}T{3:02d}:{4:02d}:{5:02d}Z'
 
@@ -378,21 +402,30 @@ class WbTime(WbRepresentation):
            the equality operator will return false if the timezone is
            different.
 
-        :param year: The year as a signed integer of between 1 and 16 digits.
+        .. deprecated:: 10.0
+           *precision* value 'millenia' is deprecated; 'millennium' must
+           be used instead.
+
+        :param year: The year as a signed integer of between 1 and 16
+            digits.
         :param month: Month of the timestamp, if it exists.
         :param day: Day of the timestamp, if it exists.
         :param hour: Hour of the timestamp, if it exists.
         :param minute: Minute of the timestamp, if it exists.
         :param second: Second of the timestamp, if it exists.
-        :param precision: The unit of the precision of the time.
-        :param before: Number of units after the given time it could be, if
-            uncertain. The unit is given by the precision.
-        :param after: Number of units before the given time it could be, if
-            uncertain. The unit is given by the precision.
+        :param precision: The unit of the precision of the time. Must be
+            either an int in range 0 - 14 or one of '1000000000',
+            '100000000', '10000000', '1000000', '100000', '10000',
+            'millennium', 'century', 'decade', 'year', month', 'day',
+            'hour', 'minute' or 'second'.
+        :param before: Number of units after the given time it could be,
+            if uncertain. The unit is given by the precision.
+        :param after: Number of units before the given time it could be,
+            if uncertain. The unit is given by the precision.
         :param timezone: Timezone information in minutes.
         :param calendarmodel: URI identifying the calendar model.
-        :param site: The Wikibase site. If not provided, retrieves the data
-            repository from the default site from user-config.py.
+        :param site: The Wikibase site. If not provided, retrieves the
+            data repository from the default site from user-config.py.
             Only used if calendarmodel is not given.
         """
         if year is None:
@@ -441,7 +474,6 @@ class WbTime(WbRepresentation):
                     and precision in self.PRECISION.values()):
                 self.precision = precision
             elif precision in self.PRECISION:
-                assert isinstance(precision, str)
                 self.precision = self.PRECISION[precision]
             else:
                 raise ValueError(f'Invalid precision: "{precision}"')
@@ -647,7 +679,7 @@ class WbTime(WbRepresentation):
             # so we don't need to do anything complicated like the other
             # examples.
             year = round(year / power_of_10) * power_of_10
-        elif self.precision == self.PRECISION['millenia']:
+        elif self.precision == self.PRECISION['millennium']:
             # Similar situation with centuries
             year_float = year / 1000
             if year_float < 0:
