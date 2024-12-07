@@ -53,6 +53,7 @@ jobs:
         pip install -r dev-requirements.txt
         pip install -r requirements.txt
         pip install wikitextparser
+        pip install "fake_useragent != 2.0.0; python_version=='3.8'"
 
     - name: Generate user files
       run: |
