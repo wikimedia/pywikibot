@@ -26,7 +26,7 @@ from pywikibot.tools import MediaWikiVersion
 SERVER_DB_ERROR_MSG = \
     '<h1>Sorry! This site is experiencing technical difficulties.</h1>'
 
-MIN_VERSION = MediaWikiVersion('1.27')
+MIN_VERSION = MediaWikiVersion('1.31')
 
 
 class MWSite:
@@ -40,7 +40,7 @@ class MWSite:
             occurred while loading the site
         :raises Timeout: a timeout occurred while loading the site
         :raises RuntimeError: Version not found or version less than
-            1.27
+            1.31
         """
         fromurl = removesuffix(fromurl, '$1')
 

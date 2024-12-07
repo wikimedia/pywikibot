@@ -51,7 +51,7 @@ from pywikibot.exceptions import (
     UnknownExtensionError,
 )
 from pywikibot.site._basesite import BaseSite
-from pywikibot.site._decorators import need_right, need_version
+from pywikibot.site._decorators import need_right
 from pywikibot.site._extensions import (
     EchoMixin,
     FlowMixin,
@@ -1235,10 +1235,10 @@ class APISite(
             pywikibot.error(msg)
             raise
 
-        if MediaWikiVersion(version) < '1.27':
+        if MediaWikiVersion(version) < '1.31':
             raise RuntimeError(f'Pywikibot "{pywikibot.__version__}" does not '
-                               f'support MediaWiki "{version}".\n'
-                               f'Use Pywikibot prior to "8.0" branch instead.')
+                               f'support MediaWiki "{version}".\nUse '
+                               f'Pywikibot prior to "10.0" branch instead.')
         return version
 
     @property
@@ -2746,7 +2746,6 @@ class APISite(
         """
         return set(self.siteinfo.get('restrictions')['types'])
 
-    @need_version('1.27.3')
     def protection_levels(self) -> set[str]:
         """Return the protection levels available on this site.
 

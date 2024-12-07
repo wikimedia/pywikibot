@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Test logentries module."""
+"""Test :mod:`logentries` module."""
 #
-# (C) Pywikibot team, 2015-2023
+# (C) Pywikibot team, 2015-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -28,11 +28,10 @@ class TestLogentriesBase(TestCase):
 
     """Base class for log entry tests.
 
-    It uses the German Wikipedia for a current representation of the
-    log entries and the test Wikipedia for the future representation.
-    It also tests on a wiki with MW <= 1.27 to check that the module
-    works with older wikis. It currently uses infogalacticwiki which as
-    of this commit uses 1.27.1.
+    It uses the German Wikipedia for a current representation of the log
+    entries and the test Wikipedia for the future representation. It
+    also tests on an older wiki to check that the module works with it.
+    It currently uses lobbypedia which as of this commit uses 1.31.6.
     """
 
     sites = {
@@ -52,9 +51,9 @@ class TestLogentriesBase(TestCase):
             'target': None,
         },
         'old': {
-            'family': AutoFamily('infogalactic',
-                                 'https://infogalactic.com/info/Main_Page'),
-            'code': 'en',
+            'family': AutoFamily('lobbypedia',
+                                 'https://lobbypedia.de/wiki/Hauptseite'),
+            'code': 'de',
             'target': None,
         }
     }
@@ -65,7 +64,7 @@ class TestLogentriesBase(TestCase):
             # This is an assertion as the tests don't make sense with newer
             # MW versions and otherwise it might not be visible that the test
             # isn't run on an older wiki.
-            self.assertEqual(self.site.mw_version, '1.27.1')
+            self.assertEqual(self.site.mw_version, '1.31.6')
 
         with skipping(StopIteration,
                       msg=f'No entry found for {logtype!r}'):

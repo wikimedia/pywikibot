@@ -496,6 +496,14 @@ class MediaWikiVersion:
         """Return version number with optional suffix."""
         return '.'.join(str(v) for v in self.version) + self.suffix
 
+    def __repr__(self) -> str:
+        """Return version number representation, mainly used by tests.
+
+        .. versionadded:: 10.0
+
+        """
+        return f"'{self}'"
+
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, str):
             other = MediaWikiVersion(other)

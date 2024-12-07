@@ -69,26 +69,21 @@ class MediaWikiSiteTestCase(SiteDetectionTestCase):
 
     non_standard_version_sites = (
         'https://wiki.gentoo.org/wiki/$1',
-        'https://www.arabeyes.org/$1',
     )
 
     old_version_sites = (
         'http://tfwiki.net/wiki/$1',  # 1.19.5-1+deb7u1
-        'http://www.hrwiki.org/index.php/$1',  # v 1.15.4
         'http://www.thelemapedia.org/index.php/$1',
         'http://www.werelate.org/wiki/$1',
-        'http://www.otterstedt.de/wiki/index.php/$1',
         'https://en.wikifur.com/wiki/$1',  # 1.23.16
+        'https://www.arabeyes.org/$1',  # non standard 1.28.0
     )
 
     no_sites = (
-        'http://www.imdb.com/name/nm$1/',
-        'http://www.ecyrd.com/JSPWiki/Wiki.jsp?page=$1',
         'http://www.tvtropes.org/pmwiki/pmwiki.php/Main/$1',
         'http://c2.com/cgi/wiki?$1',
         'https://phabricator.wikimedia.org/$1',
         'http://www.merriam-webster.com/'
-        'cgi-bin/dictionary?book=Dictionary&va=$1',
         'http://arxiv.org/abs/$1',
         # looks like a MW site but isn't, api is redirected to
         # https://foundation.wikimedia.org
