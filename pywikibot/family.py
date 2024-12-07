@@ -290,7 +290,7 @@ class Family:
     **Examples:**
 
     Allowing linking *to* ``pt`` 102 namespace from any other lang 0
-    namepace is:
+    namespace is:
 
     .. code-block:: Python
 
@@ -1075,7 +1075,7 @@ class WikibaseFamily(Family):
         return 'DataSite'
 
     def entity_sources(self, code: str) -> dict[str, tuple[str, str]]:
-        """Provide reopsitory site information for entity types.
+        """Provide repository site information for entity types.
 
         The result must be structured as follows:
 

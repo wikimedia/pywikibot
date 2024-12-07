@@ -211,7 +211,7 @@ def NewpagesPageGenerator(site: BaseSite | None = None,
 
     :param site: Site for generator results.
     :param namespaces: namespace to retrieve pages from
-    :param total: Maxmium number of pages to retrieve in total
+    :param total: Maximum number of pages to retrieve in total
     """
     # API does not (yet) have a newpages function, so this tries to duplicate
     # it by filtering the recentchanges output

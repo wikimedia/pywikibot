@@ -32,7 +32,7 @@ class TestSiteInfo(DefaultSiteTestCase):
 
     def test_siteinfo(self):
         """Test the siteinfo property."""
-        # general enteries
+        # general entries
         mysite = self.get_site()
         self.assertIsInstance(mysite.siteinfo['timeoffset'], (int, float))
         self.assertTrue(-12 * 60 <= mysite.siteinfo['timeoffset'] <= +14 * 60)

@@ -2500,7 +2500,7 @@ class LexemeSense(LexemeSubEntity):
     }
 
 
-# Add LexemeSnese to the class attribute "types" after its declaration.
+# Add LexemeSense to the class attribute "types" after its declaration.
 Property.types['wikibase-sense'] = LexemeSense
 
 

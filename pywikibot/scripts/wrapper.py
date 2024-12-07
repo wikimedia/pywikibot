@@ -250,7 +250,7 @@ def check_modules(script: str | None = None) -> bool:
         if dependency.startswith('packaging'):
             # Ignore these dependencies because ImportError is raised in an
             # early state when they are imported in backports. They are already
-            # used at this point. This is a workaound for toolforge where some
+            # used at this point. This is a workaround for toolforge where some
             # modules are not installed as a site-package.
             # TODO: Check imports from external source
             continue

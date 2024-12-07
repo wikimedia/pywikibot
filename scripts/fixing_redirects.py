@@ -8,7 +8,7 @@ Can be used with:
 -featured         Run over featured pages (for some Wikimedia wikis only)
 
 -overwrite        Usually only the link is changed ([[Foo]] -> [[Bar|Foo]]).
-                  This parameters sets the script to completly overwrite the
+                  This parameters sets the script to completely overwrite the
                   link text ([[Foo]] -> [[Bar]]).
 
 -ignoremoves      Do not try to solve deleted pages after page move.

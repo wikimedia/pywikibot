@@ -23,7 +23,7 @@ The following parameters are supported:
              .. note:: the global account must exist already before
                 using this.
 
--async       Run the bot in parallel tasks, only usefull together with
+-async       Run the bot in parallel tasks, only useful together with
              ``-all`` option
 
 .. hint:: Use :ref:`global options` ``-code``, ``-family`` or ``-site``
@@ -131,7 +131,7 @@ def main(*args: str) -> None:
     logout = False
     oauth = False
     autocreate = False
-    asyncronous = False
+    asynchronous = False
     unknown_args = []
     for arg in pywikibot.handle_args(args):
         if arg == '-all':
@@ -143,7 +143,7 @@ def main(*args: str) -> None:
         elif arg == '-autocreate':
             autocreate = True
         elif arg == '-async':
-            asyncronous = True
+            asynchronous = True
         else:
             unknown_args.append(arg)
 
@@ -157,11 +157,11 @@ def main(*args: str) -> None:
         namedict = {site.family.name: {site.code: None}}
 
     params = oauth, logout, autocreate
-    context = ThreadPoolExecutor if asyncronous else nullcontext
+    context = ThreadPoolExecutor if asynchronous else nullcontext
     with context() as executor:
         for family_name in namedict:
             for lang in namedict[family_name]:
-                if asyncronous:
+                if asynchronous:
                     executor.submit(login_one_site, lang, family_name, *params)
                 else:
                     login_one_site(lang, family_name, *params)

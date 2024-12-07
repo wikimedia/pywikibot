@@ -878,8 +878,8 @@ class TestWbGeoShapeNonDry(WbRepresentationTestCase):
             pywikibot.WbGeoShape('A string', self.get_repo())
 
     def test_WbGeoShape_error_on_non_exitant_page(self):
-        """Test WbGeoShape error handling of a non-existant page."""
-        page = Page(self.commons, 'Non-existant page... really')
+        """Test WbGeoShape error handling of a non-existent page."""
+        page = Page(self.commons, 'Non-existent page... really')
         regex = r'^Page \[\[.+?\]\] must exist\.$'
         with self.assertRaisesRegex(ValueError, regex):
             pywikibot.WbGeoShape(page, self.get_repo())
@@ -953,8 +953,8 @@ class TestWbTabularDataNonDry(WbRepresentationTestCase):
             pywikibot.WbTabularData('A string', self.get_repo())
 
     def test_WbTabularData_error_on_non_exitant_page(self):
-        """Test WbTabularData error handling of a non-existant page."""
-        page = Page(self.commons, 'Non-existant page... really')
+        """Test WbTabularData error handling of a non-existent page."""
+        page = Page(self.commons, 'Non-existent page... really')
         regex = r'^Page \[\[.+?\]\] must exist\.$'
         with self.assertRaisesRegex(ValueError, regex):
             pywikibot.WbTabularData(page, self.get_repo())

@@ -362,7 +362,7 @@ class ParamInfo(Sized, Container):
             return None
 
         if len(param_data) != 1:
-            raise RuntimeError(f'parameter data length is eiter empty or not '
+            raise RuntimeError(f'parameter data length is either empty or not '
                                f'unique.\n{param_data}')
         return param_data[0]
 

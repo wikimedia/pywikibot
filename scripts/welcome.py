@@ -163,7 +163,7 @@ international and it must be blocked in all the projects feel free to
 add it. If also you think that a word isn't so international, feel free
 to delete it.
 
-However, there is a dinamic-wikipage to load that badwords of your
+However, there is a dynamic-wikipage to load that badwords of your
 project or you can add them directly in the source code that you are
 using without adding or deleting.
 

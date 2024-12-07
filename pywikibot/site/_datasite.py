@@ -164,7 +164,7 @@ class DataSite(APISite):
         return None
 
     def tabular_data_repository(self):
-        """Return Site object for the tabular-datas repository e.g. commons."""
+        """Return Site object for the tabular-data repository e.g. commons."""
         url = self.siteinfo['general'].get(
             'wikibase-tabulardatastoragebaseurl')
         if url:

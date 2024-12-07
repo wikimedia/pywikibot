@@ -507,7 +507,7 @@ class UI(ABUIC):
         """Ask the user to select one entry from a list of entries.
 
         :param question: The question, without trailing whitespace.
-        :param answers: A sequence of options to be choosen.
+        :param answers: A sequence of options to be chosen.
         :param default: The default answer if no was entered. None to require
             an answer.
         :param force: Automatically use the default.

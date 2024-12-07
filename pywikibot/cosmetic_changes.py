@@ -700,7 +700,7 @@ class CosmeticChangesToolkit:
                     # - used intentionally in navigation bar templates on w:de
             160,    # Non-breaking space (&nbsp;)
                     # - not supported by Firefox textareas
-            173,    # Soft-hypen (&shy;) - enable editing
+            173,    # Soft-hyphen (&shy;) - enable editing
             8206,   # Left-to-right mark (&ltr;)
             8207,   # Right-to-left mark (&rtl;)
         ]
@@ -927,7 +927,7 @@ class CosmeticChangesToolkit:
         return text
 
     def fixHtml(self, text: str) -> str:
-        """Relace html markups with wikitext markups."""
+        """Replace html markups with wikitext markups."""
         def replace_header(match: Match[str]) -> str:
             """Create a header string for replacing."""
             depth = int(match[1])

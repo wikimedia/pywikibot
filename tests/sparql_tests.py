@@ -192,7 +192,7 @@ class TestCommonsQueryService(TestCase):
     family = 'commons'
     code = 'commons'
 
-    def testLoginAndOauthPermisson(self):
+    def testLoginAndOauthPermission(self):
         """Commons Query Service Login and Oauth permission."""
         # Define the SPARQL query
         query = 'SELECT ?a ?b WHERE { ?a wdt:P9478 ?b } LIMIT 4'

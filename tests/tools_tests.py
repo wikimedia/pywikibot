@@ -99,7 +99,7 @@ class OpenArchiveTestCase(TestCase):
         """Test open_archive with lzma compressor in the standard library."""
         self.assertEqual(
             self._get_content(self.base_file + '.lzma'), self.original_content)
-        # Legacy LZMA container formet has no magic, skipping
+        # Legacy LZMA container format has no magic, skipping
         # use_extension=False test here
         self.assertEqual(
             self._get_content(self.base_file + '.xz'), self.original_content)
@@ -1042,7 +1042,7 @@ class TestTinyCache(TestCase):
         self.assertEqual(self.foo.bar, 'bar')
         self.assertEqual(self.foo.read, 1)
 
-    def test_cached_with_paramters(self):
+    def test_cached_with_parameters(self):
         """Test for cached decorator with parameters."""
         msg = '"cached" decorator must be used without arguments'
         with self.assertRaisesRegex(TypeError, msg):

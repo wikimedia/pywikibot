@@ -94,7 +94,7 @@ class Siteinfo(Container):
         All properties which the site doesn't
         support contain the default value. Because pre-1.12 no data was
         returned when a property doesn't exists, it queries each property
-        independetly if a property is invalid.
+        independently if a property is invalid.
 
         .. seealso:: :api:Siteinfo
 

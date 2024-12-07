@@ -278,7 +278,7 @@ class LiveFakeUserAgentTestCase(HttpbinTestCase):
                        use_fake_user_agent='ARBITRARY')
         self.assertEqual(r.request.headers['user-agent'], 'ARBITRARY')
 
-    def test_empty_valu(self):
+    def test_empty_value(self):
         """Test fake_user_agent with empty value."""
         with self.assertRaisesRegex(ValueError,
                                     'Invalid parameter: use_fake_user_agent'):

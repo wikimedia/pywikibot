@@ -1618,7 +1618,7 @@ class PageGeneratorIntersectTestCase(GeneratorIntersectTestCase,
              pagegenerators.NewpagesPageGenerator(site=site, total=10)])
 
     def test_intersect_newpages_and_recentchanges(self):
-        """Test intersection betweem newpages and recentchanges."""
+        """Test intersection between newpages and recentchanges."""
         site = self.get_site()
         self.assertEqualItertools(
             [pagegenerators.NewpagesPageGenerator(site=site, total=50),

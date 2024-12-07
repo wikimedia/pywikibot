@@ -2,7 +2,7 @@
 """Tests for editing Wikibase items.
 
 Tests which should fail should instead be in the TestWikibaseSaveTest
-class in edit_failiure_tests.py
+class in edit_failure_tests.py
 """
 #
 # (C) Pywikibot team, 2014-2024
@@ -128,7 +128,7 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         item.editEntity(data)
 
     @unittest.expectedFailure  # T367324
-    def test_edit_entity_propogation(self):
+    def test_edit_entity_propagation(self):
         """Test that ``ItemPage.editEntity`` propagates changes to claims."""
         testsite = self.get_repo()
         item = pywikibot.ItemPage(testsite)

@@ -339,7 +339,7 @@ class SiteUserTestCase(DefaultSiteTestCase, DeprecationTestCase):
                     'nosuchright'):
             self.assertIsInstance(mysite.has_right(rgt), bool)
 
-    def test_deprected_methods(self):
+    def test_deprecated_methods(self):
         """Test deprecated user related methods."""
         mysite = self.get_site()
         self.assertIsInstance(mysite.messages(), bool)

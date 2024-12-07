@@ -15,7 +15,7 @@ will be shown by ``-help:global`` or using::
 
 The advantages of pwb.py wrapper script are:
 
-- check for framework and script depedencies and show a warning if a
+- check for framework and script dependencies and show a warning if a
   package is missing or outdated or if the Python release does not fit
 - check whether user config file (user-config.py) is available and ask
   to create it by starting the generate_user_files.py script

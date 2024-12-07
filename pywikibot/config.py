@@ -538,7 +538,7 @@ transliterate = True
 # scripts are displayed or if only one is found, it will be started.
 # There are some configuration values to change the behavior
 #
-# pwb_close_matches: the maximum number of simular scripts to be found
+# pwb_close_matches: the maximum number of similar scripts to be found
 pwb_close_matches = 10  # must be greater than 0
 # pwb_cut_off: similarity of scripts to be found
 pwb_cut_off = 0.7  # must be a float in the range [0, 1]

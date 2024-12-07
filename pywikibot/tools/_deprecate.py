@@ -483,7 +483,7 @@ def deprecate_positionals(since: str = ''):
         def wrapper(*args: Any, **kwargs: Any) -> Any:
             """Throws the warning and makes the argument fixing.
 
-            :param args: args passed to the decorated functoin or method
+            :param args: args passed to the decorated function or method
             :param kwargs: kwargs passed to the decorated function or
                 method
             :return: the value returned by the decorated function or

@@ -653,7 +653,7 @@ class TestPageCoordinates(TestCase):
     cached = True
 
     def test_coordinates(self):
-        """Test ``Page.coodinates`` method."""
+        """Test ``Page.coordinates`` method."""
         page = pywikibot.Page(self.site, 'Berlin')
         with self.subTest(primary_only=False):
             coords = page.coordinates()

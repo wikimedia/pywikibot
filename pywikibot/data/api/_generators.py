@@ -728,7 +728,7 @@ class PageGenerator(QueryGenerator):
 
         .. versionchanged:: 9.5
            No longer raise :exc:`exceptions.UnsupportedPageError` but
-           return a generic :class:`pywikibot.Page` obect. The exception
+           return a generic :class:`pywikibot.Page` object. The exception
            is raised when getting the content for example.
         .. versionchanged:: 9.6
            Upcast to :class:`page.FilePage` if *pagedata* has
