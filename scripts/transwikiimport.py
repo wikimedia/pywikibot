@@ -115,7 +115,7 @@ the titles of the transcluded pages (e.g. templates) if
 
 This option is quite *dangerous*. If the title of an existing page on
 home wiki clashes with the title of one of the linked pages it would be
-*overritten*. The histories would be merged. (If the imported version is
+*overwritten*. The histories would be merged. (If the imported version is
 newer.) Even if ``-overwrite`` is not set the linked page *can be
 overwritten*.
 

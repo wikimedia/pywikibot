@@ -353,7 +353,7 @@ PAGE_WITH_HIDDEN_TEMPLATES = {
 }
 
 # A page where there's a list of template to consider as licenses.
-PAGE_WITH_ALOWED_TEMPLATES = {
+PAGE_WITH_ALLOWED_TEMPLATES = {
     'commons': 'User:Filbot/Allowed templates',
     'de': 'Benutzer:Xqbot/Lizenzvorlagen',
     'it': 'Progetto:Coordinamento/Immagini/Bot/AllowedTemplates',
@@ -514,7 +514,7 @@ class CheckImagesBot:
         self.page_hidden = i18n.translate(self.site,
                                           PAGE_WITH_HIDDEN_TEMPLATES)
         self.page_allowed = i18n.translate(self.site,
-                                           PAGE_WITH_ALOWED_TEMPLATES)
+                                           PAGE_WITH_ALLOWED_TEMPLATES)
         self.comment = i18n.twtranslate(self.site.lang,
                                         'checkimages-source-tag-comment')
         # Adding the bot's nickname at the notification text if needed.
