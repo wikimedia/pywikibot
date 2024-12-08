@@ -22,7 +22,7 @@ from pywikibot.backports import Iterable
 from pywikibot.comms import http
 from pywikibot.exceptions import NoPageError
 from pywikibot.page._page import Page
-from pywikibot.tools import compute_file_hash, deprecated
+from pywikibot.tools import compute_file_hash
 
 
 __all__ = (
@@ -266,15 +266,6 @@ class FilePage(Page):
            renamed from :meth:`usingPages`.
         """
         return self.site.imageusage(self, **kwargs)
-
-    @deprecated('using_pages', since='7.4.0')
-    def usingPages(self, **kwargs):  # noqa: N802
-        """Yield Pages on which the file is displayed.
-
-        .. deprecated:: 7.4
-           Use :meth:`using_pages` instead.
-        """
-        return self.using_pages(**kwargs)
 
     @property
     def file_is_used(self) -> bool:

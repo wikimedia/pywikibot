@@ -3,9 +3,9 @@ Current Release Changes
 
 **Improvements**
 
-* :attr:`.login.OauthLoginManager.access_token` was added
-* Representation string for :class:`login.LoginManager` was added
-* i18n updates
+* :attr:`.login.OauthLoginManager.access_token` was added.
+* Representation string for :class:`login.LoginManager` was added.
+* i18n updates.
 
 **Bugfixes**
 
@@ -13,32 +13,34 @@ Current Release Changes
 
 **Code cleanups**
 
+* The positional arguments of :meth:`page.BasePage.linkedPages` were removed.
+* ``FilePage.usingPages()`` was renamed to :meth:`using_pages()<pywikibot.FilePage.using_pages>`.
 * ``APISite.article_path`` was removed. :attr:`APISite.articlepath
   <pywikibot.site._apisite.APISite.articlepath>` can be used instead.
 * ``fix_digits`` method of :class:`textlib.TimeStripper` was removed;
-  :func:`textlib.to_latin_digits` can be used instead
+  :func:`textlib.to_latin_digits` can be used instead.
 * :mod:`textlib`.tzoneFixedOffset class was removed in favour of
-  :class:`time.TZoneFixedOffse<pywikibot.time.TZoneFixedOffset>`
-* A boolean *watch* parameter in :meth:`page.BasePage.save` is desupported
+  :class:`time.TZoneFixedOffse<pywikibot.time.TZoneFixedOffset>`.
+* A boolean *watch* parameter in :meth:`page.BasePage.save` is desupported.
 * ``XMLDumpOldPageGenerator`` was removed in favour of a ``content`` parameter of
-  :func:`pagegenerators.XMLDumpPageGenerator` (:phab:`T306134`)
-* :meth:`pywikibot.User.is_blocked` method was renamed from ``isBlocked`` for consistency
+  :func:`pagegenerators.XMLDumpPageGenerator` (:phab:`T306134`).
+* :meth:`pywikibot.User.is_blocked` method was renamed from ``isBlocked`` for consistency.
 * Values of :meth:`APISite.allpages()<pywikibot.site._generators.GeneratorsMixin.allpages>`
-  parameter filterredir must be True, False or None
-* :mod:`tools.threading` classes no longer can be imported from :mod:`tools`
-* :mod:`tools.itertools` datatypes no longer can be imported from :mod:`tools`
-* :mod:`tools.collections` datatypes no longer can be imported from :mod:`tools`
+  parameter filterredir must be True, False or None.
+* :mod:`tools.threading` classes no longer can be imported from :mod:`tools`.
+* :mod:`tools.itertools` datatypes no longer can be imported from :mod:`tools`.
+* :mod:`tools.collections` datatypes no longer can be imported from :mod:`tools`.
 * ``svn_rev_info`` and ``getversion_svn`` of :mod:`version` module were be removed.
-  SVN repository is no longer supported. (:phab:`T362484`)
-* Old color escape sequences like ``\03{color}`` were dropped in favour of new color format like ``<<color>>``
-* ``tools.formatter.color_format()`` was removed; the new color literals can be used instead
+  SVN repository is no longer supported. (:phab:`T362484`).
+* Old color escape sequences like ``\03{color}`` were dropped in favour of new color format like ``<<color>>``.
+* ``tools.formatter.color_format()`` was removed; the new color literals can be used instead.
 * RedirectPageBot and NoRedirectPageBot bot classes were removed in favour of
-  :attr:`use_redirects<bot.BaseBot.use_redirects>` attribute
+  :attr:`use_redirects<bot.BaseBot.use_redirects>` attribute.
 
-** Other breaking changes**
+**Other breaking changes**
 
 * Python 3.7 support was dropped (:phab:`T378893`), including *importlib_metadata* of
-  :mod:`backports`
+  :mod:`backports`.
 * See also Current Deprecations below.
 
 
@@ -112,7 +114,6 @@ Pending removal in Pywikibot 10
 -------------------------------
 
 * 9.4.0: :mod:`flow` support is deprecated and will be removed (:phab:`T371180`)
-* 7.4.0: ``FilePage.usingPages()`` was renamed to :meth:`using_pages()<pywikibot.FilePage.using_pages>`
 * 7.3.0: ``linktrail`` method of :class:`family.Family` is deprecated; use :meth:`APISite.linktrail()
   <pywikibot.site._apisite.APISite.linktrail>` instead
 * 7.2.0: Positional arguments *decoder*, *layer* and *newline* for :mod:`logging` functions were dropped; keyword

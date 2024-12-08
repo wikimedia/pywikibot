@@ -42,7 +42,6 @@ from pywikibot.tools import (
     deprecated,
     deprecated_args,
     first_upper,
-    issue_deprecation_warning,
     remove_last_args,
 )
 
@@ -1513,7 +1512,8 @@ class BasePage(ComparableMixin):
                   apply_cosmetic_changes=False, nocreate=True, **kwargs)
 
     def linkedPages(
-        self, *args, **kwargs
+        self,
+        **kwargs
     ) -> Generator[pywikibot.page.BasePage, None, None]:
         """Iterate Pages that this Page links to.
 
@@ -1525,36 +1525,29 @@ class BasePage(ComparableMixin):
         :py:mod:`APISite.pagelinks<pywikibot.site.APISite.pagelinks>`
 
         .. versionadded:: 7.0
-           the `follow_redirects` keyword argument
+           the `follow_redirects` keyword argument.
         .. deprecated:: 7.0
-           the positional arguments
+           the positional arguments.
+        .. versionremoved:: 10.0
+           the positional arguments.
 
-        .. seealso:: :api:`Links`
+        .. seealso::
+           - :meth:`Site.pagelinks
+             <pywikibot.site._generators.GeneratorsMixin.pagelinks>`
+           - :api:`Links`
 
         :keyword namespaces: Only iterate pages in these namespaces
             (default: all)
         :type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
-        :keyword follow_redirects: if True, yields the target of any redirects,
-            rather than the redirect page
-        :keyword total: iterate no more than this number of pages in total
-        :keyword content: if True, load the current content of each page
+        :keyword bool follow_redirects: if True, yields the target of
+            any redirects, rather than the redirect page
+        :keyword int total: iterate no more than this number of pages in
+            total
+        :keyword bool content: if True, load the current content of each
+            page
         """
-        # Deprecate positional arguments and synchronize with Site.pagelinks
-        keys = ('namespaces', 'total', 'content')
-        for i, arg in enumerate(args):  # pragma: no cover
-            key = keys[i]
-            issue_deprecation_warning(
-                f'Positional argument {i + 1} ({arg})',
-                f'keyword argument "{key}={arg}"',
-                since='7.0.0')
-            if key in kwargs:
-                pywikibot.warning(f'{key!r} is given as keyword argument '
-                                  f'{arg!r} already; ignoring {kwargs[key]!r}')
-            else:
-                kwargs[key] = arg
-
         return self.site.pagelinks(self, **kwargs)
 
     def interwiki(
