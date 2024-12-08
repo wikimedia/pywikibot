@@ -4,6 +4,8 @@ Scripts Changelog
 10.0.0
 ------
 
+* i18n updates
+
 dataextend
 ^^^^^^^^^^
 

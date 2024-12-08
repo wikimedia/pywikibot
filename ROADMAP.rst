@@ -3,17 +3,20 @@ Current Release Changes
 
 **Improvements**
 
-* (no changes yet)
+* :attr:`.login.OauthLoginManager.access_token` was added
+* Representation string for :class:`login.LoginManager` was added
+* i18n updates
 
 **Bugfixes**
 
 * (no changes yet)
 
-**Breaking changes and code cleanups**
+**Code cleanups**
 
 * ``fix_digits`` method of :class:`textlib.TimeStripper` was removed;
   :func:`textlib.to_latin_digits` can be used instead
-* :mod:`textlib`.tzoneFixedOffset class was removed in favour of :class:`time.TZoneFixedOffset`
+* :mod:`textlib`.tzoneFixedOffset class was removed in favour of
+  :class:`time.TZoneFixedOffse<pywikibot.time.TZoneFixedOffset>`
 * A boolean *watch* parameter in :meth:`page.BasePage.save` is desupported
 * ``XMLDumpOldPageGenerator`` was removed in favour of a ``content`` parameter of
   :func:`pagegenerators.XMLDumpPageGenerator` (:phab:`T306134`)
@@ -29,13 +32,19 @@ Current Release Changes
 * ``tools.formatter.color_format()`` was removed; the new color literals can be used instead
 * RedirectPageBot and NoRedirectPageBot bot classes were removed in favour of
   :attr:`use_redirects<bot.BaseBot.use_redirects>` attribute
+
+** Other breaking changes**
+
 * Python 3.7 support was dropped (:phab:`T378893`), including *importlib_metadata* of
   :mod:`backports`
+* See also Current Deprecations below.
 
 
 Current Deprecations
 ====================
 
+* 10.0.0: 'millenia' argument for *precision* parameter of :class:`pywikibot.WbTime` is deprecated;
+  'millennium' must be used instead.
 * 10.0.0: *includeredirects* parameter of :func:`pagegenerators.AllpagesPageGenerator` and
   :func:`pagegenerators.PrefixingPageGenerator` is deprecated and should be replaced by *filterredir*
 * 9.6.0: :meth:`BaseSite.languages()<pywikibot.site._basesite.BaseSite.languages>` will be removed in favour of
