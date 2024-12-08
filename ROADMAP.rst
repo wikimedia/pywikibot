@@ -3,6 +3,7 @@ Current Release Changes
 
 **Improvements**
 
+* *args* parameter for :mod:`logging` functions can be used as formatting arguments
 * :attr:`.login.OauthLoginManager.access_token` was added.
 * Representation string for :class:`login.LoginManager` was added.
 * i18n updates.
@@ -13,6 +14,8 @@ Current Release Changes
 
 **Code cleanups**
 
+* Positional arguments *decoder*, *layer* and *newline* for :mod:`logging` functions are invalid;
+  keyword arguments must be used instead.
 * The positional arguments of :meth:`page.BasePage.linkedPages` were removed.
 * ``FilePage.usingPages()`` was renamed to :meth:`using_pages()<pywikibot.FilePage.using_pages>`.
 * ``APISite.article_path`` was removed. :attr:`APISite.articlepath
@@ -116,8 +119,6 @@ Pending removal in Pywikibot 10
 * 9.4.0: :mod:`flow` support is deprecated and will be removed (:phab:`T371180`)
 * 7.3.0: ``linktrail`` method of :class:`family.Family` is deprecated; use :meth:`APISite.linktrail()
   <pywikibot.site._apisite.APISite.linktrail>` instead
-* 7.2.0: Positional arguments *decoder*, *layer* and *newline* for :mod:`logging` functions were dropped; keyword
-  arguments must be used instead.
 * 7.2.0: ``tb`` parameter of :func:`exception()<pywikibot.logging.exception>` function was renamed to ``exc_info``
 * 7.1.0: Unused ``get_redirect`` parameter of :meth:`Page.getOldVersion()<page.BasePage.getOldVersion>` will be removed
 * 7.0.0: baserevid parameter of editSource(), editQualifier(), removeClaims(), removeSources(), remove_qualifiers()
