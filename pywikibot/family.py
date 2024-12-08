@@ -1098,7 +1098,7 @@ class DefaultWikibaseFamily(WikibaseFamily):
 
     """A base class for a Wikimedia Wikibase Family.
 
-    This class holds defauls for :meth:`calendarmodel`,
+    This class holds defaults for :meth:`calendarmodel`,
     :meth:`default_globe` and :meth:`globes` to prevent code duplication.
 
     .. warning:: Possibly you have to adjust the repository site in

@@ -46,7 +46,7 @@ class Uploader:
         returning a boolean or an iterable. The callable gets a list of
         UploadError instances and the iterable should contain the warning
         codes for which an equivalent callable would return True if all
-        UploadError codes are in thet list. If the result is False it'll
+        UploadError codes are in that list. If the result is False it'll
         not continue uploading the file and otherwise disable any warning
         and reattempt to upload the file.
 

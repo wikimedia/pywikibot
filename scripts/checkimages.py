@@ -1083,14 +1083,14 @@ class CheckImagesBot:
         for number, m in enumerate(SETTINGS_REGEX.finditer(page_text),
                                    start=1):
             name = str(m[1])
-            find_tipe = str(m[2])
+            find_type = str(m[2])
             find = str(m[3])
             imagechanges = str(m[4])
             summary = str(m[5])
             head = str(m[6])
             text = str(m[7])
             mexcatched = str(m[8])
-            settings = [number, name, find_tipe, find, imagechanges, summary,
+            settings = [number, name, find_type, find, imagechanges, summary,
                         head, text, mexcatched]
             self.settings_data.append(settings)
 
@@ -1371,7 +1371,7 @@ class CheckImagesBot:
         # In every tuple there's a setting configuration
         for tupla in self.settings_data:
             name = tupla[1]
-            find_tipe = tupla[2]
+            find_type = tupla[2]
             find = tupla[3]
             find_list = self.load(find)
             imagechanges = tupla[4]
@@ -1390,7 +1390,7 @@ class CheckImagesBot:
             text = tupla[7] % self.image_name
             mex_catched = tupla[8]
             for k in find_list:
-                if find_tipe.lower() == 'findonly':
+                if find_type.lower() == 'findonly':
                     search_results = re.findall(fr'{k.lower()}',
                                                 self.image_check_text.lower())
                     if search_results \
@@ -1403,7 +1403,7 @@ class CheckImagesBot:
                         self.summary_used = summary
                         self.mex_used = mex_catched
                         break
-                elif find_tipe.lower() == 'find' \
+                elif find_type.lower() == 'find' \
                     and re.findall(fr'{k.lower()}',
                                    self.image_check_text.lower()):
                     self.some_problem = True
