@@ -25,7 +25,7 @@ from pywikibot import config
 from pywikibot.backports import DefaultDict, Mapping, Sequence, removesuffix
 from pywikibot.data import wikistats
 from pywikibot.exceptions import FamilyMaintenanceWarning, UnknownFamilyError
-from pywikibot.tools import classproperty, deprecated, remove_last_args
+from pywikibot.tools import classproperty, deprecated
 
 
 logger = logging.getLogger('pywiki.wiki.family')
@@ -392,19 +392,6 @@ class Family:
                 )
         Family._families[fam] = cls
         return cls
-
-    @deprecated('APISite.linktrail()', since='7.3.0')
-    @remove_last_args(['fallback'])
-    def linktrail(self, code: str) -> str:
-        """Return regex for trailing chars displayed as part of a link.
-
-        .. note:: Returns a string, not a compiled regular expression
-           object.
-
-        .. deprecated:: 7.3
-        """
-        site = pywikibot.Site(code, 'wikipedia')
-        return site.linktrail()
 
     def category_redirects(self, code, fallback: str = '_default'):
         """Return list of category redirect templates."""
