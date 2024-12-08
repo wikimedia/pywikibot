@@ -25,7 +25,7 @@ from pywikibot.exceptions import (
 )
 from pywikibot.site._apisite import APISite
 from pywikibot.site._decorators import need_extension, need_right
-from pywikibot.tools import deprecated, merge_unique_dicts, remove_last_args
+from pywikibot.tools import deprecated, merge_unique_dicts
 
 
 __all__ = ('DataSite', )
@@ -476,7 +476,6 @@ class DataSite(APISite):
         return data
 
     @need_right('edit')
-    @remove_last_args(['baserevid'])  # since 7.0.0
     def editSource(self,
                    claim: pywikibot.Claim,
                    source: pywikibot.Claim,
@@ -486,10 +485,10 @@ class DataSite(APISite):
                    tags: str | None = None):
         """Create/Edit a source.
 
-        .. versionchanged:: 7.0
-           deprecated *baserevid* parameter was removed
         .. versionchanged:: 9.4
            *tags* parameter was added
+        .. versionchanged:: 10.0
+           deprecated *baserevid* parameter was removed
 
         :param claim: A Claim object to add the source to.
         :param source: A Claim object to be used as a source.
@@ -537,7 +536,6 @@ class DataSite(APISite):
         return req.submit()
 
     @need_right('edit')
-    @remove_last_args(['baserevid'])  # since 7.0.0
     def editQualifier(self,
                       claim: pywikibot.Claim,
                       qualifier: pywikibot.Claim,
@@ -547,10 +545,10 @@ class DataSite(APISite):
                       tags: str | None = None):
         """Create/Edit a qualifier.
 
-        .. versionchanged:: 7.0
-           deprecated *baserevid* parameter was removed
         .. versionchanged:: 9.4
            *tags* parameter was added
+        .. versionchanged:: 10.0
+           deprecated *baserevid* parameter was removed
 
         :param claim: A Claim object to add the qualifier to
         :param qualifier: A Claim object to be used as a qualifier
@@ -589,7 +587,6 @@ class DataSite(APISite):
         return req.submit()
 
     @need_right('edit')
-    @remove_last_args(['baserevid'])  # since 7.0.0
     def removeClaims(self,
                      claims: list[pywikibot.Claim],
                      bot: bool = True,
@@ -597,10 +594,10 @@ class DataSite(APISite):
                      tags: str | None = None):
         """Remove claims.
 
-        .. versionchanged:: 7.0
-           deprecated *baserevid* parameter was removed
         .. versionchanged:: 9.4
            *tags* parameter was added
+        .. versionchanged:: 10.0
+           deprecated *baserevid* parameter was removed
 
         :param claims: Claims to be removed
         :param bot: Whether to mark the edit as a bot edit
@@ -626,7 +623,6 @@ class DataSite(APISite):
         return req.submit()
 
     @need_right('edit')
-    @remove_last_args(['baserevid'])  # since 7.0.0
     def removeSources(self,
                       claim: pywikibot.Claim,
                       sources: list[pywikibot.Claim],
@@ -635,10 +631,10 @@ class DataSite(APISite):
                       tags: str | None = None):
         """Remove sources.
 
-        .. versionchanged:: 7.0
-           deprecated `baserevid` parameter was removed
         .. versionchanged:: 9.4
            *tags* parameter was added
+        .. versionchanged:: 10.0
+           deprecated `baserevid` parameter was removed
 
         :param claim: A Claim object to remove the sources from
         :param sources: A list of Claim objects that are sources
@@ -661,7 +657,6 @@ class DataSite(APISite):
         return req.submit()
 
     @need_right('edit')
-    @remove_last_args(['baserevid'])  # since 7.0.0
     def remove_qualifiers(self,
                           claim: pywikibot.Claim,
                           qualifiers: list[pywikibot.Claim],
@@ -670,10 +665,10 @@ class DataSite(APISite):
                           tags: str | None = None):
         """Remove qualifiers.
 
-        .. versionchanged:: 7.0
-           deprecated `baserevid` parameter was removed
         .. versionchanged:: 9.4
            *tags* parameter was added
+        .. versionchanged:: 10.0
+           deprecated `baserevid` parameter was removed
 
         :param claim: A Claim object to remove the qualifier from
         :param qualifiers: Claim objects currently used as a qualifiers

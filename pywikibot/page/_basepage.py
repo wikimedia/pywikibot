@@ -42,7 +42,6 @@ from pywikibot.tools import (
     deprecated,
     deprecated_args,
     first_upper,
-    remove_last_args,
 )
 
 
@@ -455,10 +454,11 @@ class BasePage(ComparableMixin):
             self.site.loadrevisions(self, content=content, revids=oldid)
         return self._revisions[oldid]
 
-    @remove_last_args(['get_redirect'])
     def getOldVersion(self, oldid, force: bool = False) -> str:
         """Return text of an old revision of this page.
 
+        .. versionchanged:: 10.0
+           The unused parameter *get_redirect* was removed.
         .. seealso:: :meth:`get_revision`
 
         :param oldid: The revid of the revision desired.
@@ -1526,8 +1526,6 @@ class BasePage(ComparableMixin):
 
         .. versionadded:: 7.0
            the `follow_redirects` keyword argument.
-        .. deprecated:: 7.0
-           the positional arguments.
         .. versionremoved:: 10.0
            the positional arguments.
 

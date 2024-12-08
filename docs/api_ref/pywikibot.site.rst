@@ -19,19 +19,6 @@
 
    .. autoclass:: BaseSite
 
-      .. method:: linktrail()
-
-         Return regex for trailing chars displayed as part of a link.
-
-         .. note: Returns a string, not a compiled regular expression object.
-         .. seealso:: :meth:`family.Family.linktrail`
-         .. deprecated:: 7.3
-            Only supported as :class:`APISite<pywikibot.site._apisite.APISite>`
-            method. Use :meth:`APISite.linktrail()
-            <pywikibot.site._apisite.APISite.linktrail>`
-
-         :rtype: str
-
       .. method:: category_redirects(fallback: str = '_default')
 
          Return list of category redirect templates.
