@@ -165,7 +165,7 @@ class SparqlQuery(WaitingMixin):
             return self.last_response.json()
         except JSONDecodeError:
             # There is no proper error given but server returns HTML page
-            # in case login isn't valid sotry to guess what the problem is
+            # in case login isn't valid so try to guess what the problem is
             # and notify user instead of silently ignoring it.
             # This could be made more reliable by fixing the backend.
             # Note: only raise error when response starts with HTML,

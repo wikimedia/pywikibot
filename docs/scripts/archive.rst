@@ -2,7 +2,7 @@
 Outdated core scripts
 *********************
 
-This list contains outdated scripts from :term:`core` banch which
+This list contains outdated scripts from :term:`core` branch which
 aren't supported any longer. They are deleted from repository.
 
 .. hint::

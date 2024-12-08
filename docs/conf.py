@@ -480,7 +480,7 @@ toc_object_entries_show_parents = 'hide'
 napoleon_use_admonition_for_examples = True
 napoleon_use_admonition_for_notes = True
 napoleon_use_admonition_for_references = True
-napoleon_custom_sections = ['Advice', 'Advices', 'Hints', 'Rights', 'Tips']
+napoleon_custom_sections = ['Advice', 'Hints', 'Rights']
 
 python_use_unqualified_type_names = True
 modindex_common_prefix = ['pywikibot.scripts.']

@@ -52,12 +52,12 @@ class DryCachedRequestTests(SiteAttributeTestCase):
     def setUp(self):
         """Initialize the fake requests."""
         super().setUp()
-        self.parms = {'action': 'query',
-                      'meta': 'userinfo'}
+        self.params = {'action': 'query',
+                       'meta': 'userinfo'}
         self.req = CachedRequest(expiry=1, site=self.basesite,
-                                 parameters=self.parms)
+                                 parameters=self.params)
         self.expreq = CachedRequest(expiry=0, site=self.basesite,
-                                    parameters=self.parms)
+                                    parameters=self.params)
         self.diffreq = CachedRequest(
             expiry=1, site=self.basesite,
             parameters={'action': 'query', 'meta': 'siteinfo'})
@@ -69,14 +69,14 @@ class DryCachedRequestTests(SiteAttributeTestCase):
             self.deprecated_explicit = CachedRequest(
                 expiry=1, site=self.basesite, action='query', meta='userinfo')
             self.deprecated_asterisks = CachedRequest(
-                expiry=1, site=self.basesite, **self.parms)
+                expiry=1, site=self.basesite, **self.params)
 
     def test_expiry_formats(self):
         """Test using a timedelta as expiry."""
         self.assertEqual(self.req.expiry,
                          CachedRequest(datetime.timedelta(days=1),
                                        site=self.basesite,
-                                       parameters=self.parms).expiry)
+                                       parameters=self.params).expiry)
 
     def test_expired(self):
         """Test if the request is expired."""

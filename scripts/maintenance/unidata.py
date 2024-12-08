@@ -70,8 +70,8 @@ def process_site(fam_name, site_code):
         data={'text': wikilinks},
         timeout=10,
     ).json()
-    pased_text = j['parse']['text']['*']
-    titles = findall(r'title="[^:]*:(.)', pased_text)
+    parsed_text = j['parse']['text']['*']
+    titles = findall(r'title="[^:]*:(.)', parsed_text)
     site_excepts = {}
     for i, original_char in enumerate(chars):
         title_char = titles[i]

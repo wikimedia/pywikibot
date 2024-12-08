@@ -435,7 +435,7 @@ class TestPageQuality(TestCase):
 
 class BS4TestCase(TestCase):
 
-    """Run tests which needs bs4 beeing installed."""
+    """Run tests which needs bs4 being installed."""
 
     @classmethod
     @require_modules('bs4')

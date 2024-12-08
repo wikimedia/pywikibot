@@ -722,7 +722,7 @@ Release History
 * Retry for internal_api_error_DBQueryTimeoutError errors due to :phab:`T297708`
 * Handle ParserError within xmlreader.XmlDump.parse() instead of raising an exception (:phab:`T306134`)
 * XMLDumpOldPageGenerator is deprecated in favour of a `content` parameter (:phab:`T306134`)
-* `use_disambig` BaseBot attribute was added to hande disambig skipping
+* `use_disambig` BaseBot attribute was added to handle disambig skipping
 * Deprecate RedirectPageBot and NoRedirectPageBot in favour of `use_redirects` attribute
 * tools.formatter.color_format is deprecated and will be removed
 * A new and easier color format was implemented; colors can be used like:
@@ -1020,7 +1020,7 @@ Release History
 **Improvements and Bugfixes**
 
 * Use different logfiles for multiple processes of the same script (:phab:`T56685`)
-* throttle.pip will be reused as soon as possbile
+* throttle.pip will be reused as soon as possibile
 * terminal_interface_base.TerminalHandler is subclassed from logging.StreamHandler
 * Fix iterating of SizedKeyCollection (:phab:`T282865`)
 * An abstract base user interface module was added

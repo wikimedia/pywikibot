@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Test for login and logout methods.
 
-These tests are separated from others because they should not be runned
-in paralled CI test tasks. Any logout could lead other parallel tests
-to fail.
+These tests are separated from others because they should not be run in
+paralled CI test tasks. Any logout could lead other parallel tests to
+fail.
 """
 #
 # (C) Pywikibot team, 2022-2024

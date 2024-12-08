@@ -60,8 +60,8 @@ the home Wikipedia:
 -target -fullhistory -assignknownusers
 
 
-Advices
--------
+Advice
+------
 
 The module gives access to all parameters of the API (and special page)
 and is compatible to the :mod:`scripts.transferbot` script.

@@ -796,14 +796,14 @@ def LinksearchPageGenerator(
 ) -> Iterable[pywikibot.page.Page]:
     """Yield all pages that link to a certain URL.
 
-    :param url: The URL to search for (with ot without the protocol prefix);
-            this may include a '*' as a wildcard, only at the start of the
-            hostname
+    :param url: The URL to search for (with or without the protocol
+        prefix); this may include a '*' as a wildcard, only at the start
+        of the hostname
     :param namespaces: list of namespace numbers to fetch contribs from
     :param total: Maximum number of pages to retrieve in total
     :param site: Site for generator results
-    :param protocol: Protocol to search for, likely http or https, http by
-        default. Full list shown on Special:LinkSearch wikipage
+    :param protocol: Protocol to search for, likely http or https, http
+        by default. Full list shown on Special:LinkSearch wikipage.
     """
     if site is None:
         site = pywikibot.Site()
