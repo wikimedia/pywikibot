@@ -11,6 +11,9 @@ Current Release Changes
 
 **Breaking changes and code cleanups**
 
+* ``fix_digits`` method of :class:`textlib.TimeStripper` was removed;
+  :func:`textlib.to_latin_digits` can be used instead
+* :mod:`textlib`.tzoneFixedOffset class was removed in favour of :class:`time.TZoneFixedOffset`
 * A boolean *watch* parameter in :meth:`page.BasePage.save` is desupported
 * ``XMLDumpOldPageGenerator`` was removed in favour of a ``content`` parameter of
   :func:`pagegenerators.XMLDumpPageGenerator` (:phab:`T306134`)
@@ -98,7 +101,6 @@ Pending removal in Pywikibot 10
 -------------------------------
 
 * 9.4.0: :mod:`flow` support is deprecated and will be removed (:phab:`T371180`)
-* 7.5.0: :mod:`textlib`.tzoneFixedOffset class will be removed in favour of :class:`time.TZoneFixedOffset`
 * 7.4.0: ``FilePage.usingPages()`` was renamed to :meth:`using_pages()<pywikibot.FilePage.using_pages>`
 * 7.3.0: ``linktrail`` method of :class:`family.Family` is deprecated; use :meth:`APISite.linktrail()
   <pywikibot.site._apisite.APISite.linktrail>` instead

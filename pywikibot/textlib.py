@@ -24,7 +24,6 @@ from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.family import Family
 from pywikibot.time import TZoneFixedOffset
 from pywikibot.tools import (
-    ModuleDeprecationWrapper,
     deprecated,
     deprecated_args,
     first_lower,
@@ -2104,16 +2103,6 @@ class TimeStripper:
         """
         return TIMEGROUPS
 
-    @staticmethod
-    @deprecated('to_latin_digits() function', since='7.0.0')
-    def fix_digits(line):
-        """Make non-latin digits like Persian to latin to parse.
-
-        .. deprecated:: 7.0
-           Use :func:`to_latin_digits` instead.
-        """
-        return to_latin_digits(line)
-
     def _last_match_and_replace(self,
                                 txt: str,
                                 pat) -> tuple[str, Match[str] | None]:
@@ -2280,10 +2269,3 @@ class TimeStripper:
             timestamp = None
 
         return timestamp
-
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper.add_deprecated_attr(
-    'tzoneFixedOffset',
-    replacement_name='pywikibot.time.TZoneFixedOffset',
-    since='7.5.0')
