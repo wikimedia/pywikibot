@@ -13,6 +13,8 @@ Current Release Changes
 
 **Code cleanups**
 
+* ``APISite.article_path`` was removed. :attr:`APISite.articlepath
+  <pywikibot.site._apisite.APISite.articlepath>` can be used instead.
 * ``fix_digits`` method of :class:`textlib.TimeStripper` was removed;
   :func:`textlib.to_latin_digits` can be used instead
 * :mod:`textlib`.tzoneFixedOffset class was removed in favour of

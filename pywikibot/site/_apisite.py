@@ -823,25 +823,14 @@ class APISite(
                 and self._useroptions[f'searchNs{ns.id}']
                 in ['1', True]}
 
-    @property  # type: ignore[misc]
-    @deprecated('articlepath', since='7.0.0')
-    def article_path(self) -> str:
-        """Get the nice article path without $1.
-
-        .. deprecated:: 7.0
-           Replaced by :py:meth:`articlepath`
-        """
-        return self.articlepath[:-2]
-
     @property
     def articlepath(self) -> str:
-        """Get the nice article path with placeholder.
+        """Get the nice article path with ``{}``placeholder.
 
         .. versionadded:: 7.0
-           Replaces :py:meth:`article_path`
         """
-        # Assert $1 placeholder is present
         path = self.siteinfo['general']['articlepath']
+        # Assert $1 placeholder is present
         assert '$1' in path, 'articlepath must contain "$1" placeholder'
         return path.replace('$1', '{}')
 
