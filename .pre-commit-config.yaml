@@ -92,11 +92,9 @@ repos:
           - --doctests
         additional_dependencies:
           # Due to incompatibilities between packages the order matters.
-          - flake8-bugbear!=24.1.17
-          - flake8-comprehensions>=3.13.0
+          - flake8-bugbear>=24.10.31
           - flake8-mock-x2
           - flake8-print>=5.0.0
-          - flake8-quotes>=3.3.2
-          - flake8-raise
+          - flake8-quotes>=3.4.0
           - flake8-tuple>=0.4.1
-          - pep8-naming>=0.13.3
+          - pep8-naming>=0.14.1

@@ -189,7 +189,7 @@ ignore_roles = ["api", "phab", "pylib", "source", "wiki"]
 
 
 [tool.ruff.lint]
-select = ["D"]
+select = ["C4", "D", "RSE"]
 ignore = ["D105", "D211", "D213", "D214", "D401", "D404", "D406", "D407", "D412", "D413", "D416", "D417"]
 
 [tool.ruff.lint.per-file-ignores]
