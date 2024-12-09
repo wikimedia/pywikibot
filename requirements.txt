@@ -20,7 +20,7 @@
 # mandatory dependencies, others are optional
 mwparserfromhell>=0.5.2
 packaging
-requests>=2.21.0
+requests>=2.31.0
 
 # MediaWiki markup parser
 # mwparserfromhell is mandatory but wikitextparser can be used instead
