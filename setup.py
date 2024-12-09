@@ -75,7 +75,7 @@ extra_deps.update({'scripts': [i for k, v in script_deps.items() for i in v]})
 dependencies = [
     'mwparserfromhell>=0.5.2',
     'packaging',
-    'requests>=2.21.0',
+    'requests>=2.31.0',
 ]
 
 # ------- setup tests_require ------- #

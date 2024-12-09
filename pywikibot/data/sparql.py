@@ -9,6 +9,7 @@ from __future__ import annotations
 from textwrap import fill
 from urllib.parse import quote
 
+from requests import JSONDecodeError
 from requests.exceptions import Timeout
 
 from pywikibot import Site
@@ -17,11 +18,6 @@ from pywikibot.comms import http
 from pywikibot.data import WaitingMixin
 from pywikibot.exceptions import Error, NoUsernameError, ServerError
 
-
-try:
-    from requests import JSONDecodeError
-except ImportError:  # requests < 2.27.0
-    from json import JSONDecodeError
 
 DEFAULT_HEADERS = {'cache-control': 'no-cache',
                    'Accept': 'application/sparql-results+json'}

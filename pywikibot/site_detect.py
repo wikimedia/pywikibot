@@ -13,6 +13,7 @@ from html.parser import HTMLParser
 from http import HTTPStatus
 from urllib.parse import urljoin, urlparse
 
+from requests import JSONDecodeError
 from requests.exceptions import RequestException
 
 import pywikibot
@@ -20,12 +21,6 @@ from pywikibot.backports import removesuffix
 from pywikibot.comms.http import fetch
 from pywikibot.exceptions import ClientError, ServerError
 from pywikibot.tools import MediaWikiVersion
-
-
-try:
-    from requests import JSONDecodeError
-except ImportError:  # requests < 2.27.0
-    from json import JSONDecodeError
 
 
 SERVER_DB_ERROR_MSG = \
