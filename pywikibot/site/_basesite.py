@@ -221,7 +221,7 @@ class BaseSite(ComparableMixin):
     @property
     def sitename(self):
         """String representing this Site's name and code."""
-        return self.__str__()
+        return str(self)
 
     def __repr__(self) -> str:
         """Return internal representation."""
