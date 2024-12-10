@@ -15,4 +15,4 @@ tomli>=2.0.1; python_version < "3.11"
 
 
 # optional but needed for tests
-fake-useragent
+fake-useragent != 2.0.0
