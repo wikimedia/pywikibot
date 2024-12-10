@@ -90,7 +90,7 @@ class SetupBase(abc.ABC):
 
     def __post_init__(self) -> None:
         """Post-init initializer."""
-        self.folder = Path().resolve()
+        self.folder = Path.cwd()
 
     def clear_old_dist(self) -> None:  # pragma: no cover
         """Delete old dist folders.
