@@ -10,7 +10,7 @@ Current Release Changes
 
 **Bugfixes**
 
-* (no changes yet)
+* Fix use of importlib.metadata.entry_points for pywikibot-scripts with Python 3.8 and 3.9 (:phab:`T358635`)
 
 **Code cleanups**
 
@@ -53,6 +53,7 @@ Current Release Changes
 
 **Other breaking changes**
 
+* Require ``requests >= 2.31.0`` (:phab:`T347031`)
 * Python 3.7 support was dropped (:phab:`T378893`), including *importlib_metadata* of
   :mod:`backports`.
 * See also Current Deprecations below.
