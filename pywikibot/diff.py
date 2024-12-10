@@ -139,7 +139,7 @@ class Hunk:
                 # or color whole line to be added.
                 fmt = fmt if fmt.startswith('?') else ''
                 fmt = fmt[:min(len(fmt), len(line1))]
-                fmt = fmt if fmt else None
+                fmt = fmt or None
                 yield self.color_line(line1, fmt)
 
         # handle last line
@@ -155,7 +155,7 @@ class Hunk:
             # or color whole line to be added.
             fmt = line1 if line1.startswith('?') else ''
             fmt = fmt[:min(len(fmt), len(line2))]
-            fmt = fmt if fmt else None
+            fmt = fmt or None
             yield self.color_line(line2, fmt)
 
     def color_line(self, line: str, line_ref: str | None = None) -> str:
