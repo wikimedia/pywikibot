@@ -188,7 +188,7 @@ class DataSite(APISite):
                                     # TODO: When props is empty it results in
                                     # an empty string ('&props=') but it should
                                     # result in a missing entry.
-                                    props=props if props else False)
+                                    props=props or False)
         req = self.simple_request(**params)
         data = req.submit()
         if 'success' not in data:

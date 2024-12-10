@@ -710,7 +710,7 @@ class CategoryMoveRobot(CategoryPreprocess):
             # Category is deleted.
             self.deletion_comment = i18n.twtranslate(
                 self.site, 'category-was-disbanded')
-        self.move_comment = move_comment if move_comment else self.comment
+        self.move_comment = move_comment or self.comment
 
     def run(self) -> None:
         """The main bot function that does all the work.
