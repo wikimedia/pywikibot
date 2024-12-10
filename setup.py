@@ -54,10 +54,7 @@ extra_deps = {
         'mwoauth!=0.3.1,>=0.2.4',
     ],
     'html': ['beautifulsoup4>=4.7.1'],
-    'http': [
-        'fake-useragent>=1.4.0; python_version > "3.8"',
-        'fake-useragent>=1.4.0, < 2.0.0; python_version < "3.9"',  # T381715
-    ],
+    'http': ['fake-useragent != 2.0.0'],
 }
 
 
