@@ -204,8 +204,7 @@ class Hunk:
 
     def __repr__(self) -> str:
         """Return a reconstructable representation."""
-        # TODO
-        return f'{self.__class__.__name__}(a, b, {self.group})'
+        return f'{type(self).__name__}(a, b, {self.group})'
 
 
 class _SuperHunk(abc.Sequence):
