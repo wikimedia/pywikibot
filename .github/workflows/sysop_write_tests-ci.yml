@@ -65,7 +65,7 @@ jobs:
         PYWIKIBOT_TEST_WRITE: ${{ matrix.site == 'wikipedia:test' && 1 || 0 }}
       run: |
         python pwb.py version
-        coverage -m pytest -s -r A -a "${{ matrix.attr }}"
+        coverage run -m pytest -s -r A -a "${{ matrix.attr }}"
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
