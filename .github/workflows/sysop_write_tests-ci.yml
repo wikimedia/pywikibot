@@ -67,6 +67,10 @@ jobs:
         python pwb.py version
         coverage run -m pytest -s -r A -a "${{ matrix.attr }}"
 
+    - name: Show coverage statistics
+      run: |
+        coverage report
+
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
       env:
