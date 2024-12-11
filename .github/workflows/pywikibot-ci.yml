@@ -128,7 +128,7 @@ jobs:
         if [ ${{matrix.site || 0}} != 'wikisource:zh' ]; then
           coverage run -m unittest discover -vv -p \"*_tests.py\";
         else
-          pytest --cov=.;
+          coverage run -m pytest
         fi
 
     - name: Show coverage statistics
