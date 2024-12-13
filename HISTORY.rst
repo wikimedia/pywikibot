@@ -1,6 +1,30 @@
 Release History
 ===============
 
+9.6.0
+-----
+*03 December 2024*
+
+* Add support for idwikivoyage (:phab:`T381082`)
+* Add docstrings of :class:`tools.classproperty` methods (:phab:`T380628`)
+* Site property :attr:`BaseSite.codes<pywikibot.site._basesite.BaseSite.codes>` was added (:phab:`T380606`)
+* Increase *leeway* parameter of :meth:`login.OauthLoginManager.identity` (:phab:`T380270`)
+* Show a warning if *ignore_extension* parameter of :class:`pywikibot.FilePage` was set and the extension is invalid
+* Remove old code of Python 3.2 or older in :func:`tools.chars.replace_invisible` due to :pep:`393`
+* use :meth:`BasePage.autoFormat()<page.BasePage.autoFormat>` instead of :func:`date.getAutoFormat` in
+  :mod:`titletranslate`
+* Upcast :class:`pywikibot.Page` to :class:`pywikibot.FilePage` in :meth:`PageGenerator.result()
+  <data.api.PageGenerator.result>` if ``imageinfo`` is given (:phab:`T379513`)
+* Update oauth requirements
+* i18n-updates
+* Implement param *with_sort_key* in :meth:`page.BasePage.categories` (:phab:`T75561`)
+* Python 3.7 support will be discontinued and probably this is the last version supporting it
+* Add :meth:`page.BasePage.get_revision` method
+* Retry :meth:`data.sparql.SparqlQuery.query` on internal server error (500) (:phab:`T378788`)
+* Extract :meth:`APISite.linktrail()<pywikibot.site._apisite.APISite.linktrail>`
+  for hr-wiki (:phab:`T378787`)
+
+
 9.5.0
 -----
 *30 October 2024*
@@ -28,7 +52,7 @@ Release History
 -----
 *05 October 2024*
 
-* Ignore :exc:`ValueError` durig upcast of :class:`FilePage<pywikibot.page.FilePage>` due to invalid file extension
+* Ignore :exc:`ValueError` during upcast of :class:`FilePage<pywikibot.page.FilePage>` due to invalid file extension
   (:phab:`T367777`, :phab:`T376452`)
 * Provide an entry point to connect foreign scripts with pwb wapper (:phab:`T139143`, :phab:`T139144`)
 * Show a warning message for a deleted or unknown :class:`Claim<pywikibot.Claim>` type (:phab:`T374676`)
@@ -94,7 +118,7 @@ Release History
 * No longer wait in :meth:`data.api.Request._http_request` for ``ImportError`` and ``NameError``
 * Replace ``requests.utils.urlparse`` with ``urllib.parse.urlparse`` in
   :func:`comms.http.get_authentication` (:phab:`T367649`)
-* Show an appropiate message if ``requests_oauthlib`` package is required but missing (:phab:`T353387`)
+* Show an appropriate message if ``requests_oauthlib`` package is required but missing (:phab:`T353387`)
 * Retry ``DBUnexpectedError`` in :meth:`data.api.Request._internal_api_error` (:phab:`T367383`)
 * Duplicated entries found in :mod:`pywikibot` were removed
 * Pass ``None`` instead of an empty string as *expiry* argument in
@@ -143,7 +167,7 @@ Release History
 
 * Circumvent problems with *unique* and *prefix* parameters in :meth:`Site.alllinks()
   <pywikibot.site._generators.GeneratorsMixin.alllinks>` (:phab:`T359427`)
-* Detect nighly version file with :func:`version.getversion_nightly` (:phab:`T362492`)
+* Detect nightly version file with :func:`version.getversion_nightly` (:phab:`T362492`)
 * :mod:`version`.github_svn_rev2hash() was removed; it was no longer functional (:phab:`T362484`)
 * SVN support has been dropped; ``.svnprops`` property settings was removed (:phab:`T362484`)
 * Skip process that requires login to logout (:phab:`T326614`)
@@ -698,7 +722,7 @@ Release History
 * Retry for internal_api_error_DBQueryTimeoutError errors due to :phab:`T297708`
 * Handle ParserError within xmlreader.XmlDump.parse() instead of raising an exception (:phab:`T306134`)
 * XMLDumpOldPageGenerator is deprecated in favour of a `content` parameter (:phab:`T306134`)
-* `use_disambig` BaseBot attribute was added to hande disambig skipping
+* `use_disambig` BaseBot attribute was added to handle disambig skipping
 * Deprecate RedirectPageBot and NoRedirectPageBot in favour of `use_redirects` attribute
 * tools.formatter.color_format is deprecated and will be removed
 * A new and easier color format was implemented; colors can be used like:
@@ -730,7 +754,7 @@ Release History
 
 * Add FilePage.file_is_used property to determine whether a file is used on a site
 * Add support for guwwiki and shnwikivoyage (:phab:`T303762`, :phab:`T302799`)
-* TextExtracts support was aded (:phab:`T72682`)
+* TextExtracts support was added (:phab:`T72682`)
 * Unused `get_redirect` parameter of Page.getOldVersion() has been dropped
 * Provide BasePage.get_parsed_page() as a public method
 * Provide BuiltinNamespace.canonical_namespaces() with BuiltinNamespace IntEnum
@@ -996,7 +1020,7 @@ Release History
 **Improvements and Bugfixes**
 
 * Use different logfiles for multiple processes of the same script (:phab:`T56685`)
-* throttle.pip will be reused as soon as possbile
+* throttle.pip will be reused as soon as possibile
 * terminal_interface_base.TerminalHandler is subclassed from logging.StreamHandler
 * Fix iterating of SizedKeyCollection (:phab:`T282865`)
 * An abstract base user interface module was added
@@ -1200,7 +1224,7 @@ Release History
 * Property.getType() method has been removed
 * Family.server_time() method was removed; it is still available from Site object (:phab:`T89451`)
 * All HttpRequest parameters except of charset has been dropped (:phab:`T265206`)
-* A lot of methods and properties of HttpRequest are deprecated in favour of requests.Resonse attributes
+* A lot of methods and properties of HttpRequest are deprecated in favour of requests.Response attributes
   (:phab:`T265206`)
 * Method and properties of HttpRequest are delegated to requests.Response object (:phab:`T265206`)
 * comms.threadedhttp.HttpRequest.raw was replaced by HttpRequest.content property (:phab:`T265206`)
@@ -1287,12 +1311,12 @@ Release History
 * Accept only valid names in generate_family_file.py (:phab:`T265328`, :phab:`T265353`)
 * New plural.plural_rule() function returns a rule for a given language
 * Replace deprecated urllib.request.URLopener with http.fetch (:phab:`T255575`)
-* OptionHandler/BaseBot options are accessable as OptionHandler.opt attributes or keyword item
+* OptionHandler/BaseBot options are accessible as OptionHandler.opt attributes or keyword item
   (see also :phab:`T264721`)
 * pywikibot.setAction() function was removed
 * A namedtuple is the result of textlib.extract_sections()
 * Prevent circular imports in config2.py and http.py (:phab:`T264500`)
-* version.get_module_version() is deprecated and gives no meaningfull result
+* version.get_module_version() is deprecated and gives no meaningful result
 * Fix version.get_module_filename() and update log lines (:phab:`T264235`)
 * Re-enable printing log header (:phab:`T264235`)
 * Fix result of :func:`tools.itertools.intersect_generators` (:phab:`T263947`)
@@ -1469,7 +1493,7 @@ Release History
 * Raise ServerError also if connection to PetScan timeouts
 * pagegenerators.py no longer supports 'oursql' or 'MySQLdb'. It now solely supports PyMySQL
   (:phab:`T243154`, :phab:`T89976`)
-* Disfunctional Family.versionnumber() method was removed
+* Dysfunctional Family.versionnumber() method was removed
 * Refactor login functionality (:phab:`T137805`, :phab:`T224712`, :phab:`T248767`, :phab:`T248768`, :phab:`T248945`)
 * Bugfixes and improvements
 * Localisation updates
@@ -1483,7 +1507,7 @@ Release History
 * Refactor data attributes of Wikibase entities (:phab:`T233406`)
 * Functions dealing with stars list are desupported and may be removed
 * Use path's stem of script filename within pwb.py wrapper (:phab:`T248372`)
-* Disfunctional cgi_interface.py was removed (:phab:`T248292`, :phab:`T248250`, :phab:`T193978`)
+* Dysfunctional cgi_interface.py was removed (:phab:`T248292`, :phab:`T248250`, :phab:`T193978`)
 * Fix logout on MW < 1.24 (:phab:`T214009`)
 * Fixed TypeError in getFileVersionHistoryTable method (:phab:`T248266`)
 * Outdated secure connection overrides were removed (:phab:`T247668`)
@@ -1896,7 +1920,7 @@ Release History
 * Clean up issue with _WbDataPage (:phab:`T166362`)
 * Re-enable xml for WikiStats with py2 (:phab:`T165830`)
 * Solve httplib.IncompleteRead exception in eventstreams (:phab:`T168535`)
-* Only force input_choise if self.always is given (:phab:`T161483`)
+* Only force input_choice if self.always is given (:phab:`T161483`)
 * Add colon when replacing category and file weblink (:phab:`T127745`)
 * API Request: set uiprop only when ensuring 'userinfo' in meta (:phab:`T169202`)
 
@@ -1914,7 +1938,7 @@ Release History
 * Implement pywikibot support for adding thanks to normal revisions (:phab:`T135409`)
 * Implement server side event client EventStreams (:phab:`T158943`)
 * new pagegenerators filter option -titleregexnot
-* Add exception for -namepace option (:phab:`T167580`)
+* Add exception for -namespace option (:phab:`T167580`)
 * InteractiveReplace: Allow no replacements by default
 * Encode default globe in family file
 * Add on to pywikibot support for thanking normal revisions (:phab:`T135409`)

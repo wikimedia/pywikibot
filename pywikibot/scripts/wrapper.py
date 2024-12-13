@@ -250,7 +250,7 @@ def check_modules(script: str | None = None) -> bool:
         if dependency.startswith(('importlib_metadata', 'packaging')):
             # Ignore these dependencies because ImportError is raised in an
             # early state when they are imported in backports. They are already
-            # used at this point. This is a workaound for toolforge where some
+            # used at this point. This is a workaround for toolforge where some
             # modules are not installed as a site-package.
             # TODO: Check imports from external source
             continue
@@ -422,7 +422,18 @@ def find_filename(filename):
 
         from pywikibot.i18n import set_messages_package
 
-        for ep in entry_points(name='scriptspath', group='pywikibot'):
+        if sys.version_info < (3, 10):
+            entry_points_items = [
+                ep for ep in entry_points().get('pywikibot', [])
+                if ep.name == 'scriptspath'
+            ]
+        else:
+            entry_points_items = entry_points(
+                name='scriptspath',
+                group='pywikibot',
+            )
+
+        for ep in entry_points_items:
             path = ep.load()
             found = test_paths([''], path)
             if found:

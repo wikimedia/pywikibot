@@ -1,24 +1,9 @@
 Current Release Changes
 =======================
 
-* Add support for idwikivoyage (:phab:`T381082`)
-* Add docstrings of :class:`tools.classproperty` methods (:phab:`T380628`)
-* Site property :attr:`BaseSite.codes<pywikibot.site._basesite.BaseSite.codes>` was added (:phab:`T380606`)
-* Increase *leeway* parameter of :meth:`login.OauthLoginManager.identity` (:phab:`T380270`)
-* Show a warning if *ignore_extension* parameter of :class:`pywikibot.FilePage` was set and the extension is invalid
-* Remove old code of Python 3.2 or older in :func:`tools.chars.replace_invisible` due to :pep:`393`
-* use :meth:`BasePage.autoFormat()<page.BasePage.autoFormat>` instead of :func:`date.getAutoFormat` in
-  :mod:`titletranslate`
-* Upcast :class:`pywikibot.Page` to :class:`pywikibot.FilePage` in :meth:`PageGenerator.result()
-  <data.api.PageGenerator.result>` if ``imageinfo`` is given (:phab:`T379513`)
-* Update oauth requirements
-* i18n-updates
-* Implement param *with_sort_key* in :meth:`page.BasePage.categories` (:phab:`T75561`)
-* Python 3.7 support will be discontinued and probably this is the last version supporting it
-* Add :meth:`page.BasePage.get_revision` method
-* Retry :meth:`data.sparql.SparqlQuery.query` on internal server error (500) (:phab:`T378788`)
-* Extract :meth:`APISite.linktrail()<pywikibot.site._apisite.APISite.linktrail>`
-  for hr-wiki (:phab:`T378787`)
+* Add support for tigwiki (:phab:`T381381`)
+* Fix use of importlib.metadata.entry_points for pywikibot-scripts with Python 3.8 and 3.9 (:phab:`T358635`)
+* i18n updates.
 
 
 Current Deprecations
@@ -28,7 +13,6 @@ Current Deprecations
   :attr:`BaseSite.codes<pywikibot.site._basesite.BaseSite.codes>`
 * 9.5.0: :meth:`DataSite.getPropertyType()<pywikibot.site._datasite.DataSite.getPropertyType>` will be removed
   in favour of :meth:`DataSite.get_property_type()<pywikibot.site._datasite.DataSite.get_property_type>`
-* 9.4.0: :mod:`flow` support is deprecated and will be removed (:phab:`T371180`)
 * 9.3.0: :meth:`page.BasePage.userName` and :meth:`page.BasePage.isIpEdit` are deprecated in favour of
   ``user`` or ``anon`` attributes of :attr:`page.BasePage.latest_revision` property
 * 9.2.0: Imports of :mod:`logging` functions from :mod:`bot` module is deprecated and will be desupported
@@ -52,7 +36,7 @@ Current Deprecations
 * 9.0.0: ``iteritems`` method of :class:`data.api.Request` will be removed in favour of ``items``
 * 9.0.0: ``SequenceOutputter.output()`` is deprecated in favour of :attr:`tools.formatter.SequenceOutputter.out`
   property
-* 9.0.0: *nullcontext* context manager and *SimpleQueue* queue of :mod:`backports` are derecated
+* 9.0.0: *nullcontext* context manager and *SimpleQueue* queue of :mod:`backports` are deprecated
 * 8.4.0: *modules_only_mode* parameter of :class:`data.api.ParamInfo`, its *paraminfo_keys* class attribute
   and its preloaded_modules property will be removed
 * 8.4.0: *dropdelay* and *releasepid* attributes of :class:`throttle.Throttle` will be removed
@@ -84,6 +68,7 @@ Pending removal in Pywikibot 10
 -------------------------------
 
 * 9.6.0: Python 3.7 support is deprecated and will be dropped with Pywikibot 10
+* 9.4.0: :mod:`flow` support is deprecated and will be removed (:phab:`T371180`)
 * 9.1.0: :func:`version.svn_rev_info` and :func:`version.getversion_svn` will be removed. SVN is no longer supported.
   (:phab:`T362484`)
 * 7.7.0: :mod:`tools.threading` classes should no longer imported from :mod:`tools`

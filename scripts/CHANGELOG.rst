@@ -1,6 +1,11 @@
 Scripts Changelog
 =================
 
+9.6.1
+-----
+
+* Require Pywikibot 9.6.1 (:phab:`T358635`)
+
 9.6.0
 -----
 
@@ -55,7 +60,7 @@ delinker
 * Use :pylib:`difflib.get_close_matches()<difflib#difflib.get_close_matches>`
   to find the closest image match
 * Add ``-category`` option to work from given category and look for the
-  lastest file deletion first(:phab:`T372206`)
+  latest file deletion first (:phab:`T372206`)
 * Check whether image exists first (:phab:`T372106`)
 
 unlink
@@ -526,7 +531,7 @@ archive
 checkimages
 ^^^^^^^^^^^
 
-*  Use page_from_repository() method to read categoried from wikibase
+*  Use page_from_repository() method to read categorized from wikibase
 *  Use ``itertools.zip_longest`` to find the most important image
 
 dataextend
@@ -610,7 +615,7 @@ add_text
 blockpageschecker
 ^^^^^^^^^^^^^^^^^
 
-*  Use different edit comments when adding, changeing or removing
+*  Use different edit comments when adding, changing or removing
    templates (:phab:`T291345`)
 *  Derive CheckerBot from ConfigParserBot (:phab:`T57106`)
 *  Derive CheckerBot from CurrentPageBot (:phab:`T196851`,
@@ -790,7 +795,7 @@ imagetransfer
 template
 ^^^^^^^^
 
-*  Do not try to initialze generator twice in TemplateRobot
+*  Do not try to initialize generator twice in TemplateRobot
    (:phab:`T284534`)
 
 update_script
@@ -801,7 +806,7 @@ update_script
 version
 ^^^^^^^
 
-*  Show all mandatory dependecies
+*  Show all mandatory dependencies
 
 6.3.0
 -----
@@ -902,7 +907,7 @@ reflinks
 
 *  Catch urllib3.LocationParseError and skip link (:phab:`T280356`)
 *  L10N updates
-*  Avoid dupliate reference names (:phab:`T278040`)
+*  Avoid duplicate reference names (:phab:`T278040`)
 
 solve_disambiguation
 ^^^^^^^^^^^^^^^^^^^^
@@ -959,7 +964,7 @@ login
 maintenance
 ^^^^^^^^^^^
 
-*  Add a preload_sites.py script to preload site informations
+*  Add a preload_sites.py script to preload site information
    (:phab:`T226157`)
 
 reflinks
