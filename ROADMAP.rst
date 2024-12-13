@@ -6,11 +6,10 @@ Current Release Changes
 * *args* parameter for :mod:`logging` functions can be used as formatting arguments
 * :attr:`.login.OauthLoginManager.access_token` was added.
 * Representation string for :class:`login.LoginManager` was added.
-* i18n updates.
 
 **Bugfixes**
 
-* Fix use of importlib.metadata.entry_points for pywikibot-scripts with Python 3.8 and 3.9 (:phab:`T358635`)
+* (no changes yet)
 
 **Code cleanups**
 

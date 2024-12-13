@@ -4,12 +4,16 @@ Scripts Changelog
 10.0.0
 ------
 
-* i18n updates
-
 dataextend
 ^^^^^^^^^^
 
 * Script was removed from repository
+
+9.6.1
+-----
+
+* Require Pywikibot 9.6.1 (:phab:`T358635`)
+* i18n updates
 
 9.6.0
 -----

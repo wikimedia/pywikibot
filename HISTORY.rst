@@ -1,6 +1,15 @@
 Release History
 ===============
 
+9.6.1
+-----
+*13 December 2024*
+
+* Add support for tigwiki (:phab:`T381381`)
+* Fix use of importlib.metadata.entry_points for pywikibot-scripts with Python 3.8 and 3.9 (:phab:`T358635`)
+* i18n updates.
+
+
 9.6.0
 -----
 *03 December 2024*
