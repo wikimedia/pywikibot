@@ -128,7 +128,6 @@ from importlib import import_module
 from pathlib import Path
 from textwrap import fill
 from typing import TYPE_CHECKING, Any
-from warnings import warn
 
 import pywikibot
 import pywikibot.logging as pwb_logging
@@ -730,8 +729,8 @@ def handle_args(args: Iterable[str] | None = None,
     :return: list of arguments not recognised globally
     """
     if pywikibot._sites:
-        warn('Site objects have been created before arguments were handled',
-             UserWarning)
+        warnings.warn('Site objects have been created before arguments were '
+                      'handled', UserWarning)
 
     # get commandline arguments if necessary
     if not args:
@@ -1152,8 +1151,8 @@ class BaseBot(OptionHandler):
         """
         if 'generator' in kwargs:
             if hasattr(self, 'generator'):
-                pywikibot.warn(f'{type(self).__name__} has a generator'
-                               ' already. Ignoring argument.')
+                warnings.warn(f'{type(self).__name__} has a generator'
+                              ' already. Ignoring argument.')
             else:
                 self.generator: Iterable = kwargs.pop('generator')
 

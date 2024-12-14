@@ -11,12 +11,12 @@ import datetime
 import re
 import sys
 import threading
+import warnings
 from contextlib import suppress
 from queue import Queue
 from time import sleep as time_sleep
 from typing import TYPE_CHECKING, Any, cast
 from urllib.parse import urlparse
-from warnings import warn
 
 from pywikibot import config as _config
 from pywikibot import exceptions
@@ -244,8 +244,8 @@ def Site(code: str | None = None,  # noqa: N802
         debug(f"Instantiated {interface.__name__} object '{_sites[key]}'")
 
         if _sites[key].code != code:
-            warn(f'Site {_sites[key]} instantiated using different code '
-                 f'"{code}"', UserWarning, 2)
+            warnings.warn(f'Site {_sites[key]} instantiated using different '
+                          f'code "{code}"', UserWarning, 2)
 
     return _sites[key]
 

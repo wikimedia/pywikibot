@@ -567,7 +567,8 @@ class Family:
         """Return interface to use for code."""
         if code in self.interwiki_removals:
             if code in self.codes:
-                pywikibot.warn(f'Interwiki removal {code} is in {self} codes')
+                warnings.warn(f'Interwiki removal {code} is in {self} codes',
+                              FamilyMaintenanceWarning, stacklevel=2)
             if code in self.closed_wikis:
                 return 'ClosedSite'
             if code in self.removed_wikis:

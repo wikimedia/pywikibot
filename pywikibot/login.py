@@ -536,10 +536,11 @@ class OauthLoginManager(LoginManager):
         assert password is not None and user is not None
         super().__init__(password=None, site=site, user=None)
         if self.password:
-            pywikibot.warn(
+            warn(
                 f'Password exists in password file for {self.site}: '
                 f'{self.username}. Password is unnecessary and should be'
-                ' removed if OAuth enabled.'
+                ' removed if OAuth enabled.',
+                _PasswordFileWarning
             )
         self._consumer_token = (user, password)
         self._access_token: tuple[str, str] | None = None
