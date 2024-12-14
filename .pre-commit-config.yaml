@@ -51,6 +51,8 @@ repos:
       - id: python-check-blanket-type-ignore
       - id: python-check-mock-methods
       - id: python-use-type-annotations
+      - id: rst-directive-colons
+      - id: rst-inline-touching-normal
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.8.3
     hooks:
