@@ -445,10 +445,7 @@ class ClientLoginManager(LoginManager):
                 del login_request['rememberMe']
                 continue
 
-            # messagecode was introduced with 1.29.0-wmf.14
-            # but older wikis are still supported
             login_throttled = response.get('messagecode') == 'login-throttled'
-
             if (status == 'Throttled' or status == self.keyword('fail')
                     and (login_throttled or 'wait' in fail_reason)):
                 wait = response.get('wait')
