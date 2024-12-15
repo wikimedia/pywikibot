@@ -26,7 +26,7 @@ jobs:
       max-parallel: 18
 
       matrix:
-        python-version: [ "pypy3.10", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14-dev" ]
+        python-version: [ "pypy3.10", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13" ]
         site: [ "wikipedia:en", "wikisource:zh" ]
         include:
           - python-version: "3.8"
@@ -53,11 +53,17 @@ jobs:
           - python-version: "3"
             site: wikipedia:de
             os: macOS-latest
-          # ubuntu-22.04 required for pypy3.8 due to T382214
+          # ubuntu-22.04 required for pypy3.8 and 3.14-dev due to T382214
           - python-version: "pypy3.8"
             site: wikipedia:en
             os: ubuntu-22.04
           - python-version: "pypy3.8"
+            site: wikisource:zh
+            os: ubuntu-22.04
+          - python-version: "3.14-dev"
+            site: wikipedia:en
+            os: ubuntu-22.04
+          - python-version: "3.14-dev"
             site: wikisource:zh
             os: ubuntu-22.04
 
