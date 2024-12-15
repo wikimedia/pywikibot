@@ -4,6 +4,9 @@ Scripts Changelog
 10.0.0
 ------
 
+* Require Python 3.8 or higher
+* Require Pywikibot 10.0.0
+
 dataextend
 ^^^^^^^^^^
 

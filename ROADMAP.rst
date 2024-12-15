@@ -13,6 +13,7 @@ Current Release Changes
 
 **Code cleanups**
 
+* Remove unintentional ``pywikibot.warn()``
 * Unused *get_redirect* parameter of :meth:`BasePage.getOldVersion()<page.BasePage.getOldVersion>` was removed.
 * *baserevid* parameter of :class:`DataSite<pywikibot.site._datasite.DataSite>` methods
   :meth:`editSource()<pywikibot.site._datasite.DataSite.editSource>`,
@@ -52,6 +53,7 @@ Current Release Changes
 
 **Other breaking changes**
 
+* Drop support for MediaWiki < 1.31 (:phab:`T378984`)
 * Require ``requests >= 2.31.0`` (:phab:`T347031`)
 * Python 3.7 support was dropped (:phab:`T378893`), including *importlib_metadata* of
   :mod:`backports`.
