@@ -288,7 +288,7 @@ def require_version(version_needed: str, reason: str = ''):
     """Require minimum MediaWiki version to be queried.
 
     The version needed for the test; must be given with a preleading rich
-    comparisons operator like ``<1.27wmf4`` or ``>=1.39``. If the
+    comparisons operator like ``<1.31wmf4`` or ``>=1.43``. If the
     comparison does not match the test will be skipped.
 
     This decorator can only be used for TestCase having a single site.
