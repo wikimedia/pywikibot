@@ -18,7 +18,6 @@ from typing import TYPE_CHECKING, Any
 import pywikibot
 from pywikibot import exceptions
 from pywikibot.backports import Iterator
-from pywikibot.logging import warning
 from pywikibot.time import Timestamp
 from pywikibot.tools import issue_deprecation_warning, remove_last_args
 
@@ -808,21 +807,6 @@ class WbQuantity(WbRepresentation):
     _items = ('amount', 'upperBound', 'lowerBound', 'unit')
 
     @staticmethod
-    def _require_errors(site: DataSite | None) -> bool:
-        """Check if Wikibase site is old and requires error bounds to be given.
-
-        If no site item is supplied it raises a warning and returns True.
-
-        :param site: The Wikibase site
-        """
-        if not site:
-            warning(
-                "WbQuantity now expects a 'site' parameter. This is needed to "
-                'ensure correct handling of error bounds.')
-            return False
-        return site.mw_version < '1.29.0-wmf.2'
-
-    @staticmethod
     def _todecimal(value: ToDecimalType) -> Decimal | None:
         """Convert a string to a Decimal for use in WbQuantity.
 
@@ -872,13 +856,10 @@ class WbQuantity(WbRepresentation):
            and not unit.startswith(('http://', 'https://')):
             raise ValueError("'unit' must be an ItemPage or entity uri.")
 
-        if error is None and not self._require_errors(site):
+        if error is None:
             self.upperBound = self.lowerBound = None
         else:
-            if error is None:
-                upper_error: Decimal | None = Decimal(0)
-                lower_error: Decimal | None = Decimal(0)
-            elif isinstance(error, tuple):
+            if isinstance(error, tuple):
                 upper_error = self._todecimal(error[0])
                 lower_error = self._todecimal(error[1])
             else:
@@ -945,7 +926,7 @@ class WbQuantity(WbRepresentation):
         lower_bound = cls._todecimal(data.get('lowerBound'))
         bounds_provided = (upper_bound is not None and lower_bound is not None)
         error = None
-        if bounds_provided or cls._require_errors(site):
+        if bounds_provided:
             error = (upper_bound - amount, amount - lower_bound)
         unit = None if data['unit'] == '1' else data['unit']
         return cls(amount, unit, error, site)

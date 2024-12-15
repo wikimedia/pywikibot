@@ -14,7 +14,7 @@ from contextlib import suppress
 import pywikibot
 from pywikibot import page_put_queue
 from pywikibot.exceptions import Error
-from tests.aspects import TestCase, require_version
+from tests.aspects import TestCase
 
 
 called_back = False
@@ -81,7 +81,6 @@ class TestSiteMergeHistory(TestCase):
     write = True
     rights = 'mergehistory'
 
-    @require_version('>=1.27.0wmf.13', 'support the history merge API')
     def setup_test_pages(self):
         """Helper function to set up pages that we will use in these tests."""
         site = self.get_site()
