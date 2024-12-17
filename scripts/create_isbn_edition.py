@@ -840,6 +840,77 @@ def get_item_with_prop_value(prop: str, propval: str) -> set[str]:
     pywikibot.log(item_list)
     return item_list
 
+# Placeholder for book libraries to try
+LIBRARY_SERVICES = ["goob", "openl"]  # Google Books and Open Library
+
+# Extended attributes
+ADDITIONAL_FIELDS = ['Pages', 'Place of publication']
+
+def get_google_books_data(isbn_number: str) -> dict:
+    """Fetch book data from Google Books API."""
+    try:
+        url = f"https://www.googleapis.com/books/v1/volumes?q=isbn:{isbn_number}"
+        response = requests.get(url)
+        response.raise_for_status()
+        data = response.json()
+        if 'items' in data:
+            book = data['items'][0]['volumeInfo']
+            return {
+                'Title': book.get('title', 'Unknown Title'),
+                'Authors': book.get('authors', ['Unknown Author']),
+                'Publisher': book.get('publisher', 'Unknown Publisher'),
+                'Year': book.get('publishedDate', 'Unknown Year'),
+                'Language': book.get('language', 'Unknown Language'),
+                'Pages': book.get('pageCount', 'Unknown Pages'),
+                'Place of publication': book.get('publisher', 'Unknown Place')
+            }
+    except requests.RequestException as e:
+        pywikibot.error(f"Google Books API error: {e}")
+    except KeyError as e:
+        pywikibot.error(f"Missing expected data in response: {e}")
+    return {}
+
+def get_openlibrary_data(isbn_number: str) -> dict:
+    """Fetch book data from Open Library API."""
+    try:
+        url = f"https://openlibrary.org/isbn/{isbn_number}.json"
+        response = requests.get(url)
+        response.raise_for_status()
+        data = response.json()
+        return {
+            'Title': data.get('title', 'Unknown Title'),
+            'Authors': data.get('authors', [{'name': 'Unknown Author'}])[0]['name'],
+            'Publisher': data.get('publishers', ['Unknown Publisher'])[0],
+            'Year': data.get('publish_date', 'Unknown Year'),
+            'Language': data.get('languages', ['Unknown Language'])[0],
+            'Pages': data.get('number_of_pages', 'Unknown Pages'),
+            'Place of publication': data.get('publishers', ['Unknown Place'])[0]
+        }
+    except requests.RequestException as e:
+        pywikibot.error(f"Open Library API error: {e}")
+    except KeyError as e:
+        pywikibot.error(f"Missing expected data in response: {e}")
+    return {}
+
+def check_missing_data(isbn_data: dict) -> None:
+    """Check for missing critical fields in ISBN data."""
+    for key in ['Authors', 'Publisher', 'Year']:
+        if not isbn_data.get(key):
+            pywikibot.error(f"Missing critical field: {key}")
+
+def fetch_isbn_data(isbn_number: str) -> dict:
+    """Try to get book data from multiple libraries."""
+    for service in LIBRARY_SERVICES:
+        if service == "goob":
+            data = get_google_books_data(isbn_number)
+        elif service == "openl":
+            data = get_openlibrary_data(isbn_number)
+
+        if data:  # If data is found, return it
+            return data
+
+    pywikibot.error(f"ISBN data for {isbn_number} not found in any service.")
+    return {}
 
 def amend_isbn_edition(isbn_number: str) -> int:
     """Amend ISBN registration in Wikidata.
@@ -860,42 +931,23 @@ def amend_isbn_edition(isbn_number: str) -> int:
     if not isbn_number:
         return 3  # Do nothing when the ISBN number is missing
 
-    pywikibot.info()
+    pywikibot.info(f"Processing ISBN: {isbn_number}")
 
-    # Some digital library services raise failure
-    try:
-        # Get ISBN basic data
-        isbn_data = isbnlib.meta(isbn_number, service=booklib)
-        # {
-        #     'ISBN-13': '9789042925564',
-        #     'Title': 'De Leuvense Vaart - Van De Vaartkom Tot Wijgmaal. '
-        #              'Aspecten Uit De Industriele Geschiedenis Van Leuven',
-        #     'Authors': ['A. Cresens'],
-        #     'Publisher': 'Peeters Pub & Booksellers',
-        #     'Year': '2012',
-        #     'Language': 'nl',
-        #  }
-    except isbnlib._exceptions.NotRecognizedServiceError as error:
-        fatal_error(4, f'{error}\n    pip install isbnlib-xxx')
-    except isbnlib._exceptions.NotValidISBNError as error:
-        pywikibot.error(error)
-        return 1
-    except Exception as error:
-        # When the book is unknown the function returns
-        pywikibot.error(f'{isbn_number} not found\n{error}')
-        return 1
+    # Get ISBN data from available services
+    isbn_data = fetch_isbn_data(isbn_number)
 
-    # Others return an empty result
+    # If no data is found, return error
     if not isbn_data:
-        pywikibot.error(
-            f'Unknown ISBN book number {isbnlib.mask(isbn_number)}')
+        pywikibot.error(f"Could not retrieve data for ISBN: {isbn_number}")
         return 1
 
-    # Show the raw results
-    # Can be very useful in troubleshooting
-    if verbose:
-        pywikibot.info('\n' + pformat(isbn_data))
+    # Check for missing critical fields (like author, publisher)
+    check_missing_data(isbn_data)
 
+    # Log the fetched data
+    pywikibot.info(f"Fetched data: {pformat(isbn_data)}")
+
+    # Process and add claims (this is where you would integrate with Wikidata)
     return add_claims(isbn_data)
 
 
