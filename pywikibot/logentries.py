@@ -61,9 +61,10 @@ class LogEntry(UserDict):
         for hidden_key, hidden_types in hidden.items():
             if hidden_key in self and key in hidden_types:
                 raise HiddenKeyError(
-                    "Log entry ({}) has a hidden '{}' key and you don't have "
-                    "permission to view it due to '{}'"
-                    .format(self['type'], key, hidden_key))
+                    f'Log entry ({self["type"]}) has a hidden {key!r} key and'
+                    " you don't have permission to view it due to "
+                    f'{hidden_key!r}'
+                )
 
         raise KeyError(f"Log entry ({self['type']}) has no {key!r} key")
 

@@ -197,7 +197,7 @@ class GeneratorsMixin:
             for pagedata in rvgen:
                 pywikibot.debug(f'Preloading {pagedata}')
                 try:
-                    if pagedata['title'] not in cache:
+                    if (pd_title := pagedata['title']) not in cache:
                         # API always returns a "normalized" title which is
                         # usually the same as the canonical form returned by
                         # page.title(), but sometimes not (e.g.,
@@ -206,19 +206,18 @@ class GeneratorsMixin:
                         # the response that corresponds to the canonical form
                         # used in the query.
                         for key, value in cache.items():
-                            if self.sametitle(key, pagedata['title']):
-                                cache[pagedata['title']] = value
+                            if self.sametitle(key, pd_title):
+                                cache[pd_title] = value
                                 break
                         else:
-                            pywikibot.warning(
-                                'preloadpages: Query returned unexpected '
-                                "title '{}'".format(pagedata['title']))
+                            pywikibot.warning('preloadpages: Query returned '
+                                              f'unexpected title {pd_title!r}')
                             continue
 
                 except KeyError:
-                    pywikibot.debug(f"No 'title' in {pagedata}")
-                    pywikibot.debug(f'{pageids=!s}')
-                    pywikibot.debug(f'titles={list(cache.keys())}')
+                    pywikibot.debug(f"No 'title' in {pagedata}\n"
+                                    f'{pageids=!s}\n'
+                                    f'titles={list(cache.keys())}')
                     continue
 
                 priority, page = cache[pagedata['title']]

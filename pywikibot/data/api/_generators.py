@@ -634,8 +634,8 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
                 previous_result_had_data = True
             else:
                 if 'query' not in self.data:
-                    pywikibot.log("%s: 'query' not found in api response." %
-                                  self.__class__.__name__)
+                    pywikibot.log(f"{type(self).__name__}: 'query' not found"
+                                  ' in api response.')
                     pywikibot.log(str(self.data))
 
                 # if (query-)continue is present, self.resultkey might not have
