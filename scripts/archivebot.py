@@ -164,7 +164,6 @@ import signal
 import threading
 import time
 from collections import OrderedDict, defaultdict
-from concurrent.futures import ThreadPoolExecutor
 from contextlib import nullcontext
 from hashlib import md5
 from math import ceil
@@ -185,6 +184,7 @@ from pywikibot.textlib import (
 )
 from pywikibot.time import MW_KEYS, parse_duration, str2timedelta
 from pywikibot.tools import PYTHON_VERSION
+from pywikibot.tools.threading import BoundedPoolExecutor
 
 
 class ArchiveBotSiteConfigError(Error):
@@ -970,9 +970,9 @@ def main(*args: str) -> None:
 
     if asynchronous:
         signal.signal(signal.SIGINT, signal_handler)
-        context = ThreadPoolExecutor
+        context = BoundedPoolExecutor('ThreadPoolExecutor')
     else:
-        context = nullcontext
+        context = nullcontext()
 
     for template_name in templates:
         tmpl = pywikibot.Page(site, template_name, ns=10)
@@ -992,7 +992,7 @@ def main(*args: str) -> None:
 
         botargs = tmpl, salt, force, keep, sort
         futures = []  # needed for Python < 3.9
-        with context() as executor:
+        with context as executor:
             for pg in gen:
                 if asynchronous:
                     future = executor.submit(process_page, pg, *botargs)

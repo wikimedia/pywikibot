@@ -1,20 +1,25 @@
 """Classes which can be used for threading."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2024
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
+import concurrent.futures as futures
+import importlib
 import queue
 import re
 import threading
 import time
+from typing import Any
 
 import pywikibot  # T306760
+from pywikibot.tools import SPHINX_RUNNING
 
 
 __all__ = (
+    'BoundedPoolExecutor',
     'RLock',
     'ThreadedGenerator',
     'ThreadList',
@@ -189,6 +194,8 @@ class ThreadList(list):
     ...     pool.append(threading.Thread(target=work))
     ...
 
+    .. seealso:: :class:`BoundedPoolExecutor`
+
     """
 
     def __init__(self, limit: int = 128, wait_time: float = 2, *args) -> None:
@@ -225,3 +232,121 @@ class ThreadList(list):
         super().append(thd)
         thd.start()
         pywikibot.logging.debug(f"thread {len(self)} ('{type(thd)}') started")
+
+
+class BoundedPoolExecutor(futures.Executor):
+
+    """A bounded Executor which limits prefetched Futures.
+
+    BoundedThreadPoolExecutor behaves like other executors derived from
+    :pylib:`concurrent.futures.Executor
+    <concurrent.futures.html#concurrent.futures.Executor>` but will
+    block further items on :meth:`submit` calls to be added to workers
+    queue if the *max_bound* limit is reached.
+
+    .. versionadded:: 10.0
+
+    .. seealso::
+       - :pylib:`concurrent.futures.html#executor-objects`
+       - :class:`ThreadList`
+
+    :param executor: One of the executors found in ``concurrent.futures``.
+        The parameter may be given as class type or its name.
+    :param max_bound: the maximum number of items in the workers queue.
+        If not given or None, the number is set to *max_workers*.
+    :param args: Any positional argument for the given *executor*
+    :param kwargs: Any keyword argument for the given *executor*
+    :raises AttributeError: given *executor* is not found in
+        concurrent.futures.
+    :raises TypeError: given *executor* is not a class or not a real
+        subclass of concurrent.futures.Executor.
+    :raises ValueError: minimum *max_bound* is 1.
+    """
+
+    def __new__(
+        cls,
+        executor: futures.Executor | str,
+        /,
+        max_bound: int | None = None,
+        *args: Any,
+        **kwargs: Any
+    ) -> BoundedPoolExecutor:
+        """Create a new BoundedPoolExecutor subclass.
+
+        The class inherits from :class:`BoundedPoolExecutor` and the
+        given *executor*. The class name is composed of "Bounded" and
+        the name of the *executor*.
+        """
+        module = 'concurrent.futures'
+        if isinstance(executor, str):
+            base = getattr(
+                importlib.import_module(module), executor)
+        else:
+            base = executor
+
+        if base is futures.Executor or not issubclass(base, futures.Executor):
+            raise TypeError(
+                f'expected a real subclass of {module + ".Executor"!r} or the '
+                f'class name for executor parameter, not {base.__name__!r}'
+            )
+        new = type('Bounded' + base.__name__, (cls, base), {})
+        return super().__new__(new)
+
+    def __init__(self, executor, /, max_bound=None, *args, **kwargs) -> None:
+        """Initializer."""
+        if max_bound is not None and max_bound < 1:
+            raise ValueError("Minimum 'max_bound' is 1")
+
+        super().__init__(*args, **kwargs)
+        self._bound_semaphore = threading.BoundedSemaphore(
+            max_bound or self._max_workers)
+
+    def submit(self, fn, /, *args, **kwargs) -> futures.Future:
+        """Schedules callable *fn* to be executed as ``fn(*args, **kwargs)``.
+
+        .. code-block:: python
+
+           with BoundedPoolExecutor('ThreadPoolExecutor',
+                                     max_bound=5,
+                                     max_workers=1) as executor:
+               future = executor.submit(pow, 323, 1235)
+               print(future.result())
+
+        """
+        self._bound_semaphore.acquire()
+
+        try:
+            f = super().submit(fn, *args, **kwargs)
+        except futures.BrokenExecutor:
+            self._bound_semaphore.release()
+            raise
+
+        f.add_done_callback(lambda _f: self._bound_semaphore.release())
+        return f
+
+    if not SPHINX_RUNNING:
+        submit.__doc__ = futures.Executor.submit.__doc__
+
+    def _bound(self, sep: str = '') -> str:
+        """Helper method for str and repr."""
+        if not hasattr(self, '_bound_semaphore'):
+            # class is not fully initialized
+            return ''
+
+        bound = self._bound_semaphore._initial_value
+        return '' if bound == self._max_workers else f'{sep}{bound}'
+
+    def __str__(self):
+        """String of current BoundedPoolExecutor type.
+
+        Includes *max_bound* if necessary.
+        """
+        return f'{type(self).__name__}({self._bound()})'
+
+    def __repr__(self):
+        """Representation string of BoundedPoolExecutor.
+
+        Includes the *executor* and *max_bound* if necessary.
+        """
+        base, executor = type(self).__bases__
+        return f'{base.__name__}({executor.__name__!r}{self._bound(", ")})'
