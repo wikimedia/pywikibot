@@ -864,6 +864,10 @@ def amend_isbn_edition(isbn_number: str) -> int:
 
     # Some digital library services raise failure
     try:
+
+        # Log the current digital library being queried
+        pywikibot.info(f'Querying metadata using service: {booklib}')
+
         # Get ISBN basic data
         isbn_data = isbnlib.meta(isbn_number, service=booklib)
         # {
