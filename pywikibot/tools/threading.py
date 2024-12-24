@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import concurrent.futures as futures
+import dataclasses
 import importlib
 import queue
 import re
@@ -177,41 +178,41 @@ class ThreadedGenerator(threading.Thread):
         self.stop()
 
 
+@dataclasses.dataclass(repr=False, eq=False)
 class ThreadList(list):
 
     """A simple threadpool class to limit the number of simultaneous threads.
 
-    Any threading.Thread object can be added to the pool using the append()
-    method. If the maximum number of simultaneous threads has not been reached,
-    the Thread object will be started immediately; if not, the append() call
-    will block until the thread is able to start.
+    Any threading.Thread object can be added to the pool using the
+    :meth:`append` method. If the maximum number of simultaneous threads
+    has not been reached, the Thread object will be started immediately;
+    if not, the append() call will block until the thread is able to
+    start.
 
-    >>> pool = ThreadList(limit=10)
-    >>> def work():
-    ...     time.sleep(1)
-    ...
-    >>> for x in range(20):
-    ...     pool.append(threading.Thread(target=work))
-    ...
+    Example:
+
+    .. code-block:: python
+
+       pool = ThreadList(limit=10)
+       def work():
+           time.sleep(1)
+
+       for x in range(20):
+           pool.append(threading.Thread(target=work))
+
+    .. versionchanged:: 10.0
+       the unintentional and undocumented *args* parameter was removed.
 
     .. seealso:: :class:`BoundedPoolExecutor`
 
+    :param limit: the number of simultaneous threads
+    :param wait_time: how long to wait if active threads exceeds limit
     """
 
-    def __init__(self, limit: int = 128, wait_time: float = 2, *args) -> None:
-        """Initializer.
+    limit: int = 128  #: :meta private:
+    wait_time: float = 2.0  #: :meta private:
 
-        :param limit: the number of simultaneous threads
-        :param wait_time: how long to wait if active threads exceeds limit
-        """
-        self.limit = limit
-        self.wait_time = wait_time
-        super().__init__(*args)
-        for item in self:
-            if not isinstance(item, threading.Thread):
-                raise TypeError(f"Cannot add '{type(item)}' to ThreadList")
-
-    def active_count(self):
+    def active_count(self) -> int:
         """Return the number of alive threads and delete all non-alive ones."""
         cnt = 0
         for item in self[:]:
@@ -221,8 +222,11 @@ class ThreadList(list):
                 self.remove(item)
         return cnt
 
-    def append(self, thd):
-        """Add a thread to the pool and start it."""
+    def append(self, thd: threading.Thread) -> None:
+        """Add a thread to the pool and start it.
+
+        :param thd: the Thread to be appended to the ThreadList.
+        """
         if not isinstance(thd, threading.Thread):
             raise TypeError(f"Cannot append '{type(thd)}' to ThreadList")
 
