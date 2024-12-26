@@ -150,7 +150,7 @@ Options (may be omitted):
    KeyboardInterrupt was enabled with ``-async`` option.
 """
 #
-# (C) Pywikibot team, 2006-2024
+# (C) Pywikibot team, 2006-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -446,8 +446,10 @@ class DiscussionPage(pywikibot.Page):
 
         # This extra info is not desirable when run under the unittest
         # framework, which may be run either directly or via setup.py
-        if pywikibot.calledModuleName() not in ['archivebot_tests', 'setup']:
-            pywikibot.info(f'{len(self.threads)} thread(s) found on {self}')
+        if pywikibot.calledModuleName() not in ('archivebot_tests', 'pytest',
+                                                'setup', 'unittest'):
+            self.archiver.info(
+                f'{len(self.threads)} thread(s) found on {self}')
 
     def is_full(self, max_archive_size: tuple[int, str]) -> bool:
         """Check whether archive size exceeded."""
@@ -496,7 +498,7 @@ class DiscussionPage(pywikibot.Page):
            the *asynchronous* parameter was added.
         """
         if sort_threads:
-            pywikibot.info('Sorting threads...')
+            self.archiver.info('Sorting threads...')
             self.threads.sort(key=lambda t: t.timestamp)
         newtext = self.header.strip() + '\n\n'  # Fix trailing newlines
         for t in self.threads:
@@ -515,8 +517,12 @@ class PageArchiver:
     algo = 'none'
 
     def __init__(self, page, template, salt: str, force: bool = False,
-                 keep: bool = False, sort: bool = False) -> None:
+                 keep: bool = False, sort: bool = False,
+                 asynchronous: bool = False) -> None:
         """Initializer.
+
+        .. versionchanged:: 10.0
+           The *asynchronous* parameter was added.
 
         :param page: a page object to be archived
         :type page: :py:obj:`pywikibot.Page`
@@ -524,6 +530,7 @@ class PageArchiver:
         :type template: :py:obj:`pywikibot.Page`
         :param salt: salt value
         :param force: override security value
+        :param asynchronous: asynchronous processing activated
         """
         self.attributes = OrderedDict([
             ('archive', ['', False]),
@@ -552,7 +559,28 @@ class PageArchiver:
         self.month_num2orig_names = {}
         for n, (long, short) in enumerate(self.site.months_names, start=1):
             self.month_num2orig_names[n] = {'long': long, 'short': short}
+        self.asynchronous = asynchronous
+        self.output = []
         self.load_config()
+
+    def info(self, msg: str = '') -> None:
+        """Forward text to cache if asynchronous is activated.
+
+        .. versionadded:: 10.0
+        """
+        if self.asynchronous:
+            self.output.append(msg)
+        else:
+            pywikibot.info(msg)
+
+    def flush(self) -> None:
+        """Flush the cache.
+
+        .. versionadded:: 10.0
+
+        """
+        pywikibot.info('\n'.join(self.output))
+        self.output.clear()
 
     def get_attr(self, attr, default='') -> Any:
         """Get an archiver attribute."""
@@ -590,9 +618,6 @@ class PageArchiver:
 
     def load_config(self) -> None:
         """Load and validate archiver template."""
-        pywikibot.info(
-            f'Looking for: {{{{{self.tpl.title()}}}}} in {self.page}')
-
         for tpl, params in self.page.raw_extracted_templates:
             try:  # Check tpl name before comparing; it might be invalid.
                 tpl_page = pywikibot.Page(self.site, tpl, ns=10)
@@ -697,7 +722,6 @@ class PageArchiver:
         keep_threads = []
         threads_per_archive = defaultdict(list)
         whys = set()
-        pywikibot.info(f'Processing {len(self.page.threads)} threads')
         fields = self.get_params(self.now, 0).keys()  # dummy parameters
         regex = re.compile(r'%(\((?:{})\))d'.format('|'.join(fields)))
         stringpattern = regex.sub(r'%\1s', pattern)
@@ -718,11 +742,11 @@ class PageArchiver:
                     raise MalformedConfigError(e)
 
                 pywikibot.error(e)
-                pywikibot.info(
+                self.info(
                     fill('<<lightblue>>Use string format field like '
                          '%(localfield)s instead of %(localfield)d. '
                          'Trying to solve it...'))
-                pywikibot.info()
+                self.info()
                 pattern = stringpattern
                 key = pattern % params
 
@@ -812,8 +836,12 @@ class PageArchiver:
         if self.archived_threads < mintoarchive:
             # We might not want to archive a measly few threads
             # (lowers edit frequency)
-            pywikibot.info(f'Only {self.archived_threads} (< {mintoarchive}) '
-                           f'threads are old enough. Skipping')
+            var = 'threads are' if self.archived_threads > 1 else 'thread is'
+            if self.archived_threads:
+                self.info(f'Only {self.archived_threads} {var} old enough, '
+                          f'{mintoarchive} required. Skipping')
+            else:
+                self.info('No thread is old enough. Skipping')
             return
 
         if whys:
@@ -826,7 +854,7 @@ class PageArchiver:
                     "Couldn't find the template in the header"
                 )
 
-            pywikibot.info(f'Archiving {self.archived_threads} thread(s).')
+            self.info(f'Archiving {self.archived_threads} thread(s).')
             # Save the archives first (so that bugs don't cause a loss of data)
             for archive in self.archives.values():
                 count = archive.archived_threads
@@ -864,7 +892,7 @@ class PageArchiver:
             self.page.update(comment, asynchronous=self.asynchronous)
 
 
-def process_page(page, *args: Any) -> bool:
+def process_page(page, *args: Any, asynchronous: bool = False) -> bool:
     """Call PageArchiver for a single page.
 
     :return: Return True to continue with the next page, False to break
@@ -873,16 +901,19 @@ def process_page(page, *args: Any) -> bool:
     .. versionadded:: 7.6
     .. versionchanged:: 7.7
        pass an unspecified number of arguments to the bot using ``*args``
+    .. versionchanged:: 10.0
+       *asynchronous* parameter was added.
     """
+    global outlock
     if not page.exists():
         pywikibot.info(f'{page} does not exist, skipping...')
         return True
 
-    pywikibot.info(f'\n\n>>> <<lightpurple>>{page}<<default>> <<<')
     # Catching exceptions, so that errors in one page do not bail out
     # the entire process
     try:
-        archiver = PageArchiver(page, *args)
+        archiver = PageArchiver(page, *args, asynchronous)
+        archiver.info(f'\n\n>>> <<lightpurple>>{page}<<default>> <<<')
         archiver.run()
     except ArchiveBotSiteConfigError as e:
         # no stack trace for errors originated by pages on-site
@@ -892,6 +923,9 @@ def process_page(page, *args: Any) -> bool:
     except KeyboardInterrupt:
         pywikibot.info('\nUser quit bot run...')
         return False
+    else:
+        with outlock:
+            archiver.flush()
     return True
 
 
@@ -924,7 +958,9 @@ def main(*args: str) -> None:
         pywikibot.info('\n<<lightyellow>>User quit bot run...')
         exiting.set()
 
+    global outlock
     exiting = threading.Event()
+    outlock = threading.Lock()
     filename = None
     pagename = None
     namespace = None
@@ -996,18 +1032,21 @@ def main(*args: str) -> None:
         else:
 
             ns = [str(namespace)] if namespace is not None else []
-            pywikibot.info('Fetching template transclusions...')
+            pywikibot.info(
+                f'Fetching {template_name} template transclusions...')
             gen = tmpl.getReferences(only_template_inclusion=True,
                                      follow_redirects=False,
                                      namespaces=ns,
                                      content=True)
 
         botargs = tmpl, salt, force, keep, sort
+        botkwargs = {'asynchronous': asynchronous}
         futures = []  # needed for Python < 3.9
         with context as executor:
             for pg in gen:
                 if asynchronous:
-                    future = executor.submit(process_page, pg, *botargs)
+                    future = executor.submit(
+                        process_page, pg, *botargs, **botkwargs)
 
                     if PYTHON_VERSION < (3, 9):
                         futures.append(future)
@@ -1015,20 +1054,18 @@ def main(*args: str) -> None:
                     if not exiting.is_set():
                         continue
 
-                    canceled: str | int = ''
                     pywikibot.info(
-                        '<<lightyellow>>Canceling pending Futures... ',
-                        newline=False)
+                        '<<lightyellow>>Canceling pending Futures...')
 
                     if PYTHON_VERSION < (3, 9):
                         canceled = sum(future.cancel() for future in futures)
+                        pywikibot.info(f'{canceled} canceled')
                     else:
                         executor.shutdown(cancel_futures=True)
 
-                    pywikibot.info(f'{canceled} done')
                     break
 
-                if not process_page(pg, *botargs):
+                if not process_page(pg, *botargs, **botkwargs):
                     break
 
 
