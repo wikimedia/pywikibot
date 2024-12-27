@@ -7,7 +7,8 @@ pytest-attrib>=0.1.3
 pytest-xvfb>=3.0.0
 
 pre-commit
-coverage>=5.2.1
+coverage==7.6.1; python_version < "3.9"
+coverage>=7.6.10; python_version > "3.8"
 # required for coverage (T380697)
 tomli>=2.0.1; python_version < "3.11"
 
