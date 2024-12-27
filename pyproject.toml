@@ -144,6 +144,11 @@ exclude_lines = [
     "@unittest\\.skip",
 ]
 
+exclude_also = [
+    # Comments to turn coverage on and off:
+    "no cover: start(?s:.)*?no cover: stop",
+]
+
 
 [tool.docsig]
 disable = [
