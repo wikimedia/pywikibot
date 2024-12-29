@@ -23,7 +23,7 @@ Can be used with:
 from __future__ import annotations
 
 import re
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import as_completed
 from contextlib import suppress
 
 import pywikibot
@@ -45,6 +45,7 @@ from pywikibot.exceptions import (
 from pywikibot.textlib import isDisabled
 from pywikibot.tools import first_lower
 from pywikibot.tools import first_upper as firstcap
+from pywikibot.tools.threading import BoundedPoolExecutor
 
 
 # This is required for the text that is shown when you run this script
@@ -187,7 +188,7 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, AutomaticTWSummaryBot):
             pywikibot.error(e)
             return
 
-        with ThreadPoolExecutor() as executor:
+        with BoundedPoolExecutor('ThreadPoolExecutor') as executor:
             futures = {executor.submit(self.get_target, p)
                        for p in self.current_page.linkedPages()}
             for future in as_completed(futures):

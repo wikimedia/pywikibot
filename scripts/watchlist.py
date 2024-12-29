@@ -33,12 +33,13 @@ from __future__ import annotations
 
 import datetime
 import os
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import as_completed
 
 import pywikibot
 from pywikibot import config
 from pywikibot.data.api import CachedRequest
 from pywikibot.exceptions import InvalidTitleError
+from pywikibot.tools.threading import BoundedPoolExecutor
 
 
 try:
@@ -67,7 +68,7 @@ def count_watchlist_all(quiet=False) -> None:
     if not quiet:
         pywikibot.info('Counting pages in watchlists of all wikis...')
 
-    with ThreadPoolExecutor() as executor:
+    with BoundedPoolExecutor('ThreadPoolExecutor') as executor:
         futures = {executor.submit(refresh, pywikibot.Site(lang, family))
                    for family in config.usernames
                    for lang in config.usernames[family]}
@@ -95,7 +96,7 @@ def refresh_all() -> None:
     cache_path = CachedRequest._get_cache_dir()
     files = os.scandir(cache_path)
     seen = set()
-    with ThreadPoolExecutor() as executor:
+    with BoundedPoolExecutor('ThreadPoolExecutor') as executor:
         for filename in files:
             entry = CacheEntry(cache_path, filename)
             entry._load_cache()

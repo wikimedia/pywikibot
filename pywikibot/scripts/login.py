@@ -51,13 +51,13 @@ subdirectory.
 from __future__ import annotations
 
 import datetime
-from concurrent.futures import ThreadPoolExecutor
 from contextlib import nullcontext, suppress
 
 import pywikibot
 from pywikibot import config
 from pywikibot.exceptions import NoUsernameError, SiteDefinitionError
 from pywikibot.login import OauthLoginManager
+from pywikibot.tools.threading import BoundedPoolExecutor
 
 
 def _get_consumer_token(site) -> tuple[str, str]:
@@ -157,8 +157,9 @@ def main(*args: str) -> None:
         namedict = {site.family.name: {site.code: None}}
 
     params = oauth, logout, autocreate
-    context = ThreadPoolExecutor if asynchronous else nullcontext
-    with context() as executor:
+    context = (nullcontext(),
+               BoundedPoolExecutor('ThreadPoolExecutor'))[asynchronous]
+    with context as executor:
         for family_name in namedict:
             for lang in namedict[family_name]:
                 if asynchronous:
