@@ -486,8 +486,15 @@ class DiscussionPage(pywikibot.Page):
         return len(self.header.encode('utf-8')) + sum(t.size()
                                                       for t in self.threads)
 
-    def update(self, summary, sort_threads: bool = False) -> None:
-        """Recombine threads and save page."""
+    def update(self,
+               summary, *,
+               sort_threads: bool = False,
+               asynchronous: bool = False) -> None:
+        """Recombine threads and save page.
+
+        .. versionchanged:: 10.0
+           the *asynchronous* parameter was added.
+        """
         if sort_threads:
             pywikibot.info('Sorting threads...')
             self.threads.sort(key=lambda t: t.timestamp)
@@ -498,7 +505,7 @@ class DiscussionPage(pywikibot.Page):
             summary += ' ' + i18n.twtranslate(self.site.code,
                                               'archivebot-archive-full')
         self.text = newtext
-        self.save(summary)
+        self.save(summary, asynchronous=asynchronous)
 
 
 class PageArchiver:
@@ -791,7 +798,12 @@ class PageArchiver:
         return set()
 
     def run(self) -> None:
-        """Process a single DiscussionPage object."""
+        """Process a single DiscussionPage object.
+
+        .. versionchanged:: 10.0
+           save the talk page in asynchronous mode if ``-async`` option
+           was given but archive pages are saved in synchronous mode.
+        """
         if not self.page.botMayEdit():
             return
 
@@ -849,7 +861,7 @@ class PageArchiver:
             comment = i18n.twtranslate(self.site.code,
                                        'archivebot-page-summary',
                                        self.comment_params)
-            self.page.update(comment)
+            self.page.update(comment, asynchronous=self.asynchronous)
 
 
 def process_page(page, *args: Any) -> bool:
