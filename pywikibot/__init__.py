@@ -1,6 +1,6 @@
 """The initialization file for the Pywikibot framework."""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -338,7 +338,7 @@ def _flush(stop: bool = True) -> None:
     num, sec = remaining()
     if num > 0 and sec.total_seconds() > _config.noisysleep:
         output(f'<<lightblue>>Waiting for {num} pages to be put. '
-               f'Estimated time remaining: {sec}<<default>>')
+               f'Estimated time remaining: {sec}')
 
     exit_queue = None
     if _putthread is not threading.current_thread():

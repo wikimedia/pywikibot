@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the user interface."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -449,7 +449,7 @@ class FakeUITest(TestCase):
 
     def test_one_color_newline(self):
         """Test with trailing new line and one color."""
-        self._colors = (('red', 6), ('default', 11))
+        self._colors = (('red', 6), ('default', 10))
         with redirect_stdout(self.redirect) as f:
             self.ui_obj._print('Hello <<red>>world you!\n',
                                self.ui_obj.stdout)
