@@ -15,7 +15,7 @@ from typing import Any
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Iterable, Sequence, removeprefix
+from pywikibot.backports import Iterable, Sequence, batched, removeprefix
 from pywikibot.bot_choice import (
     ChoiceException,
     Option,
@@ -53,7 +53,7 @@ colors = [
 ]
 
 colorTagR = re.compile(
-    '<<((:?{0});?(:?{0})?)>>'.format('|'.join([*colors, 'previous'])))
+    '<<((?:{0})(?:;(?:{0}))?)>>'.format('|'.join([*colors, 'previous'])))
 
 
 class UI(ABUIC):
@@ -198,16 +198,13 @@ class UI(ABUIC):
         # Add default before the last linefeed
         if text.endswith('\n'):
             text_parts[-1] = re.sub(r'\r?\n\Z', '', text_parts[-1])
-            text_parts.extend(('default', None, None,
-                               '\n', 'default', None, None))
-        else:
-            text_parts.append('default')
+            text_parts.extend(('default', '\n'))
 
-        # match.split() includes every regex group; for each matched color
-        # fg_col:b_col, fg_col and bg_col are added to the resulting list.
-        len_text_parts = len(text_parts[::4])
-        for index, (txt, next_color) in enumerate(zip(text_parts[::4],
-                                                      text_parts[1::4])):
+        text_parts.append('default')
+
+        len_text_parts = len(text_parts) // 2
+        for index, (txt, next_color) in enumerate(batched(text_parts, 2,
+                                                          strict=True)):
             current_color = color_stack[-1]
             if next_color == 'previous':
                 if len(color_stack) > 1:  # keep the last element in the stack
