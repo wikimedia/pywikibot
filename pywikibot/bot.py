@@ -80,7 +80,7 @@ when :meth:`put_current` is used.
    :attr:`use_redirects<BaseBot.use_redirects>` attribute instead.
 """
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -662,11 +662,22 @@ def input_list_choice(question: str,
 def calledModuleName() -> str:
     """Return the name of the module calling this function.
 
-    This is required because the -help option loads the module's docstring
-    and because the module name will be used for the filename of the log.
+    This is required because the -help option loads the module's
+    docstring and because the module name will be used for the filename
+    of the log.
 
+    .. versionchanged:: Detect unittest and pytest run and return the
+       test module.
     """
-    return Path(pywikibot.argvu[0]).stem
+    mod = pywikibot.argvu[0]
+
+    if 'pytest' in mod:
+        return 'pytest'
+
+    if mod.endswith('unittest'):
+        return 'unittest'
+
+    return Path(mod).stem
 
 
 def handle_args(args: Iterable[str] | None = None,
