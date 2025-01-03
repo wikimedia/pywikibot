@@ -1738,7 +1738,7 @@ class Claim(Property):
 
             msg = None
             if not claim_type:
-                msg = '{claim.id} does not exist.'
+                msg = f'{claim.id} does not exist.'
             elif claim.type in cls.types:
                 # The default covers string, url types
                 claim.target = cls.TARGET_CONVERTER.get(
