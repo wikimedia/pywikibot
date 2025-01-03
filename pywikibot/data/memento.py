@@ -9,7 +9,7 @@
 # Parts of MementoClient class codes are
 # licensed under the BSD open source software license.
 #
-# (C) Pywikibot team, 2015-2024
+# (C) Pywikibot team, 2015-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -263,13 +263,17 @@ class MementoClient(OldMementoClient):
                      timeout: int | None = None) -> requests.Response:
         """Makes HEAD requests.
 
+        .. versionchanged:: 10.0
+           The default timout was increased from 9 to 30 seconds.
+
         :param uri: the uri for the request.
         :param accept_datetime: the accept-datetime in the http format.
         :param follow_redirects: Toggle to follow redirects. False by
             default, so does not follow any redirects.
         :param session: the request session object to avoid opening new
             connections for every request.
-        :param timeout: the timeout for the HTTP requests.
+        :param timeout: the timeout for the HTTP requests. Default is
+            30 s.
         :return: the response object.
         :raises ValueError: Only HTTP URIs are supported
         """
@@ -285,7 +289,7 @@ class MementoClient(OldMementoClient):
             response = session.head(uri,
                                     headers=headers,
                                     allow_redirects=follow_redirects,
-                                    timeout=timeout or 9)
+                                    timeout=timeout or 30)
         except (InvalidSchema, MissingSchema):
             raise ValueError(
                 f'Only HTTP URIs are supported, URI {uri} unrecognized.')
@@ -308,8 +312,23 @@ OldMementoClient.request_head = MementoClient.request_head
 
 def get_closest_memento_url(url: str,
                             when: datetime | None = None,
-                            timegate_uri: str | None = None):
-    """Get most recent memento for url."""
+                            timegate_uri: str | None = None,
+                            *,
+                            timeout: int | None = None):
+    """Get most recent memento for url.
+
+    .. versionadded:: 10.0
+       The *timeout* parameter.
+
+    :param url: The input http url.
+    :param when: The datetime object of the accept datetime. The current
+        datetime is used if none is provided.
+    :param timegate_uri: A valid HTTP base uri for a timegate. Must
+        start with http(s):// and end with a /. Default value is
+        http://timetravel.mementoweb.org/timegate/.
+    :param timeout: The timeout value for the HTTP connection. If None,
+        a default value is used in :meth:`MementoClient.request_head`.
+    """
     if not when:
         when = datetime.now()
 
@@ -320,7 +339,7 @@ def get_closest_memento_url(url: str,
     retry_count = 0
     while retry_count <= config.max_retries:
         try:
-            memento_info = mc.get_memento_info(url, when)
+            memento_info = mc.get_memento_info(url, when, timeout)
             break
         except (requests.ConnectionError, MementoClientException) as e:
             error = e

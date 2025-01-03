@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """memento client test module."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -46,13 +46,13 @@ class TestMementoArchive(MementoTestCase):
     hostname = timegate_uri.replace('gate/', 'map/json/http://google.com')
 
     def test_newest(self):
-        """Test Archive for newest https://google.com."""
+        """Test Archive for an old https://google.com."""
         dt = '20220715'
         archivedversion = self._get_archive_url('https://google.com',
                                                 date_string=dt)
         parsed = urlparse(archivedversion)
         self.assertIn(parsed.scheme, ['http', 'https'])
-        self.assertEqual(parsed.netloc, 'arquivo.pt')
+        self.assertEqual(parsed.netloc, 'wayback.library.yorku.ca')
 
 
 class TestMementoDefault(MementoTestCase):
