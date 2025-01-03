@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the tests package."""
 #
-# (C) Pywikibot team, 2014-2023
+# (C) Pywikibot team, 2014-2025
 #
 # Distributed under the terms of the MIT license.
 from __future__ import annotations
@@ -10,7 +10,7 @@ import unittest
 from contextlib import suppress
 
 from tests import utils
-from tests.aspects import TestCase
+from tests.aspects import DefaultSiteTestCase, TestCase, require_version
 
 
 class HttpServerProblemTestCase(TestCase):
@@ -76,6 +76,88 @@ class TestLengthAssertion(TestCase):
         self.assertLength([], 1)
         self.assertLength(self.seq1, 0)
         self.assertLength(None, self.seq)
+
+
+class TestRequireVersionDry(DefaultSiteTestCase):
+
+    """Test require_version decorator."""
+
+    dry = True
+
+    @require_version('')
+    def method(self):
+        """Test method for decorator."""
+
+    def test_require_version(self):
+        """Test require_version for DrySite."""
+        with self.assertRaisesRegex(
+            TypeError,
+                f'{type(self).__name__}.site must be a BaseSite not DrySite'):
+            self.method()
+
+
+class TestRequireVersion(DefaultSiteTestCase):
+
+    """Test require_version decorator."""
+
+    @require_version('')
+    def method_with_params(self, key):
+        """Test method for decorated methods with unsupported arguments."""
+
+    def method_failing(self):
+        """Test method for decorator with invalid parameter."""
+        self.assertTrue(False, 'should never happen')
+
+    @require_version('>=1.31')
+    def method_succeed(self):
+        """Test that decorator passes."""
+        self.assertTrue(False, 'intentional fail for method_succeed test')
+
+    @require_version('<1.31')
+    def method_fail(self):
+        """Test that decorator skips."""
+        self.assertTrue(False, 'intentional fail for test')
+
+    def test_unsupported_methods(self):
+        """Test require_version with unsupported methods."""
+        with self.assertRaisesRegex(
+                TypeError, "Test method 'method_with_params' has parameters"):
+            self.method_with_params('42')
+        with self.assertRaisesRegex(
+                TypeError, "Test method 'method_with_params' has parameters"):
+            self.method_with_params(key='42')
+        with self.assertRaisesRegex(ValueError,
+                                    'There is no valid operator given '):
+            self.method_with_params()
+
+    def test_version_needed(self):
+        """Test for invalid decorator parameters."""
+        with self.assertRaisesRegex(ValueError,
+                                    'There is no valid operator given '):
+            require_version('foo')(self.method_failing)(self)
+        with self.assertRaisesRegex(ValueError,
+                                    'first operand foo should not be set'):
+            require_version('foo>bar')(self.method_failing)(self)
+        with self.assertRaisesRegex(ValueError, 'Invalid version number'):
+            require_version('>bar')(self.method_failing)(self)
+        with self.assertRaisesRegex(unittest.SkipTest,
+                                    r'MediaWiki < v1\.31 required'):
+            require_version('<1.31')(self.method_failing)(self)
+        with self.assertRaisesRegex(
+                unittest.SkipTest,
+                r'MediaWiki < v1\.31 required to run this test'):
+            require_version('<1.31',
+                            'run this test')(self.method_failing)(self)
+
+    def test_decorator(self):
+        """Test that decorator passes or skips."""
+        with self.assertRaisesRegex(
+            AssertionError,
+                'intentional fail for method_succeed test'):
+            self.method_succeed()
+        with self.assertRaisesRegex(unittest.SkipTest,
+                                    r'MediaWiki < v1\.31 required'):
+            self.method_fail()
 
 
 class UtilsTests(TestCase):
