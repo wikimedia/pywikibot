@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for scripts/delete.py."""
 #
-# (C) Pywikibot team, 2014-2024
+# (C) Pywikibot team, 2014-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -42,7 +42,7 @@ class TestDeletionBotWrite(ScriptMainTestCase):
         """Test undeleting an existing page."""
         site = self.get_site()
         p1 = pywikibot.Page(site, 'User:Unicodesnowman/ExistingPage')
-        if not p1.exists():
+        if not p1.exists():  # pragma: no cover
             p1.text = 'pywikibot unit test page'
             p1.save('unit test')
         delete.main('-page:User:Unicodesnowman/ExistingPage', '-always',
