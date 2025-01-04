@@ -4,7 +4,7 @@ Several parts of the test infrastructure are implemented as mixins,
 such as API result caching and excessive test durations.
 """
 #
-# (C) Pywikibot team, 2014-2024
+# (C) Pywikibot team, 2014-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -705,7 +705,7 @@ class MetaTestCaseClass(type):
                 wrapped_method.__doc__ = removesuffix(func.__doc__, '.')
                 wrapped_method.__doc__ += ' on ' + sitename
             else:
-                wrapped_method.__doc__ = 'Test ' + sitename
+                wrapped_method.__doc__ = 'Test ' + sitename  # pragma: no cover
 
             return wrapped_method
 
