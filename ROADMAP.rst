@@ -3,13 +3,17 @@ Current Release Changes
 
 **Improvements**
 
+* A *timeout* parameter was added to :func:`data.memento.get_closest_memento_url`
+  and the default timeout was increased to 30 s (:phab:`T382943`).
+* :func:`bot.calledModuleName` returns either 'unittest' or 'pytest' during test run (:phab:`T382797`).
+* :class:`tools.threading.BoundedPoolExecutor` was added (:phab:`T333741`).
 * *args* parameter for :mod:`logging` functions can be used as formatting arguments
 * :attr:`.login.OauthLoginManager.access_token` was added.
 * Representation string for :class:`login.LoginManager` was added.
 
 **Bugfixes**
 
-* (no changes yet)
+* Remove unintentional *args* parameter in :class:`tools.threading.ThreadList` (:phab:`T382787`).
 
 **Code cleanups**
 
@@ -53,6 +57,7 @@ Current Release Changes
 
 **Other breaking changes**
 
+* :mod:`backports` module is no longer a public API.
 * Drop support for MediaWiki < 1.31 (:phab:`T378984`)
 * Require ``requests >= 2.31.0`` (:phab:`T347031`)
 * Python 3.7 support was dropped (:phab:`T378893`), including *importlib_metadata* of

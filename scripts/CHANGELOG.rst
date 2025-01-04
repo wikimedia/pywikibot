@@ -7,10 +7,16 @@ Scripts Changelog
 * Require Python 3.8 or higher
 * Require Pywikibot 10.0.0
 
+archivebot
+^^^^^^^^^^
+
+* Fix mangling screen messages in ``-async`` mode (:phab:`T382797`)
+* save the talk page in asynchronous mode if ``-async`` option was given
+
 dataextend
 ^^^^^^^^^^
 
-* Script was removed from repository
+* Script was removed from repository (:phab:`T377066`)
 
 9.6.1
 -----

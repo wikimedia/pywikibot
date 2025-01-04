@@ -666,8 +666,8 @@ def calledModuleName() -> str:
     docstring and because the module name will be used for the filename
     of the log.
 
-    .. versionchanged:: Detect unittest and pytest run and return the
-       test module.
+    .. versionchanged:: 10.0
+       Detect unittest and pytest run and return the test module.
     """
     mod = pywikibot.argvu[0]
 

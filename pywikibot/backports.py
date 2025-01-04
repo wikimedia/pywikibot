@@ -1,10 +1,14 @@
 """This module contains backports to support older Python versions.
 
-This module is not part of the public pywikibot API. Breaking changes may be
-made at any time, and the module is not subject to deprecation requirements.
+.. caution:: This module is not part of the public pywikibot API.
+   Breaking changes may be made at any time, and the module is not
+   subject to deprecation requirements.
+
+.. versionchanged:: 10.0
+   This module is 'private'.
 """
 #
-# (C) Pywikibot team, 2014-2024
+# (C) Pywikibot team, 2014-2025
 #
 # Distributed under the terms of the MIT license.
 #
