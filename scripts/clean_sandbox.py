@@ -164,8 +164,7 @@ content = {
           '- pisz niżej}}',
     'pt': '<!--não apague esta linha-->'
           '{{página de testes}}<!--não apagar-->\n',
-    'ru': '{{/Пишите ниже}}\n'
-          '<!-- Не удаляйте, пожалуйста, эту строку, тестируйте ниже -->',
+    'ru': '{{тестируйте ниже}}\n',
     'simple': '{{subst:/Text}}',
     'sco': '{{subst:Saundbox}}',
     'shn': '{{subst:Sandbox reset}}',
