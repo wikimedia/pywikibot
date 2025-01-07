@@ -45,7 +45,7 @@ For example:
 
 """
 #
-# (C) Pywikibot team, 2006-2024
+# (C) Pywikibot team, 2006-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -163,8 +163,7 @@ content = {
           '- pisz niżej}}',
     'pt': '<!--não apague esta linha-->'
           '{{página de testes}}<!--não apagar-->\n',
-    'ru': '{{/Пишите ниже}}\n'
-          '<!-- Не удаляйте, пожалуйста, эту строку, тестируйте ниже -->',
+    'ru': '{{тестируйте ниже}}\n',
     'simple': '{{subst:/Text}}',
     'sco': '{{subst:Saundbox}}',
     'shn': '{{subst:Sandbox reset}}',
