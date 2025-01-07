@@ -45,7 +45,7 @@ For example:
 
 """
 #
-# (C) Pywikibot team, 2006-2024
+# (C) Pywikibot team, 2006-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -63,13 +63,14 @@ from pywikibot.exceptions import EditConflictError
 
 content = {
     'commons': '{{Sandbox}}\n<!-- Please edit only below this line. -->',
-    'meta': '{{Meta:Sandbox/Please do not edit this line}}\n'
+    'meta': '{{Meta:Sandbox/Please do not edit this line}}'
             '<!-- Please edit below this line. -->',
     'species': '{{Sandbox}}\n'
                '<!-- PLEASE ADD YOUR EDITS BELOW THIS LINE. THANK YOU. -->',
     'test': '<noinclude>{{Sandbox}}</noinclude>\n'
             '== Please start your testing below this line ==',
-    'wikidata': '{{Please leave this line alone (sandbox heading)}}',
+    'wikidata': '{{sandbox heading}}\n'
+                '<!--Test your edits below this line-->',
     'wikibooks': {
         'es': '{{ZDP}}\n== Haz tus pruebas bajo esta sección  ==',
         'ru': '{{/Шапка}}\n'
@@ -110,7 +111,7 @@ content = {
            '\n*        هاد لپاج كيتّمحا لمحتوى ديالها بشكل معاود      *'
            '\n*    تريني هنا ؤ تعلم معا راسك كيفاش تكتب ف ويكيپيديا  *'
            '\n■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■-->'
-           '\n\n[[تصنيف:معاونة ف لكتابة علا ويكيپيديا]]',
+           '\n\n[[تصنيف:معاونة ف لكتابة على ويكيپيديا]]',
     'arz': '{{عنوان السبوره}}\n<!-- مرحبا! خد راحتك فى تجريب مهاراتك فى'
            'التحرير تحت الخط ده. بما إن الصفحه دى لتجارب التعديل، فالصفحه دى '
            'حيتم تنضيفها اوتوماتيكيا كل 12 ساعه. -->',
