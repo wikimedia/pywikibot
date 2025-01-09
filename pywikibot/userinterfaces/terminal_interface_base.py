@@ -1,6 +1,6 @@
 """Base for terminal user interfaces."""
 #
-# (C) Pywikibot team, 2003-2024
+# (C) Pywikibot team, 2003-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -194,7 +194,15 @@ class UI(ABUIC):
         # Therefore we need this stack.
         color_stack = ['default']
         text_parts = colorTagR.split(text)
-        text_parts.append('default')
+
+        # Add default before the last linefeed
+        if text.endswith('\n'):
+            text_parts[-1] = re.sub(r'\r?\n\Z', '', text_parts[-1])
+            text_parts.extend(('default', None, None,
+                               '\n', 'default', None, None))
+        else:
+            text_parts.append('default')
+
         # match.split() includes every regex group; for each matched color
         # fg_col:b_col, fg_col and bg_col are added to the resulting list.
         len_text_parts = len(text_parts[::4])
@@ -210,6 +218,7 @@ class UI(ABUIC):
 
             if current_color != next_color:
                 colored_line = True
+
             if colored_line and not colorized:
                 if '\n' in txt:  # Normal end of line
                     txt = txt.replace('\n', ' ***\n', 1)
