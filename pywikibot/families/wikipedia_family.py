@@ -1,6 +1,6 @@
 """Family module for Wikipedia."""
 #
-# (C) Pywikibot team, 2004-2024
+# (C) Pywikibot team, 2004-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -119,31 +119,32 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # https://meta.wikimedia.org/wiki/BPI#Current_implementation
     # & https://meta.wikimedia.org/wiki/Special:WikiSets/2
     cross_allowed = [
-        'ab', 'ace', 'ady', 'af', 'als', 'am', 'an', 'ang', 'ar', 'arc', 'arz',
-        'as', 'ast', 'atj', 'av', 'ay', 'az', 'ba', 'bar', 'bat-smg', 'bcl',
-        'be', 'be-tarask', 'bg', 'bh', 'bi', 'bjn', 'bm', 'bo', 'bpy', 'bug',
-        'bxr', 'ca', 'cbk-zam', 'cdo', 'ce', 'ceb', 'ch', 'chr', 'chy', 'ckb',
-        'co', 'cr', 'crh', 'cs', 'csb', 'cu', 'cv', 'cy', 'da', 'diq', 'dsb',
-        'dty', 'dz', 'ee', 'el', 'eml', 'en', 'eo', 'et', 'eu', 'ext', 'fa',
-        'ff', 'fi', 'fj', 'fo', 'frp', 'frr', 'fur', 'ga', 'gag', 'gan', 'gd',
-        'glk', 'gn', 'gom', 'gor', 'got', 'gu', 'gv', 'ha', 'hak', 'haw', 'he',
-        'hi', 'hif', 'hr', 'hsb', 'ht', 'hu', 'hy', 'ia', 'ie', 'ig', 'ik',
-        'ilo', 'inh', 'io', 'iu', 'ja', 'jam', 'jbo', 'jv', 'ka', 'kaa', 'kab',
-        'kbd', 'kg', 'ki', 'kk', 'kl', 'km', 'kn', 'ko', 'koi', 'krc', 'ks',
-        'ku', 'kv', 'kw', 'ky', 'la', 'lad', 'lb', 'lbe', 'lez', 'lfn', 'lg',
-        'li', 'lij', 'lmo', 'ln', 'lo', 'lt', 'ltg', 'lv', 'map-bms', 'mdf',
-        'meta', 'mg', 'mhr', 'mi', 'mk', 'ml', 'mn', 'mrj', 'ms', 'mwl', 'my',
-        'myv', 'mzn', 'nah', 'nap', 'nds-nl', 'ne', 'new', 'nl', 'no', 'nov',
+        'ab', 'ace', 'ady', 'af', 'als', 'am', 'ami', 'an', 'ang', 'ar', 'arc',
+        'arz', 'as', 'ast', 'atj', 'av', 'avk', 'awa', 'ay', 'az', 'azb', 'ba',
+        'ban', 'bar', 'bat-smg', 'bcl', 'be', 'be-tarask', 'bh', 'bi', 'bjn',
+        'blk', 'bm', 'bo', 'bpy', 'bug', 'bxr', 'ca', 'cbk-zam', 'cdo', 'ce',
+        'ceb', 'ch', 'chr', 'chy', 'ckb', 'co', 'cr', 'crh', 'cs', 'csb', 'cu',
+        'cv', 'cy', 'dag', 'diq', 'dsb', 'dty', 'dz', 'ee', 'eml', 'eo', 'et',
+        'eu', 'ext', 'fa', 'ff', 'fj', 'fo', 'frp', 'frr', 'fur', 'ga', 'gag',
+        'gan', 'gcr', 'gd', 'glk', 'gn', 'gom', 'gor', 'got', 'gu', 'guc',
+        'gur', 'guw', 'gv', 'ha', 'hak', 'haw', 'hi', 'hif', 'hr', 'hsb', 'ht',
+        'hu', 'hy', 'hyw', 'ia', 'ie', 'ig', 'ik', 'ilo', 'inh', 'io', 'iu',
+        'jam', 'jbo', 'jv', 'ka', 'kaa', 'kab', 'kbd', 'kbp', 'kcg', 'kg',
+        'ki', 'kk', 'kl', 'km', 'kn', 'ko', 'koi', 'krc', 'ks', 'ku', 'kv',
+        'kw', 'ky', 'la', 'lad', 'lbe', 'lez', 'lfn', 'lg', 'li', 'lij', 'lld',
+        'lmo', 'ln', 'lo', 'lt', 'ltg', 'lv', 'mad', 'mai', 'map-bms', 'mdf',
+        'mg', 'mi', 'min', 'mk', 'mn', 'mni', 'mrj', 'mwl', 'my', 'myv', 'mzn',
+        'na', 'nah', 'nap', 'nds-nl', 'ne', 'new', 'nia', 'nl', 'nov', 'nqo',
         'nrm', 'nso', 'nv', 'ny', 'oc', 'olo', 'om', 'or', 'os', 'pa', 'pag',
-        'pam', 'pap', 'pdc', 'pfl', 'pi', 'pih', 'pms', 'pnb', 'pnt', 'ps',
-        'qu', 'rm', 'rmy', 'rn', 'roa-rup', 'roa-tara', 'ru', 'rue', 'rw',
-        'sa', 'sah', 'sc', 'scn', 'sco', 'sd', 'se', 'sg', 'sh', 'shn', 'si',
-        'simple', 'sk', 'sm', 'sn', 'so', 'srn', 'ss', 'st', 'stq', 'su', 'sv',
-        'sw', 'szl', 'ta', 'tcy', 'te', 'tet', 'tg', 'th', 'ti', 'tk', 'tl',
-        'tn', 'to', 'tpi', 'tr', 'ts', 'tt', 'tum', 'tw', 'ty', 'tyv', 'udm',
-        'ug', 'uz', 've', 'vec', 'vep', 'vls', 'vo', 'wa', 'war', 'wo', 'xal',
-        'xh', 'xmf', 'yi', 'yo', 'za', 'zea', 'zh', 'zh-classical',
-        'zh-min-nan', 'zh-yue', 'zu',
+        'pam', 'pap', 'pcd', 'pcm', 'pdc', 'pfl', 'pi', 'pih', 'pms', 'pnb',
+        'pnt', 'ps', 'pwn', 'qu', 'rm', 'rmy', 'rn', 'roa-rup', 'roa-tara',
+        'rue', 'rw', 'sa', 'sah', 'sat', 'sc', 'scn', 'sco', 'sd', 'se', 'sg',
+        'sh', 'shi', 'shn', 'si', 'simple', 'sk', 'skr', 'sm', 'smn', 'sn',
+        'so', 'srn', 'st', 'stq', 'su', 'sw', 'szl', 'szy', 'ta', 'tay', 'tcy',
+        'te', 'tet', 'tg', 'th', 'ti', 'tk', 'tl', 'tn', 'to', 'tpi', 'trv',
+        'ts', 'tt', 'tum', 'tw', 'ty', 'tyv', 'udm', 'ug', 'uz', 've', 'vec',
+        'vep', 'vls', 'vo', 'wa', 'war', 'wo', 'xal', 'xh', 'xmf', 'yi', 'yo',
+        'za', 'zea', 'zh', 'zh-classical', 'zh-min-nan', 'zh-yue', 'zu',
     ]
 
     # Languages that used to be coded in iso-8859-1

@@ -1,6 +1,6 @@
 """Family module for Wikiquote."""
 #
-# (C) Pywikibot team, 2005-2024
+# (C) Pywikibot team, 2005-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -51,12 +51,12 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # https://meta.wikimedia.org/wiki/BPI#Current_implementation
     # & https://meta.wikimedia.org/wiki/Special:WikiSets/2
     cross_allowed = [
-        'af', 'ar', 'az', 'be', 'bg', 'br', 'bs', 'ca', 'cs', 'cy', 'da', 'el',
-        'eo', 'es', 'et', 'eu', 'fa', 'fi', 'fr', 'gl', 'gu', 'he', 'hi', 'hu',
-        'hy', 'id', 'is', 'it', 'ja', 'ka', 'kn', 'ko', 'ku', 'ky', 'la', 'li',
-        'lt', 'ml', 'mr', 'nl', 'nn', 'no', 'pt', 'ro', 'ru', 'sa', 'sah',
-        'sk', 'sl', 'sq', 'sr', 'su', 'sv', 'ta', 'te', 'th', 'tr', 'uk', 'ur',
-        'uz', 'vi', 'wo', 'zh',
+        'af', 'ar', 'as', 'az', 'bcl', 'be', 'bg', 'bn', 'br', 'bs', 'ca',
+        'cs', 'cy', 'da', 'el', 'eo', 'es', 'et', 'eu', 'fa', 'fi', 'fr', 'gl',
+        'gu', 'he', 'hi', 'hu', 'hy', 'id', 'ig', 'is', 'it', 'ja', 'ka', 'kn',
+        'ko', 'ku', 'ky', 'la', 'li', 'lt', 'ml', 'mr', 'nl', 'nn', 'no', 'pt',
+        'ro', 'ru', 'sa', 'sah', 'sk', 'sl', 'sq', 'sr', 'su', 'sv', 'ta',
+        'te', 'th', 'tl', 'tr', 'uk', 'ur', 'uz', 'vi', 'wo', 'wq', 'zh',
     ]
 
     # Subpages for documentation.

@@ -1,6 +1,6 @@
 """Family module for Wikibooks."""
 #
-# (C) Pywikibot team, 2005-2024
+# (C) Pywikibot team, 2005-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -53,8 +53,12 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # https://meta.wikimedia.org/wiki/BPI#Current_implementation
     # & https://meta.wikimedia.org/wiki/Special:WikiSets/2
     cross_allowed = [
-        'af', 'ar', 'ba', 'ca', 'eu', 'fa', 'fy', 'gl', 'it', 'ko', 'ky', 'nl',
-        'ru', 'sk', 'th', 'zh',
+        'af', 'ar', 'az', 'ba', 'be', 'bg', 'bs', 'ca', 'cv', 'cy', 'da', 'de',
+        'el', 'eo', 'et', 'eu', 'fa', 'fi', 'gl', 'hi', 'hy', 'ia', 'id', 'is',
+        'it', 'ka', 'kk', 'km', 'ko', 'ku', 'ky', 'la', 'li', 'lt', 'mg', 'mk',
+        'ml', 'mr', 'ms', 'ne', 'nl', 'no', 'oc', 'pa', 'pl', 'ro', 'ru', 'sa',
+        'shn', 'si', 'sk', 'sl', 'sq', 'sv', 'ta', 'te', 'tg', 'th', 'tl',
+        'tr', 'tt', 'uk', 'ur', 'vi', 'zh',
     ]
 
     # Subpages for documentation.

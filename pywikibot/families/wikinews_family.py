@@ -1,6 +1,6 @@
 """Family module for Wikinews."""
 #
-# (C) Pywikibot team, 2005-2024
+# (C) Pywikibot team, 2005-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -43,8 +43,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # https://meta.wikimedia.org/wiki/BPI#Current_implementation
     # & https://meta.wikimedia.org/wiki/Special:WikiSets/2
     cross_allowed = [
-        'ar', 'bg', 'bs', 'ca', 'cs', 'el', 'en', 'eo', 'fa', 'fi', 'he', 'ja',
-        'ko', 'li', 'nl', 'no', 'pt', 'ro', 'sq', 'sr', 'sv', 'ta', 'tr', 'uk',
+        'ar', 'bs', 'ca', 'cs', 'el', 'en', 'eo', 'fa', 'fi', 'he', 'ja', 'ko',
+        'li', 'nl', 'no', 'pl', 'pt', 'ro', 'sq', 'sr', 'sv', 'ta', 'tr', 'uk',
         'zh',
     ]
 
