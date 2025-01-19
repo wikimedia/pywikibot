@@ -41,10 +41,14 @@ To log out, throw away the ``*.lwp`` file that is created in the data
 subdirectory.
 
 .. versionchanged:: 7.4
-   moved to :mod:`pywikibot.scripts` folder
+   moved to :mod:`pywikibot.scripts` folder.
+.. versionchanged:: 7.7
+   *-async* option was added.
+.. versionchanged:: 10.2
+   wildcard site codes in ``usernames`` dict are supported.
 """
 #
-# (C) Pywikibot team, 2003-2024
+# (C) Pywikibot team, 2003-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -56,6 +60,7 @@ from contextlib import nullcontext, suppress
 import pywikibot
 from pywikibot import config
 from pywikibot.exceptions import NoUsernameError, SiteDefinitionError
+from pywikibot.family import Family
 from pywikibot.login import OauthLoginManager
 from pywikibot.tools.threading import BoundedPoolExecutor
 
@@ -161,11 +166,20 @@ def main(*args: str) -> None:
                BoundedPoolExecutor('ThreadPoolExecutor'))[asynchronous]
     with context as executor:
         for family_name in namedict:
-            for lang in namedict[family_name]:
+            family_codes = namedict[family_name]
+
+            if '*' in family_codes:
+                user = family_codes['*']
+                del family_codes['*']
+                codes = (code for code in Family.load(family_name).codes
+                         if code not in family_codes)
+                family_codes.update(dict.fromkeys(codes, user))
+
+            for code in family_codes:
                 if asynchronous:
-                    executor.submit(login_one_site, lang, family_name, *params)
+                    executor.submit(login_one_site, code, family_name, *params)
                 else:
-                    login_one_site(lang, family_name, *params)
+                    login_one_site(code, family_name, *params)
 
 
 if __name__ == '__main__':
