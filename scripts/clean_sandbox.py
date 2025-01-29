@@ -64,7 +64,7 @@ from pywikibot.exceptions import EditConflictError
 content = {
     'commons': '{{Sandbox}}\n<!-- Please edit only below this line. -->',
     'meta': '{{Meta:Sandbox/Please do not edit this line}}'
-            '<!-- Please edit below this line. -->',
+            '<!-- Please edit below this line -->',
     'species': '{{Sandbox}}\n'
                '<!-- PLEASE ADD YOUR EDITS BELOW THIS LINE. THANK YOU. -->',
     'test': '<noinclude>{{Sandbox}}</noinclude>\n'
