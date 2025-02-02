@@ -8,7 +8,7 @@ This module also includes objects:
 * WikibaseEntity: base interface for Wikibase entities.
 """
 #
-# (C) Pywikibot team, 2013-2024
+# (C) Pywikibot team, 2013-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1738,7 +1738,7 @@ class Claim(Property):
 
             msg = None
             if not claim_type:
-                msg = '{claim.id} does not exist.'
+                msg = f'{claim.id} does not exist.'
             elif claim.type in cls.types:
                 # The default covers string, url types
                 claim.target = cls.TARGET_CONVERTER.get(
@@ -2139,7 +2139,7 @@ class LexemePage(WikibasePage):
     >>> repo = pywikibot.Site('wikidata')
     >>> L2 = pywikibot.LexemePage(repo, 'L2')  # create a Lexeme page
     >>> list(L2.claims)  # access the claims
-    ['P5402', 'P5831', 'P12690']
+    ['P5402', 'P5831', 'P12690', 'P12448', 'P31', 'P5275', 'P12510', ...]
     >>> len(L2.forms)  # access the forms
     3
     >>> F1 = L2.forms[0]  # access the first form

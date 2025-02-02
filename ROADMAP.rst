@@ -1,8 +1,8 @@
 Current Release Changes
 =======================
 
-* Add support for tigwiki (:phab:`T381381`)
-* Fix use of importlib.metadata.entry_points for pywikibot-scripts with Python 3.8 and 3.9 (:phab:`T358635`)
+* Add support for kncwiki (:phab:`T385187`)
+* Fix a f-string in :meth:`Claim.fromJSON()<pywikibot.Claim.fromJSON>`
 * i18n updates.
 
 
