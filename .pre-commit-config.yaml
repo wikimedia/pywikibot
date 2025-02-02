@@ -54,7 +54,7 @@ repos:
       - id: rst-directive-colons
       - id: rst-inline-touching-normal
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.2
+    rev: v0.9.4
     hooks:
       - id: ruff
         args:
@@ -77,12 +77,12 @@ repos:
           - --remove-unused-variables
         exclude: '^pywikibot/backports\.py$'
   - repo: https://github.com/PyCQA/isort
-    rev: 5.13.2
+    rev: 6.0.0
     hooks:
       - id: isort
         exclude: '^pwb\.py$'
   - repo: https://github.com/jshwi/docsig
-    rev: v0.66.1
+    rev: v0.68.0
     hooks:
       - id: docsig
         exclude: ^(tests|scripts)

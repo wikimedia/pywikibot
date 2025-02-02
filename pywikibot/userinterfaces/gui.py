@@ -34,16 +34,15 @@ except ImportError as e:
     ConfigDialog = ReplaceDialog = SearchDialog = object
     idleConf = MultiCallCreator = object  # noqa:  N816
 else:
-    import tkinter
-    from tkinter import Frame, simpledialog
-    from tkinter.scrolledtext import ScrolledText
-
     import idlelib
+    import tkinter
     from idlelib import replace as ReplaceDialog  # noqa: N812
     from idlelib import search as SearchDialog  # noqa: N812
     from idlelib.config import idleConf
     from idlelib.configdialog import ConfigDialog
     from idlelib.multicall import MultiCallCreator
+    from tkinter import Frame, simpledialog
+    from tkinter.scrolledtext import ScrolledText
 
 
 __all__ = ('EditBoxWindow', 'TextEditor', 'Tkdialog')
