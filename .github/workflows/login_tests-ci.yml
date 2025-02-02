@@ -66,7 +66,7 @@ jobs:
 
     # use deadsnakes/action for development releases
     - name: Set up development Python ${{ matrix.python-version }}
-      uses: deadsnakes/action@v3.1.0
+      uses: deadsnakes/action@v3.2.0
       if: "endsWith(matrix.python-version, '-dev')"
       with:
         python-version: ${{ matrix.python-version }}
@@ -122,6 +122,6 @@ jobs:
         coverage report
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
