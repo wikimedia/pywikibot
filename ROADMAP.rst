@@ -3,6 +3,9 @@ Current Release Changes
 
 **Improvements**
 
+* Update :attr:`Family.cross_allowed<family.Family.cross_allowed>` lists in family files
+* Ignore empty message warning in :class:`EventStreams<comms.eventstreams.EventStreams>`
+  (:phab:`T383035`).
 * A *timeout* parameter was added to :func:`data.memento.get_closest_memento_url`
   and the default timeout was increased to 30 s (:phab:`T382943`).
 * :func:`bot.calledModuleName` returns either 'unittest' or 'pytest' during test run (:phab:`T382797`).
@@ -10,13 +13,17 @@ Current Release Changes
 * *args* parameter for :mod:`logging` functions can be used as formatting arguments
 * :attr:`.login.OauthLoginManager.access_token` was added.
 * Representation string for :class:`login.LoginManager` was added.
+* i18n updates.
 
 **Bugfixes**
 
+* Appended <<default>> color tag before the last linefeed in
+  :class:`UI<userinterfaces.terminal_interface_base.UI>` (:phab:`T382884`).
 * Remove unintentional *args* parameter in :class:`tools.threading.ThreadList` (:phab:`T382787`).
 
 **Code cleanups**
 
+* Remove old and deprecated variables in :mod:`config`
 * Remove unintentional ``pywikibot.warn()``
 * Unused *get_redirect* parameter of :meth:`BasePage.getOldVersion()<page.BasePage.getOldVersion>` was removed.
 * *baserevid* parameter of :class:`DataSite<pywikibot.site._datasite.DataSite>` methods

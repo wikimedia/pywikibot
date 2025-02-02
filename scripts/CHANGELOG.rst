@@ -4,6 +4,8 @@ Scripts Changelog
 10.0.0
 ------
 
+* L10N updates
+* i18n updates
 * Require Python 3.8 or higher
 * Require Pywikibot 10.0.0
 
