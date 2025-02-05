@@ -1239,7 +1239,6 @@ class TestPropertyNames(DefaultSiteTestCase):
             'graph-data-sources',
             'hiddencat',
             'index',
-            'jsonconfig_getdata',
             'newsectionlink',
             'noeditsection',
             'nogallery',
