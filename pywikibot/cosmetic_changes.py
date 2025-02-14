@@ -374,7 +374,7 @@ class CosmeticChangesToolkit:
             subpage = False
             if self.template:
                 try:
-                    tmpl, loc = moved_links[self.site.code]
+                    tmpl, loc = i18n.translate(self.site.code, moved_links)
                     del tmpl
                 except KeyError:
                     loc = None
