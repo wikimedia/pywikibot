@@ -293,6 +293,7 @@ WELCOME = {
         'ml': '{{subst:സ്വാഗതം}}',
     },
     'wikisource': {
+        'as': '{{subst:আদৰণি}} %s',
         'bn': '{{subst:স্বাগতম}} %s',
         'ml': '{{subst:സ്വാഗതം}}',
         'mr': '{{subst:Welcome}} %s',
