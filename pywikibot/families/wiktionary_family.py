@@ -45,7 +45,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'lv', 'mad', 'mg', 'mi', 'min', 'mk', 'ml', 'mn', 'mni', 'mnw', 'mr',
         'ms', 'mt', 'my', 'na', 'nah', 'nds', 'ne', 'nia', 'nl', 'nn', 'no',
         'oc', 'om', 'or', 'pa', 'pl', 'pnb', 'ps', 'pt', 'qu', 'ro', 'roa-rup',
-        'ru', 'rw', 'sa', 'scn', 'sd', 'sg', 'sh', 'shn', 'shy', 'si',
+        'ru', 'rw', 'sa', 'sat', 'scn', 'sd', 'sg', 'sh', 'shn', 'shy', 'si',
         'simple', 'sk', 'skr', 'sl', 'sm', 'so', 'sq', 'sr', 'ss', 'st', 'su',
         'sv', 'sw', 'ta', 'tcy', 'te', 'tg', 'th', 'ti', 'tk', 'tl', 'tn',
         'tpi', 'tr', 'ts', 'tt', 'ug', 'uk', 'ur', 'uz', 'vec', 'vi', 'vo',
@@ -71,11 +71,11 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'lb', 'lmo', 'ln', 'lo', 'lt', 'lv', 'mg', 'mi', 'min', 'mk', 'mn',
         'mni', 'mnw', 'mr', 'ms', 'mt', 'my', 'na', 'nah', 'nds', 'ne', 'nia',
         'nl', 'nn', 'no', 'oc', 'om', 'or', 'pa', 'pnb', 'ps', 'pt', 'qu',
-        'roa-rup', 'rw', 'sa', 'scn', 'sd', 'sg', 'sh', 'shn', 'shy', 'si',
-        'simple', 'sk', 'skr', 'sl', 'sm', 'so', 'sq', 'sr', 'ss', 'st', 'su',
-        'sv', 'sw', 'ta', 'te', 'tg', 'th', 'ti', 'tk', 'tl', 'tn', 'tpi',
-        'tr', 'ts', 'tt', 'ug', 'uk', 'ur', 'uz', 'vec', 'vi', 'vo', 'wa',
-        'wo', 'yi', 'zh', 'zh-min-nan', 'zu',
+        'roa-rup', 'rw', 'sa', 'sat', 'scn', 'sd', 'sg', 'sh', 'shn', 'shy',
+        'si', 'simple', 'sk', 'skr', 'sl', 'sm', 'so', 'sq', 'sr', 'ss', 'st',
+        'su', 'sv', 'sw', 'ta', 'te', 'tg', 'th', 'ti', 'tk', 'tl', 'tn',
+        'tpi', 'tr', 'ts', 'tt', 'ug', 'uk', 'ur', 'uz', 'vec', 'vi', 'vo',
+        'wa', 'wo', 'yi', 'zh', 'zh-min-nan', 'zu',
     ]
 
     interwiki_on_one_line = ['pl']
