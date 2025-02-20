@@ -1,6 +1,6 @@
 """Objects representing MediaWiki families."""
 #
-# (C) Pywikibot team, 2004-2024
+# (C) Pywikibot team, 2004-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -579,23 +579,27 @@ class Family:
     def from_url(self, url: str) -> str | None:
         """Return whether this family matches the given url.
 
-        It is first checking if a domain of this family is in the domain of
-        the URL. If that is the case it's checking all codes and verifies that
-        a path generated via
-        :py:obj:`APISite.articlepath<pywikibot.site.APISite.articlepath>` and
-        :py:obj:`Family.path` matches the path of the URL together with
-        the hostname for that code.
+        It is first checking if a domain of this family is in the domain
+        of the URL. If that is the case it's checking all codes and
+        verifies that a path generated via :attr:`APISite.articlepath
+        <pywikibot.site.APISite.articlepath>` and :attr:`Family.path`
+        matches the path of the URL together with the hostname for that
+        code.
 
-        It is using :py:obj:`Family.domains` to first check if a domain
-        applies and then iterates over :py:obj:`Family.codes` to actually
+        It is using :attr:`Family.domains` to first check if a domain
+        applies and then iterates over :attr:`Family.codes` to actually
         determine which code applies.
 
-        :param url: the URL which may contain a ``$1``. If it's missing it is
-            assumed to be at the end.
-        :return: The language code of the url. None if that url is not from
-            this family.
-        :raises RuntimeError: When there are multiple languages in this family
-            which would work with the given URL.
+        .. versionchanged:: 10.0
+           *url* parameter does not have to contain a api/query/script
+           path
+
+        :param url: the URL which may contain a ``$1``. If it's missing
+            it is assumed to be at the end.
+        :return: The language code of the URL. None if that URL is not
+            from his family.
+        :raises RuntimeError: When there are multiple languages in this
+            family which would work with the given URL.
         """
         parsed = urlparse.urlparse(url)
         if parsed.scheme not in {'http', 'https', ''}:
@@ -624,6 +628,9 @@ class Family:
                 # This is only creating a Site instance if domain matches
                 site = pywikibot.Site(code, self.name)
                 pywikibot.log(f'Found candidate {site}')
+
+                if not path:
+                    return site.code
 
                 for iw_url in site._interwiki_urls():
                     iw_url, *_ = iw_url.partition('{}')

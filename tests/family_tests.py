@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the family module."""
 #
-# (C) Pywikibot team, 2014-2024
+# (C) Pywikibot team, 2014-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -168,8 +168,8 @@ class TestFamilyUrlRegex(PatchingTestCase):
         super().setUp()
         self.articlepath = '/wiki/$1'
 
-    def test_from_url_wikipedia_extra(self):
-        """Test various URLs against wikipedia regex."""
+    def test_from_url(self):
+        """Test various URLs for Family.from_url."""
         self.current_code = 'vo'
         self.current_family = 'wikipedia'
 
@@ -181,6 +181,8 @@ class TestFamilyUrlRegex(PatchingTestCase):
         self.assertEqual(f.from_url(prefix + '/w/index.php'), 'vo')
         self.assertEqual(f.from_url(prefix + '/w/index.php/'), 'vo')
         self.assertEqual(f.from_url(prefix + '/w/index.php?title=$1'), 'vo')
+        # url without scripts/api path
+        self.assertEqual(f.from_url(prefix), 'vo')
 
         self.assertEqual(f.from_url(prefix + '/wiki/$1'), 'vo')
         self.assertEqual(f.from_url('//vo.wikipedia.org/wiki/$1'), 'vo')
@@ -218,10 +220,11 @@ class TestFamilyUrlRegex(PatchingTestCase):
             family = Family.load(family)
             for code in family.codes:
                 self.current_code = code
-                url = (f'{family.protocol(code)}://{family.hostname(code)}'
-                       f'{family.path(code)}/$1')
+                url = f'{family.protocol(code)}://{family.hostname(code)}'
+                url_with_path = url + f'{family.path(code)}/$1'
                 with self.subTest(url=url):
                     self.assertEqual(family.from_url(url), code)
+                    self.assertEqual(family.from_url(url_with_path), code)
 
 
 if __name__ == '__main__':
