@@ -171,7 +171,7 @@ Some words, like "Administrator" or "Dio" (God in italian) or "Jimbo"
 aren't badwords at all but can be used for some bad-nickname.
 """
 #
-# (C) Pywikibot team, 2006-2024
+# (C) Pywikibot team, 2006-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -293,6 +293,7 @@ WELCOME = {
         'ml': '{{subst:സ്വാഗതം}}',
     },
     'wikisource': {
+        'as': '{{subst:আদৰণি}} %s',
         'bn': '{{subst:স্বাগতম}} %s',
         'ml': '{{subst:സ്വാഗതം}}',
         'mr': '{{subst:Welcome}} %s',
