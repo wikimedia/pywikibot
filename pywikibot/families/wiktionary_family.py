@@ -1,6 +1,6 @@
 """Family module for Wiktionary."""
 #
-# (C) Pywikibot team, 2005-2024
+# (C) Pywikibot team, 2005-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -45,7 +45,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'lv', 'mad', 'mg', 'mi', 'min', 'mk', 'ml', 'mn', 'mni', 'mnw', 'mr',
         'ms', 'mt', 'my', 'na', 'nah', 'nds', 'ne', 'nia', 'nl', 'nn', 'no',
         'oc', 'om', 'or', 'pa', 'pl', 'pnb', 'ps', 'pt', 'qu', 'ro', 'roa-rup',
-        'ru', 'rw', 'sa', 'scn', 'sd', 'sg', 'sh', 'shn', 'shy', 'si',
+        'ru', 'rw', 'sa', 'sat', 'scn', 'sd', 'sg', 'sh', 'shn', 'shy', 'si',
         'simple', 'sk', 'skr', 'sl', 'sm', 'so', 'sq', 'sr', 'ss', 'st', 'su',
         'sv', 'sw', 'ta', 'tcy', 'te', 'tg', 'th', 'ti', 'tk', 'tl', 'tn',
         'tpi', 'tr', 'ts', 'tt', 'ug', 'uk', 'ur', 'uz', 'vec', 'vi', 'vo',
@@ -62,18 +62,20 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # https://meta.wikimedia.org/wiki/BPI#Current_implementation
     # & https://meta.wikimedia.org/wiki/Special:WikiSets/2
     cross_allowed = [
-        'af', 'am', 'an', 'ang', 'ar', 'ast', 'ay', 'az', 'be', 'bg', 'bn',
-        'br', 'bs', 'ca', 'chr', 'co', 'cs', 'csb', 'cy', 'da', 'dv', 'el',
-        'eo', 'es', 'et', 'eu', 'fa', 'fi', 'fj', 'fo', 'fy', 'ga', 'gd', 'gl',
-        'gn', 'gu', 'gv', 'ha', 'hsb', 'hu', 'hy', 'ia', 'id', 'ie', 'io',
-        'iu', 'jbo', 'jv', 'ka', 'kk', 'kl', 'km', 'kn', 'ko', 'ks', 'ku',
-        'kw', 'ky', 'la', 'lb', 'ln', 'lo', 'lt', 'lv', 'mg', 'mi', 'mk', 'ml',
-        'mn', 'ms', 'mt', 'my', 'na', 'nah', 'nds', 'ne', 'nl', 'nn', 'no',
-        'oc', 'om', 'or', 'pa', 'pnb', 'ps', 'pt', 'qu', 'roa-rup', 'rw', 'sa',
-        'scn', 'sd', 'sg', 'sh', 'si', 'simple', 'sk', 'sl', 'sm', 'so', 'sq',
-        'sr', 'ss', 'st', 'su', 'sv', 'sw', 'ta', 'te', 'tg', 'th', 'ti', 'tk',
-        'tl', 'tn', 'tpi', 'tr', 'ts', 'tt', 'ug', 'uk', 'ur', 'uz', 'vec',
-        'vi', 'vo', 'wa', 'wo', 'yi', 'zh', 'zh-min-nan', 'zu',
+        'af', 'am', 'an', 'ang', 'ar', 'ast', 'ay', 'az', 'bcl', 'be', 'bg',
+        'bjn', 'bn', 'br', 'bs', 'ca', 'chr', 'co', 'cs', 'csb', 'cy', 'da',
+        'diq', 'dv', 'el', 'eo', 'es', 'et', 'eu', 'fa', 'fi', 'fj', 'fo',
+        'ga', 'gd', 'gl', 'gn', 'gom', 'gor', 'gu', 'guv', 'gv', 'ha', 'hiv',
+        'hr', 'hsb', 'hu', 'hy', 'ia', 'id', 'ie', 'ig', 'io', 'iu', 'jbo',
+        'jv', 'ka', 'kk', 'kl', 'km', 'kn', 'ko', 'ks', 'ku', 'kw', 'ky', 'la',
+        'lb', 'lmo', 'ln', 'lo', 'lt', 'lv', 'mg', 'mi', 'min', 'mk', 'mn',
+        'mni', 'mnw', 'mr', 'ms', 'mt', 'my', 'na', 'nah', 'nds', 'ne', 'nia',
+        'nl', 'nn', 'no', 'oc', 'om', 'or', 'pa', 'pnb', 'ps', 'pt', 'qu',
+        'roa-rup', 'rw', 'sa', 'sat', 'scn', 'sd', 'sg', 'sh', 'shn', 'shy',
+        'si', 'simple', 'sk', 'skr', 'sl', 'sm', 'so', 'sq', 'sr', 'ss', 'st',
+        'su', 'sv', 'sw', 'ta', 'te', 'tg', 'th', 'ti', 'tk', 'tl', 'tn',
+        'tpi', 'tr', 'ts', 'tt', 'ug', 'uk', 'ur', 'uz', 'vec', 'vi', 'vo',
+        'wa', 'wo', 'yi', 'zh', 'zh-min-nan', 'zu',
     ]
 
     interwiki_on_one_line = ['pl']

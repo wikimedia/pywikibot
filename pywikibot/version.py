@@ -1,6 +1,6 @@
 """Module to determine the pywikibot version (tag, revision and date)."""
 #
-# (C) Pywikibot team, 2007-2024
+# (C) Pywikibot team, 2007-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -81,7 +81,8 @@ def getversion(online: bool = True) -> str:
 def getversiondict() -> dict[str, str]:
     """Get version info for the package.
 
-    :return:
+    :return: Return a dict with the following keys:
+
         - tag (name for the repository),
         - rev (current revision identifier),
         - date (date of current revision),
@@ -245,7 +246,7 @@ def getversion_nightly(path: str | Path | None = None):
     """Get version info for a nightly release.
 
     .. hint::
-       the version informations of the nightly dump is stored in the
+       the version information of the nightly dump is stored in the
        ``version`` file within the ``pywikibot`` folder.
 
     :param path: directory of the uncompressed nightly.
@@ -275,7 +276,8 @@ def getversion_package(path=None) -> tuple[str, str, str, str]:
     """Get version info for an installed package.
 
     :param path: Unused argument
-    :return:
+    :return: Return a tuple with the following items:
+
         - tag: 'pywikibot/__init__.py'
         - rev: '-1 (unknown)'
         - date (date the package was installed locally),

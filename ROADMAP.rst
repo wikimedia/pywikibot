@@ -1,8 +1,8 @@
 Current Release Changes
 =======================
 
-* Add support for kncwiki (:phab:`T385187`)
-* Fix a f-string in :meth:`Claim.fromJSON()<pywikibot.Claim.fromJSON>`
+* Add support for satwiktionary (:phab:`T386633`)
+* Update wiktionary family file
 * i18n updates.
 
 

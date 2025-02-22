@@ -1,6 +1,14 @@
 Release History
 ===============
 
+9.6.2
+-----
+*02 February 2025*
+
+* Add support for kncwiki (:phab:`T385187`)
+* Fix a f-string in :meth:`Claim.fromJSON()<pywikibot.Claim.fromJSON>`
+* i18n updates.
+
 9.6.1
 -----
 *13 December 2024*

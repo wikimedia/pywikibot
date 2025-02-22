@@ -50,13 +50,13 @@ repos:
       - id: python-check-mock-methods
       - id: python-use-type-annotations
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.8.0
+    rev: v0.9.7
     hooks:
       - id: ruff
         args:
         - --fix
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.19.0
+    rev: v3.19.1
     hooks:
       - id: pyupgrade
         args:
@@ -73,17 +73,17 @@ repos:
           - --remove-unused-variables
         exclude: '^pywikibot/backports\.py$'
   - repo: https://github.com/PyCQA/isort
-    rev: 5.13.2
+    rev: 6.0.0
     hooks:
       - id: isort
         exclude: '^pwb\.py$'
   - repo: https://github.com/jshwi/docsig
-    rev: v0.65.0
+    rev: v0.69.1
     hooks:
       - id: docsig
         exclude: ^(tests|scripts)
   - repo: https://github.com/PyCQA/flake8
-    rev: 7.1.1
+    rev: 7.1.2
     hooks:
       - id: flake8
         args:
