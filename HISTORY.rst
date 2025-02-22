@@ -1,6 +1,15 @@
 Release History
 ===============
 
+9.6.3
+-----
+*22 February 2025*
+
+* Add support for satwiktionary (:phab:`T386633`)
+* Update wiktionary family file
+* i18n updates.
+
+
 9.6.2
 -----
 *02 February 2025*
@@ -8,6 +17,7 @@ Release History
 * Add support for kncwiki (:phab:`T385187`)
 * Fix a f-string in :meth:`Claim.fromJSON()<pywikibot.Claim.fromJSON>`
 * i18n updates.
+
 
 9.6.1
 -----
