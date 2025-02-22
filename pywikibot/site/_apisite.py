@@ -1,6 +1,6 @@
 """Objects representing API interface to MediaWiki site."""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -54,14 +54,12 @@ from pywikibot.site._basesite import BaseSite
 from pywikibot.site._decorators import need_right
 from pywikibot.site._extensions import (
     EchoMixin,
-    FlowMixin,
     GeoDataMixin,
     GlobalUsageMixin,
     LinterMixin,
     PageImagesMixin,
     ProofreadPageMixin,
     TextExtractsMixin,
-    ThanksFlowMixin,
     ThanksMixin,
     UrlShortenerMixin,
     WikibaseClientMixin,
@@ -104,7 +102,6 @@ class _OnErrorExc(NamedTuple):
 class APISite(
     BaseSite,
     EchoMixin,
-    FlowMixin,
     GeneratorsMixin,
     GeoDataMixin,
     GlobalUsageMixin,
@@ -112,7 +109,6 @@ class APISite(
     PageImagesMixin,
     ProofreadPageMixin,
     TextExtractsMixin,
-    ThanksFlowMixin,
     ThanksMixin,
     UrlShortenerMixin,
     WikibaseClientMixin,

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """API test module."""
 #
-# (C) Pywikibot team, 2007-2024
+# (C) Pywikibot team, 2007-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -268,32 +268,6 @@ class TestParamInfo(DefaultSiteTestCase):
         for mod, value in attributes.items():
             self.assertEqual(mod, pi[mod]['path'])
             self.assertEqual(value, '')
-
-
-class TestOtherSubmodule(TestCase):
-
-    """Test handling multiple different modules having submodules."""
-
-    family = 'mediawiki'
-    code = 'mediawiki'
-
-    def test_other_submodule(self):
-        """Test another module apart from query having submodules."""
-        pi = api.ParamInfo(self.site)
-        self.assertFalse(pi._modules)
-        pi.fetch(['query'])
-        self.assertNotIn('flow', pi._modules)
-        pi.fetch(['flow'])
-        self.assertIn('flow', pi._modules)
-        other_modules = set()
-        for modules in pi._modules.values():
-            self.assertIsInstance(modules, set)
-            other_modules |= modules
-
-        other_modules -= pi.action_modules
-        other_modules -= pi.query_modules
-        self.assertLessEqual(other_modules & pi.submodules('flow'),
-                             pi.submodules('flow'))
 
 
 class TestParaminfoModules(DefaultSiteTestCase):

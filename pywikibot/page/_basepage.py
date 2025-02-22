@@ -1,6 +1,6 @@
 """Objects representing a base object for a MediaWiki page."""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -64,15 +64,16 @@ class BasePage(ComparableMixin):
     reading from or writing to the wiki. All other methods are delegated
     to the Site object.
 
-    Will be subclassed by Page, WikibasePage, and FlowPage.
+    Will be subclassed by :class:`pywikibot.Page` and
+    :class:`pywikibot.page.WikibasePage`.
     """
 
     _cache_attrs = (
-        '_text', '_pageid', '_catinfo', '_templates', '_protection',
-        '_contentmodel', '_langlinks', '_isredir', '_coords',
-        '_preloadedtext', '_timestamp', '_applicable_protections',
-        '_flowinfo', '_quality', '_pageprops', '_revid', '_quality_text',
-        '_pageimage', '_item', '_lintinfo', '_imageforpage',
+        '_applicable_protections', '_catinfo', '_contentmodel', '_coords',
+        '_imageforpage', '_isredir', '_item', '_langlinks', '_lintinfo',
+        '_pageid', '_pageimage', '_pageprops', '_preloadedtext', '_protection',
+        '_quality', '_quality_text', '_revid', '_templates', '_text',
+        '_timestamp',
     )
 
     def __init__(self, source, title: str = '', ns=0) -> None:
@@ -2295,7 +2296,13 @@ class BasePage(ComparableMixin):
         return False
 
     def is_flow_page(self) -> bool:
-        """Whether a page is a Flow page."""
+        """Whether a page is a Flow page.
+
+        .. attention::
+           Structured Discussion/Flow support was deprecated in 9.4 and
+           removed in Pywikibot 10. This method is kept to detect
+           unsupported content.
+        """
         return self.content_model == 'flow-board'
 
     def create_short_link(self,
