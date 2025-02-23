@@ -20,7 +20,7 @@
 .. warning:: do not upload a development release to pypi.
 """
 #
-# (C) Pywikibot team, 2009-2024
+# (C) Pywikibot team, 2009-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -37,7 +37,7 @@ from pathlib import Path
 # ------- setup extra_requires ------- #
 extra_deps = {
     # Core library dependencies
-    'eventstreams': ['sseclient<0.0.23,>=0.0.18'],  # T222885
+    'eventstreams': ['requests-sse>=0.5.0'],
     'isbn': ['python-stdnum>=1.19'],
     'Graphviz': ['pydot>=1.4.1'],
     'Google': ['google>=1.7'],
