@@ -1,6 +1,6 @@
 """Objects representing API requests."""
 #
-# (C) Pywikibot team, 2007-2024
+# (C) Pywikibot team, 2007-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -146,7 +146,8 @@ class Request(MutableMapping, WaitingMixin):
                  max_retries: int | None = None,
                  retry_wait: int | None = None,
                  use_get: bool | None = None,
-                 parameters=_PARAM_DEFAULT, **kwargs) -> None:
+                 parameters=_PARAM_DEFAULT,
+                 **kwargs) -> None:
         """Create a new Request instance with the given parameters.
 
         The parameters for the request can be defined via either the
@@ -1163,7 +1164,10 @@ class CachedRequest(Request):
     def __init__(self, expiry, *args, **kwargs) -> None:
         """Initialize a CachedRequest object.
 
-        :param expiry: either a number of days or a datetime.timedelta object
+        :param expiry: either a number of days or a datetime.timedelta
+            object
+        :param args: Refer :class:`Request` for positional arguments.
+        :param args: Refer :class:`Request` for keyword arguments.
         """
         assert expiry is not None
         super().__init__(*args, **kwargs)

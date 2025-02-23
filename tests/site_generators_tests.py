@@ -28,7 +28,6 @@ from tests.utils import skipping
 
 global_expected_params = {
     'action': ['query'],
-    'continue': [True],
     'iilimit': ['max'],
     'iiprop': list(pywikibot.site._IIPROP),
     'indexpageids': [True],

@@ -103,6 +103,12 @@ class APIGenerator(APIGeneratorBase, GeneratorWrapper):
         :param continue_name: Name of the continue API parameter.
         :param limit_name: Name of the limit API parameter.
         :param data_name: Name of the data in API response.
+        :keyword dict parameters: All parameters passed to request class
+            usally :class:`api.Request<data.api.Request>` or
+            :class:`api.CachedRequest<data.api.CachedRequest>`. See these
+            classes for further parameter descriptions. The *parameters*
+            keys can also given here as keyword parameters but this is
+            not recommended.
         """
         kwargs = self._clean_kwargs(kwargs, action=action)
 
@@ -243,8 +249,6 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
 
         parameters['indexpageids'] = True  # always ask for list of pageids
         self.continue_name = 'continue'
-        # Explicitly enable the simplified continuation
-        parameters['continue'] = True
         self.request = self.request_class(**kwargs)
 
         self.site._paraminfo.fetch('query+' + mod for mod in self.modules)
@@ -494,8 +498,8 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
         .. versionchanged:: 8.4
            return *None* instead of *False*.
         """
-        for key, value in self.data['continue'].items():
-            # query-continue can return ints (continue too?)
+        for key, value in self.data[self.continue_name].items():
+            # old query-continue could return ints, continue too?
             if isinstance(value, int):
                 value = str(value)
             self.request[key] = value
