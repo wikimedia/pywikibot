@@ -153,7 +153,7 @@ are also in 'Pneumatics' category.
    :mod:`pagegenerators` are supported with "move" and "remove" action.
 """
 #
-# (C) Pywikibot team, 2004-2024
+# (C) Pywikibot team, 2004-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1638,12 +1638,24 @@ def main(*args: str) -> None:
                                 deletion_comment=use_deletion_summary,
                                 generator=gen)
     elif action == 'move':
-        if 'from' not in options:
-            options['from'] = pywikibot.input(
-                'Please enter the old name of the category:')
-        if 'to' not in options:
-            options['to'] = pywikibot.input(
-                'Please enter the new name of the category:')
+        while True:
+            if 'from' not in options:
+                options['from'] = pywikibot.input(
+                    'Please enter the old name of the category:')
+                if not options['from']:
+                    return
+
+            if 'to' not in options:
+                options['to'] = pywikibot.input(
+                    'Please enter the new name of the category:')
+
+            if options['from'] != options['to']:
+                break
+
+            pywikibot.error('-from and -to arguments are equal, please retry.')
+            del options['from']
+            del options['to']
+
         if use_deletion_summary:
             deletion_comment = \
                 CategoryMoveRobot.DELETION_COMMENT_SAME_AS_EDIT_COMMENT
