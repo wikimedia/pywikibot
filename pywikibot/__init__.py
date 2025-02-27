@@ -171,6 +171,9 @@ def Site(code: str | None = None,  # noqa: N802
     .. versionchanged:: 7.3
        Short creation if site code is equal to family name like
        `Site('commons')`, `Site('meta')` or `Site('wikidata')`.
+    .. versionchanged:: 10.0
+       *url* does not have to contain an api, requests or script path
+       any longer.
 
     :param code: language code (override config.mylang)
         code may also be a sitename like 'wikipedia:test'
