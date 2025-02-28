@@ -40,8 +40,6 @@ The contents of the package
     | fixes.py                   | File containing all standard fixes, stores           |
     |                            | predefined replacements used by replace.py           |
     +----------------------------+------------------------------------------------------+
-    | flow.py                    | Objects representing Flow entities                   |
-    +----------------------------+------------------------------------------------------+
     | i18n.py                    | Helper functions for both the internal translation   |
     |                            | system and for TranslateWiki-based translations      |
     +----------------------------+------------------------------------------------------+

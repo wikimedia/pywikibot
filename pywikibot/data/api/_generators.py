@@ -2,11 +2,10 @@
 
 .. versionchanged:: 7.6
    All Objects were changed from Iterable object to a Generator object.
-   They are subclassed from
-   :class:`tools.collections.GeneratorWrapper`
+   They are subclassed from :class:`tools.collections.GeneratorWrapper`
 """
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1055,9 +1054,6 @@ def update_page(page: pywikibot.Page,
         page._preloadedtext = pagedict['preloadcontent']['*']
     elif 'preload' in pagedict:
         page._preloadedtext = pagedict['preload']
-
-    if 'flowinfo' in pagedict:
-        page._flowinfo = pagedict['flowinfo']['flow']
 
     if 'lintId' in pagedict:
         page._lintinfo = pagedict
