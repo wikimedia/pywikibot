@@ -1,6 +1,6 @@
 """Text editor class for your favourite editor.
 
-.. note:: This module uses :mod:`userinterfaces.gui` and has depedencies
+.. note:: This module uses :mod:`userinterfaces.gui` and has dependencies
    from other partially external modules.
 """
 #

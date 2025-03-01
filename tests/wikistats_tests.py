@@ -11,6 +11,7 @@ import sys
 import unittest
 from contextlib import suppress
 
+from pywikibot.backports import NoneType
 from pywikibot.data.wikistats import WikiStats
 from tests.aspects import TestCase
 
@@ -36,7 +37,7 @@ class WikiStatsTestCase(TestCase):
                 self.assertIn(key, bottom)
 
         for key in top:
-            self.assertIsInstance(key, (str, type(None)))
+            self.assertIsInstance(key, (str, NoneType))
 
         self.assertIsInstance(top['good'], str)
         self.assertIsInstance(top['total'], str)

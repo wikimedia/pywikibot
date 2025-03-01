@@ -1,10 +1,36 @@
 Scripts Changelog
 =================
 
+10.0.0
+------
+
+* L10N updates
+* i18n updates
+* Require Python 3.8 or higher
+* Require Pywikibot 10.0.0
+
+archivebot
+^^^^^^^^^^
+
+* Fix mangling screen messages in ``-async`` mode (:phab:`T382797`)
+* Save the talk page in asynchronous mode if ``-async`` option was given
+
+category
+^^^^^^^^
+
+* Ensure that ``-from`` and ``-to`` arguments are not equal (:phab:`T384753`)
+
+
+dataextend
+^^^^^^^^^^
+
+* Script was removed from repository (:phab:`T377066`)
+
 9.6.1
 -----
 
 * Require Pywikibot 9.6.1 (:phab:`T358635`)
+* i18n updates
 
 9.6.0
 -----
@@ -1326,7 +1352,7 @@ archivebot
 general
 ^^^^^^^
 
-*  Add missing commas in string contants
+*  Add missing commas in string constants
 
 4.1.0
 -----

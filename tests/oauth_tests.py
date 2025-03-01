@@ -101,7 +101,7 @@ class TestOauthLoginManager(DefaultSiteTestCase, OAuthSiteTestCase):
                                           site=self.site,
                                           user=self.consumer_token[0])
         # Set access token directly, discard user interaction token fetching
-        login_manager._access_token = self.access_token
+        login_manager.access_token = self.access_token
         return login_manager
 
     def test_login(self):

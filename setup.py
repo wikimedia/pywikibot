@@ -20,7 +20,7 @@
 .. warning:: do not upload a development release to pypi.
 """
 #
-# (C) Pywikibot team, 2009-2024
+# (C) Pywikibot team, 2009-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -37,24 +37,27 @@ from pathlib import Path
 # ------- setup extra_requires ------- #
 extra_deps = {
     # Core library dependencies
-    'eventstreams': ['sseclient<0.0.23,>=0.0.18'],  # T222885
-    'isbn': ['python-stdnum>=1.19'],
-    'Graphviz': ['pydot>=1.4.1'],
+    'eventstreams': ['requests-sse>=0.5.0'],
+    'isbn': ['python-stdnum>=1.20'],
+    'Graphviz': ['pydot>=3.0.2'],
     'Google': ['google>=1.7'],
     'memento': ['memento_client==0.6.1'],
-    'wikitextparser': ['wikitextparser>=0.47.0'],
-    'mysql': ['PyMySQL >= 1.0.0'],
+    'wikitextparser': ['wikitextparser>=0.56.3'],
+    'mysql': ['PyMySQL >= 1.1.1'],
     # vulnerability found in Pillow<8.1.2 but toolforge uses 5.4.1
     'Tkinter': [
-        'Pillow>=8.1.2, != 10.0, != 10.1; python_version < "3.13"',
-        'Pillow>=10.4; python_version >= "3.13"',
+        'Pillow>=11.1.0; python_version > "3.8"',
+        'Pillow==10.4.0; python_version < "3.9"',
     ],
     'mwoauth': [
         'PyJWT != 2.10.0, != 2.10.1; python_version > "3.8"',  # T380270
         'mwoauth!=0.3.1,>=0.2.4',
     ],
     'html': ['beautifulsoup4>=4.7.1'],
-    'http': ['fake-useragent>=1.4.0'],
+    'http': [
+        'fake-useragent >= 2.0.3; python_version > "3.8"',
+        'fake-useragent == 1.5.1; python_version < "3.9"',
+    ],
 }
 
 
@@ -70,14 +73,13 @@ extra_deps.update({'scripts': [i for k, v in script_deps.items() for i in v]})
 # ------- setup install_requires ------- #
 # packages which are mandatory
 dependencies = [
-    'importlib_metadata ; python_version < "3.8"',
     'mwparserfromhell>=0.5.2',
     'packaging',
-    'requests>=2.21.0',
+    'requests>=2.31.0',
 ]
 
 # ------- setup tests_require ------- #
-test_deps = ['mock']
+test_deps = []
 
 # Add all dependencies as test dependencies,
 # so all scripts can be compiled for script_tests, etc.

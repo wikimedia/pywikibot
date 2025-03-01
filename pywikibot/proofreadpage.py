@@ -133,14 +133,14 @@ class TagAttr:
     def _convert(self, value):
         """Handle conversion from str to int and quotes."""
         if not isinstance(value, (str, int)):
-            raise TypeError(f'value={value} must be str or int.')
+            raise TypeError(f'{value=!s} must be str or int.')
 
         self._orig_value = value
 
         if isinstance(value, str):
             if (value.startswith('"') != value.endswith('"')
                     or value.startswith("'") != value.endswith("'")):
-                raise ValueError(f'value={value} has wrong quotes.')
+                raise ValueError(f'{value=!s} has wrong quotes.')
             value = value.strip('"\'')
             value = int(value) if value.isdigit() else value
 
@@ -288,7 +288,7 @@ class PagesTagParser(collections.abc.Container):
         """Initializer."""
         m = self.pat_tag.search(text)
         if m is None:
-            raise ValueError(f'Invalid text={text}')
+            raise ValueError(f'Invalid {text=!s}')
 
         tag = m['attrs']
         matches = list(self.pat_attr.finditer(tag))
@@ -1270,7 +1270,7 @@ class IndexPage(pywikibot.Page):
             end = self.num_pages
 
         if not 1 <= start <= end <= self.num_pages:
-            raise ValueError(f'start={start}, end={end} are not in valid '
+            raise ValueError(f'{start=!s}, {end=!s} are not in valid '
                              f'range (1, {self.num_pages})')
 
         # All but 'Without Text'

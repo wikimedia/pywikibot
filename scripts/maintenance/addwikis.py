@@ -45,7 +45,8 @@ def update_family(family, wikis):
     new_codes = set()
     for wiki in list(wikis):
         if wiki in original:
-            pywikibot.warning(f'{wiki!r} is alread in Family.codes; ignoring.')
+            pywikibot.warning(
+                f'{wiki!r} is already in Family.codes; ignoring.')
         else:
             new_codes.add(wiki)
 

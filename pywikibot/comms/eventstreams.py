@@ -2,34 +2,46 @@
 
 This file is part of the Pywikibot framework.
 
-This module requires sseclient to be installed::
+This module requires requests-sse to be installed::
 
-    pip install "sseclient<0.0.23,>=0.0.18"
+    pip install "requests-sse>=0.5.0"
 
 .. versionadded:: 3.0
+.. versionchanged:: 10.0
+   ``requests-sse`` package is required instead of ``sseclient``.
 """
 #
-# (C) Pywikibot team, 2017-2024
+# (C) Pywikibot team, 2017-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
 import json
+from datetime import timedelta
 from functools import partial
+from typing import Any
 
 from requests.packages.urllib3.exceptions import ProtocolError
 from requests.packages.urllib3.util.response import httplib
 
 from pywikibot import Site, Timestamp, config, debug, warning
-from pywikibot.tools import cached
+from pywikibot.backports import NoneType
+from pywikibot.tools import cached, deprecated_args
 from pywikibot.tools.collections import GeneratorWrapper
 
 
 try:
-    from sseclient import SSEClient as EventSource
-except ImportError as e:
+    from requests_sse import EventSource
+except ModuleNotFoundError as e:
     EventSource = e
+
+
+INSTALL_MSG = """requests-sse is required for EventStreams;
+install it with
+
+    pip install "requests-sse>=0.5.0"
+"""
 
 
 class EventStreams(GeneratorWrapper):
@@ -98,47 +110,76 @@ class EventStreams(GeneratorWrapper):
     >>> del stream
 
     .. versionchanged:: 7.6
-       subclassed from :class:`tools.collections.GeneratorWrapper`
+       subclassed from :class:`tools.collections.GeneratorWrapper`.
+    .. versionchanged:: 10.0
+       *retry* value is doubled for each consecutive connect try.
     """
 
+    @deprecated_args(last_id='last_event_id')  # since 10.0.0
     def __init__(self, **kwargs) -> None:
         """Initializer.
 
         :keyword bool canary: if True, include canary events, see
-            https://w.wiki/7$2z for more info
-        :keyword APISite site: a project site object. Used if no url is
-            given
-        :keyword pywikibot.Timestamp or str since: a timestamp for older
+            https://w.wiki/7$2z for more info.
+        :keyword APISite site: a project site object. Used if no *url*
+            is given.
+        :keyword int retry: Number of milliseconds to wait after disconnects
+            before attempting to reconnect. The server may change this
+            by including a 'retry' line in a message. Retries are handled
+            automatically.
+
+            .. versionchanged:: 10.0
+               5 seconds are used instead of 3 seconds as default.
+
+        :keyword pywikibot.Timestamp | str since: a timestamp for older
             events; there will likely be between 7 and 31 days of
             history available but is not guaranteed. It may be given as
             a pywikibot.Timestamp, an ISO 8601 string or a mediawiki
             timestamp string.
-        :keyword Iterable[str] or str streams: event stream types.
+        :keyword Iterable[str] | str streams: event stream types.
             Mandatory when no url is given. Multiple streams may be
             given as a string with comma separated stream types or an
             iterable of strings
-        :keyword int or float or tuple[int or float, int or float] timeout:
+        :keyword int | float | tuple[int | float, int | float] timeout:
             a timeout value indication how long to wait to send data
             before giving up
         :keyword str url: an url retrieving events from. Will be set up
             to a default url using _site.family settings, stream types
             and timestamp
-        :param kwargs: keyword arguments passed to `SSEClient` and
-            `requests` library
-        :raises ImportError: sseclient is not installed
+
+        :keyword Any last_event_id: [*requests-sse*] If provided, this
+            parameter will be sent to the server to tell it to return
+            only messages more recent than this ID.
+        :keyword requests.Session session: [*requests-sse*] specifies a
+            requests.Session, if not, create a default requests.Session.
+        :keyword Callable[[], None] on_open: [*requests-sse*] event
+            handler for open event
+        :keyword Callable[[requests_sse.MessageEvent], None] on_message:
+            [*requests-sse*] event handler for message event
+        :keyword Callable[[], None] on_error: [*requests-sse*] event
+            handler for error event
+        :keyword int chunk_size: [*requests*] A maximum size of the chunk
+            for chunk-encoded requests.
+
+            .. versionchanged:: 10.0
+               None is used instead of 1024 as default value.
+
+        :param kwargs: Other keyword arguments passed to `requests_sse`
+            and `requests` library
+        :raises ModuleNotFoundError: requests-sse is not installed
         :raises NotImplementedError: no stream types specified
 
         .. seealso:: https://stream.wikimedia.org/?doc#streams for
            available Wikimedia stream types to be passed with `streams`
            parameter.
+        .. note:: *retry* keyword argument is used instead of the
+           underlying *reconnection_time* argument which is ignored.
         """
-        if isinstance(EventSource, Exception):
-            raise ImportError(
-                'sseclient is required for EventStreams;\n'
-                'install it with "pip install sseclient==0.0.22"\n'
-            )
+        if isinstance(EventSource, ModuleNotFoundError):
+            raise ImportError(INSTALL_MSG) from EventSource
+
         self.filter = {'all': [], 'any': [], 'none': []}
-        self._total = None
+        self._total: int | None = None
         self._canary = kwargs.pop('canary', False)
 
         try:
@@ -160,6 +201,11 @@ class EventStreams(GeneratorWrapper):
 
         self._url = kwargs.get('url') or self.url
         kwargs.setdefault('url', self._url)
+
+        retry = kwargs.pop('retry', None)
+        if retry:
+            kwargs['reconnection_time'] = timedelta(milliseconds=retry)
+
         kwargs.setdefault('timeout', config.socket_timeout)
         self.sse_kwargs = kwargs
 
@@ -175,12 +221,12 @@ class EventStreams(GeneratorWrapper):
             kwargs['since'] = self._since
         if kwargs['timeout'] == config.socket_timeout:
             kwargs.pop('timeout')
-        return '{}({})'.format(self.__class__.__name__, ', '.join(
+        return '{}({})'.format(type(self).__name__, ', '.join(
             f'{k}={v!r}' for k, v in kwargs.items()))
 
     @property
     @cached
-    def url(self):
+    def url(self) -> str:
         """Get the EventStream's url.
 
         :raises NotImplementedError: no stream types specified
@@ -194,7 +240,7 @@ class EventStreams(GeneratorWrapper):
             streams=self._streams,
             since=f'?since={self._since}' if self._since else '')
 
-    def set_maximum_items(self, value: int) -> None:
+    def set_maximum_items(self, value: int | None) -> None:
         """Set the maximum number of items to be retrieved from the stream.
 
         If not called, most queries will continue as long as there is
@@ -208,7 +254,7 @@ class EventStreams(GeneratorWrapper):
             debug(f'{type(self).__name__}: Set limit (maximum_items) to '
                   f'{self._total}.')
 
-    def register_filter(self, *args, **kwargs):
+    def register_filter(self, *args, **kwargs) -> None:
         """Register a filter.
 
         Filter types:
@@ -251,6 +297,7 @@ class EventStreams(GeneratorWrapper):
             register_filter(ftype='none', bot=True)  # 3
 
         Explanation for the result of the filter function:
+
         1. ``return data['sever_name'] == 'de.wikipedia.org'``
         2. ``return data['type'] in ('edit', 'log')``
         3. ``return data['bot'] is True``
@@ -287,7 +334,7 @@ class EventStreams(GeneratorWrapper):
         # register pairs of keys and items as a filter function
         for key, value in kwargs.items():
             # append function for singletons
-            if isinstance(value, (bool, type(None))):
+            if isinstance(value, (bool, NoneType)):
                 self.filter[ftype].append(partial(_is, key=key, value=value))
             # append function for a single value
             elif isinstance(value, (str, int)):
@@ -296,7 +343,7 @@ class EventStreams(GeneratorWrapper):
             else:
                 self.filter[ftype].append(partial(_in, key=key, value=value))
 
-    def streamfilter(self, data: dict):
+    def streamfilter(self, data: dict[str, Any]) -> bool:
         """Filter function for eventstreams.
 
         See the description of register_filter() how it works.
@@ -308,10 +355,13 @@ class EventStreams(GeneratorWrapper):
 
         if any(function(data) for function in self.filter['none']):
             return False
+
         if not all(function(data) for function in self.filter['all']):
             return False
+
         if not self.filter['any']:
             return True
+
         return any(function(data) for function in self.filter['any'])
 
     @property
@@ -323,28 +373,23 @@ class EventStreams(GeneratorWrapper):
         """
         n = 0
         event = None
-        ignore_first_empty_warning = True
         while self._total is None or n < self._total:
             if not hasattr(self, 'source'):
                 self.source = EventSource(**self.sse_kwargs)
-                # sseclient >= 0.0.18 is required for eventstreams (T184713)
-                # we don't have a version string inside but the instance
-                # variable 'chunk_size' was newly introduced with 0.0.18
-                if not hasattr(self.source, 'chunk_size'):
-                    warning(
-                        'You may not have the right sseclient version;\n'
-                        'sseclient >= 0.0.18 is required for eventstreams.\n'
-                        "Install it with 'pip install \"sseclient>=0.0.18\"'")
+                self.source.connect(config.max_retries)
+
             try:
                 event = next(self.source)
             except (ProtocolError, OSError, httplib.IncompleteRead) as e:
                 warning(
                     f'Connection error: {e}.\nTry to re-establish connection.')
+                self.source.close()
                 del self.source
                 if event is not None:
-                    self.sse_kwargs['last_id'] = event.id
+                    self.sse_kwargs['last_event_id'] = event.last_event_id
                 continue
-            if event.event == 'message':
+
+            if event.type == 'message':
                 if event.data:
                     try:
                         element = json.loads(event.data)
@@ -354,17 +399,16 @@ class EventStreams(GeneratorWrapper):
                         if self.streamfilter(element):
                             n += 1
                             yield element
-                elif not ignore_first_empty_warning:
-                    warning('Empty message found.')
-                else:
-                    ignore_first_empty_warning = False
-            elif event.event == 'error':
+                # else: ignore empty message
+            elif event.type == 'error':
                 warning(f'Encountered error: {event.data}')
             else:
-                warning(f'Unknown event {event.event} occurred.')
+                warning(f'Unknown event {event.type} occurred.')
 
         debug(f'{type(self).__name__}: Stopped iterating due to exceeding item'
               ' limit.')
+
+        self.source.close()
         del self.source
 
 
@@ -376,11 +420,10 @@ def site_rc_listener(site, total: int | None = None):
     :param total: the maximum number of changes to return
 
     :return: pywikibot.comms.eventstream.rc_listener configured for given site
-    :raises ImportError: sseclient installation is required
+    :raises ModuleNotFoundError: requests-sse installation is required
     """
-    if isinstance(EventSource, Exception):
-        raise ImportError('sseclient is required for EventStreams;\n'
-                          'install it with "pip install sseclient"\n')
+    if isinstance(EventSource, ModuleNotFoundError):
+        raise ModuleNotFoundError(INSTALL_MSG) from EventSource
 
     stream = EventStreams(streams='recentchange', site=site)
     stream.set_maximum_items(total)

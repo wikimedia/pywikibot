@@ -1,6 +1,6 @@
 """Family module for Wikisource."""
 #
-# (C) Pywikibot team, 2004-2024
+# (C) Pywikibot team, 2004-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -83,10 +83,12 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # https://meta.wikimedia.org/wiki/BPI#Current_implementation
     # https://meta.wikimedia.org/wiki/Special:WikiSets/2
     cross_allowed = [
-        'ar', 'be', 'bg', 'bn', 'br', 'bs', 'ca', 'cy', 'da', 'el', 'et', 'eu',
-        'fa', 'fi', 'fo', 'gl', 'hr', 'hy', 'id', 'it', 'ja', 'kn', 'ko', 'ml',
-        'nap', 'no', 'or', 'pa', 'pl', 'pt', 'ro', 'sa', 'sk', 'sr', 'ta',
-        'te', 'th', 'uk', 'vi', 'zh',
+        'ar', 'as', 'az', 'ban', 'be', 'bg', 'bn', 'br', 'bs', 'ca', 'cy',
+        'da', 'el', 'eo', 'et', 'eu', 'fa', 'fi', 'fo', 'gl', 'gu', 'hi', 'hr',
+        'hy', 'id', 'it', 'ja', 'jv', 'kn', 'ko', 'lij', 'lt', 'mk', 'ml',
+        'nap', 'nl', 'no', 'or', 'pa', 'pl', 'pms', 'pt', 'ro', 'sa', 'sah',
+        'sk', 'sr', 'ta', 'te', 'th', 'tr', 'uk', 'vi', 'wa', 'yi', 'zh',
+        'zh-min-nan',
     ]
 
     authornamespaces = {

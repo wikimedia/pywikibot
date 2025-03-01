@@ -228,7 +228,7 @@ ignore_title = {
             'Wikipedia:Disambiguation pages with links',
             'Wikipedia:Multiple-place names \\([A-Z]\\)',
             'Wikipedia:Non-unique personal name',
-            "User:Jerzy/Disambiguation Pages i've Editted",
+            "User:Jerzy/Disambiguation Pages I've edited",
             'User:Gareth Owen/inprogress',
             'TLAs from [A-Z][A-Z][A-Z] to [A-Z][A-Z][A-Z]',
             'List of all two-letter combinations',
@@ -809,7 +809,7 @@ class DisambiguationRobot(SingleSiteBot):
             while True:
                 m = self.linkR.search(text, pos=curpos)
                 if not m:
-                    # No additinal link found
+                    # No additional link found
                     if n_links == 0:
                         # No remaining links to change for this disambiguation
                         # title.

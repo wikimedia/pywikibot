@@ -83,7 +83,7 @@ class CategoryRedirectBot(
        CategoryRedirectBot is a ConfigParserBot
 
     .. versionchanged:: 9.0
-       A logentry is writen to <userpage>/category_edit_requests if a
+       A logentry is written to <userpage>/category_edit_requests if a
        page cannot be moved
     """
 

@@ -49,6 +49,7 @@ for tests to set the default site (see :phab:`T216825`)::
 #
 from __future__ import annotations
 
+import importlib.metadata
 import os
 import sys
 import types
@@ -235,7 +236,6 @@ def check_modules(script: str | None = None) -> bool:
     """
     from packaging.requirements import Requirement
 
-    from pywikibot.backports import importlib_metadata
     from setup import script_deps
 
     missing_requirements = []
@@ -247,7 +247,7 @@ def check_modules(script: str | None = None) -> bool:
         from setup import dependencies
 
     for dependency in dependencies:
-        if dependency.startswith(('importlib_metadata', 'packaging')):
+        if dependency.startswith('packaging'):
             # Ignore these dependencies because ImportError is raised in an
             # early state when they are imported in backports. They are already
             # used at this point. This is a workaround for toolforge where some
@@ -258,8 +258,8 @@ def check_modules(script: str | None = None) -> bool:
         requirement = Requirement(dependency)
         if requirement.marker is None or requirement.marker.evaluate():
             try:
-                instlld_vrsn = importlib_metadata.version(requirement.name)
-            except importlib_metadata.PackageNotFoundError as e:
+                instlld_vrsn = importlib.metadata.version(requirement.name)
+            except importlib.metadata.PackageNotFoundError as e:
                 missing_requirements.append(requirement)
                 print(e)
             else:
@@ -271,7 +271,6 @@ def check_modules(script: str | None = None) -> bool:
                     )
 
     del Requirement
-    del importlib_metadata
     del script_deps
 
     _print_requirements(missing_requirements, script, 'missing')

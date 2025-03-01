@@ -207,7 +207,7 @@ Require a given MediaWiki version
 
   from tests.aspects import require_version
   [......]
-  @require_version('>=1.27.0')
+  @require_version('>=1.31.0')
   def test_require_version(self):
 
 @unittest.mock.patch

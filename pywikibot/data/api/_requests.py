@@ -1,6 +1,6 @@
 """Objects representing API requests."""
 #
-# (C) Pywikibot team, 2007-2024
+# (C) Pywikibot team, 2007-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -146,7 +146,8 @@ class Request(MutableMapping, WaitingMixin):
                  max_retries: int | None = None,
                  retry_wait: int | None = None,
                  use_get: bool | None = None,
-                 parameters=_PARAM_DEFAULT, **kwargs) -> None:
+                 parameters=_PARAM_DEFAULT,
+                 **kwargs) -> None:
         """Create a new Request instance with the given parameters.
 
         The parameters for the request can be defined via either the
@@ -719,7 +720,7 @@ class Request(MutableMapping, WaitingMixin):
         """Return a dict from requests.Response.
 
         .. versionchanged:: 8.2
-           show a warning to add a ``protocoll()`` method to the family
+           show a warning to add a ``protocol()`` method to the family
            file if suitable.
 
         :param response: a requests.Response object
@@ -808,7 +809,7 @@ but {scheme!r} is required. Please add the following code to your family file:
         """Handle warnings; return True to retry request, False to resume.
 
         .. versionchanged:: 7.2
-           Return True to retry the current request and Falso to resume.
+           Return True to retry the current request and False to resume.
 
         :meta public:
         """
@@ -1121,7 +1122,7 @@ but {scheme!r} is required. Please add the following code to your family file:
                 continue
 
             if code == 'urlshortener-blocked':  # T244062
-                # add additional informations to error dict
+                # add additional information to error dict
                 error['current site'] = self.site
                 if self.site.user():
                     error['current user'] = self.site.user()
@@ -1163,7 +1164,10 @@ class CachedRequest(Request):
     def __init__(self, expiry, *args, **kwargs) -> None:
         """Initialize a CachedRequest object.
 
-        :param expiry: either a number of days or a datetime.timedelta object
+        :param expiry: either a number of days or a datetime.timedelta
+            object
+        :param args: Refer :class:`Request` for positional arguments.
+        :param args: Refer :class:`Request` for keyword arguments.
         """
         assert expiry is not None
         super().__init__(*args, **kwargs)
@@ -1187,7 +1191,7 @@ class CachedRequest(Request):
         .. versionchanged:: 8.0
            return a `pathlib.Path` object.
         .. versionchanged:: 9.0
-           remove Python main version from directoy name
+           remove Python main version from directory name
 
         :return: base directory path for cache entries
 

@@ -31,7 +31,7 @@ The following parameters are supported:
    change to that settings file below the [delinker] section like.
 
 .. versionadded:: 7.2
-   This script is completely rewriten from compat branch.
+   This script is completely rewritten from compat branch.
 .. versionchanged:: 9.4
    *-category* option was added.
 """

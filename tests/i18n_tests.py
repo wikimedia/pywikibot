@@ -56,7 +56,7 @@ class TestTranslate(TestCase):
     def test_translate_commons(self):
         """Test localization with xdict for commons.
 
-        Test whether the localzation is found either with the Site object
+        Test whether the localization is found either with the Site object
         or with the site code.
         """
         site = Site('commons')
@@ -313,7 +313,7 @@ class InputTestCase(TWNTestCaseBase, UserInterfaceLangTestCase, PwbTestCase):
         """Test i18n.input fallback via pwb."""
         expect = i18n.twtranslate(self.alt_code, self.message, fallback=False)
         result = self.execute(args=['listpages', '-cat'],
-                              data_in='non-existant-category\r\n')
+                              data_in='non-existent-category\r\n')
         self.assertIn(expect, result['stderr'])
 
 

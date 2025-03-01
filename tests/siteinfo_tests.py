@@ -32,7 +32,7 @@ class TestSiteInfo(DefaultSiteTestCase):
 
     def test_siteinfo(self):
         """Test the siteinfo property."""
-        # general enteries
+        # general entries
         mysite = self.get_site()
         self.assertIsInstance(mysite.siteinfo['timeoffset'], (int, float))
         self.assertTrue(-12 * 60 <= mysite.siteinfo['timeoffset'] <= +14 * 60)
@@ -57,12 +57,12 @@ class TestSiteInfo(DefaultSiteTestCase):
 
     def test_properties(self):
         """Test the siteinfo properties."""
-        # 'fileextensions' introduced in v1.15:
+        # fileextensions
         self.assertIn('fileextensions', self.site.siteinfo)
         fileextensions = self.site.siteinfo.get('fileextensions')
         self.assertIsInstance(fileextensions, list)
         self.assertIn({'ext': 'png'}, fileextensions)
-        # 'restrictions' introduced in v1.23:
+        # restrictions
         self.assertIn('restrictions', self.site.siteinfo)
         restrictions = self.site.siteinfo.get('restrictions')
         self.assertIsInstance(restrictions, dict)

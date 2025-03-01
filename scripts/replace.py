@@ -602,15 +602,8 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
 
         return False
 
-    def apply_replacements(self, original_text, applied, page=None):
-        """Apply all replacements to the given text.
-
-        :rtype: str, set
-        """
-        if page is None:
-            pywikibot.warn(
-                'You must pass the target page as the "page" parameter to '
-                'apply_replacements().', DeprecationWarning, stacklevel=2)
+    def apply_replacements(self, original_text, applied, page) -> str:
+        """Apply all replacements to the given text."""
         new_text = original_text
         exceptions = _get_text_exceptions(self.exceptions)
         skipped_containers = set()
@@ -621,8 +614,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                     and replacement.container.name in skipped_containers):
                 continue
 
-            if page is not None and self.isTitleExcepted(
-                    page.title(), replacement.exceptions):
+            if self.isTitleExcepted(page.title(), replacement.exceptions):
                 if replacement.container:
                     pywikibot.info(
                         f'Skipping fix "{replacement.container.name}" on '

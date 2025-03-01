@@ -87,7 +87,7 @@ Bots and scripts
 +--------------------------+---------------------------------------------------------+
 | delete.py                | This script can be used to delete pages en masse.       |
 +--------------------------+---------------------------------------------------------+
-| delinker.py              | Delink file references of deleted images.               |
+| delinker.py              | Unlink file references of deleted images.               |
 +--------------------------+---------------------------------------------------------+
 | djvutext.py              | Extracts OCR text from djvu files and uploads onto      |
 |                          | pages in the "Page" namespace on Wikisource.            |

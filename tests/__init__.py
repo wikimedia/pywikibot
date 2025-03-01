@@ -1,6 +1,6 @@
 """Package tests."""
 #
-# (C) Pywikibot team, 2007-2024
+# (C) Pywikibot team, 2007-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -86,7 +86,6 @@ library_test_modules = {
     'family',
     'file',
     'fixes',
-    'flow',
     'gui',
     'http',
     'i18n',

@@ -4,7 +4,7 @@ Several parts of the test infrastructure are implemented as mixins,
 such as API result caching and excessive test durations.
 """
 #
-# (C) Pywikibot team, 2014-2024
+# (C) Pywikibot team, 2014-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -284,11 +284,11 @@ def require_modules(*required_modules):
     return test_requirement
 
 
-def require_version(version_needed: str, reason: str = ''):
+def require_version(version_needed: str, /, reason: str = ''):
     """Require minimum MediaWiki version to be queried.
 
     The version needed for the test; must be given with a preleading rich
-    comparisons operator like ``<1.27wmf4`` or ``>=1.39``. If the
+    comparisons operator like ``<1.31wmf4`` or ``>=1.43``. If the
     comparison does not match the test will be skipped.
 
     This decorator can only be used for TestCase having a single site.
@@ -298,9 +298,17 @@ def require_version(version_needed: str, reason: str = ''):
 
     .. versionadded:: 8.0
 
+    .. versionchanged:: 10.0
+       TypeError and ValueError are used for validation fails.
+       *version_needed* parameter is positional only.
+
     :param version_needed: The version needed
     :param reason: A reason for skipping the test.
-    :raises Exception: Usage validation fails
+    :raises TypeError: self.site is not a BaseSite or the decorated
+        method has parameters.
+    :raises ValueError: The given *version_needed* parameter is invalid
+        or an operand is given on the left or the version number is
+        invalid
     """
     def test_requirement(method):
         """Test the requirement and return an optionally decorated object."""
@@ -309,26 +317,33 @@ def require_version(version_needed: str, reason: str = ''):
             """Validate environment."""
             if not isinstance(self.site, BaseSite) \
                or isinstance(self.site, DrySite):
-                raise Exception(  # pragma: no cover
+                raise TypeError(
                     f'{type(self).__name__}.site must be a BaseSite not '
                     f'{type(self.site).__name__}.')
 
             if args or kwargs:
-                raise Exception(  # pragma: no cover
+                raise TypeError(
                     f'Test method {method.__name__!r} has parameters which is '
-                    f'not supported with require_version decorator.')
+                    f'not supported with require_version decorator.'
+                )
 
-            _, op, version = re.split('([<>]=?)', version_needed)
-            if not op:  # pragma: no cover
-                raise Exception(f'There is no valid operator given with '
-                                f'version {version_needed!r}')
+            try:
+                site_vers, op, version = re.split('([<>]=?)', version_needed)
+            except ValueError:
+                raise ValueError(f'There is no valid operator given with '
+                                 f'version {version_needed!r}')
+
+            if site_vers:
+                raise ValueError(
+                    f'first operand {site_vers} should not be set')
 
             skip = not eval(
                 f'self.site.mw_version {op} MediaWikiVersion(version)')
-            if not skip:
-                return method(self, *args, **kwargs)
 
-            myreason = ' to ' + reason if reason else ''  # pragma: no cover
+            if not skip:
+                return method(self)
+
+            myreason = ' to ' + reason if reason else ''
             raise unittest.SkipTest(
                 f'MediaWiki {op} v{version} required{myreason}.')
 
@@ -690,7 +705,7 @@ class MetaTestCaseClass(type):
                 wrapped_method.__doc__ = removesuffix(func.__doc__, '.')
                 wrapped_method.__doc__ += ' on ' + sitename
             else:
-                wrapped_method.__doc__ = 'Test ' + sitename
+                wrapped_method.__doc__ = 'Test ' + sitename  # pragma: no cover
 
             return wrapped_method
 

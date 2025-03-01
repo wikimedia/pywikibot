@@ -1,6 +1,15 @@
 Release History
 ===============
 
+9.6.3
+-----
+*22 February 2025*
+
+* Add support for satwiktionary (:phab:`T386633`)
+* Update wiktionary family file
+* i18n updates.
+
+
 9.6.2
 -----
 *02 February 2025*
@@ -9,6 +18,7 @@ Release History
 * Fix a f-string in :meth:`Claim.fromJSON()<pywikibot.Claim.fromJSON>`
 * i18n updates.
 
+
 9.6.1
 -----
 *13 December 2024*
@@ -16,6 +26,7 @@ Release History
 * Add support for tigwiki (:phab:`T381381`)
 * Fix use of importlib.metadata.entry_points for pywikibot-scripts with Python 3.8 and 3.9 (:phab:`T358635`)
 * i18n updates.
+
 
 9.6.0
 -----

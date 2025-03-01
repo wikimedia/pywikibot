@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test confirming paraminfo contains expected values."""
 #
-# (C) Pywikibot team, 2015-2024
+# (C) Pywikibot team, 2015-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -130,9 +130,6 @@ class MediaWikiKnownTypesTestCase(KnownTypesTestBase,
         if isinstance(self.site, DataSite):
             # It is not clear when this format has been added, see T129281.
             base.append('application/vnd.php.serialized')
-        extensions = {e['name'] for e in self.site.siteinfo['extensions']}
-        if 'CollaborationKit' in extensions:
-            base.append('text/x-collabkit')
 
         for module in ('edit', 'parse'):
             args = self.site, module, 'contentformat', base

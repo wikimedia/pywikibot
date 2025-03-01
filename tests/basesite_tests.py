@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the site module."""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -10,6 +10,7 @@ from __future__ import annotations
 from contextlib import suppress
 
 import pywikibot
+from pywikibot.backports import NoneType
 from pywikibot.exceptions import Error
 from tests.aspects import DefaultSiteTestCase, TestCase, unittest
 
@@ -87,7 +88,7 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertEqual(mysite.code, code)
         self.assertIsInstance(mysite.lang, str)
         self.assertEqual(mysite, pywikibot.Site(self.code, self.family))
-        self.assertIsInstance(mysite.user(), (str, type(None)))
+        self.assertIsInstance(mysite.user(), (str, NoneType))
         self.assertEqual(mysite.sitename, f'{self.family}:{code}')
         self.assertIsInstance(mysite.linktrail(), str)
         self.assertIsInstance(mysite.redirect(), str)
@@ -127,6 +128,20 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertTrue(mysite.sametitle('User:Always', 'User:always'))
         self.assertTrue(mysite.sametitle('MediaWiki:Always',
                                          'MediaWiki:always'))
+
+    def test_site_with_url(self):
+        """Test site constructor with url."""
+        for fam in ('commons', 'meta'):
+            with self.subTest(family=fam):
+                site = pywikibot.Site(url=f'https://{fam}.wikimedia.org')
+                self.assertEqual(site, pywikibot.Site(fam))
+                self.assertEqual(site.family.name, fam)
+                self.assertEqual(site.code, fam)
+
+        site = pywikibot.Site(url='https://fr.wikipedia.org')
+        self.assertEqual(site, pywikibot.Site('wikipedia:fr'))
+        self.assertEqual(site.family.name, 'wikipedia')
+        self.assertEqual(site.code, 'fr')
 
 
 if __name__ == '__main__':

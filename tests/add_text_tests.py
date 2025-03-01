@@ -89,7 +89,7 @@ class TestAddTextScript(TestCase):
     @patch('pywikibot.input')
     @patch('pywikibot.handle_args', Mock(side_effect=lambda args: args))
     def test_argument_prompt(self, input_mock):
-        """Reqest an argument that requres a prompt."""
+        """Request an argument that requires a prompt."""
         input_mock.return_value = 'hello world'
 
         args = parse(['-text'], self.generator_factory)

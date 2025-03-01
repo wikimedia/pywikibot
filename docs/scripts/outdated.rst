@@ -2,7 +2,7 @@
 Outdated compat scripts
 ***********************
 
-This list contains outdated scripts from :term:`compat` banch which
+This list contains outdated scripts from :term:`compat` branch which
 haven't ported to the :term:`core` branch of Pywikibot.
 
 Feel free to reactivate any script at any time by creating a Phabricator

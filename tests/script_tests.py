@@ -22,7 +22,7 @@ from tests.utils import execute_pwb
 ci_test_run = os.environ.get('PYWIKIBOT_TEST_RUNNING', '0') == '1'
 scripts_path = join_root_path('scripts')
 
-# login scritpt should be the first to test
+# login script should be the first to test
 framework_scripts = ['login', 'shell']
 
 # These dependencies are not always the package name which is in setup.py.
@@ -110,7 +110,6 @@ no_args_expected_results = {
     # TODO: until done here, remember to set editor = None in user-config.py
     'change_pagelang': 'No -setlang parameter given',
     'checkimages': 'Execution time: 0 seconds',
-    'dataextend': 'No item page specified',
     'harvest_template': 'ERROR: Please specify',
     # script_input['interwiki'] above lists a title that should not exist
     'interwiki': 'does not exist. Skipping.',
@@ -410,7 +409,6 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
         'clean_sandbox',
         'commonscat',
         'create_isbn_edition',
-        'dataextend',
         'data_ingestion',
         'delinker',
         'djvutext',

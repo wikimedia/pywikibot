@@ -9,7 +9,7 @@
 ==================================================================
 
 .. automodule:: pagegenerators._factory
-   :synopsis: GeneratorFactory module wich handles pagegenerators options
+   :synopsis: GeneratorFactory module which handles pagegenerators options
 
 :mod:`pagegenerators.\_filters` --- Filter Functions
 ====================================================

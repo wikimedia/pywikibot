@@ -214,7 +214,7 @@ class WikiBlameMixin:
             chars = int(row[3].replace(',', '_'))
             percent = float(row[4].rstrip('%'))
 
-            # take into account tht data() is ordered
+            # take into account that data() is ordered
             if n and rank > n or chars < min_chars or percent < min_pct:
                 break
 

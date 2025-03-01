@@ -1,6 +1,6 @@
 """Objects representing MediaWiki families."""
 #
-# (C) Pywikibot team, 2004-2024
+# (C) Pywikibot team, 2004-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -25,7 +25,7 @@ from pywikibot import config
 from pywikibot.backports import DefaultDict, Mapping, Sequence, removesuffix
 from pywikibot.data import wikistats
 from pywikibot.exceptions import FamilyMaintenanceWarning, UnknownFamilyError
-from pywikibot.tools import classproperty, deprecated, remove_last_args
+from pywikibot.tools import classproperty, deprecated
 
 
 logger = logging.getLogger('pywiki.wiki.family')
@@ -290,7 +290,7 @@ class Family:
     **Examples:**
 
     Allowing linking *to* ``pt`` 102 namespace from any other lang 0
-    namepace is:
+    namespace is:
 
     .. code-block:: Python
 
@@ -392,19 +392,6 @@ class Family:
                 )
         Family._families[fam] = cls
         return cls
-
-    @deprecated('APISite.linktrail()', since='7.3.0')
-    @remove_last_args(['fallback'])
-    def linktrail(self, code: str) -> str:
-        """Return regex for trailing chars displayed as part of a link.
-
-        .. note:: Returns a string, not a compiled regular expression
-           object.
-
-        .. deprecated:: 7.3
-        """
-        site = pywikibot.Site(code, 'wikipedia')
-        return site.linktrail()
 
     def category_redirects(self, code, fallback: str = '_default'):
         """Return list of category redirect templates."""
@@ -574,13 +561,14 @@ class Family:
 
     def get_address(self, code, title) -> str:
         """Return the path to title using index.php with redirects disabled."""
-        return f'{self.path(code)}?title={title}&redirect=no'
+        return f'{self.path(code)}?{title=!s}&redirect=no'
 
     def interface(self, code: str) -> str:
         """Return interface to use for code."""
         if code in self.interwiki_removals:
             if code in self.codes:
-                pywikibot.warn(f'Interwiki removal {code} is in {self} codes')
+                warnings.warn(f'Interwiki removal {code} is in {self} codes',
+                              FamilyMaintenanceWarning, stacklevel=2)
             if code in self.closed_wikis:
                 return 'ClosedSite'
             if code in self.removed_wikis:
@@ -591,23 +579,27 @@ class Family:
     def from_url(self, url: str) -> str | None:
         """Return whether this family matches the given url.
 
-        It is first checking if a domain of this family is in the domain of
-        the URL. If that is the case it's checking all codes and verifies that
-        a path generated via
-        :py:obj:`APISite.articlepath<pywikibot.site.APISite.articlepath>` and
-        :py:obj:`Family.path` matches the path of the URL together with
-        the hostname for that code.
+        It is first checking if a domain of this family is in the domain
+        of the URL. If that is the case it's checking all codes and
+        verifies that a path generated via :attr:`APISite.articlepath
+        <pywikibot.site.APISite.articlepath>` and :attr:`Family.path`
+        matches the path of the URL together with the hostname for that
+        code.
 
-        It is using :py:obj:`Family.domains` to first check if a domain
-        applies and then iterates over :py:obj:`Family.codes` to actually
+        It is using :attr:`Family.domains` to first check if a domain
+        applies and then iterates over :attr:`Family.codes` to actually
         determine which code applies.
 
-        :param url: the URL which may contain a ``$1``. If it's missing it is
-            assumed to be at the end.
-        :return: The language code of the url. None if that url is not from
-            this family.
-        :raises RuntimeError: When there are multiple languages in this family
-            which would work with the given URL.
+        .. versionchanged:: 10.0
+           *url* parameter does not have to contain a api/query/script
+           path
+
+        :param url: the URL which may contain a ``$1``. If it's missing
+            it is assumed to be at the end.
+        :return: The language code of the URL. None if that URL is not
+            from his family.
+        :raises RuntimeError: When there are multiple languages in this
+            family which would work with the given URL.
         """
         parsed = urlparse.urlparse(url)
         if parsed.scheme not in {'http', 'https', ''}:
@@ -636,6 +628,9 @@ class Family:
                 # This is only creating a Site instance if domain matches
                 site = pywikibot.Site(code, self.name)
                 pywikibot.log(f'Found candidate {site}')
+
+                if not path:
+                    return site.code
 
                 for iw_url in site._interwiki_urls():
                     iw_url, *_ = iw_url.partition('{}')
@@ -1075,7 +1070,7 @@ class WikibaseFamily(Family):
         return 'DataSite'
 
     def entity_sources(self, code: str) -> dict[str, tuple[str, str]]:
-        """Provide reopsitory site information for entity types.
+        """Provide repository site information for entity types.
 
         The result must be structured as follows:
 
@@ -1098,7 +1093,7 @@ class DefaultWikibaseFamily(WikibaseFamily):
 
     """A base class for a Wikimedia Wikibase Family.
 
-    This class holds defauls for :meth:`calendarmodel`,
+    This class holds defaults for :meth:`calendarmodel`,
     :meth:`default_globe` and :meth:`globes` to prevent code duplication.
 
     .. warning:: Possibly you have to adjust the repository site in

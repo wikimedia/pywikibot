@@ -87,7 +87,7 @@ class SupersetQuery(WaitingMixin):
         url = f'{self.superset_url}/login/mediawiki?next='
         self.last_response = http.fetch(url)
 
-        # Test if uset has been succesfully logged in
+        # Test if uset has been successfully logged in
         url = f'{self.superset_url}/api/v1/me/'
         self.last_response = http.fetch(url)
 

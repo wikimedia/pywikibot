@@ -72,7 +72,7 @@ Explanation
       :class:`pywikibot.Page` object from
       :attr:`generator<bot.BaseBot.generator>`.
 :15:  All bot options which are passed to the bot class when
-      instantiating it are accessable via
+      instantiating it are accessible via
       :class:`opt attribute<bot.OptionHandler>`. ``opt.always``,
       ``opt.text`` and ``opt.summary`` are all available options for this
       bot class.

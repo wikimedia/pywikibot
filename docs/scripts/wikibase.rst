@@ -16,13 +16,6 @@ create\_isbn\_edition script
    :no-members:
    :noindex:
 
-dataextend script
-=================
-
-.. automodule:: scripts.dataextend
-   :no-members:
-   :noindex:
-
 harvest\_template script
 ========================
 

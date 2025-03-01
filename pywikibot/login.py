@@ -112,6 +112,13 @@ class LoginManager:
         if getattr(config, 'password_file', ''):
             self.readPassword()
 
+    def __repr__(self):
+        """Return representation string for LoginManager.
+
+        ..versionadded:: 10.0
+        """
+        return f'{type(self).__name__}(user={self.username!r})'
+
     def check_user_exists(self) -> None:
         """Check that the username exists on the site.
 
@@ -438,10 +445,7 @@ class ClientLoginManager(LoginManager):
                 del login_request['rememberMe']
                 continue
 
-            # messagecode was introduced with 1.29.0-wmf.14
-            # but older wikis are still supported
             login_throttled = response.get('messagecode') == 'login-throttled'
-
             if (status == 'Throttled' or status == self.keyword('fail')
                     and (login_throttled or 'wait' in fail_reason)):
                 wait = response.get('wait')
@@ -529,10 +533,11 @@ class OauthLoginManager(LoginManager):
         assert password is not None and user is not None
         super().__init__(password=None, site=site, user=None)
         if self.password:
-            pywikibot.warn(
+            warn(
                 f'Password exists in password file for {self.site}: '
                 f'{self.username}. Password is unnecessary and should be'
-                ' removed if OAuth enabled.'
+                ' removed if OAuth enabled.',
+                _PasswordFileWarning
             )
         self._consumer_token = (user, password)
         self._access_token: tuple[str, str] | None = None
@@ -584,11 +589,23 @@ class OauthLoginManager(LoginManager):
 
     @property
     def access_token(self) -> tuple[str, str] | None:
-        """Return OAuth access key token and secret token.
+        """OAuth access key token and secret token.
 
         .. seealso:: :api:`Tokens`
+
+        :getter: Return OAuth access key token and secret token.
+        :setter: Add OAuth access key token and secret token.
+            Implemented to discard user interaction token fetching,
+            usually for tests.
+
+            .. versionadded:: 10.0
         """
         return self._access_token
+
+    @access_token.setter
+    def access_token(self, token: tuple[str, str]) -> None:
+        """Add OAuth access key token and secret token."""
+        self._access_token = token
 
     @property
     def identity(self) -> dict[str, Any] | None:

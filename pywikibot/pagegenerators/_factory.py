@@ -1,4 +1,4 @@
-"""GeneratorFactory module wich handles pagegenerators options."""
+"""GeneratorFactory module which handles pagegenerators options."""
 #
 # (C) Pywikibot team, 2008-2024
 #

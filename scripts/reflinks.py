@@ -391,7 +391,7 @@ class DuplicateReferences:
                 elif v[IX.quoted]:
                     name = f'"{name}"'
 
-                named = f'<ref {group}name={name}>{ref}</ref>'
+                named = f'<ref {group}{name=!s}>{ref}</ref>'
                 text = text.replace(v[IX.reflist][0], named, 1)
 
                 # make sure that the first (named ref) is not removed later
@@ -400,7 +400,7 @@ class DuplicateReferences:
                 end = text[pos:]
 
                 # replace multiple identical references with repeated ref
-                repeated_ref = f'<ref {group}name={name} />'
+                repeated_ref = f'<ref {group}{name=!s} />'
                 for ref in v[IX.reflist][1:]:
                     # Don't replace inside templates (T266411)
                     end = replaceExcept(end, re.escape(ref), repeated_ref,
@@ -415,7 +415,7 @@ class DuplicateReferences:
                 name = f'"{name}"'
 
             text = re.sub(rf'<ref name\s*=\s*(?P<quote>["\']?)\s*{ref}\s*'
-                          r'(?P=quote)\s*/>', f'<ref name={name} />', text)
+                          r'(?P=quote)\s*/>', f'<ref {name=!s} />', text)
         return text
 
 

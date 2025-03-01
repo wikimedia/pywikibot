@@ -15,7 +15,6 @@ from decimal import Decimal
 
 import pywikibot
 from pywikibot.page import ItemPage, Page
-from pywikibot.tools import MediaWikiVersion
 from tests.aspects import WikidataTestCase
 
 
@@ -259,7 +258,7 @@ class TestWbTime(WbRepresentationTestCase):
         # some aliases here
         decade = pywikibot.WbTime.PRECISION['decade']
         century = pywikibot.WbTime.PRECISION['century']
-        millenia = pywikibot.WbTime.PRECISION['millenia']
+        millennium = pywikibot.WbTime.PRECISION['millennium']
         t = pywikibot.WbTime(site=repo, year=2010, month=1, day=1, hour=12,
                              minute=43, second=12)
         t2 = pywikibot.WbTime(site=repo, year=2010, month=1, day=1, hour=12,
@@ -288,7 +287,7 @@ class TestWbTime(WbRepresentationTestCase):
                               precision=century)
         t10 = pywikibot.WbTime(site=repo, year=2010, month=1, day=1, hour=12,
                                minute=43, second=12,
-                               precision=millenia)
+                               precision=millennium)
         t11 = pywikibot.WbTime(site=repo, year=2010, month=1, day=1, hour=12,
                                minute=43, second=12, timezone=-300,
                                precision=pywikibot.WbTime.PRECISION['day'])
@@ -325,10 +324,10 @@ class TestWbTime(WbRepresentationTestCase):
                                           precision=century).normalize())
         self.assertEqual(t10.normalize(),
                          pywikibot.WbTime(site=repo, year=3000,
-                                          precision=millenia))
+                                          precision=millennium))
         self.assertEqual(t10.normalize(),
                          pywikibot.WbTime(site=repo, year=2010,
-                                          precision=millenia).normalize())
+                                          precision=millennium).normalize())
         t11_normalized = t11.normalize()
         t12_normalized = t12.normalize()
         self.assertEqual(t11_normalized.timezone, 0)
@@ -695,13 +694,9 @@ class TestWbQuantityNonDry(WbRepresentationTestCase):
         """Override setup to store repo and it's version."""
         super().setUp()
         self.repo = self.get_repo()
-        self.version = self.repo.mw_version
 
     def test_WbQuantity_unbound(self):
         """Test WbQuantity for value without bounds."""
-        if self.version < MediaWikiVersion('1.29.0-wmf.2'):
-            self.skipTest('Wiki version must be 1.29.0-wmf.2 or newer to '
-                          'support unbound uncertainties.')
         q = pywikibot.WbQuantity(amount=1234.5, site=self.repo)
         self.assertEqual(q.toWikibase(),
                          {'amount': '+1234.5', 'unit': '1',
@@ -709,9 +704,6 @@ class TestWbQuantityNonDry(WbRepresentationTestCase):
 
     def test_WbQuantity_formatting_unbound(self):
         """Test WbQuantity formatting without bounds."""
-        if self.version < MediaWikiVersion('1.29.0-wmf.2'):
-            self.skipTest('Wiki version must be 1.29.0-wmf.2 or newer to '
-                          'support unbound uncertainties.')
         q = pywikibot.WbQuantity(amount='0.044405586', site=self.repo)
         self.assertEqual(str(q),
                          '{{\n'
@@ -727,9 +719,6 @@ class TestWbQuantityNonDry(WbRepresentationTestCase):
 
     def test_WbQuantity_fromWikibase_unbound(self):
         """Test WbQuantity.fromWikibase() instantiating without bounds."""
-        if self.version < MediaWikiVersion('1.29.0-wmf.2'):
-            self.skipTest('Wiki version must be 1.29.0-wmf.2 or newer to '
-                          'support unbound uncertainties.')
         q = pywikibot.WbQuantity.fromWikibase({'amount': '+0.0229',
                                                'unit': '1'},
                                               site=self.repo)
@@ -739,10 +728,6 @@ class TestWbQuantityNonDry(WbRepresentationTestCase):
 
     def test_WbQuantity_ItemPage_unit(self):
         """Test WbQuantity with ItemPage unit."""
-        if self.version < MediaWikiVersion('1.28-wmf.23'):
-            self.skipTest('Wiki version must be 1.28-wmf.23 or newer to '
-                          'expose wikibase-conceptbaseuri.')
-
         q = pywikibot.WbQuantity(amount=1234, error=1,
                                  unit=pywikibot.ItemPage(self.repo, 'Q712226'))
         self.assertEqual(q.toWikibase(),
@@ -752,10 +737,6 @@ class TestWbQuantityNonDry(WbRepresentationTestCase):
 
     def test_WbQuantity_equality(self):
         """Test WbQuantity equality with different unit representations."""
-        if self.version < MediaWikiVersion('1.28-wmf.23'):
-            self.skipTest('Wiki version must be 1.28-wmf.23 or newer to '
-                          'expose wikibase-conceptbaseuri.')
-
         a = pywikibot.WbQuantity(
             amount=1234, error=1,
             unit=pywikibot.ItemPage(self.repo, 'Q712226'))
@@ -897,8 +878,8 @@ class TestWbGeoShapeNonDry(WbRepresentationTestCase):
             pywikibot.WbGeoShape('A string', self.get_repo())
 
     def test_WbGeoShape_error_on_non_exitant_page(self):
-        """Test WbGeoShape error handling of a non-existant page."""
-        page = Page(self.commons, 'Non-existant page... really')
+        """Test WbGeoShape error handling of a non-existent page."""
+        page = Page(self.commons, 'Non-existent page... really')
         regex = r'^Page \[\[.+?\]\] must exist\.$'
         with self.assertRaisesRegex(ValueError, regex):
             pywikibot.WbGeoShape(page, self.get_repo())
@@ -972,8 +953,8 @@ class TestWbTabularDataNonDry(WbRepresentationTestCase):
             pywikibot.WbTabularData('A string', self.get_repo())
 
     def test_WbTabularData_error_on_non_exitant_page(self):
-        """Test WbTabularData error handling of a non-existant page."""
-        page = Page(self.commons, 'Non-existant page... really')
+        """Test WbTabularData error handling of a non-existent page."""
+        page = Page(self.commons, 'Non-existent page... really')
         regex = r'^Page \[\[.+?\]\] must exist\.$'
         with self.assertRaisesRegex(ValueError, regex):
             pywikibot.WbTabularData(page, self.get_repo())

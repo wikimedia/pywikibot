@@ -84,7 +84,6 @@ from pywikibot.pagegenerators._generators import (
     WikidataPageFromItemGenerator,
     WikidataSPARQLPageGenerator,
     WithoutInterwikiPageGenerator,
-    XMLDumpOldPageGenerator,
     XMLDumpPageGenerator,
     YearPageGenerator,
     page_with_property_generator,
@@ -156,7 +155,6 @@ __all__ = (
     'WikidataPageFromItemGenerator',
     'WikidataSPARQLPageGenerator',
     'WithoutInterwikiPageGenerator',
-    'XMLDumpOldPageGenerator',
     'XMLDumpPageGenerator',
     'YearPageGenerator',
     # other generators

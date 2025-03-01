@@ -1,6 +1,6 @@
 """Objects representing API interface to MediaWiki site."""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -51,17 +51,15 @@ from pywikibot.exceptions import (
     UnknownExtensionError,
 )
 from pywikibot.site._basesite import BaseSite
-from pywikibot.site._decorators import need_right, need_version
+from pywikibot.site._decorators import need_right
 from pywikibot.site._extensions import (
     EchoMixin,
-    FlowMixin,
     GeoDataMixin,
     GlobalUsageMixin,
     LinterMixin,
     PageImagesMixin,
     ProofreadPageMixin,
     TextExtractsMixin,
-    ThanksFlowMixin,
     ThanksMixin,
     UrlShortenerMixin,
     WikibaseClientMixin,
@@ -104,7 +102,6 @@ class _OnErrorExc(NamedTuple):
 class APISite(
     BaseSite,
     EchoMixin,
-    FlowMixin,
     GeneratorsMixin,
     GeoDataMixin,
     GlobalUsageMixin,
@@ -112,7 +109,6 @@ class APISite(
     PageImagesMixin,
     ProofreadPageMixin,
     TextExtractsMixin,
-    ThanksFlowMixin,
     ThanksMixin,
     UrlShortenerMixin,
     WikibaseClientMixin,
@@ -639,7 +635,7 @@ class APISite(
         >>> 'anon' in site.userinfo
         True
 
-        **Usefull alternatives to userinfo property**
+        **Useful alternatives to userinfo property**
 
         - :meth:`has_group` to verify the group membership
         - :meth:`has_right` to verify that the user has a given right
@@ -823,25 +819,14 @@ class APISite(
                 and self._useroptions[f'searchNs{ns.id}']
                 in ['1', True]}
 
-    @property  # type: ignore[misc]
-    @deprecated('articlepath', since='7.0.0')
-    def article_path(self) -> str:
-        """Get the nice article path without $1.
-
-        .. deprecated:: 7.0
-           Replaced by :py:meth:`articlepath`
-        """
-        return self.articlepath[:-2]
-
     @property
     def articlepath(self) -> str:
-        """Get the nice article path with placeholder.
+        """Get the nice article path with ``{}``placeholder.
 
         .. versionadded:: 7.0
-           Replaces :py:meth:`article_path`
         """
-        # Assert $1 placeholder is present
         path = self.siteinfo['general']['articlepath']
+        # Assert $1 placeholder is present
         assert '$1' in path, 'articlepath must contain "$1" placeholder'
         return path.replace('$1', '{}')
 
@@ -1247,17 +1232,9 @@ class APISite(
             raise
 
         if MediaWikiVersion(version) < '1.31':
-            warn('\n'
-                 + fill(f'Support of MediaWiki {version} will be dropped. '
-                        'It is recommended to use MediaWiki 1.31 or above. '
-                        'You may use every Pywikibot 9.X for older MediaWiki '
-                        'versions. See T378984 for further information.'),
-                 FutureWarning)
-
-        if MediaWikiVersion(version) < '1.27':
             raise RuntimeError(f'Pywikibot "{pywikibot.__version__}" does not '
-                               f'support MediaWiki "{version}".\n'
-                               f'Use Pywikibot prior to "8.0" branch instead.')
+                               f'support MediaWiki "{version}".\nUse '
+                               f'Pywikibot prior to "10.0" branch instead.')
         return version
 
     @property
@@ -1734,7 +1711,7 @@ class APISite(
         'a9f...0a0+\\'
         >>> token = site.get_tokens(['unknown'])  # try an invalid token
         ... # doctest: +SKIP
-        ... # invalid token names shows a warnig and the key is not in result
+        ... # invalid token names shows a warning and the key is not in result
         ...
         WARNING: API warning (tokens) of unknown format:
         ... {'warnings': 'Unrecognized value for parameter "type": foo'}
@@ -2053,7 +2030,7 @@ class APISite(
             page requires solving a captcha
         :raises CascadeLockedPageError: The page is protected with
             protection cascade
-        :raises EditConflictError: an edit confict occurred
+        :raises EditConflictError: an edit conflict occurred
         :raises Error: No text to be saved or API editing not enabled on
             site or user is not authorized to edit, create pages or
             create image redirects on site or bot is not logged in and
@@ -2765,7 +2742,6 @@ class APISite(
         """
         return set(self.siteinfo.get('restrictions')['types'])
 
-    @need_version('1.27.3')
     def protection_levels(self) -> set[str]:
         """Return the protection levels available on this site.
 

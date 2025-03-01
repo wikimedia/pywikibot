@@ -115,7 +115,7 @@ class TestUpload(TestCase):
         self._test_continue_filekey(1024)
 
     @unittest.expectedFailure  # T367321
-    def test_sha1_missmatch(self):
+    def test_sha1_mismatch(self):
         """Test trying to continue with a different file."""
         self._init_upload(1024)
         with self.assertRaises(ValueError) as cm:
@@ -128,7 +128,7 @@ class TestUpload(TestCase):
         self._verify_stash()
 
     @unittest.expectedFailure  # T367316
-    def test_offset_missmatch(self):
+    def test_offset_mismatch(self):
         """Test trying to continue with a different offset."""
         self._init_upload(1024)
         self._offset = 0

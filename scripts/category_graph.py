@@ -170,7 +170,7 @@ class CategoryGraphBot(SingleSiteBot):
             self.dot.add_edge(e)
             # repeat recursively
             self.scan_level(subcat, level - 1, h)
-            # track graph's structure to reduse too big graph
+            # track graph's structure to reduce too big graph
             self.rev[e.get_destination()].append(e.get_source())
             self.fw[e.get_source()].append(e.get_destination())
 

@@ -223,7 +223,7 @@ class APIError(Error):
         self.code = code
         self.info = info
         self.other = kwargs
-        self.unicode = self.__str__()
+        self.unicode = str(self)
 
     def __repr__(self) -> str:
         """Return internal representation."""

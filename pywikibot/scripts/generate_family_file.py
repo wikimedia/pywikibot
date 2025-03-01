@@ -73,9 +73,9 @@ class FamilyFileGenerator:
             only includes site of the same domain (usually for Wikimedia
             sites), `N` or `n` for no and `E` or `e` if you want to edit
             the collection of sites.
-        :param verify: If a certificate verification failes, you may
-            pass `Y` or `y` to disable certificate validaton `N` or `n`
-            to keep it enabled.
+        :param verify: If a certificate verification fails, you may pass
+            `Y` or `y` to disable certificate validaton `N` or `n` to
+            keep it enabled.
         """
         from pywikibot.scripts import _import_with_no_user_config
 

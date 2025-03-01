@@ -153,7 +153,7 @@ are also in 'Pneumatics' category.
    :mod:`pagegenerators` are supported with "move" and "remove" action.
 """
 #
-# (C) Pywikibot team, 2004-2024
+# (C) Pywikibot team, 2004-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -710,7 +710,7 @@ class CategoryMoveRobot(CategoryPreprocess):
             # Category is deleted.
             self.deletion_comment = i18n.twtranslate(
                 self.site, 'category-was-disbanded')
-        self.move_comment = move_comment if move_comment else self.comment
+        self.move_comment = move_comment or self.comment
 
     def run(self) -> None:
         """The main bot function that does all the work.
@@ -1638,12 +1638,24 @@ def main(*args: str) -> None:
                                 deletion_comment=use_deletion_summary,
                                 generator=gen)
     elif action == 'move':
-        if 'from' not in options:
-            options['from'] = pywikibot.input(
-                'Please enter the old name of the category:')
-        if 'to' not in options:
-            options['to'] = pywikibot.input(
-                'Please enter the new name of the category:')
+        while True:
+            if 'from' not in options:
+                options['from'] = pywikibot.input(
+                    'Please enter the old name of the category:')
+                if not options['from']:
+                    return
+
+            if 'to' not in options:
+                options['to'] = pywikibot.input(
+                    'Please enter the new name of the category:')
+
+            if options['from'] != options['to']:
+                break
+
+            pywikibot.error('-from and -to arguments are equal, please retry.')
+            del options['from']
+            del options['to']
+
         if use_deletion_summary:
             deletion_comment = \
                 CategoryMoveRobot.DELETION_COMMENT_SAME_AS_EDIT_COMMENT

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test pagegenerators module."""
 #
-# (C) Pywikibot team, 2009-2024
+# (C) Pywikibot team, 2009-2025
 #
 # Distributed under the terms of the MIT license.
 from __future__ import annotations
@@ -27,7 +27,6 @@ from pywikibot.pagegenerators import (
     PreloadingGenerator,
     WikibaseItemFilterPageGenerator,
 )
-from pywikibot.tools import has_module
 from tests import join_data_path, unittest_print
 from tests.aspects import (
     DefaultSiteTestCase,
@@ -35,6 +34,7 @@ from tests.aspects import (
     RecentChangesTestCase,
     TestCase,
     WikidataTestCase,
+    require_modules,
 )
 from tests.tools_tests import GeneratorIntersectTestCase
 from tests.utils import skipping
@@ -911,7 +911,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gf = pagegenerators.GeneratorFactory()
         gf.handle_arg('-intersect')
 
-        # check wether the generator works for both directions
+        # check whether the generator works for both directions
         patterns = ['Python 3.7-dev', 'Pywikibot 7.0.dev']
         for index in range(2):
             with self.subTest(index=index):
@@ -919,7 +919,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
                 gen = gf.getCombinedGenerator(gen=patterns[index - 1])
                 self.assertEqual(''.join(gen), 'Pyot 7.dev')
 
-        # check wether the generator works for a very long text
+        # check whether the generator works for a very long text
         patterns.append('PWB 7+ unittest developed with a very long text.')
         with self.subTest(patterns=patterns):
             gf.gens = patterns
@@ -1618,7 +1618,7 @@ class PageGeneratorIntersectTestCase(GeneratorIntersectTestCase,
              pagegenerators.NewpagesPageGenerator(site=site, total=10)])
 
     def test_intersect_newpages_and_recentchanges(self):
-        """Test intersection betweem newpages and recentchanges."""
+        """Test intersection between newpages and recentchanges."""
         site = self.get_site()
         self.assertEqualItertools(
             [pagegenerators.NewpagesPageGenerator(site=site, total=50),
@@ -1648,17 +1648,10 @@ class EventStreamsPageGeneratorTestCase(RecentChangesTestCase):
 
     """Test case for Live Recent Changes pagegenerator."""
 
-    @classmethod
-    def setUpClass(cls):
-        """Setup test class."""
-        super().setUpClass()
-        cls.client = 'sseclient'
-        if not has_module(cls.client):
-            raise unittest.SkipTest(f'{cls.client} is not available')
-
+    @require_modules('requests_sse')
     def test_RC_pagegenerator_result(self):
         """Test RC pagegenerator."""
-        lgr = logging.getLogger(self.client)
+        lgr = logging.getLogger('requests_sse.client')
         lgr.setLevel(logging.DEBUG)
         ch = logging.StreamHandler()
         ch.setLevel(logging.DEBUG)

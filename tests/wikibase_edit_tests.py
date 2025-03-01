@@ -2,7 +2,7 @@
 """Tests for editing Wikibase items.
 
 Tests which should fail should instead be in the TestWikibaseSaveTest
-class in edit_failiure_tests.py
+class in edit_failure_tests.py
 """
 #
 # (C) Pywikibot team, 2014-2024
@@ -128,7 +128,7 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         item.editEntity(data)
 
     @unittest.expectedFailure  # T367324
-    def test_edit_entity_propogation(self):
+    def test_edit_entity_propagation(self):
         """Test that ``ItemPage.editEntity`` propagates changes to claims."""
         testsite = self.get_repo()
         item = pywikibot.ItemPage(testsite)
@@ -296,11 +296,6 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         testsite = self.get_repo()
         item = self._clean_item(testsite, 'P20480')
 
-        # Make sure the wiki supports wikibase-conceptbaseuri
-        if testsite.mw_version < '1.29.0-wmf.2':
-            self.skipTest('Wiki version must be 1.29.0-wmf.2 or newer to '
-                          'support unbound uncertainties.')
-
         # set new claim
         claim = pywikibot.page.Claim(testsite, 'P20480',
                                      datatype='globe-coordinate')
@@ -320,11 +315,6 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         testsite = self.get_repo()
         item = self._clean_item(testsite, 'P69')
 
-        # Make sure the wiki supports unbound uncertainties
-        if testsite.mw_version < '1.29.0-wmf.2':
-            self.skipTest('Wiki version must be 1.29.0-wmf.2 or newer to '
-                          'support unbound uncertainties.')
-
         # set new claim
         claim = pywikibot.page.Claim(testsite, 'P69', datatype='quantity')
         target = pywikibot.WbQuantity(amount=1234)
@@ -341,11 +331,6 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         # Clean the slate in preparation for test.
         testsite = self.get_repo()
         item = self._clean_item(testsite, 'P69')
-
-        # Make sure the wiki supports wikibase-conceptbaseuri
-        if testsite.mw_version < '1.28-wmf.23':
-            self.skipTest('Wiki version must be 1.28-wmf.23 or newer to '
-                          'expose wikibase-conceptbaseuri.')
 
         # set new claim
         claim = pywikibot.page.Claim(testsite, 'P69', datatype='quantity')

@@ -18,7 +18,7 @@ from pywikibot.exceptions import (
 from pywikibot.page._links import Link
 from pywikibot.page._page import Page
 from pywikibot.page._revision import Revision
-from pywikibot.tools import deprecated, is_ip_address, is_ip_network
+from pywikibot.tools import is_ip_address, is_ip_network
 
 
 __all__ = ('User', )
@@ -133,17 +133,6 @@ class User(Page):
         :param force: if True, forces reloading the data from API
         """
         return 'blockedby' in self.getprops(force)
-
-    @deprecated('is_blocked', since='7.0.0')
-    def isBlocked(self, force: bool = False) -> bool:  # noqa: N802
-        """Determine whether the user is currently blocked.
-
-        .. deprecated:: 7.0
-           use :meth:`is_blocked` instead
-
-        :param force: if True, forces reloading the data from API
-        """
-        return self.is_blocked(force)
 
     def is_locked(self, force: bool = False) -> bool:
         """Determine whether the user is currently locked globally.

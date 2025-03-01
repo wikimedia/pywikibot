@@ -15,15 +15,9 @@ import re
 import time as _time
 import types
 from contextlib import suppress
-from typing import overload
 
 import pywikibot
-from pywikibot.tools import (
-    PYTHON_VERSION,
-    SPHINX_RUNNING,
-    classproperty,
-    deprecated,
-)
+from pywikibot.tools import PYTHON_VERSION, classproperty, deprecated
 
 
 __all__ = (
@@ -176,7 +170,7 @@ class Timestamp(datetime.datetime):
         ts = cls.strptime(strpstr, strpfmt)
         if ts.tzinfo is not None:
             ts = ts.astimezone(datetime.timezone.utc).replace(tzinfo=None)
-            # why pytest in py35/py37 fails without this?
+            # TODO: why pytest in py37 fails without this?
             ts = cls._from_datetime(ts)
 
         return ts
@@ -435,69 +429,6 @@ class Timestamp(datetime.datetime):
         if PYTHON_VERSION < (3, 12):
             return super().utcnow()
         return cls.nowutc(with_tz=False)
-
-    if PYTHON_VERSION < (3, 8) or SPHINX_RUNNING:
-        # methods which does not upcast the right class but return a
-        # datetime.datetime object in Python 3.7
-
-        def __add__(self, other: datetime.timedelta) -> Timestamp:
-            """Perform addition, returning a Timestamp instead of datetime."""
-            newdt = super().__add__(other)
-            if isinstance(newdt, datetime.datetime):
-                return self._from_datetime(newdt)
-            return newdt
-
-        @overload  # type: ignore[override]
-        def __sub__(self, other: datetime.timedelta) -> Timestamp:
-            ...
-
-        @overload
-        def __sub__(self, other: datetime.datetime) -> datetime.timedelta:
-            ...
-
-        def __sub__(
-            self,
-            other: datetime.datetime | datetime.timedelta,
-        ) -> datetime.timedelta | Timestamp:
-            """Perform subtraction, returning Timestamp instead of datetime."""
-            newdt = super().__sub__(other)  # type: ignore[operator]
-            if isinstance(newdt, datetime.datetime):
-                return self._from_datetime(newdt)
-            return newdt
-
-        @classmethod
-        def fromtimestamp(cls, timestamp: int | float, tz=None) -> Timestamp:
-            """Return the local date and time corresponding to the POSIX ts.
-
-            This class method is for Python 3.7 to upcast the class if a
-            tz is given.
-
-            .. versionadded:: 9.0
-            .. seealso::
-               - :python:`datetime.fromtimestamp()
-                 <library/datetime.html#datetime.datetime.fromtimestamp>`
-            """
-            ts = super().fromtimestamp(timestamp, tz)
-            if tz:
-                ts = cls.set_timestamp(ts)
-            return ts
-
-        @classmethod
-        def now(cls, tz=None) -> Timestamp:
-            """Return the current local date and time.
-
-            This class method is for Python 3.7 to upcast the class if a
-            *tz* is given.
-
-            .. versionadded:: 9.0
-            .. seealso::
-               - :python:`datetime.now()
-                 <library/datetime.html#datetime.datetime.now>`
-            """
-            ts = super().now(tz)
-            if tz:
-                ts = cls.set_timestamp(ts)
-            return ts
 
 
 class TZoneFixedOffset(datetime.tzinfo):

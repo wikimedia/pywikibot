@@ -197,7 +197,7 @@ references using template ``Cite_Q``.
       missing are e.g.: place of publication, number of pages
     * Some digital libraries have more registrations than others.
     * Some digital libraries have data quality problems.
-    * Not all ISBN atttributes have data values (authors, publisher,
+    * Not all ISBN attributes have data values (authors, publisher,
       date of publication), language can be missing at the digital
       library.
     * How to add still more digital libraries?
@@ -221,7 +221,7 @@ references using template ``Cite_Q``.
                have P243)
         P8383: Goodreads identification code for work 13957943; should
                only have P2969)
-    * ERROR: an HTTP error has ocurred e.g. (503) Service Unavailable
+    * ERROR: an HTTP error has occurred e.g. (503) Service Unavailable
     * error: externally-managed-environment
 
       ``isbnlib-kb`` cannot be installed via :code:`pip install` command.
@@ -976,7 +976,7 @@ def add_claims(isbn_data: dict[str, Any]) -> int:  # noqa: C901
     qnumber_list = get_item_with_prop_value(ISBNPROP, isbn_fmtd)
     qnumber_list.update(get_item_with_prop_value(ISBNPROP, isbn_number))
 
-    # Get addional data from the digital library
+    # Get additional data from the digital library
     # This could fail with
     # ISBNLibHTTPError('403 Are you making many requests?')
     # Handle ISBN classification
@@ -1511,7 +1511,7 @@ def main(*args: str) -> None:
             Add source reference when creating the item:
                 (digital library instance, retrieval date)
             Create or amend items or claims:
-                Number the authors in order of appearence
+                Number the authors in order of appearance
                 Check data consistency
                 Correct data quality problems:
                     OCLC Work ID for Written work

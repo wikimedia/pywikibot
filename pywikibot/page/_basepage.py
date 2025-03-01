@@ -1,6 +1,6 @@
 """Objects representing a base object for a MediaWiki page."""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -18,7 +18,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import Timestamp, config, date, i18n, textlib, tools
-from pywikibot.backports import Generator, Iterable
+from pywikibot.backports import Generator, Iterable, NoneType
 from pywikibot.cosmetic_changes import CANCEL, CosmeticChangesToolkit
 from pywikibot.exceptions import (
     Error,
@@ -42,8 +42,6 @@ from pywikibot.tools import (
     deprecated,
     deprecated_args,
     first_upper,
-    issue_deprecation_warning,
-    remove_last_args,
 )
 
 
@@ -66,15 +64,16 @@ class BasePage(ComparableMixin):
     reading from or writing to the wiki. All other methods are delegated
     to the Site object.
 
-    Will be subclassed by Page, WikibasePage, and FlowPage.
+    Will be subclassed by :class:`pywikibot.Page` and
+    :class:`pywikibot.page.WikibasePage`.
     """
 
     _cache_attrs = (
-        '_text', '_pageid', '_catinfo', '_templates', '_protection',
-        '_contentmodel', '_langlinks', '_isredir', '_coords',
-        '_preloadedtext', '_timestamp', '_applicable_protections',
-        '_flowinfo', '_quality', '_pageprops', '_revid', '_quality_text',
-        '_pageimage', '_item', '_lintinfo', '_imageforpage',
+        '_applicable_protections', '_catinfo', '_contentmodel', '_coords',
+        '_imageforpage', '_isredir', '_item', '_langlinks', '_lintinfo',
+        '_pageid', '_pageimage', '_pageprops', '_preloadedtext', '_protection',
+        '_quality', '_quality_text', '_revid', '_templates', '_text',
+        '_timestamp',
     )
 
     def __init__(self, source, title: str = '', ns=0) -> None:
@@ -456,10 +455,11 @@ class BasePage(ComparableMixin):
             self.site.loadrevisions(self, content=content, revids=oldid)
         return self._revisions[oldid]
 
-    @remove_last_args(['get_redirect'])
     def getOldVersion(self, oldid, force: bool = False) -> str:
         """Return text of an old revision of this page.
 
+        .. versionchanged:: 10.0
+           The unused parameter *get_redirect* was removed.
         .. seealso:: :meth:`get_revision`
 
         :param oldid: The revid of the revision desired.
@@ -549,7 +549,7 @@ class BasePage(ComparableMixin):
     def text(self) -> str:
         """Return the current (edited) wikitext, loading it if necessary.
 
-        This property should be prefered over :meth:`get`. If the page
+        This property should be preferred over :meth:`get`. If the page
         does not exist, an empty string will be returned. For a redirect
         it returns the redirect page content and does not raise an
         :exc:`exceptions.IsRedirectPageError` exception.
@@ -1293,6 +1293,8 @@ class BasePage(ComparableMixin):
            edits cannot be marked as bot edits if the bot account has no
            ``bot`` right. Therefore a ``None`` argument for *bot*
            parameter was dropped.
+        .. versionchanged:: 10.0
+           boolean *watch* parameter is desupported
 
         .. hint:: Setting up :manpage:`OAuth` or :manpage:`BotPassword
            <BotPasswords>` login, you have to grant
@@ -1333,21 +1335,22 @@ class BasePage(ComparableMixin):
         :param quiet: enable/disable successful save operation message;
             defaults to False. In asynchronous mode, if True, it is up
             to the calling bot to manage the output e.g. via callback.
+        :raises TypeError: watch parameter must be a string literal or
+            None
+        :raises OtherPageSaveError: Editing restricted by a template.
         """
         if not summary:
             summary = config.default_edit_summary
 
-        if isinstance(watch, bool):  # pragma: no cover
-            issue_deprecation_warning(
-                'boolean watch parameter',
-                '"watch", "unwatch", "preferences" or "nochange" value',
-                since='7.0.0')
-            watch = ('unwatch', 'watch')[watch]
-
+        if not isinstance(watch, (str, NoneType)):
+            raise TypeError(
+                f'watch parameter must be a string literal, not {watch}')
         if not force and not self.botMayEdit():
             raise OtherPageSaveError(
                 self, 'Editing restricted by {{bots}}, {{nobots}} '
-                "or site's equivalent of {{in use}} template")
+                "or site's equivalent of {{in use}} template"
+            )
+
         self._save(summary=summary, watch=watch, minor=minor, bot=bot,
                    asynchronous=asynchronous, callback=callback,
                    cc=apply_cosmetic_changes, quiet=quiet, **kwargs)
@@ -1510,7 +1513,8 @@ class BasePage(ComparableMixin):
                   apply_cosmetic_changes=False, nocreate=True, **kwargs)
 
     def linkedPages(
-        self, *args, **kwargs
+        self,
+        **kwargs
     ) -> Generator[pywikibot.page.BasePage, None, None]:
         """Iterate Pages that this Page links to.
 
@@ -1522,36 +1526,27 @@ class BasePage(ComparableMixin):
         :py:mod:`APISite.pagelinks<pywikibot.site.APISite.pagelinks>`
 
         .. versionadded:: 7.0
-           the `follow_redirects` keyword argument
-        .. deprecated:: 7.0
-           the positional arguments
+           the `follow_redirects` keyword argument.
+        .. versionremoved:: 10.0
+           the positional arguments.
 
-        .. seealso:: :api:`Links`
+        .. seealso::
+           - :meth:`Site.pagelinks
+             <pywikibot.site._generators.GeneratorsMixin.pagelinks>`
+           - :api:`Links`
 
         :keyword namespaces: Only iterate pages in these namespaces
             (default: all)
         :type namespaces: iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
-        :keyword follow_redirects: if True, yields the target of any redirects,
-            rather than the redirect page
-        :keyword total: iterate no more than this number of pages in total
-        :keyword content: if True, load the current content of each page
+        :keyword bool follow_redirects: if True, yields the target of
+            any redirects, rather than the redirect page
+        :keyword int total: iterate no more than this number of pages in
+            total
+        :keyword bool content: if True, load the current content of each
+            page
         """
-        # Deprecate positional arguments and synchronize with Site.pagelinks
-        keys = ('namespaces', 'total', 'content')
-        for i, arg in enumerate(args):  # pragma: no cover
-            key = keys[i]
-            issue_deprecation_warning(
-                f'Positional argument {i + 1} ({arg})',
-                f'keyword argument "{key}={arg}"',
-                since='7.0.0')
-            if key in kwargs:
-                pywikibot.warning(f'{key!r} is given as keyword argument '
-                                  f'{arg!r} already; ignoring {kwargs[key]!r}')
-            else:
-                kwargs[key] = arg
-
         return self.site.pagelinks(self, **kwargs)
 
     def interwiki(
@@ -2301,7 +2296,13 @@ class BasePage(ComparableMixin):
         return False
 
     def is_flow_page(self) -> bool:
-        """Whether a page is a Flow page."""
+        """Whether a page is a Flow page.
+
+        .. attention::
+           Structured Discussion/Flow support was deprecated in 9.4 and
+           removed in Pywikibot 10. This method is kept to detect
+           unsupported content.
+        """
         return self.content_model == 'flow-board'
 
     def create_short_link(self,

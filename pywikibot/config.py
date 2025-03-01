@@ -102,21 +102,14 @@ class _ConfigurationDeprecationWarning(UserWarning):
 # exported to other modules.
 
 _private_values = {'authenticate', 'db_password'}
+# _deprecated_variables contains deprecated config variables which are
+# no longer used. The values of this dict is the Pywikibot version of
+# the deprecation but unused.
 _deprecated_variables = {
-    'available_ssl_project', 'copyright_check_in_source_google',
-    'copyright_check_in_source_msn', 'copyright_check_in_source_section_names',
-    'copyright_check_in_source_yahoo', 'copyright_connection_tries',
-    'copyright_economize_query', 'copyright_exceeded_in_queries',
-    'copyright_exceeded_in_queries_sleep_hours', 'copyright_google',
-    'copyright_max_query_for_page', 'copyright_msn', 'copyright_show_date',
-    'copyright_show_length', 'copyright_skip_query', 'copyright_yahoo',
-    'db_hostname', 'deIndentTables', 'fake_user_agent', 'flickr',
-    'interwiki_contents_on_disk', 'line_separator', 'LS', 'msn_appid',
-    'panoramio', 'persistent_http', 'proxy', 'special_page_limit',
-    'splitLongParagraphs', 'sysopnames', 'use_mwparserfromhell',
-    'use_SSL_onlogin', 'use_SSL_always', 'yahoo_appid',
+    'absolute_import': '10.0.0 ',
+    'division': '10.0.0',
+    'unicode_literals': '10.0.0',
 }
-_future_variables = {'absolute_import', 'division', 'unicode_literals'}
 
 # ############# ACCOUNT SETTINGS ##############
 
@@ -538,7 +531,7 @@ transliterate = True
 # scripts are displayed or if only one is found, it will be started.
 # There are some configuration values to change the behavior
 #
-# pwb_close_matches: the maximum number of simular scripts to be found
+# pwb_close_matches: the maximum number of similar scripts to be found
 pwb_close_matches = 10  # must be greater than 0
 # pwb_cut_off: similarity of scripts to be found
 pwb_cut_off = 0.7  # must be a float in the range [0, 1]
@@ -998,7 +991,7 @@ def _assert_types(
 
 
 DEPRECATED_VARIABLE = (
-    f'"{{}}" present in our {user_config_file} is no longer a supported'
+    f'"{{}}" present in your {user_config_file} is no longer a supported'
     ' configuration variable and should be removed. Please inform the'
     ' maintainers if you depend on it.'
 )
@@ -1026,7 +1019,7 @@ def _check_user_config_types(
             if name in _deprecated_variables:
                 warn('\n' + fill(DEPRECATED_VARIABLE.format(name)),
                      _ConfigurationDeprecationWarning)
-            elif name not in _future_variables:
+            else:
                 warn('\n' + fill(f'Configuration variable "{name}" is defined '
                                  f'in your {user_config_file} but unknown. It'
                                  ' can be a misspelled one or a variable that'

@@ -17,7 +17,7 @@ maintainers = [
     {name = "The Pywikibot team", email = "pywikibot@lists.wikimedia.org"},
 ]
 description = "Python MediaWiki Bot Framework"
-requires-python = ">=3.7.0"
+requires-python = ">=3.8.0"
 keywords = [
     "API", "bot", "client", "framework", "mediawiki", "pwb", "pybot", "python",
     "pywiki", "pywikibase", "pywikibot", "pywikipedia", "pywikipediabot",
@@ -92,14 +92,6 @@ classifiers=[
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3.14",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
     "Topic :: Internet :: WWW/HTTP :: Dynamic Content :: Wiki",
@@ -152,6 +144,11 @@ exclude_lines = [
     "@unittest\\.skip",
 ]
 
+exclude_also = [
+    # Comments to turn coverage on and off:
+    "no cover: start(?s:.)*?no cover: stop",
+]
+
 
 [tool.docsig]
 disable = [
@@ -171,7 +168,7 @@ disable = [
 
 
 [tool.isort]
-py_version = 37
+py_version = 38
 add_imports = ["from __future__ import annotations"]
 atomic = true
 ensure_newline_before_comments = true
@@ -183,7 +180,7 @@ use_parentheses = true
 
 
 [tool.mypy]
-python_version = 3.7
+python_version = 3.8
 enable_error_code = [
     "ignore-without-code",
 ]
@@ -197,7 +194,7 @@ ignore_roles = ["api", "phab", "pylib", "source", "wiki"]
 
 
 [tool.ruff.lint]
-select = ["D"]
+select = ["C4", "D", "RSE"]
 ignore = ["D105", "D211", "D213", "D214", "D401", "D404", "D406", "D407", "D412", "D413", "D416", "D417"]
 
 [tool.ruff.lint.per-file-ignores]

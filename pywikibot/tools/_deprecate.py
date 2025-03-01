@@ -445,7 +445,7 @@ def deprecated_args(**arg_pairs: str | None):
 def deprecate_positionals(since: str = ''):
     """Decorator for methods that issues warnings for positional arguments.
 
-    This decorator allowes positional arguments after keyword-only
+    This decorator allows positional arguments after keyword-only
     argument syntax (:pep:`3102`) but throws a FutureWarning. The
     decorator makes the needed argument updates before passing them to
     the called function or method. This decorator may be used for a
@@ -476,14 +476,14 @@ def deprecate_positionals(since: str = ''):
     def decorator(func):
         """Outer wrapper. Inspect the parameters of *func*.
 
-        :param func: function or method beeing wrapped.
+        :param func: function or method being wrapped.
         """
 
         @wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
             """Throws the warning and makes the argument fixing.
 
-            :param args: args passed to the decorated functoin or method
+            :param args: args passed to the decorated function or method
             :param kwargs: kwargs passed to the decorated function or
                 method
             :return: the value returned by the decorated function or

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for generators of the site module."""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -28,7 +28,6 @@ from tests.utils import skipping
 
 global_expected_params = {
     'action': ['query'],
-    'continue': [True],
     'iilimit': ['max'],
     'iiprop': list(pywikibot.site._IIPROP),
     'indexpageids': [True],
@@ -1046,12 +1045,9 @@ class TestRecentChanges(DefaultSiteTestCase):
         for change in mysite.recentchanges(redirect=False, total=5):
             self.assertIsInstance(change, dict)
             self.assertNotIn('redirect', change)
-
-        # Subtest timeouts on Wikidata due to upstream issue, see T245989
-        if mysite.sitename != 'wikidata:wikidata':
-            for change in mysite.recentchanges(redirect=True, total=5):
-                self.assertIsInstance(change, dict)
-                self.assertIn('redirect', change)
+        for change in mysite.recentchanges(redirect=True, total=5):
+            self.assertIsInstance(change, dict)
+            self.assertIn('redirect', change)
 
     def test_tag_filter(self):
         """Test the site.recentchanges() with tag filter."""
@@ -1141,7 +1137,8 @@ class SearchTestCase(DefaultSiteTestCase):
                 self.skipTest(
                     f'gsrsearch returned timeout on site {mysite}:\n{e!r}')
             if e.code == 'gsrsearch-text-disabled':
-                self.skipTest(f'gsrsearch is diabled on site {mysite}:\n{e!r}')
+                self.skipTest(
+                    'gsrsearch is disabled on site {mysite}:\n{e!r}')
             raise
 
     def test_search_where_title(self):

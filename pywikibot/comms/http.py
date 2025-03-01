@@ -400,7 +400,7 @@ def fetch(uri: str, method: str = 'GET', headers: dict | None = None,
         if use_fake_user_agent and isinstance(use_fake_user_agent, str):
             return use_fake_user_agent  # Custom UA.
         raise ValueError('Invalid parameter: '
-                         f'use_fake_user_agent={use_fake_user_agent}')
+                         f'{use_fake_user_agent=!s}')
 
     def assign_user_agent(user_agent_format_string):
         if not user_agent_format_string or '{' in user_agent_format_string:

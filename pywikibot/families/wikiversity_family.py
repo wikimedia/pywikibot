@@ -1,6 +1,6 @@
 """Family module for Wikiversity."""
 #
-# (C) Pywikibot team, 2007-2024
+# (C) Pywikibot team, 2007-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -40,5 +40,5 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # https://meta.wikimedia.org/wiki/BPI#Current_implementation
     # & https://meta.wikimedia.org/wiki/Special:WikiSets/2
     cross_allowed = [
-        'ar', 'hi', 'ja', 'ko', 'zh',
+        'ar', 'el', 'es', 'fi', 'hi', 'it', 'ja', 'ko', 'pt', 'ru', 'sl', 'zh',
     ]

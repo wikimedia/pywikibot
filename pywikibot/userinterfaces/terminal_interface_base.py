@@ -1,6 +1,6 @@
 """Base for terminal user interfaces."""
 #
-# (C) Pywikibot team, 2003-2024
+# (C) Pywikibot team, 2003-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -15,7 +15,7 @@ from typing import Any
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Iterable, Sequence, removeprefix
+from pywikibot.backports import Iterable, Sequence, batched, removeprefix
 from pywikibot.bot_choice import (
     ChoiceException,
     Option,
@@ -24,7 +24,6 @@ from pywikibot.bot_choice import (
     StandardOption,
 )
 from pywikibot.logging import INFO, INPUT, STDOUT, VERBOSE, WARNING
-from pywikibot.tools import issue_deprecation_warning
 from pywikibot.tools.threading import RLock
 from pywikibot.userinterfaces import transliteration
 from pywikibot.userinterfaces._interface_base import ABUIC
@@ -53,9 +52,8 @@ colors = [
     'white',
 ]
 
-_color_pat = '((:?{0});?(:?{0})?)'.format('|'.join([*colors, 'previous']))
-old_colorTagR = re.compile(f'\03{{{_color_pat}}}')
-new_colorTagR = re.compile(f'<<{_color_pat}>>')
+colorTagR = re.compile(
+    '<<((?:{0})(?:;(?:{0}))?)>>'.format('|'.join([*colors, 'previous'])))
 
 
 class UI(ABUIC):
@@ -195,26 +193,18 @@ class UI(ABUIC):
         # Color tags might be cascaded, e.g. because of transliteration.
         # Therefore we need this stack.
         color_stack = ['default']
-        old_parts = old_colorTagR.split(text)
-        new_parts = new_colorTagR.split(text)
-        if min(len(old_parts), len(new_parts)) > 1:
-            raise ValueError('Old color format must not be mixed with new '
-                             'color format. Found:\n'
-                             + text.replace('\03', '\\03'))
-        if len(old_parts) > 1:
-            issue_deprecation_warning(
-                'old color format variant like \03{color}',
-                'new color format like <<color>>',
-                since='7.3.0')
-            text_parts = old_parts
-        else:
-            text_parts = new_parts
+        text_parts = colorTagR.split(text)
+
+        # Add default before the last linefeed
+        if text.endswith('\n'):
+            text_parts[-1] = re.sub(r'\r?\n\Z', '', text_parts[-1])
+            text_parts.extend(('default', '\n'))
+
         text_parts.append('default')
-        # match.split() includes every regex group; for each matched color
-        # fg_col:b_col, fg_col and bg_col are added to the resulting list.
-        len_text_parts = len(text_parts[::4])
-        for index, (txt, next_color) in enumerate(zip(text_parts[::4],
-                                                      text_parts[1::4])):
+
+        len_text_parts = len(text_parts) // 2
+        for index, (txt, next_color) in enumerate(batched(text_parts, 2,
+                                                          strict=True)):
             current_color = color_stack[-1]
             if next_color == 'previous':
                 if len(color_stack) > 1:  # keep the last element in the stack
@@ -225,6 +215,7 @@ class UI(ABUIC):
 
             if current_color != next_color:
                 colored_line = True
+
             if colored_line and not colorized:
                 if '\n' in txt:  # Normal end of line
                     txt = txt.replace('\n', ' ***\n', 1)
@@ -522,7 +513,7 @@ class UI(ABUIC):
         """Ask the user to select one entry from a list of entries.
 
         :param question: The question, without trailing whitespace.
-        :param answers: A sequence of options to be choosen.
+        :param answers: A sequence of options to be chosen.
         :param default: The default answer if no was entered. None to require
             an answer.
         :param force: Automatically use the default.

@@ -1,6 +1,6 @@
 """Objects representing API generators to MediaWiki site."""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -8,9 +8,10 @@ from __future__ import annotations
 
 import heapq
 import itertools
+import typing
 from contextlib import suppress
 from itertools import zip_longest
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import pywikibot
 from pywikibot.backports import Callable, Generator, Iterable, batched
@@ -25,15 +26,11 @@ from pywikibot.exceptions import (
 )
 from pywikibot.site._decorators import need_right
 from pywikibot.site._namespace import NamespaceArgType
-from pywikibot.tools import (
-    deprecate_arg,
-    is_ip_address,
-    issue_deprecation_warning,
-)
+from pywikibot.tools import deprecate_arg, is_ip_address
 from pywikibot.tools.itertools import filter_unique
 
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from data.api import ParamInfo, Request
 
     from pywikibot.site._apisite import _RequestWrapperT
@@ -46,7 +43,7 @@ class GeneratorsMixin:
 
     """API generators mixin to MediaWiki site."""
 
-    if TYPE_CHECKING:
+    if typing.TYPE_CHECKING:
         _generator: Callable[..., _RequestWrapperT]
         _paraminfo: ParamInfo
         _request: Callable[..., Request]
@@ -201,7 +198,7 @@ class GeneratorsMixin:
             for pagedata in rvgen:
                 pywikibot.debug(f'Preloading {pagedata}')
                 try:
-                    if pagedata['title'] not in cache:
+                    if (pd_title := pagedata['title']) not in cache:
                         # API always returns a "normalized" title which is
                         # usually the same as the canonical form returned by
                         # page.title(), but sometimes not (e.g.,
@@ -210,19 +207,18 @@ class GeneratorsMixin:
                         # the response that corresponds to the canonical form
                         # used in the query.
                         for key, value in cache.items():
-                            if self.sametitle(key, pagedata['title']):
-                                cache[pagedata['title']] = value
+                            if self.sametitle(key, pd_title):
+                                cache[pd_title] = value
                                 break
                         else:
-                            pywikibot.warning(
-                                'preloadpages: Query returned unexpected '
-                                "title '{}'".format(pagedata['title']))
+                            pywikibot.warning('preloadpages: Query returned '
+                                              f'unexpected title {pd_title!r}')
                             continue
 
                 except KeyError:
-                    pywikibot.debug(f"No 'title' in {pagedata}")
-                    pywikibot.debug(f'pageids={pageids}')
-                    pywikibot.debug(f'titles={list(cache.keys())}')
+                    pywikibot.debug(f"No 'title' in {pagedata}\n"
+                                    f'{pageids=!s}\n'
+                                    f'titles={list(cache.keys())}')
                     continue
 
                 priority, page = cache[pagedata['title']]
@@ -950,40 +946,32 @@ class GeneratorsMixin:
 
         :param start: Start at this title (page need not exist).
         :param prefix: Only yield pages starting with this string.
-        :param namespace: Iterate pages from this (single) namespace
-        :param filterredir: if True, only yield redirects; if False (and not
-            None), only yield non-redirects (default: yield both)
-        :param filterlanglinks: if True, only yield pages with language links;
-            if False (and not None), only yield pages without language links
-            (default: yield both)
+        :param namespace: Iterate pages from this (single) namespace.
+        :param filterredir: if True, only yield redirects; if False (and
+            not None), only yield non-redirects (default: yield both).
+        :param filterlanglinks: if True, only yield pages with language
+            links; if False (and not None), only yield pages without
+            language links (default: yield both).
         :param minsize: if present, only yield pages at least this many
-            bytes in size
-        :param maxsize: if present, only yield pages at most this many bytes
-            in size
-        :param protect_type: only yield pages that have a protection of the
-            specified type
-        :param protect_level: only yield pages that have protection at this
-            level; can only be used if protect_type is specified
-        :param reverse: if True, iterate in reverse Unicode lexigraphic
-            order (default: iterate in forward order)
-        :param content: if True, load the current content of each iterated page
-            (default False)
+            bytes in size.
+        :param maxsize: if present, only yield pages at most this many
+            bytes in size.
+        :param protect_type: only yield pages that have a protection of
+            the specified type.
+        :param protect_level: only yield pages that have protection at
+            this level; can only be used if protect_type is specified.
+        :param reverse: if True, iterate in reverse Unicode lexicographic
+            order (default: iterate in forward order).
+        :param content: if True, load the current content of each
+            iterated page (default False).
         :raises KeyError: the namespace identifier was not resolved
         :raises TypeError: the namespace identifier has an inappropriate
-            type such as bool, or an iterable with more than one namespace
+            type such as bool, or an iterable with more than one
+            namespace or *filterredir* parameter has an invalid type.
         """
-        # backward compatibility test
         if filterredir not in (True, False, None):
-            old = filterredir
-            if not filterredir:
-                filterredir = False
-            elif filterredir == 'only':
-                filterredir = True
-            else:
-                filterredir = None
-            issue_deprecation_warning(
-                f'The value "{old}" for "filterredir"',
-                f'"{filterredir}"', since='7.0.0')
+            raise TypeError('filterredir parameter must be True, False or '
+                            f'None, not {type(filterredir)}')
 
         apgen = self._generator(api.PageGenerator, type_arg='allpages',
                                 namespaces=namespace,
@@ -1115,7 +1103,7 @@ class GeneratorsMixin:
 
         :param start: Start at this category title (category need not exist).
         :param prefix: Only yield categories starting with this string.
-        :param reverse: if True, iterate in reverse Unicode lexigraphic
+        :param reverse: if True, iterate in reverse Unicode lexicographic
             order (default: iterate in forward order)
         :param content: if True, load the current content of each iterated page
             (default False); note that this means the contents of the category
@@ -1203,7 +1191,7 @@ class GeneratorsMixin:
         :param prefix: only iterate titles starting with this substring
         :param minsize: only iterate images of at least this many bytes
         :param maxsize: only iterate images of no more than this many bytes
-        :param reverse: if True, iterate in reverse lexigraphic order
+        :param reverse: if True, iterate in reverse lexicographic order
         :param sha1: only iterate image (it is theoretically possible there
             could be more than one) with this sha1 hash
         :param sha1base36: same as sha1 but in base 36
@@ -1238,13 +1226,13 @@ class GeneratorsMixin:
     ) -> Iterable[dict[str, Any]]:
         """Iterate archived files.
 
-        Yields dict of file archive informations.
+        Yields dict of file archive information.
 
         .. seealso:: :api:`filearchive`
 
         :param start: start at this title (name need not exist)
         :param end: end at this title (name need not exist)
-        :param reverse: if True, iterate in reverse lexigraphic order
+        :param reverse: if True, iterate in reverse lexicographic order
         :param total: maximum number of pages to retrieve in total
         :keyword prefix: only iterate titles starting with this substring
         :keyword sha1: only iterate image with this sha1 hash
@@ -1559,14 +1547,20 @@ class GeneratorsMixin:
         searchstring: str,
         *,
         namespaces: NamespaceArgType = None,
-        where: str | None = None,
+        where: typing.Literal['text', 'title', 'nearmatch'] | None = None,
         total: int | None = None,
         content: bool = False,
+        sort: typing.Literal[
+            'create_timestamp_asc', 'create_timestamp_desc',
+            'incoming_links_asc', 'incoming_links_desc', 'just_match',
+            'last_edit_asc', 'last_edit_desc', 'none', 'random', 'relevance',
+            'user_random'
+        ] | None = 'relevance',
     ) -> Iterable[pywikibot.Page]:
         """Iterate Pages that contain the searchstring.
 
-        Note that this may include non-existing Pages if the wiki's database
-        table contains outdated entries.
+        Note that this may include non-existing Pages if the wiki's
+        database table contains outdated entries.
 
         .. versionchanged:: 7.0
            Default of `where` parameter has been changed from 'text' to
@@ -1574,15 +1568,21 @@ class GeneratorsMixin:
            which is 'text' on CirrusSearch'.
            raises APIError instead of Error if searchstring is not set
            or what parameter is wrong.
+        .. versionchanged:: 10.0
+           The *sort* parameter was added.
 
         .. seealso:: :api:`Search`
 
         :param searchstring: the text to search for
-        :param where: Where to search; value must be "text", "title",
-            "nearmatch" or None (many wikis do not support all search types)
-        :param namespaces: search only in these namespaces (defaults to all)
-        :param content: if True, load the current content of each iterated page
-            (default False)
+        :param namespaces: search only in these namespaces (defaults to
+            all)
+        :param where: Where to search; value must be one of the given
+            literals or None (many wikis do not support all search types)
+        :param total: limit result to this number of pages
+        :param content: if True, load the current content of each
+            iterated page (default False)
+        :param sort: Set the sort order of returned results. If None is
+            given, 'none' is used. Default is sort by relevance.
         :raises KeyError: a namespace identifier was not resolved
         :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
@@ -1593,10 +1593,18 @@ class GeneratorsMixin:
         """
         if not namespaces and namespaces != 0:
             namespaces = [ns_id for ns_id in self.namespaces if ns_id >= 0]
+        parameters = {
+            'gsrsearch': searchstring,
+            'gsrwhat': where,
+        }
+        if sort is None:
+            sort = 'none'
+        if sort != 'relevance':
+            parameters['gsrsort'] = sort
         srgen = self._generator(api.PageGenerator, type_arg='search',
-                                gsrsearch=searchstring, gsrwhat=where,
                                 namespaces=namespaces,
-                                total=total, g_content=content)
+                                total=total, g_content=content,
+                                parameters=parameters)
         return srgen
 
     def usercontribs(

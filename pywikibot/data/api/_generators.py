@@ -2,11 +2,10 @@
 
 .. versionchanged:: 7.6
    All Objects were changed from Iterable object to a Generator object.
-   They are subclassed from
-   :class:`tools.collections.GeneratorWrapper`
+   They are subclassed from :class:`tools.collections.GeneratorWrapper`
 """
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -104,6 +103,12 @@ class APIGenerator(APIGeneratorBase, GeneratorWrapper):
         :param continue_name: Name of the continue API parameter.
         :param limit_name: Name of the limit API parameter.
         :param data_name: Name of the data in API response.
+        :keyword dict parameters: All parameters passed to request class
+            usally :class:`api.Request<data.api.Request>` or
+            :class:`api.CachedRequest<data.api.CachedRequest>`. See these
+            classes for further parameter descriptions. The *parameters*
+            keys can also given here as keyword parameters but this is
+            not recommended.
         """
         kwargs = self._clean_kwargs(kwargs, action=action)
 
@@ -244,8 +249,6 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
 
         parameters['indexpageids'] = True  # always ask for list of pageids
         self.continue_name = 'continue'
-        # Explicitly enable the simplified continuation
-        parameters['continue'] = True
         self.request = self.request_class(**kwargs)
 
         self.site._paraminfo.fetch('query+' + mod for mod in self.modules)
@@ -495,8 +498,8 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
         .. versionchanged:: 8.4
            return *None* instead of *False*.
         """
-        for key, value in self.data['continue'].items():
-            # query-continue can return ints (continue too?)
+        for key, value in self.data[self.continue_name].items():
+            # old query-continue could return ints, continue too?
             if isinstance(value, int):
                 value = str(value)
             self.request[key] = value
@@ -634,8 +637,8 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
                 previous_result_had_data = True
             else:
                 if 'query' not in self.data:
-                    pywikibot.log("%s: 'query' not found in api response." %
-                                  self.__class__.__name__)
+                    pywikibot.log(f"{type(self).__name__}: 'query' not found"
+                                  ' in api response.')
                     pywikibot.log(str(self.data))
 
                 # if (query-)continue is present, self.resultkey might not have
@@ -728,7 +731,7 @@ class PageGenerator(QueryGenerator):
 
         .. versionchanged:: 9.5
            No longer raise :exc:`exceptions.UnsupportedPageError` but
-           return a generic :class:`pywikibot.Page` obect. The exception
+           return a generic :class:`pywikibot.Page` object. The exception
            is raised when getting the content for example.
         .. versionchanged:: 9.6
            Upcast to :class:`page.FilePage` if *pagedata* has
@@ -805,8 +808,8 @@ class PropertyGenerator(QueryGenerator):
                 if d is not data_dict:
                     self._update_old_result_dict(d, data_dict)
             else:
-                pywikibot.warn('Skipping result without title: '
-                               + str(data_dict))
+                pywikibot.warning('Skipping result without title: '
+                                  + str(data_dict))
 
     def _fully_retrieved_data_dicts(self, resultdata):
         """Yield items of self._previous_dicts that are not in resultdata."""
@@ -1055,9 +1058,6 @@ def update_page(page: pywikibot.Page,
         page._preloadedtext = pagedict['preloadcontent']['*']
     elif 'preload' in pagedict:
         page._preloadedtext = pagedict['preload']
-
-    if 'flowinfo' in pagedict:
-        page._flowinfo = pagedict['flowinfo']['flow']
 
     if 'lintId' in pagedict:
         page._lintinfo = pagedict

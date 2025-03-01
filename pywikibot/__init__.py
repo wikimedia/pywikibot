@@ -1,6 +1,6 @@
 """The initialization file for the Pywikibot framework."""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,12 +11,12 @@ import datetime
 import re
 import sys
 import threading
+import warnings
 from contextlib import suppress
 from queue import Queue
 from time import sleep as time_sleep
 from typing import TYPE_CHECKING, Any, cast
 from urllib.parse import urlparse
-from warnings import warn
 
 from pywikibot import config as _config
 from pywikibot import exceptions
@@ -59,7 +59,7 @@ from pywikibot.logging import (
 )
 from pywikibot.site import BaseSite as _BaseSite
 from pywikibot.time import Timestamp
-from pywikibot.tools import PYTHON_VERSION, normalize_username
+from pywikibot.tools import normalize_username
 
 
 if TYPE_CHECKING:
@@ -86,15 +86,6 @@ if not hasattr(sys.modules[__name__], 'argvu'):
 link_regex = re.compile(r'\[\[(?P<title>[^\]|[<>{}]*)(\|.*?)?\]\]')
 
 _sites: dict[str, APISite] = {}
-
-if PYTHON_VERSION < (3, 8):
-    __version = sys.version.split(maxsplit=1)[0]
-    warn(f"""
-
-    Python {__version} will be dropped soon with Pywikibot 10.
-    It is recommended to use Python 3.8 or above.
-    See phab: T379227 for further information.
-""", FutureWarning)  # adjust this line no in utils.execute()
 
 
 @cache
@@ -180,6 +171,9 @@ def Site(code: str | None = None,  # noqa: N802
     .. versionchanged:: 7.3
        Short creation if site code is equal to family name like
        `Site('commons')`, `Site('meta')` or `Site('wikidata')`.
+    .. versionchanged:: 10.0
+       *url* does not have to contain an api, requests or script path
+       any longer.
 
     :param code: language code (override config.mylang)
         code may also be a sitename like 'wikipedia:test'
@@ -253,8 +247,8 @@ def Site(code: str | None = None,  # noqa: N802
         debug(f"Instantiated {interface.__name__} object '{_sites[key]}'")
 
         if _sites[key].code != code:
-            warn(f'Site {_sites[key]} instantiated using different code '
-                 f'"{code}"', UserWarning, 2)
+            warnings.warn(f'Site {_sites[key]} instantiated using different '
+                          f'code "{code}"', UserWarning, 2)
 
     return _sites[key]
 
@@ -347,7 +341,7 @@ def _flush(stop: bool = True) -> None:
     num, sec = remaining()
     if num > 0 and sec.total_seconds() > _config.noisysleep:
         output(f'<<lightblue>>Waiting for {num} pages to be put. '
-               f'Estimated time remaining: {sec}<<default>>')
+               f'Estimated time remaining: {sec}')
 
     exit_queue = None
     if _putthread is not threading.current_thread():

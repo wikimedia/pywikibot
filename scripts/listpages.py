@@ -110,9 +110,8 @@ import os
 import pywikibot
 from pywikibot import config
 from pywikibot.bot import AutomaticTWSummaryBot, SingleSiteBot, suggest_help
-from pywikibot.exceptions import ArgumentDeprecationWarning, Error
+from pywikibot.exceptions import Error
 from pywikibot.pagegenerators import GeneratorFactory, parameterHelp
-from pywikibot.tools import issue_deprecation_warning
 
 
 docuReplacements = {'&params;': parameterHelp}  # noqa: N816
@@ -293,18 +292,9 @@ def main(*args: str) -> None:
         if option in ('-get', '-notitle', '-overwrite'):
             options[opt] = True
         elif option == '-format':
-            if '\\03{{' not in value:
-                fmt = value
-            else:
-                fmt = value.replace('\\03{{', '\03{{')
-                issue_deprecation_warning(
-                    'old color format variant like \03{color}',
-                    'new color format like <<color>>',
-                    warning_class=ArgumentDeprecationWarning,
-                    since='7.3.0')
-            if not fmt.strip():
+            if not value.strip():
                 options['notitle'] = True
-            options['format'] = fmt
+            options['format'] = value
         elif option in ('-encode', '-outputlang', '-save', '-summary'):
             options[opt] = value
         elif option == '-put':

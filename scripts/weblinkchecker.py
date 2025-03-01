@@ -281,7 +281,7 @@ class LinkCheckThread(threading.Thread):
         for the same host. Calculate the delay to start the run.
 
         :param name: The key for the hosts class attribute
-        :return: The calulated delay to start the run
+        :return: The calculated delay to start the run
         """
         now = time.monotonic()
         with cls.lock:

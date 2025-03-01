@@ -1,6 +1,6 @@
 """Family module for Wikivoyage."""
 #
-# (C) Pywikibot team, 2012-2024
+# (C) Pywikibot team, 2012-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -32,5 +32,6 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     # https://meta.wikimedia.org/wiki/BPI#Current_implementation
     # & https://meta.wikimedia.org/wiki/Special:WikiSets/2
     cross_allowed = [
-        'bn', 'el', 'en', 'es', 'fa', 'fi', 'hi', 'ps', 'ru',
+        'bn', 'el', 'en', 'eo', 'es', 'fa', 'fi', 'hi', 'ja', 'pl', 'ps', 'pt',
+        'ro', 'ru', 'shn', 'tr', 'uk', 'vi', 'zh',
     ]

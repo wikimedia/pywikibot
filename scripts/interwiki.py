@@ -2389,7 +2389,7 @@ def main(*args: str) -> None:
         pywikibot.exception()
         dump.write_dump(bot.dump_titles, append)
     else:
-        pywikibot.info('Script terminated sucessfully.')
+        pywikibot.info('Script terminated successfully.')
     finally:
         dump.delete_dumps()
 

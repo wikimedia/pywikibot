@@ -23,40 +23,30 @@ jobs:
       max-parallel: 1
 
       matrix:
-        python-version: [ "pypy3.7", "pypy3.10", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14-dev" ]
+        python-version: [ "pypy3.8", "pypy3.10", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14-dev" ]
         site: [ "wikipedia:en", "wikisource:zh", "wikipedia:test" ]
         include:
-          # ubuntu-22.04 required for Python 3.7
-          - python-version: "3.7"
-            site: wikipedia:en
-            os: ubuntu-22.04
-          - python-version: "3.7"
-            site: wikisource:zh
-            os: ubuntu-22.04
-          - python-version: "3.7"
-            site: wikipedia:test
-            os: ubuntu-22.04
-          - python-version: "3.7"
+          - python-version: "3.8"
             site: False
             family: wpbeta
             code: en
             os: ubuntu-22.04
-          - python-version: "3.7"
+          - python-version: "3.8"
             site: False
             family: wpbeta
             code: zh
             os: ubuntu-22.04
-          - python-version: "3.8"
+          - python-version: "3.9"
             site: wsbeta:en
-          - python-version: "3.7"
+          - python-version: "3.8"
             site: wikidata:test
             os: ubuntu-22.04
-          - python-version: "3.9"
+          - python-version: "3.10"
             site: wiktionary:ar
-          - python-version: "3.7"
+          - python-version: "3.8"
             site: wikidata:wikidata
             os: ubuntu-22.04
-          - python-version: "3.8"
+          - python-version: "3.9"
             site: wowwiki:uk
           - python-version: 3
             site: wikipedia:de
@@ -76,7 +66,7 @@ jobs:
 
     # use deadsnakes/action for development releases
     - name: Set up development Python ${{ matrix.python-version }}
-      uses: deadsnakes/action@v3.1.0
+      uses: deadsnakes/action@v3.2.0
       if: "endsWith(matrix.python-version, '-dev')"
       with:
         python-version: ${{ matrix.python-version }}
@@ -85,9 +75,9 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip --version
-        pip install coverage
+        pip install "coverage == 7.6.1; python_version < '3.9'"
+        pip install "coverage >= 7.6.10; python_version > '3.8'"
         pip install "tomli; python_version < '3.11'"
-        pip install "importlib_metadata ; python_version < '3.8'"
         pip install mwparserfromhell
         pip install packaging
         pip install requests
@@ -132,6 +122,6 @@ jobs:
         coverage report
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

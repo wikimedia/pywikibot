@@ -55,11 +55,6 @@ Additionally there is the :class:`AutomaticTWSummaryBot` which
 subclasses :class:`CurrentPageBot` and automatically defines the summary
 when :meth:`put_current` is used.
 
-.. deprecated:: 7.2
-   The bot classes :class:`RedirectPageBot` and
-   :class:`NoRedirectPageBot` are deprecated. Use
-   :attr:`use_redirects<BaseBot.use_redirects>` attribute instead.
-
 .. deprecated:: 9.2
    The functions
    :func:`critical()<pywikibot.logging.critical>`
@@ -78,9 +73,14 @@ when :meth:`put_current` is used.
    and ``WARNING`` imported from :mod:`logging` module are deprecated
    within this module. Import them directly. These functions can also be
    used as :mod:`pywikibot` members.
+
+.. versionremoved:: 10.0
+   The bot classes :class:`RedirectPageBot` and
+   :class:`NoRedirectPageBot` are deprecated. Use
+   :attr:`use_redirects<BaseBot.use_redirects>` attribute instead.
 """
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -105,7 +105,6 @@ __all__ = (
     'BaseBot', 'Bot', 'ConfigParserBot', 'SingleSiteBot', 'MultipleSitesBot',
     'CurrentPageBot', 'AutomaticTWSummaryBot',
     'ExistingPageBot', 'FollowRedirectPageBot', 'CreatingPageBot',
-    'RedirectPageBot', 'NoRedirectPageBot',
     'WikidataBot',
 )
 
@@ -129,7 +128,6 @@ from importlib import import_module
 from pathlib import Path
 from textwrap import fill
 from typing import TYPE_CHECKING, Any
-from warnings import warn
 
 import pywikibot
 import pywikibot.logging as pwb_logging
@@ -189,7 +187,7 @@ from pywikibot.logging import log as _log
 from pywikibot.logging import stdout as _stdout
 from pywikibot.logging import warning as _warning
 from pywikibot.throttle import Throttle
-from pywikibot.tools import issue_deprecation_warning, redirect_func, strtobool
+from pywikibot.tools import redirect_func, strtobool
 from pywikibot.tools._logging import LoggingFormatter
 
 
@@ -664,11 +662,22 @@ def input_list_choice(question: str,
 def calledModuleName() -> str:
     """Return the name of the module calling this function.
 
-    This is required because the -help option loads the module's docstring
-    and because the module name will be used for the filename of the log.
+    This is required because the -help option loads the module's
+    docstring and because the module name will be used for the filename
+    of the log.
 
+    .. versionchanged:: 10.0
+       Detect unittest and pytest run and return the test module.
     """
-    return Path(pywikibot.argvu[0]).stem
+    mod = pywikibot.argvu[0]
+
+    if 'pytest' in mod:
+        return 'pytest'
+
+    if mod.endswith('unittest'):
+        return 'unittest'
+
+    return Path(mod).stem
 
 
 def handle_args(args: Iterable[str] | None = None,
@@ -687,7 +696,7 @@ def handle_args(args: Iterable[str] | None = None,
     >>> local_args  # doctest: +SKIP
     []
     >>> local_args = pywikibot.handle_args(['-simulate', '-myoption'])
-    >>> local_args  # global optons are handled, show the remaining
+    >>> local_args  # global options are handled, show the remaining
     ['-myoption']
     >>> for arg in local_args: pass  # do whatever is wanted with local_args
 
@@ -731,8 +740,8 @@ def handle_args(args: Iterable[str] | None = None,
     :return: list of arguments not recognised globally
     """
     if pywikibot._sites:
-        warn('Site objects have been created before arguments were handled',
-             UserWarning)
+        warnings.warn('Site objects have been created before arguments were '
+                      'handled', UserWarning)
 
     # get commandline arguments if necessary
     if not args:
@@ -1153,8 +1162,8 @@ class BaseBot(OptionHandler):
         """
         if 'generator' in kwargs:
             if hasattr(self, 'generator'):
-                pywikibot.warn(f'{type(self).__name__} has a generator'
-                               ' already. Ignoring argument.')
+                warnings.warn(f'{type(self).__name__} has a generator'
+                              ' already. Ignoring argument.')
             else:
                 self.generator: Iterable = kwargs.pop('generator')
 
@@ -1933,56 +1942,6 @@ class CreatingPageBot(CurrentPageBot):
         """Treat page if doesn't exist."""
         if page.exists():
             _warning(f'Page {page} does already exist on {page.site}.')
-            return True
-        return super().skip_page(page)
-
-
-class RedirectPageBot(CurrentPageBot):  # pragma: no cover
-
-    """A RedirectPageBot class which only treats redirects.
-
-    .. deprecated:: 7.2
-       use BaseBot attribute
-       :attr:`use_redirects  = True<BaseBot.use_redirects>` instead
-    """
-
-    def __init__(self, *args, **kwargs):
-        """Deprecate RedirectPageBot."""
-        issue_deprecation_warning('RedirectPageBot',
-                                  "BaseBot attribute 'use_redirects = True'",
-                                  since='7.2.0')
-        super().__init__(*args, **kwargs)
-
-    def skip_page(self, page: pywikibot.page.BasePage) -> bool:
-        """Treat only redirect pages and handle IsNotRedirectPageError."""
-        if not page.isRedirectPage():
-            _warning(f'Page {page} on {page.site} is skipped because it is'
-                     ' not a redirect')
-            return True
-        return super().skip_page(page)
-
-
-class NoRedirectPageBot(CurrentPageBot):  # pragma: no cover
-
-    """A NoRedirectPageBot class which only treats non-redirects.
-
-    .. deprecated:: 7.2
-       use BaseBot attribute
-       :attr:`use_redirects  = False<BaseBot.use_redirects>` instead
-    """
-
-    def __init__(self, *args, **kwargs):
-        """Deprecate NoRedirectPageBot."""
-        issue_deprecation_warning('NoRedirectPageBot',
-                                  "BaseBot attribute 'use_redirects = False'",
-                                  since='7.2.0')
-        super().__init__(*args, **kwargs)
-
-    def skip_page(self, page: pywikibot.page.BasePage) -> bool:
-        """Treat only non-redirect pages and handle IsRedirectPageError."""
-        if page.isRedirectPage():
-            _warning(f'Page {page} on {page.site} is skipped because it is'
-                     ' a redirect')
             return True
         return super().skip_page(page)
 

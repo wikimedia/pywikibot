@@ -7,7 +7,7 @@ package-dir = {"pywikibot_scripts" = "scripts"}
 
 [project]
 name = "pywikibot-scripts"
-version = "9.6.1"
+version = "10.0.0"
 
 authors = [
     {name = "xqt", email = "info@gno.de"},
@@ -17,9 +17,9 @@ maintainers = [
 ]
 description = "Pywikibot Scripts Collection"
 readme = "scripts/README.rst"
-requires-python = ">=3.7.0"
+requires-python = ">=3.8.0"
 dependencies = [
-    "pywikibot >= 9.6.1",
+    "pywikibot >= 10.0.0",
     "isbnlib",
     "langdetect",
     "mwparserfromhell",
@@ -103,14 +103,6 @@ classifiers=[
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3.14",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
     "Topic :: Internet :: WWW/HTTP :: Dynamic Content :: Wiki",

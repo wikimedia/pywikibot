@@ -93,25 +93,20 @@ class Hunk:
         Check each line ends with line feed to prevent behaviour like
         :issue:`46395`
         """
-        def check_line(line: str) -> str:
-            r"""Make sure each line ends with '\n'."""
-            return line if line.endswith('\n') else line + '\n'
-
+        lf = '\n'  # required for Python < 3.12
+        prefix = {'insert': '+ ', 'delete': '- ', 'replace': '', 'equal': '  '}
         for tag, i1, i2, j1, j2 in self.group:
             # equal/delete/insert add additional space after the sign as it's
             # what difflib.ndiff does do too.
-            if tag == 'equal':
-                for line in self.a[i1:i2]:
-                    yield '  ' + check_line(line)
-            elif tag == 'delete':
-                for line in self.a[i1:i2]:
-                    yield '- ' + check_line(line)
-            elif tag == 'insert':
+            if tag == 'insert':
                 for line in self.b[j1:j2]:
-                    yield '+ ' + check_line(line)
+                    yield f'{prefix[tag]}{line.strip(lf)}{lf}'
             elif tag == 'replace':
                 for line in difflib.ndiff(self.a[i1:i2], self.b[j1:j2]):
-                    yield check_line(line)
+                    yield f'{prefix[tag]}{line.strip(lf)}{lf}'
+            else:  # equal, delete
+                for line in self.a[i1:i2]:
+                    yield f'{prefix[tag]}{line.strip(lf)}{lf}'
 
     def format_diff(self) -> Iterable[str]:
         """Color diff lines."""
@@ -139,7 +134,7 @@ class Hunk:
                 # or color whole line to be added.
                 fmt = fmt if fmt.startswith('?') else ''
                 fmt = fmt[:min(len(fmt), len(line1))]
-                fmt = fmt if fmt else None
+                fmt = fmt or None
                 yield self.color_line(line1, fmt)
 
         # handle last line
@@ -155,7 +150,7 @@ class Hunk:
             # or color whole line to be added.
             fmt = line1 if line1.startswith('?') else ''
             fmt = fmt[:min(len(fmt), len(line2))]
-            fmt = fmt if fmt else None
+            fmt = fmt or None
             yield self.color_line(line2, fmt)
 
     def color_line(self, line: str, line_ref: str | None = None) -> str:
@@ -209,8 +204,7 @@ class Hunk:
 
     def __repr__(self) -> str:
         """Return a reconstructable representation."""
-        # TODO
-        return f'{self.__class__.__name__}(a, b, {self.group})'
+        return f'{type(self).__name__}(a, b, {self.group})'
 
 
 class _SuperHunk(abc.Sequence):

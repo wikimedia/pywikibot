@@ -205,12 +205,12 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
 
     def setup(self) -> None:
         """Initialize the coroutine for parsing templates."""
-        self.parse_tempates = self.remove_templates()
-        self.parse_tempates.send(None)
+        self.parse_templates = self.remove_templates()
+        self.parse_templates.send(None)
 
     def teardown(self) -> None:
         """Close the coroutine."""
-        self.parse_tempates.close()
+        self.parse_templates.close()
 
     def treat_page(self) -> None:
         """Load the given page, do some changes, and save it."""
@@ -222,8 +222,9 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                 self.invoke_editor(page)
             return
 
-        newtext, key = self.parse_tempates.send((page.text, page.protection()))
-        next(self.parse_tempates)
+        newtext, key = self.parse_templates.send(
+            (page.text, page.protection()))
+        next(self.parse_templates)
 
         if not key:
             return

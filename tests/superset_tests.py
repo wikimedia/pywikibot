@@ -54,7 +54,7 @@ class TestSupersetWithAuth(TestCase):
     family = 'meta'
     code = 'meta'
 
-    def test_login_and_oauth_permisson(self):
+    def test_login_and_oauth_permission(self):
         """Superset login and queries."""
         sql = 'SELECT page_id, page_title FROM page LIMIT 2;'
         site = self.get_site()

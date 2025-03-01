@@ -11,7 +11,7 @@ Pywikibot logo is Public domain but it includes material that may be
 protected as a trademark. Parts of :mod:`memento<data.memento>` module
 is licenced under the `BSD`_ open source software license. The
 :func:`get_close_matches_ratio()<diff.get_close_matches_ratio>` function
-off the :mod:`diff` module incorporates code from Pyton software which
+off the :mod:`diff` module incorporates code from Python software which
 is licenced under `PSF`_ license.
 
 

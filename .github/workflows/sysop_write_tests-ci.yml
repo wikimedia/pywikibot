@@ -15,8 +15,7 @@ env:
 
 jobs:
   build:
-    # ubuntu-22.04 required for Python 3.7
-    runs-on: "ubuntu-22.04"
+    runs-on: "ubuntu-latest"
     continue-on-error: ${{ matrix.experimental || false }}
     timeout-minutes: 100
 
@@ -24,7 +23,7 @@ jobs:
       fail-fast: false
 
       matrix:
-        python-version: [ "3.7" ]
+        python-version: [ "3.8" ]
         site: [ "wikipedia:test" ]
         attr: [ "write and not rights", "write and rights", "rights and not write" ]
 
@@ -66,10 +65,14 @@ jobs:
         PYWIKIBOT_TEST_WRITE: ${{ matrix.site == 'wikipedia:test' && 1 || 0 }}
       run: |
         python pwb.py version
-        pytest -s -r A -a "${{ matrix.attr }}" --cov=.;
+        coverage run -m pytest -s -r A -a "${{ matrix.attr }}"
+
+    - name: Show coverage statistics
+      run: |
+        coverage report
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 

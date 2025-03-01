@@ -22,7 +22,7 @@ from pywikibot.backports import Iterable
 from pywikibot.comms import http
 from pywikibot.exceptions import NoPageError
 from pywikibot.page._page import Page
-from pywikibot.tools import compute_file_hash, deprecated
+from pywikibot.tools import compute_file_hash
 
 
 __all__ = (
@@ -267,15 +267,6 @@ class FilePage(Page):
         """
         return self.site.imageusage(self, **kwargs)
 
-    @deprecated('using_pages', since='7.4.0')
-    def usingPages(self, **kwargs):  # noqa: N802
-        """Yield Pages on which the file is displayed.
-
-        .. deprecated:: 7.4
-           Use :meth:`using_pages` instead.
-        """
-        return self.using_pages(**kwargs)
-
     @property
     def file_is_used(self) -> bool:
         """Check whether the file is used at this site.
@@ -292,18 +283,21 @@ class FilePage(Page):
         :param source: Path or URL to the file to be uploaded.
 
         :keyword comment: Edit summary; if this is not provided, then
-            filepage.text will be used. An empty summary is not permitted.
-            This may also serve as the initial page text (see below).
+            filepage.text will be used. An empty summary is not
+            permitted. This may also serve as the initial page text (see
+            below).
         :keyword text: Initial page text; if this is not set, then
             filepage.text will be used, or comment.
-        :keyword watch: If true, add filepage to the bot user's watchlist
+        :keyword watch: If true, add filepage to the bot user's
+            watchlist
         :keyword ignore_warnings: It may be a static boolean, a callable
-            returning a boolean or an iterable. The callable gets a list of
-            UploadError instances and the iterable should contain the warning
-            codes for which an equivalent callable would return True if all
-            UploadError codes are in thet list. If the result is False it'll
-            not continue uploading the file and otherwise disable any warning
-            and reattempt to upload the file.
+            returning a boolean or an iterable. The callable gets a list
+            of UploadError instances and the iterable should contain the
+            warning codes for which an equivalent callable would return
+            True if all UploadError codes are in that list. If the
+            result is False it'll not continue uploading the file and
+            otherwise disable any warning and reattempt to upload the
+            file.
 
             .. note:: NOTE: If report_success is True or None it'll
                raise an UploadError exception if the static boolean is
@@ -314,11 +308,12 @@ class FilePage(Page):
             only upload in chunks, if the chunk size is positive but
             lower than the file size.
         :type chunk_size: int
-        :keyword report_success: If the upload was successful it'll print a
-            success message and if ignore_warnings is set to False it'll
-            raise an UploadError if a warning occurred. If it's
-            None (default) it'll be True if ignore_warnings is a bool and False
-            otherwise. If it's True or None ignore_warnings must be a bool.
+        :keyword report_success: If the upload was successful it'll
+            print a success message and if ignore_warnings is set to
+            False it'll raise an UploadError if a warning occurred. If
+            it's None (default) it'll be True if ignore_warnings is a
+            bool and False otherwise. If it's True or None
+            ignore_warnings must be a bool.
         :return: It returns True if the upload was successful and False
             otherwise.
         """
@@ -350,7 +345,7 @@ class FilePage(Page):
 
         Pywikibot_MW_gear_icon.svg was downloaded.
 
-        Download a thumnail:
+        Download a thumbnail:
 
         >>> file.download(url_param='120px')
         True

@@ -1,11 +1,14 @@
 """This module contains backports to support older Python versions.
 
-.. deprecated:: 9.0
-   The *nullcontext* context manager; use ``contextlib.nullcontext``
-   instead. The *SimpleQueue* queue; use ``queue.SimpleQueue`` instead.
+.. caution:: This module is not part of the public pywikibot API.
+   Breaking changes may be made at any time, and the module is not
+   subject to deprecation requirements.
+
+.. versionchanged:: 10.0
+   This module is 'private'.
 """
 #
-# (C) Pywikibot team, 2014-2024
+# (C) Pywikibot team, 2014-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -36,9 +39,7 @@ else:
     )
 
 
-if PYTHON_VERSION < (3, 7, 2):
-    from typing import Dict as OrderedDict
-elif PYTHON_VERSION < (3, 9):
+if PYTHON_VERSION < (3, 9):
     from typing import OrderedDict
 else:
     from collections import OrderedDict
@@ -205,22 +206,3 @@ if PYTHON_VERSION < (3, 13) or SPHINX_RUNNING:
                 yield group
 else:
     from itertools import batched  # type: ignore[no-redef]
-
-
-try:
-    import importlib.metadata as importlib_metadata
-except ImportError:
-    import importlib_metadata
-
-
-# import ModuleDeprecationWrapper here to prevent circular import
-from pywikibot.tools import ModuleDeprecationWrapper  # noqa: E402
-
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper.add_deprecated_attr('nullcontext',
-                            replacement_name='contextlib.nullcontext',
-                            since='9.0.0')
-wrapper.add_deprecated_attr('SimpleQueue',
-                            replacement_name='queue.SimpleQueue',
-                            since='9.0.0')
