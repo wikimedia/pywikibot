@@ -1,6 +1,89 @@
 Release History
 ===============
 
+10.0.0
+------
+*01 March 2025*
+
+**Improvements**
+
+* Add *sort* parameter to :func:`pagegenerators.SearchPageGenerator` and :meth:`APISite.search()
+  <pywikibot.site._generators.GeneratorsMixin.search>`:phab:`T386594`).
+* Add support for sylwiki (:phab:`T386466`).
+* Update :attr:`Family.cross_allowed<family.Family.cross_allowed>` lists in family files.
+* Ignore empty message warning in :class:`EventStreams<comms.eventstreams.EventStreams>`
+  (:phab:`T383035`).
+* A *timeout* parameter was added to :func:`data.memento.get_closest_memento_url`
+  and the default timeout was increased to 30 s (:phab:`T382943`).
+* :func:`bot.calledModuleName` returns either 'unittest' or 'pytest' during test run (:phab:`T382797`).
+* :class:`tools.threading.BoundedPoolExecutor` was added (:phab:`T333741`).
+* *args* parameter for :mod:`logging` functions can be used as formatting arguments
+* :attr:`.login.OauthLoginManager.access_token` was added.
+* Representation string for :class:`login.LoginManager` was added.
+* i18n updates.
+
+**Bugfixes**
+
+* Allow url without api path, requests path or script path in :func:`pywikibot.Site` constuctor  (:phab:`T386665`).
+* Appended <<default>> color tag before the last linefeed in
+  :class:`UI<userinterfaces.terminal_interface_base.UI>` (:phab:`T382884`).
+* Remove unintentional *args* parameter in :class:`tools.threading.ThreadList` (:phab:`T382787`).
+
+**Code cleanups**
+
+* Remove Structured Discussions/Flow support (:phab:`T381551`, :phab:`T371180`)
+* Remove old and deprecated variables in :mod:`config`.
+* Remove unintentional ``pywikibot.warn()``.
+* Unused *get_redirect* parameter of :meth:`BasePage.getOldVersion()<page.BasePage.getOldVersion>` was removed.
+* *baserevid* parameter of :class:`DataSite<pywikibot.site._datasite.DataSite>` methods
+  :meth:`editSource()<pywikibot.site._datasite.DataSite.editSource>`,
+  :meth:`editQualifier()<pywikibot.site._datasite.DataSite.editQualifier>`,
+  :meth:`removeClaims()<pywikibot.site._datasite.DataSite.removeClaims>`,
+  :meth:`removeSources()<pywikibot.site._datasite.DataSite.removeSources>`,
+  :meth:`remove_qualifiers()<pywikibot.site._datasite.DataSite.remove_qualifiers>` were be removed.
+* ``linktrail`` methods of :class:`family.Family` and :class:`BaseSite<pywikibot.site._basesite.BaseSite>`
+  were removed; use :meth:`APISite.linktrail()<pywikibot.site._apisite.APISite.linktrail>` instead.
+* Positional arguments *decoder*, *layer* and *newline* for :mod:`logging` functions are invalid;
+  keyword arguments must be used instead.
+* *tb* parameter of :func:`exception()<pywikibot.logging.exception>` function was dropped;
+  use *exc_info* instead.
+* The positional arguments of :meth:`page.BasePage.linkedPages` were removed.
+* ``FilePage.usingPages()`` was renamed to :meth:`using_pages()<pywikibot.FilePage.using_pages>`.
+* ``APISite.article_path`` was removed. :attr:`APISite.articlepath
+  <pywikibot.site._apisite.APISite.articlepath>` can be used instead.
+* ``fix_digits`` method of :class:`textlib.TimeStripper` was removed;
+  :func:`textlib.to_latin_digits` can be used instead.
+* :mod:`textlib`.tzoneFixedOffset class was removed in favour of
+  :class:`time.TZoneFixedOffse<pywikibot.time.TZoneFixedOffset>`.
+* A boolean *watch* parameter in :meth:`page.BasePage.save` is desupported.
+* ``XMLDumpOldPageGenerator`` was removed in favour of a ``content`` parameter of
+  :func:`pagegenerators.XMLDumpPageGenerator` (:phab:`T306134`).
+* :meth:`pywikibot.User.is_blocked` method was renamed from ``isBlocked`` for consistency.
+* Values of :meth:`APISite.allpages()<pywikibot.site._generators.GeneratorsMixin.allpages>`
+  parameter filterredir must be True, False or None.
+* :mod:`tools.threading` classes no longer can be imported from :mod:`tools`.
+* :mod:`tools.itertools` datatypes no longer can be imported from :mod:`tools`.
+* :mod:`tools.collections` datatypes no longer can be imported from :mod:`tools`.
+* ``svn_rev_info`` and ``getversion_svn`` of :mod:`version` module were be removed.
+  SVN repository is no longer supported. (:phab:`T362484`).
+* Old color escape sequences like ``\03{color}`` were dropped in favour of new color format like ``<<color>>``.
+* ``tools.formatter.color_format()`` was removed; the new color literals can be used instead.
+* RedirectPageBot and NoRedirectPageBot bot classes were removed in favour of
+  :attr:`use_redirects<bot.BaseBot.use_redirects>` attribute.
+
+**Other breaking changes**
+
+* Package requirements were updated (wikitextparser, pydot, python-stdnum, Pillow, PyMySQL,
+  fake-useragent)
+* Use requests_sse instead of unsupported sseclient for :mod:`comms.eventstreams` (:phab:`T309380`).
+* :mod:`backports` module is no longer a public API.
+* Drop support for MediaWiki < 1.31 (:phab:`T378984`).
+* Require ``requests >= 2.31.0`` (:phab:`T347031`).
+* Python 3.7 support was dropped (:phab:`T378893`), including *importlib_metadata* of
+  :mod:`backports`.
+* See also Current Deprecations below.
+
+
 9.6.3
 -----
 *22 February 2025*
