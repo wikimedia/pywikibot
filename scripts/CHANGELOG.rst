@@ -13,7 +13,13 @@ archivebot
 ^^^^^^^^^^
 
 * Fix mangling screen messages in ``-async`` mode (:phab:`T382797`)
-* save the talk page in asynchronous mode if ``-async`` option was given
+* Save the talk page in asynchronous mode if ``-async`` option was given
+
+category
+^^^^^^^^
+
+* Ensure that ``-from`` and ``-to`` arguments are not equal (:phab:`T384753`)
+
 
 dataextend
 ^^^^^^^^^^

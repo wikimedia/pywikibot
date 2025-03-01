@@ -3,7 +3,10 @@ Current Release Changes
 
 **Improvements**
 
-* Update :attr:`Family.cross_allowed<family.Family.cross_allowed>` lists in family files
+* Add *sort* parameter to :func:`pagegenerators.SearchPageGenerator` and :meth:`APISite.search()
+  <pywikibot.site._generators.GeneratorsMixin.search>`:phab:`T386594`).
+* Add support for sylwiki (:phab:`T386466`).
+* Update :attr:`Family.cross_allowed<family.Family.cross_allowed>` lists in family files.
 * Ignore empty message warning in :class:`EventStreams<comms.eventstreams.EventStreams>`
   (:phab:`T383035`).
 * A *timeout* parameter was added to :func:`data.memento.get_closest_memento_url`
@@ -17,14 +20,16 @@ Current Release Changes
 
 **Bugfixes**
 
+* Allow url without api path, requests path or script path in :func:`pywikibot.Site` constuctor  (:phab:`T386665`).
 * Appended <<default>> color tag before the last linefeed in
   :class:`UI<userinterfaces.terminal_interface_base.UI>` (:phab:`T382884`).
 * Remove unintentional *args* parameter in :class:`tools.threading.ThreadList` (:phab:`T382787`).
 
 **Code cleanups**
 
-* Remove old and deprecated variables in :mod:`config`
-* Remove unintentional ``pywikibot.warn()``
+* Remove Structured Discussions/Flow support (:phab:`T381551`, :phab:`T371180`)
+* Remove old and deprecated variables in :mod:`config`.
+* Remove unintentional ``pywikibot.warn()``.
 * Unused *get_redirect* parameter of :meth:`BasePage.getOldVersion()<page.BasePage.getOldVersion>` was removed.
 * *baserevid* parameter of :class:`DataSite<pywikibot.site._datasite.DataSite>` methods
   :meth:`editSource()<pywikibot.site._datasite.DataSite.editSource>`,
@@ -64,9 +69,12 @@ Current Release Changes
 
 **Other breaking changes**
 
+* Package requirements were updated (wikitextparser, pydot, python-stdnum, Pillow, PyMySQL,
+  fake-useragent)
+* Use requests_sse instead of unsupported sseclient for :mod:`comms.eventstreams` (:phab:`T309380`).
 * :mod:`backports` module is no longer a public API.
-* Drop support for MediaWiki < 1.31 (:phab:`T378984`)
-* Require ``requests >= 2.31.0`` (:phab:`T347031`)
+* Drop support for MediaWiki < 1.31 (:phab:`T378984`).
+* Require ``requests >= 2.31.0`` (:phab:`T347031`).
 * Python 3.7 support was dropped (:phab:`T378893`), including *importlib_metadata* of
   :mod:`backports`.
 * See also Current Deprecations below.
@@ -136,9 +144,3 @@ Pending removal in Pywikibot 11
   :attr:`userinfo['messages']<pywikibot.site._apisite.APISite.userinfo>`
 * 8.0.0: :meth:`Page.editTime()<page.BasePage.editTime>` method is deprecated and should be replaced by
   :attr:`Page.latest_revision.timestamp<page.BasePage.latest_revision>`
-
-
-Pending removal in Pywikibot 10
--------------------------------
-
-* 9.4.0: :mod:`flow` support is deprecated and will be removed (:phab:`T371180`)
