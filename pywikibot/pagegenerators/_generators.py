@@ -1,6 +1,6 @@
 """Page filter generators provided by the pagegenerators module."""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -815,16 +815,32 @@ def SearchPageGenerator(
     query: str,
     total: int | None = None,
     namespaces: NamespaceArgType = None,
-    site: BaseSite | None = None
+    site: BaseSite | None = None,
+    **kwargs
 ) -> Iterable[pywikibot.page.Page]:
-    """Yield pages from the MediaWiki internal search engine.
+    r"""Yield pages from the MediaWiki internal search engine.
 
+    .. versionchanged:: 10.0
+       Keyword arguments *content*, *sort* and *where* was added.
+
+    .. seealso:: :meth:`site.search()
+       <pywikibot.site._generators.GeneratorsMixin.search>`
+
+    :param query: the text to search for
     :param total: Maximum number of pages to retrieve in total
+    :param namespaces: search only in these namespaces (defaults to all)
     :param site: Site for generator results.
+    :keyword str \| None where: Where to search; value must be one of the
+        given literals or None (many wikis do not support all search
+        types)
+    :keyword bool content: if True, load the current content of each
+        iterated page (default False)
+    :keyword sort: Set the sort order of returned results. If None is
+        given, 'none' is used. Default is sort by relevance.
     """
     if site is None:
         site = pywikibot.Site()
-    return site.search(query, total=total, namespaces=namespaces)
+    return site.search(query, total=total, namespaces=namespaces, **kwargs)
 
 
 def LiveRCPageGenerator(site: BaseSite | None = None,

@@ -1,6 +1,6 @@
 """Objects representing API generators to MediaWiki site."""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -8,9 +8,10 @@ from __future__ import annotations
 
 import heapq
 import itertools
+import typing
 from contextlib import suppress
 from itertools import zip_longest
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import pywikibot
 from pywikibot.backports import Callable, Generator, Iterable, batched
@@ -29,7 +30,7 @@ from pywikibot.tools import deprecate_arg, is_ip_address
 from pywikibot.tools.itertools import filter_unique
 
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from data.api import ParamInfo, Request
 
     from pywikibot.site._apisite import _RequestWrapperT
@@ -42,7 +43,7 @@ class GeneratorsMixin:
 
     """API generators mixin to MediaWiki site."""
 
-    if TYPE_CHECKING:
+    if typing.TYPE_CHECKING:
         _generator: Callable[..., _RequestWrapperT]
         _paraminfo: ParamInfo
         _request: Callable[..., Request]
@@ -1546,14 +1547,20 @@ class GeneratorsMixin:
         searchstring: str,
         *,
         namespaces: NamespaceArgType = None,
-        where: str | None = None,
+        where: typing.Literal['text', 'title', 'nearmatch'] | None = None,
         total: int | None = None,
         content: bool = False,
+        sort: typing.Literal[
+            'create_timestamp_asc', 'create_timestamp_desc',
+            'incoming_links_asc', 'incoming_links_desc', 'just_match',
+            'last_edit_asc', 'last_edit_desc', 'none', 'random', 'relevance',
+            'user_random'
+        ] | None = 'relevance',
     ) -> Iterable[pywikibot.Page]:
         """Iterate Pages that contain the searchstring.
 
-        Note that this may include non-existing Pages if the wiki's database
-        table contains outdated entries.
+        Note that this may include non-existing Pages if the wiki's
+        database table contains outdated entries.
 
         .. versionchanged:: 7.0
            Default of `where` parameter has been changed from 'text' to
@@ -1561,15 +1568,21 @@ class GeneratorsMixin:
            which is 'text' on CirrusSearch'.
            raises APIError instead of Error if searchstring is not set
            or what parameter is wrong.
+        .. versionchanged:: 10.0
+           The *sort* parameter was added.
 
         .. seealso:: :api:`Search`
 
         :param searchstring: the text to search for
-        :param where: Where to search; value must be "text", "title",
-            "nearmatch" or None (many wikis do not support all search types)
-        :param namespaces: search only in these namespaces (defaults to all)
-        :param content: if True, load the current content of each iterated page
-            (default False)
+        :param namespaces: search only in these namespaces (defaults to
+            all)
+        :param where: Where to search; value must be one of the given
+            literals or None (many wikis do not support all search types)
+        :param total: limit result to this number of pages
+        :param content: if True, load the current content of each
+            iterated page (default False)
+        :param sort: Set the sort order of returned results. If None is
+            given, 'none' is used. Default is sort by relevance.
         :raises KeyError: a namespace identifier was not resolved
         :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
@@ -1580,10 +1593,18 @@ class GeneratorsMixin:
         """
         if not namespaces and namespaces != 0:
             namespaces = [ns_id for ns_id in self.namespaces if ns_id >= 0]
+        parameters = {
+            'gsrsearch': searchstring,
+            'gsrwhat': where,
+        }
+        if sort is None:
+            sort = 'none'
+        if sort != 'relevance':
+            parameters['gsrsort'] = sort
         srgen = self._generator(api.PageGenerator, type_arg='search',
-                                gsrsearch=searchstring, gsrwhat=where,
                                 namespaces=namespaces,
-                                total=total, g_content=content)
+                                total=total, g_content=content,
+                                parameters=parameters)
         return srgen
 
     def usercontribs(
