@@ -10,7 +10,6 @@ import calendar
 import codecs
 import io
 import re
-import sys
 import typing
 from collections import abc
 from functools import partial
@@ -872,85 +871,131 @@ def LiveRCPageGenerator(site: BaseSite | None = None,
         yield page
 
 
-# following classes just ported from version 1 without revision; not tested
-
-
 class GoogleSearchPageGenerator(GeneratorWrapper):
 
     """Page generator using Google search results.
 
-    To use this generator, you need to install the package 'google':
+    To use this generator, you need to install the googlesearch package::
 
-        :py:obj:`https://pypi.org/project/google`
-
-    This package has been available since 2010, hosted on GitHub
-    since 2012, and provided by PyPI since 2013.
+        pip install googlesearch-python
 
     As there are concerns about Google's Terms of Service, this
     generator prints a warning for each query.
 
+    .. seealso:: https://policies.google.com/terms
     .. versionchanged:: 7.6
        subclassed from :class:`tools.collections.GeneratorWrapper`
+    .. versionchanged:: 10.1
+       ``googlesearch-python`` package is needed instead of ``google``,
+       see :phab:`T387618` for further informations. The *total*
+       parameter was added. The *query* parameter is positional only.
+       All other parameters are keyword only.
     """
 
-    def __init__(self, query: str | None = None,
-                 site: BaseSite | None = None) -> None:
+    def __init__(self, query: str = '', /, *,
+                 site: BaseSite | None = None,
+                 total: int = 10) -> None:
         """Initializer.
 
+        :param query: the text to search for.
         :param site: Site for generator results.
+        :param total: the maximum number of changes to return, default
+            is 10 which is also set by googlesearch package.
         """
-        self.query = query or pywikibot.input('Please enter the search query:')
-        if site is None:
-            site = pywikibot.Site()
-        self.site = site
-        self._google_query = None
+        self.query = query or pywikibot.input(
+            'Please enter the search query:')
+        self.site = site or pywikibot.Site()
+        self.limit = total
 
     @staticmethod
-    def queryGoogle(query: str) -> Generator[str, None, None]:
-        """Perform a query using python package 'google'.
+    def queryGoogle(query: str, /, **kwargs) -> Generator[str, None, None]:
+        """Perform a query using ``googlesearch-python`` package.
 
-        The terms of service as at June 2014 give two conditions that
-        may apply to use of search:
+        .. admonition:: Terms of Service
 
-            1. Don't access [Google Services] using a method other than
-               the interface and the instructions that [they] provide.
-            2. Don't remove, obscure, or alter any legal notices
-               displayed in or along with [Google] Services.
+           The terms of service as at June 2014 give two conditions that
+           may apply to use of search:
 
-        Both of those issues should be managed by the package 'google',
-        however Pywikibot will at least ensure the user sees the TOS
-        in order to comply with the second condition.
+           1. Don't access [Google Services] using a method other than
+              the interface and the instructions that [they] provide.
+           2. Don't remove, obscure, or alter any legal notices
+              displayed in or along with [Google] Services.
+
+           Both of those issues should be managed by the
+           ``googlesearch-python`` package, however Pywikibot will at
+           least ensure the user sees the TOS in order to comply with
+           the second.
+
+           .. seealso:: https://policies.google.com/terms
+              condition.
+
+        .. important:: These note are from 2014 and have not been
+           reviewed or updated since then.
+
+        .. versionchanged:: 10.1
+           *query* is positional only; *kwargs* parameter was added.
+
+        :param query: the text to search for.
+        :param kwargs: other keyword arguments passed to ``googlesearch``
+            module.
         """
         try:
-            import google
-        except ImportError:
-            pywikibot.error('generator GoogleSearchPageGenerator '
-                            "depends on package 'google'.\n"
-                            'To install, please run: pip install google.')
-            sys.exit(1)
+            import googlesearch
+        except ModuleNotFoundError:
+            pywikibot.error("""\
+generator GoogleSearchPageGenerator depends on package
+'googlesearch-python'. To install, please run:
+
+    pip install googlesearch-python""")
+            return
+
         pywikibot.warning('Please read http://www.google.com/accounts/TOS')
-        yield from google.search(query)
+        yield from googlesearch.search(query, **kwargs)
 
     @property
     def generator(self) -> Generator[pywikibot.page.Page, None, None]:
         """Yield results from :meth:`queryGoogle` query.
 
-        Google contains links in the format:
-        https://de.wikipedia.org/wiki/en:Foobar
-
         .. versionchanged:: 7.6
            changed from iterator method to generator property
+        .. versionchanged:: 10.1
+           use :meth:`site.protocol
+           <pywikibot.site._basesite.BaseSite.protocol>` to get the base
+           URL. Also filter duplicates.
         """
+        if not self.query:
+            pywikibot.warning('No query string was specified')
+            return
+
         # restrict query to local site
-        local_query = f'{self.query} site:{self.site.hostname()}'
-        base = f'http://{self.site.hostname()}{self.site.articlepath}'
-        pattern = base.replace('{}', '(.+)')
-        for url in self.queryGoogle(local_query):
-            m = re.search(pattern, url)
-            if m:
-                page = pywikibot.Page(pywikibot.Link(m[1], self.site))
-                if page.site == self.site:
-                    yield page
+        site = self.site
+        local_query = f'{self.query} site:{site.hostname()}'
+        base = f'{site.protocol()}://{site.hostname()}{site.articlepath}'
+        pattern = re.compile(base.replace('{}', '(?P<title>.+)'))
+
+        for url in self.queryGoogle(local_query, num_results=self.limit,
+                                    unique=True):
+            m = pattern.fullmatch(url)
+            if not m:
+                continue
+
+            page = pywikibot.Page(pywikibot.Link(m['title'], site))
+
+            # Google may contain links in the format:
+            # https://de.wikipedia.org/wiki/en:Foobar
+            if page.site == site:
+                yield page
+
+    def set_maximum_items(self, value: int, /):
+        """Set the maximum number of items to be retrieved from google.
+
+        This method is added to be used by the
+        :class:`pagegenerators.GeneratorFactory` to circumvent call of
+        :func:`itertools.islice` filter for this generator.
+
+        .. versionadded:: 10.1
+        """
+        self.limit = value
 
 
 def MySQLPageGenerator(query: str, site: BaseSite | None = None,
