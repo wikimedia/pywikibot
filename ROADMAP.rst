@@ -37,7 +37,7 @@ Current Deprecations
 * 9.0.0: ``iteritems`` method of :class:`data.api.Request` will be removed in favour of ``items``
 * 9.0.0: ``SequenceOutputter.output()`` is deprecated in favour of :attr:`tools.formatter.SequenceOutputter.out`
   property
-* 9.0.0: *nullcontext* context manager and *SimpleQueue* queue of :mod:`backports` are deprecated
+
 
 Pending removal in Pywikibot 11
 -------------------------------
