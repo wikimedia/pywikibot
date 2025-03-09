@@ -830,7 +830,7 @@ def SearchPageGenerator(
     :param total: Maximum number of pages to retrieve in total
     :param namespaces: search only in these namespaces (defaults to all)
     :param site: Site for generator results.
-    :keyword str \| None where: Where to search; value must be one of the
+    :keyword str | None where: Where to search; value must be one of the
         given literals or None (many wikis do not support all search
         types)
     :keyword bool content: if True, load the current content of each
