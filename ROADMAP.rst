@@ -1,7 +1,9 @@
 Current Release Changes
 =======================
 
-* (no changes yet)
+* *page* parameter was added to :meth:`site.recentchanges()
+  <pywikibot.site._generators.GeneratorsMixin.recentchanges>`
+* googlesearch-python package is required for :class:`pagegenerators.GoogleSearchPageGenerator`
 
 Current Deprecations
 ====================

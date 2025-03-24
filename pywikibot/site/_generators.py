@@ -1477,6 +1477,9 @@ class GeneratorsMixin:
     ) -> Iterable[dict[str, Any]]:
         """Iterate recent changes.
 
+        .. versionchanged:: 10.1
+           *page* parameter was added.
+
         .. seealso:: :api:`RecentChanges`
 
         :param start: Timestamp to start listing from
