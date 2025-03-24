@@ -361,7 +361,7 @@ references using template ``Cite_Q``.
    several implementation improvements
 """  # noqa: E501, W505
 #
-# (C) Pywikibot team, 2022-2024
+# (C) Pywikibot team, 2022-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -937,10 +937,9 @@ def add_claims(isbn_data: dict[str, Any]) -> int:  # noqa: C901
     target[EDITIONLANGPROP] = lang_item.getID()
 
     # Require short Wikipedia language code
-    if len(booklang) > 3:
+    if len(booklang) > 3 and WIKILANGPROP in lang_item.claims:
         # Get official language code
-        if WIKILANGPROP in lang_item.claims:
-            booklang = lang_item.claims[WIKILANGPROP][0].getTarget()
+        booklang = lang_item.claims[WIKILANGPROP][0].getTarget()
 
     # Get edition title
     edition_title = isbn_data['Title'].strip()
