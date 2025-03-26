@@ -791,6 +791,7 @@ class DisambiguationRobot(SingleSiteBot):
             pywikibot.info(f'Page [[{ref_page.title()}]] does not seem to'
                            ' exist?! Skipping.')
         else:
+            self.counter['read'] += 1
             ignore_reason = self.checkContents(text)
             if ignore_reason:
                 pywikibot.info(f'\n\nSkipping {ref_page.title()} because it '
@@ -1014,6 +1015,8 @@ class DisambiguationRobot(SingleSiteBot):
                     pywikibot.info('Page not saved: page is locked')
                 except PageSaveRelatedError as error:
                     pywikibot.info(f'Page not saved: {error.args}')
+                else:
+                    self.counter['write'] += 1
 
         return 'done'
 
