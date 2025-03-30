@@ -12,7 +12,7 @@ from collections import Counter
 from contextlib import suppress
 from itertools import islice
 from textwrap import shorten, wrap
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, NoReturn
 from urllib.parse import quote_from_bytes
 from warnings import warn
 
@@ -2079,16 +2079,42 @@ class BasePage(ComparableMixin):
         timestamp,
         content: bool = False,
         **kwargs
-    ) -> list:
+    ) -> dict[str, Any] | list[NoReturn]:
         """Return a particular deleted revision by timestamp.
+
+        Gives a dictionary with `revid`, `parentid`, `user`, `timestamp`,
+        and `comment` as keys like this:
+
+        .. code:: Python
+
+           {'revid': 658621, 'parentid': 0, 'user': 'Pywikibot-test',
+           'timestamp': '2025-05-24T11:01:25Z',
+           'comment': 'Pywikibot unit test'}
+
+        If *content* is True, a `slots` key is added which holds
+        additional information of the content like:
+
+        .. code:: Python
+
+           'slots': {
+               'main': {
+                   'contentmodel': 'wikitext',
+                   'contentformat': 'text/x-wiki',
+                   '*': 'Pywikibot deletion test.'
+                }
+           }
+
+        .. caution::
+           If *timestamp* is not found, an empty **list** is given.
 
         .. seealso:: :meth:`APISite.deletedrevs()
            <pywikibot.site._generators.GeneratorsMixin.deletedrevs>`
 
-        :return: a list of [date, editor, comment, text, restoration
-            marker]. text will be None, unless content is True (or has
-            been retrieved earlier). If timestamp is not found, returns
-            empty list.
+        :param timestamp: Timestamp of the deleted revision
+        :param content: If True, give also the content of the deleted
+            revision.
+        :return: a dictionary information about the deleted revision. If
+            timestamp is not found, an empty list is given.
         """
         if hasattr(self, '_deletedRevs') \
            and timestamp in self._deletedRevs \
