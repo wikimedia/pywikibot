@@ -690,7 +690,12 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
         return False
 
     def treat(self, page) -> None:
-        """Work on each page retrieved from generator."""
+        """Work on each page retrieved from generator.
+
+        .. versionchanged:: 10.1
+           After the browser call, the script affects the possibly
+           changed text.
+        """
         try:
             original_text = page.text
         except InvalidPageError as e:
@@ -761,6 +766,8 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
                     page.get(get_redirect=True, force=True)
                 except NoPageError:
                     pywikibot.info(f'Page {page.title()} has been deleted.')
+                else:
+                    self.treat(page)
                 return
 
             if choice == 'n':
