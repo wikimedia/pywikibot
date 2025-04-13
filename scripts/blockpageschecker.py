@@ -45,20 +45,24 @@ Examples::
 
 """
 #
-# (C) Pywikibot team, 2007-2024
+# (C) Pywikibot team, 2007-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
 import re
-import webbrowser
 from itertools import chain
 from typing import NamedTuple
 
 import pywikibot
 from pywikibot import i18n, pagegenerators
-from pywikibot.bot import ConfigParserBot, ExistingPageBot, SingleSiteBot
+from pywikibot.bot import (
+    ConfigParserBot,
+    ExistingPageBot,
+    SingleSiteBot,
+    open_webbrowser,
+)
 from pywikibot.editor import TextEditor
 from pywikibot.exceptions import Error
 
@@ -198,7 +202,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
             'Do you want to open the page?',
             [('with browser', 'b'), ('with gui', 'g'), ('no', 'n')], 'n')
         if choice == 'b':
-            webbrowser.open(f'{page.full_url()}?redirect=no')
+            open_webbrowser(page)
         elif choice == 'g':
             editor = TextEditor()
             editor.edit(page.text)
