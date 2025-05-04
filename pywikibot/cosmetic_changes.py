@@ -731,11 +731,16 @@ class CosmeticChangesToolkit:
         stripped_text = textlib.removeLanguageLinks(text, self.site, '\n')
         for reg in skip_regexes:
             stripped_text = reg.sub(r'', stripped_text)
+
         strip_sections = textlib.extract_sections(
             stripped_text, self.site).sections
 
         # get proper sections
         header, sections, footer = textlib.extract_sections(text, self.site)
+
+        if len(strip_sections) > len(sections):
+            # there must be something wrong with the extracted sections; skip
+            return text
 
         # iterate stripped sections and create a new page body
         new_body: list[textlib.Section] = []
