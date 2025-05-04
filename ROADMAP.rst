@@ -1,6 +1,13 @@
 Current Release Changes
 =======================
 
+* Retieve charset from accept-charset header entry in :func:`comms.http._decide_encoding` (:phab:`T392345`)
+* Skip :meth:`CosmeticChangesToolkit.removeEmptySections()
+  <cosmetic_changes.CosmeticChangesToolkit.removeEmptySections>` if section length is too less  (:phab:`T391776`)
+* Add support for nupwiki (:phab:`T390713`)
+* i18n updates
+* No longer follow redirects in :func:`bot.open_webbrowser` (:phab:`T390447`)
+* Update closed and removed wikis (:phab:`T390732`)
 * *page* parameter was added to :meth:`site.recentchanges()
   <pywikibot.site._generators.GeneratorsMixin.recentchanges>`
 * googlesearch-python package is required for :class:`pagegenerators.GoogleSearchPageGenerator`
