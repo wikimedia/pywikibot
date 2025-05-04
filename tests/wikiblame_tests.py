@@ -1,6 +1,6 @@
 """Tests for the WikiHistoryMixin."""
 #
-# (C) Pywikibot team, 2022-2024
+# (C) Pywikibot team, 2022-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -35,6 +35,7 @@ class TestWikiBlameMixin(TestCase):
                 'main_authors method is implemented for main namespace only'):
             page.authorship()
 
+    @unittest.expectedFailure  # T392694
     @require_modules('wikitextparser')
     def test_main_authors(self):
         """Test main_authors() method."""
@@ -47,6 +48,7 @@ class TestWikiBlameMixin(TestCase):
         self.assertIsInstance(values[0], int)
         self.assertIsInstance(values[1], float)
 
+    @unittest.expectedFailure  # T392694
     @require_modules('wikitextparser')
     def test_restrictions(self):
         """Test main_authors() method with restrictions."""

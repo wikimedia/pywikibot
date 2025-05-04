@@ -74,8 +74,8 @@ class WikiBlameMixin:
         >>> import pywikibot
         >>> site = pywikibot.Site('wikipedia:eu')
         >>> page = pywikibot.Page(site, 'Python (informatika)')
-        >>> auth = page.main_authors()
-        >>> auth.most_common(1)
+        >>> auth = page.main_authors()  # doctest: +SKIP
+        >>> auth.most_common(1)  # doctest: +SKIP
         [('Ksarasola', 82)]
 
         .. important:: Only implemented for main namespace pages and
@@ -126,8 +126,8 @@ class WikiBlameMixin:
         >>> import pywikibot
         >>> site = pywikibot.Site('wikipedia:en')
         >>> page = pywikibot.Page(site, 'Pywikibot')
-        >>> auth = page.authorship()
-        >>> auth
+        >>> auth = page.authorship()  # doctest: +SKIP
+        >>> auth  # doctest: +SKIP
         {'1234qwer1234qwer4': (68, 100.0)}
 
         .. important:: Only implemented for main namespace pages and
