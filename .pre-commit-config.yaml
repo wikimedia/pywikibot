@@ -98,8 +98,8 @@ repos:
           - --doctests
         additional_dependencies:
           # Due to incompatibilities between packages the order matters.
-          - flake8-bugbear>=24.10.31
+          - flake8-bugbear>=24.12.12
           - flake8-mock-x2
           - flake8-print>=5.0.0
           - flake8-tuple>=0.4.1
-          - pep8-naming>=0.14.1
+          - pep8-naming>=0.14.1, !=0.15.0
