@@ -58,7 +58,7 @@ repos:
       - id: rst-inline-touching-normal
       - id: text-unicode-replacement-char
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.8
+    rev: v0.11.9
     hooks:
       - id: ruff
         args:
@@ -102,4 +102,4 @@ repos:
           - flake8-mock-x2
           - flake8-print>=5.0.0
           - flake8-tuple>=0.4.1
-          - pep8-naming>=0.14.1, !=0.15.0
+          - pep8-naming>=0.15.1
