@@ -386,7 +386,7 @@ class EventStreams(GeneratorWrapper):
                 self.source.close()
                 del self.source
                 if event is not None:
-                    self.sse_kwargs['last_event_id'] = event.last_event_id
+                    self.sse_kwargs['latest_event_id'] = event.last_event_id
                 continue
 
             if event.type == 'message':
