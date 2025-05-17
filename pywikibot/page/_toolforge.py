@@ -3,7 +3,7 @@
 .. versionadded:: 7.7
 """
 #
-# (C) Pywikibot team, 2022-2024
+# (C) Pywikibot team, 2022-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -12,23 +12,10 @@ from __future__ import annotations
 import collections
 import re
 from http import HTTPStatus
-from typing import TYPE_CHECKING
+from warnings import warn
 
 import pywikibot
-from pywikibot import textlib
-from pywikibot.tools import deprecated, deprecated_args
-
-
-try:
-    import wikitextparser
-except ImportError as e:
-    wikitextparser = e
-
-if TYPE_CHECKING:
-    import datetime
-
-    from pywikibot import Timestamp
-    DATETYPE = str | Timestamp | datetime.datetime | datetime.date | None
+from pywikibot.tools import deprecated, deprecated_args, remove_last_args
 
 
 class WikiBlameMixin:
@@ -39,10 +26,7 @@ class WikiBlameMixin:
     """
 
     #: Supported wikipedia site codes
-    WIKIBLAME_CODES = (
-        'ar', 'de', 'en', 'es', 'eu', 'fr', 'hu', 'id', 'it', 'ja', 'nl', 'pl',
-        'pt', 'tr',
-    )
+    WIKIBLAME_CODES = 'als', 'bar', 'de', 'en', 'it', 'nds', 'sco'
 
     def _check_wh_supported(self):
         """Check if WikiHistory is supported."""
@@ -50,19 +34,16 @@ class WikiBlameMixin:
             raise NotImplementedError(
                 'main_authors method is implemented for wikipedia family only')
 
-        if self.site.code not in self.WIKIBLAME_CODES:
-            raise NotImplementedError('main_authors method is not implemented '
-                                      f'for wikipedia:{self.site.code}')
-
-        if self.namespace() != pywikibot.site.Namespace.MAIN:
+        if (code := self.site.code) not in self.WIKIBLAME_CODES:
             raise NotImplementedError(
-                'main_authors method is implemented for main namespace only')
+                f'main_authors method is not implemented for wikipedia:{code}')
+
+        if (ns := self.namespace()) not in (0, 4, 10, 12, 14, 100):
+            raise NotImplementedError(
+                f'main_authors method is not implemented for {ns} namespace')
 
         if not self.exists():
             raise pywikibot.exceptions.NoPageError(self)
-
-        if isinstance(wikitextparser, ImportError):
-            raise wikitextparser
 
     @deprecated('authorsship', since='9.3.0')
     @deprecated_args(onlynew=None)  # since 9.2.0
@@ -72,40 +53,27 @@ class WikiBlameMixin:
         Sample:
 
         >>> import pywikibot
-        >>> site = pywikibot.Site('wikipedia:eu')
-        >>> page = pywikibot.Page(site, 'Python (informatika)')
-        >>> auth = page.main_authors()  # doctest: +SKIP
-        >>> auth.most_common(1)  # doctest: +SKIP
-        [('Ksarasola', 82)]
+        >>> site = pywikibot.Site('wikipedia:de')
+        >>> page = pywikibot.Page(site, 'Project:Pywikibot')
+        >>> auth = page.main_authors()
+        >>> auth.most_common(1)
+        [('DrTrigon', 37)]
 
-        .. important:: Only implemented for main namespace pages and
-           only wikipedias of :attr:`WIKIBLAME_CODES` are supported.
-        .. seealso::
-           - https://wikihistory.toolforge.org
-           - https://de.wikipedia.org/wiki/Wikipedia:Technik/Cloud/wikihistory
-           - https://xtools.wmcloud.org/authorship/
-
-        .. versionchanged:: 9.2
-           do not use any wait cycles due to :phab:`366100`.
-        .. versionchanged:: 9.3
-           https://xtools.wmcloud.org/authorship/ is used to retrieve
-           authors
         .. deprecated:: 9.3
            use :meth:`authorship` instead.
+        .. seealso:: :meth:`authorship` for further informations
 
         :return: Percentage of edits for each username
 
-        :raise ImportError: missing ``wikitextparser`` module.
         :raise NotImplementedError: unsupported site or unsupported
             namespace.
-        :raise Error: Error response from xtools.
         :raise NoPageError: The page does not exist.
-        :raise requests.exceptions.HTTPError: 429 Client Error: Too Many
-            Requests for url; login to meta family first.
+        :raise TimeoutError: WikiHistory timeout
         """
         return collections.Counter(
             {user: int(cnt) for user, (_, cnt) in self.authorship(5).items()})
 
+    @remove_last_args(['revid', 'date'])  # since 10.1
     def authorship(
         self,
         n: int | None = None,
@@ -113,13 +81,11 @@ class WikiBlameMixin:
         min_chars: int = 0,
         min_pct: float = 0.0,
         max_pct_sum: float | None = None,
-        revid: int | None = None,
-        date: DATETYPE = None,
     ) -> dict[str, tuple[int, float]]:
         """Retrieve authorship attribution of an article.
 
-        This method uses XTools/Authorship to retrieve the authors
-        measured by character count.
+        This method uses WikiHistory to retrieve the authors measured by
+        character count.
 
         Sample:
 
@@ -130,15 +96,58 @@ class WikiBlameMixin:
         >>> auth  # doctest: +SKIP
         {'1234qwer1234qwer4': (68, 100.0)}
 
-        .. important:: Only implemented for main namespace pages and
-           only wikipedias of :attr:`WIKIBLAME_CODES` are supported.
-        .. seealso::
-           - https://xtools.wmcloud.org/authorship/
-           - https://www.mediawiki.org/wiki/XTools/Authorship
-           - https://www.mediawiki.org/wiki/WikiWho
-
+        .. important:: Only implemented for pages in Main, Project,
+           Category and Template namespaces and only wikipedias of
+           :attr:`WIKIBLAME_CODES` are supported.
         .. versionadded:: 9.3
-           this method replaces :meth:`main_authors`.
+           XTools is used to retrieve authors. This method replaces
+           :meth:`main_authors`.
+        .. versionchanged:: 10.1
+           WikiHistory is used to retrieve authors due to :phab:`T392694`.
+
+        Here are the differences between these two implementations:
+
+        .. tabs::
+
+           .. tab:: WikiHistory
+
+              .. versionadded:: 10.1
+
+              - Implemented from version 7.7 until 9.2 (with
+                :meth:`main_authors` method) and from 10.1.
+              - Main, Project, Category and Template namespaces are
+                supported
+              - Only 'als', 'bar', 'de', 'en', 'it', 'nds' and 'sco'
+                Wikipedias are supported.
+              - Revision ID *revid* or revision *date* is not supported.
+                Always the latest revision is used.
+              - Only the most 5 authors are given.
+              - No additional parsing library is required.
+
+
+              .. seealso::
+                 - https://wikihistory.toolforge.org
+                 - https://de.wikipedia.org/wiki/WP:HT/wikihistory
+
+           .. tab:: XTools
+
+              .. versionremoved:: 10.1
+
+              - Implemented from version 9.3 until 10.0.
+              - Only Main namespace is supported.
+              - Only 'ar', 'de', 'en', 'es', 'eu', 'fr', 'hu', 'id',
+                'it', 'ja', 'nl', 'pl', 'pt' and 'tr' Wikipedias are
+                supported.
+              - Revision ID *revid* or revision *date* is supported to
+                get authorship for this revision.
+              - All authors can be given.
+              - wikitextparser parsing library is required.
+
+              .. seealso::
+                 - https://xtools.wmcloud.org/authorship/
+                 - https://www.mediawiki.org/wiki/XTools/Authorship
+                 - https://www.mediawiki.org/wiki/WikiWho
+
 
         :param n: Only return the first *n* or fewer authors.
         :param min_chars: Only return authors with more than *min_chars*
@@ -157,68 +166,49 @@ class WikiBlameMixin:
         :return: Character count and percentage of edits for each
             username.
 
-        :raise ImportError: missing ``wikitextparser`` module
         :raise NotImplementedError: unsupported site or unsupported
             namespace.
-        :raise Error: Error response from xtools.
-        :raiseNoPageError: The page does not exist.
-        :raise requests.exceptions.HTTPError: 429 Client Error: Too Many
-            Requests for url; login to meta family first.
+        :raise NoPageError: The page does not exist.
+        :raise TimeoutError: WikiHistory timeout
         """
-        baseurl = 'https://xtools.wmcloud.org/authorship/{url}&format=wikitext'
-        pattern = r'\[\[.+[|/](?P<user>.+)\]\]'
+        if n and n > 5:
+            warn('Only the first 5 authors can be given.')
+
+        baseurl = 'https://wikihistory.toolforge.org'
+        pattern = (r'><bdi>(?P<author>.+?)</bdi></a>\s'
+                   r'\((?P<percent>\d{1,3})&')
 
         self._check_wh_supported()
 
-        if revid and date:
-            raise ValueError(
-                'You cannot specify revid together with date argument')
+        for onlynew in (1, 0):
+            url = baseurl + (f'/wiki/getauthors.php?wiki={self.site.code}wiki'
+                             f'&page_id={self.pageid}&onlynew={onlynew}')
 
-        show = revid or 0 if date is None else str(date)[:10]
-        url = '{}.wikipedia.org/{}/{}?uselang={}'.format(
-            self.site.code,
-            self.title(as_url=True, with_ns=False, with_section=False),
-            show,
-            'en',
-        )
-        url = baseurl.format(url=url)
+            r = pywikibot.comms.http.fetch(url)
+            if r.status_code != HTTPStatus.OK:
+                r.raise_for_status()
 
-        r = pywikibot.comms.http.fetch(url)
-        if r.status_code != HTTPStatus.OK:
-            r.raise_for_status()
+            if 'Timeout' not in r.text:
+                break
 
+            pywikibot.sleep(pywikibot.config.retry_wait)
+        else:
+            raise pywikibot.exceptions.TimeoutError('WikiHistory Timeout')
+
+        length = len(self.text)
         result: list[list[str]] = []
-        try:
-            table = wikitextparser.parse(r.text).tables[0]
-        except IndexError:
-            pattern = textlib.get_regexes('code')[0]
-            match = pattern.search(r.text)
-            if match:
-                msg = textlib.removeHTMLParts(match[0])
-            else:
-                pattern = textlib.get_regexes('strong')[0]
-                strongs = pattern.findall(r.text)
-                if strongs:
-                    msg = textlib.removeHTMLParts('\n'.join(strongs))
-                else:
-                    msg = 'Unknown exception from xtools'
-            raise pywikibot.exceptions.Error(msg) from None
-
         pct_sum = 0.0
-        for row in table.data():
-            if row[0] == 'Rank':
-                continue  # skip headline
-
-            rank = int(row[0])
-            user = re.match(pattern, row[1])['user']
-            chars = int(row[3].replace(',', '_'))
-            percent = float(row[4].rstrip('%'))
+        for rank, (user, cnt) in enumerate(re.findall(pattern, r.text),
+                                           start=1):
+            chars = length * int(cnt) // 100
+            percent = float(cnt)
 
             # take into account that data() is ordered
             if n and rank > n or chars < min_chars or percent < min_pct:
                 break
 
             result.append((user, chars, percent))
+
             pct_sum += percent
             if max_pct_sum and pct_sum >= max_pct_sum:
                 break
