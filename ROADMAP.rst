@@ -1,6 +1,10 @@
 Current Release Changes
 =======================
 
+* Use WikiHistory instead of XTools to implement :meth:`Page.authorship()
+  <page._toolforge.WikiBlameMixin.authorship>` (:phab:`T392345`)
+* Correct :class:`comms.eventstreams.EventStreams` kwarg name
+  from *last_event_id* to *latest_event_id* (:phab:`T394570`)
 * Retieve charset from accept-charset header entry in :func:`comms.http._decide_encoding` (:phab:`T392345`)
 * Skip :meth:`CosmeticChangesToolkit.removeEmptySections()
   <cosmetic_changes.CosmeticChangesToolkit.removeEmptySections>` if section length is too less  (:phab:`T391776`)
