@@ -982,8 +982,12 @@ def writeToCommandLogFile() -> None:
 
 
 def open_webbrowser(page: pywikibot.page.BasePage) -> None:
-    """Open the web browser displaying the page and wait for input."""
-    webbrowser.open(page.full_url())
+    """Open the web browser displaying the page and wait for input.
+
+    .. versionchanged:: 10.1
+       No longer follow a redirect.
+    """
+    webbrowser.open(f'{page.full_url()}?redirect=no')
     i18n.input('pywikibot-enter-finished-browser')
 
 

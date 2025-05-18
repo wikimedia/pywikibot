@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the site module."""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1251,7 +1251,6 @@ class TestPropertyNames(DefaultSiteTestCase):
             'wikibase-badge-Q17437796',
             'wikibase-badge-Q17437798',
             'wikibase-badge-Q17506997',
-            'wikibase-badge-Q17559452',
             'wikibase-badge-Q17580674',
             'wikibase-badge-Q70894304',
             'wikibase_item',

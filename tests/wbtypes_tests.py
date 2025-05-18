@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the Wikidata parts of the page module."""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -510,11 +510,11 @@ class TestWbTime(WbRepresentationTestCase):
         self.assertGreaterEqual(t2, t1)
         self.assertNotEqual(t1, t2)
         self.assertNotEqual(t2, t1)
-        # Ignore H205: We specifically want to test the operator
-        self.assertFalse(t1 > t2)  # noqa: H205
-        self.assertFalse(t2 > t1)  # noqa: H205
-        self.assertFalse(t1 < t2)  # noqa: H205
-        self.assertFalse(t2 < t1)  # noqa: H205
+        # We specifically want to test the operator
+        self.assertFalse(t1 > t2)
+        self.assertFalse(t2 > t1)
+        self.assertFalse(t1 < t2)
+        self.assertFalse(t2 < t1)
 
     def test_comparison_equal_instant(self):
         """Test the equal_instant method."""

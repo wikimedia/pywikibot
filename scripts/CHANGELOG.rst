@@ -1,6 +1,26 @@
 Scripts Changelog
 =================
 
+10.1.0
+------
+
+* i18n updates
+
+solve_disambiguation
+^^^^^^^^^^^^^^^^^^^^
+
+* adjust read/write counter
+
+replace
+^^^^^^^
+
+* After browser call, the script affects the possibly changed text (:phab:`T389166`)
+
+welcome
+^^^^^^^
+
+* L10N updates
+
 10.0.0
 ------
 

@@ -844,7 +844,7 @@ class FandomFamily(Family):
         if hasattr(cls, 'code_aliases'):
             codes += cls.code_aliases
 
-        return {code: cls.domain for code in codes}
+        return dict.fromkeys(codes, cls.domain)
 
     def scriptpath(self, code):
         """Return the script path for this family."""

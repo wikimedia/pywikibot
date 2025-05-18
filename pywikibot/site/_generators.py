@@ -1469,12 +1469,16 @@ class GeneratorsMixin:
         redirect: bool | None = None,
         patrolled: bool | None = None,
         top_only: bool = False,
+        page: str | pywikibot.Page | None = None,
         total: int | None = None,
-        user: str | list[str] | None = None,
-        excludeuser: str | list[str] | None = None,
+        user: str | None = None,
+        excludeuser: str | None = None,
         tag: str | None = None,
     ) -> Iterable[dict[str, Any]]:
         """Iterate recent changes.
+
+        .. versionchanged:: 10.1
+           *page* parameter was added.
 
         .. seealso:: :api:`RecentChanges`
 
@@ -1499,8 +1503,9 @@ class GeneratorsMixin:
             only list non-patrolled edits; if None, list all
         :param top_only: if True, only list changes that are the latest
             revision (default False)
-        :param user: if not None, only list edits by this user or users
-        :param excludeuser: if not None, exclude edits by this user or users
+        :param page: if not None, only list edits to this page
+        :param user: if not None, only list edits by this user
+        :param excludeuser: if not None, exclude edits by this user
         :param tag: a recent changes tag
         :raises KeyError: a namespace identifier was not resolved
         :raises TypeError: a namespace identifier has an inappropriate
@@ -1522,6 +1527,8 @@ class GeneratorsMixin:
             rcgen.request['rcdir'] = 'newer'
         if changetype:
             rcgen.request['rctype'] = changetype
+        if page:
+            rcgen.request['rctitle'] = page
         filters = {'minor': minor,
                    'bot': bot,
                    'anon': anon,

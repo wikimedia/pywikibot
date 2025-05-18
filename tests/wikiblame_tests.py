@@ -1,6 +1,6 @@
 """Tests for the WikiHistoryMixin."""
 #
-# (C) Pywikibot team, 2022-2024
+# (C) Pywikibot team, 2022-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,7 +11,7 @@ import unittest
 from contextlib import suppress
 
 import pywikibot
-from tests.aspects import TestCase, require_modules
+from tests.aspects import TestCase
 
 
 class TestWikiBlameMixin(TestCase):
@@ -19,7 +19,7 @@ class TestWikiBlameMixin(TestCase):
     """Test WikiBlameMixin using nds wiki."""
 
     family = 'wikipedia'
-    code = 'nl'
+    code = 'nds'
 
     def test_exceptions(self):
         """Test that main_authors fails if page does not exist."""
@@ -29,25 +29,30 @@ class TestWikiBlameMixin(TestCase):
                                     f"Page {title} doesn't exist"):
             page.authorship()
 
-        page = pywikibot.Page(self.site, 'Project:Pywikibot')
+        page = pywikibot.Page(self.site, 'Diskuschoon:Wikipedia')
         with self.assertRaisesRegex(
             NotImplementedError,
-                'main_authors method is implemented for main namespace only'):
+                'main_authors method is not implemented for Talk: namespace'):
             page.authorship()
 
-    @require_modules('wikitextparser')
+        page = pywikibot.Page(pywikibot.Site('wikipedia:nl'),
+                              'Project:Pywikibot')
+        with self.assertRaisesRegex(
+            NotImplementedError,
+                'main_authors method is not implemented for wikipedia:nl'):
+            page.authorship()
+
     def test_main_authors(self):
         """Test main_authors() method."""
-        page = pywikibot.Page(self.site, 'Python (programmeertaal)')
+        page = pywikibot.Page(self.site, 'Python (Programmeerspraak)')
         auth = page.authorship(5)
         self.assertLessEqual(len(auth), 5)
         self.assertLessEqual(sum(pct for _, pct in auth.values()), 100)
         user, values = next(iter(auth.items()))
-        self.assertEqual(user, 'Emperor045')
+        self.assertEqual(user, 'RebeccaBreu')
         self.assertIsInstance(values[0], int)
         self.assertIsInstance(values[1], float)
 
-    @require_modules('wikitextparser')
     def test_restrictions(self):
         """Test main_authors() method with restrictions."""
         page = pywikibot.Page(pywikibot.Site('wikipedia:en'), 'Python')

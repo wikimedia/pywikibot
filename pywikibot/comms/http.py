@@ -25,7 +25,7 @@ To enable access via cookies, assign cookie handling class::
    Cookies are lazy loaded when logging to site.
 """
 #
-# (C) Pywikibot team, 2007-2024
+# (C) Pywikibot team, 2007-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -512,7 +512,14 @@ def _get_encoding_from_response_headers(
 
 def _decide_encoding(response: requests.Response,
                      charset: str | None = None) -> str | None:
-    """Detect the response encoding."""
+    """Detect the response encoding.
+
+    .. versionchanged:: 10.1
+       retrieve charset from `Accept-Charset` list which may look like
+       `'ISO-8859-1,utf-8;q=0.7,*;q=0.7'`.
+
+    :meta public:
+    """
     def _try_decode(content: bytes, encoding: str | None) -> str | None:
         """Helper function to try decoding."""
         if encoding is None:
@@ -521,7 +528,8 @@ def _decide_encoding(response: requests.Response,
         try:
             content.decode(encoding)
         except LookupError:
-            pywikibot.warning(f'Unknown or invalid encoding {encoding!r}')
+            pywikibot.warning(
+                f'Unknown or invalid encoding {encoding!r} for {response.url}')
         except UnicodeDecodeError as e:
             pywikibot.warning(f'{e} found in {content}')
         else:
@@ -534,7 +542,8 @@ def _decide_encoding(response: requests.Response,
         pywikibot.log('Http response does not contain a charset.')
 
     if charset is None:
-        charset = response.request.headers.get('accept-charset')
+        charset = response.request.headers.get('accept-charset', '')
+        charset = charset.split(',', 1)[0].split(';', 1)[0].strip() or None
 
     # No charset requested, or in request headers or response headers.
     # Defaults to latin1.

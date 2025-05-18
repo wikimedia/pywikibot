@@ -81,6 +81,7 @@ Contents
    :caption: About
 
    changelog
+   compatibility
    licenses
    credits
    glossary

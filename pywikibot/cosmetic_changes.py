@@ -50,7 +50,7 @@ or by adding a list to the given one::
                                      'your_script_name_2']
 """
 #
-# (C) Pywikibot team, 2006-2024
+# (C) Pywikibot team, 2006-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -538,11 +538,11 @@ class CosmeticChangesToolkit:
         This function will:
 
         * Replace underscores with spaces
-        * Move leading and trailing spaces out of the wikilink and into the
-          surrounding text
+        * Move leading and trailing spaces out of the wikilink and into
+          the surrounding text
         * Convert URL-encoded characters into Unicode-encoded characters
-        * Move trailing characters out of the link and make the link without
-          using a pipe, if possible
+        * Move trailing characters out of the link and make the link
+          without using a pipe, if possible
         * Capitalize the article title of the link, if appropriate
 
         .. versionchanged:: 8.4
@@ -560,7 +560,7 @@ class CosmeticChangesToolkit:
                                           encodings=self.site.encodings())
             label = match['label']
             trailingChars = match['linktrail']
-            newline = match['newline']
+            newline = match['newline'] or ''
             # entire link but convert URL-encoded text
             oldlink = url2string(match.group(),
                                  encodings=self.site.encodings())
@@ -582,16 +582,15 @@ class CosmeticChangesToolkit:
             if not in_main_namespace:
                 return oldlink
 
-            # Replace underlines by spaces, also multiple underlines
-            titleWithSection = re.sub('_+', ' ', titleWithSection)
-            # Remove double spaces
-            titleWithSection = re.sub('  +', ' ', titleWithSection)
+            # Replace underlines by spaces, remove double spaces
+            titleWithSection = re.sub('[_ ]+', ' ', titleWithSection)
             # Remove unnecessary leading spaces from title,
             # but remember if we did this because we eventually want
             # to re-add it outside of the link later.
             titleLength = len(titleWithSection)
             titleWithSection = titleWithSection.lstrip()
-            hadLeadingSpaces = len(titleWithSection) != titleLength
+            hadLeadingSpaces = not newline \
+                and len(titleWithSection) != titleLength
             hadTrailingSpaces = False
             # Remove unnecessary trailing spaces from title,
             # but remember if we did this because it may affect
@@ -609,13 +608,15 @@ class CosmeticChangesToolkit:
             # Remove unnecessary initial and final spaces from label.
             # Please note that some editors prefer spaces around pipes.
             # (See [[en:Wikipedia:Semi-bots]]). We remove them anyway.
-            if label is not None:
+            if label is None:
+                label = titleWithSection
+            else:
                 # Remove unnecessary leading spaces from label,
                 # but remember if we did this because we want
                 # to re-add it outside of the link later.
                 labelLength = len(label)
                 label = label.lstrip()
-                hadLeadingSpaces = len(label) != labelLength
+                hadLeadingSpaces = not newline and len(label) != labelLength
                 # Remove unnecessary trailing spaces from label,
                 # but remember if we did this because it affects
                 # the linktrail.
@@ -623,8 +624,7 @@ class CosmeticChangesToolkit:
                     labelLength = len(label)
                     label = label.rstrip()
                     hadTrailingSpaces = len(label) != labelLength
-            else:
-                label = titleWithSection
+
             if trailingChars:
                 label += trailingChars
 
@@ -643,7 +643,6 @@ class CosmeticChangesToolkit:
                   and trailR.sub('', label[len(titleWithSection):]) == ''):
                 newLink = (f'[[{label[:len(titleWithSection)]}]]'
                            f'{label[len(titleWithSection):]}')
-
             else:
                 # Try to capitalize the first letter of the title.
                 # Not useful for languages that don't capitalize nouns.
@@ -653,19 +652,15 @@ class CosmeticChangesToolkit:
                 if self.site.sitename == 'wikipedia:de':
                     titleWithSection = first_upper(titleWithSection)
                 newLink = f'[[{titleWithSection}|{label}]]'
+
             # re-add spaces that were pulled out of the link.
             # Examples:
             #   text[[ title ]]text        -> text [[title]] text
             #   text[[ title | name ]]text -> text [[title|name]] text
             #   text[[ title |name]]text   -> text[[title|name]]text
             #   text[[title| name]]text    -> text [[title|name]]text
-            if hadLeadingSpaces and not newline:
-                newLink = ' ' + newLink
-            if hadTrailingSpaces:
-                newLink += ' '
-            if newline:
-                newLink = newline + newLink
-            return newLink
+            return f"{newline}{' ' if hadLeadingSpaces else ''}" \
+                   f"{newLink}{' ' if hadTrailingSpaces else ''}"
 
         trailR = re.compile(self.site.linktrail())
     # The regular expression which finds links. Results consist of four groups:
@@ -736,11 +731,16 @@ class CosmeticChangesToolkit:
         stripped_text = textlib.removeLanguageLinks(text, self.site, '\n')
         for reg in skip_regexes:
             stripped_text = reg.sub(r'', stripped_text)
+
         strip_sections = textlib.extract_sections(
             stripped_text, self.site).sections
 
         # get proper sections
         header, sections, footer = textlib.extract_sections(text, self.site)
+
+        if len(strip_sections) > len(sections):
+            # there must be something wrong with the extracted sections; skip
+            return text
 
         # iterate stripped sections and create a new page body
         new_body: list[textlib.Section] = []

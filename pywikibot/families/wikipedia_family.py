@@ -19,7 +19,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     closed_wikis = [
         # https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist
         'aa', 'ak', 'cho', 'ho', 'hz', 'ii', 'kj', 'kr', 'lrc', 'mh', 'mus',
-        'na', 'ng', 'ten',
+        'na', 'ng', 'pih', 'ten',
     ]
 
     removed_wikis = [
@@ -49,8 +49,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'mdf', 'mg', 'mhr', 'mi', 'min', 'mk', 'ml', 'mn', 'mni', 'mnw', 'mos',
         'mr', 'mrj', 'ms', 'mt', 'mwl', 'my', 'myv', 'mzn', 'nah', 'nap',
         'nds', 'nds-nl', 'ne', 'new', 'nia', 'nl', 'nn', 'no', 'nov', 'nqo',
-        'nr', 'nrm', 'nso', 'nv', 'ny', 'oc', 'olo', 'om', 'or', 'os', 'pa',
-        'pag', 'pam', 'pap', 'pcd', 'pcm', 'pdc', 'pfl', 'pi', 'pih', 'pl',
+        'nr', 'nrm', 'nso', 'nup', 'nv', 'ny', 'oc', 'olo', 'om', 'or', 'os',
+        'pa', 'pag', 'pam', 'pap', 'pcd', 'pcm', 'pdc', 'pfl', 'pi', 'pl',
         'pms', 'pnb', 'pnt', 'ps', 'pt', 'pwn', 'qu', 'rm', 'rmy', 'rn', 'ro',
         'roa-rup', 'roa-tara', 'rsk', 'ru', 'rue', 'rw', 'sa', 'sah', 'sat',
         'sc', 'scn', 'sco', 'sd', 'se', 'sg', 'sh', 'shi', 'shn', 'si',

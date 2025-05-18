@@ -6,13 +6,13 @@
 #
 from __future__ import annotations
 
-import concurrent.futures as futures
 import dataclasses
 import importlib
 import queue
 import re
 import threading
 import time
+from concurrent import futures
 from typing import Any
 
 import pywikibot  # T306760

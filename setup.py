@@ -40,7 +40,7 @@ extra_deps = {
     'eventstreams': ['requests-sse>=0.5.0'],
     'isbn': ['python-stdnum>=1.20'],
     'Graphviz': ['pydot>=3.0.2'],
-    'Google': ['google>=1.7'],
+    'Google': ['googlesearch-python >= 1.3.0'],
     'memento': ['memento_client==0.6.1'],
     'wikitextparser': ['wikitextparser>=0.56.3'],
     'mysql': ['PyMySQL >= 1.1.1'],
