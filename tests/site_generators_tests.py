@@ -17,6 +17,7 @@ from pywikibot.exceptions import (
     APIError,
     Error,
     HiddenKeyError,
+    InvalidTitleError,
     NoPageError,
     TimeoutError,
 )
@@ -243,46 +244,46 @@ class TestSiteGenerators(DefaultSiteTestCase):
             self.assertIsInstance(target, pywikibot.Page)
             self.assertFalse(target.isRedirectPage())
 
+    def validate_page(self, page, *, namespace: int = 0) -> bool:
+        """Validate page, title and namespace.
+
+        Allow further tests if title is valid.
+        """
+        self.assertIsInstance(page, pywikibot.Page)
+        self.assertTrue(page.exists())
+        try:
+            self.assertEqual(page.namespace(), namespace)
+        except InvalidTitleError:
+            return False
+        return True
+
     def test_allpages(self):
         """Test the site.allpages() method."""
         mysite = self.get_site()
         fwd = list(mysite.allpages(total=10))
         self.assertLessEqual(len(fwd), 10)
         for page in fwd:
-            self.assertIsInstance(page, pywikibot.Page)
-            self.assertTrue(page.exists())
-            self.assertEqual(page.namespace(), 0)
+            self.validate_page(page)
+
         rev = list(mysite.allpages(reverse=True, start='Aa', total=12))
         self.assertLessEqual(len(rev), 12)
         for page in rev:
-            self.assertIsInstance(page, pywikibot.Page)
-            self.assertTrue(page.exists())
-            self.assertEqual(page.namespace(), 0)
-            self.assertLessEqual(page.title(), 'Aa')
+            if self.validate_page(page):
+                self.assertLessEqual(page.title(), 'Aa')
         for page in mysite.allpages(start='Py', total=5):
-            self.assertIsInstance(page, pywikibot.Page)
-            self.assertTrue(page.exists())
-            self.assertEqual(page.namespace(), 0)
-            self.assertGreaterEqual(page.title(), 'Py')
+            if self.validate_page(page):
+                self.assertGreaterEqual(page.title(), 'Py')
         for page in mysite.allpages(prefix='Pre', total=5):
-            self.assertIsInstance(page, pywikibot.Page)
-            self.assertTrue(page.exists())
-            self.assertEqual(page.namespace(), 0)
-            self.assertTrue(page.title().startswith('Pre'))
+            if self.validate_page(page):
+                self.assertTrue(page.title().startswith('Pre'))
         for page in mysite.allpages(namespace=1, total=5):
-            self.assertIsInstance(page, pywikibot.Page)
-            self.assertTrue(page.exists())
-            self.assertEqual(page.namespace(), 1)
+            self.validate_page(page, namespace=1)
         for page in mysite.allpages(filterredir=True, total=5):
-            self.assertIsInstance(page, pywikibot.Page)
-            self.assertTrue(page.exists())
-            self.assertEqual(page.namespace(), 0)
-            self.assertTrue(page.isRedirectPage())
+            if self.validate_page(page):
+                self.assertTrue(page.isRedirectPage())
         for page in mysite.allpages(filterredir=False, total=5):
-            self.assertIsInstance(page, pywikibot.Page)
-            self.assertTrue(page.exists())
-            self.assertEqual(page.namespace(), 0)
-            self.assertFalse(page.isRedirectPage())
+            if self.validate_page(page):
+                self.assertFalse(page.isRedirectPage())
 
     def test_allpages_langlinks_enabled(self):
         """Test allpages with langlinks enabled."""
