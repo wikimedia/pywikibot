@@ -1,18 +1,15 @@
 """Miscellaneous helper functions (not wiki-dependent)."""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
 import abc
-import bz2
-import gzip
 import hashlib
 import importlib.metadata
 import ipaddress
-import lzma
 import os
 import re
 import stat
@@ -42,6 +39,14 @@ from pywikibot.tools._deprecate import (
     remove_last_args,
 )
 from pywikibot.tools._unidata import _first_upper_exception
+
+
+try:  # Python 3.14+
+    from compression import bz2, gzip, lzma
+except ModuleNotFoundError:
+    import bz2
+    import gzip
+    import lzma
 
 
 __all__ = (
