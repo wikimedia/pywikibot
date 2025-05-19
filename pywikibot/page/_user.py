@@ -1,6 +1,6 @@
 """Object representing a Wiki user."""
 #
-# (C) Pywikibot team, 2009-2024
+# (C) Pywikibot team, 2009-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -72,6 +72,8 @@ class User(Page):
         The page does not need to exist for this method to return
         True.
 
+        .. seealso:: :meth:`isAnonymous`
+
         :param force: if True, forces reloading the data from API
         """
         # T135828: the registration timestamp may be None but the key exists
@@ -79,15 +81,31 @@ class User(Page):
                 and 'registration' in self.getprops(force))
 
     def isAnonymous(self) -> bool:  # noqa: N802
-        """Determine if the user is editing as an IP address."""
+        """Determine if the user is editing as an IP address.
+
+        .. seealso::
+           - :meth:`isRegistered`
+           - :meth:`is_CIDR`
+           - :func:`tools.is_ip_address`
+        """
         return is_ip_address(self.username)
 
     def is_CIDR(self) -> bool:  # noqa: N802
-        """Determine if the input refers to a range of IP addresses."""
+        """Determine if the input refers to a range of IP addresses.
+
+        .. versionadded:: 9.0
+        .. seealso::
+           - :meth:`isRegistered`
+           - :meth:`isAnonymous`
+           - :func:`tools.is_ip_network`
+        """
         return is_ip_network(self.username)
 
     def getprops(self, force: bool = False) -> dict:
         """Return a properties about the user.
+
+        .. versionchanged:: 9.0
+           detect range blocks
 
         :param force: if True, forces reloading the data from API
         """
@@ -127,7 +145,8 @@ class User(Page):
         """Determine whether the user is currently blocked.
 
         .. versionchanged:: 7.0
-           renamed from :meth:`isBlocked` method,
+           renamed from :meth:`isBlocked` method
+        .. versionchanged:: 9.0
            can also detect range blocks.
 
         :param force: if True, forces reloading the data from API

@@ -329,6 +329,8 @@ Release History
   only available for :class:`family.WikimediaFamily` families. The ``wikimedia_sites.py`` maintenance script was
   removed.
 * Add :func:`config.base_dir<config.get_base_dir>` to scripts search path with :mod:`pwb` wrapper (:phab:`T324287`)
+* Detect range blocks with :meth:`pywikibot.User.is_blocked` and :meth:`pywikibot.User.getprops` (:phab:`T301282`)
+* Add :func:`tools.is_ip_network` and :meth:`pywikibot.User.is_CIDR` (:phab:`T301282`)
 * :meth:`pywikibot.WbTime.equal_instant` was added (:phab:`T325248`)
 * ``revisions`` parameter of :class:`xmlreader.XmlDump` was introduced to specify parsing method
   (:phab:`T340804`)

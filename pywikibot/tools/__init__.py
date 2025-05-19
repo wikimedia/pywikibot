@@ -92,6 +92,7 @@ def is_ip_address(value: str) -> bool:
 
     .. versionadded:: 6.1
        Was renamed from ``is_IP()``.
+    .. seealso:: :func:`is_ip_network`
 
     :param value: value to check
     """
@@ -106,6 +107,7 @@ def is_ip_network(value: str) -> bool:
     """Check if a value is a valid range of IPv4 or IPv6 addresses.
 
     .. versionadded:: 9.0
+    .. seealso:: :func:`is_ip_address`
 
     :param value: value to check
     """
