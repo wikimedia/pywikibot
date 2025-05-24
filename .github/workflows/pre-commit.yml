@@ -19,6 +19,7 @@ jobs:
         python-version:
           - "3.13"
           - "3.14-dev"
+          - "3.15-dev"
     steps:
       - name: set up python ${{ matrix.python-version }}
         if: "!endsWith(matrix.python-version, '-dev')"
