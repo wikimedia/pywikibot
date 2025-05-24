@@ -14,6 +14,7 @@
 #
 from __future__ import annotations
 
+import re
 import sys
 from typing import Any
 
@@ -206,3 +207,86 @@ if PYTHON_VERSION < (3, 13) or SPHINX_RUNNING:
                 yield group
 else:
     from itertools import batched  # type: ignore[no-redef]
+
+
+# gh-115942, gh-134323
+if PYTHON_VERSION < (3, 14) or SPHINX_RUNNING:
+    import threading as _threading
+
+    from pywikibot.tools import deprecated, issue_deprecation_warning
+
+    class RLock:
+
+        """Context manager which implements extended reentrant lock objects.
+
+        This RLock is implicit derived from threading.RLock but provides a
+        locked() method like in threading.Lock and a count attribute which
+        gives the active recursion level of locks.
+
+        Usage:
+
+        >>> lock = RLock()
+        >>> lock.acquire()
+        True
+        >>> with lock: print(lock.count)  # nested lock
+        2
+        >>> lock.locked()
+        True
+        >>> lock.release()
+        >>> lock.locked()
+        False
+
+        .. versionadded:: 6.2
+        .. versionchanged:: 10.2
+           moved from :mod:`tools.threading` to :mod:`backports`.
+        .. note:: Passing any arguments has no effect and has been
+           deprecated since Python 3.14 and was removed in Python 3.15.
+        """
+
+        def __init__(self, *args, **kwargs) -> None:
+            """Initializer."""
+            if args or kwargs:
+                issue_deprecation_warning('Passing arguments to RLock',
+                                          since='10.2.0')
+            self._lock = _threading.RLock()
+            self._block = _threading.Lock()
+
+        def __enter__(self):
+            """Acquire lock and call atenter."""
+            return self._lock.__enter__()
+
+        def __exit__(self, *exc):
+            """Call atexit and release lock."""
+            return self._lock.__exit__(*exc)
+
+        def __getattr__(self, name):
+            """Delegate attributes and methods to self._lock."""
+            return getattr(self._lock, name)
+
+        def __repr__(self) -> str:
+            """Representation of tools.RLock instance."""
+            return repr(self._lock).replace(
+                '_thread.RLock',
+                f'{self.__module__}.{type(self).__name__}'
+            )
+
+        @property
+        @deprecated(since='10.2.0')
+        def count(self):
+            """Return number of acquired locks.
+
+            .. deprecated:: 10.2
+            """
+            with self._block:
+                counter = re.search(r'count=(\d+) ', repr(self))
+                return int(counter[1])
+
+        def locked(self):
+            """Return true if the lock is acquired."""
+            with self._block:
+                status = repr(self).split(maxsplit=1)[0][1:]
+                assert status in ('locked', 'unlocked')
+                return status == 'locked'
+
+else:
+    from threading import RLock
