@@ -4,7 +4,7 @@
 e.g. used to test password-file based login.
 """
 #
-# (C) Pywikibot team, 2012-2022
+# (C) Pywikibot team, 2012-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -12,10 +12,12 @@ from __future__ import annotations
 
 from collections import defaultdict
 from io import StringIO
+from pathlib import Path
 from unittest import mock
 
 from pywikibot.exceptions import NoUsernameError
 from pywikibot.login import LoginManager
+from pywikibot.tools import PYTHON_VERSION
 from tests.aspects import DefaultDrySiteTestCase, unittest
 
 
@@ -105,26 +107,29 @@ class TestPasswordFile(DefaultDrySiteTestCase):
 
         self.stat = self.patch('os.stat')
         self.stat.return_value.st_mode = 0o100600
-
         self.chmod = self.patch('os.chmod')
 
-        self.open = self.patch('codecs.open')
+        if PYTHON_VERSION[:2] == (3, 10):
+            self.open = self.patch('pathlib.Path._accessor.open')
+        else:
+            self.open = self.patch('io.open')
+
         self.open.return_value = StringIO()
 
     def test_auto_chmod_OK(self):
         """Do not chmod files that have mode private_files_permission."""
         self.stat.return_value.st_mode = 0o100600
         LoginManager()
-        self.stat.assert_called_with(self.config.password_file)
+        self.stat.assert_called_with(Path(self.config.password_file))
         self.assertFalse(self.chmod.called)
 
     def test_auto_chmod_not_OK(self):
         """Chmod files that do not have mode private_files_permission."""
         self.stat.return_value.st_mode = 0o100644
         LoginManager()
-        self.stat.assert_called_with(self.config.password_file)
+        self.stat.assert_called_with(Path(self.config.password_file))
         self.chmod.assert_called_once_with(
-            self.config.password_file,
+            Path(self.config.password_file),
             0o600
         )
 

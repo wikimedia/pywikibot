@@ -659,7 +659,7 @@ def merge_unique_dicts(*args, **kwargs):
 
 
 def file_mode_checker(
-    filename: str,
+    filename: str | bytes | os.PathLike,
     mode: int = 0o600,
     quiet: bool = False,
     create: bool = False
