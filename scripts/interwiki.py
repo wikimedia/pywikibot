@@ -343,18 +343,18 @@ To run the script on all pages on a language, run it with option
 ``-continue`` next time.
 """
 #
-# (C) Pywikibot team, 2003-2024
+# (C) Pywikibot team, 2003-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
-import codecs
 import os
 import re
 import sys
 from collections import Counter, defaultdict
 from contextlib import suppress
+from pathlib import Path
 from textwrap import fill
 
 import pywikibot
@@ -507,8 +507,8 @@ class InterwikiBotConfig:
                 'Please enter the hint filename:')
             # hint or title ends either before | or before ]]
             R = re.compile(r'\[\[(.+?)(?:\]\]|\|)')
-            with codecs.open(hintfilename, 'r', config.textfile_encoding) as f:
-                self.hints += R.findall(f.read())
+            txt = Path(hintfilename).read_text(config.textfile_encoding)
+            self.hints += R.findall(txt)
         elif arg == 'untranslatedonly':
             self.untranslated = True
             self.untranslatedonly = True
@@ -1009,9 +1009,8 @@ class Subject(interwiki_graph.Subject):
         """Report interwikiless page."""
         self.conf.note(f'{self.origin} does not have any interwiki links')
         if config.without_interwiki:
-            with codecs.open(
-                    pywikibot.config.datafilepath('without_interwiki.txt'),
-                    'a', 'utf-8') as f:
+            with open(pywikibot.config.datafilepath('without_interwiki.txt'),
+                      'a', encoding='utf-8') as f:
                 f.write(f'# {page} \n')
 
     def askForHints(self, counter) -> None:
@@ -1189,9 +1188,9 @@ class Subject(interwiki_graph.Subject):
                            f'pages {duplicate} and {page} are found')
             self.makeForcedStop(counter)
             try:
-                with codecs.open(
+                with open(
                     pywikibot.config.datafilepath('autonomous_problems.dat'),
-                        'a', 'utf-8') as f:
+                        'a', encoding='utf-8') as f:
                     f.write(
                         f'* {self.origin} '
                         f'{{Found more than one link for {page.site}}}')
@@ -2227,7 +2226,7 @@ class InterwikiDumps(OptionHandler):
         filename = os.path.join(self.path,
                                 self.FILE_PATTERN.format(site=self.site))
         mode = 'appended' if append else 'written'
-        with codecs.open(filename, mode[0], 'utf-8') as f:
+        with open(filename, mode[0], encoding='utf-8') as f:
             f.write('\r\n'.join(iterable))
             f.write('\r\n')
         pywikibot.info(
