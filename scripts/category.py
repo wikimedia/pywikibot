@@ -1413,7 +1413,7 @@ class CategoryTreeRobot:
         pywikibot.info()
         if self.filename:
             pywikibot.info('Saving results in ' + self.filename)
-            with codecs.open(self.filename, 'a', 'utf-8') as f:
+            with codecs.open(self.filename, 'a', encoding='utf-8') as f:
                 f.write(tree)
         else:
             pywikibot.stdout(tree)
