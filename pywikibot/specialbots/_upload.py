@@ -3,7 +3,7 @@
 Do not import classes directly from here but from specialbots.
 """
 #
-# (C) Pywikibot team, 2003-2024
+# (C) Pywikibot team, 2003-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -238,6 +238,10 @@ class UploadRobot(BaseBot):
     def process_filename(self, file_url: str) -> str | None:
         """Return base filename portion of *file_url*.
 
+        .. versionchanged:: 10.2
+           no longer shows the description if UploadRobot's parameter
+           *verify_description* is set to False.
+
         :param file_url: either a URL or a local file path
         """
         # Isolate the pure name
@@ -331,9 +335,8 @@ class UploadRobot(BaseBot):
                     continue
             break
 
-        # A proper description for the submission.
-        # Empty descriptions are not accepted.
-        if self.description:
+        # Show the description to verify it for the submission
+        if self.description and self.verify_description:
             pywikibot.info(
                 f'The suggested description is:\n{self.description}')
 
