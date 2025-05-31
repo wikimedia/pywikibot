@@ -26,7 +26,7 @@ class TestDeletionBotWrite(ScriptMainTestCase):
     rights = 'undelete'
     write = True
 
-    def test_delete(self):
+    def test_delete(self) -> None:
         """Test deletionbot on the test wiki."""
         site = self.get_site()
         cat = pywikibot.Category(site, 'Pywikibot Delete Test')
@@ -38,7 +38,7 @@ class TestDeletionBotWrite(ScriptMainTestCase):
                     '-undelete', '-summary:pywikibot unit tests')
         self.assertLength(list(cat.members()), 2)
 
-    def test_undelete_existing(self):
+    def test_undelete_existing(self) -> None:
         """Test undeleting an existing page."""
         site = self.get_site()
         p1 = pywikibot.Page(site, 'User:Unicodesnowman/ExistingPage')
@@ -79,7 +79,7 @@ class TestDeletionBotUser(ScriptMainTestCase):
         cls.page.save('Pywikibot unit test')
 
     @unittest.expectedFailure  # T367299
-    def test_delete_mark(self):
+    def test_delete_mark(self) -> None:
         """Test marking User:Unicodesnowman/DeleteMark for deletion."""
         delete.main('-page:User:Unicodesnowman/DeleteMark', '-always',
                     '-summary:pywikibot unit test. Do NOT actually delete.')
@@ -117,7 +117,7 @@ class TestDeletionBot(ScriptMainTestCase):
         pywikibot.Page.undelete = self._original_undelete
         super().tearDown()
 
-    def test_dry(self):
+    def test_dry(self) -> None:
         """Test dry run of bot."""
         with empty_sites():
             delete.main('-page:Main Page', '-always', '-summary:foo')

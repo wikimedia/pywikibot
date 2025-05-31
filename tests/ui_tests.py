@@ -106,7 +106,7 @@ class TestTerminalOutput(UITestCase):
         ('CRITICAL', CRITICAL, '', 'CRITICAL: CRITICAL\n'),
     ]
 
-    def test_outputlevels_logging(self):
+    def test_outputlevels_logging(self) -> None:
         """Test logger with output levels."""
         for text, level, out, err in self.tests:
             with self.subTest(test=text):
@@ -119,42 +119,42 @@ class TestTerminalOutput(UITestCase):
                     stream.truncate(0)
                     stream.seek(0)
 
-    def test_output(self):
+    def test_output(self) -> None:
         pywikibot.info('output')
         self.assertEqual(self.strout.getvalue(), '')
         self.assertEqual(self.strerr.getvalue(), 'output\n')
 
-    def test_stdout(self):
+    def test_stdout(self) -> None:
         pywikibot.stdout('output')
         self.assertEqual(self.strout.getvalue(), 'output\n')
         self.assertEqual(self.strerr.getvalue(), '')
 
-    def test_warning(self):
+    def test_warning(self) -> None:
         pywikibot.warning('warning')
         self.assertEqual(self.strout.getvalue(), '')
         self.assertEqual(self.strerr.getvalue(), 'WARNING: warning\n')
 
-    def test_error(self):
+    def test_error(self) -> None:
         pywikibot.error('error')
         self.assertEqual(self.strout.getvalue(), '')
         self.assertEqual(self.strerr.getvalue(), 'ERROR: error\n')
 
-    def test_log(self):
+    def test_log(self) -> None:
         pywikibot.log('log')
         self.assertEqual(self.strout.getvalue(), '')
         self.assertEqual(self.strerr.getvalue(), '')
 
-    def test_critical(self):
+    def test_critical(self) -> None:
         pywikibot.critical('critical')
         self.assertEqual(self.strout.getvalue(), '')
         self.assertEqual(self.strerr.getvalue(), 'CRITICAL: critical\n')
 
-    def test_debug(self):
+    def test_debug(self) -> None:
         pywikibot.debug('debug', layer='test')
         self.assertEqual(self.strout.getvalue(), '')
         self.assertEqual(self.strerr.getvalue(), '')
 
-    def test_exception(self):
+    def test_exception(self) -> None:
         try:
             raise ExceptionTestError('Testing Exception')
         except ExceptionTestError:
@@ -163,7 +163,7 @@ class TestTerminalOutput(UITestCase):
         self.assertEqual(self.strerr.getvalue(),
                          'ERROR: exception\n')
 
-    def test_exception_empty(self):
+    def test_exception_empty(self) -> None:
         try:
             raise ExceptionTestError('Testing Exception')
         except ExceptionTestError:
@@ -172,7 +172,7 @@ class TestTerminalOutput(UITestCase):
         self.assertEqual(self.strerr.getvalue(),
                          'ERROR: Testing Exception (ExceptionTestError)\n')
 
-    def test_exception_tb(self):
+    def test_exception_tb(self) -> None:
         try:
             raise ExceptionTestError('Testing Exception')
         except ExceptionTestError:
@@ -196,7 +196,7 @@ class TestTerminalInput(UITestCase):
 
     input_choice_output = 'question ([A]nswer 1, a[n]swer 2, an[s]wer 3): '
 
-    def testInput(self):
+    def testInput(self) -> None:
         self.strin.write('input to read\n')
         self.strin.seek(0)
         returned = pywikibot.input('question')
@@ -206,7 +206,7 @@ class TestTerminalInput(UITestCase):
         self.assertIsInstance(returned, str)
         self.assertEqual(returned, 'input to read')
 
-    def test_input_yn(self):
+    def test_input_yn(self) -> None:
         self.strin.write('\n')
         self.strin.seek(0)
         returned = pywikibot.input_yn('question', False, automatic_quit=False)
@@ -228,14 +228,14 @@ class TestTerminalInput(UITestCase):
         self.assertIsInstance(rv, str)
         return rv
 
-    def testInputChoiceDefault(self):
+    def testInputChoiceDefault(self) -> None:
         self.strin.write('\n')
         self.strin.seek(0)
         returned = self._call_input_choice()
 
         self.assertEqual(returned, 'a')
 
-    def testInputChoiceCapital(self):
+    def testInputChoiceCapital(self) -> None:
         self.strin.write('N\n')
         self.strin.seek(0)
         returned = self._call_input_choice()
@@ -243,7 +243,7 @@ class TestTerminalInput(UITestCase):
         self.assertEqual(self.strerr.getvalue(), self.input_choice_output)
         self.assertEqual(returned, 'n')
 
-    def testInputChoiceNonCapital(self):
+    def testInputChoiceNonCapital(self) -> None:
         self.strin.write('n\n')
         self.strin.seek(0)
         returned = self._call_input_choice()
@@ -251,7 +251,7 @@ class TestTerminalInput(UITestCase):
         self.assertEqual(self.strerr.getvalue(), self.input_choice_output)
         self.assertEqual(returned, 'n')
 
-    def testInputChoiceIncorrectAnswer(self):
+    def testInputChoiceIncorrectAnswer(self) -> None:
         self.strin.write('X\nN\n')
         self.strin.seek(0)
         returned = self._call_input_choice()
@@ -259,7 +259,7 @@ class TestTerminalInput(UITestCase):
         self.assertEqual(self.strerr.getvalue(), self.input_choice_output * 2)
         self.assertEqual(returned, 'n')
 
-    def test_input_list_choice(self):
+    def test_input_list_choice(self) -> None:
         """Test input_list_choice function."""
         options = ('answer 1', 'answer 2', 'answer 3')
         rv = pywikibot.bot.input_list_choice('question', options, '2')
@@ -280,14 +280,14 @@ class TestTerminalOutputColorUnix(UITestCase):
 
     str1 = 'text <<lightpurple>>light purple text<<default>> text'
 
-    def testOutputColorizedText(self):
+    def testOutputColorizedText(self) -> None:
         pywikibot.info(self.str1)
         self.assertEqual(self.strout.getvalue(), '')
         self.assertEqual(
             self.strerr.getvalue(),
             'text \x1b[95mlight purple text\x1b[0m text\n')
 
-    def testOutputNoncolorizedText(self):
+    def testOutputNoncolorizedText(self) -> None:
         pywikibot.config.colorized_output = False
         pywikibot.info(self.str1)
         self.assertEqual(self.strout.getvalue(), '')
@@ -299,7 +299,7 @@ class TestTerminalOutputColorUnix(UITestCase):
             '<<lightblue>> light blue <<previous>> light purple '
             '<<default>> normal text')
 
-    def testOutputColorCascade_incorrect(self):
+    def testOutputColorCascade_incorrect(self) -> None:
         """Test incorrect behavior of testOutputColorCascade."""
         pywikibot.info(self.str2)
         self.assertEqual(self.strout.getvalue(), '')
@@ -315,12 +315,12 @@ class TestTerminalUnicodeUnix(UITestCase):
 
     """Terminal output tests for Unix."""
 
-    def testOutputUnicodeText(self):
+    def testOutputUnicodeText(self) -> None:
         pywikibot.info('Заглавная_страница')
         self.assertEqual(self.strout.getvalue(), '')
         self.assertEqual(self.strerr.getvalue(), 'Заглавная_страница\n')
 
-    def testInputUnicodeText(self):
+    def testInputUnicodeText(self) -> None:
         self.strin.write('Заглавная_страница\n')
         self.strin.seek(0)
 
@@ -339,7 +339,7 @@ class TestTransliterationUnix(UITestCase):
 
     """Terminal output transliteration tests."""
 
-    def testOutputTransliteratedUnicodeText(self):
+    def testOutputTransliteratedUnicodeText(self) -> None:
         pywikibot.bot.ui.encoding = 'latin-1'
         pywikibot.config.transliterate = True
         pywikibot.info('abcd АБГД αβγδ あいうえお')
@@ -358,7 +358,7 @@ class TestTransliterationTable(TestCase):
 
     net = False
 
-    def test_latin_digits(self):
+    def test_latin_digits(self) -> None:
         """Test that non latin digits are in transliteration table."""
         for lang, digits in NON_LATIN_DIGITS.items():
             with self.subTest(lang=lang):
@@ -366,7 +366,7 @@ class TestTransliterationTable(TestCase):
                     self.assertIn(char, _trans,
                                   f'{char!r} not in transliteration table')
 
-    def test_transliteration_table(self):
+    def test_transliteration_table(self) -> None:
         """Test transliteration table consistency."""
         for k, v in _trans.items():
             with self.subTest():
@@ -406,21 +406,21 @@ class FakeUITest(TestCase):
         raise AssertionError(
             'This method should not be invoked')  # pragma: no cover
 
-    def test_no_color(self):
+    def test_no_color(self) -> None:
         """Test a string without any colors."""
         self._colors = ()
         with redirect_stdout(self.redirect) as f:
             self.ui_obj._print('Hello world you!', self.ui_obj.stdout)
         self.assertEqual(f.getvalue(), 'Hello world you!')
 
-    def test_one_color(self):
+    def test_one_color(self) -> None:
         """Test a string using one color."""
         self._colors = (('red', 6), ('default', 10))
         with redirect_stdout(self.redirect) as f:
             self.ui_obj._print('Hello <<red>>world you!', self.ui_obj.stdout)
         self.assertEqual(f.getvalue(), self.expected)
 
-    def test_flat_color(self):
+    def test_flat_color(self) -> None:
         """Test using colors with defaulting in between."""
         self._colors = (('red', 6), ('default', 6), ('yellow', 3),
                         ('default', 1))
@@ -430,7 +430,7 @@ class FakeUITest(TestCase):
                 self.ui_obj.stdout)
         self.assertEqual(f.getvalue(), self.expected)
 
-    def test_stack_with_pop_color(self):
+    def test_stack_with_pop_color(self) -> None:
         """Test using stacked colors and just popping the latest color."""
         self._colors = (('red', 6), ('yellow', 6), ('red', 3), ('default', 1))
         with redirect_stdout(self.redirect) as f:
@@ -439,7 +439,7 @@ class FakeUITest(TestCase):
                 self.ui_obj.stdout)
         self.assertEqual(f.getvalue(), self.expected)
 
-    def test_stack_implicit_color(self):
+    def test_stack_implicit_color(self) -> None:
         """Test using stacked colors without popping any."""
         self._colors = (('red', 6), ('yellow', 6), ('default', 4))
         with redirect_stdout(self.redirect) as f:
@@ -447,7 +447,7 @@ class FakeUITest(TestCase):
                                self.ui_obj.stdout)
         self.assertEqual(f.getvalue(), self.expected)
 
-    def test_one_color_newline(self):
+    def test_one_color_newline(self) -> None:
         """Test with trailing new line and one color."""
         self._colors = (('red', 6), ('default', 10))
         with redirect_stdout(self.redirect) as f:

@@ -71,7 +71,7 @@ class OAuthEditTest(OAuthSiteTestCase):
         super().tearDown()
         config.authenticate = self._authenticate
 
-    def test_edit(self):
+    def test_edit(self) -> None:
         """Test editing to a page."""
         self.site.login()
         self.assertTrue(self.site.logged_in())
@@ -104,14 +104,14 @@ class TestOauthLoginManager(DefaultSiteTestCase, OAuthSiteTestCase):
         login_manager.access_token = self.access_token
         return login_manager
 
-    def test_login(self):
+    def test_login(self) -> None:
         """Test login."""
         login_manager = self._get_login_manager()
         login_manager.login()
         self.assertEqual(login_manager.consumer_token, self.consumer_token)
         self.assertEqual(login_manager.access_token, self.access_token)
 
-    def test_identity(self):
+    def test_identity(self) -> None:
         """Test identity."""
         login_manager = self._get_login_manager()
         self.assertIsNotNone(login_manager.access_token)

@@ -47,54 +47,54 @@ class TestDjVuFile(TestCase):
         super().setUp()
         self.djvu = DjVuFile(file_djvu)
 
-    def test_number_of_images(self):  # pragma: no cover
+    def test_number_of_images(self) -> None:  # pragma: no cover
         """Test page number generator."""
         self.assertEqual(self.djvu.number_of_images(), 4)
 
-    def test_page_info(self):  # pragma: no cover
+    def test_page_info(self) -> None:  # pragma: no cover
         """Test page info retrieval."""
         self.assertEqual(self.djvu.page_info(1),
                          ('{myfile.djvu}', ('1092x221', 600)))
 
-    def test_get_most_common_info(self):  # pragma: no cover
+    def test_get_most_common_info(self) -> None:  # pragma: no cover
         """Test that most common (size, dpi) are returned."""
         self.assertEqual(self.djvu.get_most_common_info(), ('1092x221', 600))
 
-    def test_has_text(self):  # pragma: no cover
+    def test_has_text(self) -> None:  # pragma: no cover
         """Test if djvu file contains text."""
         self.assertTrue(self.djvu.has_text())
         djvu = DjVuFile(self.file_djvu_wo_text)
         self.assertFalse(djvu.has_text())
 
-    def test_get_existing_page_number(self):  # pragma: no cover
+    def test_get_existing_page_number(self) -> None:  # pragma: no cover
         """Test text is returned for existing page number."""
         self.assertTrue(self.djvu.has_text())
         txt = self.djvu.get_page(1)
         self.assertEqual(txt, self.test_txt)
 
-    def test_get_not_existing_page_number(self):  # pragma: no cover
+    def test_get_not_existing_page_number(self) -> None:  # pragma: no cover
         """Test error is raised if djvu page number is out of range."""
         self.assertTrue(self.djvu.has_text())
         with self.assertRaises(ValueError):
             self.djvu.get_page(100)
 
-    def test_get_not_existing_page(self):  # pragma: no cover
+    def test_get_not_existing_page(self) -> None:  # pragma: no cover
         """Test error is raised if djvu file has no text."""
         self.assertFalse(self.djvu.has_text())
         with self.assertRaises(ValueError):
             self.djvu.get_page(1)
 
-    def test_whiten_not_existing_page_number(self):  # pragma: no cover
+    def test_whiten_not_existing_page_number(self) -> None:  # pragma: no cover
         """Test djvu page cannot be whitend if page number is out of range."""
         with self.assertRaises(ValueError):
             self.djvu.whiten_page(100)
 
-    def test_delete_not_existing_page_number(self):  # pragma: no cover
+    def test_delete_not_existing_page_number(self) -> None:  # pragma: no cover
         """Test djvu page cannot be deleted if page number is out of range."""
         with self.assertRaises(ValueError):
             self.djvu.delete_page(100)
 
-    def test_clear_cache(self):  # pragma: no cover
+    def test_clear_cache(self) -> None:  # pragma: no cover
         """Test if djvu file contains text."""
         self.assertTrue(self.djvu.has_text())
         self.djvu._has_text = False
@@ -115,17 +115,17 @@ class TestDjVuFileWithoutLib(TestCase):
         super().setUp()
         self.djvu = DjVuFile(file_djvu)
 
-    def test_file_existence(self):
+    def test_file_existence(self) -> None:
         """Test file existence checks."""
         self.assertEqual(os.path.abspath(file_djvu), self.djvu.file)
         with self.assertRaises(IOError):
             DjVuFile(self.file_djvu_not_existing)
 
-    def test_str_method(self):
+    def test_str_method(self) -> None:
         """Test __str__() method."""
         self.assertEqual(str(self.djvu), f"DjVuFile('{file_djvu}')")
 
-    def test_repr_method(self):
+    def test_repr_method(self) -> None:
         """Test __repr__() method."""
         self.assertEqual(repr(self.djvu),
                          f"pywikibot.tools.djvu.DjVuFile('{file_djvu}')")

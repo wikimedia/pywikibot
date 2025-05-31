@@ -22,7 +22,7 @@ class TestHarvestRobot(ScriptMainTestCase):
     family = 'wikipedia'
     code = 'cs'
 
-    def test_template_link_target(self):
+    def test_template_link_target(self) -> None:
         """Test template_link_target static method."""
         tests = [
             ('Pes', 'Q144'),
@@ -37,7 +37,7 @@ class TestHarvestRobot(ScriptMainTestCase):
                 self.assertIsInstance(target, ItemPage)
                 self.assertEqual(target.title(), item)
 
-    def test_handle_time(self):
+    def test_handle_time(self) -> None:
         """Test handle_time method."""
         bot = HarvestRobot('Foo', {}, site=self.site)
 

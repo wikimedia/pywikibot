@@ -27,7 +27,7 @@ class TestLoginLogout(DefaultSiteTestCase):
 
     login = True
 
-    def test_login_logout(self):
+    def test_login_logout(self) -> None:
         """Validate login and logout methods by toggling the state."""
         site = self.get_site()
         loginstatus = pywikibot.login.LoginStatus
@@ -66,7 +66,7 @@ class TestClearCookies(TestCase):
     family = 'wikisource'
     code = 'zh'
 
-    def test_clear_cookies(self):
+    def test_clear_cookies(self) -> None:
         """Test cookies are cleared (:phab:`T224712`)."""
         site = self.get_site()
         site.login()

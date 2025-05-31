@@ -20,19 +20,19 @@ class CharsTestCase(TestCase):
 
     net = False
 
-    def test_replace(self):
+    def test_replace(self) -> None:
         """Test replace_invisible."""
         self.assertEqual(
             chars.replace_invisible('Hello world!'), 'Hello world!')
         self.assertEqual(
             chars.replace_invisible('\u200eRTL\u200f'), '<200e>RTL<200f>')
 
-    def test_contains(self):
+    def test_contains(self) -> None:
         """Test contains_invisible."""
         self.assertFalse(chars.contains_invisible('Hello world!'))
         self.assertTrue(chars.contains_invisible('\u200eRTL\u200f'))
 
-    def test_category_cf(self):
+    def test_category_cf(self) -> None:
         """Test that all characters in _category_cf are actually in Cf."""
         invalid = {}
         # Cn are undefined characters (and were defined later in Unicode)

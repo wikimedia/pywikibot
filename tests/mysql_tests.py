@@ -21,7 +21,7 @@ class TestMySQL(TestCase):
 
     net = False
 
-    def test_mysql(self):
+    def test_mysql(self) -> None:
         """Test data.mysql.mysql_query function."""
         from pywikibot.data.mysql import mysql_query
         result = mysql_query('test')

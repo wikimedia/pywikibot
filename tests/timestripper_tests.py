@@ -38,7 +38,7 @@ class TestTimeStripperWithNoDigitsAsMonths(TestTimeStripperCase):
     family = 'wikipedia'
     code = 'fr'
 
-    def test_last_match_and_replace(self):
+    def test_last_match_and_replace(self) -> None:
         """Test that pattern matches and removes items correctly."""
         txt_with_one_match = 'this string has 3000, 1999 and 3000 in it'
         txt_with_two_match = 'this string has 1998, 1999 and 3000 in it'
@@ -89,7 +89,7 @@ class TestTimeStripperWithNoDigitsAsMonths(TestTimeStripperCase):
             self.ts._last_match_and_replace(txt_with_no_match, pat),
             (txt_with_no_match, None))
 
-    def test_hour(self):
+    def test_hour(self) -> None:
         """Test that correct hour is matched."""
         txt_hour_in_range = '7 février 2010 à 23:00 (CET)'
         txt_hour_out_of_range = '7 février 2010 à 24:00 (CET)'
@@ -105,7 +105,7 @@ class TestTimeStripperWithDigitsAsMonths(TestTimeStripperCase):
     family = 'wikipedia'
     code = 'cs'
 
-    def test_last_match_and_replace(self):
+    def test_last_match_and_replace(self) -> None:
         """Test that pattern matches and removes items correctly."""
         txt_with_one_match = 'this string has XX. YY. 12. in it'
         txt_with_two_match = 'this string has XX. 1. 12. in it'
@@ -143,13 +143,13 @@ class TestTimeStripperNumberAndDate(TestTimeStripperCase):
     family = 'wikipedia'
     code = 'en'
 
-    def test_four_digit_is_not_year_with_no_timestamp(self):
+    def test_four_digit_is_not_year_with_no_timestamp(self) -> None:
         """A 4-digit number should not be mistaken as year (w/o timestamp)."""
         self.assertIsNone(
             self.ts.timestripper(
                 '2000 people will meet on 16 December at 22:00 (UTC).'))
 
-    def test_four_digit_is_not_year_with_timestamp(self):
+    def test_four_digit_is_not_year_with_timestamp(self) -> None:
         """A 4-digit number should not be mistaken as year (w/ timestamp)."""
         self.assertEqual(
             self.ts.timestripper(
@@ -281,7 +281,7 @@ class TestTimeStripperTreatSpecialText(TestTimeStripperCase):
     tzone = TZoneFixedOffset(0, 'UTC')
     expected_date = datetime.datetime(2015, 6, 6, 6, 57, tzinfo=tzone)
 
-    def test_timestripper_match_comment(self):
+    def test_timestripper_match_comment(self) -> None:
         """Test that comments are correctly matched."""
         ts = self.ts
 
@@ -289,7 +289,7 @@ class TestTimeStripperTreatSpecialText(TestTimeStripperCase):
         exp_match = 'a test comment'
         self.assertEqual(ts._comment_pat.search(txt_match)[1], exp_match)
 
-    def test_timestripper_match_hyperlink(self):
+    def test_timestripper_match_hyperlink(self) -> None:
         """Test that hyperlinks are correctly matched."""
         ts = self.ts
 
@@ -298,7 +298,7 @@ class TestTimeStripperTreatSpecialText(TestTimeStripperCase):
         self.assertEqual(ts._hyperlink_pat.search(txt_match).group(),
                          exp_match)
 
-    def test_timestripper_match_wikilink(self):
+    def test_timestripper_match_wikilink(self) -> None:
         """Test that wikilinks are correctly matched."""
         ts = self.ts
 
@@ -310,7 +310,7 @@ class TestTimeStripperTreatSpecialText(TestTimeStripperCase):
         self.assertEqual(ts._wikilink_pat.search(txt_match)['anchor'],
                          exp_match_anchor)
 
-    def test_timestripper_match_comment_with_date(self):
+    def test_timestripper_match_comment_with_date(self) -> None:
         """Test that dates in comments are correctly matched."""
         ts = self.ts.timestripper
 
@@ -326,7 +326,7 @@ class TestTimeStripperTreatSpecialText(TestTimeStripperCase):
         txt_match = '<!--comment|' + self.date + '-->' + self.fake_date
         self.assertEqual(ts(txt_match), self.expected_date)
 
-    def test_timestripper_skip_hyperlink(self):
+    def test_timestripper_skip_hyperlink(self) -> None:
         """Test that dates in hyperlinks are correctly skipped."""
         ts = self.ts.timestripper
 
@@ -343,7 +343,7 @@ class TestTimeStripperTreatSpecialText(TestTimeStripperCase):
         txt_match = '[http://' + self.fake_date + ']' + self.date
         self.assertEqual(ts(txt_match), self.expected_date)
 
-    def test_timestripper_skip_hyperlink_and_do_not_connect(self):
+    def test_timestripper_skip_hyperlink_and_do_not_connect(self) -> None:
         """Test that skipping hyperlinks will not make gaps shorter."""
         ts = self.ts.timestripper
 
@@ -353,7 +353,7 @@ class TestTimeStripperTreatSpecialText(TestTimeStripperCase):
         )
         self.assertIsNone(ts(txt_match))
 
-    def test_timestripper_match_wikilink_with_date(self):
+    def test_timestripper_match_wikilink_with_date(self) -> None:
         """Test that dates in wikilinks are correctly matched."""
         ts = self.ts.timestripper
 
@@ -369,7 +369,7 @@ class TestTimeStripperTreatSpecialText(TestTimeStripperCase):
         txt_match = '[[wikilink|' + self.date + ']]' + self.fake_date
         self.assertEqual(ts(txt_match), self.expected_date)
 
-    def test_timestripper_skip_wikilink_and_do_not_connect(self):
+    def test_timestripper_skip_wikilink_and_do_not_connect(self) -> None:
         """Test that skipping wikilinks will not make gaps shorter."""
         ts = self.ts.timestripper
 
@@ -380,7 +380,7 @@ class TestTimeStripperTreatSpecialText(TestTimeStripperCase):
         txt_match = self.date[:9] + '[[foo]]' + self.date[9:]
         self.assertEqual(ts(txt_match), self.expected_date)
 
-    def test_timestripper_skip_html(self):
+    def test_timestripper_skip_html(self) -> None:
         """Test dates in html are correctly skipped."""
         ts = self.ts.timestripper
 
@@ -407,7 +407,7 @@ class TestTimeStripperDoNotArchiveUntil(TestTimeStripperCase):
     user_and_date = username + ' ' + date
     tzone = TZoneFixedOffset(0, 'UTC')
 
-    def test_timestripper_match(self):
+    def test_timestripper_match(self) -> None:
         """Test that dates in comments are correctly recognised."""
         ts = self.ts
 
@@ -423,7 +423,7 @@ class TestTimeStripperDoNotArchiveUntil(TestTimeStripperCase):
         res = datetime.datetime(2015, 6, 6, 6, 57, tzinfo=self.tzone)
         self.assertEqual(ts.timestripper(txt_match), res)
 
-    def test_timestripper_match_only(self):
+    def test_timestripper_match_only(self) -> None:
         """Test that latest date is used instead of other dates."""
         ts = self.ts
 

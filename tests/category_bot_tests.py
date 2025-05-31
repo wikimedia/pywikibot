@@ -26,7 +26,7 @@ class CfdActions(DefaultSiteTestCase):
 
     """Test CFD (Categories for deletion) actions."""
 
-    def test_strip_cfd_templates_does_nothing_when_no_templates(self):
+    def test_strip_cfd_templates_does_nothing_when_no_templates(self) -> None:
         """Test when the're no CFD templates, the page text is not changed."""
         bot = CategoryMoveRobot(oldcat='Old', newcat='New')
         bot.newcat.text = 'Nothing should change.\n\nAnother line.'
@@ -34,12 +34,12 @@ class CfdActions(DefaultSiteTestCase):
         self.assertEqual(bot.newcat.text,
                          'Nothing should change.\n\nAnother line.')
 
-    def test_strip_cfd_templates_with_spaces_in_comments(self):
+    def test_strip_cfd_templates_with_spaces_in_comments(self) -> None:
         """Test CFD templates with spaces in the syntax are removed."""
         self._runtest_strip_cfd_templates('<!-- BEGIN CFD TEMPLATE -->',
                                           '<!-- END CFD TEMPLATE -->')
 
-    def test_strip_cfd_templates_without_spaces_in_comments(self):
+    def test_strip_cfd_templates_without_spaces_in_comments(self) -> None:
         """Test CFD templates without spaces in the syntax are removed."""
         self._runtest_strip_cfd_templates('<!--BEGIN CFD TEMPLATE-->',
                                           '<!--END CFD TEMPLATE-->')
@@ -65,7 +65,7 @@ class TestPreprocessingCategory(TestCase):
     family = 'wikipedia'
     code = 'en'
 
-    def test_determine_type_target(self):
+    def test_determine_type_target(self) -> None:
         """Test determining type target."""
         page = pywikibot.Page(self.site, 'Template:Doc')
         bot = CategoryPreprocess(follow_redirects=True)
@@ -86,7 +86,7 @@ class TestPreprocessingCategory(TestCase):
         new_page = bot.determine_type_target(page)
         self.assertIsNone(new_page)
 
-    def test_determine_template_target(self):
+    def test_determine_template_target(self) -> None:
         """Test determining template target."""
         page = pywikibot.Page(self.site, 'Template:Documentation')
         bot = CategoryPreprocess()

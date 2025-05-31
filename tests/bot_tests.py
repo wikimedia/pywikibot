@@ -132,7 +132,7 @@ class TestDrySiteBot(TestBotTreatExit, SiteAttributeTestCase):
         yield pywikibot.Page(self.de, 'Page 3')
         yield pywikibot.Page(self.en, 'Page 4')
 
-    def test_SingleSiteBot_automatic(self):
+    def test_SingleSiteBot_automatic(self) -> None:
         """Test SingleSiteBot class with no predefined site."""
         self._treat_site = self.de
         self.bot = pywikibot.bot.SingleSiteBot(site=None,
@@ -143,7 +143,7 @@ class TestDrySiteBot(TestBotTreatExit, SiteAttributeTestCase):
         self.bot.run()
         self.assertEqual(self.bot.site, self._treat_site)
 
-    def test_SingleSiteBot_specific(self):
+    def test_SingleSiteBot_specific(self) -> None:
         """Test SingleSiteBot class with predefined site."""
         self._treat_site = self.en
         self.bot = pywikibot.bot.SingleSiteBot(site=self.en,
@@ -154,7 +154,7 @@ class TestDrySiteBot(TestBotTreatExit, SiteAttributeTestCase):
         self.bot.run()
         self.assertEqual(self.bot.site, self._treat_site)
 
-    def test_MultipleSitesBot(self):
+    def test_MultipleSitesBot(self) -> None:
         """Test MultipleSitesBot class."""
         # Assert no specific site
         self._treat_site = False
@@ -164,7 +164,7 @@ class TestDrySiteBot(TestBotTreatExit, SiteAttributeTestCase):
         self.bot.exit = self._exit(4)
         self.bot.run()
 
-    def test_Bot(self):
+    def test_Bot(self) -> None:
         """Test normal Bot class."""
         # Assert no specific site
         self._treat_site = False
@@ -173,7 +173,7 @@ class TestDrySiteBot(TestBotTreatExit, SiteAttributeTestCase):
         self.bot.exit = self._exit(4)
         self.bot.run()
 
-    def test_CurrentPageBot(self):
+    def test_CurrentPageBot(self) -> None:
         """Test normal Bot class."""
         def post_treat(page):
             self.assertIs(self.bot.current_page, page)
@@ -184,7 +184,7 @@ class TestDrySiteBot(TestBotTreatExit, SiteAttributeTestCase):
         self.bot.exit = self._exit(4)
         self.bot.run()
 
-    def test_Bot_ValueError(self):
+    def test_Bot_ValueError(self) -> None:
         """Test normal Bot class with a ValueError in treat."""
         def post_treat(page):
             if page.title() == 'Page 3':
@@ -200,7 +200,7 @@ class TestDrySiteBot(TestBotTreatExit, SiteAttributeTestCase):
         with self.assertRaisesRegex(ValueError, 'Whatever'):
             self.bot.run()
 
-    def test_Bot_KeyboardInterrupt(self):
+    def test_Bot_KeyboardInterrupt(self) -> None:
         """Test normal Bot class with a KeyboardInterrupt in treat."""
         def post_treat(page):
             if page.title() == 'Page 3':
@@ -249,7 +249,7 @@ class LiveBotTestCase(TestBotTreatExit, DefaultSiteTestCase):
             super(LiveBotTestCase, self)._exit(t, written, exception)()
         return exit
 
-    def test_ExistingPageBot(self):
+    def test_ExistingPageBot(self) -> None:
         """Test ExistingPageBot class."""
         def post_treat(page):
             """Verify the page exists."""
@@ -262,7 +262,7 @@ class LiveBotTestCase(TestBotTreatExit, DefaultSiteTestCase):
         self.bot.exit = self._exit()
         self.bot.run()
 
-    def test_CreatingPageBot(self):
+    def test_CreatingPageBot(self) -> None:
         """Test CreatingPageBot class."""
         # This doesn't verify much (e.g. it could yield the first existing
         # page) but the assertion in post_treat should verify that the page
@@ -305,7 +305,7 @@ class TestOptionHandler(TestCase):
         self.option_handler = Options(baz=True)
         super().setUp()
 
-    def test_opt_values(self):
+    def test_opt_values(self) -> None:
         """Test OptionHandler."""
         oh = self.option_handler
         self.assertEqual(oh.opt.foo, 'bar')

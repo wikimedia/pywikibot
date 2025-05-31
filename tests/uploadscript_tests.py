@@ -33,7 +33,7 @@ class TestUploadScript(TestCase):
 
     net = False
 
-    def test_regex(self):
+    def test_regex(self) -> None:
         """Test CHUNK_SIZE_REGEX and get_chunk_size function."""
         self.assertEqual(match(), 1024 ** 2)
         self.assertEqual(match('12345'), 12345)

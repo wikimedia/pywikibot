@@ -74,7 +74,7 @@ class TestGenerateFamilyFile(DefaultSiteTestCase):
             url=self.site.base_url(''), name=self.familyname,
             dointerwiki=answer)
 
-    def test_initial_attributes(self):
+    def test_initial_attributes(self) -> None:
         """Test initial FamilyFileGenerator attributes."""
         self.assertEqual(self.generator_instance.base_url,
                          self.site.base_url(''))
@@ -83,7 +83,7 @@ class TestGenerateFamilyFile(DefaultSiteTestCase):
         self.assertIsInstance(self.generator_instance.wikis, dict)
         self.assertIsInstance(self.generator_instance.langs, list)
 
-    def test_attributes_after_run(self):
+    def test_attributes_after_run(self) -> None:
         """Test FamilyFileGenerator attributes after run()."""
         gen = self.generator_instance
         gen.run()

@@ -22,7 +22,7 @@ class TestTkdialog(TestCase):
 
     net = True
 
-    def test_tk_dialog(self):
+    def test_tk_dialog(self) -> None:
         """Test Tk dialog."""
         desc = 'foo'
         filename = 'MP_sounds.png'
@@ -43,7 +43,7 @@ class TestTkinter(TestCase):
     family = 'wikipedia'
     code = 'en'
 
-    def test_tkinter(self):
+    def test_tkinter(self) -> None:
         """Test Tkinter window."""
         root = tkinter.Tk()
         root.resizable(width=tkinter.FALSE, height=tkinter.FALSE)

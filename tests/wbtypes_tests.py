@@ -34,7 +34,7 @@ class TestWikibaseCoordinate(WbRepresentationTestCase):
 
     dry = True
 
-    def test_Coordinate_WbRepresentation_methods(self):
+    def test_Coordinate_WbRepresentation_methods(self) -> None:
         """Test inherited or extended methods from _WbRepresentation."""
         repo = self.get_repo()
         coord = pywikibot.Coordinate(
@@ -42,7 +42,7 @@ class TestWikibaseCoordinate(WbRepresentationTestCase):
             globe='moon')
         self._test_hashable(coord)
 
-    def test_Coordinate_dim(self):
+    def test_Coordinate_dim(self) -> None:
         """Test Coordinate dimension."""
         repo = self.get_repo()
         x = pywikibot.Coordinate(site=repo, lat=12.0, lon=13.0, precision=5.0)
@@ -56,7 +56,7 @@ class TestWikibaseCoordinate(WbRepresentationTestCase):
         with self.assertRaisesRegex(ValueError, regex):
             z.precisionToDim()
 
-    def test_Coordinate_plain_globe(self):
+    def test_Coordinate_plain_globe(self) -> None:
         """Test setting Coordinate globe from a plain-text value."""
         repo = self.get_repo()
         coord = pywikibot.Coordinate(
@@ -67,7 +67,7 @@ class TestWikibaseCoordinate(WbRepresentationTestCase):
                           'altitude': None, 'precision': 0,
                           'globe': 'http://www.wikidata.org/entity/Q405'})
 
-    def test_Coordinate_entity_uri_globe(self):
+    def test_Coordinate_entity_uri_globe(self) -> None:
         """Test setting Coordinate globe from an entity uri."""
         repo = self.get_repo()
         coord = pywikibot.Coordinate(
@@ -87,7 +87,7 @@ class TestWikibaseCoordinateNonDry(WbRepresentationTestCase):
     to the appropriate version.
     """
 
-    def test_Coordinate_item_globe(self):
+    def test_Coordinate_item_globe(self) -> None:
         """Test setting Coordinate globe from an ItemPage."""
         repo = self.get_repo()
         coord = pywikibot.Coordinate(
@@ -98,7 +98,7 @@ class TestWikibaseCoordinateNonDry(WbRepresentationTestCase):
                           'altitude': None, 'precision': 0,
                           'globe': 'http://www.wikidata.org/entity/Q123'})
 
-    def test_Coordinate_get_globe_item_from_uri(self):
+    def test_Coordinate_get_globe_item_from_uri(self) -> None:
         """Test getting globe item from Coordinate with entity uri globe."""
         repo = self.get_repo()
         q = pywikibot.Coordinate(
@@ -106,7 +106,7 @@ class TestWikibaseCoordinateNonDry(WbRepresentationTestCase):
             globe_item='http://www.wikidata.org/entity/Q123')
         self.assertEqual(q.get_globe_item(), ItemPage(repo, 'Q123'))
 
-    def test_Coordinate_get_globe_item_from_itempage(self):
+    def test_Coordinate_get_globe_item_from_itempage(self) -> None:
         """Test getting globe item from Coordinate with ItemPage globe."""
         repo = self.get_repo()
         globe = ItemPage(repo, 'Q123')
@@ -114,14 +114,14 @@ class TestWikibaseCoordinateNonDry(WbRepresentationTestCase):
             site=repo, lat=12.0, lon=13.0, precision=0, globe_item=globe)
         self.assertEqual(q.get_globe_item(), ItemPage(repo, 'Q123'))
 
-    def test_Coordinate_get_globe_item_from_plain_globe(self):
+    def test_Coordinate_get_globe_item_from_plain_globe(self) -> None:
         """Test getting globe item from Coordinate with plain text globe."""
         repo = self.get_repo()
         q = pywikibot.Coordinate(
             site=repo, lat=12.0, lon=13.0, precision=0, globe='moon')
         self.assertEqual(q.get_globe_item(), ItemPage(repo, 'Q405'))
 
-    def test_Coordinate_get_globe_item_provide_repo(self):
+    def test_Coordinate_get_globe_item_provide_repo(self) -> None:
         """Test getting globe item from Coordinate, providing repo."""
         repo = self.get_repo()
         q = pywikibot.Coordinate(
@@ -129,7 +129,7 @@ class TestWikibaseCoordinateNonDry(WbRepresentationTestCase):
             globe_item='http://www.wikidata.org/entity/Q123')
         self.assertEqual(q.get_globe_item(repo), ItemPage(repo, 'Q123'))
 
-    def test_Coordinate_get_globe_item_different_repo(self):
+    def test_Coordinate_get_globe_item_different_repo(self) -> None:
         """Test getting globe item in different repo from Coordinate."""
         repo = self.get_repo()
         test_repo = pywikibot.Site('test', 'wikidata')
@@ -139,7 +139,7 @@ class TestWikibaseCoordinateNonDry(WbRepresentationTestCase):
         self.assertEqual(q.get_globe_item(test_repo),
                          ItemPage(test_repo, 'Q123'))
 
-    def test_Coordinate_equality(self):
+    def test_Coordinate_equality(self) -> None:
         """Test Coordinate equality with different globe representations."""
         repo = self.get_repo()
         a = pywikibot.Coordinate(
@@ -168,14 +168,14 @@ class TestWbTime(WbRepresentationTestCase):
 
     dry = True
 
-    def test_WbTime_WbRepresentation_methods(self):
+    def test_WbTime_WbRepresentation_methods(self) -> None:
         """Test inherited or extended methods from _WbRepresentation."""
         repo = self.get_repo()
         t = pywikibot.WbTime(site=repo, year=2010, month=0, day=0, hour=12,
                              minute=43)
         self._test_hashable(t)
 
-    def test_WbTime_timestr(self):
+    def test_WbTime_timestr(self) -> None:
         """Test timestr functions of WbTime."""
         repo = self.get_repo()
         t = pywikibot.WbTime(site=repo, year=2010, month=0, day=0, hour=12,
@@ -191,7 +191,7 @@ class TestWbTime(WbRepresentationTestCase):
         self.assertEqual(t.toTimestr(), '-00000002010-01-01T12:43:00Z')
         self.assertEqual(t.toTimestr(force_iso=True), '-2010-01-01T12:43:00Z')
 
-    def test_WbTime_fromTimestr(self):
+    def test_WbTime_fromTimestr(self) -> None:
         """Test WbTime creation from UTC date/time string."""
         repo = self.get_repo()
         t = pywikibot.WbTime.fromTimestr('+00000002010-01-01T12:43:00Z',
@@ -199,7 +199,7 @@ class TestWbTime(WbRepresentationTestCase):
         self.assertEqual(t, pywikibot.WbTime(site=repo, year=2010, hour=12,
                                              minute=43, precision=14))
 
-    def test_WbTime_zero_month(self):
+    def test_WbTime_zero_month(self) -> None:
         """Test WbTime creation from date/time string with zero month."""
         # ensures we support formats in T123888 / T107870
         repo = self.get_repo()
@@ -209,7 +209,7 @@ class TestWbTime(WbRepresentationTestCase):
                                              day=0, hour=12, minute=43,
                                              precision=14))
 
-    def test_WbTime_skip_params_precision(self):
+    def test_WbTime_skip_params_precision(self) -> None:
         """Test skipping units (such as day, month) when creating WbTimes."""
         repo = self.get_repo()
         t = pywikibot.WbTime(year=2020, day=2, site=repo)
@@ -251,7 +251,7 @@ class TestWbTime(WbRepresentationTestCase):
                                               hour=0, minute=5, site=repo))
         self.assertEqual(t9.precision, pywikibot.WbTime.PRECISION['minute'])
 
-    def test_WbTime_normalization(self):
+    def test_WbTime_normalization(self) -> None:
         """Test WbTime normalization."""
         repo = self.get_repo()
         # flake8 is being annoying, so to reduce line length, I'll make
@@ -336,7 +336,7 @@ class TestWbTime(WbRepresentationTestCase):
         self.assertEqual(t11_normalized, t12_normalized)
         self.assertEqual(t13.normalize().timezone, -300)
 
-    def test_WbTime_normalization_very_low_precision(self):
+    def test_WbTime_normalization_very_low_precision(self) -> None:
         """Test WbTime normalization with very low precision."""
         repo = self.get_repo()
         # flake8 is being annoying, so to reduce line length, I'll make
@@ -378,7 +378,7 @@ class TestWbTime(WbRepresentationTestCase):
                          pywikibot.WbTime(site=repo, year=-3000000000,
                                           precision=year_1000000000))
 
-    def test_WbTime_timestamp(self):
+    def test_WbTime_timestamp(self) -> None:
         """Test timestamp functions of WbTime."""
         repo = self.get_repo()
         timestamp = pywikibot.Timestamp.fromISOformat('2010-01-01T12:43:00Z')
@@ -420,7 +420,7 @@ class TestWbTime(WbRepresentationTestCase):
         self.assertEqual(t1.toTimestamp(timezone_aware=True), ts1)
         self.assertNotEqual(t1.toTimestamp(timezone_aware=False), ts1)
 
-    def test_WbTime_errors(self):
+    def test_WbTime_errors(self) -> None:
         """Test WbTime precision errors."""
         repo = self.get_repo()
         regex = r'^no year given$'
@@ -436,7 +436,7 @@ class TestWbTime(WbRepresentationTestCase):
             pywikibot.WbTime(site=repo, year=2020,
                              precision='invalid_precision')
 
-    def test_comparison(self):
+    def test_comparison(self) -> None:
         """Test WbTime comparison."""
         repo = self.get_repo()
         t1 = pywikibot.WbTime(site=repo, year=2010, hour=12, minute=43)
@@ -467,7 +467,7 @@ class TestWbTime(WbRepresentationTestCase):
         self.assertIsInstance(t1.toTimestamp(), pywikibot.Timestamp)
         self.assertRaises(ValueError, t2.toTimestamp)
 
-    def test_comparison_types(self):
+    def test_comparison_types(self) -> None:
         """Test WbTime comparison with different types."""
         repo = self.get_repo()
         t1 = pywikibot.WbTime(site=repo, year=2010, hour=12, minute=43)
@@ -478,7 +478,7 @@ class TestWbTime(WbRepresentationTestCase):
         self.assertRaises(TypeError, operator.le, t1, 5)
         self.assertRaises(TypeError, operator.ge, t1, 5)
 
-    def test_comparison_timezones(self):
+    def test_comparison_timezones(self) -> None:
         """Test comparisons with timezones."""
         repo = self.get_repo()
         ts1 = pywikibot.Timestamp(
@@ -493,7 +493,7 @@ class TestWbTime(WbRepresentationTestCase):
         t2 = pywikibot.WbTime.fromTimestamp(ts2, timezone=0, site=repo)
         self.assertGreater(t1, t2)
 
-    def test_comparison_timezones_equal(self):
+    def test_comparison_timezones_equal(self) -> None:
         """Test when two WbTime's have equal instants but not the same tz."""
         repo = self.get_repo()
         ts1 = pywikibot.Timestamp(
@@ -516,7 +516,7 @@ class TestWbTime(WbRepresentationTestCase):
         self.assertFalse(t1 < t2)
         self.assertFalse(t2 < t1)
 
-    def test_comparison_equal_instant(self):
+    def test_comparison_equal_instant(self) -> None:
         """Test the equal_instant method."""
         repo = self.get_repo()
 
@@ -559,13 +559,13 @@ class TestWbQuantity(WbRepresentationTestCase):
 
     dry = True
 
-    def test_WbQuantity_WbRepresentation_methods(self):
+    def test_WbQuantity_WbRepresentation_methods(self) -> None:
         """Test inherited or extended methods from _WbRepresentation."""
         repo = self.get_repo()
         q = pywikibot.WbQuantity(amount=1234, error=1, site=repo)
         self._test_hashable(q)
 
-    def test_WbQuantity_integer(self):
+    def test_WbQuantity_integer(self) -> None:
         """Test WbQuantity for integer value."""
         repo = self.get_repo()
         q = pywikibot.WbQuantity(amount=1234, error=1, site=repo)
@@ -585,7 +585,7 @@ class TestWbQuantity(WbRepresentationTestCase):
                          {'amount': '-5', 'lowerBound': '-8',
                           'upperBound': '-3', 'unit': '1'})
 
-    def test_WbQuantity_float_27(self):
+    def test_WbQuantity_float_27(self) -> None:
         """Test WbQuantity for float value."""
         repo = self.get_repo()
         q = pywikibot.WbQuantity(amount=0.044405586, error=0.0, site=repo)
@@ -593,7 +593,7 @@ class TestWbQuantity(WbRepresentationTestCase):
                   'upperBound': '+0.044405586', 'unit': '1'}
         self.assertEqual(q.toWikibase(), q_dict)
 
-    def test_WbQuantity_scientific(self):
+    def test_WbQuantity_scientific(self) -> None:
         """Test WbQuantity for scientific notation."""
         repo = self.get_repo()
         q = pywikibot.WbQuantity(amount='1.3e-13', error='1e-14', site=repo)
@@ -601,7 +601,7 @@ class TestWbQuantity(WbRepresentationTestCase):
                   'upperBound': '+1.4e-13', 'unit': '1'}
         self.assertEqual(q.toWikibase(), q_dict)
 
-    def test_WbQuantity_decimal(self):
+    def test_WbQuantity_decimal(self) -> None:
         """Test WbQuantity for decimal value."""
         repo = self.get_repo()
         q = pywikibot.WbQuantity(amount=Decimal('0.044405586'),
@@ -610,7 +610,7 @@ class TestWbQuantity(WbRepresentationTestCase):
                   'upperBound': '+0.044405586', 'unit': '1'}
         self.assertEqual(q.toWikibase(), q_dict)
 
-    def test_WbQuantity_string(self):
+    def test_WbQuantity_string(self) -> None:
         """Test WbQuantity for decimal notation."""
         repo = self.get_repo()
         q = pywikibot.WbQuantity(amount='0.044405586', error='0', site=repo)
@@ -618,7 +618,7 @@ class TestWbQuantity(WbRepresentationTestCase):
                   'upperBound': '+0.044405586', 'unit': '1'}
         self.assertEqual(q.toWikibase(), q_dict)
 
-    def test_WbQuantity_formatting_bound(self):
+    def test_WbQuantity_formatting_bound(self) -> None:
         """Test WbQuantity formatting with bounds."""
         repo = self.get_repo()
         q = pywikibot.WbQuantity(amount='0.044405586', error='0', site=repo)
@@ -634,13 +634,13 @@ class TestWbQuantity(WbRepresentationTestCase):
                          'upperBound={val}, lowerBound={val}, '
                          'unit=1)'.format(val='0.044405586'))
 
-    def test_WbQuantity_self_equality(self):
+    def test_WbQuantity_self_equality(self) -> None:
         """Test WbQuantity equality."""
         repo = self.get_repo()
         q = pywikibot.WbQuantity(amount='0.044405586', error='0', site=repo)
         self.assertEqual(q, q)
 
-    def test_WbQuantity_fromWikibase(self):
+    def test_WbQuantity_fromWikibase(self) -> None:
         """Test WbQuantity.fromWikibase() instantiating."""
         repo = self.get_repo()
         q = pywikibot.WbQuantity.fromWikibase({'amount': '+0.0229',
@@ -653,13 +653,13 @@ class TestWbQuantity(WbRepresentationTestCase):
                          {'amount': '+0.0229', 'lowerBound': '+0.0000',
                           'upperBound': '+1.0000', 'unit': '1'})
 
-    def test_WbQuantity_errors(self):
+    def test_WbQuantity_errors(self) -> None:
         """Test WbQuantity error handling."""
         regex = r'^no amount given$'
         with self.assertRaisesRegex(ValueError, regex):
             pywikibot.WbQuantity(amount=None, error=1)
 
-    def test_WbQuantity_entity_unit(self):
+    def test_WbQuantity_entity_unit(self) -> None:
         """Test WbQuantity with entity uri unit."""
         repo = self.get_repo()
         q = pywikibot.WbQuantity(amount=1234, error=1, site=repo,
@@ -669,7 +669,7 @@ class TestWbQuantity(WbRepresentationTestCase):
                           'upperBound': '+1235',
                           'unit': 'http://www.wikidata.org/entity/Q712226'})
 
-    def test_WbQuantity_unit_fromWikibase(self):
+    def test_WbQuantity_unit_fromWikibase(self) -> None:
         """Test WbQuantity recognising unit from Wikibase output."""
         repo = self.get_repo()
         q = pywikibot.WbQuantity.fromWikibase({
@@ -695,14 +695,14 @@ class TestWbQuantityNonDry(WbRepresentationTestCase):
         super().setUp()
         self.repo = self.get_repo()
 
-    def test_WbQuantity_unbound(self):
+    def test_WbQuantity_unbound(self) -> None:
         """Test WbQuantity for value without bounds."""
         q = pywikibot.WbQuantity(amount=1234.5, site=self.repo)
         self.assertEqual(q.toWikibase(),
                          {'amount': '+1234.5', 'unit': '1',
                           'upperBound': None, 'lowerBound': None})
 
-    def test_WbQuantity_formatting_unbound(self):
+    def test_WbQuantity_formatting_unbound(self) -> None:
         """Test WbQuantity formatting without bounds."""
         q = pywikibot.WbQuantity(amount='0.044405586', site=self.repo)
         self.assertEqual(str(q),
@@ -717,7 +717,7 @@ class TestWbQuantityNonDry(WbRepresentationTestCase):
                          'upperBound=None, lowerBound=None, '
                          'unit=1)'.format(val='0.044405586'))
 
-    def test_WbQuantity_fromWikibase_unbound(self):
+    def test_WbQuantity_fromWikibase_unbound(self) -> None:
         """Test WbQuantity.fromWikibase() instantiating without bounds."""
         q = pywikibot.WbQuantity.fromWikibase({'amount': '+0.0229',
                                                'unit': '1'},
@@ -726,7 +726,7 @@ class TestWbQuantityNonDry(WbRepresentationTestCase):
                          {'amount': '+0.0229', 'lowerBound': None,
                           'upperBound': None, 'unit': '1'})
 
-    def test_WbQuantity_ItemPage_unit(self):
+    def test_WbQuantity_ItemPage_unit(self) -> None:
         """Test WbQuantity with ItemPage unit."""
         q = pywikibot.WbQuantity(amount=1234, error=1,
                                  unit=pywikibot.ItemPage(self.repo, 'Q712226'))
@@ -735,7 +735,7 @@ class TestWbQuantityNonDry(WbRepresentationTestCase):
                           'upperBound': '+1235',
                           'unit': 'http://www.wikidata.org/entity/Q712226'})
 
-    def test_WbQuantity_equality(self):
+    def test_WbQuantity_equality(self) -> None:
         """Test WbQuantity equality with different unit representations."""
         a = pywikibot.WbQuantity(
             amount=1234, error=1,
@@ -754,7 +754,7 @@ class TestWbQuantityNonDry(WbRepresentationTestCase):
         self.assertNotEqual(b, c)
         self.assertNotEqual(b, d)
 
-    def test_WbQuantity_get_unit_item(self):
+    def test_WbQuantity_get_unit_item(self) -> None:
         """Test getting unit item from WbQuantity."""
         repo = self.get_repo()
         q = pywikibot.WbQuantity(amount=1234, error=1, site=repo,
@@ -762,7 +762,7 @@ class TestWbQuantityNonDry(WbRepresentationTestCase):
         self.assertEqual(q.get_unit_item(),
                          ItemPage(repo, 'Q123'))
 
-    def test_WbQuantity_get_unit_item_provide_repo(self):
+    def test_WbQuantity_get_unit_item_provide_repo(self) -> None:
         """Test getting unit item from WbQuantity, providing repo."""
         repo = self.get_repo()
         q = pywikibot.WbQuantity(amount=1234, error=1,
@@ -770,7 +770,7 @@ class TestWbQuantityNonDry(WbRepresentationTestCase):
         self.assertEqual(q.get_unit_item(repo),
                          ItemPage(repo, 'Q123'))
 
-    def test_WbQuantity_get_unit_item_different_repo(self):
+    def test_WbQuantity_get_unit_item_different_repo(self) -> None:
         """Test getting unit item in different repo from WbQuantity."""
         repo = self.get_repo()
         test_repo = pywikibot.Site('test', 'wikidata')
@@ -786,39 +786,39 @@ class TestWbMonolingualText(WbRepresentationTestCase):
 
     dry = True
 
-    def test_WbMonolingualText_WbRepresentation_methods(self):
+    def test_WbMonolingualText_WbRepresentation_methods(self) -> None:
         """Test inherited or extended methods from _WbRepresentation."""
         q = pywikibot.WbMonolingualText(
             text='Test that basics work', language='en')
         self._test_hashable(q)
 
-    def test_WbMonolingualText_string(self):
+    def test_WbMonolingualText_string(self) -> None:
         """Test WbMonolingualText string."""
         q = pywikibot.WbMonolingualText(text='Test that basics work',
                                         language='en')
         q_dict = {'text': 'Test that basics work', 'language': 'en'}
         self.assertEqual(q.toWikibase(), q_dict)
 
-    def test_WbMonolingualText_unicode(self):
+    def test_WbMonolingualText_unicode(self) -> None:
         """Test WbMonolingualText unicode."""
         q = pywikibot.WbMonolingualText(text='Testa det här', language='sv')
         q_dict = {'text': 'Testa det här', 'language': 'sv'}
         self.assertEqual(q.toWikibase(), q_dict)
 
-    def test_WbMonolingualText_equality(self):
+    def test_WbMonolingualText_equality(self) -> None:
         """Test WbMonolingualText equality."""
         q = pywikibot.WbMonolingualText(text='Thou shall test this!',
                                         language='en-gb')
         self.assertEqual(q, q)
 
-    def test_WbMonolingualText_fromWikibase(self):
+    def test_WbMonolingualText_fromWikibase(self) -> None:
         """Test WbMonolingualText.fromWikibase() instantiating."""
         q = pywikibot.WbMonolingualText.fromWikibase({'text': 'Test this!',
                                                       'language': 'en'})
         self.assertEqual(q.toWikibase(),
                          {'text': 'Test this!', 'language': 'en'})
 
-    def test_WbMonolingualText_errors(self):
+    def test_WbMonolingualText_errors(self) -> None:
         """Test WbMonolingualText error handling."""
         regex = r'^text and language cannot be empty$'
         with self.assertRaisesRegex(ValueError, regex):
@@ -842,49 +842,49 @@ class TestWbGeoShapeNonDry(WbRepresentationTestCase):
         self.page = Page(self.commons, 'Data:Lyngby Hovedgade.map')
         super().setUp()
 
-    def test_WbGeoShape_WbRepresentation_methods(self):
+    def test_WbGeoShape_WbRepresentation_methods(self) -> None:
         """Test inherited or extended methods from _WbRepresentation."""
         q = pywikibot.WbGeoShape(self.page)
         self._test_hashable(q)
 
-    def test_WbGeoShape_page(self):
+    def test_WbGeoShape_page(self) -> None:
         """Test WbGeoShape page."""
         q = pywikibot.WbGeoShape(self.page)
         q_val = 'Data:Lyngby Hovedgade.map'
         self.assertEqual(q.toWikibase(), q_val)
 
-    def test_WbGeoShape_page_and_site(self):
+    def test_WbGeoShape_page_and_site(self) -> None:
         """Test WbGeoShape from page and site."""
         q = pywikibot.WbGeoShape(self.page, self.get_repo())
         q_val = 'Data:Lyngby Hovedgade.map'
         self.assertEqual(q.toWikibase(), q_val)
 
-    def test_WbGeoShape_equality(self):
+    def test_WbGeoShape_equality(self) -> None:
         """Test WbGeoShape equality."""
         q = pywikibot.WbGeoShape(self.page, self.get_repo())
         self.assertEqual(q, q)
 
-    def test_WbGeoShape_fromWikibase(self):
+    def test_WbGeoShape_fromWikibase(self) -> None:
         """Test WbGeoShape.fromWikibase() instantiating."""
         repo = self.get_repo()
         q = pywikibot.WbGeoShape.fromWikibase(
             'Data:Lyngby Hovedgade.map', repo)
         self.assertEqual(q.toWikibase(), 'Data:Lyngby Hovedgade.map')
 
-    def test_WbGeoShape_error_on_non_page(self):
+    def test_WbGeoShape_error_on_non_page(self) -> None:
         """Test WbGeoShape error handling when given a non-page."""
         regex = r'^Page .+? must be a pywikibot\.Page object not a'
         with self.assertRaisesRegex(ValueError, regex):
             pywikibot.WbGeoShape('A string', self.get_repo())
 
-    def test_WbGeoShape_error_on_non_exitant_page(self):
+    def test_WbGeoShape_error_on_non_exitant_page(self) -> None:
         """Test WbGeoShape error handling of a non-existent page."""
         page = Page(self.commons, 'Non-existent page... really')
         regex = r'^Page \[\[.+?\]\] must exist\.$'
         with self.assertRaisesRegex(ValueError, regex):
             pywikibot.WbGeoShape(page, self.get_repo())
 
-    def test_WbGeoShape_error_on_wrong_site(self):
+    def test_WbGeoShape_error_on_wrong_site(self) -> None:
         """Test WbGeoShape error handling of a page on non-filerepo site."""
         repo = self.get_repo()
         page = Page(repo, 'Q123')
@@ -892,7 +892,7 @@ class TestWbGeoShapeNonDry(WbRepresentationTestCase):
         with self.assertRaisesRegex(ValueError, regex):
             pywikibot.WbGeoShape(page, self.get_repo())
 
-    def test_WbGeoShape_error_on_wrong_page_type(self):
+    def test_WbGeoShape_error_on_wrong_page_type(self) -> None:
         """Test WbGeoShape error handling of a non-map page."""
         non_data_page = Page(self.commons, 'File:Foo.jpg')
         non_map_page = Page(self.commons, 'Data:TemplateData/TemplateData.tab')
@@ -917,49 +917,49 @@ class TestWbTabularDataNonDry(WbRepresentationTestCase):
         self.page = Page(self.commons, 'Data:Bea.gov/GDP by state.tab')
         super().setUp()
 
-    def test_WbTabularData_WbRepresentation_methods(self):
+    def test_WbTabularData_WbRepresentation_methods(self) -> None:
         """Test inherited or extended methods from _WbRepresentation."""
         q = pywikibot.WbTabularData(self.page)
         self._test_hashable(q)
 
-    def test_WbTabularData_page(self):
+    def test_WbTabularData_page(self) -> None:
         """Test WbTabularData page."""
         q = pywikibot.WbTabularData(self.page)
         q_val = 'Data:Bea.gov/GDP by state.tab'
         self.assertEqual(q.toWikibase(), q_val)
 
-    def test_WbTabularData_page_and_site(self):
+    def test_WbTabularData_page_and_site(self) -> None:
         """Test WbTabularData from page and site."""
         q = pywikibot.WbTabularData(self.page, self.get_repo())
         q_val = 'Data:Bea.gov/GDP by state.tab'
         self.assertEqual(q.toWikibase(), q_val)
 
-    def test_WbTabularData_equality(self):
+    def test_WbTabularData_equality(self) -> None:
         """Test WbTabularData equality."""
         q = pywikibot.WbTabularData(self.page, self.get_repo())
         self.assertEqual(q, q)
 
-    def test_WbTabularData_fromWikibase(self):
+    def test_WbTabularData_fromWikibase(self) -> None:
         """Test WbTabularData.fromWikibase() instantiating."""
         repo = self.get_repo()
         q = pywikibot.WbTabularData.fromWikibase(
             'Data:Bea.gov/GDP by state.tab', repo)
         self.assertEqual(q.toWikibase(), 'Data:Bea.gov/GDP by state.tab')
 
-    def test_WbTabularData_error_on_non_page(self):
+    def test_WbTabularData_error_on_non_page(self) -> None:
         """Test WbTabularData error handling when given a non-page."""
         regex = r'^Page .+? must be a pywikibot\.Page object not a'
         with self.assertRaisesRegex(ValueError, regex):
             pywikibot.WbTabularData('A string', self.get_repo())
 
-    def test_WbTabularData_error_on_non_exitant_page(self):
+    def test_WbTabularData_error_on_non_exitant_page(self) -> None:
         """Test WbTabularData error handling of a non-existent page."""
         page = Page(self.commons, 'Non-existent page... really')
         regex = r'^Page \[\[.+?\]\] must exist\.$'
         with self.assertRaisesRegex(ValueError, regex):
             pywikibot.WbTabularData(page, self.get_repo())
 
-    def test_WbTabularData_error_on_wrong_site(self):
+    def test_WbTabularData_error_on_wrong_site(self) -> None:
         """Test WbTabularData error handling of a page on non-filerepo site."""
         repo = self.get_repo()
         page = Page(repo, 'Q123')
@@ -967,7 +967,7 @@ class TestWbTabularDataNonDry(WbRepresentationTestCase):
         with self.assertRaisesRegex(ValueError, regex):
             pywikibot.WbTabularData(page, self.get_repo())
 
-    def test_WbTabularData_error_on_wrong_page_type(self):
+    def test_WbTabularData_error_on_wrong_page_type(self) -> None:
         """Test WbTabularData error handling of a non-map page."""
         non_data_page = Page(self.commons, 'File:Foo.jpg')
         non_map_page = Page(self.commons, 'Data:Lyngby Hovedgade.map')
@@ -985,25 +985,25 @@ class TestWbUnknown(WbRepresentationTestCase):
 
     dry = True
 
-    def test_WbUnknown_WbRepresentation_methods(self):
+    def test_WbUnknown_WbRepresentation_methods(self) -> None:
         """Test inherited or extended methods from _WbRepresentation."""
         q_dict = {'text': 'Test that basics work', 'language': 'en'}
         q = pywikibot.WbUnknown(q_dict)
         self._test_hashable(q)
 
-    def test_WbUnknown_string(self):
+    def test_WbUnknown_string(self) -> None:
         """Test WbUnknown string."""
         q_dict = {'text': 'Test that basics work', 'language': 'en'}
         q = pywikibot.WbUnknown(q_dict)
         self.assertEqual(q.toWikibase(), q_dict)
 
-    def test_WbUnknown_equality(self):
+    def test_WbUnknown_equality(self) -> None:
         """Test WbUnknown equality."""
         q_dict = {'text': 'Thou shall test this!', 'language': 'unknown'}
         q = pywikibot.WbUnknown(q_dict)
         self.assertEqual(q, q)
 
-    def test_WbUnknown_fromWikibase(self):
+    def test_WbUnknown_fromWikibase(self) -> None:
         """Test WbUnknown.fromWikibase() instantiating."""
         q = pywikibot.WbUnknown.fromWikibase({'text': 'Test this!',
                                               'language': 'en'})

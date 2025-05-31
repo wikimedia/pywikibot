@@ -25,7 +25,7 @@ class TestThankRevision(TestCase):
     code = 'test'
     write = True
 
-    def test_thank_revision(self):
+    def test_thank_revision(self) -> None:
         """Test thanks for normal revisions.
 
         This test relies on activity in recentchanges, and there must
@@ -47,7 +47,7 @@ class TestThankRevision(TestCase):
                                      start=before_time, reverse=True)
         self.assertTrue(bool(next(log_entries, None)))
 
-    def test_self_thank(self):
+    def test_self_thank(self) -> None:
         """Test that thanking oneself causes an error.
 
         This test is not in TestThankRevisionErrors because it may require
@@ -77,7 +77,7 @@ class TestThankRevisionErrors(TestCase):
     code = 'test'
     write = True
 
-    def test_bad_recipient(self):
+    def test_bad_recipient(self) -> None:
         """Test that thanking a bad recipient causes an error."""
         site = self.get_site()
         data = site.recentchanges(total=20)
@@ -92,7 +92,7 @@ class TestThankRevisionErrors(TestCase):
         self.assertAPIError('invalidrecipient', None, site.thank_revision,
                             revid, source='pywikibot test')
 
-    def test_invalid_revision(self):
+    def test_invalid_revision(self) -> None:
         """Test that passing an invalid revision ID causes an error."""
         site = self.get_site()
         invalid_revids = (0.99, (0, -1), (0, -1, 0.99), [0, -1, 0.99], 'zero',

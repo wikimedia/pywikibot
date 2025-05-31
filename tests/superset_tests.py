@@ -27,7 +27,7 @@ class TestSupersetWithoutAuth(TestCase):
     family = 'meta'
     code = 'meta'
 
-    def test_init(self):
+    def test_init(self) -> None:
         """Test init validation functions."""
         # Test initial database_id parameter in wrong format
         site = self.get_site()
@@ -55,7 +55,7 @@ class TestSupersetWithAuth(TestCase):
     code = 'meta'
 
     @unittest.expectedFailure  # T395664
-    def test_login_and_oauth_permission(self):
+    def test_login_and_oauth_permission(self) -> None:
         """Superset login and queries."""
         sql = 'SELECT page_id, page_title FROM page LIMIT 2;'
         site = self.get_site()
@@ -121,7 +121,7 @@ class TestSupersetWithAuth(TestCase):
         with self.assertRaisesRegex(TypeError, msg):
             rows = superset.query(sql, schema_name='fiwiki_p', site=site)
 
-    def test_superset_generators(self):
+    def test_superset_generators(self) -> None:
         """Superset generator."""
         site = self.get_site()
         query = 'SELECT page_id FROM page LIMIT 2'

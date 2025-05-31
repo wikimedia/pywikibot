@@ -22,7 +22,7 @@ class LocalVersionTestCase(TestCase):
 
     net = False
 
-    def test_nightly_version(self):
+    def test_nightly_version(self) -> None:
         """Test version file of nightly dump."""
         path = Path(__file__).parent / 'data'
         tag, rev, date, hsh, *dummy = version.getversion_nightly(path)
@@ -32,7 +32,7 @@ class LocalVersionTestCase(TestCase):
         self.assertEqual(hsh, 'e8f64f2')
         self.assertEqual(dummy, [])
 
-    def test_package_version(self):
+    def test_package_version(self) -> None:
         """Test package version."""
         tag, rev, date, hsh, *dummy = version.getversion_package()
         self.assertEqual(tag, 'pywikibot/__init__.py')
@@ -48,7 +48,7 @@ class RemoteVersionTestCase(TestCase):
 
     net = True
 
-    def test_onlinerepo_version(self):
+    def test_onlinerepo_version(self) -> None:
         """Test online repository hash."""
         for branch in ('master', 'stable'):
             with self.subTest(branch=branch):

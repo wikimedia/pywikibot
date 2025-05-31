@@ -47,7 +47,7 @@ class TestPwb(PwbTestCase):
 
         return (direct, vpwb)
 
-    def test_env(self):
+    def test_env(self) -> None:
         """Test external environment of pywikibot.
 
         Make sure the environment is not contaminated, and is the same as
@@ -55,7 +55,7 @@ class TestPwb(PwbTestCase):
         """
         self._do_check('print_env')
 
-    def test_locals(self):
+    def test_locals(self) -> None:
         """Test internal environment of pywikibot.
 
         Make sure the environment is not contaminated, and is the same as
@@ -63,7 +63,7 @@ class TestPwb(PwbTestCase):
         """
         self._do_check('print_locals')
 
-    def test_unicode(self):
+    def test_unicode(self) -> None:
         """Test printing unicode in pywikibot."""
         (direct, vpwb) = self._do_check('print_unicode')
 
@@ -72,7 +72,7 @@ class TestPwb(PwbTestCase):
         self.assertEqual('Häuser', vpwb['stdout'].strip())
         self.assertEqual('Häuser', vpwb['stderr'].strip())
 
-    def test_argv(self):
+    def test_argv(self) -> None:
         """Test argv of pywikibot.
 
         Make sure that argv passed to the script is not contaminated by
@@ -89,19 +89,19 @@ class TestPwb(PwbTestCase):
         self.assertEqual(without_global_args['stdout'].rstrip(),
                          str([script_name, *script_opts]))
 
-    def test_script_found(self):
+    def test_script_found(self) -> None:
         """Test pwb.py script call which is found."""
         stdout = io.StringIO(execute_pwb(['pwb'])['stdout'])
         self.assertEqual(stdout.readline().strip(),
                          'Wrapper script to invoke pywikibot-based scripts.')
 
-    def test_script_not_found(self):
+    def test_script_not_found(self) -> None:
         """Test pwbot.py script call which is not found."""
         stderr = io.StringIO(execute_pwb(['pywikibot'])['stderr'])
         self.assertEqual(stderr.readline().strip(),
                          'ERROR: pywikibot.py not found! Misspelling?')
 
-    def test_one_similar_script(self):
+    def test_one_similar_script(self) -> None:
         """Test shell.py script call which gives one similar result."""
         result = [
             'ERROR: hello.py not found! Misspelling?',
@@ -120,7 +120,7 @@ class TestPwb(PwbTestCase):
         with self.subTest(line=2):
             self.assertEqual(stderr.readline().strip(), result[2])
 
-    def test_similar_scripts_found(self):
+    def test_similar_scripts_found(self) -> None:
         """Test script call which gives multiple similar results."""
         result = [
             'ERROR: inter_wikidata.py not found! Misspelling?',

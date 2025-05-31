@@ -31,7 +31,7 @@ class TestValidTemplateMeta(MetaTestCaseClass):
         """Create the new class."""
         def test_method(site, package):
 
-            def test_template(self):
+            def test_template(self) -> None:
                 """Test validity of template."""
                 lang = site.lang
                 if lang not in keys:
@@ -107,7 +107,7 @@ class TestPackages(TestCase):
 
     net = False
 
-    def test_valid_package(self):
+    def test_valid_package(self) -> None:
         """Test whether package has entries."""
         for package in chain(['cosmetic_changes-standalone',
                               'pywikibot-cosmetic-changes'], PACKAGES):
@@ -116,7 +116,7 @@ class TestPackages(TestCase):
                 self.assertIsNotEmpty(keys)
                 self.assertIn('en', keys)
 
-    def test_package_bundles(self):
+    def test_package_bundles(self) -> None:
         """Test whether package bundles has valid entries."""
         langs = i18n.known_languages()
         self.assertIsInstance(langs, list)

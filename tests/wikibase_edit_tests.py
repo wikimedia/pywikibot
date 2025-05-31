@@ -29,7 +29,7 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
     login = True
     write = True
 
-    def test_label_set(self):
+    def test_label_set(self) -> None:
         """Test setting an English label."""
         testsite = self.get_repo()
         item = pywikibot.ItemPage(testsite, 'Q68')
@@ -39,7 +39,7 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         item.get(force=True)
         self.assertEqual(item.labels['en'], 'Test123')
 
-    def test_label_remove(self):
+    def test_label_remove(self) -> None:
         """Test adding a Farsi and English label and removing the Farsi one."""
         testsite = self.get_repo()
         item = pywikibot.ItemPage(testsite, 'Q68')
@@ -58,14 +58,14 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         item.get()
         self.assertNotIn('fa', item.labels.keys())
 
-    def test_alias_set(self):
+    def test_alias_set(self) -> None:
         """Test setting an English alias."""
         testsite = self.get_repo()
         ts = str(time.time())
         item = pywikibot.ItemPage(testsite, 'Q68')
         item.editAliases({'en': [ts]})
 
-    def test_add_claim_with_qualifier(self):
+    def test_add_claim_with_qualifier(self) -> None:
         """Test adding a claim with a qualifier to an item and a property."""
         testsite = self.get_repo()
         item = pywikibot.ItemPage(testsite, 'Q68')
@@ -106,7 +106,7 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         end_date.setTarget(pywikibot.WbTime(year=2012))
         item.claims['P115'][0].addQualifier(end_date)
 
-    def test_edit_entity_new_item(self):
+    def test_edit_entity_new_item(self) -> None:
         """Test creating a new item using ``ItemPage.editEntity``."""
         testsite = self.get_repo()
         ts = str(time.time())
@@ -128,7 +128,7 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         item.editEntity(data)
 
     @unittest.expectedFailure  # T367324
-    def test_edit_entity_propagation(self):
+    def test_edit_entity_propagation(self) -> None:
         """Test that ``ItemPage.editEntity`` propagates changes to claims."""
         testsite = self.get_repo()
         item = pywikibot.ItemPage(testsite)
@@ -160,7 +160,7 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         self.assertSame(ref.on_item, item)
 
     @unittest.expectedFailure  # T367323
-    def test_edit_entity_new_property(self):
+    def test_edit_entity_new_property(self) -> None:
         """Test creating a new property using ``PropertyPage.editEntity``."""
         testsite = self.get_repo()
         ts = str(time.time())
@@ -181,7 +181,7 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         prop = pywikibot.PropertyPage(testsite, datatype='string')
         prop.editEntity(data)
 
-    def test_edit_entity_new_linked_item(self):
+    def test_edit_entity_new_linked_item(self) -> None:
         """Test linking a page using a new item."""
         ts = str(time.time())
 
@@ -212,7 +212,7 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         self.assertEqual(item._defined_by(), {})
         item.editEntity(data)
 
-    def test_set_redirect_target(self):
+    def test_set_redirect_target(self) -> None:
         """Test set_redirect_target method."""
         testsite = self.get_repo()
         item = pywikibot.ItemPage(testsite, 'Q1107')
@@ -256,7 +256,7 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         item.get(force=True)
         return item
 
-    def test_math_edit(self):
+    def test_math_edit(self) -> None:
         """Attempt adding a math claim with valid input."""
         testsite = self.get_repo()
         item = self._clean_item(testsite, 'P717')
@@ -272,7 +272,7 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         claim = item.claims['P717'][0]
         self.assertEqual(claim.getTarget(), target)
 
-    def test_WbMonolingualText_edit(self):
+    def test_WbMonolingualText_edit(self) -> None:
         """Attempt adding a monolingual text with valid input."""
         # Clean the slate in preparation for test.
         testsite = self.get_repo()
@@ -291,7 +291,7 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         self.assertEqual(claim.getTarget(), target)
 
     @unittest.expectedFailure  # T367326
-    def test_Coordinate_edit(self):
+    def test_Coordinate_edit(self) -> None:
         """Attempt adding a Coordinate with globe set via item."""
         testsite = self.get_repo()
         item = self._clean_item(testsite, 'P20480')
@@ -309,7 +309,7 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         claim = item.claims['P20480'][0]
         self.assertEqual(claim.getTarget(), target)
 
-    def test_WbQuantity_edit_unbound(self):
+    def test_WbQuantity_edit_unbound(self) -> None:
         """Attempt adding a quantity with unbound errors."""
         # Clean the slate in preparation for test.
         testsite = self.get_repo()
@@ -326,7 +326,7 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         claim = item.claims['P69'][0]
         self.assertEqual(claim.getTarget(), target)
 
-    def test_WbQuantity_edit(self):
+    def test_WbQuantity_edit(self) -> None:
         """Attempt adding a quantity with valid input."""
         # Clean the slate in preparation for test.
         testsite = self.get_repo()
@@ -343,7 +343,7 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         claim = item.claims['P69'][0]
         self.assertEqual(claim.getTarget(), target)
 
-    def test_identifier_edit(self):
+    def test_identifier_edit(self) -> None:
         """Attempt adding an external identifier claim with valid input."""
         testsite = self.get_repo()
         item = self._clean_item(testsite, 'P718')
@@ -359,7 +359,7 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         claim = item.claims['P718'][0]
         self.assertEqual(claim.getTarget(), target)
 
-    def test_WbGeoShape_edit(self):
+    def test_WbGeoShape_edit(self) -> None:
         """Attempt adding a geo-shape with valid input."""
         # Clean the slate in preparation for test.
         testsite = self.get_repo()
@@ -379,7 +379,7 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         self.assertEqual(claim.getTarget(), target)
 
     @unittest.expectedFailure  # T367327
-    def test_WbTabularData_edit(self):
+    def test_WbTabularData_edit(self) -> None:
         """Attempt adding a tabular-data with valid input."""
         # Clean the slate in preparation for test.
         testsite = self.get_repo()
@@ -399,7 +399,7 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         claim = item.claims['P30175'][0]
         self.assertEqual(claim.getTarget(), target)
 
-    def test_musical_notation_edit(self):
+    def test_musical_notation_edit(self) -> None:
         """Attempt adding a musical notation claim with valid input."""
         testsite = self.get_repo()
         item = self._clean_item(testsite, 'P88936')
@@ -416,7 +416,7 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         claim = item.claims['P88936'][0]
         self.assertEqual(claim.getTarget(), target)
 
-    def test_WbTime_edit_simple(self):
+    def test_WbTime_edit_simple(self) -> None:
         """Attempt adding a WbTime claim with valid input."""
         testsite = self.get_repo()
         item = self._clean_item(testsite, 'P66')
@@ -434,7 +434,7 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         self.assertEqual(claim.getTarget(), target)
 
     @unittest.expectedFailure  # T325860
-    def test_WbTime_edit_fromTimestr(self):
+    def test_WbTime_edit_fromTimestr(self) -> None:
         """Attempt adding a WbTime claim with valid input."""
         testsite = self.get_repo()
         item = self._clean_item(testsite, 'P66')
@@ -488,7 +488,7 @@ class TestWikibaseRemoveQualifier(WikibaseTestCase):
         qual_2.setTarget(pywikibot.ItemPage(testsite, 'Q67'))
         item.claims['P115'][0].addQualifier(qual_2)
 
-    def test_remove_single(self):
+    def test_remove_single(self) -> None:
         """Test adding a claim with two qualifiers, then removing one."""
         self.setUp()
         testsite = self.get_repo()
@@ -507,7 +507,7 @@ class TestWikibaseRemoveQualifier(WikibaseTestCase):
         self.assertNotIn('P580', claim.qualifiers.keys())
         self.assertIn('P88', claim.qualifiers.keys())
 
-    def test_remove_multiple(self):
+    def test_remove_multiple(self) -> None:
         """Test adding a claim with two qualifiers, then removing both."""
         self.setUp()
         testsite = self.get_repo()
@@ -555,14 +555,14 @@ class TestWikibaseDataSiteWbsetActions(WikibaseTestCase):
         self.sitelink = None
         super().tearDown()
 
-    def test_wbsetlabel_set_from_id(self):
+    def test_wbsetlabel_set_from_id(self) -> None:
         """Test setting an Italian label using id."""
         self.assertEqual(self.item.getID(), 'Q68')
         self.testsite.wbsetlabel('Q68', {'language': 'it', 'value': 'Test123'})
         self.item.get(force=True)
         self.assertEqual(self.item.labels['it'], 'Test123')
 
-    def test_wbsetlabel_remove_from_item(self):
+    def test_wbsetlabel_remove_from_item(self) -> None:
         """Test removing an Italian label using item."""
         self.assertEqual(self.item.getID(), 'Q68')
         self.testsite.wbsetlabel(self.item, {'language': 'it', 'value': ''})
@@ -570,7 +570,7 @@ class TestWikibaseDataSiteWbsetActions(WikibaseTestCase):
         self.item.get(force=True)
         self.assertNotIn('it', self.item.labels.keys())
 
-    def test_wbsetsitelink_set_remove(self):
+    def test_wbsetsitelink_set_remove(self) -> None:
         """Test setting a sitelink using id."""
         self.assertEqual(self.item.getID(), 'Q68')
         # add sitelink
@@ -615,7 +615,7 @@ class TestWikibaseAddClaimToExisting(WikibaseTestCase):
         item.get(force=True)
         return item
 
-    def test_multiple_changes(self):
+    def test_multiple_changes(self) -> None:
         """Make multiple changes with EditEntity."""
         testsite = self.get_repo()
         prop = 'P95931'

@@ -192,7 +192,7 @@ class TestCommonsQueryService(TestCase):
     family = 'commons'
     code = 'commons'
 
-    def testLoginAndOauthPermission(self):
+    def testLoginAndOauthPermission(self) -> None:
         """Commons Query Service Login and Oauth permission."""
         # Define the SPARQL query
         query = 'SELECT ?a ?b WHERE { ?a wdt:P9478 ?b } LIMIT 4'
@@ -224,15 +224,15 @@ class Shared:
         net = False
         object_under_test = None
 
-        def test_is_sparql_node(self):
+        def test_is_sparql_node(self) -> None:
             """Object should be a SparqlNode."""
             self.assertIsInstance(self.object_under_test, sparql.SparqlNode)
 
-        def test__repr__returnsStringType(self):
+        def test__repr__returnsStringType(self) -> None:
             """__repr__ should return type str."""
             self.assertIsInstance(self.object_under_test.__repr__(), str)
 
-        def test__str__returnsStringType(self):
+        def test__str__returnsStringType(self) -> None:
             """__str__ should return type str."""
             self.assertIsInstance(self.object_under_test.__str__(), str)
 

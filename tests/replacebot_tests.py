@@ -98,7 +98,7 @@ class TestReplacementsMain(TWNBotTestCase):
         """
         return replace.main(*args, '-site:wikipedia:test', '-page:TEST')
 
-    def test_invalid_replacements(self):
+    def test_invalid_replacements(self) -> None:
         """Test invalid command line replacement configurations."""
         # old and new no longer need to be together but pairsfile must exist
         self._run('foo', '-pairsfile:/dev/null', 'bar')
@@ -172,7 +172,7 @@ class TestReplacementsMain(TWNBotTestCase):
                          bot.apply_replacements('Hello 1', applied, page))
         self.assertEqual(applied, required_applied)
 
-    def test_only_cmd(self):
+    def test_only_cmd(self) -> None:
         """Test command line replacements only."""
         bot = self._get_bot(True, '1', '2')
         self.assertLength(bot.replacements, 1)
@@ -183,7 +183,7 @@ class TestReplacementsMain(TWNBotTestCase):
             'be something like: Bot: Automated text replacement  (-1 +2)',
         ], pywikibot.bot.ui.pop_output())
 
-    def test_cmd_automatic(self):
+    def test_cmd_automatic(self) -> None:
         """Test command line replacements with automatic summary."""
         bot = self._get_bot(None, '1', '2', '-automaticsummary')
         self.assertLength(bot.replacements, 1)
@@ -195,21 +195,21 @@ class TestReplacementsMain(TWNBotTestCase):
             'be something like: Bot: Automated text replacement  (-1 +2)',
         ], pywikibot.bot.ui.pop_output())
 
-    def test_only_fix_global_message(self):
+    def test_only_fix_global_message(self) -> None:
         """Test fixes replacements only."""
         bot = self._get_bot(None, '-fix:has-msg')
         self.assertLength(bot.replacements, 1)
         self._test_fix_replacement(bot.replacements[0])
         self.assertEqual([], pywikibot.bot.ui.pop_output())
 
-    def test_only_fix_global_message_tw(self):
+    def test_only_fix_global_message_tw(self) -> None:
         """Test fixes replacements only."""
         bot = self._get_bot(None, '-fix:has-msg-tw')
         self.assertLength(bot.replacements, 1)
         self._test_fix_replacement(bot.replacements[0])
         self.assertEqual([], pywikibot.bot.ui.pop_output())
 
-    def test_only_fix_no_message(self):
+    def test_only_fix_no_message(self) -> None:
         """Test fixes replacements only."""
         bot = self._get_bot(True, '-fix:no-msg')
         self.assertLength(bot.replacements, 1)
@@ -221,14 +221,14 @@ class TestReplacementsMain(TWNBotTestCase):
             '"no-msg" (all replacements)',
         ], pywikibot.bot.ui.pop_output())
 
-    def test_only_fix_all_replacement_summary(self):
+    def test_only_fix_all_replacement_summary(self) -> None:
         """Test fixes replacements only."""
         bot = self._get_bot(None, '-fix:all-repl-msg')
         self.assertLength(bot.replacements, 1)
         self._test_fix_replacement(bot.replacements[0], msg=True)
         self.assertEqual([], pywikibot.bot.ui.pop_output())
 
-    def test_only_fix_partial_replacement_summary(self):
+    def test_only_fix_partial_replacement_summary(self) -> None:
         """Test fixes replacements only."""
         bot = self._get_bot(True, '-fix:partial-repl-msg')
         for offset, replacement in enumerate(bot.replacements):
@@ -241,7 +241,7 @@ class TestReplacementsMain(TWNBotTestCase):
             '"partial-repl-msg" (replacement #2)',
         ], pywikibot.bot.ui.pop_output())
 
-    def test_only_fix_multiple(self):
+    def test_only_fix_multiple(self) -> None:
         """Test fixes replacements only."""
         bot = self._get_bot(None, '-fix:has-msg-multiple')
         for offset, replacement in enumerate(bot.replacements):
@@ -249,7 +249,7 @@ class TestReplacementsMain(TWNBotTestCase):
         self.assertLength(bot.replacements, 3)
         self.assertEqual([], pywikibot.bot.ui.pop_output())
 
-    def test_cmd_and_fix(self):
+    def test_cmd_and_fix(self) -> None:
         """Test command line and fix replacements together."""
         bot = self._get_bot(True, '1', '2', '-fix:has-msg')
         self.assertLength(bot.replacements, 2)
@@ -261,7 +261,7 @@ class TestReplacementsMain(TWNBotTestCase):
             'something like: Bot: Automated text replacement  (-1 +2)',
         ], pywikibot.bot.ui.pop_output())
 
-    def test_except_title(self):
+    def test_except_title(self) -> None:
         """Test excepting and requiring a title specific to fix."""
         bot = self._get_bot(True, '-fix:no-msg-title-exceptions')
         self.assertLength(bot.replacements, 1)
@@ -290,7 +290,7 @@ class TestReplacementsMain(TWNBotTestCase):
             'because the title is on the exceptions list.'
         ], pywikibot.bot.ui.pop_output())
 
-    def test_fix_callable(self):
+    def test_fix_callable(self) -> None:
         """Test fix replacements using a callable."""
         bot = self._get_bot(True, '-fix:no-msg-callable')
         self.assertLength(bot.replacements, 1)
@@ -303,7 +303,7 @@ class TestReplacementsMain(TWNBotTestCase):
             '"no-msg-callable" (all replacements)',
         ], pywikibot.bot.ui.pop_output())
 
-    def test_pairs_file(self):
+    def test_pairs_file(self) -> None:
         """Test handle_pairsfile."""
         result = replace.handle_pairsfile('non existing file')
         self.assertIsNone(result)

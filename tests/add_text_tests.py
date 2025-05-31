@@ -47,7 +47,7 @@ class TestAddTextScript(TestCase):
         self.generator_factory = pywikibot.pagegenerators.GeneratorFactory()
 
     @patch('pywikibot.handle_args', Mock(side_effect=lambda args: args))
-    def test_parse(self):
+    def test_parse(self) -> None:
         """Basic argument parsing."""
         args = parse(['-text:"hello world"'], self.generator_factory)
         self.assertEqual('"hello world"', args['text'])
@@ -61,7 +61,7 @@ class TestAddTextScript(TestCase):
         self.assertFalse(args['reorder'])
 
     @patch('pywikibot.handle_args', Mock(side_effect=lambda args: args))
-    def test_unrecognized_argument(self):
+    def test_unrecognized_argument(self) -> None:
         """Provide an argument that doesn't exist."""
         expected_error = "Argument '-no_such_arg' is unrecognized"
 
@@ -70,7 +70,7 @@ class TestAddTextScript(TestCase):
                 parse([invalid_arg], self.generator_factory)
 
     @patch('pywikibot.handle_args', Mock(side_effect=lambda args: args))
-    def test_neither_text_argument(self):
+    def test_neither_text_argument(self) -> None:
         """Don't provide either -text or -textfile."""
         expected_error = "Either the '-text' or '-textfile' is required"
 
@@ -78,7 +78,7 @@ class TestAddTextScript(TestCase):
             parse(['-noreorder'], self.generator_factory)
 
     @patch('pywikibot.handle_args', Mock(side_effect=lambda args: args))
-    def test_both_text_arguments(self):
+    def test_both_text_arguments(self) -> None:
         """Provide both -text and -textfile."""
         expected_error = "'-text' and '-textfile' cannot both be used"
 
@@ -97,7 +97,7 @@ class TestAddTextScript(TestCase):
         input_mock.assert_called_with('What text do you want to add?')
 
     @patch('pywikibot.handle_args', Mock(side_effect=lambda args: args))
-    def test_main_no_arguments(self):
+    def test_main_no_arguments(self) -> None:
         """Invoke our main method without any arguments."""
         main()
 
@@ -107,7 +107,7 @@ class TestAddTextScript(TestCase):
         ], pywikibot.bot.ui.pop_output())
 
     @patch('pywikibot.handle_args', Mock(side_effect=lambda args: args))
-    def test_main_unrecognized_argument(self):
+    def test_main_unrecognized_argument(self) -> None:
         """Invoke our main method with an invalid argument."""
         main('no_such_arg')
 
@@ -117,7 +117,7 @@ class TestAddTextScript(TestCase):
         ], pywikibot.bot.ui.pop_output())
 
     @patch('pywikibot.handle_args', Mock(side_effect=lambda args: args))
-    def test_main_no_generator_found(self):
+    def test_main_no_generator_found(self) -> None:
         """Invoke main when our generator_factory can't provide a generator."""
         main('-text:hello')
 
@@ -126,7 +126,7 @@ class TestAddTextScript(TestCase):
             'Use -help for further information.'
         ], pywikibot.bot.ui.pop_output())
 
-    def test_setup_with_text(self):
+    def test_setup_with_text(self) -> None:
         """Exercise bot with a -text argument."""
         bot = AddTextBot(text='hello\\nworld')
 
@@ -149,7 +149,7 @@ class TestAddTextScript(TestCase):
 
         mock_file.assert_called_with('/path/to/my/file.txt', 'rb', ANY)
 
-    def test_not_skipped(self):
+    def test_not_skipped(self) -> None:
         """Exercise skip_page() with a page we should accept."""
         bot = AddTextBot()
         page = _mock_page()
@@ -157,7 +157,7 @@ class TestAddTextScript(TestCase):
         self.assertFalse(bot.skip_page(page))
         self.assertEqual([], pywikibot.bot.ui.pop_output())
 
-    def test_skip_missing_standard(self):
+    def test_skip_missing_standard(self) -> None:
         """Exercise skip_page() with a non-talk page that doesn't exist."""
         bot = AddTextBot()
         page = _mock_page(exists=False)
@@ -167,7 +167,7 @@ class TestAddTextScript(TestCase):
             'Page mock_page does not exist on mock_site.'
         ], pywikibot.bot.ui.pop_output())
 
-    def test_skip_missing_talk(self):
+    def test_skip_missing_talk(self) -> None:
         """Exercise skip_page() with a talk page that doesn't exist."""
         bot = AddTextBot()
         page = _mock_page(exists=False, talk=True)
@@ -177,7 +177,7 @@ class TestAddTextScript(TestCase):
             "mock_page doesn't exist, creating it!"
         ], pywikibot.bot.ui.pop_output())
 
-    def test_skip_missing_standard_with_create(self):
+    def test_skip_missing_standard_with_create(self) -> None:
         """Exercise skip_page() with -create option for a non-talk page."""
         bot = AddTextBot(create=True)
         for exists in (True, False):
@@ -187,7 +187,7 @@ class TestAddTextScript(TestCase):
                 self.assertFalse(bot.skip_page(page))
                 self.assertIsEmpty(pywikibot.bot.ui.pop_output())
 
-    def test_skip_if_redirect(self):
+    def test_skip_if_redirect(self) -> None:
         """Exercise skip_page() with a page that is a redirect."""
         bot = AddTextBot()
         page = _mock_page(redirect=True)
@@ -197,7 +197,7 @@ class TestAddTextScript(TestCase):
             'Page mock_page on mock_site is skipped because it is a redirect'
         ], pywikibot.bot.ui.pop_output())
 
-    def test_skip_if_url_match(self):
+    def test_skip_if_url_match(self) -> None:
         """Exercise skip_page() with a '-excepturl' argument."""
         bot = AddTextBot(regex_skip_url='.*\\.com')
 

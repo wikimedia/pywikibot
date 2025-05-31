@@ -50,7 +50,7 @@ class TestSharedFiles(TestCase):
 
     cached = True
 
-    def test_shared_only(self):
+    def test_shared_only(self) -> None:
         """Test file_is_shared() on file page with shared file only."""
         title = 'File:Sepp Maier 1.JPG'
 
@@ -77,7 +77,7 @@ class TestSharedFiles(TestCase):
                 rf'Page \[\[(wikipedia:|)it:{title}\]\] doesn\'t exist.'):
             itwp_file.get()
 
-    def test_local_only(self):
+    def test_local_only(self) -> None:
         """Test file_is_shared() on file page with local file only."""
         title = 'File:Untitled (Three Forms), stainless steel sculpture by ' \
                 '--James Rosati--, 1975-1976, --Honolulu Academy of Arts--.JPG'
@@ -110,7 +110,7 @@ class TestSharedFiles(TestCase):
                 page_doesnt_exist_exc_regex):
             commons_file.get()
 
-    def test_on_both(self):
+    def test_on_both(self) -> None:
         """Test file_is_shared() on file page with local and shared file."""
         title = 'Pywikibot MW gear icon.svg'
 
@@ -131,7 +131,7 @@ class TestSharedFiles(TestCase):
         self.assertTrue(commons_file.file_is_shared())
         self.assertTrue(commons_file.file_is_used)
 
-    def test_non_file_local(self):
+    def test_non_file_local(self) -> None:
         """Test file page, without local file, existing on the local wiki."""
         title = 'File:Sepp Maier 1.JPG'
 
@@ -164,7 +164,7 @@ class TestFilePage(TestCase):
 
     cached = True
 
-    def test_file_info_with_no_page(self):
+    def test_file_info_with_no_page(self) -> None:
         """FilePage:latest_file_info raises NoPageError for missing pages."""
         site = self.get_site()
         image = pywikibot.FilePage(site, 'File:NoPage.jpg')
@@ -176,7 +176,7 @@ class TestFilePage(TestCase):
                  r"doesn't exist\.")):
             image = image.latest_file_info
 
-    def test_file_info_with_no_file(self):
+    def test_file_info_with_no_file(self) -> None:
         """FilePage:latest_file_info raises PagerelatedError if no file."""
         site = self.get_site()
         image = pywikibot.FilePage(site, 'File:Test with no image.png')
@@ -229,7 +229,7 @@ class TestFilePageLatestFileInfo(TestCase):
         super().setUp()
         self.image = pywikibot.FilePage(self.site, self.file_name)
 
-    def test_lazyload_metadata(self):
+    def test_lazyload_metadata(self) -> None:
         """Test metadata lazy load."""
         self.assertTrue(self.image.exists())
 
@@ -237,7 +237,7 @@ class TestFilePageLatestFileInfo(TestCase):
         self.assertIsNone(rev._metadata)
         self.assertIsNotNone(rev.metadata)
 
-    def test_get_file_url(self):
+    def test_get_file_url(self) -> None:
         """Get File url."""
         self.assertTrue(self.image.exists())
         self.assertEqual(self.image.get_file_url(),
@@ -248,7 +248,7 @@ class TestFilePageLatestFileInfo(TestCase):
                          'd/d3/Albert_Einstein_Head.jpg')
 
     @unittest.expectedFailure
-    def test_get_file_url_thumburl_from_width(self):
+    def test_get_file_url_thumburl_from_width(self) -> None:
         """Get File thumburl from width."""
         self.assertTrue(self.image.exists())
         # url_param has no precedence over height/width.
@@ -260,7 +260,7 @@ class TestFilePageLatestFileInfo(TestCase):
         self.assertEqual(self.image.latest_file_info.thumbheight, 133)
 
     @unittest.expectedFailure
-    def test_get_file_url_thumburl_from_height(self):
+    def test_get_file_url_thumburl_from_height(self) -> None:
         """Get File thumburl from height."""
         self.assertTrue(self.image.exists())
         # url_param has no precedence over height/width.
@@ -272,7 +272,7 @@ class TestFilePageLatestFileInfo(TestCase):
         self.assertEqual(self.image.latest_file_info.thumbheight, 100)
 
     @unittest.expectedFailure
-    def test_get_file_url_thumburl_from_url_param(self):
+    def test_get_file_url_thumburl_from_url_param(self) -> None:
         """Get File thumburl from height."""
         self.assertTrue(self.image.exists())
         # url_param has no precedence over height/width.
@@ -293,7 +293,7 @@ class TestFilePageDownload(TestCase):
 
     cached = True
 
-    def test_successful_download(self):
+    def test_successful_download(self) -> None:
         """Test successful download."""
         page = pywikibot.FilePage(self.site, 'File:Albert Einstein.jpg')
         filename = join_images_path('Albert Einstein.jpg')
@@ -317,7 +317,7 @@ class TestFilePageDownload(TestCase):
 
         os.remove(filename)
 
-    def test_changed_title(self):
+    def test_changed_title(self) -> None:
         """Test changed title."""
         page = pywikibot.FilePage(self.site, 'Pywikibot MW gear icon.svg')
         filename = join_images_path('Pywikibot MW gear icon.svg')
@@ -333,7 +333,7 @@ class TestFilePageDownload(TestCase):
         os.remove(filename)
         os.remove(new_filename)
 
-    def test_not_existing_download(self):
+    def test_not_existing_download(self) -> None:
         """Test not existing download."""
         page = pywikibot.FilePage(self.site,
                                   'File:notexisting_Albert Einstein.jpg')
@@ -355,7 +355,7 @@ class TestFilePageDataItem(TestCase):
 
     cached = True
 
-    def test_data_item(self):
+    def test_data_item(self) -> None:
         """Test associated data item."""
         page = pywikibot.FilePage(self.site, 'File:Albert Einstein.jpg')
         item = page.data_item()
@@ -385,7 +385,7 @@ class TestFilePageDataItem(TestCase):
         del item._file
         self.assertEqual(page, item.file)
 
-    def test_data_item_not_file(self):
+    def test_data_item_not_file(self) -> None:
         """Test data item with invalid pageid."""
         item = pywikibot.MediaInfo(self.site, 'M1')  # Main Page
         with self.assertRaises(Error):
@@ -394,7 +394,7 @@ class TestFilePageDataItem(TestCase):
             item.get()
         self.assertFalse(item.exists())
 
-    def test_data_item_when_no_file_or_data_item(self):
+    def test_data_item_when_no_file_or_data_item(self) -> None:
         """Test data item associated to file that does not exist."""
         page = pywikibot.FilePage(self.site,
                                   'File:Notexisting_Albert Einstein.jpg')
@@ -409,7 +409,7 @@ class TestFilePageDataItem(TestCase):
         with self.assertRaises(NoWikibaseEntityError):
             item.labels
 
-    def test_data_item_when_file_exist_but_without_item(self):
+    def test_data_item_when_file_exist_but_without_item(self) -> None:
         """Test if data item is missing from file."""
         # Get latest uploaded files.
         gen = pagegenerators.RecentChangesPageGenerator(
@@ -438,7 +438,7 @@ class TestFilePageDataItem(TestCase):
             item.statements,
             pywikibot.page._collections.ClaimCollection)
 
-    def test_data_list_to_dict_workaround(self):
+    def test_data_list_to_dict_workaround(self) -> None:
         """Test that T222159 workaround converts [] to {}."""
         page = pywikibot.FilePage(self.site, 'File:Albert Einstein.jpg')
         item = page.data_item()
@@ -463,7 +463,7 @@ class TestMediaInfoEditing(TestCase):
     family = 'commons'
     code = 'beta'
 
-    def test_edit_label(self):
+    def test_edit_label(self) -> None:
         """Test label editing."""
         # Test label editing when file doesn't exists
         page = pywikibot.FilePage(self.site, 'File:123_4_DOESNT_EXISTS.jpg')
@@ -506,7 +506,7 @@ class TestMediaInfoEditing(TestCase):
         item.get(force=True)
         self.assertEqual(item.labels['fi'], label)
 
-    def test_edit_claims(self):
+    def test_edit_claims(self) -> None:
         """Test addClaim and removeClaim editing."""
         wikidata_site = pywikibot.Site('beta', 'wikidata')
 

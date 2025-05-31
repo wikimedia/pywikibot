@@ -253,13 +253,13 @@ class TestLogentryParams(TestLogentriesBase):
         # main page was moved back again, we test it.
         self.assertEqual(mainpage, target.moved_target())
 
-    def test_moved_target_fail_old(self):
+    def test_moved_target_fail_old(self) -> None:
         """Test moved_target method failing on older wiki."""
         site = self.get_site('old')
         with self.assertRaises(NoMoveTargetError):
             self.get_mainpage(site).moved_target()
 
-    def test_moved_target_fail_de(self):
+    def test_moved_target_fail_de(self) -> None:
         """Test moved_target method failing on de-wiki."""
         page = pywikibot.Page(self.get_site('dewp'), 'Main Page')
         with self.assertRaises(NoMoveTargetError):
@@ -272,7 +272,7 @@ class TestLogentryParams(TestLogentriesBase):
         logentry = self._get_logentry('thanks')
         self.assertIsInstance(logentry.page(), pywikibot.User)
 
-    def test_equality(self):
+    def test_equality(self) -> None:
         """Test equality of LogEntry instances."""
         site = self.get_site('dewp')
         other_site = self.get_site('tewp')

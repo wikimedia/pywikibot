@@ -21,7 +21,7 @@ class TestDryHTMLComparator(TestCase):
 
     net = False
 
-    def test_added_context(self):
+    def test_added_context(self) -> None:
         """Test html_comparator's detection of added-context."""
         output = html_comparator("""
 <tr>
@@ -35,7 +35,7 @@ class TestDryHTMLComparator(TestCase):
         self.assertEqual(output['added-context'],
                          ['line 1a', 'line \n2a', 'line 1b', 'line 2b'])
 
-    def test_deleted_context(self):
+    def test_deleted_context(self) -> None:
         """Test html_comparator's detection of deleted-context."""
         output = html_comparator("""
 <tr>
@@ -49,7 +49,7 @@ class TestDryHTMLComparator(TestCase):
         self.assertEqual(output['deleted-context'],
                          ['line 1a', 'line \n2a', 'line 1b', 'line 2b'])
 
-    def test_run(self):
+    def test_run(self) -> None:
         """Test html_comparator using examples given in mw-api docs."""
         with open(join_html_data_path('diff.html')) as filed:
             diff_html = filed.read()
@@ -75,7 +75,7 @@ class TestHTMLComparator(TestCase):
     family = 'wikipedia'
     code = 'en'
 
-    def test_wikipedia_rev_139992(self):
+    def test_wikipedia_rev_139992(self) -> None:
         """Test html_comparator with revision 139992 in en:wikipedia."""
         site = self.get_site()
         diff_html = site.compare(139992, 139993)
@@ -175,7 +175,7 @@ class TestPatchManager(TestCase):
                   '+    Pywikipediabot   \n'
                   '? +\n'})]
 
-    def test_patch_manager(self):
+    def test_patch_manager(self) -> None:
         """Test PatchManager."""
         for case in self.cases:
             p = PatchManager(case[0], case[1])
@@ -184,7 +184,7 @@ class TestPatchManager(TestCase):
                     self.assertEqual(p.hunks[key].diff_plain_text,
                                      case[2][key])
 
-    def test_patch_manager_no_diff(self):
+    def test_patch_manager_no_diff(self) -> None:
         """Test PatchManager for the same strings."""
         for context in range(2):
             p = PatchManager('Pywikibot', 'Pywikibot', context=context)

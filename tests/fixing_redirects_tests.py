@@ -19,7 +19,7 @@ class TestFixingRedirects(TestCase):
     family = 'wikipedia'
     code = 'en'
 
-    def test_disabled(self):
+    def test_disabled(self) -> None:
         """Test disabled parts of fixing redirects."""
         bot = FixingRedirectBot()
         text = ('<!--[[Template:Doc]]--><source>[[Template:Doc]]</source>'

@@ -23,7 +23,7 @@ class TestFamily(TestCase):
 
     net = False
 
-    def test_family_load_valid(self):
+    def test_family_load_valid(self) -> None:
         """Test that a family can be loaded via Family.load."""
         for name in pywikibot.config.family_files:
             with self.subTest(family=name):
@@ -50,42 +50,42 @@ class TestFamily(TestCase):
                     self.assertEqual(set(f.langs), {f.code})
                     self.assertEqual(set(f.codes), {f.code})
 
-    def test_family_load_invalid(self):
+    def test_family_load_invalid(self) -> None:
         """Test that an invalid family raised UnknownFamilyError."""
         with self.assertRaisesRegex(
                 UnknownFamilyError,
                 'Family unknown does not exist'):
             Family.load('unknown')
 
-    def test_new_same_family_singleton(self):
+    def test_new_same_family_singleton(self) -> None:
         """Test that two same Family are the same object and equal."""
         family_1 = Family.load('wikipedia')
         family_2 = Family.load('wikipedia')
         self.assertIs(family_1, family_2)
         self.assertEqual(family_1, family_2)
 
-    def test_new_different_families_ne(self):
+    def test_new_different_families_ne(self) -> None:
         """Test that two different Family are not same nor equal."""
         family_1 = Family.load('wikipedia')
         family_2 = Family.load('wiktionary')
         self.assertIsNot(family_1, family_2)
         self.assertNotEqual(family_1, family_2)
 
-    def test_eq_family_with_string_repr_same_family(self):
+    def test_eq_family_with_string_repr_same_family(self) -> None:
         """Test that Family and string with same name are equal."""
         family = Family.load('wikipedia')
         other = 'wikipedia'
         self.assertEqual(family, other)
         self.assertFalse(family != other)
 
-    def test_ne_family_with_string_repr_different_family(self):
+    def test_ne_family_with_string_repr_different_family(self) -> None:
         """Test that Family and string with different name are not equal."""
         family = Family.load('wikipedia')
         other = 'wikisource'
         self.assertNotEqual(family, other)
         self.assertFalse(family == other)
 
-    def test_eq_family_with_string_repr_not_existing_family(self):
+    def test_eq_family_with_string_repr_not_existing_family(self) -> None:
         """Test that Family and string with different name are not equal."""
         family = Family.load('wikipedia')
         other = 'unknown'
@@ -94,7 +94,7 @@ class TestFamily(TestCase):
                 'Family unknown does not exist'):
             family.__eq__(other)
 
-    def test_get_obsolete_wp(self):
+    def test_get_obsolete_wp(self) -> None:
         """Test three types of obsolete codes."""
         family = Family.load('wikipedia')
         self.assertIsInstance(family.obsolete, Mapping)
@@ -108,7 +108,7 @@ class TestFamily(TestCase):
         self.assertIsNone(family.obsolete['ru-sib'])
         self.assertIn('dk', family.interwiki_replacements)
 
-    def test_obsolete_from_attributes(self):
+    def test_obsolete_from_attributes(self) -> None:
         """Test obsolete property for given class attributes."""
         # Construct a temporary family and instantiate it
         family = type('TempFamily', (Family,), {})()
@@ -124,7 +124,7 @@ class TestFamily(TestCase):
         self.assertEqual(family.interwiki_replacements, {'a': 'b'})
         self.assertEqual(family.interwiki_removals, frozenset('c'))
 
-    def test_obsolete_readonly(self):
+    def test_obsolete_readonly(self) -> None:
         """Test obsolete result not updatable."""
         family = Family.load('wikipedia')
         with self.assertRaisesRegex(
@@ -168,7 +168,7 @@ class TestFamilyUrlRegex(PatchingTestCase):
         super().setUp()
         self.articlepath = '/wiki/$1'
 
-    def test_from_url(self):
+    def test_from_url(self) -> None:
         """Test various URLs for Family.from_url."""
         self.current_code = 'vo'
         self.current_family = 'wikipedia'
@@ -210,7 +210,7 @@ class TestFamilyUrlRegex(PatchingTestCase):
         self.assertIsNone(f.from_url('https://vo.wikipedia.org/wik/$1'))
         self.assertIsNone(f.from_url('https://vo.wikipedia.org/index.php/$1'))
 
-    def test_each_family(self):
+    def test_each_family(self) -> None:
         """Test each family builds a working regex."""
         for family in pywikibot.config.family_files:
             if family == 'wowwiki':

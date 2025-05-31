@@ -25,7 +25,7 @@ class TestLinterPages(DefaultSiteTestCase):
             self.skipTest(
                 f'The site {self.site} does not use Linter extension')
 
-    def test_linter_pages(self):
+    def test_linter_pages(self) -> None:
         """Test the deprecated site.logpages() method."""
         le = list(self.site.linter_pages(
             lint_categories='obsolete-tag|missing-end-tag', total=5))

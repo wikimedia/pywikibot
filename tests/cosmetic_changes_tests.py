@@ -36,7 +36,7 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
 
     dry = True
 
-    def test_fixSelfInterwiki(self):
+    def test_fixSelfInterwiki(self) -> None:
         """Test fixSelfInterwiki method."""
         self.assertEqual('[[Foo bar]]',
                          self.cct.fixSelfInterwiki('[[de:Foo bar]]'))
@@ -47,7 +47,7 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
         self.assertEqual('[[en:Foo bar]]',
                          self.cct.fixSelfInterwiki('[[en:Foo bar]]'))
 
-    def test_standardizePageFooter(self):
+    def test_standardizePageFooter(self) -> None:
         """Test standardizePageFooter method."""
         self.assertEqual('Foo\n{{any template}}\n\n[[Category:Foo]]',
                          self.cct.standardizePageFooter(
@@ -59,7 +59,7 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
                          self.cct.standardizePageFooter(
                              'Foo\n[[category:foo]]\n{{Personendaten}}'))
 
-    def test_resolveHtmlEntities(self):
+    def test_resolveHtmlEntities(self) -> None:
         """Test resolveHtmlEntities method."""
         self.assertEqual(
             '&amp;#&nbsp;# #0#&#62;#x',
@@ -73,7 +73,7 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
             '<!-- &ndash; -->',
             self.cct.resolveHtmlEntities('<!-- &ndash; -->'))
 
-    def test_removeUselessSpaces(self):
+    def test_removeUselessSpaces(self) -> None:
         """Test removeUselessSpaces method."""
         self.assertEqual('Foo bar',
                          self.cct.removeUselessSpaces('Foo  bar '))
@@ -91,12 +91,12 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
         self.assertEqual('Fooooo bar',
                          self.cct.removeUselessSpaces('Fooooo bar\t'))
 
-    def test_removeNonBreakingSpaceBeforePercent(self):
+    def test_removeNonBreakingSpaceBeforePercent(self) -> None:
         """Test removeNonBreakingSpaceBeforePercent method."""
         self.assertEqual(
             '42 %', self.cct.removeNonBreakingSpaceBeforePercent('42&nbsp;%'))
 
-    def test_cleanUpSectionHeaders(self):
+    def test_cleanUpSectionHeaders(self) -> None:
         """Test cleanUpSectionHeaders method."""
         self.assertEqual('=== Header ===\n',
                          self.cct.cleanUpSectionHeaders('===Header===\n'))
@@ -107,7 +107,7 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
         self.assertEqual('=== Header ===\n',
                          self.cct.cleanUpSectionHeaders('===\tHeader\t===\n'))
 
-    def test_putSpacesInLists(self):
+    def test_putSpacesInLists(self) -> None:
         """Test putSpacesInLists method."""
         self.assertEqual('* Foo bar',
                          self.cct.putSpacesInLists('*Foo bar'))
@@ -127,7 +127,7 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
         self.assertEqual(':* Foo bar',
                          self.cct.putSpacesInLists(':*Foo bar'))
 
-    def test_replaceDeprecatedTemplates(self):
+    def test_replaceDeprecatedTemplates(self) -> None:
         """Test replaceDeprecatedTemplates method."""
         self.assertEqual(
             '{{Belege fehlen}}'
@@ -141,7 +141,7 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
                 '{{Quellen_fehlen|foo}}'
             ))
 
-    def test_fixHtml(self):
+    def test_fixHtml(self) -> None:
         """Test fixHtml method."""
         self.assertEqual("'''Foo''' bar",
                          self.cct.fixHtml('<b>Foo</b> bar'))
@@ -156,7 +156,7 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
         self.assertEqual('\n=== Header ===\n',
                          self.cct.fixHtml('\n<h3>Header</h3>\n'))
 
-    def test_fixReferences(self):
+    def test_fixReferences(self) -> None:
         """Test fixReferences method."""
         self.assertEqual('<ref name="Foo" />',
                          self.cct.fixReferences('<ref name= "Foo" />'))
@@ -169,14 +169,14 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
         self.assertEqual('',
                          self.cct.fixReferences('<ref> \n</ref>'))
 
-    def test_fixTypo(self):
+    def test_fixTypo(self) -> None:
         """Test fixTypo method."""
         self.assertEqual('42&nbsp;cm³',
                          self.cct.fixTypo('42 ccm'))
         self.assertEqual('42&nbsp;°C',
                          self.cct.fixTypo('42 ºC'))
 
-    def test_fixArabicLetters(self):
+    def test_fixArabicLetters(self) -> None:
         """Test fixArabicLetters."""
         text = '1234,كىي'
         # fixArabicLetters must not change text when site is not fa or ckb
@@ -200,7 +200,7 @@ class TestDryFixSyntaxSave(TestCosmeticChanges):
             14: ['Kategorie', 'Category'],
         })
 
-    def test_title_param(self):
+    def test_title_param(self) -> None:
         """Test fixing url with title parameter."""
         # necessary as the fixer needs the article path to fix it
         self.assertEqual(
@@ -227,7 +227,7 @@ class TestDryFixSyntaxSave(TestCosmeticChanges):
                 '[https://de.wiktionary.org/w/index.php?title=Example]\n'
             ))
 
-    def test_fix_url(self):
+    def test_fix_url(self) -> None:
         """Test fixing urls."""
         self.assertEqual(
             '[[Example]]\n[[Example]]\n[[Example]]\n'
@@ -258,25 +258,25 @@ class TestDryFixSyntaxSave(TestCosmeticChanges):
                 '[https://de.wikipedia.org/w/index.php/&]\n'
             ))
 
-    def test_fix_brackets(self):
+    def test_fix_brackets(self) -> None:
         """Test fixing brackets."""
         self.assertEqual(
             '[https://de.wikipedia.org]',
             self.cct.fixSyntaxSave('[[https://de.wikipedia.org]]'))
 
-    def test_fix_missing_bracket(self):
+    def test_fix_missing_bracket(self) -> None:
         """Test fixing missing bracket."""
         self.assertEqual(
             '[https://de.wikipedia.org]',
             self.cct.fixSyntaxSave('[[https://de.wikipedia.org]'))
 
-    def test_fix_link_text(self):
+    def test_fix_link_text(self) -> None:
         """Test fixing link text."""
         self.assertEqual(
             '[https://de.wikipedia.org/w/api.php API]',
             self.cct.fixSyntaxSave('[https://de.wikipedia.org/w/api.php|API]'))
 
-    def test_fix_files_and_categories(self):
+    def test_fix_files_and_categories(self) -> None:
         """Test files and categories fix."""
         self.assertEqual(
             '[[:Kategorie:Example]]\n'
@@ -307,7 +307,7 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
 
     """Test cosmetic_changes requiring a live wiki."""
 
-    def test_removeEmptySections(self):
+    def test_removeEmptySections(self) -> None:
         """Test removeEmptySections method."""
         content = '\nSome content'
         # same level
@@ -370,7 +370,7 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
             self.cct.removeEmptySections('\n==Bar==\n[[cs:Foo]]'
                                          '\n[[Category:Baz]]'))
 
-    def test_remove_empty_sections_interlanguage_links(self):
+    def test_remove_empty_sections_interlanguage_links(self) -> None:
         """Test removeEmptySections with edge cases of language links."""
         # When removing language links, do not remove the \n after them,
         # otherwise the sections won't be detected correctly.
@@ -384,7 +384,7 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
             't\n[[en:link]]',
             self.cct.removeEmptySections('t\n=== 1 ===\n[[en:link]]'))
 
-    def test_remove_empty_sections_with_heading_comments(self):
+    def test_remove_empty_sections_with_heading_comments(self) -> None:
         """Test removeEmptySections with comments in the section headings."""
         self.assertEqual(
             '==2==<!--c--> <!--\n-->\nt',
@@ -396,14 +396,14 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
             '==2<!--\n-->==\nt',
             self.cct.removeEmptySections('==1==\n==2<!--\n-->==\nt'))
 
-    def test_translate_and_capitalize_namespaces(self):
+    def test_translate_and_capitalize_namespaces(self) -> None:
         """Test translateAndCapitalizeNamespaces method."""
         self.assertEqual(
             '[[Wikipedia:Test]], [[Wikipedia:Test]], [[Datei:Test]]',
             self.cct.translateAndCapitalizeNamespaces(
                 '[[Project:Test]], [[wikipedia:Test]], [[Image:Test]]'))
 
-    def test_translate_magic_words(self):
+    def test_translate_magic_words(self) -> None:
         """Test translateMagicWords method."""
         self.assertEqual(
             '[[File:Foo.bar|mini]]',
@@ -433,7 +433,7 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
             self.cct.translateMagicWords('[[File:Foo.bar|250px|center|Bar]]'))
 
     @unittest.expectedFailure
-    def test_translateMagicWords_fail(self):
+    def test_translateMagicWords_fail(self) -> None:
         """Test translateMagicWords method.
 
         The current implementation doesn't check whether the magic word is
@@ -443,7 +443,7 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
             '[[File:Foo.bar|{{Baz|thumb|foo}}]]',
             self.cct.translateMagicWords('[[File:Foo.bar|{{Baz|thumb|foo}}]]'))
 
-    def test_cleanUpLinks_pipes(self):
+    def test_cleanUpLinks_pipes(self) -> None:
         """Test cleanUpLinks method."""
         self.assertEqual('[[No|no change]]',
                          self.cct.cleanUpLinks('[[no|no change]]'))
@@ -471,7 +471,7 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
                          self.cct.cleanUpLinks('[[Sand|sand]]box'))
 
     @unittest.expectedFailure
-    def test_cleanup_links(self):
+    def test_cleanup_links(self) -> None:
         """Test cleanUpLinks method.
 
         This method fails for the given samples from library. Either
@@ -487,7 +487,7 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
             with self.subTest(text=text):
                 self.assertEqual(self.cct.cleanUpLinks(text), result)
 
-    def test_replace_deprecated_templates(self):
+    def test_replace_deprecated_templates(self) -> None:
         """Test replaceDeprecatedTemplates method."""
         self.assertEqual('{{Belege fehlen}}',
                          self.cct.replaceDeprecatedTemplates('{{Belege}}'))
@@ -503,13 +503,13 @@ class TestCosmeticChangesPersian(TestCosmeticChanges):
     family = 'wikipedia'
     code = 'fa'
 
-    def test_fix_arabic_letters_comma(self):
+    def test_fix_arabic_letters_comma(self) -> None:
         """Test fixArabicLetters comma replacements."""
         self.assertEqual(self.cct.fixArabicLetters(','), '،')
         self.assertEqual(self.cct.fixArabicLetters('A,b,ا,۴,'),
                          'A,b،ا،۴،')
 
-    def test_fix_arabic_letters_comma_skip(self):
+    def test_fix_arabic_letters_comma_skip(self) -> None:
         """Test fixArabicLetters Latin comma not replaced."""
         self.assertEqual(self.cct.fixArabicLetters('a", b'), 'a", b')
         self.assertEqual(self.cct.fixArabicLetters('a, "b'), 'a, "b')
@@ -532,7 +532,7 @@ class TestCosmeticChangesPersian(TestCosmeticChanges):
         self.assertEqual(self.cct.fixArabicLetters('a", ۴'), 'a", ۴')
         self.assertEqual(self.cct.fixArabicLetters(' , '), ' , ')
 
-    def test_fix_arabic_letters_letters(self):
+    def test_fix_arabic_letters_letters(self) -> None:
         """Test fixArabicLetters letter replacements."""
         self.assertEqual(self.cct.fixArabicLetters('ك'),
                          'ک')
@@ -560,7 +560,7 @@ class TestCosmeticChangesISBN(TestCosmeticChanges):
     ISBN_INVALIDCHARERROR_RE = 'ISBN [0-9a-zA-Z]+ contains invalid characters'
     ISBN_INVALIDLENGTHERROR_RE = 'The number has an invalid length'
 
-    def test_valid_isbn(self):
+    def test_valid_isbn(self) -> None:
         """Test ISBN."""
         text = self.cct.fix_ISBN(' ISBN 097522980x ')
         self.assertEqual(text, ' ISBN 0-9752298-0-X ')
@@ -574,7 +574,7 @@ class TestCosmeticChangesISBN(TestCosmeticChanges):
         text = self.cct.fix_ISBN(' ISBN 9791091447034 ')
         self.assertEqual(text, ' ISBN 979-10-91447-03-4 ')
 
-    def test_invalid_isbn(self):
+    def test_invalid_isbn(self) -> None:
         """Test that it'll fail when the ISBN is invalid."""
         from stdnum.exceptions import ValidationError
 
@@ -608,7 +608,7 @@ class TestCosmeticChangesISBN(TestCosmeticChanges):
         ):
             self.cct.fix_ISBN('ISBN 09752X9801')
 
-    def test_ignore_invalid_isbn(self):
+    def test_ignore_invalid_isbn(self) -> None:
         """Test fixing ISBN numbers with an invalid ISBN."""
         safe_ignore = self.cct.ignore
         self.cct.ignore = CANCEL.MATCH

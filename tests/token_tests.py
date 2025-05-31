@@ -32,7 +32,7 @@ class TestSiteTokens(DeprecationTestCase, DefaultSiteTestCase):
 
     login = True
 
-    def test_tokens(self):
+    def test_tokens(self) -> None:
         """Test tokens."""
         redirected_tokens = ['edit', 'move', 'delete']
         for ttype in [*redirected_tokens, 'patrol', 'deleteglobalaccount']:
@@ -44,7 +44,7 @@ class TestSiteTokens(DeprecationTestCase, DefaultSiteTestCase):
                 self._do_test_warning_filename = False
                 self.assertDeprecationParts(f'Token {ttype!r}', "'csrf'")
 
-    def test_invalid_token(self):
+    def test_invalid_token(self) -> None:
         """Test invalid token."""
         with self.assertRaises(KeyError):
             self.site.tokens['invalidtype']
@@ -88,7 +88,7 @@ class PatrolTestCase(TokenTestBase, TestCase):
     rights = 'patrol'
     token_type = 'patrol'
 
-    def test_patrol(self):
+    def test_patrol(self) -> None:
         """Test the site.patrol() method."""
         mysite = self.get_site()
 

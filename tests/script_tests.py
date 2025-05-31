@@ -197,7 +197,7 @@ class ScriptTestMeta(MetaTestCaseClass):
             is_autorun = ('-help' not in args
                           and script_name in auto_run_script_set)
 
-            def test_script(self):
+            def test_script(self) -> None:
                 global_args_msg = \
                     'For global options use -help:global or run pwb'
                 global_args = ['-pwb_close_matches:1']

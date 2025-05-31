@@ -24,7 +24,7 @@ class TestXMLPageGenerator(TestCase):
 
     dry = True
 
-    def test_non_bare_ref_urls(self):
+    def test_non_bare_ref_urls(self) -> None:
         """Test pages without bare references are not processed."""
         gen = XmlDumpPageGenerator(
             filename=join_xml_data_path('article-pear-0.10.xml'),
@@ -34,7 +34,7 @@ class TestXMLPageGenerator(TestCase):
         pages = list(gen)
         self.assertIsEmpty(pages)
 
-    def test_simple_bare_refs(self):
+    def test_simple_bare_refs(self) -> None:
         """Test simple bare references with several namespaces options."""
         namespace_variants = (None, [], [0, 1], ['0', '1'])
 
@@ -50,7 +50,7 @@ class TestXMLPageGenerator(TestCase):
                                                    'Talk:Fake page'),
                                            site=self.site)
 
-    def test_namespace_names(self):
+    def test_namespace_names(self) -> None:
         """Test namespaces with namespace names."""
         gen = XmlDumpPageGenerator(
             filename=join_xml_data_path('dummy-reflinks.xml'),
@@ -60,7 +60,7 @@ class TestXMLPageGenerator(TestCase):
         pages = list(gen)
         self.assertPageTitlesEqual(pages, ['Talk:Fake page'], site=self.site)
 
-    def test_start_variants(self):
+    def test_start_variants(self) -> None:
         """Test with several page title options."""
         start_variants = (
             None,  # None
@@ -108,14 +108,14 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
         with empty_sites():
             super().tearDown()
 
-    def test_xml_simple(self):
+    def test_xml_simple(self) -> None:
         """Test the generator without any narrowing."""
         main('-xml:' + join_xml_data_path('dummy-reflinks.xml'))
         gen = self.constructor_kwargs['generator']
         self.assertPageTitlesCountEqual(gen, ['Fake page', 'Talk:Fake page'],
                                         site=self.get_site())
 
-    def test_xml_one_namespace(self):
+    def test_xml_one_namespace(self) -> None:
         """Test the generator using one namespace id."""
         main('-xml:' + join_xml_data_path('dummy-reflinks.xml'),
              '-namespace:1')
@@ -124,7 +124,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
         self.assertPageTitlesEqual(pages, ['Talk:Fake page'],
                                    site=self.get_site())
 
-    def test_xml_multiple_namespace_ids(self):
+    def test_xml_multiple_namespace_ids(self) -> None:
         """Test the generator using multiple separate namespaces parameters."""
         main('-xml:' + join_xml_data_path('dummy-reflinks.xml'),
              '-namespace:0', '-namespace:1', '-xmlstart:Fake page')
@@ -132,7 +132,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
         self.assertPageTitlesCountEqual(gen, ['Fake page', 'Talk:Fake page'],
                                         site=self.get_site())
 
-    def test_xml_multiple_namespace_ids_2(self):
+    def test_xml_multiple_namespace_ids_2(self) -> None:
         """Test the generator using multiple namespaces in one parameter."""
         main('-xml:' + join_xml_data_path('dummy-reflinks.xml'),
              '-namespace:0,1', '-xmlstart:Fake page')
@@ -140,7 +140,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
         self.assertPageTitlesCountEqual(gen, ['Fake page', 'Talk:Fake page'],
                                         site=self.get_site())
 
-    def test_xml_start_variants(self):
+    def test_xml_start_variants(self) -> None:
         """Test the generator using variants of start page."""
         start_variants = (
             '-xmlstart:Fake page',  # title
@@ -157,7 +157,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
                 self.assertPageTitlesEqual(pages, ['Talk:Fake page'],
                                            site=self.site)
 
-    def test_xml_namespace_name(self):
+    def test_xml_namespace_name(self) -> None:
         """Test the generator using a namespace name."""
         main('-xml:' + join_xml_data_path('dummy-reflinks.xml'),
              '-namespace:Talk', '-xmlstart:Fake page')

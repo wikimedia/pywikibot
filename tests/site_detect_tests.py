@@ -103,37 +103,37 @@ class MediaWikiSiteTestCase(SiteDetectionTestCase):
          'http://musicbrainz.org/doc/api.php.'),
     ]
 
-    def test_standard_version_sites(self):
+    def test_standard_version_sites(self) -> None:
         """Test detection of standard MediaWiki sites."""
         for url in self.standard_version_sites:
             with self.subTest(url=urlparse(url).netloc):
                 self.assertSite(url)
 
-    def test_proofreadwiki(self):
+    def test_proofreadwiki(self) -> None:
         """Test detection of proofwiki.org site."""
         if os.getenv('GITHUB_ACTIONS'):
             self.skipTest('Skip test on github due to T331223')
         self.assertSite('http://proofwiki.org/wiki/$1')
 
-    def test_non_standard_version_sites(self):
+    def test_non_standard_version_sites(self) -> None:
         """Test detection of non standard MediaWiki sites."""
         for url in self.non_standard_version_sites:
             with self.subTest(url=urlparse(url).netloc):
                 self.assertSite(url)
 
-    def test_old_version_sites(self):
+    def test_old_version_sites(self) -> None:
         """Test detection of old MediaWiki sites."""
         for url in self.old_version_sites:
             with self.subTest(url=urlparse(url).netloc):
                 self.assertNoSite(url)
 
-    def test_no_sites(self):
+    def test_no_sites(self) -> None:
         """Test detection of non-MediaWiki sites."""
         for url in self.no_sites:
             with self.subTest(url=urlparse(url).netloc):
                 self.assertNoSite(url)
 
-    def test_failing_sites(self):
+    def test_failing_sites(self) -> None:
         """Test detection of failing MediaWiki sites."""
         for url, reason in self.failing_sites:
             with self.subTest(url=urlparse(url).netloc, reason=reason):
@@ -211,7 +211,7 @@ class PrivateWikiTestCase(PatchingTestCase):
             for key, value in self._siteinfo.items())
         return site
 
-    def test_T235768_failure(self):
+    def test_T235768_failure(self) -> None:
         """Test generate_family_file works for private wikis.
 
         generate_family_file.FamilyFileGenerator.run() does:

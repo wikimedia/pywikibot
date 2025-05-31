@@ -23,7 +23,7 @@ class DateTestMeta(MetaTestCaseClass):
         """Create the new class."""
         def test_method(formatname):
 
-            def testMapEntry(self):
+            def testMapEntry(self) -> None:
                 """The test ported from date.py."""
                 step = 1
                 if formatname in date.decadeFormats:
@@ -69,7 +69,7 @@ class TestMonthName(TestCase):
 
     net = True
 
-    def test_month_name_formats(self):
+    def test_month_name_formats(self) -> None:
         """Test MonthName format for codes retrieved via MediaWiki message."""
         formatname = 'MonthName'
         for code in date.formats['Cat_BirthsAD']:
@@ -90,7 +90,7 @@ class TestMonthName(TestCase):
                         f'value {new_value} does not match {value}'
                     )
 
-    def test_month_name(self):
+    def test_month_name(self) -> None:
         """Test some MonthName results."""
         # T273573
         self.assertEqual(date.formats['MonthName']['hu']('január'), 1)
@@ -103,7 +103,7 @@ class TestMonthDelta(TestCase):
 
     net = False
 
-    def test_apply_positive_delta(self):
+    def test_apply_positive_delta(self) -> None:
         """Test adding months to a date."""
         self.assertEqual(datetime(2012, 3, 10),
                          date.apply_month_delta(datetime(2012, 1, 10), 2))
@@ -115,7 +115,7 @@ class TestMonthDelta(TestCase):
                          date.apply_month_delta(datetime(2012, 1, 31),
                          add_overlap=True))
 
-    def test_apply_negative_delta(self):
+    def test_apply_negative_delta(self) -> None:
         """Test adding months to a date."""
         self.assertEqual(datetime(2012, 1, 10),
                          date.apply_month_delta(datetime(2012, 3, 10), -2))
@@ -127,7 +127,7 @@ class TestMonthDelta(TestCase):
                          date.apply_month_delta(datetime(2012, 3, 31), -1,
                          add_overlap=True))
 
-    def test_get_delta(self):
+    def test_get_delta(self) -> None:
         """Test that the delta is calculated correctly."""
         self.assertEqual(date.get_month_delta(datetime(2012, 1, 31),
                          datetime(2012, 3, 31)), 2)

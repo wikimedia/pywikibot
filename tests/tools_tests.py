@@ -64,12 +64,12 @@ class OpenArchiveTestCase(TestCase):
         with tools.open_archive(*args, **kwargs) as f:
             return f.read().replace(b'\r\n', b'\n')
 
-    def test_open_archive_normal(self):
+    def test_open_archive_normal(self) -> None:
         """Test open_archive with no compression in the standard library."""
         self.assertEqual(
             self._get_content(self.base_file), self.original_content)
 
-    def test_open_archive_bz2(self):
+    def test_open_archive_bz2(self) -> None:
         """Test open_archive with bz2 compressor in the standard library."""
         self.assertEqual(
             self._get_content(self.base_file + '.bz2'), self.original_content)
@@ -77,12 +77,12 @@ class OpenArchiveTestCase(TestCase):
             self._get_content(self.base_file + '.bz2', use_extension=False),
             self.original_content)
 
-    def test_open_archive_gz(self):
+    def test_open_archive_gz(self) -> None:
         """Test open_archive with gz compressor in the standard library."""
         self.assertEqual(
             self._get_content(self.base_file + '.gz'), self.original_content)
 
-    def test_open_archive_7z(self):
+    def test_open_archive_7z(self) -> None:
         """Test open_archive with 7za if installed."""
         with skipping(OSError, msg='7za not installed'):
             subprocess.Popen(['7za'], stdout=subprocess.PIPE).stdout.close()
@@ -95,7 +95,7 @@ class OpenArchiveTestCase(TestCase):
             self._get_content(self.base_file + '_invalid.7z',
                               use_extension=True)
 
-    def test_open_archive_lzma(self):
+    def test_open_archive_lzma(self) -> None:
         """Test open_archive with lzma compressor in the standard library."""
         self.assertEqual(
             self._get_content(self.base_file + '.lzma'), self.original_content)
@@ -135,7 +135,7 @@ class OpenArchiveWriteTestCase(TestCase):
             os.close(fh)
             os.remove(fn)
 
-    def test_invalid_modes(self):
+    def test_invalid_modes(self) -> None:
         """Test various invalid mode configurations."""
         with self.assertRaisesRegex(
                 ValueError,
@@ -155,37 +155,37 @@ class OpenArchiveWriteTestCase(TestCase):
             tools.open_archive('/dev/null',  # writing without extension
                                'wb', False)
 
-    def test_binary_mode(self):
+    def test_binary_mode(self) -> None:
         """Test that it uses binary mode."""
         with tools.open_archive(self.base_file, 'r') as f:
             self.assertEqual(f.mode, 'rb')
             self.assertIsInstance(f.read(), bytes)
 
-    def test_write_archive_bz2(self):
+    def test_write_archive_bz2(self) -> None:
         """Test writing a bz2 archive."""
         content = self._write_content('.bz2')
         with open(self.base_file + '.bz2', 'rb') as f:
             self.assertEqual(content, f.read())
 
-    def test_write_archive_gz(self):
+    def test_write_archive_gz(self) -> None:
         """Test writing a gz archive."""
         content = self._write_content('.gz')
         self.assertEqual(content[:3], b'\x1F\x8B\x08')
 
-    def test_write_archive_7z(self):
+    def test_write_archive_7z(self) -> None:
         """Test writing an archive as a 7z archive."""
         with self.assertRaisesRegex(
                 NotImplementedError,
                 'It is not possible to write a 7z file.'):
             tools.open_archive('/dev/null.7z', mode='wb')
 
-    def test_write_archive_lzma(self):
+    def test_write_archive_lzma(self) -> None:
         """Test writing a lzma archive."""
         content = self._write_content('.lzma')
         with open(self.base_file + '.lzma', 'rb') as f:
             self.assertEqual(content, f.read())
 
-    def test_write_archive_xz(self):
+    def test_write_archive_xz(self) -> None:
         """Test writing a xz archive."""
         content = self._write_content('.xz')
         self.assertEqual(content[:6], b'\xFD7zXZ\x00')
@@ -201,24 +201,24 @@ class MergeUniqueDicts(TestCase):
     dct_both = dct1.copy()
     dct_both.update(dct2)
 
-    def test_single(self):
+    def test_single(self) -> None:
         """Test that it returns the dict itself when there is only one."""
         self.assertEqual(tools.merge_unique_dicts(self.dct1), self.dct1)
         self.assertEqual(tools.merge_unique_dicts(**self.dct1), self.dct1)
 
-    def test_multiple(self):
+    def test_multiple(self) -> None:
         """Test that it actually merges dicts."""
         self.assertEqual(tools.merge_unique_dicts(self.dct1, self.dct2),
                          self.dct_both)
         self.assertEqual(tools.merge_unique_dicts(self.dct2, **self.dct1),
                          self.dct_both)
 
-    def test_different_type(self):
+    def test_different_type(self) -> None:
         """Test that the keys can be different types."""
         self.assertEqual(tools.merge_unique_dicts({'1': 'str'}, {1: 'int'}),
                          {'1': 'str', 1: 'int'})
 
-    def test_conflict(self):
+    def test_conflict(self) -> None:
         """Test that it detects conflicts."""
         with self.assertRaisesRegex(ValueError, '42'):
             tools.merge_unique_dicts(self.dct1, **{'42': 'bad'})
@@ -237,7 +237,7 @@ class TestIsSliceWithEllipsis(TestCase):
     it = ['a', 'b', 'c', 'd', 'f']
     it_null = []
 
-    def test_show_default_marker(self):
+    def test_show_default_marker(self) -> None:
         """Test marker is shown without kwargs."""
         stop = 2
         it = list(islice_with_ellipsis(self.it, stop))
@@ -245,7 +245,7 @@ class TestIsSliceWithEllipsis(TestCase):
         self.assertEqual(it[:-1], self.it[:stop])
         self.assertEqual(it[-1], '…')
 
-    def test_show_custom_marker(self):
+    def test_show_custom_marker(self) -> None:
         """Test correct marker is shown with kwargs.."""
         stop = 2
         it = list(islice_with_ellipsis(self.it, stop, marker='new'))
@@ -254,7 +254,7 @@ class TestIsSliceWithEllipsis(TestCase):
         self.assertNotEqual(it[-1], '…')
         self.assertEqual(it[-1], 'new')
 
-    def test_show_marker_with_start_stop(self):
+    def test_show_marker_with_start_stop(self) -> None:
         """Test marker is shown with start and stop without kwargs."""
         start = 1
         stop = 3
@@ -263,7 +263,7 @@ class TestIsSliceWithEllipsis(TestCase):
         self.assertEqual(it[:-1], self.it[start:stop])
         self.assertEqual(it[-1], '…')
 
-    def test_show_custom_marker_with_start_stop(self):
+    def test_show_custom_marker_with_start_stop(self) -> None:
         """Test marker is shown with start and stop with kwargs."""
         start = 1
         stop = 3
@@ -273,20 +273,20 @@ class TestIsSliceWithEllipsis(TestCase):
         self.assertNotEqual(it[-1], '…')
         self.assertEqual(it[-1], 'new')
 
-    def test_show_marker_with_stop_zero(self):
+    def test_show_marker_with_stop_zero(self) -> None:
         """Test marker is shown with stop for non empty iterable."""
         stop = 0
         it = list(islice_with_ellipsis(self.it, stop))
         self.assertLength(it, stop + 1)  # +1 to consider marker.
         self.assertEqual(it[-1], '…')
 
-    def test_do_not_show_marker_with_stop_zero(self):
+    def test_do_not_show_marker_with_stop_zero(self) -> None:
         """Test marker is shown with stop for empty iterable."""
         stop = 0
         it = list(islice_with_ellipsis(self.it_null, stop))
         self.assertLength(it, stop)
 
-    def test_do_not_show_marker(self):
+    def test_do_not_show_marker(self) -> None:
         """Test marker is not shown when no marker is specified."""
         import itertools
         stop = 2
@@ -294,7 +294,7 @@ class TestIsSliceWithEllipsis(TestCase):
         it_2 = list(itertools.islice(self.it, stop))
         self.assertEqual(it_1, it_2)  # same behavior as islice().
 
-    def test_do_not_show_marker_when_get_all(self):
+    def test_do_not_show_marker_when_get_all(self) -> None:
         """Test marker is not shown when all elements are retrieved."""
         stop = None
         it = list(islice_with_ellipsis(self.it, stop))
@@ -434,49 +434,49 @@ class TestFilterUnique(TestCase):
         with self.assertRaises(StopIteration):
             next(deduper)
 
-    def test_set(self):
+    def test_set(self) -> None:
         """Test filter_unique with a set."""
         deduped = set()
         deduper = filter_unique(self.ints, container=deduped)
         self._test_dedup_int(deduped, deduper)
 
-    def test_dict(self):
+    def test_dict(self) -> None:
         """Test filter_unique with a dict."""
         deduped = {}
         deduper = filter_unique(self.ints, container=deduped)
         self._test_dedup_int(deduped, deduper)
 
-    def test_OrderedDict(self):
+    def test_OrderedDict(self) -> None:
         """Test filter_unique with an OrderedDict."""
         deduped = OrderedDict()
         deduper = filter_unique(self.ints, container=deduped)
         self._test_dedup_int(deduped, deduper)
 
-    def test_int_hash(self):
+    def test_int_hash(self) -> None:
         """Test filter_unique with ints using hash as key."""
         deduped = set()
         deduper = filter_unique(self.ints, container=deduped, key=hash)
         self._test_dedup_int(deduped, deduper, hash)
 
-    def test_int_id(self):
+    def test_int_id(self) -> None:
         """Test filter_unique with ints using id as key."""
         deduped = set()
         deduper = filter_unique(self.ints, container=deduped, key=id)
         self._test_dedup_int(deduped, deduper, id)
 
-    def test_obj(self):
+    def test_obj(self) -> None:
         """Test filter_unique with objects."""
         deduped = set()
         deduper = filter_unique(self.decs, container=deduped)
         self._test_dedup_int(deduped, deduper)
 
-    def test_obj_hash(self):
+    def test_obj_hash(self) -> None:
         """Test filter_unique with objects using hash as key."""
         deduped = set()
         deduper = filter_unique(self.decs, container=deduped, key=hash)
         self._test_dedup_int(deduped, deduper, hash)
 
-    def test_obj_id(self):
+    def test_obj_id(self) -> None:
         """Test filter_unique with objects using id as key, which fails."""
         # Two objects which may be equal do not necessary have the same id.
         deduped = set()
@@ -490,19 +490,19 @@ class TestFilterUnique(TestCase):
         deduper_ids = list(filter_unique(self.decs, key=id))
         self.assertNotEqual(len(deduper_ids), len(set(deduper_ids)))
 
-    def test_str(self):
+    def test_str(self) -> None:
         """Test filter_unique with str."""
         deduped = set()
         deduper = filter_unique(self.strs, container=deduped)
         self._test_dedup_str(deduped, deduper)
 
-    def test_str_hash(self):
+    def test_str_hash(self) -> None:
         """Test filter_unique with str using hash as key."""
         deduped = set()
         deduper = filter_unique(self.strs, container=deduped, key=hash)
         self._test_dedup_str(deduped, deduper, hash)
 
-    def test_for_resumable(self):
+    def test_for_resumable(self) -> None:
         """Test filter_unique is resumable after a for loop."""
         gen2 = filter_unique(self.ints)
         deduped = []
@@ -516,7 +516,7 @@ class TestFilterUnique(TestCase):
         with self.assertRaises(StopIteration):
             next(gen2)
 
-    def test_skip(self):
+    def test_skip(self) -> None:
         """Test filter_unique with a container that skips items."""
         deduped = SkipList()
         deduper = filter_unique(self.ints, container=deduped)
@@ -524,7 +524,7 @@ class TestFilterUnique(TestCase):
         self.assertCountEqual(deduped, deduped_out)
         self.assertEqual(deduped, {2, 4})
 
-    def test_process_again(self):
+    def test_process_again(self) -> None:
         """Test filter_unique with an ignoring container."""
         deduped = ProcessAgainList()
         deduper = filter_unique(self.ints, container=deduped)
@@ -532,7 +532,7 @@ class TestFilterUnique(TestCase):
         self.assertEqual(deduped_out, [1, 3, 2, 1, 1, 4])
         self.assertEqual(deduped, {2, 4})
 
-    def test_stop_contains(self):
+    def test_stop_contains(self) -> None:
         """Test filter_unique with an ignoring container."""
         deduped = ContainsStopList()
         deduped.stop_list = [2]
@@ -545,7 +545,7 @@ class TestFilterUnique(TestCase):
         with self.assertRaises(StopIteration):
             next(deduper)
 
-    def test_stop_add(self):
+    def test_stop_add(self) -> None:
         """Test filter_unique with an ignoring container during add call."""
         deduped = AddStopList()
         deduped.stop_list = [4]
@@ -578,7 +578,7 @@ class TestFileModeChecker(TestCase):
         self.chmod = self.patch('os.chmod')
         self.file = '~FakeFile'
 
-    def test_auto_chmod_for_dir(self):
+    def test_auto_chmod_for_dir(self) -> None:
         """Do not chmod files that have mode private_files_permission."""
         self.stat.return_value.st_mode = 0o040600  # dir
         tools.file_mode_checker(self.file,
@@ -586,7 +586,7 @@ class TestFileModeChecker(TestCase):
         self.stat.assert_called_with(self.file)
         self.assertFalse(self.chmod.called)
 
-    def test_auto_chmod_OK(self):
+    def test_auto_chmod_OK(self) -> None:
         """Do not chmod files that have mode private_files_permission."""
         self.stat.return_value.st_mode = 0o100600  # regular file
         tools.file_mode_checker(self.file,
@@ -594,7 +594,7 @@ class TestFileModeChecker(TestCase):
         self.stat.assert_called_with(self.file)
         self.assertFalse(self.chmod.called)
 
-    def test_auto_chmod_not_OK(self):
+    def test_auto_chmod_not_OK(self) -> None:
         """Chmod files that do not have mode private_files_permission."""
         self.stat.return_value.st_mode = 0o100644  # regular file
         tools.file_mode_checker(self.file,
@@ -626,7 +626,7 @@ class TestFileShaCalculator(TestCase):
         'function': partial(hash_func, 'md5')
     }
 
-    def test_md5_complete_calculation(self):
+    def test_md5_complete_calculation(self) -> None:
         """Test md5 of complete file."""
         for test, sha in self.md5_tests.items():
             with self.subTest(test=test):
@@ -636,7 +636,7 @@ class TestFileShaCalculator(TestCase):
                     '2c941f2fa7e6e629d165708eb02b67f7',
                 ))
 
-    def test_md5_partial_calculation(self):
+    def test_md5_partial_calculation(self) -> None:
         """Test md5 of partial file (1024 bytes)."""
         for test, sha in self.md5_tests.items():
             with self.subTest(test=test):
@@ -647,7 +647,7 @@ class TestFileShaCalculator(TestCase):
                     'be0227b6d490baa49e6d7e131c7f596b',
                 ))
 
-    def test_sha1_complete_calculation(self):
+    def test_sha1_complete_calculation(self) -> None:
         """Test sha1 of complete file."""
         res = tools.compute_file_hash(self.filename, sha='sha1')
         self.assertIn(res, (
@@ -655,7 +655,7 @@ class TestFileShaCalculator(TestCase):
             '146121e6d0461916c9a0fab00dc718acdb6a6b14',
         ))
 
-    def test_sha1_partial_calculation(self):
+    def test_sha1_partial_calculation(self) -> None:
         """Test sha1 of partial file (1024 bytes)."""
         res = tools.compute_file_hash(self.filename, sha='sha1',
                                       bytes_to_read=1024)
@@ -664,7 +664,7 @@ class TestFileShaCalculator(TestCase):
             '617ce7d539848885b52355ed597a042dae1e726f',
         ))
 
-    def test_sha224_complete_calculation(self):
+    def test_sha224_complete_calculation(self) -> None:
         """Test sha224 of complete file."""
         res = tools.compute_file_hash(self.filename, sha='sha224')
         self.assertIn(res, (
@@ -672,7 +672,7 @@ class TestFileShaCalculator(TestCase):
             '4a2cf33b7da01f7b0530b2cc624e1180c8651b20198e9387aee0c767',
         ))
 
-    def test_sha224_partial_calculation(self):
+    def test_sha224_partial_calculation(self) -> None:
         """Test sha224 of partial file (1024 bytes)."""
         res = tools.compute_file_hash(self.filename, sha='sha224',
                                       bytes_to_read=1024)
@@ -700,7 +700,7 @@ class TestClassProperty(TestCase):
 
     net = False
 
-    def test_classproperty(self):
+    def test_classproperty(self) -> None:
         """Test for classproperty decorator."""
         self.assertEqual(Foo.bar, 'baz')
         self.assertEqual(Foo.bar, Foo._bar)
@@ -740,15 +740,15 @@ class BasicGeneratorIntersectTestCase(GeneratorIntersectTestCase):
 
     net = False
 
-    def test_intersect_basic(self):
+    def test_intersect_basic(self) -> None:
         """Test basic intersect without duplicates."""
         self.assertEqualItertools(['abc', 'db', 'ba'])
 
-    def test_intersect_with_dups(self):
+    def test_intersect_with_dups(self) -> None:
         """Test basic intersect with duplicates."""
         self.assertEqualItertools(['aabc', 'dddb', 'baa'])
 
-    def test_intersect_with_accepted_dups(self):
+    def test_intersect_with_accepted_dups(self) -> None:
         """Test intersect with duplicates accepted."""
         self.assertEqualItertoolsWithDuplicates(['abc', 'db', 'ba'])
         self.assertEqualItertoolsWithDuplicates(['aabc', 'dddb', 'baa'])
@@ -764,7 +764,7 @@ class TestMergeGenerator(TestCase):
 
     net = False
 
-    def test_roundrobin_generators(self):
+    def test_roundrobin_generators(self) -> None:
         """Test merge_generators generator."""
         gen = range(5)
         result = list(roundrobin_generators(gen, 'ABC'))
@@ -779,7 +779,7 @@ class TestIsIpAddress(TestCase):
 
     net = False
 
-    def test_valid_ipv4_addresses(self):
+    def test_valid_ipv4_addresses(self) -> None:
         """Check with valid IPv4 addresses."""
         valid_addresses = (
             '0.0.0.0',
@@ -793,7 +793,7 @@ class TestIsIpAddress(TestCase):
             with self.subTest(ip_address=address):
                 self.assertTrue(is_ip_address(address))
 
-    def test_invalid_ipv4_addresses(self):
+    def test_invalid_ipv4_addresses(self) -> None:
         """Check with invalid IPv4 addresses."""
         invalid_addresses = (
             None,
@@ -809,7 +809,7 @@ class TestIsIpAddress(TestCase):
             with self.subTest(ip_address=address):
                 self.assertFalse(is_ip_address(address))
 
-    def test_valid_ipv6_addresses(self):
+    def test_valid_ipv6_addresses(self) -> None:
         """Check with valid IPv6 addresses."""
         valid_addresses = (
             'fe80:0000:0000:0000:0202:b3ff:fe1e:8329',
@@ -823,7 +823,7 @@ class TestIsIpAddress(TestCase):
             with self.subTest(ip_address=address):
                 self.assertTrue(is_ip_address(address))
 
-    def test_invalid_ipv6_addresses(self):
+    def test_invalid_ipv6_addresses(self) -> None:
         """Check with invalid IPv6 addresses."""
         invalid_addresses = (
             None,
@@ -846,7 +846,7 @@ class TestIsIpNetwork(TestCase):
 
     net = False
 
-    def test_valid_ipv4_ranges(self):
+    def test_valid_ipv4_ranges(self) -> None:
         """Check with valid IPv4 address ranges."""
         valid_ranges = (
             '0.0.0.0/32',
@@ -862,7 +862,7 @@ class TestIsIpNetwork(TestCase):
             with self.subTest(ip_network=ip_range):
                 self.assertTrue(is_ip_network(ip_range))
 
-    def test_invalid_ipv4_ranges(self):
+    def test_invalid_ipv4_ranges(self) -> None:
         """Check with invalid IPv4 address ranges."""
         invalid_ranges = (
             None,
@@ -881,7 +881,7 @@ class TestIsIpNetwork(TestCase):
             with self.subTest(ip_network=ip_range):
                 self.assertFalse(is_ip_network(ip_range))
 
-    def test_valid_ipv6_ranges(self):
+    def test_valid_ipv6_ranges(self) -> None:
         """Check with valid IPv6 address ranges."""
         valid_ranges = (
             'fe80:0000:0000:0000:0202:b3ff:fe1e:8329/128',
@@ -897,7 +897,7 @@ class TestIsIpNetwork(TestCase):
             with self.subTest(ip_network=ip_range):
                 self.assertTrue(is_ip_network(ip_range))
 
-    def test_invalid_ipv6_addresses(self):
+    def test_invalid_ipv6_addresses(self) -> None:
         """Check with invalid IPv6 addresses."""
         invalid_ranges = (
             None,
@@ -921,19 +921,19 @@ class TestHasModule(TestCase):
 
     net = False
 
-    def test_when_present(self):
+    def test_when_present(self) -> None:
         """Test when the module is available."""
         self.assertTrue(has_module('requests'))
         self.assertTrue(has_module('requests', '1.0'))
 
-    def test_when_missing(self):
+    def test_when_missing(self) -> None:
         """Test when the module is unavailable."""
         self.assertFalse(has_module('no-such-module'))
 
     @suppress_warnings(
         r'^Module version .* is lower than requested version 99999$',
         ImportWarning)
-    def test_when_insufficient_version(self):
+    def test_when_insufficient_version(self) -> None:
         """Test when the module is older than what we need."""
         self.assertFalse(has_module('requests', '99999'))
 
@@ -944,13 +944,13 @@ class TestStringFunctions(TestCase):
 
     net = False
 
-    def test_first_lower(self):
+    def test_first_lower(self) -> None:
         """Test first_lower function."""
         self.assertEqual(tools.first_lower('Foo Bar'), 'foo Bar')
         self.assertEqual(tools.first_lower('FOO BAR'), 'fOO BAR')
         self.assertEqual(tools.first_lower(''), '')
 
-    def test_first_upper(self):
+    def test_first_upper(self) -> None:
         """Test first_upper function."""
         self.assertEqual(tools.first_upper('foo bar'), 'Foo bar')
         self.assertEqual(tools.first_upper('foo BAR'), 'Foo BAR')
@@ -958,7 +958,7 @@ class TestStringFunctions(TestCase):
         self.assertEqual(tools.first_upper('ß'), 'ß')
         self.assertNotEqual(tools.first_upper('ß'), str.upper('ß'))
 
-    def test_strtobool(self):
+    def test_strtobool(self) -> None:
         """Test strtobool function."""
         for string in ('True', 'TRUE', 'true', 'T', 'Yes', 'y', 'on', '1'):
             with self.subTest(truth=string):
@@ -1020,7 +1020,7 @@ class TestTinyCache(TestCase):
         self.foo = DecoratedMethods()
         super().setUp()
 
-    def test_cached(self):
+    def test_cached(self) -> None:
         """Test for cached decorator."""
         self.assertEqual(self.foo.foo(), 'foo')  # check computed value
         self.assertEqual(self.foo.read, 1)
@@ -1034,7 +1034,7 @@ class TestTinyCache(TestCase):
                          'Test class to verify cached decorator.')
         self.assertEqual(self.foo.foo.__doc__, 'A method.')
 
-    def test_cached_property(self):
+    def test_cached_property(self) -> None:
         """Test for cached property decorator."""
         self.assertEqual(self.foo.bar, 'bar')
         self.assertEqual(self.foo.read, 1)
@@ -1042,7 +1042,7 @@ class TestTinyCache(TestCase):
         self.assertEqual(self.foo.bar, 'bar')
         self.assertEqual(self.foo.read, 1)
 
-    def test_cached_with_parameters(self):
+    def test_cached_with_parameters(self) -> None:
         """Test for cached decorator with parameters."""
         msg = '"cached" decorator must be used without arguments'
         with self.assertRaisesRegex(TypeError, msg):
@@ -1050,7 +1050,7 @@ class TestTinyCache(TestCase):
         with self.assertRaisesRegex(TypeError, msg):
             cached()(self.foo.baz())
 
-    def test_cached_with_force(self):
+    def test_cached_with_force(self) -> None:
         """Test for cached decorator with force enabled."""
         self.assertEqual(self.foo.quux(), 'quux')
         self.assertEqual(self.foo.read, 1)
@@ -1058,7 +1058,7 @@ class TestTinyCache(TestCase):
         self.assertEqual(self.foo.quux(force=True), 'quux')
         self.assertEqual(self.foo.read, 2)
 
-    def test_cached_with_argse(self):
+    def test_cached_with_argse(self) -> None:
         """Test method with args."""
         self.assertEqual(self.foo.method_with_args(force=False),
                          'method_with_args')

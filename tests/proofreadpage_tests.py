@@ -34,7 +34,7 @@ class TestPagesTagParser(TestCase):
 
     net = False
 
-    def test_tag_attr_int(self):
+    def test_tag_attr_int(self) -> None:
         """Test TagAttr for int values."""
         attr = TagAttr('to', 3)
         self.assertEqual(repr(attr), "TagAttr('to', 3)")
@@ -42,7 +42,7 @@ class TestPagesTagParser(TestCase):
         self.assertEqual(attr.attr, 'to')
         self.assertEqual(attr.value, 3)
 
-    def test_tag_attr_srt_int(self):
+    def test_tag_attr_srt_int(self) -> None:
         """Test TagAttr for str values that can be converted to int."""
         attr = TagAttr('to', '3')
         self.assertEqual(repr(attr), "TagAttr('to', '3')")
@@ -55,7 +55,7 @@ class TestPagesTagParser(TestCase):
         self.assertEqual(repr(attr), """TagAttr('to', '"3"')""")
         self.assertEqual(attr.value, 3)
 
-    def test_tag_attr_str(self):
+    def test_tag_attr_str(self) -> None:
         """Test TagAttr for str value."""
         attr = TagAttr('fromsection', 'A123')
         self.assertEqual(repr(attr), "TagAttr('fromsection', 'A123')")
@@ -73,12 +73,12 @@ class TestPagesTagParser(TestCase):
         self.assertEqual(str(attr), "fromsection='A123'")
         self.assertEqual(attr.value, 'A123')
 
-    def test_tag_attr_exceptions(self):
+    def test_tag_attr_exceptions(self) -> None:
         """Test TagAttr for Exceptions."""
         self.assertRaises(ValueError, TagAttr, 'fromsection', 'A123"')
         self.assertRaises(TypeError, TagAttr, 'fromsection', 3.0)
 
-    def test_pages_tag_parser(self):
+    def test_pages_tag_parser(self) -> None:
         """Test PagesTagParser."""
         tp = PagesTagParser('Text: <pages />')
         self.assertEqual(repr(tp), "PagesTagParser('<pages />')")
@@ -108,7 +108,7 @@ class TestPagesTagParser(TestCase):
         self.assertEqual(str(tp), """<pages from=1 to='3' step=3 />""")
         self.assertIn('step', tp)
 
-    def test_pages_tag_parser_exceptions(self):
+    def test_pages_tag_parser_exceptions(self) -> None:
         """Test PagesTagParser Exceptions."""
         text = """Text: <pages index="Index.pdf />"""
         self.assertRaises(ValueError, PagesTagParser, text)
@@ -129,7 +129,7 @@ class TestProofreadPageInvalidSite(TestCase):
 
     cached = True
 
-    def test_invalid_site_source(self):
+    def test_invalid_site_source(self) -> None:
         """Test ProofreadPage from invalid Site as source."""
         with self.assertRaises(UnknownExtensionError):
             ProofreadPage(self.site, 'title')
@@ -148,7 +148,7 @@ class TestBasePageMethodsProofreadPage(BasePageMethodsTestBase):
             self.site, 'Page:Popular Science Monthly Volume 1.djvu/12')
         super().setUp()
 
-    def test_basepage_methods(self):
+    def test_basepage_methods(self) -> None:
         """Test ProofreadPage methods inherited from superclass BasePage."""
         self._test_invoke()
         self._test_return_datatypes()
@@ -168,7 +168,7 @@ class TestLoadRevisionsCachingProofreadPage(
             self.site, 'Page:Popular Science Monthly Volume 1.djvu/12')
         super().setUp()
 
-    def test_page_text(self):
+    def test_page_text(self) -> None:
         """Test site.loadrevisions() with Page.text."""
         self._test_page_text()
 
@@ -286,18 +286,18 @@ class TestProofreadPageValidSite(TestCase):
            '{class_pagetext}</noinclude>'
            '<noinclude>{references}{div_end}</noinclude>')
 
-    def test_valid_site_source(self):
+    def test_valid_site_source(self) -> None:
         """Test ProofreadPage from valid Site as source."""
         page = ProofreadPage(self.site, 'Page:dummy test page')
         self.assertEqual(page.namespace(), self.site.proofread_page_ns)
 
-    def test_invalid_existing_page_source(self):
+    def test_invalid_existing_page_source(self) -> None:
         """Test ProofreadPage from invalid existing Page as source."""
         source = pywikibot.Page(self.site, self.existing_invalid['title'])
         with self.assertRaises(ValueError):
             ProofreadPage(source)
 
-    def test_invalid_not_existing_page_source(self):
+    def test_invalid_not_existing_page_source(self) -> None:
         """Test ProofreadPage from invalid not existing Page as source."""
         # namespace is forced
         source = pywikibot.Page(self.site,
@@ -308,21 +308,21 @@ class TestProofreadPageValidSite(TestCase):
         page = ProofreadPage(fixed_source)
         self.assertEqual(page.title(), fixed_source.title())
 
-    def test_invalid_not_existing_page_source_wrong_ns(self):
+    def test_invalid_not_existing_page_source_wrong_ns(self) -> None:
         """Test ProofreadPage from Page not existing in non-Page ns."""
         source = pywikibot.Page(self.site,
                                 self.not_existing_invalid['title1'])
         with self.assertRaises(ValueError):
             ProofreadPage(source)
 
-    def test_invalid_link_source(self):
+    def test_invalid_link_source(self) -> None:
         """Test ProofreadPage from invalid Link as source."""
         source = pywikibot.Link(self.not_existing_invalid['title'],
                                 source=self.site)
         with self.assertRaises(ValueError):
             ProofreadPage(source)
 
-    def test_valid_link_source(self):
+    def test_valid_link_source(self) -> None:
         """Test ProofreadPage from valid Link as source."""
         source = pywikibot.Link(
             self.valid['title'],
@@ -332,7 +332,7 @@ class TestProofreadPageValidSite(TestCase):
         self.assertEqual(page.title(with_ns=False), source.title)
         self.assertEqual(page.namespace(), source.namespace)
 
-    def test_valid_parsing(self):
+    def test_valid_parsing(self) -> None:
         """Test ProofreadPage page parsing functions."""
         page = ProofreadPage(self.site, self.valid['title'])
         self.assertEqual(page.ql, self.valid['ql'])
@@ -340,19 +340,19 @@ class TestProofreadPageValidSite(TestCase):
         self.assertEqual(page.header, self.valid['header'])
         self.assertEqual(page.footer, self.valid['footer'])
 
-    def test_div_in_footer(self):
+    def test_div_in_footer(self) -> None:
         """Test ProofreadPage page parsing functions."""
         page = ProofreadPage(self.site, self.div_in_footer['title'])
         self.assertTrue(page.footer.endswith('</div>'))
 
-    def test_decompose_recompose_text(self):
+    def test_decompose_recompose_text(self) -> None:
         """Test ProofreadPage page decomposing/composing text."""
         page = ProofreadPage(self.site, self.valid['title'])
         plain_text = pywikibot.Page(self.site, self.valid['title']).text
         assert page.text
         self.assertEqual(plain_text, page.text)
 
-    def test_preload_from_not_existing_page(self):
+    def test_preload_from_not_existing_page(self) -> None:
         """Test ProofreadPage page decomposing/composing text."""
         page = ProofreadPage(self.site, 'Page:dummy test page')
         # Fetch page text to instantiate page._full_header, in order to allow
@@ -366,7 +366,7 @@ class TestProofreadPageValidSite(TestCase):
                                          references='<references/>',
                                          div_end=div))
 
-    def test_preload_from_empty_text(self):
+    def test_preload_from_empty_text(self) -> None:
         """Test ProofreadPage page decomposing/composing text."""
         page = ProofreadPage(self.site, 'Page:dummy test page')
         page.text = ''
@@ -378,7 +378,7 @@ class TestProofreadPageValidSite(TestCase):
                                          references='',
                                          div_end=div))
 
-    def test_json_format(self):
+    def test_json_format(self) -> None:
         """Test conversion to json format."""
         page = ProofreadPage(self.site, self.valid['title'])
 
@@ -401,7 +401,7 @@ class TestProofreadPageValidSite(TestCase):
         self.assertEqual(json.loads(page_text), json.loads(loaded_text))
 
     @require_modules('bs4')
-    def test_url_image(self):
+    def test_url_image(self) -> None:
         """Test fetching of url image of the scan of ProofreadPage."""
         page = ProofreadPage(self.site, self.valid['title'])
         self.assertEqual(page.url_image, self.valid['url_image'])
@@ -424,7 +424,7 @@ class TestPageQuality(TestCase):
 
     cached = True
 
-    def test_applicable_quality_level(self):
+    def test_applicable_quality_level(self) -> None:
         """Test Page.quality_level when applicable."""
         site = self.get_site()
         title = 'Page:Popular Science Monthly Volume 49.djvu/1'
@@ -473,12 +473,12 @@ class TestPageOCR(BS4TestCase):
         self.page = ProofreadPage(site, title)
         super().setUp()
 
-    def test_ocr_exceptions(self):
+    def test_ocr_exceptions(self) -> None:
         """Test page.ocr() exceptions."""
         with self.assertRaises(TypeError):
             self.page.ocr(ocr_tool='dummy')
 
-    def test_do_ocr_wmfocr(self):
+    def test_do_ocr_wmfocr(self) -> None:
         """Test page._do_ocr(ocr_tool='wmfOCR')."""
         error, text = self.page._do_ocr(ocr_tool='wmfOCR')
         if error:
@@ -487,7 +487,7 @@ class TestPageOCR(BS4TestCase):
         s = difflib.SequenceMatcher(None, text, ref_text)
         self.assertGreater(s.ratio(), 0.9)
 
-    def test_do_ocr_googleocr(self):
+    def test_do_ocr_googleocr(self) -> None:
         """Test page._do_ocr(ocr_tool='googleOCR')."""
         error, text = self.page._do_ocr(ocr_tool='googleOCR')
         if error:
@@ -496,7 +496,7 @@ class TestPageOCR(BS4TestCase):
         s = difflib.SequenceMatcher(None, text, ref_text)
         self.assertGreater(s.ratio(), 0.9)
 
-    def test_ocr_wmfocr(self):
+    def test_ocr_wmfocr(self) -> None:
         """Test page.ocr(ocr_tool='wmfOCR')."""
         try:
             text = self.page.ocr(ocr_tool='wmfOCR')
@@ -532,7 +532,7 @@ class TestProofreadPageIndexProperty(BS4TestCase):
         'title': 'Page:Pywikibot unlinked test page',
     }
 
-    def test_index(self):
+    def test_index(self) -> None:
         """Test index property."""
         # Page with Index.
         page = ProofreadPage(self.site, self.valid['title'])
@@ -576,7 +576,7 @@ class TestIndexPageInvalidSite(BS4TestCase):
 
     cached = True
 
-    def test_invalid_site_source(self):
+    def test_invalid_site_source(self) -> None:
         """Test IndexPage from invalid Site as source."""
         with self.assertRaises(UnknownExtensionError):
             IndexPage(self.site, 'title')
@@ -595,32 +595,32 @@ class TestIndexPageValidSite(BS4TestCase):
     existing_invalid_title = 'Main Page'
     not_existing_invalid_title = 'User:cannot_exists'
 
-    def test_valid_site_as_source(self):
+    def test_valid_site_as_source(self) -> None:
         """Test IndexPage from valid Site as source."""
         page = IndexPage(self.site, 'Index:dummy test page')
         self.assertEqual(page.namespace(), self.site.proofread_index_ns)
 
-    def test_invalid_existing_page_as_source(self):
+    def test_invalid_existing_page_as_source(self) -> None:
         """Test IndexPage from invalid existing Page as source."""
         source = pywikibot.Page(self.site, self.existing_invalid_title)
         with self.assertRaises(ValueError):
             IndexPage(source)
 
-    def test_invalid_not_existing_page_as_source(self):
+    def test_invalid_not_existing_page_as_source(self) -> None:
         """Test IndexPage from Page not existing in non-Page ns as source."""
         source = pywikibot.Page(self.site,
                                 self.not_existing_invalid_title)
         with self.assertRaises(ValueError):
             IndexPage(source)
 
-    def test_invalid_link_as_source(self):
+    def test_invalid_link_as_source(self) -> None:
         """Test IndexPage from invalid Link as source."""
         source = pywikibot.Link(self.not_existing_invalid_title,
                                 source=self.site)
         with self.assertRaises(ValueError):
             IndexPage(source)
 
-    def test_valid_link_as_source(self):
+    def test_valid_link_as_source(self) -> None:
         """Test IndexPage from valid Link as source."""
         source = pywikibot.Link(self.valid_index_title,
                                 source=self.site,
@@ -643,7 +643,7 @@ class TestBasePageMethodsIndexPage(BS4TestCase, BasePageMethodsTestBase):
             self.site, 'Index:Popular Science Monthly Volume 1.djvu')
         super().setUp()
 
-    def test_basepage_methods(self):
+    def test_basepage_methods(self) -> None:
         """Test IndexPage methods inherited from superclass BasePage."""
         self._test_invoke()
         self._test_return_datatypes()
@@ -663,7 +663,7 @@ class TestLoadRevisionsCachingIndexPage(BS4TestCase,
             self.site, 'Index:Popular Science Monthly Volume 1.djvu')
         super().setUp()
 
-    def test_page_text(self):
+    def test_page_text(self) -> None:
         """Test site.loadrevisions() with Page.text."""
         self._test_page_text()
 
@@ -868,17 +868,17 @@ class TestIndexPageMappingsRedlinks(BS4TestCase):
         cls.pages = [ProofreadPage(cls.site, page) for page in cls.page_names]
         cls.missing = ProofreadPage(cls.site, cls.missing_name)
 
-    def test_index_redlink(self):
+    def test_index_redlink(self) -> None:
         """Test index property with redlink."""
         self.assertEqual(self.missing.index, self.index)
 
-    def test_get_page_and_number_redlink(self):
+    def test_get_page_and_number_redlink(self) -> None:
         """Test IndexPage page get_page_number functions with redlinks."""
         for page in self.pages:
             n = self.index.get_number(page)
             self.assertEqual(self.index.get_page(n), page)
 
-    def test_page_gen_redlink(self):
+    def test_page_gen_redlink(self) -> None:
         """Test Index page generator with redlinks."""
         # Check start/end limits.
         with self.assertRaises(ValueError):
@@ -909,58 +909,58 @@ class TestIndexPageHasValidContent(BS4TestCase):
         super().setUpClass()
         cls.index = IndexPage(cls.site, cls.index_name)
 
-    def test_has_valid_content_empty(self):
+    def test_has_valid_content_empty(self) -> None:
         """Test empty page is invalid."""
         self.index.text = ''
         self.assertFalse(self.index.has_valid_content())
 
-    def test_has_valid_content_non_template(self):
+    def test_has_valid_content_non_template(self) -> None:
         """Test non-template is invalid."""
         self.index.text = 'foobar'
         self.assertFalse(self.index.has_valid_content())
 
-    def test_has_valid_content_valid(self):
+    def test_has_valid_content_valid(self) -> None:
         """Test correct Index template is valid."""
         self.index.text = self.valid_template
         self.assertTrue(self.index.has_valid_content())
 
-    def test_has_valid_content_prefixed(self):
+    def test_has_valid_content_prefixed(self) -> None:
         """Test prefixing Index template is invalid."""
         self.index.text = f'pre {self.valid_template}'
         self.assertFalse(self.index.has_valid_content())
 
-    def test_has_valid_content_postfixed(self):
+    def test_has_valid_content_postfixed(self) -> None:
         """Test postfixing Index template is invalid."""
         self.index.text = f'{self.valid_template}post'
         self.assertFalse(self.index.has_valid_content())
 
-    def test_has_valid_content_pre_and_postfixed(self):
+    def test_has_valid_content_pre_and_postfixed(self) -> None:
         """Test pre- and postfixing Index template is invalid."""
         self.index.text = f'pre{self.valid_template}post'
         self.assertFalse(self.index.has_valid_content())
 
-    def test_has_valid_content_second_template(self):
+    def test_has_valid_content_second_template(self) -> None:
         """Test postfixing a second template is invalid."""
         self.index.text = self.valid_template + self.other_template
         self.assertFalse(self.index.has_valid_content())
 
-    def test_has_valid_content_wrong_template(self):
+    def test_has_valid_content_wrong_template(self) -> None:
         """Test incorrect template is invalid."""
         self.index.text = self.other_template
         self.assertFalse(self.index.has_valid_content())
 
-    def test_has_valid_content_missnamed_template(self):
+    def test_has_valid_content_missnamed_template(self) -> None:
         """Test nested templates is valid."""
         self.index.text = '{{%s_bar|foo=bar}}' % IndexPage.INDEX_TEMPLATE
         self.assertFalse(self.index.has_valid_content())
 
-    def test_has_valid_content_nested_template(self):
+    def test_has_valid_content_nested_template(self) -> None:
         """Test nested templates is valid."""
         self.index.text = ('{{%s|foo=%s}}'
                            % (IndexPage.INDEX_TEMPLATE, self.other_template))
         self.assertTrue(self.index.has_valid_content())
 
-    def test_has_valid_content_multiple_valid(self):
+    def test_has_valid_content_multiple_valid(self) -> None:
         """Test multiple Index templates is invalid."""
         self.index.text = self.valid_template * 2
         self.assertFalse(self.index.has_valid_content())

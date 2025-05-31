@@ -21,7 +21,7 @@ class TestWikiBlameMixin(TestCase):
     family = 'wikipedia'
     code = 'nds'
 
-    def test_exceptions(self):
+    def test_exceptions(self) -> None:
         """Test that main_authors fails if page does not exist."""
         page = pywikibot.Page(self.site, 'Pywikibot')
         title = re.escape(page.title(as_link=True))
@@ -42,7 +42,7 @@ class TestWikiBlameMixin(TestCase):
                 'main_authors method is not implemented for wikipedia:nl'):
             page.authorship()
 
-    def test_main_authors(self):
+    def test_main_authors(self) -> None:
         """Test main_authors() method."""
         page = pywikibot.Page(self.site, 'Python (Programmeerspraak)')
         auth = page.authorship(5)
@@ -53,7 +53,7 @@ class TestWikiBlameMixin(TestCase):
         self.assertIsInstance(values[0], int)
         self.assertIsInstance(values[1], float)
 
-    def test_restrictions(self):
+    def test_restrictions(self) -> None:
         """Test main_authors() method with restrictions."""
         page = pywikibot.Page(pywikibot.Site('wikipedia:en'), 'Python')
         auth = page.authorship(min_chars=100, min_pct=5.0)

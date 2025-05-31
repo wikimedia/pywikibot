@@ -70,7 +70,7 @@ class TestInterwikidataBot(AlteredDefaultSiteTestCase, SiteAttributeTestCase):
                     r'interwiki\.py instead\.'):
                 interwikidata.main()
 
-    def test_iw_bot(self):
+    def test_iw_bot(self) -> None:
         """Test IWBot class."""
         page = pywikibot.Page(self.en, 'User:Ladsgroup')
         text = page.get()
@@ -99,7 +99,7 @@ class TestInterwikidataBot(AlteredDefaultSiteTestCase, SiteAttributeTestCase):
 
         self.assertFalse(bot.handle_complicated())
 
-    def test_without_repo(self):
+    def test_without_repo(self) -> None:
         """Test throwing error when site does not have a data repo."""
         wt_page = pywikibot.Page(self.wt, 'User:Ladsgroup')
         with self.assertRaises(ValueError):
