@@ -12,6 +12,7 @@ import re
 import webbrowser
 from enum import IntEnum
 from pathlib import Path
+from textwrap import fill
 from typing import Any
 from warnings import warn
 
@@ -354,6 +355,11 @@ class ClientLoginManager(LoginManager):
     .. versionchanged:: 8.0
        2FA login was enabled. LoginManager was moved from :mod:`data.api`
        to :mod:`login` module and renamed to *ClientLoginManager*.
+    .. versionchanged:: 10.2
+       Secondary authentication via email was enabled.
+    .. seealso::
+       - https://www.mediawiki.org/wiki/Extension:OATHAuth
+       - https://www.mediawiki.org/wiki/Extension:EmailAuth
     """
 
     # API login parameters mapping
@@ -406,7 +412,13 @@ class ClientLoginManager(LoginManager):
         takes care of all the cookie stuff. Throws exception on failure.
 
         .. versionchanged:: 8.0
-           2FA login was enabled.
+           2FA login was implemented.
+        .. versionchanged:: 10.2
+           Secondary authentication via email was implemented.
+
+        :raises RuntimeError: Unexpected API login response key or
+            unexpected API login requests response
+        :raises APIError: API login error
         """
         if hasattr(self, '_waituntil') \
            and datetime.datetime.now() < self._waituntil:
@@ -463,12 +475,34 @@ class ClientLoginManager(LoginManager):
                 continue
 
             if status == 'UI':  # pragma: no cover
-                oathtoken = pywikibot.input(response['message'], password=True)
-                login_request['OATHToken'] = oathtoken
+                # find token key
+                token_key = None
+                for request in response['requests']:
+                    if 'fields' in request:
+                        fields = request['fields']
+                        keys = list(fields)
+                        if len(keys) == 1:
+                            token_key = keys[0]
+                            field = fields[token_key]
+                        break
+
+                if not token_key:
+                    raise RuntimeError('Unexpected API login requests response'
+                                       f':\n{response["requests"]}')
+
+                pywikibot.info(fill(response['message'], 77))
+                if fail := response['messagecode'].endswith(('-failure',
+                                                             '-failed')):
+                    pywikibot.info(fill(field['help'], 77))
+                token_val = pywikibot.input(field['label'], password=True)
+                login_request[token_key] = token_val
                 login_request['logincontinue'] = True
-                del login_request['username']
-                del login_request['password']
-                del login_request['rememberMe']
+
+                if not fail:
+                    del login_request['username']
+                    del login_request['password']
+                    del login_request['rememberMe']
+
                 continue
 
             login_throttled = response.get('messagecode') == 'login-throttled'
