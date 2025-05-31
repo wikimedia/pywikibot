@@ -327,27 +327,32 @@ class WikibaseEntity:
         if hasattr(self, '_content'):
             del self._content
         self.latest_revision_id = updates['entity'].get('lastrevid')
-        if update_self and 'claims' in updates['entity']:
-            updated_claims = updates['entity']['claims']
-            for claim_prop_id, statements in updated_claims.items():
-                for claim_index, statement in enumerate(statements):
-                    claim = self.claims[claim_prop_id][claim_index]
-                    claim.snak = statement['id']
-                    claim.on_item = self
-                    updated_qualifiers = statement.get('qualifiers', {})
-                    for qual_propid, qualifier in updated_qualifiers.items():
-                        for qual_index, qual_statement in enumerate(qualifier):
-                            target_qual_prop = claim.qualifiers[qual_propid]
-                            target_qual = target_qual_prop[qual_index]
-                            target_qual.hash = qual_statement['hash']
-                    updated_references = statement.get('references', [])
-                    for ref_grp_idx, ref_grp in enumerate(updated_references):
-                        for ref_propid, reference in ref_grp['snaks'].items():
-                            for ref_index, ref_stat in enumerate(reference):
-                                target_ref_grp = claim.sources[ref_grp_idx]
-                                target_ref_prop = target_ref_grp[ref_propid]
-                                target_ref = target_ref_prop[ref_index]
-                                target_ref.hash = ref_stat['hash']
+
+        if not update_self or 'claims' not in updates['entity']:
+            return
+
+        updated_claims = updates['entity']['claims']
+        for claim_prop_id, statements in updated_claims.items():
+            for claim_index, statement in enumerate(statements):
+                claim = self.claims[claim_prop_id][claim_index]
+                claim.snak = statement['id']
+                claim.on_item = self
+
+                updated_qualifiers = statement.get('qualifiers', {})
+                for qual_propid, qualifier in updated_qualifiers.items():
+                    for qual_index, qual_statement in enumerate(qualifier):
+                        target_qual_prop = claim.qualifiers[qual_propid]
+                        target_qual = target_qual_prop[qual_index]
+                        target_qual.hash = qual_statement['hash']
+
+                updated_references = statement.get('references', [])
+                for ref_grp_idx, ref_grp in enumerate(updated_references):
+                    for ref_propid, reference in ref_grp['snaks'].items():
+                        for ref_index, ref_stat in enumerate(reference):
+                            target_ref_grp = claim.sources[ref_grp_idx]
+                            target_ref_prop = target_ref_grp[ref_propid]
+                            target_ref = target_ref_prop[ref_index]
+                            target_ref.hash = ref_stat['hash']
 
     def concept_uri(self) -> str:
         """Return the full concept URI.
