@@ -109,7 +109,6 @@ __all__ = (
 )
 
 import atexit
-import codecs
 import configparser
 import json
 import logging
@@ -122,7 +121,6 @@ import warnings
 import webbrowser
 from collections import Counter
 from collections.abc import Container, Generator
-from contextlib import closing
 from functools import wraps
 from importlib import import_module
 from pathlib import Path
@@ -965,15 +963,11 @@ def writeToCommandLogFile() -> None:
     modname = calledModuleName()
     # put quotation marks around all parameters
     args = [modname] + [f'"{s}"' for s in pywikibot.argvu[1:]]
-    command_log_filename = config.datafilepath('logs', 'commands.log')
-    try:
-        command_log_file = codecs.open(command_log_filename, 'a', 'utf-8')
-    except OSError:
-        command_log_file = codecs.open(command_log_filename, 'w', 'utf-8')
+    iso_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 
-    with closing(command_log_file):
-        # add a timestamp in ISO 8601 formulation
-        iso_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+    command_log = Path(config.datafilepath('logs', 'commands.log'))
+    mode = 'a' if command_log.exists() else 'w'
+    with command_log.open(mode, encoding='utf-8') as command_log_file:
         command_log_file.write('{} r{} Python {} '
                                .format(iso_date,
                                        version.getversiondict()['rev'],
