@@ -1,17 +1,17 @@
 """Library to log the bot in to a wiki account."""
 #
-# (C) Pywikibot team, 2003-2024
+# (C) Pywikibot team, 2003-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
-import codecs
 import datetime
 import os
 import re
 import webbrowser
 from enum import IntEnum
+from pathlib import Path
 from typing import Any
 from warnings import warn
 
@@ -19,7 +19,12 @@ import pywikibot
 from pywikibot import __url__, config
 from pywikibot.comms import http
 from pywikibot.exceptions import APIError, NoUsernameError
-from pywikibot.tools import deprecated, file_mode_checker, normalize_username
+from pywikibot.tools import (
+    PYTHON_VERSION,
+    deprecated,
+    file_mode_checker,
+    normalize_username,
+)
 
 
 try:
@@ -208,23 +213,41 @@ class LoginManager:
          ('wikipedia', 'my_wikipedia_user', 'my_wikipedia_pass')
          ('en', 'wikipedia', 'my_en_wikipedia_user', 'my_en_wikipedia_pass')
          ('my_username', BotPassword('my_suffix', 'my_password'))
+
+        .. versionchanged:: 10.2
+           raises ValueError instead of AttributeError if password_file
+               is not set
+
+        :raises ValueError: `password_file` is not set in the user-config.py
+        :raises FileNotFoundError: password file does not exist
         """
+        if config.password_file is None:
+            raise ValueError('password_file is not set in the user-config.py')
+
         # Set path to password file relative to the user_config
         # but fall back on absolute path for backwards compatibility
-        assert config.base_dir is not None and config.password_file is not None
-        password_file = os.path.join(config.base_dir, config.password_file)
-        if not os.path.isfile(password_file):
-            password_file = config.password_file
+        password_path = Path(config.base_dir, config.password_file)
+
+        params = {} if PYTHON_VERSION < (3, 13) else {'follow_symlinks': False}
+        # test for symlink required for Python < 3.13
+        if not password_path.is_file(**params) or password_path.is_symlink:
+            password_path = Path(config.password_file)
+
+        # ignore this check when running tests
+        if os.environ.get('PYWIKIBOT_TEST_RUNNING', '0') == '0':
+            if not password_path.is_file(**params) or password_path.is_symlink:
+                raise FileNotFoundError(
+                    f'Password file {password_path.name} does not exist in '
+                    f'{password_path.parent}'
+                )
 
         # We fix password file permission first.
-        file_mode_checker(password_file, mode=config.private_files_permission)
+        file_mode_checker(password_path, mode=config.private_files_permission)
 
-        with codecs.open(password_file, encoding='utf-8') as f:
-            lines = f.readlines()
+        lines = password_path.read_text('utf-8').splitlines()
+        line_len = len(lines)
 
-        line_nr = len(lines) + 1
-        for line in reversed(lines):
-            line_nr -= 1
+        for n, line in enumerate(reversed(lines)):
             if not line.strip() or line.startswith('#'):
                 continue
 
@@ -234,17 +257,19 @@ class LoginManager:
                 entry = None
 
             if not isinstance(entry, tuple):
-                warn(f'Invalid tuple in line {line_nr}',
+                warn(f'Invalid tuple in line {line_len - n}',
                      _PasswordFileWarning)
                 continue
 
-            if not 2 <= len(entry) <= 4:
-                warn(f'The length of tuple in line {line_nr} should be 2 to 4 '
-                     f'({entry} given)', _PasswordFileWarning)
+            if not 2 <= (entry_len := len(entry)) <= 4:
+                warn(f'The length of tuple in line {line_len - n} should be 2 '
+                     f'to 4, {entry_len} given ({entry})',
+                     _PasswordFileWarning)
                 continue
 
             code, family, username, password = (
-                self.site.code, self.site.family.name)[:4 - len(entry)] + entry
+                self.site.code, self.site.family.name)[:4 - entry_len] + entry
+
             if (normalize_username(username) == self.username
                     and family == self.site.family.name
                     and code == self.site.code):
