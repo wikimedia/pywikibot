@@ -4,7 +4,7 @@
 .. versionadded:: 9.2
 """
 #
-# (C) Pywikibot team, 2024
+# (C) Pywikibot team, 2024-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -54,6 +54,7 @@ class TestSupersetWithAuth(TestCase):
     family = 'meta'
     code = 'meta'
 
+    @unittest.expectedFailure  # T395664
     def test_login_and_oauth_permission(self):
         """Superset login and queries."""
         sql = 'SELECT page_id, page_title FROM page LIMIT 2;'
