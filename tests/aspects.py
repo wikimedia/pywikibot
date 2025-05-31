@@ -57,6 +57,9 @@ from tests.utils import (
 
 
 OSWIN32 = (sys.platform == 'win32')
+SIZED_ERROR = 'seq argument is not a Sized class containing __len__'
+
+
 pywikibot.bot.set_interface('buffer')
 
 
@@ -90,7 +93,7 @@ class TestCaseBase(TestTimerMixin):
     def assertIsEmpty(self, seq, msg=None):
         """Check that the sequence is empty."""
         self.assertIsInstance(
-            seq, Sized, 'seq argument is not a Sized class containing __len__')
+            seq, Sized, SIZED_ERROR)
         if seq:
             msg = self._formatMessage(msg, f'{safe_repr(seq)} is not empty')
             self.fail(msg)
@@ -98,7 +101,7 @@ class TestCaseBase(TestTimerMixin):
     def assertIsNotEmpty(self, seq, msg=None):
         """Check that the sequence is not empty."""
         self.assertIsInstance(
-            seq, Sized, 'seq argument is not a Sized class containing __len__')
+            seq, Sized, SIZED_ERROR)
         if not seq:
             msg = self._formatMessage(msg, f'{safe_repr(seq)} is empty')
             self.fail(msg)
@@ -107,7 +110,7 @@ class TestCaseBase(TestTimerMixin):
         """Verify that a sequence seq has the length of other."""
         # the other parameter may be given as a sequence too
         self.assertIsInstance(
-            seq, Sized, 'seq argument is not a Sized class containing __len__')
+            seq, Sized, SIZED_ERROR)
         first_len = len(seq)
         try:
             second_len = len(other)
@@ -132,9 +135,11 @@ class TestCaseBase(TestTimerMixin):
         self.assertIn(page.namespace(), namespaces,
                       f'{page} not in namespace {namespaces!r}')
 
-    def _get_gen_pages(self,
-                       gen: Iterable[pywikibot.Page],
-                       site: pywikibot.site.APISite = None) -> None:
+    def _get_gen_pages(
+        self,
+        gen: Iterable[pywikibot.Page],
+        site: pywikibot.site.APISite | None = None
+    ) -> list[pywikibot.Page]:
         """Get pages from gen, asserting they are Page from site.
 
         .. versionchanged:: 9.3
@@ -154,7 +159,9 @@ class TestCaseBase(TestTimerMixin):
 
         return gen_pages
 
-    def _get_gen_titles(self, gen, site=None) -> list[str]:
+    def _get_gen_titles(self,
+                        gen: list[pywikibot.Page],
+                        site=None) -> list[str]:
         """Return a list of page titles of given iterable."""
         return [page.title() for page in self._get_gen_pages(gen, site)]
 
