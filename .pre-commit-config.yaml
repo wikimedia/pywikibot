@@ -45,7 +45,7 @@ repos:
       - id: trailing-whitespace
         args:
           - --markdown-linebreak-ext=rst
-        exclude: '^tests/data/'
+        exclude: ^tests/data/
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.10.0
     hooks:
@@ -79,12 +79,12 @@ repos:
           - --remove-all-unused-imports
           - --remove-duplicate-keys
           - --remove-unused-variables
-        exclude: '^pywikibot/backports\.py$'
+        exclude: ^pywikibot/backports\.py$
   - repo: https://github.com/PyCQA/isort
     rev: 6.0.1
     hooks:
       - id: isort
-        exclude: '^pwb\.py$'
+        exclude: ^pwb\.py$
   - repo: https://github.com/jshwi/docsig
     rev: v0.69.3
     hooks:
