@@ -15,7 +15,13 @@ from typing import Any
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Iterable, Sequence, batched, removeprefix
+from pywikibot.backports import (
+    Iterable,
+    RLock,
+    Sequence,
+    batched,
+    removeprefix,
+)
 from pywikibot.bot_choice import (
     ChoiceException,
     Option,
@@ -24,7 +30,6 @@ from pywikibot.bot_choice import (
     StandardOption,
 )
 from pywikibot.logging import INFO, INPUT, STDOUT, VERBOSE, WARNING
-from pywikibot.tools.threading import RLock
 from pywikibot.userinterfaces import transliteration
 from pywikibot.userinterfaces._interface_base import ABUIC
 

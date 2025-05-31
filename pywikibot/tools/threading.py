@@ -1,6 +1,6 @@
 """Classes which can be used for threading."""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,85 +9,20 @@ from __future__ import annotations
 import dataclasses
 import importlib
 import queue
-import re
 import threading
 import time
 from concurrent import futures
 from typing import Any
 
 import pywikibot  # T306760
-from pywikibot.tools import SPHINX_RUNNING
+from pywikibot.tools import SPHINX_RUNNING, ModuleDeprecationWrapper
 
 
 __all__ = (
     'BoundedPoolExecutor',
-    'RLock',
     'ThreadedGenerator',
     'ThreadList',
 )
-
-
-class RLock:
-
-    """Context manager which implements extended reentrant lock objects.
-
-    This RLock is implicit derived from threading.RLock but provides a
-    locked() method like in threading.Lock and a count attribute which
-    gives the active recursion level of locks.
-
-    Usage:
-
-    >>> lock = RLock()
-    >>> lock.acquire()
-    True
-    >>> with lock: print(lock.count)  # nested lock
-    2
-    >>> lock.locked()
-    True
-    >>> lock.release()
-    >>> lock.locked()
-    False
-
-    .. versionadded:: 6.2
-    """
-
-    def __init__(self, *args, **kwargs) -> None:
-        """Initializer."""
-        self._lock = threading.RLock(*args, **kwargs)
-        self._block = threading.Lock()
-
-    def __enter__(self):
-        """Acquire lock and call atenter."""
-        return self._lock.__enter__()
-
-    def __exit__(self, *exc):
-        """Call atexit and release lock."""
-        return self._lock.__exit__(*exc)
-
-    def __getattr__(self, name):
-        """Delegate attributes and methods to self._lock."""
-        return getattr(self._lock, name)
-
-    def __repr__(self) -> str:
-        """Representation of tools.RLock instance."""
-        return repr(self._lock).replace(
-            '_thread.RLock',
-            f'{self.__module__}.{type(self).__name__}'
-        )
-
-    @property
-    def count(self):
-        """Return number of acquired locks."""
-        with self._block:
-            counter = re.search(r'count=(\d+) ', repr(self))
-            return int(counter[1])
-
-    def locked(self):
-        """Return true if the lock is acquired."""
-        with self._block:
-            status = repr(self).split(maxsplit=1)[0][1:]
-            assert status in ('locked', 'unlocked')
-            return status == 'locked'
 
 
 class ThreadedGenerator(threading.Thread):
@@ -354,3 +289,10 @@ class BoundedPoolExecutor(futures.Executor):
         """
         base, executor = type(self).__bases__
         return f'{base.__name__}({executor.__name__!r}{self._bound(", ")})'
+
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper.add_deprecated_attr(
+    'RLock',
+    replacement_name='pywikibot.backports.RLock',
+    since='10.2.0')
