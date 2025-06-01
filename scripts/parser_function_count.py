@@ -43,13 +43,12 @@ Should you specify neither first nor atleast, all templates using parser
 functions will be listed.
 """
 #
-# (C) Pywikibot team, 2013-2022
+# (C) Pywikibot team, 2013-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
-import codecs
 import re
 from collections import Counter
 
@@ -163,12 +162,8 @@ class ParserFunctionCountBot(SingleSiteBot, ExistingPageBot):
 
         # File operations:
         if self.opt.save:
-            # This opens in strict error mode, that means bot will stop
-            # on encoding errors with ValueError.
-            # See https://docs.python.org/3/library/codecs.html#codecs.open
             try:
-                with codecs.open(
-                        self.opt.save, encoding='utf-8', mode='a') as f:
+                with open(self.opt.save, 'a', encoding='utf-8') as f:
                     f.write(resultlist)
             except OSError as e:
                 pywikibot.error(e)
