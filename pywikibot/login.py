@@ -230,16 +230,17 @@ class LoginManager:
 
         params = {} if PYTHON_VERSION < (3, 13) else {'follow_symlinks': False}
         # test for symlink required for Python < 3.13
-        if not password_path.is_file(**params) or password_path.is_symlink:
+        if not password_path.is_file(**params) or password_path.is_symlink():
             password_path = Path(config.password_file)
 
         # ignore this check when running tests
-        if os.environ.get('PYWIKIBOT_TEST_RUNNING', '0') == '0':
-            if not password_path.is_file(**params) or password_path.is_symlink:
-                raise FileNotFoundError(
-                    f'Password file {password_path.name} does not exist in '
-                    f'{password_path.parent}'
-                )
+        if os.environ.get('PYWIKIBOT_TEST_RUNNING', '0') == '0' \
+           and (not password_path.is_file(**params)
+                or password_path.is_symlink()):
+            raise FileNotFoundError(
+                f'Password file {password_path.name} does not exist in '
+                f'{password_path.parent}'
+            )
 
         # We fix password file permission first.
         file_mode_checker(password_path, mode=config.private_files_permission)
