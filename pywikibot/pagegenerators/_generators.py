@@ -7,7 +7,6 @@
 from __future__ import annotations
 
 import calendar
-import codecs
 import io
 import re
 import typing
@@ -401,7 +400,7 @@ def LinkedPageGenerator(
     return linkingPage.linkedPages(total=total, content=content)
 
 
-def _yield_titles(f: codecs.StreamReaderWriter | io.StringIO,
+def _yield_titles(f: io.TextIOBase,
                   site: pywikibot.site.BaseSite
                   ) -> Generator[pywikibot.page.Page, None, None]:
     """Yield page titles from a text stream.
@@ -451,7 +450,7 @@ def TextIOPageGenerator(source: str | None = None,
         site = pywikibot.Site()
     # If source cannot be parsed as an HTTP URL, treat as local file
     if not urlparse(source).netloc:
-        with codecs.open(source, 'r', config.textfile_encoding) as local_file:
+        with open(source, encoding=config.textfile_encoding) as local_file:
             yield from _yield_titles(local_file, site)
     # Else, fetch page (page should return text in same format as that expected
     # in filename, i.e. pages separated by newlines or pages enclosed in double
