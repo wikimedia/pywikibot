@@ -56,7 +56,7 @@ class TestWikiBlameMixin(TestCase):
     def test_restrictions(self) -> None:
         """Test main_authors() method with restrictions."""
         page = pywikibot.Page(pywikibot.Site('wikipedia:en'), 'Python')
-        auth = page.authorship(min_chars=100, min_pct=5.0)
+        auth = page.authorship(4, min_chars=100, min_pct=5.0)
         self.assertLessEqual(len(auth), 4)
         for k, (chars, pct) in auth.items():
             with self.subTest(user=k):

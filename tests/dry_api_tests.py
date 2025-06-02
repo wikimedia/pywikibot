@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """API tests which do not interact with a site."""
 #
-# (C) Pywikibot team, 2012-2024
+# (C) Pywikibot team, 2012-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -330,7 +330,7 @@ class ParamInfoDictTests(DefaultDrySiteTestCase):
                             'index': 1,
                             'name': 'prop',
                             'type': [
-                                'displaytitle'
+                                'displaytitle',
                                 'notificationtimestamp',
                                 'protection',
                                 'subjectid',

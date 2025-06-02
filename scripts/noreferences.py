@@ -28,7 +28,7 @@ bandwidth. Instead, use the -xml parameter, or use another way to generate
 a list of affected articles
 """
 #
-# (C) Pywikibot team, 2007-2024
+# (C) Pywikibot team, 2007-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -166,9 +166,9 @@ placeBeforeSections = {
         '바깥 고리',
         '바깥고리',
         '바깥 링크',
-        '바깥링크'
+        '바깥링크',
         '외부 고리',
-        '외부고리'
+        '외부고리',
     ],
     'lt': [              # no explicit policy on where to put the references
         'Nuorodos'
@@ -382,10 +382,10 @@ referencesSections = {
         ],
         'ko': [
             '주석',
-            '각주'
-            '주석 및 참고 자료'
+            '각주',
+            '주석 및 참고 자료',
             '주석 및 참고자료',
-            '주석 및 참고 출처'
+            '주석 및 참고 출처',
         ],
         'lt': [             # not sure about which ones are preferred.
             'Šaltiniai',
