@@ -37,13 +37,11 @@ class TestSupersetWithoutAuth(TestCase):
 
         msg = 'Only one of schema_name and site parameters can be defined'
         with self.assertRaisesRegex(TypeError, msg):
-            superset = SupersetQuery(schema_name='enwiki_p',
-                                     site=site)
+            SupersetQuery(schema_name='enwiki_p', site=site)
 
         msg = 'database_id should be integer'
         with self.assertRaisesRegex(TypeError, msg):
-            superset = SupersetQuery(schema_name='enwiki_p',
-                                     database_id='foo')
+            SupersetQuery(schema_name='enwiki_p', database_id='foo')
 
 
 class TestSupersetWithAuth(TestCase):
