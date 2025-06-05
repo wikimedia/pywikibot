@@ -1,19 +1,24 @@
 #!/usr/bin/env python3
 """Test add_text script."""
 #
-# (C) Pywikibot team, 2016-2022
+# (C) Pywikibot team, 2016-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
 import unittest
-from unittest.mock import ANY, MagicMock, Mock, mock_open, patch
+from pathlib import Path
+from unittest.mock import MagicMock, Mock, mock_open, patch
 
 import pywikibot
 import pywikibot.pagegenerators
+from pywikibot.tools import PYTHON_VERSION
 from scripts.add_text import AddTextBot, main, parse
 from tests.aspects import TestCase
+
+
+PYTHON_310 = PYTHON_VERSION[:2] == (3, 10)
 
 
 def _mock_page(exists=True, redirect=False, talk=False, url='wikipedia.org'):
@@ -136,18 +141,30 @@ class TestAddTextScript(TestCase):
         bot.setup()
         self.assertEqual('hello\nworld', bot.opt.text)
 
-    @patch('builtins.open', new_callable=mock_open, read_data=b'file data')
-    def test_setup_with_textfile(self, mock_file):
+    def common_setup_test_with_textfile(self, mock_file):
         """Exercise both with a -textfile argument."""
         bot = AddTextBot(textfile='/path/to/my/file.txt')
-
         # setup reads the file content
-
         self.assertEqual('', bot.opt.text)
         bot.setup()
         self.assertEqual('file data', bot.opt.text)
+        mock_file.assert_called_once()
+        self.assertEqual(mock_file.call_args.args[:3],
+                         (Path('/path/to/my/file.txt'), 'r', -1))
 
-        mock_file.assert_called_with('/path/to/my/file.txt', 'rb', ANY)
+    @unittest.skipUnless(PYTHON_310,
+                         f'Test for Python 3.10 but {PYTHON_VERSION} given')
+    @patch('pathlib.Path._accessor.open', new_callable=mock_open,
+           read_data='file data')
+    def test_textfile_py10(self, mock_file):
+        """Test with a -textfile argument for Python 3.10."""
+        self.common_setup_test_with_textfile(mock_file)
+
+    @unittest.skipIf(PYTHON_310, 'Test except for Python 3.10')
+    @patch('io.open', new_callable=mock_open, read_data='file data')
+    def test_textfile_other(self, mock_file):
+        """Test with a -textfile argument for Python != 3.10."""
+        self.common_setup_test_with_textfile(mock_file)
 
     def test_not_skipped(self) -> None:
         """Exercise skip_page() with a page we should accept."""

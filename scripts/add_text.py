@@ -63,14 +63,14 @@ category:
    -summary:"Bot: Aggiungo template Categorizzare"
 """
 #
-# (C) Pywikibot team, 2007-2024
+# (C) Pywikibot team, 2007-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
-import codecs
 import re
+from pathlib import Path
 
 import pywikibot
 from pywikibot import config, pagegenerators, textlib
@@ -122,9 +122,8 @@ class AddTextBot(AutomaticTWSummaryBot, ExistingPageBot):
     def setup(self) -> None:
         """Read text to be added from file."""
         if self.opt.textfile:
-            with codecs.open(self.opt.textfile, 'r',
-                             config.textfile_encoding) as f:
-                self.opt.text = f.read()
+            pth = Path(self.opt.textfile)
+            self.opt.text = pth.read_text(encoding=config.textfile_encoding)
         else:
             # Translating the \\n into binary \n if given from command line
             self.opt.text = self.opt.text.replace('\\n', '\n')
