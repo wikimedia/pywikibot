@@ -97,7 +97,6 @@ Example
 from __future__ import annotations
 
 import base64
-import codecs
 import csv
 import hashlib
 import io
@@ -318,7 +317,7 @@ def main(*args: str) -> None:
 
         filename = os.path.join(csv_dir, configuration['csvFile'])
         try:
-            f = codecs.open(filename, 'r', configuration['csvEncoding'])
+            f = open(filename, encoding=configuration['csvEncoding'])
         except OSError as e:
             pywikibot.error(f'{filename} could not be opened: {e}')
         else:
