@@ -559,8 +559,6 @@ class RequireLoginMixin(TestCaseBase):
 
     """Run tests against a specific site, with a login."""
 
-    login = True
-
     @classmethod
     def require_site_user(cls, family, code):
         """Check the user config has a valid login to the site."""
