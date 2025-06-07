@@ -64,6 +64,12 @@ class TestTimestamp(TestCase):
         ],
     }
 
+    def test_clone(self) -> None:
+        """Validate that Timestamp.replace() returns a Timestamp."""
+        ts1 = Timestamp.now()
+        ts2 = ts1.replace()
+        self.assertIsInstance(ts2, Timestamp)
+
     def test_set_from_timestamp(self) -> None:
         """Test creating instance from Timestamp object."""
         for func in Timestamp.utcnow, Timestamp.nowutc:
