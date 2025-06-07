@@ -578,9 +578,10 @@ class TestSiteGenerators(DefaultSiteTestCase):
                 self.assertRaises(AssertionError):
             mysite.blocks(total=5, starttime=high, endtime=low, reverse=True)
 
-    def test_exturl_usage(self) -> None:
+    def test_exturlusage(self) -> None:
         """Test the site.exturlusage() method."""
         mysite = self.get_site()
+
         url = 'www.google.com'
         eu = list(mysite.exturlusage(url, total=10))
         self.assertLessEqual(len(eu), 10)
@@ -590,6 +591,16 @@ class TestSiteGenerators(DefaultSiteTestCase):
         for link in mysite.exturlusage(url, namespaces=[2, 3], total=5):
             self.assertIsInstance(link, pywikibot.Page)
             self.assertIn(link.namespace(), (2, 3))
+
+        with self.assertRaises(ValueError):
+            mysite.exturlusage('https://www.google.com', protocol='http')
+        with self.assertRaises(ValueError):
+            mysite.exturlusage('http://www.google.com', protocol='https')
+        with self.assertRaises(ValueError):
+            mysite.exturlusage(
+                'https://www.google.com',
+                protocol=['http', 'https'],
+            )
 
     def test_protectedpages_create(self) -> None:
         """Test that protectedpages returns protected page titles."""
