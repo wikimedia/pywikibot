@@ -74,17 +74,16 @@ To complete a move of a page, one can use:
 
 """
 #
-# (C) Pywikibot team, 2003-2024
+# (C) Pywikibot team, 2003-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
-import codecs
-import os
 import re
 from contextlib import suppress
 from itertools import chain
+from pathlib import Path
 from typing import Generator
 
 import pywikibot
@@ -456,28 +455,29 @@ class PrimaryIgnoreManager:
         self.disamb_page = disamb_page
         self.enabled = enabled
         self.ignorelist = set()
+        self._read_ignorelist(config.datafilepath('disambiguations'))
 
-        folder = config.datafilepath('disambiguations')
-        if os.path.exists(folder):
-            self._read_ignorelist(folder)
-
-    def _read_ignorelist(self, folder) -> None:
+    def _read_ignorelist(self, folder: str) -> None:
         """Read pages to be ignored from file.
 
-        :type folder: str
+        The file is stored in the disambiguation/ subdir.
         """
-        filename = os.path.join(
-            folder, self.disamb_page.title(as_filename=True) + '.txt')
+        folderpath = Path(folder)
+        if not folderpath.is_dir() or folderpath.is_symlink():
+            return
+
+        filepath = folderpath / (
+            self.disamb_page.title(as_filename=True) + '.txt')
+        if not filepath.is_file() or filepath.is_symlink():
+            return
 
         # The file is stored in the disambiguation/ subdir.
         # Create if necessary.
-        with suppress(IOError), codecs.open(filename, 'r', 'utf-8') as f:
-            for line in f:
-                # remove trailing newlines and carriage returns
-                line = line.rstrip('\r\n')
-                # skip empty lines
-                if line:
-                    self.ignorelist.add(line)
+        with suppress(IOError):
+            text = filepath.read_text(encoding='utf-8')
+
+        # skip empty lines
+        self.ignorelist = {line for line in text.splitlines() if line}
 
     def isIgnored(self, ref_page) -> bool:  # noqa: N802
         """Return if ref_page is to be ignored.
@@ -495,6 +495,7 @@ class PrimaryIgnoreManager:
         # backward compatibility
         if isinstance(page_titles, pywikibot.Page):
             page_titles = [page_titles.title(as_url=True)]
+
         if self.enabled:
             # Skip this occurrence next time.
             filename = config.datafilepath(
@@ -502,7 +503,7 @@ class PrimaryIgnoreManager:
                 self.disamb_page.title(as_url=True) + '.txt')
 
             # Open file for appending. If none exists, create a new one.
-            with suppress(IOError), codecs.open(filename, 'a', 'utf-8') as f:
+            with suppress(IOError), open(filename, 'a', encoding='utf-8') as f:
                 f.write('\n'.join(page_titles) + '\n')
 
 
