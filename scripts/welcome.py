@@ -177,7 +177,6 @@ aren't badwords at all but can be used for some bad-nickname.
 #
 from __future__ import annotations
 
-import codecs
 import locale
 import pickle
 import re
@@ -774,14 +773,11 @@ class WelcomeBot(SingleSiteBot):
                                'random signature will be disabled.')
                 globalvar.random_sign = False
         else:
+            filename = pywikibot.config.datafilepath(globalvar.sign_file_name)
             try:
-                f = codecs.open(
-                    pywikibot.config.datafilepath(globalvar.sign_file_name),
-                    'r',
-                    encoding=config.console_encoding)
+                f = open(filename, encoding=config.console_encoding)
             except LookupError:
-                f = codecs.open(pywikibot.config.datafilepath(
-                    globalvar.sign_file_name), 'r', encoding='utf-8')
+                f = open(filename, encoding='utf-8')
             except OSError:
                 pywikibot.error('No fileName!')
                 raise FilenameNotSet('No signature filename specified.')
