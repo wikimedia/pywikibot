@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
 """Test textlib module."""
 #
-# (C) Pywikibot team, 2011-2024
+# (C) Pywikibot team, 2011-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
-import codecs
 import functools
-import os
 import re
 import unittest
 from collections import OrderedDict
 from contextlib import nullcontext, suppress
+from pathlib import Path
 from unittest import mock
 
 import pywikibot
@@ -30,87 +29,77 @@ from tests.aspects import (
 )
 
 
-files = {}
-dirname = os.path.join(os.path.dirname(__file__), 'pages')
-
-for f in ['enwiki_help_editing']:
-    with codecs.open(os.path.join(dirname, f + '.page'),
-                     'r', 'utf-8') as content:
-        files[f] = content.read()
-
-
 class TestSectionFunctions(TestCase):
 
     """Test wikitext section handling function."""
 
     net = False
 
+    @classmethod
+    def setUpClass(cls):
+        """Read test content."""
+        dirname = Path(__file__).parent / 'pages'
+        file = dirname / 'enwiki_help_editing.page'
+        cls.content = file.read_text(encoding='utf-8')
+
     def setUp(self):
         """Setup tests."""
         self.catresult1 = '[[Category:Cat1]]\n[[Category:Cat2]]\n'
         super().setUp()
 
-    @staticmethod
-    def contains(fn, sn):
-        """Invoke does_text_contain_section()."""
-        return textlib.does_text_contain_section(
-            files[fn], sn)
+    def assertContains(self, sn, msg=None):
+        """Test that file content contains sn."""
+        self.assertTrue(textlib.does_text_contain_section(self.content, sn),
+                        msg)
 
-    def assertContains(self, fn, sn, *args, **kwargs):
-        """Test that files[fn] contains sn."""
-        self.assertEqual(self.contains(fn, sn), True, *args, **kwargs)
-
-    def assertNotContains(self, fn, sn, *args, **kwargs):
-        """Test that files[fn] does not contain sn."""
-        self.assertEqual(self.contains(fn, sn), False, *args, **kwargs)
+    def assertNotContains(self, sn, msg=None):
+        """Test that file content does not contain sn."""
+        self.assertFalse(textlib.does_text_contain_section(self.content, sn),
+                         msg)
 
     def testCurrentBehaviour(self) -> None:
         """Test that 'Editing' is found."""
-        self.assertContains('enwiki_help_editing', 'Editing')
+        self.assertContains('Editing')
 
     def testSpacesInSection(self) -> None:
         """Test with spaces in section."""
-        self.assertContains('enwiki_help_editing', 'Minor_edits')
-        self.assertNotContains('enwiki_help_editing', '#Minor edits',
+        self.assertContains('Minor_edits')
+        self.assertNotContains('#Minor edits',
                                "Incorrect, '#Minor edits' does not work")
-        self.assertNotContains('enwiki_help_editing', 'Minor Edits',
+        self.assertNotContains('Minor Edits',
                                'section hashes are case-sensitive')
-        self.assertNotContains('enwiki_help_editing', 'Minor_Edits',
+        self.assertNotContains('Minor_Edits',
                                'section hashes are case-sensitive')
 
     @unittest.expectedFailure  # TODO: T133276
     def test_encoded_chars_in_section(self) -> None:
         """Test encoded chars in section."""
-        self.assertContains(
-            'enwiki_help_editing', 'Talk_.28discussion.29_pages',
-            'As used in the TOC')
+        self.assertContains('Talk_.28discussion.29_pages',
+                            'As used in the TOC')
 
     def test_underline_characters_in_section(self) -> None:
         """Test with underline chars in section."""
-        self.assertContains('enwiki_help_editing', 'Talk_(discussion)_pages',
+        self.assertContains('Talk_(discussion)_pages',
                             'Understood by mediawiki')
 
     def test_spaces_outside_section(self) -> None:
         """Test with spaces around section."""
-        self.assertContains('enwiki_help_editing', 'Naming and_moving')
-        self.assertContains('enwiki_help_editing', ' Naming and_moving ')
-        self.assertContains('enwiki_help_editing', ' Naming and_moving_')
+        self.assertContains('Naming and_moving')
+        self.assertContains(' Naming and_moving ')
+        self.assertContains(' Naming and_moving_')
 
     def test_link_in_section(self) -> None:
         """Test with link inside section."""
         # section is ==[[Wiki markup]]==
-        self.assertContains('enwiki_help_editing', '[[Wiki markup]]',
-                            'Link as section header')
-        self.assertContains('enwiki_help_editing', '[[:Wiki markup]]',
+        self.assertContains('[[Wiki markup]]', 'Link as section header')
+        self.assertContains('[[:Wiki markup]]',
                             'section header link with preleading colon')
-        self.assertNotContains('enwiki_help_editing', 'Wiki markup',
-                               'section header must be a link')
+        self.assertNotContains('Wiki markup', 'section header must be a link')
         # section is ===[[:Help]]ful tips===
-        self.assertContains('enwiki_help_editing', '[[Help]]ful tips',
-                            'Containing link')
-        self.assertContains('enwiki_help_editing', '[[:Help]]ful tips',
+        self.assertContains('[[Help]]ful tips', 'Containing link')
+        self.assertContains('[[:Help]]ful tips',
                             'Containing link with preleading colon')
-        self.assertNotContains('enwiki_help_editing', 'Helpful tips',
+        self.assertNotContains('Helpful tips',
                                'section header must contain a link')
 
 
