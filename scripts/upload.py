@@ -45,7 +45,8 @@ The following parameters are supported:
 
 -summary:      [str] Pick a custom edit summary for the bot.
 
--descfile:     [str] Specify a filename where the description is stored
+-descfile:     [str] Specify a filename where the description is stored.
+               An error message is printed if the file does not exist.
 
 
 It is possible to combine ``-abortonwarn`` and ``-ignorewarn`` so that
@@ -66,16 +67,16 @@ The script will ask for the location of an image(s), if not given as a
 parameter, and for a description.
 """
 #
-# (C) Pywikibot team, 2003-2024
+# (C) Pywikibot team, 2003-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
-import codecs
 import math
 import os
 import re
+from pathlib import Path
 
 import pywikibot
 from pywikibot.bot import suggest_help
@@ -183,9 +184,14 @@ def main(*args: str) -> None:
             pywikibot.error('Both a description and a -descfile were '
                             'provided. Please specify only one of those.')
             return
-        with codecs.open(description_file,
-                         encoding=pywikibot.config.textfile_encoding) as f:
-            description = f.read().replace('\r\n', '\n')
+
+        filepath = Path(description_file)
+        if not filepath.is_file() or filepath.is_symlink():
+            pywikibot.Error('Invalid filename given with -descfile')
+            return
+
+        description = filepath.read_text(
+            encoding=pywikibot.config.textfile_encoding).replace('\r\n', '\n')
 
     while not ('://' in url or os.path.exists(url)):
         if not url:
