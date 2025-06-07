@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the Tk UI."""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -94,8 +94,7 @@ def setUpModule():
         dialog = tkinter.Tk()
     except RuntimeError as e:
         raise unittest.SkipTest(f'Skipping due to T380732 - {e}')
-    else:
-        dialog.destroy()
+    dialog.destroy()
 
     from pywikibot.userinterfaces.gui import EditBoxWindow, Tkdialog
 
