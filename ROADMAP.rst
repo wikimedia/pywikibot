@@ -1,7 +1,11 @@
 Current Release Changes
 =======================
 
-* (no changes yet)
+* Add login methods overview to :mod:`login` module (:phab:`T396204`)
+* Enable EmailAuth with :class:`login.ClientLoginManager` (:phab:`T395703`)
+* Move :mod:`tools.threading.RLock<tools.threading>` to :mod:`backports` module (:phab:`T395182`)
+* Only show the description passed to :class:`specialbots.UploadRobot` if it is to be verified (:phab:`T394895`)
+* Add support for Python 3.15 (:phab:`T395177`)
 
 
 Current Deprecations

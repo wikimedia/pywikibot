@@ -1,6 +1,14 @@
 Scripts Changelog
 =================
 
+10.2.0
+------
+
+noreferences
+^^^^^^^^^^^^
+
+* Fix missing commas in L10N dicts
+
 10.1.0
 ------
 
