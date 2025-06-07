@@ -230,7 +230,8 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
                 pywikibot.info('Adding nowCommons template to '
                                + sourceImagePage.title())
                 sourceImagePage.put(sourceImagePage.get() + '\n\n'
-                                    + nowCommonsTemplate[sourceSite.code]
+                                    + i18n.translate(sourceSite.code,
+                                                     nowCommonsTemplate)
                                     % target_filename,
                                     summary=reason)
 

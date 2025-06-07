@@ -261,7 +261,8 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
     def skipPage(page) -> bool:
         """Determine if the page should be skipped."""
         try:
-            templates_to_ignore = ignoreTemplates[page.site.code]
+            templates_to_ignore = i18n.translate(page.site.code,
+                                                 ignoreTemplates)
         except KeyError:
             return False
 

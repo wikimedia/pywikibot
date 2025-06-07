@@ -1864,7 +1864,7 @@ class InterwikiBot:
                 if page.namespace() == 10:
                     loc = None
                     with suppress(KeyError):
-                        tmpl, loc = moved_links[page.site.code]
+                        tmpl, loc = i18n.translate(page.site.code, moved_links)
                         del tmpl
                     if loc is not None and loc in page.title():
                         pywikibot.info(
@@ -2084,15 +2084,17 @@ def botMayEdit(page) -> bool:
     """Test for allowed edits."""
     tmpl = []
     with suppress(KeyError):
-        tmpl, _ = moved_links[page.site.code]
+        tmpl, _ = i18n.translate(page.site.code, moved_links)
 
     if not isinstance(tmpl, list):
         tmpl = [tmpl]
 
     with suppress(KeyError):
-        tmpl += ignoreTemplates[page.site.code]
+        tmpl += i18n.translate(page.site.code, ignoreTemplates,
+                               fallback=i18n.DEFAULT_FALLBACK)
 
-    tmpl += ignoreTemplates['_default']
+    tmpl += i18n.translate('_default', ignoreTemplates,
+                           fallback=i18n.DEFAULT_FALLBACK)
     if tmpl != []:
         templates = page.templatesWithParams()
         for template in templates:

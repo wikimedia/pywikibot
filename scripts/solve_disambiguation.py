@@ -1040,7 +1040,9 @@ class DisambiguationRobot(SingleSiteBot):
                     if params and template == primary_page:
                         baseTerm = params[1]
                         break
-                disambTitle = primary_topic_format[self.site.lang] % baseTerm
+                disambTitle = i18n.translate(
+                    self.site.lang,
+                    primary_topic_format) % baseTerm
                 try:
                     page2 = pywikibot.Page(
                         pywikibot.Link(disambTitle, self.site))
@@ -1081,7 +1083,8 @@ or press enter to quit:""")
                     try:
                         page2 = pywikibot.Page(
                             pywikibot.Link(
-                                primary_topic_format[self.site.lang]
+                                i18n.translate(self.site.lang,
+                                               primary_topic_format)
                                 % page.title(),
                                 self.site))
                         links = page2.linkedPages()
