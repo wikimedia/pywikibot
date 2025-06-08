@@ -30,16 +30,15 @@ instantiating the bot. It also calls ``bot.run()`` to create the dictionaries:
 >>> bot.to_json()
 """
 #
-# (C) Pywikibot team, 2013-2024
+# (C) Pywikibot team, 2013-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
-import codecs
 import json
-import os
 from importlib import import_module
+from pathlib import Path
 
 from pywikibot import config
 
@@ -132,24 +131,23 @@ class i18nBot:  # noqa: N801
 
         if not self.dict:
             self.run(quiet)
-        json_dir = os.path.join(
-            config.base_dir, 'scripts/i18n', self.scriptname)
-        if not os.path.exists(json_dir):
-            os.makedirs(json_dir)
+        json_dir = Path(config.base_dir, 'scripts/i18n', self.scriptname)
+        json_dir.mkdir(exist_ok=True)
+
         for lang in self.dict:
-            file_name = os.path.join(json_dir, f'{lang}.json')
-            if os.path.isfile(file_name):
-                with codecs.open(file_name, 'r', 'utf-8') as json_file:
-                    new_dict = json.load(json_file)
-            else:
-                new_dict = {}
+            new_dict = {}
+
+            file_path = json_dir / f'{lang}.json'
+            if file_path.is_file():
+                new_dict = json.load(file_path.read_text(encoding='utf-8'))
+
             new_dict['@metadata'] = new_dict.get('@metadata', {'authors': []})
-            with codecs.open(file_name, 'w', 'utf-8') as json_file:
-                new_dict.update(self.dict[lang])
-                s = json.dumps(new_dict, ensure_ascii=False, sort_keys=True,
-                               indent=indent, separators=(',', ': '))
-                s = s.replace(' ' * indent, '\t')
-                json_file.write(s)
+            new_dict.update(self.dict[lang])
+            s = json.dumps(new_dict, ensure_ascii=False, sort_keys=True,
+                           indent=indent, separators=(',', ': '))
+            s = s.replace(' ' * indent, '\t')
+
+            file_path.write_text(s, encoding='utf-8')
 
 
 if __name__ == '__main__':
