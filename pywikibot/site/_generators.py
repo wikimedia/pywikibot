@@ -1317,7 +1317,7 @@ class GeneratorsMixin:
     def exturlusage(
         self,
         url: str | None = None,
-        protocol: str | list[str] | None = None,
+        protocol: str | None = None,
         namespaces: NamespaceArgType = None,
         total: int | None = None,
         content: bool = False,
@@ -1331,11 +1331,9 @@ class GeneratorsMixin:
             of the hostname
         :param namespaces: list of namespace numbers to fetch contribs from
         :param total: Maximum number of pages to retrieve in total
-        :param protocol: list of protocols to search for, http and https by
-                default. Full list shown on Special:LinkSearch wikipage
+        :param protocol: protocol to search for, http and https by default.
+                Full list shown on Special:LinkSearch wikipage
         """
-        if isinstance(protocol, str):
-            protocol = [protocol]
         if url is not None:
             found_protocol, _, url = url.rpartition('://')
 
@@ -1345,18 +1343,12 @@ class GeneratorsMixin:
                 url = None
 
             if found_protocol:
-                if protocol:
-                    if len(protocol) > 1:
-                        raise ValueError(
-                            'More than one protocol was specified and a  '
-                            'protocol was found in searched url'
-                        )
-                    if protocol[0] != found_protocol:
-                        raise ValueError(
-                            f'Protocol {protocol!r} was specified, but '
-                            f'{found_protocol!r} was found in searched url'
-                        )
-                protocol = [found_protocol]
+                if protocol and protocol != found_protocol:
+                    raise ValueError(
+                        f'Protocol {protocol!r} was specified, but '
+                        f'{found_protocol!r} was found in searched url'
+                    )
+                protocol = found_protocol
 
         return self._generator(api.PageGenerator, type_arg='exturlusage',
                                geuquery=url, geuprotocol=protocol,

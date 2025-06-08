@@ -596,11 +596,6 @@ class TestSiteGenerators(DefaultSiteTestCase):
             mysite.exturlusage('https://www.google.com', protocol='http')
         with self.assertRaises(ValueError):
             mysite.exturlusage('http://www.google.com', protocol='https')
-        with self.assertRaises(ValueError):
-            mysite.exturlusage(
-                'https://www.google.com',
-                protocol=['http', 'https'],
-            )
 
     def test_protectedpages_create(self) -> None:
         """Test that protectedpages returns protected page titles."""
