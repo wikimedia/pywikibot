@@ -153,7 +153,7 @@ are also in 'Pneumatics' category.
    :mod:`pagegenerators` are supported with "move" and "remove" action.
 """
 #
-# (C) Pywikibot team, 2004-2024
+# (C) Pywikibot team, 2004-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -301,7 +301,7 @@ class CategoryPreprocess(BaseBot):
             return page
 
         tmpl: Sequence = []
-        with suppress(KeyError):
+        with suppress(TypeError):
             tmpl, _loc = i18n.translate(page.site.code, moved_links)
 
         if not isinstance(tmpl, list):

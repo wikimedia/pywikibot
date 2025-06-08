@@ -343,7 +343,7 @@ To run the script on all pages on a language, run it with option
 ``-continue`` next time.
 """
 #
-# (C) Pywikibot team, 2003-2024
+# (C) Pywikibot team, 2003-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1864,9 +1864,8 @@ class InterwikiBot:
                     continue
                 if page.namespace() == 10:
                     loc = None
-                    with suppress(KeyError):
-                        tmpl, loc = i18n.translate(page.site.code, moved_links)
-                        del tmpl
+                    with suppress(TypeError):
+                        _tpl, loc = i18n.translate(page.site.code, moved_links)
                     if loc is not None and loc in page.title():
                         pywikibot.info(
                             f'Skipping: {page.title()} is a templates subpage')
@@ -2084,19 +2083,18 @@ def compareLanguages(old, new, insite, summary):
 def botMayEdit(page) -> bool:
     """Test for allowed edits."""
     tmpl = []
-    with suppress(KeyError):
+    with suppress(TypeError):
         tmpl, _ = i18n.translate(page.site.code, moved_links)
 
     if not isinstance(tmpl, list):
         tmpl = [tmpl]
 
-    with suppress(KeyError):
-        tmpl += i18n.translate(page.site.code, ignoreTemplates,
-                               fallback=i18n.DEFAULT_FALLBACK)
+    with suppress(TypeError):
+        tmpl += i18n.translate(page.site.code, ignoreTemplates)
 
-    tmpl += i18n.translate('_default', ignoreTemplates,
-                           fallback=i18n.DEFAULT_FALLBACK)
-    if tmpl != []:
+    tmpl += i18n.translate('_default', ignoreTemplates)
+
+    if tmpl:
         templates = page.templatesWithParams()
         for template in templates:
             if template[0].title(with_ns=False).lower() in tmpl:

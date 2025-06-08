@@ -50,7 +50,7 @@ or by adding a list to the given one::
                                      'your_script_name_2']
 """
 #
-# (C) Pywikibot team, 2006-2024
+# (C) Pywikibot team, 2006-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -373,11 +373,9 @@ class CosmeticChangesToolkit:
         if not self.talkpage:
             subpage = False
             if self.template:
-                try:
-                    tmpl, loc = i18n.translate(self.site.code, moved_links)
-                    del tmpl
-                except KeyError:
-                    loc = None
+                loc = None
+                with suppress(TypeError):
+                    _tmpl, loc = i18n.translate(self.site.code, moved_links)
                 if loc is not None and loc in self.title:
                     subpage = True
 
