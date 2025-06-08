@@ -71,15 +71,15 @@ added between the existing and the new text. For example a parameter
 between them by specifying '\n' as a value.
 """
 #
-# (C) Pywikibot team, 2004-2024
+# (C) Pywikibot team, 2004-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
-import codecs
 import os
 import re
+from pathlib import Path
 
 import pywikibot
 from pywikibot import config, i18n
@@ -231,11 +231,9 @@ class PageFromFileReader(OptionHandler, GeneratorWrapper):
            changed from iterator method to generator property
         """
         pywikibot.info(f"\n\nReading '{self.filename}'...")
+        filepath = Path(self.filename)
         try:
-            with codecs.open(self.filename, 'r',
-                             encoding=config.textfile_encoding) as f:
-                text = f.read()
-
+            text = filepath.read_text(encoding=config.textfile_encoding)
         except OSError as e:
             pywikibot.error(e)
             return
