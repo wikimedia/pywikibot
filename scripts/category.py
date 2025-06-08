@@ -300,7 +300,7 @@ class CategoryPreprocess(BaseBot):
             return page
 
         tmpl: Sequence = []
-        with suppress(KeyError):
+        with suppress(TypeError):
             tmpl, _loc = i18n.translate(page.site.code, moved_links)
 
         if not isinstance(tmpl, list):

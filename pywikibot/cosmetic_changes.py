@@ -373,11 +373,9 @@ class CosmeticChangesToolkit:
         if not self.talkpage:
             subpage = False
             if self.template:
-                try:
-                    tmpl, loc = i18n.translate(self.site.code, moved_links)
-                    del tmpl
-                except KeyError:
-                    loc = None
+                loc = None
+                with suppress(TypeError):
+                    _tmpl, loc = i18n.translate(self.site.code, moved_links)
                 if loc is not None and loc in self.title:
                     subpage = True
 

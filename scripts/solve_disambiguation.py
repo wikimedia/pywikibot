@@ -74,7 +74,7 @@ To complete a move of a page, one can use:
 
 """
 #
-# (C) Pywikibot team, 2003-2024
+# (C) Pywikibot team, 2003-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1028,24 +1028,25 @@ class DisambiguationRobot(SingleSiteBot):
         :return: True if everything goes fine, False otherwise
         """
         if page.isRedirectPage() and not self.opt.primary:
+            topic = None
             primary = i18n.translate(page.site,
                                      self.primary_redir_template)
             if primary:
-                primary_page = pywikibot.Page(page.site,
-                                              'Template:' + primary)
-            if primary and primary_page in page.itertemplates(
+                primary_page = pywikibot.Page(page.site, 'Template:' + primary)
+                topic = i18n.translate(self.site.code, primary_topic_format)
+
+            if topic and primary_page in page.itertemplates(
                     namespaces=Namespace.TEMPLATE):
                 baseTerm = page.title()
                 for template, params in page.templatesWithParams():
                     if params and template == primary_page:
                         baseTerm = params[1]
                         break
-                disambTitle = i18n.translate(
-                    self.site.lang,
-                    primary_topic_format) % baseTerm
+
+                disamb_title = topic % baseTerm
                 try:
                     page2 = pywikibot.Page(
-                        pywikibot.Link(disambTitle, self.site))
+                        pywikibot.Link(disamb_title, self.site))
                     links = page2.linkedPages()
                     if self.opt.first:
                         links = self.firstize(page2, links)
@@ -1053,7 +1054,7 @@ class DisambiguationRobot(SingleSiteBot):
                              for link in links]
                 except NoPageError:
                     pywikibot.info(
-                        f'No page at {disambTitle}, using redirect target.')
+                        f'No page at {disamb_title}, using redirect target.')
                     links = page.linkedPages()[:1]
                     links = [correctcap(link,
                                         page.get(get_redirect=True))
@@ -1068,34 +1069,30 @@ class DisambiguationRobot(SingleSiteBot):
                     user_input = pywikibot.input("""\
 Please enter the name of the page where the redirect should have pointed at,
 or press enter to quit:""")
-                    if user_input == '':
-                        self.quit()
-                    else:
-                        self.opt.pos.append(user_input)
+                    if not user_input:
+                        self.quit()  # raises QuitKeyboardInterrupt
+
+                    self.opt.pos.append(user_input)
                 except IsNotRedirectPageError:
                     pywikibot.info(
                         'The specified page is not a redirect. Skipping.')
                     return False
+
         elif self.opt.just:
             # not page.isRedirectPage() or self.opt.primary
             try:
-                if self.opt.primary:
+                topic = i18n.translate(self.site.lang, primary_topic_format)
+                if topic and self.opt.primary:
                     try:
-                        page2 = pywikibot.Page(
-                            pywikibot.Link(
-                                i18n.translate(self.site.lang,
-                                               primary_topic_format)
-                                % page.title(),
-                                self.site))
+                        page2 = pywikibot.Page(self.site, topic % page.title())
                         links = page2.linkedPages()
                         if self.opt.first:
                             links = self.firstize(page2, links)
                         links = [correctcap(link, page2.get())
                                  for link in links]
                     except NoPageError:
-                        pywikibot.info(
-                            'Page does not exist; using first '
-                            f'link in page {page.title()}.')
+                        pywikibot.info('Page does not exist; using first '
+                                       f'link in page {page.title()}.')
                         links = page.linkedPages()[:1]
                         links = [correctcap(link, page.get())
                                  for link in links]
@@ -1109,10 +1106,13 @@ or press enter to quit:""")
                     except NoPageError:
                         pywikibot.info('Page does not exist, skipping.')
                         return False
+
             except IsRedirectPageError:
                 pywikibot.info('Page is a redirect, skipping.')
                 return False
+
             self.opt.pos += links
+
         return True
 
     def setSummaryMessage(

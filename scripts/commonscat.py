@@ -40,7 +40,7 @@ For example to go through all categories:
 # *Found one template. Add this template
 # *Found more templates. Ask the user <- still have to implement this
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -260,10 +260,8 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
     @staticmethod
     def skipPage(page) -> bool:
         """Determine if the page should be skipped."""
-        try:
-            templates_to_ignore = i18n.translate(page.site.code,
-                                                 ignoreTemplates)
-        except KeyError:
+        templates_to_ignore = i18n.translate(page.site.code, ignoreTemplates)
+        if not templates_to_ignore:
             return False
 
         for template in templates_to_ignore:
