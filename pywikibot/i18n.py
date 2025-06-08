@@ -560,16 +560,25 @@ def translate(code: str | pywikibot.site.BaseSite,
     """Return the most appropriate localization from a localization dict.
 
     Given a site code and a dictionary, returns the dictionary's value
-    for key 'code' if this key exists; otherwise tries to return a value
+    for key *code* if this key exists; otherwise tries to return a value
     for an alternative code that is most applicable to use on the wiki
-    in language 'code' except fallback is False.
+    in language *code* except fallback is False.
 
-    The code itself is always checked first, then these codes that have
+    The *code* itself is always checked first, then these codes that have
     been defined to be alternatives, and finally English.
 
-    If fallback is False and the code is not found in the
+    If *fallback* is False and the code is not found in the *xdict*,
+    None is returned.
 
-    For PLURAL support have a look at the twtranslate method.
+    For PLURAL support have a look at the :func:`twtranslate` function.
+
+    .. versionchanged:: 2.0
+       *parameter* other than a mapping (or None) is deprecated.
+    .. versionchanged:: 6.2
+       ValueError is raised if *parameter* is not a mapping.
+    .. versionchanged:: 10.2
+       TypeError instead of ValueError is raised if *parameter* is not a
+       mapping.
 
     :param code: The site code as string or Site object. If xdict is an
         extended dictionary the Site object should be used in favour of
@@ -586,9 +595,10 @@ def translate(code: str | pywikibot.site.BaseSite,
     :raise IndexError: If the language supports and requires more
         plurals than defined for the given PLURAL pattern.
     :raise KeyError: No fallback key found if fallback is not False
+    :raise TypeError: *parameter* is not a mapping
     """
     family = pywikibot.config.family
-    # If a site is given instead of a code, use its language
+    # If a site is given instead of a code, use its code
     if hasattr(code, 'code'):
         family = code.family.name
         code = code.code
@@ -636,7 +646,7 @@ def translate(code: str | pywikibot.site.BaseSite,
         return trans
 
     if not isinstance(parameters, Mapping):
-        raise ValueError(
+        raise TypeError(
             f'parameters should be a mapping, not {type(parameters).__name__}'
         )
 
