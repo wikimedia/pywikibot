@@ -12,12 +12,18 @@ where action can be one of these
 
 :double:       Shortcut: **do**. Fix redirects which point to other redirects.
 
-:broken:       Shortcut: **br**. Tries to fix redirect which point to nowhere
-               by using the last moved target of the destination page. If this
-               fails and the -delete option is set, it either deletes the page
-               or marks it for deletion depending on whether the account has
-               admin rights. It will mark the redirect not for deletion if
-               there is no speedy deletion template available.
+:broken:       Shortcut: **br**. Tries to fix redirect which point to
+               nowhere by using the last moved target of the source page
+               and both have the same namespace. If this fails and the
+               *-delete* option is set, it either deletes the page or
+               marks it for deletion depending on whether the account
+               has delete rights. It will mark the redirect not for
+               deletion if there is no speedy deletion template
+               available.
+
+               .. versionchanged:: 10.3
+                  only tries to fix if the namspace of the source page
+                  is equal to the destination page.
 
 :both:         Both of the above. Retrieves redirect pages from live wiki,
                not from a special page.
@@ -515,6 +521,9 @@ class RedirectRobot(ExistingPageBot):
                 if not movedTarget.exists():
                     # FIXME: Test to another move
                     pywikibot.info(f'Target page {movedTarget} does not exist')
+                elif redir_page.namespace() != movedTarget.namespace():
+                    pywikibot.info(f'Namespace of {redir_page} is different'
+                                   f'from target page {movedTarget}')
                 elif redir_page == movedTarget:
                     pywikibot.info(
                         'Redirect to target page forms a redirect loop')
