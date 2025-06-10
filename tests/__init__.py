@@ -92,7 +92,6 @@ library_test_modules = {
     'interwiki_graph',
     'interwiki_link',
     'interwikimap',
-    'l10n',  # pywikibot-i18n repository runs it too
     'link',
     'linter',
     'logentries',
@@ -156,7 +155,6 @@ script_test_modules = {
     'generate_user_files',
     'harvest_template',
     'interwikidata',
-    'l10n',
     'make_dist',
     'noreferences',
     'patrolbot',
