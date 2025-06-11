@@ -1012,19 +1012,19 @@ def _check_user_config_types(
                     value = _assert_default_type(name, value,
                                                  default_values[name])
             except _DifferentTypeError as e:
-                warn(e)
+                warn(e, stacklevel=2)
             else:
                 user_config[name] = value
         elif not name.startswith('_') and name not in skipped:
             if name in _deprecated_variables:
                 warn('\n' + fill(DEPRECATED_VARIABLE.format(name)),
-                     _ConfigurationDeprecationWarning)
+                     _ConfigurationDeprecationWarning, stacklevel=2)
             else:
                 warn('\n' + fill(f'Configuration variable "{name}" is defined '
                                  f'in your {user_config_file} but unknown. It'
                                  ' can be a misspelled one or a variable that'
                                  ' is no longer supported.'),
-                     UserWarning)
+                     UserWarning, stacklevel=2)
 
 
 _check_user_config_types(_exec_globals, _public_globals, _imports)
@@ -1039,7 +1039,7 @@ if 'user_agent_format' in _modified:
     if _right_user_agent_format != _exec_globals['user_agent_format']:
         warn('`{httplib2}` in user_agent_format is deprecated, '
              'will replace `{httplib2}` with `{http_backend}`',
-             _ConfigurationDeprecationWarning)
+             _ConfigurationDeprecationWarning, stacklevel=2)
         _exec_globals['user_agent_format'] = _right_user_agent_format
     del _right_user_agent_format
 
@@ -1048,7 +1048,7 @@ for _key in _modified:
 
     if _key in _deprecated_variables:
         warn(DEPRECATED_VARIABLE.format(_key),
-             _ConfigurationDeprecationWarning)
+             _ConfigurationDeprecationWarning, stacklevel=2)
 
 # If we cannot auto-detect the console encoding (e.g. when piping data)
 # assume utf-8. On Linux, this will typically be correct; on Windows,

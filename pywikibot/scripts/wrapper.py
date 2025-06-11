@@ -411,7 +411,7 @@ def find_filename(filename):
         else:
             warn("'user_script_paths' must be a list,\n"
                  f'found: {type(config.user_script_paths).__name__}.'
-                 ' Ignoring this setting.')
+                 ' Ignoring this setting.', stacklevel=2)
 
     found = test_paths(user_script_paths, Path(config.base_dir))
     if found:  # pragma: no cover
@@ -519,7 +519,7 @@ def execute() -> bool:
                 module = import_module(file_package)
             except ImportError as e:
                 warn(f'Parent module {file_package} not found: {e}',
-                     ImportWarning)
+                     ImportWarning, stacklevel=2)
 
     help_option = any(arg.startswith('-help:') or arg == '-help'
                       for arg in script_args)

@@ -138,7 +138,7 @@ def has_module(module: str, version: str | None = None) -> bool:
 
         if module_version < required_version:
             warn(f'Module version {module_version} is lower than requested '
-                 f'version {required_version}', ImportWarning)
+                 f'version {required_version}', ImportWarning, stacklevel=2)
             return False
 
     return True
@@ -687,7 +687,8 @@ def file_mode_checker(
         os.chmod(filename, mode)
         # re-read and check changes
         if os.stat(filename).st_mode != st_mode and not quiet:
-            warn(warn_str.format(filename, st_mode - stat.S_IFREG, mode))
+            warn(warn_str.format(filename, st_mode - stat.S_IFREG, mode),
+                 stacklevel=2)
 
 
 def compute_file_hash(filename: str | os.PathLike,

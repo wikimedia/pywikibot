@@ -265,7 +265,7 @@ class Request(MutableMapping, WaitingMixin):
         # TODO: Use ParamInfo request to determine valid parameters
         if isinstance(kwargs.get('parameters'), dict):
             warn('The request contains already a "parameters" entry which is '
-                 'a dict.')
+                 'a dict.', stacklevel=2)
         return cls(site=req_site, parameters=kwargs)
 
     @classmethod
