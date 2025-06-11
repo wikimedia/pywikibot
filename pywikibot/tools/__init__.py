@@ -511,7 +511,7 @@ class MediaWikiVersion:
         """
         return f"'{self}'"
 
-    def __eq__(self, other: object) -> bool:
+    def __eq__(self, other: Any) -> bool:
         if isinstance(other, str):
             other = MediaWikiVersion(other)
         elif not isinstance(other, MediaWikiVersion):
