@@ -531,7 +531,6 @@ class InterwikiBotConfig:
         elif arg == 'skipfile':
             skip_page_gen = pagegenerators.TextIOPageGenerator(value)
             self.skip.update(skip_page_gen)
-            del skip_page_gen
         elif arg == 'neverlink':
             self.neverlink += value.split(',')
         elif arg == 'ignore':
@@ -540,7 +539,6 @@ class InterwikiBotConfig:
         elif arg == 'ignorefile':
             ignore_page_gen = pagegenerators.TextIOPageGenerator(value)
             self.ignore.update(ignore_page_gen)
-            del ignore_page_gen
         elif arg == 'showpage':
             self.showtextlink += self.showtextlinkadd
         elif arg == 'graph':

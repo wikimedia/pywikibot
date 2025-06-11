@@ -577,7 +577,6 @@ class WelcomeBot(SingleSiteBot):
                 self.show_status(Msg.WARN)
                 pywikibot.info("The bad word page doesn't exist!")
             self._blacklist = elenco + elenco_others + list_loaded
-            del elenco, elenco_others, list_loaded
 
         if not hasattr(self, '_whitelist') or force:
             # initialize whitelist
@@ -599,7 +598,6 @@ class WelcomeBot(SingleSiteBot):
 
             # Join the whitelist words.
             self._whitelist = list_white + whitelist_default
-            del list_white, whitelist_default
 
         with suppress(UnicodeEncodeError):
             for wname in self._whitelist:

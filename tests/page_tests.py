@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the page module."""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -875,7 +875,6 @@ class TestPageBotMayEdit(TestCase):
                 page = pywikibot.Page(self.site, 'Pywikibot nobots test')
                 page.text = content
                 self.assertFalse(page.botMayEdit())
-                del page
 
     def test_real_page(self) -> None:
         """Test botMayEdit for real example due to T377651."""

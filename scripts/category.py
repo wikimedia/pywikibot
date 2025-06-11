@@ -368,7 +368,6 @@ class CategoryDatabase:
                 self.cat_content_db = databases['cat_content_db']
                 # like the above, but for supercategories
                 self.superclass_db = databases['superclass_db']
-                del databases
             except Exception:
                 # If something goes wrong, just rebuild the database
                 self.rebuild()
@@ -1389,7 +1388,6 @@ class CategoryTreeRobot:
             result += ' ' + i18n.twtranslate(self.site, 'category-also-in',
                                              {'alsocat': comma.join(
                                                  supercat_names)})
-        del supercat_names
         result += '\n'
         if current_depth < self.max_depth:
             for subcat in self.cat_db.get_subcats(cat):
