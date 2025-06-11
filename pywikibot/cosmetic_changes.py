@@ -203,7 +203,7 @@ class CANCEL(IntEnum):
     MATCH = 3
 
 
-def _format_isbn_match(match: Match[str], strict: bool = True) -> str:
+def _format_isbn_match(match: Match[str], *, strict: bool = True) -> str:
     """Helper function to validate and format a single matched ISBN."""
     if not stdnum_isbn:
         raise NotImplementedError(
@@ -221,7 +221,7 @@ def _format_isbn_match(match: Match[str], strict: bool = True) -> str:
     return stdnum_isbn.format(isbn)
 
 
-def _reformat_ISBNs(text: str, strict: bool = True) -> str:
+def _reformat_ISBNs(text: str, *, strict: bool = True) -> str:
     """Helper function to normalise ISBNs in text.
 
     :raises Exception: Invalid ISBN encountered when strict enabled

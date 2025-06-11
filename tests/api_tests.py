@@ -327,7 +327,8 @@ class TestOptionSet(TestCase):
         with self.assertRaises(KeyError):
             options._set_site(self.get_site(), 'recentchanges', 'show')
         self.assertLength(options, 2)
-        options._set_site(self.get_site(), 'recentchanges', 'show', True)
+        options._set_site(self.get_site(), 'recentchanges', 'show',
+                          clear_invalid=True)
         self.assertLength(options, 1)
         with self.assertRaises(TypeError):
             options._set_site(self.get_site(), 'recentchanges', 'show')

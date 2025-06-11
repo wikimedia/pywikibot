@@ -1,6 +1,6 @@
 """Object representing boolean API option."""
 #
-# (C) Pywikibot team, 2015-2024
+# (C) Pywikibot team, 2015-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -54,7 +54,7 @@ class OptionSet(MutableMapping):
         if data:
             self.from_dict(data)
 
-    def _set_site(self, site, module: str, param: str,
+    def _set_site(self, site, module: str, param: str, *,
                   clear_invalid: bool = False) -> None:
         """Set the site and valid names.
 
