@@ -13,7 +13,7 @@ Useful for editing the contents of an article.
 .. seealso:: :mod:`editor`
 """
 #
-# (C) Pywikibot team, 2003-2024
+# (C) Pywikibot team, 2003-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -84,25 +84,21 @@ class TextEditor(ScrolledText):
     @staticmethod
     def _initialize_config(theme):
         """Fix idleConf.GetHighlight method for different Python releases."""
-        config = {
+        return {
             'padx': 5,
             'wrap': 'word',
             'undo': 'True',
             'width': idleConf.GetOption('main', 'EditorWindow', 'width'),
             'height': idleConf.GetOption('main', 'EditorWindow', 'height'),
+            'foreground': idleConf.GetHighlight(theme, 'normal')['foreground'],
+            'background': idleConf.GetHighlight(theme, 'normal')['background'],
+            'highlightcolor': idleConf.GetHighlight(
+                theme, 'hilite')['foreground'],
+            'highlightbackground': idleConf.GetHighlight(
+                theme, 'hilite')['background'],
+            'insertbackground': idleConf.GetHighlight(
+                theme, 'cursor')['foreground'],
         }
-
-        config['foreground'] = idleConf.GetHighlight(
-            theme, 'normal')['foreground']
-        config['background'] = idleConf.GetHighlight(
-            theme, 'normal')['background']
-        config['highlightcolor'] = idleConf.GetHighlight(
-            theme, 'hilite')['foreground']
-        config['highlightbackground'] = idleConf.GetHighlight(
-            theme, 'hilite')['background']
-        config['insertbackground'] = idleConf.GetHighlight(
-            theme, 'cursor')['foreground']
-        return config
 
     def add_bindings(self) -> None:
         """Assign key and events bindings to methods."""
