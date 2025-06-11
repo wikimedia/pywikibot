@@ -83,7 +83,7 @@ class BaseSite(ComparableMixin):
                     pywikibot.config.mylang = self.__code
                     warn('Global configuration variable "mylang" changed to '
                          f'"{self.__code}" while instantiating site {self}',
-                         UserWarning)
+                         UserWarning, stacklevel=2)
             else:
                 error_msg = (f"Language '{self.__code}' does not exist in "
                              f'family {self.__family.name}')

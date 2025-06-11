@@ -105,7 +105,7 @@ def getversiondict() -> dict[str, str]:
         tag, rev, date, hsh = (
             '', '-1 (unknown)', '0 (unknown)', '(unknown)')
         warn(f'Unable to detect version; exceptions raised:\n{exceptions!r}',
-             UserWarning)
+             UserWarning, stacklevel=2)
         exceptions = None
 
     # Git and SVN can silently fail, as it may be a nightly.
@@ -117,7 +117,7 @@ def getversiondict() -> dict[str, str]:
     elif isinstance(date, time.struct_time):
         datestring = time.strftime('%Y/%m/%d, %H:%M:%S', date)
     else:  # pragma: no cover
-        warn('Unable to detect package date', UserWarning)
+        warn('Unable to detect package date', UserWarning, stacklevel=2)
         datestring = '-2 (unknown)'
 
     return {'tag': tag, 'rev': rev, 'date': datestring, 'hsh': hsh}

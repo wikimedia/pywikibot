@@ -2186,7 +2186,7 @@ class BasePage(ComparableMixin):
             undelete_revs = []
         if reason is None:
             warn('Not passing a reason for undelete() is deprecated.',
-                 DeprecationWarning)
+                 DeprecationWarning, stacklevel=2)
             pywikibot.info(f'Undeleting {self.title(as_link=True)}.')
             reason = pywikibot.input(
                 'Please enter a reason for the undeletion:')

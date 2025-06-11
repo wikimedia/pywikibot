@@ -739,7 +739,7 @@ def handle_args(args: Iterable[str] | None = None,
     """
     if pywikibot._sites:
         warnings.warn('Site objects have been created before arguments were '
-                      'handled', UserWarning)
+                      'handled', UserWarning, stacklevel=2)
 
     # get commandline arguments if necessary
     if not args:
@@ -1161,7 +1161,7 @@ class BaseBot(OptionHandler):
         if 'generator' in kwargs:
             if hasattr(self, 'generator'):
                 warnings.warn(f'{type(self).__name__} has a generator'
-                              ' already. Ignoring argument.')
+                              ' already. Ignoring argument.', stacklevel=2)
             else:
                 self.generator: Iterable = kwargs.pop('generator')
 

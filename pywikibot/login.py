@@ -139,7 +139,7 @@ class LoginManager:
             warn('When using BotPasswords it is recommended that you store'
                  ' your login credentials in a password_file instead. See '
                  f'{__url__}/BotPasswords for instructions and more'
-                 ' information.')
+                 ' information.', stacklevel=2)
             main_username = self.username.partition('@')[0]
 
         try:
@@ -260,13 +260,13 @@ class LoginManager:
 
             if not isinstance(entry, tuple):
                 warn(f'Invalid tuple in line {line_len - n}',
-                     _PasswordFileWarning)
+                     _PasswordFileWarning, stacklevel=2)
                 continue
 
             if not 2 <= (entry_len := len(entry)) <= 4:
                 warn(f'The length of tuple in line {line_len - n} should be 2 '
                      f'to 4, {entry_len} given ({entry})',
-                     _PasswordFileWarning)
+                     _PasswordFileWarning, stacklevel=2)
                 continue
 
             code, family, username, password = (
@@ -284,7 +284,8 @@ class LoginManager:
                     self.login_name = password.login_name(self.username)
                     break
 
-                warn('Invalid password format', _PasswordFileWarning)
+                warn('Invalid password format', _PasswordFileWarning,
+                     stacklevel=2)
 
     _api_error = {
         'NotExists': 'does not exist',
@@ -554,7 +555,7 @@ class BotPassword:
         """
         if '@' in suffix:
             warn('The BotPassword entry should only include the suffix',
-                 _PasswordFileWarning)
+                 _PasswordFileWarning, stacklevel=2)
         self.suffix = suffix
         self.password = password
 
@@ -597,7 +598,7 @@ class OauthLoginManager(LoginManager):
                 f'Password exists in password file for {self.site}: '
                 f'{self.username}. Password is unnecessary and should be'
                 ' removed if OAuth enabled.',
-                _PasswordFileWarning
+                _PasswordFileWarning, stacklevel=2
             )
         self._consumer_token = (user, password)
         self._access_token: tuple[str, str] | None = None

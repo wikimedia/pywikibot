@@ -2102,7 +2102,7 @@ class APISite(
                     f"{self.user()} is within 'bot' group but 'bot' right"
                     " wasn't activated with OAuth or BotPassword settings"
                 )
-                warn(msg)
+                warn(msg, stacklevel=2)
 
         params = dict(
             action='edit',

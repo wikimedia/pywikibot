@@ -300,7 +300,7 @@ def get_authentication(uri: str) -> tuple[str, str] | None:
 
             warn(f'config.authenticate[{path!r}] has invalid value.\n'
                  f'It should contain 2 or 4 items, not {length}.\n'
-                 f'See {pywikibot.__url__}/OAuth for more info.')
+                 f'See {pywikibot.__url__}/OAuth for more info.', stacklevel=2)
 
     return None
 
