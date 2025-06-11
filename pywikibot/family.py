@@ -592,6 +592,8 @@ class Family:
         .. versionchanged:: 10.0
            *url* parameter does not have to contain a api/query/script
            path
+        .. versionchanged:: 10.3
+           accept a trailing slash in *url* after domain.
 
         :param url: the URL which may contain a ``$1``. If it's missing
             it is assumed to be at the end.
@@ -628,7 +630,7 @@ class Family:
                 site = pywikibot.Site(code, self.name)
                 pywikibot.log(f'Found candidate {site}')
 
-                if not path:
+                if path in ('', '/'):  # accept trailing slash
                     return site.code
 
                 for iw_url in site._interwiki_urls():
