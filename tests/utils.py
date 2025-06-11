@@ -513,7 +513,7 @@ def execute(command: list[str], *, data_in=None, timeout=None):
 
 def execute_pwb(args: list[str], *,
                 data_in: Sequence[str] | None = None,
-                timeout: int | float | None = None,
+                timeout: float | None = None,
                 overrides: dict[str, str] | None = None) -> dict[str, Any]:
     """Execute the pwb.py script and capture outputs.
 

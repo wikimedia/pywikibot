@@ -67,7 +67,7 @@ class Throttle:
     def __init__(self, site: pywikibot.site.BaseSite | str, *,
                  mindelay: int | None = None,
                  maxdelay: int | None = None,
-                 writedelay: int | float | None = None) -> None:
+                 writedelay: float | None = None) -> None:
         """Initializer."""
         self.lock = threading.RLock()
         self.lock_write = threading.RLock()
@@ -261,7 +261,7 @@ class Throttle:
         self._write_file(processes)
 
     @staticmethod
-    def wait(seconds: int | float) -> None:
+    def wait(seconds: float) -> None:
         """Wait for seconds seconds.
 
         Announce the delay if it exceeds a preset limit.
