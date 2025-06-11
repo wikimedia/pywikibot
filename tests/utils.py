@@ -1,6 +1,6 @@
 """Test utilities."""
 #
-# (C) Pywikibot team, 2013-2024
+# (C) Pywikibot team, 2013-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -152,12 +152,6 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
                         break
 
                     skip_frames -= 1
-
-            # Ignore socket IO warnings (T183696, T184996)
-            if issubclass(warn_msg.category, ResourceWarning) \
-               and str(warn_msg.message).startswith(
-                   ('unclosed <ssl.SSLSocket', 'unclosed <socket.socket')):
-                return
 
             log.append(warn_msg)
 
