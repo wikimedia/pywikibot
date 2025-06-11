@@ -954,7 +954,7 @@ def main(*args: str) -> None:
 
     :param args: command line arguments
     """
-    def signal_handler(signum, frame):
+    def signal_handler(signum, frame) -> None:
         pywikibot.info('\n<<lightyellow>>User quit bot run...')
         exiting.set()
 

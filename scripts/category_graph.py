@@ -71,7 +71,7 @@ class CategoryGraphBot(SingleSiteBot):
     """Bot to create graph of the category structure."""
 
     @staticmethod
-    def setup_args(ap):
+    def setup_args(ap) -> None:
         """Declares arguments."""
         ap.add_argument('-from', nargs='?', default=argparse.SUPPRESS)
         ap.add_argument('-to', nargs='?', default='')

@@ -28,7 +28,7 @@ class WikiBlameMixin:
     #: Supported wikipedia site codes
     WIKIBLAME_CODES = 'als', 'bar', 'de', 'en', 'it', 'nds', 'sco'
 
-    def _check_wh_supported(self):
+    def _check_wh_supported(self) -> None:
         """Check if WikiHistory is supported."""
         if self.site.family.name != 'wikipedia':
             raise NotImplementedError(

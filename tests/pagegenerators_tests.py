@@ -72,12 +72,12 @@ class TestDryPageGenerators(TestCase):
 
     titles = en_wp_page_titles + en_wp_nopage_titles
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup test."""
         super().setUp()
         self.site = self.get_site()
 
-    def assertFunction(self, obj):
+    def assertFunction(self, obj) -> None:
         """Assert function test."""
         self.assertTrue(hasattr(pagegenerators, obj))
         self.assertTrue(callable(getattr(pagegenerators, obj)))
@@ -201,7 +201,7 @@ class BasetitleTestCase(TestCase):
     base_title = ('Page:06-24-1920 -The Story of the Jones County '
                   'Calf Case.pdf/{}')
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         super().setUp()
         self.site = self.get_site()
@@ -227,7 +227,7 @@ class TestCategoryFilterPageGenerator(BasetitleTestCase):
 
     category_list = ['Category:Validated']
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         super().setUp()
         self.catfilter_list = [pywikibot.Category(self.site, cat)
@@ -482,7 +482,7 @@ class TestTextIOPageGenerator(DefaultSiteTestCase):
         self.assertPageTitlesEqual(titles, expected_titles)
 
     @unittest.mock.patch('pywikibot.comms.http.fetch', autospec=True)
-    def test_url(self, mock_fetch):
+    def test_url(self, mock_fetch) -> None:
         """Test TextIOPageGenerator with URL."""
         # Mock return value of fetch()
         fetch_return = unittest.mock.Mock()
@@ -525,7 +525,7 @@ class TestDayPageGenerator(DefaultSiteTestCase):
 
     """Test the day page generator."""
 
-    def _run_test(self, start_month=1, end_month=12, year=2000):
+    def _run_test(self, start_month=1, end_month=12, year=2000) -> None:
         """Test method for DayPageGenerator."""
         params = {
             'start_month': start_month,
@@ -816,7 +816,8 @@ class TestItemClaimFilterPageGenerator(WikidataTestCase):
 
     """Test item claim filter page generator generator."""
 
-    def _simple_claim_test(self, prop, claim, qualifiers, valid, negate=False):
+    def _simple_claim_test(self, prop, claim, qualifiers, valid,
+                           negate: bool = False) -> None:
         """Test given claim on sample (India) page.
 
         :param prop: the property to check
@@ -1382,7 +1383,7 @@ class TestFactoryGeneratorNewpages(TestCase):
         },
     }
 
-    def test_newpages_default(self, key):
+    def test_newpages_default(self, key) -> None:
         """Test newpages generator."""
         site = self.get_site(key)
         gf = pagegenerators.GeneratorFactory(site=site)
@@ -1401,7 +1402,7 @@ class TestFactoryGeneratorNewpages(TestCase):
 
         self.assertIsNotEmpty(pages, msg=failure_message)
 
-    def test_newpages_ns_default(self, key):
+    def test_newpages_ns_default(self, key) -> None:
         """Test newpages generator with limit argument."""
         site = self.get_site(key)
         gf = pagegenerators.GeneratorFactory(site=site)
@@ -1410,7 +1411,7 @@ class TestFactoryGeneratorNewpages(TestCase):
         self.assertIsNotNone(gen)
         self.assertPagesInNamespaces(gen, 0)
 
-    def test_newpages_ns(self, key):
+    def test_newpages_ns(self, key) -> None:
         """Test newpages generator with limit argument and namespace filter."""
         site = self.get_site(key)
         gf = pagegenerators.GeneratorFactory(site=site)
@@ -1425,7 +1426,7 @@ class TestWantedFactoryGenerator(DefaultSiteTestCase):
 
     """Test pagegenerators.GeneratorFactory for wanted pages."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         super().setUp()
         self.gf = pagegenerators.GeneratorFactory(site=self.site)
@@ -1545,7 +1546,7 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
     """Test GeneratorFactory with pagegenerators.LogeventsPageGenerator."""
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Setup test class."""
         super().setUpClass()
         site = pywikibot.Site()

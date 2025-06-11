@@ -229,7 +229,7 @@ class SandboxBot(Bot, ConfigParserBot):
 
             self.generator = pages
 
-    def treat(self, page):
+    def treat(self, page) -> None:
         """Treat a single page."""
         if not page.exists():
             pywikibot.info('*** The sandbox is not existent, skipping.')

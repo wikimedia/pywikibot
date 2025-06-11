@@ -985,7 +985,7 @@ generator GoogleSearchPageGenerator depends on package
             if page.site == site:
                 yield page
 
-    def set_maximum_items(self, value: int, /):
+    def set_maximum_items(self, value: int, /) -> None:
         """Set the maximum number of items to be retrieved from google.
 
         This method is added to be used by the
@@ -1462,7 +1462,7 @@ class PagePilePageGenerator(GeneratorWrapper):
     .. versionadded:: 9.0
     """
 
-    def __init__(self, id: int):
+    def __init__(self, id: int) -> None:
         """Initializer.
 
         :param id: The PagePile id to query

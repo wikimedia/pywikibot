@@ -268,7 +268,7 @@ class TestNamespacesDictLookupName(TestCase):
             'project_talk', 'PROJECT_TALK', 'Project_talk', 'Project_Talk:'],
     }
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup namespaces dict."""
         super().setUp()
         self.namespaces = builtin_NamespacesDict()

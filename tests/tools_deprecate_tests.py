@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import unittest
 from contextlib import suppress
+from typing import NoReturn
 
 from pywikibot.tools import (
     PYTHON_VERSION,
@@ -26,24 +27,24 @@ from tests.aspects import DeprecationTestCase
 def noop(foo=None):
     """Dummy decorator."""
     def decorator(obj):
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> NoReturn:
             raise Exception(obj.__full_name__)
         return wrapper
     return decorator
 
 
 @noop()
-def decorated_func():
+def decorated_func() -> None:
     """Test dummy decorator."""
 
 
 @noop(foo='bar')
-def decorated_func2():
+def decorated_func2() -> None:
     """Test dummy decorator."""
 
 
 @noop('baz')
-def decorated_func3():
+def decorated_func3() -> None:
     """Test dummy decorator."""
 
 
@@ -142,7 +143,7 @@ def deprecated_func_arg3(foo=None):
 
 
 @remove_last_args(['foo', 'bar'])
-def deprecated_all():
+def deprecated_all() -> None:
     """Test remove_last_args with all args removed."""
     return
 
@@ -230,7 +231,7 @@ class DeprecatedMethodClass:
         return foo
 
     @remove_last_args(['foo', 'bar'])
-    def deprecated_all(self):
+    def deprecated_all(self) -> None:
         """Deprecating positional parameters."""
         return
 
@@ -257,7 +258,7 @@ class DeprecatedClass:
 
     """Deprecated class."""
 
-    def __init__(self, foo=None):
+    def __init__(self, foo=None) -> None:
         """Initializer."""
         self.foo = foo
 
@@ -438,7 +439,7 @@ class DeprecatorTestCase(DeprecationTestCase):
 
     def test_deprecate_function_arg(self) -> None:
         """Test @deprecated function argument."""
-        def tests(func):
+        def tests(func) -> None:
             """Test function."""
             rv = func()
             self.assertIsNone(rv)

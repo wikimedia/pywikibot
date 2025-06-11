@@ -78,7 +78,7 @@ class ExportDotThreeTestCase(TestCase):
             self.assertEqual(previous, result)
         return result
 
-    def _compare_variants(self, revisions):
+    def _compare_variants(self, revisions) -> None:
         """Compare the different XML file variants."""
         previous = None
         previous = self._compare(previous, '.xml', revisions)

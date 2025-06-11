@@ -18,7 +18,7 @@ from importlib import import_module
 from itertools import chain
 from os.path import basename, dirname, splitext
 from textwrap import fill
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NoReturn
 
 import pywikibot
 from pywikibot import config
@@ -545,14 +545,14 @@ class Family:
         """Return path to api.php."""
         return f'{self.scriptpath(code)}/api.php'
 
-    def eventstreams_host(self, code):
+    def eventstreams_host(self, code) -> NoReturn:
         """Hostname for EventStreams.
 
         .. versionadded:: 3.0
         """
         raise NotImplementedError('This family does not support EventStreams')
 
-    def eventstreams_path(self, code):
+    def eventstreams_path(self, code) -> NoReturn:
         """Return path for EventStreams.
 
         .. versionadded:: 3.0

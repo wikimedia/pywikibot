@@ -462,7 +462,7 @@ class TestWikibaseRemoveQualifier(WikibaseTestCase):
     login = True
     write = True
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Add a claim with two qualifiers."""
         super().setUp()
         testsite = self.get_repo()
@@ -539,7 +539,7 @@ class TestWikibaseDataSiteWbsetActions(WikibaseTestCase):
     login = True
     write = True
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         self.testsite = self.get_repo()
         self.item = pywikibot.ItemPage(self.testsite, 'Q68')
@@ -549,7 +549,7 @@ class TestWikibaseDataSiteWbsetActions(WikibaseTestCase):
                                                 badges=[badge])
         super().setUp()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Tear down tests."""
         self.item = None
         self.sitelink = None

@@ -130,7 +130,7 @@ class Page(BasePage, WikiBlameMixin):
         keep_section: bool = False,
         save: bool = True,
         **kwargs
-    ):
+    ) -> None:
         """Change the page's text to point to the redirect page.
 
         .. versionchanged:: 9.3

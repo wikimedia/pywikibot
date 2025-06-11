@@ -29,7 +29,7 @@ class TestPhoto(TestCase):
         },
     }
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up unit test."""
         super().setUp()
         url = ('http://upload.wikimedia.org/wikipedia/commons/f/'
@@ -82,7 +82,7 @@ class TestCSVReader(TestCase):
     family = 'commons'
     code = 'commons'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up unit test."""
         super().setUp()
         with open(join_data_path('csv_ingestion.csv')) as fileobj:

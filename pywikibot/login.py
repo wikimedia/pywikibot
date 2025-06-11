@@ -118,7 +118,7 @@ class LoginManager:
         if getattr(config, 'password_file', ''):
             self.readPassword()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return representation string for LoginManager.
 
         ..versionadded:: 10.0

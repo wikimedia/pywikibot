@@ -191,7 +191,7 @@ def issue_deprecation_warning(name: str,
                               instead: str | None = None,
                               depth: int = 2, *,
                               warning_class: type | None = None,
-                              since: str | None = None):
+                              since: str | None = None) -> None:
     """Issue a deprecation warning.
 
     .. versionchanged:: 7.0
@@ -671,7 +671,7 @@ class ModuleDeprecationWrapper(types.ModuleType):
                             replacement_name: str | None = None,
                             warning_message: str | None = None,
                             since: str = '',
-                            future_warning: bool = True):
+                            future_warning: bool = True) -> None:
         """Add the name to the local deprecated names dict.
 
         .. versionchanged:: 7.0

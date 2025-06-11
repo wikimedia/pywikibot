@@ -33,7 +33,7 @@ class TestPatrolBot(DefaultDrySiteTestCase):
 
     """Test the PatrolBot class."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Create a bot dummy instance."""
         super().setUp()
         self.bot = PatrolBot(self.site)

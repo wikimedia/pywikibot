@@ -80,7 +80,7 @@ def process_site(fam_name, site_code):
     return site_excepts
 
 
-def threads_target(q):
+def threads_target(q) -> None:
     """Thread processing a single site."""
     global families_excepts
     while True:
@@ -104,7 +104,7 @@ def spawn_threads(q):
     return threads
 
 
-def stop_threads(q, threads):
+def stop_threads(q, threads) -> None:
     """Stop threads."""
     for _ in range(NUMBER_OF_THREADS):
         q.put(None)
@@ -112,7 +112,7 @@ def stop_threads(q, threads):
         t.join()
 
 
-def main():
+def main() -> None:
     """Main loop processing sites."""
     global families_excepts
     q = Queue()
@@ -137,7 +137,7 @@ def main():
     stop_threads(q, threads)
 
 
-def save_json(obj, path):
+def save_json(obj, path) -> None:
     """Save data to file."""
     with open(path, 'w', encoding='utf8') as f:
         dump(obj, f)

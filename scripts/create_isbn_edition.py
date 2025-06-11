@@ -589,7 +589,7 @@ propreqinst = {
 transcmt = '#pwb Create ISBN edition'
 
 
-def fatal_error(errcode, errtext):
+def fatal_error(errcode, errtext) -> None:
     """A fatal error has occurred.
 
     Print the error message, and exit with an error code.

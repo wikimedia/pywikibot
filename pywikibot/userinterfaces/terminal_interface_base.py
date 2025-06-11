@@ -11,7 +11,7 @@ import logging
 import re
 import sys
 import threading
-from typing import Any
+from typing import Any, NoReturn
 
 import pywikibot
 from pywikibot import config
@@ -140,7 +140,7 @@ class UI(ABUIC):
         warnings_logger = logging.getLogger('py.warnings')
         warnings_logger.addHandler(warning_handler)
 
-    def encounter_color(self, color, target_stream):
+    def encounter_color(self, color, target_stream) -> NoReturn:
         """Abstract method to handle the next color encountered."""
         raise NotImplementedError(f'The {type(self).__name__} class does not'
                                   ' support colors.')

@@ -102,7 +102,7 @@ class TestTimestamp(TestCase):
 
         return datetime(1970, 1, 1) + timedelta(seconds=sec, microseconds=usec)
 
-    def _test_set_from_string_fmt(self, fmt):
+    def _test_set_from_string_fmt(self, fmt) -> None:
         """Test creating instance from <FMT> string."""
         for timestr, posix in self.test_results[fmt]:
             with self.subTest(timestr):

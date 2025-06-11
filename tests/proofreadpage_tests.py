@@ -142,7 +142,7 @@ class TestBasePageMethodsProofreadPage(BasePageMethodsTestBase):
     family = 'wikisource'
     code = 'en'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test case."""
         self._page = ProofreadPage(
             self.site, 'Page:Popular Science Monthly Volume 1.djvu/12')
@@ -162,7 +162,7 @@ class TestLoadRevisionsCachingProofreadPage(
     family = 'wikisource'
     code = 'en'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test case."""
         self._page = ProofreadPage(
             self.site, 'Page:Popular Science Monthly Volume 1.djvu/12')
@@ -221,7 +221,7 @@ class TestProofreadPageParseTitle(TestCase):
         },
     }
 
-    def test_parse_title(self, key):
+    def test_parse_title(self, key) -> None:
         """Test ProofreadPage_parse_title() function."""
         data = self.sites[key]
         title = data['title']
@@ -439,7 +439,7 @@ class BS4TestCase(TestCase):
 
     @classmethod
     @require_modules('bs4')
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Check whether bs4 module is installed already."""
         super().setUpClass()
 
@@ -466,7 +466,7 @@ class TestPageOCR(BS4TestCase):
             '4 334\n',
     }
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Test setUp."""
         site = self.get_site()
         title = self.data['title']
@@ -637,7 +637,7 @@ class TestBasePageMethodsIndexPage(BS4TestCase, BasePageMethodsTestBase):
     family = 'wikisource'
     code = 'en'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test case."""
         self._page = IndexPage(
             self.site, 'Index:Popular Science Monthly Volume 1.djvu')
@@ -657,7 +657,7 @@ class TestLoadRevisionsCachingIndexPage(BS4TestCase,
     family = 'wikisource'
     code = 'en'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test case."""
         self._page = IndexPage(
             self.site, 'Index:Popular Science Monthly Volume 1.djvu')
@@ -721,7 +721,7 @@ class TestIndexPageMappings(BS4TestCase):
     cached = True
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Prepare get_page dataset for tests."""
         super().setUpClass()
         for key, site_def in cls.sites.items():
@@ -735,7 +735,7 @@ class TestIndexPageMappings(BS4TestCase):
                             for i in page_numbers}
                 site_def['get_page'].append([label, page_set])
 
-    def test_check_if_cached(self, key):
+    def test_check_if_cached(self, key) -> None:
         """Test if cache is checked and loaded properly."""
         data = self.sites[key]
         index_page = IndexPage(self.site, self.sites[key]['index'])
@@ -754,12 +754,12 @@ class TestIndexPageMappings(BS4TestCase):
         index_page._cached = False
         self.assertEqual(index_page.get_label_from_page_number(num), label)
 
-    def test_num_pages(self, key):
+    def test_num_pages(self, key) -> None:
         """Test num_pages property."""
         index_page = IndexPage(self.site, self.sites[key]['index'])
         self.assertEqual(index_page.num_pages, self.sites[key]['num_pages'])
 
-    def test_get_labels(self, key):
+    def test_get_labels(self, key) -> None:
         """Test IndexPage page get_label_from_* functions."""
         data = self.sites[key]
         num, title_num, label = data['get_label']
@@ -780,7 +780,7 @@ class TestIndexPageMappings(BS4TestCase):
         with self.assertRaises(KeyError):
             index_page.get_label_from_page(None)
 
-    def test_get_page_and_number(self, key):
+    def test_get_page_and_number(self, key) -> None:
         """Test IndexPage page get_page_number functions."""
         data = self.sites[key]
         index_page = IndexPage(self.site, self.sites[key]['index'])
@@ -820,7 +820,7 @@ class TestIndexPageMappings(BS4TestCase):
             n = index_page.get_number(p)
             self.assertEqual(index_page.get_page(n), p)
 
-    def test_page_gen(self, key):
+    def test_page_gen(self, key) -> None:
         """Test Index page generator."""
         data = self.sites[key]
         num, title_num, _label = data['get_label']
@@ -861,7 +861,7 @@ class TestIndexPageMappingsRedlinks(BS4TestCase):
     missing_name = 'Page:Pywikibot test page.djvu/2'
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Prepare tests by creating page instances."""
         super().setUpClass()
         cls.index = IndexPage(cls.site, cls.index_name)
@@ -904,7 +904,7 @@ class TestIndexPageHasValidContent(BS4TestCase):
     other_template = '{{PoTM|bar=foobar}}'
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Prepare tests by creating an IndexPage instance."""
         super().setUpClass()
         cls.index = IndexPage(cls.site, cls.index_name)

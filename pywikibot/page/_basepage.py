@@ -413,7 +413,7 @@ class BasePage(ComparableMixin):
             return self._revisions[self._revid]
         return None
 
-    def _getInternals(self):
+    def _getInternals(self) -> None:
         """Helper function for get().
 
         Stores latest revision in self if it doesn't contain it, doesn't think.
@@ -1282,7 +1282,7 @@ class BasePage(ComparableMixin):
              callback=None,
              apply_cosmetic_changes: bool | None = None,
              quiet: bool = False,
-             **kwargs):
+             **kwargs) -> None:
         """Save the current contents of page's text to the wiki.
 
         .. versionchanged:: 7.0
@@ -1356,7 +1356,11 @@ class BasePage(ComparableMixin):
                    cc=apply_cosmetic_changes, quiet=quiet, **kwargs)
 
     @allow_asynchronous
-    def _save(self, summary=None, cc=None, quiet: bool = False, **kwargs):
+    def _save(self,
+              summary=None,
+              cc=None,
+              quiet: bool = False,
+              **kwargs) -> None:
         """Helper function for save()."""
         link = self.title(as_link=True)
         if cc or (cc is None and config.cosmetic_changes):
@@ -1485,7 +1489,7 @@ class BasePage(ComparableMixin):
         return self.site.purgepages([self], **kwargs)
 
     @deprecated_args(botflag='bot')  # since 9.3.0
-    def touch(self, callback=None, bot: bool = False, **kwargs):
+    def touch(self, callback=None, bot: bool = False, **kwargs) -> None:
         """Make a touch edit for this page.
 
         See Meth:`save` method docs for all parameters. The following
@@ -2128,7 +2132,7 @@ class BasePage(ComparableMixin):
                 return item['revisions'][0]
         return []
 
-    def markDeletedRevision(self, timestamp, undelete: bool = True):
+    def markDeletedRevision(self, timestamp, undelete: bool = True) -> None:
         """Mark the revision identified by timestamp for undeletion.
 
         .. seealso::

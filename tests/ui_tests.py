@@ -12,6 +12,7 @@ import logging
 import os
 import unittest
 from contextlib import redirect_stdout, suppress
+from typing import NoReturn
 from unittest.mock import patch
 
 import pywikibot
@@ -47,7 +48,7 @@ class UITestCase(TestCaseBase):
 
     net = False
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup test.
 
         Here we patch standard input, output, and errors, essentially
@@ -71,7 +72,7 @@ class UITestCase(TestCaseBase):
         pywikibot.ui.transliteration_target = None
         pywikibot.ui.encoding = 'utf-8'
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Cleanup test."""
         super().tearDown()
 
@@ -384,7 +385,7 @@ class FakeUITest(TestCase):
     expect_color = False
     ui_class = terminal_interface_base.UI
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Create dummy instances for the test and patch encounter_color."""
         super().setUp()
         self.ui_obj = self.ui_class()
@@ -394,14 +395,14 @@ class FakeUITest(TestCase):
         self.ui_obj.encounter_color = self._encounter_color
         self._index = 0
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Unpatch the encounter_color method."""
         self.ui_obj.encounter_color = self._orig_encounter_color
         super().tearDown()
         self.assertEqual(self._index,
                          len(self._colors) if self.expect_color else 0)
 
-    def _encounter_color(self, color, target_stream):
+    def _encounter_color(self, color, target_stream) -> NoReturn:
         """Patched encounter_color method."""
         raise AssertionError(
             'This method should not be invoked')  # pragma: no cover
@@ -465,18 +466,18 @@ class FakeUIColorizedTestBase(TestCase):
     expect_color = True
     expected = 'Hello world you!'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Force colorized_output to True."""
         super().setUp()
         self._old_config = pywikibot.config.colorized_output
         pywikibot.config.colorized_output = True
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Undo colorized_output configuration."""
         pywikibot.config.colorized_output = self._old_config
         super().tearDown()
 
-    def _encounter_color(self, color, target_stream):
+    def _encounter_color(self, color, target_stream) -> None:
         """Verify that the written data, color and stream are correct."""
         self.assertIs(target_stream, self.ui_obj.stdout)
         expected_color = self._colors[self._index][0]
@@ -504,7 +505,7 @@ class FakeWin32Test(FakeUIColorizedTestBase, FakeUITest):
 
     ui_class = terminal_interface_win32.Win32UI
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Patch the ctypes import and initialize a stream and UI instance."""
         super().setUp()
         self.ui_obj.stdout.isatty = lambda: self.expect_color

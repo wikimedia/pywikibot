@@ -35,7 +35,7 @@ class TestReplacementsMain(TWNBotTestCase):
     code = 'test'
     cached = False
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Replace the original bot class with a fake one."""
         class FakeReplaceBot(replace.ReplaceRobot):
 
@@ -43,18 +43,18 @@ class TestReplacementsMain(TWNBotTestCase):
 
             changed_pages = -42  # show that weird number to show this was used
 
-            def __init__(inner_self, *args, **kwargs):  # noqa: N805
+            def __init__(inner_self, *args, **kwargs) -> None:  # noqa: N805
                 # Unpatch already here, as otherwise super calls will use
                 # this class' super which is the class itself
                 replace.ReplaceRobot = self._original_bot
                 super().__init__(*args, **kwargs)
                 self.bots.append(inner_self)
 
-            def run(inner_self):  # noqa: N805
+            def run(inner_self) -> None:  # noqa: N805
                 """Nothing to do here."""
                 inner_self.changed_pages = -47  # show that run was called
 
-        def patched_login():
+        def patched_login() -> None:
             """Do nothing."""
 
         def patched_site(*args, **kwargs):
@@ -75,7 +75,7 @@ class TestReplacementsMain(TWNBotTestCase):
 
         pywikibot.bot.ui.clear()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Bring back the old bot class."""
         replace.ReplaceRobot = self._original_bot
         replace.pywikibot.input = self._original_input
@@ -83,7 +83,7 @@ class TestReplacementsMain(TWNBotTestCase):
         with empty_sites():
             super().tearDown()
 
-    def _fake_input(self, message):
+    def _fake_input(self, message) -> str:
         """Cache the message and return static text "TESTRUN"."""
         self.inputs.append(message)
         return 'TESTRUN'
@@ -116,7 +116,7 @@ class TestReplacementsMain(TWNBotTestCase):
         self.assertFalse(self.bots)
 
     def _test_replacement(self, replacement, clazz=replace.Replacement,
-                          offset=0):
+                          offset=0) -> None:
         """Test a replacement from the command line."""
         self.assertIsInstance(replacement, clazz)
         self.assertEqual(replacement.old, str(offset * 2 + 1))
@@ -124,7 +124,7 @@ class TestReplacementsMain(TWNBotTestCase):
             self.assertEqual(replacement.new, str(offset * 2 + 2))
 
     def _test_fix_replacement(self, replacement,
-                              length=1, offset=0, msg=False):
+                              length=1, offset=0, msg=False) -> None:
         """Test a replacement from a fix."""
         assert length > offset
         self._test_replacement(replacement, replace.ReplacementListEntry,
@@ -157,7 +157,7 @@ class TestReplacementsMain(TWNBotTestCase):
         self.assertEqual(bot.changed_pages, -47)
         return bot
 
-    def _apply(self, bot, expected, missing=None, title='Test page'):
+    def _apply(self, bot, expected, missing=None, title='Test page') -> None:
         """Test applying a test change."""
         applied = set()
         if missing is True:

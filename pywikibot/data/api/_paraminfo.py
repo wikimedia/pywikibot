@@ -76,7 +76,7 @@ class ParamInfo(Sized, Container):
         else:
             self._modules[name] = modules
 
-    def _init(self):
+    def _init(self) -> None:
         assert ('query' in self._modules) is ('main' in self._paraminfo)
 
         # Skip if ParamInfo is already initialized

@@ -37,7 +37,7 @@ class TestEventStreamsUrlTests(TestCase):
         },
     }
 
-    def test_url_parameter(self, key):
+    def test_url_parameter(self, key) -> None:
         """Test EventStreams with given url."""
         e = EventStreams(url=self.sites[key]['hostname'])
         self.assertEqual(e._url, self.sites[key]['hostname'])
@@ -48,7 +48,7 @@ class TestEventStreamsUrlTests(TestCase):
         self.assertEqual(repr(e),
                          f"EventStreams(url='{self.sites[key]['hostname']}')")
 
-    def test_url_from_site(self, key):
+    def test_url_from_site(self, key) -> None:
         """Test EventStreams with url from site."""
         site = self.get_site(key)
         streams = 'recentchange'
@@ -69,7 +69,7 @@ class TestEventStreamsStreamsTests(DefaultSiteTestCase):
 
     """Stream tests for eventstreams module."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         super().setUp()
         site = self.get_site()
@@ -113,7 +113,7 @@ class TestEventStreamsSettingTests(TestCase):
 
     dry = True
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up unit test."""
         super().setUp()
         with mock.patch('pywikibot.comms.eventstreams.EventSource'):
@@ -132,7 +132,7 @@ class TestEventStreamsSettingTests(TestCase):
 
     def test_filter_function_settings(self) -> None:
         """Test EventStreams filter function settings."""
-        def foo():
+        def foo() -> bool:
             """Dummy function."""
             return True
 
@@ -172,7 +172,7 @@ class TestEventStreamsFilter(TestCase):
 
     data = {'foo': True, 'bar': 'baz'}
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up unit test."""
         super().setUp()
         with mock.patch('pywikibot.comms.eventstreams.EventSource'):
@@ -238,7 +238,7 @@ class TestEventStreamsFilter(TestCase):
         c = {'bar': 'baz'}
         self.assertNotEqual(f(c), g(c))
 
-    def _test_filter(self, none_type, all_type, any_type, result):
+    def _test_filter(self, none_type, all_type, any_type, result) -> None:
         """Test a single fixed filter."""
         self.es.filter = {'all': [], 'any': [], 'none': []}
         self.es.register_filter(lambda x: none_type, ftype='none')

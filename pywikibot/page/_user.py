@@ -261,7 +261,7 @@ class User(Page):
         return ('emailuser' in maildata
                 and maildata['emailuser']['result'] == 'Success')
 
-    def block(self, *args, **kwargs):
+    def block(self, *args, **kwargs) -> None:
         """Block user.
 
         Refer :py:obj:`APISite.blockuser` method for parameters.

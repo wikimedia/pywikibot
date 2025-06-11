@@ -21,15 +21,15 @@ class DummyBot(interwikidata.IWBot):
 
     """A dummy bot to prevent editing in production wikis."""
 
-    def put_current(self):
+    def put_current(self) -> bool:
         """Prevent editing."""
         return False
 
-    def create_item(self):
+    def create_item(self) -> bool:
         """Prevent creating items."""
         return False
 
-    def try_to_add(self):
+    def try_to_add(self) -> None:
         """Prevent adding sitelinks to items."""
         return
 
@@ -53,7 +53,7 @@ class TestInterwikidataBot(AlteredDefaultSiteTestCase, SiteAttributeTestCase):
         },
     }
 
-    def test_main(self, key):
+    def test_main(self, key) -> None:
         """Test main function interwikidata.py."""
         site = self.get_site(key)
         pywikibot.config.family = site.family

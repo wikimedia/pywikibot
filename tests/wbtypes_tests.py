@@ -22,7 +22,7 @@ class WbRepresentationTestCase(WikidataTestCase):
 
     """Test methods inherited or extended from _WbRepresentation."""
 
-    def _test_hashable(self, representation):
+    def _test_hashable(self, representation) -> None:
         """Test that the representation is hashable."""
         list_of_dupes = [representation, representation]
         self.assertLength(set(list_of_dupes), 1)
@@ -690,7 +690,7 @@ class TestWbQuantityNonDry(WbRepresentationTestCase):
     the appropriate version.
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Override setup to store repo and it's version."""
         super().setUp()
         self.repo = self.get_repo()
@@ -836,7 +836,7 @@ class TestWbGeoShapeNonDry(WbRepresentationTestCase):
     These require non dry tests due to the page.exists() call.
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         self.commons = pywikibot.Site('commons')
         self.page = Page(self.commons, 'Data:Lyngby Hovedgade.map')
@@ -911,7 +911,7 @@ class TestWbTabularDataNonDry(WbRepresentationTestCase):
     These require non dry tests due to the page.exists() call.
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         self.commons = pywikibot.Site('commons')
         self.page = Page(self.commons, 'Data:Bea.gov/GDP by state.tab')

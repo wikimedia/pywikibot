@@ -54,7 +54,7 @@ class TestMediaWikiVersion(TestCase):
         self.assertGreater(self._make('1.33'), self._make('1.33-rc.2'))
         self.assertEqual(self._make('1.33rc1'), self._make('1.33-rc.1'))
 
-    def _version_check(self, version, digits, dev_version, suffix):
+    def _version_check(self, version, digits, dev_version, suffix) -> None:
         v = self._make(version)
         self.assertEqual(v.version, digits)
         self.assertEqual(v._dev_version, dev_version)

@@ -40,7 +40,7 @@ class TestGeneralWrite(TestCase):
         """Test writing to a page."""
         global called_back
 
-        def callback(page, err):
+        def callback(page, err) -> None:
             global called_back
             self.assertEqual(page, p)
             self.assertIsNone(err)

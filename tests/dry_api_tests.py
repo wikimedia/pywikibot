@@ -49,7 +49,7 @@ class DryCachedRequestTests(SiteAttributeTestCase):
 
     dry = True
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Initialize the fake requests."""
         super().setUp()
         self.params = {'action': 'query',
@@ -144,12 +144,12 @@ class MockCachedRequestKeyTests(TestCase):
 
     net = False
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Create a mock family and site."""
         class MockFamily(Family):
 
             @property
-            def name(self):
+            def name(self) -> str:
                 return 'mock'
 
         class MockSite(pywikibot.site.APISite):
@@ -158,15 +158,15 @@ class MockCachedRequestKeyTests(TestCase):
 
             _namespaces = {2: ['User']}
 
-            def __init__(self):
+            def __init__(self) -> None:
                 self._user = 'anon'
                 pywikibot.site.BaseSite.__init__(self, 'mock', MockFamily())
                 self._siteinfo = DummySiteinfo({'case': 'first-letter'})
 
-            def version(self):
+            def version(self) -> str:
                 return '1.31'  # lowest supported release
 
-            def protocol(self):
+            def protocol(self) -> str:
                 return 'http'
 
             @property
@@ -176,7 +176,7 @@ class MockCachedRequestKeyTests(TestCase):
             def user(self):
                 return self._user
 
-            def encoding(self):
+            def encoding(self) -> str:
                 return 'utf-8'
 
             def encodings(self):
@@ -186,7 +186,7 @@ class MockCachedRequestKeyTests(TestCase):
             def siteinfo(self):
                 return self._siteinfo
 
-            def __repr__(self):
+            def __repr__(self) -> str:
                 return 'MockSite()'
 
             def __getattr__(self, attr):
@@ -384,7 +384,7 @@ class ParamInfoDictTests(DefaultDrySiteTestCase):
         }
     }
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Add a real ParamInfo to the DrySite."""
         super().setUp()
         site = self.get_site()

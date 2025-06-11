@@ -19,7 +19,7 @@ from collections.abc import MutableMapping
 from contextlib import suppress
 from email.mime.nonmultipart import MIMENonMultipart
 from pathlib import Path
-from typing import Any
+from typing import Any, NoReturn
 from urllib.parse import unquote, urlencode, urlparse
 from warnings import warn
 
@@ -401,7 +401,7 @@ class Request(MutableMapping, WaitingMixin):
         """
         return iter(self.items())
 
-    def _add_defaults(self):
+    def _add_defaults(self) -> None:
         """Add default parameters to the API request.
 
         This method will only add them once.
@@ -1178,7 +1178,7 @@ class CachedRequest(Request):
         self._cachetime = None
 
     @classmethod
-    def create_simple(cls, req_site, **kwargs):
+    def create_simple(cls, req_site, **kwargs) -> NoReturn:
         """Unsupported as it requires at least two parameters."""
         raise NotImplementedError('CachedRequest cannot be created simply.')
 

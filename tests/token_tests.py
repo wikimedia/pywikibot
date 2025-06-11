@@ -54,7 +54,7 @@ class TokenTestBase(TestCaseBase):
 
     """Verify token exists before running tests."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Skip test if user does not have token and clear site wallet."""
         super().setUp()
         mysite = self.get_site()
@@ -72,7 +72,7 @@ class TokenTestBase(TestCaseBase):
         self._orig_wallet = self.site.tokens
         self.site.tokens.clear()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Restore site tokens."""
         self.site._tokens = self._orig_wallet
         super().tearDown()

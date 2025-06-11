@@ -93,7 +93,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
     family = 'wikipedia'
     code = 'en'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up the script by patching the bot class."""
         super().setUp()
         self._original_constructor = ReferencesRobot.__init__
@@ -101,7 +101,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
         ReferencesRobot.__init__ = dummy_constructor
         ReferencesRobot.run = lambda self: None
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Tear down the test by undoing the bot class patch."""
         ReferencesRobot.__init__ = self._original_constructor
         ReferencesRobot.run = self._original_run
@@ -167,7 +167,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
                                    site=self.get_site())
 
 
-def dummy_constructor(self, *args, **kwargs):
+def dummy_constructor(self, *args, **kwargs) -> None:
     """A constructor faking the actual constructor."""
     TestReferencesBotConstructor.constructor_args = args
     TestReferencesBotConstructor.constructor_kwargs = kwargs

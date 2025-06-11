@@ -91,7 +91,7 @@ class TestNoBeautifulSoup(TestCase):
 
     net = False
 
-    def test_html_comparator(self, mocked_import):
+    def test_html_comparator(self, mocked_import) -> None:
         """Test html_comparator when bs4 not installed."""
         with self.assertRaises(ImportError):
             html_comparator('')
@@ -215,7 +215,7 @@ class TestCherryPick(TestCase):
                               '<<lightgreen>>+ e\n<<default>>'
                               '<<lightgreen>>+ w\n<<default>>')
 
-    def check_headers(self, mock):
+    def check_headers(self, mock) -> None:
         """Check if all headers were added to output."""
         for header in self.headers:
             mock.assert_any_call(self.header_base.format(header))
@@ -223,7 +223,7 @@ class TestCherryPick(TestCase):
     @patch('pywikibot.info')
     @patch('pywikibot.userinterfaces.buffer_interface.UI.input',
            return_value='y')
-    def test_accept(self, input, mock):
+    def test_accept(self, input, mock) -> None:
         """Check output of cherry_pick if changes accepted."""
         self.assertEqual(cherry_pick(self.oldtext, self.newtext), self.newtext)
         self.check_headers(mock)
@@ -232,7 +232,7 @@ class TestCherryPick(TestCase):
     @patch('pywikibot.info')
     @patch('pywikibot.userinterfaces.buffer_interface.UI.input',
            return_value='n')
-    def test_reject(self, input, mock):
+    def test_reject(self, input, mock) -> None:
         """Check output of cherry_pick if changes rejected."""
         self.assertEqual(cherry_pick(self.oldtext, self.newtext), self.oldtext)
         self.check_headers(mock)
@@ -242,7 +242,7 @@ class TestCherryPick(TestCase):
     @patch('pywikibot.info')
     @patch('pywikibot.userinterfaces.buffer_interface.UI.input',
            return_value='q')
-    def test_quit(self, input, mock):
+    def test_quit(self, input, mock) -> None:
         """Check output of cherry_pick if quit."""
         self.assertEqual(cherry_pick(self.oldtext, self.newtext), self.oldtext)
         self.check_headers(mock)
@@ -252,7 +252,7 @@ class TestCherryPick(TestCase):
     @patch('pywikibot.info')
     @patch('pywikibot.userinterfaces.buffer_interface.UI.input',
            return_value='y')
-    def test_by_letter_accept(self, input, mock):
+    def test_by_letter_accept(self, input, mock) -> None:
         """Check cherry_pick output.
 
         If by_letter diff is enabled and changes accepted.
@@ -265,7 +265,7 @@ class TestCherryPick(TestCase):
     @patch('pywikibot.info')
     @patch('pywikibot.userinterfaces.buffer_interface.UI.input',
            return_value='q')
-    def test_by_letter_quit(self, input, mock):
+    def test_by_letter_quit(self, input, mock) -> None:
         """Check cherry_pick output.
 
         If by_letter diff is enabled and quit during review.

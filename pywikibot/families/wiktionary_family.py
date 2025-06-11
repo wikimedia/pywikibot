@@ -93,7 +93,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     }
 
     @classmethod
-    def __post_init__(cls):
+    def __post_init__(cls) -> None:
         """Add 'zh-yue' code alias due to :phab:`T341960`.
 
         .. versionadded:: 8.3

@@ -37,7 +37,7 @@ class TestWiktionaryGraph(SiteAttributeTestCase):
     dry = True
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Setup test class."""
         super().setUpClass()
 
@@ -48,7 +48,7 @@ class TestWiktionaryGraph(SiteAttributeTestCase):
             'pl': DryPage(cls.plwikt, 'origin'),
         }
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup interwiki_graph data."""
         super().setUp()
         data = interwiki_graph.Subject(self.pages['en'])

@@ -197,7 +197,7 @@ class TestFilePageCommons(TestCase):
     code = 'commons'
     cached = True
 
-    def test_globalusage(self, key):
+    def test_globalusage(self, key) -> None:
         """Test globalusage generator."""
         page = pywikibot.FilePage(self.site, 'File:Example.jpg')
         gen = page.globalusage(total=3)
@@ -224,7 +224,7 @@ class TestFilePageLatestFileInfo(TestCase):
 
     cached = True
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Create File page."""
         super().setUp()
         self.image = pywikibot.FilePage(self.site, self.file_name)

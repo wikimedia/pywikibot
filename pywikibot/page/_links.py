@@ -361,7 +361,7 @@ class Link(BaseLink):
                 return (newsite.family.name, newsite.code)
         return (fam.name, code)  # text before : doesn't match any known prefix
 
-    def parse(self):
+    def parse(self) -> None:
         """Parse wikitext of the link.
 
         Called internally when accessing attributes.

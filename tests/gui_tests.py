@@ -58,7 +58,7 @@ class TestTkinter(TestCase):
 
 
 @require_modules('PIL')
-def setUpModule():
+def setUpModule() -> None:
     """Skip tests if tkinter or PIL is not installed.
 
     .. versionchanged:: 7.7

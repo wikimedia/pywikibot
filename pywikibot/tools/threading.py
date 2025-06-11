@@ -275,14 +275,14 @@ class BoundedPoolExecutor(futures.Executor):
         bound = self._bound_semaphore._initial_value
         return '' if bound == self._max_workers else f'{sep}{bound}'
 
-    def __str__(self):
+    def __str__(self) -> str:
         """String of current BoundedPoolExecutor type.
 
         Includes *max_bound* if necessary.
         """
         return f'{type(self).__name__}({self._bound()})'
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Representation string of BoundedPoolExecutor.
 
         Includes the *executor* and *max_bound* if necessary.

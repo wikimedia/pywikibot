@@ -91,7 +91,7 @@ class TokenWallet(Container):
         return (f'{type(self).__name__}'
                 f'(pywikibot.Site({self.site.sitename!r}{user}))')
 
-    def clear(self):
+    def clear(self) -> None:
         """Clear the self._tokens cache. Tokens are reloaded when needed.
 
         .. versionadded:: 8.0

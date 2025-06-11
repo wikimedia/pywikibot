@@ -349,7 +349,7 @@ def create_user_config(
     main_code: str,
     main_username: str,
     force: bool = False
-):
+) -> None:
     """Create a user-config.py in base_dir.
 
     Create a user-password.py if necessary.
@@ -438,7 +438,7 @@ def create_user_config(
     save_botpasswords(botpasswords, f_pass)
 
 
-def save_botpasswords(botpasswords: str, path: Path):
+def save_botpasswords(botpasswords: str, path: Path) -> None:
     """Write botpasswords to file.
 
     :param botpasswords: botpasswords for password file

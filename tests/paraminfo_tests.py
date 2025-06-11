@@ -37,17 +37,17 @@ class KnownTypesTestBase(TestCaseBase):
                 f'No defined values for {module}.{parameter}')
         return param['type']
 
-    def _check_param_values(self, site, module, parameter, expected):
+    def _check_param_values(self, site, module, parameter, expected) -> None:
         """Check that a parameter matches the expected list exactly."""
         values = self._get_param_values(site, module, parameter)
         self.assertCountEqual(expected, values)
 
-    def _check_param_subset(self, site, module, parameter, expected):
+    def _check_param_subset(self, site, module, parameter, expected) -> None:
         """Check that a parameter contains all entries in expected list."""
         values = self._get_param_values(site, module, parameter)
         self.assertLessEqual(set(expected), set(values))
 
-    def _check_param_superset(self, site, module, parameter, expected):
+    def _check_param_superset(self, site, module, parameter, expected) -> None:
         """Check that a parameter only contains entries in expected list."""
         values = self._get_param_values(site, module, parameter)
         exp = set(expected)

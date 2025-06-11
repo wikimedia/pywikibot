@@ -68,7 +68,7 @@ class TestBaseSiteProperties(TestCase):
 
     dry = True
 
-    def test_properties(self, key):
+    def test_properties(self, key) -> None:
         """Test cases for BaseSite properties."""
         mysite = self.get_site(key)
         self.assertEqual(mysite.doc_subpage, self.sites[key]['result'])

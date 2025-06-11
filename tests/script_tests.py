@@ -33,7 +33,7 @@ script_deps = {
 }
 
 
-def check_script_deps(script_name):
+def check_script_deps(script_name) -> bool:
     """Detect whether all dependencies are installed."""
     if script_name in script_deps:
         for package_name in script_deps[script_name]:
@@ -173,7 +173,7 @@ def load_tests(loader=unittest.loader.defaultTestLoader,
     return collector(loader)
 
 
-def import_script(script_name: str):
+def import_script(script_name: str) -> None:
     """Import script for coverage only (T305795)."""
     if not ci_test_run:
         return  # pragma: no cover

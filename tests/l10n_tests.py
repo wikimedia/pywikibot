@@ -92,7 +92,7 @@ class TestValidTemplate(TestCase, metaclass=TestValidTemplateMeta):
     code = 'en'
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Skip test gracefully if i18n package is missing."""
         super().setUpClass()
         if not i18n.messages_available():

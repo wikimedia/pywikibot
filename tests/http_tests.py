@@ -50,7 +50,7 @@ class TestGetAuthenticationConfig(TestCase):
 
     net = False
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test by configuring config.authenticate."""
         super().setUp()
         self._authenticate = config.authenticate
@@ -61,7 +61,7 @@ class TestGetAuthenticationConfig(TestCase):
             '*.wmflabs.org': ('7', '8', '8'),
         }
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Tear down test by resetting config.authenticate."""
         super().tearDown()
         config.authenticate = self._authenticate
@@ -215,7 +215,7 @@ class DefaultUserAgentTestCase(TestCase):
 
     net = False
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up unit test."""
         super().setUp()
         self.orig_format = config.user_agent_format
@@ -223,7 +223,7 @@ class DefaultUserAgentTestCase(TestCase):
                                     '{pwb} ({revision}) {http_backend} '
                                     '{python}')
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Tear down unit test."""
         super().tearDown()
         config.user_agent_format = self.orig_format
@@ -246,13 +246,13 @@ class LiveFakeUserAgentTestCase(HttpbinTestCase):
 
     """Test the usage of fake user agent."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up the unit test."""
         self.orig_fake_user_agent_exceptions = (
             config.fake_user_agent_exceptions)
         super().setUp()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Tear down unit test."""
         config.fake_user_agent_exceptions = (
             self.orig_fake_user_agent_exceptions)
@@ -471,7 +471,7 @@ class BinaryTestCase(TestCase):
     url = 'https://upload.wikimedia.org/wikipedia/commons/f/fc/MP_sounds.png'
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Set up test class."""
         super().setUpClass()
 
@@ -502,7 +502,7 @@ class QueryStringParamsTestCase(HttpbinTestCase):
     'args' key with urldecoded query string parameters.
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up tests."""
         super().setUp()
         self.url = self.get_httpbin_url('/get')

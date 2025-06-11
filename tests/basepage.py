@@ -16,7 +16,7 @@ class BasePageTestBase(TestCase):
 
     _page = None
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test."""
         super().setUp()
         assert self._page, 'setUp() must create an empty BasePage in _page'
@@ -35,12 +35,12 @@ class BasePageLoadRevisionsCachingTestBase(BasePageTestBase):
     cached = False
     custom_text = 'foobar'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test."""
         super().setUp()
         assert self.cached is False, 'Tests do not support caching'
 
-    def _test_page_text(self, get_text=True):
+    def _test_page_text(self, get_text=True) -> None:
         """Test site.loadrevisions() with .text."""
         page = self._page
 
@@ -109,7 +109,7 @@ class BasePageMethodsTestBase(BasePageTestBase):
 
     """Test base methods."""
 
-    def _test_invoke(self):
+    def _test_invoke(self) -> None:
         """Basic invocation of some base methods and properties."""
         self.assertTrue(self._page.exists())
         self.assertIsNotNone(self._page.latest_revision)
@@ -122,13 +122,13 @@ class BasePageMethodsTestBase(BasePageTestBase):
 
         self._page.botMayEdit()
 
-    def _test_return_datatypes(self):
+    def _test_return_datatypes(self) -> None:
         """Test the base methods have correct datatypes only."""
         self.assertIsInstance(self._page.langlinks(), list)
         self.assertIsInstance(self._page.templates(), list)
         self.assertIsInstance(self._page.isCategoryRedirect(), int)
 
-    def _test_no_wikitext(self):
+    def _test_no_wikitext(self) -> None:
         """Test the base methods responses simulate no wikitext."""
         self._test_return_datatypes()
         self.assertEqual(self._page.langlinks(), [])

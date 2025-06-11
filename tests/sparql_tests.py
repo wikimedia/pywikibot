@@ -91,7 +91,7 @@ class Container:
 
     """Simple test container for return values."""
 
-    def __init__(self, value):
+    def __init__(self, value) -> None:
         """Create container."""
         self.text = value
 
@@ -105,7 +105,7 @@ class TestSparql(WikidataTestCase):
     """Test SPARQL queries."""
 
     @patch.object(sparql.http, 'fetch')
-    def testQuerySelect(self, mock_method):
+    def testQuerySelect(self, mock_method) -> None:
         """Test SELECT query."""
         mock_method.return_value = Container(
             SQL_RESPONSE_CONTAINER % f'{ITEM_Q498787}, {ITEM_Q677525}')
@@ -127,7 +127,7 @@ class TestSparql(WikidataTestCase):
             'Bad result')
 
     @patch.object(sparql.http, 'fetch')
-    def testQuerySelectFull(self, mock_method):
+    def testQuerySelectFull(self, mock_method) -> None:
         """Test SELECT query with full data."""
         mock_method.return_value = Container(
             SQL_RESPONSE_CONTAINER % f'{ITEM_Q498787}, {ITEM_Q677525}')
@@ -156,7 +156,7 @@ class TestSparql(WikidataTestCase):
             'Wrong URI representation')
 
     @patch.object(sparql.http, 'fetch')
-    def testGetItems(self, mock_method):
+    def testGetItems(self, mock_method) -> None:
         """Test item list retrieval via SPARQL."""
         mock_method.return_value = Container(
             SQL_RESPONSE_CONTAINER % (f'{ITEM_Q498787}, {ITEM_Q677525}, '
@@ -171,7 +171,7 @@ class TestSparql(WikidataTestCase):
         self.assertEqual(res, ['Q498787', 'Q677525', 'Q677525'])
 
     @patch.object(sparql.http, 'fetch')
-    def testQueryAsk(self, mock_method):
+    def testQueryAsk(self, mock_method) -> None:
         """Test ASK query."""
         mock_method.return_value = Container(RESPONSE_TRUE)
         with skipping(pywikibot.exceptions.TimeoutError):

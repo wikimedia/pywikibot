@@ -171,7 +171,7 @@ class MovePagesBot(CurrentPageBot):
     def _title_creator(self, page, prefix):
         """Create function to generate new title."""
 
-        def create_new_title_prefix(prefix, page):
+        def create_new_title_prefix(prefix, page) -> str:
             """Replace prefix helper function."""
             page_title = page.title(with_ns=False)
             return f'{prefix}{page_title}'

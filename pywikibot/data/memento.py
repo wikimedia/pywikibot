@@ -89,7 +89,7 @@ class MementoClient(OldMementoClient):
     :return: A :class:`MementoClient` obj.
     """  # noqa: E501, W505
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """Initializer."""
         # To prevent documentation inclusion from inherited class
         # because it is malformed.

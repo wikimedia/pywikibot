@@ -25,7 +25,7 @@ class TestTimeStripperCase(TestCase):
 
     cached = True
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test cases."""
         super().setUp()
         self.ts = TimeStripper(self.get_site())
@@ -223,7 +223,7 @@ class TestTimeStripperLanguage(TestCase):
 
     cached = True
 
-    def test_timestripper_match(self, key):
+    def test_timestripper_match(self, key) -> None:
         """Test that correct date is matched."""
         self.ts = TimeStripper(self.get_site(key))
 
@@ -254,7 +254,7 @@ class TestTimeStripperLanguage(TestCase):
 
         self.assertEqual(self.ts.timestripper(txt_match), res)
 
-    def test_timestripper_nomatch(self, key):
+    def test_timestripper_nomatch(self, key) -> None:
         """Test that correct date is not matched."""
         self.ts = TimeStripper(self.get_site(key))
         txt_no_match = self.sites[key].get(

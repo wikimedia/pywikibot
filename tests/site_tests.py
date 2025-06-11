@@ -279,7 +279,7 @@ class TestLockingPage(DefaultSiteTestCase):
 
     cached = True
 
-    def worker(self):
+    def worker(self) -> None:
         """Lock a page, wait few seconds and unlock the page."""
         page = pywikibot.Page(self.site, 'Foo')
         page.site.lock_page(page=page, block=True)
@@ -824,7 +824,7 @@ class TestSiteLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase,
 
     """Test site.loadrevisions() caching."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         self._page = self.get_mainpage(force=True)
         super().setUp()
@@ -921,7 +921,7 @@ class TestUploadEnabledSite(TestCase):
 
     login = True
 
-    def test_is_uploaddisabled(self, key):
+    def test_is_uploaddisabled(self, key) -> None:
         """Test is_uploaddisabled()."""
         site = self.get_site(key)
         self.assertEqual(site.is_uploaddisabled(), self.sites[key]['disabled'])
@@ -964,7 +964,7 @@ class TestSametitleSite(TestCase):
         """Test sametitle for enwt."""
         self.assertFalse(self.get_site('enwt').sametitle('Foo', 'foo'))
 
-    def test_general(self, code):
+    def test_general(self, code) -> None:
         """Test sametitle."""
         site = self.get_site(code)
         self.assertTrue(site.sametitle('File:Foo', 'Image:Foo'))
@@ -1222,7 +1222,7 @@ class TestPropertyNames(DefaultSiteTestCase):
 
     cached = True
 
-    def test_get_property_names(self, key):
+    def test_get_property_names(self, key) -> None:
         """Test get_property_names method."""
         mysite = self.get_site(key)
         pnames = mysite.get_property_names()
@@ -1283,7 +1283,7 @@ class TestPageFromWikibase(DefaultSiteTestCase):
 
     ITEM = 'Q131303'
 
-    def test_page_from_repository(self, key):
+    def test_page_from_repository(self, key) -> None:
         """Validate page_from_repository."""
         site = self.get_site(key)
         page = site.page_from_repository(self.ITEM)
@@ -1321,7 +1321,7 @@ class TestCategoryFromWikibase(DefaultSiteTestCase):
 
     ITEM = 'Q6939656'
 
-    def test_page_from_repository(self, key):
+    def test_page_from_repository(self, key) -> None:
         """Validate page_from_repository."""
         site = self.get_site(key)
         page = site.page_from_repository(self.ITEM)

@@ -23,7 +23,7 @@ class TestUserClass(TestCase):
     family = 'wikipedia'
     code = 'de'
 
-    def _tests_unregistered_user(self, user, prop='invalid'):
+    def _tests_unregistered_user(self, user, prop='invalid') -> None:
         """Proceed user tests."""
         self.assertEqual(user.title(with_ns=False), user.username)
         self.assertFalse(user.isRegistered())

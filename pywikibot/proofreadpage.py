@@ -125,7 +125,7 @@ class TagAttr:
     .. versionadded:: 8.0
     """
 
-    def __init__(self, attr, value):
+    def __init__(self, attr, value) -> None:
         """Initializer."""
         self.attr = attr
         self._value = self._convert(value)
@@ -152,14 +152,14 @@ class TagAttr:
         return self._value
 
     @value.setter
-    def value(self, value):
+    def value(self, value) -> None:
         self._value = self._convert(value)
 
-    def __str__(self):
+    def __str__(self) -> str:
         attr = 'from' if self.attr == 'ffrom' else self.attr
         return f'{attr}={self._orig_value}'
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         attr = 'from' if self.attr == 'ffrom' else self.attr
         return f"{type(self).__name__}('{attr}', {self._orig_value!r})"
 
@@ -171,7 +171,7 @@ class TagAttrDesc:
     .. versionadded:: 8.0
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initializer."""
         self.attrs = WeakKeyDictionary()
 
@@ -182,7 +182,7 @@ class TagAttrDesc:
         attr = self.attrs.get(obj)
         return attr.value if attr is not None else None
 
-    def __set__(self, obj, value):
+    def __set__(self, obj, value) -> None:
         attr = self.attrs.get(obj)
         if attr is not None:
             attr.value = value
@@ -284,7 +284,7 @@ class PagesTagParser(collections.abc.Container):
     tosection = TagAttrDesc()
     onlysection = TagAttrDesc()
 
-    def __init__(self, text='<pages />'):
+    def __init__(self, text='<pages />') -> None:
         """Initializer."""
         m = self.pat_tag.search(text)
         if m is None:
@@ -308,17 +308,17 @@ class PagesTagParser(collections.abc.Container):
                if isinstance(v, TagAttrDesc)}
         return res
 
-    def __contains__(self, attr):
+    def __contains__(self, attr) -> bool:
         return getattr(self, attr) is not None
 
-    def __str__(self):
+    def __str__(self) -> str:
         descriptors = self.get_descriptors().items()
         attrs = [v.attrs.get(self) for k, v in descriptors
                  if v.attrs.get(self) is not None]
         attrs = ' '.join(str(attr) for attr in attrs)
         return f'<pages {attrs} />' if attrs else '<pages />'
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{self.__class__.__name__}('{self}')"
 
 

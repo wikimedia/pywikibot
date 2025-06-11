@@ -480,7 +480,7 @@ class FileInfo:
         self._metadata = None
         self.update(file_revision)
 
-    def update(self, file_revision):
+    def update(self, file_revision) -> None:
         """Update FileInfo with new values.
 
         .. versionadded:: 8.6
@@ -517,7 +517,7 @@ class FileInfo:
         return self._metadata
 
     @metadata.setter
-    def metadata(self, value):
+    def metadata(self, value) -> None:
         """Set metadata.
 
         .. versionadded:: 8.6

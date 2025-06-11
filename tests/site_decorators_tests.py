@@ -23,7 +23,7 @@ class DecoratorTestsBase(TestCase):
 
     # Implemented without setUpClass(cls) and global variables as objects
     # were not completely disposed and recreated but retained 'memory'
-    def setUp(self):
+    def setUp(self) -> None:
         """Creating fake variables to appear as a site."""
         self.code = 'test'
         self.family = lambda: None
@@ -43,12 +43,12 @@ class TestMustBe(DecoratorTestsBase):
 
     """Test cases for the must_be decorator."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Creating fake variables to appear as a site."""
         self._userinfo = []
         super().setUp()
 
-    def login(self, group):
+    def login(self, group) -> None:
         """Fake the log in as required user group."""
         self._logged_in_as = group
         self._userinfo = [group]
@@ -142,12 +142,12 @@ class TestNeedRight(DecoratorTestsBase):
 
     # Implemented without setUpClass(cls) and global variables as objects
     # were not completely disposed and recreated but retained 'memory'
-    def setUp(self):
+    def setUp(self) -> None:
         """Creating fake variables to appear as a site."""
         self.userinfo = {'rights': []}
         super().setUp()
 
-    def login(self, group, right):
+    def login(self, group, right) -> None:
         """Fake the log in as required user group."""
         self._logged_in_as = group
         self.userinfo['rights'] = [right]
@@ -195,47 +195,47 @@ class TestNeedVersion(DeprecationTestCase):
 
     # Implemented without setUpClass(cls) and global variables as objects
     # were not completely disposed and recreated but retained 'memory'
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test method."""
         super().setUp()
         self.version = lambda: '1.23'
 
     @need_version('1.24')
-    def too_new(self):
+    def too_new(self) -> bool:
         """Method which is to new."""
         return True
 
     @need_version('1.23')
-    def old_enough(self):
+    def old_enough(self) -> bool:
         """Method which is as new as the server."""
         return True
 
     @need_version('1.22')
-    def older(self):
+    def older(self) -> bool:
         """Method which is old enough."""
         return True
 
     @need_version('1.24')
     @deprecated
-    def deprecated_unavailable_method(self):
+    def deprecated_unavailable_method(self) -> bool:
         """Method which is to new and then deprecated."""
         return True
 
     @deprecated
     @need_version('1.24')
-    def deprecated_unavailable_method2(self):
+    def deprecated_unavailable_method2(self) -> bool:
         """Method which is deprecated first and then to new."""
         return True
 
     @need_version('1.22')
     @deprecated
-    def deprecated_available_method(self):
+    def deprecated_available_method(self) -> bool:
         """Method which is old enough and then deprecated."""
         return True
 
     @deprecated
     @need_version('1.22')
-    def deprecated_available_method2(self):
+    def deprecated_available_method2(self) -> bool:
         """Method which is deprecated first and then old enough."""
         return True
 

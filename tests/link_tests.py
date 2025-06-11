@@ -28,7 +28,7 @@ class TestCreateSeparated(DefaultDrySiteTestCase):
 
     """Test ``Link.create_separated``."""
 
-    def _test_link(self, link, page, section, label):
+    def _test_link(self, link, page, section, label) -> None:
         """Test the separate contents of the link."""
         self.assertIs(link.site, self.site)
         self.assertEqual(link.title, page)
@@ -243,7 +243,7 @@ class LinkTestWikiEn(LinkTestCase):
     family = 'wikipedia'
     code = 'en'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         super().setUp()
         config.mylang = 'en'
@@ -315,7 +315,7 @@ class TestPartiallyQualifiedExplicitLinkDifferentFamilyParser(LinkTestCase):
     family = 'wikipedia'
     code = 'en'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         super().setUp()
         config.mylang = 'en'
@@ -391,7 +391,7 @@ class TestFullyQualifiedLinkDifferentFamilyParser(LinkTestCase):
 
     PATTERN = '{colon}{first}:{second}:{title}'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         super().setUp()
         config.mylang = 'en'
@@ -441,7 +441,7 @@ class TestFullyQualifiedExplicitLinkNoLangConfigFamilyParser(LinkTestCase):
     family = 'wikipedia'
     code = 'en'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         super().setUp()
         config.mylang = 'wikidata'
@@ -495,7 +495,7 @@ class TestFullyQualifiedNoLangFamilyExplicitLinkParser(LinkTestCase):
         },
     }
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         super().setUp()
         config.mylang = 'en'
@@ -529,7 +529,7 @@ class TestFullyQualifiedOneSiteFamilyExplicitLinkParser(LinkTestCase):
     family = 'species'
     code = 'species'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         super().setUp()
         config.mylang = 'en'
@@ -620,7 +620,7 @@ class TestPartiallyQualifiedImplicitLinkDifferentFamilyParser(LinkTestCase):
     family = 'wikipedia'
     code = 'en'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         super().setUp()
         config.mylang = 'en'
@@ -671,7 +671,7 @@ class TestFullyQualifiedImplicitLinkNoLangConfigFamilyParser(LinkTestCase):
     family = 'wikipedia'
     code = 'en'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         super().setUp()
         config.mylang = 'wikidata'
@@ -717,7 +717,7 @@ class TestFullyQualifiedNoLangFamilyImplicitLinkParser(LinkTestCase):
     family = 'wikidata'
     code = 'test'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         super().setUp()
         config.mylang = 'en'
@@ -755,7 +755,7 @@ class TestFullyQualifiedOneSiteFamilyImplicitLinkParser(LinkTestCase):
     family = 'species'
     code = 'species'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         super().setUp()
         config.mylang = 'en'
@@ -895,7 +895,7 @@ class TestSiteLink(WikimediaDefaultSiteTestCase):
 
     """Test parsing namespaces when creating SiteLinks."""
 
-    def _test_link(self, link, title, namespace, site_code, site_fam):
+    def _test_link(self, link, title, namespace, site_code, site_fam) -> None:
         """Test the separate contents of the link."""
         self.assertEqual(link.title, title)
         self.assertEqual(link.namespace, namespace)

@@ -47,7 +47,7 @@ class i18nBot:  # noqa: N801
 
     """I18n bot."""
 
-    def __init__(self, script, *args, **kwargs):
+    def __init__(self, script, *args, **kwargs) -> None:
         """Initializer."""
         modules = script.split('.')
         self.scriptname = modules[0]
@@ -65,7 +65,7 @@ class i18nBot:  # noqa: N801
             self.messages[old] = new.replace('_', '-')
         self.dict = {}
 
-    def print_all(self):
+    def print_all(self) -> None:
         """Pretty print the dict as a file content to screen."""
         if not self.dict:
             print('No messages found, read them first.\n'
@@ -89,7 +89,7 @@ class i18nBot:  # noqa: N801
             print('    },')
         print('};')
 
-    def read(self, oldmsg, newmsg=None):
+    def read(self, oldmsg, newmsg=None) -> None:
         """Read a single message from source script."""
         msg = getattr(self.script, oldmsg)
         keys = list(msg.keys())
@@ -110,7 +110,7 @@ class i18nBot:  # noqa: N801
         if 'en' not in keys:
             print('WARNING: "en" key missing for message ' + newmsg)
 
-    def run(self, quiet=False):
+    def run(self, quiet=False) -> None:
         """Run the bot, read the messages from source and print the dict.
 
         :param quiet: print the result if False
@@ -121,7 +121,7 @@ class i18nBot:  # noqa: N801
         if not quiet:
             self.print_all()
 
-    def to_json(self, quiet=True):
+    def to_json(self, quiet=True) -> None:
         """Run the bot and create json files.
 
         :param quiet: Print the result if False

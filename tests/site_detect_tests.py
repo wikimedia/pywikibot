@@ -28,7 +28,7 @@ class SiteDetectionTestCase(TestCase):
 
     net = True
 
-    def assertSite(self, url: str):
+    def assertSite(self, url: str) -> None:
         """Assert a MediaWiki site can be loaded from the url.
 
         :param url: Url of tested site
@@ -37,7 +37,7 @@ class SiteDetectionTestCase(TestCase):
         with skipping(ServerError, requests_exceptions.Timeout):
             self.assertIsInstance(MWSite(url), MWSite)
 
-    def assertNoSite(self, url: str):
+    def assertNoSite(self, url: str) -> None:
         """Assert a url is not a MediaWiki site.
 
         :param url: Url of tested site

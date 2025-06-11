@@ -434,7 +434,7 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
             self.site._paraminfo.parameter('query+' + self.limited_module,
                                            'namespace'))
 
-    def set_namespace(self, namespaces):
+    def set_namespace(self, namespaces) -> bool | None:
         """Set a namespace filter on this query.
 
         :param namespaces: namespace identifiers to limit query results
@@ -883,7 +883,7 @@ class LogEntryListGenerator(ListGenerator):
         return result.ns() in self._namespaces
 
 
-def _update_pageid(page, pagedict: dict):
+def _update_pageid(page, pagedict: dict) -> None:
     """Update pageid."""
     if 'pageid' in pagedict:
         page._pageid = int(pagedict['pageid'])
@@ -942,7 +942,7 @@ def _update_templates(page, templates) -> None:
         page._templates = templ_pages
 
 
-def _update_categories(page, categories):
+def _update_categories(page, categories) -> None:
     """Update page categories."""
     cat_pages = {pywikibot.Page(page.site, ct['title']) for ct in categories}
     if hasattr(page, '_categories'):

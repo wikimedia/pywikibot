@@ -145,7 +145,7 @@ class UnusedFilesBot(SingleSiteBot,
         else:
             self.append_text(usertalkpage, '\n\n' + msg2uploader + ' ~~~~')
 
-    def append_text(self, page, apptext):
+    def append_text(self, page, apptext) -> None:
         """Append apptext to the page."""
         if page.isRedirectPage():
             page = page.getRedirectTarget()

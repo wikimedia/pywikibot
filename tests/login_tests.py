@@ -96,7 +96,7 @@ class TestPasswordFile(DefaultDrySiteTestCase):
         self.addCleanup(patcher.stop)
         return patcher.start()
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Patch a variety of dependencies."""
         super().setUp()
         self.config = self.patch('pywikibot.login.config')

@@ -213,7 +213,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         self.linkR = textlib.compileLinkR()
         self.create_missing_item = self.opt.create
 
-    def setup(self):
+    def setup(self) -> None:
         """Cache some static data from wikis."""
         self.cacheSources()
         self.templateTitles = self.getTemplateSynonyms(self.template_title)

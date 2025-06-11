@@ -86,7 +86,7 @@ class TestNonSysopSaveFailure(TestCase):
     code = 'test'
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Skip tests for sysop accounts."""
         super().setUpClass()
         if cls.site.has_group('sysop'):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the category bot script."""
 #
-# (C) Pywikibot team, 2015-2024
+# (C) Pywikibot team, 2015-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -44,7 +44,9 @@ class CfdActions(DefaultSiteTestCase):
         self._runtest_strip_cfd_templates('<!--BEGIN CFD TEMPLATE-->',
                                           '<!--END CFD TEMPLATE-->')
 
-    def _runtest_strip_cfd_templates(self, template_start, template_end):
+    def _runtest_strip_cfd_templates(self,
+                                     template_start,
+                                     template_end) -> None:
         """Run a CFD template stripping test, given CFD start/end templates."""
         bot = CategoryMoveRobot(oldcat='Old', newcat='New')
         bot.newcat.text = (

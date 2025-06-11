@@ -63,7 +63,7 @@ class TestInterwikiMap(TestCase):
         },
     }
 
-    def test_interwikimap(self, key):
+    def test_interwikimap(self, key) -> None:
         """Test interwiki map."""
         site = self.get_site(key)
         iw_map = site._interwikimap
@@ -92,7 +92,7 @@ class TestInterwikiMap(TestCase):
                     entry.url.startswith(('http', 'irc://')),
                     entry.url + ' does not start with "http" or "irc://')
 
-    def test_interwiki(self, key):
+    def test_interwiki(self, key) -> None:
         """Test site.interwiki method."""
         site = self.get_site(key)
         prefix = self.sites[key]['family']
@@ -111,7 +111,7 @@ class TestInterwikiMapPrefix(TestCase):
     family = 'wikipedia'
     code = 'en'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         super().setUp()
         self.iw_map = self.site._interwikimap

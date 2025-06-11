@@ -36,23 +36,23 @@ class TestSectionFunctions(TestCase):
     net = False
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Read test content."""
         dirname = Path(__file__).parent / 'pages'
         file = dirname / 'enwiki_help_editing.page'
         cls.content = file.read_text(encoding='utf-8')
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         self.catresult1 = '[[Category:Cat1]]\n[[Category:Cat2]]\n'
         super().setUp()
 
-    def assertContains(self, sn, msg=None):
+    def assertContains(self, sn, msg=None) -> None:
         """Test that file content contains sn."""
         self.assertTrue(textlib.does_text_contain_section(self.content, sn),
                         msg)
 
-    def assertNotContains(self, sn, msg=None):
+    def assertNotContains(self, sn, msg=None) -> None:
         """Test that file content does not contain sn."""
         self.assertFalse(textlib.does_text_contain_section(self.content, sn),
                          msg)
@@ -311,7 +311,7 @@ class TestTemplateParams(TestCase):
 
     net = False
 
-    def _common_results(self, func):
+    def _common_results(self, func) -> None:
         """Common cases."""
         self.assertEqual(func('{{a}}'), [('a', OrderedDict())])
         self.assertEqual(func('{{ a}}'), [('a', OrderedDict())])
@@ -366,7 +366,7 @@ class TestTemplateParams(TestCase):
         self.assertEqual(func('{{a'), [])
         self.assertEqual(func('{{a}}{{foo|'), [('a', OrderedDict())])
 
-    def _unstripped(self, func):
+    def _unstripped(self, func) -> None:
         """Common cases of unstripped results."""
         self.assertEqual(func('{{a|b=<!--{{{1}}}-->}}'),
                          [('a', OrderedDict((('b', '<!--{{{1}}}-->'), )))])
@@ -400,7 +400,7 @@ class TestTemplateParams(TestCase):
                          [('a', OrderedDict((('1', ' foo '), (' 2 ', ' bar '),
                                              ('2', ' baz '))))])
 
-    def _stripped(self, func):
+    def _stripped(self, func) -> None:
         """Common cases of stripped results."""
         self.assertEqual(func('{{a|  }}'),
                          [('a', OrderedDict((('1', '  '), )))])
@@ -429,13 +429,13 @@ class TestTemplateParams(TestCase):
                          [('a', OrderedDict((('1', ' foo '),
                                              ('2', ' baz '))))])
 
-    def _etp_regex_differs(self, func):
+    def _etp_regex_differs(self, func) -> None:
         """Common cases not handled the same by ETP_REGEX."""
         # inner {} should be treated as part of the value
         self.assertEqual(func('{{a|b={} }}'),
                          [('a', OrderedDict((('b', '{} '), )))])
 
-    def _order_differs(self, func):
+    def _order_differs(self, func) -> None:
         """Common cases where the order of templates differs."""
         self.assertCountEqual(func('{{a|b={{c}}}}'),
                               [('a', OrderedDict((('b', '{{c}}'), ))),
@@ -451,7 +451,7 @@ class TestTemplateParams(TestCase):
                                                   ('2', 'd')])),
                                ('b', OrderedDict([('1', 'c')]))])
 
-    def _mwpfh_passes(self, func):
+    def _mwpfh_passes(self, func) -> None:
         """Common cases failing with wikitextparser but passes with mwpfh.
 
         Probably the behaviour of regex or mwpfh is wrong.
@@ -682,7 +682,7 @@ class TestReplaceLinks(TestCase):
             '[[bug:1337]]?')
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Create a fake interwiki cache."""
         super().setUpClass()
         # make APISite.interwiki work and prevent it from doing requests
@@ -735,7 +735,7 @@ class TestReplaceLinks(TestCase):
 
     def test_unlink_all(self) -> None:
         """Test unlinking."""
-        def callback(link, text, groups, rng):
+        def callback(link, text, groups, rng) -> bool:
             self.assertEqual(link.site, self.wp_site)
             return False
         self.assertEqual(
@@ -909,7 +909,7 @@ class TestReplaceLinks(TestCase):
 
     def test_unicode_callback(self) -> None:
         """Test returning unicode in the callback."""
-        def callback(link, text, groups, rng):
+        def callback(link, text, groups, rng) -> str | None:
             self.assertEqual(link.site, self.wp_site)
             if link.title == 'World':
                 # This must be a unicode instance not bytes
@@ -923,7 +923,7 @@ class TestReplaceLinks(TestCase):
 
     def test_bytes_callback(self) -> None:
         """Test returning bytes in the callback."""
-        def callback(link, text, groups, rng):
+        def callback(link, text, groups, rng) -> bytes | None:
             self.assertEqual(link.site, self.wp_site)
             if link.title == 'World':
                 # This must be a bytes instance not unicode
@@ -1440,7 +1440,7 @@ class TestMultiTemplateMatchBuilder(DefaultDrySiteTestCase):
     """Test MultiTemplateMatchBuilder."""
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Cache namespace 10 (Template) case sensitivity."""
         super().setUpClass()
         cls._template_not_case_sensitive = (
@@ -1510,12 +1510,12 @@ class TestGetLanguageLinks(SiteAttributeTestCase):
                     '[[baden:Site]] [[fr:{{PAGENAME}}]]')
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Define set of valid targets for the example text."""
         super().setUpClass()
         cls.sites_set = {cls.enwp, cls.dewp}
 
-    def test_getLanguageLinks(self, key):
+    def test_getLanguageLinks(self, key) -> None:
         """Test if the function returns the correct titles and sites."""
         with mock.patch('pywikibot.info') as m:
             lang_links = textlib.getLanguageLinks(self.example_text,
@@ -1533,7 +1533,7 @@ class TestExtractSections(DefaultDrySiteTestCase):
     """Test the extract_sections function."""
 
     def _extract_sections_tests(self, result, header, sections, footer='',
-                                title=''):
+                                title='') -> None:
         """Test extract_sections function."""
         self.assertIsInstance(result, tuple)
         self.assertIsInstance(result.sections, list)

@@ -116,7 +116,7 @@ class TestArchiveBot(TestCase):
     cached = True
     expected_failures = ['ar', 'scn', 'th']
 
-    def test_archivebot(self, code=None):
+    def test_archivebot(self, code=None) -> None:
         """Test archivebot for one site."""
         site = self.get_site(code)
         page = pywikibot.Page(site, 'user talk:xqt')
@@ -175,7 +175,7 @@ class TestArchiveBotAfterDateUpdate(TestCase):
 
     cached = True
 
-    def test_archivebot(self, code=None):
+    def test_archivebot(self, code=None) -> None:
         """Test archivebot for one site."""
         site = self.get_site(code)
         page = pywikibot.Page(site, 'user talk:mpaa')
@@ -214,7 +214,7 @@ class TestDiscussionPageObject(TestCase):
     family = 'wikipedia'
     code = 'test'
 
-    def load_page(self, title: str):
+    def load_page(self, title: str) -> None:
         """Load the given page."""
         page = pywikibot.Page(self.site, title)
         tmpl = pywikibot.Page(self.site, 'User:MiszaBot/config')

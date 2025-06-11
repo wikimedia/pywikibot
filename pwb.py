@@ -29,7 +29,7 @@ if not python_is_supported():  # pragma: no cover
     sys.exit(VERSIONS_REQUIRED_MESSAGE.format(version=sys.version))
 
 
-def main():
+def main() -> None:
     """Entry point for :func:`tests.utils.execute_pwb`."""
     from pathlib import Path
     path = Path(__file__).parent / 'pywikibot' / 'scripts' / 'wrapper.py'

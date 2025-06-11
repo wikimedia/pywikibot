@@ -24,7 +24,7 @@ class TestCosmeticChanges(TestCase):
     code = 'de'
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Setup class for all tests."""
         super().setUpClass()
         cls.cct = CosmeticChangesToolkit(Page(cls.site, 'Test'))
@@ -190,7 +190,7 @@ class TestDryFixSyntaxSave(TestCosmeticChanges):
     dry = True
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Setup class for all tests."""
         super().setUpClass()
         cls.cct.site._siteinfo._cache['general'] = (

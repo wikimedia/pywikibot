@@ -33,7 +33,7 @@ class TestDjVuFile(TestCase):
     test_txt = 'A file with non-ASCII characters, \nlike é or ç'
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Skip if djvulibre library not installed."""
         super().setUpClass()
         with skipping(OSError, msg='djvulibre library not installed.'):
@@ -42,7 +42,7 @@ class TestDjVuFile(TestCase):
                                   stderr=subprocess.PIPE)
             dp.communicate()
 
-    def setUp(self):  # pragma: no cover
+    def setUp(self) -> None:  # pragma: no cover
         """Set up test."""
         super().setUp()
         self.djvu = DjVuFile(file_djvu)
@@ -110,7 +110,7 @@ class TestDjVuFileWithoutLib(TestCase):
 
     file_djvu_not_existing = join_djvu_data_path('not_existing.djvu')
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test."""
         super().setUp()
         self.djvu = DjVuFile(file_djvu)

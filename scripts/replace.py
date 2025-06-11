@@ -246,7 +246,7 @@ class ReplacementBase:
         return f'-{self.old} +{self.new}'
 
     @property
-    def container(self):
+    def container(self) -> None:
         """Container object which contains this replacement.
 
         A container object is an object that groups one or more replacements
@@ -672,7 +672,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
         semicolon = self.site.mediawiki_message('semicolon-separator')
         return semicolon.join(summary_messages)
 
-    def skip_page(self, page):
+    def skip_page(self, page) -> bool:
         """Check whether treat should be skipped for the page."""
         if super().skip_page(page):
             return True

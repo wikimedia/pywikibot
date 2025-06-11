@@ -768,7 +768,7 @@ class NoReferencesBot(AutomaticTWSummaryBot, SingleSiteBot, ExistingPageBot):
                                    f'localized for {self.site}')
         return oldText[:index].rstrip() + ref_section + oldText[index:]
 
-    def skip_page(self, page):
+    def skip_page(self, page) -> bool:
         """Check whether the page could be processed."""
         if super().skip_page(page):
             return True

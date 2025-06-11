@@ -43,7 +43,7 @@ class TextEditor:
        Editor detection functions were moved from :mod:`config`.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Setup external Editor."""
         self.editor: str
         if config.editor is True:

@@ -82,7 +82,7 @@ class TestClearCookies(TestCase):
         self.assertFalse(raised)
 
 
-def setUpModule():
+def setUpModule() -> None:
     """Skip tests if PYWIKIBOT_TEST_LOGOUT variable is not set."""
     if os.environ.get('PYWIKIBOT_TEST_LOGOUT', '0') != '1':
         raise unittest.SkipTest('login/logout tests are disabled')

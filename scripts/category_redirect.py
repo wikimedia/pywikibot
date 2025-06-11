@@ -231,7 +231,7 @@ class CategoryRedirectBot(
         log_text += ('\n\n' + message)
         return log_text
 
-    def setup_hard_redirect(self):
+    def setup_hard_redirect(self) -> None:
         """Setup hard redirect task."""
         pywikibot.info('Checking hard-redirect category pages.')
         self.summary_key = REDIR_COMMENT
@@ -317,7 +317,7 @@ class CategoryRedirectBot(
         else:
             self.counter['touch'] += 1
 
-    def setup_soft_redirect(self):
+    def setup_soft_redirect(self) -> None:
         """Setup soft redirect task."""
         pywikibot.info(f'\nChecking {self.cat.categoryinfo["subcats"]}'
                        ' category redirect pages')

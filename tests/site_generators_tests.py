@@ -43,7 +43,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
 
     cached = True
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Initialize self.site and self.mainpage."""
         super().setUp()
         self.site = self.get_site()
@@ -721,7 +721,7 @@ class TestSiteGeneratorsUsers(DefaultSiteTestCase):
 
     cached = True
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Initialize self.site and self.mainpage."""
         super().setUp()
         self.site = self.get_site()
@@ -1585,7 +1585,7 @@ class SiteRandomTestCase(DefaultSiteTestCase):
     """Test random methods of a site."""
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Skip test on beta due to T282602."""
         super().setUpClass()
         site = cls.get_site()
@@ -1690,7 +1690,7 @@ class TestSiteLoadRevisions(TestCase):
 
     # Implemented without setUpClass(cls) and global variables as objects
     # were not completely disposed and recreated but retained 'memory'
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         super().setUp()
         self.mysite = self.get_site()
@@ -1823,7 +1823,7 @@ class TestBacklinks(TestCase):
 
     cached = True
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         super().setUp()
         self.page = pywikibot.Page(self.site, 'File:BoA – Woman.png')
@@ -1938,7 +1938,7 @@ class TestLoadPagesFromPageids(DefaultSiteTestCase):
 
     cached = True
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         super().setUp()
         self.site = self.get_site()
@@ -2246,7 +2246,7 @@ class TestPagePreloading(DefaultSiteTestCase):
                 break
 
     @patch.object(pywikibot, 'info')
-    def test_preload_langlinks_count(self, output_mock):
+    def test_preload_langlinks_count(self, output_mock) -> None:
         """Test preloading continuation works."""
         mysite = self.get_site()
         mainpage = self.get_mainpage()

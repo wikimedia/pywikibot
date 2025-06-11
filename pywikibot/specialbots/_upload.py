@@ -469,7 +469,7 @@ class UploadRobot(BaseBot):
 
         return False
 
-    def run(self):
+    def run(self) -> None:
         """Run bot.
 
         .. versionchanged:: 9.1

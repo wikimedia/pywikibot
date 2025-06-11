@@ -728,7 +728,7 @@ def replace_links(text: str, replace, site: pywikibot.site.BaseSite) -> str:
             return replace_list[1]
         return None
 
-    def check_classes(replacement):
+    def check_classes(replacement) -> None:
         """Normalize the replacement into a list."""
         if not isinstance(replacement, (pywikibot.Page, pywikibot.Link)):
             raise ValueError('The replacement must be None, False, a'

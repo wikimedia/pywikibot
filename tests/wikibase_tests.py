@@ -50,7 +50,7 @@ class TestLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase,
 
     """Test site.loadrevisions() caching."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup test."""
         self._page = ItemPage(self.get_repo(), 'Q15169668')
         super().setUp()
@@ -66,7 +66,7 @@ class TestGeneral(WikidataTestCase):
     """General Wikibase tests."""
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Setup test class."""
         super().setUpClass()
         enwiki = pywikibot.Site('en', 'wikipedia')
@@ -163,7 +163,7 @@ class TestLoadUnknownType(WikidataTestCase):
 
     dry = True
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup test."""
         super().setUp()
         wikidata = self.get_repo()
@@ -230,12 +230,12 @@ class TestItemLoad(WikidataTestCase):
     }
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Setup test class."""
         super().setUpClass()
         cls.site = cls.get_site('enwiki')
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup test."""
         super().setUp()
         self.nyc = pywikibot.Page(pywikibot.page.Link('New York City',
@@ -464,7 +464,7 @@ class TestItemLoad(WikidataTestCase):
         item.get()
         self.assertTrue(item.exists())
 
-    def _test_fromPage_noitem(self, link):
+    def _test_fromPage_noitem(self, link) -> None:
         """Helper function to test a page without an associated item.
 
         It tests two of the ways to fetch an item:
@@ -1012,7 +1012,7 @@ class TestItemBasePageMethods(WikidataTestCase, BasePageMethodsTestBase):
 
     """Test behavior of ItemPage methods inherited from BasePage."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         self._page = ItemPage(self.get_repo(), 'Q60')
         super().setUp()
@@ -1032,7 +1032,7 @@ class TestPageMethodsWithItemTitle(WikidataTestCase, BasePageMethodsTestBase):
 
     """Test behavior of Page methods for wikibase item."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         self._page = pywikibot.Page(self.site, 'Q60')
         super().setUp()
@@ -1063,7 +1063,7 @@ class TestLinks(WikidataTestCase):
         }
     }
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup Tests."""
         super().setUp()
         self.wdp = ItemPage(self.get_repo(), 'Q60')
@@ -1097,7 +1097,7 @@ class TestWriteNormalizeData(TestCase):
 
     net = False
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         super().setUp()
         self.data_out = {
@@ -1288,7 +1288,7 @@ class TestAlternateNamespaces(WikidataTestCase):
     dry = True
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Setup test class."""
         super().setUpClass()
 
@@ -1351,7 +1351,7 @@ class TestOwnClient(TestCase):
         },
     }
 
-    def test_own_client(self, key):
+    def test_own_client(self, key) -> None:
         """Test that a data repository family can be its own client."""
         site = self.get_site(key)
         page = self.get_mainpage(site)
@@ -1359,13 +1359,13 @@ class TestOwnClient(TestCase):
         self.assertEqual(page.site, site)
         self.assertEqual(item.site, site)
 
-    def test_page_from_repository(self, key):
+    def test_page_from_repository(self, key) -> None:
         """Test that page_from_repository method works for wikibase too."""
         site = self.get_site(key)
         page = site.page_from_repository('Q5296')
         self.assertEqual(page, self.get_mainpage(site))
 
-    def test_redirect_from_repository(self, key):
+    def test_redirect_from_repository(self, key) -> None:
         """Test page_from_repository method with redirects."""
         site = self.get_site(key)
         item = self.sites[key]['item']
@@ -1396,7 +1396,7 @@ class TestUnconnectedClient(TestCase):
 
     dry = True
 
-    def test_not_supported_family(self, key):
+    def test_not_supported_family(self, key) -> None:
         """Test that family without a data repository causes error."""
         site = self.get_site(key)
 
@@ -1407,12 +1407,12 @@ class TestUnconnectedClient(TestCase):
         with self.assertRaisesRegex(WikiBaseError, regex):
             self.wdp.data_item()
 
-    def test_has_data_repository(self, key):
+    def test_has_data_repository(self, key) -> None:
         """Test that site has no data repository."""
         site = self.get_site(key)
         self.assertFalse(site.has_data_repository)
 
-    def test_page_from_repository_fails(self, key):
+    def test_page_from_repository_fails(self, key) -> None:
         """Test that page_from_repository method fails."""
         site = self.get_site(key)
         dummy_item = 'Q1'
@@ -1425,7 +1425,7 @@ class TestJSON(WikidataTestCase):
 
     """Test cases to test toJSON() functions."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup test."""
         super().setUp()
         wikidata = self.get_repo()

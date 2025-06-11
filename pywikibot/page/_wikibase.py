@@ -19,7 +19,7 @@ import re
 from collections import OrderedDict, defaultdict
 from contextlib import suppress
 from itertools import chain
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, NoReturn
 
 import pywikibot
 from pywikibot.exceptions import (
@@ -139,7 +139,7 @@ class WikibaseEntity:
             f"'{type(self).__name__}' object has no attribute '{name}'"
         )
 
-    def _initialize_empty(self):
+    def _initialize_empty(self) -> None:
         for key, cls in self.DATA_ATTRIBUTES.items():
             setattr(self, key, cls.new_empty(self.repo))
 
@@ -391,7 +391,7 @@ class MediaInfo(WikibaseEntity):
 
         return super().__getattr__(name)
 
-    def _assert_has_id(self):
+    def _assert_has_id(self) -> None:
         if self.id != '-1':
             return
 
@@ -546,7 +546,7 @@ class MediaInfo(WikibaseEntity):
         data = {'labels': labels}
         self.editEntity(data, **kwargs)
 
-    def addClaim(self, claim, bot: bool = True, **kwargs):
+    def addClaim(self, claim, bot: bool = True, **kwargs) -> None:
         """Add a claim to the MediaInfo.
 
         .. versionadded:: 8.5
@@ -873,7 +873,7 @@ class WikibasePage(BasePage, WikibaseEntity):
         keep_section: bool = False,
         save: bool = True,
         **kwargs
-    ):
+    ) -> NoReturn:
         """Set target of a redirect for a Wikibase page.
 
         Has not been implemented in the Wikibase API yet, except for ItemPage.
@@ -881,7 +881,7 @@ class WikibasePage(BasePage, WikibaseEntity):
         raise NotImplementedError
 
     @allow_asynchronous
-    def addClaim(self, claim, bot: bool = True, **kwargs):
+    def addClaim(self, claim, bot: bool = True, **kwargs) -> None:
         """Add a claim to the entity.
 
         :param claim: The claim to add
@@ -1404,7 +1404,7 @@ class Property:
         if datatype:
             self._type = datatype
 
-    def exists(self):
+    def exists(self) -> bool:
         """Determine if the property exists in the data repository.
 
         .. versionadded:: 9.4
@@ -1852,7 +1852,7 @@ class Claim(Property):
                     data['references'].append(reference)
         return data
 
-    def setTarget(self, value):
+    def setTarget(self, value) -> None:
         """Set the target value in the local object.
 
         :param value: The new target value.
@@ -1905,7 +1905,7 @@ class Claim(Property):
         """
         return self.snaktype
 
-    def setSnakType(self, value):
+    def setSnakType(self, value) -> None:
         """Set the type of snak.
 
         :param value: Type of snak
@@ -1954,7 +1954,7 @@ class Claim(Property):
         """
         self.addSources([claim], **kwargs)
 
-    def addSources(self, claims, **kwargs):
+    def addSources(self, claims, **kwargs) -> None:
         """Add the claims as one source.
 
         :param claims: the claims to add
@@ -2001,7 +2001,7 @@ class Claim(Property):
             source_dict[source.getID()].append(source)
             self.sources.remove(source_dict)
 
-    def addQualifier(self, qualifier, **kwargs):
+    def addQualifier(self, qualifier, **kwargs) -> None:
         """Add the given qualifier.
 
         :param qualifier: the qualifier to add
@@ -2191,7 +2191,7 @@ class LexemePage(WikibasePage):
         super().__init__(site, title, entity_type='lexeme')
         assert self.id == self._link.title
 
-    def get_data_for_new_entity(self):
+    def get_data_for_new_entity(self) -> NoReturn:
         """Return data required for creation of a new lexeme."""
         raise NotImplementedError  # TODO
 
@@ -2267,7 +2267,7 @@ class LexemePage(WikibasePage):
         return new_data
 
     @allow_asynchronous
-    def add_form(self, form, **kwargs):
+    def add_form(self, form, **kwargs) -> None:
         """Add a form to the lexeme.
 
         :param form: The form to add
@@ -2310,7 +2310,7 @@ class LexemePage(WikibasePage):
 
     # TODO: senses
 
-    def mergeInto(self, lexeme, **kwargs):
+    def mergeInto(self, lexeme, **kwargs) -> None:
         """Merge the lexeme into another lexeme.
 
         :param lexeme: The lexeme to merge into
@@ -2367,15 +2367,15 @@ class LexemeSubEntity(WikibaseEntity):
         return self._on_lexeme
 
     @on_lexeme.setter
-    def on_lexeme(self, lexeme):
+    def on_lexeme(self, lexeme) -> None:
         self._on_lexeme = lexeme
 
     @on_lexeme.deleter
-    def on_lexeme(self):
+    def on_lexeme(self) -> None:
         self._on_lexeme = None
 
     @allow_asynchronous
-    def addClaim(self, claim, **kwargs):
+    def addClaim(self, claim, **kwargs) -> None:
         """Add a claim to the form.
 
         :param claim: The claim to add

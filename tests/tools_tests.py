@@ -51,7 +51,7 @@ class OpenArchiveTestCase(TestCase):
     net = False
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Define base_file and original_content."""
         super().setUpClass()
         cls.base_file = join_xml_data_path('article-pyrus.xml')
@@ -115,7 +115,7 @@ class OpenArchiveWriteTestCase(TestCase):
     net = False
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Define base_file and original_content."""
         super().setUpClass()
         cls.base_file = join_xml_data_path('article-pyrus.xml')
@@ -314,7 +314,7 @@ class SkipList(set):
 
     skip_list = [1, 3]
 
-    def __contains__(self, item):
+    def __contains__(self, item) -> bool:
         """Override to not process some items."""
         if item in self.skip_list:
             return True
@@ -328,7 +328,7 @@ class ProcessAgainList(set):
 
     process_again_list = [1, 3]
 
-    def add(self, item):
+    def add(self, item) -> None:
         """Override to not add some items."""
         if item in self.process_again_list:
             return
@@ -342,7 +342,7 @@ class ContainsStopList(set):
 
     stop_list = []
 
-    def __contains__(self, item):
+    def __contains__(self, item) -> bool:
         """Override to stop on encountering items."""
         if item in self.stop_list:
             raise StopIteration
@@ -356,7 +356,7 @@ class AddStopList(set):
 
     stop_list = []
 
-    def add(self, item):
+    def add(self, item) -> None:
         """Override to not continue on encountering items."""
         if item in self.stop_list:
             raise StopIteration
@@ -374,7 +374,7 @@ class TestFilterUnique(TestCase):
     strs = [str(i) for i in ints]
     decs = [decimal.Decimal(i) for i in ints]
 
-    def _test_dedup_int(self, deduped, deduper, key=None):
+    def _test_dedup_int(self, deduped, deduper, key=None) -> None:
         """Test filter_unique results for int."""
         if not key:
             key = passthrough
@@ -406,7 +406,7 @@ class TestFilterUnique(TestCase):
         with self.assertRaises(StopIteration):
             next(deduper)
 
-    def _test_dedup_str(self, deduped, deduper, key=None):
+    def _test_dedup_str(self, deduped, deduper, key=None) -> None:
         """Test filter_unique results for str."""
         if not key:
             key = passthrough
@@ -571,7 +571,7 @@ class TestFileModeChecker(TestCase):
         self.addCleanup(patcher.stop)
         return patcher.start()
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Patch a variety of dependencies."""
         super().setUp()
         self.stat = self.patch('os.stat')
@@ -710,7 +710,7 @@ class GeneratorIntersectTestCase(TestCase):
 
     """Base class for intersect_generators test cases."""
 
-    def assertEqualItertools(self, gens):
+    def assertEqualItertools(self, gens) -> None:
         """Assert intersect_generators result is same as set intersection."""
         # If they are a generator, we need to convert to a list
         # first otherwise the generator is empty the second time.
@@ -721,7 +721,7 @@ class GeneratorIntersectTestCase(TestCase):
         self.assertCountEqual(set(result), result)
         self.assertCountEqual(result, set_result)
 
-    def assertEqualItertoolsWithDuplicates(self, gens):
+    def assertEqualItertoolsWithDuplicates(self, gens) -> None:
         """Assert intersect_generators result equals Counter intersection."""
         # If they are a generator, we need to convert to a list
         # first otherwise the generator is empty the second time.
@@ -974,36 +974,36 @@ class DecoratedMethods:
 
     """Test class to verify cached decorator."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initializer, reset read counter."""
         self.read = 0
 
     @cached
-    def foo(self):
+    def foo(self) -> str:
         """A method."""
         self.read += 1
         return 'foo'
 
     @property
     @cached
-    def bar(self):
+    def bar(self) -> str:
         """A property."""
         self.read += 1
         return 'bar'
 
-    def baz(self):
+    def baz(self) -> str:
         """An undecorated method."""
         self.read += 1
         return 'baz'
 
     @cached
-    def quux(self, force=False):
+    def quux(self, force=False) -> str:
         """Method with force."""
         self.read += 1
         return 'quux'
 
     @cached
-    def method_with_args(self, *args, **kwargs):
+    def method_with_args(self, *args, **kwargs) -> str:
         """Method with force."""
         self.read += 1
         return 'method_with_args'
@@ -1015,7 +1015,7 @@ class TestTinyCache(TestCase):
 
     net = False
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         self.foo = DecoratedMethods()
         super().setUp()

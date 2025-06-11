@@ -85,7 +85,7 @@ class TestRequireVersionDry(DefaultSiteTestCase):
     dry = True
 
     @require_version('')
-    def method(self):
+    def method(self) -> None:
         """Test method for decorator."""
 
     def test_require_version(self) -> None:
@@ -101,20 +101,20 @@ class TestRequireVersion(DefaultSiteTestCase):
     """Test require_version decorator."""
 
     @require_version('')
-    def method_with_params(self, key):
+    def method_with_params(self, key) -> None:
         """Test method for decorated methods with unsupported arguments."""
 
-    def method_failing(self):
+    def method_failing(self) -> None:
         """Test method for decorator with invalid parameter."""
         self.assertTrue(False, 'should never happen')
 
     @require_version('>=1.31')
-    def method_succeed(self):
+    def method_succeed(self) -> None:
         """Test that decorator passes."""
         self.assertTrue(False, 'intentional fail for method_succeed test')
 
     @require_version('<1.31')
-    def method_fail(self):
+    def method_fail(self) -> None:
         """Test that decorator skips."""
         self.assertTrue(False, 'intentional fail for test')
 

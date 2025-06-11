@@ -32,7 +32,7 @@ class TestTitleTranslate(TestCase):
         },
     }
 
-    def test_translate(self, key):
+    def test_translate(self, key) -> None:
         """Test translate method."""
         site = self.get_site(key)
         result = translate(page=self.get_mainpage(site), auto=False,

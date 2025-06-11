@@ -25,7 +25,7 @@ class TestSiteInfo(DefaultSiteTestCase):
 
     cached = True
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Clear siteinfo cache."""
         super().setUp()
         self.site.siteinfo.clear()

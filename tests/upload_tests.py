@@ -46,9 +46,9 @@ class TestUpload(TestCase):
                          comment='pywikibot test',
                          ignore_warnings=True, chunk_size=1024)
 
-    def _init_upload(self, chunk_size):
+    def _init_upload(self, chunk_size) -> None:
         """Do an initial upload causing an abort because of warnings."""
-        def warn_callback(warnings):
+        def warn_callback(warnings) -> None:
             """A simple callback not automatically finishing the upload."""
             self.assertCountEqual([w.code for w in warnings], expected_warns)
             # by now we know there are only two but just make sure
@@ -75,7 +75,7 @@ class TestUpload(TestCase):
         self.assertRegex(self._file_key, r'[0-9a-z]+.[0-9a-z]+.\d+.png')
         self._verify_stash()
 
-    def _verify_stash(self):
+    def _verify_stash(self) -> None:
         info = self.site.stash_info(self._file_key, ['size', 'sha1'])
         if info['size'] == 1024:
             self.assertEqual('3503db342c8dfb0a38db0682b7370ddd271fa163',
@@ -84,7 +84,7 @@ class TestUpload(TestCase):
             self.assertEqual('0408a0f6a5e057e701f3aed96b0d1fb913c3d9d0',
                              info['sha1'])
 
-    def _finish_upload(self, chunk_size, file_name):
+    def _finish_upload(self, chunk_size, file_name) -> None:
         """Finish the upload."""
         # Finish/continue upload with the given file key
         page = pywikibot.FilePage(self.site, 'MP_sounds-pwb.png')
@@ -92,7 +92,7 @@ class TestUpload(TestCase):
                          comment='pywikibot test', chunk_size=chunk_size,
                          ignore_warnings=True, report_success=False)
 
-    def _test_continue_filekey(self, chunk_size):
+    def _test_continue_filekey(self, chunk_size) -> None:
         """Test uploading a chunk first and finish in a separate upload."""
         self._init_upload(chunk_size)
         self._finish_upload(chunk_size, self.sounds_png)

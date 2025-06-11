@@ -289,7 +289,7 @@ class LinkCheckThread(threading.Thread):
             cls.hosts[name] = max(now, timestamp) + 6
         return max(0, timestamp - now)
 
-    def run(self):
+    def run(self) -> None:
         """Run the bot."""
         time.sleep(self.get_delay(self.name))
         try:

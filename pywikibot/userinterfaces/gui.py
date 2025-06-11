@@ -259,7 +259,7 @@ class TextEditor(ScrolledText):
         self.tag_add(tkinter.SEL, start, end)
         self.focus_set()
 
-    def goto_line_event(self, event):
+    def goto_line_event(self, event) -> str | None:
         """Perform goto line operation."""
         lineno = simpledialog.askinteger('Goto', 'Go to line number:',
                                          parent=self)

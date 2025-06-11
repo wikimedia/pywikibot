@@ -305,7 +305,7 @@ def get_authentication(uri: str) -> tuple[str, str] | None:
     return None
 
 
-def error_handling_callback(response):
+def error_handling_callback(response) -> None:
     """Raise exceptions and log alerts.
 
     :param response: Response returned by Session.request().

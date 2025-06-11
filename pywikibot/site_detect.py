@@ -273,7 +273,7 @@ class WikiHTMLPageParser(HTMLParser):
             self.set_api_url(attrs['src'])
 
 
-def check_response(response):
+def check_response(response) -> None:
     """Raise ClientError or ServerError depending on http status.
 
     .. versionadded:: 3.0

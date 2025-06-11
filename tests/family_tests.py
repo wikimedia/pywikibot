@@ -163,7 +163,7 @@ class TestFamilyUrlRegex(PatchingTestCase):
                                             True)
         return site
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup default article path."""
         super().setUp()
         self.articlepath = '/wiki/$1'

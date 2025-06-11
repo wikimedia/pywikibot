@@ -60,7 +60,7 @@ class TestDeletionBotUser(ScriptMainTestCase):
     write = True
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Set up test class."""
         super().setUpClass()
         cls.page = pywikibot.Page(cls.site, 'User:Unicodesnowman/DeleteMark')
@@ -68,13 +68,13 @@ class TestDeletionBotUser(ScriptMainTestCase):
             cls.save_page()  # pragma: no cover
 
     @classmethod
-    def tearDownClass(cls):
+    def tearDownClass(cls) -> None:
         """Tear down test class."""
         cls.save_page()
         super().tearDownClass()
 
     @classmethod
-    def save_page(cls):
+    def save_page(cls) -> None:
         """Reset the test page content."""
         cls.page.text = 'Pywikibot deletion test.'
         cls.page.save('Pywikibot unit test')
@@ -100,14 +100,14 @@ class TestDeletionBot(DefaultSiteTestCase):
     undelete_args = []
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Patch APISite.login."""
         patcher = patch.object(pywikibot.site.APISite, 'login')
         cls.addClassCleanup(patcher.stop)
         patcher.start()
         super().setUpClass()
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up unit test."""
         self._original_delete = pywikibot.Page.delete
         self._original_undelete = pywikibot.Page.undelete
@@ -115,7 +115,7 @@ class TestDeletionBot(DefaultSiteTestCase):
         pywikibot.Page.undelete = undelete_dummy
         super().setUp()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Tear down unit test."""
         pywikibot.Page.delete = self._original_delete
         pywikibot.Page.undelete = self._original_undelete
@@ -133,14 +133,14 @@ class TestDeletionBot(DefaultSiteTestCase):
             self.assertEqual(self.undelete_args, ['[[FoooOoOooO]]', 'foo'])
 
 
-def delete_dummy(self, reason, prompt, mark, automatic_quit):
+def delete_dummy(self, reason, prompt, mark, automatic_quit) -> int:
     """Dummy delete method."""
     TestDeletionBot.delete_args = [self.title(as_link=True), reason, prompt,
                                    mark, automatic_quit]
     return 0
 
 
-def undelete_dummy(self, reason):
+def undelete_dummy(self, reason) -> None:
     """Dummy undelete method."""
     TestDeletionBot.undelete_args = [self.title(as_link=True), reason]
 

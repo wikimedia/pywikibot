@@ -45,7 +45,7 @@ class UnlinkBot(SingleSiteBot, BaseUnlinkBot):
 
     summary_key = 'unlink-unlinking'
 
-    def __init__(self, page_title: str, **kwargs):
+    def __init__(self, page_title: str, **kwargs) -> None:
         """Initialize a UnlinkBot instance with the given page to unlink."""
         super().__init__(**kwargs)
         self.pageToUnlink = pywikibot.Page(self.site, page_title)  # noqa: N803
@@ -57,7 +57,7 @@ class UnlinkBot(SingleSiteBot, BaseUnlinkBot):
         """Return the title parameter."""
         return {'title': self.pageToUnlink.title()}
 
-    def treat_page(self):
+    def treat_page(self) -> None:
         """Remove links pointing to the configured page from the given page."""
         self.unlink(self.pageToUnlink)
 

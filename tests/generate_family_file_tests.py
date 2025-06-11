@@ -23,7 +23,7 @@ class FamilyTestGenerator(generate_family_file.FamilyFileGenerator):
 
     """Family file test creator."""
 
-    def getapis(self):
+    def getapis(self) -> None:
         """Only load up to additional ten different wikis randomly."""
         save = self.langs
 
@@ -48,7 +48,7 @@ class FamilyTestGenerator(generate_family_file.FamilyFileGenerator):
         self.prefixes = [item['prefix'] for item in self.langs]
         self.langs = save
 
-    def writefile(self, verify):
+    def writefile(self, verify) -> None:
         """Pass writing."""
 
 
@@ -59,14 +59,14 @@ class TestGenerateFamilyFile(DefaultSiteTestCase):
     familyname = 'testgff'
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Set up tests class."""
         super().setUpClass()
         # test fails on wowwiki (T297042)
         if cls.site.family.name == 'wowwiki':
             raise unittest.SkipTest(f'skipping {cls.site} due to T297042')
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up tests."""
         super().setUp()
         answer = 's' if isinstance(self.site.family, WikimediaFamily) else 'y'

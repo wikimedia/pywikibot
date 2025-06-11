@@ -493,7 +493,7 @@ class SubEntityCollection(MutableSequence):
 
     """Ordered collection of sub-entities indexed by their ids."""
 
-    def __init__(self, repo, data=None):
+    def __init__(self, repo, data=None) -> None:
         """Initializer.
 
         :param repo: Wikibase site
@@ -508,7 +508,7 @@ class SubEntityCollection(MutableSequence):
         if data:
             self.extend(data)
 
-    def _validate_isinstance(self, obj):
+    def _validate_isinstance(self, obj) -> None:
         if not isinstance(obj, self.type_class):
             raise TypeError(
                 f'{type(self).__name__} should only hold instances of '
@@ -524,10 +524,10 @@ class SubEntityCollection(MutableSequence):
                 raise ValueError(f'No entity with id {index} was found') from e
         return self._data[index]
 
-    def __setitem__(self, index, value):
+    def __setitem__(self, index, value) -> None:
         raise NotImplementedError
 
-    def __delitem__(self, index):
+    def __delitem__(self, index) -> None:
         if isinstance(index, str):
             try:
                 index = self._by_key[index]
@@ -537,10 +537,10 @@ class SubEntityCollection(MutableSequence):
         del self._data[index]
         del self._by_key[obj.id]
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._data)
 
-    def insert(self, index, obj):
+    def insert(self, index, obj) -> None:
         """Insert a sub-entity to the collection."""
         self._validate_isinstance(obj)
         self._data.insert(index, obj)

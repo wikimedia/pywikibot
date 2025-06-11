@@ -530,7 +530,7 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
                 urlobj.close()
                 os.unlink(infile)
 
-    def setup(self):
+    def setup(self) -> None:
         """Read dead links from file."""
         try:
             path = Path(listof404pages)
@@ -542,7 +542,7 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
                 'http://www.twoevils.org/files/wikipedia/404-links.txt.gz\n'
                 'and to unzip it in the same directory')
 
-    def skip_page(self, page):
+    def skip_page(self, page) -> bool:
         """Skip unwanted pages."""
         if super().skip_page(page):
             return True

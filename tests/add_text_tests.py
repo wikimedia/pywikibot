@@ -45,7 +45,7 @@ class TestAddTextScript(TestCase):
 
     dry = True
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup test."""
         super().setUp()
         pywikibot.bot.ui.clear()
@@ -93,7 +93,7 @@ class TestAddTextScript(TestCase):
 
     @patch('pywikibot.input')
     @patch('pywikibot.handle_args', Mock(side_effect=lambda args: args))
-    def test_argument_prompt(self, input_mock):
+    def test_argument_prompt(self, input_mock) -> None:
         """Request an argument that requires a prompt."""
         input_mock.return_value = 'hello world'
 
@@ -141,7 +141,7 @@ class TestAddTextScript(TestCase):
         bot.setup()
         self.assertEqual('hello\nworld', bot.opt.text)
 
-    def common_setup_test_with_textfile(self, mock_file):
+    def common_setup_test_with_textfile(self, mock_file) -> None:
         """Exercise both with a -textfile argument."""
         bot = AddTextBot(textfile='/path/to/my/file.txt')
         # setup reads the file content
@@ -156,13 +156,13 @@ class TestAddTextScript(TestCase):
                          f'Test for Python 3.10 but {PYTHON_VERSION} given')
     @patch('pathlib.Path._accessor.open', new_callable=mock_open,
            read_data='file data')
-    def test_textfile_py10(self, mock_file):
+    def test_textfile_py10(self, mock_file) -> None:
         """Test with a -textfile argument for Python 3.10."""
         self.common_setup_test_with_textfile(mock_file)
 
     @unittest.skipIf(PYTHON_310, 'Test except for Python 3.10')
     @patch('io.open', new_callable=mock_open, read_data='file data')
-    def test_textfile_other(self, mock_file):
+    def test_textfile_other(self, mock_file) -> None:
         """Test with a -textfile argument for Python != 3.10."""
         self.common_setup_test_with_textfile(mock_file)
 

@@ -22,7 +22,7 @@ class RequestCacheTests(TestCase):
 
     net = False
 
-    def _check_cache_entry(self, entry):
+    def _check_cache_entry(self, entry) -> None:
         """Assert validity of the cache entry."""
         self.assertIsInstance(entry.site, BaseSite)
         self.assertIsInstance(entry.site._loginstatus, int)

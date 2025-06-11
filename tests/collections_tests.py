@@ -25,7 +25,7 @@ class DataCollectionTestCase(WikidataTestCase):
 
     collection_class = None
 
-    def _test_new_empty(self):
+    def _test_new_empty(self) -> None:
         """Test that new_empty method returns empty collection."""
         cls = self.collection_class
         result = cls.new_empty(self.get_repo())
@@ -43,7 +43,7 @@ class TestLanguageDict(DataCollectionTestCase):
 
     dry = True
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         super().setUp()
         self.site = self.get_site()
@@ -131,7 +131,7 @@ class TestAliasesDict(DataCollectionTestCase):
 
     dry = True
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         super().setUp()
         self.site = self.get_site()

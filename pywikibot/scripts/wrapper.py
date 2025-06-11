@@ -43,7 +43,7 @@ for tests to set the default site (see :phab:`T216825`)::
    enable external scripts via entry points.
 """
 #
-# (C) Pywikibot team, 2012-2024
+# (C) Pywikibot team, 2012-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -64,7 +64,7 @@ pwb = None
 site_package = False
 
 
-def check_pwb_versions(package: str):
+def check_pwb_versions(package: str) -> None:
     """Validate package version and scripts version.
 
     Rules:
@@ -113,7 +113,7 @@ def check_pwb_versions(package: str):
 # https://bitbucket.org/ned/coveragepy/src/2c5fb3a8b81c/setup.py?at=default#cl-31
 
 
-def run_python_file(filename: str, args: list[str], package=None):
+def run_python_file(filename: str, args: list[str], package=None) -> None:
     """Run a python file as if it were the main program on the command line.
 
     .. versionchanged:: 7.7
@@ -208,7 +208,9 @@ def handle_args(
     return fname, list(args[index:]), local, env
 
 
-def _print_requirements(requirements, script, variant):  # pragma: no cover
+def _print_requirements(requirements,
+                        script,
+                        variant) -> None:  # pragma: no cover
     """Print pip command to install requirements."""
     if not requirements:
         return
@@ -459,7 +461,7 @@ def find_filename(filename):
     return find_alternates(filename, path_list)
 
 
-def execute():
+def execute() -> bool:
     """Parse arguments, extract filename and run the script.
 
     .. versionadded:: 7.0
@@ -526,7 +528,7 @@ def execute():
     return True
 
 
-def main():
+def main() -> None:
     """Script entry point. Print doc if necessary.
 
     .. versionchanged:: 7.0
@@ -539,7 +541,7 @@ def main():
         print(__doc__)
 
 
-def run():  # pragma: no cover
+def run() -> None:  # pragma: no cover
     """Site package entry point. Print doc if necessary.
 
     .. versionadded:: 7.0

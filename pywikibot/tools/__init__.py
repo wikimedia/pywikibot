@@ -663,7 +663,7 @@ def file_mode_checker(
     mode: int = 0o600,
     quiet: bool = False,
     create: bool = False
-):
+) -> None:
     """Check file mode and update it, if needed.
 
     .. versionadded:: 3.0

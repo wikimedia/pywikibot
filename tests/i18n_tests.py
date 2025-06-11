@@ -23,7 +23,7 @@ class Site:
 
         """Nested class to hold the family name attribute."""
 
-    def __init__(self, code, family='wikipedia'):
+    def __init__(self, code, family='wikipedia') -> None:
         """Initializer."""
         self.code = code
         self.family = self.Family()
@@ -198,13 +198,13 @@ class UserInterfaceLangTestCase(TestCase):
 
     """Base class for tests using config.userinterface_lang."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Change the userinterface language to the site's code."""
         super().setUp()
         self.orig_userinterface_lang = pywikibot.config.userinterface_lang
         pywikibot.config.userinterface_lang = self.get_site().code
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Reset the userinterface language."""
         pywikibot.config.userinterface_lang = self.orig_userinterface_lang
         super().tearDown()
@@ -216,13 +216,13 @@ class TWNSetMessagePackageBase(TestCase):
 
     message_package = None
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Load the test translations."""
         self.orig_messages_package_name = i18n._messages_package_name
         i18n.set_messages_package(self.message_package)
         super().setUp()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Load the original translations back."""
         super().tearDown()
         i18n.set_messages_package(self.orig_messages_package_name)
@@ -233,7 +233,7 @@ class TWNTestCaseBase(TWNSetMessagePackageBase):
     """Base class for TranslateWiki tests."""
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Verify that the test translations are not empty."""
         if not isinstance(cls.message_package, str):
             raise TypeError(  # pragma: no cover
@@ -301,7 +301,7 @@ class InputTestCase(TWNTestCaseBase, UserInterfaceLangTestCase, PwbTestCase):
     message = 'pywikibot-enter-category-name'
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Verify that a translation does not yet exist."""
         super().setUpClass()
 
@@ -325,10 +325,10 @@ class MissingPackageTestCase(TWNSetMessagePackageBase,
 
     message_package = 'scripts.foobar.i18n'
 
-    def _capture_output(self, text, *args, **kwargs):
+    def _capture_output(self, text, *args, **kwargs) -> None:
         self.output_text = text
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Patch the output and input methods."""
         super().setUp()
         bot.set_interface('terminal')
@@ -339,7 +339,7 @@ class MissingPackageTestCase(TWNSetMessagePackageBase,
         bot.ui.stream_output = self._capture_output
         self.old_cc_setting = config.cosmetic_changes_mylang_only
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Restore the output and input methods."""
         config.cosmetic_changes_mylang_only = self.old_cc_setting
         bot.ui._raw_input = self.orig_raw_input

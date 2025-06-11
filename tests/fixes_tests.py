@@ -21,12 +21,12 @@ class TestFixes(TestCase):
 
     net = False
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Backup the current fixes."""
         super().setUp()
         self._old_fixes = fixes.fixes
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Recover the current fixes."""
         fixes.fixes = self._old_fixes
         super().tearDown()

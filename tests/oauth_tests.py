@@ -36,7 +36,7 @@ class OAuthSiteTestCase(TestCase):
         tokens = os.environ.get('PYWIKIBOT_TEST_OAUTH')
         return tuple(tokens.split(':')) if tokens is not None else None
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Check if OAuth extension is installed and OAuth tokens are set."""
         super().setUp()
         self.site = self.get_site()
@@ -59,14 +59,14 @@ class OAuthEditTest(OAuthSiteTestCase):
 
     write = True
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test by checking site and initialization."""
         super().setUp()
         self._authenticate = config.authenticate
         oauth_tokens = self.consumer_token + self.access_token
         config.authenticate[self.site.hostname()] = oauth_tokens
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Tear down test by resetting config.authenticate."""
         super().tearDown()
         config.authenticate = self._authenticate

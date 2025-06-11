@@ -13,7 +13,7 @@ import unittest
 import warnings
 from contextlib import contextmanager, suppress
 from subprocess import PIPE, Popen, TimeoutExpired
-from typing import Any
+from typing import Any, NoReturn
 
 import pywikibot
 from pywikibot import config
@@ -65,7 +65,7 @@ def fixed_generator(iterable):
     return gen
 
 
-def entered_loop(iterable):
+def entered_loop(iterable) -> bool:
     """Return True if iterable contains items."""
     for _ in iterable:
         return True
@@ -81,7 +81,7 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
     patched into the call stack.
     """
 
-    def __init__(self, skip_list):
+    def __init__(self, skip_list) -> None:
         """Initializer.
 
         :param skip_list: List of objects to be skipped. The source of any
@@ -100,7 +100,7 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
         return self._skip_list
 
     @skip_list.setter
-    def skip_list(self, value):
+    def skip_list(self, value) -> None:
         """Set list of objects to be skipped.
 
         :param value: List of objects to be skipped
@@ -119,7 +119,7 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
 
     def __enter__(self):
         """Enter the context manager."""
-        def detailed_show_warning(*args, **kwargs):
+        def detailed_show_warning(*args, **kwargs) -> None:
             """Replacement handler for warnings.showwarning."""
             warn_msg = warnings.WarningMessage(*args, **kwargs)
 
@@ -176,7 +176,7 @@ class AssertAPIErrorContextManager:
     object given or calls the callable object.
     """
 
-    def __init__(self, code, info, msg, test_case, regex=None):
+    def __init__(self, code, info, msg, test_case, regex=None) -> None:
         """Create instance expecting the code and info."""
         self.code = code
         self.info = info
@@ -217,7 +217,7 @@ class DryParamInfo(dict):
 
     """Dummy class to use instead of :py:obj:`data.api.ParamInfo`."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """Initializer."""
         super().__init__(*args, **kwargs)
         self.action_modules = set()
@@ -252,7 +252,7 @@ class DummySiteinfo:
     <pywikibot.site._siteinfo.Siteinfo>`.
     """
 
-    def __init__(self, cache):
+    def __init__(self, cache) -> None:
         """Initializer."""
         self._cache = {key: (item, False) for key, item in cache.items()}
 
@@ -260,7 +260,7 @@ class DummySiteinfo:
         """Get item."""
         return self.get(key, False)
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key, value) -> None:
         """Set item."""
         self._cache[key] = (value, False)
 
@@ -284,7 +284,7 @@ class DummySiteinfo:
 
         raise KeyError(key)
 
-    def __contains__(self, key):
+    def __contains__(self, key) -> bool:
         """Return False."""
         return False
 
@@ -295,11 +295,11 @@ class DummySiteinfo:
         """
         return key in self._cache
 
-    def is_recognised(self, key):
+    def is_recognised(self, key) -> None:
         """Return None."""
         return
 
-    def get_requested_time(self, key):
+    def get_requested_time(self, key) -> bool:
         """Return False."""
         return False
 
@@ -308,7 +308,7 @@ class DryRequest(CachedRequest):
 
     """Dummy class to use instead of :py:obj:`data.api.Request`."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """Initializer."""
         _original_Request.__init__(self, *args, **kwargs)
 
@@ -317,14 +317,14 @@ class DryRequest(CachedRequest):
         """Skip CachedRequest implementation."""
         return _original_Request.create_simple(req_site, **kwargs)
 
-    def _expired(self, dt):
+    def _expired(self, dt) -> bool:
         """Never invalidate cached data."""
         return False
 
     def _write_cache(self, data) -> None:
         """Never write data but just do nothing."""
 
-    def submit(self):
+    def submit(self) -> NoReturn:
         """Prevented method."""
         raise Exception(f'DryRequest rejecting request: {self._params!r}')
 
@@ -335,7 +335,7 @@ class DrySite(pywikibot.site.APISite):
 
     _loginstatus = LoginStatus.NOT_ATTEMPTED
 
-    def __init__(self, code, fam, user):
+    def __init__(self, code, fam, user) -> None:
         """Initializer."""
         super().__init__(code, fam, user)
         self._userinfo = pywikibot.tools.collections.EMPTY_DEFAULT
@@ -370,7 +370,7 @@ class DrySite(pywikibot.site.APISite):
                     author_ns, 'Author', case=self.siteinfo['case'])
         return ns_dict
 
-    def linktrail(self):
+    def linktrail(self) -> str:
         """Return default linkrail."""
         return '[a-z]*'
 
@@ -379,7 +379,7 @@ class DrySite(pywikibot.site.APISite):
         """Return dry data."""
         return self._userinfo
 
-    def version(self):
+    def version(self) -> str:
         """Return a big dummy version string."""
         return '999.999'
 
@@ -412,7 +412,7 @@ class DrySite(pywikibot.site.APISite):
                                   interface=DryDataSite)
         return None
 
-    def login(self, *args, cookie_only=False, **kwargs):
+    def login(self, *args, cookie_only=False, **kwargs) -> None:
         """Overwrite login which is called when a site is initialized.
 
         .. versionadded:: 8.0.4
@@ -454,12 +454,12 @@ class FakeLoginManager(pywikibot.login.ClientLoginManager):
     """Loads a fake password."""
 
     @property
-    def password(self):
+    def password(self) -> str:
         """Get the fake password."""
         return 'foo'
 
     @password.setter
-    def password(self, value):
+    def password(self, value) -> None:
         """Ignore password changes."""
 
 

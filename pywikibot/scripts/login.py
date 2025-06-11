@@ -95,7 +95,7 @@ def _oauth_login(site) -> None:
         )
 
 
-def login_one_site(code, family, oauth, logout, autocreate):
+def login_one_site(code, family, oauth, logout, autocreate) -> None:
     """Login on one site."""
     try:
         site = pywikibot.Site(code, family)
