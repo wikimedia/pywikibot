@@ -77,7 +77,7 @@ class LogEntry(UserDict):
         """Combine site and logid as the hash."""
         return self.logid() ^ hash(self.site)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Compare if self is equal to other."""
         if not isinstance(other, LogEntry):
             pywikibot.debug(f"'{type(self).__name__}' cannot be compared with "
