@@ -265,8 +265,6 @@ class User(Page):
         """Block user.
 
         Refer :py:obj:`APISite.blockuser` method for parameters.
-
-        :return: None
         """
         try:
             self.site.blockuser(self, *args, **kwargs)
