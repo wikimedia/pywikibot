@@ -60,7 +60,8 @@ repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.11.13
     hooks:
-      - id: ruff
+      - id: ruff-check
+        alias: ruff
         args:
         - --fix
   - repo: https://github.com/asottile/pyupgrade
