@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the Wikidata parts of the page module."""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -716,7 +716,7 @@ class TestPropertyPage(WikidataTestCase):
         self.assertEqual(claim.type, 'wikibase-property')
         self.assertEqual(claim.target, property_page)
 
-    @unittest.expectedFailure
+    @unittest.expectedFailure  # T145971
     def test_exists(self) -> None:
         """Test the exists method of PropertyPage."""
         wikidata = self.get_repo()

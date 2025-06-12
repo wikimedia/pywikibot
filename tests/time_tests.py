@@ -163,7 +163,7 @@ class TestTimestamp(TestCase):
         self.assertEqual(date, str(t1.date()))
         self.assertEqual(time, str(t1.time()))
 
-    @unittest.expectedFailure
+    @unittest.expectedFailure  # T396723
     def test_iso_format_with_sep(self) -> None:
         """Test conversion from and to ISO format with separator."""
         sep = '*'

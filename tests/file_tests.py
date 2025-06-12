@@ -247,7 +247,7 @@ class TestFilePageLatestFileInfo(TestCase):
                          'https://upload.wikimedia.org/wikipedia/commons/'
                          'd/d3/Albert_Einstein_Head.jpg')
 
-    @unittest.expectedFailure
+    @unittest.expectedFailure  # T391761
     def test_get_file_url_thumburl_from_width(self) -> None:
         """Get File thumburl from width."""
         self.assertTrue(self.image.exists())
@@ -259,7 +259,7 @@ class TestFilePageLatestFileInfo(TestCase):
         self.assertEqual(self.image.latest_file_info.thumbwidth, 100)
         self.assertEqual(self.image.latest_file_info.thumbheight, 133)
 
-    @unittest.expectedFailure
+    @unittest.expectedFailure  # T391761
     def test_get_file_url_thumburl_from_height(self) -> None:
         """Get File thumburl from height."""
         self.assertTrue(self.image.exists())
@@ -271,7 +271,7 @@ class TestFilePageLatestFileInfo(TestCase):
         self.assertEqual(self.image.latest_file_info.thumbwidth, 75)
         self.assertEqual(self.image.latest_file_info.thumbheight, 100)
 
-    @unittest.expectedFailure
+    @unittest.expectedFailure  # T391761
     def test_get_file_url_thumburl_from_url_param(self) -> None:
         """Get File thumburl from height."""
         self.assertTrue(self.image.exists())

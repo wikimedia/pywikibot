@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test cosmetic_changes module."""
 #
-# (C) Pywikibot team, 2015-2024
+# (C) Pywikibot team, 2015-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -432,7 +432,7 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
             '[[File:Foo.bar|250px|zentriert|Bar]]',
             self.cct.translateMagicWords('[[File:Foo.bar|250px|center|Bar]]'))
 
-    @unittest.expectedFailure
+    @unittest.expectedFailure  # T396715
     def test_translateMagicWords_fail(self) -> None:
         """Test translateMagicWords method.
 
@@ -470,7 +470,7 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
         self.assertEqual('[[sand]]box',
                          self.cct.cleanUpLinks('[[Sand|sand]]box'))
 
-    @unittest.expectedFailure
+    @unittest.expectedFailure  # T396714
     def test_cleanup_links(self) -> None:
         """Test cleanUpLinks method.
 

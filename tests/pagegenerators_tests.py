@@ -1726,7 +1726,7 @@ class TestLinksearchPageGenerator(TestCase):
     family = 'wikipedia'
     code = 'en'
 
-    @unittest.skip('Needs to be adapted for T14810')
+    @unittest.expectedFailure  # T396728
     def test_weblink(self) -> None:
         """Test -weblink."""
         cases = (('wikipedia.org', 'http://wikipedia.org'),

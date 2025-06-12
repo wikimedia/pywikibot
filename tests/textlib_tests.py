@@ -71,7 +71,7 @@ class TestSectionFunctions(TestCase):
         self.assertNotContains('Minor_Edits',
                                'section hashes are case-sensitive')
 
-    @unittest.expectedFailure  # TODO: T133276
+    @unittest.expectedFailure  # T133276
     def test_encoded_chars_in_section(self) -> None:
         """Test encoded chars in section."""
         self.assertContains('Talk_.28discussion.29_pages',
@@ -874,7 +874,7 @@ class TestReplaceLinks(TestCase):
                                   self.get_site('wt')),
             '[[Bar]] and [[Bar|bar]]')
 
-    @unittest.expectedFailure
+    @unittest.expectedFailure  # T396719
     def test_label_diff_namespace(self) -> None:
         """Test that it uses the old label when the new doesn't match."""
         # These tests require to get the actual part which is before the title
@@ -1369,7 +1369,7 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
                 'x', 'y', ['file'], site=self.site),
             '[[File:a|[[foo]] [[bar [invalid ]].x]][[y]]')
 
-    @unittest.expectedFailure
+    @unittest.expectedFailure  # T396721
     def test_replace_tag_file_failure(self) -> None:
         """Test showing limits of the file link regex."""
         # When the double brackets are unbalanced, the regex
