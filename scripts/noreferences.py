@@ -202,8 +202,8 @@ placeBeforeSections = {
         'Notas',
     ],
     'ru': [
-        'Ссылки',
         'Литература',
+        'Ссылки',
     ],
     'sd': [
         'وڌيڪ ڏسو',
@@ -324,11 +324,6 @@ referencesSections = {
             'Footnotes',
             'Notes',
         ],
-        'ru': [
-            'Примечания',
-            'Сноски',
-            'Источники',
-        ],
         'eo': [
             'Referencoj',
         ],
@@ -407,6 +402,11 @@ referencesSections = {
         ],
         'pt': [
             'Referências',
+        ],
+        'ru': [
+            'Примечания',
+            'Сноски',
+            'Источники',
         ],
         'sd': [
             'حوالا',
