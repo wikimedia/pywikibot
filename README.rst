@@ -25,6 +25,10 @@
 .. image:: https://img.shields.io/github/last-commit/wikimedia/pywikibot
    :alt: Last commit
    :target: https://gerrit.wikimedia.org/r/plugins/gitiles/pywikibot/core/
+.. image:: https://snyk.io/advisor/python/pywikibot/badge.svg
+   :target: https://snyk.io/advisor/python/pywikibot
+   :alt: pywikibot
+
 
 *********
 Pywikibot
