@@ -42,10 +42,10 @@ class TestBotTreatExit:
     def _treat(self, pages, post_treat=None):
         """Get tests which are executed on each treat.
 
-        It uses pages as an iterator and compares the page given to the page
-        returned by pages iterator. It checks that the bot's _site and site
-        attributes are set to the page's site. If _treat_site is set with a
-        Site it compares it to that one too.
+        It uses pages as an iterator and compares the page given to the
+        page returned by pages iterator. It checks that the bot's _site
+        and site attributes are set to the page's site. If _treat_site
+        is set with a Site it compares it to that one too.
 
         Afterwards it calls post_treat so it's possible to do additional
         checks.
@@ -72,11 +72,11 @@ class TestBotTreatExit:
     def _treat_page(self, pages=True, post_treat=None):
         """Adjust to CurrentPageBot signature.
 
-        It uses almost the same logic as _treat but returns a wrapper function
-        which itself calls the function returned by _treat.
+        It uses almost the same logic as _treat but returns a wrapper
+        function which itself calls the function returned by _treat.
 
-        The pages may be set to True which sill use _treat_generator as the
-        source for the pages.
+        The pages may be set to True which sill use _treat_generator as
+        the source for the pages.
         """
         def treat_page() -> None:
             treat(self.bot.current_page)

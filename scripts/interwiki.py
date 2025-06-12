@@ -408,7 +408,8 @@ class LinkMustBeRemoved(SaveError):
     """An interwiki link has to be removed manually.
 
     An interwiki link has to be removed, but this can't be done because
-    of user preferences or because the user chose not to change the page.
+    of user preferences or because the user chose not to change the
+    page.
     """
 
 
@@ -641,8 +642,8 @@ class Subject(interwiki_graph.Subject):
     def __init__(self, origin=None, hints=None, conf=None) -> None:
         """Initializer.
 
-        Takes as arguments the Page on the home wiki
-        plus optionally a list of hints for translation
+        Takes as arguments the Page on the home wiki plus optionally a
+        list of hints for translation
         """
         self.conf = conf
 
@@ -674,10 +675,10 @@ class Subject(interwiki_graph.Subject):
     def getFoundDisambig(self, site):
         """Return the first disambiguation found.
 
-        If we found a disambiguation on the given site while working on the
-        subject, this method returns it. If several ones have been found, the
-        first one will be returned.
-        Otherwise, None will be returned.
+        If we found a disambiguation on the given site while working on
+        the subject, this method returns it. If several ones have been
+        found, the first one will be returned. Otherwise, None will be
+        returned.
         """
         for tree in [self.done, self.pending]:
             for page in tree.filter(site):
@@ -688,10 +689,10 @@ class Subject(interwiki_graph.Subject):
     def getFoundNonDisambig(self, site):
         """Return the first non-disambiguation found.
 
-        If we found a non-disambiguation on the given site while working on the
-        subject, this method returns it. If several ones have been found, the
-        first one will be returned.
-        Otherwise, None will be returned.
+        If we found a non-disambiguation on the given site while working
+        on the subject, this method returns it. If several ones have
+        been found, the first one will be returned. Otherwise, None will
+        be returned.
         """
         for tree in [self.done, self.pending]:
             for page in tree.filter(site):
@@ -705,9 +706,9 @@ class Subject(interwiki_graph.Subject):
     def getFoundInCorrectNamespace(self, site):
         """Return the first page in the extended namespace.
 
-        If we found a page that has the expected namespace on the given site
-        while working on the subject, this method returns it. If several ones
-        have been found, the first one will be returned.
+        If we found a page that has the expected namespace on the given
+        site while working on the subject, this method returns it. If
+        several ones have been found, the first one will be returned.
         Otherwise, None will be returned.
         """
         for tree in [self.done, self.pending, self.todo]:
@@ -795,8 +796,8 @@ class Subject(interwiki_graph.Subject):
 
         If it is added, update the counter accordingly.
 
-        Also remembers where we found the page, regardless of whether it had
-        already been found before or not.
+        Also remembers where we found the page, regardless of whether it
+        had already been found before or not.
 
         Returns True if the page is new.
         """
@@ -842,8 +843,8 @@ class Subject(interwiki_graph.Subject):
     def namespaceMismatch(self, linkingPage, linkedPage, counter) -> bool:
         """Check whether or not the given page has a different namespace.
 
-        Returns True if the namespaces are different and the user
-        has selected not to follow the linked page.
+        Returns True if the namespaces are different and the user has
+        selected not to follow the linked page.
         """
         if linkedPage in self.found_in:
             # We have seen this page before, don't ask again.
@@ -1056,7 +1057,10 @@ class Subject(interwiki_graph.Subject):
                         self.hintedsites.add(page.site)
 
     def redir_checked(self, page, counter) -> bool:
-        """Check and handle redirect. Return True if check is done."""
+        """Check and handle redirect.
+
+        Return True if check is done.
+        """
         if page.isRedirectPage():
             redirect_target = page.getRedirectTarget()
             redir = ''
@@ -1241,13 +1245,12 @@ class Subject(interwiki_graph.Subject):
         """Notify that the promised batch of pages was loaded.
 
         This is called by a worker to tell us that the promised batch of
-        pages was loaded.
-        In other words, all the pages in self.pending have already
-        been preloaded.
+        pages was loaded. In other words, all the pages in self.pending
+        have already been preloaded.
 
-        The only argument is an instance of a counter class, that has methods
-        minus() and plus() to keep counts of the total work todo.
-
+        The only argument is an instance of a counter class, that has
+        methods minus() and plus() to keep counts of the total work
+        todo.
         """
         # Loop over all the pages that should have been taken care of
         for page in self.pending:
@@ -1818,8 +1821,8 @@ class InterwikiBot:
     def setPageGenerator(self, pageGenerator, number=None, until=None) -> None:
         """Add a generator of subjects.
 
-        Once the list of subjects gets too small,
-        this generator is called to produce more Pages.
+        Once the list of subjects gets too small, this generator is
+        called to produce more Pages.
         """
         self.pageGenerator = pageGenerator
         self.generateNumber = number
@@ -1833,9 +1836,8 @@ class InterwikiBot:
     def generateMore(self, number) -> None:
         """Generate more subjects.
 
-        This is called internally when the
-        list of subjects becomes too small, but only if there is a
-        PageGenerator
+        This is called internally when the list of subjects becomes too
+        small, but only if there is a PageGenerator
         """
         fs = self.firstSubject()
         if fs:
@@ -1896,8 +1898,8 @@ class InterwikiBot:
     def maxOpenSite(self):
         """Return the site that has the most open queries plus the number.
 
-        If there is nothing left, return None.
-        Only sites that are todo for the first Subject are returned.
+        If there is nothing left, return None. Only sites that are todo
+        for the first Subject are returned.
         """
         if not self.firstSubject():
             return None
@@ -1950,8 +1952,7 @@ class InterwikiBot:
     def oneQuery(self) -> bool:
         """Perform one step in the solution process.
 
-        Returns True if pages could be preloaded, or false
-        otherwise.
+        Returns True if pages could be preloaded, or false otherwise.
         """
         # First find the best language to work on
         site = self.selectQuerySite()
@@ -2102,10 +2103,10 @@ def botMayEdit(page) -> bool:
 def page_empty_check(page) -> bool:
     """Return True if page should be skipped as it is almost empty.
 
-    Pages in content namespaces are considered empty if they contain less than
-    50 characters, and other pages are considered empty if they are not
-    category pages and contain less than 4 characters excluding interlanguage
-    links and categories.
+    Pages in content namespaces are considered empty if they contain
+    less than 50 characters, and other pages are considered empty if
+    they are not category pages and contain less than 4 characters
+    excluding interlanguage links and categories.
     """
     txt = page.text
     # Check if the page is in content namespace
@@ -2135,8 +2136,8 @@ class InterwikiDumps(OptionHandler):
     def __init__(self, **kwargs) -> None:
         """Initializer.
 
-        :keyword do_continue: If true, continue alphabetically starting at the
-            last of the dumped pages.
+        :keyword do_continue: If true, continue alphabetically starting
+            at the last of the dumped pages.
         """
         try:
             self.site = kwargs.pop('site')
@@ -2218,8 +2219,8 @@ class InterwikiDumps(OptionHandler):
         """Write dump file.
 
         :param iterable: an iterable of page titles to be dumped.
-        :param append: if a dump already exits, append the page titles to it
-            if True else overwrite it.
+        :param append: if a dump already exits, append the page titles
+            to it if True else overwrite it.
         """
         filename = os.path.join(self.path,
                                 self.FILE_PATTERN.format(site=self.site))

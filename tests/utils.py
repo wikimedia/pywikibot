@@ -76,16 +76,16 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
 
     """Warning context manager that adjusts source of warning.
 
-    The source of the warning will be moved further down the
-    stack to skip a list of objects that have been monkey
-    patched into the call stack.
+    The source of the warning will be moved further down the stack to
+    skip a list of objects that have been monkey patched into the call
+    stack.
     """
 
     def __init__(self, skip_list) -> None:
         """Initializer.
 
-        :param skip_list: List of objects to be skipped. The source of any
-            warning that matches the skip_list won't be adjusted.
+        :param skip_list: List of objects to be skipped. The source of
+            any warning that matches the skip_list won't be adjusted.
         :type skip_list: list of object or (obj, str, int, int)
         """
         super().__init__(record=True)

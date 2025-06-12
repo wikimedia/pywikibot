@@ -36,7 +36,6 @@ The image "Flag.svg" has been uploaded, making the old "Flag.jpg"
 obsolete:
 
     python pwb.py image Flag.jpg Flag.svg
-
 """
 #
 # (C) Pywikibot team, 2013-2024
@@ -70,8 +69,8 @@ class ImageRobot(ReplaceBot):
         :param generator: the pages to work on
         :type generator: iterable
         :param old_image: the title of the old image (without namespace)
-        :param new_image: the title of the new image (without namespace), or
-                          None if you want to remove the image
+        :param new_image: the title of the new image (without
+            namespace), or None if you want to remove the image
         """
         self.available_options.update({
             'summary': None,

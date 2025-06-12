@@ -608,7 +608,8 @@ def get_item_header(header: str | list[str]) -> str:
     """Get the item header (label, description, alias in user language).
 
     :param header: item label, description, or alias language list
-    :return: label, description, or alias in the first available language
+    :return: label, description, or alias in the first available
+        language
     """
     # Return one of the preferred labels
     for lang in main_languages:
@@ -627,7 +628,8 @@ def get_item_header_lang(header: str | list[str], lang: str) -> str:
 
     :param header: item label, description, or alias language list
     :param lang: language code
-    :return: label, description, or alias in the first available language
+    :return: label, description, or alias in the first available
+        language
     """
     # Try to get any explicit language code
     if lang in header:
@@ -1458,8 +1460,8 @@ def add_claims(isbn_data: dict[str, Any]) -> int:  # noqa: C901
 def show_final_information(isbn_number: str) -> None:
     """Print additional information.
 
-    Get optional information.Could generate too many transactions errors;
-    so the process might stop at the first error.
+    Get optional information.Could generate too many transactions
+    errors; so the process might stop at the first error.
     """
     # Book description
     isbn_description = isbnlib.desc(isbn_number)

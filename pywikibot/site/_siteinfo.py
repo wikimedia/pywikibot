@@ -22,11 +22,12 @@ class Siteinfo(Container):
 
     """A 'dictionary' like container for siteinfo.
 
-    This class queries the server to get the requested siteinfo property.
-    Optionally it can cache this directly in the instance so that later
-    requests don't need to query the server.
+    This class queries the server to get the requested siteinfo
+    property. Optionally it can cache this directly in the instance so
+    that later requests don't need to query the server.
 
-    All values of the siteinfo property 'general' are directly available.
+    All values of the siteinfo property 'general' are directly
+    available.
     """
 
     WARNING_REGEX = re.compile(r'Unrecognized values? for parameter '
@@ -70,7 +71,10 @@ class Siteinfo(Container):
 
     @staticmethod
     def _post_process(prop, data) -> None:
-        """Do some default handling of data. Directly modifies data."""
+        """Do some default handling of data.
+
+        Directly modifies data.
+        """
         # Be careful with version tests inside this here as it might need to
         # query this method to actually get the version number
 
@@ -316,7 +320,10 @@ class Siteinfo(Container):
         return True
 
     def is_recognised(self, key: str) -> bool | None:
-        """Return if 'key' is a valid property name. 'None' if not cached."""
+        """Return if 'key' is a valid property name.
+
+        'None' if not cached.
+        """
         time = self.get_requested_time(key)
         return None if time is None else bool(time)
 

@@ -244,9 +244,9 @@ def getversion_onlinerepo(path: str = 'branches/master') -> str:
 def get_module_filename(module) -> str | None:
     """Retrieve filename from an imported pywikibot module.
 
-    It uses the __file__ attribute of the module. If it's file extension ends
-    with py and another character the last character is discarded when the py
-    file exist.
+    It uses the __file__ attribute of the module. If it's file extension
+    ends with py and another character the last character is discarded
+    when the py file exist.
 
     :param module: The module instance.
     :type module: module
@@ -268,7 +268,8 @@ def get_module_mtime(module):
 
     :param module: The module instance.
     :type module: module
-    :return: The modification time if it's a pywikibot module otherwise None.
+    :return: The modification time if it's a pywikibot module otherwise
+        None.
     :rtype: datetime or None
     """
     filename = get_module_filename(module)

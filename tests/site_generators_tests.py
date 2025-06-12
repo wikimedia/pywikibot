@@ -2209,7 +2209,10 @@ class TestPagePreloading(DefaultSiteTestCase):
                 break
 
     def test_preload_invalid_titles_without_pageids(self) -> None:
-        """Test sending invalid titles. No warnings issued, but it should."""
+        """Test sending invalid titles.
+
+        No warnings issued, but it should.
+        """
         mysite = self.get_site()
         mainpage = self.get_mainpage()
         links = list(mysite.pagelinks(mainpage, total=10))

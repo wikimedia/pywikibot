@@ -214,17 +214,16 @@ class PrivateWikiTestCase(PatchingTestCase):
     def test_T235768_failure(self) -> None:
         """Test generate_family_file works for private wikis.
 
-        generate_family_file.FamilyFileGenerator.run() does:
-          w = self.Wiki(self.base_url)
-          self.wikis[w.lang] = w
+        generate_family_file.FamilyFileGenerator.run() does:   w =
+        self.Wiki(self.base_url)   self.wikis[w.lang] = w
 
-        where self.Wiki is pywikibot.site_detect.MWSite.__init__.
-        That calls MWSite._parse_post_117() which sets lang, but
-        that call's wrapped to log exceptions and then continue
-        past them.  In T235768, the code that handles private
-        wikis raises an exception that's consumed in that way.
-        The value returned to FamilyFileGenerator.run() does not
-        have lang set, causing generate_family_file to bomb.
+        where self.Wiki is pywikibot.site_detect.MWSite.__init__. That
+        calls MWSite._parse_post_117() which sets lang, but that call's
+        wrapped to log exceptions and then continue past them.  In
+        T235768, the code that handles private wikis raises an exception
+        that's consumed in that way. The value returned to
+        FamilyFileGenerator.run() does not have lang set, causing
+        generate_family_file to bomb.
         """
         site = MWSite(self._weburl)
         self.assertIsInstance(site, MWSite)

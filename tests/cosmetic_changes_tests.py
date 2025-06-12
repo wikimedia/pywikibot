@@ -436,8 +436,8 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
     def test_translateMagicWords_fail(self) -> None:
         """Test translateMagicWords method.
 
-        The current implementation doesn't check whether the magic word is
-        inside a template.
+        The current implementation doesn't check whether the magic word
+        is inside a template.
         """
         self.assertEqual(
             '[[File:Foo.bar|{{Baz|thumb|foo}}]]',
@@ -474,8 +474,8 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
     def test_cleanup_links(self) -> None:
         """Test cleanUpLinks method.
 
-        This method fails for the given samples from library. Either
-        the method has to be changed or the examples must be fixed.
+        This method fails for the given samples from library. Either the
+        method has to be changed or the examples must be fixed.
         """
         tests = [
             ('text [[title]] text', 'text[[ title ]]text'),

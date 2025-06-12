@@ -16,7 +16,6 @@ This script understands various command-line arguments:
 -touch            Do a null edit on every page which has a Wikibase item.
                   Be careful, this option can trigger edit rates or captchas
                   if your account is not autoconfirmed.
-
 """
 #
 # (C) Pywikibot team, 2014-2024
@@ -96,8 +95,8 @@ class NewItemRobot(WikidataBot):
     def get_skipping_templates(self, site) -> set[pywikibot.Page]:
         """Get templates which leads the page to be skipped.
 
-        If the script is used for multiple sites, hold the skipping templates
-        as attribute.
+        If the script is used for multiple sites, hold the skipping
+        templates as attribute.
         """
         if site in self._skipping_templates:
             return self._skipping_templates[site]

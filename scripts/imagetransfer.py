@@ -181,14 +181,15 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
         :type generator: iterable
         :keyword target_site: Site to send image to, default none
         :type target_site: pywikibot.site.APISite
-        :keyword interwiki: Look for images in interwiki links, default false
+        :keyword interwiki: Look for images in interwiki links, default
+            false
         :type interwiki: boolean
-        :keyword keepname: Keep the filename and do not verify description
-            while replacing, default false
+        :keyword keepname: Keep the filename and do not verify
+            description while replacing, default false
         :type keepname: boolean
         :keyword force_if_shared: Upload the file even if it's currently
-            shared to the target site (e.g. when moving from Commons to another
-            wiki)
+            shared to the target site (e.g. when moving from Commons to
+            another wiki)
         :type force_if_shared: boolean
         :keyword asynchronous: Upload to stash.
         :type asynchronous: boolean

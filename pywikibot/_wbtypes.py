@@ -113,9 +113,9 @@ class Coordinate(WbRepresentation):
         :param name: The name
         :param dim: Dimension (in meters)
         :param site: The Wikibase site
-        :param globe_item: The Wikibase item for the globe, or the entity URI
-                           of this Wikibase item. Takes precedence over 'globe'
-                           if present.
+        :param globe_item: The Wikibase item for the globe, or the
+            entity URI of this Wikibase item. Takes precedence over
+            'globe' if present.
         :param primary: True for a primary set of coordinates
         """
         self.lat = lat
@@ -272,15 +272,16 @@ class Coordinate(WbRepresentation):
                        lazy_load: bool = False) -> pywikibot.ItemPage:
         """Return the ItemPage corresponding to the globe.
 
-        Note that the globe need not be in the same data repository as the
-        Coordinate itself.
+        Note that the globe need not be in the same data repository as
+        the Coordinate itself.
 
-        A successful lookup is stored as an internal value to avoid the need
-        for repeated lookups.
+        A successful lookup is stored as an internal value to avoid the
+        need for repeated lookups.
 
-        :param repo: the Wikibase site for the globe, if different from that
-            provided with the Coordinate.
-        :param lazy_load: Do not raise NoPage if ItemPage does not exist.
+        :param repo: the Wikibase site for the globe, if different from
+            that provided with the Coordinate.
+        :param lazy_load: Do not raise NoPage if ItemPage does not
+            exist.
         :return: pywikibot.ItemPage
         """
         if isinstance(self._entity, pywikibot.ItemPage):
@@ -792,8 +793,8 @@ class WbTime(WbRepresentation):
         """Create a WbTime from the JSON data given by the Wikibase API.
 
         :param data: Wikibase JSON
-        :param site: The Wikibase site. If not provided, retrieves the data
-            repository from the default site from user-config.py.
+        :param site: The Wikibase site. If not provided, retrieves the
+            data repository from the default site from user-config.py.
         """
         return cls.fromTimestr(data['time'], data['precision'],
                                data['before'], data['after'],
@@ -839,8 +840,8 @@ class WbQuantity(WbRepresentation):
         """Create a new WbQuantity object.
 
         :param amount: number representing this quantity
-        :param unit: the Wikibase item for the unit or the entity URI of this
-            Wikibase item.
+        :param unit: the Wikibase item for the unit or the entity URI of
+            this Wikibase item.
         :param error: the uncertainty of the amount (e.g. ±1)
         :param site: The Wikibase site
         """
@@ -882,15 +883,16 @@ class WbQuantity(WbRepresentation):
                       lazy_load: bool = False) -> pywikibot.ItemPage:
         """Return the ItemPage corresponding to the unit.
 
-        Note that the unit need not be in the same data repository as the
-        WbQuantity itself.
+        Note that the unit need not be in the same data repository as
+        the WbQuantity itself.
 
-        A successful lookup is stored as an internal value to avoid the need
-        for repeated lookups.
+        A successful lookup is stored as an internal value to avoid the
+        need for repeated lookups.
 
-        :param repo: the Wikibase site for the unit, if different from that
-            provided with the WbQuantity.
-        :param lazy_load: Do not raise NoPage if ItemPage does not exist.
+        :param repo: the Wikibase site for the unit, if different from
+            that provided with the WbQuantity.
+        :param lazy_load: Do not raise NoPage if ItemPage does not
+            exist.
         :return: pywikibot.ItemPage
         """
         if not isinstance(self._unit, str):

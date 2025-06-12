@@ -153,8 +153,9 @@ class APISite(
     def interwiki(self, prefix: str) -> BaseSite:
         """Return the site for a corresponding interwiki prefix.
 
-        :raises pywikibot.exceptions.SiteDefinitionError: if the url given in
-            the interwiki table doesn't match any of the existing families.
+        :raises pywikibot.exceptions.SiteDefinitionError: if the url
+            given in the interwiki table doesn't match any of the
+            existing families.
         :raises KeyError: if the prefix is not an interwiki prefix.
         """
         return self._interwikimap[prefix].site
@@ -182,12 +183,13 @@ class APISite(
     def local_interwiki(self, prefix: str) -> bool:
         """Return whether the interwiki prefix is local.
 
-        A local interwiki prefix is handled by the target site like a normal
-        link. So if that link also contains an interwiki link it does follow
-        it as long as it's a local link.
+        A local interwiki prefix is handled by the target site like a
+        normal link. So if that link also contains an interwiki link it
+        does follow it as long as it's a local link.
 
-        :raises pywikibot.exceptions.SiteDefinitionError: if the url given in
-            the interwiki table doesn't match any of the existing families.
+        :raises pywikibot.exceptions.SiteDefinitionError: if the url
+            given in the interwiki table doesn't match any of the
+            existing families.
         :raises KeyError: if the prefix is not an interwiki prefix.
         """
         return self._interwikimap[prefix].local
@@ -251,8 +253,8 @@ class APISite(
         except for 'g_content' which is passed as a normal parameter to
         the generator's Initializer.
 
-        :param gen_class: the type of generator to construct (must be
-            a subclass of pywikibot.data.api._RequestWrapper)
+        :param gen_class: the type of generator to construct (must be a
+            subclass of pywikibot.data.api._RequestWrapper)
         :param type_arg: query type argument to be passed to generator's
             constructor unchanged (not all types require this)
         :param namespaces: if not None, limit the query to namespaces in
@@ -284,8 +286,8 @@ class APISite(
     def _request_class(kwargs: dict[str, Any]) -> type[api.Request]:
         """Get the appropriate class.
 
-        Inside this class kwargs use the parameters mode but QueryGenerator may
-        use the old kwargs mode.
+        Inside this class kwargs use the parameters mode but
+        QueryGenerator may use the old kwargs mode.
         """
         # This checks expiry in kwargs and not kwargs['parameters'] so it won't
         # create a CachedRequest when there is an expiry in an API parameter
@@ -442,9 +444,9 @@ class APISite(
     def _relogin(self) -> None:
         """Force a login sequence without logging out, using the current user.
 
-        This is an internal function which is used to re-login when
-        the internal login state does not match the state we receive
-        from the site.
+        This is an internal function which is used to re-login when the
+        internal login state does not match the state we receive from
+        the site.
         """
         del self.userinfo
         self._loginstatus = login.LoginStatus.NOT_LOGGED_IN
@@ -654,7 +656,6 @@ class APISite(
           - rights: list of rights (could be empty)
           - messages: True if user has a new message on talk page (bool)
           - blockinfo: present if user is blocked (dict)
-
         """
         if not hasattr(self, '_userinfo'):
             uirequest = self.simple_request(
@@ -790,9 +791,10 @@ class APISite(
     def get_searched_namespaces(self, force: bool = False) -> set[Namespace]:
         """Retrieve the default searched namespaces for the user.
 
-        If no user is logged in, it returns the namespaces used by default.
-        Otherwise it returns the user preferences. It caches the last result
-        and returns it, if the username or login status hasn't changed.
+        If no user is logged in, it returns the namespaces used by
+        default. Otherwise it returns the user preferences. It caches
+        the last result and returns it, if the username or login status
+        hasn't changed.
 
         :param force: Whether the cache should be discarded.
         :return: The namespaces which are searched by default.
@@ -887,10 +889,11 @@ class APISite(
         :param start: The start value to compare
         :param end: The end value to compare
         :param reverse: The reverse option
-        :param is_ts: When comparing timestamps (with is_ts=True) the start
-            is usually greater than end. Comparing titles this is vice versa.
-        :raises AssertionError: start/end values are not comparabel types or
-            are in the wrong order
+        :param is_ts: When comparing timestamps (with is_ts=True) the
+            start is usually greater than end. Comparing titles this is
+            vice versa.
+        :raises AssertionError: start/end values are not comparabel
+            types or are in the wrong order
         """
         if not (isinstance(end, type(start)) or isinstance(start, type(end))):
             raise TypeError(
@@ -1026,8 +1029,8 @@ class APISite(
     def months_names(self) -> list[tuple[str, str]]:
         """Obtain month names from the site messages.
 
-        The list is zero-indexed, ordered by month in calendar, and should
-        be in the original site language.
+        The list is zero-indexed, ordered by month in calendar, and
+        should be in the original site language.
 
         :return: list of tuples (month name, abbreviation)
         """
@@ -1052,10 +1055,10 @@ class APISite(
     def list_to_text(self, args: typing.Iterable[str]) -> str:
         """Convert a list of strings into human-readable text.
 
-        The MediaWiki messages 'and' and 'word-separator' are used as separator
-        between the last two arguments.
-        If more than two arguments are given, other arguments are
-        joined using MediaWiki message 'comma-separator'.
+        The MediaWiki messages 'and' and 'word-separator' are used as
+        separator between the last two arguments. If more than two
+        arguments are given, other arguments are joined using MediaWiki
+        message 'comma-separator'.
 
         :param args: text to be expanded
         """
@@ -1083,9 +1086,9 @@ class APISite(
         """Parse the given text for preprocessing and rendering.
 
         e.g expand templates and strip comments if includecomments
-        parameter is not True. Keeps text inside
-        <nowiki></nowiki> tags unchanges etc. Can be used to parse
-        magic parser words like {{CURRENTTIMESTAMP}}.
+        parameter is not True. Keeps text inside <nowiki></nowiki> tags
+        unchanges etc. Can be used to parse magic parser words like
+        {{CURRENTTIMESTAMP}}.
 
         :param text: text to be expanded
         :param title: page title without section
@@ -1119,8 +1122,8 @@ class APISite(
     def server_time(self) -> pywikibot.Timestamp:
         """Return a Timestamp object representing the current server time.
 
-        It uses the 'time' property of the siteinfo 'general'. It'll force a
-        reload before returning the time.
+        It uses the 'time' property of the siteinfo 'general'. It'll
+        force a reload before returning the time.
 
         :return: the current server time
         """
@@ -1239,8 +1242,8 @@ class APISite(
 
     @property
     def mw_version(self) -> MediaWikiVersion:
-        """Return :meth:`version()<pywikibot.site._apisite.APISite.version>`
-        as a :class:`tools.MediaWikiVersion` object.
+        """Return :meth:`version()<pywikibot.site._apisite.APISite.version>` as
+        a :class:`tools.MediaWikiVersion` object.
 
         Cache the result for 24 hours.
         """  # noqa: D205, D400
@@ -1275,7 +1278,8 @@ class APISite(
     def data_repository(self) -> pywikibot.site.DataSite | None:
         """Return the data repository connected to this site.
 
-        :return: The data repository if one is connected or None otherwise.
+        :return: The data repository if one is connected or None
+            otherwise.
         """
         def handle_warning(
             mod: str,
@@ -1409,9 +1413,8 @@ class APISite(
         :param page: page object to be updated
         :param query: API query generator
         :param verify_imageinfo: if given, every pageitem is checked
-            whether 'imageinfo' is missing. In that case an exception
-            is raised.
-
+            whether 'imageinfo' is missing. In that case an exception is
+            raised.
         :raises NoPageError: 'missing' key is found in pageitem
         :raises PageRelatedError: 'imageinfo' is missing in pageitem
         """
@@ -2937,12 +2940,13 @@ class APISite(
 
         :param pages: list of Page objects
         :param redirects: Automatically resolve redirects.
-        :param converttitles: Convert titles to other variants if necessary.
-            Only works if the wiki's content language supports variant
-            conversion.
+        :param converttitles: Convert titles to other variants if
+            necessary. Only works if the wiki's content language
+            supports variant conversion.
         :param forcelinkupdate: Update the links tables.
-        :param forcerecursivelinkupdate: Update the links table, and update the
-            links tables for any page that uses this page as a template.
+        :param forcerecursivelinkupdate: Update the links table, and
+            update the links tables for any page that uses this page as
+            a template.
         :return: True if API returned expected response; False otherwise
         """
         req = self.simple_request(action='purge', titles=list(set(pages)))

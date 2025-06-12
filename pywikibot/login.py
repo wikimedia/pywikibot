@@ -90,12 +90,11 @@ class LoginManager:
         All parameters default to defaults in user-config.
 
         :param site: Site object to log into
-        :param user: username to use.
-            If user is None, the username is loaded from config.usernames.
+        :param user: username to use. If user is None, the username is
+            loaded from config.usernames.
         :param password: password to use
-
-        :raises pywikibot.exceptions.NoUsernameError: No username is configured
-            for the requested site.
+        :raises pywikibot.exceptions.NoUsernameError: No username is
+            configured for the requested site.
         """
         site = self.site = site or pywikibot.Site()
         if not user:
@@ -161,7 +160,8 @@ class LoginManager:
     def botAllowed(self) -> bool:
         """Check whether the bot is listed on a specific page.
 
-        This allows bots to comply with the policy on the respective wiki.
+        This allows bots to comply with the policy on the respective
+        wiki.
         """
         code, fam = self.site.code, self.site.family.name
         if code in botList.get(fam, []):
@@ -550,7 +550,6 @@ class BotPassword:
 
         :param suffix: Suffix of the login name
         :param password: bot password
-
         :raises _PasswordFileWarning: suffix improperly specified
         """
         if '@' in suffix:
@@ -584,9 +583,8 @@ class OauthLoginManager(LoginManager):
         :param site: Site object to log into
         :param user: consumer key
         :param password: consumer secret
-
-        :raises pywikibot.exceptions.NoUsernameError: No username is configured
-            for the requested site.
+        :raises pywikibot.exceptions.NoUsernameError: No username is
+            configured for the requested site.
         :raises ImportError: mwoauth isn't installed
         """
         if isinstance(mwoauth, ImportError):

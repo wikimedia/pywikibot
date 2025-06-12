@@ -281,9 +281,9 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
     def treat_page(self) -> None:
         """Add CommonsCat template to page.
 
-        Take a page. Go to all the interwiki page looking for a commonscat
-        template. When all the interwiki's links are checked and a proper
-        category is found add it to the page.
+        Take a page. Go to all the interwiki page looking for a
+        commonscat template. When all the interwiki's links are checked
+        and a proper category is found add it to the page.
         """
         page = self.current_page
         # Get the right templates for this page
@@ -412,8 +412,8 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
     def find_commons_category(self, page) -> str:
         """Find CommonsCat template on Wikibase repository.
 
-        Use Wikibase property to get the category if possible.
-        Otherwise check all langlinks to find it.
+        Use Wikibase property to get the category if possible. Otherwise
+        check all langlinks to find it.
 
         :return: name of a valid commons category
         """
@@ -461,9 +461,8 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
     def checkCommonscatLink(self, name: str = ''):
         """Return the name of a valid commons category.
 
-        If the page is a redirect this function tries to follow it.
-        If the page doesn't exists the function will return an empty string
-
+        If the page is a redirect this function tries to follow it. If
+        the page doesn't exists the function will return an empty string
         """
         if not name:  # target name is empty
             return ''

@@ -498,8 +498,8 @@ class QueryStringParamsTestCase(HttpbinTestCase):
 
     """Test the query string parameter of request methods.
 
-    The /get endpoint of httpbin returns JSON that can include an
-    'args' key with urldecoded query string parameters.
+    The /get endpoint of httpbin returns JSON that can include an 'args'
+    key with urldecoded query string parameters.
     """
 
     def setUp(self) -> None:
@@ -522,8 +522,8 @@ class QueryStringParamsTestCase(HttpbinTestCase):
     def test_unencoded_params(self) -> None:
         """Test fetch method with unencoded parameters to be encoded inside.
 
-        HTTPBin returns the args in their urldecoded form, so what we put in
-        should be the same as what we get out.
+        HTTPBin returns the args in their urldecoded form, so what we
+        put in should be the same as what we get out.
         """
         r = self.fetch(self.url, params={'fish&chips': 'delicious'})
 
@@ -538,8 +538,8 @@ class QueryStringParamsTestCase(HttpbinTestCase):
     def test_encoded_params(self) -> None:
         """Test fetch method with encoded parameters to be re-encoded inside.
 
-        HTTPBin returns the args in their urldecoded form, so what we put in
-        should be the same as what we get out.
+        HTTPBin returns the args in their urldecoded form, so what we
+        put in should be the same as what we get out.
         """
         r = self.fetch(self.url, params={'fish%26chips': 'delicious'})
 

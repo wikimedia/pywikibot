@@ -118,7 +118,8 @@ def get_site_and_lang(
     :param default_family: The default family which should be chosen.
     :param default_lang: The default site code which should be chosen,
         if the family supports it.
-    :param default_username: The default username which should be chosen.
+    :param default_username: The default username which should be
+        chosen.
     :return: The family, site code and username
     """
     known_families = sorted(pywikibot.config.family_files.keys())
@@ -468,9 +469,9 @@ def save_botpasswords(botpasswords: str, path: Path) -> None:
 def ask_for_dir_change(force) -> tuple[bool, bool]:
     """Ask whether the base directory is has to be changed.
 
-    Only give option for directory change if user-config.py or user-password
-    already exists in the directory. This will repeat if user-config.py also
-    exists in the requested directory.
+    Only give option for directory change if user-config.py or user-
+    password already exists in the directory. This will repeat if user-
+    config.py also exists in the requested directory.
 
     :param force: Skip asking for directory change
     :type force: bool

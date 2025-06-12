@@ -61,9 +61,10 @@ class TestLink(DefaultDrySiteTestCase):
 
     """Test parsing links with DrySite.
 
-    The DrySite is using the builtin namespaces which behaviour is controlled
-    in this repository so namespace aware tests do work, even when the actual
-    default site is using completely different namespaces.
+    The DrySite is using the builtin namespaces which behaviour is
+    controlled in this repository so namespace aware tests do work, even
+    when the actual default site is using completely different
+    namespaces.
     """
 
     def replaced(self, iterable):

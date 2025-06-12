@@ -54,7 +54,8 @@ class SparqlQuery(WaitingMixin):
             after an error, defaults to config.retry_wait seconds
             (doubles each retry until config.retry_max is reached).
         :raises Error: The site does not provide a sparql endpoint or if
-            initialised with an endpoint the entity_url must be provided.
+            initialised with an endpoint the entity_url must be
+            provided.
         """
         # default to Wikidata
         if not repo and not endpoint:
@@ -195,11 +196,11 @@ class SparqlQuery(WaitingMixin):
 
         Items are returned as Wikibase IDs.
 
-        :param query: Query string. Must contain ?{item_name} as one of the
-            projected values.
+        :param query: Query string. Must contain ?{item_name} as one of
+            the projected values.
         :param item_name: Name of the value to extract
-        :param result_type: type of the iterable in which
-              SPARQL results are stored (default set)
+        :param result_type: type of the iterable in which SPARQL results
+            are stored (default set)
         :type result_type: iterable
         :return: item ids, e.g. Q1234
         :rtype: same as result_type

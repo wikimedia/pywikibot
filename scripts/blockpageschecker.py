@@ -42,7 +42,6 @@ Examples::
     python pwb.py blockpageschecker -cat:Geography -always
 
     python pwb.py blockpageschecker -show -protectedpages:4
-
 """
 #
 # (C) Pywikibot team, 2007-2025

@@ -179,8 +179,8 @@ class TestPasswordFile(DefaultDrySiteTestCase):
         """Test BotPassword entries.
 
         When a BotPassword is used, the login_name changes to contain a
-        suffix, while the password is read from an object (instead of being
-        read from the password file directly).
+        suffix, while the password is read from an object (instead of
+        being read from the password file directly).
         """
         obj = self._test_pwfile("""
             ('~FakeUsername', BotPassword('~FakeSuffix', '~FakePassword'))

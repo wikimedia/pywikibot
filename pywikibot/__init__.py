@@ -277,8 +277,8 @@ def showDiff(oldtext: str,  # noqa: N802
              context: int = 0) -> None:
     """Output a string showing the differences between oldtext and newtext.
 
-    The differences are highlighted (only on compatible systems) to show which
-    changes were made.
+    The differences are highlighted (only on compatible systems) to show
+    which changes were made.
     """
     PatchManager(oldtext, newtext, context=context).print_hunks()
 

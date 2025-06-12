@@ -347,9 +347,9 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
     """Test cases for running scripts with -simulate.
 
     This class sets the 'user' attribute on every test, thereby ensuring
-    that the test runner has a username for the default site, and so that
-    Site.login() is called in the test runner, which means that the scripts
-    run in pwb can automatically login using the saved cookies.
+    that the test runner has a username for the default site, and so
+    that Site.login() is called in the test runner, which means that the
+    scripts run in pwb can automatically login using the saved cookies.
     """
 
     login = True

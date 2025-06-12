@@ -80,8 +80,8 @@ class CoordImportRobot(ConfigParserBot, WikidataBot):
 
         :param claims: the Wikibase claims to check in
         :type claims: dict
-        :return: the first property for which self.prop
-            is used as qualifier, or None if any
+        :return: the first property for which self.prop is used as
+            qualifier, or None if any
         """
         for prop in claims:
             for claim in claims[prop]:
@@ -124,8 +124,8 @@ class CoordImportRobot(ConfigParserBot, WikidataBot):
     def try_import_coordinates_from_page(self, page, item) -> bool:
         """Try import coordinate from the given page to the given item.
 
-        :return: whether any coordinates were found and the import
-            was successful
+        :return: whether any coordinates were found and the import was
+            successful
         """
         coordinate = page.coordinates(primary_only=True)
         if not coordinate:

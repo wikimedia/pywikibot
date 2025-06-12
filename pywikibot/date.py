@@ -118,8 +118,8 @@ def dh_noConv(value: int, pattern: str, limit: Callable[[int], bool]) -> str:
 def dh_dayOfMnth(value: int, pattern: str) -> str:
     """Helper for decoding a single integer value.
 
-    The single integer should be <=31, no conversion,
-    no rounding (used in days of month).
+    The single integer should be <=31, no conversion, no rounding (used
+    in days of month).
     """
     # For now use January because it has all 31 days
     return dh_noConv(value, pattern, formatLimits[dayMnthFmts[0]][0])
@@ -128,8 +128,8 @@ def dh_dayOfMnth(value: int, pattern: str) -> str:
 def dh_mnthOfYear(value: int, pattern: str) -> str:
     """Helper for decoding a single integer value.
 
-    The value should be >=1000, no conversion,
-    no rounding (used in month of the year)
+    The value should be >=1000, no conversion, no rounding (used in
+    month of the year)
     """
     return dh_noConv(value, pattern, _formatLimit_MonthOfYear[0])
 
@@ -231,7 +231,6 @@ def slh(value: int, lst: Sequence[str]) -> str:
         formats['MonthName']['en'](1) => 'January'
         formats['MonthName']['en']('January') => 1
         formats['MonthName']['en']('anything else') => raise ValueError
-
     """
     return lst[value - 1]
 
@@ -274,7 +273,8 @@ def _(value: str, ind: int, match: str) -> int:
 def alwaysTrue(x: Any) -> bool:
     """Return True, always.
 
-    Used for multiple value selection function to accept all other values.
+    Used for multiple value selection function to accept all other
+    values.
 
     :param x: not used
     :return: True
@@ -408,8 +408,8 @@ def escapePattern2(
 ) -> tuple[Pattern[str], str, list[decoder_type]]:
     """Convert a string pattern into a regex expression and cache.
 
-    Allows matching of any _digitDecoders inside the string.
-    Returns a compiled regex object and a list of digit decoders.
+    Allows matching of any _digitDecoders inside the string. Returns a
+    compiled regex object and a list of digit decoders.
     """
     @singledispatch
     def decode(dec: decoder_type, subpattern: str, newpattern: str,
@@ -495,7 +495,6 @@ def dh(value: int, pattern: str, encf: encf_type, decf: decf_type,
         into dh() to produce the original string. This function is a complement
         of encf. dh() interprets %d as a decimal and %s as a roman
         numeral number.
-
     """
     _compPattern, strPattern, decoders = escapePattern2(pattern)
     # Encode an integer value into a textual form.
@@ -1685,8 +1684,9 @@ def addFmt1(lang: str, isMnthOfYear: bool,
     """Add 12 month formats for a specific type ('January', 'Feb.').
 
     The function must accept one parameter for the ->int or ->string
-    conversions, just like everywhere else in the formats map.
-    The patterns parameter is a list of 12 elements to be used for each month.
+    conversions, just like everywhere else in the formats map. The
+    patterns parameter is a list of 12 elements to be used for each
+    month.
 
     :param lang: language code
     """
@@ -2020,20 +2020,21 @@ def apply_month_delta(date: datetime.date, month_delta: int = 1,
                       add_overlap: bool = False) -> datetime.date:
     """Add or subtract months from the date.
 
-    By default if the new month has less days then the day of the date it
-    chooses the last day in the new month. For example a date in the March 31st
-    added by one month will result in April 30th.
+    By default if the new month has less days then the day of the date
+    it chooses the last day in the new month. For example a date in the
+    March 31st added by one month will result in April 30th.
 
-    When the overlap is enabled, and there is overlap, then the new_date will
-    be one month off and get_month_delta will report a number one higher.
+    When the overlap is enabled, and there is overlap, then the new_date
+    will be one month off and get_month_delta will report a number one
+    higher.
 
-    It does only work on calendars with 12 months per year, and where the
-    months are numbered consecutively beginning by 1.
+    It does only work on calendars with 12 months per year, and where
+    the months are numbered consecutively beginning by 1.
 
     :param date: The starting date
     :param month_delta: The amount of months added or subtracted.
-    :param add_overlap: Add any missing days to the date, increasing the month
-        once more.
+    :param add_overlap: Add any missing days to the date, increasing the
+        month once more.
     :return: The end date
     """
     if not isinstance(month_delta, int):
@@ -2052,7 +2053,7 @@ def apply_month_delta(date: datetime.date, month_delta: int = 1,
 def get_month_delta(date1: datetime.date, date2: datetime.date) -> int:
     """Return the difference between two dates in months.
 
-    It does only work on calendars with 12 months per year, and where the
-    months are consecutive and non-negative numbers.
+    It does only work on calendars with 12 months per year, and where
+    the months are consecutive and non-negative numbers.
     """
     return date2.month - date1.month + (date2.year - date1.year) * 12

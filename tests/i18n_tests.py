@@ -56,8 +56,8 @@ class TestTranslate(TestCase):
     def test_translate_commons(self) -> None:
         """Test localization with xdict for commons.
 
-        Test whether the localization is found either with the Site object
-        or with the site code.
+        Test whether the localization is found either with the Site
+        object or with the site code.
         """
         site = Site('commons')
         for code in (site, 'commons'):
@@ -68,8 +68,8 @@ class TestTranslate(TestCase):
     def test_translate_de(self) -> None:
         """Test localization fallbacks for 'de' with xdict.
 
-        'de' key is defined in a nested 'wikipedia' sub dict. This should
-        always fall back to this nested 'wikipedia' entry.
+        'de' key is defined in a nested 'wikipedia' sub dict. This
+        should always fall back to this nested 'wikipedia' entry.
         """
         site1 = Site('de', 'wikipedia')
         site2 = Site('de', 'wikibooks')
@@ -82,9 +82,9 @@ class TestTranslate(TestCase):
     def test_translate_en(self) -> None:
         """Test localization fallbacks for 'en' with xdict.
 
-        'en' key is defined directly in xdict. This topmost key goes over
-        site specific key. Therefore 'test-localized WS-EN' is not given
-        back.
+        'en' key is defined directly in xdict. This topmost key goes
+        over site specific key. Therefore 'test-localized WS-EN' is not
+        given back.
         """
         site1 = Site('en', 'wikipedia')
         site2 = Site('en', 'wikibooks')
@@ -132,9 +132,9 @@ class TestTranslate(TestCase):
     def test_translate_ja(self) -> None:
         """Test localization fallbacks for 'ja' with xdict.
 
-        'ja' key is defined in 'wkisource' sub dict only. Therefore there
-        is no fallback to the 'wikipedia' entry and the localization result
-        is None.
+        'ja' key is defined in 'wkisource' sub dict only. Therefore
+        there is no fallback to the 'wikipedia' entry and the
+        localization result is None.
         """
         site1 = Site('ja', 'wikipedia')
         site2 = Site('ja', 'wikibooks')

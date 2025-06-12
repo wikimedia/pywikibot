@@ -19,11 +19,12 @@ class OptionSet(MutableMapping):
 
     """A class to store a set of options which can be either enabled or not.
 
-    If it is instantiated with the associated site, module and parameter it
-    will only allow valid names as options. If instantiated 'lazy loaded' it
-    won't checks if the names are valid until the site has been set (which
-    isn't required, but recommended). The site can only be set once if it's not
-    None and after setting it, any site (even None) will fail.
+    If it is instantiated with the associated site, module and parameter
+    it will only allow valid names as options. If instantiated 'lazy
+    loaded' it won't checks if the names are valid until the site has
+    been set (which isn't required, but recommended). The site can only
+    be set once if it's not None and after setting it, any site (even
+    None) will fail.
     """
 
     @deprecate_arg('dict', 'data')  # since 9.0
@@ -58,16 +59,18 @@ class OptionSet(MutableMapping):
                   clear_invalid: bool = False) -> None:
         """Set the site and valid names.
 
-        As soon as the site has been not None, any subsequent calls will fail,
-        unless there had been invalid names and a KeyError was thrown.
+        As soon as the site has been not None, any subsequent calls will
+        fail, unless there had been invalid names and a KeyError was
+        thrown.
 
         :param site: The associated site
         :type site: pywikibot.site.APISite
         :param module: The module name which is used by paraminfo.
-        :param param: The parameter name inside the module. That parameter must
-            have a 'type' entry.
-        :param clear_invalid: Instead of throwing a KeyError, invalid names are
-            silently removed from the options (disabled by default).
+        :param param: The parameter name inside the module. That
+            parameter must have a 'type' entry.
+        :param clear_invalid: Instead of throwing a KeyError, invalid
+            names are silently removed from the options (disabled by
+            default).
         """
         if self._site_set:
             raise TypeError('The site cannot be set multiple times.')
@@ -97,14 +100,13 @@ class OptionSet(MutableMapping):
         """Load options from the dict.
 
         The options are not cleared before. If changes have been made
-        previously, but only the dict values should be applied it needs to be
-        cleared first.
+        previously, but only the dict values should be applied it needs
+        to be cleared first.
 
-        :param dictionary:
-            a dictionary containing for each entry either the value
-            False, True or None. The names must be valid depending on whether
-            they enable or disable the option. All names with the value None
-            can be in either of the list.
+        :param dictionary: a dictionary containing for each entry either
+            the value False, True or None. The names must be valid
+            depending on whether they enable or disable the option. All
+            names with the value None can be in either of the list.
         :type dictionary: dict (keys are strings, values are bool/None)
         """
         enabled = set()
@@ -153,10 +155,10 @@ class OptionSet(MutableMapping):
     def __getitem__(self, name) -> bool | None:
         """Return whether the option is enabled.
 
-        :return: If the name has been set it returns whether it is enabled.
-            Otherwise it returns None. If the site has been set it raises a
-            KeyError if the name is invalid. Otherwise it might return a value
-            even though the name might be invalid.
+        :return: If the name has been set it returns whether it is
+            enabled. Otherwise it returns None. If the site has been set
+            it raises a KeyError if the name is invalid. Otherwise it
+            might return a value even though the name might be invalid.
         """
         if name in self._enabled:
             return True

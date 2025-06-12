@@ -65,14 +65,15 @@ class GeneratorsMixin:
     ) -> Generator[pywikibot.Page, None, None]:
         """Return a page generator from pageids.
 
-        Pages are iterated in the same order than in the underlying pageids.
+        Pages are iterated in the same order than in the underlying
+        pageids.
 
         Pageids are filtered and only one page is returned in case of
         duplicate pageids.
 
         :param pageids: an iterable that returns pageids (str or int),
-            or a comma- or pipe-separated string of pageids
-            (e.g. '945097,1483753, 956608' or '945097|483753|956608')
+            or a comma- or pipe-separated string of pageids (e.g.
+            '945097,1483753, 956608' or '945097|483753|956608')
         """
         if not pageids:
             return
@@ -384,8 +385,8 @@ class GeneratorsMixin:
     ) -> Iterable[pywikibot.Page]:
         """Convenience method combining pagebacklinks and page_embeddedin.
 
-        :param namespaces: If present, only return links from the namespaces
-            in this list.
+        :param namespaces: If present, only return links from the
+            namespaces in this list.
         :raises KeyError: a namespace identifier was not resolved
         :raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
@@ -516,7 +517,6 @@ class GeneratorsMixin:
         :param content: if True, load the current content of each iterated page
             (default False); note that this means the content of the image
             description page, not the image itself
-
         """
         imtitle = page.title(with_section=False).encode(self.encoding())
         return self._generator(api.PageGenerator, type_arg='images',
@@ -1124,10 +1124,11 @@ class GeneratorsMixin:
     ) -> Generator[dict[str, Any], None, None]:
         """Iterate bot users.
 
-        Iterated values are dicts containing 'name', 'userid', 'editcount',
-        'registration', and 'groups' keys. 'groups' will be present only if
-        the user is a member of at least 1 group, and will be a list of
-        str; all the other values are str and should always be present.
+        Iterated values are dicts containing 'name', 'userid',
+        'editcount', 'registration', and 'groups' keys. 'groups' will be
+        present only if the user is a member of at least 1 group, and
+        will be a list of str; all the other values are str and should
+        always be present.
         """
         if not hasattr(self, '_bots'):
             self._bots: dict[str, dict[str, str | list[str]]] = {}
@@ -2053,14 +2054,14 @@ class GeneratorsMixin:
     ):
         """Yield new articles (as Page objects) from recent changes.
 
-        Starts with the newest article and fetches the number of articles
-        specified in the first argument.
+        Starts with the newest article and fetches the number of
+        articles specified in the first argument.
 
-        The objects yielded are dependent on parameter returndict.
-        When true, it yields a tuple composed of a Page object and a
-        dict of attributes. When false, it yields a tuple composed of
-        the Page object, timestamp (str), length (int), an empty string,
-        username or IP address (str), comment (str).
+        The objects yielded are dependent on parameter returndict. When
+        true, it yields a tuple composed of a Page object and a dict of
+        attributes. When false, it yields a tuple composed of the Page
+        object, timestamp (str), length (int), an empty string, username
+        or IP address (str), comment (str).
 
         :param namespaces: only iterate pages in these namespaces
         :raises KeyError: a namespace identifier was not resolved

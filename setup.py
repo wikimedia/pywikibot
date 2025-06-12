@@ -184,7 +184,8 @@ def read_desc(filename) -> str:
     """Read long description.
 
     Combine included restructured text files which must be done before
-    uploading because the source isn't available after creating the package.
+    uploading because the source isn't available after creating the
+    package.
     """
     pattern = r'(?:\:\w+\:`([^`]+?)(?:<.+>)?` *)', r'\1'
     desc = []

@@ -275,9 +275,8 @@ For global options use -help:global or run pwb.py -help
 """
 
 ui: pywikibot.userinterfaces._interface_base.ABUIC | None = None
-"""Holds a user interface object defined in
-:mod:`pywikibot.userinterfaces` subpackage.
-"""
+"""Holds a user interface object defined in :mod:`pywikibot.userinterfaces`
+subpackage."""
 
 
 def set_interface(module_name: str) -> None:
@@ -554,11 +553,13 @@ def input(question: str,
           force: bool = False) -> str:
     """Ask the user a question, return the user's answer.
 
-    :param question: a string that will be shown to the user. Don't add a
-        space after the question mark/colon, this method will do this for you.
-    :param password: if True, hides the user's input (for password entry).
-    :param default: The default answer if none was entered. None to require
-        an answer.
+    :param question: a string that will be shown to the user. Don't add
+        a space after the question mark/colon, this method will do this
+        for you.
+    :param password: if True, hides the user's input (for password
+        entry).
+    :param default: The default answer if none was entered. None to
+        require an answer.
     :param force: Automatically use the default
     """
     assert ui is not None
@@ -645,9 +646,10 @@ def input_list_choice(question: str,
     """Ask the user the question and return one of the valid answers.
 
     :param question: The question asked without trailing spaces.
-    :param answers: The valid answers each containing a full length answer.
-    :param default: The result if no answer was entered. It must not be in the
-        valid answers and can be disabled by setting it to None.
+    :param answers: The valid answers each containing a full length
+        answer.
+    :param default: The result if no answer was entered. It must not be
+        in the valid answers and can be disabled by setting it to None.
     :param force: Automatically use the default
     :return: The selected answer.
     """
@@ -1057,7 +1059,8 @@ class OptionHandler:
     """
 
     available_options: dict[str, Any] = {}
-    """ Handler configuration attribute.
+    """Handler configuration attribute.
+
     Only the keys of the dict can be passed as `__init__` options.
     The values are the default values. Overwrite this in subclasses!
     """
@@ -1113,9 +1116,9 @@ class BaseBot(OptionHandler):
     """
 
     use_disambigs: bool | None = None
-    """Attribute to determine whether to use disambiguation pages. Set
-    it to True to use disambigs only, set it to False to skip disambigs.
-    If None both are processed.
+    """Attribute to determine whether to use disambiguation pages. Set it to
+    True to use disambigs only, set it to False to skip disambigs. If None both
+    are processed.
 
     .. versionadded:: 7.2
     """
@@ -1142,8 +1145,8 @@ class BaseBot(OptionHandler):
     }
 
     update_options: dict[str, Any] = {}
-    """`update_options` can be used to update :attr:`available_options`;
-    do not use it if the bot class is to be derived but use
+    """`update_options` can be used to update :attr:`available_options`; do not
+    use it if the bot class is to be derived but use
     `self.available_options.update(<dict>)` initializer in such case.
 
     .. versionadded:: 6.4
@@ -1181,8 +1184,8 @@ class BaseBot(OptionHandler):
         """
 
         self.generator_completed: bool = False
-        """
-        Instance attribute which is True if the :attr:`generator` is completed.
+        """Instance attribute which is True if the :attr:`generator` is
+        completed.
 
         It gives False if the the generator processing in :meth:`run` is
         either interrupted by ``KeyboardInterrupt`` or exited by
@@ -1216,9 +1219,9 @@ class BaseBot(OptionHandler):
     def current_page(self, page: pywikibot.page.BasePage) -> None:
         """Set the current working page as a property.
 
-        When the value is actually changed, the page title is printed
-        to the standard output (highlighted in purple) and logged
-        with a VERBOSE level.
+        When the value is actually changed, the page title is printed to
+        the standard output (highlighted in purple) and logged with a
+        VERBOSE level.
 
         This also prevents the same title from being printed twice.
 
@@ -1601,8 +1604,8 @@ class Bot(BaseBot):
 
     """Generic bot subclass for multiple sites.
 
-    If possible the MultipleSitesBot or SingleSiteBot classes should be used
-    instead which specifically handle multiple or single sites.
+    If possible the MultipleSitesBot or SingleSiteBot classes should be
+    used instead which specifically handle multiple or single sites.
     """
 
     def __init__(self, site: BaseSite | None = None,
@@ -1629,8 +1632,9 @@ class Bot(BaseBot):
     def site(self, site: BaseSite | None) -> None:
         """Set the Site that the bot is using.
 
-        When Bot.run() is managing the generator and site property, this is
-        set each time a page is on a site different from the previous page.
+        When Bot.run() is managing the generator and site property, this
+        is set each time a page is on a site different from the previous
+        page.
         """
         if not site:
             self._site = None
@@ -1683,9 +1687,9 @@ class SingleSiteBot(BaseBot):
 
     """A bot only working on one site and ignoring the others.
 
-    If no site is given from the start it'll use the first page's site. Any
-    page after the site has been defined and is not on the defined site will be
-    ignored.
+    If no site is given from the start it'll use the first page's site.
+    Any page after the site has been defined and is not on the defined
+    site will be ignored.
     """
 
     def __init__(self,
@@ -1812,8 +1816,9 @@ class CurrentPageBot(BaseBot):
 
     """A bot which automatically sets 'current_page' on each treat().
 
-    This class should be always used together with either the MultipleSitesBot
-    or SingleSiteBot class as there is no site management in this class.
+    This class should be always used together with either the
+    MultipleSitesBot or SingleSiteBot class as there is no site
+    management in this class.
     """
 
     ignore_save_related_errors = True
@@ -1950,23 +1955,19 @@ class WikidataBot(Bot, ExistingPageBot):
 
     Source claims (P143) can be created for specific sites
 
-    :cvar use_from_page: If True (default) it will apply ItemPage.fromPage
-        for every item. If False it assumes that the pages are actually
-        already ItemPage (page in treat_page_and_item will be None).
-        If None it'll use ItemPage.fromPage when the page is not in the site's
-        item namespace.
-
+    :cvar use_from_page: If True (default) it will apply
+        ItemPage.fromPage for every item. If False it assumes that the
+        pages are actually already ItemPage (page in treat_page_and_item
+        will be None). If None it'll use ItemPage.fromPage when the page
+        is not in the site's item namespace.
     :type use_from_page: bool, None
-
-    :cvar treat_missing_item: Whether pages without items should be treated.
-        Note that this is checked after create_missing_item.
-
+    :cvar treat_missing_item: Whether pages without items should be
+        treated. Note that this is checked after create_missing_item.
     :type treat_missing_item: bool
-
     :ivar create_missing_item: If True, new items will be created if the
-        current page doesn't have one. Subclasses should override this in the
-        initializer with a bool value or using self.opt attribute.
-
+        current page doesn't have one. Subclasses should override this
+        in the initializer with a bool value or using self.opt
+        attribute.
     :type create_missing_item: bool
     """
 
@@ -2023,15 +2024,18 @@ class WikidataBot(Bot, ExistingPageBot):
         """Edit entity with data provided, with user confirmation as required.
 
         :param entity: page to be edited
-        :param data: data to be saved, or None if the diff should be created
-          automatically
-        :param ignore_save_related_errors: Ignore save related errors and
-            automatically print a message. If None uses this instances default.
-        :param ignore_server_errors: Ignore server errors and automatically
-            print a message. If None uses this instances default.
-        :keyword summary: revision comment, passed to ItemPage.editEntity
-        :keyword show_diff: show changes between oldtext and newtext (default:
-          True)
+        :param data: data to be saved, or None if the diff should be
+            created automatically
+        :param ignore_save_related_errors: Ignore save related errors
+            and automatically print a message. If None uses this
+            instances default.
+        :param ignore_server_errors: Ignore server errors and
+            automatically print a message. If None uses this instances
+            default.
+        :keyword summary: revision comment, passed to
+            ItemPage.editEntity
+        :keyword show_diff: show changes between oldtext and newtext
+            (default: True)
         :return: whether the item was saved successfully
         """
         if ignore_save_related_errors is None:
@@ -2092,7 +2096,6 @@ class WikidataBot(Bot, ExistingPageBot):
         """Create a Claim usable as a source for Wikibase statements.
 
         :param site: site that is the source of assertions.
-
         :return: pywikibot.Claim or None
         """
         source = None
@@ -2202,10 +2205,10 @@ class WikidataBot(Bot, ExistingPageBot):
         """Create an ItemPage with the provided page as the sitelink.
 
         :param page: the page for which the item will be created
-        :param data: additional data to be included in the new item (optional).
-            Note that data created from the page have higher priority.
+        :param data: additional data to be included in the new item
+            (optional). Note that data created from the page have higher
+            priority.
         :param summary: optional edit summary to replace the default one
-
         :return: pywikibot.ItemPage or None
         """
         if not summary:

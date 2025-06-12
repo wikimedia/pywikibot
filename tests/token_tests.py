@@ -27,7 +27,6 @@ class TestSiteTokens(DeprecationTestCase, DefaultSiteTestCase):
     needed by the test case.
 
     Test is skipped if site version is not compatible.
-
     """
 
     login = True

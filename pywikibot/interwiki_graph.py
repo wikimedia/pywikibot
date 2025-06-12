@@ -79,9 +79,8 @@ class GraphDrawer:
     def __init__(self, subject: pywikibot.interwiki_graph.Subject) -> None:
         """Initializer.
 
-        :param subject: page data to graph
-
-        :raises ImportError if pydot is not installed
+        :param subject: page data to graph :raises ImportError if pydot
+            is not installed
         """
         if PYDOT_ERROR:
             msg = f'pydot is not installed: {PYDOT_ERROR}.'
@@ -176,7 +175,8 @@ class GraphDrawer:
     def createGraph(self) -> None:
         """Create graph of the interwiki links.
 
-        For more info see https://meta.wikimedia.org/wiki/Interwiki_graphs
+        For more info see
+        https://meta.wikimedia.org/wiki/Interwiki_graphs
         """
         pywikibot.info(f'Preparing graph for {self.subject.origin.title()}')
         # create empty graph

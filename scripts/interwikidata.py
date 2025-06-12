@@ -147,10 +147,10 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
     def handle_complicated(self) -> bool:
         """Handle pages when they have interwiki conflict.
 
-        When this method returns True it means conflict has resolved
-        and it's okay to clean old interwiki links.
-        This method should change self.current_item and fix conflicts.
-        Change it in subclasses.
+        When this method returns True it means conflict has resolved and
+        it's okay to clean old interwiki links. This method should
+        change self.current_item and fix conflicts. Change it in
+        subclasses.
         """
         return False
 

@@ -103,7 +103,6 @@ class UI(ABUIC):
         enabled by config.verbose_output), INFO, STDOUT, WARNING, ERROR,
         and CRITICAL. STDOUT writes its output to sys.stdout; all the
         others write theirs to sys.stderr.
-
         """
         if default_stream == 'stdout':
             default_stream = self.stdout
@@ -149,9 +148,9 @@ class UI(ABUIC):
     def divide_color(cls, color):
         """Split color label in a tuple.
 
-        Received color is a string like 'fg_color;bg_color' or 'fg_color'.
-        Returned values are (fg_color, bg_color) or (fg_color, None).
-
+        Received color is a string like 'fg_color;bg_color' or
+        'fg_color'. Returned values are (fg_color, bg_color) or
+        (fg_color, None).
         """
         return cls.split_col_pat.search(color).groups()
 
@@ -342,16 +341,18 @@ class UI(ABUIC):
               force: bool = False) -> str:
         """Ask the user a question and return the answer.
 
-        Works like raw_input(), but returns a unicode string instead of ASCII.
+        Works like raw_input(), but returns a unicode string instead of
+        ASCII.
 
-        Unlike raw_input, this function automatically adds a colon and space
-        after the question if they are not already present. Also recognises
-        a trailing question mark.
+        Unlike raw_input, this function automatically adds a colon and
+        space after the question if they are not already present. Also
+        recognises a trailing question mark.
 
         :param question: The question, without trailing whitespace.
-        :param password: if True, hides the user's input (for password entry).
-        :param default: The default answer if none was entered. None to require
-            an answer.
+        :param password: if True, hides the user's input (for password
+            entry).
+        :param default: The default answer if none was entered. None to
+            require an answer.
         :param force: Automatically use the default
         """
         assert not password or not default
@@ -519,8 +520,8 @@ class UI(ABUIC):
 
         :param question: The question, without trailing whitespace.
         :param answers: A sequence of options to be chosen.
-        :param default: The default answer if no was entered. None to require
-            an answer.
+        :param default: The default answer if no was entered. None to
+            require an answer.
         :param force: Automatically use the default.
         :return: Return a single Sequence entry.
         """
@@ -561,9 +562,10 @@ class UI(ABUIC):
 
         :param text: the text to be edited
         :param jumpIndex: position at which to put the caret
-        :param highlight: each occurrence of this substring will be highlighted
-        :return: the modified text, or None if the user didn't save the text
-            file in his text editor
+        :param highlight: each occurrence of this substring will be
+            highlighted
+        :return: the modified text, or None if the user didn't save the
+            text file in his text editor
         """
         try:
             from pywikibot.userinterfaces import gui
@@ -599,9 +601,9 @@ class TerminalHandler(logging.StreamHandler):
     def createLock(self) -> None:
         """Acquire a thread lock for serializing access to the underlying I/O.
 
-        Replace Handler's instance-specific lock with the shared
-        class lock to ensure that only one instance of this handler can
-        write to the console at a time.
+        Replace Handler's instance-specific lock with the shared class
+        lock to ensure that only one instance of this handler can write
+        to the console at a time.
         """
         self.lock = TerminalHandler.sharedlock
 
@@ -626,7 +628,6 @@ class MaxLevelFilter:
 
     .. note:: setting handler level only passes records at or *above* a
        specified level, so this provides the opposite functionality.
-
     """
 
     def __init__(self, level=None) -> None:

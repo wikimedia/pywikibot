@@ -325,8 +325,8 @@ class NamespacesDict(Mapping):
 
     """An immutable dictionary containing the Namespace instances.
 
-    It adds a deprecation message when called as the 'namespaces' property of
-    APISite was callable.
+    It adds a deprecation message when called as the 'namespaces'
+    property of APISite was callable.
     """
 
     def __init__(self, namespaces) -> None:
@@ -403,12 +403,13 @@ class NamespacesDict(Mapping):
         """Resolve namespace identifiers to obtain Namespace objects.
 
         Identifiers may be any value for which int() produces a valid
-        namespace id, except bool, or any string which Namespace.lookup_name
-        successfully finds. A numerical string is resolved as an integer.
+        namespace id, except bool, or any string which
+        Namespace.lookup_name successfully finds. A numerical string is
+        resolved as an integer.
 
         :param identifiers: namespace identifiers
-        :type identifiers: iterable of str or Namespace key,
-            or a single instance of those types
+        :type identifiers: iterable of str or Namespace key, or a single
+            instance of those types
         :return: list of Namespace objects in the same order as the
             identifiers
         :raises KeyError: a namespace identifier was not resolved

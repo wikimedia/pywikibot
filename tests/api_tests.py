@@ -576,9 +576,8 @@ class TestDryQueryGeneratorNamespaceParam(TestCase):
 
     """Test setting of namespace param with ListGenerator.
 
-    Generators with different characteristics are used.
-    site._paraminfo is not always faithful to API, but serves the purpose
-    here.
+    Generators with different characteristics are used. site._paraminfo
+    is not always faithful to API, but serves the purpose here.
     """
 
     family = 'wikipedia'
@@ -757,12 +756,14 @@ class TestLazyLoginBase(TestCase):
 
     """Test that it tries to login when read API access is denied.
 
-    Because there is no such family configured it creates an AutoFamily and
-    BaseSite on it's own. It's testing against steward.wikimedia.org.
+    Because there is no such family configured it creates an AutoFamily
+    and BaseSite on it's own. It's testing against
+    steward.wikimedia.org.
 
-    These tests are split into two subclasses as only the first failed login
-    behaves as expected. All subsequent logins will raise an APIError, making
-    it impossible to test two scenarios with the same APISite object.
+    These tests are split into two subclasses as only the first failed
+    login behaves as expected. All subsequent logins will raise an
+    APIError, making it impossible to test two scenarios with the same
+    APISite object.
     """
 
     hostname = 'steward.wikimedia.org'

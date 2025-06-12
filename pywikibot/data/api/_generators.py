@@ -131,8 +131,8 @@ class APIGenerator(APIGeneratorBase, GeneratorWrapper):
 
         If not called, the default is config.step.
 
-        :param value: The value of maximum number of items to be retrieved
-            per API request to set.
+        :param value: The value of maximum number of items to be
+            retrieved per API request to set.
         """
         self.query_increment = int(value)
         self.request[self.limit_name] = self.query_increment
@@ -145,8 +145,8 @@ class APIGenerator(APIGeneratorBase, GeneratorWrapper):
         If not called, most queries will continue as long as there is
         more data to be retrieved from the API.
 
-        :param value: The value of maximum number of items to be retrieved
-            in total to set. Ignores None value.
+        :param value: The value of maximum number of items to be
+            retrieved in total to set. Ignores None value.
         """
         if value is not None and int(value) > 0:
             self.limit = int(value)
@@ -394,13 +394,13 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
         If not called, most queries will continue as long as there is
         more data to be retrieved from the API.
 
-        If set to -1 (or any negative value), the "limit" parameter will be
-        omitted from the request. For some request types (such as
+        If set to -1 (or any negative value), the "limit" parameter will
+        be omitted from the request. For some request types (such as
         prop=revisions), this is necessary to signal that only current
         revision is to be returned.
 
-        :param value: The value of maximum number of items to be retrieved
-            in total to set. Ignores None value.
+        :param value: The value of maximum number of items to be
+            retrieved in total to set. Ignores None value.
         """
         if value is not None:
             self.limit = int(value)
@@ -765,8 +765,8 @@ class PropertyGenerator(QueryGenerator):
     This generator yields one or more dict object(s) corresponding to
     each "page" item(s) from the API response; the calling module has to
     decide what to do with the contents of the dict. There will be one
-    dict for each page queried via a titles= or ids= parameter (which must
-    be supplied when instantiating this class).
+    dict for each page queried via a titles= or ids= parameter (which
+    must be supplied when instantiating this class).
     """
 
     def __init__(self, prop: str, **kwargs) -> None:
@@ -998,9 +998,9 @@ def update_page(page: pywikibot.Page,
     :param pagedict: the contents of a *page* element of a query
         response
     :param props: the property names which resulted in *pagedict*. If a
-        missing value in *pagedict* can indicate both 'false' and
-        'not present' the property which would make the value present
-        must be in the *props* parameter.
+        missing value in *pagedict* can indicate both 'false' and 'not
+        present' the property which would make the value present must be
+        in the *props* parameter.
     :raises InvalidTitleError: Page title is invalid
     :raises UnsupportedPageError: Page with namespace < 0 is not
         supported yet

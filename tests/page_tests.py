@@ -599,7 +599,8 @@ class TestPageObject(DefaultSiteTestCase):
     def test_page_image(self) -> None:
         """Test ``Page.page_image`` function.
 
-        Since we are not sure what the wiki will return, we mainly test types
+        Since we are not sure what the wiki will return, we mainly test
+        types
         """
         site = self.get_site()
         mainpage = self.get_mainpage()
@@ -969,8 +970,8 @@ class TestPageRedirects(TestCase):
     """Test redirects.
 
     This is using the pages 'User:Legoktm/R1', 'User:Legoktm/R2' and
-    'User:Legoktm/R3' on the English Wikipedia. 'R1' is redirecting to 'R2',
-    'R2' is a normal page and 'R3' does not exist.
+    'User:Legoktm/R3' on the English Wikipedia. 'R1' is redirecting to
+    'R2', 'R2' is a normal page and 'R3' does not exist.
     """
 
     sites = {

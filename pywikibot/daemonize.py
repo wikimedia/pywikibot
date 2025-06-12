@@ -20,10 +20,11 @@ def daemonize(close_fd: bool = True,
               redirect_std: str | None = None) -> None:
     """Daemonize the current process.
 
-    Only works on POSIX compatible operating systems.
-    The process will fork to the background and return control to terminal.
+    Only works on POSIX compatible operating systems. The process will
+    fork to the background and return control to terminal.
 
-    :param close_fd: Close the standard streams and replace them by /dev/null
+    :param close_fd: Close the standard streams and replace them by
+        /dev/null
     :param chdir: Change the current working directory to /
     :param redirect_std: Filename to redirect stdout and stdin to
     """

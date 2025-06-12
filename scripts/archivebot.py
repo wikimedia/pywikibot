@@ -209,16 +209,18 @@ class ArchiveSecurityError(ArchiveBotSiteConfigError):
 
     """Page title is not a valid archive of page being archived.
 
-    The page title is neither a subpage of the page being archived,
-    nor does it match the key specified in the archive configuration template.
+    The page title is neither a subpage of the page being archived, nor
+    does it match the key specified in the archive configuration
+    template.
     """
 
 
 def str2localized_duration(site, string: str) -> str:
     """Localise a shorthand duration.
 
-    Translates a duration written in the shorthand notation (ex. "24h", "7d")
-    into an expression in the local wiki language ("24 hours", "7 days").
+    Translates a duration written in the shorthand notation (ex. "24h",
+    "7d") into an expression in the local wiki language ("24 hours", "7
+    days").
     """
     try:
         key, duration = parse_duration(string)
@@ -261,8 +263,8 @@ def str2size(string: str) -> tuple[int, str]:
 def template_title_regex(tpl_page: pywikibot.Page) -> Pattern:
     """Return a regex that matches to variations of the template title.
 
-    It supports the transcluding variant as well as localized namespaces and
-    case-insensitivity depending on the namespace.
+    It supports the transcluding variant as well as localized namespaces
+    and case-insensitivity depending on the namespace.
 
     :param tpl_page: The template page
     :type tpl_page: pywikibot.page.Page
@@ -295,7 +297,6 @@ class DiscussionThread:
 
         Thread content here. ~~~~
         :Reply, etc. ~~~~
-
     """
 
     def __init__(self, title: str, timestripper: TimeStripper) -> None:
@@ -577,7 +578,6 @@ class PageArchiver:
         """Flush the cache.
 
         .. versionadded:: 10.0
-
         """
         pywikibot.info('\n'.join(self.output))
         self.output.clear()
@@ -663,8 +663,8 @@ class PageArchiver:
     def get_archive_page(self, title: str, params=None) -> DiscussionPage:
         """Return the page for archiving.
 
-        If it doesn't exist yet, create and cache it.
-        Also check for security violations.
+        If it doesn't exist yet, create and cache it. Also check for
+        security violations.
         """
         if title not in self.archives:
             page_title = self.page.title()

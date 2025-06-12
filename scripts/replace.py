@@ -237,11 +237,12 @@ class ReplacementBase:
     def description(self) -> str:
         """Description of the changes that this replacement applies.
 
-        This description is used as the default summary of the replacement. If
-        you do not specify an edit summary on the command line or in some other
-        way, whenever you apply this replacement to a page and submit the
-        changes to the MediaWiki server, the edit summary includes the
-        descriptions of each replacement that you applied to the page.
+        This description is used as the default summary of the
+        replacement. If you do not specify an edit summary on the
+        command line or in some other way, whenever you apply this
+        replacement to a page and submit the changes to the MediaWiki
+        server, the edit summary includes the descriptions of each
+        replacement that you applied to the page.
         """
         return f'-{self.old} +{self.new}'
 
@@ -249,10 +250,11 @@ class ReplacementBase:
     def container(self) -> None:
         """Container object which contains this replacement.
 
-        A container object is an object that groups one or more replacements
-        together and provides some properties that are common to all of them.
-        For example, containers may define a common name for a group of
-        replacements, or a common edit summary.
+        A container object is an object that groups one or more
+        replacements together and provides some properties that are
+        common to all of them. For example, containers may define a
+        common name for a group of replacements, or a common edit
+        summary.
 
         Container objects must have a "name" attribute.
         """
@@ -389,10 +391,11 @@ class ReplacementListEntry(ReplacementBase):
     def container(self):
         """Container object which contains this replacement.
 
-        A container object is an object that groups one or more replacements
-        together and provides some properties that are common to all of them.
-        For example, containers may define a common name for a group of
-        replacements, or a common edit summary.
+        A container object is an object that groups one or more
+        replacements together and provides some properties that are
+        common to all of them. For example, containers may define a
+        common name for a group of replacements, or a common edit
+        summary.
 
         Container objects must have a "name" attribute.
         """
@@ -546,7 +549,6 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
        - `site` parameter should be passed to constructor.
          Otherwise the bot takes the current site and warns the operator
          about the missing site
-
     """
 
     def __init__(self, generator,
@@ -811,7 +813,7 @@ EXC_KEYS = {
 }
 """Dictionary to convert exceptions command line options to exceptions keys.
 
-    .. versionadded:: 7.0
+.. versionadded:: 7.0
 """
 
 

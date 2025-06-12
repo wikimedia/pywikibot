@@ -140,7 +140,8 @@ class TemplateRobot(ReplaceBot):
         :type generator: iterable
         :param templates: a dictionary which maps old template names to
             their replacements. If remove or subst is True, it maps the
-            names of the templates that should be removed/resolved to None.
+            names of the templates that should be removed/resolved to
+            None.
         """
         SingleSiteBot.__init__(self, **kwargs)
 

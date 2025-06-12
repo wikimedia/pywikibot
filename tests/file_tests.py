@@ -152,9 +152,8 @@ class TestFilePage(TestCase):
 
     """Test FilePage.latest_revision_info.
 
-    These tests cover exceptions for all properties and methods
-    in FilePage that rely on site.loadimageinfo.
-
+    These tests cover exceptions for all properties and methods in
+    FilePage that rely on site.loadimageinfo.
     """
 
     family = 'wikipedia'
@@ -212,9 +211,8 @@ class TestFilePageLatestFileInfo(TestCase):
 
     """Test FilePage.latest_file_info.
 
-    These tests cover properties and methods in FilePage that rely
-    on site.loadimageinfo.
-
+    These tests cover properties and methods in FilePage that rely on
+    site.loadimageinfo.
     """
 
     family = 'commons'

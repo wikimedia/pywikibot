@@ -507,7 +507,6 @@ class MediaWikiVersion:
         """Return version number representation, mainly used by tests.
 
         .. versionadded:: 10.0
-
         """
         return f"'{self}'"
 

@@ -90,7 +90,8 @@ class ProtectionRobot(SingleSiteBot, ConfigParserBot, CurrentPageBot):
 
         :param protections: protections as a dict with "type": "level"
         :type protections: dict
-        :param kwargs: additional arguments directly feed to super().__init__()
+        :param kwargs: additional arguments directly feed to
+            super().__init__()
         """
         super().__init__(**kwargs)
         self.protections = protections

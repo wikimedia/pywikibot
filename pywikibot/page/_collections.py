@@ -27,8 +27,8 @@ class BaseDataDict(MutableMapping):
 
     """Base structure holding data for a Wikibase entity.
 
-    Data are mappings from a language to a value. It will be
-    specialised in subclasses.
+    Data are mappings from a language to a value. It will be specialised
+    in subclasses.
     """
 
     def __init__(self, data=None) -> None:
@@ -112,8 +112,8 @@ class LanguageDict(BaseDataDict):
     def toJSON(self, diffto: dict | None = None) -> dict:
         """Create JSON suitable for Wikibase API.
 
-        When diffto is provided, JSON representing differences
-        to the provided data is created.
+        When diffto is provided, JSON representing differences to the
+        provided data is created.
 
         :param diffto: JSON containing entity data
         """
@@ -175,8 +175,8 @@ class AliasesDict(BaseDataDict):
     def toJSON(self, diffto: dict | None = None) -> dict:
         """Create JSON suitable for Wikibase API.
 
-        When diffto is provided, JSON representing differences
-        to the provided data is created.
+        When diffto is provided, JSON representing differences to the
+        provided data is created.
 
         :param diffto: JSON containing entity data
         """
@@ -256,8 +256,8 @@ class ClaimCollection(MutableMapping):
     def toJSON(self, diffto: dict | None = None) -> dict:
         """Create JSON suitable for Wikibase API.
 
-        When diffto is provided, JSON representing differences
-        to the provided data is created.
+        When diffto is provided, JSON representing differences to the
+        provided data is created.
 
         :param diffto: JSON containing entity data
         """
@@ -423,7 +423,6 @@ class SiteLinkCollection(MutableMapping):
 
         :param data: Data to normalize
         :type data: list or dict
-
         :return: The dict with normalized data
         """
         norm_data = {}
@@ -452,8 +451,8 @@ class SiteLinkCollection(MutableMapping):
     def toJSON(self, diffto: dict | None = None) -> dict:
         """Create JSON suitable for Wikibase API.
 
-        When diffto is provided, JSON representing differences
-        to the provided data is created.
+        When diffto is provided, JSON representing differences to the
+        provided data is created.
 
         :param diffto: JSON containing entity data
         """
@@ -565,7 +564,6 @@ class SubEntityCollection(MutableSequence):
 
         :param data: Data to normalize
         :type data: list
-
         :return: the altered dict from parameter data.
         """
         raise NotImplementedError  # TODO
@@ -573,8 +571,8 @@ class SubEntityCollection(MutableSequence):
     def toJSON(self, diffto: dict | None = None) -> dict:
         """Create JSON suitable for Wikibase API.
 
-        When diffto is provided, JSON representing differences
-        to the provided data is created.
+        When diffto is provided, JSON representing differences to the
+        provided data is created.
 
         :param diffto: JSON containing entity data
         """

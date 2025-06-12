@@ -20,8 +20,8 @@ def _call_cmd(args, lib: str = 'djvulibre') -> tuple:
     :param args: same as Popen()
     :type args: str or typing.Sequence[string]
     :param lib: library to be logged in logging messages
-    :return: returns a tuple (res, stdoutdata), where
-        res is True if dp.returncode != 0 else False
+    :return: returns a tuple (res, stdoutdata), where res is True if
+        dp.returncode != 0 else False
     """
     # upcast any param in sequence args to str
     cmd = ' '.join(str(a) for a in args) if not isinstance(args, str) else args
@@ -45,9 +45,10 @@ class DjVuFile:
     Perform file existence checks.
 
     Control characters in djvu text-layer are converted for convenience
-    (see http://djvu.sourceforge.net/doc/man/djvused.html for control chars
+    (see
+    http://djvu.sourceforge.net/doc/man/djvused.html
+    for control chars
     details).
-
     """
 
     def __init__(self, file: str) -> None:
@@ -188,7 +189,8 @@ class DjVuFile:
     def _remove_control_chars(data):
         """Remove djvu format control characters.
 
-        See http://djvu.sourceforge.net/doc/man/djvused.html for control chars.
+        See http://djvu.sourceforge.net/doc/man/djvused.html for control
+        chars.
 
         :param data: the data checked for djvu format control characters
         """

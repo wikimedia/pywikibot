@@ -112,6 +112,7 @@ class Family:
 
     code_aliases: dict[str, str] = {}
     """Code mappings which are only an alias, and there is no 'old' wiki.
+
     For all except 'nl_nds', subdomains do exist as a redirect, but that
     should not be relied upon.
     """
@@ -130,14 +131,11 @@ class Family:
 
     edit_restricted_templates: dict[str, tuple[str, ...]] = {}
     """A dict of tuples for different sites with names of templates that
-    indicate an edit should be avoided.
-    """
+    indicate an edit should be avoided."""
 
     archived_page_templates: dict[str, tuple[str, ...]] = {}
-    """A dict of tuples for different sites with names of archive
-    templates that indicate an edit of non-archive bots should be
-    avoided.
-    """
+    """A dict of tuples for different sites with names of archive templates
+    that indicate an edit of non-archive bots should be avoided."""
 
     #: A set of projects that share cross-project sessions.
     cross_projects: set[str] = set()
@@ -153,43 +151,38 @@ class Family:
     cross_allowed: list[str] = []
 
     disambcatname: dict[str, str] = {}
-    """A dict with the name of the category containing disambiguation
-    pages for the various languages. Only one category per language, and
-    without the namespace, so add things like:
+    """A dict with the name of the category containing disambiguation pages for
+    the various languages. Only one category per language, and without the
+    namespace, so add things like:
 
-        'en': "Disambiguation"
+    'en': "Disambiguation"
     """
 
     interwiki_attop: list[str] = []
-    """attop is a list of languages that prefer to have the interwiki
-    links at the top of the page.
-    """
+    """Attop is a list of languages that prefer to have the interwiki links at
+    the top of the page."""
 
     interwiki_on_one_line: list[str] = []
-    """on_one_line is a list of languages that want the interwiki links
-    one-after-another on a single line
-    """
+    """on_one_line is a list of languages that want the interwiki links one-
+    after-another on a single line."""
 
     #: String used as separator between interwiki links and the text.
     interwiki_text_separator = '\n\n'
 
     # Similar for category
     category_attop: list[str] = []
-    """attop is a list of categories that prefer to have the category
-    links at the top of the page.
-    """
+    """Attop is a list of categories that prefer to have the category links at
+    the top of the page."""
 
     category_on_one_line: list[str] = []
-    """on_one_line is a list of languages that want the category links
-    one-after-another on a single line.
-    """
+    """on_one_line is a list of languages that want the category links one-
+    after-another on a single line."""
 
     #: String used as separator between category links and the text
     category_text_separator = '\n\n'
 
     categories_last: list[str] = []
-    """When both at the bottom should categories come after
-    interwikilinks?
+    """When both at the bottom should categories come after interwikilinks?
 
     TODO: :phab:`T86284` Needed on Wikia sites, as it uses the
     CategorySelect extension which puts categories last on all sites.
@@ -197,18 +190,22 @@ class Family:
     """
 
     interwiki_putfirst: dict[str, str] = {}
-    """Which languages have a special order for putting interlanguage
-    links, and what order is it? If a language is not in
-    interwiki_putfirst, alphabetical order on language code is used. For
-    languages that are in interwiki_putfirst, interwiki_putfirst is
-    checked first, and languages are put in the order given there. All
-    other languages are put after those, in code-alphabetical order.
+    """Which languages have a special order for putting interlanguage links,
+    and what order is it?
+
+    If a language is not in interwiki_putfirst, alphabetical order on
+    language code is used. For languages that are in interwiki_putfirst,
+    interwiki_putfirst is checked first, and languages are put in the
+    order given there. All other languages are put after those, in code-
+    alphabetical order.
     """
 
     interwiki_forward: str | None = None
-    """Some families, e. g. commons and meta, are not multilingual and
-    forward interlanguage links to another family (wikipedia). These
-    families can set this variable to the name of the target family.
+    """Some families, e.
+
+    g. commons and meta, are not multilingual and forward interlanguage
+    links to another family (wikipedia). These families can set this
+    variable to the name of the target family.
     """
 
     #: Some languages belong to a group where the possibility is high
@@ -306,20 +303,20 @@ class Family:
        crossnamespace[102] = {
            'pt': { '_default': [0]}
        }
-
     """
 
     shared_urlshortner_wiki: tuple[str, str] | None = None
-    """Some wiki farms have UrlShortener extension enabled only on
-    the main site. This value can specify this last one with
+    """Some wiki farms have UrlShortener extension enabled only on the main
+    site.
+
+    This value can specify this last one with
     ``(lang, family)`` tuple.
     """
 
     title_delimiter_and_aliases = ' _'
-    """Titles usually are delimited by a space and the alias is replaced
-    to this delimiter; e.g. "Main page" is the title with spaces as
-    delimiters but "Main_page" also works. Other families may have
-    different settings.
+    """Titles usually are delimited by a space and the alias is replaced to
+    this delimiter; e.g. "Main page" is the title with spaces as delimiters but
+    "Main_page" also works. Other families may have different settings.
 
     .. note:: The first character is used as delimiter, the others are
        aliases.
@@ -336,9 +333,11 @@ class Family:
     def load(fam: str | None = None):
         """Import the named family.
 
-        :param fam: family name (if omitted, uses the configured default)
+        :param fam: family name (if omitted, uses the configured
+            default)
         :return: a Family instance configured for the named family.
-        :raises pywikibot.exceptions.UnknownFamilyError: family not known
+        :raises pywikibot.exceptions.UnknownFamilyError: family not
+            known
         """
         if fam is None:
             fam = config.family
@@ -524,8 +523,8 @@ class Family:
 
         :param code: The site code
         :param uri: The absolute path after the hostname
-        :param protocol: The protocol which is used. If None it'll determine
-            the protocol from the code.
+        :param protocol: The protocol which is used. If None it'll
+            determine the protocol from the code.
         :return: The full URL ending with uri
         """
         protocol, host = self._hostname(code, protocol)

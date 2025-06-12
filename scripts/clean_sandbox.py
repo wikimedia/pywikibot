@@ -42,7 +42,6 @@ For example:
 
 .. seealso:: :python:`Supported .ini File Structure
    <library/configparser.html#supported-ini-file-structure>`
-
 """
 #
 # (C) Pywikibot team, 2006-2025

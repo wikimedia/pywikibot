@@ -766,9 +766,9 @@ class CosmeticChangesToolkit:
     def removeNonBreakingSpaceBeforePercent(self, text: str) -> str:
         """Remove a non-breaking space between number and percent sign.
 
-        Newer MediaWiki versions automatically place a non-breaking space in
-        front of a percent sign, so it is no longer required to place it
-        manually.
+        Newer MediaWiki versions automatically place a non-breaking
+        space in front of a percent sign, so it is no longer required to
+        place it manually.
         """
         text = textlib.replaceExcept(
             text, r'(\d)&(?:nbsp|#160|#x[Aa]0);%', r'\1 %', ['timeline'])

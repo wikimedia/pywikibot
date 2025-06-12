@@ -286,12 +286,14 @@ class Request(MutableMapping, WaitingMixin):
     def clean_kwargs(cls, kwargs: dict) -> dict:
         """Convert keyword arguments into new parameters mode.
 
-        If there are no other arguments in kwargs apart from the used arguments
-        by the class' initializer it'll just return kwargs and otherwise remove
-        those which aren't in the initializer and put them in a dict which is
-        added as a 'parameters' keyword. It will always create a shallow copy.
+        If there are no other arguments in kwargs apart from the used
+        arguments by the class' initializer it'll just return kwargs and
+        otherwise remove those which aren't in the initializer and put
+        them in a dict which is added as a 'parameters' keyword. It will
+        always create a shallow copy.
 
-        :param kwargs: The original keyword arguments which is not modified.
+        :param kwargs: The original keyword arguments which is not
+            modified.
         :return: The normalized keyword arguments.
         """
         if 'expiry' in kwargs and kwargs['expiry'] is None:
@@ -357,11 +359,11 @@ class Request(MutableMapping, WaitingMixin):
         """Set MediaWiki API request parameter.
 
         :param value: param value(s)
-        :type value: str in site encoding
-            (string types may be a `|`-separated list)
-            iterable, where items are converted to string
-            with special handling for datetime.datetime to convert it to a
-            string using the ISO 8601 format accepted by the MediaWiki API.
+        :type value: str in site encoding (string types may be a
+            `|`-separated list) iterable, where items are converted to
+            string with special handling for datetime.datetime to
+            convert it to a string using the ISO 8601 format accepted by
+            the MediaWiki API.
         """
         if isinstance(value, bytes):
             value = value.decode(self.site.encoding())
@@ -450,14 +452,15 @@ class Request(MutableMapping, WaitingMixin):
 
         This helper method only prepares params for serialisation or
         transmission, so it only encodes values which are not ASCII,
-        requiring callers to consider how to handle ASCII vs other values,
-        however the output is designed to enable __str__ and __repr__ to
-        do the right thing in most circumstances.
+        requiring callers to consider how to handle ASCII vs other
+        values, however the output is designed to enable __str__ and
+        __repr__ to do the right thing in most circumstances.
 
         Servers which use an encoding that is not a superset of ASCII
         are not supported.
 
-        :return: Parameters either in the site encoding, or ASCII strings
+        :return: Parameters either in the site encoding, or ASCII
+            strings
         """
         params = {}
         for key, values in self._params.items():
@@ -613,7 +616,8 @@ class Request(MutableMapping, WaitingMixin):
         """Construct a MIME multipart form post.
 
         :param params: HTTP request params
-        :param mime_params: HTTP request parts which must be sent in the body
+        :param mime_params: HTTP request parts which must be sent in the
+            body
         :type mime_params: dict of (content, keytype, headers)
         :return: HTTP request headers and body
         """
@@ -870,10 +874,10 @@ but {scheme!r} is required. Please add the following code to your family file:
     def _logged_in(self, code) -> bool:
         """Check whether user is logged in.
 
-        Older wikis returned an error instead of a warning when the request
-        asked for too many values. If we get this error, assume we are not
-        logged in (we can't check this because the userinfo data is not
-        present) and force a re-login
+        Older wikis returned an error instead of a warning when the
+        request asked for too many values. If we get this error, assume
+        we are not logged in (we can't check this because the userinfo
+        data is not present) and force a re-login
         """
         if code.endswith('limit'):
             message = 'Received API limit error.'
@@ -1227,8 +1231,8 @@ class CachedRequest(Request):
         """Return unique description for the cache entry.
 
         If this is modified, please also update
-        scripts/maintenance/cache.py to support
-        the new key and all previous keys.
+        scripts/maintenance/cache.py to support the new key and all
+        previous keys.
         """
         login_status = self.site._loginstatus
 

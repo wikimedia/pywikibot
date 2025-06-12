@@ -230,7 +230,8 @@ def _print_requirements(requirements,
 def check_modules(script: str | None = None) -> bool:
     """Check whether mandatory modules are present.
 
-    This also checks Python version when importing dependencies from setup.py
+    This also checks Python version when importing dependencies from
+    setup.py
 
     :param script: The script name to be checked for dependencies
     :return: True if all dependencies are installed

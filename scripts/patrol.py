@@ -38,7 +38,6 @@ Commandline parameters:
 -recentchanges     Run on complete unpatrolled recentchanges
                    (default for any project except Wikipedia Projects)
 -usercontribs      Filter generators above to the given user
-
 """
 #
 # (C) Pywikibot team, 2011-2024
@@ -86,7 +85,8 @@ class PatrolBot(BaseBot):
 
         :keyword ask: If True, confirm each patrol action
         :keyword whitelist: page title for whitelist (optional)
-        :keyword autopatroluserns: Takes user consent to automatically patrol
+        :keyword autopatroluserns: Takes user consent to automatically
+            patrol
         :keyword versionchecktime: Check versionchecktime lapse in sec
         """
         super().__init__(**kwargs)

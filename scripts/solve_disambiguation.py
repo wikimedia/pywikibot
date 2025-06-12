@@ -71,7 +71,6 @@ Command line options:
 To complete a move of a page, one can use:
 
     python pwb.py solve_disambiguation -just -pos:New_Name Old_Name
-
 """
 #
 # (C) Pywikibot team, 2003-2025
@@ -381,8 +380,8 @@ def correctcap(link, text: str) -> str:
     :param link: link page
     :type link: pywikibot.Page
     :param text: the wikitext that is supposed to refer to the link
-    :return: uncapitalized title of the link if the text links to the link
-        with an uncapitalized title, else capitalized
+    :return: uncapitalized title of the link if the text links to the
+        link with an uncapitalized title, else capitalized
     """
     linkupper = link.title()
     linklower = first_lower(linkupper)
@@ -442,10 +441,10 @@ class PrimaryIgnoreManager:
 
     """Primary ignore manager.
 
-    If run with the -primary argument, reads from a file which pages should
-    not be worked on; these are the ones where the user pressed n last time.
-    If run without the -primary argument, doesn't ignore any pages.
-
+    If run with the -primary argument, reads from a file which pages
+    should not be worked on; these are the ones where the user pressed n
+    last time. If run without the -primary argument, doesn't ignore any
+    pages.
     """
 
     def __init__(self, disamb_page, enabled: bool = False) -> None:
@@ -631,9 +630,9 @@ class DisambiguationRobot(SingleSiteBot):
         """Check if the text matches any of the ignore regexes.
 
         :param text: wikitext of a page
-        :return: None if none of the regular expressions
-            given in the dictionary at the top of this class matches
-            a substring of the text, otherwise the matched substring
+        :return: None if none of the regular expressions given in the
+            dictionary at the top of this class matches a substring of
+            the text, otherwise the matched substring
         """
         for ig in self.ignore_contents_regexes:
             match = ig.search(text)
@@ -680,12 +679,12 @@ class DisambiguationRobot(SingleSiteBot):
     def firstlinks(page) -> Generator[str]:
         """Return a list of first links of every line beginning with `*`.
 
-        When a disambpage is full of unnecessary links, this may be useful
-        to sort out the relevant links. E.g. from line
-        `* [[Jim Smith (smith)|Jim Smith]] ([[1832]]-[[1932]]) [[English]]`
-        it returns only 'Jim Smith (smith)'
-        Lines without an asterisk at the beginning will be disregarded.
-        No check for page existence, it has already been done.
+        When a disambpage is full of unnecessary links, this may be
+        useful to sort out the relevant links. E.g. from line `* [[Jim
+        Smith (smith)|Jim Smith]] ([[1832]]-[[1932]]) [[English]]` it
+        returns only 'Jim Smith (smith)' Lines without an asterisk at
+        the beginning will be disregarded. No check for page existence,
+        it has already been done.
         """
         reg = re.compile(r'\*.*?\[\[(.*?)(?:\||\]\])')
         for line in page.text.splitlines():
@@ -696,9 +695,10 @@ class DisambiguationRobot(SingleSiteBot):
     def firstize(self, page, links) -> list[pywikibot.Page]:
         """Call firstlinks and remove extra links.
 
-        This will remove a lot of silly redundant links from overdecorated
-        disambiguation pages and leave the first link of each asterisked
-        line only. This must be done if -first is used in command line.
+        This will remove a lot of silly redundant links from
+        overdecorated disambiguation pages and leave the first link of
+        each asterisked line only. This must be done if -first is used
+        in command line.
         """
         titles = {first_upper(t) for t in self.firstlinks(page)}
         links = list(links)
@@ -710,13 +710,13 @@ class DisambiguationRobot(SingleSiteBot):
     def treat_links(self, ref_page, disamb_page) -> bool:
         """Resolve the links to disamb_page or its redirects.
 
-        :param disamb_page: the disambiguation page or redirect we don't want
-            anything to link to
+        :param disamb_page: the disambiguation page or redirect we don't
+            want anything to link to
         :type disamb_page: pywikibot.Page
         :param ref_page: a page linking to disamb_page
         :type ref_page: pywikibot.Page
-        :return: Return whether continue with next page (True)
-            or next disambig (False)
+        :return: Return whether continue with next page (True) or next
+            disambig (False)
         """
         nochange = True
 
@@ -738,14 +738,14 @@ class DisambiguationRobot(SingleSiteBot):
     def treat_disamb_only(self, ref_page, disamb_page) -> str:
         """Resolve the links to disamb_page but don't look for its redirects.
 
-        :param disamb_page: the disambiguation page or redirect we don't want
-            anything to link to
+        :param disamb_page: the disambiguation page or redirect we don't
+            want anything to link to
         :type disamb_page: pywikibot.Page
         :param ref_page: a page linking to disamb_page
         :type ref_page: pywikibot.Page
         :return: "nextpage" if the user enters "n" to skip this page,
-            "nochange" if the page needs no change, and
-            "done" if the page is processed successfully
+            "nochange" if the page needs no change, and "done" if the
+            page is processed successfully
         """
         # TODO: break this function up into subroutines!
 

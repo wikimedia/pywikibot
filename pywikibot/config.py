@@ -880,17 +880,17 @@ pickle_protocol = 2
 def makepath(path: str, create: bool = True) -> str:
     """Return a normalized absolute version of the path argument.
 
-    If the given path already exists in the filesystem or create is False
-    the filesystem is not modified.
-    Otherwise if create is True makepath creates directories along the given
-    path using the dirname() of the path. You may append a '/' to the path if
-    you want it to be a directory path.
+    If the given path already exists in the filesystem or create is
+    False the filesystem is not modified. Otherwise if create is True
+    makepath creates directories along the given path using the
+    dirname() of the path. You may append a '/' to the path if you want
+    it to be a directory path.
 
     from holger@trillke.net 2002/03/18
 
     :param path: path in the filesystem
-    :param create: create the directory if it is True. Otherwise do not change
-        the filesystem. Default is True.
+    :param create: create the directory if it is True. Otherwise do not
+        change the filesystem. Default is True.
     """
     dpath = os.path.normpath(os.path.dirname(path))
     if create and not os.path.exists(dpath):
@@ -901,14 +901,14 @@ def makepath(path: str, create: bool = True) -> str:
 def datafilepath(*filename: str, create: bool = True) -> str:
     """Return an absolute path to a data file in a standard location.
 
-    Argument(s) are zero or more directory names, optionally followed by a
-    data file name. The return path is offset to config.base_dir. Any
-    directories in the path that do not already exist are created if create
-    is True, otherwise the filesystem keeps unchanged.
+    Argument(s) are zero or more directory names, optionally followed by
+    a data file name. The return path is offset to config.base_dir. Any
+    directories in the path that do not already exist are created if
+    create is True, otherwise the filesystem keeps unchanged.
 
     :param filename: path in the filesystem
-    :param create: create the directory if it is True. Otherwise don't change
-        the filesystem. Default is True.
+    :param create: create the directory if it is True. Otherwise don't
+        change the filesystem. Default is True.
     """
     return makepath(os.path.join(base_dir, *filename), create=create)
 

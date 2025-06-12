@@ -54,12 +54,12 @@ class ThreadedGenerator(threading.Thread):
                  args=(), kwargs=None, qsize: int = 65536) -> None:
         """Initializer. Takes same keyword arguments as threading.Thread.
 
-        target must be a generator function (or other callable that returns
-        an iterable object).
+        target must be a generator function (or other callable that
+        returns an iterable object).
 
-        :param qsize: The size of the lookahead queue. The larger the qsize,
-            the more values will be computed in advance of use (which can eat
-            up memory and processor time).
+        :param qsize: The size of the lookahead queue. The larger the
+            qsize, the more values will be computed in advance of use
+            (which can eat up memory and processor time).
         """
         if kwargs is None:
             kwargs = {}
@@ -250,7 +250,6 @@ class BoundedPoolExecutor(futures.Executor):
                                      max_workers=1) as executor:
                future = executor.submit(pow, 323, 1235)
                print(future.result())
-
         """
         self._bound_semaphore.acquire()
 

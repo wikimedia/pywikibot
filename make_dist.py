@@ -195,8 +195,8 @@ class SetupPywikibot(SetupBase):
     def copy_files(self) -> None:  # pragma: no cover
         """Copy i18n files to pywikibot.scripts folder.
 
-        Pywikibot i18n files are used for some translations. They are copied
-        to the pywikibot scripts folder.
+        Pywikibot i18n files are used for some translations. They are
+        copied to the pywikibot scripts folder.
         """
         info('<<lightyellow>>Copy files')
         info(f'directory is {self.folder}')

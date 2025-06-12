@@ -125,8 +125,8 @@ class DataSite(APISite):
     def get_entity_for_entity_id(self, entity_id):
         """Return a new instance for given entity id.
 
-        :raises pywikibot.exceptions.NoWikibaseEntityError: there is no entity
-            with the id
+        :raises pywikibot.exceptions.NoWikibaseEntityError: there is no
+            entity with the id
         :return: a WikibaseEntity subclass
         :rtype: WikibaseEntity
         """
@@ -175,10 +175,9 @@ class DataSite(APISite):
     def loadcontent(self, identification, *props):
         """Fetch the current content of a Wikibase item.
 
-        This is called loadcontent since
-        wbgetentities does not support fetching old
-        revisions. Eventually this will get replaced by
-        an actual loadrevisions.
+        This is called loadcontent since wbgetentities does not support
+        fetching old revisions. Eventually this will get replaced by an
+        actual loadrevisions.
 
         :param identification: Parameters used to identify the page(s)
         :type identification: dict

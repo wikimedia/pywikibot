@@ -298,8 +298,8 @@ class DuplicateReferences:
 
     """Helper to de-duplicate references in text.
 
-    When some references are duplicated in an article,
-    name the first, and remove the content of the others
+    When some references are duplicated in an article, name the first,
+    and remove the content of the others
     """
 
     def __init__(self, site=None) -> None:

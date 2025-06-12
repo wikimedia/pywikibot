@@ -180,8 +180,8 @@ class TestCategoryRearrangement(DefaultDrySiteTestCase):
 
     """Ensure that sorting keys are not being lost.
 
-    Tests .getCategoryLinks() and .replaceCategoryLinks(),
-    with both a newline and an empty string as separators.
+    Tests .getCategoryLinks() and .replaceCategoryLinks(), with both a
+    newline and an empty string as separators.
     """
 
     old = '[[Category:Cat1]]\n[[Category:Cat2|]]\n' \
@@ -1629,8 +1629,8 @@ class TestExtractSections(DefaultDrySiteTestCase):
         r"""Test for text having a long expanse of white space.
 
         This is to catch certain regex issues caused by patterns like
-        r'(\s+)*$' (as found in older versions of extract_section).
-        They may not halt.
+        r'(\s+)*$' (as found in older versions of extract_section). They
+        may not halt.
 
         c.f.
         https://www.regular-expressions.info/catastrophic.html

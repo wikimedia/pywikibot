@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""memento client test module."""
+"""Memento client test module."""
 #
 # (C) Pywikibot team, 2015-2025
 #

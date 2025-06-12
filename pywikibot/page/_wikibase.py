@@ -146,10 +146,11 @@ class WikibaseEntity:
     def _defined_by(self, singular: bool = False) -> dict[str, str]:
         """Function to provide the API parameters to identify the entity.
 
-        An empty dict is returned if the entity has not been created yet.
+        An empty dict is returned if the entity has not been created
+        yet.
 
-        :param singular: Whether the parameter names should use the singular
-            form
+        :param singular: Whether the parameter names should use the
+            singular form
         :return: API parameters
         """
         params = {}
@@ -179,8 +180,8 @@ class WikibaseEntity:
     def toJSON(self, diffto: dict | None = None) -> dict:
         """Create JSON suitable for Wikibase API.
 
-        When diffto is provided, JSON representing differences
-        to the provided data is created.
+        When diffto is provided, JSON representing differences to the
+        provided data is created.
 
         :param diffto: JSON containing entity data
         """
@@ -594,9 +595,9 @@ class WikibasePage(BasePage, WikibaseEntity):
     def __init__(self, site, title: str = '', **kwargs) -> None:
         """Initializer.
 
-        If title is provided, either ns or entity_type must also be provided,
-        and will be checked against the title parsed using the Page
-        initialisation logic.
+        If title is provided, either ns or entity_type must also be
+        provided, and will be checked against the title parsed using the
+        Page initialisation logic.
 
         :param site: Wikibase data site
         :type site: pywikibot.site.DataSite
@@ -606,7 +607,6 @@ class WikibasePage(BasePage, WikibaseEntity):
         :type ns: Namespace instance, or int
         :keyword entity_type: Wikibase entity type
         :type entity_type: str ('item' or 'property')
-
         :raises TypeError: incorrect use of parameters
         :raises ValueError: incorrect namespace
         :raises pywikibot.exceptions.Error: title parsing problems
@@ -707,10 +707,10 @@ class WikibasePage(BasePage, WikibaseEntity):
     def botMayEdit(self) -> bool:
         """Return whether bots may edit this page.
 
-        Because there is currently no system to mark a page that it shouldn't
-        be edited by bots on Wikibase pages it always returns True. The content
-        of the page is not text but a dict, the original way (to search for a
-        template) doesn't apply.
+        Because there is currently no system to mark a page that it
+        shouldn't be edited by bots on Wikibase pages it always returns
+        True. The content of the page is not text but a dict, the
+        original way (to search for a template) doesn't apply.
 
         :return: True
         """
@@ -755,7 +755,8 @@ class WikibasePage(BasePage, WikibaseEntity):
         """Get the revision id for the most recent revision of the entity.
 
         :rtype: int
-        :raise pywikibot.exceptions.NoPageError: if the entity doesn't exist
+        :raise pywikibot.exceptions.NoPageError: if the entity doesn't
+            exist
         """
         if not hasattr(self, '_revid'):
             self.get()
@@ -876,7 +877,8 @@ class WikibasePage(BasePage, WikibaseEntity):
     ) -> NoReturn:
         """Set target of a redirect for a Wikibase page.
 
-        Has not been implemented in the Wikibase API yet, except for ItemPage.
+        Has not been implemented in the Wikibase API yet, except for
+        ItemPage.
         """
         raise NotImplementedError
 
@@ -887,15 +889,15 @@ class WikibasePage(BasePage, WikibaseEntity):
         :param claim: The claim to add
         :type claim: pywikibot.page.Claim
         :param bot: Whether to flag as bot (if possible)
-        :keyword asynchronous: if True, launch a separate thread to add claim
-            asynchronously
+        :keyword asynchronous: if True, launch a separate thread to add
+            claim asynchronously
         :type asynchronous: bool
-        :keyword callback: a callable object that will be called after the
-            claim has been added. It must take two arguments:
-            (1) a WikibasePage object, and (2) an exception instance,
-            which will be None if the entity was saved successfully. This is
-            intended for use by bots that need to keep track of which saves
-            were successful.
+        :keyword callback: a callable object that will be called after
+            the claim has been added. It must take two arguments: (1) a
+            WikibasePage object, and (2) an exception instance, which
+            will be None if the entity was saved successfully. This is
+            intended for use by bots that need to keep track of which
+            saves were successful.
         :type callback: callable
         """
         if claim.on_item is not None:
@@ -925,11 +927,11 @@ class ItemPage(WikibasePage):
 
     """Wikibase entity of type 'item'.
 
-    A Wikibase item may be defined by either a 'Q' id (qid),
-    or by a site & title.
+    A Wikibase item may be defined by either a 'Q' id (qid), or by a
+    site & title.
 
-    If an item is defined by site & title, once an item's qid has
-    been looked up, the item is then defined by the qid.
+    If an item is defined by site & title, once an item's qid has been
+    looked up, the item is then defined by the qid.
     """
 
     _cache_attrs = (*WikibasePage._cache_attrs, 'labels', 'descriptions',
@@ -975,15 +977,15 @@ class ItemPage(WikibasePage):
     def _defined_by(self, singular: bool = False) -> dict:
         """Function to provide the API parameters to identify the item.
 
-        The API parameters may be 'id' if the ItemPage has one,
-        or 'site'&'title' if instantiated via ItemPage.fromPage with
+        The API parameters may be 'id' if the ItemPage has one, or
+        'site'&'title' if instantiated via ItemPage.fromPage with
         lazy_load enabled.
 
-        Once an item's Q## is looked up, that will be used for all future
-        requests.
+        Once an item's Q## is looked up, that will be used for all
+        future requests.
 
-        An empty dict is returned if the ItemPage is instantiated without
-        either ID (internally it has id = '-1') or site&title.
+        An empty dict is returned if the ItemPage is instantiated
+        without either ID (internally it has id = '-1') or site&title.
 
         :param singular: Whether the parameter names should use the
             singular form
@@ -1021,10 +1023,10 @@ class ItemPage(WikibasePage):
     def title(self, **kwargs):
         """Return ID as title of the ItemPage.
 
-        If the ItemPage was lazy-loaded via ItemPage.fromPage, this method
-        will fetch the Wikibase item ID for the page, potentially raising
-        NoPageError with the page on the linked wiki if it does not exist, or
-        does not have a corresponding Wikibase item ID.
+        If the ItemPage was lazy-loaded via ItemPage.fromPage, this
+        method will fetch the Wikibase item ID for the page, potentially
+        raising NoPageError with the page on the linked wiki if it does
+        not exist, or does not have a corresponding Wikibase item ID.
 
         This method also refreshes the title if the id property was set.
         i.e. item.id = 'Q60'
@@ -1070,9 +1072,8 @@ class ItemPage(WikibasePage):
         :param lazy_load: Do not raise NoPageError if either page or
             corresponding ItemPage does not exist.
         :rtype: pywikibot.page.ItemPage
-
-        :raise pywikibot.exceptions.NoPageError: There is no corresponding
-            ItemPage for the page
+        :raise pywikibot.exceptions.NoPageError: There is no
+            corresponding ItemPage for the page
         :raise pywikibot.exceptions.WikiBaseError: The site of the page
             has no data repository.
         """
@@ -1107,13 +1108,14 @@ class ItemPage(WikibasePage):
         :param site: The Wikibase site for the item.
         :type site: pywikibot.site.DataSite
         :param uri: Entity uri for the Wikibase item.
-        :param lazy_load: Do not raise NoPageError if ItemPage does not exist.
+        :param lazy_load: Do not raise NoPageError if ItemPage does not
+            exist.
         :rtype: pywikibot.page.ItemPage
-
         :raise TypeError: Site is not a valid DataSite.
-        :raise ValueError: Site does not match the base of the provided uri.
-        :raise pywikibot.exceptions.NoPageError: Uri points to non-existent
-            item.
+        :raise ValueError: Site does not match the base of the provided
+            uri.
+        :raise pywikibot.exceptions.NoPageError: Uri points to non-
+            existent item.
         """
         if not isinstance(site, DataSite):
             raise TypeError(f'{site} is not a data repository.')
@@ -1191,8 +1193,8 @@ class ItemPage(WikibasePage):
     def iterlinks(self, family=None):
         """Iterate through all the sitelinks.
 
-        :param family: string/Family object which represents what family of
-                       links to iterate
+        :param family: string/Family object which represents what family
+            of links to iterate
         :type family: str|pywikibot.family.Family
         :return: iterator of pywikibot.Page objects
         :rtype: iterator
@@ -1254,8 +1256,8 @@ class ItemPage(WikibasePage):
                         ) -> None:
         """Remove sitelinks.
 
-        Sites should be a list, with values either
-        being Site objects, or dbNames.
+        Sites should be a list, with values either being Site objects,
+        or dbNames.
         """
         data = []
         for site in sites:
@@ -1345,12 +1347,12 @@ class Property:
     """A Wikibase property.
 
     While every Wikibase property has a Page on the data repository,
-    this object is for when the property is used as part of another concept
-    where the property is not _the_ Page of the property.
+    this object is for when the property is used as part of another
+    concept where the property is not _the_ Page of the property.
 
-    For example, a claim on an ItemPage has many property attributes, and so
-    it subclasses this Property class, but a claim does not have Page like
-    behaviour and semantics.
+    For example, a claim on an ItemPage has many property attributes,
+    and so it subclasses this Property class, but a claim does not have
+    Page like behaviour and semantics.
     """
 
     types = {
@@ -1396,8 +1398,8 @@ class Property:
         :param site: data repository
         :type site: pywikibot.site.DataSite
         :param id: id of the property
-        :param datatype: datatype of the property;
-            if not given, it will be queried via the API
+        :param datatype: datatype of the property; if not given, it will
+            be queried via the API
         """
         self.repo = site
         self.id = id.upper()
@@ -1467,8 +1469,8 @@ class PropertyPage(WikibasePage, Property):
 
         :param source: data repository property is on
         :type source: pywikibot.site.DataSite
-        :param title: identifier of property, like "P##",
-                      "-1" or None for an empty property.
+        :param title: identifier of property, like "P##", "-1" or None
+            for an empty property.
         :type title: str
         :param datatype: Datatype for a new property.
         :type datatype: str
@@ -1583,9 +1585,9 @@ class Claim(Property):
 
         Defined by the "snak" value, supplemented by site + pid
 
-        :param site: Repository where the property of the claim is defined.
-            Note that this does not have to correspond to the repository
-            where the claim has been stored.
+        :param site: Repository where the property of the claim is
+            defined. Note that this does not have to correspond to the
+            repository where the claim has been stored.
         :type site: pywikibot.site.DataSite
         :param pid: property id, with "P" prefix
         :param snak: snak identifier for claim
@@ -1794,9 +1796,9 @@ class Claim(Property):
     def qualifierFromJSON(cls, site, data):
         """Create a Claim for a qualifier from JSON.
 
-        Qualifier objects are represented a bit
-        differently like references, but I'm not
-        sure if this even requires it's own function.
+        Qualifier objects are represented a bit differently like
+        references, but I'm not sure if this even requires it's own
+        function.
 
         :rtype: pywikibot.page.Claim
         """
@@ -1857,9 +1859,8 @@ class Claim(Property):
 
         :param value: The new target value.
         :type value: object
-
-        :exception ValueError: if value is not of the type
-            required for the Claim type.
+        :exception ValueError: if value is not of the type required for
+            the Claim type.
         """
         value_class = self.types[self.type]
         if not isinstance(value, value_class):
@@ -2198,8 +2199,8 @@ class LexemePage(WikibasePage):
     def toJSON(self, diffto: dict | None = None) -> dict:
         """Create JSON suitable for Wikibase API.
 
-        When diffto is provided, JSON representing differences
-        to the provided data is created.
+        When diffto is provided, JSON representing differences to the
+        provided data is created.
 
         :param diffto: JSON containing entity data
         """
@@ -2274,15 +2275,15 @@ class LexemePage(WikibasePage):
         :type form: Form
         :keyword bot: Whether to flag as bot (if possible)
         :type bot: bool
-        :keyword asynchronous: if True, launch a separate thread to add form
-            asynchronously
+        :keyword asynchronous: if True, launch a separate thread to add
+            form asynchronously
         :type asynchronous: bool
-        :keyword callback: a callable object that will be called after the
-            claim has been added. It must take two arguments:
-            (1) a LexemePage object, and
-            (2) an exception instance, which will be None if the entity was
-            saved successfully. This is intended for use by bots that need to
-            keep track of which saves were successful.
+        :keyword callback: a callable object that will be called after
+            the claim has been added. It must take two arguments: (1) a
+            LexemePage object, and (2) an exception instance, which will
+            be None if the entity was saved successfully. This is
+            intended for use by bots that need to keep track of which
+            saves were successful.
         :type callback: callable
         """
         if form.on_lexeme is not None:
@@ -2382,14 +2383,15 @@ class LexemeSubEntity(WikibaseEntity):
         :type claim: Claim
         :keyword bot: Whether to flag as bot (if possible)
         :type bot: bool
-        :keyword asynchronous: if True, launch a separate thread to add claim
-            asynchronously
+        :keyword asynchronous: if True, launch a separate thread to add
+            claim asynchronously
         :type asynchronous: bool
-        :keyword callback: a callable object that will be called after the
-            claim has been added. It must take two arguments: (1) a Form
-            object, and (2) an exception instance, which will be None if the
-            form was saved successfully. This is intended for use by bots that
-            need to keep track of which saves were successful.
+        :keyword callback: a callable object that will be called after
+            the claim has been added. It must take two arguments: (1) a
+            Form object, and (2) an exception instance, which will be
+            None if the form was saved successfully. This is intended
+            for use by bots that need to keep track of which saves were
+            successful.
         :type callback: callable
         """
         self.repo.addClaim(self, claim, **kwargs)

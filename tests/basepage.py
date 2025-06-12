@@ -28,8 +28,8 @@ class BasePageLoadRevisionsCachingTestBase(BasePageTestBase):
     """Test site.loadrevisions() caching.
 
     This test class monkey patches site.loadrevisions, which will cause
-    the pickling tests in site_tests and page_tests to fail, if it
-    is done on the same site as those tests use (the default site).
+    the pickling tests in site_tests and page_tests to fail, if it is
+    done on the same site as those tests use (the default site).
     """
 
     cached = False

@@ -205,11 +205,10 @@ class TextEditor(ScrolledText):
     def find_all(self, s):
         """Highlight all occurrences of string s, and select the first one.
 
-        If the string has already been highlighted, jump to the next occurrence
-        after the current selection. (You cannot go backwards using the
-        button, but you can manually place the cursor anywhere in the
-        document to start searching from that point.)
-
+        If the string has already been highlighted, jump to the next
+        occurrence after the current selection. (You cannot go backwards
+        using the button, but you can manually place the cursor anywhere
+        in the document to start searching from that point.)
         """
         if hasattr(self, '_highlight') and self._highlight == s:
             try:
@@ -381,9 +380,10 @@ class EditBoxWindow(Frame):
 
         :param text: the text to be edited
         :param jumpIndex: position at which to put the caret
-        :param highlight: each occurrence of this substring will be highlighted
-        :return: the modified text, or None if the user didn't save the text
-            file in his text editor
+        :param highlight: each occurrence of this substring will be
+            highlighted
+        :return: the modified text, or None if the user didn't save the
+            text file in his text editor
         """
         self.text = None
         # put given text into our textarea
@@ -425,8 +425,8 @@ class EditBoxWindow(Frame):
     def pressedOK(self) -> None:  # noqa: N802
         """Perform OK operation.
 
-        Called when user pushes the OK button.
-        Saves the buffer into a variable, and closes the window.
+        Called when user pushes the OK button. Saves the buffer into a
+        variable, and closes the window.
         """
         self.text = self.editbox.get('1.0', tkinter.END)
         self.parent.destroy()

@@ -106,7 +106,6 @@ class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
     """Responsible for writing pages to the wiki.
 
     Titles and contents are given by a PageFromFileReader.
-
     """
 
     update_options = {

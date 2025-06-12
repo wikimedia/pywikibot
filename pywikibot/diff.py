@@ -32,7 +32,6 @@ class Hunk:
 
     .. note:: parts of this code are taken from by
        `difflib.get_grouped_opcodes()`.
-
     """
 
     APPR = 1
@@ -47,8 +46,9 @@ class Hunk:
 
         :param a: sequence of lines
         :param b: sequence of lines
-        :param grouped_opcode: list of 5-tuples describing how to turn a into
-            b. It has the same format as returned by difflib.get_opcodes().
+        :param grouped_opcode: list of 5-tuples describing how to turn a
+            into b. It has the same format as returned by
+            difflib.get_opcodes().
         """
         self.a = a
         self.b = b
@@ -252,10 +252,10 @@ class PatchManager:
         :param text_a: base text
         :param text_b: target text
         :param context: number of lines which are context
-        :param by_letter: if text_a and text_b are single lines, comparison can
-            be done letter by letter.
-        :param replace_invisible: Replace invisible characters like U+200e with
-            the charnumber in brackets (e.g. <200e>).
+        :param by_letter: if text_a and text_b are single lines,
+            comparison can be done letter by letter.
+        :param replace_invisible: Replace invisible characters like
+            U+200e with the charnumber in brackets (e.g. <200e>).
         """
         self.a: str | list[str] = text_a.splitlines(True)
         self.b: str | list[str] = text_b.splitlines(True)
@@ -527,7 +527,10 @@ class PatchManager:
                         for answer in answers)))
 
     def apply(self) -> list[str]:
-        """Apply changes. If there are undecided changes, ask to review."""
+        """Apply changes.
+
+        If there are undecided changes, ask to review.
+        """
         if any(h.reviewed == h.PENDING for h in self.hunks):
             pywikibot.info('There are unreviewed hunks.\n'
                            'Please review them before proceeding.\n')
@@ -559,7 +562,6 @@ def cherry_pick(oldtext: str, newtext: str, n: int = 0,
     Text with approved changes will be returned.
     n: int, line of context as defined in difflib.get_grouped_opcodes().
     by_letter: if text_a and text_b are single lines, comparison can be done
-
     """
     template = '{2}<<lightpurple>>{0:{1}^50}<<default>>{2}'
 

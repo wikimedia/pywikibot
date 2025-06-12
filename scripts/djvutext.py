@@ -35,7 +35,6 @@ by default:
 -force     Overwrites existing text optional, default False.
 
 -always    Do not bother asking to confirm any of the changes.
-
 """
 #
 # (C) Pywikibot team, 2008-2024

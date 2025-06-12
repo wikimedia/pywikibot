@@ -50,16 +50,16 @@ class TestPwb(PwbTestCase):
     def test_env(self) -> None:
         """Test external environment of pywikibot.
 
-        Make sure the environment is not contaminated, and is the same as
-        the environment we get when directly running a script.
+        Make sure the environment is not contaminated, and is the same
+        as the environment we get when directly running a script.
         """
         self._do_check('print_env')
 
     def test_locals(self) -> None:
         """Test internal environment of pywikibot.
 
-        Make sure the environment is not contaminated, and is the same as
-        the environment we get when directly running a script.
+        Make sure the environment is not contaminated, and is the same
+        as the environment we get when directly running a script.
         """
         self._do_check('print_locals')
 

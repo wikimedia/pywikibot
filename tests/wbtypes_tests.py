@@ -83,8 +83,8 @@ class TestWikibaseCoordinateNonDry(WbRepresentationTestCase):
 
     """Test Wikibase Coordinate data type (non-dry).
 
-    These can be moved to TestWikibaseCoordinate once DrySite has been bumped
-    to the appropriate version.
+    These can be moved to TestWikibaseCoordinate once DrySite has been
+    bumped to the appropriate version.
     """
 
     def test_Coordinate_item_globe(self) -> None:

@@ -31,10 +31,10 @@ class UploadRobot(BaseBot):
     """Upload bot."""
 
     post_processor: Callable[[str, str | None], None] | None = None
-    """If this attribute is set to a callable, the :meth:`run` method
-    calls it after upload. The parameters passed to the callable is the
-    origin *file_url* passed to the :meth:`upload` method and the
-    *filename* returned from that method. It can be used like this:
+    """If this attribute is set to a callable, the :meth:`run` method calls it
+    after upload. The parameters passed to the callable is the origin
+    *file_url* passed to the :meth:`upload` method and the *filename* returned
+    from that method. It can be used like this:
 
     .. code-block:: python
 
@@ -205,8 +205,9 @@ class UploadRobot(BaseBot):
         """Return whether the warning cause an abort or be ignored.
 
         :param warning: The warning name
-        :return: False if this warning should cause an abort, True if it should
-            be ignored or None if this warning has no default handler.
+        :return: False if this warning should cause an abort, True if it
+            should be ignored or None if this warning has no default
+            handler.
         """
         if self.aborts is not True and warning in self.aborts:
             return False

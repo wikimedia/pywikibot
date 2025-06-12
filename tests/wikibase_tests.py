@@ -292,9 +292,9 @@ class TestItemLoad(WikidataTestCase):
     def test_reuse_item_set_id(self) -> None:
         """Test modifying item.id attribute.
 
-        Some scripts are using item.id = 'Q60' semantics, which does work
-        but modifying item.id does not currently work, and this test
-        highlights that it breaks silently.
+        Some scripts are using item.id = 'Q60' semantics, which does
+        work but modifying item.id does not currently work, and this
+        test highlights that it breaks silently.
         """
         # label could change
         label = ['New York', 'New York City']
@@ -318,8 +318,8 @@ class TestItemLoad(WikidataTestCase):
     def test_empty_item(self) -> None:
         """Test empty wikibase item.
 
-        should not raise an error as the constructor only requires
-        the site parameter, with the title parameter defaulted to None.
+        should not raise an error as the constructor only requires the
+        site parameter, with the title parameter defaulted to None.
         """
         wikidata = self.get_repo()
         item = ItemPage(wikidata)
@@ -746,8 +746,8 @@ class TestClaim(WikidataTestCase):
     def test_claim_eq_simple_different_value(self) -> None:
         """Test comparing two claims.
 
-        If they have the same property and different values,
-        they are not equal.
+        If they have the same property and different values, they are
+        not equal.
         """
         wikidata = self.get_repo()
         claim1 = pywikibot.Claim(wikidata, 'P31')
@@ -775,8 +775,8 @@ class TestClaim(WikidataTestCase):
     def test_claim_eq_simple_different_snaktype(self) -> None:
         """Test comparing two claims.
 
-        If they have the same property and different snaktypes,
-        they are not equal.
+        If they have the same property and different snaktypes, they are
+        not equal.
         """
         wikidata = self.get_repo()
         claim1 = pywikibot.Claim(wikidata, 'P31')
@@ -789,8 +789,8 @@ class TestClaim(WikidataTestCase):
     def test_claim_eq_simple_different_property(self) -> None:
         """Test comparing two claims.
 
-        If they have the same value and different properties,
-        they are not equal.
+        If they have the same value and different properties, they are
+        not equal.
         """
         wikidata = self.get_repo()
         claim1 = pywikibot.Claim(wikidata, 'P31')
@@ -803,7 +803,8 @@ class TestClaim(WikidataTestCase):
     def test_claim_eq_with_qualifiers(self) -> None:
         """Test comparing two claims.
 
-        If they have the same property, value and qualifiers, they are equal.
+        If they have the same property, value and qualifiers, they are
+        equal.
         """
         wikidata = self.get_repo()
         claim1 = pywikibot.Claim(wikidata, 'P31')
@@ -822,8 +823,8 @@ class TestClaim(WikidataTestCase):
     def test_claim_eq_with_different_qualifiers(self) -> None:
         """Test comparing two claims.
 
-        If they have the same property and value and different qualifiers,
-        they are not equal.
+        If they have the same property and value and different
+        qualifiers, they are not equal.
         """
         wikidata = self.get_repo()
         claim1 = pywikibot.Claim(wikidata, 'P31')
@@ -842,8 +843,8 @@ class TestClaim(WikidataTestCase):
     def test_claim_eq_one_without_qualifiers(self) -> None:
         """Test comparing two claims.
 
-        If they have the same property and value and one of them has
-        no qualifiers while the other one does, they are not equal.
+        If they have the same property and value and one of them has no
+        qualifiers while the other one does, they are not equal.
         """
         wikidata = self.get_repo()
         claim1 = pywikibot.Claim(wikidata, 'P31')
@@ -1047,9 +1048,9 @@ class TestLinks(WikidataTestCase):
 
     """Test cases to test links stored in Wikidata.
 
-    Uses a stored data file for the wikibase item.
-    However wikibase creates site objects for each sitelink, and the unit test
-    directly creates a Site for 'wikipedia:af' to use in a comparison.
+    Uses a stored data file for the wikibase item. However wikibase
+    creates site objects for each sitelink, and the unit test directly
+    creates a Site for 'wikipedia:af' to use in a comparison.
     """
 
     sites = {
@@ -1171,8 +1172,8 @@ class TestNamespaces(WikidataTestCase):
     def test_empty_wikibase_page(self) -> None:
         """Test empty wikibase page.
 
-        As a base class it should be able to instantiate
-        it with minimal arguments
+        As a base class it should be able to instantiate it with minimal
+        arguments
         """
         wikidata = self.get_repo()
         page = WikibasePage(wikidata)

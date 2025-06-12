@@ -100,9 +100,9 @@ class PageWithRefs(Page):
     def ref_table(self) -> RefTable:
         """Build link reference table lazily.
 
-        This property gives a default table without any parameter set for
-        getReferences(), whereas self.get_ref_table() is able to accept
-        parameters.
+        This property gives a default table without any parameter set
+        for getReferences(), whereas self.get_ref_table() is able to
+        accept parameters.
         """
         if not hasattr(self, '_ref_table'):
             self._ref_table = self.get_ref_table()
@@ -111,8 +111,8 @@ class PageWithRefs(Page):
     def namespaces_with_ref_to_page(self, namespaces=None) -> set[Namespace]:
         """Check if current page has links from pages in namespaces.
 
-        If namespaces is None, all namespaces are checked.
-        Returns a set with namespaces where a ref to page is present.
+        If namespaces is None, all namespaces are checked. Returns a set
+        with namespaces where a ref to page is present.
 
         :param namespaces: Namespace to check
         :type namespaces: iterable of Namespace objects

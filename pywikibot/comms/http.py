@@ -164,9 +164,10 @@ def user_agent_username(username=None):
     """Reduce username to a representation permitted in HTTP headers.
 
     To achieve that, this function:
-    1) replaces spaces (' ') with '_'
-    2) encodes the username as 'utf-8' and if the username is not ASCII
-    3) URL encodes the username if it is not ASCII, or contains '%'
+
+    - replaces spaces (' ') with '_'
+    - encodes the username as 'utf-8' and if the username is not ASCII
+    - URL encodes the username if it is not ASCII, or contains '%'
     """
     if not username:
         return ''

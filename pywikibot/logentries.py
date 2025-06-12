@@ -19,12 +19,11 @@ class LogEntry(UserDict):
 
     """Generic log entry.
 
-    LogEntry parameters may be retrieved by the corresponding method
-    or the LogEntry key. The following statements are equivalent:
+    LogEntry parameters may be retrieved by the corresponding method or
+    the LogEntry key. The following statements are equivalent:
 
-    action = logentry.action()
-    action = logentry['action']
-    action = logentry.data['action']
+    action = logentry.action() action = logentry['action'] action =
+    logentry.data['action']
     """
 
     # Log type expected. None for every type, or one of the (letype) str :
@@ -130,8 +129,8 @@ class UserTargetLogEntry(LogEntry):
     def page(self) -> pywikibot.page.User:
         """Return the target user.
 
-        This returns a User object instead of the Page object returned by the
-        superclass method.
+        This returns a User object instead of the Page object returned
+        by the superclass method.
 
         :return: target user
         """
@@ -142,8 +141,8 @@ class BlockEntry(LogEntry):
 
     """Block or unblock log entry.
 
-    It might contain a block or unblock depending on the action. The duration,
-    expiry and flags are not available on unblock log entries.
+    It might contain a block or unblock depending on the action. The
+    duration, expiry and flags are not available on unblock log entries.
     """
 
     _expected_type = 'block'
@@ -163,8 +162,8 @@ class BlockEntry(LogEntry):
         """Return the blocked account or IP.
 
         :return: the Page object of username or IP if this block action
-            targets a username or IP, or the blockid if this log reflects
-            the removal of an autoblock
+            targets a username or IP, or the blockid if this log
+            reflects the removal of an autoblock
         """
         # TODO what for IP ranges ?
         if self.isAutoblockRemoval:
@@ -313,9 +312,9 @@ class LogEntryFactory:
         """Initializer.
 
         :param site: The site on which the log entries are created.
-        :param logtype: The log type of the log entries, if known in advance.
-                        If None, the Factory will fetch the log entry from
-                        the data to create each object.
+        :param logtype: The log type of the log entries, if known in
+            advance. If None, the Factory will fetch the log entry from
+            the data to create each object.
         """
         self._site = site
         if logtype is None:
@@ -330,7 +329,6 @@ class LogEntryFactory:
         """Instantiate the LogEntry object representing logdata.
 
         :param logdata: <item> returned by the api
-
         :return: LogEntry object representing logdata
         """
         return self._creator(logdata)

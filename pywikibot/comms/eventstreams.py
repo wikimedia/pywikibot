@@ -246,8 +246,8 @@ class EventStreams(GeneratorWrapper):
         If not called, most queries will continue as long as there is
         more data to be retrieved from the stream.
 
-        :param value: The value of maximum number of items to be retrieved
-            in total to set.
+        :param value: The value of maximum number of items to be
+            retrieved in total to set.
         """
         if value is not None:
             self._total = int(value)
@@ -415,11 +415,12 @@ class EventStreams(GeneratorWrapper):
 def site_rc_listener(site, total: int | None = None):
     """Yield changes received from EventStream.
 
-    :param site: the Pywikibot.Site object to yield live recent changes for
+    :param site: the Pywikibot.Site object to yield live recent changes
+        for
     :type site: Pywikibot.BaseSite
     :param total: the maximum number of changes to return
-
-    :return: pywikibot.comms.eventstream.rc_listener configured for given site
+    :return: pywikibot.comms.eventstream.rc_listener configured for
+        given site
     :raises ModuleNotFoundError: requests-sse installation is required
     """
     if isinstance(EventSource, ModuleNotFoundError):

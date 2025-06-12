@@ -1,7 +1,7 @@
 """Test aspects to allow fine grained control over what tests are executed.
 
-Several parts of the test infrastructure are implemented as mixins,
-such as API result caching and excessive test durations.
+Several parts of the test infrastructure are implemented as mixins, such
+as API result caching and excessive test durations.
 """
 #
 # (C) Pywikibot team, 2014-2025
@@ -389,8 +389,7 @@ class ForceCacheMixin(TestCaseBase):
 
     """Aggressively cached API test cases.
 
-    Patches pywikibot.data.api to aggressively cache
-    API responses.
+    Patches pywikibot.data.api to aggressively cache API responses.
     """
 
     def setUp(self) -> None:
@@ -570,8 +569,8 @@ class RequireLoginMixin(TestCaseBase):
     def setUpClass(cls) -> None:
         """Set up the test class.
 
-        Skip the test class if the user config does not have
-        a valid login to the site.
+        Skip the test class if the user config does not have a valid
+        login to the site.
         """
         super().setUpClass()
 
@@ -910,8 +909,8 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
     def setUpClass(cls) -> None:
         """Set up the test class.
 
-        Prefetch the Site object for each of the sites the test
-        class has declared are needed.
+        Prefetch the Site object for each of the sites the test class
+        has declared are needed.
         """
         super().setUpClass()
 
@@ -1263,8 +1262,8 @@ class WikibaseClientTestCase(WikibaseTestCase):
     def setUpClass(cls) -> None:
         """Set up the test class.
 
-        Checks that all sites are configured as a Wikibase client,
-        with Site.has_data_repository returning True.
+        Checks that all sites are configured as a Wikibase client, with
+        Site.has_data_repository returning True.
         """
         super().setUpClass()
 

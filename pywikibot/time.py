@@ -237,7 +237,8 @@ class Timestamp(datetime.datetime):
     def _ISO8601Format(cls, sep: str = 'T') -> str:  # noqa: N802
         """ISO8601 format string.
 
-        :param sep: one-character separator, placed between the date and time
+        :param sep: one-character separator, placed between the date and
+            time
         :return: ISO8601 format string
         """
         assert len(sep) == 1
@@ -250,7 +251,8 @@ class Timestamp(datetime.datetime):
         """Convert an ISO 8601 timestamp to a Timestamp object.
 
         :param ts: ISO 8601 timestamp or a Timestamp object already
-        :param sep: one-character separator, placed between the date and time
+        :param sep: one-character separator, placed between the date and
+            time
         :return: Timestamp object
         """
         # If inadvertently passed a Timestamp object, use replace()
@@ -314,9 +316,9 @@ class Timestamp(datetime.datetime):
     def isoformat(self, sep: str = 'T') -> str:  # type: ignore[override]
         """Convert object to an ISO 8601 timestamp accepted by MediaWiki.
 
-        datetime.datetime.isoformat does not postfix the ISO formatted date
-        with a 'Z' unless a timezone is included, which causes MediaWiki
-        ~1.19 and earlier to fail.
+        datetime.datetime.isoformat does not postfix the ISO formatted
+        date with a 'Z' unless a timezone is included, which causes
+        MediaWiki ~1.19 and earlier to fail.
         """
         return self.strftime(self._ISO8601Format(sep))
 
@@ -435,7 +437,8 @@ class TZoneFixedOffset(datetime.tzinfo):
 
     """Class building tzinfo objects for fixed-offset time zones.
 
-    :param offset: a number indicating fixed offset in minutes east from UTC
+    :param offset: a number indicating fixed offset in minutes east from
+        UTC
     :param name: a string with name of the timezone
     """
 

@@ -30,7 +30,6 @@ class Revision(Mapping):
 
        - :api:`Revisions`
        - :api:`Alldeletedrevisions`
-
     """
 
     def __init__(self, **kwargs) -> None:
