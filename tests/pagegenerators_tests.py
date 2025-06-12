@@ -1724,15 +1724,16 @@ class TestLinksearchPageGenerator(TestCase):
     """Tests for pagegenerators.LinksearchPageGenerator."""
 
     family = 'wikipedia'
-    code = 'en'
+    code = 'de'
 
-    @unittest.expectedFailure  # T396728
     def test_weblink(self) -> None:
         """Test -weblink."""
-        cases = (('wikipedia.org', 'http://wikipedia.org'),
-                 ('en.wikipedia.org', 'http://en.wikipedia.org'),
-                 ('https://fr.wikipedia.org', 'https://fr.wikipedia.org'),
-                 ('ftp://*', 'ftp://'))
+        cases = (
+            ('wikipedia.org', 'wikipedia.org'),
+            ('en.wikipedia.org', 'http://en.wikipedia.org'),
+            ('https://fr.wikipedia.org', 'https://fr.wikipedia.org'),
+            ('ftp://*', 'ftp://')
+        )
 
         for search, expected in cases:
             with self.subTest(search=search, expected=expected):
@@ -1757,7 +1758,6 @@ class TestLinksearchPageGenerator(TestCase):
                                                    protocol='https',
                                                    site=self.site)
 
-    @unittest.skip('Needs to be adapted for T14810')
     def test_double_same_protocols(self) -> None:
         """Test LinksearchPageGenerator with two same protocols."""
         gen = pagegenerators.LinksearchPageGenerator('https://w.wiki',
