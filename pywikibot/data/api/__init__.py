@@ -61,10 +61,10 @@ def _invalidate_superior_cookies(family) -> None:
 
 # Bug: T113120, T228841
 # Subclassing necessary to fix bug of the email package in Python 3:
-# see https://bugs.python.org/issue19003
-# see https://bugs.python.org/issue18886
+# see https://github.com/python/cpython/issues/63203
+# see https://github.com/python/cpython/issues/63086
 # The following solution might be removed if the bug is fixed for
-# Python versions which are supported by PWB, probably with Python 3.5
+# Python versions which are supported by PWB
 
 class CTEBinaryBytesGenerator(BytesGenerator):
 
