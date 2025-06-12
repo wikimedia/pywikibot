@@ -28,7 +28,7 @@ class EchoMixin:
     def notifications(self, **kwargs):
         """Yield Notification objects from the Echo extension.
 
-        :keyword Optional[str] format: If specified, notifications will
+        :keyword str | None format: If specified, notifications will
             be returned formatted this way. Its value is either ``model``,
             ``special`` or ``None``. Default is ``special``.
 

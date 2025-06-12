@@ -263,10 +263,10 @@ def request(site: pywikibot.site.BaseSite,
 
     :param site: The Site to connect to
     :param uri: the URI to retrieve
-    :keyword Optional[CodecInfo, str] charset: Either a valid charset
-        (usable for str.decode()) or None to automatically chose the
-        charset from the returned header (defaults to latin-1)
-    :keyword Optional[str] protocol: a url scheme
+    :keyword CodecInfo or str or None charset: Either a valid charset
+        (usable for `str.decode()`) or None to automatically chose the
+        charset from the returned header (defaults to latin-1).
+    :keyword str | None protocol: a url scheme
     :return: The received data Response
     """
     kwargs.setdefault('verify', site.verify_SSL_certificate())

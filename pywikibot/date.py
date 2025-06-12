@@ -1,6 +1,6 @@
 """Date data and manipulation module."""
 #
-# (C) Pywikibot team, 2003-2024
+# (C) Pywikibot team, 2003-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -475,26 +475,24 @@ def dh(value: int, pattern: str, encf: encf_type, decf: decf_type,
 
         lambda v: dh(v, 'pattern string', encf, decf)
 
-    :param encf:
-        Converts from an integer parameter to another integer or a tuple of
-        integers. Depending on the pattern, each integer will be converted to a
-        proper string representation, and will be passed as a format argument
-        to the pattern::
-
-                    pattern % encf(value)
-
-        This function is a complement of decf.
-
     .. versionchanged:: 9.0
        *filter* parameter was renamed to *filter_func*
 
-    :param decf:
-        Converts a tuple/list of non-negative integers found in the original
-        value string
-        into a normalized value. The normalized value can be passed right back
-        into dh() to produce the original string. This function is a complement
-        of encf. dh() interprets %d as a decimal and %s as a roman
-        numeral number.
+    :param encf: Converts from an integer parameter to another integer
+        or a tuple of integers. Depending on the pattern, each integer
+        will be converted to a proper string representation, and will be
+        passed as a format argument to the pattern::
+
+            pattern % encf(value)
+
+        This function is a complement of *decf*.
+
+    :param decf: Converts a tuple or list of non-negative integers found
+        in the original value string into a normalized value. The
+        normalized value can be passed right back into :func:`dh` to
+        produce the original string. This function is a complement of
+        *encf*. :func:`dh` interprets ``%d`` as a decimal and ``%s`` as
+        a roman numeral number.
     """
     _compPattern, strPattern, decoders = escapePattern2(pattern)
     # Encode an integer value into a textual form.
