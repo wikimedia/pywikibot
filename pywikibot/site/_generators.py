@@ -533,7 +533,7 @@ class GeneratorsMixin:
     ) -> Iterable[pywikibot.Page]:
         """Iterate pages transcluded (not just linked) on the page.
 
-        .. note: You should not use this method directly; use
+        .. note:: You should not use this method directly; use
            :meth:`pywikibot.Page.itertemplates` instead.
 
         .. seealso::
