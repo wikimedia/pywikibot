@@ -120,7 +120,7 @@ class LoginManager:
     def __repr__(self) -> str:
         """Return representation string for LoginManager.
 
-        ..versionadded:: 10.0
+        .. versionadded:: 10.0
         """
         return f'{type(self).__name__}(user={self.username!r})'
 
