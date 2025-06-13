@@ -156,13 +156,6 @@ class WikiBlameMixin:
             percentage edits.
         :param max_pct_sum: Only return authors until the prcentage sum
             reached *max_pct_sum*.
-        :param revid: The revision id for the authors should be found.
-            If ``None`` or ``0``, the latest revision is be used. Cannot
-            be used together with *date*.
-        :param date: The revision date for the authors should be found.
-            If ``None``, it will be ignored. Cannot be used together
-            with *revid*. If the parameter is a string it must be given
-            in the form ``YYYY-MM-DD``
         :return: Character count and percentage of edits for each
             username.
 
