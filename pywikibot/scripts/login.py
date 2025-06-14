@@ -9,6 +9,8 @@ The following parameters are supported:
 -all         Try to log in on all sites where a username is defined in
              user config file (user-config.py).
 
+-cookies     Only login from cookies file, don't ask for password
+
 -logout      Log out of the current site. Combine with ``-all`` to log
              out of all sites, or with :ref:`global options` ``-family``,
              ``-lang`` or ``-site`` to log out of a specific site.
@@ -46,6 +48,8 @@ subdirectory.
    *-async* option was added.
 .. versionchanged:: 10.2
    wildcard site codes in ``usernames`` dict are supported.
+.. versionchanged:: 10.3
+   the -cookies option
 """
 #
 # (C) Pywikibot team, 2003-2025
@@ -95,7 +99,8 @@ def _oauth_login(site) -> None:
         )
 
 
-def login_one_site(code, family, oauth, logout, autocreate) -> None:
+def login_one_site(code: str, family: str, oauth: bool, logout: bool,
+                   autocreate: bool, cookies: bool) -> None:
     """Login on one site."""
     try:
         site = pywikibot.Site(code, family)
@@ -112,7 +117,7 @@ def login_one_site(code, family, oauth, logout, autocreate) -> None:
         site.logout()
     else:
         try:
-            site.login(autocreate=autocreate)
+            site.login(autocreate=autocreate, cookie_only=cookies)
         except NoUsernameError as e:
             pywikibot.error(e)
 
@@ -137,6 +142,7 @@ def main(*args: str) -> None:
     oauth = False
     autocreate = False
     asynchronous = False
+    cookies = False
     unknown_args = []
     for arg in pywikibot.handle_args(args):
         if arg == '-all':
@@ -149,6 +155,8 @@ def main(*args: str) -> None:
             autocreate = True
         elif arg == '-async':
             asynchronous = True
+        elif arg == '-cookies':
+            cookies = True
         else:
             unknown_args.append(arg)
 
@@ -161,7 +169,7 @@ def main(*args: str) -> None:
         site = pywikibot.Site()
         namedict = {site.family.name: {site.code: None}}
 
-    params = oauth, logout, autocreate
+    params = oauth, logout, autocreate, cookies
     context = (nullcontext(),
                BoundedPoolExecutor('ThreadPoolExecutor'))[asynchronous]
     with context as executor:
