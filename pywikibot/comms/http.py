@@ -35,6 +35,7 @@ import atexit
 import codecs
 import re
 import sys
+import threading
 import traceback
 from contextlib import suppress
 from http import HTTPStatus, cookiejar
@@ -67,7 +68,12 @@ class PywikibotCookieJar(cookiejar.LWPCookieJar):
     """CookieJar which create the filename and checks file permissions.
 
     .. versionadded:: 8.0
+    .. versionchanged:: 10.2
+       use `threading.Lock` in :meth:`load` and :meth`save` to be thread
+       safe.
     """
+
+    _lock = threading.Lock()  # Class-level lock shared across all instances
 
     def load(self, user: str = '', *args, **kwargs) -> None:
         """Loads cookies from a file.
@@ -81,7 +87,8 @@ class PywikibotCookieJar(cookiejar.LWPCookieJar):
         self.filename = config.datafilepath(f'pywikibot{_user}.lwp')
 
         try:
-            super().load(*args, **kwargs)
+            with self._lock:
+                super().load(*args, **kwargs)
         except (cookiejar.LoadError, FileNotFoundError):
             debug(f'Loading cookies for user {user} failed.')
         else:
@@ -96,9 +103,10 @@ class PywikibotCookieJar(cookiejar.LWPCookieJar):
         :raises ValueError: a filename was not supplied; :meth:`load`
             must be called first.
         """
-        if self.filename:
-            file_mode_checker(self.filename, create=True)
-        super().save(*args, **kwargs)
+        with self._lock:
+            if self.filename:
+                file_mode_checker(self.filename, create=True)
+            super().save(*args, **kwargs)
 
 
 #: global :class:`PywikibotCookieJar` instance.
