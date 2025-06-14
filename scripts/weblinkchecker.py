@@ -103,13 +103,12 @@ Loads all wiki pages where dead links were found during a prior run:
     python pwb.py weblinkchecker -repeat
 """
 #
-# (C) Pywikibot team, 2005-2024
+# (C) Pywikibot team, 2005-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
-import codecs
 import pickle
 import re
 import threading
@@ -378,7 +377,7 @@ class History:
             'deadlinks',
             f'results-{self.site.family.name}-{self.site.lang}.txt'
         )
-        with codecs.open(txtfilename, 'a', 'utf-8') as txtfile:
+        with open(txtfilename, 'a', encoding='utf-8') as txtfile:
             self.log_count += 1
             if self.log_count % 30 == 0:
                 # insert a caption
