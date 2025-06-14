@@ -1,6 +1,24 @@
 Release History
 ===============
 
+10.2.0
+------
+*14 June 2025*
+
+* Use Lock object in :class:`comms.http.PywikibotCookieJar` for thread-safe saving (:phab:`T396309`)
+* Raise TypeError instead of ValueError in :func:`i18n.translate` if *parameter* is not a mapping
+* Recognise wildcard in :mod:`config.usernames<config>` when running
+  :mod:`login<pywikibot.scripts.login>` script (:phab:`T110411`)
+* Search for http and https by default in :meth:`Site.exturlusage()
+  <.site._generators.GeneratorsMixin.exturlusage>` (:phab:`T396280`)
+* Add login methods overview to :mod:`login` module (:phab:`T396204`)
+* Enable EmailAuth with :class:`login.ClientLoginManager` (:phab:`T395703`)
+* Move :mod:`tools.threading.RLock<tools.threading>` to :mod:`backports` module (:phab:`T395182`)
+* Only show the description passed to :class:`specialbots.UploadRobot` if it is to be verified (:phab:`T394895`)
+* i18n updates
+* Add support for Python 3.15 (:phab:`T395177`)
+
+
 10.1.0
 ------
 *18 May 2025*

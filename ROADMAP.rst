@@ -1,22 +1,17 @@
 Current Release Changes
 =======================
 
-* Use Lock object in :class:`comms.http.PywikibotCookieJar` for thread-safe saving (:phab:`T396309`)
-* Raise TypeError instead of ValueError in :func:`i18n.translate` if *parameter* is not a mapping
-* Recognise wildcard in :mod:`config.usernames<config>` when running
-  :mod:`login<pywikibot.scripts.login>` script (:phab:`T110411`)
-* Search for http and https by default in :meth:`Site.exturlusage()
-  <.site._generators.GeneratorsMixin.exturlusage>` (:phab:`T396280`)
-* Add login methods overview to :mod:`login` module (:phab:`T396204`)
-* Enable EmailAuth with :class:`login.ClientLoginManager` (:phab:`T395703`)
-* Move :mod:`tools.threading.RLock<tools.threading>` to :mod:`backports` module (:phab:`T395182`)
-* Only show the description passed to :class:`specialbots.UploadRobot` if it is to be verified (:phab:`T394895`)
-* Add support for Python 3.15 (:phab:`T395177`)
-
+* (no changes yet)
 
 Current Deprecations
 ====================
 
+* 10.2.0: :mod:`tools.threading.RLock<tools.threading>` is deprecated and moved to :mod:`backports`
+  module. The :meth:`backports.RLock.count` method is also deprecated. For Python 3.14+ use ``RLock``
+  from Python library ``threading`` instead. (:phab:`T395182`)
+* 10.1.0: *revid* and *date* parameters of :meth:`Page.authorship()
+  <page._toolforge.WikiBlameMixin.authorship>` were dropped
+* 10.0.0: *last_id* of :class:`comms.eventstreams.EventStreams` was renamed to *last_event_id* (:phab:`T309380`)
 * 10.0.0: 'millenia' argument for *precision* parameter of :class:`pywikibot.WbTime` is deprecated;
   'millennium' must be used instead.
 * 10.0.0: *includeredirects* parameter of :func:`pagegenerators.AllpagesPageGenerator` and

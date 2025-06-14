@@ -73,7 +73,7 @@ class WikiBlameMixin:
         return collections.Counter(
             {user: int(cnt) for user, (_, cnt) in self.authorship(5).items()})
 
-    @remove_last_args(['revid', 'date'])  # since 10.1
+    @remove_last_args(['revid', 'date'])  # since 10.1.0
     def authorship(
         self,
         n: int | None = None,
