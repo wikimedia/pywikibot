@@ -1,6 +1,12 @@
 Current Release Changes
 =======================
 
+* Use Lock object in :class:`comms.http.PywikibotCookieJar` for thread-safe saving (:phab:`T396309`)
+* Raise TypeError instead of ValueError in :func:`i18n.translate` if *parameter* is not a mapping
+* Recognise wildcard in :mod:`config.usernames<config>` when running
+  :mod:`login<pywikibot.scripts.login>` script (:phab:`T110411`)
+* Search for http and https by default in :meth:`Site.exturlusage()
+  <.site._generators.GeneratorsMixin.exturlusage>` (:phab:`T396280`)
 * Add login methods overview to :mod:`login` module (:phab:`T396204`)
 * Enable EmailAuth with :class:`login.ClientLoginManager` (:phab:`T395703`)
 * Move :mod:`tools.threading.RLock<tools.threading>` to :mod:`backports` module (:phab:`T395182`)

@@ -7,6 +7,7 @@ Scripts Changelog
 noreferences
 ^^^^^^^^^^^^
 
+* Changing sections order for references
 * Fix missing commas in L10N dicts
 
 10.1.0
